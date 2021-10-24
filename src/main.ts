@@ -17,8 +17,10 @@ async function bootstrap() {
   );
   const options = new DocumentBuilder()
     .setTitle('Refresh Tokens')
-    .setDescription('Rest API Documentation')
+    .setDescription('SST Rest API Documentation')
     .setVersion('1.0')
+    .addTag('SST API')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, options);
