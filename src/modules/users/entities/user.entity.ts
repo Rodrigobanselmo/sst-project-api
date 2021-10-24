@@ -1,6 +1,7 @@
-import { User } from '.prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
+
+import { User } from '.prisma/client';
 
 export class UserEntity implements User {
   @ApiProperty({ description: 'The id of the User' })
