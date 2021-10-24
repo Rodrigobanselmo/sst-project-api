@@ -1,8 +1,10 @@
-import { NestFactory } from '@nestjs/core';
+import { InternalServerExceptionFilter } from './shared/filters/internal-server-exception.filter';
+import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 
 import { AppModule } from './app.module';
+import { PrismaDbExceptionFilter } from './shared/filters/prisma-db-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -25,6 +27,9 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api', app, document);
+
+  app.useGlobalFilters(new InternalServerExceptionFilter());
+  app.useGlobalFilters(new PrismaDbExceptionFilter());
 
   app.enableCors();
   await app.listen(process.env.PORT);
