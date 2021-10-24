@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { HashProvider } from 'src/shared/providers/HashProvider/implementations/HashProvider';
+
+import { HashProvider } from '../../../../shared/providers/HashProvider/implementations/HashProvider';
 import { CreateUserDto } from '../../dto/create-user.dto';
 import { UsersRepository } from '../../repositories/implementations/UsersRepository';
 

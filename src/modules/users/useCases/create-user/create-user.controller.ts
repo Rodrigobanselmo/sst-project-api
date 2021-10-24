@@ -5,7 +5,7 @@ import { classToClass } from 'class-transformer';
 import { CreateUserDto } from '../../dto/create-user.dto';
 import { CreateUserService } from './create-user.service';
 
-@Controller('create-user')
+@Controller('users')
 export class CreateUserController {
   constructor(private readonly createUserService: CreateUserService) {}
 
