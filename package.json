@@ -26,6 +26,7 @@
     "@nestjs/platform-express": "^8.0.0",
     "@nestjs/swagger": "^5.1.4",
     "@prisma/client": "^3.3.0",
+    "dayjs": "^1.10.7",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
