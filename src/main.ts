@@ -17,9 +17,7 @@ async function bootstrap() {
   );
   const options = new DocumentBuilder()
     .setTitle('Refresh Tokens')
-    .setDescription(
-      'Full authentication Rest API with typeorm and NestJs using refresh token strategy ',
-    )
+    .setDescription('Rest API Documentation')
     .setVersion('1.0')
     .build();
 
