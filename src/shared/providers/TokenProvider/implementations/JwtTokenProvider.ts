@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 import { DayJSProvider } from '../../DateProvider/implementations/DayJSProvider';
-import { IPayloadToken, ITokenProvider } from '../models/ITokenProvider';
+import { IPayloadToken, ITokenProvider } from '../models/ITokenProvider.types';
 
 @Injectable()
 export class TokenProvider implements ITokenProvider {
