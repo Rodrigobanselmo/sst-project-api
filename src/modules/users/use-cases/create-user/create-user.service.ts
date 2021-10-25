@@ -11,7 +11,7 @@ export class CreateUserService {
     private readonly hashProvider: HashProvider,
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
+  async execute(createUserDto: CreateUserDto) {
     const passHash = await this.hashProvider.createHash(createUserDto.password);
 
     const user = await this.userRepository.create({

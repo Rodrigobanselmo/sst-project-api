@@ -12,8 +12,24 @@ class DayJSProvider implements IDateProvider {
   addHours(date: Date, hours: number): Date {
     return dayjs(date).add(hours, 'hours').toDate();
   }
+
   addDay(date: Date, days: number): Date {
     return dayjs(date).add(days, 'days').toDate();
+  }
+
+  addTime(date: Date, time: string): Date {
+    const lastChar = time.slice(-1);
+    const timeValue = Number(time.slice(0, -1));
+
+    if (!timeValue) {
+      return this.dateNow();
+    }
+    if (lastChar === 'y') return dayjs(date).add(timeValue, 'years').toDate();
+    if (lastChar === 'm') return dayjs(date).add(timeValue, 'months').toDate();
+    if (lastChar === 'w') return dayjs(date).add(timeValue, 'weeks').toDate();
+    if (lastChar === 'd') return dayjs(date).add(timeValue, 'days').toDate();
+    if (lastChar === 'h') return dayjs(date).add(timeValue, 'hours').toDate();
+    return dayjs(date).add(timeValue, 'seconds').toDate();
   }
 
   compareIfBefore(start_date: Date, end_date: Date): boolean {

@@ -13,6 +13,6 @@ export class CreateUserController {
   @ApiTags('users')
   @Post('create')
   async create(@Body() createUserDto: CreateUserDto) {
-    return classToClass(this.createUserService.create(createUserDto));
+    return classToClass(this.createUserService.execute(createUserDto));
   }
 }
