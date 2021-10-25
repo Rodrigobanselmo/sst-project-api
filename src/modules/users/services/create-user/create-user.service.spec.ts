@@ -1,4 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
+
+import { HashProvider } from '../../../../shared/providers/HashProvider/implementations/HashProvider';
+import { UsersRepository } from '../../repositories/implementations/UsersRepository';
 import { CreateUserService } from './create-user.service';
 
 describe('CreateUserService', () => {
@@ -6,7 +9,16 @@ describe('CreateUserService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [CreateUserService],
+      providers: [
+        CreateUserService,
+        HashProvider,
+        {
+          provide: UsersRepository,
+          useValue: {
+            create: jest.fn().mockResolvedValue({}),
+          } as Partial<UsersRepository>,
+        },
+      ],
     }).compile();
 
     service = module.get<CreateUserService>(CreateUserService);
@@ -14,5 +26,10 @@ describe('CreateUserService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+  });
+
+  it('should return created user', async () => {
+    const user = await service.execute({ password: '123456' } as any);
+    expect(user).toEqual({});
   });
 });
