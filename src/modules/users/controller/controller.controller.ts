@@ -1,7 +1,7 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { classToClass } from 'class-transformer';
-import { Public } from 'src/shared/decorators/public.decorator';
+import { Public } from '../../../shared/decorators/public.decorator';
 
 import { CreateUserDto } from '../dto/create-user.dto';
 import { CreateUserService } from '../services/create-user/create-user.service';

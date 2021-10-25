@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { classToClass } from 'class-transformer';
-import { UsersRepository } from 'src/modules/users/repositories/implementations/UsersRepository';
+import { UsersRepository } from '../../../../modules/users/repositories/implementations/UsersRepository';
 
 import { HashProvider } from '../../../../shared/providers/HashProvider/implementations/HashProvider';
 import { TokenProvider } from '../../../../shared/providers/TokenProvider/implementations/JwtTokenProvider';

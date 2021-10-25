@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { DayJSProvider } from 'src/shared/providers/DateProvider/implementations/DayJSProvider';
-import { HashProvider } from 'src/shared/providers/HashProvider/implementations/HashProvider';
-import { TokenProvider } from 'src/shared/providers/TokenProvider/implementations/JwtTokenProvider';
+import { DayJSProvider } from '../../shared/providers/DateProvider/implementations/DayJSProvider';
+import { HashProvider } from '../../shared/providers/HashProvider/implementations/HashProvider';
+import { TokenProvider } from '../../shared/providers/TokenProvider/implementations/JwtTokenProvider';
 import { UsersRepository } from '../users/repositories/implementations/UsersRepository';
 
 import { AuthController } from './controller/auth.controller';
