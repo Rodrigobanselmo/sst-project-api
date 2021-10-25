@@ -28,7 +28,9 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api', app, document);
 
-  app.useGlobalFilters(new InternalServerExceptionFilter());
+  if (process.env.NODE_ENV === 'production')
+    app.useGlobalFilters(new InternalServerExceptionFilter());
+
   app.useGlobalFilters(new PrismaDbExceptionFilter());
 
   app.enableCors();
