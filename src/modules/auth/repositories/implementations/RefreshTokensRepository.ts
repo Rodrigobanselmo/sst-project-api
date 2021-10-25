@@ -51,7 +51,6 @@ export class RefreshTokensRepository implements IRefreshTokensRepository {
       },
     });
 
-    // TODO: may return sensitive data
     return deletedResult;
   }
 
