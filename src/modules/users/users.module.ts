@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 
 import { HashProvider } from '../../shared/providers/HashProvider/implementations/HashProvider';
+import { UsersController } from './controller/controller.controller';
 import { UsersRepository } from './repositories/implementations/UsersRepository';
-import { CreateUserController } from './use-cases/create-user/create-user.controller';
-import { CreateUserService } from './use-cases/create-user/create-user.service';
+import { CreateUserService } from './services/create-user/create-user.service';
 
 @Module({
-  controllers: [CreateUserController],
+  controllers: [UsersController],
   providers: [HashProvider, UsersRepository, CreateUserService],
   exports: [UsersRepository],
 })
