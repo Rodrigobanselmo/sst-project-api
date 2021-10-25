@@ -5,7 +5,7 @@ import { PrismaService } from '../../../../prisma/prisma.service';
 import { CreateUserDto } from '../../dto/create-user.dto';
 import { UpdateUserDto } from '../../dto/update-user.dto';
 import { UserEntity } from '../../entities/user.entity';
-import { IUsersRepository } from '../IUsersRepository';
+import { IUsersRepository } from '../IUsersRepository.types';
 
 @Injectable()
 export class UsersRepository implements IUsersRepository {
