@@ -1,4 +1,15 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Delete } from '@nestjs/common';
 
-@Controller('delete-all-expired-refresh-tokens')
-export class DeleteAllExpiredRefreshTokensController {}
+import { DeleteAllExpiredRefreshTokensService } from './delete-all-expired-refresh-tokens.service';
+
+@Controller('auth')
+export class DeleteAllExpiredRefreshTokensController {
+  constructor(
+    private readonly deleteAllExpiredRefreshTokensService: DeleteAllExpiredRefreshTokensService,
+  ) {}
+
+  @Delete('expired-refresh-tokens')
+  deleteAll() {
+    return this.deleteAllExpiredRefreshTokensService.execute();
+  }
+}
