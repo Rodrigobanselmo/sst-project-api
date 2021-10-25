@@ -24,5 +24,6 @@ import { RolesGuard } from './shared/guards/roles.guard';
       useClass: PermissionsGuard,
     },
   ],
+  controllers: [],
 })
 export class AppModule {}
