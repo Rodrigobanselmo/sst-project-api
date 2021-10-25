@@ -1,7 +1,8 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { Public } from '../../../../shared/decorators/public.decorator';
-import { LoginUserDto } from '../../dto/login-user.dto';
-import { SessionService } from './session.service';
+
+import { Public } from '../../../../../shared/decorators/public.decorator';
+import { LoginUserDto } from '../../../dto/login-user.dto';
+import { SessionService } from '../service/session.service';
 
 @Controller('auth')
 export class SessionController {

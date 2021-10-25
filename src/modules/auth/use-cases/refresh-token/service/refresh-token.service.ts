@@ -7,8 +7,8 @@ import { classToClass } from 'class-transformer';
 import { UsersRepository } from 'src/modules/users/repositories/implementations/UsersRepository';
 import { TokenProvider } from 'src/shared/providers/TokenProvider/implementations/JwtTokenProvider';
 
-import { PayloadTokenDto } from '../../dto/payload-token.dto';
-import { RefreshTokensRepository } from '../../repositories/implementations/RefreshTokensRepository';
+import { PayloadTokenDto } from '../../../dto/payload-token.dto';
+import { RefreshTokensRepository } from '../../../repositories/implementations/RefreshTokensRepository';
 
 @Injectable()
 export class RefreshTokenService {

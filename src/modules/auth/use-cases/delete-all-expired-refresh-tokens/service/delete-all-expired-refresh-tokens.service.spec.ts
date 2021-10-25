@@ -9,7 +9,9 @@ describe('DeleteAllExpiredRefreshTokensService', () => {
       providers: [DeleteAllExpiredRefreshTokensService],
     }).compile();
 
-    service = module.get<DeleteAllExpiredRefreshTokensService>(DeleteAllExpiredRefreshTokensService);
+    service = module.get<DeleteAllExpiredRefreshTokensService>(
+      DeleteAllExpiredRefreshTokensService,
+    );
   });
 
   it('should be defined', () => {

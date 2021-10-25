@@ -8,38 +8,18 @@ import { TokenProvider } from '../../shared/providers/TokenProvider/implementati
 import { UsersRepository } from '../users/repositories/implementations/UsersRepository';
 import { RefreshTokensRepository } from './repositories/implementations/RefreshTokensRepository';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { DeleteAllExpiredRefreshTokensController } from './use-cases/delete-all-expired-refresh-tokens/delete-all-expired-refresh-tokens.controller';
-import { DeleteAllExpiredRefreshTokensService } from './use-cases/delete-all-expired-refresh-tokens/delete-all-expired-refresh-tokens.service';
-import { RefreshTokenController } from './use-cases/refresh-token/refresh-token.controller';
-import { RefreshTokenService } from './use-cases/refresh-token/refresh-token.service';
-import { SessionController } from './use-cases/session/session.controller';
-import { SessionService } from './use-cases/session/session.service';
+import { DeleteAllExpiredRefreshTokensModule } from './use-cases/delete-all-expired-refresh-tokens/delete-all-expired-refresh-tokens.module';
+import { RefreshTokensModule } from './use-cases/refresh-token/refresh-token.module';
+import { SessionModule } from './use-cases/session/session.module';
 
 @Module({
   imports: [
+    DeleteAllExpiredRefreshTokensModule,
+    RefreshTokensModule,
     PassportModule,
-    JwtModule.register({
-      secret: process.env.TOKEN_SECRET,
-      signOptions: {
-        expiresIn: process.env.TOKEN_EXPIRES,
-      },
-    }),
+    SessionModule,
   ],
-  controllers: [
-    SessionController,
-    RefreshTokenController,
-    DeleteAllExpiredRefreshTokensController,
-  ],
-  providers: [
-    SessionService,
-    DayJSProvider,
-    JwtStrategy,
-    HashProvider,
-    TokenProvider,
-    UsersRepository,
-    RefreshTokensRepository,
-    RefreshTokenService,
-    DeleteAllExpiredRefreshTokensService,
-  ],
+  controllers: [],
+  providers: [JwtStrategy],
 })
 export class AuthModule {}
