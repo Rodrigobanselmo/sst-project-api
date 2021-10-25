@@ -6,11 +6,11 @@ import {
 import { classToClass } from 'class-transformer';
 import { UsersRepository } from 'src/modules/users/repositories/implementations/UsersRepository';
 
-import { HashProvider } from '../../../../../shared/providers/HashProvider/implementations/HashProvider';
-import { TokenProvider } from '../../../../../shared/providers/TokenProvider/implementations/JwtTokenProvider';
-import { LoginUserDto } from '../../../dto/login-user.dto';
-import { PayloadTokenDto } from '../../../dto/payload-token.dto';
-import { RefreshTokensRepository } from '../../../repositories/implementations/RefreshTokensRepository';
+import { HashProvider } from '../../../../shared/providers/HashProvider/implementations/HashProvider';
+import { TokenProvider } from '../../../../shared/providers/TokenProvider/implementations/JwtTokenProvider';
+import { LoginUserDto } from '../../dto/login-user.dto';
+import { PayloadTokenDto } from '../../dto/payload-token.dto';
+import { RefreshTokensRepository } from '../../repositories/implementations/RefreshTokensRepository';
 
 @Injectable()
 export class SessionService {

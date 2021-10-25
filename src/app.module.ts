@@ -10,7 +10,6 @@ import { RolesGuard } from './shared/guards/roles.guard';
 
 @Module({
   imports: [PrismaModule, UsersModule, AuthModule],
-  controllers: [],
   providers: [
     {
       provide: APP_GUARD,

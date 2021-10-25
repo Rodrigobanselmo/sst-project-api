@@ -1,9 +1,9 @@
-import { InternalServerExceptionFilter } from './shared/filters/internal-server-exception.filter';
-import { HttpAdapterHost, NestFactory } from '@nestjs/core';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { AppModule } from './app.module';
+import { InternalServerExceptionFilter } from './shared/filters/internal-server-exception.filter';
 import { PrismaDbExceptionFilter } from './shared/filters/prisma-db-exception.filter';
 
 async function bootstrap() {
@@ -18,10 +18,10 @@ async function bootstrap() {
     }),
   );
   const options = new DocumentBuilder()
-    .setTitle('Refresh Tokens')
+    .setTitle('SST API')
     .setDescription('SST Rest API Documentation')
     .setVersion('1.0')
-    .addTag('SST API')
+    .addTag('Software')
     .addBearerAuth()
     .build();
 

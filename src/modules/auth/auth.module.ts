@@ -1,25 +1,39 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-
-import { DayJSProvider } from '../../shared/providers/DateProvider/implementations/DayJSProvider';
-import { HashProvider } from '../../shared/providers/HashProvider/implementations/HashProvider';
-import { TokenProvider } from '../../shared/providers/TokenProvider/implementations/JwtTokenProvider';
+import { DayJSProvider } from 'src/shared/providers/DateProvider/implementations/DayJSProvider';
+import { HashProvider } from 'src/shared/providers/HashProvider/implementations/HashProvider';
+import { TokenProvider } from 'src/shared/providers/TokenProvider/implementations/JwtTokenProvider';
 import { UsersRepository } from '../users/repositories/implementations/UsersRepository';
+
+import { AuthController } from './controller/auth.controller';
 import { RefreshTokensRepository } from './repositories/implementations/RefreshTokensRepository';
+import { DeleteAllExpiredService } from './services/delete-all-expired/delete-all-expired.service';
+import { RefreshTokenService } from './services/refresh-token/refresh-token.service';
+import { SessionService } from './services/session/session.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { DeleteAllExpiredRefreshTokensModule } from './use-cases/delete-all-expired-refresh-tokens/delete-all-expired-refresh-tokens.module';
-import { RefreshTokensModule } from './use-cases/refresh-token/refresh-token.module';
-import { SessionModule } from './use-cases/session/session.module';
 
 @Module({
   imports: [
-    DeleteAllExpiredRefreshTokensModule,
-    RefreshTokensModule,
     PassportModule,
-    SessionModule,
+    JwtModule.register({
+      secret: process.env.TOKEN_SECRET,
+      signOptions: {
+        expiresIn: process.env.TOKEN_EXPIRES,
+      },
+    }),
   ],
-  controllers: [],
-  providers: [JwtStrategy],
+  controllers: [AuthController],
+  providers: [
+    SessionService,
+    RefreshTokenService,
+    DeleteAllExpiredService,
+    UsersRepository,
+    HashProvider,
+    DayJSProvider,
+    RefreshTokensRepository,
+    TokenProvider,
+    JwtStrategy,
+  ],
 })
 export class AuthModule {}
