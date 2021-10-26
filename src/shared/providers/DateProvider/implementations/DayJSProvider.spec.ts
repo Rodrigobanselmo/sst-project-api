@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import dayjs from 'dayjs';
-import { DayJSProvider } from '../../../../shared/providers/DateProvider/implementations/DayJSProvider';
+import { DayJSProvider } from './DayJSProvider';
 
 describe('DayJSProvider', () => {
   let dayJSProvider: DayJSProvider;
