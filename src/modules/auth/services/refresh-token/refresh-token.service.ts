@@ -25,6 +25,10 @@ export class RefreshTokenService {
       throw new UnauthorizedException('jwt expired');
     }
 
+    if (sub === 'invalid') {
+      throw new UnauthorizedException('invalid jwt');
+    }
+
     const userId = Number(sub);
 
     const userRefreshToken =

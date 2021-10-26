@@ -20,7 +20,6 @@ export class JwtTokenProvider implements ITokenProvider {
     const secret_refresh_token = process.env.REFRESH_TOKEN_SECRET;
     const expires_in_refresh_token = process.env.REFRESH_TOKEN_EXPIRES;
 
-    console.log(`secret_refresh_token`, secret_refresh_token);
     const dateNow = this.dateProvider.dateNow();
     const lastChar = expires_in_refresh_token.slice(-1);
     const timeValue = Number(expires_in_refresh_token.slice(0, -1));
@@ -34,7 +33,7 @@ export class JwtTokenProvider implements ITokenProvider {
     const refresh_token = this.jwtService.sign(
       { sub: userId },
       {
-        secret: secret_refresh_token || 'secret',
+        secret: secret_refresh_token,
         expiresIn: expires_in_refresh_token,
       },
     );
@@ -45,7 +44,7 @@ export class JwtTokenProvider implements ITokenProvider {
   public verifyIsValidToken(
     refresh_token: string,
     secret_type?: 'refresh' | 'token',
-  ): number | 'expired' {
+  ): number | 'expired' | 'invalid' {
     let secret: string;
 
     if (secret_type === 'refresh') {
@@ -62,6 +61,9 @@ export class JwtTokenProvider implements ITokenProvider {
     } catch (err) {
       if (err.message === 'jwt expired') {
         return 'expired';
+      }
+      if (err.message === 'invalid signature') {
+        return 'invalid';
       }
     }
   }
