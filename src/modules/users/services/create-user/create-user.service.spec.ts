@@ -11,12 +11,17 @@ describe('CreateUserService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CreateUserService,
-        HashProvider,
         {
           provide: UsersRepository,
           useValue: {
             create: jest.fn().mockResolvedValue({}),
           } as Partial<UsersRepository>,
+        },
+        {
+          provide: HashProvider,
+          useValue: {
+            createHash: jest.fn().mockResolvedValue('string'),
+          } as Partial<HashProvider>,
         },
       ],
     }).compile();
