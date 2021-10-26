@@ -19,10 +19,6 @@ export class RefreshTokenService {
   ) {}
 
   async execute(refresh_token: string) {
-    if (!refresh_token) {
-      throw new HttpException('Token not present!', 401);
-    }
-
     const sub = this.tokenProvider.verifyIsValidToken(refresh_token, 'refresh');
 
     if (sub === 'expired') {
@@ -55,7 +51,7 @@ export class RefreshTokenService {
     const [new_refresh_token, refreshTokenExpiresDate] =
       this.tokenProvider.generateRefreshToken(user.id);
 
-    await this.refreshTokensRepository.create(
+    const refreshToken = await this.refreshTokensRepository.create(
       new_refresh_token,
       user.id,
       refreshTokenExpiresDate,
@@ -64,7 +60,7 @@ export class RefreshTokenService {
     await this.refreshTokensRepository.deleteById(userRefreshToken.id);
 
     return {
-      refresh_token: new_refresh_token,
+      refresh_token: refreshToken.refresh_token,
       token: token,
       user: classToClass(user),
     };
