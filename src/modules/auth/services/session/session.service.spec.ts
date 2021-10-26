@@ -2,7 +2,7 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersRepository } from '../../../../modules/users/repositories/implementations/UsersRepository';
 import { HashProvider } from '../../../../shared/providers/HashProvider/implementations/HashProvider';
-import { TokenProvider } from '../../../../shared/providers/TokenProvider/implementations/JwtTokenProvider';
+import { JwtTokenProvider } from '../../../../shared/providers/TokenProvider/implementations/JwtTokenProvider';
 import { RefreshTokensRepository } from '../../repositories/implementations/RefreshTokensRepository';
 import { SessionService } from './session.service';
 
@@ -18,18 +18,18 @@ describe('SessionService', () => {
         {
           provide: HashProvider,
           useValue: {
-            createHash: jest.fn().mockReturnValue('string'),
-            compare: jest.fn().mockReturnValue(true),
+            createHash: jest.fn().mockResolvedValue('string'),
+            compare: jest.fn().mockResolvedValue(true),
           } as Partial<HashProvider>,
         },
         {
-          provide: TokenProvider,
+          provide: JwtTokenProvider,
           useValue: {
             generateToken: jest.fn().mockReturnValue('token'),
             generateRefreshToken: jest
               .fn()
               .mockReturnValue(['refresh_token', new Date()]),
-          } as Partial<TokenProvider>,
+          } as Partial<JwtTokenProvider>,
         },
         {
           provide: RefreshTokensRepository,

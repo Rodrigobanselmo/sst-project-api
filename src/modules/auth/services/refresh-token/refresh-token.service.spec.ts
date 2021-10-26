@@ -1,14 +1,14 @@
 import { UnauthorizedException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersRepository } from '../../../../modules/users/repositories/implementations/UsersRepository';
-import { TokenProvider } from '../../../../shared/providers/TokenProvider/implementations/JwtTokenProvider';
+import { JwtTokenProvider } from '../../../../shared/providers/TokenProvider/implementations/JwtTokenProvider';
 import { RefreshTokensRepository } from '../../repositories/implementations/RefreshTokensRepository';
 import { RefreshTokenService } from './refresh-token.service';
 
 describe('RefreshTokenService', () => {
   let service: RefreshTokenService;
   let refreshTokensRepository: RefreshTokensRepository;
-  let tokenProvider: TokenProvider;
+  let jwtTokenProvider: JwtTokenProvider;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -26,14 +26,14 @@ describe('RefreshTokenService', () => {
           } as Partial<RefreshTokensRepository>,
         },
         {
-          provide: TokenProvider,
+          provide: JwtTokenProvider,
           useValue: {
             generateToken: jest.fn().mockReturnValue('token'),
             generateRefreshToken: jest
               .fn()
               .mockReturnValue(['refresh_token', new Date()]),
             verifyIsValidToken: jest.fn().mockReturnValue(true),
-          } as Partial<TokenProvider>,
+          } as Partial<JwtTokenProvider>,
         },
         {
           provide: UsersRepository,
@@ -44,7 +44,7 @@ describe('RefreshTokenService', () => {
       ],
     }).compile();
 
-    tokenProvider = module.get<TokenProvider>(TokenProvider);
+    jwtTokenProvider = module.get<JwtTokenProvider>(JwtTokenProvider);
     refreshTokensRepository = module.get<RefreshTokensRepository>(
       RefreshTokensRepository,
     );
@@ -67,9 +67,22 @@ describe('RefreshTokenService', () => {
     );
   });
 
+  it('should return error if token is invalid', async () => {
+    jest
+      .spyOn(jwtTokenProvider, 'verifyIsValidToken')
+      .mockImplementation(() => 'invalid' as any);
+
+    try {
+      await service.execute({} as any);
+      throw new Error('error');
+    } catch (err) {
+      expect(err).toEqual(new UnauthorizedException('invalid jwt'));
+    }
+  });
+
   it('should return error if token is expired', async () => {
     jest
-      .spyOn(tokenProvider, 'verifyIsValidToken')
+      .spyOn(jwtTokenProvider, 'verifyIsValidToken')
       .mockImplementation(() => 'expired' as any);
 
     try {
