@@ -5,7 +5,7 @@ import { DayJSProvider } from '../../DateProvider/implementations/DayJSProvider'
 import { IPayloadToken, ITokenProvider } from '../models/ITokenProvider.types';
 
 @Injectable()
-export class TokenProvider implements ITokenProvider {
+export class JwtTokenProvider implements ITokenProvider {
   constructor(
     private readonly jwtService: JwtService,
     private readonly dateProvider: DayJSProvider,

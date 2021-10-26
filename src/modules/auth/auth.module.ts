@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+
 import { DayJSProvider } from '../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { HashProvider } from '../../shared/providers/HashProvider/implementations/HashProvider';
-import { TokenProvider } from '../../shared/providers/TokenProvider/implementations/JwtTokenProvider';
+import { JwtTokenProvider } from '../../shared/providers/TokenProvider/implementations/JwtTokenProvider';
 import { UsersRepository } from '../users/repositories/implementations/UsersRepository';
-
 import { AuthController } from './controller/auth.controller';
 import { RefreshTokensRepository } from './repositories/implementations/RefreshTokensRepository';
 import { DeleteAllExpiredService } from './services/delete-all-expired/delete-all-expired.service';
@@ -32,7 +32,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     HashProvider,
     DayJSProvider,
     RefreshTokensRepository,
-    TokenProvider,
+    JwtTokenProvider,
     JwtStrategy,
   ],
 })

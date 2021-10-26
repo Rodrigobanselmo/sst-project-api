@@ -7,7 +7,7 @@ import { classToClass } from 'class-transformer';
 import { UsersRepository } from '../../../../modules/users/repositories/implementations/UsersRepository';
 
 import { HashProvider } from '../../../../shared/providers/HashProvider/implementations/HashProvider';
-import { TokenProvider } from '../../../../shared/providers/TokenProvider/implementations/JwtTokenProvider';
+import { JwtTokenProvider } from '../../../../shared/providers/TokenProvider/implementations/JwtTokenProvider';
 import { LoginUserDto } from '../../dto/login-user.dto';
 import { PayloadTokenDto } from '../../dto/payload-token.dto';
 import { RefreshTokensRepository } from '../../repositories/implementations/RefreshTokensRepository';
@@ -18,7 +18,7 @@ export class SessionService {
     private readonly usersRepository: UsersRepository,
     private readonly refreshTokensRepository: RefreshTokensRepository,
     private readonly hashProvider: HashProvider,
-    private readonly tokenProvider: TokenProvider,
+    private readonly jwtTokenProvider: JwtTokenProvider,
   ) {}
 
   async execute({ email, password }: LoginUserDto) {
@@ -44,10 +44,10 @@ export class SessionService {
       permissions: user.permissions,
     };
 
-    const token = this.tokenProvider.generateToken(payload);
+    const token = this.jwtTokenProvider.generateToken(payload);
 
     const [refresh_token, refreshTokenExpiresDate] =
-      this.tokenProvider.generateRefreshToken(user.id);
+      this.jwtTokenProvider.generateRefreshToken(user.id);
 
     const newRefreshToken = await this.refreshTokensRepository.create(
       refresh_token,
