@@ -22,10 +22,13 @@ export class TokenProvider implements ITokenProvider {
 
     console.log(`secret_refresh_token`, secret_refresh_token);
     const dateNow = this.dateProvider.dateNow();
+    const lastChar = expires_in_refresh_token.slice(-1);
+    const timeValue = Number(expires_in_refresh_token.slice(0, -1));
 
     const refreshTokenExpiresDate = this.dateProvider.addTime(
       dateNow,
-      expires_in_refresh_token,
+      timeValue,
+      lastChar,
     );
 
     const refresh_token = this.jwtService.sign(

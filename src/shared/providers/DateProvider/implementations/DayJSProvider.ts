@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
-import { IDateProvider } from '../models/IDateProvider.types';
+import { IDateProvider, ManipulateType } from '../models/IDateProvider.types';
 
 dayjs.extend(utc);
 
@@ -17,35 +17,22 @@ class DayJSProvider implements IDateProvider {
     return dayjs(date).add(days, 'days').toDate();
   }
 
-  addTime(date: Date, time: string): Date {
-    const lastChar = time.slice(-1);
-    const timeValue = Number(time.slice(0, -1));
-
-    if (!timeValue) {
-      return this.dateNow();
-    }
-    if (lastChar === 'y') return dayjs(date).add(timeValue, 'years').toDate();
-    if (lastChar === 'm') return dayjs(date).add(timeValue, 'months').toDate();
-    if (lastChar === 'w') return dayjs(date).add(timeValue, 'weeks').toDate();
-    if (lastChar === 'd') return dayjs(date).add(timeValue, 'days').toDate();
-    if (lastChar === 'h') return dayjs(date).add(timeValue, 'hours').toDate();
-    return dayjs(date).add(timeValue, 'seconds').toDate();
+  addTime(date: Date, value: number, type: string): Date {
+    return dayjs(date).add(value, type).toDate();
   }
 
   compareIfBefore(start_date: Date, end_date: Date): boolean {
     return dayjs(start_date).isBefore(end_date);
   }
 
-  compareInHours(start_date: Date, end_date: Date): number {
+  compareTime(
+    start_date: Date,
+    end_date: Date,
+    compareIn: ManipulateType,
+  ): number {
     const endDateFormat = this.convertToUTC(end_date);
     const startDateFormat = this.convertToUTC(start_date);
-    return dayjs(endDateFormat).diff(startDateFormat, 'hours');
-  }
-
-  compareInDays(start_date: Date, end_date: Date): number {
-    const endDateFormat = this.convertToUTC(end_date);
-    const startDateFormat = this.convertToUTC(start_date);
-    return dayjs(endDateFormat).diff(startDateFormat, 'days');
+    return dayjs(endDateFormat).diff(startDateFormat, compareIn);
   }
 
   convertToUTC(date: Date): string {
