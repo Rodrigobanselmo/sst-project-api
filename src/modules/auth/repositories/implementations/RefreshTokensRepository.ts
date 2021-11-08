@@ -19,6 +19,15 @@ export class RefreshTokensRepository implements IRefreshTokensRepository {
     return new RefreshTokenEntity(refreshToken);
   }
 
+  async findById(id: string) {
+    const userTokens = await this.prisma.refreshToken.findUnique({
+      where: { id },
+    });
+    if (!userTokens) return;
+
+    return new RefreshTokenEntity(userTokens);
+  }
+
   async findByRefreshToken(refresh_token: string) {
     const userTokens = await this.prisma.refreshToken.findFirst({
       where: { refresh_token },
