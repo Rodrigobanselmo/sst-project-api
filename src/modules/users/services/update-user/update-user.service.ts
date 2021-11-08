@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { HashProvider } from 'src/shared/providers/HashProvider/implementations/HashProvider';
+import { HashProvider } from '../../../../shared/providers/HashProvider/implementations/HashProvider';
 
 import { UpdateUserDto } from '../../dto/update-user.dto';
 import { UsersRepository } from '../../repositories/implementations/UsersRepository';
