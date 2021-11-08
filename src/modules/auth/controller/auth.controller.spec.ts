@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DeleteAllExpiredService } from '../services/delete-all-expired/delete-all-expired.service';
 import { RefreshTokenService } from '../services/refresh-token/refresh-token.service';
+import { SendForgotPassMailService } from '../services/send-forgot-pass-mail/send-forgot-pass-mail.service';
 import { SessionService } from '../services/session/session.service';
 import { AuthController } from './auth.controller';
 
@@ -25,6 +26,12 @@ describe('AuthController', () => {
         },
         {
           provide: DeleteAllExpiredService,
+          useValue: {
+            execute: jest.fn().mockResolvedValue({}),
+          },
+        },
+        {
+          provide: SendForgotPassMailService,
           useValue: {
             execute: jest.fn().mockResolvedValue({}),
           },
