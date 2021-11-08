@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UsersRepository } from 'src/modules/users/repositories/implementations/UsersRepository';
-import { DayJSProvider } from 'src/shared/providers/DateProvider/implementations/DayJSProvider';
-import { EtherealMailProvider } from 'src/shared/providers/MailProvider/implementations/Ethereal/EtherealMailProvider';
+import { UsersRepository } from '../../../../modules/users/repositories/implementations/UsersRepository';
+import { DayJSProvider } from '../../../../shared/providers/DateProvider/implementations/DayJSProvider';
+import { EtherealMailProvider } from '../../../../shared/providers/MailProvider/implementations/Ethereal/EtherealMailProvider';
 import { RefreshTokensRepository } from '../../repositories/implementations/RefreshTokensRepository';
 import { SendForgotPassMailService } from './send-forgot-pass-mail.service';
 
