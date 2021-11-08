@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { User } from '@prisma/client';
 import { classToClass } from 'class-transformer';
 import { UsersRepository } from '../../../../modules/users/repositories/implementations/UsersRepository';
 
@@ -22,20 +23,7 @@ export class SessionService {
   ) {}
 
   async execute({ email, password }: LoginUserDto) {
-    const user = await this.usersRepository.findByEmail(email);
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    const passwordMatch = await this.hashProvider.compare(
-      password,
-      user.password,
-    );
-
-    if (!passwordMatch) {
-      throw new BadRequestException('Email or password incorrect');
-    }
+    const user: User = await this.validateUser(email, password);
 
     const payload: PayloadTokenDto = {
       email,
@@ -60,5 +48,24 @@ export class SessionService {
       refresh_token: newRefreshToken.refresh_token,
       user: classToClass(user),
     };
+  }
+
+  async validateUser(email: string, password: string) {
+    const user = await this.usersRepository.findByEmail(email);
+
+    if (!user) {
+      throw new BadRequestException('Email or password incorrect');
+    }
+
+    const passwordMatch = await this.hashProvider.compare(
+      password,
+      user.password,
+    );
+
+    if (!passwordMatch) {
+      throw new BadRequestException('Email or password incorrect');
+    }
+
+    return user;
   }
 }

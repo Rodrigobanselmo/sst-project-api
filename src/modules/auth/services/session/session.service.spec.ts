@@ -67,6 +67,11 @@ describe('SessionService', () => {
     );
   });
 
+  it('should not return password', async () => {
+    const session = await service.execute({} as any);
+    expect(session.user.password).toBeUndefined();
+  });
+
   it('should throw error if user does not exist', async () => {
     jest
       .spyOn(usersRepository, 'findByEmail')
@@ -76,7 +81,9 @@ describe('SessionService', () => {
       await service.execute({} as any);
       throw new Error('error');
     } catch (err) {
-      expect(err).toEqual(new NotFoundException('User not found'));
+      expect(err).toEqual(
+        new BadRequestException('Email or password incorrect'),
+      );
     }
   });
 
