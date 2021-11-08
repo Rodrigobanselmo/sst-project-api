@@ -1,4 +1,4 @@
-import { IsEmail, IsString, Length } from 'class-validator';
+import { IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
 
 export class LoginUserDto {
   @IsString()
@@ -6,6 +6,10 @@ export class LoginUserDto {
   readonly email: string;
 
   @IsString()
-  @Length(6)
+  @MinLength(8)
+  @MaxLength(20)
+  // @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
+  //   message: 'password too weak',
+  // })
   readonly password: string;
 }
