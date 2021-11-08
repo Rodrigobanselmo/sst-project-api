@@ -3,7 +3,7 @@ import { IHashProvider } from '../models/IHashProvider.types';
 
 class HashProvider implements IHashProvider {
   async createHash(password: string): Promise<string> {
-    const passwordHash = await hash(password, 8);
+    const passwordHash = await hash(password, 10);
     return passwordHash;
   }
   async compare(password: string, hash_password: string): Promise<boolean> {
