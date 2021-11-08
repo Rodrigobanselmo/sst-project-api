@@ -12,6 +12,8 @@ import { DeleteAllExpiredService } from './services/delete-all-expired/delete-al
 import { RefreshTokenService } from './services/refresh-token/refresh-token.service';
 import { SessionService } from './services/session/session.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { SendForgotPassMailService } from './services/send-forgot-pass-mail/send-forgot-pass-mail.service';
+import { EtherealMailProvider } from 'src/shared/providers/MailProvider/implementations/Ethereal/EtherealMailProvider';
 
 @Module({
   imports: [
@@ -34,6 +36,8 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     RefreshTokensRepository,
     JwtTokenProvider,
     JwtStrategy,
+    SendForgotPassMailService,
+    EtherealMailProvider,
   ],
 })
 export class AuthModule {}
