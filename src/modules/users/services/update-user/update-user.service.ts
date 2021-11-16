@@ -1,23 +1,29 @@
+import { DayJSProvider } from '../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 import {
   BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { HashProvider } from '../../../../shared/providers/HashProvider/implementations/HashProvider';
 
+import { HashProvider } from '../../../../shared/providers/HashProvider/implementations/HashProvider';
 import { UpdateUserDto } from '../../dto/update-user.dto';
+import { InviteUsersRepository } from '../../repositories/implementations/InviteUsersRepository';
 import { UsersRepository } from '../../repositories/implementations/UsersRepository';
+import { UserCompanyDto } from '../../dto/user-company.dto';
+import { getCompanyByToken } from '../create-user/create-user.service';
 
 @Injectable()
 export class UpdateUserService {
   constructor(
     private readonly userRepository: UsersRepository,
     private readonly hashProvider: HashProvider,
+    private readonly dateProvider: DayJSProvider,
+    private readonly inviteUsersRepository: InviteUsersRepository,
   ) {}
 
   async execute(
     id: number,
-    { password, oldPassword, ...restUpdateUserDto }: UpdateUserDto,
+    { password, oldPassword, token, ...restUpdateUserDto }: UpdateUserDto,
   ) {
     if (!id) throw new BadRequestException(`Bad Request`);
 
@@ -42,7 +48,14 @@ export class UpdateUserService {
       updateUserDto.password = passHash;
     }
 
-    const user = await this.userRepository.update(id, updateUserDto);
+    const companies: UserCompanyDto[] = await getCompanyByToken(
+      token,
+      userData.email,
+      this.inviteUsersRepository,
+      this.dateProvider,
+    );
+
+    const user = await this.userRepository.update(id, updateUserDto, companies);
 
     return user;
   }

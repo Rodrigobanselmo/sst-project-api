@@ -15,11 +15,23 @@ model User {
   id    Int     @default(autoincrement()) @id
   email String  @unique
   password String
-  roles String[]
-  permissions String[]
   created_at DateTime @default(now())
   updatedAt  DateTime   @updatedAt
   refresh_token RefreshToken[]
+  companies UserCompany[]
+}
+
+model UserCompany {
+  roles String[]
+  permissions String[]
+  userId Int
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
+  companyId Int
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
+  created_at DateTime @default(now())
+  updatedAt  DateTime   @updatedAt
+  
+  @@id([companyId, userId])
 }
 
 model RefreshToken {
@@ -30,3 +42,90 @@ model RefreshToken {
   userId Int
   user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
+
+model InviteUsers {
+  id   String @id @default(uuid())
+  expires_date DateTime
+  companyId Int
+  email String 
+  roles String[]
+  permissions String[]
+}
+
+model Company {
+  id    Int     @default(autoincrement()) @id
+  cnpj String
+  name String  
+  fantasy String
+  status String
+  type String
+  created_at DateTime @default(now())
+  updatedAt  DateTime   @updatedAt
+  users UserCompany[]
+  workspace Workspace[]
+  primary_activity PrimaryActivityOnCompany[] 
+  secondary_activity SecondaryActivityOnCompany[] 
+  employees Employee[] 
+}
+ 
+model Activity {
+  id    Int     @default(autoincrement()) @id
+  code String @unique
+  name String
+  created_at DateTime @default(now())
+  company_primary_activity PrimaryActivityOnCompany[]
+  company_secondary_activity SecondaryActivityOnCompany[]
+} 
+
+model PrimaryActivityOnCompany {
+  activity       Activity     @relation(fields: [activityId], references: [id])
+  activityId     Int 
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId Int 
+
+  @@id([activityId, companyId])
+}
+
+model SecondaryActivityOnCompany {
+  activity       Activity     @relation(fields: [activityId], references: [id])
+  activityId     Int 
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId Int 
+
+  @@id([activityId, companyId])
+}
+
+model Workspace {
+  id    Int     @default(autoincrement()) @id
+  name String  
+  cnpj String
+  status String
+  created_at DateTime @default(now())
+  updatedAt  DateTime   @updatedAt
+  companyId Int
+  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  address Address?
+}
+
+model Address {
+  id    Int     @default(autoincrement()) @id
+  cep String 
+  street String?
+  number Int?
+  complement String?
+  neighborhood String?
+  city String
+  state String
+  workspaceId Int
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model Employee {
+  id    Int     @default(autoincrement()) @id
+  status String 
+  name String 
+  cpf Int 
+  created_at DateTime @default(now())
+  companyId Int
+  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+} 

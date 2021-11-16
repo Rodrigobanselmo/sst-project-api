@@ -8,11 +8,16 @@ interface IVerifyToken {
   secret_type: 'default' | 'refresh';
 }
 
+interface IPayloadUserCompany {
+  companyId: number;
+  roles: string[];
+  permissions: string[];
+}
+
 interface IPayloadToken {
   sub: number;
   email: string;
-  roles: string[];
-  permissions: string[];
+  companies: IPayloadUserCompany[];
 }
 
 interface ITokenProvider {

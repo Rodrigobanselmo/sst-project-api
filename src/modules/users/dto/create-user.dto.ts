@@ -10,9 +10,6 @@ export class CreateUserDto {
   @MaxLength(20)
   password: string;
 
-  @IsString({ each: true })
-  readonly roles: string[];
-
-  @IsString({ each: true })
-  readonly permissions: string[];
+  @IsString()
+  readonly token: string;
 }

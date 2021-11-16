@@ -1,4 +1,7 @@
-import { IsEmail, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsEmail, IsString, ValidateNested } from 'class-validator';
+
+import { UserCompanyDto } from '../../../shared/dto/user-payload.dto';
 
 export class PayloadTokenDto {
   @IsString()
@@ -8,9 +11,7 @@ export class PayloadTokenDto {
   @IsEmail()
   readonly email: string;
 
-  @IsString({ each: true })
-  readonly roles: string[];
-
-  @IsString({ each: true })
-  readonly permissions: string[];
+  @ValidateNested({ each: true })
+  @Type(() => UserCompanyDto)
+  readonly companies: UserCompanyDto[];
 }

@@ -13,7 +13,7 @@ import { RefreshTokenService } from './services/refresh-token/refresh-token.serv
 import { SessionService } from './services/session/session.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { SendForgotPassMailService } from './services/send-forgot-pass-mail/send-forgot-pass-mail.service';
-import { EtherealMailProvider } from 'src/shared/providers/MailProvider/implementations/Ethereal/EtherealMailProvider';
+import { EtherealMailProvider } from '../../shared/providers/MailProvider/implementations/Ethereal/EtherealMailProvider';
 
 @Module({
   imports: [

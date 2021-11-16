@@ -1,17 +1,17 @@
 import { Injectable } from '@nestjs/common';
 
-import { RefreshTokensRepository } from '../../../../modules/auth/repositories/implementations/RefreshTokensRepository';
 import { DayJSProvider } from '../../../../shared/providers/DateProvider/implementations/DayJSProvider';
+import { InviteUsersRepository } from '../../repositories/implementations/InviteUsersRepository';
 
 @Injectable()
-export class DeleteAllExpiredService {
+export class DeleteExpiredInvitesService {
   constructor(
-    private readonly refreshTokensRepository: RefreshTokensRepository,
+    private readonly inviteUsersRepository: InviteUsersRepository,
     private readonly dateProvider: DayJSProvider,
   ) {}
 
   async execute() {
     const currentDate = this.dateProvider.dateNow();
-    return this.refreshTokensRepository.deleteAllOldTokens(currentDate);
+    return this.inviteUsersRepository.deleteAllOldInvites(currentDate);
   }
 }

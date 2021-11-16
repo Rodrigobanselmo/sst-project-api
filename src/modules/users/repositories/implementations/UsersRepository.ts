@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { CreateUserDto } from '../../dto/create-user.dto';
 import { UpdateUserDto } from '../../dto/update-user.dto';
+import { UserCompanyDto } from '../../dto/user-company.dto';
 import { UserEntity } from '../../entities/user.entity';
 import { IUsersRepository } from '../IUsersRepository.types';
 
@@ -11,20 +12,26 @@ import { IUsersRepository } from '../IUsersRepository.types';
 export class UsersRepository implements IUsersRepository {
   constructor(private prisma: PrismaService) {}
 
-  async create(createUserDto: CreateUserDto) {
+  async create(
+    createUserDto: Omit<CreateUserDto, 'token'>,
+    userCompanyDto: UserCompanyDto[],
+  ) {
     const user = await this.prisma.user.create({
-      data: createUserDto,
+      data: { ...createUserDto, companies: { create: userCompanyDto } },
+      include: { companies: true },
     });
+
     return new UserEntity(user);
   }
 
   async update(
     id: number,
     { email, oldPassword, ...updateUserDto }: UpdateUserDto,
+    userCompanyDto: UserCompanyDto[] = [],
   ) {
     const user = await this.prisma.user.update({
       where: { id: id },
-      data: updateUserDto,
+      data: { ...updateUserDto, companies: { create: userCompanyDto } },
     });
     if (!user) return;
     return new UserEntity(user);
@@ -42,13 +49,19 @@ export class UsersRepository implements IUsersRepository {
   }
 
   async findByEmail(email: string) {
-    const user = await this.prisma.user.findUnique({ where: { email } });
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+      include: { companies: true },
+    });
     if (!user) return;
     return new UserEntity(user);
   }
 
   async findById(id: number) {
-    const user = await this.prisma.user.findUnique({ where: { id } });
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      include: { companies: true },
+    });
     if (!user) return;
     return new UserEntity(user);
   }

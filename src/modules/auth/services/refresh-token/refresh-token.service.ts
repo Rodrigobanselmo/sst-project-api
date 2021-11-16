@@ -42,12 +42,18 @@ export class RefreshTokenService {
     }
 
     const user = await this.usersRepository.findById(userId);
+    const companies = user.companies.map(
+      ({ companyId, permissions, roles }) => ({
+        companyId,
+        permissions,
+        roles,
+      }),
+    );
 
     const payloadToken: PayloadTokenDto = {
       email: user.email,
       sub: user.id,
-      roles: user.roles,
-      permissions: user.permissions,
+      companies,
     };
 
     const token = this.jwtTokenProvider.generateToken(payloadToken);

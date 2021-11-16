@@ -3,6 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { EtherealMailProvider } from './EtherealMailProvider';
 
 // import { resolve } from 'path';
+// es6 mock jest
 
 describe('DayJSProvider', () => {
   let etherealMailProvider: EtherealMailProvider;

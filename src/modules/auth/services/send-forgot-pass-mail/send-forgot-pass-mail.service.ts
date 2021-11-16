@@ -1,6 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { resolve } from 'path';
-import { v4 as uuid } from 'uuid';
 
 import { UsersRepository } from '../../../../modules/users/repositories/implementations/UsersRepository';
 import { DayJSProvider } from '../../../../shared/providers/DateProvider/implementations/DayJSProvider';
@@ -42,8 +41,12 @@ export class SendForgotPassMailService {
 
     const variables = {
       name: 'user.name',
-      link: `${process.env.APP_HOST}password/reset?token=${refresh_token.id}`,
+      link: `${process.env.APP_HOST}/password/reset?token=${refresh_token.id}`,
     };
+
+    // console.log('variables', variables);
+    // console.log('email', email);
+    // console.log('templatePath', templatePath);
 
     await this.mailProvider.sendMail({
       path: templatePath,

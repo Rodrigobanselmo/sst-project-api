@@ -1,12 +1,7 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { User } from '@prisma/client';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { classToClass } from 'class-transformer';
-import { UsersRepository } from '../../../../modules/users/repositories/implementations/UsersRepository';
 
+import { UsersRepository } from '../../../../modules/users/repositories/implementations/UsersRepository';
 import { HashProvider } from '../../../../shared/providers/HashProvider/implementations/HashProvider';
 import { JwtTokenProvider } from '../../../../shared/providers/TokenProvider/implementations/JwtTokenProvider';
 import { LoginUserDto } from '../../dto/login-user.dto';
@@ -23,13 +18,18 @@ export class SessionService {
   ) {}
 
   async execute({ email, password }: LoginUserDto) {
-    const user: User = await this.validateUser(email, password);
-
+    const user = await this.validateUser(email, password);
+    const companies = user.companies.map(
+      ({ companyId, permissions, roles }) => ({
+        companyId,
+        permissions,
+        roles,
+      }),
+    );
     const payload: PayloadTokenDto = {
       email,
       sub: user.id,
-      roles: user.roles,
-      permissions: user.permissions,
+      companies,
     };
 
     const token = this.jwtTokenProvider.generateToken(payload);

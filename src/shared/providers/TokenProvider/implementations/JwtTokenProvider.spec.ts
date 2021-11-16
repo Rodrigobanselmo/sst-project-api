@@ -54,7 +54,6 @@ describe('JwtTokenProvider', () => {
   it('should verify a valid token', () => {
     // process.env.SECRET_TOKEN = secret
     const sub = jwtTokenProvider.verifyIsValidToken('secret');
-
     expect(sub).toEqual('userId');
   });
 
