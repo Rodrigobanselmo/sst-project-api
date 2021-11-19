@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { CreateUserService } from '../../services/create-user/create-user.service';
-import { FindByEmailService } from '../../services/find-by-email/find-by-email.service';
-import { FindByIdService } from '../../services/find-by-id/find-by-id.service';
-import { ResetPasswordService } from '../../services/reset-password/reset-password.service';
-import { UpdateUserService } from '../../services/update-user/update-user.service';
+import { CreateUserService } from '../../services/users/create-user/create-user.service';
+import { FindByEmailService } from '../../services/users/find-by-email/find-by-email.service';
+import { FindByIdService } from '../../services/users/find-by-id/find-by-id.service';
+import { ResetPasswordService } from '../../services/users/reset-password/reset-password.service';
+import { UpdateUserService } from '../../services/users/update-user/update-user.service';
 import { UsersController } from './users.controller';
 
 describe('ControllerController', () => {

@@ -12,14 +12,16 @@
 // 1
 
 export enum Role {
+  MASTER = 'master',
   USER = 'user',
   ADMIN = 'admin',
 }
 export enum Permission {
+  MASTER = 'master',
   USER = '1',
   INVITE_USER = '1.1',
 }
 
 export enum SpecialPermission {
-  YOUR_COMPANY = 'C',
+  CHILD_COMPANY = 'C',
 }

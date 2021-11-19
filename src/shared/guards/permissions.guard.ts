@@ -1,10 +1,13 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { PrismaService } from '../../prisma/prisma.service';
+import { Permission } from '../constants/authorization';
 import {
   IPermissionOptions,
   PERMISSIONS_KEY,
 } from '../decorators/permissions.decorator';
-import { UserPayloadDto } from '../dto/user-payload.dto';
+import { UserCompanyDto, UserPayloadDto } from '../dto/user-payload.dto';
+import { asyncSome } from '../utils/asyncSome.utils';
 
 type IMethods = 'GET' | 'POST' | 'PATCH' | 'DELETE';
 
@@ -40,51 +43,129 @@ const comparePermission = (
   return isEqualCode && isEqualCrud;
 };
 
-const isNotRegisterOnCompany = (req, companyId: number): boolean => {
+const getCompanyId = (req): boolean | number => {
   const query = req.query;
   const params = req.params;
   const body = req.body;
 
-  if (body && body.companyId == companyId) return false;
-  if (params && params.companyId == companyId) return false;
-  if (query && query.companyId == companyId) return false;
+  if (body && body.companyId) return Number(body.companyId);
+  if (params && params.companyId) return Number(params.companyId);
+  if (query && query.companyId) return Number(query.companyId);
+  return false;
+};
+
+const getRequestCompanyId = (req): boolean | number => {
+  const query = req.query;
+  const params = req.params;
+  const body = req.body;
+
+  if (body && body.myCompanyId) return Number(body.myCompanyId);
+  if (params && params.myCompanyId) return Number(params.myCompanyId);
+  if (query && query.myCompanyId) return Number(query.myCompanyId);
+  return false;
+};
+
+const isParentCompany = async (
+  prisma: PrismaService,
+  userCompanyId: number,
+  companyId: number,
+): Promise<boolean> => {
+  const parentRelation = await prisma.relatedCompanies.findUnique({
+    where: {
+      parentCompanyId_childCompanyId: {
+        parentCompanyId: userCompanyId,
+        childCompanyId: companyId,
+      },
+    },
+  });
+
+  if (!parentRelation) return false;
+
   return true;
+};
+
+const hasPermissions = (
+  company: UserCompanyDto,
+  options: IPermissionOptions,
+  CRUD: string,
+) => {
+  return company.permissions.some((permission) =>
+    comparePermission(options, permission, CRUD),
+  );
+};
+
+const isAdmin = (company: UserCompanyDto) => {
+  return company.permissions.some(
+    (permission) => permission === Permission.MASTER,
+  );
 };
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {
-  constructor(private reflector: Reflector) {}
+  constructor(private reflector: Reflector, private prisma: PrismaService) {}
 
-  canActivate(context: ExecutionContext): boolean {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const requiredPermissionsOptions = this.reflector.getAllAndOverride<
       IPermissionOptions[]
     >(PERMISSIONS_KEY, [context.getHandler(), context.getClass()]);
     if (!requiredPermissionsOptions) {
       return true;
     }
-
     const req = context.switchToHttp().getRequest();
     const user: UserPayloadDto = req.user;
 
     const method: IMethods = req.method;
     const CRUD = methodToCrud(method);
-
     if (user && user?.companies)
-      return user.companies
-        .map((company) => {
-          return requiredPermissionsOptions.some((options) => {
-            if (
-              options.checkCompany &&
-              isNotRegisterOnCompany(req, company.companyId)
-            )
-              return false;
+      // map all companies in user token
+      return await asyncSome(user.companies, async (company) => {
+        // map all permissions required in route
+        return await asyncSome(requiredPermissionsOptions, async (options) => {
+          const { checkChild, checkCompany } = options;
 
-            return company.permissions.some((permission) =>
-              comparePermission(options, permission, CRUD),
-            );
-          });
-        })
-        .some((i) => i);
+          // checks if has permission to edit this company (your or child companies)
+          if (checkChild || checkCompany) {
+            const companyId = getCompanyId(req);
+            const isCompany = companyId == company.companyId;
+
+            // if not same company and checkChild = true
+            if (checkChild && !isCompany) {
+              console.log(`passa aqui4`);
+              // if is not a request from reqCompanyId return false
+              const reqCompanyId = getRequestCompanyId(req);
+              if (reqCompanyId !== company.companyId) return isAdmin(company);
+
+              // if companyId is not present denied access
+              if (typeof companyId === 'number') {
+                const havePermission = hasPermissions(company, options, CRUD);
+
+                if (!havePermission)
+                  // if does not have permissions denied access
+                  return isAdmin(company);
+
+                // if have permissions then check in database if companyId is child of the company permissions
+                const isParent = await isParentCompany(
+                  this.prisma,
+                  company.companyId,
+                  companyId,
+                );
+
+                if (isParent) return true;
+
+                return isAdmin(company);
+              } else {
+                return isAdmin(company);
+              }
+            }
+
+            // if not same company and does not check for child then return false
+            if (!isCompany && !checkChild) return isAdmin(company);
+          }
+
+          // if dont check for companies domain, then just check if has permissions in one of the companies
+          return hasPermissions(company, options, CRUD) || isAdmin(company);
+        });
+      });
     return false;
   }
 }

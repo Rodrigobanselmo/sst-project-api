@@ -5,6 +5,7 @@ export interface IPermissionOptions {
   code: Permission;
   crud?: boolean;
   checkCompany?: boolean;
+  checkChild?: boolean;
 }
 
 export const PERMISSIONS_KEY = 'Permissions';

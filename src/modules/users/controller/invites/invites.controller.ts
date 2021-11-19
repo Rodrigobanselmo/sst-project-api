@@ -5,9 +5,9 @@ import { classToClass } from 'class-transformer';
 import { Permission } from '../../../../shared/constants/authorization';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 import { InviteUserDto } from '../../dto/invite-user.dto';
-import { DeleteExpiredInvitesService } from '../../services/delete-expired-invites/delete-expired-invites.service';
-import { DeleteInvitesService } from '../../services/delete-invites/delete-invites.service';
-import { InviteUsersService } from '../../services/invite-users/invite-users.service';
+import { DeleteExpiredInvitesService } from '../../services/invites/delete-expired-invites/delete-expired-invites.service';
+import { DeleteInvitesService } from '../../services/invites/delete-invites/delete-invites.service';
+import { InviteUsersService } from '../../services/invites/invite-users/invite-users.service';
 import { DeleteInviteDto } from './../../dto/delete-invite.dto';
 
 @ApiTags('invites')
@@ -23,6 +23,7 @@ export class InvitesController {
   @Permissions({
     code: Permission.INVITE_USER,
     checkCompany: true,
+    checkChild: true,
   })
   async invite(@Body() inviteUserDto: InviteUserDto) {
     return classToClass(this.inviteUsersService.execute(inviteUserDto));

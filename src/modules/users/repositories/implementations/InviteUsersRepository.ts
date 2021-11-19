@@ -32,6 +32,7 @@ export class InviteUsersRepository implements IInviteUsersRepository {
 
     return new InviteUsersEntity(invite);
   }
+
   async findById(id: string): Promise<InviteUsersEntity | undefined> {
     const invite = await this.prisma.inviteUsers.findUnique({
       where: { id },

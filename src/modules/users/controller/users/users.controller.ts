@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { classToClass } from 'class-transformer';
-import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
+import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 
 import { Public } from '../../../../shared/decorators/public.decorator';
 import { User } from '../../../../shared/decorators/user.decorator';
@@ -18,12 +18,12 @@ import { ValidateEmailPipe } from '../../../../shared/pipes/validate-email.pipe'
 import { CreateUserDto } from '../../dto/create-user.dto';
 import { ResetPasswordDto } from '../../dto/reset-pass';
 import { UpdateUserDto } from '../../dto/update-user.dto';
-import { CreateUserService } from '../../services/create-user/create-user.service';
-import { FindByEmailService } from '../../services/find-by-email/find-by-email.service';
-import { FindByIdService } from '../../services/find-by-id/find-by-id.service';
-import { FindMeService } from '../../services/find-me/find-me.service';
-import { ResetPasswordService } from '../../services/reset-password/reset-password.service';
-import { UpdateUserService } from '../../services/update-user/update-user.service';
+import { CreateUserService } from '../../services/users/create-user/create-user.service';
+import { FindByEmailService } from '../../services/users/find-by-email/find-by-email.service';
+import { FindByIdService } from '../../services/users/find-by-id/find-by-id.service';
+import { FindMeService } from '../../services/users/find-me/find-me.service';
+import { ResetPasswordService } from '../../services/users/reset-password/reset-password.service';
+import { UpdateUserService } from '../../services/users/update-user/update-user.service';
 
 @ApiTags('users')
 @Controller('users')

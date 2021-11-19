@@ -59,13 +59,27 @@ model Company {
   fantasy String
   status String
   type String
+  isConsulting Boolean @default(false)
   created_at DateTime @default(now())
   updatedAt  DateTime   @updatedAt
   users UserCompany[]
   workspace Workspace[]
-  primary_activity PrimaryActivityOnCompany[] 
-  secondary_activity SecondaryActivityOnCompany[] 
+  primary_activity Activity[] @relation(name: "primary_activity")
+  secondary_activity Activity[] @relation(name: "secondary_activity")
   employees Employee[] 
+  childCompany RelatedCompanies[]  @relation(name: "childCompany")
+  parentCompany RelatedCompanies[] @relation(name: "parentCompany")
+}
+
+model RelatedCompanies {
+  parentCompany   Company @relation(name: "parentCompany",fields: [parentCompanyId], references: [id])
+  parentCompanyId Int 
+  childCompany   Company @relation(name: "childCompany",fields: [childCompanyId], references: [id])
+  childCompanyId Int 
+  status String
+  created_at DateTime @default(now())
+ 
+  @@id([parentCompanyId, childCompanyId])
 }
  
 model Activity {
@@ -73,32 +87,13 @@ model Activity {
   code String @unique
   name String
   created_at DateTime @default(now())
-  company_primary_activity PrimaryActivityOnCompany[]
-  company_secondary_activity SecondaryActivityOnCompany[]
+  company_primary_activity Company[] @relation(name: "primary_activity")
+  company_secondary_activity Company[] @relation(name: "secondary_activity")
 } 
-
-model PrimaryActivityOnCompany {
-  activity       Activity     @relation(fields: [activityId], references: [id])
-  activityId     Int 
-  company   Company @relation(fields: [companyId], references: [id])
-  companyId Int 
-
-  @@id([activityId, companyId])
-}
-
-model SecondaryActivityOnCompany {
-  activity       Activity     @relation(fields: [activityId], references: [id])
-  activityId     Int 
-  company   Company @relation(fields: [companyId], references: [id])
-  companyId Int 
-
-  @@id([activityId, companyId])
-}
 
 model Workspace {
   id    Int     @default(autoincrement()) @id
   name String  
-  cnpj String
   status String
   created_at DateTime @default(now())
   updatedAt  DateTime   @updatedAt
@@ -111,7 +106,7 @@ model Address {
   id    Int     @default(autoincrement()) @id
   cep String 
   street String?
-  number Int?
+  number String?
   complement String?
   neighborhood String?
   city String

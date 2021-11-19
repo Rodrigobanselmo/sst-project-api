@@ -13,8 +13,6 @@ import { Response } from 'express';
 @Catch(PrismaClientKnownRequestError)
 export class PrismaDbExceptionFilter implements ExceptionFilter {
   catch(exception: any, host: ArgumentsHost) {
-    console.log(`exception`, exception);
-
     const context = host.switchToHttp();
     const response = context.getResponse<Response>();
     const request = context.getRequest<Request>();

@@ -6,17 +6,19 @@ import { HashProvider } from '../../shared/providers/HashProvider/implementation
 import { RefreshTokensRepository } from '../auth/repositories/implementations/RefreshTokensRepository';
 import { UsersController } from './controller/users/users.controller';
 import { UsersRepository } from './repositories/implementations/UsersRepository';
-import { CreateUserService } from './services/create-user/create-user.service';
-import { FindByEmailService } from './services/find-by-email/find-by-email.service';
-import { FindByIdService } from './services/find-by-id/find-by-id.service';
-import { InviteUsersService } from './services/invite-users/invite-users.service';
-import { ResetPasswordService } from './services/reset-password/reset-password.service';
-import { UpdateUserService } from './services/update-user/update-user.service';
+import { CreateUserService } from './services/users/create-user/create-user.service';
+import { FindByEmailService } from './services/users/find-by-email/find-by-email.service';
+import { FindByIdService } from './services/users/find-by-id/find-by-id.service';
+import { InviteUsersService } from './services/invites/invite-users/invite-users.service';
+import { ResetPasswordService } from './services/users/reset-password/reset-password.service';
+import { UpdateUserService } from './services/users/update-user/update-user.service';
 import { InvitesController } from './controller/invites/invites.controller';
-import { DeleteInvitesService } from './services/delete-invites/delete-invites.service';
-import { DeleteExpiredInvitesService } from './services/delete-expired-invites/delete-expired-invites.service';
+import { DeleteInvitesService } from './services/invites/delete-invites/delete-invites.service';
+import { DeleteExpiredInvitesService } from './services/invites/delete-expired-invites/delete-expired-invites.service';
 import { EtherealMailProvider } from '../../shared/providers/MailProvider/implementations/Ethereal/EtherealMailProvider';
-import { FindMeService } from './services/find-me/find-me.service';
+import { FindMeService } from './services/users/find-me/find-me.service';
+import { UsersCompanyRepository } from './repositories/implementations/UsersCompanyRepository';
+import { FindByTokenService } from './services/invites/find-by-token/find-by-token.service';
 
 @Module({
   controllers: [UsersController, InvitesController],
@@ -31,11 +33,13 @@ import { FindMeService } from './services/find-me/find-me.service';
     FindByIdService,
     FindByEmailService,
     InviteUsersService,
-    RefreshTokensRepository,
-    InviteUsersRepository,
     DeleteInvitesService,
     DeleteExpiredInvitesService,
     FindMeService,
+    RefreshTokensRepository,
+    InviteUsersRepository,
+    UsersCompanyRepository,
+    FindByTokenService,
   ],
   exports: [UsersRepository],
 })
