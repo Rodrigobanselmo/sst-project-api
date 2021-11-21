@@ -19,6 +19,7 @@ import { EtherealMailProvider } from '../../shared/providers/MailProvider/implem
 import { FindMeService } from './services/users/find-me/find-me.service';
 import { UsersCompanyRepository } from './repositories/implementations/UsersCompanyRepository';
 import { FindByTokenService } from './services/invites/find-by-token/find-by-token.service';
+import { UpdatePermissionsRolesService } from './services/users/update-permissions-roles/update-permissions-roles.service';
 
 @Module({
   controllers: [UsersController, InvitesController],
@@ -40,6 +41,7 @@ import { FindByTokenService } from './services/invites/find-by-token/find-by-tok
     InviteUsersRepository,
     UsersCompanyRepository,
     FindByTokenService,
+    UpdatePermissionsRolesService,
   ],
   exports: [UsersRepository],
 })

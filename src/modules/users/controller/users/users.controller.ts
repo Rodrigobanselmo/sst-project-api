@@ -10,19 +10,21 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { classToClass } from 'class-transformer';
-import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 
 import { Public } from '../../../../shared/decorators/public.decorator';
 import { User } from '../../../../shared/decorators/user.decorator';
+import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import { ValidateEmailPipe } from '../../../../shared/pipes/validate-email.pipe';
 import { CreateUserDto } from '../../dto/create-user.dto';
 import { ResetPasswordDto } from '../../dto/reset-pass';
+import { UpdateUserCompanyDto } from '../../dto/update-user-company.dto';
 import { UpdateUserDto } from '../../dto/update-user.dto';
 import { CreateUserService } from '../../services/users/create-user/create-user.service';
 import { FindByEmailService } from '../../services/users/find-by-email/find-by-email.service';
 import { FindByIdService } from '../../services/users/find-by-id/find-by-id.service';
 import { FindMeService } from '../../services/users/find-me/find-me.service';
 import { ResetPasswordService } from '../../services/users/reset-password/reset-password.service';
+import { UpdatePermissionsRolesService } from '../../services/users/update-permissions-roles/update-permissions-roles.service';
 import { UpdateUserService } from '../../services/users/update-user/update-user.service';
 
 @ApiTags('users')
@@ -35,6 +37,7 @@ export class UsersController {
     private readonly findMeService: FindMeService,
     private readonly findByEmailService: FindByEmailService,
     private readonly findByIdService: FindByIdService,
+    private readonly updatePermissionsRolesService: UpdatePermissionsRolesService,
   ) {}
 
   @Get('me')
@@ -64,6 +67,15 @@ export class UsersController {
     @User() { userId }: UserPayloadDto,
   ) {
     return classToClass(this.updateUserService.execute(+userId, updateUserDto));
+  }
+
+  @Patch('update/authorization')
+  async updatePermissionsRoles(
+    @Body() updateUserCompanyDto: UpdateUserCompanyDto,
+  ) {
+    return classToClass(
+      this.updatePermissionsRolesService.execute(updateUserCompanyDto),
+    );
   }
 
   @Public()

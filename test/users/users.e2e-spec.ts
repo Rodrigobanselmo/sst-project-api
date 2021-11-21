@@ -127,7 +127,7 @@ describe('[Feature] Users - /users', () => {
     });
 
     it('should validate token', async () => {
-      const createUser = new FakerUser();
+      const createUser = new FakerUser({ token: '123' });
       return await request(app.getHttpServer())
         .post('/users')
         .send(createUser)
@@ -136,8 +136,6 @@ describe('[Feature] Users - /users', () => {
 
     it('should create token and add permissions on create user', async () => {
       const createInvite = new FakeInvite();
-
-      await request(app.getHttpServer()).post('/invites').send(createInvite);
 
       const { body: invite } = await request(app.getHttpServer())
         .post('/invites')

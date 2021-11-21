@@ -6,6 +6,7 @@ export class FakeWorkspace implements WorkspaceDto {
   constructor(partial?: Partial<WorkspaceDto>) {
     Object.assign(this, partial);
   }
+  id?: number;
   name = faker.lorem.sentence();
   status = 'active';
   address = new FakeAddress();

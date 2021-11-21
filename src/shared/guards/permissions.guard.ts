@@ -34,6 +34,9 @@ const comparePermission = (
 ) => {
   const isEqualCode = permission.split('-')[0] === options.code;
   const isEqualCrud = options.crud ? permission.includes(CRUD) : true;
+  // if (CRUD === 'c')
+  // console.log(`object`, isEqualCode, isEqualCrud, options.crud, permission);
+
   // const isEqualExtends = options.special
   //   ? !options.special
   //       .map((extend) => permission.includes(extend))
@@ -79,6 +82,7 @@ const isParentCompany = async (
     },
   });
 
+  if (parentRelation.status !== 'ACTIVE') return false;
   if (!parentRelation) return false;
 
   return true;
@@ -162,6 +166,7 @@ export class PermissionsGuard implements CanActivate {
           }
 
           // if dont check for companies domain, then just check if has permissions in one of the companies
+          // if (CRUD === 'c') console.log(`object`, options, company);
           return hasPermissions(company, options, CRUD) || isAdmin(company);
         });
       });

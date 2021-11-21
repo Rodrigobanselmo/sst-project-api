@@ -1,18 +1,20 @@
 import { Transform } from 'class-transformer';
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
 import { StatusEnum } from '../../../shared/constants/enum/status.enum';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 
-export class UserCompanyDto {
-  @IsString()
-  readonly companyId: string;
+export class UserCompanyEditDto {
+  @IsNumber()
+  readonly userId: number;
 
   @IsString({ each: true })
-  readonly roles: string[];
+  @IsOptional()
+  readonly roles?: string[];
 
   @IsString({ each: true })
-  readonly permissions: string[];
+  @IsOptional()
+  readonly permissions?: string[];
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsString()

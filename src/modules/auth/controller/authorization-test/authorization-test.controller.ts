@@ -14,8 +14,8 @@ export class AuthorizationTestController {
       code: Permission.INVITE_USER,
     },
   )
-  @Get('1')
-  permissions1() {
+  @Get()
+  route1() {
     return true;
   }
 
@@ -26,12 +26,26 @@ export class AuthorizationTestController {
     },
     {
       code: Permission.INVITE_USER,
+      checkCompany: true,
+    },
+    {
+      code: Permission.CREATE_COMPANY,
       crud: true,
       checkCompany: true,
     },
   )
   @Post()
-  permissions2() {
+  route2() {
+    return true;
+  }
+
+  @Permissions({
+    code: Permission.CREATE_COMPANY,
+    crud: true,
+    checkCompany: true,
+  })
+  @Post('2')
+  route21() {
     return true;
   }
 
@@ -53,16 +67,22 @@ export class AuthorizationTestController {
     },
   )
   @Patch()
-  permissions3() {
+  route3() {
     return true;
   }
 
-  @Permissions({
-    code: Permission.INVITE_USER,
-    crud: true,
-  })
+  @Permissions(
+    {
+      code: Permission.INVITE_USER,
+      crud: true,
+    },
+    {
+      code: Permission.CREATE_COMPANY,
+      checkChild: true,
+    },
+  )
   @Delete()
-  permissions4() {
+  route4() {
     return true;
   }
 }

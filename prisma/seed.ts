@@ -6,7 +6,7 @@ import { v4 as uuidV4 } from 'uuid';
 const prisma = new PrismaClient();
 
 const createUserAndCompany = async () => {
-  const id = process.env.NODE_ENV === 'test' ? 'admin' : uuidV4();
+  const id = process.env.NODE_ENV === 'test' ? '1' : uuidV4();
   const company = await prisma.company.create({
     data: {
       id,
@@ -16,7 +16,6 @@ const createUserAndCompany = async () => {
       status: 'ACTIVE',
       type: 'Matriz',
       license: { create: { companyId: id } },
-      // licenseOwner: { create: {} },
     },
   });
 

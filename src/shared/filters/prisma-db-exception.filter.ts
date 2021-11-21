@@ -20,7 +20,7 @@ export class PrismaDbExceptionFilter implements ExceptionFilter {
 
     let error = new HttpException('Database Prisma error', 500);
 
-    const { cause, target } = meta;
+    const { cause, target, field_name } = meta;
 
     switch (code) {
       case 'P2002':
@@ -29,6 +29,13 @@ export class PrismaDbExceptionFilter implements ExceptionFilter {
             `Data you trying to create already exists: property ${target.join(
               ', ',
             )} is conflicting`,
+          );
+        break;
+
+      case 'P2003':
+        if (field_name)
+          error = new BadRequestException(
+            `Data you trying to create requires an FK: ${field_name}`,
           );
         break;
 

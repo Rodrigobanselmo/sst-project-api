@@ -20,6 +20,7 @@ model User {
 model UserCompany {
   roles String[]
   permissions String[]
+  status String @default("ACTIVE")
   userId Int
   user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
   companyId String
@@ -53,7 +54,7 @@ model Company {
   cnpj String
   name String  
   fantasy String
-  status String
+  status String @default("ACTIVE")
   type String
   isConsulting Boolean @default(false)
   created_at DateTime @default(now())
@@ -102,7 +103,7 @@ model Activity {
 model Workspace {
   id    Int     @default(autoincrement()) @id
   name String  
-  status String
+  status String @default("ACTIVE")
   created_at DateTime @default(now())
   updatedAt  DateTime   @updatedAt
   companyId String
@@ -125,7 +126,7 @@ model Address {
 
 model Employee {
   id    Int     @default(autoincrement()) @id
-  status String 
+  status String @default("ACTIVE")
   name String 
   cpf Int 
   created_at DateTime @default(now())

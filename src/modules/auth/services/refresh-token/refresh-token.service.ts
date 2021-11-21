@@ -42,13 +42,17 @@ export class RefreshTokenService {
     }
 
     const user = await this.usersRepository.findById(userId);
-    const companies = user.companies.map(
-      ({ companyId, permissions, roles }) => ({
-        companyId,
-        permissions,
-        roles,
-      }),
-    );
+    const companies = user.companies
+      .map(({ companyId, permissions, roles, status }) => {
+        if (status.toUpperCase() !== 'ACTIVE') return null;
+
+        return {
+          companyId,
+          permissions,
+          roles,
+        };
+      })
+      .filter((i) => i);
 
     const payloadToken: PayloadTokenDto = {
       email: user.email,

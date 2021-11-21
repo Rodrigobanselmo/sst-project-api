@@ -38,6 +38,7 @@ export class CreateCompanyDto {
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsString()
+  @IsOptional()
   @IsEnum(StatusEnum, {
     message: `status must be one of: ${KeysOfEnum(StatusEnum)}`,
   })
@@ -56,7 +57,7 @@ export class CreateCompanyDto {
 
   @ValidateNested()
   @Type(() => LicenseDto)
-  readonly license?: LicenseDto;
+  license?: LicenseDto;
 
   @ValidateNested({ each: true })
   @IsDefined()

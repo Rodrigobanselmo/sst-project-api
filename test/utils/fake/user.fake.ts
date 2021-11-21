@@ -8,5 +8,5 @@ export class FakerUser implements CreateUserDto {
 
   email = faker.lorem.word() + faker.internet.email();
   password = '12345678';
-  token = '12345678';
+  token = '';
 }

@@ -19,13 +19,17 @@ export class SessionService {
 
   async execute({ email, password }: LoginUserDto) {
     const user = await this.validateUser(email, password);
-    const companies = user.companies.map(
-      ({ companyId, permissions, roles }) => ({
-        companyId,
-        permissions,
-        roles,
-      }),
-    );
+    const companies = user.companies
+      .map(({ companyId, permissions, roles, status }) => {
+        if (status.toUpperCase() !== 'ACTIVE') return null;
+
+        return {
+          companyId,
+          permissions,
+          roles,
+        };
+      })
+      .filter((i) => i);
     const payload: PayloadTokenDto = {
       email,
       sub: user.id,

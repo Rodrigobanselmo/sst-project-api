@@ -24,6 +24,12 @@ export class UserCompanyEntity implements UserCompany {
   @ApiProperty({ description: 'The creation date of the User account' })
   created_at: Date;
 
+  @ApiProperty({
+    description: 'The current status of the user account',
+    examples: ['active', 'pending', 'canceled'],
+  })
+  status: string;
+
   constructor(partial: Partial<UserCompanyEntity>) {
     Object.assign(this, partial);
   }

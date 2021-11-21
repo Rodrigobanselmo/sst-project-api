@@ -6,6 +6,7 @@ import {
   IsString,
   MaxLength,
   ValidateNested,
+  IsNumber,
 } from 'class-validator';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
 
@@ -15,6 +16,10 @@ import { AddressDto } from './address.dto';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 
 export class WorkspaceDto {
+  @IsNumber()
+  @IsOptional()
+  id?: number;
+
   @Transform(StringCapitalizeTransform, { toClassOnly: true })
   @IsString()
   @MaxLength(100)
@@ -23,6 +28,7 @@ export class WorkspaceDto {
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsString()
+  @IsOptional()
   @IsEnum(StatusEnum, {
     message: `status must be one of: ${KeysOfEnum(StatusEnum)}`,
   })

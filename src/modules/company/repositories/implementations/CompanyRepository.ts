@@ -6,9 +6,9 @@ import { CreateCompanyDto } from '../../dto/create-company.dto';
 import { CompanyEntity } from '../../entities/company.entity';
 import { ICompanyRepository } from '../ICompanyRepository.types';
 import { v4 as uuidV4 } from 'uuid';
+import { UpdateCompanyDto } from '../../dto/update-company.dto';
 
 interface ICreateCompany extends CreateCompanyDto {
-  // licenseId?: number;
   companyId?: string;
 }
 
@@ -44,16 +44,14 @@ export class CompanyRepository implements ICompanyRepository {
         ...createCompanyDto,
         ...contractInfo,
         workspace: {
-          connectOrCreate: [
-            ...workspace.map(({ address, ...ws }) => ({
-              create: {
-                ...ws,
-                address: { create: address },
-              },
-              where: { id: -1 },
+          create: [
+            ...workspace.map(({ id, address, ...work }) => ({
+              ...work,
+              address: { create: address },
             })),
           ],
         },
+        // TODO: should be connect only
         primary_activity: {
           connectOrCreate: [
             ...primary_activity.map((activity) => ({
@@ -62,6 +60,7 @@ export class CompanyRepository implements ICompanyRepository {
             })),
           ],
         },
+        // TODO: should be connect only
         secondary_activity: {
           connectOrCreate: [
             ...secondary_activity.map((activity) => ({
@@ -82,18 +81,123 @@ export class CompanyRepository implements ICompanyRepository {
     return new CompanyEntity(company);
   }
 
-  // async update(
-  //   id: number,
-  //   { email, oldPassword, ...updateUserDto }: UpdateUserDto,
-  //   userCompanyDto: UserCompanyDto[] = [],
-  // ) {
-  //   const user = await this.prisma.user.update({
-  //     where: { id: id },
-  //     data: { ...updateUserDto, companies: { create: userCompanyDto } },
-  //   });
-  //   if (!user) return;
-  //   return new UserEntity(user);
-  // }
+  async updateInsert(
+    id: string,
+    {
+      secondary_activity = [],
+      primary_activity = [],
+      workspace = [],
+      users = [],
+      license,
+      ...updateCompanyDto
+    }: UpdateCompanyDto,
+  ) {
+    const company = await this.prisma.company.update({
+      where: { id: id },
+      data: {
+        ...updateCompanyDto,
+        users: {
+          upsert: [
+            ...users.map(({ userId, ...user }) => {
+              const { roles = [], permissions = [] } = user;
+              return {
+                create: { ...user, permissions, roles, userId },
+                update: { ...user },
+                where: {
+                  companyId_userId: { companyId: id, userId },
+                },
+              };
+            }),
+          ],
+        },
+        workspace: {
+          upsert: [
+            ...workspace.map(({ id, address, ...work }) => ({
+              create: {
+                ...work,
+                address: { create: address },
+              },
+              update: {
+                ...work,
+                address: { update: address },
+              },
+              where: { id: id ?? -1 },
+            })),
+          ],
+        },
+        // TODO: should be connect only
+        primary_activity: {
+          connectOrCreate: [
+            ...primary_activity.map((activity) => ({
+              create: activity,
+              where: { code: activity.code },
+            })),
+          ],
+        },
+        secondary_activity: {
+          connect: [
+            ...secondary_activity.map((activity) => ({ code: activity.code })),
+          ],
+        },
+      },
+      include: {
+        workspace: { include: { address: true } },
+        primary_activity: true,
+        secondary_activity: true,
+        license: true,
+        users: true,
+      },
+    });
+
+    return new CompanyEntity(company);
+  }
+
+  async updateDisconnect(
+    id: string,
+    {
+      secondary_activity = [],
+      primary_activity = [],
+      workspace = [],
+      license,
+      users = [],
+      ...updateCompanyDto
+    }: UpdateCompanyDto,
+  ) {
+    const company = await this.prisma.company.update({
+      where: { id: id },
+      data: {
+        ...updateCompanyDto,
+        users: {
+          delete: [
+            ...users.map(({ userId }) => ({
+              companyId_userId: {
+                companyId: id,
+                userId,
+              },
+            })),
+          ],
+        },
+        primary_activity: {
+          disconnect: [
+            ...primary_activity.map((activity) => ({ code: activity.code })),
+          ],
+        },
+        secondary_activity: {
+          disconnect: [
+            ...secondary_activity.map((activity) => ({ code: activity.code })),
+          ],
+        },
+      },
+      include: {
+        workspace: { include: { address: true } },
+        primary_activity: true,
+        secondary_activity: true,
+        license: true,
+      },
+    });
+
+    return new CompanyEntity(company);
+  }
 
   // async removeById(id: number) {
   //   const user = await this.prisma.user.delete({ where: { id: id } });
