@@ -7,7 +7,7 @@ export class UserCompanyEntity implements UserCompany {
   userId: number;
 
   @ApiProperty({ description: 'The id of the company' })
-  companyId: number;
+  companyId: string;
 
   @ApiProperty({ example: ['admin'], description: 'The roles of the User' })
   roles: string[];

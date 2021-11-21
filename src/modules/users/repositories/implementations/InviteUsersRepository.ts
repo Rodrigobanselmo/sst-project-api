@@ -22,7 +22,7 @@ export class InviteUsersRepository implements IInviteUsersRepository {
   }
 
   async findByCompanyIdAndEmail(
-    companyId: number,
+    companyId: string,
     email: string,
   ): Promise<InviteUsersEntity | undefined> {
     const invite = await this.prisma.inviteUsers.findFirst({
@@ -43,7 +43,7 @@ export class InviteUsersRepository implements IInviteUsersRepository {
   }
 
   async deleteByCompanyIdAndEmail(
-    companyId: number,
+    companyId: string,
     email: string,
   ): Promise<Prisma.BatchPayload> {
     const invite = await this.prisma.inviteUsers.deleteMany({

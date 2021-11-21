@@ -1,11 +1,10 @@
 import {
   ArgumentsHost,
-  BadRequestException,
   Catch,
   ExceptionFilter,
   HttpException,
   HttpStatus,
-  NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { Response } from 'express';
@@ -34,7 +33,7 @@ export class PrismaDbExceptionFilter implements ExceptionFilter {
         break;
 
       case 'P2025':
-        if (cause) error = new NotFoundException(cause);
+        if (cause) error = new BadRequestException(cause);
         break;
 
       default:
@@ -43,6 +42,7 @@ export class PrismaDbExceptionFilter implements ExceptionFilter {
     const status = error.getStatus();
 
     if (status === HttpStatus.INTERNAL_SERVER_ERROR) {
+      console.log(`error`, exception);
       console.log('Do something to warn me');
     }
     response.status(status).json({

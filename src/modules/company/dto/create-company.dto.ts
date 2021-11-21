@@ -1,5 +1,6 @@
 import { Transform, Type } from 'class-transformer';
 import {
+  ArrayNotEmpty,
   IsBoolean,
   IsDefined,
   IsEnum,
@@ -17,6 +18,7 @@ import { StringCapitalizeTransform } from '../../../shared/transformers/string-c
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
 import { ActivityDto } from './activity.dto';
+import { LicenseDto } from './license.dto';
 import { WorkspaceDto } from './workspace.dto';
 
 export class CreateCompanyDto {
@@ -52,8 +54,13 @@ export class CreateCompanyDto {
   @IsBoolean()
   isConsulting: boolean;
 
+  @ValidateNested()
+  @Type(() => LicenseDto)
+  readonly license?: LicenseDto;
+
   @ValidateNested({ each: true })
   @IsDefined()
+  @ArrayNotEmpty()
   @Type(() => WorkspaceDto)
   readonly workspace: WorkspaceDto[];
 

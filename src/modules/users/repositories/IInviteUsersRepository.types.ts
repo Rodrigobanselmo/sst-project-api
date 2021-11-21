@@ -8,14 +8,14 @@ interface IInviteUsersRepository {
     expires_date: Date,
   ): Promise<InviteUsersEntity>;
   findByCompanyIdAndEmail(
-    companyId: number,
+    companyId: string,
     email: string,
   ): Promise<InviteUsersEntity | undefined>;
   findById(id: string): Promise<InviteUsersEntity | undefined>;
   // deleteById(id: string): Promise<void>;
   // deleteByEmail(email: string): Promise<void>;
   deleteByCompanyIdAndEmail(
-    companyId: number,
+    companyId: string,
     email: string,
   ): Promise<Prisma.BatchPayload>;
   deleteAllOldInvites(currentDate: Date): Promise<Prisma.BatchPayload>;

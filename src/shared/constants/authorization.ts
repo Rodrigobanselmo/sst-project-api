@@ -20,6 +20,7 @@ export enum Permission {
   MASTER = 'master',
   USER = '1',
   INVITE_USER = '1.1',
+  CREATE_COMPANY = '2',
 }
 
 export enum SpecialPermission {

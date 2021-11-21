@@ -43,38 +43,38 @@ const comparePermission = (
   return isEqualCode && isEqualCrud;
 };
 
-const getCompanyId = (req): boolean | number => {
+const getCompanyId = (req): boolean | string => {
   const query = req.query;
   const params = req.params;
   const body = req.body;
 
-  if (body && body.companyId) return Number(body.companyId);
-  if (params && params.companyId) return Number(params.companyId);
-  if (query && query.companyId) return Number(query.companyId);
+  if (body && body.companyId) return body.companyId;
+  if (params && params.companyId) return params.companyId;
+  if (query && query.companyId) return query.companyId;
   return false;
 };
 
-const getRequestCompanyId = (req): boolean | number => {
+const getRequestCompanyId = (req): boolean | string => {
   const query = req.query;
   const params = req.params;
   const body = req.body;
 
-  if (body && body.myCompanyId) return Number(body.myCompanyId);
-  if (params && params.myCompanyId) return Number(params.myCompanyId);
-  if (query && query.myCompanyId) return Number(query.myCompanyId);
+  if (body && body.myCompanyId) return body.myCompanyId;
+  if (params && params.myCompanyId) return params.myCompanyId;
+  if (query && query.myCompanyId) return query.myCompanyId;
   return false;
 };
 
 const isParentCompany = async (
   prisma: PrismaService,
-  userCompanyId: number,
-  companyId: number,
+  userCompanyId: string,
+  companyId: string,
 ): Promise<boolean> => {
-  const parentRelation = await prisma.relatedCompanies.findUnique({
+  const parentRelation = await prisma.contract.findUnique({
     where: {
-      parentCompanyId_childCompanyId: {
-        parentCompanyId: userCompanyId,
-        childCompanyId: companyId,
+      applyingServiceCompanyId_receivingServiceCompanyId: {
+        applyingServiceCompanyId: userCompanyId,
+        receivingServiceCompanyId: companyId,
       },
     },
   });
@@ -130,13 +130,12 @@ export class PermissionsGuard implements CanActivate {
 
             // if not same company and checkChild = true
             if (checkChild && !isCompany) {
-              console.log(`passa aqui4`);
               // if is not a request from reqCompanyId return false
               const reqCompanyId = getRequestCompanyId(req);
               if (reqCompanyId !== company.companyId) return isAdmin(company);
 
               // if companyId is not present denied access
-              if (typeof companyId === 'number') {
+              if (typeof companyId === 'string') {
                 const havePermission = hasPermissions(company, options, CRUD);
 
                 if (!havePermission)

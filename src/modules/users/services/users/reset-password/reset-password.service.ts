@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { RefreshTokensRepository } from '../../../../auth/repositories/implementations/RefreshTokensRepository';
 
 import { HashProvider } from '../../../../../shared/providers/HashProvider/implementations/HashProvider';
@@ -16,7 +16,7 @@ export class ResetPasswordService {
   async execute({ tokenId, password }: ResetPasswordDto) {
     const refresh_token = await this.refreshTokensRepository.findById(tokenId);
 
-    if (!refresh_token) throw new NotFoundException('Token not found');
+    if (!refresh_token) throw new BadRequestException('Token not found');
 
     const passHash = await this.hashProvider.createHash(password);
 

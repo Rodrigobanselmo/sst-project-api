@@ -1,4 +1,5 @@
 import * as faker from 'faker';
+import { LicenseDto } from 'src/modules/company/dto/license.dto';
 
 import { ActivityDto } from '../../../src/modules/company/dto/activity.dto';
 import { CreateCompanyDto } from '../../../src/modules/company/dto/create-company.dto';
@@ -23,7 +24,7 @@ export function generate(useFormat = false): string {
 }
 
 export class FakeCompany implements CreateCompanyDto {
-  constructor(partial: Partial<CreateUserDto>) {
+  constructor(partial?: Partial<CreateUserDto>) {
     Object.assign(this, partial);
   }
 
@@ -36,4 +37,8 @@ export class FakeCompany implements CreateCompanyDto {
   workspace: WorkspaceDto[] = [];
   primary_activity: ActivityDto[] = [];
   secondary_activity: ActivityDto[] = [];
+
+  pushWorkspace(work: WorkspaceDto) {
+    return this.workspace.push(work);
+  }
 }

@@ -10,7 +10,7 @@ export class UsersCompanyRepository implements IUsersCompanyRepository {
   constructor(private prisma: PrismaService) {}
   async findByUserIdAndCompanyId(
     userId: number,
-    companyId: number,
+    companyId: string,
   ): Promise<UserCompanyEntity> {
     const UserCompany = await this.prisma.userCompany.findUnique({
       where: { companyId_userId: { userId, companyId } },

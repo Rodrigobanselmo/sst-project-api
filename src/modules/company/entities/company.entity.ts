@@ -1,10 +1,11 @@
 import { Company } from '.prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+import { LicenseEntity } from './license.entity';
 import { WorkspaceEntity } from './workspace.entity';
 
 export class CompanyEntity implements Company {
   @ApiProperty({ description: 'The id of the Company' })
-  id: number;
+  id: string;
 
   @ApiProperty({ description: 'The CNPJ of the Company' })
   cnpj: string;
@@ -39,6 +40,15 @@ export class CompanyEntity implements Company {
     description: 'The last time that the Company data was updated',
   })
   updatedAt: Date;
+
+  @ApiProperty({ description: 'The license id of the Company' })
+  licenseId: number;
+
+  @ApiProperty({ description: 'The parent company id of the Company' })
+  parentCompanyId: string;
+
+  @ApiProperty({ description: 'The creation date of the Company' })
+  license?: LicenseEntity;
 
   @ApiProperty({ description: 'The workspace related to the company' })
   workspace?: WorkspaceEntity[];

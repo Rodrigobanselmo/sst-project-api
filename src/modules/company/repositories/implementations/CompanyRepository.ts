@@ -5,6 +5,12 @@ import { PrismaService } from '../../../../prisma/prisma.service';
 import { CreateCompanyDto } from '../../dto/create-company.dto';
 import { CompanyEntity } from '../../entities/company.entity';
 import { ICompanyRepository } from '../ICompanyRepository.types';
+import { v4 as uuidV4 } from 'uuid';
+
+interface ICreateCompany extends CreateCompanyDto {
+  // licenseId?: number;
+  companyId?: string;
+}
 
 @Injectable()
 export class CompanyRepository implements ICompanyRepository {
@@ -14,11 +20,29 @@ export class CompanyRepository implements ICompanyRepository {
     workspace = [],
     primary_activity = [],
     secondary_activity = [],
+    license,
+    companyId,
     ...createCompanyDto
-  }: CreateCompanyDto): Promise<CompanyEntity> {
+  }: ICreateCompany): Promise<CompanyEntity> {
+    const companyUUId = uuidV4();
+
+    const isReceivingService = !!companyId;
+
+    const contractInfo = isReceivingService
+      ? {
+          license: { connect: { companyId: companyId } },
+          receivingServiceContracts: {
+            create: { applyingServiceCompanyId: companyId },
+          },
+        }
+      : {};
+
     const company = await this.prisma.company.create({
       data: {
+        id: companyUUId,
+        license: { create: { ...license, companyId: companyUUId } },
         ...createCompanyDto,
+        ...contractInfo,
         workspace: {
           connectOrCreate: [
             ...workspace.map(({ address, ...ws }) => ({
@@ -51,6 +75,7 @@ export class CompanyRepository implements ICompanyRepository {
         workspace: { include: { address: true } },
         primary_activity: true,
         secondary_activity: true,
+        license: true,
       },
     });
 

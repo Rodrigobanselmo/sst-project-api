@@ -7,7 +7,7 @@ export class FakeInvite implements InviteUserDto {
     Object.assign(this, partial);
   }
   email = faker.lorem.word() + faker.internet.email();
-  companyId = 1;
+  companyId = 'admin';
   roles = ['admin'];
   permissions = ['1', '2'];
 

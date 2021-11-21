@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { InviteUsersEntity } from '../../../entities/invite-users.entity';
 import { InviteUsersRepository } from '../../../repositories/implementations/InviteUsersRepository';
 
@@ -8,7 +8,7 @@ export class FindByTokenService {
   async execute(token: string) {
     const invite = await this.inviteUsersRepository.findById(token);
 
-    if (!invite) throw new NotFoundException('Invite token not found');
+    if (!invite) throw new BadRequestException('Invite token not found');
 
     return new InviteUsersEntity(invite);
   }

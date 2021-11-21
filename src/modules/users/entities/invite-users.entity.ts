@@ -22,7 +22,7 @@ export class InviteUsersEntity implements InviteUsers {
   expires_date: Date;
 
   @ApiProperty({ description: 'The company id for user invitation' })
-  companyId: number;
+  companyId: string;
 
   constructor(partial: Partial<InviteUsersEntity>) {
     Object.assign(this, partial);

@@ -58,7 +58,7 @@ export class UsersController {
     return classToClass(this.createUserService.execute(createUserDto));
   }
 
-  @Patch()
+  @Patch('update')
   async update(
     @Body() updateUserDto: UpdateUserDto,
     @User() { userId }: UserPayloadDto,

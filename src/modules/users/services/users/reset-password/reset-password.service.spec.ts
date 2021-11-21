@@ -1,4 +1,4 @@
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { RefreshTokensRepository } from '../../../../auth/repositories/implementations/RefreshTokensRepository';
 import { HashProvider } from '../../../../../shared/providers/HashProvider/implementations/HashProvider';
@@ -60,7 +60,7 @@ describe('ResetPasswordService', () => {
       await service.execute({} as any);
       throw new Error('error');
     } catch (err) {
-      expect(err).toEqual(new NotFoundException('Token not found'));
+      expect(err).toEqual(new BadRequestException('Token not found'));
     }
   });
 });

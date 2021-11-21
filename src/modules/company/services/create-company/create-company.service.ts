@@ -6,7 +6,10 @@ import { CompanyRepository } from '../../repositories/implementations/CompanyRep
 export class CreateCompanyService {
   constructor(private readonly companyRepository: CompanyRepository) {}
   async execute(createCompanyDto: CreateCompanyDto) {
-    const company = await this.companyRepository.create(createCompanyDto);
+    const company = await this.companyRepository.create({
+      license: {},
+      ...createCompanyDto,
+    });
 
     return company;
   }

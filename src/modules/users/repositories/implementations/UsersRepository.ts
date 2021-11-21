@@ -26,12 +26,13 @@ export class UsersRepository implements IUsersRepository {
 
   async update(
     id: number,
-    { email, oldPassword, ...updateUserDto }: UpdateUserDto,
+    { oldPassword, ...updateUserDto }: UpdateUserDto,
     userCompanyDto: UserCompanyDto[] = [],
   ) {
     const user = await this.prisma.user.update({
       where: { id: id },
       data: { ...updateUserDto, companies: { create: userCompanyDto } },
+      include: { companies: true },
     });
     if (!user) return;
     return new UserEntity(user);

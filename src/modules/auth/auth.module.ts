@@ -14,6 +14,7 @@ import { SessionService } from './services/session/session.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { SendForgotPassMailService } from './services/send-forgot-pass-mail/send-forgot-pass-mail.service';
 import { EtherealMailProvider } from '../../shared/providers/MailProvider/implementations/Ethereal/EtherealMailProvider';
+import { AuthorizationTestController } from './controller/authorization-test/authorization-test.controller';
 
 @Module({
   imports: [
@@ -25,7 +26,7 @@ import { EtherealMailProvider } from '../../shared/providers/MailProvider/implem
       },
     }),
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, AuthorizationTestController],
   providers: [
     SessionService,
     RefreshTokenService,

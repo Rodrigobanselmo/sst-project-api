@@ -25,7 +25,7 @@ export class WorkspaceEntity implements Workspace {
   updatedAt: Date;
 
   @ApiProperty({ description: 'The company id related to the Workspace' })
-  companyId: number;
+  companyId: string;
 
   @ApiProperty({ description: 'The address related to the Workspace' })
   address?: AddressEntity;

@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { HashProvider } from '../../../../../shared/providers/HashProvider/implementations/HashProvider';
@@ -30,7 +26,7 @@ export class UpdateUserService {
     const updateUserDto: UpdateUserDto = { ...restUpdateUserDto };
 
     const userData = await this.userRepository.findById(id);
-    if (!userData) throw new NotFoundException(`user #${id} not found`);
+    if (!userData) throw new BadRequestException(`user #${id} not found`);
 
     if (password) {
       if (!oldPassword) throw new BadRequestException(`Old password missing`);

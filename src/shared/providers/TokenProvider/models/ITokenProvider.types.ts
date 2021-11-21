@@ -9,7 +9,7 @@ interface IVerifyToken {
 }
 
 interface IPayloadUserCompany {
-  companyId: number;
+  companyId: string;
   roles: string[];
   permissions: string[];
 }

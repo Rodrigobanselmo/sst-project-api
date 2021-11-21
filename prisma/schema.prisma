@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,7 +6,6 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
 
 model User {
   id    Int     @default(autoincrement()) @id
@@ -26,7 +22,7 @@ model UserCompany {
   permissions String[]
   userId Int
   user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
-  companyId Int
+  companyId String
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
   created_at DateTime @default(now())
   updatedAt  DateTime   @updatedAt
@@ -46,14 +42,14 @@ model RefreshToken {
 model InviteUsers {
   id   String @id @default(uuid())
   expires_date DateTime
-  companyId Int
+  companyId String
   email String 
   roles String[]
   permissions String[]
 }
 
 model Company {
-  id    Int     @default(autoincrement()) @id
+  id   String    @id @default(uuid())
   cnpj String
   name String  
   fantasy String
@@ -67,19 +63,31 @@ model Company {
   primary_activity Activity[] @relation(name: "primary_activity")
   secondary_activity Activity[] @relation(name: "secondary_activity")
   employees Employee[] 
-  childCompany RelatedCompanies[]  @relation(name: "childCompany")
-  parentCompany RelatedCompanies[] @relation(name: "parentCompany")
+  receivingServiceContracts Contract[]
+  applyingServiceContracts Contract[]  @relation(name: "contracts")
+  licenseId Int? 
+  license License? @relation(name:"license",fields: [licenseId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
 }
 
-model RelatedCompanies {
-  parentCompany   Company @relation(name: "parentCompany",fields: [parentCompanyId], references: [id])
-  parentCompanyId Int 
-  childCompany   Company @relation(name: "childCompany",fields: [childCompanyId], references: [id])
-  childCompanyId Int 
-  status String
+model Contract {
+  receivingServiceCompany   Company @relation(fields: [receivingServiceCompanyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  applyingServiceCompany  Company @relation(name: "contracts", fields: [applyingServiceCompanyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  applyingServiceCompanyId String 
+  receivingServiceCompanyId String 
+  status String  @default("ACTIVE")
   created_at DateTime @default(now())
  
-  @@id([parentCompanyId, childCompanyId])
+  @@id([applyingServiceCompanyId, receivingServiceCompanyId])
+}
+
+model License {
+  id    Int     @default(autoincrement()) @id
+  companies   Company[] @relation(name:"license")
+  companyId String  @unique
+  status String @default("ACTIVE")
+  created_at DateTime @default(now())
+
+  @@index(companyId)
 }
  
 model Activity {
@@ -97,7 +105,7 @@ model Workspace {
   status String
   created_at DateTime @default(now())
   updatedAt  DateTime   @updatedAt
-  companyId Int
+  companyId String
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   address Address?
 }
@@ -121,6 +129,6 @@ model Employee {
   name String 
   cpf Int 
   created_at DateTime @default(now())
-  companyId Int
+  companyId String
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
 } 

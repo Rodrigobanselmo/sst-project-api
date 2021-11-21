@@ -1,17 +1,22 @@
 import { PrismaClient } from '@prisma/client';
 import { Permission, Role } from '../src/shared/constants/authorization';
 import { hash } from 'bcrypt';
+import { v4 as uuidV4 } from 'uuid';
 
 const prisma = new PrismaClient();
 
 const createUserAndCompany = async () => {
+  const id = process.env.NODE_ENV === 'test' ? 'admin' : uuidV4();
   const company = await prisma.company.create({
     data: {
+      id,
       cnpj: '10000000000',
       fantasy: 'Simple',
       name: 'Simplesst LTDA',
-      status: 'Ativo',
+      status: 'ACTIVE',
       type: 'Matriz',
+      license: { create: { companyId: id } },
+      // licenseOwner: { create: {} },
     },
   });
 

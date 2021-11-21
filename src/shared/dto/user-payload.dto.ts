@@ -3,7 +3,7 @@ import { IsEmail, IsNumber, IsString, ValidateNested } from 'class-validator';
 
 export class UserCompanyDto {
   @IsNumber()
-  readonly companyId: number;
+  readonly companyId: string;
 
   @IsString({ each: true })
   readonly roles: string[];

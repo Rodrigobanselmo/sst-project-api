@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 
 import { UsersRepository } from '../../../repositories/implementations/UsersRepository';
 
@@ -8,7 +8,7 @@ export class FindByEmailService {
   async execute(email: string) {
     const user = await this.userRepository.findByEmail(email);
     if (!user)
-      throw new NotFoundException(`user with email ${email} not found`);
+      throw new BadRequestException(`user with email ${email} not found`);
     return user;
   }
 }
