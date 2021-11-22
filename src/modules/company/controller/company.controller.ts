@@ -22,7 +22,7 @@ export class CompanyController {
   @Post()
   @Permissions({
     code: Permission.CREATE_COMPANY,
-    checkCompany: true,
+    isMember: true,
   })
   create(@Body() createCompanyDto: CreateCompanyDto) {
     return this.createCompanyService.execute(createCompanyDto);
@@ -31,7 +31,7 @@ export class CompanyController {
   @Post('contract')
   @Permissions({
     code: Permission.CREATE_COMPANY,
-    checkCompany: true,
+    isMember: true,
   })
   createChild(@Body() createContractDto: CreateContractDto) {
     return this.createContractService.execute(createContractDto);

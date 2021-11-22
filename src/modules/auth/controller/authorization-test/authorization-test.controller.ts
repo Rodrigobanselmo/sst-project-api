@@ -26,12 +26,12 @@ export class AuthorizationTestController {
     },
     {
       code: Permission.INVITE_USER,
-      checkCompany: true,
+      isMember: true,
     },
     {
       code: Permission.CREATE_COMPANY,
       crud: true,
-      checkCompany: true,
+      isMember: true,
     },
   )
   @Post()
@@ -42,7 +42,7 @@ export class AuthorizationTestController {
   @Permissions({
     code: Permission.CREATE_COMPANY,
     crud: true,
-    checkCompany: true,
+    isMember: true,
   })
   @Post('2')
   route21() {
@@ -57,13 +57,13 @@ export class AuthorizationTestController {
     {
       code: Permission.INVITE_USER,
       crud: true,
-      checkCompany: true,
-      checkChild: true,
+      isMember: true,
+      isContract: true,
     },
     {
       code: Permission.CREATE_COMPANY,
       crud: true,
-      checkChild: true,
+      isContract: true,
     },
   )
   @Patch()
@@ -71,18 +71,37 @@ export class AuthorizationTestController {
     return true;
   }
 
-  @Permissions(
-    {
-      code: Permission.INVITE_USER,
-      crud: true,
-    },
-    {
-      code: Permission.CREATE_COMPANY,
-      checkChild: true,
-    },
-  )
+  @Permissions({
+    code: Permission.INVITE_USER,
+    crud: true,
+  })
   @Delete()
   route4() {
+    return true;
+  }
+
+  @Permissions({
+    isMember: true,
+  })
+  @Get('6')
+  route6() {
+    return true;
+  }
+
+  @Permissions({
+    isContract: true,
+  })
+  @Get('7')
+  route7() {
+    return true;
+  }
+
+  @Permissions({
+    code: Permission.CREATE_COMPANY,
+    isContract: true,
+  })
+  @Get('8')
+  route8() {
     return true;
   }
 }

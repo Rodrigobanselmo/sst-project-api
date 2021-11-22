@@ -22,8 +22,8 @@ export class InvitesController {
   @Post()
   @Permissions({
     code: Permission.INVITE_USER,
-    checkCompany: true,
-    checkChild: true,
+    isMember: true,
+    isContract: true,
   })
   async invite(@Body() inviteUserDto: InviteUserDto) {
     return classToClass(this.inviteUsersService.execute(inviteUserDto));
@@ -32,7 +32,7 @@ export class InvitesController {
   @Delete()
   @Permissions({
     code: Permission.INVITE_USER,
-    checkCompany: true,
+    isMember: true,
   })
   async delete(@Query() deleteInviteDto: DeleteInviteDto) {
     return classToClass(this.deleteInvitesService.execute(deleteInviteDto));

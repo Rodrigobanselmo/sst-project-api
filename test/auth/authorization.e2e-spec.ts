@@ -208,14 +208,14 @@ describe('[Feature] Authorization', () => {
         .expect(HttpStatus.OK);
     });
 
-    it('should be able access only with permission', async () => {
+    it('should be able to access only with permission', async () => {
       return await request(app.getHttpServer())
         .get('/authorization-test')
         .set('Authorization', `Bearer ${sessionMain.token}`)
         .expect(HttpStatus.OK);
     });
 
-    it('should be able access crud on get', async () => {
+    it('should be able to access with crud on get', async () => {
       const invite = await createToken(app, sessionAdmin.token, {
         companyId: companyMain.id,
         permissions: [`${Permission.USER}-cud`],
@@ -246,7 +246,7 @@ describe('[Feature] Authorization', () => {
         .expect(HttpStatus.OK);
     });
 
-    it('should be able access crud on post', async () => {
+    it('should be able to access with crud on post', async () => {
       await request(app.getHttpServer())
         .post('/authorization-test')
         .set('Authorization', `Bearer ${sessionMain.token}`)
@@ -270,7 +270,7 @@ describe('[Feature] Authorization', () => {
         .expect(HttpStatus.CREATED);
     });
 
-    it('should be able access only for same company', async () => {
+    it('should be able to access only with same company', async () => {
       const invite = await createToken(app, sessionAdmin.token, {
         companyId: companyContract.id,
       });
@@ -301,7 +301,7 @@ describe('[Feature] Authorization', () => {
         .expect(HttpStatus.CREATED);
     });
 
-    it('should be able access only for same company and crud', async () => {
+    it('should be able to access only with same company and crud', async () => {
       const invite = await createToken(app, sessionAdmin.token, {
         companyId: companyMain.id,
         permissions: [`${Permission.CREATE_COMPANY}-c`],
@@ -350,7 +350,7 @@ describe('[Feature] Authorization', () => {
         .expect(HttpStatus.CREATED);
     });
 
-    it('should be able access crud on patch', async () => {
+    it('should be able to access with crud on patch', async () => {
       await request(app.getHttpServer())
         .patch('/authorization-test')
         .set('Authorization', `Bearer ${sessionMain.token}`)
@@ -379,7 +379,7 @@ describe('[Feature] Authorization', () => {
         .expect(HttpStatus.OK);
     });
 
-    it('should be able access only for company or childCompanies', async () => {
+    it('should be able to access only with company or contract', async () => {
       const inviteContractOK = await createToken(app, sessionAdmin.token, {
         companyId: companyContract.id,
         permissions: [`${Permission.INVITE_USER}-crud`],
@@ -466,10 +466,10 @@ describe('[Feature] Authorization', () => {
         .expect(HttpStatus.OK);
     });
 
-    it('should be able access only for childCompanies and crud', async () => {
+    it('should be able to access only with contract and crud', async () => {
       const inviteContractOK = await createToken(app, sessionAdmin.token, {
         companyId: companyContract.id,
-        permissions: [`${Permission.INVITE_USER}-crud`],
+        permissions: [`${Permission.CREATE_COMPANY}-crud`],
       });
 
       const userContractOK = await createUser(app, {
@@ -553,7 +553,7 @@ describe('[Feature] Authorization', () => {
         .expect(HttpStatus.OK);
     });
 
-    it('should be able access crud on delete', async () => {
+    it('should be able to access with crud on delete', async () => {
       await request(app.getHttpServer())
         .delete('/authorization-test')
         .set('Authorization', `Bearer ${sessionMain.token}`)
@@ -582,295 +582,264 @@ describe('[Feature] Authorization', () => {
         .expect(HttpStatus.OK);
     });
 
-    it.todo('should be able access only for childCompanies');
-    // it('should return user', async () => {});
+    it('should be able to access only if is company member', async () => {
+      const inviteContractOK = await createToken(app, sessionAdmin.token, {
+        companyId: companyContract.id,
+        permissions: [`${Permission.CREATE_COMPANY}-crud`],
+      });
+
+      const userContractOK = await createUser(app, {
+        token: inviteContractOK.id,
+        email: inviteContractOK.email,
+      });
+
+      const sessionContractOK = await createSession(
+        app,
+        userContractOK.email,
+        '12345678',
+      );
+
+      const inviteMainOK = await createToken(app, sessionAdmin.token, {
+        companyId: companyMain.id,
+        permissions: [`${Permission.CREATE_COMPANY}-crud`],
+      });
+
+      const userMainOK = await createUser(app, {
+        token: inviteMainOK.id,
+        email: inviteMainOK.email,
+      });
+
+      const sessionMainOK = await createSession(
+        app,
+        userMainOK.email,
+        '12345678',
+      );
+
+      const companyMain2 = await createCompany(app, sessionAdmin.token);
+
+      const inviteMain2 = await createToken(app, sessionAdmin.token, {
+        companyId: companyMain2.id,
+        permissions: [`${Permission.CREATE_COMPANY}-crud`],
+      });
+
+      const userMain2 = await createUser(app, {
+        token: inviteMain2.id,
+        email: inviteMain2.email,
+      });
+
+      const sessionMain2 = await createSession(
+        app,
+        userMain2.email,
+        '12345678',
+      );
+
+      await request(app.getHttpServer())
+        .get('/authorization-test/6')
+        .set('Authorization', `Bearer ${sessionAdmin.token}`)
+        .send({ companyId: companyContract.id })
+        .expect(HttpStatus.OK);
+
+      await request(app.getHttpServer())
+        .get('/authorization-test/6')
+        .set('Authorization', `Bearer ${sessionContractOK.token}`)
+        .send({ companyId: companyContract.id })
+        .expect(HttpStatus.OK);
+
+      await request(app.getHttpServer())
+        .get('/authorization-test/6')
+        .set('Authorization', `Bearer ${sessionContract.token}`)
+        .send({ companyId: companyContract.id })
+        .expect(HttpStatus.OK);
+
+      await request(app.getHttpServer())
+        .get('/authorization-test/6')
+        .set('Authorization', `Bearer ${sessionMain2.token}`)
+        .send({ companyId: companyContract.id })
+        .expect(HttpStatus.FORBIDDEN);
+
+      return await request(app.getHttpServer())
+        .get('/authorization-test/6')
+        .set('Authorization', `Bearer ${sessionMainOK.token}`)
+        .send({ companyId: companyContract.id, myCompanyId: companyMain.id })
+        .expect(HttpStatus.FORBIDDEN);
+    });
+
+    it('should be able to access only if is contract', async () => {
+      const inviteContractOK = await createToken(app, sessionAdmin.token, {
+        companyId: companyContract.id,
+        permissions: [`${Permission.CREATE_COMPANY}-crud`],
+      });
+
+      const userContractOK = await createUser(app, {
+        token: inviteContractOK.id,
+        email: inviteContractOK.email,
+      });
+
+      const sessionContractOK = await createSession(
+        app,
+        userContractOK.email,
+        '12345678',
+      );
+
+      const inviteMainOK = await createToken(app, sessionAdmin.token, {
+        companyId: companyMain.id,
+        permissions: [`${Permission.CREATE_COMPANY}-crud`],
+      });
+
+      const userMainOK = await createUser(app, {
+        token: inviteMainOK.id,
+        email: inviteMainOK.email,
+      });
+
+      const sessionMainOK = await createSession(
+        app,
+        userMainOK.email,
+        '12345678',
+      );
+
+      const companyMain2 = await createCompany(app, sessionAdmin.token);
+
+      const inviteMain2 = await createToken(app, sessionAdmin.token, {
+        companyId: companyMain2.id,
+        permissions: [`${Permission.CREATE_COMPANY}-crud`],
+      });
+
+      const userMain2 = await createUser(app, {
+        token: inviteMain2.id,
+        email: inviteMain2.email,
+      });
+
+      const sessionMain2 = await createSession(
+        app,
+        userMain2.email,
+        '12345678',
+      );
+
+      await request(app.getHttpServer())
+        .get('/authorization-test/7')
+        .set('Authorization', `Bearer ${sessionAdmin.token}`)
+        .send({ companyId: companyContract.id })
+        .expect(HttpStatus.OK);
+
+      await request(app.getHttpServer())
+        .get('/authorization-test/7')
+        .set('Authorization', `Bearer ${sessionContractOK.token}`)
+        .send({ companyId: companyContract.id })
+        .expect(HttpStatus.FORBIDDEN);
+
+      await request(app.getHttpServer())
+        .get('/authorization-test/7')
+        .set('Authorization', `Bearer ${sessionContract.token}`)
+        .send({ companyId: companyContract.id })
+        .expect(HttpStatus.FORBIDDEN);
+
+      await request(app.getHttpServer())
+        .get('/authorization-test/7')
+        .set('Authorization', `Bearer ${sessionMain2.token}`)
+        .send({ companyId: companyContract.id })
+        .expect(HttpStatus.FORBIDDEN);
+
+      await request(app.getHttpServer())
+        .get('/authorization-test/7')
+        .set('Authorization', `Bearer ${sessionMain.token}`)
+        .send({ companyId: companyContract.id, myCompanyId: companyMain.id })
+        .expect(HttpStatus.OK);
+
+      return await request(app.getHttpServer())
+        .get('/authorization-test/7')
+        .set('Authorization', `Bearer ${sessionMainOK.token}`)
+        .send({ companyId: companyContract.id, myCompanyId: companyMain.id })
+        .expect(HttpStatus.OK);
+    });
+
+    it('should be able to access only for contract and code', async () => {
+      const inviteContractOK = await createToken(app, sessionAdmin.token, {
+        companyId: companyContract.id,
+        permissions: [`${Permission.CREATE_COMPANY}-crud`],
+      });
+
+      const userContractOK = await createUser(app, {
+        token: inviteContractOK.id,
+        email: inviteContractOK.email,
+      });
+
+      const sessionContractOK = await createSession(
+        app,
+        userContractOK.email,
+        '12345678',
+      );
+
+      const inviteMainOK = await createToken(app, sessionAdmin.token, {
+        companyId: companyMain.id,
+        permissions: [],
+      });
+
+      const userMainOK = await createUser(app, {
+        token: inviteMainOK.id,
+        email: inviteMainOK.email,
+      });
+
+      const sessionMainOK = await createSession(
+        app,
+        userMainOK.email,
+        '12345678',
+      );
+
+      const companyMain2 = await createCompany(app, sessionAdmin.token);
+
+      const inviteMain2 = await createToken(app, sessionAdmin.token, {
+        companyId: companyMain2.id,
+        permissions: [`${Permission.CREATE_COMPANY}-crud`],
+      });
+
+      const userMain2 = await createUser(app, {
+        token: inviteMain2.id,
+        email: inviteMain2.email,
+      });
+
+      const sessionMain2 = await createSession(
+        app,
+        userMain2.email,
+        '12345678',
+      );
+
+      await request(app.getHttpServer())
+        .get('/authorization-test/8')
+        .set('Authorization', `Bearer ${sessionAdmin.token}`)
+        .send({ companyId: companyContract.id })
+        .expect(HttpStatus.OK);
+
+      await request(app.getHttpServer())
+        .get('/authorization-test/8')
+        .set('Authorization', `Bearer ${sessionContractOK.token}`)
+        .send({ companyId: companyContract.id })
+        .expect(HttpStatus.FORBIDDEN);
+
+      await request(app.getHttpServer())
+        .get('/authorization-test/8')
+        .set('Authorization', `Bearer ${sessionContract.token}`)
+        .send({ companyId: companyContract.id })
+        .expect(HttpStatus.FORBIDDEN);
+
+      await request(app.getHttpServer())
+        .get('/authorization-test/8')
+        .set('Authorization', `Bearer ${sessionMain2.token}`)
+        .send({ companyId: companyContract.id })
+        .expect(HttpStatus.FORBIDDEN);
+
+      await request(app.getHttpServer())
+        .get('/authorization-test/8')
+        .set('Authorization', `Bearer ${sessionMain.token}`)
+        .send({ companyId: companyContract.id, myCompanyId: companyMain.id })
+        .expect(HttpStatus.OK);
+
+      return await request(app.getHttpServer())
+        .get('/authorization-test/8')
+        .set('Authorization', `Bearer ${sessionMainOK.token}`)
+        .send({ companyId: companyContract.id, myCompanyId: companyMain.id })
+        .expect(HttpStatus.FORBIDDEN);
+    });
   });
-
-  // describe('Get ME [GET /me]', () => {
-  //   it('should return user', async () => {
-  //     const sessionUser: LoginUserDto = {
-  //       email: user.email,
-  //       password: user.password,
-  //     };
-
-  //     const { body: session } = await request(app.getHttpServer())
-  //       .post('/session')
-  //       .send(sessionUser);
-
-  //     // trying to access route without token
-  //     await request(app.getHttpServer())
-  //       .get('/users/me')
-  //       .expect(HttpStatus.UNAUTHORIZED);
-
-  //     const userMe = await request(app.getHttpServer())
-  //       .get('/users/me')
-  //       .set('Authorization', `Bearer ${session.token}`)
-  //       .expect(HttpStatus.OK);
-
-  //     expect(userMe.body).not.toHaveProperty('password');
-
-  //     return expect(userMe.body.companies).toEqual([]);
-  //   });
-  // });
-
-  // describe('Create [POST]', () => {
-  //   it('should create User', async () => {
-  //     const createUser = new FakerUser();
-  //     delete createUser.token;
-
-  //     const user = await request(app.getHttpServer())
-  //       .post('/users')
-  //       .send(createUser)
-  //       .expect(HttpStatus.CREATED);
-
-  //     expect(user.body).not.toHaveProperty('password');
-
-  //     return expect(user.body.companies).toEqual([]);
-  //   });
-
-  //   it('should not create User with same email', async () => {
-  //     const createUser = new FakerUser({ email: user.email });
-  //     delete createUser.token;
-
-  //     return await request(app.getHttpServer())
-  //       .post('/users')
-  //       .send(createUser)
-  //       .expect(HttpStatus.BAD_REQUEST);
-  //   });
-
-  //   it('should validate fields', async () => {
-  //     const createUser = new FakerUser({ email: '123' });
-  //     return await request(app.getHttpServer())
-  //       .post('/users')
-  //       .send(createUser)
-  //       .expect(HttpStatus.BAD_REQUEST);
-  //   });
-
-  //   it('should validate token', async () => {
-  //     const createUser = new FakerUser();
-  //     return await request(app.getHttpServer())
-  //       .post('/users')
-  //       .send(createUser)
-  //       .expect(HttpStatus.NOT_FOUND);
-  //   });
-
-  //   it('should create token and add permissions on create user', async () => {
-  //     const createInvite = new FakeInvite();
-
-  //     await request(app.getHttpServer()).post('/invites').send(createInvite);
-
-  //     const { body: invite } = await request(app.getHttpServer())
-  //       .post('/invites')
-  //       .send(createInvite)
-  //       .set('Authorization', `Bearer ${sessionAdmin.token}`)
-  //       .expect(HttpStatus.CREATED);
-
-  //     const createUser = new FakerUser({
-  //       token: invite.id,
-  //       email: invite.email,
-  //     });
-
-  //     const user = await request(app.getHttpServer())
-  //       .post('/users')
-  //       .send(createUser)
-  //       .expect(HttpStatus.CREATED);
-
-  //     return expect(user.body.companies).not.toEqual([]);
-  //   });
-
-  //   it('should not create user if token is assigned to another email or email already exist', async () => {
-  //     const createInvite = new FakeInvite();
-
-  //     const { body: invite } = await request(app.getHttpServer())
-  //       .post('/invites')
-  //       .send(createInvite)
-  //       .set('Authorization', `Bearer ${sessionAdmin.token}`)
-  //       .expect(HttpStatus.CREATED);
-
-  //     const createUser = new FakerUser({
-  //       token: invite.id,
-  //     });
-
-  //     await request(app.getHttpServer())
-  //       .post('/users')
-  //       .send(createUser)
-  //       .expect(HttpStatus.BAD_REQUEST);
-
-  //     const createUserInvite = new FakerUser({
-  //       email: invite.email,
-  //       token: invite.id,
-  //     });
-
-  //     await request(app.getHttpServer())
-  //       .post('/users')
-  //       .send(createUserInvite)
-  //       .expect(HttpStatus.CREATED);
-
-  //     // user already exist in this company
-  //     return await request(app.getHttpServer())
-  //       .post('/invites')
-  //       .send(createInvite)
-  //       .set('Authorization', `Bearer ${sessionAdmin.token}`)
-  //       .expect(HttpStatus.BAD_REQUEST);
-  //   });
-  // });
-
-  // describe('Update one [PATCH]', () => {
-  //   it('Update user', async () => {
-  //     const createUser = new FakerUser();
-
-  //     delete createUser.token;
-
-  //     const sessionUser = {
-  //       email: createUser.email,
-  //       password: createUser.password,
-  //     };
-
-  //     await request(app.getHttpServer())
-  //       .post('/users')
-  //       .send(createUser)
-  //       .expect(HttpStatus.CREATED);
-
-  //     const { body: session } = await request(app.getHttpServer())
-  //       .post('/session')
-  //       .send(sessionUser)
-  //       .expect(HttpStatus.OK);
-
-  //     return request(app.getHttpServer())
-  //       .patch(`/users/update`)
-  //       .set('Authorization', `Bearer ${session.token}`)
-  //       .send({ email: 'user@gmail.com' })
-  //       .expect(HttpStatus.OK)
-  //       .then(({ body }) => {
-  //         expect(body).toEqual(
-  //           expect.objectContaining({
-  //             id: expect.any(Number),
-  //             email: expect.any(String),
-  //           }),
-  //         );
-  //         expect(body.password).toBeUndefined();
-  //       });
-  //   });
-
-  //   it('Update user password or fail if incorrect', async () => {
-  //     const createUser = new FakerUser();
-
-  //     delete createUser.token;
-
-  //     const sessionUser = {
-  //       email: createUser.email,
-  //       password: createUser.password,
-  //     };
-
-  //     await request(app.getHttpServer())
-  //       .post('/users')
-  //       .send(createUser)
-  //       .expect(HttpStatus.CREATED);
-
-  //     const { body: session } = await request(app.getHttpServer())
-  //       .post('/session')
-  //       .send(sessionUser)
-  //       .expect(HttpStatus.OK);
-
-  //     await request(app.getHttpServer())
-  //       .patch(`/users/update`)
-  //       .set('Authorization', `Bearer ${session.token}`)
-  //       .send({
-  //         password: '1234567890',
-  //         oldPassword: 'incorrect',
-  //       })
-  //       .expect(HttpStatus.BAD_REQUEST);
-
-  //     return request(app.getHttpServer())
-  //       .patch(`/users/update`)
-  //       .set('Authorization', `Bearer ${session.token}`)
-  //       .send({
-  //         password: '1234567890',
-  //         oldPassword: createUser.password,
-  //       })
-  //       .expect(HttpStatus.OK)
-  //       .then(({ body }) => {
-  //         expect(body).toEqual(
-  //           expect.objectContaining({
-  //             id: expect.any(Number),
-  //             email: expect.any(String),
-  //           }),
-  //         );
-  //         expect(body.password).toBeUndefined();
-  //       });
-  //   });
-
-  //   it('Update user roles and permissions by token', async () => {
-  //     const createUser = new FakerUser();
-
-  //     delete createUser.token;
-
-  //     const sessionUser = {
-  //       email: createUser.email,
-  //       password: createUser.password,
-  //     };
-
-  //     await request(app.getHttpServer())
-  //       .post('/users')
-  //       .send(createUser)
-  //       .expect(HttpStatus.CREATED);
-
-  //     const { body: session } = await request(app.getHttpServer())
-  //       .post('/session')
-  //       .send(sessionUser)
-  //       .expect(HttpStatus.OK);
-
-  //     const createInvite = new FakeInvite({ email: createUser.email });
-
-  //     const { body: invite } = await request(app.getHttpServer())
-  //       .post('/invites')
-  //       .send(createInvite)
-  //       .set('Authorization', `Bearer ${sessionAdmin.token}`)
-  //       .expect(HttpStatus.CREATED);
-
-  //     return request(app.getHttpServer())
-  //       .patch(`/users/update`)
-  //       .set('Authorization', `Bearer ${session.token}`)
-  //       .send({ token: invite.id })
-  //       .expect(HttpStatus.OK)
-  //       .then(({ body }) => {
-  //         expect(body.companies[0].permissions).toEqual(
-  //           createInvite.permissions,
-  //         );
-  //         expect(body.companies[0].roles).toEqual(createInvite.roles);
-  //       });
-  //   });
-  // });
-
-  //   return request(app.getHttpServer())
-  //     .get('/users')
-  //     .set('Authorization', `Bearer ${refreshSession.token}`)
-  //     .expect(HttpStatus.OK)
-  //     .then(({ body }) => {
-  //       expect(Array.isArray(body)).toBe(true);
-  //       expect(body).toEqual(
-  //         expect.arrayContaining([
-  //           expect.objectContaining({
-  //             id: expect.any(Number),
-  //             email: expect.any(String),
-  //             name: expect.any(String),
-  //             created_at: expect.any(String),
-  //             roles: expect.arrayContaining([expect.any(String)]),
-  //             permissions: expect.arrayContaining([expect.any(String)]),
-  //           }),
-  //         ]),
-  //       );
-  //       expect(body).toEqual(
-  //         expect.arrayContaining([
-  //           expect.not.objectContaining({
-  //             password: expect.any(String),
-  //           }),
-  //         ]),
-  //       );
-  //     });
-  // });
-
-  // it.todo('Delete one [DELETE /:id]');
 
   afterAll(async () => {
     await app.close();

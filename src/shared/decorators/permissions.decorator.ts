@@ -2,10 +2,10 @@ import { SetMetadata } from '@nestjs/common';
 import { Permission } from '../constants/authorization';
 
 export interface IPermissionOptions {
-  code: Permission;
+  code?: Permission;
   crud?: boolean;
-  checkCompany?: boolean;
-  checkChild?: boolean;
+  isMember?: boolean;
+  isContract?: boolean;
 }
 
 export const PERMISSIONS_KEY = 'Permissions';

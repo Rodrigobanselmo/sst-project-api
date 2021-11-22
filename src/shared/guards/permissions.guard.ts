@@ -27,26 +27,7 @@ const methodToCrud = (method: IMethods) => {
   }
 };
 
-const comparePermission = (
-  options: IPermissionOptions,
-  permission: string,
-  CRUD: string,
-) => {
-  const isEqualCode = permission.split('-')[0] === options.code;
-  const isEqualCrud = options.crud ? permission.includes(CRUD) : true;
-  // if (CRUD === 'c')
-  // console.log(`object`, isEqualCode, isEqualCrud, options.crud, permission);
-
-  // const isEqualExtends = options.special
-  //   ? !options.special
-  //       .map((extend) => permission.includes(extend))
-  //       .some((i) => !i)
-  //   : true;
-
-  return isEqualCode && isEqualCrud;
-};
-
-const getCompanyId = (req): boolean | string => {
+const getCompanyId = (req): string => {
   const query = req.query;
   const params = req.params;
   const body = req.body;
@@ -54,10 +35,10 @@ const getCompanyId = (req): boolean | string => {
   if (body && body.companyId) return body.companyId;
   if (params && params.companyId) return params.companyId;
   if (query && query.companyId) return query.companyId;
-  return false;
+  return '';
 };
 
-const getRequestCompanyId = (req): boolean | string => {
+const getRequestCompanyId = (req): string => {
   const query = req.query;
   const params = req.params;
   const body = req.body;
@@ -65,43 +46,48 @@ const getRequestCompanyId = (req): boolean | string => {
   if (body && body.myCompanyId) return body.myCompanyId;
   if (params && params.myCompanyId) return params.myCompanyId;
   if (query && query.myCompanyId) return query.myCompanyId;
-  return false;
+  return '';
 };
 
 const isParentCompany = async (
   prisma: PrismaService,
-  userCompanyId: string,
+  requestCompanyId: string,
   companyId: string,
 ): Promise<boolean> => {
   const parentRelation = await prisma.contract.findUnique({
     where: {
       applyingServiceCompanyId_receivingServiceCompanyId: {
-        applyingServiceCompanyId: userCompanyId,
+        applyingServiceCompanyId: requestCompanyId,
         receivingServiceCompanyId: companyId,
       },
     },
   });
 
-  if (parentRelation.status !== 'ACTIVE') return false;
   if (!parentRelation) return false;
+  if (parentRelation.status !== 'ACTIVE') return false;
 
   return true;
-};
-
-const hasPermissions = (
-  company: UserCompanyDto,
-  options: IPermissionOptions,
-  CRUD: string,
-) => {
-  return company.permissions.some((permission) =>
-    comparePermission(options, permission, CRUD),
-  );
 };
 
 const isAdmin = (company: UserCompanyDto) => {
   return company.permissions.some(
     (permission) => permission === Permission.MASTER,
   );
+};
+
+const checkPermissions = (
+  company: UserCompanyDto,
+  options: IPermissionOptions,
+  CRUD: string,
+) => {
+  if (!options.code) return true;
+
+  return company.permissions.some((permission) => {
+    const isEqualCode = permission.split('-')[0] === options.code;
+    const isEqualCrud = options.crud ? permission.includes(CRUD) : true;
+
+    return isEqualCode && isEqualCrud;
+  });
 };
 
 @Injectable()
@@ -120,54 +106,48 @@ export class PermissionsGuard implements CanActivate {
 
     const method: IMethods = req.method;
     const CRUD = methodToCrud(method);
+
     if (user && user?.companies)
       // map all companies in user token
       return await asyncSome(user.companies, async (company) => {
         // map all permissions required in route
         return await asyncSome(requiredPermissionsOptions, async (options) => {
-          const { checkChild, checkCompany } = options;
+          const { isContract, isMember } = options;
+          const userCompanyId = company.companyId;
 
-          // checks if has permission to edit this company (your or child companies)
-          if (checkChild || checkCompany) {
-            const companyId = getCompanyId(req);
-            const isCompany = companyId == company.companyId;
-
-            // if not same company and checkChild = true
-            if (checkChild && !isCompany) {
-              // if is not a request from reqCompanyId return false
-              const reqCompanyId = getRequestCompanyId(req);
-              if (reqCompanyId !== company.companyId) return isAdmin(company);
-
-              // if companyId is not present denied access
-              if (typeof companyId === 'string') {
-                const havePermission = hasPermissions(company, options, CRUD);
-
-                if (!havePermission)
-                  // if does not have permissions denied access
-                  return isAdmin(company);
-
-                // if have permissions then check in database if companyId is child of the company permissions
-                const isParent = await isParentCompany(
-                  this.prisma,
-                  company.companyId,
-                  companyId,
-                );
-
-                if (isParent) return true;
-
-                return isAdmin(company);
-              } else {
-                return isAdmin(company);
-              }
-            }
-
-            // if not same company and does not check for child then return false
-            if (!isCompany && !checkChild) return isAdmin(company);
+          const myCompanyId = getRequestCompanyId(req);
+          if (isContract) {
+            // if has contract and you pass an myCompanyId, if is != from user company permission fails
+            if (myCompanyId && myCompanyId !== userCompanyId) return false;
           }
 
-          // if dont check for companies domain, then just check if has permissions in one of the companies
-          // if (CRUD === 'c') console.log(`object`, options, company);
-          return hasPermissions(company, options, CRUD) || isAdmin(company);
+          if (isAdmin(company)) return true;
+
+          let isCompanyMember = false;
+          const affectedCompanyId = getCompanyId(req);
+          if (isMember) {
+            if (!affectedCompanyId) return false;
+
+            isCompanyMember = affectedCompanyId == userCompanyId;
+          }
+
+          const isPermissionPresent = checkPermissions(company, options, CRUD);
+          if (!isPermissionPresent) return false;
+
+          if (!isMember && !isContract && isPermissionPresent) return true;
+          if (isCompanyMember && isPermissionPresent) return true;
+
+          if (isContract) {
+            const isCompanyContract = await isParentCompany(
+              this.prisma,
+              userCompanyId,
+              affectedCompanyId,
+            );
+
+            if (isCompanyContract && isPermissionPresent) return true;
+          }
+
+          return false;
         });
       });
     return false;
