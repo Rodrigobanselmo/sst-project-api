@@ -1,5 +1,4 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { InviteUsersEntity } from '../../../entities/invite-users.entity';
 import { InviteUsersRepository } from '../../../repositories/implementations/InviteUsersRepository';
 
 @Injectable()
@@ -10,6 +9,6 @@ export class FindByTokenService {
 
     if (!invite) throw new BadRequestException('Invite token not found');
 
-    return new InviteUsersEntity(invite);
+    return invite;
   }
 }

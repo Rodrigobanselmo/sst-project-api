@@ -1,28 +1,27 @@
-import { UserEntity } from '../../src/modules/users/entities/user.entity';
-import { CompanyEntity } from '../../src/modules/company/entities/company.entity';
 import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
+import { UpdateUserCompanyDto } from 'src/modules/users/dto/update-user-company.dto';
 import request from 'supertest';
 
 import { AuthModule } from '../../src/modules/auth/auth.module';
-import { LoginUserDto } from '../../src/modules/auth/dto/login-user.dto';
 import { CompanyModule } from '../../src/modules/company/company.module';
+import { CompanyEntity } from '../../src/modules/company/entities/company.entity';
+import { CreateUserDto } from '../../src/modules/users/dto/create-user.dto';
+import { InviteUserDto } from '../../src/modules/users/dto/invite-user.dto';
+import { UserEntity } from '../../src/modules/users/entities/user.entity';
 import { UsersModule } from '../../src/modules/users/users.module';
 import { PrismaModule } from '../../src/prisma/prisma.module';
+import { Permission } from '../../src/shared/constants/authorization';
 import { PrismaDbExceptionFilter } from '../../src/shared/filters/prisma-db-exception.filter';
 import { JwtAuthGuard } from '../../src/shared/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../../src/shared/guards/permissions.guard';
 import { RolesGuard } from '../../src/shared/guards/roles.guard';
+import { FakeCompany } from '../utils/fake/company.fake';
 import { FakeInvite } from '../utils/fake/invite.fake';
 import { FakerUser } from '../utils/fake/user.fake';
-import { User } from '.prisma/client';
-import { FakeCompany } from '../utils/fake/company.fake';
 import { FakeWorkspace } from '../utils/fake/workspace.fake';
-import { CreateUserDto } from '../../src/modules/users/dto/create-user.dto';
-import { InviteUserDto } from '../../src/modules/users/dto/invite-user.dto';
-import { Permission } from '../../src/shared/constants/authorization';
-import { UpdateUserCompanyDto } from 'src/modules/users/dto/update-user-company.dto';
+import { User } from '.prisma/client';
 
 const createToken = async (
   app: INestApplication,

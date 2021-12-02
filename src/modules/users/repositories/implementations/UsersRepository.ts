@@ -10,6 +10,7 @@ import { IUsersRepository } from '../IUsersRepository.types';
 
 @Injectable()
 export class UsersRepository implements IUsersRepository {
+  private count = 0;
   constructor(private prisma: PrismaService) {}
 
   async create(

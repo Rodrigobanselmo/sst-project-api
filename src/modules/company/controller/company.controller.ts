@@ -9,6 +9,8 @@ import { CreateContractService } from '../services/create-contract/create-contra
 import { CreateCompanyService } from '../services/create-company/create-company.service';
 import { UpdateCompanyDto } from '../dto/update-company.dto';
 import { UpdateCompanyService } from '../services/update-company/update-company.service';
+import { Public } from '../../../shared/decorators/public.decorator';
+import { ExportCompaniesService } from '../services/export-companies/export-companies.service';
 
 @ApiTags('company')
 @Controller('company')
@@ -17,6 +19,7 @@ export class CompanyController {
     private readonly createCompanyService: CreateCompanyService,
     private readonly createContractService: CreateContractService,
     private readonly updateCompanyService: UpdateCompanyService,
+    private readonly exportCompaniesService: ExportCompaniesService,
   ) {}
 
   @Post()
@@ -26,6 +29,12 @@ export class CompanyController {
   })
   create(@Body() createCompanyDto: CreateCompanyDto) {
     return this.createCompanyService.execute(createCompanyDto);
+  }
+
+  @Post('export')
+  @Public()
+  export() {
+    return this.exportCompaniesService.execute();
   }
 
   @Post('contract')
@@ -50,7 +59,7 @@ export class CompanyController {
     return this.updateCompanyService.execute(id, updateCompanyDto);
   }
 
-  // TODO
+  // TODO: create disconnect users or activities or...
   // @Patch('update/disconnect/:companyId')
   // updateDisconnect(
   //   @Param('companyId') id: string,

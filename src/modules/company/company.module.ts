@@ -5,6 +5,8 @@ import { UpdateCompanyService } from './services/update-company/update-company.s
 import { CompanyRepository } from './repositories/implementations/CompanyRepository';
 import { CreateContractService } from './services/create-contract/create-contract.service';
 import { LicenseRepository } from './repositories/implementations/LicenseRepository';
+import { ExportCompaniesService } from './services/export-companies/export-companies.service';
+import { ExcelProvider } from '../../shared/providers/ExcelProvider/implementations/ExcelProvider';
 
 @Module({
   controllers: [CompanyController],
@@ -14,6 +16,8 @@ import { LicenseRepository } from './repositories/implementations/LicenseReposit
     CreateContractService,
     CompanyRepository,
     LicenseRepository,
+    ExportCompaniesService,
+    ExcelProvider,
   ],
 })
 export class CompanyModule {}

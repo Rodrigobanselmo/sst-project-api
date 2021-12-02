@@ -4,21 +4,22 @@ import { PassportModule } from '@nestjs/passport';
 
 import { DayJSProvider } from '../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { HashProvider } from '../../shared/providers/HashProvider/implementations/HashProvider';
+import { EtherealMailProvider } from '../../shared/providers/MailProvider/implementations/Ethereal/EtherealMailProvider';
 import { JwtTokenProvider } from '../../shared/providers/TokenProvider/implementations/JwtTokenProvider';
-import { UsersRepository } from '../users/repositories/implementations/UsersRepository';
+import { UsersModule } from '../users/users.module';
 import { AuthController } from './controller/auth.controller';
+import { AuthorizationTestController } from './controller/authorization-test/authorization-test.controller';
 import { RefreshTokensRepository } from './repositories/implementations/RefreshTokensRepository';
 import { DeleteAllExpiredService } from './services/delete-all-expired/delete-all-expired.service';
 import { RefreshTokenService } from './services/refresh-token/refresh-token.service';
+import { SendForgotPassMailService } from './services/send-forgot-pass-mail/send-forgot-pass-mail.service';
 import { SessionService } from './services/session/session.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { SendForgotPassMailService } from './services/send-forgot-pass-mail/send-forgot-pass-mail.service';
-import { EtherealMailProvider } from '../../shared/providers/MailProvider/implementations/Ethereal/EtherealMailProvider';
-import { AuthorizationTestController } from './controller/authorization-test/authorization-test.controller';
 
 @Module({
   imports: [
     PassportModule,
+    UsersModule,
     JwtModule.register({
       secret: process.env.TOKEN_SECRET,
       signOptions: {
@@ -31,7 +32,6 @@ import { AuthorizationTestController } from './controller/authorization-test/aut
     SessionService,
     RefreshTokenService,
     DeleteAllExpiredService,
-    UsersRepository,
     HashProvider,
     DayJSProvider,
     RefreshTokensRepository,
