@@ -26,7 +26,7 @@ export class UserCompanyEntity implements UserCompany {
 
   @ApiProperty({
     description: 'The current status of the user account',
-    examples: ['active', 'pending', 'canceled'],
+    examples: ['ACTIVE', 'PENDING', 'CANCELED'],
   })
   status: string;
 

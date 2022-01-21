@@ -12,7 +12,7 @@ export class WorkspaceEntity implements Workspace {
 
   @ApiProperty({
     description: 'The current status of the Workspace',
-    examples: ['active', 'pending', 'canceled'],
+    examples: ['ACTIVE', 'PENDING', 'CANCELED'],
   })
   status: string;
 

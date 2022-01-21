@@ -22,7 +22,3 @@ export enum Permission {
   INVITE_USER = '1.1',
   CREATE_COMPANY = '2',
 }
-
-export enum SpecialPermission {
-  CHILD_COMPANY = 'C',
-}

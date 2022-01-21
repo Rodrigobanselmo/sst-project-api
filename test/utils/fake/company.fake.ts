@@ -1,5 +1,4 @@
 import * as faker from 'faker';
-import { LicenseDto } from 'src/modules/company/dto/license.dto';
 
 import { ActivityDto } from '../../../src/modules/company/dto/activity.dto';
 import { CreateCompanyDto } from '../../../src/modules/company/dto/create-company.dto';
@@ -31,7 +30,7 @@ export class FakeCompany implements CreateCompanyDto {
   cnpj = generate();
   name = faker.lorem.sentence();
   fantasy = faker.lorem.sentence();
-  status = 'active';
+  status = 'ACTIVE';
   type = 'matriz';
   isConsulting = false;
   workspace: WorkspaceDto[] = [];

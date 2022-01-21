@@ -12,7 +12,7 @@ export class LicenseEntity implements License {
 
   @ApiProperty({
     description: 'The current status of the License',
-    examples: ['active', 'pending', 'canceled'],
+    examples: ['ACTIVE', 'PENDING', 'CANCELED'],
   })
   status: string;
 

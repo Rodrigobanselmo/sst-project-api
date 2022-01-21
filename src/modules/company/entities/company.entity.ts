@@ -18,7 +18,7 @@ export class CompanyEntity implements Company {
 
   @ApiProperty({
     description: 'The current status of the Company',
-    examples: ['active', 'pending', 'canceled'],
+    examples: ['ACTIVE', 'PENDING', 'CANCELED'],
   })
   status: string;
 

@@ -6,5 +6,5 @@ export class FakeLicense implements LicenseDto {
   constructor(partial?: Partial<InviteUserDto>) {
     Object.assign(this, partial);
   }
-  status = 'active';
+  status = 'ACTIVE';
 }

@@ -8,6 +8,6 @@ export class FakeWorkspace implements WorkspaceDto {
   }
   id?: number;
   name = faker.lorem.sentence();
-  status = 'active';
+  status = 'ACTIVE';
   address = new FakeAddress();
 }
