@@ -37,6 +37,8 @@ export class AuthController {
   @Public()
   @Post('refresh')
   refresh(@Body() { refresh_token }: RefreshTokenDto) {
+    console.log(refresh_token);
+
     return this.refreshTokenService.execute(refresh_token);
   }
 

@@ -7,6 +7,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
+enum RiskFactorsEnum {
+  BIO 
+  QUI
+  FIS
+  ERG
+  ACI
+}
+
+enum StatusEnum {
+  ACTIVE
+  PROGRESS
+  INACTIVE
+  PENDING
+  CANCELED
+}
+
 model User {
   id    Int     @default(autoincrement()) @id
   email String  @unique
@@ -20,7 +37,7 @@ model User {
 model UserCompany {
   roles String[]
   permissions String[]
-  status String @default("ACTIVE")
+  status StatusEnum @default(ACTIVE)
   userId Int
   user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
   companyId String
@@ -54,7 +71,7 @@ model Company {
   cnpj String
   name String  
   fantasy String
-  status String @default("ACTIVE")
+  status StatusEnum @default(ACTIVE)
   type String
   isConsulting Boolean @default(false)
   created_at DateTime @default(now())
@@ -68,6 +85,9 @@ model Company {
   applyingServiceContracts Contract[]  @relation(name: "contracts")
   licenseId Int? 
   license License? @relation(name:"license",fields: [licenseId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
+  riskFactors RiskFactors[] 
+  recMed RecMed[] 
+  checklist Checklist[] 
 }
 
 model Contract {
@@ -75,7 +95,7 @@ model Contract {
   applyingServiceCompany  Company @relation(name: "contracts", fields: [applyingServiceCompanyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   applyingServiceCompanyId String 
   receivingServiceCompanyId String 
-  status String  @default("ACTIVE")
+  status StatusEnum @default(ACTIVE)
   created_at DateTime @default(now())
  
   @@id([applyingServiceCompanyId, receivingServiceCompanyId])
@@ -85,7 +105,7 @@ model License {
   id    Int     @default(autoincrement()) @id
   companies   Company[] @relation(name:"license")
   companyId String  @unique
-  status String @default("ACTIVE")
+  status StatusEnum @default(ACTIVE)
   created_at DateTime @default(now())
 
   @@index(companyId)
@@ -103,7 +123,7 @@ model Activity {
 model Workspace {
   id    Int     @default(autoincrement()) @id
   name String  
-  status String @default("ACTIVE")
+  status StatusEnum @default(ACTIVE)
   created_at DateTime @default(now())
   updatedAt  DateTime   @updatedAt
   companyId String
@@ -126,10 +146,49 @@ model Address {
 
 model Employee {
   id    Int     @default(autoincrement()) @id
-  status String @default("ACTIVE")
+  status StatusEnum @default(ACTIVE)
   name String 
   cpf Int 
   created_at DateTime @default(now())
   companyId String
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+} 
+
+model RiskFactors {
+  id    Int     @default(autoincrement()) @id
+  name String 
+  companyId String
+  system Boolean
+  type RiskFactorsEnum
+  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  created_at DateTime @default(now())
+} 
+
+model RecMed {
+  id    Int     @default(autoincrement()) @id
+  recName String 
+  medName String 
+  companyId String
+  system Boolean
+  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  created_at DateTime @default(now())
+} 
+
+
+
+model Checklist {
+  id    Int     @default(autoincrement()) @id
+  status StatusEnum @default(PROGRESS)
+  name String 
+  companyId String
+  system Boolean
+  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  data ChecklistData?
+  created_at DateTime @default(now())
+} 
+
+model ChecklistData {
+  json Json
+  checklistId    Int  
+  checklist Checklist @relation(fields: [checklistId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 } 

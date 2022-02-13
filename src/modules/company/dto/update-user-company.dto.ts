@@ -1,8 +1,8 @@
 import { Transform } from 'class-transformer';
 import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
-import { StatusEnum } from '../../../shared/constants/enum/status.enum';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
+import { StatusEnum } from '@prisma/client';
 
 export class UserCompanyEditDto {
   @IsNumber()
@@ -22,5 +22,5 @@ export class UserCompanyEditDto {
   @IsEnum(StatusEnum, {
     message: `status must be one of: ${KeysOfEnum(StatusEnum)}`,
   })
-  status?: string;
+  status?: StatusEnum;
 }

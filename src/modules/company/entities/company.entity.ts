@@ -1,5 +1,6 @@
 import { Company } from '.prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+import { StatusEnum } from '@prisma/client';
 import { LicenseEntity } from './license.entity';
 import { WorkspaceEntity } from './workspace.entity';
 
@@ -20,7 +21,7 @@ export class CompanyEntity implements Company {
     description: 'The current status of the Company',
     examples: ['ACTIVE', 'PENDING', 'CANCELED'],
   })
-  status: string;
+  status: StatusEnum;
 
   @ApiProperty({
     description: 'The type of the Company',

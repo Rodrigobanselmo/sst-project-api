@@ -1,5 +1,6 @@
 import { Workspace } from '.prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+import { StatusEnum } from '@prisma/client';
 import { AddressEntity } from './address.entity';
 import { CompanyEntity } from './company.entity';
 
@@ -14,7 +15,7 @@ export class WorkspaceEntity implements Workspace {
     description: 'The current status of the Workspace',
     examples: ['ACTIVE', 'PENDING', 'CANCELED'],
   })
-  status: string;
+  status: StatusEnum;
 
   @ApiProperty({ description: 'The creation date of the Workspace' })
   created_at: Date;

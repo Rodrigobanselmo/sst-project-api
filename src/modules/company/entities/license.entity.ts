@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { CompanyEntity } from './company.entity';
 import { License } from '.prisma/client';
+import { StatusEnum } from '@prisma/client';
 
 export class LicenseEntity implements License {
   @ApiProperty({ description: 'The id of the License' })
@@ -14,7 +15,7 @@ export class LicenseEntity implements License {
     description: 'The current status of the License',
     examples: ['ACTIVE', 'PENDING', 'CANCELED'],
   })
-  status: string;
+  status: StatusEnum;
 
   @ApiProperty({ description: 'The creation date of the License' })
   created_at: Date;

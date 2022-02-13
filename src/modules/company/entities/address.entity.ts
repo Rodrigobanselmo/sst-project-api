@@ -1,8 +1,8 @@
-import { StatusEnum } from './../../../shared/constants/enum/status.enum';
 import { ApiProperty } from '@nestjs/swagger';
 
 import { Address } from '.prisma/client';
 import { WorkspaceEntity } from './workspace.entity';
+import { StatusEnum } from '@prisma/client';
 
 export class AddressEntity implements Address {
   @ApiProperty({ description: 'address id.' })
@@ -27,7 +27,7 @@ export class AddressEntity implements Address {
   city: string;
 
   @ApiProperty({ description: 'address state.', enum: StatusEnum })
-  state: string;
+  state: StatusEnum;
 
   @ApiProperty({ description: 'address workspace id.' })
   workspaceId: number;

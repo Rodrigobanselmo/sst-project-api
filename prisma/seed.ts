@@ -14,7 +14,7 @@ const createUserAndCompany = async () => {
       fantasy: 'Simple',
       name: 'Simplesst LTDA',
       status: 'ACTIVE',
-      type: 'Matriz',
+      type: 'MASTER',
       license: { create: { companyId: id } },
     },
   });

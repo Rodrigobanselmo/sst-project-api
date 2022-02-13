@@ -8,9 +8,10 @@ import { JwtAuthGuard } from './shared/guards/jwt-auth.guard';
 import { PermissionsGuard } from './shared/guards/permissions.guard';
 import { RolesGuard } from './shared/guards/roles.guard';
 import { CompanyModule } from './modules/company/company.module';
+import { ChecklistModule } from './modules/checklist/checklist.module';
 
 @Module({
-  imports: [PrismaModule, UsersModule, AuthModule, CompanyModule],
+  imports: [PrismaModule, UsersModule, AuthModule, CompanyModule, ChecklistModule],
   providers: [
     {
       provide: APP_GUARD,

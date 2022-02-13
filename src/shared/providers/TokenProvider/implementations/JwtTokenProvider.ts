@@ -33,8 +33,9 @@ export class JwtTokenProvider implements ITokenProvider {
     const refresh_token = this.jwtService.sign(
       { sub: userId },
       {
-        secret: secret_refresh_token,
         expiresIn: expires_in_refresh_token,
+        secret: secret_refresh_token,
+        privateKey: secret_refresh_token,
       },
     );
 
@@ -52,10 +53,11 @@ export class JwtTokenProvider implements ITokenProvider {
     } else {
       secret = process.env.TOKEN_SECRET;
     }
+
     try {
       const { sub }: Pick<IPayloadToken, 'sub'> = this.jwtService.verify(
         refresh_token,
-        { secret },
+        { secret, publicKey: secret },
       );
       return sub;
     } catch (err) {

@@ -1,8 +1,8 @@
-import { LicenseRepository } from '../../repositories/implementations/LicenseRepository';
+import { LicenseRepository } from '../../../repositories/implementations/LicenseRepository';
 import { BadRequestException, Injectable } from '@nestjs/common';
 
-import { CreateContractDto } from '../../dto/create-contract.dto';
-import { CompanyRepository } from '../../repositories/implementations/CompanyRepository';
+import { CreateContractDto } from '../../../dto/create-contract.dto';
+import { CompanyRepository } from '../../../repositories/implementations/CompanyRepository';
 
 @Injectable()
 export class CreateContractService {

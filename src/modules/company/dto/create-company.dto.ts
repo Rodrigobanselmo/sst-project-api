@@ -1,3 +1,4 @@
+import { StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import {
   ArrayNotEmpty,
@@ -12,7 +13,6 @@ import {
 } from 'class-validator';
 
 import { CompanyTypesEnum } from '../../../shared/constants/enum/company-types.enum';
-import { StatusEnum } from '../../../shared/constants/enum/status.enum';
 import { CnpjFormatTransform } from '../../../shared/transformers/cnpj-format.transform';
 import { StringCapitalizeTransform } from '../../../shared/transformers/string-capitalize';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
@@ -42,7 +42,7 @@ export class CreateCompanyDto {
   @IsEnum(StatusEnum, {
     message: `status must be one of: ${KeysOfEnum(StatusEnum)}`,
   })
-  status: string;
+  status: StatusEnum;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsString()

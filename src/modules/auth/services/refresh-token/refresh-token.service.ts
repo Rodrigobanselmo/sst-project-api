@@ -42,6 +42,7 @@ export class RefreshTokenService {
     }
 
     const user = await this.usersRepository.findById(userId);
+    console.log(user);
     const companies = user.companies
       .map(({ companyId, permissions, roles, status }) => {
         if (status.toUpperCase() !== 'ACTIVE') return null;

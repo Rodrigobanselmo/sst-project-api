@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 import { UserCompany } from '.prisma/client';
+import { StatusEnum } from '@prisma/client';
 
 export class UserCompanyEntity implements UserCompany {
   @ApiProperty({ description: 'The id of the User' })
@@ -28,7 +29,7 @@ export class UserCompanyEntity implements UserCompany {
     description: 'The current status of the user account',
     examples: ['ACTIVE', 'PENDING', 'CANCELED'],
   })
-  status: string;
+  status: StatusEnum;
 
   constructor(partial: Partial<UserCompanyEntity>) {
     Object.assign(this, partial);

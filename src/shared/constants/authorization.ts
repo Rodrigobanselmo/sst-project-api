@@ -21,4 +21,5 @@ export enum Permission {
   USER = '1',
   INVITE_USER = '1.1',
   CREATE_COMPANY = '2',
+  CREATE_RISK = '3',
 }
