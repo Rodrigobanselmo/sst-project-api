@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateChecklistDto } from 'src/modules/checklist/dto/create-checklist.dto';
 import { ChecklistRepository } from 'src/modules/checklist/repositories/implementations/ChecklistRepository';
 import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
@@ -13,6 +13,9 @@ export class CreateChecklistService {
     userPayloadDto: UserPayloadDto,
   ) {
     const user = isMaster(userPayloadDto);
+
+    if (!createChecklistDto.data)
+      throw new BadRequestException('Data is missing');
 
     const system =
       user.isMaster && user.companyId === createChecklistDto.companyId;

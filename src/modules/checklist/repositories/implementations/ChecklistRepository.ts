@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { UpdateChecklistDto } from './../../dto/update-checklist.dto';
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
@@ -31,5 +33,30 @@ export class ChecklistRepository implements IChecklistRepository {
       where: { OR: [{ system: true }, { companyId }] },
     });
     return checklists.map((checklist) => new ChecklistEntity(checklist));
+  }
+
+  async findChecklistData(id: number) {
+    const checklist = await this.prisma.checklist.findUnique({
+      where: { id },
+      include: { data: true },
+    });
+
+    return new ChecklistEntity(checklist);
+  }
+
+  async update(
+    id: number,
+    {
+      data: { json },
+      ...updateChecklistDto
+    }: Omit<UpdateChecklistDto, 'companyId'>,
+  ) {
+    const checklist = await this.prisma.checklist.update({
+      data: { ...updateChecklistDto, data: { update: { json } } },
+      where: { id },
+      include: { data: true },
+    });
+
+    return new ChecklistEntity(checklist);
   }
 }
