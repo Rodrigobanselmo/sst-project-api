@@ -1,3 +1,4 @@
+import { StatusEnum } from '@prisma/client';
 import * as faker from 'faker';
 
 import { ActivityDto } from '../../../src/modules/company/dto/activity.dto';
@@ -30,7 +31,7 @@ export class FakeCompany implements CreateCompanyDto {
   cnpj = generate();
   name = faker.lorem.sentence();
   fantasy = faker.lorem.sentence();
-  status = 'ACTIVE';
+  status = StatusEnum.ACTIVE;
   type = 'matriz';
   isConsulting = false;
   workspace: WorkspaceDto[] = [];

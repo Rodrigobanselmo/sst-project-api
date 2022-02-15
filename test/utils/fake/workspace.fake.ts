@@ -1,3 +1,4 @@
+import { StatusEnum } from '@prisma/client';
 import * as faker from 'faker';
 import { WorkspaceDto } from '../../../src/modules/company/dto/workspace.dto';
 import { FakeAddress } from './address.fake';
@@ -8,6 +9,6 @@ export class FakeWorkspace implements WorkspaceDto {
   }
   id?: number;
   name = faker.lorem.sentence();
-  status = 'ACTIVE';
+  status = StatusEnum.ACTIVE;
   address = new FakeAddress();
 }

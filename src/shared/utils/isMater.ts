@@ -2,17 +2,8 @@ import { Role } from '../constants/authorization';
 import { UserPayloadDto } from '../dto/user-payload.dto';
 
 export const isMaster = (user: UserPayloadDto) => {
-  const result = {
-    isMaster: false,
-    companyId: null,
+  return {
+    isMaster: user.roles.includes(Role.MASTER),
+    companyId: user.companyId,
   };
-
-  user.companies.forEach((company) => {
-    if (company.roles.includes(Role.MASTER)) {
-      result.isMaster = true;
-      result.companyId = company.companyId;
-    }
-  });
-
-  return result;
 };

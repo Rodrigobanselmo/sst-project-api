@@ -42,7 +42,7 @@ export class RefreshTokenService {
     }
 
     const user = await this.usersRepository.findById(userId);
-    console.log(user);
+
     const companies = user.companies
       .map(({ companyId, permissions, roles, status }) => {
         if (status.toUpperCase() !== 'ACTIVE') return null;
@@ -55,10 +55,12 @@ export class RefreshTokenService {
       })
       .filter((i) => i);
 
+    const company = companies[0] || ({} as typeof companies[0]);
+
     const payloadToken: PayloadTokenDto = {
       email: user.email,
       sub: user.id,
-      companies,
+      ...company,
     };
 
     const token = this.jwtTokenProvider.generateToken(payloadToken);
@@ -77,6 +79,7 @@ export class RefreshTokenService {
       refresh_token: refreshToken.refresh_token,
       token: token,
       user: classToClass(user),
+      ...company,
     };
   }
 }

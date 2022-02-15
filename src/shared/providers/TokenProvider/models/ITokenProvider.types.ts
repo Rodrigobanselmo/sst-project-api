@@ -14,10 +14,9 @@ interface IPayloadUserCompany {
   permissions: string[];
 }
 
-interface IPayloadToken {
+interface IPayloadToken extends IPayloadUserCompany {
   sub: number;
   email: string;
-  companies: IPayloadUserCompany[];
 }
 
 interface ITokenProvider {

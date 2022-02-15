@@ -1,5 +1,4 @@
-import { Type } from 'class-transformer';
-import { IsEmail, IsNumber, IsString, ValidateNested } from 'class-validator';
+import { IsEmail, IsNumber, IsString } from 'class-validator';
 
 export class UserCompanyDto {
   @IsNumber()
@@ -12,15 +11,11 @@ export class UserCompanyDto {
   readonly permissions: string[];
 }
 
-export class UserPayloadDto {
+export class UserPayloadDto extends UserCompanyDto {
   @IsString()
   readonly userId: number;
 
   @IsString()
   @IsEmail()
   readonly email: string;
-
-  @ValidateNested({ each: true })
-  @Type(() => UserCompanyDto)
-  readonly companies: UserCompanyDto[];
 }

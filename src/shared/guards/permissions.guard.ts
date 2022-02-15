@@ -1,12 +1,13 @@
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+
 import { PrismaService } from '../../prisma/prisma.service';
 import { Permission } from '../constants/authorization';
 import {
   IPermissionOptions,
   PERMISSIONS_KEY,
 } from '../decorators/permissions.decorator';
-import { UserCompanyDto, UserPayloadDto } from '../dto/user-payload.dto';
+import { UserPayloadDto } from '../dto/user-payload.dto';
 import { asyncSome } from '../utils/asyncSome.utils';
 
 type IMethods = 'GET' | 'POST' | 'PATCH' | 'DELETE';
@@ -38,17 +39,6 @@ const getCompanyId = (req): string => {
   return '';
 };
 
-const getRequestCompanyId = (req): string => {
-  const query = req.query;
-  const params = req.params;
-  const body = req.body;
-
-  if (body && body.myCompanyId) return body.myCompanyId;
-  if (params && params.myCompanyId) return params.myCompanyId;
-  if (query && query.myCompanyId) return query.myCompanyId;
-  return '';
-};
-
 const isParentCompany = async (
   prisma: PrismaService,
   requestCompanyId: string,
@@ -69,20 +59,20 @@ const isParentCompany = async (
   return true;
 };
 
-const isAdmin = (company: UserCompanyDto) => {
-  return company.permissions.some(
+const isAdmin = (user: UserPayloadDto) => {
+  return user.permissions.some(
     (permission) => permission === Permission.MASTER,
   );
 };
 
 const checkPermissions = (
-  company: UserCompanyDto,
+  user: UserPayloadDto,
   options: IPermissionOptions,
   CRUD: string,
 ) => {
   if (!options.code) return true;
 
-  return company.permissions.some((permission) => {
+  return user.permissions.some((permission) => {
     const isEqualCode = permission.split('-')[0] === options.code;
     const isEqualCrud = options.crud ? permission.includes(CRUD) : true;
 
@@ -107,48 +97,41 @@ export class PermissionsGuard implements CanActivate {
     const method: IMethods = req.method;
     const CRUD = methodToCrud(method);
 
-    if (user && user?.companies)
+    if (user)
       // map all companies in user token
-      return await asyncSome(user.companies, async (company) => {
-        // map all permissions required in route
-        return await asyncSome(requiredPermissionsOptions, async (options) => {
-          const { isContract, isMember } = options;
-          const userCompanyId = company.companyId;
+      return await asyncSome(requiredPermissionsOptions, async (options) => {
+        const { isContract, isMember } = options;
+        const userCompanyId = user.companyId;
 
-          const myCompanyId = getRequestCompanyId(req);
-          if (isContract) {
-            // if has contract and you pass an myCompanyId, if is != from user company permission fails
-            if (myCompanyId && myCompanyId !== userCompanyId) return false;
-          }
+        if (isAdmin(user)) return true;
 
-          if (isAdmin(company)) return true;
+        let isCompanyMember = false;
 
-          let isCompanyMember = false;
-          const affectedCompanyId = getCompanyId(req);
-          if (isMember) {
-            if (!affectedCompanyId) return false;
+        const affectedCompanyId = getCompanyId(req);
 
-            isCompanyMember = affectedCompanyId == userCompanyId;
-          }
+        if (isMember) {
+          if (!affectedCompanyId) return false;
 
-          const isPermissionPresent = checkPermissions(company, options, CRUD);
-          if (!isPermissionPresent) return false;
+          isCompanyMember = affectedCompanyId == userCompanyId;
+        }
 
-          if (!isMember && !isContract && isPermissionPresent) return true;
-          if (isCompanyMember && isPermissionPresent) return true;
+        const isPermissionPresent = checkPermissions(user, options, CRUD);
+        if (!isPermissionPresent) return false;
 
-          if (isContract) {
-            const isCompanyContract = await isParentCompany(
-              this.prisma,
-              userCompanyId,
-              affectedCompanyId,
-            );
+        if (!isMember && !isContract && isPermissionPresent) return true;
+        if (isCompanyMember && isPermissionPresent) return true;
 
-            if (isCompanyContract && isPermissionPresent) return true;
-          }
+        if (isContract) {
+          const isCompanyContract = await isParentCompany(
+            this.prisma,
+            userCompanyId,
+            affectedCompanyId,
+          );
 
-          return false;
-        });
+          if (isCompanyContract && isPermissionPresent) return true;
+        }
+
+        return false;
       });
     return false;
   }

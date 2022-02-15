@@ -30,15 +30,14 @@ export class AuthController {
   @Public()
   @HttpCode(HttpStatus.OK)
   @Post('session')
-  session(@Body() loginUserDto: LoginUserDto) {
+  async session(@Body() loginUserDto: LoginUserDto) {
+    console.log(await this.sessionService.execute(loginUserDto));
     return this.sessionService.execute(loginUserDto);
   }
 
   @Public()
   @Post('refresh')
   refresh(@Body() { refresh_token }: RefreshTokenDto) {
-    console.log(refresh_token);
-
     return this.refreshTokenService.execute(refresh_token);
   }
 

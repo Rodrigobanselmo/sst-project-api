@@ -30,10 +30,13 @@ export class SessionService {
         };
       })
       .filter((i) => i);
+
+    const company = companies[0] || ({} as typeof companies[0]);
+
     const payload: PayloadTokenDto = {
       email,
       sub: user.id,
-      companies,
+      ...company,
     };
 
     const token = this.jwtTokenProvider.generateToken(payload);
@@ -51,6 +54,7 @@ export class SessionService {
       token,
       refresh_token: newRefreshToken.refresh_token,
       user: classToClass(user),
+      ...company,
     };
   }
 
