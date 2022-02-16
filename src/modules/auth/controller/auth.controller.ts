@@ -31,7 +31,6 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post('session')
   async session(@Body() loginUserDto: LoginUserDto) {
-    console.log(await this.sessionService.execute(loginUserDto));
     return this.sessionService.execute(loginUserDto);
   }
 

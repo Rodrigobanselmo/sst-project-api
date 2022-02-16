@@ -46,7 +46,7 @@ export class ChecklistController {
     return this.findAvailableChecklistService.execute(companyId);
   }
 
-  @Get('/data/:checklistId/:companyId?')
+  @Get('/data/:checklistId')
   @Permissions({
     code: Permission.CREATE_RISK,
     isMember: true,
