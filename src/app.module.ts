@@ -9,9 +9,10 @@ import { PermissionsGuard } from './shared/guards/permissions.guard';
 import { RolesGuard } from './shared/guards/roles.guard';
 import { CompanyModule } from './modules/company/company.module';
 import { ChecklistModule } from './modules/checklist/checklist.module';
+import { FilesModule } from './modules/files/files.module';
 
 @Module({
-  imports: [PrismaModule, UsersModule, AuthModule, CompanyModule, ChecklistModule],
+  imports: [PrismaModule, UsersModule, AuthModule, CompanyModule, ChecklistModule, FilesModule],
   providers: [
     {
       provide: APP_GUARD,

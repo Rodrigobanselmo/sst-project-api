@@ -159,22 +159,27 @@ model RiskFactors {
   name String 
   companyId String
   system Boolean
+  appendix String
+  propagation String[]
+  status StatusEnum @default(ACTIVE)
   type RiskFactorsEnum
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   created_at DateTime @default(now())
+  recMed RecMed[]
 } 
 
 model RecMed {
   id    Int     @default(autoincrement()) @id
+  riskId    Int    
   recName String 
   medName String 
   companyId String
   system Boolean
+  status StatusEnum @default(ACTIVE)
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  risk RiskFactors @relation(fields: [riskId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   created_at DateTime @default(now())
 } 
-
-
 
 model Checklist {
   id    Int     @default(autoincrement()) @id

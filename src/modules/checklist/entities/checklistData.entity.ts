@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 import { ChecklistData, Prisma } from '.prisma/client';
-import { ChecklistEntity } from './checklist.entity';
 
 export class ChecklistDataEntity implements ChecklistData {
   @ApiProperty({
@@ -11,9 +10,6 @@ export class ChecklistDataEntity implements ChecklistData {
 
   @ApiProperty({ description: 'the checklist json data' })
   json: Prisma.JsonValue;
-
-  @ApiProperty({ description: 'The checklist owner' })
-  checklist?: ChecklistEntity;
 
   constructor(partial: Partial<ChecklistDataEntity>) {
     Object.assign(this, partial);
