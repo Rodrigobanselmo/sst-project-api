@@ -21,7 +21,7 @@ export class RiskRepository implements IRiskRepository {
         system,
         recMed: {
           createMany: {
-            data: recMed.map(({ ...rm }) => ({ system, ...rm })),
+            data: recMed ? recMed.map(({ ...rm }) => ({ system, ...rm })) : [],
             skipDuplicates: true,
           },
         },
@@ -130,7 +130,7 @@ export class RiskRepository implements IRiskRepository {
   ): Promise<RiskFactorsEntity> {
     const risk = await this.prisma.riskFactors.findUnique({
       where: { id_companyId: { id, companyId } },
-      include: { company: include.company, recMed: include.recMed },
+      include: { company: !!include.company, recMed: !!include.recMed },
     });
 
     return new RiskFactorsEntity(risk);
@@ -143,7 +143,7 @@ export class RiskRepository implements IRiskRepository {
   ): Promise<RiskFactorsEntity[]> {
     const risks = await this.prisma.riskFactors.findMany({
       where: { companyId, ...where },
-      include: { company: include.company, recMed: include.recMed },
+      include: { company: !!include.company, recMed: !!include.recMed },
     });
 
     return risks.map((risk) => new RiskFactorsEntity(risk));
@@ -155,7 +155,7 @@ export class RiskRepository implements IRiskRepository {
   ): Promise<RiskFactorsEntity[]> {
     const risks = await this.prisma.riskFactors.findMany({
       where: { OR: [{ companyId }, { system: true }] },
-      include: { company: include.company, recMed: include.recMed },
+      include: { company: !!include.company, recMed: !!include.recMed },
     });
 
     return risks.map((risk) => new RiskFactorsEntity(risk));

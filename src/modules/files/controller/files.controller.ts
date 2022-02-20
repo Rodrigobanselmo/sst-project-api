@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Res,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -24,16 +25,30 @@ export class FilesController {
 
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
-  uploadFile(
+  async uploadFile(
     @UploadedFile() file: Express.Multer.File,
     @User() userPayloadDto: UserPayloadDto,
+    @Res() res,
   ) {
-    return this.uploadChecklistDataService.execute(file, userPayloadDto);
+    const { workbook, filename } =
+      await this.uploadChecklistDataService.execute(file, userPayloadDto);
+
+    res.attachment(filename);
+    workbook.xlsx.write(res).then(function () {
+      res.end();
+    });
   }
 
   @Get('/download')
-  download(@User() userPayloadDto: UserPayloadDto) {
-    return this.downloadRiskDataService.execute(userPayloadDto);
+  async download(@User() userPayloadDto: UserPayloadDto, @Res() res) {
+    const { workbook, filename } = await this.downloadRiskDataService.execute(
+      userPayloadDto,
+    );
+
+    res.attachment(filename);
+    workbook.xlsx.write(res).then(function () {
+      res.end();
+    });
   }
 
   @Get('/database-tables')

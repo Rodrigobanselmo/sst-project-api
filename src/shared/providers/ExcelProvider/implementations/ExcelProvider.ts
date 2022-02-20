@@ -98,7 +98,11 @@ class ExcelProvider implements IExcelProvider {
       });
     });
 
-    await workbook.xlsx.writeFile(`${__dirname}/myFile.xlsx`);
+    return {
+      workbook,
+      filename: `${workbookExcel.fileName}-${workbookExcel.version}.xlsx`,
+    };
+    // await workbook.xlsx.writeFile(`test.xlsx`);
     // return await workbook.xlsx.writeBuffer({
     //   filename: `${workbookExcel.fileName}-${workbookExcel.version}.xlsx`,
     // });

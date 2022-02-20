@@ -33,7 +33,9 @@ async function bootstrap() {
 
   app.useGlobalFilters(new PrismaDbExceptionFilter());
 
-  app.enableCors();
+  app.enableCors({
+    exposedHeaders: ['Content-Disposition'],
+  });
   await app.listen(process.env.PORT);
 }
 bootstrap();

@@ -40,13 +40,13 @@ export class UsersController {
     private readonly updatePermissionsRolesService: UpdatePermissionsRolesService,
   ) {}
 
-  @Get('me/:companyId?')
-  findMe(
-    @User() userPayloadDto: UserPayloadDto,
-    @Param('companyId') companyId: string | undefined,
-  ) {
+  @Get('me')
+  findMe(@User() userPayloadDto: UserPayloadDto) {
     return classToClass(
-      this.findMeService.execute(userPayloadDto.userId, companyId),
+      this.findMeService.execute(
+        userPayloadDto.userId,
+        userPayloadDto.companyId,
+      ),
     );
   }
 

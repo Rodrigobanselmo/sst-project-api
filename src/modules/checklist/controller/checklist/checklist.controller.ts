@@ -36,7 +36,7 @@ export class ChecklistController {
     );
   }
 
-  @Get('/:companyId')
+  @Get('/:companyId?')
   @Permissions({
     code: Permission.CREATE_RISK,
     isMember: true,

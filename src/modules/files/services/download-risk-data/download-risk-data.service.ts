@@ -43,13 +43,13 @@ export class DownloadRiskDataService {
     );
 
     // create new table with new data
-    const newExcelFile = await this.excelProvider.create({
+    const newExcelWorkbook = await this.excelProvider.create({
       fileName: riskWorkbook.name,
       version: riskDatabaseTable.version,
       lastUpdate: new Date(riskDatabaseTable.updated_at),
       sheets: allRiskSheets,
     });
 
-    return newExcelFile;
+    return newExcelWorkbook;
   }
 }

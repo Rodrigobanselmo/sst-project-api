@@ -5,7 +5,7 @@ import { ChecklistRepository } from 'src/modules/checklist/repositories/implemen
 export class FindAvailableChecklistService {
   constructor(private readonly checklistRepository: ChecklistRepository) {}
 
-  async execute(companyId: string) {
+  async execute(companyId?: string) {
     const ChecklistFactor = await this.checklistRepository.findAllAvailable(
       companyId,
     );

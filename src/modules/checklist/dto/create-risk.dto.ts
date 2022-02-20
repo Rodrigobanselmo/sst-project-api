@@ -24,6 +24,7 @@ export class CreateRiskDto {
   name: string;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsOptional()
   @IsString()
   @IsEnum(StatusEnum, {
     message: `type must be one of: ${KeysOfEnum(StatusEnum)}`,
@@ -34,6 +35,7 @@ export class CreateRiskDto {
   companyId: string;
 
   @ValidateNested({ each: true })
+  @IsOptional()
   @IsObject()
   @Type(() => CreateRecMedDto)
   recMed?: CreateRecMedDto[];
@@ -45,6 +47,7 @@ export class UpsertRiskDto extends CreateRiskDto {
   id: number;
 
   @ValidateNested({ each: true })
+  @IsOptional()
   @IsObject()
   @Type(() => UpsertRecMedDto)
   recMed?: UpsertRecMedDto[];
