@@ -40,7 +40,7 @@ export class CompanyEntity implements Company {
   @ApiProperty({
     description: 'The last time that the Company data was updated',
   })
-  updatedAt: Date;
+  updated_at: Date;
 
   @ApiProperty({ description: 'The license id of the Company' })
   licenseId: number;

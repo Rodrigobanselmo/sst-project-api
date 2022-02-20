@@ -1,5 +1,5 @@
 import * as faker from 'faker';
-import { Permission } from '../../../src/shared/constants/authorization';
+import { Permission } from '../../../src/shared/constants/enum/authorization';
 
 import { InviteUserDto } from '../../../src/modules/users/dto/invite-user.dto';
 

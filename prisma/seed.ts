@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { Permission, Role } from '../src/shared/constants/authorization';
+import { Permission, Role } from '../src/shared/constants/enum/authorization';
 import { hash } from 'bcrypt';
 import { v4 as uuidV4 } from 'uuid';
 

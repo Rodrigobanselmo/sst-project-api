@@ -25,5 +25,6 @@ import { UpdateChecklistService } from './services/checklist/update-checklist/up
     FindChecklistDataService,
     UpdateChecklistService,
   ],
+  exports: [RiskRepository],
 })
 export class ChecklistModule {}

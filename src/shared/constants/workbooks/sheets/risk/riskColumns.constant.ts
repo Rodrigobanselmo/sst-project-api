@@ -2,7 +2,7 @@ import { ITableSchema } from 'src/shared/providers/ExcelProvider/models/IExcelPr
 import { checkIsNumber } from 'src/shared/utils/validators/checkIdNumber';
 import { checkIsString } from 'src/shared/utils/validators/checkIsString';
 
-export const commonRiskTableConstant = [
+export const riskColumnsConstant = [
   {
     databaseName: 'name',
     excelName: 'Descrição',

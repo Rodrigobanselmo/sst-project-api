@@ -1,0 +1,7 @@
+export enum RiskSheetEnum {
+  PHYSICAL_RISK,
+  CHEMICAL_RISK,
+  BIOLOGICAL_RISK,
+  ACCIDENT_RISK,
+  ERGONOMIC_RISK,
+}

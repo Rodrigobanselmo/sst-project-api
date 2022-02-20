@@ -1,8 +1,16 @@
 import { RiskFactorsEnum, StatusEnum } from '@prisma/client';
-import { Transform } from 'class-transformer';
-import { IsEnum, IsString } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import {
+  IsEnum,
+  IsNumber,
+  IsObject,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 import { StringUppercaseTransform } from 'src/shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from 'src/shared/utils/keysOfEnum.utils';
+import { CreateRecMedDto, UpsertRecMedDto } from './create-rec-med.dto';
 
 export class CreateRiskDto {
   @Transform(StringUppercaseTransform, { toClassOnly: true })
@@ -24,4 +32,20 @@ export class CreateRiskDto {
 
   @IsString()
   companyId: string;
+
+  @ValidateNested({ each: true })
+  @IsObject()
+  @Type(() => CreateRecMedDto)
+  recMed?: CreateRecMedDto[];
+}
+
+export class UpsertRiskDto extends CreateRiskDto {
+  @IsNumber()
+  @IsOptional()
+  id: number;
+
+  @ValidateNested({ each: true })
+  @IsObject()
+  @Type(() => UpsertRecMedDto)
+  recMed?: UpsertRecMedDto[];
 }

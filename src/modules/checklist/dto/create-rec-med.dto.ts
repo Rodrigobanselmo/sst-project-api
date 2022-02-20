@@ -1,15 +1,20 @@
 import { StatusEnum } from '@prisma/client';
 import { Transform } from 'class-transformer';
-import { IsEnum, IsString } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 import { StringUppercaseTransform } from 'src/shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from 'src/shared/utils/keysOfEnum.utils';
 
 export class CreateRecMedDto {
-  @IsString()
-  recName: string;
+  @IsNumber()
+  riskId: number;
 
+  @IsOptional()
   @IsString()
-  medName: string;
+  recName?: string;
+
+  @IsOptional()
+  @IsString()
+  medName?: string;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsString()
@@ -20,4 +25,10 @@ export class CreateRecMedDto {
 
   @IsString()
   companyId: string;
+}
+
+export class UpsertRecMedDto extends CreateRecMedDto {
+  @IsNumber()
+  @IsOptional()
+  id: number;
 }

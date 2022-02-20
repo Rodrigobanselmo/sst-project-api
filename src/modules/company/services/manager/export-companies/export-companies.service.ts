@@ -6,6 +6,6 @@ export class ExportCompaniesService {
   constructor(private readonly excelProvider: ExcelProvider) {}
 
   async execute() {
-    this.excelProvider.create();
+    // this.excelProvider.create();
   }
 }

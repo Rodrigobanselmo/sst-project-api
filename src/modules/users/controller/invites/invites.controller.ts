@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Post, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { classToClass } from 'class-transformer';
 
-import { Permission } from '../../../../shared/constants/authorization';
+import { Permission } from '../../../../shared/constants/enum/authorization';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 import { InviteUserDto } from '../../dto/invite-user.dto';
 import { DeleteExpiredInvitesService } from '../../services/invites/delete-expired-invites/delete-expired-invites.service';

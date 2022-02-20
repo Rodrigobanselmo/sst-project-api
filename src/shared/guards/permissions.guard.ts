@@ -2,7 +2,7 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
 import { PrismaService } from '../../prisma/prisma.service';
-import { Permission } from '../constants/authorization';
+import { Permission } from '../constants/enum/authorization';
 import {
   IPermissionOptions,
   PERMISSIONS_KEY,

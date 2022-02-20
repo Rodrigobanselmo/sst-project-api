@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Patch, Delete } from '@nestjs/common';
 
-import { Permission } from '../../../../shared/constants/authorization';
+import { Permission } from '../../../../shared/constants/enum/authorization';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 
 @Controller('authorization-test')

@@ -1,4 +1,4 @@
-import { Role } from '../constants/authorization';
+import { Role } from '../constants/enum/authorization';
 import { UserPayloadDto } from '../dto/user-payload.dto';
 
 export const isMaster = (user: UserPayloadDto) => {

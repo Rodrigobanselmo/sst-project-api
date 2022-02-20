@@ -29,7 +29,7 @@ model User {
   email String  @unique
   password String
   created_at DateTime @default(now())
-  updatedAt  DateTime   @updatedAt
+  updated_at  DateTime   @updatedAt
   refresh_token RefreshToken[]
   companies UserCompany[]
 }
@@ -43,7 +43,7 @@ model UserCompany {
   companyId String
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
   created_at DateTime @default(now())
-  updatedAt  DateTime   @updatedAt
+  updated_at  DateTime   @updatedAt
   
   @@id([companyId, userId])
 }
@@ -75,7 +75,7 @@ model Company {
   type String
   isConsulting Boolean @default(false)
   created_at DateTime @default(now())
-  updatedAt  DateTime   @updatedAt
+  updated_at  DateTime   @updatedAt
   users UserCompany[]
   workspace Workspace[]
   primary_activity Activity[] @relation(name: "primary_activity")
@@ -87,6 +87,7 @@ model Company {
   license License? @relation(name:"license",fields: [licenseId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
   riskFactors RiskFactors[] 
   recMed RecMed[] 
+  databaseTable DatabaseTable[] 
   checklist Checklist[] 
 }
 
@@ -125,7 +126,7 @@ model Workspace {
   name String  
   status StatusEnum @default(ACTIVE)
   created_at DateTime @default(now())
-  updatedAt  DateTime   @updatedAt
+  updated_at  DateTime   @updatedAt
   companyId String
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   address Address?
@@ -155,30 +156,34 @@ model Employee {
 } 
 
 model RiskFactors {
-  id    Int     @default(autoincrement()) @id
+  id    Int     @default(autoincrement())
   name String 
   companyId String
   system Boolean
-  appendix String
-  propagation String[]
+  appendix String? 
+  propagation String[] 
   status StatusEnum @default(ACTIVE)
   type RiskFactorsEnum
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   created_at DateTime @default(now())
   recMed RecMed[]
+  
+  @@id([id, companyId])
 } 
 
 model RecMed {
-  id    Int     @default(autoincrement()) @id
+  id    Int     @default(autoincrement())
   riskId    Int    
-  recName String 
-  medName String 
+  recName String? 
+  medName String? 
   companyId String
   system Boolean
   status StatusEnum @default(ACTIVE)
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  risk RiskFactors @relation(fields: [riskId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  risk RiskFactors @relation(fields: [riskId,companyId], references: [id,companyId], onDelete: Cascade, onUpdate: Cascade)
   created_at DateTime @default(now())
+
+  @@id([id, companyId])
 } 
 
 model Checklist {
@@ -196,4 +201,18 @@ model ChecklistData {
   json Json
   checklistId    Int  
   checklist Checklist @relation(fields: [checklistId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+} 
+
+model DatabaseTable {
+  id    Int     @default(autoincrement())
+  name String 
+  version Int  @default(1)
+  companyId String
+  system Boolean
+  status StatusEnum @default(ACTIVE)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  created_at DateTime @default(now())
+  updated_at  DateTime   @updatedAt
+
+  @@id([id, companyId])
 } 

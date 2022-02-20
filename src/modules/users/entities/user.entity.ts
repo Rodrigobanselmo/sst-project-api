@@ -16,7 +16,7 @@ export class UserEntity implements User {
   password: string;
 
   @ApiProperty({ description: 'The last time that the User was updated' })
-  updatedAt: Date;
+  updated_at: Date;
 
   @ApiProperty({ description: 'The creation date of the User account' })
   created_at: Date;

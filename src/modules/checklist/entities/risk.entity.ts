@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { RiskFactors, RiskFactorsEnum } from '.prisma/client';
 import { StatusEnum } from '@prisma/client';
+import { RecMedEntity } from './recMed.entity';
 
 export class RiskFactorsEntity implements RiskFactors {
   @ApiProperty({ description: 'The id of the Company' })
@@ -32,6 +33,15 @@ export class RiskFactorsEntity implements RiskFactors {
 
   @ApiProperty({ description: 'The creation date of the risk' })
   created_at: Date;
+
+  @ApiProperty({ description: 'The appendix date of the risk' })
+  appendix: string;
+
+  @ApiProperty({ description: 'The propagation array of the risk' })
+  propagation: string[];
+
+  @ApiProperty({ description: 'The array riskMed data' })
+  riskMed?: RecMedEntity[];
 
   constructor(partial: Partial<RiskFactorsEntity>) {
     Object.assign(this, partial);

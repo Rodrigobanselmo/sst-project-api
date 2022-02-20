@@ -12,7 +12,7 @@ import { InviteUserDto } from '../../src/modules/users/dto/invite-user.dto';
 import { UserEntity } from '../../src/modules/users/entities/user.entity';
 import { UsersModule } from '../../src/modules/users/users.module';
 import { PrismaModule } from '../../src/prisma/prisma.module';
-import { Permission } from '../../src/shared/constants/authorization';
+import { Permission } from '../../src/shared/constants/enum/authorization';
 import { PrismaDbExceptionFilter } from '../../src/shared/filters/prisma-db-exception.filter';
 import { JwtAuthGuard } from '../../src/shared/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../../src/shared/guards/permissions.guard';

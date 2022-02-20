@@ -4,6 +4,8 @@ import {
 } from '@nestjs/common';
 import ExcelJS from 'excelJS';
 import xlsx from 'node-xlsx';
+import { sheetStylesConstant } from 'src/shared/constants/workbooks/styles/sheet-styles.constant';
+import { IWorkbookExcel } from 'src/shared/interfaces/worksheet.types';
 import { transformStringToObject } from 'src/shared/utils/transformStringToObject';
 
 import {
@@ -12,63 +14,94 @@ import {
   ITableSchema,
 } from '../models/IExcelProvider.types';
 
-const User = [
-  {
-    fname: 'Amir',
-    lname: 'Mustafa',
-    email: 'amir@gmail.com',
-    gender: 'Male',
-  },
-  {
-    fname: 'Ashwani',
-    lname: 'Kumar',
-    email: 'ashwani@gmail.com',
-    gender: 'Male',
-  },
-  {
-    fname: 'Nupur',
-    lname: 'Shah',
-    email: 'nupur@gmail.com',
-    gender: 'Female',
-  },
-  {
-    fname: 'Himanshu',
-    lname: 'Mewari',
-    email: 'himanshu@gmail.com',
-    gender: 'Male',
-  },
-  {
-    fname: 'Vankayala',
-    lname: 'Sirisha',
-    email: 'sirisha@gmail.com',
-    gender: 'Female',
-  },
-];
+const addVersion = (
+  worksheet: ExcelJS.Worksheet,
+  version: number,
+  lastUpdate: Date,
+) => {
+  worksheet.addRow(['Versão', version, new Date(lastUpdate)]);
+
+  const row = worksheet.lastRow;
+  row.eachCell((cell) => {
+    cell.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'b6a371' },
+    };
+  });
+};
+
+const addRules = (worksheet: ExcelJS.Worksheet) => {
+  worksheet.addRow(['Obrigarótio', 'Opcinal']);
+
+  const row = worksheet.lastRow;
+
+  row.height = 25;
+  row.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+
+  row.getCell(1).fill = sheetStylesConstant.fill.required;
+  row.getCell(2).fill = sheetStylesConstant.fill.optional;
+  row.getCell(3).value = `Possivel adicionar \n + abaixo`;
+  row.getCell(3).border = sheetStylesConstant.border.addMore;
+};
+
+const addHeader = (worksheet: ExcelJS.Worksheet, columns: ITableSchema[]) => {
+  const rows = columns.map((row) => row.excelName);
+  const columnsWidth = columns.map((row) => ({
+    width: row.excelName.length > 20 ? row.excelName.length : 18,
+  }));
+
+  worksheet.addRow(rows);
+
+  worksheet.columns = columnsWidth;
+
+  const row = worksheet.lastRow;
+
+  row.alignment = { vertical: 'middle', horizontal: 'center' };
+
+  row.eachCell((cell, colNumber) => {
+    const isRequired = columns[colNumber - 1].required;
+    const isArray = columns[colNumber - 1].isArray;
+
+    if (isArray) cell.border = sheetStylesConstant.border.addMore;
+
+    if (isRequired) cell.fill = sheetStylesConstant.fill.required;
+    if (!isRequired) cell.fill = sheetStylesConstant.fill.optional;
+  });
+};
+
+const addEmptyRow = (worksheet: ExcelJS.Worksheet) => {
+  worksheet.addRow([]);
+};
 
 class ExcelProvider implements IExcelProvider {
-  async create() {
+  async create(workbookExcel: IWorkbookExcel) {
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet('My Users');
 
-    worksheet.columns = [
-      { header: 'S no.', key: 's_no', width: 10 },
-      { header: 'First Name', key: 'fname', width: 10 },
-      { header: 'Last Name', key: 'lname', width: 10 },
-      { header: 'Email Id', key: 'email', width: 10 },
-      { header: 'Gender', key: 'gender', width: 10 },
-    ];
-    // Looping through User data
-    User.forEach((user, index) => {
-      worksheet.addRow({ s_no: index + 1, ...user }); // Add data in worksheet
-    });
-    // Making first line in excel bold
-    worksheet.getRow(1).eachCell((cell) => {
-      cell.font = { bold: true };
+    workbookExcel.sheets.forEach((sheet) => {
+      const worksheet = workbook.addWorksheet(sheet.sheetName, {
+        properties: { defaultColWidth: 18 },
+      });
+
+      if (workbookExcel.version) {
+        addVersion(worksheet, workbookExcel.version, workbookExcel.lastUpdate);
+        addEmptyRow(worksheet);
+      }
+
+      addRules(worksheet);
+      addEmptyRow(worksheet);
+
+      addHeader(worksheet, sheet.tableHeader);
+
+      sheet.rows.forEach((row) => {
+        worksheet.addRow(row);
+      });
     });
 
-    const buffer = await workbook.xlsx.writeBuffer({ filename: 'test.xlsx' });
-    console.log(`buffer`, buffer);
-    return;
+    await workbook.xlsx.writeFile(`${__dirname}/myFile.xlsx`);
+    // return await workbook.xlsx.writeBuffer({
+    //   filename: `${workbookExcel.fileName}-${workbookExcel.version}.xlsx`,
+    // });
   }
 
   async read(buffer: Buffer) {
@@ -83,6 +116,37 @@ class ExcelProvider implements IExcelProvider {
     }
   }
 
+  async transformToExcelData(databaseData: any[], tableSchema: ITableSchema[]) {
+    const rowsData = [] as any[];
+    databaseData.forEach((data) => {
+      const rows = [] as any[][];
+      tableSchema.forEach((cellSchema, indexCell) => {
+        const cellValue = data[cellSchema.databaseName.split('.')[0]];
+        if (!rows[0]) rows[0] = [];
+
+        if (cellSchema.isArray) {
+          cellValue.forEach((value, indexRow) => {
+            if (!rows[indexRow]) rows[indexRow] = [];
+            if (typeof value === 'object') {
+              if (indexRow !== 0) rows[indexRow][0] = '-';
+
+              rows[indexRow][indexCell] =
+                value[cellSchema.databaseName.split('.')[1]];
+            } else {
+              rows[indexRow][indexCell] = value;
+            }
+          });
+        } else {
+          rows[0][indexCell] = cellValue;
+        }
+      });
+
+      rowsData.push(...rows.filter((i) => i));
+    });
+
+    return rowsData;
+  }
+
   async transformToTableData(
     excelReadData: IExcelReadData,
     tableSchema: ITableSchema[],
@@ -90,6 +154,7 @@ class ExcelProvider implements IExcelProvider {
     const transformStep = {
       startMap: false,
       row: 0,
+      version: 0,
     };
 
     const databaseRows = [] as any[];
@@ -111,7 +176,9 @@ class ExcelProvider implements IExcelProvider {
 
       if (transformStep.startMap) {
         tableSchema.forEach((tableSchemaCell, indexCell) => {
-          const actualCell = `row ${indexRow + 1} column ${indexCell + 1}`;
+          const actualCell = ` spreadsheet ${excelReadData.name}, row ${
+            indexRow + 1
+          } and column ${indexCell + 1}`;
 
           const excelCell = excelRow[indexCell];
           const isEmptyCell =
@@ -189,7 +256,6 @@ class ExcelProvider implements IExcelProvider {
         });
 
         if (!isNextArrayData) {
-          console.log(indexRow, databaseRow);
           transformStep.row = transformStep.row + 1;
           return databaseRows.push(databaseRow);
         }
@@ -197,6 +263,8 @@ class ExcelProvider implements IExcelProvider {
 
       const excelHeader = tableSchema.map((row) => row.excelName);
       const sameLength = excelRow.length === excelHeader.length;
+
+      if (indexRow === 0) transformStep.version = Number(excelRow[1]);
 
       if (!sameLength) return;
 
@@ -207,7 +275,7 @@ class ExcelProvider implements IExcelProvider {
       if (isTableHeader) transformStep.startMap = true;
     });
 
-    return databaseRows;
+    return { rows: databaseRows, version: transformStep.version };
   }
 }
 

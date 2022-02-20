@@ -9,6 +9,11 @@ export class RecMedEntity implements RecMed {
   })
   id: number;
 
+  @ApiProperty({
+    description: 'The id of the parent risk',
+  })
+  riskId: number;
+
   @ApiProperty({ description: 'the recommendation description' })
   recName: string;
 

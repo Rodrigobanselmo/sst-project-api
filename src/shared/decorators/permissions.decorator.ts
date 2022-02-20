@@ -1,5 +1,5 @@
 import { SetMetadata } from '@nestjs/common';
-import { Permission } from '../constants/authorization';
+import { Permission } from '../constants/enum/authorization';
 
 export interface IPermissionOptions {
   code?: Permission;

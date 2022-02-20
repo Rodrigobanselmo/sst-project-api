@@ -1,7 +1,7 @@
 import { Body, Controller, Param, Patch, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
-import { Permission } from '../../../../shared/constants/authorization';
+import { Permission } from '../../../../shared/constants/enum/authorization';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 import { CreateContractDto } from '../../dto/create-contract.dto';
 import { CreateCompanyDto } from '../../dto/create-company.dto';

@@ -4,7 +4,7 @@ import { CreateRiskService } from '../../services/risk/create-risk/create-risk.s
 import { User } from 'src/shared/decorators/user.decorator';
 import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
-import { Permission } from 'src/shared/constants/authorization';
+import { Permission } from 'src/shared/constants/enum/authorization';
 
 @Controller('risk')
 export class RiskController {
