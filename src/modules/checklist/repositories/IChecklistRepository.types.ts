@@ -8,6 +8,6 @@ interface IChecklistRepository {
     system: boolean,
   ): Promise<ChecklistEntity | undefined>;
   findAllAvailable(companyId?: string): Promise<ChecklistEntity[]>;
-  findChecklistData(id: number): Promise<ChecklistEntity>;
+  findChecklistData(id: number, companyId: string): Promise<ChecklistEntity>;
 }
 export { IChecklistRepository };

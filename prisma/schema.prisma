@@ -24,6 +24,12 @@ enum StatusEnum {
   CANCELED
 }
 
+enum CompanyTypesEnum {
+  MATRIZ
+  FILIAL
+  MASTER
+}
+
 model User {
   id    Int     @default(autoincrement()) @id
   email String  @unique
@@ -72,7 +78,7 @@ model Company {
   name String  
   fantasy String
   status StatusEnum @default(ACTIVE)
-  type String
+  type CompanyTypesEnum @default(MATRIZ)
   isConsulting Boolean @default(false)
   created_at DateTime @default(now())
   updated_at  DateTime   @updatedAt
@@ -187,7 +193,7 @@ model RecMed {
 } 
 
 model Checklist {
-  id    Int     @default(autoincrement()) @id
+  id    Int     @default(autoincrement())
   status StatusEnum @default(PROGRESS)
   name String 
   companyId String
@@ -195,12 +201,17 @@ model Checklist {
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   data ChecklistData?
   created_at DateTime @default(now())
+
+  @@id([id, companyId])
 } 
 
 model ChecklistData {
   json Json
+  companyId String
   checklistId    Int  
-  checklist Checklist @relation(fields: [checklistId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  checklist Checklist @relation(fields: [checklistId,companyId], references: [id,companyId], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([checklistId, companyId])
 } 
 
 model DatabaseTable {

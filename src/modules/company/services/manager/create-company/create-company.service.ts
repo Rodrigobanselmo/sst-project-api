@@ -5,6 +5,7 @@ import { CompanyRepository } from '../../../repositories/implementations/Company
 @Injectable()
 export class CreateCompanyService {
   constructor(private readonly companyRepository: CompanyRepository) {}
+
   async execute(createCompanyDto: CreateCompanyDto) {
     const company = await this.companyRepository.create({
       license: {},

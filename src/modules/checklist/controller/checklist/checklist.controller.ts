@@ -1,9 +1,7 @@
 import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
-import { Permission } from 'src/shared/constants/enum/authorization';
 import { User } from 'src/shared/decorators/user.decorator';
 import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
 
-import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 import { CreateChecklistDto } from '../../dto/create-checklist.dto';
 import { UpdateChecklistDto } from '../../dto/update-checklist.dto';
 import { CreateChecklistService } from '../../services/checklist/create-checklist/create-checklist.service';
@@ -11,6 +9,8 @@ import { FindAvailableChecklistService } from '../../services/checklist/find-ava
 import { FindChecklistDataService } from '../../services/checklist/find-checklist-data/find-checklist-data.service';
 import { UpdateChecklistService } from '../../services/checklist/update-checklist/update-checklist.service';
 
+// import { Permission  } from 'src/shared/constants/enum/authorization';
+// import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 @Controller('checklist')
 export class ChecklistController {
   constructor(
@@ -21,11 +21,6 @@ export class ChecklistController {
   ) {}
 
   @Post()
-  @Permissions({
-    code: Permission.CREATE_RISK,
-    isMember: true,
-    isContract: true,
-  })
   create(
     @User() userPayloadDto: UserPayloadDto,
     @Body() createChecklistDto: CreateChecklistDto,
@@ -37,31 +32,19 @@ export class ChecklistController {
   }
 
   @Get('/:companyId?')
-  @Permissions({
-    code: Permission.CREATE_RISK,
-    isMember: true,
-    isContract: true,
-  })
-  findAllAvailable(@Param('companyId') companyId: string) {
-    return this.findAvailableChecklistService.execute(companyId);
+  findAllAvailable(@User() userPayloadDto: UserPayloadDto) {
+    return this.findAvailableChecklistService.execute(userPayloadDto);
   }
 
-  @Get('/data/:checklistId')
-  @Permissions({
-    code: Permission.CREATE_RISK,
-    isMember: true,
-    isContract: true,
-  })
-  findChecklistData(@Param('checklistId') checklistId: number) {
-    return this.findChecklistDataService.execute(checklistId);
+  @Get('/data/:checklistId/:companyId?')
+  findChecklistData(
+    @Param('checklistId') checklistId: number,
+    @User() userPayloadDto: UserPayloadDto,
+  ) {
+    return this.findChecklistDataService.execute(checklistId, userPayloadDto);
   }
 
   @Patch('/:checklistId')
-  @Permissions({
-    code: Permission.CREATE_RISK,
-    isMember: true,
-    isContract: true,
-  })
   async update(
     @Param('checklistId') checklistId: number,
     @Body() updateChecklistDto: UpdateChecklistDto,

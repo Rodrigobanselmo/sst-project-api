@@ -6,11 +6,11 @@ import { WorkbooksEnum } from 'src/shared/constants/workbooks/workbooks.enum';
 import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
 import { ExcelProvider } from 'src/shared/providers/ExcelProvider/implementations/ExcelProvider';
 import { IExcelReadData } from 'src/shared/providers/ExcelProvider/models/IExcelProvider.types';
-import { isMaster } from 'src/shared/utils/isMater';
 import { sortNumber } from 'src/shared/utils/sorts/number.sort';
+
 import { DatabaseTableEntity } from '../../entities/databaseTable.entity';
 import { DatabaseTableRepository } from '../../repositories/implementations/DatabaseTableRepository';
-import { findAllRisks } from '../../utils/functions/findAllRisks';
+import { findAllRisks } from '../../utils/findAllRisks';
 
 @Injectable()
 export class UploadChecklistDataService {
@@ -25,10 +25,9 @@ export class UploadChecklistDataService {
     const buffer = file.buffer;
 
     const riskWorkbook = workbooksConstant[WorkbooksEnum.RISK];
-    const user = isMaster(userPayloadDto);
 
-    const system = user.isMaster;
-    const companyId = user.companyId;
+    const system = userPayloadDto.isMaster;
+    const companyId = userPayloadDto.targetCompanyId;
 
     const readFileData = await this.excelProvider.read(buffer);
 

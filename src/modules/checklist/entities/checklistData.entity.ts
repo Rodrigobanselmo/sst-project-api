@@ -14,4 +14,7 @@ export class ChecklistDataEntity implements ChecklistData {
   constructor(partial: Partial<ChecklistDataEntity>) {
     Object.assign(this, partial);
   }
+
+  @ApiProperty({ description: 'the company id related' })
+  companyId: string;
 }

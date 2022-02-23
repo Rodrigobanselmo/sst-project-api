@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
 import { RiskFactorsEnum } from '@prisma/client';
+import { IPrismaOptions } from 'src/shared/interfaces/prisma-options.types';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { CreateRiskDto, UpsertRiskDto } from '../../dto/create-risk.dto';
@@ -126,8 +127,10 @@ export class RiskRepository implements IRiskRepository {
   async findById(
     id: number,
     companyId: string,
-    include?: { company?: boolean; recMed?: boolean },
+    options?: IPrismaOptions<{ company?: boolean; recMed?: boolean }>,
   ): Promise<RiskFactorsEntity> {
+    const include = options.include || {};
+
     const risk = await this.prisma.riskFactors.findUnique({
       where: { id_companyId: { id, companyId } },
       include: { company: !!include.company, recMed: !!include.recMed },
@@ -138,9 +141,11 @@ export class RiskRepository implements IRiskRepository {
 
   async findAllByCompanyId(
     companyId: string,
-    include?: { company?: boolean; recMed?: boolean },
-    where?: any,
+    options?: IPrismaOptions<{ company?: boolean; recMed?: boolean }>,
   ): Promise<RiskFactorsEntity[]> {
+    const where = options.where || {};
+    const include = options.include || {};
+
     const risks = await this.prisma.riskFactors.findMany({
       where: { companyId, ...where },
       include: { company: !!include.company, recMed: !!include.recMed },
@@ -151,8 +156,10 @@ export class RiskRepository implements IRiskRepository {
 
   async findAllAvailable(
     companyId: string,
-    include?: { company?: boolean; recMed?: boolean },
+    options?: IPrismaOptions<{ company?: boolean; recMed?: boolean }>,
   ): Promise<RiskFactorsEntity[]> {
+    const include = options.include || {};
+
     const risks = await this.prisma.riskFactors.findMany({
       where: { OR: [{ companyId }, { system: true }] },
       include: { company: !!include.company, recMed: !!include.recMed },

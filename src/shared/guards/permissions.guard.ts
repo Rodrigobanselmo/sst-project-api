@@ -9,6 +9,7 @@ import {
 } from '../decorators/permissions.decorator';
 import { UserPayloadDto } from '../dto/user-payload.dto';
 import { asyncSome } from '../utils/asyncSome.utils';
+import { getCompanyId } from '../utils/getCompanId';
 
 type IMethods = 'GET' | 'POST' | 'PATCH' | 'DELETE';
 
@@ -26,17 +27,6 @@ const methodToCrud = (method: IMethods) => {
     default:
       break;
   }
-};
-
-const getCompanyId = (req): string => {
-  const query = req.query;
-  const params = req.params;
-  const body = req.body;
-
-  if (body && body.companyId) return body.companyId;
-  if (params && params.companyId) return params.companyId;
-  if (query && query.companyId) return query.companyId;
-  return '';
 };
 
 const isParentCompany = async (
@@ -98,41 +88,50 @@ export class PermissionsGuard implements CanActivate {
     const CRUD = methodToCrud(method);
 
     if (user)
-      // map all companies in user token
-      return await asyncSome(requiredPermissionsOptions, async (options) => {
-        const { isContract, isMember } = options;
-        const userCompanyId = user.companyId;
+      return await asyncSome(
+        requiredPermissionsOptions,
+        async (PermissionOption) => {
+          const { isContract, isMember } = PermissionOption;
+          const userCompanyId = user.companyId;
 
-        if (isAdmin(user)) return true;
+          if (isAdmin(user)) return true;
 
-        let isCompanyMember = false;
+          const affectedCompanyId = getCompanyId(req);
 
-        const affectedCompanyId = getCompanyId(req);
+          // is being send an array of items with different companies Ids
+          if (affectedCompanyId === false) return false;
 
-        if (isMember) {
-          if (!affectedCompanyId) return false;
-
-          isCompanyMember = affectedCompanyId == userCompanyId;
-        }
-
-        const isPermissionPresent = checkPermissions(user, options, CRUD);
-        if (!isPermissionPresent) return false;
-
-        if (!isMember && !isContract && isPermissionPresent) return true;
-        if (isCompanyMember && isPermissionPresent) return true;
-
-        if (isContract) {
-          const isCompanyContract = await isParentCompany(
-            this.prisma,
-            userCompanyId,
-            affectedCompanyId,
+          const isPermissionPresent = checkPermissions(
+            user,
+            PermissionOption,
+            CRUD,
           );
 
-          if (isCompanyContract && isPermissionPresent) return true;
-        }
+          if (!isPermissionPresent) return false;
 
-        return false;
-      });
+          if (!isMember && !isContract && isPermissionPresent) return true;
+
+          if (isMember && isPermissionPresent) {
+            if (!affectedCompanyId) return true;
+            if (affectedCompanyId == userCompanyId) return true;
+          }
+
+          if (isContract && isPermissionPresent) {
+            if (!affectedCompanyId) return false;
+            if (affectedCompanyId == userCompanyId) return false;
+
+            const isCompanyContract = await isParentCompany(
+              this.prisma,
+              userCompanyId,
+              affectedCompanyId,
+            );
+
+            if (isCompanyContract) return true;
+          }
+
+          return false;
+        },
+      );
     return false;
   }
 }

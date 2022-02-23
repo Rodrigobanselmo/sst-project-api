@@ -1,3 +1,4 @@
+import { IPrismaOptions } from 'src/shared/interfaces/prisma-options.types';
 import { CreateRiskDto, UpsertRiskDto } from '../dto/create-risk.dto';
 import { RiskFactorsEntity } from '../entities/risk.entity';
 
@@ -22,18 +23,12 @@ interface IRiskRepository {
   findById(
     id: number,
     companyId: string,
-    include?: {
-      company?: boolean;
-      recMed?: boolean;
-    },
+    options?: IPrismaOptions<{ company?: boolean; recMed?: boolean }>,
   ): Promise<RiskFactorsEntity>;
 
   findAllByCompanyId(
     companyId: string,
-    include?: {
-      company?: boolean;
-      recMed?: boolean;
-    },
+    options?: IPrismaOptions<{ company?: boolean; recMed?: boolean }>,
   ): Promise<RiskFactorsEntity[]>;
 }
 export { IRiskRepository };

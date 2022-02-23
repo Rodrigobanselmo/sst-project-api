@@ -1,4 +1,10 @@
-import { IsEmail, IsNumber, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsEmail,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class UserCompanyDto {
   @IsNumber()
@@ -18,4 +24,11 @@ export class UserPayloadDto extends UserCompanyDto {
   @IsString()
   @IsEmail()
   readonly email: string;
+
+  @IsBoolean()
+  isMaster: boolean;
+
+  @IsOptional()
+  @IsString()
+  targetCompanyId?: string;
 }

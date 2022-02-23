@@ -1,4 +1,4 @@
-import { Company } from '.prisma/client';
+import { Company, CompanyTypesEnum } from '.prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 import { StatusEnum } from '@prisma/client';
 import { LicenseEntity } from './license.entity';
@@ -27,7 +27,7 @@ export class CompanyEntity implements Company {
     description: 'The type of the Company',
     examples: ['matriz', 'filial'],
   })
-  type: string;
+  type: CompanyTypesEnum;
 
   @ApiProperty({
     description: 'If true, the company can administrate other companies',

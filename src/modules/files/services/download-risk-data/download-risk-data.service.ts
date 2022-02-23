@@ -7,7 +7,7 @@ import { ExcelProvider } from 'src/shared/providers/ExcelProvider/implementation
 import { sortNumber } from 'src/shared/utils/sorts/number.sort';
 
 import { DatabaseTableRepository } from '../../repositories/implementations/DatabaseTableRepository';
-import { findAllRisks } from '../../utils/functions/findAllRisks';
+import { findAllRisks } from '../../utils/findAllRisks';
 
 @Injectable()
 export class DownloadRiskDataService {

@@ -6,10 +6,7 @@ import { ChecklistRepository } from 'src/modules/checklist/repositories/implemen
 export class UpdateChecklistService {
   constructor(private readonly checklistRepository: ChecklistRepository) {}
 
-  async execute(
-    id: number,
-    updateChecklistDto: Omit<UpdateChecklistDto, 'companyId'>,
-  ) {
+  async execute(id: number, updateChecklistDto: UpdateChecklistDto) {
     const Checklist = await this.checklistRepository.update(
       id,
       updateChecklistDto,

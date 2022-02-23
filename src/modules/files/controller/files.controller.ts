@@ -10,7 +10,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { workbooksConstant } from 'src/shared/constants/workbooks/workbooks.constant';
 import { User } from 'src/shared/decorators/user.decorator';
 import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
-import { ExcelProvider } from 'src/shared/providers/ExcelProvider/implementations/ExcelProvider';
 
 import { DownloadRiskDataService } from '../services/download-risk-data/download-risk-data.service';
 import { UploadChecklistDataService } from '../services/upload-checklist-data/upload-checklist-data.service';
@@ -20,10 +19,9 @@ export class FilesController {
   constructor(
     private readonly uploadChecklistDataService: UploadChecklistDataService,
     private readonly downloadRiskDataService: DownloadRiskDataService,
-    private readonly excelProvider: ExcelProvider,
   ) {}
 
-  @Post('upload')
+  @Post('upload/companyId?')
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(
     @UploadedFile() file: Express.Multer.File,
@@ -39,7 +37,7 @@ export class FilesController {
     });
   }
 
-  @Get('/download')
+  @Get('/download/companyId?')
   async download(@User() userPayloadDto: UserPayloadDto, @Res() res) {
     const { workbook, filename } = await this.downloadRiskDataService.execute(
       userPayloadDto,

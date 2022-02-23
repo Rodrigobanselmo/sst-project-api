@@ -8,13 +8,10 @@ export const findAllRisks = async (
   riskSheet: IRiskSheet,
   companyId: string,
 ) => {
-  const riskData = await riskRepository.findAllByCompanyId(
-    companyId,
-    {
-      recMed: true,
-    },
-    { type: riskSheet.type },
-  );
+  const riskData = await riskRepository.findAllByCompanyId(companyId, {
+    include: { recMed: true },
+    where: { type: riskSheet.type },
+  });
 
   const riskExcelRows = await excelProvider.transformToExcelData(
     riskData,

@@ -36,7 +36,7 @@ export class ChecklistRepository implements IChecklistRepository {
   }
 
   async findChecklistData(id: number) {
-    const checklist = await this.prisma.checklist.findUnique({
+    const checklist = await this.prisma.checklist.findFirst({
       where: { id },
       include: { data: true },
     });
@@ -46,14 +46,11 @@ export class ChecklistRepository implements IChecklistRepository {
 
   async update(
     id: number,
-    {
-      data: { json },
-      ...updateChecklistDto
-    }: Omit<UpdateChecklistDto, 'companyId'>,
+    { data: { json }, ...updateChecklistDto }: UpdateChecklistDto,
   ) {
     const checklist = await this.prisma.checklist.update({
       data: { ...updateChecklistDto, data: { update: { json } } },
-      where: { id },
+      where: { id_companyId: { id, companyId: updateChecklistDto.companyId } },
       include: { data: true },
     });
 

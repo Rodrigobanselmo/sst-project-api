@@ -6,11 +6,8 @@ import { CompanyRepository } from '../../../repositories/implementations/Company
 export class UpdateCompanyService {
   constructor(private readonly companyRepository: CompanyRepository) {}
 
-  async execute(id: string, updateCompanyDto: UpdateCompanyDto) {
-    const company = await this.companyRepository.updateInsert(
-      id,
-      updateCompanyDto,
-    );
+  async execute(updateCompanyDto: UpdateCompanyDto) {
+    const company = await this.companyRepository.updateInsert(updateCompanyDto);
 
     return company;
   }

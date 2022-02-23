@@ -1,7 +1,0 @@
-export enum StatusEnum {
-  ACTIVE = 'ACTIVE',
-  PENDING = 'PENDING',
-  CANCELED = 'CANCELED',
-  INACTIVE = 'INACTIVE',
-  PROGRESS = 'PROGRESS',
-}
