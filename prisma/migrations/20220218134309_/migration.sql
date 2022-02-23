@@ -1,6 +1,0 @@
--- AlterTable
-ALTER TABLE "RecMed" ALTER COLUMN "recName" DROP NOT NULL,
-ALTER COLUMN "medName" DROP NOT NULL;
-
--- AlterTable
-ALTER TABLE "RiskFactors" ALTER COLUMN "appendix" DROP NOT NULL;
