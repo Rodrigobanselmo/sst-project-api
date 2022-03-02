@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateRiskDto } from 'src/modules/checklist/dto/create-risk.dto';
+import { CreateRiskDto } from 'src/modules/checklist/dto/risk.dto';
 import { RiskRepository } from 'src/modules/checklist/repositories/implementations/RiskRepository';
 import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
 

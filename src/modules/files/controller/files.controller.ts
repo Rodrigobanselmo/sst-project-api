@@ -21,7 +21,7 @@ export class FilesController {
     private readonly downloadRiskDataService: DownloadRiskDataService,
   ) {}
 
-  @Post('upload/companyId?')
+  @Post('/upload/:companyId?')
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(
     @UploadedFile() file: Express.Multer.File,
@@ -37,7 +37,7 @@ export class FilesController {
     });
   }
 
-  @Get('/download/companyId?')
+  @Get('/download/:companyId?')
   async download(@User() userPayloadDto: UserPayloadDto, @Res() res) {
     const { workbook, filename } = await this.downloadRiskDataService.execute(
       userPayloadDto,

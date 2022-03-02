@@ -4,7 +4,11 @@ import { RiskFactorsEnum } from '@prisma/client';
 import { IPrismaOptions } from 'src/shared/interfaces/prisma-options.types';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
-import { CreateRiskDto, UpsertRiskDto } from '../../dto/create-risk.dto';
+import {
+  CreateRiskDto,
+  UpdateRiskDto,
+  UpsertRiskDto,
+} from '../../dto/risk.dto';
 import { RiskFactorsEntity } from '../../entities/risk.entity';
 import { IRiskRepository } from '../IRiskRepository.types';
 
@@ -27,6 +31,34 @@ export class RiskRepository implements IRiskRepository {
           },
         },
       },
+      include: { recMed: true },
+    });
+
+    return new RiskFactorsEntity(risk);
+  }
+
+  async update(
+    { recMed, id, ...createRiskDto }: UpdateRiskDto,
+    system: boolean,
+    companyId: string,
+  ): Promise<RiskFactorsEntity> {
+    const risk = await this.prisma.riskFactors.update({
+      data: {
+        recMed: {
+          upsert: !recMed
+            ? []
+            : recMed.map(({ id, ...rm }) => {
+                return {
+                  create: { system, ...rm },
+                  update: { system, ...rm },
+                  where: { id_companyId: { companyId, id: id || -1 } },
+                };
+              }),
+        },
+        ...createRiskDto,
+      },
+      where: { id_companyId: { companyId, id: id || -1 } },
+      include: { recMed: true },
     });
 
     return new RiskFactorsEntity(risk);

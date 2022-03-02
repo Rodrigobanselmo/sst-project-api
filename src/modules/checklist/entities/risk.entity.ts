@@ -41,7 +41,7 @@ export class RiskFactorsEntity implements RiskFactors {
   propagation: string[];
 
   @ApiProperty({ description: 'The array riskMed data' })
-  riskMed?: RecMedEntity[];
+  recMed?: RecMedEntity[];
 
   constructor(partial: Partial<RiskFactorsEntity>) {
     Object.assign(this, partial);

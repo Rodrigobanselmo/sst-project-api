@@ -11,6 +11,7 @@ import { UpdateChecklistService } from '../../services/checklist/update-checklis
 
 // import { Permission  } from 'src/shared/constants/enum/authorization';
 // import { Permissions } from '../../../../shared/decorators/permissions.decorator';
+
 @Controller('checklist')
 export class ChecklistController {
   constructor(
@@ -49,7 +50,6 @@ export class ChecklistController {
     @Param('checklistId') checklistId: number,
     @Body() updateChecklistDto: UpdateChecklistDto,
   ) {
-    delete updateChecklistDto.companyId;
     return this.updateChecklistService.execute(checklistId, updateChecklistDto);
   }
 }

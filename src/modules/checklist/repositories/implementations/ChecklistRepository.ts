@@ -46,11 +46,11 @@ export class ChecklistRepository implements IChecklistRepository {
 
   async update(
     id: number,
-    { data: { json }, ...updateChecklistDto }: UpdateChecklistDto,
+    { data: { json }, companyId, ...updateChecklistDto }: UpdateChecklistDto,
   ) {
     const checklist = await this.prisma.checklist.update({
       data: { ...updateChecklistDto, data: { update: { json } } },
-      where: { id_companyId: { id, companyId: updateChecklistDto.companyId } },
+      where: { id_companyId: { id, companyId: companyId } },
       include: { data: true },
     });
 

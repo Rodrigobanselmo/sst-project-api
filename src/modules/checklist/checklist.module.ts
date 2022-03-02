@@ -12,6 +12,8 @@ import { FindAvailableChecklistService } from './services/checklist/find-availab
 import { FindChecklistDataService } from './services/checklist/find-checklist-data/find-checklist-data.service';
 import { UpdateChecklistService } from './services/checklist/update-checklist/update-checklist.service';
 import { FindAllAvailableRiskService } from './services/risk/find-all-available-risk/find-all-available-risk.service';
+import { UpdateRiskService } from './services/risk/update-risk/update-risk.service';
+import { UpdateRecMedService } from './services/rec-med/update-rec-med/update-rec-med.service';
 
 @Module({
   controllers: [RiskController, RecMedController, ChecklistController],
@@ -26,6 +28,8 @@ import { FindAllAvailableRiskService } from './services/risk/find-all-available-
     FindChecklistDataService,
     UpdateChecklistService,
     FindAllAvailableRiskService,
+    UpdateRiskService,
+    UpdateRecMedService,
   ],
   exports: [RiskRepository],
 })

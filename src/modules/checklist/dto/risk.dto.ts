@@ -3,14 +3,18 @@ import { Transform, Type } from 'class-transformer';
 import {
   IsEnum,
   IsNumber,
-  IsObject,
   IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
 import { StringUppercaseTransform } from 'src/shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from 'src/shared/utils/keysOfEnum.utils';
-import { CreateRecMedDto, UpsertRecMedDto } from './create-rec-med.dto';
+
+import {
+  RiskCreateRecMedDto,
+  RiskUpdateRecMedDto,
+  UpsertRecMedDto,
+} from './rec-med.dto';
 
 export class CreateRiskDto {
   @Transform(StringUppercaseTransform, { toClassOnly: true })
@@ -36,9 +40,8 @@ export class CreateRiskDto {
 
   @ValidateNested({ each: true })
   @IsOptional()
-  @IsObject()
-  @Type(() => CreateRecMedDto)
-  recMed?: CreateRecMedDto[];
+  @Type(() => RiskCreateRecMedDto)
+  recMed?: RiskCreateRecMedDto[];
 }
 
 export class UpsertRiskDto extends CreateRiskDto {
@@ -48,7 +51,39 @@ export class UpsertRiskDto extends CreateRiskDto {
 
   @ValidateNested({ each: true })
   @IsOptional()
-  @IsObject()
   @Type(() => UpsertRecMedDto)
   recMed?: UpsertRecMedDto[];
+}
+
+export class UpdateRiskDto {
+  @IsNumber()
+  id: number;
+
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsOptional()
+  @IsString()
+  @IsEnum(RiskFactorsEnum, {
+    message: `type must be one of: ${KeysOfEnum(RiskFactorsEnum)}`,
+  })
+  type?: RiskFactorsEnum;
+
+  @IsString()
+  @IsOptional()
+  name?: string;
+
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsOptional()
+  @IsString()
+  @IsEnum(StatusEnum, {
+    message: `type must be one of: ${KeysOfEnum(StatusEnum)}`,
+  })
+  status?: StatusEnum;
+
+  @IsString()
+  companyId: string;
+
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @Type(() => RiskUpdateRecMedDto)
+  recMed?: RiskUpdateRecMedDto[];
 }

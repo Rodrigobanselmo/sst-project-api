@@ -1,4 +1,4 @@
-import { CreateRecMedDto } from '../dto/create-rec-med.dto';
+import { CreateRecMedDto } from '../dto/rec-med.dto';
 import { RecMedEntity } from '../entities/recMed.entity';
 
 interface IRecMedRepository {
