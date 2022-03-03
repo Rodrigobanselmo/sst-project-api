@@ -40,6 +40,9 @@ export class DatabaseTableRepository implements IDatabaseTableRepository {
     const database = await this.prisma.databaseTable.findFirst({
       where: { name, companyId },
     });
+    if (!database) {
+      return new DatabaseTableEntity({ version: 1, updated_at: new Date() });
+    }
     return new DatabaseTableEntity(database);
   }
 }

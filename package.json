@@ -29,6 +29,7 @@
     "posttest:e2e": "docker-compose stop test_db && docker-compose rm -f test_db"
   },
   "dependencies": {
+    "@brazilian-utils/brazilian-utils": "^1.0.0-rc.12",
     "@nestjs/common": "^8.0.0",
     "@nestjs/core": "^8.0.0",
     "@nestjs/jwt": "^8.0.0",

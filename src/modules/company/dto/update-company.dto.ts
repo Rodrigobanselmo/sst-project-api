@@ -7,6 +7,10 @@ import { UserCompanyEditDto } from './update-user-company.dto';
 
 export class UpdateCompanyDto extends PartialType(CreateCompanyDto) {
   @IsString()
+  @IsOptional()
+  id?: string;
+
+  @IsString()
   companyId: string;
 
   @ValidateNested({ each: true })

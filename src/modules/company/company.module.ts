@@ -6,8 +6,8 @@ import { CompanyRepository } from './repositories/implementations/CompanyReposit
 import { LicenseRepository } from './repositories/implementations/LicenseRepository';
 import { CreateCompanyService } from './services/manager/create-company/create-company.service';
 import { CreateContractService } from './services/manager/create-contract/create-contract.service';
-import { ExportCompaniesService } from './services/manager/export-companies/export-companies.service';
 import { UpdateCompanyService } from './services/manager/update-company/update-company.service';
+import { FindAllCompaniesService } from './services/manager/find-all-companies/find-all-companies.service';
 
 @Module({
   controllers: [CompanyController],
@@ -17,8 +17,9 @@ import { UpdateCompanyService } from './services/manager/update-company/update-c
     CreateContractService,
     CompanyRepository,
     LicenseRepository,
-    ExportCompaniesService,
     ExcelProvider,
+    FindAllCompaniesService,
   ],
+  exports: [CompanyRepository],
 })
 export class CompanyModule {}

@@ -6,7 +6,10 @@ import ExcelJS from 'excelJS';
 import xlsx from 'node-xlsx';
 import { sheetStylesConstant } from 'src/shared/constants/workbooks/styles/sheet-styles.constant';
 import { IWorkbookExcel } from 'src/shared/interfaces/worksheet.types';
-import { transformStringToObject } from 'src/shared/utils/transformStringToObject';
+import {
+  getObjectValueFromString,
+  transformStringToObject,
+} from 'src/shared/utils/transformStringToObject';
 
 import {
   IExcelProvider,
@@ -134,8 +137,10 @@ class ExcelProvider implements IExcelProvider {
             if (typeof value === 'object') {
               if (indexRow !== 0) rows[indexRow][0] = '-';
 
-              rows[indexRow][indexCell] =
-                value[cellSchema.databaseName.split('.')[1]];
+              rows[indexRow][indexCell] = getObjectValueFromString(
+                cellSchema.databaseName.split('.').slice(1).join('.'),
+                value,
+              );
             } else {
               rows[indexRow][indexCell] = value;
             }
@@ -186,12 +191,28 @@ class ExcelProvider implements IExcelProvider {
 
           const excelCell = excelRow[indexCell];
           const isEmptyCell =
-            excelCell === null || excelCell === undefined || excelCell === '-';
+            excelCell === null ||
+            excelCell === undefined ||
+            (excelCell === '-' && indexCell == 0);
 
           const isMissingField =
             isEmptyCell && !isArrayData && tableSchemaCell.required;
 
-          if (isMissingField)
+          const isMissingArrayField =
+            isEmptyCell &&
+            isArrayData &&
+            tableSchemaCell.required &&
+            tableSchemaCell.isArray &&
+            !tableSchema.every((tCell, idxCell) => {
+              return (
+                tCell.databaseName.split('.')[0] !==
+                  tableSchemaCell.databaseName.split('.')[0] ||
+                excelRow[idxCell] === null ||
+                excelRow[idxCell] === undefined
+              );
+            });
+
+          if (isMissingField || isMissingArrayField)
             throw new BadRequestException(
               `Is missing an required field value on ${actualCell}`,
             );

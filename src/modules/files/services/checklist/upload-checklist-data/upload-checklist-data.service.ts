@@ -1,16 +1,16 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { RiskRepository } from 'src/modules/checklist/repositories/implementations/RiskRepository';
+import { UploadExcelProvider } from 'src/modules/files/providers/uploadExcelProvider';
 import { IRiskSheet } from 'src/shared/constants/workbooks/sheets/risk/riskSheet.constant';
 import { workbooksConstant } from 'src/shared/constants/workbooks/workbooks.constant';
 import { WorkbooksEnum } from 'src/shared/constants/workbooks/workbooks.enum';
 import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
 import { ExcelProvider } from 'src/shared/providers/ExcelProvider/implementations/ExcelProvider';
 import { IExcelReadData } from 'src/shared/providers/ExcelProvider/models/IExcelProvider.types';
-import { sortNumber } from 'src/shared/utils/sorts/number.sort';
 
-import { DatabaseTableEntity } from '../../entities/databaseTable.entity';
-import { DatabaseTableRepository } from '../../repositories/implementations/DatabaseTableRepository';
-import { findAllRisks } from '../../utils/findAllRisks';
+import { DatabaseTableEntity } from '../../../entities/databaseTable.entity';
+import { DatabaseTableRepository } from '../../../repositories/implementations/DatabaseTableRepository';
+import { findAllRisks } from '../../../utils/findAllRisks';
 
 @Injectable()
 export class UploadChecklistDataService {
@@ -18,6 +18,7 @@ export class UploadChecklistDataService {
     private readonly excelProvider: ExcelProvider,
     private readonly riskRepository: RiskRepository,
     private readonly databaseTableRepository: DatabaseTableRepository,
+    private readonly uploadExcelProvider: UploadExcelProvider,
   ) {}
 
   async execute(file: Express.Multer.File, userPayloadDto: UserPayloadDto) {
@@ -29,8 +30,6 @@ export class UploadChecklistDataService {
     const system = userPayloadDto.isMaster;
     const companyId = userPayloadDto.targetCompanyId;
 
-    const readFileData = await this.excelProvider.read(buffer);
-
     // get risk table with actual version
     const riskDatabaseTable =
       await this.databaseTableRepository.findByNameAndCompany(
@@ -38,64 +37,24 @@ export class UploadChecklistDataService {
         companyId,
       );
 
-    // read, validate and transform excel read response to rows and also check version
-    const allRiskSeparatedArray = await Promise.all(
-      Object.values(riskWorkbook.sheets).map(async (sheet) => {
-        return await readRisks(
-          readFileData,
-          this.excelProvider,
-          sheet,
-          riskDatabaseTable,
-        );
-      }),
-    );
-
-    const allRisks = [];
-
-    allRiskSeparatedArray.forEach((risks) => {
-      allRisks.push(...risks);
+    const allRisks = await this.uploadExcelProvider.getAllData({
+      buffer,
+      Workbook: riskWorkbook,
+      read: readRisks,
+      DatabaseTable: riskDatabaseTable,
     });
 
     // update or create all risks
     await this.riskRepository.upsertMany(allRisks, system, companyId);
 
-    // get all user available risks to generate a new table
-    const allRiskSheets = await Promise.all(
-      Object.values(riskWorkbook.sheets)
-        .sort((a, b) => sortNumber(a, b, 'id'))
-        .map(async (sheet) => {
-          return await findAllRisks(
-            this.excelProvider,
-            this.riskRepository,
-            sheet,
-            companyId,
-          );
-        }),
-    );
-
-    // create or update database table version
-    const databaseTable = await this.databaseTableRepository.upsert(
-      {
-        name: riskWorkbook.name,
-        companyId,
-        version: riskDatabaseTable.version
-          ? Number(riskDatabaseTable.version) + 1
-          : 1,
-      },
-      companyId,
+    return await this.uploadExcelProvider.newTableData({
+      findAll: (sheet) =>
+        findAllRisks(this.excelProvider, this.riskRepository, sheet, companyId),
+      Workbook: riskWorkbook,
       system,
-      riskDatabaseTable.id,
-    );
-
-    // create new table with new data
-    const newExcelFile = await this.excelProvider.create({
-      fileName: riskWorkbook.name,
-      version: databaseTable.version,
-      lastUpdate: new Date(databaseTable.updated_at),
-      sheets: allRiskSheets,
+      companyId,
+      DatabaseTable: riskDatabaseTable,
     });
-
-    return newExcelFile;
   }
 }
 

@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ChecklistRepository } from 'src/modules/checklist/repositories/implementations/ChecklistRepository';
 import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
 import { checkIsAvailable } from 'src/shared/utils/validators/checkIsAvailable';
@@ -14,6 +18,8 @@ export class FindChecklistDataService {
       checklistId,
     );
 
-    return checkIsAvailable(Checklist, user);
+    if (checkIsAvailable(Checklist, user, 'checklist')) return Checklist;
+
+    throw new NotFoundException(`not found`);
   }
 }

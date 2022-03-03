@@ -7,6 +7,7 @@ import { CompanyEntity } from '../../entities/company.entity';
 import { ICompanyRepository } from '../ICompanyRepository.types';
 import { v4 as uuidV4 } from 'uuid';
 import { UpdateCompanyDto } from '../../dto/update-company.dto';
+import { IPrismaOptions } from 'src/shared/interfaces/prisma-options.types';
 
 interface ICreateCompany extends CreateCompanyDto {
   companyId?: string;
@@ -80,16 +81,19 @@ export class CompanyRepository implements ICompanyRepository {
     return new CompanyEntity(company);
   }
 
-  async updateInsert({
-    secondary_activity = [],
-    primary_activity = [],
-    workspace = [],
-    users = [],
-    license,
-    companyId,
-    ...updateCompanyDto
-  }: UpdateCompanyDto) {
-    const company = await this.prisma.company.update({
+  async updateInsert(
+    {
+      secondary_activity = [],
+      primary_activity = [],
+      workspace = [],
+      users = [],
+      license,
+      companyId,
+      ...updateCompanyDto
+    }: UpdateCompanyDto,
+    prismaRef?: boolean,
+  ) {
+    const companyPrisma = this.prisma.company.update({
       where: { id: companyId },
       data: {
         ...updateCompanyDto,
@@ -146,7 +150,100 @@ export class CompanyRepository implements ICompanyRepository {
       },
     });
 
-    return new CompanyEntity(company);
+    if (prismaRef) return companyPrisma;
+
+    return new CompanyEntity(await companyPrisma);
+  }
+
+  async upsertMany(
+    updateCompanyDto: UpdateCompanyDto[],
+  ): Promise<CompanyEntity[]> {
+    const data = await this.prisma.$transaction(
+      updateCompanyDto.map(
+        ({
+          secondary_activity = [],
+          primary_activity = [],
+          workspace = [],
+          id,
+          users,
+          license,
+          ...upsertRiskDto
+        }) =>
+          this.prisma.company.upsert({
+            where: { id: id || 'no-id' },
+            create: {
+              name: '',
+              cnpj: '',
+              fantasy: '',
+              ...upsertRiskDto,
+              workspace: {
+                create: [
+                  ...workspace.map(({ id, address, ...work }) => ({
+                    ...work,
+                    address: { create: address },
+                  })),
+                ],
+              },
+              primary_activity: {
+                connect: [
+                  ...primary_activity.map((activity) => ({
+                    code: activity.code,
+                  })),
+                ],
+              },
+              secondary_activity: {
+                connect: [
+                  ...secondary_activity.map((activity) => ({
+                    code: activity.code,
+                  })),
+                ],
+              },
+            },
+            update: {
+              ...upsertRiskDto,
+              workspace: {
+                upsert: [
+                  ...workspace.map(({ id, address, ...work }) => ({
+                    create: {
+                      ...work,
+                      address: { create: address },
+                    },
+                    update: {
+                      ...work,
+                      address: { update: address },
+                    },
+                    where: { id: id ?? -1 },
+                  })),
+                ],
+              },
+              // TODO: should be connect only
+              primary_activity: {
+                connect: [
+                  ...primary_activity.map((activity) => ({
+                    code: activity.code,
+                  })),
+                ],
+              },
+              secondary_activity: {
+                connect: [
+                  ...secondary_activity.map((activity) => ({
+                    code: activity.code,
+                  })),
+                ],
+              },
+            },
+            include: {
+              workspace: { include: { address: true } },
+              primary_activity: true,
+              secondary_activity: true,
+              license: true,
+              users: true,
+            },
+          }),
+      ),
+    );
+
+    return data.map((company) => new CompanyEntity(company));
   }
 
   async updateDisconnect({
@@ -194,32 +291,56 @@ export class CompanyRepository implements ICompanyRepository {
     return new CompanyEntity(company);
   }
 
-  // async removeById(id: number) {
-  //   const user = await this.prisma.user.delete({ where: { id: id } });
-  //   if (!user) return;
-  //   return new UserEntity(user);
-  // }
+  async findAllRelatedByCompanyId(
+    companyId: string,
+    options?: IPrismaOptions<{
+      primary_activity?: boolean;
+      secondary_activity?: boolean;
+    }>,
+  ): Promise<CompanyEntity[]> {
+    const include = options?.include || {};
 
-  // async findAll() {
-  //   const users = await this.prisma.user.findMany();
-  //   return users.map((user) => new UserEntity(user));
-  // }
+    const company = await this.prisma.company.findUnique({
+      where: { id: companyId },
+      include: {
+        primary_activity: !!include?.primary_activity,
+        secondary_activity: !!include?.secondary_activity,
+        workspace: { include: { address: true } },
+      },
+    });
 
-  // async findByEmail(email: string) {
-  //   const user = await this.prisma.user.findUnique({
-  //     where: { email },
-  //     include: { companies: true },
-  //   });
-  //   if (!user) return;
-  //   return new UserEntity(user);
-  // }
+    const companies = await this.prisma.contract.findMany({
+      where: { applyingServiceCompanyId: companyId },
+      include: {
+        receivingServiceCompany: true,
+      },
+    });
 
-  // async findById(id: number) {
-  //   const user = await this.prisma.user.findUnique({
-  //     where: { id },
-  //     include: { companies: true },
-  //   });
-  //   if (!user) return;
-  //   return new UserEntity(user);
-  // }
+    return [
+      new CompanyEntity(company),
+      ...companies.map(
+        (applyingServiceCompany) =>
+          new CompanyEntity(applyingServiceCompany.receivingServiceCompany),
+      ),
+    ];
+  }
+
+  async findAll(
+    options?: IPrismaOptions<{
+      primary_activity?: boolean;
+      secondary_activity?: boolean;
+    }>,
+  ): Promise<CompanyEntity[]> {
+    const include = options?.include || {};
+
+    const companies = await this.prisma.company.findMany({
+      include: {
+        primary_activity: !!include?.primary_activity,
+        secondary_activity: !!include?.secondary_activity,
+        workspace: { include: { address: true } },
+      },
+    });
+
+    return [...companies.map((company) => new CompanyEntity(company))];
+  }
 }

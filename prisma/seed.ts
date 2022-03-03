@@ -10,16 +10,22 @@ const createUserAndCompany = async () => {
   const company = await prisma.company.create({
     data: {
       id,
-      cnpj: '10000000000',
+      cnpj: '07.689.002/0001-89',
       fantasy: 'Simple',
       name: 'Simplesst LTDA',
       status: 'ACTIVE',
       type: 'MASTER',
       license: { create: { companyId: id } },
+      workspace: {
+        create: {
+          name: 'Workspace',
+          address: { create: { cep: '12246-000' } },
+        },
+      },
     },
   });
 
-  const passwordHash = await hash('12345678', 10);
+  const passwordHash = await hash('aaaa0123', 10);
 
   await prisma.user.create({
     data: {

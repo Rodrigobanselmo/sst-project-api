@@ -145,8 +145,8 @@ model Address {
   number String?
   complement String?
   neighborhood String?
-  city String
-  state String
+  city String?
+  state String?
   workspaceId Int
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
