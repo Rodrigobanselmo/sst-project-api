@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-export const checkIsEnum = (value: any) => {
-  // TODO
+export const checkIsEnum = (value: any, enums: any) => {
   const transformToNumber = String(value);
 
   if (!transformToNumber) {
@@ -8,7 +7,9 @@ export const checkIsEnum = (value: any) => {
   }
 
   if (typeof value === 'string') {
-    return transformToNumber;
+    if (Object.values(enums).includes(value)) {
+      return value;
+    }
   }
 
   return false;

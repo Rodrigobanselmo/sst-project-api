@@ -1,3 +1,5 @@
+import { PrismaService } from 'src/prisma/prisma.service';
+
 export interface IExcelReadData {
   name: string;
   data: (string | number | null)[][];
@@ -10,6 +12,7 @@ export interface ITableSchema {
   checkHandler: (value: any) => string | false;
   isId?: boolean;
   isArray?: boolean;
+  notes?: (prisma: PrismaService, companyId: string) => Promise<string[]>;
 }
 
 interface IExcelProvider {

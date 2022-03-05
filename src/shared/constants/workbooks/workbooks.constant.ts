@@ -1,5 +1,6 @@
 import { WorkbooksEnum } from 'src/shared/constants/workbooks/workbooks.enum';
 import { companySheetConstant } from './sheets/company/companySheet.constant';
+import { companyUniqueSheetConstant } from './sheets/companyUnique/companyUniqueSheet.constant';
 import { riskSheetConstant } from './sheets/risk/riskSheet.constant';
 
 export const workbooksConstant = {
@@ -14,5 +15,10 @@ export const workbooksConstant = {
     id: WorkbooksEnum.COMPANIES,
     sheets: companySheetConstant,
     path: 'files/company',
+  },
+  [WorkbooksEnum.COMPANY]: {
+    name: 'Empresa',
+    id: WorkbooksEnum.COMPANY,
+    sheets: companyUniqueSheetConstant,
   },
 };

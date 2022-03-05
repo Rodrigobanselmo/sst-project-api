@@ -7,7 +7,15 @@ export class UpdateCompanyService {
   constructor(private readonly companyRepository: CompanyRepository) {}
 
   async execute(updateCompanyDto: UpdateCompanyDto) {
-    const company = await this.companyRepository.updateInsert(updateCompanyDto);
+    const company = await this.companyRepository.update(updateCompanyDto, {
+      include: {
+        license: true,
+        workspace: true,
+        primary_activity: true,
+        users: true,
+        secondary_activity: true,
+      },
+    });
 
     return company;
   }

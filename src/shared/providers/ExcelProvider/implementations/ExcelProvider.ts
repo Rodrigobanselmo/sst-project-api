@@ -1,9 +1,11 @@
 import {
   BadRequestException,
+  Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
 import ExcelJS from 'excelJS';
 import xlsx from 'node-xlsx';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { sheetStylesConstant } from 'src/shared/constants/workbooks/styles/sheet-styles.constant';
 import { IWorkbookExcel } from 'src/shared/interfaces/worksheet.types';
 import {
@@ -48,7 +50,12 @@ const addRules = (worksheet: ExcelJS.Worksheet) => {
   row.getCell(3).border = sheetStylesConstant.border.addMore;
 };
 
-const addHeader = (worksheet: ExcelJS.Worksheet, columns: ITableSchema[]) => {
+const addHeader = async (
+  worksheet: ExcelJS.Worksheet,
+  columns: ITableSchema[],
+  prisma?: PrismaService,
+  companyId?: string,
+) => {
   const rows = columns.map((row) => row.excelName);
   const columnsWidth = columns.map((row) => ({
     width: row.excelName.length > 20 ? row.excelName.length : 18,
@@ -62,11 +69,51 @@ const addHeader = (worksheet: ExcelJS.Worksheet, columns: ITableSchema[]) => {
 
   row.alignment = { vertical: 'middle', horizontal: 'center' };
 
-  row.eachCell((cell, colNumber) => {
+  const notes = {} as Record<string, string[]>;
+
+  await Promise.all(
+    columns.map(async (column) => {
+      if (column.notes) {
+        const notesCell = await column.notes(prisma, companyId);
+        notes[column.excelName] = notesCell;
+      }
+    }),
+  );
+
+  row.eachCell(async (cell, colNumber) => {
+    const excelName = columns[colNumber - 1].excelName;
     const isRequired = columns[colNumber - 1].required;
     const isArray = columns[colNumber - 1].isArray;
 
     if (isArray) cell.border = sheetStylesConstant.border.addMore;
+
+    if (notes[excelName]) {
+      cell.note = {
+        editAs: 'oneCells',
+        autoShape: true,
+        texts: [
+          {
+            font: {
+              size: 12,
+              bold: true,
+              color: { theme: 1 },
+              name: 'Calibri',
+            },
+            text: 'Opções de valores: \n',
+          },
+          ...notes[excelName].map((note) => {
+            return {
+              font: {
+                size: 12,
+                color: { theme: 1 },
+                name: 'Calibri',
+              },
+              text: note + '\n',
+            } as ExcelJS.RichText;
+          }),
+        ],
+      };
+    }
 
     if (isRequired) cell.fill = sheetStylesConstant.fill.required;
     if (!isRequired) cell.fill = sheetStylesConstant.fill.optional;
@@ -77,38 +124,43 @@ const addEmptyRow = (worksheet: ExcelJS.Worksheet) => {
   worksheet.addRow([]);
 };
 
+@Injectable()
 class ExcelProvider implements IExcelProvider {
-  async create(workbookExcel: IWorkbookExcel) {
+  constructor(private readonly prisma?: PrismaService) {}
+
+  async create(workbookExcel: IWorkbookExcel, companyId?: string) {
     const workbook = new ExcelJS.Workbook();
 
-    workbookExcel.sheets.forEach((sheet) => {
-      const worksheet = workbook.addWorksheet(sheet.sheetName, {
-        properties: { defaultColWidth: 18 },
-      });
+    await Promise.all(
+      workbookExcel.sheets.map(async (sheet) => {
+        const worksheet = workbook.addWorksheet(sheet.sheetName, {
+          properties: { defaultColWidth: 18 },
+        });
 
-      if (workbookExcel.version) {
-        addVersion(worksheet, workbookExcel.version, workbookExcel.lastUpdate);
+        if (workbookExcel.version) {
+          addVersion(
+            worksheet,
+            workbookExcel.version,
+            workbookExcel.lastUpdate,
+          );
+          addEmptyRow(worksheet);
+        }
+
+        addRules(worksheet);
         addEmptyRow(worksheet);
-      }
 
-      addRules(worksheet);
-      addEmptyRow(worksheet);
+        await addHeader(worksheet, sheet.tableHeader, this.prisma, companyId);
 
-      addHeader(worksheet, sheet.tableHeader);
-
-      sheet.rows.forEach((row) => {
-        worksheet.addRow(row);
-      });
-    });
+        sheet.rows.forEach((row) => {
+          worksheet.addRow(row);
+        });
+      }),
+    );
 
     return {
       workbook,
       filename: `${workbookExcel.fileName}-${workbookExcel.version}.xlsx`,
     };
-    // await workbook.xlsx.writeFile(`test.xlsx`);
-    // return await workbook.xlsx.writeBuffer({
-    //   filename: `${workbookExcel.fileName}-${workbookExcel.version}.xlsx`,
-    // });
   }
 
   async read(buffer: Buffer) {

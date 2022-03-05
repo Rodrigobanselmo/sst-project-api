@@ -29,6 +29,9 @@ export class AddressEntity implements Address {
   @ApiProperty({ description: 'address state.', enum: StatusEnum })
   state: StatusEnum;
 
+  @ApiProperty({ description: 'company id.' })
+  companyId: string;
+
   @ApiProperty({ description: 'address workspace id.' })
   workspaceId: number;
 

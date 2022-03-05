@@ -3,6 +3,7 @@ import { Type } from 'class-transformer';
 import { IsOptional, IsString, ValidateNested } from 'class-validator';
 
 import { CreateCompanyDto } from './create-company.dto';
+import { UpdateEmployeeDto } from './employee.dto copy';
 import { UserCompanyEditDto } from './update-user-company.dto';
 
 export class UpdateCompanyDto extends PartialType(CreateCompanyDto) {
@@ -17,4 +18,9 @@ export class UpdateCompanyDto extends PartialType(CreateCompanyDto) {
   @IsOptional()
   @Type(() => UserCompanyEditDto)
   users: UserCompanyEditDto[];
+
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @Type(() => UpdateEmployeeDto)
+  employees: UpdateEmployeeDto[];
 }

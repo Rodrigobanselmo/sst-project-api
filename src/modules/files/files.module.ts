@@ -11,6 +11,9 @@ import { FilesCompanyController } from './controller/company/files-company.contr
 import { FilesController } from './controller/files.controller';
 import { CompanyModule } from '../company/company.module';
 import { UploadExcelProvider } from './providers/uploadExcelProvider';
+import { DownloadUniqueCompanyService } from './services/company/download-unique-company/download-unique-company.service';
+import { UploadUniqueCompanyService } from './services/company/upload-unique-company/upload-unique-company.service';
+import { DownloadExcelProvider } from './providers/donwlodExcelProvider';
 
 @Module({
   controllers: [
@@ -20,6 +23,7 @@ import { UploadExcelProvider } from './providers/uploadExcelProvider';
   ],
   imports: [ChecklistModule, CompanyModule],
   providers: [
+    DownloadExcelProvider,
     UploadExcelProvider,
     UploadChecklistDataService,
     ExcelProvider,
@@ -27,6 +31,8 @@ import { UploadExcelProvider } from './providers/uploadExcelProvider';
     DownloadRiskDataService,
     UploadCompaniesService,
     DownloadCompaniesService,
+    DownloadUniqueCompanyService,
+    UploadUniqueCompanyService,
   ],
 })
 export class FilesModule {}

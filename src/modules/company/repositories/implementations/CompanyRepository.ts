@@ -81,18 +81,29 @@ export class CompanyRepository implements ICompanyRepository {
     return new CompanyEntity(company);
   }
 
-  async updateInsert(
+  async update(
     {
       secondary_activity = [],
       primary_activity = [],
       workspace = [],
+      employees = [],
       users = [],
       license,
       companyId,
       ...updateCompanyDto
     }: UpdateCompanyDto,
+    options?: IPrismaOptions<{
+      primary_activity?: boolean;
+      secondary_activity?: boolean;
+      workspace?: boolean;
+      employees?: boolean;
+      license?: boolean;
+      users?: boolean;
+    }>,
     prismaRef?: boolean,
   ) {
+    const include = options?.include || {};
+
     const companyPrisma = this.prisma.company.update({
       where: { id: companyId },
       data: {
@@ -111,6 +122,53 @@ export class CompanyRepository implements ICompanyRepository {
             }),
           ],
         },
+        employees: {
+          upsert: [
+            ...employees.map(
+              ({ id, companyId, hierarchyId, workplaceId, ...rest }: any) => {
+                return {
+                  create: {
+                    ...rest,
+                    companyId,
+                    hierarchy: hierarchyId
+                      ? {
+                          connect: {
+                            id_companyId: { companyId, id: hierarchyId },
+                          },
+                        }
+                      : undefined,
+                    workplace: workplaceId
+                      ? {
+                          connect: {
+                            id_companyId: { companyId, id: workplaceId },
+                          },
+                        }
+                      : undefined,
+                  },
+                  update: {
+                    ...rest,
+                    companyId,
+                    hierarchy: hierarchyId
+                      ? {
+                          connect: {
+                            id_companyId: { companyId, id: hierarchyId },
+                          },
+                        }
+                      : undefined,
+                    workplace: workplaceId
+                      ? {
+                          connect: {
+                            id_companyId: { companyId, id: workplaceId },
+                          },
+                        }
+                      : undefined,
+                  },
+                  where: { id_companyId: { companyId, id: id || -1 } },
+                };
+              },
+            ),
+          ],
+        },
         workspace: {
           upsert: [
             ...workspace.map(({ id, address, ...work }) => ({
@@ -122,7 +180,12 @@ export class CompanyRepository implements ICompanyRepository {
                 ...work,
                 address: { update: address },
               },
-              where: { id: id ?? -1 },
+              where: {
+                id_companyId: {
+                  companyId,
+                  id: id || -1,
+                },
+              },
             })),
           ],
         },
@@ -142,11 +205,12 @@ export class CompanyRepository implements ICompanyRepository {
         },
       },
       include: {
-        workspace: { include: { address: true } },
-        primary_activity: true,
-        secondary_activity: true,
-        license: true,
-        users: true,
+        workspace: include.workspace ? { include: { address: true } } : false,
+        primary_activity: !!include.primary_activity,
+        secondary_activity: !!include.secondary_activity,
+        license: !!include.license,
+        users: !!include.users,
+        employees: !!include.users,
       },
     });
 
@@ -157,12 +221,23 @@ export class CompanyRepository implements ICompanyRepository {
 
   async upsertMany(
     updateCompanyDto: UpdateCompanyDto[],
+    options?: IPrismaOptions<{
+      primary_activity?: boolean;
+      secondary_activity?: boolean;
+      workspace?: boolean;
+      employees?: boolean;
+      license?: boolean;
+      users?: boolean;
+    }>,
   ): Promise<CompanyEntity[]> {
+    const include = options?.include || {};
+
     const data = await this.prisma.$transaction(
       updateCompanyDto.map(
         ({
           secondary_activity = [],
           primary_activity = [],
+          employees = [],
           workspace = [],
           id,
           users,
@@ -212,11 +287,15 @@ export class CompanyRepository implements ICompanyRepository {
                       ...work,
                       address: { update: address },
                     },
-                    where: { id: id ?? -1 },
+                    where: {
+                      id_companyId: {
+                        companyId: upsertRiskDto.companyId,
+                        id: id || -1,
+                      },
+                    },
                   })),
                 ],
               },
-              // TODO: should be connect only
               primary_activity: {
                 connect: [
                   ...primary_activity.map((activity) => ({
@@ -233,11 +312,14 @@ export class CompanyRepository implements ICompanyRepository {
               },
             },
             include: {
-              workspace: { include: { address: true } },
-              primary_activity: true,
-              secondary_activity: true,
-              license: true,
-              users: true,
+              workspace: include.workspace
+                ? { include: { address: true } }
+                : false,
+              primary_activity: !!include.primary_activity,
+              secondary_activity: !!include.secondary_activity,
+              license: !!include.license,
+              users: !!include.users,
+              employees: !!include.users,
             },
           }),
       ),
@@ -250,6 +332,7 @@ export class CompanyRepository implements ICompanyRepository {
     secondary_activity = [],
     primary_activity = [],
     workspace = [],
+    employees = [],
     license,
     users = [],
     companyId,
@@ -285,6 +368,32 @@ export class CompanyRepository implements ICompanyRepository {
         primary_activity: true,
         secondary_activity: true,
         license: true,
+      },
+    });
+
+    return new CompanyEntity(company);
+  }
+
+  async findById(
+    id: string,
+    options?: IPrismaOptions<{
+      primary_activity?: boolean;
+      secondary_activity?: boolean;
+      workspace?: boolean;
+      employees?: boolean;
+    }>,
+  ): Promise<CompanyEntity> {
+    const include = options?.include || {};
+
+    const company = await this.prisma.company.findUnique({
+      where: { id },
+      include: {
+        primary_activity: !!include?.primary_activity,
+        secondary_activity: !!include?.secondary_activity,
+        workspace: !!include?.workspace
+          ? { include: { address: true } }
+          : false,
+        employees: !!include?.employees,
       },
     });
 
