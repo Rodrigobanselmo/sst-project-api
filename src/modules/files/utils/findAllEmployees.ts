@@ -1,9 +1,11 @@
-import { Hierarchy, HierarchyEnum } from '@prisma/client';
+import { Hierarchy, HierarchyEnum, StatusEnum } from '@prisma/client';
 import { CompanyRepository } from 'src/modules/company/repositories/implementations/CompanyRepository';
 import { HierarchyRepository } from 'src/modules/company/repositories/implementations/HierarchyRepository';
 import { ICompanyUniqueSheet } from 'src/shared/constants/workbooks/sheets/companyUnique/companyUniqueSheet.constant';
 import { ExcelProvider } from 'src/shared/providers/ExcelProvider/implementations/ExcelProvider';
 import { getPathIdTreeMap } from 'src/shared/utils/getPathIdTreeMap';
+import { statusEnumTranslateUsToBr } from 'src/shared/utils/translate/statusEnum.translate';
+import { HierarchyExcelProvider } from '../providers/HierarchyExcelProvider';
 
 export const findAllEmployees = async (
   excelProvider: ExcelProvider,
@@ -12,13 +14,17 @@ export const findAllEmployees = async (
   riskSheet: ICompanyUniqueSheet,
   companyId: string,
 ) => {
+  const hierarchyExcel = new HierarchyExcelProvider();
   const company = await companyRepository.findById(companyId, {
     include: { employees: true },
   });
-  // const employees = await employeeRepository.findAllByCompany(companyId);
-  const hierarchyTree = await hierarchyRepository.findHierarchyTreeByCompany(
+
+  const hierarchies = await hierarchyRepository.findAllHierarchyByCompany(
     companyId,
   );
+
+  const hierarchyTree =
+    hierarchyExcel.transformArrayToHierarchyMapTree(hierarchies);
 
   company.employees = company.employees.map((employee) => {
     const hierarchyId = employee.hierarchyId;
@@ -27,6 +33,9 @@ export const findAllEmployees = async (
       const pathsHierarchy = pathIds.map((id) => hierarchyTree[id]);
 
       const newEmployee = { ...employee };
+      newEmployee.status = statusEnumTranslateUsToBr(
+        newEmployee.status,
+      ) as StatusEnum;
 
       Object.values(HierarchyEnum).forEach((type) => {
         const hierarchy = pathsHierarchy.find(

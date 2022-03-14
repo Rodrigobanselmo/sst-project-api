@@ -12,7 +12,10 @@ export interface ITableSchema {
   checkHandler: (value: any) => string | false;
   isId?: boolean;
   isArray?: boolean;
-  notes?: (prisma: PrismaService, companyId: string) => Promise<string[]>;
+  notes?: (
+    prisma: PrismaService,
+    companyId: string,
+  ) => Promise<string[]> | string[];
 }
 
 interface IExcelProvider {

@@ -3,7 +3,7 @@ import { Type } from 'class-transformer';
 import { IsOptional, IsString, ValidateNested } from 'class-validator';
 
 import { CreateCompanyDto } from './create-company.dto';
-import { UpdateEmployeeDto } from './employee.dto copy';
+import { UpdateEmployeeDto } from './employee.dto';
 import { UserCompanyEditDto } from './update-user-company.dto';
 
 export class UpdateCompanyDto extends PartialType(CreateCompanyDto) {

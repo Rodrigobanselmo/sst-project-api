@@ -6,6 +6,7 @@ import {
 import ExcelJS from 'excelJS';
 import xlsx from 'node-xlsx';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { ErrorMessageEnum } from 'src/shared/constants/enum/errorMessage';
 import { sheetStylesConstant } from 'src/shared/constants/workbooks/styles/sheet-styles.constant';
 import { IWorkbookExcel } from 'src/shared/interfaces/worksheet.types';
 import {
@@ -74,8 +75,12 @@ const addHeader = async (
   await Promise.all(
     columns.map(async (column) => {
       if (column.notes) {
-        const notesCell = await column.notes(prisma, companyId);
-        notes[column.excelName] = notesCell;
+        if (Array.isArray(column.notes)) {
+          notes[column.excelName] = column.notes;
+        } else {
+          const notesCell = await column.notes(prisma, companyId);
+          notes[column.excelName] = notesCell;
+        }
       }
     }),
   );
@@ -211,6 +216,7 @@ class ExcelProvider implements IExcelProvider {
   async transformToTableData(
     excelReadData: IExcelReadData,
     tableSchema: ITableSchema[],
+    options?: { isArrayWithMissingFirstData?: boolean },
   ) {
     const transformStep = {
       startMap: false,
@@ -222,10 +228,15 @@ class ExcelProvider implements IExcelProvider {
     let databaseRow = {} as any;
 
     excelReadData.data.forEach((excelRow, indexRow) => {
-      const isArrayData = excelRow[0] === '-';
+      const isArrayData =
+        excelRow[0] === '-' ||
+        (options.isArrayWithMissingFirstData && !excelRow[0]);
+
       const isNextArrayData =
         excelReadData.data[indexRow + 1] &&
-        excelReadData.data[indexRow + 1][0] === '-';
+        (excelReadData.data[indexRow + 1][0] === '-' ||
+          (options.isArrayWithMissingFirstData &&
+            excelReadData.data[indexRow + 1].some((row) => row)));
 
       const saveIndexes = {
         hasSaved: false,
@@ -351,6 +362,9 @@ class ExcelProvider implements IExcelProvider {
 
       if (isTableHeader) transformStep.startMap = true;
     });
+
+    if (databaseRows.length === 0 && !transformStep.startMap)
+      throw new BadRequestException(ErrorMessageEnum.FILE_WRONG_TABLE_HEAD);
 
     return { rows: databaseRows, version: transformStep.version };
   }

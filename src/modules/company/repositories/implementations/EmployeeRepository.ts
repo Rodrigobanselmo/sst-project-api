@@ -9,10 +9,7 @@ import { v4 as uuidV4 } from 'uuid';
 import { UpdateCompanyDto } from '../../dto/update-company.dto';
 import { IPrismaOptions } from 'src/shared/interfaces/prisma-options.types';
 import { EmployeeEntity } from '../../entities/employee.entity';
-import {
-  CreateEmployeeDto,
-  UpdateEmployeeDto,
-} from '../../dto/employee.dto copy';
+import { CreateEmployeeDto, UpdateEmployeeDto } from '../../dto/employee.dto';
 import { transformStringToObject } from 'src/shared/utils/transformStringToObject';
 import { Hierarchy } from '@prisma/client';
 

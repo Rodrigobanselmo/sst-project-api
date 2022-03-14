@@ -3,7 +3,7 @@ import { Hierarchy, HierarchyEnum, StatusEnum } from '@prisma/client';
 
 export class HierarchyEntity implements Hierarchy {
   @ApiProperty({ description: 'The id of the Hierarchy' })
-  id: number;
+  id: string;
 
   @ApiProperty({ description: 'The name of the Hierarchy' })
   name: string;
@@ -29,7 +29,10 @@ export class HierarchyEntity implements Hierarchy {
   type: HierarchyEnum;
 
   @ApiProperty({ description: 'The parent id of the Hierarchy' })
-  parentId: number;
+  parentId: string;
+
+  @ApiProperty({ description: 'The workplace id of the Hierarchy' })
+  workplaceId: number;
 
   constructor(partial: Partial<HierarchyEntity>) {
     Object.assign(this, partial);

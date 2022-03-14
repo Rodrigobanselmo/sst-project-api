@@ -37,12 +37,42 @@ const createUserAndCompany = async () => {
       hierarchy: {
         createMany: {
           data: [
-            { name: 'DIRECTORY', type: 'DIRECTORY', id: 1 },
-            { name: 'MANAGEMENT', type: 'MANAGEMENT', id: 2, parentId: 1 },
-            { name: 'SECTOR', type: 'SECTOR', id: 3, parentId: 2 },
-            { name: 'OFFICE 1', type: 'OFFICE', id: 4, parentId: 3 },
-            { name: 'OFFICE 2', type: 'OFFICE', id: 5, parentId: 3 },
-            { name: 'SUB_OFFICE', type: 'SUB_OFFICE', id: 6, parentId: 4 },
+            { name: 'DIRECTORY', type: 'DIRECTORY', id: '1', workplaceId: 1 },
+            {
+              name: 'MANAGEMENT',
+              type: 'MANAGEMENT',
+              id: '2',
+              parentId: '1',
+              workplaceId: 1,
+            },
+            {
+              name: 'SECTOR',
+              type: 'SECTOR',
+              id: '3',
+              parentId: '2',
+              workplaceId: 1,
+            },
+            {
+              name: 'OFFICE 1',
+              type: 'OFFICE',
+              id: '4',
+              parentId: '3',
+              workplaceId: 1,
+            },
+            {
+              name: 'OFFICE 2',
+              type: 'OFFICE',
+              id: '5',
+              parentId: '3',
+              workplaceId: 1,
+            },
+            {
+              name: 'SUB_OFFICE',
+              type: 'SUB_OFFICE',
+              id: '6',
+              parentId: '4',
+              workplaceId: 1,
+            },
           ],
         },
       },
@@ -64,7 +94,7 @@ const createUserAndCompany = async () => {
             },
           },
           hierarchy: {
-            connect: { id_companyId: { companyId: id, id: 6 } },
+            connect: { id_companyId: { companyId: id, id: '6' } },
           },
         },
       },

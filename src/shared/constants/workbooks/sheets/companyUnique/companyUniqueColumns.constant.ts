@@ -2,7 +2,7 @@ import { StatusEnum } from '@prisma/client';
 import { excelWorkplaceNotes } from 'src/modules/files/utils/notes/excel-workplace-notes';
 import { ITableSchema } from 'src/shared/providers/ExcelProvider/models/IExcelProvider.types';
 import {
-  statusEnumTranslate,
+  statusEnumTranslateBrToUs,
   StatusEnumTranslated,
 } from 'src/shared/utils/translate/statusEnum.translate';
 import { checkIsNumber } from 'src/shared/utils/validators/checkIdNumber';
@@ -53,7 +53,7 @@ export const companyUniqueColumnsConstant = [
   },
   {
     databaseName: 'employees.cpf',
-    excelName: 'Nome do empregado',
+    excelName: 'CPF do empregado',
     isArray: true,
     required: false,
     checkHandler: checkIsString,
@@ -113,8 +113,9 @@ export const companyUniqueColumnsConstant = [
     excelName: 'Status',
     isEnum: [StatusEnumTranslated.ACTIVE, StatusEnumTranslated.INACTIVE],
     isArray: true,
+    notes: [StatusEnumTranslated.ACTIVE, StatusEnumTranslated.INACTIVE],
     required: false,
     checkHandler: (value: any) =>
-      checkIsEnum(statusEnumTranslate(value), StatusEnum),
+      checkIsEnum(statusEnumTranslateBrToUs(value), StatusEnum),
   },
 ] as ITableSchema[];

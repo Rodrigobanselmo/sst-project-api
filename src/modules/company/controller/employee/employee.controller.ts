@@ -1,15 +1,23 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { User } from 'src/shared/decorators/user.decorator';
 import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
+import { CreateEmployeeDto } from '../../dto/employee.dto';
+import { CreateEmployeeService } from '../../services/employee/create-employee/create-employee.service';
 import { FindAllAvailableEmployeesService } from '../../services/employee/find-all-available-employees/find-all-available-employees.service';
 import { FindEmployeeService } from '../../services/employee/find-employee/find-employee.service';
 
 @Controller('employee')
 export class EmployeeController {
   constructor(
+    private readonly createEmployeeService: CreateEmployeeService,
     private readonly findEmployeeService: FindEmployeeService,
     private readonly findAllAvailableEmployeesService: FindAllAvailableEmployeesService,
   ) {}
+
+  @Post()
+  create(@Body() createEmployeeDto: CreateEmployeeDto) {
+    return this.createEmployeeService.execute(createEmployeeDto);
+  }
 
   @Get('/all/:companyId?')
   FindAllAvailable(@User() userPayloadDto: UserPayloadDto) {

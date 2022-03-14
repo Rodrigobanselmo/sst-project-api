@@ -31,7 +31,6 @@ export class FilesCompanyController {
     @User() userPayloadDto: UserPayloadDto,
     @Res() res,
   ) {
-    console.log(9999);
     const { workbook, filename } =
       await this.uploadUniqueCompanyService.execute(file, userPayloadDto);
 

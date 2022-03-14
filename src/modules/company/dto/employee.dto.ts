@@ -39,7 +39,7 @@ export class CreateEmployeeDto {
   workplaceId: number;
 
   @IsNumber()
-  hierarchyId: number;
+  hierarchyId: string;
 }
 
 export class UpdateEmployeeDto extends PartialType(CreateEmployeeDto) {
