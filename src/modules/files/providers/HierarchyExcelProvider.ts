@@ -153,7 +153,6 @@ export class HierarchyExcelProvider {
 
       newHierarchy[hierarchy.id] = { refId: allHierarchy.id };
     };
-
     Object.keys(HierarchyEnum).forEach((type) =>
       Object.values(compareMap)
         .filter((i) => i.type === type)
