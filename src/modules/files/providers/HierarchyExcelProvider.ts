@@ -153,6 +153,7 @@ export class HierarchyExcelProvider {
 
       newHierarchy[hierarchy.id] = { refId: allHierarchy.id };
     };
+
     Object.keys(HierarchyEnum).forEach((type) =>
       Object.values(compareMap)
         .filter((i) => i.type === type)
@@ -188,7 +189,7 @@ export class HierarchyExcelProvider {
               ].connectedToOldId;
           }
 
-          //se tiver outro igual
+          //if has other equal hierarchy
           const equalHierarchy = Object.values(newHierarchy).find(
             (i) =>
               !i.fromOld &&

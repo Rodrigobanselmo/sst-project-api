@@ -4,7 +4,7 @@ import { CompanyRepository } from 'src/modules/company/repositories/implementati
 import { HierarchyRepository } from 'src/modules/company/repositories/implementations/HierarchyRepository';
 import { HierarchyExcelProvider } from 'src/modules/files/providers/HierarchyExcelProvider';
 import { UploadExcelProvider } from 'src/modules/files/providers/uploadExcelProvider';
-import { findAllCompanies } from 'src/modules/files/utils/findAllCompanies';
+import { findAllEmployees } from 'src/modules/files/utils/findAllEmployees';
 import { ErrorMessageEnum } from 'src/shared/constants/enum/errorMessage';
 import { ICompanySheet } from 'src/shared/constants/workbooks/sheets/company/companySheet.constant';
 import { workbooksConstant } from 'src/shared/constants/workbooks/workbooks.constant';
@@ -12,6 +12,7 @@ import { WorkbooksEnum } from 'src/shared/constants/workbooks/workbooks.enum';
 import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
 import { ExcelProvider } from 'src/shared/providers/ExcelProvider/implementations/ExcelProvider';
 import { IExcelReadData } from 'src/shared/providers/ExcelProvider/models/IExcelProvider.types';
+import { asyncEach } from 'src/shared/utils/asyncEach';
 
 import { DatabaseTableEntity } from '../../../entities/databaseTable.entity';
 import { DatabaseTableRepository } from '../../../repositories/implementations/DatabaseTableRepository';
@@ -68,27 +69,77 @@ export class UploadUniqueCompanyService {
       sheetHierarchyTree,
     );
 
-    console.log(hierarchyTree);
-    throw new BadRequestException(`Invalid data `);
+    const hierarchyArray = Object.values(hierarchyTree)
+      .filter((hierarchy) => !hierarchy.refId)
+      .map(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        ({ connectedToOldId, children, fromOld, ...hierarchy }) => ({
+          ...hierarchy,
+        }),
+      );
 
-    // Object.keys(HierarchyEnum).map(async (type) => {
-    //   await hierarchyTree.filter((hy) => hy.type === type);
-    // });
+    const upsertHierarchy = async (type) => {
+      await this.hierarchyRepository.upsertMany(
+        hierarchyArray.filter((hy) => hy.type === type),
+        companyId,
+      );
+    };
+
+    await asyncEach(Object.keys(HierarchyEnum), upsertHierarchy);
+
+    // console.log(company[0]);
+    // console.log(hierarchyTree);
+
+    const employees = company[0].employees.map((employee) => {
+      const newEmployee = { ...employee, cpf: '908' };
+      let hierarchy = null as any;
+
+      const getByNameHierarchy = () => {
+        Object.keys(HierarchyEnum).forEach((key) => {
+          const hierarchyName = newEmployee[key.toLocaleLowerCase()];
+          delete newEmployee[key.toLocaleLowerCase()];
+
+          if (hierarchyName) {
+            const children = hierarchy
+              ? hierarchy.children.map((child) => hierarchyTree[child])
+              : Object.values(hierarchyTree);
+
+            const actualHierarchy = children.find(
+              (h) =>
+                h?.name &&
+                h?.type &&
+                h.name === hierarchyName &&
+                h.type === key,
+            );
+
+            if (actualHierarchy) {
+              hierarchy = actualHierarchy;
+              newEmployee.hierarchyId = actualHierarchy.id;
+            }
+          }
+        });
+      };
+
+      getByNameHierarchy();
+
+      return newEmployee;
+    });
 
     // update or create all
     await this.companyRepository.update({
-      companyId: company[0].id,
       ...company[0],
+      companyId: company[0].id,
+      employees,
     });
 
     return await this.uploadExcelProvider.newTableData({
       findAll: (sheet) =>
-        findAllCompanies(
+        findAllEmployees(
           this.excelProvider,
           this.companyRepository,
+          this.hierarchyRepository,
           sheet,
           companyId,
-          userPayloadDto.isMaster,
         ),
       Workbook,
       system,

@@ -7,6 +7,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Public } from 'src/shared/decorators/public.decorator';
 import { User } from 'src/shared/decorators/user.decorator';
 import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
 
@@ -70,7 +71,7 @@ export class FilesCompanyController {
     });
   }
 
-  @Get('/download/unique/:companyId')
+  @Public()
   async downloadUnique(@User() userPayloadDto: UserPayloadDto, @Res() res) {
     const { workbook, filename } =
       await this.downloadUniqueCompanyService.execute(userPayloadDto);

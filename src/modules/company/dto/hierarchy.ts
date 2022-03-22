@@ -1,12 +1,13 @@
 import { PartialType } from '@nestjs/swagger';
 import { HierarchyEnum, StatusEnum } from '@prisma/client';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsEnum,
   IsNumber,
   IsOptional,
   IsString,
   MaxLength,
+  ValidateNested,
 } from 'class-validator';
 
 import { StringCapitalizeTransform } from '../../../shared/transformers/string-capitalize';
@@ -42,6 +43,11 @@ export class CreateHierarchyDto {
 
   @IsString()
   parentId: string;
+
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @Type(() => CreateHierarchyDto)
+  readonly children?: CreateHierarchyDto[];
 }
 
 export class UpdateHierarchyDto extends PartialType(CreateHierarchyDto) {

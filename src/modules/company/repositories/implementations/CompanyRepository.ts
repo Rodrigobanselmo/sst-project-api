@@ -129,7 +129,6 @@ export class CompanyRepository implements ICompanyRepository {
                 return {
                   create: {
                     ...rest,
-                    companyId,
                     hierarchy: hierarchyId
                       ? {
                           connect: {
@@ -147,7 +146,6 @@ export class CompanyRepository implements ICompanyRepository {
                   },
                   update: {
                     ...rest,
-                    companyId,
                     hierarchy: hierarchyId
                       ? {
                           connect: {
