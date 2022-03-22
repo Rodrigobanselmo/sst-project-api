@@ -19,7 +19,7 @@ export class EmployeeController {
     return this.createEmployeeService.execute(createEmployeeDto);
   }
 
-  @Get('/all/:companyId?')
+  @Get('/:companyId?')
   FindAllAvailable(@User() userPayloadDto: UserPayloadDto) {
     return this.findAllAvailableEmployeesService.execute(userPayloadDto);
   }

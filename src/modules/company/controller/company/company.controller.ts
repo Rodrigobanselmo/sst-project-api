@@ -6,10 +6,10 @@ import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
 import { CreateCompanyDto } from '../../dto/create-company.dto';
 import { CreateContractDto } from '../../dto/create-contract.dto';
 import { UpdateCompanyDto } from '../../dto/update-company.dto';
-import { CreateCompanyService } from '../../services/manager/create-company/create-company.service';
-import { CreateContractService } from '../../services/manager/create-contract/create-contract.service';
-import { FindAllCompaniesService } from '../../services/manager/find-all-companies/find-all-companies.service';
-import { UpdateCompanyService } from '../../services/manager/update-company/update-company.service';
+import { CreateCompanyService } from '../../services/company/create-company/create-company.service';
+import { CreateContractService } from '../../services/company/create-contract/create-contract.service';
+import { FindAllCompaniesService } from '../../services/company/find-all-companies/find-all-companies.service';
+import { UpdateCompanyService } from '../../services/company/update-company/update-company.service';
 
 @ApiTags('company')
 @Controller('company')
