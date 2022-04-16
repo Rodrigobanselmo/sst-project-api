@@ -15,9 +15,12 @@ import { UpdateEmployeeService } from './services/employee/update-employee/updat
 import { FindAllAvailableEmployeesService } from './services/employee/find-all-available-employees/find-all-available-employees.service';
 import { HierarchyRepository } from './repositories/implementations/HierarchyRepository';
 import { CreateEmployeeService } from './services/employee/create-employee/create-employee.service';
+import { HierarchyController } from './controller/hierarchy/hierarchy.controller';
+import { FindAllHierarchyService } from './services/hierarchy/find-all-hierarchies/find-all-hierarchies.service';
+import { FindCompanyService } from './services/company/find-company/find-company.service';
 
 @Module({
-  controllers: [CompanyController, EmployeeController],
+  controllers: [CompanyController, EmployeeController, HierarchyController],
   providers: [
     CreateCompanyService,
     UpdateCompanyService,
@@ -28,10 +31,12 @@ import { CreateEmployeeService } from './services/employee/create-employee/creat
     HierarchyRepository,
     ExcelProvider,
     FindAllCompaniesService,
+    FindCompanyService,
     FindEmployeeService,
     CreateEmployeeService,
     UpdateEmployeeService,
     FindAllAvailableEmployeesService,
+    FindAllHierarchyService,
   ],
   exports: [CompanyRepository, EmployeeRepository, HierarchyRepository],
 })

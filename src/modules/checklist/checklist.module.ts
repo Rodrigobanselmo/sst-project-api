@@ -1,3 +1,4 @@
+import { GenerateSourceController } from './controller/generate-source/generate-source.controller';
 import { Module } from '@nestjs/common';
 import { RiskController } from './controller/risk/risk.controller';
 import { RiskRepository } from './repositories/implementations/RiskRepository';
@@ -14,22 +15,33 @@ import { UpdateChecklistService } from './services/checklist/update-checklist/up
 import { FindAllAvailableRiskService } from './services/risk/find-all-available-risk/find-all-available-risk.service';
 import { UpdateRiskService } from './services/risk/update-risk/update-risk.service';
 import { UpdateRecMedService } from './services/rec-med/update-rec-med/update-rec-med.service';
+import { GenerateSourceRepository } from './repositories/implementations/GenerateSourceRepository';
+import { CreateGenerateSourceService } from './services/generate-source/create-generate-source/create-generate-source.service';
+import { UpdateGenerateSourceService } from './services/generate-source/update-generate-source/update-generate-source.service';
 
 @Module({
-  controllers: [RiskController, RecMedController, ChecklistController],
+  controllers: [
+    RiskController,
+    RecMedController,
+    ChecklistController,
+    GenerateSourceController,
+  ],
   providers: [
+    CreateChecklistService,
     RiskRepository,
     CreateRiskService,
-    CreateRecMedService,
-    CreateChecklistService,
+    UpdateRiskService,
     RecMedRepository,
+    CreateRecMedService,
+    UpdateRecMedService,
+    GenerateSourceRepository,
+    CreateGenerateSourceService,
+    UpdateGenerateSourceService,
     ChecklistRepository,
     FindAvailableChecklistService,
     FindChecklistDataService,
     UpdateChecklistService,
     FindAllAvailableRiskService,
-    UpdateRiskService,
-    UpdateRecMedService,
   ],
   exports: [RiskRepository],
 })

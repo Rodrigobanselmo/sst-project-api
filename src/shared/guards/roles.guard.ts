@@ -4,6 +4,10 @@ import { Reflector } from '@nestjs/core';
 import { Role } from '../constants/enum/authorization';
 import { UserPayloadDto } from '../dto/user-payload.dto';
 
+const isAdmin = (user: UserPayloadDto) => {
+  return user.roles.some((roles) => roles === Role.MASTER);
+};
+
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
@@ -17,6 +21,9 @@ export class RolesGuard implements CanActivate {
       return true;
     }
     const user: UserPayloadDto = context.switchToHttp().getRequest().user;
+
+    if (isAdmin(user)) return true;
+
     return requiredRoles.some((role) => user.roles.includes(role));
   }
 }

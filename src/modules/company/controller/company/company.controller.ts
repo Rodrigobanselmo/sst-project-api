@@ -9,6 +9,7 @@ import { UpdateCompanyDto } from '../../dto/update-company.dto';
 import { CreateCompanyService } from '../../services/company/create-company/create-company.service';
 import { CreateContractService } from '../../services/company/create-contract/create-contract.service';
 import { FindAllCompaniesService } from '../../services/company/find-all-companies/find-all-companies.service';
+import { FindCompanyService } from '../../services/company/find-company/find-company.service';
 import { UpdateCompanyService } from '../../services/company/update-company/update-company.service';
 
 @ApiTags('company')
@@ -19,7 +20,18 @@ export class CompanyController {
     private readonly createContractService: CreateContractService,
     private readonly updateCompanyService: UpdateCompanyService,
     private readonly findAllCompaniesService: FindAllCompaniesService,
+    private readonly findCompanyService: FindCompanyService,
   ) {}
+
+  @Get('/:companyId')
+  findOne(@User() userPayloadDto: UserPayloadDto) {
+    return this.findCompanyService.execute(userPayloadDto);
+  }
+
+  @Get()
+  findAll(@User() userPayloadDto: UserPayloadDto) {
+    return this.findAllCompaniesService.execute(userPayloadDto);
+  }
 
   @Post()
   create(@Body() createCompanyDto: CreateCompanyDto) {
@@ -39,11 +51,6 @@ export class CompanyController {
     delete updateCompanyDto.license;
 
     return this.updateCompanyService.execute(updateCompanyDto);
-  }
-
-  @Get('all')
-  export(@User() userPayloadDto: UserPayloadDto) {
-    return this.findAllCompaniesService.execute(userPayloadDto);
   }
 
   // TODO: create disconnect users or activities or...

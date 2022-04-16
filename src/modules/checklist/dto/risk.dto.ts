@@ -9,6 +9,11 @@ import {
 } from 'class-validator';
 import { StringUppercaseTransform } from 'src/shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from 'src/shared/utils/keysOfEnum.utils';
+import {
+  RiskCreateGenerateSourceDto,
+  RiskUpdateGenerateSourceDto,
+  UpsertGenerateSourceDto,
+} from './generate-source.dto';
 
 import {
   RiskCreateRecMedDto,
@@ -42,6 +47,11 @@ export class CreateRiskDto {
   @IsOptional()
   @Type(() => RiskCreateRecMedDto)
   recMed?: RiskCreateRecMedDto[];
+
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @Type(() => RiskCreateGenerateSourceDto)
+  generateSource?: RiskCreateGenerateSourceDto[];
 }
 
 export class UpsertRiskDto extends CreateRiskDto {
@@ -53,6 +63,11 @@ export class UpsertRiskDto extends CreateRiskDto {
   @IsOptional()
   @Type(() => UpsertRecMedDto)
   recMed?: UpsertRecMedDto[];
+
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @Type(() => UpsertGenerateSourceDto)
+  generateSource?: UpsertGenerateSourceDto[];
 }
 
 export class UpdateRiskDto {
@@ -86,4 +101,9 @@ export class UpdateRiskDto {
   @IsOptional()
   @Type(() => RiskUpdateRecMedDto)
   recMed?: RiskUpdateRecMedDto[];
+
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @Type(() => RiskUpdateGenerateSourceDto)
+  generateSource?: RiskUpdateGenerateSourceDto[];
 }

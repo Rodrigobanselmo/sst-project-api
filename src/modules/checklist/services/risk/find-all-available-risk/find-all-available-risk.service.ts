@@ -8,7 +8,7 @@ export class FindAllAvailableRiskService {
   async execute(companyId: string) {
     const ChecklistFactor = await this.riskRepository.findAllAvailable(
       companyId,
-      { include: { recMed: true } },
+      { include: { recMed: true, generateSource: true } },
     );
 
     return ChecklistFactor;

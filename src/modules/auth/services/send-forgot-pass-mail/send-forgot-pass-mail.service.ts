@@ -47,10 +47,6 @@ export class SendForgotPassMailService {
       link: `${process.env.APP_HOST}/password/reset?token=${refresh_token.id}`,
     };
 
-    // console.log('variables', variables);
-    // console.log('email', email);
-    // console.log('templatePath', templatePath);
-
     await this.mailProvider.sendMail({
       path: templatePath,
       subject: 'Recuperação de Senha',

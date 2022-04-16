@@ -69,10 +69,6 @@ const inviteNewUser = async (
     link: `${process.env.APP_HOST}/invites/?token=${invite.id}`,
   };
 
-  // console.log('variables', variables);
-  // console.log('email', invite.email);
-  // console.log('templatePath', templatePath);
-
   await mailProvider.sendMail({
     path: templatePath,
     subject: 'Convite para se tornar membro',

@@ -71,11 +71,6 @@ export class HierarchyRepository {
     upsertHierarchyMany: CreateHierarchyDto & { id: string },
     companyId: string,
   ): Promise<HierarchyEntity> {
-    console.log({
-      id: upsertHierarchyMany.id,
-      parentId: upsertHierarchyMany.parentId,
-    });
-
     const data = await this.prisma.hierarchy.update({
       where: { id_companyId: { companyId, id: upsertHierarchyMany.id } },
       data: {

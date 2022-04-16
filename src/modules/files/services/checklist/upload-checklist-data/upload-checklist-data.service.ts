@@ -66,6 +66,11 @@ const readRisks = async (
 ) => {
   const risksTable = readFileData.find((data) => data.name === riskSheet.name);
 
+  if (!risksTable)
+    throw new BadRequestException(
+      'The table you trying to insert has a different sheet name',
+    );
+
   const riskDatabase = await excelProvider.transformToTableData(
     risksTable,
     riskSheet.columns,

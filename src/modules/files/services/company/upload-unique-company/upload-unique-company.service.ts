@@ -87,9 +87,6 @@ export class UploadUniqueCompanyService {
 
     await asyncEach(Object.keys(HierarchyEnum), upsertHierarchy);
 
-    // console.log(company[0]);
-    // console.log(hierarchyTree);
-
     const employees = company[0].employees.map((employee) => {
       const newEmployee = { ...employee, cpf: '908' };
       let hierarchy = null as any;

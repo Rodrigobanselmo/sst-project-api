@@ -106,6 +106,7 @@ model Company {
   licenseId Int? 
   license License? @relation(name:"license",fields: [licenseId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
   riskFactors RiskFactors[] 
+  generateSource GenerateSource[] 
   recMed RecMed[] 
   hierarchy Hierarchy[] 
   databaseTable DatabaseTable[] 
@@ -151,6 +152,20 @@ model Employee {
   hierarchy Hierarchy @relation(fields: [hierarchyId,companyId], references: [id,companyId], onDelete: Restrict, onUpdate: Cascade)
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   
+  @@id([id, companyId])
+} 
+
+model GenerateSource {
+  id    Int     @default(autoincrement())
+  riskId    Int    
+  name String
+  companyId String
+  system Boolean
+  status StatusEnum @default(ACTIVE)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  risk RiskFactors @relation(fields: [riskId,companyId], references: [id,companyId], onDelete: Cascade, onUpdate: Cascade)
+  created_at DateTime @default(now())
+
   @@id([id, companyId])
 } 
 
@@ -227,6 +242,7 @@ model RiskFactors {
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   created_at DateTime @default(now())
   recMed RecMed[]
+  generateSource GenerateSource[]
   
   @@id([id, companyId])
 } 

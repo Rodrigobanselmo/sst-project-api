@@ -51,4 +51,19 @@ export const riskColumnsConstant = [
     required: false,
     checkHandler: checkIsString,
   },
+  {
+    isId: true,
+    isArray: true,
+    databaseName: 'generateSource.id',
+    excelName: 'ID (fonte geradora)',
+    required: false,
+    checkHandler: checkIsNumber,
+  },
+  {
+    databaseName: 'generateSource.name',
+    excelName: 'Fonte geradora',
+    isArray: true,
+    required: false,
+    checkHandler: checkIsString,
+  },
 ] as ITableSchema[];

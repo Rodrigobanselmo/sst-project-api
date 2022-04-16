@@ -72,6 +72,11 @@ const read = async (
 ) => {
   const table = readFileData.find((data) => data.name === sheet.name);
 
+  if (!table)
+    throw new BadRequestException(
+      'The table you trying to insert has a different sheet name',
+    );
+
   const database = await excelProvider.transformToTableData(
     table,
     sheet.columns,
