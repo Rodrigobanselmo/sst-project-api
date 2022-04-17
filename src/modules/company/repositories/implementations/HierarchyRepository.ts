@@ -2,7 +2,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
-import { CreateHierarchyDto } from '../../dto/hierarchy';
+import { CreateHierarchyDto, UpdateHierarchyDto } from '../../dto/hierarchy';
 import { HierarchyEntity } from '../../entities/hierarchy.entity';
 
 @Injectable()
@@ -53,7 +53,9 @@ export class HierarchyRepository {
                     connect: { id_companyId: { companyId, id: workplaceId } },
                   },
               parent: !parentId
-                ? undefined
+                ? parentId === null
+                  ? { disconnect: true }
+                  : undefined
                 : {
                     connect: { id_companyId: { companyId, id: parentId } },
                   },
@@ -68,22 +70,87 @@ export class HierarchyRepository {
   }
 
   async update(
-    upsertHierarchyMany: CreateHierarchyDto & { id: string },
+    {
+      companyId: _,
+      workplaceId,
+      parentId,
+      id,
+      children,
+      ...updateHierarchy
+    }: UpdateHierarchyDto,
     companyId: string,
   ): Promise<HierarchyEntity> {
     const data = await this.prisma.hierarchy.update({
-      where: { id_companyId: { companyId, id: upsertHierarchyMany.id } },
+      where: { id_companyId: { companyId, id } },
       data: {
-        parent: upsertHierarchyMany.parentId
-          ? {
+        ...updateHierarchy,
+        workplace: !workplaceId
+          ? undefined
+          : {
               connect: {
-                id_companyId: { companyId, id: upsertHierarchyMany.parentId },
+                id_companyId: { companyId, id: workplaceId },
               },
-            }
-          : undefined,
+            },
+        parent: !parentId
+          ? undefined
+          : {
+              connect: {
+                id_companyId: { companyId, id: parentId },
+              },
+            },
       },
     });
 
     return new HierarchyEntity(data);
+  }
+
+  async upsert(
+    {
+      companyId: _,
+      id,
+      workplaceId,
+      parentId,
+      children,
+      ...upsertHierarchy
+    }: CreateHierarchyDto & { id?: string },
+    companyId: string,
+  ): Promise<HierarchyEntity> {
+    const data = await this.prisma.hierarchy.upsert({
+      create: {
+        ...upsertHierarchy,
+        id,
+        company: { connect: { id: companyId } },
+        workplace: {
+          connect: { id_companyId: { companyId, id: workplaceId } },
+        },
+        parent: parentId
+          ? {
+              connect: { id_companyId: { companyId, id: parentId } },
+            }
+          : undefined,
+      },
+      update: {
+        ...upsertHierarchy,
+        workplace: !workplaceId
+          ? undefined
+          : {
+              connect: { id_companyId: { companyId, id: workplaceId } },
+            },
+        parent: !parentId
+          ? undefined
+          : {
+              connect: { id_companyId: { companyId, id: parentId } },
+            },
+      },
+      where: { id_companyId: { companyId, id: id || 'none' } },
+    });
+
+    return new HierarchyEntity(data);
+  }
+
+  async deleteById(id: string, companyId: string): Promise<void> {
+    await this.prisma.hierarchy.delete({
+      where: { id_companyId: { companyId, id: id || 'none' } },
+    });
   }
 }

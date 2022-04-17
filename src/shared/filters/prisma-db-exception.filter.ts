@@ -35,7 +35,7 @@ export class PrismaDbExceptionFilter implements ExceptionFilter {
       case 'P2003':
         if (field_name)
           error = new BadRequestException(
-            `Data you trying to create requires an FK: ${field_name}`,
+            `Data you trying to create or delete requires an FK: ${field_name}`,
           );
         break;
 

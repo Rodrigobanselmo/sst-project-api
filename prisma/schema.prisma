@@ -170,7 +170,7 @@ model GenerateSource {
 } 
 
 model Hierarchy {
-  id    String     @default(uuid()) 
+  id    String     @default(uuid())  @unique
   created_at DateTime @default(now())
   status StatusEnum @default(ACTIVE)
   type HierarchyEnum 
@@ -180,7 +180,7 @@ model Hierarchy {
   workplaceId Int
   workplace Workspace @relation(fields: [workplaceId, companyId], references: [id, companyId], onDelete: Restrict, onUpdate: Cascade)
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  parent Hierarchy?  @relation(name: "children_parent", fields: [parentId,companyId], references: [id,companyId], onDelete: Cascade, onUpdate: Cascade)
+  parent Hierarchy?  @relation(name: "children_parent", fields: [parentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   children Hierarchy[] @relation(name: "children_parent")
   employee Employee[] 
 

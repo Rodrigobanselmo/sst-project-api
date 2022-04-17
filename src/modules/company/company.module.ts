@@ -18,6 +18,10 @@ import { CreateEmployeeService } from './services/employee/create-employee/creat
 import { HierarchyController } from './controller/hierarchy/hierarchy.controller';
 import { FindAllHierarchyService } from './services/hierarchy/find-all-hierarchies/find-all-hierarchies.service';
 import { FindCompanyService } from './services/company/find-company/find-company.service';
+import { CreateHierarchyService } from './services/hierarchy/create-hierarchies/create-hierarchies.service';
+import { UpdateHierarchyService } from './services/hierarchy/update-hierarchies/update-hierarchies.service';
+import { DeleteHierarchyService } from './services/hierarchy/delete-hierarchies/delete-hierarchies.service';
+import { UpsertManyHierarchyService } from './services/hierarchy/upsert-many-hierarchies/upsert-many-hierarchies.service';
 
 @Module({
   controllers: [CompanyController, EmployeeController, HierarchyController],
@@ -37,6 +41,10 @@ import { FindCompanyService } from './services/company/find-company/find-company
     UpdateEmployeeService,
     FindAllAvailableEmployeesService,
     FindAllHierarchyService,
+    CreateHierarchyService,
+    UpdateHierarchyService,
+    DeleteHierarchyService,
+    UpsertManyHierarchyService,
   ],
   exports: [CompanyRepository, EmployeeRepository, HierarchyRepository],
 })

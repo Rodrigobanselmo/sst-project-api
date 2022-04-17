@@ -29,9 +29,8 @@ export class CreateHierarchyDto {
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsString()
-  @IsOptional()
   @IsEnum(HierarchyEnum, {
-    message: `status must be one of: ${HierarchyEnum.DIRECTORY} or ${HierarchyEnum.MANAGEMENT} or ${HierarchyEnum.SECTOR} or ${HierarchyEnum.OFFICE}`,
+    message: `type must be one of: ${HierarchyEnum.DIRECTORY} or ${HierarchyEnum.MANAGEMENT} or ${HierarchyEnum.SECTOR} or ${HierarchyEnum.OFFICE}`,
   })
   type: HierarchyEnum;
 
@@ -42,7 +41,8 @@ export class CreateHierarchyDto {
   workplaceId: number;
 
   @IsString()
-  parentId: string;
+  @IsOptional()
+  parentId?: string;
 
   @ValidateNested({ each: true })
   @IsOptional()
@@ -53,5 +53,52 @@ export class CreateHierarchyDto {
 export class UpdateHierarchyDto extends PartialType(CreateHierarchyDto) {
   @IsOptional()
   @IsString()
-  id?: number;
+  id?: string;
+}
+
+export class UpsertHierarchyDto {
+  @IsOptional()
+  @IsString()
+  id?: string;
+
+  @Transform(StringCapitalizeTransform, { toClassOnly: true })
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  name?: string;
+
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsString()
+  @IsOptional()
+  @IsEnum(StatusEnum, {
+    message: `status must be one of: ${StatusEnum.ACTIVE} or ${StatusEnum.INACTIVE}`,
+  })
+  status?: StatusEnum;
+
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsString()
+  @IsOptional()
+  @IsEnum(HierarchyEnum, {
+    message: `type must be one of: ${HierarchyEnum.DIRECTORY} or ${HierarchyEnum.MANAGEMENT} or ${HierarchyEnum.SECTOR} or ${HierarchyEnum.OFFICE}`,
+  })
+  type?: HierarchyEnum;
+
+  @IsString()
+  @IsOptional()
+  companyId?: string;
+
+  @IsNumber()
+  @IsOptional()
+  workplaceId?: number;
+
+  @IsString()
+  @IsOptional()
+  parentId?: string;
+}
+
+export class UpsertManyHierarchyDto {
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @Type(() => UpsertHierarchyDto)
+  readonly data: UpsertHierarchyDto[];
 }
