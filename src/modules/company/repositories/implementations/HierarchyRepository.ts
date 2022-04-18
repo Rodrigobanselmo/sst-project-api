@@ -9,14 +9,6 @@ import { HierarchyEntity } from '../../entities/hierarchy.entity';
 export class HierarchyRepository {
   constructor(private prisma: PrismaService) {}
 
-  async findAllHierarchyByCompany(companyId: string) {
-    const hierarchies = await this.prisma.hierarchy.findMany({
-      where: { companyId },
-    });
-
-    return hierarchies.map((hierarchy) => new HierarchyEntity(hierarchy));
-  }
-
   async upsertMany(
     upsertHierarchyMany: (CreateHierarchyDto & { id: string })[],
     companyId: string,
@@ -41,7 +33,7 @@ export class HierarchyRepository {
               },
               parent: parentId
                 ? {
-                    connect: { id_companyId: { companyId, id: parentId } },
+                    connect: { id: parentId },
                   }
                 : undefined,
             },
@@ -57,10 +49,10 @@ export class HierarchyRepository {
                   ? { disconnect: true }
                   : undefined
                 : {
-                    connect: { id_companyId: { companyId, id: parentId } },
+                    connect: { id: parentId },
                   },
             },
-            where: { id_companyId: { companyId, id: id || 'none' } },
+            where: { id: id || 'none' },
           });
         },
       ),
@@ -81,7 +73,7 @@ export class HierarchyRepository {
     companyId: string,
   ): Promise<HierarchyEntity> {
     const data = await this.prisma.hierarchy.update({
-      where: { id_companyId: { companyId, id } },
+      where: { id },
       data: {
         ...updateHierarchy,
         workplace: !workplaceId
@@ -95,7 +87,7 @@ export class HierarchyRepository {
           ? undefined
           : {
               connect: {
-                id_companyId: { companyId, id: parentId },
+                id: parentId,
               },
             },
       },
@@ -125,7 +117,7 @@ export class HierarchyRepository {
         },
         parent: parentId
           ? {
-              connect: { id_companyId: { companyId, id: parentId } },
+              connect: { id: parentId },
             }
           : undefined,
       },
@@ -139,18 +131,34 @@ export class HierarchyRepository {
         parent: !parentId
           ? undefined
           : {
-              connect: { id_companyId: { companyId, id: parentId } },
+              connect: { id: parentId },
             },
       },
-      where: { id_companyId: { companyId, id: id || 'none' } },
+      where: { id: id || 'none' },
     });
 
     return new HierarchyEntity(data);
   }
 
-  async deleteById(id: string, companyId: string): Promise<void> {
+  async deleteById(id: string): Promise<void> {
     await this.prisma.hierarchy.delete({
-      where: { id_companyId: { companyId, id: id || 'none' } },
+      where: { id: id || 'none' },
     });
+  }
+
+  async findAllHierarchyByCompanyAndId(id: string, companyId: string) {
+    const hierarchy = await this.prisma.hierarchy.findFirst({
+      where: { companyId, id },
+    });
+
+    return new HierarchyEntity(hierarchy);
+  }
+
+  async findAllHierarchyByCompany(companyId: string) {
+    const hierarchies = await this.prisma.hierarchy.findMany({
+      where: { companyId },
+    });
+
+    return hierarchies.map((hierarchy) => new HierarchyEntity(hierarchy));
   }
 }

@@ -106,22 +106,47 @@ CREATE TABLE "Employee" (
     "cpf" TEXT NOT NULL,
     "companyId" TEXT NOT NULL,
     "workplaceId" INTEGER NOT NULL,
-    "hierarchyId" INTEGER NOT NULL,
+    "hierarchyId" TEXT NOT NULL,
 
     CONSTRAINT "Employee_pkey" PRIMARY KEY ("id","companyId")
 );
 
 -- CreateTable
-CREATE TABLE "Hierarchy" (
+CREATE TABLE "GenerateSource" (
     "id" SERIAL NOT NULL,
+    "riskId" INTEGER NOT NULL,
+    "name" TEXT NOT NULL,
+    "companyId" TEXT NOT NULL,
+    "system" BOOLEAN NOT NULL,
+    "status" "StatusEnum" NOT NULL DEFAULT E'ACTIVE',
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "GenerateSource_pkey" PRIMARY KEY ("id","companyId")
+);
+
+-- CreateTable
+CREATE TABLE "Hierarchy" (
+    "id" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "status" "StatusEnum" NOT NULL DEFAULT E'ACTIVE',
     "type" "HierarchyEnum" NOT NULL,
     "name" TEXT NOT NULL,
     "companyId" TEXT NOT NULL,
-    "parentId" INTEGER,
+    "parentId" TEXT,
+    "workplaceId" INTEGER NOT NULL,
 
-    CONSTRAINT "Hierarchy_pkey" PRIMARY KEY ("id","companyId")
+    CONSTRAINT "Hierarchy_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "HomogeneousGroup" (
+    "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+    "companyId" TEXT NOT NULL,
+    "status" "StatusEnum" NOT NULL DEFAULT E'ACTIVE',
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "HomogeneousGroup_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -283,16 +308,28 @@ ALTER TABLE "DatabaseTable" ADD CONSTRAINT "DatabaseTable_companyId_fkey" FOREIG
 ALTER TABLE "Employee" ADD CONSTRAINT "Employee_workplaceId_companyId_fkey" FOREIGN KEY ("workplaceId", "companyId") REFERENCES "Workspace"("id", "companyId") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Employee" ADD CONSTRAINT "Employee_hierarchyId_companyId_fkey" FOREIGN KEY ("hierarchyId", "companyId") REFERENCES "Hierarchy"("id", "companyId") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Employee" ADD CONSTRAINT "Employee_hierarchyId_fkey" FOREIGN KEY ("hierarchyId") REFERENCES "Hierarchy"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Employee" ADD CONSTRAINT "Employee_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "GenerateSource" ADD CONSTRAINT "GenerateSource_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "GenerateSource" ADD CONSTRAINT "GenerateSource_riskId_companyId_fkey" FOREIGN KEY ("riskId", "companyId") REFERENCES "RiskFactors"("id", "companyId") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Hierarchy" ADD CONSTRAINT "Hierarchy_workplaceId_companyId_fkey" FOREIGN KEY ("workplaceId", "companyId") REFERENCES "Workspace"("id", "companyId") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Hierarchy" ADD CONSTRAINT "Hierarchy_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Hierarchy" ADD CONSTRAINT "Hierarchy_parentId_companyId_fkey" FOREIGN KEY ("parentId", "companyId") REFERENCES "Hierarchy"("id", "companyId") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Hierarchy" ADD CONSTRAINT "Hierarchy_parentId_fkey" FOREIGN KEY ("parentId") REFERENCES "Hierarchy"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "HomogeneousGroup" ADD CONSTRAINT "HomogeneousGroup_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "RecMed" ADD CONSTRAINT "RecMed_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

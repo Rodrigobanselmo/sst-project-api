@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { UpdateGenerateSourceDto } from 'src/modules/checklist/dto/generate-source.dto';
 import { GenerateSourceRepository } from 'src/modules/checklist/repositories/implementations/GenerateSourceRepository';
 import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
+import { isMaster } from 'src/shared/utils/isMater';
 
 @Injectable()
 export class UpdateGenerateSourceService {
@@ -12,20 +13,34 @@ export class UpdateGenerateSourceService {
   async execute(
     id: number,
     updateGenerateSourceDto: UpdateGenerateSourceDto,
-    user: UserPayloadDto,
+    userPayloadDto: UserPayloadDto,
   ) {
+    const user = isMaster(userPayloadDto);
     const companyId = user.targetCompanyId;
 
-    const generateSource = await this.generateSourceRepository.update(
-      {
-        id,
-        ...updateGenerateSourceDto,
-      },
+    const system =
+      user.isMaster && user.companyId === updateGenerateSourceDto.companyId;
+
+    const generateSource = await this.generateSourceRepository.findById(
+      id,
       companyId,
     );
 
-    if (!generateSource.id) throw new NotFoundException('data not found');
+    if (!generateSource?.id) throw new NotFoundException('data not found');
 
-    return generateSource;
+    const generateSourceUpdated = await this.generateSourceRepository.update(
+      {
+        id,
+        riskId: generateSource.riskId,
+        ...updateGenerateSourceDto,
+      },
+      system,
+      companyId,
+    );
+
+    if (!generateSourceUpdated.id)
+      throw new NotFoundException('data not found');
+
+    return generateSourceUpdated;
   }
 }

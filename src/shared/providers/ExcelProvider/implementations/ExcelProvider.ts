@@ -95,7 +95,6 @@ const addHeader = async (
     if (notes[excelName]) {
       cell.note = {
         editAs: 'oneCells',
-        autoShape: true,
         texts: [
           {
             font: {

@@ -11,7 +11,9 @@ export class CreateHierarchyService {
 
   async execute(hierarchy: CreateHierarchyDto, user: UserPayloadDto) {
     if (hierarchy.parentId && hierarchy.type === HierarchyEnum.DIRECTORY) {
-      throw new BadRequestException(ErrorCompanyEnum.CREATE_WITH_PARENT);
+      throw new BadRequestException(
+        ErrorCompanyEnum.CREATE_HIERARCHY_WITH_PARENT,
+      );
     }
 
     const hierarchies = await this.hierarchyRepository.upsert(

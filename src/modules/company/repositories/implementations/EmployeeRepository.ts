@@ -1,17 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
+import { IPrismaOptions } from 'src/shared/interfaces/prisma-options.types';
+import { transformStringToObject } from 'src/shared/utils/transformStringToObject';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
-import { CreateCompanyDto } from '../../dto/create-company.dto';
-import { CompanyEntity } from '../../entities/company.entity';
-import { ICompanyRepository } from '../ICompanyRepository.types';
-import { v4 as uuidV4 } from 'uuid';
-import { UpdateCompanyDto } from '../../dto/update-company.dto';
-import { IPrismaOptions } from 'src/shared/interfaces/prisma-options.types';
-import { EmployeeEntity } from '../../entities/employee.entity';
 import { CreateEmployeeDto, UpdateEmployeeDto } from '../../dto/employee.dto';
-import { transformStringToObject } from 'src/shared/utils/transformStringToObject';
-import { Hierarchy } from '@prisma/client';
+import { EmployeeEntity } from '../../entities/employee.entity';
 
 @Injectable()
 export class EmployeeRepository {
@@ -31,7 +25,7 @@ export class EmployeeRepository {
           connect: { id_companyId: { companyId, id: workplaceId } },
         },
         hierarchy: {
-          connect: { id_companyId: { companyId, id: hierarchyId } },
+          connect: { id: hierarchyId },
         },
       },
     });
@@ -57,7 +51,7 @@ export class EmployeeRepository {
         hierarchy: !hierarchyId
           ? undefined
           : {
-              connect: { id_companyId: { companyId, id: hierarchyId } },
+              connect: { id: hierarchyId },
             },
       },
       where: { id_companyId: { companyId, id } },
@@ -87,7 +81,7 @@ export class EmployeeRepository {
                 connect: { id_companyId: { companyId, id: workplaceId } },
               },
               hierarchy: {
-                connect: { id_companyId: { companyId, id: hierarchyId } },
+                connect: { id: hierarchyId },
               },
             },
             update: {
@@ -100,7 +94,7 @@ export class EmployeeRepository {
               hierarchy: !hierarchyId
                 ? undefined
                 : {
-                    connect: { id_companyId: { companyId, id: hierarchyId } },
+                    connect: { id: hierarchyId },
                   },
             },
             where: { id_companyId: { companyId, id: id || -1 } },

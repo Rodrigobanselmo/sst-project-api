@@ -11,7 +11,9 @@ export class UpdateHierarchyService {
 
   async execute(hierarchy: UpdateHierarchyDto, user: UserPayloadDto) {
     if (hierarchy.parentId && hierarchy.type === HierarchyEnum.DIRECTORY) {
-      throw new BadRequestException(ErrorCompanyEnum.UPDATE_WITH_PARENT);
+      throw new BadRequestException(
+        ErrorCompanyEnum.UPDATE_HIERARCHY_WITH_PARENT,
+      );
     }
 
     const hierarchies = await this.hierarchyRepository.update(

@@ -37,40 +37,45 @@ const createUserAndCompany = async () => {
       hierarchy: {
         createMany: {
           data: [
-            { name: 'DIRECTORY', type: 'DIRECTORY', id: '1', workplaceId: 1 },
+            {
+              name: 'DIRECTORY',
+              type: 'DIRECTORY',
+              id: 'a',
+              workplaceId: 1,
+            },
             {
               name: 'MANAGEMENT',
               type: 'MANAGEMENT',
-              id: '2',
-              parentId: '1',
+              id: 'b',
+              parentId: 'a',
               workplaceId: 1,
             },
             {
               name: 'SECTOR',
               type: 'SECTOR',
-              id: '3',
-              parentId: '2',
+              id: 'c',
+              parentId: 'b',
               workplaceId: 1,
             },
             {
               name: 'OFFICE 1',
               type: 'OFFICE',
-              id: '4',
-              parentId: '3',
+              id: 'd',
+              parentId: 'c',
               workplaceId: 1,
             },
             {
               name: 'OFFICE 2',
               type: 'OFFICE',
-              id: '5',
-              parentId: '3',
+              id: 'e',
+              parentId: 'c',
               workplaceId: 1,
             },
             {
               name: 'SUB_OFFICE',
               type: 'SUB_OFFICE',
-              id: '6',
-              parentId: '4',
+              id: 'f',
+              parentId: 'd',
               workplaceId: 1,
             },
           ],
@@ -94,11 +99,57 @@ const createUserAndCompany = async () => {
             },
           },
           hierarchy: {
-            connect: { id_companyId: { companyId: id, id: '6' } },
+            connect: { id: 'f' },
           },
         },
       },
     },
+  });
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const risks = await prisma.riskFactors.createMany({
+    data: [
+      {
+        id: 1,
+        companyId: company.id,
+        name: 'Todos',
+        system: true,
+        type: 'ACI',
+        representAll: true,
+      },
+      {
+        id: 2,
+        companyId: company.id,
+        name: 'Todos',
+        system: true,
+        representAll: true,
+        type: 'BIO',
+      },
+      {
+        id: 3,
+        companyId: company.id,
+        name: 'Todos',
+        system: true,
+        type: 'QUI',
+        representAll: true,
+      },
+      {
+        id: 4,
+        companyId: company.id,
+        name: 'Todos',
+        representAll: true,
+        system: true,
+        type: 'FIS',
+      },
+      {
+        id: 5,
+        companyId: company.id,
+        name: 'Todos',
+        system: true,
+        type: 'ERG',
+        representAll: true,
+      },
+    ],
   });
 
   const passwordHash = await hash('aaaa0123', 10);

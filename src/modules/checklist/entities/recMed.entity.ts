@@ -40,6 +40,9 @@ export class RecMedEntity implements RecMed {
   @ApiProperty({ description: 'The creation date of the risk' })
   created_at: Date;
 
+  @ApiProperty({ description: 'The generate source id related' })
+  generateSourceId: number;
+
   constructor(partial: Partial<RecMedEntity>) {
     Object.assign(this, partial);
   }

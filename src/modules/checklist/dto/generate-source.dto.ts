@@ -1,8 +1,15 @@
 import { StatusEnum } from '@prisma/client';
-import { Transform } from 'class-transformer';
-import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import {
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 import { StringUppercaseTransform } from 'src/shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from 'src/shared/utils/keysOfEnum.utils';
+import { RiskCreateRecMedDto, RiskUpdateRecMedDto } from './rec-med.dto';
 
 export class CreateGenerateSourceDto {
   @IsNumber()
@@ -21,6 +28,11 @@ export class CreateGenerateSourceDto {
 
   @IsString()
   companyId: string;
+
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @Type(() => RiskCreateRecMedDto)
+  recMeds?: RiskCreateRecMedDto[];
 }
 
 export class UpsertGenerateSourceDto extends CreateGenerateSourceDto {
@@ -44,6 +56,11 @@ export class UpdateGenerateSourceDto {
 
   @IsString()
   companyId: string;
+
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @Type(() => RiskUpdateRecMedDto)
+  recMeds?: RiskUpdateRecMedDto[];
 }
 
 export class RiskCreateGenerateSourceDto {

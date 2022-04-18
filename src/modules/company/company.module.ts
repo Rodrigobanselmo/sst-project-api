@@ -22,9 +22,20 @@ import { CreateHierarchyService } from './services/hierarchy/create-hierarchies/
 import { UpdateHierarchyService } from './services/hierarchy/update-hierarchies/update-hierarchies.service';
 import { DeleteHierarchyService } from './services/hierarchy/delete-hierarchies/delete-hierarchies.service';
 import { UpsertManyHierarchyService } from './services/hierarchy/upsert-many-hierarchies/upsert-many-hierarchies.service';
+import { CreateHomoGroupService } from './services/homoGroup/create-homo-group/create-homo-group.service';
+import { UpdateHomoGroupService } from './services/homoGroup/update-homo-group/update-homo-group.service';
+import { DeleteHomoGroupService } from './services/homoGroup/delete-homo-group/delete-homo-group.service';
+import { FindByCompanyHomoGroupService } from './services/homoGroup/find-by-company-homo-group/find-by-company-homo-group.service';
+import { HomoGroupRepository } from './repositories/implementations/HomoGroupRepository';
+import { HomoGroupsController } from './controller/HomoGroups/HomoGroups.controller';
 
 @Module({
-  controllers: [CompanyController, EmployeeController, HierarchyController],
+  controllers: [
+    CompanyController,
+    EmployeeController,
+    HierarchyController,
+    HomoGroupsController,
+  ],
   providers: [
     CreateCompanyService,
     UpdateCompanyService,
@@ -33,6 +44,7 @@ import { UpsertManyHierarchyService } from './services/hierarchy/upsert-many-hie
     LicenseRepository,
     EmployeeRepository,
     HierarchyRepository,
+    HomoGroupRepository,
     ExcelProvider,
     FindAllCompaniesService,
     FindCompanyService,
@@ -45,6 +57,10 @@ import { UpsertManyHierarchyService } from './services/hierarchy/upsert-many-hie
     UpdateHierarchyService,
     DeleteHierarchyService,
     UpsertManyHierarchyService,
+    CreateHomoGroupService,
+    UpdateHomoGroupService,
+    DeleteHomoGroupService,
+    FindByCompanyHomoGroupService,
   ],
   exports: [CompanyRepository, EmployeeRepository, HierarchyRepository],
 })

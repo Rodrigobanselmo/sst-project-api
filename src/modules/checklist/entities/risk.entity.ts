@@ -27,6 +27,11 @@ export class RiskFactorsEntity implements RiskFactors {
   system: boolean;
 
   @ApiProperty({
+    description: 'If represent all risks',
+  })
+  representAll: boolean;
+
+  @ApiProperty({
     description: 'The current status of the risk',
     examples: ['ACTIVE', 'PENDING', 'CANCELED'],
   })
