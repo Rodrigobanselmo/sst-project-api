@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UpdateHomoGroupService } from './update-homo-group.service';
 
-describe('UpsertHierarchyService', () => {
+describe.skip('UpsertHierarchyService', () => {
   let service: UpdateHomoGroupService;
 
   beforeEach(async () => {

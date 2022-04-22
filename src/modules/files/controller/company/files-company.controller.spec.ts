@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { FilesCompanyController } from './files-company.controller';
 
-describe('FilesCompanyController', () => {
+describe.skip('FilesCompanyController', () => {
   let controller: FilesCompanyController;
 
   beforeEach(async () => {

@@ -5,7 +5,7 @@ import { EtherealMailProvider } from './EtherealMailProvider';
 // import { resolve } from 'path';
 // es6 mock jest
 
-describe('DayJSProvider', () => {
+describe('EtherealProvider', () => {
   let etherealMailProvider: EtherealMailProvider;
 
   beforeEach(async () => {

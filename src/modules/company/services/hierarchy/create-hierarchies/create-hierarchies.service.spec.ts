@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CreateHierarchyService } from './create-hierarchies.service';
 
-describe('UpsertHierarchyService', () => {
+describe.skip('UpsertHierarchyService', () => {
   let service: CreateHierarchyService;
 
   beforeEach(async () => {

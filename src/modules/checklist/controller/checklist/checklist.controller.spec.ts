@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ChecklistController } from './checklist.controller';
 
-describe('ChecklistController', () => {
+describe.skip('ChecklistController', () => {
   let controller: ChecklistController;
 
   beforeEach(async () => {

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { HierarchyController } from './hierarchy.controller';
 
-describe('HierarchyController', () => {
+describe.skip('HierarchyController', () => {
   let controller: HierarchyController;
 
   beforeEach(async () => {

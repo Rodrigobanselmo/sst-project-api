@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DeleteHierarchyService } from './delete-hierarchies.service';
 
-describe('DeleteHierarchyService', () => {
+describe.skip('DeleteHierarchyService', () => {
   let service: DeleteHierarchyService;
 
   beforeEach(async () => {

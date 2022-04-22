@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UpdateChecklistService } from './update-checklist.service';
 
-describe('UpdateChecklistService', () => {
+describe.skip('UpdateChecklistService', () => {
   let service: UpdateChecklistService;
 
   beforeEach(async () => {
