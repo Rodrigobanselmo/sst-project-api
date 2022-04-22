@@ -7,8 +7,8 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { User } from 'src/shared/decorators/user.decorator';
-import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
+import { User } from '../../../../shared/decorators/user.decorator';
+import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 
 import { DownloadCompaniesService } from '../../services/company/download-companies/download-companies.service';
 import { DownloadUniqueCompanyService } from '../../services/company/download-unique-company/download-unique-company.service';

@@ -1,7 +1,7 @@
 import { Body, Controller, Param, Patch, Post } from '@nestjs/common';
-import { Permission } from 'src/shared/constants/enum/authorization';
-import { User } from 'src/shared/decorators/user.decorator';
-import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
+import { Permission } from '../../../../shared/constants/enum/authorization';
+import { User } from '../../../../shared/decorators/user.decorator';
+import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 import { CreateRecMedService } from '../../services/rec-med/create-rec-med/create-rec-med.service';

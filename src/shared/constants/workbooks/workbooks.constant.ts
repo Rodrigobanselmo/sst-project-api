@@ -1,4 +1,4 @@
-import { WorkbooksEnum } from 'src/shared/constants/workbooks/workbooks.enum';
+import { WorkbooksEnum } from '../../../shared/constants/workbooks/workbooks.enum';
 import { companySheetConstant } from './sheets/company/companySheet.constant';
 import { companyUniqueSheetConstant } from './sheets/companyUnique/companyUniqueSheet.constant';
 import { riskSheetConstant } from './sheets/risk/riskSheet.constant';

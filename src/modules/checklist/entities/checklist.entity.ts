@@ -3,9 +3,9 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Checklist, StatusEnum } from '.prisma/client';
 import { ChecklistDataEntity } from './checklistData.entity';
 import { Transform } from 'class-transformer';
-import { StringUppercaseTransform } from 'src/shared/transformers/string-uppercase.transform';
+import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
-import { KeysOfEnum } from 'src/shared/utils/keysOfEnum.utils';
+import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
 
 export class ChecklistEntity implements Checklist {
   @ApiProperty({

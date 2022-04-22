@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateChecklistDto } from 'src/modules/checklist/dto/create-checklist.dto';
-import { ChecklistRepository } from 'src/modules/checklist/repositories/implementations/ChecklistRepository';
-import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
+import { CreateChecklistDto } from '../../../../../modules/checklist/dto/create-checklist.dto';
+import { ChecklistRepository } from '../../../../../modules/checklist/repositories/implementations/ChecklistRepository';
+import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 
 @Injectable()
 export class CreateChecklistService {

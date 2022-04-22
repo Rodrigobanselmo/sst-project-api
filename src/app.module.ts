@@ -12,7 +12,14 @@ import { ChecklistModule } from './modules/checklist/checklist.module';
 import { FilesModule } from './modules/files/files.module';
 
 @Module({
-  imports: [PrismaModule, UsersModule, AuthModule, CompanyModule, ChecklistModule, FilesModule],
+  imports: [
+    PrismaModule,
+    UsersModule,
+    AuthModule,
+    CompanyModule,
+    ChecklistModule,
+    FilesModule,
+  ],
   providers: [
     {
       provide: APP_GUARD,

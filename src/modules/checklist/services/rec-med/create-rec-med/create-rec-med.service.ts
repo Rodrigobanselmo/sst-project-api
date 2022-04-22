@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { CreateRecMedDto } from 'src/modules/checklist/dto/rec-med.dto';
-import { RecMedRepository } from 'src/modules/checklist/repositories/implementations/RecMedRepository';
-import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
-import { isMaster } from 'src/shared/utils/isMater';
+import { CreateRecMedDto } from '../../../../../modules/checklist/dto/rec-med.dto';
+import { RecMedRepository } from '../../../../../modules/checklist/repositories/implementations/RecMedRepository';
+import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
+import { isMaster } from '../../../../../shared/utils/isMater';
 
 @Injectable()
 export class CreateRecMedService {

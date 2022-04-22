@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CreateEmployeeDto } from 'src/modules/company/dto/employee.dto';
-import { EmployeeRepository } from 'src/modules/company/repositories/implementations/EmployeeRepository';
+import { CreateEmployeeDto } from '../../../../../modules/company/dto/employee.dto';
+import { EmployeeRepository } from '../../../../../modules/company/repositories/implementations/EmployeeRepository';
 
 @Injectable()
 export class CreateEmployeeService {

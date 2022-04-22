@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
-import { User } from 'src/shared/decorators/user.decorator';
-import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
+import { User } from '../../../../shared/decorators/user.decorator';
+import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 
 import { CreateRiskDto, UpdateRiskDto } from '../../dto/risk.dto';
 import { CreateRiskService } from '../../services/risk/create-risk/create-risk.service';

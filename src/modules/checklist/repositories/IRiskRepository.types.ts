@@ -1,4 +1,4 @@
-import { IPrismaOptions } from 'src/shared/interfaces/prisma-options.types';
+import { IPrismaOptions } from '../../../shared/interfaces/prisma-options.types';
 import { CreateRiskDto, UpsertRiskDto } from '../dto/risk.dto';
 import { RiskFactorsEntity } from '../entities/risk.entity';
 

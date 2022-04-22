@@ -1,9 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { HierarchyEnum } from '@prisma/client';
-import { UpdateHierarchyDto } from 'src/modules/company/dto/hierarchy';
-import { HierarchyRepository } from 'src/modules/company/repositories/implementations/HierarchyRepository';
-import { ErrorCompanyEnum } from 'src/shared/constants/enum/errorMessage';
-import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
+import { UpdateHierarchyDto } from '../../../../../modules/company/dto/hierarchy';
+import { HierarchyRepository } from '../../../../../modules/company/repositories/implementations/HierarchyRepository';
+import { ErrorCompanyEnum } from '../../../../../shared/constants/enum/errorMessage';
+import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 
 @Injectable()
 export class UpdateHierarchyService {

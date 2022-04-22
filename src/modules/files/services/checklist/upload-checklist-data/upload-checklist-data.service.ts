@@ -1,12 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { RiskRepository } from 'src/modules/checklist/repositories/implementations/RiskRepository';
-import { UploadExcelProvider } from 'src/modules/files/providers/uploadExcelProvider';
-import { IRiskSheet } from 'src/shared/constants/workbooks/sheets/risk/riskSheet.constant';
-import { workbooksConstant } from 'src/shared/constants/workbooks/workbooks.constant';
-import { WorkbooksEnum } from 'src/shared/constants/workbooks/workbooks.enum';
-import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
-import { ExcelProvider } from 'src/shared/providers/ExcelProvider/implementations/ExcelProvider';
-import { IExcelReadData } from 'src/shared/providers/ExcelProvider/models/IExcelProvider.types';
+import { RiskRepository } from '../../../../../modules/checklist/repositories/implementations/RiskRepository';
+import { UploadExcelProvider } from '../../../../../modules/files/providers/uploadExcelProvider';
+import { IRiskSheet } from '../../../../../shared/constants/workbooks/sheets/risk/riskSheet.constant';
+import { workbooksConstant } from '../../../../../shared/constants/workbooks/workbooks.constant';
+import { WorkbooksEnum } from '../../../../../shared/constants/workbooks/workbooks.enum';
+import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
+import { ExcelProvider } from '../../../../../shared/providers/ExcelProvider/implementations/ExcelProvider';
+import { IExcelReadData } from '../../../../../shared/providers/ExcelProvider/models/IExcelProvider.types';
 
 import { DatabaseTableEntity } from '../../../entities/databaseTable.entity';
 import { DatabaseTableRepository } from '../../../repositories/implementations/DatabaseTableRepository';

@@ -1,5 +1,5 @@
 import { RiskFactorsEnum } from '@prisma/client';
-import { ITableSchema } from 'src/shared/providers/ExcelProvider/models/IExcelProvider.types';
+import { ITableSchema } from '../../../../../shared/providers/ExcelProvider/models/IExcelProvider.types';
 import { riskColumnsConstant } from './riskColumns.constant';
 import { RiskSheetEnum } from './riskSheet.enum';
 

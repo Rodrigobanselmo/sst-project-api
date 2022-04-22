@@ -7,8 +7,8 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { StringUppercaseTransform } from 'src/shared/transformers/string-uppercase.transform';
-import { KeysOfEnum } from 'src/shared/utils/keysOfEnum.utils';
+import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
+import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
 import { RiskCreateRecMedDto, RiskUpdateRecMedDto } from './rec-med.dto';
 
 export class CreateGenerateSourceDto {

@@ -1,7 +1,7 @@
 import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
-import { UpdateUserCompanyDto } from 'src/modules/users/dto/update-user-company.dto';
+import { UpdateUserCompanyDto } from '../../src/modules/users/dto/update-user-company.dto';
 import request from 'supertest';
 
 import { AuthModule } from '../../src/modules/auth/auth.module';

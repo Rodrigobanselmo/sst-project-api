@@ -1,14 +1,14 @@
 import { StatusEnum } from '@prisma/client';
-import { excelWorkplaceNotes } from 'src/modules/files/utils/notes/excel-workplace-notes';
-import { ITableSchema } from 'src/shared/providers/ExcelProvider/models/IExcelProvider.types';
+import { excelWorkplaceNotes } from '../../../../../modules/files/utils/notes/excel-workplace-notes';
+import { ITableSchema } from '../../../../../shared/providers/ExcelProvider/models/IExcelProvider.types';
 import {
   statusEnumTranslateBrToUs,
   StatusEnumTranslated,
-} from 'src/shared/utils/translate/statusEnum.translate';
-import { checkIsNumber } from 'src/shared/utils/validators/checkIdNumber';
-import { checkIsEnum } from 'src/shared/utils/validators/checkIsEnum';
-import { checkIsString } from 'src/shared/utils/validators/checkIsString';
-import { checkIsValidCnpj } from 'src/shared/utils/validators/checkIsValidCnpj';
+} from '../../../../../shared/utils/translate/statusEnum.translate';
+import { checkIsNumber } from '../../../../../shared/utils/validators/checkIdNumber';
+import { checkIsEnum } from '../../../../../shared/utils/validators/checkIsEnum';
+import { checkIsString } from '../../../../../shared/utils/validators/checkIsString';
+import { checkIsValidCnpj } from '../../../../../shared/utils/validators/checkIsValidCnpj';
 
 export const companyUniqueColumnsConstant = [
   {

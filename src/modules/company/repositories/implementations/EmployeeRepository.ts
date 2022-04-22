@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
-import { IPrismaOptions } from 'src/shared/interfaces/prisma-options.types';
-import { transformStringToObject } from 'src/shared/utils/transformStringToObject';
+import { IPrismaOptions } from '../../../../shared/interfaces/prisma-options.types';
+import { transformStringToObject } from '../../../../shared/utils/transformStringToObject';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { CreateEmployeeDto, UpdateEmployeeDto } from '../../dto/employee.dto';

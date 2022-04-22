@@ -1,6 +1,6 @@
-import { RiskRepository } from 'src/modules/checklist/repositories/implementations/RiskRepository';
-import { IRiskSheet } from 'src/shared/constants/workbooks/sheets/risk/riskSheet.constant';
-import { ExcelProvider } from 'src/shared/providers/ExcelProvider/implementations/ExcelProvider';
+import { RiskRepository } from '../../../modules/checklist/repositories/implementations/RiskRepository';
+import { IRiskSheet } from '../../../shared/constants/workbooks/sheets/risk/riskSheet.constant';
+import { ExcelProvider } from '../../../shared/providers/ExcelProvider/implementations/ExcelProvider';
 
 export const findAllRisks = async (
   excelProvider: ExcelProvider,

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Hierarchy, HierarchyEnum } from '@prisma/client';
-import { HierarchyEntity } from 'src/modules/company/entities/hierarchy.entity';
+import { HierarchyEntity } from '../../../modules/company/entities/hierarchy.entity';
 import { v4 } from 'uuid';
 
 type hierarchyMap = Record<

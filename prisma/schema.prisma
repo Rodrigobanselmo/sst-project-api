@@ -64,6 +64,23 @@ model Address {
   @@id([workspaceId, companyId])
 }
 
+
+model AdmMeasures {
+  id    Int     @default(autoincrement())
+  riskId    Int    
+  name String 
+  companyId String
+  generateSourceId  Int?    
+  system Boolean
+  status StatusEnum @default(ACTIVE)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  risk RiskFactors @relation(fields: [riskId,companyId], references: [id,companyId], onDelete: Cascade, onUpdate: Cascade)
+  generateSource GenerateSource? @relation(fields: [generateSourceId,companyId], references: [id,companyId], onDelete: Cascade, onUpdate: Cascade)
+  created_at DateTime @default(now())
+
+  @@id([id, companyId])
+} 
+
 model Checklist {
   id    Int     @default(autoincrement())
   status StatusEnum @default(PROGRESS)
@@ -112,6 +129,7 @@ model Company {
   hierarchy Hierarchy[] 
   databaseTable DatabaseTable[] 
   checklist Checklist[] 
+  adms AdmMeasures[] 
 }
 
 model Contract {
@@ -156,6 +174,22 @@ model Employee {
   @@id([id, companyId])
 } 
 
+
+model Epi {
+  id    Int     @default(autoincrement()) @id
+  ca Int @unique
+  isValid Boolean?  
+  expiredDate DateTime?
+  desc String @default("")
+  equipment String @default("")
+  status StatusEnum @default(ACTIVE)
+  created_at DateTime @default(now())
+
+  @@index(ca)
+  @@unique([ca, status])
+} 
+
+
 model GenerateSource {
   id    Int     @default(autoincrement())
   riskId    Int    
@@ -166,6 +200,7 @@ model GenerateSource {
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   risk RiskFactors @relation(fields: [riskId,companyId], references: [id,companyId], onDelete: Cascade, onUpdate: Cascade)
   recMeds RecMed[] 
+  adms AdmMeasures[] 
   created_at DateTime @default(now())
 
   @@id([id, companyId])
@@ -251,6 +286,7 @@ model RiskFactors {
   id    Int     @default(autoincrement())
   name String 
   companyId String
+  severity Int 
   system Boolean
   appendix String? 
   propagation String[] 
@@ -260,6 +296,7 @@ model RiskFactors {
   created_at DateTime @default(now())
   recMed RecMed[]
   generateSource GenerateSource[]
+  adms AdmMeasures[] 
   representAll Boolean @default(false)
   
   @@id([id, companyId])

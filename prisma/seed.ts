@@ -116,6 +116,7 @@ const createUserAndCompany = async () => {
         system: true,
         type: 'ACI',
         representAll: true,
+        severity: 0,
       },
       {
         id: 2,
@@ -124,6 +125,7 @@ const createUserAndCompany = async () => {
         system: true,
         representAll: true,
         type: 'BIO',
+        severity: 0,
       },
       {
         id: 3,
@@ -132,6 +134,7 @@ const createUserAndCompany = async () => {
         system: true,
         type: 'QUI',
         representAll: true,
+        severity: 0,
       },
       {
         id: 4,
@@ -140,6 +143,7 @@ const createUserAndCompany = async () => {
         representAll: true,
         system: true,
         type: 'FIS',
+        severity: 0,
       },
       {
         id: 5,
@@ -148,6 +152,7 @@ const createUserAndCompany = async () => {
         system: true,
         type: 'ERG',
         representAll: true,
+        severity: 0,
       },
     ],
   });

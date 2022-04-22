@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { UpdateHomoGroupDto } from 'src/modules/company/dto/homoGroup';
-import { HomoGroupRepository } from 'src/modules/company/repositories/implementations/HomoGroupRepository';
-import { ErrorCompanyEnum } from 'src/shared/constants/enum/errorMessage';
-import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
+import { UpdateHomoGroupDto } from '../../../../../modules/company/dto/homoGroup';
+import { HomoGroupRepository } from '../../../../../modules/company/repositories/implementations/HomoGroupRepository';
+import { ErrorCompanyEnum } from '../../../../../shared/constants/enum/errorMessage';
+import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 
 @Injectable()
 export class UpdateHomoGroupService {

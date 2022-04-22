@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { CreateGenerateSourceDto } from 'src/modules/checklist/dto/generate-source.dto';
-import { GenerateSourceRepository } from 'src/modules/checklist/repositories/implementations/GenerateSourceRepository';
-import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
-import { isMaster } from 'src/shared/utils/isMater';
+import { CreateGenerateSourceDto } from '../../../../../modules/checklist/dto/generate-source.dto';
+import { GenerateSourceRepository } from '../../../../../modules/checklist/repositories/implementations/GenerateSourceRepository';
+import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
+import { isMaster } from '../../../../../shared/utils/isMater';
 
 @Injectable()
 export class CreateGenerateSourceService {

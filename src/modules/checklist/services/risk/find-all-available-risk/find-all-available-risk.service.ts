@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { RiskRepository } from 'src/modules/checklist/repositories/implementations/RiskRepository';
+import { RiskRepository } from '../../../../../modules/checklist/repositories/implementations/RiskRepository';
 
 @Injectable()
 export class FindAllAvailableRiskService {

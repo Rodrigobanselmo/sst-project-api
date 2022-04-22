@@ -1,6 +1,6 @@
-import { CompanyRepository } from 'src/modules/company/repositories/implementations/CompanyRepository';
-import { ICompanySheet } from 'src/shared/constants/workbooks/sheets/company/companySheet.constant';
-import { ExcelProvider } from 'src/shared/providers/ExcelProvider/implementations/ExcelProvider';
+import { CompanyRepository } from '../../../modules/company/repositories/implementations/CompanyRepository';
+import { ICompanySheet } from '../../../shared/constants/workbooks/sheets/company/companySheet.constant';
+import { ExcelProvider } from '../../../shared/providers/ExcelProvider/implementations/ExcelProvider';
 
 export const findAllCompanies = async (
   excelProvider: ExcelProvider,

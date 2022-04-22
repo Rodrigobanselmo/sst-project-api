@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { UpdateChecklistDto } from 'src/modules/checklist/dto/update-checklist.dto';
-import { ChecklistRepository } from 'src/modules/checklist/repositories/implementations/ChecklistRepository';
+import { UpdateChecklistDto } from '../../../../../modules/checklist/dto/update-checklist.dto';
+import { ChecklistRepository } from '../../../../../modules/checklist/repositories/implementations/ChecklistRepository';
 
 @Injectable()
 export class UpdateChecklistService {

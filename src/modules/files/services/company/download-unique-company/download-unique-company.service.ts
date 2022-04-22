@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { CompanyRepository } from 'src/modules/company/repositories/implementations/CompanyRepository';
-import { HierarchyRepository } from 'src/modules/company/repositories/implementations/HierarchyRepository';
-import { DownloadExcelProvider } from 'src/modules/files/providers/donwlodExcelProvider';
-import { workbooksConstant } from 'src/shared/constants/workbooks/workbooks.constant';
-import { WorkbooksEnum } from 'src/shared/constants/workbooks/workbooks.enum';
-import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
-import { ExcelProvider } from 'src/shared/providers/ExcelProvider/implementations/ExcelProvider';
+import { CompanyRepository } from '../../../../../modules/company/repositories/implementations/CompanyRepository';
+import { HierarchyRepository } from '../../../../../modules/company/repositories/implementations/HierarchyRepository';
+import { DownloadExcelProvider } from '../../../../../modules/files/providers/donwlodExcelProvider';
+import { workbooksConstant } from '../../../../../shared/constants/workbooks/workbooks.constant';
+import { WorkbooksEnum } from '../../../../../shared/constants/workbooks/workbooks.enum';
+import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
+import { ExcelProvider } from '../../../../../shared/providers/ExcelProvider/implementations/ExcelProvider';
 
 import { findAllEmployees } from './../../../utils/findAllEmployees';
 

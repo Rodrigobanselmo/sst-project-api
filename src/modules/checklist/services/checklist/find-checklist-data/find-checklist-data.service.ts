@@ -3,9 +3,9 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { ChecklistRepository } from 'src/modules/checklist/repositories/implementations/ChecklistRepository';
-import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
-import { checkIsAvailable } from 'src/shared/utils/validators/checkIsAvailable';
+import { ChecklistRepository } from '../../../../../modules/checklist/repositories/implementations/ChecklistRepository';
+import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
+import { checkIsAvailable } from '../../../../../shared/utils/validators/checkIsAvailable';
 
 @Injectable()
 export class FindChecklistDataService {

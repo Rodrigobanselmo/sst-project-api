@@ -7,7 +7,7 @@ import { CompanyEntity } from '../../entities/company.entity';
 import { ICompanyRepository } from '../ICompanyRepository.types';
 import { v4 as uuidV4 } from 'uuid';
 import { UpdateCompanyDto } from '../../dto/update-company.dto';
-import { IPrismaOptions } from 'src/shared/interfaces/prisma-options.types';
+import { IPrismaOptions } from '../../../../shared/interfaces/prisma-options.types';
 
 interface ICreateCompany extends CreateCompanyDto {
   companyId?: string;

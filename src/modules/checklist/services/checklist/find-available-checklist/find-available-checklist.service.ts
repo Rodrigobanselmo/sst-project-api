@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { ChecklistRepository } from 'src/modules/checklist/repositories/implementations/ChecklistRepository';
-import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
+import { ChecklistRepository } from '../../../../../modules/checklist/repositories/implementations/ChecklistRepository';
+import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 
 @Injectable()
 export class FindAvailableChecklistService {

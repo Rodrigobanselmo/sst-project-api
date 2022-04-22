@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ExcelProvider } from 'src/shared/providers/ExcelProvider/implementations/ExcelProvider';
+import { ExcelProvider } from '../../shared/providers/ExcelProvider/implementations/ExcelProvider';
 import { ChecklistModule } from '../checklist/checklist.module';
 import { FilesChecklistController } from './controller/checklist/files-checklist.controller';
 import { DatabaseTableRepository } from './repositories/implementations/DatabaseTableRepository';

@@ -1,4 +1,4 @@
-import { ITableSchema } from 'src/shared/providers/ExcelProvider/models/IExcelProvider.types';
+import { ITableSchema } from '../../../../../shared/providers/ExcelProvider/models/IExcelProvider.types';
 import { companyUniqueColumnsConstant } from './companyUniqueColumns.constant';
 
 import { CompanyUniqueSheetEnum } from './companyUniqueSheet.enum';

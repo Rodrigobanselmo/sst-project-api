@@ -1,6 +1,6 @@
-import { ITableSchema } from 'src/shared/providers/ExcelProvider/models/IExcelProvider.types';
-import { checkIsNumber } from 'src/shared/utils/validators/checkIdNumber';
-import { checkIsString } from 'src/shared/utils/validators/checkIsString';
+import { ITableSchema } from '../../../../../shared/providers/ExcelProvider/models/IExcelProvider.types';
+import { checkIsNumber } from '../../../../../shared/utils/validators/checkIdNumber';
+import { checkIsString } from '../../../../../shared/utils/validators/checkIsString';
 
 export const riskColumnsConstant = [
   {

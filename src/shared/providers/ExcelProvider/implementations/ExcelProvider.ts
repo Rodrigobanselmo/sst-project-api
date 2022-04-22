@@ -5,14 +5,14 @@ import {
 } from '@nestjs/common';
 import ExcelJS from 'excelJS';
 import xlsx from 'node-xlsx';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { ErrorMessageEnum } from 'src/shared/constants/enum/errorMessage';
-import { sheetStylesConstant } from 'src/shared/constants/workbooks/styles/sheet-styles.constant';
-import { IWorkbookExcel } from 'src/shared/interfaces/worksheet.types';
+import { PrismaService } from '../../../../prisma/prisma.service';
+import { ErrorMessageEnum } from '../../../../shared/constants/enum/errorMessage';
+import { sheetStylesConstant } from '../../../../shared/constants/workbooks/styles/sheet-styles.constant';
+import { IWorkbookExcel } from '../../../../shared/interfaces/worksheet.types';
 import {
   getObjectValueFromString,
   transformStringToObject,
-} from 'src/shared/utils/transformStringToObject';
+} from '../../../../shared/utils/transformStringToObject';
 
 import {
   IExcelProvider,

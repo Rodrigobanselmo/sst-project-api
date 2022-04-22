@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { HomoGroupRepository } from 'src/modules/company/repositories/implementations/HomoGroupRepository';
-import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
+import { HomoGroupRepository } from '../../../../../modules/company/repositories/implementations/HomoGroupRepository';
+import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 
 @Injectable()
 export class FindByCompanyHomoGroupService {

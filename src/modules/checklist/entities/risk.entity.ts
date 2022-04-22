@@ -9,8 +9,11 @@ export class RiskFactorsEntity implements RiskFactors {
   @ApiProperty({ description: 'The id of the Company' })
   id: number;
 
-  @ApiProperty({ description: 'The parent company id of the Company' })
+  @ApiProperty({ description: 'The name of the risk' })
   name: string;
+
+  @ApiProperty({ description: 'The severity of the rik' })
+  severity: number;
 
   @ApiProperty({
     description: 'The current type of the risk',

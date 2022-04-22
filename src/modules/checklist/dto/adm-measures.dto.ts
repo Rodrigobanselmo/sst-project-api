@@ -5,17 +5,12 @@ import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
 
-export class CreateRecMedDto {
+export class CreateAdmMeasures {
   @IsNumber()
   riskId: number;
 
-  @IsOptional()
   @IsString()
-  recName?: string;
-
-  @IsOptional()
-  @IsString()
-  medName?: string;
+  name: string;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsOptional()
@@ -29,20 +24,15 @@ export class CreateRecMedDto {
   companyId: string;
 }
 
-export class UpsertRecMedDto extends CreateRecMedDto {
+export class UpsertAdmMeasuresDto extends CreateAdmMeasures {
   @IsNumber()
   @IsOptional()
   id: number;
 }
 
-export class UpdateRecMedDto {
-  @IsOptional()
+export class UpdateAdmMeasuresDto {
   @IsString()
-  recName?: string;
-
-  @IsOptional()
-  @IsString()
-  medName?: string;
+  name: string;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsOptional()
@@ -56,14 +46,9 @@ export class UpdateRecMedDto {
   companyId: string;
 }
 
-export class RiskCreateRecMedDto {
-  @IsOptional()
+export class RiskCreateAdmMeasuresDto {
   @IsString()
-  recName?: string;
-
-  @IsOptional()
-  @IsString()
-  medName?: string;
+  name: string;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsOptional()
@@ -74,7 +59,9 @@ export class RiskCreateRecMedDto {
   status?: StatusEnum;
 }
 
-export class RiskUpdateRecMedDto extends PartialType(RiskCreateRecMedDto) {
+export class RiskUpdateAdmMeasuresDto extends PartialType(
+  RiskCreateAdmMeasuresDto,
+) {
   @IsNumber()
   @IsOptional()
   id: number;

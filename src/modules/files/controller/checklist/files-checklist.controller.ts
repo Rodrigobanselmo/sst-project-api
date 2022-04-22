@@ -7,8 +7,8 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { User } from 'src/shared/decorators/user.decorator';
-import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
+import { User } from '../../../../shared/decorators/user.decorator';
+import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 
 import { DownloadRiskDataService } from '../../services/checklist/download-risk-data/download-risk-data.service';
 import { UploadChecklistDataService } from '../../services/checklist/upload-checklist-data/upload-checklist-data.service';

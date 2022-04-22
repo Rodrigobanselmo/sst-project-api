@@ -1,10 +1,10 @@
 import { Hierarchy, HierarchyEnum, StatusEnum } from '@prisma/client';
-import { CompanyRepository } from 'src/modules/company/repositories/implementations/CompanyRepository';
-import { HierarchyRepository } from 'src/modules/company/repositories/implementations/HierarchyRepository';
-import { ICompanyUniqueSheet } from 'src/shared/constants/workbooks/sheets/companyUnique/companyUniqueSheet.constant';
-import { ExcelProvider } from 'src/shared/providers/ExcelProvider/implementations/ExcelProvider';
-import { getPathIdTreeMap } from 'src/shared/utils/getPathIdTreeMap';
-import { statusEnumTranslateUsToBr } from 'src/shared/utils/translate/statusEnum.translate';
+import { CompanyRepository } from '../../../modules/company/repositories/implementations/CompanyRepository';
+import { HierarchyRepository } from '../../../modules/company/repositories/implementations/HierarchyRepository';
+import { ICompanyUniqueSheet } from '../../../shared/constants/workbooks/sheets/companyUnique/companyUniqueSheet.constant';
+import { ExcelProvider } from '../../../shared/providers/ExcelProvider/implementations/ExcelProvider';
+import { getPathIdTreeMap } from '../../../shared/utils/getPathIdTreeMap';
+import { statusEnumTranslateUsToBr } from '../../../shared/utils/translate/statusEnum.translate';
 import { HierarchyExcelProvider } from '../providers/HierarchyExcelProvider';
 
 export const findAllEmployees = async (

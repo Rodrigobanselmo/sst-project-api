@@ -1,16 +1,13 @@
 import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
-import { User } from 'src/shared/decorators/user.decorator';
-import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
 
+import { User } from '../../../../shared/decorators/user.decorator';
+import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import { CreateChecklistDto } from '../../dto/create-checklist.dto';
 import { UpdateChecklistDto } from '../../dto/update-checklist.dto';
 import { CreateChecklistService } from '../../services/checklist/create-checklist/create-checklist.service';
 import { FindAvailableChecklistService } from '../../services/checklist/find-available-checklist/find-available-checklist.service';
 import { FindChecklistDataService } from '../../services/checklist/find-checklist-data/find-checklist-data.service';
 import { UpdateChecklistService } from '../../services/checklist/update-checklist/update-checklist.service';
-
-// import { Permission  } from 'src/shared/constants/enum/authorization';
-// import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 
 @Controller('checklist')
 export class ChecklistController {

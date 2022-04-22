@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
-import { RiskFactorsEnum } from '@prisma/client';
-import { IPrismaOptions } from 'src/shared/interfaces/prisma-options.types';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
+import { IPrismaOptions } from '../../../../shared/interfaces/prisma-options.types';
 import {
   CreateRiskDto,
   UpdateRiskDto,

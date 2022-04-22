@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { CreateHomoGroupDto } from 'src/modules/company/dto/homoGroup';
-import { HomoGroupRepository } from 'src/modules/company/repositories/implementations/HomoGroupRepository';
-import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
+import { CreateHomoGroupDto } from '../../../../../modules/company/dto/homoGroup';
+import { HomoGroupRepository } from '../../../../../modules/company/repositories/implementations/HomoGroupRepository';
+import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 
 @Injectable()
 export class CreateHomoGroupService {

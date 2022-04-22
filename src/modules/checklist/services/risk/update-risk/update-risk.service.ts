@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { UpdateRiskDto } from 'src/modules/checklist/dto/risk.dto';
-import { RiskRepository } from 'src/modules/checklist/repositories/implementations/RiskRepository';
-import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
+import { UpdateRiskDto } from '../../../../../modules/checklist/dto/risk.dto';
+import { RiskRepository } from '../../../../../modules/checklist/repositories/implementations/RiskRepository';
+import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 
 @Injectable()
 export class UpdateRiskService {

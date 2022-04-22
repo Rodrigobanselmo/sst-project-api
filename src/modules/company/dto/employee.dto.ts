@@ -9,7 +9,7 @@ import {
   Length,
   MaxLength,
 } from 'class-validator';
-import { CpfFormatTransform } from 'src/shared/transformers/cpf-format.transform';
+import { CpfFormatTransform } from '../../../shared/transformers/cpf-format.transform';
 
 import { StringCapitalizeTransform } from '../../../shared/transformers/string-capitalize';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';

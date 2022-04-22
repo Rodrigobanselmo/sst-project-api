@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { ExcelProvider } from 'src/shared/providers/ExcelProvider/implementations/ExcelProvider';
-import { sortNumber } from 'src/shared/utils/sorts/number.sort';
+import { ExcelProvider } from '../../../shared/providers/ExcelProvider/implementations/ExcelProvider';
+import { sortNumber } from '../../../shared/utils/sorts/number.sort';
 
 import { DatabaseTableRepository } from '../repositories/implementations/DatabaseTableRepository';
 

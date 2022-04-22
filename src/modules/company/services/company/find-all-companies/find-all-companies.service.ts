@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CompanyRepository } from 'src/modules/company/repositories/implementations/CompanyRepository';
-import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
+import { CompanyRepository } from '../../../../../modules/company/repositories/implementations/CompanyRepository';
+import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 
 @Injectable()
 export class FindAllCompaniesService {

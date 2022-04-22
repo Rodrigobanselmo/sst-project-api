@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
-import { workbooksConstant } from 'src/shared/constants/workbooks/workbooks.constant';
+import { workbooksConstant } from '../../../shared/constants/workbooks/workbooks.constant';
 
 @Controller('files')
 export class FilesController {

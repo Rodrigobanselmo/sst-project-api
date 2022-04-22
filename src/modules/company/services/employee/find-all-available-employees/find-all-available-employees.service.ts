@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { EmployeeRepository } from 'src/modules/company/repositories/implementations/EmployeeRepository';
-import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
+import { EmployeeRepository } from '../../../../../modules/company/repositories/implementations/EmployeeRepository';
+import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 
 @Injectable()
 export class FindAllAvailableEmployeesService {
