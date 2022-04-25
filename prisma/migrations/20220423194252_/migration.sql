@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Epi" ALTER COLUMN "ca" SET DATA TYPE TEXT;

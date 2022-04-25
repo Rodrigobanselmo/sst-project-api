@@ -1,4 +1,3 @@
-import { ChecklistDataEntity } from '../entities/checklistData.entity';
 import { CreateChecklistDto } from './../dto/create-checklist.dto';
 import { ChecklistEntity } from './../entities/checklist.entity';
 

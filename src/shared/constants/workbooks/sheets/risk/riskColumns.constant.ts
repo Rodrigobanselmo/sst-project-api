@@ -23,6 +23,12 @@ export const riskColumnsConstant = [
     checkHandler: checkIsString,
   },
   {
+    databaseName: 'severity',
+    excelName: 'Severidade',
+    required: true,
+    checkHandler: checkIsNumber,
+  },
+  {
     isArray: true,
     databaseName: 'propagation',
     excelName: 'Meio de propagação',

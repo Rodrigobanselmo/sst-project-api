@@ -38,7 +38,7 @@ export class RiskRepository implements IRiskRepository {
           },
         },
       },
-      include: { recMed: true, generateSource: true },
+      include: { recMed: true, generateSource: true, adms: true },
     });
 
     return new RiskFactorsEntity(risk);
@@ -58,7 +58,7 @@ export class RiskRepository implements IRiskRepository {
                 return {
                   create: { system, ...rm },
                   update: { system, ...rm },
-                  where: { id_companyId: { companyId, id: id || -1 } },
+                  where: { id_companyId: { companyId, id: id || 'no-id' } },
                 };
               }),
         },
@@ -69,14 +69,14 @@ export class RiskRepository implements IRiskRepository {
                 return {
                   create: { system, ...gs },
                   update: { system, ...gs },
-                  where: { id_companyId: { companyId, id: id || -1 } },
+                  where: { id_companyId: { companyId, id: id || 'no-id' } },
                 };
               }),
         },
         ...createRiskDto,
       },
-      where: { id_companyId: { companyId, id: id || -1 } },
-      include: { recMed: true, generateSource: true },
+      where: { id_companyId: { companyId, id: id || 'no-id' } },
+      include: { recMed: true, generateSource: true, adms: true },
     });
 
     return new RiskFactorsEntity(risk);
@@ -131,7 +131,7 @@ export class RiskRepository implements IRiskRepository {
                 return {
                   create: { system, ...rm },
                   update: { system, ...rm },
-                  where: { id_companyId: { companyId, id: id || -1 } },
+                  where: { id_companyId: { companyId, id: id || 'no-id' } },
                 };
               }),
         },
@@ -142,13 +142,13 @@ export class RiskRepository implements IRiskRepository {
                 return {
                   create: { system, ...gs },
                   update: { system, ...gs },
-                  where: { id_companyId: { companyId, id: id || -1 } },
+                  where: { id_companyId: { companyId, id: id || 'no-id' } },
                 };
               }),
         },
       },
-      where: { id_companyId: { companyId, id: id || -1 } },
-      include: { recMed: true, generateSource: true },
+      where: { id_companyId: { companyId, id: id || 'no-id' } },
+      include: { recMed: true, generateSource: true, adms: true },
     });
 
     return new RiskFactorsEntity(risk);
@@ -200,7 +200,9 @@ export class RiskRepository implements IRiskRepository {
                       return {
                         create: { system, ...rm },
                         update: { system, ...rm },
-                        where: { id_companyId: { companyId, id: id || -1 } },
+                        where: {
+                          id_companyId: { companyId, id: id || 'no-id' },
+                        },
                       };
                     }),
               },
@@ -211,13 +213,15 @@ export class RiskRepository implements IRiskRepository {
                       return {
                         create: { system, ...gs },
                         update: { system, ...gs },
-                        where: { id_companyId: { companyId, id: id || -1 } },
+                        where: {
+                          id_companyId: { companyId, id: id || 'no-id' },
+                        },
                       };
                     }),
               },
             },
-            where: { id_companyId: { companyId, id: id || -1 } },
-            include: { recMed: true, generateSource: true },
+            where: { id_companyId: { companyId, id: id || 'no-id' } },
+            include: { recMed: true, generateSource: true, adms: true },
           }),
       ),
     );
@@ -226,12 +230,13 @@ export class RiskRepository implements IRiskRepository {
   }
 
   async findById(
-    id: number,
+    id: string,
     companyId: string,
     options?: IPrismaOptions<{
       company?: boolean;
       recMed?: boolean;
       generateSource?: boolean;
+      adms?: boolean;
     }>,
   ): Promise<RiskFactorsEntity> {
     const include = options.include || {};
@@ -242,6 +247,7 @@ export class RiskRepository implements IRiskRepository {
         company: !!include.company,
         recMed: !!include.recMed,
         generateSource: !!include.generateSource,
+        adms: !!include.adms,
       },
     });
 
@@ -254,6 +260,7 @@ export class RiskRepository implements IRiskRepository {
       company?: boolean;
       recMed?: boolean;
       generateSource?: boolean;
+      adms?: boolean;
     }>,
   ): Promise<RiskFactorsEntity[]> {
     const where = options.where || {};
@@ -265,6 +272,7 @@ export class RiskRepository implements IRiskRepository {
         company: !!include.company,
         recMed: !!include.recMed,
         generateSource: !!include.generateSource,
+        adms: !!include.adms,
       },
     });
 
@@ -277,16 +285,24 @@ export class RiskRepository implements IRiskRepository {
       company?: boolean;
       recMed?: boolean;
       generateSource?: boolean;
-    }>,
+      adms?: boolean;
+    }> & { representAll?: boolean },
   ): Promise<RiskFactorsEntity[]> {
     const include = options.include || {};
+    const representAll =
+      typeof options.representAll === 'boolean'
+        ? { representAll: options.representAll }
+        : {};
 
     const risks = await this.prisma.riskFactors.findMany({
-      where: { OR: [{ companyId }, { system: true }] },
+      where: {
+        AND: [{ OR: [{ companyId }, { system: true }] }, representAll],
+      },
       include: {
         company: !!include.company,
         recMed: !!include.recMed,
         generateSource: !!include.generateSource,
+        adms: !!include.adms,
       },
     });
 

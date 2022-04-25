@@ -8,7 +8,7 @@ export class UpdateRiskService {
   constructor(private readonly riskRepository: RiskRepository) {}
 
   async execute(
-    id: number,
+    id: string,
     updateRiskDto: UpdateRiskDto,
     user: UserPayloadDto,
   ) {

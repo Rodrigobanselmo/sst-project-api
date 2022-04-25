@@ -35,7 +35,7 @@ export class HierarchyExcelProvider {
 
   createTreeMapFromHierarchyStruct(
     hierarchies: {
-      workplaceId: number;
+      workplaceId: string;
       directory?: string;
       management?: string;
       sector?: string;

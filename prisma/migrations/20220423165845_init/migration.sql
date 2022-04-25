@@ -29,10 +29,24 @@ CREATE TABLE "Address" (
     "neighborhood" TEXT,
     "city" TEXT,
     "state" TEXT,
-    "workspaceId" INTEGER NOT NULL,
+    "workspaceId" TEXT NOT NULL,
     "companyId" TEXT NOT NULL,
 
     CONSTRAINT "Address_pkey" PRIMARY KEY ("workspaceId","companyId")
+);
+
+-- CreateTable
+CREATE TABLE "AdmMeasures" (
+    "id" TEXT NOT NULL,
+    "riskId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "companyId" TEXT NOT NULL,
+    "generateSourceId" TEXT,
+    "system" BOOLEAN NOT NULL,
+    "status" "StatusEnum" NOT NULL DEFAULT E'ACTIVE',
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "AdmMeasures_pkey" PRIMARY KEY ("id","companyId")
 );
 
 -- CreateTable
@@ -105,16 +119,30 @@ CREATE TABLE "Employee" (
     "name" TEXT NOT NULL,
     "cpf" TEXT NOT NULL,
     "companyId" TEXT NOT NULL,
-    "workplaceId" INTEGER NOT NULL,
+    "workplaceId" TEXT NOT NULL,
     "hierarchyId" TEXT NOT NULL,
 
     CONSTRAINT "Employee_pkey" PRIMARY KEY ("id","companyId")
 );
 
 -- CreateTable
-CREATE TABLE "GenerateSource" (
+CREATE TABLE "Epi" (
     "id" SERIAL NOT NULL,
-    "riskId" INTEGER NOT NULL,
+    "ca" INTEGER NOT NULL,
+    "isValid" BOOLEAN,
+    "expiredDate" TIMESTAMP(3),
+    "desc" TEXT NOT NULL DEFAULT E'',
+    "equipment" TEXT NOT NULL DEFAULT E'',
+    "status" "StatusEnum" NOT NULL DEFAULT E'ACTIVE',
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Epi_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "GenerateSource" (
+    "id" TEXT NOT NULL,
+    "riskId" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "companyId" TEXT NOT NULL,
     "system" BOOLEAN NOT NULL,
@@ -133,14 +161,14 @@ CREATE TABLE "Hierarchy" (
     "name" TEXT NOT NULL,
     "companyId" TEXT NOT NULL,
     "parentId" TEXT,
-    "workplaceId" INTEGER NOT NULL,
+    "workplaceId" TEXT NOT NULL,
 
     CONSTRAINT "Hierarchy_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "HomogeneousGroup" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "companyId" TEXT NOT NULL,
     "status" "StatusEnum" NOT NULL DEFAULT E'ACTIVE',
@@ -173,11 +201,12 @@ CREATE TABLE "License" (
 
 -- CreateTable
 CREATE TABLE "RecMed" (
-    "id" SERIAL NOT NULL,
-    "riskId" INTEGER NOT NULL,
+    "id" TEXT NOT NULL,
+    "riskId" TEXT NOT NULL,
     "recName" TEXT,
     "medName" TEXT,
     "companyId" TEXT NOT NULL,
+    "generateSourceId" TEXT,
     "system" BOOLEAN NOT NULL,
     "status" "StatusEnum" NOT NULL DEFAULT E'ACTIVE',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -198,15 +227,17 @@ CREATE TABLE "RefreshToken" (
 
 -- CreateTable
 CREATE TABLE "RiskFactors" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "companyId" TEXT NOT NULL,
+    "severity" INTEGER NOT NULL,
     "system" BOOLEAN NOT NULL,
     "appendix" TEXT,
     "propagation" TEXT[],
     "status" "StatusEnum" NOT NULL DEFAULT E'ACTIVE',
     "type" "RiskFactorsEnum" NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "representAll" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "RiskFactors_pkey" PRIMARY KEY ("id","companyId")
 );
@@ -237,7 +268,7 @@ CREATE TABLE "UserCompany" (
 
 -- CreateTable
 CREATE TABLE "Workspace" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "status" "StatusEnum" NOT NULL DEFAULT E'ACTIVE',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -259,8 +290,26 @@ CREATE TABLE "_secondary_activity" (
     "B" TEXT NOT NULL
 );
 
+-- CreateTable
+CREATE TABLE "_HierarchyToHomogeneousGroup" (
+    "A" TEXT NOT NULL,
+    "B" TEXT NOT NULL
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Activity_code_key" ON "Activity"("code");
+
+-- CreateIndex
+CREATE INDEX "Epi_ca_idx" ON "Epi"("ca");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Epi_ca_status_key" ON "Epi"("ca", "status");
+
+-- CreateIndex
+CREATE INDEX "Hierarchy_companyId_idx" ON "Hierarchy"("companyId");
+
+-- CreateIndex
+CREATE INDEX "HomogeneousGroup_companyId_idx" ON "HomogeneousGroup"("companyId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "License_companyId_key" ON "License"("companyId");
@@ -283,8 +332,23 @@ CREATE UNIQUE INDEX "_secondary_activity_AB_unique" ON "_secondary_activity"("A"
 -- CreateIndex
 CREATE INDEX "_secondary_activity_B_index" ON "_secondary_activity"("B");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "_HierarchyToHomogeneousGroup_AB_unique" ON "_HierarchyToHomogeneousGroup"("A", "B");
+
+-- CreateIndex
+CREATE INDEX "_HierarchyToHomogeneousGroup_B_index" ON "_HierarchyToHomogeneousGroup"("B");
+
 -- AddForeignKey
 ALTER TABLE "Address" ADD CONSTRAINT "Address_workspaceId_companyId_fkey" FOREIGN KEY ("workspaceId", "companyId") REFERENCES "Workspace"("id", "companyId") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "AdmMeasures" ADD CONSTRAINT "AdmMeasures_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "AdmMeasures" ADD CONSTRAINT "AdmMeasures_riskId_companyId_fkey" FOREIGN KEY ("riskId", "companyId") REFERENCES "RiskFactors"("id", "companyId") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "AdmMeasures" ADD CONSTRAINT "AdmMeasures_generateSourceId_companyId_fkey" FOREIGN KEY ("generateSourceId", "companyId") REFERENCES "GenerateSource"("id", "companyId") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Checklist" ADD CONSTRAINT "Checklist_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -338,6 +402,9 @@ ALTER TABLE "RecMed" ADD CONSTRAINT "RecMed_companyId_fkey" FOREIGN KEY ("compan
 ALTER TABLE "RecMed" ADD CONSTRAINT "RecMed_riskId_companyId_fkey" FOREIGN KEY ("riskId", "companyId") REFERENCES "RiskFactors"("id", "companyId") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "RecMed" ADD CONSTRAINT "RecMed_generateSourceId_companyId_fkey" FOREIGN KEY ("generateSourceId", "companyId") REFERENCES "GenerateSource"("id", "companyId") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "RefreshToken" ADD CONSTRAINT "RefreshToken_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -363,3 +430,9 @@ ALTER TABLE "_secondary_activity" ADD FOREIGN KEY ("A") REFERENCES "Activity"("i
 
 -- AddForeignKey
 ALTER TABLE "_secondary_activity" ADD FOREIGN KEY ("B") REFERENCES "Company"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_HierarchyToHomogeneousGroup" ADD FOREIGN KEY ("A") REFERENCES "Hierarchy"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_HierarchyToHomogeneousGroup" ADD FOREIGN KEY ("B") REFERENCES "HomogeneousGroup"("id") ON DELETE CASCADE ON UPDATE CASCADE;

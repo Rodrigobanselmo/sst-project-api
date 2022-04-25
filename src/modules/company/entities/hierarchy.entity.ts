@@ -32,7 +32,7 @@ export class HierarchyEntity implements Hierarchy {
   parentId: string;
 
   @ApiProperty({ description: 'The workplace id of the Hierarchy' })
-  workplaceId: number;
+  workplaceId: string;
 
   constructor(partial: Partial<HierarchyEntity>) {
     Object.assign(this, partial);

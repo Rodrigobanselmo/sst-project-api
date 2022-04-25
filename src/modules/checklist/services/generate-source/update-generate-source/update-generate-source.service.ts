@@ -11,7 +11,7 @@ export class UpdateGenerateSourceService {
   ) {}
 
   async execute(
-    id: number,
+    id: string,
     updateGenerateSourceDto: UpdateGenerateSourceDto,
     userPayloadDto: UserPayloadDto,
   ) {

@@ -30,7 +30,7 @@ export class RecMedController {
 
   @Patch('/:recMedId')
   async update(
-    @Param('recMedId') recMedId: number,
+    @Param('recMedId') recMedId: string,
     @User() userPayloadDto: UserPayloadDto,
     @Body() updateRiskDto: UpdateRecMedDto,
   ) {

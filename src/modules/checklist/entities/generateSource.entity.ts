@@ -7,12 +7,12 @@ export class GenerateSourceEntity implements GenerateSource {
   @ApiProperty({
     description: 'The id of the generate source or control measure',
   })
-  id: number;
+  id: string;
 
   @ApiProperty({
     description: 'The id of the parent risk',
   })
-  riskId: number;
+  riskId: string;
 
   @ApiProperty({ description: 'the generate source description' })
   name: string;

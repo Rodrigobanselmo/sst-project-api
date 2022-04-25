@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { Permission, Role } from '../src/shared/constants/enum/authorization';
 import { hash } from 'bcrypt';
+import { v4 } from 'uuid';
 
 const prisma = new PrismaClient();
 
@@ -9,6 +10,8 @@ const createUserAndCompany = async () => {
     process.env.NODE_ENV === 'test'
       ? '1'
       : 'b8635456-334e-4d6e-ac43-cfe5663aee17';
+
+  const workId = v4();
 
   const company = await prisma.company.create({
     data: {
@@ -22,6 +25,7 @@ const createUserAndCompany = async () => {
       workspace: {
         create: {
           name: 'Workspace',
+          id: workId,
           address: { create: { cep: '12246-000' } },
         },
       },
@@ -41,42 +45,42 @@ const createUserAndCompany = async () => {
               name: 'DIRECTORY',
               type: 'DIRECTORY',
               id: 'a',
-              workplaceId: 1,
+              workplaceId: workId,
             },
             {
               name: 'MANAGEMENT',
               type: 'MANAGEMENT',
               id: 'b',
               parentId: 'a',
-              workplaceId: 1,
+              workplaceId: workId,
             },
             {
               name: 'SECTOR',
               type: 'SECTOR',
               id: 'c',
               parentId: 'b',
-              workplaceId: 1,
+              workplaceId: workId,
             },
             {
               name: 'OFFICE 1',
               type: 'OFFICE',
               id: 'd',
               parentId: 'c',
-              workplaceId: 1,
+              workplaceId: workId,
             },
             {
               name: 'OFFICE 2',
               type: 'OFFICE',
               id: 'e',
               parentId: 'c',
-              workplaceId: 1,
+              workplaceId: workId,
             },
             {
               name: 'SUB_OFFICE',
               type: 'SUB_OFFICE',
               id: 'f',
               parentId: 'd',
-              workplaceId: 1,
+              workplaceId: workId,
             },
           ],
         },
@@ -110,7 +114,7 @@ const createUserAndCompany = async () => {
   const risks = await prisma.riskFactors.createMany({
     data: [
       {
-        id: 1,
+        id: v4(),
         companyId: company.id,
         name: 'Todos',
         system: true,
@@ -119,7 +123,7 @@ const createUserAndCompany = async () => {
         severity: 0,
       },
       {
-        id: 2,
+        id: v4(),
         companyId: company.id,
         name: 'Todos',
         system: true,
@@ -128,7 +132,7 @@ const createUserAndCompany = async () => {
         severity: 0,
       },
       {
-        id: 3,
+        id: v4(),
         companyId: company.id,
         name: 'Todos',
         system: true,
@@ -137,7 +141,7 @@ const createUserAndCompany = async () => {
         severity: 0,
       },
       {
-        id: 4,
+        id: v4(),
         companyId: company.id,
         name: 'Todos',
         representAll: true,
@@ -146,7 +150,7 @@ const createUserAndCompany = async () => {
         severity: 0,
       },
       {
-        id: 5,
+        id: v4(),
         companyId: company.id,
         name: 'Todos',
         system: true,

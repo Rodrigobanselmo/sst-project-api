@@ -1,13 +1,14 @@
 import { PartialType } from '@nestjs/swagger';
 import { StatusEnum } from '@prisma/client';
 import { Transform } from 'class-transformer';
-import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
+
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
 
 export class CreateRecMedDto {
-  @IsNumber()
-  riskId: number;
+  @IsString()
+  riskId: string;
 
   @IsOptional()
   @IsString()
@@ -30,9 +31,9 @@ export class CreateRecMedDto {
 }
 
 export class UpsertRecMedDto extends CreateRecMedDto {
-  @IsNumber()
+  @IsString()
   @IsOptional()
-  id: number;
+  id: string;
 }
 
 export class UpdateRecMedDto {
@@ -75,7 +76,7 @@ export class RiskCreateRecMedDto {
 }
 
 export class RiskUpdateRecMedDto extends PartialType(RiskCreateRecMedDto) {
-  @IsNumber()
+  @IsString()
   @IsOptional()
-  id: number;
+  id: string;
 }

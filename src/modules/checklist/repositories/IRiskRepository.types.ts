@@ -21,7 +21,7 @@ interface IRiskRepository {
   ): Promise<RiskFactorsEntity[]>;
 
   findById(
-    id: number,
+    id: string,
     companyId: string,
     options?: IPrismaOptions<{ company?: boolean; recMed?: boolean }>,
   ): Promise<RiskFactorsEntity>;

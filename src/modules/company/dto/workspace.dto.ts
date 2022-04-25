@@ -17,8 +17,8 @@ import { StatusEnum } from '@prisma/client';
 
 export class WorkspaceDto {
   @IsNumber()
-  @IsOptional()
-  id?: number;
+  @IsString()
+  id?: string;
 
   @Transform(StringCapitalizeTransform, { toClassOnly: true })
   @IsString()

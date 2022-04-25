@@ -24,14 +24,14 @@ export class RecMedRepository implements IRecMedRepository {
   }
 
   async update(
-    { id, ...createRecMedDto }: UpdateRecMedDto & { id: number },
+    { id, ...createRecMedDto }: UpdateRecMedDto & { id: string },
     companyId: string,
   ): Promise<RecMedEntity> {
     const recMed = await this.prisma.recMed.update({
       data: {
         ...createRecMedDto,
       },
-      where: { id_companyId: { companyId, id: id || -1 } },
+      where: { id_companyId: { companyId, id: id || 'no-id' } },
     });
 
     return new RecMedEntity(recMed);

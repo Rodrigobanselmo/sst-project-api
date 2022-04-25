@@ -7,12 +7,12 @@ export class RecMedEntity implements RecMed {
   @ApiProperty({
     description: 'The id of the recommendation or control measure',
   })
-  id: number;
+  id: string;
 
   @ApiProperty({
     description: 'The id of the parent risk',
   })
-  riskId: number;
+  riskId: string;
 
   @ApiProperty({ description: 'the recommendation description' })
   recName: string;
@@ -41,7 +41,7 @@ export class RecMedEntity implements RecMed {
   created_at: Date;
 
   @ApiProperty({ description: 'The generate source id related' })
-  generateSourceId: number;
+  generateSourceId: string;
 
   constructor(partial: Partial<RecMedEntity>) {
     Object.assign(this, partial);

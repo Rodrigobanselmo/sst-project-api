@@ -18,12 +18,17 @@ import { UpdateRecMedService } from './services/rec-med/update-rec-med/update-re
 import { GenerateSourceRepository } from './repositories/implementations/GenerateSourceRepository';
 import { CreateGenerateSourceService } from './services/generate-source/create-generate-source/create-generate-source.service';
 import { UpdateGenerateSourceService } from './services/generate-source/update-generate-source/update-generate-source.service';
+import { EpiController } from './controller/epi/epi.controller';
+import { CreateEpiService } from './services/epi/create-epi/create-epi.service';
+import { UpdateEpiService } from './services/epi/update-epi/update-epi.service';
+import { EpiRepository } from './repositories/implementations/EpiRepository';
 
 @Module({
   controllers: [
     RiskController,
     RecMedController,
     ChecklistController,
+    EpiController,
     GenerateSourceController,
   ],
   providers: [
@@ -32,8 +37,11 @@ import { UpdateGenerateSourceService } from './services/generate-source/update-g
     CreateRiskService,
     UpdateRiskService,
     RecMedRepository,
+    EpiRepository,
     CreateRecMedService,
     UpdateRecMedService,
+    CreateEpiService,
+    UpdateEpiService,
     GenerateSourceRepository,
     CreateGenerateSourceService,
     UpdateGenerateSourceService,

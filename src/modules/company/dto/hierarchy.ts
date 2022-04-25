@@ -3,7 +3,6 @@ import { HierarchyEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import {
   IsEnum,
-  IsNumber,
   IsOptional,
   IsString,
   MaxLength,
@@ -37,8 +36,8 @@ export class CreateHierarchyDto {
   @IsString()
   companyId: string;
 
-  @IsNumber()
-  workplaceId: number;
+  @IsString()
+  workplaceId: string;
 
   @IsString()
   @IsOptional()
@@ -87,9 +86,9 @@ export class UpsertHierarchyDto {
   @IsOptional()
   companyId?: string;
 
-  @IsNumber()
+  @IsString()
   @IsOptional()
-  workplaceId?: number;
+  workplaceId?: string;
 
   @IsString()
   @IsOptional()

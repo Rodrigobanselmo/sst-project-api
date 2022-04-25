@@ -36,7 +36,7 @@ export class GenerateSourceController {
 
   @Patch('/:generateSourceId')
   async update(
-    @Param('generateSourceId') generateSourceId: number,
+    @Param('generateSourceId') generateSourceId: string,
     @User() userPayloadDto: UserPayloadDto,
     @Body() updateRiskDto: UpdateGenerateSourceDto,
   ) {

@@ -7,12 +7,12 @@ export class AdmMeasuresEntity implements AdmMeasures {
   @ApiProperty({
     description: 'The id of the recommendation or control measure',
   })
-  id: number;
+  id: string;
 
   @ApiProperty({
     description: 'The id of the parent risk',
   })
-  riskId: number;
+  riskId: string;
 
   @ApiProperty({ description: 'the recommendation description' })
   name: string;
@@ -38,7 +38,7 @@ export class AdmMeasuresEntity implements AdmMeasures {
   created_at: Date;
 
   @ApiProperty({ description: 'The generate source id related' })
-  generateSourceId: number;
+  generateSourceId: string;
 
   constructor(partial: Partial<AdmMeasuresEntity>) {
     Object.assign(this, partial);

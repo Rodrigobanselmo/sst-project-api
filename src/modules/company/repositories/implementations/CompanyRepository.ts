@@ -161,7 +161,7 @@ export class CompanyRepository implements ICompanyRepository {
                         }
                       : undefined,
                   },
-                  where: { id_companyId: { companyId, id: id || -1 } },
+                  where: { id_companyId: { companyId, id: id || 'no-id' } },
                 };
               },
             ),
@@ -181,7 +181,7 @@ export class CompanyRepository implements ICompanyRepository {
               where: {
                 id_companyId: {
                   companyId,
-                  id: id || -1,
+                  id: id || 'no-id',
                 },
               },
             })),
@@ -288,7 +288,7 @@ export class CompanyRepository implements ICompanyRepository {
                     where: {
                       id_companyId: {
                         companyId: upsertRiskDto.companyId,
-                        id: id || -1,
+                        id: id || 'no-id',
                       },
                     },
                   })),

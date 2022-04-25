@@ -1,19 +1,13 @@
 import { StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
-import {
-  IsEnum,
-  IsNumber,
-  IsOptional,
-  IsString,
-  ValidateNested,
-} from 'class-validator';
+import { IsEnum, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
 import { RiskCreateRecMedDto, RiskUpdateRecMedDto } from './rec-med.dto';
 
 export class CreateGenerateSourceDto {
-  @IsNumber()
-  riskId: number;
+  @IsString()
+  riskId: string;
 
   @IsString()
   name: string;
@@ -36,9 +30,9 @@ export class CreateGenerateSourceDto {
 }
 
 export class UpsertGenerateSourceDto extends CreateGenerateSourceDto {
-  @IsNumber()
+  @IsString()
   @IsOptional()
-  id: number;
+  id: string;
 }
 
 export class UpdateGenerateSourceDto {
@@ -77,7 +71,7 @@ export class RiskCreateGenerateSourceDto {
 }
 
 export class RiskUpdateGenerateSourceDto extends RiskCreateGenerateSourceDto {
-  @IsNumber()
+  @IsString()
   @IsOptional()
-  id: number;
+  id: string;
 }

@@ -58,9 +58,9 @@ export class CreateRiskDto {
 }
 
 export class UpsertRiskDto extends CreateRiskDto {
-  @IsNumber()
+  @IsString()
   @IsOptional()
-  id: number;
+  id: string;
 
   @ValidateNested({ each: true })
   @IsOptional()
@@ -74,8 +74,8 @@ export class UpsertRiskDto extends CreateRiskDto {
 }
 
 export class UpdateRiskDto {
-  @IsNumber()
-  id: number;
+  @IsString()
+  id: string;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsOptional()

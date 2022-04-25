@@ -25,7 +25,7 @@ export class RiskController {
 
   @Patch('/:riskId')
   async update(
-    @Param('riskId') riskId: number,
+    @Param('riskId') riskId: string,
     @User() userPayloadDto: UserPayloadDto,
     @Body() updateRiskDto: UpdateRiskDto,
   ) {

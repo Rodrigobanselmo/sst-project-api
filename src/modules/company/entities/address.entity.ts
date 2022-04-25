@@ -33,7 +33,7 @@ export class AddressEntity implements Address {
   companyId: string;
 
   @ApiProperty({ description: 'address workspace id.' })
-  workspaceId: number;
+  workspaceId: string;
 
   @ApiProperty({ description: 'The workspace related to the address' })
   workspace?: WorkspaceEntity;

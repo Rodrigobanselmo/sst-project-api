@@ -44,7 +44,7 @@ export class GenerateSourceRepository implements IGenerateSourceRepository {
       recMeds,
       riskId,
       ...createGenerateSourceDto
-    }: UpdateGenerateSourceDto & { id: number; riskId?: number },
+    }: UpdateGenerateSourceDto & { id: string; riskId?: string },
     system: boolean,
     companyId: string,
   ): Promise<GenerateSourceEntity> {
@@ -60,12 +60,12 @@ export class GenerateSourceRepository implements IGenerateSourceRepository {
                   return {
                     create: { system, ...rm, riskId },
                     update: { system, ...rm, riskId },
-                    where: { id_companyId: { companyId, id: id || -1 } },
+                    where: { id_companyId: { companyId, id: id || 'no-id' } },
                   };
                 }),
         },
       },
-      where: { id_companyId: { companyId, id: id || -1 } },
+      where: { id_companyId: { companyId, id: id || 'no-id' } },
     });
 
     await Promise.all(
@@ -76,10 +76,10 @@ export class GenerateSourceRepository implements IGenerateSourceRepository {
             data: {
               ...createGenerateSourceDto,
               recMeds: {
-                connect: { id_companyId: { companyId, id: _id || -1 } },
+                connect: { id_companyId: { companyId, id: _id || 'no-id' } },
               },
             },
-            where: { id_companyId: { companyId, id: id || -1 } },
+            where: { id_companyId: { companyId, id: id || 'no-id' } },
           });
         }),
     );
@@ -87,7 +87,7 @@ export class GenerateSourceRepository implements IGenerateSourceRepository {
     return new GenerateSourceEntity(generateSource);
   }
 
-  async findById(id: number, companyId: string): Promise<GenerateSourceEntity> {
+  async findById(id: string, companyId: string): Promise<GenerateSourceEntity> {
     const generate = await this.prisma.generateSource.findUnique({
       where: { id_companyId: { id, companyId } },
     });

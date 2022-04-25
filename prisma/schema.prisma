@@ -57,7 +57,7 @@ model Address {
   neighborhood String?
   city String?
   state String?
-  workspaceId Int
+  workspaceId String
   companyId String
   workspace Workspace @relation(fields: [workspaceId,companyId], references: [id,companyId], onDelete: Cascade, onUpdate: Cascade)
   
@@ -66,11 +66,11 @@ model Address {
 
 
 model AdmMeasures {
-  id    Int     @default(autoincrement())
-  riskId    Int    
+  id    String     @default(uuid())
+  riskId    String    
   name String 
   companyId String
-  generateSourceId  Int?    
+  generateSourceId  String?    
   system Boolean
   status StatusEnum @default(ACTIVE)
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
@@ -165,7 +165,7 @@ model Employee {
   name String 
   cpf String 
   companyId String
-  workplaceId Int
+  workplaceId String
   hierarchyId String
   workplace Workspace @relation(fields: [workplaceId, companyId], references: [id, companyId], onDelete: Restrict, onUpdate: Cascade)
   hierarchy Hierarchy @relation(fields: [hierarchyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
@@ -177,7 +177,7 @@ model Employee {
 
 model Epi {
   id    Int     @default(autoincrement()) @id
-  ca Int @unique
+  ca String
   isValid Boolean?  
   expiredDate DateTime?
   desc String @default("")
@@ -191,8 +191,8 @@ model Epi {
 
 
 model GenerateSource {
-  id    Int     @default(autoincrement())
-  riskId    Int    
+  id    String     @default(uuid())
+  riskId    String    
   name String
   companyId String
   system Boolean
@@ -211,10 +211,11 @@ model Hierarchy {
   created_at DateTime @default(now())
   status StatusEnum @default(ACTIVE)
   type HierarchyEnum 
+  description String
   name String   
   companyId String
   parentId  String?
-  workplaceId Int
+  workplaceId String
   workplace Workspace @relation(fields: [workplaceId, companyId], references: [id, companyId], onDelete: Restrict, onUpdate: Cascade)
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   parent Hierarchy?  @relation(name: "children_parent", fields: [parentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
@@ -228,6 +229,7 @@ model Hierarchy {
 model HomogeneousGroup {
   id    String     @default(uuid()) @id
   name String
+  description String
   companyId String
   status StatusEnum @default(ACTIVE)
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
@@ -257,12 +259,12 @@ model License {
 }
 
 model RecMed {
-  id    Int     @default(autoincrement())
-  riskId    Int    
+  id    String     @default(uuid())
+  riskId    String    
   recName String? 
   medName String? 
   companyId String
-  generateSourceId    Int?    
+  generateSourceId    String?    
   system Boolean
   status StatusEnum @default(ACTIVE)
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
@@ -283,7 +285,7 @@ model RefreshToken {
 }
 
 model RiskFactors {
-  id    Int     @default(autoincrement())
+  id    String     @default(uuid())
   name String 
   companyId String
   severity Int 
@@ -327,7 +329,7 @@ model UserCompany {
 }
 
 model Workspace {
-  id    Int     @default(autoincrement()) 
+  id    String     @default(uuid()) 
   name String  
   status StatusEnum @default(ACTIVE)
   created_at DateTime @default(now())
@@ -340,4 +342,5 @@ model Workspace {
 
   @@id([id, companyId])
 }
+
 

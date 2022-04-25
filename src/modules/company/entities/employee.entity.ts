@@ -34,7 +34,7 @@ export class EmployeeEntity implements Employee {
   updated_at: Date;
 
   @ApiProperty({ description: 'The workplace id of the Employee' })
-  workplaceId: number;
+  workplaceId: string;
 
   @ApiProperty({ description: 'The hierarchy id of the Employee' })
   hierarchyId: string;

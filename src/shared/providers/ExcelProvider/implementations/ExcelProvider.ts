@@ -229,12 +229,13 @@ class ExcelProvider implements IExcelProvider {
     excelReadData.data.forEach((excelRow, indexRow) => {
       const isArrayData =
         excelRow[0] === '-' ||
-        (options.isArrayWithMissingFirstData && !excelRow[0]);
+        (options && options.isArrayWithMissingFirstData && !excelRow[0]);
 
       const isNextArrayData =
         excelReadData.data[indexRow + 1] &&
         (excelReadData.data[indexRow + 1][0] === '-' ||
-          (options.isArrayWithMissingFirstData &&
+          (options &&
+            options.isArrayWithMissingFirstData &&
             excelReadData.data[indexRow + 1].some((row) => row)));
 
       const saveIndexes = {

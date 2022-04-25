@@ -8,7 +8,7 @@ export class UpdateRecMedService {
   constructor(private readonly recMedRepository: RecMedRepository) {}
 
   async execute(
-    id: number,
+    id: string,
     updateRecMedDto: UpdateRecMedDto,
     user: UserPayloadDto,
   ) {

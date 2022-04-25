@@ -7,7 +7,7 @@ import { GenerateSourceEntity } from './generateSource.entity';
 
 export class RiskFactorsEntity implements RiskFactors {
   @ApiProperty({ description: 'The id of the Company' })
-  id: number;
+  id: string;
 
   @ApiProperty({ description: 'The name of the risk' })
   name: string;

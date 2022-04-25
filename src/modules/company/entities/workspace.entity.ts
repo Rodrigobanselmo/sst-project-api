@@ -6,7 +6,7 @@ import { CompanyEntity } from './company.entity';
 
 export class WorkspaceEntity implements Workspace {
   @ApiProperty({ description: 'The id of the Workspace' })
-  id: number;
+  id: string;
 
   @ApiProperty({ description: 'The name of the Workspace' })
   name: string;
