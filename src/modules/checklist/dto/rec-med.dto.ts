@@ -24,7 +24,7 @@ export class CreateRecMedDto {
   @IsEnum(MeasuresTypeEnum, {
     message: `type must be one of: ${KeysOfEnum(MeasuresTypeEnum)}`,
   })
-  medType?: MeasuresTypeEnum;
+  medType: MeasuresTypeEnum;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsOptional()
@@ -59,7 +59,7 @@ export class UpdateRecMedDto {
   @IsEnum(MeasuresTypeEnum, {
     message: `type must be one of: ${KeysOfEnum(MeasuresTypeEnum)}`,
   })
-  medType?: MeasuresTypeEnum;
+  medType: MeasuresTypeEnum;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsOptional()
@@ -88,7 +88,7 @@ export class RiskCreateRecMedDto {
   @IsEnum(MeasuresTypeEnum, {
     message: `type must be one of: ${KeysOfEnum(MeasuresTypeEnum)}`,
   })
-  medType?: MeasuresTypeEnum;
+  medType: MeasuresTypeEnum;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsOptional()
@@ -100,6 +100,14 @@ export class RiskCreateRecMedDto {
 }
 
 export class RiskUpdateRecMedDto extends PartialType(RiskCreateRecMedDto) {
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsOptional()
+  @IsString()
+  @IsEnum(MeasuresTypeEnum, {
+    message: `type must be one of: ${KeysOfEnum(MeasuresTypeEnum)}`,
+  })
+  medType: MeasuresTypeEnum;
+
   @IsString()
   @IsOptional()
   id: string;

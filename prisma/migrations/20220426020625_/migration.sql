@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "RecMed" ALTER COLUMN "medType" DROP DEFAULT;

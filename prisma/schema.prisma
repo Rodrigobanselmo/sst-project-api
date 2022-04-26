@@ -253,7 +253,7 @@ model RecMed {
   companyId String
   generateSourceId    String?    
   system Boolean 
-  medType MeasuresTypeEnum? 
+  medType MeasuresTypeEnum 
   status StatusEnum @default(ACTIVE)
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   risk RiskFactors @relation(fields: [riskId,companyId], references: [id,companyId], onDelete: Cascade, onUpdate: Cascade)
