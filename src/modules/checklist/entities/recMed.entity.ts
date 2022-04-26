@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 import { RecMed } from '.prisma/client';
-import { StatusEnum } from '@prisma/client';
+import { MeasuresTypeEnum, StatusEnum } from '@prisma/client';
 
 export class RecMedEntity implements RecMed {
   @ApiProperty({
@@ -30,6 +30,12 @@ export class RecMedEntity implements RecMed {
     description: 'If was created from one of simple professionals',
   })
   system: boolean;
+
+  @ApiProperty({
+    description: 'The current control measure type',
+    examples: ['ADM', 'ENG'],
+  })
+  medType: MeasuresTypeEnum;
 
   @ApiProperty({
     description: 'The current status of the recommendation or control measure',

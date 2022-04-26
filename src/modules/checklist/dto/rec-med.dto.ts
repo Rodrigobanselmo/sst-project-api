@@ -1,5 +1,5 @@
 import { PartialType } from '@nestjs/swagger';
-import { StatusEnum } from '@prisma/client';
+import { MeasuresTypeEnum, StatusEnum } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
 
@@ -17,6 +17,14 @@ export class CreateRecMedDto {
   @IsOptional()
   @IsString()
   medName?: string;
+
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsOptional()
+  @IsString()
+  @IsEnum(MeasuresTypeEnum, {
+    message: `type must be one of: ${KeysOfEnum(MeasuresTypeEnum)}`,
+  })
+  medType?: MeasuresTypeEnum;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsOptional()
@@ -48,6 +56,14 @@ export class UpdateRecMedDto {
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsOptional()
   @IsString()
+  @IsEnum(MeasuresTypeEnum, {
+    message: `type must be one of: ${KeysOfEnum(MeasuresTypeEnum)}`,
+  })
+  medType?: MeasuresTypeEnum;
+
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsOptional()
+  @IsString()
   @IsEnum(StatusEnum, {
     message: `type must be one of: ${KeysOfEnum(StatusEnum)}`,
   })
@@ -65,6 +81,14 @@ export class RiskCreateRecMedDto {
   @IsOptional()
   @IsString()
   medName?: string;
+
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsOptional()
+  @IsString()
+  @IsEnum(MeasuresTypeEnum, {
+    message: `type must be one of: ${KeysOfEnum(MeasuresTypeEnum)}`,
+  })
+  medType?: MeasuresTypeEnum;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsOptional()
