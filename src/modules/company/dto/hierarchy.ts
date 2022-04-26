@@ -37,6 +37,10 @@ export class CreateHierarchyDto {
   companyId: string;
 
   @IsString()
+  @IsOptional()
+  description?: string;
+
+  @IsString()
   workplaceId: string;
 
   @IsString()

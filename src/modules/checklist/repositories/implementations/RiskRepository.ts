@@ -38,7 +38,7 @@ export class RiskRepository implements IRiskRepository {
           },
         },
       },
-      include: { recMed: true, generateSource: true, adms: true },
+      include: { recMed: true, generateSource: true },
     });
 
     return new RiskFactorsEntity(risk);
@@ -76,7 +76,7 @@ export class RiskRepository implements IRiskRepository {
         ...createRiskDto,
       },
       where: { id_companyId: { companyId, id: id || 'no-id' } },
-      include: { recMed: true, generateSource: true, adms: true },
+      include: { recMed: true, generateSource: true },
     });
 
     return new RiskFactorsEntity(risk);
@@ -148,7 +148,7 @@ export class RiskRepository implements IRiskRepository {
         },
       },
       where: { id_companyId: { companyId, id: id || 'no-id' } },
-      include: { recMed: true, generateSource: true, adms: true },
+      include: { recMed: true, generateSource: true },
     });
 
     return new RiskFactorsEntity(risk);
@@ -221,7 +221,7 @@ export class RiskRepository implements IRiskRepository {
               },
             },
             where: { id_companyId: { companyId, id: id || 'no-id' } },
-            include: { recMed: true, generateSource: true, adms: true },
+            include: { recMed: true, generateSource: true },
           }),
       ),
     );
@@ -236,7 +236,6 @@ export class RiskRepository implements IRiskRepository {
       company?: boolean;
       recMed?: boolean;
       generateSource?: boolean;
-      adms?: boolean;
     }>,
   ): Promise<RiskFactorsEntity> {
     const include = options.include || {};
@@ -247,7 +246,6 @@ export class RiskRepository implements IRiskRepository {
         company: !!include.company,
         recMed: !!include.recMed,
         generateSource: !!include.generateSource,
-        adms: !!include.adms,
       },
     });
 
@@ -260,7 +258,6 @@ export class RiskRepository implements IRiskRepository {
       company?: boolean;
       recMed?: boolean;
       generateSource?: boolean;
-      adms?: boolean;
     }>,
   ): Promise<RiskFactorsEntity[]> {
     const where = options.where || {};
@@ -272,7 +269,6 @@ export class RiskRepository implements IRiskRepository {
         company: !!include.company,
         recMed: !!include.recMed,
         generateSource: !!include.generateSource,
-        adms: !!include.adms,
       },
     });
 
@@ -285,7 +281,6 @@ export class RiskRepository implements IRiskRepository {
       company?: boolean;
       recMed?: boolean;
       generateSource?: boolean;
-      adms?: boolean;
     }> & { representAll?: boolean },
   ): Promise<RiskFactorsEntity[]> {
     const include = options.include || {};
@@ -302,7 +297,6 @@ export class RiskRepository implements IRiskRepository {
         company: !!include.company,
         recMed: !!include.recMed,
         generateSource: !!include.generateSource,
-        adms: !!include.adms,
       },
     });
 

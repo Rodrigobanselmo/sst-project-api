@@ -9,7 +9,7 @@ export const findAllRisks = async (
   companyId: string,
 ) => {
   const riskData = await riskRepository.findAllByCompanyId(companyId, {
-    include: { recMed: true, generateSource: true, adms: true },
+    include: { recMed: true, generateSource: true },
     where: { type: riskSheet.type, representAll: false },
   });
 

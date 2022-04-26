@@ -65,22 +65,6 @@ model Address {
 }
 
 
-model AdmMeasures {
-  id    String     @default(uuid())
-  riskId    String    
-  name String 
-  companyId String
-  generateSourceId  String?    
-  system Boolean
-  status StatusEnum @default(ACTIVE)
-  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  risk RiskFactors @relation(fields: [riskId,companyId], references: [id,companyId], onDelete: Cascade, onUpdate: Cascade)
-  generateSource GenerateSource? @relation(fields: [generateSourceId,companyId], references: [id,companyId], onDelete: Cascade, onUpdate: Cascade)
-  created_at DateTime @default(now())
-
-  @@id([id, companyId])
-} 
-
 model Checklist {
   id    Int     @default(autoincrement())
   status StatusEnum @default(PROGRESS)
@@ -129,7 +113,6 @@ model Company {
   hierarchy Hierarchy[] 
   databaseTable DatabaseTable[] 
   checklist Checklist[] 
-  adms AdmMeasures[] 
 }
 
 model Contract {
@@ -200,7 +183,6 @@ model GenerateSource {
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   risk RiskFactors @relation(fields: [riskId,companyId], references: [id,companyId], onDelete: Cascade, onUpdate: Cascade)
   recMeds RecMed[] 
-  adms AdmMeasures[] 
   created_at DateTime @default(now())
 
   @@id([id, companyId])
@@ -211,7 +193,7 @@ model Hierarchy {
   created_at DateTime @default(now())
   status StatusEnum @default(ACTIVE)
   type HierarchyEnum 
-  description String
+  description String @default("")
   name String   
   companyId String
   parentId  String?
@@ -229,7 +211,7 @@ model Hierarchy {
 model HomogeneousGroup {
   id    String     @default(uuid()) @id
   name String
-  description String
+  description String @default("") //! remove default
   companyId String
   status StatusEnum @default(ACTIVE)
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
@@ -298,7 +280,6 @@ model RiskFactors {
   created_at DateTime @default(now())
   recMed RecMed[]
   generateSource GenerateSource[]
-  adms AdmMeasures[] 
   representAll Boolean @default(false)
   
   @@id([id, companyId])

@@ -10,6 +10,9 @@ export class CreateHomoGroupDto {
   @MaxLength(100)
   name: string;
 
+  @IsString()
+  description: string;
+
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsString()
   @IsOptional()

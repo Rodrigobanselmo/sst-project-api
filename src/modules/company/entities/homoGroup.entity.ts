@@ -9,6 +9,9 @@ export class HomoGroupEntity implements HomogeneousGroup {
   @ApiProperty({ description: 'The name of the HomogeneousGroup' })
   name: string;
 
+  @ApiProperty({ description: 'The name of the HomogeneousGroup' })
+  description: string;
+
   @ApiProperty({
     description: 'The current status of the HomogeneousGroup',
     examples: [StatusEnum.ACTIVE, StatusEnum.INACTIVE],

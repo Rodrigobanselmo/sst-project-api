@@ -8,6 +8,9 @@ export class HierarchyEntity implements Hierarchy {
   @ApiProperty({ description: 'The name of the Hierarchy' })
   name: string;
 
+  @ApiProperty({ description: 'The description of the Hierarchy' })
+  description: string;
+
   @ApiProperty({
     description: 'The current status of the Hierarchy',
     examples: [StatusEnum.ACTIVE, StatusEnum.INACTIVE],
