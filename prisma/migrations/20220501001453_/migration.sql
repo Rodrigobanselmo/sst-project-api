@@ -10,6 +10,9 @@ CREATE TYPE "RiskFactorsEnum" AS ENUM ('BIO', 'QUI', 'FIS', 'ERG', 'ACI');
 -- CreateEnum
 CREATE TYPE "StatusEnum" AS ENUM ('ACTIVE', 'PROGRESS', 'INACTIVE', 'PENDING', 'CANCELED');
 
+-- CreateEnum
+CREATE TYPE "MeasuresTypeEnum" AS ENUM ('ADM', 'ENG');
+
 -- CreateTable
 CREATE TABLE "Activity" (
     "id" SERIAL NOT NULL,
@@ -33,20 +36,6 @@ CREATE TABLE "Address" (
     "companyId" TEXT NOT NULL,
 
     CONSTRAINT "Address_pkey" PRIMARY KEY ("workspaceId","companyId")
-);
-
--- CreateTable
-CREATE TABLE "AdmMeasures" (
-    "id" TEXT NOT NULL,
-    "riskId" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "companyId" TEXT NOT NULL,
-    "generateSourceId" TEXT,
-    "system" BOOLEAN NOT NULL,
-    "status" "StatusEnum" NOT NULL DEFAULT E'ACTIVE',
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT "AdmMeasures_pkey" PRIMARY KEY ("id","companyId")
 );
 
 -- CreateTable
@@ -128,10 +117,14 @@ CREATE TABLE "Employee" (
 -- CreateTable
 CREATE TABLE "Epi" (
     "id" SERIAL NOT NULL,
-    "ca" INTEGER NOT NULL,
+    "ca" TEXT NOT NULL,
     "isValid" BOOLEAN,
+    "fabrication" INTEGER NOT NULL DEFAULT 0,
     "expiredDate" TIMESTAMP(3),
     "desc" TEXT NOT NULL DEFAULT E'',
+    "report" TEXT NOT NULL DEFAULT E'',
+    "restriction" TEXT NOT NULL DEFAULT E'',
+    "observation" TEXT NOT NULL DEFAULT E'',
     "equipment" TEXT NOT NULL DEFAULT E'',
     "status" "StatusEnum" NOT NULL DEFAULT E'ACTIVE',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -158,6 +151,7 @@ CREATE TABLE "Hierarchy" (
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "status" "StatusEnum" NOT NULL DEFAULT E'ACTIVE',
     "type" "HierarchyEnum" NOT NULL,
+    "description" TEXT NOT NULL DEFAULT E'',
     "name" TEXT NOT NULL,
     "companyId" TEXT NOT NULL,
     "parentId" TEXT,
@@ -170,6 +164,7 @@ CREATE TABLE "Hierarchy" (
 CREATE TABLE "HomogeneousGroup" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
     "companyId" TEXT NOT NULL,
     "status" "StatusEnum" NOT NULL DEFAULT E'ACTIVE',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -208,6 +203,7 @@ CREATE TABLE "RecMed" (
     "companyId" TEXT NOT NULL,
     "generateSourceId" TEXT,
     "system" BOOLEAN NOT NULL,
+    "medType" "MeasuresTypeEnum" NOT NULL,
     "status" "StatusEnum" NOT NULL DEFAULT E'ACTIVE',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -340,15 +336,6 @@ CREATE INDEX "_HierarchyToHomogeneousGroup_B_index" ON "_HierarchyToHomogeneousG
 
 -- AddForeignKey
 ALTER TABLE "Address" ADD CONSTRAINT "Address_workspaceId_companyId_fkey" FOREIGN KEY ("workspaceId", "companyId") REFERENCES "Workspace"("id", "companyId") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "AdmMeasures" ADD CONSTRAINT "AdmMeasures_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "AdmMeasures" ADD CONSTRAINT "AdmMeasures_riskId_companyId_fkey" FOREIGN KEY ("riskId", "companyId") REFERENCES "RiskFactors"("id", "companyId") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "AdmMeasures" ADD CONSTRAINT "AdmMeasures_generateSourceId_companyId_fkey" FOREIGN KEY ("generateSourceId", "companyId") REFERENCES "GenerateSource"("id", "companyId") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Checklist" ADD CONSTRAINT "Checklist_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
