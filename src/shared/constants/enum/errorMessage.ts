@@ -8,3 +8,7 @@ export enum ErrorCompanyEnum {
   UPDATE_HIERARCHY_WITH_PARENT = "O campo 'parentId' não pode existir para o tipo 'Directory'",
   GHO_NOT_FOUND = 'O GHO informado não foi encontrado nesta empresa',
 }
+
+export enum ErrorChecklistEnum {
+  EPI_NOT_FOUND = 'Epi não encontrado',
+}

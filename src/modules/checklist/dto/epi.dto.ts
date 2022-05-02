@@ -8,6 +8,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
+import { PaginationQueryDto } from 'src/shared/dto/pagination.dto';
 
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
@@ -19,9 +20,25 @@ export class CreateEpiDto {
   @IsString()
   equipment: string;
 
+  @IsBoolean()
+  @IsOptional()
+  national?: boolean;
+
   @IsOptional()
   @IsString()
-  desc?: string;
+  description?: string;
+
+  @IsOptional()
+  @IsString()
+  report?: string;
+
+  @IsOptional()
+  @IsString()
+  restriction?: string;
+
+  @IsOptional()
+  @IsString()
+  observation?: string;
 
   @IsDate()
   @Type(() => Date)
@@ -47,3 +64,13 @@ export class UpsertEpiDto extends CreateEpiDto {
 }
 
 export class UpdateEpiDto extends PartialType(CreateEpiDto) {}
+
+export class FindEpiDto extends PaginationQueryDto {
+  @IsString()
+  @IsOptional()
+  ca?: string;
+
+  @IsString()
+  @IsOptional()
+  equipment?: string;
+}

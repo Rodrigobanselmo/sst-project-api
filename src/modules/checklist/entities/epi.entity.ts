@@ -16,7 +16,7 @@ export class EpiEntity implements Epi {
   equipment: string;
 
   @ApiProperty({ description: 'the epi description' })
-  desc: string;
+  description: string;
 
   @ApiProperty({ description: 'if api is valid' })
   isValid: boolean;
@@ -32,6 +32,18 @@ export class EpiEntity implements Epi {
 
   @ApiProperty({ description: 'The creation date of the epi' })
   created_at: Date;
+
+  @ApiProperty({ description: 'The creation date of the epi' })
+  national: boolean;
+
+  @ApiProperty({ description: 'The report of the epi' })
+  report: string;
+
+  @ApiProperty({ description: 'The report restriction of the epi' })
+  restriction: string;
+
+  @ApiProperty({ description: 'The observations about the epi report' })
+  observation: string;
 
   constructor(partial: Partial<EpiEntity>) {
     Object.assign(this, partial);

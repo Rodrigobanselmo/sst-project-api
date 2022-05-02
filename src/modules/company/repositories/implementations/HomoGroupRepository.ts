@@ -34,7 +34,6 @@ export class HomoGroupRepository {
   }
 
   async update({
-    companyId: _,
     id,
     hierarchies,
     ...updateHomoGroup

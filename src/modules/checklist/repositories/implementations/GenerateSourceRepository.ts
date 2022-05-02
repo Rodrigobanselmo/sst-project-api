@@ -33,6 +33,7 @@ export class GenerateSourceRepository implements IGenerateSourceRepository {
           },
         },
       },
+      include: { recMeds: true },
     });
 
     return new GenerateSourceEntity(redMed);

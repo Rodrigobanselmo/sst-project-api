@@ -287,10 +287,12 @@ class ExcelProvider implements IExcelProvider {
 
           if (isEmptyCell) return;
 
-          const checkedData = tableSchemaCell.checkHandler(excelCell);
+          let checkedData = tableSchemaCell.checkHandler(excelCell);
 
-          if (!checkedData && excelCell != '-')
+          if (checkedData === false && excelCell != '-')
             throw new BadRequestException(`Invalid data on ${actualCell}`);
+
+          if (checkedData === 'false') checkedData = false;
 
           const nestedObject = transformStringToObject(
             tableSchemaCell.databaseName,

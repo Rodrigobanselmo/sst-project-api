@@ -14,6 +14,8 @@ import { UploadExcelProvider } from './providers/uploadExcelProvider';
 import { DownloadUniqueCompanyService } from './services/company/download-unique-company/download-unique-company.service';
 import { UploadUniqueCompanyService } from './services/company/upload-unique-company/upload-unique-company.service';
 import { DownloadExcelProvider } from './providers/donwlodExcelProvider';
+import { UploadEpiDataService } from './services/checklist/upload-epi-data/upload-epi-data.service';
+import { EpiRepository } from '../checklist/repositories/implementations/EpiRepository';
 
 @Module({
   controllers: [
@@ -33,6 +35,8 @@ import { DownloadExcelProvider } from './providers/donwlodExcelProvider';
     DownloadCompaniesService,
     DownloadUniqueCompanyService,
     UploadUniqueCompanyService,
+    UploadEpiDataService,
+    EpiRepository,
   ],
 })
 export class FilesModule {}

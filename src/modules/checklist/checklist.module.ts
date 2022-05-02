@@ -22,6 +22,8 @@ import { EpiController } from './controller/epi/epi.controller';
 import { CreateEpiService } from './services/epi/create-epi/create-epi.service';
 import { UpdateEpiService } from './services/epi/update-epi/update-epi.service';
 import { EpiRepository } from './repositories/implementations/EpiRepository';
+import { FindByCAEpiService } from './services/epi/find-ca-epi /find-ca-epi.service';
+import { FindEpiService } from './services/epi/find-epi/find-epi.service';
 
 @Module({
   controllers: [
@@ -50,6 +52,8 @@ import { EpiRepository } from './repositories/implementations/EpiRepository';
     FindChecklistDataService,
     UpdateChecklistService,
     FindAllAvailableRiskService,
+    FindByCAEpiService,
+    FindEpiService,
   ],
   exports: [RiskRepository],
 })

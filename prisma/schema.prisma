@@ -167,9 +167,9 @@ model Epi {
   id    Int     @default(autoincrement()) @id
   ca String
   isValid Boolean?  
-  fabrication Int @default(0)
+  national Boolean @default(true)
   expiredDate DateTime?
-  desc String @default("")
+  description String @default("")
   report String @default("")
   restriction String @default("")
   observation String @default("")

@@ -1,6 +1,7 @@
 import { WorkbooksEnum } from '../../../shared/constants/workbooks/workbooks.enum';
 import { companySheetConstant } from './sheets/company/companySheet.constant';
 import { companyUniqueSheetConstant } from './sheets/companyUnique/companyUniqueSheet.constant';
+import { epiSheetConstant } from './sheets/epi/epiSheet.constant';
 import { riskSheetConstant } from './sheets/risk/riskSheet.constant';
 
 export const workbooksConstant = {
@@ -20,5 +21,11 @@ export const workbooksConstant = {
     name: 'Empresa',
     id: WorkbooksEnum.COMPANY,
     sheets: companyUniqueSheetConstant,
+  },
+  [WorkbooksEnum.EPI]: {
+    name: 'EPI',
+    id: WorkbooksEnum.EPI,
+    sheets: epiSheetConstant,
+    path: 'files/checklist/epi',
   },
 };

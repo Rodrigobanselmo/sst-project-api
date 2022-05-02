@@ -1,4 +1,3 @@
-import { PartialType } from '@nestjs/swagger';
 import { StatusEnum } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import { IsEnum, IsOptional, IsString, MaxLength } from 'class-validator';
@@ -29,10 +28,14 @@ export class CreateHomoGroupDto {
   readonly hierarchies?: string[];
 }
 
-export class UpdateHomoGroupDto extends PartialType(CreateHomoGroupDto) {
+export class UpdateHomoGroupDto {
   @IsOptional()
   @IsString()
   id?: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
 
   @IsString()
   @IsOptional()
