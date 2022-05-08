@@ -118,6 +118,8 @@ model Company {
   hierarchy Hierarchy[] 
   databaseTable DatabaseTable[] 
   checklist Checklist[] 
+  riskFactorData RiskFactorData[] 
+  riskFactorGroupData RiskFactorGroupData[] 
 }
 
 model Contract {
@@ -176,6 +178,7 @@ model Epi {
   equipment String @default("")
   status StatusEnum @default(ACTIVE)
   created_at DateTime @default(now())
+  riskFactorData RiskFactorData[]
 
   @@index(ca)
   @@unique([ca, status])
@@ -183,18 +186,19 @@ model Epi {
 
 
 model GenerateSource {
-  id    String     @default(uuid())
+  id    String   @id  @default(uuid())
   riskId    String    
   name String
   companyId String
   system Boolean
+  created_at DateTime @default(now())
   status StatusEnum @default(ACTIVE)
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   risk RiskFactors @relation(fields: [riskId,companyId], references: [id,companyId], onDelete: Cascade, onUpdate: Cascade)
   recMeds RecMed[] 
-  created_at DateTime @default(now())
+  riskFactorData RiskFactorData[]
 
-  @@id([id, companyId])
+  @@unique([id, companyId])
 } 
 
 model Hierarchy {
@@ -213,6 +217,7 @@ model Hierarchy {
   children Hierarchy[] @relation(name: "children_parent")
   employee Employee[] 
   homogeneousGroup HomogeneousGroup[]
+  riskFactorData RiskFactorData[] 
 
   @@index(companyId)
 }
@@ -226,6 +231,7 @@ model HomogeneousGroup {
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   hierarchies Hierarchy[] 
   created_at DateTime @default(now())
+  riskFactorData RiskFactorData[] 
   
   @@index(companyId)
 }
@@ -250,7 +256,7 @@ model License {
 }
 
 model RecMed {
-  id    String     @default(uuid())
+  id    String   @id  @default(uuid())
   riskId    String    
   recName String? 
   medName String? 
@@ -263,8 +269,9 @@ model RecMed {
   risk RiskFactors @relation(fields: [riskId,companyId], references: [id,companyId], onDelete: Cascade, onUpdate: Cascade)
   generateSource GenerateSource? @relation(fields: [generateSourceId,companyId], references: [id,companyId], onDelete: Cascade, onUpdate: Cascade)
   created_at DateTime @default(now())
+  riskFactorData RiskFactorData[]
 
-  @@id([id, companyId])
+  @@unique([id, companyId])
 } 
 
 model RefreshToken {
@@ -291,9 +298,43 @@ model RiskFactors {
   recMed RecMed[]
   generateSource GenerateSource[]
   representAll Boolean @default(false)
+  riskFactorData RiskFactorData[]
   
   @@id([id, companyId])
 } 
+
+model RiskFactorGroupData {
+  id    String   @id  @default(uuid())
+  name String?
+  created_at DateTime @default(now())
+  companyId String
+  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  data RiskFactorData[]
+  status StatusEnum @default(ACTIVE)
+
+  @@unique([id, companyId])
+}
+
+model RiskFactorData {
+  id    String   @id  @default(uuid())
+  probability Int?
+  probabilityAfter Int?
+  companyId String
+  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  riskId    String
+  riskFactor RiskFactors @relation(fields: [riskId,companyId], references: [id,companyId], onDelete: Restrict, onUpdate: Cascade)
+  homogeneousGroupId String?
+  homogeneousGroup HomogeneousGroup? @relation(fields: [homogeneousGroupId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  hierarchyId String?
+  hierarchy Hierarchy? @relation(fields: [hierarchyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  riskFactorGroupDataId String
+  riskFactorGroupData RiskFactorGroupData @relation(fields: [riskFactorGroupDataId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  generateSources GenerateSource[]
+  recMeds RecMed[]
+  epis Epi[]
+
+  @@unique([id, companyId])
+}
 
 model User {
   id    Int     @default(autoincrement()) @id
