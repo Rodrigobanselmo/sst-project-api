@@ -10,9 +10,8 @@ export class UpsertRiskGroupDataDto {
   @IsOptional()
   id?: string;
 
-  @IsOptional()
   @IsString()
-  name?: string;
+  name: string;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsOptional()

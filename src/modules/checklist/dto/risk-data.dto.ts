@@ -38,7 +38,15 @@ export class UpsertRiskDataDto {
 
   @IsString({ each: true })
   @IsOptional()
-  recMeds?: string[];
+  recs?: string[];
+
+  @IsString({ each: true })
+  @IsOptional()
+  engs?: string[];
+
+  @IsString({ each: true })
+  @IsOptional()
+  adms?: string[];
 
   @IsOptional()
   @IsString({ each: true })

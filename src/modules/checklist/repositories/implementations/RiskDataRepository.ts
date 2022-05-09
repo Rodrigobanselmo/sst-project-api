@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
+import { removeDuplicate } from 'src/shared/utils/removeDuplicate';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { UpsertRiskDataDto } from '../../dto/risk-data.dto';
@@ -9,7 +10,9 @@ import { RiskFactorDataEntity } from '../../entities/riskData.entity';
 export class RiskDataRepository {
   constructor(private prisma: PrismaService) {}
   async upsert({
-    recMeds,
+    recs,
+    adms,
+    engs,
     epis,
     generateSources,
     companyId,
@@ -32,9 +35,23 @@ export class RiskDataRepository {
               })),
             }
           : undefined,
-        recMeds: recMeds
+        recs: recs
           ? {
-              connect: recMeds.map((id) => ({
+              connect: recs.map((id) => ({
+                id_companyId: { companyId, id },
+              })),
+            }
+          : undefined,
+        adms: adms
+          ? {
+              connect: adms.map((id) => ({
+                id_companyId: { companyId, id },
+              })),
+            }
+          : undefined,
+        engs: engs
+          ? {
+              connect: engs.map((id) => ({
                 id_companyId: { companyId, id },
               })),
             }
@@ -43,9 +60,25 @@ export class RiskDataRepository {
       update: {
         ...createDto,
         companyId,
-        recMeds: recMeds
+        recs: recs
           ? {
-              set: recMeds.map((id) => ({ id_companyId: { companyId, id } })),
+              set: recs.map((id) => ({
+                id_companyId: { companyId, id },
+              })),
+            }
+          : undefined,
+        adms: adms
+          ? {
+              set: adms.map((id) => ({
+                id_companyId: { companyId, id },
+              })),
+            }
+          : undefined,
+        engs: engs
+          ? {
+              set: engs.map((id) => ({
+                id_companyId: { companyId, id },
+              })),
             }
           : undefined,
         generateSources: generateSources
@@ -63,7 +96,9 @@ export class RiskDataRepository {
       },
       where: { id_companyId: { companyId, id: id || 'not-found' } },
       include: {
-        recMeds: true,
+        adms: true,
+        recs: true,
+        engs: true,
         generateSources: true,
         epis: true,
       },
@@ -76,7 +111,9 @@ export class RiskDataRepository {
     const riskFactorData = await this.prisma.riskFactorData.findMany({
       where: { riskFactorGroupDataId, companyId },
       include: {
-        recMeds: true,
+        adms: true,
+        recs: true,
+        engs: true,
         generateSources: true,
         epis: true,
         hierarchy: true,
@@ -95,7 +132,9 @@ export class RiskDataRepository {
     const riskFactorData = await this.prisma.riskFactorData.findMany({
       where: { riskFactorGroupDataId, companyId, riskId },
       include: {
-        recMeds: true,
+        adms: true,
+        recs: true,
+        engs: true,
         generateSources: true,
         epis: true,
       },

@@ -42,9 +42,19 @@ export class RiskFactorDataEntity implements RiskFactorData {
   homogeneousGroup?: HomoGroupEntity;
 
   @ApiProperty({
-    description: 'The array with recommendations and measure controls data',
+    description: 'The array with recommendations data',
   })
-  recMed?: RecMedEntity[];
+  recs?: RecMedEntity[];
+
+  @ApiProperty({
+    description: 'The array with measure controls data',
+  })
+  engs?: RecMedEntity[];
+
+  @ApiProperty({
+    description: 'The array with measure controls data',
+  })
+  adms?: RecMedEntity[];
 
   @ApiProperty({ description: 'The array with generate source data' })
   generateSource?: GenerateSourceEntity[];

@@ -24,6 +24,14 @@ import { UpdateEpiService } from './services/epi/update-epi/update-epi.service';
 import { EpiRepository } from './repositories/implementations/EpiRepository';
 import { FindByCAEpiService } from './services/epi/find-ca-epi /find-ca-epi.service';
 import { FindEpiService } from './services/epi/find-epi/find-epi.service';
+import { RiskGroupDataController } from './controller/risk-group-data/risk-group-data.controller';
+import { RiskDataController } from './controller/risk-data/risk-data.controller';
+import { RiskGroupDataRepository } from './repositories/implementations/RiskGroupDataRepository';
+import { RiskDataRepository } from './repositories/implementations/RiskDataRepository';
+import { UpsertRiskGroupDataService } from './services/risk-group-data/upsert-risk-group-data/upsert-risk-group-data.service';
+import { FindAllByCompanyService } from './services/risk-group-data/find-by-company/find-by-company.service';
+import { UpsertRiskDataService } from './services/risk-data/upsert-risk-data/upsert-risk.service';
+import { FindAllByGroupAndRiskService } from './services/risk-data/find-by-group-risk/find-by-group-risk.service';
 
 @Module({
   controllers: [
@@ -32,6 +40,8 @@ import { FindEpiService } from './services/epi/find-epi/find-epi.service';
     ChecklistController,
     EpiController,
     GenerateSourceController,
+    RiskGroupDataController,
+    RiskDataController,
   ],
   providers: [
     CreateChecklistService,
@@ -54,6 +64,12 @@ import { FindEpiService } from './services/epi/find-epi/find-epi.service';
     FindAllAvailableRiskService,
     FindByCAEpiService,
     FindEpiService,
+    FindAllByGroupAndRiskService,
+    UpsertRiskDataService,
+    FindAllByCompanyService,
+    UpsertRiskGroupDataService,
+    RiskDataRepository,
+    RiskGroupDataRepository,
   ],
   exports: [RiskRepository],
 })
