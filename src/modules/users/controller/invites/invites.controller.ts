@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Post, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { classToClass } from 'class-transformer';
 
-import { Permission } from '../../../../shared/constants/enum/authorization';
+import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 import { InviteUserDto } from '../../dto/invite-user.dto';
 import { DeleteExpiredInvitesService } from '../../services/invites/delete-expired-invites/delete-expired-invites.service';
@@ -21,7 +21,7 @@ export class InvitesController {
 
   @Post()
   @Permissions({
-    code: Permission.INVITE_USER,
+    code: PermissionEnum.INVITE_USER,
     isMember: true,
     isContract: true,
   })
@@ -31,7 +31,7 @@ export class InvitesController {
 
   @Delete()
   @Permissions({
-    code: Permission.INVITE_USER,
+    code: PermissionEnum.INVITE_USER,
     isMember: true,
   })
   async delete(@Query() deleteInviteDto: DeleteInviteDto) {

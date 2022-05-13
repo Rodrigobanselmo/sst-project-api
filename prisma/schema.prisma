@@ -207,6 +207,7 @@ model Hierarchy {
   status StatusEnum @default(ACTIVE)
   type HierarchyEnum 
   description String @default("")
+  realDescription String @default("")
   name String   
   companyId String
   parentId  String?
@@ -263,7 +264,7 @@ model RecMed {
   companyId String
   generateSourceId    String?    
   system Boolean 
-  medType MeasuresTypeEnum 
+  medType MeasuresTypeEnum?
   status StatusEnum @default(ACTIVE)
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   risk RiskFactors @relation(fields: [riskId,companyId], references: [id,companyId], onDelete: Cascade, onUpdate: Cascade)
@@ -310,6 +311,11 @@ model RiskFactorGroupData {
   name String?
   created_at DateTime @default(now())
   companyId String
+  source String?
+  elaboratedBy String?
+  revisionBy String?
+  approvedBy String?
+  documentDate DateTime @default(now())
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   data RiskFactorData[]
   status StatusEnum @default(PROGRESS)

@@ -16,8 +16,18 @@ export class UpsertManyHierarchyService {
           ErrorCompanyEnum.UPDATE_HIERARCHY_WITH_PARENT,
         );
       }
+      if (
+        !hierarchy.parentId &&
+        (
+          [HierarchyEnum.OFFICE, HierarchyEnum.SUB_OFFICE] as HierarchyEnum[]
+        ).includes(hierarchy.type)
+      ) {
+        throw new BadRequestException(
+          ErrorCompanyEnum.UPSERT_HIERARCHY_WITH_PARENT,
+        );
+      }
     });
-    console.log('hierarchies', hierarchies, user.targetCompanyId);
+
     const allHierarchy = await this.hierarchyRepository.upsertMany(
       hierarchies as any,
       user.targetCompanyId,

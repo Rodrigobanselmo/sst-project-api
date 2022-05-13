@@ -138,8 +138,6 @@ export class EmployeeRepository {
   ): Promise<EmployeeEntity[]> {
     const include = options?.include || {};
 
-    console.log(include?.hierarchy);
-
     const employees = await this.prisma.employee.findMany({
       where: { companyId },
       include: {

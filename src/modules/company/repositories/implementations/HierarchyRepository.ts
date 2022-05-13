@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { CreateHierarchyDto, UpdateHierarchyDto } from '../../dto/hierarchy';
@@ -154,9 +155,13 @@ export class HierarchyRepository {
     return new HierarchyEntity(hierarchy);
   }
 
-  async findAllHierarchyByCompany(companyId: string) {
+  async findAllHierarchyByCompany(
+    companyId: string,
+    options: { include?: Prisma.HierarchyInclude } = {},
+  ) {
     const hierarchies = await this.prisma.hierarchy.findMany({
       where: { companyId },
+      ...options,
     });
 
     return hierarchies.map((hierarchy) => new HierarchyEntity(hierarchy));

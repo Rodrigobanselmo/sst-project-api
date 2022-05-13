@@ -71,6 +71,6 @@ import { FindAllByGroupAndRiskService } from './services/risk-data/find-by-group
     RiskDataRepository,
     RiskGroupDataRepository,
   ],
-  exports: [RiskRepository],
+  exports: [RiskRepository, RiskGroupDataRepository],
 })
 export class ChecklistModule {}

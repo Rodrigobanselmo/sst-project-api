@@ -6,6 +6,7 @@ export enum ErrorMessageEnum {
 export enum ErrorCompanyEnum {
   CREATE_HIERARCHY_WITH_PARENT = "O campo 'parentId' não pode existir para o tipo 'Directory'",
   UPDATE_HIERARCHY_WITH_PARENT = "O campo 'parentId' não pode existir para o tipo 'Directory'",
+  UPSERT_HIERARCHY_WITH_PARENT = "O campo 'parentId' é obrigatório",
   GHO_NOT_FOUND = 'O GHO informado não foi encontrado nesta empresa',
 }
 

@@ -11,12 +11,13 @@
 // 1-A
 // 1
 
-export enum Role {
+export enum RoleEnum {
   MASTER = 'master',
   USER = 'user',
   ADMIN = 'admin',
 }
-export enum Permission {
+
+export enum PermissionEnum {
   MASTER = 'master',
   USER = '1',
   INVITE_USER = '1.1',

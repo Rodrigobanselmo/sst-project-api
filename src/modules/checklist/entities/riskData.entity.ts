@@ -6,6 +6,7 @@ import { RecMedEntity } from './recMed.entity';
 import { RiskFactorData } from '.prisma/client';
 import { HierarchyEntity } from '../../company/entities/hierarchy.entity';
 import { HomoGroupEntity } from '../../company/entities/homoGroup.entity';
+import { RiskFactorsEntity } from './risk.entity';
 
 export class RiskFactorDataEntity implements RiskFactorData {
   @ApiProperty({ description: 'The id of the Company' })
@@ -23,23 +24,26 @@ export class RiskFactorDataEntity implements RiskFactorData {
   @ApiProperty({ description: 'The creation date of the risk data' })
   created_at: Date;
 
+  @ApiProperty({ description: 'The hierarchy data' })
+  hierarchy?: HierarchyEntity;
+
   @ApiProperty({ description: 'The hierarchy id' })
   hierarchyId: string;
 
+  @ApiProperty({ description: 'The homogeneous group data' })
+  homogeneousGroup?: HomoGroupEntity;
+
   @ApiProperty({ description: 'The homogeneous group id' })
   homogeneousGroupId: string;
+
+  @ApiProperty({ description: 'The risk factor data' })
+  riskFactor?: RiskFactorsEntity;
 
   @ApiProperty({ description: 'The risk id' })
   riskId: string;
 
   @ApiProperty({ description: 'The risk group data id' })
   riskFactorGroupDataId: string;
-
-  @ApiProperty({ description: 'The hierarchy data' })
-  hierarchy?: HierarchyEntity;
-
-  @ApiProperty({ description: 'The homogeneous group data' })
-  homogeneousGroup?: HomoGroupEntity;
 
   @ApiProperty({
     description: 'The array with recommendations data',
@@ -57,7 +61,7 @@ export class RiskFactorDataEntity implements RiskFactorData {
   adms?: RecMedEntity[];
 
   @ApiProperty({ description: 'The array with generate source data' })
-  generateSource?: GenerateSourceEntity[];
+  generateSources?: GenerateSourceEntity[];
 
   @ApiProperty({ description: 'The array with generate source data' })
   epis?: EpiEntity[];

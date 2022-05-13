@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Hierarchy, HierarchyEnum, StatusEnum } from '@prisma/client';
+import { WorkspaceEntity } from './workspace.entity';
 
 export class HierarchyEntity implements Hierarchy {
   @ApiProperty({ description: 'The id of the Hierarchy' })
@@ -10,6 +11,9 @@ export class HierarchyEntity implements Hierarchy {
 
   @ApiProperty({ description: 'The description of the Hierarchy' })
   description: string;
+
+  @ApiProperty({ description: 'The real description of the Hierarchy' })
+  realDescription: string;
 
   @ApiProperty({
     description: 'The current status of the Hierarchy',
@@ -36,6 +40,9 @@ export class HierarchyEntity implements Hierarchy {
 
   @ApiProperty({ description: 'The workplace id of the Hierarchy' })
   workplaceId: string;
+
+  @ApiProperty({ description: 'The workplace of the Hierarchy' })
+  workplace?: WorkspaceEntity;
 
   constructor(partial: Partial<HierarchyEntity>) {
     Object.assign(this, partial);

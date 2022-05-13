@@ -1,8 +1,8 @@
 import { SetMetadata } from '@nestjs/common';
-import { Permission } from '../constants/enum/authorization';
+import { PermissionEnum } from '../constants/enum/authorization';
 
 export interface IPermissionOptions {
-  code?: Permission;
+  code?: PermissionEnum;
   crud?: boolean;
   isMember?: boolean;
   isContract?: boolean;

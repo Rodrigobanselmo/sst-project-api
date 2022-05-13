@@ -1,17 +1,17 @@
 import { Controller, Get, Post, Patch, Delete } from '@nestjs/common';
 
-import { Permission } from '../../../../shared/constants/enum/authorization';
+import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 
 @Controller('authorization-test')
 export class AuthorizationTestController {
   @Permissions(
     {
-      code: Permission.USER,
+      code: PermissionEnum.USER,
       crud: true,
     },
     {
-      code: Permission.INVITE_USER,
+      code: PermissionEnum.INVITE_USER,
     },
   )
   @Get()
@@ -21,15 +21,15 @@ export class AuthorizationTestController {
 
   @Permissions(
     {
-      code: Permission.USER,
+      code: PermissionEnum.USER,
       crud: true,
     },
     {
-      code: Permission.INVITE_USER,
+      code: PermissionEnum.INVITE_USER,
       isMember: true,
     },
     {
-      code: Permission.CREATE_COMPANY,
+      code: PermissionEnum.CREATE_COMPANY,
       crud: true,
       isMember: true,
     },
@@ -40,7 +40,7 @@ export class AuthorizationTestController {
   }
 
   @Permissions({
-    code: Permission.CREATE_COMPANY,
+    code: PermissionEnum.CREATE_COMPANY,
     crud: true,
     isMember: true,
   })
@@ -51,17 +51,17 @@ export class AuthorizationTestController {
 
   @Permissions(
     {
-      code: Permission.USER,
+      code: PermissionEnum.USER,
       crud: true,
     },
     {
-      code: Permission.INVITE_USER,
+      code: PermissionEnum.INVITE_USER,
       crud: true,
       isMember: true,
       isContract: true,
     },
     {
-      code: Permission.CREATE_COMPANY,
+      code: PermissionEnum.CREATE_COMPANY,
       crud: true,
       isContract: true,
     },
@@ -72,7 +72,7 @@ export class AuthorizationTestController {
   }
 
   @Permissions({
-    code: Permission.INVITE_USER,
+    code: PermissionEnum.INVITE_USER,
     crud: true,
   })
   @Delete()
@@ -97,7 +97,7 @@ export class AuthorizationTestController {
   }
 
   @Permissions({
-    code: Permission.CREATE_COMPANY,
+    code: PermissionEnum.CREATE_COMPANY,
     isContract: true,
   })
   @Get('8')

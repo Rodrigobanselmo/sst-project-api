@@ -1,5 +1,8 @@
 import { PrismaClient } from '@prisma/client';
-import { Permission, Role } from '../src/shared/constants/enum/authorization';
+import {
+  PermissionEnum,
+  RoleEnum,
+} from '../src/shared/constants/enum/authorization';
 import { hash } from 'bcrypt';
 import { v4 } from 'uuid';
 
@@ -171,8 +174,8 @@ const createUserAndCompany = async () => {
         create: [
           {
             companyId: company.id,
-            roles: [Role.MASTER],
-            permissions: [Permission.MASTER],
+            roles: [RoleEnum.MASTER],
+            permissions: [PermissionEnum.MASTER],
           },
         ],
       },

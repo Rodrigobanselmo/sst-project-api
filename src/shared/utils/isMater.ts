@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import { Role } from '../constants/enum/authorization';
+import { RoleEnum } from '../constants/enum/authorization';
 import { UserPayloadDto } from '../dto/user-payload.dto';
 
 export interface IMasterReturn {
@@ -11,7 +11,8 @@ export const isMaster = (
   user: UserPayloadDto | undefined,
   companyId?: string | false,
 ) => {
-  const includeMaster = user && user.roles && user.roles.includes(Role.MASTER);
+  const includeMaster =
+    user && user.roles && user.roles.includes(RoleEnum.MASTER);
   const sameCompany = companyId ? user.companyId === companyId : true;
 
   return {

@@ -42,6 +42,7 @@
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.1",
     "dayjs": "^1.10.7",
+    "docx": "^7.3.0",
     "exceljs": "^4.3.0",
     "handlebars": "^4.7.7",
     "node-xlsx": "^0.21.0",

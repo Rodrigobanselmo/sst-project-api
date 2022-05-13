@@ -2,7 +2,7 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
 import { PrismaService } from '../../prisma/prisma.service';
-import { Permission } from '../constants/enum/authorization';
+import { PermissionEnum } from '../constants/enum/authorization';
 import {
   IPermissionOptions,
   PERMISSIONS_KEY,
@@ -51,7 +51,7 @@ const isParentCompany = async (
 
 const isAdmin = (user: UserPayloadDto) => {
   return user.permissions.some(
-    (permission) => permission === Permission.MASTER,
+    (permission) => permission === PermissionEnum.MASTER,
   );
 };
 

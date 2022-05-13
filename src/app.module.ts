@@ -10,6 +10,7 @@ import { RolesGuard } from './shared/guards/roles.guard';
 import { CompanyModule } from './modules/company/company.module';
 import { ChecklistModule } from './modules/checklist/checklist.module';
 import { FilesModule } from './modules/files/files.module';
+import { DocumentsModule } from './modules/documents/documents.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { FilesModule } from './modules/files/files.module';
     CompanyModule,
     ChecklistModule,
     FilesModule,
+    DocumentsModule,
   ],
   providers: [
     {

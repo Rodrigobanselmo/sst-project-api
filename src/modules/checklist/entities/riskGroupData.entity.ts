@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { StatusEnum } from '@prisma/client';
 
 import { RiskFactorGroupData } from '.prisma/client';
+import { CompanyEntity } from 'src/modules/company/entities/company.entity';
 import { RiskFactorDataEntity } from './riskData.entity';
 
 export class RiskFactorGroupDataEntity implements RiskFactorGroupData {
@@ -26,7 +27,18 @@ export class RiskFactorGroupDataEntity implements RiskFactorGroupData {
   @ApiProperty({
     description: 'The array with risks data',
   })
-  data?: RiskFactorDataEntity[];
+  data?: Partial<RiskFactorDataEntity>[];
+
+  @ApiProperty({
+    description: 'The array with risks data',
+  })
+  company?: Partial<CompanyEntity>;
+
+  source: string;
+  elaboratedBy: string;
+  revisionBy: string;
+  approvedBy: string;
+  documentDate: Date;
 
   constructor(partial: Partial<RiskFactorGroupDataEntity>) {
     Object.assign(this, partial);

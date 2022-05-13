@@ -12,7 +12,7 @@ import { InviteUserDto } from '../../src/modules/users/dto/invite-user.dto';
 import { UserEntity } from '../../src/modules/users/entities/user.entity';
 import { UsersModule } from '../../src/modules/users/users.module';
 import { PrismaModule } from '../../src/prisma/prisma.module';
-import { Permission } from '../../src/shared/constants/enum/authorization';
+import { PermissionEnum } from '../../src/shared/constants/enum/authorization';
 import { PrismaDbExceptionFilter } from '../../src/shared/filters/prisma-db-exception.filter';
 import { JwtAuthGuard } from '../../src/shared/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../../src/shared/guards/permissions.guard';
@@ -217,7 +217,7 @@ describe('[Feature] Authorization', () => {
     it('should be able to access with crud on get', async () => {
       const invite = await createToken(app, sessionAdmin.token, {
         companyId: companyMain.id,
-        permissions: [`${Permission.USER}-cud`],
+        permissions: [`${PermissionEnum.USER}-cud`],
       });
 
       const user = await createUser(app, {
@@ -235,7 +235,7 @@ describe('[Feature] Authorization', () => {
       const newSession = await editUsersRoles(app, sessionAdmin.token, {
         companyId: companyMain.id,
         userId: user.id,
-        permissions: [`${Permission.USER}-r`],
+        permissions: [`${PermissionEnum.USER}-r`],
         roles: [],
       });
 
@@ -253,7 +253,7 @@ describe('[Feature] Authorization', () => {
 
       const invite = await createToken(app, sessionAdmin.token, {
         companyId: companyMain.id,
-        permissions: [`${Permission.USER}-c`],
+        permissions: [`${PermissionEnum.USER}-c`],
       });
 
       const user = await createUser(app, {
@@ -303,7 +303,7 @@ describe('[Feature] Authorization', () => {
     it('should be able to access only with same company and crud', async () => {
       const invite = await createToken(app, sessionAdmin.token, {
         companyId: companyMain.id,
-        permissions: [`${Permission.CREATE_COMPANY}-c`],
+        permissions: [`${PermissionEnum.CREATE_COMPANY}-c`],
       });
 
       const user = await createUser(app, {
@@ -357,7 +357,7 @@ describe('[Feature] Authorization', () => {
 
       const invite = await createToken(app, sessionAdmin.token, {
         companyId: companyMain.id,
-        permissions: [`${Permission.USER}-u`],
+        permissions: [`${PermissionEnum.USER}-u`],
       });
 
       const user = await createUser(app, {
@@ -381,7 +381,7 @@ describe('[Feature] Authorization', () => {
     it('should be able to access only with company or contract', async () => {
       const inviteContractOK = await createToken(app, sessionAdmin.token, {
         companyId: companyContract.id,
-        permissions: [`${Permission.INVITE_USER}-crud`],
+        permissions: [`${PermissionEnum.INVITE_USER}-crud`],
       });
 
       const userContractOK = await createUser(app, {
@@ -397,7 +397,7 @@ describe('[Feature] Authorization', () => {
 
       const inviteMainOK = await createToken(app, sessionAdmin.token, {
         companyId: companyMain.id,
-        permissions: [`${Permission.INVITE_USER}-crud`],
+        permissions: [`${PermissionEnum.INVITE_USER}-crud`],
       });
 
       const userMainOK = await createUser(app, {
@@ -415,7 +415,7 @@ describe('[Feature] Authorization', () => {
 
       const inviteMain2 = await createToken(app, sessionAdmin.token, {
         companyId: companyMain2.id,
-        permissions: [`${Permission.INVITE_USER}-crud`],
+        permissions: [`${PermissionEnum.INVITE_USER}-crud`],
       });
 
       const userMain2 = await createUser(app, {
@@ -468,7 +468,7 @@ describe('[Feature] Authorization', () => {
     it('should be able to access only with contract and crud', async () => {
       const inviteContractOK = await createToken(app, sessionAdmin.token, {
         companyId: companyContract.id,
-        permissions: [`${Permission.CREATE_COMPANY}-crud`],
+        permissions: [`${PermissionEnum.CREATE_COMPANY}-crud`],
       });
 
       const userContractOK = await createUser(app, {
@@ -484,7 +484,7 @@ describe('[Feature] Authorization', () => {
 
       const inviteMainOK = await createToken(app, sessionAdmin.token, {
         companyId: companyMain.id,
-        permissions: [`${Permission.CREATE_COMPANY}-crud`],
+        permissions: [`${PermissionEnum.CREATE_COMPANY}-crud`],
       });
 
       const userMainOK = await createUser(app, {
@@ -502,7 +502,7 @@ describe('[Feature] Authorization', () => {
 
       const inviteMain2 = await createToken(app, sessionAdmin.token, {
         companyId: companyMain2.id,
-        permissions: [`${Permission.CREATE_COMPANY}-crud`],
+        permissions: [`${PermissionEnum.CREATE_COMPANY}-crud`],
       });
 
       const userMain2 = await createUser(app, {
@@ -560,7 +560,7 @@ describe('[Feature] Authorization', () => {
 
       const invite = await createToken(app, sessionAdmin.token, {
         companyId: companyMain.id,
-        permissions: [`${Permission.INVITE_USER}-d`],
+        permissions: [`${PermissionEnum.INVITE_USER}-d`],
       });
 
       const user = await createUser(app, {
@@ -584,7 +584,7 @@ describe('[Feature] Authorization', () => {
     it('should be able to access only if is company member', async () => {
       const inviteContractOK = await createToken(app, sessionAdmin.token, {
         companyId: companyContract.id,
-        permissions: [`${Permission.CREATE_COMPANY}-crud`],
+        permissions: [`${PermissionEnum.CREATE_COMPANY}-crud`],
       });
 
       const userContractOK = await createUser(app, {
@@ -600,7 +600,7 @@ describe('[Feature] Authorization', () => {
 
       const inviteMainOK = await createToken(app, sessionAdmin.token, {
         companyId: companyMain.id,
-        permissions: [`${Permission.CREATE_COMPANY}-crud`],
+        permissions: [`${PermissionEnum.CREATE_COMPANY}-crud`],
       });
 
       const userMainOK = await createUser(app, {
@@ -618,7 +618,7 @@ describe('[Feature] Authorization', () => {
 
       const inviteMain2 = await createToken(app, sessionAdmin.token, {
         companyId: companyMain2.id,
-        permissions: [`${Permission.CREATE_COMPANY}-crud`],
+        permissions: [`${PermissionEnum.CREATE_COMPANY}-crud`],
       });
 
       const userMain2 = await createUser(app, {
@@ -666,7 +666,7 @@ describe('[Feature] Authorization', () => {
     it('should be able to access only if is contract', async () => {
       const inviteContractOK = await createToken(app, sessionAdmin.token, {
         companyId: companyContract.id,
-        permissions: [`${Permission.CREATE_COMPANY}-crud`],
+        permissions: [`${PermissionEnum.CREATE_COMPANY}-crud`],
       });
 
       const userContractOK = await createUser(app, {
@@ -682,7 +682,7 @@ describe('[Feature] Authorization', () => {
 
       const inviteMainOK = await createToken(app, sessionAdmin.token, {
         companyId: companyMain.id,
-        permissions: [`${Permission.CREATE_COMPANY}-crud`],
+        permissions: [`${PermissionEnum.CREATE_COMPANY}-crud`],
       });
 
       const userMainOK = await createUser(app, {
@@ -700,7 +700,7 @@ describe('[Feature] Authorization', () => {
 
       const inviteMain2 = await createToken(app, sessionAdmin.token, {
         companyId: companyMain2.id,
-        permissions: [`${Permission.CREATE_COMPANY}-crud`],
+        permissions: [`${PermissionEnum.CREATE_COMPANY}-crud`],
       });
 
       const userMain2 = await createUser(app, {
@@ -754,7 +754,7 @@ describe('[Feature] Authorization', () => {
     it('should be able to access only for contract and code', async () => {
       const inviteContractOK = await createToken(app, sessionAdmin.token, {
         companyId: companyContract.id,
-        permissions: [`${Permission.CREATE_COMPANY}-crud`],
+        permissions: [`${PermissionEnum.CREATE_COMPANY}-crud`],
       });
 
       const userContractOK = await createUser(app, {
@@ -788,7 +788,7 @@ describe('[Feature] Authorization', () => {
 
       const inviteMain2 = await createToken(app, sessionAdmin.token, {
         companyId: companyMain2.id,
-        permissions: [`${Permission.CREATE_COMPANY}-crud`],
+        permissions: [`${PermissionEnum.CREATE_COMPANY}-crud`],
       });
 
       const userMain2 = await createUser(app, {
