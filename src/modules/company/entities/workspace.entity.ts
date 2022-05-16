@@ -34,6 +34,8 @@ export class WorkspaceEntity implements Workspace {
   @ApiProperty({ description: 'The company related to the workspace' })
   company?: CompanyEntity;
 
+  description: string;
+
   constructor(partial: Partial<WorkspaceEntity>) {
     Object.assign(this, partial);
   }

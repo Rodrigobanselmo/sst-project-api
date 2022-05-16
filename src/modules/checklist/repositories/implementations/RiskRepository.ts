@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { IPrismaOptions } from '../../../../shared/interfaces/prisma-options.types';
@@ -277,27 +278,24 @@ export class RiskRepository implements IRiskRepository {
 
   async findAllAvailable(
     companyId: string,
-    options?: IPrismaOptions<{
-      company?: boolean;
-      recMed?: boolean;
-      generateSource?: boolean;
-    }> & { representAll?: boolean },
+    {
+      representAll,
+      ...options
+    }: {
+      select?: Prisma.RiskFactorsSelect;
+      include?: Prisma.RiskFactorsInclude;
+      representAll?: boolean;
+    } = {},
   ): Promise<RiskFactorsEntity[]> {
     const include = options.include || {};
-    const representAll =
-      typeof options.representAll === 'boolean'
-        ? { representAll: options.representAll }
-        : {};
+    const rall =
+      typeof representAll === 'boolean' ? { representAll: representAll } : {};
 
     const risks = await this.prisma.riskFactors.findMany({
       where: {
-        AND: [{ OR: [{ companyId }, { system: true }] }, representAll],
+        AND: [{ OR: [{ companyId }, { system: true }] }, rall],
       },
-      include: {
-        company: !!include.company,
-        recMed: !!include.recMed,
-        generateSource: !!include.generateSource,
-      },
+      ...options,
     });
 
     return risks.map((risk) => new RiskFactorsEntity(risk));

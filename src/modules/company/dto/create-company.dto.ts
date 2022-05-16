@@ -1,9 +1,7 @@
 import { CompanyTypesEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import {
-  ArrayNotEmpty,
   IsBoolean,
-  IsDefined,
   IsEnum,
   IsOptional,
   IsString,
@@ -17,6 +15,7 @@ import { StringCapitalizeTransform } from '../../../shared/transformers/string-c
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
 import { ActivityDto } from './activity.dto';
+import { AddressDto } from './address.dto';
 import { LicenseDto } from './license.dto';
 import { WorkspaceDto } from './workspace.dto';
 
@@ -32,6 +31,7 @@ export class CreateCompanyDto {
 
   @Transform(StringCapitalizeTransform, { toClassOnly: true })
   @IsString()
+  @IsOptional()
   @MaxLength(100)
   fantasy: string;
 
@@ -55,22 +55,60 @@ export class CreateCompanyDto {
   isConsulting: boolean;
 
   @ValidateNested()
+  @IsOptional()
   @Type(() => LicenseDto)
   license?: LicenseDto;
 
+  @ValidateNested()
+  @IsOptional()
+  @Type(() => AddressDto)
+  address?: AddressDto;
+
   @ValidateNested({ each: true })
-  @IsDefined()
-  @ArrayNotEmpty()
+  // @IsDefined()
+  // @ArrayNotEmpty()
   @Type(() => WorkspaceDto)
   readonly workspace: WorkspaceDto[];
 
   @ValidateNested({ each: true })
-  @IsDefined()
+  // @IsDefined()
   @Type(() => ActivityDto)
   readonly primary_activity: ActivityDto[];
 
   @ValidateNested({ each: true })
-  @IsDefined()
+  // @IsDefined()
   @Type(() => ActivityDto)
   readonly secondary_activity: ActivityDto[];
+
+  @IsOptional()
+  @IsString()
+  size: string;
+
+  @IsOptional()
+  @IsString()
+  phone: string;
+
+  @IsOptional()
+  @IsString()
+  legal_nature: string;
+
+  @IsOptional()
+  @IsString()
+  cadastral_situation: string;
+
+  @IsOptional()
+  @IsString()
+  activity_start_date: string;
+
+  @IsOptional()
+  @IsString()
+  cadastral_situation_date: string;
+
+  @IsOptional()
+  @IsString()
+  legal_nature_code: string;
+
+  @IsOptional()
+  @IsString()
+  cadastral_situation_description: string;
 }

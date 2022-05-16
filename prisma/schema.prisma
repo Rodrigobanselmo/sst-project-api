@@ -55,6 +55,23 @@ model Activity {
 }
 
 model Address {
+  id   String    @id @default(uuid())
+  companyId String
+  cep String 
+  workspaceId String?
+  street String?
+  number String?
+  complement String?
+  neighborhood String?
+  city String?
+  state String?
+  workspace Workspace? @relation(fields: [id,companyId], references: [id,companyId], onDelete: Cascade, onUpdate: Cascade)
+  
+  @@unique([workspaceId, companyId])
+}
+
+model AddressCompany {
+  id   String    @id @default(uuid())
   cep String 
   street String?
   number String?
@@ -62,11 +79,8 @@ model Address {
   neighborhood String?
   city String?
   state String?
-  workspaceId String
   companyId String
-  workspace Workspace @relation(fields: [workspaceId,companyId], references: [id,companyId], onDelete: Cascade, onUpdate: Cascade)
-  
-  @@id([workspaceId, companyId])
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 
@@ -96,20 +110,30 @@ model Company {
   id   String    @id @default(uuid())
   cnpj String
   name String  
-  fantasy String
-  status StatusEnum @default(ACTIVE)
-  type CompanyTypesEnum @default(MATRIZ)
+  fantasy String?
+  description String?
+  size String?
+  phone String?
+  legal_nature String?
+  cadastral_situation String?
+  activity_start_date String?
+  cadastral_situation_date String?
+  legal_nature_code String?
+  cadastral_situation_description String?
   isConsulting Boolean @default(false)
+  licenseId Int? 
   created_at DateTime @default(now())
   updated_at  DateTime   @updatedAt
+  status StatusEnum @default(ACTIVE)
+  type CompanyTypesEnum @default(MATRIZ)
   users UserCompany[]
   workspace Workspace[]
+  address AddressCompany?
   primary_activity Activity[] @relation(name: "primary_activity")
   secondary_activity Activity[] @relation(name: "secondary_activity")
   employees Employee[] 
   receivingServiceContracts Contract[]
   applyingServiceContracts Contract[]  @relation(name: "contracts")
-  licenseId Int? 
   license License? @relation(name:"license",fields: [licenseId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
   riskFactors RiskFactors[] 
   homogeneousGroup HomogeneousGroup[] 
@@ -216,9 +240,9 @@ model Hierarchy {
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   parent Hierarchy?  @relation(name: "children_parent", fields: [parentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   children Hierarchy[] @relation(name: "children_parent")
-  employee Employee[] 
-  homogeneousGroup HomogeneousGroup[]
-  riskFactorData RiskFactorData[] 
+  employees Employee[] 
+  homogeneousGroups HomogeneousGroup[]
+  riskFactorDatas RiskFactorData[] 
 
   @@index(companyId)
 }
@@ -290,10 +314,25 @@ model RiskFactors {
   id    String     @default(uuid())
   name String 
   companyId String
-  severity Int 
-  system Boolean
+  severity Int  @default(0)
+  system Boolean @default(false)
   appendix String? 
+  risk String? 
   propagation String[] 
+  exame String?
+  symptoms String?
+  method String?
+  unit String?
+  cas String?
+  breather String?
+  nr15lt String?
+  twa String?
+  stel String?
+  ipvs String?
+  pv String?
+  pe String?
+  carnogenicityACGIH String?
+  carnogenicityLinach String?
   status StatusEnum @default(ACTIVE)
   type RiskFactorsEnum
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
@@ -373,10 +412,11 @@ model UserCompany {
 model Workspace {
   id    String     @default(uuid()) 
   name String  
-  status StatusEnum @default(ACTIVE)
+  description String?  
   created_at DateTime @default(now())
   updated_at  DateTime   @updatedAt
   companyId String
+  status StatusEnum @default(ACTIVE)
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   address Address?
   employee Employee[]

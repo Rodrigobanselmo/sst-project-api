@@ -58,12 +58,12 @@ export class RiskGroupDataRepository {
               epis: true,
               riskFactor: true,
               hierarchy: options?.includeEmployees
-                ? { include: { employee: true } }
+                ? { include: { employees: true } }
                 : true,
               homogeneousGroup: {
                 include: {
                   hierarchies: options?.includeEmployees
-                    ? { include: { employee: true } }
+                    ? { include: { employees: true } }
                     : true,
                 },
               },

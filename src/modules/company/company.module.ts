@@ -28,6 +28,9 @@ import { DeleteHomoGroupService } from './services/homoGroup/delete-homo-group/d
 import { FindByCompanyHomoGroupService } from './services/homoGroup/find-by-company-homo-group/find-by-company-homo-group.service';
 import { HomoGroupRepository } from './repositories/implementations/HomoGroupRepository';
 import { HomoGroupsController } from './controller/HomoGroups/HomoGroups.controller';
+import { FindCnpjService } from './services/company/find-cnpj/find-cnpj.service';
+import { HttpService } from '@nestjs/axios';
+import { FindCepService } from './services/company/find-cep/find-cep.service';
 
 @Module({
   controllers: [
@@ -61,6 +64,8 @@ import { HomoGroupsController } from './controller/HomoGroups/HomoGroups.control
     UpdateHomoGroupService,
     DeleteHomoGroupService,
     FindByCompanyHomoGroupService,
+    FindCnpjService,
+    FindCepService,
   ],
   exports: [CompanyRepository, EmployeeRepository, HierarchyRepository],
 })

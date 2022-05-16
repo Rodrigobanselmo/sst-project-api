@@ -1,3 +1,4 @@
+import { StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import {
   IsDefined,
@@ -6,17 +7,15 @@ import {
   IsString,
   MaxLength,
   ValidateNested,
-  IsNumber,
 } from 'class-validator';
-import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
 
 import { StringCapitalizeTransform } from '../../../shared/transformers/string-capitalize';
-import { AddressDto } from './address.dto';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
-import { StatusEnum } from '@prisma/client';
+import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
+import { AddressDto } from './address.dto';
 
 export class WorkspaceDto {
-  @IsNumber()
+  @IsOptional()
   @IsString()
   id?: string;
 

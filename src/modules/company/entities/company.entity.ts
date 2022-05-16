@@ -58,7 +58,17 @@ export class CompanyEntity implements Company {
   @ApiProperty({ description: 'The employees related to the company' })
   employees?: EmployeeEntity[];
 
+  description: string;
+
   constructor(partial: Partial<CompanyEntity>) {
     Object.assign(this, partial);
   }
+  size: string;
+  phone: string;
+  legal_nature: string;
+  cadastral_situation: string;
+  activity_start_date: string;
+  cadastral_situation_date: string;
+  legal_nature_code: string;
+  cadastral_situation_description: string;
 }

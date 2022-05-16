@@ -34,11 +34,11 @@ export class RiskFactorGroupDataEntity implements RiskFactorGroupData {
   })
   company?: Partial<CompanyEntity>;
 
-  source: string;
-  elaboratedBy: string;
-  revisionBy: string;
-  approvedBy: string;
-  documentDate: Date;
+  source: string | null;
+  elaboratedBy: string | null;
+  revisionBy: string | null;
+  approvedBy: string | null;
+  documentDate: Date | null;
 
   constructor(partial: Partial<RiskFactorGroupDataEntity>) {
     Object.assign(this, partial);

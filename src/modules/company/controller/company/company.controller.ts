@@ -1,14 +1,17 @@
-import { Body, Controller, Get, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { Public } from 'src/shared/decorators/public.decorator';
+
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
-
 import { CreateCompanyDto } from '../../dto/create-company.dto';
 import { CreateContractDto } from '../../dto/create-contract.dto';
 import { UpdateCompanyDto } from '../../dto/update-company.dto';
 import { CreateCompanyService } from '../../services/company/create-company/create-company.service';
 import { CreateContractService } from '../../services/company/create-contract/create-contract.service';
 import { FindAllCompaniesService } from '../../services/company/find-all-companies/find-all-companies.service';
+import { FindCepService } from '../../services/company/find-cep/find-cep.service';
+import { FindCnpjService } from '../../services/company/find-cnpj/find-cnpj.service';
 import { FindCompanyService } from '../../services/company/find-company/find-company.service';
 import { UpdateCompanyService } from '../../services/company/update-company/update-company.service';
 
@@ -21,6 +24,8 @@ export class CompanyController {
     private readonly updateCompanyService: UpdateCompanyService,
     private readonly findAllCompaniesService: FindAllCompaniesService,
     private readonly findCompanyService: FindCompanyService,
+    private readonly findCnpjService: FindCnpjService,
+    private readonly findCepService: FindCepService,
   ) {}
 
   @Get('/:companyId')
@@ -31,6 +36,17 @@ export class CompanyController {
   @Get()
   findAll(@User() userPayloadDto: UserPayloadDto) {
     return this.findAllCompaniesService.execute(userPayloadDto);
+  }
+
+  @Get('cnpj/:cnpj')
+  findCNPJ(@Param('cnpj') cnpj: string) {
+    return this.findCnpjService.execute(cnpj);
+  }
+
+  @Public()
+  @Get('cep/:cep')
+  findCEP(@Param('cep') cep: string) {
+    return this.findCepService.execute(cep);
   }
 
   @Post()

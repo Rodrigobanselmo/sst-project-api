@@ -1,41 +1,37 @@
 /* eslint-disable prettier/prettier */
 import { HierarchyEnum } from '@prisma/client';
-import { headerTableProps } from '../../elements/header';
+
+import { bodyTableProps } from '../../elements/body';
 
 export enum FirstRiskInventoryColumnEnum {
-  INFO,
-  HIERARCHY,
-  MORE,
+  SOURCE,
+  REVIEW,
+  ELABORATION_BY,
+  APPROVE_BY,
+  DATA,
+  UNIT,
 }
 
-const rows = ["Fonte:", ]
+const RewRiskInventoryHeader = (): bodyTableProps[] => {
+  const header: bodyTableProps[] = [];
 
-const RewRiskInventoryHeader = (): headerTableProps[] => {
-  const header: headerTableProps[] = [];
+  header[FirstRiskInventoryColumnEnum.SOURCE] = { text: 'Fonte:', bold: true };
+  header[FirstRiskInventoryColumnEnum.REVIEW] = { text: 'Revisão:' , bold: true };
+  header[FirstRiskInventoryColumnEnum.ELABORATION_BY] = { text: 'Elaborador:', bold: true  };
+  header[FirstRiskInventoryColumnEnum.APPROVE_BY] = { text: 'Aprovação:', bold: true  };
+  header[FirstRiskInventoryColumnEnum.DATA] = { text: 'Data:', bold: true };
+  header[FirstRiskInventoryColumnEnum.UNIT] = { text: 'Unidade:', bold: true  };
 
-  header[FirstRiskInventoryColumnEnum.INFO] = { text: 'ITEM' }
-  header[FirstRiskInventoryColumnEnum.HIERARCHY] = { text: 'GSE' }
-  header[FirstRiskInventoryColumnEnum.MORE] = { text: 'PERIGOS\nFATORES DE RISCO' }
-
-  return header
+  return header;
 };
 
-export const firstRiskInventoryHeader = RewRiskInventoryHeader()
+export const firstRiskInventoryHeader = RewRiskInventoryHeader();
 
-
-export const riskInventoryTitle: string[] = [
-  'PLANO DE AÇÃO',
-  'PGR - PROGRAMA DE GERENCIAMENTO DE RISCOS',
-];
-
-
-
-  export const hierarchyMap: Record<string, {text:string; index:number}> = {
-    [HierarchyEnum.DIRECTORY]: {text:'DIRETORIA:', index:0},
-    [HierarchyEnum.MANAGEMENT]: {text:'Gerência:', index:1},
-    [HierarchyEnum.SECTOR]: {text:'Setor:', index:2},
-    [HierarchyEnum.SUB_SECTOR]: {text:'Subsetor (Posto de Trabalho):', index:3},
-    [HierarchyEnum.OFFICE]: {text:'Cargo:', index:4},
-    [HierarchyEnum.SUB_OFFICE]: {text:'Cardo Desenvolvido:', index:5},
-
-  };
+export const hierarchyMap: Record<string, {text:string; index:number}> = {
+  [HierarchyEnum.DIRECTORY]: {text:'DIRETORIA:', index: 0 },
+  [HierarchyEnum.MANAGEMENT]: {text:'Gerência:', index: 1 },
+  [HierarchyEnum.SECTOR]: {text:'Setor:', index: 2 },
+  [HierarchyEnum.SUB_SECTOR]: {text:'Subsetor (Posto de Trabalho):', index: 3 },
+  [HierarchyEnum.OFFICE]: {text:'Cargo:', index: 4 },
+  [HierarchyEnum.SUB_OFFICE]: {text:'Cardo Desenvolvido:', index: 5 },
+};

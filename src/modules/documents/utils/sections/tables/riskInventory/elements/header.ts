@@ -1,25 +1,52 @@
 import {
   AlignmentType,
-  HeightRule,
+  BorderStyle,
+  ITableCellOptions,
   Paragraph,
   TableCell,
   TableRow,
-  TextDirection,
   TextRun,
   VerticalAlign,
   WidthType,
 } from 'docx';
 import { palette } from 'src/shared/constants/palette';
 
-export interface headerTableProps {
+export interface headerTableProps extends Partial<ITableCellOptions> {
   text: string;
   size?: number;
+  borderBottom?: boolean;
   position?: number;
   columnSpan?: number;
 }
 
+export const whiteBorder = {
+  style: BorderStyle.SINGLE,
+  color: 'ffffff',
+  size: 20,
+};
+
+export const whiteColumnBorder = {
+  style: BorderStyle.SINGLE,
+  color: 'ffffff',
+  size: 5,
+};
+
+export const borderBottomStyle = {
+  top: { style: BorderStyle.NIL },
+  bottom: whiteBorder,
+  left: { style: BorderStyle.NIL },
+  right: { style: BorderStyle.NIL },
+};
+
+export const borderRightStyle = {
+  top: { style: BorderStyle.NIL },
+  bottom: { style: BorderStyle.NIL },
+  left: { style: BorderStyle.NIL },
+  right: whiteBorder,
+};
+
 export class TableHeaderElements {
-  headerTitle({ text, columnSpan }: headerTableProps) {
+  headerTitle({ text, columnSpan, ...props }: headerTableProps) {
     return new TableRow({
       tableHeader: true,
       children: [
@@ -29,7 +56,7 @@ export class TableHeaderElements {
               children: [
                 new TextRun({
                   text: text,
-                  size: 20,
+                  size: 14,
                   bold: true,
                   color: '000000',
                 }),
@@ -40,7 +67,8 @@ export class TableHeaderElements {
           shading: { fill: palette.table.header.string },
           verticalAlign: VerticalAlign.CENTER,
           columnSpan: columnSpan,
-          margins: { top: 150, bottom: 150 },
+          margins: { top: 60, bottom: 60 },
+          ...props,
         }),
       ],
     });
@@ -48,13 +76,19 @@ export class TableHeaderElements {
 
   headerRow(tableCell: TableCell[]) {
     return new TableRow({
-      height: { value: 1600, rule: HeightRule.EXACT },
       tableHeader: true,
       children: [...tableCell],
     });
   }
 
-  headerCell({ text, size = 10, ...rest }: headerTableProps) {
+  spacing() {
+    return new Paragraph({
+      children: [],
+      spacing: { line: 20 },
+    });
+  }
+
+  headerCell({ text = '', size = 10, ...rest }: headerTableProps) {
     return new TableCell({
       children: [
         ...text.split('\n').map(
@@ -73,9 +107,9 @@ export class TableHeaderElements {
         ),
       ],
       shading: { fill: palette.table.header.string },
-      textDirection: TextDirection.BOTTOM_TO_TOP_LEFT_TO_RIGHT,
       verticalAlign: VerticalAlign.CENTER,
       width: { size, type: WidthType.PERCENTAGE },
+      margins: { top: 60, bottom: 60 },
       ...rest,
     });
   }

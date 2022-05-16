@@ -6,7 +6,7 @@ import { StatusEnum } from '@prisma/client';
 
 export class AddressEntity implements Address {
   @ApiProperty({ description: 'address id.' })
-  id: number;
+  id: string;
 
   @ApiProperty({ description: 'address number.' })
   number: string;

@@ -4,5 +4,5 @@ export const hexToColors = (hex: string) => {
 
 export const palette = {
   table: { header: hexToColors('#fca557'), row: hexToColors('#fcf2e8') },
-  text: { main: hexToColors('#000000') },
+  text: { main: hexToColors('#000000'), attention: hexToColors('#ff0000') },
 };

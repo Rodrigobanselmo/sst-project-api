@@ -1,22 +1,20 @@
-import { PageOrientation, Table, WidthType } from 'docx';
+import { Table, WidthType } from 'docx';
 import { RiskFactorGroupDataEntity } from 'src/modules/checklist/entities/riskGroupData.entity';
-import { HierarchyEntity } from 'src/modules/company/entities/hierarchy.entity';
-import {
-  firstRiskInventoryHeader,
-  riskInventoryTitle,
-} from 'src/modules/documents/utils/sections/tables/riskInventory/parts/first/first.constant';
-import { TableBodyElements } from '../../elements/body';
-import { TableHeaderElements } from '../../elements/header';
+import { firstRiskInventoryHeader } from 'src/modules/documents/utils/sections/tables/riskInventory/parts/first/first.constant';
 
-import { hierarchyConverter } from './converter/hierarchy.converter';
+import { MapData } from '../../converter/hierarchy.converter';
+import { TableBodyElements } from '../../elements/body';
+import { borderBottomStyle, TableHeaderElements } from '../../elements/header';
+import { documentConverter } from './first.converter';
 
 export const firstRiskInventoryTableSection = (
-  hierarchiesEntity: HierarchyEntity[],
+  riskFactorGroupData: RiskFactorGroupDataEntity,
+  hierarchyData: MapData,
 ) => {
-  // const riskInventoryData = riskInventoryConverter(riskFactorGroupData);
-  const hierarchyData = hierarchyConverter(hierarchiesEntity);
-
-  console.log('hierarchyData', hierarchyData);
+  const riskInventoryData = documentConverter(
+    riskFactorGroupData,
+    hierarchyData,
+  );
 
   const tableHeaderElements = new TableHeaderElements();
   const tableBodyElements = new TableBodyElements();
@@ -27,13 +25,11 @@ export const firstRiskInventoryTableSection = (
       tableHeaderElements.headerTitle({
         text: 'INVENTÁRIO DE RISCO (APR)',
         columnSpan: firstRiskInventoryHeader.length,
+        borders: borderBottomStyle,
       }),
-      // tableHeaderElements.headerRow(
-      //   riskInventoryHeader.map(tableHeaderElements.headerCell),
-      // ),
-      // ...riskInventoryData.map((data) =>
-      //   tableBodyElements.tableRow(data.map(tableBodyElements.tableCell)),
-      // ),
+      ...riskInventoryData.map((data) =>
+        tableBodyElements.tableRow(data.map(tableBodyElements.tableCell)),
+      ),
     ],
   });
 

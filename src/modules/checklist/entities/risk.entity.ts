@@ -57,7 +57,23 @@ export class RiskFactorsEntity implements RiskFactors {
   @ApiProperty({ description: 'The array with generate source data' })
   generateSource?: GenerateSourceEntity[];
 
+  risk: string;
+
   constructor(partial: Partial<RiskFactorsEntity>) {
     Object.assign(this, partial);
   }
+  exame: string;
+  symptoms: string;
+  method: string;
+  unit: string;
+  cas: string;
+  breather: string;
+  nr15lt: string;
+  twa: string;
+  stel: string;
+  ipvs: string;
+  pv: string;
+  pe: string;
+  carnogenicityACGIH: string;
+  carnogenicityLinach: string;
 }

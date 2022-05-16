@@ -24,16 +24,14 @@ export class PgrDownloadService {
 
     const hierarchyData =
       await this.hierarchyRepository.findAllHierarchyByCompany(companyId, {
-        include: { employee: true, workplace: true },
+        include: { employees: true, workplace: true, homogeneousGroups: true },
       });
 
-    // console.log('hierarchyData', hierarchyData);
-    // const doc = new Document({
-    //   sections: [actionPlanTableSection(riskGroupData)],
-    // });
-
     const doc = new Document({
-      sections: [riskInventoryTableSection(riskGroupData, hierarchyData)],
+      sections: [
+        actionPlanTableSection(riskGroupData),
+        ...riskInventoryTableSection(riskGroupData, hierarchyData),
+      ],
     });
 
     return doc;

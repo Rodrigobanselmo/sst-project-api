@@ -7,7 +7,7 @@ export class FindCompanyService {
   constructor(private readonly companyRepository: CompanyRepository) {}
 
   async execute(user: UserPayloadDto) {
-    return await this.companyRepository.findById(user.companyId, {
+    return await this.companyRepository.findById(user.targetCompanyId, {
       include: { workspace: true },
     });
   }

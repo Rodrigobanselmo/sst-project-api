@@ -22,12 +22,12 @@ export class CompanyRepository implements ICompanyRepository {
     primary_activity = [],
     secondary_activity = [],
     license,
+    address,
     companyId,
     ...createCompanyDto
   }: ICreateCompany): Promise<CompanyEntity> {
     const companyUUId = uuidV4();
     const isReceivingService = !!companyId;
-
     const company = await this.prisma.company.create({
       data: {
         id: companyUUId,
@@ -43,38 +43,51 @@ export class CompanyRepository implements ICompanyRepository {
               create: { applyingServiceCompanyId: companyId },
             }
           : undefined,
-        workspace: {
-          create: [
-            ...workspace.map(({ id, address, ...work }) => ({
-              ...work,
-              address: { create: address },
-            })),
-          ],
-        },
+        address: address
+          ? {
+              create: { ...address },
+            }
+          : undefined,
+        workspace: workspace
+          ? {
+              create: [
+                ...workspace.map(({ id, address, ...work }) => ({
+                  ...work,
+                  address: { create: address },
+                })),
+              ],
+            }
+          : undefined,
+
         // TODO: should be connect only
-        primary_activity: {
-          connectOrCreate: [
-            ...primary_activity.map((activity) => ({
-              create: activity,
-              where: { code: activity.code },
-            })),
-          ],
-        },
+        primary_activity: primary_activity
+          ? {
+              connectOrCreate: [
+                ...primary_activity.map((activity) => ({
+                  create: activity,
+                  where: { code: activity.code },
+                })),
+              ],
+            }
+          : undefined,
         // TODO: should be connect only
-        secondary_activity: {
-          connectOrCreate: [
-            ...secondary_activity.map((activity) => ({
-              create: activity,
-              where: { code: activity.code },
-            })),
-          ],
-        },
+        secondary_activity: secondary_activity
+          ? {
+              connectOrCreate: [
+                ...secondary_activity.map((activity) => ({
+                  create: activity,
+                  where: { code: activity.code },
+                })),
+              ],
+            }
+          : undefined,
       },
       include: {
         workspace: { include: { address: true } },
         primary_activity: true,
         secondary_activity: true,
         license: true,
+        address: true,
       },
     });
 
@@ -88,6 +101,7 @@ export class CompanyRepository implements ICompanyRepository {
       workspace = [],
       employees = [],
       users = [],
+      address,
       license,
       companyId,
       ...updateCompanyDto
@@ -237,6 +251,7 @@ export class CompanyRepository implements ICompanyRepository {
           primary_activity = [],
           employees = [],
           workspace = [],
+          address,
           id,
           users,
           license,
@@ -333,6 +348,7 @@ export class CompanyRepository implements ICompanyRepository {
     employees = [],
     license,
     users = [],
+    address,
     companyId,
     ...updateCompanyDto
   }: UpdateCompanyDto) {
@@ -392,6 +408,7 @@ export class CompanyRepository implements ICompanyRepository {
           ? { include: { address: true } }
           : false,
         employees: !!include?.employees,
+        address: true,
       },
     });
 
