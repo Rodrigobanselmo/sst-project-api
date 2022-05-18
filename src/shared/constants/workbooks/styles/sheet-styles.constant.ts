@@ -1,4 +1,4 @@
-import ExcelJS from 'excelJS';
+import ExcelJS from 'exceljs';
 
 const colors = {
   optional: '4fb364',

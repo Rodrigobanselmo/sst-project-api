@@ -18,7 +18,9 @@ class DayJSProvider implements IDateProvider {
   }
 
   addTime(date: Date, value: number, type: string): Date {
-    return dayjs(date).add(value, type).toDate();
+    return dayjs(date)
+      .add(value, type as any)
+      .toDate();
   }
 
   compareIfBefore(start_date: Date, end_date: Date): boolean {
