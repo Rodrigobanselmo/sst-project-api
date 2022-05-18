@@ -244,6 +244,7 @@ model Hierarchy {
   homogeneousGroups HomogeneousGroup[]
   riskFactorDatas RiskFactorData[] 
 
+  @@unique([id, companyId])
   @@index(companyId)
 }
 
@@ -354,7 +355,7 @@ model RiskFactorGroupData {
   elaboratedBy String?
   revisionBy String?
   approvedBy String?
-  documentDate DateTime @default(now())
+  visitDate DateTime?
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   data RiskFactorData[]
   status StatusEnum @default(PROGRESS)
@@ -412,6 +413,7 @@ model UserCompany {
 model Workspace {
   id    String     @default(uuid()) 
   name String  
+  abbreviation String? //!remove ?
   description String?  
   created_at DateTime @default(now())
   updated_at  DateTime   @updatedAt
@@ -422,6 +424,7 @@ model Workspace {
   employee Employee[]
   hierarchy Hierarchy[]
 
+  @@unique([abbreviation, companyId])
   @@id([id, companyId])
 }
 

@@ -71,4 +71,5 @@ export class CompanyEntity implements Company {
   cadastral_situation_date: string;
   legal_nature_code: string;
   cadastral_situation_description: string;
+  employeeCount?: number;
 }

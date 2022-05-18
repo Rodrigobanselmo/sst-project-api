@@ -13,8 +13,6 @@ export const riskInventoryTableSection = (
 ) => {
   const hierarchyData = hierarchyConverter(hierarchiesEntity);
 
-  // hierarchyData.forEach((data) => console.log(data.org));
-
   const sectionsTables = [];
   hierarchyData.forEach((hierarchy) => {
     // eslint-disable-next-line prettier/prettier

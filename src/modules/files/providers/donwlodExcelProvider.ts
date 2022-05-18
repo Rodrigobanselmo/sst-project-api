@@ -29,12 +29,15 @@ export class DownloadExcelProvider {
     );
 
     // create new table with new data
-    const newExcelFile = await this.excelProvider.create({
-      fileName: Workbook.name,
-      version: databaseTable.version,
-      lastUpdate: new Date(databaseTable.updated_at),
-      sheets: allSheets,
-    });
+    const newExcelFile = await this.excelProvider.create(
+      {
+        fileName: Workbook.name,
+        version: databaseTable.version,
+        lastUpdate: new Date(databaseTable.updated_at),
+        sheets: allSheets,
+      },
+      companyId,
+    );
 
     return newExcelFile;
   }

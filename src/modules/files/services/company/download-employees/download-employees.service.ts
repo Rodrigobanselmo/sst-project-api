@@ -1,17 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { WorkspaceRepository } from 'src/modules/company/repositories/implementations/WorkspaceRepository';
-import { CompanyRepository } from '../../../../../modules/company/repositories/implementations/CompanyRepository';
-import { HierarchyRepository } from '../../../../../modules/company/repositories/implementations/HierarchyRepository';
-import { DownloadExcelProvider } from '../../../../../modules/files/providers/donwlodExcelProvider';
+import { CompanyRepository } from '../../../../company/repositories/implementations/CompanyRepository';
+import { HierarchyRepository } from '../../../../company/repositories/implementations/HierarchyRepository';
+import { DownloadExcelProvider } from '../../../providers/donwlodExcelProvider';
 import { workbooksConstant } from '../../../../../shared/constants/workbooks/workbooks.constant';
 import { WorkbooksEnum } from '../../../../../shared/constants/workbooks/workbooks.enum';
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { ExcelProvider } from '../../../../../shared/providers/ExcelProvider/implementations/ExcelProvider';
 
-import { findAllEmployees } from './../../../utils/findAllEmployees';
+import { findAllEmployees } from '../../../utils/findAllEmployees';
+import { WorkspaceRepository } from 'src/modules/company/repositories/implementations/WorkspaceRepository';
 
 @Injectable()
-export class DownloadUniqueCompanyService {
+export class DownloadEmployeesService {
   constructor(
     private readonly excelProvider: ExcelProvider,
     private readonly companyRepository: CompanyRepository,
@@ -21,8 +21,8 @@ export class DownloadUniqueCompanyService {
   ) {}
 
   async execute(userPayloadDto: UserPayloadDto) {
-    const Workbook = workbooksConstant[WorkbooksEnum.COMPANY];
-    const companyId = userPayloadDto.companyId;
+    const Workbook = workbooksConstant[WorkbooksEnum.EMPLOYEES];
+    const companyId = userPayloadDto.targetCompanyId;
 
     return this.downloadExcelProvider.newTableData({
       findAll: (sheet) =>

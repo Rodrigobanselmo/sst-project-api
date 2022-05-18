@@ -175,7 +175,7 @@ export class CompanyRepository implements ICompanyRepository {
                         }
                       : undefined,
                   },
-                  where: { id_companyId: { companyId, id: id || 'no-id' } },
+                  where: { id_companyId: { companyId, id: id || -1 } },
                 };
               },
             ),
@@ -399,6 +399,10 @@ export class CompanyRepository implements ICompanyRepository {
   ): Promise<CompanyEntity> {
     const include = options?.include || {};
 
+    const employeeCount = await this.prisma.employee.count({
+      where: { companyId: id },
+    });
+
     const company = await this.prisma.company.findUnique({
       where: { id },
       include: {
@@ -412,7 +416,7 @@ export class CompanyRepository implements ICompanyRepository {
       },
     });
 
-    return new CompanyEntity(company);
+    return new CompanyEntity({ ...company, employeeCount: employeeCount });
   }
 
   async findAllRelatedByCompanyId(

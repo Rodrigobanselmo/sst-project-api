@@ -1,4 +1,6 @@
 import { Hierarchy, HierarchyEnum, StatusEnum } from '@prisma/client';
+import { WorkspaceRepository } from 'src/modules/company/repositories/implementations/WorkspaceRepository';
+import { IEmployeeSheet } from 'src/shared/constants/workbooks/sheets/employees/employeesSheet.constant';
 import { CompanyRepository } from '../../../modules/company/repositories/implementations/CompanyRepository';
 import { HierarchyRepository } from '../../../modules/company/repositories/implementations/HierarchyRepository';
 import { ICompanyUniqueSheet } from '../../../shared/constants/workbooks/sheets/companyUnique/companyUniqueSheet.constant';
@@ -10,8 +12,9 @@ import { HierarchyExcelProvider } from '../providers/HierarchyExcelProvider';
 export const findAllEmployees = async (
   excelProvider: ExcelProvider,
   companyRepository: CompanyRepository,
+  workspaceRepository: WorkspaceRepository,
   hierarchyRepository: HierarchyRepository,
-  riskSheet: ICompanyUniqueSheet,
+  riskSheet: ICompanyUniqueSheet | IEmployeeSheet,
   companyId: string,
 ) => {
   const hierarchyExcel = new HierarchyExcelProvider();
@@ -52,8 +55,21 @@ export const findAllEmployees = async (
     return employee;
   });
 
+  const workspaces = await workspaceRepository.findByCompany(companyId);
+
+  company.employees = company.employees.map((employee) => {
+    const workspace = workspaces.find(
+      (workspace) => workspace.id === employee.workplaceId,
+    );
+
+    return {
+      ...employee,
+      abbreviation: workspace.abbreviation,
+    };
+  });
+
   const excelRows = await excelProvider.transformToExcelData(
-    [company],
+    company.employees,
     riskSheet.columns,
   );
 

@@ -1,12 +1,14 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { HierarchyEnum } from '@prisma/client';
-import { WorkspaceRepository } from 'src/modules/company/repositories/implementations/WorkspaceRepository';
-import { CompanyRepository } from '../../../../../modules/company/repositories/implementations/CompanyRepository';
-import { HierarchyRepository } from '../../../../../modules/company/repositories/implementations/HierarchyRepository';
-import { HierarchyExcelProvider } from '../../../../../modules/files/providers/HierarchyExcelProvider';
-import { UploadExcelProvider } from '../../../../../modules/files/providers/uploadExcelProvider';
-import { findAllEmployees } from '../../../../../modules/files/utils/findAllEmployees';
-import { ErrorMessageEnum } from '../../../../../shared/constants/enum/errorMessage';
+import { CompanyRepository } from '../../../../company/repositories/implementations/CompanyRepository';
+import { HierarchyRepository } from '../../../../company/repositories/implementations/HierarchyRepository';
+import { HierarchyExcelProvider } from '../../../providers/HierarchyExcelProvider';
+import { UploadExcelProvider } from '../../../providers/uploadExcelProvider';
+import { findAllEmployees } from '../../../utils/findAllEmployees';
+import {
+  ErrorCompanyEnum,
+  ErrorMessageEnum,
+} from '../../../../../shared/constants/enum/errorMessage';
 import { ICompanySheet } from '../../../../../shared/constants/workbooks/sheets/company/companySheet.constant';
 import { workbooksConstant } from '../../../../../shared/constants/workbooks/workbooks.constant';
 import { WorkbooksEnum } from '../../../../../shared/constants/workbooks/workbooks.enum';
@@ -17,9 +19,10 @@ import { asyncEach } from '../../../../../shared/utils/asyncEach';
 
 import { DatabaseTableEntity } from '../../../entities/databaseTable.entity';
 import { DatabaseTableRepository } from '../../../repositories/implementations/DatabaseTableRepository';
+import { WorkspaceRepository } from 'src/modules/company/repositories/implementations/WorkspaceRepository';
 
 @Injectable()
-export class UploadUniqueCompanyService {
+export class UploadEmployeesService {
   constructor(
     private readonly excelProvider: ExcelProvider,
     private readonly companyRepository: CompanyRepository,
@@ -34,7 +37,7 @@ export class UploadUniqueCompanyService {
     const buffer = file.buffer;
     const hierarchyExcel = new HierarchyExcelProvider();
 
-    const Workbook = workbooksConstant[WorkbooksEnum.COMPANY];
+    const Workbook = workbooksConstant[WorkbooksEnum.EMPLOYEES];
 
     const system = userPayloadDto.isMaster;
     const companyId = userPayloadDto.targetCompanyId;
@@ -46,25 +49,33 @@ export class UploadUniqueCompanyService {
         companyId,
       );
 
-    const company = await this.uploadExcelProvider.getAllData({
+    let employeesData = await this.uploadExcelProvider.getAllData({
       buffer,
       Workbook,
       read,
       DatabaseTable,
     });
 
-    if (company.length != 1)
-      throw new BadRequestException(`Only one company is allowed`);
+    const workplaces = await this.workspaceRepository.findByCompany(companyId);
 
-    // TODO: hierarchyId
+    employeesData = employeesData.map((employee) => {
+      const workplace = workplaces.find(
+        (work) => work.abbreviation === employee.abbreviation,
+      );
+
+      if (!workplace)
+        throw new BadRequestException(ErrorCompanyEnum.WORKPLACE_NOT_FOUND);
+
+      delete employee.abbreviation;
+      return { ...employee, workplaceId: workplace.id };
+    });
 
     const allHierarchyTree = hierarchyExcel.transformArrayToHierarchyMapTree(
       await this.hierarchyRepository.findAllHierarchyByCompany(companyId),
     );
 
-    const sheetHierarchyTree = hierarchyExcel.createTreeMapFromHierarchyStruct(
-      company[0].employees,
-    );
+    const sheetHierarchyTree =
+      hierarchyExcel.createTreeMapFromHierarchyStruct(employeesData);
 
     const hierarchyTree = hierarchyExcel.compare(
       allHierarchyTree,
@@ -89,7 +100,7 @@ export class UploadUniqueCompanyService {
 
     await asyncEach(Object.keys(HierarchyEnum), upsertHierarchy);
 
-    const employees = company[0].employees.map((employee) => {
+    const employees = employeesData.map((employee) => {
       const newEmployee = { ...employee, cpf: '908' };
       let hierarchy = null as any;
 
@@ -126,9 +137,9 @@ export class UploadUniqueCompanyService {
 
     // update or create all
     await this.companyRepository.update({
-      ...company[0],
-      companyId: company[0].id,
+      companyId,
       employees,
+      users: [],
     });
 
     return await this.uploadExcelProvider.newTableData({
@@ -165,7 +176,6 @@ const read = async (
   const database = await excelProvider.transformToTableData(
     table,
     sheet.columns,
-    { isArrayWithMissingFirstData: true },
   );
 
   if (databaseTable?.version && database.version !== databaseTable.version)

@@ -9,6 +9,6 @@ export const excelWorkplaceNotes = async (
   });
 
   return workplaces.map((workplace) => {
-    return `${workplace.id} - ${workplace.name}`;
+    return `${workplace.abbreviation}`;
   });
 };

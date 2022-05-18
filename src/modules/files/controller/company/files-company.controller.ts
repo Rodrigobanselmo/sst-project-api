@@ -11,8 +11,10 @@ import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 
 import { DownloadCompaniesService } from '../../services/company/download-companies/download-companies.service';
+import { DownloadEmployeesService } from '../../services/company/download-employees/download-employees.service';
 import { DownloadUniqueCompanyService } from '../../services/company/download-unique-company/download-unique-company.service';
 import { UploadCompaniesService } from '../../services/company/upload-companies/upload-companies.service';
+import { UploadEmployeesService } from '../../services/company/upload-employees/upload-employees.service';
 import { UploadUniqueCompanyService } from '../../services/company/upload-unique-company/upload-unique-company.service';
 
 @Controller('files/company')
@@ -22,6 +24,8 @@ export class FilesCompanyController {
     private readonly uploadCompaniesService: UploadCompaniesService,
     private readonly downloadUniqueCompanyService: DownloadUniqueCompanyService,
     private readonly uploadUniqueCompanyService: UploadUniqueCompanyService,
+    private readonly uploadEmployeesService: UploadEmployeesService,
+    private readonly downloadEmployeesService: DownloadEmployeesService,
   ) {}
 
   @Post('/upload/unique')
@@ -33,6 +37,24 @@ export class FilesCompanyController {
   ) {
     const { workbook, filename } =
       await this.uploadUniqueCompanyService.execute(file, userPayloadDto);
+
+    res.attachment(filename);
+    workbook.xlsx.write(res).then(function () {
+      res.end();
+    });
+  }
+
+  @Post('employees/upload/:companyId?')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadEmployeesFile(
+    @UploadedFile() file: Express.Multer.File,
+    @User() userPayloadDto: UserPayloadDto,
+    @Res() res,
+  ) {
+    const { workbook, filename } = await this.uploadEmployeesService.execute(
+      file,
+      userPayloadDto,
+    );
 
     res.attachment(filename);
     workbook.xlsx.write(res).then(function () {
@@ -74,6 +96,18 @@ export class FilesCompanyController {
   async downloadUnique(@User() userPayloadDto: UserPayloadDto, @Res() res) {
     const { workbook, filename } =
       await this.downloadUniqueCompanyService.execute(userPayloadDto);
+
+    res.attachment(filename);
+    workbook.xlsx.write(res).then(function () {
+      res.end();
+    });
+  }
+
+  @Get('/employees/download/:companyId?')
+  async downloadEmployees(@User() userPayloadDto: UserPayloadDto, @Res() res) {
+    const { workbook, filename } = await this.downloadEmployeesService.execute(
+      userPayloadDto,
+    );
 
     res.attachment(filename);
     workbook.xlsx.write(res).then(function () {

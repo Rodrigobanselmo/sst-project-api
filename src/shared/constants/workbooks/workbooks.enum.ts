@@ -3,4 +3,5 @@ export enum WorkbooksEnum {
   EPI,
   COMPANIES,
   COMPANY,
+  EMPLOYEES,
 }
