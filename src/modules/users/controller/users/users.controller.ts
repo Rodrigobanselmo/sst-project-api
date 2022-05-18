@@ -9,7 +9,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { classToClass } from 'class-transformer';
+import { instanceToInstance } from 'class-transformer';
 
 import { Public } from '../../../../shared/decorators/public.decorator';
 import { User } from '../../../../shared/decorators/user.decorator';
@@ -42,7 +42,7 @@ export class UsersController {
 
   @Get('me')
   findMe(@User() userPayloadDto: UserPayloadDto) {
-    return classToClass(
+    return instanceToInstance(
       this.findMeService.execute(
         userPayloadDto.userId,
         userPayloadDto.companyId,
@@ -52,18 +52,18 @@ export class UsersController {
 
   @Get(':id')
   findId(@Param('id', ParseIntPipe) id: number) {
-    return classToClass(this.findByIdService.execute(+id));
+    return instanceToInstance(this.findByIdService.execute(+id));
   }
 
   @Get()
   findEmail(@Query('email', ValidateEmailPipe) email: string) {
-    return classToClass(this.findByEmailService.execute(email));
+    return instanceToInstance(this.findByEmailService.execute(email));
   }
 
   @Public()
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
-    return classToClass(this.createUserService.execute(createUserDto));
+    return instanceToInstance(this.createUserService.execute(createUserDto));
   }
 
   @Patch('update')
@@ -71,14 +71,16 @@ export class UsersController {
     @Body() updateUserDto: UpdateUserDto,
     @User() { userId }: UserPayloadDto,
   ) {
-    return classToClass(this.updateUserService.execute(+userId, updateUserDto));
+    return instanceToInstance(
+      this.updateUserService.execute(+userId, updateUserDto),
+    );
   }
 
   @Patch('update/authorization')
   async updatePermissionsRoles(
     @Body() updateUserCompanyDto: UpdateUserCompanyDto,
   ) {
-    return classToClass(
+    return instanceToInstance(
       this.updatePermissionsRolesService.execute(updateUserCompanyDto),
     );
   }
@@ -86,6 +88,8 @@ export class UsersController {
   @Public()
   @Patch('reset-password')
   async reset(@Body() resetPasswordDto: ResetPasswordDto) {
-    return classToClass(this.resetPasswordService.execute(resetPasswordDto));
+    return instanceToInstance(
+      this.resetPasswordService.execute(resetPasswordDto),
+    );
   }
 }

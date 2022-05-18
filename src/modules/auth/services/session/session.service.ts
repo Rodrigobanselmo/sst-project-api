@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { classToClass } from 'class-transformer';
+import { instanceToInstance } from 'class-transformer';
 
 import { UsersRepository } from '../../../../modules/users/repositories/implementations/UsersRepository';
 import { HashProvider } from '../../../../shared/providers/HashProvider/implementations/HashProvider';
@@ -53,7 +53,7 @@ export class SessionService {
     return {
       token,
       refresh_token: newRefreshToken.refresh_token,
-      user: classToClass(user),
+      user: instanceToInstance(user),
       ...company,
     };
   }
