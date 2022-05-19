@@ -1,5 +1,5 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { instanceToInstance } from 'class-transformer';;
+import { classToClass } from 'class-transformer';;
 
 import { UsersRepository } from '../../../../modules/users/repositories/implementations/UsersRepository';
 import { JwtTokenProvider } from '../../../../shared/providers/TokenProvider/implementations/JwtTokenProvider';
@@ -78,7 +78,7 @@ export class RefreshTokenService {
     return {
       refresh_token: refreshToken.refresh_token,
       token: token,
-      user: instanceToInstance(user),
+      user: classToClass(user),
       ...company,
     };
   }

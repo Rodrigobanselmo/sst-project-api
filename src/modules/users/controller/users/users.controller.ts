@@ -9,7 +9,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { instanceToInstance } from 'class-transformer';
+import { classToClass } from 'class-transformer';
 
 import { Public } from '../../../../shared/decorators/public.decorator';
 import { User } from '../../../../shared/decorators/user.decorator';
@@ -42,7 +42,7 @@ export class UsersController {
 
   @Get('me')
   findMe(@User() userPayloadDto: UserPayloadDto) {
-    return instanceToInstance(
+    return classToClass(
       this.findMeService.execute(
         userPayloadDto.userId,
         userPayloadDto.companyId,
@@ -52,18 +52,18 @@ export class UsersController {
 
   @Get(':id')
   findId(@Param('id', ParseIntPipe) id: number) {
-    return instanceToInstance(this.findByIdService.execute(+id));
+    return classToClass(this.findByIdService.execute(+id));
   }
 
   @Get()
   findEmail(@Query('email', ValidateEmailPipe) email: string) {
-    return instanceToInstance(this.findByEmailService.execute(email));
+    return classToClass(this.findByEmailService.execute(email));
   }
 
   @Public()
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
-    return instanceToInstance(this.createUserService.execute(createUserDto));
+    return classToClass(this.createUserService.execute(createUserDto));
   }
 
   @Patch('update')
@@ -71,7 +71,7 @@ export class UsersController {
     @Body() updateUserDto: UpdateUserDto,
     @User() { userId }: UserPayloadDto,
   ) {
-    return instanceToInstance(
+    return classToClass(
       this.updateUserService.execute(+userId, updateUserDto),
     );
   }
@@ -80,7 +80,7 @@ export class UsersController {
   async updatePermissionsRoles(
     @Body() updateUserCompanyDto: UpdateUserCompanyDto,
   ) {
-    return instanceToInstance(
+    return classToClass(
       this.updatePermissionsRolesService.execute(updateUserCompanyDto),
     );
   }
@@ -88,7 +88,7 @@ export class UsersController {
   @Public()
   @Patch('reset-password')
   async reset(@Body() resetPasswordDto: ResetPasswordDto) {
-    return instanceToInstance(
+    return classToClass(
       this.resetPasswordService.execute(resetPasswordDto),
     );
   }
