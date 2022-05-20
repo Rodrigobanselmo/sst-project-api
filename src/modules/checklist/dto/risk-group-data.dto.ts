@@ -1,6 +1,8 @@
 import { StatusEnum } from '@prisma/client';
-import { Transform } from 'class-transformer';
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import { IsDate, IsEnum, IsOptional, IsString } from 'class-validator';
+import { DateFormat } from 'src/shared/transformers/date-format';
+import { StringCapitalizeTransform } from 'src/shared/transformers/string-capitalize';
 
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
@@ -21,6 +23,37 @@ export class UpsertRiskGroupDataDto {
   })
   status?: StatusEnum;
 
+  @IsOptional()
   @IsString()
   companyId: string;
+
+  @IsOptional()
+  @IsString()
+  source: string;
+
+  @Transform(StringCapitalizeTransform, { toClassOnly: true })
+  @IsOptional()
+  @IsString()
+  elaboratedBy: string;
+
+  @Transform(StringCapitalizeTransform, { toClassOnly: true })
+  @IsOptional()
+  @IsString()
+  approvedBy: string;
+
+  @IsOptional()
+  @IsString()
+  revisionBy: string;
+
+  @Transform(DateFormat, { toClassOnly: true })
+  @IsOptional()
+  @IsDate()
+  @Type(() => Date)
+  documentDate: Date;
+
+  @Transform(DateFormat, { toClassOnly: true })
+  @IsOptional()
+  @IsDate()
+  @Type(() => Date)
+  visitDate: Date;
 }

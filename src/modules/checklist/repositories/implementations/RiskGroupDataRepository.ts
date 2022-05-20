@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { UpsertRiskGroupDataDto } from '../../dto/risk-group-data.dto';
@@ -41,6 +42,23 @@ export class RiskGroupDataRepository {
   }
 
   async findById(
+    id: string,
+    companyId: string,
+    options: {
+      select?: Prisma.RiskFactorGroupDataSelect;
+      include?: Prisma.RiskFactorGroupDataInclude;
+    } = {},
+  ) {
+    const riskFactorGroupDataEntity =
+      await this.prisma.riskFactorGroupData.findUnique({
+        where: { id_companyId: { id, companyId } },
+        ...options,
+      });
+
+    return new RiskFactorGroupDataEntity(riskFactorGroupDataEntity);
+  }
+
+  async findAllDataById(
     id: string,
     companyId: string,
     options?: { includeEmployees: boolean },

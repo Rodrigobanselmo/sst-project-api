@@ -26,7 +26,7 @@ export const documentConverter = (
     riskFactorGroupData.elaboratedBy || '',
     riskFactorGroupData.revisionBy || '',
     riskFactorGroupData.approvedBy || '',
-    dayjs(riskFactorGroupData.documentDate).format('DD/MM/YYYY') || '',
+    dayjs(riskFactorGroupData.visitDate).format('DD/MM/YYYY') || '',
     hierarchy.workspace || '',
   ];
 

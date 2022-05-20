@@ -27,7 +27,7 @@ const createUserAndCompany = async () => {
       license: { create: { companyId: id } },
       workspace: {
         create: {
-          name: 'Workspace',
+          name: 'MATRIZ',
           id: workId,
           address: { create: { cep: '12246-000' } },
         },
@@ -45,44 +45,44 @@ const createUserAndCompany = async () => {
         createMany: {
           data: [
             {
-              name: 'DIRECTORY',
+              name: 'Presidência',
               type: 'DIRECTORY',
               id: 'a',
               workplaceId: workId,
             },
             {
-              name: 'MANAGEMENT',
+              name: 'Gerente',
               type: 'MANAGEMENT',
               id: 'b',
               parentId: 'a',
               workplaceId: workId,
             },
             {
-              name: 'SECTOR',
+              name: 'Tecnologia',
               type: 'SECTOR',
               id: 'c',
               parentId: 'b',
               workplaceId: workId,
             },
             {
-              name: 'OFFICE 1',
-              type: 'OFFICE',
-              id: 'd',
-              parentId: 'c',
+              name: 'Médicina ocupacional',
+              type: 'SECTOR',
+              id: 'f',
+              parentId: 'b',
               workplaceId: workId,
             },
             {
-              name: 'OFFICE 2',
+              name: 'Engenheiro de Segurança',
+              type: 'OFFICE',
+              id: 'd',
+              parentId: 'f',
+              workplaceId: workId,
+            },
+            {
+              name: 'Engenheiro de Software',
               type: 'OFFICE',
               id: 'e',
               parentId: 'c',
-              workplaceId: workId,
-            },
-            {
-              name: 'SUB_OFFICE',
-              type: 'SUB_OFFICE',
-              id: 'f',
-              parentId: 'd',
               workplaceId: workId,
             },
           ],
@@ -97,18 +97,32 @@ const createUserAndCompany = async () => {
     include: { employees: true },
     data: {
       employees: {
-        create: {
-          cpf: '123456789',
-          name: 'Employee',
-          workplace: {
-            connect: {
-              id_companyId: { companyId: id, id: company.workspace[0].id },
+        create: [
+          {
+            cpf: '123456789',
+            name: 'Alex Abreu Marins',
+            workplace: {
+              connect: {
+                id_companyId: { companyId: id, id: company.workspace[0].id },
+              },
+            },
+            hierarchy: {
+              connect: { id: 'f' },
             },
           },
-          hierarchy: {
-            connect: { id: 'f' },
+          {
+            cpf: '123456789',
+            name: 'Rodrigo Barbosa Anselmo',
+            workplace: {
+              connect: {
+                id_companyId: { companyId: id, id: company.workspace[0].id },
+              },
+            },
+            hierarchy: {
+              connect: { id: 'e' },
+            },
           },
-        },
+        ],
       },
     },
   });

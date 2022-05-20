@@ -403,6 +403,10 @@ export class CompanyRepository implements ICompanyRepository {
       where: { companyId: id },
     });
 
+    const riskGroupCount = await this.prisma.riskFactorGroupData.count({
+      where: { companyId: id },
+    });
+
     const company = await this.prisma.company.findUnique({
       where: { id },
       include: {
@@ -416,7 +420,11 @@ export class CompanyRepository implements ICompanyRepository {
       },
     });
 
-    return new CompanyEntity({ ...company, employeeCount: employeeCount });
+    return new CompanyEntity({
+      ...company,
+      employeeCount: employeeCount,
+      riskGroupCount: riskGroupCount,
+    });
   }
 
   async findAllRelatedByCompanyId(

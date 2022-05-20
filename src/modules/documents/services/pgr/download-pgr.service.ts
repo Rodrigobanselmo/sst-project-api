@@ -13,11 +13,11 @@ export class PgrDownloadService {
     private readonly riskGroupDataRepository: RiskGroupDataRepository,
     private readonly hierarchyRepository: HierarchyRepository,
   ) {}
-
   async execute(userPayloadDto: UserPayloadDto, riskGroupId: string) {
     const companyId = userPayloadDto.targetCompanyId;
 
-    const riskGroupData = await this.riskGroupDataRepository.findById(
+    console.log(riskGroupId, companyId);
+    const riskGroupData = await this.riskGroupDataRepository.findAllDataById(
       riskGroupId,
       companyId,
     );
