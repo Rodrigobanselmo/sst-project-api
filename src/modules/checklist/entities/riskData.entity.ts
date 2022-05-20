@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { EpiEntity } from './Epi.entity';
+import { EpiEntity } from './epi.entity';
 import { GenerateSourceEntity } from './generateSource.entity';
 import { RecMedEntity } from './recMed.entity';
 import { RiskFactorData } from '.prisma/client';

@@ -3,7 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import ExcelJS from 'excelJS';
+import ExcelJS from 'exceljs';
 import xlsx from 'node-xlsx';
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { ErrorMessageEnum } from '../../../../shared/constants/enum/errorMessage';

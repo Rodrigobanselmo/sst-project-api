@@ -71,7 +71,9 @@ export class UsersController {
     @Body() updateUserDto: UpdateUserDto,
     @User() { userId }: UserPayloadDto,
   ) {
-    return classToClass(this.updateUserService.execute(+userId, updateUserDto));
+    return classToClass(
+      this.updateUserService.execute(+userId, updateUserDto),
+    );
   }
 
   @Patch('update/authorization')
@@ -86,6 +88,8 @@ export class UsersController {
   @Public()
   @Patch('reset-password')
   async reset(@Body() resetPasswordDto: ResetPasswordDto) {
-    return classToClass(this.resetPasswordService.execute(resetPasswordDto));
+    return classToClass(
+      this.resetPasswordService.execute(resetPasswordDto),
+    );
   }
 }

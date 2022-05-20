@@ -8,7 +8,7 @@ import {
   UpdateEpiDto,
   UpsertEpiDto,
 } from '../../dto/epi.dto';
-import { EpiEntity } from '../../entities/Epi.entity';
+import { EpiEntity } from '../../entities/epi.entity';
 
 let i = 0;
 
