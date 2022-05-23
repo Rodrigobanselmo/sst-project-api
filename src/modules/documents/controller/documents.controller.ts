@@ -34,12 +34,12 @@ export class DocumentsController {
     @User() userPayloadDto: UserPayloadDto,
     @Body() upsertPgrDto: UpsertPgrDto,
   ) {
-    const { buffer: file } = await this.pgrUploadService.execute(
+    const { buffer: file, fileName } = await this.pgrUploadService.execute(
       upsertPgrDto,
       userPayloadDto,
     );
 
-    res.setHeader('Content-Disposition', 'attachment; filename=name.docx');
+    res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
     res.send(file);
   }
 }

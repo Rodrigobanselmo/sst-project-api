@@ -31,8 +31,8 @@ let DocumentsController = class DocumentsController {
         fileStream.pipe(res);
     }
     async uploadPGR(res, userPayloadDto, upsertPgrDto) {
-        const { buffer: file } = await this.pgrUploadService.execute(upsertPgrDto, userPayloadDto);
-        res.setHeader('Content-Disposition', 'attachment; filename=name.docx');
+        const { buffer: file, fileName } = await this.pgrUploadService.execute(upsertPgrDto, userPayloadDto);
+        res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
         res.send(file);
     }
 };
