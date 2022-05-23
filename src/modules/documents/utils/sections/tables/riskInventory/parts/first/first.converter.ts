@@ -4,7 +4,10 @@ import { RiskFactorGroupDataEntity } from 'src/modules/checklist/entities/riskGr
 
 import { MapData } from '../../converter/hierarchy.converter';
 import { bodyTableProps, borderNoneStyle } from '../../elements/body';
-import { firstRiskInventoryHeader } from './first.constant';
+import {
+  FirstRiskInventoryColumnEnum,
+  firstRiskInventoryHeader,
+} from './first.constant';
 
 export const documentConverter = (
   riskFactorGroupData: RiskFactorGroupDataEntity,
@@ -21,14 +24,19 @@ export const documentConverter = (
     })),
   );
 
-  const docData = [
-    riskFactorGroupData.source || '',
-    riskFactorGroupData.elaboratedBy || '',
-    riskFactorGroupData.revisionBy || '',
-    riskFactorGroupData.approvedBy || '',
-    dayjs(riskFactorGroupData.visitDate).format('DD/MM/YYYY') || '',
-    hierarchy.workspace || '',
-  ];
+  const docData = [];
+
+  docData[FirstRiskInventoryColumnEnum.SOURCE] =
+    riskFactorGroupData.source || '';
+  docData[FirstRiskInventoryColumnEnum.REVIEW] =
+    riskFactorGroupData.revisionBy || '';
+  docData[FirstRiskInventoryColumnEnum.ELABORATION_BY] =
+    riskFactorGroupData.elaboratedBy || '';
+  docData[FirstRiskInventoryColumnEnum.APPROVE_BY] =
+    riskFactorGroupData.approvedBy || '';
+  docData[FirstRiskInventoryColumnEnum.DATA] =
+    dayjs(riskFactorGroupData.visitDate).format('DD/MM/YYYY') || '';
+  docData[FirstRiskInventoryColumnEnum.UNIT] = hierarchy.workspace || '';
 
   rows.push(
     docData.map((data) => ({

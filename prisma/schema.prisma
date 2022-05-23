@@ -144,6 +144,7 @@ model Company {
   checklist Checklist[] 
   riskFactorData RiskFactorData[] 
   riskFactorGroupData RiskFactorGroupData[] 
+  riskFactorDocument RiskFactorDocument[] 
 }
 
 model Contract {
@@ -344,6 +345,23 @@ model RiskFactors {
   riskFactorData RiskFactorData[]
   
   @@id([id, companyId])
+}
+
+model RiskFactorDocument {
+  id    String   @id  @default(uuid())
+  fileUrl String
+  name String 
+  description String @default("")
+  version String  @default("1")
+  companyId String
+  riskGroupId String
+  status StatusEnum @default(ACTIVE)
+  created_at DateTime @default(now())
+  updated_at  DateTime   @updatedAt
+  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  riskGroup RiskFactorGroupData @relation(fields: [riskGroupId, companyId], references: [id, companyId], onDelete: Restrict, onUpdate: Cascade)
+
+  @@unique([id, companyId])
 } 
 
 model RiskFactorGroupData {
@@ -358,6 +376,7 @@ model RiskFactorGroupData {
   visitDate DateTime?
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   data RiskFactorData[]
+  docs RiskFactorDocument[]
   status StatusEnum @default(PROGRESS)
 
   @@unique([id, companyId])
@@ -413,7 +432,7 @@ model UserCompany {
 model Workspace {
   id    String     @default(uuid()) 
   name String  
-  abbreviation String? //!remove ?
+  abbreviation String?
   description String?  
   created_at DateTime @default(now())
   updated_at  DateTime   @updatedAt

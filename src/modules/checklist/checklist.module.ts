@@ -33,6 +33,8 @@ import { FindAllByCompanyService } from './services/risk-group-data/find-by-comp
 import { UpsertRiskDataService } from './services/risk-data/upsert-risk-data/upsert-risk.service';
 import { FindAllByGroupAndRiskService } from './services/risk-data/find-by-group-risk/find-by-group-risk.service';
 import { FindByIdService } from './services/risk-group-data/find-by-id/find-by-id.service';
+import { RiskDocumentRepository } from './repositories/implementations/RiskDocumentRepository';
+import { FindDocumentsService } from './services/risk-group-data/find-documents/find-documents.service';
 
 @Module({
   controllers: [
@@ -64,6 +66,7 @@ import { FindByIdService } from './services/risk-group-data/find-by-id/find-by-i
     UpdateChecklistService,
     FindAllAvailableRiskService,
     FindByCAEpiService,
+    FindDocumentsService,
     FindEpiService,
     FindAllByGroupAndRiskService,
     UpsertRiskDataService,
@@ -71,8 +74,9 @@ import { FindByIdService } from './services/risk-group-data/find-by-id/find-by-i
     UpsertRiskGroupDataService,
     RiskDataRepository,
     RiskGroupDataRepository,
+    RiskDocumentRepository,
     FindByIdService,
   ],
-  exports: [RiskRepository, RiskGroupDataRepository],
+  exports: [RiskRepository, RiskGroupDataRepository, RiskDocumentRepository],
 })
 export class ChecklistModule {}

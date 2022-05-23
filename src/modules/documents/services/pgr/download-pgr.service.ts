@@ -1,39 +1,31 @@
-import { Injectable } from '@nestjs/common';
-import { Document } from 'docx';
-import { RiskGroupDataRepository } from 'src/modules/checklist/repositories/implementations/RiskGroupDataRepository';
-import { HierarchyRepository } from 'src/modules/company/repositories/implementations/HierarchyRepository';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { RiskDocumentRepository } from 'src/modules/checklist/repositories/implementations/RiskDocumentRepository';
+import { AmazonStorageProvider } from 'src/shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
 
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
-import { actionPlanTableSection } from '../../utils/sections/tables/actionPlan/actionPlan.section';
-import { riskInventoryTableSection } from '../../utils/sections/tables/riskInventory/riskInventory.section';
+import { ErrorDocumentEnum } from './../../../../shared/constants/enum/errorMessage';
 
 @Injectable()
 export class PgrDownloadService {
   constructor(
-    private readonly riskGroupDataRepository: RiskGroupDataRepository,
-    private readonly hierarchyRepository: HierarchyRepository,
+    private readonly amazonStorageProvider: AmazonStorageProvider,
+    private readonly riskDocumentRepository: RiskDocumentRepository,
   ) {}
-  async execute(userPayloadDto: UserPayloadDto, riskGroupId: string) {
+  async execute(userPayloadDto: UserPayloadDto, docId: string) {
     const companyId = userPayloadDto.targetCompanyId;
 
-    console.log(riskGroupId, companyId);
-    const riskGroupData = await this.riskGroupDataRepository.findAllDataById(
-      riskGroupId,
+    const riskDoc = await this.riskDocumentRepository.findById(
+      docId,
       companyId,
     );
 
-    const hierarchyData =
-      await this.hierarchyRepository.findAllHierarchyByCompany(companyId, {
-        include: { employees: true, workplace: true, homogeneousGroups: true },
-      });
+    if (!riskDoc) throw new BadRequestException(ErrorDocumentEnum.NOT_FOUND);
 
-    const doc = new Document({
-      sections: [
-        actionPlanTableSection(riskGroupData),
-        ...riskInventoryTableSection(riskGroupData, hierarchyData),
-      ],
+    const fileKey = riskDoc.fileUrl.split('/').pop();
+    const { file: fileStream } = this.amazonStorageProvider.download({
+      fileKey,
     });
 
-    return doc;
+    return { fileStream, fileKey };
   }
 }

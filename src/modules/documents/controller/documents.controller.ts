@@ -1,31 +1,45 @@
-import { Controller, Get, Param, Res } from '@nestjs/common';
-import { Packer } from 'docx';
+import { Body, Controller, Get, Param, Post, Res } from '@nestjs/common';
 import { User } from 'src/shared/decorators/user.decorator';
 import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
+import { UpsertPgrDto } from '../dto/pgr.dto';
 
 import { PgrDownloadService } from '../services/pgr/download-pgr.service';
+import { PgrUploadService } from '../services/pgr/upload-pgr.service';
 
 @Controller('documents')
 export class DocumentsController {
-  constructor(private readonly pgrDownloadService: PgrDownloadService) {}
+  constructor(
+    private readonly pgrDownloadService: PgrDownloadService,
+    private readonly pgrUploadService: PgrUploadService,
+  ) {}
 
-  @Get('/pgr/:groupId/:companyId?')
+  @Get('/pgr/:docId/:companyId?')
   async downloadPGR(
     @Res() res,
     @User() userPayloadDto: UserPayloadDto,
-    @Param('groupId') riskGroupId: string,
+    @Param('docId') docId: string,
   ) {
-    const doc = await this.pgrDownloadService.execute(
+    const { fileKey, fileStream } = await this.pgrDownloadService.execute(
       userPayloadDto,
-      riskGroupId,
+      docId,
     );
 
-    const b64string = await Packer.toBase64String(doc);
+    res.setHeader('Content-Disposition', `attachment; filename=${fileKey}`);
+    fileStream.pipe(res);
+  }
 
-    res.setHeader(
-      'Content-Disposition',
-      'attachment; filename=My Document.docx',
+  @Post('/pgr')
+  async uploadPGR(
+    @Res() res,
+    @User() userPayloadDto: UserPayloadDto,
+    @Body() upsertPgrDto: UpsertPgrDto,
+  ) {
+    const { buffer: file } = await this.pgrUploadService.execute(
+      upsertPgrDto,
+      userPayloadDto,
     );
-    res.send(Buffer.from(b64string, 'base64'));
+
+    res.setHeader('Content-Disposition', 'attachment; filename=name.docx');
+    res.send(file);
   }
 }

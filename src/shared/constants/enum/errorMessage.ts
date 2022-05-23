@@ -14,3 +14,7 @@ export enum ErrorCompanyEnum {
 export enum ErrorChecklistEnum {
   EPI_NOT_FOUND = 'Epi não encontrado',
 }
+
+export enum ErrorDocumentEnum {
+  NOT_FOUND = 'Documento não encontrado',
+}

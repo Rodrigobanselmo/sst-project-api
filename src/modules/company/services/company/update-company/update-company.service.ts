@@ -12,6 +12,7 @@ export class UpdateCompanyService {
   ) {}
 
   async execute(updateCompanyDto: UpdateCompanyDto) {
+    console.log(updateCompanyDto);
     const newWorkspaces = [] as WorkspaceDto[];
 
     if (updateCompanyDto.workspace && updateCompanyDto.workspace.length > 0) {
@@ -21,7 +22,9 @@ export class UpdateCompanyService {
 
       updateCompanyDto.workspace.forEach(async (workspace) => {
         const loop = (abr: string, count = 0) => {
-          const found = workspaces.find((w) => w.abbreviation === abr);
+          const found = workspaces.find(
+            (w) => w.abbreviation === abr && w.id !== workspace.id,
+          );
 
           if (!found) {
             return abr;
@@ -34,6 +37,7 @@ export class UpdateCompanyService {
         };
 
         let abr = workspace.name
+          .replace(/[^0-9a-zA-Z\s]/g, '')
           .split(' ')
           .slice(0, 2)
           .map((el) => el[0])
