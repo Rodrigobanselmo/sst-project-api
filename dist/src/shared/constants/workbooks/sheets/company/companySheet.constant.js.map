@@ -1,0 +1,1 @@
+{"version":3,"file":"companySheet.constant.js","sourceRoot":"","sources":["../../../../../../../src/shared/constants/workbooks/sheets/company/companySheet.constant.ts"],"names":[],"mappings":";;;AAEA,uEAAmE;AACnE,2DAAuD;AAQ1C,QAAA,oBAAoB,GAAG;IAClC,CAAC,oCAAgB,CAAC,SAAS,CAAC,EAAE;QAC5B,IAAI,EAAE,UAAU;QAChB,EAAE,EAAE,oCAAgB,CAAC,SAAS;QAC9B,OAAO,EAAE,gDAAsB;KAChC;CACyC,CAAC"}
