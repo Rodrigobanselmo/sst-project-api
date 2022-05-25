@@ -1,1 +1,0 @@
-{"version":3,"file":"mime.js","sourceRoot":"","sources":["../../../../src/shared/utils/mime.ts"],"names":[],"mappings":";;;;;AAAA,4DAA8B;AAE9B,MAAM,SAAS;IACb,YAAY,CAAC,WAAmB;QAC9B,OAAO,oBAAI,CAAC,SAAS,CAAC,WAAW,CAAC,CAAC;IACrC,CAAC;IAED,aAAa,CAAC,SAAiB;QAC7B,OAAO,oBAAI,CAAC,WAAW,CAAC,SAAS,CAAC,CAAC;IACrC,CAAC;CACF;AAED,kBAAe,SAAS,CAAC"}
