@@ -12,7 +12,7 @@ const jwt_1 = require("@nestjs/jwt");
 const passport_1 = require("@nestjs/passport");
 const DayJSProvider_1 = require("../../shared/providers/DateProvider/implementations/DayJSProvider");
 const HashProvider_1 = require("../../shared/providers/HashProvider/implementations/HashProvider");
-const EtherealMailProvider_1 = require("../../shared/providers/MailProvider/implementations/Ethereal/EtherealMailProvider");
+const AwsSesProvider_1 = require("../../shared/providers/MailProvider/implementations/AwsSes/AwsSesProvider");
 const JwtTokenProvider_1 = require("../../shared/providers/TokenProvider/implementations/JwtTokenProvider");
 const users_module_1 = require("../users/users.module");
 const auth_controller_1 = require("./controller/auth.controller");
@@ -48,7 +48,7 @@ AuthModule = __decorate([
             JwtTokenProvider_1.JwtTokenProvider,
             jwt_strategy_1.JwtStrategy,
             send_forgot_pass_mail_service_1.SendForgotPassMailService,
-            EtherealMailProvider_1.EtherealMailProvider,
+            AwsSesProvider_1.AwsSesProvider,
         ],
     })
 ], AuthModule);

@@ -13,7 +13,7 @@ exports.InviteUsersService = void 0;
 const common_1 = require("@nestjs/common");
 const path_1 = require("path");
 const DayJSProvider_1 = require("../../../../../shared/providers/DateProvider/implementations/DayJSProvider");
-const EtherealMailProvider_1 = require("../../../../../shared/providers/MailProvider/implementations/Ethereal/EtherealMailProvider");
+const AwsSesProvider_1 = require("../../../../../shared/providers/MailProvider/implementations/AwsSes/AwsSesProvider");
 const InviteUsersRepository_1 = require("../../../repositories/implementations/InviteUsersRepository");
 const UsersRepository_1 = require("../../../repositories/implementations/UsersRepository");
 let InviteUsersService = class InviteUsersService {
@@ -42,7 +42,7 @@ InviteUsersService = __decorate([
     __metadata("design:paramtypes", [InviteUsersRepository_1.InviteUsersRepository,
         UsersRepository_1.UsersRepository,
         DayJSProvider_1.DayJSProvider,
-        EtherealMailProvider_1.EtherealMailProvider])
+        AwsSesProvider_1.AwsSesProvider])
 ], InviteUsersService);
 exports.InviteUsersService = InviteUsersService;
 const inviteNewUser = async (mailProvider, invite) => {

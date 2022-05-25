@@ -14,7 +14,7 @@ const common_1 = require("@nestjs/common");
 const path_1 = require("path");
 const UsersRepository_1 = require("../../../../modules/users/repositories/implementations/UsersRepository");
 const DayJSProvider_1 = require("../../../../shared/providers/DateProvider/implementations/DayJSProvider");
-const EtherealMailProvider_1 = require("../../../../shared/providers/MailProvider/implementations/Ethereal/EtherealMailProvider");
+const AwsSesProvider_1 = require("../../../../shared/providers/MailProvider/implementations/AwsSes/AwsSesProvider");
 const RefreshTokensRepository_1 = require("../../repositories/implementations/RefreshTokensRepository");
 let SendForgotPassMailService = class SendForgotPassMailService {
     constructor(usersRepository, refreshTokensRepository, mailProvider, dateProvider) {
@@ -47,7 +47,7 @@ SendForgotPassMailService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [UsersRepository_1.UsersRepository,
         RefreshTokensRepository_1.RefreshTokensRepository,
-        EtherealMailProvider_1.EtherealMailProvider,
+        AwsSesProvider_1.AwsSesProvider,
         DayJSProvider_1.DayJSProvider])
 ], SendForgotPassMailService);
 exports.SendForgotPassMailService = SendForgotPassMailService;

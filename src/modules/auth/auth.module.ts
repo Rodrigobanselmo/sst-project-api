@@ -4,7 +4,7 @@ import { PassportModule } from '@nestjs/passport';
 
 import { DayJSProvider } from '../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { HashProvider } from '../../shared/providers/HashProvider/implementations/HashProvider';
-import { EtherealMailProvider } from '../../shared/providers/MailProvider/implementations/Ethereal/EtherealMailProvider';
+import { AwsSesProvider } from '../../shared/providers/MailProvider/implementations/AwsSes/AwsSesProvider';
 import { JwtTokenProvider } from '../../shared/providers/TokenProvider/implementations/JwtTokenProvider';
 import { UsersModule } from '../users/users.module';
 import { AuthController } from './controller/auth.controller';
@@ -38,7 +38,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     JwtTokenProvider,
     JwtStrategy,
     SendForgotPassMailService,
-    EtherealMailProvider,
+    AwsSesProvider,
   ],
 })
 export class AuthModule {}

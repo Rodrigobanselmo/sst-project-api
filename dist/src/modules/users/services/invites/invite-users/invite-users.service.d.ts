@@ -1,5 +1,5 @@
 import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
-import { EtherealMailProvider } from '../../../../../shared/providers/MailProvider/implementations/Ethereal/EtherealMailProvider';
+import { AwsSesProvider } from '../../../../../shared/providers/MailProvider/implementations/AwsSes/AwsSesProvider';
 import { InviteUserDto } from '../../../dto/invite-user.dto';
 import { InviteUsersEntity } from '../../../entities/invite-users.entity';
 import { InviteUsersRepository } from '../../../repositories/implementations/InviteUsersRepository';
@@ -9,6 +9,6 @@ export declare class InviteUsersService {
     private readonly usersRepository;
     private readonly dateProvider;
     private readonly mailProvider;
-    constructor(inviteUsersRepository: InviteUsersRepository, usersRepository: UsersRepository, dateProvider: DayJSProvider, mailProvider: EtherealMailProvider);
+    constructor(inviteUsersRepository: InviteUsersRepository, usersRepository: UsersRepository, dateProvider: DayJSProvider, mailProvider: AwsSesProvider);
     execute(inviteUserDto: InviteUserDto): Promise<InviteUsersEntity>;
 }

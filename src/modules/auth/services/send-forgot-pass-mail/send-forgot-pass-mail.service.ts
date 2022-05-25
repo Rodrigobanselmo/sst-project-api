@@ -3,7 +3,7 @@ import { resolve } from 'path';
 
 import { UsersRepository } from '../../../../modules/users/repositories/implementations/UsersRepository';
 import { DayJSProvider } from '../../../../shared/providers/DateProvider/implementations/DayJSProvider';
-import { EtherealMailProvider } from '../../../../shared/providers/MailProvider/implementations/Ethereal/EtherealMailProvider';
+import { AwsSesProvider } from '../../../../shared/providers/MailProvider/implementations/AwsSes/AwsSesProvider';
 import { RefreshTokensRepository } from '../../repositories/implementations/RefreshTokensRepository';
 
 @Injectable()
@@ -11,7 +11,7 @@ export class SendForgotPassMailService {
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly refreshTokensRepository: RefreshTokensRepository,
-    private readonly mailProvider: EtherealMailProvider,
+    private readonly mailProvider: AwsSesProvider,
     private readonly dateProvider: DayJSProvider,
   ) {}
 

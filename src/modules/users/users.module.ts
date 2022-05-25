@@ -15,7 +15,7 @@ import { UpdateUserService } from './services/users/update-user/update-user.serv
 import { InvitesController } from './controller/invites/invites.controller';
 import { DeleteInvitesService } from './services/invites/delete-invites/delete-invites.service';
 import { DeleteExpiredInvitesService } from './services/invites/delete-expired-invites/delete-expired-invites.service';
-import { EtherealMailProvider } from '../../shared/providers/MailProvider/implementations/Ethereal/EtherealMailProvider';
+import { AwsSesProvider } from '../../shared/providers/MailProvider/implementations/AwsSes/AwsSesProvider';
 import { FindMeService } from './services/users/find-me/find-me.service';
 import { UsersCompanyRepository } from './repositories/implementations/UsersCompanyRepository';
 import { FindByTokenService } from './services/invites/find-by-token/find-by-token.service';
@@ -26,7 +26,7 @@ import { UpdatePermissionsRolesService } from './services/users/update-permissio
   providers: [
     HashProvider,
     DayJSProvider,
-    EtherealMailProvider,
+    AwsSesProvider,
     UsersRepository,
     CreateUserService,
     UpdateUserService,

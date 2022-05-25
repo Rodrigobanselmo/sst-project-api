@@ -23,7 +23,7 @@ const update_user_service_1 = require("./services/users/update-user/update-user.
 const invites_controller_1 = require("./controller/invites/invites.controller");
 const delete_invites_service_1 = require("./services/invites/delete-invites/delete-invites.service");
 const delete_expired_invites_service_1 = require("./services/invites/delete-expired-invites/delete-expired-invites.service");
-const EtherealMailProvider_1 = require("../../shared/providers/MailProvider/implementations/Ethereal/EtherealMailProvider");
+const AwsSesProvider_1 = require("../../shared/providers/MailProvider/implementations/AwsSes/AwsSesProvider");
 const find_me_service_1 = require("./services/users/find-me/find-me.service");
 const UsersCompanyRepository_1 = require("./repositories/implementations/UsersCompanyRepository");
 const find_by_token_service_1 = require("./services/invites/find-by-token/find-by-token.service");
@@ -36,7 +36,7 @@ UsersModule = __decorate([
         providers: [
             HashProvider_1.HashProvider,
             DayJSProvider_1.DayJSProvider,
-            EtherealMailProvider_1.EtherealMailProvider,
+            AwsSesProvider_1.AwsSesProvider,
             UsersRepository_1.UsersRepository,
             create_user_service_1.CreateUserService,
             update_user_service_1.UpdateUserService,

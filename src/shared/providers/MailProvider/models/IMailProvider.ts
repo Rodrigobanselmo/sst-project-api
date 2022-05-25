@@ -3,6 +3,7 @@ export interface ISendMailData {
   subject: string;
   variables: Record<string, unknown>;
   path: string;
+  source?: string;
 }
 
 interface IMailProvider {
