@@ -26,7 +26,7 @@ export const employeesColumnsConstant = [
   },
   {
     databaseName: 'abbreviation',
-    excelName: 'Unidade (Área de trabalho)',
+    excelName: 'Estabelecimento (Área de trabalho)',
     isArray: false,
     required: true,
     notes: excelWorkplaceNotes,

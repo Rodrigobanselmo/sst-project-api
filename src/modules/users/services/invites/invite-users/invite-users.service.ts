@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { resolve } from 'path';
 
 import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
-import { AwsSesProvider } from '../../../../../shared/providers/MailProvider/implementations/AwsSes/AwsSesProvider';
+import { SendGridProvider } from '../../../../../shared/providers/MailProvider/implementations/SendGrid/SendGridProvider';
 import { InviteUserDto } from '../../../dto/invite-user.dto';
 import { InviteUsersEntity } from '../../../entities/invite-users.entity';
 import { InviteUsersRepository } from '../../../repositories/implementations/InviteUsersRepository';
@@ -14,7 +14,7 @@ export class InviteUsersService {
     private readonly inviteUsersRepository: InviteUsersRepository,
     private readonly usersRepository: UsersRepository,
     private readonly dateProvider: DayJSProvider,
-    private readonly mailProvider: AwsSesProvider,
+    private readonly mailProvider: SendGridProvider,
   ) {}
 
   async execute(inviteUserDto: InviteUserDto) {
@@ -47,7 +47,7 @@ export class InviteUsersService {
 }
 
 const inviteNewUser = async (
-  mailProvider: AwsSesProvider,
+  mailProvider: SendGridProvider,
   invite: InviteUsersEntity,
 ) => {
   const templatePath = resolve(

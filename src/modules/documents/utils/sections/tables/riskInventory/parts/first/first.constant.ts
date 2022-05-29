@@ -20,7 +20,7 @@ const RewRiskInventoryHeader = (): bodyTableProps[] => {
   header[FirstRiskInventoryColumnEnum.ELABORATION_BY] = { text: 'Elaborador:', bold: true  };
   header[FirstRiskInventoryColumnEnum.APPROVE_BY] = { text: 'Aprovação:', bold: true  };
   header[FirstRiskInventoryColumnEnum.DATA] = { text: 'Data:', bold: true };
-  header[FirstRiskInventoryColumnEnum.UNIT] = { text: 'Unidade:', bold: true  };
+  header[FirstRiskInventoryColumnEnum.UNIT] = { text: 'Estabelecimento:', bold: true  };
 
   return header;
 };

@@ -42,6 +42,14 @@ export class InviteUsersRepository implements IInviteUsersRepository {
     return new InviteUsersEntity(invite);
   }
 
+  async findAllByCompanyId(companyId: string): Promise<InviteUsersEntity[]> {
+    const invites = await this.prisma.inviteUsers.findMany({
+      where: { companyId },
+    });
+
+    return invites.map((invite) => new InviteUsersEntity(invite));
+  }
+
   async deleteByCompanyIdAndEmail(
     companyId: string,
     email: string,

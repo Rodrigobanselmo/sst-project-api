@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { ErrorAuthEnum } from 'src/shared/constants/enum/errorMessage';
 
 import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { HashProvider } from '../../../../../shared/providers/HashProvider/implementations/HashProvider';
@@ -18,6 +19,12 @@ export class CreateUserService {
 
   async execute({ token, password, ...restCreateUserDto }: CreateUserDto) {
     const passHash = await this.hashProvider.createHash(password);
+    const userAlreadyExist = await this.userRepository.findByEmail(
+      restCreateUserDto.email,
+    );
+
+    if (userAlreadyExist)
+      throw new BadRequestException(ErrorAuthEnum.USER_ALREADY_EXIST);
 
     const companies: UserCompanyDto[] = await getCompanyPermissionByToken(
       token,

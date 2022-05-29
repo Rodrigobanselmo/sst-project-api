@@ -8,7 +8,7 @@ export enum ErrorCompanyEnum {
   UPDATE_HIERARCHY_WITH_PARENT = "O campo 'parentId' não pode existir para o tipo 'Directory'",
   UPSERT_HIERARCHY_WITH_PARENT = "O campo 'parentId' é obrigatório",
   GHO_NOT_FOUND = 'O GHO informado não foi encontrado nesta empresa',
-  WORKPLACE_NOT_FOUND = 'A Unidade (área de trabalho) informada não foi encontrada, verifique a sigla utilizada',
+  WORKPLACE_NOT_FOUND = 'A Estabelecimento (área de trabalho) informada não foi encontrada, verifique a sigla utilizada',
 }
 
 export enum ErrorChecklistEnum {
@@ -17,4 +17,8 @@ export enum ErrorChecklistEnum {
 
 export enum ErrorDocumentEnum {
   NOT_FOUND = 'Documento não encontrado',
+}
+
+export enum ErrorAuthEnum {
+  USER_ALREADY_EXIST = 'Usuário já cadastrado',
 }

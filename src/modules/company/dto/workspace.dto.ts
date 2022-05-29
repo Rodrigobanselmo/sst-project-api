@@ -23,6 +23,10 @@ export class WorkspaceDto {
   @IsString()
   abbreviation?: string;
 
+  @IsOptional()
+  @IsString()
+  description?: string;
+
   @Transform(StringCapitalizeTransform, { toClassOnly: true })
   @IsString()
   @MaxLength(100)

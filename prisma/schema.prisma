@@ -408,6 +408,7 @@ model RiskFactorData {
 model User {
   id    Int     @default(autoincrement()) @id
   email String  @unique
+  name String? 
   password String
   created_at DateTime @default(now())
   updated_at  DateTime   @updatedAt

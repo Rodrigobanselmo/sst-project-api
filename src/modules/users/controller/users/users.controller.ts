@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { classToClass } from 'class-transformer';
+import { SessionService } from '../../../../modules/auth/services/session/session.service';
 
 import { Public } from '../../../../shared/decorators/public.decorator';
 import { User } from '../../../../shared/decorators/user.decorator';
@@ -20,6 +21,7 @@ import { ResetPasswordDto } from '../../dto/reset-pass';
 import { UpdateUserCompanyDto } from '../../dto/update-user-company.dto';
 import { UpdateUserDto } from '../../dto/update-user.dto';
 import { CreateUserService } from '../../services/users/create-user/create-user.service';
+import { FindAllByCompanyService } from '../../services/users/find-all/find-all.service';
 import { FindByEmailService } from '../../services/users/find-by-email/find-by-email.service';
 import { FindByIdService } from '../../services/users/find-by-id/find-by-id.service';
 import { FindMeService } from '../../services/users/find-me/find-me.service';
@@ -36,7 +38,9 @@ export class UsersController {
     private readonly updateUserService: UpdateUserService,
     private readonly findMeService: FindMeService,
     private readonly findByEmailService: FindByEmailService,
+    private readonly findAllByCompanyService: FindAllByCompanyService,
     private readonly findByIdService: FindByIdService,
+    private readonly sessionService: SessionService,
     private readonly updatePermissionsRolesService: UpdatePermissionsRolesService,
   ) {}
 
@@ -60,23 +64,28 @@ export class UsersController {
     return classToClass(this.findByEmailService.execute(email));
   }
 
+  @Get('/company/:companyId?')
+  findAllByCompany(@User() user: UserPayloadDto) {
+    return classToClass(this.findAllByCompanyService.execute(user));
+  }
+
   @Public()
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
-    return classToClass(this.createUserService.execute(createUserDto));
+    await this.createUserService.execute(createUserDto);
+
+    return this.sessionService.execute(createUserDto);
   }
 
-  @Patch('update')
-  async update(
+  @Patch()
+  update(
     @Body() updateUserDto: UpdateUserDto,
     @User() { userId }: UserPayloadDto,
   ) {
-    return classToClass(
-      this.updateUserService.execute(+userId, updateUserDto),
-    );
+    return classToClass(this.updateUserService.execute(+userId, updateUserDto));
   }
 
-  @Patch('update/authorization')
+  @Patch('/company')
   async updatePermissionsRoles(
     @Body() updateUserCompanyDto: UpdateUserCompanyDto,
   ) {
@@ -88,8 +97,6 @@ export class UsersController {
   @Public()
   @Patch('reset-password')
   async reset(@Body() resetPasswordDto: ResetPasswordDto) {
-    return classToClass(
-      this.resetPasswordService.execute(resetPasswordDto),
-    );
+    return classToClass(this.resetPasswordService.execute(resetPasswordDto));
   }
 }

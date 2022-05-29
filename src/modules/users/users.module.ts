@@ -1,5 +1,5 @@
 import { InviteUsersRepository } from './repositories/implementations/InviteUsersRepository';
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 
 import { DayJSProvider } from '../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { HashProvider } from '../../shared/providers/HashProvider/implementations/HashProvider';
@@ -15,26 +15,32 @@ import { UpdateUserService } from './services/users/update-user/update-user.serv
 import { InvitesController } from './controller/invites/invites.controller';
 import { DeleteInvitesService } from './services/invites/delete-invites/delete-invites.service';
 import { DeleteExpiredInvitesService } from './services/invites/delete-expired-invites/delete-expired-invites.service';
-import { AwsSesProvider } from '../../shared/providers/MailProvider/implementations/AwsSes/AwsSesProvider';
+import { SendGridProvider } from '../../shared/providers/MailProvider/implementations/SendGrid/SendGridProvider';
 import { FindMeService } from './services/users/find-me/find-me.service';
 import { UsersCompanyRepository } from './repositories/implementations/UsersCompanyRepository';
 import { FindByTokenService } from './services/invites/find-by-token/find-by-token.service';
 import { UpdatePermissionsRolesService } from './services/users/update-permissions-roles/update-permissions-roles.service';
+import { AuthModule } from '../auth/auth.module';
+import { FindAllByCompanyService } from './services/users/find-all/find-all.service';
+import { FindAllByCompanyIdService } from './services/invites/find-by-companyId/find-by-companyId.service';
 
 @Module({
   controllers: [UsersController, InvitesController],
+  imports: [forwardRef(() => AuthModule)],
   providers: [
     HashProvider,
     DayJSProvider,
-    AwsSesProvider,
+    SendGridProvider,
     UsersRepository,
     CreateUserService,
     UpdateUserService,
     ResetPasswordService,
     FindByIdService,
     FindByEmailService,
+    FindAllByCompanyIdService,
     InviteUsersService,
     DeleteInvitesService,
+    FindAllByCompanyService,
     DeleteExpiredInvitesService,
     FindMeService,
     RefreshTokensRepository,

@@ -45,8 +45,11 @@ export class UsersRepository implements IUsersRepository {
     return new UserEntity(user);
   }
 
-  async findAll() {
-    const users = await this.prisma.user.findMany();
+  async findAllByCompany(companyId?: string) {
+    const users = await this.prisma.user.findMany({
+      where: { companies: { some: { companyId } } },
+      include: { companies: true },
+    });
     return users.map((user) => new UserEntity(user));
   }
 

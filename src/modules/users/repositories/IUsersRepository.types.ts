@@ -14,7 +14,7 @@ interface IUsersRepository {
     userCompanyDto: UserCompanyDto[],
   ): Promise<UserEntity>;
   removeById(id: number): Promise<UserEntity>;
-  findAll(): Promise<UserEntity[]>;
+  findAllByCompany(company: string): Promise<UserEntity[]>;
   findByEmail(email: string): Promise<UserEntity>;
   findById(id: number): Promise<UserEntity>;
 }

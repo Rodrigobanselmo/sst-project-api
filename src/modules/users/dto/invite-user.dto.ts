@@ -1,4 +1,8 @@
-import { IsEmail, IsString } from 'class-validator';
+import { IsEmail, IsEnum, IsOptional, IsString } from 'class-validator';
+import {
+  PermissionEnum,
+  RoleEnum,
+} from 'src/shared/constants/enum/authorization';
 
 export class InviteUserDto {
   @IsString()
@@ -9,8 +13,17 @@ export class InviteUserDto {
   readonly companyId: string;
 
   @IsString({ each: true })
-  readonly roles: string[];
+  @IsOptional()
+  @IsEnum(PermissionEnum, {
+    message: `wrong permission value sent`,
+    each: true,
+  })
+  readonly permissions: PermissionEnum[];
 
   @IsString({ each: true })
-  readonly permissions: string[];
+  @IsEnum(RoleEnum, {
+    message: `wrong role value sent`,
+    each: true,
+  })
+  readonly roles?: RoleEnum[];
 }

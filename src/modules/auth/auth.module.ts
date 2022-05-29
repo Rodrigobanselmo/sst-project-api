@@ -1,10 +1,10 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 
 import { DayJSProvider } from '../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { HashProvider } from '../../shared/providers/HashProvider/implementations/HashProvider';
-import { AwsSesProvider } from '../../shared/providers/MailProvider/implementations/AwsSes/AwsSesProvider';
+import { SendGridProvider } from '../../shared/providers/MailProvider/implementations/SendGrid/SendGridProvider';
 import { JwtTokenProvider } from '../../shared/providers/TokenProvider/implementations/JwtTokenProvider';
 import { UsersModule } from '../users/users.module';
 import { AuthController } from './controller/auth.controller';
@@ -19,7 +19,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 @Module({
   imports: [
     PassportModule,
-    UsersModule,
+    forwardRef(() => UsersModule),
     JwtModule.register({
       secret: process.env.TOKEN_SECRET,
       signOptions: {
@@ -38,7 +38,8 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     JwtTokenProvider,
     JwtStrategy,
     SendForgotPassMailService,
-    AwsSesProvider,
+    SendGridProvider,
   ],
+  exports: [SessionService],
 })
 export class AuthModule {}
