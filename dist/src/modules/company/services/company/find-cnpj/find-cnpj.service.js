@@ -22,6 +22,7 @@ let FindCnpjService = class FindCnpjService {
             response = await axios_1.default.get(`https://brasilapi.com.br/api/cnpj/v1/${cnpjString}`);
         }
         catch (error) {
+            console.log(error);
             if (error.code === 'ERR_BAD_REQUEST')
                 throw new common_1.BadRequestException(error.response.data.message);
             throw new common_1.InternalServerErrorException(error.response.data.message);

@@ -25,8 +25,8 @@ let RiskDataController = class RiskDataController {
         this.upsertRiskDataService = upsertRiskDataService;
         this.findAllByGroupAndRiskService = findAllByGroupAndRiskService;
     }
-    upsert(createRiskDto) {
-        return this.upsertRiskDataService.execute(createRiskDto);
+    upsert(upsertRiskDataDto) {
+        return this.upsertRiskDataService.execute(upsertRiskDataDto);
     }
     findAllAvailable(userPayloadDto, riskId, groupId) {
         const companyId = userPayloadDto.targetCompanyId;

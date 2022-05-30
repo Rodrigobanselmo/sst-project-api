@@ -39,38 +39,38 @@ let RiskDataRepository = class RiskDataRepository {
                     : undefined, generateSources: generateSources
                     ? {
                         connect: generateSources.map((id) => ({
-                            id_companyId: { companyId, id },
+                            id,
                         })),
                     }
                     : undefined, recs: recs
                     ? {
                         connect: recs.map((id) => ({
-                            id_companyId: { companyId, id },
+                            id,
                         })),
                     }
                     : undefined, adms: adms
                     ? {
                         connect: adms.map((id) => ({
-                            id_companyId: { companyId, id },
+                            id,
                         })),
                     }
                     : undefined, engs: engs
                     ? {
                         connect: engs.map((id) => ({
-                            id_companyId: { companyId, id },
+                            id,
                         })),
                     }
                     : undefined }),
             update: Object.assign(Object.assign({}, createDto), { companyId, recs: recs
                     ? {
                         set: recs.map((id) => ({
-                            id_companyId: { companyId, id },
+                            id,
                         })),
                     }
                     : undefined, adms: adms
                     ? {
                         set: adms.map((id) => ({
-                            id_companyId: { companyId, id },
+                            id,
                         })),
                     }
                     : undefined, engs: engs

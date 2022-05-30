@@ -48,7 +48,6 @@ let SessionService = class SessionService {
         if (!user) {
             throw new common_1.BadRequestException('Email or password incorrect');
         }
-        console.log(password, user.password);
         const passwordMatch = await this.hashProvider.compare(password, user.password);
         if (!passwordMatch) {
             throw new common_1.BadRequestException('Email or password incorrect');

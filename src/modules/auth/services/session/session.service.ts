@@ -65,7 +65,6 @@ export class SessionService {
       throw new BadRequestException('Email or password incorrect');
     }
 
-    console.log(password, user.password);
     const passwordMatch = await this.hashProvider.compare(
       password,
       user.password,

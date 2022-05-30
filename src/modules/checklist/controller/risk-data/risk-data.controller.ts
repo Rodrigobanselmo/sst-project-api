@@ -14,8 +14,8 @@ export class RiskDataController {
   ) {}
 
   @Post()
-  upsert(@Body() createRiskDto: UpsertRiskDataDto) {
-    return this.upsertRiskDataService.execute(createRiskDto);
+  upsert(@Body() upsertRiskDataDto: UpsertRiskDataDto) {
+    return this.upsertRiskDataService.execute(upsertRiskDataDto);
   }
 
   @Get('/:companyId/:groupId/:riskId')

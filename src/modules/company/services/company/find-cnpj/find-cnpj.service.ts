@@ -17,6 +17,7 @@ export class FindCnpjService {
         `https://brasilapi.com.br/api/cnpj/v1/${cnpjString}`,
       );
     } catch (error) {
+      console.log(error);
       if (error.code === 'ERR_BAD_REQUEST')
         throw new BadRequestException(error.response.data.message);
 

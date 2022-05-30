@@ -25,11 +25,11 @@ export declare class CompanyController {
     create(createCompanyDto: CreateCompanyDto): Promise<import("../../entities/company.entity").CompanyEntity>;
     createChild(createContractDto: CreateContractDto): Promise<import("../../entities/company.entity").CompanyEntity>;
     update(updateCompanyDto: UpdateCompanyDto): Promise<import("../../entities/company.entity").CompanyEntity | (import(".prisma/client").Company & {
-        users: import(".prisma/client").UserCompany[];
+        license: import(".prisma/client").License;
         workspace: import(".prisma/client").Workspace[];
         primary_activity: import(".prisma/client").Activity[];
         secondary_activity: import(".prisma/client").Activity[];
+        users: import(".prisma/client").UserCompany[];
         employees: import(".prisma/client").Employee[];
-        license: import(".prisma/client").License;
     })>;
 }
