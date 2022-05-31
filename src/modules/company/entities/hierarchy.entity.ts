@@ -1,7 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Hierarchy, HierarchyEnum, StatusEnum } from '@prisma/client';
+
 import { EmployeeEntity } from './employee.entity';
-import { HomoGroupEntity } from './homoGroup.entity';
+import {
+  HierarchyOnHomogeneousEntity,
+  HomoGroupEntity,
+} from './homoGroup.entity';
 import { WorkspaceEntity } from './workspace.entity';
 
 export class HierarchyEntity implements Hierarchy {
@@ -40,17 +44,20 @@ export class HierarchyEntity implements Hierarchy {
   @ApiProperty({ description: 'The parent id of the Hierarchy' })
   parentId: string;
 
-  @ApiProperty({ description: 'The workplace id of the Hierarchy' })
-  workplaceId: string;
-
   @ApiProperty({ description: 'The workplace of the Hierarchy' })
-  workplace?: WorkspaceEntity;
+  workspaces?: WorkspaceEntity[];
+
+  @ApiProperty({ description: 'The group of the Hierarchy' })
+  hierarchyOnHomogeneous?: HierarchyOnHomogeneousEntity[];
 
   @ApiProperty({ description: 'The group of the Hierarchy' })
   homogeneousGroups?: HomoGroupEntity[];
 
   @ApiProperty({ description: 'The workplace of the Hierarchy' })
   employees?: EmployeeEntity[];
+
+  workspaceIds?: string[];
+  workspaceId?: string;
 
   constructor(partial: Partial<HierarchyEntity>) {
     Object.assign(this, partial);

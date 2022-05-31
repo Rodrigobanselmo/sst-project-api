@@ -1,5 +1,5 @@
 import { HierarchyEnum } from '@prisma/client';
-import { HierarchyEntity } from 'src/modules/company/entities/hierarchy.entity';
+import { HierarchyEntity } from '../../../../../../../modules/company/entities/hierarchy.entity';
 
 import { hierarchyMap } from '../parts/first/first.constant';
 
@@ -82,7 +82,7 @@ export const hierarchyConverter = (hierarchies: HierarchyEntity[]) => {
 
       hierarchyData.set(hierarchy.id, {
         org: hierarchyArrayData.filter((hierarchyInfo) => hierarchyInfo),
-        workspace: hierarchy.workplace.name,
+        workspace: hierarchy.workspaces[0].name, //!
         descRh: hierarchy.description,
         descReal: hierarchy.realDescription,
         employeesLength: hierarchy?.employees?.length || 0,

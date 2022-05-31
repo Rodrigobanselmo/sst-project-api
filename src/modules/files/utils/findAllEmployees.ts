@@ -1,6 +1,6 @@
 import { Hierarchy, HierarchyEnum, StatusEnum } from '@prisma/client';
-import { WorkspaceRepository } from 'src/modules/company/repositories/implementations/WorkspaceRepository';
-import { IEmployeeSheet } from 'src/shared/constants/workbooks/sheets/employees/employeesSheet.constant';
+import { WorkspaceRepository } from '../../../modules/company/repositories/implementations/WorkspaceRepository';
+import { IEmployeeSheet } from '../../../shared/constants/workbooks/sheets/employees/employeesSheet.constant';
 import { CompanyRepository } from '../../../modules/company/repositories/implementations/CompanyRepository';
 import { HierarchyRepository } from '../../../modules/company/repositories/implementations/HierarchyRepository';
 import { ICompanyUniqueSheet } from '../../../shared/constants/workbooks/sheets/companyUnique/companyUniqueSheet.constant';
@@ -59,7 +59,9 @@ export const findAllEmployees = async (
 
   company.employees = company.employees.map((employee) => {
     const workspace = workspaces.find(
-      (workspace) => workspace.id === employee.workplaceId,
+      (workspace) =>
+        employee.workspaces &&
+        employee.workspaces.find((w) => w.id == workspace.id),
     );
 
     return {

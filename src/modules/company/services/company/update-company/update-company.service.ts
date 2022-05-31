@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { WorkspaceDto } from 'src/modules/company/dto/workspace.dto';
-import { WorkspaceRepository } from 'src/modules/company/repositories/implementations/WorkspaceRepository';
+import { WorkspaceDto } from '../../../../../modules/company/dto/workspace.dto';
+import { WorkspaceRepository } from '../../../../../modules/company/repositories/implementations/WorkspaceRepository';
 import { UpdateCompanyDto } from '../../../dto/update-company.dto';
 import { CompanyRepository } from '../../../repositories/implementations/CompanyRepository';
 

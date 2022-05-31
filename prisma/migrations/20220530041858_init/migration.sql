@@ -26,17 +26,32 @@ CREATE TABLE "Activity" (
 -- CreateTable
 CREATE TABLE "Address" (
     "id" TEXT NOT NULL,
-    "cep" TEXT NOT NULL,
     "companyId" TEXT NOT NULL,
+    "cep" TEXT NOT NULL,
+    "workspaceId" TEXT,
     "street" TEXT,
     "number" TEXT,
     "complement" TEXT,
     "neighborhood" TEXT,
     "city" TEXT,
     "state" TEXT,
-    "workspaceId" TEXT,
 
     CONSTRAINT "Address_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "AddressCompany" (
+    "id" TEXT NOT NULL,
+    "cep" TEXT NOT NULL,
+    "street" TEXT,
+    "number" TEXT,
+    "complement" TEXT,
+    "neighborhood" TEXT,
+    "city" TEXT,
+    "state" TEXT,
+    "companyId" TEXT NOT NULL,
+
+    CONSTRAINT "AddressCompany_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -118,10 +133,9 @@ CREATE TABLE "Employee" (
     "name" TEXT NOT NULL,
     "cpf" TEXT NOT NULL,
     "companyId" TEXT NOT NULL,
-    "workplaceId" TEXT NOT NULL,
     "hierarchyId" TEXT NOT NULL,
 
-    CONSTRAINT "Employee_pkey" PRIMARY KEY ("id","companyId")
+    CONSTRAINT "Employee_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -166,9 +180,17 @@ CREATE TABLE "Hierarchy" (
     "name" TEXT NOT NULL,
     "companyId" TEXT NOT NULL,
     "parentId" TEXT,
-    "workplaceId" TEXT NOT NULL,
 
     CONSTRAINT "Hierarchy_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "HierarchyOnHomogeneous" (
+    "hierarchyId" TEXT NOT NULL,
+    "homogeneousGroupId" TEXT NOT NULL,
+    "workspaceId" TEXT NOT NULL,
+
+    CONSTRAINT "HierarchyOnHomogeneous_pkey" PRIMARY KEY ("hierarchyId","homogeneousGroupId","workspaceId")
 );
 
 -- CreateTable
@@ -261,7 +283,23 @@ CREATE TABLE "RiskFactors" (
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "representAll" BOOLEAN NOT NULL DEFAULT false,
 
-    CONSTRAINT "RiskFactors_pkey" PRIMARY KEY ("id","companyId")
+    CONSTRAINT "RiskFactors_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "RiskFactorDocument" (
+    "id" TEXT NOT NULL,
+    "fileUrl" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "description" TEXT NOT NULL DEFAULT E'',
+    "version" TEXT NOT NULL DEFAULT E'1',
+    "companyId" TEXT NOT NULL,
+    "riskGroupId" TEXT NOT NULL,
+    "status" "StatusEnum" NOT NULL DEFAULT E'ACTIVE',
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "RiskFactorDocument_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -274,7 +312,7 @@ CREATE TABLE "RiskFactorGroupData" (
     "elaboratedBy" TEXT,
     "revisionBy" TEXT,
     "approvedBy" TEXT,
-    "documentDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "visitDate" TIMESTAMP(3),
     "status" "StatusEnum" NOT NULL DEFAULT E'PROGRESS',
 
     CONSTRAINT "RiskFactorGroupData_pkey" PRIMARY KEY ("id")
@@ -298,6 +336,7 @@ CREATE TABLE "RiskFactorData" (
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
     "email" TEXT NOT NULL,
+    "name" TEXT,
     "password" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
@@ -322,13 +361,14 @@ CREATE TABLE "UserCompany" (
 CREATE TABLE "Workspace" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "abbreviation" TEXT,
     "description" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
     "companyId" TEXT NOT NULL,
     "status" "StatusEnum" NOT NULL DEFAULT E'ACTIVE',
 
-    CONSTRAINT "Workspace_pkey" PRIMARY KEY ("id","companyId")
+    CONSTRAINT "Workspace_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -339,6 +379,12 @@ CREATE TABLE "_primary_activity" (
 
 -- CreateTable
 CREATE TABLE "_secondary_activity" (
+    "A" INTEGER NOT NULL,
+    "B" TEXT NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "_EmployeeToWorkspace" (
     "A" INTEGER NOT NULL,
     "B" TEXT NOT NULL
 );
@@ -356,7 +402,7 @@ CREATE TABLE "_GenerateSourceToRiskFactorData" (
 );
 
 -- CreateTable
-CREATE TABLE "_HierarchyToHomogeneousGroup" (
+CREATE TABLE "_HierarchyToWorkspace" (
     "A" TEXT NOT NULL,
     "B" TEXT NOT NULL
 );
@@ -389,7 +435,10 @@ CREATE UNIQUE INDEX "Address_workspaceId_companyId_key" ON "Address"("workspaceI
 CREATE UNIQUE INDEX "Address_id_companyId_key" ON "Address"("id", "companyId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Address_companyId_key" ON "Address"("companyId");
+CREATE UNIQUE INDEX "AddressCompany_companyId_key" ON "AddressCompany"("companyId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Employee_id_companyId_key" ON "Employee"("id", "companyId");
 
 -- CreateIndex
 CREATE INDEX "Epi_ca_idx" ON "Epi"("ca");
@@ -404,6 +453,9 @@ CREATE UNIQUE INDEX "GenerateSource_id_companyId_key" ON "GenerateSource"("id", 
 CREATE INDEX "Hierarchy_companyId_idx" ON "Hierarchy"("companyId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Hierarchy_id_companyId_key" ON "Hierarchy"("id", "companyId");
+
+-- CreateIndex
 CREATE INDEX "HomogeneousGroup_companyId_idx" ON "HomogeneousGroup"("companyId");
 
 -- CreateIndex
@@ -416,6 +468,12 @@ CREATE INDEX "License_companyId_idx" ON "License"("companyId");
 CREATE UNIQUE INDEX "RecMed_id_companyId_key" ON "RecMed"("id", "companyId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "RiskFactors_id_companyId_key" ON "RiskFactors"("id", "companyId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "RiskFactorDocument_id_companyId_key" ON "RiskFactorDocument"("id", "companyId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "RiskFactorGroupData_id_companyId_key" ON "RiskFactorGroupData"("id", "companyId");
 
 -- CreateIndex
@@ -423,6 +481,12 @@ CREATE UNIQUE INDEX "RiskFactorData_id_companyId_key" ON "RiskFactorData"("id", 
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Workspace_abbreviation_companyId_key" ON "Workspace"("abbreviation", "companyId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Workspace_id_companyId_key" ON "Workspace"("id", "companyId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_primary_activity_AB_unique" ON "_primary_activity"("A", "B");
@@ -437,6 +501,12 @@ CREATE UNIQUE INDEX "_secondary_activity_AB_unique" ON "_secondary_activity"("A"
 CREATE INDEX "_secondary_activity_B_index" ON "_secondary_activity"("B");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "_EmployeeToWorkspace_AB_unique" ON "_EmployeeToWorkspace"("A", "B");
+
+-- CreateIndex
+CREATE INDEX "_EmployeeToWorkspace_B_index" ON "_EmployeeToWorkspace"("B");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "_EpiToRiskFactorData_AB_unique" ON "_EpiToRiskFactorData"("A", "B");
 
 -- CreateIndex
@@ -449,10 +519,10 @@ CREATE UNIQUE INDEX "_GenerateSourceToRiskFactorData_AB_unique" ON "_GenerateSou
 CREATE INDEX "_GenerateSourceToRiskFactorData_B_index" ON "_GenerateSourceToRiskFactorData"("B");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "_HierarchyToHomogeneousGroup_AB_unique" ON "_HierarchyToHomogeneousGroup"("A", "B");
+CREATE UNIQUE INDEX "_HierarchyToWorkspace_AB_unique" ON "_HierarchyToWorkspace"("A", "B");
 
 -- CreateIndex
-CREATE INDEX "_HierarchyToHomogeneousGroup_B_index" ON "_HierarchyToHomogeneousGroup"("B");
+CREATE INDEX "_HierarchyToWorkspace_B_index" ON "_HierarchyToWorkspace"("B");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_recs_AB_unique" ON "_recs"("A", "B");
@@ -476,7 +546,7 @@ CREATE INDEX "_adms_B_index" ON "_adms"("B");
 ALTER TABLE "Address" ADD CONSTRAINT "Address_id_companyId_fkey" FOREIGN KEY ("id", "companyId") REFERENCES "Workspace"("id", "companyId") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Address" ADD CONSTRAINT "Address_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "AddressCompany" ADD CONSTRAINT "AddressCompany_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Checklist" ADD CONSTRAINT "Checklist_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -497,9 +567,6 @@ ALTER TABLE "Contract" ADD CONSTRAINT "Contract_applyingServiceCompanyId_fkey" F
 ALTER TABLE "DatabaseTable" ADD CONSTRAINT "DatabaseTable_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Employee" ADD CONSTRAINT "Employee_workplaceId_companyId_fkey" FOREIGN KEY ("workplaceId", "companyId") REFERENCES "Workspace"("id", "companyId") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "Employee" ADD CONSTRAINT "Employee_hierarchyId_fkey" FOREIGN KEY ("hierarchyId") REFERENCES "Hierarchy"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -512,13 +579,19 @@ ALTER TABLE "GenerateSource" ADD CONSTRAINT "GenerateSource_companyId_fkey" FORE
 ALTER TABLE "GenerateSource" ADD CONSTRAINT "GenerateSource_riskId_companyId_fkey" FOREIGN KEY ("riskId", "companyId") REFERENCES "RiskFactors"("id", "companyId") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Hierarchy" ADD CONSTRAINT "Hierarchy_workplaceId_companyId_fkey" FOREIGN KEY ("workplaceId", "companyId") REFERENCES "Workspace"("id", "companyId") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "Hierarchy" ADD CONSTRAINT "Hierarchy_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Hierarchy" ADD CONSTRAINT "Hierarchy_parentId_fkey" FOREIGN KEY ("parentId") REFERENCES "Hierarchy"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "HierarchyOnHomogeneous" ADD CONSTRAINT "HierarchyOnHomogeneous_hierarchyId_fkey" FOREIGN KEY ("hierarchyId") REFERENCES "Hierarchy"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "HierarchyOnHomogeneous" ADD CONSTRAINT "HierarchyOnHomogeneous_homogeneousGroupId_fkey" FOREIGN KEY ("homogeneousGroupId") REFERENCES "HomogeneousGroup"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "HierarchyOnHomogeneous" ADD CONSTRAINT "HierarchyOnHomogeneous_workspaceId_fkey" FOREIGN KEY ("workspaceId") REFERENCES "Workspace"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "HomogeneousGroup" ADD CONSTRAINT "HomogeneousGroup_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -539,13 +612,19 @@ ALTER TABLE "RefreshToken" ADD CONSTRAINT "RefreshToken_userId_fkey" FOREIGN KEY
 ALTER TABLE "RiskFactors" ADD CONSTRAINT "RiskFactors_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "RiskFactorDocument" ADD CONSTRAINT "RiskFactorDocument_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "RiskFactorDocument" ADD CONSTRAINT "RiskFactorDocument_riskGroupId_companyId_fkey" FOREIGN KEY ("riskGroupId", "companyId") REFERENCES "RiskFactorGroupData"("id", "companyId") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "RiskFactorGroupData" ADD CONSTRAINT "RiskFactorGroupData_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "RiskFactorData" ADD CONSTRAINT "RiskFactorData_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "RiskFactorData" ADD CONSTRAINT "RiskFactorData_riskId_companyId_fkey" FOREIGN KEY ("riskId", "companyId") REFERENCES "RiskFactors"("id", "companyId") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "RiskFactorData" ADD CONSTRAINT "RiskFactorData_riskId_fkey" FOREIGN KEY ("riskId") REFERENCES "RiskFactors"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "RiskFactorData" ADD CONSTRAINT "RiskFactorData_homogeneousGroupId_fkey" FOREIGN KEY ("homogeneousGroupId") REFERENCES "HomogeneousGroup"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -578,6 +657,12 @@ ALTER TABLE "_secondary_activity" ADD FOREIGN KEY ("A") REFERENCES "Activity"("i
 ALTER TABLE "_secondary_activity" ADD FOREIGN KEY ("B") REFERENCES "Company"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "_EmployeeToWorkspace" ADD FOREIGN KEY ("A") REFERENCES "Employee"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_EmployeeToWorkspace" ADD FOREIGN KEY ("B") REFERENCES "Workspace"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "_EpiToRiskFactorData" ADD FOREIGN KEY ("A") REFERENCES "Epi"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -590,10 +675,10 @@ ALTER TABLE "_GenerateSourceToRiskFactorData" ADD FOREIGN KEY ("A") REFERENCES "
 ALTER TABLE "_GenerateSourceToRiskFactorData" ADD FOREIGN KEY ("B") REFERENCES "RiskFactorData"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "_HierarchyToHomogeneousGroup" ADD FOREIGN KEY ("A") REFERENCES "Hierarchy"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "_HierarchyToWorkspace" ADD FOREIGN KEY ("A") REFERENCES "Hierarchy"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "_HierarchyToHomogeneousGroup" ADD FOREIGN KEY ("B") REFERENCES "HomogeneousGroup"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "_HierarchyToWorkspace" ADD FOREIGN KEY ("B") REFERENCES "Workspace"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_recs" ADD FOREIGN KEY ("A") REFERENCES "RecMed"("id") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -1,6 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { HomogeneousGroup, StatusEnum } from '@prisma/client';
+import {
+  HierarchyOnHomogeneous,
+  HomogeneousGroup,
+  StatusEnum,
+} from '@prisma/client';
 import { HierarchyEntity } from './hierarchy.entity';
+import { WorkspaceEntity } from './workspace.entity';
 
 export class HomoGroupEntity implements HomogeneousGroup {
   @ApiProperty({ description: 'The id of the HomogeneousGroup' })
@@ -26,8 +31,25 @@ export class HomoGroupEntity implements HomogeneousGroup {
   @ApiProperty({ description: 'The creation date of the HomogeneousGroup' })
   created_at: Date;
 
+  hierarchyOnHomogeneous?: HierarchyOnHomogeneousEntity[];
+
   @ApiProperty({ description: 'The hierarchies of the HomogeneousGroup' })
   hierarchies?: HierarchyEntity[];
+
+  workspaceId?: string;
+
+  constructor(partial: Partial<HomoGroupEntity>) {
+    Object.assign(this, partial);
+  }
+}
+
+export class HierarchyOnHomogeneousEntity implements HierarchyOnHomogeneous {
+  hierarchyId: string;
+  homogeneousGroupId: string;
+  workspaceId: string;
+  hierarchy?: HierarchyEntity;
+  workspace?: WorkspaceEntity;
+  homogeneousGroup?: HomoGroupEntity;
 
   constructor(partial: Partial<HomoGroupEntity>) {
     Object.assign(this, partial);

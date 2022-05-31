@@ -1,8 +1,8 @@
 import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { classToClass } from 'class-transformer';
-import { User } from 'src/shared/decorators/user.decorator';
-import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
+import { User } from '../../../../shared/decorators/user.decorator';
+import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 
 import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';

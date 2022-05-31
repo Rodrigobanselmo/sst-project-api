@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { FindEpiDto } from 'src/modules/checklist/dto/epi.dto';
+import { FindEpiDto } from '../../../../../modules/checklist/dto/epi.dto';
 
 import { EpiRepository } from '../../../repositories/implementations/EpiRepository';
 

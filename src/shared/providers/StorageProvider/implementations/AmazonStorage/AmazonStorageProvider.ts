@@ -1,5 +1,5 @@
 import * as AWS from 'aws-sdk';
-import MimeClass from 'src/shared/utils/mime';
+import MimeClass from '../../../../../shared/utils/mime';
 import {
   FileStorage,
   IStorageProvider,

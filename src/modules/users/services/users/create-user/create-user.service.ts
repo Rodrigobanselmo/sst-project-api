@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { ErrorAuthEnum } from 'src/shared/constants/enum/errorMessage';
+import { ErrorAuthEnum } from '../../../../../shared/constants/enum/errorMessage';
 
 import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { HashProvider } from '../../../../../shared/providers/HashProvider/implementations/HashProvider';

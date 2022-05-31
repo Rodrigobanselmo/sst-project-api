@@ -10,25 +10,15 @@ export class HomoGroupRepository {
   constructor(private prisma: PrismaService) {}
 
   async create(
-    { hierarchies, ...updateHomoGroup }: CreateHomoGroupDto,
+    { ...createHomoGroupDto }: CreateHomoGroupDto,
     companyId: string,
   ): Promise<HomoGroupEntity> {
     const data = await this.prisma.homogeneousGroup.create({
       data: {
-        ...updateHomoGroup,
+        ...createHomoGroupDto,
         companyId,
       },
     });
-
-    if (hierarchies && hierarchies.length)
-      await this.prisma.homogeneousGroup.update({
-        data: {
-          hierarchies: {
-            set: hierarchies.map((id) => ({ id })),
-          },
-        },
-        where: { id: data.id },
-      });
 
     return new HomoGroupEntity(data);
   }
@@ -40,16 +30,32 @@ export class HomoGroupRepository {
   }: UpdateHomoGroupDto): Promise<HomoGroupEntity> {
     const data = await this.prisma.homogeneousGroup.update({
       where: { id },
-      include: { hierarchies: true },
+      include: { hierarchyOnHomogeneous: { include: { hierarchy: true } } },
       data: {
         ...updateHomoGroup,
-        hierarchies: hierarchies
-          ? { set: hierarchies.map((id) => ({ id })) }
+        hierarchyOnHomogeneous: hierarchies
+          ? {
+              set: hierarchies.map((hierarchy) => ({
+                hierarchyId_homogeneousGroupId_workspaceId: {
+                  hierarchyId: hierarchy.id,
+                  homogeneousGroupId: id,
+                  workspaceId: hierarchy.workplaceId,
+                },
+              })),
+            }
           : undefined,
       },
     });
 
-    return new HomoGroupEntity(data);
+    const homoGroup = { ...data } as HomoGroupEntity;
+
+    if (data.hierarchyOnHomogeneous)
+      homoGroup.hierarchies = data.hierarchyOnHomogeneous.map((homo) => ({
+        ...homo.hierarchy,
+        workspaceId: homo.workspaceId,
+      }));
+
+    return new HomoGroupEntity(homoGroup);
   }
 
   async deleteById(id: string): Promise<void> {
@@ -69,9 +75,20 @@ export class HomoGroupRepository {
   async findHomoGroupByCompany(companyId: string) {
     const hierarchies = await this.prisma.homogeneousGroup.findMany({
       where: { companyId },
-      include: { hierarchies: true },
+      include: { hierarchyOnHomogeneous: { include: { hierarchy: true } } },
     });
 
-    return hierarchies.map((homoGroup) => new HomoGroupEntity(homoGroup));
+    return hierarchies.map((homoGroup) => {
+      const homogeneousGroup = { ...homoGroup } as HomoGroupEntity;
+      if (homoGroup.hierarchyOnHomogeneous)
+        homogeneousGroup.hierarchies = homoGroup.hierarchyOnHomogeneous.map(
+          (homo) => ({
+            ...homo.hierarchy,
+            workspaceId: homo.workspaceId,
+          }),
+        );
+
+      return new HomoGroupEntity(homogeneousGroup);
+    });
   }
 }

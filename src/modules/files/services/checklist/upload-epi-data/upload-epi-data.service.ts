@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { EpiRepository } from 'src/modules/checklist/repositories/implementations/EpiRepository';
-import { findAllEpis } from 'src/modules/files/utils/findAllEpis';
-import { IEpiSheet } from 'src/shared/constants/workbooks/sheets/epi/epiSheet.constant';
-import { removeDuplicate } from 'src/shared/utils/removeDuplicate';
+import { EpiRepository } from '../../../../../modules/checklist/repositories/implementations/EpiRepository';
+import { findAllEpis } from '../../../../../modules/files/utils/findAllEpis';
+import { IEpiSheet } from '../../../../../shared/constants/workbooks/sheets/epi/epiSheet.constant';
+import { removeDuplicate } from '../../../../../shared/utils/removeDuplicate';
 
 import { workbooksConstant } from '../../../../../shared/constants/workbooks/workbooks.constant';
 import { WorkbooksEnum } from '../../../../../shared/constants/workbooks/workbooks.enum';

@@ -8,7 +8,7 @@ import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { ExcelProvider } from '../../../../../shared/providers/ExcelProvider/implementations/ExcelProvider';
 
 import { findAllEmployees } from '../../../utils/findAllEmployees';
-import { WorkspaceRepository } from 'src/modules/company/repositories/implementations/WorkspaceRepository';
+import { WorkspaceRepository } from '../../../../../modules/company/repositories/implementations/WorkspaceRepository';
 
 @Injectable()
 export class DownloadEmployeesService {

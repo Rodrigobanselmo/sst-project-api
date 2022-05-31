@@ -33,14 +33,11 @@ export class EmployeeEntity implements Employee {
   })
   updated_at: Date;
 
-  @ApiProperty({ description: 'The workplace id of the Employee' })
-  workplaceId: string;
-
   @ApiProperty({ description: 'The hierarchy id of the Employee' })
   hierarchyId: string;
 
-  @ApiProperty({ description: 'The workspace related to the Employee' })
-  workspace?: WorkspaceEntity;
+  @ApiProperty({ description: 'The workspaces related to the Employee' })
+  workspaces?: WorkspaceEntity[];
 
   @ApiProperty({ description: 'The hierarchy of the Employee' })
   hierarchy?: HierarchyEntity;

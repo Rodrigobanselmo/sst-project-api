@@ -4,6 +4,7 @@ import { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { UpsertRiskGroupDataDto } from '../../dto/risk-group-data.dto';
+import { RiskFactorDataEntity } from '../../entities/riskData.entity';
 import { RiskFactorGroupDataEntity } from '../../entities/riskGroupData.entity';
 
 @Injectable()
@@ -80,9 +81,13 @@ export class RiskGroupDataRepository {
                 : true,
               homogeneousGroup: {
                 include: {
-                  hierarchies: options?.includeEmployees
-                    ? { include: { employees: true } }
-                    : true,
+                  hierarchyOnHomogeneous: {
+                    include: {
+                      hierarchy: options?.includeEmployees
+                        ? { include: { employees: true } }
+                        : true,
+                    },
+                  },
                 },
               },
             },
@@ -90,6 +95,28 @@ export class RiskGroupDataRepository {
           company: true,
         },
       });
+
+    const riskFactorGroupData = {
+      ...riskFactorGroupDataEntity,
+    } as any;
+
+    riskFactorGroupData.data = riskFactorGroupDataEntity.data.map(
+      (riskData) => {
+        const data = { ...riskData } as any;
+        if (
+          data.homogeneousGroup &&
+          data.homogeneousGroup.hierarchyOnHomogeneous
+        )
+          data.homogeneousGroup.hierarchies =
+            riskData.homogeneousGroup.hierarchyOnHomogeneous.map(
+              (hierarchy) => ({
+                ...hierarchy.hierarchy,
+                hierarchyId: hierarchy.hierarchyId,
+              }),
+            );
+        return;
+      },
+    );
 
     return new RiskFactorGroupDataEntity(riskFactorGroupDataEntity);
   }

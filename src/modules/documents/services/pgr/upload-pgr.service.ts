@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Document, Packer } from 'docx';
-import { RiskDocumentRepository } from 'src/modules/checklist/repositories/implementations/RiskDocumentRepository';
-import { RiskGroupDataRepository } from 'src/modules/checklist/repositories/implementations/RiskGroupDataRepository';
-import { CompanyEntity } from 'src/modules/company/entities/company.entity';
-import { HierarchyRepository } from 'src/modules/company/repositories/implementations/HierarchyRepository';
-import { AmazonStorageProvider } from 'src/shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
+import { RiskDocumentRepository } from '../../../../modules/checklist/repositories/implementations/RiskDocumentRepository';
+import { RiskGroupDataRepository } from '../../../../modules/checklist/repositories/implementations/RiskGroupDataRepository';
+import { CompanyEntity } from '../../../../modules/company/entities/company.entity';
+import { HierarchyRepository } from '../../../../modules/company/repositories/implementations/HierarchyRepository';
+import { AmazonStorageProvider } from '../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
 import { Readable } from 'stream';
 
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
@@ -29,9 +29,7 @@ export class PgrUploadService {
     );
 
     const hierarchyData =
-      await this.hierarchyRepository.findAllHierarchyByCompany(companyId, {
-        include: { employees: true, workplace: true, homogeneousGroups: true },
-      });
+      await this.hierarchyRepository.findAllDataHierarchyByCompany(companyId);
 
     const doc = new Document({
       sections: [

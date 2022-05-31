@@ -2,7 +2,7 @@ import { IsEmail, IsEnum, IsOptional, IsString } from 'class-validator';
 import {
   PermissionEnum,
   RoleEnum,
-} from 'src/shared/constants/enum/authorization';
+} from '../../../shared/constants/enum/authorization';
 
 export class InviteUserDto {
   @IsString()

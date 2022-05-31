@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { HierarchyEnum } from '@prisma/client';
-import { WorkspaceRepository } from 'src/modules/company/repositories/implementations/WorkspaceRepository';
+import { WorkspaceRepository } from '../../../../../modules/company/repositories/implementations/WorkspaceRepository';
 import { CompanyRepository } from '../../../../../modules/company/repositories/implementations/CompanyRepository';
 import { HierarchyRepository } from '../../../../../modules/company/repositories/implementations/HierarchyRepository';
 import { HierarchyExcelProvider } from '../../../../../modules/files/providers/HierarchyExcelProvider';

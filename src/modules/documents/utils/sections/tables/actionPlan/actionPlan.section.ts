@@ -1,9 +1,9 @@
 import { PageOrientation, Table, WidthType } from 'docx';
-import { RiskFactorGroupDataEntity } from 'src/modules/checklist/entities/riskGroupData.entity';
+import { RiskFactorGroupDataEntity } from '../../../../../../modules/checklist/entities/riskGroupData.entity';
 import {
   actionPlanHeader,
   actionPlanTitle,
-} from 'src/modules/documents/utils/sections/tables/actionPlan/actionPlan.constant';
+} from '../../../../../../modules/documents/utils/sections/tables/actionPlan/actionPlan.constant';
 
 import { TableBodyElements } from './elements/body';
 import { TableHeaderElements } from './elements/header';

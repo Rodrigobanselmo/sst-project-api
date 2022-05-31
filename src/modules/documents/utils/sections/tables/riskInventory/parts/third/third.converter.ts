@@ -1,9 +1,9 @@
 import { RiskFactorsEnum } from '@prisma/client';
 import { AlignmentType } from 'docx';
-import { RiskFactorGroupDataEntity } from 'src/modules/checklist/entities/riskGroupData.entity';
-import { riskMap } from 'src/modules/documents/constants/risks.constant';
-import { getMatrizRisk } from 'src/modules/documents/utils/matriz';
-import { palette } from 'src/shared/constants/palette';
+import { RiskFactorGroupDataEntity } from '../../../../../../../../modules/checklist/entities/riskGroupData.entity';
+import { riskMap } from '../../../../../../../../modules/documents/constants/risks.constant';
+import { getMatrizRisk } from '../../../../../../../../modules/documents/utils/matriz';
+import { palette } from '../../../../../../../../shared/constants/palette';
 
 import { bodyTableProps, borderNoneStyle } from '../../elements/body';
 import { whiteBorder, whiteColumnBorder } from '../../elements/header';

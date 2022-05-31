@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { WorkspaceRepository } from 'src/modules/company/repositories/implementations/WorkspaceRepository';
+import { WorkspaceRepository } from '../../../../../modules/company/repositories/implementations/WorkspaceRepository';
 import { CompanyRepository } from '../../../../../modules/company/repositories/implementations/CompanyRepository';
 import { HierarchyRepository } from '../../../../../modules/company/repositories/implementations/HierarchyRepository';
 import { DownloadExcelProvider } from '../../../../../modules/files/providers/donwlodExcelProvider';

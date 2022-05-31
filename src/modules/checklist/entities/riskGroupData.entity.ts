@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { StatusEnum } from '@prisma/client';
 
 import { RiskFactorGroupData } from '.prisma/client';
-import { CompanyEntity } from 'src/modules/company/entities/company.entity';
+import { CompanyEntity } from '../../../modules/company/entities/company.entity';
 import { RiskFactorDataEntity } from './riskData.entity';
 
 export class RiskFactorGroupDataEntity implements RiskFactorGroupData {

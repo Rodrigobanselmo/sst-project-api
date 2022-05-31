@@ -9,7 +9,7 @@ import {
   VerticalAlign,
   WidthType,
 } from 'docx';
-import { palette } from 'src/shared/constants/palette';
+import { palette } from '../../../../../../../shared/constants/palette';
 
 export interface headerTableProps {
   text: string;

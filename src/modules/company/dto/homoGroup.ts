@@ -1,9 +1,22 @@
 import { StatusEnum } from '@prisma/client';
-import { Transform } from 'class-transformer';
-import { IsEnum, IsOptional, IsString, MaxLength } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import {
+  IsEnum,
+  IsOptional,
+  IsString,
+  MaxLength,
+  ValidateNested,
+} from 'class-validator';
 
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 
+export class HierarchyOnHomoDto {
+  @IsString()
+  workplaceId: string;
+
+  @IsString()
+  id: string;
+}
 export class CreateHomoGroupDto {
   @IsString()
   @MaxLength(100)
@@ -22,10 +35,6 @@ export class CreateHomoGroupDto {
 
   @IsString()
   companyId: string;
-
-  @IsOptional()
-  @IsString({ each: true })
-  readonly hierarchies?: string[];
 }
 
 export class UpdateHomoGroupDto {
@@ -42,7 +51,8 @@ export class UpdateHomoGroupDto {
   @MaxLength(100)
   name: string;
 
+  @ValidateNested({ each: true })
   @IsOptional()
-  @IsString({ each: true })
-  readonly hierarchies?: string[];
+  @Type(() => HierarchyOnHomoDto)
+  readonly hierarchies?: HierarchyOnHomoDto[];
 }

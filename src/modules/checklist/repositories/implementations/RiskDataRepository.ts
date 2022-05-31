@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
-import { removeDuplicate } from 'src/shared/utils/removeDuplicate';
+import { removeDuplicate } from '../../../../shared/utils/removeDuplicate';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { UpsertRiskDataDto } from '../../dto/risk-data.dto';
@@ -118,10 +118,24 @@ export class RiskDataRepository {
         epis: true,
         hierarchy: true,
         riskFactor: true,
-        homogeneousGroup: { include: { hierarchies: true } },
+        homogeneousGroup: {
+          include: {
+            hierarchyOnHomogeneous: { include: { hierarchy: true } }, //!
+          },
+        },
       },
     });
-    return riskFactorData.map((data) => new RiskFactorDataEntity(data));
+    return riskFactorData.map((data) => {
+      const riskData = { ...data } as RiskFactorDataEntity;
+      if (data.homogeneousGroup && data.homogeneousGroup.hierarchyOnHomogeneous)
+        riskData.homogeneousGroup.hierarchies =
+          data.homogeneousGroup.hierarchyOnHomogeneous.map((homo) => ({
+            ...homo.hierarchy,
+            workspaceId: homo.workspaceId,
+          }));
+
+      return new RiskFactorDataEntity(riskData);
+    });
   }
 
   async findAllByGroupAndRisk(

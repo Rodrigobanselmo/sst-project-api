@@ -12,7 +12,7 @@ export class EmployeeRepository {
   constructor(private prisma: PrismaService) {}
 
   async create({
-    workplaceId,
+    workplaceIds,
     hierarchyId,
     companyId,
     ...createCompanyDto
@@ -21,8 +21,10 @@ export class EmployeeRepository {
       data: {
         ...createCompanyDto,
         company: { connect: { id: companyId } },
-        workplace: {
-          connect: { id_companyId: { companyId, id: workplaceId } },
+        workplaces: {
+          connect: workplaceIds.map((id) => ({
+            id_companyId: { companyId, id },
+          })),
         },
         hierarchy: {
           connect: { id: hierarchyId },
@@ -34,7 +36,7 @@ export class EmployeeRepository {
   }
 
   async update({
-    workplaceId,
+    workplaceIds,
     hierarchyId,
     companyId,
     id,
@@ -43,10 +45,12 @@ export class EmployeeRepository {
     const employee = await this.prisma.employee.update({
       data: {
         ...createCompanyDto,
-        workplace: !workplaceId
+        workplaces: !workplaceIds
           ? undefined
           : {
-              connect: { id_companyId: { companyId, id: workplaceId } },
+              set: workplaceIds.map((id) => ({
+                id_companyId: { companyId, id },
+              })),
             },
         hierarchy: !hierarchyId
           ? undefined
@@ -69,7 +73,7 @@ export class EmployeeRepository {
         ({
           companyId: _,
           id,
-          workplaceId,
+          workplaceIds,
           hierarchyId,
           ...upsertEmployeeDto
         }) =>
@@ -77,8 +81,10 @@ export class EmployeeRepository {
             create: {
               ...upsertEmployeeDto,
               company: { connect: { id: companyId } },
-              workplace: {
-                connect: { id_companyId: { companyId, id: workplaceId } },
+              workplaces: {
+                connect: workplaceIds.map((id) => ({
+                  id_companyId: { companyId, id },
+                })),
               },
               hierarchy: {
                 connect: { id: hierarchyId },
@@ -86,10 +92,12 @@ export class EmployeeRepository {
             },
             update: {
               ...upsertEmployeeDto,
-              workplace: !workplaceId
+              workplaces: !workplaceIds
                 ? undefined
                 : {
-                    connect: { id_companyId: { companyId, id: workplaceId } },
+                    set: workplaceIds.map((id) => ({
+                      id_companyId: { companyId, id },
+                    })),
                   },
               hierarchy: !hierarchyId
                 ? undefined

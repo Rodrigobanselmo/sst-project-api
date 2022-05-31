@@ -1,8 +1,8 @@
 import { StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import { IsDate, IsEnum, IsOptional, IsString } from 'class-validator';
-import { DateFormat } from 'src/shared/transformers/date-format';
-import { StringCapitalizeTransform } from 'src/shared/transformers/string-capitalize';
+import { DateFormat } from '../../../shared/transformers/date-format';
+import { StringCapitalizeTransform } from '../../../shared/transformers/string-capitalize';
 
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';

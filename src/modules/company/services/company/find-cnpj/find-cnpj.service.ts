@@ -4,8 +4,8 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import axios, { AxiosResponse } from 'axios';
-import { ICnpjResponse } from 'src/modules/company/interfaces/cnpj';
-import { ICnpjBrasilResponse } from 'src/modules/company/interfaces/cnpj-brasil.types';
+import { ICnpjResponse } from '../../../../../modules/company/interfaces/cnpj';
+import { ICnpjBrasilResponse } from '../../../../../modules/company/interfaces/cnpj-brasil.types';
 
 @Injectable()
 export class FindCnpjService {

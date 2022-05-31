@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
-import { StringCapitalizeTransform } from 'src/shared/transformers/string-capitalize';
+import { StringCapitalizeTransform } from '../../../shared/transformers/string-capitalize';
 
 export class UpdateUserDto {
   @ApiProperty({ description: 'user older password' })

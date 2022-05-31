@@ -4,8 +4,8 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import axios, { AxiosResponse } from 'axios';
-import { ICepResponse } from 'src/modules/company/interfaces/cep.types';
-import { ICepBrasilResponse } from 'src/modules/company/interfaces/cep-brasil.types';
+import { ICepResponse } from '../../../../../modules/company/interfaces/cep.types';
+import { ICepBrasilResponse } from '../../../../../modules/company/interfaces/cep-brasil.types';
 
 @Injectable()
 export class FindCepService {

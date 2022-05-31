@@ -1,7 +1,7 @@
-import { checkIsValidDate } from 'src/shared/utils/validators/checkIsValidDate';
-import { checkIsNational } from 'src/shared/utils/validators/epiTable/checkIsNational';
-import { checkNormalize } from 'src/shared/utils/validators/epiTable/checkNormalize';
-import { checkSituation } from 'src/shared/utils/validators/epiTable/checkSituation';
+import { checkIsValidDate } from '../../../../../shared/utils/validators/checkIsValidDate';
+import { checkIsNational } from '../../../../../shared/utils/validators/epiTable/checkIsNational';
+import { checkNormalize } from '../../../../../shared/utils/validators/epiTable/checkNormalize';
+import { checkSituation } from '../../../../../shared/utils/validators/epiTable/checkSituation';
 
 import { ITableSchema } from '../../../../providers/ExcelProvider/models/IExcelProvider.types';
 import { checkIsString } from '../../../../utils/validators/checkIsString';

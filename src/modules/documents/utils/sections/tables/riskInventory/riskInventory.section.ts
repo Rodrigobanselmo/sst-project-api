@@ -1,6 +1,6 @@
 import { PageOrientation } from 'docx';
-import { RiskFactorGroupDataEntity } from 'src/modules/checklist/entities/riskGroupData.entity';
-import { HierarchyEntity } from 'src/modules/company/entities/hierarchy.entity';
+import { RiskFactorGroupDataEntity } from '../../../../../../modules/checklist/entities/riskGroupData.entity';
+import { HierarchyEntity } from '../../../../../../modules/company/entities/hierarchy.entity';
 
 import { hierarchyConverter } from './converter/hierarchy.converter';
 import { firstRiskInventoryTableSection } from './parts/first/first.table';

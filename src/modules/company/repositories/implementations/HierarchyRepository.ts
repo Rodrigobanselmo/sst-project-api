@@ -19,7 +19,7 @@ export class HierarchyRepository {
         ({
           companyId: _,
           id,
-          workplaceId,
+          workplaceIds,
           parentId,
           children,
           ...upsertHierarchy
@@ -29,8 +29,10 @@ export class HierarchyRepository {
               ...upsertHierarchy,
               id,
               company: { connect: { id: companyId } },
-              workplace: {
-                connect: { id_companyId: { companyId, id: workplaceId } },
+              workplaces: {
+                connect: workplaceIds.map((id) => ({
+                  id_companyId: { companyId, id },
+                })),
               },
               parent: parentId
                 ? {
@@ -40,10 +42,12 @@ export class HierarchyRepository {
             },
             update: {
               ...upsertHierarchy,
-              workplace: !workplaceId
+              workplaces: !workplaceIds
                 ? undefined
                 : {
-                    connect: { id_companyId: { companyId, id: workplaceId } },
+                    set: workplaceIds.map((id) => ({
+                      id_companyId: { companyId, id },
+                    })),
                   },
               parent: !parentId
                 ? parentId === null
@@ -65,7 +69,7 @@ export class HierarchyRepository {
   async update(
     {
       companyId: _,
-      workplaceId,
+      workplaceIds,
       parentId,
       id,
       children,
@@ -77,12 +81,12 @@ export class HierarchyRepository {
       where: { id },
       data: {
         ...updateHierarchy,
-        workplace: !workplaceId
+        workplaces: !workplaceIds
           ? undefined
           : {
-              connect: {
-                id_companyId: { companyId, id: workplaceId },
-              },
+              set: workplaceIds.map((id) => ({
+                id_companyId: { companyId, id },
+              })),
             },
         parent: !parentId
           ? undefined
@@ -101,7 +105,7 @@ export class HierarchyRepository {
     {
       companyId: _,
       id,
-      workplaceId,
+      workplaceIds,
       parentId,
       children,
       ...upsertHierarchy
@@ -113,8 +117,10 @@ export class HierarchyRepository {
         ...upsertHierarchy,
         id,
         company: { connect: { id: companyId } },
-        workplace: {
-          connect: { id_companyId: { companyId, id: workplaceId } },
+        workplaces: {
+          connect: workplaceIds.map((id) => ({
+            id_companyId: { companyId, id },
+          })),
         },
         parent: parentId
           ? {
@@ -124,10 +130,12 @@ export class HierarchyRepository {
       },
       update: {
         ...upsertHierarchy,
-        workplace: !workplaceId
+        workplaces: !workplaceIds
           ? undefined
           : {
-              connect: { id_companyId: { companyId, id: workplaceId } },
+              set: workplaceIds.map((id) => ({
+                id_companyId: { companyId, id },
+              })),
             },
         parent: !parentId
           ? undefined
@@ -157,13 +165,53 @@ export class HierarchyRepository {
 
   async findAllHierarchyByCompany(
     companyId: string,
-    options: { include?: Prisma.HierarchyInclude } = {},
+    options: {
+      include?: Prisma.HierarchyInclude;
+    } = {},
   ) {
     const hierarchies = await this.prisma.hierarchy.findMany({
       where: { companyId },
       ...options,
     });
 
-    return hierarchies.map((hierarchy) => new HierarchyEntity(hierarchy));
+    return hierarchies.map((hierarchy) => {
+      if ((hierarchy as any)?.workplaces) {
+        (hierarchy as any).workplaceIds = (hierarchy as any)?.workplaces.map(
+          (workspace) => workspace.id,
+        );
+
+        delete (hierarchy as any).workplaces;
+      }
+      return new HierarchyEntity(hierarchy);
+    });
+  }
+
+  async findAllDataHierarchyByCompany(
+    companyId: string,
+    options: {
+      include?: Prisma.HierarchyInclude;
+    } = {},
+  ) {
+    const newOptions = { ...options };
+
+    const hierarchies = await this.prisma.hierarchy.findMany({
+      where: { companyId },
+      include: {
+        hierarchyOnHomogeneous: { include: { homogeneousGroup: true } },
+        employees: true,
+        workplaces: true,
+      },
+    });
+
+    return hierarchies.map((hierarchy) => {
+      const homogeneousGroup = { ...hierarchy } as HierarchyEntity;
+      if (hierarchy.hierarchyOnHomogeneous)
+        homogeneousGroup.homogeneousGroups =
+          hierarchy.hierarchyOnHomogeneous.map((homo) => ({
+            ...homo.homogeneousGroup,
+            workspaceId: homo.workspaceId,
+          }));
+      return new HierarchyEntity(hierarchy);
+    });
   }
 }

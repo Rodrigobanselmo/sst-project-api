@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Post, Res } from '@nestjs/common';
-import { User } from 'src/shared/decorators/user.decorator';
-import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
+import { User } from '../../../shared/decorators/user.decorator';
+import { UserPayloadDto } from '../../../shared/dto/user-payload.dto';
 import { UpsertPgrDto } from '../dto/pgr.dto';
 
 import { PgrDownloadService } from '../services/pgr/download-pgr.service';

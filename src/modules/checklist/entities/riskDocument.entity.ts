@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { RiskFactorDocument, StatusEnum } from '@prisma/client';
-import { CompanyEntity } from 'src/modules/company/entities/company.entity';
+import { CompanyEntity } from '../../../modules/company/entities/company.entity';
 
 export class RiskDocumentEntity implements RiskFactorDocument {
   @ApiProperty({ description: 'The id of the risk group data' })

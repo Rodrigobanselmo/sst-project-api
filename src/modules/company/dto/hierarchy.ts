@@ -40,8 +40,8 @@ export class CreateHierarchyDto {
   @IsOptional()
   description?: string;
 
-  @IsString()
-  workplaceId: string;
+  @IsString({ each: true })
+  workplaceIds: string[];
 
   @IsString()
   @IsOptional()
@@ -90,8 +90,8 @@ export class UpsertHierarchyDto {
   @IsOptional()
   companyId?: string;
 
-  @IsString()
   @IsOptional()
+  @IsString({ each: true })
   workplaceId?: string;
 
   @IsString()

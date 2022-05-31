@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { AlignmentType } from 'docx';
-import { RiskFactorGroupDataEntity } from 'src/modules/checklist/entities/riskGroupData.entity';
+import { RiskFactorGroupDataEntity } from '../../../../../../../../modules/checklist/entities/riskGroupData.entity';
 
 import { MapData } from '../../converter/hierarchy.converter';
 import { bodyTableProps, borderNoneStyle } from '../../elements/body';

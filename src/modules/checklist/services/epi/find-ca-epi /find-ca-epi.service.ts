@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ErrorChecklistEnum } from 'src/shared/constants/enum/errorMessage';
+import { ErrorChecklistEnum } from '../../../../../shared/constants/enum/errorMessage';
 
 import { EpiRepository } from '../../../repositories/implementations/EpiRepository';
 

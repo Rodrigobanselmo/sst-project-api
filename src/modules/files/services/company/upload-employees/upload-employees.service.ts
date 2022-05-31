@@ -19,7 +19,7 @@ import { asyncEach } from '../../../../../shared/utils/asyncEach';
 
 import { DatabaseTableEntity } from '../../../entities/databaseTable.entity';
 import { DatabaseTableRepository } from '../../../repositories/implementations/DatabaseTableRepository';
-import { WorkspaceRepository } from 'src/modules/company/repositories/implementations/WorkspaceRepository';
+import { WorkspaceRepository } from '../../../../../modules/company/repositories/implementations/WorkspaceRepository';
 
 @Injectable()
 export class UploadEmployeesService {
@@ -59,19 +59,23 @@ export class UploadEmployeesService {
     const workplaces = await this.workspaceRepository.findByCompany(companyId);
 
     employeesData = employeesData.map((employee) => {
-      const workplace = workplaces.find(
-        (work) => work.abbreviation === employee.abbreviation,
+      const workplace = workplaces.filter(
+        (work) =>
+          employee.abbreviation &&
+          employee.abbreviation.includes(work.abbreviation),
       );
 
       if (!workplace)
         throw new BadRequestException(ErrorCompanyEnum.WORKPLACE_NOT_FOUND);
 
       delete employee.abbreviation;
-      return { ...employee, workplaceId: workplace.id };
+      return { ...employee, workplaceIds: workplace.map((work) => work.id) };
     });
 
     const allHierarchyTree = hierarchyExcel.transformArrayToHierarchyMapTree(
-      await this.hierarchyRepository.findAllHierarchyByCompany(companyId),
+      await this.hierarchyRepository.findAllHierarchyByCompany(companyId, {
+        include: { workplaces: true },
+      }),
     );
 
     const sheetHierarchyTree =
@@ -101,7 +105,7 @@ export class UploadEmployeesService {
     await asyncEach(Object.keys(HierarchyEnum), upsertHierarchy);
 
     const employees = employeesData.map((employee) => {
-      const newEmployee = { ...employee, cpf: '908' };
+      const newEmployee = { ...employee, cpf: '908' }; //!
       let hierarchy = null as any;
 
       const getByNameHierarchy = () => {

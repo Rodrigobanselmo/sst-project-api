@@ -1,7 +1,7 @@
 import sgMail, { MailService } from '@sendgrid/mail';
 import fs from 'fs';
 import handlebars from 'handlebars';
-import { EmailsEnum } from 'src/shared/constants/enum/emails';
+import { EmailsEnum } from '../../../../../shared/constants/enum/emails';
 
 import { IMailProvider, ISendMailData } from '../../models/IMailProvider';
 

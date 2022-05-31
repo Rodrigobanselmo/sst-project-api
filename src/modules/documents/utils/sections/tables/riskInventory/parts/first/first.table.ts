@@ -1,6 +1,6 @@
 import { Table, WidthType } from 'docx';
-import { RiskFactorGroupDataEntity } from 'src/modules/checklist/entities/riskGroupData.entity';
-import { firstRiskInventoryHeader } from 'src/modules/documents/utils/sections/tables/riskInventory/parts/first/first.constant';
+import { RiskFactorGroupDataEntity } from '../../../../../../../../modules/checklist/entities/riskGroupData.entity';
+import { firstRiskInventoryHeader } from '../../../../../../../../modules/documents/utils/sections/tables/riskInventory/parts/first/first.constant';
 
 import { MapData } from '../../converter/hierarchy.converter';
 import { TableBodyElements } from '../../elements/body';
