@@ -22,13 +22,10 @@ export class RiskGroupDataController {
     return this.upsertRiskGroupDataService.execute(upsertRiskGroupDataDto);
   }
 
-  @Get('/:workspaceId/:companyId')
-  findAllAvailable(
-    @Param('workspaceId') workspaceId: string,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
+  @Get('/:companyId')
+  findAllAvailable(@User() userPayloadDto: UserPayloadDto) {
     const companyId = userPayloadDto.targetCompanyId;
-    return this.findAllByCompanyService.execute(companyId, workspaceId);
+    return this.findAllByCompanyService.execute(companyId);
   }
 
   @Get('/:id/:companyId')

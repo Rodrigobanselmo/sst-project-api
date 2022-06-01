@@ -7,10 +7,9 @@ export class FindAllByCompanyService {
     private readonly riskGroupDataRepository: RiskGroupDataRepository,
   ) {}
 
-  async execute(companyId: string, workspaceId: string) {
+  async execute(companyId: string) {
     const riskGroupData = await this.riskGroupDataRepository.findAllByCompany(
       companyId,
-      workspaceId,
     );
 
     return riskGroupData;

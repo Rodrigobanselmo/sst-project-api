@@ -375,13 +375,11 @@ model RiskFactorGroupData {
   name String?
   created_at DateTime @default(now())
   companyId String
-  workspaceId String
   source String?
   elaboratedBy String?
   revisionBy String?
   approvedBy String?
   visitDate DateTime?
-  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   data RiskFactorData[]
   docs RiskFactorDocument[]
@@ -450,7 +448,6 @@ model Workspace {
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   address Address?
   employee Employee[]
-  riskFactorGroupData RiskFactorGroupData[]
   hierarchyOnHomogeneous HierarchyOnHomogeneous[]
   hierarchy Hierarchy[]
 
