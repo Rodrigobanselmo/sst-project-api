@@ -139,7 +139,7 @@ export class CompanyRepository implements ICompanyRepository {
         employees: {
           upsert: [
             ...employees.map(
-              ({ id, hierarchyId, workplaceId, ...rest }: any) => {
+              ({ id, hierarchyId, workspaceIds, ...rest }: any) => {
                 return {
                   create: {
                     ...rest,
@@ -150,11 +150,11 @@ export class CompanyRepository implements ICompanyRepository {
                           },
                         }
                       : undefined,
-                    workplace: workplaceId
+                    workspaces: workspaceIds
                       ? {
-                          connect: {
-                            id_companyId: { companyId, id: workplaceId },
-                          },
+                          connect: workspaceIds.map((workspaceId) => ({
+                            id_companyId: { companyId, id: workspaceId },
+                          })),
                         }
                       : undefined,
                   },
@@ -167,11 +167,11 @@ export class CompanyRepository implements ICompanyRepository {
                           },
                         }
                       : undefined,
-                    workplace: workplaceId
+                    workspaces: workspaceIds
                       ? {
-                          connect: {
-                            id_companyId: { companyId, id: workplaceId },
-                          },
+                          set: workspaceIds.map((workspaceId) => ({
+                            id_companyId: { companyId, id: workspaceId },
+                          })),
                         }
                       : undefined,
                   },
@@ -222,7 +222,9 @@ export class CompanyRepository implements ICompanyRepository {
         secondary_activity: !!include.secondary_activity,
         license: !!include.license,
         users: !!include.users,
-        employees: !!include.users,
+        employees: !!include.employees
+          ? { include: { workspaces: true } }
+          : false,
       },
     });
 
@@ -332,7 +334,9 @@ export class CompanyRepository implements ICompanyRepository {
               secondary_activity: !!include.secondary_activity,
               license: !!include.license,
               users: !!include.users,
-              employees: !!include.users,
+              employees: !!include.employees
+                ? { include: { workspaces: true } }
+                : false,
             },
           }),
       ),
@@ -415,7 +419,9 @@ export class CompanyRepository implements ICompanyRepository {
         workspace: !!include?.workspace
           ? { include: { address: true } }
           : false,
-        employees: !!include?.employees,
+        employees: !!include.employees
+          ? { include: { workspaces: true } }
+          : false,
         address: true,
       },
     });

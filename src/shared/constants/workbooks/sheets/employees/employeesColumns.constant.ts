@@ -1,6 +1,6 @@
 import { StatusEnum } from '@prisma/client';
 
-import { excelWorkplaceNotes } from '../../../../../modules/files/utils/notes/excel-workplace-notes';
+import { excelWorkspaceNotes } from '../../../../../modules/files/utils/notes/excel-workspace-notes';
 import { ITableSchema } from '../../../../providers/ExcelProvider/models/IExcelProvider.types';
 import {
   statusEnumTranslateBrToUs,
@@ -27,9 +27,9 @@ export const employeesColumnsConstant = [
   {
     databaseName: 'abbreviation',
     excelName: 'Estabelecimento (Área de trabalho)',
-    isArray: false,
+    isArray: true,
     required: true,
-    notes: excelWorkplaceNotes,
+    notes: excelWorkspaceNotes,
     checkHandler: checkIsString,
   },
   {

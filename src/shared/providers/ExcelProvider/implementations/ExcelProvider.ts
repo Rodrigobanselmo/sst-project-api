@@ -184,10 +184,11 @@ class ExcelProvider implements IExcelProvider {
     databaseData.forEach((data) => {
       const rows = [] as any[][];
       tableSchema.forEach((cellSchema, indexCell) => {
-        const cellValue = data[cellSchema.databaseName.split('.')[0]];
+        let cellValue = data[cellSchema.databaseName.split('.')[0]];
         if (!rows[0]) rows[0] = [];
 
         if (cellSchema.isArray) {
+          if (typeof cellValue === 'string') cellValue = [cellValue];
           cellValue.forEach((value, indexRow) => {
             if (!rows[indexRow]) rows[indexRow] = [];
             if (typeof value === 'object') {

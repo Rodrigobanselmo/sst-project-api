@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Hierarchy, HierarchyEnum } from '@prisma/client';
 import { HierarchyEntity } from '../../../modules/company/entities/hierarchy.entity';
 import { v4 } from 'uuid';
+import { removeDuplicate } from '../../../shared/utils/removeDuplicate';
 
 type hierarchyMap = Record<
   string,
@@ -35,7 +36,7 @@ export class HierarchyExcelProvider {
 
   createTreeMapFromHierarchyStruct(
     hierarchies: {
-      workplaceId: string;
+      workspaceIds: string[];
       directory?: string;
       management?: string;
       sector?: string;
@@ -55,17 +56,17 @@ export class HierarchyExcelProvider {
 
       Object.entries(hierarchy).forEach(([key, value]) => {
         if (key === 'directory' && value)
-          orderedHierarchy[0] = { key, value, id: v4() };
+          orderedHierarchy[0] = { key, value: value as string, id: v4() };
         if (key === 'management' && value)
-          orderedHierarchy[1] = { key, value, id: v4() };
+          orderedHierarchy[1] = { key, value: value as string, id: v4() };
         if (key === 'sector' && value)
-          orderedHierarchy[2] = { key, value, id: v4() };
+          orderedHierarchy[2] = { key, value: value as string, id: v4() };
         if (key === 'sub_sector' && value)
-          orderedHierarchy[3] = { key, value, id: v4() };
+          orderedHierarchy[3] = { key, value: value as string, id: v4() };
         if (key === 'office' && value)
-          orderedHierarchy[4] = { key, value, id: v4() };
+          orderedHierarchy[4] = { key, value: value as string, id: v4() };
         if (key === 'sub_office' && value)
-          orderedHierarchy[5] = { key, value, id: v4() };
+          orderedHierarchy[5] = { key, value: value as string, id: v4() };
       });
 
       orderedHierarchy = orderedHierarchy.filter((i) => i);
@@ -79,7 +80,7 @@ export class HierarchyExcelProvider {
             if (!hierarchyMap[id]) hierarchyMap[id] = {};
 
             hierarchyMap[id].id = id;
-            hierarchyMap[id].workplaceId = hierarchy.workplaceId;
+            hierarchyMap[id].workspaceIds = hierarchy.workspaceIds;
             hierarchyMap[id].name = employeeWork.value;
             hierarchyMap[id].type =
               employeeWork.key.toUpperCase() as HierarchyEnum;
@@ -104,10 +105,8 @@ export class HierarchyExcelProvider {
     const newHierarchy = { ...compareMap } as Record<string, any>;
 
     const isEqualHierarchy = (h1, h2, parent?) => {
-      const firstEqual =
-        h1.name === h2.name &&
-        h1.type === h2.type &&
-        h1.workplaceId === h2.workplaceId;
+      const firstEqual = h1.name === h2.name && h1.type === h2.type;
+      //&& h1.workspaceId === h2.workspaceId; //!
 
       if (parent) {
         if (newHierarchy[h1.parentId] && newHierarchy[h2.parentId]) {
@@ -135,6 +134,15 @@ export class HierarchyExcelProvider {
           fromOld: true,
         };
 
+      if (newHierarchy[allHierarchy.id].workspaceIds && hierarchy.workspaceId) {
+        newHierarchy[allHierarchy.id].workspaceIds = removeDuplicate(
+          [
+            ...newHierarchy[allHierarchy.id].workspaceIds,
+            ...hierarchy.workspaceId,
+          ],
+          { simpleCompare: true },
+        );
+      }
       if (parentId) newHierarchy[allHierarchy.id].parentId = parentId;
 
       if (newHierarchy[hierarchy.id].children)

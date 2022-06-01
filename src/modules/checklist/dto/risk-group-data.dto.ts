@@ -45,6 +45,10 @@ export class UpsertRiskGroupDataDto {
   @IsString()
   revisionBy: string;
 
+  @IsOptional()
+  @IsString()
+  workspaceId: string;
+
   @Transform(DateFormat, { toClassOnly: true })
   @IsOptional()
   @IsDate()

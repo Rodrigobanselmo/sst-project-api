@@ -56,25 +56,25 @@ export class UploadEmployeesService {
       DatabaseTable,
     });
 
-    const workplaces = await this.workspaceRepository.findByCompany(companyId);
+    const workspaces = await this.workspaceRepository.findByCompany(companyId);
 
     employeesData = employeesData.map((employee) => {
-      const workplace = workplaces.filter(
+      const workspace = workspaces.filter(
         (work) =>
           employee.abbreviation &&
           employee.abbreviation.includes(work.abbreviation),
       );
 
-      if (!workplace)
-        throw new BadRequestException(ErrorCompanyEnum.WORKPLACE_NOT_FOUND);
+      if (!workspace)
+        throw new BadRequestException(ErrorCompanyEnum.WORKSPACE_NOT_FOUND);
 
       delete employee.abbreviation;
-      return { ...employee, workplaceIds: workplace.map((work) => work.id) };
+      return { ...employee, workspaceIds: workspace.map((work) => work.id) };
     });
 
     const allHierarchyTree = hierarchyExcel.transformArrayToHierarchyMapTree(
       await this.hierarchyRepository.findAllHierarchyByCompany(companyId, {
-        include: { workplaces: true },
+        include: { workspaces: true },
       }),
     );
 
@@ -105,7 +105,7 @@ export class UploadEmployeesService {
     await asyncEach(Object.keys(HierarchyEnum), upsertHierarchy);
 
     const employees = employeesData.map((employee) => {
-      const newEmployee = { ...employee, cpf: '908' }; //!
+      const newEmployee = { ...employee, cpf: '908' };
       let hierarchy = null as any;
 
       const getByNameHierarchy = () => {

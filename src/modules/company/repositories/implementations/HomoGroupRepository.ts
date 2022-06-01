@@ -39,7 +39,7 @@ export class HomoGroupRepository {
                 hierarchyId_homogeneousGroupId_workspaceId: {
                   hierarchyId: hierarchy.id,
                   homogeneousGroupId: id,
-                  workspaceId: hierarchy.workplaceId,
+                  workspaceId: hierarchy.workspaceId,
                 },
               })),
             }

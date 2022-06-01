@@ -43,8 +43,6 @@ enum MeasuresTypeEnum {
   ENG
 }
 
-
- 
 model Activity {
   id    Int     @default(autoincrement()) @id
   code String @unique
@@ -82,7 +80,6 @@ model AddressCompany {
   companyId String
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
-
 
 model Checklist {
   id    Int     @default(autoincrement())
@@ -173,20 +170,19 @@ model DatabaseTable {
 } 
 
 model Employee {
-  id    Int     @default(autoincrement())
+  id    Int   @id  @default(autoincrement())
   created_at DateTime @default(now())
   updated_at  DateTime   @updatedAt
   status StatusEnum @default(ACTIVE)
   name String 
   cpf String 
   companyId String
-  workplaceId String
   hierarchyId String
-  workplace Workspace @relation(fields: [workplaceId, companyId], references: [id, companyId], onDelete: Restrict, onUpdate: Cascade)
+  workspaces Workspace[]
   hierarchy Hierarchy @relation(fields: [hierarchyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   
-  @@id([id, companyId])
+  @@unique([id, companyId])
 } 
 
 
@@ -236,17 +232,27 @@ model Hierarchy {
   name String   
   companyId String
   parentId  String?
-  workplaceId String
-  workplace Workspace @relation(fields: [workplaceId, companyId], references: [id, companyId], onDelete: Restrict, onUpdate: Cascade)
+  workspaces Workspace[]
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   parent Hierarchy?  @relation(name: "children_parent", fields: [parentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   children Hierarchy[] @relation(name: "children_parent")
   employees Employee[] 
-  homogeneousGroups HomogeneousGroup[]
+  hierarchyOnHomogeneous HierarchyOnHomogeneous[]
   riskFactorDatas RiskFactorData[] 
 
   @@unique([id, companyId])
   @@index(companyId)
+}
+
+model HierarchyOnHomogeneous {
+  hierarchy       Hierarchy     @relation(fields: [hierarchyId], references: [id])
+  hierarchyId     String
+  homogeneousGroup   HomogeneousGroup @relation(fields: [homogeneousGroupId], references: [id])
+  homogeneousGroupId     String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  workspaceId     String
+
+  @@id([hierarchyId, homogeneousGroupId, workspaceId])
 }
 
 model HomogeneousGroup {
@@ -256,7 +262,7 @@ model HomogeneousGroup {
   companyId String
   status StatusEnum @default(ACTIVE)
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  hierarchies Hierarchy[] 
+  hierarchyOnHomogeneous HierarchyOnHomogeneous[] 
   created_at DateTime @default(now())
   riskFactorData RiskFactorData[] 
   
@@ -313,7 +319,7 @@ model RefreshToken {
 }
 
 model RiskFactors {
-  id    String     @default(uuid())
+  id    String   @id  @default(uuid())
   name String 
   companyId String
   severity Int  @default(0)
@@ -344,7 +350,7 @@ model RiskFactors {
   representAll Boolean @default(false)
   riskFactorData RiskFactorData[]
   
-  @@id([id, companyId])
+  @@unique([id, companyId])
 }
 
 model RiskFactorDocument {
@@ -369,11 +375,13 @@ model RiskFactorGroupData {
   name String?
   created_at DateTime @default(now())
   companyId String
+  workspaceId String
   source String?
   elaboratedBy String?
   revisionBy String?
   approvedBy String?
   visitDate DateTime?
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   data RiskFactorData[]
   docs RiskFactorDocument[]
@@ -389,7 +397,7 @@ model RiskFactorData {
   companyId String
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   riskId    String
-  riskFactor RiskFactors @relation(fields: [riskId,companyId], references: [id,companyId], onDelete: Restrict, onUpdate: Cascade)
+  riskFactor RiskFactors @relation(fields: [riskId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   homogeneousGroupId String?
   homogeneousGroup HomogeneousGroup? @relation(fields: [homogeneousGroupId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   hierarchyId String?
@@ -431,7 +439,7 @@ model UserCompany {
 }
 
 model Workspace {
-  id    String     @default(uuid()) 
+  id    String  @id   @default(uuid()) 
   name String  
   abbreviation String?
   description String?  
@@ -442,10 +450,12 @@ model Workspace {
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   address Address?
   employee Employee[]
+  riskFactorGroupData RiskFactorGroupData[]
+  hierarchyOnHomogeneous HierarchyOnHomogeneous[]
   hierarchy Hierarchy[]
 
   @@unique([abbreviation, companyId])
-  @@id([id, companyId])
+  @@unique([id, companyId])
 }
 
 

@@ -31,10 +31,10 @@ export class RiskGroupDataRepository {
     return new RiskFactorGroupDataEntity(riskFactorGroupDataEntity);
   }
 
-  async findAllByCompany(companyId: string) {
+  async findAllByCompany(companyId: string, workspaceId: string) {
     const riskFactorGroupDataEntity =
       await this.prisma.riskFactorGroupData.findMany({
-        where: { companyId },
+        where: { companyId, workspaceId },
       });
 
     return riskFactorGroupDataEntity.map(

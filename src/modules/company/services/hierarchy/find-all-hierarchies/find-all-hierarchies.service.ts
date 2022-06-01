@@ -10,6 +10,7 @@ export class FindAllHierarchyService {
     const hierarchies =
       await this.hierarchyRepository.findAllHierarchyByCompany(
         user.targetCompanyId,
+        { include: { workspaces: true } },
       );
 
     return hierarchies;

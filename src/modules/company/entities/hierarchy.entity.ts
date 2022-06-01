@@ -44,7 +44,7 @@ export class HierarchyEntity implements Hierarchy {
   @ApiProperty({ description: 'The parent id of the Hierarchy' })
   parentId: string;
 
-  @ApiProperty({ description: 'The workplace of the Hierarchy' })
+  @ApiProperty({ description: 'The workspace of the Hierarchy' })
   workspaces?: WorkspaceEntity[];
 
   @ApiProperty({ description: 'The group of the Hierarchy' })
@@ -53,7 +53,7 @@ export class HierarchyEntity implements Hierarchy {
   @ApiProperty({ description: 'The group of the Hierarchy' })
   homogeneousGroups?: HomoGroupEntity[];
 
-  @ApiProperty({ description: 'The workplace of the Hierarchy' })
+  @ApiProperty({ description: 'The workspace of the Hierarchy' })
   employees?: EmployeeEntity[];
 
   workspaceIds?: string[];

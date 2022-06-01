@@ -59,7 +59,7 @@ export class CompanyController {
     return this.createContractService.execute(createContractDto);
   }
 
-  // edit company data or create if does not exist like workplace / primary_activity
+  // edit company data or create if does not exist like workspace / primary_activity
   @Patch()
   update(@Body() updateCompanyDto: UpdateCompanyDto) {
     // cant edit this type of data

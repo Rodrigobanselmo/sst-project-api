@@ -12,7 +12,7 @@ import { StringUppercaseTransform } from '../../../shared/transformers/string-up
 
 export class HierarchyOnHomoDto {
   @IsString()
-  workplaceId: string;
+  workspaceId: string;
 
   @IsString()
   id: string;

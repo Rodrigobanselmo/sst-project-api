@@ -34,6 +34,7 @@ export class RiskFactorGroupDataEntity implements RiskFactorGroupData {
   })
   company?: Partial<CompanyEntity>;
 
+  workspaceId: string;
   source: string | null;
   elaboratedBy: string | null;
   approvedBy: string | null;

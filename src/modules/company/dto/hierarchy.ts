@@ -41,7 +41,7 @@ export class CreateHierarchyDto {
   description?: string;
 
   @IsString({ each: true })
-  workplaceIds: string[];
+  workspaceIds?: string[];
 
   @IsString()
   @IsOptional()
@@ -92,7 +92,7 @@ export class UpsertHierarchyDto {
 
   @IsOptional()
   @IsString({ each: true })
-  workplaceId?: string;
+  workspaceIds?: string[];
 
   @IsString()
   @IsOptional()

@@ -19,7 +19,7 @@ export class HierarchyRepository {
         ({
           companyId: _,
           id,
-          workplaceIds,
+          workspaceIds,
           parentId,
           children,
           ...upsertHierarchy
@@ -29,8 +29,8 @@ export class HierarchyRepository {
               ...upsertHierarchy,
               id,
               company: { connect: { id: companyId } },
-              workplaces: {
-                connect: workplaceIds.map((id) => ({
+              workspaces: {
+                connect: workspaceIds.map((id) => ({
                   id_companyId: { companyId, id },
                 })),
               },
@@ -42,10 +42,10 @@ export class HierarchyRepository {
             },
             update: {
               ...upsertHierarchy,
-              workplaces: !workplaceIds
+              workspaces: !workspaceIds
                 ? undefined
                 : {
-                    set: workplaceIds.map((id) => ({
+                    set: workspaceIds.map((id) => ({
                       id_companyId: { companyId, id },
                     })),
                   },
@@ -69,7 +69,7 @@ export class HierarchyRepository {
   async update(
     {
       companyId: _,
-      workplaceIds,
+      workspaceIds,
       parentId,
       id,
       children,
@@ -81,10 +81,10 @@ export class HierarchyRepository {
       where: { id },
       data: {
         ...updateHierarchy,
-        workplaces: !workplaceIds
+        workspaces: !workspaceIds
           ? undefined
           : {
-              set: workplaceIds.map((id) => ({
+              set: workspaceIds.map((id) => ({
                 id_companyId: { companyId, id },
               })),
             },
@@ -105,7 +105,7 @@ export class HierarchyRepository {
     {
       companyId: _,
       id,
-      workplaceIds,
+      workspaceIds,
       parentId,
       children,
       ...upsertHierarchy
@@ -117,8 +117,8 @@ export class HierarchyRepository {
         ...upsertHierarchy,
         id,
         company: { connect: { id: companyId } },
-        workplaces: {
-          connect: workplaceIds.map((id) => ({
+        workspaces: {
+          connect: workspaceIds.map((id) => ({
             id_companyId: { companyId, id },
           })),
         },
@@ -130,10 +130,10 @@ export class HierarchyRepository {
       },
       update: {
         ...upsertHierarchy,
-        workplaces: !workplaceIds
+        workspaces: !workspaceIds
           ? undefined
           : {
-              set: workplaceIds.map((id) => ({
+              set: workspaceIds.map((id) => ({
                 id_companyId: { companyId, id },
               })),
             },
@@ -175,12 +175,12 @@ export class HierarchyRepository {
     });
 
     return hierarchies.map((hierarchy) => {
-      if ((hierarchy as any)?.workplaces) {
-        (hierarchy as any).workplaceIds = (hierarchy as any)?.workplaces.map(
+      if ((hierarchy as any)?.workspaces) {
+        (hierarchy as any).workspaceIds = (hierarchy as any)?.workspaces.map(
           (workspace) => workspace.id,
         );
 
-        delete (hierarchy as any).workplaces;
+        delete (hierarchy as any).workspaces;
       }
       return new HierarchyEntity(hierarchy);
     });
@@ -199,7 +199,7 @@ export class HierarchyRepository {
       include: {
         hierarchyOnHomogeneous: { include: { homogeneousGroup: true } },
         employees: true,
-        workplaces: true,
+        workspaces: true,
       },
     });
 

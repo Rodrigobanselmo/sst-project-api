@@ -28,6 +28,7 @@ const createUserAndCompany = async () => {
       workspace: {
         create: {
           name: 'MATRIZ',
+          abbreviation: 'MA',
           id: workId,
           address: { create: { cep: '12246-000' } },
         },
@@ -37,95 +38,87 @@ const createUserAndCompany = async () => {
   });
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const hierarchy = await prisma.company.update({
-    where: { id },
-    include: { employees: true, hierarchy: true },
-    data: {
-      hierarchy: {
-        createMany: {
-          data: [
-            {
-              name: 'Presidência',
-              type: 'DIRECTORY',
-              id: 'a',
-              workplaceId: workId,
-            },
-            {
-              name: 'Gerente',
-              type: 'MANAGEMENT',
-              id: 'b',
-              parentId: 'a',
-              workplaceId: workId,
-            },
-            {
-              name: 'Tecnologia',
-              type: 'SECTOR',
-              id: 'c',
-              parentId: 'b',
-              workplaceId: workId,
-            },
-            {
-              name: 'Médicina ocupacional',
-              type: 'SECTOR',
-              id: 'f',
-              parentId: 'b',
-              workplaceId: workId,
-            },
-            {
-              name: 'Engenheiro de Segurança',
-              type: 'OFFICE',
-              id: 'd',
-              parentId: 'f',
-              workplaceId: workId,
-            },
-            {
-              name: 'Engenheiro de Software',
-              type: 'OFFICE',
-              id: 'e',
-              parentId: 'c',
-              workplaceId: workId,
-            },
-          ],
-        },
-      },
-    },
-  });
+  // const hierarchy = await prisma.hierarchy.createMany({
+  //   data: [
+  //     {
+  //       name: 'Presidência',
+  //       type: 'DIRECTORY',
+  //       id: 'a',
+  //       companyId: id,
+  //     },
+  //     {
+  //       name: 'Gerente',
+  //       type: 'MANAGEMENT',
+  //       id: 'b',
+  //       parentId: 'a',
+  //       workspaceId: workId,
+  //     },
+  //     {
+  //       name: 'Tecnologia',
+  //       type: 'SECTOR',
+  //       id: 'c',
+  //       parentId: 'b',
+  //       workspaceId: workId,
+  //     },
+  //     {
+  //       name: 'Médicina ocupacional',
+  //       type: 'SECTOR',
+  //       id: 'f',
+  //       parentId: 'b',
+  //       workspaceId: workId,
+  //     },
+  //     {
+  //       name: 'Engenheiro de Segurança',
+  //       type: 'OFFICE',
+  //       id: 'd',
+  //       parentId: 'f',
+  //       workspaceId: workId,
+  //     },
+  //     {
+  //       name: 'Engenheiro de Software',
+  //       type: 'OFFICE',
+  //       id: 'e',
+  //       parentId: 'c',
+  //       workspaceId: workId,
+  //     },
+  //   ],
+  // });
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const employees = await prisma.company.update({
-    where: { id },
-    include: { employees: true },
-    data: {
-      employees: {
-        create: [
-          {
-            cpf: '123456789',
-            name: 'Alex Abreu Marins',
-            workplace: {
-              connect: {
-                id_companyId: { companyId: id, id: company.workspace[0].id },
-              },
-            },
-            hierarchy: {
-              connect: { id: 'f' },
-            },
-          },
-          {
-            cpf: '123456789',
-            name: 'Rodrigo Barbosa Anselmo',
-            workplace: {
-              connect: {
-                id_companyId: { companyId: id, id: company.workspace[0].id },
-              },
-            },
-            hierarchy: {
-              connect: { id: 'e' },
-            },
-          },
-        ],
-      },
-    },
-  });
+  // const employees = await prisma.company.update({
+  //   where: { id },
+  //   include: { employees: true },
+  //   data: {
+  //     employees: {
+  //       create: [
+  //         {
+  //           cpf: '123456789',
+  //           name: 'Alex Abreu Marins',
+  //           workspace: {
+  //             connect: {
+  //               id_companyId: { companyId: id, id: company.workspace[0].id },
+  //             },
+  //           },
+  //           hierarchy: {
+  //             connect: { id: 'f' },
+  //           },
+  //         },
+  //         {
+  //           cpf: '123456789',
+  //           name: 'Rodrigo Barbosa Anselmo',
+  //           workspace: {
+  //             connect: {
+  //               id_companyId: { companyId: id, id: company.workspace[0].id },
+  //             },
+  //           },
+  //           hierarchy: {
+  //             connect: { id: 'e' },
+  //           },
+  //         },
+  //       ],
+  //     },
+  //   },
+  // });
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const risks = await prisma.riskFactors.createMany({

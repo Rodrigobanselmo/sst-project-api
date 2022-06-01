@@ -1,5 +1,5 @@
 import { StatusEnum } from '@prisma/client';
-import { excelWorkplaceNotes } from '../../../../../modules/files/utils/notes/excel-workplace-notes';
+import { excelWorkspaceNotes } from '../../../../../modules/files/utils/notes/excel-workspace-notes';
 import { ITableSchema } from '../../../../../shared/providers/ExcelProvider/models/IExcelProvider.types';
 import {
   statusEnumTranslateBrToUs,
@@ -59,11 +59,11 @@ export const companyUniqueColumnsConstant = [
     checkHandler: checkIsString,
   },
   {
-    databaseName: 'employees.workplaceId',
+    databaseName: 'employees.workspaceId',
     excelName: 'Área de trabalho (ID)',
     isArray: true,
     required: true,
-    notes: excelWorkplaceNotes,
+    notes: excelWorkspaceNotes,
     checkHandler: checkIsNumber,
   },
   {

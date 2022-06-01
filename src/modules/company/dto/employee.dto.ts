@@ -36,7 +36,7 @@ export class CreateEmployeeDto {
   companyId: string;
 
   @IsString({ each: true })
-  workplaceIds: string[];
+  workspaceIds: string[];
 
   @IsNumber()
   hierarchyId: string;

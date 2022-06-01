@@ -53,7 +53,7 @@ export class CompanyEntity implements Company {
   license?: LicenseEntity;
 
   @ApiProperty({ description: 'The workspace related to the company' })
-  workspace?: WorkspaceEntity[];
+  workspaces?: WorkspaceEntity[];
 
   @ApiProperty({ description: 'The employees related to the company' })
   employees?: EmployeeEntity[];

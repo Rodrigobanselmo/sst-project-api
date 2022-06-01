@@ -12,7 +12,7 @@ export class EmployeeRepository {
   constructor(private prisma: PrismaService) {}
 
   async create({
-    workplaceIds,
+    workspaceIds,
     hierarchyId,
     companyId,
     ...createCompanyDto
@@ -21,8 +21,8 @@ export class EmployeeRepository {
       data: {
         ...createCompanyDto,
         company: { connect: { id: companyId } },
-        workplaces: {
-          connect: workplaceIds.map((id) => ({
+        workspaces: {
+          connect: workspaceIds.map((id) => ({
             id_companyId: { companyId, id },
           })),
         },
@@ -36,7 +36,7 @@ export class EmployeeRepository {
   }
 
   async update({
-    workplaceIds,
+    workspaceIds,
     hierarchyId,
     companyId,
     id,
@@ -45,10 +45,10 @@ export class EmployeeRepository {
     const employee = await this.prisma.employee.update({
       data: {
         ...createCompanyDto,
-        workplaces: !workplaceIds
+        workspaces: !workspaceIds
           ? undefined
           : {
-              set: workplaceIds.map((id) => ({
+              set: workspaceIds.map((id) => ({
                 id_companyId: { companyId, id },
               })),
             },
@@ -73,7 +73,7 @@ export class EmployeeRepository {
         ({
           companyId: _,
           id,
-          workplaceIds,
+          workspaceIds,
           hierarchyId,
           ...upsertEmployeeDto
         }) =>
@@ -81,8 +81,8 @@ export class EmployeeRepository {
             create: {
               ...upsertEmployeeDto,
               company: { connect: { id: companyId } },
-              workplaces: {
-                connect: workplaceIds.map((id) => ({
+              workspaces: {
+                connect: workspaceIds.map((id) => ({
                   id_companyId: { companyId, id },
                 })),
               },
@@ -92,10 +92,10 @@ export class EmployeeRepository {
             },
             update: {
               ...upsertEmployeeDto,
-              workplaces: !workplaceIds
+              workspaces: !workspaceIds
                 ? undefined
                 : {
-                    set: workplaceIds.map((id) => ({
+                    set: workspaceIds.map((id) => ({
                       id_companyId: { companyId, id },
                     })),
                   },

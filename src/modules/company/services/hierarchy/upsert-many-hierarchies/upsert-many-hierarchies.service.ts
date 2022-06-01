@@ -11,7 +11,10 @@ export class UpsertManyHierarchyService {
 
   async execute(hierarchies: UpdateHierarchyDto[], user: UserPayloadDto) {
     hierarchies.map((hierarchy) => {
-      if (hierarchy.parentId && hierarchy.type === HierarchyEnum.DIRECTORY) {
+      if (
+        hierarchy.parentId &&
+        ([HierarchyEnum.DIRECTORY] as HierarchyEnum[]).includes(hierarchy.type)
+      ) {
         throw new BadRequestException(
           ErrorCompanyEnum.UPDATE_HIERARCHY_WITH_PARENT,
         );
@@ -19,7 +22,10 @@ export class UpsertManyHierarchyService {
       if (
         !hierarchy.parentId &&
         (
-          [HierarchyEnum.OFFICE, HierarchyEnum.SUB_OFFICE] as HierarchyEnum[]
+          [
+            HierarchyEnum.SUB_SECTOR,
+            HierarchyEnum.SUB_OFFICE,
+          ] as HierarchyEnum[]
         ).includes(hierarchy.type)
       ) {
         throw new BadRequestException(
