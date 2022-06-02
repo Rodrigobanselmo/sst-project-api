@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { CreateHomoGroupDto, UpdateHomoGroupDto } from '../../dto/homoGroup';
 import { HomoGroupEntity } from '../../entities/homoGroup.entity';
+import { asyncEach } from '../../../../shared/utils/asyncEach';
 
 @Injectable()
 export class HomoGroupRepository {
@@ -25,23 +26,39 @@ export class HomoGroupRepository {
 
   async update({
     id,
-    hierarchies,
+    hierarchies = [],
     ...updateHomoGroup
   }: UpdateHomoGroupDto): Promise<HomoGroupEntity> {
+    const homoHierarchies = hierarchies.map((hierarchy) => ({
+      hierarchyId_homogeneousGroupId_workspaceId: {
+        hierarchyId: hierarchy.id,
+        homogeneousGroupId: id,
+        workspaceId: hierarchy.workspaceId,
+      },
+    }));
+
+    await this.prisma.hierarchyOnHomogeneous.deleteMany({
+      where: { homogeneousGroupId: id },
+    });
+
+    const addHomoHierarchies = async (value: typeof homoHierarchies[0]) => {
+      await this.prisma.hierarchyOnHomogeneous.upsert({
+        create: { ...value.hierarchyId_homogeneousGroupId_workspaceId },
+        update: {},
+        where: value,
+      });
+    };
+
+    await asyncEach(homoHierarchies, addHomoHierarchies);
+
     const data = await this.prisma.homogeneousGroup.update({
       where: { id },
       include: { hierarchyOnHomogeneous: { include: { hierarchy: true } } },
       data: {
         ...updateHomoGroup,
-        hierarchyOnHomogeneous: hierarchies
+        hierarchyOnHomogeneous: homoHierarchies.length
           ? {
-              set: hierarchies.map((hierarchy) => ({
-                hierarchyId_homogeneousGroupId_workspaceId: {
-                  hierarchyId: hierarchy.id,
-                  homogeneousGroupId: id,
-                  workspaceId: hierarchy.workspaceId,
-                },
-              })),
+              set: homoHierarchies,
             }
           : undefined,
       },
