@@ -20,6 +20,12 @@ export class UpsertRiskDocumentDto {
   version: string;
 
   @IsString()
+  workspaceId: string;
+
+  @IsString()
+  workspaceName: string;
+
+  @IsString()
   fileUrl: string;
 
   @IsString()

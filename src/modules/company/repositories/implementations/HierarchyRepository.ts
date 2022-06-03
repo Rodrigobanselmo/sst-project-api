@@ -188,6 +188,7 @@ export class HierarchyRepository {
 
   async findAllDataHierarchyByCompany(
     companyId: string,
+    workspaceId: string,
     options: {
       include?: Prisma.HierarchyInclude;
     } = {},
@@ -195,10 +196,10 @@ export class HierarchyRepository {
     const newOptions = { ...options };
 
     const hierarchies = await this.prisma.hierarchy.findMany({
-      where: { companyId },
+      where: { companyId, workspaces: { some: { id: workspaceId } } },
       include: {
         hierarchyOnHomogeneous: { include: { homogeneousGroup: true } },
-        employees: true,
+        employees: { where: { workspaces: { some: { id: workspaceId } } } },
         workspaces: true,
       },
     });

@@ -34,4 +34,10 @@ export class UpsertPgrDto {
   @IsOptional()
   @IsString()
   companyId: string;
+
+  @IsString()
+  workspaceId: string;
+
+  @IsString()
+  workspaceName: string;
 }

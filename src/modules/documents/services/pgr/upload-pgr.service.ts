@@ -22,6 +22,7 @@ export class PgrUploadService {
   ) {}
   async execute(upsertPgrDto: UpsertPgrDto, userPayloadDto: UserPayloadDto) {
     const companyId = userPayloadDto.targetCompanyId;
+    const workspaceId = upsertPgrDto.workspaceId;
 
     const riskGroupData = await this.riskGroupDataRepository.findAllDataById(
       upsertPgrDto.riskGroupId,
@@ -29,7 +30,10 @@ export class PgrUploadService {
     );
 
     const hierarchyData =
-      await this.hierarchyRepository.findAllDataHierarchyByCompany(companyId);
+      await this.hierarchyRepository.findAllDataHierarchyByCompany(
+        companyId,
+        workspaceId,
+      );
 
     const doc = new Document({
       sections: [

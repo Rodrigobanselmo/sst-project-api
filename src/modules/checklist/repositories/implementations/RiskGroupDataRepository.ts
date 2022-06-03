@@ -59,15 +59,12 @@ export class RiskGroupDataRepository {
     return new RiskFactorGroupDataEntity(riskFactorGroupDataEntity);
   }
 
-  async findAllDataById(
-    id: string,
-    companyId: string,
-    options?: { includeEmployees: boolean },
-  ) {
+  async findAllDataById(id: string, companyId: string, options?: unknown) {
     const riskFactorGroupDataEntity =
       await this.prisma.riskFactorGroupData.findUnique({
         where: { id_companyId: { id, companyId } },
         include: {
+          company: true,
           data: {
             include: {
               adms: true,
@@ -76,47 +73,34 @@ export class RiskGroupDataRepository {
               generateSources: true,
               epis: true,
               riskFactor: true,
-              hierarchy: options?.includeEmployees
-                ? { include: { employees: true } }
-                : true,
-              homogeneousGroup: {
-                include: {
-                  hierarchyOnHomogeneous: {
-                    include: {
-                      hierarchy: options?.includeEmployees
-                        ? { include: { employees: true } }
-                        : true,
-                    },
-                  },
-                },
-              },
+              hierarchy: { include: { employees: true } },
+              homogeneousGroup: true,
             },
           },
-          company: true,
         },
       });
 
-    const riskFactorGroupData = {
-      ...riskFactorGroupDataEntity,
-    } as any;
+    // const riskFactorGroupData = {
+    //   ...riskFactorGroupDataEntity,
+    // } as any;
 
-    riskFactorGroupData.data = riskFactorGroupDataEntity.data.map(
-      (riskData) => {
-        const data = { ...riskData } as any;
-        if (
-          data.homogeneousGroup &&
-          data.homogeneousGroup.hierarchyOnHomogeneous
-        )
-          data.homogeneousGroup.hierarchies =
-            riskData.homogeneousGroup.hierarchyOnHomogeneous.map(
-              (hierarchy) => ({
-                ...hierarchy.hierarchy,
-                hierarchyId: hierarchy.hierarchyId,
-              }),
-            );
-        return;
-      },
-    );
+    // riskFactorGroupData.data = riskFactorGroupDataEntity.data.map(
+    //   (riskData) => {
+    //     const data = { ...riskData } as any;
+    //     if (
+    //       data.homogeneousGroup &&
+    //       data.homogeneousGroup.hierarchyOnHomogeneous
+    //     )
+    //       data.homogeneousGroup.hierarchies =
+    //         riskData.homogeneousGroup.hierarchyOnHomogeneous.map(
+    //           (hierarchy) => ({
+    //             ...hierarchy.hierarchy,
+    //             hierarchyId: hierarchy.hierarchyId,
+    //           }),
+    //         );
+    //     return;
+    //   },
+    // );
 
     return new RiskFactorGroupDataEntity(riskFactorGroupDataEntity);
   }

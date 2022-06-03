@@ -14,20 +14,19 @@ export class RiskDocumentRepository {
     id,
     ...createDto
   }: UpsertRiskDocumentDto): Promise<RiskDocumentEntity> {
-    const riskFactorGroupDataEntity =
-      await this.prisma.riskFactorDocument.upsert({
-        create: {
-          companyId,
-          ...createDto,
-        },
-        update: {
-          ...createDto,
-          companyId,
-        },
-        where: { id_companyId: { companyId, id: id || 'not-found' } },
-      });
+    const riskFactorDocEntity = await this.prisma.riskFactorDocument.upsert({
+      create: {
+        companyId,
+        ...createDto,
+      },
+      update: {
+        ...createDto,
+        companyId,
+      },
+      where: { id_companyId: { companyId, id: id || 'not-found' } },
+    });
 
-    return new RiskDocumentEntity(riskFactorGroupDataEntity);
+    return new RiskDocumentEntity(riskFactorDocEntity);
   }
 
   async findByRiskGroupAndCompany(riskGroupId: string, companyId: string) {

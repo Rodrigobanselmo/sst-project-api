@@ -56,13 +56,13 @@ model Address {
   id   String    @id @default(uuid())
   companyId String
   cep String 
-  workspaceId String?
   street String?
   number String?
   complement String?
   neighborhood String?
   city String?
   state String?
+  workspaceId String?
   workspace Workspace? @relation(fields: [id,companyId], references: [id,companyId], onDelete: Cascade, onUpdate: Cascade)
   
   @@unique([workspaceId, companyId])
@@ -361,6 +361,9 @@ model RiskFactorDocument {
   version String  @default("1")
   companyId String
   riskGroupId String
+  workspaceName String
+  workspaceId String
+  workspace Workspace @relation(fields: [workspaceId,companyId], references: [id,companyId], onDelete: Cascade, onUpdate: Cascade)
   status StatusEnum @default(ACTIVE)
   created_at DateTime @default(now())
   updated_at  DateTime   @updatedAt
@@ -448,6 +451,7 @@ model Workspace {
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   address Address?
   employee Employee[]
+  riskFactorDocument RiskFactorDocument[]
   hierarchyOnHomogeneous HierarchyOnHomogeneous[]
   hierarchy Hierarchy[]
 
