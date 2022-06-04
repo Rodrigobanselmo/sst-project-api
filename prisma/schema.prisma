@@ -129,6 +129,7 @@ model Company {
   primary_activity Activity[] @relation(name: "primary_activity")
   secondary_activity Activity[] @relation(name: "secondary_activity")
   employees Employee[] 
+  invites InviteUsers[] 
   receivingServiceContracts Contract[]
   applyingServiceContracts Contract[]  @relation(name: "contracts")
   license License? @relation(name:"license",fields: [licenseId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
@@ -273,6 +274,7 @@ model InviteUsers {
   id   String @id @default(uuid())
   expires_date DateTime
   companyId String
+  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   email String 
   roles String[]
   permissions String[]

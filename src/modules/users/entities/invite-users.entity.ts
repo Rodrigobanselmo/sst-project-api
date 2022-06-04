@@ -24,6 +24,9 @@ export class InviteUsersEntity implements InviteUsers {
   @ApiProperty({ description: 'The company id for user invitation' })
   companyId: string;
 
+  @ApiProperty()
+  companyName?: string;
+
   constructor(partial: Partial<InviteUsersEntity>) {
     Object.assign(this, partial);
   }
