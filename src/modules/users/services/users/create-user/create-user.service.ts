@@ -1,5 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { ErrorAuthEnum } from '../../../../../shared/constants/enum/errorMessage';
+import { InviteUsersRepository } from '../../../../../modules/users/repositories/implementations/InviteUsersRepository';
+import {
+  ErrorAuthEnum,
+  ErrorInvitesEnum,
+} from '../../../../../shared/constants/enum/errorMessage';
 
 import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { HashProvider } from '../../../../../shared/providers/HashProvider/implementations/HashProvider';
@@ -15,6 +19,7 @@ export class CreateUserService {
     private readonly findByTokenService: FindByTokenService,
     private readonly dateProvider: DayJSProvider,
     private readonly hashProvider: HashProvider,
+    private readonly inviteUsersRepository: InviteUsersRepository,
   ) {}
 
   async execute({ token, password, ...restCreateUserDto }: CreateUserDto) {
@@ -26,7 +31,7 @@ export class CreateUserService {
     if (userAlreadyExist)
       throw new BadRequestException(ErrorAuthEnum.USER_ALREADY_EXIST);
 
-    const companies: UserCompanyDto[] = await getCompanyPermissionByToken(
+    const { companies, email, companyId } = await getCompanyPermissionByToken(
       token,
       restCreateUserDto.email,
       this.findByTokenService,
@@ -39,6 +44,11 @@ export class CreateUserService {
     };
 
     const user = await this.userRepository.create(userData, companies);
+    if (email && companyId)
+      await this.inviteUsersRepository.deleteByCompanyIdAndEmail(
+        companyId,
+        email,
+      );
 
     return user;
   }
@@ -50,7 +60,7 @@ export const getCompanyPermissionByToken = async (
   findByTokenService: FindByTokenService,
   dateProvider: DayJSProvider,
 ) => {
-  if (!token) return [];
+  if (!token) return { companies: [] };
 
   const invite = await findByTokenService.execute(token);
 
@@ -58,10 +68,10 @@ export const getCompanyPermissionByToken = async (
   const expires_date = new Date(dateProvider.convertToUTC(invite.expires_date));
 
   if (invite.email !== email)
-    throw new BadRequestException('Invite token not valid for this email');
+    throw new BadRequestException(ErrorInvitesEnum.TOKEN_NOT_VALID_EMAIL);
 
   if (currentDate > expires_date)
-    throw new BadRequestException('Invite token is expired');
+    throw new BadRequestException(ErrorInvitesEnum.TOKEN_EXPIRES);
 
   const companies: UserCompanyDto[] = [
     {
@@ -71,5 +81,5 @@ export const getCompanyPermissionByToken = async (
     },
   ];
 
-  return companies;
+  return { companies, email: invite.email, companyId: invite.companyId };
 };

@@ -1,9 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 
+import { InviteUsersRepository } from '../../../../../modules/users/repositories/implementations/InviteUsersRepository';
 import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { HashProvider } from '../../../../../shared/providers/HashProvider/implementations/HashProvider';
 import { UpdateUserDto } from '../../../dto/update-user.dto';
-import { UserCompanyDto } from '../../../dto/user-company.dto';
 import { UsersRepository } from '../../../repositories/implementations/UsersRepository';
 import { FindByTokenService } from '../../invites/find-by-token/find-by-token.service';
 import { getCompanyPermissionByToken } from '../create-user/create-user.service';
@@ -15,6 +15,7 @@ export class UpdateUserService {
     private readonly hashProvider: HashProvider,
     private readonly dateProvider: DayJSProvider,
     private readonly findByTokenService: FindByTokenService,
+    private readonly inviteUsersRepository: InviteUsersRepository,
   ) {}
 
   async execute(
@@ -44,7 +45,7 @@ export class UpdateUserService {
       updateUserDto.password = passHash;
     }
 
-    const companies: UserCompanyDto[] = await getCompanyPermissionByToken(
+    const { companies, email, companyId } = await getCompanyPermissionByToken(
       token,
       userData.email,
       this.findByTokenService,
@@ -52,6 +53,11 @@ export class UpdateUserService {
     );
 
     const user = await this.userRepository.update(id, updateUserDto, companies);
+    if (email && companyId)
+      await this.inviteUsersRepository.deleteByCompanyIdAndEmail(
+        companyId,
+        email,
+      );
 
     return user;
   }

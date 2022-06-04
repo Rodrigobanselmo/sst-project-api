@@ -14,10 +14,6 @@ interface IInviteUsersRepository {
   findById(id: string): Promise<InviteUsersEntity | undefined>;
   // deleteById(id: string): Promise<void>;
   // deleteByEmail(email: string): Promise<void>;
-  deleteByCompanyIdAndEmail(
-    companyId: string,
-    email: string,
-  ): Promise<Prisma.BatchPayload>;
   deleteAllOldInvites(currentDate: Date): Promise<Prisma.BatchPayload>;
 }
 export { IInviteUsersRepository };

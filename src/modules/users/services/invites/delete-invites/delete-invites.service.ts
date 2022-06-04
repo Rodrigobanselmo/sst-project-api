@@ -7,12 +7,11 @@ import { InviteUsersRepository } from '../../../repositories/implementations/Inv
 export class DeleteInvitesService {
   constructor(private readonly inviteUsersRepository: InviteUsersRepository) {}
 
-  async execute({ companyId, email }: DeleteInviteDto) {
-    const deletedInvites =
-      await this.inviteUsersRepository.deleteByCompanyIdAndEmail(
-        companyId,
-        email,
-      );
+  async execute({ companyId, id }: DeleteInviteDto) {
+    const deletedInvites = await this.inviteUsersRepository.deleteById(
+      companyId,
+      id,
+    );
 
     return deletedInvites;
   }

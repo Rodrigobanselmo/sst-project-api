@@ -65,8 +65,8 @@ const inviteNewUser = async (
 
   // Todo: add company name
   const variables = {
-    company: invite.companyId,
-    link: `${process.env.APP_HOST}/invites/?token=${invite.id}`,
+    company: invite.companyName,
+    link: `${process.env.APP_HOST}/cadastro/?token=${invite.id}&email=${invite.email}`,
   };
 
   await mailProvider.sendMail({

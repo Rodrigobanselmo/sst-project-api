@@ -2,13 +2,14 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   Param,
   Post,
-  Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { classToClass } from 'class-transformer';
+import { ErrorInvitesEnum } from 'src/shared/constants/enum/errorMessage';
 import { ValidateEmailPipe } from 'src/shared/pipes/validate-email.pipe';
 
 import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
@@ -21,7 +22,6 @@ import { DeleteInvitesService } from '../../services/invites/delete-invites/dele
 import { FindAllByCompanyIdService } from '../../services/invites/find-by-companyId/find-by-companyId.service';
 import { FindAllByEmailService } from '../../services/invites/find-by-email/find-by-email.service';
 import { InviteUsersService } from '../../services/invites/invite-users/invite-users.service';
-import { DeleteInviteDto } from './../../dto/delete-invite.dto';
 
 @ApiTags('invites')
 @Controller('invites')
@@ -41,8 +41,15 @@ export class InvitesController {
     );
   }
 
-  @Get('/:email')
-  async findAllByEmail(@Param('email', ValidateEmailPipe) email: string) {
+  @Get('/me/:email')
+  async findAllByEmail(
+    @Param('email', ValidateEmailPipe) email: string,
+    @User() user: UserPayloadDto,
+  ) {
+    if (user.email !== email)
+      throw new ForbiddenException(
+        ErrorInvitesEnum.FORBIDDEN_ACCESS_USER_INVITE_LIST,
+      );
     return classToClass(this.findAllByEmailService.execute(email));
   }
 
@@ -56,13 +63,14 @@ export class InvitesController {
     return classToClass(this.inviteUsersService.execute(inviteUserDto));
   }
 
-  @Delete()
-  @Permissions({
-    code: PermissionEnum.INVITE_USER,
-    isMember: true,
-  })
-  async delete(@Query() deleteInviteDto: DeleteInviteDto) {
-    return classToClass(this.deleteInvitesService.execute(deleteInviteDto));
+  @Delete('/:id/:companyId?')
+  async delete(@Param('id') id: string, @User() user: UserPayloadDto) {
+    await this.deleteInvitesService.execute({
+      id,
+      companyId: user.targetCompanyId,
+    });
+
+    return id;
   }
 
   @Delete('expired')
