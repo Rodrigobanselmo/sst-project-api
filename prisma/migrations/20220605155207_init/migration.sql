@@ -28,13 +28,13 @@ CREATE TABLE "Address" (
     "id" TEXT NOT NULL,
     "companyId" TEXT NOT NULL,
     "cep" TEXT NOT NULL,
-    "workspaceId" TEXT,
     "street" TEXT,
     "number" TEXT,
     "complement" TEXT,
     "neighborhood" TEXT,
     "city" TEXT,
     "state" TEXT,
+    "workspaceId" TEXT,
 
     CONSTRAINT "Address_pkey" PRIMARY KEY ("id")
 );
@@ -295,6 +295,8 @@ CREATE TABLE "RiskFactorDocument" (
     "version" TEXT NOT NULL DEFAULT E'1',
     "companyId" TEXT NOT NULL,
     "riskGroupId" TEXT NOT NULL,
+    "workspaceName" TEXT NOT NULL,
+    "workspaceId" TEXT NOT NULL,
     "status" "StatusEnum" NOT NULL DEFAULT E'ACTIVE',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
@@ -330,6 +332,26 @@ CREATE TABLE "RiskFactorData" (
     "riskFactorGroupDataId" TEXT NOT NULL,
 
     CONSTRAINT "RiskFactorData_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "RiskFactorProbability" (
+    "id" TEXT NOT NULL,
+    "intensity" INTEGER,
+    "intensityResult" DOUBLE PRECISION,
+    "intensityLt" DOUBLE PRECISION,
+    "minDurationJT" INTEGER,
+    "minDurationEO" INTEGER,
+    "chancesOfHappening" INTEGER,
+    "frequency" INTEGER,
+    "history" INTEGER,
+    "medsImplemented" INTEGER,
+    "riskFactorDataAfterId" TEXT,
+    "riskFactorDataId" TEXT,
+    "riskId" TEXT NOT NULL,
+    "riskFactorGroupDataId" TEXT,
+
+    CONSTRAINT "RiskFactorProbability_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -480,6 +502,15 @@ CREATE UNIQUE INDEX "RiskFactorGroupData_id_companyId_key" ON "RiskFactorGroupDa
 CREATE UNIQUE INDEX "RiskFactorData_id_companyId_key" ON "RiskFactorData"("id", "companyId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "RiskFactorData_id_riskId_riskFactorGroupDataId_key" ON "RiskFactorData"("id", "riskId", "riskFactorGroupDataId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "RiskFactorProbability_riskFactorDataId_riskId_riskFactorGro_key" ON "RiskFactorProbability"("riskFactorDataId", "riskId", "riskFactorGroupDataId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "RiskFactorProbability_riskFactorDataAfterId_riskId_riskFact_key" ON "RiskFactorProbability"("riskFactorDataAfterId", "riskId", "riskFactorGroupDataId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
@@ -597,6 +628,9 @@ ALTER TABLE "HierarchyOnHomogeneous" ADD CONSTRAINT "HierarchyOnHomogeneous_work
 ALTER TABLE "HomogeneousGroup" ADD CONSTRAINT "HomogeneousGroup_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "InviteUsers" ADD CONSTRAINT "InviteUsers_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "RecMed" ADD CONSTRAINT "RecMed_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -610,6 +644,9 @@ ALTER TABLE "RefreshToken" ADD CONSTRAINT "RefreshToken_userId_fkey" FOREIGN KEY
 
 -- AddForeignKey
 ALTER TABLE "RiskFactors" ADD CONSTRAINT "RiskFactors_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "RiskFactorDocument" ADD CONSTRAINT "RiskFactorDocument_workspaceId_companyId_fkey" FOREIGN KEY ("workspaceId", "companyId") REFERENCES "Workspace"("id", "companyId") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "RiskFactorDocument" ADD CONSTRAINT "RiskFactorDocument_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -634,6 +671,15 @@ ALTER TABLE "RiskFactorData" ADD CONSTRAINT "RiskFactorData_hierarchyId_fkey" FO
 
 -- AddForeignKey
 ALTER TABLE "RiskFactorData" ADD CONSTRAINT "RiskFactorData_riskFactorGroupDataId_fkey" FOREIGN KEY ("riskFactorGroupDataId") REFERENCES "RiskFactorGroupData"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "RiskFactorProbability" ADD CONSTRAINT "RiskFactorProbability_riskId_fkey" FOREIGN KEY ("riskId") REFERENCES "RiskFactors"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "RiskFactorProbability" ADD CONSTRAINT "RiskFactorProbability_riskFactorDataId_riskId_riskFactorGr_fkey" FOREIGN KEY ("riskFactorDataId", "riskId", "riskFactorGroupDataId") REFERENCES "RiskFactorData"("id", "riskId", "riskFactorGroupDataId") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "RiskFactorProbability" ADD CONSTRAINT "RiskFactorProbability_riskFactorDataAfterId_riskId_riskFac_fkey" FOREIGN KEY ("riskFactorDataAfterId", "riskId", "riskFactorGroupDataId") REFERENCES "RiskFactorData"("id", "riskId", "riskFactorGroupDataId") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "UserCompany" ADD CONSTRAINT "UserCompany_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
