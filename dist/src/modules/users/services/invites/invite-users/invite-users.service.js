@@ -46,7 +46,7 @@ InviteUsersService = __decorate([
 ], InviteUsersService);
 exports.InviteUsersService = InviteUsersService;
 const inviteNewUser = async (mailProvider, invite) => {
-    const templatePath = (0, path_1.resolve)(__dirname, '..', '..', '..', '..', '..', '..', 'templates', 'email', 'InviteUser.hbs');
+    const templatePath = (0, path_1.resolve)(__dirname, '..', '..', '..', '..', '..', '..', 'templates', 'email', 'inviteUser.hbs');
     const variables = {
         company: invite.companyName,
         link: `${process.env.APP_HOST}/cadastro/?token=${invite.id}&email=${invite.email}`,

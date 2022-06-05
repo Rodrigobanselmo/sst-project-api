@@ -31,7 +31,7 @@ export class SendForgotPassMailService {
       '..',
       'templates',
       'email',
-      'ForgotPassword.hbs',
+      'forgotPassword.hbs',
     );
 
     const expires_date = this.dateProvider.addHours(new Date(), 3);

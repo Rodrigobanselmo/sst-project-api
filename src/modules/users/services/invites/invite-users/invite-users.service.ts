@@ -60,7 +60,7 @@ const inviteNewUser = async (
     '..',
     'templates',
     'email',
-    'InviteUser.hbs',
+    'inviteUser.hbs',
   );
 
   // Todo: add company name

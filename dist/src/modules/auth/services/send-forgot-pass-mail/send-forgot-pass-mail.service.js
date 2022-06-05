@@ -28,7 +28,7 @@ let SendForgotPassMailService = class SendForgotPassMailService {
         if (!user) {
             throw new common_1.BadRequestException('User does not exists');
         }
-        const templatePath = (0, path_1.resolve)(__dirname, '..', '..', '..', '..', '..', 'templates', 'email', 'ForgotPassword.hbs');
+        const templatePath = (0, path_1.resolve)(__dirname, '..', '..', '..', '..', '..', 'templates', 'email', 'forgotPassword.hbs');
         const expires_date = this.dateProvider.addHours(new Date(), 3);
         const refresh_token = await this.refreshTokensRepository.create('reset', user.id, expires_date);
         const variables = {
