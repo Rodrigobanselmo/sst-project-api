@@ -28,6 +28,8 @@ const EpiRepository_1 = require("../checklist/repositories/implementations/EpiRe
 const WorkspaceRepository_1 = require("../company/repositories/implementations/WorkspaceRepository");
 const download_employees_service_1 = require("./services/company/download-employees/download-employees.service");
 const upload_employees_service_1 = require("./services/company/upload-employees/upload-employees.service");
+const upload_hierarchies_service_1 = require("./services/company/upload-hierarchies/upload-hierarchies.service");
+const download_hierarchies_service_1 = require("./services/company/download-hierarchies/download-hierarchies.service");
 let FilesModule = class FilesModule {
 };
 FilesModule = __decorate([
@@ -54,6 +56,8 @@ FilesModule = __decorate([
             WorkspaceRepository_1.WorkspaceRepository,
             download_employees_service_1.DownloadEmployeesService,
             upload_employees_service_1.UploadEmployeesService,
+            upload_hierarchies_service_1.UploadHierarchiesService,
+            download_hierarchies_service_1.DownloadHierarchiesService,
         ],
     })
 ], FilesModule);

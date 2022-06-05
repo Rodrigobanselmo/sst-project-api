@@ -9,8 +9,8 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { classToClass } from 'class-transformer';
-import { ErrorInvitesEnum } from 'src/shared/constants/enum/errorMessage';
-import { ValidateEmailPipe } from 'src/shared/pipes/validate-email.pipe';
+import { ErrorInvitesEnum } from '../../../../shared/constants/enum/errorMessage';
+import { ValidateEmailPipe } from '../../../../shared/pipes/validate-email.pipe';
 
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';

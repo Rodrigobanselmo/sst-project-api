@@ -23,5 +23,10 @@ export declare class FilesController {
         id: import("../../../shared/constants/workbooks/workbooks.enum").WorkbooksEnum;
         sheets: Record<import("../../../shared/constants/workbooks/sheets/employees/employees.enum").EmployeesUniqueSheetEnum, import("../../../shared/constants/workbooks/sheets/employees/employeesSheet.constant").IEmployeeSheet>;
         path: string;
+    } | {
+        name: string;
+        id: import("../../../shared/constants/workbooks/workbooks.enum").WorkbooksEnum;
+        sheets: Record<import("../../../shared/constants/workbooks/sheets/hierarchies/hierarchies.enum").HierarchiesSheetEnum, import("../../../shared/constants/workbooks/sheets/hierarchies/hierarchiesSheet.constant").IEmployeeSheet>;
+        path: string;
     })[];
 }

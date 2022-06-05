@@ -28,9 +28,52 @@ let HierarchyRepository = class HierarchyRepository {
     constructor(prisma) {
         this.prisma = prisma;
     }
-    async upsertMany(upsertHierarchyMany, companyId) {
+    async upsertMany(upsertHierarchyMany, companyId, ghoNames) {
+        let homogeneousGroup = [];
+        if (upsertHierarchyMany && upsertHierarchyMany.length > 0)
+            homogeneousGroup = ghoNames
+                ? await this.prisma.$transaction(ghoNames.map((ghoName) => {
+                    return this.prisma.homogeneousGroup.upsert({
+                        create: {
+                            company: { connect: { id: companyId } },
+                            name: ghoName,
+                            description: '',
+                        },
+                        update: {
+                            name: ghoName,
+                        },
+                        where: { name_companyId: { companyId, name: ghoName } },
+                    });
+                }))
+                : await this.prisma.$transaction(upsertHierarchyMany
+                    .filter(({ ghoName }) => ghoName)
+                    .map(({ ghoName }) => {
+                    return this.prisma.homogeneousGroup.upsert({
+                        create: {
+                            company: { connect: { id: companyId } },
+                            name: ghoName,
+                            description: '',
+                        },
+                        update: {
+                            name: ghoName,
+                        },
+                        where: { name_companyId: { companyId, name: ghoName } },
+                    });
+                }));
+        const HierarchyOnHomoGroup = [];
         const data = await this.prisma.$transaction(upsertHierarchyMany.map((_a) => {
-            var { companyId: _, id, workspaceIds, parentId, children } = _a, upsertHierarchy = __rest(_a, ["companyId", "id", "workspaceIds", "parentId", "children"]);
+            var { companyId: _, id, workspaceIds, parentId, children, ghoName } = _a, upsertHierarchy = __rest(_a, ["companyId", "id", "workspaceIds", "parentId", "children", "ghoName"]);
+            const HierarchyOnHomo = workspaceIds
+                .map((workspaceId) => {
+                var _a;
+                return ({
+                    hierarchyId: id,
+                    homogeneousGroupId: (_a = homogeneousGroup.find((homogeneous) => homogeneous.name === ghoName)) === null || _a === void 0 ? void 0 : _a.id,
+                    workspaceId,
+                });
+            })
+                .filter((hierarchyOnHomo) => hierarchyOnHomo.homogeneousGroupId);
+            HierarchyOnHomoGroup.push(...HierarchyOnHomo);
             return this.prisma.hierarchy.upsert({
                 create: Object.assign(Object.assign({}, upsertHierarchy), { id, company: { connect: { id: companyId } }, workspaces: {
                         connect: workspaceIds.map((id) => ({
@@ -55,6 +98,15 @@ let HierarchyRepository = class HierarchyRepository {
                             connect: { id: parentId },
                         } }),
                 where: { id: id || 'none' },
+            });
+        }));
+        await this.prisma.$transaction(HierarchyOnHomoGroup.map((hierarchyOnHomoGroup) => {
+            return this.prisma.hierarchyOnHomogeneous.upsert({
+                create: Object.assign({}, hierarchyOnHomoGroup),
+                update: {},
+                where: {
+                    hierarchyId_homogeneousGroupId_workspaceId: hierarchyOnHomoGroup,
+                },
             });
         }));
         return data.map((hierarchy) => new hierarchy_entity_1.HierarchyEntity(hierarchy));

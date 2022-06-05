@@ -43,6 +43,7 @@ export class HierarchyExcelProvider {
       sub_sector?: string;
       office?: string;
       sub_office?: string;
+      ghoName?: string;
     }[],
   ) {
     const hierarchyMap = {} as any;
@@ -81,6 +82,7 @@ export class HierarchyExcelProvider {
 
             hierarchyMap[id].id = id;
             hierarchyMap[id].workspaceIds = hierarchy.workspaceIds;
+            hierarchyMap[id].ghoName = hierarchy.ghoName;
             hierarchyMap[id].name = employeeWork.value;
             hierarchyMap[id].type =
               employeeWork.key.toUpperCase() as HierarchyEnum;

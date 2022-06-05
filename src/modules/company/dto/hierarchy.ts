@@ -38,6 +38,10 @@ export class CreateHierarchyDto {
 
   @IsString()
   @IsOptional()
+  ghoName: string;
+
+  @IsString()
+  @IsOptional()
   description?: string;
 
   @IsString({ each: true })

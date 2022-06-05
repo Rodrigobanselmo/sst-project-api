@@ -12,9 +12,11 @@ import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 
 import { DownloadCompaniesService } from '../../services/company/download-companies/download-companies.service';
 import { DownloadEmployeesService } from '../../services/company/download-employees/download-employees.service';
+import { DownloadHierarchiesService } from '../../services/company/download-hierarchies/download-hierarchies.service';
 import { DownloadUniqueCompanyService } from '../../services/company/download-unique-company/download-unique-company.service';
 import { UploadCompaniesService } from '../../services/company/upload-companies/upload-companies.service';
 import { UploadEmployeesService } from '../../services/company/upload-employees/upload-employees.service';
+import { UploadHierarchiesService } from '../../services/company/upload-hierarchies/upload-hierarchies.service';
 import { UploadUniqueCompanyService } from '../../services/company/upload-unique-company/upload-unique-company.service';
 
 @Controller('files/company')
@@ -26,6 +28,8 @@ export class FilesCompanyController {
     private readonly uploadUniqueCompanyService: UploadUniqueCompanyService,
     private readonly uploadEmployeesService: UploadEmployeesService,
     private readonly downloadEmployeesService: DownloadEmployeesService,
+    private readonly uploadHierarchiesService: UploadHierarchiesService,
+    private readonly downloadHierarchiesService: DownloadHierarchiesService,
   ) {}
 
   @Post('/upload/unique')
@@ -60,6 +64,16 @@ export class FilesCompanyController {
     workbook.xlsx.write(res).then(function () {
       res.end();
     });
+  }
+
+  @Post('hierarchies/upload/:companyId?')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadHierarchiesFile(
+    @UploadedFile() file: Express.Multer.File,
+    @User() userPayloadDto: UserPayloadDto,
+  ) {
+    await this.uploadHierarchiesService.execute(file, userPayloadDto);
+    return 'sucesso';
   }
 
   @Post('/upload/:companyId?')
@@ -108,6 +122,20 @@ export class FilesCompanyController {
     const { workbook, filename } = await this.downloadEmployeesService.execute(
       userPayloadDto,
     );
+
+    res.attachment(filename);
+    workbook.xlsx.write(res).then(function () {
+      res.end();
+    });
+  }
+
+  @Get('/hierarchies/download/:companyId?')
+  async downloadHierarchies(
+    @User() userPayloadDto: UserPayloadDto,
+    @Res() res,
+  ) {
+    const { workbook, filename } =
+      await this.downloadHierarchiesService.execute(userPayloadDto);
 
     res.attachment(filename);
     workbook.xlsx.write(res).then(function () {

@@ -29,4 +29,10 @@ export declare const workbooksConstant: {
         sheets: Record<import("./sheets/employees/employees.enum").EmployeesUniqueSheetEnum, import("./sheets/employees/employeesSheet.constant").IEmployeeSheet>;
         path: string;
     };
+    5: {
+        name: string;
+        id: WorkbooksEnum;
+        sheets: Record<import("./sheets/hierarchies/hierarchies.enum").HierarchiesSheetEnum, import("./sheets/hierarchies/hierarchiesSheet.constant").IEmployeeSheet>;
+        path: string;
+    };
 };

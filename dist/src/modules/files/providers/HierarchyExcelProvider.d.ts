@@ -13,6 +13,7 @@ export declare class HierarchyExcelProvider {
         sub_sector?: string;
         office?: string;
         sub_office?: string;
+        ghoName?: string;
     }[]): any;
     compare(allMap: hierarchyMap, compareMap: hierarchyMap): Record<string, any>;
 }

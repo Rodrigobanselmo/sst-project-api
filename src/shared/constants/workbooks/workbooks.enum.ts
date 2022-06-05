@@ -4,4 +4,5 @@ export enum WorkbooksEnum {
   COMPANIES,
   COMPANY,
   EMPLOYEES,
+  HIERARCHIES,
 }

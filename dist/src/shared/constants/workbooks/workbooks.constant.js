@@ -6,6 +6,7 @@ const companySheet_constant_1 = require("./sheets/company/companySheet.constant"
 const companyUniqueSheet_constant_1 = require("./sheets/companyUnique/companyUniqueSheet.constant");
 const employeesSheet_constant_1 = require("./sheets/employees/employeesSheet.constant");
 const epiSheet_constant_1 = require("./sheets/epi/epiSheet.constant");
+const hierarchiesSheet_constant_1 = require("./sheets/hierarchies/hierarchiesSheet.constant");
 const riskSheet_constant_1 = require("./sheets/risk/riskSheet.constant");
 exports.workbooksConstant = {
     [workbooks_enum_1.WorkbooksEnum.RISK]: {
@@ -36,6 +37,12 @@ exports.workbooksConstant = {
         id: workbooks_enum_1.WorkbooksEnum.EMPLOYEES,
         sheets: employeesSheet_constant_1.employeesSheetConstant,
         path: 'files/company/employees',
+    },
+    [workbooks_enum_1.WorkbooksEnum.HIERARCHIES]: {
+        name: 'Organograma',
+        id: workbooks_enum_1.WorkbooksEnum.HIERARCHIES,
+        sheets: hierarchiesSheet_constant_1.hierarchiesSheetConstant,
+        path: 'files/company/hierarchies',
     },
 };
 //# sourceMappingURL=workbooks.constant.js.map

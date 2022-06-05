@@ -52,6 +52,7 @@ let HierarchyExcelProvider = class HierarchyExcelProvider {
                         hierarchyMap[id] = {};
                     hierarchyMap[id].id = id;
                     hierarchyMap[id].workspaceIds = hierarchy.workspaceIds;
+                    hierarchyMap[id].ghoName = hierarchy.ghoName;
                     hierarchyMap[id].name = employeeWork.value;
                     hierarchyMap[id].type =
                         employeeWork.key.toUpperCase();

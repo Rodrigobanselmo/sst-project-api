@@ -8,5 +8,6 @@ var WorkbooksEnum;
     WorkbooksEnum[WorkbooksEnum["COMPANIES"] = 2] = "COMPANIES";
     WorkbooksEnum[WorkbooksEnum["COMPANY"] = 3] = "COMPANY";
     WorkbooksEnum[WorkbooksEnum["EMPLOYEES"] = 4] = "EMPLOYEES";
+    WorkbooksEnum[WorkbooksEnum["HIERARCHIES"] = 5] = "HIERARCHIES";
 })(WorkbooksEnum = exports.WorkbooksEnum || (exports.WorkbooksEnum = {}));
 //# sourceMappingURL=workbooks.enum.js.map

@@ -19,6 +19,8 @@ import { EpiRepository } from '../checklist/repositories/implementations/EpiRepo
 import { WorkspaceRepository } from '../company/repositories/implementations/WorkspaceRepository';
 import { DownloadEmployeesService } from './services/company/download-employees/download-employees.service';
 import { UploadEmployeesService } from './services/company/upload-employees/upload-employees.service';
+import { UploadHierarchiesService } from './services/company/upload-hierarchies/upload-hierarchies.service';
+import { DownloadHierarchiesService } from './services/company/download-hierarchies/download-hierarchies.service';
 
 @Module({
   controllers: [
@@ -43,6 +45,8 @@ import { UploadEmployeesService } from './services/company/upload-employees/uplo
     WorkspaceRepository,
     DownloadEmployeesService,
     UploadEmployeesService,
+    UploadHierarchiesService,
+    DownloadHierarchiesService,
   ],
 })
 export class FilesModule {}

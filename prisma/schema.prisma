@@ -267,6 +267,7 @@ model HomogeneousGroup {
   created_at DateTime @default(now())
   riskFactorData RiskFactorData[] 
   
+  @@unique([name, companyId])
   @@index(companyId)
 }
 

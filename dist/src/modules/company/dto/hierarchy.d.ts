@@ -4,6 +4,7 @@ export declare class CreateHierarchyDto {
     status: StatusEnum;
     type: HierarchyEnum;
     companyId: string;
+    ghoName: string;
     description?: string;
     workspaceIds?: string[];
     parentId?: string;

@@ -3,6 +3,7 @@ import { companySheetConstant } from './sheets/company/companySheet.constant';
 import { companyUniqueSheetConstant } from './sheets/companyUnique/companyUniqueSheet.constant';
 import { employeesSheetConstant } from './sheets/employees/employeesSheet.constant';
 import { epiSheetConstant } from './sheets/epi/epiSheet.constant';
+import { hierarchiesSheetConstant } from './sheets/hierarchies/hierarchiesSheet.constant';
 import { riskSheetConstant } from './sheets/risk/riskSheet.constant';
 
 export const workbooksConstant = {
@@ -34,5 +35,11 @@ export const workbooksConstant = {
     id: WorkbooksEnum.EMPLOYEES,
     sheets: employeesSheetConstant,
     path: 'files/company/employees',
+  },
+  [WorkbooksEnum.HIERARCHIES]: {
+    name: 'Organograma',
+    id: WorkbooksEnum.HIERARCHIES,
+    sheets: hierarchiesSheetConstant,
+    path: 'files/company/hierarchies',
   },
 };

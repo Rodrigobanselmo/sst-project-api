@@ -20,18 +20,22 @@ const user_decorator_1 = require("../../../../shared/decorators/user.decorator")
 const user_payload_dto_1 = require("../../../../shared/dto/user-payload.dto");
 const download_companies_service_1 = require("../../services/company/download-companies/download-companies.service");
 const download_employees_service_1 = require("../../services/company/download-employees/download-employees.service");
+const download_hierarchies_service_1 = require("../../services/company/download-hierarchies/download-hierarchies.service");
 const download_unique_company_service_1 = require("../../services/company/download-unique-company/download-unique-company.service");
 const upload_companies_service_1 = require("../../services/company/upload-companies/upload-companies.service");
 const upload_employees_service_1 = require("../../services/company/upload-employees/upload-employees.service");
+const upload_hierarchies_service_1 = require("../../services/company/upload-hierarchies/upload-hierarchies.service");
 const upload_unique_company_service_1 = require("../../services/company/upload-unique-company/upload-unique-company.service");
 let FilesCompanyController = class FilesCompanyController {
-    constructor(downloadCompaniesService, uploadCompaniesService, downloadUniqueCompanyService, uploadUniqueCompanyService, uploadEmployeesService, downloadEmployeesService) {
+    constructor(downloadCompaniesService, uploadCompaniesService, downloadUniqueCompanyService, uploadUniqueCompanyService, uploadEmployeesService, downloadEmployeesService, uploadHierarchiesService, downloadHierarchiesService) {
         this.downloadCompaniesService = downloadCompaniesService;
         this.uploadCompaniesService = uploadCompaniesService;
         this.downloadUniqueCompanyService = downloadUniqueCompanyService;
         this.uploadUniqueCompanyService = uploadUniqueCompanyService;
         this.uploadEmployeesService = uploadEmployeesService;
         this.downloadEmployeesService = downloadEmployeesService;
+        this.uploadHierarchiesService = uploadHierarchiesService;
+        this.downloadHierarchiesService = downloadHierarchiesService;
     }
     async uploadCompanyFile(file, userPayloadDto, res) {
         const { workbook, filename } = await this.uploadUniqueCompanyService.execute(file, userPayloadDto);
@@ -46,6 +50,10 @@ let FilesCompanyController = class FilesCompanyController {
         workbook.xlsx.write(res).then(function () {
             res.end();
         });
+    }
+    async uploadHierarchiesFile(file, userPayloadDto) {
+        await this.uploadHierarchiesService.execute(file, userPayloadDto);
+        return 'sucesso';
     }
     async uploadFile(file, userPayloadDto, res) {
         const { workbook, filename } = await this.uploadCompaniesService.execute(file, userPayloadDto);
@@ -75,6 +83,13 @@ let FilesCompanyController = class FilesCompanyController {
             res.end();
         });
     }
+    async downloadHierarchies(userPayloadDto, res) {
+        const { workbook, filename } = await this.downloadHierarchiesService.execute(userPayloadDto);
+        res.attachment(filename);
+        workbook.xlsx.write(res).then(function () {
+            res.end();
+        });
+    }
 };
 __decorate([
     (0, common_1.Post)('/upload/unique'),
@@ -98,6 +113,16 @@ __decorate([
     __metadata("design:paramtypes", [Object, user_payload_dto_1.UserPayloadDto, Object]),
     __metadata("design:returntype", Promise)
 ], FilesCompanyController.prototype, "uploadEmployeesFile", null);
+__decorate([
+    (0, common_1.Post)('hierarchies/upload/:companyId?'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
+    openapi.ApiResponse({ status: 201, type: String }),
+    __param(0, (0, common_1.UploadedFile)()),
+    __param(1, (0, user_decorator_1.User)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, user_payload_dto_1.UserPayloadDto]),
+    __metadata("design:returntype", Promise)
+], FilesCompanyController.prototype, "uploadHierarchiesFile", null);
 __decorate([
     (0, common_1.Post)('/upload/:companyId?'),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
@@ -136,6 +161,15 @@ __decorate([
     __metadata("design:paramtypes", [user_payload_dto_1.UserPayloadDto, Object]),
     __metadata("design:returntype", Promise)
 ], FilesCompanyController.prototype, "downloadEmployees", null);
+__decorate([
+    (0, common_1.Get)('/hierarchies/download/:companyId?'),
+    openapi.ApiResponse({ status: 200 }),
+    __param(0, (0, user_decorator_1.User)()),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [user_payload_dto_1.UserPayloadDto, Object]),
+    __metadata("design:returntype", Promise)
+], FilesCompanyController.prototype, "downloadHierarchies", null);
 FilesCompanyController = __decorate([
     (0, common_1.Controller)('files/company'),
     __metadata("design:paramtypes", [download_companies_service_1.DownloadCompaniesService,
@@ -143,7 +177,9 @@ FilesCompanyController = __decorate([
         download_unique_company_service_1.DownloadUniqueCompanyService,
         upload_unique_company_service_1.UploadUniqueCompanyService,
         upload_employees_service_1.UploadEmployeesService,
-        download_employees_service_1.DownloadEmployeesService])
+        download_employees_service_1.DownloadEmployeesService,
+        upload_hierarchies_service_1.UploadHierarchiesService,
+        download_hierarchies_service_1.DownloadHierarchiesService])
 ], FilesCompanyController);
 exports.FilesCompanyController = FilesCompanyController;
 //# sourceMappingURL=files-company.controller.js.map
