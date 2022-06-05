@@ -12,8 +12,6 @@ import { classToClass } from 'class-transformer';
 import { ErrorInvitesEnum } from 'src/shared/constants/enum/errorMessage';
 import { ValidateEmailPipe } from 'src/shared/pipes/validate-email.pipe';
 
-import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
-import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import { InviteUserDto } from '../../dto/invite-user.dto';
@@ -54,11 +52,6 @@ export class InvitesController {
   }
 
   @Post()
-  @Permissions({
-    code: PermissionEnum.INVITE_USER,
-    isMember: true,
-    isContract: true,
-  })
   async invite(@Body() inviteUserDto: InviteUserDto) {
     return classToClass(this.inviteUsersService.execute(inviteUserDto));
   }

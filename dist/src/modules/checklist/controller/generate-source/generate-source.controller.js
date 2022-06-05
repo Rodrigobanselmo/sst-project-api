@@ -15,10 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.GenerateSourceController = void 0;
 const openapi = require("@nestjs/swagger");
 const common_1 = require("@nestjs/common");
-const authorization_1 = require("../../../../shared/constants/enum/authorization");
 const user_decorator_1 = require("../../../../shared/decorators/user.decorator");
 const user_payload_dto_1 = require("../../../../shared/dto/user-payload.dto");
-const permissions_decorator_1 = require("../../../../shared/decorators/permissions.decorator");
 const generate_source_dto_1 = require("../../dto/generate-source.dto");
 const create_generate_source_service_1 = require("../../services/generate-source/create-generate-source/create-generate-source.service");
 const update_generate_source_service_1 = require("../../services/generate-source/update-generate-source/update-generate-source.service");
@@ -36,11 +34,6 @@ let GenerateSourceController = class GenerateSourceController {
 };
 __decorate([
     (0, common_1.Post)(),
-    (0, permissions_decorator_1.Permissions)({
-        code: authorization_1.PermissionEnum.CREATE_RISK,
-        isMember: true,
-        isContract: true,
-    }),
     openapi.ApiResponse({ status: 201, type: require("../../entities/generateSource.entity").GenerateSourceEntity }),
     __param(0, (0, user_decorator_1.User)()),
     __param(1, (0, common_1.Body)()),

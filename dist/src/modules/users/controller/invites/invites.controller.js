@@ -19,8 +19,6 @@ const swagger_1 = require("@nestjs/swagger");
 const class_transformer_1 = require("class-transformer");
 const errorMessage_1 = require("../../../../shared/constants/enum/errorMessage");
 const validate_email_pipe_1 = require("../../../../shared/pipes/validate-email.pipe");
-const authorization_1 = require("../../../../shared/constants/enum/authorization");
-const permissions_decorator_1 = require("../../../../shared/decorators/permissions.decorator");
 const user_decorator_1 = require("../../../../shared/decorators/user.decorator");
 const user_payload_dto_1 = require("../../../../shared/dto/user-payload.dto");
 const invite_user_dto_1 = require("../../dto/invite-user.dto");
@@ -78,11 +76,6 @@ __decorate([
 ], InvitesController.prototype, "findAllByEmail", null);
 __decorate([
     (0, common_1.Post)(),
-    (0, permissions_decorator_1.Permissions)({
-        code: authorization_1.PermissionEnum.INVITE_USER,
-        isMember: true,
-        isContract: true,
-    }),
     openapi.ApiResponse({ status: 201, type: require("../../entities/invite-users.entity").InviteUsersEntity }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),

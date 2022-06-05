@@ -1,9 +1,7 @@
 import { Body, Controller, Param, Patch, Post } from '@nestjs/common';
-import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
+
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
-
-import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 import {
   CreateGenerateSourceDto,
   UpdateGenerateSourceDto,
@@ -19,11 +17,6 @@ export class GenerateSourceController {
   ) {}
 
   @Post()
-  @Permissions({
-    code: PermissionEnum.CREATE_RISK,
-    isMember: true,
-    isContract: true,
-  })
   create(
     @User() userPayloadDto: UserPayloadDto,
     @Body() createGenerateSourceDto: CreateGenerateSourceDto,
