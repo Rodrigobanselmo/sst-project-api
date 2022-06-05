@@ -37,6 +37,9 @@ export class HomoGroupEntity implements HomogeneousGroup {
   hierarchies?: HierarchyEntity[];
 
   workspaceId?: string;
+  workspaceIds?: string[];
+
+  employeeCount?: number;
 
   constructor(partial: Partial<HomoGroupEntity>) {
     Object.assign(this, partial);

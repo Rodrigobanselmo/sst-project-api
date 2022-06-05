@@ -5,6 +5,9 @@ import { PrismaService } from '../../../../prisma/prisma.service';
 import { CreateHomoGroupDto, UpdateHomoGroupDto } from '../../dto/homoGroup';
 import { HomoGroupEntity } from '../../entities/homoGroup.entity';
 import { asyncEach } from '../../../../shared/utils/asyncEach';
+import { removeDuplicate } from 'src/shared/utils/removeDuplicate';
+import { Hierarchy } from '@prisma/client';
+import { HierarchyEntity } from '../../entities/hierarchy.entity';
 
 @Injectable()
 export class HomoGroupRepository {
@@ -21,7 +24,7 @@ export class HomoGroupRepository {
       },
     });
 
-    return new HomoGroupEntity(data);
+    return this.getHomoGroupData(data);
   }
 
   async update({
@@ -72,7 +75,7 @@ export class HomoGroupRepository {
         workspaceId: homo.workspaceId,
       }));
 
-    return new HomoGroupEntity(homoGroup);
+    return this.getHomoGroupData(homoGroup);
   }
 
   async deleteById(id: string): Promise<void> {
@@ -95,17 +98,99 @@ export class HomoGroupRepository {
       include: { hierarchyOnHomogeneous: { include: { hierarchy: true } } },
     });
 
-    return hierarchies.map((homoGroup) => {
-      const homogeneousGroup = { ...homoGroup } as HomoGroupEntity;
-      if (homoGroup.hierarchyOnHomogeneous)
-        homogeneousGroup.hierarchies = homoGroup.hierarchyOnHomogeneous.map(
-          (homo) => ({
+    const homogeneousGroup = await Promise.all(
+      hierarchies.map(async (homoGroup) => {
+        return await this.getHomoGroupData(homoGroup);
+      }),
+    );
+
+    return homogeneousGroup;
+  }
+
+  private async getHomoGroupData(homoGroup: HomoGroupEntity) {
+    const homogeneousGroup = { ...homoGroup } as HomoGroupEntity;
+    const companyId = homoGroup.companyId;
+    const workplacesIds = new Set<string>();
+
+    if (homoGroup.hierarchyOnHomogeneous)
+      homogeneousGroup.hierarchies = homoGroup.hierarchyOnHomogeneous.map(
+        (homo) => {
+          workplacesIds.add(homo.workspaceId);
+          return {
             ...homo.hierarchy,
             workspaceId: homo.workspaceId,
-          }),
-        );
+          };
+        },
+      );
 
-      return new HomoGroupEntity(homogeneousGroup);
+    homogeneousGroup.workspaceIds = Array.from(workplacesIds);
+
+    const hierarchiesIds = removeDuplicate(
+      homogeneousGroup.hierarchies.map((h) => h.id),
+    );
+
+    const where = {
+      companyId,
+      workspaces: {
+        some: {
+          OR: homogeneousGroup.workspaceIds.map((workspaceId) => ({
+            id: workspaceId,
+          })),
+        },
+      },
+    };
+
+    const AllChildrenHierarchies = await this.prisma.hierarchy.findMany({
+      where: { parentId: { in: hierarchiesIds }, ...where },
+      include: {
+        children: {
+          where,
+          include: {
+            children: {
+              where,
+              include: {
+                children: {
+                  where,
+                  include: {
+                    children: {
+                      where,
+                      include: {
+                        children: {
+                          include: { children: true },
+                          where,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     });
+
+    const getAllHierarchiesChildren = async (
+      hierarchies: HierarchyEntity[],
+    ) => {
+      hierarchies.forEach((hierarchy) => {
+        hierarchiesIds.push(hierarchy.id);
+
+        if (hierarchy.children) getAllHierarchiesChildren(hierarchy.children);
+      });
+    };
+
+    await getAllHierarchiesChildren(AllChildrenHierarchies);
+
+    homogeneousGroup.employeeCount = await this.prisma.employee.count({
+      where: {
+        companyId,
+        hierarchyId: {
+          in: hierarchiesIds,
+        },
+      },
+    });
+
+    return new HomoGroupEntity(homogeneousGroup);
   }
 }

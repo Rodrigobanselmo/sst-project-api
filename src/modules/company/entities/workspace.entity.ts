@@ -35,6 +35,7 @@ export class WorkspaceEntity implements Workspace {
   company?: CompanyEntity;
 
   description: string;
+  employeeCount?: number;
 
   constructor(partial: Partial<WorkspaceEntity>) {
     Object.assign(this, partial);

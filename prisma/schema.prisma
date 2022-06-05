@@ -351,6 +351,7 @@ model RiskFactors {
   generateSource GenerateSource[]
   representAll Boolean @default(false)
   riskFactorData RiskFactorData[]
+  riskFactorProbability RiskFactorProbability[]
   
   @@unique([id, companyId])
 }
@@ -397,6 +398,8 @@ model RiskFactorData {
   id    String   @id  @default(uuid())
   probability Int?
   probabilityAfter Int?
+  probabilityCalc RiskFactorProbability? @relation(name: "RiskFactorProbabilityBefore")
+  probabilityAfterCalc RiskFactorProbability? @relation(name: "RiskFactorProbabilityAfter")
   companyId String
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   riskId    String
@@ -414,7 +417,29 @@ model RiskFactorData {
   epis Epi[]
 
   @@unique([id, companyId])
+  @@unique([id, riskId, riskFactorGroupDataId])
 }
+
+model RiskFactorProbability {
+  id    String   @id  @default(uuid())
+  intensity Int?
+  intensityResult Float?
+  intensityLt Float?
+  minDurationJT Int?
+  minDurationEO Int?
+  chancesOfHappening Int?
+  frequency Int?
+  history Int?
+  medsImplemented Int?
+  riskFactorDataAfterId String?
+  riskFactorDataId String?
+  riskId    String
+  riskFactorGroupDataId String?
+  riskFactor RiskFactors @relation(fields: [riskId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  riskFactorData RiskFactorData? @relation(name: "RiskFactorProbabilityBefore", fields: [riskFactorDataId,riskId,riskFactorGroupDataId], references: [id,riskId,riskFactorGroupDataId], onDelete: Restrict, onUpdate: Cascade)
+  riskFactorDataAfter RiskFactorData? @relation(name: "RiskFactorProbabilityAfter", fields: [riskFactorDataAfterId,riskId,riskFactorGroupDataId], references: [id,riskId,riskFactorGroupDataId], onDelete: Restrict, onUpdate: Cascade)
+}
+
 
 model User {
   id    Int     @default(autoincrement()) @id
