@@ -22,10 +22,10 @@ var __rest = (this && this.__rest) || function (s, e) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HomoGroupRepository = void 0;
 const common_1 = require("@nestjs/common");
-const prisma_service_1 = require("../../../../prisma/prisma.service");
-const homoGroup_entity_1 = require("../../entities/homoGroup.entity");
-const asyncEach_1 = require("../../../../shared/utils/asyncEach");
 const removeDuplicate_1 = require("../../../../shared/utils/removeDuplicate");
+const prisma_service_1 = require("../../../../prisma/prisma.service");
+const asyncEach_1 = require("../../../../shared/utils/asyncEach");
+const homoGroup_entity_1 = require("../../entities/homoGroup.entity");
 let HomoGroupRepository = class HomoGroupRepository {
     constructor(prisma) {
         this.prisma = prisma;
@@ -102,7 +102,9 @@ let HomoGroupRepository = class HomoGroupRepository {
                 return Object.assign(Object.assign({}, homo.hierarchy), { workspaceId: homo.workspaceId });
             });
         homogeneousGroup.workspaceIds = Array.from(workplacesIds);
-        const hierarchiesIds = (0, removeDuplicate_1.removeDuplicate)(homogeneousGroup.hierarchies.map((h) => h.id));
+        const hierarchiesIds = homogeneousGroup.hierarchies
+            ? (0, removeDuplicate_1.removeDuplicate)(homogeneousGroup.hierarchies.map((h) => h.id))
+            : [];
         const where = {
             companyId,
             workspaces: {

@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
+import { removeDuplicate } from 'src/shared/utils/removeDuplicate';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
-import { CreateHomoGroupDto, UpdateHomoGroupDto } from '../../dto/homoGroup';
-import { HomoGroupEntity } from '../../entities/homoGroup.entity';
 import { asyncEach } from '../../../../shared/utils/asyncEach';
-import { removeDuplicate } from 'src/shared/utils/removeDuplicate';
-import { Hierarchy } from '@prisma/client';
+import { CreateHomoGroupDto, UpdateHomoGroupDto } from '../../dto/homoGroup';
 import { HierarchyEntity } from '../../entities/hierarchy.entity';
+import { HomoGroupEntity } from '../../entities/homoGroup.entity';
 
 @Injectable()
 export class HomoGroupRepository {
@@ -125,9 +124,9 @@ export class HomoGroupRepository {
 
     homogeneousGroup.workspaceIds = Array.from(workplacesIds);
 
-    const hierarchiesIds = removeDuplicate(
-      homogeneousGroup.hierarchies.map((h) => h.id),
-    );
+    const hierarchiesIds = homogeneousGroup.hierarchies
+      ? removeDuplicate(homogeneousGroup.hierarchies.map((h) => h.id))
+      : [];
 
     const where = {
       companyId,
