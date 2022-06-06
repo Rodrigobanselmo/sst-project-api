@@ -1,7 +1,7 @@
 import { matrixRisk, matrixRiskMap } from '../constants/matrizRisk.constant';
 
 export const getMatrizRisk = (severity?: number, probability?: number) => {
-  if (!severity || !probability) return null;
+  if (!severity || !probability) return matrixRiskMap[0];
 
   const value = matrixRisk[5 - probability][
     severity - 1
