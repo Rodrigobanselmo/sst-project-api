@@ -7,10 +7,14 @@ import { secondRiskInventoryHeader } from './second.constant';
 import { dataConverter } from './second.converter';
 
 export const secondRiskInventoryTableSection = (hierarchyData: MapData) => {
-  const data = dataConverter(hierarchyData);
+  let data = dataConverter(hierarchyData);
 
   const tableHeaderElements = new TableHeaderElements();
   const tableBodyElements = new TableBodyElements();
+
+  //!  REMOVE AFTER TEST
+  data = data.slice(1, 2);
+  //!  REMOVE AFTER TEST
 
   const table = new Table({
     width: { size: 100, type: WidthType.PERCENTAGE },

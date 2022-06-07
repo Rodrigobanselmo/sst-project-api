@@ -64,7 +64,7 @@ export class UploadHierarchiesService {
       });
 
     const workspaces = await this.workspaceRepository.findByCompany(companyId);
-    const ghoNames = new Set<string>();
+    const ghoNameDescriptionMap = {} as Record<string, string>;
 
     hierarchiesExcelData = hierarchiesExcelData.map((hierarchy) => {
       const workspace = workspaces.filter(
@@ -77,7 +77,7 @@ export class UploadHierarchiesService {
         throw new BadRequestException(ErrorCompanyEnum.WORKSPACE_NOT_FOUND);
 
       if (hierarchy.ghoName) {
-        ghoNames.add(hierarchy.ghoName);
+        ghoNameDescriptionMap[hierarchy.ghoName] = hierarchy.ghoDescription;
       }
 
       delete hierarchy.abbreviation;
@@ -87,7 +87,16 @@ export class UploadHierarchiesService {
     //! REMOVE AFTER TEST
 
     hierarchiesExcelData = hierarchiesExcelData.reduce((acc, hierarchy) => {
-      const newHierarchies = hierarchy.office.split('/').map((office) => {
+      const offices = hierarchy.office.split('/').reduce((acc, office) => {
+        return [
+          ...acc,
+          ...office.split(';').reduce((acc, office) => {
+            return [...acc, ...office.split(',')];
+          }, []),
+        ];
+      }, []);
+
+      const newHierarchies = offices.map((office) => {
         return {
           ...hierarchy,
           office: office.trim(),
@@ -127,7 +136,7 @@ export class UploadHierarchiesService {
       await this.hierarchyRepository.upsertMany(
         hierarchyArray.filter((hy) => hy.type === type),
         companyId,
-        Array.from(ghoNames),
+        ghoNameDescriptionMap,
       );
     };
 

@@ -102,7 +102,6 @@ export class CompanyRepository implements ICompanyRepository {
       employees = [],
       users = [],
       address,
-      license,
       companyId,
       ...updateCompanyDto
     }: UpdateCompanyDto,
@@ -256,7 +255,6 @@ export class CompanyRepository implements ICompanyRepository {
           address,
           id,
           users,
-          license,
           ...upsertRiskDto
         }) =>
           this.prisma.company.upsert({
@@ -350,7 +348,6 @@ export class CompanyRepository implements ICompanyRepository {
     primary_activity = [],
     workspace = [],
     employees = [],
-    license,
     users = [],
     address,
     companyId,

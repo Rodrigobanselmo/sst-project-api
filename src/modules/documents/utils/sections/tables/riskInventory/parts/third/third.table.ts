@@ -1,5 +1,6 @@
 import { Table, WidthType } from 'docx';
 import { RiskFactorGroupDataEntity } from '../../../../../../../../modules/checklist/entities/riskGroupData.entity';
+import { MapData } from '../../converter/hierarchy.converter';
 
 import { TableBodyElements } from '../../elements/body';
 import { TableHeaderElements } from '../../elements/header';
@@ -11,8 +12,9 @@ import { dataConverter } from './third.converter';
 
 export const thirdRiskInventoryTableSection = (
   riskFactorGroupData: RiskFactorGroupDataEntity,
+  hierarchyData: MapData,
 ) => {
-  const data = dataConverter(riskFactorGroupData);
+  const data = dataConverter(riskFactorGroupData, hierarchyData);
 
   const tableHeaderElements = new TableHeaderElements();
   const tableBodyElements = new TableBodyElements();

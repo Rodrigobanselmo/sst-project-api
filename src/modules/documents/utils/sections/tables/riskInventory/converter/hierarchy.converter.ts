@@ -7,6 +7,7 @@ export interface MapData {
   org: {
     type: string;
     name: string;
+    homogeneousGroupIds: string[];
     homogeneousGroup: string;
   }[];
   workspace: string;
@@ -62,6 +63,9 @@ export const hierarchyConverter = (hierarchies: HierarchyEntity[]) => {
         hierarchyArrayData[parentInfo.index] = {
           type: parentInfo.text,
           name: parent.name,
+          homogeneousGroupIds: parent?.homogeneousGroups?.map(
+            (group) => group.id,
+          ),
           homogeneousGroup:
             parent?.homogeneousGroups?.map((group) => group.name).join(', ') ||
             '',
@@ -73,6 +77,9 @@ export const hierarchyConverter = (hierarchies: HierarchyEntity[]) => {
       hierarchyArrayData[hierarchyInfo.index] = {
         type: hierarchyInfo.text,
         name: hierarchy.name,
+        homogeneousGroupIds: hierarchy?.homogeneousGroups?.map(
+          (group) => group.id,
+        ),
         homogeneousGroup:
           hierarchy?.homogeneousGroups?.map((group) => group.name).join(', ') ||
           '',

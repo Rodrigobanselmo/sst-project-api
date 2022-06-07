@@ -418,6 +418,8 @@ model RiskFactorData {
   epis Epi[]
 
   @@unique([id, companyId])
+  @@unique([homogeneousGroupId, riskId, riskFactorGroupDataId])
+  @@unique([hierarchyId, riskId, riskFactorGroupDataId])
   @@unique([id, riskId, riskFactorGroupDataId])
 }
 

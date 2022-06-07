@@ -35,6 +35,7 @@ import { FindAllByGroupAndRiskService } from './services/risk-data/find-by-group
 import { FindByIdService } from './services/risk-group-data/find-by-id/find-by-id.service';
 import { RiskDocumentRepository } from './repositories/implementations/RiskDocumentRepository';
 import { FindDocumentsService } from './services/risk-group-data/find-documents/find-documents.service';
+import { UpsertManyRiskDataService } from './services/risk-data/upsert-many-risk-data/upsert-many-risk-data.service';
 
 @Module({
   controllers: [
@@ -76,6 +77,7 @@ import { FindDocumentsService } from './services/risk-group-data/find-documents/
     RiskGroupDataRepository,
     RiskDocumentRepository,
     FindByIdService,
+    UpsertManyRiskDataService,
   ],
   exports: [RiskRepository, RiskGroupDataRepository, RiskDocumentRepository],
 })

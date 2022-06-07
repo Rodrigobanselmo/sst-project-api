@@ -62,10 +62,6 @@ export class CompanyController {
   // edit company data or create if does not exist like workspace / primary_activity
   @Patch()
   update(@Body() updateCompanyDto: UpdateCompanyDto) {
-    // cant edit this type of data
-    delete updateCompanyDto.isConsulting;
-    delete updateCompanyDto.license;
-
     return this.updateCompanyService.execute(updateCompanyDto);
   }
 

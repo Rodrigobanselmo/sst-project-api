@@ -16,6 +16,7 @@ export interface IHierarchiesColumns {
   sub_office: string;
   sub_sector: string;
   realDescription: string;
+  ghoDescription: string;
   description: string;
   status: string;
   sector: string;
@@ -92,6 +93,13 @@ export const hierarchiesColumnsConstant = [
   {
     databaseName: 'realDescription',
     excelName: 'Descrição real do cargo (entrevista com trabalhador)',
+    isArray: false,
+    required: false,
+    checkHandler: checkIsString,
+  },
+  {
+    databaseName: 'ghoDescription',
+    excelName: 'Descrição do GSE',
     isArray: false,
     required: false,
     checkHandler: checkIsString,

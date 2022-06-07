@@ -4,16 +4,27 @@ import { RiskFactorGroupDataEntity } from '../../../../../../../../modules/check
 import { riskMap } from '../../../../../../../../modules/documents/constants/risks.constant';
 import { getMatrizRisk } from '../../../../../../../../modules/documents/utils/matriz';
 import { palette } from '../../../../../../../../shared/constants/palette';
+import { MapData } from '../../converter/hierarchy.converter';
 
 import { bodyTableProps, borderNoneStyle } from '../../elements/body';
 import { whiteBorder, whiteColumnBorder } from '../../elements/header';
 import { ThirdRiskInventoryColumnEnum } from './third.constant';
 
-export const dataConverter = (riskGroup: RiskFactorGroupDataEntity) => {
+export const dataConverter = (
+  riskGroup: RiskFactorGroupDataEntity,
+  hierarchyData: MapData,
+) => {
   const riskFactorsMap = new Map<RiskFactorsEnum, bodyTableProps[][]>();
   const riskInventoryData: bodyTableProps[][] = [];
 
   riskGroup.data.forEach((riskData) => {
+    if (
+      !hierarchyData.org.some((org) =>
+        org.homogeneousGroupIds.includes(riskData.homogeneousGroupId),
+      )
+    )
+      return;
+
     const cells: bodyTableProps[] = [];
     // eslint-disable-next-line prettier/prettier
     const base = { borders: {...borderNoneStyle, right:whiteColumnBorder, top:whiteColumnBorder}, margins: { top: 50, bottom: 50 }, alignment: AlignmentType.CENTER}

@@ -57,7 +57,10 @@ export const documentConverter = (
       }
 
       return {
-        text: hierarchy.org[index].type,
+        // text: hierarchy.org[index].type,
+        //!  REMOVE AFTER TEST
+        text: '',
+        //!  REMOVE AFTER TEST
         size: 10,
         bold: true,
         borders: borderNoneStyle,
@@ -69,6 +72,9 @@ export const documentConverter = (
   // add hierarchy table body
   rows.push(
     docData.map((_, index) => {
+      //!  REMOVE AFTER TEST
+      return { text: '', size: 20, borders: borderNoneStyle };
+      //!  REMOVE AFTER TEST
       if (!hierarchy.org[index])
         return { text: '', size: 20, borders: borderNoneStyle };
       return {

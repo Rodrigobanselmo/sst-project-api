@@ -3,13 +3,114 @@ import { Injectable } from '@nestjs/common';
 import { removeDuplicate } from '../../../../shared/utils/removeDuplicate';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
-import { UpsertRiskDataDto } from '../../dto/risk-data.dto';
+import {
+  UpsertManyRiskDataDto,
+  UpsertRiskDataDto,
+} from '../../dto/risk-data.dto';
 import { RiskFactorDataEntity } from '../../entities/riskData.entity';
+import { PrismaPromise } from '@prisma/client';
 
 @Injectable()
 export class RiskDataRepository {
   constructor(private prisma: PrismaService) {}
-  async upsert({
+  async upsert(
+    upsertRiskDataDto: UpsertRiskDataDto,
+  ): Promise<RiskFactorDataEntity> {
+    const riskFactorData = await this.upsertPrisma(upsertRiskDataDto);
+
+    return new RiskFactorDataEntity(riskFactorData);
+  }
+
+  async upsertMany(
+    upsertManyRiskDataDto: UpsertManyRiskDataDto,
+  ): Promise<RiskFactorDataEntity[]> {
+    const homogeneousGroupIds = upsertManyRiskDataDto.homogeneousGroupIds;
+    if (homogeneousGroupIds) {
+      delete upsertManyRiskDataDto.homogeneousGroupIds;
+      delete upsertManyRiskDataDto.hierarchyIds;
+
+      const data = await this.prisma.$transaction(
+        homogeneousGroupIds.map((homogeneousGroupId) =>
+          this.upsertPrisma({
+            homogeneousGroupId,
+            ...upsertManyRiskDataDto,
+          } as unknown as UpsertRiskDataDto),
+        ),
+      );
+
+      return data.map(
+        (riskFactorData) => new RiskFactorDataEntity(riskFactorData),
+      );
+    }
+    return [];
+  }
+
+  async findAllByGroup(riskFactorGroupDataId: string, companyId?: string) {
+    const riskFactorData = await this.prisma.riskFactorData.findMany({
+      where: { riskFactorGroupDataId, companyId },
+      include: {
+        adms: true,
+        recs: true,
+        engs: true,
+        generateSources: true,
+        epis: true,
+        hierarchy: true,
+        riskFactor: true,
+        homogeneousGroup: {
+          include: {
+            hierarchyOnHomogeneous: { include: { hierarchy: true } }, //!
+          },
+        },
+      },
+    });
+    return riskFactorData.map((data) => {
+      const riskData = { ...data } as RiskFactorDataEntity;
+      if (data.homogeneousGroup && data.homogeneousGroup.hierarchyOnHomogeneous)
+        riskData.homogeneousGroup.hierarchies =
+          data.homogeneousGroup.hierarchyOnHomogeneous.map((homo) => ({
+            ...homo.hierarchy,
+            workspaceId: homo.workspaceId,
+          }));
+
+      return new RiskFactorDataEntity(riskData);
+    });
+  }
+
+  async findAllByGroupAndRisk(
+    riskFactorGroupDataId: string,
+    riskId: string,
+    companyId: string,
+  ) {
+    const riskFactorData = await this.prisma.riskFactorData.findMany({
+      where: { riskFactorGroupDataId, companyId, riskId },
+      include: {
+        adms: true,
+        recs: true,
+        engs: true,
+        generateSources: true,
+        epis: true,
+      },
+    });
+
+    return riskFactorData.map((data) => new RiskFactorDataEntity(data));
+  }
+  async deleteById(id: string) {
+    const riskFactorData = await this.prisma.riskFactorData.delete({
+      where: { id },
+    });
+
+    return new RiskFactorDataEntity(riskFactorData);
+  }
+
+  async deleteByIds(ids: string[]) {
+    const riskFactorData = await this.prisma.riskFactorData.deleteMany({
+      where: { id: { in: ids } },
+    });
+
+    return riskFactorData;
+  }
+
+  private upsertPrisma({
     recs,
     adms,
     engs,
@@ -18,8 +119,8 @@ export class RiskDataRepository {
     companyId,
     id,
     ...createDto
-  }: UpsertRiskDataDto): Promise<RiskFactorDataEntity> {
-    const riskFactorData = await this.prisma.riskFactorData.upsert({
+  }: UpsertRiskDataDto) {
+    return this.prisma.riskFactorData.upsert({
       create: {
         ...createDto,
         companyId,
@@ -77,14 +178,14 @@ export class RiskDataRepository {
         engs: engs
           ? {
               set: engs.map((id) => ({
-                id_companyId: { companyId, id },
+                id,
               })),
             }
           : undefined,
         generateSources: generateSources
           ? {
               set: generateSources.map((id) => ({
-                id_companyId: { companyId, id },
+                id,
               })),
             }
           : undefined,
@@ -94,57 +195,13 @@ export class RiskDataRepository {
             }
           : undefined,
       },
-      where: { id_companyId: { companyId, id: id || 'not-found' } },
-      include: {
-        adms: true,
-        recs: true,
-        engs: true,
-        generateSources: true,
-        epis: true,
-      },
-    });
-
-    return new RiskFactorDataEntity(riskFactorData);
-  }
-
-  async findAllByGroup(riskFactorGroupDataId: string, companyId?: string) {
-    const riskFactorData = await this.prisma.riskFactorData.findMany({
-      where: { riskFactorGroupDataId, companyId },
-      include: {
-        adms: true,
-        recs: true,
-        engs: true,
-        generateSources: true,
-        epis: true,
-        hierarchy: true,
-        riskFactor: true,
-        homogeneousGroup: {
-          include: {
-            hierarchyOnHomogeneous: { include: { hierarchy: true } }, //!
-          },
+      where: {
+        homogeneousGroupId_riskId_riskFactorGroupDataId: {
+          riskFactorGroupDataId: createDto.riskFactorGroupDataId,
+          riskId: createDto.riskId,
+          homogeneousGroupId: createDto.homogeneousGroupId,
         },
       },
-    });
-    return riskFactorData.map((data) => {
-      const riskData = { ...data } as RiskFactorDataEntity;
-      if (data.homogeneousGroup && data.homogeneousGroup.hierarchyOnHomogeneous)
-        riskData.homogeneousGroup.hierarchies =
-          data.homogeneousGroup.hierarchyOnHomogeneous.map((homo) => ({
-            ...homo.hierarchy,
-            workspaceId: homo.workspaceId,
-          }));
-
-      return new RiskFactorDataEntity(riskData);
-    });
-  }
-
-  async findAllByGroupAndRisk(
-    riskFactorGroupDataId: string,
-    riskId: string,
-    companyId: string,
-  ) {
-    const riskFactorData = await this.prisma.riskFactorData.findMany({
-      where: { riskFactorGroupDataId, companyId, riskId },
       include: {
         adms: true,
         recs: true,
@@ -153,7 +210,5 @@ export class RiskDataRepository {
         epis: true,
       },
     });
-
-    return riskFactorData.map((data) => new RiskFactorDataEntity(data));
   }
 }

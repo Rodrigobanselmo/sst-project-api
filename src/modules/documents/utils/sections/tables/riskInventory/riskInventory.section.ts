@@ -1,3 +1,4 @@
+import { HomogeneousGroup } from '@prisma/client';
 import { PageOrientation } from 'docx';
 import { RiskFactorGroupDataEntity } from '../../../../../../modules/checklist/entities/riskGroupData.entity';
 import { HierarchyEntity } from '../../../../../../modules/company/entities/hierarchy.entity';
@@ -14,11 +15,37 @@ export const riskInventoryTableSection = (
   const hierarchyData = hierarchyConverter(hierarchiesEntity);
 
   const sectionsTables = [];
+
+  const map = new Map<string, boolean>();
+  // let count = 0;
   hierarchyData.forEach((hierarchy) => {
+    //!  REMOVE AFTER TEST
+
+    const homoGroupID = hierarchy.org.find(
+      (hierarchy) =>
+        hierarchy.homogeneousGroupIds &&
+        hierarchy.homogeneousGroupIds.length > 0,
+    ).homogeneousGroupIds[0];
+
+    if (map.get(homoGroupID)) {
+      return;
+    }
+
+    map.set(homoGroupID, true);
+    // if (count > 10) return;
+    // count++;
     // eslint-disable-next-line prettier/prettier
-    const firstTable = firstRiskInventoryTableSection(riskFactorGroupData, hierarchy);
+    //!  REMOVE AFTER TEST
+
+    const firstTable = firstRiskInventoryTableSection(
+      riskFactorGroupData,
+      hierarchy,
+    );
     const secondTable = secondRiskInventoryTableSection(hierarchy);
-    const thirdTable = thirdRiskInventoryTableSection(riskFactorGroupData);
+    const thirdTable = thirdRiskInventoryTableSection(
+      riskFactorGroupData,
+      hierarchy,
+    );
 
     sectionsTables.push([firstTable, ...secondTable, ...thirdTable]);
   });

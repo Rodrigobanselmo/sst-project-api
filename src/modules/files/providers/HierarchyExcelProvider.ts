@@ -44,6 +44,8 @@ export class HierarchyExcelProvider {
       office?: string;
       sub_office?: string;
       ghoName?: string;
+      description?: string;
+      realDescription?: string;
     }[],
   ) {
     const hierarchyMap = {} as any;
@@ -82,6 +84,8 @@ export class HierarchyExcelProvider {
 
             hierarchyMap[id].id = id;
             hierarchyMap[id].workspaceIds = hierarchy.workspaceIds;
+            hierarchyMap[id].description = hierarchy.description;
+            hierarchyMap[id].realDescription = hierarchy.realDescription;
             hierarchyMap[id].ghoName = hierarchy.ghoName;
             hierarchyMap[id].name = employeeWork.value;
             hierarchyMap[id].type =

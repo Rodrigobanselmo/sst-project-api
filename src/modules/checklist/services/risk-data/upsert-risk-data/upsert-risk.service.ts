@@ -10,6 +10,19 @@ export class UpsertRiskDataService {
   async execute(upsertRiskDataDto: UpsertRiskDataDto) {
     const riskData = await this.riskDataRepository.upsert(upsertRiskDataDto);
 
+    const isEmpty =
+      riskData.adms.length === 0 &&
+      riskData.recs.length === 0 &&
+      riskData.engs.length === 0 &&
+      riskData.epis.length === 0 &&
+      riskData.generateSources.length === 0 &&
+      riskData.probability;
+
+    if (isEmpty) {
+      await this.riskDataRepository.deleteById(riskData.id);
+      return riskData.id;
+    }
+
     return riskData;
   }
 }

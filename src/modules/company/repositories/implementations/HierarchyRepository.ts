@@ -13,7 +13,7 @@ export class HierarchyRepository {
   async upsertMany(
     upsertHierarchyMany: (CreateHierarchyDto & { id: string })[],
     companyId: string,
-    ghoNames?: string[],
+    ghoNames?: Record<string, string>,
   ): Promise<HierarchyEntity[]> {
     let homogeneousGroup = [];
 
@@ -21,12 +21,12 @@ export class HierarchyRepository {
     if (upsertHierarchyMany && upsertHierarchyMany.length > 0)
       homogeneousGroup = ghoNames
         ? await this.prisma.$transaction(
-            ghoNames.map((ghoName) => {
+            Object.entries(ghoNames).map(([ghoName, description]) => {
               return this.prisma.homogeneousGroup.upsert({
                 create: {
                   company: { connect: { id: companyId } },
                   name: ghoName,
-                  description: '',
+                  description: description || '',
                 },
                 update: {
                   name: ghoName,
@@ -38,12 +38,12 @@ export class HierarchyRepository {
         : await this.prisma.$transaction(
             upsertHierarchyMany
               .filter(({ ghoName }) => ghoName)
-              .map(({ ghoName }) => {
+              .map(({ ghoName, description }) => {
                 return this.prisma.homogeneousGroup.upsert({
                   create: {
                     company: { connect: { id: companyId } },
                     name: ghoName,
-                    description: '',
+                    description: description || '',
                   },
                   update: {
                     name: ghoName,
@@ -285,7 +285,7 @@ export class HierarchyRepository {
             ...homo.homogeneousGroup,
             workspaceId: homo.workspaceId,
           }));
-      return new HierarchyEntity(hierarchy);
+      return new HierarchyEntity(homogeneousGroup);
     });
   }
 }
