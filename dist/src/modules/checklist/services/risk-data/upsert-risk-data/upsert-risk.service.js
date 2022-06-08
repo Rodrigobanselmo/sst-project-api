@@ -23,7 +23,7 @@ let UpsertRiskDataService = class UpsertRiskDataService {
             riskData.engs.length === 0 &&
             riskData.epis.length === 0 &&
             riskData.generateSources.length === 0 &&
-            riskData.probability;
+            !riskData.probability;
         if (isEmpty) {
             await this.riskDataRepository.deleteById(riskData.id);
             return riskData.id;
