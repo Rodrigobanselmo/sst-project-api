@@ -7,6 +7,7 @@ export declare class UserEntity implements User {
     password: string;
     updated_at: Date;
     created_at: Date;
+    deleted_at: Date | null;
     companies?: UserCompanyEntity[];
     constructor(partial: Partial<UserEntity>);
 }

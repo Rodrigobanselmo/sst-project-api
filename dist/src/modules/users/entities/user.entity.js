@@ -18,7 +18,7 @@ class UserEntity {
         Object.assign(this, partial);
     }
     static _OPENAPI_METADATA_FACTORY() {
-        return { id: { required: true, type: () => Number }, email: { required: true, type: () => String }, name: { required: true, type: () => String }, password: { required: true, type: () => String }, updated_at: { required: true, type: () => Date }, created_at: { required: true, type: () => Date }, companies: { required: false, type: () => [require("./userCompany.entity").UserCompanyEntity] } };
+        return { id: { required: true, type: () => Number }, email: { required: true, type: () => String }, name: { required: true, type: () => String }, password: { required: true, type: () => String }, updated_at: { required: true, type: () => Date }, created_at: { required: true, type: () => Date }, deleted_at: { required: true, type: () => Date, nullable: true }, companies: { required: false, type: () => [require("./userCompany.entity").UserCompanyEntity] } };
     }
 }
 __decorate([
@@ -46,6 +46,10 @@ __decorate([
     (0, swagger_1.ApiProperty)({ description: 'The creation date of the User account' }),
     __metadata("design:type", Date)
 ], UserEntity.prototype, "created_at", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'The deleted date of data' }),
+    __metadata("design:type", Date)
+], UserEntity.prototype, "deleted_at", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)(),
     __metadata("design:type", Array)

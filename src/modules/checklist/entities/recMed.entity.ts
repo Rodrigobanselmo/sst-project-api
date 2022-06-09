@@ -49,6 +49,9 @@ export class RecMedEntity implements RecMed {
   @ApiProperty({ description: 'The generate source id related' })
   generateSourceId: string;
 
+  @ApiProperty({ description: 'The deleted date of data' })
+  deleted_at: Date | null;
+
   constructor(partial: Partial<RecMedEntity>) {
     Object.assign(this, partial);
   }

@@ -57,6 +57,9 @@ export class RiskFactorsEntity implements RiskFactors {
   @ApiProperty({ description: 'The array with generate source data' })
   generateSource?: GenerateSourceEntity[];
 
+  @ApiProperty({ description: 'The deleted date of data' })
+  deleted_at: Date | null;
+
   risk: string;
 
   constructor(partial: Partial<RiskFactorsEntity>) {

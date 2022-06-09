@@ -18,7 +18,7 @@ class RecMedEntity {
         Object.assign(this, partial);
     }
     static _OPENAPI_METADATA_FACTORY() {
-        return { id: { required: true, type: () => String }, riskId: { required: true, type: () => String }, recName: { required: true, type: () => String }, medName: { required: true, type: () => String }, companyId: { required: true, type: () => String }, system: { required: true, type: () => Boolean }, medType: { required: true, type: () => Object }, status: { required: true, type: () => Object }, created_at: { required: true, type: () => Date }, generateSourceId: { required: true, type: () => String } };
+        return { id: { required: true, type: () => String }, riskId: { required: true, type: () => String }, recName: { required: true, type: () => String }, medName: { required: true, type: () => String }, companyId: { required: true, type: () => String }, system: { required: true, type: () => Boolean }, medType: { required: true, type: () => Object }, status: { required: true, type: () => Object }, created_at: { required: true, type: () => Date }, generateSourceId: { required: true, type: () => String }, deleted_at: { required: true, type: () => Date, nullable: true } };
     }
 }
 __decorate([
@@ -75,5 +75,9 @@ __decorate([
     (0, swagger_1.ApiProperty)({ description: 'The generate source id related' }),
     __metadata("design:type", String)
 ], RecMedEntity.prototype, "generateSourceId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'The deleted date of data' }),
+    __metadata("design:type", Date)
+], RecMedEntity.prototype, "deleted_at", void 0);
 exports.RecMedEntity = RecMedEntity;
 //# sourceMappingURL=recMed.entity.js.map

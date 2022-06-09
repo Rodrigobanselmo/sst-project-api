@@ -8,5 +8,6 @@ export declare class GenerateSourceEntity implements GenerateSource {
     system: boolean;
     status: StatusEnum;
     created_at: Date;
+    deleted_at: Date | null;
     constructor(partial: Partial<GenerateSourceEntity>);
 }

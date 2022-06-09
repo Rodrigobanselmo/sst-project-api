@@ -16,6 +16,7 @@ export declare class RiskFactorsEntity implements RiskFactors {
     propagation: string[];
     recMed?: RecMedEntity[];
     generateSource?: GenerateSourceEntity[];
+    deleted_at: Date | null;
     risk: string;
     constructor(partial: Partial<RiskFactorsEntity>);
     exame: string;

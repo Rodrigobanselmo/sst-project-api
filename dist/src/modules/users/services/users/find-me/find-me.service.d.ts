@@ -12,6 +12,7 @@ export declare class FindMeService {
         password: string;
         updated_at: Date;
         created_at: Date;
+        deleted_at: Date;
         companies?: import("../../../entities/userCompany.entity").UserCompanyEntity[];
     }>;
 }

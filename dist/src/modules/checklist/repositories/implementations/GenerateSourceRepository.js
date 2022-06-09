@@ -30,10 +30,13 @@ let GenerateSourceRepository = class GenerateSourceRepository {
     }
     async create(_a, system) {
         var { recMeds } = _a, createGenerateSourceDto = __rest(_a, ["recMeds"]);
+        const hasRecMed = recMeds
+            ? recMeds.filter(({ recName, medName }) => recName || medName).length > 0
+            : false;
         const redMed = await this.prisma.generateSource.create({
             data: Object.assign(Object.assign({}, createGenerateSourceDto), { system, recMeds: {
                     createMany: {
-                        data: recMeds
+                        data: hasRecMed
                             ? recMeds.map((_a) => {
                                 var rm = __rest(_a, []);
                                 return (Object.assign(Object.assign({ system }, rm), { riskId: createGenerateSourceDto.riskId }));

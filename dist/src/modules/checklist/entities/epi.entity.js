@@ -18,7 +18,7 @@ class EpiEntity {
         Object.assign(this, partial);
     }
     static _OPENAPI_METADATA_FACTORY() {
-        return { id: { required: true, type: () => Number }, ca: { required: true, type: () => String }, equipment: { required: true, type: () => String }, description: { required: true, type: () => String }, isValid: { required: true, type: () => Boolean }, status: { required: true, type: () => Object }, expiredDate: { required: true, type: () => Date }, created_at: { required: true, type: () => Date }, national: { required: true, type: () => Boolean }, report: { required: true, type: () => String }, restriction: { required: true, type: () => String }, observation: { required: true, type: () => String } };
+        return { id: { required: true, type: () => Number }, ca: { required: true, type: () => String }, equipment: { required: true, type: () => String }, description: { required: true, type: () => String }, isValid: { required: true, type: () => Boolean }, status: { required: true, type: () => Object }, expiredDate: { required: true, type: () => Date }, created_at: { required: true, type: () => Date }, national: { required: true, type: () => Boolean }, report: { required: true, type: () => String }, restriction: { required: true, type: () => String }, observation: { required: true, type: () => String }, deleted_at: { required: true, type: () => Date, nullable: true } };
     }
 }
 __decorate([
@@ -74,5 +74,9 @@ __decorate([
     (0, swagger_1.ApiProperty)({ description: 'The observations about the epi report' }),
     __metadata("design:type", String)
 ], EpiEntity.prototype, "observation", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'The deleted date of data' }),
+    __metadata("design:type", Date)
+], EpiEntity.prototype, "deleted_at", void 0);
 exports.EpiEntity = EpiEntity;
 //# sourceMappingURL=epi.entity.js.map

@@ -11,5 +11,6 @@ export declare class RecMedEntity implements RecMed {
     status: StatusEnum;
     created_at: Date;
     generateSourceId: string;
+    deleted_at: Date | null;
     constructor(partial: Partial<RecMedEntity>);
 }

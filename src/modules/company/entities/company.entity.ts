@@ -58,6 +58,9 @@ export class CompanyEntity implements Company {
   @ApiProperty({ description: 'The employees related to the company' })
   employees?: EmployeeEntity[];
 
+  @ApiProperty({ description: 'The deleted date of data' })
+  deleted_at: Date | null;
+
   description: string;
 
   constructor(partial: Partial<CompanyEntity>) {

@@ -72,9 +72,10 @@ export class EpiRepository {
     const where = {};
 
     Object.entries(query).forEach(([key, value]) => {
-      where[key] = {
-        contains: value,
-      };
+      if (value)
+        where[key] = {
+          contains: value,
+        };
     });
 
     const response = await this.prisma.$transaction([
@@ -88,9 +89,21 @@ export class EpiRepository {
       }),
     ]);
 
+    const standardEpis = [];
+    if (Object.keys(where).length === 0) {
+      const epis = await this.prisma.epi.findMany({
+        where: { ca: { in: ['0', '1', '2'] } },
+      });
+
+      standardEpis.push(...epis);
+    }
+
     const count = response[0];
 
-    return { data: response[1].map((epi) => new EpiEntity(epi)), count };
+    return {
+      data: [...standardEpis, ...response[1]].map((epi) => new EpiEntity(epi)),
+      count,
+    };
   }
 
   async findAll(): Promise<EpiEntity[]> {

@@ -20,7 +20,7 @@ class CompanyEntity {
         Object.assign(this, partial);
     }
     static _OPENAPI_METADATA_FACTORY() {
-        return { id: { required: true, type: () => String }, cnpj: { required: true, type: () => String }, name: { required: true, type: () => String }, fantasy: { required: true, type: () => String }, status: { required: true, type: () => Object }, type: { required: true, type: () => Object }, isConsulting: { required: true, type: () => Boolean }, created_at: { required: true, type: () => Date }, updated_at: { required: true, type: () => Date }, licenseId: { required: true, type: () => Number }, parentCompanyId: { required: true, type: () => String }, license: { required: false, type: () => require("./license.entity").LicenseEntity }, workspaces: { required: false, type: () => [require("./workspace.entity").WorkspaceEntity] }, employees: { required: false, type: () => [require("./employee.entity").EmployeeEntity] }, description: { required: true, type: () => String }, size: { required: true, type: () => String }, phone: { required: true, type: () => String }, legal_nature: { required: true, type: () => String }, cadastral_situation: { required: true, type: () => String }, activity_start_date: { required: true, type: () => String }, cadastral_situation_date: { required: true, type: () => String }, legal_nature_code: { required: true, type: () => String }, cadastral_situation_description: { required: true, type: () => String }, employeeCount: { required: false, type: () => Number }, riskGroupCount: { required: false, type: () => Number } };
+        return { id: { required: true, type: () => String }, cnpj: { required: true, type: () => String }, name: { required: true, type: () => String }, fantasy: { required: true, type: () => String }, status: { required: true, type: () => Object }, type: { required: true, type: () => Object }, isConsulting: { required: true, type: () => Boolean }, created_at: { required: true, type: () => Date }, updated_at: { required: true, type: () => Date }, licenseId: { required: true, type: () => Number }, parentCompanyId: { required: true, type: () => String }, license: { required: false, type: () => require("./license.entity").LicenseEntity }, workspaces: { required: false, type: () => [require("./workspace.entity").WorkspaceEntity] }, employees: { required: false, type: () => [require("./employee.entity").EmployeeEntity] }, deleted_at: { required: true, type: () => Date, nullable: true }, description: { required: true, type: () => String }, size: { required: true, type: () => String }, phone: { required: true, type: () => String }, legal_nature: { required: true, type: () => String }, cadastral_situation: { required: true, type: () => String }, activity_start_date: { required: true, type: () => String }, cadastral_situation_date: { required: true, type: () => String }, legal_nature_code: { required: true, type: () => String }, cadastral_situation_description: { required: true, type: () => String }, employeeCount: { required: false, type: () => Number }, riskGroupCount: { required: false, type: () => Number } };
     }
 }
 __decorate([
@@ -89,5 +89,9 @@ __decorate([
     (0, swagger_1.ApiProperty)({ description: 'The employees related to the company' }),
     __metadata("design:type", Array)
 ], CompanyEntity.prototype, "employees", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'The deleted date of data' }),
+    __metadata("design:type", Date)
+], CompanyEntity.prototype, "deleted_at", void 0);
 exports.CompanyEntity = CompanyEntity;
 //# sourceMappingURL=company.entity.js.map

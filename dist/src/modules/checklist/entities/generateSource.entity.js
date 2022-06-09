@@ -18,7 +18,7 @@ class GenerateSourceEntity {
         Object.assign(this, partial);
     }
     static _OPENAPI_METADATA_FACTORY() {
-        return { id: { required: true, type: () => String }, riskId: { required: true, type: () => String }, name: { required: true, type: () => String }, companyId: { required: true, type: () => String }, system: { required: true, type: () => Boolean }, status: { required: true, type: () => Object }, created_at: { required: true, type: () => Date } };
+        return { id: { required: true, type: () => String }, riskId: { required: true, type: () => String }, name: { required: true, type: () => String }, companyId: { required: true, type: () => String }, system: { required: true, type: () => Boolean }, status: { required: true, type: () => Object }, created_at: { required: true, type: () => Date }, deleted_at: { required: true, type: () => Date, nullable: true } };
     }
 }
 __decorate([
@@ -60,5 +60,9 @@ __decorate([
     (0, swagger_1.ApiProperty)({ description: 'The creation date of the risk' }),
     __metadata("design:type", Date)
 ], GenerateSourceEntity.prototype, "created_at", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'The deleted date of data' }),
+    __metadata("design:type", Date)
+], GenerateSourceEntity.prototype, "deleted_at", void 0);
 exports.GenerateSourceEntity = GenerateSourceEntity;
 //# sourceMappingURL=generateSource.entity.js.map

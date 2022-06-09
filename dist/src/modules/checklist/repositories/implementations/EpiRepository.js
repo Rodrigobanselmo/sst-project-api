@@ -65,9 +65,10 @@ let EpiRepository = class EpiRepository {
     async find(query, pagination) {
         const where = {};
         Object.entries(query).forEach(([key, value]) => {
-            where[key] = {
-                contains: value,
-            };
+            if (value)
+                where[key] = {
+                    contains: value,
+                };
         });
         const response = await this.prisma.$transaction([
             this.prisma.epi.count({
@@ -79,8 +80,18 @@ let EpiRepository = class EpiRepository {
                 skip: pagination.skip || 0,
             }),
         ]);
+        const standardEpis = [];
+        if (Object.keys(where).length === 0) {
+            const epis = await this.prisma.epi.findMany({
+                where: { ca: { in: ['0', '1', '2'] } },
+            });
+            standardEpis.push(...epis);
+        }
         const count = response[0];
-        return { data: response[1].map((epi) => new epi_entity_1.EpiEntity(epi)), count };
+        return {
+            data: [...standardEpis, ...response[1]].map((epi) => new epi_entity_1.EpiEntity(epi)),
+            count,
+        };
     }
     async findAll() {
         const epis = await this.prisma.epi.findMany();

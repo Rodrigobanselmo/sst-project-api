@@ -120,6 +120,7 @@ model Company {
   isConsulting Boolean @default(false)
   licenseId Int? 
   created_at DateTime @default(now())
+  deleted_at DateTime? 
   updated_at  DateTime   @updatedAt
   status StatusEnum @default(ACTIVE)
   type CompanyTypesEnum @default(MATRIZ)
@@ -186,7 +187,6 @@ model Employee {
   @@unique([id, companyId])
 } 
 
-
 model Epi {
   id    Int     @default(autoincrement()) @id
   ca String
@@ -200,12 +200,12 @@ model Epi {
   equipment String @default("")
   status StatusEnum @default(ACTIVE)
   created_at DateTime @default(now())
+  deleted_at DateTime? 
   riskFactorData RiskFactorData[]
 
   @@index(ca)
   @@unique([ca, status])
 } 
-
 
 model GenerateSource {
   id    String   @id  @default(uuid())
@@ -217,6 +217,7 @@ model GenerateSource {
   status StatusEnum @default(ACTIVE)
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   risk RiskFactors @relation(fields: [riskId,companyId], references: [id,companyId], onDelete: Cascade, onUpdate: Cascade)
+  deleted_at DateTime? 
   recMeds RecMed[] 
   riskFactorData RiskFactorData[]
 
@@ -304,6 +305,7 @@ model RecMed {
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   risk RiskFactors @relation(fields: [riskId,companyId], references: [id,companyId], onDelete: Cascade, onUpdate: Cascade)
   generateSource GenerateSource? @relation(fields: [generateSourceId,companyId], references: [id,companyId], onDelete: Cascade, onUpdate: Cascade)
+  deleted_at DateTime? 
   created_at DateTime @default(now())
   recs RiskFactorData[]  @relation(name: "recs")
   engs RiskFactorData[]  @relation(name: "engs")
@@ -348,6 +350,7 @@ model RiskFactors {
   type RiskFactorsEnum
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   created_at DateTime @default(now())
+  deleted_at DateTime? 
   recMed RecMed[]
   generateSource GenerateSource[]
   representAll Boolean @default(false)
@@ -443,7 +446,6 @@ model RiskFactorProbability {
   riskFactorDataAfter RiskFactorData? @relation(name: "RiskFactorProbabilityAfter", fields: [riskFactorDataAfterId,riskId,riskFactorGroupDataId], references: [id,riskId,riskFactorGroupDataId], onDelete: Restrict, onUpdate: Cascade)
 }
 
-
 model User {
   id    Int     @default(autoincrement()) @id
   email String  @unique
@@ -451,6 +453,7 @@ model User {
   password String
   created_at DateTime @default(now())
   updated_at  DateTime   @updatedAt
+  deleted_at DateTime? 
   refresh_token RefreshToken[]
   companies UserCompany[]
 }

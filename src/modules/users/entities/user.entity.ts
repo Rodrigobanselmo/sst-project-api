@@ -24,6 +24,9 @@ export class UserEntity implements User {
   @ApiProperty({ description: 'The creation date of the User account' })
   created_at: Date;
 
+  @ApiProperty({ description: 'The deleted date of data' })
+  deleted_at: Date | null;
+
   @ApiProperty()
   companies?: UserCompanyEntity[];
 

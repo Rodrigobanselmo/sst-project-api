@@ -19,7 +19,7 @@ class RiskFactorsEntity {
         Object.assign(this, partial);
     }
     static _OPENAPI_METADATA_FACTORY() {
-        return { id: { required: true, type: () => String }, name: { required: true, type: () => String }, severity: { required: true, type: () => Number }, type: { required: true, type: () => Object }, companyId: { required: true, type: () => String }, system: { required: true, type: () => Boolean }, representAll: { required: true, type: () => Boolean }, status: { required: true, type: () => Object }, created_at: { required: true, type: () => Date }, appendix: { required: true, type: () => String }, propagation: { required: true, type: () => [String] }, recMed: { required: false, type: () => [require("./recMed.entity").RecMedEntity] }, generateSource: { required: false, type: () => [require("./generateSource.entity").GenerateSourceEntity] }, risk: { required: true, type: () => String }, exame: { required: true, type: () => String }, symptoms: { required: true, type: () => String }, method: { required: true, type: () => String }, unit: { required: true, type: () => String }, cas: { required: true, type: () => String }, breather: { required: true, type: () => String }, nr15lt: { required: true, type: () => String }, twa: { required: true, type: () => String }, stel: { required: true, type: () => String }, ipvs: { required: true, type: () => String }, pv: { required: true, type: () => String }, pe: { required: true, type: () => String }, carnogenicityACGIH: { required: true, type: () => String }, carnogenicityLinach: { required: true, type: () => String } };
+        return { id: { required: true, type: () => String }, name: { required: true, type: () => String }, severity: { required: true, type: () => Number }, type: { required: true, type: () => Object }, companyId: { required: true, type: () => String }, system: { required: true, type: () => Boolean }, representAll: { required: true, type: () => Boolean }, status: { required: true, type: () => Object }, created_at: { required: true, type: () => Date }, appendix: { required: true, type: () => String }, propagation: { required: true, type: () => [String] }, recMed: { required: false, type: () => [require("./recMed.entity").RecMedEntity] }, generateSource: { required: false, type: () => [require("./generateSource.entity").GenerateSourceEntity] }, deleted_at: { required: true, type: () => Date, nullable: true }, risk: { required: true, type: () => String }, exame: { required: true, type: () => String }, symptoms: { required: true, type: () => String }, method: { required: true, type: () => String }, unit: { required: true, type: () => String }, cas: { required: true, type: () => String }, breather: { required: true, type: () => String }, nr15lt: { required: true, type: () => String }, twa: { required: true, type: () => String }, stel: { required: true, type: () => String }, ipvs: { required: true, type: () => String }, pv: { required: true, type: () => String }, pe: { required: true, type: () => String }, carnogenicityACGIH: { required: true, type: () => String }, carnogenicityLinach: { required: true, type: () => String } };
     }
 }
 __decorate([
@@ -86,5 +86,9 @@ __decorate([
     (0, swagger_1.ApiProperty)({ description: 'The array with generate source data' }),
     __metadata("design:type", Array)
 ], RiskFactorsEntity.prototype, "generateSource", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'The deleted date of data' }),
+    __metadata("design:type", Date)
+], RiskFactorsEntity.prototype, "deleted_at", void 0);
 exports.RiskFactorsEntity = RiskFactorsEntity;
 //# sourceMappingURL=risk.entity.js.map

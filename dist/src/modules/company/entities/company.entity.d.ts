@@ -18,6 +18,7 @@ export declare class CompanyEntity implements Company {
     license?: LicenseEntity;
     workspaces?: WorkspaceEntity[];
     employees?: EmployeeEntity[];
+    deleted_at: Date | null;
     description: string;
     constructor(partial: Partial<CompanyEntity>);
     size: string;

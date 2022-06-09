@@ -45,6 +45,9 @@ export class EpiEntity implements Epi {
   @ApiProperty({ description: 'The observations about the epi report' })
   observation: string;
 
+  @ApiProperty({ description: 'The deleted date of data' })
+  deleted_at: Date | null;
+
   constructor(partial: Partial<EpiEntity>) {
     Object.assign(this, partial);
   }

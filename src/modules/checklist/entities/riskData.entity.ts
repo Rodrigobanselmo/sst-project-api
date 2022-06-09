@@ -24,6 +24,9 @@ export class RiskFactorDataEntity implements RiskFactorData {
   @ApiProperty({ description: 'The creation date of the risk data' })
   created_at: Date;
 
+  @ApiProperty({ description: 'The deleted date of data' })
+  deleted_at: Date | null;
+
   @ApiProperty({ description: 'The hierarchy data' })
   hierarchy?: HierarchyEntity;
 

@@ -20,7 +20,7 @@ class RiskFactorDataEntity {
         Object.assign(this, partial);
     }
     static _OPENAPI_METADATA_FACTORY() {
-        return { id: { required: true, type: () => String }, probability: { required: true, type: () => Number }, probabilityAfter: { required: true, type: () => Number }, companyId: { required: true, type: () => String }, created_at: { required: true, type: () => Date }, hierarchy: { required: false, type: () => require("../../company/entities/hierarchy.entity").HierarchyEntity }, hierarchyId: { required: true, type: () => String }, homogeneousGroup: { required: false, type: () => require("../../company/entities/homoGroup.entity").HomoGroupEntity }, homogeneousGroupId: { required: true, type: () => String }, riskFactor: { required: false, type: () => require("./risk.entity").RiskFactorsEntity }, riskId: { required: true, type: () => String }, riskFactorGroupDataId: { required: true, type: () => String }, recs: { required: false, type: () => [require("./recMed.entity").RecMedEntity] }, engs: { required: false, type: () => [require("./recMed.entity").RecMedEntity] }, adms: { required: false, type: () => [require("./recMed.entity").RecMedEntity] }, generateSources: { required: false, type: () => [require("./generateSource.entity").GenerateSourceEntity] }, epis: { required: false, type: () => [require("./epi.entity").EpiEntity] } };
+        return { id: { required: true, type: () => String }, probability: { required: true, type: () => Number }, probabilityAfter: { required: true, type: () => Number }, companyId: { required: true, type: () => String }, created_at: { required: true, type: () => Date }, deleted_at: { required: true, type: () => Date, nullable: true }, hierarchy: { required: false, type: () => require("../../company/entities/hierarchy.entity").HierarchyEntity }, hierarchyId: { required: true, type: () => String }, homogeneousGroup: { required: false, type: () => require("../../company/entities/homoGroup.entity").HomoGroupEntity }, homogeneousGroupId: { required: true, type: () => String }, riskFactor: { required: false, type: () => require("./risk.entity").RiskFactorsEntity }, riskId: { required: true, type: () => String }, riskFactorGroupDataId: { required: true, type: () => String }, recs: { required: false, type: () => [require("./recMed.entity").RecMedEntity] }, engs: { required: false, type: () => [require("./recMed.entity").RecMedEntity] }, adms: { required: false, type: () => [require("./recMed.entity").RecMedEntity] }, generateSources: { required: false, type: () => [require("./generateSource.entity").GenerateSourceEntity] }, epis: { required: false, type: () => [require("./epi.entity").EpiEntity] } };
     }
 }
 __decorate([
@@ -43,6 +43,10 @@ __decorate([
     (0, swagger_1.ApiProperty)({ description: 'The creation date of the risk data' }),
     __metadata("design:type", Date)
 ], RiskFactorDataEntity.prototype, "created_at", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'The deleted date of data' }),
+    __metadata("design:type", Date)
+], RiskFactorDataEntity.prototype, "deleted_at", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ description: 'The hierarchy data' }),
     __metadata("design:type", hierarchy_entity_1.HierarchyEntity)

@@ -33,6 +33,7 @@ export declare class UsersController {
         password: string;
         updated_at: Date;
         created_at: Date;
+        deleted_at: Date;
         companies?: import("../../entities/userCompany.entity").UserCompanyEntity[];
     }>;
     findId(id: number): Promise<import("../../entities/user.entity").UserEntity>;

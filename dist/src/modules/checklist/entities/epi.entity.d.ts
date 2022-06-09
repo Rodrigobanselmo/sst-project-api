@@ -13,5 +13,6 @@ export declare class EpiEntity implements Epi {
     report: string;
     restriction: string;
     observation: string;
+    deleted_at: Date | null;
     constructor(partial: Partial<EpiEntity>);
 }

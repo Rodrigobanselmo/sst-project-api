@@ -16,13 +16,17 @@ export class GenerateSourceRepository implements IGenerateSourceRepository {
     { recMeds, ...createGenerateSourceDto }: CreateGenerateSourceDto,
     system: boolean,
   ): Promise<GenerateSourceEntity> {
+    const hasRecMed = recMeds
+      ? recMeds.filter(({ recName, medName }) => recName || medName).length > 0
+      : false;
+
     const redMed = await this.prisma.generateSource.create({
       data: {
         ...createGenerateSourceDto,
         system,
         recMeds: {
           createMany: {
-            data: recMeds
+            data: hasRecMed
               ? recMeds.map(({ ...rm }) => ({
                   system,
                   ...rm,

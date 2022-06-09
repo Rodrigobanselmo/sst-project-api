@@ -11,6 +11,7 @@ export declare class RiskFactorDataEntity implements RiskFactorData {
     probabilityAfter: number;
     companyId: string;
     created_at: Date;
+    deleted_at: Date | null;
     hierarchy?: HierarchyEntity;
     hierarchyId: string;
     homogeneousGroup?: HomoGroupEntity;
