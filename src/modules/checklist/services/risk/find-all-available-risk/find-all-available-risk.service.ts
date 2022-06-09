@@ -9,7 +9,10 @@ export class FindAllAvailableRiskService {
     const ChecklistFactor = await this.riskRepository.findAllAvailable(
       companyId,
       {
-        include: { recMed: true, generateSource: true },
+        include: {
+          recMed: { where: { deleted_at: null } },
+          generateSource: { where: { deleted_at: null } },
+        },
       },
     );
 

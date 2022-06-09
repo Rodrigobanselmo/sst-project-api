@@ -111,4 +111,13 @@ export class EpiRepository {
 
     return epis.map((epi) => new EpiEntity(epi));
   }
+
+  async DeleteByIdSoft(id: number): Promise<EpiEntity> {
+    const epis = await this.prisma.epi.update({
+      where: { id },
+      data: { deleted_at: new Date() },
+    });
+
+    return new EpiEntity(epis);
+  }
 }

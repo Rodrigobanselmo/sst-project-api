@@ -1,9 +1,18 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 
 import { CreateRiskDto, UpdateRiskDto } from '../../dto/risk.dto';
 import { CreateRiskService } from '../../services/risk/create-risk/create-risk.service';
+import { DeleteSoftRiskService } from '../../services/risk/delete-soft-risk/delete-soft-risk.service';
 import { FindAllAvailableRiskService } from '../../services/risk/find-all-available-risk/find-all-available-risk.service';
 import { UpdateRiskService } from '../../services/risk/update-risk/update-risk.service';
 
@@ -13,6 +22,7 @@ export class RiskController {
     private readonly createRiskService: CreateRiskService,
     private readonly updateRiskService: UpdateRiskService,
     private readonly findAllAvailableRiskService: FindAllAvailableRiskService,
+    private readonly deleteSoftRiskService: DeleteSoftRiskService,
   ) {}
 
   @Post()
@@ -40,5 +50,13 @@ export class RiskController {
   findAllAvailable(@User() userPayloadDto: UserPayloadDto) {
     const companyId = userPayloadDto.targetCompanyId;
     return this.findAllAvailableRiskService.execute(companyId);
+  }
+
+  @Delete('/:riskId')
+  async deleteSoft(
+    @Param('riskId') riskId: string,
+    @User() userPayloadDto: UserPayloadDto,
+  ) {
+    return this.deleteSoftRiskService.execute(riskId, userPayloadDto);
   }
 }

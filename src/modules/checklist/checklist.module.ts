@@ -36,6 +36,9 @@ import { FindByIdService } from './services/risk-group-data/find-by-id/find-by-i
 import { RiskDocumentRepository } from './repositories/implementations/RiskDocumentRepository';
 import { FindDocumentsService } from './services/risk-group-data/find-documents/find-documents.service';
 import { UpsertManyRiskDataService } from './services/risk-data/upsert-many-risk-data/upsert-many-risk-data.service';
+import { DeleteSoftGenerateSourceService } from './services/generate-source/delete-soft-generate-source/delete-soft-generate-source.service';
+import { DeleteSoftRiskService } from './services/risk/delete-soft-risk/delete-soft-risk.service';
+import { DeleteSoftRecMedService } from './services/rec-med/delete-soft-rec-med/delete-soft-rec-med.service';
 
 @Module({
   controllers: [
@@ -53,6 +56,7 @@ import { UpsertManyRiskDataService } from './services/risk-data/upsert-many-risk
     CreateRiskService,
     UpdateRiskService,
     RecMedRepository,
+    DeleteSoftGenerateSourceService,
     EpiRepository,
     CreateRecMedService,
     UpdateRecMedService,
@@ -69,6 +73,8 @@ import { UpsertManyRiskDataService } from './services/risk-data/upsert-many-risk
     FindByCAEpiService,
     FindDocumentsService,
     FindEpiService,
+    DeleteSoftRiskService,
+    DeleteSoftRecMedService,
     FindAllByGroupAndRiskService,
     UpsertRiskDataService,
     FindAllByCompanyService,

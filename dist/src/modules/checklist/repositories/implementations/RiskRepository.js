@@ -228,8 +228,16 @@ let RiskRepository = class RiskRepository {
         const rall = typeof representAll === 'boolean' ? { representAll: representAll } : {};
         const risks = await this.prisma.riskFactors.findMany(Object.assign({ where: {
                 AND: [{ OR: [{ companyId }, { system: true }] }, rall],
+                deleted_at: null,
             } }, options));
         return risks.map((risk) => new risk_entity_1.RiskFactorsEntity(risk));
+    }
+    async DeleteByIdSoft(id, companyId) {
+        const riskFactors = await this.prisma.riskFactors.update({
+            where: { id_companyId: { id, companyId } },
+            data: { deleted_at: new Date() },
+        });
+        return new risk_entity_1.RiskFactorsEntity(riskFactors);
     }
 };
 RiskRepository = __decorate([

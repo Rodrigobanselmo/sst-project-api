@@ -16,4 +16,5 @@ export declare class EpiRepository {
         count: number;
     }>;
     findAll(): Promise<EpiEntity[]>;
+    DeleteByIdSoft(id: number): Promise<EpiEntity>;
 }

@@ -19,13 +19,15 @@ const user_decorator_1 = require("../../../../shared/decorators/user.decorator")
 const user_payload_dto_1 = require("../../../../shared/dto/user-payload.dto");
 const risk_dto_1 = require("../../dto/risk.dto");
 const create_risk_service_1 = require("../../services/risk/create-risk/create-risk.service");
+const delete_soft_risk_service_1 = require("../../services/risk/delete-soft-risk/delete-soft-risk.service");
 const find_all_available_risk_service_1 = require("../../services/risk/find-all-available-risk/find-all-available-risk.service");
 const update_risk_service_1 = require("../../services/risk/update-risk/update-risk.service");
 let RiskController = class RiskController {
-    constructor(createRiskService, updateRiskService, findAllAvailableRiskService) {
+    constructor(createRiskService, updateRiskService, findAllAvailableRiskService, deleteSoftRiskService) {
         this.createRiskService = createRiskService;
         this.updateRiskService = updateRiskService;
         this.findAllAvailableRiskService = findAllAvailableRiskService;
+        this.deleteSoftRiskService = deleteSoftRiskService;
     }
     create(userPayloadDto, createRiskDto) {
         return this.createRiskService.execute(createRiskDto, userPayloadDto);
@@ -36,6 +38,9 @@ let RiskController = class RiskController {
     findAllAvailable(userPayloadDto) {
         const companyId = userPayloadDto.targetCompanyId;
         return this.findAllAvailableRiskService.execute(companyId);
+    }
+    async deleteSoft(riskId, userPayloadDto) {
+        return this.deleteSoftRiskService.execute(riskId, userPayloadDto);
     }
 };
 __decorate([
@@ -67,11 +72,21 @@ __decorate([
     __metadata("design:paramtypes", [user_payload_dto_1.UserPayloadDto]),
     __metadata("design:returntype", void 0)
 ], RiskController.prototype, "findAllAvailable", null);
+__decorate([
+    (0, common_1.Delete)('/:riskId'),
+    openapi.ApiResponse({ status: 200, type: require("../../entities/risk.entity").RiskFactorsEntity }),
+    __param(0, (0, common_1.Param)('riskId')),
+    __param(1, (0, user_decorator_1.User)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, user_payload_dto_1.UserPayloadDto]),
+    __metadata("design:returntype", Promise)
+], RiskController.prototype, "deleteSoft", null);
 RiskController = __decorate([
     (0, common_1.Controller)('risk'),
     __metadata("design:paramtypes", [create_risk_service_1.CreateRiskService,
         update_risk_service_1.UpdateRiskService,
-        find_all_available_risk_service_1.FindAllAvailableRiskService])
+        find_all_available_risk_service_1.FindAllAvailableRiskService,
+        delete_soft_risk_service_1.DeleteSoftRiskService])
 ], RiskController);
 exports.RiskController = RiskController;
 //# sourceMappingURL=risk.controller.js.map

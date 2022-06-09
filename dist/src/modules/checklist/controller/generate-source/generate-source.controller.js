@@ -19,17 +19,22 @@ const user_decorator_1 = require("../../../../shared/decorators/user.decorator")
 const user_payload_dto_1 = require("../../../../shared/dto/user-payload.dto");
 const generate_source_dto_1 = require("../../dto/generate-source.dto");
 const create_generate_source_service_1 = require("../../services/generate-source/create-generate-source/create-generate-source.service");
+const delete_soft_generate_source_service_1 = require("../../services/generate-source/delete-soft-generate-source/delete-soft-generate-source.service");
 const update_generate_source_service_1 = require("../../services/generate-source/update-generate-source/update-generate-source.service");
 let GenerateSourceController = class GenerateSourceController {
-    constructor(createGenerateSourceService, updateGenerateSourceService) {
+    constructor(createGenerateSourceService, updateGenerateSourceService, deleteSoftGenerateSourceService) {
         this.createGenerateSourceService = createGenerateSourceService;
         this.updateGenerateSourceService = updateGenerateSourceService;
+        this.deleteSoftGenerateSourceService = deleteSoftGenerateSourceService;
     }
     create(userPayloadDto, createGenerateSourceDto) {
         return this.createGenerateSourceService.execute(createGenerateSourceDto, userPayloadDto);
     }
     async update(generateSourceId, userPayloadDto, updateRiskDto) {
         return this.updateGenerateSourceService.execute(generateSourceId, updateRiskDto, userPayloadDto);
+    }
+    async deleteSoft(generateSourceId, userPayloadDto) {
+        return this.deleteSoftGenerateSourceService.execute(generateSourceId, userPayloadDto);
     }
 };
 __decorate([
@@ -53,10 +58,20 @@ __decorate([
         generate_source_dto_1.UpdateGenerateSourceDto]),
     __metadata("design:returntype", Promise)
 ], GenerateSourceController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)('/:generateSourceId'),
+    openapi.ApiResponse({ status: 200, type: require("../../entities/generateSource.entity").GenerateSourceEntity }),
+    __param(0, (0, common_1.Param)('generateSourceId')),
+    __param(1, (0, user_decorator_1.User)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, user_payload_dto_1.UserPayloadDto]),
+    __metadata("design:returntype", Promise)
+], GenerateSourceController.prototype, "deleteSoft", null);
 GenerateSourceController = __decorate([
     (0, common_1.Controller)('generate-source'),
     __metadata("design:paramtypes", [create_generate_source_service_1.CreateGenerateSourceService,
-        update_generate_source_service_1.UpdateGenerateSourceService])
+        update_generate_source_service_1.UpdateGenerateSourceService,
+        delete_soft_generate_source_service_1.DeleteSoftGenerateSourceService])
 ], GenerateSourceController);
 exports.GenerateSourceController = GenerateSourceController;
 //# sourceMappingURL=generate-source.controller.js.map

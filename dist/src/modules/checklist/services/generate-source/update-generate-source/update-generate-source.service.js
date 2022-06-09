@@ -19,7 +19,7 @@ let UpdateGenerateSourceService = class UpdateGenerateSourceService {
     }
     async execute(id, updateGenerateSourceDto, userPayloadDto) {
         const user = (0, isMater_1.isMaster)(userPayloadDto);
-        const companyId = user.targetCompanyId;
+        const companyId = user.companyId;
         const system = user.isMaster && user.companyId === updateGenerateSourceDto.companyId;
         const generateSource = await this.generateSourceRepository.findById(id, companyId);
         if (!(generateSource === null || generateSource === void 0 ? void 0 : generateSource.id))

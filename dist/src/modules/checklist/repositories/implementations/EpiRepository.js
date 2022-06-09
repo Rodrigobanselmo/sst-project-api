@@ -97,6 +97,13 @@ let EpiRepository = class EpiRepository {
         const epis = await this.prisma.epi.findMany();
         return epis.map((epi) => new epi_entity_1.EpiEntity(epi));
     }
+    async DeleteByIdSoft(id) {
+        const epis = await this.prisma.epi.update({
+            where: { id },
+            data: { deleted_at: new Date() },
+        });
+        return new epi_entity_1.EpiEntity(epis);
+    }
 };
 EpiRepository = __decorate([
     (0, common_1.Injectable)(),

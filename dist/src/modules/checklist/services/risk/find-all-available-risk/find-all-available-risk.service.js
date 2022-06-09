@@ -18,7 +18,10 @@ let FindAllAvailableRiskService = class FindAllAvailableRiskService {
     }
     async execute(companyId) {
         const ChecklistFactor = await this.riskRepository.findAllAvailable(companyId, {
-            include: { recMed: true, generateSource: true },
+            include: {
+                recMed: { where: { deleted_at: null } },
+                generateSource: { where: { deleted_at: null } },
+            },
         });
         return ChecklistFactor;
     }

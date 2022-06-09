@@ -294,10 +294,23 @@ export class RiskRepository implements IRiskRepository {
     const risks = await this.prisma.riskFactors.findMany({
       where: {
         AND: [{ OR: [{ companyId }, { system: true }] }, rall],
+        deleted_at: null,
       },
       ...options,
     });
 
     return risks.map((risk) => new RiskFactorsEntity(risk));
+  }
+
+  async DeleteByIdSoft(
+    id: string,
+    companyId: string,
+  ): Promise<RiskFactorsEntity> {
+    const riskFactors = await this.prisma.riskFactors.update({
+      where: { id_companyId: { id, companyId } },
+      data: { deleted_at: new Date() },
+    });
+
+    return new RiskFactorsEntity(riskFactors);
   }
 }

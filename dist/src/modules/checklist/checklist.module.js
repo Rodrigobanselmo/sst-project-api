@@ -45,6 +45,9 @@ const find_by_id_service_1 = require("./services/risk-group-data/find-by-id/find
 const RiskDocumentRepository_1 = require("./repositories/implementations/RiskDocumentRepository");
 const find_documents_service_1 = require("./services/risk-group-data/find-documents/find-documents.service");
 const upsert_many_risk_data_service_1 = require("./services/risk-data/upsert-many-risk-data/upsert-many-risk-data.service");
+const delete_soft_generate_source_service_1 = require("./services/generate-source/delete-soft-generate-source/delete-soft-generate-source.service");
+const delete_soft_risk_service_1 = require("./services/risk/delete-soft-risk/delete-soft-risk.service");
+const delete_soft_rec_med_service_1 = require("./services/rec-med/delete-soft-rec-med/delete-soft-rec-med.service");
 let ChecklistModule = class ChecklistModule {
 };
 ChecklistModule = __decorate([
@@ -64,6 +67,7 @@ ChecklistModule = __decorate([
             create_risk_service_1.CreateRiskService,
             update_risk_service_1.UpdateRiskService,
             RecMedRepository_1.RecMedRepository,
+            delete_soft_generate_source_service_1.DeleteSoftGenerateSourceService,
             EpiRepository_1.EpiRepository,
             create_rec_med_service_1.CreateRecMedService,
             update_rec_med_service_1.UpdateRecMedService,
@@ -80,6 +84,8 @@ ChecklistModule = __decorate([
             find_ca_epi_service_1.FindByCAEpiService,
             find_documents_service_1.FindDocumentsService,
             find_epi_service_1.FindEpiService,
+            delete_soft_risk_service_1.DeleteSoftRiskService,
+            delete_soft_rec_med_service_1.DeleteSoftRecMedService,
             find_by_group_risk_service_1.FindAllByGroupAndRiskService,
             upsert_risk_service_1.UpsertRiskDataService,
             find_by_company_service_1.FindAllByCompanyService,

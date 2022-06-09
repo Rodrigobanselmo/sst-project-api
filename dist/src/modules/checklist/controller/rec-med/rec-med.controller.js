@@ -19,17 +19,22 @@ const user_decorator_1 = require("../../../../shared/decorators/user.decorator")
 const user_payload_dto_1 = require("../../../../shared/dto/user-payload.dto");
 const rec_med_dto_1 = require("../../dto/rec-med.dto");
 const create_rec_med_service_1 = require("../../services/rec-med/create-rec-med/create-rec-med.service");
+const delete_soft_rec_med_service_1 = require("../../services/rec-med/delete-soft-rec-med/delete-soft-rec-med.service");
 const update_rec_med_service_1 = require("../../services/rec-med/update-rec-med/update-rec-med.service");
 let RecMedController = class RecMedController {
-    constructor(createRecMedService, updateRecMedService) {
+    constructor(createRecMedService, updateRecMedService, deleteSoftRecMedService) {
         this.createRecMedService = createRecMedService;
         this.updateRecMedService = updateRecMedService;
+        this.deleteSoftRecMedService = deleteSoftRecMedService;
     }
     create(userPayloadDto, createRecMedDto) {
         return this.createRecMedService.execute(createRecMedDto, userPayloadDto);
     }
     async update(recMedId, userPayloadDto, updateRiskDto) {
         return this.updateRecMedService.execute(recMedId, updateRiskDto, userPayloadDto);
+    }
+    async deleteSoft(recMedId, userPayloadDto) {
+        return this.deleteSoftRecMedService.execute(recMedId, userPayloadDto);
     }
 };
 __decorate([
@@ -53,10 +58,20 @@ __decorate([
         rec_med_dto_1.UpdateRecMedDto]),
     __metadata("design:returntype", Promise)
 ], RecMedController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)('/:recMedId'),
+    openapi.ApiResponse({ status: 200, type: require("../../entities/recMed.entity").RecMedEntity }),
+    __param(0, (0, common_1.Param)('recMedId')),
+    __param(1, (0, user_decorator_1.User)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, user_payload_dto_1.UserPayloadDto]),
+    __metadata("design:returntype", Promise)
+], RecMedController.prototype, "deleteSoft", null);
 RecMedController = __decorate([
     (0, common_1.Controller)('rec-med'),
     __metadata("design:paramtypes", [create_rec_med_service_1.CreateRecMedService,
-        update_rec_med_service_1.UpdateRecMedService])
+        update_rec_med_service_1.UpdateRecMedService,
+        delete_soft_rec_med_service_1.DeleteSoftRecMedService])
 ], RecMedController);
 exports.RecMedController = RecMedController;
 //# sourceMappingURL=rec-med.controller.js.map

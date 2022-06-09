@@ -16,7 +16,7 @@ export class UpdateGenerateSourceService {
     userPayloadDto: UserPayloadDto,
   ) {
     const user = isMaster(userPayloadDto);
-    const companyId = user.targetCompanyId;
+    const companyId = user.companyId;
 
     const system =
       user.isMaster && user.companyId === updateGenerateSourceDto.companyId;
