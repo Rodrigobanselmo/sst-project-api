@@ -13,6 +13,12 @@ enum CompanyTypesEnum {
   MASTER
 }
 
+enum CompanyEmviromentTypesEnum {
+  SUPPORT
+  OPERATION
+  ADMINISTRATIVE
+}
+
 enum HierarchyEnum {
   DIRECTORY 
   MANAGEMENT
@@ -110,7 +116,6 @@ model Company {
   fantasy String?
   description String?
   size String?
-  phone String?
   legal_nature String?
   cadastral_situation String?
   activity_start_date String?
@@ -119,6 +124,15 @@ model Company {
   cadastral_situation_description String?
   isConsulting Boolean @default(false)
   licenseId Int? 
+  phone String?
+  email String?
+  riskDegree Int?
+  operatonTime String?
+  logoUrl String?
+  responsableName String?
+  mission String?
+  vision String?
+  values String?
   created_at DateTime @default(now())
   deleted_at DateTime? 
   updated_at  DateTime   @updatedAt
@@ -144,6 +158,24 @@ model Company {
   riskFactorData RiskFactorData[] 
   riskFactorGroupData RiskFactorGroupData[] 
   riskFactorDocument RiskFactorDocument[] 
+}
+
+model CompanyEnvironment {
+  id   String    @id @default(uuid())
+  name String  
+  description String?
+  vision String?
+  created_at DateTime @default(now())
+  deleted_at DateTime? 
+  updated_at  DateTime   @updatedAt
+  type CompanyEmviromentTypesEnum 
+  workspaceId String
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
+  riskFactors RiskFactors[] 
+  hierarchy Hierarchy[] 
+  parentEnvironmentId String
+  parentEnvironment CompanyEnvironment @relation(name: "parent_enviroment",fields: [parentEnvironmentId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
+  childEnvironments CompanyEnvironment[] @relation(name: "parent_enviroment")
 }
 
 model Contract {
@@ -239,6 +271,7 @@ model Hierarchy {
   parent Hierarchy?  @relation(name: "children_parent", fields: [parentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   children Hierarchy[] @relation(name: "children_parent")
   employees Employee[] 
+  companyEnvironment CompanyEnvironment[] 
   hierarchyOnHomogeneous HierarchyOnHomogeneous[]
   riskFactorDatas RiskFactorData[] 
 
@@ -356,6 +389,7 @@ model RiskFactors {
   representAll Boolean @default(false)
   riskFactorData RiskFactorData[]
   riskFactorProbability RiskFactorProbability[]
+  companyEnvironment CompanyEnvironment[] 
   
   @@unique([id, companyId])
 }
@@ -477,6 +511,7 @@ model Workspace {
   name String  
   abbreviation String?
   description String?  
+  cnpj String?  
   created_at DateTime @default(now())
   updated_at  DateTime   @updatedAt
   companyId String
@@ -487,6 +522,7 @@ model Workspace {
   riskFactorDocument RiskFactorDocument[]
   hierarchyOnHomogeneous HierarchyOnHomogeneous[]
   hierarchy Hierarchy[]
+  companyEnvironment CompanyEnvironment[]
 
   @@unique([abbreviation, companyId])
   @@unique([id, companyId])

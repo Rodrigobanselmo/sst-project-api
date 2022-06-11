@@ -14,5 +14,6 @@ export declare class WorkspaceEntity implements Workspace {
     description: string;
     employeeCount?: number;
     constructor(partial: Partial<WorkspaceEntity>);
+    cnpj: string;
     abbreviation: string;
 }

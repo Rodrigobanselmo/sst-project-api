@@ -20,7 +20,14 @@ export declare class CompanyEntity implements Company {
     employees?: EmployeeEntity[];
     deleted_at: Date | null;
     description: string;
-    constructor(partial: Partial<CompanyEntity>);
+    email: string;
+    riskDegree: number;
+    operatonTime: string;
+    logoUrl: string;
+    responsableName: string;
+    mission: string;
+    vision: string;
+    values: string;
     size: string;
     phone: string;
     legal_nature: string;
@@ -31,4 +38,5 @@ export declare class CompanyEntity implements Company {
     cadastral_situation_description: string;
     employeeCount?: number;
     riskGroupCount?: number;
+    constructor(partial: Partial<CompanyEntity>);
 }

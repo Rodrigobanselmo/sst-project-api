@@ -40,5 +40,6 @@ export class WorkspaceEntity implements Workspace {
   constructor(partial: Partial<WorkspaceEntity>) {
     Object.assign(this, partial);
   }
+  cnpj: string;
   abbreviation: string;
 }

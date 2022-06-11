@@ -20,7 +20,7 @@ class WorkspaceEntity {
         Object.assign(this, partial);
     }
     static _OPENAPI_METADATA_FACTORY() {
-        return { id: { required: true, type: () => String }, name: { required: true, type: () => String }, status: { required: true, type: () => Object }, created_at: { required: true, type: () => Date }, updated_at: { required: true, type: () => Date }, companyId: { required: true, type: () => String }, address: { required: false, type: () => require("./address.entity").AddressEntity }, company: { required: false, type: () => require("./company.entity").CompanyEntity }, description: { required: true, type: () => String }, employeeCount: { required: false, type: () => Number }, abbreviation: { required: true, type: () => String } };
+        return { id: { required: true, type: () => String }, name: { required: true, type: () => String }, status: { required: true, type: () => Object }, created_at: { required: true, type: () => Date }, updated_at: { required: true, type: () => Date }, companyId: { required: true, type: () => String }, address: { required: false, type: () => require("./address.entity").AddressEntity }, company: { required: false, type: () => require("./company.entity").CompanyEntity }, description: { required: true, type: () => String }, employeeCount: { required: false, type: () => Number }, cnpj: { required: true, type: () => String }, abbreviation: { required: true, type: () => String } };
     }
 }
 __decorate([
