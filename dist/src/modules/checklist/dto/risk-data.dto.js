@@ -82,7 +82,7 @@ __decorate([
 exports.UpsertRiskDataDto = UpsertRiskDataDto;
 class UpsertManyRiskDataDto {
     static _OPENAPI_METADATA_FACTORY() {
-        return { id: { required: false, type: () => String }, probability: { required: false, type: () => Number }, probabilityAfter: { required: false, type: () => Number }, companyId: { required: true, type: () => String }, riskId: { required: true, type: () => String }, hierarchyIds: { required: true, type: () => [String] }, homogeneousGroupIds: { required: true, type: () => [String] }, riskFactorGroupDataId: { required: true, type: () => String }, recs: { required: false, type: () => [String] }, engs: { required: false, type: () => [String] }, adms: { required: false, type: () => [String] }, generateSources: { required: false, type: () => [String] }, epis: { required: false, type: () => [Number] } };
+        return { id: { required: false, type: () => String }, probability: { required: false, type: () => Number }, probabilityAfter: { required: false, type: () => Number }, companyId: { required: true, type: () => String }, riskId: { required: true, type: () => String }, riskIds: { required: true, type: () => [String] }, hierarchyIds: { required: true, type: () => [String] }, homogeneousGroupIds: { required: true, type: () => [String] }, riskFactorGroupDataId: { required: true, type: () => String }, recs: { required: false, type: () => [String] }, engs: { required: false, type: () => [String] }, adms: { required: false, type: () => [String] }, generateSources: { required: false, type: () => [String] }, epis: { required: false, type: () => [Number] } };
     }
 }
 __decorate([
@@ -106,8 +106,14 @@ __decorate([
 ], UpsertManyRiskDataDto.prototype, "companyId", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], UpsertManyRiskDataDto.prototype, "riskId", void 0);
+__decorate([
+    (0, class_validator_1.IsString)({ each: true }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Array)
+], UpsertManyRiskDataDto.prototype, "riskIds", void 0);
 __decorate([
     (0, class_validator_1.ValidateIf)((o) => !o.homogeneousGroupIds || o.hierarchyIds),
     (0, class_validator_1.IsString)({ each: true }),

@@ -37,6 +37,7 @@ let RiskDataRepository = class RiskDataRepository {
         if (homogeneousGroupIds) {
             delete upsertManyRiskDataDto.homogeneousGroupIds;
             delete upsertManyRiskDataDto.hierarchyIds;
+            delete upsertManyRiskDataDto.riskIds;
             const data = await this.prisma.$transaction(homogeneousGroupIds.map((homogeneousGroupId) => this.upsertPrisma(Object.assign({ homogeneousGroupId }, upsertManyRiskDataDto))));
             return data.map((riskFactorData) => new riskData_entity_1.RiskFactorDataEntity(riskFactorData));
         }

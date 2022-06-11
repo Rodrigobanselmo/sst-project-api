@@ -74,7 +74,12 @@ export class UpsertManyRiskDataDto {
   companyId: string;
 
   @IsString()
+  @IsOptional()
   riskId: string;
+
+  @IsString({ each: true })
+  @IsOptional()
+  riskIds: string[];
 
   @ValidateIf((o) => !o.homogeneousGroupIds || o.hierarchyIds)
   @IsString({ each: true })

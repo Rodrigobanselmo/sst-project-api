@@ -28,6 +28,7 @@ export class RiskDataRepository {
     if (homogeneousGroupIds) {
       delete upsertManyRiskDataDto.homogeneousGroupIds;
       delete upsertManyRiskDataDto.hierarchyIds;
+      delete upsertManyRiskDataDto.riskIds;
 
       const data = await this.prisma.$transaction(
         homogeneousGroupIds.map((homogeneousGroupId) =>

@@ -9,6 +9,6 @@ export declare class RiskDataController {
     private readonly findAllByGroupAndRiskService;
     constructor(upsertRiskDataService: UpsertRiskDataService, upsertManyRiskDataService: UpsertManyRiskDataService, findAllByGroupAndRiskService: FindAllByGroupAndRiskService);
     upsert(upsertRiskDataDto: UpsertRiskDataDto): Promise<string | import("../../entities/riskData.entity").RiskFactorDataEntity>;
-    upsertMany(upsertRiskDataDto: UpsertManyRiskDataDto): Promise<string[] | import("../../entities/riskData.entity").RiskFactorDataEntity[]>;
+    upsertMany(upsertRiskDataDto: UpsertManyRiskDataDto): Promise<import("../../entities/riskData.entity").RiskFactorDataEntity[][]>;
     findAllAvailable(userPayloadDto: UserPayloadDto, riskId: string, groupId: string): Promise<import("../../entities/riskData.entity").RiskFactorDataEntity[]>;
 }

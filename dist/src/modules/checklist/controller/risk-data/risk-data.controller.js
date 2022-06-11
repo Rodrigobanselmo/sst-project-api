@@ -48,7 +48,7 @@ __decorate([
 ], RiskDataController.prototype, "upsert", null);
 __decorate([
     (0, common_1.Post)('many'),
-    openapi.ApiResponse({ status: 201, type: Object }),
+    openapi.ApiResponse({ status: 201, type: [[require("../../entities/riskData.entity").RiskFactorDataEntity]] }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [risk_data_dto_1.UpsertManyRiskDataDto]),

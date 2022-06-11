@@ -19,6 +19,7 @@ export declare class UpsertManyRiskDataDto {
     probabilityAfter?: number;
     companyId: string;
     riskId: string;
+    riskIds: string[];
     hierarchyIds: string[];
     homogeneousGroupIds: string[];
     riskFactorGroupDataId: string;
