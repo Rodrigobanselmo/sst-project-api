@@ -21,20 +21,20 @@ var __rest = (this && this.__rest) || function (s, e) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateContractService = void 0;
-const LicenseRepository_1 = require("../../../repositories/implementations/LicenseRepository");
 const common_1 = require("@nestjs/common");
 const CompanyRepository_1 = require("../../../repositories/implementations/CompanyRepository");
+const LicenseRepository_1 = require("../../../repositories/implementations/LicenseRepository");
 let CreateContractService = class CreateContractService {
     constructor(companyRepository, licenseRepository) {
         this.companyRepository = companyRepository;
         this.licenseRepository = licenseRepository;
     }
-    async execute(_a) {
+    async execute(_a, user) {
         var createContractDto = __rest(_a, []);
-        const license = await this.licenseRepository.findByCompanyId(createContractDto.companyId);
+        const license = await this.licenseRepository.findByCompanyId(user.companyId);
         if (!license)
             throw new common_1.BadRequestException('license not found');
-        const company = await this.companyRepository.create(Object.assign({}, createContractDto));
+        const company = await this.companyRepository.create(Object.assign(Object.assign({}, createContractDto), { companyId: user.companyId, license }));
         return company;
     }
 };

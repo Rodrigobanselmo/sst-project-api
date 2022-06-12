@@ -1,6 +1,5 @@
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import { CreateCompanyDto } from '../../dto/create-company.dto';
-import { CreateContractDto } from '../../dto/create-contract.dto';
 import { UpdateCompanyDto } from '../../dto/update-company.dto';
 import { CreateCompanyService } from '../../services/company/create-company/create-company.service';
 import { CreateContractService } from '../../services/company/create-contract/create-contract.service';
@@ -22,14 +21,13 @@ export declare class CompanyController {
     findAll(userPayloadDto: UserPayloadDto): Promise<import("../../entities/company.entity").CompanyEntity[]>;
     findCNPJ(cnpj: string): Promise<import("../../interfaces/cnpj").ICnpjResponse>;
     findCEP(cep: string): Promise<import("../../interfaces/cep.types").ICepResponse>;
-    create(createCompanyDto: CreateCompanyDto): Promise<import("../../entities/company.entity").CompanyEntity>;
-    createChild(createContractDto: CreateContractDto): Promise<import("../../entities/company.entity").CompanyEntity>;
+    create(createCompanyDto: CreateCompanyDto, userPayloadDto: UserPayloadDto): Promise<import("../../entities/company.entity").CompanyEntity>;
     update(updateCompanyDto: UpdateCompanyDto): Promise<import("../../entities/company.entity").CompanyEntity | (import(".prisma/client").Company & {
-        users: import(".prisma/client").UserCompany[];
+        license: import(".prisma/client").License;
         workspace: import(".prisma/client").Workspace[];
         primary_activity: import(".prisma/client").Activity[];
         secondary_activity: import(".prisma/client").Activity[];
+        users: import(".prisma/client").UserCompany[];
         employees: import(".prisma/client").Employee[];
-        license: import(".prisma/client").License;
     })>;
 }

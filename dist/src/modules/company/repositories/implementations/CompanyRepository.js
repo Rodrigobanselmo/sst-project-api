@@ -34,12 +34,14 @@ let CompanyRepository = class CompanyRepository {
         const companyUUId = (0, uuid_1.v4)();
         const isReceivingService = !!companyId;
         const company = await this.prisma.company.create({
-            data: Object.assign(Object.assign({ id: companyUUId }, createCompanyDto), { license: {
-                    connectOrCreate: {
-                        create: Object.assign(Object.assign({}, license), { companyId: companyUUId }),
-                        where: { companyId: companyId || 'company not found' },
-                    },
-                }, receivingServiceContracts: isReceivingService
+            data: Object.assign(Object.assign({ id: companyUUId }, createCompanyDto), { license: Object.keys(license).length === 0
+                    ? undefined
+                    : {
+                        connectOrCreate: {
+                            create: Object.assign(Object.assign({}, license), { companyId: companyUUId }),
+                            where: { companyId: companyId || 'company not found' },
+                        },
+                    }, receivingServiceContracts: isReceivingService
                     ? {
                         create: { applyingServiceCompanyId: companyId },
                     }

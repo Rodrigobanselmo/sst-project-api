@@ -1,11 +1,10 @@
 import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { Public } from '../../../../shared/decorators/public.decorator';
 
+import { Public } from '../../../../shared/decorators/public.decorator';
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import { CreateCompanyDto } from '../../dto/create-company.dto';
-import { CreateContractDto } from '../../dto/create-contract.dto';
 import { UpdateCompanyDto } from '../../dto/update-company.dto';
 import { CreateCompanyService } from '../../services/company/create-company/create-company.service';
 import { CreateContractService } from '../../services/company/create-contract/create-contract.service';
@@ -50,14 +49,20 @@ export class CompanyController {
   }
 
   @Post()
-  create(@Body() createCompanyDto: CreateCompanyDto) {
-    return this.createCompanyService.execute(createCompanyDto);
+  create(
+    @Body() createCompanyDto: CreateCompanyDto,
+    @User() userPayloadDto: UserPayloadDto,
+  ) {
+    if (userPayloadDto.isMaster) {
+      return this.createCompanyService.execute(createCompanyDto);
+    }
+    return this.createContractService.execute(createCompanyDto, userPayloadDto);
   }
 
-  @Post('contract')
-  createChild(@Body() createContractDto: CreateContractDto) {
-    return this.createContractService.execute(createContractDto);
-  }
+  // @Post('contract')
+  // createChild(@Body() createContractDto: CreateContractDto) {
+  //   return this.createContractService.execute(createContractDto);
+  // }
 
   // edit company data or create if does not exist like workspace / primary_activity
   @Patch()

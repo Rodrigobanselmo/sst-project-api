@@ -1,8 +1,9 @@
-import { LicenseRepository } from '../../../repositories/implementations/LicenseRepository';
 import { BadRequestException, Injectable } from '@nestjs/common';
 
-import { CreateContractDto } from '../../../dto/create-contract.dto';
+import { CreateCompanyDto } from '../../../../../modules/company/dto/create-company.dto';
+import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { CompanyRepository } from '../../../repositories/implementations/CompanyRepository';
+import { LicenseRepository } from '../../../repositories/implementations/LicenseRepository';
 
 @Injectable()
 export class CreateContractService {
@@ -10,15 +11,20 @@ export class CreateContractService {
     private readonly companyRepository: CompanyRepository,
     private readonly licenseRepository: LicenseRepository,
   ) {}
-  async execute({ ...createContractDto }: CreateContractDto) {
+  async execute(
+    { ...createContractDto }: CreateCompanyDto,
+    user: UserPayloadDto,
+  ) {
     const license = await this.licenseRepository.findByCompanyId(
-      createContractDto.companyId,
+      user.companyId,
     );
 
     if (!license) throw new BadRequestException('license not found');
 
     const company = await this.companyRepository.create({
       ...createContractDto,
+      companyId: user.companyId,
+      license,
     });
 
     return company;

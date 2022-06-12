@@ -32,12 +32,15 @@ export class CompanyRepository implements ICompanyRepository {
       data: {
         id: companyUUId,
         ...createCompanyDto,
-        license: {
-          connectOrCreate: {
-            create: { ...license, companyId: companyUUId },
-            where: { companyId: companyId || 'company not found' },
-          },
-        },
+        license:
+          Object.keys(license).length === 0
+            ? undefined
+            : {
+                connectOrCreate: {
+                  create: { ...license, companyId: companyUUId },
+                  where: { companyId: companyId || 'company not found' },
+                },
+              },
         receivingServiceContracts: isReceivingService
           ? {
               create: { applyingServiceCompanyId: companyId },

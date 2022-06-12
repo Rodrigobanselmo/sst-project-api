@@ -20,7 +20,6 @@ const public_decorator_1 = require("../../../../shared/decorators/public.decorat
 const user_decorator_1 = require("../../../../shared/decorators/user.decorator");
 const user_payload_dto_1 = require("../../../../shared/dto/user-payload.dto");
 const create_company_dto_1 = require("../../dto/create-company.dto");
-const create_contract_dto_1 = require("../../dto/create-contract.dto");
 const update_company_dto_1 = require("../../dto/update-company.dto");
 const create_company_service_1 = require("../../services/company/create-company/create-company.service");
 const create_contract_service_1 = require("../../services/company/create-contract/create-contract.service");
@@ -51,11 +50,11 @@ let CompanyController = class CompanyController {
     findCEP(cep) {
         return this.findCepService.execute(cep);
     }
-    create(createCompanyDto) {
-        return this.createCompanyService.execute(createCompanyDto);
-    }
-    createChild(createContractDto) {
-        return this.createContractService.execute(createContractDto);
+    create(createCompanyDto, userPayloadDto) {
+        if (userPayloadDto.isMaster) {
+            return this.createCompanyService.execute(createCompanyDto);
+        }
+        return this.createContractService.execute(createCompanyDto, userPayloadDto);
     }
     update(updateCompanyDto) {
         return this.updateCompanyService.execute(updateCompanyDto);
@@ -98,18 +97,12 @@ __decorate([
     (0, common_1.Post)(),
     openapi.ApiResponse({ status: 201, type: require("../../entities/company.entity").CompanyEntity }),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, user_decorator_1.User)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_company_dto_1.CreateCompanyDto]),
+    __metadata("design:paramtypes", [create_company_dto_1.CreateCompanyDto,
+        user_payload_dto_1.UserPayloadDto]),
     __metadata("design:returntype", void 0)
 ], CompanyController.prototype, "create", null);
-__decorate([
-    (0, common_1.Post)('contract'),
-    openapi.ApiResponse({ status: 201, type: require("../../entities/company.entity").CompanyEntity }),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_contract_dto_1.CreateContractDto]),
-    __metadata("design:returntype", void 0)
-], CompanyController.prototype, "createChild", null);
 __decorate([
     (0, common_1.Patch)(),
     openapi.ApiResponse({ status: 200, type: Object }),
