@@ -32,6 +32,17 @@ let RiskDataRepository = class RiskDataRepository {
         const riskFactorData = await this.upsertPrisma(upsertRiskDataDto);
         return new riskData_entity_1.RiskFactorDataEntity(riskFactorData);
     }
+    async upsertConnectMany(upsertManyRiskDataDto) {
+        const homogeneousGroupIds = upsertManyRiskDataDto.homogeneousGroupIds;
+        if (homogeneousGroupIds) {
+            delete upsertManyRiskDataDto.homogeneousGroupIds;
+            delete upsertManyRiskDataDto.hierarchyIds;
+            delete upsertManyRiskDataDto.riskIds;
+            const data = await this.prisma.$transaction(homogeneousGroupIds.map((homogeneousGroupId) => this.upsertConnectPrisma(Object.assign({ homogeneousGroupId }, upsertManyRiskDataDto))));
+            return data.map((riskFactorData) => new riskData_entity_1.RiskFactorDataEntity(riskFactorData));
+        }
+        return [];
+    }
     async upsertMany(upsertManyRiskDataDto) {
         const homogeneousGroupIds = upsertManyRiskDataDto.homogeneousGroupIds;
         if (homogeneousGroupIds) {
@@ -94,6 +105,18 @@ let RiskDataRepository = class RiskDataRepository {
         });
         return riskFactorData;
     }
+    async deleteByHomoAndRisk(homogeneousGroupIds, riskIds, groupId) {
+        const riskFactorData = await this.prisma.riskFactorData.deleteMany({
+            where: {
+                AND: [
+                    { homogeneousGroupId: { in: homogeneousGroupIds } },
+                    { riskId: { in: riskIds } },
+                    { riskFactorGroupDataId: groupId },
+                ],
+            },
+        });
+        return riskFactorData;
+    }
     upsertPrisma(_a) {
         var { recs, adms, engs, epis, generateSources, companyId, id } = _a, createDto = __rest(_a, ["recs", "adms", "engs", "epis", "generateSources", "companyId", "id"]);
         return this.prisma.riskFactorData.upsert({
@@ -153,6 +176,83 @@ let RiskDataRepository = class RiskDataRepository {
                     : undefined, epis: epis
                     ? {
                         set: epis.map((id) => ({ id })),
+                    }
+                    : undefined }),
+            where: {
+                homogeneousGroupId_riskId_riskFactorGroupDataId: {
+                    riskFactorGroupDataId: createDto.riskFactorGroupDataId,
+                    riskId: createDto.riskId,
+                    homogeneousGroupId: createDto.homogeneousGroupId,
+                },
+            },
+            include: {
+                adms: true,
+                recs: true,
+                engs: true,
+                generateSources: true,
+                epis: true,
+            },
+        });
+    }
+    upsertConnectPrisma(_a) {
+        var { recs, adms, engs, epis, generateSources, companyId, id } = _a, createDto = __rest(_a, ["recs", "adms", "engs", "epis", "generateSources", "companyId", "id"]);
+        return this.prisma.riskFactorData.upsert({
+            create: Object.assign(Object.assign({}, createDto), { companyId, epis: epis
+                    ? {
+                        connect: epis.map((id) => ({ id })),
+                    }
+                    : undefined, generateSources: generateSources
+                    ? {
+                        connect: generateSources.map((id) => ({
+                            id,
+                        })),
+                    }
+                    : undefined, recs: recs
+                    ? {
+                        connect: recs.map((id) => ({
+                            id,
+                        })),
+                    }
+                    : undefined, adms: adms
+                    ? {
+                        connect: adms.map((id) => ({
+                            id,
+                        })),
+                    }
+                    : undefined, engs: engs
+                    ? {
+                        connect: engs.map((id) => ({
+                            id,
+                        })),
+                    }
+                    : undefined }),
+            update: Object.assign(Object.assign({}, createDto), { companyId, recs: recs
+                    ? {
+                        connect: recs.map((id) => ({
+                            id,
+                        })),
+                    }
+                    : undefined, adms: adms
+                    ? {
+                        connect: adms.map((id) => ({
+                            id,
+                        })),
+                    }
+                    : undefined, engs: engs
+                    ? {
+                        connect: engs.map((id) => ({
+                            id,
+                        })),
+                    }
+                    : undefined, generateSources: generateSources
+                    ? {
+                        connect: generateSources.map((id) => ({
+                            id,
+                        })),
+                    }
+                    : undefined, epis: epis
+                    ? {
+                        connect: epis.map((id) => ({ id })),
                     }
                     : undefined }),
             where: {

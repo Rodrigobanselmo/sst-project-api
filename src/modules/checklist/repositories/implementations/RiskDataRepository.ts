@@ -21,6 +21,31 @@ export class RiskDataRepository {
     return new RiskFactorDataEntity(riskFactorData);
   }
 
+  async upsertConnectMany(
+    upsertManyRiskDataDto: UpsertManyRiskDataDto,
+  ): Promise<RiskFactorDataEntity[]> {
+    const homogeneousGroupIds = upsertManyRiskDataDto.homogeneousGroupIds;
+    if (homogeneousGroupIds) {
+      delete upsertManyRiskDataDto.homogeneousGroupIds;
+      delete upsertManyRiskDataDto.hierarchyIds;
+      delete upsertManyRiskDataDto.riskIds;
+
+      const data = await this.prisma.$transaction(
+        homogeneousGroupIds.map((homogeneousGroupId) =>
+          this.upsertConnectPrisma({
+            homogeneousGroupId,
+            ...upsertManyRiskDataDto,
+          } as unknown as UpsertRiskDataDto),
+        ),
+      );
+
+      return data.map(
+        (riskFactorData) => new RiskFactorDataEntity(riskFactorData),
+      );
+    }
+    return [];
+  }
+
   async upsertMany(
     upsertManyRiskDataDto: UpsertManyRiskDataDto,
   ): Promise<RiskFactorDataEntity[]> {
@@ -111,6 +136,24 @@ export class RiskDataRepository {
     return riskFactorData;
   }
 
+  async deleteByHomoAndRisk(
+    homogeneousGroupIds: string[],
+    riskIds: string[],
+    groupId: string,
+  ) {
+    const riskFactorData = await this.prisma.riskFactorData.deleteMany({
+      where: {
+        AND: [
+          { homogeneousGroupId: { in: homogeneousGroupIds } },
+          { riskId: { in: riskIds } },
+          { riskFactorGroupDataId: groupId },
+        ],
+      },
+    });
+
+    return riskFactorData;
+  }
+
   private upsertPrisma({
     recs,
     adms,
@@ -193,6 +236,108 @@ export class RiskDataRepository {
         epis: epis
           ? {
               set: epis.map((id) => ({ id })),
+            }
+          : undefined,
+      },
+      where: {
+        homogeneousGroupId_riskId_riskFactorGroupDataId: {
+          riskFactorGroupDataId: createDto.riskFactorGroupDataId,
+          riskId: createDto.riskId,
+          homogeneousGroupId: createDto.homogeneousGroupId,
+        },
+      },
+      include: {
+        adms: true,
+        recs: true,
+        engs: true,
+        generateSources: true,
+        epis: true,
+      },
+    });
+  }
+
+  private upsertConnectPrisma({
+    recs,
+    adms,
+    engs,
+    epis,
+    generateSources,
+    companyId,
+    id,
+    ...createDto
+  }: UpsertRiskDataDto) {
+    return this.prisma.riskFactorData.upsert({
+      create: {
+        ...createDto,
+        companyId,
+        epis: epis
+          ? {
+              connect: epis.map((id) => ({ id })),
+            }
+          : undefined,
+        generateSources: generateSources
+          ? {
+              connect: generateSources.map((id) => ({
+                id,
+              })),
+            }
+          : undefined,
+        recs: recs
+          ? {
+              connect: recs.map((id) => ({
+                id,
+              })),
+            }
+          : undefined,
+        adms: adms
+          ? {
+              connect: adms.map((id) => ({
+                id,
+              })),
+            }
+          : undefined,
+        engs: engs
+          ? {
+              connect: engs.map((id) => ({
+                id,
+              })),
+            }
+          : undefined,
+      },
+      update: {
+        ...createDto,
+        companyId,
+        recs: recs
+          ? {
+              connect: recs.map((id) => ({
+                id,
+              })),
+            }
+          : undefined,
+        adms: adms
+          ? {
+              connect: adms.map((id) => ({
+                id,
+              })),
+            }
+          : undefined,
+        engs: engs
+          ? {
+              connect: engs.map((id) => ({
+                id,
+              })),
+            }
+          : undefined,
+        generateSources: generateSources
+          ? {
+              connect: generateSources.map((id) => ({
+                id,
+              })),
+            }
+          : undefined,
+        epis: epis
+          ? {
+              connect: epis.map((id) => ({ id })),
             }
           : undefined,
       },

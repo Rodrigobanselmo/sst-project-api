@@ -29,3 +29,7 @@ export declare class UpsertManyRiskDataDto {
     generateSources?: string[];
     epis?: number[];
 }
+export declare class DeleteManyRiskDataDto {
+    riskIds: string[];
+    homogeneousGroupIds: string[];
+}

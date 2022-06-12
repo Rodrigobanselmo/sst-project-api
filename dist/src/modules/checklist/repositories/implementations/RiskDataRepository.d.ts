@@ -5,10 +5,13 @@ export declare class RiskDataRepository {
     private prisma;
     constructor(prisma: PrismaService);
     upsert(upsertRiskDataDto: UpsertRiskDataDto): Promise<RiskFactorDataEntity>;
+    upsertConnectMany(upsertManyRiskDataDto: UpsertManyRiskDataDto): Promise<RiskFactorDataEntity[]>;
     upsertMany(upsertManyRiskDataDto: UpsertManyRiskDataDto): Promise<RiskFactorDataEntity[]>;
     findAllByGroup(riskFactorGroupDataId: string, companyId?: string): Promise<RiskFactorDataEntity[]>;
     findAllByGroupAndRisk(riskFactorGroupDataId: string, riskId: string, companyId: string): Promise<RiskFactorDataEntity[]>;
     deleteById(id: string): Promise<RiskFactorDataEntity>;
     deleteByIds(ids: string[]): Promise<import(".prisma/client").Prisma.BatchPayload>;
+    deleteByHomoAndRisk(homogeneousGroupIds: string[], riskIds: string[], groupId: string): Promise<import(".prisma/client").Prisma.BatchPayload>;
     private upsertPrisma;
+    private upsertConnectPrisma;
 }

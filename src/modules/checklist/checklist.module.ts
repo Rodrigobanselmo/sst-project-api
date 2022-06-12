@@ -39,6 +39,7 @@ import { UpsertManyRiskDataService } from './services/risk-data/upsert-many-risk
 import { DeleteSoftGenerateSourceService } from './services/generate-source/delete-soft-generate-source/delete-soft-generate-source.service';
 import { DeleteSoftRiskService } from './services/risk/delete-soft-risk/delete-soft-risk.service';
 import { DeleteSoftRecMedService } from './services/rec-med/delete-soft-rec-med/delete-soft-rec-med.service';
+import { DeleteManyRiskDataService } from './services/risk-data/delete-many-risk-data/delete-many-risk-data.service';
 
 @Module({
   controllers: [
@@ -84,6 +85,7 @@ import { DeleteSoftRecMedService } from './services/rec-med/delete-soft-rec-med/
     RiskDocumentRepository,
     FindByIdService,
     UpsertManyRiskDataService,
+    DeleteManyRiskDataService,
   ],
   exports: [RiskRepository, RiskGroupDataRepository, RiskDocumentRepository],
 })

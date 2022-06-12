@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UpsertManyRiskDataDto = exports.UpsertRiskDataDto = void 0;
+exports.DeleteManyRiskDataDto = exports.UpsertManyRiskDataDto = exports.UpsertRiskDataDto = void 0;
 const openapi = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class UpsertRiskDataDto {
@@ -154,4 +154,19 @@ __decorate([
     __metadata("design:type", Array)
 ], UpsertManyRiskDataDto.prototype, "epis", void 0);
 exports.UpsertManyRiskDataDto = UpsertManyRiskDataDto;
+class DeleteManyRiskDataDto {
+    static _OPENAPI_METADATA_FACTORY() {
+        return { riskIds: { required: true, type: () => [String] }, homogeneousGroupIds: { required: true, type: () => [String] } };
+    }
+}
+__decorate([
+    (0, class_validator_1.IsString)({ each: true }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Array)
+], DeleteManyRiskDataDto.prototype, "riskIds", void 0);
+__decorate([
+    (0, class_validator_1.IsString)({ each: true }),
+    __metadata("design:type", Array)
+], DeleteManyRiskDataDto.prototype, "homogeneousGroupIds", void 0);
+exports.DeleteManyRiskDataDto = DeleteManyRiskDataDto;
 //# sourceMappingURL=risk-data.dto.js.map

@@ -9,23 +9,21 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UpsertManyRiskDataService = void 0;
+exports.DeleteManyRiskDataService = void 0;
 const common_1 = require("@nestjs/common");
 const RiskDataRepository_1 = require("../../../repositories/implementations/RiskDataRepository");
-let UpsertManyRiskDataService = class UpsertManyRiskDataService {
+let DeleteManyRiskDataService = class DeleteManyRiskDataService {
     constructor(riskDataRepository) {
         this.riskDataRepository = riskDataRepository;
     }
-    async execute(upsertRiskDataDto) {
-        const risksDataMany = (await Promise.all(upsertRiskDataDto.riskIds.map(async (riskId) => await this.riskDataRepository.upsertConnectMany(Object.assign(Object.assign({}, upsertRiskDataDto), { riskId }))))) || [];
-        if (upsertRiskDataDto.riskId)
-            risksDataMany.push(await this.riskDataRepository.upsertMany(upsertRiskDataDto));
-        return risksDataMany;
+    async execute(upsertRiskDataDto, groupId) {
+        const deletedCount = await this.riskDataRepository.deleteByHomoAndRisk(upsertRiskDataDto.homogeneousGroupIds, upsertRiskDataDto.riskIds, groupId);
+        return deletedCount;
     }
 };
-UpsertManyRiskDataService = __decorate([
+DeleteManyRiskDataService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [RiskDataRepository_1.RiskDataRepository])
-], UpsertManyRiskDataService);
-exports.UpsertManyRiskDataService = UpsertManyRiskDataService;
-//# sourceMappingURL=upsert-many-risk-data.service.js.map
+], DeleteManyRiskDataService);
+exports.DeleteManyRiskDataService = DeleteManyRiskDataService;
+//# sourceMappingURL=delete-many-risk-data.service.js.map

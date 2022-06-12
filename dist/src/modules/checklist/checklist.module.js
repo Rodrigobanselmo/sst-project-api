@@ -48,6 +48,7 @@ const upsert_many_risk_data_service_1 = require("./services/risk-data/upsert-man
 const delete_soft_generate_source_service_1 = require("./services/generate-source/delete-soft-generate-source/delete-soft-generate-source.service");
 const delete_soft_risk_service_1 = require("./services/risk/delete-soft-risk/delete-soft-risk.service");
 const delete_soft_rec_med_service_1 = require("./services/rec-med/delete-soft-rec-med/delete-soft-rec-med.service");
+const delete_many_risk_data_service_1 = require("./services/risk-data/delete-many-risk-data/delete-many-risk-data.service");
 let ChecklistModule = class ChecklistModule {
 };
 ChecklistModule = __decorate([
@@ -95,6 +96,7 @@ ChecklistModule = __decorate([
             RiskDocumentRepository_1.RiskDocumentRepository,
             find_by_id_service_1.FindByIdService,
             upsert_many_risk_data_service_1.UpsertManyRiskDataService,
+            delete_many_risk_data_service_1.DeleteManyRiskDataService,
         ],
         exports: [RiskRepository_1.RiskRepository, RiskGroupDataRepository_1.RiskGroupDataRepository, RiskDocumentRepository_1.RiskDocumentRepository],
     })

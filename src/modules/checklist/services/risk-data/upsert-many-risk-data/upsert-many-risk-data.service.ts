@@ -12,7 +12,7 @@ export class UpsertManyRiskDataService {
       (await Promise.all(
         upsertRiskDataDto.riskIds.map(
           async (riskId) =>
-            await this.riskDataRepository.upsertMany({
+            await this.riskDataRepository.upsertConnectMany({
               ...upsertRiskDataDto,
               riskId,
             }),

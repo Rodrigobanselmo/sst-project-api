@@ -112,3 +112,12 @@ export class UpsertManyRiskDataDto {
   @IsOptional()
   epis?: number[];
 }
+
+export class DeleteManyRiskDataDto {
+  @IsString({ each: true })
+  @IsOptional()
+  riskIds: string[];
+
+  @IsString({ each: true })
+  homogeneousGroupIds: string[];
+}

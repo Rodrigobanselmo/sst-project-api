@@ -17,15 +17,17 @@ const openapi = require("@nestjs/swagger");
 const common_1 = require("@nestjs/common");
 const user_decorator_1 = require("../../../../shared/decorators/user.decorator");
 const user_payload_dto_1 = require("../../../../shared/dto/user-payload.dto");
+const delete_many_risk_data_service_1 = require("../../services/risk-data/delete-many-risk-data/delete-many-risk-data.service");
 const find_by_group_risk_service_1 = require("../../services/risk-data/find-by-group-risk/find-by-group-risk.service");
 const upsert_many_risk_data_service_1 = require("../../services/risk-data/upsert-many-risk-data/upsert-many-risk-data.service");
 const upsert_risk_service_1 = require("../../services/risk-data/upsert-risk-data/upsert-risk.service");
 const risk_data_dto_1 = require("./../../dto/risk-data.dto");
 let RiskDataController = class RiskDataController {
-    constructor(upsertRiskDataService, upsertManyRiskDataService, findAllByGroupAndRiskService) {
+    constructor(upsertRiskDataService, upsertManyRiskDataService, findAllByGroupAndRiskService, deleteManyRiskDataService) {
         this.upsertRiskDataService = upsertRiskDataService;
         this.upsertManyRiskDataService = upsertManyRiskDataService;
         this.findAllByGroupAndRiskService = findAllByGroupAndRiskService;
+        this.deleteManyRiskDataService = deleteManyRiskDataService;
     }
     upsert(upsertRiskDataDto) {
         return this.upsertRiskDataService.execute(upsertRiskDataDto);
@@ -36,6 +38,9 @@ let RiskDataController = class RiskDataController {
     findAllAvailable(userPayloadDto, riskId, groupId) {
         const companyId = userPayloadDto.targetCompanyId;
         return this.findAllByGroupAndRiskService.execute(riskId, groupId, companyId);
+    }
+    deleteMany(upsertRiskDataDto, groupId) {
+        return this.deleteManyRiskDataService.execute(upsertRiskDataDto, groupId);
     }
 };
 __decorate([
@@ -64,11 +69,21 @@ __decorate([
     __metadata("design:paramtypes", [user_payload_dto_1.UserPayloadDto, String, String]),
     __metadata("design:returntype", void 0)
 ], RiskDataController.prototype, "findAllAvailable", null);
+__decorate([
+    (0, common_1.Post)('/:companyId/:groupId/delete/many'),
+    openapi.ApiResponse({ status: 201, type: Object }),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Param)('groupId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [risk_data_dto_1.DeleteManyRiskDataDto, String]),
+    __metadata("design:returntype", void 0)
+], RiskDataController.prototype, "deleteMany", null);
 RiskDataController = __decorate([
     (0, common_1.Controller)('risk-data'),
     __metadata("design:paramtypes", [upsert_risk_service_1.UpsertRiskDataService,
         upsert_many_risk_data_service_1.UpsertManyRiskDataService,
-        find_by_group_risk_service_1.FindAllByGroupAndRiskService])
+        find_by_group_risk_service_1.FindAllByGroupAndRiskService,
+        delete_many_risk_data_service_1.DeleteManyRiskDataService])
 ], RiskDataController);
 exports.RiskDataController = RiskDataController;
 //# sourceMappingURL=risk-data.controller.js.map
