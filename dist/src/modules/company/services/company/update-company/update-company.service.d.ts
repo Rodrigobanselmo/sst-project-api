@@ -6,11 +6,11 @@ export declare class UpdateCompanyService {
     private readonly workspaceRepository;
     constructor(companyRepository: CompanyRepository, workspaceRepository: WorkspaceRepository);
     execute(updateCompanyDto: UpdateCompanyDto): Promise<import("../../../entities/company.entity").CompanyEntity | (import(".prisma/client").Company & {
+        users: import(".prisma/client").UserCompany[];
         workspace: import(".prisma/client").Workspace[];
         primary_activity: import(".prisma/client").Activity[];
         secondary_activity: import(".prisma/client").Activity[];
-        license: import(".prisma/client").License;
-        users: import(".prisma/client").UserCompany[];
         employees: import(".prisma/client").Employee[];
+        license: import(".prisma/client").License;
     })>;
 }
