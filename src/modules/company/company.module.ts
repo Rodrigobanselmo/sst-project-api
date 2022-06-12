@@ -3,10 +3,12 @@ import { Module } from '@nestjs/common';
 import { ExcelProvider } from '../../shared/providers/ExcelProvider/implementations/ExcelProvider';
 import { CompanyController } from './controller/company/company.controller';
 import { EmployeeController } from './controller/employee/employee.controller';
+import { EnvironmentController } from './controller/environment/environment.controller';
 import { HierarchyController } from './controller/hierarchy/hierarchy.controller';
 import { HomoGroupsController } from './controller/HomoGroups/HomoGroups.controller';
 import { CompanyRepository } from './repositories/implementations/CompanyRepository';
 import { EmployeeRepository } from './repositories/implementations/EmployeeRepository';
+import { EnvironmentRepository } from './repositories/implementations/EnvironmentRepository';
 import { HierarchyRepository } from './repositories/implementations/HierarchyRepository';
 import { HomoGroupRepository } from './repositories/implementations/HomoGroupRepository';
 import { LicenseRepository } from './repositories/implementations/LicenseRepository';
@@ -22,6 +24,9 @@ import { CreateEmployeeService } from './services/employee/create-employee/creat
 import { FindAllAvailableEmployeesService } from './services/employee/find-all-available-employees/find-all-available-employees.service';
 import { FindEmployeeService } from './services/employee/find-employee/find-employee.service';
 import { UpdateEmployeeService } from './services/employee/update-employee/update-employee.service';
+import { DeleteEnvironmentService } from './services/environment/delete-environment/delete-environment.service';
+import { FindAllEnvironmentService } from './services/environment/find-all-environment/find-all-environment.service';
+import { UpsertEnvironmentService } from './services/environment/upsert-environment/upsert-environment.service';
 import { CreateHierarchyService } from './services/hierarchy/create-hierarchies/create-hierarchies.service';
 import { DeleteHierarchyService } from './services/hierarchy/delete-hierarchies/delete-hierarchies.service';
 import { FindAllHierarchyService } from './services/hierarchy/find-all-hierarchies/find-all-hierarchies.service';
@@ -38,6 +43,7 @@ import { UpdateHomoGroupService } from './services/homoGroup/update-homo-group/u
     EmployeeController,
     HierarchyController,
     HomoGroupsController,
+    EnvironmentController,
   ],
   providers: [
     CreateCompanyService,
@@ -67,6 +73,10 @@ import { UpdateHomoGroupService } from './services/homoGroup/update-homo-group/u
     FindByCompanyHomoGroupService,
     FindCnpjService,
     FindCepService,
+    UpsertEnvironmentService,
+    FindAllEnvironmentService,
+    DeleteEnvironmentService,
+    EnvironmentRepository,
   ],
   exports: [CompanyRepository, EmployeeRepository, HierarchyRepository],
 })

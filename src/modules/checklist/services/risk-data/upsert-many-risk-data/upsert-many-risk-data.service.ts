@@ -24,6 +24,30 @@ export class UpsertManyRiskDataService {
         await this.riskDataRepository.upsertMany(upsertRiskDataDto),
       );
 
+    // const emptyRiskDataIds = risksDataMany.reduce((acc, riskDataSlice) => {
+    //   return [
+    //     ...acc,
+    //     ...riskDataSlice
+    //       .map((riskData) => {
+    //         const isEmpty =
+    //           riskData.adms.length === 0 &&
+    //           riskData.recs.length === 0 &&
+    //           riskData.engs.length === 0 &&
+    //           riskData.epis.length === 0 &&
+    //           riskData.generateSources.length === 0 &&
+    //           !riskData.probability;
+
+    //         if (isEmpty) {
+    //           return riskData.id;
+    //         }
+    //         return;
+    //       })
+    //       .filter((id) => id),
+    //   ];
+    // }, [] as string[]);
+
+    // await this.riskDataRepository.deleteByIds(emptyRiskDataIds);
+
     return risksDataMany;
   }
 }

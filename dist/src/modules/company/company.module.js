@@ -11,10 +11,12 @@ const common_1 = require("@nestjs/common");
 const ExcelProvider_1 = require("../../shared/providers/ExcelProvider/implementations/ExcelProvider");
 const company_controller_1 = require("./controller/company/company.controller");
 const employee_controller_1 = require("./controller/employee/employee.controller");
+const environment_controller_1 = require("./controller/environment/environment.controller");
 const hierarchy_controller_1 = require("./controller/hierarchy/hierarchy.controller");
 const HomoGroups_controller_1 = require("./controller/HomoGroups/HomoGroups.controller");
 const CompanyRepository_1 = require("./repositories/implementations/CompanyRepository");
 const EmployeeRepository_1 = require("./repositories/implementations/EmployeeRepository");
+const EnvironmentRepository_1 = require("./repositories/implementations/EnvironmentRepository");
 const HierarchyRepository_1 = require("./repositories/implementations/HierarchyRepository");
 const HomoGroupRepository_1 = require("./repositories/implementations/HomoGroupRepository");
 const LicenseRepository_1 = require("./repositories/implementations/LicenseRepository");
@@ -30,6 +32,9 @@ const create_employee_service_1 = require("./services/employee/create-employee/c
 const find_all_available_employees_service_1 = require("./services/employee/find-all-available-employees/find-all-available-employees.service");
 const find_employee_service_1 = require("./services/employee/find-employee/find-employee.service");
 const update_employee_service_1 = require("./services/employee/update-employee/update-employee.service");
+const delete_environment_service_1 = require("./services/environment/delete-environment/delete-environment.service");
+const find_all_environment_service_1 = require("./services/environment/find-all-environment/find-all-environment.service");
+const upsert_environment_service_1 = require("./services/environment/upsert-environment/upsert-environment.service");
 const create_hierarchies_service_1 = require("./services/hierarchy/create-hierarchies/create-hierarchies.service");
 const delete_hierarchies_service_1 = require("./services/hierarchy/delete-hierarchies/delete-hierarchies.service");
 const find_all_hierarchies_service_1 = require("./services/hierarchy/find-all-hierarchies/find-all-hierarchies.service");
@@ -48,6 +53,7 @@ CompanyModule = __decorate([
             employee_controller_1.EmployeeController,
             hierarchy_controller_1.HierarchyController,
             HomoGroups_controller_1.HomoGroupsController,
+            environment_controller_1.EnvironmentController,
         ],
         providers: [
             create_company_service_1.CreateCompanyService,
@@ -77,6 +83,10 @@ CompanyModule = __decorate([
             find_by_company_homo_group_service_1.FindByCompanyHomoGroupService,
             find_cnpj_service_1.FindCnpjService,
             find_cep_service_1.FindCepService,
+            upsert_environment_service_1.UpsertEnvironmentService,
+            find_all_environment_service_1.FindAllEnvironmentService,
+            delete_environment_service_1.DeleteEnvironmentService,
+            EnvironmentRepository_1.EnvironmentRepository,
         ],
         exports: [CompanyRepository_1.CompanyRepository, EmployeeRepository_1.EmployeeRepository, HierarchyRepository_1.HierarchyRepository],
     })

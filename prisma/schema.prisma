@@ -13,7 +13,7 @@ enum CompanyTypesEnum {
   MASTER
 }
 
-enum CompanyEmviromentTypesEnum {
+enum CompanyEnvironmentTypesEnum {
   SUPPORT
   OPERATION
   ADMINISTRATIVE
@@ -152,6 +152,7 @@ model Company {
   homogeneousGroup HomogeneousGroup[] 
   generateSource GenerateSource[] 
   recMed RecMed[] 
+  companyEnvironment CompanyEnvironment[] 
   hierarchy Hierarchy[] 
   databaseTable DatabaseTable[] 
   checklist Checklist[] 
@@ -163,19 +164,34 @@ model Company {
 model CompanyEnvironment {
   id   String    @id @default(uuid())
   name String  
+  photos CompanyEnvironmentPhoto[]
   description String?
-  vision String?
   created_at DateTime @default(now())
   deleted_at DateTime? 
   updated_at  DateTime   @updatedAt
-  type CompanyEmviromentTypesEnum 
+  type CompanyEnvironmentTypesEnum 
   workspaceId String
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
   riskFactors RiskFactors[] 
   hierarchy Hierarchy[] 
-  parentEnvironmentId String
-  parentEnvironment CompanyEnvironment @relation(name: "parent_enviroment",fields: [parentEnvironmentId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
+  parentEnvironmentId String?
+  parentEnvironment CompanyEnvironment? @relation(name: "parent_enviroment",fields: [parentEnvironmentId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
   childEnvironments CompanyEnvironment[] @relation(name: "parent_enviroment")
+  companyId String
+  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
+  
+  @@unique([workspaceId, companyId, id])
+}
+
+model CompanyEnvironmentPhoto {
+  id   String    @id @default(uuid())
+  name String  
+  photoUrl String
+  created_at DateTime @default(now())
+  deleted_at DateTime? 
+  updated_at  DateTime   @updatedAt
+  companyEnvironmentId String
+  companyEnvironment CompanyEnvironment @relation(fields: [companyEnvironmentId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
 }
 
 model Contract {

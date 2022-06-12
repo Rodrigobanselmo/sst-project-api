@@ -21,6 +21,7 @@ import { DownloadEmployeesService } from './services/company/download-employees/
 import { UploadEmployeesService } from './services/company/upload-employees/upload-employees.service';
 import { UploadHierarchiesService } from './services/company/upload-hierarchies/upload-hierarchies.service';
 import { DownloadHierarchiesService } from './services/company/download-hierarchies/download-hierarchies.service';
+import { EnvironmentPhotoRepository } from '../company/repositories/implementations/EnvironmentPhotoRepository';
 
 @Module({
   controllers: [
@@ -46,6 +47,7 @@ import { DownloadHierarchiesService } from './services/company/download-hierarch
     DownloadEmployeesService,
     UploadEmployeesService,
     UploadHierarchiesService,
+    EnvironmentPhotoRepository,
     DownloadHierarchiesService,
   ],
 })
