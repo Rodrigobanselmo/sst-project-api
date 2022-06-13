@@ -33,10 +33,12 @@ let RiskRepository = class RiskRepository {
         const risk = await this.prisma.riskFactors.create({
             data: Object.assign(Object.assign({}, createRiskDto), { system, recMed: {
                     createMany: {
-                        data: recMed ? recMed.map((_a) => {
-                            var rm = __rest(_a, []);
-                            return (Object.assign({ system }, rm));
-                        }) : [],
+                        data: recMed
+                            ? recMed.map((_a) => {
+                                var rm = __rest(_a, []);
+                                return (Object.assign({ system, companyId: createRiskDto.companyId }, rm));
+                            })
+                            : [],
                         skipDuplicates: true,
                     },
                 }, generateSource: {
@@ -44,7 +46,7 @@ let RiskRepository = class RiskRepository {
                         data: generateSource
                             ? generateSource.map((_a) => {
                                 var gs = __rest(_a, []);
-                                return (Object.assign({ system }, gs));
+                                return (Object.assign({ system, companyId: createRiskDto.companyId }, gs));
                             })
                             : [],
                         skipDuplicates: true,
@@ -63,9 +65,9 @@ let RiskRepository = class RiskRepository {
                         : recMed.map((_a) => {
                             var { id } = _a, rm = __rest(_a, ["id"]);
                             return {
-                                create: Object.assign({ system }, rm),
+                                create: Object.assign({ system, companyId }, rm),
                                 update: Object.assign({ system }, rm),
-                                where: { id_companyId: { companyId, id: id || 'no-id' } },
+                                where: { id: id || 'no-id' },
                             };
                         }),
                 }, generateSource: {
@@ -74,9 +76,9 @@ let RiskRepository = class RiskRepository {
                         : generateSource.map((_a) => {
                             var { id } = _a, gs = __rest(_a, ["id"]);
                             return {
-                                create: Object.assign({ system }, gs),
+                                create: Object.assign({ system, companyId }, gs),
                                 update: Object.assign({ system }, gs),
-                                where: { id_companyId: { companyId, id: id || 'no-id' } },
+                                where: { id: id || 'no-id' },
                             };
                         }),
                 } }, createRiskDto),
@@ -114,22 +116,22 @@ let RiskRepository = class RiskRepository {
                     upsert: !recMed
                         ? []
                         : recMed.map((_a) => {
-                            var { companyId: _, id } = _a, rm = __rest(_a, ["companyId", "id"]);
+                            var { id } = _a, rm = __rest(_a, ["id"]);
                             return {
                                 create: Object.assign({ system }, rm),
                                 update: Object.assign({ system }, rm),
-                                where: { id_companyId: { companyId, id: id || 'no-id' } },
+                                where: { id: id || 'no-id' },
                             };
                         }),
                 }, generateSource: {
                     upsert: !generateSource
                         ? []
                         : generateSource.map((_a) => {
-                            var { companyId: _, id } = _a, gs = __rest(_a, ["companyId", "id"]);
+                            var { id, companyId, recMeds: _ } = _a, gs = __rest(_a, ["id", "companyId", "recMeds"]);
                             return {
-                                create: Object.assign({ system }, gs),
+                                create: Object.assign({ system, companyId }, gs),
                                 update: Object.assign({ system }, gs),
-                                where: { id_companyId: { companyId, id: id || 'no-id' } },
+                                where: { id: id || 'no-id' },
                             };
                         }),
                 } }),
@@ -168,26 +170,22 @@ let RiskRepository = class RiskRepository {
                         upsert: !recMed
                             ? []
                             : recMed.map((_a) => {
-                                var { companyId: _, id } = _a, rm = __rest(_a, ["companyId", "id"]);
+                                var { id } = _a, rm = __rest(_a, ["id"]);
                                 return {
                                     create: Object.assign({ system }, rm),
                                     update: Object.assign({ system }, rm),
-                                    where: {
-                                        id_companyId: { companyId, id: id || 'no-id' },
-                                    },
+                                    where: { id: id || 'no-id' },
                                 };
                             }),
                     }, generateSource: {
                         upsert: !generateSource
                             ? []
                             : generateSource.map((_a) => {
-                                var { companyId: _, id } = _a, gs = __rest(_a, ["companyId", "id"]);
+                                var { id, recMeds: _ } = _a, gs = __rest(_a, ["id", "recMeds"]);
                                 return {
                                     create: Object.assign({ system }, gs),
                                     update: Object.assign({ system }, gs),
-                                    where: {
-                                        id_companyId: { companyId, id: id || 'no-id' },
-                                    },
+                                    where: { id: id || 'no-id' },
                                 };
                             }),
                     } }),

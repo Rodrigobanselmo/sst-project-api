@@ -34,17 +34,17 @@ let GenerateSourceRepository = class GenerateSourceRepository {
             ? recMeds.filter(({ recName, medName }) => recName || medName).length > 0
             : false;
         const redMed = await this.prisma.generateSource.create({
-            data: Object.assign(Object.assign({}, createGenerateSourceDto), { system, recMeds: {
-                    createMany: {
-                        data: hasRecMed
-                            ? recMeds.map((_a) => {
+            data: Object.assign(Object.assign({}, createGenerateSourceDto), { system, recMeds: hasRecMed
+                    ? {
+                        createMany: {
+                            data: recMeds.map((_a) => {
                                 var rm = __rest(_a, []);
-                                return (Object.assign(Object.assign({ system }, rm), { riskId: createGenerateSourceDto.riskId }));
-                            })
-                            : [],
-                        skipDuplicates: true,
-                    },
-                } }),
+                                return (Object.assign(Object.assign({ system }, rm), { riskId: createGenerateSourceDto.riskId, companyId: createGenerateSourceDto.companyId }));
+                            }),
+                            skipDuplicates: true,
+                        },
+                    }
+                    : undefined }),
             include: { recMeds: true },
         });
         return new generateSource_entity_1.GenerateSourceEntity(redMed);
@@ -60,9 +60,9 @@ let GenerateSourceRepository = class GenerateSourceRepository {
                             .map((_a) => {
                             var { id } = _a, rm = __rest(_a, ["id"]);
                             return {
-                                create: Object.assign(Object.assign({ system }, rm), { riskId }),
+                                create: Object.assign(Object.assign({ system, companyId }, rm), { riskId }),
                                 update: Object.assign(Object.assign({ system }, rm), { riskId }),
-                                where: { id_companyId: { companyId, id: id || 'no-id' } },
+                                where: { id: id || 'no-id' },
                             };
                         }),
                 } }),

@@ -26,14 +26,24 @@ export class RiskRepository implements IRiskRepository {
         system,
         recMed: {
           createMany: {
-            data: recMed ? recMed.map(({ ...rm }) => ({ system, ...rm })) : [],
+            data: recMed
+              ? recMed.map(({ ...rm }) => ({
+                  system,
+                  companyId: createRiskDto.companyId,
+                  ...rm,
+                }))
+              : [],
             skipDuplicates: true,
           },
         },
         generateSource: {
           createMany: {
             data: generateSource
-              ? generateSource.map(({ ...gs }) => ({ system, ...gs }))
+              ? generateSource.map(({ ...gs }) => ({
+                  system,
+                  companyId: createRiskDto.companyId,
+                  ...gs,
+                }))
               : [],
             skipDuplicates: true,
           },
@@ -57,9 +67,9 @@ export class RiskRepository implements IRiskRepository {
             ? []
             : recMed.map(({ id, ...rm }) => {
                 return {
-                  create: { system, ...rm },
+                  create: { system, companyId, ...rm },
                   update: { system, ...rm },
-                  where: { id_companyId: { companyId, id: id || 'no-id' } },
+                  where: { id: id || 'no-id' },
                 };
               }),
         },
@@ -68,9 +78,9 @@ export class RiskRepository implements IRiskRepository {
             ? []
             : generateSource.map(({ id, ...gs }) => {
                 return {
-                  create: { system, ...gs },
+                  create: { system, companyId, ...gs },
                   update: { system, ...gs },
-                  where: { id_companyId: { companyId, id: id || 'no-id' } },
+                  where: { id: id || 'no-id' },
                 };
               }),
         },
@@ -128,22 +138,22 @@ export class RiskRepository implements IRiskRepository {
         recMed: {
           upsert: !recMed
             ? []
-            : recMed.map(({ companyId: _, id, ...rm }) => {
+            : recMed.map(({ id, ...rm }) => {
                 return {
                   create: { system, ...rm },
                   update: { system, ...rm },
-                  where: { id_companyId: { companyId, id: id || 'no-id' } },
+                  where: { id: id || 'no-id' },
                 };
               }),
         },
         generateSource: {
           upsert: !generateSource
             ? []
-            : generateSource.map(({ companyId: _, id, ...gs }) => {
+            : generateSource.map(({ id, companyId, recMeds: _, ...gs }) => {
                 return {
-                  create: { system, ...gs },
+                  create: { system, companyId, ...gs },
                   update: { system, ...gs },
-                  where: { id_companyId: { companyId, id: id || 'no-id' } },
+                  where: { id: id || 'no-id' },
                 };
               }),
         },
@@ -197,26 +207,22 @@ export class RiskRepository implements IRiskRepository {
               recMed: {
                 upsert: !recMed
                   ? []
-                  : recMed.map(({ companyId: _, id, ...rm }) => {
+                  : recMed.map(({ id, ...rm }) => {
                       return {
                         create: { system, ...rm },
                         update: { system, ...rm },
-                        where: {
-                          id_companyId: { companyId, id: id || 'no-id' },
-                        },
+                        where: { id: id || 'no-id' },
                       };
                     }),
               },
               generateSource: {
                 upsert: !generateSource
                   ? []
-                  : generateSource.map(({ companyId: _, id, ...gs }) => {
+                  : generateSource.map(({ id, recMeds: _, ...gs }) => {
                       return {
                         create: { system, ...gs },
                         update: { system, ...gs },
-                        where: {
-                          id_companyId: { companyId, id: id || 'no-id' },
-                        },
+                        where: { id: id || 'no-id' },
                       };
                     }),
               },

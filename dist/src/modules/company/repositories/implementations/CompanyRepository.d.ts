@@ -19,12 +19,12 @@ export declare class CompanyRepository implements ICompanyRepository {
         license?: boolean;
         users?: boolean;
     }>, prismaRef?: boolean): Promise<CompanyEntity | (import(".prisma/client").Company & {
-        users: import(".prisma/client").UserCompany[];
+        license: import(".prisma/client").License;
+        employees: import(".prisma/client").Employee[];
         workspace: import(".prisma/client").Workspace[];
+        users: import(".prisma/client").UserCompany[];
         primary_activity: import(".prisma/client").Activity[];
         secondary_activity: import(".prisma/client").Activity[];
-        employees: import(".prisma/client").Employee[];
-        license: import(".prisma/client").License;
     })>;
     upsertMany(updateCompanyDto: UpdateCompanyDto[], options?: IPrismaOptions<{
         primary_activity?: boolean;

@@ -24,18 +24,19 @@ export class GenerateSourceRepository implements IGenerateSourceRepository {
       data: {
         ...createGenerateSourceDto,
         system,
-        recMeds: {
-          createMany: {
-            data: hasRecMed
-              ? recMeds.map(({ ...rm }) => ({
+        recMeds: hasRecMed
+          ? {
+              createMany: {
+                data: recMeds.map(({ ...rm }) => ({
                   system,
                   ...rm,
                   riskId: createGenerateSourceDto.riskId,
-                }))
-              : [],
-            skipDuplicates: true,
-          },
-        },
+                  companyId: createGenerateSourceDto.companyId,
+                })),
+                skipDuplicates: true,
+              },
+            }
+          : undefined,
       },
       include: { recMeds: true },
     });
@@ -63,9 +64,9 @@ export class GenerateSourceRepository implements IGenerateSourceRepository {
                 .filter(({ recName, medName }) => recName || medName)
                 .map(({ id, ...rm }) => {
                   return {
-                    create: { system, ...rm, riskId },
+                    create: { system, companyId, ...rm, riskId },
                     update: { system, ...rm, riskId },
-                    where: { id_companyId: { companyId, id: id || 'no-id' } },
+                    where: { id: id || 'no-id' },
                   };
                 }),
         },
