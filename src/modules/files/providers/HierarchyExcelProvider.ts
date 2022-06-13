@@ -74,34 +74,32 @@ export class HierarchyExcelProvider {
 
       orderedHierarchy = orderedHierarchy.filter((i) => i);
 
-      orderedHierarchy
-        .filter((i) => i)
-        .forEach((employeeWork, index) => {
-          if (employeeWork) {
-            const id = employeeWork.id;
+      orderedHierarchy.forEach((employeeWork, index) => {
+        if (employeeWork) {
+          const id = employeeWork.id;
 
-            if (!hierarchyMap[id]) hierarchyMap[id] = {};
+          if (!hierarchyMap[id]) hierarchyMap[id] = {};
 
-            hierarchyMap[id].id = id;
-            hierarchyMap[id].workspaceIds = hierarchy.workspaceIds;
-            hierarchyMap[id].description = hierarchy.description;
-            hierarchyMap[id].realDescription = hierarchy.realDescription;
-            hierarchyMap[id].ghoName = hierarchy.ghoName;
-            hierarchyMap[id].name = employeeWork.value;
-            hierarchyMap[id].type =
-              employeeWork.key.toUpperCase() as HierarchyEnum;
-            hierarchyMap[id].parentId =
-              index === 0 ? null : orderedHierarchy[index - 1].id;
+          hierarchyMap[id].id = id;
+          hierarchyMap[id].workspaceIds = hierarchy.workspaceIds;
+          hierarchyMap[id].description = hierarchy.description;
+          hierarchyMap[id].realDescription = hierarchy.realDescription;
+          hierarchyMap[id].ghoName = hierarchy.ghoName;
+          hierarchyMap[id].name = employeeWork.value;
+          hierarchyMap[id].type =
+            employeeWork.key.toUpperCase() as HierarchyEnum;
+          hierarchyMap[id].parentId =
+            index === 0 ? null : orderedHierarchy[index - 1].id;
 
-            if (orderedHierarchy[index - 1] && index !== 0) {
-              const _id = orderedHierarchy[index - 1].id;
-              if (!hierarchyMap[_id].children) {
-                hierarchyMap[_id].children = [];
-              }
-              hierarchyMap[_id].children.push(id);
+          if (orderedHierarchy[index - 1] && index !== 0) {
+            const _id = orderedHierarchy[index - 1].id;
+            if (!hierarchyMap[_id].children) {
+              hierarchyMap[_id].children = [];
             }
+            hierarchyMap[_id].children.push(id);
           }
-        });
+        }
+      });
     });
 
     return hierarchyMap;

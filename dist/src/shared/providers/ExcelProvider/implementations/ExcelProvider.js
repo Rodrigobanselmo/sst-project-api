@@ -56,6 +56,9 @@ const addHeader = async (worksheet, columns, prisma, companyId) => {
             if (Array.isArray(column.notes)) {
                 notes[column.excelName] = column.notes;
             }
+            else if (typeof column.notes === 'string') {
+                notes[column.excelName] = column.notes;
+            }
             else {
                 const notesCell = await column.notes(prisma, companyId);
                 notes[column.excelName] = notesCell;
@@ -69,29 +72,40 @@ const addHeader = async (worksheet, columns, prisma, companyId) => {
         if (isArray)
             cell.border = sheet_styles_constant_1.sheetStylesConstant.border.addMore;
         if (notes[excelName]) {
-            cell.note = {
-                editAs: 'oneCells',
-                texts: [
-                    {
+            const notesTexts = [];
+            if (Array.isArray(notes[excelName])) {
+                notesTexts.push({
+                    font: {
+                        size: 12,
+                        bold: true,
+                        color: { theme: 1 },
+                        name: 'Calibri',
+                    },
+                    text: 'Opções de valores: \n',
+                }, ...notes[excelName].map((note) => {
+                    return {
                         font: {
                             size: 12,
-                            bold: true,
                             color: { theme: 1 },
                             name: 'Calibri',
                         },
-                        text: 'Opções de valores: \n',
+                        text: note + '\n',
+                    };
+                }));
+            }
+            if (typeof notes[excelName] === 'string') {
+                notesTexts.push({
+                    font: {
+                        size: 12,
+                        color: { theme: 1 },
+                        name: 'Calibri',
                     },
-                    ...notes[excelName].map((note) => {
-                        return {
-                            font: {
-                                size: 12,
-                                color: { theme: 1 },
-                                name: 'Calibri',
-                            },
-                            text: note + '\n',
-                        };
-                    }),
-                ],
+                    text: notes[excelName] + '\n',
+                });
+            }
+            cell.note = {
+                editAs: 'oneCells',
+                texts: notesTexts,
             };
         }
         if (isRequired)

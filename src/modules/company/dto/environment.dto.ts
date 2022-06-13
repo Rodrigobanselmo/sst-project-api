@@ -1,9 +1,9 @@
 import { CompanyEnvironmentTypesEnum } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import { IsEnum, IsOptional, IsString, MaxLength } from 'class-validator';
-import { StringCapitalizeTransform } from 'src/shared/transformers/string-capitalize';
-import { StringCapitalizeParagraphTransform } from 'src/shared/transformers/string-capitalize-paragraph';
-import { KeysOfEnum } from 'src/shared/utils/keysOfEnum.utils';
+import { StringCapitalizeTransform } from '../../../shared/transformers/string-capitalize';
+import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
+import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
 
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 

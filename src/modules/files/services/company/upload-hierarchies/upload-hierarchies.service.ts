@@ -45,7 +45,6 @@ export class UploadHierarchiesService {
 
     const Workbook = workbooksConstant[WorkbooksEnum.HIERARCHIES];
 
-    const system = userPayloadDto.isMaster;
     const companyId = userPayloadDto.targetCompanyId;
 
     // get risk table with actual version

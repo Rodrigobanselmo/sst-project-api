@@ -3,7 +3,7 @@ import { RecMedRepository } from '../../../repositories/implementations/RecMedRe
 
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { isMaster } from '../../../../../shared/utils/isMater';
-import { RecMedEntity } from 'src/modules/checklist/entities/recMed.entity';
+import { RecMedEntity } from '../../../../../modules/checklist/entities/recMed.entity';
 
 @Injectable()
 export class DeleteSoftRecMedService {

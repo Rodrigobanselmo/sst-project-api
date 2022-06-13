@@ -1,14 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { Document, Packer } from 'docx';
+import { Readable } from 'stream';
+
 import { RiskDocumentRepository } from '../../../../modules/checklist/repositories/implementations/RiskDocumentRepository';
 import { RiskGroupDataRepository } from '../../../../modules/checklist/repositories/implementations/RiskGroupDataRepository';
 import { CompanyEntity } from '../../../../modules/company/entities/company.entity';
 import { HierarchyRepository } from '../../../../modules/company/repositories/implementations/HierarchyRepository';
-import { AmazonStorageProvider } from '../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
-import { Readable } from 'stream';
-import fs from 'fs';
-
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
+import { AmazonStorageProvider } from '../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
 import { UpsertPgrDto } from '../../dto/pgr.dto';
 import { actionPlanTableSection } from '../../utils/sections/tables/actionPlan/actionPlan.section';
 import { riskInventoryTableSection } from '../../utils/sections/tables/riskInventory/riskInventory.section';
@@ -24,13 +23,12 @@ export class PgrUploadService {
   async execute(upsertPgrDto: UpsertPgrDto, userPayloadDto: UserPayloadDto) {
     const companyId = userPayloadDto.targetCompanyId;
     const workspaceId = upsertPgrDto.workspaceId;
-    console.log('companyId', 1);
+
     const riskGroupData = await this.riskGroupDataRepository.findAllDataById(
       upsertPgrDto.riskGroupId,
       companyId,
     );
 
-    console.log('companyId', 2);
     const hierarchyData =
       await this.hierarchyRepository.findAllDataHierarchyByCompany(
         companyId,
@@ -43,11 +41,6 @@ export class PgrUploadService {
         ...riskInventoryTableSection(riskGroupData, hierarchyData),
       ],
     });
-    console.log('companyId', 3);
-
-    // Packer.toBuffer(doc).then((buffer) => {
-    //   fs.writeFileSync('My Document.docx', buffer);
-    // });
 
     const b64string = await Packer.toBase64String(doc);
     const buffer = Buffer.from(b64string, 'base64');

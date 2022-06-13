@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
-import { pngFileFilter } from 'src/shared/utils/filters/png.filters';
+import { pngFileFilter } from '../../../../shared/utils/filters/png.filters';
 
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';

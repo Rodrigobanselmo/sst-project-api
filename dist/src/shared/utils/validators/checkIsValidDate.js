@@ -1,7 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkIsValidDate = void 0;
+const ExcelDate_1 = require("../ExcelDate");
 const checkIsValidDate = (value) => {
+    console.log(value);
+    console.log((0, ExcelDate_1.ExcelDateToJSDate)(value));
     const transformToString = String(value);
     if (!transformToString) {
         return false;

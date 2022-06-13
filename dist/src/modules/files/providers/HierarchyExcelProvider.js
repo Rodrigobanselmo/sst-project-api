@@ -43,9 +43,7 @@ let HierarchyExcelProvider = class HierarchyExcelProvider {
                     orderedHierarchy[5] = { key, value: value, id: (0, uuid_1.v4)() };
             });
             orderedHierarchy = orderedHierarchy.filter((i) => i);
-            orderedHierarchy
-                .filter((i) => i)
-                .forEach((employeeWork, index) => {
+            orderedHierarchy.forEach((employeeWork, index) => {
                 if (employeeWork) {
                     const id = employeeWork.id;
                     if (!hierarchyMap[id])

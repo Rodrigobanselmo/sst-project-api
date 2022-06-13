@@ -228,11 +228,14 @@ model Employee {
   cpf String 
   companyId String
   hierarchyId String
+  birthday DateTime?
+  admissionDate DateTime?
   workspaces Workspace[]
   hierarchy Hierarchy @relation(fields: [hierarchyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   
   @@unique([id, companyId])
+  @@unique([cpf, companyId])
 } 
 
 model Epi {

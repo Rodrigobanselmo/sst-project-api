@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { GenerateSourceEntity } from 'src/modules/checklist/entities/generateSource.entity';
+import { GenerateSourceEntity } from '../../../../../modules/checklist/entities/generateSource.entity';
 
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { isMaster } from '../../../../../shared/utils/isMater';

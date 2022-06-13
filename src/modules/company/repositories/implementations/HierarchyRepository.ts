@@ -38,12 +38,12 @@ export class HierarchyRepository {
         : await this.prisma.$transaction(
             upsertHierarchyMany
               .filter(({ ghoName }) => ghoName)
-              .map(({ ghoName, description }) => {
+              .map(({ ghoName }) => {
                 return this.prisma.homogeneousGroup.upsert({
                   create: {
                     company: { connect: { id: companyId } },
                     name: ghoName,
-                    description: description || '',
+                    description: '',
                   },
                   update: {
                     name: ghoName,

@@ -59,12 +59,20 @@ let UploadEmployeesService = class UploadEmployeesService {
             read,
             DatabaseTable,
         });
+        return;
         const workspaces = await this.workspaceRepository.findByCompany(companyId);
+        const ghoNameDescriptionMap = {};
         employeesData = employeesData.map((employee) => {
             const workspace = workspaces.filter((work) => employee.abbreviation &&
                 employee.abbreviation.includes(work.abbreviation));
             if (!workspace)
                 throw new common_1.BadRequestException(errorMessage_1.ErrorCompanyEnum.WORKSPACE_NOT_FOUND);
+            if (employee.ghoName) {
+                ghoNameDescriptionMap[employee.ghoName] =
+                    ghoNameDescriptionMap[employee.ghoName] ||
+                        employee.ghoDescription ||
+                        '';
+            }
             delete employee.abbreviation;
             return Object.assign(Object.assign({}, employee), { workspaceIds: workspace.map((work) => work.id) });
         });
@@ -76,15 +84,15 @@ let UploadEmployeesService = class UploadEmployeesService {
         const hierarchyArray = Object.values(hierarchyTree)
             .filter((hierarchy) => !hierarchy.refId)
             .map((_a) => {
-            var { connectedToOldId, children, fromOld } = _a, hierarchy = __rest(_a, ["connectedToOldId", "children", "fromOld"]);
-            return (Object.assign({}, hierarchy));
+            var { connectedToOldId, children, fromOld, type } = _a, hierarchy = __rest(_a, ["connectedToOldId", "children", "fromOld", "type"]);
+            return (Object.assign(Object.assign({}, hierarchy), { type: type, ghoName: type == client_1.HierarchyEnum.OFFICE ? hierarchy.ghoName : '' }));
         });
         const upsertHierarchy = async (type) => {
-            await this.hierarchyRepository.upsertMany(hierarchyArray.filter((hy) => hy.type === type), companyId);
+            await this.hierarchyRepository.upsertMany(hierarchyArray.filter((hy) => hy.type === type), companyId, ghoNameDescriptionMap);
         };
         await (0, asyncEach_1.asyncEach)(Object.keys(client_1.HierarchyEnum), upsertHierarchy);
         const employees = employeesData.map((employee) => {
-            const newEmployee = Object.assign(Object.assign({}, employee), { cpf: '908' });
+            const newEmployee = Object.assign({}, employee);
             let hierarchy = null;
             const getByNameHierarchy = () => {
                 Object.keys(client_1.HierarchyEnum).forEach((key) => {

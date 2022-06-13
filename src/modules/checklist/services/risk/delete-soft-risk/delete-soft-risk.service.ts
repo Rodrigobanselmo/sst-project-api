@@ -3,7 +3,7 @@ import { RiskRepository } from '../../../repositories/implementations/RiskReposi
 
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { isMaster } from '../../../../../shared/utils/isMater';
-import { RiskFactorsEntity } from 'src/modules/checklist/entities/risk.entity';
+import { RiskFactorsEntity } from '../../../../../modules/checklist/entities/risk.entity';
 
 @Injectable()
 export class DeleteSoftRiskService {

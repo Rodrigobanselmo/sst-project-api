@@ -1,5 +1,9 @@
+import { ExcelDateToJSDate } from '../ExcelDate';
+
 /* eslint-disable @typescript-eslint/no-unused-vars */
 export const checkIsValidDate = (value: any) => {
+  console.log(value);
+  console.log(ExcelDateToJSDate(value));
   const transformToString = String(value);
 
   if (!transformToString) {

@@ -77,6 +77,8 @@ const addHeader = async (
       if (column.notes) {
         if (Array.isArray(column.notes)) {
           notes[column.excelName] = column.notes;
+        } else if (typeof column.notes === 'string') {
+          notes[column.excelName] = column.notes;
         } else {
           const notesCell = await column.notes(prisma, companyId);
           notes[column.excelName] = notesCell;
@@ -93,9 +95,10 @@ const addHeader = async (
     if (isArray) cell.border = sheetStylesConstant.border.addMore;
 
     if (notes[excelName]) {
-      cell.note = {
-        editAs: 'oneCells',
-        texts: [
+      const notesTexts = [] as ExcelJS.RichText[];
+
+      if (Array.isArray(notes[excelName])) {
+        notesTexts.push(
           {
             font: {
               size: 12,
@@ -115,7 +118,23 @@ const addHeader = async (
               text: note + '\n',
             } as ExcelJS.RichText;
           }),
-        ],
+        );
+      }
+
+      if (typeof notes[excelName] === 'string') {
+        notesTexts.push({
+          font: {
+            size: 12,
+            color: { theme: 1 },
+            name: 'Calibri',
+          },
+          text: notes[excelName] + '\n',
+        } as ExcelJS.RichText);
+      }
+
+      cell.note = {
+        editAs: 'oneCells',
+        texts: notesTexts,
       };
     }
 

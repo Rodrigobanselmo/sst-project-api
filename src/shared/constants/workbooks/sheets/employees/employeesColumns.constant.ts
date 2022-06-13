@@ -1,4 +1,5 @@
 import { StatusEnum } from '@prisma/client';
+import { checkIsValidDate } from '../../../../../shared/utils/validators/checkIsValidDate';
 
 import { excelWorkspaceNotes } from '../../../../../modules/files/utils/notes/excel-workspace-notes';
 import { ITableSchema } from '../../../../providers/ExcelProvider/models/IExcelProvider.types';
@@ -11,6 +12,13 @@ import { checkIsString } from '../../../../utils/validators/checkIsString';
 
 export const employeesColumnsConstant = [
   {
+    databaseName: 'cpf',
+    excelName: 'CPF do empregado',
+    isArray: false,
+    required: true,
+    checkHandler: checkIsString,
+  },
+  {
     databaseName: 'name',
     excelName: 'Nome do empregado',
     isArray: false,
@@ -18,11 +26,18 @@ export const employeesColumnsConstant = [
     checkHandler: checkIsString,
   },
   {
-    databaseName: 'cpf',
-    excelName: 'CPF do empregado',
+    databaseName: 'birthday',
+    excelName: 'Nascimento',
     isArray: false,
     required: false,
-    checkHandler: checkIsString,
+    checkHandler: checkIsValidDate,
+  },
+  {
+    databaseName: 'admissionDate',
+    excelName: 'Admissão',
+    isArray: false,
+    required: false,
+    checkHandler: checkIsValidDate,
   },
   {
     databaseName: 'abbreviation',
@@ -70,6 +85,35 @@ export const employeesColumnsConstant = [
   {
     databaseName: 'sub_office',
     excelName: 'Cargo desenvolvido',
+    isArray: false,
+    required: false,
+    checkHandler: checkIsString,
+  },
+  {
+    databaseName: 'description',
+    excelName: 'Descrição do cargo',
+    isArray: false,
+    required: false,
+    checkHandler: checkIsString,
+  },
+  {
+    databaseName: 'realDescription',
+    excelName: 'Descrição real do cargo (entrevista com trabalhador)',
+    isArray: false,
+    required: false,
+    checkHandler: checkIsString,
+  },
+  {
+    databaseName: 'ghoName',
+    excelName: 'GSE',
+    isArray: false,
+    required: false,
+    notes: 'Nome do grupo similar de exposição referente ao cargo',
+    checkHandler: checkIsString,
+  },
+  {
+    databaseName: 'ghoDescription',
+    excelName: 'Descrição do GSE',
     isArray: false,
     required: false,
     checkHandler: checkIsString,

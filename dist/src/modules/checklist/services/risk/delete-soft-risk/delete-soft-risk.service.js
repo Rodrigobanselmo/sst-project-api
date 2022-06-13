@@ -13,7 +13,6 @@ exports.DeleteSoftRiskService = void 0;
 const common_1 = require("@nestjs/common");
 const RiskRepository_1 = require("../../../repositories/implementations/RiskRepository");
 const isMater_1 = require("../../../../../shared/utils/isMater");
-const risk_entity_1 = require("../../../entities/risk.entity");
 let DeleteSoftRiskService = class DeleteSoftRiskService {
     constructor(riskRepository) {
         this.riskRepository = riskRepository;

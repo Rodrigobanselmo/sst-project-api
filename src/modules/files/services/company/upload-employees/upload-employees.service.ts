@@ -56,7 +56,10 @@ export class UploadEmployeesService {
       DatabaseTable,
     });
 
+    return;
+
     const workspaces = await this.workspaceRepository.findByCompany(companyId);
+    const ghoNameDescriptionMap = {} as Record<string, string>;
 
     employeesData = employeesData.map((employee) => {
       const workspace = workspaces.filter(
@@ -67,6 +70,13 @@ export class UploadEmployeesService {
 
       if (!workspace)
         throw new BadRequestException(ErrorCompanyEnum.WORKSPACE_NOT_FOUND);
+
+      if (employee.ghoName) {
+        ghoNameDescriptionMap[employee.ghoName] =
+          ghoNameDescriptionMap[employee.ghoName] ||
+          employee.ghoDescription ||
+          '';
+      }
 
       delete employee.abbreviation;
       return { ...employee, workspaceIds: workspace.map((work) => work.id) };
@@ -90,8 +100,10 @@ export class UploadEmployeesService {
       .filter((hierarchy) => !hierarchy.refId)
       .map(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        ({ connectedToOldId, children, fromOld, ...hierarchy }) => ({
+        ({ connectedToOldId, children, fromOld, type, ...hierarchy }) => ({
           ...hierarchy,
+          type: type as HierarchyEnum,
+          ghoName: type == HierarchyEnum.OFFICE ? hierarchy.ghoName : '',
         }),
       );
 
@@ -99,13 +111,14 @@ export class UploadEmployeesService {
       await this.hierarchyRepository.upsertMany(
         hierarchyArray.filter((hy) => hy.type === type),
         companyId,
+        ghoNameDescriptionMap,
       );
     };
 
     await asyncEach(Object.keys(HierarchyEnum), upsertHierarchy);
 
     const employees = employeesData.map((employee) => {
-      const newEmployee = { ...employee, cpf: '908' };
+      const newEmployee = { ...employee };
       let hierarchy = null as any;
 
       const getByNameHierarchy = () => {

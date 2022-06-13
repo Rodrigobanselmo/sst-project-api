@@ -11,7 +11,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DeleteSoftGenerateSourceService = void 0;
 const common_1 = require("@nestjs/common");
-const generateSource_entity_1 = require("../../../entities/generateSource.entity");
 const isMater_1 = require("../../../../../shared/utils/isMater");
 const GenerateSourceRepository_1 = require("../../../repositories/implementations/GenerateSourceRepository");
 let DeleteSoftGenerateSourceService = class DeleteSoftGenerateSourceService {

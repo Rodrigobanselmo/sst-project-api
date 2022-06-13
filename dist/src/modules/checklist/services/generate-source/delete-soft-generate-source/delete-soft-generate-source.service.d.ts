@@ -1,4 +1,4 @@
-import { GenerateSourceEntity } from 'src/modules/checklist/entities/generateSource.entity';
+import { GenerateSourceEntity } from '../../../../../modules/checklist/entities/generateSource.entity';
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { GenerateSourceRepository } from '../../../repositories/implementations/GenerateSourceRepository';
 export declare class DeleteSoftGenerateSourceService {

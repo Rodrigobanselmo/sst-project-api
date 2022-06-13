@@ -49,7 +49,6 @@ let UploadHierarchiesService = class UploadHierarchiesService {
         const buffer = file.buffer;
         const hierarchyExcel = new HierarchyExcelProvider_1.HierarchyExcelProvider();
         const Workbook = workbooks_constant_1.workbooksConstant[workbooks_enum_1.WorkbooksEnum.HIERARCHIES];
-        const system = userPayloadDto.isMaster;
         const companyId = userPayloadDto.targetCompanyId;
         const DatabaseTable = await this.databaseTableRepository.findByNameAndCompany(Workbook.name, companyId);
         let hierarchiesExcelData = await this.uploadExcelProvider.getAllData({
