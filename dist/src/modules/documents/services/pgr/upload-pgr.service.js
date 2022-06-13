@@ -46,11 +46,6 @@ let PgrUploadService = class PgrUploadService {
         console.log('companyId', 3);
         const buffer = await docx_1.Packer.toBuffer(doc);
         fs_1.default.writeFileSync('My Document.docx', buffer);
-        console.log('companyId', 4);
-        const docName = upsertPgrDto.name.replace(/\s+/g, '');
-        const fileName = `${docName.length > 0 ? docName + '-' : ''}${riskGroupData.company.name.replace(/\s+/g, '')}-v${upsertPgrDto.version}.docx`;
-        await this.upload(buffer, fileName, upsertPgrDto, riskGroupData.company);
-        return { buffer, fileName };
     }
     async upload(fileBuffer, fileName, upsertPgrDto, company) {
         const stream = stream_1.Readable.from(fileBuffer);

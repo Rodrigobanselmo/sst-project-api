@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import { RiskDocumentRepository } from '../../../../modules/checklist/repositories/implementations/RiskDocumentRepository';
 import { RiskGroupDataRepository } from '../../../../modules/checklist/repositories/implementations/RiskGroupDataRepository';
 import { HierarchyRepository } from '../../../../modules/company/repositories/implementations/HierarchyRepository';
@@ -11,9 +10,6 @@ export declare class PgrUploadService {
     private readonly amazonStorageProvider;
     private readonly hierarchyRepository;
     constructor(riskGroupDataRepository: RiskGroupDataRepository, riskDocumentRepository: RiskDocumentRepository, amazonStorageProvider: AmazonStorageProvider, hierarchyRepository: HierarchyRepository);
-    execute(upsertPgrDto: UpsertPgrDto, userPayloadDto: UserPayloadDto): Promise<{
-        buffer: Buffer;
-        fileName: string;
-    }>;
+    execute(upsertPgrDto: UpsertPgrDto, userPayloadDto: UserPayloadDto): Promise<void>;
     private upload;
 }

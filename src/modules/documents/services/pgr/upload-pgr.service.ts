@@ -53,18 +53,18 @@ export class PgrUploadService {
     // const buffer = Buffer.from(b64string, 'base64');
     const buffer = await Packer.toBuffer(doc);
     fs.writeFileSync('My Document.docx', buffer);
-    console.log('companyId', 4);
-    const docName = upsertPgrDto.name.replace(/\s+/g, '');
+    // console.log('companyId', 4);
+    // const docName = upsertPgrDto.name.replace(/\s+/g, '');
 
-    const fileName = `${
-      docName.length > 0 ? docName + '-' : ''
-    }${riskGroupData.company.name.replace(/\s+/g, '')}-v${
-      upsertPgrDto.version
-    }.docx`;
+    // const fileName = `${
+    //   docName.length > 0 ? docName + '-' : ''
+    // }${riskGroupData.company.name.replace(/\s+/g, '')}-v${
+    //   upsertPgrDto.version
+    // }.docx`;
 
-    await this.upload(buffer, fileName, upsertPgrDto, riskGroupData.company);
+    // await this.upload(buffer, fileName, upsertPgrDto, riskGroupData.company);
 
-    return { buffer, fileName };
+    // return { buffer, fileName };
   }
 
   private async upload(
