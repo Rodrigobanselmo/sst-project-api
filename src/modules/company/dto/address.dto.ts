@@ -5,7 +5,6 @@ import {
   IsUppercase,
   Length,
   Matches,
-  MaxLength,
 } from 'class-validator';
 
 import { CepFormatTransform } from '../../../shared/transformers/cep-format.transform';
@@ -18,6 +17,7 @@ export class AddressDto {
     message: 'The number address has an invalid format',
   })
   @Length(1, 12)
+  @IsOptional()
   @Transform(NumberFormat, { toClassOnly: true })
   number: string;
 
@@ -27,28 +27,25 @@ export class AddressDto {
 
   @Transform(StringCapitalizeTransform, { toClassOnly: true })
   @IsString()
-  @MaxLength(100)
   @IsOptional()
   street: string;
 
   @IsString()
   @IsOptional()
-  @MaxLength(50)
   complement: string;
 
   @Transform(StringCapitalizeTransform, { toClassOnly: true })
-  @MaxLength(50)
   @IsOptional()
   @IsString()
   neighborhood: string;
 
   @Transform(StringCapitalizeTransform, { toClassOnly: true })
+  @IsOptional()
   @IsString()
-  @MaxLength(30)
   city: string;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
-  @IsString()
+  @IsOptional()
   @Length(2, 2)
   @IsUppercase()
   state: string;
