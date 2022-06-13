@@ -49,8 +49,10 @@ export class PgrUploadService {
     //   fs.writeFileSync('My Document.docx', buffer);
     // });
 
-    const b64string = await Packer.toBase64String(doc);
-    const buffer = Buffer.from(b64string, 'base64');
+    // const b64string = await Packer.toBase64String(doc);
+    // const buffer = Buffer.from(b64string, 'base64');
+    const buffer = await Packer.toBuffer(doc);
+    console.log('companyId', 4);
     const docName = upsertPgrDto.name.replace(/\s+/g, '');
 
     const fileName = `${

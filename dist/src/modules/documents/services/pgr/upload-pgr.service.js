@@ -40,8 +40,8 @@ let PgrUploadService = class PgrUploadService {
             ],
         });
         console.log('companyId', 3);
-        const b64string = await docx_1.Packer.toBase64String(doc);
-        const buffer = Buffer.from(b64string, 'base64');
+        const buffer = await docx_1.Packer.toBuffer(doc);
+        console.log('companyId', 4);
         const docName = upsertPgrDto.name.replace(/\s+/g, '');
         const fileName = `${docName.length > 0 ? docName + '-' : ''}${riskGroupData.company.name.replace(/\s+/g, '')}-v${upsertPgrDto.version}.docx`;
         await this.upload(buffer, fileName, upsertPgrDto, riskGroupData.company);
