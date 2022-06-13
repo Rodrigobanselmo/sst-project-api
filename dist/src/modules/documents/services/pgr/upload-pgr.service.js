@@ -23,6 +23,7 @@ const stream_1 = require("stream");
 const fs_1 = __importDefault(require("fs"));
 const actionPlan_section_1 = require("../../utils/sections/tables/actionPlan/actionPlan.section");
 const riskInventory_section_1 = require("../../utils/sections/tables/riskInventory/riskInventory.section");
+const simulateAwait_1 = require("../../../../shared/utils/simulateAwait");
 let PgrUploadService = class PgrUploadService {
     constructor(riskGroupDataRepository, riskDocumentRepository, amazonStorageProvider, hierarchyRepository) {
         this.riskGroupDataRepository = riskGroupDataRepository;
@@ -46,6 +47,8 @@ let PgrUploadService = class PgrUploadService {
         console.log('companyId', 3);
         hierarchyData = undefined;
         riskGroupData = undefined;
+        (0, simulateAwait_1.simulateAwait)(3000);
+        console.log('companyId', 3.1);
         docx_1.Packer.toBuffer(doc).then((buffer) => {
             fs_1.default.writeFileSync('My Document.docx', buffer);
         });

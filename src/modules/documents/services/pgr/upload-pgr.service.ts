@@ -12,6 +12,7 @@ import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import { UpsertPgrDto } from '../../dto/pgr.dto';
 import { actionPlanTableSection } from '../../utils/sections/tables/actionPlan/actionPlan.section';
 import { riskInventoryTableSection } from '../../utils/sections/tables/riskInventory/riskInventory.section';
+import { simulateAwait } from 'src/shared/utils/simulateAwait';
 
 @Injectable()
 export class PgrUploadService {
@@ -46,6 +47,9 @@ export class PgrUploadService {
     console.log('companyId', 3);
     hierarchyData = undefined;
     riskGroupData = undefined;
+
+    simulateAwait(3000);
+    console.log('companyId', 3.1);
 
     Packer.toBuffer(doc).then((buffer) => {
       fs.writeFileSync('My Document.docx', buffer);
