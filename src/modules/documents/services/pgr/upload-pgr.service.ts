@@ -12,7 +12,6 @@ import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import { UpsertPgrDto } from '../../dto/pgr.dto';
 import { actionPlanTableSection } from '../../utils/sections/tables/actionPlan/actionPlan.section';
 import { riskInventoryTableSection } from '../../utils/sections/tables/riskInventory/riskInventory.section';
-import { simulateAwait } from 'src/shared/utils/simulateAwait';
 
 @Injectable()
 export class PgrUploadService {
@@ -26,13 +25,13 @@ export class PgrUploadService {
     const companyId = userPayloadDto.targetCompanyId;
     const workspaceId = upsertPgrDto.workspaceId;
     console.log('companyId', 1);
-    let riskGroupData = await this.riskGroupDataRepository.findAllDataById(
+    const riskGroupData = await this.riskGroupDataRepository.findAllDataById(
       upsertPgrDto.riskGroupId,
       companyId,
     );
 
     console.log('companyId', 2);
-    let hierarchyData =
+    const hierarchyData =
       await this.hierarchyRepository.findAllDataHierarchyByCompany(
         companyId,
         workspaceId,
@@ -45,32 +44,24 @@ export class PgrUploadService {
       ],
     });
     console.log('companyId', 3);
-    hierarchyData = undefined;
-    riskGroupData = undefined;
 
-    await simulateAwait(3000);
-    console.log('companyId', 3.1);
+    // Packer.toBuffer(doc).then((buffer) => {
+    //   fs.writeFileSync('My Document.docx', buffer);
+    // });
 
-    Packer.toBuffer(doc).then((buffer) => {
-      fs.writeFileSync('My Document.docx', buffer);
-    });
+    const b64string = await Packer.toBase64String(doc);
+    const buffer = Buffer.from(b64string, 'base64');
+    const docName = upsertPgrDto.name.replace(/\s+/g, '');
 
-    // const b64string = await Packer.toBase64String(doc);
-    // const buffer = Buffer.from(b64string, 'base64');
-    // const buffer = await Packer.toBuffer(doc);
-    // fs.writeFileSync('My Document.docx', buffer);
-    console.log('companyId', 4);
-    // const docName = upsertPgrDto.name.replace(/\s+/g, '');
+    const fileName = `${
+      docName.length > 0 ? docName + '-' : ''
+    }${riskGroupData.company.name.replace(/\s+/g, '')}-v${
+      upsertPgrDto.version
+    }.docx`;
 
-    // const fileName = `${
-    //   docName.length > 0 ? docName + '-' : ''
-    // }${riskGroupData.company.name.replace(/\s+/g, '')}-v${
-    //   upsertPgrDto.version
-    // }.docx`;
+    await this.upload(buffer, fileName, upsertPgrDto, riskGroupData.company);
 
-    // await this.upload(buffer, fileName, upsertPgrDto, riskGroupData.company);
-
-    // return { buffer, fileName };
+    return { buffer, fileName };
   }
 
   private async upload(

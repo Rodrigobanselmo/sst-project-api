@@ -8,9 +8,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PgrUploadService = void 0;
 const common_1 = require("@nestjs/common");
@@ -20,10 +17,8 @@ const RiskGroupDataRepository_1 = require("../../../../modules/checklist/reposit
 const HierarchyRepository_1 = require("../../../../modules/company/repositories/implementations/HierarchyRepository");
 const AmazonStorageProvider_1 = require("../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider");
 const stream_1 = require("stream");
-const fs_1 = __importDefault(require("fs"));
 const actionPlan_section_1 = require("../../utils/sections/tables/actionPlan/actionPlan.section");
 const riskInventory_section_1 = require("../../utils/sections/tables/riskInventory/riskInventory.section");
-const simulateAwait_1 = require("../../../../shared/utils/simulateAwait");
 let PgrUploadService = class PgrUploadService {
     constructor(riskGroupDataRepository, riskDocumentRepository, amazonStorageProvider, hierarchyRepository) {
         this.riskGroupDataRepository = riskGroupDataRepository;
@@ -35,9 +30,9 @@ let PgrUploadService = class PgrUploadService {
         const companyId = userPayloadDto.targetCompanyId;
         const workspaceId = upsertPgrDto.workspaceId;
         console.log('companyId', 1);
-        let riskGroupData = await this.riskGroupDataRepository.findAllDataById(upsertPgrDto.riskGroupId, companyId);
+        const riskGroupData = await this.riskGroupDataRepository.findAllDataById(upsertPgrDto.riskGroupId, companyId);
         console.log('companyId', 2);
-        let hierarchyData = await this.hierarchyRepository.findAllDataHierarchyByCompany(companyId, workspaceId);
+        const hierarchyData = await this.hierarchyRepository.findAllDataHierarchyByCompany(companyId, workspaceId);
         const doc = new docx_1.Document({
             sections: [
                 (0, actionPlan_section_1.actionPlanTableSection)(riskGroupData),
@@ -45,14 +40,12 @@ let PgrUploadService = class PgrUploadService {
             ],
         });
         console.log('companyId', 3);
-        hierarchyData = undefined;
-        riskGroupData = undefined;
-        await (0, simulateAwait_1.simulateAwait)(3000);
-        console.log('companyId', 3.1);
-        docx_1.Packer.toBuffer(doc).then((buffer) => {
-            fs_1.default.writeFileSync('My Document.docx', buffer);
-        });
-        console.log('companyId', 4);
+        const b64string = await docx_1.Packer.toBase64String(doc);
+        const buffer = Buffer.from(b64string, 'base64');
+        const docName = upsertPgrDto.name.replace(/\s+/g, '');
+        const fileName = `${docName.length > 0 ? docName + '-' : ''}${riskGroupData.company.name.replace(/\s+/g, '')}-v${upsertPgrDto.version}.docx`;
+        await this.upload(buffer, fileName, upsertPgrDto, riskGroupData.company);
+        return { buffer, fileName };
     }
     async upload(fileBuffer, fileName, upsertPgrDto, company) {
         const stream = stream_1.Readable.from(fileBuffer);
