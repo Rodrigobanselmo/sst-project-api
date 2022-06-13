@@ -48,7 +48,7 @@ export class PgrUploadService {
     hierarchyData = undefined;
     riskGroupData = undefined;
 
-    simulateAwait(3000);
+    await simulateAwait(3000);
     console.log('companyId', 3.1);
 
     Packer.toBuffer(doc).then((buffer) => {

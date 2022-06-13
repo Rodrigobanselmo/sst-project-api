@@ -47,7 +47,7 @@ let PgrUploadService = class PgrUploadService {
         console.log('companyId', 3);
         hierarchyData = undefined;
         riskGroupData = undefined;
-        (0, simulateAwait_1.simulateAwait)(3000);
+        await (0, simulateAwait_1.simulateAwait)(3000);
         console.log('companyId', 3.1);
         docx_1.Packer.toBuffer(doc).then((buffer) => {
             fs_1.default.writeFileSync('My Document.docx', buffer);
