@@ -14,18 +14,16 @@ const openapi = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class ActivityDto {
     static _OPENAPI_METADATA_FACTORY() {
-        return { name: { required: true, type: () => String, maxLength: 100 }, code: { required: true, type: () => String, maxLength: 10 } };
+        return { name: { required: true, type: () => String }, code: { required: true, type: () => String } };
     }
 }
 __decorate([
-    (0, class_validator_1.MaxLength)(100),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], ActivityDto.prototype, "name", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.MaxLength)(10),
     __metadata("design:type", String)
 ], ActivityDto.prototype, "code", void 0);
 exports.ActivityDto = ActivityDto;

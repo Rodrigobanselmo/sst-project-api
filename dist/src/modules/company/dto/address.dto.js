@@ -19,7 +19,7 @@ const string_capitalize_1 = require("../../../shared/transformers/string-capital
 const string_uppercase_transform_1 = require("../../../shared/transformers/string-uppercase.transform");
 class AddressDto {
     static _OPENAPI_METADATA_FACTORY() {
-        return { number: { required: true, type: () => String }, cep: { required: true, type: () => String }, street: { required: true, type: () => String, maxLength: 100 }, complement: { required: true, type: () => String, maxLength: 50 }, neighborhood: { required: true, type: () => String, maxLength: 50 }, city: { required: true, type: () => String, maxLength: 30 }, state: { required: true, type: () => String } };
+        return { number: { required: true, type: () => String }, cep: { required: true, type: () => String }, street: { required: true, type: () => String }, complement: { required: true, type: () => String }, neighborhood: { required: true, type: () => String }, city: { required: true, type: () => String }, state: { required: true, type: () => String } };
     }
 }
 __decorate([
@@ -27,6 +27,7 @@ __decorate([
         message: 'The number address has an invalid format',
     }),
     (0, class_validator_1.Length)(1, 12),
+    (0, class_validator_1.IsOptional)(),
     (0, class_transformer_1.Transform)(number_format_1.NumberFormat, { toClassOnly: true }),
     __metadata("design:type", String)
 ], AddressDto.prototype, "number", void 0);
@@ -38,32 +39,29 @@ __decorate([
 __decorate([
     (0, class_transformer_1.Transform)(string_capitalize_1.StringCapitalizeTransform, { toClassOnly: true }),
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.MaxLength)(100),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], AddressDto.prototype, "street", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.MaxLength)(50),
     __metadata("design:type", String)
 ], AddressDto.prototype, "complement", void 0);
 __decorate([
     (0, class_transformer_1.Transform)(string_capitalize_1.StringCapitalizeTransform, { toClassOnly: true }),
-    (0, class_validator_1.MaxLength)(50),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], AddressDto.prototype, "neighborhood", void 0);
 __decorate([
     (0, class_transformer_1.Transform)(string_capitalize_1.StringCapitalizeTransform, { toClassOnly: true }),
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.MaxLength)(30),
     __metadata("design:type", String)
 ], AddressDto.prototype, "city", void 0);
 __decorate([
     (0, class_transformer_1.Transform)(string_uppercase_transform_1.StringUppercaseTransform, { toClassOnly: true }),
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.Length)(2, 2),
     (0, class_validator_1.IsUppercase)(),
     __metadata("design:type", String)
