@@ -29,7 +29,9 @@ let PgrUploadService = class PgrUploadService {
     async execute(upsertPgrDto, userPayloadDto) {
         const companyId = userPayloadDto.targetCompanyId;
         const workspaceId = upsertPgrDto.workspaceId;
+        console.log('companyId', 1);
         const riskGroupData = await this.riskGroupDataRepository.findAllDataById(upsertPgrDto.riskGroupId, companyId);
+        console.log('companyId', 2);
         const hierarchyData = await this.hierarchyRepository.findAllDataHierarchyByCompany(companyId, workspaceId);
         const doc = new docx_1.Document({
             sections: [
@@ -37,12 +39,7 @@ let PgrUploadService = class PgrUploadService {
                 ...(0, riskInventory_section_1.riskInventoryTableSection)(riskGroupData, hierarchyData),
             ],
         });
-        const b64string = await docx_1.Packer.toBase64String(doc);
-        const buffer = Buffer.from(b64string, 'base64');
-        const docName = upsertPgrDto.name.replace(/\s+/g, '');
-        const fileName = `${docName.length > 0 ? docName + '-' : ''}${riskGroupData.company.name.replace(/\s+/g, '')}-v${upsertPgrDto.version}.docx`;
-        await this.upload(buffer, fileName, upsertPgrDto, riskGroupData.company);
-        return { buffer, fileName };
+        console.log('companyId', 3);
     }
     async upload(fileBuffer, fileName, upsertPgrDto, company) {
         const stream = stream_1.Readable.from(fileBuffer);

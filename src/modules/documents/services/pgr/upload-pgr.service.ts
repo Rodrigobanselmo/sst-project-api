@@ -6,6 +6,7 @@ import { CompanyEntity } from '../../../../modules/company/entities/company.enti
 import { HierarchyRepository } from '../../../../modules/company/repositories/implementations/HierarchyRepository';
 import { AmazonStorageProvider } from '../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
 import { Readable } from 'stream';
+import fs from 'fs';
 
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import { UpsertPgrDto } from '../../dto/pgr.dto';
@@ -23,12 +24,13 @@ export class PgrUploadService {
   async execute(upsertPgrDto: UpsertPgrDto, userPayloadDto: UserPayloadDto) {
     const companyId = userPayloadDto.targetCompanyId;
     const workspaceId = upsertPgrDto.workspaceId;
-
+    console.log('companyId', 1);
     const riskGroupData = await this.riskGroupDataRepository.findAllDataById(
       upsertPgrDto.riskGroupId,
       companyId,
     );
 
+    console.log('companyId', 2);
     const hierarchyData =
       await this.hierarchyRepository.findAllDataHierarchyByCompany(
         companyId,
@@ -41,20 +43,25 @@ export class PgrUploadService {
         ...riskInventoryTableSection(riskGroupData, hierarchyData),
       ],
     });
+    console.log('companyId', 3);
 
-    const b64string = await Packer.toBase64String(doc);
-    const buffer = Buffer.from(b64string, 'base64');
-    const docName = upsertPgrDto.name.replace(/\s+/g, '');
+    // Packer.toBuffer(doc).then((buffer) => {
+    //   fs.writeFileSync('My Document.docx', buffer);
+    // });
 
-    const fileName = `${
-      docName.length > 0 ? docName + '-' : ''
-    }${riskGroupData.company.name.replace(/\s+/g, '')}-v${
-      upsertPgrDto.version
-    }.docx`;
+    // const b64string = await Packer.toBase64String(doc);
+    // const buffer = Buffer.from(b64string, 'base64');
+    // const docName = upsertPgrDto.name.replace(/\s+/g, '');
 
-    await this.upload(buffer, fileName, upsertPgrDto, riskGroupData.company);
+    // const fileName = `${
+    //   docName.length > 0 ? docName + '-' : ''
+    // }${riskGroupData.company.name.replace(/\s+/g, '')}-v${
+    //   upsertPgrDto.version
+    // }.docx`;
 
-    return { buffer, fileName };
+    // await this.upload(buffer, fileName, upsertPgrDto, riskGroupData.company);
+
+    // return { buffer, fileName };
   }
 
   private async upload(
