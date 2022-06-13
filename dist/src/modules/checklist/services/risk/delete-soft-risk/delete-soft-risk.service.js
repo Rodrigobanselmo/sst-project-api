@@ -13,6 +13,7 @@ exports.DeleteSoftRiskService = void 0;
 const common_1 = require("@nestjs/common");
 const RiskRepository_1 = require("../../../repositories/implementations/RiskRepository");
 const isMater_1 = require("../../../../../shared/utils/isMater");
+const risk_entity_1 = require("../../../entities/risk.entity");
 let DeleteSoftRiskService = class DeleteSoftRiskService {
     constructor(riskRepository) {
         this.riskRepository = riskRepository;
@@ -20,10 +21,16 @@ let DeleteSoftRiskService = class DeleteSoftRiskService {
     async execute(id, userPayloadDto) {
         const user = (0, isMater_1.isMaster)(userPayloadDto);
         const companyId = user.companyId;
-        const recMed = await this.riskRepository.DeleteByIdSoft(id, companyId);
-        if (!recMed.id)
+        let risk;
+        if (user.isMaster) {
+            risk = await this.riskRepository.DeleteByIdSoft(id);
+        }
+        else {
+            risk = await this.riskRepository.DeleteByCompanyAndIdSoft(id, companyId);
+        }
+        if (!risk.id)
             throw new common_1.NotFoundException('data not found');
-        return recMed;
+        return risk;
     }
 };
 DeleteSoftRiskService = __decorate([

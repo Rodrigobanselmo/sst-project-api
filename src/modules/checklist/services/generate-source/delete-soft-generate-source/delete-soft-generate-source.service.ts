@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { GenerateSourceEntity } from 'src/modules/checklist/entities/generateSource.entity';
 
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { isMaster } from '../../../../../shared/utils/isMater';
@@ -14,10 +15,16 @@ export class DeleteSoftGenerateSourceService {
     const user = isMaster(userPayloadDto);
     const companyId = user.companyId;
 
-    const generateSource = await this.generateSourceRepository.DeleteByIdSoft(
-      id,
-      companyId,
-    );
+    let generateSource: GenerateSourceEntity;
+    if (user.isMaster) {
+      generateSource = await this.generateSourceRepository.DeleteByIdSoft(id);
+    } else {
+      generateSource =
+        await this.generateSourceRepository.DeleteByCompanyAndIdSoft(
+          id,
+          companyId,
+        );
+    }
 
     if (!generateSource.id) throw new NotFoundException('data not found');
 

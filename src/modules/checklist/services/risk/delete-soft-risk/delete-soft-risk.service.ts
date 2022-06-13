@@ -3,6 +3,7 @@ import { RiskRepository } from '../../../repositories/implementations/RiskReposi
 
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { isMaster } from '../../../../../shared/utils/isMater';
+import { RiskFactorsEntity } from 'src/modules/checklist/entities/risk.entity';
 
 @Injectable()
 export class DeleteSoftRiskService {
@@ -12,10 +13,15 @@ export class DeleteSoftRiskService {
     const user = isMaster(userPayloadDto);
     const companyId = user.companyId;
 
-    const recMed = await this.riskRepository.DeleteByIdSoft(id, companyId);
+    let risk: RiskFactorsEntity;
+    if (user.isMaster) {
+      risk = await this.riskRepository.DeleteByIdSoft(id);
+    } else {
+      risk = await this.riskRepository.DeleteByCompanyAndIdSoft(id, companyId);
+    }
 
-    if (!recMed.id) throw new NotFoundException('data not found');
+    if (!risk.id) throw new NotFoundException('data not found');
 
-    return recMed;
+    return risk;
   }
 }

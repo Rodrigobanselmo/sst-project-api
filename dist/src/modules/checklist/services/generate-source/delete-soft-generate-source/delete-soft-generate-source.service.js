@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DeleteSoftGenerateSourceService = void 0;
 const common_1 = require("@nestjs/common");
+const generateSource_entity_1 = require("../../../entities/generateSource.entity");
 const isMater_1 = require("../../../../../shared/utils/isMater");
 const GenerateSourceRepository_1 = require("../../../repositories/implementations/GenerateSourceRepository");
 let DeleteSoftGenerateSourceService = class DeleteSoftGenerateSourceService {
@@ -20,7 +21,14 @@ let DeleteSoftGenerateSourceService = class DeleteSoftGenerateSourceService {
     async execute(id, userPayloadDto) {
         const user = (0, isMater_1.isMaster)(userPayloadDto);
         const companyId = user.companyId;
-        const generateSource = await this.generateSourceRepository.DeleteByIdSoft(id, companyId);
+        let generateSource;
+        if (user.isMaster) {
+            generateSource = await this.generateSourceRepository.DeleteByIdSoft(id);
+        }
+        else {
+            generateSource =
+                await this.generateSourceRepository.DeleteByCompanyAndIdSoft(id, companyId);
+        }
         if (!generateSource.id)
             throw new common_1.NotFoundException('data not found');
         return generateSource;

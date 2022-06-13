@@ -11,5 +11,6 @@ export declare class GenerateSourceRepository implements IGenerateSourceReposito
         riskId?: string;
     }, system: boolean, companyId: string): Promise<GenerateSourceEntity>;
     findById(id: string, companyId: string): Promise<GenerateSourceEntity>;
-    DeleteByIdSoft(id: string, companyId: string): Promise<GenerateSourceEntity>;
+    DeleteByCompanyAndIdSoft(id: string, companyId: string): Promise<GenerateSourceEntity>;
+    DeleteByIdSoft(id: string): Promise<GenerateSourceEntity>;
 }

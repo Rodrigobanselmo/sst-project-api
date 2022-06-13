@@ -86,9 +86,16 @@ let GenerateSourceRepository = class GenerateSourceRepository {
         });
         return new generateSource_entity_1.GenerateSourceEntity(generate);
     }
-    async DeleteByIdSoft(id, companyId) {
+    async DeleteByCompanyAndIdSoft(id, companyId) {
         const generate = await this.prisma.generateSource.update({
             where: { id_companyId: { id, companyId } },
+            data: { deleted_at: new Date() },
+        });
+        return new generateSource_entity_1.GenerateSourceEntity(generate);
+    }
+    async DeleteByIdSoft(id) {
+        const generate = await this.prisma.generateSource.update({
+            where: { id },
             data: { deleted_at: new Date() },
         });
         return new generateSource_entity_1.GenerateSourceEntity(generate);

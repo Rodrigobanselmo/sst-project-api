@@ -42,9 +42,16 @@ let RecMedRepository = class RecMedRepository {
         });
         return new recMed_entity_1.RecMedEntity(recMed);
     }
-    async DeleteByIdSoft(id, companyId) {
+    async DeleteByCompanyAndIdSoft(id, companyId) {
         const recMed = await this.prisma.recMed.update({
             where: { id_companyId: { id, companyId } },
+            data: { deleted_at: new Date() },
+        });
+        return new recMed_entity_1.RecMedEntity(recMed);
+    }
+    async DeleteByIdSoft(id) {
+        const recMed = await this.prisma.recMed.update({
+            where: { id },
             data: { deleted_at: new Date() },
         });
         return new recMed_entity_1.RecMedEntity(recMed);

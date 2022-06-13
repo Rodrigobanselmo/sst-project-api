@@ -9,5 +9,6 @@ export declare class RecMedRepository implements IRecMedRepository {
     update({ id, ...createRecMedDto }: UpdateRecMedDto & {
         id: string;
     }, companyId: string): Promise<RecMedEntity>;
-    DeleteByIdSoft(id: string, companyId: string): Promise<RecMedEntity>;
+    DeleteByCompanyAndIdSoft(id: string, companyId: string): Promise<RecMedEntity>;
+    DeleteByIdSoft(id: string): Promise<RecMedEntity>;
 }

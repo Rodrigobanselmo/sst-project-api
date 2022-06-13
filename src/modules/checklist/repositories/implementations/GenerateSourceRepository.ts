@@ -101,12 +101,21 @@ export class GenerateSourceRepository implements IGenerateSourceRepository {
     return new GenerateSourceEntity(generate);
   }
 
-  async DeleteByIdSoft(
+  async DeleteByCompanyAndIdSoft(
     id: string,
     companyId: string,
   ): Promise<GenerateSourceEntity> {
     const generate = await this.prisma.generateSource.update({
       where: { id_companyId: { id, companyId } },
+      data: { deleted_at: new Date() },
+    });
+
+    return new GenerateSourceEntity(generate);
+  }
+
+  async DeleteByIdSoft(id: string): Promise<GenerateSourceEntity> {
+    const generate = await this.prisma.generateSource.update({
+      where: { id },
       data: { deleted_at: new Date() },
     });
 

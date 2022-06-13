@@ -230,7 +230,14 @@ let RiskRepository = class RiskRepository {
             } }, options));
         return risks.map((risk) => new risk_entity_1.RiskFactorsEntity(risk));
     }
-    async DeleteByIdSoft(id, companyId) {
+    async DeleteByIdSoft(id) {
+        const riskFactors = await this.prisma.riskFactors.update({
+            where: { id },
+            data: { deleted_at: new Date() },
+        });
+        return new risk_entity_1.RiskFactorsEntity(riskFactors);
+    }
+    async DeleteByCompanyAndIdSoft(id, companyId) {
         const riskFactors = await this.prisma.riskFactors.update({
             where: { id_companyId: { id, companyId } },
             data: { deleted_at: new Date() },

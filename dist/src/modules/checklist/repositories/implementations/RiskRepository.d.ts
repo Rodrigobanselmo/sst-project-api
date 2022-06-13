@@ -26,5 +26,6 @@ export declare class RiskRepository implements IRiskRepository {
         include?: Prisma.RiskFactorsInclude;
         representAll?: boolean;
     }): Promise<RiskFactorsEntity[]>;
-    DeleteByIdSoft(id: string, companyId: string): Promise<RiskFactorsEntity>;
+    DeleteByIdSoft(id: string): Promise<RiskFactorsEntity>;
+    DeleteByCompanyAndIdSoft(id: string, companyId: string): Promise<RiskFactorsEntity>;
 }

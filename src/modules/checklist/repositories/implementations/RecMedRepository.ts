@@ -37,9 +37,21 @@ export class RecMedRepository implements IRecMedRepository {
     return new RecMedEntity(recMed);
   }
 
-  async DeleteByIdSoft(id: string, companyId: string): Promise<RecMedEntity> {
+  async DeleteByCompanyAndIdSoft(
+    id: string,
+    companyId: string,
+  ): Promise<RecMedEntity> {
     const recMed = await this.prisma.recMed.update({
       where: { id_companyId: { id, companyId } },
+      data: { deleted_at: new Date() },
+    });
+
+    return new RecMedEntity(recMed);
+  }
+
+  async DeleteByIdSoft(id: string): Promise<RecMedEntity> {
+    const recMed = await this.prisma.recMed.update({
+      where: { id },
       data: { deleted_at: new Date() },
     });
 
