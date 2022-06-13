@@ -25,13 +25,13 @@ export class PgrUploadService {
     const companyId = userPayloadDto.targetCompanyId;
     const workspaceId = upsertPgrDto.workspaceId;
     console.log('companyId', 1);
-    const riskGroupData = await this.riskGroupDataRepository.findAllDataById(
+    let riskGroupData = await this.riskGroupDataRepository.findAllDataById(
       upsertPgrDto.riskGroupId,
       companyId,
     );
 
     console.log('companyId', 2);
-    const hierarchyData =
+    let hierarchyData =
       await this.hierarchyRepository.findAllDataHierarchyByCompany(
         companyId,
         workspaceId,
@@ -44,6 +44,8 @@ export class PgrUploadService {
       ],
     });
     console.log('companyId', 3);
+    hierarchyData = undefined;
+    riskGroupData = undefined;
 
     Packer.toBuffer(doc).then((buffer) => {
       fs.writeFileSync('My Document.docx', buffer);
