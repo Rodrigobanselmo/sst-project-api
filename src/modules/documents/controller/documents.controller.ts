@@ -34,9 +34,14 @@ export class DocumentsController {
     @User() userPayloadDto: UserPayloadDto,
     @Body() upsertPgrDto: UpsertPgrDto,
   ) {
-    await this.pgrUploadService.execute(upsertPgrDto, userPayloadDto);
-    res.send('ok');
-    // res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
-    // res.send(file);
+    // await this.pgrUploadService.execute(upsertPgrDto, userPayloadDto);
+    // res.send('ok');
+
+    const { buffer: file, fileName } = await this.pgrUploadService.execute(
+      upsertPgrDto,
+      userPayloadDto,
+    );
+    res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
+    res.send(file);
   }
 }
