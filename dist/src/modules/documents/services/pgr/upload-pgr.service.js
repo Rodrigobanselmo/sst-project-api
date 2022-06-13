@@ -44,8 +44,10 @@ let PgrUploadService = class PgrUploadService {
             ],
         });
         console.log('companyId', 3);
-        const buffer = await docx_1.Packer.toBuffer(doc);
-        fs_1.default.writeFileSync('My Document.docx', buffer);
+        docx_1.Packer.toBuffer(doc).then((buffer) => {
+            fs_1.default.writeFileSync('My Document.docx', buffer);
+        });
+        console.log('companyId', 4);
     }
     async upload(fileBuffer, fileName, upsertPgrDto, company) {
         const stream = stream_1.Readable.from(fileBuffer);
