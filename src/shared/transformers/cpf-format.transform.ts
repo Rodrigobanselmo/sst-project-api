@@ -1,4 +1,4 @@
-import { formatCPF, isValidCPF } from '@brazilian-utils/brazilian-utils';
+import { onlyNumbers, isValidCPF } from '@brazilian-utils/brazilian-utils';
 import { TransformFnParams } from 'class-transformer';
 
 export const CpfFormatTransform = (data: TransformFnParams) => {
@@ -8,7 +8,7 @@ export const CpfFormatTransform = (data: TransformFnParams) => {
 
   if (typeof cpf === 'string') {
     if (isValidCPF(cpf)) {
-      return formatCPF(cpf);
+      return onlyNumbers(cpf);
     }
   }
 

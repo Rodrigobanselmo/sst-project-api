@@ -1,9 +1,10 @@
 import { ExcelDateToJSDate } from '../ExcelDate';
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
 export const checkIsValidDate = (value: any) => {
-  console.log(value);
-  console.log(ExcelDateToJSDate(value));
+  if (typeof value === 'number') {
+    return ExcelDateToJSDate(value);
+  }
+
   const transformToString = String(value);
 
   if (!transformToString) {
@@ -12,7 +13,7 @@ export const checkIsValidDate = (value: any) => {
 
   const slice = transformToString.replace(/'/, '').split('/');
   if (slice.length == 3) {
-    const date = slice[0] + '/' + slice[1] + '/' + slice[2];
+    const date = slice[1] + '/' + slice[2] + '/' + slice[2];
     return new Date(date);
   }
 

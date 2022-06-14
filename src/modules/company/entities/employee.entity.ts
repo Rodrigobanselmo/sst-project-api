@@ -52,4 +52,6 @@ export class EmployeeEntity implements Employee {
   constructor(partial: Partial<EmployeeEntity>) {
     Object.assign(this, partial);
   }
+  birthdate: Date;
+  admissionDate: Date;
 }

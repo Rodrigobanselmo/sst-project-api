@@ -9,7 +9,7 @@ const checkIsValidCep = (value) => {
     }
     if (typeof transformToString === 'string') {
         if ((0, brazilian_utils_1.isValidCEP)(transformToString))
-            return (0, brazilian_utils_1.formatCEP)(transformToString);
+            return (0, brazilian_utils_1.onlyNumbers)(transformToString);
     }
     return false;
 };

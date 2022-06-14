@@ -1,7 +1,7 @@
-import { isValidCEP, onlyNumbers } from '@brazilian-utils/brazilian-utils';
+import { isValidCPF, onlyNumbers } from '@brazilian-utils/brazilian-utils';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
-export const checkIsValidCep = (value: any) => {
+export const checkIsValidCpf = (value: any) => {
   const transformToString = String(value);
 
   if (!transformToString) {
@@ -9,7 +9,7 @@ export const checkIsValidCep = (value: any) => {
   }
 
   if (typeof transformToString === 'string') {
-    if (isValidCEP(transformToString)) return onlyNumbers(transformToString);
+    if (isValidCPF(transformToString)) return onlyNumbers(transformToString);
   }
 
   return false;

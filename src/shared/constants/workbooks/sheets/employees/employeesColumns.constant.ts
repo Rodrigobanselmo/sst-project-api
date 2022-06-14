@@ -1,3 +1,4 @@
+import { checkIsValidCpf } from './../../../../utils/validators/checkIsValidCpf';
 import { StatusEnum } from '@prisma/client';
 import { checkIsValidDate } from '../../../../../shared/utils/validators/checkIsValidDate';
 
@@ -16,7 +17,7 @@ export const employeesColumnsConstant = [
     excelName: 'CPF do empregado',
     isArray: false,
     required: true,
-    checkHandler: checkIsString,
+    checkHandler: checkIsValidCpf,
   },
   {
     databaseName: 'name',
@@ -26,7 +27,7 @@ export const employeesColumnsConstant = [
     checkHandler: checkIsString,
   },
   {
-    databaseName: 'birthday',
+    databaseName: 'birthdate',
     excelName: 'Nascimento',
     isArray: false,
     required: false,

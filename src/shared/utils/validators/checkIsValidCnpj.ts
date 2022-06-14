@@ -1,4 +1,4 @@
-import { isValidCNPJ, formatCNPJ } from '@brazilian-utils/brazilian-utils';
+import { isValidCNPJ, onlyNumbers } from '@brazilian-utils/brazilian-utils';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 export const checkIsValidCnpj = (value: any) => {
@@ -9,7 +9,7 @@ export const checkIsValidCnpj = (value: any) => {
   }
 
   if (typeof transformToString === 'string') {
-    if (isValidCNPJ(transformToString)) return formatCNPJ(transformToString);
+    if (isValidCNPJ(transformToString)) return onlyNumbers(transformToString);
   }
 
   return false;

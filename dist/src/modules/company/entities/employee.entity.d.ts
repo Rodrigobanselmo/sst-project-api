@@ -19,4 +19,6 @@ export declare class EmployeeEntity implements Employee {
     office?: string;
     sub_office?: string;
     constructor(partial: Partial<EmployeeEntity>);
+    birthdate: Date;
+    admissionDate: Date;
 }

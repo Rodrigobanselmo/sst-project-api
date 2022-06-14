@@ -8,7 +8,7 @@ const CpfFormatTransform = (data) => {
         return null;
     if (typeof cpf === 'string') {
         if ((0, brazilian_utils_1.isValidCPF)(cpf)) {
-            return (0, brazilian_utils_1.formatCPF)(cpf);
+            return (0, brazilian_utils_1.onlyNumbers)(cpf);
         }
     }
     return null;

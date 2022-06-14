@@ -228,7 +228,7 @@ model Employee {
   cpf String 
   companyId String
   hierarchyId String
-  birthday DateTime?
+  birthdate DateTime?
   admissionDate DateTime?
   workspaces Workspace[]
   hierarchy Hierarchy @relation(fields: [hierarchyId], references: [id], onDelete: Restrict, onUpdate: Cascade)

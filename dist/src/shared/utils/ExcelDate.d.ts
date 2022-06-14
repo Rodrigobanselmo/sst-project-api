@@ -1,1 +1,1 @@
-export declare function ExcelDateToJSDate(serial: number): Date;
+export declare function ExcelDateToJSDate(serialDate: number): Date;

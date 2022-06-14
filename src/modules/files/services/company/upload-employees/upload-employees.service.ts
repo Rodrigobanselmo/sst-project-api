@@ -56,8 +56,6 @@ export class UploadEmployeesService {
       DatabaseTable,
     });
 
-    return;
-
     const workspaces = await this.workspaceRepository.findByCompany(companyId);
     const ghoNameDescriptionMap = {} as Record<string, string>;
 
@@ -118,6 +116,7 @@ export class UploadEmployeesService {
     await asyncEach(Object.keys(HierarchyEnum), upsertHierarchy);
 
     const employees = employeesData.map((employee) => {
+      if (employee.ghoName) delete employee.ghoName;
       const newEmployee = { ...employee };
       let hierarchy = null as any;
 

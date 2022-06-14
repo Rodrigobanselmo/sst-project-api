@@ -177,7 +177,7 @@ export class CompanyRepository implements ICompanyRepository {
                         }
                       : undefined,
                   },
-                  where: { id_companyId: { companyId, id: id || -1 } },
+                  where: { cpf_companyId: { cpf: rest.cpf, companyId } },
                 };
               },
             ),

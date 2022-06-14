@@ -59,7 +59,6 @@ let UploadEmployeesService = class UploadEmployeesService {
             read,
             DatabaseTable,
         });
-        return;
         const workspaces = await this.workspaceRepository.findByCompany(companyId);
         const ghoNameDescriptionMap = {};
         employeesData = employeesData.map((employee) => {
@@ -92,6 +91,8 @@ let UploadEmployeesService = class UploadEmployeesService {
         };
         await (0, asyncEach_1.asyncEach)(Object.keys(client_1.HierarchyEnum), upsertHierarchy);
         const employees = employeesData.map((employee) => {
+            if (employee.ghoName)
+                delete employee.ghoName;
             const newEmployee = Object.assign({}, employee);
             let hierarchy = null;
             const getByNameHierarchy = () => {

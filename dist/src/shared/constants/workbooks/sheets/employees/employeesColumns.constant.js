@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.employeesColumnsConstant = void 0;
+const checkIsValidCpf_1 = require("./../../../../utils/validators/checkIsValidCpf");
 const client_1 = require("@prisma/client");
 const checkIsValidDate_1 = require("../../../../../shared/utils/validators/checkIsValidDate");
 const excel_workspace_notes_1 = require("../../../../../modules/files/utils/notes/excel-workspace-notes");
@@ -13,7 +14,7 @@ exports.employeesColumnsConstant = [
         excelName: 'CPF do empregado',
         isArray: false,
         required: true,
-        checkHandler: checkIsString_1.checkIsString,
+        checkHandler: checkIsValidCpf_1.checkIsValidCpf,
     },
     {
         databaseName: 'name',
@@ -23,7 +24,7 @@ exports.employeesColumnsConstant = [
         checkHandler: checkIsString_1.checkIsString,
     },
     {
-        databaseName: 'birthday',
+        databaseName: 'birthdate',
         excelName: 'Nascimento',
         isArray: false,
         required: false,
