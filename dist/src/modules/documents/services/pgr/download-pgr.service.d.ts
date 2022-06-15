@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { RiskDocumentRepository } from '../../../../modules/checklist/repositories/implementations/RiskDocumentRepository';
 import { AmazonStorageProvider } from '../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';

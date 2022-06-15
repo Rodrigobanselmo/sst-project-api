@@ -18,23 +18,40 @@ export const riskInventoryTableSection = (
 
   const map = new Map<string, boolean>();
   // let count = 0;
-  hierarchyData.forEach((hierarchy) => {
+  hierarchyData.forEach((hierarchy, key) => {
     //!  REMOVE AFTER TEST
 
-    const homoGroupID = hierarchy.org.find(
-      (hierarchy) =>
-        hierarchy.homogeneousGroupIds &&
-        hierarchy.homogeneousGroupIds.length > 0,
-    ).homogeneousGroupIds[0];
+    if (key == '478287bf-855e-4308-b50f-29b77ee0ef3c') console.log(hierarchy);
 
-    if (map.get(homoGroupID)) {
-      return;
-    }
+    const homoGroupsIds = hierarchy.org.reduce((acc, hierarchy) => {
+      if (hierarchy.homogeneousGroupIds)
+        return [...acc, ...hierarchy.homogeneousGroupIds];
+    }, []);
 
-    map.set(homoGroupID, true);
+    homoGroupsIds.forEach((homoGroupID) => {
+      if (map.get(homoGroupID)) {
+        return;
+      }
+
+      map.set(homoGroupID, true);
+
+      const firstTable = firstRiskInventoryTableSection(
+        riskFactorGroupData,
+        hierarchy,
+      );
+      const secondTable = secondRiskInventoryTableSection(hierarchy);
+      const thirdTable = thirdRiskInventoryTableSection(
+        riskFactorGroupData,
+        hierarchy,
+      );
+
+      sectionsTables.push([firstTable, ...secondTable, ...thirdTable]);
+    });
     // if (count > 10) return;
     // count++;
     // eslint-disable-next-line prettier/prettier
+    // will return to stop to continue with hierarchy code
+    return;
     //!  REMOVE AFTER TEST
 
     const firstTable = firstRiskInventoryTableSection(
