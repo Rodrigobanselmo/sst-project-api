@@ -21,7 +21,8 @@ export class PgrDownloadService {
 
     if (!riskDoc) throw new BadRequestException(ErrorDocumentEnum.NOT_FOUND);
 
-    const fileKey = riskDoc.fileUrl.split('/').pop();
+    const fileKey = riskDoc.fileUrl.split('.com/').pop();
+
     const { file: fileStream } = this.amazonStorageProvider.download({
       fileKey,
     });

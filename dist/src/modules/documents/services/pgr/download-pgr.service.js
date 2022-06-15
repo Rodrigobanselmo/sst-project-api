@@ -24,7 +24,7 @@ let PgrDownloadService = class PgrDownloadService {
         const riskDoc = await this.riskDocumentRepository.findById(docId, companyId);
         if (!riskDoc)
             throw new common_1.BadRequestException(errorMessage_1.ErrorDocumentEnum.NOT_FOUND);
-        const fileKey = riskDoc.fileUrl.split('/').pop();
+        const fileKey = riskDoc.fileUrl.split('.com/').pop();
         const { file: fileStream } = this.amazonStorageProvider.download({
             fileKey,
         });
