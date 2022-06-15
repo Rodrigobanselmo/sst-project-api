@@ -30,6 +30,10 @@ export class UpsertEnvironmentDto {
   @IsOptional()
   description?: string;
 
+  @IsString({ each: true })
+  @IsOptional()
+  photos?: string[];
+
   @IsString()
   @IsOptional()
   parentEnvironmentId?: string;
@@ -39,9 +43,9 @@ export class UpsertEnvironmentDto {
   hierarchyIds?: string[];
 }
 
-export class UpsertPhotoEnvironmentDto {
+export class AddPhotoEnvironmentDto {
   @IsString()
-  id: string;
+  companyEnvironmentId: string;
 
   @Transform(StringCapitalizeTransform, { toClassOnly: true })
   @IsString()

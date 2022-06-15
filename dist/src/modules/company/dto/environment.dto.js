@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UpsertPhotoEnvironmentDto = exports.UpsertEnvironmentDto = void 0;
+exports.AddPhotoEnvironmentDto = exports.UpsertEnvironmentDto = void 0;
 const openapi = require("@nestjs/swagger");
 const client_1 = require("@prisma/client");
 const class_transformer_1 = require("class-transformer");
@@ -20,7 +20,7 @@ const keysOfEnum_utils_1 = require("../../../shared/utils/keysOfEnum.utils");
 const string_uppercase_transform_1 = require("../../../shared/transformers/string-uppercase.transform");
 class UpsertEnvironmentDto {
     static _OPENAPI_METADATA_FACTORY() {
-        return { id: { required: false, type: () => String }, name: { required: false, type: () => String, maxLength: 100 }, type: { required: false, type: () => Object }, description: { required: false, type: () => String }, parentEnvironmentId: { required: false, type: () => String }, hierarchyIds: { required: false, type: () => [String] } };
+        return { id: { required: false, type: () => String }, name: { required: false, type: () => String, maxLength: 100 }, type: { required: false, type: () => Object }, description: { required: false, type: () => String }, photos: { required: false, type: () => [String] }, parentEnvironmentId: { required: false, type: () => String }, hierarchyIds: { required: false, type: () => [String] } };
     }
 }
 __decorate([
@@ -50,6 +50,11 @@ __decorate([
     __metadata("design:type", String)
 ], UpsertEnvironmentDto.prototype, "description", void 0);
 __decorate([
+    (0, class_validator_1.IsString)({ each: true }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Array)
+], UpsertEnvironmentDto.prototype, "photos", void 0);
+__decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
@@ -60,20 +65,20 @@ __decorate([
     __metadata("design:type", Array)
 ], UpsertEnvironmentDto.prototype, "hierarchyIds", void 0);
 exports.UpsertEnvironmentDto = UpsertEnvironmentDto;
-class UpsertPhotoEnvironmentDto {
+class AddPhotoEnvironmentDto {
     static _OPENAPI_METADATA_FACTORY() {
-        return { id: { required: true, type: () => String }, name: { required: true, type: () => String, maxLength: 100 } };
+        return { companyEnvironmentId: { required: true, type: () => String }, name: { required: true, type: () => String, maxLength: 100 } };
     }
 }
 __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], UpsertPhotoEnvironmentDto.prototype, "id", void 0);
+], AddPhotoEnvironmentDto.prototype, "companyEnvironmentId", void 0);
 __decorate([
     (0, class_transformer_1.Transform)(string_capitalize_1.StringCapitalizeTransform, { toClassOnly: true }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MaxLength)(100),
     __metadata("design:type", String)
-], UpsertPhotoEnvironmentDto.prototype, "name", void 0);
-exports.UpsertPhotoEnvironmentDto = UpsertPhotoEnvironmentDto;
+], AddPhotoEnvironmentDto.prototype, "name", void 0);
+exports.AddPhotoEnvironmentDto = AddPhotoEnvironmentDto;
 //# sourceMappingURL=environment.dto.js.map

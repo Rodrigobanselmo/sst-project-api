@@ -3,7 +3,7 @@ export declare class AmazonStorageProvider implements IStorageProvider {
     private readonly s3;
     private readonly bucket;
     constructor();
-    upload({ file, fileName, }: FileStorage.Upload.Params): Promise<FileStorage.Upload.Result>;
+    upload({ file, fileName, isPublic, }: FileStorage.Upload.Params): Promise<FileStorage.Upload.Result>;
     download({ fileKey, }: FileStorage.Download.Params): FileStorage.Download.Result;
     delete({ fileName, }: FileStorage.Delete.Params): Promise<FileStorage.Delete.Result>;
     private contentType;

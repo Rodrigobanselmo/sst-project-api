@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { AmazonStorageProvider } from '../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
 
 import { ExcelProvider } from '../../shared/providers/ExcelProvider/implementations/ExcelProvider';
 import { CompanyController } from './controller/company/company.controller';
@@ -36,6 +37,9 @@ import { CreateHomoGroupService } from './services/homoGroup/create-homo-group/c
 import { DeleteHomoGroupService } from './services/homoGroup/delete-homo-group/delete-homo-group.service';
 import { FindByCompanyHomoGroupService } from './services/homoGroup/find-by-company-homo-group/find-by-company-homo-group.service';
 import { UpdateHomoGroupService } from './services/homoGroup/update-homo-group/update-homo-group.service';
+import { EnvironmentPhotoRepository } from './repositories/implementations/EnvironmentPhotoRepository';
+import { AddEnvironmentPhotoService } from './services/environment/add-environment-photo/add-environment-photo.service';
+import { DeleteEnvironmentPhotoService } from './services/environment/delete-environment-photo/delete-environment-photo.service';
 
 @Module({
   controllers: [
@@ -77,6 +81,10 @@ import { UpdateHomoGroupService } from './services/homoGroup/update-homo-group/u
     FindAllEnvironmentService,
     DeleteEnvironmentService,
     EnvironmentRepository,
+    AmazonStorageProvider,
+    EnvironmentPhotoRepository,
+    AddEnvironmentPhotoService,
+    DeleteEnvironmentPhotoService,
   ],
   exports: [CompanyRepository, EmployeeRepository, HierarchyRepository],
 })

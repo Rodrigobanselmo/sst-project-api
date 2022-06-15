@@ -5,7 +5,7 @@ import { PrismaService } from '../../../../prisma/prisma.service';
 import { UpsertEnvironmentDto } from '../../dto/environment.dto';
 import { EnvironmentEntity } from '../../entities/environment.entity';
 
-interface ICompanyEnvironment extends UpsertEnvironmentDto {
+interface ICompanyEnvironment extends Omit<UpsertEnvironmentDto, 'photos'> {
   companyId: string;
   workspaceId: string;
 }
@@ -31,11 +31,15 @@ export class EnvironmentRepository {
         workspaceId,
         name: environmentDto.name,
         type: environmentDto.type,
-        hierarchy: { connect: hierarchyIds.map((id) => ({ id })) },
+        hierarchy: hierarchyIds
+          ? { connect: hierarchyIds.map((id) => ({ id })) }
+          : undefined,
       },
       update: {
         ...environmentDto,
-        hierarchy: { set: hierarchyIds.map((id) => ({ id })) },
+        hierarchy: hierarchyIds
+          ? { set: hierarchyIds.map((id) => ({ id })) }
+          : undefined,
       },
     });
 
@@ -53,6 +57,15 @@ export class EnvironmentRepository {
     });
 
     return [...environment.map((env) => new EnvironmentEntity(env))];
+  }
+
+  async findById(id: string) {
+    const environment = await this.prisma.companyEnvironment.findUnique({
+      where: { id },
+      include: { photos: true },
+    });
+
+    return new EnvironmentEntity(environment);
   }
 
   async delete(id: string, companyId: string, workspaceId: string) {

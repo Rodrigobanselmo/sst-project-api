@@ -1,21 +1,33 @@
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
-import { UpsertPhotoEnvironmentDto } from '../../dto/environment.dto';
+import { AddPhotoEnvironmentDto } from '../../dto/environment.dto';
 import { EnvironmentPhotoEntity } from '../../entities/environment-photo.entity';
 
-interface IEnvironmentPhoto extends UpsertPhotoEnvironmentDto {
+export interface IEnvironmentPhoto extends Partial<AddPhotoEnvironmentDto> {
   photoUrl: string;
-  environmentId: string;
+  companyEnvironmentId: string;
+  name: string;
+  id?: string;
 }
 
 @Injectable()
 export class EnvironmentPhotoRepository {
   constructor(private prisma: PrismaService) {}
 
+  async createMany(environmentPhoto: IEnvironmentPhoto[]) {
+    const environments = await this.prisma.companyEnvironmentPhoto.createMany({
+      data: environmentPhoto.map(({ ...rest }) => ({
+        ...rest,
+      })),
+    });
+
+    return environments;
+  }
+
   async upsert({
     id,
-    environmentId,
+    companyEnvironmentId: environmentId,
     ...environmentPhotoDto
   }: IEnvironmentPhoto): Promise<EnvironmentPhotoEntity> {
     const environment = await this.prisma.companyEnvironmentPhoto.upsert({
@@ -33,9 +45,17 @@ export class EnvironmentPhotoRepository {
     return new EnvironmentPhotoEntity(environment);
   }
 
-  async delete(id: string, companyId: string, workspaceId: string) {
-    const environment = await this.prisma.companyEnvironment.delete({
-      where: { workspaceId_companyId_id: { workspaceId, companyId, id } },
+  async findById(id: string) {
+    const environment = await this.prisma.companyEnvironmentPhoto.findUnique({
+      where: { id },
+    });
+
+    return new EnvironmentPhotoEntity(environment);
+  }
+
+  async delete(id: string) {
+    const environment = await this.prisma.companyEnvironmentPhoto.delete({
+      where: { id },
     });
 
     return new EnvironmentPhotoEntity(environment);

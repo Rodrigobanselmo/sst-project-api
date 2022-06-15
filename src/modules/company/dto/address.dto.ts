@@ -22,7 +22,7 @@ export class AddressDto {
   number: string;
 
   @Transform(CepFormatTransform, { toClassOnly: true })
-  @Length(9, 9)
+  @Length(8, 8)
   cep: string;
 
   @Transform(StringCapitalizeTransform, { toClassOnly: true })

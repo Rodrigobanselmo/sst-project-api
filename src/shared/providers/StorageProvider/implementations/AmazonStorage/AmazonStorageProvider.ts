@@ -1,4 +1,5 @@
 import * as AWS from 'aws-sdk';
+
 import MimeClass from '../../../../../shared/utils/mime';
 import {
   FileStorage,
@@ -17,6 +18,7 @@ export class AmazonStorageProvider implements IStorageProvider {
   async upload({
     file,
     fileName,
+    isPublic,
   }: FileStorage.Upload.Params): Promise<FileStorage.Upload.Result> {
     const { Location: url } = await this.s3
       .upload({
@@ -24,6 +26,7 @@ export class AmazonStorageProvider implements IStorageProvider {
         Key: fileName,
         Body: file,
         ContentType: this.contentType(fileName),
+        ACL: isPublic ? 'public-read' : undefined,
       })
       .promise();
     return { url };

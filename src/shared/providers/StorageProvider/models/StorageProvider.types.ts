@@ -10,6 +10,7 @@ export namespace FileStorage {
     export type Params = {
       file: Readable;
       fileName: string;
+      isPublic?: boolean;
     };
 
     export type Result = {

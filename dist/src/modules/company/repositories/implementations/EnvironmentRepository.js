@@ -35,14 +35,25 @@ let EnvironmentRepository = class EnvironmentRepository {
                 workspaceId_companyId_id: { id: id || 'no-id', companyId, workspaceId },
             },
             create: Object.assign(Object.assign({}, environmentDto), { companyId,
-                workspaceId, name: environmentDto.name, type: environmentDto.type, hierarchy: { connect: hierarchyIds.map((id) => ({ id })) } }),
-            update: Object.assign(Object.assign({}, environmentDto), { hierarchy: { set: hierarchyIds.map((id) => ({ id })) } }),
+                workspaceId, name: environmentDto.name, type: environmentDto.type, hierarchy: hierarchyIds
+                    ? { connect: hierarchyIds.map((id) => ({ id })) }
+                    : undefined }),
+            update: Object.assign(Object.assign({}, environmentDto), { hierarchy: hierarchyIds
+                    ? { set: hierarchyIds.map((id) => ({ id })) }
+                    : undefined }),
         });
         return new environment_entity_1.EnvironmentEntity(environment);
     }
     async findAll(companyId, workspaceId, options) {
         const environment = await this.prisma.companyEnvironment.findMany(Object.assign({ where: { workspaceId, companyId } }, options));
         return [...environment.map((env) => new environment_entity_1.EnvironmentEntity(env))];
+    }
+    async findById(id) {
+        const environment = await this.prisma.companyEnvironment.findUnique({
+            where: { id },
+            include: { photos: true },
+        });
+        return new environment_entity_1.EnvironmentEntity(environment);
     }
     async delete(id, companyId, workspaceId) {
         const environment = await this.prisma.companyEnvironment.delete({

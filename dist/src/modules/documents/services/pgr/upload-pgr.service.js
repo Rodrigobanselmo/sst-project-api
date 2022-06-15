@@ -48,7 +48,7 @@ let PgrUploadService = class PgrUploadService {
         const stream = stream_1.Readable.from(fileBuffer);
         const { url } = await this.amazonStorageProvider.upload({
             file: stream,
-            fileName,
+            fileName: company.id + '/pgr/' + fileName,
         });
         const doc = await this.riskDocumentRepository.upsert(Object.assign(Object.assign({}, upsertPgrDto), { companyId: company.id, fileUrl: url }));
         return doc;

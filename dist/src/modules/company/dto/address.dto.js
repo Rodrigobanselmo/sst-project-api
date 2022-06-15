@@ -33,7 +33,7 @@ __decorate([
 ], AddressDto.prototype, "number", void 0);
 __decorate([
     (0, class_transformer_1.Transform)(cep_format_transform_1.CepFormatTransform, { toClassOnly: true }),
-    (0, class_validator_1.Length)(9, 9),
+    (0, class_validator_1.Length)(8, 8),
     __metadata("design:type", String)
 ], AddressDto.prototype, "cep", void 0);
 __decorate([

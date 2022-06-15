@@ -23,11 +23,11 @@ export declare class CompanyController {
     findCEP(cep: string): Promise<import("../../interfaces/cep.types").ICepResponse>;
     create(createCompanyDto: CreateCompanyDto, userPayloadDto: UserPayloadDto): Promise<import("../../entities/company.entity").CompanyEntity>;
     update(updateCompanyDto: UpdateCompanyDto): Promise<import("../../entities/company.entity").CompanyEntity | (import(".prisma/client").Company & {
+        users: import(".prisma/client").UserCompany[];
         workspace: import(".prisma/client").Workspace[];
         primary_activity: import(".prisma/client").Activity[];
         secondary_activity: import(".prisma/client").Activity[];
-        license: import(".prisma/client").License;
-        users: import(".prisma/client").UserCompany[];
         employees: import(".prisma/client").Employee[];
+        license: import(".prisma/client").License;
     })>;
 }

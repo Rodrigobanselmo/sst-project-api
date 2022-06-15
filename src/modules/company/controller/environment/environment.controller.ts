@@ -17,11 +17,13 @@ import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import {
   UpsertEnvironmentDto,
-  UpsertPhotoEnvironmentDto,
+  AddPhotoEnvironmentDto,
 } from '../../dto/environment.dto';
 import { DeleteEnvironmentService } from '../../services/environment/delete-environment/delete-environment.service';
 import { FindAllEnvironmentService } from '../../services/environment/find-all-environment/find-all-environment.service';
 import { UpsertEnvironmentService } from '../../services/environment/upsert-environment/upsert-environment.service';
+import { AddEnvironmentPhotoService } from '../../services/environment/add-environment-photo/add-environment-photo.service';
+import { DeleteEnvironmentPhotoService } from '../../services/environment/delete-environment-photo/delete-environment-photo.service';
 
 @ApiTags('environments')
 @Controller('/company/:companyId/workspace/:workspaceId/environments')
@@ -30,6 +32,8 @@ export class EnvironmentController {
     private readonly upsertEnvironmentService: UpsertEnvironmentService,
     private readonly findAllEnvironmentService: FindAllEnvironmentService,
     private readonly deleteEnvironmentService: DeleteEnvironmentService,
+    private readonly addEnvironmentPhotoService: AddEnvironmentPhotoService,
+    private readonly deleteEnvironmentPhotoService: DeleteEnvironmentPhotoService,
   ) {}
 
   @Get()
@@ -62,25 +66,20 @@ export class EnvironmentController {
   @UseInterceptors(FileInterceptor('file'))
   async uploadRiskFile(
     @UploadedFile() file: Express.Multer.File,
-    @Body() upsertPhotoEnvironmentDto: UpsertPhotoEnvironmentDto,
+    @Body() addPhotoEnvironmentDto: AddPhotoEnvironmentDto,
     @User() userPayloadDto: UserPayloadDto,
-    @Param('workspaceId') workspaceId: string,
   ) {
-    return upsertPhotoEnvironmentDto;
+    return this.addEnvironmentPhotoService.execute(
+      addPhotoEnvironmentDto,
+      userPayloadDto,
+      file,
+    );
   }
 
-  @Delete('/photo')
+  @Delete('/photo/:id')
   @UseInterceptors(FileInterceptor('file'))
-  deletePhoto(
-    @Param('id') id: string,
-    @Param('workspaceId') workspaceId: string,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
-    return this.deleteEnvironmentService.execute(
-      id,
-      workspaceId,
-      userPayloadDto,
-    );
+  deletePhoto(@Param('id') id: string) {
+    return this.deleteEnvironmentPhotoService.execute(id);
   }
 
   @Delete('/:id')

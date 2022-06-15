@@ -24,25 +24,25 @@ const license_dto_1 = require("./license.dto");
 const workspace_dto_1 = require("./workspace.dto");
 class CreateCompanyDto {
     static _OPENAPI_METADATA_FACTORY() {
-        return { cnpj: { required: true, type: () => String }, name: { required: true, type: () => String, maxLength: 100 }, fantasy: { required: true, type: () => String, maxLength: 100 }, status: { required: true, type: () => Object }, type: { required: true, type: () => Object }, isConsulting: { required: true, type: () => Boolean }, license: { required: false, type: () => require("./license.dto").LicenseDto }, address: { required: false, type: () => require("./address.dto").AddressDto }, workspace: { required: true, type: () => [require("./workspace.dto").WorkspaceDto] }, primary_activity: { required: true, type: () => [require("./activity.dto").ActivityDto] }, secondary_activity: { required: true, type: () => [require("./activity.dto").ActivityDto] }, size: { required: true, type: () => String }, phone: { required: true, type: () => String }, legal_nature: { required: true, type: () => String }, cadastral_situation: { required: true, type: () => String }, activity_start_date: { required: true, type: () => String }, cadastral_situation_date: { required: true, type: () => String }, legal_nature_code: { required: true, type: () => String }, cadastral_situation_description: { required: true, type: () => String } };
+        return { cnpj: { required: true, type: () => String }, name: { required: true, type: () => String, maxLength: 250 }, fantasy: { required: true, type: () => String, maxLength: 250 }, status: { required: true, type: () => Object }, type: { required: true, type: () => Object }, isConsulting: { required: true, type: () => Boolean }, license: { required: false, type: () => require("./license.dto").LicenseDto }, address: { required: false, type: () => require("./address.dto").AddressDto }, workspace: { required: true, type: () => [require("./workspace.dto").WorkspaceDto] }, primary_activity: { required: true, type: () => [require("./activity.dto").ActivityDto] }, secondary_activity: { required: true, type: () => [require("./activity.dto").ActivityDto] }, size: { required: true, type: () => String }, phone: { required: true, type: () => String }, legal_nature: { required: true, type: () => String }, cadastral_situation: { required: true, type: () => String }, activity_start_date: { required: true, type: () => String }, cadastral_situation_date: { required: true, type: () => String }, legal_nature_code: { required: true, type: () => String }, cadastral_situation_description: { required: true, type: () => String } };
     }
 }
 __decorate([
     (0, class_transformer_1.Transform)(cnpj_format_transform_1.CnpjFormatTransform, { toClassOnly: true }),
-    (0, class_validator_1.Length)(18, 18, { message: 'invalid CNPJ' }),
+    (0, class_validator_1.Length)(14, 14, { message: 'invalid CNPJ' }),
     __metadata("design:type", String)
 ], CreateCompanyDto.prototype, "cnpj", void 0);
 __decorate([
     (0, class_transformer_1.Transform)(string_capitalize_1.StringCapitalizeTransform, { toClassOnly: true }),
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.MaxLength)(100),
+    (0, class_validator_1.MaxLength)(250),
     __metadata("design:type", String)
 ], CreateCompanyDto.prototype, "name", void 0);
 __decorate([
     (0, class_transformer_1.Transform)(string_capitalize_1.StringCapitalizeTransform, { toClassOnly: true }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.MaxLength)(100),
+    (0, class_validator_1.MaxLength)(250),
     __metadata("design:type", String)
 ], CreateCompanyDto.prototype, "fantasy", void 0);
 __decorate([

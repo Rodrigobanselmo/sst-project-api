@@ -4,10 +4,11 @@ export declare class UpsertEnvironmentDto {
     name?: string;
     type?: CompanyEnvironmentTypesEnum;
     description?: string;
+    photos?: string[];
     parentEnvironmentId?: string;
     hierarchyIds?: string[];
 }
-export declare class UpsertPhotoEnvironmentDto {
-    id: string;
+export declare class AddPhotoEnvironmentDto {
+    companyEnvironmentId: string;
     name: string;
 }

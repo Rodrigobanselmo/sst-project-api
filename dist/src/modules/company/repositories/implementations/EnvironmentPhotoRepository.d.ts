@@ -1,14 +1,17 @@
 import { PrismaService } from '../../../../prisma/prisma.service';
-import { UpsertPhotoEnvironmentDto } from '../../dto/environment.dto';
+import { AddPhotoEnvironmentDto } from '../../dto/environment.dto';
 import { EnvironmentPhotoEntity } from '../../entities/environment-photo.entity';
-interface IEnvironmentPhoto extends UpsertPhotoEnvironmentDto {
+export interface IEnvironmentPhoto extends Partial<AddPhotoEnvironmentDto> {
     photoUrl: string;
-    environmentId: string;
+    companyEnvironmentId: string;
+    name: string;
+    id?: string;
 }
 export declare class EnvironmentPhotoRepository {
     private prisma;
     constructor(prisma: PrismaService);
-    upsert({ id, environmentId, ...environmentPhotoDto }: IEnvironmentPhoto): Promise<EnvironmentPhotoEntity>;
-    delete(id: string, companyId: string, workspaceId: string): Promise<EnvironmentPhotoEntity>;
+    createMany(environmentPhoto: IEnvironmentPhoto[]): Promise<import(".prisma/client").Prisma.BatchPayload>;
+    upsert({ id, companyEnvironmentId: environmentId, ...environmentPhotoDto }: IEnvironmentPhoto): Promise<EnvironmentPhotoEntity>;
+    findById(id: string): Promise<EnvironmentPhotoEntity>;
+    delete(id: string): Promise<EnvironmentPhotoEntity>;
 }
-export {};

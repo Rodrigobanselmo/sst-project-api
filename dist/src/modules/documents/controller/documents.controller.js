@@ -28,6 +28,9 @@ let DocumentsController = class DocumentsController {
     async downloadPGR(res, userPayloadDto, docId) {
         const { fileKey, fileStream } = await this.pgrDownloadService.execute(userPayloadDto, docId);
         res.setHeader('Content-Disposition', `attachment; filename=${fileKey}`);
+        fileStream.on('error', function (e) {
+            res.status(500).send(e);
+        });
         fileStream.pipe(res);
     }
     async uploadPGR(res, userPayloadDto, upsertPgrDto) {

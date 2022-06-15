@@ -9,6 +9,7 @@ export declare namespace FileStorage {
         type Params = {
             file: Readable;
             fileName: string;
+            isPublic?: boolean;
         };
         type Result = {
             url: string;

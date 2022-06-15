@@ -28,8 +28,17 @@ let EnvironmentPhotoRepository = class EnvironmentPhotoRepository {
     constructor(prisma) {
         this.prisma = prisma;
     }
+    async createMany(environmentPhoto) {
+        const environments = await this.prisma.companyEnvironmentPhoto.createMany({
+            data: environmentPhoto.map((_a) => {
+                var rest = __rest(_a, []);
+                return (Object.assign({}, rest));
+            }),
+        });
+        return environments;
+    }
     async upsert(_a) {
-        var { id, environmentId } = _a, environmentPhotoDto = __rest(_a, ["id", "environmentId"]);
+        var { id, companyEnvironmentId: environmentId } = _a, environmentPhotoDto = __rest(_a, ["id", "companyEnvironmentId"]);
         const environment = await this.prisma.companyEnvironmentPhoto.upsert({
             where: { id: id || 'no-id' },
             create: Object.assign(Object.assign({}, environmentPhotoDto), { companyEnvironmentId: environmentId, name: environmentPhotoDto.name }),
@@ -37,9 +46,15 @@ let EnvironmentPhotoRepository = class EnvironmentPhotoRepository {
         });
         return new environment_photo_entity_1.EnvironmentPhotoEntity(environment);
     }
-    async delete(id, companyId, workspaceId) {
-        const environment = await this.prisma.companyEnvironment.delete({
-            where: { workspaceId_companyId_id: { workspaceId, companyId, id } },
+    async findById(id) {
+        const environment = await this.prisma.companyEnvironmentPhoto.findUnique({
+            where: { id },
+        });
+        return new environment_photo_entity_1.EnvironmentPhotoEntity(environment);
+    }
+    async delete(id) {
+        const environment = await this.prisma.companyEnvironmentPhoto.delete({
+            where: { id },
         });
         return new environment_photo_entity_1.EnvironmentPhotoEntity(environment);
     }

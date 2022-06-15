@@ -8,6 +8,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CompanyModule = void 0;
 const common_1 = require("@nestjs/common");
+const AmazonStorageProvider_1 = require("../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider");
 const ExcelProvider_1 = require("../../shared/providers/ExcelProvider/implementations/ExcelProvider");
 const company_controller_1 = require("./controller/company/company.controller");
 const employee_controller_1 = require("./controller/employee/employee.controller");
@@ -44,6 +45,9 @@ const create_homo_group_service_1 = require("./services/homoGroup/create-homo-gr
 const delete_homo_group_service_1 = require("./services/homoGroup/delete-homo-group/delete-homo-group.service");
 const find_by_company_homo_group_service_1 = require("./services/homoGroup/find-by-company-homo-group/find-by-company-homo-group.service");
 const update_homo_group_service_1 = require("./services/homoGroup/update-homo-group/update-homo-group.service");
+const EnvironmentPhotoRepository_1 = require("./repositories/implementations/EnvironmentPhotoRepository");
+const add_environment_photo_service_1 = require("./services/environment/add-environment-photo/add-environment-photo.service");
+const delete_environment_photo_service_1 = require("./services/environment/delete-environment-photo/delete-environment-photo.service");
 let CompanyModule = class CompanyModule {
 };
 CompanyModule = __decorate([
@@ -87,6 +91,10 @@ CompanyModule = __decorate([
             find_all_environment_service_1.FindAllEnvironmentService,
             delete_environment_service_1.DeleteEnvironmentService,
             EnvironmentRepository_1.EnvironmentRepository,
+            AmazonStorageProvider_1.AmazonStorageProvider,
+            EnvironmentPhotoRepository_1.EnvironmentPhotoRepository,
+            add_environment_photo_service_1.AddEnvironmentPhotoService,
+            delete_environment_photo_service_1.DeleteEnvironmentPhotoService,
         ],
         exports: [CompanyRepository_1.CompanyRepository, EmployeeRepository_1.EmployeeRepository, HierarchyRepository_1.HierarchyRepository],
     })

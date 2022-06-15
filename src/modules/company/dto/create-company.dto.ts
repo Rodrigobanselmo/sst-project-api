@@ -21,18 +21,18 @@ import { WorkspaceDto } from './workspace.dto';
 
 export class CreateCompanyDto {
   @Transform(CnpjFormatTransform, { toClassOnly: true })
-  @Length(18, 18, { message: 'invalid CNPJ' })
+  @Length(14, 14, { message: 'invalid CNPJ' })
   cnpj: string;
 
   @Transform(StringCapitalizeTransform, { toClassOnly: true })
   @IsString()
-  @MaxLength(100)
+  @MaxLength(250)
   name: string;
 
   @Transform(StringCapitalizeTransform, { toClassOnly: true })
   @IsString()
   @IsOptional()
-  @MaxLength(100)
+  @MaxLength(250)
   fantasy: string;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })

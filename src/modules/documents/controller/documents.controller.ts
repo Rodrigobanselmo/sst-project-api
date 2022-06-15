@@ -1,8 +1,8 @@
 import { Body, Controller, Get, Param, Post, Res } from '@nestjs/common';
+
 import { User } from '../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../shared/dto/user-payload.dto';
 import { UpsertPgrDto } from '../dto/pgr.dto';
-
 import { PgrDownloadService } from '../services/pgr/download-pgr.service';
 import { PgrUploadService } from '../services/pgr/upload-pgr.service';
 
@@ -25,6 +25,10 @@ export class DocumentsController {
     );
 
     res.setHeader('Content-Disposition', `attachment; filename=${fileKey}`);
+    fileStream.on('error', function (e) {
+      res.status(500).send(e);
+    });
+
     fileStream.pipe(res);
   }
 

@@ -30,13 +30,14 @@ class AmazonStorageProvider {
         this.s3 = new AWS.S3({ region: process.env.AWS_BUCKET_REGION });
         this.bucket = process.env.AWS_S3_BUCKET;
     }
-    async upload({ file, fileName, }) {
+    async upload({ file, fileName, isPublic, }) {
         const { Location: url } = await this.s3
             .upload({
             Bucket: this.bucket,
             Key: fileName,
             Body: file,
             ContentType: this.contentType(fileName),
+            ACL: isPublic ? 'public-read' : undefined,
         })
             .promise();
         return { url };

@@ -24,11 +24,15 @@ const environment_dto_1 = require("../../dto/environment.dto");
 const delete_environment_service_1 = require("../../services/environment/delete-environment/delete-environment.service");
 const find_all_environment_service_1 = require("../../services/environment/find-all-environment/find-all-environment.service");
 const upsert_environment_service_1 = require("../../services/environment/upsert-environment/upsert-environment.service");
+const add_environment_photo_service_1 = require("../../services/environment/add-environment-photo/add-environment-photo.service");
+const delete_environment_photo_service_1 = require("../../services/environment/delete-environment-photo/delete-environment-photo.service");
 let EnvironmentController = class EnvironmentController {
-    constructor(upsertEnvironmentService, findAllEnvironmentService, deleteEnvironmentService) {
+    constructor(upsertEnvironmentService, findAllEnvironmentService, deleteEnvironmentService, addEnvironmentPhotoService, deleteEnvironmentPhotoService) {
         this.upsertEnvironmentService = upsertEnvironmentService;
         this.findAllEnvironmentService = findAllEnvironmentService;
         this.deleteEnvironmentService = deleteEnvironmentService;
+        this.addEnvironmentPhotoService = addEnvironmentPhotoService;
+        this.deleteEnvironmentPhotoService = deleteEnvironmentPhotoService;
     }
     findAll(userPayloadDto, workspaceId) {
         return this.findAllEnvironmentService.execute(workspaceId, userPayloadDto);
@@ -36,11 +40,11 @@ let EnvironmentController = class EnvironmentController {
     upsert(upsertEnvironmentDto, userPayloadDto, workspaceId, files) {
         return this.upsertEnvironmentService.execute(upsertEnvironmentDto, workspaceId, userPayloadDto, files);
     }
-    async uploadRiskFile(file, upsertPhotoEnvironmentDto, userPayloadDto, workspaceId) {
-        return upsertPhotoEnvironmentDto;
+    async uploadRiskFile(file, addPhotoEnvironmentDto, userPayloadDto) {
+        return this.addEnvironmentPhotoService.execute(addPhotoEnvironmentDto, userPayloadDto, file);
     }
-    deletePhoto(id, workspaceId, userPayloadDto) {
-        return this.deleteEnvironmentService.execute(id, workspaceId, userPayloadDto);
+    deletePhoto(id) {
+        return this.deleteEnvironmentPhotoService.execute(id);
     }
     delete(id, workspaceId, userPayloadDto) {
         return this.deleteEnvironmentService.execute(id, workspaceId, userPayloadDto);
@@ -71,25 +75,22 @@ __decorate([
 __decorate([
     (0, common_1.Post)('/photo'),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
-    openapi.ApiResponse({ status: 201, type: require("../../dto/environment.dto").UpsertPhotoEnvironmentDto }),
+    openapi.ApiResponse({ status: 201, type: require("../../entities/environment.entity").EnvironmentEntity }),
     __param(0, (0, common_1.UploadedFile)()),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, user_decorator_1.User)()),
-    __param(3, (0, common_1.Param)('workspaceId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, environment_dto_1.UpsertPhotoEnvironmentDto,
-        user_payload_dto_1.UserPayloadDto, String]),
+    __metadata("design:paramtypes", [Object, environment_dto_1.AddPhotoEnvironmentDto,
+        user_payload_dto_1.UserPayloadDto]),
     __metadata("design:returntype", Promise)
 ], EnvironmentController.prototype, "uploadRiskFile", null);
 __decorate([
-    (0, common_1.Delete)('/photo'),
+    (0, common_1.Delete)('/photo/:id'),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
     openapi.ApiResponse({ status: 200, type: require("../../entities/environment.entity").EnvironmentEntity }),
     __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Param)('workspaceId')),
-    __param(2, (0, user_decorator_1.User)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, user_payload_dto_1.UserPayloadDto]),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], EnvironmentController.prototype, "deletePhoto", null);
 __decorate([
@@ -107,7 +108,9 @@ EnvironmentController = __decorate([
     (0, common_1.Controller)('/company/:companyId/workspace/:workspaceId/environments'),
     __metadata("design:paramtypes", [upsert_environment_service_1.UpsertEnvironmentService,
         find_all_environment_service_1.FindAllEnvironmentService,
-        delete_environment_service_1.DeleteEnvironmentService])
+        delete_environment_service_1.DeleteEnvironmentService,
+        add_environment_photo_service_1.AddEnvironmentPhotoService,
+        delete_environment_photo_service_1.DeleteEnvironmentPhotoService])
 ], EnvironmentController);
 exports.EnvironmentController = EnvironmentController;
 //# sourceMappingURL=environment.controller.js.map
