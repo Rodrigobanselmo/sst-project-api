@@ -11,18 +11,21 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TableBodyElements = void 0;
+exports.TableBodyElements = exports.emptyCellName = exports.borderNoneStyle = void 0;
 const docx_1 = require("docx");
 const palette_1 = require("../../../../../../../shared/constants/palette");
+exports.borderNoneStyle = {};
+exports.emptyCellName = ' ';
 class TableBodyElements {
     tableRow(tableCell) {
         return new docx_1.TableRow({
             children: [...tableCell],
+            cantSplit: true,
         });
     }
     tableCell(_a) {
         var { text, size = 1 } = _a, rest = __rest(_a, ["text", "size"]);
-        return new docx_1.TableCell(Object.assign({ children: [
+        return new docx_1.TableCell(Object.assign(Object.assign(Object.assign({ children: [
                 new docx_1.Paragraph({
                     children: [
                         new docx_1.TextRun({
@@ -33,7 +36,7 @@ class TableBodyElements {
                     ],
                     alignment: docx_1.AlignmentType.CENTER,
                 }),
-            ], margins: { top: 20, bottom: 20 }, shading: { fill: palette_1.palette.table.row.string }, verticalAlign: docx_1.VerticalAlign.CENTER, width: { size, type: docx_1.WidthType.PERCENTAGE } }, rest));
+            ] }, (text == exports.emptyCellName ? { borders: exports.borderNoneStyle } : {})), { margins: { top: 20, bottom: 20 }, shading: { fill: palette_1.palette.table.row.string }, verticalAlign: docx_1.VerticalAlign.CENTER, width: { size, type: docx_1.WidthType.PERCENTAGE } }), rest));
     }
 }
 exports.TableBodyElements = TableBodyElements;

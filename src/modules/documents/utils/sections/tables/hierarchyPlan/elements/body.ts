@@ -1,5 +1,6 @@
 import {
   AlignmentType,
+  BorderStyle,
   ITableCellOptions,
   Paragraph,
   TableCell,
@@ -15,10 +16,18 @@ export interface bodyTableProps extends Partial<ITableCellOptions> {
   size?: number;
 }
 
+export const borderNoneStyle = {
+  // top: { style: BorderStyle.NIL, size: 0 },
+  // bottom: { style: BorderStyle.NIL, size: 0 },
+};
+
+export const emptyCellName = ' ';
+
 export class TableBodyElements {
   tableRow(tableCell: TableCell[]) {
     return new TableRow({
       children: [...tableCell],
+      cantSplit: true,
     });
   }
 
@@ -36,6 +45,7 @@ export class TableBodyElements {
           alignment: AlignmentType.CENTER,
         }),
       ],
+      ...(text == emptyCellName ? { borders: borderNoneStyle } : {}),
       margins: { top: 20, bottom: 20 },
       shading: { fill: palette.table.row.string },
       verticalAlign: VerticalAlign.CENTER,

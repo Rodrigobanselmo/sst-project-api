@@ -1,17 +1,12 @@
-import { HierarchyEnum } from '@prisma/client';
-import { sortNumber } from '../../../../../../shared/utils/sorts/number.sort';
-
+import { hierarchyList } from '../../../../../../shared/constants/lists/hierarchy.list';
 import { palette } from '../../../../../../shared/constants/palette';
-import { removeDuplicate } from '../../../../../../shared/utils/removeDuplicate';
+import { sortNumber } from '../../../../../../shared/utils/sorts/number.sort';
 import { sortString } from '../../../../../../shared/utils/sorts/string.sort';
-import { RiskFactorGroupDataEntity } from '../../../../../checklist/entities/riskGroupData.entity';
 import {
   IHierarchyData,
-  IHierarchyMap,
   IHomoGroupMap,
 } from '../../converter/hierarchy.converter';
-import { hierarchyMap } from '../riskInventory/parts/first/first.constant';
-import { bodyTableProps } from './elements/body';
+import { bodyTableProps, emptyCellName } from './elements/body';
 import { headerTableProps } from './elements/header';
 import {
   HierarchyPlanColumnEnum,
@@ -33,6 +28,8 @@ export type IHierarchyPlan<T> = Record<string, IHierarchyDataRecord<T>>;
 //                 ['DIRECTOR_NAME_2'].data['MANAGER_NAME_2'].data['SECTOR_NAME']...
 //                                         ['MANAGER_NAME_3'].data['SECTOR_NAME']...
 
+const hierarchyEmptyId = '0';
+
 export const hierarchyPlanConverter = (
   hierarchyData: IHierarchyData,
   homoGroupTree: IHomoGroupMap,
@@ -42,6 +39,25 @@ export const hierarchyPlanConverter = (
 
   (function mapAllHierarchyPlan() {
     hierarchyData.forEach((hierarchiesData) => {
+      const org = hierarchyList.map((type) => {
+        const hierarchyData = hierarchiesData.org.find(
+          (org) => org.typeEnum === type,
+        );
+
+        if (!hierarchyData) {
+          return {
+            type: type,
+            typeEnum: type,
+            name: emptyCellName,
+            id: hierarchyEmptyId,
+            homogeneousGroupIds: [],
+            homogeneousGroup: '',
+          };
+        }
+
+        return hierarchyData;
+      });
+
       hierarchiesData.org.forEach((hierarchyData) => {
         hierarchyData.homogeneousGroupIds.forEach((homogeneousGroupId) => {
           if (!allHierarchyPlan[homogeneousGroupId])
@@ -51,10 +67,11 @@ export const hierarchyPlanConverter = (
             allHierarchyPlanLoop: IHierarchyPlan<any>,
             index: number,
           ) => {
-            const hierarchyId = hierarchiesData.org[index].id;
-            const hierarchyName = hierarchiesData.org[index].name;
-            const hierarchyType = hierarchiesData.org[index].typeEnum;
-            hierarchyColumns[hierarchyType] = 0;
+            const hierarchyId = org[index].id;
+            const hierarchyName = org[index].name;
+            const hierarchyType = org[index].typeEnum;
+            if (hierarchyId !== hierarchyEmptyId)
+              hierarchyColumns[hierarchyType] = 0;
 
             if (!allHierarchyPlanLoop[hierarchyId])
               allHierarchyPlanLoop[hierarchyId] = {
@@ -63,7 +80,7 @@ export const hierarchyPlanConverter = (
                 name: hierarchyName,
               };
 
-            if (hierarchiesData.org[index + 1]) {
+            if (org[index + 1]) {
               loop(allHierarchyPlanLoop[hierarchyId].data, index + 1);
             }
           };
@@ -115,23 +132,20 @@ export const hierarchyPlanConverter = (
       .forEach(([homogeneousGroupId, firstHierarchyPlan]) => {
         const row = generateRow();
         const firstPosition = rowsPosition;
-        // eslint-disable-next-line prettier/prettier
-        row[0] = { text:  homoGroupTree[homogeneousGroupId].name };
+        row[0] = { text: homoGroupTree[homogeneousGroupId].name };
         row[1] = { text: homoGroupTree[homogeneousGroupId].description };
 
         rows[rowsPosition] = row;
 
         const loop = (map: IHierarchyPlan<any>) => {
           const hierarchyArray = Object.entries(map);
-          const firstPosition = rowsPosition;
           let totalRowsToSpan = 0;
-          let indexRowSpan = 0;
 
           hierarchyArray.forEach(([, hierarchyData]) => {
+            const firstPosition = rowsPosition;
             const hierarchyColumnTypePosition =
               hierarchyColumns[hierarchyData.type];
-
-            indexRowSpan = hierarchyColumnTypePosition;
+            const indexRowSpan = hierarchyColumnTypePosition;
 
             if (!rows[rowsPosition]) rows[rowsPosition] = generateRow();
 
@@ -139,31 +153,37 @@ export const hierarchyPlanConverter = (
               text: hierarchyData.name,
             };
 
-            const someRowsToSpan = loop(hierarchyData.data);
+            const childrenRowsToSpan = loop(hierarchyData.data);
 
+            if (indexRowSpan)
+              rows[firstPosition][indexRowSpan] = {
+                ...rows[firstPosition][indexRowSpan],
+                rowSpan: childrenRowsToSpan,
+              };
+
+            totalRowsToSpan = childrenRowsToSpan + totalRowsToSpan;
             rowsPosition++;
-            totalRowsToSpan = totalRowsToSpan + someRowsToSpan;
           });
 
-          if (indexRowSpan)
-            rows[firstPosition][indexRowSpan] = {
-              ...rows[firstPosition][indexRowSpan],
-              rowSpan: totalRowsToSpan,
-            };
-
-          return totalRowsToSpan;
+          return totalRowsToSpan || 1;
         };
 
         const rowsToSpan = loop(firstHierarchyPlan);
+
         rows[firstPosition][0] = {
           ...rows[firstPosition][0],
+          rowSpan: rowsToSpan,
+          shading: { fill: palette.table.header.string },
+        };
+        rows[firstPosition][1] = {
+          ...rows[firstPosition][1],
           rowSpan: rowsToSpan,
         };
 
         return row;
       });
 
-    return rows;
+    return rows.map((row) => row.filter((row) => row.text));
   }
 
   const bodyData = setBodyTable();

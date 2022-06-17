@@ -12,30 +12,49 @@ var __rest = (this && this.__rest) || function (s, e) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.hierarchyPlanConverter = void 0;
+const hierarchy_list_1 = require("../../../../../../shared/constants/lists/hierarchy.list");
+const palette_1 = require("../../../../../../shared/constants/palette");
 const number_sort_1 = require("../../../../../../shared/utils/sorts/number.sort");
 const string_sort_1 = require("../../../../../../shared/utils/sorts/string.sort");
+const body_1 = require("./elements/body");
 const hierarchyPlan_constant_1 = require("./hierarchyPlan.constant");
+const hierarchyEmptyId = '0';
 const hierarchyPlanConverter = (hierarchyData, homoGroupTree) => {
     const allHierarchyPlan = {};
     const hierarchyColumns = {};
     (function mapAllHierarchyPlan() {
         hierarchyData.forEach((hierarchiesData) => {
+            const org = hierarchy_list_1.hierarchyList.map((type) => {
+                const hierarchyData = hierarchiesData.org.find((org) => org.typeEnum === type);
+                if (!hierarchyData) {
+                    return {
+                        type: type,
+                        typeEnum: type,
+                        name: body_1.emptyCellName,
+                        id: hierarchyEmptyId,
+                        homogeneousGroupIds: [],
+                        homogeneousGroup: '',
+                    };
+                }
+                return hierarchyData;
+            });
             hierarchiesData.org.forEach((hierarchyData) => {
                 hierarchyData.homogeneousGroupIds.forEach((homogeneousGroupId) => {
                     if (!allHierarchyPlan[homogeneousGroupId])
                         allHierarchyPlan[homogeneousGroupId] = {};
                     const loop = (allHierarchyPlanLoop, index) => {
-                        const hierarchyId = hierarchiesData.org[index].id;
-                        const hierarchyName = hierarchiesData.org[index].name;
-                        const hierarchyType = hierarchiesData.org[index].typeEnum;
-                        hierarchyColumns[hierarchyType] = 0;
+                        const hierarchyId = org[index].id;
+                        const hierarchyName = org[index].name;
+                        const hierarchyType = org[index].typeEnum;
+                        if (hierarchyId !== hierarchyEmptyId)
+                            hierarchyColumns[hierarchyType] = 0;
                         if (!allHierarchyPlanLoop[hierarchyId])
                             allHierarchyPlanLoop[hierarchyId] = {
                                 type: hierarchyType,
                                 data: {},
                                 name: hierarchyName,
                             };
-                        if (hierarchiesData.org[index + 1]) {
+                        if (org[index + 1]) {
                             loop(allHierarchyPlanLoop[hierarchyId].data, index + 1);
                         }
                     };
@@ -84,30 +103,30 @@ const hierarchyPlanConverter = (hierarchyData, homoGroupTree) => {
             rows[rowsPosition] = row;
             const loop = (map) => {
                 const hierarchyArray = Object.entries(map);
-                const firstPosition = rowsPosition;
                 let totalRowsToSpan = 0;
-                let indexRowSpan = 0;
                 hierarchyArray.forEach(([, hierarchyData]) => {
+                    const firstPosition = rowsPosition;
                     const hierarchyColumnTypePosition = hierarchyColumns[hierarchyData.type];
-                    indexRowSpan = hierarchyColumnTypePosition;
+                    const indexRowSpan = hierarchyColumnTypePosition;
                     if (!rows[rowsPosition])
                         rows[rowsPosition] = generateRow();
                     rows[rowsPosition][hierarchyColumnTypePosition] = {
                         text: hierarchyData.name,
                     };
-                    const someRowsToSpan = loop(hierarchyData.data);
+                    const childrenRowsToSpan = loop(hierarchyData.data);
+                    if (indexRowSpan)
+                        rows[firstPosition][indexRowSpan] = Object.assign(Object.assign({}, rows[firstPosition][indexRowSpan]), { rowSpan: childrenRowsToSpan });
+                    totalRowsToSpan = childrenRowsToSpan + totalRowsToSpan;
                     rowsPosition++;
-                    totalRowsToSpan = totalRowsToSpan + someRowsToSpan;
                 });
-                if (indexRowSpan)
-                    rows[firstPosition][indexRowSpan] = Object.assign(Object.assign({}, rows[firstPosition][indexRowSpan]), { rowSpan: totalRowsToSpan });
-                return totalRowsToSpan;
+                return totalRowsToSpan || 1;
             };
             const rowsToSpan = loop(firstHierarchyPlan);
-            rows[firstPosition][0] = Object.assign(Object.assign({}, rows[firstPosition][0]), { rowSpan: rowsToSpan });
+            rows[firstPosition][0] = Object.assign(Object.assign({}, rows[firstPosition][0]), { rowSpan: rowsToSpan, shading: { fill: palette_1.palette.table.header.string } });
+            rows[firstPosition][1] = Object.assign(Object.assign({}, rows[firstPosition][1]), { rowSpan: rowsToSpan });
             return row;
         });
-        return rows;
+        return rows.map((row) => row.filter((row) => row.text));
     }
     const bodyData = setBodyTable();
     return { bodyData, headerData };

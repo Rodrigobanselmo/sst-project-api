@@ -43,8 +43,8 @@ export class PgrUploadService {
 
     const doc = new Document({
       sections: [
-        hierarchyPlanTableSection(hierarchyData, homoGroupTree),
         // hierarchyRisksTableSection(riskGroupData, hierarchyData),
+        hierarchyPlanTableSection(hierarchyData, homoGroupTree),
         // actionPlanTableSection(riskGroupData),
         // ...riskInventoryTableSection(riskGroupData, hierarchyData),
       ],
