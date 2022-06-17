@@ -1,5 +1,5 @@
 import { AlignmentType } from 'docx';
-import { MapData } from '../../converter/hierarchy.converter';
+import { MapData } from '../../../../converter/hierarchy.converter';
 export declare const dataConverter: (hierarchyData: MapData) => ({
     text: string;
     alignment: AlignmentType;

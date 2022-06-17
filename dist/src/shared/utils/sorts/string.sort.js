@@ -1,9 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sortString = void 0;
-const sortString = function (a, b, field) {
-    const arrayA = field ? a[field] : a;
-    const arrayB = field ? b[field] : b;
+const sortString = function (a, b, field, field2) {
+    let arrayA = field ? a[field] : a;
+    let arrayB = field ? b[field] : b;
+    if (field2) {
+        arrayA = arrayA[field2];
+        arrayB = arrayB[field2];
+    }
     if (arrayA
         .toLowerCase()
         .normalize('NFD')

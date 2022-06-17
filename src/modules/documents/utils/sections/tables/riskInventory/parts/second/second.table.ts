@@ -1,6 +1,6 @@
 import { Table, WidthType } from 'docx';
 
-import { MapData } from '../../converter/hierarchy.converter';
+import { MapData } from '../../../../converter/hierarchy.converter';
 import { TableBodyElements } from '../../elements/body';
 import { TableHeaderElements } from '../../elements/header';
 import { secondRiskInventoryHeader } from './second.constant';

@@ -4,7 +4,7 @@ import { RiskFactorGroupDataEntity } from '../../../../../../../../modules/check
 import { riskMap } from '../../../../../../../../modules/documents/constants/risks.constant';
 import { getMatrizRisk } from '../../../../../../../../modules/documents/utils/matriz';
 import { palette } from '../../../../../../../../shared/constants/palette';
-import { MapData } from '../../converter/hierarchy.converter';
+import { MapData } from '../../../../converter/hierarchy.converter';
 
 import { bodyTableProps, borderNoneStyle } from '../../elements/body';
 import { whiteBorder, whiteColumnBorder } from '../../elements/header';

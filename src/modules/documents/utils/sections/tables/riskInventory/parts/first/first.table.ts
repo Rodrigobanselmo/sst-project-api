@@ -2,7 +2,7 @@ import { Table, WidthType } from 'docx';
 import { RiskFactorGroupDataEntity } from '../../../../../../../../modules/checklist/entities/riskGroupData.entity';
 import { firstRiskInventoryHeader } from '../../../../../../../../modules/documents/utils/sections/tables/riskInventory/parts/first/first.constant';
 
-import { MapData } from '../../converter/hierarchy.converter';
+import { MapData } from '../../../../converter/hierarchy.converter';
 import { TableBodyElements } from '../../elements/body';
 import { borderBottomStyle, TableHeaderElements } from '../../elements/header';
 import { documentConverter } from './first.converter';

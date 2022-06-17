@@ -1,7 +1,7 @@
 import { PageOrientation } from 'docx';
 import { RiskFactorGroupDataEntity } from '../../../../../../modules/checklist/entities/riskGroupData.entity';
-import { HierarchyEntity } from '../../../../../../modules/company/entities/hierarchy.entity';
-export declare const riskInventoryTableSection: (riskFactorGroupData: RiskFactorGroupDataEntity, hierarchiesEntity: HierarchyEntity[]) => {
+import { IHierarchyData } from '../../converter/hierarchy.converter';
+export declare const riskInventoryTableSection: (riskFactorGroupData: RiskFactorGroupDataEntity, hierarchyData: IHierarchyData) => {
     children: any[];
     properties: {
         page: {

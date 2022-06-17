@@ -1,7 +1,17 @@
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const sortString = function (a: any, b: any, field?: string) {
-  const arrayA = field ? a[field] : a;
-  const arrayB = field ? b[field] : b;
+export const sortString = function (
+  a: any,
+  b: any,
+  field?: string,
+  field2?: string,
+) {
+  let arrayA = field ? a[field] : a;
+  let arrayB = field ? b[field] : b;
+
+  if (field2) {
+    arrayA = arrayA[field2];
+    arrayB = arrayB[field2];
+  }
 
   if (
     arrayA

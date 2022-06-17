@@ -17,8 +17,8 @@ const RiskDocumentRepository_1 = require("../../../../modules/checklist/reposito
 const RiskGroupDataRepository_1 = require("../../../../modules/checklist/repositories/implementations/RiskGroupDataRepository");
 const HierarchyRepository_1 = require("../../../../modules/company/repositories/implementations/HierarchyRepository");
 const AmazonStorageProvider_1 = require("../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider");
-const actionPlan_section_1 = require("../../utils/sections/tables/actionPlan/actionPlan.section");
-const riskInventory_section_1 = require("../../utils/sections/tables/riskInventory/riskInventory.section");
+const hierarchy_converter_1 = require("../../utils/sections/converter/hierarchy.converter");
+const hierarchyPlan_section_1 = require("../../utils/sections/tables/hierarchyPlan/hierarchyPlan.section");
 let PgrUploadService = class PgrUploadService {
     constructor(riskGroupDataRepository, riskDocumentRepository, amazonStorageProvider, hierarchyRepository) {
         this.riskGroupDataRepository = riskGroupDataRepository;
@@ -30,11 +30,11 @@ let PgrUploadService = class PgrUploadService {
         const companyId = userPayloadDto.targetCompanyId;
         const workspaceId = upsertPgrDto.workspaceId;
         const riskGroupData = await this.riskGroupDataRepository.findAllDataById(upsertPgrDto.riskGroupId, companyId);
-        const hierarchyData = await this.hierarchyRepository.findAllDataHierarchyByCompany(companyId, workspaceId);
+        const hierarchyHierarchy = await this.hierarchyRepository.findAllDataHierarchyByCompany(companyId, workspaceId);
+        const { hierarchyData, homoGroupTree } = (0, hierarchy_converter_1.hierarchyConverter)(hierarchyHierarchy);
         const doc = new docx_1.Document({
             sections: [
-                (0, actionPlan_section_1.actionPlanTableSection)(riskGroupData),
-                ...(0, riskInventory_section_1.riskInventoryTableSection)(riskGroupData, hierarchyData),
+                (0, hierarchyPlan_section_1.hierarchyPlanTableSection)(hierarchyData, homoGroupTree),
             ],
         });
         const b64string = await docx_1.Packer.toBase64String(doc);

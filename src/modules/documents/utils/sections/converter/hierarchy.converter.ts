@@ -1,15 +1,20 @@
 import { HierarchyEnum } from '@prisma/client';
-import { HierarchyEntity } from '../../../../../../../modules/company/entities/hierarchy.entity';
+import { HomoGroupEntity } from 'src/modules/company/entities/homoGroup.entity';
+import { removeDuplicate } from '../../../../../shared/utils/removeDuplicate';
+import { HierarchyEntity } from '../../../../company/entities/hierarchy.entity';
 
-import { hierarchyMap } from '../parts/first/first.constant';
+import { hierarchyMap } from '../tables/riskInventory/parts/first/first.constant';
 
 export interface MapData {
   org: {
     type: string;
+    typeEnum: string;
     name: string;
+    id: string;
     homogeneousGroupIds: string[];
     homogeneousGroup: string;
   }[];
+  allHomogeneousGroupIds: string[];
   workspace: string;
   descRh: string;
   descReal: string;
@@ -18,18 +23,26 @@ export interface MapData {
 
 export type IHierarchyData = Map<string, MapData>;
 
-type IHierarchyMap = Record<
+export type IHierarchyMap = Record<
   string,
   HierarchyEntity & {
     children: string[];
   }
 >;
 
+export type IHomoGroupMap = Record<string, HomoGroupEntity>;
+
 const setMapHierarchies = (hierarchyData: HierarchyEntity[]) => {
   const hierarchyTree = {} as IHierarchyMap;
+  const homoGroupTree = {} as IHomoGroupMap;
 
   hierarchyData.forEach((hierarchy) => {
     hierarchyTree[hierarchy.id] = { ...hierarchy, children: [] };
+    hierarchy.homogeneousGroups.forEach((homogeneousGroup) => {
+      homoGroupTree[homogeneousGroup.id] = {
+        ...homogeneousGroup,
+      };
+    });
   });
 
   Object.values(hierarchyTree).forEach((hierarchy) => {
@@ -38,11 +51,11 @@ const setMapHierarchies = (hierarchyData: HierarchyEntity[]) => {
     }
   });
 
-  return hierarchyTree;
+  return { hierarchyTree, homoGroupTree };
 };
 
 export const hierarchyConverter = (hierarchies: HierarchyEntity[]) => {
-  const hierarchyTree = setMapHierarchies(hierarchies);
+  const { hierarchyTree, homoGroupTree } = setMapHierarchies(hierarchies);
   const hierarchyData = new Map<string, MapData>();
 
   hierarchies
@@ -54,18 +67,23 @@ export const hierarchyConverter = (hierarchies: HierarchyEntity[]) => {
     .forEach((hierarchy) => {
       const hierarchyArrayData: MapData['org'] = [];
       const hierarchyInfo = hierarchyMap[hierarchy.type];
+      const allHomogeneousGroupIds = [];
 
       const loop = (parentId: string) => {
         if (!parentId) return;
         const parent = hierarchyTree[parentId];
         const parentInfo = hierarchyMap[parent.type];
+        const homogeneousGroupIds =
+          parent?.homogeneousGroups?.map((group) => group.id) || [];
+
+        allHomogeneousGroupIds.push(...homogeneousGroupIds);
 
         hierarchyArrayData[parentInfo.index] = {
           type: parentInfo.text,
+          typeEnum: parent.type,
           name: parent.name,
-          homogeneousGroupIds: parent?.homogeneousGroups?.map(
-            (group) => group.id,
-          ),
+          id: parent.id,
+          homogeneousGroupIds,
           homogeneousGroup:
             parent?.homogeneousGroups?.map((group) => group.name).join(', ') ||
             '',
@@ -74,27 +92,34 @@ export const hierarchyConverter = (hierarchies: HierarchyEntity[]) => {
         loop(parent.parentId);
       };
 
+      const homogeneousGroupIds =
+        hierarchy?.homogeneousGroups?.map((group) => group.id) || [];
+
       hierarchyArrayData[hierarchyInfo.index] = {
         type: hierarchyInfo.text,
+        typeEnum: hierarchy.type,
         name: hierarchy.name,
-        homogeneousGroupIds: hierarchy?.homogeneousGroups?.map(
-          (group) => group.id,
-        ),
+        id: hierarchy.id,
+        homogeneousGroupIds,
         homogeneousGroup:
           hierarchy?.homogeneousGroups?.map((group) => group.name).join(', ') ||
           '',
       };
 
+      allHomogeneousGroupIds.push(...homogeneousGroupIds);
       loop(hierarchy.parentId);
 
       hierarchyData.set(hierarchy.id, {
         org: hierarchyArrayData.filter((hierarchyInfo) => hierarchyInfo),
-        workspace: hierarchy.workspaces[0].name, //!
+        workspace: hierarchy.workspaces[0].name, //! Make it possible for many workspaces
         descRh: hierarchy.description,
         descReal: hierarchy.realDescription,
         employeesLength: hierarchy?.employees?.length || 0,
+        allHomogeneousGroupIds: removeDuplicate(allHomogeneousGroupIds, {
+          simpleCompare: true,
+        }),
       });
     });
 
-  return hierarchyData;
+  return { hierarchyData, homoGroupTree, hierarchyTree };
 };

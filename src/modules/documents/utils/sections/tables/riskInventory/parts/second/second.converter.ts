@@ -1,6 +1,6 @@
 import { AlignmentType } from 'docx';
 
-import { MapData } from '../../converter/hierarchy.converter';
+import { MapData } from '../../../../converter/hierarchy.converter';
 import { borderNoneStyle } from '../../elements/body';
 import { borderRightStyle } from '../../elements/header';
 
