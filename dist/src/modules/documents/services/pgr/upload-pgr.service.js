@@ -18,7 +18,11 @@ const RiskGroupDataRepository_1 = require("../../../../modules/checklist/reposit
 const HierarchyRepository_1 = require("../../../../modules/company/repositories/implementations/HierarchyRepository");
 const AmazonStorageProvider_1 = require("../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider");
 const hierarchy_converter_1 = require("../../utils/sections/converter/hierarchy.converter");
-const hierarchyPlan_section_1 = require("../../utils/sections/tables/hierarchyPlan/hierarchyPlan.section");
+const actionPlan_section_1 = require("../../utils/sections/tables/actionPlan/actionPlan.section");
+const hierarchyPlan_section_1 = require("../../utils/sections/tables/hierarchyOrg/hierarchyPlan.section");
+const hierarchyPrioritization_section_1 = require("../../utils/sections/tables/hierarchyPrioritization/hierarchyPrioritization.section");
+const hierarchyRisks_section_1 = require("../../utils/sections/tables/hierarchyRisks/hierarchyRisks.section");
+const riskInventory_section_1 = require("../../utils/sections/tables/riskInventory/riskInventory.section");
 let PgrUploadService = class PgrUploadService {
     constructor(riskGroupDataRepository, riskDocumentRepository, amazonStorageProvider, hierarchyRepository) {
         this.riskGroupDataRepository = riskGroupDataRepository;
@@ -34,7 +38,11 @@ let PgrUploadService = class PgrUploadService {
         const { hierarchyData, homoGroupTree } = (0, hierarchy_converter_1.hierarchyConverter)(hierarchyHierarchy);
         const doc = new docx_1.Document({
             sections: [
+                (0, hierarchyPrioritization_section_1.hierarchyPrioritizationTableSection)(riskGroupData, hierarchyData),
+                (0, hierarchyRisks_section_1.hierarchyRisksTableSection)(riskGroupData, hierarchyData),
                 (0, hierarchyPlan_section_1.hierarchyPlanTableSection)(hierarchyData, homoGroupTree),
+                (0, actionPlan_section_1.actionPlanTableSection)(riskGroupData),
+                ...(0, riskInventory_section_1.riskInventoryTableSection)(riskGroupData, hierarchyData),
             ],
         });
         const b64string = await docx_1.Packer.toBase64String(doc);

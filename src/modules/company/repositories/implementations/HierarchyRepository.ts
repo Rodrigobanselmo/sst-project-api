@@ -30,6 +30,7 @@ export class HierarchyRepository {
                 },
                 update: {
                   name: ghoName,
+                  ...(description ? { description: description } : {}),
                 },
                 where: { name_companyId: { companyId, name: ghoName } },
               });

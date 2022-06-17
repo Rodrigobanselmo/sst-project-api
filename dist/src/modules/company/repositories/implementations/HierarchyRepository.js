@@ -39,9 +39,7 @@ let HierarchyRepository = class HierarchyRepository {
                             name: ghoName,
                             description: description || '',
                         },
-                        update: {
-                            name: ghoName,
-                        },
+                        update: Object.assign({ name: ghoName }, (description ? { description: description } : {})),
                         where: { name_companyId: { companyId, name: ghoName } },
                     });
                 }))

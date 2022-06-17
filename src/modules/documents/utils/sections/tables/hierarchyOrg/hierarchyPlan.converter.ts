@@ -133,7 +133,7 @@ export const hierarchyPlanConverter = (
         const row = generateRow();
         const firstPosition = rowsPosition;
         row[0] = { text: homoGroupTree[homogeneousGroupId].name };
-        row[1] = { text: homoGroupTree[homogeneousGroupId].description };
+        row[1] = { text: homoGroupTree[homogeneousGroupId].description || ' ' };
 
         rows[rowsPosition] = row;
 
