@@ -26,6 +26,7 @@ export class UpsertEnvironmentDto {
   })
   type?: CompanyEnvironmentTypesEnum;
 
+  @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
   @IsString()
   @IsOptional()
   description?: string;

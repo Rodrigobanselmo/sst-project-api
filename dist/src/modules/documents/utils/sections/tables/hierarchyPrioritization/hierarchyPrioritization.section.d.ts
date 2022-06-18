@@ -1,7 +1,8 @@
 import { PageOrientation, Table } from 'docx';
 import { RiskFactorGroupDataEntity } from '../../../../../checklist/entities/riskGroupData.entity';
 import { IHierarchyData } from '../../converter/hierarchy.converter';
-export declare const hierarchyPrioritizationTableSection: (riskFactorGroupData: RiskFactorGroupDataEntity, hierarchiesEntity: IHierarchyData) => {
+import { IHierarchyPrioritizationOptions } from './hierarchyPrioritization.converter';
+export declare const hierarchyPrioritizationTableSection: (riskFactorGroupData: RiskFactorGroupDataEntity, hierarchiesEntity: IHierarchyData, options?: IHierarchyPrioritizationOptions) => {
     children: Table[];
     properties: {
         page: {
@@ -16,4 +17,4 @@ export declare const hierarchyPrioritizationTableSection: (riskFactorGroupData: 
             };
         };
     };
-};
+}[];

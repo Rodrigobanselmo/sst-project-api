@@ -14,6 +14,7 @@ const openapi = require("@nestjs/swagger");
 const client_1 = require("@prisma/client");
 const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
+const string_capitalize_paragraph_1 = require("../../../shared/transformers/string-capitalize-paragraph");
 const date_format_1 = require("../../../shared/transformers/date-format");
 const string_capitalize_1 = require("../../../shared/transformers/string-capitalize");
 const string_uppercase_transform_1 = require("../../../shared/transformers/string-uppercase.transform");
@@ -29,6 +30,7 @@ __decorate([
     __metadata("design:type", String)
 ], UpsertRiskGroupDataDto.prototype, "id", void 0);
 __decorate([
+    (0, class_transformer_1.Transform)(string_capitalize_paragraph_1.StringCapitalizeParagraphTransform, { toClassOnly: true }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], UpsertRiskGroupDataDto.prototype, "name", void 0);
@@ -47,6 +49,7 @@ __decorate([
     __metadata("design:type", String)
 ], UpsertRiskGroupDataDto.prototype, "companyId", void 0);
 __decorate([
+    (0, class_transformer_1.Transform)(string_capitalize_paragraph_1.StringCapitalizeParagraphTransform, { toClassOnly: true }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
@@ -64,6 +67,7 @@ __decorate([
     __metadata("design:type", String)
 ], UpsertRiskGroupDataDto.prototype, "approvedBy", void 0);
 __decorate([
+    (0, class_transformer_1.Transform)(string_capitalize_1.StringCapitalizeTransform, { toClassOnly: true }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)

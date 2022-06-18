@@ -14,7 +14,7 @@ const firstRiskInventoryTableSection = (riskFactorGroupData, hierarchyData) => {
         width: { size: 100, type: docx_1.WidthType.PERCENTAGE },
         rows: [
             tableHeaderElements.headerTitle({
-                text: 'INVENTÁRIO DE RISCO (APR)',
+                text: 'INVENTÁRIO DE RISCO (APP/APR)',
                 columnSpan: first_constant_1.firstRiskInventoryHeader.length,
                 borders: header_1.borderBottomStyle,
             }),

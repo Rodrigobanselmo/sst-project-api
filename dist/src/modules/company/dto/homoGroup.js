@@ -13,6 +13,7 @@ exports.UpdateHomoGroupDto = exports.CreateHomoGroupDto = exports.HierarchyOnHom
 const client_1 = require("@prisma/client");
 const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
+const string_capitalize_paragraph_1 = require("../../../shared/transformers/string-capitalize-paragraph");
 const string_uppercase_transform_1 = require("../../../shared/transformers/string-uppercase.transform");
 class HierarchyOnHomoDto {
 }
@@ -28,11 +29,13 @@ exports.HierarchyOnHomoDto = HierarchyOnHomoDto;
 class CreateHomoGroupDto {
 }
 __decorate([
+    (0, class_transformer_1.Transform)(string_capitalize_paragraph_1.StringCapitalizeParagraphTransform, { toClassOnly: true }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MaxLength)(100),
     __metadata("design:type", String)
 ], CreateHomoGroupDto.prototype, "name", void 0);
 __decorate([
+    (0, class_transformer_1.Transform)(string_capitalize_paragraph_1.StringCapitalizeParagraphTransform, { toClassOnly: true }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateHomoGroupDto.prototype, "description", void 0);
@@ -58,11 +61,13 @@ __decorate([
     __metadata("design:type", String)
 ], UpdateHomoGroupDto.prototype, "id", void 0);
 __decorate([
+    (0, class_transformer_1.Transform)(string_capitalize_paragraph_1.StringCapitalizeParagraphTransform, { toClassOnly: true }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], UpdateHomoGroupDto.prototype, "description", void 0);
 __decorate([
+    (0, class_transformer_1.Transform)(string_capitalize_paragraph_1.StringCapitalizeParagraphTransform, { toClassOnly: true }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.MaxLength)(100),

@@ -7,11 +7,13 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
+import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
 import { ChecklistDataDto } from './checklist-data';
 
 export class UpdateChecklistDto {
+  @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
   @IsOptional()
   @IsString()
   name: string;

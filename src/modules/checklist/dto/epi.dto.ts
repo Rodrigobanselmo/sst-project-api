@@ -8,6 +8,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
+import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
 import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
 
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
@@ -17,6 +18,7 @@ export class CreateEpiDto {
   @IsString()
   ca: string;
 
+  @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
   @IsString()
   equipment: string;
 
@@ -24,18 +26,22 @@ export class CreateEpiDto {
   @IsOptional()
   national?: boolean;
 
+  @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
   @IsOptional()
   @IsString()
   description?: string;
 
+  @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
   @IsOptional()
   @IsString()
   report?: string;
 
+  @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
   @IsOptional()
   @IsString()
   restriction?: string;
 
+  @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
   @IsOptional()
   @IsString()
   observation?: string;

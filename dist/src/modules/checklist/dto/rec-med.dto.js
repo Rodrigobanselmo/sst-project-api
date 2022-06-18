@@ -15,6 +15,7 @@ const swagger_1 = require("@nestjs/swagger");
 const client_1 = require("@prisma/client");
 const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
+const string_capitalize_paragraph_1 = require("../../../shared/transformers/string-capitalize-paragraph");
 const string_uppercase_transform_1 = require("../../../shared/transformers/string-uppercase.transform");
 const keysOfEnum_utils_1 = require("../../../shared/utils/keysOfEnum.utils");
 class CreateRecMedDto {
@@ -27,11 +28,13 @@ __decorate([
     __metadata("design:type", String)
 ], CreateRecMedDto.prototype, "riskId", void 0);
 __decorate([
+    (0, class_transformer_1.Transform)(string_capitalize_paragraph_1.StringCapitalizeParagraphTransform, { toClassOnly: true }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateRecMedDto.prototype, "recName", void 0);
 __decorate([
+    (0, class_transformer_1.Transform)(string_capitalize_paragraph_1.StringCapitalizeParagraphTransform, { toClassOnly: true }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
@@ -76,11 +79,13 @@ class UpdateRecMedDto {
     }
 }
 __decorate([
+    (0, class_transformer_1.Transform)(string_capitalize_paragraph_1.StringCapitalizeParagraphTransform, { toClassOnly: true }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], UpdateRecMedDto.prototype, "recName", void 0);
 __decorate([
+    (0, class_transformer_1.Transform)(string_capitalize_paragraph_1.StringCapitalizeParagraphTransform, { toClassOnly: true }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
@@ -114,11 +119,13 @@ class RiskCreateRecMedDto {
     }
 }
 __decorate([
+    (0, class_transformer_1.Transform)(string_capitalize_paragraph_1.StringCapitalizeParagraphTransform, { toClassOnly: true }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], RiskCreateRecMedDto.prototype, "recName", void 0);
 __decorate([
+    (0, class_transformer_1.Transform)(string_capitalize_paragraph_1.StringCapitalizeParagraphTransform, { toClassOnly: true }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)

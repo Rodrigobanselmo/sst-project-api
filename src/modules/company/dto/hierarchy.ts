@@ -8,6 +8,7 @@ import {
   MaxLength,
   ValidateNested,
 } from 'class-validator';
+import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
 
 import { StringCapitalizeTransform } from '../../../shared/transformers/string-capitalize';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
@@ -36,10 +37,12 @@ export class CreateHierarchyDto {
   @IsString()
   companyId: string;
 
+  @Transform(StringCapitalizeTransform, { toClassOnly: true })
   @IsString()
   @IsOptional()
   ghoName: string;
 
+  @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
   @IsString()
   @IsOptional()
   description?: string;

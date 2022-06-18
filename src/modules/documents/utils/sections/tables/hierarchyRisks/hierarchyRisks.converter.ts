@@ -9,6 +9,10 @@ import { hierarchyMap } from '../riskInventory/parts/first/first.constant';
 import { bodyTableProps } from './elements/body';
 import { headerTableProps } from './elements/header';
 
+export interface IHierarchyRiskOptions {
+  hierarchyType?: HierarchyEnum;
+}
+
 interface IHomoPositionData {
   position: number[];
 }
@@ -26,9 +30,8 @@ interface IRiskDataMap {
 export const hierarchyRisksConverter = (
   riskGroup: RiskFactorGroupDataEntity,
   hierarchyData: IHierarchyData,
+  { hierarchyType = HierarchyEnum.SECTOR }: IHierarchyRiskOptions,
 ) => {
-  const hierarchyType = HierarchyEnum.SECTOR;
-
   const allHierarchyRecord = {} as Record<string, IHierarchyDataType>;
   const allRiskRecord = {} as Record<string, IRiskDataMap>;
 
@@ -80,10 +83,13 @@ export const hierarchyRisksConverter = (
   const allRisks = Object.values(allRiskRecord);
   const allHierarchy = Object.values(allHierarchyRecord);
 
+  const isLengthGreaterThan50 =
+    allRisks.length > 50 && allHierarchy.length > 50;
   const isRiskLengthGreater = allRisks.length > allHierarchy.length;
+  const shouldRiskBeInRows = isLengthGreaterThan50 || isRiskLengthGreater;
 
-  const header = isRiskLengthGreater ? allHierarchy : allRisks;
-  const body = isRiskLengthGreater ? allRisks : allHierarchy;
+  const header = shouldRiskBeInRows ? allHierarchy : allRisks;
+  const body = shouldRiskBeInRows ? allRisks : allHierarchy;
 
   function setHeaderTable() {
     const row = header

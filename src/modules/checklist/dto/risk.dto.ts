@@ -7,6 +7,7 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
+import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
 import {
@@ -29,6 +30,7 @@ export class CreateRiskDto {
   })
   type: RiskFactorsEnum;
 
+  @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
   @IsString()
   name: string;
 
@@ -85,6 +87,7 @@ export class UpdateRiskDto {
   })
   type?: RiskFactorsEnum;
 
+  @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
   @IsString()
   @IsOptional()
   name?: string;

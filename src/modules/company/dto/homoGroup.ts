@@ -7,6 +7,7 @@ import {
   MaxLength,
   ValidateNested,
 } from 'class-validator';
+import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
 
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 
@@ -18,10 +19,12 @@ export class HierarchyOnHomoDto {
   id: string;
 }
 export class CreateHomoGroupDto {
+  @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
   @IsString()
   @MaxLength(100)
   name: string;
 
+  @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
   @IsString()
   description: string;
 
@@ -42,10 +45,12 @@ export class UpdateHomoGroupDto {
   @IsString()
   id?: string;
 
+  @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
   @IsOptional()
   @IsString()
   description?: string;
 
+  @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
   @IsString()
   @IsOptional()
   @MaxLength(100)

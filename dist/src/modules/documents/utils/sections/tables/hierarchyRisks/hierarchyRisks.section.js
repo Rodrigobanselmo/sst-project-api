@@ -1,12 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.hierarchyRisksTableSection = void 0;
+const client_1 = require("@prisma/client");
 const docx_1 = require("docx");
 const body_1 = require("./elements/body");
 const header_1 = require("./elements/header");
 const hierarchyRisks_converter_1 = require("./hierarchyRisks.converter");
-const hierarchyRisksTableSection = (riskFactorGroupData, hierarchiesEntity) => {
-    const { bodyData, headerData } = (0, hierarchyRisks_converter_1.hierarchyRisksConverter)(riskFactorGroupData, hierarchiesEntity);
+const hierarchyRisksTableSection = (riskFactorGroupData, hierarchiesEntity, options = {
+    hierarchyType: client_1.HierarchyEnum.SECTOR,
+}) => {
+    const { bodyData, headerData } = (0, hierarchyRisks_converter_1.hierarchyRisksConverter)(riskFactorGroupData, hierarchiesEntity, options);
     const tableHeaderElements = new header_1.TableHeaderElements();
     const tableBodyElements = new body_1.TableBodyElements();
     const table = new docx_1.Table({

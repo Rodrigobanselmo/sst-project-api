@@ -3,6 +3,7 @@ import { MeasuresTypeEnum, StatusEnum } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
 
+import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
 
@@ -10,10 +11,12 @@ export class CreateRecMedDto {
   @IsString()
   riskId: string;
 
+  @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
   @IsOptional()
   @IsString()
   recName?: string;
 
+  @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
   @IsOptional()
   @IsString()
   medName?: string;
@@ -45,10 +48,12 @@ export class UpsertRecMedDto extends CreateRecMedDto {
 }
 
 export class UpdateRecMedDto {
+  @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
   @IsOptional()
   @IsString()
   recName?: string;
 
+  @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
   @IsOptional()
   @IsString()
   medName?: string;
@@ -74,10 +79,12 @@ export class UpdateRecMedDto {
 }
 
 export class RiskCreateRecMedDto {
+  @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
   @IsOptional()
   @IsString()
   recName?: string;
 
+  @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
   @IsOptional()
   @IsString()
   medName?: string;

@@ -6,8 +6,7 @@ const palette_1 = require("../../../../../../shared/constants/palette");
 const removeDuplicate_1 = require("../../../../../../shared/utils/removeDuplicate");
 const string_sort_1 = require("../../../../../../shared/utils/sorts/string.sort");
 const first_constant_1 = require("../riskInventory/parts/first/first.constant");
-const hierarchyRisksConverter = (riskGroup, hierarchyData) => {
-    const hierarchyType = client_1.HierarchyEnum.SECTOR;
+const hierarchyRisksConverter = (riskGroup, hierarchyData, { hierarchyType = client_1.HierarchyEnum.SECTOR }) => {
     const allHierarchyRecord = {};
     const allRiskRecord = {};
     const HomoPositionMap = new Map();
@@ -47,9 +46,11 @@ const hierarchyRisksConverter = (riskGroup, hierarchyData) => {
     })();
     const allRisks = Object.values(allRiskRecord);
     const allHierarchy = Object.values(allHierarchyRecord);
+    const isLengthGreaterThan50 = allRisks.length > 50 && allHierarchy.length > 50;
     const isRiskLengthGreater = allRisks.length > allHierarchy.length;
-    const header = isRiskLengthGreater ? allHierarchy : allRisks;
-    const body = isRiskLengthGreater ? allRisks : allHierarchy;
+    const shouldRiskBeInRows = isLengthGreaterThan50 || isRiskLengthGreater;
+    const header = shouldRiskBeInRows ? allHierarchy : allRisks;
+    const body = shouldRiskBeInRows ? allRisks : allHierarchy;
     function setHeaderTable() {
         const row = header
             .sort((a, b) => (0, string_sort_1.sortString)(a, b, 'name'))

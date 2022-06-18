@@ -1,6 +1,7 @@
 import { StatusEnum } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
 
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
@@ -10,6 +11,7 @@ export class UpsertRiskDocumentDto {
   @IsOptional()
   id?: string;
 
+  @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
   @IsString()
   name: string;
 
@@ -28,6 +30,7 @@ export class UpsertRiskDocumentDto {
   @IsString()
   fileUrl: string;
 
+  @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
   @IsString()
   @IsOptional()
   description?: string;

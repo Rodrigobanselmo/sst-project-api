@@ -14,6 +14,7 @@ const openapi = require("@nestjs/swagger");
 const client_1 = require("@prisma/client");
 const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
+const string_capitalize_paragraph_1 = require("../../../shared/transformers/string-capitalize-paragraph");
 const string_uppercase_transform_1 = require("../../../shared/transformers/string-uppercase.transform");
 const keysOfEnum_utils_1 = require("../../../shared/utils/keysOfEnum.utils");
 const rec_med_dto_1 = require("./rec-med.dto");
@@ -27,6 +28,7 @@ __decorate([
     __metadata("design:type", String)
 ], CreateGenerateSourceDto.prototype, "riskId", void 0);
 __decorate([
+    (0, class_transformer_1.Transform)(string_capitalize_paragraph_1.StringCapitalizeParagraphTransform, { toClassOnly: true }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateGenerateSourceDto.prototype, "name", void 0);
@@ -67,6 +69,7 @@ class UpdateGenerateSourceDto {
     }
 }
 __decorate([
+    (0, class_transformer_1.Transform)(string_capitalize_paragraph_1.StringCapitalizeParagraphTransform, { toClassOnly: true }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
@@ -97,6 +100,7 @@ class RiskCreateGenerateSourceDto {
     }
 }
 __decorate([
+    (0, class_transformer_1.Transform)(string_capitalize_paragraph_1.StringCapitalizeParagraphTransform, { toClassOnly: true }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], RiskCreateGenerateSourceDto.prototype, "name", void 0);

@@ -23,7 +23,7 @@ export const firstRiskInventoryTableSection = (
     width: { size: 100, type: WidthType.PERCENTAGE },
     rows: [
       tableHeaderElements.headerTitle({
-        text: 'INVENTÁRIO DE RISCO (APR)',
+        text: 'INVENTÁRIO DE RISCO (APP/APR)',
         columnSpan: firstRiskInventoryHeader.length,
         borders: borderBottomStyle,
       }),

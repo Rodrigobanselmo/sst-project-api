@@ -1,6 +1,7 @@
 import { StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import { IsDate, IsEnum, IsOptional, IsString } from 'class-validator';
+import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
 import { DateFormat } from '../../../shared/transformers/date-format';
 import { StringCapitalizeTransform } from '../../../shared/transformers/string-capitalize';
 
@@ -12,6 +13,7 @@ export class UpsertRiskGroupDataDto {
   @IsOptional()
   id?: string;
 
+  @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
   @IsString()
   name: string;
 
@@ -27,6 +29,7 @@ export class UpsertRiskGroupDataDto {
   @IsString()
   companyId: string;
 
+  @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
   @IsOptional()
   @IsString()
   source: string;
@@ -41,6 +44,7 @@ export class UpsertRiskGroupDataDto {
   @IsString()
   approvedBy: string;
 
+  @Transform(StringCapitalizeTransform, { toClassOnly: true })
   @IsOptional()
   @IsString()
   revisionBy: string;

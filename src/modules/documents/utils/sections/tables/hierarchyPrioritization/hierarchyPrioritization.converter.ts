@@ -1,8 +1,4 @@
 import { HierarchyEnum } from '@prisma/client';
-import {
-  matrixRisk,
-  matrixRiskMap,
-} from 'src/modules/documents/constants/matrizRisk.constant';
 
 import { palette } from '../../../../../../shared/constants/palette';
 import { removeDuplicate } from '../../../../../../shared/utils/removeDuplicate';
@@ -14,9 +10,12 @@ import { hierarchyMap } from '../riskInventory/parts/first/first.constant';
 import { bodyTableProps } from './elements/body';
 import { headerTableProps } from './elements/header';
 
+export interface IHierarchyPrioritizationOptions {
+  isByGroup?: boolean;
+  hierarchyType?: HierarchyEnum;
+}
 interface IHomoPositionData {
   data: { position: number; riskDegree: string; riskDegreeLevel: number }[];
-  // position: number[];
 }
 
 interface IHierarchyDataType {
@@ -34,16 +33,18 @@ interface IRiskDataMap {
 export const hierarchyPrioritizationConverter = (
   riskGroup: RiskFactorGroupDataEntity,
   hierarchyData: IHierarchyData,
+  {
+    hierarchyType = HierarchyEnum.SECTOR,
+    isByGroup = false,
+  }: IHierarchyPrioritizationOptions,
 ) => {
-  const hierarchyType = HierarchyEnum.SECTOR;
-  const isByGroup = true;
   const warnLevelStart = 4;
-  const allHierarchyRecord = {} as Record<string, IHierarchyDataType>;
   const allRiskRecord = {} as Record<string, IRiskDataMap>;
+  const allHierarchyRecord = {} as Record<string, IHierarchyDataType>;
 
   const HomoPositionMap = new Map<string, IHomoPositionData>();
 
-  (function getAllHierarchyByType() {
+  function getAllHierarchyByType() {
     hierarchyData.forEach((hierarchiesData) => {
       const hierarchy = hierarchiesData.org.find((hierarchyData) => {
         return hierarchyData.typeEnum === hierarchyType;
@@ -66,7 +67,26 @@ export const hierarchyPrioritizationConverter = (
         };
       }
     });
-  })();
+
+    return allHierarchyRecord;
+  }
+
+  function getAllHomoGroups() {
+    riskGroup.data.forEach((riskData) => {
+      const homoId = riskData.homogeneousGroup.id;
+      const name = riskData.homogeneousGroup.name;
+      const hierarchyMap = allHierarchyRecord[homoId] || {
+        homogeneousGroupIds: [homoId],
+      };
+
+      allHierarchyRecord[homoId] = {
+        ...hierarchyMap,
+        name,
+      };
+    });
+  }
+
+  !isByGroup ? getAllHierarchyByType() : getAllHomoGroups();
 
   (function getAllRiskFactors() {
     riskGroup.data.forEach((riskData) => {
@@ -101,12 +121,15 @@ export const hierarchyPrioritizationConverter = (
   const allRisks = Object.values(allRiskRecord);
   const allHierarchy = Object.values(allHierarchyRecord);
 
+  const isLengthGreaterThan50 =
+    allRisks.length > 50 && allHierarchy.length > 50;
   const isRiskLengthGreater = allRisks.length > allHierarchy.length;
+  const shouldRiskBeInRows = isLengthGreaterThan50 || isRiskLengthGreater;
 
-  const header: (IHierarchyDataType | IRiskDataMap)[] = isRiskLengthGreater
+  const header: (IHierarchyDataType | IRiskDataMap)[] = shouldRiskBeInRows
     ? allHierarchy
     : allRisks;
-  const body: (IHierarchyDataType | IRiskDataMap)[] = isRiskLengthGreater
+  const body: (IHierarchyDataType | IRiskDataMap)[] = shouldRiskBeInRows
     ? allRisks
     : allHierarchy;
 
@@ -141,7 +164,7 @@ export const hierarchyPrioritizationConverter = (
       });
 
     row.unshift({
-      text: hierarchyMap[hierarchyType].text,
+      text: isByGroup ? 'GSE' : hierarchyMap[hierarchyType].text,
       position: 0,
       textDirection: undefined,
       size: row.length < 6 ? 1 : Math.ceil(row.length / 6),
