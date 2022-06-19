@@ -1,8 +1,6 @@
 import { PageOrientation, Table } from 'docx';
 import { RiskFactorGroupDataEntity } from '../../../../../checklist/entities/riskGroupData.entity';
-import { IHierarchyData } from '../../converter/hierarchy.converter';
-import { IHierarchyRiskOptions } from './hierarchyRisks.converter';
-export declare const hierarchyRisksTableSections: (riskFactorGroupData: RiskFactorGroupDataEntity, hierarchiesEntity: IHierarchyData, options?: IHierarchyRiskOptions) => {
+export declare const riskCharacterizationTableSection: (riskFactorGroupData: RiskFactorGroupDataEntity) => {
     children: Table[];
     properties: {
         page: {
@@ -17,4 +15,4 @@ export declare const hierarchyRisksTableSections: (riskFactorGroupData: RiskFact
             };
         };
     };
-}[];
+};

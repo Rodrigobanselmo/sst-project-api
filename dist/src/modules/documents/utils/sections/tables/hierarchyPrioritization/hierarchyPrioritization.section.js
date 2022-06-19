@@ -1,13 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.hierarchyPrioritizationTableSection = void 0;
+exports.hierarchyPrioritizationTableSections = void 0;
 const client_1 = require("@prisma/client");
 const docx_1 = require("docx");
 const arrayChunks_1 = require("../../../../../../shared/utils/arrayChunks");
 const body_1 = require("./elements/body");
 const header_1 = require("./elements/header");
 const hierarchyPrioritization_converter_1 = require("./hierarchyPrioritization.converter");
-const hierarchyPrioritizationTableSection = (riskFactorGroupData, hierarchiesEntity, options = {
+const hierarchyPrioritizationTableSections = (riskFactorGroupData, hierarchiesEntity, options = {
     hierarchyType: client_1.HierarchyEnum.SECTOR,
     isByGroup: false,
 }) => {
@@ -44,5 +44,5 @@ const hierarchyPrioritizationTableSection = (riskFactorGroupData, hierarchiesEnt
     }));
     return sections;
 };
-exports.hierarchyPrioritizationTableSection = hierarchyPrioritizationTableSection;
+exports.hierarchyPrioritizationTableSections = hierarchyPrioritizationTableSections;
 //# sourceMappingURL=hierarchyPrioritization.section.js.map

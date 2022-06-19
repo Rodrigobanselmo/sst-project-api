@@ -60,7 +60,9 @@ let RiskGroupDataRepository = class RiskGroupDataRepository {
                         generateSources: true,
                         epis: true,
                         riskFactor: true,
-                        hierarchy: { include: { employees: true } },
+                        hierarchy: {
+                            include: { employees: { select: { _count: true } } },
+                        },
                         homogeneousGroup: true,
                     },
                 },

@@ -6,7 +6,11 @@ const hexToColors = (hex) => {
 };
 exports.hexToColors = hexToColors;
 exports.palette = {
-    table: { header: (0, exports.hexToColors)('#fca557'), row: (0, exports.hexToColors)('#fcf2e8') },
+    table: {
+        header: (0, exports.hexToColors)('#fca557'),
+        row: (0, exports.hexToColors)('#fcf2e8'),
+        rowDark: (0, exports.hexToColors)('#fce2c9'),
+    },
     text: { main: (0, exports.hexToColors)('#000000'), attention: (0, exports.hexToColors)('#ff0000') },
 };
 //# sourceMappingURL=palette.js.map

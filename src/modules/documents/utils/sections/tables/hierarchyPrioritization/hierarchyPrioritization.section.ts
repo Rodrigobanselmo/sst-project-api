@@ -11,7 +11,7 @@ import {
   IHierarchyPrioritizationOptions,
 } from './hierarchyPrioritization.converter';
 
-export const hierarchyPrioritizationTableSection = (
+export const hierarchyPrioritizationTableSections = (
   riskFactorGroupData: RiskFactorGroupDataEntity,
   hierarchiesEntity: IHierarchyData,
   options: IHierarchyPrioritizationOptions = {

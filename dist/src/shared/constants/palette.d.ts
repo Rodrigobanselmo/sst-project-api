@@ -12,6 +12,10 @@ export declare const palette: {
             hex: string;
             string: string;
         };
+        rowDark: {
+            hex: string;
+            string: string;
+        };
     };
     text: {
         main: {
