@@ -14,7 +14,7 @@ const openapi = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class UpsertRiskDataDto {
     static _OPENAPI_METADATA_FACTORY() {
-        return { id: { required: false, type: () => String }, probability: { required: false, type: () => Number }, probabilityAfter: { required: false, type: () => Number }, companyId: { required: true, type: () => String }, riskId: { required: true, type: () => String }, hierarchyId: { required: true, type: () => String }, homogeneousGroupId: { required: true, type: () => String }, riskFactorGroupDataId: { required: true, type: () => String }, recs: { required: false, type: () => [String] }, engs: { required: false, type: () => [String] }, adms: { required: false, type: () => [String] }, generateSources: { required: false, type: () => [String] }, epis: { required: false, type: () => [Number] } };
+        return { id: { required: false, type: () => String }, probability: { required: false, type: () => Number }, probabilityAfter: { required: false, type: () => Number }, companyId: { required: true, type: () => String }, riskId: { required: true, type: () => String }, hierarchyId: { required: true, type: () => String }, homogeneousGroupId: { required: true, type: () => String }, riskFactorGroupDataId: { required: true, type: () => String }, recs: { required: false, type: () => [String] }, engs: { required: false, type: () => [String] }, adms: { required: false, type: () => [String] }, generateSources: { required: false, type: () => [String] }, epis: { required: false, type: () => [Number] }, keepEmpty: { required: false, type: () => Boolean } };
     }
 }
 __decorate([
@@ -79,6 +79,10 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Array)
 ], UpsertRiskDataDto.prototype, "epis", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Boolean)
+], UpsertRiskDataDto.prototype, "keepEmpty", void 0);
 exports.UpsertRiskDataDto = UpsertRiskDataDto;
 class UpsertManyRiskDataDto {
     static _OPENAPI_METADATA_FACTORY() {

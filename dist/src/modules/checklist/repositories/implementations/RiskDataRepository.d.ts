@@ -4,11 +4,12 @@ import { RiskFactorDataEntity } from '../../entities/riskData.entity';
 export declare class RiskDataRepository {
     private prisma;
     constructor(prisma: PrismaService);
-    upsert(upsertRiskDataDto: UpsertRiskDataDto): Promise<RiskFactorDataEntity>;
+    upsert(upsertRiskDataDto: Omit<UpsertRiskDataDto, 'keepEmpty'>): Promise<RiskFactorDataEntity>;
     upsertConnectMany(upsertManyRiskDataDto: UpsertManyRiskDataDto): Promise<RiskFactorDataEntity[]>;
     upsertMany(upsertManyRiskDataDto: UpsertManyRiskDataDto): Promise<RiskFactorDataEntity[]>;
     findAllByGroup(riskFactorGroupDataId: string, companyId?: string): Promise<RiskFactorDataEntity[]>;
     findAllByGroupAndRisk(riskFactorGroupDataId: string, riskId: string, companyId: string): Promise<RiskFactorDataEntity[]>;
+    findAllByHomogeneousGroupId(companyId: string, riskFactorGroupDataId: string, homogeneousGroupId: string): Promise<RiskFactorDataEntity[]>;
     deleteById(id: string): Promise<RiskFactorDataEntity>;
     deleteByIds(ids: string[]): Promise<import(".prisma/client").Prisma.BatchPayload>;
     deleteByHomoAndRisk(homogeneousGroupIds: string[], riskIds: string[], groupId: string): Promise<import(".prisma/client").Prisma.BatchPayload>;

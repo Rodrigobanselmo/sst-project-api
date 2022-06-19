@@ -21,7 +21,7 @@ export declare class RiskRepository implements IRiskRepository {
         recMed?: boolean;
         generateSource?: boolean;
     }>): Promise<RiskFactorsEntity[]>;
-    findAllAvailable(companyId: string, { representAll, ...options }?: {
+    findAllAvailable(companyId: string, userCompanyId: string, { representAll, ...options }?: {
         select?: Prisma.RiskFactorsSelect;
         include?: Prisma.RiskFactorsInclude;
         representAll?: boolean;

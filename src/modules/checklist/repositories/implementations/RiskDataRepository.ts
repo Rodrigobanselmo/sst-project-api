@@ -14,7 +14,7 @@ import { PrismaPromise } from '@prisma/client';
 export class RiskDataRepository {
   constructor(private prisma: PrismaService) {}
   async upsert(
-    upsertRiskDataDto: UpsertRiskDataDto,
+    upsertRiskDataDto: Omit<UpsertRiskDataDto, 'keepEmpty'>,
   ): Promise<RiskFactorDataEntity> {
     const riskFactorData = await this.upsertPrisma(upsertRiskDataDto);
 
@@ -120,6 +120,26 @@ export class RiskDataRepository {
 
     return riskFactorData.map((data) => new RiskFactorDataEntity(data));
   }
+
+  async findAllByHomogeneousGroupId(
+    companyId: string,
+    riskFactorGroupDataId: string,
+    homogeneousGroupId: string,
+  ) {
+    const riskFactorData = await this.prisma.riskFactorData.findMany({
+      where: { riskFactorGroupDataId, companyId, homogeneousGroupId },
+      include: {
+        adms: true,
+        recs: true,
+        engs: true,
+        generateSources: true,
+        epis: true,
+      },
+    });
+
+    return riskFactorData.map((data) => new RiskFactorDataEntity(data));
+  }
+
   async deleteById(id: string) {
     const riskFactorData = await this.prisma.riskFactorData.delete({
       where: { id },
@@ -163,7 +183,7 @@ export class RiskDataRepository {
     companyId,
     id,
     ...createDto
-  }: UpsertRiskDataDto) {
+  }: Omit<UpsertRiskDataDto, 'keepEmpty'>) {
     return this.prisma.riskFactorData.upsert({
       create: {
         ...createDto,
@@ -265,7 +285,7 @@ export class RiskDataRepository {
     companyId,
     id,
     ...createDto
-  }: UpsertRiskDataDto) {
+  }: Omit<UpsertRiskDataDto, 'keepEmpty'>) {
     return this.prisma.riskFactorData.upsert({
       create: {
         ...createDto,

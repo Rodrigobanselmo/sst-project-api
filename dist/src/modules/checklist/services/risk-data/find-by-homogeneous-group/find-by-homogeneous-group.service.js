@@ -9,35 +9,21 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UpsertRiskDataService = void 0;
+exports.FindAllByHomogeneousGroupService = void 0;
 const common_1 = require("@nestjs/common");
 const RiskDataRepository_1 = require("../../../repositories/implementations/RiskDataRepository");
-let UpsertRiskDataService = class UpsertRiskDataService {
+let FindAllByHomogeneousGroupService = class FindAllByHomogeneousGroupService {
     constructor(riskDataRepository) {
         this.riskDataRepository = riskDataRepository;
     }
-    async execute(upsertRiskDataDto) {
-        const keepEmpty = upsertRiskDataDto.keepEmpty;
-        delete upsertRiskDataDto.keepEmpty;
-        const riskData = await this.riskDataRepository.upsert(upsertRiskDataDto);
-        if (!keepEmpty) {
-            const isEmpty = riskData.adms.length === 0 &&
-                riskData.recs.length === 0 &&
-                riskData.engs.length === 0 &&
-                riskData.epis.length === 0 &&
-                riskData.generateSources.length === 0 &&
-                !riskData.probability;
-            if (isEmpty) {
-                await this.riskDataRepository.deleteById(riskData.id);
-                return riskData.id;
-            }
-        }
+    async execute(homogeneousGroupId, groupId, companyId) {
+        const riskData = await this.riskDataRepository.findAllByHomogeneousGroupId(companyId, groupId, homogeneousGroupId);
         return riskData;
     }
 };
-UpsertRiskDataService = __decorate([
+FindAllByHomogeneousGroupService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [RiskDataRepository_1.RiskDataRepository])
-], UpsertRiskDataService);
-exports.UpsertRiskDataService = UpsertRiskDataService;
-//# sourceMappingURL=upsert-risk.service.js.map
+], FindAllByHomogeneousGroupService);
+exports.FindAllByHomogeneousGroupService = FindAllByHomogeneousGroupService;
+//# sourceMappingURL=find-by-homogeneous-group.service.js.map

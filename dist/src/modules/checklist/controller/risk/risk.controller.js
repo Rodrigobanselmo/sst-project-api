@@ -36,8 +36,7 @@ let RiskController = class RiskController {
         return this.updateRiskService.execute(riskId, updateRiskDto, userPayloadDto);
     }
     findAllAvailable(userPayloadDto) {
-        const companyId = userPayloadDto.targetCompanyId;
-        return this.findAllAvailableRiskService.execute(companyId);
+        return this.findAllAvailableRiskService.execute(userPayloadDto);
     }
     async deleteSoft(riskId, userPayloadDto) {
         return this.deleteSoftRiskService.execute(riskId, userPayloadDto);

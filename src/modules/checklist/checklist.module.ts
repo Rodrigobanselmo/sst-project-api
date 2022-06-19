@@ -40,6 +40,7 @@ import { DeleteSoftGenerateSourceService } from './services/generate-source/dele
 import { DeleteSoftRiskService } from './services/risk/delete-soft-risk/delete-soft-risk.service';
 import { DeleteSoftRecMedService } from './services/rec-med/delete-soft-rec-med/delete-soft-rec-med.service';
 import { DeleteManyRiskDataService } from './services/risk-data/delete-many-risk-data/delete-many-risk-data.service';
+import { FindAllByHomogeneousGroupService } from './services/risk-data/find-by-homogeneous-group/find-by-homogeneous-group.service';
 
 @Module({
   controllers: [
@@ -69,6 +70,7 @@ import { DeleteManyRiskDataService } from './services/risk-data/delete-many-risk
     ChecklistRepository,
     FindAvailableChecklistService,
     FindChecklistDataService,
+    FindAllByHomogeneousGroupService,
     UpdateChecklistService,
     FindAllAvailableRiskService,
     FindByCAEpiService,

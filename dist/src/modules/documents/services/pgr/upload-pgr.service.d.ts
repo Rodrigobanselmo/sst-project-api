@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { RiskDocumentRepository } from '../../../../modules/checklist/repositories/implementations/RiskDocumentRepository';
 import { RiskGroupDataRepository } from '../../../../modules/checklist/repositories/implementations/RiskGroupDataRepository';
 import { HierarchyRepository } from '../../../../modules/company/repositories/implementations/HierarchyRepository';

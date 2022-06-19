@@ -55,6 +55,9 @@ export class UpsertRiskDataDto {
   @IsInt({ each: true })
   @IsOptional()
   epis?: number[];
+
+  @IsOptional()
+  keepEmpty?: boolean;
 }
 
 export class UpsertManyRiskDataDto {

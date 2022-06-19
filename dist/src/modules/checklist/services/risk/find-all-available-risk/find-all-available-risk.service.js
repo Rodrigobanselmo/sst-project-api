@@ -11,13 +11,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FindAllAvailableRiskService = void 0;
 const common_1 = require("@nestjs/common");
+const user_payload_dto_1 = require("../../../../../shared/dto/user-payload.dto");
 const RiskRepository_1 = require("../../../../../modules/checklist/repositories/implementations/RiskRepository");
 let FindAllAvailableRiskService = class FindAllAvailableRiskService {
     constructor(riskRepository) {
         this.riskRepository = riskRepository;
     }
-    async execute(companyId) {
-        const ChecklistFactor = await this.riskRepository.findAllAvailable(companyId, {
+    async execute(userPayloadDto) {
+        const ChecklistFactor = await this.riskRepository.findAllAvailable(userPayloadDto.targetCompanyId, userPayloadDto.companyId, {
             include: {
                 recMed: { where: { deleted_at: null } },
                 generateSource: { where: { deleted_at: null } },

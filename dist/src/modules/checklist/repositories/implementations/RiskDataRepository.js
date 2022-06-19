@@ -93,6 +93,19 @@ let RiskDataRepository = class RiskDataRepository {
         });
         return riskFactorData.map((data) => new riskData_entity_1.RiskFactorDataEntity(data));
     }
+    async findAllByHomogeneousGroupId(companyId, riskFactorGroupDataId, homogeneousGroupId) {
+        const riskFactorData = await this.prisma.riskFactorData.findMany({
+            where: { riskFactorGroupDataId, companyId, homogeneousGroupId },
+            include: {
+                adms: true,
+                recs: true,
+                engs: true,
+                generateSources: true,
+                epis: true,
+            },
+        });
+        return riskFactorData.map((data) => new riskData_entity_1.RiskFactorDataEntity(data));
+    }
     async deleteById(id) {
         const riskFactorData = await this.prisma.riskFactorData.delete({
             where: { id },

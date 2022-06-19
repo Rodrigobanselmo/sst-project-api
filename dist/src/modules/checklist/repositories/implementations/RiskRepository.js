@@ -22,6 +22,7 @@ var __rest = (this && this.__rest) || function (s, e) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RiskRepository = void 0;
 const common_1 = require("@nestjs/common");
+const removeDuplicate_1 = require("../../../../shared/utils/removeDuplicate");
 const prisma_service_1 = require("../../../../prisma/prisma.service");
 const risk_entity_1 = require("../../entities/risk.entity");
 let RiskRepository = class RiskRepository {
@@ -220,12 +221,28 @@ let RiskRepository = class RiskRepository {
         });
         return risks.map((risk) => new risk_entity_1.RiskFactorsEntity(risk));
     }
-    async findAllAvailable(companyId, _a = {}) {
+    async findAllAvailable(companyId, userCompanyId, _a = {}) {
         var { representAll } = _a, options = __rest(_a, ["representAll"]);
         const include = options.include || {};
         const rall = typeof representAll === 'boolean' ? { representAll: representAll } : {};
+        const companyIds = [userCompanyId, companyId];
+        const parentCompaniesIds = await this.prisma.contract.findMany({
+            where: {
+                receivingServiceCompanyId: { equals: userCompanyId },
+            },
+            select: { applyingServiceCompanyId: true },
+        });
+        parentCompaniesIds.map((companyId) => companyIds.push(companyId.applyingServiceCompanyId));
         const risks = await this.prisma.riskFactors.findMany(Object.assign({ where: {
-                AND: [{ OR: [{ companyId }, { system: true }] }, rall],
+                AND: [
+                    {
+                        OR: [
+                            ...(0, removeDuplicate_1.removeDuplicate)(companyIds, { simpleCompare: true }).map((c) => ({ companyId: c })),
+                            { system: true },
+                        ],
+                    },
+                    rall,
+                ],
                 deleted_at: null,
             } }, options));
         return risks.map((risk) => new risk_entity_1.RiskFactorsEntity(risk));

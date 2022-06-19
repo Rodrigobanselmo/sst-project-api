@@ -49,6 +49,7 @@ const delete_soft_generate_source_service_1 = require("./services/generate-sourc
 const delete_soft_risk_service_1 = require("./services/risk/delete-soft-risk/delete-soft-risk.service");
 const delete_soft_rec_med_service_1 = require("./services/rec-med/delete-soft-rec-med/delete-soft-rec-med.service");
 const delete_many_risk_data_service_1 = require("./services/risk-data/delete-many-risk-data/delete-many-risk-data.service");
+const find_by_homogeneous_group_service_1 = require("./services/risk-data/find-by-homogeneous-group/find-by-homogeneous-group.service");
 let ChecklistModule = class ChecklistModule {
 };
 ChecklistModule = __decorate([
@@ -80,6 +81,7 @@ ChecklistModule = __decorate([
             ChecklistRepository_1.ChecklistRepository,
             find_available_checklist_service_1.FindAvailableChecklistService,
             find_checklist_data_service_1.FindChecklistDataService,
+            find_by_homogeneous_group_service_1.FindAllByHomogeneousGroupService,
             update_checklist_service_1.UpdateChecklistService,
             find_all_available_risk_service_1.FindAllAvailableRiskService,
             find_ca_epi_service_1.FindByCAEpiService,

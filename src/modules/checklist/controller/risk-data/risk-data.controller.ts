@@ -4,6 +4,7 @@ import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import { DeleteManyRiskDataService } from '../../services/risk-data/delete-many-risk-data/delete-many-risk-data.service';
 import { FindAllByGroupAndRiskService } from '../../services/risk-data/find-by-group-risk/find-by-group-risk.service';
+import { FindAllByHomogeneousGroupService } from '../../services/risk-data/find-by-homogeneous-group/find-by-homogeneous-group.service';
 import { UpsertManyRiskDataService } from '../../services/risk-data/upsert-many-risk-data/upsert-many-risk-data.service';
 import { UpsertRiskDataService } from '../../services/risk-data/upsert-risk-data/upsert-risk.service';
 import {
@@ -18,6 +19,7 @@ export class RiskDataController {
     private readonly upsertRiskDataService: UpsertRiskDataService,
     private readonly upsertManyRiskDataService: UpsertManyRiskDataService,
     private readonly findAllByGroupAndRiskService: FindAllByGroupAndRiskService,
+    private readonly findAllByHomogeneousGroupService: FindAllByHomogeneousGroupService,
     private readonly deleteManyRiskDataService: DeleteManyRiskDataService,
   ) {}
 
@@ -41,6 +43,21 @@ export class RiskDataController {
 
     return this.findAllByGroupAndRiskService.execute(
       riskId,
+      groupId,
+      companyId,
+    );
+  }
+
+  @Get('/:companyId/:groupId/homogeneous/:homogeneousGroupId')
+  findAllAvailableByHomogenousGroup(
+    @User() userPayloadDto: UserPayloadDto,
+    @Param('groupId') groupId: string,
+    @Param('homogeneousGroupId') homogeneousGroupId: string,
+  ) {
+    const companyId = userPayloadDto.targetCompanyId;
+
+    return this.findAllByHomogeneousGroupService.execute(
+      homogeneousGroupId,
       groupId,
       companyId,
     );

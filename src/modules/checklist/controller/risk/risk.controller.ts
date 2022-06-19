@@ -48,8 +48,7 @@ export class RiskController {
 
   @Get('/:companyId?')
   findAllAvailable(@User() userPayloadDto: UserPayloadDto) {
-    const companyId = userPayloadDto.targetCompanyId;
-    return this.findAllAvailableRiskService.execute(companyId);
+    return this.findAllAvailableRiskService.execute(userPayloadDto);
   }
 
   @Delete('/:riskId')

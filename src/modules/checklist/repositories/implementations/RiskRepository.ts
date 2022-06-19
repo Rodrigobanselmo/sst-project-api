@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { removeDuplicate } from 'src/shared/utils/removeDuplicate';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { IPrismaOptions } from '../../../../shared/interfaces/prisma-options.types';
@@ -284,6 +285,7 @@ export class RiskRepository implements IRiskRepository {
 
   async findAllAvailable(
     companyId: string,
+    userCompanyId: string,
     {
       representAll,
       ...options
@@ -297,9 +299,32 @@ export class RiskRepository implements IRiskRepository {
     const rall =
       typeof representAll === 'boolean' ? { representAll: representAll } : {};
 
+    const companyIds = [userCompanyId, companyId];
+
+    const parentCompaniesIds = await this.prisma.contract.findMany({
+      where: {
+        receivingServiceCompanyId: { equals: userCompanyId },
+      },
+      select: { applyingServiceCompanyId: true },
+    });
+
+    parentCompaniesIds.map((companyId) =>
+      companyIds.push(companyId.applyingServiceCompanyId),
+    );
+
     const risks = await this.prisma.riskFactors.findMany({
       where: {
-        AND: [{ OR: [{ companyId }, { system: true }] }, rall],
+        AND: [
+          {
+            OR: [
+              ...removeDuplicate(companyIds, { simpleCompare: true }).map(
+                (c) => ({ companyId: c }),
+              ),
+              { system: true },
+            ],
+          },
+          rall,
+        ],
         deleted_at: null,
       },
       ...options,

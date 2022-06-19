@@ -12,6 +12,7 @@ export declare class UpsertRiskDataDto {
     adms?: string[];
     generateSources?: string[];
     epis?: number[];
+    keepEmpty?: boolean;
 }
 export declare class UpsertManyRiskDataDto {
     id?: string;
