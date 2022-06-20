@@ -4,8 +4,8 @@ import { palette } from '../../../../../../shared/constants/palette';
 import { removeDuplicate } from '../../../../../../shared/utils/removeDuplicate';
 import { sortString } from '../../../../../../shared/utils/sorts/string.sort';
 import { RiskFactorGroupDataEntity } from '../../../../../checklist/entities/riskGroupData.entity';
-import { IHierarchyData } from '../../converter/hierarchy.converter';
-import { hierarchyMap } from '../riskInventory/parts/first/first.constant';
+import { IHierarchyData } from '../../../converter/hierarchy.converter';
+import { hierarchyMap } from '../appr/parts/first/first.constant';
 import { bodyTableProps } from './elements/body';
 import { headerTableProps } from './elements/header';
 

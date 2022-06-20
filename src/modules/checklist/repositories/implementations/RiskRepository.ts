@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { removeDuplicate } from 'src/shared/utils/removeDuplicate';
+import { removeDuplicate } from '../../../../shared/utils/removeDuplicate';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { IPrismaOptions } from '../../../../shared/interfaces/prisma-options.types';

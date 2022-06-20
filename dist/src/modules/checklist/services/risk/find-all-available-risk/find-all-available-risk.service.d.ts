@@ -1,4 +1,4 @@
-import { UserPayloadDto } from 'src/shared/dto/user-payload.dto';
+import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { RiskRepository } from '../../../../../modules/checklist/repositories/implementations/RiskRepository';
 export declare class FindAllAvailableRiskService {
     private readonly riskRepository;

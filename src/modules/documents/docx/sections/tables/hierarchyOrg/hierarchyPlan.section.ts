@@ -3,7 +3,7 @@ import { PageOrientation, Table, WidthType } from 'docx';
 import {
   IHierarchyData,
   IHomoGroupMap,
-} from '../../converter/hierarchy.converter';
+} from '../../../converter/hierarchy.converter';
 import { TableBodyElements } from './elements/body';
 import { TableHeaderElements } from './elements/header';
 import { hierarchyPlanConverter } from './hierarchyPlan.converter';

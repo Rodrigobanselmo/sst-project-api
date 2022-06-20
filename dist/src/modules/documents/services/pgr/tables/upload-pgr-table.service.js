@@ -17,14 +17,9 @@ const RiskDocumentRepository_1 = require("../../../../../modules/checklist/repos
 const RiskGroupDataRepository_1 = require("../../../../../modules/checklist/repositories/implementations/RiskGroupDataRepository");
 const HierarchyRepository_1 = require("../../../../../modules/company/repositories/implementations/HierarchyRepository");
 const AmazonStorageProvider_1 = require("../../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider");
-const document_1 = require("../../../utils/base/document");
-const hierarchy_converter_1 = require("../../../utils/sections/converter/hierarchy.converter");
-const actionPlan_section_1 = require("../../../utils/sections/tables/actionPlan/actionPlan.section");
-const hierarchyPlan_section_1 = require("../../../utils/sections/tables/hierarchyOrg/hierarchyPlan.section");
-const hierarchyPrioritization_section_1 = require("../../../utils/sections/tables/hierarchyPrioritization/hierarchyPrioritization.section");
-const hierarchyRisks_section_1 = require("../../../utils/sections/tables/hierarchyRisks/hierarchyRisks.section");
-const riskCharacterization_section_1 = require("../../../utils/sections/tables/riskCharacterization/riskCharacterization.section");
-const riskInventory_section_1 = require("../../../utils/sections/tables/riskInventory/riskInventory.section");
+const document_1 = require("../../../docx/base/document");
+const hierarchy_converter_1 = require("../../../docx/converter/hierarchy.converter");
+const appr_section_1 = require("../../../docx/sections/tables/appr/appr.section");
 let PgrUploadTableService = class PgrUploadTableService {
     constructor(riskGroupDataRepository, riskDocumentRepository, amazonStorageProvider, hierarchyRepository) {
         this.riskGroupDataRepository = riskGroupDataRepository;
@@ -39,12 +34,7 @@ let PgrUploadTableService = class PgrUploadTableService {
         const hierarchyHierarchy = await this.hierarchyRepository.findAllDataHierarchyByCompany(companyId, workspaceId);
         const { hierarchyData, homoGroupTree } = (0, hierarchy_converter_1.hierarchyConverter)(hierarchyHierarchy);
         const sections = [
-            (0, riskCharacterization_section_1.riskCharacterizationTableSection)(riskGroupData),
-            ...(0, hierarchyPrioritization_section_1.hierarchyPrioritizationTableSections)(riskGroupData, hierarchyData),
-            ...(0, hierarchyRisks_section_1.hierarchyRisksTableSections)(riskGroupData, hierarchyData),
-            (0, hierarchyPlan_section_1.hierarchyPlanTableSection)(hierarchyData, homoGroupTree),
-            (0, actionPlan_section_1.actionPlanTableSection)(riskGroupData),
-            ...(0, riskInventory_section_1.riskInventoryTableSection)(riskGroupData, hierarchyData),
+            ...(0, appr_section_1.APPRTableSection)(riskGroupData, hierarchyData, homoGroupTree),
         ];
         const doc = (0, document_1.createBaseDocument)(sections);
         const b64string = await docx_1.Packer.toBase64String(doc);

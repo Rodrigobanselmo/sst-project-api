@@ -5,7 +5,7 @@ import { sortString } from '../../../../../../shared/utils/sorts/string.sort';
 import {
   IHierarchyData,
   IHomoGroupMap,
-} from '../../converter/hierarchy.converter';
+} from '../../../converter/hierarchy.converter';
 import { bodyTableProps, emptyCellName } from './elements/body';
 import { headerTableProps } from './elements/header';
 import {
