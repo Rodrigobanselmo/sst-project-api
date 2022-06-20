@@ -1,7 +1,7 @@
 import { HomogeneousGroup } from '@prisma/client';
 import { PageOrientation } from 'docx';
-import { RiskFactorGroupDataEntity } from '../../../../../../modules/checklist/entities/riskGroupData.entity';
-import { HierarchyEntity } from '../../../../../../modules/company/entities/hierarchy.entity';
+import { RiskFactorGroupDataEntity } from '../../../../../checklist/entities/riskGroupData.entity';
+import { HierarchyEntity } from '../../../../../company/entities/hierarchy.entity';
 
 import {
   hierarchyConverter,

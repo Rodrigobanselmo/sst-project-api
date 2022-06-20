@@ -8,5 +8,9 @@ export const palette = {
     row: hexToColors('#fcf2e8'),
     rowDark: hexToColors('#fce2c9'),
   },
-  text: { main: hexToColors('#000000'), attention: hexToColors('#ff0000') },
+  text: {
+    simple: hexToColors('#fca557'),
+    main: hexToColors('#000000'),
+    attention: hexToColors('#ff0000'),
+  },
 };

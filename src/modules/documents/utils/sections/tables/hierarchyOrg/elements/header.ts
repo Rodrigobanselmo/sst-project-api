@@ -41,12 +41,17 @@ export class TableHeaderElements {
                   color: palette.text.main.string,
                 }),
               ],
+              spacing: {
+                before: 0,
+                after: 0,
+              },
               alignment: AlignmentType.CENTER,
             }),
         ),
       ],
       shading: { fill: palette.table.header.string },
       width: { size, type: WidthType.PERCENTAGE },
+      verticalAlign: VerticalAlign.CENTER,
       ...rest,
     });
   }

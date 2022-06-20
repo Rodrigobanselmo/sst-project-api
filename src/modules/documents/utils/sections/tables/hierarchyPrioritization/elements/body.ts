@@ -37,6 +37,10 @@ export class TableBodyElements {
               bold: !!attention,
             }),
           ],
+          spacing: {
+            before: 0,
+            after: 0,
+          },
           alignment: AlignmentType.CENTER,
         }),
       ],

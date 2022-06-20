@@ -35,6 +35,10 @@ export class TableHeaderElements {
                       color: '000000',
                     }),
                   ],
+                  spacing: {
+                    before: 0,
+                    after: 0,
+                  },
                   alignment: AlignmentType.CENTER,
                 }),
             ),
@@ -71,6 +75,10 @@ export class TableHeaderElements {
                 }),
               ],
               alignment: AlignmentType.CENTER,
+              spacing: {
+                before: 0,
+                after: 0,
+              },
             }),
         ),
       ],

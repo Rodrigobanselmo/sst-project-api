@@ -3,14 +3,14 @@ import { Body, Controller, Get, Param, Post, Res } from '@nestjs/common';
 import { User } from '../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../shared/dto/user-payload.dto';
 import { UpsertPgrDto } from '../dto/pgr.dto';
-import { PgrDownloadService } from '../services/pgr/download-pgr.service';
-import { PgrUploadService } from '../services/pgr/upload-pgr.service';
+import { PgrDownloadTableService } from '../services/pgr/tables/download-pgr-table.service';
+import { PgrUploadTableService } from '../services/pgr/tables/upload-pgr-table.service';
 
 @Controller('documents')
 export class DocumentsController {
   constructor(
-    private readonly pgrDownloadService: PgrDownloadService,
-    private readonly pgrUploadService: PgrUploadService,
+    private readonly pgrDownloadService: PgrDownloadTableService,
+    private readonly pgrUploadService: PgrUploadTableService,
   ) {}
 
   @Get('/pgr/:docId/:companyId?')

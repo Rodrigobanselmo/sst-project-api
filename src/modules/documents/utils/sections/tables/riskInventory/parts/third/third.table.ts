@@ -1,5 +1,5 @@
 import { Table, WidthType } from 'docx';
-import { RiskFactorGroupDataEntity } from '../../../../../../../../modules/checklist/entities/riskGroupData.entity';
+import { RiskFactorGroupDataEntity } from '../../../../../../../checklist/entities/riskGroupData.entity';
 import { MapData } from '../../../../converter/hierarchy.converter';
 
 import { TableBodyElements } from '../../elements/body';

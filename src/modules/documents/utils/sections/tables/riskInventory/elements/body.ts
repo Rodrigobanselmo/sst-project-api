@@ -73,7 +73,11 @@ export class TableBodyElements {
           return new Paragraph({
             children: children.reverse(),
             alignment,
-            spacing: spacing,
+            spacing: {
+              before: 0,
+              after: 0,
+              ...spacing,
+            },
           });
         }),
       ],

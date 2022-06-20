@@ -33,6 +33,10 @@ export class TableBodyElements {
               color: palette.text.main.string,
             }),
           ],
+          spacing: {
+            before: 0,
+            after: 0,
+          },
           alignment: AlignmentType.CENTER,
         }),
       ],

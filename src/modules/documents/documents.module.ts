@@ -5,8 +5,10 @@ import { ExcelProvider } from '../../shared/providers/ExcelProvider/implementati
 import { ChecklistModule } from '../checklist/checklist.module';
 import { CompanyModule } from '../company/company.module';
 import { DocumentsController } from './controller/documents.controller';
-import { PgrDownloadService } from './services/pgr/download-pgr.service';
-import { PgrUploadService } from './services/pgr/upload-pgr.service';
+import { PgrDownloadService } from './services/pgr/document/download-pgr-doc.service';
+import { PgrUploadService } from './services/pgr/document/upload-pgr-doc.service';
+import { PgrDownloadTableService } from './services/pgr/tables/download-pgr-table.service';
+import { PgrUploadTableService } from './services/pgr/tables/upload-pgr-table.service';
 
 @Module({
   controllers: [DocumentsController],
@@ -15,7 +17,8 @@ import { PgrUploadService } from './services/pgr/upload-pgr.service';
     ExcelProvider,
     PgrDownloadService,
     PgrUploadService,
-    PgrUploadService,
+    PgrDownloadTableService,
+    PgrUploadTableService,
     AmazonStorageProvider,
   ],
 })

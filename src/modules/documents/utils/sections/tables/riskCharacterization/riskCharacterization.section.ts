@@ -1,6 +1,6 @@
 import { PageOrientation, Table, WidthType } from 'docx';
 import { RiskFactorGroupDataEntity } from '../../../../../checklist/entities/riskGroupData.entity';
-import { riskCharacterizationHeader } from '../riskCharacterization/riskCharacterization.constant';
+import { riskCharacterizationHeader } from './riskCharacterization.constant';
 
 import { TableBodyElements } from './elements/body';
 import { TableHeaderElements } from './elements/header';

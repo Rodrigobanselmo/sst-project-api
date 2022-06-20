@@ -42,6 +42,10 @@ export class TableHeaderElements {
                   color: palette.text.main.string,
                 }),
               ],
+              spacing: {
+                before: 0,
+                after: 0,
+              },
               alignment: AlignmentType.CENTER,
             }),
         ),

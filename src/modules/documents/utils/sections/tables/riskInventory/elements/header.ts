@@ -61,6 +61,10 @@ export class TableHeaderElements {
                   color: '000000',
                 }),
               ],
+              spacing: {
+                before: 0,
+                after: 0,
+              },
               alignment: AlignmentType.CENTER,
             }),
           ],
