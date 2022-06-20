@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createBaseDocument = void 0;
 const docx_1 = require("docx");
 const createBaseDocument = (sections) => {
-    return new docx_1.Document({
+    const doc = new docx_1.Document({
         numbering: {
             config: [
                 {
@@ -173,6 +173,7 @@ const createBaseDocument = (sections) => {
         },
         sections: sections,
     });
+    return doc;
 };
 exports.createBaseDocument = createBaseDocument;
 //# sourceMappingURL=document.js.map

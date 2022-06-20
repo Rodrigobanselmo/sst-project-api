@@ -47,6 +47,8 @@ let PgrUploadTableService = class PgrUploadTableService {
             ...(0, riskInventory_section_1.riskInventoryTableSection)(riskGroupData, hierarchyData),
         ];
         const doc = (0, document_1.createBaseDocument)(sections);
+        doc.Settings.
+        ;
         const b64string = await docx_1.Packer.toBase64String(doc);
         const buffer = Buffer.from(b64string, 'base64');
         const docName = upsertPgrDto.name.replace(/\s+/g, '');

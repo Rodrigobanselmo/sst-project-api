@@ -18,12 +18,16 @@ const common_1 = require("@nestjs/common");
 const user_decorator_1 = require("../../../shared/decorators/user.decorator");
 const user_payload_dto_1 = require("../../../shared/dto/user-payload.dto");
 const pgr_dto_1 = require("../dto/pgr.dto");
+const download_pgr_doc_service_1 = require("../services/pgr/document/download-pgr-doc.service");
+const upload_pgr_doc_service_1 = require("../services/pgr/document/upload-pgr-doc.service");
 const download_pgr_table_service_1 = require("../services/pgr/tables/download-pgr-table.service");
 const upload_pgr_table_service_1 = require("../services/pgr/tables/upload-pgr-table.service");
 let DocumentsController = class DocumentsController {
-    constructor(pgrDownloadService, pgrUploadService) {
+    constructor(pgrDownloadService, pgrUploadService, pgrDownloadDocService, pgrUploadDocService) {
         this.pgrDownloadService = pgrDownloadService;
         this.pgrUploadService = pgrUploadService;
+        this.pgrDownloadDocService = pgrDownloadDocService;
+        this.pgrUploadDocService = pgrUploadDocService;
     }
     async downloadPGR(res, userPayloadDto, docId) {
         const { fileKey, fileStream } = await this.pgrDownloadService.execute(userPayloadDto, docId);
@@ -35,6 +39,11 @@ let DocumentsController = class DocumentsController {
     }
     async uploadPGR(res, userPayloadDto, upsertPgrDto) {
         const { buffer: file, fileName } = await this.pgrUploadService.execute(upsertPgrDto, userPayloadDto);
+        res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
+        res.send(file);
+    }
+    async uploadPGRDoc(res, userPayloadDto, upsertPgrDto) {
+        const { buffer: file, fileName } = await this.pgrUploadDocService.execute(upsertPgrDto, userPayloadDto);
         res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
         res.send(file);
     }
@@ -60,10 +69,23 @@ __decorate([
         pgr_dto_1.UpsertPgrDto]),
     __metadata("design:returntype", Promise)
 ], DocumentsController.prototype, "uploadPGR", null);
+__decorate([
+    (0, common_1.Post)('/pgr/doc'),
+    openapi.ApiResponse({ status: 201 }),
+    __param(0, (0, common_1.Res)()),
+    __param(1, (0, user_decorator_1.User)()),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, user_payload_dto_1.UserPayloadDto,
+        pgr_dto_1.UpsertPgrDto]),
+    __metadata("design:returntype", Promise)
+], DocumentsController.prototype, "uploadPGRDoc", null);
 DocumentsController = __decorate([
     (0, common_1.Controller)('documents'),
     __metadata("design:paramtypes", [download_pgr_table_service_1.PgrDownloadTableService,
-        upload_pgr_table_service_1.PgrUploadTableService])
+        upload_pgr_table_service_1.PgrUploadTableService,
+        download_pgr_doc_service_1.PgrDownloadService,
+        upload_pgr_doc_service_1.PgrUploadService])
 ], DocumentsController);
 exports.DocumentsController = DocumentsController;
 //# sourceMappingURL=documents.controller.js.map

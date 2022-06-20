@@ -1,7 +1,7 @@
 import { Document, ISectionOptions, LevelFormat } from 'docx';
 
 export const createBaseDocument = (sections: ISectionOptions[]) => {
-  return new Document({
+  const doc = new Document({
     numbering: {
       config: [
         {
@@ -184,4 +184,6 @@ export const createBaseDocument = (sections: ISectionOptions[]) => {
     },
     sections: sections,
   });
+
+  return doc;
 };

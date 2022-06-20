@@ -10,6 +10,6 @@ const paragraphNormal = (text, options) => new docx_1.Paragraph(Object.assign({ 
             text: text,
             bold: isOdd(index),
         })),
-    ], spacing: { line: 350 } }, options));
+    ], spacing: { line: 350 }, alignment: docx_1.AlignmentType.JUSTIFIED }, options));
 exports.paragraphNormal = paragraphNormal;
 //# sourceMappingURL=paragraphs.js.map
