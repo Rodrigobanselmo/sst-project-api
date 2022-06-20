@@ -2,7 +2,7 @@
 import { RiskFactorGroupDataEntity } from '../../../../../checklist/entities/riskGroupData.entity';
 import { ActionPlanColumnEnum } from './actionPlan.constant';
 import { bodyTableProps } from './elements/body';
-import { getMatrizRisk } from '../../../matriz';
+import { getMatrizRisk } from '../../../../../../shared/utils/matriz';
 
 export const actionPlanConverter = (riskGroup: RiskFactorGroupDataEntity) => {
   const homogeneousGroupsMap = new Map<string, bodyTableProps[][]>();

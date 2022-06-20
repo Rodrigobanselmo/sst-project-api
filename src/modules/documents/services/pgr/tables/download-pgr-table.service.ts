@@ -22,7 +22,7 @@ export class PgrDownloadTableService {
     if (!riskDoc) throw new BadRequestException(ErrorDocumentEnum.NOT_FOUND);
 
     const fileKey = riskDoc.fileUrl.split('.com/').pop();
-
+    console.log(fileKey);
     const { file: fileStream } = this.amazonStorageProvider.download({
       fileKey,
     });

@@ -9,14 +9,14 @@ import { HierarchyRepository } from '../../../../../modules/company/repositories
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { AmazonStorageProvider } from '../../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
 import { UpsertPgrDto } from '../../../dto/pgr.dto';
-import { createBaseDocument } from '../../../utils/base/document';
-import { hierarchyConverter } from '../../../utils/sections/converter/hierarchy.converter';
-import { actionPlanTableSection } from '../../../utils/sections/tables/actionPlan/actionPlan.section';
-import { hierarchyPlanTableSection } from '../../../utils/sections/tables/hierarchyOrg/hierarchyPlan.section';
-import { hierarchyPrioritizationTableSections } from '../../../utils/sections/tables/hierarchyPrioritization/hierarchyPrioritization.section';
-import { hierarchyRisksTableSections } from '../../../utils/sections/tables/hierarchyRisks/hierarchyRisks.section';
-import { riskCharacterizationTableSection } from '../../../utils/sections/tables/riskCharacterization/riskCharacterization.section';
-import { riskInventoryTableSection } from '../../../utils/sections/tables/riskInventory/riskInventory.section';
+import { createBaseDocument } from '../../../docx/base/document';
+import { hierarchyConverter } from '../../../docx/sections/converter/hierarchy.converter';
+import { actionPlanTableSection } from '../../../docx/sections/tables/actionPlan/actionPlan.section';
+import { hierarchyPlanTableSection } from '../../../docx/sections/tables/hierarchyOrg/hierarchyPlan.section';
+import { hierarchyPrioritizationTableSections } from '../../../docx/sections/tables/hierarchyPrioritization/hierarchyPrioritization.section';
+import { hierarchyRisksTableSections } from '../../../docx/sections/tables/hierarchyRisks/hierarchyRisks.section';
+import { riskCharacterizationTableSection } from '../../../docx/sections/tables/riskCharacterization/riskCharacterization.section';
+import { riskInventoryTableSection } from '../../../docx/sections/tables/riskInventory/riskInventory.section';
 
 @Injectable()
 export class PgrUploadTableService {

@@ -1,28 +1,54 @@
 import { Injectable } from '@nestjs/common';
-import docx, { ISectionOptions, Packer } from 'docx';
-import fs from 'fs';
+import docx, {
+  Bookmark,
+  Document,
+  HeadingLevel,
+  ImageRun,
+  InternalHyperlink,
+  ISectionOptions,
+  OutlineLevel,
+  Packer,
+  PageReference,
+  Paragraph,
+  SequentialIdentifier,
+  StyleLevel,
+  TableOfContents,
+  TextRun,
+} from 'docx';
 import { Readable } from 'stream';
-import { v4 } from 'uuid';
 
-import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
-import { AmazonStorageProvider } from '../../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
+import { RiskDocumentRepository } from '../../../../modules/checklist/repositories/implementations/RiskDocumentRepository';
+import { RiskGroupDataRepository } from '../../../../modules/checklist/repositories/implementations/RiskGroupDataRepository';
+import { CompanyEntity } from '../../../../modules/company/entities/company.entity';
+import { HierarchyRepository } from '../../../../modules/company/repositories/implementations/HierarchyRepository';
+import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
+import { AmazonStorageProvider } from '../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
+import { UpsertPgrDto } from '../../dto/pgr.dto';
+import { hierarchyConverter } from '../../docx/sections/converter/hierarchy.converter';
+import { actionPlanTableSection } from '../../docx/sections/tables/actionPlan/actionPlan.section';
+import { hierarchyPlanTableSection } from '../../docx/sections/tables/hierarchyOrg/hierarchyPlan.section';
+import { hierarchyPrioritizationTableSections } from '../../docx/sections/tables/hierarchyPrioritization/hierarchyPrioritization.section';
+import { hierarchyRisksTableSections } from '../../docx/sections/tables/hierarchyRisks/hierarchyRisks.section';
+import { riskCharacterizationTableSection } from '../../docx/sections/tables/riskCharacterization/riskCharacterization.section';
+import { riskInventoryTableSection } from '../../docx/sections/tables/riskInventory/riskInventory.section';
+
+import fs from 'fs';
+import { v4 } from 'uuid';
 import {
   downloadImageFile,
   getExtensionFromUrl,
-} from '../../../../../shared/utils/downloadImageFile';
-import { RiskDocumentRepository } from '../../../../checklist/repositories/implementations/RiskDocumentRepository';
-import { RiskGroupDataRepository } from '../../../../checklist/repositories/implementations/RiskGroupDataRepository';
-import { CompanyEntity } from '../../../../company/entities/company.entity';
-import { HierarchyRepository } from '../../../../company/repositories/implementations/HierarchyRepository';
-import { UpsertPgrDto } from '../../../dto/pgr.dto';
-import { chapterSection } from '../../../docx/base/chapter';
-import { coverSections } from '../../../docx/base/cover';
-import { createBaseDocument } from '../../../docx/base/document';
-import { bulletsNormal } from '../../../docx/base/elements/bullets';
-import { h1, h2, title } from '../../../docx/base/elements/heading';
-import { paragraphNormal } from '../../../docx/base/elements/paragraphs';
-import { headerAndFooter } from '../../../docx/base/headerAndFooter/headerAndFooter';
-import { summarySections } from '../../../docx/base/summary';
+} from '../../../../shared/utils/downloadImageFile';
+import { createBaseDocument } from '../../docx/base/document';
+import { summarySections } from '../../docx/base/summary';
+import { createFooter } from '../../docx/base/headerAndFooter/footer';
+import { createHeader } from '../../docx/base/headerAndFooter/header';
+import { sectionProperties } from '../../docx/base/styles';
+import { coverSections } from '../../docx/base/cover';
+import { chapterSection } from '../../docx/base/chapter';
+import { headerAndFooter } from '../../docx/base/headerAndFooter/headerAndFooter';
+import { h1, h2, title } from '../../docx/base/elements/heading';
+import { paragraphNormal } from '../../docx/base/elements/paragraphs';
+import { bulletsNormal } from '../../docx/base/elements/bullets';
 
 @Injectable()
 export class PgrUploadService {
@@ -96,6 +122,12 @@ export class PgrUploadService {
           version,
         }),
       },
+      // riskCharacterizationTableSection(riskGroupData),
+      // ...hierarchyPrioritizationTableSections(riskGroupData, hierarchyData),
+      // ...hierarchyRisksTableSections(riskGroupData, hierarchyData),
+      // hierarchyPlanTableSection(hierarchyData, homoGroupTree),
+      // actionPlanTableSection(riskGroupData),
+      // ...riskInventoryTableSection(riskGroupData, hierarchyData),
     ];
 
     const doc = createBaseDocument(sections);

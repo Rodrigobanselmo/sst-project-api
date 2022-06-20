@@ -25,6 +25,7 @@ let PgrDownloadTableService = class PgrDownloadTableService {
         if (!riskDoc)
             throw new common_1.BadRequestException(errorMessage_1.ErrorDocumentEnum.NOT_FOUND);
         const fileKey = riskDoc.fileUrl.split('.com/').pop();
+        console.log(fileKey);
         const { file: fileStream } = this.amazonStorageProvider.download({
             fileKey,
         });
