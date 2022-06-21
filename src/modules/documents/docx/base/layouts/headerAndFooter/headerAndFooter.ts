@@ -1,21 +1,21 @@
-import { sectionProperties } from '../styles';
+import { sectionProperties } from '../../config/styles';
 import { createFooter } from './footer';
 import { createHeader } from './header';
 
 interface IHeaderFooterProps {
   version: string;
-  chapter: string;
+  footerText: string;
   logoPath: string;
 }
 
 export const headerAndFooter = ({
   version,
-  chapter,
+  footerText,
   logoPath,
 }: IHeaderFooterProps) => {
   return {
     footers: createFooter({
-      chapter,
+      footerText,
       version,
     }),
     headers: createHeader({

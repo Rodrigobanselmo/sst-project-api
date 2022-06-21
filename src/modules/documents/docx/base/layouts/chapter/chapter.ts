@@ -11,7 +11,7 @@ import {
   WidthType,
 } from 'docx';
 
-import { borderNoneStyle, sectionCoverProperties } from './styles';
+import { borderNoneStyle, sectionCoverProperties } from '../../config/styles';
 
 interface IChapterProps {
   version: string;

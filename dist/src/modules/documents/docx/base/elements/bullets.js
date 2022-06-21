@@ -1,13 +1,19 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.bulletsMoreLevels = exports.bulletsNormal = void 0;
+exports.bulletsMoreLevels = exports.bulletsArray = exports.bulletsNormal = void 0;
 const paragraphs_1 = require("./paragraphs");
-const bulletsNormal = (bullets, options) => {
+const bulletsNormal = (text, level = 0, options) => {
+    return (0, paragraphs_1.paragraphNormal)(text, Object.assign({ bullet: {
+            level,
+        }, spacing: { line: 350, after: 80, before: 0 } }, options));
+};
+exports.bulletsNormal = bulletsNormal;
+const bulletsArray = (bullets, options) => {
     return bullets.map(([text, level]) => (0, paragraphs_1.paragraphNormal)(text, Object.assign({ bullet: {
             level: level || 0,
         }, spacing: { line: 350, after: 80, before: 0 } }, options)));
 };
-exports.bulletsNormal = bulletsNormal;
+exports.bulletsArray = bulletsArray;
 const bulletsMoreLevels = (bullets, options) => {
     return bullets
         .map((text) => {

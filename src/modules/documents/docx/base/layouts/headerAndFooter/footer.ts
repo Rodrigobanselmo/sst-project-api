@@ -10,10 +10,10 @@ import {
   TextRun,
   WidthType,
 } from 'docx';
-import { palette } from '../../../../../shared/constants/palette';
+import { palette } from '../../../../../../shared/constants/palette';
 
 interface IFooterProps {
-  chapter: string;
+  footerText: string;
   version: string;
 }
 const borderStyle: ITableBordersOptions = {
@@ -36,7 +36,7 @@ const table = (rows: TableRow[]) =>
     borders: borderStyle,
   });
 
-const firstCell = (chapter: string, version: string) =>
+const firstCell = (footerText: string, version: string) =>
   new TableCell({
     children: [
       new Paragraph({
@@ -53,7 +53,7 @@ const firstCell = (chapter: string, version: string) =>
       new Paragraph({
         children: [
           new TextRun({
-            text: chapter,
+            text: footerText,
             size: 12,
             color: palette.text.main.string,
           }),
@@ -97,15 +97,15 @@ const secondCell = () =>
     ],
   });
 
-const row = (chapter: string, version: string) =>
+const row = (footerText: string, version: string) =>
   new TableRow({
-    children: [firstCell(chapter, version), secondCell()],
+    children: [firstCell(footerText, version), secondCell()],
   });
 
-export const createFooter = ({ chapter, version }: IFooterProps) => {
+export const createFooter = ({ footerText, version }: IFooterProps) => {
   const footer = {
     default: new Footer({
-      children: [table([row(chapter, version)])],
+      children: [table([row(footerText, version)])],
     }),
     first: new Footer({
       children: [],

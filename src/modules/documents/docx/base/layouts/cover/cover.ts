@@ -1,7 +1,7 @@
 import { ImageRun, ISectionOptions, Paragraph, TextRun } from 'docx';
 import fs from 'fs';
 
-import { sectionCoverProperties } from './styles';
+import { sectionCoverProperties } from '../../config/styles';
 
 interface IHeaderProps {
   version: string;
@@ -14,6 +14,7 @@ const title = () =>
       new TextRun({
         text: 'PROGRAMA DE GERENCIAMENTO DE RISCOS – PGR',
         size: 96,
+        bold: true,
       }),
     ],
     spacing: { after: 400, before: 0 },

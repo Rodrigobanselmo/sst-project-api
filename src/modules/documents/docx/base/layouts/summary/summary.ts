@@ -6,7 +6,7 @@ import {
   TextRun,
 } from 'docx';
 
-import { sectionCoverProperties } from './styles';
+import { sectionCoverProperties } from '../../config/styles';
 
 const summaryText = (text: string) =>
   new Paragraph({
@@ -20,7 +20,7 @@ const summaryText = (text: string) =>
     spacing: { after: 400, before: 0 },
   });
 
-export const summarySections: ISectionOptions[] = [
+export const summarySections = (): ISectionOptions[] => [
   {
     children: [
       summaryText('Sumário'),

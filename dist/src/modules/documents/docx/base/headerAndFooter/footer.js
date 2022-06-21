@@ -20,7 +20,7 @@ const table = (rows) => new docx_1.Table({
     rows,
     borders: borderStyle,
 });
-const firstCell = (chapter, version) => new docx_1.TableCell({
+const firstCell = (footerText, version) => new docx_1.TableCell({
     children: [
         new docx_1.Paragraph({
             children: [
@@ -36,7 +36,7 @@ const firstCell = (chapter, version) => new docx_1.TableCell({
         new docx_1.Paragraph({
             children: [
                 new docx_1.TextRun({
-                    text: chapter,
+                    text: footerText,
                     size: 12,
                     color: palette_1.palette.text.main.string,
                 }),
@@ -77,13 +77,13 @@ const secondCell = () => new docx_1.TableCell({
         }),
     ],
 });
-const row = (chapter, version) => new docx_1.TableRow({
-    children: [firstCell(chapter, version), secondCell()],
+const row = (footerText, version) => new docx_1.TableRow({
+    children: [firstCell(footerText, version), secondCell()],
 });
-const createFooter = ({ chapter, version }) => {
+const createFooter = ({ footerText, version }) => {
     const footer = {
         default: new docx_1.Footer({
-            children: [table([row(chapter, version)])],
+            children: [table([row(footerText, version)])],
         }),
         first: new docx_1.Footer({
             children: [],

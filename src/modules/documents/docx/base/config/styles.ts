@@ -7,7 +7,7 @@ import {
 export const sectionProperties: ISectionPropertiesOptions = {
   page: {
     margin: {
-      bottom: 567,
+      bottom: 900,
       left: 567,
       right: 567,
       top: 567,

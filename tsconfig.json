@@ -13,6 +13,9 @@
     "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": true,
+    "lib": [
+      "ES2021"
+    ],
     "strictNullChecks": false,
     "noImplicitAny": false,
     "strictBindCallApply": false,

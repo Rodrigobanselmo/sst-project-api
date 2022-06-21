@@ -9,7 +9,7 @@ import { HierarchyRepository } from '../../../../../modules/company/repositories
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { AmazonStorageProvider } from '../../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
 import { UpsertPgrDto } from '../../../dto/pgr.dto';
-import { createBaseDocument } from '../../../docx/base/document';
+import { createBaseDocument } from '../../../docx/base/config/document';
 import { hierarchyConverter } from '../../../docx/converter/hierarchy.converter';
 import { actionPlanTableSection } from '../../../docx/sections/tables/actionPlan/actionPlan.section';
 import { hierarchyPlanTableSection } from '../../../docx/sections/tables/hierarchyOrg/hierarchyPlan.section';
@@ -45,11 +45,11 @@ export class PgrUploadTableService {
       hierarchyConverter(hierarchyHierarchy);
 
     const sections: ISectionOptions[] = [
-      // riskCharacterizationTableSection(riskGroupData),
-      // ...hierarchyPrioritizationTableSections(riskGroupData, hierarchyData),
-      // ...hierarchyRisksTableSections(riskGroupData, hierarchyData),
-      // hierarchyPlanTableSection(hierarchyData, homoGroupTree),
-      // actionPlanTableSection(riskGroupData),
+      riskCharacterizationTableSection(riskGroupData),
+      ...hierarchyPrioritizationTableSections(riskGroupData, hierarchyData),
+      ...hierarchyRisksTableSections(riskGroupData, hierarchyData),
+      hierarchyPlanTableSection(hierarchyData, homoGroupTree),
+      actionPlanTableSection(riskGroupData),
       ...APPRTableSection(riskGroupData, hierarchyData, homoGroupTree),
     ];
 

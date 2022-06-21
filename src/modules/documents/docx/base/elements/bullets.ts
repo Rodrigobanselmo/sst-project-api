@@ -3,6 +3,20 @@ import { IParagraphOptions, Paragraph } from 'docx';
 import { paragraphNormal } from './paragraphs';
 
 export const bulletsNormal = (
+  text: string,
+  level: 0 | 1 | 2 | 3 | 4 | 5 | 6 = 0,
+  options?: IParagraphOptions,
+) => {
+  return paragraphNormal(text, {
+    bullet: {
+      level,
+    },
+    spacing: { line: 350, after: 80, before: 0 },
+    ...options,
+  });
+};
+
+export const bulletsArray = (
   bullets: [string, number?][],
   options?: IParagraphOptions,
 ) => {

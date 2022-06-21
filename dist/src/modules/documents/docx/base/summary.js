@@ -13,7 +13,7 @@ const summaryText = (text) => new docx_1.Paragraph({
     alignment: docx_1.AlignmentType.CENTER,
     spacing: { after: 400, before: 0 },
 });
-exports.summarySections = [
+const summarySections = () => [
     {
         children: [
             summaryText('Sumário'),
@@ -44,4 +44,5 @@ exports.summarySections = [
         properties: styles_1.sectionCoverProperties,
     },
 ];
+exports.summarySections = summarySections;
 //# sourceMappingURL=summary.js.map
