@@ -33,6 +33,10 @@ export class RiskDocumentEntity implements RiskFactorDocument {
   updated_at: Date;
   workspaceName: string;
   workspaceId: string;
+  elaboratedBy: string;
+  revisionBy: string;
+  approvedBy: string;
+  validity: string;
 
   constructor(partial: Partial<RiskDocumentEntity>) {
     Object.assign(this, partial);

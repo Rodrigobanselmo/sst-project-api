@@ -2,7 +2,7 @@ import { sectionProperties } from '../../config/styles';
 import { createFooter } from './footer';
 import { createHeader } from './header';
 
-interface IHeaderFooterProps {
+export interface IHeaderFooterProps {
   version: string;
   footerText: string;
   logoPath: string;

@@ -9,16 +9,19 @@ import { PgrDownloadService } from './services/pgr/document/download-pgr-doc.ser
 import { PgrUploadService } from './services/pgr/document/upload-pgr-doc.service';
 import { PgrDownloadTableService } from './services/pgr/tables/download-pgr-table.service';
 import { PgrUploadTableService } from './services/pgr/tables/upload-pgr-table.service';
+import { DayJSProvider } from '../../shared/providers/DateProvider/implementations/DayJSProvider';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   controllers: [DocumentsController],
-  imports: [ChecklistModule, CompanyModule],
+  imports: [ChecklistModule, CompanyModule, UsersModule],
   providers: [
     ExcelProvider,
     PgrDownloadService,
     PgrUploadService,
     PgrDownloadTableService,
     PgrUploadTableService,
+    DayJSProvider,
     AmazonStorageProvider,
   ],
 })

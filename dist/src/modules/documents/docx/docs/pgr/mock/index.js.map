@@ -1,1 +1,0 @@
-{"version":3,"file":"index.js","sourceRoot":"","sources":["../../../../../../../../src/modules/documents/docx/docs/pgr/mock/index.ts"],"names":[],"mappings":";;;AACA,sCAAuC;AAE1B,QAAA,cAAc,GAA8B;IACvD,QAAQ,EAAE,CAAC,qBAAW,CAAC;IACvB,SAAS,EAAE;QACT,EAAE,WAAW,EAAE,oBAAoB,EAAE,KAAK,EAAE,2BAA2B,EAAE;QACzE,EAAE,WAAW,EAAE,iBAAiB,EAAE,KAAK,EAAE,SAAS,EAAE;KACrD;CACF,CAAC"}

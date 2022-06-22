@@ -5,14 +5,11 @@ import {
   Paragraph,
   TextRun,
 } from 'docx';
-
-function isOdd(num: number) {
-  return num % 2 === 0 ? false : true;
-}
+import { isOdd } from '../../../../../shared/utils/isOdd';
 
 export const paragraphNormal = (
   text: string,
-  options?: IParagraphOptions & { break?: boolean },
+  options?: IParagraphOptions & { break?: boolean; size?: number },
 ) =>
   new Paragraph({
     children: [
@@ -26,6 +23,7 @@ export const paragraphNormal = (
               text: text,
               bold: isBold,
               break: isBreakOne ? 1 : 0,
+              size: options?.size ? options?.size * 2 : undefined,
             });
           });
         })

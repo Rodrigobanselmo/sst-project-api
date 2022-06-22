@@ -24,6 +24,7 @@ import { AuthModule } from '../auth/auth.module';
 import { FindAllByCompanyService } from './services/users/find-all/find-all.service';
 import { FindAllByCompanyIdService } from './services/invites/find-by-companyId/find-by-companyId.service';
 import { FindAllByEmailService } from './services/invites/find-by-email/find-by-email.service';
+import { ProfessionalRepository } from './repositories/implementations/ProfessionalRepository';
 
 @Module({
   controllers: [UsersController, InvitesController],
@@ -50,7 +51,8 @@ import { FindAllByEmailService } from './services/invites/find-by-email/find-by-
     FindByTokenService,
     UpdatePermissionsRolesService,
     FindAllByEmailService,
+    ProfessionalRepository,
   ],
-  exports: [UsersRepository],
+  exports: [UsersRepository, ProfessionalRepository],
 })
 export class UsersModule {}

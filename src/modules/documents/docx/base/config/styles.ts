@@ -11,8 +11,8 @@ export const sectionProperties: ISectionPropertiesOptions = {
       left: 567,
       right: 567,
       top: 567,
-      footer: 100,
-      header: 100,
+      footer: 300,
+      header: 300,
     },
   },
 };

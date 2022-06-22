@@ -44,6 +44,10 @@ class DayJSProvider implements IDateProvider {
   dateNow(): Date {
     return dayjs().toDate();
   }
+
+  format(date: Date): string {
+    return dayjs(date).format('DD/MM/YYYY');
+  }
 }
 
-export { DayJSProvider };
+export { DayJSProvider, dayjs };

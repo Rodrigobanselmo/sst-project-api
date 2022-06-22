@@ -41,6 +41,7 @@ export class RiskFactorGroupDataEntity implements RiskFactorGroupData {
   revisionBy: string | null;
   documentDate: Date | null;
   visitDate: Date | null;
+  validity: string;
 
   constructor(partial: Partial<RiskFactorGroupDataEntity>) {
     Object.assign(this, partial);

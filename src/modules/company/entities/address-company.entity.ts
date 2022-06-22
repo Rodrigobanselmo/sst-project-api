@@ -1,10 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { Address } from '.prisma/client';
-import { WorkspaceEntity } from './workspace.entity';
+import { AddressCompany } from '.prisma/client';
 import { StatusEnum } from '@prisma/client';
 
-export class AddressEntity implements Address {
+export class AddressCompanyEntity implements AddressCompany {
   @ApiProperty({ description: 'address id.' })
   id: string;
 
@@ -26,19 +25,13 @@ export class AddressEntity implements Address {
   @ApiProperty({ description: 'address city.' })
   city: string;
 
-  @ApiProperty({ description: 'address state.' })
+  @ApiProperty({ description: 'address state.', enum: StatusEnum })
   state: string;
 
   @ApiProperty({ description: 'company id.' })
   companyId: string;
 
-  @ApiProperty({ description: 'address workspace id.' })
-  workspaceId: string;
-
-  @ApiProperty({ description: 'The workspace related to the address' })
-  workspace?: WorkspaceEntity;
-
-  constructor(partial: Partial<AddressEntity>) {
+  constructor(partial: Partial<AddressCompanyEntity>) {
     Object.assign(this, partial);
   }
 }

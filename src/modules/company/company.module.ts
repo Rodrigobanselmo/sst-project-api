@@ -86,6 +86,11 @@ import { DeleteEnvironmentPhotoService } from './services/environment/delete-env
     AddEnvironmentPhotoService,
     DeleteEnvironmentPhotoService,
   ],
-  exports: [CompanyRepository, EmployeeRepository, HierarchyRepository],
+  exports: [
+    CompanyRepository,
+    EmployeeRepository,
+    HierarchyRepository,
+    WorkspaceRepository,
+  ],
 })
 export class CompanyModule {}

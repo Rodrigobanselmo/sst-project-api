@@ -1,6 +1,7 @@
 import { Company, CompanyTypesEnum } from '.prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 import { StatusEnum } from '@prisma/client';
+import { AddressCompanyEntity } from './address-company.entity';
 import { EmployeeEntity } from './employee.entity';
 import { LicenseEntity } from './license.entity';
 import { WorkspaceEntity } from './workspace.entity';
@@ -52,6 +53,9 @@ export class CompanyEntity implements Company {
   @ApiProperty({ description: 'The creation date of the Company' })
   license?: LicenseEntity;
 
+  @ApiProperty({ description: 'The address of the Company' })
+  address?: AddressCompanyEntity;
+
   @ApiProperty({ description: 'The workspace related to the company' })
   workspaces?: WorkspaceEntity[];
 
@@ -65,9 +69,8 @@ export class CompanyEntity implements Company {
 
   email: string;
   riskDegree: number;
-  operatonTime: string;
   logoUrl: string;
-  responsableName: string;
+  responsibleName: string;
   mission: string;
   vision: string;
   values: string;
@@ -81,6 +84,8 @@ export class CompanyEntity implements Company {
   cadastral_situation_description: string;
   employeeCount?: number;
   riskGroupCount?: number;
+  shortName: string;
+  operationTime: string;
 
   constructor(partial: Partial<CompanyEntity>) {
     Object.assign(this, partial);

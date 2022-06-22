@@ -22,8 +22,8 @@ export class WorkspaceRepository {
     address,
     companyId,
     ...workspaceDto
-  }: IWorkspaceCompany): Promise<CompanyEntity> {
-    const company = await this.prisma.workspace.create({
+  }: IWorkspaceCompany): Promise<WorkspaceEntity> {
+    const workspace = await this.prisma.workspace.create({
       data: {
         ...workspaceDto,
         companyId: companyId,
@@ -38,7 +38,16 @@ export class WorkspaceRepository {
       },
     });
 
-    return new CompanyEntity(company);
+    return new WorkspaceEntity(workspace as any);
+  }
+
+  async findById(id: string) {
+    const workspace = await this.prisma.workspace.findUnique({
+      where: { id },
+      include: { address: true },
+    });
+
+    return new WorkspaceEntity(workspace);
   }
 
   async findByCompany(companyId: string) {

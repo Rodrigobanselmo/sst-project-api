@@ -113,6 +113,7 @@ model Company {
   id   String    @id @default(uuid())
   cnpj String
   name String  
+  shortName String?
   fantasy String?
   description String?
   size String?
@@ -127,9 +128,9 @@ model Company {
   phone String?
   email String?
   riskDegree Int?
-  operatonTime String?
+  operationTime String?
   logoUrl String?
-  responsableName String?
+  responsibleName String?
   mission String?
   vision String?
   values String?
@@ -138,6 +139,7 @@ model Company {
   updated_at  DateTime   @updatedAt
   status StatusEnum @default(ACTIVE)
   type CompanyTypesEnum @default(MATRIZ)
+  professional Professional[]
   users UserCompany[]
   workspace Workspace[]
   address AddressCompany?
@@ -193,6 +195,7 @@ model CompanyEnvironmentPhoto {
   companyEnvironmentId String
   companyEnvironment CompanyEnvironment @relation(fields: [companyEnvironmentId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
 }
+
 
 model Contract {
   receivingServiceCompany   Company @relation(fields: [receivingServiceCompanyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
@@ -344,6 +347,25 @@ model License {
   @@index(companyId)
 }
 
+model Professional {
+  id   String    @id @default(uuid())
+  name String
+  formation String[]
+  certifications String[]
+  nit String?
+  crea String?
+  created_at DateTime @default(now())
+  deleted_at DateTime? 
+  updated_at  DateTime   @updatedAt
+  companyId String?
+  company Company? @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
+  userId Int?
+  user User? @relation(fields: [userId, name], references: [id,name], onDelete: Cascade, onUpdate: Cascade) 
+  riskFactorGroupData RiskFactorGroupData[]
+
+  @@unique([name, userId])
+}
+
 model RecMed {
   id    String   @id  @default(uuid())
   riskId    String    
@@ -423,6 +445,10 @@ model RiskFactorDocument {
   riskGroupId String
   workspaceName String
   workspaceId String
+  elaboratedBy String?
+  revisionBy String?
+  approvedBy String?
+  validity String?
   workspace Workspace @relation(fields: [workspaceId,companyId], references: [id,companyId], onDelete: Cascade, onUpdate: Cascade)
   status StatusEnum @default(ACTIVE)
   created_at DateTime @default(now())
@@ -442,11 +468,13 @@ model RiskFactorGroupData {
   elaboratedBy String?
   revisionBy String?
   approvedBy String?
+  validity String?
   visitDate DateTime?
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   data RiskFactorData[]
   docs RiskFactorDocument[]
   status StatusEnum @default(PROGRESS)
+  professional Professional[]
 
   @@unique([id, companyId])
 }
@@ -509,6 +537,9 @@ model User {
   deleted_at DateTime? 
   refresh_token RefreshToken[]
   companies UserCompany[]
+  profession Professional?
+  
+  @@unique([id, name])
 }
 
 model UserCompany {

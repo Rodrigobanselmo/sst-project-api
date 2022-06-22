@@ -37,8 +37,8 @@ const imageCover = (imgPath: string) =>
       new ImageRun({
         data: fs.readFileSync(imgPath),
         transformation: {
-          width: 600,
-          height: 337,
+          width: 630,
+          height: 354,
         },
       }),
     ],

@@ -3,7 +3,7 @@ import { HomoGroupEntity } from '../../../../modules/company/entities/homoGroup.
 import { removeDuplicate } from '../../../../shared/utils/removeDuplicate';
 import { HierarchyEntity } from '../../../company/entities/hierarchy.entity';
 
-import { hierarchyMap } from '../sections/tables/appr/parts/first/first.constant';
+import { hierarchyMap } from '../components/tables/appr/parts/first/first.constant';
 
 export interface MapData {
   org: {
