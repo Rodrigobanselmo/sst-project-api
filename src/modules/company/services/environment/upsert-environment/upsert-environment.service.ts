@@ -1,3 +1,4 @@
+import sizeOf from 'image-size';
 import { Injectable } from '@nestjs/common';
 import { Readable } from 'stream';
 import { v4 } from 'uuid';
@@ -36,7 +37,8 @@ export class UpsertEnvironmentService {
       await this.environmentPhotoRepository.createMany(
         photos.map((photo, index) => ({
           companyEnvironmentId: environment.id,
-          photoUrl: urls[index],
+          photoUrl: urls[index][0],
+          isVertical: urls[index][1],
           name: photo,
         })),
       );
@@ -62,7 +64,10 @@ export class UpsertEnvironmentService {
           fileName: path,
         });
 
-        return url;
+        const dimensions = sizeOf(file.buffer);
+        const isVertical = dimensions.width < dimensions.height;
+
+        return [url, isVertical] as [string, boolean];
       }),
     );
 

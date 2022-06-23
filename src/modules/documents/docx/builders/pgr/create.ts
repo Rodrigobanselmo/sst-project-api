@@ -1,9 +1,9 @@
+import { EnvironmentEntity } from './../../../../company/entities/environment.entity';
 import { ISectionOptions } from 'docx';
 import { RiskDocumentEntity } from 'src/modules/checklist/entities/riskDocument.entity';
 
 import { CompanyEntity } from '../../../../company/entities/company.entity';
 import { WorkspaceEntity } from '../../../../company/entities/workspace.entity';
-import { ProfessionalEntity } from './../../../../users/entities/professional.entity';
 import { VariablesPGREnum } from './enums/variables.enum';
 import { companyVariables } from './functions/getVariables/company.variables';
 import { ElementsMapClass } from './maps/elementTypeMap';
@@ -24,7 +24,7 @@ export class DocumentBuildPGR {
   private docSections: IDocumentPGRSectionGroups;
   private versions: RiskDocumentEntity[];
   private variables: IDocVariables;
-  private professionals: ProfessionalEntity[];
+  private environments: EnvironmentEntity[];
 
   constructor({
     version,
@@ -32,7 +32,7 @@ export class DocumentBuildPGR {
     company,
     workspace,
     versions,
-    professionals,
+    environments,
   }: ICreatePGR) {
     this.version = version;
     this.logoImagePath = logo;
@@ -40,7 +40,7 @@ export class DocumentBuildPGR {
     this.workspace = workspace;
     this.docSections = docPGRSections;
     this.versions = versions;
-    this.professionals = professionals;
+    this.environments = environments;
     this.variables = this.getVariables();
   }
 
@@ -63,6 +63,7 @@ export class DocumentBuildPGR {
   private getVariables(): IDocVariables {
     return {
       [VariablesPGREnum.VERSION]: this.version,
+      [VariablesPGREnum.DOC_VALIDITY]: this.versions[0].validity,
       ...companyVariables(this.company, this.workspace, this.workspace.address),
       ...this.docSections.variables,
     };
@@ -74,7 +75,8 @@ export class DocumentBuildPGR {
     const elementsMap = new ElementsMapClass({
       versions: this.versions,
       variables: this.variables,
-      professionals: this.professionals,
+      professionals: this.company?.professionals ?? [],
+      environments: this.environments ?? [],
     }).map;
 
     const sectionsMap = new SectionsMapClass({

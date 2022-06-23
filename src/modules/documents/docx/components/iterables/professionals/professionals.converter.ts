@@ -1,6 +1,6 @@
-import { VariablesPGREnum } from '../../builders/pgr/enums/variables.enum';
-import { IDocVariables } from '../../builders/pgr/types/section.types';
-import { ProfessionalEntity } from './../../../../users/entities/professional.entity';
+import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
+import { IDocVariables } from '../../../builders/pgr/types/section.types';
+import { ProfessionalEntity } from '../../../../../users/entities/professional.entity';
 
 export const ProfessionalsConverter = (
   professionalEntity: ProfessionalEntity[],

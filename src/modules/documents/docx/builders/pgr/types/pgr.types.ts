@@ -1,7 +1,7 @@
-import { ProfessionalEntity } from './../../../../../users/entities/professional.entity';
-import { WorkspaceEntity } from '../../../../../company/entities/workspace.entity';
-import { CompanyEntity } from '../../../../../company/entities/company.entity';
+import { EnvironmentEntity } from './../../../../../company/entities/environment.entity';
 import { RiskDocumentEntity } from '../../../../../checklist/entities/riskDocument.entity';
+import { CompanyEntity } from '../../../../../company/entities/company.entity';
+import { WorkspaceEntity } from '../../../../../company/entities/workspace.entity';
 
 export interface ICreatePGR {
   version: string;
@@ -9,5 +9,5 @@ export interface ICreatePGR {
   company: CompanyEntity;
   workspace: WorkspaceEntity;
   versions: RiskDocumentEntity[];
-  professionals: ProfessionalEntity[];
+  environments: EnvironmentEntity[];
 }

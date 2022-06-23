@@ -35,24 +35,26 @@ const table = (rows: TableRow[]) =>
     borders: borderStyle,
   });
 
-const firstCell = (path: string) =>
-  new TableCell({
+const firstCell = (path?: string) => {
+  const image = path
+    ? new ImageRun({
+        data: fs.readFileSync(path),
+        transformation: {
+          width: 45,
+          height: 25,
+        },
+      })
+    : undefined;
+
+  return new TableCell({
     verticalAlign: VerticalAlign.CENTER,
     children: [
       new Paragraph({
-        children: [
-          new ImageRun({
-            data: fs.readFileSync(path),
-            transformation: {
-              width: 45,
-              height: 25,
-            },
-          }),
-        ],
+        children: [image],
       }),
     ],
   });
-
+};
 const secondCell = () =>
   new TableCell({
     verticalAlign: VerticalAlign.CENTER,

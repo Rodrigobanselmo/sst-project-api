@@ -48,6 +48,7 @@ export const createCover = ({
   version,
   imgPath,
 }: IHeaderProps): Paragraph[] => {
+  if (!imgPath) return [title()];
   return [title(), versionDate(version), imageCover(imgPath)];
 };
 

@@ -6,6 +6,7 @@ import { EnvironmentPhotoEntity } from '../../entities/environment-photo.entity'
 
 export interface IEnvironmentPhoto extends Partial<AddPhotoEnvironmentDto> {
   photoUrl: string;
+  isVertical: boolean;
   companyEnvironmentId: string;
   name: string;
   id?: string;

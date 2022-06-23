@@ -35,12 +35,15 @@ export class EnvironmentEntity implements CompanyEnvironment {
   @ApiProperty({ description: 'The photos related to the company environment' })
   photos?: EnvironmentPhotoEntity[];
 
-  constructor(partial: Partial<EnvironmentEntity>) {
-    Object.assign(this, partial);
-  }
-  vision: string;
+  noiseValue: string;
+  temperature: string;
+  moisturePercentage: string;
   deleted_at: Date;
   updated_at: Date;
   workspaceId: string;
   companyId: string;
+
+  constructor(partial: Partial<EnvironmentEntity>) {
+    Object.assign(this, partial);
+  }
 }

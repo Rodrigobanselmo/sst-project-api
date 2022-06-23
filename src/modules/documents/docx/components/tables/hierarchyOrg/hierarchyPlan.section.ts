@@ -1,4 +1,4 @@
-import { PageOrientation, Table, WidthType } from 'docx';
+import { Footer, Header, PageOrientation, Table, WidthType } from 'docx';
 
 import {
   IHierarchyData,
@@ -41,6 +41,16 @@ export const hierarchyPlanTableSection = (
         margin: { left: 500, right: 500, top: 500, bottom: 500 },
         size: { orientation: PageOrientation.LANDSCAPE },
       },
+    },
+    footers: {
+      default: new Footer({
+        children: [],
+      }),
+    },
+    headers: {
+      default: new Header({
+        children: [],
+      }),
     },
   };
 

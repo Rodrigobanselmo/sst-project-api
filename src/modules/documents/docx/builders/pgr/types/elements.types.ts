@@ -1,3 +1,5 @@
+import { AlignmentType, IParagraphOptions } from 'docx';
+
 export enum PGRSectionChildrenTypeEnum {
   TITLE = 'TITLE',
   H1 = 'H1',
@@ -10,6 +12,9 @@ export enum PGRSectionChildrenTypeEnum {
   BREAK = 'BREAK',
   BULLET = 'BULLET',
   TABLE_VERSION_CONTROL = 'TABLE_VERSION_CONTROL',
+  ITERABLE_ENVIRONMENTS = 'ITERABLE_ENVIRONMENTS',
+  PARAGRAPH_TABLE = 'PARAGRAPH_TABLE',
+  PARAGRAPH_FIGURE = 'PARAGRAPH_FIGURE',
   PROFESSIONAL = 'PROFESSIONAL',
 }
 
@@ -54,10 +59,19 @@ export type ITitle = {
   text: string;
 };
 
-export type IParagraph = {
+export type IParagraph = Omit<IParagraphOptions, 'text'> & {
   type: PGRSectionChildrenTypeEnum.PARAGRAPH;
   text: string;
   size?: number;
+  align?: AlignmentType;
+};
+
+export type IParagraphTable = Omit<IParagraph, 'type'> & {
+  type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE;
+};
+
+export type IParagraphFigure = Omit<IParagraph, 'type'> & {
+  type: PGRSectionChildrenTypeEnum.PARAGRAPH_FIGURE;
 };
 
 export type IBreak = {
@@ -66,6 +80,10 @@ export type IBreak = {
 
 export type ITableVersionControl = {
   type: PGRSectionChildrenTypeEnum.TABLE_VERSION_CONTROL;
+};
+
+export type IEnvironments = {
+  type: PGRSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS;
 };
 
 export type IProfessional = {
@@ -84,4 +102,7 @@ export type ISectionChildrenType =
   | ITitle
   | IBullet
   | ITableVersionControl
+  | IParagraphTable
+  | IParagraphFigure
+  | IEnvironments
   | IProfessional;

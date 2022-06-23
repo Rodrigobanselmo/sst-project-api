@@ -1,27 +1,43 @@
-import { WorkspaceRepository } from './../../../../company/repositories/implementations/WorkspaceRepository';
-import { DocumentBuildPGR } from '../../../docx/builders/pgr/create';
-import { Injectable } from '@nestjs/common';
-import { ISectionOptions, Packer } from 'docx';
+import {
+  borderNoneStyle,
+  sectionProperties,
+} from './../../../docx/base/config/styles';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  ImageRun,
+  ISectionOptions,
+  Packer,
+  Paragraph,
+  Table,
+  TableCell,
+  TableRow,
+  TextRun,
+  WidthType,
+} from 'docx';
 import fs from 'fs';
 import { Readable } from 'stream';
 import { v4 } from 'uuid';
+import sizeOf from 'image-size';
 
+import { CompanyRepository } from '../../../../../modules/company/repositories/implementations/CompanyRepository';
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
+import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { AmazonStorageProvider } from '../../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
 import {
   downloadImageFile,
   getExtensionFromUrl,
 } from '../../../../../shared/utils/downloadImageFile';
+import { RiskDocumentEntity } from '../../../../checklist/entities/riskDocument.entity';
 import { RiskDocumentRepository } from '../../../../checklist/repositories/implementations/RiskDocumentRepository';
 import { RiskGroupDataRepository } from '../../../../checklist/repositories/implementations/RiskGroupDataRepository';
 import { CompanyEntity } from '../../../../company/entities/company.entity';
 import { HierarchyRepository } from '../../../../company/repositories/implementations/HierarchyRepository';
-import { createBaseDocument } from '../../../docx/base/config/document';
-import { UpsertPgrDto } from '../../../dto/pgr.dto';
-import { CompanyRepository } from '../../../../../modules/company/repositories/implementations/CompanyRepository';
-import { RiskDocumentEntity } from '../../../../checklist/entities/riskDocument.entity';
-import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { ProfessionalRepository } from '../../../../users/repositories/implementations/ProfessionalRepository';
+import { createBaseDocument } from '../../../docx/base/config/document';
+import { DocumentBuildPGR } from '../../../docx/builders/pgr/create';
+import { UpsertPgrDto } from '../../../dto/pgr.dto';
+import { WorkspaceRepository } from './../../../../company/repositories/implementations/WorkspaceRepository';
+import { VFullWidthImage } from 'src/modules/documents/docx/base/elements/imagesLayout/vFullWidthImage';
 
 @Injectable()
 export class PgrUploadService {
@@ -45,13 +61,29 @@ export class PgrUploadService {
     // const hierarchyHierarchy =  await this.hierarchyRepository.findAllDataHierarchyByCompany(companyId, workspaceId);
     // eslint-disable-next-line prettier/prettier
     const versions = await this.riskDocumentRepository.findByRiskGroupAndCompany(upsertPgrDto.riskGroupId, companyId);
-
-
     const workspace = await this.workspaceRepository.findById(workspaceId);
-    const company = await this.companyRepository.findById(companyId);
-    // eslint-disable-next-line prettier/prettier
-    const professionals = await this.professionalRepository.findByCompanyId(companyId);
+    const company = await this.companyRepository.findByIdAll(companyId, {
+      include: {
+        address: true,
+        environments: { include: { photos: true } },
+        professional: true,
+      },
+    });
 
+    const logo = company.logoUrl
+      ? await downloadImageFile(
+          company.logoUrl,
+          `tmp/${v4()}.${getExtensionFromUrl(company.logoUrl)}`,
+        )
+      : '';
+
+    // throw new Error('');
+    // const dimensions = sizeOf(logo);
+    // console.log(dimensions.width, dimensions.height);
+
+    const { environments, photosPath } = await this.downloadPhotos(company);
+
+    // eslint-disable-next-line prettier/prettier
     // const { hierarchyData, homoGroupTree } =
     //   hierarchyConverter(hierarchyHierarchy);
 
@@ -66,32 +98,32 @@ export class PgrUploadService {
 
     versions.push(version);
 
-    const url =
-      'https://prod-simplesst-docs.s3.amazonaws.com/b8635456-334e-4d6e-ac43-cfe5663aee17/environment/dcf93c91-815a-4b12-8a68-a6f39d86711b.png';
-
-    const example_image_1 = await downloadImageFile(
-      url,
-      `tmp/${v4()}.${getExtensionFromUrl(url)}`,
-    );
-
     const versionString = `${this.dayJSProvider.format(
       version.created_at,
     )} - REV. ${version.version}`;
 
     const sections: ISectionOptions[] = new DocumentBuildPGR({
       version: versionString,
-      logo: example_image_1,
+      logo,
       company,
       workspace,
       versions,
-      professionals,
+      environments,
     }).build();
+
+    // const sections: ISectionOptions[] = [
+    //   {
+    //     // children: [...vTwoImages(logo, 'qw')],
+    //     children: [...vThreeImages([logo, logo, logo], ['qw', 'qw1', 'qw2'])],
+    //     properties: sectionProperties,
+    //   },
+    // ];
 
     const doc = createBaseDocument(sections);
 
-    fs.unlinkSync(example_image_1);
-
     const b64string = await Packer.toBase64String(doc);
+    [logo, ...photosPath].forEach((path) => path && fs.unlinkSync(path));
+
     const buffer = Buffer.from(b64string, 'base64');
 
     const fileName = 'delete.docx';
@@ -119,5 +151,33 @@ export class PgrUploadService {
     });
 
     return doc;
+  }
+
+  private async downloadPhotos(company: Partial<CompanyEntity>) {
+    const photosPath = [];
+    // return { environments: [], photosPath };
+    try {
+      const environments = await Promise.all(
+        company.environments.map(async (environment) => {
+          const photos = await Promise.all(
+            environment.photos.map(async (photo) => {
+              const path = await downloadImageFile(
+                photo.photoUrl,
+                `tmp/${v4()}.${getExtensionFromUrl(photo.photoUrl)}`,
+              );
+              photosPath.push(path);
+              return { ...photo, photoUrl: path };
+            }),
+          );
+
+          return { ...environment, photos };
+        }),
+      );
+      return { environments, photosPath };
+    } catch (error) {
+      photosPath.forEach((path) => fs.unlinkSync(path));
+
+      throw new InternalServerErrorException(error);
+    }
   }
 }

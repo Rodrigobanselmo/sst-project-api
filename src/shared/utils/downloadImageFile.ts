@@ -2,12 +2,19 @@ import axios from 'axios';
 import fs from 'fs';
 
 export const getExtensionFromUrl = (url: string) => {
+  if (!url) return '';
+
   const urlFile = url.split('/');
   return urlFile[urlFile.length - 1].split('.')[1];
 };
 
-export const downloadImageFile = (url: string, image_path: string) =>
-  axios({
+export const downloadImageFile = async (
+  url: string | null,
+  image_path: string,
+): Promise<string | null> => {
+  if (!url) return null;
+
+  return axios({
     url,
     responseType: 'stream',
   }).then(
@@ -19,3 +26,4 @@ export const downloadImageFile = (url: string, image_path: string) =>
           .on('error', (e) => reject(e));
       }),
   );
+};

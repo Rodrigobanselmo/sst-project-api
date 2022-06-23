@@ -34,7 +34,7 @@ export const summarySections = (): ISectionOptions[] => [
   {
     children: [
       summaryText('Índice de tabelas'),
-      new TableOfContents('Tables', {
+      new TableOfContents('Tabelas', {
         hyperlink: true,
         captionLabelIncludingNumbers: 'Table',
       }),
@@ -44,9 +44,9 @@ export const summarySections = (): ISectionOptions[] => [
   {
     children: [
       summaryText('Índice de imagens'),
-      new TableOfContents('Tables', {
+      new TableOfContents('Imagens', {
         hyperlink: true,
-        captionLabelIncludingNumbers: 'Table',
+        captionLabelIncludingNumbers: 'Figure',
       }),
     ],
     properties: sectionCoverProperties,

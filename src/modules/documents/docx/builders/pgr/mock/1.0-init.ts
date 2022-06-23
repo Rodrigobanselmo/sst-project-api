@@ -242,7 +242,15 @@ export const initSection: IDocumentPGRSectionGroup = {
           text: 'REVISÕES DO DOCUMENTO',
         },
         {
+          type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE,
+          text: 'Controle das Revisões do Documento',
+        },
+        {
           type: PGRSectionChildrenTypeEnum.TABLE_VERSION_CONTROL,
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          text: `VIGÊNCIA: ${VariablesPGREnum.DOC_VALIDITY}`,
         },
       ],
     },

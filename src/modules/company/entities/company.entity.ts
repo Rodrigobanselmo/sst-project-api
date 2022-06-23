@@ -1,3 +1,4 @@
+import { ProfessionalEntity } from './../../users/entities/professional.entity';
 import { Company, CompanyTypesEnum } from '.prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 import { StatusEnum } from '@prisma/client';
@@ -5,6 +6,7 @@ import { AddressCompanyEntity } from './address-company.entity';
 import { EmployeeEntity } from './employee.entity';
 import { LicenseEntity } from './license.entity';
 import { WorkspaceEntity } from './workspace.entity';
+import { EnvironmentEntity } from './environment.entity';
 
 export class CompanyEntity implements Company {
   @ApiProperty({ description: 'The id of the Company' })
@@ -67,6 +69,8 @@ export class CompanyEntity implements Company {
 
   description: string;
 
+  environments?: EnvironmentEntity[];
+  professionals?: ProfessionalEntity[];
   email: string;
   riskDegree: number;
   logoUrl: string;

@@ -21,6 +21,5 @@ export const companyVariables = (
     [VariablesPGREnum.COMPANY_STREET]: address?.street || '',
     [VariablesPGREnum.COMPANY_CITY]: address?.city || '',
     [VariablesPGREnum.COMPANY_NEIGHBOR]: address?.neighborhood || '',
-    [VariablesPGREnum.COMPANY_NAME]: company?.phone || '',
   };
 };

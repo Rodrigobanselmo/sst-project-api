@@ -23,6 +23,7 @@ export class EnvironmentPhotoEntity implements CompanyEnvironmentPhoto {
   })
   created_at: Date;
 
+  isVertical: boolean;
   deleted_at: Date;
   updated_at: Date;
 

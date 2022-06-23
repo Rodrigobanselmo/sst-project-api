@@ -8,6 +8,7 @@ import { ICompanyRepository } from '../ICompanyRepository.types';
 import { v4 as uuidV4 } from 'uuid';
 import { UpdateCompanyDto } from '../../dto/update-company.dto';
 import { IPrismaOptions } from '../../../../shared/interfaces/prisma-options.types';
+import { Prisma } from '@prisma/client';
 
 interface ICreateCompany extends CreateCompanyDto {
   companyId?: string;
@@ -392,57 +393,16 @@ export class CompanyRepository implements ICompanyRepository {
     return new CompanyEntity(company);
   }
 
-  async findById(
+  async findByIdAll(
     id: string,
-    options?: IPrismaOptions<{
-      primary_activity?: boolean;
-      secondary_activity?: boolean;
-      workspace?: boolean;
-      employees?: boolean;
-    }>,
+    options?: Partial<Prisma.CompanyFindUniqueArgs>,
   ): Promise<CompanyEntity> {
-    const include = options?.include || {};
-
-    const employeeCount = await this.prisma.employee.count({
-      where: { companyId: id },
-    });
-
-    const riskGroupCount = await this.prisma.riskFactorGroupData.count({
-      where: { companyId: id },
-    });
-
     const company = await this.prisma.company.findUnique({
       where: { id },
-      include: {
-        primary_activity: !!include?.primary_activity,
-        secondary_activity: !!include?.secondary_activity,
-        workspace: !!include?.workspace
-          ? { include: { address: true } }
-          : false,
-        employees: !!include.employees
-          ? { include: { workspaces: true } }
-          : false,
-        address: true,
-      },
+      ...options,
     });
 
-    if (company.workspace) {
-      company.workspace = await Promise.all(
-        company.workspace.map(async (workspace) => {
-          const employeeCount = await this.prisma.employee.count({
-            where: { workspaces: { some: { id: workspace.id } } },
-          });
-
-          return { ...workspace, employeeCount };
-        }),
-      );
-    }
-
-    return new CompanyEntity({
-      ...company,
-      employeeCount: employeeCount,
-      riskGroupCount: riskGroupCount,
-    });
+    return new CompanyEntity(company);
   }
 
   async findAllRelatedByCompanyId(
@@ -496,5 +456,58 @@ export class CompanyRepository implements ICompanyRepository {
     });
 
     return [...companies.map((company) => new CompanyEntity(company))];
+  }
+
+  async findById(
+    id: string,
+    options?: IPrismaOptions<{
+      primary_activity?: boolean;
+      secondary_activity?: boolean;
+      workspace?: boolean;
+      employees?: boolean;
+    }>,
+  ): Promise<CompanyEntity> {
+    const include = options?.include || {};
+
+    const employeeCount = await this.prisma.employee.count({
+      where: { companyId: id },
+    });
+
+    const riskGroupCount = await this.prisma.riskFactorGroupData.count({
+      where: { companyId: id },
+    });
+
+    const company = await this.prisma.company.findUnique({
+      where: { id },
+      include: {
+        primary_activity: !!include?.primary_activity,
+        secondary_activity: !!include?.secondary_activity,
+        workspace: !!include?.workspace
+          ? { include: { address: true } }
+          : false,
+        employees: !!include.employees
+          ? { include: { workspaces: true } }
+          : false,
+        address: true,
+      },
+    });
+
+    if (company.workspace) {
+      company.workspace = await Promise.all(
+        company.workspace.map(async (workspace) => {
+          const employeeCount = await this.prisma.employee.count({
+            where: { workspaces: { some: { id: workspace.id } } },
+          });
+
+          return { ...workspace, employeeCount };
+        }),
+      );
+    }
+
+    return new CompanyEntity({
+      ...company,
+      employeeCount: employeeCount,
+      riskGroupCount: riskGroupCount,
+    });
   }
 }

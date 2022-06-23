@@ -1,5 +1,7 @@
 import {
   AlignmentType,
+  Footer,
+  Header,
   HeightRule,
   ISectionOptions,
   Paragraph,
@@ -69,5 +71,15 @@ export const chapterSection = ({
   return {
     children: [createChapterPage({ version, chapter })],
     properties: sectionCoverProperties,
+    footers: {
+      default: new Footer({
+        children: [],
+      }),
+    },
+    headers: {
+      default: new Header({
+        children: [],
+      }),
+    },
   };
 };

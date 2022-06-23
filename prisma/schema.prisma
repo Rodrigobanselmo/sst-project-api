@@ -154,7 +154,7 @@ model Company {
   homogeneousGroup HomogeneousGroup[] 
   generateSource GenerateSource[] 
   recMed RecMed[] 
-  companyEnvironment CompanyEnvironment[] 
+  environments CompanyEnvironment[] 
   hierarchy Hierarchy[] 
   databaseTable DatabaseTable[] 
   checklist Checklist[] 
@@ -172,6 +172,9 @@ model CompanyEnvironment {
   deleted_at DateTime? 
   updated_at  DateTime   @updatedAt
   type CompanyEnvironmentTypesEnum 
+  noiseValue String?  
+  temperature String?  
+  moisturePercentage String?   
   workspaceId String
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
   riskFactors RiskFactors[] 
@@ -188,6 +191,7 @@ model CompanyEnvironment {
 model CompanyEnvironmentPhoto {
   id   String    @id @default(uuid())
   name String  
+  isVertical Boolean @default(false)
   photoUrl String
   created_at DateTime @default(now())
   deleted_at DateTime? 

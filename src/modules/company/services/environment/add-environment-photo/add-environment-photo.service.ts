@@ -1,3 +1,4 @@
+import sizeOf from 'image-size';
 import { Injectable } from '@nestjs/common';
 import { Readable } from 'stream';
 import { v4 } from 'uuid';
@@ -22,13 +23,14 @@ export class AddEnvironmentPhotoService {
     file: Express.Multer.File,
   ) {
     const companyId = userPayloadDto.targetCompanyId;
-    const photoUrl = await this.upload(companyId, file);
+    const [photoUrl, isVertical] = await this.upload(companyId, file);
 
     await this.environmentPhotoRepository.createMany([
       {
         companyEnvironmentId: addPhotoEnvironmentDto.companyEnvironmentId,
         photoUrl,
         name: addPhotoEnvironmentDto.name,
+        isVertical,
       },
     ]);
 
@@ -51,6 +53,9 @@ export class AddEnvironmentPhotoService {
       fileName: path,
     });
 
-    return url;
+    const dimensions = sizeOf(file.buffer);
+    const isVertical = dimensions.width < dimensions.height;
+
+    return [url, isVertical] as [string, boolean];
   }
 }

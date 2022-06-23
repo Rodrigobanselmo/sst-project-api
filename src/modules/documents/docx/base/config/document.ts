@@ -39,6 +39,16 @@ export const createBaseDocument = (sections: ISectionOptions[]) => {
             },
           ],
         },
+        {
+          reference: 'table-numbering',
+          levels: [
+            {
+              level: 0,
+              text: 'Tabela: %1',
+              format: LevelFormat.DECIMAL,
+            },
+          ],
+        },
       ],
     },
     features: {

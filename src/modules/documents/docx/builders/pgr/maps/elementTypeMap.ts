@@ -1,3 +1,8 @@
+import { EnvironmentEntity } from './../../../../../company/entities/environment.entity';
+import {
+  paragraphTable,
+  paragraphFigure,
+} from './../../../base/elements/paragraphs';
 import { ProfessionalEntity } from './../../../../../users/entities/professional.entity';
 import { Paragraph, Table } from 'docx';
 
@@ -21,8 +26,9 @@ import {
 import { IDocVariables } from '../types/section.types';
 import { RiskDocumentEntity } from '../../../../../checklist/entities/riskDocument.entity';
 import { versionControlTable } from '../../../components/tables/versionControl/versionControl.table';
-import { professionalsIterable } from '../../../components/iterables/professionals.iterable';
+import { professionalsIterable } from '../../../components/iterables/professionals/professionals.iterable';
 import { replaceAllVariables } from '../functions/replaceAllVariables';
+import { environmentIterable } from '../../../components/iterables/environments/environments.iterable';
 
 export type IMapElementDocumentType = Record<
   string,
@@ -33,17 +39,25 @@ type IDocumentClassType = {
   variables: IDocVariables;
   versions: RiskDocumentEntity[];
   professionals: ProfessionalEntity[];
+  environments: EnvironmentEntity[];
 };
 
 export class ElementsMapClass {
   private variables: IDocVariables;
   private versions: RiskDocumentEntity[];
   private professionals: ProfessionalEntity[];
+  private environments: EnvironmentEntity[];
 
-  constructor({ variables, versions, professionals }: IDocumentClassType) {
+  constructor({
+    variables,
+    versions,
+    professionals,
+    environments,
+  }: IDocumentClassType) {
     this.variables = variables;
     this.versions = versions;
     this.professionals = professionals;
+    this.environments = environments;
   }
 
   public map: IMapElementDocumentType = {
@@ -55,17 +69,34 @@ export class ElementsMapClass {
     [PGRSectionChildrenTypeEnum.H6]: ({ text }: IH6) => [h6(text)],
     [PGRSectionChildrenTypeEnum.BREAK]: ({}: IBreak) => [pageBreak()],
     [PGRSectionChildrenTypeEnum.TITLE]: ({ text }: ITitle) => [title(text)],
-    [PGRSectionChildrenTypeEnum.PARAGRAPH]: ({ text, size }: IParagraph) => [
-      paragraphNormal(text, { size }),
+    [PGRSectionChildrenTypeEnum.PARAGRAPH]: ({ text, ...rest }: IParagraph) => [
+      paragraphNormal(text, rest),
+    ],
+    [PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE]: ({
+      text,
+      ...rest
+    }: IParagraph) => [paragraphTable(text, rest)],
+    [PGRSectionChildrenTypeEnum.PARAGRAPH_FIGURE]: ({
+      text,
+      ...rest
+    }: IParagraph) => [paragraphFigure(text, rest)],
+    [PGRSectionChildrenTypeEnum.TABLE_VERSION_CONTROL]: () => [
+      versionControlTable(this.versions),
     ],
     [PGRSectionChildrenTypeEnum.TABLE_VERSION_CONTROL]: () => [
       versionControlTable(this.versions),
     ],
+    [PGRSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS]: () =>
+      environmentIterable(this.environments, (x, v) =>
+        this.convertToDocx(x, v),
+      ),
     [PGRSectionChildrenTypeEnum.BULLET]: ({ level, text }: IBullet) => [
       bulletsNormal(text, level),
     ],
     [PGRSectionChildrenTypeEnum.PROFESSIONAL]: () =>
-      professionalsIterable(this.professionals, this.convertToDocx),
+      professionalsIterable(this.professionals, (x, v) =>
+        this.convertToDocx(x, v),
+      ),
   };
 
   private convertToDocx(
