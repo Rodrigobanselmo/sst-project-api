@@ -1,5 +1,6 @@
 import {
   BorderStyle,
+  IBorderOptions,
   ISectionPropertiesOptions,
   ITableBordersOptions,
 } from 'docx';
@@ -38,3 +39,63 @@ export const borderNoneStyle: ITableBordersOptions = {
   insideHorizontal: { style: BorderStyle.NIL, size: 0 },
   right: { style: BorderStyle.NIL, size: 0 },
 };
+
+interface ISTableBordersOptions {
+  readonly top?: Partial<IBorderOptions>;
+  readonly bottom?: Partial<IBorderOptions>;
+  readonly left?: Partial<IBorderOptions>;
+  readonly right?: Partial<IBorderOptions>;
+  readonly insideHorizontal?: Partial<IBorderOptions>;
+  readonly insideVertical?: Partial<IBorderOptions>;
+  readonly size?: number;
+}
+
+export const borderStyle = (
+  color: string,
+  options: ISTableBordersOptions = {
+    bottom: {},
+    left: {},
+    right: {},
+    top: {},
+    insideHorizontal: {},
+    insideVertical: {},
+    size: 1,
+  },
+): ITableBordersOptions => ({
+  top: {
+    style: BorderStyle.SINGLE,
+    size: options.size,
+    color: color,
+    ...options.top,
+  },
+  bottom: {
+    style: BorderStyle.SINGLE,
+    size: options.size,
+    color: color,
+    ...options.bottom,
+  },
+  left: {
+    style: BorderStyle.SINGLE,
+    size: options.size,
+    color: color,
+    ...options.left,
+  },
+  insideVertical: {
+    style: BorderStyle.SINGLE,
+    size: options.size,
+    color: color,
+    ...options.insideVertical,
+  },
+  insideHorizontal: {
+    style: BorderStyle.SINGLE,
+    size: options.size,
+    color: color,
+    ...options.insideHorizontal,
+  },
+  right: {
+    style: BorderStyle.SINGLE,
+    size: options.size,
+    color: color,
+    ...options.right,
+  },
+});

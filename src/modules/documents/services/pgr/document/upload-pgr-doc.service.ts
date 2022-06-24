@@ -1,3 +1,5 @@
+import { expositionDegreeFQTable } from './../../../docx/components/tables/mock/expositionDegree/tables/expositionDegreeFQTable';
+import { healthSeverityFisQuiTable } from '../../../docx/components/tables/mock/healthSeverity/tables/healthSeverityBTable';
 import {
   borderNoneStyle,
   sectionProperties,
@@ -38,6 +40,10 @@ import { DocumentBuildPGR } from '../../../docx/builders/pgr/create';
 import { UpsertPgrDto } from '../../../dto/pgr.dto';
 import { WorkspaceRepository } from './../../../../company/repositories/implementations/WorkspaceRepository';
 import { VFullWidthImage } from 'src/modules/documents/docx/base/elements/imagesLayout/vFullWidthImage';
+import { expositionDegreeBTable } from 'src/modules/documents/docx/components/tables/mock/expositionDegree/tables/expositionDegreeBTable';
+import { expositionDegreeETable } from 'src/modules/documents/docx/components/tables/mock/expositionDegree/tables/expositionDegreeETable';
+import { expositionDegreeATable } from 'src/modules/documents/docx/components/tables/mock/expositionDegree/tables/expositionDegreeATable';
+import { matrizTable } from 'src/modules/documents/docx/components/tables/mock/matriz/table.component';
 
 @Injectable()
 export class PgrUploadService {
@@ -102,22 +108,22 @@ export class PgrUploadService {
       version.created_at,
     )} - REV. ${version.version}`;
 
-    const sections: ISectionOptions[] = new DocumentBuildPGR({
-      version: versionString,
-      logo,
-      company,
-      workspace,
-      versions,
-      environments,
-    }).build();
+    // const sections: ISectionOptions[] = new DocumentBuildPGR({
+    //   version: versionString,
+    //   logo,
+    //   company,
+    //   workspace,
+    //   versions,
+    //   environments,
+    // }).build();
 
-    // const sections: ISectionOptions[] = [
-    //   {
-    //     // children: [...vTwoImages(logo, 'qw')],
-    //     children: [...vThreeImages([logo, logo, logo], ['qw', 'qw1', 'qw2'])],
-    //     properties: sectionProperties,
-    //   },
-    // ];
+    const sections: ISectionOptions[] = [
+      {
+        // children: [...vTwoImages(logo, 'qw')],
+        children: [matrizTable()],
+        properties: sectionProperties,
+      },
+    ];
 
     const doc = createBaseDocument(sections);
 
