@@ -6,7 +6,7 @@ import { rowBodyBio } from '../data/bodyB';
 import { headerConverter } from '../header.converter';
 
 // Table 2
-export const healthSeverityFisQuiTable = () => {
+export const healthSeverityBioTable = () => {
   const tableHeaderElements = new TableHeaderElements();
   const tableBodyElements = new TableBodyElements();
 

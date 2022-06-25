@@ -1,5 +1,5 @@
+import { quantityResultsQTable } from './../../../docx/components/tables/mock/quantityResults/tables/quantityResultsQTable';
 import { expositionDegreeFQTable } from './../../../docx/components/tables/mock/expositionDegree/tables/expositionDegreeFQTable';
-import { healthSeverityFisQuiTable } from '../../../docx/components/tables/mock/healthSeverity/tables/healthSeverityBTable';
 import {
   borderNoneStyle,
   sectionProperties,
@@ -44,6 +44,11 @@ import { expositionDegreeBTable } from 'src/modules/documents/docx/components/ta
 import { expositionDegreeETable } from 'src/modules/documents/docx/components/tables/mock/expositionDegree/tables/expositionDegreeETable';
 import { expositionDegreeATable } from 'src/modules/documents/docx/components/tables/mock/expositionDegree/tables/expositionDegreeATable';
 import { matrizTable } from 'src/modules/documents/docx/components/tables/mock/matriz/table.component';
+import { quantityResultsRTable } from 'src/modules/documents/docx/components/tables/mock/quantityResults/tables/quantityResultsRTable';
+import { quantityResultsR2Table } from 'src/modules/documents/docx/components/tables/mock/quantityResults/tables/quantityResultsR2Table';
+import { quantityResultsHTable } from 'src/modules/documents/docx/components/tables/mock/quantityResults/tables/quantityResultsHTable';
+import { quantityResultsFBVTable } from 'src/modules/documents/docx/components/tables/mock/quantityResults/tables/quantityResultsFBVTable';
+import { quantityResultsLVTable } from 'src/modules/documents/docx/components/tables/mock/quantityResults/tables/quantityResultsLV';
 
 @Injectable()
 export class PgrUploadService {
@@ -120,7 +125,7 @@ export class PgrUploadService {
     const sections: ISectionOptions[] = [
       {
         // children: [...vTwoImages(logo, 'qw')],
-        children: [matrizTable()],
+        children: [quantityResultsLVTable()],
         properties: sectionProperties,
       },
     ];

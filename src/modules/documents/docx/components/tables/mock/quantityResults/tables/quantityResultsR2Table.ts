@@ -1,12 +1,14 @@
 import { HeightRule, Table, WidthType } from 'docx';
+
 import { TableBodyElements } from '../../elements/body';
 import { TableHeaderElements } from '../../elements/header';
 import { NewBody } from '../body.converter';
-import { rowBodyAci } from '../data/bodyA';
-import { headerConverter } from '../header.converter';
+import { rowBodyNoise2 } from '../data/bodyR2';
+import { headerQR } from '../data/headerQR';
+import { NewHeader } from '../header.converter';
 
 // Table 2
-export const healthSeverityAciTable = () => {
+export const quantityResultsR2Table = () => {
   const tableHeaderElements = new TableHeaderElements();
   const tableBodyElements = new TableBodyElements();
 
@@ -14,14 +16,14 @@ export const healthSeverityAciTable = () => {
     width: { size: 100, type: WidthType.PERCENTAGE },
     rows: [
       tableHeaderElements.headerRow(
-        headerConverter.map(tableHeaderElements.headerCell),
+        NewHeader(headerQR).map(tableHeaderElements.headerCell),
         {
           height: { value: 550, rule: HeightRule.EXACT },
         },
       ),
-      ...NewBody(rowBodyAci).map((data) =>
+      ...NewBody(rowBodyNoise2).map((data) =>
         tableBodyElements.tableRow(data.map(tableBodyElements.tableCell), {
-          height: { value: 700, rule: HeightRule.ATLEAST },
+          height: { value: 550, rule: HeightRule.ATLEAST },
         }),
       ),
     ],

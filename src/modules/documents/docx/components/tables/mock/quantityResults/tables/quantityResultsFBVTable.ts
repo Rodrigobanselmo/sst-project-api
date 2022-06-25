@@ -1,12 +1,14 @@
 import { HeightRule, Table, WidthType } from 'docx';
+
 import { TableBodyElements } from '../../elements/body';
 import { TableHeaderElements } from '../../elements/header';
-import { NewBody } from '../body.converter';
-import { rowBodyAci } from '../data/bodyA';
-import { headerConverter } from '../header.converter';
+import { NewBodyC6 } from '../bodyC6.converter';
+import { rowBodyFullBodyVibration } from '../data/bodyFBV';
+import { headerFBV } from '../data/headerFBV';
+import { NewHeaderC5 } from '../headerC5.converter';
 
 // Table 2
-export const healthSeverityAciTable = () => {
+export const quantityResultsFBVTable = () => {
   const tableHeaderElements = new TableHeaderElements();
   const tableBodyElements = new TableBodyElements();
 
@@ -14,14 +16,14 @@ export const healthSeverityAciTable = () => {
     width: { size: 100, type: WidthType.PERCENTAGE },
     rows: [
       tableHeaderElements.headerRow(
-        headerConverter.map(tableHeaderElements.headerCell),
+        NewHeaderC5(headerFBV).map(tableHeaderElements.headerCell),
         {
           height: { value: 550, rule: HeightRule.EXACT },
         },
       ),
-      ...NewBody(rowBodyAci).map((data) =>
+      ...NewBodyC6(rowBodyFullBodyVibration).map((data) =>
         tableBodyElements.tableRow(data.map(tableBodyElements.tableCell), {
-          height: { value: 700, rule: HeightRule.ATLEAST },
+          height: { value: 550, rule: HeightRule.ATLEAST },
         }),
       ),
     ],
