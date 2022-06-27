@@ -1,4 +1,4 @@
-import { textLink } from './../../../../base/elements/paragraphs';
+import { textLink } from '../../../../base/elements/paragraphs';
 import {
   AlignmentType,
   ITableCellOptions,
@@ -11,7 +11,7 @@ import {
   WidthType,
 } from 'docx';
 import { isOdd } from 'src/shared/utils/isOdd';
-import { borderStyle } from '../../../../../../../modules/documents/docx/base/config/styles';
+import { borderStyle } from '../../../../base/config/styles';
 import { palette } from '../../../../../../../shared/constants/palette';
 
 export interface bodyTableProps extends Partial<ITableCellOptions> {

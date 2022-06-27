@@ -7,26 +7,34 @@ export enum PGRSectionTypeEnum {
   SECTION = 'SECTION',
 }
 
+interface IBase {
+  removeWithSomeEmptyVars?: string[];
+  removeWithAllEmptyVars?: string[];
+  removeWithAllValidVars?: string[];
+  addWithAllVars?: string[];
+}
+
 export type ICover = {
   type: PGRSectionTypeEnum.COVER;
   imgPath?: string;
   version?: string;
-};
+} & IBase;
 
 export type ITOC = {
   type: PGRSectionTypeEnum.TOC;
-};
+} & IBase;
 
 export type IChapter = {
   type: PGRSectionTypeEnum.CHAPTER;
   text?: string;
   version?: string;
-};
+} & IBase;
+
 export type ISection = {
   type: PGRSectionTypeEnum.SECTION;
   children: ISectionChildrenType[];
   footerText?: string;
-};
+} & IBase;
 
 export type IAllSectionTypesPGR = IChapter | ISection | ICover | ITOC;
 

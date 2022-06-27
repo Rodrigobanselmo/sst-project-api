@@ -9,7 +9,7 @@ import {
   VerticalAlign,
   WidthType,
 } from 'docx';
-import { borderStyle } from '../../../../../../../modules/documents/docx/base/config/styles';
+import { borderStyle } from '../../../../base/config/styles';
 
 import { palette } from '../../../../../../../shared/constants/palette';
 

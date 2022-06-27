@@ -11,7 +11,6 @@ export const versionControlConverter = (documentsVersions:  RiskDocumentEntity[]
   documentsVersions.sort((a, b) => sortData(a, b, 'created_at')).map((version,index) => {
     const cells: bodyTableProps[] = [];
 
-
     cells[VersionControlColumnEnum.INDEX] = { text: String(index) }
     cells[VersionControlColumnEnum.DATE] = { text: dayjs(version.created_at).format('DD/MM/YYYY') || '' }
     cells[VersionControlColumnEnum.DESCRIPTION] = { text: version.description || ''  }

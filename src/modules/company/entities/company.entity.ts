@@ -94,4 +94,5 @@ export class CompanyEntity implements Company {
   constructor(partial: Partial<CompanyEntity>) {
     Object.assign(this, partial);
   }
+  coordinatorName: string;
 }

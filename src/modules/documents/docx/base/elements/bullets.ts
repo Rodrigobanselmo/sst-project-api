@@ -16,6 +16,13 @@ export const bulletsNormal = (
   });
 };
 
+export const bulletsSpace = (text: string, options?: IParagraphOptions) => {
+  return paragraphNormal(`         ${text}`, {
+    spacing: { line: 250, after: 80, before: 0 },
+    ...options,
+  });
+};
+
 export const bulletsArray = (
   bullets: [string, number?][],
   options?: IParagraphOptions,

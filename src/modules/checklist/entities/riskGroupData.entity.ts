@@ -42,6 +42,9 @@ export class RiskFactorGroupDataEntity implements RiskFactorGroupData {
   documentDate: Date | null;
   visitDate: Date | null;
   validity: string;
+  complementarySystems: string[];
+  complementaryDocs: string[];
+  coordinatorBy: string;
 
   constructor(partial: Partial<RiskFactorGroupDataEntity>) {
     Object.assign(this, partial);

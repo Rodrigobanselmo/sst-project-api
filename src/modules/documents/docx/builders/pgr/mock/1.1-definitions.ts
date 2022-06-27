@@ -33,7 +33,7 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Acidente do Trabalho:** : São ocorrências de menos frequência, que se restringem na maior parte das vezes a uma pessoa, não passando dos limites da empresa envolvida. Por exemplo: cortes, queimaduras térmicas/químicas, torções etc.;',
+          text: '**Acidente do Trabalho:** São ocorrências de menos frequência, que se restringem na maior parte das vezes a uma pessoa, não passando dos limites da empresa envolvida. Por exemplo: cortes, queimaduras térmicas/químicas, torções etc.;',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,

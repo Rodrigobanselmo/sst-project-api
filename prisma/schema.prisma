@@ -470,6 +470,7 @@ model RiskFactorGroupData {
   companyId String
   source String?
   elaboratedBy String?
+  coordinatorBy String?
   revisionBy String?
   approvedBy String?
   validity String?
@@ -479,6 +480,8 @@ model RiskFactorGroupData {
   docs RiskFactorDocument[]
   status StatusEnum @default(PROGRESS)
   professional Professional[]
+  complementaryDocs String[]
+  complementarySystems String[]
 
   @@unique([id, companyId])
 }

@@ -37,6 +37,7 @@ export class RiskDocumentEntity implements RiskFactorDocument {
   revisionBy: string;
   approvedBy: string;
   validity: string;
+  complementaryDocs: string[];
 
   constructor(partial: Partial<RiskDocumentEntity>) {
     Object.assign(this, partial);

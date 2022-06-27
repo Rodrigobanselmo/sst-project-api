@@ -4,6 +4,7 @@ import { chapterSection } from '../../../base/layouts/chapter/chapter';
 import { coverSections } from '../../../base/layouts/cover/cover';
 import { headerAndFooter } from '../../../base/layouts/headerAndFooter/headerAndFooter';
 import { summarySections } from '../../../base/layouts/summary/summary';
+import { convertToDocxHelper } from '../functions/convertToDocx';
 import { replaceAllVariables } from '../functions/replaceAllVariables';
 import { ISectionChildrenType } from '../types/elements.types';
 import {
@@ -71,12 +72,12 @@ export class SectionsMapClass {
   private convertToDocx(data: ISectionChildrenType[]) {
     return data
       .map((child) => {
-        if ('text' in child) {
-          child.text = replaceAllVariables(child.text, this.variables);
-        }
+        const childData = convertToDocxHelper(child, this.variables);
+        if (!childData) return null;
 
-        return this.elementsMap[child.type](child);
+        return this.elementsMap[childData.type](childData);
       })
+      .filter((x) => x)
       .reduce((acc, curr) => {
         return [...acc, ...curr];
       }, []);

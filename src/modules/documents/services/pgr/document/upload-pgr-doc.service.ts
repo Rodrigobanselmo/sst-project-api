@@ -1,5 +1,5 @@
-import { quantityResultsQTable } from './../../../docx/components/tables/mock/quantityResults/tables/quantityResultsQTable';
-import { expositionDegreeFQTable } from './../../../docx/components/tables/mock/expositionDegree/tables/expositionDegreeFQTable';
+import { quantityResultsQTable } from '../../../docx/components/tables/mock/components/quantityResults/tables/quantityResultsQTable';
+import { expositionDegreeFQTable } from '../../../docx/components/tables/mock/components/expositionDegree/tables/expositionDegreeFQTable';
 import {
   borderNoneStyle,
   sectionProperties,
@@ -40,15 +40,16 @@ import { DocumentBuildPGR } from '../../../docx/builders/pgr/create';
 import { UpsertPgrDto } from '../../../dto/pgr.dto';
 import { WorkspaceRepository } from './../../../../company/repositories/implementations/WorkspaceRepository';
 import { VFullWidthImage } from 'src/modules/documents/docx/base/elements/imagesLayout/vFullWidthImage';
-import { expositionDegreeBTable } from 'src/modules/documents/docx/components/tables/mock/expositionDegree/tables/expositionDegreeBTable';
-import { expositionDegreeETable } from 'src/modules/documents/docx/components/tables/mock/expositionDegree/tables/expositionDegreeETable';
-import { expositionDegreeATable } from 'src/modules/documents/docx/components/tables/mock/expositionDegree/tables/expositionDegreeATable';
-import { matrizTable } from 'src/modules/documents/docx/components/tables/mock/matriz/table.component';
-import { quantityResultsRTable } from 'src/modules/documents/docx/components/tables/mock/quantityResults/tables/quantityResultsRTable';
-import { quantityResultsR2Table } from 'src/modules/documents/docx/components/tables/mock/quantityResults/tables/quantityResultsR2Table';
-import { quantityResultsHTable } from 'src/modules/documents/docx/components/tables/mock/quantityResults/tables/quantityResultsHTable';
-import { quantityResultsFBVTable } from 'src/modules/documents/docx/components/tables/mock/quantityResults/tables/quantityResultsFBVTable';
-import { quantityResultsLVTable } from 'src/modules/documents/docx/components/tables/mock/quantityResults/tables/quantityResultsLV';
+import { expositionDegreeBTable } from 'src/modules/documents/docx/components/tables/mock/components/expositionDegree/tables/expositionDegreeBTable';
+import { expositionDegreeETable } from 'src/modules/documents/docx/components/tables/mock/components/expositionDegree/tables/expositionDegreeETable';
+import { expositionDegreeATable } from 'src/modules/documents/docx/components/tables/mock/components/expositionDegree/tables/expositionDegreeATable';
+import { matrizTable } from 'src/modules/documents/docx/components/tables/mock/components/matriz/table.component';
+import { quantityResultsRTable } from 'src/modules/documents/docx/components/tables/mock/components/quantityResults/tables/quantityResultsRTable';
+import { quantityResultsR2Table } from 'src/modules/documents/docx/components/tables/mock/components/quantityResults/tables/quantityResultsR2Table';
+import { quantityResultsHTable } from 'src/modules/documents/docx/components/tables/mock/components/quantityResults/tables/quantityResultsHTable';
+import { quantityResultsFBVTable } from 'src/modules/documents/docx/components/tables/mock/components/quantityResults/tables/quantityResultsFBVTable';
+import { quantityResultsLVTable } from 'src/modules/documents/docx/components/tables/mock/components/quantityResults/tables/quantityResultsLV';
+import { annualDoseTable } from 'src/modules/documents/docx/components/tables/mock/components/annualDose/table.component';
 
 @Injectable()
 export class PgrUploadService {
@@ -93,6 +94,8 @@ export class PgrUploadService {
     // console.log(dimensions.width, dimensions.height);
 
     const { environments, photosPath } = await this.downloadPhotos(company);
+    // const environments = [];
+    // const photosPath = [];
 
     // eslint-disable-next-line prettier/prettier
     // const { hierarchyData, homoGroupTree } =
@@ -107,28 +110,27 @@ export class PgrUploadService {
       created_at: new Date(),
     });
 
-    versions.push(version);
-
     const versionString = `${this.dayJSProvider.format(
       version.created_at,
     )} - REV. ${version.version}`;
 
-    // const sections: ISectionOptions[] = new DocumentBuildPGR({
-    //   version: versionString,
-    //   logo,
-    //   company,
-    //   workspace,
-    //   versions,
-    //   environments,
-    // }).build();
+    const sections: ISectionOptions[] = new DocumentBuildPGR({
+      version: versionString,
+      document: riskGroupData,
+      logo,
+      company,
+      workspace,
+      versions,
+      environments,
+    }).build();
 
-    const sections: ISectionOptions[] = [
-      {
-        // children: [...vTwoImages(logo, 'qw')],
-        children: [quantityResultsLVTable()],
-        properties: sectionProperties,
-      },
-    ];
+    // const sections: ISectionOptions[] = [
+    //   {
+    //     // children: [...vTwoImages(logo, 'qw')],
+    //     children: [annualDoseTable()],
+    //     properties: sectionProperties,
+    //   },
+    // ];
 
     const doc = createBaseDocument(sections);
 

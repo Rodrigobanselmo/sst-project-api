@@ -1,3 +1,5 @@
+import { BorderStyle } from 'docx';
+import { palette } from 'src/shared/constants/palette';
 import { VariablesPGREnum } from '../enums/variables.enum';
 import { PGRSectionChildrenTypeEnum } from '../types/elements.types';
 import {
@@ -250,7 +252,29 @@ export const initSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: `VIGÊNCIA: ${VariablesPGREnum.DOC_VALIDITY}`,
+          text: '',
+          size: 8,
+          spacing: { before: 0, after: 0, line: 50 },
+          shading: { fill: palette.table.header.string },
+          border: {
+            right: {
+              style: BorderStyle.SINGLE,
+              size: 4,
+              color: palette.common.white.string,
+            },
+            left: {
+              style: BorderStyle.SINGLE,
+              size: 4,
+              color: palette.common.white.string,
+            },
+          },
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          text: ` VIGÊNCIA: ${VariablesPGREnum.DOC_VALIDITY}`,
+          size: 8,
+          spacing: { before: 0, after: 0, line: 300 },
+          shading: { fill: palette.table.header.string },
         },
       ],
     },

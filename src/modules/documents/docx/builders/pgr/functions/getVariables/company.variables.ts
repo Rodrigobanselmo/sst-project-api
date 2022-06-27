@@ -21,5 +21,10 @@ export const companyVariables = (
     [VariablesPGREnum.COMPANY_STREET]: address?.street || '',
     [VariablesPGREnum.COMPANY_CITY]: address?.city || '',
     [VariablesPGREnum.COMPANY_NEIGHBOR]: address?.neighborhood || '',
+    [VariablesPGREnum.COMPANY_MISSION]: company?.mission || '',
+    [VariablesPGREnum.COMPANY_VISION]: company?.vision || '',
+    [VariablesPGREnum.COMPANY_VALUES]: company?.values || '',
+    [VariablesPGREnum.COMPANY_RESPONSIBLE]: company?.responsibleName || '',
+    [VariablesPGREnum.IS_RS]: address?.state === 'RS' ? 'true' : '',
   };
 };

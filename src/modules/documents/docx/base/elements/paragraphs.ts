@@ -102,6 +102,17 @@ export const paragraphTable = (text: string, options = {} as ParagraphProps) =>
     spacing: { after: 70 },
   });
 
+export const paragraphTableLegend = (
+  text: string,
+  options = {} as ParagraphProps,
+) =>
+  paragraphNormal(text, {
+    ...options,
+    size: 8,
+    spacing: { after: 300 },
+    align: AlignmentType.START,
+  });
+
 export const paragraphFigure = (
   text: string,
   options = {} as ParagraphProps & { spacingAfter?: number },

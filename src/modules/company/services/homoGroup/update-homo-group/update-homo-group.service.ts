@@ -9,6 +9,7 @@ export class UpdateHomoGroupService {
   constructor(private readonly homoGroupRepository: HomoGroupRepository) {}
 
   async execute(homoGroup: UpdateHomoGroupDto, userPayloadDto: UserPayloadDto) {
+    console.log(homoGroup);
     const foundHomoGroup =
       await this.homoGroupRepository.findHomoGroupByCompanyAndId(
         homoGroup.id,

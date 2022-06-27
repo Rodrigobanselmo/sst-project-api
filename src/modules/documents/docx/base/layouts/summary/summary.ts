@@ -2,6 +2,7 @@ import {
   AlignmentType,
   ISectionOptions,
   Paragraph,
+  StyleLevel,
   TableOfContents,
   TextRun,
 } from 'docx';

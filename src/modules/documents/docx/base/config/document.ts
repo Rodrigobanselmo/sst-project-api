@@ -178,19 +178,19 @@ export const createBaseDocument = (sections: ISectionOptions[]) => {
           },
         },
       },
-      // paragraphStyles: [
-      //   {
-      //     id: 'h1',
-      //     name: 'Header Styles 1',
-      //     quickFormat: true,
-      //     basedOn: 'Heading1',
-      //     next: 'Heading1',
-      //     run: {
-      //       color: '000000',
-      //       bold: true,
-      //     },
-      //   },
-      // ],
+      paragraphStyles: [
+        // {
+        //   id: 'MySpectacularStyle',
+        //   name: 'My Spectacular Style',
+        //   basedOn: 'Heading1',
+        //   next: 'Heading1',
+        //   quickFormat: true,
+        //   run: {
+        //     italics: true,
+        //     color: '990000',
+        //   },
+        // },
+      ],
     },
     sections: sections,
   });
