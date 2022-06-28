@@ -97,11 +97,11 @@ export const document: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,
-          text: 'g.  Os meios e recursos necessários para os primeiros socorros, encaminhamento de acidentados e abandono; e',
+          text: 'g) Os meios e recursos necessários para os primeiros socorros, encaminhamento de acidentados e abandono; e',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,
-          text: 'h.  As medidas necessárias para os cenários de emergências de grande magnitude, quando aplicável.',
+          text: 'h) As medidas necessárias para os cenários de emergências de grande magnitude, quando aplicável.',
         },
       ],
     },

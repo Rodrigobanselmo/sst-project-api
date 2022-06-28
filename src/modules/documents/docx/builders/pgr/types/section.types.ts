@@ -1,3 +1,4 @@
+import { ISectionPropertiesOptions } from 'docx';
 import { ISectionChildrenType } from './elements.types';
 
 export enum PGRSectionTypeEnum {
@@ -34,6 +35,7 @@ export type ISection = {
   type: PGRSectionTypeEnum.SECTION;
   children: ISectionChildrenType[];
   footerText?: string;
+  properties?: ISectionPropertiesOptions;
 } & IBase;
 
 export type IAllSectionTypesPGR = IChapter | ISection | ICover | ITOC;

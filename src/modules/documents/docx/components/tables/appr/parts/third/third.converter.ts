@@ -4,7 +4,7 @@ import { RiskFactorGroupDataEntity } from '../../../../../../../checklist/entiti
 import { riskMap } from '../../../../../../constants/risks.constant';
 import { getMatrizRisk } from '../../../../../../../../shared/utils/matriz';
 import { palette } from '../../../../../../../../shared/constants/palette';
-import { MapData } from '../../../../../converter/hierarchy.converter';
+import { HierarchyMapData } from '../../../../../converter/hierarchy.converter';
 
 import { bodyTableProps, borderNoneStyle } from '../../elements/body';
 import { whiteBorder, whiteColumnBorder } from '../../elements/header';
@@ -12,7 +12,7 @@ import { ThirdRiskInventoryColumnEnum } from './third.constant';
 
 export const dataConverter = (
   riskGroup: RiskFactorGroupDataEntity,
-  hierarchyData: MapData,
+  hierarchyData: HierarchyMapData,
 ) => {
   const riskFactorsMap = new Map<RiskFactorsEnum, bodyTableProps[][]>();
   const riskInventoryData: bodyTableProps[][] = [];

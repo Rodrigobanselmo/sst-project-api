@@ -11,12 +11,19 @@ import { headerTableProps } from './elements/header';
 import {
   HierarchyPlanColumnEnum,
   HierarchyPlanMap,
-} from './hierarchyPlan.constant';
+} from './hierarchyOrg.constant';
+
+type ConverterProps = {
+  showHomogeneous?: boolean;
+  showDescription?: boolean;
+};
 
 type IHierarchyDataRecord<T> = {
   data: IHierarchyPlan<T>;
   name: string;
   type: string;
+  numEmployees: string;
+  description: string;
 };
 export type IHierarchyPlan<T> = Record<string, IHierarchyDataRecord<T>>;
 
@@ -33,16 +40,25 @@ const hierarchyEmptyId = '0';
 export const hierarchyPlanConverter = (
   hierarchyData: IHierarchyData,
   homoGroupTree: IHomoGroupMap,
+  { showDescription, showHomogeneous }: ConverterProps = {
+    showHomogeneous: false,
+    showDescription: true,
+  },
 ) => {
+  let hasAtLeastOneDescription = false;
   const allHierarchyPlan = {} as Record<string, IHierarchyPlan<any>>;
   const hierarchyColumns = {} as Record<string, number>;
 
   (function mapAllHierarchyPlan() {
     hierarchyData.forEach((hierarchiesData) => {
-      const org = hierarchyList.map((type) => {
+      const highParent = hierarchiesData.org[0].id;
+
+      const org = [...hierarchyList, 'EMPLOYEE'].map((type) => {
         const hierarchyData = hierarchiesData.org.find(
           (org) => org.typeEnum === type,
         );
+
+        if (hierarchiesData.descRh) hasAtLeastOneDescription = true;
 
         if (!hierarchyData) {
           return {
@@ -52,14 +68,21 @@ export const hierarchyPlanConverter = (
             id: hierarchyEmptyId,
             homogeneousGroupIds: [],
             homogeneousGroup: '',
+            employeesLength: hierarchiesData.employeesLength,
+            description: hierarchiesData.descRh,
           };
         }
 
-        return hierarchyData;
+        return {
+          ...hierarchyData,
+          homogeneousGroupIds: [highParent],
+          employeesLength: hierarchiesData.employeesLength,
+          description: hierarchiesData.descRh,
+        };
       });
 
-      hierarchiesData.org.forEach((hierarchyData) => {
-        hierarchyData.homogeneousGroupIds.forEach((homogeneousGroupId) => {
+      hierarchiesData.org.forEach(() => {
+        [highParent].forEach((homogeneousGroupId) => {
           if (!allHierarchyPlan[homogeneousGroupId])
             allHierarchyPlan[homogeneousGroupId] = {};
 
@@ -70,14 +93,18 @@ export const hierarchyPlanConverter = (
             const hierarchyId = org[index].id;
             const hierarchyName = org[index].name;
             const hierarchyType = org[index].typeEnum;
+            const hierarchyEmployees = org[index]?.employeesLength || 0;
+            const hierarchyDesc = org[index]?.description || 0;
             if (hierarchyId !== hierarchyEmptyId)
-              hierarchyColumns[hierarchyType] = 0;
+              hierarchyColumns[hierarchyType as any] = 0;
 
             if (!allHierarchyPlanLoop[hierarchyId])
               allHierarchyPlanLoop[hierarchyId] = {
-                type: hierarchyType,
+                type: hierarchyType as any,
                 data: {},
                 name: hierarchyName,
+                numEmployees: String(hierarchyEmployees),
+                description: hierarchyDesc || '',
               };
 
             if (org[index + 1]) {
@@ -100,7 +127,7 @@ export const hierarchyPlanConverter = (
   });
 
   function setHeaderTable() {
-    const row = [...mockedColumns];
+    const row = showHomogeneous ? [...mockedColumns] : [];
     const headerTable = Object.keys(hierarchyColumns)
       .map((type) => {
         return { type, ...HierarchyPlanMap[type] };
@@ -132,9 +159,12 @@ export const hierarchyPlanConverter = (
       .forEach(([homogeneousGroupId, firstHierarchyPlan]) => {
         const row = generateRow();
         const firstPosition = rowsPosition;
-        row[0] = { text: homoGroupTree[homogeneousGroupId].name };
-        row[1] = { text: homoGroupTree[homogeneousGroupId].description || ' ' };
-
+        if (showHomogeneous) {
+          row[0] = { text: homoGroupTree[homogeneousGroupId].name };
+          row[1] = {
+            text: homoGroupTree[homogeneousGroupId].description || ' ',
+          };
+        }
         rows[rowsPosition] = row;
 
         const loop = (map: IHierarchyPlan<any>) => {
@@ -151,6 +181,8 @@ export const hierarchyPlanConverter = (
 
             rows[rowsPosition][hierarchyColumnTypePosition] = {
               text: hierarchyData.name,
+              employee: hierarchyData.numEmployees,
+              description: hierarchyData.description,
             };
 
             const childrenRowsToSpan = loop(hierarchyData.data);
@@ -187,6 +219,26 @@ export const hierarchyPlanConverter = (
   }
 
   const bodyData = setBodyTable();
+
+  bodyData.forEach((row) => {
+    const employees = row[row.length - 1].employee;
+    const description = row[row.length - 1].description;
+
+    if (showDescription && hasAtLeastOneDescription)
+      row[row.length] = { text: description };
+    row[row.length] = { text: employees };
+  });
+
+  if (showDescription && hasAtLeastOneDescription)
+    headerData[headerData.length] = {
+      text: 'Descrição do cargo',
+      size: 5,
+    };
+
+  headerData[headerData.length] = {
+    text: 'Nº',
+    size: 1,
+  };
 
   return { bodyData, headerData };
 };

@@ -41,35 +41,35 @@ export const developmentSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,
-          text: 'a.  **Reconhecimento do Agente:** Consiste em perceber / aceitar / admitir que tem o Risco.',
+          text: 'a) **Reconhecimento do Agente:** Consiste em perceber / aceitar / admitir que tem o Risco.',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,
-          text: 'b.  **Identificação – Determinação de sua Localização e Fonte Geradora:** Consiste em localizar a(s) principal (is) fontes geradoras do contaminante **(NR-01 item 1.5.4.3.1 alínea b).**',
+          text: 'b) **Identificação – Determinação de sua Localização e Fonte Geradora:** Consiste em localizar a(s) principal (is) fontes geradoras do contaminante **(NR-01 item 1.5.4.3.1 alínea b).**',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,
-          text: 'c.  **Trajetória e Meios de Propagação:** Consiste em Identificar a trajetória e formas de propagação do agente.',
+          text: 'c) **Trajetória e Meios de Propagação:** Consiste em Identificar a trajetória e formas de propagação do agente.',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,
-          text: 'd.  **Funções e Trabalhadores Expostos:** Consistem em identificar o número de trabalhadores expostos ao agente agressivo as atividades desenvolvidas? / Gestos profissionais.',
+          text: 'd) **Funções e Trabalhadores Expostos:** Consistem em identificar o número de trabalhadores expostos ao agente agressivo as atividades desenvolvidas? / Gestos profissionais.',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,
-          text: 'e.  **Caracterização da Atividade e do Tipo de Exposição:** Consiste em estimar o tempo e a frequência de exposição ao agente durante a jornada de trabalho. A ferramenta proposta é a matriz AIHA.',
+          text: 'e) **Caracterização da Atividade e do Tipo de Exposição:** Consiste em estimar o tempo e a frequência de exposição ao agente durante a jornada de trabalho. A ferramenta proposta é a matriz AIHA.',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,
-          text: 'f.  **Obtenção Dados Epidemiológicos da Empresa:** Consiste em examinar, quando disponível, o histórico clínico, estatísticas, casos e demais informações sobre queixas mais comum, acidentes ou doenças do trabalho ocorrido na empresa.',
+          text: 'f) **Obtenção Dados Epidemiológicos da Empresa:** Consiste em examinar, quando disponível, o histórico clínico, estatísticas, casos e demais informações sobre queixas mais comum, acidentes ou doenças do trabalho ocorrido na empresa.',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,
-          text: 'g.  **Possíveis Danos a Saúde:** Consiste em identificar na literatura técnica (Ex. Lista B Decreto 3048/99 INSS – Agentes Etiológicos, Base do TLV da ACGIH) Agentes Etiológicos – os possíveis danos a saúde relacionados aos riscos identificados (NR-01 item 1.5.4.3.1 alínea a).',
+          text: 'g) **Possíveis Danos a Saúde:** Consiste em identificar na literatura técnica (Ex. Lista B Decreto 3048/99 INSS – Agentes Etiológicos, Base do TLV da ACGIH) Agentes Etiológicos – os possíveis danos a saúde relacionados aos riscos identificados (NR-01 item 1.5.4.3.1 alínea a).',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,
-          text: 'h.  **Medidas de Controle Já Existentes:** Consiste em descrever as tecnologias de proteção individual e coletiva existentes.',
+          text: 'h) **Medidas de Controle Já Existentes:** Consiste em descrever as tecnologias de proteção individual e coletiva existentes.',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,

@@ -5,7 +5,7 @@ import { HierarchyEntity } from '../../../company/entities/hierarchy.entity';
 
 import { hierarchyMap } from '../components/tables/appr/parts/first/first.constant';
 
-export interface MapData {
+export interface HierarchyMapData {
   org: {
     type: string;
     typeEnum: string;
@@ -21,7 +21,7 @@ export interface MapData {
   employeesLength: number;
 }
 
-export type IHierarchyData = Map<string, MapData>;
+export type IHierarchyData = Map<string, HierarchyMapData>;
 
 export type IHierarchyMap = Record<
   string,
@@ -56,7 +56,7 @@ const setMapHierarchies = (hierarchyData: HierarchyEntity[]) => {
 
 export const hierarchyConverter = (hierarchies: HierarchyEntity[]) => {
   const { hierarchyTree, homoGroupTree } = setMapHierarchies(hierarchies);
-  const hierarchyData = new Map<string, MapData>();
+  const hierarchyData = new Map<string, HierarchyMapData>();
 
   hierarchies
     .filter((i) =>
@@ -65,7 +65,7 @@ export const hierarchyConverter = (hierarchies: HierarchyEntity[]) => {
       ).includes(i.type),
     )
     .forEach((hierarchy) => {
-      const hierarchyArrayData: MapData['org'] = [];
+      const hierarchyArrayData: HierarchyMapData['org'] = [];
       const hierarchyInfo = hierarchyMap[hierarchy.type];
       const allHomogeneousGroupIds = [];
 

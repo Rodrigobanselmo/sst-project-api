@@ -1,7 +1,7 @@
 import { RiskFactorGroupDataEntity } from './../../../../checklist/entities/riskGroupData.entity';
 import { EnvironmentEntity } from './../../../../company/entities/environment.entity';
 import { ISectionOptions } from 'docx';
-import { RiskDocumentEntity } from 'src/modules/checklist/entities/riskDocument.entity';
+import { RiskDocumentEntity } from '../../../../checklist/entities/riskDocument.entity';
 
 import { CompanyEntity } from '../../../../company/entities/company.entity';
 import { WorkspaceEntity } from '../../../../company/entities/workspace.entity';
@@ -16,6 +16,10 @@ import {
   IDocumentPGRSectionGroups,
   IDocVariables,
 } from './types/section.types';
+import {
+  HierarchyMapData,
+  IHomoGroupMap,
+} from '../../converter/hierarchy.converter';
 
 export class DocumentBuildPGR {
   private version: string;
@@ -27,6 +31,8 @@ export class DocumentBuildPGR {
   private variables: IDocVariables;
   private environments: EnvironmentEntity[];
   private document: RiskFactorGroupDataEntity;
+  private homogeneousGroup: IHomoGroupMap;
+  private hierarchy: Map<string, HierarchyMapData>;
 
   constructor({
     version,
@@ -36,6 +42,8 @@ export class DocumentBuildPGR {
     versions,
     environments,
     document,
+    homogeneousGroup,
+    hierarchy,
   }: ICreatePGR) {
     this.version = version;
     this.logoImagePath = logo;
@@ -46,6 +54,8 @@ export class DocumentBuildPGR {
     this.environments = environments;
     this.variables = this.getVariables();
     this.document = document;
+    this.homogeneousGroup = homogeneousGroup;
+    this.hierarchy = hierarchy;
   }
 
   public build() {
@@ -86,6 +96,8 @@ export class DocumentBuildPGR {
       professionals: this.company?.professionals ?? [],
       environments: this.environments ?? [],
       document: this.document,
+      homogeneousGroup: this.homogeneousGroup,
+      hierarchy: this.hierarchy,
     }).map;
 
     const sectionsMap = new SectionsMapClass({

@@ -10,7 +10,7 @@ import {
   VerticalAlign,
   WidthType,
 } from 'docx';
-import { isOdd } from 'src/shared/utils/isOdd';
+import { isOdd } from '../../../../../../../shared/utils/isOdd';
 import { borderStyle } from '../../../../base/config/styles';
 import { palette } from '../../../../../../../shared/constants/palette';
 

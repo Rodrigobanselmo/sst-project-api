@@ -1,10 +1,10 @@
 import { AlignmentType } from 'docx';
 
-import { MapData } from '../../../../../converter/hierarchy.converter';
+import { HierarchyMapData } from '../../../../../converter/hierarchy.converter';
 import { borderNoneStyle } from '../../elements/body';
 import { borderRightStyle } from '../../elements/header';
 
-export const dataConverter = (hierarchyData: MapData) => {
+export const dataConverter = (hierarchyData: HierarchyMapData) => {
   return [
     {
       text: hierarchyData.descRh,

@@ -1,13 +1,13 @@
 import { Table, WidthType } from 'docx';
 
-import { MapData } from '../../../../../converter/hierarchy.converter';
+import { HierarchyMapData } from '../../../../../converter/hierarchy.converter';
 import { TableBodyElements } from '../../elements/body';
 import { TableHeaderElements } from '../../elements/header';
 import { secondRiskInventoryHeader } from './second.constant';
 import { dataConverter } from './second.converter';
 
 export const secondRiskInventoryTableSection = (
-  hierarchyData: MapData,
+  hierarchyData: HierarchyMapData,
   isByGroup: boolean,
 ) => {
   let data = dataConverter(hierarchyData);

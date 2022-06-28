@@ -3,6 +3,7 @@ import {
   IBorderOptions,
   ISectionPropertiesOptions,
   ITableBordersOptions,
+  PageOrientation,
 } from 'docx';
 
 export const sectionProperties: ISectionPropertiesOptions = {
@@ -15,6 +16,13 @@ export const sectionProperties: ISectionPropertiesOptions = {
       footer: 300,
       header: 300,
     },
+  },
+};
+
+export const sectionLandscapeProperties: ISectionPropertiesOptions = {
+  page: {
+    margin: { left: 500, right: 500, top: 500, bottom: 500 },
+    size: { orientation: PageOrientation.LANDSCAPE },
   },
 };
 

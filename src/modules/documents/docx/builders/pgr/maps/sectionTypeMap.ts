@@ -1,4 +1,5 @@
 import { ISectionOptions } from 'docx';
+import { sectionLandscapeProperties } from '../../../base/config/styles';
 
 import { chapterSection } from '../../../base/layouts/chapter/chapter';
 import { coverSections } from '../../../base/layouts/cover/cover';
@@ -55,9 +56,15 @@ export class SectionsMapClass {
         version: this.version,
         chapter: replaceAllVariables(text, this.variables),
       }),
-    [PGRSectionTypeEnum.SECTION]: ({ children, footerText }: ISection) => ({
+    [PGRSectionTypeEnum.SECTION]: ({
+      children,
+      footerText,
+      ...rest
+    }: ISection) => ({
       children: this.convertToDocx(children),
       ...this.getFooterHeader(footerText),
+      ...rest,
+      ...sectionLandscapeProperties,
     }),
   };
 

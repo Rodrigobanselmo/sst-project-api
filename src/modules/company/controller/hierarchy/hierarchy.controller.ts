@@ -59,7 +59,7 @@ export class HierarchyController {
     );
   }
 
-  @Post('upsert-many')
+  @Post('/upsert-many/:companyId?')
   upsertMany(
     @Body() upsertManyHierarchyDto: UpsertManyHierarchyDto,
     @User() userPayloadDto: UserPayloadDto,

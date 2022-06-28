@@ -31,23 +31,23 @@ export const available: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,
-          text: 'a.  Após implementação das medidas de prevenção, para avaliação de riscos residuais;',
+          text: 'a) Após implementação das medidas de prevenção, para avaliação de riscos residuais;',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,
-          text: 'b.  Após inovações e modificações nas tecnologias, ambientes, processos, condições, procedimentos e organização do trabalho que impliquem em novos riscos ou modifiquem os riscos existentes;',
+          text: 'b) Após inovações e modificações nas tecnologias, ambientes, processos, condições, procedimentos e organização do trabalho que impliquem em novos riscos ou modifiquem os riscos existentes;',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,
-          text: 'c.  Quando identificadas inadequações, insuficiências ou ineficácias das medidas de prevenção;',
+          text: 'c) Quando identificadas inadequações, insuficiências ou ineficácias das medidas de prevenção;',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,
-          text: 'd.  Na ocorrência de acidentes ou doenças relacionadas ao trabalho;',
+          text: 'd) Na ocorrência de acidentes ou doenças relacionadas ao trabalho;',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,
-          text: 'e.  Quando houver mudança nos requisitos legais aplicáveis.',
+          text: 'e) Quando houver mudança nos requisitos legais aplicáveis.',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -59,15 +59,15 @@ export const available: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,
-          text: 'a.  Antes do início do funcionamento do estabelecimento ou novas instalações;',
+          text: 'a) Antes do início do funcionamento do estabelecimento ou novas instalações;',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,
-          text: 'b.  Para as atividades existentes; e',
+          text: 'b) Para as atividades existentes; e',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,
-          text: 'c.  Nas mudanças e introdução de novos processos ou atividades de trabalho.',
+          text: 'c) Nas mudanças e introdução de novos processos ou atividades de trabalho.',
         },
         {
           type: PGRSectionChildrenTypeEnum.H3,

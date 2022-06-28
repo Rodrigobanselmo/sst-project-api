@@ -42,6 +42,11 @@ import { quantityResultsTable } from '../../../components/tables/mock/components
 import { measureHierarchyImage } from '../../../components/images/measureHierarch';
 import { rsDocumentImage } from '../../../components/images/rsDocument';
 import { complementarySystemsIterable } from '../../../components/iterables/complementarySystems/complementarySystems.iterable';
+import {
+  HierarchyMapData,
+  IHomoGroupMap,
+} from '../../../converter/hierarchy.converter';
+import { hierarchyPlanTableSection } from '../../../components/tables/hierarchyHomo/hierarchyPlan.section';
 
 export type IMapElementDocumentType = Record<
   string,
@@ -54,6 +59,8 @@ type IDocumentClassType = {
   professionals: ProfessionalEntity[];
   environments: EnvironmentEntity[];
   document: RiskFactorGroupDataEntity;
+  homogeneousGroup: IHomoGroupMap;
+  hierarchy: Map<string, HierarchyMapData>;
 };
 
 export class ElementsMapClass {
@@ -62,6 +69,8 @@ export class ElementsMapClass {
   private professionals: ProfessionalEntity[];
   private document: RiskFactorGroupDataEntity;
   private environments: EnvironmentEntity[];
+  private homogeneousGroup: IHomoGroupMap;
+  private hierarchy: Map<string, HierarchyMapData>;
 
   constructor({
     variables,
@@ -69,12 +78,16 @@ export class ElementsMapClass {
     professionals,
     environments,
     document,
+    homogeneousGroup,
+    hierarchy,
   }: IDocumentClassType) {
     this.variables = variables;
     this.versions = versions;
     this.professionals = professionals;
     this.environments = environments;
     this.document = document;
+    this.homogeneousGroup = homogeneousGroup;
+    this.hierarchy = hierarchy;
   }
 
   public map: IMapElementDocumentType = {
@@ -132,6 +145,10 @@ export class ElementsMapClass {
       expositionDegreeTable((x, v) => this.convertToDocx(x, v)),
     [PGRSectionChildrenTypeEnum.MATRIX_TABLES]: () => [matrizTable()],
     [PGRSectionChildrenTypeEnum.MEASURE_IMAGE]: () => measureHierarchyImage(),
+    [PGRSectionChildrenTypeEnum.HIERARCHY_ORG_TABLE]: () =>
+      hierarchyPlanTableSection(this.hierarchy, this.homogeneousGroup)[
+        'children'
+      ],
     [PGRSectionChildrenTypeEnum.RS_IMAGE]: () => rsDocumentImage(),
     [PGRSectionChildrenTypeEnum.QUANTITY_RESULTS_TABLES]: () =>
       quantityResultsTable((x, v) => this.convertToDocx(x, v)),

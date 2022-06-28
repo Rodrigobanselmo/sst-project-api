@@ -15,7 +15,7 @@ export const hierarchyPrioritizationTableSections = (
   riskFactorGroupData: RiskFactorGroupDataEntity,
   hierarchiesEntity: IHierarchyData,
   options: IHierarchyPrioritizationOptions = {
-    hierarchyType: HierarchyEnum.SECTOR,
+    hierarchyType: HierarchyEnum.OFFICE,
     isByGroup: false,
   },
 ) => {

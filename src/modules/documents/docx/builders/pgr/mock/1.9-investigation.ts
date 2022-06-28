@@ -27,15 +27,15 @@ export const investigation: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,
-          text: 'd.  Considerar as situações geradoras dos eventos, levando em conta as atividades efetivamente desenvolvidas, ambiente de trabalho, materiais e organização da produção e do trabalho;',
+          text: 'd) Considerar as situações geradoras dos eventos, levando em conta as atividades efetivamente desenvolvidas, ambiente de trabalho, materiais e organização da produção e do trabalho;',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,
-          text: 'e.  Identificar os fatores relacionados com o evento; e',
+          text: 'e) Identificar os fatores relacionados com o evento; e',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,
-          text: 'f.  Fornecer evidências para subsidiar e revisar as medidas de prevenção existentes.',
+          text: 'f) Fornecer evidências para subsidiar e revisar as medidas de prevenção existentes.',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,

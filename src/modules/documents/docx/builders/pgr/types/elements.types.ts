@@ -24,6 +24,7 @@ export enum PGRSectionChildrenTypeEnum {
   COMPLEMENTARY_SYSTEMS = 'COMPLEMENTARY_SYSTEMS',
   HEALTH_EFFECT_TABLES = 'HEALTH_EFFECT_TABLES',
   EXPOSITION_DEGREE_TABLES = 'EXPOSITION_DEGREE_TABLES',
+  HIERARCHY_ORG_TABLE = 'HIERARCHY_ORG_TABLE',
   QUANTITY_RESULTS_TABLES = 'QUANTITY_RESULTS_TABLES',
   MATRIX_TABLES = 'MATRIX_TABLES',
 }
@@ -151,6 +152,10 @@ export type IRSImage = {
   type: PGRSectionChildrenTypeEnum.RS_IMAGE;
 } & IBase;
 
+export type IHierarchyTable = {
+  type: PGRSectionChildrenTypeEnum.HIERARCHY_ORG_TABLE;
+} & IBase;
+
 export type ISectionChildrenType =
   | IH1
   | IH2
@@ -170,6 +175,7 @@ export type ISectionChildrenType =
   | IComplementarySystems
   | IHealthEffectTable
   | IExpositionTable
+  | IHierarchyTable
   | IMatrix
   | IQuantityTable
   | IComplementaryDocs

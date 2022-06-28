@@ -16,25 +16,27 @@ import { rs } from './1.9.1-rs';
 import { document } from './1.9.2-document';
 import { available } from './1.9.3-avaliation';
 import { environmentSection } from './2.0-envronment';
+import { employeeSection } from './2.1-employee';
 
 export const docPGRSections: IDocumentPGRSectionGroups = {
   sections: [
-    // testSection,
-    initSection,
-    definitionsSection,
-    definitions2Section,
-    developmentSection,
-    complementsSection,
-    mvvSection,
-    organizationSection,
-    organization2Section,
-    qualityEvaluation,
-    prioritization,
-    investigation,
-    rs,
-    document,
-    available,
-    environmentSection,
+    employeeSection,
+    // // testSection,
+    // initSection,
+    // definitionsSection,
+    // definitions2Section,
+    // developmentSection,
+    // complementsSection,
+    // mvvSection,
+    // organizationSection,
+    // organization2Section,
+    // qualityEvaluation,
+    // prioritization,
+    // investigation,
+    // rs,
+    // document,
+    // available,
+    // environmentSection,
   ],
   variables: {
     [VariablesPGREnum.CHAPTER_1]: 'PARTE 01 – DOCUMENTO BASE',

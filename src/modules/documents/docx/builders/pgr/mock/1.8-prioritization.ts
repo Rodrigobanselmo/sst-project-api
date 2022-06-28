@@ -86,15 +86,15 @@ export const prioritization: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,
-          text: 'a.  a verificação da execução das ações planejadas;',
+          text: 'a) a verificação da execução das ações planejadas;',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,
-          text: 'b.  as inspeções dos locais e equipamentos de trabalho; e',
+          text: 'b) as inspeções dos locais e equipamentos de trabalho; e',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,
-          text: 'c.  o monitoramento das condições ambientais e exposições a agentes nocivos, quando aplicável.',
+          text: 'c) o monitoramento das condições ambientais e exposições a agentes nocivos, quando aplicável.',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -260,15 +260,15 @@ export const prioritization: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,
-          text: 'a.  Comunicar de imediato e por escrito ao órgão regional competente em matéria de segurança e saúde no trabalho, que repassará a informação ao sindicato da categoria profissional;',
+          text: 'a) Comunicar de imediato e por escrito ao órgão regional competente em matéria de segurança e saúde no trabalho, que repassará a informação ao sindicato da categoria profissional;',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,
-          text: 'b.  Isolar o local diretamente relacionado ao acidente, mantendo suas características até sua liberação pela autoridade policial competente e pelo órgão regional competente em matéria de segurança e saúde no trabalho;',
+          text: 'b) Isolar o local diretamente relacionado ao acidente, mantendo suas características até sua liberação pela autoridade policial competente e pelo órgão regional competente em matéria de segurança e saúde no trabalho;',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,
-          text: 'c.  A liberação do local, pelo órgão regional competente em matéria de segurança e saúde no trabalho, será concedida em até 72 (setenta e duas) horas, contadas do protocolo de recebimento da comunicação escrita ao referido órgão.',
+          text: 'c) A liberação do local, pelo órgão regional competente em matéria de segurança e saúde no trabalho, será concedida em até 72 (setenta e duas) horas, contadas do protocolo de recebimento da comunicação escrita ao referido órgão.',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,

@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import { AlignmentType } from 'docx';
 import { RiskFactorGroupDataEntity } from '../../../../../../../checklist/entities/riskGroupData.entity';
 
-import { MapData } from '../../../../../converter/hierarchy.converter';
+import { HierarchyMapData } from '../../../../../converter/hierarchy.converter';
 import { bodyTableProps, borderNoneStyle } from '../../elements/body';
 import {
   FirstRiskInventoryColumnEnum,
@@ -11,7 +11,7 @@ import {
 
 export const documentConverter = (
   riskFactorGroupData: RiskFactorGroupDataEntity,
-  hierarchy: MapData,
+  hierarchy: HierarchyMapData,
   isByGroup: boolean,
 ) => {
   const rows: bodyTableProps[][] = [];
