@@ -6,15 +6,23 @@ import {
 } from '../../../converter/hierarchy.converter';
 import { TableBodyElements } from './elements/body';
 import { TableHeaderElements } from './elements/header';
-import { hierarchyPlanConverter } from './hierarchyPlan.converter';
+import {
+  ConverterProps,
+  hierarchyPlanConverter,
+} from './hierarchyHomoOrg.converter';
 
-export const hierarchyPlanTableSection = (
+export const hierarchyHomoOrgSection = (
   hierarchiesEntity: IHierarchyData,
   homoGroupTree: IHomoGroupMap,
+  { showDescription, showHomogeneous }: ConverterProps = {
+    showHomogeneous: false,
+    showDescription: true,
+  },
 ) => {
   const { bodyData, headerData } = hierarchyPlanConverter(
     hierarchiesEntity,
     homoGroupTree,
+    { showDescription, showHomogeneous },
   );
 
   const tableHeaderElements = new TableHeaderElements();

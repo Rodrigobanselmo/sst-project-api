@@ -11,9 +11,9 @@ import { headerTableProps } from './elements/header';
 import {
   HierarchyPlanColumnEnum,
   HierarchyPlanMap,
-} from './hierarchyOrg.constant';
+} from './hierarchyHomoOrg.constant';
 
-type ConverterProps = {
+export type ConverterProps = {
   showHomogeneous?: boolean;
   showDescription?: boolean;
 };
@@ -51,7 +51,7 @@ export const hierarchyPlanConverter = (
 
   (function mapAllHierarchyPlan() {
     hierarchyData.forEach((hierarchiesData) => {
-      const highParent = hierarchiesData.org[0].id;
+      const highParent = hierarchiesData.org[0];
 
       const org = [...hierarchyList, 'EMPLOYEE'].map((type) => {
         const hierarchyData = hierarchiesData.org.find(
@@ -75,14 +75,17 @@ export const hierarchyPlanConverter = (
 
         return {
           ...hierarchyData,
-          homogeneousGroupIds: [highParent],
+          ...(showHomogeneous ? {} : { homogeneousGroupIds: [highParent.id] }),
           employeesLength: hierarchiesData.employeesLength,
           description: hierarchiesData.descRh,
         };
       });
 
-      hierarchiesData.org.forEach(() => {
-        [highParent].forEach((homogeneousGroupId) => {
+      hierarchiesData.org.forEach((hierarchyData) => {
+        (showHomogeneous
+          ? hierarchyData.homogeneousGroupIds
+          : [highParent.id]
+        ).forEach((homogeneousGroupId) => {
           if (!allHierarchyPlan[homogeneousGroupId])
             allHierarchyPlan[homogeneousGroupId] = {};
 
@@ -91,7 +94,7 @@ export const hierarchyPlanConverter = (
             index: number,
           ) => {
             const hierarchyId = org[index].id;
-            const hierarchyName = org[index].name;
+            const hierarchyName = org[index]?.name;
             const hierarchyType = org[index].typeEnum;
             const hierarchyEmployees = org[index]?.employeesLength || 0;
             const hierarchyDesc = org[index]?.description || 0;
@@ -155,7 +158,7 @@ export const hierarchyPlanConverter = (
       Array.from({ length: columnsLength }).map(() => ({}));
 
     Object.entries(allHierarchyPlan)
-      .sort(([a], [b]) => sortString(a, b))
+      .sort(([, c], [, d]) => sortString(c[0], d[0], 'name'))
       .forEach(([homogeneousGroupId, firstHierarchyPlan]) => {
         const row = generateRow();
         const firstPosition = rowsPosition;

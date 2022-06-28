@@ -17,10 +17,12 @@ import { document } from './1.9.2-document';
 import { available } from './1.9.3-avaliation';
 import { environmentSection } from './2.0-envronment';
 import { employeeSection } from './2.1-employee';
+import { riskFactorsSection } from './2.2-riskFactors';
+import { riskFactors2Section } from './2.3-riskFactors';
+import { riskFactors3Section } from './2.4-riskFactors';
 
 export const docPGRSections: IDocumentPGRSectionGroups = {
   sections: [
-    employeeSection,
     // // testSection,
     // initSection,
     // definitionsSection,
@@ -37,6 +39,10 @@ export const docPGRSections: IDocumentPGRSectionGroups = {
     // document,
     // available,
     // environmentSection,
+    employeeSection,
+    // riskFactorsSection,
+    // riskFactors2Section,
+    // riskFactors3Section,
   ],
   variables: {
     [VariablesPGREnum.CHAPTER_1]: 'PARTE 01 – DOCUMENTO BASE',

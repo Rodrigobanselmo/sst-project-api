@@ -26,7 +26,7 @@ import { AmazonStorageProvider } from '../../../../shared/providers/StorageProvi
 import { UpsertPgrDto } from '../../dto/pgr.dto';
 import { hierarchyConverter } from '../../docx/converter/hierarchy.converter';
 import { actionPlanTableSection } from '../../docx/components/tables/actionPlan/actionPlan.section';
-import { hierarchyPlanTableSection } from '../../docx/components/tables/hierarchyHomo/hierarchyPlan.section';
+import { hierarchyHomoOrgSection } from '../../docx/components/tables/hierarchyHomoOrg/hierarchyHomoOrg.section';
 import { hierarchyPrioritizationTableSections } from '../../docx/components/tables/hierarchyPrioritization/hierarchyPrioritization.section';
 import { hierarchyRisksTableSections } from '../../docx/components/tables/hierarchyRisks/hierarchyRisks.section';
 import { riskCharacterizationTableSection } from '../../docx/components/tables/riskCharacterization/riskCharacterization.section';

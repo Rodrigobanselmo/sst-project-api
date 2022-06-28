@@ -38,6 +38,14 @@ export const employeeSection: IDocumentPGRSectionGroup = {
         {
           type: PGRSectionChildrenTypeEnum.HIERARCHY_ORG_TABLE,
         },
+        {
+          type: PGRSectionChildrenTypeEnum.H2,
+          text: '2.2.	Inventário de Risco (APR)',
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          text: 'De acordo cNo Anexo 01 deste documento, encontram-se as planilhas com o resumo das entrevistas realizadas com os trabalhadores que sumarizam as características de exposição, constando a Função; Descrição da fun-ção e Atividades/Fatores de Risco e Perigos resumindo as principais informações do Inventário de Risco, incluindo a Severidade, Probabilidade e principalmente o Risco Ocupacional. om o Organograma – Macroestrutura, a empresa encontra-se organizada através de Seto- res. Na tabela a seguir são apresentados os setores como as respectivas quantidades de trabalhadores.',
+        },
       ],
     },
   ],

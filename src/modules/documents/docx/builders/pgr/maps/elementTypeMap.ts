@@ -46,7 +46,10 @@ import {
   HierarchyMapData,
   IHomoGroupMap,
 } from '../../../converter/hierarchy.converter';
-import { hierarchyPlanTableSection } from '../../../components/tables/hierarchyHomo/hierarchyPlan.section';
+import { hierarchyHomoOrgSection } from '../../../components/tables/hierarchyHomoOrg/hierarchyHomoOrg.section';
+import { hierarchyRisksTableSections } from '../../../components/tables/hierarchyRisks/hierarchyRisks.section';
+import { HierarchyEnum } from '@prisma/client';
+import { riskCharacterizationTableSection } from '../../../components/tables/riskCharacterization/riskCharacterization.section';
 
 export type IMapElementDocumentType = Record<
   string,
@@ -145,13 +148,24 @@ export class ElementsMapClass {
       expositionDegreeTable((x, v) => this.convertToDocx(x, v)),
     [PGRSectionChildrenTypeEnum.MATRIX_TABLES]: () => [matrizTable()],
     [PGRSectionChildrenTypeEnum.MEASURE_IMAGE]: () => measureHierarchyImage(),
-    [PGRSectionChildrenTypeEnum.HIERARCHY_ORG_TABLE]: () =>
-      hierarchyPlanTableSection(this.hierarchy, this.homogeneousGroup)[
-        'children'
-      ],
     [PGRSectionChildrenTypeEnum.RS_IMAGE]: () => rsDocumentImage(),
     [PGRSectionChildrenTypeEnum.QUANTITY_RESULTS_TABLES]: () =>
       quantityResultsTable((x, v) => this.convertToDocx(x, v)),
+    [PGRSectionChildrenTypeEnum.HIERARCHY_ORG_TABLE]: () =>
+      hierarchyHomoOrgSection(this.hierarchy, this.homogeneousGroup, {
+        showDescription: false,
+        showHomogeneous: false,
+      })['children'],
+    [PGRSectionChildrenTypeEnum.RISK_TABLE]: () =>
+      riskCharacterizationTableSection(this.document)['children'],
+    [PGRSectionChildrenTypeEnum.HIERARCHY_RISK_TABLE]: () =>
+      hierarchyRisksTableSections(this.document, this.hierarchy, {
+        hierarchyType: HierarchyEnum.SECTOR,
+      })
+        .map((s) => s['children'])
+        .reduce((acc, curr) => {
+          return [...acc, ...curr];
+        }, []),
   };
 
   private convertToDocx(

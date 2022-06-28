@@ -14,6 +14,8 @@ export enum PGRSectionChildrenTypeEnum {
   BULLET_SPACE = 'BULLET_SPACE',
   TABLE_VERSION_CONTROL = 'TABLE_VERSION_CONTROL',
   ITERABLE_ENVIRONMENTS = 'ITERABLE_ENVIRONMENTS',
+  HIERARCHY_RISK_TABLE = 'HIERARCHY_RISK_TABLE',
+  RISK_TABLE = 'RISK_TABLE',
   PARAGRAPH_TABLE = 'PARAGRAPH_TABLE',
   LEGEND = 'LEGEND',
   MEASURE_IMAGE = 'MEASURE_IMAGE',
@@ -156,6 +158,14 @@ export type IHierarchyTable = {
   type: PGRSectionChildrenTypeEnum.HIERARCHY_ORG_TABLE;
 } & IBase;
 
+export type IHierarchyRiskTable = {
+  type: PGRSectionChildrenTypeEnum.HIERARCHY_RISK_TABLE;
+} & IBase;
+
+export type IRiskTable = {
+  type: PGRSectionChildrenTypeEnum.RISK_TABLE;
+} & IBase;
+
 export type ISectionChildrenType =
   | IH1
   | IH2
@@ -176,6 +186,8 @@ export type ISectionChildrenType =
   | IHealthEffectTable
   | IExpositionTable
   | IHierarchyTable
+  | IHierarchyRiskTable
+  | IRiskTable
   | IMatrix
   | IQuantityTable
   | IComplementaryDocs

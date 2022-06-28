@@ -12,12 +12,11 @@ import { UpsertPgrDto } from '../../../dto/pgr.dto';
 import { createBaseDocument } from '../../../docx/base/config/document';
 import { hierarchyConverter } from '../../../docx/converter/hierarchy.converter';
 import { actionPlanTableSection } from '../../../docx/components/tables/actionPlan/actionPlan.section';
-import { hierarchyPlanTableSection } from '../../../docx/components/tables/hierarchyHomo/hierarchyPlan.section';
+import { hierarchyHomoOrgSection } from '../../../docx/components/tables/hierarchyHomoOrg/hierarchyHomoOrg.section';
 import { hierarchyPrioritizationTableSections } from '../../../docx/components/tables/hierarchyPrioritization/hierarchyPrioritization.section';
 import { hierarchyRisksTableSections } from '../../../docx/components/tables/hierarchyRisks/hierarchyRisks.section';
 import { riskCharacterizationTableSection } from '../../../docx/components/tables/riskCharacterization/riskCharacterization.section';
 import { APPRTableSection } from '../../../docx/components/tables/appr/appr.section';
-import { hierarchyOrgTableSection } from '../../../docx/components/tables/hierarchyOrg/hierarchyOrg.section';
 
 @Injectable()
 export class PgrUploadTableService {
@@ -46,13 +45,12 @@ export class PgrUploadTableService {
       hierarchyConverter(hierarchyHierarchy);
 
     const sections: ISectionOptions[] = [
-      // riskCharacterizationTableSection(riskGroupData),
-      // ...hierarchyPrioritizationTableSections(riskGroupData, hierarchyData),
-      // ...hierarchyRisksTableSections(riskGroupData, hierarchyData),
-      hierarchyPlanTableSection(hierarchyData, homoGroupTree),
-      // actionPlanTableSection(riskGroupData),
-      // ...APPRTableSection(riskGroupData, hierarchyData, homoGroupTree),
-      hierarchyOrgTableSection(hierarchyData, homoGroupTree),
+      riskCharacterizationTableSection(riskGroupData),
+      ...hierarchyPrioritizationTableSections(riskGroupData, hierarchyData),
+      ...hierarchyRisksTableSections(riskGroupData, hierarchyData),
+      hierarchyHomoOrgSection(hierarchyData, homoGroupTree),
+      actionPlanTableSection(riskGroupData),
+      ...APPRTableSection(riskGroupData, hierarchyData, homoGroupTree),
     ];
 
     const doc = createBaseDocument(sections);

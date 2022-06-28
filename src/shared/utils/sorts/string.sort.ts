@@ -5,6 +5,9 @@ export const sortString = function (
   field?: string,
   field2?: string,
 ) {
+  if (!a) return 0;
+  if (!b) return 0;
+
   let arrayA = field ? a[field] : a;
   let arrayB = field ? b[field] : b;
 
