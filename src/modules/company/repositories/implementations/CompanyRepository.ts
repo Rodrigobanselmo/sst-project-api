@@ -149,7 +149,15 @@ export class CompanyRepository implements ICompanyRepository {
         employees: {
           upsert: [
             ...employees.map(
-              ({ id, hierarchyId, workspaceIds, ...rest }: any) => {
+              ({
+                id,
+                hierarchyId,
+                description,
+                ghoDescription,
+                realDescription,
+                workspaceIds,
+                ...rest
+              }: any) => {
                 return {
                   create: {
                     ...rest,

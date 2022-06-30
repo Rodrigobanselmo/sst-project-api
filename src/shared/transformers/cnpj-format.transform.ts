@@ -7,9 +7,10 @@ export const CnpjFormatTransform = (data: TransformFnParams) => {
   if (!cnpj) return null;
 
   if (typeof cnpj === 'string') {
-    if (isValidCNPJ(cnpj)) {
-      return onlyNumbers(cnpj);
-    }
+    console.log(cnpj, isValidCNPJ(cnpj));
+    return onlyNumbers(cnpj);
+    // if (isValidCNPJ(cnpj)) {
+    // }
   }
 
   return null;
