@@ -5,7 +5,7 @@ import { initSection } from './1.0-init';
 import { definitionsSection } from './1.1-definitions';
 import { definitions2Section } from './1.2-definitions';
 import { complementsSection } from './1.3-complements';
-import { mvvSection } from './1.4-MVV';
+import { mvvSection } from './1.4-mvv';
 import { organizationSection } from './1.5-organization';
 import { organization2Section } from './1.5-organization2';
 import { developmentSection } from './1.6-development';
