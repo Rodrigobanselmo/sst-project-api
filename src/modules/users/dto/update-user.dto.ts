@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { CpfFormatTransform } from '../../../shared/transformers/cpf-format.transform';
 import { StringCapitalizeTransform } from '../../../shared/transformers/string-capitalize';
 
 export class UpdateUserDto {
@@ -20,6 +21,23 @@ export class UpdateUserDto {
   @MaxLength(100)
   @IsOptional()
   name?: string;
+
+  @Transform(CpfFormatTransform, { toClassOnly: true })
+  @IsString({ message: 'CPF inválido' })
+  @IsOptional()
+  cpf?: string;
+
+  @IsString()
+  @IsOptional()
+  crea?: string;
+
+  @IsString({ each: true })
+  @IsOptional()
+  certifications?: string;
+
+  @IsString({ each: true })
+  @IsOptional()
+  formation?: string;
 
   @IsString()
   @IsOptional()

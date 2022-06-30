@@ -59,11 +59,12 @@ export class PgrUploadTableService {
     const buffer = Buffer.from(b64string, 'base64');
     const docName = upsertPgrDto.name.replace(/\s+/g, '');
 
-    const fileName = `${
-      docName.length > 0 ? docName + '-' : ''
-    }${riskGroupData.company.name.replace(/\s+/g, '')}-v${
-      upsertPgrDto.version
-    }.docx`;
+    const fileName = `${docName.length > 0 ? docName + '-' : ''}${
+      riskGroupData.company.name
+    }-v${upsertPgrDto.version}.docx`
+      .normalize('NFD')
+      .replace(/\s+/g, '_')
+      .replace(/[^a-zA-Z0-9s_/.!\\={}?()-]/g, '');
 
     await this.upload(buffer, fileName, upsertPgrDto, riskGroupData.company);
 

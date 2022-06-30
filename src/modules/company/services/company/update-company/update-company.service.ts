@@ -46,8 +46,6 @@ export class UpdateCompanyService {
         const abrWorkspace =
           abr.length > 1 ? abr : abr + workspace.name.slice(1, 2).toUpperCase();
 
-        console.log(abrWorkspace);
-
         abr = loop(abrWorkspace) as string;
         newWorkspaces.push({
           ...workspace,

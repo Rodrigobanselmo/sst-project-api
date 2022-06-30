@@ -8,7 +8,11 @@ export class FindCompanyService {
 
   async execute(user: UserPayloadDto) {
     return await this.companyRepository.findById(user.targetCompanyId, {
-      include: { workspace: true },
+      include: {
+        workspace: true,
+        primary_activity: true,
+        secondary_activity: true,
+      },
     });
   }
 }

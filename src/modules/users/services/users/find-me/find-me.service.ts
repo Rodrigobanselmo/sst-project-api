@@ -25,6 +25,8 @@ export class FindMeService {
       companies[0] ||
       ({} as typeof companies[0]);
 
+    delete user.password;
+
     return { ...user, ...company };
   }
 }

@@ -11,7 +11,10 @@ export class HierarchyRepository {
   constructor(private prisma: PrismaService) {}
 
   async upsertMany(
-    upsertHierarchyMany: (CreateHierarchyDto & { id: string })[],
+    upsertHierarchyMany: (CreateHierarchyDto & {
+      id: string;
+      workspaceIds: string[];
+    })[],
     companyId: string,
     ghoNames?: Record<string, string>,
   ): Promise<HierarchyEntity[]> {

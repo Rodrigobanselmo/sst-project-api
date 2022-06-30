@@ -40,6 +40,7 @@ import { UpdateHomoGroupService } from './services/homoGroup/update-homo-group/u
 import { EnvironmentPhotoRepository } from './repositories/implementations/EnvironmentPhotoRepository';
 import { AddEnvironmentPhotoService } from './services/environment/add-environment-photo/add-environment-photo.service';
 import { DeleteEnvironmentPhotoService } from './services/environment/delete-environment-photo/delete-environment-photo.service';
+import { AddCompanyPhotoService } from './services/company/add-company-photo/add-company-photo.service';
 
 @Module({
   controllers: [
@@ -85,6 +86,7 @@ import { DeleteEnvironmentPhotoService } from './services/environment/delete-env
     EnvironmentPhotoRepository,
     AddEnvironmentPhotoService,
     DeleteEnvironmentPhotoService,
+    AddCompanyPhotoService,
   ],
   exports: [
     CompanyRepository,
@@ -92,6 +94,7 @@ import { DeleteEnvironmentPhotoService } from './services/environment/delete-env
     HierarchyRepository,
     WorkspaceRepository,
     EnvironmentRepository,
+    HomoGroupRepository,
   ],
 })
 export class CompanyModule {}

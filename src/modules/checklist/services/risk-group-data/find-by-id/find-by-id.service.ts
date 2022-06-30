@@ -11,6 +11,7 @@ export class FindByIdService {
     const riskGroupData = await this.riskGroupDataRepository.findById(
       id,
       companyId,
+      { include: { professionals: true, users: true } },
     );
 
     return riskGroupData;

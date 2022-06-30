@@ -1,26 +1,8 @@
-import { hierarchyConverter } from './../../../docx/converter/hierarchy.converter';
-import { quantityResultsQTable } from '../../../docx/components/tables/mock/components/quantityResults/tables/quantityResultsQTable';
-import { expositionDegreeFQTable } from '../../../docx/components/tables/mock/components/expositionDegree/tables/expositionDegreeFQTable';
-import {
-  borderNoneStyle,
-  sectionProperties,
-} from './../../../docx/base/config/styles';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import {
-  ImageRun,
-  ISectionOptions,
-  Packer,
-  Paragraph,
-  Table,
-  TableCell,
-  TableRow,
-  TextRun,
-  WidthType,
-} from 'docx';
+import { ISectionOptions, Packer } from 'docx';
 import fs from 'fs';
 import { Readable } from 'stream';
 import { v4 } from 'uuid';
-import sizeOf from 'image-size';
 
 import { CompanyRepository } from '../../../../../modules/company/repositories/implementations/CompanyRepository';
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
@@ -40,17 +22,7 @@ import { createBaseDocument } from '../../../docx/base/config/document';
 import { DocumentBuildPGR } from '../../../docx/builders/pgr/create';
 import { UpsertPgrDto } from '../../../dto/pgr.dto';
 import { WorkspaceRepository } from './../../../../company/repositories/implementations/WorkspaceRepository';
-import { VFullWidthImage } from './../../../../../modules/documents/docx/base/elements/imagesLayout/vFullWidthImage';
-import { expositionDegreeBTable } from './../../../../..//modules/documents/docx/components/tables/mock/components/expositionDegree/tables/expositionDegreeBTable';
-import { expositionDegreeETable } from './../../../../..//modules/documents/docx/components/tables/mock/components/expositionDegree/tables/expositionDegreeETable';
-import { expositionDegreeATable } from './../../../../..//modules/documents/docx/components/tables/mock/components/expositionDegree/tables/expositionDegreeATable';
-import { matrizTable } from './../../../../..//modules/documents/docx/components/tables/mock/components/matriz/table.component';
-import { quantityResultsRTable } from './../../../../..//modules/documents/docx/components/tables/mock/components/quantityResults/tables/quantityResultsRTable';
-import { quantityResultsR2Table } from './../../../../..//modules/documents/docx/components/tables/mock/components/quantityResults/tables/quantityResultsR2Table';
-import { quantityResultsHTable } from './../../../../..//modules/documents/docx/components/tables/mock/components/quantityResults/tables/quantityResultsHTable';
-import { quantityResultsFBVTable } from './../../../../..//modules/documents/docx/components/tables/mock/components/quantityResults/tables/quantityResultsFBVTable';
-import { quantityResultsLVTable } from './../../../../..//modules/documents/docx/components/tables/mock/components/quantityResults/tables/quantityResultsLV';
-import { annualDoseTable } from './../../../../..//modules/documents/docx/components/tables/mock/components/annualDose/table.component';
+import { hierarchyConverter } from './../../../docx/converter/hierarchy.converter';
 
 @Injectable()
 export class PgrUploadService {
@@ -79,7 +51,7 @@ export class PgrUploadService {
       include: {
         address: true,
         environments: { include: { photos: true } },
-        professional: true,
+        professionals: true,
       },
     });
 
@@ -94,9 +66,9 @@ export class PgrUploadService {
     // const dimensions = sizeOf(logo);
     // console.log(dimensions.width, dimensions.height);
 
-    // const { environments, photosPath } = await this.downloadPhotos(company);
-    const environments = [];
-    const photosPath = [];
+    const { environments, photosPath } = await this.downloadPhotos(company);
+    // const environments = [];
+    // const photosPath = [];
 
     const hierarchyHierarchy =
       await this.hierarchyRepository.findAllDataHierarchyByCompany(

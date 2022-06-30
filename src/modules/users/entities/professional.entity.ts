@@ -25,6 +25,7 @@ export class ProfessionalEntity implements Professional {
   certifications: string[];
   nit: string;
   crea: string;
+  cpf: string;
 
   constructor(partial: Partial<ProfessionalEntity>) {
     Object.assign(this, partial);

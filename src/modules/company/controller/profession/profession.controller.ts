@@ -78,28 +78,8 @@ export class CompanyController {
     return this.addCompanyPhotoService.execute(userPayloadDto, file);
   }
 
-  // @Post('contract')
-  // createChild(@Body() createContractDto: CreateContractDto) {
-  //   return this.createContractService.execute(createContractDto);
-  // }
-
-  // edit company data or create if does not exist like workspace / primary_activity
   @Patch()
   update(@Body() updateCompanyDto: UpdateCompanyDto) {
     return this.updateCompanyService.execute(updateCompanyDto);
   }
-
-  // TODO: create disconnect users or activities or...
-  // @Patch('update/disconnect/:companyId')
-  // updateDisconnect(
-  //   @Param('companyId') id: string,
-  //   @Body() updateCompanyDto: UpdateCompanyDto,
-  // ) {
-  //   delete updateCompanyDto.myCompanyId;
-  //   delete updateCompanyDto.isConsulting;
-  //   delete updateCompanyDto.cnpj;
-  //   delete updateCompanyDto.license;
-
-  //   return this.updateCompanyService.execute(id, updateCompanyDto);
-  // }
 }

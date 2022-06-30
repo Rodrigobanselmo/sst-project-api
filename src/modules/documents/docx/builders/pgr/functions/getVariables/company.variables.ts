@@ -9,12 +9,17 @@ export const companyVariables = (
   address: AddressEntity,
 ) => {
   return {
+    [VariablesPGREnum.COMPANY_CNAE]: company?.primary_activity
+      ? `${company?.primary_activity[0].code} – ${company?.primary_activity[0].name}`
+      : '',
+    [VariablesPGREnum.COMPANY_RISK_DEGREE]: company?.riskDegree
+      ? String(company?.riskDegree)
+      : '',
     [VariablesPGREnum.COMPANY_EMAIL]: company?.email || '',
     [VariablesPGREnum.COMPANY_NAME]: company?.name || '',
     [VariablesPGREnum.COMPANY_TELEPHONE]: company?.phone || '',
     [VariablesPGREnum.COMPANY_SHORT_NAME]: company?.shortName || '',
     [VariablesPGREnum.COMPANY_WORK_TIME]: company?.operationTime || '',
-    [VariablesPGREnum.WORKSPACE_CNPJ]: workspace?.cnpj || '',
     [VariablesPGREnum.COMPANY_NUMBER]: address?.number || '',
     [VariablesPGREnum.COMPANY_CEP]: address?.cep || '',
     [VariablesPGREnum.COMPANY_STATE]: address?.state || '',
@@ -25,6 +30,7 @@ export const companyVariables = (
     [VariablesPGREnum.COMPANY_VISION]: company?.vision || '',
     [VariablesPGREnum.COMPANY_VALUES]: company?.values || '',
     [VariablesPGREnum.COMPANY_RESPONSIBLE]: company?.responsibleName || '',
+    [VariablesPGREnum.WORKSPACE_CNPJ]: workspace?.cnpj || '',
     [VariablesPGREnum.IS_RS]: address?.state === 'RS' ? 'true' : '',
   };
 };

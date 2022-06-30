@@ -3,6 +3,7 @@ import { Transform, Type } from 'class-transformer';
 import {
   IsBoolean,
   IsEnum,
+  IsInt,
   IsOptional,
   IsString,
   Length,
@@ -26,13 +27,12 @@ export class CreateCompanyDto {
 
   @Transform(StringCapitalizeTransform, { toClassOnly: true })
   @IsString()
-  @MaxLength(250)
+  @MaxLength(500)
   name: string;
 
   @Transform(StringCapitalizeTransform, { toClassOnly: true })
   @IsString()
   @IsOptional()
-  @MaxLength(250)
   fantasy: string;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
@@ -111,4 +111,24 @@ export class CreateCompanyDto {
   @IsOptional()
   @IsString()
   cadastral_situation_description: string;
+
+  @IsOptional()
+  @IsInt()
+  riskDegree?: number;
+
+  @IsOptional()
+  @IsString()
+  operationTime?: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @IsString()
+  responsibleName?: string;
+
+  @IsOptional()
+  @IsString()
+  email?: string;
 }

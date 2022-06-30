@@ -1,4 +1,4 @@
-import { StatusEnum } from '@prisma/client';
+import { HomoTypeEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import {
   IsEnum,
@@ -7,6 +7,7 @@ import {
   MaxLength,
   ValidateNested,
 } from 'class-validator';
+import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
 import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
 
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
@@ -19,13 +20,26 @@ export class HierarchyOnHomoDto {
   id: string;
 }
 export class CreateHomoGroupDto {
+  @IsOptional()
+  @IsString()
+  id?: string;
+
   @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
   @IsString()
   @MaxLength(100)
   name: string;
 
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsOptional()
+  @IsString()
+  @IsEnum(HomoTypeEnum, {
+    message: `type must be one of: ${KeysOfEnum(HomoTypeEnum)}`,
+  })
+  type?: HomoTypeEnum;
+
   @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
   @IsString()
+  @IsOptional()
   description: string;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
@@ -44,6 +58,14 @@ export class UpdateHomoGroupDto {
   @IsOptional()
   @IsString()
   id?: string;
+
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsOptional()
+  @IsString()
+  @IsEnum(HomoTypeEnum, {
+    message: `type must be one of: ${KeysOfEnum(HomoTypeEnum)}`,
+  })
+  type?: HomoTypeEnum;
 
   @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
   @IsOptional()

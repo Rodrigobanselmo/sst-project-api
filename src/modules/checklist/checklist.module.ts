@@ -41,6 +41,7 @@ import { DeleteSoftRiskService } from './services/risk/delete-soft-risk/delete-s
 import { DeleteSoftRecMedService } from './services/rec-med/delete-soft-rec-med/delete-soft-rec-med.service';
 import { DeleteManyRiskDataService } from './services/risk-data/delete-many-risk-data/delete-many-risk-data.service';
 import { FindAllByHomogeneousGroupService } from './services/risk-data/find-by-homogeneous-group/find-by-homogeneous-group.service';
+import { CompanyModule } from '../company/company.module';
 
 @Module({
   controllers: [
@@ -90,5 +91,6 @@ import { FindAllByHomogeneousGroupService } from './services/risk-data/find-by-h
     DeleteManyRiskDataService,
   ],
   exports: [RiskRepository, RiskGroupDataRepository, RiskDocumentRepository],
+  imports: [CompanyModule],
 })
 export class ChecklistModule {}

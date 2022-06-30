@@ -77,15 +77,17 @@ export class HomoGroupRepository {
     return this.getHomoGroupData(homoGroup);
   }
 
-  async deleteById(id: string): Promise<void> {
-    await this.prisma.homogeneousGroup.delete({
-      where: { id },
-    });
-  }
-
   async findHomoGroupByCompanyAndId(id: string, companyId: string) {
     const hierarchies = await this.prisma.homogeneousGroup.findFirst({
       where: { companyId, id },
+    });
+
+    return new HomoGroupEntity(hierarchies);
+  }
+
+  async findHomoGroupByCompanyAndName(name: string, companyId: string) {
+    const hierarchies = await this.prisma.homogeneousGroup.findFirst({
+      where: { companyId, name },
     });
 
     return new HomoGroupEntity(hierarchies);
@@ -191,5 +193,11 @@ export class HomoGroupRepository {
     });
 
     return new HomoGroupEntity(homogeneousGroup);
+  }
+
+  async deleteById(id: string): Promise<void> {
+    await this.prisma.homogeneousGroup.delete({
+      where: { id },
+    });
   }
 }

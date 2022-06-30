@@ -11,7 +11,7 @@ export class FindAllByCompanyService {
       user.targetCompanyId,
     );
 
-    users.map((userCompany) => {
+    return users.map((userCompany) => {
       userCompany.companies = userCompany.companies
         .map((company) => {
           if (company.companyId === user.targetCompanyId) {
@@ -22,9 +22,8 @@ export class FindAllByCompanyService {
         })
         .filter((company) => company !== null);
 
+      delete userCompany.password;
       return userCompany;
     });
-
-    return users;
   }
 }

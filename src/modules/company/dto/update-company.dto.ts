@@ -2,17 +2,17 @@ import { CompanyTypesEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import {
   IsEnum,
+  IsInt,
   IsOptional,
   IsString,
   Length,
-  MaxLength,
   ValidateNested,
 } from 'class-validator';
+
 import { CnpjFormatTransform } from '../../../shared/transformers/cnpj-format.transform';
 import { StringCapitalizeTransform } from '../../../shared/transformers/string-capitalize';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
-
 import { ActivityDto } from './activity.dto';
 import { AddressDto } from './address.dto';
 import { UpdateEmployeeDto } from './employee.dto';
@@ -39,19 +39,17 @@ export class UpdateCompanyDto {
 
   @Transform(CnpjFormatTransform, { toClassOnly: true })
   @IsOptional()
-  @Length(18, 18, { message: 'invalid CNPJ' })
+  @Length(14, 14, { message: 'invalid CNPJ' })
   cnpj?: string;
 
   @Transform(StringCapitalizeTransform, { toClassOnly: true })
   @IsString()
-  @MaxLength(100)
   @IsOptional()
   name?: string;
 
   @Transform(StringCapitalizeTransform, { toClassOnly: true })
   @IsString()
   @IsOptional()
-  @MaxLength(100)
   fantasy?: string;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
@@ -96,6 +94,10 @@ export class UpdateCompanyDto {
 
   @IsOptional()
   @IsString()
+  logoUrl?: string;
+
+  @IsOptional()
+  @IsString()
   phone?: string;
 
   @IsOptional()
@@ -121,4 +123,24 @@ export class UpdateCompanyDto {
   @IsOptional()
   @IsString()
   cadastral_situation_description?: string;
+
+  @IsOptional()
+  @IsInt()
+  riskDegree?: number;
+
+  @IsOptional()
+  @IsString()
+  operationTime?: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @IsString()
+  responsibleName?: string;
+
+  @IsOptional()
+  @IsString()
+  email?: string;
 }

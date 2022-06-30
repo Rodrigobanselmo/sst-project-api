@@ -7,6 +7,7 @@ export class FindByIdService {
   async execute(id: number) {
     const user = await this.userRepository.findById(id);
     if (!user) throw new BadRequestException(`user with id ${id} not found`);
+    delete user.password;
     return user;
   }
 }

@@ -50,6 +50,7 @@ export class CreateUserService {
         email,
       );
 
+    delete user.password;
     return user;
   }
 }

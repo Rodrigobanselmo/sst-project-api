@@ -9,6 +9,7 @@ export class FindByEmailService {
     const user = await this.userRepository.findByEmail(email);
     if (!user)
       throw new BadRequestException(`user with email ${email} not found`);
+    delete user.password;
     return user;
   }
 }

@@ -24,6 +24,7 @@ export class ResetPasswordService {
       password: passHash,
     });
 
+    delete user.password;
     return user;
   }
 }

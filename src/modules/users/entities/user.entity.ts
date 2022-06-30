@@ -30,6 +30,11 @@ export class UserEntity implements User {
   @ApiProperty()
   companies?: UserCompanyEntity[];
 
+  formation: string[];
+  certifications: string[];
+  cpf: string;
+  crea: string;
+
   constructor(partial: Partial<UserEntity>) {
     Object.assign(this, partial);
   }

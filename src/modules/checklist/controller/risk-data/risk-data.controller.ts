@@ -33,11 +33,11 @@ export class RiskDataController {
     return this.upsertManyRiskDataService.execute(upsertRiskDataDto);
   }
 
-  @Get('/:companyId/:groupId/:riskId')
+  @Get('/:companyId/:riskGroupId/:riskId')
   findAllAvailable(
     @User() userPayloadDto: UserPayloadDto,
     @Param('riskId') riskId: string,
-    @Param('groupId') groupId: string,
+    @Param('riskGroupId') groupId: string,
   ) {
     const companyId = userPayloadDto.targetCompanyId;
 
@@ -47,6 +47,21 @@ export class RiskDataController {
       companyId,
     );
   }
+
+  // @Get('/:companyId/:groupId/hierarchy/:hierarchyId')
+  // findAllAvailableByHierarchy(
+  //   @User() userPayloadDto: UserPayloadDto,
+  //   @Param('groupId') groupId: string,
+  //   @Param('hierarchyId') hierarchyId: string,
+  // ) {
+  //   const companyId = userPayloadDto.targetCompanyId;
+
+  //   return this.findAllByGroupAndRiskService.execute(
+  //     hierarchyId,
+  //     groupId,
+  //     companyId,
+  //   );
+  // }
 
   @Get('/:companyId/:groupId/homogeneous/:homogeneousGroupId')
   findAllAvailableByHomogenousGroup(

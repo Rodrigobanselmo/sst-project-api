@@ -14,7 +14,7 @@ import { PrismaPromise } from '@prisma/client';
 export class RiskDataRepository {
   constructor(private prisma: PrismaService) {}
   async upsert(
-    upsertRiskDataDto: Omit<UpsertRiskDataDto, 'keepEmpty'>,
+    upsertRiskDataDto: Omit<UpsertRiskDataDto, 'keepEmpty' | 'type'>,
   ): Promise<RiskFactorDataEntity> {
     const riskFactorData = await this.upsertPrisma(upsertRiskDataDto);
 

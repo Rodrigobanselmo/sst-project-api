@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   HierarchyOnHomogeneous,
   HomogeneousGroup,
+  HomoTypeEnum,
   StatusEnum,
 } from '@prisma/client';
 import { HierarchyEntity } from './hierarchy.entity';
@@ -36,6 +37,7 @@ export class HomoGroupEntity implements HomogeneousGroup {
   @ApiProperty({ description: 'The hierarchies of the HomogeneousGroup' })
   hierarchies?: HierarchyEntity[];
 
+  type: HomoTypeEnum;
   workspaceId?: string;
   workspaceIds?: string[];
 

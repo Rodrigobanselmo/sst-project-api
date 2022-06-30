@@ -1,15 +1,32 @@
+import { HomoTypeEnum } from '@prisma/client';
+import { Transform } from 'class-transformer';
 import {
+  IsEnum,
   IsInt,
   IsNumber,
   IsOptional,
   IsString,
   ValidateIf,
 } from 'class-validator';
+import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
+import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
 
 export class UpsertRiskDataDto {
   @IsString()
   @IsOptional()
   id?: string;
+
+  @IsString()
+  @IsOptional()
+  workspaceId?: string;
+
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsOptional()
+  @IsString()
+  @IsEnum(HomoTypeEnum, {
+    message: `type must be one of: ${KeysOfEnum(HomoTypeEnum)}`,
+  })
+  type?: HomoTypeEnum;
 
   @IsOptional()
   @IsNumber()
@@ -64,6 +81,18 @@ export class UpsertManyRiskDataDto {
   @IsString()
   @IsOptional()
   id?: string;
+
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsOptional()
+  @IsString()
+  @IsEnum(HomoTypeEnum, {
+    message: `type must be one of: ${KeysOfEnum(HomoTypeEnum)}`,
+  })
+  type?: HomoTypeEnum;
+
+  @IsString()
+  @IsOptional()
+  workspaceId?: string;
 
   @IsOptional()
   @IsNumber()

@@ -1,22 +1,50 @@
+import { HierarchyRepository } from './../../../../company/repositories/implementations/HierarchyRepository';
+import { HomoGroupRepository } from './../../../../company/repositories/implementations/HomoGroupRepository';
 import { Injectable } from '@nestjs/common';
+import { HomoTypeEnum } from '@prisma/client';
 
 import { UpsertManyRiskDataDto } from '../../../dto/risk-data.dto';
 import { RiskDataRepository } from '../../../repositories/implementations/RiskDataRepository';
+import { hierarchyCreateHomo } from '../upsert-risk-data/upsert-risk.service';
 
 @Injectable()
 export class UpsertManyRiskDataService {
-  constructor(private readonly riskDataRepository: RiskDataRepository) {}
+  constructor(
+    private readonly riskDataRepository: RiskDataRepository,
+    private readonly homoGroupRepository: HomoGroupRepository,
+    private readonly hierarchyRepository: HierarchyRepository,
+  ) {}
 
   async execute(upsertRiskDataDto: UpsertManyRiskDataDto) {
+    (await Promise.all(
+      upsertRiskDataDto.homogeneousGroupIds.map(async (homogeneousGroupId) => {
+        const workspaceId = upsertRiskDataDto.workspaceId;
+        const type = upsertRiskDataDto.type;
+        delete upsertRiskDataDto.workspaceId;
+        delete upsertRiskDataDto.type;
+
+        const isTypeHierarchy = type && type == HomoTypeEnum.HIERARCHY;
+        if (isTypeHierarchy && workspaceId) {
+          await hierarchyCreateHomo({
+            homogeneousGroupId: homogeneousGroupId,
+            companyId: upsertRiskDataDto.companyId,
+            homoGroupRepository: this.homoGroupRepository,
+            hierarchyRepository: this.hierarchyRepository,
+            type,
+            workspaceId,
+          });
+        }
+      }),
+    )) || [];
+
     const risksDataMany =
       (await Promise.all(
-        upsertRiskDataDto.riskIds.map(
-          async (riskId) =>
-            await this.riskDataRepository.upsertConnectMany({
-              ...upsertRiskDataDto,
-              riskId,
-            }),
-        ),
+        upsertRiskDataDto.riskIds.map(async (riskId) => {
+          return await this.riskDataRepository.upsertConnectMany({
+            ...upsertRiskDataDto,
+            riskId,
+          });
+        }),
       )) || [];
 
     if (upsertRiskDataDto.riskId)

@@ -45,7 +45,7 @@ export class UsersController {
   ) {}
 
   @Get('me')
-  findMe(@User() userPayloadDto: UserPayloadDto) {
+  async findMe(@User() userPayloadDto: UserPayloadDto) {
     return classToClass(
       this.findMeService.execute(
         userPayloadDto.userId,

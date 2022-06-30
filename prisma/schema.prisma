@@ -44,6 +44,14 @@ enum StatusEnum {
   CANCELED
 }
 
+enum HomoTypeEnum {
+  HIERARCHY
+  ENVIRONMENT
+  WORKSTATION
+  EQUIPMENT
+  ACTIVITIES
+}
+
 enum MeasuresTypeEnum {
   ADM
   ENG
@@ -72,6 +80,7 @@ model Address {
   workspace Workspace? @relation(fields: [id,companyId], references: [id,companyId], onDelete: Cascade, onUpdate: Cascade)
   
   @@unique([workspaceId, companyId])
+  @@unique([id,companyId])
 }
 
 model AddressCompany {
@@ -83,7 +92,7 @@ model AddressCompany {
   neighborhood String?
   city String?
   state String?
-  companyId String
+  companyId String @unique
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
@@ -139,7 +148,7 @@ model Company {
   updated_at  DateTime   @updatedAt
   status StatusEnum @default(ACTIVE)
   type CompanyTypesEnum @default(MATRIZ)
-  professional Professional[]
+  professionals Professional[]
   users UserCompany[]
   workspace Workspace[]
   address AddressCompany?
@@ -326,8 +335,10 @@ model HomogeneousGroup {
   hierarchyOnHomogeneous HierarchyOnHomogeneous[] 
   created_at DateTime @default(now())
   riskFactorData RiskFactorData[] 
+  type HomoTypeEnum?
   
   @@unique([name, companyId])
+  @@index(name)
   @@index(companyId)
 }
 
@@ -356,18 +367,14 @@ model Professional {
   name String
   formation String[]
   certifications String[]
-  nit String?
+  cpf String?
   crea String?
   created_at DateTime @default(now())
   deleted_at DateTime? 
   updated_at  DateTime   @updatedAt
-  companyId String?
-  company Company? @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
-  userId Int?
-  user User? @relation(fields: [userId, name], references: [id,name], onDelete: Cascade, onUpdate: Cascade) 
+  companyId String
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
   riskFactorGroupData RiskFactorGroupData[]
-
-  @@unique([name, userId])
 }
 
 model RecMed {
@@ -479,7 +486,8 @@ model RiskFactorGroupData {
   data RiskFactorData[]
   docs RiskFactorDocument[]
   status StatusEnum @default(PROGRESS)
-  professional Professional[]
+  professionals Professional[]
+  users User[]
   complementaryDocs String[]
   complementarySystems String[]
 
@@ -532,19 +540,26 @@ model RiskFactorProbability {
   riskFactor RiskFactors @relation(fields: [riskId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   riskFactorData RiskFactorData? @relation(name: "RiskFactorProbabilityBefore", fields: [riskFactorDataId,riskId,riskFactorGroupDataId], references: [id,riskId,riskFactorGroupDataId], onDelete: Restrict, onUpdate: Cascade)
   riskFactorDataAfter RiskFactorData? @relation(name: "RiskFactorProbabilityAfter", fields: [riskFactorDataAfterId,riskId,riskFactorGroupDataId], references: [id,riskId,riskFactorGroupDataId], onDelete: Restrict, onUpdate: Cascade)
+
+  @@unique([riskFactorDataId,riskId,riskFactorGroupDataId])
+  @@unique([riskFactorDataAfterId,riskId,riskFactorGroupDataId])
 }
 
 model User {
   id    Int     @default(autoincrement()) @id
   email String  @unique
-  name String? 
+  name String?
+  formation String[]
+  certifications String[]
+  cpf String?
+  crea String? 
   password String
   created_at DateTime @default(now())
   updated_at  DateTime   @updatedAt
   deleted_at DateTime? 
   refresh_token RefreshToken[]
   companies UserCompany[]
-  profession Professional?
+  riskFactorGroupData RiskFactorGroupData[]
   
   @@unique([id, name])
 }

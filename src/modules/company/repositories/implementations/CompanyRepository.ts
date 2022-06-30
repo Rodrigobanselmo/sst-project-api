@@ -121,6 +121,13 @@ export class CompanyRepository implements ICompanyRepository {
   ) {
     const include = options?.include || {};
 
+    await this.prisma.company.update({
+      where: { id: companyId },
+      data: { primary_activity: { set: [] } },
+    });
+
+    console.log(updateCompanyDto);
+
     const companyPrisma = this.prisma.company.update({
       where: { id: companyId },
       data: {
@@ -184,6 +191,7 @@ export class CompanyRepository implements ICompanyRepository {
             ),
           ],
         },
+        address: address ? { update: { ...address } } : undefined,
         workspace: {
           upsert: [
             ...workspace.map(({ id, address, ...work }) => ({
@@ -460,12 +468,7 @@ export class CompanyRepository implements ICompanyRepository {
 
   async findById(
     id: string,
-    options?: IPrismaOptions<{
-      primary_activity?: boolean;
-      secondary_activity?: boolean;
-      workspace?: boolean;
-      employees?: boolean;
-    }>,
+    options?: Partial<Prisma.CompanyFindManyArgs>,
   ): Promise<CompanyEntity> {
     const include = options?.include || {};
 
@@ -480,6 +483,7 @@ export class CompanyRepository implements ICompanyRepository {
     const company = await this.prisma.company.findUnique({
       where: { id },
       include: {
+        ...include,
         primary_activity: !!include?.primary_activity,
         secondary_activity: !!include?.secondary_activity,
         workspace: !!include?.workspace

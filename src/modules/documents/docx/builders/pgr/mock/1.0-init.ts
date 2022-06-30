@@ -203,6 +203,14 @@ export const initSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          text: `**Grau de Risco**: ??${VariablesPGREnum.COMPANY_RISK_DEGREE}??`,
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          text: `**CNAE**: ??${VariablesPGREnum.COMPANY_CNAE}??`,
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
           text: `**Horário de Trabalho**: ??${VariablesPGREnum.COMPANY_WORK_TIME}??`,
         },
         {

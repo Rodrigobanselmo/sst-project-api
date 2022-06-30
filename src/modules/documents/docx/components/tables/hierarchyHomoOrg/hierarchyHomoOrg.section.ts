@@ -15,7 +15,7 @@ export const hierarchyHomoOrgSection = (
   hierarchiesEntity: IHierarchyData,
   homoGroupTree: IHomoGroupMap,
   { showDescription, showHomogeneous }: ConverterProps = {
-    showHomogeneous: false,
+    showHomogeneous: true,
     showDescription: true,
   },
 ) => {

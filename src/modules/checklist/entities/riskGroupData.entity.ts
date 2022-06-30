@@ -4,6 +4,8 @@ import { StatusEnum } from '@prisma/client';
 import { RiskFactorGroupData } from '.prisma/client';
 import { CompanyEntity } from '../../../modules/company/entities/company.entity';
 import { RiskFactorDataEntity } from './riskData.entity';
+import { ProfessionalEntity } from '../../../modules/users/entities/professional.entity';
+import { UserEntity } from '../../../modules/users/entities/user.entity';
 
 export class RiskFactorGroupDataEntity implements RiskFactorGroupData {
   @ApiProperty({ description: 'The id of the risk group data' })
@@ -34,6 +36,8 @@ export class RiskFactorGroupDataEntity implements RiskFactorGroupData {
   })
   company?: Partial<CompanyEntity>;
 
+  professionals?: ProfessionalEntity[];
+  users?: UserEntity[];
   workspaceId: string;
   source: string | null;
   elaboratedBy: string | null;
