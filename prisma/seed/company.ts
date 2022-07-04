@@ -12,12 +12,12 @@ export const seedCompany = async (
 
   const workId = v4();
 
-  if (options.skip) {
+  if (options?.skip) {
     return { workId, companyId: id, company: {} };
   }
 
-  const company = await prisma.company.create({
-    data: {
+  const company = await prisma.company.upsert({
+    create: {
       id,
       cnpj: '07.689.002/0001-89',
       fantasy: 'Simple',
@@ -34,8 +34,10 @@ export const seedCompany = async (
         },
       },
     },
+    update: {},
     include: { workspace: true },
+    where: { id },
   });
 
-  return { workId, companyId: id, company };
+  return { workId: company.workspace[0].id, companyId: id, company };
 };

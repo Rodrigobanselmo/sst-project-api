@@ -121,12 +121,11 @@ export class CompanyRepository implements ICompanyRepository {
   ) {
     const include = options?.include || {};
 
-    await this.prisma.company.update({
-      where: { id: companyId },
-      data: { primary_activity: { set: [] } },
-    });
-
-    console.log(updateCompanyDto);
+    if (primary_activity.length)
+      await this.prisma.company.update({
+        where: { id: companyId },
+        data: { primary_activity: { set: [] } },
+      });
 
     const companyPrisma = this.prisma.company.update({
       where: { id: companyId },
@@ -411,6 +410,7 @@ export class CompanyRepository implements ICompanyRepository {
 
   async findByIdAll(
     id: string,
+    workspaceId: string,
     options?: Partial<Prisma.CompanyFindUniqueArgs>,
   ): Promise<CompanyEntity> {
     const company = await this.prisma.company.findUnique({
@@ -418,7 +418,11 @@ export class CompanyRepository implements ICompanyRepository {
       ...options,
     });
 
-    return new CompanyEntity(company);
+    const employeeCount = await this.prisma.employee.count({
+      where: { companyId: id, workspaces: { some: { id: workspaceId } } },
+    });
+
+    return new CompanyEntity({ ...company, employeeCount });
   }
 
   async findAllRelatedByCompanyId(
@@ -488,6 +492,10 @@ export class CompanyRepository implements ICompanyRepository {
       where: { companyId: id },
     });
 
+    const hierarchyCount = await this.prisma.hierarchy.count({
+      where: { companyId: id },
+    });
+
     const company = await this.prisma.company.findUnique({
       where: { id },
       include: {
@@ -520,6 +528,7 @@ export class CompanyRepository implements ICompanyRepository {
       ...company,
       employeeCount: employeeCount,
       riskGroupCount: riskGroupCount,
+      hierarchyCount,
     });
   }
 }

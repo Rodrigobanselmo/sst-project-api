@@ -13,7 +13,13 @@ export enum PGRSectionChildrenTypeEnum {
   BULLET = 'BULLET',
   BULLET_SPACE = 'BULLET_SPACE',
   TABLE_VERSION_CONTROL = 'TABLE_VERSION_CONTROL',
-  ITERABLE_ENVIRONMENTS = 'ITERABLE_ENVIRONMENTS',
+  ITERABLE_ENVIRONMENTS_ADM = 'ITERABLE_ENVIRONMENTS',
+  ITERABLE_ENVIRONMENTS_OP = 'ITERABLE_ENVIRONMENTS_OP',
+  ITERABLE_ENVIRONMENTS_SUP = 'ITERABLE_ENVIRONMENTS_SUP',
+  ITERABLE_CHARACTERIZATION_EQUIP = 'ITERABLE_CHARACTERIZATION_EQUIP',
+  ITERABLE_CHARACTERIZATION_ACTIVIT = 'ITERABLE_CHARACTERIZATION_ACTIVIT',
+  ITERABLE_CHARACTERIZATION_WORKSTATION = 'ITERABLE_CHARACTERIZATION_WORKSTATION',
+  TABLE_GSE = 'TABLE_GSE',
   HIERARCHY_RISK_TABLE = 'HIERARCHY_RISK_TABLE',
   RISK_TABLE = 'RISK_TABLE',
   PARAGRAPH_TABLE = 'PARAGRAPH_TABLE',
@@ -114,8 +120,28 @@ export type ITableVersionControl = {
   type: PGRSectionChildrenTypeEnum.TABLE_VERSION_CONTROL;
 } & IBase;
 
-export type IEnvironments = {
-  type: PGRSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS;
+export type IEnvironmentsAdm = {
+  type: PGRSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS_ADM;
+} & IBase;
+
+export type IEnvironmentsOp = {
+  type: PGRSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS_OP;
+} & IBase;
+
+export type IEnvironmentsSup = {
+  type: PGRSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS_SUP;
+} & IBase;
+
+export type ICharacterizationEquip = {
+  type: PGRSectionChildrenTypeEnum.ITERABLE_CHARACTERIZATION_EQUIP;
+} & IBase;
+
+export type ICharacterizationActivity = {
+  type: PGRSectionChildrenTypeEnum.ITERABLE_CHARACTERIZATION_ACTIVIT;
+} & IBase;
+
+export type ICharacterizationWork = {
+  type: PGRSectionChildrenTypeEnum.ITERABLE_CHARACTERIZATION_WORKSTATION;
 } & IBase;
 
 export type IProfessional = {
@@ -136,6 +162,10 @@ export type IHealthEffectTable = {
 
 export type IExpositionTable = {
   type: PGRSectionChildrenTypeEnum.EXPOSITION_DEGREE_TABLES;
+} & IBase;
+
+export type IGseTable = {
+  type: PGRSectionChildrenTypeEnum.TABLE_GSE;
 } & IBase;
 
 export type IMatrix = {
@@ -191,7 +221,13 @@ export type ISectionChildrenType =
   | IMatrix
   | IQuantityTable
   | IComplementaryDocs
-  | IEnvironments
+  | IEnvironmentsAdm
+  | IEnvironmentsSup
+  | IEnvironmentsOp
+  | ICharacterizationEquip
+  | ICharacterizationActivity
+  | ICharacterizationWork
   | IMeasureImage
   | IRSImage
+  | IGseTable
   | IProfessional;

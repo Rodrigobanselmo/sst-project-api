@@ -1,0 +1,69 @@
+import { Injectable } from '@nestjs/common';
+
+import { PrismaService } from '../../../../prisma/prisma.service';
+import { AddPhotoCharacterizationDto } from '../../dto/characterization.dto';
+import { CharacterizationPhotoEntity } from '../../entities/characterization-photo.entity';
+
+export interface ICharacterizationPhoto
+  extends Partial<AddPhotoCharacterizationDto> {
+  photoUrl: string;
+  isVertical: boolean;
+  companyCharacterizationId: string;
+  name: string;
+  id?: string;
+}
+
+@Injectable()
+export class CharacterizationPhotoRepository {
+  constructor(private prisma: PrismaService) {}
+
+  async createMany(characterizationPhoto: ICharacterizationPhoto[]) {
+    const characterizations =
+      await this.prisma.companyCharacterizationPhoto.createMany({
+        data: characterizationPhoto.map(({ ...rest }) => ({
+          ...rest,
+        })),
+      });
+
+    return characterizations;
+  }
+
+  async upsert({
+    id,
+    companyCharacterizationId: characterizationId,
+    ...characterizationPhotoDto
+  }: ICharacterizationPhoto): Promise<CharacterizationPhotoEntity> {
+    const characterization =
+      await this.prisma.companyCharacterizationPhoto.upsert({
+        where: { id: id || 'no-id' },
+        create: {
+          ...characterizationPhotoDto,
+          companyCharacterizationId: characterizationId,
+          name: characterizationPhotoDto.name,
+        },
+        update: {
+          ...characterizationPhotoDto,
+        },
+      });
+
+    return new CharacterizationPhotoEntity(characterization);
+  }
+
+  async findById(id: string) {
+    const characterization =
+      await this.prisma.companyCharacterizationPhoto.findUnique({
+        where: { id },
+      });
+
+    return new CharacterizationPhotoEntity(characterization);
+  }
+
+  async delete(id: string) {
+    const characterization =
+      await this.prisma.companyCharacterizationPhoto.delete({
+        where: { id },
+      });
+
+    return new CharacterizationPhotoEntity(characterization);
+  }
+}

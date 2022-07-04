@@ -52,9 +52,21 @@ enum HomoTypeEnum {
   ACTIVITIES
 }
 
+enum CharacterizationTypeEnum {
+  WORKSTATION
+  EQUIPMENT
+  ACTIVITIES
+}
+
 enum MeasuresTypeEnum {
   ADM
   ENG
+}
+
+enum RecTypeEnum {
+  ADM
+  ENG
+  EPI
 }
 
 model Activity {
@@ -164,6 +176,7 @@ model Company {
   generateSource GenerateSource[] 
   recMed RecMed[] 
   environments CompanyEnvironment[] 
+  characterization CompanyCharacterization[] 
   hierarchy Hierarchy[] 
   databaseTable DatabaseTable[] 
   checklist Checklist[] 
@@ -172,27 +185,59 @@ model Company {
   riskFactorDocument RiskFactorDocument[] 
 }
 
+model CompanyCharacterization {
+  id   String    @id @default(uuid())
+  name String  
+  photos CompanyCharacterizationPhoto[]
+  description String?
+  created_at DateTime @default(now())
+  considerations String[]
+  deleted_at DateTime? 
+  updated_at  DateTime   @updatedAt
+  type CharacterizationTypeEnum
+  workspaceId String
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
+  homogeneousGroup HomogeneousGroup? @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: Cascade) 
+  companyId String
+  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
+  
+  @@unique([workspaceId, companyId, id])
+}
+
+model CompanyCharacterizationPhoto {
+  id   String    @id @default(uuid())
+  name String  
+  isVertical Boolean @default(false)
+  photoUrl String
+  created_at DateTime @default(now())
+  deleted_at DateTime? 
+  updated_at  DateTime   @updatedAt
+  companyCharacterizationId String
+  companyEnvironment CompanyCharacterization @relation(fields: [companyCharacterizationId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
+}
+
 model CompanyEnvironment {
   id   String    @id @default(uuid())
   name String  
   photos CompanyEnvironmentPhoto[]
   description String?
+  considerations String[]
   created_at DateTime @default(now())
   deleted_at DateTime? 
   updated_at  DateTime   @updatedAt
   type CompanyEnvironmentTypesEnum 
   noiseValue String?  
   temperature String?  
+  luminosity String?  
   moisturePercentage String?   
   workspaceId String
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
-  riskFactors RiskFactors[] 
-  hierarchy Hierarchy[] 
   parentEnvironmentId String?
   parentEnvironment CompanyEnvironment? @relation(name: "parent_enviroment",fields: [parentEnvironmentId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
   childEnvironments CompanyEnvironment[] @relation(name: "parent_enviroment")
   companyId String
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
+  homogeneousGroup HomogeneousGroup? @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: Cascade) 
   
   @@unique([workspaceId, companyId, id])
 }
@@ -208,7 +253,6 @@ model CompanyEnvironmentPhoto {
   companyEnvironmentId String
   companyEnvironment CompanyEnvironment @relation(fields: [companyEnvironmentId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
 }
-
 
 model Contract {
   receivingServiceCompany   Company @relation(fields: [receivingServiceCompanyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
@@ -306,7 +350,6 @@ model Hierarchy {
   parent Hierarchy?  @relation(name: "children_parent", fields: [parentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   children Hierarchy[] @relation(name: "children_parent")
   employees Employee[] 
-  companyEnvironment CompanyEnvironment[] 
   hierarchyOnHomogeneous HierarchyOnHomogeneous[]
   riskFactorDatas RiskFactorData[] 
 
@@ -332,6 +375,8 @@ model HomogeneousGroup {
   companyId String
   status StatusEnum @default(ACTIVE)
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  characterization CompanyCharacterization?
+  environment CompanyEnvironment?
   hierarchyOnHomogeneous HierarchyOnHomogeneous[] 
   created_at DateTime @default(now())
   riskFactorData RiskFactorData[] 
@@ -386,6 +431,7 @@ model RecMed {
   generateSourceId    String?    
   system Boolean 
   medType MeasuresTypeEnum?
+  recType RecTypeEnum?
   status StatusEnum @default(ACTIVE)
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   risk RiskFactors @relation(fields: [riskId], references: [id], onDelete: Cascade, onUpdate: Cascade)
@@ -441,7 +487,6 @@ model RiskFactors {
   representAll Boolean @default(false)
   riskFactorData RiskFactorData[]
   riskFactorProbability RiskFactorProbability[]
-  companyEnvironment CompanyEnvironment[] 
   
   @@unique([id, companyId])
 }
@@ -595,6 +640,7 @@ model Workspace {
   hierarchyOnHomogeneous HierarchyOnHomogeneous[]
   hierarchy Hierarchy[]
   companyEnvironment CompanyEnvironment[]
+  characterization CompanyCharacterization[]
 
   @@unique([abbreviation, companyId])
   @@unique([id, companyId])

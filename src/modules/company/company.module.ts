@@ -41,6 +41,14 @@ import { EnvironmentPhotoRepository } from './repositories/implementations/Envir
 import { AddEnvironmentPhotoService } from './services/environment/add-environment-photo/add-environment-photo.service';
 import { DeleteEnvironmentPhotoService } from './services/environment/delete-environment-photo/delete-environment-photo.service';
 import { AddCompanyPhotoService } from './services/company/add-company-photo/add-company-photo.service';
+import { UpsertCharacterizationService } from './services/characterization/upsert-characterization/upsert-characterization.service';
+import { FindAllCharacterizationService } from './services/characterization/find-all-characterization/find-all-characterization.service';
+import { DeleteCharacterizationService } from './services/characterization/delete-characterization/delete-characterization.service';
+import { CharacterizationPhotoRepository } from './repositories/implementations/CharacterizationPhotoRepository';
+import { AddCharacterizationPhotoService } from './services/characterization/add-characterization-photo/add-characterization-photo.service';
+import { DeleteCharacterizationPhotoService } from './services/characterization/delete-characterization-photo/delete-characterization-photo.service';
+import { CharacterizationRepository } from './repositories/implementations/CharacterizationRepository';
+import { CharacterizationController } from './controller/characterization/characterization.controller';
 
 @Module({
   controllers: [
@@ -49,6 +57,7 @@ import { AddCompanyPhotoService } from './services/company/add-company-photo/add
     HierarchyController,
     HomoGroupsController,
     EnvironmentController,
+    CharacterizationController,
   ],
   providers: [
     CreateCompanyService,
@@ -87,6 +96,13 @@ import { AddCompanyPhotoService } from './services/company/add-company-photo/add
     AddEnvironmentPhotoService,
     DeleteEnvironmentPhotoService,
     AddCompanyPhotoService,
+    UpsertCharacterizationService,
+    FindAllCharacterizationService,
+    DeleteCharacterizationService,
+    CharacterizationPhotoRepository,
+    AddCharacterizationPhotoService,
+    DeleteCharacterizationPhotoService,
+    CharacterizationRepository,
   ],
   exports: [
     CompanyRepository,

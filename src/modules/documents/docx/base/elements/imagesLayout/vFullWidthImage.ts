@@ -23,6 +23,6 @@ export const VFullWidthImage = (
       ],
       ...options,
     }),
-    paragraphFigure(text),
+    paragraphFigure(text, { spacingAfter: 200 }),
   ].filter((i) => i);
 };

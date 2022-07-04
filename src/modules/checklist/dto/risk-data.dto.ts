@@ -94,6 +94,10 @@ export class UpsertManyRiskDataDto {
   @IsOptional()
   workspaceId?: string;
 
+  @IsString({ each: true })
+  @IsOptional()
+  workspaceIds?: string;
+
   @IsOptional()
   @IsNumber()
   probability?: number;

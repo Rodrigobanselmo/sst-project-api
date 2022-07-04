@@ -23,7 +23,7 @@ export const environmentSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.H1,
-          text: 'CARACTERIZAÇÃO DO AMBIENTE DE TRABALHO (NR-01 ITEM 1.5.7.3.2 ALÍNEA A)',
+          text: 'CARACTERIZAÇÃO DOS PROCESSOS E AMBIENTES DE TRABALHO (NR-01 ‘itens’ 1.5.4.2 e 1.5.7.3.2 alínea a)',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -42,7 +42,50 @@ export const environmentSection: IDocumentPGRSectionGroup = {
           text: 'Nos ambientes administrativos são executadas atividades diversas pouco relacionadas com riscos físicos, químicos e biológicos, mas é possível encontrar alguns fatores de riscos ergonômicos e até mesmo de acidentes, no entanto de baixa severidade.',
         },
         {
-          type: PGRSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS,
+          type: PGRSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS_ADM,
+          removeWithSomeEmptyVars: [
+            VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_ADM,
+          ],
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.BREAK,
+          removeWithSomeEmptyVars: [
+            VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_ADM,
+          ],
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.H2,
+          text: 'Ambientes Operacionais',
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          text: 'FAZER TESTO EXPLICANDO O QUE SÃO CONSIDERADOS Ambientes Operacionais',
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS_OP,
+          removeWithSomeEmptyVars: [
+            VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_OP,
+          ],
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.BREAK,
+          removeWithSomeEmptyVars: [
+            VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_OP,
+          ],
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.H2,
+          text: 'Ambientes de Apoio',
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          text: 'FAZER TESTO EXPLICANDO O QUE SÃO CONSIDERADOS Ambientes de apoi',
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS_SUP,
+          removeWithSomeEmptyVars: [
+            VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_SUP,
+          ],
         },
       ],
     },

@@ -17,25 +17,32 @@ export class UpsertManyRiskDataService {
 
   async execute(upsertRiskDataDto: UpsertManyRiskDataDto) {
     (await Promise.all(
-      upsertRiskDataDto.homogeneousGroupIds.map(async (homogeneousGroupId) => {
-        const workspaceId = upsertRiskDataDto.workspaceId;
-        const type = upsertRiskDataDto.type;
-        delete upsertRiskDataDto.workspaceId;
-        delete upsertRiskDataDto.type;
+      upsertRiskDataDto.homogeneousGroupIds.map(
+        async (homogeneousGroupId, index) => {
+          const workspaceId = upsertRiskDataDto.workspaceIds
+            ? upsertRiskDataDto.workspaceIds[index]
+            : upsertRiskDataDto.workspaceId;
 
-        const isTypeHierarchy = type && type == HomoTypeEnum.HIERARCHY;
-        if (isTypeHierarchy && workspaceId) {
-          await hierarchyCreateHomo({
-            homogeneousGroupId: homogeneousGroupId,
-            companyId: upsertRiskDataDto.companyId,
-            homoGroupRepository: this.homoGroupRepository,
-            hierarchyRepository: this.hierarchyRepository,
-            type,
-            workspaceId,
-          });
-        }
-      }),
+          const type = upsertRiskDataDto.type;
+
+          const isTypeHierarchy = type && type == HomoTypeEnum.HIERARCHY;
+          if (isTypeHierarchy && workspaceId) {
+            await hierarchyCreateHomo({
+              homogeneousGroupId: homogeneousGroupId,
+              companyId: upsertRiskDataDto.companyId,
+              homoGroupRepository: this.homoGroupRepository,
+              hierarchyRepository: this.hierarchyRepository,
+              type,
+              workspaceId,
+            });
+          }
+        },
+      ),
     )) || [];
+
+    delete upsertRiskDataDto.workspaceIds;
+    delete upsertRiskDataDto.workspaceId;
+    delete upsertRiskDataDto.type;
 
     const risksDataMany =
       (await Promise.all(

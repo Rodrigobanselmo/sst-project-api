@@ -19,7 +19,7 @@ export const riskFactors2Section: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: 'Na Tabela a seguir é apresentada toda estrutura organizacional da TOXILAB onde encontra-se assinalado com um X os fatores de risco presentes em cada departamento da empresa.',
+          text: `Na Tabela a seguir é apresentada toda estrutura organizacional da ??${VariablesPGREnum.COMPANY_SHORT_NAME}?? onde encontra-se assinalado com um X os fatores de risco presentes em cada departamento da empresa.`,
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET,

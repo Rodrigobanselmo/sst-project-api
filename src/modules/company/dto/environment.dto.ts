@@ -42,6 +42,26 @@ export class UpsertEnvironmentDto {
   @IsOptional()
   @IsString({ each: true })
   hierarchyIds?: string[];
+
+  @IsOptional()
+  @IsString({ each: true })
+  considerations?: string[];
+
+  @IsOptional()
+  @IsString()
+  noiseValue?: string;
+
+  @IsOptional()
+  @IsString()
+  temperature?: string;
+
+  @IsOptional()
+  @IsString()
+  moisturePercentage?: string;
+
+  @IsOptional()
+  @IsString()
+  luminosity?: string;
 }
 
 export class AddPhotoEnvironmentDto {

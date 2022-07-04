@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { RecMed } from '.prisma/client';
+import { RecMed, RecTypeEnum } from '.prisma/client';
 import { MeasuresTypeEnum, StatusEnum } from '@prisma/client';
 
 export class RecMedEntity implements RecMed {
@@ -51,6 +51,8 @@ export class RecMedEntity implements RecMed {
 
   @ApiProperty({ description: 'The deleted date of data' })
   deleted_at: Date | null;
+
+  recType: RecTypeEnum;
 
   constructor(partial: Partial<RecMedEntity>) {
     Object.assign(this, partial);

@@ -1,3 +1,4 @@
+import { CharacterizationEntity } from './../../../../company/entities/characterization.entity';
 import { RiskFactorGroupDataEntity } from './../../../../checklist/entities/riskGroupData.entity';
 import { EnvironmentEntity } from './../../../../company/entities/environment.entity';
 import { ISectionOptions } from 'docx';
@@ -20,6 +21,7 @@ import {
   HierarchyMapData,
   IHomoGroupMap,
 } from '../../converter/hierarchy.converter';
+import { booleanVariables } from './functions/getVariables/boolean.variables';
 
 export class DocumentBuildPGR {
   private version: string;
@@ -33,6 +35,7 @@ export class DocumentBuildPGR {
   private document: RiskFactorGroupDataEntity;
   private homogeneousGroup: IHomoGroupMap;
   private hierarchy: Map<string, HierarchyMapData>;
+  private characterizations: CharacterizationEntity[];
 
   constructor({
     version,
@@ -44,6 +47,7 @@ export class DocumentBuildPGR {
     document,
     homogeneousGroup,
     hierarchy,
+    characterizations,
   }: ICreatePGR) {
     this.version = version;
     this.logoImagePath = logo;
@@ -56,6 +60,7 @@ export class DocumentBuildPGR {
     this.document = document;
     this.homogeneousGroup = homogeneousGroup;
     this.hierarchy = hierarchy;
+    this.characterizations = characterizations;
   }
 
   public build() {
@@ -83,6 +88,7 @@ export class DocumentBuildPGR {
       [VariablesPGREnum.DOCUMENT_COORDINATOR]:
         this.document?.coordinatorBy || '',
       ...companyVariables(this.company, this.workspace, this.workspace.address),
+      ...booleanVariables(this.company, this.hierarchy),
       ...this.docSections.variables,
     };
   }
@@ -95,6 +101,7 @@ export class DocumentBuildPGR {
       variables: this.variables,
       professionals: this.company?.professionals ?? [],
       environments: this.environments ?? [],
+      characterizations: this.characterizations ?? [],
       document: this.document,
       homogeneousGroup: this.homogeneousGroup,
       hierarchy: this.hierarchy,

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { HomoTypeEnum, Prisma } from '@prisma/client';
+import { v4 } from 'uuid';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { UpsertEnvironmentDto } from '../../dto/environment.dto';
@@ -18,28 +19,65 @@ export class EnvironmentRepository {
     id,
     companyId,
     workspaceId,
-    hierarchyIds,
+    hierarchyIds = [],
     ...environmentDto
   }: ICompanyEnvironment): Promise<EnvironmentEntity> {
+    const newId = v4();
+
+    const homogeneousGroup = await this.prisma.homogeneousGroup.upsert({
+      where: { id: id || 'no-id' },
+      create: {
+        id: newId,
+        name: newId,
+        //! optimization here nd on characterization
+        description: environmentDto.name + '(//)' + environmentDto.type,
+        companyId: companyId,
+        type: HomoTypeEnum.ENVIRONMENT,
+      },
+      update: {
+        description: environmentDto.name + '(//)' + environmentDto.type,
+      },
+    });
+
+    await this.prisma.hierarchyOnHomogeneous.deleteMany({
+      where: { homogeneousGroupId: homogeneousGroup.id },
+    });
+
+    await Promise.all(
+      hierarchyIds.map(
+        async (hierarchyId) =>
+          await this.prisma.hierarchyOnHomogeneous.upsert({
+            where: {
+              hierarchyId_homogeneousGroupId_workspaceId: {
+                hierarchyId,
+                workspaceId,
+                homogeneousGroupId: homogeneousGroup.id,
+              },
+            },
+            create: {
+              hierarchyId,
+              workspaceId,
+              homogeneousGroupId: homogeneousGroup.id,
+            },
+            update: {},
+          }),
+      ),
+    );
+
     const environment = await this.prisma.companyEnvironment.upsert({
       where: {
         workspaceId_companyId_id: { id: id || 'no-id', companyId, workspaceId },
       },
       create: {
         ...environmentDto,
+        id: newId,
         companyId,
         workspaceId,
         name: environmentDto.name,
         type: environmentDto.type,
-        hierarchy: hierarchyIds
-          ? { connect: hierarchyIds.map((id) => ({ id })) }
-          : undefined,
       },
       update: {
         ...environmentDto,
-        hierarchy: hierarchyIds
-          ? { set: hierarchyIds.map((id) => ({ id })) }
-          : undefined,
       },
     });
 

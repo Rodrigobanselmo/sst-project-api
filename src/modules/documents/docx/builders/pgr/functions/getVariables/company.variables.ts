@@ -8,6 +8,7 @@ export const companyVariables = (
   workspace: WorkspaceEntity,
   address: AddressEntity,
 ) => {
+  console.log('company?.employeeCount', company?.employeeCount);
   return {
     [VariablesPGREnum.COMPANY_CNAE]: company?.primary_activity
       ? `${company?.primary_activity[0].code} – ${company?.primary_activity[0].name}`
@@ -32,5 +33,7 @@ export const companyVariables = (
     [VariablesPGREnum.COMPANY_RESPONSIBLE]: company?.responsibleName || '',
     [VariablesPGREnum.WORKSPACE_CNPJ]: workspace?.cnpj || '',
     [VariablesPGREnum.IS_RS]: address?.state === 'RS' ? 'true' : '',
+    [VariablesPGREnum.COMPANY_EMPLOYEES_TOTAL]:
+      String(company?.employeeCount) || '',
   };
 };

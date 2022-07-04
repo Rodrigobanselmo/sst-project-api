@@ -1,4 +1,8 @@
-import { RiskFactorGroupDataEntity } from './../../../../../checklist/entities/riskGroupData.entity';
+import { CharacterizationEntity } from './../../../../../company/entities/characterization.entity';
+import {
+  CharacterizationTypeEnum,
+  CompanyEnvironmentTypesEnum,
+} from '@prisma/client';
 import { Paragraph, Table } from 'docx';
 
 import { RiskDocumentEntity } from '../../../../../checklist/entities/riskDocument.entity';
@@ -9,11 +13,25 @@ import {
   paragraphNormal,
   paragraphTableLegend,
 } from '../../../base/elements/paragraphs';
+import { measureHierarchyImage } from '../../../components/images/measureHierarch';
+import { rsDocumentImage } from '../../../components/images/rsDocument';
+import { characterizationIterable } from '../../../components/iterables/characterization/characterization.iterable';
 import { complementaryDocsIterable } from '../../../components/iterables/complementaryDocs/complementaryDocs.iterable';
+import { complementarySystemsIterable } from '../../../components/iterables/complementarySystems/complementarySystems.iterable';
 import { environmentIterable } from '../../../components/iterables/environments/environments.iterable';
 import { professionalsIterable } from '../../../components/iterables/professionals/professionals.iterable';
+import { hierarchyHomoOrgSection } from '../../../components/tables/hierarchyHomoOrg/hierarchyHomoOrg.section';
+import { hierarchyRisksTableAllSections } from '../../../components/tables/hierarchyRisks/hierarchyRisks.section';
+import { expositionDegreeTable } from '../../../components/tables/mock/components/expositionDegree/section/expositionDegreeTable';
 import { healthEffectTable } from '../../../components/tables/mock/components/healthSeverity/section/healthEffectTable';
+import { matrizTable } from '../../../components/tables/mock/components/matriz/table.component';
+import { quantityResultsTable } from '../../../components/tables/mock/components/quantityResults/section/quantityResultsTable';
+import { riskCharacterizationTableSection } from '../../../components/tables/riskCharacterization/riskCharacterization.section';
 import { versionControlTable } from '../../../components/tables/versionControl/versionControl.table';
+import {
+  HierarchyMapData,
+  IHomoGroupMap,
+} from '../../../converter/hierarchy.converter';
 import { convertToDocxHelper } from '../functions/convertToDocx';
 import {
   IBreak,
@@ -30,26 +48,13 @@ import {
   PGRSectionChildrenTypeEnum,
 } from '../types/elements.types';
 import { IDocVariables } from '../types/section.types';
+import { RiskFactorGroupDataEntity } from './../../../../../checklist/entities/riskGroupData.entity';
 import { EnvironmentEntity } from './../../../../../company/entities/environment.entity';
 import { ProfessionalEntity } from './../../../../../users/entities/professional.entity';
 import {
   paragraphFigure,
   paragraphTable,
 } from './../../../base/elements/paragraphs';
-import { expositionDegreeTable } from '../../../components/tables/mock/components/expositionDegree/section/expositionDegreeTable';
-import { matrizTable } from '../../../components/tables/mock/components/matriz/table.component';
-import { quantityResultsTable } from '../../../components/tables/mock/components/quantityResults/section/quantityResultsTable';
-import { measureHierarchyImage } from '../../../components/images/measureHierarch';
-import { rsDocumentImage } from '../../../components/images/rsDocument';
-import { complementarySystemsIterable } from '../../../components/iterables/complementarySystems/complementarySystems.iterable';
-import {
-  HierarchyMapData,
-  IHomoGroupMap,
-} from '../../../converter/hierarchy.converter';
-import { hierarchyHomoOrgSection } from '../../../components/tables/hierarchyHomoOrg/hierarchyHomoOrg.section';
-import { hierarchyRisksTableSections } from '../../../components/tables/hierarchyRisks/hierarchyRisks.section';
-import { HierarchyEnum } from '@prisma/client';
-import { riskCharacterizationTableSection } from '../../../components/tables/riskCharacterization/riskCharacterization.section';
 
 export type IMapElementDocumentType = Record<
   string,
@@ -64,6 +69,7 @@ type IDocumentClassType = {
   document: RiskFactorGroupDataEntity;
   homogeneousGroup: IHomoGroupMap;
   hierarchy: Map<string, HierarchyMapData>;
+  characterizations: CharacterizationEntity[];
 };
 
 export class ElementsMapClass {
@@ -72,6 +78,7 @@ export class ElementsMapClass {
   private professionals: ProfessionalEntity[];
   private document: RiskFactorGroupDataEntity;
   private environments: EnvironmentEntity[];
+  private characterizations: CharacterizationEntity[];
   private homogeneousGroup: IHomoGroupMap;
   private hierarchy: Map<string, HierarchyMapData>;
 
@@ -79,6 +86,7 @@ export class ElementsMapClass {
     variables,
     versions,
     professionals,
+    characterizations,
     environments,
     document,
     homogeneousGroup,
@@ -88,6 +96,7 @@ export class ElementsMapClass {
     this.versions = versions;
     this.professionals = professionals;
     this.environments = environments;
+    this.characterizations = characterizations;
     this.document = document;
     this.homogeneousGroup = homogeneousGroup;
     this.hierarchy = hierarchy;
@@ -119,10 +128,53 @@ export class ElementsMapClass {
     [PGRSectionChildrenTypeEnum.TABLE_VERSION_CONTROL]: () => [
       versionControlTable(this.versions),
     ],
-    [PGRSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS]: () =>
-      environmentIterable(this.environments, (x, v) =>
-        this.convertToDocx(x, v),
+    [PGRSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS_ADM]: () =>
+      environmentIterable(
+        this.environments.filter(
+          (e) => e.type === CompanyEnvironmentTypesEnum.ADMINISTRATIVE,
+        ),
+        (x, v) => this.convertToDocx(x, v),
       ),
+    [PGRSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS_OP]: () =>
+      environmentIterable(
+        this.environments.filter(
+          (e) => e.type === CompanyEnvironmentTypesEnum.OPERATION,
+        ),
+        (x, v) => this.convertToDocx(x, v),
+      ),
+    [PGRSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS_SUP]: () =>
+      environmentIterable(
+        this.environments.filter(
+          (e) => e.type === CompanyEnvironmentTypesEnum.SUPPORT,
+        ),
+        (x, v) => this.convertToDocx(x, v),
+      ),
+    [PGRSectionChildrenTypeEnum.ITERABLE_CHARACTERIZATION_WORKSTATION]: () =>
+      characterizationIterable(
+        this.characterizations.filter(
+          (e) => e.type === CharacterizationTypeEnum.WORKSTATION,
+        ),
+        (x, v) => this.convertToDocx(x, v),
+      ),
+    [PGRSectionChildrenTypeEnum.ITERABLE_CHARACTERIZATION_ACTIVIT]: () =>
+      characterizationIterable(
+        this.characterizations.filter(
+          (e) => e.type === CharacterizationTypeEnum.ACTIVITIES,
+        ),
+        (x, v) => this.convertToDocx(x, v),
+      ),
+    [PGRSectionChildrenTypeEnum.ITERABLE_CHARACTERIZATION_EQUIP]: () =>
+      characterizationIterable(
+        this.characterizations.filter(
+          (e) => e.type === CharacterizationTypeEnum.EQUIPMENT,
+        ),
+        (x, v) => this.convertToDocx(x, v),
+      ),
+    [PGRSectionChildrenTypeEnum.TABLE_GSE]: () =>
+      hierarchyHomoOrgSection(this.hierarchy, this.homogeneousGroup, {
+        showDescription: false,
+        showHomogeneous: true,
+      })['children'],
     [PGRSectionChildrenTypeEnum.BULLET]: ({ level, text }: IBullet) => [
       bulletsNormal(text, level),
     ],
@@ -159,13 +211,9 @@ export class ElementsMapClass {
     [PGRSectionChildrenTypeEnum.RISK_TABLE]: () =>
       riskCharacterizationTableSection(this.document)['children'],
     [PGRSectionChildrenTypeEnum.HIERARCHY_RISK_TABLE]: () =>
-      hierarchyRisksTableSections(this.document, this.hierarchy, {
-        hierarchyType: HierarchyEnum.SECTOR,
-      })
-        .map((s) => s['children'])
-        .reduce((acc, curr) => {
-          return [...acc, ...curr];
-        }, []),
+      hierarchyRisksTableAllSections(this.document, this.hierarchy, (x, v) =>
+        this.convertToDocx(x, v),
+      ),
   };
 
   private convertToDocx(

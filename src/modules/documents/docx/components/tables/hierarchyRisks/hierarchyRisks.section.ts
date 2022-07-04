@@ -1,8 +1,13 @@
 import { HierarchyEnum } from '@prisma/client';
-import { PageOrientation, Table, WidthType } from 'docx';
+import { PageOrientation, Paragraph, Table, WidthType } from 'docx';
 import { arrayChunks } from '../../../../../../shared/utils/arrayChunks';
 
 import { RiskFactorGroupDataEntity } from '../../../../../checklist/entities/riskGroupData.entity';
+import {
+  ISectionChildrenType,
+  PGRSectionChildrenTypeEnum,
+} from '../../../builders/pgr/types/elements.types';
+import { IDocVariables } from '../../../builders/pgr/types/section.types';
 import { IHierarchyData } from '../../../converter/hierarchy.converter';
 import { TableBodyElements } from './elements/body';
 import { TableHeaderElements } from './elements/header';
@@ -23,6 +28,10 @@ export const hierarchyRisksTableSections = (
     hierarchiesEntity,
     options,
   );
+
+  const noData = headerData.length == 1;
+
+  if (noData) return [];
 
   const tableHeaderElements = new TableHeaderElements();
   const tableBodyElements = new TableBodyElements();
@@ -68,4 +77,87 @@ export const hierarchyRisksTableSections = (
   }));
 
   return sections;
+};
+
+export const hierarchyRisksTableAllSections = (
+  riskFactorGroupData: RiskFactorGroupDataEntity,
+  hierarchiesEntity: IHierarchyData,
+  convertToDocx: (
+    data: ISectionChildrenType[],
+    variables?: IDocVariables,
+  ) => (Paragraph | Table)[],
+) => {
+  const table1 = convertToDocx([
+    {
+      type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE,
+      text: 'Relação de Fatores de Risco e Perigos por Diretorias da Empresa',
+    },
+    {
+      type: PGRSectionChildrenTypeEnum.BREAK,
+    },
+  ]);
+
+  const table2 = convertToDocx([
+    {
+      type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE,
+      text: 'Relação de Fatores de Risco e Perigos por Gerências da Empresa',
+    },
+    {
+      type: PGRSectionChildrenTypeEnum.BREAK,
+    },
+  ]);
+
+  const table3 = convertToDocx([
+    {
+      type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE,
+      text: 'Relação de Fatores de Risco e Perigos por Setores da Empresa',
+    },
+    {
+      type: PGRSectionChildrenTypeEnum.BREAK,
+    },
+  ]);
+
+  const table4 = convertToDocx([
+    {
+      type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE,
+      text: 'Relação de Fatores de Risco e Perigos por Sub Setores da Empresa',
+    },
+    {
+      type: PGRSectionChildrenTypeEnum.BREAK,
+    },
+  ]);
+
+  const allTables = [
+    [HierarchyEnum.DIRECTORY, table1],
+    [HierarchyEnum.MANAGEMENT, table2],
+    [HierarchyEnum.SECTOR, table3],
+    [HierarchyEnum.SUB_SECTOR, table4],
+  ].map(([type, tableConverted]) => {
+    const tableHeader = tableConverted as (Paragraph | Table)[];
+
+    const section = hierarchyRisksTableSections(
+      riskFactorGroupData,
+      hierarchiesEntity,
+      {
+        hierarchyType: type as any,
+      },
+    );
+
+    if (section.length === 0) return null;
+
+    const table = section
+      .map((s) => s['children'])
+      .reduce((acc, curr) => {
+        return [...acc, ...curr];
+      }, []);
+    tableHeader.splice(1, 0, table[0]);
+
+    return tableHeader;
+  });
+
+  return allTables
+    .filter((table) => table !== null)
+    .reduce((acc, curr) => {
+      return [...acc, ...curr];
+    }, []);
 };

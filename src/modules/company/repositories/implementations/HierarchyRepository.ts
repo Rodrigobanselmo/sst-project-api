@@ -73,6 +73,7 @@ export class HierarchyRepository {
           parentId,
           children,
           ghoName,
+          employeesIds,
           ...upsertHierarchy
         }) => {
           const HierarchyOnHomo = workspaceIds
@@ -92,6 +93,14 @@ export class HierarchyRepository {
               ...upsertHierarchy,
               id,
               company: { connect: { id: companyId } },
+              employees:
+                employeesIds && employeesIds.length
+                  ? {
+                      connect: employeesIds.map((id) => ({
+                        id_companyId: { companyId, id },
+                      })),
+                    }
+                  : undefined,
               workspaces: {
                 connect: workspaceIds.map((id) => ({
                   id_companyId: { companyId, id },
@@ -112,6 +121,14 @@ export class HierarchyRepository {
                       id_companyId: { companyId, id },
                     })),
                   },
+              employees:
+                employeesIds && employeesIds.length
+                  ? {
+                      connect: employeesIds.map((id) => ({
+                        id_companyId: { companyId, id },
+                      })),
+                    }
+                  : undefined,
               parent: !parentId
                 ? parentId === null
                   ? { disconnect: true }
@@ -150,6 +167,7 @@ export class HierarchyRepository {
       parentId,
       id,
       children,
+      employeesIds,
       ...updateHierarchy
     }: UpdateHierarchyDto,
     companyId: string,
@@ -165,6 +183,14 @@ export class HierarchyRepository {
                 id_companyId: { companyId, id },
               })),
             },
+        employees:
+          employeesIds && employeesIds.length
+            ? {
+                connect: employeesIds.map((id) => ({
+                  id_companyId: { companyId, id },
+                })),
+              }
+            : undefined,
         parent: !parentId
           ? undefined
           : {
@@ -185,6 +211,7 @@ export class HierarchyRepository {
       workspaceIds,
       parentId,
       children,
+      employeesIds,
       ...upsertHierarchy
     }: CreateHierarchyDto & { id?: string },
     companyId: string,
@@ -199,6 +226,14 @@ export class HierarchyRepository {
             id_companyId: { companyId, id },
           })),
         },
+        employees:
+          employeesIds && employeesIds.length
+            ? {
+                connect: employeesIds.map((id) => ({
+                  id_companyId: { companyId, id },
+                })),
+              }
+            : undefined,
         parent: parentId
           ? {
               connect: { id: parentId },
@@ -207,6 +242,14 @@ export class HierarchyRepository {
       },
       update: {
         ...upsertHierarchy,
+        employees:
+          employeesIds && employeesIds.length
+            ? {
+                connect: employeesIds.map((id) => ({
+                  id_companyId: { companyId, id },
+                })),
+              }
+            : undefined,
         workspaces: !workspaceIds
           ? undefined
           : {

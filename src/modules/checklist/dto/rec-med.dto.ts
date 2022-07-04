@@ -1,5 +1,5 @@
 import { PartialType } from '@nestjs/swagger';
-import { MeasuresTypeEnum, StatusEnum } from '@prisma/client';
+import { MeasuresTypeEnum, RecTypeEnum, StatusEnum } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
 
@@ -28,6 +28,14 @@ export class CreateRecMedDto {
     message: `type must be one of: ${KeysOfEnum(MeasuresTypeEnum)}`,
   })
   medType: MeasuresTypeEnum;
+
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsOptional()
+  @IsString()
+  @IsEnum(RecTypeEnum, {
+    message: `type must be one of: ${KeysOfEnum(RecTypeEnum)}`,
+  })
+  recType: RecTypeEnum;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsOptional()

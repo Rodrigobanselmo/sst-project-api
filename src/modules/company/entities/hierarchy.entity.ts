@@ -57,6 +57,7 @@ export class HierarchyEntity implements Hierarchy {
   employees?: EmployeeEntity[];
 
   workspaceIds?: string[];
+  parent?: Hierarchy;
   children?: Hierarchy[];
   workspaceId?: string;
 

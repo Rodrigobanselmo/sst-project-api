@@ -21,8 +21,10 @@ export const environmentIterable = (
   const environmentData = environmentsConverter(environments);
 
   const iterableSections = environmentData
-    .map(({ variables, elements }) => {
+    .map(({ variables, elements, risks, considerations: cons }) => {
       const parameters: ISectionChildrenType[] = [];
+      const riskFactors: ISectionChildrenType[] = [];
+      const considerations: ISectionChildrenType[] = [];
 
       if (variables[VariablesPGREnum.ENVIRONMENT_NOISE]) {
         parameters.push({
@@ -44,15 +46,65 @@ export const environmentIterable = (
         parameters.push({
           type: PGRSectionChildrenTypeEnum.BULLET,
           level: 0,
-          text: `Umidade do ar: ??${VariablesPGREnum.ENVIRONMENT_TEMPERATURE}??%`,
+          text: `Umidade do ar: ??${VariablesPGREnum.ENVIRONMENT_MOISTURE}??%`,
         });
       }
 
-      if (parameters.length)
+      if (variables[VariablesPGREnum.ENVIRONMENT_LUMINOSITY]) {
+        parameters.push({
+          type: PGRSectionChildrenTypeEnum.BULLET,
+          level: 0,
+          text: `Umidade do ar: ??${VariablesPGREnum.ENVIRONMENT_LUMINOSITY}??%`,
+        });
+      }
+
+      if (parameters.length) {
         parameters.unshift({
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: 'Parâmetros ambientais:',
+          text: '**Parâmetros ambientais:**',
         });
+
+        // if (cons.length)
+        //   parameters.push({
+        //     type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+        //     text: '',
+        //   });
+      }
+
+      risks.forEach((risk, index) => {
+        if (index === 0)
+          riskFactors.push({
+            type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+            text: '**Fatores de risco:**',
+          });
+
+        riskFactors.push({
+          type: PGRSectionChildrenTypeEnum.BULLET,
+          level: 0,
+          text: `${risk.name} (${risk.type})`,
+        });
+
+        if (index === risks.length - 1)
+          riskFactors.push({
+            type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+            text: '',
+            removeWithSomeEmptyVars: [VariablesPGREnum.ENVIRONMENT_DESCRIPTION],
+          });
+      });
+
+      cons.forEach((consideration, index) => {
+        if (index === 0)
+          considerations.push({
+            type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+            text: '**Considerações:**',
+          });
+
+        considerations.push({
+          type: PGRSectionChildrenTypeEnum.BULLET,
+          level: 0,
+          text: consideration,
+        });
+      });
 
       return [
         ...convertToDocx(
@@ -67,11 +119,16 @@ export const environmentIterable = (
         ...elements,
         ...convertToDocx(
           [
+            ...riskFactors,
             {
               type: PGRSectionChildrenTypeEnum.PARAGRAPH,
               text: `??${VariablesPGREnum.ENVIRONMENT_DESCRIPTION}??`,
+              removeWithSomeEmptyVars: [
+                VariablesPGREnum.ENVIRONMENT_DESCRIPTION,
+              ],
             },
             ...parameters,
+            ...considerations,
             {
               type: PGRSectionChildrenTypeEnum.PARAGRAPH,
               text: '',

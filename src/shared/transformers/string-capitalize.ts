@@ -3,7 +3,7 @@ import { TransformFnParams } from 'class-transformer';
 export const StringCapitalizeTransform = (data: TransformFnParams) => {
   const str = data.obj[data.key];
 
-  if (!str) return null;
+  if (str != '' && !str) return null;
 
   if (typeof str === 'string') {
     const ignore = ['de', 'da', 'das', 'do', 'dos', 'a', 'e', 'o'];

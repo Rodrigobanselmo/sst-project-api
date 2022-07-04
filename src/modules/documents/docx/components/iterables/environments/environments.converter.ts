@@ -9,12 +9,19 @@ import { VThreeImages } from '../../../base/elements/imagesLayout/vThreeImages';
 import { VTwoImages } from '../../../base/elements/imagesLayout/vTwoImages';
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
+import { RiskFactorsEntity } from './../../../../../checklist/entities/risk.entity';
+import { CharacterizationPhotoEntity } from './../../../../../company/entities/characterization-photo.entity';
 import { EnvironmentPhotoEntity } from './../../../../../company/entities/environment-photo.entity';
 import { EnvironmentEntity } from './../../../../../company/entities/environment.entity';
 
 export const environmentsConverter = (
   environments: EnvironmentEntity[],
-): { variables: IDocVariables; elements: ReturnType<typeof getLayouts> }[] => {
+): {
+  variables: IDocVariables;
+  elements: ReturnType<typeof getLayouts>;
+  risks: RiskFactorsEntity[];
+  considerations: string[];
+}[] => {
   return environments.map((environment) => {
     const imagesVertical = environment.photos.filter(
       (image) => image.isVertical,
@@ -30,17 +37,24 @@ export const environmentsConverter = (
       [VariablesPGREnum.ENVIRONMENT_DESCRIPTION]: environment.description || '',
       [VariablesPGREnum.ENVIRONMENT_NOISE]: environment.noiseValue || '',
       [VariablesPGREnum.ENVIRONMENT_TEMPERATURE]: environment.temperature || '',
+      [VariablesPGREnum.ENVIRONMENT_LUMINOSITY]: environment.luminosity || '',
       [VariablesPGREnum.ENVIRONMENT_MOISTURE]:
         environment.moisturePercentage || '',
     };
 
-    return { elements, variables };
+    const risks = environment.homogeneousGroup.riskFactorData.map(
+      (risk) => risk.riskFactor,
+    );
+
+    const considerations = environment.considerations;
+
+    return { elements, variables, risks, considerations };
   });
 };
 
-const getLayouts = (
-  vPhotos: EnvironmentPhotoEntity[],
-  hPhotos: EnvironmentPhotoEntity[],
+export const getLayouts = (
+  vPhotos: (EnvironmentPhotoEntity | CharacterizationPhotoEntity)[],
+  hPhotos: (EnvironmentPhotoEntity | CharacterizationPhotoEntity)[],
 ) => {
   const vLength = vPhotos.length;
   const hLength = hPhotos.length;
@@ -51,7 +65,10 @@ const getLayouts = (
 
   const layouts: (Table[] | Paragraph[])[] = [];
 
-  const vLayout = (vPhotos: EnvironmentPhotoEntity[], length: number) => {
+  const vLayout = (
+    vPhotos: (EnvironmentPhotoEntity | CharacterizationPhotoEntity)[],
+    length: number,
+  ) => {
     const hasDivider = layouts.length > 0;
 
     if (hasDivider) layouts.push([ImageDivider()]);
@@ -91,8 +108,8 @@ const getLayouts = (
   };
 
   const hLayout = (
-    hPhotos: EnvironmentPhotoEntity[],
-    vPhotos: EnvironmentPhotoEntity[],
+    hPhotos: (EnvironmentPhotoEntity | CharacterizationPhotoEntity)[],
+    vPhotos: (EnvironmentPhotoEntity | CharacterizationPhotoEntity)[],
     hLength: number,
   ) => {
     const hasDivider = layouts.length > 0;

@@ -47,13 +47,34 @@ export class PgrUploadService {
     // eslint-disable-next-line prettier/prettier
     const versions = await this.riskDocumentRepository.findByRiskGroupAndCompany(upsertPgrDto.riskGroupId, companyId);
     const workspace = await this.workspaceRepository.findById(workspaceId);
-    const company = await this.companyRepository.findByIdAll(companyId, {
-      include: {
-        address: true,
-        environments: { include: { photos: true } },
-        professionals: true,
+    const company = await this.companyRepository.findByIdAll(
+      companyId,
+      workspaceId,
+      {
+        include: {
+          address: true,
+          environments: {
+            include: {
+              photos: true,
+              homogeneousGroup: {
+                include: { riskFactorData: { include: { riskFactor: true } } },
+              },
+            },
+            where: { workspaceId },
+          },
+          characterization: {
+            include: {
+              photos: true,
+              homogeneousGroup: {
+                include: { riskFactorData: { include: { riskFactor: true } } },
+              },
+            },
+            where: { workspaceId },
+          },
+          professionals: true,
+        },
       },
-    });
+    );
 
     const logo = company.logoUrl
       ? await downloadImageFile(
@@ -66,8 +87,10 @@ export class PgrUploadService {
     // const dimensions = sizeOf(logo);
     // console.log(dimensions.width, dimensions.height);
 
-    const { environments, photosPath } = await this.downloadPhotos(company);
+    const { environments, characterizations, photosPath } =
+      await this.downloadPhotos(company);
     // const environments = [];
+    // const characterizations = [];
     // const photosPath = [];
 
     const hierarchyHierarchy =
@@ -102,6 +125,7 @@ export class PgrUploadService {
       environments,
       hierarchy: hierarchyData,
       homogeneousGroup: homoGroupTree,
+      characterizations,
     }).build();
 
     // const sections: ISectionOptions[] = [
@@ -166,7 +190,24 @@ export class PgrUploadService {
           return { ...environment, photos };
         }),
       );
-      return { environments, photosPath };
+
+      const characterizations = await Promise.all(
+        company.characterization.map(async (environment) => {
+          const photos = await Promise.all(
+            environment.photos.map(async (photo) => {
+              const path = await downloadImageFile(
+                photo.photoUrl,
+                `tmp/${v4()}.${getExtensionFromUrl(photo.photoUrl)}`,
+              );
+              photosPath.push(path);
+              return { ...photo, photoUrl: path };
+            }),
+          );
+
+          return { ...environment, photos };
+        }),
+      );
+      return { environments, characterizations, photosPath };
     } catch (error) {
       photosPath.forEach((path) => fs.unlinkSync(path));
 

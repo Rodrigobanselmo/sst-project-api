@@ -4,6 +4,7 @@ import {
   CompanyEnvironmentTypesEnum,
 } from '@prisma/client';
 import { EnvironmentPhotoEntity } from './environment-photo.entity';
+import { HomoGroupEntity } from './homoGroup.entity';
 
 import { WorkspaceEntity } from './workspace.entity';
 
@@ -35,9 +36,14 @@ export class EnvironmentEntity implements CompanyEnvironment {
   @ApiProperty({ description: 'The photos related to the company environment' })
   photos?: EnvironmentPhotoEntity[];
 
+  @ApiProperty({ description: 'The group of the environment' })
+  homogeneousGroup?: HomoGroupEntity;
+
   noiseValue: string;
   temperature: string;
   moisturePercentage: string;
+  considerations: string[];
+  luminosity: string;
   deleted_at: Date;
   updated_at: Date;
   workspaceId: string;

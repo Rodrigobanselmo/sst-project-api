@@ -1,3 +1,4 @@
+import { CharacterizationEntity } from './../../../../../company/entities/characterization.entity';
 import { EnvironmentEntity } from './../../../../../company/entities/environment.entity';
 import { RiskDocumentEntity } from '../../../../../checklist/entities/riskDocument.entity';
 import { CompanyEntity } from '../../../../../company/entities/company.entity';
@@ -18,4 +19,5 @@ export interface ICreatePGR {
   document: RiskFactorGroupDataEntity;
   homogeneousGroup: IHomoGroupMap;
   hierarchy: Map<string, HierarchyMapData>;
+  characterizations: CharacterizationEntity[];
 }

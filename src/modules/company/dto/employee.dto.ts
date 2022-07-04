@@ -1,5 +1,5 @@
 import { PartialType } from '@nestjs/swagger';
-import { StatusEnum } from '@prisma/client';
+import { HierarchyEnum, StatusEnum } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import {
   IsEnum,
@@ -9,6 +9,7 @@ import {
   Length,
   MaxLength,
 } from 'class-validator';
+import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
 import { CpfFormatTransform } from '../../../shared/transformers/cpf-format.transform';
 
 import { StringCapitalizeTransform } from '../../../shared/transformers/string-capitalize';
@@ -16,7 +17,7 @@ import { StringUppercaseTransform } from '../../../shared/transformers/string-up
 
 export class CreateEmployeeDto {
   @Transform(CpfFormatTransform, { toClassOnly: true })
-  @Length(14, 14, { message: 'invalid CPF' })
+  @Length(11, 11, { message: 'invalid CPF' })
   cpf: string;
 
   @Transform(StringCapitalizeTransform, { toClassOnly: true })
@@ -36,9 +37,10 @@ export class CreateEmployeeDto {
   companyId: string;
 
   @IsString({ each: true })
+  @IsOptional()
   workspaceIds: string[];
 
-  @IsNumber()
+  @IsString()
   hierarchyId: string;
 }
 
@@ -49,4 +51,26 @@ export class UpdateEmployeeDto extends PartialType(CreateEmployeeDto) {
 
   @IsString()
   companyId: string;
+}
+
+export class FindEmployeeDto extends PaginationQueryDto {
+  @IsString()
+  @IsOptional()
+  search?: string;
+
+  @IsString()
+  @IsOptional()
+  name?: string;
+
+  @IsString()
+  @IsOptional()
+  cpf?: string;
+
+  @IsString()
+  @IsOptional()
+  companyId?: string;
+
+  @IsString()
+  @IsOptional()
+  hierarchyId?: string;
 }

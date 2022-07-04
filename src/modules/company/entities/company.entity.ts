@@ -8,6 +8,7 @@ import { LicenseEntity } from './license.entity';
 import { WorkspaceEntity } from './workspace.entity';
 import { EnvironmentEntity } from './environment.entity';
 import { ActivityEntity } from './activity.entity';
+import { CharacterizationEntity } from './characterization.entity';
 
 export class CompanyEntity implements Company {
   @ApiProperty({ description: 'The id of the Company' })
@@ -73,6 +74,7 @@ export class CompanyEntity implements Company {
   primary_activity?: ActivityEntity[];
   secondary_activity?: ActivityEntity[];
   environments?: EnvironmentEntity[];
+  characterization?: CharacterizationEntity[];
   professionals?: ProfessionalEntity[];
   email: string;
   riskDegree: number;
@@ -91,6 +93,7 @@ export class CompanyEntity implements Company {
   cadastral_situation_description: string;
   employeeCount?: number;
   riskGroupCount?: number;
+  hierarchyCount?: number;
   shortName: string;
   operationTime: string;
 

@@ -51,38 +51,42 @@ export const seedEmployees = async (
     ],
   });
 
-  await prisma.company.update({
-    where: { id: companyId },
-    include: { employees: true },
-    data: {
-      employees: {
-        create: [
-          {
-            cpf: '123456789',
-            name: 'Alex Abreu Marins',
-            workspace: {
-              connect: {
-                id_companyId: { companyId: companyId, id: workId },
+  try {
+    await prisma.company.update({
+      where: { id: companyId },
+      include: { employees: true },
+      data: {
+        employees: {
+          create: [
+            {
+              cpf: '1234567894',
+              name: 'Alex Abreu Marins',
+              workspaces: {
+                connect: {
+                  id_companyId: { companyId: companyId, id: workId },
+                },
+              },
+              hierarchy: {
+                connect: { id: 'f' },
               },
             },
-            hierarchy: {
-              connect: { id: 'f' },
-            },
-          },
-          {
-            cpf: '123456789',
-            name: 'Rodrigo Barbosa Anselmo',
-            workspace: {
-              connect: {
-                id_companyId: { companyId: companyId, id: workId },
+            {
+              cpf: '1234567892',
+              name: 'Rodrigo Barbosa Anselmo',
+              workspaces: {
+                connect: {
+                  id_companyId: { companyId: companyId, id: workId },
+                },
+              },
+              hierarchy: {
+                connect: { id: 'e' },
               },
             },
-            hierarchy: {
-              connect: { id: 'e' },
-            },
-          },
-        ],
+          ],
+        },
       },
-    },
-  });
+    });
+  } catch (error) {
+    console.log(error);
+  }
 };

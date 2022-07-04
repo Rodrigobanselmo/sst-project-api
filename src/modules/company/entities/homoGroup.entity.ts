@@ -1,3 +1,4 @@
+import { RiskFactorDataEntity } from './../../checklist/entities/riskData.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import {
   HierarchyOnHomogeneous,
@@ -40,6 +41,7 @@ export class HomoGroupEntity implements HomogeneousGroup {
   type: HomoTypeEnum;
   workspaceId?: string;
   workspaceIds?: string[];
+  riskFactorData?: RiskFactorDataEntity[];
 
   employeeCount?: number;
 

@@ -17,32 +17,38 @@ import { document } from './1.9.2-document';
 import { available } from './1.9.3-avaliation';
 import { environmentSection } from './2.0-envronment';
 import { employeeSection } from './2.1-employee';
+import { characterizationSection } from './2.1.1-characterization';
 import { riskFactorsSection } from './2.2-riskFactors';
 import { riskFactors2Section } from './2.3-riskFactors';
 import { riskFactors3Section } from './2.4-riskFactors';
+import { gseSection } from './2.5-gse';
+import { gse2Section } from './2.5.1-gse';
 
 export const docPGRSections: IDocumentPGRSectionGroups = {
   sections: [
-    // testSection,
-    initSection,
-    definitionsSection,
-    definitions2Section,
-    developmentSection,
-    complementsSection,
-    mvvSection,
-    organizationSection,
-    organization2Section,
-    qualityEvaluation,
-    prioritization,
-    investigation,
-    rs,
-    document,
-    available,
-    environmentSection,
-    employeeSection,
-    riskFactorsSection,
-    riskFactors2Section,
-    riskFactors3Section,
+    // // testSection,
+    // initSection,
+    // definitionsSection,
+    // definitions2Section,
+    // developmentSection,
+    // complementsSection,
+    // mvvSection,
+    // organizationSection,
+    // organization2Section,
+    // qualityEvaluation,
+    // prioritization,
+    // investigation,
+    // rs,
+    // document,
+    // available,
+    // environmentSection,
+    // employeeSection,
+    // characterizationSection,
+    gseSection,
+    gse2Section,
+    // riskFactorsSection,
+    // riskFactors2Section,
+    // riskFactors3Section,
   ],
   variables: {
     [VariablesPGREnum.CHAPTER_1]: 'PARTE 01 – DOCUMENTO BASE',

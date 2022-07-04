@@ -1,11 +1,18 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { IPrismaOptions } from '../../../../shared/interfaces/prisma-options.types';
 import { transformStringToObject } from '../../../../shared/utils/transformStringToObject';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
-import { CreateEmployeeDto, UpdateEmployeeDto } from '../../dto/employee.dto';
+import {
+  CreateEmployeeDto,
+  FindEmployeeDto,
+  UpdateEmployeeDto,
+} from '../../dto/employee.dto';
 import { EmployeeEntity } from '../../entities/employee.entity';
+import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
+import { Prisma } from '@prisma/client';
+import { ErrorCompanyEnum } from '../../../../shared/constants/enum/errorMessage';
 
 @Injectable()
 export class EmployeeRepository {
@@ -17,22 +24,35 @@ export class EmployeeRepository {
     companyId,
     ...createCompanyDto
   }: CreateEmployeeDto): Promise<EmployeeEntity> {
-    const employee = await this.prisma.employee.create({
-      data: {
-        ...createCompanyDto,
-        company: { connect: { id: companyId } },
-        workspaces: {
-          connect: workspaceIds.map((id) => ({
-            id_companyId: { companyId, id },
-          })),
-        },
-        hierarchy: {
-          connect: { id: hierarchyId },
-        },
-      },
+    const hierarchy = await this.prisma.hierarchy.findUnique({
+      where: { id: hierarchyId },
+      include: { workspaces: true },
     });
 
-    return new EmployeeEntity(employee);
+    try {
+      const employee = await this.prisma.employee.create({
+        data: {
+          ...createCompanyDto,
+          company: { connect: { id: companyId } },
+          workspaces:
+            hierarchy.workspaces.length > 0
+              ? {
+                  connect: hierarchy.workspaces.map((workspace) => ({
+                    id_companyId: { companyId, id: workspace.id },
+                  })),
+                }
+              : undefined,
+          hierarchy: {
+            connect: { id: hierarchyId },
+          },
+        },
+      });
+      return new EmployeeEntity(employee);
+    } catch (error) {
+      if (error.code == 'P2002')
+        throw new ConflictException(ErrorCompanyEnum.CPF_CONFLICT);
+      throw new Error(error);
+    }
   }
 
   async update({
@@ -42,16 +62,24 @@ export class EmployeeRepository {
     id,
     ...createCompanyDto
   }: UpdateEmployeeDto): Promise<EmployeeEntity> {
+    const hierarchy = hierarchyId
+      ? await this.prisma.hierarchy.findUnique({
+          where: { id: hierarchyId },
+          include: { workspaces: true },
+        })
+      : undefined;
+
     const employee = await this.prisma.employee.update({
       data: {
         ...createCompanyDto,
-        workspaces: !workspaceIds
-          ? undefined
-          : {
-              set: workspaceIds.map((id) => ({
-                id_companyId: { companyId, id },
-              })),
-            },
+        workspaces:
+          hierarchy && hierarchy.workspaces.length > 0
+            ? {
+                connect: hierarchy.workspaces.map((workspace) => ({
+                  id_companyId: { companyId, id: workspace.id },
+                })),
+              }
+            : undefined,
         hierarchy: !hierarchyId
           ? undefined
           : {
@@ -141,27 +169,42 @@ export class EmployeeRepository {
   }
 
   async findAllByCompany(
-    companyId: string,
-    options?: IPrismaOptions<{ hierarchy?: boolean }>,
-  ): Promise<EmployeeEntity[]> {
-    const include = options?.include || {};
+    query: Partial<FindEmployeeDto>,
+    pagination: PaginationQueryDto,
+    options: Prisma.EmployeeFindManyArgs = {},
+  ) {
+    const where = {} as Prisma.EmployeeFindManyArgs['where'];
 
-    const employees = await this.prisma.employee.findMany({
-      where: { companyId },
-      include: {
-        hierarchy: include?.hierarchy
-          ? {
-              ...transformStringToObject(
-                Array.from({ length: 6 })
-                  .map(() => 'include.parent')
-                  .join('.'),
-                true,
-              ),
-            }
-          : false,
-      },
+    if ('search' in query) {
+      where.OR = [
+        { name: { contains: query.search } },
+        { cpf: { contains: query.search } },
+      ];
+      delete query.search;
+    }
+
+    Object.entries(query).forEach(([key, value]) => {
+      if (value)
+        where[key] = {
+          contains: value,
+        };
     });
 
-    return employees.map((employee) => new EmployeeEntity(employee));
+    const response = await this.prisma.$transaction([
+      this.prisma.employee.count({
+        where,
+      }),
+      this.prisma.employee.findMany({
+        ...options,
+        where,
+        take: pagination.take || 20,
+        skip: pagination.skip || 0,
+      }),
+    ]);
+
+    return {
+      data: response[1].map((employee) => new EmployeeEntity(employee)),
+      count: response[0],
+    };
   }
 }

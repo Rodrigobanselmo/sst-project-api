@@ -10,6 +10,7 @@ export enum ErrorCompanyEnum {
   GHO_NOT_FOUND = 'O GHO informado não foi encontrado nesta empresa',
   HOMOGENEOUS_SAME_NAME = 'Já existe um grupo homogêneo com o mesmo nome',
   WORKSPACE_NOT_FOUND = 'O Estabelecimento (área de trabalho) informada não foi encontrada, verifique a sigla utilizada',
+  CPF_CONFLICT = 'CPF já cadastrado',
 }
 
 export enum ErrorInvitesEnum {
