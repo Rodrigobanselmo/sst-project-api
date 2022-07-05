@@ -24,7 +24,7 @@ export class UpsertEnvironmentService {
     files: Array<Express.Multer.File>,
   ) {
     const companyId = userPayloadDto.targetCompanyId;
-    console.log(upsertEnvironmentDto);
+
     const environment = await this.environmentRepository.upsert({
       ...upsertEnvironmentDto,
       companyId,

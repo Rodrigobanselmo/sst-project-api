@@ -25,9 +25,11 @@ import { FindAllByCompanyService } from './services/users/find-all/find-all.serv
 import { FindAllByCompanyIdService } from './services/invites/find-by-companyId/find-by-companyId.service';
 import { FindAllByEmailService } from './services/invites/find-by-email/find-by-email.service';
 import { ProfessionalRepository } from './repositories/implementations/ProfessionalRepository';
+import { FindAllProfessionalsByCompanyService } from './services/professionals/find-all/find-all.service';
+import { ProfessionalsController } from './controller/professionals/professionals.controller';
 
 @Module({
-  controllers: [UsersController, InvitesController],
+  controllers: [UsersController, InvitesController, ProfessionalsController],
   imports: [forwardRef(() => AuthModule)],
   providers: [
     HashProvider,
@@ -52,6 +54,7 @@ import { ProfessionalRepository } from './repositories/implementations/Professio
     UpdatePermissionsRolesService,
     FindAllByEmailService,
     ProfessionalRepository,
+    FindAllProfessionalsByCompanyService,
   ],
   exports: [UsersRepository, ProfessionalRepository],
 })

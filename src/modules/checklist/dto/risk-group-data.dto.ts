@@ -1,6 +1,6 @@
 import { StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
-import { IsDate, IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsDate, IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
 import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
 import { DateFormat } from '../../../shared/transformers/date-format';
 import { StringCapitalizeTransform } from '../../../shared/transformers/string-capitalize';
@@ -14,6 +14,7 @@ export class UpsertRiskGroupDataDto {
   id?: string;
 
   @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
+  @IsOptional()
   @IsString()
   name: string;
 
@@ -49,19 +50,46 @@ export class UpsertRiskGroupDataDto {
   @IsString()
   revisionBy: string;
 
+  @Transform(StringCapitalizeTransform, { toClassOnly: true })
+  @IsOptional()
+  @IsString()
+  coordinatorBy: string;
+
   @IsOptional()
   @IsString()
   workspaceId: string;
 
-  @Transform(DateFormat, { toClassOnly: true })
   @IsOptional()
-  @IsDate()
-  @Type(() => Date)
-  documentDate: Date;
+  @IsString({ each: true })
+  professionalsIds: string[];
+
+  @IsOptional()
+  @IsInt({ each: true })
+  usersIds: number[];
+
+  @IsOptional()
+  @IsString({ each: true })
+  complementarySystems: string[];
+
+  @IsOptional()
+  @IsString({ each: true })
+  complementaryDocs: string[];
 
   @Transform(DateFormat, { toClassOnly: true })
   @IsOptional()
   @IsDate()
   @Type(() => Date)
   visitDate: Date;
+
+  @Transform(DateFormat, { toClassOnly: true })
+  @IsOptional()
+  @IsDate()
+  @Type(() => Date)
+  validityEnd?: Date;
+
+  @Transform(DateFormat, { toClassOnly: true })
+  @IsOptional()
+  @IsDate()
+  @Type(() => Date)
+  validityStart?: Date;
 }

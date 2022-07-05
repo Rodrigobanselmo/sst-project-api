@@ -42,6 +42,26 @@ export const environmentSection: IDocumentPGRSectionGroup = {
           text: 'Nos ambientes administrativos são executadas atividades diversas pouco relacionadas com riscos físicos, químicos e biológicos, mas é possível encontrar alguns fatores de riscos ergonômicos e até mesmo de acidentes, no entanto de baixa severidade.',
         },
         {
+          type: PGRSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS_GENERAL,
+          removeWithSomeEmptyVars: [
+            VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_GENERAL,
+          ],
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.BREAK,
+          removeWithSomeEmptyVars: [
+            VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_GENERAL,
+          ],
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.H2,
+          text: 'Ambientes Administrativos',
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          text: 'Nos ambientes administrativos são executadas atividades diversas pouco relacionadas com riscos físicos, químicos e biológicos, mas é possível encontrar alguns fatores de riscos ergonômicos e até mesmo de acidentes, no entanto de baixa severidade.',
+        },
+        {
           type: PGRSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS_ADM,
           removeWithSomeEmptyVars: [
             VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_ADM,

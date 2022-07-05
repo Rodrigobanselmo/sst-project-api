@@ -22,7 +22,6 @@ import { emergencyIterable } from '../../../components/iterables/emergency/emerg
 import { environmentIterable } from '../../../components/iterables/environments/environments.iterable';
 import { professionalsIterable } from '../../../components/iterables/professionals/professionals.iterable';
 import { recommendationsIterable } from '../../../components/iterables/recommendations/recommendations.iterable';
-import { actionPlanTableSection } from '../../../components/tables/actionPlan/actionPlan.section';
 import { APPRTableSection } from '../../../components/tables/appr/appr.section';
 import { hierarchyHomoOrgSection } from '../../../components/tables/hierarchyHomoOrg/hierarchyHomoOrg.section';
 import { hierarchyPrioritizationPage } from '../../../components/tables/hierarchyPrioritization/hierarchyPrioritization.page';
@@ -58,6 +57,7 @@ import { RiskFactorGroupDataEntity } from './../../../../../checklist/entities/r
 import { CharacterizationEntity } from './../../../../../company/entities/characterization.entity';
 import { EnvironmentEntity } from './../../../../../company/entities/environment.entity';
 import { ProfessionalEntity } from './../../../../../users/entities/professional.entity';
+import { UserEntity } from './../../../../../users/entities/user.entity';
 import {
   paragraphFigure,
   paragraphTable,
@@ -71,7 +71,7 @@ export type IMapElementDocumentType = Record<
 type IDocumentClassType = {
   variables: IDocVariables;
   versions: RiskDocumentEntity[];
-  professionals: ProfessionalEntity[];
+  professionals: (ProfessionalEntity | UserEntity)[];
   environments: EnvironmentEntity[];
   document: RiskFactorGroupDataEntity;
   homogeneousGroup: IHomoGroupMap;
@@ -83,7 +83,7 @@ type IDocumentClassType = {
 export class ElementsMapClass {
   private variables: IDocVariables;
   private versions: RiskDocumentEntity[];
-  private professionals: ProfessionalEntity[];
+  private professionals: (ProfessionalEntity | UserEntity)[];
   private environments: EnvironmentEntity[];
   private characterizations: CharacterizationEntity[];
   private document: RiskFactorGroupDataEntity;
@@ -139,6 +139,13 @@ export class ElementsMapClass {
     [PGRSectionChildrenTypeEnum.TABLE_VERSION_CONTROL]: () => [
       versionControlTable(this.versions),
     ],
+    [PGRSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS_GENERAL]: () =>
+      environmentIterable(
+        this.environments.filter(
+          (e) => e.type === CompanyEnvironmentTypesEnum.GENERAL,
+        ),
+        (x, v) => this.convertToDocx(x, v),
+      ),
     [PGRSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS_ADM]: () =>
       environmentIterable(
         this.environments.filter(

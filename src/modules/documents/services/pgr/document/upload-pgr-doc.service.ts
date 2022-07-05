@@ -162,10 +162,7 @@ export class PgrUploadService {
         ...upsertPgrDto,
         companyId: company.id,
         fileUrl: url,
-        attachments: [
-          { name: 'Plano de ', url: actionPlanUrl },
-          { name: 'APR', url: urlAPR },
-        ],
+        attachments: attachments,
       });
 
       // return doc;

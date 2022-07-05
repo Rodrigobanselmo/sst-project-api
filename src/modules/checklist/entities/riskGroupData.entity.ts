@@ -6,6 +6,7 @@ import { CompanyEntity } from '../../../modules/company/entities/company.entity'
 import { RiskFactorDataEntity } from './riskData.entity';
 import { ProfessionalEntity } from '../../../modules/users/entities/professional.entity';
 import { UserEntity } from '../../../modules/users/entities/user.entity';
+import { dayjs } from 'src/shared/providers/DateProvider/implementations/DayJSProvider';
 
 export class RiskFactorGroupDataEntity implements RiskFactorGroupData {
   @ApiProperty({ description: 'The id of the risk group data' })
@@ -36,8 +37,6 @@ export class RiskFactorGroupDataEntity implements RiskFactorGroupData {
   })
   company?: Partial<CompanyEntity>;
 
-  professionals?: ProfessionalEntity[];
-  users?: UserEntity[];
   workspaceId: string;
   source: string | null;
   elaboratedBy: string | null;
@@ -49,8 +48,18 @@ export class RiskFactorGroupDataEntity implements RiskFactorGroupData {
   complementarySystems: string[];
   complementaryDocs: string[];
   coordinatorBy: string;
+  validityEnd: Date;
+  validityStart: Date;
+  professionals?: ProfessionalEntity[];
+  users?: UserEntity[];
 
   constructor(partial: Partial<RiskFactorGroupDataEntity>) {
     Object.assign(this, partial);
+    if (this.validityStart && this.validityEnd) {
+      this.validity =
+        dayjs(this.validityStart).format('MM/YYYY') +
+        ' a ' +
+        dayjs(this.validityEnd).format('MM/YYYY');
+    }
   }
 }

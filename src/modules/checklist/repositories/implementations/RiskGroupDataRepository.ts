@@ -4,7 +4,6 @@ import { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { UpsertRiskGroupDataDto } from '../../dto/risk-group-data.dto';
-import { RiskFactorDataEntity } from '../../entities/riskData.entity';
 import { RiskFactorGroupDataEntity } from '../../entities/riskGroupData.entity';
 
 @Injectable()
@@ -13,6 +12,8 @@ export class RiskGroupDataRepository {
   async upsert({
     companyId,
     id,
+    professionalsIds,
+    usersIds,
     ...createDto
   }: UpsertRiskGroupDataDto): Promise<RiskFactorGroupDataEntity> {
     const riskFactorGroupDataEntity =
@@ -20,10 +21,22 @@ export class RiskGroupDataRepository {
         create: {
           ...createDto,
           companyId,
+          users: usersIds
+            ? { connect: usersIds.map((user) => ({ id: user })) }
+            : undefined,
+          professionals: professionalsIds
+            ? { connect: professionalsIds.map((prof) => ({ id: prof })) }
+            : undefined,
         },
         update: {
           ...createDto,
           companyId,
+          users: usersIds
+            ? { connect: usersIds.map((user) => ({ id: user })) }
+            : undefined,
+          professionals: professionalsIds
+            ? { connect: professionalsIds.map((prof) => ({ id: prof })) }
+            : undefined,
         },
         where: { id_companyId: { companyId, id: id || 'not-found' } },
       });
@@ -72,6 +85,8 @@ export class RiskGroupDataRepository {
         where: { id_companyId: { id, companyId } },
         include: {
           company: true,
+          professionals: true,
+          users: true,
           data: {
             include: {
               adms: true,

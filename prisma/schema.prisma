@@ -14,6 +14,7 @@ enum CompanyTypesEnum {
 }
 
 enum CompanyEnvironmentTypesEnum {
+  GENERAL
   SUPPORT
   OPERATION
   ADMINISTRATIVE
@@ -539,6 +540,8 @@ model RiskFactorGroupData {
   approvedBy String?
   validity String?
   visitDate DateTime?
+  validityStart DateTime?
+  validityEnd DateTime?
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   data RiskFactorData[]
   docs RiskFactorDocument[]

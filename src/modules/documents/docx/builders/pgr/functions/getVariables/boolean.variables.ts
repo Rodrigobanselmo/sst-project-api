@@ -16,6 +16,12 @@ export const booleanVariables = (
   document: RiskFactorGroupDataEntity,
 ) => {
   return {
+    [VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_GENERAL]:
+      company.environments.find(
+        (env) => env.type === CompanyEnvironmentTypesEnum.GENERAL,
+      )
+        ? 'true'
+        : '',
     [VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_ADM]: company.environments.find(
       (env) => env.type === CompanyEnvironmentTypesEnum.ADMINISTRATIVE,
     )

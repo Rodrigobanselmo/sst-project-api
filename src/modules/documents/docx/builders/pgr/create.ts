@@ -108,7 +108,10 @@ export class DocumentBuildPGR {
     const elementsMap = new ElementsMapClass({
       versions: this.versions,
       variables: this.variables,
-      professionals: this.company?.professionals ?? [],
+      professionals: [
+        ...(this.document?.professionals || []),
+        ...(this.document?.users || []),
+      ],
       environments: this.environments ?? [],
       characterizations: this.characterizations ?? [],
       document: this.document,

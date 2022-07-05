@@ -5,6 +5,9 @@ import {
 } from '@prisma/client';
 
 export const originRiskMap: Record<string, { name: string }> = {
+  [CompanyEnvironmentTypesEnum.GENERAL]: {
+    name: 'Visão Geral',
+  },
   [CompanyEnvironmentTypesEnum.ADMINISTRATIVE]: {
     name: 'Ambiente Administrativo',
   },

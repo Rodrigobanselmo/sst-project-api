@@ -16,6 +16,7 @@ export enum PGRSectionChildrenTypeEnum {
   ITERABLE_ENVIRONMENTS_ADM = 'ITERABLE_ENVIRONMENTS',
   ITERABLE_ENVIRONMENTS_OP = 'ITERABLE_ENVIRONMENTS_OP',
   ITERABLE_ENVIRONMENTS_SUP = 'ITERABLE_ENVIRONMENTS_SUP',
+  ITERABLE_ENVIRONMENTS_GENERAL = 'ITERABLE_ENVIRONMENTS_GENERAL',
   ITERABLE_CHARACTERIZATION_EQUIP = 'ITERABLE_CHARACTERIZATION_EQUIP',
   ITERABLE_CHARACTERIZATION_ACTIVIT = 'ITERABLE_CHARACTERIZATION_ACTIVIT',
   ITERABLE_CHARACTERIZATION_WORKSTATION = 'ITERABLE_CHARACTERIZATION_WORKSTATION',
@@ -131,6 +132,10 @@ export type ITableVersionControl = {
 
 export type IEnvironmentsAdm = {
   type: PGRSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS_ADM;
+} & IBase;
+
+export type IEnvironmentsGeneral = {
+  type: PGRSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS_GENERAL;
 } & IBase;
 
 export type IEnvironmentsOp = {
@@ -257,6 +262,7 @@ export type ISectionChildrenType =
   | IEnvironmentsAdm
   | IEnvironmentsSup
   | IEnvironmentsOp
+  | IEnvironmentsGeneral
   | ICharacterizationEquip
   | ICharacterizationActivity
   | ICharacterizationWork

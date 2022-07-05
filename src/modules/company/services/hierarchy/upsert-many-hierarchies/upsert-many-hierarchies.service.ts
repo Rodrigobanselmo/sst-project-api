@@ -34,8 +34,6 @@ export class UpsertManyHierarchyService {
       }
     });
 
-    console.log(hierarchies);
-
     const allHierarchy = await this.hierarchyRepository.upsertMany(
       hierarchies as any,
       user.targetCompanyId,

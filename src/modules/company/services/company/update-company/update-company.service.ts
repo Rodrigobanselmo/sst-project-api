@@ -12,7 +12,6 @@ export class UpdateCompanyService {
   ) {}
 
   async execute(updateCompanyDto: UpdateCompanyDto) {
-    console.log(updateCompanyDto);
     const newWorkspaces = [] as WorkspaceDto[];
 
     if (updateCompanyDto.workspace && updateCompanyDto.workspace.length > 0) {
