@@ -19,7 +19,10 @@ export enum PGRSectionChildrenTypeEnum {
   ITERABLE_CHARACTERIZATION_EQUIP = 'ITERABLE_CHARACTERIZATION_EQUIP',
   ITERABLE_CHARACTERIZATION_ACTIVIT = 'ITERABLE_CHARACTERIZATION_ACTIVIT',
   ITERABLE_CHARACTERIZATION_WORKSTATION = 'ITERABLE_CHARACTERIZATION_WORKSTATION',
+  ITERABLE_RECOMMENDATIONS = 'ITERABLE_RECOMMENDATIONS',
+  ITERABLE_EMERGENCY_RISKS = 'ITERABLE_EMERGENCY_RISKS',
   TABLE_GSE = 'TABLE_GSE',
+  TABLE_PRIORITIZATION = 'TABLE_PRIORITIZATION',
   HIERARCHY_RISK_TABLE = 'HIERARCHY_RISK_TABLE',
   RISK_TABLE = 'RISK_TABLE',
   PARAGRAPH_TABLE = 'PARAGRAPH_TABLE',
@@ -35,6 +38,9 @@ export enum PGRSectionChildrenTypeEnum {
   HIERARCHY_ORG_TABLE = 'HIERARCHY_ORG_TABLE',
   QUANTITY_RESULTS_TABLES = 'QUANTITY_RESULTS_TABLES',
   MATRIX_TABLES = 'MATRIX_TABLES',
+  APR_TABLE = 'APR_TABLE',
+  PLAN_TABLE = 'PLAN_TABLE',
+  ATTACHMENTS = 'ATTACHMENTS',
 }
 
 interface IBase {
@@ -44,10 +50,11 @@ interface IBase {
   addWithAllVars?: string[];
 }
 
-export type IBullet = {
+export type IBullet = Omit<IParagraphOptions, 'text'> & {
   type: PGRSectionChildrenTypeEnum.BULLET;
-  level: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+  level?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
   text: string;
+  size?: number;
 } & IBase;
 
 export type IBulletSpace = {
@@ -94,12 +101,14 @@ export type IParagraph = Omit<IParagraphOptions, 'text'> & {
   type: PGRSectionChildrenTypeEnum.PARAGRAPH;
   text: string;
   size?: number;
+  color?: string;
   align?: AlignmentType;
 } & IBase;
 
 export type ILegend = Omit<IParagraphOptions, 'text'> & {
   type: PGRSectionChildrenTypeEnum.LEGEND;
   text: string;
+  color?: string;
   size?: number;
   align?: AlignmentType;
 } & IBase;
@@ -196,6 +205,30 @@ export type IRiskTable = {
   type: PGRSectionChildrenTypeEnum.RISK_TABLE;
 } & IBase;
 
+export type IPrioritization = {
+  type: PGRSectionChildrenTypeEnum.TABLE_PRIORITIZATION;
+} & IBase;
+
+export type IRecommendations = {
+  type: PGRSectionChildrenTypeEnum.ITERABLE_RECOMMENDATIONS;
+} & IBase;
+
+export type IEmergency = {
+  type: PGRSectionChildrenTypeEnum.ITERABLE_EMERGENCY_RISKS;
+} & IBase;
+
+export type IApr = {
+  type: PGRSectionChildrenTypeEnum.APR_TABLE;
+} & IBase;
+
+export type IPlan = {
+  type: PGRSectionChildrenTypeEnum.PLAN_TABLE;
+} & IBase;
+
+export type IAttachments = {
+  type: PGRSectionChildrenTypeEnum.ATTACHMENTS;
+} & IBase;
+
 export type ISectionChildrenType =
   | IH1
   | IH2
@@ -230,4 +263,10 @@ export type ISectionChildrenType =
   | IMeasureImage
   | IRSImage
   | IGseTable
+  | IPrioritization
+  | IRecommendations
+  | IEmergency
+  | IApr
+  | IPlan
+  | IAttachments
   | IProfessional;

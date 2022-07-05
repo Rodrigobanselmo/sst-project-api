@@ -1,3 +1,5 @@
+import { EnvironmentEntity } from './../../company/entities/environment.entity';
+import { CharacterizationEntity } from './../../company/entities/characterization.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 import { EpiEntity } from './epi.entity';

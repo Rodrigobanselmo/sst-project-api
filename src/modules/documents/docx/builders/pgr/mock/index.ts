@@ -23,6 +23,12 @@ import { riskFactors2Section } from './2.3-riskFactors';
 import { riskFactors3Section } from './2.4-riskFactors';
 import { gseSection } from './2.5-gse';
 import { gse2Section } from './2.5.1-gse';
+import { prioritizationSection } from './2.7-prioritization';
+import { prioritization2Section } from './2.7.1-prioritization';
+import { recommendationsSection } from './2.8-recommendations';
+import { recommendations1Section } from './2.8.1-recommendations';
+import { attachmentsSection } from './3.0-anexos';
+import { attachmentsLinkSection } from './3.01-anexos-link';
 
 export const docPGRSections: IDocumentPGRSectionGroups = {
   sections: [
@@ -42,13 +48,19 @@ export const docPGRSections: IDocumentPGRSectionGroups = {
     // document,
     // available,
     // environmentSection,
-    // employeeSection,
+    employeeSection,
     // characterizationSection,
-    gseSection,
-    gse2Section,
     // riskFactorsSection,
     // riskFactors2Section,
     // riskFactors3Section,
+    // gseSection,
+    // gse2Section,
+    // prioritizationSection,
+    // prioritization2Section,
+    // recommendationsSection,
+    // recommendations1Section,
+    // attachmentsLinkSection,
+    // attachmentsSection,
   ],
   variables: {
     [VariablesPGREnum.CHAPTER_1]: 'PARTE 01 – DOCUMENTO BASE',

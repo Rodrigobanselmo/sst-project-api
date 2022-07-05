@@ -1,3 +1,4 @@
+import { HomoTypeEnum } from '@prisma/client';
 import { hierarchyList } from '../../../../../../shared/constants/lists/hierarchy.list';
 import { palette } from '../../../../../../shared/constants/palette';
 import { sortNumber } from '../../../../../../shared/utils/sorts/number.sort';
@@ -16,6 +17,7 @@ import {
 export type ConverterProps = {
   showHomogeneous?: boolean;
   showDescription?: boolean;
+  type?: HomoTypeEnum | undefined;
 };
 
 type IHierarchyDataRecord<T> = {
@@ -40,9 +42,10 @@ const hierarchyEmptyId = '0';
 export const hierarchyPlanConverter = (
   hierarchyData: IHierarchyData,
   homoGroupTree: IHomoGroupMap,
-  { showDescription, showHomogeneous }: ConverterProps = {
+  { showDescription, showHomogeneous, type }: ConverterProps = {
     showHomogeneous: false,
     showDescription: true,
+    type: undefined,
   },
 ) => {
   let hasAtLeastOneDescription = false;
@@ -160,6 +163,14 @@ export const hierarchyPlanConverter = (
     Object.entries(allHierarchyPlan)
       .sort(([, c], [, d]) => sortString(c[0], d[0], 'name'))
       .forEach(([homogeneousGroupId, firstHierarchyPlan]) => {
+        if (type && homoGroupTree[homogeneousGroupId].type != type) return;
+        if (
+          !type &&
+          homoGroupTree[homogeneousGroupId] &&
+          homoGroupTree[homogeneousGroupId].type
+        )
+          return;
+
         const row = generateRow();
         const firstPosition = rowsPosition;
         if (showHomogeneous) {

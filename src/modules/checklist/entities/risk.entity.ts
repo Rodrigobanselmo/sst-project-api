@@ -61,6 +61,7 @@ export class RiskFactorsEntity implements RiskFactors {
   deleted_at: Date | null;
 
   risk: string;
+  isEmergency: boolean;
 
   constructor(partial: Partial<RiskFactorsEntity>) {
     Object.assign(this, partial);

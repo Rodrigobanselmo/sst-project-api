@@ -59,7 +59,14 @@ export class RiskGroupDataRepository {
     return new RiskFactorGroupDataEntity(riskFactorGroupDataEntity);
   }
 
-  async findAllDataById(id: string, companyId: string, options?: unknown) {
+  async findAllDataById(
+    id: string,
+    companyId: string,
+    options: {
+      select?: Prisma.RiskFactorGroupDataSelect;
+      include?: Prisma.RiskFactorGroupDataInclude;
+    } = {},
+  ) {
     const riskFactorGroupDataEntity =
       await this.prisma.riskFactorGroupData.findUnique({
         where: { id_companyId: { id, companyId } },
@@ -76,7 +83,9 @@ export class RiskGroupDataRepository {
               hierarchy: {
                 include: { employees: { select: { _count: true } } },
               },
-              homogeneousGroup: true,
+              homogeneousGroup: {
+                include: { characterization: true, environment: true },
+              },
             },
           },
         },

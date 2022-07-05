@@ -1,18 +1,20 @@
-import { HierarchyEnum } from '@prisma/client';
+import { HierarchyEnum, HomoTypeEnum } from '@prisma/client';
+
 import { HomoGroupEntity } from '../../../../modules/company/entities/homoGroup.entity';
 import { removeDuplicate } from '../../../../shared/utils/removeDuplicate';
 import { HierarchyEntity } from '../../../company/entities/hierarchy.entity';
-
 import { hierarchyMap } from '../components/tables/appr/parts/first/first.constant';
+import { EnvironmentEntity } from './../../../company/entities/environment.entity';
 
 export interface HierarchyMapData {
   org: {
     type: string;
-    typeEnum: string;
+    typeEnum: HierarchyEnum;
     name: string;
     id: string;
     homogeneousGroupIds: string[];
     homogeneousGroup: string;
+    environments: string;
   }[];
   allHomogeneousGroupIds: string[];
   workspace: string;
@@ -54,7 +56,10 @@ const setMapHierarchies = (hierarchyData: HierarchyEntity[]) => {
   return { hierarchyTree, homoGroupTree };
 };
 
-export const hierarchyConverter = (hierarchies: HierarchyEntity[]) => {
+export const hierarchyConverter = (
+  hierarchies: HierarchyEntity[],
+  environments = [] as EnvironmentEntity[],
+) => {
   const { hierarchyTree, homoGroupTree } = setMapHierarchies(hierarchies);
   const hierarchyData = new Map<string, HierarchyMapData>();
 
@@ -84,9 +89,25 @@ export const hierarchyConverter = (hierarchies: HierarchyEntity[]) => {
           name: parent.name,
           id: parent.id,
           homogeneousGroupIds,
+          environments:
+            parent?.homogeneousGroups
+              ?.map((group) => {
+                if (group.type != HomoTypeEnum.ENVIRONMENT) return;
+                return (
+                  (environments.find((e) => e.id === group.id) || {})?.name ||
+                  ''
+                );
+              })
+              .filter((e) => e)
+              .join(', ') || '',
           homogeneousGroup:
-            parent?.homogeneousGroups?.map((group) => group.name).join(', ') ||
-            '',
+            parent?.homogeneousGroups
+              ?.map((group) => {
+                if (group.type) return;
+                return group.name;
+              })
+              .filter((e) => e)
+              .join(', ') || '',
         };
 
         loop(parent.parentId);
@@ -101,9 +122,23 @@ export const hierarchyConverter = (hierarchies: HierarchyEntity[]) => {
         name: hierarchy.name,
         id: hierarchy.id,
         homogeneousGroupIds,
+        environments:
+          hierarchy?.homogeneousGroups
+            ?.map((group) => {
+              if (group.type != HomoTypeEnum.ENVIRONMENT) return;
+              return (
+                (environments.find((e) => e.id === group.id) || {})?.name || ''
+              );
+            })
+            .filter((e) => e)
+            .join(', ') || '',
         homogeneousGroup:
-          hierarchy?.homogeneousGroups?.map((group) => group.name).join(', ') ||
-          '',
+          hierarchy?.homogeneousGroups
+            ?.map((group) => {
+              if (group.type) return;
+              return group.name;
+            })
+            .join(', ') || '',
       };
 
       allHomogeneousGroupIds.push(...homogeneousGroupIds);

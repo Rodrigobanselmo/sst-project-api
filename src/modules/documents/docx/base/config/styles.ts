@@ -21,7 +21,14 @@ export const sectionProperties: ISectionPropertiesOptions = {
 
 export const sectionLandscapeProperties: ISectionPropertiesOptions = {
   page: {
-    margin: { left: 500, right: 500, top: 500, bottom: 500 },
+    margin: {
+      left: 500,
+      right: 500,
+      top: 500,
+      bottom: 500,
+      footer: 300,
+      header: 300,
+    },
     size: { orientation: PageOrientation.LANDSCAPE },
   },
 };

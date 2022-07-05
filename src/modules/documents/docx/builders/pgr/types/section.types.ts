@@ -6,6 +6,7 @@ export enum PGRSectionTypeEnum {
   TOC = 'TOC',
   COVER = 'COVER',
   SECTION = 'SECTION',
+  APR = 'APR',
 }
 
 interface IBase {
@@ -38,7 +39,17 @@ export type ISection = {
   properties?: ISectionPropertiesOptions;
 } & IBase;
 
-export type IAllSectionTypesPGR = IChapter | ISection | ICover | ITOC;
+export type IAprTable = {
+  type: PGRSectionTypeEnum.APR;
+  properties?: ISectionPropertiesOptions;
+} & IBase;
+
+export type IAllSectionTypesPGR =
+  | IChapter
+  | ISection
+  | ICover
+  | ITOC
+  | IAprTable;
 
 export type IDocumentPGRSectionGroup = {
   data: IAllSectionTypesPGR[];

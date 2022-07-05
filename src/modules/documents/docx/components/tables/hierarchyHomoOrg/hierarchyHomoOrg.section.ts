@@ -1,3 +1,4 @@
+import { HomoTypeEnum } from '@prisma/client';
 import { Footer, Header, PageOrientation, Table, WidthType } from 'docx';
 
 import {
@@ -14,15 +15,16 @@ import {
 export const hierarchyHomoOrgSection = (
   hierarchiesEntity: IHierarchyData,
   homoGroupTree: IHomoGroupMap,
-  { showDescription, showHomogeneous }: ConverterProps = {
+  { showDescription, showHomogeneous, type }: ConverterProps = {
     showHomogeneous: true,
     showDescription: true,
+    type: undefined,
   },
 ) => {
   const { bodyData, headerData } = hierarchyPlanConverter(
     hierarchiesEntity,
     homoGroupTree,
-    { showDescription, showHomogeneous },
+    { showDescription, showHomogeneous, type },
   );
 
   const tableHeaderElements = new TableHeaderElements();

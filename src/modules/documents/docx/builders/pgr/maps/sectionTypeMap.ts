@@ -1,3 +1,4 @@
+import { RiskFactorGroupDataEntity } from './../../../../../checklist/entities/riskGroupData.entity';
 import { ISectionOptions } from 'docx';
 import { sectionLandscapeProperties } from '../../../base/config/styles';
 
@@ -5,6 +6,7 @@ import { chapterSection } from '../../../base/layouts/chapter/chapter';
 import { coverSections } from '../../../base/layouts/cover/cover';
 import { headerAndFooter } from '../../../base/layouts/headerAndFooter/headerAndFooter';
 import { summarySections } from '../../../base/layouts/summary/summary';
+import { APPRTableSection } from '../../../components/tables/appr/appr.section';
 import { convertToDocxHelper } from '../functions/convertToDocx';
 import { replaceAllVariables } from '../functions/replaceAllVariables';
 import { ISectionChildrenType } from '../types/elements.types';
@@ -17,6 +19,10 @@ import {
   PGRSectionTypeEnum,
 } from '../types/section.types';
 import { IMapElementDocumentType } from './elementTypeMap';
+import {
+  HierarchyMapData,
+  IHomoGroupMap,
+} from '../../../converter/hierarchy.converter';
 
 type IMapSectionDocumentType = Record<
   string,
@@ -28,6 +34,9 @@ type IDocumentClassType = {
   logoImagePath?: string;
   version?: string;
   elementsMap: IMapElementDocumentType;
+  document: RiskFactorGroupDataEntity;
+  homogeneousGroup: IHomoGroupMap;
+  hierarchy: Map<string, HierarchyMapData>;
 };
 
 export class SectionsMapClass {
@@ -35,13 +44,19 @@ export class SectionsMapClass {
   private logoPath: string;
   private version: string;
   private elementsMap: IMapElementDocumentType;
+  private document: RiskFactorGroupDataEntity;
+  private homogeneousGroup: IHomoGroupMap;
+  private hierarchy: Map<string, HierarchyMapData>;
 
   // eslint-disable-next-line prettier/prettier
-  constructor({ variables, version, logoImagePath, elementsMap }: IDocumentClassType) {
+  constructor({ variables, version, logoImagePath, elementsMap, document, hierarchy, homogeneousGroup }: IDocumentClassType) {
     this.variables = variables;
     this.version = version;
     this.logoPath = logoImagePath;
     this.elementsMap = elementsMap;
+    this.document = document;
+    this.hierarchy = hierarchy;
+    this.homogeneousGroup = homogeneousGroup;
   }
 
   public map: IMapSectionDocumentType = {
@@ -66,6 +81,8 @@ export class SectionsMapClass {
       ...rest,
       ...sectionLandscapeProperties,
     }),
+    [PGRSectionTypeEnum.APR]: () =>
+      APPRTableSection(this.document, this.hierarchy, this.homogeneousGroup),
   };
 
   getFooterHeader = (footerText: string) => {

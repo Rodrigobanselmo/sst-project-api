@@ -84,11 +84,13 @@ const secondCell = () =>
             text: 'SIMPLE',
             size: 42,
             color: palette.text.main.string,
+            bold: true,
           }),
           new TextRun({
             text: 'SST',
             size: 42,
             color: palette.text.simple.string,
+            bold: true,
           }),
         ],
         alignment: AlignmentType.END,

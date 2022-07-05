@@ -2,7 +2,10 @@ import dayjs from 'dayjs';
 import { AlignmentType } from 'docx';
 import { RiskFactorGroupDataEntity } from '../../../../../../../checklist/entities/riskGroupData.entity';
 
-import { HierarchyMapData } from '../../../../../converter/hierarchy.converter';
+import {
+  HierarchyMapData,
+  IHomoGroupMap,
+} from '../../../../../converter/hierarchy.converter';
 import { bodyTableProps, borderNoneStyle } from '../../elements/body';
 import {
   FirstRiskInventoryColumnEnum,
@@ -11,11 +14,13 @@ import {
 
 export const documentConverter = (
   riskFactorGroupData: RiskFactorGroupDataEntity,
+  homoGroupTree: IHomoGroupMap,
   hierarchy: HierarchyMapData,
   isByGroup: boolean,
 ) => {
   const rows: bodyTableProps[][] = [];
   const homogeneousGroups = [];
+  const environments = [];
 
   rows.push(
     firstRiskInventoryHeader.map((data) => ({
@@ -57,6 +62,10 @@ export const documentConverter = (
         homogeneousGroups.push(hierarchy.org[index].homogeneousGroup);
       }
 
+      if (hierarchy.org[index]?.environments) {
+        environments.push(hierarchy.org[index].environments);
+      }
+
       const cell = {
         text: hierarchy.org[index].type,
         size: 10,
@@ -92,16 +101,29 @@ export const documentConverter = (
     docData.map((_, index) => {
       const last = 0 === index;
       const penultimate = 1 === index;
+      const lastPenultimate = 2 === index;
 
       if (last)
         return {
           title: `GSE:`,
-          text: homogeneousGroups.length ? homogeneousGroups.join(', ') : ' --',
+          text: homogeneousGroups.length
+            ? homogeneousGroups.filter((homo) => homo).join(', ')
+            : ' --',
           size: 30,
           borders: borderNoneStyle,
         };
 
       if (penultimate)
+        return {
+          title: `Ambientes:`,
+          text: environments.length
+            ? environments.filter((homo) => homo).join(', ')
+            : ' --',
+          size: 30,
+          borders: borderNoneStyle,
+        };
+
+      if (lastPenultimate)
         return {
           title: `Quantidade de Funcionários Expostos:`,
           text: String(hierarchy.employeesLength),

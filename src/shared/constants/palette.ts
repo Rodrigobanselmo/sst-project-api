@@ -6,6 +6,7 @@ export const palette = {
   table: {
     header: hexToColors('#fca557'),
     row: hexToColors('#fcf2e8'),
+    attention: hexToColors('#3cbe7d'),
     rowDark: hexToColors('#fce2c9'),
   },
   common: {

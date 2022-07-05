@@ -5,6 +5,7 @@ import {
 } from '@prisma/client';
 
 import { CharacterizationPhotoEntity } from './characterization-photo.entity';
+import { HierarchyEntity } from './hierarchy.entity';
 import { HomoGroupEntity } from './homoGroup.entity';
 import { WorkspaceEntity } from './workspace.entity';
 
@@ -33,6 +34,7 @@ export class CharacterizationEntity implements CompanyCharacterization {
   @ApiProperty({ description: 'The photos related to the workstation' })
   photos?: CharacterizationPhotoEntity[];
 
+  hierarchies?: HierarchyEntity[];
   homogeneousGroup?: HomoGroupEntity;
   considerations: string[];
   deleted_at: Date;

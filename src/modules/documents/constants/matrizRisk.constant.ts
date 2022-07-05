@@ -42,7 +42,7 @@ export const matrixRiskMap = {
     level: 4,
   },
   [5]: {
-    label: 'Muito Alto',
+    label: 'Muito\nAlto',
     short: 'MA',
     intervention: 'AÇÃO IMEDIATA',
     table: 'Muito Alto\n(Inaceitável)',

@@ -1,4 +1,4 @@
-import { RiskFactorsEnum } from '@prisma/client';
+import { HomoTypeEnum, RiskFactorsEnum } from '@prisma/client';
 import { AlignmentType } from 'docx';
 import { RiskFactorGroupDataEntity } from '../../../../../../../checklist/entities/riskGroupData.entity';
 import { riskMap } from '../../../../../../constants/risks.constant';
@@ -9,6 +9,7 @@ import { HierarchyMapData } from '../../../../../converter/hierarchy.converter';
 import { bodyTableProps, borderNoneStyle } from '../../elements/body';
 import { whiteBorder, whiteColumnBorder } from '../../elements/header';
 import { ThirdRiskInventoryColumnEnum } from './third.constant';
+import { originRiskMap } from '../../../../../../../../shared/constants/maps/origin-risk';
 
 export const dataConverter = (
   riskGroup: RiskFactorGroupDataEntity,
@@ -40,8 +41,29 @@ export const dataConverter = (
       riskData.probability,
     );
 
+    let origin: string;
+    // eslint-disable-next-line prettier/prettier
+    if (riskData.homogeneousGroup.environment) origin = `${riskData.homogeneousGroup.environment.name}\n(${originRiskMap[riskData.homogeneousGroup.environment.type].name})`
+    // eslint-disable-next-line prettier/prettier
+    if (riskData.homogeneousGroup.characterization) origin =`${riskData.homogeneousGroup.characterization.name}\n(${originRiskMap[riskData.homogeneousGroup.characterization.type].name})`;
+    // eslint-disable-next-line prettier/prettier
+    if (!riskData.homogeneousGroup.type) origin = `${riskData.homogeneousGroup.name}\n(GSE)`;
+
+    if (riskData.homogeneousGroup.type == HomoTypeEnum.HIERARCHY) {
+      const hierarchy = hierarchyData.org.find(
+        (hierarchy) => hierarchy.id == riskData.homogeneousGroup.id,
+      );
+
+      if (hierarchy)
+        origin = `${hierarchy.name}\n(${
+          originRiskMap[hierarchy.typeEnum].name
+        })`;
+    }
+
     // eslint-disable-next-line prettier/prettier
     cells[ThirdRiskInventoryColumnEnum.TYPE] = { text: riskMap[riskData.riskFactor.type]?.label||'', bold: true, size: 4, ...base, ...fill};
+    // eslint-disable-next-line prettier/prettier
+    cells[ThirdRiskInventoryColumnEnum.ORIGIN] = { text:origin ||'', bold: true, size: 6, ...base, ...fill};
     // eslint-disable-next-line prettier/prettier
     cells[ThirdRiskInventoryColumnEnum.RISK_FACTOR] = { text: riskData.riskFactor.name, size: 10, ...base};
     // eslint-disable-next-line prettier/prettier
@@ -57,7 +79,7 @@ export const dataConverter = (
     // eslint-disable-next-line prettier/prettier
     cells[ThirdRiskInventoryColumnEnum.SEVERITY] = { text: String(riskData.riskFactor.severity), size: 1, ...base, ...fill};
     // eslint-disable-next-line prettier/prettier
-    cells[ThirdRiskInventoryColumnEnum.PROBABILITY] = { text: String(riskData.probability), size: 1, ...base, ...fill};
+    cells[ThirdRiskInventoryColumnEnum.PROBABILITY] = { text: String(riskData.probability||'-'), size: 1, ...base, ...fill};
     // eslint-disable-next-line prettier/prettier
     cells[ThirdRiskInventoryColumnEnum.RISK_OCCUPATIONAL] = { text: riskOccupational?.label || '', ...base,...(riskOccupational.level>3?attention:{}), borders:  {...borderNoneStyle, right:whiteBorder, top:whiteColumnBorder}, size: 3, ...fill};
     // eslint-disable-next-line prettier/prettier
@@ -65,7 +87,7 @@ export const dataConverter = (
     // eslint-disable-next-line prettier/prettier
     cells[ThirdRiskInventoryColumnEnum.SEVERITY_AFTER] = { text: String(riskData.riskFactor.severity), size: 1, ...base, ...fill};
     // eslint-disable-next-line prettier/prettier
-    cells[ThirdRiskInventoryColumnEnum.PROBABILITY_AFTER] = { text: String(riskData.probabilityAfter||riskData.probability), size: 1, ...base, ...fill};
+    cells[ThirdRiskInventoryColumnEnum.PROBABILITY_AFTER] = { text: String(riskData.probabilityAfter||riskData.probability||'-'), size: 1, ...base, ...fill};
     // eslint-disable-next-line prettier/prettier
     cells[ThirdRiskInventoryColumnEnum.RISK_OCCUPATIONAL_AFTER] = { text: riskOccupationalAfter?.label || '', ...base,...(riskOccupationalAfter.level>3?attention:{}), borders: {...borderNoneStyle, top:whiteColumnBorder}, size: 3, ...fill};
 

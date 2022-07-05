@@ -5,6 +5,7 @@ import { v4 } from 'uuid';
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { UpsertEnvironmentDto } from '../../dto/environment.dto';
 import { EnvironmentEntity } from '../../entities/environment.entity';
+import { HierarchyEntity } from '../../entities/hierarchy.entity';
 
 interface ICompanyEnvironment extends Omit<UpsertEnvironmentDto, 'photos'> {
   companyId: string;
@@ -89,10 +90,26 @@ export class EnvironmentRepository {
     workspaceId: string,
     options?: Prisma.CompanyEnvironmentFindManyArgs,
   ) {
-    const environment = await this.prisma.companyEnvironment.findMany({
+    const environment = (await this.prisma.companyEnvironment.findMany({
       where: { workspaceId, companyId },
       ...options,
-    });
+    })) as EnvironmentEntity[];
+
+    //! optimization here, it has the hierarchy tree on front cam get only ids on hierarchyOnHomogeneous
+    await Promise.all(
+      environment.map(async (env, index) => {
+        const hierarchies = await this.prisma.hierarchy.findMany({
+          where: {
+            hierarchyOnHomogeneous: { some: { homogeneousGroupId: env.id } },
+            companyId,
+          },
+        });
+
+        environment[index].hierarchies = hierarchies.map(
+          (hierarchy) => new HierarchyEntity(hierarchy),
+        );
+      }),
+    );
 
     return [...environment.map((env) => new EnvironmentEntity(env))];
   }

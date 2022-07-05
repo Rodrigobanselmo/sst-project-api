@@ -2,18 +2,23 @@ import { Table, WidthType } from 'docx';
 import { RiskFactorGroupDataEntity } from '../../../../../../../checklist/entities/riskGroupData.entity';
 import { firstRiskInventoryHeader } from './first.constant';
 
-import { HierarchyMapData } from '../../../../../converter/hierarchy.converter';
+import {
+  HierarchyMapData,
+  IHomoGroupMap,
+} from '../../../../../converter/hierarchy.converter';
 import { TableBodyElements } from '../../elements/body';
 import { borderBottomStyle, TableHeaderElements } from '../../elements/header';
 import { documentConverter } from './first.converter';
 
 export const firstRiskInventoryTableSection = (
   riskFactorGroupData: RiskFactorGroupDataEntity,
+  homoGroupTree: IHomoGroupMap,
   hierarchyData: HierarchyMapData,
   isByGroup: boolean,
 ) => {
   const riskInventoryData = documentConverter(
     riskFactorGroupData,
+    homoGroupTree,
     hierarchyData,
     isByGroup,
   );

@@ -108,6 +108,17 @@ model AddressCompany {
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
+model Attachments {
+  id   String    @id @default(uuid())
+  name String?  
+  url String
+  created_at DateTime @default(now())
+  deleted_at DateTime? 
+  updated_at  DateTime   @updatedAt
+  riskFactorDocumentId String?
+  riskFactorDocument RiskFactorDocument? @relation(fields: [riskFactorDocumentId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
+}
+
 model Checklist {
   id    Int     @default(autoincrement())
   status StatusEnum @default(PROGRESS)
@@ -475,6 +486,7 @@ model RiskFactors {
   ipvs String?
   pv String?
   pe String?
+  isEmergency Boolean  @default(false)
   carnogenicityACGIH String?
   carnogenicityLinach String?
   status StatusEnum @default(ACTIVE)
@@ -493,7 +505,7 @@ model RiskFactors {
 
 model RiskFactorDocument {
   id    String   @id  @default(uuid())
-  fileUrl String
+  fileUrl String?
   name String 
   description String @default("")
   version String  @default("1")
@@ -511,7 +523,7 @@ model RiskFactorDocument {
   updated_at  DateTime   @updatedAt
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   riskGroup RiskFactorGroupData @relation(fields: [riskGroupId, companyId], references: [id, companyId], onDelete: Restrict, onUpdate: Cascade)
-
+  attachments Attachments[]
   @@unique([id, companyId])
 } 
 
@@ -630,6 +642,7 @@ model Workspace {
   description String?  
   cnpj String?  
   created_at DateTime @default(now())
+  isOwner Boolean @default(true)
   updated_at  DateTime   @updatedAt
   companyId String
   status StatusEnum @default(ACTIVE)

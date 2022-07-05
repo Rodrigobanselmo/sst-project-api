@@ -27,7 +27,7 @@ export class CreateRecMedDto {
   @IsEnum(MeasuresTypeEnum, {
     message: `type must be one of: ${KeysOfEnum(MeasuresTypeEnum)}`,
   })
-  medType: MeasuresTypeEnum;
+  medType?: MeasuresTypeEnum;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsOptional()
@@ -35,7 +35,7 @@ export class CreateRecMedDto {
   @IsEnum(RecTypeEnum, {
     message: `type must be one of: ${KeysOfEnum(RecTypeEnum)}`,
   })
-  recType: RecTypeEnum;
+  recType?: RecTypeEnum;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsOptional()
@@ -72,7 +72,15 @@ export class UpdateRecMedDto {
   @IsEnum(MeasuresTypeEnum, {
     message: `type must be one of: ${KeysOfEnum(MeasuresTypeEnum)}`,
   })
-  medType: MeasuresTypeEnum;
+  medType?: MeasuresTypeEnum;
+
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsOptional()
+  @IsString()
+  @IsEnum(RecTypeEnum, {
+    message: `type must be one of: ${KeysOfEnum(RecTypeEnum)}`,
+  })
+  recType?: RecTypeEnum;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsOptional()
@@ -103,7 +111,15 @@ export class RiskCreateRecMedDto {
   @IsEnum(MeasuresTypeEnum, {
     message: `type must be one of: ${KeysOfEnum(MeasuresTypeEnum)}`,
   })
-  medType: MeasuresTypeEnum;
+  medType?: MeasuresTypeEnum;
+
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsOptional()
+  @IsString()
+  @IsEnum(RecTypeEnum, {
+    message: `type must be one of: ${KeysOfEnum(RecTypeEnum)}`,
+  })
+  recType?: RecTypeEnum;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsOptional()
@@ -121,7 +137,15 @@ export class RiskUpdateRecMedDto extends PartialType(RiskCreateRecMedDto) {
   @IsEnum(MeasuresTypeEnum, {
     message: `type must be one of: ${KeysOfEnum(MeasuresTypeEnum)}`,
   })
-  medType: MeasuresTypeEnum;
+  medType?: MeasuresTypeEnum;
+
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsOptional()
+  @IsString()
+  @IsEnum(RecTypeEnum, {
+    message: `type must be one of: ${KeysOfEnum(RecTypeEnum)}`,
+  })
+  recType?: RecTypeEnum;
 
   @IsString()
   @IsOptional()

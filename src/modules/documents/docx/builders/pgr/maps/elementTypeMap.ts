@@ -1,4 +1,3 @@
-import { CharacterizationEntity } from './../../../../../company/entities/characterization.entity';
 import {
   CharacterizationTypeEnum,
   CompanyEnvironmentTypesEnum,
@@ -15,12 +14,18 @@ import {
 } from '../../../base/elements/paragraphs';
 import { measureHierarchyImage } from '../../../components/images/measureHierarch';
 import { rsDocumentImage } from '../../../components/images/rsDocument';
+import { attachmentsIterable } from '../../../components/iterables/attachments/attachments.iterable';
 import { characterizationIterable } from '../../../components/iterables/characterization/characterization.iterable';
 import { complementaryDocsIterable } from '../../../components/iterables/complementaryDocs/complementaryDocs.iterable';
 import { complementarySystemsIterable } from '../../../components/iterables/complementarySystems/complementarySystems.iterable';
+import { emergencyIterable } from '../../../components/iterables/emergency/emergency.iterable';
 import { environmentIterable } from '../../../components/iterables/environments/environments.iterable';
 import { professionalsIterable } from '../../../components/iterables/professionals/professionals.iterable';
+import { recommendationsIterable } from '../../../components/iterables/recommendations/recommendations.iterable';
+import { actionPlanTableSection } from '../../../components/tables/actionPlan/actionPlan.section';
+import { APPRTableSection } from '../../../components/tables/appr/appr.section';
 import { hierarchyHomoOrgSection } from '../../../components/tables/hierarchyHomoOrg/hierarchyHomoOrg.section';
+import { hierarchyPrioritizationPage } from '../../../components/tables/hierarchyPrioritization/hierarchyPrioritization.page';
 import { hierarchyRisksTableAllSections } from '../../../components/tables/hierarchyRisks/hierarchyRisks.section';
 import { expositionDegreeTable } from '../../../components/tables/mock/components/expositionDegree/section/expositionDegreeTable';
 import { healthEffectTable } from '../../../components/tables/mock/components/healthSeverity/section/healthEffectTable';
@@ -48,7 +53,9 @@ import {
   PGRSectionChildrenTypeEnum,
 } from '../types/elements.types';
 import { IDocVariables } from '../types/section.types';
+import { AttachmentEntity } from './../../../../../checklist/entities/attachment.entity';
 import { RiskFactorGroupDataEntity } from './../../../../../checklist/entities/riskGroupData.entity';
+import { CharacterizationEntity } from './../../../../../company/entities/characterization.entity';
 import { EnvironmentEntity } from './../../../../../company/entities/environment.entity';
 import { ProfessionalEntity } from './../../../../../users/entities/professional.entity';
 import {
@@ -70,15 +77,17 @@ type IDocumentClassType = {
   homogeneousGroup: IHomoGroupMap;
   hierarchy: Map<string, HierarchyMapData>;
   characterizations: CharacterizationEntity[];
+  attachments: AttachmentEntity[];
 };
 
 export class ElementsMapClass {
   private variables: IDocVariables;
   private versions: RiskDocumentEntity[];
   private professionals: ProfessionalEntity[];
-  private document: RiskFactorGroupDataEntity;
   private environments: EnvironmentEntity[];
   private characterizations: CharacterizationEntity[];
+  private document: RiskFactorGroupDataEntity;
+  private attachments: AttachmentEntity[];
   private homogeneousGroup: IHomoGroupMap;
   private hierarchy: Map<string, HierarchyMapData>;
 
@@ -91,6 +100,7 @@ export class ElementsMapClass {
     document,
     homogeneousGroup,
     hierarchy,
+    attachments,
   }: IDocumentClassType) {
     this.variables = variables;
     this.versions = versions;
@@ -100,6 +110,7 @@ export class ElementsMapClass {
     this.document = document;
     this.homogeneousGroup = homogeneousGroup;
     this.hierarchy = hierarchy;
+    this.attachments = attachments;
   }
 
   public map: IMapElementDocumentType = {
@@ -175,9 +186,20 @@ export class ElementsMapClass {
         showDescription: false,
         showHomogeneous: true,
       })['children'],
-    [PGRSectionChildrenTypeEnum.BULLET]: ({ level, text }: IBullet) => [
-      bulletsNormal(text, level),
-    ],
+    [PGRSectionChildrenTypeEnum.TABLE_PRIORITIZATION]: () =>
+      hierarchyPrioritizationPage(
+        this.document,
+        this.hierarchy,
+        {
+          isByGroup: true,
+        },
+        (x, v) => this.convertToDocx(x, v),
+      ),
+    [PGRSectionChildrenTypeEnum.BULLET]: ({
+      level = 0,
+      text,
+      ...rest
+    }: IBullet) => [bulletsNormal(text, level, rest)],
     [PGRSectionChildrenTypeEnum.BULLET_SPACE]: ({ text }: IBullet) => [
       bulletsSpace(text),
     ],
@@ -193,6 +215,18 @@ export class ElementsMapClass {
       complementarySystemsIterable(
         this.document.complementarySystems || [],
         (x, v) => this.convertToDocx(x, v),
+      ),
+    [PGRSectionChildrenTypeEnum.ITERABLE_RECOMMENDATIONS]: () =>
+      recommendationsIterable(this.document?.data || [], (x, v) =>
+        this.convertToDocx(x, v),
+      ),
+    [PGRSectionChildrenTypeEnum.ITERABLE_EMERGENCY_RISKS]: () =>
+      emergencyIterable(this.document?.data || [], (x, v) =>
+        this.convertToDocx(x, v),
+      ),
+    [PGRSectionChildrenTypeEnum.ATTACHMENTS]: () =>
+      attachmentsIterable(this.attachments || [], (x, v) =>
+        this.convertToDocx(x, v),
       ),
     [PGRSectionChildrenTypeEnum.HEALTH_EFFECT_TABLES]: () =>
       healthEffectTable((x, v) => this.convertToDocx(x, v)),
@@ -214,6 +248,14 @@ export class ElementsMapClass {
       hierarchyRisksTableAllSections(this.document, this.hierarchy, (x, v) =>
         this.convertToDocx(x, v),
       ),
+    // [PGRSectionChildrenTypeEnum.PLAN_TABLE]: () =>
+    //   actionPlanTableSection(this.document)['children'],
+    [PGRSectionChildrenTypeEnum.APR_TABLE]: () =>
+      APPRTableSection(this.document, this.hierarchy, this.homogeneousGroup)
+        .map((s) => s['children'])
+        .reduce((acc, curr) => {
+          return [...acc, ...curr];
+        }, []),
   };
 
   private convertToDocx(

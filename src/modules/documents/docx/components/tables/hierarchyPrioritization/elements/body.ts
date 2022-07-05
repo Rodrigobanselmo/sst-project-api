@@ -14,6 +14,7 @@ export interface bodyTableProps extends Partial<ITableCellOptions> {
   text?: string;
   size?: number;
   attention?: boolean;
+  shaded?: boolean;
 }
 
 export class TableBodyElements {
@@ -23,7 +24,7 @@ export class TableBodyElements {
     });
   }
 
-  tableCell({ text, attention, size = 1, ...rest }: bodyTableProps) {
+  tableCell({ text, attention, shaded, size = 1, ...rest }: bodyTableProps) {
     return new TableCell({
       children: [
         new Paragraph({
@@ -45,7 +46,9 @@ export class TableBodyElements {
         }),
       ],
       margins: { top: 20, bottom: 20 },
-      shading: { fill: palette.table.row.string },
+      shading: shaded
+        ? { fill: palette.table.attention.string }
+        : { fill: palette.table.row.string },
       verticalAlign: VerticalAlign.CENTER,
       width: { size, type: WidthType.PERCENTAGE },
       ...rest,

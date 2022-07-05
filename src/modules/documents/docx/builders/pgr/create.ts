@@ -1,3 +1,4 @@
+import { AttachmentEntity } from './../../../../checklist/entities/attachment.entity';
 import { CharacterizationEntity } from './../../../../company/entities/characterization.entity';
 import { RiskFactorGroupDataEntity } from './../../../../checklist/entities/riskGroupData.entity';
 import { EnvironmentEntity } from './../../../../company/entities/environment.entity';
@@ -36,6 +37,7 @@ export class DocumentBuildPGR {
   private homogeneousGroup: IHomoGroupMap;
   private hierarchy: Map<string, HierarchyMapData>;
   private characterizations: CharacterizationEntity[];
+  private attachments: AttachmentEntity[];
 
   constructor({
     version,
@@ -48,6 +50,7 @@ export class DocumentBuildPGR {
     homogeneousGroup,
     hierarchy,
     characterizations,
+    attachments,
   }: ICreatePGR) {
     this.version = version;
     this.logoImagePath = logo;
@@ -56,11 +59,12 @@ export class DocumentBuildPGR {
     this.docSections = docPGRSections;
     this.versions = versions;
     this.environments = environments;
-    this.variables = this.getVariables();
     this.document = document;
     this.homogeneousGroup = homogeneousGroup;
     this.hierarchy = hierarchy;
     this.characterizations = characterizations;
+    this.attachments = attachments;
+    this.variables = this.getVariables();
   }
 
   public build() {
@@ -88,7 +92,12 @@ export class DocumentBuildPGR {
       [VariablesPGREnum.DOCUMENT_COORDINATOR]:
         this.document?.coordinatorBy || '',
       ...companyVariables(this.company, this.workspace, this.workspace.address),
-      ...booleanVariables(this.company, this.hierarchy),
+      ...booleanVariables(
+        this.company,
+        this.workspace,
+        this.hierarchy,
+        this.document,
+      ),
       ...this.docSections.variables,
     };
   }
@@ -105,6 +114,7 @@ export class DocumentBuildPGR {
       document: this.document,
       homogeneousGroup: this.homogeneousGroup,
       hierarchy: this.hierarchy,
+      attachments: this.attachments,
     }).map;
 
     const sectionsMap = new SectionsMapClass({
@@ -112,6 +122,9 @@ export class DocumentBuildPGR {
       logoImagePath: this.logoImagePath,
       version: this.version,
       elementsMap,
+      document: this.document,
+      homogeneousGroup: this.homogeneousGroup,
+      hierarchy: this.hierarchy,
     }).map;
 
     data.forEach((child) => {

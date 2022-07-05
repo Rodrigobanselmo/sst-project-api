@@ -1,3 +1,4 @@
+import { AttachmentEntity } from './../../../../../checklist/entities/attachment.entity';
 import { CharacterizationEntity } from './../../../../../company/entities/characterization.entity';
 import { EnvironmentEntity } from './../../../../../company/entities/environment.entity';
 import { RiskDocumentEntity } from '../../../../../checklist/entities/riskDocument.entity';
@@ -20,4 +21,5 @@ export interface ICreatePGR {
   homogeneousGroup: IHomoGroupMap;
   hierarchy: Map<string, HierarchyMapData>;
   characterizations: CharacterizationEntity[];
+  attachments: AttachmentEntity[];
 }

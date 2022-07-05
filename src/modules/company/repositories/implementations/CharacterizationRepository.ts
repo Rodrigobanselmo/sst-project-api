@@ -5,6 +5,7 @@ import { v4 } from 'uuid';
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { UpsertCharacterizationDto } from '../../dto/characterization.dto';
 import { CharacterizationEntity } from '../../entities/characterization.entity';
+import { HierarchyEntity } from '../../entities/hierarchy.entity';
 
 interface ICompanyCharacterization
   extends Omit<UpsertCharacterizationDto, 'photos'> {
@@ -91,11 +92,26 @@ export class CharacterizationRepository {
     workspaceId: string,
     options?: Prisma.CompanyCharacterizationFindManyArgs,
   ) {
-    const characterization = await this.prisma.companyCharacterization.findMany(
-      {
+    const characterization =
+      (await this.prisma.companyCharacterization.findMany({
         where: { workspaceId, companyId },
         ...options,
-      },
+      })) as CharacterizationEntity[];
+
+    //! optimization here, it has the hierarchy tree on front cam get only ids on hierarchyOnHomogeneous
+    await Promise.all(
+      characterization.map(async (env, index) => {
+        const hierarchies = await this.prisma.hierarchy.findMany({
+          where: {
+            hierarchyOnHomogeneous: { some: { homogeneousGroupId: env.id } },
+            companyId,
+          },
+        });
+
+        characterization[index].hierarchies = hierarchies.map(
+          (hierarchy) => new HierarchyEntity(hierarchy),
+        );
+      }),
     );
 
     return [...characterization.map((env) => new CharacterizationEntity(env))];

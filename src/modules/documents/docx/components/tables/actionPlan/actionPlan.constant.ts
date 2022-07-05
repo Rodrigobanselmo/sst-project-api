@@ -3,7 +3,7 @@ import { headerTableProps } from './elements/header';
 
 export enum ActionPlanColumnEnum {
   ITEM,
-  GSE,
+  ORIGIN,
   RISK,
   SOURCE,
   SEVERITY,
@@ -19,7 +19,7 @@ const NewActionPlanHeader = (): headerTableProps[] => {
   const header: headerTableProps[] = [];
 
   header[ActionPlanColumnEnum.ITEM] = { text: 'ITEM', size: 2 }
-  header[ActionPlanColumnEnum.GSE] = { text: 'GSE', size: 5 }
+  header[ActionPlanColumnEnum.ORIGIN] = { text: 'ORIGEM', size: 5 }
   header[ActionPlanColumnEnum.RISK] = { text: 'PERIGOS\nFATORES DE RISCO', size: 10 }
   header[ActionPlanColumnEnum.SOURCE] = { text: 'FONTE GERADORA OU\nATIVIDADE DE RISCO', size: 10 }
   header[ActionPlanColumnEnum.SEVERITY] = { text: 'SEVERIDADE', size: 1 }

@@ -41,7 +41,7 @@ export class PgrUploadTableService {
         workspaceId,
       );
 
-    const { hierarchyData, homoGroupTree } =
+    const { hierarchyData, homoGroupTree, hierarchyTree } =
       hierarchyConverter(hierarchyHierarchy);
 
     const sections: ISectionOptions[] = [
@@ -49,7 +49,7 @@ export class PgrUploadTableService {
       ...hierarchyPrioritizationTableSections(riskGroupData, hierarchyData),
       ...hierarchyRisksTableSections(riskGroupData, hierarchyData),
       hierarchyHomoOrgSection(hierarchyData, homoGroupTree),
-      actionPlanTableSection(riskGroupData),
+      actionPlanTableSection(riskGroupData, hierarchyTree),
       ...APPRTableSection(riskGroupData, hierarchyData, homoGroupTree),
     ];
 

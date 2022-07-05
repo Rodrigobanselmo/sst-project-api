@@ -8,6 +8,8 @@ import {
 } from '@prisma/client';
 import { HierarchyEntity } from './hierarchy.entity';
 import { WorkspaceEntity } from './workspace.entity';
+import { CharacterizationEntity } from './characterization.entity';
+import { EnvironmentEntity } from './environment.entity';
 
 export class HomoGroupEntity implements HomogeneousGroup {
   @ApiProperty({ description: 'The id of the HomogeneousGroup' })
@@ -42,6 +44,8 @@ export class HomoGroupEntity implements HomogeneousGroup {
   workspaceId?: string;
   workspaceIds?: string[];
   riskFactorData?: RiskFactorDataEntity[];
+  characterization?: CharacterizationEntity;
+  environment?: EnvironmentEntity;
 
   employeeCount?: number;
 

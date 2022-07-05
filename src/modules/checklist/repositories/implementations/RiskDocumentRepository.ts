@@ -12,15 +12,30 @@ export class RiskDocumentRepository {
   async upsert({
     companyId,
     id,
+    attachments,
     ...createDto
   }: UpsertRiskDocumentDto): Promise<RiskDocumentEntity> {
     const riskFactorDocEntity = await this.prisma.riskFactorDocument.upsert({
       create: {
         companyId,
+        attachments: attachments
+          ? {
+              create: attachments.map((attachment) => ({
+                ...attachment,
+              })),
+            }
+          : undefined,
         ...createDto,
       },
       update: {
         ...createDto,
+        attachments: attachments
+          ? {
+              create: attachments.map((attachment) => ({
+                ...attachment,
+              })),
+            }
+          : undefined,
         companyId,
       },
       where: { id_companyId: { companyId, id: id || 'not-found' } },
@@ -41,8 +56,8 @@ export class RiskDocumentRepository {
     id: string,
     companyId: string,
     options: {
-      select?: Prisma.RiskFactorGroupDataSelect;
-      include?: Prisma.RiskFactorGroupDataInclude;
+      select?: Prisma.RiskFactorDocumentSelect;
+      include?: Prisma.RiskFactorDocumentInclude;
     } = {},
   ) {
     const riskDocumentEntity = await this.prisma.riskFactorDocument.findUnique({

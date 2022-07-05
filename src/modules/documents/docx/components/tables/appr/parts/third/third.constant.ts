@@ -10,6 +10,7 @@ export enum ThirdRiskInventoryHeaderEnum {
 
 export enum ThirdRiskInventoryColumnEnum {
   TYPE,
+  ORIGIN,
   RISK_FACTOR,
   RISK,
   SOURCE,
@@ -41,6 +42,7 @@ const ThirdRiskInventoryColumnsHeader = (): bodyTableProps[] => {
   const header: bodyTableProps[] = [];
 
   header[ThirdRiskInventoryColumnEnum.TYPE] = { text: 'Tipo' , bold: true, borders: {...borderNoneStyle, right:whiteColumnBorder}, size: 4,  margins: { top: 100, bottom: 100 }};
+  header[ThirdRiskInventoryColumnEnum.ORIGIN] = { text: 'Origem' , bold: true, borders: {...borderNoneStyle, right:whiteColumnBorder}, size: 6,  margins: { top: 100, bottom: 100 }};
   header[ThirdRiskInventoryColumnEnum.RISK_FACTOR] = { text: 'PERIGOS | FATORES DE RISCO', borders: {...borderNoneStyle, right:whiteColumnBorder}  , size: 10, margins: { top: 100, bottom: 100 }};
   header[ThirdRiskInventoryColumnEnum.RISK] = { text: 'Risco' , borders: {...borderNoneStyle, right:whiteColumnBorder}, size: 7, margins: { top: 100, bottom: 100 }};
   header[ThirdRiskInventoryColumnEnum.SOURCE] = { text: 'Fonte Geradora ou Condição de Risco' , borders: {...borderNoneStyle, right:whiteColumnBorder}, size: 10, margins: { top: 100, bottom: 100 }};
@@ -59,3 +61,4 @@ const ThirdRiskInventoryColumnsHeader = (): bodyTableProps[] => {
 };
 
 export const thirdRiskInventoryColumnsHeader = ThirdRiskInventoryColumnsHeader();
+

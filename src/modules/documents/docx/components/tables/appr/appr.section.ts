@@ -1,5 +1,5 @@
 import { HierarchyEnum, HomogeneousGroup } from '@prisma/client';
-import { PageOrientation } from 'docx';
+import { ISectionOptions, PageOrientation } from 'docx';
 import { RiskFactorGroupDataEntity } from '../../../../../checklist/entities/riskGroupData.entity';
 import { HierarchyEntity } from '../../../../../company/entities/hierarchy.entity';
 
@@ -23,9 +23,9 @@ export const APPRTableSection = (
   homoGroupTree: IHomoGroupMap,
   options: IAPPRTableOptions = {
     hierarchyType: HierarchyEnum.SECTOR,
-    isByGroup: true,
+    isByGroup: false,
   },
-) => {
+): ISectionOptions[] => {
   const sectionsTables = [];
   const isByGroup = options.isByGroup;
 
@@ -35,6 +35,7 @@ export const APPRTableSection = (
     const createTable = () => {
       const firstTable = firstRiskInventoryTableSection(
         riskFactorGroupData,
+        homoGroupTree,
         hierarchy,
         isByGroup,
       );
@@ -47,29 +48,36 @@ export const APPRTableSection = (
       sectionsTables.push([firstTable, ...secondTable, ...thirdTable]);
     };
 
-    if (isByGroup) {
-      const homoGroupsIds = hierarchy.org.reduce((acc, hierarchy) => {
-        if (hierarchy.homogeneousGroupIds)
-          return [...acc, ...hierarchy.homogeneousGroupIds];
-      }, []);
+    const description = hierarchy.descReal;
 
-      homoGroupsIds.forEach((homoGroupID) => {
-        if (map.get(homoGroupID)) {
-          return;
-        }
+    const homoGroupsIds = hierarchy.org.reduce((acc, hierarchy) => {
+      if (hierarchy.homogeneousGroupIds)
+        return [...acc, ...hierarchy.homogeneousGroupIds];
+      return acc;
+    }, []);
 
-        const homoGroup = homoGroupTree[homoGroupID] || { description: '' };
+    homoGroupsIds.forEach((homoGroupID) => {
+      if (map.get(homoGroupID)) {
+        return;
+      }
 
-        map.set(homoGroupID, true);
+      const homoGroup = homoGroupTree[homoGroupID] || {
+        description: '',
+        type: null,
+      };
 
+      map.set(homoGroupID, true);
+
+      // eslint-disable-next-line prettier/prettier
+      if (!description && !homoGroup.type)  hierarchy.descReal = homoGroup?.description;
+      if (!homoGroup.type && isByGroup)
         hierarchy.descReal =
-          homoGroup?.description || hierarchy.descReal || hierarchy.descRh; //!remove  hierarchy.descReal || hierarchy.descRh only for ramon
+          homoGroup?.description || hierarchy.descReal || hierarchy.descRh;
 
-        createTable();
-      });
+      if (isByGroup) createTable();
+    });
 
-      return;
-    }
+    if (isByGroup) return;
 
     createTable();
   });

@@ -16,11 +16,12 @@ interface ParagraphProps extends IParagraphOptions {
   align?: AlignmentType;
   isBold?: boolean;
   isBreak?: boolean;
+  color?: string;
 }
 
 export const paragraphNormal = (
   text: string,
-  { children, ...options } = {} as ParagraphProps,
+  { children, color, ...options } = {} as ParagraphProps,
 ) =>
   new Paragraph({
     children: [
@@ -41,6 +42,7 @@ export const paragraphNormal = (
                     bold: isBold,
                     break: isBreak ? 1 : 0,
                     size: options?.size ? options?.size * 2 : undefined,
+                    ...(color ? { color: color } : {}),
                   });
                 if (isLink)
                   return textLink(text, {
@@ -107,10 +109,10 @@ export const paragraphTableLegend = (
   options = {} as ParagraphProps,
 ) =>
   paragraphNormal(text, {
-    ...options,
-    size: 8,
     spacing: { after: 300 },
+    size: 8,
     align: AlignmentType.START,
+    ...options,
   });
 
 export const paragraphFigure = (

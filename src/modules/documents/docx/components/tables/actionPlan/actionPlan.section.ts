@@ -1,15 +1,20 @@
 import { PageOrientation, Table, WidthType } from 'docx';
-import { RiskFactorGroupDataEntity } from '../../../../../checklist/entities/riskGroupData.entity';
-import { actionPlanHeader, actionPlanTitle } from './actionPlan.constant';
 
+import { RiskFactorGroupDataEntity } from '../../../../../checklist/entities/riskGroupData.entity';
+import { IHierarchyMap } from '../../../converter/hierarchy.converter';
+import { actionPlanHeader, actionPlanTitle } from './actionPlan.constant';
+import { actionPlanConverter } from './actionPlan.converter';
 import { TableBodyElements } from './elements/body';
 import { TableHeaderElements } from './elements/header';
-import { actionPlanConverter } from './actionPlan.converter';
 
 export const actionPlanTableSection = (
   riskFactorGroupData: RiskFactorGroupDataEntity,
+  hierarchyTree: IHierarchyMap,
 ) => {
-  const actionPlanData = actionPlanConverter(riskFactorGroupData);
+  const actionPlanData = actionPlanConverter(
+    riskFactorGroupData,
+    hierarchyTree,
+  );
 
   const tableHeaderElements = new TableHeaderElements();
   const tableBodyElements = new TableBodyElements();
