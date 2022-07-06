@@ -38,7 +38,7 @@ export const professionalsIterable = (
       // eslint-disable-next-line prettier/prettier
       if (variables[VariablesPGREnum.PROFESSIONAL_CREA]) text = `${text}CREA: ??${VariablesPGREnum.PROFESSIONAL_CREA}??\n`
       // eslint-disable-next-line prettier/prettier
-      if (variables[VariablesPGREnum.PROFESSIONAL_CPF]) text = `${text}NIT(PIS/PASEP): ${variables[VariablesPGREnum.PROFESSIONAL_CPF]}\n`
+      if (variables[VariablesPGREnum.PROFESSIONAL_CPF]) text = `${text}CPF: ${variables[VariablesPGREnum.PROFESSIONAL_CPF]}\n`
       // eslint-disable-next-line prettier/prettier
       if (variables[VariablesPGREnum.PROFESSIONAL_CERTIFICATIONS]) text = `${text}${variables[VariablesPGREnum.PROFESSIONAL_CERTIFICATIONS]}`
       return convertToDocx(
