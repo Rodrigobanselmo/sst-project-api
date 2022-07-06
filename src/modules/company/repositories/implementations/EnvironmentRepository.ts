@@ -44,7 +44,7 @@ export class EnvironmentRepository {
       where: { homogeneousGroupId: homogeneousGroup.id },
     });
 
-    await Promise.all(
+    const homoHierarchy = await Promise.all(
       hierarchyIds.map(
         async (hierarchyId) =>
           await this.prisma.hierarchyOnHomogeneous.upsert({
@@ -61,11 +61,12 @@ export class EnvironmentRepository {
               homogeneousGroupId: homogeneousGroup.id,
             },
             update: {},
+            // include: { hierarchy: true },
           }),
       ),
     );
 
-    const environment = await this.prisma.companyEnvironment.upsert({
+    const environment = (await this.prisma.companyEnvironment.upsert({
       where: {
         workspaceId_companyId_id: { id: id || 'no-id', companyId, workspaceId },
       },
@@ -80,7 +81,11 @@ export class EnvironmentRepository {
       update: {
         ...environmentDto,
       },
-    });
+    })) as EnvironmentEntity;
+
+    // environment.hierarchies = homoHierarchy.map(
+    //   (hh) => new HierarchyEntity(hh.hierarchy),
+    // );
 
     return new EnvironmentEntity(environment);
   }
@@ -115,10 +120,22 @@ export class EnvironmentRepository {
   }
 
   async findById(id: string) {
-    const environment = await this.prisma.companyEnvironment.findUnique({
+    const environment = (await this.prisma.companyEnvironment.findUnique({
       where: { id },
       include: { photos: true },
+    })) as EnvironmentEntity;
+
+    const hierarchies = await this.prisma.hierarchy.findMany({
+      where: {
+        hierarchyOnHomogeneous: {
+          some: { homogeneousGroupId: environment.id },
+        },
+      },
     });
+
+    environment.hierarchies = hierarchies.map(
+      (hierarchy) => new HierarchyEntity(hierarchy),
+    );
 
     return new EnvironmentEntity(environment);
   }

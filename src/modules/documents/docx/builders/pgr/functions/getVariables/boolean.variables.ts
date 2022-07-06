@@ -16,6 +16,26 @@ export const booleanVariables = (
   document: RiskFactorGroupDataEntity,
 ) => {
   return {
+    [VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_RISK]: (document.data || []).find(
+      (riskData) => riskData.homogeneousGroup.environment,
+    )
+      ? 'true'
+      : '',
+    [VariablesPGREnum.COMPANY_HAS_CHARACTERIZATION_RISK]: (
+      document.data || []
+    ).find((riskData) => riskData.homogeneousGroup.characterization)
+      ? 'true'
+      : '',
+    [VariablesPGREnum.COMPANY_HAS_HIERARCHY_RISK]: (document.data || []).find(
+      (riskData) => riskData.homogeneousGroup.type === 'HIERARCHY',
+    )
+      ? 'true'
+      : '',
+    [VariablesPGREnum.COMPANY_HAS_GSE_RISK]: (document.data || []).find(
+      (riskData) => !riskData.homogeneousGroup.type,
+    )
+      ? 'true'
+      : '',
     [VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_GENERAL]:
       company.environments.find(
         (env) => env.type === CompanyEnvironmentTypesEnum.GENERAL,

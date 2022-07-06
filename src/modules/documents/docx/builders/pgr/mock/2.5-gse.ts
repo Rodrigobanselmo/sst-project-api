@@ -12,6 +12,7 @@ export const gseSection: IDocumentPGRSectionGroup = {
     {
       type: PGRSectionTypeEnum.SECTION,
       footerText: `??${VariablesPGREnum.CHAPTER_2}??`,
+      removeWithSomeEmptyVars: [VariablesPGREnum.COMPANY_HAS_GSE_RISK],
       children: [
         {
           type: PGRSectionChildrenTypeEnum.H1,

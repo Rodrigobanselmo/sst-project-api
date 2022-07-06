@@ -46,8 +46,16 @@ export class PgrUploadTableService {
 
     const sections: ISectionOptions[] = [
       riskCharacterizationTableSection(riskGroupData),
-      ...hierarchyPrioritizationTableSections(riskGroupData, hierarchyData),
-      ...hierarchyRisksTableSections(riskGroupData, hierarchyData),
+      ...hierarchyPrioritizationTableSections(
+        riskGroupData,
+        hierarchyData,
+        hierarchyTree,
+      ),
+      ...hierarchyRisksTableSections(
+        riskGroupData,
+        hierarchyData,
+        hierarchyTree,
+      ),
       hierarchyHomoOrgSection(hierarchyData, homoGroupTree),
       actionPlanTableSection(riskGroupData, hierarchyTree),
       ...APPRTableSection(riskGroupData, hierarchyData, homoGroupTree),

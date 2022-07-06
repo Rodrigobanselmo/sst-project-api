@@ -1,4 +1,3 @@
-import { HomoTypeEnum } from '@prisma/client';
 import { Footer, Header, PageOrientation, Table, WidthType } from 'docx';
 
 import {
@@ -15,17 +14,32 @@ import {
 export const hierarchyHomoOrgSection = (
   hierarchiesEntity: IHierarchyData,
   homoGroupTree: IHomoGroupMap,
-  { showDescription, showHomogeneous, type }: ConverterProps = {
+  {
+    showDescription,
+    showHomogeneous,
+    showHomogeneousDescription,
+    type,
+  }: ConverterProps = {
     showHomogeneous: true,
     showDescription: true,
+    showHomogeneousDescription: false,
     type: undefined,
   },
 ) => {
   const { bodyData, headerData } = hierarchyPlanConverter(
     hierarchiesEntity,
     homoGroupTree,
-    { showDescription, showHomogeneous, type },
+    { showDescription, showHomogeneous, type, showHomogeneousDescription },
   );
+
+  const groupName = () => {
+    if (!type) return 'GSE';
+    if (type === 'ENVIRONMENT') return 'Ambiente';
+    return 'Mão de Obra';
+  };
+
+  headerData[0].text = groupName();
+  if (!showHomogeneousDescription) headerData.splice(1, 1);
 
   const tableHeaderElements = new TableHeaderElements();
   const tableBodyElements = new TableBodyElements();

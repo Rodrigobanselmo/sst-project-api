@@ -7,6 +7,7 @@ import { WorkspaceEntity } from '../../../../../company/entities/workspace.entit
 import { RiskFactorGroupDataEntity } from '../../../../../checklist/entities/riskGroupData.entity';
 import {
   HierarchyMapData,
+  IHierarchyMap,
   IHomoGroupMap,
 } from '../../../converter/hierarchy.converter';
 
@@ -22,4 +23,5 @@ export interface ICreatePGR {
   hierarchy: Map<string, HierarchyMapData>;
   characterizations: CharacterizationEntity[];
   attachments: AttachmentEntity[];
+  hierarchyTree: IHierarchyMap;
 }

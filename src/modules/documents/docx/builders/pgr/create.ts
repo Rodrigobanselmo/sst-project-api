@@ -20,6 +20,7 @@ import {
 } from './types/section.types';
 import {
   HierarchyMapData,
+  IHierarchyMap,
   IHomoGroupMap,
 } from '../../converter/hierarchy.converter';
 import { booleanVariables } from './functions/getVariables/boolean.variables';
@@ -38,6 +39,7 @@ export class DocumentBuildPGR {
   private hierarchy: Map<string, HierarchyMapData>;
   private characterizations: CharacterizationEntity[];
   private attachments: AttachmentEntity[];
+  private hierarchyTree: IHierarchyMap;
 
   constructor({
     version,
@@ -51,6 +53,7 @@ export class DocumentBuildPGR {
     hierarchy,
     characterizations,
     attachments,
+    hierarchyTree,
   }: ICreatePGR) {
     this.version = version;
     this.logoImagePath = logo;
@@ -64,6 +67,7 @@ export class DocumentBuildPGR {
     this.hierarchy = hierarchy;
     this.characterizations = characterizations;
     this.attachments = attachments;
+    this.hierarchyTree = hierarchyTree;
     this.variables = this.getVariables();
   }
 
@@ -118,6 +122,7 @@ export class DocumentBuildPGR {
       homogeneousGroup: this.homogeneousGroup,
       hierarchy: this.hierarchy,
       attachments: this.attachments,
+      hierarchyTree: this.hierarchyTree,
     }).map;
 
     const sectionsMap = new SectionsMapClass({

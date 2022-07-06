@@ -4,7 +4,10 @@ import { palette } from '../../../../../../shared/constants/palette';
 import { removeDuplicate } from '../../../../../../shared/utils/removeDuplicate';
 import { sortString } from '../../../../../../shared/utils/sorts/string.sort';
 import { RiskFactorGroupDataEntity } from '../../../../../checklist/entities/riskGroupData.entity';
-import { IHierarchyData } from '../../../converter/hierarchy.converter';
+import {
+  IHierarchyData,
+  IHierarchyMap,
+} from '../../../converter/hierarchy.converter';
 import { hierarchyMap } from '../appr/parts/first/first.constant';
 import { bodyTableProps } from './elements/body';
 import { headerTableProps } from './elements/header';
@@ -30,6 +33,7 @@ interface IRiskDataMap {
 export const hierarchyRisksConverter = (
   riskGroup: RiskFactorGroupDataEntity,
   hierarchyData: IHierarchyData,
+  hierarchyTree: IHierarchyMap,
   { hierarchyType = HierarchyEnum.SECTOR }: IHierarchyRiskOptions,
 ) => {
   const allHierarchyRecord = {} as Record<string, IHierarchyDataType>;

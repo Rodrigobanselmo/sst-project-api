@@ -318,7 +318,13 @@ export class HierarchyRepository {
     const hierarchies = await this.prisma.hierarchy.findMany({
       where: { companyId, workspaces: { some: { id: workspaceId } } },
       include: {
-        hierarchyOnHomogeneous: { include: { homogeneousGroup: true } },
+        hierarchyOnHomogeneous: {
+          include: {
+            homogeneousGroup: {
+              include: { characterization: true, environment: true },
+            },
+          },
+        },
         employees: { where: { workspaces: { some: { id: workspaceId } } } },
         workspaces: true,
       },

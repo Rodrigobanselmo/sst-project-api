@@ -7,7 +7,10 @@ import {
   PGRSectionChildrenTypeEnum,
 } from '../../../builders/pgr/types/elements.types';
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
-import { IHierarchyData } from '../../../converter/hierarchy.converter';
+import {
+  IHierarchyData,
+  IHierarchyMap,
+} from '../../../converter/hierarchy.converter';
 import { IHierarchyPrioritizationOptions } from './hierarchyPrioritization.converter';
 import { HierarchyEnum } from '@prisma/client';
 import { hierarchyPrioritizationTables } from './hierarchyPrioritization.tables';
@@ -17,6 +20,7 @@ import { bodyTableProps, TableBodyElements } from './elements/body';
 export const hierarchyPrioritizationPage = (
   riskFactorGroupData: RiskFactorGroupDataEntity,
   hierarchiesEntity: IHierarchyData,
+  hierarchyTree: IHierarchyMap,
   options: IHierarchyPrioritizationOptions = {
     hierarchyType: HierarchyEnum.OFFICE,
     isByGroup: false,
@@ -29,6 +33,7 @@ export const hierarchyPrioritizationPage = (
   const tables = hierarchyPrioritizationTables(
     riskFactorGroupData,
     hierarchiesEntity,
+    hierarchyTree,
     options,
   );
 

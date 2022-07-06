@@ -148,6 +148,7 @@ export class PgrUploadService {
         hierarchy: hierarchyData,
         homogeneousGroup: homoGroupTree,
         characterizations,
+        hierarchyTree,
       }).build();
 
       const doc = createBaseDocument(sections);

@@ -8,7 +8,10 @@ import {
   PGRSectionChildrenTypeEnum,
 } from '../../../builders/pgr/types/elements.types';
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
-import { IHierarchyData } from '../../../converter/hierarchy.converter';
+import {
+  IHierarchyData,
+  IHierarchyMap,
+} from '../../../converter/hierarchy.converter';
 import { TableBodyElements } from './elements/body';
 import { TableHeaderElements } from './elements/header';
 import {
@@ -19,6 +22,7 @@ import {
 export const hierarchyRisksTableSections = (
   riskFactorGroupData: RiskFactorGroupDataEntity,
   hierarchiesEntity: IHierarchyData,
+  hierarchyTree: IHierarchyMap,
   options: IHierarchyRiskOptions = {
     hierarchyType: HierarchyEnum.SECTOR,
   },
@@ -26,6 +30,7 @@ export const hierarchyRisksTableSections = (
   const { bodyData, headerData } = hierarchyRisksConverter(
     riskFactorGroupData,
     hierarchiesEntity,
+    hierarchyTree,
     options,
   );
 

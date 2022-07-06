@@ -1,6 +1,7 @@
 import {
   CharacterizationTypeEnum,
   CompanyEnvironmentTypesEnum,
+  HomoTypeEnum,
 } from '@prisma/client';
 import { Paragraph, Table } from 'docx';
 
@@ -34,6 +35,7 @@ import { riskCharacterizationTableSection } from '../../../components/tables/ris
 import { versionControlTable } from '../../../components/tables/versionControl/versionControl.table';
 import {
   HierarchyMapData,
+  IHierarchyMap,
   IHomoGroupMap,
 } from '../../../converter/hierarchy.converter';
 import { convertToDocxHelper } from '../functions/convertToDocx';
@@ -78,6 +80,7 @@ type IDocumentClassType = {
   hierarchy: Map<string, HierarchyMapData>;
   characterizations: CharacterizationEntity[];
   attachments: AttachmentEntity[];
+  hierarchyTree: IHierarchyMap;
 };
 
 export class ElementsMapClass {
@@ -90,6 +93,7 @@ export class ElementsMapClass {
   private attachments: AttachmentEntity[];
   private homogeneousGroup: IHomoGroupMap;
   private hierarchy: Map<string, HierarchyMapData>;
+  private hierarchyTree: IHierarchyMap;
 
   constructor({
     variables,
@@ -101,6 +105,7 @@ export class ElementsMapClass {
     homogeneousGroup,
     hierarchy,
     attachments,
+    hierarchyTree,
   }: IDocumentClassType) {
     this.variables = variables;
     this.versions = versions;
@@ -111,6 +116,7 @@ export class ElementsMapClass {
     this.homogeneousGroup = homogeneousGroup;
     this.hierarchy = hierarchy;
     this.attachments = attachments;
+    this.hierarchyTree = hierarchyTree;
   }
 
   public map: IMapElementDocumentType = {
@@ -192,13 +198,64 @@ export class ElementsMapClass {
       hierarchyHomoOrgSection(this.hierarchy, this.homogeneousGroup, {
         showDescription: false,
         showHomogeneous: true,
+        showHomogeneousDescription: true,
+      })['children'],
+    [PGRSectionChildrenTypeEnum.TABLE_HIERARCHY_ENV]: () =>
+      hierarchyHomoOrgSection(this.hierarchy, this.homogeneousGroup, {
+        showDescription: false,
+        showHomogeneous: true,
+        type: 'ENVIRONMENT',
+      })['children'],
+    [PGRSectionChildrenTypeEnum.TABLE_HIERARCHY_CHAR]: () =>
+      hierarchyHomoOrgSection(this.hierarchy, this.homogeneousGroup, {
+        showDescription: false,
+        showHomogeneous: true,
+        type: ['EQUIPMENT', 'ACTIVITIES', 'WORKSTATION'],
       })['children'],
     [PGRSectionChildrenTypeEnum.TABLE_PRIORITIZATION]: () =>
       hierarchyPrioritizationPage(
         this.document,
         this.hierarchy,
+        this.hierarchyTree,
         {
           isByGroup: true,
+        },
+        (x, v) => this.convertToDocx(x, v),
+      ),
+    [PGRSectionChildrenTypeEnum.TABLE_PRIORITIZATION_HIERARCHY]: () =>
+      hierarchyPrioritizationPage(
+        this.document,
+        this.hierarchy,
+        this.hierarchyTree,
+        {
+          isByGroup: true,
+          homoType: HomoTypeEnum.HIERARCHY,
+        },
+        (x, v) => this.convertToDocx(x, v),
+      ),
+    [PGRSectionChildrenTypeEnum.TABLE_PRIORITIZATION_ENV]: () =>
+      hierarchyPrioritizationPage(
+        this.document,
+        this.hierarchy,
+        this.hierarchyTree,
+        {
+          isByGroup: true,
+          homoType: HomoTypeEnum.ENVIRONMENT,
+        },
+        (x, v) => this.convertToDocx(x, v),
+      ),
+    [PGRSectionChildrenTypeEnum.TABLE_PRIORITIZATION_CHAR]: () =>
+      hierarchyPrioritizationPage(
+        this.document,
+        this.hierarchy,
+        this.hierarchyTree,
+        {
+          isByGroup: true,
+          homoType: [
+            HomoTypeEnum.ACTIVITIES,
+            HomoTypeEnum.EQUIPMENT,
+            HomoTypeEnum.ACTIVITIES,
+          ],
         },
         (x, v) => this.convertToDocx(x, v),
       ),

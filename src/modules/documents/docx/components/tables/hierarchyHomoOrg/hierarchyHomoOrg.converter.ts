@@ -1,3 +1,4 @@
+import { originRiskMap } from './../../../../../../shared/constants/maps/origin-risk';
 import { HomoTypeEnum } from '@prisma/client';
 import { hierarchyList } from '../../../../../../shared/constants/lists/hierarchy.list';
 import { palette } from '../../../../../../shared/constants/palette';
@@ -16,8 +17,9 @@ import {
 
 export type ConverterProps = {
   showHomogeneous?: boolean;
+  showHomogeneousDescription?: boolean;
   showDescription?: boolean;
-  type?: HomoTypeEnum | undefined;
+  type?: HomoTypeEnum | HomoTypeEnum[] | undefined;
 };
 
 type IHierarchyDataRecord<T> = {
@@ -42,8 +44,14 @@ const hierarchyEmptyId = '0';
 export const hierarchyPlanConverter = (
   hierarchyData: IHierarchyData,
   homoGroupTree: IHomoGroupMap,
-  { showDescription, showHomogeneous, type }: ConverterProps = {
+  {
+    showDescription,
+    showHomogeneous,
+    showHomogeneousDescription,
+    type,
+  }: ConverterProps = {
     showHomogeneous: false,
+    showHomogeneousDescription: false,
     showDescription: true,
     type: undefined,
   },
@@ -132,6 +140,8 @@ export const hierarchyPlanConverter = (
     return column;
   });
 
+  if (!showHomogeneousDescription) mockedColumns.slice(0, 1);
+
   function setHeaderTable() {
     const row = showHomogeneous ? [...mockedColumns] : [];
     const headerTable = Object.keys(hierarchyColumns)
@@ -163,21 +173,33 @@ export const hierarchyPlanConverter = (
     Object.entries(allHierarchyPlan)
       .sort(([, c], [, d]) => sortString(c[0], d[0], 'name'))
       .forEach(([homogeneousGroupId, firstHierarchyPlan]) => {
-        if (type && homoGroupTree[homogeneousGroupId].type != type) return;
-        if (
-          !type &&
-          homoGroupTree[homogeneousGroupId] &&
-          homoGroupTree[homogeneousGroupId].type
-        )
-          return;
+        const homo = homoGroupTree[homogeneousGroupId];
+
+        if (!homo) return;
+        if (!type && homo && homo.type) return;
+        if (type && !Array.isArray(type) && homo.type !== type) return;
+        if (type && Array.isArray(type) && !type.includes(homo.type)) return;
+
+        let name = homo.name;
+        if (homo.type === HomoTypeEnum.ENVIRONMENT) {
+          name = `${homo.environment.name}\n(${
+            originRiskMap[homo.environment.type].name
+          })`;
+        }
+
+        if (homo.characterization)
+          name = `${homo.characterization.name}\n(${
+            originRiskMap[homo.characterization.type].name
+          })`;
 
         const row = generateRow();
         const firstPosition = rowsPosition;
         if (showHomogeneous) {
-          row[0] = { text: homoGroupTree[homogeneousGroupId].name };
-          row[1] = {
-            text: homoGroupTree[homogeneousGroupId].description || ' ',
-          };
+          row[0] = { text: name };
+          if (showHomogeneousDescription)
+            row[1] = {
+              text: homo.description || ' ',
+            };
         }
         rows[rowsPosition] = row;
 

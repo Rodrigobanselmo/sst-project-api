@@ -23,7 +23,12 @@ export enum PGRSectionChildrenTypeEnum {
   ITERABLE_RECOMMENDATIONS = 'ITERABLE_RECOMMENDATIONS',
   ITERABLE_EMERGENCY_RISKS = 'ITERABLE_EMERGENCY_RISKS',
   TABLE_GSE = 'TABLE_GSE',
+  TABLE_HIERARCHY_ENV = 'TABLE_HIERARCHY_ENV',
+  TABLE_HIERARCHY_CHAR = 'TABLE_HIERARCHY_CHAR',
   TABLE_PRIORITIZATION = 'TABLE_PRIORITIZATION',
+  TABLE_PRIORITIZATION_ENV = 'TABLE_PRIORITIZATION_ENV',
+  TABLE_PRIORITIZATION_CHAR = 'TABLE_PRIORITIZATION_CHAR',
+  TABLE_PRIORITIZATION_HIERARCHY = 'TABLE_PRIORITIZATION_HIERARCHY',
   HIERARCHY_RISK_TABLE = 'HIERARCHY_RISK_TABLE',
   RISK_TABLE = 'RISK_TABLE',
   PARAGRAPH_TABLE = 'PARAGRAPH_TABLE',
@@ -182,6 +187,14 @@ export type IGseTable = {
   type: PGRSectionChildrenTypeEnum.TABLE_GSE;
 } & IBase;
 
+export type IGseEnvTable = {
+  type: PGRSectionChildrenTypeEnum.TABLE_HIERARCHY_ENV;
+} & IBase;
+
+export type IGseCharTable = {
+  type: PGRSectionChildrenTypeEnum.TABLE_HIERARCHY_CHAR;
+} & IBase;
+
 export type IMatrix = {
   type: PGRSectionChildrenTypeEnum.MATRIX_TABLES;
 } & IBase;
@@ -212,6 +225,18 @@ export type IRiskTable = {
 
 export type IPrioritization = {
   type: PGRSectionChildrenTypeEnum.TABLE_PRIORITIZATION;
+} & IBase;
+
+export type IPrioritizationH = {
+  type: PGRSectionChildrenTypeEnum.TABLE_PRIORITIZATION_HIERARCHY;
+} & IBase;
+
+export type IPrioritizationE = {
+  type: PGRSectionChildrenTypeEnum.TABLE_PRIORITIZATION_ENV;
+} & IBase;
+
+export type IPrioritizationC = {
+  type: PGRSectionChildrenTypeEnum.TABLE_PRIORITIZATION_CHAR;
 } & IBase;
 
 export type IRecommendations = {
@@ -270,7 +295,12 @@ export type ISectionChildrenType =
   | IRSImage
   | IGseTable
   | IPrioritization
+  | IPrioritizationH
+  | IPrioritizationE
+  | IPrioritizationC
   | IRecommendations
+  | IGseCharTable
+  | IGseEnvTable
   | IEmergency
   | IApr
   | IPlan

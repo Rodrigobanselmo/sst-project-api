@@ -1,11 +1,15 @@
-import { HierarchyEnum } from '@prisma/client';
+import { originRiskMap } from './../../../../../../shared/constants/maps/origin-risk';
+import { HierarchyEnum, HomoTypeEnum } from '@prisma/client';
 
 import { palette } from '../../../../../../shared/constants/palette';
 import { removeDuplicate } from '../../../../../../shared/utils/removeDuplicate';
 import { sortString } from '../../../../../../shared/utils/sorts/string.sort';
 import { RiskFactorGroupDataEntity } from '../../../../../checklist/entities/riskGroupData.entity';
 import { getMatrizRisk } from '../../../../../../shared/utils/matriz';
-import { IHierarchyData } from '../../../converter/hierarchy.converter';
+import {
+  IHierarchyData,
+  IHierarchyMap,
+} from '../../../converter/hierarchy.converter';
 import { hierarchyMap } from '../appr/parts/first/first.constant';
 import { bodyTableProps } from './elements/body';
 import { headerTableProps } from './elements/header';
@@ -13,6 +17,7 @@ import { headerTableProps } from './elements/header';
 export interface IHierarchyPrioritizationOptions {
   isByGroup?: boolean;
   hierarchyType?: HierarchyEnum;
+  homoType?: HomoTypeEnum | HomoTypeEnum[];
 }
 interface IHomoPositionData {
   data: { position: number; riskDegree: string; riskDegreeLevel: number }[];
@@ -33,9 +38,11 @@ interface IRiskDataMap {
 export const hierarchyPrioritizationConverter = (
   riskGroup: RiskFactorGroupDataEntity,
   hierarchyData: IHierarchyData,
+  hierarchyTree: IHierarchyMap,
   {
     hierarchyType = HierarchyEnum.SECTOR,
     isByGroup = false,
+    homoType,
   }: IHierarchyPrioritizationOptions,
 ) => {
   const warnLevelStart = 4;
@@ -73,8 +80,34 @@ export const hierarchyPrioritizationConverter = (
 
   function getAllHomoGroups() {
     riskGroup.data.forEach((riskData) => {
+      if (!homoType && riskData.homogeneousGroup.type) return;
+      // eslint-disable-next-line prettier/prettier
+      if (homoType && !Array.isArray(homoType)&&riskData.homogeneousGroup.type !== homoType) return;
+      // eslint-disable-next-line prettier/prettier
+      if (homoType && Array.isArray(homoType) && !homoType.includes(riskData.homogeneousGroup.type)) return;
+
       const homoId = riskData.homogeneousGroup.id;
-      const name = riskData.homogeneousGroup.name;
+      let name = riskData.homogeneousGroup.name;
+
+      if (riskData.homogeneousGroup.type === HomoTypeEnum.ENVIRONMENT) {
+        name = `${riskData.homogeneousGroup.environment.name}\n(${
+          originRiskMap[riskData.homogeneousGroup.environment.type].name
+        })`;
+      }
+
+      if (riskData.homogeneousGroup.characterization)
+        name = `${riskData.homogeneousGroup.characterization.name}\n(${
+          originRiskMap[riskData.homogeneousGroup.characterization.type].name
+        })`;
+
+      //nivel hierarquido da estrtura organizacional
+      if (riskData.homogeneousGroup.type == HomoTypeEnum.HIERARCHY) {
+        const hierarchy = hierarchyTree[homoId];
+
+        if (hierarchy)
+          name = `${hierarchy.name}\n(${originRiskMap[hierarchy.type].name})`;
+      }
+
       const hierarchyMap = allHierarchyRecord[homoId] || {
         homogeneousGroupIds: [homoId],
       };
@@ -163,8 +196,15 @@ export const hierarchyPrioritizationConverter = (
         };
       });
 
+    const groupName = () => {
+      if (!homoType) return 'GSE';
+      if (homoType === 'HIERARCHY') return 'Nível Hierarquico';
+      if (homoType === 'ENVIRONMENT') return 'Ambiente';
+      return 'Mão de Obra';
+    };
+
     row.unshift({
-      text: isByGroup ? 'GSE' : hierarchyMap[hierarchyType].text,
+      text: isByGroup ? groupName() : hierarchyMap[hierarchyType].text,
       position: 0,
       textDirection: undefined,
       size: row.length < 6 ? 1 : Math.ceil(row.length / 6),
