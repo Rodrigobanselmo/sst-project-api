@@ -500,6 +500,7 @@ model RiskFactors {
   representAll Boolean @default(false)
   riskFactorData RiskFactorData[]
   riskFactorProbability RiskFactorProbability[]
+  json Json?
   
   @@unique([id, companyId])
 }
@@ -575,6 +576,7 @@ model RiskFactorData {
   engs RecMed[]  @relation(name: "engs")
   adms RecMed[]  @relation(name: "adms")
   epis Epi[]
+  json Json?
 
   @@unique([id, companyId])
   @@unique([homogeneousGroupId, riskId, riskFactorGroupDataId])
