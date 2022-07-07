@@ -1,4 +1,4 @@
-import { HomoTypeEnum } from '@prisma/client';
+import { HomoTypeEnum, Prisma } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import {
   IsEnum,
@@ -75,6 +75,9 @@ export class UpsertRiskDataDto {
 
   @IsOptional()
   keepEmpty?: boolean;
+
+  @IsOptional()
+  json?: Prisma.JsonValue;
 }
 
 export class UpsertManyRiskDataDto {

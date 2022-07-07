@@ -54,6 +54,16 @@ export class EnvironmentPhotoRepository {
     return new EnvironmentPhotoEntity(environment);
   }
 
+  async findByEnvironment(environmentId: string) {
+    const environments = await this.prisma.companyEnvironmentPhoto.findMany({
+      where: { companyEnvironmentId: environmentId },
+    });
+
+    return environments.map(
+      (environment) => new EnvironmentPhotoEntity(environment),
+    );
+  }
+
   async delete(id: string) {
     const environment = await this.prisma.companyEnvironmentPhoto.delete({
       where: { id },

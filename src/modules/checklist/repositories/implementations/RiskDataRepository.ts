@@ -90,7 +90,7 @@ export class RiskDataRepository {
       },
     });
     return riskFactorData.map((data) => {
-      const riskData = { ...data } as RiskFactorDataEntity;
+      const riskData = { ...data } as unknown as RiskFactorDataEntity;
       if (data.homogeneousGroup && data.homogeneousGroup.hierarchyOnHomogeneous)
         riskData.homogeneousGroup.hierarchies =
           data.homogeneousGroup.hierarchyOnHomogeneous.map((homo) => ({
@@ -184,6 +184,7 @@ export class RiskDataRepository {
     id,
     ...createDto
   }: Omit<UpsertRiskDataDto, 'keepEmpty'>) {
+    console.log(createDto);
     return this.prisma.riskFactorData.upsert({
       create: {
         ...createDto,

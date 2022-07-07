@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { RiskFactors, RiskFactorsEnum } from '.prisma/client';
+import { Prisma, RiskFactors, RiskFactorsEnum } from '.prisma/client';
 import { StatusEnum } from '@prisma/client';
 import { RecMedEntity } from './recMed.entity';
 import { GenerateSourceEntity } from './generateSource.entity';
@@ -63,9 +63,7 @@ export class RiskFactorsEntity implements RiskFactors {
   risk: string;
   isEmergency: boolean;
 
-  constructor(partial: Partial<RiskFactorsEntity>) {
-    Object.assign(this, partial);
-  }
+  json: Prisma.JsonValue;
   exame: string;
   symptoms: string;
   method: string;
@@ -80,4 +78,8 @@ export class RiskFactorsEntity implements RiskFactors {
   pe: string;
   carnogenicityACGIH: string;
   carnogenicityLinach: string;
+
+  constructor(partial: Partial<RiskFactorsEntity>) {
+    Object.assign(this, partial);
+  }
 }
