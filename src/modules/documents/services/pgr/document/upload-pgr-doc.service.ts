@@ -55,6 +55,7 @@ export class PgrUploadService {
     const hierarchyHierarchy =  await this.hierarchyRepository.findAllDataHierarchyByCompany(companyId, workspaceId);
     // eslint-disable-next-line prettier/prettier
     const versions = await this.riskDocumentRepository.findByRiskGroupAndCompany(upsertPgrDto.riskGroupId, companyId);
+
     const workspace = await this.workspaceRepository.findById(workspaceId);
     const company = await this.companyRepository.findByIdAll(
       companyId,
@@ -102,15 +103,15 @@ export class PgrUploadService {
       const { hierarchyData, homoGroupTree, hierarchyTree } =
         hierarchyConverter(hierarchyHierarchy, environments);
 
-      const actionPlanUrl = ' ';
-      const urlAPR = ' ';
-      // const { actionPlanUrl, urlAPR } = await this.generateAttachment(
-      //   riskGroupData,
-      //   hierarchyData,
-      //   hierarchyTree,
-      //   homoGroupTree,
-      //   upsertPgrDto,
-      // );
+      // const actionPlanUrl = ' ';
+      // const urlAPR = ' ';
+      const { actionPlanUrl, urlAPR } = await this.generateAttachment(
+        riskGroupData,
+        hierarchyData,
+        hierarchyTree,
+        homoGroupTree,
+        upsertPgrDto,
+      );
 
       const version = new RiskDocumentEntity({
         version: upsertPgrDto.version,
@@ -120,6 +121,8 @@ export class PgrUploadService {
         revisionBy: riskGroupData.revisionBy,
         created_at: new Date(),
       });
+
+      versions.unshift(version);
 
       const attachments = [
         new AttachmentEntity({
