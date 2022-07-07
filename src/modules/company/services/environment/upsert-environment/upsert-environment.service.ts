@@ -53,13 +53,12 @@ export class UpsertEnvironmentService {
   private async upload(companyId: string, files: Array<Express.Multer.File>) {
     const urls = await Promise.all(
       files.map(async (file) => {
-        const stream = Readable.from(file.buffer);
         const fileType =
           file.originalname.split('.')[file.originalname.split('.').length - 1];
         const path = companyId + '/environment/' + v4() + '.' + fileType;
 
         const { url } = await this.amazonStorageProvider.upload({
-          file: stream,
+          file: file.buffer,
           isPublic: true,
           fileName: path,
         });

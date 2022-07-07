@@ -43,13 +43,12 @@ export class AddCharacterizationPhotoService {
   }
 
   private async upload(companyId: string, file: Express.Multer.File) {
-    const stream = Readable.from(file.buffer);
     const fileType =
       file.originalname.split('.')[file.originalname.split('.').length - 1];
     const path = companyId + '/characterization/' + v4() + '.' + fileType;
 
     const { url } = await this.amazonStorageProvider.upload({
-      file: stream,
+      file: file.buffer,
       isPublic: true,
       fileName: path,
     });

@@ -32,6 +32,23 @@ export class AmazonStorageProvider implements IStorageProvider {
     return { url };
   }
 
+  async uploadLarge({
+    file,
+    fileName,
+    isPublic,
+  }: FileStorage.Upload.Params): Promise<FileStorage.Upload.Result> {
+    const { Location: url } = await this.s3
+      .upload({
+        Bucket: this.bucket,
+        Key: fileName,
+        Body: file,
+        ContentType: this.contentType(fileName),
+        ACL: isPublic ? 'public-read' : undefined,
+      })
+      .promise();
+    return { url };
+  }
+
   download({
     fileKey,
   }: FileStorage.Download.Params): FileStorage.Download.Result {

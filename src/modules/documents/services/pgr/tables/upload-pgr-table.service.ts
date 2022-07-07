@@ -85,10 +85,8 @@ export class PgrUploadTableService {
     upsertPgrDto: UpsertPgrDto,
     company: Partial<CompanyEntity>,
   ) {
-    const stream = Readable.from(fileBuffer);
-
     const { url } = await this.amazonStorageProvider.upload({
-      file: stream,
+      file: fileBuffer,
       fileName: company.id + '/pgr/' + fileName,
     });
 

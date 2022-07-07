@@ -89,8 +89,8 @@ export const hierarchyPrioritizationConverter = (
       const homoId = riskData.homogeneousGroup.id;
       let name = riskData.homogeneousGroup.name;
 
-      if (riskData.homogeneousGroup.type === HomoTypeEnum.ENVIRONMENT) {
-        name = `${riskData.homogeneousGroup.environment.name}\n(${
+      if (riskData.homogeneousGroup.environment) {
+        name = `${riskData.homogeneousGroup.environment?.name}\n(${
           originRiskMap[riskData.homogeneousGroup.environment.type].name
         })`;
       }

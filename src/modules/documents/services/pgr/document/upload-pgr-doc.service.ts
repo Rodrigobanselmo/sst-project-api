@@ -185,10 +185,8 @@ export class PgrUploadService {
     fileName: string,
     company: Partial<CompanyEntity>,
   ) {
-    const stream = Readable.from(fileBuffer);
-
     const { url } = await this.amazonStorageProvider.upload({
-      file: stream,
+      file: fileBuffer,
       fileName: company.id + '/pgr/' + fileName,
       isPublic: true,
     });

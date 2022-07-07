@@ -1,4 +1,4 @@
-import internal, { Readable } from 'stream';
+import internal from 'stream';
 
 interface IStorageProvider {
   upload(params: FileStorage.Upload.Params): Promise<FileStorage.Upload.Result>;
@@ -8,7 +8,7 @@ interface IStorageProvider {
 export namespace FileStorage {
   export namespace Upload {
     export type Params = {
-      file: Readable;
+      file: Buffer;
       fileName: string;
       isPublic?: boolean;
     };
