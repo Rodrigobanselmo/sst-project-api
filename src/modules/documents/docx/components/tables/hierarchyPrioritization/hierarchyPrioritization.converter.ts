@@ -80,11 +80,6 @@ export const hierarchyPrioritizationConverter = (
 
   function getAllHomoGroups() {
     riskGroup.data.forEach((riskData) => {
-      console.log(
-        riskData.homogeneousGroup.type,
-        homoType,
-        JSON.stringify(riskData.homogeneousGroup),
-      );
       if (!homoType && riskData.homogeneousGroup.type) return;
       // eslint-disable-next-line prettier/prettier
       if (homoType && !Array.isArray(homoType)&&riskData.homogeneousGroup.type !== homoType) return;

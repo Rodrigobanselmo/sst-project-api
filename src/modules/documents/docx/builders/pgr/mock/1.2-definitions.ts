@@ -27,7 +27,7 @@ export const definitions2Section: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Risco:** Exposição de pessoas a perigos . O risco pode ser dimensionado em função da probabilidade e da gravidade do dano possível.',
+          text: '**Risco:** Exposição de pessoas a perigos. O risco pode ser dimensionado em função da probabilidade e da gravidade do dano possível.',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,

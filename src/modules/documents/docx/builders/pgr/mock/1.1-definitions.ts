@@ -41,7 +41,7 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Acidentes Maiores/Acidentes Químicos Ampliados:** São eventos de maior gravidade e de frequência significativamente menor, cujas consequências se es-tendem a um maior número de pessoas. Estes eventos causam grandes perdas as próprias instalações da empresa, podendo ultrapassar os seus limites geográficos e causam substanciais danos ambientais;',
+          text: '**Acidentes Maiores/Acidentes Químicos Ampliados:** São eventos de maior gravidade e de frequência significativamente menor, cujas consequências se estendem a um maior número de pessoas. Estes eventos causam grandes perdas as próprias instalações da empresa, podendo ultrapassar os seus limites geográficos e causam substanciais danos ambientais;',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -77,7 +77,7 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Agentes Químicos – Poeiras:** partículas sólidas, produzidas por ruptura mecânica de sólidos, tais como moa-gem, trituração, esmerilhamento, polimento, explosão, abrasão, corte etc.;',
+          text: '**Agentes Químicos – Poeiras:** partículas sólidas, produzidas por ruptura mecânica de sólidos, tais como moagem, trituração, esmerilhamento, polimento, explosão, abrasão, corte etc.;',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -93,15 +93,15 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Agentes Químicos – Vias de Absorção – Respiratória ou inalatória:** constitui a principal via de absorção de tóxicos, devido não só a grande quantidade de ar inalado durante a jornada de trabalho, como também a grande superfície dos alvéolos pulmonares. As substâncias penetram pelo nariz e pela boca, atuando na garganta e nos pulmões, em virtude da grande permeabilidade da parede alveolar da rica vasculari-zação. Os gases e os vapores são rapidamente absorvidos e diluídos no sangue, que por sua vez serão distribuídos para outras regiões do organismo. Algumas vezes, eles podem retidos em nível alveolar e de-senvolver uma ação localizada:',
+          text: '**Agentes Químicos – Vias de Absorção – Respiratória ou inalatória:** constitui a principal via de absorção de tóxicos, devido não só a grande quantidade de ar inalado durante a jornada de trabalho, como também a grande superfície dos alvéolos pulmonares. As substâncias penetram pelo nariz e pela boca, atuando na garganta e nos pulmões, em virtude da grande permeabilidade da parede alveolar da rica vascularização. Os gases e os vapores são rapidamente absorvidos e diluídos no sangue, que por sua vez serão distribuídos para outras regiões do organismo. Algumas vezes, eles podem retidos em nível alveolar e de-senvolver uma ação localizada:',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Agentes Químicos:** Consideram-se agentes químicos as substâncias, compostos ou produtos que possam penetrar no organismo pela via cutânea, digestiva ou respiratória, nas formas sólida, líquida ou gasosa, tais como: poeiras minerais ou vegetais, fumos metálicos, névoas, neblinas, gases ou vapores e outros, ou que, pela natureza da atividade possam se apresentar potencializados pelo pela reação ou transforma-ção química entre os corpos;',
+          text: '**Agentes Químicos:** Consideram-se agentes químicos as substâncias, compostos ou produtos que possam penetrar no organismo pela via cutânea, digestiva ou respiratória, nas formas sólida, líquida ou gasosa, tais como: poeiras minerais ou vegetais, fumos metálicos, névoas, neblinas, gases ou vapores e outros, ou que, pela natureza da atividade possam se apresentar potencializados pelo pela reação ou transformação química entre os corpos;',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Ainda desconhecidos, mas que são perfeitamente identificáveis através de metodologias já́ empregadas pela empresa:** Ex. Armazenamento de produtos tóxicos e inflamáveis em áreas de presença permanente de pessoas. A aplicação da inspeção planejada no almoxarifado constatou que estavam armazenando produto tóxico e inflamável em locais que poderiam prejudicar a saúde das pessoas e provocar um in-cêndio;',
+          text: '**Ainda desconhecidos, mas que são perfeitamente identificáveis através de metodologias já́ empregadas pela empresa:** Ex. Armazenamento de produtos tóxicos e inflamáveis em áreas de presença permanente de pessoas. A aplicação da inspeção planejada no almoxarifado constatou que estavam armazenando produto tóxico e inflamável em locais que poderiam prejudicar a saúde das pessoas e provocar um incêndio;',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -117,11 +117,11 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Avaliação Qualitativa:** Caracterização preliminar dos riscos ambientais a partir da identificação dos Fato-res de Riscos e Perigos presentes no ambiente de trabalho ou decorrentes do processo produtivo, da ca-tegorização dos seus efeitos à saúde, da listagem e do tempo de execução das tarefas desempenhadas pelos empregados;',
+          text: '**Avaliação Qualitativa:** Caracterização preliminar dos riscos ambientais a partir da identificação dos Fatores de Riscos e Perigos presentes no ambiente de trabalho ou decorrentes do processo produtivo, da categorização dos seus efeitos à saúde, da listagem e do tempo de execução das tarefas desempenhadas pelos empregados;',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Avaliação Quantitativa:** Determinação das concentrações dos agentes químicos e biológicos ou intensi-dade dos agentes físicos, através de metodologias de Higiene Ocupacional;',
+          text: '**Avaliação Quantitativa:** Determinação das concentrações dos agentes químicos e biológicos ou intensidade dos agentes físicos, através de metodologias de Higiene Ocupacional;',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -129,7 +129,7 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Canteiro de obra:** área de trabalho fixa e temporária, onde se desenvolvem operações de apoio e exe-cução à construção, demolição ou reforma de uma obra. **(NR-01 Anexo I);**',
+          text: '**Canteiro de obra:** área de trabalho fixa e temporária, onde se desenvolvem operações de apoio e execução à construção, demolição ou reforma de uma obra. **(NR-01 Anexo I);**',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -137,11 +137,11 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**CIPA:** Comissão Interna de Prevenção de Acidentes: comissão no âmbito das empresas, privadas e públi-cas, regulamentada pela CLT, nos artigos 162 a 165, e pela NR 5;',
+          text: '**CIPA:** Comissão Interna de Prevenção de Acidentes: comissão no âmbito das empresas, privadas e públicas, regulamentada pela CLT, nos artigos 162 a 165, e pela NR 5;',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Classificação de Riscos:** Processo global de estimar a magnitude do risco e de decisão sobre se o risco é ou não tolerável; ou, Processo de avaliação de riscos provenientes de perigos, levando em considera-ção a adequação de qualquer controle existente, e decidindo se o risco é ou não aceitável. Neste do-cumento os Fatores de Riscos e Perigos são classificados em 5 (cinco) níveis, sedo estes: 1º Muito Baixo (MB); 2º Baixo (B); Moderado (M); Alto (A); Muito Alto (MA);',
+          text: '**Classificação de Riscos:** Processo global de estimar a magnitude do risco e de decisão sobre se o risco é ou não tolerável; ou, Processo de avaliação de riscos provenientes de perigos, levando em consideração a adequação de qualquer controle existente, e decidindo se o risco é ou não aceitável. Neste documento os Fatores de Riscos e Perigos são classificados em 5 (cinco) níveis, sedo estes: 1º Muito Baixo (MB); 2º Baixo (B); Moderado (M); Alto (A); Muito Alto (MA);',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -149,19 +149,19 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Confiabilidade:** é quantitativamente definida como sendo a probabilidade que um componente, disposi-tivo, equipamento ou sistema desempenhe satisfatoriamente suas funções por um determinado espaço de tempo e sob um dado conjunto de condições de operação;',
+          text: '**Confiabilidade:** é quantitativamente definida como sendo a probabilidade que um componente, dispositivo, equipamento ou sistema desempenhe satisfatoriamente suas funções por um determinado espaço de tempo e sob um dado conjunto de condições de operação;',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Conhecidos e já́ devidamente controlados:** Ex. Sala de transformadores isolada e fechada. Casa de máqui-nas e compressores com elevado nível de ruído, totalmente fechada e sinalizada;',
+          text: '**Conhecidos e já́ devidamente controlados:** Ex. Sala de transformadores isolada e fechada. Casa de máquinas e compressores com elevado nível de ruído, totalmente fechada e sinalizada;',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Conhecidos, porém ainda não aceitavelmente controlados:** Ex. O produto químico Hexano ainda é muito utilizado em alguns tipos de solventes, podendo gerar problemas a saúde do trabalhador. Uma escada com degraus pequenos onde é necessário transportar volumes grandes, foi colocado um piso antiderra-pante e placas de aviso, mas o risco de queda contínua;',
+          text: '**Conhecidos, porém ainda não aceitavelmente controlados:** Ex. O produto químico Hexano ainda é muito utilizado em alguns tipos de solventes, podendo gerar problemas a saúde do trabalhador. Uma escada com degraus pequenos onde é necessário transportar volumes grandes, foi colocado um piso antiderrapante e placas de aviso, mas o risco de queda contínua;',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Consequência/Dano:** é a medida do resultado de um acidente do trabalho ou de acidentes maiores. Também pode ser definido como sendo a gravidade da perda humana, material ou financeira, ou a re-dução da capacidade de desempenho de uma função pré-determinada em um dado sistema;',
+          text: '**Consequência/Dano:** é a medida do resultado de um acidente do trabalho ou de acidentes maiores. Também pode ser definido como sendo a gravidade da perda humana, material ou financeira, ou a redução da capacidade de desempenho de uma função pré-determinada em um dado sistema;',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -177,11 +177,11 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Doenças Profissionais:** São todos os males aos quais a saúde humana está exposta, devido as atividades profissionais desenvolvidas. Estas doenças são causadas principalmente pela exposição crônica a deter-minados agentes físicos, químicos ou biológicos;',
+          text: '**Doenças Profissionais:** São todos os males aos quais a saúde humana está exposta, devido as atividades profissionais desenvolvidas. Estas doenças são causadas principalmente pela exposição crônica a determinados agentes físicos, químicos ou biológicos;',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Empregador:** a empresa individual ou coletiva que, assumindo os riscos da atividade econômica, admite, assalaria e dirige a prestação pessoal de serviços. Equiparam-se ao empregador as organizações, os pro-fissionais liberais, as instituições de beneficência, as associações recreativas ou outras instituições sem fins lucrativos, que admitam trabalhadores como empregados. **(NR-01 Anexo I);**',
+          text: '**Empregador:** a empresa individual ou coletiva que, assumindo os riscos da atividade econômica, admite, assalaria e dirige a prestação pessoal de serviços. Equiparam-se ao empregador as organizações, os profissionais liberais, as instituições de beneficência, as associações recreativas ou outras instituições sem fins lucrativos, que admitam trabalhadores como empregados. **(NR-01 Anexo I);**',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -217,7 +217,7 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Grau de risco:** classificação adotada pelos Ministérios do Trabalho e Emprego e da Previdência e Assistên-cia Social que fixa uma escala crescente para os riscos presentes nos diferentes ramos da atividade eco-nômica;',
+          text: '**Grau de risco:** classificação adotada pelos Ministérios do Trabalho e Emprego e da Previdência e Assistência Social que fixa uma escala crescente para os riscos presentes nos diferentes ramos da atividade econômica;',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -225,7 +225,7 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Higiene Ocupacional:** É a ciência e arte dedicadas à prevenção, reconhecimento, avaliação e controle dos fatores ambientais ou tensões emanadas ou provocadas pelo local de trabalho, e que pode ocasio-nar enfermidades, destruir a saúde e o bem-estar, ou criar algum mal-estar significativo entre aos traba-lhadores ou cidadãos da comunidade;',
+          text: '**Higiene Ocupacional:** É a ciência e arte dedicadas à prevenção, reconhecimento, avaliação e controle dos fatores ambientais ou tensões emanadas ou provocadas pelo local de trabalho, e que pode ocasionar enfermidades, destruir a saúde e o bem-estar, ou criar algum mal-estar significativo entre aos trabalhadores ou cidadãos da comunidade;',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -237,11 +237,11 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Incidente:** qualquer evento ou fato negativo com potencial para provocar danos. É também chamado de “quase-acidente”. Atualmente, este conceito tem sido muito contestado, uma vez que pela defini-ção de acidentes, estes se confundiriam, ficando a diferença em se ter ou não lesão.',
+          text: '**Incidente:** qualquer evento ou fato negativo com potencial para provocar danos. É também chamado de “quase-acidente”. Atualmente, este conceito tem sido muito contestado, uma vez que pela definição de acidentes, estes se confundiriam, ficando a diferença em se ter ou não lesão.',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Índice de Julgamento (IJ):** É um conceito estatístico extraído da INSTRUÇÃO NORMATIVA Nº 1 DE 20 DE DE-ZEMBRO DE 1995 que trata da AVALIAÇÃO DAS CONCENTRAÇÕES DE BENZENO EM AMBIENTES DE TRABA-LHO, mas que pode ser extrapolada para qualquer Fator de Risco Químico, o qual na referida IN é expres-so pela fórmula: IJ = LSC (95%)  ÷ LC . Considerando que na IN 01 o LSC representa o critério de aceitabili-dade da exposição para efeito de comparação com o LEO, neste documento o IJ sofre a seguinte adaptação: IJ = MVUE ÷ LEO. Desta forma podemos dizer que o IJ é um índice estatístico que expressa uma relação percentual de quanto o resultado representativo da exposição do trabalhador (concentra-ção do FR no ambiente de trabalho) se aproxima ou se afasta do LEO, tendo este índice a referência central em 1 (um) sendo este índice equivalente a 100%, sendo assim, quanto mais abaixo de 1 for o IJ mais distante do LEO maior é a condição de aceitabilidade da exposição e menos ações de controles são necessárias, ao passo que quanto mais o IJ se aproximar ou superar o 1, maior o risco para o traba-lhador e consequentemente a condição de inaceitabilidade torna-se mais urgente e demanda ações ainda mais imediatas (Alex Abreu Marins). ',
+          text: '**Índice de Julgamento (IJ):** É um conceito estatístico extraído da INSTRUÇÃO NORMATIVA Nº 1 DE 20 DE DE-ZEMBRO DE 1995 que trata da AVALIAÇÃO DAS CONCENTRAÇÕES DE BENZENO EM AMBIENTES DE TRABALHO, mas que pode ser extrapolada para qualquer Fator de Risco Químico, o qual na referida IN é expresso pela fórmula: IJ = LSC (95%) ÷ LC . Considerando que na IN 01 o LSC representa o critério de aceitabilidade da exposição para efeito de comparação com o LEO, neste documento o IJ sofre a seguinte adaptação: IJ = MVUE ÷ LEO. Desta forma podemos dizer que o IJ é um índice estatístico que expressa uma relação percentual de quanto o resultado representativo da exposição do trabalhador (concentração do FR no ambiente de trabalho) se aproxima ou se afasta do LEO, tendo este índice a referência central em 1 (um) sendo este índice equivalente a 100%, sendo assim, quanto mais abaixo de 1 for o IJ mais distante do LEO maior é a condição de aceitabilidade da exposição e menos ações de controles são necessárias, ao passo que quanto mais o IJ se aproximar ou superar o 1, maior o risco para o trabalhador e consequentemente a condição de inaceitabilidade torna-se mais urgente e demanda ações ainda mais imediatas (Alex Abreu Marins). ',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -249,7 +249,7 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Limite de Exposição – Curta Duração – TLV-STEL2 (ACGIH-EUA):** concentração máxima a que os trabalhado-res podem estar expostos continuamente por um período curto, de até 15 minutos, sem sofrer irritação, lesão tissular crônica ou irreversível, narcose em grau suficiente para aumentar a predisposição a aciden-tes, impedir autossalvamento ou reduzir significativamente a eficiência no trabalho, desde que não sejam permitidas mais de 4 exposições diárias, com pelo menos 60 minutos de intervalo entre os períodos de exposição e também que não seja excedido o TLV-TWA. 2– STEL: Short Term Exposure Limit;',
+          text: '**Limite de Exposição – Curta Duração – TLV-STEL2 (ACGIH-EUA):** concentração máxima a que os trabalhadores podem estar expostos continuamente por um período curto, de até 15 minutos, sem sofrer irritação, lesão tissular crônica ou irreversível, narcose em grau suficiente para aumentar a predisposição a acidentes, impedir autossalvamento ou reduzir significativamente a eficiência no trabalho, desde que não sejam permitidas mais de 4 exposições diárias, com pelo menos 60 minutos de intervalo entre os períodos de exposição e também que não seja excedido o TLV-TWA. 2– STEL: Short Term Exposure Limit;',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -257,7 +257,7 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Limite de Exposição – Valor Teto (NR-15/Brasil), TLV-C3 (ACGIH-EUA):** concentração que não deverá ser ex-cedida durante nenhum momento de exposição na jornada. 3 – TLV – C – Treshold Limit Value, C- Ceiling (Teto);',
+          text: '**Limite de Exposição – Valor Teto (NR-15/Brasil), TLV-C3 (ACGIH-EUA):** concentração que não deverá ser excedida durante nenhum momento de exposição na jornada. 3 – TLV – C – Treshold Limit Value, C- Ceiling (Teto);',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -265,11 +265,11 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Limites de Exposição Ocupacional:** são os valores de limites de tolerância previstos na Norma Regulamen-tadora n.º 15 ou, na ausência de limites de tolerância previstos na NR-15 e seus anexos, devem ser utiliza-dos como referência para a adoção de medidas de prevenção aqueles previstos pela American Confe-rence of Governmental Industrial Higyenists – ACGIH. (NR-09 item 9.6.1.1);',
+          text: '**Limites de Exposição Ocupacional:** são os valores de limites de tolerância previstos na Norma Regulamen-tadora n.º 15 ou, na ausência de limites de tolerância previstos na NR-15 e seus anexos, devem ser utilizados como referência para a adoção de medidas de prevenção aqueles previstos pela American Confe-rence of Governmental Industrial Higyenists – ACGIH. (NR-09 item 9.6.1.1);',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Medidas de Controle:** ações tomadas para eliminar, neutralizar e/ou minimizar os riscos de exposição aos agentes ambientais. Podem ser de âmbito coletivo (equipamento de proteção coletiva – EPC) ou indivi-dual (equipamento de proteção individual – EPI);',
+          text: '**Medidas de Controle:** ações tomadas para eliminar, neutralizar e/ou minimizar os riscos de exposição aos agentes ambientais. Podem ser de âmbito coletivo (equipamento de proteção coletiva – EPC) ou individual (equipamento de proteção individual – EPI);',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -281,15 +281,15 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**MVUE: Minimum – Variance Unbiased Estimator:** Estimativa da Média Verdadeira obtida através de trata-mento estatístico;',
+          text: '**MVUE: Minimum – Variance Unbiased Estimator:** Estimativa da Média Verdadeira obtida através de tratamento estatístico;',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Nível de Ação:** valor acima do qual devem ser iniciadas ações preventivas (monitoramento periódico, informação aos trabalhadores e controle médico) de forma a minimizar a probabilidade de que as expo-sições a agentes ambientais ultrapassem os limites de exposição. Para agentes químicos corresponde a metade dos limites de exposição ocupacional (NR-15, ACGIH, acordos coletivos) e para o ruído a dose de 0,5 (superior a 50%), conforme estabelecido na NR-15, Anexo 1, item 6 — Considera-se nível de ação, o valor acima do qual devem ser implementadas ações de controle sistemático de forma a minimizar a probabilidade de que as exposições ocupacionais ultrapassem os limites de exposição. (NR-09 item 9.6.1.2);',
+          text: '**Nível de Ação:** valor acima do qual devem ser iniciadas ações preventivas (monitoramento periódico, informação aos trabalhadores e controle médico) de forma a minimizar a probabilidade de que as exposições a agentes ambientais ultrapassem os limites de exposição. Para agentes químicos corresponde a metade dos limites de exposição ocupacional (NR-15, ACGIH, acordos coletivos) e para o ruído a dose de 0,5 (superior a 50%), conforme estabelecido na NR-15, Anexo 1, item 6 — Considera-se nível de ação, o valor acima do qual devem ser implementadas ações de controle sistemático de forma a minimizar a probabilidade de que as exposições ocupacionais ultrapassem os limites de exposição. (NR-09 item 9.6.1.2);',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**NR:** Norma Regulamentadora. Instituídas pelo Ministério do Trabalho, regulamentam e oferecem orienta-ções sobre procedimentos obrigatórios relacionados à medicina e segurança no trabalho;',
+          text: '**NR:** Norma Regulamentadora. Instituídas pelo Ministério do Trabalho, regulamentam e oferecem orientações sobre procedimentos obrigatórios relacionados à medicina e segurança no trabalho;',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -301,7 +301,7 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Organização:** pessoa ou grupo de pessoas com suas próprias funções com responsabilidades, autoridades e relações para alcançar seus objetivos. Inclui, mas não é limitado a empregador, a tomador de serviços, a empresa, a empreendedor individual, produtor rural, companhia, corporação, firma, autoridade, parce-ria, organização de caridade ou instituição, ou parte ou combinação desses, seja incorporada ou não, pública ou privada. **(NR-01 Anexo I);**',
+          text: '**Organização:** pessoa ou grupo de pessoas com suas próprias funções com responsabilidades, autoridades e relações para alcançar seus objetivos. Inclui, mas não é limitado a empregador, a tomador de serviços, a empresa, a empreendedor individual, produtor rural, companhia, corporação, firma, autoridade, parceria, organização de caridade ou instituição, ou parte ou combinação desses, seja incorporada ou não, pública ou privada. **(NR-01 Anexo I);**',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -317,7 +317,7 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Probabilidade:** é a chance de ocorrência de uma falha que pode conduzir a um determinado acidente. Esta falha pode ser de um equipamento ou componente do mesmo, ou pode ser ainda uma falha huma-na.',
+          text: '**Probabilidade:** é a chance de ocorrência de uma falha que pode conduzir a um determinado acidente. Esta falha pode ser de um equipamento ou componente do mesmo, ou pode ser ainda uma falha humana.',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -325,7 +325,7 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Radiações não Ionizantes:** É uma radiação eletromagnética, cuja energia não é suficiente para ionizar os átomos dos meios nos quais incide ou atravessa (ex. microondas, ultravioleta, etc.);',
+          text: '**Radiações não Ionizantes:** É uma radiação eletromagnética, cuja energia não é suficiente para ionizar os átomos dos meios nos quais incide ou atravessa (ex. micro-ondas, ultravioleta, etc.);',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -333,7 +333,7 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Responsável técnico pela capacitação:** profissional legalmente habilitado ou trabalhador qualificado, con-forme disposto em NR específica, responsável pela elaboração das capacitações e treinamentos. **(NR-01 Anexo I);**',
+          text: '**Responsável técnico pela capacitação:** profissional legalmente habilitado ou trabalhador qualificado, conforme disposto em NR específica, responsável pela elaboração das capacitações e treinamentos. **(NR-01 Anexo I);**',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -341,7 +341,7 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Risco (Risk):** expressa uma probabilidade de possíveis danos dentro de um período especifico de tempo ou número de ciclos operacionais. O valor quantitativo do risco de uma dada instalação ou processo industrial pode ser conseguido multiplicando-se a probabilidade de ocorrência (taxa de falha) de um acidente pela medida da consequência/dano (perda material ou humana) causada por este acidente;',
+          text: '**Risco (Risk):** expressa uma probabilidade de possíveis danos dentro de um período específico de tempo ou número de ciclos operacionais. O valor quantitativo do risco de uma dada instalação ou processo industrial pode ser conseguido multiplicando-se a probabilidade de ocorrência (taxa de falha) de um acidente pela medida da consequência/dano (perda material ou humana) causada por este acidente;',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -365,11 +365,11 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Ruído:** Denomina-se ruído uma mistura de tons de diversas frequências, sendo que as mesmas diferem en-tre si por um valor ao poder de descriminação (em frequência) do ouvido. Som é um fenômeno físico on-dulatório resultante de variações da pressão num meio elástico, que se sucede com regularidade. Dentro do ambiente de trabalho da empresa, em geral, os sons são produzidos por máquinas ou equipamentos utilizados. Dessa forma, os trabalhadores mais expostos, são, por exemplo, operadores de maquinário es-pecializado, em comparação a outros setores administrativos. A exposição prolongada a níveis de ruído excessivo pode a curto, médio e longo prazo provocar prejuízo à saúde do trabalhador. A propagação do ruído se dá através do ar em forma de vibrações sonoras ou ondas sonoras. O ruído pode ser:',
+          text: '**Ruído:** Denomina-se ruído uma mistura de tons de diversas frequências, sendo que elas diferem entre si por um valor ao poder de descriminação (em frequência) do ouvido. Som é um fenômeno físico ondulatório resultante de variações da pressão num meio elástico, que se sucede com regularidade. Dentro do ambiente de trabalho da empresa, em geral, os sons são produzidos por máquinas ou equipamentos utilizados. Dessa forma, os trabalhadores mais expostos, são, por exemplo, operadores de maquinário especializado, em comparação a outros setores administrativos. A exposição prolongada a níveis de ruído excessivo pode a curto, médio e longo prazo provocar prejuízo à saúde do trabalhador. A propagação do ruído se dá através do ar em forma de vibrações sonoras ou ondas sonoras. O ruído pode ser:',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Segurança:** é frequentemente definido como “isenção de riscos”. Entretanto é praticamente impossível a eliminação completa de todos os riscos. Podemos então definir segurança como, uma condição ou con-junto de condições que objetivam uma relativa proteção contra um determinado risco;',
+          text: '**Segurança:** é frequentemente definido como “isenção de riscos”. Entretanto é praticamente impossível a eliminação completa de todos os riscos. Podemos então definir segurança como, uma condição ou conjunto de condições que objetivam uma relativa proteção contra um determinado risco;',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -377,7 +377,7 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Setor de serviço:** A menor unidade administrativa ou operacional compreendida no mesmo estabeleci-mento. **(NR-01 Anexo I);**',
+          text: '**Setor de serviço:** A menor unidade administrativa ou operacional compreendida no mesmo estabelecimento. **(NR-01 Anexo I);**',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -389,27 +389,27 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**SRT (Superintendência Regional do Trabalho):** Órgão do Ministério do Trabalho para execução das ativida-des relacionadas à segurança e à medicina do trabalho, nos limites de sua jurisdição, inclusive da Cam-panha Nacional de Prevenção de Acidentes do Trabalho (CANPAT), do Programa de Alimentação do Trabalhador (PAT) e da fiscalização do cumprimento dos preceitos legais e regulamentares nas áreas de sua alçada. <link>http://www.mte.gov.br|www.mte.gov.br<link>;',
+          text: '**SRT (Superintendência Regional do Trabalho):** Órgão do Ministério do Trabalho para execução das atividades relacionadas à segurança e à medicina do trabalho, nos limites de sua jurisdição, inclusive da Campanha Nacional de Prevenção de Acidentes do Trabalho (CANPAT), do Programa de Alimentação do Trabalhador (PAT) e da fiscalização do cumprimento dos preceitos legais e regulamentares nas áreas de sua alçada. <link>http://www.mte.gov.br|www.mte.gov.br<link>;',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**SSST:** Secretaria de Segurança e Saúde no Trabalho: criada pela NR 1, da Portaria/MTb n.º 3.214/1978, atu-almente Departamento de Segurança e Saúde no Trabalho, criado pelo Decreto n.º 3.129/ 1999, de 9 de agosto de 1999, é o órgão de âmbito nacional competente para coordenar, orientar, controlar e super-visionar as atividades relacionadas com a segurança e a medicina do trabalho, além de fiscalizar o cum-primento dos preceitos legais e regulamentares sobre as áreas de sua alçada em todo o território nacio-nal, entre outras atribuições. (<link>https://www.gov.br/trabalho/pt-br|www.gov.br/trabalho/pt-br<link>);',
+          text: '**SSST:** Secretaria de Segurança e Saúde no Trabalho: criada pela NR 1, da Portaria/MTb n.º 3.214/1978, atualmente Departamento de Segurança e Saúde no Trabalho, criado pelo Decreto n.º 3.129/ 1999, de 9 de agosto de 1999, é o órgão de âmbito nacional competente para coordenar, orientar, controlar e supervisionar as atividades relacionadas com a segurança e a medicina do trabalho, além de fiscalizar o cumprimento dos preceitos legais e regulamentares sobre as áreas de sua alçada em todo o território nacional, entre outras atribuições. (<link>https://www.gov.br/trabalho/pt-br|www.gov.br/trabalho/pt-br<link>);',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Temperaturas Extremas:** Várias são as atividades em que os trabalhadores podem estar expostos a tempe-raturas extremas que estão divididas em frio ou calor;',
+          text: '**Temperaturas Extremas:** Várias são as atividades em que os trabalhadores podem estar expostos a temperaturas extremas que estão divididas em frio ou calor;',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Totalmente desconhecidos por falta de informações que nos permita identificá-los:** Ex.: O ascarel era um pro-duto muito usado nos anos 70 em todo o mundo para refrigerar transformadores, até descobrirem que ele é altamente cancerígeno;',
+          text: '**Totalmente desconhecidos por falta de informações que nos permita identificá-los:** Ex.: O ascarel era um produto muito usado nos anos 70 em todo o mundo para refrigerar transformadores, até descobrirem que ele é altamente cancerígeno;',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Trabalhador:** pessoa física inserida em uma relação de trabalho, inclusive de natureza administrativa, co-mo os empregados e outros sem vínculo de emprego. **(NR-01 Anexo I);**',
+          text: '**Trabalhador:** pessoa física inserida em uma relação de trabalho, inclusive de natureza administrativa, como os empregados e outros sem vínculo de emprego. **(NR-01 Anexo I);**',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Umidade:** quando as atividades são exercidas em locais alagados com umidade excessiva, podem ocor-rer danos à saúde dos trabalhadores. A forma de contato com este agente se dá pelo contato;',
+          text: '**Umidade:** quando as atividades são exercidas em locais alagados com umidade excessiva, podem ocorrer danos à saúde dos trabalhadores. A forma de contato com este agente se dá pelo contato;',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -417,11 +417,11 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Vibrações Localizada:** são aquelas provocadas pelo uso de ferramentas manuais, elétricas ou pneumáti-cas; ',
+          text: '**Vibrações Localizada:** são aquelas provocadas pelo uso de ferramentas manuais, elétricas ou pneumáticas; ',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Vibrações:** Definem-se como vibrações o ato ou efeito de vibrar, tremular ou oscilar. A utilização de de-terminadas máquinas ou equipamentos pode produzir nos operadores vibrações danosas. Podemos classi-ficar as vibrações em dois tipos:',
+          text: '**Vibrações:** Definem-se como vibrações o ato ou efeito de vibrar, tremular ou oscilar. A utilização de determinadas máquinas ou equipamentos pode produzir nos operadores vibrações danosas. Podemos classificar as vibrações em dois tipos:',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,

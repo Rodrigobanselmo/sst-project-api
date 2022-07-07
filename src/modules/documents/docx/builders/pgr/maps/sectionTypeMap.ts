@@ -98,7 +98,7 @@ export class SectionsMapClass {
       .map((child) => {
         const childData = convertToDocxHelper(child, this.variables);
         if (!childData) return null;
-
+        console.log(childData.type);
         return this.elementsMap[childData.type](childData);
       })
       .filter((x) => x)

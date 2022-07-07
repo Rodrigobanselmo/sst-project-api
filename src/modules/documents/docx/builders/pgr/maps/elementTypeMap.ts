@@ -23,6 +23,7 @@ import { emergencyIterable } from '../../../components/iterables/emergency/emerg
 import { environmentIterable } from '../../../components/iterables/environments/environments.iterable';
 import { professionalsIterable } from '../../../components/iterables/professionals/professionals.iterable';
 import { recommendationsIterable } from '../../../components/iterables/recommendations/recommendations.iterable';
+import { actionPlanTableSection } from '../../../components/tables/actionPlan/actionPlan.section';
 import { APPRTableSection } from '../../../components/tables/appr/appr.section';
 import { hierarchyHomoOrgSection } from '../../../components/tables/hierarchyHomoOrg/hierarchyHomoOrg.section';
 import { hierarchyPrioritizationPage } from '../../../components/tables/hierarchyPrioritization/hierarchyPrioritization.page';
@@ -320,8 +321,8 @@ export class ElementsMapClass {
         this.hierarchyTree,
         (x, v) => this.convertToDocx(x, v),
       ),
-    // [PGRSectionChildrenTypeEnum.PLAN_TABLE]: () =>
-    //   actionPlanTableSection(this.document)['children'],
+    [PGRSectionChildrenTypeEnum.PLAN_TABLE]: () =>
+      actionPlanTableSection(this.document, this.hierarchyTree)['children'],
     [PGRSectionChildrenTypeEnum.APR_TABLE]: () =>
       APPRTableSection(this.document, this.hierarchy, this.homogeneousGroup)
         .map((s) => s['children'])

@@ -27,7 +27,7 @@ import { prioritizationSection } from './2.7-prioritization';
 import { prioritization2Section } from './2.7.1-prioritization';
 import { recommendationsSection } from './2.8-recommendations';
 import { recommendations1Section } from './2.8.1-recommendations';
-import { attachmentsSection } from './3.0-anexos';
+// import { attachmentsSection } from './3.0-anexos';
 import { attachmentsLinkSection } from './3.01-anexos-link';
 
 export const docPGRSections: IDocumentPGRSectionGroups = {
@@ -60,7 +60,7 @@ export const docPGRSections: IDocumentPGRSectionGroups = {
     recommendationsSection,
     recommendations1Section,
     attachmentsLinkSection,
-    attachmentsSection,
+    // attachmentsSection,
   ],
   variables: {
     [VariablesPGREnum.CHAPTER_1]: 'PARTE 01 – DOCUMENTO BASE',

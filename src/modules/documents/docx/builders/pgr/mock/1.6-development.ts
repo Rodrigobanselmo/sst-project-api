@@ -29,7 +29,7 @@ export const developmentSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: 'A antecipação dos riscos será efetuada através da análise preliminar de perigos de todas as intervenções nos processos produtivos, e caso o risco seja relevante será incorporados ao PGR e demais programas que se façam necessários.',
+          text: 'A antecipação dos riscos será efetuada através da análise preliminar de perigos de todas as intervenções nos processos produtivos, e caso o risco seja relevante será incorporado ao PGR e demais programas que se façam necessários.',
         },
         {
           type: PGRSectionChildrenTypeEnum.H2,

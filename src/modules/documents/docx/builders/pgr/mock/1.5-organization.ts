@@ -363,7 +363,7 @@ export const organizationSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: 'Os principais desvios de saúde encontrados nos exames médicos periódicos, fornecerão indicações das prováveis áreas de risco mais críticas para a empresa. Deste modo maximiza-se o uso das informações disponíveis em prol de uma efetiva prevenção de ocorrência de desvios de saúde, através de um bem- sucedido controle de riscos ambientais **(NR-01 item 1.5.5.4.2).**',
+          text: 'Os principais desvios de saúde encontrados nos exames médicos periódicos, fornecerão indicações das prováveis áreas de risco mais críticas para a empresa. Deste modo maximiza-se o uso das informações disponíveis em prol de uma efetiva prevenção de ocorrência de desvios de saúde, através de um bem-sucedido controle de riscos ambientais **(NR-01 item 1.5.5.4.2).**',
         },
         {
           type: PGRSectionChildrenTypeEnum.H4,
