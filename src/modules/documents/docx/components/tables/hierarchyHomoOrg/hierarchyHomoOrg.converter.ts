@@ -182,7 +182,7 @@ export const hierarchyPlanConverter = (
           if (type && !Array.isArray(type) && homo.type !== type) return;
           if (type && Array.isArray(type) && !type.includes(homo.type)) return;
 
-          if (homo.type === HomoTypeEnum.ENVIRONMENT) {
+          if (homo.environment) {
             name = `${homo.environment.name}\n(${
               originRiskMap[homo.environment.type].name
             })`;
