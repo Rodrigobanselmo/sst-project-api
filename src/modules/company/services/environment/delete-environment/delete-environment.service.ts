@@ -19,15 +19,16 @@ export class DeleteEnvironmentService {
     userPayloadDto: UserPayloadDto,
   ) {
     const photos = await this.environmentPhotoRepository.findByEnvironment(id);
-    Promise.all(
+
+    await Promise.all(
       photos.map(async (photo) => {
-        const splitUrl = photo.photoUrl.split('/');
+        const splitUrl = photo.photoUrl.split('.com/');
 
         await this.amazonStorageProvider.delete({
           fileName: splitUrl[splitUrl.length - 1],
         });
 
-        await this.environmentPhotoRepository.delete(id);
+        await this.environmentPhotoRepository.delete(photo.id);
       }),
     );
 

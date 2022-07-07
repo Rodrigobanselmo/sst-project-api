@@ -14,7 +14,7 @@ export class DeleteCharacterizationPhotoService {
 
   async execute(id: string) {
     const photo = await this.characterizationPhotoRepository.findById(id);
-    const splitUrl = photo.photoUrl.split('/');
+    const splitUrl = photo.photoUrl.split('.com/');
 
     await this.amazonStorageProvider.delete({
       fileName: splitUrl[splitUrl.length - 1],

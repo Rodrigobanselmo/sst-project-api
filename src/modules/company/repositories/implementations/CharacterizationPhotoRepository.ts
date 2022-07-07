@@ -49,6 +49,17 @@ export class CharacterizationPhotoRepository {
     return new CharacterizationPhotoEntity(characterization);
   }
 
+  async findByCharacterization(characterizationId: string) {
+    const characterizations =
+      await this.prisma.companyCharacterizationPhoto.findMany({
+        where: { companyCharacterizationId: characterizationId },
+      });
+
+    return characterizations.map(
+      (characterization) => new CharacterizationPhotoEntity(characterization),
+    );
+  }
+
   async findById(id: string) {
     const characterization =
       await this.prisma.companyCharacterizationPhoto.findUnique({

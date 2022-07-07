@@ -14,7 +14,7 @@ export class DeleteEnvironmentPhotoService {
 
   async execute(id: string) {
     const photo = await this.environmentPhotoRepository.findById(id);
-    const splitUrl = photo.photoUrl.split('/');
+    const splitUrl = photo.photoUrl.split('.com/');
 
     await this.amazonStorageProvider.delete({
       fileName: splitUrl[splitUrl.length - 1],
