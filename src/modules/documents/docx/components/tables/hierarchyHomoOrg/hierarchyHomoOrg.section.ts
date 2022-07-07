@@ -37,9 +37,8 @@ export const hierarchyHomoOrgSection = (
     if (type === 'ENVIRONMENT') return 'Ambiente';
     return 'Mão de Obra';
   };
-
-  headerData[0].text = groupName();
-  if (!showHomogeneousDescription) headerData.splice(1, 1);
+  if (showHomogeneous) headerData[0].text = groupName();
+  if (showHomogeneous && !showHomogeneousDescription) headerData.splice(1, 1);
 
   const tableHeaderElements = new TableHeaderElements();
   const tableBodyElements = new TableBodyElements();

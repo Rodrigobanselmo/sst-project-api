@@ -1,4 +1,4 @@
-import { Paragraph, Table } from 'docx';
+import { AlignmentType, Paragraph, Table } from 'docx';
 
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
 import {
@@ -82,6 +82,7 @@ export const environmentIterable = (
           type: PGRSectionChildrenTypeEnum.BULLET,
           level: 0,
           text: `${risk.name} (${risk.type})`,
+          alignment: AlignmentType.START,
         });
 
         if (index === risks.length - 1)
@@ -110,6 +111,9 @@ export const environmentIterable = (
         ...convertToDocx(
           [
             {
+              type: PGRSectionChildrenTypeEnum.BREAK,
+            },
+            {
               type: PGRSectionChildrenTypeEnum.H3,
               text: `??${VariablesPGREnum.ENVIRONMENT_NAME}??`,
             },
@@ -123,6 +127,7 @@ export const environmentIterable = (
             {
               type: PGRSectionChildrenTypeEnum.PARAGRAPH,
               text: `??${VariablesPGREnum.ENVIRONMENT_DESCRIPTION}??`,
+              alignment: AlignmentType.START,
               removeWithSomeEmptyVars: [
                 VariablesPGREnum.ENVIRONMENT_DESCRIPTION,
               ],

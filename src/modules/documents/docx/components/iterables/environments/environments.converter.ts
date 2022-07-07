@@ -68,25 +68,35 @@ export const getLayouts = (
   const vLayout = (
     vPhotos: (EnvironmentPhotoEntity | CharacterizationPhotoEntity)[],
     length: number,
+    keepVTree = false,
   ) => {
     const hasDivider = layouts.length > 0;
 
     if (hasDivider) layouts.push([ImageDivider()]);
 
-    if (length >= 3 && length - 3 !== 1) {
+    // if ((length >= 3 && length - 3 !== 1) || (keepVTree && length > 0)) {
+    if (length >= 3 || (keepVTree && length > 0)) {
       const removeLegend =
         isAllLegendEqual && (length - 3 !== 0 || hLength !== 0);
 
       layouts.push(
         VThreeImages(
-          [vPhotos[0].photoUrl, vPhotos[1].photoUrl, vPhotos[2].photoUrl],
-          [vPhotos[0].name, vPhotos[1].name, vPhotos[2].name],
+          [
+            vPhotos[0].photoUrl,
+            vPhotos[1] ? vPhotos[1].photoUrl : '',
+            vPhotos[2] ? vPhotos[2].photoUrl : '',
+          ],
+          [
+            vPhotos[0].name,
+            vPhotos[1] ? vPhotos[1].name : '',
+            vPhotos[2] ? vPhotos[2].name : '',
+          ],
           removeLegend,
         ),
       );
 
       const restOfPhotos = vPhotos.slice(3);
-      return vLayout(restOfPhotos, restOfPhotos.length);
+      return vLayout(restOfPhotos, restOfPhotos.length, true);
     }
 
     if (length >= 2) {

@@ -87,6 +87,7 @@ export const hierarchyRisksTableSections = (
 export const hierarchyRisksTableAllSections = (
   riskFactorGroupData: RiskFactorGroupDataEntity,
   hierarchiesEntity: IHierarchyData,
+  hierarchyTree: IHierarchyMap,
   convertToDocx: (
     data: ISectionChildrenType[],
     variables?: IDocVariables,
@@ -143,6 +144,7 @@ export const hierarchyRisksTableAllSections = (
     const section = hierarchyRisksTableSections(
       riskFactorGroupData,
       hierarchiesEntity,
+      hierarchyTree,
       {
         hierarchyType: type as any,
       },

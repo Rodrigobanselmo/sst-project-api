@@ -1,5 +1,5 @@
 import { CharacterizationEntity } from '../../../../../company/entities/characterization.entity';
-import { Paragraph, Table } from 'docx';
+import { AlignmentType, Paragraph, Table } from 'docx';
 
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
 import {
@@ -57,6 +57,7 @@ export const characterizationIterable = (
           type: PGRSectionChildrenTypeEnum.BULLET,
           level: 0,
           text: consideration,
+          alignment: AlignmentType.START,
         });
       });
 
@@ -77,6 +78,7 @@ export const characterizationIterable = (
             {
               type: PGRSectionChildrenTypeEnum.PARAGRAPH,
               text: `??${VariablesPGREnum.CHARACTERIZATION_DESC}??`,
+              alignment: AlignmentType.START,
               removeWithSomeEmptyVars: [VariablesPGREnum.CHARACTERIZATION_DESC],
             },
             ...considerations,

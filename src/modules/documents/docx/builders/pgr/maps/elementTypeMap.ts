@@ -204,13 +204,17 @@ export class ElementsMapClass {
       hierarchyHomoOrgSection(this.hierarchy, this.homogeneousGroup, {
         showDescription: false,
         showHomogeneous: true,
-        type: 'ENVIRONMENT',
+        type: HomoTypeEnum.ENVIRONMENT,
       })['children'],
     [PGRSectionChildrenTypeEnum.TABLE_HIERARCHY_CHAR]: () =>
       hierarchyHomoOrgSection(this.hierarchy, this.homogeneousGroup, {
         showDescription: false,
         showHomogeneous: true,
-        type: ['EQUIPMENT', 'ACTIVITIES', 'WORKSTATION'],
+        type: [
+          HomoTypeEnum.ACTIVITIES,
+          HomoTypeEnum.EQUIPMENT,
+          HomoTypeEnum.WORKSTATION,
+        ],
       })['children'],
     [PGRSectionChildrenTypeEnum.TABLE_PRIORITIZATION]: () =>
       hierarchyPrioritizationPage(
@@ -254,7 +258,7 @@ export class ElementsMapClass {
           homoType: [
             HomoTypeEnum.ACTIVITIES,
             HomoTypeEnum.EQUIPMENT,
-            HomoTypeEnum.ACTIVITIES,
+            HomoTypeEnum.WORKSTATION,
           ],
         },
         (x, v) => this.convertToDocx(x, v),
@@ -305,12 +309,16 @@ export class ElementsMapClass {
       hierarchyHomoOrgSection(this.hierarchy, this.homogeneousGroup, {
         showDescription: false,
         showHomogeneous: false,
+        showHomogeneousDescription: false,
       })['children'],
     [PGRSectionChildrenTypeEnum.RISK_TABLE]: () =>
       riskCharacterizationTableSection(this.document)['children'],
     [PGRSectionChildrenTypeEnum.HIERARCHY_RISK_TABLE]: () =>
-      hierarchyRisksTableAllSections(this.document, this.hierarchy, (x, v) =>
-        this.convertToDocx(x, v),
+      hierarchyRisksTableAllSections(
+        this.document,
+        this.hierarchy,
+        this.hierarchyTree,
+        (x, v) => this.convertToDocx(x, v),
       ),
     // [PGRSectionChildrenTypeEnum.PLAN_TABLE]: () =>
     //   actionPlanTableSection(this.document)['children'],

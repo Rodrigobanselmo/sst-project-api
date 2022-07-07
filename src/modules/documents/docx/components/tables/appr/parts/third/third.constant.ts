@@ -29,7 +29,7 @@ export enum ThirdRiskInventoryColumnEnum {
 const ThirdRiskInventoryHeader = (): bodyTableProps[] => {
   const header: bodyTableProps[] = [];
 
-  header[ThirdRiskInventoryHeaderEnum.FIRST] = { text: 'Severidade (S) x Probabilidade (P) = RISCO OCUPACIONAL (RO):' , bold: true, borders: borderNoneStyle, columnSpan: 4};
+  header[ThirdRiskInventoryHeaderEnum.FIRST] = { text: 'Severidade (S) x Probabilidade (P) = RISCO OCUPACIONAL (RO):' , bold: true, borders: borderNoneStyle, columnSpan: 5};
   header[ThirdRiskInventoryHeaderEnum.SECOND] = { text: 'RISCO PURO (REAL) Incluindo as Medidas de Controles Existentes', bold: true, borders: borderRightStyle, columnSpan: 6};
   header[ThirdRiskInventoryHeaderEnum.THIRD] = { text: 'RISCO RESIDUAL' , bold: true, borders: borderNoneStyle, columnSpan: 4};
 

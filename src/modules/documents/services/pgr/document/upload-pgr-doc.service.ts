@@ -93,25 +93,25 @@ export class PgrUploadService {
         )
       : '';
 
-    const { environments, characterizations, photosPath } =
-      await this.downloadPhotos(company);
-    // const environments = [];
-    // const characterizations = [];
-    // const photosPath = [];
+    // const { environments, characterizations, photosPath } =
+    //   await this.downloadPhotos(company);
+    const environments = [];
+    const characterizations = [];
+    const photosPath = [];
 
     try {
       const { hierarchyData, homoGroupTree, hierarchyTree } =
         hierarchyConverter(hierarchyHierarchy, environments);
 
-      // const actionPlanUrl = ' ';
-      // const urlAPR = ' ';
-      const { actionPlanUrl, urlAPR } = await this.generateAttachment(
-        riskGroupData,
-        hierarchyData,
-        hierarchyTree,
-        homoGroupTree,
-        upsertPgrDto,
-      );
+      const actionPlanUrl = ' ';
+      const urlAPR = ' ';
+      // const { actionPlanUrl, urlAPR } = await this.generateAttachment(
+      //   riskGroupData,
+      //   hierarchyData,
+      //   hierarchyTree,
+      //   homoGroupTree,
+      //   upsertPgrDto,
+      // );
 
       const version = new RiskDocumentEntity({
         version: upsertPgrDto.version,

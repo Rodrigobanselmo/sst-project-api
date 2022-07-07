@@ -140,7 +140,7 @@ export const hierarchyPlanConverter = (
     return column;
   });
 
-  if (!showHomogeneousDescription) mockedColumns.slice(0, 1);
+  if (showHomogeneous && !showHomogeneousDescription) mockedColumns.slice(0, 1);
 
   function setHeaderTable() {
     const row = showHomogeneous ? [...mockedColumns] : [];
@@ -174,23 +174,25 @@ export const hierarchyPlanConverter = (
       .sort(([, c], [, d]) => sortString(c[0], d[0], 'name'))
       .forEach(([homogeneousGroupId, firstHierarchyPlan]) => {
         const homo = homoGroupTree[homogeneousGroupId];
+        let name = homo ? homo.name : '';
 
-        if (!homo) return;
-        if (!type && homo && homo.type) return;
-        if (type && !Array.isArray(type) && homo.type !== type) return;
-        if (type && Array.isArray(type) && !type.includes(homo.type)) return;
+        if (showHomogeneous) {
+          if (!homo) return;
+          if (!type && homo && homo.type) return;
+          if (type && !Array.isArray(type) && homo.type !== type) return;
+          if (type && Array.isArray(type) && !type.includes(homo.type)) return;
 
-        let name = homo.name;
-        if (homo.type === HomoTypeEnum.ENVIRONMENT) {
-          name = `${homo.environment.name}\n(${
-            originRiskMap[homo.environment.type].name
-          })`;
+          if (homo.type === HomoTypeEnum.ENVIRONMENT) {
+            name = `${homo.environment.name}\n(${
+              originRiskMap[homo.environment.type].name
+            })`;
+          }
+
+          if (homo.characterization)
+            name = `${homo.characterization.name}\n(${
+              originRiskMap[homo.characterization.type].name
+            })`;
         }
-
-        if (homo.characterization)
-          name = `${homo.characterization.name}\n(${
-            originRiskMap[homo.characterization.type].name
-          })`;
 
         const row = generateRow();
         const firstPosition = rowsPosition;

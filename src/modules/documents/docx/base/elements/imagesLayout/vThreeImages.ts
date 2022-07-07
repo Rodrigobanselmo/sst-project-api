@@ -65,15 +65,17 @@ export const VThreeImages = (
             new TableCell({
               children: [
                 new Paragraph({
-                  children: [
-                    new ImageRun({
-                      data: fs.readFileSync(images[1]),
-                      transformation: {
-                        width: width,
-                        height: width * (16 / 9),
-                      },
-                    }),
-                  ],
+                  children: images[1]
+                    ? [
+                        new ImageRun({
+                          data: fs.readFileSync(images[1]),
+                          transformation: {
+                            width: width,
+                            height: width * (16 / 9),
+                          },
+                        }),
+                      ]
+                    : [],
                   spacing: { after: 32 },
                 }),
               ],
@@ -87,15 +89,17 @@ export const VThreeImages = (
             new TableCell({
               children: [
                 new Paragraph({
-                  children: [
-                    new ImageRun({
-                      data: fs.readFileSync(images[2]),
-                      transformation: {
-                        width: width,
-                        height: width * (16 / 9),
-                      },
-                    }),
-                  ],
+                  children: images[2]
+                    ? [
+                        new ImageRun({
+                          data: fs.readFileSync(images[2]),
+                          transformation: {
+                            width: width,
+                            height: width * (16 / 9),
+                          },
+                        }),
+                      ]
+                    : [],
                   spacing: { after: 32 },
                 }),
               ],
