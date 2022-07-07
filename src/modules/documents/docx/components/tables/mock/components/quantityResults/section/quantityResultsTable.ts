@@ -62,7 +62,7 @@ export const quantityResultsTable = (
     },
     {
       type: PGRSectionChildrenTypeEnum.LEGEND,
-      text: '**Legenda:**\n**LEO** = Limite de Exposição Ocupacional;\n**NA** = Nível de Ação;\n**LII:** Limite Inferior de Incerteza;\n**LSI:** Limite Superior de Incerteza;\n**IBUTG** = Índice de Bulbo Úmido Termômetros de Globo – Unidade em oC que representa a sobrecarga térmica do trabalhador.',
+      text: '**Legenda:**\n**LEO** = Limite de Exposição Ocupacional;\n**NA** = Nível de Ação;\n**LII:** Limite Inferior de Incerteza;\n**LSI:** Limite Superior de Incerteza;\n**IBUTG** = Índice de Bulbo Úmido Termômetros de Globo – Unidade em ºC que representa a sobrecarga térmica do trabalhador.',
     },
     {
       type: PGRSectionChildrenTypeEnum.BREAK,

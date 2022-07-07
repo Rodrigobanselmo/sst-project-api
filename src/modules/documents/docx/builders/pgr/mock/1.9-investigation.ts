@@ -120,7 +120,7 @@ export const investigation: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET,
-          text: 'Lesão pessoal: Qualquer dano sofrido pelo organismo humano, como conseqüência de acidentedo trabalho.',
+          text: 'Lesão pessoal: Qualquer dano sofrido pelo organismo humano, como consequência de acidente do trabalho.',
           level: 0,
         },
         {

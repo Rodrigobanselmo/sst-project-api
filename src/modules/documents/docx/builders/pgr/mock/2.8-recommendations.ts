@@ -73,7 +73,7 @@ export const recommendationsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.H2,
-          text: 'Orientações Genéricas (Quando aplicável)',
+          text: 'Orientações Genéricas (Quando aplicável):',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -93,7 +93,7 @@ export const recommendationsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.H3,
-          text: 'Treinamentos Prover treinamento sobre os seguintes aspectos:(Quando aplicável)',
+          text: 'Treinamentos Prover treinamento sobre os seguintes aspectos (Quando aplicável):',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET,

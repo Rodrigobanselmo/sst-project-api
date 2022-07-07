@@ -21,7 +21,7 @@ export const environmentIterable = (
   const environmentData = environmentsConverter(environments);
 
   const iterableSections = environmentData
-    .map(({ variables, elements, risks, considerations: cons }) => {
+    .map(({ variables, elements, risks, considerations: cons, breakPage }) => {
       const parameters: ISectionChildrenType[] = [];
       const riskFactors: ISectionChildrenType[] = [];
       const considerations: ISectionChildrenType[] = [];
@@ -30,7 +30,7 @@ export const environmentIterable = (
         parameters.push({
           type: PGRSectionChildrenTypeEnum.BULLET,
           level: 0,
-          text: `Ruído ambiente (Maior Valor Medido): ??${VariablesPGREnum.ENVIRONMENT_NOISE}?? db(A)`,
+          text: `Ruído ambiente (Maior Valor Medido): ??${VariablesPGREnum.ENVIRONMENT_NOISE}?? dB(A)`,
         });
       }
 
@@ -107,19 +107,17 @@ export const environmentIterable = (
         });
       });
 
+      const title = [
+        {
+          type: PGRSectionChildrenTypeEnum.H3,
+          text: `??${VariablesPGREnum.ENVIRONMENT_NAME}??`,
+        },
+      ] as ISectionChildrenType[];
+
+      if (breakPage) title.unshift({ type: PGRSectionChildrenTypeEnum.BREAK });
+
       return [
-        ...convertToDocx(
-          [
-            {
-              type: PGRSectionChildrenTypeEnum.BREAK,
-            },
-            {
-              type: PGRSectionChildrenTypeEnum.H3,
-              text: `??${VariablesPGREnum.ENVIRONMENT_NAME}??`,
-            },
-          ],
-          variables,
-        ),
+        ...convertToDocx([...title], variables),
         ...elements,
         ...convertToDocx(
           [

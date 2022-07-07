@@ -34,7 +34,7 @@ export const expositionDegreeTable = (
     },
     {
       type: PGRSectionChildrenTypeEnum.LEGEND,
-      text: '**Fonte:**  [JMV Global – Biológicos]',
+      text: '**Fonte:** [JMV Global – Biológicos]',
     },
   ]);
 

@@ -11,6 +11,7 @@ export const characterizationsConverter = (
   elements: ReturnType<typeof getLayouts>;
   risks: RiskFactorsEntity[];
   considerations: string[];
+  breakPage: boolean;
 }[] => {
   return characterizations.map((characterization: any) => {
     const imagesVertical = characterization.photos.filter(
@@ -20,6 +21,8 @@ export const characterizationsConverter = (
     const imagesHorizontal = characterization.photos.filter(
       (image) => !image.isVertical,
     );
+
+    const breakPage = imagesVertical.length > 0 || imagesHorizontal.length > 0;
 
     const elements = getLayouts(imagesVertical, imagesHorizontal);
     const variables = {
@@ -34,6 +37,6 @@ export const characterizationsConverter = (
 
     const considerations = characterization.considerations;
 
-    return { elements, variables, risks, considerations };
+    return { elements, variables, risks, considerations, breakPage };
   });
 };

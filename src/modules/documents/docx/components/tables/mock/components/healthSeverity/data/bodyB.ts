@@ -26,7 +26,7 @@ export const rowBodyBio: [string, string[]][] = [
   [
     '05 EXCESSIVA',
     [
-      '– Agente exótico ou desconhecido ou classe 4 – NR32, onde não se conhece profilaxia pra cura.',
+      '– Agente exótico ou desconhecido ou classe 4 – NR32, onde não se conhece profilaxia para cura.',
     ],
   ],
 ];

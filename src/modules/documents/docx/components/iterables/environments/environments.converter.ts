@@ -21,6 +21,7 @@ export const environmentsConverter = (
   elements: ReturnType<typeof getLayouts>;
   risks: RiskFactorsEntity[];
   considerations: string[];
+  breakPage: boolean;
 }[] => {
   return environments.map((environment) => {
     const imagesVertical = environment.photos.filter(
@@ -31,6 +32,7 @@ export const environmentsConverter = (
       (image) => !image.isVertical,
     );
 
+    const breakPage = imagesVertical.length > 0 || imagesHorizontal.length > 0;
     const elements = getLayouts(imagesVertical, imagesHorizontal);
     const variables = {
       [VariablesPGREnum.ENVIRONMENT_NAME]: environment.name || '',
@@ -48,7 +50,7 @@ export const environmentsConverter = (
 
     const considerations = environment.considerations;
 
-    return { elements, variables, risks, considerations };
+    return { elements, variables, risks, considerations, breakPage };
   });
 };
 

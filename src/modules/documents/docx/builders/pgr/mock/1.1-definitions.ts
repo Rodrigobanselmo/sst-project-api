@@ -29,7 +29,7 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Ação Preventiva:** Ação para eliminar a causa de um potencial não conformidade ou outra situação po-tencialmente indesejável. É executada para prevenir a ocorrência;',
+          text: '**Ação Preventiva:** Ação para eliminar a causa de um potencial não conformidade ou outra situação potencialmente indesejável. É executada para prevenir a ocorrência;',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -45,7 +45,7 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Agente Biológico:** Microrganismos, parasitas ou materiais originados de organismos que, em função de sua natureza e do tipo de exposição, são capazes de acarretar lesão ou agravo à saúde do trabalhador. Exemplos: bacté-ria Bacillus anthracis, vírus linfotrópico da célula T humana, príon agente de doença de Creutzfeldt-Jakob, fungo Coccidioides immitis **(NR-01 Anexo I);**',
+          text: '**Agente Biológico:** Microrganismos, parasitas ou materiais originados de organismos que, em função de sua natureza e do tipo de exposição, são capazes de acarretar lesão ou agravo à saúde do trabalhador. Exemplos: bactéria Bacillus anthracis, vírus linfotrópico da célula T humana, príon agente de doença de Creutzfeldt-Jakob, fungo Coccidioides immitis **(NR-01 Anexo I);**',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -53,7 +53,7 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Agente Químico:** : Substância química, por si só ou em misturas, quer seja em seu estado natural, quer seja produzida, utili-zada ou gerada no processo de trabalho, que em função de sua natureza, concentração e exposição, é capaz de causar lesão ou agravo à saúde do trabalhador. **Exemplos:** : fumos de cádmio, poeira mineral contendo sílica cristalina, vapores de tolueno, névoas de ácido sulfúri-co. **(NR-01 Anexo I);**',
+          text: '**Agente Químico:** Substância química, por si só ou em misturas, quer seja em seu estado natural, quer seja produzida, utili-zada ou gerada no processo de trabalho, que em função de sua natureza, concentração e exposição, é capaz de causar lesão ou agravo à saúde do trabalhador. **Exemplos:** fumos de cádmio, poeira mineral contendo sílica cristalina, vapores de tolueno, névoas de ácido sulfúrico. **(NR-01 Anexo I);**',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -93,7 +93,7 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Agentes Químicos – Vias de Absorção – Respiratória ou inalatória:** constitui a principal via de absorção de tóxicos, devido não só a grande quantidade de ar inalado durante a jornada de trabalho, como também a grande superfície dos alvéolos pulmonares. As substâncias penetram pelo nariz e pela boca, atuando na garganta e nos pulmões, em virtude da grande permeabilidade da parede alveolar da rica vascularização. Os gases e os vapores são rapidamente absorvidos e diluídos no sangue, que por sua vez serão distribuídos para outras regiões do organismo. Algumas vezes, eles podem retidos em nível alveolar e de-senvolver uma ação localizada:',
+          text: '**Agentes Químicos – Vias de Absorção – Respiratória ou inalatória:** constitui a principal via de absorção de tóxicos, devido não só a grande quantidade de ar inalado durante a jornada de trabalho, como também a grande superfície dos alvéolos pulmonares. As substâncias penetram pelo nariz e pela boca, atuando na garganta e nos pulmões, em virtude da grande permeabilidade da parede alveolar da rica vascularização. Os gases e os vapores são rapidamente absorvidos e diluídos no sangue, que por sua vez serão distribuídos para outras regiões do organismo. Algumas vezes, eles podem retidos em nível alveolar e desenvolver uma ação localizada:',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -265,7 +265,7 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Limites de Exposição Ocupacional:** são os valores de limites de tolerância previstos na Norma Regulamen-tadora n.º 15 ou, na ausência de limites de tolerância previstos na NR-15 e seus anexos, devem ser utilizados como referência para a adoção de medidas de prevenção aqueles previstos pela American Confe-rence of Governmental Industrial Higyenists – ACGIH. (NR-09 item 9.6.1.1);',
+          text: '**Limites de Exposição Ocupacional:** são os valores de limites de tolerância previstos na Norma Regulamentadora n.º 15 ou, na ausência de limites de tolerância previstos na NR-15 e seus anexos, devem ser utilizados como referência para a adoção de medidas de prevenção aqueles previstos pela American Conference of Governmental Industrial Higyenists – ACGIH. (NR-09 item 9.6.1.1);',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -341,7 +341,7 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Risco (Risk):** expressa uma probabilidade de possíveis danos dentro de um período específico de tempo ou número de ciclos operacionais. O valor quantitativo do risco de uma dada instalação ou processo industrial pode ser conseguido multiplicando-se a probabilidade de ocorrência (taxa de falha) de um acidente pela medida da consequência/dano (perda material ou humana) causada por este acidente;',
+          text: '**Risco (Risk):** expressa uma probabilidade de possíveis danos dentro de um período específico ou número de ciclos operacionais. O valor quantitativo do risco de uma dada instalação ou processo industrial pode ser conseguido multiplicando-se a probabilidade de ocorrência (taxa de falha) de um acidente pela medida da consequência/dano (perda material ou humana) causada por este acidente;',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,

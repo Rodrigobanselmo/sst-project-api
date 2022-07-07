@@ -48,7 +48,7 @@ export const riskFactors2Section: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET,
-          text: 'LINACH (Isto é: I Grupo 1 carcinogênicos para humanos; II Grupo 2A provavelmente carci-nogênicos para humanos; e III Grupo 2B possivelmente carcinogênicos para humanos;',
+          text: 'LINACH (Isto é: I Grupo 1 carcinogênicos para humanos; II Grupo 2A provavelmente carcinogênicos para humanos; e III Grupo 2B possivelmente carcinogênicos para humanos;',
           level: 1,
         },
         {
@@ -133,15 +133,15 @@ export const riskFactors2Section: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: 'Conforme a ACGIH, a carcinogenicidade das substâncias químicas está classificada nas seguintes cate-gorias:',
+          text: 'Conforme a ACGIH, a carcinogenicidade das substâncias químicas está classificada nas seguintes categorias:',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**A1** – Carcinógeno Humano Confirmado: O agente é carcinógeno para o ser humano, com base em evi-dências de estudos epidemiológicos.',
+          text: '**A1** – Carcinógeno Humano Confirmado: O agente é carcinógeno para o ser humano, com base em evidências de estudos epidemiológicos.',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**A2** – Carcinógeno Humano Suspeito: Dados obtidos para seres humanos são considerados qualitativamen-te adequados, porém, são conflitantes ou insuficientes para classificar o agente como carcinogênico humano confirmado; ou o agente é carcinógeno em experimentos animais, em dose (s), por via de admi-nistração, em locais, tipo (s) histológico (s), ou por mecanismo (s) que possam ser considerados relevantes para a exposição do trabalhador. A notação A2 é usada principalmente quando há evidência limitada de carcinogenicidade no homem e evidência suficiente de carcinogenicidade nas experiências em ani-mais, com relevância para os seres humanos.',
+          text: '**A2** – Carcinógeno Humano Suspeito: Dados obtidos para seres humanos são considerados qualitativamente adequados, porém, são conflitantes ou insuficientes para classificar o agente como carcinogênico humano confirmado; ou o agente é carcinógeno em experimentos animais, em dose (s), por via de administração, em locais, tipo (s) histológico (s), ou por mecanismo (s) que possam ser considerados relevantes para a exposição do trabalhador. A notação A2 é usada principalmente quando há evidência limitada de carcinogenicidade no homem e evidência suficiente de carcinogenicidade nas experiências em animais, com relevância para os seres humanos.',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -149,7 +149,7 @@ export const riskFactors2Section: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**A4** – Não Classificável como Carcinogênico Humano: Agentes que, suspeita-se, possam ser carcinogêni-cos para o ser humano, mas cujos dados existentes são insuficientes para se afirmar isso de forma conclu-siva.',
+          text: '**A4** – Não Classificável como Carcinogênico Humano: Agentes que, suspeita-se, possam ser carcinogênicos para o ser humano, mas cujos dados existentes são insuficientes para se afirmar isso de forma conclusiva.',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,

@@ -1,3 +1,4 @@
+import sizeOf from 'image-size';
 import { AttachmentEntity } from './../../../../checklist/entities/attachment.entity';
 import { APPRTableSection } from './../../../docx/components/tables/appr/appr.section';
 import { actionPlanTableSection } from './../../../docx/components/tables/actionPlan/actionPlan.section';
@@ -92,6 +93,9 @@ export class PgrUploadService {
           `tmp/${v4()}.${getExtensionFromUrl(company.logoUrl)}`,
         )
       : '';
+
+    // console.log(sizeOf(fs.readFileSync(logo)));
+    // return;
 
     const { environments, characterizations, photosPath } =
       await this.downloadPhotos(company);

@@ -21,7 +21,7 @@ export const characterizationIterable = (
   const characterizationData = characterizationsConverter(characterizations);
 
   const iterableSections = characterizationData
-    .map(({ variables, elements, risks, considerations: cons }) => {
+    .map(({ variables, elements, risks, considerations: cons, breakPage }) => {
       const riskFactors: ISectionChildrenType[] = [];
       const considerations: ISectionChildrenType[] = [];
 
@@ -61,16 +61,17 @@ export const characterizationIterable = (
         });
       });
 
+      const title = [
+        {
+          type: PGRSectionChildrenTypeEnum.H3,
+          text: `??${VariablesPGREnum.CHARACTERIZATION_NAME}??`,
+        },
+      ] as ISectionChildrenType[];
+
+      if (breakPage) title.unshift({ type: PGRSectionChildrenTypeEnum.BREAK });
+
       return [
-        ...convertToDocx(
-          [
-            {
-              type: PGRSectionChildrenTypeEnum.H3,
-              text: `??${VariablesPGREnum.CHARACTERIZATION_NAME}??`,
-            },
-          ],
-          variables,
-        ),
+        ...convertToDocx([...title], variables),
         ...elements,
         ...convertToDocx(
           [

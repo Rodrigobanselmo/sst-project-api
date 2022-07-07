@@ -27,7 +27,7 @@ export const available: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.H2,
-          text: 'A avaliação de riscos deve constituir um processo contínuo e ser revista a cada dois anos ou quando da ocorrência das seguintes situações **(NR-01 item 1.5.4.4.6):**',
+          text: 'A avaliação de riscos deve constituir um processo contínuo e ser revista a cada dois anos ou quando da ocorrência das seguintes situações (NR-01 item 1.5.4.4.6):',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,
@@ -51,11 +51,11 @@ export const available: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: 'No caso de organizações que possuírem certificações em sistema de gestão de SST, o prazo poderá ser de até 3 (três) anos (NR-01 item 1.5.4.4.6.1).',
+          text: 'No caso de organizações que possuírem certificações em sistema de gestão de SST, o prazo poderá ser de até 3 (três) anos **(NR-01 item 1.5.4.4.6.1)**.',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: 'O levantamento preliminar de perigos deve ser realizado (NR-01 item 1.5.4.2):',
+          text: 'O levantamento preliminar de perigos deve ser realizado **(NR-01 item 1.5.4.2)**:',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,

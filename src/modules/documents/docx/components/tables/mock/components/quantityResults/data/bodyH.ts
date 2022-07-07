@@ -19,7 +19,7 @@ export const rowBodyHeat: [string, string, string, string][] = [
   ],
   [
     'Acima dos limites estabelecidos na Tabela 2 da NHO 06.',
-    'Acima do limite de exposi-ção\n(IBUTG > LEO).',
+    'Acima do limite de exposição\n(IBUTG > LEO).',
     'Adoção imediata de medidas corretivas.',
     'Nesta situação, a frequência de monitoramento deve ser aquela necessária para a avaliação das medidas adotadas.',
   ],

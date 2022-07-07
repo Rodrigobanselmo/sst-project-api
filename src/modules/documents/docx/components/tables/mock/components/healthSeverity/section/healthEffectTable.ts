@@ -34,7 +34,7 @@ export const healthEffectTable = (
     },
     {
       type: PGRSectionChildrenTypeEnum.LEGEND,
-      text: '**Fonte:**  [AIHA – A Strategy for Assessing and Managing Occupational Exposures, 2015]; [JMVGLOBAL - Biológicos]',
+      text: '**Fonte:** [AIHA – A Strategy for Assessing and Managing Occupational Exposures, 2015]; [JMVGLOBAL - Biológicos]',
     },
   ]);
 

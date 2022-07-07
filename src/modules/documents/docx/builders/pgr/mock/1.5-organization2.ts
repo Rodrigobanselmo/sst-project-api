@@ -17,7 +17,7 @@ export const organization2Section: IDocumentPGRSectionGroup = {
       children: [
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: 'Quando aplicável promover os demais treinamentos específicos à medida que Fatores de Riscos e Perigos específicos forem sejam caracterizados, conforme preconiza as Normas Técnicas e/ou Normas Regulamentadoras (NR’s) pertinentes, tais como, relacionados a seguir:,',
+          text: 'Quando aplicável promover os demais treinamentos específicos à medida que Fatores de Riscos e Perigos específicos forem sejam caracterizados, conforme preconiza as Normas Técnicas e/ou Normas Regulamentadoras (NR’s) pertinentes, tais como, relacionados a seguir:',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET,

@@ -547,7 +547,7 @@ export const organizationSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Programa de Proteção Respiratória – PPR (Quando Identificado Riscos Químicos com FPMR4 > 1 ou seja Menor que o LEO)**',
+          text: '**Programa de Proteção Respiratória – PPR (Quando Identificado Riscos Químicos com FPMR4 > 1 ou seja menor que o LEO)**',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET,
