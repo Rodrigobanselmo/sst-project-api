@@ -7,6 +7,8 @@ export enum PGRSectionTypeEnum {
   COVER = 'COVER',
   SECTION = 'SECTION',
   APR = 'APR',
+  ITERABLE_ENVIRONMENTS = 'ITERABLE_ENVIRONMENTS',
+  ITERABLE_CHARACTERIZATION = 'ITERABLE_CHARACTERIZATION',
 }
 
 interface IBase {
@@ -39,6 +41,14 @@ export type ISection = {
   properties?: ISectionPropertiesOptions;
 } & IBase;
 
+export type ISectionEnv = {
+  type: PGRSectionTypeEnum.ITERABLE_ENVIRONMENTS;
+} & IBase;
+
+export type ISectionChar = {
+  type: PGRSectionTypeEnum.ITERABLE_CHARACTERIZATION;
+} & IBase;
+
 export type IAprTable = {
   type: PGRSectionTypeEnum.APR;
   properties?: ISectionPropertiesOptions;
@@ -48,6 +58,8 @@ export type IAllSectionTypesPGR =
   | IChapter
   | ISection
   | ICover
+  | ISectionEnv
+  | ISectionChar
   | ITOC
   | IAprTable;
 

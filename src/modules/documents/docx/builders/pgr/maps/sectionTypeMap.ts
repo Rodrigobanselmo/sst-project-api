@@ -1,12 +1,18 @@
-import { RiskFactorGroupDataEntity } from './../../../../../checklist/entities/riskGroupData.entity';
+import { CharacterizationEntity } from './../../../../../company/entities/characterization.entity';
 import { ISectionOptions } from 'docx';
-import { sectionLandscapeProperties } from '../../../base/config/styles';
 
+import { sectionLandscapeProperties } from '../../../base/config/styles';
 import { chapterSection } from '../../../base/layouts/chapter/chapter';
 import { coverSections } from '../../../base/layouts/cover/cover';
 import { headerAndFooter } from '../../../base/layouts/headerAndFooter/headerAndFooter';
 import { summarySections } from '../../../base/layouts/summary/summary';
+import { characterizationSections } from '../../../components/iterables/characterization/characterization.sections';
+import { environmentSections } from '../../../components/iterables/environments/environments.sections';
 import { APPRTableSection } from '../../../components/tables/appr/appr.section';
+import {
+  HierarchyMapData,
+  IHomoGroupMap,
+} from '../../../converter/hierarchy.converter';
 import { convertToDocxHelper } from '../functions/convertToDocx';
 import { replaceAllVariables } from '../functions/replaceAllVariables';
 import { ISectionChildrenType } from '../types/elements.types';
@@ -18,11 +24,9 @@ import {
   ISection,
   PGRSectionTypeEnum,
 } from '../types/section.types';
+import { RiskFactorGroupDataEntity } from './../../../../../checklist/entities/riskGroupData.entity';
+import { EnvironmentEntity } from './../../../../../company/entities/environment.entity';
 import { IMapElementDocumentType } from './elementTypeMap';
-import {
-  HierarchyMapData,
-  IHomoGroupMap,
-} from '../../../converter/hierarchy.converter';
 
 type IMapSectionDocumentType = Record<
   string,
@@ -37,6 +41,8 @@ type IDocumentClassType = {
   document: RiskFactorGroupDataEntity;
   homogeneousGroup: IHomoGroupMap;
   hierarchy: Map<string, HierarchyMapData>;
+  characterizations: CharacterizationEntity[];
+  environments: EnvironmentEntity[];
 };
 
 export class SectionsMapClass {
@@ -46,10 +52,12 @@ export class SectionsMapClass {
   private elementsMap: IMapElementDocumentType;
   private document: RiskFactorGroupDataEntity;
   private homogeneousGroup: IHomoGroupMap;
+  private environments: EnvironmentEntity[];
+  private characterizations: CharacterizationEntity[];
   private hierarchy: Map<string, HierarchyMapData>;
 
   // eslint-disable-next-line prettier/prettier
-  constructor({ variables, version, logoImagePath, elementsMap, document, hierarchy, homogeneousGroup }: IDocumentClassType) {
+  constructor({ variables, version, logoImagePath, elementsMap, document, hierarchy, homogeneousGroup,environments,characterizations }: IDocumentClassType) {
     this.variables = variables;
     this.version = version;
     this.logoPath = logoImagePath;
@@ -57,6 +65,8 @@ export class SectionsMapClass {
     this.document = document;
     this.hierarchy = hierarchy;
     this.homogeneousGroup = homogeneousGroup;
+    this.environments = environments;
+    this.characterizations = characterizations;
   }
 
   public map: IMapSectionDocumentType = {
@@ -81,6 +91,22 @@ export class SectionsMapClass {
       ...rest,
       ...sectionLandscapeProperties,
     }),
+    [PGRSectionTypeEnum.ITERABLE_ENVIRONMENTS]: (): ISectionOptions[] =>
+      environmentSections(this.environments, (x, v) =>
+        this.convertToDocx(x, v),
+      ).map(({ footerText, children }) => ({
+        children,
+        ...this.getFooterHeader(footerText),
+        ...sectionLandscapeProperties,
+      })),
+    [PGRSectionTypeEnum.ITERABLE_CHARACTERIZATION]: (): ISectionOptions[] =>
+      characterizationSections(this.characterizations, (x, v) =>
+        this.convertToDocx(x, v),
+      ).map(({ footerText, children }) => ({
+        children,
+        ...this.getFooterHeader(footerText),
+        ...sectionLandscapeProperties,
+      })),
     [PGRSectionTypeEnum.APR]: () =>
       APPRTableSection(this.document, this.hierarchy, this.homogeneousGroup),
   };
@@ -93,10 +119,16 @@ export class SectionsMapClass {
     });
   };
 
-  private convertToDocx(data: ISectionChildrenType[]) {
+  private convertToDocx(
+    data: ISectionChildrenType[],
+    variables = {} as IDocVariables,
+  ) {
     return data
       .map((child) => {
-        const childData = convertToDocxHelper(child, this.variables);
+        const childData = convertToDocxHelper(child, {
+          ...this.variables,
+          ...variables,
+        });
         if (!childData) return null;
         console.log(childData.type);
         return this.elementsMap[childData.type](childData);

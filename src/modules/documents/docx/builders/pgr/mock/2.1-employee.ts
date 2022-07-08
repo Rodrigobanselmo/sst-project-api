@@ -29,7 +29,7 @@ export const employeeSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: 'De acordo com o Organograma – Macroestrutura, a empresa encontra-se organizada através de Seto- res. Na tabela a seguir são apresentados os setores como as respectivas quantidades de trabalhadores.',
+          text: 'De acordo com o Organograma – Macroestrutura, a empresa encontra-se organizada através de Setores. Na tabela a seguir são apresentados os setores como as respectivas quantidades de trabalhadores.',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE,

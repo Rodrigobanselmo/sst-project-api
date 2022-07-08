@@ -87,6 +87,7 @@ export class PgrUploadService {
       },
     );
 
+    console.log(0);
     const logo = company.logoUrl
       ? await downloadImageFile(
           company.logoUrl,
@@ -96,6 +97,7 @@ export class PgrUploadService {
 
     // console.log(sizeOf(fs.readFileSync(logo)));
     // return;
+    console.log(1);
 
     const { environments, characterizations, photosPath } =
       await this.downloadPhotos(company);
@@ -103,19 +105,21 @@ export class PgrUploadService {
     // const characterizations = [];
     // const photosPath = [];
 
+    console.log(2);
     try {
       const { hierarchyData, homoGroupTree, hierarchyTree } =
         hierarchyConverter(hierarchyHierarchy, environments);
+      console.log(3);
 
-      // const actionPlanUrl = ' ';
-      // const urlAPR = ' ';
-      const { actionPlanUrl, urlAPR } = await this.generateAttachment(
-        riskGroupData,
-        hierarchyData,
-        hierarchyTree,
-        homoGroupTree,
-        upsertPgrDto,
-      );
+      const actionPlanUrl = ' ';
+      const urlAPR = ' ';
+      // const { actionPlanUrl, urlAPR } = await this.generateAttachment(
+      //   riskGroupData,
+      //   hierarchyData,
+      //   hierarchyTree,
+      //   homoGroupTree,
+      //   upsertPgrDto,
+      // );
 
       const version = new RiskDocumentEntity({
         version: upsertPgrDto.version,
@@ -158,21 +162,24 @@ export class PgrUploadService {
         hierarchyTree,
       }).build();
 
+      console.log(4);
       const doc = createBaseDocument(sections);
 
       const b64string = await Packer.toBase64String(doc);
       const buffer = Buffer.from(b64string, 'base64');
+
       const fileName = this.getFileName(upsertPgrDto, riskGroupData);
 
-      const url = await this.upload(buffer, fileName, upsertPgrDto);
+      // const url = await this.upload(buffer, fileName, upsertPgrDto);
 
-      await this.riskDocumentRepository.upsert({
-        ...upsertPgrDto,
-        companyId: company.id,
-        fileUrl: url,
-        attachments: attachments,
-      });
+      // await this.riskDocumentRepository.upsert({
+      //   ...upsertPgrDto,
+      //   companyId: company.id,
+      //   fileUrl: url,
+      //   attachments: attachments,
+      // });
 
+      console.log(5);
       // return doc;
 
       [logo, ...photosPath].forEach((path) => path && fs.unlinkSync(path));

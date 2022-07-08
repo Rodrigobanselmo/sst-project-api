@@ -133,6 +133,8 @@ export class DocumentBuildPGR {
       document: this.document,
       homogeneousGroup: this.homogeneousGroup,
       hierarchy: this.hierarchy,
+      environments: this.environments ?? [],
+      characterizations: this.characterizations ?? [],
     }).map;
 
     data.forEach((child) => {

@@ -83,10 +83,6 @@ export const characterizationIterable = (
               removeWithSomeEmptyVars: [VariablesPGREnum.CHARACTERIZATION_DESC],
             },
             ...considerations,
-            {
-              type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-              text: '',
-            },
           ],
           variables,
         ),

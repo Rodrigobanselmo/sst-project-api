@@ -132,10 +132,6 @@ export const environmentIterable = (
             },
             ...parameters,
             ...considerations,
-            {
-              type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-              text: '',
-            },
           ],
           variables,
         ),
