@@ -19,7 +19,7 @@ export const environmentSection: IDocumentPGRSectionGroup = {
       children: [
         {
           type: PGRSectionChildrenTypeEnum.TITLE,
-          text: `??${VariablesPGREnum.CHAPTER_2}??`,
+          text: `??${VariablesPGREnum.CHAPTER_2}?? (NR-01 ‘itens’ 1.5.4.2 e 1.5.4.3)`,
         },
         {
           type: PGRSectionChildrenTypeEnum.H1,
@@ -27,23 +27,23 @@ export const environmentSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: `A caracterização dos ambientes de trabalho é uma ferramenta importante na graduação do risco de exposição dos empregados, pois fornece uma visão geral dos processos, dos riscos presentes e das fontes geradoras desses riscos. Através da análise de fluxogramas, layouts, diagramas e da própria descrição de cada processo de trabalho, podemos identificar oportunidades de implantação de medidas de controle capazes de minimizar ou até mesmo eliminar os riscos de exposição para os trabalhadores`,
+          text: `A caracterização dos ambientes de trabalho é uma ferramenta importante na graduação do Risco Ocupacional dos empregados, pois fornece uma visão geral dos processos, dos riscos presentes e das fontes geradoras desses riscos. Através da análise de fluxogramas, layouts, diagramas e da própria descrição de cada processo de trabalho, podemos identificar oportunidades de implantação de medidas de controle capazes de minimizar ou até mesmo eliminar os riscos de exposição para os trabalhadores. Os ambientes de trabalho são classificados nas categorias a seguir:`,
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET,
-          text: '**Visão Geral dos Ambientes:** TEXTO ALEX',
+          text: '**Ambientes Gerais:** Nos ambientes considerados gerais são aqueles que não possuem uma destinação específica e certamente são isentos de riscos próprios, envolve áreas comuns de circulação e normalmente sem restrição de acesso ao público, tais como: Fachada da empresa, Roll de entrada, ambientes de espera, pátios, áreas de recreação, etc.',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET,
-          text: '**Ambientes Administrativos:** Nos ambientes administrativos são executadas atividades diversas pouco relacionadas com riscos físicos, químicos e biológicos, mas é possível encontrar alguns fatores de riscos ergonômicos e até mesmo de acidentes, no entanto de baixa severidade.',
+          text: '**Ambientes Administrativos:** Nos ambientes administrativos são executadas atividades diversas sem relação direta com o processo produtivo e pouco relacionadas com riscos físicos, químicos e biológicos, mas é possível encontrar alguns fatores de riscos ergonômicos e até mesmo de acidentes, no entanto de baixa severidade.',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET,
-          text: '**Ambientes Operacionais:** Nos ambientes administrativos são executadas atividades diversas pouco relacionadas com riscos físicos, químicos e biológicos, mas é possível encontrar alguns fatores de riscos ergonômicos e até mesmo de acidentes, no entanto de baixa severidade.',
+          text: '**Ambientes de Apoio:** Nos ambientes de apoio são executadas atividades que dão suporte às atividades operacionais da empresa, normalmente envolvem Fatores de Riscos e Perigos característicos ao que é executado nos seus posto de trabalho gerando exposições primárias, são exemplos os seguintes ambientes: Oficinas diversa, laboratórios, estações de tratamento (efluentes), pátios de resíduos, etc.',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET,
-          text: '**Ambientes de Apoio:** Nos ambientes administrativos são executadas atividades diversas pouco relacionadas com riscos físicos, químicos e biológicos, mas é possível encontrar alguns fatores de riscos ergonômicos e até mesmo de acidentes, no entanto de baixa severidade.',
+          text: '**Ambientes Operacionais:** Nos ambientes operacionais são executadas atividades que resultam no produto ou serviço fim da empresa, ou seja, onde ocorre o processo produtivo, normalmente são os ambientes de maior concentração de Fatores de Riscos e Perigos envolvendo quase sempre exposições primárias e secundárias.',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,

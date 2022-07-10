@@ -57,19 +57,19 @@ export class UpsertRiskGroupDataDto {
 
   @IsOptional()
   @IsString()
-  workspaceId: string;
+  workspaceId?: string;
 
   @IsOptional()
   @IsString({ each: true })
-  professionalsIds: string[];
+  professionalsIds?: string[];
 
   @IsOptional()
   @IsInt({ each: true })
-  usersIds: number[];
+  usersIds?: number[];
 
   @IsOptional()
   @IsString({ each: true })
-  complementarySystems: string[];
+  complementarySystems?: string[];
 
   @IsOptional()
   @IsString({ each: true })

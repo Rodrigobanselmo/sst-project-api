@@ -81,7 +81,7 @@ export const document: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: 'Os documentos e dados deverão ser preservados por um período mínimo de 20 (vinte) anos. A divulgação dos dados será feita através de reuniões de divulgação, Boletins de Circulação Interna, reuniões da CIPA e Quadros de Avisos **(NR-01 Item 1.5.7.3.3.1).**',
+          text: 'Os documentos e dados deverão ser preservados por um período mínimo de 20 (vinte) anos. A divulgação dos dados será feita por reuniões de divulgação, Boletins de Circulação Interna, reuniões da CIPA e Quadros de Avisos **(NR-01 Item 1.5.7.3.3.1).**',
         },
         {
           type: PGRSectionChildrenTypeEnum.H2,
@@ -89,7 +89,7 @@ export const document: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: 'Deve ser elaborado um Plano para respostas aos cenários de emergências, de acordo com os riscos, as características e as circunstâncias das atividades, caso seja identificado algum cenário de emergência que se justifique essa ação. (NR-01 Item 1.5.6.1)',
+          text: 'Deve ser elaborado um Plano para respostas aos cenários de emergências, conforme com os riscos, as características e as circunstâncias das atividades, caso seja identificado algum cenário de emergência que se justifique essa ação. (NR-01 Item 1.5.6.1)',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,

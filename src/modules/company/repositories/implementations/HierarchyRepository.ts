@@ -285,8 +285,12 @@ export class HierarchyRepository {
 
   async findAllHierarchyByCompany(
     companyId: string,
-    options: {
+    {
+      returnWorkspace,
+      ...options
+    }: {
       include?: Prisma.HierarchyInclude;
+      returnWorkspace?: boolean;
     } = {},
   ) {
     const hierarchies = await this.prisma.hierarchy.findMany({
@@ -300,7 +304,7 @@ export class HierarchyRepository {
           (workspace) => workspace.id,
         );
 
-        delete (hierarchy as any).workspaces;
+        if (!returnWorkspace) delete (hierarchy as any).workspaces;
       }
       return new HierarchyEntity(hierarchy);
     });

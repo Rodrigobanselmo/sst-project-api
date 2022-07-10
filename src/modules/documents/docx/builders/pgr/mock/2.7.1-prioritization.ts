@@ -13,7 +13,7 @@ export const prioritization2Section: IDocumentPGRSectionGroup = {
     {
       properties: sectionLandscapeProperties,
       type: PGRSectionTypeEnum.SECTION,
-      footerText: `??${VariablesPGREnum.CHAPTER_2}??`,
+      footerText: `??${VariablesPGREnum.CHAPTER_3}??`,
       removeWithAllEmptyVars: [VariablesPGREnum.COMPANY_HAS_GSE_RISK],
       children: [
         {
@@ -28,7 +28,7 @@ export const prioritization2Section: IDocumentPGRSectionGroup = {
     {
       properties: sectionLandscapeProperties,
       type: PGRSectionTypeEnum.SECTION,
-      footerText: `??${VariablesPGREnum.CHAPTER_2}??`,
+      footerText: `??${VariablesPGREnum.CHAPTER_3}??`,
       removeWithAllEmptyVars: [VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_RISK],
       children: [
         {
@@ -43,7 +43,7 @@ export const prioritization2Section: IDocumentPGRSectionGroup = {
     {
       properties: sectionLandscapeProperties,
       type: PGRSectionTypeEnum.SECTION,
-      footerText: `??${VariablesPGREnum.CHAPTER_2}??`,
+      footerText: `??${VariablesPGREnum.CHAPTER_3}??`,
       removeWithAllEmptyVars: [
         VariablesPGREnum.COMPANY_HAS_CHARACTERIZATION_RISK,
       ],
@@ -60,7 +60,7 @@ export const prioritization2Section: IDocumentPGRSectionGroup = {
     {
       properties: sectionLandscapeProperties,
       type: PGRSectionTypeEnum.SECTION,
-      footerText: `??${VariablesPGREnum.CHAPTER_2}??`,
+      footerText: `??${VariablesPGREnum.CHAPTER_3}??`,
       removeWithAllEmptyVars: [VariablesPGREnum.COMPANY_HAS_HIERARCHY_RISK],
       children: [
         {

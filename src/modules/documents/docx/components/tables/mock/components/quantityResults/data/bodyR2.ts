@@ -2,7 +2,7 @@ export const rowBodyNoise2: [string, string, string, string][] = [
   [
     'Qualquer resultado > 115 dB(A)',
     'NA',
-    'Interromper as atividades imediatamente, situação de risco grave e eminente.',
+    'Interromper as atividades imediatamente, situação de risco grave e iminente.',
     'Interromper as atividades',
   ],
   [

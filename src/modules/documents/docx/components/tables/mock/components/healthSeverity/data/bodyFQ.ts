@@ -2,14 +2,12 @@ export const rowBodyFisQui: [string, string[]][] = [
   [
     '01\nDESPREZÍVEL',
     [
-      '– Não há exposição significativa aos agentes ambientais;',
       '– Efeitos reversíveis de pouca importância ou nenhum agravamento a saúde conhecido.',
     ],
   ],
   [
     '02\nPEQUENO',
     [
-      '– Exposição sem evidências de agravos fisiológicos significativos',
       '– Efeitos nocivos (adversos) subclínicas, leves, reversíveis;',
       '– São irritantes de pele e mucosas;',
       '– Sem evidência de carcinogenicidade, teratogenicidade ou mutagenicidade.',

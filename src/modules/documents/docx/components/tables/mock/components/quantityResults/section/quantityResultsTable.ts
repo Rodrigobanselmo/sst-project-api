@@ -26,7 +26,7 @@ export const quantityResultsTable = (
     },
     {
       type: PGRSectionChildrenTypeEnum.LEGEND,
-      text: '**Legenda:**\n**MVUE** = Estimativa da Média Verdadeira obtida através de tratamento estatístico das avaliações;\n**LEO** = Limite de Exposição Ocupacional;\n**IJ** = Critério estatístico que representa a razão entre o MVUE e o LEO do agente de risco, fornece a porcentagem do MVUE em relação ao LEO.\n**Obs.:** Substâncias carcinogênicas (LINACH/ACHIG) e Fatores de Riscos Químicos cujo Limite de Exposição é valor Teto (NR15/ACGIH) serão monitorados pelo menos 1 vez por ano independente do Risco Ocupacional.',
+      text: '**Legenda:**\n**MVUE** = Estimativa da Média Verdadeira obtida por tratamento estatístico das avaliações;\n**LEO** = Limite de Exposição Ocupacional;\n**IJ** = Critério estatístico que representa a razão entre o MVUE e o LEO do agente de risco, fornece a porcentagem do MVUE em relação ao LEO.\n**Obs.:** Substâncias carcinogênicas (LINACH/ACGIH) e Fatores de Riscos Químicos cujo Limite de Exposição é valor Teto (NR15/ACGIH) serão monitorados pelo menos 1 vez por ano independente do Risco Ocupacional.',
     },
   ]);
 
@@ -37,7 +37,7 @@ export const quantityResultsTable = (
     },
     {
       type: PGRSectionChildrenTypeEnum.LEGEND,
-      text: '**Legenda:**\n**MVUE** = Estimativa da Média Verdadeira obtida através de tratamento estatístico das avaliações;\n**LEO** = Limite de Exposição Ocupacional;\n**IJ** = Critério estatístico que representa a razão entre o MVUE e o LEO do agente de risco, fornece a porcentagem do MVUE em relação ao LEO.',
+      text: '**Legenda:**\n**MVUE** = Estimativa da Média Verdadeira obtida por tratamento estatístico das avaliações;\n**LEO** = Limite de Exposição Ocupacional;\n**IJ** = Critério estatístico que representa a razão entre o MVUE e o LEO do agente de risco, fornece a porcentagem do MVUE em relação ao LEO.',
     },
     {
       type: PGRSectionChildrenTypeEnum.BREAK,
@@ -51,14 +51,14 @@ export const quantityResultsTable = (
     },
     {
       type: PGRSectionChildrenTypeEnum.LEGEND,
-      text: '**Legenda:**\n**MVUE** = Estimativa da Média Verdadeira obtida através de tratamento estatístico das avaliações;\n**LEO** = Limite de Exposição Ocupacional;\n**IJ** = Critério estatístico que representa a razão entre o MVUE e o LEO do agente de risco, fornece a porcentagem do MVUE em relação ao LEO.',
+      text: '**Legenda:**\n**MVUE** = Estimativa da Média Verdadeira obtida por tratamento estatístico das avaliações;\n**LEO** = Limite de Exposição Ocupacional;\n**IJ** = Critério estatístico que representa a razão entre o MVUE e o LEO do agente de risco, fornece a porcentagem do MVUE em relação ao LEO.',
     },
   ]);
 
   const table4 = convertToDocx([
     {
       type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE,
-      text: 'Critério de Interpretação de Resultados Quantitativos (CALOR) (NR-01 item 1.5.7.3.2 alínea f)',
+      text: 'Critério de Interpretação de Resultados Quantitativos para trabalhadores aclimatizados (CALOR) (NR-01 item 1.5.7.3.2 alínea f)',
     },
     {
       type: PGRSectionChildrenTypeEnum.LEGEND,
@@ -98,7 +98,7 @@ export const quantityResultsTable = (
     },
     {
       type: PGRSectionChildrenTypeEnum.LEGEND,
-      text: '**Observação:** Para as atividades que envolverem exposição a Radiações Ionizantes (Raio-X, Alfa, Beta, Gama ou Nêutrons), conforme Anexo 5 da NR15, consideraremos os Limites de Tolerância determinados pela Norma CNEN NE 3.01, conforme tabela acima.',
+      text: '**Observação:** Para as atividades que envolvem exposição a Radiações Ionizantes (Raio-X, Alfa, Beta, Gama ou Nêutrons), conforme Anexo 5 da NR 15, consideramos os Limites de Tolerância determinados pela Norma CNEN NE 3.01, conforme tabela acima.',
     },
   ]);
 

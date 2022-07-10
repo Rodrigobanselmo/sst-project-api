@@ -20,7 +20,7 @@ export const rs: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: 'A Secretaria Estadual da Saúde do Rio Grande do Sul – SES-RS – através do Decreto 40.222/2000, implantou o Sistema de Informação em Saúde do Trabalhador – SIST/RS – com o objetivo de estabelecer a notifica- ção compulsória de todos os acidentes e doenças relacionadas ao trabalho no Rio Grande do Sul. Para viabilizar o fluxo de informação das notificações foram elaborados os formulários em papel do RINA (Re- latório Individual de Notificação de Agravos) e uma base de dados em EPINFO onde estes formulários em papel deveriam ser digitados. Agora o Sistema de Informação em Saúde do Trabalhador avançou, já se encontra disponível a notificação pela rede de Internet. O endereço é <link>http://www.sist.saude.rs.gov.br|www.sist.saude.rs.gov.br<link>.',
+          text: 'A Secretaria Estadual da Saúde do Rio Grande do Sul – SES-RS – através do Decreto 40.222/2000, implantou o Sistema de Informação em Saúde do Trabalhador – SIST/RS – visando estabelecer a notifica- ção compulsória de todos os acidentes e doenças relacionadas ao trabalho no Rio Grande do Sul. Para viabilizar o fluxo de informação das notificações foram elaborados os formulários em papel do RINA (Re- latório Individual de Notificação de Agravos) e uma base de dados em EPINFO onde estes formulários em papel deveriam ser digitados. Agora o Sistema de Informação em Saúde do Trabalhador avançou, já se encontra disponível a notificação pela rede de Internet. O endereço é <link>http://www.sist.saude.rs.gov.br|www.sist.saude.rs.gov.br<link>.',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,

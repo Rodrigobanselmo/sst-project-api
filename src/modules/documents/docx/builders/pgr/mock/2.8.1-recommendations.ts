@@ -11,7 +11,7 @@ export const recommendations1Section: IDocumentPGRSectionGroup = {
   data: [
     {
       type: PGRSectionTypeEnum.SECTION,
-      footerText: `??${VariablesPGREnum.CHAPTER_2}??`,
+      footerText: `??${VariablesPGREnum.CHAPTER_3}??`,
       removeWithAllEmptyVars: [
         VariablesPGREnum.HAS_HEAT,
         VariablesPGREnum.HAS_VFB,

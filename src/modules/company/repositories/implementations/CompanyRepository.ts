@@ -512,7 +512,7 @@ export class CompanyRepository implements ICompanyRepository {
       },
     });
 
-    if (company.workspace) {
+    if (company?.workspace) {
       company.workspace = await Promise.all(
         company.workspace.map(async (workspace) => {
           const employeeCount = await this.prisma.employee.count({

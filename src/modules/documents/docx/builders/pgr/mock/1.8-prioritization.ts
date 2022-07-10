@@ -15,11 +15,11 @@ export const prioritization: IDocumentPGRSectionGroup = {
       children: [
         {
           type: PGRSectionChildrenTypeEnum.H2,
-          text: 'Priorização de GSE’s e Fatores de Risco (NR-01 item 1.5.3.2 alínea d) / (NR-01 item 1.5.7.3.2 alínea e)',
+          text: 'Priorização de GSE’s e Fatores de Risco (NR-01 ‘item’ 1.5.3.2 alínea d) / (NR-01 ‘item’ 1.5.7.3.2 alínea e; f)',
         },
         {
           type: PGRSectionChildrenTypeEnum.H3,
-          text: 'Priorização de GSE’s e Fatores de Risco (NR-01 item 1.5.3.2 alínea d) / (NR-01 item 1.5.7.3.2 alínea e)',
+          text: 'Avaliações Quantitativas (NR-01 ‘item’ 1.5.7.3.2 alínea f)',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -134,7 +134,7 @@ export const prioritization: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: 'As ações relativas ao gerenciamento e controle dos riscos ambientais serão implantadas de acordo com o cronograma, a alocação de recursos, definição de responsabilidades e prazos, discriminados no Plano de Ação do PGR. O acompanhamento da implantação das medidas de controle é atribuição do Coordenador Geral, bem como a sua divulgação.',
+          text: 'As ações relativas ao gerenciamento e controle dos riscos ambientais serão implantadas conforme o cronograma, a alocação de recursos, definição de responsabilidades e prazos, discriminados no Plano de Ação do PGR. O acompanhamento da implantação das medidas de controle é atribuição do Coordenador Geral, bem como a sua divulgação.',
         },
         {
           type: PGRSectionChildrenTypeEnum.H3,
@@ -161,7 +161,7 @@ export const prioritization: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET,
-          text: 'E sempre que for concluída uma ação do Plano de Ação relativa a Medidas de Controle, para que seja avaliado o risco residual.',
+          text: 'E sempre que for concluída uma ação do Plano de Ação relativa a Medidas de Controle, para ser avaliado o risco residual.',
           level: 0,
         },
         {

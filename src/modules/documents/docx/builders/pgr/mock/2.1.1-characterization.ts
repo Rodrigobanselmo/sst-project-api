@@ -14,32 +14,28 @@ export const characterizationSection: IDocumentPGRSectionGroup = {
       footerText: `??${VariablesPGREnum.CHAPTER_2}??`,
       children: [
         {
-          type: PGRSectionChildrenTypeEnum.TITLE,
-          text: `??${VariablesPGREnum.CHAPTER_2}??`,
-        },
-        {
           type: PGRSectionChildrenTypeEnum.H1,
-          text: 'CARACTERIZAÇÃO DA MÃO DE OBRA',
+          text: 'CARACTERIZAÇÃO DAS ATIVIDADES / (NR-01 ‘item’ 1.5.7.3.2 alínea b)',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: `A seguir, serão demonstrados elementos coletados em campo, que justificaram as classificações quanto ao Grau de Risco na APR/APP`,
+          text: `A caracterização da Mão de Obra é mais eficiente quando se analisa as diversas Atividades/Tarefas; Postos de Trabalho e Equipamentos sendo uma ferramenta importante na graduação do Risco Ocupacional dos empregados, pois fornece uma visão detalhada dos Procedimentos Operacionais (PO), permitindo identificar os riscos presentes e as fontes geradoras desses riscos. Através da análise de cada etapa dos PO's, sejam esses formalizados (escritos e oficiais), ou não, fornecendo uma visão do GRO da teoria à prática. A caracterização da Mão de Obra neste PGR foi categorizada de três formas:`,
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET,
-          text: '**Posto de Trabalho:** TEXTO ALEX',
+          text: '**Posto de Trabalho:** Consiste na análise dos Fatores de Riscos e Perigos (FR/P) com base nas características dos locais onde as principais tarefas são executadas, é fundamental para entender como o local de trabalho afeta as atividades executadas e consequentemente impactam no FR/P.',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET,
-          text: '**Atividades:** ...',
+          text: '**Atividades:** Consiste na análise dos Fatores de Riscos e Perigos (FR/P) com base nas características das atividades executadas, é fundamental para entender como a forma de executar os procedimentos operacionais (tarefas rotineiras de cada trabalhador) impactam no FR/P.',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET,
-          text: '**Equipamentos:** ...',
+          text: '**Equipamentos:** Consiste na análise dos Fatores de Riscos e Perigos (FR/P) com base nas características dos equipamentos e ferramentas com que as principais tarefas são executadas, é fundamental para entender como estes ïntrumentos" afetam as atividades executadas e consequentemente impactam no FR/P.',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: `A seguir é apresentada à caracterização da mão de obra que compreende a empresa **??${VariablesPGREnum.COMPANY_SHORT_NAME}??** com sua respectiva descrição e caracteristicas.`,
+          text: `A seguir é apresentada uma relação das diversas Categorias de Caracterização da Mão de Obra  da **??${VariablesPGREnum.COMPANY_SHORT_NAME}??** com suas descrições e respectivos Fatores de Riscos e Perigos identificados.`,
         },
       ],
     },

@@ -13,7 +13,7 @@ export const endSection: IDocumentPGRSectionGroup = {
     {
       properties: sectionLandscapeProperties,
       type: PGRSectionTypeEnum.SECTION,
-      footerText: `??${VariablesPGREnum.CHAPTER_2}??`,
+      footerText: `??${VariablesPGREnum.CHAPTER_3}??`,
       children: [
         {
           type: PGRSectionChildrenTypeEnum.H1,

@@ -16,6 +16,7 @@ import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import { CreateCompanyDto } from '../../dto/create-company.dto';
 import { UpdateCompanyDto } from '../../dto/update-company.dto';
 import { AddCompanyPhotoService } from '../../services/company/add-company-photo/add-company-photo.service';
+import { CopyCompanyService } from '../../services/company/copy-company/copy-company.service';
 import { CreateCompanyService } from '../../services/company/create-company/create-company.service';
 import { CreateContractService } from '../../services/company/create-contract/create-contract.service';
 import { FindAllCompaniesService } from '../../services/company/find-all-companies/find-all-companies.service';
@@ -36,6 +37,7 @@ export class CompanyController {
     private readonly findCompanyService: FindCompanyService,
     private readonly findCnpjService: FindCnpjService,
     private readonly findCepService: FindCepService,
+    private readonly copyCompanyService: CopyCompanyService,
   ) {}
 
   @Get('/:companyId')
@@ -87,6 +89,19 @@ export class CompanyController {
   @Patch()
   update(@Body() updateCompanyDto: UpdateCompanyDto) {
     return this.updateCompanyService.execute(updateCompanyDto);
+  }
+
+  @Post('/copy/:copyFromCompanyId/:riskGroupId/:companyId')
+  copy(
+    @Param('copyFromCompanyId') copyFromCompanyId: string,
+    @Param('riskGroupId') riskGroupId: string,
+    @User() userPayloadDto: UserPayloadDto,
+  ) {
+    return this.copyCompanyService.execute(
+      copyFromCompanyId,
+      riskGroupId,
+      userPayloadDto,
+    );
   }
 
   // TODO: create disconnect users or activities or...

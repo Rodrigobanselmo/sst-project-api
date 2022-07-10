@@ -23,7 +23,7 @@ export const available: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: 'O acompanhamento do programa deverá ser feito pelo Coordenador Geral que promoverá pelo menos uma reunião a cada 2 meses com todos aqueles a quem delegou competência para o desempenho de atividades específicas do programa com o objetivo de fazer os ajustes necessários no Plano de Ação.',
+          text: 'O acompanhamento do programa deverá ser feito pelo Coordenador Geral que promoverá pelo menos uma reunião a cada 2 meses com todos aqueles a quem delegou competência para o desempenho de atividades específicas do programa visando fazer os ajustes necessários no Plano de Ação.',
         },
         {
           type: PGRSectionChildrenTypeEnum.H2,

@@ -23,7 +23,7 @@ export const qualityEvaluation: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: 'Deve-se selecionar as ferramentas e técnicas de avaliação de riscos que sejam adequadas ao risco ou circunstância em avaliação. **(NR-01 item 1.5.3.4.4.2.1).**',
+          text: 'Deve-se selecionar as ferramentas e técnicas de avaliação de riscos adequadas às circunstâncias em avaliação. **(NR-01 item 1.5.3.4.4.2.1).**',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -41,7 +41,7 @@ export const qualityEvaluation: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: 'Para determinação do Grau de Exposição Estimado (GEE) dos trabalhadores é feita uma avaliação qualitativa da exposição aos diversos agentes, com base em dados de avaliações de exposição anteriores (se existirem), nas concentrações e quantidades movimentadas/manipuladas dos agentes químicos e ou biológicos, na intensidade dos agentes físicos, no tipo de atividade executada, no local e nas condições de emissão e dispersão do agente e do tempo de exposição.',
+          text: 'Para determinação do Grau de Exposição Estimado (GEE) dos trabalhadores é feita uma avaliação qualitativa da exposição aos diversos agentes, com base em dados de avaliações de exposição anteriores (se existirem), nas concentrações e quantidades movimentadas/manipuladas dos agentes químicos e/ou biológicos, na intensidade dos agentes físicos, no categoria de atividade executada, no local e nas condições de emissão e dispersão do agente e do tempo de exposição. ',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -78,7 +78,7 @@ export const qualityEvaluation: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: 'O Julgamento (IJ) que é calculado pela relação entre o MVUE (parâmetro estatístico) e o Limite de Tolerância mais restritivo dentre aqueles da NR-15 e ACGIH.',
+          text: 'O Julgamento (IJ) é calculado pela relação entre o MVUE (parâmetro estatístico) e o Limite de Tolerância mais restritivo dentre aqueles da NR-15 e ACGIH.',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -90,6 +90,10 @@ export const qualityEvaluation: IDocumentPGRSectionGroup = {
         {
           type: PGRSectionChildrenTypeEnum.H2,
           text: `Avaliação Quantitativa do Risco Ocupacional (NR-01 item 1.5.3.2 alínea c)`,
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          text: `Quando o agente de risco for avaliado quantitativamente o RO calculado por tratamento estatístico deverá prevalecer em relação ao qualitativo. A seguir são apresentados os critérios para determinação do Risco Ocupacional por avaliação quantitativa.`,
         },
         {
           type: PGRSectionChildrenTypeEnum.QUANTITY_RESULTS_TABLES,

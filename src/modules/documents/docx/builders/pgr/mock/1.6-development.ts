@@ -17,7 +17,7 @@ export const developmentSection: IDocumentPGRSectionGroup = {
       children: [
         {
           type: PGRSectionChildrenTypeEnum.H1,
-          text: 'DESENVOLVIMENTO DO PGR – METODOLOGIA APLICADA',
+          text: 'METODOLOGIA APLICADA',
         },
         {
           type: PGRSectionChildrenTypeEnum.H2,
@@ -53,7 +53,7 @@ export const developmentSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,
-          text: 'd) **Funções e Trabalhadores Expostos:** Consistem em identificar o número de trabalhadores expostos ao agente agressivo as atividades desenvolvidas? / Gestos profissionais.',
+          text: 'd) **Funções e Trabalhadores Expostos:** Consistem em identificar o número de trabalhadores expostos ao agente agressivo, as atividades desenvolvidas? / Gestos profissionais.',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,
@@ -61,11 +61,11 @@ export const developmentSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,
-          text: 'f) **Obtenção Dados Epidemiológicos da Empresa:** Consiste em examinar, quando disponível, o histórico clínico, estatísticas, casos e demais informações sobre queixas mais comum, acidentes ou doenças do trabalho ocorrido na empresa.',
+          text: 'f) **Obtenção Dados Epidemiológicos da Empresa:** Consiste em examinar, quando disponível, o histórico clínico, estatísticas, casos e demais informações sobre queixas mais comuns, acidentes ou doenças do trabalho ocorridos na empresa.',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,
-          text: 'g) **Possíveis Danos a Saúde:** Consiste em identificar na literatura técnica (Ex. Lista B Decreto 3048/99 INSS – Agentes Etiológicos, Base do TLV da ACGIH) Agentes Etiológicos – os possíveis danos a saúde relacionados aos riscos identificados (NR-01 item 1.5.4.3.1 alínea a).',
+          text: 'g) **Possíveis Danos à Saúde:** Consiste em identificar na literatura técnica (Ex. Lista B Decreto 3048/99 INSS – Agentes Etiológicos, Base do TLV da ACGIH) Agentes Etiológicos – os possíveis danos a saúde relacionados aos riscos identificados (NR-01 item 1.5.4.3.1 alínea a).',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,
@@ -77,7 +77,7 @@ export const developmentSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET,
-          text: '**Caracterização do Ambiente de Trabalho (NR-01 item 1.5.7.3.2 alínea a)**',
+          text: '**Caracterização dos Processos e Ambientes de Trabalho (NR-01 ‘item’ 1.5.7.3.2 alínea a)**',
           level: 0,
         },
         {
@@ -86,16 +86,16 @@ export const developmentSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET,
-          text: '**Caracterização da Mão de Obra (NR-01 item 1.5.4.3.1 alínea c) / (NR-01 item 1.5.7.3.2 alínea b)**',
+          text: '**Caracterização das Atividades - Análise Preliminar de Riscos (NR-01 ‘item’ 1.5.4.3.1 alínea c) / (NR-01 ‘item’ 1.5.7.3.2 alínea b)**',
           level: 0,
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: 'Para cada função integrante do organograma funcional da empresa, serão relacionadas às diferentes tarefas e atividades executadas, os riscos de exposição associados, a mobilidade entre as diversas áreas, o tempo de exposição aos agentes ambientais e as medidas de controle existentes. Estas informações serão tabuladas na Planilha “Inventário de Risco”, integrante do capítulo de Caracterização da Mão de Obra. Esse sumário pode variar em função do Fator de Riscos a ser caracterizado, sendo assim, mais de um modelo poderá ser utilizado.',
+          text: 'Para cada função integrante do organograma funcional da empresa, serão relacionadas às diferentes tarefas e atividades executadas, os riscos de exposição associados, a mobilidade entre as diversas áreas, o tempo de exposição aos agentes ambientais e as medidas de controle existentes. Estas informações serão tabuladas na Planilha “Inventário de Risco”, esse sumário pode variar em função do Fator de Riscos ou Perigo a ser caracterizado, sendo assim, mais de um modelo poderá ser utilizado.',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET,
-          text: 'Caracterização dos Fatores de Risco (NR-01 item 1.5.7.3.2 alínea c)',
+          text: '(Caracterização) Identificação dos Fatores de Riscos e Perigos (NR-01 ‘item’ 1.5.7.3.2 alínea c)',
           level: 0,
         },
         {

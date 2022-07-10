@@ -1,19 +1,31 @@
 import { Module } from '@nestjs/common';
-import { AmazonStorageProvider } from '../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
 
 import { ExcelProvider } from '../../shared/providers/ExcelProvider/implementations/ExcelProvider';
+import { AmazonStorageProvider } from '../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
+import { RiskGroupDataRepository } from '../checklist/repositories/implementations/RiskGroupDataRepository';
+import { CharacterizationController } from './controller/characterization/characterization.controller';
 import { CompanyController } from './controller/company/company.controller';
 import { EmployeeController } from './controller/employee/employee.controller';
 import { EnvironmentController } from './controller/environment/environment.controller';
 import { HierarchyController } from './controller/hierarchy/hierarchy.controller';
 import { HomoGroupsController } from './controller/HomoGroups/HomoGroups.controller';
+import { CharacterizationPhotoRepository } from './repositories/implementations/CharacterizationPhotoRepository';
+import { CharacterizationRepository } from './repositories/implementations/CharacterizationRepository';
 import { CompanyRepository } from './repositories/implementations/CompanyRepository';
 import { EmployeeRepository } from './repositories/implementations/EmployeeRepository';
+import { EnvironmentPhotoRepository } from './repositories/implementations/EnvironmentPhotoRepository';
 import { EnvironmentRepository } from './repositories/implementations/EnvironmentRepository';
 import { HierarchyRepository } from './repositories/implementations/HierarchyRepository';
 import { HomoGroupRepository } from './repositories/implementations/HomoGroupRepository';
 import { LicenseRepository } from './repositories/implementations/LicenseRepository';
 import { WorkspaceRepository } from './repositories/implementations/WorkspaceRepository';
+import { AddCharacterizationPhotoService } from './services/characterization/add-characterization-photo/add-characterization-photo.service';
+import { DeleteCharacterizationPhotoService } from './services/characterization/delete-characterization-photo/delete-characterization-photo.service';
+import { DeleteCharacterizationService } from './services/characterization/delete-characterization/delete-characterization.service';
+import { FindAllCharacterizationService } from './services/characterization/find-all-characterization/find-all-characterization.service';
+import { UpsertCharacterizationService } from './services/characterization/upsert-characterization/upsert-characterization.service';
+import { AddCompanyPhotoService } from './services/company/add-company-photo/add-company-photo.service';
+import { CopyCompanyService } from './services/company/copy-company/copy-company.service';
 import { CreateCompanyService } from './services/company/create-company/create-company.service';
 import { CreateContractService } from './services/company/create-contract/create-contract.service';
 import { FindAllCompaniesService } from './services/company/find-all-companies/find-all-companies.service';
@@ -25,6 +37,8 @@ import { CreateEmployeeService } from './services/employee/create-employee/creat
 import { FindAllAvailableEmployeesService } from './services/employee/find-all-available-employees/find-all-available-employees.service';
 import { FindEmployeeService } from './services/employee/find-employee/find-employee.service';
 import { UpdateEmployeeService } from './services/employee/update-employee/update-employee.service';
+import { AddEnvironmentPhotoService } from './services/environment/add-environment-photo/add-environment-photo.service';
+import { DeleteEnvironmentPhotoService } from './services/environment/delete-environment-photo/delete-environment-photo.service';
 import { DeleteEnvironmentService } from './services/environment/delete-environment/delete-environment.service';
 import { FindAllEnvironmentService } from './services/environment/find-all-environment/find-all-environment.service';
 import { UpsertEnvironmentService } from './services/environment/upsert-environment/upsert-environment.service';
@@ -37,18 +51,6 @@ import { CreateHomoGroupService } from './services/homoGroup/create-homo-group/c
 import { DeleteHomoGroupService } from './services/homoGroup/delete-homo-group/delete-homo-group.service';
 import { FindByCompanyHomoGroupService } from './services/homoGroup/find-by-company-homo-group/find-by-company-homo-group.service';
 import { UpdateHomoGroupService } from './services/homoGroup/update-homo-group/update-homo-group.service';
-import { EnvironmentPhotoRepository } from './repositories/implementations/EnvironmentPhotoRepository';
-import { AddEnvironmentPhotoService } from './services/environment/add-environment-photo/add-environment-photo.service';
-import { DeleteEnvironmentPhotoService } from './services/environment/delete-environment-photo/delete-environment-photo.service';
-import { AddCompanyPhotoService } from './services/company/add-company-photo/add-company-photo.service';
-import { UpsertCharacterizationService } from './services/characterization/upsert-characterization/upsert-characterization.service';
-import { FindAllCharacterizationService } from './services/characterization/find-all-characterization/find-all-characterization.service';
-import { DeleteCharacterizationService } from './services/characterization/delete-characterization/delete-characterization.service';
-import { CharacterizationPhotoRepository } from './repositories/implementations/CharacterizationPhotoRepository';
-import { AddCharacterizationPhotoService } from './services/characterization/add-characterization-photo/add-characterization-photo.service';
-import { DeleteCharacterizationPhotoService } from './services/characterization/delete-characterization-photo/delete-characterization-photo.service';
-import { CharacterizationRepository } from './repositories/implementations/CharacterizationRepository';
-import { CharacterizationController } from './controller/characterization/characterization.controller';
 
 @Module({
   controllers: [
@@ -103,6 +105,8 @@ import { CharacterizationController } from './controller/characterization/charac
     AddCharacterizationPhotoService,
     DeleteCharacterizationPhotoService,
     CharacterizationRepository,
+    CopyCompanyService,
+    RiskGroupDataRepository,
   ],
   exports: [
     CompanyRepository,

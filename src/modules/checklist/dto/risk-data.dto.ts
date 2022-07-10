@@ -44,7 +44,7 @@ export class UpsertRiskDataDto {
 
   @ValidateIf((o) => !o.homogeneousGroupId || o.hierarchyId)
   @IsString()
-  hierarchyId: string;
+  hierarchyId?: string;
 
   @ValidateIf((o) => !o.hierarchyId || o.homogeneousGroupId)
   @IsString()

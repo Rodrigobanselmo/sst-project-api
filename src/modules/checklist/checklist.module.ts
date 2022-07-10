@@ -1,5 +1,5 @@
 import { GenerateSourceController } from './controller/generate-source/generate-source.controller';
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { RiskController } from './controller/risk/risk.controller';
 import { RiskRepository } from './repositories/implementations/RiskRepository';
 import { CreateRiskService } from './services/risk/create-risk/create-risk.service';

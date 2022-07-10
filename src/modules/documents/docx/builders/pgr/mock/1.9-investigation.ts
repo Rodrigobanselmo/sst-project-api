@@ -27,7 +27,7 @@ export const investigation: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,
-          text: 'd) Considerar as situações geradoras dos eventos, levando em conta as atividades efetivamente desenvolvidas, ambiente de trabalho, materiais e organização da produção e do trabalho;',
+          text: 'd) Considerar as situações geradoras dos eventos, considerando as atividades efetivamente desenvolvidas, ambiente de trabalho, materiais e organização da produção e do trabalho;',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET_SPACE,
@@ -57,7 +57,7 @@ export const investigation: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET,
-          text: '**Acidente de trajeto:** Acidente sofrido pelo empregado no percurso da residência para o local de trabalho ou deste para aquela, qualquer que seja o meio de locomoção, inclusive veículo de propriedade do empregado, desde que não haja interrupção ou alteração de percurso por motivo alheio ao trabalho.',
+          text: '**Acidente de trajeto:** Acidente sofrido pelo empregado no percurso da residência para o local de trabalho ou deste para aquela, independentemente do meio de locomoção, inclusive veículo de propriedade do empregado, desde que não haja interrupção ou alteração de percurso por motivo alheio ao trabalho.',
           level: 0,
         },
         {
@@ -205,7 +205,7 @@ export const investigation: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: 'A empresa que não informar o acidente de trabalho dentro do prazo legal estará sujeita à aplicação de multa, conforme disposto nos artigos 286 e 336 do Decreto no 3.048/1999.',
+          text: 'A empresa que não informar o acidente de trabalho no prazo legal estará sujeita à aplicação de multa, conforme disposto nos artigos 286 e 336 do Decreto n.º 3.048/1999. ',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,

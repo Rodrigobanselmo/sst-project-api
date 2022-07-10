@@ -1,3 +1,4 @@
+import { RiskFactorGroupDataEntity } from './../../checklist/entities/riskGroupData.entity';
 import { ProfessionalEntity } from './../../users/entities/professional.entity';
 import { Company, CompanyTypesEnum } from '.prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
@@ -76,6 +77,7 @@ export class CompanyEntity implements Company {
   environments?: EnvironmentEntity[];
   characterization?: CharacterizationEntity[];
   professionals?: ProfessionalEntity[];
+  riskFactorGroupData?: RiskFactorGroupDataEntity[];
   email: string;
   riskDegree: number;
   logoUrl: string;

@@ -6,7 +6,7 @@ import { CompanyEntity } from '../../../modules/company/entities/company.entity'
 import { RiskFactorDataEntity } from './riskData.entity';
 import { ProfessionalEntity } from '../../../modules/users/entities/professional.entity';
 import { UserEntity } from '../../../modules/users/entities/user.entity';
-import { dayjs } from 'src/shared/providers/DateProvider/implementations/DayJSProvider';
+import { dayjs } from '../../../shared/providers/DateProvider/implementations/DayJSProvider';
 
 export class RiskFactorGroupDataEntity implements RiskFactorGroupData {
   @ApiProperty({ description: 'The id of the risk group data' })
@@ -37,7 +37,7 @@ export class RiskFactorGroupDataEntity implements RiskFactorGroupData {
   })
   company?: Partial<CompanyEntity>;
 
-  workspaceId: string;
+  workspaceId?: string;
   source: string | null;
   elaboratedBy: string | null;
   approvedBy: string | null;

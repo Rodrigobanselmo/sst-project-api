@@ -7,6 +7,7 @@ import { asyncEach } from '../../../../shared/utils/asyncEach';
 import { CreateHomoGroupDto, UpdateHomoGroupDto } from '../../dto/homoGroup';
 import { HierarchyEntity } from '../../entities/hierarchy.entity';
 import { HomoGroupEntity } from '../../entities/homoGroup.entity';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class HomoGroupRepository {
@@ -93,10 +94,19 @@ export class HomoGroupRepository {
     return new HomoGroupEntity(hierarchies);
   }
 
-  async findHomoGroupByCompany(companyId: string) {
+  async findHomoGroupByCompany(
+    companyId: string,
+    options: {
+      include?: Prisma.HomogeneousGroupInclude;
+      where?: Prisma.HomogeneousGroupWhereInput;
+    } = {},
+  ) {
     const hierarchies = await this.prisma.homogeneousGroup.findMany({
-      where: { companyId },
-      include: { hierarchyOnHomogeneous: { include: { hierarchy: true } } },
+      where: { companyId, ...options.where },
+      include: {
+        hierarchyOnHomogeneous: { include: { hierarchy: true } },
+        ...options.include,
+      },
     });
 
     const homogeneousGroup = await Promise.all(

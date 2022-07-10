@@ -184,7 +184,6 @@ export class RiskDataRepository {
     id,
     ...createDto
   }: Omit<UpsertRiskDataDto, 'keepEmpty'>) {
-    console.log(createDto);
     return this.prisma.riskFactorData.upsert({
       create: {
         ...createDto,
