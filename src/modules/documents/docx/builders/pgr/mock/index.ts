@@ -23,6 +23,14 @@ import { riskFactors2Section } from './2.3-riskFactors';
 import { riskFactors3Section } from './2.4-riskFactors';
 import { gseSection } from './2.5-gse';
 import { gse2Section } from './2.5.1-gse';
+import { qualitySection } from './2.6-quality';
+import { quantitySection } from './2.6.1-quantity';
+import { quantityNoiseSection } from './2.6.2-quantity-noise';
+import { quantityHeatSection } from './2.6.3-quantity-heat';
+import { quantityVFBSection } from './2.6.4-quantity-vfb';
+import { quantityVLSection } from './2.6.5-quantity-vl';
+import { quantityRadSection } from './2.6.6-quantity-rad';
+import { quantityQuiSection } from './2.6.7-quantity-qui';
 import { prioritizationSection } from './2.7-prioritization';
 import { prioritization2Section } from './2.7.1-prioritization';
 import { recommendationsSection } from './2.8-recommendations';
@@ -55,6 +63,14 @@ export const docPGRSections: IDocumentPGRSectionGroups = {
     riskFactors3Section,
     gseSection,
     gse2Section,
+    qualitySection,
+    quantitySection,
+    quantityNoiseSection,
+    quantityHeatSection,
+    quantityVFBSection,
+    quantityVLSection,
+    quantityRadSection,
+    quantityQuiSection,
     prioritizationSection,
     prioritization2Section,
     recommendationsSection,

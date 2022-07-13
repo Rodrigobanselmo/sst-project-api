@@ -14,7 +14,7 @@ export const riskFactors2Section: IDocumentPGRSectionGroup = {
       footerText: `??${VariablesPGREnum.CHAPTER_2}??`,
       children: [
         {
-          type: PGRSectionChildrenTypeEnum.H1,
+          type: PGRSectionChildrenTypeEnum.H2,
           text: 'Caracterização dos Fatores de Risco Ocupacional',
         },
         {

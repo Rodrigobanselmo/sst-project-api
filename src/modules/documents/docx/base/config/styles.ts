@@ -65,7 +65,7 @@ interface ISTableBordersOptions {
   readonly size?: number;
 }
 
-export const borderStyle = (
+export const borderStyleGlobal = (
   color: string,
   options: ISTableBordersOptions = {
     bottom: {},

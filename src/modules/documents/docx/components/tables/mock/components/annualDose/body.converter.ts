@@ -1,7 +1,7 @@
 import { AlignmentType } from 'docx';
 import { palette } from '../../../../../../../../shared/constants/palette';
 import { bodyTableProps } from '../../elements/body';
-import { borderStyle } from '../../../../../base/config/styles';
+import { borderStyleGlobal } from '../../../../../base/config/styles';
 import { rowBody } from './data/body';
 
 export const NewBody = () => {
@@ -17,7 +17,7 @@ export const NewBody = () => {
         shading: { fill: palette.table.header.string },
         margins: { top: 60, bottom: 60, left: 50 },
         rowSpan: index == 1 ? 3 : undefined,
-        borders: borderStyle(palette.common.white.string, {
+        borders: borderStyleGlobal(palette.common.white.string, {
           right: { size: 15 } as any,
         }),
       };
@@ -27,7 +27,7 @@ export const NewBody = () => {
       shading: { fill: palette.table.rowDark.string },
       margins: { top: 60, bottom: 60, left: 50 },
       alignment: AlignmentType.CENTER,
-      borders: borderStyle(palette.common.white.string),
+      borders: borderStyleGlobal(palette.common.white.string),
     };
 
     cells[row.length - 2] = {
@@ -35,7 +35,7 @@ export const NewBody = () => {
       shading: { fill: palette.table.rowDark.string },
       margins: { top: 60, bottom: 60, left: 50 },
       alignment: AlignmentType.CENTER,
-      borders: borderStyle(palette.common.white.string),
+      borders: borderStyleGlobal(palette.common.white.string),
     };
 
     cells[row.length - 1] = {
@@ -43,7 +43,7 @@ export const NewBody = () => {
       shading: { fill: palette.table.rowDark.string },
       margins: { top: 60, bottom: 60, left: 50 },
       alignment: AlignmentType.CENTER,
-      borders: borderStyle(palette.common.white.string),
+      borders: borderStyleGlobal(palette.common.white.string),
     };
 
     rows.push(cells);

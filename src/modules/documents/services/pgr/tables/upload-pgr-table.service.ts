@@ -1,3 +1,4 @@
+import { APPRByGroupTableSection } from '../../../docx/components/tables/apprByGroup/appr-group.section';
 import { Injectable } from '@nestjs/common';
 import { ISectionOptions, Packer } from 'docx';
 import { Readable } from 'stream';
@@ -45,20 +46,26 @@ export class PgrUploadTableService {
       hierarchyConverter(hierarchyHierarchy);
 
     const sections: ISectionOptions[] = [
-      riskCharacterizationTableSection(riskGroupData),
-      ...hierarchyPrioritizationTableSections(
+      // riskCharacterizationTableSection(riskGroupData),
+      // ...hierarchyPrioritizationTableSections(
+      //   riskGroupData,
+      //   hierarchyData,
+      //   hierarchyTree,
+      // ),
+      // ...hierarchyRisksTableSections(
+      //   riskGroupData,
+      //   hierarchyData,
+      //   hierarchyTree,
+      // ),
+      // hierarchyHomoOrgSection(hierarchyData, homoGroupTree),
+      // actionPlanTableSection(riskGroupData, hierarchyTree),
+      ...APPRByGroupTableSection(
         riskGroupData,
         hierarchyData,
         hierarchyTree,
+        homoGroupTree,
+        { isByGroup: true },
       ),
-      ...hierarchyRisksTableSections(
-        riskGroupData,
-        hierarchyData,
-        hierarchyTree,
-      ),
-      hierarchyHomoOrgSection(hierarchyData, homoGroupTree),
-      actionPlanTableSection(riskGroupData, hierarchyTree),
-      ...APPRTableSection(riskGroupData, hierarchyData, homoGroupTree),
     ];
 
     const doc = createBaseDocument(sections);

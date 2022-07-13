@@ -1,3 +1,7 @@
+import {
+  IRiskDataJson,
+  QuantityTypeEnum,
+} from './../../../../../../company/interfaces/risk-data-json.types';
 import { WorkspaceEntity } from './../../../../../../company/entities/workspace.entity';
 import { RiskFactorGroupDataEntity } from './../../../../../../checklist/entities/riskGroupData.entity';
 import { HierarchyMapData } from './../../../../converter/hierarchy.converter';
@@ -15,7 +19,97 @@ export const booleanVariables = (
   hierarchy: Map<string, HierarchyMapData>,
   document: RiskFactorGroupDataEntity,
 ) => {
+  console.log(
+    (document.data || []).find(
+      (riskData) => riskData.riskFactor.type == RiskFactorsEnum.ACI,
+    ),
+  );
   return {
+    [VariablesPGREnum.IS_Q5]: document.isQ5 ? 'true' : '',
+    [VariablesPGREnum.HAS_RISK_FIS]: (document.data || []).find(
+      (riskData) => riskData.riskFactor.type == RiskFactorsEnum.FIS,
+    )
+      ? 'true'
+      : '',
+    [VariablesPGREnum.HAS_RISK_QUI]: (document.data || []).find(
+      (riskData) => riskData.riskFactor.type == RiskFactorsEnum.QUI,
+    )
+      ? 'true'
+      : '',
+    [VariablesPGREnum.HAS_RISK_BIO]: (document.data || []).find(
+      (riskData) => riskData.riskFactor.type == RiskFactorsEnum.BIO,
+    )
+      ? 'true'
+      : '',
+    [VariablesPGREnum.HAS_RISK_ERG]: (document.data || []).find(
+      (riskData) => riskData.riskFactor.type == RiskFactorsEnum.ERG,
+    )
+      ? 'true'
+      : '',
+    [VariablesPGREnum.HAS_RISK_ACI]: (document.data || []).find(
+      (riskData) => riskData.riskFactor.type == RiskFactorsEnum.ACI,
+    )
+      ? 'true'
+      : '',
+    [VariablesPGREnum.HAS_QUANTITY]: (document.data || []).find(
+      (riskData) => riskData.isQuantity,
+    )
+      ? 'true'
+      : '',
+    [VariablesPGREnum.HAS_QUANTITY_NOISE]: (document.data || []).find(
+      (riskData) =>
+        riskData.json &&
+        riskData.isQuantity &&
+        (riskData.json as unknown as IRiskDataJson).type ===
+          QuantityTypeEnum.NOISE,
+    )
+      ? 'true'
+      : '',
+    [VariablesPGREnum.HAS_QUANTITY_QUI]: (document.data || []).find(
+      (riskData) =>
+        riskData.json &&
+        riskData.isQuantity &&
+        (riskData.json as unknown as IRiskDataJson).type ===
+          QuantityTypeEnum.QUI,
+    )
+      ? 'true'
+      : '',
+    [VariablesPGREnum.HAS_QUANTITY_VFB]: (document.data || []).find(
+      (riskData) =>
+        riskData.json &&
+        riskData.isQuantity &&
+        (riskData.json as unknown as IRiskDataJson).type ===
+          QuantityTypeEnum.VFB,
+    )
+      ? 'true'
+      : '',
+    [VariablesPGREnum.HAS_QUANTITY_VL]: (document.data || []).find(
+      (riskData) =>
+        riskData.json &&
+        riskData.isQuantity &&
+        (riskData.json as unknown as IRiskDataJson).type ===
+          QuantityTypeEnum.VL,
+    )
+      ? 'true'
+      : '',
+    [VariablesPGREnum.HAS_QUANTITY_RAD]: (document.data || []).find(
+      (riskData) =>
+        riskData.json &&
+        riskData.isQuantity &&
+        (riskData.json as unknown as IRiskDataJson).type ===
+          QuantityTypeEnum.RADIATION,
+    )
+      ? 'true'
+      : '',
+    [VariablesPGREnum.HAS_QUANTITY_HEAT]: (document.data || []).find(
+      (riskData) =>
+        riskData.json &&
+        riskData.isQuantity &&
+        (riskData.json as unknown as IRiskDataJson).type ===
+          QuantityTypeEnum.HEAT,
+    )
+      ? 'true'
+      : '',
     [VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_RISK]: (document.data || []).find(
       (riskData) => riskData.homogeneousGroup.environment,
     )

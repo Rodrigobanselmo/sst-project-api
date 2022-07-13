@@ -2,8 +2,10 @@ import {
   CharacterizationTypeEnum,
   CompanyEnvironmentTypesEnum,
   HomoTypeEnum,
+  RiskFactorsEnum,
 } from '@prisma/client';
 import { Paragraph, Table } from 'docx';
+import { removeDuplicate } from 'src/shared/utils/removeDuplicate';
 
 import { RiskDocumentEntity } from '../../../../../checklist/entities/riskDocument.entity';
 import { bulletsNormal, bulletsSpace } from '../../../base/elements/bullets';
@@ -16,6 +18,7 @@ import {
 import { measureHierarchyImage } from '../../../components/images/measureHierarch';
 import { rsDocumentImage } from '../../../components/images/rsDocument';
 import { attachmentsIterable } from '../../../components/iterables/attachments/attachments.iterable';
+import { bulletTextIterable } from '../../../components/iterables/bullets/bullets.iterable';
 import { characterizationIterable } from '../../../components/iterables/characterization/characterization.iterable';
 import { complementaryDocsIterable } from '../../../components/iterables/complementaryDocs/complementaryDocs.iterable';
 import { complementarySystemsIterable } from '../../../components/iterables/complementarySystems/complementarySystems.iterable';
@@ -32,6 +35,12 @@ import { expositionDegreeTable } from '../../../components/tables/mock/component
 import { healthEffectTable } from '../../../components/tables/mock/components/healthSeverity/section/healthEffectTable';
 import { matrizTable } from '../../../components/tables/mock/components/matriz/table.component';
 import { quantityResultsTable } from '../../../components/tables/mock/components/quantityResults/section/quantityResultsTable';
+import { quantityHeatTable } from '../../../components/tables/quantity/quantityHeat/quantityHeat.table';
+import { quantityNoiseTable } from '../../../components/tables/quantity/quantityNoise/quantityNoise.table';
+import { quantityQuiTable } from '../../../components/tables/quantity/quantityQui/quantityQui.table';
+import { quantityRadTable } from '../../../components/tables/quantity/quantityRad/quantityRad.table';
+import { quantityVFBTable } from '../../../components/tables/quantity/quantityVFB/quantityVFB.table';
+import { quantityVLTable } from '../../../components/tables/quantity/quantityVL/quantityVL.table';
 import { riskCharacterizationTableSection } from '../../../components/tables/riskCharacterization/riskCharacterization.section';
 import { versionControlTable } from '../../../components/tables/versionControl/versionControl.table';
 import {
@@ -264,6 +273,94 @@ export class ElementsMapClass {
         },
         (x, v) => this.convertToDocx(x, v),
       ),
+    [PGRSectionChildrenTypeEnum.TABLE_QUANTITY_NOISE]: () => [
+      quantityNoiseTable(this.document, this.hierarchyTree),
+    ],
+    [PGRSectionChildrenTypeEnum.TABLE_QUANTITY_HEAT]: () => [
+      quantityHeatTable(this.document, this.hierarchyTree),
+    ],
+    [PGRSectionChildrenTypeEnum.TABLE_QUANTITY_VFB]: () => [
+      quantityVFBTable(this.document, this.hierarchyTree),
+    ],
+    [PGRSectionChildrenTypeEnum.TABLE_QUANTITY_VL]: () => [
+      quantityVLTable(this.document, this.hierarchyTree),
+    ],
+    [PGRSectionChildrenTypeEnum.TABLE_QUANTITY_RAD]: () => [
+      quantityRadTable(this.document, this.hierarchyTree),
+    ],
+    [PGRSectionChildrenTypeEnum.TABLE_QUANTITY_QUI]: () => [
+      quantityQuiTable(this.document, this.hierarchyTree),
+    ],
+    [PGRSectionChildrenTypeEnum.ITERABLE_QUALITY_FIS]: () =>
+      bulletTextIterable(
+        removeDuplicate(
+          (this.document?.data || [])
+            .map(
+              (riskData) =>
+                !!(riskData.riskFactor.type === RiskFactorsEnum.FIS) &&
+                riskData.riskFactor.name,
+            )
+            .filter((x) => x),
+          { simpleCompare: true },
+        ),
+        (x, v) => this.convertToDocx(x, v),
+      ),
+    [PGRSectionChildrenTypeEnum.ITERABLE_QUALITY_QUI]: () =>
+      bulletTextIterable(
+        removeDuplicate(
+          (this.document?.data || [])
+            .map(
+              (riskData) =>
+                !!(riskData.riskFactor.type === RiskFactorsEnum.QUI) &&
+                riskData.riskFactor.name,
+            )
+            .filter((x) => x),
+          { simpleCompare: true },
+        ),
+        (x, v) => this.convertToDocx(x, v),
+      ),
+    [PGRSectionChildrenTypeEnum.ITERABLE_QUALITY_BIO]: () =>
+      bulletTextIterable(
+        removeDuplicate(
+          (this.document?.data || [])
+            .map(
+              (riskData) =>
+                !!(riskData.riskFactor.type === RiskFactorsEnum.BIO) &&
+                riskData.riskFactor.name,
+            )
+            .filter((x) => x),
+          { simpleCompare: true },
+        ),
+        (x, v) => this.convertToDocx(x, v),
+      ),
+    [PGRSectionChildrenTypeEnum.ITERABLE_QUALITY_ERG]: () =>
+      bulletTextIterable(
+        removeDuplicate(
+          (this.document?.data || [])
+            .map(
+              (riskData) =>
+                !!(riskData.riskFactor.type === RiskFactorsEnum.ERG) &&
+                riskData.riskFactor.name,
+            )
+            .filter((x) => x),
+          { simpleCompare: true },
+        ),
+        (x, v) => this.convertToDocx(x, v),
+      ),
+    [PGRSectionChildrenTypeEnum.ITERABLE_QUALITY_ACI]: () =>
+      bulletTextIterable(
+        removeDuplicate(
+          (this.document?.data || [])
+            .map(
+              (riskData) =>
+                !!(riskData.riskFactor.type === RiskFactorsEnum.ACI) &&
+                riskData.riskFactor.name,
+            )
+            .filter((x) => x),
+          { simpleCompare: true },
+        ),
+        (x, v) => this.convertToDocx(x, v),
+      ),
     [PGRSectionChildrenTypeEnum.BULLET]: ({
       level = 0,
       text,
@@ -323,12 +420,12 @@ export class ElementsMapClass {
       ),
     [PGRSectionChildrenTypeEnum.PLAN_TABLE]: () =>
       actionPlanTableSection(this.document, this.hierarchyTree)['children'],
-    [PGRSectionChildrenTypeEnum.APR_TABLE]: () =>
-      APPRTableSection(this.document, this.hierarchy, this.homogeneousGroup)
-        .map((s) => s['children'])
-        .reduce((acc, curr) => {
-          return [...acc, ...curr];
-        }, []),
+    // [PGRSectionChildrenTypeEnum.APR_TABLE]: () =>
+    //   APPRTableSection(this.document, this.hierarchy, this.homogeneousGroup)
+    //     .map((s) => s['children'])
+    //     .reduce((acc, curr) => {
+    //       return [...acc, ...curr];
+    //     }, []),
   };
 
   private convertToDocx(

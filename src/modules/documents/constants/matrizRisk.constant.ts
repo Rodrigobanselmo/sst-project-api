@@ -49,6 +49,14 @@ export const matrixRiskMap = {
     color: palette.matrix[5].string,
     level: 5,
   },
+  [6]: {
+    label: 'Interromper\nAtividades',
+    short: 'IA',
+    intervention: 'INTERROMPER ATIVIDADES',
+    table: 'Interromper\nAtividades',
+    color: palette.matrix[5].string,
+    level: 5,
+  },
 };
 
 export const matrixRisk = [

@@ -48,13 +48,20 @@ export class RiskFactorGroupDataEntity implements RiskFactorGroupData {
   complementarySystems: string[];
   complementaryDocs: string[];
   coordinatorBy: string;
+  isQ5: boolean;
   validityEnd: Date;
   validityStart: Date;
   professionals?: ProfessionalEntity[];
   users?: UserEntity[];
 
   constructor(partial: Partial<RiskFactorGroupDataEntity>) {
+    this.isQ5 = false;
     Object.assign(this, partial);
+
+    if (partial.data) {
+      this.data = partial.data.map((d) => new RiskFactorDataEntity(d));
+    }
+
     if (this.validityStart && this.validityEnd) {
       this.validity =
         dayjs(this.validityStart).format('MM/YYYY') +

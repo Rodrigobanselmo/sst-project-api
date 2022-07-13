@@ -29,6 +29,20 @@ export enum PGRSectionChildrenTypeEnum {
   TABLE_PRIORITIZATION_ENV = 'TABLE_PRIORITIZATION_ENV',
   TABLE_PRIORITIZATION_CHAR = 'TABLE_PRIORITIZATION_CHAR',
   TABLE_PRIORITIZATION_HIERARCHY = 'TABLE_PRIORITIZATION_HIERARCHY',
+
+  ITERABLE_QUALITY_FIS = 'ITERABLE_QUALITY_FIS',
+  ITERABLE_QUALITY_QUI = 'ITERABLE_QUALITY_QUI',
+  ITERABLE_QUALITY_BIO = 'ITERABLE_QUALITY_BIO',
+  ITERABLE_QUALITY_ERG = 'ITERABLE_QUALITY_ERG',
+  ITERABLE_QUALITY_ACI = 'ITERABLE_QUALITY_ACI',
+
+  TABLE_QUANTITY_NOISE = 'TABLE_QUANTITY_NOISE',
+  TABLE_QUANTITY_QUI = 'TABLE_QUANTITY_QUI',
+  TABLE_QUANTITY_HEAT = 'TABLE_QUANTITY_HEAT',
+  TABLE_QUANTITY_VFB = 'TABLE_QUANTITY_VFB',
+  TABLE_QUANTITY_VL = 'TABLE_QUANTITY_VL',
+  TABLE_QUANTITY_RAD = 'TABLE_QUANTITY_RAD',
+
   HIERARCHY_RISK_TABLE = 'HIERARCHY_RISK_TABLE',
   RISK_TABLE = 'RISK_TABLE',
   PARAGRAPH_TABLE = 'PARAGRAPH_TABLE',
@@ -239,6 +253,30 @@ export type IPrioritizationC = {
   type: PGRSectionChildrenTypeEnum.TABLE_PRIORITIZATION_CHAR;
 } & IBase;
 
+export type IQuantityNoise = {
+  type: PGRSectionChildrenTypeEnum.TABLE_QUANTITY_NOISE;
+} & IBase;
+
+export type IQuantityQui = {
+  type: PGRSectionChildrenTypeEnum.TABLE_QUANTITY_QUI;
+} & IBase;
+
+export type IQuantityHeat = {
+  type: PGRSectionChildrenTypeEnum.TABLE_QUANTITY_HEAT;
+} & IBase;
+
+export type IQuantityVFB = {
+  type: PGRSectionChildrenTypeEnum.TABLE_QUANTITY_VFB;
+} & IBase;
+
+export type IQuantityVL = {
+  type: PGRSectionChildrenTypeEnum.TABLE_QUANTITY_VL;
+} & IBase;
+
+export type IQuantityRad = {
+  type: PGRSectionChildrenTypeEnum.TABLE_QUANTITY_RAD;
+} & IBase;
+
 export type IRecommendations = {
   type: PGRSectionChildrenTypeEnum.ITERABLE_RECOMMENDATIONS;
 } & IBase;
@@ -257,6 +295,26 @@ export type IPlan = {
 
 export type IAttachments = {
   type: PGRSectionChildrenTypeEnum.ATTACHMENTS;
+} & IBase;
+
+export type IIterableFis = {
+  type: PGRSectionChildrenTypeEnum.ITERABLE_QUALITY_FIS;
+} & IBase;
+
+export type IIterableQui = {
+  type: PGRSectionChildrenTypeEnum.ITERABLE_QUALITY_QUI;
+} & IBase;
+
+export type IIterableBio = {
+  type: PGRSectionChildrenTypeEnum.ITERABLE_QUALITY_BIO;
+} & IBase;
+
+export type IIterableErg = {
+  type: PGRSectionChildrenTypeEnum.ITERABLE_QUALITY_ERG;
+} & IBase;
+
+export type IIterableArc = {
+  type: PGRSectionChildrenTypeEnum.ITERABLE_QUALITY_ACI;
 } & IBase;
 
 export type ISectionChildrenType =
@@ -282,6 +340,12 @@ export type ISectionChildrenType =
   | IHierarchyRiskTable
   | IRiskTable
   | IMatrix
+  | IQuantityNoise
+  | IQuantityQui
+  | IQuantityHeat
+  | IQuantityVFB
+  | IQuantityVL
+  | IQuantityRad
   | IQuantityTable
   | IComplementaryDocs
   | IEnvironmentsAdm
@@ -304,5 +368,10 @@ export type ISectionChildrenType =
   | IEmergency
   | IApr
   | IPlan
+  | IIterableFis
+  | IIterableQui
+  | IIterableBio
+  | IIterableErg
+  | IIterableArc
   | IAttachments
   | IProfessional;

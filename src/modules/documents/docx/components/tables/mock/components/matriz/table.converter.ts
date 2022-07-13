@@ -1,6 +1,6 @@
 import { AlignmentType, TextDirection, VerticalAlign } from 'docx';
 import { palette } from '../../../../../../../../shared/constants/palette';
-import { borderStyle } from '../../../../../base/config/styles';
+import { borderStyleGlobal } from '../../../../../base/config/styles';
 import { bodyTableProps } from '../../elements/body';
 import {
   matrixRisk,
@@ -11,7 +11,7 @@ export const NewTableData = (): bodyTableProps[][] => {
   const legend = {
     text: `**GRAU DE EXPOSIÇÃO**\n**PROBABILIDADE**`,
     size: 5,
-    borders: borderStyle(palette.common.white.string, {
+    borders: borderStyleGlobal(palette.common.white.string, {
       size: 2,
     }),
     shading: { fill: palette.common.white.string },
@@ -28,7 +28,7 @@ export const NewTableData = (): bodyTableProps[][] => {
       {
         text: `**${String(5 - probability)}**`,
         size: 5,
-        borders: borderStyle(palette.common.white.string, {
+        borders: borderStyleGlobal(palette.common.white.string, {
           size: 2,
         }),
         shading: { fill: palette.common.black.string },
@@ -45,7 +45,7 @@ export const NewTableData = (): bodyTableProps[][] => {
             .map((text) => `**${text}**`)
             .join('\n'),
           size: 18,
-          borders: borderStyle(palette.common.white.string, {
+          borders: borderStyleGlobal(palette.common.white.string, {
             size: 10,
           }),
           shading: { fill: matrix.color },
@@ -67,7 +67,7 @@ export const NewTableData = (): bodyTableProps[][] => {
     return {
       text: `**${severity ? String(severity) : ''}**`,
       size: severity ? 18 : 5,
-      borders: borderStyle(palette.common.white.string, {
+      borders: borderStyleGlobal(palette.common.white.string, {
         size: 10,
       }),
       shading: { fill: palette.common.black.string },
@@ -81,7 +81,7 @@ export const NewTableData = (): bodyTableProps[][] => {
     {
       text: ``,
       size: 5,
-      borders: borderStyle(palette.common.white.string, {
+      borders: borderStyleGlobal(palette.common.white.string, {
         size: 2,
       }),
       shading: { fill: palette.common.white.string },
@@ -91,7 +91,7 @@ export const NewTableData = (): bodyTableProps[][] => {
     {
       text: `GRAU DE EFEITO À SAÚDE (SEVERIDADE)`,
       size: 5,
-      borders: borderStyle(palette.common.white.string, {
+      borders: borderStyleGlobal(palette.common.white.string, {
         size: 2,
       }),
       shading: { fill: palette.common.white.string },

@@ -11,7 +11,7 @@ import {
   WidthType,
 } from 'docx';
 import { isOdd } from '../../../../../../../shared/utils/isOdd';
-import { borderStyle } from '../../../../base/config/styles';
+import { borderStyleGlobal } from '../../../../base/config/styles';
 import { palette } from '../../../../../../../shared/constants/palette';
 
 export interface bodyTableProps extends Partial<ITableCellOptions> {
@@ -80,7 +80,7 @@ export class TableBodyElements {
       margins: { top: 60, bottom: 60 },
       verticalAlign: VerticalAlign.CENTER,
       width: { size, type: WidthType.PERCENTAGE },
-      borders: borderStyle(palette.table.rowDark.string),
+      borders: borderStyleGlobal(palette.table.rowDark.string),
       ...rest,
     });
   }

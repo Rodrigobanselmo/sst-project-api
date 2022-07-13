@@ -1,7 +1,7 @@
 import { AlignmentType } from 'docx';
 import { palette } from '../../../../../../../../shared/constants/palette';
 import { bodyTableProps } from '../../elements/body';
-import { borderStyle } from '../../../../../base/config/styles';
+import { borderStyleGlobal } from '../../../../../base/config/styles';
 
 export const NewBody = (body: [string, string, string, string][]) => {
   const rows: bodyTableProps[][] = [];
@@ -14,7 +14,7 @@ export const NewBody = (body: [string, string, string, string][]) => {
       alignment: AlignmentType.CENTER,
       shading: { fill: palette.table.header.string },
       margins: { top: 60, bottom: 60, left: 50 },
-      borders: borderStyle(palette.common.white.string, {
+      borders: borderStyleGlobal(palette.common.white.string, {
         right: { size: 15 } as any,
       }),
     };
@@ -22,7 +22,7 @@ export const NewBody = (body: [string, string, string, string][]) => {
       text: row[1],
       shading: { fill: palette.table.rowDark.string },
       margins: { top: 60, bottom: 60, left: 50 },
-      borders: borderStyle(palette.common.white.string),
+      borders: borderStyleGlobal(palette.common.white.string),
       alignment: AlignmentType.CENTER,
     };
 
@@ -30,7 +30,7 @@ export const NewBody = (body: [string, string, string, string][]) => {
       text: row[2],
       shading: { fill: palette.table.rowDark.string },
       margins: { top: 60, bottom: 60, left: 50 },
-      borders: borderStyle(palette.common.white.string),
+      borders: borderStyleGlobal(palette.common.white.string),
       alignment: AlignmentType.CENTER,
     };
 
@@ -38,7 +38,7 @@ export const NewBody = (body: [string, string, string, string][]) => {
       text: row[3],
       shading: { fill: palette.table.header.string },
       margins: { top: 60, bottom: 60, left: 50 },
-      borders: borderStyle(palette.common.white.string, {
+      borders: borderStyleGlobal(palette.common.white.string, {
         left: { size: 15 } as any,
       }),
       alignment: AlignmentType.CENTER,

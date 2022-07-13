@@ -1,3 +1,4 @@
+import { EmployeeEntity } from './../../../company/entities/employee.entity';
 import { HierarchyEnum, HomoTypeEnum } from '@prisma/client';
 
 import { HomoGroupEntity } from '../../../../modules/company/entities/homoGroup.entity';
@@ -40,17 +41,51 @@ const setMapHierarchies = (hierarchyData: HierarchyEntity[]) => {
 
   hierarchyData.forEach((hierarchy) => {
     hierarchyTree[hierarchy.id] = { ...hierarchy, children: [] };
-    hierarchy.homogeneousGroups.forEach((homogeneousGroup) => {
-      homoGroupTree[homogeneousGroup.id] = {
-        ...homogeneousGroup,
-      };
-    });
   });
 
   Object.values(hierarchyTree).forEach((hierarchy) => {
     if (hierarchy.parentId) {
       hierarchyTree[hierarchy.parentId].children.push(hierarchy.id);
+      if (!hierarchyTree[hierarchy.parentId].employees)
+        hierarchyTree[hierarchy.parentId].employees = [];
+
+      hierarchyTree[hierarchy.parentId].employees.push(...hierarchy.employees);
     }
+  });
+
+  Object.values(hierarchyTree).forEach((h) => {
+    hierarchyTree[h.id].employees = removeDuplicate(
+      hierarchyTree[h.id].employees,
+      { removeById: 'id' },
+    );
+
+    const hierarchy = hierarchyTree[h.id];
+
+    hierarchy.homogeneousGroups.forEach((homogeneousGroup) => {
+      if (!homoGroupTree[homogeneousGroup.id])
+        homoGroupTree[homogeneousGroup.id] = {
+          hierarchies: [],
+        } as any;
+
+      homoGroupTree[homogeneousGroup.id] = {
+        ...homogeneousGroup,
+        hierarchies: [
+          ...homoGroupTree[homogeneousGroup.id].hierarchies,
+          hierarchy,
+        ],
+      };
+    });
+  });
+
+  Object.values(homoGroupTree).forEach((homoGroup) => {
+    const employees: EmployeeEntity[] = [];
+    homoGroupTree[homoGroup.id].hierarchies.forEach((h) => {
+      employees.push(...h.employees);
+    });
+
+    homoGroupTree[homoGroup.id].employeeCount = removeDuplicate(employees, {
+      removeById: 'id',
+    }).length;
   });
 
   return { hierarchyTree, homoGroupTree };
@@ -103,7 +138,7 @@ export const hierarchyConverter = (
           homogeneousGroup:
             parent?.homogeneousGroups
               ?.map((group) => {
-                if (group.type) return;
+                if (group.type) return false;
                 return group.name;
               })
               .filter((e) => e)
@@ -135,9 +170,10 @@ export const hierarchyConverter = (
         homogeneousGroup:
           hierarchy?.homogeneousGroups
             ?.map((group) => {
-              if (group.type) return;
+              if (group.type) return false;
               return group.name;
             })
+            .filter((e) => e)
             .join(', ') || '',
       };
 

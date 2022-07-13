@@ -107,8 +107,8 @@ export class SectionsMapClass {
         ...this.getFooterHeader(footerText),
         ...sectionLandscapeProperties,
       })),
-    [PGRSectionTypeEnum.APR]: () =>
-      APPRTableSection(this.document, this.hierarchy, this.homogeneousGroup),
+    // [PGRSectionTypeEnum.APR]: () =>
+    //   APPRTableSection(this.document, this.hierarchy, this.homogeneousGroup),
   };
 
   getFooterHeader = (footerText: string) => {
@@ -130,7 +130,6 @@ export class SectionsMapClass {
           ...variables,
         });
         if (!childData) return null;
-        console.log(childData.type);
         return this.elementsMap[childData.type](childData);
       })
       .filter((x) => x)

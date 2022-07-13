@@ -29,30 +29,33 @@ export class HomoGroupRepository {
 
   async update({
     id,
-    hierarchies = [],
+    hierarchies,
     ...updateHomoGroup
   }: UpdateHomoGroupDto): Promise<HomoGroupEntity> {
-    const homoHierarchies = hierarchies.map((hierarchy) => ({
-      hierarchyId_homogeneousGroupId_workspaceId: {
-        hierarchyId: hierarchy.id,
-        homogeneousGroupId: id,
-        workspaceId: hierarchy.workspaceId,
-      },
-    }));
+    let homoHierarchies = [];
+    if (hierarchies) {
+      homoHierarchies = hierarchies.map((hierarchy) => ({
+        hierarchyId_homogeneousGroupId_workspaceId: {
+          hierarchyId: hierarchy.id,
+          homogeneousGroupId: id,
+          workspaceId: hierarchy.workspaceId,
+        },
+      }));
 
-    await this.prisma.hierarchyOnHomogeneous.deleteMany({
-      where: { homogeneousGroupId: id },
-    });
-
-    const addHomoHierarchies = async (value: typeof homoHierarchies[0]) => {
-      await this.prisma.hierarchyOnHomogeneous.upsert({
-        create: { ...value.hierarchyId_homogeneousGroupId_workspaceId },
-        update: {},
-        where: value,
+      await this.prisma.hierarchyOnHomogeneous.deleteMany({
+        where: { homogeneousGroupId: id },
       });
-    };
 
-    await asyncEach(homoHierarchies, addHomoHierarchies);
+      const addHomoHierarchies = async (value: typeof homoHierarchies[0]) => {
+        await this.prisma.hierarchyOnHomogeneous.upsert({
+          create: { ...value.hierarchyId_homogeneousGroupId_workspaceId },
+          update: {},
+          where: value,
+        });
+      };
+
+      await asyncEach(homoHierarchies, addHomoHierarchies);
+    }
 
     const data = await this.prisma.homogeneousGroup.update({
       where: { id },

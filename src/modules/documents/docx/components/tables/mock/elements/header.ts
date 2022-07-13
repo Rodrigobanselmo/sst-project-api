@@ -9,7 +9,7 @@ import {
   VerticalAlign,
   WidthType,
 } from 'docx';
-import { borderStyle } from '../../../../base/config/styles';
+import { borderStyleGlobal } from '../../../../base/config/styles';
 
 import { palette } from '../../../../../../../shared/constants/palette';
 
@@ -53,7 +53,7 @@ export class TableHeaderElements {
       shading: { fill: palette.table.header.string },
       verticalAlign: VerticalAlign.CENTER,
       width: { size, type: WidthType.PERCENTAGE },
-      borders: borderStyle(palette.table.rowDark.string),
+      borders: borderStyleGlobal(palette.table.rowDark.string),
       ...rest,
     });
   }

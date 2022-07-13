@@ -1,12 +1,6 @@
-import sizeOf from 'image-size';
-import { AttachmentEntity } from './../../../../checklist/entities/attachment.entity';
-import { APPRTableSection } from './../../../docx/components/tables/appr/appr.section';
-import { actionPlanTableSection } from './../../../docx/components/tables/actionPlan/actionPlan.section';
-import { RiskFactorGroupDataEntity } from './../../../../checklist/entities/riskGroupData.entity';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ISectionOptions, Packer } from 'docx';
 import fs from 'fs';
-import { Readable } from 'stream';
 import { v4 } from 'uuid';
 
 import { CompanyRepository } from '../../../../../modules/company/repositories/implementations/CompanyRepository';
@@ -26,7 +20,11 @@ import { ProfessionalRepository } from '../../../../users/repositories/implement
 import { createBaseDocument } from '../../../docx/base/config/document';
 import { DocumentBuildPGR } from '../../../docx/builders/pgr/create';
 import { UpsertPgrDto } from '../../../dto/pgr.dto';
+import { AttachmentEntity } from './../../../../checklist/entities/attachment.entity';
+import { RiskFactorGroupDataEntity } from './../../../../checklist/entities/riskGroupData.entity';
 import { WorkspaceRepository } from './../../../../company/repositories/implementations/WorkspaceRepository';
+import { actionPlanTableSection } from './../../../docx/components/tables/actionPlan/actionPlan.section';
+import { APPRTableSection } from './../../../docx/components/tables/appr/appr.section';
 import {
   hierarchyConverter,
   HierarchyMapData,
@@ -87,7 +85,6 @@ export class PgrUploadService {
       },
     );
 
-    console.log(0);
     const logo = company.logoUrl
       ? await downloadImageFile(
           company.logoUrl,
@@ -97,19 +94,16 @@ export class PgrUploadService {
 
     // console.log(sizeOf(fs.readFileSync(logo)));
     // return;
-    console.log(1);
 
-    const { environments, characterizations, photosPath } =
-      await this.downloadPhotos(company);
-    // const environments = [];
-    // const characterizations = [];
-    // const photosPath = [];
+    // const { environments, characterizations, photosPath } =
+    //   await this.downloadPhotos(company);
+    const environments = [];
+    const characterizations = [];
+    const photosPath = [];
 
-    console.log(2);
     try {
       const { hierarchyData, homoGroupTree, hierarchyTree } =
         hierarchyConverter(hierarchyHierarchy, environments);
-      console.log(3);
 
       const actionPlanUrl = ' ';
       const urlAPR = ' ';
@@ -162,7 +156,6 @@ export class PgrUploadService {
         hierarchyTree,
       }).build();
 
-      console.log(4);
       const doc = createBaseDocument(sections);
 
       const b64string = await Packer.toBase64String(doc);
@@ -179,7 +172,6 @@ export class PgrUploadService {
       //   attachments: attachments,
       // });
 
-      console.log(5);
       // return doc;
 
       [logo, ...photosPath].forEach((path) => path && fs.unlinkSync(path));

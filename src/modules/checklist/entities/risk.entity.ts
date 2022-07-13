@@ -73,6 +73,7 @@ export class RiskFactorsEntity implements RiskFactors {
   nr15lt: string;
   twa: string;
   stel: string;
+  vmp: string;
   ipvs: string;
   pv: string;
   pe: string;
@@ -81,5 +82,19 @@ export class RiskFactorsEntity implements RiskFactors {
 
   constructor(partial: Partial<RiskFactorsEntity>) {
     Object.assign(this, partial);
+    this.vmp = String(this.getVMP(this?.nr15lt || ''));
+  }
+
+  private getVMP(nr15lt?: string) {
+    if (!nr15lt) return '';
+    if (nr15lt == '-') return '';
+
+    const LT = Number(nr15lt.replace(/[^0-9.]/g, ''));
+
+    if (LT <= 1) return 3 * LT;
+    if (LT <= 10) return 2 * LT;
+    if (LT <= 100) return 1.5 * LT;
+    if (LT <= 1000) return 1.25 * LT;
+    return 1.1 * LT;
   }
 }

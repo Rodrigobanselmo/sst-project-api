@@ -1,7 +1,7 @@
 import { AlignmentType } from 'docx';
 import { palette } from '../../../../../../../../shared/constants/palette';
 import { bodyTableProps } from '../../elements/body';
-import { borderStyle } from '../../../../../base/config/styles';
+import { borderStyleGlobal } from '../../../../../base/config/styles';
 
 export const NewBodyC6 = (
   body: [string, string, string, string, string, string][],
@@ -16,13 +16,13 @@ export const NewBodyC6 = (
       alignment: AlignmentType.CENTER,
       shading: { fill: palette.table.header.string },
       margins: { top: 60, bottom: 60, left: 50 },
-      borders: borderStyle(palette.common.white.string, {}),
+      borders: borderStyleGlobal(palette.common.white.string, {}),
     };
     cells1[1] = {
       text: row[1],
       shading: { fill: palette.table.header.string },
       margins: { top: 60, bottom: 60, left: 50 },
-      borders: borderStyle(palette.common.white.string, {
+      borders: borderStyleGlobal(palette.common.white.string, {
         right: { size: 15 } as any,
       }),
       alignment: AlignmentType.CENTER,
@@ -32,7 +32,7 @@ export const NewBodyC6 = (
       text: row[2],
       shading: { fill: palette.table.rowDark.string },
       margins: { top: 60, bottom: 60, left: 50 },
-      borders: borderStyle(palette.common.white.string),
+      borders: borderStyleGlobal(palette.common.white.string),
       alignment: AlignmentType.CENTER,
     };
 
@@ -40,7 +40,7 @@ export const NewBodyC6 = (
       text: row[3],
       shading: { fill: palette.table.rowDark.string },
       margins: { top: 60, bottom: 60, left: 50 },
-      borders: borderStyle(palette.common.white.string),
+      borders: borderStyleGlobal(palette.common.white.string),
       alignment: AlignmentType.CENTER,
     };
 
@@ -48,7 +48,7 @@ export const NewBodyC6 = (
       text: row[4],
       shading: { fill: palette.table.header.string },
       margins: { top: 60, bottom: 60, left: 50 },
-      borders: borderStyle(palette.common.white.string, {
+      borders: borderStyleGlobal(palette.common.white.string, {
         left: { size: 15 } as any,
       }),
       alignment: AlignmentType.CENTER,
@@ -58,7 +58,7 @@ export const NewBodyC6 = (
       text: row[5],
       shading: { fill: palette.table.header.string },
       margins: { top: 60, bottom: 60, left: 50 },
-      borders: borderStyle(palette.common.white.string),
+      borders: borderStyleGlobal(palette.common.white.string),
       alignment: AlignmentType.CENTER,
     };
 

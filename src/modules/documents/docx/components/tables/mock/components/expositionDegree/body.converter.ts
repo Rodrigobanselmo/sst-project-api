@@ -1,7 +1,7 @@
 import { AlignmentType } from 'docx';
 import { palette } from '../../../../../../../../shared/constants/palette';
 import { bodyTableProps } from '../../elements/body';
-import { borderStyle } from '../../../../../base/config/styles';
+import { borderStyleGlobal } from '../../../../../base/config/styles';
 
 export const NewBody = (body: [string, string[][], string][]) => {
   const rows: bodyTableProps[][] = [];
@@ -15,7 +15,7 @@ export const NewBody = (body: [string, string[][], string][]) => {
       alignment: AlignmentType.CENTER,
       shading: { fill: palette.table.header.string },
       margins: { top: 60, bottom: 60, left: 50 },
-      borders: borderStyle(palette.common.white.string, {
+      borders: borderStyleGlobal(palette.common.white.string, {
         right: { size: 15 } as any,
       }),
       rowSpan: 2,
@@ -24,14 +24,14 @@ export const NewBody = (body: [string, string[][], string][]) => {
       text: row[1][0].join('\n'),
       shading: { fill: palette.table.rowDark.string },
       margins: { top: 60, bottom: 60, left: 50 },
-      borders: borderStyle(palette.common.white.string),
+      borders: borderStyleGlobal(palette.common.white.string),
     };
 
     cells1[3] = {
       text: row[2],
       shading: { fill: palette.table.header.string },
       margins: { top: 60, bottom: 60, left: 50 },
-      borders: borderStyle(palette.common.white.string, {
+      borders: borderStyleGlobal(palette.common.white.string, {
         left: { size: 15 } as any,
       }),
       rowSpan: 2,
@@ -44,7 +44,7 @@ export const NewBody = (body: [string, string[][], string][]) => {
       text: row[1][1].join('\n'),
       shading: { fill: palette.table.rowDark.string },
       margins: { top: 60, bottom: 60, left: 50 },
-      borders: borderStyle(palette.common.white.string),
+      borders: borderStyleGlobal(palette.common.white.string),
     };
 
     rows.push(cells2);
