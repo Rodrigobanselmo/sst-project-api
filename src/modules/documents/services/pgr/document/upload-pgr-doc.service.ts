@@ -1,3 +1,4 @@
+import { APPRByGroupTableSection } from './../../../docx/components/tables/apprByGroup/appr-group.section';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ISectionOptions, Packer } from 'docx';
 import fs from 'fs';
@@ -107,7 +108,8 @@ export class PgrUploadService {
 
       const actionPlanUrl = ' ';
       const urlAPR = ' ';
-      // const { actionPlanUrl, urlAPR } = await this.generateAttachment(
+      const urlGroupAPR = ' ';
+      // const { actionPlanUrl, urlAPR,urlGroupAPR } = await this.generateAttachment(
       //   riskGroupData,
       //   hierarchyData,
       //   hierarchyTree,
@@ -130,6 +132,10 @@ export class PgrUploadService {
         new AttachmentEntity({
           name: 'Inventário de Risco por Função (APR)',
           url: urlAPR,
+        }),
+        new AttachmentEntity({
+          name: 'Inventário de Risco por GSE (APR)',
+          url: urlGroupAPR,
         }),
         new AttachmentEntity({
           name: 'Plano de Ação Detalhado',
@@ -172,7 +178,7 @@ export class PgrUploadService {
       //   attachments: attachments,
       // });
 
-      // return doc;
+      // return doc; //?remove
 
       [logo, ...photosPath].forEach((path) => path && fs.unlinkSync(path));
 
@@ -191,7 +197,7 @@ export class PgrUploadService {
     const { url } = await this.amazonStorageProvider.upload({
       file: fileBuffer,
       fileName: company.id + '/pgr/' + fileName,
-      isPublic: true,
+      // isPublic: true,
     });
 
     return url;
@@ -249,43 +255,45 @@ export class PgrUploadService {
     homoGroupTree: IHomoGroupMap,
     upsertPgrDto: UpsertPgrDto,
   ) {
+    const save = async (sections: ISectionOptions[], text: string) => {
+      const Doc = createBaseDocument(sections);
+
+      const b64string = await Packer.toBase64String(Doc);
+      const buffer = Buffer.from(b64string, 'base64');
+
+      const fileName = this.getFileName(upsertPgrDto, riskGroupData, text);
+
+      const url = await this.upload(buffer, fileName, upsertPgrDto);
+
+      return url;
+    };
+
     // APRs
     const aprSection: ISectionOptions[] = [
       ...APPRTableSection(riskGroupData, hierarchyData, homoGroupTree),
     ];
 
-    const aprDoc = createBaseDocument(aprSection);
+    const urlAPR = await save(aprSection, '--APR');
 
-    const b64APRstring = await Packer.toBase64String(aprDoc);
-    const bufferApr = Buffer.from(b64APRstring, 'base64');
+    const aprGroupSection: ISectionOptions[] = [
+      ...APPRByGroupTableSection(
+        riskGroupData,
+        hierarchyData,
+        hierarchyTree,
+        homoGroupTree,
+      ),
+    ];
 
-    const fileAprName = this.getFileName(upsertPgrDto, riskGroupData, '--APR');
-
-    const urlAPR = await this.upload(bufferApr, fileAprName, upsertPgrDto);
+    const urlGroupAPR = await save(aprGroupSection, '--APR');
 
     // ACTION PLAN
     const actionPlanSections: ISectionOptions[] = [
       actionPlanTableSection(riskGroupData, hierarchyTree),
     ];
 
-    const planDoc = createBaseDocument(actionPlanSections);
+    const actionPlanUrl = await save(actionPlanSections, '--PLANO_DE_ACAO');
 
-    const b64PlanString = await Packer.toBase64String(planDoc);
-    const bufferPlan = Buffer.from(b64PlanString, 'base64');
-
-    const filePlanName = this.getFileName(
-      upsertPgrDto,
-      riskGroupData,
-      '-PLANO_DE_ACAO',
-    );
-
-    const actionPlanUrl = await this.upload(
-      bufferPlan,
-      filePlanName,
-      upsertPgrDto,
-    );
-
-    return { urlAPR, actionPlanUrl };
+    return { urlAPR, urlGroupAPR, actionPlanUrl };
   }
 
   private getFileName = (

@@ -1,7 +1,6 @@
-import { APPRByGroupTableSection } from '../../../docx/components/tables/apprByGroup/appr-group.section';
+import { APPRByGroupTableSection } from './../../../docx/components/tables/apprByGroup/appr-group.section';
 import { Injectable } from '@nestjs/common';
 import { ISectionOptions, Packer } from 'docx';
-import { Readable } from 'stream';
 
 import { RiskDocumentRepository } from '../../../../../modules/checklist/repositories/implementations/RiskDocumentRepository';
 import { RiskGroupDataRepository } from '../../../../../modules/checklist/repositories/implementations/RiskGroupDataRepository';
@@ -9,15 +8,15 @@ import { CompanyEntity } from '../../../../../modules/company/entities/company.e
 import { HierarchyRepository } from '../../../../../modules/company/repositories/implementations/HierarchyRepository';
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { AmazonStorageProvider } from '../../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
-import { UpsertPgrDto } from '../../../dto/pgr.dto';
 import { createBaseDocument } from '../../../docx/base/config/document';
-import { hierarchyConverter } from '../../../docx/converter/hierarchy.converter';
 import { actionPlanTableSection } from '../../../docx/components/tables/actionPlan/actionPlan.section';
+import { APPRTableSection } from '../../../docx/components/tables/appr/appr.section';
 import { hierarchyHomoOrgSection } from '../../../docx/components/tables/hierarchyHomoOrg/hierarchyHomoOrg.section';
 import { hierarchyPrioritizationTableSections } from '../../../docx/components/tables/hierarchyPrioritization/hierarchyPrioritization.section';
 import { hierarchyRisksTableSections } from '../../../docx/components/tables/hierarchyRisks/hierarchyRisks.section';
 import { riskCharacterizationTableSection } from '../../../docx/components/tables/riskCharacterization/riskCharacterization.section';
-import { APPRTableSection } from '../../../docx/components/tables/appr/appr.section';
+import { hierarchyConverter } from '../../../docx/converter/hierarchy.converter';
+import { UpsertPgrDto } from '../../../dto/pgr.dto';
 
 @Injectable()
 export class PgrUploadTableService {
@@ -46,19 +45,20 @@ export class PgrUploadTableService {
       hierarchyConverter(hierarchyHierarchy);
 
     const sections: ISectionOptions[] = [
-      // riskCharacterizationTableSection(riskGroupData),
-      // ...hierarchyPrioritizationTableSections(
-      //   riskGroupData,
-      //   hierarchyData,
-      //   hierarchyTree,
-      // ),
-      // ...hierarchyRisksTableSections(
-      //   riskGroupData,
-      //   hierarchyData,
-      //   hierarchyTree,
-      // ),
-      // hierarchyHomoOrgSection(hierarchyData, homoGroupTree),
-      // actionPlanTableSection(riskGroupData, hierarchyTree),
+      riskCharacterizationTableSection(riskGroupData),
+      ...hierarchyPrioritizationTableSections(
+        riskGroupData,
+        hierarchyData,
+        hierarchyTree,
+      ),
+      ...hierarchyRisksTableSections(
+        riskGroupData,
+        hierarchyData,
+        hierarchyTree,
+      ),
+      hierarchyHomoOrgSection(hierarchyData, homoGroupTree),
+      actionPlanTableSection(riskGroupData, hierarchyTree),
+      ...APPRTableSection(riskGroupData, hierarchyData, homoGroupTree),
       ...APPRByGroupTableSection(
         riskGroupData,
         hierarchyData,
