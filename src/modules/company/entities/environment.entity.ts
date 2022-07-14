@@ -3,6 +3,7 @@ import {
   CompanyEnvironment,
   CompanyEnvironmentTypesEnum,
 } from '@prisma/client';
+import { RiskFactorDataEntity } from 'src/modules/checklist/entities/riskData.entity';
 import { EnvironmentPhotoEntity } from './environment-photo.entity';
 import { HierarchyEntity } from './hierarchy.entity';
 import { HomoGroupEntity } from './homoGroup.entity';
@@ -41,6 +42,7 @@ export class EnvironmentEntity implements CompanyEnvironment {
   homogeneousGroup?: HomoGroupEntity;
 
   hierarchies?: HierarchyEntity[];
+  riskData?: RiskFactorDataEntity[];
   noiseValue: string;
   temperature: string;
   moisturePercentage: string;

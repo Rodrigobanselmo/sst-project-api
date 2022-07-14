@@ -1,6 +1,7 @@
-import { StatusEnum } from '@prisma/client';
+import { Prisma, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import {
+  IsBoolean,
   IsDefined,
   IsEnum,
   IsOptional,
@@ -26,6 +27,13 @@ export class WorkspaceDto {
   @IsOptional()
   @IsString()
   description?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  isOwner?: boolean;
+
+  @IsOptional()
+  companyJson?: Prisma.JsonValue;
 
   @Transform(StringCapitalizeTransform, { toClassOnly: true })
   @IsString()

@@ -8,6 +8,7 @@ export class ActivityEntity implements Activity {
   code: string;
   name: string;
   created_at: Date;
+  riskDegree: number;
 
   constructor(partial: Partial<ActivityEntity>) {
     Object.assign(this, partial);

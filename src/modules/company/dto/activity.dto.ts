@@ -1,10 +1,13 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export class ActivityDto {
   @IsString()
-  @IsOptional()
   name: string;
 
   @IsString()
   code: string;
+
+  @IsBoolean()
+  @IsOptional()
+  riskDegree: number;
 }

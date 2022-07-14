@@ -2,7 +2,6 @@ import { CompanyTypesEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import {
   IsEnum,
-  IsInt,
   IsOptional,
   IsString,
   Length,
@@ -123,10 +122,6 @@ export class UpdateCompanyDto {
   @IsOptional()
   @IsString()
   cadastral_situation_description?: string;
-
-  @IsOptional()
-  @IsInt()
-  riskDegree?: number;
 
   @IsOptional()
   @IsString()

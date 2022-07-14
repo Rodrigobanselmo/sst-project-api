@@ -41,27 +41,31 @@ export class PgrUploadTableService {
         workspaceId,
       );
 
-    const { hierarchyData, homoGroupTree, hierarchyTree } =
-      hierarchyConverter(hierarchyHierarchy);
+    const {
+      hierarchyData,
+      homoGroupTree,
+      hierarchyHighLevelsData,
+      hierarchyTree,
+    } = hierarchyConverter(hierarchyHierarchy);
 
     const sections: ISectionOptions[] = [
-      riskCharacterizationTableSection(riskGroupData),
-      ...hierarchyPrioritizationTableSections(
-        riskGroupData,
-        hierarchyData,
-        hierarchyTree,
-      ),
-      ...hierarchyRisksTableSections(
-        riskGroupData,
-        hierarchyData,
-        hierarchyTree,
-      ),
-      hierarchyHomoOrgSection(hierarchyData, homoGroupTree),
-      actionPlanTableSection(riskGroupData, hierarchyTree),
-      ...APPRTableSection(riskGroupData, hierarchyData, homoGroupTree),
+      // riskCharacterizationTableSection(riskGroupData),
+      // ...hierarchyPrioritizationTableSections(
+      //   riskGroupData,
+      //   hierarchyData,
+      //   hierarchyTree,
+      // ),
+      // ...hierarchyRisksTableSections(
+      //   riskGroupData,
+      //   hierarchyData,
+      //   hierarchyTree,
+      // ),
+      // hierarchyHomoOrgSection(hierarchyData, homoGroupTree),
+      // actionPlanTableSection(riskGroupData, hierarchyTree),
+      // ...APPRTableSection(riskGroupData, hierarchyData, homoGroupTree),
       ...APPRByGroupTableSection(
         riskGroupData,
-        hierarchyData,
+        hierarchyHighLevelsData,
         hierarchyTree,
         homoGroupTree,
         { isByGroup: true },

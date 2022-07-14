@@ -1,3 +1,5 @@
+import { setNiceProportion } from './../../../../../../shared/utils/setNiceProportion';
+import sizeOf from 'image-size';
 import { ImageRun, ISectionOptions, Paragraph, TextRun } from 'docx';
 import fs from 'fs';
 
@@ -31,18 +33,33 @@ const versionDate = (version: string) =>
     spacing: { after: 100, before: 0 },
   });
 
-const imageCover = (imgPath: string) =>
-  new Paragraph({
+const imageCover = (imgPath: string) => {
+  const { height: imgHeight, width: imgWidth } = sizeOf(
+    fs.readFileSync(imgPath),
+  );
+
+  const maxWidth = 630;
+  const maxHeight = 354;
+
+  const { height, width } = setNiceProportion(
+    maxWidth,
+    maxHeight,
+    imgWidth,
+    imgHeight,
+  );
+
+  return new Paragraph({
     children: [
       new ImageRun({
         data: fs.readFileSync(imgPath),
         transformation: {
-          width: 630,
-          height: 354,
+          width,
+          height,
         },
       }),
     ],
   });
+};
 
 export const createCover = ({
   version,

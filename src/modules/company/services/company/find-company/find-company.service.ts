@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+
 import { CompanyRepository } from '../../../../../modules/company/repositories/implementations/CompanyRepository';
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 

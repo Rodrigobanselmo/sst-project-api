@@ -19,7 +19,6 @@ export class FindCepService {
     } catch (error) {
       if (error.code === 'ERR_BAD_REQUEST')
         throw new BadRequestException(error.response.data.message);
-
       throw new InternalServerErrorException(error.response.data.message);
     }
 

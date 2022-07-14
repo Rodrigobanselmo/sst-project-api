@@ -74,6 +74,7 @@ model Activity {
   id    Int     @default(autoincrement()) @id
   code String @unique
   name String
+  riskDegree Int @default(0)
   created_at DateTime @default(now())
   company_primary_activity Company[] @relation(name: "primary_activity")
   company_secondary_activity Company[] @relation(name: "secondary_activity")
@@ -160,7 +161,6 @@ model Company {
   licenseId Int? 
   phone String?
   email String?
-  riskDegree Int?
   operationTime String?
   logoUrl String?
   responsibleName String?
@@ -370,11 +370,11 @@ model Hierarchy {
 }
 
 model HierarchyOnHomogeneous {
-  hierarchy       Hierarchy     @relation(fields: [hierarchyId], references: [id])
+  hierarchy       Hierarchy     @relation(fields: [hierarchyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   hierarchyId     String
-  homogeneousGroup   HomogeneousGroup @relation(fields: [homogeneousGroupId], references: [id])
+  homogeneousGroup   HomogeneousGroup @relation(fields: [homogeneousGroupId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   homogeneousGroupId     String
-  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   workspaceId     String
 
   @@id([hierarchyId, homogeneousGroupId, workspaceId])
@@ -646,6 +646,7 @@ model Workspace {
   abbreviation String?
   description String?  
   cnpj String?  
+  companyJson Json?  
   created_at DateTime @default(now())
   isOwner Boolean @default(true)
   updated_at  DateTime   @updatedAt

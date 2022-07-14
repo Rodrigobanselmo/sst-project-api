@@ -79,7 +79,6 @@ export class CompanyEntity implements Company {
   professionals?: ProfessionalEntity[];
   riskFactorGroupData?: RiskFactorGroupDataEntity[];
   email: string;
-  riskDegree: number;
   logoUrl: string;
   responsibleName: string;
   mission: string;

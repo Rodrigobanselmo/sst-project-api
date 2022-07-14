@@ -209,6 +209,14 @@ export class HomoGroupRepository {
   }
 
   async deleteById(id: string): Promise<void> {
+    await this.prisma.hierarchyOnHomogeneous.deleteMany({
+      where: { homogeneousGroupId: id },
+    });
+
+    await this.prisma.riskFactorData.deleteMany({
+      where: { homogeneousGroupId: id },
+    });
+
     await this.prisma.homogeneousGroup.delete({
       where: { id },
     });

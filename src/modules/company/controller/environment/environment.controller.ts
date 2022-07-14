@@ -24,6 +24,7 @@ import { FindAllEnvironmentService } from '../../services/environment/find-all-e
 import { UpsertEnvironmentService } from '../../services/environment/upsert-environment/upsert-environment.service';
 import { AddEnvironmentPhotoService } from '../../services/environment/add-environment-photo/add-environment-photo.service';
 import { DeleteEnvironmentPhotoService } from '../../services/environment/delete-environment-photo/delete-environment-photo.service';
+import { FindByIdEnvironmentService } from '../../services/environment/find-by-id-environment/find-by-id-environment.service';
 
 @ApiTags('environments')
 @Controller('/company/:companyId/workspace/:workspaceId/environments')
@@ -34,6 +35,7 @@ export class EnvironmentController {
     private readonly deleteEnvironmentService: DeleteEnvironmentService,
     private readonly addEnvironmentPhotoService: AddEnvironmentPhotoService,
     private readonly deleteEnvironmentPhotoService: DeleteEnvironmentPhotoService,
+    private readonly findByIdEnvironmentService: FindByIdEnvironmentService,
   ) {}
 
   @Get()
@@ -42,6 +44,11 @@ export class EnvironmentController {
     @Param('workspaceId') workspaceId: string,
   ) {
     return this.findAllEnvironmentService.execute(workspaceId, userPayloadDto);
+  }
+
+  @Get('/:id')
+  findById(@User() userPayloadDto: UserPayloadDto, @Param('id') id: string) {
+    return this.findByIdEnvironmentService.execute(id, userPayloadDto);
   }
 
   @Post()

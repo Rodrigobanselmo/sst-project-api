@@ -1,4 +1,5 @@
 import { WorkbooksEnum } from '../../../shared/constants/workbooks/workbooks.enum';
+import { cnaeSheetConstant } from './sheets/cnae/cnaeSheet.constant';
 import { companySheetConstant } from './sheets/company/companySheet.constant';
 import { companyUniqueSheetConstant } from './sheets/companyUnique/companyUniqueSheet.constant';
 import { employeesSheetConstant } from './sheets/employees/employeesSheet.constant';
@@ -41,5 +42,11 @@ export const workbooksConstant = {
     id: WorkbooksEnum.HIERARCHIES,
     sheets: hierarchiesSheetConstant,
     path: 'files/company/hierarchies',
+  },
+  [WorkbooksEnum.CNAE]: {
+    name: 'CNAE',
+    id: WorkbooksEnum.CNAE,
+    sheets: cnaeSheetConstant,
+    path: 'files/cnae',
   },
 };

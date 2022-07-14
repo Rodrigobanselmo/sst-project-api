@@ -8,6 +8,8 @@ export enum ErrorCompanyEnum {
   UPDATE_HIERARCHY_WITH_PARENT = "O campo 'parentId' não pode existir para o tipo 'Directory'",
   UPSERT_HIERARCHY_WITH_PARENT = "O campo 'parentId' é obrigatório",
   GHO_NOT_FOUND = 'O GHO informado não foi encontrado nesta empresa',
+  ENVIRONMENT_NOT_FOUND = 'O Ambiente requisitado não foi encontrado nesta empresa',
+  CHARACTERIZATION_NOT_FOUND = 'A Atividade requisitada não foi encontrado nesta empresa',
   HOMOGENEOUS_SAME_NAME = 'Já existe um grupo homogêneo com o mesmo nome',
   WORKSPACE_NOT_FOUND = 'O Estabelecimento (área de trabalho) informada não foi encontrada, verifique a sigla utilizada',
   CPF_CONFLICT = 'CPF já cadastrado',
@@ -29,4 +31,9 @@ export enum ErrorDocumentEnum {
 
 export enum ErrorAuthEnum {
   USER_ALREADY_EXIST = 'Usuário já cadastrado',
+}
+
+export enum ErrorFilesEnum {
+  WRONG_TABLE_SHEET = 'A tabela que está enviando possui um nome de planilha diferente do experado: enviado: ??FOUND??, esperado: ??EXPECTED??',
+  WRONG_TABLE_VERSION = 'A tabela que está enviando possui uma versão diferente, verifique se você possui a versão mais atualizada',
 }

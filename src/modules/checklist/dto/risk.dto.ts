@@ -48,6 +48,14 @@ export class CreateRiskDto {
   @IsString()
   companyId: string;
 
+  @IsString()
+  @IsOptional()
+  risk: string;
+
+  @IsString()
+  @IsOptional()
+  symptoms: string;
+
   @ValidateNested({ each: true })
   @IsOptional()
   @Type(() => RiskCreateRecMedDto)
@@ -102,6 +110,14 @@ export class UpdateRiskDto {
 
   @IsString()
   companyId: string;
+
+  @IsString()
+  @IsOptional()
+  risk: string;
+
+  @IsString()
+  @IsOptional()
+  symptoms: string;
 
   @ValidateNested({ each: true })
   @IsOptional()

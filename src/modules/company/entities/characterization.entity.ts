@@ -1,3 +1,4 @@
+import { RiskFactorDataEntity } from './../../checklist/entities/riskData.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import {
   CharacterizationTypeEnum,
@@ -35,6 +36,7 @@ export class CharacterizationEntity implements CompanyCharacterization {
   photos?: CharacterizationPhotoEntity[];
 
   hierarchies?: HierarchyEntity[];
+  riskData?: RiskFactorDataEntity[];
   homogeneousGroup?: HomoGroupEntity;
   considerations: string[];
   deleted_at: Date;

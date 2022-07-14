@@ -1,3 +1,5 @@
+import { RiskFactorsEntity } from './../../../checklist/entities/risk.entity';
+import { RiskFactorDataEntity } from './../../../checklist/entities/riskData.entity';
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { v4 } from 'uuid';
@@ -98,31 +100,68 @@ export class CharacterizationRepository {
         ...options,
       })) as CharacterizationEntity[];
 
-    //! optimization here, it has the hierarchy tree on front cam get only ids on hierarchyOnHomogeneous
-    await Promise.all(
-      characterization.map(async (env, index) => {
-        const hierarchies = await this.prisma.hierarchy.findMany({
-          where: {
-            hierarchyOnHomogeneous: { some: { homogeneousGroupId: env.id } },
-            companyId,
-          },
-        });
+    // //! optimization here, it has the hierarchy tree on front cam get only ids on hierarchyOnHomogeneous
+    // await Promise.all(
+    //   characterization.map(async (env, index) => {
+    //     const hierarchies = await this.prisma.hierarchy.findMany({
+    //       where: {
+    //         hierarchyOnHomogeneous: { some: { homogeneousGroupId: env.id } },
+    //         companyId,
+    //       },
+    //     });
 
-        characterization[index].hierarchies = hierarchies.map(
-          (hierarchy) => new HierarchyEntity(hierarchy),
-        );
-      }),
-    );
+    //     characterization[index].hierarchies = hierarchies.map(
+    //       (hierarchy) => new HierarchyEntity(hierarchy),
+    //     );
+    //   }),
+    // );
 
     return [...characterization.map((env) => new CharacterizationEntity(env))];
   }
 
-  async findById(id: string) {
+  async findById(
+    id: string,
+    options: Partial<
+      Prisma.CompanyCharacterizationFindUniqueArgs & {
+        getRiskData: boolean;
+      }
+    > = {},
+  ) {
     const characterization =
-      await this.prisma.companyCharacterization.findUnique({
+      (await this.prisma.companyCharacterization.findUnique({
         where: { id },
-        include: { photos: true },
+        include: { photos: true, ...options.include },
+      })) as CharacterizationEntity;
+
+    const hierarchies = await this.prisma.hierarchy.findMany({
+      where: {
+        hierarchyOnHomogeneous: {
+          some: { homogeneousGroupId: characterization.id },
+        },
+      },
+    });
+
+    if (options.getRiskData) {
+      const riskData = await this.prisma.riskFactorData.findMany({
+        where: {
+          homogeneousGroupId: id,
+        },
+        include: { riskFactor: true },
       });
+
+      characterization.riskData = riskData.map(({ riskFactor, ...risk }) => {
+        return new RiskFactorDataEntity({
+          ...risk,
+          ...(riskFactor
+            ? { riskFactor: new RiskFactorsEntity(riskFactor) }
+            : {}),
+        });
+      });
+    }
+
+    characterization.hierarchies = hierarchies.map(
+      (hierarchy) => new HierarchyEntity(hierarchy),
+    );
 
     return new CharacterizationEntity(characterization);
   }

@@ -1,4 +1,4 @@
-import { Workspace } from '.prisma/client';
+import { Prisma, Workspace } from '.prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 import { StatusEnum } from '@prisma/client';
 import { AddressEntity } from './address.entity';
@@ -40,6 +40,7 @@ export class WorkspaceEntity implements Workspace {
   constructor(partial: Partial<WorkspaceEntity>) {
     Object.assign(this, partial);
   }
+  companyJson: Prisma.JsonValue;
   isOwner: boolean;
   cnpj: string;
   abbreviation: string;

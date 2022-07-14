@@ -97,68 +97,30 @@ export const hierarchyConverter = (
 ) => {
   const { hierarchyTree, homoGroupTree } = setMapHierarchies(hierarchies);
   const hierarchyData = new Map<string, HierarchyMapData>();
+  const hierarchyHighLevelsData = new Map<string, HierarchyMapData>();
 
-  hierarchies
-    .filter((i) =>
-      (
-        [HierarchyEnum.OFFICE, HierarchyEnum.SUB_OFFICE] as HierarchyEnum[]
-      ).includes(i.type),
-    )
-    .forEach((hierarchy) => {
-      const hierarchyArrayData: HierarchyMapData['org'] = [];
-      const hierarchyInfo = hierarchyMap[hierarchy.type];
-      const allHomogeneousGroupIds = [];
+  hierarchies.forEach((hierarchy) => {
+    const hierarchyArrayData: HierarchyMapData['org'] = [];
+    const hierarchyInfo = hierarchyMap[hierarchy.type];
+    const allHomogeneousGroupIds = [];
 
-      const loop = (parentId: string) => {
-        if (!parentId) return;
-        const parent = hierarchyTree[parentId];
-        const parentInfo = hierarchyMap[parent.type];
-        const homogeneousGroupIds =
-          parent?.homogeneousGroups?.map((group) => group.id) || [];
-
-        allHomogeneousGroupIds.push(...homogeneousGroupIds);
-
-        hierarchyArrayData[parentInfo.index] = {
-          type: parentInfo.text,
-          typeEnum: parent.type,
-          name: parent.name,
-          id: parent.id,
-          homogeneousGroupIds,
-          environments:
-            parent?.homogeneousGroups
-              ?.map((group) => {
-                if (group.type != HomoTypeEnum.ENVIRONMENT) return;
-                return (
-                  (environments.find((e) => e.id === group.id) || {})?.name ||
-                  ''
-                );
-              })
-              .filter((e) => e)
-              .join(', ') || '',
-          homogeneousGroup:
-            parent?.homogeneousGroups
-              ?.map((group) => {
-                if (group.type) return false;
-                return group.name;
-              })
-              .filter((e) => e)
-              .join(', ') || '',
-        };
-
-        loop(parent.parentId);
-      };
-
+    const loop = (parentId: string) => {
+      if (!parentId) return;
+      const parent = hierarchyTree[parentId];
+      const parentInfo = hierarchyMap[parent.type];
       const homogeneousGroupIds =
-        hierarchy?.homogeneousGroups?.map((group) => group.id) || [];
+        parent?.homogeneousGroups?.map((group) => group.id) || [];
 
-      hierarchyArrayData[hierarchyInfo.index] = {
-        type: hierarchyInfo.text,
-        typeEnum: hierarchy.type,
-        name: hierarchy.name,
-        id: hierarchy.id,
+      allHomogeneousGroupIds.push(...homogeneousGroupIds);
+
+      hierarchyArrayData[parentInfo.index] = {
+        type: parentInfo.text,
+        typeEnum: parent.type,
+        name: parent.name,
+        id: parent.id,
         homogeneousGroupIds,
         environments:
-          hierarchy?.homogeneousGroups
+          parent?.homogeneousGroups
             ?.map((group) => {
               if (group.type != HomoTypeEnum.ENVIRONMENT) return;
               return (
@@ -168,7 +130,7 @@ export const hierarchyConverter = (
             .filter((e) => e)
             .join(', ') || '',
         homogeneousGroup:
-          hierarchy?.homogeneousGroups
+          parent?.homogeneousGroups
             ?.map((group) => {
               if (group.type) return false;
               return group.name;
@@ -177,9 +139,46 @@ export const hierarchyConverter = (
             .join(', ') || '',
       };
 
-      allHomogeneousGroupIds.push(...homogeneousGroupIds);
-      loop(hierarchy.parentId);
+      loop(parent.parentId);
+    };
 
+    const homogeneousGroupIds =
+      hierarchy?.homogeneousGroups?.map((group) => group.id) || [];
+
+    hierarchyArrayData[hierarchyInfo.index] = {
+      type: hierarchyInfo.text,
+      typeEnum: hierarchy.type,
+      name: hierarchy.name,
+      id: hierarchy.id,
+      homogeneousGroupIds,
+      environments:
+        hierarchy?.homogeneousGroups
+          ?.map((group) => {
+            if (group.type != HomoTypeEnum.ENVIRONMENT) return;
+            return (
+              (environments.find((e) => e.id === group.id) || {})?.name || ''
+            );
+          })
+          .filter((e) => e)
+          .join(', ') || '',
+      homogeneousGroup:
+        hierarchy?.homogeneousGroups
+          ?.map((group) => {
+            if (group.type) return false;
+            return group.name;
+          })
+          .filter((e) => e)
+          .join(', ') || '',
+    };
+
+    allHomogeneousGroupIds.push(...homogeneousGroupIds);
+    loop(hierarchy.parentId);
+
+    const isOffice = (
+      [HierarchyEnum.OFFICE, HierarchyEnum.SUB_OFFICE] as HierarchyEnum[]
+    ).includes(hierarchy.type);
+
+    if (isOffice)
       hierarchyData.set(hierarchy.id, {
         org: hierarchyArrayData.filter((hierarchyInfo) => hierarchyInfo),
         workspace: hierarchy.workspaces[0].name, //! Make it possible for many workspaces
@@ -190,7 +189,23 @@ export const hierarchyConverter = (
           simpleCompare: true,
         }),
       });
-    });
 
-  return { hierarchyData, homoGroupTree, hierarchyTree };
+    hierarchyHighLevelsData.set(hierarchy.id, {
+      org: hierarchyArrayData.filter((hierarchyInfo) => hierarchyInfo),
+      workspace: hierarchy.workspaces[0].name, //! Make it possible for many workspaces
+      descRh: hierarchy.description,
+      descReal: hierarchy.realDescription,
+      employeesLength: hierarchy?.employees?.length || 0,
+      allHomogeneousGroupIds: removeDuplicate(allHomogeneousGroupIds, {
+        simpleCompare: true,
+      }),
+    });
+  });
+
+  return {
+    hierarchyData,
+    hierarchyHighLevelsData,
+    homoGroupTree,
+    hierarchyTree,
+  };
 };

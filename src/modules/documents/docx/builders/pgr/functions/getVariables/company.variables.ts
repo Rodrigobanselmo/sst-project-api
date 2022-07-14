@@ -12,9 +12,10 @@ export const companyVariables = (
     [VariablesPGREnum.COMPANY_CNAE]: company?.primary_activity
       ? `${company?.primary_activity[0].code} – ${company?.primary_activity[0].name}`
       : '',
-    [VariablesPGREnum.COMPANY_RISK_DEGREE]: company?.riskDegree
-      ? String(company?.riskDegree)
-      : '',
+    [VariablesPGREnum.COMPANY_RISK_DEGREE]:
+      company?.primary_activity && company?.primary_activity[0]
+        ? String(company?.primary_activity[0].riskDegree)
+        : '',
     [VariablesPGREnum.COMPANY_EMAIL]: company?.email || '',
     [VariablesPGREnum.COMPANY_NAME]: company?.name || '',
     [VariablesPGREnum.COMPANY_TELEPHONE]: company?.phone || '',

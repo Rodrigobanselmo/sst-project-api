@@ -24,6 +24,7 @@ import { FindAllCharacterizationService } from '../../services/characterization/
 import { UpsertCharacterizationService } from '../../services/characterization/upsert-characterization/upsert-characterization.service';
 import { AddCharacterizationPhotoService } from '../../services/characterization/add-characterization-photo/add-characterization-photo.service';
 import { DeleteCharacterizationPhotoService } from '../../services/characterization/delete-characterization-photo/delete-characterization-photo.service';
+import { FindByIdCharacterizationService } from '../../services/characterization/find-by-id-characterization/find-by-id-characterization.service';
 
 @ApiTags('characterizations')
 @Controller('/company/:companyId/workspace/:workspaceId/characterizations')
@@ -34,6 +35,7 @@ export class CharacterizationController {
     private readonly deleteCharacterizationService: DeleteCharacterizationService,
     private readonly addCharacterizationPhotoService: AddCharacterizationPhotoService,
     private readonly deleteCharacterizationPhotoService: DeleteCharacterizationPhotoService,
+    private readonly findByIdCharacterizationService: FindByIdCharacterizationService,
   ) {}
 
   @Get()
@@ -45,6 +47,11 @@ export class CharacterizationController {
       workspaceId,
       userPayloadDto,
     );
+  }
+
+  @Get('/:id')
+  findById(@User() userPayloadDto: UserPayloadDto, @Param('id') id: string) {
+    return this.findByIdCharacterizationService.execute(id, userPayloadDto);
   }
 
   @Post()

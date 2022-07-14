@@ -62,7 +62,7 @@ export class DocumentsController {
     // await this.pgrUploadService.execute(upsertPgrDto, userPayloadDto);
     // res.send('ok');
 
-    const { buffer: file, fileName } = await this.pgrUploadService.execute(
+    const { buffer: file, fileName } = await this.pgrUploadDocService.execute(
       upsertPgrDto,
       userPayloadDto,
     );

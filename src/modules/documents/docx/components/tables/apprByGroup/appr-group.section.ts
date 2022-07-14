@@ -1,5 +1,6 @@
 import { HomoTypeEnum } from '@prisma/client';
 import { ISectionOptions, PageOrientation } from 'docx';
+import { removeDuplicate } from 'src/shared/utils/removeDuplicate';
 
 import { originRiskMap } from '../../../../../../shared/constants/maps/origin-risk';
 import { RiskFactorGroupDataEntity } from '../../../../../checklist/entities/riskGroupData.entity';
@@ -114,10 +115,29 @@ export const APPRByGroupTableSection = (
     everyHomoFound.push(homo.id);
 
     homoGroupTree[homo.id].hierarchies.forEach((hierarchy, i, hierarchies) => {
-      hierarchy.homogeneousGroups.forEach((homoGroup) => {
-        const isOnEvery = hierarchies.every((hierarchyEvery) =>
-          hierarchyEvery.homogeneousGroups.find((h) => h.id === homoGroup.id),
-        );
+      const allHomogeneousGroupIds = (
+        hierarchyData.get(hierarchy.id) || { allHomogeneousGroupIds: [] }
+      )?.allHomogeneousGroupIds;
+
+      removeDuplicate(
+        [
+          ...allHomogeneousGroupIds.map((id) => ({ id })),
+          ...hierarchy.homogeneousGroups,
+        ],
+        { removeById: 'id' },
+      ).forEach((homoGroup) => {
+        const isOnEvery = hierarchies.every((hierarchyEvery) => {
+          const everyAllHomogeneousGroupIds = (
+            hierarchyData.get(hierarchyEvery.id) || {
+              allHomogeneousGroupIds: [],
+            }
+          )?.allHomogeneousGroupIds;
+
+          return [
+            ...everyAllHomogeneousGroupIds.map((id) => ({ id })),
+            ...hierarchyEvery.homogeneousGroups,
+          ].find((h) => h.id === homoGroup.id);
+        });
 
         const mapDataHomo = hierarchyDataHomoGroup.get(homo.id);
         const isHomoAdded = mapDataHomo.allHomogeneousGroupIds.find(
@@ -126,7 +146,6 @@ export const APPRByGroupTableSection = (
 
         if (isOnEvery && !isHomoAdded) {
           everyHomoFound.push(homoGroup.id);
-
           const allHomogeneousGroupIds = [
             ...mapDataHomo.allHomogeneousGroupIds,
             homoGroup.id,
@@ -147,12 +166,14 @@ export const APPRByGroupTableSection = (
 
   Object.values(homoGroupTree).forEach((homo) => {
     const hasFound = everyHomoFound.includes(homo.id);
+    // const isNotOnEvery = everyHomoNotFound.includes(homo.id);
     if (!hasFound) {
       setHomoGroup(homo);
     }
   });
 
   hierarchyDataHomoGroup.forEach((hierarchy) => {
+    console.log(hierarchy);
     const createTable = () => {
       const firstTable = firstRiskInventoryTableSection(
         riskFactorGroupData,

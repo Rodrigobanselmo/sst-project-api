@@ -22,11 +22,15 @@ import { UploadEmployeesService } from './services/company/upload-employees/uplo
 import { UploadHierarchiesService } from './services/company/upload-hierarchies/upload-hierarchies.service';
 import { DownloadHierarchiesService } from './services/company/download-hierarchies/download-hierarchies.service';
 import { EnvironmentPhotoRepository } from '../company/repositories/implementations/EnvironmentPhotoRepository';
+import { DownloadCnaeService } from './services/cnae/download-cnae/download-cnae.service';
+import { UploadCnaeDataService } from './services/cnae/upload-cnae/upload-cnae.service';
+import { FilesCnaeController } from './controller/cnae/files-cnae.controller';
 
 @Module({
   controllers: [
     FilesChecklistController,
     FilesCompanyController,
+    FilesCnaeController,
     FilesController,
   ],
   imports: [ChecklistModule, CompanyModule],
@@ -49,6 +53,8 @@ import { EnvironmentPhotoRepository } from '../company/repositories/implementati
     UploadHierarchiesService,
     EnvironmentPhotoRepository,
     DownloadHierarchiesService,
+    DownloadCnaeService,
+    UploadCnaeDataService,
   ],
 })
 export class FilesModule {}

@@ -1,3 +1,5 @@
+import { setNiceProportion } from './../../../../../../shared/utils/setNiceProportion';
+import sizeOf from 'image-size';
 import {
   AlignmentType,
   BorderStyle,
@@ -36,13 +38,26 @@ const table = (rows: TableRow[]) =>
   });
 
 const firstCell = (path?: string) => {
+  const getProportion = () => {
+    const { height: imgHeight, width: imgWidth } = sizeOf(
+      fs.readFileSync(path),
+    );
+
+    const maxWidth = 100;
+    const maxHeight = 25;
+
+    const { height, width } = setNiceProportion(
+      maxWidth,
+      maxHeight,
+      imgWidth,
+      imgHeight,
+    );
+    return { height, width };
+  };
   const image = path
     ? new ImageRun({
         data: fs.readFileSync(path),
-        transformation: {
-          width: 45,
-          height: 25,
-        },
+        transformation: getProportion(),
       })
     : undefined;
 

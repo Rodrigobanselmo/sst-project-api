@@ -2,8 +2,8 @@ import { CompanyTypesEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import {
   IsBoolean,
+  IsDefined,
   IsEnum,
-  IsInt,
   IsOptional,
   IsString,
   Length,
@@ -71,12 +71,11 @@ export class CreateCompanyDto {
   readonly workspace: WorkspaceDto[];
 
   @ValidateNested({ each: true })
-  // @IsDefined()
+  @IsDefined()
   @Type(() => ActivityDto)
   readonly primary_activity: ActivityDto[];
 
   @ValidateNested({ each: true })
-  // @IsDefined()
   @Type(() => ActivityDto)
   readonly secondary_activity: ActivityDto[];
 
@@ -111,10 +110,6 @@ export class CreateCompanyDto {
   @IsOptional()
   @IsString()
   cadastral_situation_description: string;
-
-  @IsOptional()
-  @IsInt()
-  riskDegree?: number;
 
   @IsOptional()
   @IsString()

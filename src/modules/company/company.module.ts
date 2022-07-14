@@ -9,6 +9,7 @@ import { EmployeeController } from './controller/employee/employee.controller';
 import { EnvironmentController } from './controller/environment/environment.controller';
 import { HierarchyController } from './controller/hierarchy/hierarchy.controller';
 import { HomoGroupsController } from './controller/HomoGroups/HomoGroups.controller';
+import { ActivityRepository } from './repositories/implementations/ActivityRepository';
 import { CharacterizationPhotoRepository } from './repositories/implementations/CharacterizationPhotoRepository';
 import { CharacterizationRepository } from './repositories/implementations/CharacterizationRepository';
 import { CompanyRepository } from './repositories/implementations/CompanyRepository';
@@ -23,6 +24,7 @@ import { AddCharacterizationPhotoService } from './services/characterization/add
 import { DeleteCharacterizationPhotoService } from './services/characterization/delete-characterization-photo/delete-characterization-photo.service';
 import { DeleteCharacterizationService } from './services/characterization/delete-characterization/delete-characterization.service';
 import { FindAllCharacterizationService } from './services/characterization/find-all-characterization/find-all-characterization.service';
+import { FindByIdCharacterizationService } from './services/characterization/find-by-id-characterization/find-by-id-characterization.service';
 import { UpsertCharacterizationService } from './services/characterization/upsert-characterization/upsert-characterization.service';
 import { AddCompanyPhotoService } from './services/company/add-company-photo/add-company-photo.service';
 import { CopyCompanyService } from './services/company/copy-company/copy-company.service';
@@ -41,6 +43,7 @@ import { AddEnvironmentPhotoService } from './services/environment/add-environme
 import { DeleteEnvironmentPhotoService } from './services/environment/delete-environment-photo/delete-environment-photo.service';
 import { DeleteEnvironmentService } from './services/environment/delete-environment/delete-environment.service';
 import { FindAllEnvironmentService } from './services/environment/find-all-environment/find-all-environment.service';
+import { FindByIdEnvironmentService } from './services/environment/find-by-id-environment/find-by-id-environment.service';
 import { UpsertEnvironmentService } from './services/environment/upsert-environment/upsert-environment.service';
 import { CreateHierarchyService } from './services/hierarchy/create-hierarchies/create-hierarchies.service';
 import { DeleteHierarchyService } from './services/hierarchy/delete-hierarchies/delete-hierarchies.service';
@@ -107,6 +110,9 @@ import { UpdateHomoGroupService } from './services/homoGroup/update-homo-group/u
     CharacterizationRepository,
     CopyCompanyService,
     RiskGroupDataRepository,
+    ActivityRepository,
+    FindByIdEnvironmentService,
+    FindByIdCharacterizationService,
   ],
   exports: [
     CompanyRepository,
@@ -115,6 +121,7 @@ import { UpdateHomoGroupService } from './services/homoGroup/update-homo-group/u
     WorkspaceRepository,
     EnvironmentRepository,
     HomoGroupRepository,
+    ActivityRepository,
   ],
 })
 export class CompanyModule {}

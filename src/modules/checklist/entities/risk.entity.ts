@@ -61,11 +61,11 @@ export class RiskFactorsEntity implements RiskFactors {
   deleted_at: Date | null;
 
   risk: string;
-  isEmergency: boolean;
+  symptoms: string;
 
+  isEmergency: boolean;
   json: Prisma.JsonValue;
   exame: string;
-  symptoms: string;
   method: string;
   unit: string;
   cas: string;

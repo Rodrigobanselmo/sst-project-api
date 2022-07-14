@@ -1,3 +1,5 @@
+import { RiskFactorsEntity } from './../../../checklist/entities/risk.entity';
+import { RiskFactorDataEntity } from './../../../checklist/entities/riskData.entity';
 import { Injectable } from '@nestjs/common';
 import { HomoTypeEnum, Prisma } from '@prisma/client';
 import { v4 } from 'uuid';
@@ -101,28 +103,35 @@ export class EnvironmentRepository {
     })) as EnvironmentEntity[];
 
     //! optimization here, it has the hierarchy tree on front cam get only ids on hierarchyOnHomogeneous
-    await Promise.all(
-      environment.map(async (env, index) => {
-        const hierarchies = await this.prisma.hierarchy.findMany({
-          where: {
-            hierarchyOnHomogeneous: { some: { homogeneousGroupId: env.id } },
-            companyId,
-          },
-        });
+    // await Promise.all(
+    //   environment.map(async (env, index) => {
+    //     const hierarchies = await this.prisma.hierarchy.findMany({
+    //       where: {
+    //         hierarchyOnHomogeneous: { some: { homogeneousGroupId: env.id } },
+    //         companyId,
+    //       },
+    //     });
 
-        environment[index].hierarchies = hierarchies.map(
-          (hierarchy) => new HierarchyEntity(hierarchy),
-        );
-      }),
-    );
+    //     environment[index].hierarchies = hierarchies.map(
+    //       (hierarchy) => new HierarchyEntity(hierarchy),
+    //     );
+    //   }),
+    // );
 
     return [...environment.map((env) => new EnvironmentEntity(env))];
   }
 
-  async findById(id: string) {
+  async findById(
+    id: string,
+    options: Partial<
+      Prisma.CompanyEnvironmentFindUniqueArgs & {
+        getRiskData: boolean;
+      }
+    > = {},
+  ) {
     const environment = (await this.prisma.companyEnvironment.findUnique({
       where: { id },
-      include: { photos: true },
+      include: { photos: true, ...options.include },
     })) as EnvironmentEntity;
 
     const hierarchies = await this.prisma.hierarchy.findMany({
@@ -132,6 +141,24 @@ export class EnvironmentRepository {
         },
       },
     });
+
+    if (options.getRiskData) {
+      const riskData = await this.prisma.riskFactorData.findMany({
+        where: {
+          homogeneousGroupId: id,
+        },
+        include: { riskFactor: true },
+      });
+
+      environment.riskData = riskData.map(({ riskFactor, ...risk }) => {
+        return new RiskFactorDataEntity({
+          ...risk,
+          ...(riskFactor
+            ? { riskFactor: new RiskFactorsEntity(riskFactor) }
+            : {}),
+        });
+      });
+    }
 
     environment.hierarchies = hierarchies.map(
       (hierarchy) => new HierarchyEntity(hierarchy),

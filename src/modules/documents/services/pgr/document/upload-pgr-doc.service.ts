@@ -1,3 +1,4 @@
+import sizeOf from 'image-size';
 import { APPRByGroupTableSection } from './../../../docx/components/tables/apprByGroup/appr-group.section';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ISectionOptions, Packer } from 'docx';
@@ -54,7 +55,7 @@ export class PgrUploadService {
     // eslint-disable-next-line prettier/prettier
     const hierarchyHierarchy =  await this.hierarchyRepository.findAllDataHierarchyByCompany(companyId, workspaceId);
     // eslint-disable-next-line prettier/prettier
-    const versions = await this.riskDocumentRepository.findByRiskGroupAndCompany(upsertPgrDto.riskGroupId, companyId);
+    const versions = await (await this.riskDocumentRepository.findByRiskGroupAndCompany(upsertPgrDto.riskGroupId, companyId)).filter(riskDocument => riskDocument.version.includes('.0.0'));
 
     const workspace = await this.workspaceRepository.findById(workspaceId);
     const company = await this.companyRepository.findByIdAll(
@@ -92,8 +93,6 @@ export class PgrUploadService {
           `tmp/${v4()}.${getExtensionFromUrl(company.logoUrl)}`,
         )
       : '';
-
-    // console.log(sizeOf(fs.readFileSync(logo)));
     // return;
 
     // const { environments, characterizations, photosPath } =
@@ -103,8 +102,12 @@ export class PgrUploadService {
     const photosPath = [];
 
     try {
-      const { hierarchyData, homoGroupTree, hierarchyTree } =
-        hierarchyConverter(hierarchyHierarchy, environments);
+      const {
+        hierarchyData,
+        hierarchyHighLevelsData,
+        homoGroupTree,
+        hierarchyTree,
+      } = hierarchyConverter(hierarchyHierarchy, environments);
 
       const actionPlanUrl = ' ';
       const urlAPR = ' ';
@@ -112,6 +115,7 @@ export class PgrUploadService {
       // const { actionPlanUrl, urlAPR,urlGroupAPR } = await this.generateAttachment(
       //   riskGroupData,
       //   hierarchyData,
+      // hierarchyHighLevelsData,
       //   hierarchyTree,
       //   homoGroupTree,
       //   upsertPgrDto,
@@ -251,6 +255,7 @@ export class PgrUploadService {
   private async generateAttachment(
     riskGroupData: RiskFactorGroupDataEntity,
     hierarchyData: Map<string, HierarchyMapData>,
+    hierarchyHighLevelsData: Map<string, HierarchyMapData>,
     hierarchyTree: IHierarchyMap,
     homoGroupTree: IHomoGroupMap,
     upsertPgrDto: UpsertPgrDto,
@@ -278,7 +283,7 @@ export class PgrUploadService {
     const aprGroupSection: ISectionOptions[] = [
       ...APPRByGroupTableSection(
         riskGroupData,
-        hierarchyData,
+        hierarchyHighLevelsData,
         hierarchyTree,
         homoGroupTree,
       ),

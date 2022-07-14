@@ -54,14 +54,10 @@ export const dataConverter = (
     if (!riskData.homogeneousGroup.type) origin = `${riskData.homogeneousGroup.name}\n(GSE)`;
 
     if (riskData.homogeneousGroup.type == HomoTypeEnum.HIERARCHY) {
-      const hierarchy = hierarchyData.org.find(
-        (hierarchy) => hierarchy.id == riskData.homogeneousGroup.id,
-      );
+      const hierarchy = hierarchyTree[riskData.homogeneousGroup.id];
 
       if (hierarchy)
-        origin = `${hierarchy.name}\n(${
-          originRiskMap[hierarchy.typeEnum].name
-        })`;
+        origin = `${hierarchy.name}\n(${originRiskMap[hierarchy.type].name})`;
     }
 
     // eslint-disable-next-line prettier/prettier
