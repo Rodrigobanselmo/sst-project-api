@@ -1,3 +1,4 @@
+import { ErrorInvitesEnum } from './../../../../../shared/constants/enum/errorMessage';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { resolve } from 'path';
 
@@ -25,7 +26,8 @@ export class InviteUsersService {
         (company) => company.companyId === inviteUserDto.companyId,
       );
 
-      if (userAlreadyAdded) throw new BadRequestException('User already added');
+      if (userAlreadyAdded)
+        throw new BadRequestException(ErrorInvitesEnum.USER_ALREADY_EXIST);
     }
 
     const expires_date = this.dateProvider.addHours(new Date(), 3);

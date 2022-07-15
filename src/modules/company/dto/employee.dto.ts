@@ -1,3 +1,4 @@
+import { ErrorCompanyEnum } from './../../../shared/constants/enum/errorMessage';
 import { PartialType } from '@nestjs/swagger';
 import { HierarchyEnum, StatusEnum } from '@prisma/client';
 import { Transform } from 'class-transformer';
@@ -17,7 +18,7 @@ import { StringUppercaseTransform } from '../../../shared/transformers/string-up
 
 export class CreateEmployeeDto {
   @Transform(CpfFormatTransform, { toClassOnly: true })
-  @Length(11, 11, { message: 'invalid CPF' })
+  @Length(11, 11, { message: ErrorCompanyEnum.INVALID_CPF })
   cpf: string;
 
   @Transform(StringCapitalizeTransform, { toClassOnly: true })

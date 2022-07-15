@@ -510,7 +510,7 @@ model RiskFactorDocument {
   fileUrl String?
   name String 
   description String @default("")
-  version String  @default("1")
+  version String  @default("1.0.0")
   companyId String
   riskGroupId String
   workspaceName String

@@ -5,8 +5,6 @@ import {
   PGRSectionTypeEnum,
 } from '../types/section.types';
 
-//* document example (TOXILAB) form page 12 to 30
-
 export const complementsSection: IDocumentPGRSectionGroup = {
   footer: true,
   header: true,

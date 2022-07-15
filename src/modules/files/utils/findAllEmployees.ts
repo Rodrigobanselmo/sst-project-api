@@ -19,8 +19,13 @@ export const findAllEmployees = async (
 ) => {
   const hierarchyExcel = new HierarchyExcelProvider();
   const company = await companyRepository.findById(companyId, {
-    include: { employees: true },
+    include: { employees: true, workspace: true },
   });
+
+  if (company.workspace?.length === 1)
+    riskSheet.columns = riskSheet.columns.filter(
+      (column) => column.databaseName !== 'abbreviation',
+    );
 
   const hierarchies = await hierarchyRepository.findAllHierarchyByCompany(
     companyId,

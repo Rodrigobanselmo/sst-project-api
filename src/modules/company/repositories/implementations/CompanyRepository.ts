@@ -496,6 +496,10 @@ export class CompanyRepository implements ICompanyRepository {
       where: { companyId: id },
     });
 
+    const homogenousGroupCount = await this.prisma.homogeneousGroup.count({
+      where: { companyId: id },
+    });
+
     const company = await this.prisma.company.findUnique({
       where: { id },
       include: {
@@ -528,6 +532,7 @@ export class CompanyRepository implements ICompanyRepository {
       ...company,
       employeeCount: employeeCount,
       riskGroupCount: riskGroupCount,
+      homogenousGroupCount,
       hierarchyCount,
     });
   }

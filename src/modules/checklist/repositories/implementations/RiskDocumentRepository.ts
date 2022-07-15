@@ -11,7 +11,6 @@ export class RiskDocumentRepository {
   constructor(private prisma: PrismaService) {}
   async upsert({
     companyId,
-    id,
     attachments,
     ...createDto
   }: UpsertRiskDocumentDto): Promise<RiskDocumentEntity> {
@@ -38,7 +37,7 @@ export class RiskDocumentRepository {
           : undefined,
         companyId,
       },
-      where: { id_companyId: { companyId, id: id || 'not-found' } },
+      where: { id_companyId: { companyId, id: createDto.id || 'not-found' } },
     });
 
     return new RiskDocumentEntity(riskFactorDocEntity);

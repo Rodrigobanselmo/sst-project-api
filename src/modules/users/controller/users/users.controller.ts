@@ -88,9 +88,10 @@ export class UsersController {
   @Patch('/company')
   async updatePermissionsRoles(
     @Body() updateUserCompanyDto: UpdateUserCompanyDto,
+    @User() user: UserPayloadDto,
   ) {
     return classToClass(
-      this.updatePermissionsRolesService.execute(updateUserCompanyDto),
+      this.updatePermissionsRolesService.execute(updateUserCompanyDto, user),
     );
   }
 

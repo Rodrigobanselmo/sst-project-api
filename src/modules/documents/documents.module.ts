@@ -11,6 +11,7 @@ import { PgrDownloadTableService } from './services/pgr/tables/download-pgr-tabl
 import { PgrUploadTableService } from './services/pgr/tables/upload-pgr-table.service';
 import { DayJSProvider } from '../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { UsersModule } from '../users/users.module';
+import { PgrDownloadAttachmentsService } from './services/pgr/document/download-pgr-attachment-doc.service';
 
 @Module({
   controllers: [DocumentsController],
@@ -23,6 +24,7 @@ import { UsersModule } from '../users/users.module';
     PgrUploadTableService,
     DayJSProvider,
     AmazonStorageProvider,
+    PgrDownloadAttachmentsService,
   ],
 })
 export class DocumentsModule {}

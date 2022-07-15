@@ -29,22 +29,22 @@ export class ProfessionalRepository {
     });
 
     const users = await this.prisma.user.findMany({
-      // where: { //! add here
-      //   OR: [
-      //     { companies: { some: { companyId } } },
-      //     {
-      //       companies: {
-      //         some: {
-      //           company: {
-      //             applyingServiceContracts: {
-      //               some: { receivingServiceCompanyId: companyId },
-      //             },
-      //           },
-      //         },
-      //       },
-      //     },
-      //   ],
-      // },
+      where: {
+        OR: [
+          { companies: { some: { companyId } } },
+          {
+            companies: {
+              some: {
+                company: {
+                  applyingServiceContracts: {
+                    some: { receivingServiceCompanyId: companyId },
+                  },
+                },
+              },
+            },
+          },
+        ],
+      },
     });
 
     const usersEntity = users.map((user) => new UserEntity(user));

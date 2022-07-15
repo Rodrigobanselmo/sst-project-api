@@ -42,6 +42,16 @@ export class UploadEmployeesService {
     const system = userPayloadDto.isMaster;
     const companyId = userPayloadDto.targetCompanyId;
 
+    //! fetching twice company (also on findAllEmployees)
+    const company = await this.companyRepository.findById(companyId, {
+      include: { workspace: true },
+    });
+
+    if (company.workspace?.length === 1)
+      Workbook.sheets[0].columns = Workbook.sheets[0].columns.filter(
+        (column) => column.databaseName !== 'abbreviation',
+      );
+
     // get risk table with actual version
     const DatabaseTable =
       await this.databaseTableRepository.findByNameAndCompany(
@@ -60,11 +70,14 @@ export class UploadEmployeesService {
     const ghoNameDescriptionMap = {} as Record<string, string>;
 
     employeesData = employeesData.map((employee) => {
-      const workspace = workspaces.filter(
-        (work) =>
-          employee.abbreviation &&
-          employee.abbreviation.includes(work.abbreviation),
-      );
+      const workspace =
+        company.workspace?.length === 1
+          ? workspaces
+          : workspaces.filter(
+              (work) =>
+                employee?.abbreviation &&
+                employee?.abbreviation.includes(work.abbreviation),
+            );
 
       if (!workspace)
         throw new BadRequestException(ErrorCompanyEnum.WORKSPACE_NOT_FOUND);
@@ -76,7 +89,7 @@ export class UploadEmployeesService {
           '';
       }
 
-      delete employee.abbreviation;
+      if (employee?.abbreviation) delete employee.abbreviation;
       return { ...employee, workspaceIds: workspace.map((work) => work.id) };
     });
 

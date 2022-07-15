@@ -4,6 +4,7 @@ export enum ErrorMessageEnum {
 }
 
 export enum ErrorCompanyEnum {
+  INVALID_CPF = 'CPF inválido',
   CREATE_HIERARCHY_WITH_PARENT = "O campo 'parentId' não pode existir para o tipo 'Directory'",
   UPDATE_HIERARCHY_WITH_PARENT = "O campo 'parentId' não pode existir para o tipo 'Directory'",
   UPSERT_HIERARCHY_WITH_PARENT = "O campo 'parentId' é obrigatório",
@@ -19,6 +20,8 @@ export enum ErrorInvitesEnum {
   FORBIDDEN_ACCESS_USER_INVITE_LIST = 'Você não tem permissão para acessar a lista de convites de outro usuário ',
   TOKEN_EXPIRES = 'O Convite expirou',
   TOKEN_NOT_VALID_EMAIL = 'O Convite não é válido para esse email',
+  FORBIDDEN_INSUFFICIENT_PERMISSIONS = 'Você não tem permissão para criar um usuário com essas credênciais',
+  USER_ALREADY_EXIST = 'Usuário já cadastrado',
 }
 
 export enum ErrorChecklistEnum {

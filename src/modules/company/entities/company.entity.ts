@@ -62,7 +62,7 @@ export class CompanyEntity implements Company {
   address?: AddressCompanyEntity;
 
   @ApiProperty({ description: 'The workspace related to the company' })
-  workspaces?: WorkspaceEntity[];
+  workspace?: WorkspaceEntity[];
 
   @ApiProperty({ description: 'The employees related to the company' })
   employees?: EmployeeEntity[];
@@ -94,6 +94,7 @@ export class CompanyEntity implements Company {
   cadastral_situation_description: string;
   employeeCount?: number;
   riskGroupCount?: number;
+  homogenousGroupCount?: number;
   hierarchyCount?: number;
   shortName: string;
   operationTime: string;

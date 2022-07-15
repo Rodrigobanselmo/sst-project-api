@@ -1,5 +1,3 @@
-import sizeOf from 'image-size';
-import { APPRByGroupTableSection } from './../../../docx/components/tables/apprByGroup/appr-group.section';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ISectionOptions, Packer } from 'docx';
 import fs from 'fs';
@@ -27,6 +25,7 @@ import { RiskFactorGroupDataEntity } from './../../../../checklist/entities/risk
 import { WorkspaceRepository } from './../../../../company/repositories/implementations/WorkspaceRepository';
 import { actionPlanTableSection } from './../../../docx/components/tables/actionPlan/actionPlan.section';
 import { APPRTableSection } from './../../../docx/components/tables/appr/appr.section';
+import { APPRByGroupTableSection } from './../../../docx/components/tables/apprByGroup/appr-group.section';
 import {
   hierarchyConverter,
   HierarchyMapData,
@@ -95,11 +94,11 @@ export class PgrUploadService {
       : '';
     // return;
 
-    // const { environments, characterizations, photosPath } =
-    //   await this.downloadPhotos(company);
-    const environments = [];
-    const characterizations = [];
-    const photosPath = [];
+    const { environments, characterizations, photosPath } =
+      await this.downloadPhotos(company);
+    // const environments = [];
+    // const characterizations = [];
+    // const photosPath = [];
 
     try {
       const {
@@ -109,17 +108,18 @@ export class PgrUploadService {
         hierarchyTree,
       } = hierarchyConverter(hierarchyHierarchy, environments);
 
-      const actionPlanUrl = ' ';
-      const urlAPR = ' ';
-      const urlGroupAPR = ' ';
-      // const { actionPlanUrl, urlAPR,urlGroupAPR } = await this.generateAttachment(
-      //   riskGroupData,
-      //   hierarchyData,
-      // hierarchyHighLevelsData,
-      //   hierarchyTree,
-      //   homoGroupTree,
-      //   upsertPgrDto,
-      // );
+      // const actionPlanUrl = ' ';
+      // const urlAPR = ' ';
+      // const urlGroupAPR = ' ';
+      const { actionPlanUrl, urlAPR, urlGroupAPR } =
+        await this.generateAttachment(
+          riskGroupData,
+          hierarchyData,
+          hierarchyHighLevelsData,
+          hierarchyTree,
+          homoGroupTree,
+          upsertPgrDto,
+        );
 
       const version = new RiskDocumentEntity({
         version: upsertPgrDto.version,
@@ -132,16 +132,21 @@ export class PgrUploadService {
 
       versions.unshift(version);
 
+      const docId = v4();
+
       const attachments = [
         new AttachmentEntity({
+          id: v4(),
           name: 'Inventário de Risco por Função (APR)',
           url: urlAPR,
         }),
         new AttachmentEntity({
+          id: v4(),
           name: 'Inventário de Risco por GSE (APR)',
           url: urlGroupAPR,
         }),
         new AttachmentEntity({
+          id: v4(),
           name: 'Plano de Ação Detalhado',
           url: actionPlanUrl,
         }),
@@ -154,7 +159,10 @@ export class PgrUploadService {
       const sections: ISectionOptions[] = new DocumentBuildPGR({
         version: versionString,
         document: riskGroupData,
-        attachments,
+        attachments: attachments.map((attachment) => ({
+          ...attachment,
+          url: `${process.env.APP_HOST}/download/pgr/anexos?ref1=${docId}&ref2=${attachment.id}&ref3=${companyId}`,
+        })),
         logo,
         company,
         workspace,
@@ -173,14 +181,15 @@ export class PgrUploadService {
 
       const fileName = this.getFileName(upsertPgrDto, riskGroupData);
 
-      // const url = await this.upload(buffer, fileName, upsertPgrDto);
+      const url = await this.upload(buffer, fileName, upsertPgrDto);
 
-      // await this.riskDocumentRepository.upsert({
-      //   ...upsertPgrDto,
-      //   companyId: company.id,
-      //   fileUrl: url,
-      //   attachments: attachments,
-      // });
+      await this.riskDocumentRepository.upsert({
+        ...upsertPgrDto,
+        id: docId,
+        companyId: company.id,
+        fileUrl: url,
+        attachments: attachments,
+      });
 
       // return doc; //?remove
 
@@ -209,7 +218,7 @@ export class PgrUploadService {
 
   private async downloadPhotos(company: Partial<CompanyEntity>) {
     const photosPath = [];
-    // return { environments: [], photosPath };
+
     try {
       const environments = await Promise.all(
         company.environments.map(async (environment) => {

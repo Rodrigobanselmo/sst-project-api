@@ -5,8 +5,6 @@ import {
   PGRSectionTypeEnum,
 } from '../types/section.types';
 
-//* document example (TOXILAB) form page 12 to 30
-
 export const organization2Section: IDocumentPGRSectionGroup = {
   footer: true,
   header: true,
