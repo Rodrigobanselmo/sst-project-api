@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
-import { AddPhotoCharacterizationDto } from '../../dto/characterization.dto';
+import {
+  AddPhotoCharacterizationDto,
+  UpdatePhotoCharacterizationDto,
+} from '../../dto/characterization.dto';
 import { CharacterizationPhotoEntity } from '../../entities/characterization-photo.entity';
 
 export interface ICharacterizationPhoto
@@ -9,6 +12,7 @@ export interface ICharacterizationPhoto
   photoUrl: string;
   isVertical: boolean;
   companyCharacterizationId: string;
+  order?: number;
   name: string;
   id?: string;
 }
@@ -26,6 +30,21 @@ export class CharacterizationPhotoRepository {
       });
 
     return characterizations;
+  }
+
+  async update({
+    id,
+    ...characterizationPhotoDto
+  }: UpdatePhotoCharacterizationDto): Promise<CharacterizationPhotoEntity> {
+    const characterization =
+      await this.prisma.companyCharacterizationPhoto.update({
+        where: { id: id || 'no-id' },
+        data: {
+          ...characterizationPhotoDto,
+        },
+      });
+
+    return new CharacterizationPhotoEntity(characterization);
   }
 
   async upsert({

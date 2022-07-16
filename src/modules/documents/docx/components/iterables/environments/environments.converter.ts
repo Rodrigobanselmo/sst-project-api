@@ -1,3 +1,4 @@
+import { sortNumber } from './../../../../../../shared/utils/sorts/number.sort';
 import { Paragraph, Table } from 'docx';
 
 import { HFullWidthImage } from '../../../base/elements/imagesLayout/hFullWidthImage';
@@ -23,35 +24,40 @@ export const environmentsConverter = (
   considerations: string[];
   breakPage: boolean;
 }[] => {
-  return environments.map((environment) => {
-    const imagesVertical = environment.photos.filter(
-      (image) => image.isVertical,
-    );
+  return environments
+    .sort((a, b) => sortNumber(a, b, 'order'))
+    .map((environment) => {
+      const imagesVertical = environment.photos.filter(
+        (image) => image.isVertical,
+      );
 
-    const imagesHorizontal = environment.photos.filter(
-      (image) => !image.isVertical,
-    );
+      const imagesHorizontal = environment.photos.filter(
+        (image) => !image.isVertical,
+      );
 
-    const breakPage = imagesVertical.length > 0 || imagesHorizontal.length > 0;
-    const elements = getLayouts(imagesVertical, imagesHorizontal);
-    const variables = {
-      [VariablesPGREnum.ENVIRONMENT_NAME]: environment.name || '',
-      [VariablesPGREnum.ENVIRONMENT_DESCRIPTION]: environment.description || '',
-      [VariablesPGREnum.ENVIRONMENT_NOISE]: environment.noiseValue || '',
-      [VariablesPGREnum.ENVIRONMENT_TEMPERATURE]: environment.temperature || '',
-      [VariablesPGREnum.ENVIRONMENT_LUMINOSITY]: environment.luminosity || '',
-      [VariablesPGREnum.ENVIRONMENT_MOISTURE]:
-        environment.moisturePercentage || '',
-    };
+      const breakPage =
+        imagesVertical.length > 0 || imagesHorizontal.length > 0;
+      const elements = getLayouts(imagesVertical, imagesHorizontal);
+      const variables = {
+        [VariablesPGREnum.ENVIRONMENT_NAME]: environment.name || '',
+        [VariablesPGREnum.ENVIRONMENT_DESCRIPTION]:
+          environment.description || '',
+        [VariablesPGREnum.ENVIRONMENT_NOISE]: environment.noiseValue || '',
+        [VariablesPGREnum.ENVIRONMENT_TEMPERATURE]:
+          environment.temperature || '',
+        [VariablesPGREnum.ENVIRONMENT_LUMINOSITY]: environment.luminosity || '',
+        [VariablesPGREnum.ENVIRONMENT_MOISTURE]:
+          environment.moisturePercentage || '',
+      };
 
-    const risks = environment.homogeneousGroup.riskFactorData.map(
-      (risk) => risk.riskFactor,
-    );
+      const risks = environment.homogeneousGroup.riskFactorData.map(
+        (risk) => risk.riskFactor,
+      );
 
-    const considerations = environment.considerations;
+      const considerations = environment.considerations;
 
-    return { elements, variables, risks, considerations, breakPage };
-  });
+      return { elements, variables, risks, considerations, breakPage };
+    });
 };
 
 export const getLayouts = (

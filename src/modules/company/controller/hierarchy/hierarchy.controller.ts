@@ -14,6 +14,7 @@ import {
   UpdateHierarchyDto,
   UpsertManyHierarchyDto,
 } from '../../dto/hierarchy';
+import { FindHierarchyService } from '../../services/hierarchy/find-hierarchy/find-hierarchy.service';
 import { CreateHierarchyService } from '../../services/hierarchy/create-hierarchies/create-hierarchies.service';
 import { DeleteHierarchyService } from '../../services/hierarchy/delete-hierarchies/delete-hierarchies.service';
 
@@ -29,6 +30,7 @@ export class HierarchyController {
     private readonly updateHierarchyService: UpdateHierarchyService,
     private readonly upsertManyHierarchyService: UpsertManyHierarchyService,
     private readonly deleteHierarchyService: DeleteHierarchyService,
+    private readonly findHierarchyService: FindHierarchyService,
   ) {}
 
   @Get('/:companyId?')
@@ -36,7 +38,12 @@ export class HierarchyController {
     return this.findAllHierarchyService.execute(userPayloadDto);
   }
 
-  @Post('')
+  @Get('/:id/:companyId?')
+  findById(@Param('id') id: string, @User() userPayloadDto: UserPayloadDto) {
+    return this.findHierarchyService.execute(id, userPayloadDto);
+  }
+
+  @Post('/:companyId?')
   create(
     @Body() createHierarchyDto: CreateHierarchyDto,
     @User() userPayloadDto: UserPayloadDto,

@@ -26,6 +26,7 @@ export class EnvironmentPhotoEntity implements CompanyEnvironmentPhoto {
   isVertical: boolean;
   deleted_at: Date;
   updated_at: Date;
+  order: number;
 
   constructor(partial: Partial<EnvironmentPhotoEntity>) {
     Object.assign(this, partial);

@@ -45,6 +45,7 @@ import { DeleteEnvironmentService } from './services/environment/delete-environm
 import { FindAllEnvironmentService } from './services/environment/find-all-environment/find-all-environment.service';
 import { FindByIdEnvironmentService } from './services/environment/find-by-id-environment/find-by-id-environment.service';
 import { UpsertEnvironmentService } from './services/environment/upsert-environment/upsert-environment.service';
+import { FindHierarchyService } from './services/hierarchy/find-hierarchy/find-hierarchy.service';
 import { CreateHierarchyService } from './services/hierarchy/create-hierarchies/create-hierarchies.service';
 import { DeleteHierarchyService } from './services/hierarchy/delete-hierarchies/delete-hierarchies.service';
 import { FindAllHierarchyService } from './services/hierarchy/find-all-hierarchies/find-all-hierarchies.service';
@@ -54,6 +55,8 @@ import { CreateHomoGroupService } from './services/homoGroup/create-homo-group/c
 import { DeleteHomoGroupService } from './services/homoGroup/delete-homo-group/delete-homo-group.service';
 import { FindByCompanyHomoGroupService } from './services/homoGroup/find-by-company-homo-group/find-by-company-homo-group.service';
 import { UpdateHomoGroupService } from './services/homoGroup/update-homo-group/update-homo-group.service';
+import { UpdateEnvironmentPhotoService } from './services/environment/update-environment-photo/update-environment-photo.service';
+import { UpdateCharacterizationPhotoService } from './services/characterization/update-characterization-photo/update-characterization-photo.service';
 
 @Module({
   controllers: [
@@ -113,6 +116,9 @@ import { UpdateHomoGroupService } from './services/homoGroup/update-homo-group/u
     ActivityRepository,
     FindByIdEnvironmentService,
     FindByIdCharacterizationService,
+    FindHierarchyService,
+    UpdateEnvironmentPhotoService,
+    UpdateCharacterizationPhotoService,
   ],
   exports: [
     CompanyRepository,

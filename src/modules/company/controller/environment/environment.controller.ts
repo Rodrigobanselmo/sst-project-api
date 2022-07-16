@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   UploadedFile,
   UploadedFiles,
@@ -18,6 +19,7 @@ import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import {
   UpsertEnvironmentDto,
   AddPhotoEnvironmentDto,
+  UpdatePhotoEnvironmentDto,
 } from '../../dto/environment.dto';
 import { DeleteEnvironmentService } from '../../services/environment/delete-environment/delete-environment.service';
 import { FindAllEnvironmentService } from '../../services/environment/find-all-environment/find-all-environment.service';
@@ -25,6 +27,7 @@ import { UpsertEnvironmentService } from '../../services/environment/upsert-envi
 import { AddEnvironmentPhotoService } from '../../services/environment/add-environment-photo/add-environment-photo.service';
 import { DeleteEnvironmentPhotoService } from '../../services/environment/delete-environment-photo/delete-environment-photo.service';
 import { FindByIdEnvironmentService } from '../../services/environment/find-by-id-environment/find-by-id-environment.service';
+import { UpdateEnvironmentPhotoService } from '../../services/environment/update-environment-photo/update-environment-photo.service';
 
 @ApiTags('environments')
 @Controller('/company/:companyId/workspace/:workspaceId/environments')
@@ -34,6 +37,7 @@ export class EnvironmentController {
     private readonly findAllEnvironmentService: FindAllEnvironmentService,
     private readonly deleteEnvironmentService: DeleteEnvironmentService,
     private readonly addEnvironmentPhotoService: AddEnvironmentPhotoService,
+    private readonly updateEnvironmentPhotoService: UpdateEnvironmentPhotoService,
     private readonly deleteEnvironmentPhotoService: DeleteEnvironmentPhotoService,
     private readonly findByIdEnvironmentService: FindByIdEnvironmentService,
   ) {}
@@ -80,6 +84,17 @@ export class EnvironmentController {
       addPhotoEnvironmentDto,
       userPayloadDto,
       file,
+    );
+  }
+
+  @Patch('/photo/:id')
+  async update(
+    @Body() updatePhotoEnvironmentDto: UpdatePhotoEnvironmentDto,
+    @Param('id') id: string,
+  ) {
+    return this.updateEnvironmentPhotoService.execute(
+      id,
+      updatePhotoEnvironmentDto,
     );
   }
 

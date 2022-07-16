@@ -345,4 +345,56 @@ export class HierarchyRepository {
       return new HierarchyEntity(homogeneousGroup);
     });
   }
+
+  async findById(id: string, companyId: string) {
+    const hierarchiesIds: string[] = [];
+    const AllChildrenHierarchies = (await this.prisma.hierarchy.findFirst({
+      where: { id: { equals: id } },
+      include: {
+        workspaces: true,
+        children: {
+          include: {
+            children: {
+              include: {
+                children: {
+                  include: {
+                    children: {
+                      include: {
+                        children: {
+                          include: { children: true },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    })) as HierarchyEntity;
+
+    const getAllHierarchiesChildren = (hierarchies: HierarchyEntity[]) => {
+      hierarchies.forEach((hierarchy) => {
+        hierarchiesIds.push(hierarchy.id);
+
+        if (hierarchy.children) getAllHierarchiesChildren(hierarchy.children);
+      });
+    };
+
+    getAllHierarchiesChildren([AllChildrenHierarchies]);
+
+    AllChildrenHierarchies.employeesCount = await this.prisma.employee.count({
+      where: {
+        companyId,
+        hierarchyId: {
+          in: hierarchiesIds,
+        },
+      },
+    });
+
+    delete AllChildrenHierarchies.children;
+
+    return new HierarchyEntity(AllChildrenHierarchies);
+  }
 }

@@ -1,12 +1,11 @@
-import sizeOf from 'image-size';
 import { Injectable } from '@nestjs/common';
-import { Readable } from 'stream';
+import sizeOf from 'image-size';
 import { v4 } from 'uuid';
 
-import { CharacterizationPhotoRepository } from '../../../repositories/implementations/CharacterizationPhotoRepository';
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { AmazonStorageProvider } from '../../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
 import { UpsertCharacterizationDto } from '../../../dto/characterization.dto';
+import { CharacterizationPhotoRepository } from '../../../repositories/implementations/CharacterizationPhotoRepository';
 import { CharacterizationRepository } from '../../../repositories/implementations/CharacterizationRepository';
 
 @Injectable()

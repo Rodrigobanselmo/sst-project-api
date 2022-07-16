@@ -1,6 +1,12 @@
 import { CompanyEnvironmentTypesEnum } from '@prisma/client';
 import { Transform } from 'class-transformer';
-import { IsEnum, IsOptional, IsString, MaxLength } from 'class-validator';
+import {
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 import { StringCapitalizeTransform } from '../../../shared/transformers/string-capitalize';
 import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
@@ -35,6 +41,10 @@ export class UpsertEnvironmentDto {
   @IsOptional()
   photos?: string[];
 
+  @IsInt()
+  @IsOptional()
+  order?: number;
+
   @IsString()
   @IsOptional()
   parentEnvironmentId?: string;
@@ -68,7 +78,27 @@ export class AddPhotoEnvironmentDto {
   @IsString()
   companyEnvironmentId: string;
 
+  @IsInt()
+  @IsOptional()
+  order: number;
+
   @Transform(StringCapitalizeTransform, { toClassOnly: true })
+  @IsString()
+  @MaxLength(100)
+  name: string;
+}
+
+export class UpdatePhotoEnvironmentDto {
+  @IsOptional()
+  @IsString()
+  id?: string;
+
+  @IsInt()
+  @IsOptional()
+  order: number;
+
+  @Transform(StringCapitalizeTransform, { toClassOnly: true })
+  @IsOptional()
   @IsString()
   @MaxLength(100)
   name: string;

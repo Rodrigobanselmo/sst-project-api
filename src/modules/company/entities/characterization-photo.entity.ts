@@ -21,6 +21,7 @@ export class CharacterizationPhotoEntity
   created_at: Date;
 
   isVertical: boolean;
+  order: number;
   deleted_at: Date;
   updated_at: Date;
   companyCharacterizationId: string;

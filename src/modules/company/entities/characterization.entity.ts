@@ -38,6 +38,7 @@ export class CharacterizationEntity implements CompanyCharacterization {
   hierarchies?: HierarchyEntity[];
   riskData?: RiskFactorDataEntity[];
   homogeneousGroup?: HomoGroupEntity;
+  order: number;
   considerations: string[];
   deleted_at: Date;
   updated_at: Date;

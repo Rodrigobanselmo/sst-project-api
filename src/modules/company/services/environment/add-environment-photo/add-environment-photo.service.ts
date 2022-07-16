@@ -1,6 +1,5 @@
-import sizeOf from 'image-size';
 import { Injectable } from '@nestjs/common';
-import { Readable } from 'stream';
+import sizeOf from 'image-size';
 import { v4 } from 'uuid';
 
 import { EnvironmentPhotoRepository } from '../../../../../modules/company/repositories/implementations/EnvironmentPhotoRepository';
@@ -27,6 +26,7 @@ export class AddEnvironmentPhotoService {
 
     await this.environmentPhotoRepository.createMany([
       {
+        ...addPhotoEnvironmentDto,
         companyEnvironmentId: addPhotoEnvironmentDto.companyEnvironmentId,
         photoUrl,
         name: addPhotoEnvironmentDto.name,

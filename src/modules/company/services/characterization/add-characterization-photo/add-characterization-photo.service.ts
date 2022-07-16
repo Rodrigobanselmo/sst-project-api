@@ -27,6 +27,7 @@ export class AddCharacterizationPhotoService {
 
     await this.characterizationPhotoRepository.createMany([
       {
+        ...addPhotoCharacterizationDto,
         companyCharacterizationId:
           addPhotoCharacterizationDto.companyCharacterizationId,
         photoUrl,

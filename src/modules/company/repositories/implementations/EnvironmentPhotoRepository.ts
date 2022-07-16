@@ -1,13 +1,17 @@
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
-import { AddPhotoEnvironmentDto } from '../../dto/environment.dto';
+import {
+  AddPhotoEnvironmentDto,
+  UpdatePhotoEnvironmentDto,
+} from '../../dto/environment.dto';
 import { EnvironmentPhotoEntity } from '../../entities/environment-photo.entity';
 
 export interface IEnvironmentPhoto extends Partial<AddPhotoEnvironmentDto> {
   photoUrl: string;
   isVertical: boolean;
   companyEnvironmentId: string;
+  order?: number;
   name: string;
   id?: string;
 }
@@ -26,19 +30,14 @@ export class EnvironmentPhotoRepository {
     return environments;
   }
 
-  async upsert({
+  async update({
     id,
-    companyEnvironmentId: environmentId,
     ...environmentPhotoDto
-  }: IEnvironmentPhoto): Promise<EnvironmentPhotoEntity> {
-    const environment = await this.prisma.companyEnvironmentPhoto.upsert({
+  }: UpdatePhotoEnvironmentDto): Promise<EnvironmentPhotoEntity> {
+    console.log(environmentPhotoDto);
+    const environment = await this.prisma.companyEnvironmentPhoto.update({
       where: { id: id || 'no-id' },
-      create: {
-        ...environmentPhotoDto,
-        companyEnvironmentId: environmentId,
-        name: environmentPhotoDto.name,
-      },
-      update: {
+      data: {
         ...environmentPhotoDto,
       },
     });

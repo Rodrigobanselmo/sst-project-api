@@ -1,5 +1,3 @@
-import { RiskFactorsEntity } from './../../../checklist/entities/risk.entity';
-import { RiskFactorDataEntity } from './../../../checklist/entities/riskData.entity';
 import { Injectable } from '@nestjs/common';
 import { HomoTypeEnum, Prisma } from '@prisma/client';
 import { v4 } from 'uuid';
@@ -8,6 +6,8 @@ import { PrismaService } from '../../../../prisma/prisma.service';
 import { UpsertEnvironmentDto } from '../../dto/environment.dto';
 import { EnvironmentEntity } from '../../entities/environment.entity';
 import { HierarchyEntity } from '../../entities/hierarchy.entity';
+import { RiskFactorsEntity } from './../../../checklist/entities/risk.entity';
+import { RiskFactorDataEntity } from './../../../checklist/entities/riskData.entity';
 
 interface ICompanyEnvironment extends Omit<UpsertEnvironmentDto, 'photos'> {
   companyId: string;
@@ -67,7 +67,6 @@ export class EnvironmentRepository {
           }),
       ),
     );
-
     const environment = (await this.prisma.companyEnvironment.upsert({
       where: {
         workspaceId_companyId_id: { id: id || 'no-id', companyId, workspaceId },

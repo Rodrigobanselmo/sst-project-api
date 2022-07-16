@@ -45,6 +45,7 @@ export const environmentSections = (
       (
         { variables, elements, risks, considerations: cons, breakPage },
         index,
+        arr,
       ) => {
         const parameters: ISectionChildrenType[] = [];
         const riskFactors: ISectionChildrenType[] = [];
@@ -155,22 +156,21 @@ export const environmentSections = (
           ),
         ];
 
-        if (breakPage) sections.push(section);
-        else
-          sections[sections.length - 1] = [
-            ...(sections[sections.length - 1] || []),
-            ...section,
-          ];
-
         if (index == 0)
-          sections[sections.length - 1] = [
+          section.unshift(
             ...convertToDocx([
               {
                 type: PGRSectionChildrenTypeEnum.H2,
                 text: titleSection,
               },
             ]),
+          );
+
+        if (breakPage) sections.push(section);
+        else
+          sections[sections.length - 1] = [
             ...(sections[sections.length - 1] || []),
+            ...section,
           ];
       },
     );

@@ -18,6 +18,7 @@ import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import {
   UpsertCharacterizationDto,
   AddPhotoCharacterizationDto,
+  UpdatePhotoCharacterizationDto,
 } from '../../dto/characterization.dto';
 import { DeleteCharacterizationService } from '../../services/characterization/delete-characterization/delete-characterization.service';
 import { FindAllCharacterizationService } from '../../services/characterization/find-all-characterization/find-all-characterization.service';
@@ -25,6 +26,7 @@ import { UpsertCharacterizationService } from '../../services/characterization/u
 import { AddCharacterizationPhotoService } from '../../services/characterization/add-characterization-photo/add-characterization-photo.service';
 import { DeleteCharacterizationPhotoService } from '../../services/characterization/delete-characterization-photo/delete-characterization-photo.service';
 import { FindByIdCharacterizationService } from '../../services/characterization/find-by-id-characterization/find-by-id-characterization.service';
+import { UpdateCharacterizationPhotoService } from '../../services/characterization/update-characterization-photo/update-characterization-photo.service';
 
 @ApiTags('characterizations')
 @Controller('/company/:companyId/workspace/:workspaceId/characterizations')
@@ -36,6 +38,7 @@ export class CharacterizationController {
     private readonly addCharacterizationPhotoService: AddCharacterizationPhotoService,
     private readonly deleteCharacterizationPhotoService: DeleteCharacterizationPhotoService,
     private readonly findByIdCharacterizationService: FindByIdCharacterizationService,
+    private readonly updateCharacterizationPhotoService: UpdateCharacterizationPhotoService,
   ) {}
 
   @Get()
@@ -83,6 +86,17 @@ export class CharacterizationController {
       addPhotoCharacterizationDto,
       userPayloadDto,
       file,
+    );
+  }
+
+  @Post('/photo/:id')
+  async update(
+    @Body() updatePhotoCharacterizationDto: UpdatePhotoCharacterizationDto,
+    @Param('id') id: string,
+  ) {
+    return this.updateCharacterizationPhotoService.execute(
+      id,
+      updatePhotoCharacterizationDto,
     );
   }
 

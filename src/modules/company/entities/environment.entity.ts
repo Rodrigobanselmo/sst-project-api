@@ -44,6 +44,7 @@ export class EnvironmentEntity implements CompanyEnvironment {
   hierarchies?: HierarchyEntity[];
   riskData?: RiskFactorDataEntity[];
   noiseValue: string;
+  order: number;
   temperature: string;
   moisturePercentage: string;
   considerations: string[];

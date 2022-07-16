@@ -1,6 +1,12 @@
 import { CharacterizationTypeEnum } from '@prisma/client';
 import { Transform } from 'class-transformer';
-import { IsEnum, IsOptional, IsString, MaxLength } from 'class-validator';
+import {
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 
 import { StringCapitalizeTransform } from '../../../shared/transformers/string-capitalize';
 import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
@@ -39,6 +45,10 @@ export class UpsertCharacterizationDto {
   @IsOptional()
   photos?: string[];
 
+  @IsInt()
+  @IsOptional()
+  order?: number;
+
   @IsOptional()
   @IsString({ each: true })
   hierarchyIds?: string[];
@@ -49,6 +59,22 @@ export class AddPhotoCharacterizationDto {
   companyCharacterizationId: string;
 
   @Transform(StringCapitalizeTransform, { toClassOnly: true })
+  @IsString()
+  @MaxLength(100)
+  name: string;
+}
+
+export class UpdatePhotoCharacterizationDto {
+  @IsOptional()
+  @IsString()
+  id?: string;
+
+  @IsInt()
+  @IsOptional()
+  order: number;
+
+  @Transform(StringCapitalizeTransform, { toClassOnly: true })
+  @IsOptional()
   @IsString()
   @MaxLength(100)
   name: string;

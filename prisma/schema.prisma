@@ -204,6 +204,7 @@ model CompanyCharacterization {
   description String?
   created_at DateTime @default(now())
   considerations String[]
+  order Int?
   deleted_at DateTime? 
   updated_at  DateTime   @updatedAt
   type CharacterizationTypeEnum
@@ -222,6 +223,7 @@ model CompanyCharacterizationPhoto {
   isVertical Boolean @default(false)
   photoUrl String
   created_at DateTime @default(now())
+  order Int?
   deleted_at DateTime? 
   updated_at  DateTime   @updatedAt
   companyCharacterizationId String
@@ -233,6 +235,7 @@ model CompanyEnvironment {
   name String  
   photos CompanyEnvironmentPhoto[]
   description String?
+  order Int?
   considerations String[]
   created_at DateTime @default(now())
   deleted_at DateTime? 
@@ -258,6 +261,7 @@ model CompanyEnvironmentPhoto {
   id   String    @id @default(uuid())
   name String  
   isVertical Boolean @default(false)
+  order Int?
   photoUrl String
   created_at DateTime @default(now())
   deleted_at DateTime? 

@@ -196,6 +196,7 @@ export class HomoGroupRepository {
 
     await getAllHierarchiesChildren(AllChildrenHierarchies);
 
+    //only need this data on modal, can query only once
     homogeneousGroup.employeeCount = await this.prisma.employee.count({
       where: {
         companyId,

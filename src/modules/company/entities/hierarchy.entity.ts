@@ -60,6 +60,7 @@ export class HierarchyEntity implements Hierarchy {
   parent?: Hierarchy;
   children?: Hierarchy[];
   workspaceId?: string;
+  employeesCount?: number;
 
   constructor(partial: Partial<HierarchyEntity>) {
     Object.assign(this, partial);
