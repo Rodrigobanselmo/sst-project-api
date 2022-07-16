@@ -75,6 +75,7 @@ export class EpiRepository {
       if (value)
         where[key] = {
           contains: value,
+          mode: 'insensitive',
         };
     });
 

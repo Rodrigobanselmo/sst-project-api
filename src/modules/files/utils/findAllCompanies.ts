@@ -11,15 +11,29 @@ export const findAllCompanies = async (
 ) => {
   let data = [];
 
-  if (!isMaster)
-    data = await companyRepository.findAllRelatedByCompanyId(companyId, {
-      include: { primary_activity: true, secondary_activity: true },
-    });
+  if (!isMaster) {
+    const response = await companyRepository.findAllRelatedByCompanyId(
+      companyId,
+      {},
+      { take: 100000 },
+      {
+        include: { primary_activity: true, secondary_activity: true },
+      },
+    );
+    data = response.data;
+  }
 
-  if (isMaster)
-    data = await companyRepository.findAll({
-      include: { primary_activity: true, secondary_activity: true },
-    });
+  if (isMaster) {
+    const response = await companyRepository.findAll(
+      {},
+      { take: 100000 },
+      {
+        include: { primary_activity: true, secondary_activity: true },
+      },
+    );
+
+    data = response.data;
+  }
 
   const excelRows = await excelProvider.transformToExcelData(
     data,

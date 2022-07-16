@@ -5,6 +5,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -13,7 +14,10 @@ import { ApiTags } from '@nestjs/swagger';
 
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
-import { CreateCompanyDto } from '../../dto/create-company.dto';
+import {
+  CreateCompanyDto,
+  FindCompaniesDto,
+} from '../../dto/create-company.dto';
 import { UpdateCompanyDto } from '../../dto/update-company.dto';
 import { AddCompanyPhotoService } from '../../services/company/add-company-photo/add-company-photo.service';
 import { CopyCompanyService } from '../../services/company/copy-company/copy-company.service';
@@ -46,8 +50,11 @@ export class CompanyController {
   }
 
   @Get()
-  findAll(@User() userPayloadDto: UserPayloadDto) {
-    return this.findAllCompaniesService.execute(userPayloadDto);
+  findAll(
+    @User() userPayloadDto: UserPayloadDto,
+    @Query() query: FindCompaniesDto,
+  ) {
+    return this.findAllCompaniesService.execute(userPayloadDto, query);
   }
 
   @Get('cnpj/:cnpj')

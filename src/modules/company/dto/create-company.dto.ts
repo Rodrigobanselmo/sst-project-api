@@ -1,3 +1,4 @@
+import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
 import { CompanyTypesEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import {
@@ -126,4 +127,10 @@ export class CreateCompanyDto {
   @IsOptional()
   @IsString()
   email?: string;
+}
+
+export class FindCompaniesDto extends PaginationQueryDto {
+  @IsString()
+  @IsOptional()
+  search?: string;
 }

@@ -13,6 +13,7 @@ import { EmployeeEntity } from '../../entities/employee.entity';
 import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
 import { Prisma } from '@prisma/client';
 import { ErrorCompanyEnum } from '../../../../shared/constants/enum/errorMessage';
+import { onlyNumbers } from '@brazilian-utils/brazilian-utils';
 
 @Injectable()
 export class EmployeeRepository {
@@ -177,8 +178,12 @@ export class EmployeeRepository {
 
     if ('search' in query) {
       where.OR = [
-        { name: { contains: query.search } },
-        { cpf: { contains: query.search } },
+        { name: { contains: query.search, mode: 'insensitive' } },
+        {
+          cpf: {
+            contains: query.search ? onlyNumbers(query.search) || 'no' : '',
+          },
+        },
       ];
       delete query.search;
     }
@@ -187,6 +192,7 @@ export class EmployeeRepository {
       if (value)
         where[key] = {
           contains: value,
+          mode: 'insensitive',
         };
     });
 

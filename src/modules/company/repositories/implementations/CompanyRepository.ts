@@ -1,14 +1,19 @@
+import { PaginationQueryDto } from './../../../../shared/dto/pagination.dto';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
-import { CreateCompanyDto } from '../../dto/create-company.dto';
+import {
+  CreateCompanyDto,
+  FindCompaniesDto,
+} from '../../dto/create-company.dto';
 import { CompanyEntity } from '../../entities/company.entity';
 import { ICompanyRepository } from '../ICompanyRepository.types';
 import { v4 as uuidV4 } from 'uuid';
 import { UpdateCompanyDto } from '../../dto/update-company.dto';
 import { IPrismaOptions } from '../../../../shared/interfaces/prisma-options.types';
 import { Prisma } from '@prisma/client';
+import { onlyNumbers } from '@brazilian-utils/brazilian-utils';
 
 interface ICreateCompany extends CreateCompanyDto {
   companyId?: string;
@@ -427,55 +432,111 @@ export class CompanyRepository implements ICompanyRepository {
 
   async findAllRelatedByCompanyId(
     companyId: string,
-    options?: IPrismaOptions<{
-      primary_activity?: boolean;
-      secondary_activity?: boolean;
-    }>,
-  ): Promise<CompanyEntity[]> {
-    const include = options?.include || {};
+    query: FindCompaniesDto,
+    pagination: PaginationQueryDto,
+    options: Partial<Prisma.CompanyFindManyArgs> = { where: undefined },
+  ) {
+    const where = {
+      OR: [
+        { id: companyId },
+        {
+          receivingServiceContracts: {
+            some: { applyingServiceCompanyId: companyId },
+          },
+        },
+      ],
+      ...options?.where,
+    } as typeof options.where;
 
-    const company = await this.prisma.company.findUnique({
-      where: { id: companyId },
-      include: {
-        primary_activity: !!include?.primary_activity,
-        secondary_activity: !!include?.secondary_activity,
-        workspace: { include: { address: true } },
-      },
+    if ('search' in query) {
+      where.OR = [
+        { name: { contains: query.search, mode: 'insensitive' } },
+        {
+          cnpj: {
+            contains: query.search ? onlyNumbers(query.search) || 'no' : '',
+          },
+        },
+      ];
+      delete query.search;
+    }
+
+    Object.entries(query).forEach(([key, value]) => {
+      if (value)
+        where[key] = {
+          contains: value,
+          mode: 'insensitive',
+        };
     });
 
-    const companies = await this.prisma.contract.findMany({
-      where: { applyingServiceCompanyId: companyId },
-      include: {
-        receivingServiceCompany: true,
-      },
-    });
+    const response = await this.prisma.$transaction([
+      this.prisma.company.count({
+        where,
+      }),
+      this.prisma.company.findMany({
+        ...options,
+        where,
+        include: {
+          workspace: { include: { address: true } },
+          ...options?.include,
+        },
+        take: pagination.take || 20,
+        skip: pagination.skip || 0,
+      }),
+    ]);
 
-    return [
-      new CompanyEntity(company),
-      ...companies.map(
-        (applyingServiceCompany) =>
-          new CompanyEntity(applyingServiceCompany.receivingServiceCompany),
-      ),
-    ];
+    return {
+      data: response[1].map((company) => new CompanyEntity(company)),
+      count: response[0],
+    };
   }
 
   async findAll(
-    options?: IPrismaOptions<{
-      primary_activity?: boolean;
-      secondary_activity?: boolean;
-    }>,
-  ): Promise<CompanyEntity[]> {
-    const include = options?.include || {};
+    query: FindCompaniesDto,
+    pagination: PaginationQueryDto,
+    options: Partial<Prisma.CompanyFindManyArgs> = {},
+  ) {
+    const where = {} as typeof options.where;
 
-    const companies = await this.prisma.company.findMany({
-      include: {
-        primary_activity: !!include?.primary_activity,
-        secondary_activity: !!include?.secondary_activity,
-        workspace: { include: { address: true } },
-      },
+    if ('search' in query) {
+      where.OR = [
+        { name: { contains: query.search, mode: 'insensitive' } },
+        {
+          cnpj: {
+            contains: query.search ? onlyNumbers(query.search) || 'no' : '',
+          },
+        },
+      ];
+      delete query.search;
+    }
+
+    Object.entries(query).forEach(([key, value]) => {
+      if (value)
+        where[key] = {
+          contains: value,
+          mode: 'insensitive',
+        };
     });
 
-    return [...companies.map((company) => new CompanyEntity(company))];
+    const response = await this.prisma.$transaction([
+      this.prisma.company.count({
+        where,
+      }),
+      this.prisma.company.findMany({
+        ...options,
+        where,
+        include: {
+          workspace: { include: { address: true } },
+          ...options?.include,
+        },
+        take: pagination.take || 20,
+        skip: pagination.skip || 0,
+      }),
+    ]);
+
+    return {
+      data: response[1].map((company) => new CompanyEntity(company)),
+      count: response[0],
+    };
   }
 
   async findById(
