@@ -34,7 +34,6 @@ export class EnvironmentPhotoRepository {
     id,
     ...environmentPhotoDto
   }: UpdatePhotoEnvironmentDto): Promise<EnvironmentPhotoEntity> {
-    console.log(environmentPhotoDto);
     const environment = await this.prisma.companyEnvironmentPhoto.update({
       where: { id: id || 'no-id' },
       data: {

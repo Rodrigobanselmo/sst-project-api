@@ -42,7 +42,13 @@ enum StatusEnum {
   PROGRESS
   INACTIVE
   PENDING
+  PROCESSING
+  EXPIRED
+  VALID
+  INVALID
+  ERROR
   CANCELED
+  DONE
 }
 
 enum HomoTypeEnum {

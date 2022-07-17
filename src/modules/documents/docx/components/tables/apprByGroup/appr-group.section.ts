@@ -173,7 +173,6 @@ export const APPRByGroupTableSection = (
   });
 
   hierarchyDataHomoGroup.forEach((hierarchy) => {
-    console.log(hierarchy);
     const createTable = () => {
       const firstTable = firstRiskInventoryTableSection(
         riskFactorGroupData,

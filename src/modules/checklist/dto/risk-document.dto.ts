@@ -29,7 +29,7 @@ export class UpsertRiskDocumentDto {
   workspaceName: string;
 
   @IsString()
-  fileUrl: string;
+  fileUrl?: string;
 
   @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
   @IsString()

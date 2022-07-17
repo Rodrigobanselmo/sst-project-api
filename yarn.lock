@@ -5419,6 +5419,13 @@ sprintf-js@~1.0.2:
   resolved "https://registry.npmjs.org/sprintf-js/-/sprintf-js-1.0.3.tgz"
   integrity sha1-BOaSb2YolTVPPdAVIDYzuFcpfiw=
 
+sqs-consumer@^5.7.0:
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/sqs-consumer/-/sqs-consumer-5.7.0.tgz#d7c83516e0258d261caae199889e094bda93ac05"
+  integrity sha512-CjPzGsmmsKb6L0ia1WjbxjojjIHjVZ1FDK8s1MhEnf1eS8lJjuC28QEmcBpryQgsyaIcg1SgTsuicoZe008oQg==
+  dependencies:
+    debug "^4.3.1"
+
 ssf@~0.11.2:
   version "0.11.2"
   resolved "https://registry.npmjs.org/ssf/-/ssf-0.11.2.tgz"

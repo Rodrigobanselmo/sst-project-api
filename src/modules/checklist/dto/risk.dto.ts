@@ -100,6 +100,10 @@ export class UpdateRiskDto {
   @IsOptional()
   name?: string;
 
+  @IsNumber()
+  @IsOptional()
+  severity: number;
+
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsOptional()
   @IsString()

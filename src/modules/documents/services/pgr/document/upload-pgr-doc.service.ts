@@ -1,4 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { StatusEnum } from '@prisma/client';
 import { ISectionOptions, Packer } from 'docx';
 import fs from 'fs';
 import { v4 } from 'uuid';
@@ -45,8 +46,8 @@ export class PgrUploadService {
     private readonly professionalRepository: ProfessionalRepository,
     private readonly dayJSProvider: DayJSProvider,
   ) {}
-  async execute(upsertPgrDto: UpsertPgrDto, userPayloadDto: UserPayloadDto) {
-    const companyId = userPayloadDto.targetCompanyId;
+  async execute(upsertPgrDto: UpsertPgrDto) {
+    const companyId = upsertPgrDto.companyId;
     const workspaceId = upsertPgrDto.workspaceId;
 
     // eslint-disable-next-line prettier/prettier
@@ -54,7 +55,7 @@ export class PgrUploadService {
     // eslint-disable-next-line prettier/prettier
     const hierarchyHierarchy =  await this.hierarchyRepository.findAllDataHierarchyByCompany(companyId, workspaceId);
     // eslint-disable-next-line prettier/prettier
-    const versions = await (await this.riskDocumentRepository.findByRiskGroupAndCompany(upsertPgrDto.riskGroupId, companyId)).filter(riskDocument => riskDocument.version.includes('.0.0'));
+    const versions = (await this.riskDocumentRepository.findByRiskGroupAndCompany(upsertPgrDto.riskGroupId, companyId)).filter(riskDocument => riskDocument.version.includes('.0.0'));
 
     const workspace = await this.workspaceRepository.findById(workspaceId);
     const company = await this.companyRepository.findByIdAll(
@@ -85,6 +86,7 @@ export class PgrUploadService {
         },
       },
     );
+    console.log('done: query data');
 
     const logo = company.logoUrl
       ? await downloadImageFile(
@@ -99,6 +101,7 @@ export class PgrUploadService {
     // const environments = [];
     // const characterizations = [];
     // const photosPath = [];
+    console.log('done: photos');
 
     try {
       const {
@@ -120,6 +123,7 @@ export class PgrUploadService {
           homoGroupTree,
           upsertPgrDto,
         );
+      console.log('done: attachment');
 
       const version = new RiskDocumentEntity({
         version: upsertPgrDto.version,
@@ -132,7 +136,7 @@ export class PgrUploadService {
 
       versions.unshift(version);
 
-      const docId = v4();
+      const docId = upsertPgrDto.id || v4();
 
       const attachments = [
         new AttachmentEntity({
@@ -175,6 +179,7 @@ export class PgrUploadService {
       }).build();
 
       const doc = createBaseDocument(sections);
+      console.log('done: build document');
 
       const b64string = await Packer.toBase64String(doc);
       const buffer = Buffer.from(b64string, 'base64');
@@ -182,22 +187,33 @@ export class PgrUploadService {
       const fileName = this.getFileName(upsertPgrDto, riskGroupData);
 
       const url = await this.upload(buffer, fileName, upsertPgrDto);
+      console.log('done: upload');
 
       await this.riskDocumentRepository.upsert({
         ...upsertPgrDto,
         id: docId,
         companyId: company.id,
         fileUrl: url,
+        status: StatusEnum.DONE,
         attachments: attachments,
       });
 
       // return doc; //?remove
 
       [logo, ...photosPath].forEach((path) => path && fs.unlinkSync(path));
+      console.log('done: unlink photos');
 
       return { buffer, fileName };
     } catch (error) {
       [logo, ...photosPath].forEach((path) => path && fs.unlinkSync(path));
+      console.log('error: unlink photos');
+
+      if (upsertPgrDto.id)
+        await this.riskDocumentRepository.upsert({
+          ...upsertPgrDto,
+          status: StatusEnum.ERROR,
+        });
+
       throw error;
     }
   }

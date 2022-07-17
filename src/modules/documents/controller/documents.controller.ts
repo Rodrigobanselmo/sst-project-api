@@ -3,6 +3,7 @@ import { Body, Controller, Get, Param, Post, Res } from '@nestjs/common';
 import { User } from '../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../shared/dto/user-payload.dto';
 import { UpsertPgrDto } from '../dto/pgr.dto';
+import { AddQueuePGRDocumentService } from '../services/pgr/document/add-queue-pgr-doc.service';
 import { PgrDownloadAttachmentsService } from '../services/pgr/document/download-pgr-attachment-doc.service';
 import { PgrDownloadService } from '../services/pgr/document/download-pgr-doc.service';
 import { PgrUploadService } from '../services/pgr/document/upload-pgr-doc.service';
@@ -15,6 +16,7 @@ export class DocumentsController {
     private readonly pgrUploadService: PgrUploadTableService,
     private readonly pgrDownloadDocService: PgrDownloadService,
     private readonly pgrUploadDocService: PgrUploadService,
+    private readonly addQueuePGRDocumentService: AddQueuePGRDocumentService,
   ) {}
 
   @Get('/:docId/attachment/:attachmentId/:companyId?')
@@ -76,13 +78,23 @@ export class DocumentsController {
   ) {
     // await this.pgrUploadService.execute(upsertPgrDto, userPayloadDto);
     // res.send('ok');
+    const { buffer: file, fileName } = await this.pgrUploadDocService.execute({
+      ...upsertPgrDto,
+      companyId: userPayloadDto.targetCompanyId,
+    });
+    res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
+    res.send(file);
+  }
 
-    const { buffer: file, fileName } = await this.pgrUploadDocService.execute(
+  @Post('/add-queue')
+  async addQueuePGRDoc(
+    @User() userPayloadDto: UserPayloadDto,
+    @Body() upsertPgrDto: UpsertPgrDto,
+  ) {
+    return this.addQueuePGRDocumentService.execute(
       upsertPgrDto,
       userPayloadDto,
     );
-    res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
-    res.send(file);
   }
 }
 

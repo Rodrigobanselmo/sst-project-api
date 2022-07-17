@@ -19,11 +19,6 @@ export const booleanVariables = (
   hierarchy: Map<string, HierarchyMapData>,
   document: RiskFactorGroupDataEntity,
 ) => {
-  console.log(
-    (document.data || []).find(
-      (riskData) => riskData.riskFactor.type == RiskFactorsEnum.ACI,
-    ),
-  );
   return {
     [VariablesPGREnum.IS_Q5]: document.isQ5 ? 'true' : '',
     [VariablesPGREnum.HAS_RISK_FIS]: (document.data || []).find(

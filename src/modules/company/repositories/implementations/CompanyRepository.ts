@@ -437,35 +437,43 @@ export class CompanyRepository implements ICompanyRepository {
     options: Partial<Prisma.CompanyFindManyArgs> = { where: undefined },
   ) {
     const where = {
-      OR: [
-        { id: companyId },
+      AND: [
         {
-          receivingServiceContracts: {
-            some: { applyingServiceCompanyId: companyId },
-          },
+          OR: [
+            { id: companyId },
+            {
+              receivingServiceContracts: {
+                some: { applyingServiceCompanyId: companyId },
+              },
+            },
+          ],
+          ...options?.where,
         },
       ],
-      ...options?.where,
     } as typeof options.where;
 
     if ('search' in query) {
-      where.OR = [
-        { name: { contains: query.search, mode: 'insensitive' } },
-        {
-          cnpj: {
-            contains: query.search ? onlyNumbers(query.search) || 'no' : '',
+      (where.AND as any).push({
+        OR: [
+          { name: { contains: query.search, mode: 'insensitive' } },
+          {
+            cnpj: {
+              contains: query.search ? onlyNumbers(query.search) || 'no' : '',
+            },
           },
-        },
-      ];
+        ],
+      } as typeof options.where);
       delete query.search;
     }
 
     Object.entries(query).forEach(([key, value]) => {
       if (value)
-        where[key] = {
-          contains: value,
-          mode: 'insensitive',
-        };
+        (where.AND as any).push({
+          [key]: {
+            contains: value,
+            mode: 'insensitive',
+          },
+        } as typeof options.where);
     });
 
     const response = await this.prisma.$transaction([

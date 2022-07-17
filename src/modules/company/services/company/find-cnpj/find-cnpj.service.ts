@@ -11,14 +11,12 @@ import { ICnpjBrasilResponse } from '../../../../../modules/company/interfaces/c
 export class FindCnpjService {
   async execute(cnpj: string) {
     const cnpjString = cnpj.replace(/[ˆ\D ]/g, '');
-    console.log(cnpjString);
     let response: AxiosResponse<ICnpjBrasilResponse, any>;
     try {
       response = await axios.get<ICnpjBrasilResponse>(
         `https://brasilapi.com.br/api/cnpj/v1/${cnpjString}`,
       );
     } catch (error) {
-      console.log(error);
       if (error.code === 'ERR_BAD_REQUEST')
         throw new BadRequestException(error.response.data.message);
 

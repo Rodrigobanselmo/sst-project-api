@@ -58,7 +58,7 @@ export class RiskFactorGroupDataEntity implements RiskFactorGroupData {
     this.isQ5 = false;
     Object.assign(this, partial);
 
-    if (partial.data) {
+    if (partial?.data) {
       this.data = partial.data.map((d) => new RiskFactorDataEntity(d));
     }
 

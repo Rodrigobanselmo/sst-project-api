@@ -12,6 +12,8 @@ import { PgrUploadTableService } from './services/pgr/tables/upload-pgr-table.se
 import { DayJSProvider } from '../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { UsersModule } from '../users/users.module';
 import { PgrDownloadAttachmentsService } from './services/pgr/document/download-pgr-attachment-doc.service';
+import { AddQueuePGRDocumentService } from './services/pgr/document/add-queue-pgr-doc.service';
+import { SendSMSConsumer } from './consumers/pgr/documents.consumer';
 
 @Module({
   controllers: [DocumentsController],
@@ -25,6 +27,8 @@ import { PgrDownloadAttachmentsService } from './services/pgr/document/download-
     DayJSProvider,
     AmazonStorageProvider,
     PgrDownloadAttachmentsService,
+    AddQueuePGRDocumentService,
+    SendSMSConsumer,
   ],
 })
 export class DocumentsModule {}
