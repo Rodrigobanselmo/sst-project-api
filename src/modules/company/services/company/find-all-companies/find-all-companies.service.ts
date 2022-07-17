@@ -1,8 +1,8 @@
-import { FindCompaniesDto } from './../../../dto/create-company.dto';
 import { Injectable } from '@nestjs/common';
+
 import { CompanyRepository } from '../../../../../modules/company/repositories/implementations/CompanyRepository';
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
-import { simulateAwait } from 'src/shared/utils/simulateAwait';
+import { FindCompaniesDto } from './../../../dto/create-company.dto';
 
 @Injectable()
 export class FindAllCompaniesService {
@@ -12,7 +12,6 @@ export class FindAllCompaniesService {
     user: UserPayloadDto,
     { skip, take, ...query }: FindCompaniesDto,
   ) {
-    await simulateAwait(1000);
     if (!user.isMaster)
       return await this.companyRepository.findAllRelatedByCompanyId(
         user.companyId,

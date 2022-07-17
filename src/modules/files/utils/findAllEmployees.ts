@@ -1,9 +1,12 @@
-import { Hierarchy, HierarchyEnum, StatusEnum } from '@prisma/client';
-import { WorkspaceRepository } from '../../../modules/company/repositories/implementations/WorkspaceRepository';
-import { IEmployeeSheet } from '../../../shared/constants/workbooks/sheets/employees/employeesSheet.constant';
+import { HierarchyEnum, StatusEnum } from '@prisma/client';
+import { hierarchyList } from '../../../shared/constants/lists/hierarchy.list';
+
+import { HierarchyEntity } from '../../../modules/company/entities/hierarchy.entity';
 import { CompanyRepository } from '../../../modules/company/repositories/implementations/CompanyRepository';
 import { HierarchyRepository } from '../../../modules/company/repositories/implementations/HierarchyRepository';
+import { WorkspaceRepository } from '../../../modules/company/repositories/implementations/WorkspaceRepository';
 import { ICompanyUniqueSheet } from '../../../shared/constants/workbooks/sheets/companyUnique/companyUniqueSheet.constant';
+import { IEmployeeSheet } from '../../../shared/constants/workbooks/sheets/employees/employeesSheet.constant';
 import { ExcelProvider } from '../../../shared/providers/ExcelProvider/implementations/ExcelProvider';
 import { getPathIdTreeMap } from '../../../shared/utils/getPathIdTreeMap';
 import { statusEnumTranslateUsToBr } from '../../../shared/utils/translate/statusEnum.translate';
@@ -29,6 +32,17 @@ export const findAllEmployees = async (
 
   const hierarchies = await hierarchyRepository.findAllHierarchyByCompany(
     companyId,
+    {
+      include: {
+        hierarchyOnHomogeneous: {
+          include: {
+            homogeneousGroup: {
+              include: { characterization: true, environment: true },
+            },
+          },
+        },
+      },
+    },
   );
 
   const hierarchyTree =
@@ -45,13 +59,29 @@ export const findAllEmployees = async (
         newEmployee.status,
       ) as StatusEnum;
 
-      Object.values(HierarchyEnum).forEach((type) => {
+      hierarchyList.forEach((type) => {
         const hierarchy = pathsHierarchy.find(
           (h) => h.type === type,
-        ) as Hierarchy;
+        ) as HierarchyEntity;
 
         if (hierarchy) {
+          //* update here to add more on download
           newEmployee[type.toLocaleLowerCase()] = hierarchy.name;
+
+          if (hierarchy.homogeneousGroups) {
+            const foundHomo = hierarchy.homogeneousGroups
+              .reverse()
+              .find((hierarchy) => !hierarchy.type);
+
+            (newEmployee as any).ghoName = foundHomo?.name || '';
+            (newEmployee as any).ghoDescription = foundHomo?.description || '';
+          }
+
+          if ([HierarchyEnum.OFFICE].includes(type.toUpperCase() as any)) {
+            (newEmployee as any).description = hierarchy?.description || '';
+            (newEmployee as any).realDescription =
+              hierarchy?.realDescription || '';
+          }
         }
       });
 

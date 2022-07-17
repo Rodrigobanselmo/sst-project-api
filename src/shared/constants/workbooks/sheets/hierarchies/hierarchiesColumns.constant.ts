@@ -59,7 +59,7 @@ export const hierarchiesColumnsConstant = [
     databaseName: 'sector',
     excelName: 'Setor',
     isArray: false,
-    required: false,
+    required: true,
     checkHandler: checkIsString,
   },
   {
@@ -100,6 +100,7 @@ export const hierarchiesColumnsConstant = [
   {
     databaseName: 'ghoDescription',
     excelName: 'Descrição do GSE',
+    notes: ['somente conecta a um GSE, para remover-lo deve-se usar o sistema'],
     isArray: false,
     required: false,
     checkHandler: checkIsString,

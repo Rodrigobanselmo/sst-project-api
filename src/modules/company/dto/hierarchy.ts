@@ -7,6 +7,7 @@ import {
   IsOptional,
   IsString,
   MaxLength,
+  ValidateIf,
   ValidateNested,
 } from 'class-validator';
 import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
@@ -44,9 +45,16 @@ export class CreateHierarchyDto {
   ghoName: string;
 
   @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
+  @ValidateIf((customer) => customer.description !== '')
   @IsString()
   @IsOptional()
   description?: string;
+
+  @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
+  @ValidateIf((customer) => customer.description !== '')
+  @IsString()
+  @IsOptional()
+  realDescription?: string;
 
   @IsString({ each: true })
   workspaceIds?: string[];
@@ -111,6 +119,17 @@ export class UpsertHierarchyDto {
   @IsString()
   @IsOptional()
   parentId?: string;
+
+  @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
+  @ValidateIf((customer) => customer.description !== '')
+  @IsString()
+  @IsOptional()
+  realDescription?: string;
 }
 
 export class UpsertManyHierarchyDto {

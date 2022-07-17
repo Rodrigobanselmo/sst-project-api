@@ -20,6 +20,7 @@ import { asyncEach } from '../../../../../shared/utils/asyncEach';
 import { DatabaseTableEntity } from '../../../entities/databaseTable.entity';
 import { DatabaseTableRepository } from '../../../repositories/implementations/DatabaseTableRepository';
 import { WorkspaceRepository } from '../../../../../modules/company/repositories/implementations/WorkspaceRepository';
+import { hierarchyList } from '../../../../../shared/constants/lists/hierarchy.list';
 
 @Injectable()
 export class UploadEmployeesService {
@@ -126,7 +127,7 @@ export class UploadEmployeesService {
       );
     };
 
-    await asyncEach(Object.keys(HierarchyEnum), upsertHierarchy);
+    await asyncEach(hierarchyList, upsertHierarchy);
 
     const employees = employeesData.map((employee) => {
       if (employee.ghoName) delete employee.ghoName;

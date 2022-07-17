@@ -538,6 +538,7 @@ export class CompanyRepository implements ICompanyRepository {
         },
         take: pagination.take || 20,
         skip: pagination.skip || 0,
+        orderBy: { name: 'asc' },
       }),
     ]);
 

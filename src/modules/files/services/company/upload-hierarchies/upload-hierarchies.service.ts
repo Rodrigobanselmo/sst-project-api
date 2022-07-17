@@ -1,3 +1,4 @@
+import { hierarchyList } from './../../../../../shared/constants/lists/hierarchy.list';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { HierarchyEnum } from '@prisma/client';
 
@@ -139,7 +140,7 @@ export class UploadHierarchiesService {
       );
     };
 
-    await asyncEach(Object.keys(HierarchyEnum), upsertHierarchy);
+    await asyncEach(hierarchyList, upsertHierarchy);
 
     // return await this.uploadExcelProvider.newTableData({
     //   findAll: (sheet) =>

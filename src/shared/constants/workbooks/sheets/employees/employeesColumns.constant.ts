@@ -66,7 +66,7 @@ export const employeesColumnsConstant = [
     databaseName: 'sector',
     excelName: 'Setor',
     isArray: false,
-    required: false,
+    required: true,
     checkHandler: checkIsString,
   },
   {
@@ -109,7 +109,9 @@ export const employeesColumnsConstant = [
     excelName: 'GSE',
     isArray: false,
     required: false,
-    notes: 'Nome do grupo similar de exposição referente ao cargo',
+    notes: [
+      'somente conecta um GSE ao cargo, para remover-lo deve-se usar o sistema',
+    ],
     checkHandler: checkIsString,
   },
   {

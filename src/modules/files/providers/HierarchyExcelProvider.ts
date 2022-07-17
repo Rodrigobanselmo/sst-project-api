@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { Hierarchy, HierarchyEnum } from '@prisma/client';
-import { HierarchyEntity } from '../../../modules/company/entities/hierarchy.entity';
+import { HierarchyEnum } from '@prisma/client';
 import { v4 } from 'uuid';
+
+import { HierarchyEntity } from '../../../modules/company/entities/hierarchy.entity';
 import { removeDuplicate } from '../../../shared/utils/removeDuplicate';
 
 type hierarchyMap = Record<
   string,
-  Hierarchy & {
+  HierarchyEntity & {
     children: (string | number)[];
   }
 >;
@@ -135,6 +136,10 @@ export class HierarchyExcelProvider {
       if (!newHierarchy[allHierarchy.id])
         newHierarchy[allHierarchy.id] = {
           ...allHierarchy,
+          description: hierarchy?.description ?? allHierarchy.description,
+          realDescription:
+            hierarchy?.realDescription ?? allHierarchy.realDescription,
+          ghoName: hierarchy?.ghoName ?? allHierarchy.ghoName,
           fromOld: true,
         };
 

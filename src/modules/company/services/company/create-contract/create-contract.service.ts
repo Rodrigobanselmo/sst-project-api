@@ -11,10 +11,10 @@ export class CreateContractService {
     private readonly companyRepository: CompanyRepository,
     private readonly licenseRepository: LicenseRepository,
   ) {}
-  async execute(
-    { ...createContractDto }: CreateCompanyDto,
-    user: UserPayloadDto,
-  ) {
+  async execute(createContractDto: CreateCompanyDto, user: UserPayloadDto) {
+    if ('isConsulting' in createContractDto)
+      delete createContractDto.isConsulting;
+
     const license = await this.licenseRepository.findByCompanyId(
       user.companyId,
     );

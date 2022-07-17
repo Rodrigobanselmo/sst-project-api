@@ -19,7 +19,7 @@ export class HierarchyRepository {
     ghoNames?: Record<string, string>,
   ): Promise<HierarchyEntity[]> {
     let homogeneousGroup = [];
-
+    console.log(upsertHierarchyMany);
     //create homogenies group
     if (upsertHierarchyMany && upsertHierarchyMany.length > 0)
       homogeneousGroup = ghoNames
@@ -306,6 +306,19 @@ export class HierarchyRepository {
 
         if (!returnWorkspace) delete (hierarchy as any).workspaces;
       }
+
+      if ('hierarchyOnHomogeneous' in hierarchy) {
+        const homogeneousGroup = { ...hierarchy } as HierarchyEntity;
+        if ((hierarchy as any).hierarchyOnHomogeneous)
+          homogeneousGroup.homogeneousGroups = (
+            hierarchy as any
+          ).hierarchyOnHomogeneous.map((homo) => ({
+            ...homo.homogeneousGroup,
+            workspaceId: homo.workspaceId,
+          }));
+        return new HierarchyEntity(homogeneousGroup);
+      }
+
       return new HierarchyEntity(hierarchy);
     });
   }
