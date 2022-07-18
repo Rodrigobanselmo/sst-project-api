@@ -47,6 +47,8 @@ export const hierarchiesColumnsConstant = [
     isArray: false,
     required: false,
     checkHandler: checkIsString,
+    notes:
+      'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
   },
   {
     databaseName: 'management',
@@ -54,6 +56,8 @@ export const hierarchiesColumnsConstant = [
     isArray: false,
     required: false,
     checkHandler: checkIsString,
+    notes:
+      'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
   },
   {
     databaseName: 'sector',
@@ -61,6 +65,8 @@ export const hierarchiesColumnsConstant = [
     isArray: false,
     required: true,
     checkHandler: checkIsString,
+    notes:
+      'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
   },
   {
     databaseName: 'sub_sector',
@@ -68,6 +74,8 @@ export const hierarchiesColumnsConstant = [
     isArray: false,
     required: false,
     checkHandler: checkIsString,
+    notes:
+      'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
   },
   {
     databaseName: 'office',
@@ -75,6 +83,8 @@ export const hierarchiesColumnsConstant = [
     isArray: false,
     required: true,
     checkHandler: checkIsString,
+    notes:
+      'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
   },
   {
     databaseName: 'sub_office',
@@ -82,6 +92,8 @@ export const hierarchiesColumnsConstant = [
     isArray: false,
     required: false,
     checkHandler: checkIsString,
+    notes:
+      'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
   },
   {
     databaseName: 'description',

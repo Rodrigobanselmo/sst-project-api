@@ -23,7 +23,7 @@ export const bulletTextIterable = (
         [
           {
             type: PGRSectionChildrenTypeEnum.BULLET,
-            text: `**??${VariablesPGREnum.BULLET_TEXT}??**`,
+            text: `??${VariablesPGREnum.BULLET_TEXT}??`,
             level: 0,
           },
         ],

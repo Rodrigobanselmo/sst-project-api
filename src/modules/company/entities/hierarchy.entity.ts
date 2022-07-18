@@ -65,4 +65,5 @@ export class HierarchyEntity implements Hierarchy {
   constructor(partial: Partial<HierarchyEntity>) {
     Object.assign(this, partial);
   }
+  refName: string;
 }

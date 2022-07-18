@@ -367,6 +367,7 @@ model Hierarchy {
   name String   
   companyId String
   parentId  String?
+  refName  String?
   workspaces Workspace[]
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   parent Hierarchy?  @relation(name: "children_parent", fields: [parentId], references: [id], onDelete: Cascade, onUpdate: Cascade)

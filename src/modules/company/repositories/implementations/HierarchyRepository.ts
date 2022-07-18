@@ -74,6 +74,7 @@ export class HierarchyRepository {
           children,
           ghoName,
           employeesIds,
+          name,
           ...upsertHierarchy
         }) => {
           const HierarchyOnHomo = workspaceIds
@@ -91,6 +92,8 @@ export class HierarchyRepository {
           return this.prisma.hierarchy.upsert({
             create: {
               ...upsertHierarchy,
+              name: name.split('//')[0],
+              ...(name.split('//')[1] ? { refName: name.split('//')[1] } : {}),
               id,
               company: { connect: { id: companyId } },
               employees:
@@ -114,6 +117,8 @@ export class HierarchyRepository {
             },
             update: {
               ...upsertHierarchy,
+              name: name.split('//')[0],
+              ...(name.split('//')[1] ? { refName: name.split('//')[1] } : {}),
               workspaces: !workspaceIds
                 ? undefined
                 : {
@@ -167,6 +172,7 @@ export class HierarchyRepository {
       parentId,
       id,
       children,
+      name,
       employeesIds,
       ...updateHierarchy
     }: UpdateHierarchyDto,
@@ -176,6 +182,8 @@ export class HierarchyRepository {
       where: { id },
       data: {
         ...updateHierarchy,
+        name: name.split('//')[0],
+        ...(name.split('//')[1] ? { refName: name.split('//')[1] } : {}),
         workspaces: !workspaceIds
           ? undefined
           : {
@@ -211,6 +219,7 @@ export class HierarchyRepository {
       workspaceIds,
       parentId,
       children,
+      name,
       employeesIds,
       ...upsertHierarchy
     }: CreateHierarchyDto & { id?: string },
@@ -220,6 +229,8 @@ export class HierarchyRepository {
       create: {
         ...upsertHierarchy,
         id,
+        name: name.split('//')[0],
+        ...(name.split('//')[1] ? { refName: name.split('//')[1] } : {}),
         company: { connect: { id: companyId } },
         workspaces: {
           connect: workspaceIds.map((id) => ({
@@ -242,6 +253,8 @@ export class HierarchyRepository {
       },
       update: {
         ...upsertHierarchy,
+        name: name.split('//')[0],
+        ...(name.split('//')[1] ? { refName: name.split('//')[1] } : {}),
         employees:
           employeesIds && employeesIds.length
             ? {

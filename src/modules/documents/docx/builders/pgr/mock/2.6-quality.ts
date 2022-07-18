@@ -60,7 +60,7 @@ export const qualitySection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: 'A estimativa do Risco Ocupacional para os FRQ foi baseada em observações “in loco” dos ambientes, setores, postos de trabalho, equipamentos dos processo e no julgamento profissional da equipe de avaliação, considerando variávei tais como: concentração dos Fatores de Riscos, tempo de permanência junto à fonte de emissão e tipo de atividade;.',
+          text: 'A estimativa do Risco Ocupacional para os FRQ foi baseada em observações “in loco” dos ambientes, setores, postos de trabalho, equipamentos dos processos e no julgamento profissional da equipe de avaliação, considerando variável tais como: concentração dos Fatores de Riscos, tempo de permanência junto à fonte de emissão e tipo de atividade.',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -116,7 +116,7 @@ export const qualitySection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '\nQuanto aos perigos de acidante, foram considerados para avaliação qualitativa as situações listadas abaixo:',
+          text: '\nQuanto aos perigos de acidente, foram considerados para avaliação qualitativa as situações listadas abaixo:',
         },
         {
           type: PGRSectionChildrenTypeEnum.ITERABLE_QUALITY_ACI,

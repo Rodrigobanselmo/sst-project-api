@@ -312,8 +312,8 @@ export class CopyCompanyService {
             const sameWorkspaceFrom = hierarchyFrom.workspaces.find(
               (workspaceFrom) => {
                 const isTheSame =
-                  workspaceFrom.name.toLocaleLowerCase() ===
-                  workspace.name.toLocaleLowerCase();
+                  workspaceFrom.name.toLowerCase() ===
+                  workspace.name.toLowerCase();
                 if (isTheSame) equalWorkspace[workspaceFrom.id] = workspace;
 
                 return isTheSame;
@@ -321,8 +321,10 @@ export class CopyCompanyService {
             );
 
             const sameName =
-              hierarchyFrom.name.toLocaleLowerCase() ===
-              targetHierarchy.name.toLocaleLowerCase();
+              hierarchyFrom.name.toLowerCase() ===
+                targetHierarchy.name.toLowerCase() ||
+              hierarchyFrom.name.toLowerCase() ===
+                (targetHierarchy.refName || '').toLowerCase();
 
             const sameParent = targetHierarchy.parentId
               ? equalHierarchy[
