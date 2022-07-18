@@ -40,15 +40,16 @@ class FirebaseProvider {
 
   async validateGoogleToken(token: string) {
     const credential = GoogleAuthProvider.credential(token);
-    signInWithCredential(this.firebaseAuth, credential)
-      .then((result) => {
-        console.log(result);
-      })
-      .catch((error) => {
-        const errorMessage = error.message;
+    const result = await signInWithCredential(
+      this.firebaseAuth,
+      credential,
+    ).catch((error) => {
+      const errorMessage = error.message;
 
-        throw new InternalServerErrorException(errorMessage);
-      });
+      throw new InternalServerErrorException(errorMessage);
+    });
+
+    return result;
   }
 }
 

@@ -12,10 +12,7 @@ async function main() {
     //     companies: { connect: { id: 'd1309cad-19d4-4102-9bf9-231f91095c20' } },
     //   },
     // });
-    await deleteCompany('c9e42b34-2b6c-4f4f-ae00-59832ff22341', prisma);
-    await deleteCompany('baa8c370-4e7a-47f2-a9dc-4dd7175e7fcc', prisma);
-    await deleteCompany('8d0da9db-4667-4432-95a8-36c12fafc40f', prisma);
-    await deleteCompany('7fbdf94f-90e8-4030-a9bb-ce4c896ab6de', prisma);
+    await deleteCompany('b318ffa6-c8b0-496b-983f-63fe56fb0822', prisma);
   } catch (error) {
     console.log(error);
     console.log('error: end');

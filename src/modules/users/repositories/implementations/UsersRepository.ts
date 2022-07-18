@@ -70,4 +70,13 @@ export class UsersRepository implements IUsersRepository {
     if (!user) return;
     return new UserEntity(user);
   }
+
+  async findByGoogleExternalId(id: string) {
+    const user = await this.prisma.user.findFirst({
+      where: { googleExternalId: id },
+      include: { companies: true },
+    });
+    if (!user) return;
+    return new UserEntity(user);
+  }
 }

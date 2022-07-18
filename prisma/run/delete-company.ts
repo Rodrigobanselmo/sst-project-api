@@ -1,6 +1,15 @@
 import { PrismaClient } from '@prisma/client';
 
 export const deleteCompany = async (id: string, prisma: PrismaClient) => {
+  await prisma.riskFactorData.deleteMany({
+    where: { companyId: id },
+  });
+  await prisma.riskFactorGroupData.deleteMany({
+    where: { companyId: id },
+  });
+  await prisma.databaseTable.deleteMany({
+    where: { companyId: id },
+  });
   await prisma.contract.deleteMany({
     where: { receivingServiceCompanyId: id },
   });

@@ -29,6 +29,17 @@ export class UpdateUserService {
     const userData = await this.userRepository.findById(id);
     if (!userData) throw new BadRequestException(`user #${id} not found`);
 
+    if (restUpdateUserDto.googleExternalId) {
+      const user = await this.userRepository.findByGoogleExternalId(
+        restUpdateUserDto.googleExternalId,
+      );
+      if (user && user.id !== id) {
+        await this.userRepository.update(user.id, {
+          googleExternalId: null,
+        });
+      }
+    }
+
     if (password) {
       if (!oldPassword) throw new BadRequestException(`Old password missing`);
 

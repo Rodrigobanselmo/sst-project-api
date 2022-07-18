@@ -10,12 +10,13 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { Public } from '../../../shared/decorators/public.decorator';
 import { ForgotPasswordDto } from '../dto/forgot-password';
-import { LoginUserDto } from '../dto/login-user.dto';
+import { LoginGoogleUserDto, LoginUserDto } from '../dto/login-user.dto';
 import { RefreshTokenDto } from '../dto/refresh-token.dto';
 import { DeleteAllExpiredService } from '../services/delete-all-expired/delete-all-expired.service';
 import { RefreshTokenService } from '../services/refresh-token/refresh-token.service';
 import { SendForgotPassMailService } from '../services/send-forgot-pass-mail/send-forgot-pass-mail.service';
 import { SessionService } from '../services/session/session.service';
+import { VerifyGoogleLoginService } from '../services/verify-google-login/verify-google-login.service';
 
 @ApiTags('Authentication')
 @Controller()
@@ -25,6 +26,7 @@ export class AuthController {
     private readonly refreshTokenService: RefreshTokenService,
     private readonly sendForgotPassMailService: SendForgotPassMailService,
     private readonly deleteAllExpiredRefreshTokensService: DeleteAllExpiredService,
+    private readonly verifyGoogleLoginService: VerifyGoogleLoginService,
   ) {}
 
   @Public()
@@ -32,6 +34,14 @@ export class AuthController {
   @Post('session')
   async session(@Body() loginUserDto: LoginUserDto) {
     return this.sessionService.execute(loginUserDto);
+  }
+
+  @Public()
+  @Post('session/google')
+  async google(@Body() loginUserDto: LoginGoogleUserDto) {
+    const user = await this.verifyGoogleLoginService.execute(loginUserDto);
+
+    return this.sessionService.execute({ email: user.email, userEntity: user });
   }
 
   @Public()

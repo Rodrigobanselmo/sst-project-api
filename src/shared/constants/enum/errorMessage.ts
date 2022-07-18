@@ -22,6 +22,7 @@ export enum ErrorInvitesEnum {
   TOKEN_NOT_VALID_EMAIL = 'O Convite não é válido para esse email',
   FORBIDDEN_INSUFFICIENT_PERMISSIONS = 'Você não tem permissão para criar um usuário com essas credênciais',
   USER_ALREADY_EXIST = 'Usuário já cadastrado',
+  GOOGLE_USER_NOT_EXIST = 'Nenhum usuário econtrado que esteja vinculado a esta conta Google',
 }
 
 export enum ErrorChecklistEnum {

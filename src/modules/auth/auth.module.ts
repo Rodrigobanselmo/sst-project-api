@@ -3,6 +3,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 
 import { DayJSProvider } from '../../shared/providers/DateProvider/implementations/DayJSProvider';
+import { FirebaseProvider } from '../../shared/providers/FirebaseProvider/FirebaseProvider';
 import { HashProvider } from '../../shared/providers/HashProvider/implementations/HashProvider';
 import { SendGridProvider } from '../../shared/providers/MailProvider/implementations/SendGrid/SendGridProvider';
 import { JwtTokenProvider } from '../../shared/providers/TokenProvider/implementations/JwtTokenProvider';
@@ -14,6 +15,7 @@ import { DeleteAllExpiredService } from './services/delete-all-expired/delete-al
 import { RefreshTokenService } from './services/refresh-token/refresh-token.service';
 import { SendForgotPassMailService } from './services/send-forgot-pass-mail/send-forgot-pass-mail.service';
 import { SessionService } from './services/session/session.service';
+import { VerifyGoogleLoginService } from './services/verify-google-login/verify-google-login.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
@@ -39,6 +41,8 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     JwtStrategy,
     SendForgotPassMailService,
     SendGridProvider,
+    VerifyGoogleLoginService,
+    FirebaseProvider,
   ],
   exports: [SessionService],
 })

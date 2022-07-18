@@ -1,3 +1,4 @@
+import { UserEntity } from './../../../users/entities/user.entity';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { classToClass } from 'class-transformer';
 
@@ -17,8 +18,15 @@ export class SessionService {
     private readonly jwtTokenProvider: JwtTokenProvider,
   ) {}
 
-  async execute({ email, password }: LoginUserDto) {
-    const user = await this.validateUser(email, password);
+  async execute({
+    email,
+    password,
+    userEntity,
+  }: LoginUserDto & { userEntity?: UserEntity }) {
+    const user = userEntity
+      ? userEntity
+      : await this.validateUser(email, password);
+
     const companies = user.companies
       .map(({ companyId, permissions, roles, status }) => {
         if (status.toUpperCase() !== 'ACTIVE') return null;

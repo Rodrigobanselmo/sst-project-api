@@ -27,6 +27,7 @@ import { FindAllByEmailService } from './services/invites/find-by-email/find-by-
 import { ProfessionalRepository } from './repositories/implementations/ProfessionalRepository';
 import { FindAllProfessionalsByCompanyService } from './services/professionals/find-all/find-all.service';
 import { ProfessionalsController } from './controller/professionals/professionals.controller';
+import { FirebaseProvider } from '../../shared/providers/FirebaseProvider/FirebaseProvider';
 
 @Module({
   controllers: [UsersController, InvitesController, ProfessionalsController],
@@ -55,6 +56,7 @@ import { ProfessionalsController } from './controller/professionals/professional
     FindAllByEmailService,
     ProfessionalRepository,
     FindAllProfessionalsByCompanyService,
+    FirebaseProvider,
   ],
   exports: [UsersRepository, ProfessionalRepository],
 })
