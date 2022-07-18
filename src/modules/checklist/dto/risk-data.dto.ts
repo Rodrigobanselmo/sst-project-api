@@ -42,7 +42,7 @@ export class UpsertRiskDataDto {
   @IsString()
   riskId: string;
 
-  @ValidateIf((o) => !o.homogeneousGroupId || o.hierarchyId)
+  @ValidateIf((o) => !o.homogeneousGroupId || o.hierarchyId) //oneOf
   @IsString()
   hierarchyId?: string;
 
@@ -150,6 +150,9 @@ export class UpsertManyRiskDataDto {
   @IsInt({ each: true })
   @IsOptional()
   epis?: number[];
+
+  @IsOptional()
+  json?: Prisma.JsonValue;
 }
 
 export class DeleteManyRiskDataDto {

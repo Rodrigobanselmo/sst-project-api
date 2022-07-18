@@ -57,6 +57,7 @@ import { FindByCompanyHomoGroupService } from './services/homoGroup/find-by-comp
 import { UpdateHomoGroupService } from './services/homoGroup/update-homo-group/update-homo-group.service';
 import { UpdateEnvironmentPhotoService } from './services/environment/update-environment-photo/update-environment-photo.service';
 import { UpdateCharacterizationPhotoService } from './services/characterization/update-characterization-photo/update-characterization-photo.service';
+import { RiskDataRepository } from '../checklist/repositories/implementations/RiskDataRepository';
 
 @Module({
   controllers: [
@@ -113,6 +114,7 @@ import { UpdateCharacterizationPhotoService } from './services/characterization/
     CharacterizationRepository,
     CopyCompanyService,
     RiskGroupDataRepository,
+    RiskDataRepository,
     ActivityRepository,
     FindByIdEnvironmentService,
     FindByIdCharacterizationService,

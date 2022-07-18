@@ -11,6 +11,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { JwtAuthGuard } from './shared/guards/jwt-auth.guard';
 import { PermissionsGuard } from './shared/guards/permissions.guard';
 import { RolesGuard } from './shared/guards/roles.guard';
+import { FirebaseProvider } from './shared/providers/FirebaseProvider/FirebaseProvider';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { RolesGuard } from './shared/guards/roles.guard';
       provide: APP_GUARD,
       useClass: PermissionsGuard,
     },
+    FirebaseProvider,
   ],
   controllers: [],
 })

@@ -625,6 +625,8 @@ model User {
   certifications String[]
   cpf String?
   crea String? 
+  googleExternalId String? 
+  facebookExternalId String? 
   password String
   created_at DateTime @default(now())
   updated_at  DateTime   @updatedAt

@@ -34,6 +34,8 @@ export class UserEntity implements User {
   certifications: string[];
   cpf: string;
   crea: string;
+  googleExternalId: string;
+  facebookExternalId: string;
 
   constructor(partial: Partial<UserEntity>) {
     Object.assign(this, partial);
