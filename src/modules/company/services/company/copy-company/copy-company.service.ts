@@ -117,9 +117,11 @@ export class CopyCompanyService {
               equalHierarchy[hierarchy.id + '//' + workspaceId];
 
             if (hierarchyFound && equalWorkspace[workspaceId])
-              hierarchies.push({
-                ...hierarchyFound,
-                workspaceId: equalWorkspace[workspaceId].id,
+              hierarchyFound.forEach((h) => {
+                hierarchies.push({
+                  ...h,
+                  workspaceId: equalWorkspace[workspaceId].id,
+                });
               });
           });
         });
@@ -292,7 +294,7 @@ export class CopyCompanyService {
     targetHierarchies: HierarchyEntity[],
     fromHierarchies: HierarchyEntity[],
   ) {
-    const equalHierarchy: Record<string, HierarchyEntity> = {};
+    const equalHierarchy: Record<string, HierarchyEntity[]> = {};
     const equalWorkspace: Record<string, WorkspaceEntity> = {};
     [
       HierarchyEnum.DIRECTORY,
@@ -305,51 +307,58 @@ export class CopyCompanyService {
       targetHierarchies.forEach((targetHierarchy) => {
         if (targetHierarchy.type !== hierarchyType) return;
 
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        targetHierarchy.workspaces.forEach((workspace) => {
-          fromHierarchies.find((hierarchyFrom) => {
-            if (hierarchyFrom.type !== hierarchyType) return;
+        fromHierarchies.find((hierarchyFrom) => {
+          const same = hierarchyFrom.id === targetHierarchy.refName;
+          if (same) {
+            equalWorkspace[hierarchyFrom.workspaces[0].id] =
+              hierarchyFrom.workspaces[0];
 
-            //* check if same hierarchy
-            // const sameWorkspaceFrom = hierarchyFrom.workspaces.find(
-            //   (workspaceFrom) => {
-            //     const isTheSame =
-            //       workspaceFrom.name.toLowerCase() ===
-            //       workspace.name.toLowerCase();
-            //     if (isTheSame) equalWorkspace[workspaceFrom.id] = workspace;
-
-            //     return isTheSame;
-            //   },
-            // );
-
-            // const sameName =
-            //   hierarchyFrom.name.toLowerCase() ===
-            //   targetHierarchy.name.toLowerCase();
-
-            // const sameParent = targetHierarchy.parentId
-            //   ? equalHierarchy[
-            //       hierarchyFrom.parentId + '//' + sameWorkspaceFrom.id
-            //     ] &&
-            //     equalHierarchy[
-            //       hierarchyFrom.parentId + '//' + sameWorkspaceFrom.id
-            //     ].id === targetHierarchy.parentId
-            //   : true;
-
-            // if (sameWorkspaceFrom && sameName && sameParent) {
-            //   equalHierarchy[hierarchyFrom.id + '//' + sameWorkspaceFrom.id] =
-            //     targetHierarchy;
-            // }
-
-            const same = hierarchyFrom.id === targetHierarchy.refName;
-            if (same) {
-              equalWorkspace[hierarchyFrom.workspaces[0].id] =
-                hierarchyFrom.workspaces[0];
+            const old =
               equalHierarchy[
                 hierarchyFrom.id + '//' + hierarchyFrom.workspaces[0].id
-              ] = targetHierarchy;
-            }
-          });
+              ] || [];
+
+            equalHierarchy[
+              hierarchyFrom.id + '//' + hierarchyFrom.workspaces[0].id
+            ] = [targetHierarchy, ...old];
+          }
         });
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        // targetHierarchy.workspaces.forEach((workspace) => {
+        // fromHierarchies.find((hierarchyFrom) => {
+        // if (hierarchyFrom.type !== hierarchyType) return;
+
+        //* check if same hierarchy
+        // const sameWorkspaceFrom = hierarchyFrom.workspaces.find(
+        //   (workspaceFrom) => {
+        //     const isTheSame =
+        //       workspaceFrom.name.toLowerCase() ===
+        //       workspace.name.toLowerCase();
+        //     if (isTheSame) equalWorkspace[workspaceFrom.id] = workspace;
+
+        //     return isTheSame;
+        //   },
+        // );
+
+        // const sameName =
+        //   hierarchyFrom.name.toLowerCase() ===
+        //   targetHierarchy.name.toLowerCase();
+
+        // const sameParent = targetHierarchy.parentId
+        //   ? equalHierarchy[
+        //       hierarchyFrom.parentId + '//' + sameWorkspaceFrom.id
+        //     ] &&
+        //     equalHierarchy[
+        //       hierarchyFrom.parentId + '//' + sameWorkspaceFrom.id
+        //     ].id === targetHierarchy.parentId
+        //   : true;
+
+        // if (sameWorkspaceFrom && sameName && sameParent) {
+        //   equalHierarchy[hierarchyFrom.id + '//' + sameWorkspaceFrom.id] =
+        //     targetHierarchy;
+        // }
+        // });
+        // });
       });
     });
 

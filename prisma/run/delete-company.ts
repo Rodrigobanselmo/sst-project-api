@@ -20,8 +20,8 @@ export const deleteCompany = async (id: string, prisma: PrismaClient) => {
 
   await prisma.homogeneousGroup.deleteMany({ where: { companyId: id } });
   await prisma.hierarchy.deleteMany({ where: { companyId: id } });
-  await prisma.workspace.deleteMany({
-    where: { companyId: id },
-  });
-  await prisma.company.delete({ where: { id } });
+  // await prisma.workspace.deleteMany({
+  //   where: { companyId: id },
+  // });
+  // await prisma.company.delete({ where: { id } });
 };
