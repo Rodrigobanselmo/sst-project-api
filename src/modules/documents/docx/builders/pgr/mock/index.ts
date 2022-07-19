@@ -40,7 +40,7 @@ import { attachmentsLinkSection } from './3.01-anexos-link';
 
 export const docPGRSections: IDocumentPGRSectionGroups = {
   sections: [
-    // // // testSection,
+    // // // // testSection,
     initSection,
     definitionsSection,
     definitions2Section,
@@ -76,7 +76,7 @@ export const docPGRSections: IDocumentPGRSectionGroups = {
     recommendationsSection,
     recommendations1Section,
     attachmentsLinkSection,
-    // // // attachmentsSection,
+    // // // // attachmentsSection,
   ],
   variables: {
     [VariablesPGREnum.CHAPTER_1]: 'PARTE 01 – DOCUMENTO BASE',

@@ -3,7 +3,11 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
-import { CreateHierarchyDto, UpdateHierarchyDto } from '../../dto/hierarchy';
+import {
+  CreateHierarchyDto,
+  UpdateHierarchyDto,
+  UpdateSimpleManyHierarchyDto,
+} from '../../dto/hierarchy';
 import { HierarchyEntity } from '../../entities/hierarchy.entity';
 
 @Injectable()
@@ -19,7 +23,6 @@ export class HierarchyRepository {
     ghoNames?: Record<string, string>,
   ): Promise<HierarchyEntity[]> {
     let homogeneousGroup = [];
-    console.log(upsertHierarchyMany);
     //create homogenies group
     if (upsertHierarchyMany && upsertHierarchyMany.length > 0)
       homogeneousGroup = ghoNames
@@ -77,15 +80,19 @@ export class HierarchyRepository {
           name,
           ...upsertHierarchy
         }) => {
-          const HierarchyOnHomo = workspaceIds
-            .map((workspaceId) => ({
-              hierarchyId: id,
-              homogeneousGroupId: homogeneousGroup.find(
-                (homogeneous) => homogeneous.name === ghoName,
-              )?.id,
-              workspaceId,
-            }))
-            .filter((hierarchyOnHomo) => hierarchyOnHomo.homogeneousGroupId);
+          const HierarchyOnHomo = !workspaceIds
+            ? []
+            : workspaceIds
+                .map((workspaceId) => ({
+                  hierarchyId: id,
+                  homogeneousGroupId: homogeneousGroup.find(
+                    (homogeneous) => homogeneous.name === ghoName,
+                  )?.id,
+                  workspaceId,
+                }))
+                .filter(
+                  (hierarchyOnHomo) => hierarchyOnHomo.homogeneousGroupId,
+                );
 
           HierarchyOnHomoGroup.push(...HierarchyOnHomo);
 
@@ -93,7 +100,6 @@ export class HierarchyRepository {
             create: {
               ...upsertHierarchy,
               name: name.split('//')[0],
-              ...(name.split('//')[1] ? { refName: name.split('//')[1] } : {}),
               id,
               company: { connect: { id: companyId } },
               employees:
@@ -104,11 +110,13 @@ export class HierarchyRepository {
                       })),
                     }
                   : undefined,
-              workspaces: {
-                connect: workspaceIds.map((id) => ({
-                  id_companyId: { companyId, id },
-                })),
-              },
+              workspaces: workspaceIds
+                ? {
+                    connect: workspaceIds.map((id) => ({
+                      id_companyId: { companyId, id },
+                    })),
+                  }
+                : undefined,
               parent: parentId
                 ? {
                     connect: { id: parentId },
@@ -118,7 +126,6 @@ export class HierarchyRepository {
             update: {
               ...upsertHierarchy,
               name: name.split('//')[0],
-              ...(name.split('//')[1] ? { refName: name.split('//')[1] } : {}),
               workspaces: !workspaceIds
                 ? undefined
                 : {
@@ -165,6 +172,28 @@ export class HierarchyRepository {
     return data.map((hierarchy) => new HierarchyEntity(hierarchy));
   }
 
+  async updateSimpleMany(
+    upsertHierarchyMany: (UpdateSimpleManyHierarchyDto & {
+      id: string;
+    })[],
+    companyId: string,
+  ): Promise<HierarchyEntity[]> {
+    const data = await this.prisma.$transaction(
+      upsertHierarchyMany.map(({ id, ...upsertHierarchy }) => {
+        return this.prisma.hierarchy.update({
+          data: {
+            ...upsertHierarchy,
+            companyId,
+            id,
+          },
+          where: { id: id || 'none' },
+        });
+      }),
+    );
+
+    return data.map((hierarchy) => new HierarchyEntity(hierarchy));
+  }
+
   async update(
     {
       companyId: _,
@@ -183,7 +212,6 @@ export class HierarchyRepository {
       data: {
         ...updateHierarchy,
         name: name.split('//')[0],
-        ...(name.split('//')[1] ? { refName: name.split('//')[1] } : {}),
         workspaces: !workspaceIds
           ? undefined
           : {
@@ -230,7 +258,6 @@ export class HierarchyRepository {
         ...upsertHierarchy,
         id,
         name: name.split('//')[0],
-        ...(name.split('//')[1] ? { refName: name.split('//')[1] } : {}),
         company: { connect: { id: companyId } },
         workspaces: {
           connect: workspaceIds.map((id) => ({
@@ -254,7 +281,6 @@ export class HierarchyRepository {
       update: {
         ...upsertHierarchy,
         name: name.split('//')[0],
-        ...(name.split('//')[1] ? { refName: name.split('//')[1] } : {}),
         employees:
           employeesIds && employeesIds.length
             ? {

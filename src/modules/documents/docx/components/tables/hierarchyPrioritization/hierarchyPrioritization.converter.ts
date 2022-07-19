@@ -20,7 +20,12 @@ export interface IHierarchyPrioritizationOptions {
   homoType?: HomoTypeEnum | HomoTypeEnum[];
 }
 interface IHomoPositionData {
-  data: { position: number; riskDegree: string; riskDegreeLevel: number }[];
+  data: {
+    position: number;
+    riskDegree: string;
+    riskDegreeLevel: number;
+    isQuantity: boolean;
+  }[];
 }
 
 interface IHierarchyDataType {
@@ -30,6 +35,7 @@ interface IHierarchyDataType {
 
 interface IRiskDataMap {
   name: string;
+  isQuantity: boolean;
   riskDegree: string;
   homogeneousGroupIds: string[];
   riskDegreeLevel?: number;
@@ -142,6 +148,7 @@ export const hierarchyPrioritizationConverter = (
 
       allRiskRecord[riskData.riskId] = {
         ...hasRisk,
+        isQuantity: riskData.isQuantity,
         name: riskData.riskFactor.name,
         homogeneousGroupIds: [
           ...hasRisk.homogeneousGroupIds,
@@ -154,14 +161,17 @@ export const hierarchyPrioritizationConverter = (
   const allRisks = Object.values(allRiskRecord);
   const allHierarchy = Object.values(allHierarchyRecord);
 
-  const isLengthGreaterThan50 =
-    allRisks.length > 50 && allHierarchy.length > 50;
-  const isRiskLengthGreater = allRisks.length > allHierarchy.length;
-  const shouldRiskBeInRows = isLengthGreaterThan50 || isRiskLengthGreater;
+  const isLengthGreaterThan50 = allHierarchy.length > 50;
+  const shouldRiskBeInRows = isLengthGreaterThan50;
+
+  // const isLengthGreaterThan50 = allRisks.length > 50 && allHierarchy.length > 50;
+  // const isRiskLengthGreater = allRisks.length > allHierarchy.length;
+  // const shouldRiskBeInRows = isLengthGreaterThan50 || isRiskLengthGreater;
 
   const header: (IHierarchyDataType | IRiskDataMap)[] = shouldRiskBeInRows
     ? allHierarchy
     : allRisks;
+
   const body: (IHierarchyDataType | IRiskDataMap)[] = shouldRiskBeInRows
     ? allRisks
     : allHierarchy;
@@ -175,6 +185,7 @@ export const hierarchyPrioritizationConverter = (
             data: [],
           };
 
+          const isQuantity = 'isQuantity' in risk && !!risk.isQuantity;
           const isDataRisk = 'riskDegree' in risk && risk.riskDegree;
           const isDataRiskLevel =
             'riskDegreeLevel' in risk && risk.riskDegreeLevel;
@@ -186,6 +197,7 @@ export const hierarchyPrioritizationConverter = (
                 position: index + 1,
                 riskDegree: isDataRisk || '',
                 riskDegreeLevel: isDataRiskLevel || 0,
+                isQuantity,
               },
             ],
           });
@@ -232,14 +244,16 @@ export const hierarchyPrioritizationConverter = (
         const isDataRisk = 'riskDegree' in hierarchy && hierarchy.riskDegree;
         const isDataRiskLevel =
           'riskDegree' in hierarchy && hierarchy.riskDegreeLevel;
-
+        const isDataRiskQuantity =
+          'isQuantity' in hierarchy && !!hierarchy.isQuantity;
         hierarchy.homogeneousGroupIds.forEach((homogeneousGroupId) => {
           const homoPosition = HomoPositionMap.get(homogeneousGroupId);
           if (homoPosition) {
             homoPosition.data.forEach(
-              ({ position, riskDegree, riskDegreeLevel }) => {
+              ({ position, riskDegree, riskDegreeLevel, isQuantity }) => {
                 row[position] = {
                   text: riskDegree || isDataRisk,
+                  shaded: isQuantity || isDataRiskQuantity,
                   attention:
                     (riskDegreeLevel || isDataRiskLevel) >= warnLevelStart,
                 };

@@ -90,6 +90,7 @@ export class UpsertHierarchyDto {
   name?: string;
 
   @IsInt({ each: true })
+  @IsOptional()
   employeesIds?: number[];
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
@@ -111,6 +112,10 @@ export class UpsertHierarchyDto {
   @IsString()
   @IsOptional()
   companyId?: string;
+
+  @IsString()
+  @IsOptional()
+  refName?: string;
 
   @IsOptional()
   @IsString({ each: true })
@@ -137,4 +142,20 @@ export class UpsertManyHierarchyDto {
   @IsOptional()
   @Type(() => UpsertHierarchyDto)
   readonly data: UpsertHierarchyDto[];
+}
+
+export class UpdateSimpleHierarchyDto {
+  @IsOptional()
+  @IsString()
+  id: string;
+
+  @IsString()
+  @IsOptional()
+  refName?: string;
+}
+export class UpdateSimpleManyHierarchyDto {
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @Type(() => UpdateSimpleHierarchyDto)
+  readonly data: UpdateSimpleHierarchyDto[];
 }

@@ -552,6 +552,7 @@ model RiskFactorGroupData {
   approvedBy String?
   validity String?
   visitDate DateTime?
+  isQ5 Boolean @default(false)
   validityStart DateTime?
   validityEnd DateTime?
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)

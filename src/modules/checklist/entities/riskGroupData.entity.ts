@@ -55,7 +55,6 @@ export class RiskFactorGroupDataEntity implements RiskFactorGroupData {
   users?: UserEntity[];
 
   constructor(partial: Partial<RiskFactorGroupDataEntity>) {
-    this.isQ5 = false;
     Object.assign(this, partial);
 
     if (partial?.data) {

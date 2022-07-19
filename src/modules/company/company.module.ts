@@ -58,6 +58,7 @@ import { UpdateHomoGroupService } from './services/homoGroup/update-homo-group/u
 import { UpdateEnvironmentPhotoService } from './services/environment/update-environment-photo/update-environment-photo.service';
 import { UpdateCharacterizationPhotoService } from './services/characterization/update-characterization-photo/update-characterization-photo.service';
 import { RiskDataRepository } from '../checklist/repositories/implementations/RiskDataRepository';
+import { UpdateSimpleManyHierarchyService } from './services/hierarchy/update-simple-many-hierarchies /upsert-many-hierarchies.service';
 
 @Module({
   controllers: [
@@ -121,6 +122,7 @@ import { RiskDataRepository } from '../checklist/repositories/implementations/Ri
     FindHierarchyService,
     UpdateEnvironmentPhotoService,
     UpdateCharacterizationPhotoService,
+    UpdateSimpleManyHierarchyService,
   ],
   exports: [
     CompanyRepository,

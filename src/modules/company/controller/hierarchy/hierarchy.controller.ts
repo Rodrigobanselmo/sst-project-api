@@ -12,6 +12,7 @@ import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import {
   CreateHierarchyDto,
   UpdateHierarchyDto,
+  UpdateSimpleManyHierarchyDto,
   UpsertManyHierarchyDto,
 } from '../../dto/hierarchy';
 import { FindHierarchyService } from '../../services/hierarchy/find-hierarchy/find-hierarchy.service';
@@ -21,6 +22,7 @@ import { DeleteHierarchyService } from '../../services/hierarchy/delete-hierarch
 import { FindAllHierarchyService } from '../../services/hierarchy/find-all-hierarchies/find-all-hierarchies.service';
 import { UpdateHierarchyService } from '../../services/hierarchy/update-hierarchies/update-hierarchies.service';
 import { UpsertManyHierarchyService } from '../../services/hierarchy/upsert-many-hierarchies/upsert-many-hierarchies.service';
+import { UpdateSimpleManyHierarchyService } from '../../services/hierarchy/update-simple-many-hierarchies /upsert-many-hierarchies.service';
 
 @Controller('hierarchy')
 export class HierarchyController {
@@ -31,6 +33,7 @@ export class HierarchyController {
     private readonly upsertManyHierarchyService: UpsertManyHierarchyService,
     private readonly deleteHierarchyService: DeleteHierarchyService,
     private readonly findHierarchyService: FindHierarchyService,
+    private readonly updateSimpleManyHierarchyService: UpdateSimpleManyHierarchyService,
   ) {}
 
   @Get('/:companyId?')
@@ -72,6 +75,17 @@ export class HierarchyController {
     @User() userPayloadDto: UserPayloadDto,
   ) {
     return this.upsertManyHierarchyService.execute(
+      upsertManyHierarchyDto.data,
+      userPayloadDto,
+    );
+  }
+
+  @Post('/simple-update-many/:companyId?')
+  updateSimpleMany(
+    @Body() upsertManyHierarchyDto: UpdateSimpleManyHierarchyDto,
+    @User() userPayloadDto: UserPayloadDto,
+  ) {
+    return this.updateSimpleManyHierarchyService.execute(
       upsertManyHierarchyDto.data,
       userPayloadDto,
     );

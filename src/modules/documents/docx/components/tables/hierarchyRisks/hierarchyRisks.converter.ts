@@ -87,10 +87,12 @@ export const hierarchyRisksConverter = (
   const allRisks = Object.values(allRiskRecord);
   const allHierarchy = Object.values(allHierarchyRecord);
 
-  const isLengthGreaterThan50 =
-    allRisks.length > 50 && allHierarchy.length > 50;
-  const isRiskLengthGreater = allRisks.length > allHierarchy.length;
-  const shouldRiskBeInRows = isLengthGreaterThan50 || isRiskLengthGreater;
+  const isLengthGreaterThan50 = allHierarchy.length > 50;
+  const shouldRiskBeInRows = isLengthGreaterThan50;
+
+  // const isLengthGreaterThan50 = allRisks.length > 50 && allHierarchy.length > 50;
+  // const isRiskLengthGreater = allRisks.length > allHierarchy.length;
+  // const shouldRiskBeInRows = isLengthGreaterThan50 || isRiskLengthGreater;
 
   const header = shouldRiskBeInRows ? allHierarchy : allRisks;
   const body = shouldRiskBeInRows ? allRisks : allHierarchy;
