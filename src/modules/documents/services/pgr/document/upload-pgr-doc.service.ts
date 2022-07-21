@@ -5,7 +5,6 @@ import fs from 'fs';
 import { v4 } from 'uuid';
 
 import { CompanyRepository } from '../../../../../modules/company/repositories/implementations/CompanyRepository';
-import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { AmazonStorageProvider } from '../../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
 import {
@@ -21,6 +20,7 @@ import { ProfessionalRepository } from '../../../../users/repositories/implement
 import { createBaseDocument } from '../../../docx/base/config/document';
 import { DocumentBuildPGR } from '../../../docx/builders/pgr/create';
 import { UpsertPgrDto } from '../../../dto/pgr.dto';
+import { getDocxFileName } from './../../../../../shared/utils/getFileName';
 import { AttachmentEntity } from './../../../../checklist/entities/attachment.entity';
 import { RiskFactorGroupDataEntity } from './../../../../checklist/entities/riskGroupData.entity';
 import { WorkspaceRepository } from './../../../../company/repositories/implementations/WorkspaceRepository';
@@ -296,26 +296,19 @@ export class PgrUploadService {
     homoGroupTree: IHomoGroupMap,
     upsertPgrDto: UpsertPgrDto,
   ) {
-    const save = async (sections: ISectionOptions[], text: string) => {
-      const Doc = createBaseDocument(sections);
-
-      const b64string = await Packer.toBase64String(Doc);
-      const buffer = Buffer.from(b64string, 'base64');
-
-      const fileName = this.getFileName(upsertPgrDto, riskGroupData, text);
-
-      const url = await this.upload(buffer, fileName, upsertPgrDto);
-
-      return url;
-    };
-
     // APRs
     const aprSection: ISectionOptions[] = [
       ...APPRTableSection(riskGroupData, hierarchyData, homoGroupTree),
     ];
 
-    const urlAPR = await save(aprSection, '--APR');
+    const urlAPR = await this.save(
+      riskGroupData,
+      upsertPgrDto,
+      aprSection,
+      '--APR',
+    );
 
+    // APRs Groups
     const aprGroupSection: ISectionOptions[] = [
       ...APPRByGroupTableSection(
         riskGroupData,
@@ -325,14 +318,24 @@ export class PgrUploadService {
       ),
     ];
 
-    const urlGroupAPR = await save(aprGroupSection, '--APR');
+    const urlGroupAPR = await this.save(
+      riskGroupData,
+      upsertPgrDto,
+      aprGroupSection,
+      '--APR-GSE',
+    );
 
     // ACTION PLAN
     const actionPlanSections: ISectionOptions[] = [
       actionPlanTableSection(riskGroupData, hierarchyTree),
     ];
 
-    const actionPlanUrl = await save(actionPlanSections, '--PLANO_DE_ACAO');
+    const actionPlanUrl = await this.save(
+      riskGroupData,
+      upsertPgrDto,
+      actionPlanSections,
+      '--PLANO_DE_ACAO',
+    );
 
     return { urlAPR, urlGroupAPR, actionPlanUrl };
   }
@@ -342,14 +345,29 @@ export class PgrUploadService {
     riskGroupData: RiskFactorGroupDataEntity,
     typeName = '',
   ) => {
-    const docName = upsertPgrDto.name.replace(/\s+/g, '');
-    const fileAprName = `${docName.length > 0 ? docName + '-' : ''}${
-      riskGroupData.company.name
-    }${typeName}-v${upsertPgrDto.version}.docx`
-      .normalize('NFD')
-      .replace(/\s+/g, '_')
-      .replace(/[^a-zA-Z0-9s_/.!\\={}?()-]/g, '');
-
-    return fileAprName;
+    return getDocxFileName({
+      name: upsertPgrDto.name,
+      companyName: riskGroupData.company.name,
+      version: upsertPgrDto.version,
+      typeName,
+    });
   };
+
+  private async save(
+    riskGroupData: RiskFactorGroupDataEntity,
+    upsertPgrDto: UpsertPgrDto,
+    sections: ISectionOptions[],
+    text: string,
+  ) {
+    const Doc = createBaseDocument(sections);
+
+    const b64string = await Packer.toBase64String(Doc);
+    const buffer = Buffer.from(b64string, 'base64');
+
+    const fileName = this.getFileName(upsertPgrDto, riskGroupData, text);
+
+    const url = await this.upload(buffer, fileName, upsertPgrDto);
+
+    return url;
+  }
 }

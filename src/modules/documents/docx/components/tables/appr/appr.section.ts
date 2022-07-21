@@ -21,13 +21,11 @@ export const APPRTableSection = (
   riskFactorGroupData: RiskFactorGroupDataEntity,
   hierarchyData: IHierarchyData,
   homoGroupTree: IHomoGroupMap,
-  options: IAPPRTableOptions = {
-    hierarchyType: HierarchyEnum.SECTOR,
-    isByGroup: false,
-  },
+  // options: IAPPRTableOptions = {},
 ): ISectionOptions[] => {
   const sectionsTables = [];
-  const isByGroup = options.isByGroup;
+  const isByGroup = false;
+  console.log(isByGroup);
 
   const map = new Map<string, boolean>();
 

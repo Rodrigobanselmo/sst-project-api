@@ -15,7 +15,7 @@ export const organizationSection: IDocumentPGRSectionGroup = {
       children: [
         {
           type: PGRSectionChildrenTypeEnum.H1,
-          text: 'POLÍTICA DE SAÚDE E SEGURANÇA OCUPACIONAL',
+          text: 'ORGANIZAÇÃO',
         },
         {
           type: PGRSectionChildrenTypeEnum.H2,

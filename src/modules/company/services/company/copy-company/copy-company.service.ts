@@ -311,7 +311,7 @@ export class CopyCompanyService {
           const same = hierarchyFrom.id === targetHierarchy.refName;
           if (same) {
             equalWorkspace[hierarchyFrom.workspaces[0].id] =
-              hierarchyFrom.workspaces[0];
+              targetHierarchy.workspaces[0];
 
             const old =
               equalHierarchy[

@@ -179,6 +179,7 @@ model Company {
   cadastral_situation_description String?
   isConsulting Boolean @default(false)
   licenseId Int? 
+  groupId Int? 
   phone String?
   email String?
   operationTime String?
@@ -203,6 +204,7 @@ model Company {
   receivingServiceContracts Contract[]
   applyingServiceContracts Contract[]  @relation(name: "contracts")
   license License? @relation(name:"license",fields: [licenseId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
+  group CompanyGroup? @relation(fields: [groupId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
   riskFactors RiskFactors[] 
   homogeneousGroup HomogeneousGroup[] 
   generateSource GenerateSource[] 
@@ -216,6 +218,15 @@ model Company {
   riskFactorDataRec RiskFactorDataRec[] 
   riskFactorGroupData RiskFactorGroupData[] 
   riskFactorDocument RiskFactorDocument[] 
+}
+
+model CompanyGroup {
+  id    Int   @id  @default(autoincrement())
+  name String  
+  description String?
+  created_at DateTime @default(now())
+  updated_at  DateTime   @updatedAt
+  company Company[]
 }
 
 model CompanyCharacterization {
@@ -370,6 +381,12 @@ model GenerateSource {
   riskFactorData RiskFactorData[]
 
   @@unique([id, companyId])
+} 
+
+model AccessGroups {
+  id    Int     @default(autoincrement()) @id
+  roles String[]
+  permissions String[]
 } 
 
 model Hierarchy {
