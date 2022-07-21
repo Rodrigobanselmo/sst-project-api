@@ -6,7 +6,6 @@ export const attachmentsConverter = (
   attachments: AttachmentEntity[],
 ): IDocVariables[] => {
   const attachmentsData: IDocVariables[] = [];
-  console.log(attachments);
   attachments.forEach((attachment) => {
     if (attachment?.url)
       attachmentsData.push({

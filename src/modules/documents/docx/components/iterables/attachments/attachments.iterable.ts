@@ -17,7 +17,6 @@ export const attachmentsIterable = (
   ) => (Paragraph | Table)[],
 ) => {
   const attachmentsVarArray = attachmentsConverter(attachments);
-  console.log(attachmentsVarArray);
   const iterableSections = attachmentsVarArray
     .map((variables, index) => {
       return convertToDocx(

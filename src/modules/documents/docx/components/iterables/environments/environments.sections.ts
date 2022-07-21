@@ -41,7 +41,6 @@ export const environmentSections = (
     if (!environments?.length) return;
 
     const environmentData = environmentsConverter(environments);
-    console.log(environmentData);
     environmentData.forEach(
       (
         { variables, elements, risks, considerations: cons, breakPage },

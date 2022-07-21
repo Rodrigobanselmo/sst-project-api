@@ -25,7 +25,6 @@ export const APPRTableSection = (
 ): ISectionOptions[] => {
   const sectionsTables = [];
   const isByGroup = false;
-  console.log(isByGroup);
 
   const map = new Map<string, boolean>();
 

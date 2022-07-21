@@ -82,8 +82,6 @@ export class PgrActionPlanUploadTableService {
       fileName: company.id + '/pgr/' + fileName,
     });
 
-    console.log(url);
-
     return url;
   }
 }
