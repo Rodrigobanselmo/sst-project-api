@@ -52,6 +52,9 @@ export class CompanyEntity implements Company {
   @ApiProperty({ description: 'The license id of the Company' })
   licenseId: number;
 
+  @ApiProperty({ description: 'The group id of the Company' })
+  groupId: number;
+
   @ApiProperty({ description: 'The parent company id of the Company' })
   parentCompanyId: string;
 
