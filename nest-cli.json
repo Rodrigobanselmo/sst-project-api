@@ -4,7 +4,13 @@
   "compilerOptions": {
     "deleteOutDir": true,
     "plugins": ["@nestjs/swagger/plugin"],
-    "assets": ["**/*.hbs"],
+    "assets": [
+      {
+        "include": "./templates",
+        "outDir": "dist",
+        "watchAssets": true
+      }
+    ],
     "watchAssets": true
   }
 }

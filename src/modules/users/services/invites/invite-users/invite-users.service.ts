@@ -1,4 +1,3 @@
-import { ErrorInvitesEnum } from './../../../../../shared/constants/enum/errorMessage';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { resolve } from 'path';
 
@@ -8,6 +7,7 @@ import { InviteUserDto } from '../../../dto/invite-user.dto';
 import { InviteUsersEntity } from '../../../entities/invite-users.entity';
 import { InviteUsersRepository } from '../../../repositories/implementations/InviteUsersRepository';
 import { UsersRepository } from '../../../repositories/implementations/UsersRepository';
+import { ErrorInvitesEnum } from './../../../../../shared/constants/enum/errorMessage';
 
 @Injectable()
 export class InviteUsersService {
@@ -30,7 +30,7 @@ export class InviteUsersService {
         throw new BadRequestException(ErrorInvitesEnum.USER_ALREADY_EXIST);
     }
 
-    const expires_date = this.dateProvider.addHours(new Date(), 3);
+    const expires_date = this.dateProvider.addDay(new Date(), 7);
 
     await this.inviteUsersRepository.deleteByCompanyIdAndEmail(
       inviteUserDto.companyId,

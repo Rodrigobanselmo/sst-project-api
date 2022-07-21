@@ -1,3 +1,5 @@
+import { ErrorMessageEnum } from './../../../../constants/enum/errorMessage';
+import { UnprocessableEntityException } from '@nestjs/common';
 import sgMail, { MailService } from '@sendgrid/mail';
 import fs from 'fs';
 import handlebars from 'handlebars';
@@ -20,20 +22,24 @@ class SendGridProvider implements IMailProvider {
     variables,
     source = EmailsEnum.VALIDATION,
   }: ISendMailData): Promise<any> {
-    const templateFileContent = fs.readFileSync(path).toString('utf-8');
+    try {
+      const templateFileContent = fs.readFileSync(path).toString('utf-8');
 
-    const templateParse = handlebars.compile(templateFileContent);
+      const templateParse = handlebars.compile(templateFileContent);
 
-    const templateHTML = templateParse(variables);
+      const templateHTML = templateParse(variables);
 
-    const random = String(Math.floor(Math.random() * 1000000));
+      const random = String(Math.floor(Math.random() * 1000000));
 
-    await this.client.send({
-      to: to,
-      from: source.replace(':id', random),
-      subject: subject,
-      html: templateHTML,
-    });
+      await this.client.send({
+        to: to,
+        from: source.replace(':id', random),
+        subject: subject,
+        html: templateHTML,
+      });
+    } catch (error) {
+      throw new UnprocessableEntityException(ErrorMessageEnum.EMAIL_NOT_SEND);
+    }
   }
 }
 
