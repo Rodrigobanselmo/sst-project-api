@@ -1,3 +1,4 @@
+import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
 import { HomoTypeEnum, Prisma } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import {
@@ -15,6 +16,10 @@ export class UpsertRiskDataDto {
   @IsString()
   @IsOptional()
   id?: string;
+
+  @IsString()
+  @IsOptional()
+  level?: number;
 
   @IsString()
   @IsOptional()
@@ -93,6 +98,9 @@ export class UpsertManyRiskDataDto {
   })
   type?: HomoTypeEnum;
 
+  @IsOptional()
+  level?: number;
+
   @IsString()
   @IsOptional()
   workspaceId?: string;
@@ -162,4 +170,10 @@ export class DeleteManyRiskDataDto {
 
   @IsString({ each: true })
   homogeneousGroupIds: string[];
+}
+
+export class FindRiskDataDto extends PaginationQueryDto {
+  @IsString()
+  @IsOptional()
+  search?: string;
 }

@@ -3,7 +3,7 @@ import { UserPayloadDto } from './../../../../../shared/dto/user-payload.dto';
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { UpdateUserCompanyDto } from '../../../dto/update-user-company.dto';
 import { UsersCompanyRepository } from '../../../repositories/implementations/UsersCompanyRepository';
-import { isMaster } from 'src/shared/utils/isMater';
+import { isMaster } from '../../../../../shared/utils/isMater';
 
 @Injectable()
 export class UpdatePermissionsRolesService {

@@ -41,6 +41,7 @@ export const environmentSections = (
     if (!environments?.length) return;
 
     const environmentData = environmentsConverter(environments);
+    console.log(environmentData);
     environmentData.forEach(
       (
         { variables, elements, risks, considerations: cons, breakPage },
@@ -166,12 +167,13 @@ export const environmentSections = (
             ]),
           );
 
-        if (breakPage) sections.push(section);
-        else
+        if (breakPage || sections.length === 0) sections.push(section);
+        else {
           sections[sections.length - 1] = [
             ...(sections[sections.length - 1] || []),
             ...section,
           ];
+        }
       },
     );
   });

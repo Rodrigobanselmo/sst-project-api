@@ -1,6 +1,8 @@
+import { ErrorMessageEnum } from './../../../../../shared/constants/enum/errorMessage';
+import { HomoGroupRepository } from './../../../repositories/implementations/HomoGroupRepository';
 import { CharacterizationPhotoRepository } from './../../../repositories/implementations/CharacterizationPhotoRepository';
 import { AmazonStorageProvider } from './../../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { CharacterizationRepository } from '../../../repositories/implementations/CharacterizationRepository';
@@ -11,6 +13,7 @@ export class DeleteCharacterizationService {
     private readonly characterizationRepository: CharacterizationRepository,
     private readonly characterizationPhotoRepository: CharacterizationPhotoRepository,
     private readonly amazonStorageProvider: AmazonStorageProvider,
+    private readonly homoGroupRepository: HomoGroupRepository,
   ) {}
 
   async execute(
@@ -32,12 +35,16 @@ export class DeleteCharacterizationService {
         await this.characterizationPhotoRepository.delete(photo.id);
       }),
     );
-
-    const characterizations = await this.characterizationRepository.delete(
+    const characterizations = await this.characterizationRepository.findById(
       id,
-      userPayloadDto.targetCompanyId,
-      workspaceId,
     );
+    if (characterizations.companyId !== userPayloadDto.targetCompanyId) {
+      throw new BadRequestException(
+        ErrorMessageEnum.NOT_FOUND_ON_COMPANY_TO_DELETE,
+      );
+    }
+
+    await this.homoGroupRepository.deleteById(id);
 
     return characterizations;
   }

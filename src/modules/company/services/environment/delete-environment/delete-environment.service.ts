@@ -1,9 +1,11 @@
+import { HomoGroupRepository } from './../../../repositories/implementations/HomoGroupRepository';
 import { AmazonStorageProvider } from './../../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
 import { EnvironmentPhotoRepository } from './../../../repositories/implementations/EnvironmentPhotoRepository';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { EnvironmentRepository } from '../../../repositories/implementations/EnvironmentRepository';
+import { ErrorMessageEnum } from '../../../../../shared/constants/enum/errorMessage';
 
 @Injectable()
 export class DeleteEnvironmentService {
@@ -11,6 +13,7 @@ export class DeleteEnvironmentService {
     private readonly environmentRepository: EnvironmentRepository,
     private readonly environmentPhotoRepository: EnvironmentPhotoRepository,
     private readonly amazonStorageProvider: AmazonStorageProvider,
+    private readonly homoGroupRepository: HomoGroupRepository,
   ) {}
 
   async execute(
@@ -32,11 +35,15 @@ export class DeleteEnvironmentService {
       }),
     );
 
-    const environments = await this.environmentRepository.delete(
-      id,
-      userPayloadDto.targetCompanyId,
-      workspaceId,
-    );
+    const environments = await this.environmentRepository.findById(id);
+
+    if (environments.companyId !== userPayloadDto.targetCompanyId) {
+      throw new BadRequestException(
+        ErrorMessageEnum.NOT_FOUND_ON_COMPANY_TO_DELETE,
+      );
+    }
+
+    await this.homoGroupRepository.deleteById(id);
 
     return environments;
   }

@@ -14,6 +14,7 @@ import { UsersModule } from '../users/users.module';
 import { PgrDownloadAttachmentsService } from './services/pgr/document/download-pgr-attachment-doc.service';
 import { AddQueuePGRDocumentService } from './services/pgr/document/add-queue-pgr-doc.service';
 import { SendSMSConsumer } from './consumers/pgr/documents.consumer';
+import { PgrActionPlanUploadTableService } from './services/pgr/action-plan/upload-action-plan-table.service';
 
 @Module({
   controllers: [DocumentsController],
@@ -29,6 +30,7 @@ import { SendSMSConsumer } from './consumers/pgr/documents.consumer';
     PgrDownloadAttachmentsService,
     AddQueuePGRDocumentService,
     SendSMSConsumer,
+    PgrActionPlanUploadTableService,
   ],
 })
 export class DocumentsModule {}

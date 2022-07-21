@@ -1,6 +1,6 @@
 import { HomoTypeEnum } from '@prisma/client';
 import { ISectionOptions, PageOrientation } from 'docx';
-import { removeDuplicate } from 'src/shared/utils/removeDuplicate';
+import { removeDuplicate } from '../../../../../../shared/utils/removeDuplicate';
 
 import { originRiskMap } from '../../../../../../shared/constants/maps/origin-risk';
 import { RiskFactorGroupDataEntity } from '../../../../../checklist/entities/riskGroupData.entity';

@@ -32,6 +32,7 @@ export class PgrUploadTableService {
 
     const riskGroupData = await this.riskGroupDataRepository.findAllDataById(
       upsertPgrDto.riskGroupId,
+      workspaceId,
       companyId,
     );
 

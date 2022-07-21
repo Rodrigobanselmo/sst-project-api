@@ -1,9 +1,9 @@
-import {
-  heatTableLEOConstant,
-  heatTableLIIConstant,
-  heatTableNAConstant,
-  heatTableTETOConstant,
-} from './../../documents/constants/heatTable.constant';
+import { ApiProperty } from '@nestjs/swagger';
+
+import { HierarchyEntity } from '../../company/entities/hierarchy.entity';
+import { HomoGroupEntity } from '../../company/entities/homoGroup.entity';
+import { originRiskMap } from './../../../shared/constants/maps/origin-risk';
+import { getMatrizRisk } from './../../../shared/utils/matriz';
 import {
   IRiskDataJson,
   IRiskDataJsonHeat,
@@ -13,15 +13,18 @@ import {
   IRiskDataJsonVibration,
   QuantityTypeEnum,
 } from './../../company/interfaces/risk-data-json.types';
-import { ApiProperty } from '@nestjs/swagger';
-
-import { HierarchyEntity } from '../../company/entities/hierarchy.entity';
-import { HomoGroupEntity } from '../../company/entities/homoGroup.entity';
+import {
+  heatTableLEOConstant,
+  heatTableLIIConstant,
+  heatTableNAConstant,
+  heatTableTETOConstant,
+} from './../../documents/constants/heatTable.constant';
 import { EpiEntity } from './epi.entity';
 import { GenerateSourceEntity } from './generateSource.entity';
 import { RecMedEntity } from './recMed.entity';
 import { RiskFactorsEntity } from './risk.entity';
 import { Prisma, RiskFactorData } from '.prisma/client';
+import { RiskDataRecEntity } from './riskDataRec.entity';
 
 export class RiskFactorDataEntity implements RiskFactorData {
   @ApiProperty({ description: 'The id of the Company' })
@@ -84,20 +87,29 @@ export class RiskFactorDataEntity implements RiskFactorData {
   @ApiProperty({ description: 'The array with generate source data' })
   epis?: EpiEntity[];
 
+  dataRecs?: RiskDataRecEntity[];
+  level: number;
   json: Prisma.JsonValue;
   isQuantity?: boolean;
   ibtugLEO?: number;
   ibtug?: number;
   probAren?: number;
   probVdvr?: number;
+  origin?: string;
+  ro?: string;
+  intervention?: string;
+  progress?: number;
 
   constructor(partial: Partial<RiskFactorDataEntity>) {
     Object.assign(this, partial);
+    this.getOrigin();
 
     if (partial.riskFactor) {
       this.riskFactor = new RiskFactorsEntity(partial.riskFactor);
+      this.getMatrix();
     }
 
+    this.progress = 0;
     this.isQuantity = false;
 
     if (this.json && typeof this.json === 'object') {
@@ -109,6 +121,28 @@ export class RiskFactorDataEntity implements RiskFactorData {
       if (json.type === QuantityTypeEnum.VL) this.vibLProb(json);
       if (json.type === QuantityTypeEnum.RADIATION) this.radProb(json);
       if (json.type === QuantityTypeEnum.HEAT) this.heatProb(json);
+    }
+  }
+
+  private getMatrix() {
+    if (this.riskFactor && this.riskFactor?.severity && this.probability) {
+      const matrix = getMatrizRisk(this.riskFactor.severity, this.probability);
+
+      this.level = matrix.level || this.level || 0;
+      this.ro = matrix.label;
+      this.intervention = matrix.intervention;
+    }
+  }
+  private getOrigin() {
+    if (this.homogeneousGroup) {
+      // eslint-disable-next-line prettier/prettier
+      if (this.homogeneousGroup.environment) this.origin = `${this.homogeneousGroup.environment.name}\n(${originRiskMap[this.homogeneousGroup.environment.type].name})`
+      // eslint-disable-next-line prettier/prettier
+      if (this.homogeneousGroup.hierarchy) this.origin =`${this.homogeneousGroup.hierarchy.name}\n(${originRiskMap[this.homogeneousGroup.hierarchy.type].name})`;
+      // eslint-disable-next-line prettier/prettier
+      if (this.homogeneousGroup.characterization) this.origin =`${this.homogeneousGroup.characterization.name}\n(${originRiskMap[this.homogeneousGroup.characterization.type].name})`;
+      // eslint-disable-next-line prettier/prettier
+      if (!this.homogeneousGroup.type) this.origin = `${this.homogeneousGroup.name}\n(GSE)`;
     }
   }
 

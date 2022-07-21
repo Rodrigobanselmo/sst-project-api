@@ -76,6 +76,20 @@ enum RecTypeEnum {
   EPI
 }
 
+
+enum RiskRecTypeEnum {
+  CANCELED
+  POSTPONED
+  DONE
+}
+
+enum RiskRecTextTypeEnum {
+  MONEY
+  TECHNIQUE
+  LOGISTICS
+  OTHER
+}
+
 model Activity {
   id    Int     @default(autoincrement()) @id
   code String @unique
@@ -199,6 +213,7 @@ model Company {
   databaseTable DatabaseTable[] 
   checklist Checklist[] 
   riskFactorData RiskFactorData[] 
+  riskFactorDataRec RiskFactorDataRec[] 
   riskFactorGroupData RiskFactorGroupData[] 
   riskFactorDocument RiskFactorDocument[] 
 }
@@ -464,6 +479,7 @@ model RecMed {
   recs RiskFactorData[]  @relation(name: "recs")
   engs RiskFactorData[]  @relation(name: "engs")
   adms RiskFactorData[]  @relation(name: "adms")
+  dataRecs RiskFactorDataRec[]
 
   @@unique([id, companyId])
 } 
@@ -563,6 +579,10 @@ model RiskFactorGroupData {
   users User[]
   complementaryDocs String[]
   complementarySystems String[]
+  months_period_level_5 Int @default(3)
+  months_period_level_4 Int @default(6)
+  months_period_level_3 Int @default(12)
+  months_period_level_2 Int @default(24)
 
   @@unique([id, companyId])
 }
@@ -588,7 +608,9 @@ model RiskFactorData {
   engs RecMed[]  @relation(name: "engs")
   adms RecMed[]  @relation(name: "adms")
   epis Epi[]
+  dataRecs RiskFactorDataRec[]
   json Json?
+  level    Int?
 
   @@unique([id, companyId])
   @@unique([homogeneousGroupId, riskId, riskFactorGroupDataId])
@@ -617,6 +639,36 @@ model RiskFactorProbability {
 
   @@unique([riskFactorDataId,riskId,riskFactorGroupDataId])
   @@unique([riskFactorDataAfterId,riskId,riskFactorGroupDataId])
+}
+
+
+model RiskFactorDataRec {
+  id    String   @id  @default(uuid())
+  responsibleName    String?
+  endDate    DateTime?
+  status    StatusEnum @default(PENDING)
+  recMedId String
+  riskFactorDataId String
+  recMed RecMed @relation(fields: [recMedId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  riskFactorData RiskFactorData @relation(fields: [riskFactorDataId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  comments RiskFactorDataRecComments[]
+  created_at DateTime @default(now())
+  updated_at  DateTime   @updatedAt
+  companyId String
+  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@unique([riskFactorDataId, recMedId, companyId])
+}
+
+model RiskFactorDataRecComments {
+  id    String   @id  @default(uuid())
+  text    String
+  type    RiskRecTypeEnum
+  textType    RiskRecTextTypeEnum
+  riskFactorDataRecId String
+  riskFactorDataRec RiskFactorDataRec @relation(fields: [riskFactorDataRecId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  created_at DateTime @default(now())
+  updated_at  DateTime   @updatedAt
 }
 
 model User {

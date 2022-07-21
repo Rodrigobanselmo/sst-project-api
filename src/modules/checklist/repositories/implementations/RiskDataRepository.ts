@@ -1,14 +1,17 @@
+import { PaginationQueryDto } from './../../../../shared/dto/pagination.dto';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
 import { removeDuplicate } from '../../../../shared/utils/removeDuplicate';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import {
+  FindRiskDataDto,
   UpsertManyRiskDataDto,
   UpsertRiskDataDto,
 } from '../../dto/risk-data.dto';
 import { RiskFactorDataEntity } from '../../entities/riskData.entity';
-import { PrismaPromise } from '@prisma/client';
+import { Prisma, PrismaPromise } from '@prisma/client';
+import { getMatrizRisk } from '../../../../shared/utils/matriz';
 
 @Injectable()
 export class RiskDataRepository {
@@ -16,6 +19,9 @@ export class RiskDataRepository {
   async upsert(
     upsertRiskDataDto: Omit<UpsertRiskDataDto, 'keepEmpty' | 'type'>,
   ): Promise<RiskFactorDataEntity> {
+    const level = await this.addLevel(upsertRiskDataDto);
+    if (level) upsertRiskDataDto.level = level;
+
     const riskFactorData = await this.upsertPrisma(upsertRiskDataDto);
 
     return new RiskFactorDataEntity(riskFactorData);
@@ -29,6 +35,9 @@ export class RiskDataRepository {
       delete upsertManyRiskDataDto.homogeneousGroupIds;
       delete upsertManyRiskDataDto.hierarchyIds;
       delete upsertManyRiskDataDto.riskIds;
+
+      const level = await this.addLevel(upsertManyRiskDataDto);
+      if (level) upsertManyRiskDataDto.level = level;
 
       const data = await this.prisma.$transaction(
         homogeneousGroupIds.map((homogeneousGroupId) =>
@@ -54,6 +63,9 @@ export class RiskDataRepository {
       delete upsertManyRiskDataDto.homogeneousGroupIds;
       delete upsertManyRiskDataDto.hierarchyIds;
       delete upsertManyRiskDataDto.riskIds;
+
+      const level = await this.addLevel(upsertManyRiskDataDto);
+      if (level) upsertManyRiskDataDto.level = level;
 
       const data = await this.prisma.$transaction(
         homogeneousGroupIds.map((homogeneousGroupId) =>
@@ -119,6 +131,103 @@ export class RiskDataRepository {
     });
 
     return riskFactorData.map((data) => new RiskFactorDataEntity(data));
+  }
+
+  async findAllActionPlan(
+    riskFactorGroupDataId: string,
+    workspaceId: string,
+    companyId: string,
+    query: Partial<FindRiskDataDto>,
+    pagination: PaginationQueryDto,
+  ) {
+    const where = {
+      AND: [
+        {
+          riskFactorGroupDataId,
+          companyId,
+          recs: { some: { recName: { contains: '' } } },
+          homogeneousGroup: {
+            hierarchyOnHomogeneous: {
+              some: {
+                OR: [
+                  { workspaceId: workspaceId },
+                  {
+                    hierarchy: {
+                      workspaces: {
+                        some: { id: workspaceId },
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      ],
+    } as Prisma.RiskFactorDataFindManyArgs['where'];
+
+    // if ('search' in query) {
+    //   (where.AND as any).push({
+    //     OR: [{ name: { contains: query.search, mode: 'insensitive' } }],
+    //   } as Prisma.RiskFactorDataFindManyArgs['where']);
+    //   delete query.search;
+    // }
+
+    // Object.entries(query).forEach(([key, value]) => {
+    //   if (value)
+    //     (where.AND as any).push({
+    //       [key]: {
+    //         contains: value,
+    //         mode: 'insensitive',
+    //       },
+    //     } as Prisma.RiskFactorDataFindManyArgs['where']);
+    // });
+
+    const response = await this.prisma.$transaction([
+      this.prisma.riskFactorData.count({
+        where,
+      }),
+      this.prisma.riskFactorData.findMany({
+        where,
+        orderBy: { level: 'desc' },
+        take: pagination.take || 20,
+        skip: pagination.skip || 0,
+        include: {
+          adms: true,
+          recs: true,
+          engs: true,
+          generateSources: true,
+          riskFactor: true,
+          epis: true,
+          dataRecs: { include: { comments: true } },
+          homogeneousGroup: {
+            include: { characterization: true, environment: true },
+          },
+        },
+      }),
+    ]);
+
+    const riskData = await Promise.all(
+      (response[1] as unknown as RiskFactorDataEntity[]).map(async (data) => {
+        if (
+          data.homogeneousGroup &&
+          data.homogeneousGroup.type === 'HIERARCHY'
+        ) {
+          const hierarchy = await this.prisma.hierarchy.findUnique({
+            where: { id: data.homogeneousGroup.id },
+          });
+
+          data.homogeneousGroup.hierarchy = hierarchy;
+        }
+
+        return new RiskFactorDataEntity(data);
+      }),
+    );
+
+    return {
+      data: riskData,
+      count: response[0],
+    };
   }
 
   async findAllByHomogeneousGroupId(
@@ -376,5 +485,31 @@ export class RiskDataRepository {
         epis: true,
       },
     });
+  }
+
+  private async addLevel({
+    riskId,
+    probability,
+  }: {
+    riskId?: string;
+    probability?: number;
+  }) {
+    let level = 0;
+    if (probability && riskId) {
+      const risk = await this.prisma.riskFactors.findUnique({
+        where: {
+          id: riskId,
+        },
+      });
+
+      if (risk && risk.severity) {
+        const matriz = getMatrizRisk(risk.severity, probability);
+
+        level = matriz.level;
+        risk.severity;
+      }
+    }
+
+    return level;
   }
 }

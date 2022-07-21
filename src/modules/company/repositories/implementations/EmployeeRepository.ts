@@ -174,26 +174,32 @@ export class EmployeeRepository {
     pagination: PaginationQueryDto,
     options: Prisma.EmployeeFindManyArgs = {},
   ) {
-    const where = {} as Prisma.EmployeeFindManyArgs['where'];
+    const where = {
+      AND: [],
+    } as typeof options.where;
 
     if ('search' in query) {
-      where.OR = [
-        { name: { contains: query.search, mode: 'insensitive' } },
-        {
-          cpf: {
-            contains: query.search ? onlyNumbers(query.search) || 'no' : '',
+      (where.AND as any).push({
+        OR: [
+          { name: { contains: query.search, mode: 'insensitive' } },
+          {
+            cpf: {
+              contains: query.search ? onlyNumbers(query.search) || 'no' : '',
+            },
           },
-        },
-      ];
+        ],
+      } as typeof options.where);
       delete query.search;
     }
 
     Object.entries(query).forEach(([key, value]) => {
       if (value)
-        where[key] = {
-          contains: value,
-          mode: 'insensitive',
-        };
+        (where.AND as any).push({
+          [key]: {
+            contains: value,
+            mode: 'insensitive',
+          },
+        } as typeof options.where);
     });
 
     const response = await this.prisma.$transaction([
@@ -205,6 +211,7 @@ export class EmployeeRepository {
         where,
         take: pagination.take || 20,
         skip: pagination.skip || 0,
+        orderBy: { name: 'asc' },
       }),
     ]);
 

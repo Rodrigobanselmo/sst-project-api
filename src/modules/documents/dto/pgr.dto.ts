@@ -41,3 +41,14 @@ export class UpsertPgrDto {
   @IsString()
   workspaceName: string;
 }
+export class UploadPgrActionPlanDto {
+  @IsString()
+  riskGroupId: string;
+
+  @IsOptional()
+  @IsString()
+  companyId: string;
+
+  @IsString()
+  workspaceId: string;
+}

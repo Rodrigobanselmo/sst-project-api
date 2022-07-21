@@ -34,7 +34,7 @@ export const hierarchyRisksTableSections = (
     options,
   );
 
-  const noData = headerData.length == 1;
+  const noData = headerData.length == 1 || bodyData.length == 0;
 
   if (noData) return [];
 

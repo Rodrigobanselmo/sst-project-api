@@ -53,6 +53,10 @@ export class RiskFactorGroupDataEntity implements RiskFactorGroupData {
   validityStart: Date;
   professionals?: ProfessionalEntity[];
   users?: UserEntity[];
+  months_period_level_5: number;
+  months_period_level_4: number;
+  months_period_level_3: number;
+  months_period_level_2: number;
 
   constructor(partial: Partial<RiskFactorGroupDataEntity>) {
     Object.assign(this, partial);

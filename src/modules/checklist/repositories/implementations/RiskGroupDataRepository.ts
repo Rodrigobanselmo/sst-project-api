@@ -74,6 +74,7 @@ export class RiskGroupDataRepository {
 
   async findAllDataById(
     id: string,
+    workspaceId: string,
     companyId: string,
     options: {
       select?: Prisma.RiskFactorGroupDataSelect;
@@ -88,6 +89,28 @@ export class RiskGroupDataRepository {
           professionals: true,
           users: true,
           data: {
+            where: {
+              OR: [
+                {
+                  homogeneousGroup: {
+                    hierarchyOnHomogeneous: {
+                      some: {
+                        OR: [
+                          { workspaceId: workspaceId },
+                          {
+                            hierarchy: {
+                              workspaces: {
+                                some: { id: workspaceId },
+                              },
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  },
+                },
+              ],
+            },
             include: {
               adms: true,
               recs: true,
@@ -95,6 +118,7 @@ export class RiskGroupDataRepository {
               generateSources: true,
               epis: true,
               riskFactor: true,
+              dataRecs: true,
               hierarchy: {
                 include: { employees: { select: { _count: true } } },
               },

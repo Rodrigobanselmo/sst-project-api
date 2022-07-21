@@ -5,7 +5,7 @@ import {
   RiskFactorsEnum,
 } from '@prisma/client';
 import { Paragraph, Table } from 'docx';
-import { removeDuplicate } from 'src/shared/utils/removeDuplicate';
+import { removeDuplicate } from '../../../../../../shared/utils/removeDuplicate';
 
 import { RiskDocumentEntity } from '../../../../../checklist/entities/riskDocument.entity';
 import { bulletsNormal, bulletsSpace } from '../../../base/elements/bullets';

@@ -46,6 +46,7 @@ export class HomoGroupEntity implements HomogeneousGroup {
   riskFactorData?: RiskFactorDataEntity[];
   characterization?: CharacterizationEntity;
   environment?: EnvironmentEntity;
+  hierarchy?: HierarchyEntity;
 
   employeeCount?: number;
 

@@ -51,7 +51,7 @@ export class PgrUploadService {
     const workspaceId = upsertPgrDto.workspaceId;
 
     // eslint-disable-next-line prettier/prettier
-    const riskGroupData = await this.riskGroupDataRepository.findAllDataById(upsertPgrDto.riskGroupId, companyId);
+    const riskGroupData = await this.riskGroupDataRepository.findAllDataById(upsertPgrDto.riskGroupId, workspaceId, companyId);
     // eslint-disable-next-line prettier/prettier
     const hierarchyHierarchy =  await this.hierarchyRepository.findAllDataHierarchyByCompany(companyId, workspaceId);
     // eslint-disable-next-line prettier/prettier
@@ -138,6 +138,8 @@ export class PgrUploadService {
 
       const docId = upsertPgrDto.id || v4();
 
+      const actionPlanName = 'Plano de Ação Detalhado';
+
       const attachments = [
         new AttachmentEntity({
           id: v4(),
@@ -151,7 +153,7 @@ export class PgrUploadService {
         }),
         new AttachmentEntity({
           id: v4(),
-          name: 'Plano de Ação Detalhado',
+          name: actionPlanName,
           url: actionPlanUrl,
         }),
       ];
@@ -163,10 +165,19 @@ export class PgrUploadService {
       const sections: ISectionOptions[] = new DocumentBuildPGR({
         version: versionString,
         document: riskGroupData,
-        attachments: attachments.map((attachment) => ({
-          ...attachment,
-          url: `${process.env.APP_HOST}/download/pgr/anexos?ref1=${docId}&ref2=${attachment.id}&ref3=${companyId}`,
-        })),
+        attachments: attachments.map((attachment) => {
+          if (actionPlanName === attachment.name) {
+            return {
+              ...attachment,
+              url: `${process.env.APP_HOST}/dashboard/empresas/${companyId}/${workspaceId}/plano-de-acao/${riskGroupData.id}`,
+            };
+          }
+
+          return {
+            ...attachment,
+            url: `${process.env.APP_HOST}/download/pgr/anexos?ref1=${docId}&ref2=${attachment.id}&ref3=${companyId}`,
+          };
+        }),
         logo,
         company,
         workspace,
@@ -206,7 +217,7 @@ export class PgrUploadService {
       return { buffer, fileName };
     } catch (error) {
       [logo, ...photosPath].forEach((path) => path && fs.unlinkSync(path));
-      console.log('error: unlink photos');
+      console.log('error: unlink photos', error);
 
       if (upsertPgrDto.id)
         await this.riskDocumentRepository.upsert({
@@ -221,11 +232,11 @@ export class PgrUploadService {
   private async upload(
     fileBuffer: Buffer,
     fileName: string,
-    company: Partial<CompanyEntity>,
+    upsertPgrDto: UpsertPgrDto,
   ) {
     const { url } = await this.amazonStorageProvider.upload({
       file: fileBuffer,
-      fileName: company.id + '/pgr/' + fileName,
+      fileName: upsertPgrDto.companyId + '/pgr/' + fileName,
       // isPublic: true,
     });
 

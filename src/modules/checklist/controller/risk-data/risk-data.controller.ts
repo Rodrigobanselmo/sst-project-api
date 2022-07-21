@@ -1,14 +1,16 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import { DeleteManyRiskDataService } from '../../services/risk-data/delete-many-risk-data/delete-many-risk-data.service';
+import { FindAllActionPlanService } from '../../services/risk-data/find-all-action-plan/find-all-action-plan.service';
 import { FindAllByGroupAndRiskService } from '../../services/risk-data/find-by-group-risk/find-by-group-risk.service';
 import { FindAllByHomogeneousGroupService } from '../../services/risk-data/find-by-homogeneous-group/find-by-homogeneous-group.service';
 import { UpsertManyRiskDataService } from '../../services/risk-data/upsert-many-risk-data/upsert-many-risk-data.service';
 import { UpsertRiskDataService } from '../../services/risk-data/upsert-risk-data/upsert-risk.service';
 import {
   DeleteManyRiskDataDto,
+  FindRiskDataDto,
   UpsertManyRiskDataDto,
   UpsertRiskDataDto,
 } from './../../dto/risk-data.dto';
@@ -21,11 +23,28 @@ export class RiskDataController {
     private readonly findAllByGroupAndRiskService: FindAllByGroupAndRiskService,
     private readonly findAllByHomogeneousGroupService: FindAllByHomogeneousGroupService,
     private readonly deleteManyRiskDataService: DeleteManyRiskDataService,
+    private readonly findAllActionPlanService: FindAllActionPlanService,
   ) {}
 
   @Post()
   upsert(@Body() upsertRiskDataDto: UpsertRiskDataDto) {
     return this.upsertRiskDataService.execute(upsertRiskDataDto);
+  }
+
+  @Get('/action-plan/:companyId/:workspaceId/:riskGroupId')
+  findActionPlan(
+    @User() userPayloadDto: UserPayloadDto,
+    @Param('riskGroupId') groupId: string,
+    @Param('workspaceId') workspaceId: string,
+    @Query() query: FindRiskDataDto,
+  ) {
+    const companyId = userPayloadDto.targetCompanyId;
+    return this.findAllActionPlanService.execute(
+      groupId,
+      workspaceId,
+      companyId,
+      query,
+    );
   }
 
   @Post('many')

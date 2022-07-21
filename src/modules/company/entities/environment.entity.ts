@@ -3,7 +3,7 @@ import {
   CompanyEnvironment,
   CompanyEnvironmentTypesEnum,
 } from '@prisma/client';
-import { RiskFactorDataEntity } from 'src/modules/checklist/entities/riskData.entity';
+import { RiskFactorDataEntity } from '../../../modules/checklist/entities/riskData.entity';
 import { EnvironmentPhotoEntity } from './environment-photo.entity';
 import { HierarchyEntity } from './hierarchy.entity';
 import { HomoGroupEntity } from './homoGroup.entity';

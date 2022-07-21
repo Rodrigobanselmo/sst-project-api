@@ -42,9 +42,11 @@ const setMapHierarchies = (hierarchyData: HierarchyEntity[]) => {
   hierarchyData.forEach((hierarchy) => {
     hierarchyTree[hierarchy.id] = { ...hierarchy, children: [] };
   });
+  console.log(hierarchyTree);
 
   Object.values(hierarchyTree).forEach((hierarchy) => {
     if (hierarchy.parentId) {
+      console.log(hierarchy.parentId);
       hierarchyTree[hierarchy.parentId].children.push(hierarchy.id);
       if (!hierarchyTree[hierarchy.parentId].employees)
         hierarchyTree[hierarchy.parentId].employees = [];

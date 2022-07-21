@@ -119,7 +119,7 @@ export const characterizationSections = (
             ]),
           );
 
-        if (breakPage) sections.push(section);
+        if (breakPage || sections.length === 0) sections.push(section);
         else
           sections[sections.length - 1] = [
             ...(sections[sections.length - 1] || []),

@@ -12,7 +12,10 @@ async function main() {
     //     companies: { connect: { id: 'd1309cad-19d4-4102-9bf9-231f91095c20' } },
     //   },
     // });
-    await deleteCompany('076ca2af-d3e3-449c-87e0-9601d92ca0cf', prisma);
+    // await prisma.userCompany.deleteMany({
+    //   where: { user: { email: 'marcelo.alves@grupoevicon.com.br' } },
+    // });
+    // await deleteCompany('be0953c9-37d5-4115-9589-ecae8f38226e', prisma);
   } catch (error) {
     console.log(error);
     console.log('error: end');

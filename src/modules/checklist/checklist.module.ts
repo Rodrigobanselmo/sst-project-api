@@ -6,6 +6,7 @@ import { DocumentPgrController } from './controller/doc-pgr/doc-pgr.controller';
 import { EpiController } from './controller/epi/epi.controller';
 import { GenerateSourceController } from './controller/generate-source/generate-source.controller';
 import { RecMedController } from './controller/rec-med/rec-med.controller';
+import { RiskDataRecController } from './controller/risk-data-rec/risk-data-rec.controller';
 import { RiskDataController } from './controller/risk-data/risk-data.controller';
 import { RiskGroupDataController } from './controller/risk-group-data/risk-group-data.controller';
 import { RiskController } from './controller/risk/risk.controller';
@@ -13,6 +14,7 @@ import { ChecklistRepository } from './repositories/implementations/ChecklistRep
 import { EpiRepository } from './repositories/implementations/EpiRepository';
 import { GenerateSourceRepository } from './repositories/implementations/GenerateSourceRepository';
 import { RecMedRepository } from './repositories/implementations/RecMedRepository';
+import { RiskDataRecRepository } from './repositories/implementations/RiskDataRecRepository';
 import { RiskDataRepository } from './repositories/implementations/RiskDataRepository';
 import { RiskDocumentRepository } from './repositories/implementations/RiskDocumentRepository';
 import { RiskGroupDataRepository } from './repositories/implementations/RiskGroupDataRepository';
@@ -33,7 +35,9 @@ import { FindDocumentsService } from './services/pgr-doc/find-documents/find-doc
 import { CreateRecMedService } from './services/rec-med/create-rec-med/create-rec-med.service';
 import { DeleteSoftRecMedService } from './services/rec-med/delete-soft-rec-med/delete-soft-rec-med.service';
 import { UpdateRecMedService } from './services/rec-med/update-rec-med/update-rec-med.service';
+import { UpsertRiskDataRecService } from './services/risk-data-rec/upsert-risk-data-rec/upsert-risk-data-rec.service';
 import { DeleteManyRiskDataService } from './services/risk-data/delete-many-risk-data/delete-many-risk-data.service';
+import { FindAllActionPlanService } from './services/risk-data/find-all-action-plan/find-all-action-plan.service';
 import { FindAllByGroupAndRiskService } from './services/risk-data/find-by-group-risk/find-by-group-risk.service';
 import { FindAllByHomogeneousGroupService } from './services/risk-data/find-by-homogeneous-group/find-by-homogeneous-group.service';
 import { UpsertManyRiskDataService } from './services/risk-data/upsert-many-risk-data/upsert-many-risk-data.service';
@@ -56,6 +60,7 @@ import { UpdateRiskService } from './services/risk/update-risk/update-risk.servi
     RiskGroupDataController,
     RiskDataController,
     DocumentPgrController,
+    RiskDataRecController,
   ],
   providers: [
     CreateChecklistService,
@@ -94,6 +99,9 @@ import { UpdateRiskService } from './services/risk/update-risk/update-risk.servi
     UpsertManyRiskDataService,
     DeleteManyRiskDataService,
     FindByIdDocumentsService,
+    FindAllActionPlanService,
+    RiskDataRecRepository,
+    UpsertRiskDataRecService,
   ],
   exports: [RiskRepository, RiskGroupDataRepository, RiskDocumentRepository],
   imports: [CompanyModule],

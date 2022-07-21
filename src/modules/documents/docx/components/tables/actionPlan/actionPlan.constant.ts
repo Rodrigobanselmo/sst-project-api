@@ -8,7 +8,7 @@ export enum ActionPlanColumnEnum {
   SOURCE,
   SEVERITY,
   PROBABILITY,
-  OR,
+  RO,
   INTERVENTION,
   RECOMMENDATION,
   RESPONSIBLE,
@@ -24,7 +24,7 @@ const NewActionPlanHeader = (): headerTableProps[] => {
   header[ActionPlanColumnEnum.SOURCE] = { text: 'FONTE GERADORA OU\nATIVIDADE DE RISCO', size: 10 }
   header[ActionPlanColumnEnum.SEVERITY] = { text: 'SEVERIDADE', size: 1 }
   header[ActionPlanColumnEnum.PROBABILITY] = { text: 'PROBABILIDADE', size: 1 }
-  header[ActionPlanColumnEnum.OR] = { text: 'RISCO OCUPACIONAL', size: 5 }
+  header[ActionPlanColumnEnum.RO] = { text: 'RISCO OCUPACIONAL', size: 5 }
   header[ActionPlanColumnEnum.INTERVENTION] = { text: 'INTERVENÇÃO', size: 5 }
   header[ActionPlanColumnEnum.RECOMMENDATION] = { text: 'RECOMENDAÇÕES', size: 10 }
   header[ActionPlanColumnEnum.RESPONSIBLE] = { text: 'RESPONSÁVEL', size: 5 }
