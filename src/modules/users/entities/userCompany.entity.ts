@@ -30,6 +30,7 @@ export class UserCompanyEntity implements UserCompany {
     examples: ['ACTIVE', 'PENDING', 'CANCELED'],
   })
   status: StatusEnum;
+  groupId: number;
 
   constructor(partial: Partial<UserCompanyEntity>) {
     Object.assign(this, partial);

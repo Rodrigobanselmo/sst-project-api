@@ -8,7 +8,6 @@ import {
 } from '@nestjs/common';
 import { UpdateUserCompanyDto } from '../../../dto/update-user-company.dto';
 import { UsersCompanyRepository } from '../../../repositories/implementations/UsersCompanyRepository';
-import { isMaster } from '../../../../../shared/utils/isMater';
 
 @Injectable()
 export class UpdatePermissionsRolesService {

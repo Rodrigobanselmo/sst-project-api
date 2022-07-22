@@ -10,6 +10,10 @@ export class AccessGroupsEntity implements AccessGroups {
   created_at: Date;
   roles: string[];
   permissions: string[];
+  companyId: string;
+  system: boolean;
+  name: string;
+  description: string;
 
   constructor(partial: Partial<AccessGroupsEntity>) {
     Object.assign(this, partial);

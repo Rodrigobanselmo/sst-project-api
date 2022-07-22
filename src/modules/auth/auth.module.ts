@@ -55,6 +55,6 @@ import { AuthGroupController } from './controller/group/group.controller';
     FindAvailableAccessGroupsService,
     UpsertAccessGroupsService,
   ],
-  exports: [SessionService],
+  exports: [SessionService, AuthGroupRepository],
 })
 export class AuthModule {}

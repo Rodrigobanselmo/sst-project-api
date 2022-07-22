@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { Response } from 'express';
+import { ErrorMessageEnum } from '../constants/enum/errorMessage';
 
 @Catch(PrismaClientKnownRequestError)
 export class PrismaDbExceptionFilter implements ExceptionFilter {
@@ -18,7 +19,7 @@ export class PrismaDbExceptionFilter implements ExceptionFilter {
 
     const { code, meta } = exception;
 
-    let error = new HttpException('Database Prisma error', 500);
+    let error = new HttpException(ErrorMessageEnum.PRISMA_ERROR, 500);
 
     const { cause, target, field_name } = meta;
 
@@ -28,16 +29,17 @@ export class PrismaDbExceptionFilter implements ExceptionFilter {
       case 'P2002':
         if (target)
           error = new BadRequestException(
-            `Data you trying to create already exists: property ${target.join(
+            `Dado que está tentando criar já existe: ${target.join(
               ', ',
-            )} is conflicting`,
+            )} está em conflito`,
           );
         break;
 
       case 'P2003':
         if (field_name)
+          //Data you trying to create or delete requires an FK
           error = new BadRequestException(
-            `Data you trying to create or delete requires an FK: ${field_name}`,
+            `está faltando campos para realizar essa operação: ${field_name}`,
           );
         break;
 
@@ -57,7 +59,7 @@ export class PrismaDbExceptionFilter implements ExceptionFilter {
     response.status(status).json({
       statusCode: status,
       timestamp: new Date().toISOString(),
-      message: error.message,
+      message: error.message || ErrorMessageEnum.PRISMA_ERROR,
       error: error.name,
       path: request.url,
     });

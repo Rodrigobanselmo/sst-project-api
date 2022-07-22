@@ -10,8 +10,8 @@ import { UpsertCompanyGroupsService } from '../../services/group/upsert-company-
 import { User } from './../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from './../../../../shared/dto/user-payload.dto';
 
-@ApiTags('access-group')
-@Controller('auth/group/:companyId')
+@ApiTags('company-group')
+@Controller('company/:companyId/group')
 export class CompanyGroupController {
   constructor(
     private readonly upsertCompanyGroupsService: UpsertCompanyGroupsService,

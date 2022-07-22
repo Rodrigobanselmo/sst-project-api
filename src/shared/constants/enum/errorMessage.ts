@@ -2,6 +2,7 @@ export enum ErrorMessageEnum {
   FILE_WRONG_TABLE_HEAD = 'Cabeçario da tabela está com valores diferente do esperado, certifique-se que você possui a versão mais atualizada da tabela',
   EMAIL_NOT_SEND = 'Erro no envio de email',
   NOT_FOUND_ON_COMPANY_TO_DELETE = 'Dado a ser deletado não foi encontrado nesta empresa',
+  PRISMA_ERROR = 'Desculpe, algo de errado acontenceu, informe o suporte para mais detalhes',
 }
 
 export enum ErrorCompanyEnum {

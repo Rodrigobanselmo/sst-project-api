@@ -4,7 +4,7 @@ import { Reflector } from '@nestjs/core';
 import { RoleEnum } from '../constants/enum/authorization';
 import { UserPayloadDto } from '../dto/user-payload.dto';
 
-const isAdmin = (user: UserPayloadDto) => {
+const isMaster = (user: UserPayloadDto) => {
   return user.roles.some((roles) => roles === RoleEnum.MASTER);
 };
 
@@ -22,7 +22,7 @@ export class RolesGuard implements CanActivate {
     }
     const user: UserPayloadDto = context.switchToHttp().getRequest().user;
 
-    if (isAdmin(user)) return true;
+    if (isMaster(user)) return true;
 
     return requiredRoles.some((role) => user.roles.includes(role));
   }
