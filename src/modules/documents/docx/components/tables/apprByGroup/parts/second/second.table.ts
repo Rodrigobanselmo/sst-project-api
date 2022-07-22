@@ -25,7 +25,14 @@ export const secondRiskInventoryTableSection = (
           tableHeaderElements.headerCell,
         ),
       ),
-      tableBodyElements.tableRow(data.map(tableBodyElements.tableCell)),
+      tableBodyElements.tableRow(
+        data.map((data) =>
+          tableBodyElements.tableCell({
+            ...data,
+            margins: { top: 60, bottom: 60 },
+          }),
+        ),
+      ),
     ],
   });
 

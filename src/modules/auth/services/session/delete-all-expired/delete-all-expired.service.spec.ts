@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { DayJSProvider } from '../../../../shared/providers/DateProvider/implementations/DayJSProvider';
-import { RefreshTokensRepository } from '../../repositories/implementations/RefreshTokensRepository';
+import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
+import { RefreshTokensRepository } from '../../../repositories/implementations/RefreshTokensRepository';
 import { DeleteAllExpiredService } from './delete-all-expired.service';
 
 describe('DeleteAllExpiredRefreshTokensService', () => {

@@ -8,15 +8,15 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
-import { Public } from '../../../shared/decorators/public.decorator';
-import { ForgotPasswordDto } from '../dto/forgot-password';
-import { LoginGoogleUserDto, LoginUserDto } from '../dto/login-user.dto';
-import { RefreshTokenDto } from '../dto/refresh-token.dto';
-import { DeleteAllExpiredService } from '../services/delete-all-expired/delete-all-expired.service';
-import { RefreshTokenService } from '../services/refresh-token/refresh-token.service';
-import { SendForgotPassMailService } from '../services/send-forgot-pass-mail/send-forgot-pass-mail.service';
-import { SessionService } from '../services/session/session.service';
-import { VerifyGoogleLoginService } from '../services/verify-google-login/verify-google-login.service';
+import { Public } from '../../../../shared/decorators/public.decorator';
+import { ForgotPasswordDto } from '../../dto/forgot-password';
+import { LoginGoogleUserDto, LoginUserDto } from '../../dto/login-user.dto';
+import { RefreshTokenDto } from '../../dto/refresh-token.dto';
+import { DeleteAllExpiredService } from '../../services/session/delete-all-expired/delete-all-expired.service';
+import { RefreshTokenService } from '../../services/session/refresh-token/refresh-token.service';
+import { SendForgotPassMailService } from '../../services/session/send-forgot-pass-mail/send-forgot-pass-mail.service';
+import { SessionService } from '../../services/session/session/session.service';
+import { VerifyGoogleLoginService } from '../../services/session/verify-google-login/verify-google-login.service';
 
 @ApiTags('Authentication')
 @Controller()

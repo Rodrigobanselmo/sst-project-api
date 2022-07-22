@@ -1,9 +1,9 @@
-import { ErrorInvitesEnum } from './../../../../shared/constants/enum/errorMessage';
+import { ErrorInvitesEnum } from '../../../../../shared/constants/enum/errorMessage';
 import { BadRequestException, Injectable } from '@nestjs/common';
 
-import { FirebaseProvider } from '../../../../shared/providers/FirebaseProvider/FirebaseProvider';
-import { UsersRepository } from '../../../users/repositories/implementations/UsersRepository';
-import { LoginGoogleUserDto } from '../../dto/login-user.dto';
+import { FirebaseProvider } from '../../../../../shared/providers/FirebaseProvider/FirebaseProvider';
+import { UsersRepository } from '../../../../users/repositories/implementations/UsersRepository';
+import { LoginGoogleUserDto } from '../../../dto/login-user.dto';
 
 @Injectable()
 export class VerifyGoogleLoginService {

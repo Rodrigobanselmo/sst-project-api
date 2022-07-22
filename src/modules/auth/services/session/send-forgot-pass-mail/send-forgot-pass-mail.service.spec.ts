@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SendGridProvider } from '../../../../shared/providers/MailProvider/implementations/SendGrid/SendGridProvider';
-import { UsersRepository } from '../../../../modules/users/repositories/implementations/UsersRepository';
-import { DayJSProvider } from '../../../../shared/providers/DateProvider/implementations/DayJSProvider';
-import { RefreshTokensRepository } from '../../repositories/implementations/RefreshTokensRepository';
+import { SendGridProvider } from '../../../../../shared/providers/MailProvider/implementations/SendGrid/SendGridProvider';
+import { UsersRepository } from '../../../../users/repositories/implementations/UsersRepository';
+import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
+import { RefreshTokensRepository } from '../../../repositories/implementations/RefreshTokensRepository';
 import { SendForgotPassMailService } from './send-forgot-pass-mail.service';
 
 describe('SendForgotPassMailService', () => {

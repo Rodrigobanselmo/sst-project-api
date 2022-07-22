@@ -1,13 +1,13 @@
-import { UserEntity } from './../../../users/entities/user.entity';
+import { UserEntity } from '../../../../users/entities/user.entity';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { classToClass } from 'class-transformer';
 
-import { UsersRepository } from '../../../../modules/users/repositories/implementations/UsersRepository';
-import { HashProvider } from '../../../../shared/providers/HashProvider/implementations/HashProvider';
-import { JwtTokenProvider } from '../../../../shared/providers/TokenProvider/implementations/JwtTokenProvider';
-import { LoginUserDto } from '../../dto/login-user.dto';
-import { PayloadTokenDto } from '../../dto/payload-token.dto';
-import { RefreshTokensRepository } from '../../repositories/implementations/RefreshTokensRepository';
+import { UsersRepository } from '../../../../users/repositories/implementations/UsersRepository';
+import { HashProvider } from '../../../../../shared/providers/HashProvider/implementations/HashProvider';
+import { JwtTokenProvider } from '../../../../../shared/providers/TokenProvider/implementations/JwtTokenProvider';
+import { LoginUserDto } from '../../../dto/login-user.dto';
+import { PayloadTokenDto } from '../../../dto/payload-token.dto';
+import { RefreshTokensRepository } from '../../../repositories/implementations/RefreshTokensRepository';
 
 @Injectable()
 export class SessionService {

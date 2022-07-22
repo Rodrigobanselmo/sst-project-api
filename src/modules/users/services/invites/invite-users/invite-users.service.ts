@@ -1,4 +1,11 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { UsersCompanyRepository } from './../../../repositories/implementations/UsersCompanyRepository';
+import { UserPayloadDto } from './../../../../../shared/dto/user-payload.dto';
+import { AuthGroupRepository } from './../../../../auth/repositories/implementations/AuthGroupRepository';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { resolve } from 'path';
 
 import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
@@ -14,15 +21,51 @@ export class InviteUsersService {
   constructor(
     private readonly inviteUsersRepository: InviteUsersRepository,
     private readonly usersRepository: UsersRepository,
+    private readonly authGroupRepository: AuthGroupRepository,
     private readonly dateProvider: DayJSProvider,
     private readonly mailProvider: SendGridProvider,
   ) {}
 
-  async execute(inviteUserDto: InviteUserDto) {
-    const user = await this.usersRepository.findByEmail(inviteUserDto.email);
+  async execute(inviteUserDto: InviteUserDto, userPayloadDto: UserPayloadDto) {
+    const userRoles = userPayloadDto.roles || [];
+    const userPermissions = userPayloadDto.permissions || [];
 
-    if (user) {
-      const userAlreadyAdded = user.companies.some(
+    const userToAdd = await this.usersRepository.findByEmail(
+      inviteUserDto.email,
+    );
+
+    const authGroup = await this.authGroupRepository.findById(
+      inviteUserDto.groupId,
+      userPayloadDto.companyId,
+    );
+
+    if (!authGroup)
+      throw new BadRequestException(ErrorInvitesEnum.AUTH_GROUP_NOT_FOUND);
+
+    if (!userPayloadDto.isMaster) {
+      const addRoles = [
+        ...(inviteUserDto.roles || []),
+        ...(authGroup?.roles || []),
+      ];
+
+      const addPermissions = [
+        ...(inviteUserDto.permissions || []),
+        ...(authGroup?.permissions || []),
+      ];
+
+      const hasAllRoles = addRoles.every((role) => userRoles.includes(role));
+      const hasAllPermissions = addPermissions.every((permission) =>
+        userPermissions.includes(permission),
+      );
+
+      if (!hasAllRoles || !hasAllPermissions)
+        throw new ForbiddenException(
+          ErrorInvitesEnum.FORBIDDEN_INSUFFICIENT_PERMISSIONS,
+        );
+    }
+
+    if (userToAdd) {
+      const userAlreadyAdded = userToAdd.companies.some(
         (company) => company.companyId === inviteUserDto.companyId,
       );
 

@@ -1,4 +1,4 @@
-import { IsEmail, IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsEmail, IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
 import {
   PermissionEnum,
   RoleEnum,
@@ -8,6 +8,10 @@ export class InviteUserDto {
   @IsString()
   @IsEmail()
   readonly email: string;
+
+  @IsInt()
+  @IsOptional()
+  readonly groupId: number;
 
   @IsString()
   readonly companyId: string;

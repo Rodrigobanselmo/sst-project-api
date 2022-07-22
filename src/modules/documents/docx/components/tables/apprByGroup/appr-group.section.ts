@@ -1,3 +1,4 @@
+import { HierarchyEntity } from './../../../../../company/entities/hierarchy.entity';
 import { HomoTypeEnum } from '@prisma/client';
 import { ISectionOptions, PageOrientation } from 'docx';
 import { removeDuplicate } from '../../../../../../shared/utils/removeDuplicate';
@@ -14,6 +15,7 @@ import {
 import { firstRiskInventoryTableSection } from './parts/first/first.table';
 import { secondRiskInventoryTableSection } from './parts/second/second.table';
 import { thirdRiskInventoryTableSection } from './parts/third/third.table';
+import { officeRiskInventoryTableSection } from './parts/2-offices/offices.table';
 
 export interface IAPPRTableOptions {
   isByGroup?: boolean;
@@ -37,7 +39,10 @@ export const APPRByGroupTableSection = (
     if (hierarchy.workspace) workspace = hierarchy.workspace;
   });
 
-  const hierarchyDataHomoGroup = new Map<string, HierarchyMapData>();
+  const hierarchyDataHomoGroup = new Map<
+    string,
+    HierarchyMapData & { hierarchies: HierarchyEntity[] }
+  >();
 
   const everyHomoFound = [] as string[];
   const everyHomoNotFound = [] as string[];
@@ -83,6 +88,7 @@ export const APPRByGroupTableSection = (
     }
 
     hierarchyDataHomoGroup.set(homo.id, {
+      hierarchies: homoGroupTree[homo.id].hierarchies,
       allHomogeneousGroupIds: [homo.id],
       descReal: desc,
       descRh: descRh || desc,
@@ -154,6 +160,7 @@ export const APPRByGroupTableSection = (
           hierarchyDataHomoGroup.set(homo.id, {
             ...mapDataHomo,
             allHomogeneousGroupIds,
+            hierarchies: homoGroupTree[homo.id].hierarchies,
           });
         }
 
@@ -180,6 +187,7 @@ export const APPRByGroupTableSection = (
         hierarchy,
         isByGroup,
       );
+      const officeTable = officeRiskInventoryTableSection(hierarchy);
       const secondTable = secondRiskInventoryTableSection(hierarchy, isByGroup);
       const thirdTable = thirdRiskInventoryTableSection(
         riskFactorGroupData,
@@ -187,7 +195,12 @@ export const APPRByGroupTableSection = (
         hierarchyTree,
       );
 
-      sectionsTables.push([firstTable, ...secondTable, ...thirdTable]);
+      sectionsTables.push([
+        firstTable,
+        ...officeTable,
+        ...secondTable,
+        ...thirdTable,
+      ]);
     };
     createTable();
   });

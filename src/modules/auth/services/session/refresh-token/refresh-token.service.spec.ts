@@ -1,8 +1,8 @@
 import { UnauthorizedException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { UsersRepository } from '../../../../modules/users/repositories/implementations/UsersRepository';
-import { JwtTokenProvider } from '../../../../shared/providers/TokenProvider/implementations/JwtTokenProvider';
-import { RefreshTokensRepository } from '../../repositories/implementations/RefreshTokensRepository';
+import { UsersRepository } from '../../../../users/repositories/implementations/UsersRepository';
+import { JwtTokenProvider } from '../../../../../shared/providers/TokenProvider/implementations/JwtTokenProvider';
+import { RefreshTokensRepository } from '../../../repositories/implementations/RefreshTokensRepository';
 import { RefreshTokenService } from './refresh-token.service';
 
 describe('RefreshTokenService', () => {

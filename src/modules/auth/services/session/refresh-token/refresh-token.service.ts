@@ -1,10 +1,10 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { classToClass } from 'class-transformer';
 
-import { UsersRepository } from '../../../../modules/users/repositories/implementations/UsersRepository';
-import { JwtTokenProvider } from '../../../../shared/providers/TokenProvider/implementations/JwtTokenProvider';
-import { PayloadTokenDto } from '../../dto/payload-token.dto';
-import { RefreshTokensRepository } from '../../repositories/implementations/RefreshTokensRepository';
+import { UsersRepository } from '../../../../users/repositories/implementations/UsersRepository';
+import { JwtTokenProvider } from '../../../../../shared/providers/TokenProvider/implementations/JwtTokenProvider';
+import { PayloadTokenDto } from '../../../dto/payload-token.dto';
+import { RefreshTokensRepository } from '../../../repositories/implementations/RefreshTokensRepository';
 
 @Injectable()
 export class RefreshTokenService {

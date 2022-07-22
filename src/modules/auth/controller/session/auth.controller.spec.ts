@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { DeleteAllExpiredService } from '../services/delete-all-expired/delete-all-expired.service';
-import { RefreshTokenService } from '../services/refresh-token/refresh-token.service';
-import { SendForgotPassMailService } from '../services/send-forgot-pass-mail/send-forgot-pass-mail.service';
-import { SessionService } from '../services/session/session.service';
+import { DeleteAllExpiredService } from '../../services/session/delete-all-expired/delete-all-expired.service';
+import { RefreshTokenService } from '../../services/session/refresh-token/refresh-token.service';
+import { SendForgotPassMailService } from '../../services/session/send-forgot-pass-mail/send-forgot-pass-mail.service';
+import { SessionService } from '../../services/session/session/session.service';
 import { AuthController } from './auth.controller';
 
 describe('AuthController', () => {

@@ -59,6 +59,10 @@ import { UpdateEnvironmentPhotoService } from './services/environment/update-env
 import { UpdateCharacterizationPhotoService } from './services/characterization/update-characterization-photo/update-characterization-photo.service';
 import { RiskDataRepository } from '../checklist/repositories/implementations/RiskDataRepository';
 import { UpdateSimpleManyHierarchyService } from './services/hierarchy/update-simple-many-hierarchies /upsert-many-hierarchies.service';
+import { CompanyGroupController } from './controller/group/group.controller';
+import { CompanyGroupRepository } from './repositories/implementations/CompanyGroupRepository';
+import { FindAvailableCompanyGroupsService } from './services/group/find-company-groups-group/find-company-groups-group.service';
+import { UpsertCompanyGroupsService } from './services/group/upsert-company-group/upsert-company-group.service';
 
 @Module({
   controllers: [
@@ -68,6 +72,7 @@ import { UpdateSimpleManyHierarchyService } from './services/hierarchy/update-si
     HomoGroupsController,
     EnvironmentController,
     CharacterizationController,
+    CompanyGroupController,
   ],
   providers: [
     CreateCompanyService,
@@ -123,6 +128,9 @@ import { UpdateSimpleManyHierarchyService } from './services/hierarchy/update-si
     UpdateEnvironmentPhotoService,
     UpdateCharacterizationPhotoService,
     UpdateSimpleManyHierarchyService,
+    CompanyGroupRepository,
+    FindAvailableCompanyGroupsService,
+    UpsertCompanyGroupsService,
   ],
   exports: [
     CompanyRepository,

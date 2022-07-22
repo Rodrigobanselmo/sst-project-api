@@ -76,7 +76,6 @@ enum RecTypeEnum {
   EPI
 }
 
-
 enum RiskRecTypeEnum {
   CANCELED
   POSTPONED
@@ -89,6 +88,23 @@ enum RiskRecTextTypeEnum {
   LOGISTICS
   OTHER
 }
+
+// START TABLES
+
+model AccessGroups {
+  id    Int     @default(autoincrement()) @id
+  roles String[]
+  permissions String[]
+  name String  
+  description String?  
+  companyId String  
+  system Boolean @default(false)  
+  users UserCompany[]
+  invites InviteUsers[]
+  company Company? @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
+
+  @@unique([id, companyId])
+} 
 
 model Activity {
   id    Int     @default(autoincrement()) @id
@@ -196,6 +212,7 @@ model Company {
   professionals Professional[]
   users UserCompany[]
   workspace Workspace[]
+  accessGroups AccessGroups[]
   address AddressCompany?
   primary_activity Activity[] @relation(name: "primary_activity")
   secondary_activity Activity[] @relation(name: "secondary_activity")
@@ -204,7 +221,7 @@ model Company {
   receivingServiceContracts Contract[]
   applyingServiceContracts Contract[]  @relation(name: "contracts")
   license License? @relation(name:"license",fields: [licenseId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
-  group CompanyGroup? @relation(fields: [groupId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
+  group CompanyGroup? @relation(name:"group", fields: [groupId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
   riskFactors RiskFactors[] 
   homogeneousGroup HomogeneousGroup[] 
   generateSource GenerateSource[] 
@@ -214,6 +231,7 @@ model Company {
   hierarchy Hierarchy[] 
   databaseTable DatabaseTable[] 
   checklist Checklist[] 
+  companyGroups CompanyGroup[] 
   riskFactorData RiskFactorData[] 
   riskFactorDataRec RiskFactorDataRec[] 
   riskFactorGroupData RiskFactorGroupData[] 
@@ -226,7 +244,11 @@ model CompanyGroup {
   description String?
   created_at DateTime @default(now())
   updated_at  DateTime   @updatedAt
-  company Company[]
+  companies Company[] @relation(name:"group") 
+  companyId String
+  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
+
+  @@unique([id, companyId])
 }
 
 model CompanyCharacterization {
@@ -383,12 +405,6 @@ model GenerateSource {
   @@unique([id, companyId])
 } 
 
-model AccessGroups {
-  id    Int     @default(autoincrement()) @id
-  roles String[]
-  permissions String[]
-} 
-
 model Hierarchy {
   id    String     @default(uuid())  @id
   created_at DateTime @default(now())
@@ -450,6 +466,8 @@ model InviteUsers {
   email String 
   roles String[]
   permissions String[]
+  groupId Int?
+  group AccessGroups? @relation(fields: [groupId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
 }
 
 model License {
@@ -658,7 +676,6 @@ model RiskFactorProbability {
   @@unique([riskFactorDataAfterId,riskId,riskFactorGroupDataId])
 }
 
-
 model RiskFactorDataRec {
   id    String   @id  @default(uuid())
   responsibleName    String?
@@ -712,6 +729,8 @@ model User {
 model UserCompany {
   roles String[]
   permissions String[]
+  groupId Int?
+  group AccessGroups? @relation(fields: [groupId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
   status StatusEnum @default(ACTIVE)
   userId Int
   user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade) 

@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { StatusEnum } from '@prisma/client';
@@ -13,6 +13,10 @@ export class UserCompanyDto {
 
   @IsString({ each: true })
   readonly permissions: string[];
+
+  @IsInt()
+  @IsOptional()
+  readonly groupId?: number;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsString()

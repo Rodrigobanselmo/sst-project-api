@@ -1,10 +1,10 @@
 import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { UsersRepository } from '../../../../modules/users/repositories/implementations/UsersRepository';
-import { HashProvider } from '../../../../shared/providers/HashProvider/implementations/HashProvider';
-import { JwtTokenProvider } from '../../../../shared/providers/TokenProvider/implementations/JwtTokenProvider';
-import { RefreshTokensRepository } from '../../repositories/implementations/RefreshTokensRepository';
+import { UsersRepository } from '../../../../users/repositories/implementations/UsersRepository';
+import { HashProvider } from '../../../../../shared/providers/HashProvider/implementations/HashProvider';
+import { JwtTokenProvider } from '../../../../../shared/providers/TokenProvider/implementations/JwtTokenProvider';
+import { RefreshTokensRepository } from '../../../repositories/implementations/RefreshTokensRepository';
 import { SessionService } from './session.service';
 
 describe('SessionService', () => {

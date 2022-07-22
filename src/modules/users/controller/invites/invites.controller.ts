@@ -52,8 +52,11 @@ export class InvitesController {
   }
 
   @Post()
-  async invite(@Body() inviteUserDto: InviteUserDto) {
-    return classToClass(this.inviteUsersService.execute(inviteUserDto));
+  async invite(
+    @Body() inviteUserDto: InviteUserDto,
+    @User() user: UserPayloadDto,
+  ) {
+    return classToClass(this.inviteUsersService.execute(inviteUserDto, user));
   }
 
   @Delete('/:id/:companyId?')

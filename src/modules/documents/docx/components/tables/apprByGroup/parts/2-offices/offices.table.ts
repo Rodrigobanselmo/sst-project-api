@@ -1,28 +1,26 @@
+import { HierarchyEntity } from './../../../../../../../company/entities/hierarchy.entity';
 import { Table, WidthType } from 'docx';
 
 import { HierarchyMapData } from '../../../../../converter/hierarchy.converter';
 import { TableBodyElements } from '../../elements/body';
 import { TableHeaderElements } from '../../elements/header';
-import { secondRiskInventoryHeader } from './second.constant';
-import { dataConverter } from './second.converter';
+import { secondRiskInventoryHeader } from './offices.constant';
+import { dataConverter } from './offices.converter';
 
-export const secondRiskInventoryTableSection = (
-  hierarchyData: HierarchyMapData,
-  isByGroup: boolean,
+export const officeRiskInventoryTableSection = (
+  hierarchyData: HierarchyMapData & { hierarchies: HierarchyEntity[] },
 ) => {
-  let data = dataConverter(hierarchyData);
+  const data = dataConverter(hierarchyData);
 
   const tableHeaderElements = new TableHeaderElements();
   const tableBodyElements = new TableBodyElements();
-
-  if (isByGroup) data = data.slice(1, 2);
 
   const table = new Table({
     width: { size: 100, type: WidthType.PERCENTAGE },
     rows: [
       tableHeaderElements.headerRow(
-        secondRiskInventoryHeader(isByGroup).map(
-          tableHeaderElements.headerCell,
+        secondRiskInventoryHeader().map((data) =>
+          tableHeaderElements.headerCell({ ...data }),
         ),
       ),
       tableBodyElements.tableRow(

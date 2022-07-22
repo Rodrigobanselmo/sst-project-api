@@ -24,6 +24,7 @@ export enum ErrorInvitesEnum {
   FORBIDDEN_INSUFFICIENT_PERMISSIONS = 'Você não tem permissão para criar um usuário com essas credênciais',
   USER_ALREADY_EXIST = 'Usuário já cadastrado',
   GOOGLE_USER_NOT_EXIST = 'Nenhum usuário econtrado que esteja vinculado a esta conta Google',
+  AUTH_GROUP_NOT_FOUND = 'Grupo de permissões não enontrado',
 }
 
 export enum ErrorChecklistEnum {

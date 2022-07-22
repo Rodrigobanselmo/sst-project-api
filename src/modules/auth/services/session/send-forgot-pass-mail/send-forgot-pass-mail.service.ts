@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { resolve } from 'path';
 
-import { UsersRepository } from '../../../../modules/users/repositories/implementations/UsersRepository';
-import { DayJSProvider } from '../../../../shared/providers/DateProvider/implementations/DayJSProvider';
-import { SendGridProvider } from '../../../../shared/providers/MailProvider/implementations/SendGrid/SendGridProvider';
-import { RefreshTokensRepository } from '../../repositories/implementations/RefreshTokensRepository';
+import { UsersRepository } from '../../../../users/repositories/implementations/UsersRepository';
+import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
+import { SendGridProvider } from '../../../../../shared/providers/MailProvider/implementations/SendGrid/SendGridProvider';
+import { RefreshTokensRepository } from '../../../repositories/implementations/RefreshTokensRepository';
 
 @Injectable()
 export class SendForgotPassMailService {

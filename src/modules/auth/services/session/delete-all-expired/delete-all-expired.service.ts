@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
-import { RefreshTokensRepository } from '../../../../modules/auth/repositories/implementations/RefreshTokensRepository';
-import { DayJSProvider } from '../../../../shared/providers/DateProvider/implementations/DayJSProvider';
+import { RefreshTokensRepository } from '../../../repositories/implementations/RefreshTokensRepository';
+import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 
 @Injectable()
 export class DeleteAllExpiredService {
