@@ -431,24 +431,28 @@ export class CompanyRepository implements ICompanyRepository {
   }
 
   async findAllRelatedByCompanyId(
-    companyId: string,
+    companyId: string | null,
     query: FindCompaniesDto,
     pagination: PaginationQueryDto,
     options: Partial<Prisma.CompanyFindManyArgs> = { where: undefined },
   ) {
     const where = {
       AND: [
-        {
-          OR: [
-            { id: companyId },
-            {
-              receivingServiceContracts: {
-                some: { applyingServiceCompanyId: companyId },
+        ...(companyId
+          ? [
+              {
+                OR: [
+                  { id: companyId },
+                  {
+                    receivingServiceContracts: {
+                      some: { applyingServiceCompanyId: companyId },
+                    },
+                  },
+                ],
+                ...options?.where,
               },
-            },
-          ],
-          ...options?.where,
-        },
+            ]
+          : []),
       ],
     } as typeof options.where;
 

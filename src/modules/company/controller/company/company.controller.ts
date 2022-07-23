@@ -24,6 +24,7 @@ import { CopyCompanyService } from '../../services/company/copy-company/copy-com
 import { CreateCompanyService } from '../../services/company/create-company/create-company.service';
 import { CreateContractService } from '../../services/company/create-contract/create-contract.service';
 import { FindAllCompaniesService } from '../../services/company/find-all-companies/find-all-companies.service';
+import { FindAllUserCompaniesService } from '../../services/company/find-all-user-companies /find-all-companies.service';
 import { FindCepService } from '../../services/company/find-cep/find-cep.service';
 import { FindCnpjService } from '../../services/company/find-cnpj/find-cnpj.service';
 import { FindCompanyService } from '../../services/company/find-company/find-company.service';
@@ -38,16 +39,12 @@ export class CompanyController {
     private readonly addCompanyPhotoService: AddCompanyPhotoService,
     private readonly updateCompanyService: UpdateCompanyService,
     private readonly findAllCompaniesService: FindAllCompaniesService,
+    private readonly findAllUserCompaniesService: FindAllUserCompaniesService,
     private readonly findCompanyService: FindCompanyService,
     private readonly findCnpjService: FindCnpjService,
     private readonly findCepService: FindCepService,
     private readonly copyCompanyService: CopyCompanyService,
   ) {}
-
-  @Get('/:companyId')
-  findOne(@User() userPayloadDto: UserPayloadDto) {
-    return this.findCompanyService.execute(userPayloadDto);
-  }
 
   @Get()
   findAll(
@@ -55,6 +52,19 @@ export class CompanyController {
     @Query() query: FindCompaniesDto,
   ) {
     return this.findAllCompaniesService.execute(userPayloadDto, query);
+  }
+
+  @Get('user')
+  findAllByUser(
+    @User() userPayloadDto: UserPayloadDto,
+    @Query() query: FindCompaniesDto,
+  ) {
+    return this.findAllUserCompaniesService.execute(userPayloadDto, query);
+  }
+
+  @Get('/:companyId')
+  findOne(@User() userPayloadDto: UserPayloadDto) {
+    return this.findCompanyService.execute(userPayloadDto);
   }
 
   @Get('cnpj/:cnpj')

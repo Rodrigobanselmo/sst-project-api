@@ -63,6 +63,7 @@ import { CompanyGroupController } from './controller/group/group.controller';
 import { CompanyGroupRepository } from './repositories/implementations/CompanyGroupRepository';
 import { FindAvailableCompanyGroupsService } from './services/group/find-company-groups-group/find-company-groups-group.service';
 import { UpsertCompanyGroupsService } from './services/group/upsert-company-group/upsert-company-group.service';
+import { FindAllUserCompaniesService } from './services/company/find-all-user-companies /find-all-companies.service';
 
 @Module({
   controllers: [
@@ -131,6 +132,7 @@ import { UpsertCompanyGroupsService } from './services/group/upsert-company-grou
     CompanyGroupRepository,
     FindAvailableCompanyGroupsService,
     UpsertCompanyGroupsService,
+    FindAllUserCompaniesService,
   ],
   exports: [
     CompanyRepository,

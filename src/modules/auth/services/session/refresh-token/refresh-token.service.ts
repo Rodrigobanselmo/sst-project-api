@@ -14,7 +14,7 @@ export class RefreshTokenService {
     private readonly jwtTokenProvider: JwtTokenProvider,
   ) {}
 
-  async execute(refresh_token: string) {
+  async execute(refresh_token: string, companyId?: string) {
     const sub = this.jwtTokenProvider.verifyIsValidToken(
       refresh_token,
       'refresh',
@@ -55,7 +55,10 @@ export class RefreshTokenService {
       })
       .filter((i) => i);
 
-    const company = companies[0] || ({} as typeof companies[0]);
+    const company =
+      companies.find((userCompany) => userCompany.companyId === companyId) ||
+      companies[0] ||
+      ({} as typeof companies[0]);
 
     const payloadToken: PayloadTokenDto = {
       email: user.email,

@@ -26,6 +26,8 @@ class AwsSesProvider implements IMailProvider {
 
     const random = String(Math.floor(Math.random() * 1000000));
 
+    if (process.env.APP_HOST.includes('localhost')) return;
+
     const message = await this.client
       .sendEmail({
         Source: source.replace(':id', random),
