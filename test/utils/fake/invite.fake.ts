@@ -12,7 +12,7 @@ export class FakeInvite implements InviteUserDto {
   roles: string[] = ['admin'];
   permissions: string[] = [
     PermissionEnum.USER,
-    PermissionEnum.INVITE_USER,
+    PermissionEnum.USER,
     PermissionEnum.CREATE_COMPANY,
   ];
 

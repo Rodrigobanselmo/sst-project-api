@@ -6,7 +6,7 @@ import { UpsertPgrDto } from '../../dto/pgr.dto';
 import { PgrUploadService } from '../../services/pgr/document/upload-pgr-doc.service';
 
 @Injectable()
-export class SendSMSConsumer {
+export class PgrConsumer {
   constructor(private readonly pgrUploadDocService: PgrUploadService) {
     Consumer.create({
       queueUrl: process.env.AWS_SQS_PGR_URL,

@@ -20,6 +20,12 @@ import { DeleteInvitesService } from '../../services/invites/delete-invites/dele
 import { FindAllByCompanyIdService } from '../../services/invites/find-by-companyId/find-by-companyId.service';
 import { FindAllByEmailService } from '../../services/invites/find-by-email/find-by-email.service';
 import { InviteUsersService } from '../../services/invites/invite-users/invite-users.service';
+import { Permissions } from '../../../../shared/decorators/permissions.decorator';
+import {
+  PermissionEnum,
+  RoleEnum,
+} from '../../../../shared/constants/enum/authorization';
+import { Roles } from '../../../../shared/decorators/roles.decorator';
 
 @ApiTags('invites')
 @Controller('invites')
@@ -32,6 +38,11 @@ export class InvitesController {
     private readonly deleteExpiredInvitesService: DeleteExpiredInvitesService,
   ) {}
 
+  @Permissions({
+    code: PermissionEnum.USER,
+    isMember: true,
+    isContract: true,
+  })
   @Get('/:companyId?')
   async findAllByCompany(@User() user: UserPayloadDto) {
     return classToClass(
@@ -51,6 +62,12 @@ export class InvitesController {
     return classToClass(this.findAllByEmailService.execute(email));
   }
 
+  @Permissions({
+    code: PermissionEnum.USER,
+    isMember: true,
+    isContract: true,
+    crud: true,
+  })
   @Post()
   async invite(
     @Body() inviteUserDto: InviteUserDto,
@@ -59,6 +76,12 @@ export class InvitesController {
     return classToClass(this.inviteUsersService.execute(inviteUserDto, user));
   }
 
+  @Permissions({
+    code: PermissionEnum.USER,
+    isMember: true,
+    crud: true,
+    isContract: true,
+  })
   @Delete('/:id/:companyId?')
   async delete(@Param('id') id: string, @User() user: UserPayloadDto) {
     await this.deleteInvitesService.execute({

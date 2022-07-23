@@ -209,33 +209,33 @@ model Company {
   updated_at  DateTime   @updatedAt
   status StatusEnum @default(ACTIVE)
   type CompanyTypesEnum @default(MATRIZ)
-  professionals Professional[]
-  users UserCompany[]
-  workspace Workspace[]
   accessGroups AccessGroups[]
   address AddressCompany?
-  primary_activity Activity[] @relation(name: "primary_activity")
-  secondary_activity Activity[] @relation(name: "secondary_activity")
-  employees Employee[] 
-  invites InviteUsers[] 
-  receivingServiceContracts Contract[]
   applyingServiceContracts Contract[]  @relation(name: "contracts")
-  license License? @relation(name:"license",fields: [licenseId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
-  group CompanyGroup? @relation(name:"group", fields: [groupId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
-  riskFactors RiskFactors[] 
-  homogeneousGroup HomogeneousGroup[] 
-  generateSource GenerateSource[] 
-  recMed RecMed[] 
-  environments CompanyEnvironment[] 
   characterization CompanyCharacterization[] 
-  hierarchy Hierarchy[] 
-  databaseTable DatabaseTable[] 
   checklist Checklist[] 
   companyGroups CompanyGroup[] 
+  databaseTable DatabaseTable[] 
+  employees Employee[] 
+  environments CompanyEnvironment[] 
+  generateSource GenerateSource[] 
+  group CompanyGroup? @relation(name:"group", fields: [groupId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
+  hierarchy Hierarchy[] 
+  homogeneousGroup HomogeneousGroup[] 
+  invites InviteUsers[] 
+  license License? @relation(name:"license",fields: [licenseId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
+  primary_activity Activity[] @relation(name: "primary_activity")
+  professionals Professional[]
+  receivingServiceContracts Contract[]
+  recMed RecMed[] 
   riskFactorData RiskFactorData[] 
   riskFactorDataRec RiskFactorDataRec[] 
-  riskFactorGroupData RiskFactorGroupData[] 
   riskFactorDocument RiskFactorDocument[] 
+  riskFactorGroupData RiskFactorGroupData[] 
+  riskFactors RiskFactors[] 
+  secondary_activity Activity[] @relation(name: "secondary_activity")
+  users UserCompany[]
+  workspace Workspace[]
 }
 
 model CompanyGroup {
@@ -463,6 +463,7 @@ model InviteUsers {
   expires_date DateTime
   companyId String
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  companiesIds String[]
   email String 
   roles String[]
   permissions String[]
@@ -730,7 +731,7 @@ model UserCompany {
   roles String[]
   permissions String[]
   groupId Int?
-  group AccessGroups? @relation(fields: [groupId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
+  group AccessGroups? @relation(fields: [groupId], references: [id], onDelete: SetNull, onUpdate: Cascade) 
   status StatusEnum @default(ACTIVE)
   userId Int
   user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade) 

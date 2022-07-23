@@ -13,7 +13,7 @@ import { DayJSProvider } from '../../shared/providers/DateProvider/implementatio
 import { UsersModule } from '../users/users.module';
 import { PgrDownloadAttachmentsService } from './services/pgr/document/download-pgr-attachment-doc.service';
 import { AddQueuePGRDocumentService } from './services/pgr/document/add-queue-pgr-doc.service';
-import { SendSMSConsumer } from './consumers/pgr/documents.consumer';
+import { PgrConsumer } from './consumers/pgr/documents.consumer';
 import { PgrActionPlanUploadTableService } from './services/pgr/action-plan/upload-action-plan-table.service';
 
 @Module({
@@ -29,7 +29,7 @@ import { PgrActionPlanUploadTableService } from './services/pgr/action-plan/uplo
     AmazonStorageProvider,
     PgrDownloadAttachmentsService,
     AddQueuePGRDocumentService,
-    SendSMSConsumer,
+    // PgrConsumer,
     PgrActionPlanUploadTableService,
   ],
 })

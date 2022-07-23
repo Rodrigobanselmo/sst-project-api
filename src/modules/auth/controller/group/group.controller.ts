@@ -9,6 +9,12 @@ import { FindAvailableAccessGroupsService } from '../../services/group/find-avai
 import { UpsertAccessGroupsService } from '../../services/group/upsert-access-group/upsert-access-group.service';
 import { User } from './../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from './../../../../shared/dto/user-payload.dto';
+import { Permissions } from '../../../../shared/decorators/permissions.decorator';
+import {
+  PermissionEnum,
+  RoleEnum,
+} from '../../../../shared/constants/enum/authorization';
+import { Roles } from '../../../../shared/decorators/roles.decorator';
 
 @ApiTags('access-group')
 @Controller('auth/group/:companyId')
@@ -18,6 +24,18 @@ export class AuthGroupController {
     private readonly upsertAccessGroupsService: UpsertAccessGroupsService,
   ) {}
 
+  @Permissions(
+    {
+      code: PermissionEnum.ACCESS_GROUP,
+      crud: true,
+      isMember: true,
+    },
+    {
+      code: PermissionEnum.USER,
+      crud: true,
+      isMember: true,
+    },
+  )
   @Get()
   find(
     @User() userPayloadDto: UserPayloadDto,
@@ -26,6 +44,11 @@ export class AuthGroupController {
     return this.findAvailableAccessGroupsService.execute(query, userPayloadDto);
   }
 
+  @Permissions({
+    code: PermissionEnum.ACCESS_GROUP,
+    crud: true,
+    isMember: true,
+  })
   @Post()
   upsert(
     @Body() upsertAccessGroupDto: UpsertAccessGroupDto,

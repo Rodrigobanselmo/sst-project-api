@@ -30,5 +30,6 @@ export class InviteUsersEntity implements InviteUsers {
   constructor(partial: Partial<InviteUsersEntity>) {
     Object.assign(this, partial);
   }
+  companiesIds: string[];
   groupId: number;
 }

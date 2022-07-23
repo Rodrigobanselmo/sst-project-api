@@ -11,7 +11,7 @@ export class AuthorizationTestController {
       crud: true,
     },
     {
-      code: PermissionEnum.INVITE_USER,
+      code: PermissionEnum.USER,
     },
   )
   @Get()
@@ -25,7 +25,7 @@ export class AuthorizationTestController {
       crud: true,
     },
     {
-      code: PermissionEnum.INVITE_USER,
+      code: PermissionEnum.USER,
       isMember: true,
     },
     {
@@ -55,7 +55,7 @@ export class AuthorizationTestController {
       crud: true,
     },
     {
-      code: PermissionEnum.INVITE_USER,
+      code: PermissionEnum.USER,
       crud: true,
       isMember: true,
       isContract: true,
@@ -72,7 +72,7 @@ export class AuthorizationTestController {
   }
 
   @Permissions({
-    code: PermissionEnum.INVITE_USER,
+    code: PermissionEnum.USER,
     crud: true,
   })
   @Delete()

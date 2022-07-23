@@ -3,7 +3,7 @@ import { PermissionEnum } from '../constants/enum/authorization';
 
 export interface IPermissionOptions {
   code?: PermissionEnum;
-  crud?: boolean;
+  crud?: boolean | string;
   isMember?: boolean;
   isContract?: boolean;
 }

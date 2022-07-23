@@ -28,6 +28,12 @@ import { FindMeService } from '../../services/users/find-me/find-me.service';
 import { ResetPasswordService } from '../../services/users/reset-password/reset-password.service';
 import { UpdatePermissionsRolesService } from '../../services/users/update-permissions-roles/update-permissions-roles.service';
 import { UpdateUserService } from '../../services/users/update-user/update-user.service';
+import { Permissions } from '../../../../shared/decorators/permissions.decorator';
+import {
+  PermissionEnum,
+  RoleEnum,
+} from '../../../../shared/constants/enum/authorization';
+import { Roles } from '../../../../shared/decorators/roles.decorator';
 
 @ApiTags('users')
 @Controller('users')
@@ -54,16 +60,27 @@ export class UsersController {
     );
   }
 
+  @Permissions({
+    code: PermissionEnum.USER,
+  })
   @Get(':id')
   findId(@Param('id', ParseIntPipe) id: number) {
     return classToClass(this.findByIdService.execute(+id));
   }
 
+  @Permissions({
+    code: PermissionEnum.USER,
+  })
   @Get()
   findEmail(@Query('email', ValidateEmailPipe) email: string) {
     return classToClass(this.findByEmailService.execute(email));
   }
 
+  @Permissions({
+    code: PermissionEnum.USER,
+    isMember: true,
+    isContract: true,
+  })
   @Get('/company/:companyId?')
   findAllByCompany(@User() user: UserPayloadDto) {
     return classToClass(this.findAllByCompanyService.execute(user));
@@ -85,6 +102,12 @@ export class UsersController {
     return classToClass(this.updateUserService.execute(+userId, updateUserDto));
   }
 
+  @Permissions({
+    code: PermissionEnum.USER,
+    isMember: true,
+    isContract: true,
+    crud: true,
+  })
   @Patch('/company')
   async updatePermissionsRoles(
     @Body() updateUserCompanyDto: UpdateUserCompanyDto,

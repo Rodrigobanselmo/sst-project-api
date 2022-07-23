@@ -15,6 +15,12 @@ import { CreateRiskService } from '../../services/risk/create-risk/create-risk.s
 import { DeleteSoftRiskService } from '../../services/risk/delete-soft-risk/delete-soft-risk.service';
 import { FindAllAvailableRiskService } from '../../services/risk/find-all-available-risk/find-all-available-risk.service';
 import { UpdateRiskService } from '../../services/risk/update-risk/update-risk.service';
+import { Permissions } from '../../../../shared/decorators/permissions.decorator';
+import {
+  PermissionEnum,
+  RoleEnum,
+} from '../../../../shared/constants/enum/authorization';
+import { Roles } from '../../../../shared/decorators/roles.decorator';
 
 @Controller('risk')
 export class RiskController {
@@ -25,6 +31,11 @@ export class RiskController {
     private readonly deleteSoftRiskService: DeleteSoftRiskService,
   ) {}
 
+  @Permissions({
+    code: PermissionEnum.RISK,
+    crud: true,
+    isMember: true,
+  })
   @Post()
   create(
     @User() userPayloadDto: UserPayloadDto,
@@ -33,6 +44,11 @@ export class RiskController {
     return this.createRiskService.execute(createRiskDto, userPayloadDto);
   }
 
+  @Permissions({
+    code: PermissionEnum.RISK,
+    crud: true,
+    isMember: true,
+  })
   @Patch('/:riskId')
   async update(
     @Param('riskId') riskId: string,
@@ -46,11 +62,26 @@ export class RiskController {
     );
   }
 
+  @Permissions(
+    {
+      code: PermissionEnum.MANAGEMENT,
+      isMember: true,
+    },
+    {
+      code: PermissionEnum.RISK,
+      isMember: true,
+    },
+  )
   @Get('/:companyId?')
   findAllAvailable(@User() userPayloadDto: UserPayloadDto) {
     return this.findAllAvailableRiskService.execute(userPayloadDto);
   }
 
+  @Permissions({
+    code: PermissionEnum.RISK,
+    crud: true,
+    isMember: true,
+  })
   @Delete('/:riskId')
   async deleteSoft(
     @Param('riskId') riskId: string,

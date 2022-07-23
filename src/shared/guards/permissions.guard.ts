@@ -1,4 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
 import { PrismaService } from '../../prisma/prisma.service';
@@ -43,15 +48,22 @@ const isParentCompany = async (
     },
   });
 
-  if (!parentRelation) return false;
-  if (parentRelation.status !== 'ACTIVE') return false;
+  if (!parentRelation) throw new ForbiddenException('Accesso negado');
+  if (parentRelation.status !== 'ACTIVE')
+    throw new ForbiddenException('Accesso negado');
 
   return true;
 };
 
-const isAdmin = (user: UserPayloadDto) => {
-  return user.permissions.some(
-    (permission) => permission === PermissionEnum.MASTER,
+const isMaster = (
+  user: UserPayloadDto,
+  options: IPermissionOptions,
+  CRUD: string,
+) => {
+  return checkPermissions(
+    user,
+    { ...options, code: PermissionEnum.MASTER },
+    CRUD,
   );
 };
 
@@ -61,10 +73,13 @@ const checkPermissions = (
   CRUD: string,
 ) => {
   if (!options.code) return true;
+  const crudString = typeof options.crud === 'string' ? options.crud : CRUD;
 
   return user.permissions.some((permission) => {
     const isEqualCode = permission.split('-')[0] === options.code;
-    const isEqualCrud = options.crud ? permission.includes(CRUD) : true;
+    const isEqualCrud = options.crud
+      ? Array.from(crudString).some((crud) => permission.includes(crud))
+      : true;
 
     return isEqualCode && isEqualCrud;
   });
@@ -94,12 +109,13 @@ export class PermissionsGuard implements CanActivate {
           const { isContract, isMember } = PermissionOption;
           const userCompanyId = user.companyId;
 
-          if (isAdmin(user)) return true;
+          if (isMaster(user, PermissionOption, CRUD)) return true;
 
           const affectedCompanyId = getCompanyId(req);
 
           // is being send an array of items with different companies Ids
-          if (affectedCompanyId === false) return false;
+          if (affectedCompanyId === false)
+            throw new ForbiddenException('Accesso negado');
 
           const isPermissionPresent = checkPermissions(
             user,
@@ -107,7 +123,8 @@ export class PermissionsGuard implements CanActivate {
             CRUD,
           );
 
-          if (!isPermissionPresent) return false;
+          if (!isPermissionPresent)
+            throw new ForbiddenException('Accesso negado');
 
           if (!isMember && !isContract && isPermissionPresent) return true;
 
@@ -117,8 +134,10 @@ export class PermissionsGuard implements CanActivate {
           }
 
           if (isContract && isPermissionPresent) {
-            if (!affectedCompanyId) return false;
-            if (affectedCompanyId == userCompanyId) return false;
+            if (!affectedCompanyId)
+              throw new ForbiddenException('Accesso negado');
+            if (affectedCompanyId == userCompanyId)
+              throw new ForbiddenException('Accesso negado');
 
             const isCompanyContract = await isParentCompany(
               this.prisma,
@@ -129,9 +148,9 @@ export class PermissionsGuard implements CanActivate {
             if (isCompanyContract) return true;
           }
 
-          return false;
+          throw new ForbiddenException('Accesso negado');
         },
       );
-    return false;
+    throw new ForbiddenException('Accesso negado');
   }
 }

@@ -466,6 +466,20 @@ export class CompanyRepository implements ICompanyRepository {
       delete query.search;
     }
 
+    if ('userId' in query) {
+      (where.AND as any).push({
+        users: { some: { userId: query.userId } },
+      } as typeof options.where);
+      delete query.userId;
+    }
+
+    if ('companiesIds' in query) {
+      (where.AND as any).push({
+        id: { in: query.companiesIds },
+      } as typeof options.where);
+      delete query.companiesIds;
+    }
+
     Object.entries(query).forEach(([key, value]) => {
       if (value)
         (where.AND as any).push({
@@ -503,26 +517,37 @@ export class CompanyRepository implements ICompanyRepository {
     pagination: PaginationQueryDto,
     options: Partial<Prisma.CompanyFindManyArgs> = {},
   ) {
-    const where = {} as typeof options.where;
+    const where = { AND: [] } as typeof options.where;
 
     if ('search' in query) {
-      where.OR = [
-        { name: { contains: query.search, mode: 'insensitive' } },
-        {
-          cnpj: {
-            contains: query.search ? onlyNumbers(query.search) || 'no' : '',
+      (where.AND as any).push({
+        OR: [
+          { name: { contains: query.search, mode: 'insensitive' } },
+          {
+            cnpj: {
+              contains: query.search ? onlyNumbers(query.search) || 'no' : '',
+            },
           },
-        },
-      ];
+        ],
+      } as typeof options.where);
       delete query.search;
+    }
+
+    if ('userId' in query) {
+      (where.AND as any).push({
+        users: { some: { userId: query.userId } },
+      } as typeof options.where);
+      delete query.userId;
     }
 
     Object.entries(query).forEach(([key, value]) => {
       if (value)
-        where[key] = {
-          contains: value,
-          mode: 'insensitive',
-        };
+        (where.AND as any).push({
+          [key]: {
+            contains: value,
+            mode: 'insensitive',
+          },
+        } as typeof options.where);
     });
 
     const response = await this.prisma.$transaction([

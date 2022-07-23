@@ -11,18 +11,23 @@ export class InviteUserDto {
 
   @IsInt()
   @IsOptional()
-  readonly groupId: number;
+  readonly groupId?: number;
 
   @IsString()
   readonly companyId: string;
 
+  @IsOptional()
+  @IsString({ each: true })
+  companiesIds?: string[];
+
   @IsString({ each: true })
   @IsOptional()
-  @IsEnum(PermissionEnum, {
-    message: `wrong permission value sent`,
-    each: true,
-  })
-  readonly permissions: PermissionEnum[];
+  // @IsEnum(PermissionEnum, {
+  //   message: `wrong permission value sent`,
+  //   each: true,
+  // })
+  // readonly permissions: PermissionEnum[];
+  readonly permissions: string[];
 
   @IsString({ each: true })
   @IsEnum(RoleEnum, {

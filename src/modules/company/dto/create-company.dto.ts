@@ -5,6 +5,7 @@ import {
   IsBoolean,
   IsDefined,
   IsEnum,
+  IsInt,
   IsOptional,
   IsString,
   Length,
@@ -133,4 +134,12 @@ export class FindCompaniesDto extends PaginationQueryDto {
   @IsString()
   @IsOptional()
   search?: string;
+
+  @IsInt()
+  @IsOptional()
+  userId?: number;
+
+  @IsString({ each: true })
+  @IsOptional()
+  companiesIds?: string[];
 }

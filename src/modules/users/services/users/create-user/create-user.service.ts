@@ -74,13 +74,20 @@ export const getCompanyPermissionByToken = async (
   if (currentDate > expires_date)
     throw new BadRequestException(ErrorInvitesEnum.TOKEN_EXPIRES);
 
-  const companies: UserCompanyDto[] = [
-    {
-      permissions: invite.permissions,
-      roles: invite.roles,
-      companyId: invite.companyId,
-    },
-  ];
+  let companies: UserCompanyDto[] = invite.companiesIds.map((companyId) => ({
+    permissions: invite.permissions,
+    roles: invite.roles,
+    companyId,
+  }));
+
+  if (companies.length === 0)
+    companies = [
+      {
+        permissions: invite.permissions,
+        roles: invite.roles,
+        companyId: invite.companyId,
+      },
+    ];
 
   return { companies, email: invite.email, companyId: invite.companyId };
 };

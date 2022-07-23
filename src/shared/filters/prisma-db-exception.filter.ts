@@ -18,7 +18,6 @@ export class PrismaDbExceptionFilter implements ExceptionFilter {
     const request = context.getRequest<Request>();
 
     const { code, meta } = exception;
-
     let error = new HttpException(ErrorMessageEnum.PRISMA_ERROR, 500);
 
     const { cause, target, field_name } = meta;

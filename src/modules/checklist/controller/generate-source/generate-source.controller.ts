@@ -1,5 +1,7 @@
 import { Body, Controller, Delete, Param, Patch, Post } from '@nestjs/common';
 
+import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
+import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import {
@@ -18,6 +20,11 @@ export class GenerateSourceController {
     private readonly deleteSoftGenerateSourceService: DeleteSoftGenerateSourceService,
   ) {}
 
+  @Permissions({
+    code: PermissionEnum.GS,
+    crud: true,
+    isMember: true,
+  })
   @Post()
   create(
     @User() userPayloadDto: UserPayloadDto,
@@ -29,6 +36,11 @@ export class GenerateSourceController {
     );
   }
 
+  @Permissions({
+    code: PermissionEnum.GS,
+    crud: true,
+    isMember: true,
+  })
   @Patch('/:generateSourceId')
   async update(
     @Param('generateSourceId') generateSourceId: string,
@@ -42,6 +54,11 @@ export class GenerateSourceController {
     );
   }
 
+  @Permissions({
+    code: PermissionEnum.GS,
+    crud: true,
+    isMember: true,
+  })
   @Delete('/:generateSourceId')
   async deleteSoft(
     @Param('generateSourceId') generateSourceId: string,

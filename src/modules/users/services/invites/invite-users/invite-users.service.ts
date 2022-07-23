@@ -1,3 +1,6 @@
+import { AccessGroupsEntity } from './../../../../auth/entities/access-groups.entity';
+import { RoleEnum } from './../../../../../shared/constants/enum/authorization';
+import { CompanyRepository } from './../../../../company/repositories/implementations/CompanyRepository';
 import { UsersCompanyRepository } from './../../../repositories/implementations/UsersCompanyRepository';
 import { UserPayloadDto } from './../../../../../shared/dto/user-payload.dto';
 import { AuthGroupRepository } from './../../../../auth/repositories/implementations/AuthGroupRepository';
@@ -23,6 +26,7 @@ export class InviteUsersService {
     private readonly usersRepository: UsersRepository,
     private readonly authGroupRepository: AuthGroupRepository,
     private readonly dateProvider: DayJSProvider,
+    private readonly companyRepository: CompanyRepository,
     private readonly mailProvider: SendGridProvider,
   ) {}
 
@@ -34,28 +38,40 @@ export class InviteUsersService {
       inviteUserDto.email,
     );
 
-    const authGroup = await this.authGroupRepository.findById(
-      inviteUserDto.groupId,
-      userPayloadDto.companyId,
+    const company = await this.companyRepository.findById(
+      inviteUserDto.companyId,
     );
 
-    if (!authGroup)
-      throw new BadRequestException(ErrorInvitesEnum.AUTH_GROUP_NOT_FOUND);
+    const isConsulting = company.isConsulting;
 
-    if (!userPayloadDto.isMaster) {
-      const addRoles = [
-        ...(inviteUserDto.roles || []),
-        ...(authGroup?.roles || []),
-      ];
+    if (!isConsulting) inviteUserDto.companiesIds = [];
 
-      const addPermissions = [
-        ...(inviteUserDto.permissions || []),
-        ...(authGroup?.permissions || []),
-      ];
+    const addRoles: string[] = [...(inviteUserDto.roles || [])];
+    const addPermissions: string[] = [...(inviteUserDto.permissions || [])];
 
+    if (inviteUserDto.groupId) {
+      const authGroup = await this.authGroupRepository.findById(
+        inviteUserDto.groupId,
+        userPayloadDto.companyId,
+      );
+
+      if (!authGroup)
+        throw new BadRequestException(ErrorInvitesEnum.AUTH_GROUP_NOT_FOUND);
+
+      addPermissions.push(...authGroup.permissions);
+      addRoles.push(...authGroup.roles);
+    }
+
+    if (!userRoles.includes(RoleEnum.MASTER)) {
       const hasAllRoles = addRoles.every((role) => userRoles.includes(role));
-      const hasAllPermissions = addPermissions.every((permission) =>
-        userPermissions.includes(permission),
+      const hasAllPermissions = addPermissions.every((addPermission) =>
+        userPermissions.every(
+          (userPermission) =>
+            userPermission.split('-')[0] === addPermission.split('-')[0] &&
+            Array.from(addPermission.split('-')[1] || '').every((crud) =>
+              (userPermission.split('-')[1] || '').includes(crud),
+            ),
+        ),
       );
 
       if (!hasAllRoles || !hasAllPermissions)
@@ -65,13 +81,24 @@ export class InviteUsersService {
     }
 
     if (userToAdd) {
-      const userAlreadyAdded = userToAdd.companies.some(
+      let userAlreadyAdded = userToAdd.companies.some(
         (company) => company.companyId === inviteUserDto.companyId,
       );
+
+      if (isConsulting)
+        userAlreadyAdded = userToAdd.companies.some((company) =>
+          inviteUserDto.companiesIds.includes(company.companyId),
+        );
 
       if (userAlreadyAdded)
         throw new BadRequestException(ErrorInvitesEnum.USER_ALREADY_EXIST);
     }
+
+    const companies = await this.companyRepository.findAllRelatedByCompanyId(
+      inviteUserDto.companyId,
+      { companiesIds: inviteUserDto?.companiesIds || [] },
+      { skip: 0, take: 100 },
+    );
 
     const expires_date = this.dateProvider.addDay(new Date(), 7);
 
@@ -81,7 +108,10 @@ export class InviteUsersService {
     );
 
     const invite = await this.inviteUsersRepository.create(
-      inviteUserDto,
+      {
+        ...inviteUserDto,
+        companiesIds: companies.data.map((company) => company.id),
+      },
       expires_date,
     );
 

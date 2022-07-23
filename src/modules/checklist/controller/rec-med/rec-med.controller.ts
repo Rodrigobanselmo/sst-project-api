@@ -6,7 +6,8 @@ import { CreateRecMedDto, UpdateRecMedDto } from '../../dto/rec-med.dto';
 import { CreateRecMedService } from '../../services/rec-med/create-rec-med/create-rec-med.service';
 import { DeleteSoftRecMedService } from '../../services/rec-med/delete-soft-rec-med/delete-soft-rec-med.service';
 import { UpdateRecMedService } from '../../services/rec-med/update-rec-med/update-rec-med.service';
-
+import { Permissions } from '../../../../shared/decorators/permissions.decorator';
+import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
 @Controller('rec-med')
 export class RecMedController {
   constructor(
@@ -15,6 +16,11 @@ export class RecMedController {
     private readonly deleteSoftRecMedService: DeleteSoftRecMedService,
   ) {}
 
+  @Permissions({
+    code: PermissionEnum.REC_MED,
+    crud: true,
+    isMember: true,
+  })
   @Post()
   create(
     @User() userPayloadDto: UserPayloadDto,
@@ -23,6 +29,11 @@ export class RecMedController {
     return this.createRecMedService.execute(createRecMedDto, userPayloadDto);
   }
 
+  @Permissions({
+    code: PermissionEnum.REC_MED,
+    crud: true,
+    isMember: true,
+  })
   @Patch('/:recMedId')
   async update(
     @Param('recMedId') recMedId: string,
@@ -36,6 +47,11 @@ export class RecMedController {
     );
   }
 
+  @Permissions({
+    code: PermissionEnum.REC_MED,
+    crud: true,
+    isMember: true,
+  })
   @Delete('/:recMedId')
   async deleteSoft(
     @Param('recMedId') recMedId: string,

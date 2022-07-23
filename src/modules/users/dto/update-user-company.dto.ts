@@ -1,5 +1,5 @@
 import { PartialType } from '@nestjs/swagger';
-import { IsNumber, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 import { UserCompanyDto } from './user-company.dto';
 
@@ -9,4 +9,8 @@ export class UpdateUserCompanyDto extends PartialType(UserCompanyDto) {
 
   @IsNumber()
   readonly userId: number;
+
+  @IsOptional()
+  @IsString({ each: true })
+  companiesIds?: string[];
 }
