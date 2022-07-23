@@ -65,7 +65,7 @@ export class InviteUsersService {
     if (!userRoles.includes(RoleEnum.MASTER)) {
       const hasAllRoles = addRoles.every((role) => userRoles.includes(role));
       const hasAllPermissions = addPermissions.every((addPermission) =>
-        userPermissions.every(
+        userPermissions.some(
           (userPermission) =>
             userPermission.split('-')[0] === addPermission.split('-')[0] &&
             Array.from(addPermission.split('-')[1] || '').every((crud) =>

@@ -46,7 +46,7 @@ export class AuthGroupController {
 
   @Permissions({
     code: PermissionEnum.ACCESS_GROUP,
-    crud: true,
+    crud: 'cu',
     isMember: true,
   })
   @Post()

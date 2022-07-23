@@ -1,6 +1,7 @@
 import { CompanyTypesEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import {
+  IsBoolean,
   IsEnum,
   IsOptional,
   IsString,
@@ -71,6 +72,10 @@ export class UpdateCompanyDto {
   @IsOptional()
   @Type(() => AddressDto)
   address?: AddressDto;
+
+  @IsOptional()
+  @IsBoolean()
+  isConsulting?: boolean;
 
   @IsOptional()
   @ValidateNested({ each: true })

@@ -22,7 +22,7 @@ export enum ErrorInvitesEnum {
   FORBIDDEN_ACCESS_USER_INVITE_LIST = 'Você não tem permissão para acessar a lista de convites de outro usuário ',
   TOKEN_EXPIRES = 'O Convite expirou',
   TOKEN_NOT_VALID_EMAIL = 'O Convite não é válido para esse email',
-  FORBIDDEN_INSUFFICIENT_PERMISSIONS = 'Grupo de permissões não encontrado',
+  FORBIDDEN_INSUFFICIENT_PERMISSIONS = 'Você não tem permissão para criar/editar um usuário com essas credênciais',
   USER_ALREADY_EXIST = 'Usuário já cadastrado',
   GOOGLE_USER_NOT_EXIST = 'Nenhum usuário econtrado que esteja vinculado a esta conta Google',
   AUTH_GROUP_NOT_FOUND = 'Grupo de permissões não enontrado',

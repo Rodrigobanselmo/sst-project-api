@@ -56,13 +56,14 @@ export class UpdatePermissionsRolesService {
         userRoles.includes(role),
       );
       const doesUserHasAllPermissions = addPermissions.every((addPermission) =>
-        userPermissions.every(
-          (userPermission) =>
+        userPermissions.some((userPermission) => {
+          return (
             userPermission.split('-')[0] === addPermission.split('-')[0] &&
             Array.from(addPermission.split('-')[1] || '').every((crud) =>
               (userPermission.split('-')[1] || '').includes(crud),
-            ),
-        ),
+            )
+          );
+        }),
       );
 
       if (!doesUserHasAllRoles || !doesUserHasAllPermissions) {
