@@ -14,6 +14,7 @@ import { UpdateCompanyDto } from '../../dto/update-company.dto';
 import { IPrismaOptions } from '../../../../shared/interfaces/prisma-options.types';
 import { Prisma } from '@prisma/client';
 import { onlyNumbers } from '@brazilian-utils/brazilian-utils';
+import { isEnvironment } from './CharacterizationRepository';
 
 interface ICreateCompany extends CreateCompanyDto {
   companyId?: string;
@@ -93,6 +94,7 @@ export class CompanyRepository implements ICompanyRepository {
       },
       include: {
         workspace: { include: { address: true } },
+        group: true,
         primary_activity: true,
         secondary_activity: true,
         license: true,
@@ -245,6 +247,7 @@ export class CompanyRepository implements ICompanyRepository {
         secondary_activity: !!include.secondary_activity,
         license: !!include.license,
         users: !!include.users,
+        group: true,
         employees: !!include.employees
           ? { include: { workspaces: true } }
           : false,
@@ -356,6 +359,7 @@ export class CompanyRepository implements ICompanyRepository {
               secondary_activity: !!include.secondary_activity,
               license: !!include.license,
               users: !!include.users,
+              group: true,
               employees: !!include.employees
                 ? { include: { workspaces: true } }
                 : false,
@@ -406,6 +410,7 @@ export class CompanyRepository implements ICompanyRepository {
         workspace: { include: { address: true } },
         primary_activity: true,
         secondary_activity: true,
+        group: true,
         license: true,
       },
     });
@@ -418,14 +423,22 @@ export class CompanyRepository implements ICompanyRepository {
     workspaceId: string,
     options?: Partial<Prisma.CompanyFindUniqueArgs>,
   ): Promise<CompanyEntity> {
-    const company = await this.prisma.company.findUnique({
+    const company = (await this.prisma.company.findUnique({
       where: { id },
       ...options,
-    });
+    })) as CompanyEntity;
 
     const employeeCount = await this.prisma.employee.count({
       where: { companyId: id, workspaces: { some: { id: workspaceId } } },
     });
+
+    company.environments = [];
+    if (company.characterization) {
+      company.characterization.forEach((characterization) => {
+        const isEnv = isEnvironment(characterization.type);
+        if (isEnv) company.environments.push(characterization);
+      });
+    }
 
     return new CompanyEntity({ ...company, employeeCount });
   }
@@ -459,6 +472,7 @@ export class CompanyRepository implements ICompanyRepository {
     if ('search' in query) {
       (where.AND as any).push({
         OR: [
+          { group: { name: { contains: query.search, mode: 'insensitive' } } },
           { name: { contains: query.search, mode: 'insensitive' } },
           {
             cnpj: {
@@ -475,6 +489,13 @@ export class CompanyRepository implements ICompanyRepository {
         users: { some: { userId: query.userId } },
       } as typeof options.where);
       delete query.userId;
+    }
+
+    if ('groupId' in query) {
+      (where.AND as any).push({
+        group: { id: query.groupId },
+      } as typeof options.where);
+      delete query.groupId;
     }
 
     if ('companiesIds' in query) {
@@ -503,6 +524,7 @@ export class CompanyRepository implements ICompanyRepository {
         where,
         include: {
           workspace: { include: { address: true } },
+          group: true,
           ...options?.include,
         },
         take: pagination.take || 20,
@@ -526,6 +548,7 @@ export class CompanyRepository implements ICompanyRepository {
     if ('search' in query) {
       (where.AND as any).push({
         OR: [
+          { group: { name: { contains: query.search, mode: 'insensitive' } } },
           { name: { contains: query.search, mode: 'insensitive' } },
           {
             cnpj: {
@@ -542,6 +565,13 @@ export class CompanyRepository implements ICompanyRepository {
         users: { some: { userId: query.userId } },
       } as typeof options.where);
       delete query.userId;
+    }
+
+    if ('groupId' in query) {
+      (where.AND as any).push({
+        group: { id: query.groupId },
+      } as typeof options.where);
+      delete query.groupId;
     }
 
     Object.entries(query).forEach(([key, value]) => {
@@ -563,6 +593,7 @@ export class CompanyRepository implements ICompanyRepository {
         where,
         include: {
           workspace: { include: { address: true } },
+          group: true,
           ...options?.include,
         },
         take: pagination.take || 20,
@@ -603,6 +634,7 @@ export class CompanyRepository implements ICompanyRepository {
       where: { id },
       include: {
         ...include,
+        group: true,
         primary_activity: !!include?.primary_activity,
         secondary_activity: !!include?.secondary_activity,
         workspace: !!include?.workspace

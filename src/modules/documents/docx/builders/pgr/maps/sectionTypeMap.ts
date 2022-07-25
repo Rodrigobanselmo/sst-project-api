@@ -92,16 +92,22 @@ export class SectionsMapClass {
       ...sectionLandscapeProperties,
     }),
     [PGRSectionTypeEnum.ITERABLE_ENVIRONMENTS]: (): ISectionOptions[] =>
-      environmentSections(this.environments, (x, v) =>
-        this.convertToDocx(x, v),
+      environmentSections(
+        this.environments,
+        this.hierarchy,
+        this.homogeneousGroup,
+        (x, v) => this.convertToDocx(x, v),
       ).map(({ footerText, children }) => ({
         children,
         ...this.getFooterHeader(footerText),
         ...sectionLandscapeProperties,
       })),
     [PGRSectionTypeEnum.ITERABLE_CHARACTERIZATION]: (): ISectionOptions[] =>
-      characterizationSections(this.characterizations, (x, v) =>
-        this.convertToDocx(x, v),
+      characterizationSections(
+        this.characterizations,
+        this.hierarchy,
+        this.homogeneousGroup,
+        (x, v) => this.convertToDocx(x, v),
       ).map(({ footerText, children }) => ({
         children,
         ...this.getFooterHeader(footerText),

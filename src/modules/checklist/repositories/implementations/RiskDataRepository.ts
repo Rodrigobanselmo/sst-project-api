@@ -1,3 +1,4 @@
+import { isEnvironment } from './../../../company/repositories/implementations/CharacterizationRepository';
 import { PaginationQueryDto } from './../../../../shared/dto/pagination.dto';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
@@ -218,6 +219,16 @@ export class RiskDataRepository {
           });
 
           data.homogeneousGroup.hierarchy = hierarchy;
+        }
+
+        if (
+          data.homogeneousGroup.characterization &&
+          isEnvironment(data.homogeneousGroup.characterization.type)
+        ) {
+          data.homogeneousGroup.environment =
+            data.homogeneousGroup.characterization;
+
+          data.homogeneousGroup.characterization = null;
         }
 
         return new RiskFactorDataEntity(data);

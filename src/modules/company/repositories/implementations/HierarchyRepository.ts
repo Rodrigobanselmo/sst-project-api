@@ -9,6 +9,7 @@ import {
   UpdateSimpleManyHierarchyDto,
 } from '../../dto/hierarchy';
 import { HierarchyEntity } from '../../entities/hierarchy.entity';
+import { isEnvironment } from './CharacterizationRepository';
 
 @Injectable()
 export class HierarchyRepository {
@@ -354,6 +355,16 @@ export class HierarchyRepository {
           ).hierarchyOnHomogeneous.map((homo) => ({
             ...homo.homogeneousGroup,
             workspaceId: homo.workspaceId,
+            environment:
+              homo.homogeneousGroup?.characterization &&
+              isEnvironment(homo.homogeneousGroup.characterization.type)
+                ? homo.homogeneousGroup.characterization
+                : undefined,
+            characterization:
+              homo.homogeneousGroup?.characterization &&
+              !isEnvironment(homo.homogeneousGroup.characterization.type)
+                ? homo.homogeneousGroup.characterization
+                : undefined,
           }));
         return new HierarchyEntity(homogeneousGroup);
       }
@@ -387,14 +398,26 @@ export class HierarchyRepository {
     });
 
     return hierarchies.map((hierarchy) => {
-      const homogeneousGroup = { ...hierarchy } as HierarchyEntity;
+      const hierarchyCopy = { ...hierarchy } as HierarchyEntity;
+
       if (hierarchy.hierarchyOnHomogeneous)
-        homogeneousGroup.homogeneousGroups =
-          hierarchy.hierarchyOnHomogeneous.map((homo) => ({
+        hierarchyCopy.homogeneousGroups = hierarchy.hierarchyOnHomogeneous.map(
+          (homo) => ({
             ...homo.homogeneousGroup,
             workspaceId: homo.workspaceId,
-          }));
-      return new HierarchyEntity(homogeneousGroup);
+            characterization:
+              homo.homogeneousGroup?.characterization &&
+              !isEnvironment(homo.homogeneousGroup.characterization.type)
+                ? homo.homogeneousGroup.characterization
+                : undefined,
+            environment:
+              homo.homogeneousGroup?.characterization &&
+              isEnvironment(homo.homogeneousGroup.characterization.type)
+                ? homo.homogeneousGroup.characterization
+                : undefined,
+          }),
+        );
+      return new HierarchyEntity(hierarchyCopy);
     });
   }
 

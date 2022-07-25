@@ -20,6 +20,7 @@ export type ConverterProps = {
   showHomogeneousDescription?: boolean;
   showDescription?: boolean;
   type?: HomoTypeEnum | HomoTypeEnum[] | undefined;
+  groupIdFilter?: string | undefined;
 };
 
 type IHierarchyDataRecord<T> = {
@@ -49,11 +50,13 @@ export const hierarchyPlanConverter = (
     showHomogeneous,
     showHomogeneousDescription,
     type,
+    groupIdFilter,
   }: ConverterProps = {
     showHomogeneous: false,
     showHomogeneousDescription: false,
     showDescription: true,
     type: undefined,
+    groupIdFilter: undefined,
   },
 ) => {
   let hasAtLeastOneDescription = false;
@@ -64,17 +67,17 @@ export const hierarchyPlanConverter = (
     hierarchyData.forEach((hierarchiesData) => {
       const highParent = hierarchiesData.org[0];
 
-      const org = [...hierarchyList, 'EMPLOYEE'].map((type) => {
+      const org = [...hierarchyList, 'EMPLOYEE'].map((orgType) => {
         const hierarchyData = hierarchiesData.org.find(
-          (org) => org.typeEnum === type,
+          (org) => org.typeEnum === orgType,
         );
 
         if (hierarchiesData.descRh) hasAtLeastOneDescription = true;
 
         if (!hierarchyData) {
           return {
-            type: type,
-            typeEnum: type,
+            type: orgType,
+            typeEnum: orgType,
             name: emptyCellName,
             id: hierarchyEmptyId,
             homogeneousGroupIds: [],
@@ -181,6 +184,8 @@ export const hierarchyPlanConverter = (
           if (!type && homo && homo.type) return;
           if (type && !Array.isArray(type) && homo.type !== type) return;
           if (type && Array.isArray(type) && !type.includes(homo.type)) return;
+
+          if (groupIdFilter && homo.id != groupIdFilter) return;
 
           if (homo.environment) {
             name = `${homo.environment.name}\n(${

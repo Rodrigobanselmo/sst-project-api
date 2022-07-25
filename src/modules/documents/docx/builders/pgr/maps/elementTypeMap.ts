@@ -1,6 +1,5 @@
 import {
   CharacterizationTypeEnum,
-  CompanyEnvironmentTypesEnum,
   HomoTypeEnum,
   RiskFactorsEnum,
 } from '@prisma/client';
@@ -158,28 +157,28 @@ export class ElementsMapClass {
     [PGRSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS_GENERAL]: () =>
       environmentIterable(
         this.environments.filter(
-          (e) => e.type === CompanyEnvironmentTypesEnum.GENERAL,
+          (e) => e.type === CharacterizationTypeEnum.GENERAL,
         ),
         (x, v) => this.convertToDocx(x, v),
       ),
     [PGRSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS_ADM]: () =>
       environmentIterable(
         this.environments.filter(
-          (e) => e.type === CompanyEnvironmentTypesEnum.ADMINISTRATIVE,
+          (e) => e.type === CharacterizationTypeEnum.ADMINISTRATIVE,
         ),
         (x, v) => this.convertToDocx(x, v),
       ),
     [PGRSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS_OP]: () =>
       environmentIterable(
         this.environments.filter(
-          (e) => e.type === CompanyEnvironmentTypesEnum.OPERATION,
+          (e) => e.type === CharacterizationTypeEnum.OPERATION,
         ),
         (x, v) => this.convertToDocx(x, v),
       ),
     [PGRSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS_SUP]: () =>
       environmentIterable(
         this.environments.filter(
-          (e) => e.type === CompanyEnvironmentTypesEnum.SUPPORT,
+          (e) => e.type === CharacterizationTypeEnum.SUPPORT,
         ),
         (x, v) => this.convertToDocx(x, v),
       ),

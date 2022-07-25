@@ -21,7 +21,7 @@ export class UpdateEnvironmentPhotoService {
     });
 
     const environmentData = await this.environmentRepository.findById(
-      environmentPhoto.companyEnvironmentId,
+      environmentPhoto.companyCharacterizationId,
     );
 
     return environmentData;

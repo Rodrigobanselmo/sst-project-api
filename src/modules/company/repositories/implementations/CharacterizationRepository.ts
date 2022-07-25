@@ -1,7 +1,7 @@
 import { RiskFactorsEntity } from './../../../checklist/entities/risk.entity';
 import { RiskFactorDataEntity } from './../../../checklist/entities/riskData.entity';
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { CharacterizationTypeEnum, HomoTypeEnum, Prisma } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
@@ -15,6 +15,22 @@ interface ICompanyCharacterization
   workspaceId: string;
 }
 
+export const isEnvironment = (type: CharacterizationTypeEnum) => {
+  return (
+    [
+      CharacterizationTypeEnum.ADMINISTRATIVE,
+      CharacterizationTypeEnum.OPERATION,
+      CharacterizationTypeEnum.SUPPORT,
+      CharacterizationTypeEnum.GENERAL,
+    ] as CharacterizationTypeEnum[]
+  ).includes(type);
+};
+
+export const getCharacterizationType = (type: CharacterizationTypeEnum) => {
+  if (isEnvironment(type)) return HomoTypeEnum.ENVIRONMENT;
+
+  return type as HomoTypeEnum;
+};
 @Injectable()
 export class CharacterizationRepository {
   constructor(private prisma: PrismaService) {}
@@ -25,6 +41,7 @@ export class CharacterizationRepository {
     workspaceId,
     hierarchyIds = [],
     type,
+    profileParentId,
     ...characterizationDto
   }: ICompanyCharacterization): Promise<CharacterizationEntity> {
     const newId = v4();
@@ -37,7 +54,7 @@ export class CharacterizationRepository {
         //! optimization here nd on characterization
         description: characterizationDto.name + '(//)' + type,
         companyId: companyId,
-        type: type,
+        type: getCharacterizationType(type),
       },
       update: {
         description: characterizationDto.name + '(//)' + type,
@@ -75,6 +92,7 @@ export class CharacterizationRepository {
       },
       create: {
         ...characterizationDto,
+        profileParentId: profileParentId || undefined,
         id: newId,
         companyId,
         workspaceId,
@@ -82,11 +100,54 @@ export class CharacterizationRepository {
         name: characterizationDto.name,
       },
       update: {
+        type,
+        profileParentId: profileParentId || undefined,
         ...characterizationDto,
       },
+      include: { profiles: true },
     });
 
     return new CharacterizationEntity(characterization);
+  }
+
+  async find(
+    companyId: string,
+    workspaceId: string,
+    options?: Prisma.CompanyCharacterizationFindManyArgs,
+  ) {
+    const characterization =
+      (await this.prisma.companyCharacterization.findMany({
+        where: {
+          workspaceId,
+          companyId,
+          type: {
+            in: [
+              CharacterizationTypeEnum.ACTIVITIES,
+              CharacterizationTypeEnum.EQUIPMENT,
+              CharacterizationTypeEnum.WORKSTATION,
+            ],
+          },
+        },
+        ...options,
+      })) as CharacterizationEntity[];
+
+    // //! optimization here, it has the hierarchy tree on front cam get only ids on hierarchyOnHomogeneous
+    // await Promise.all(
+    //   characterization.map(async (env, index) => {
+    //     const hierarchies = await this.prisma.hierarchy.findMany({
+    //       where: {
+    //         hierarchyOnHomogeneous: { some: { homogeneousGroupId: env.id } },
+    //         companyId,
+    //       },
+    //     });
+
+    //     characterization[index].hierarchies = hierarchies.map(
+    //       (hierarchy) => new HierarchyEntity(hierarchy),
+    //     );
+    //   }),
+    // );
+
+    return [...characterization.map((env) => new CharacterizationEntity(env))];
   }
 
   async findAll(
@@ -96,7 +157,11 @@ export class CharacterizationRepository {
   ) {
     const characterization =
       (await this.prisma.companyCharacterization.findMany({
-        where: { workspaceId, companyId },
+        where: {
+          workspaceId,
+          companyId,
+          profileParentId: null,
+        },
         ...options,
       })) as CharacterizationEntity[];
 
@@ -130,9 +195,42 @@ export class CharacterizationRepository {
     const characterization =
       (await this.prisma.companyCharacterization.findUnique({
         where: { id },
-        include: { photos: true, ...options.include },
+        include: { photos: true, profiles: true, ...options.include },
       })) as CharacterizationEntity;
 
+    const characterizationChildrenWithRisk = await Promise.all(
+      characterization.profiles?.map(async (child) => {
+        const profile = await this.getHierarchiesAndRisks(
+          child.id,
+          child,
+          options,
+        );
+        return profile;
+      }),
+    );
+
+    characterization.profiles = characterizationChildrenWithRisk;
+
+    return this.getHierarchiesAndRisks(id, characterization, options);
+  }
+
+  async delete(id: string, companyId: string, workspaceId: string) {
+    const characterization = await this.prisma.companyCharacterization.delete({
+      where: {
+        workspaceId_companyId_id: { workspaceId, companyId, id: id || 'no-id' },
+      },
+    });
+
+    return new CharacterizationEntity(characterization);
+  }
+
+  private async getHierarchiesAndRisks(
+    id: string,
+    characterization: CharacterizationEntity,
+    options: {
+      getRiskData?: boolean;
+    } = {},
+  ) {
     const hierarchies = await this.prisma.hierarchy.findMany({
       where: {
         hierarchyOnHomogeneous: {
@@ -162,16 +260,6 @@ export class CharacterizationRepository {
     characterization.hierarchies = hierarchies.map(
       (hierarchy) => new HierarchyEntity(hierarchy),
     );
-
-    return new CharacterizationEntity(characterization);
-  }
-
-  async delete(id: string, companyId: string, workspaceId: string) {
-    const characterization = await this.prisma.companyCharacterization.delete({
-      where: {
-        workspaceId_companyId_id: { workspaceId, companyId, id: id || 'no-id' },
-      },
-    });
 
     return new CharacterizationEntity(characterization);
   }

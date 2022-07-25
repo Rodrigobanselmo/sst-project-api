@@ -36,7 +36,7 @@ export class UpsertEnvironmentService {
     if (photos)
       await this.environmentPhotoRepository.createMany(
         photos.map((photo, index) => ({
-          companyEnvironmentId: environment.id,
+          companyCharacterizationId: environment.id,
           photoUrl: urls[index][0],
           isVertical: urls[index][1],
           name: photo,

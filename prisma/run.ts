@@ -16,6 +16,22 @@ async function main() {
     //   where: { user: { email: 'marcelo.alves@grupoevicon.com.br' } },
     // });
     // await deleteCompany('be0953c9-37d5-4115-9589-ecae8f38226e', prisma);
+    const env = await prisma.companyEnvironment.findMany();
+    Promise.all(
+      env.map(async ({ parentEnvironmentId, ...e }) => {
+        await prisma.companyCharacterization.create({
+          data: { ...e },
+        });
+      }),
+    );
+    const envPhoto = await prisma.companyEnvironmentPhoto.findMany();
+    Promise.all(
+      envPhoto.map(async ({ order, companyEnvironmentId, ...e }) => {
+        await prisma.companyCharacterizationPhoto.create({
+          data: { ...e, companyCharacterizationId: companyEnvironmentId },
+        });
+      }),
+    );
   } catch (error) {
     console.log(error);
     console.log('error: end');

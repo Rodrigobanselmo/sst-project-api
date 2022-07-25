@@ -1,15 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { HomoTypeEnum, Prisma } from '@prisma/client';
+import { CharacterizationTypeEnum, HomoTypeEnum, Prisma } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
-import { UpsertEnvironmentDto } from '../../dto/environment.dto';
+import { UpsertCharacterizationDto } from '../../dto/characterization.dto';
 import { EnvironmentEntity } from '../../entities/environment.entity';
 import { HierarchyEntity } from '../../entities/hierarchy.entity';
 import { RiskFactorsEntity } from './../../../checklist/entities/risk.entity';
 import { RiskFactorDataEntity } from './../../../checklist/entities/riskData.entity';
 
-interface ICompanyEnvironment extends Omit<UpsertEnvironmentDto, 'photos'> {
+interface ICompanyCharacterization
+  extends Omit<UpsertCharacterizationDto, 'photos'> {
   companyId: string;
   workspaceId: string;
 }
@@ -23,8 +24,8 @@ export class EnvironmentRepository {
     companyId,
     workspaceId,
     hierarchyIds = [],
-    ...environmentDto
-  }: ICompanyEnvironment): Promise<EnvironmentEntity> {
+    ...characterizationDto
+  }: ICompanyCharacterization): Promise<EnvironmentEntity> {
     const newId = v4();
 
     const homogeneousGroup = await this.prisma.homogeneousGroup.upsert({
@@ -33,12 +34,14 @@ export class EnvironmentRepository {
         id: newId,
         name: newId,
         //! optimization here nd on characterization
-        description: environmentDto.name + '(//)' + environmentDto.type,
+        description:
+          characterizationDto.name + '(//)' + characterizationDto.type,
         companyId: companyId,
         type: HomoTypeEnum.ENVIRONMENT,
       },
       update: {
-        description: environmentDto.name + '(//)' + environmentDto.type,
+        description:
+          characterizationDto.name + '(//)' + characterizationDto.type,
       },
     });
 
@@ -46,7 +49,8 @@ export class EnvironmentRepository {
       where: { homogeneousGroupId: homogeneousGroup.id },
     });
 
-    const homoHierarchy = await Promise.all(
+    //homoHierarchy
+    await Promise.all(
       hierarchyIds.map(
         async (hierarchyId) =>
           await this.prisma.hierarchyOnHomogeneous.upsert({
@@ -67,76 +71,69 @@ export class EnvironmentRepository {
           }),
       ),
     );
-    const environment = (await this.prisma.companyEnvironment.upsert({
+    const characterization = (await this.prisma.companyCharacterization.upsert({
       where: {
         workspaceId_companyId_id: { id: id || 'no-id', companyId, workspaceId },
       },
       create: {
-        ...environmentDto,
+        ...characterizationDto,
         id: newId,
         companyId,
         workspaceId,
-        name: environmentDto.name,
-        type: environmentDto.type,
+        name: characterizationDto.name,
+        type: characterizationDto.type,
       },
       update: {
-        ...environmentDto,
+        ...characterizationDto,
       },
     })) as EnvironmentEntity;
 
-    // environment.hierarchies = homoHierarchy.map(
-    //   (hh) => new HierarchyEntity(hh.hierarchy),
-    // );
-
-    return new EnvironmentEntity(environment);
+    return new EnvironmentEntity(characterization);
   }
 
   async findAll(
     companyId: string,
     workspaceId: string,
-    options?: Prisma.CompanyEnvironmentFindManyArgs,
+    options?: Prisma.CompanyCharacterizationFindManyArgs,
   ) {
-    const environment = (await this.prisma.companyEnvironment.findMany({
-      where: { workspaceId, companyId },
-      ...options,
-    })) as EnvironmentEntity[];
+    const characterization =
+      (await this.prisma.companyCharacterization.findMany({
+        where: {
+          workspaceId,
+          companyId,
+          type: {
+            in: [
+              CharacterizationTypeEnum.ADMINISTRATIVE,
+              CharacterizationTypeEnum.GENERAL,
+              CharacterizationTypeEnum.OPERATION,
+              CharacterizationTypeEnum.SUPPORT,
+            ],
+          },
+        },
+        ...options,
+      })) as EnvironmentEntity[];
 
-    //! optimization here, it has the hierarchy tree on front cam get only ids on hierarchyOnHomogeneous
-    // await Promise.all(
-    //   environment.map(async (env, index) => {
-    //     const hierarchies = await this.prisma.hierarchy.findMany({
-    //       where: {
-    //         hierarchyOnHomogeneous: { some: { homogeneousGroupId: env.id } },
-    //         companyId,
-    //       },
-    //     });
-
-    //     environment[index].hierarchies = hierarchies.map(
-    //       (hierarchy) => new HierarchyEntity(hierarchy),
-    //     );
-    //   }),
-    // );
-
-    return [...environment.map((env) => new EnvironmentEntity(env))];
+    return [...characterization.map((env) => new EnvironmentEntity(env))];
   }
 
   async findById(
     id: string,
     options: Partial<
-      Prisma.CompanyEnvironmentFindUniqueArgs & {
+      Prisma.CompanyCharacterizationFindUniqueArgs & {
         getRiskData: boolean;
       }
     > = {},
   ) {
-    const environment = (await this.prisma.companyEnvironment.findUnique({
-      where: { id },
-      include: { photos: true, ...options.include },
-    })) as EnvironmentEntity;
+    const characterization =
+      (await this.prisma.companyCharacterization.findUnique({
+        where: { id },
+        include: { photos: true, ...options.include },
+      })) as EnvironmentEntity;
 
     const hierarchies = await this.prisma.hierarchy.findMany({
       where: {
         hierarchyOnHomogeneous: {
-          some: { homogeneousGroupId: environment.id },
+          some: { homogeneousGroupId: characterization.id },
         },
       },
     });
@@ -149,7 +146,7 @@ export class EnvironmentRepository {
         include: { riskFactor: true },
       });
 
-      environment.riskData = riskData.map(({ riskFactor, ...risk }) => {
+      characterization.riskData = riskData.map(({ riskFactor, ...risk }) => {
         return new RiskFactorDataEntity({
           ...risk,
           ...(riskFactor
@@ -159,20 +156,20 @@ export class EnvironmentRepository {
       });
     }
 
-    environment.hierarchies = hierarchies.map(
+    characterization.hierarchies = hierarchies.map(
       (hierarchy) => new HierarchyEntity(hierarchy),
     );
 
-    return new EnvironmentEntity(environment);
+    return new EnvironmentEntity(characterization);
   }
 
   async delete(id: string, companyId: string, workspaceId: string) {
-    const environment = await this.prisma.companyEnvironment.delete({
+    const characterization = await this.prisma.companyCharacterization.delete({
       where: {
         workspaceId_companyId_id: { workspaceId, companyId, id: id || 'no-id' },
       },
     });
 
-    return new EnvironmentEntity(environment);
+    return new EnvironmentEntity(characterization);
   }
 }

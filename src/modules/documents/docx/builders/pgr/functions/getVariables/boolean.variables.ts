@@ -7,11 +7,7 @@ import { RiskFactorGroupDataEntity } from './../../../../../../checklist/entitie
 import { HierarchyMapData } from './../../../../converter/hierarchy.converter';
 import { CompanyEntity } from '../../../../../../company/entities/company.entity';
 import { VariablesPGREnum } from '../../enums/variables.enum';
-import {
-  CharacterizationTypeEnum,
-  CompanyEnvironmentTypesEnum,
-  RiskFactorsEnum,
-} from '@prisma/client';
+import { CharacterizationTypeEnum, RiskFactorsEnum } from '@prisma/client';
 
 export const booleanVariables = (
   company: CompanyEntity,
@@ -127,22 +123,22 @@ export const booleanVariables = (
       : '',
     [VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_GENERAL]:
       company.environments.find(
-        (env) => env.type === CompanyEnvironmentTypesEnum.GENERAL,
+        (env) => env.type === CharacterizationTypeEnum.GENERAL,
       )
         ? 'true'
         : '',
     [VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_ADM]: company.environments.find(
-      (env) => env.type === CompanyEnvironmentTypesEnum.ADMINISTRATIVE,
+      (env) => env.type === CharacterizationTypeEnum.ADMINISTRATIVE,
     )
       ? 'true'
       : '',
     [VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_OP]: company.environments.find(
-      (env) => env.type === CompanyEnvironmentTypesEnum.OPERATION,
+      (env) => env.type === CharacterizationTypeEnum.OPERATION,
     )
       ? 'true'
       : '',
     [VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_SUP]: company.environments.find(
-      (env) => env.type === CompanyEnvironmentTypesEnum.SUPPORT,
+      (env) => env.type === CharacterizationTypeEnum.SUPPORT,
     )
       ? 'true'
       : '',

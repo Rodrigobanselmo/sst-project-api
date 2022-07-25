@@ -1,16 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-  CompanyEnvironment,
-  CompanyEnvironmentTypesEnum,
+  CharacterizationTypeEnum,
+  CompanyCharacterization,
 } from '@prisma/client';
+
 import { RiskFactorDataEntity } from '../../../modules/checklist/entities/riskData.entity';
-import { EnvironmentPhotoEntity } from './environment-photo.entity';
+import { CharacterizationPhotoEntity } from './characterization-photo.entity';
 import { HierarchyEntity } from './hierarchy.entity';
 import { HomoGroupEntity } from './homoGroup.entity';
-
 import { WorkspaceEntity } from './workspace.entity';
 
-export class EnvironmentEntity implements CompanyEnvironment {
+export class EnvironmentEntity implements CompanyCharacterization {
   @ApiProperty({ description: 'The id of the company environment' })
   id: string;
 
@@ -25,18 +25,15 @@ export class EnvironmentEntity implements CompanyEnvironment {
 
   @ApiProperty({
     description: 'The type of the company environment',
-    examples: [...Object.values(CompanyEnvironmentTypesEnum)],
+    examples: [...Object.values(CharacterizationTypeEnum)],
   })
-  type: CompanyEnvironmentTypesEnum;
-
-  @ApiProperty({ description: 'The parent id of the company environment' })
-  parentEnvironmentId: string;
+  type: CharacterizationTypeEnum;
 
   @ApiProperty({ description: 'The workspace of the company environment' })
   workspace?: WorkspaceEntity;
 
   @ApiProperty({ description: 'The photos related to the company environment' })
-  photos?: EnvironmentPhotoEntity[];
+  photos?: CharacterizationPhotoEntity[];
 
   @ApiProperty({ description: 'The group of the environment' })
   homogeneousGroup?: HomoGroupEntity;
@@ -47,12 +44,17 @@ export class EnvironmentEntity implements CompanyEnvironment {
   order: number;
   temperature: string;
   moisturePercentage: string;
-  considerations: string[];
   luminosity: string;
   deleted_at: Date;
   updated_at: Date;
   workspaceId: string;
+  activities: string[];
+  considerations: string[];
   companyId: string;
+  profileName: string;
+  profileParentId: string;
+  profileParent?: EnvironmentEntity;
+  profiles?: EnvironmentEntity[];
 
   constructor(partial: Partial<EnvironmentEntity>) {
     Object.assign(this, partial);

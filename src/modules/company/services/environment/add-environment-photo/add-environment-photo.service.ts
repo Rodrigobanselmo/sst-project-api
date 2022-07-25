@@ -27,7 +27,8 @@ export class AddEnvironmentPhotoService {
     await this.environmentPhotoRepository.createMany([
       {
         ...addPhotoEnvironmentDto,
-        companyEnvironmentId: addPhotoEnvironmentDto.companyEnvironmentId,
+        companyCharacterizationId:
+          addPhotoEnvironmentDto.companyCharacterizationId,
         photoUrl,
         name: addPhotoEnvironmentDto.name,
         isVertical,
@@ -35,7 +36,7 @@ export class AddEnvironmentPhotoService {
     ]);
 
     const environmentData = await this.environmentRepository.findById(
-      addPhotoEnvironmentDto.companyEnvironmentId,
+      addPhotoEnvironmentDto.companyCharacterizationId,
     );
 
     return environmentData;

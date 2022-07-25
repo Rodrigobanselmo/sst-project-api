@@ -139,6 +139,10 @@ export class FindCompaniesDto extends PaginationQueryDto {
   @IsOptional()
   userId?: number;
 
+  @IsInt()
+  @IsOptional()
+  groupId?: number;
+
   @IsString({ each: true })
   @IsOptional()
   companiesIds?: string[];

@@ -1,3 +1,4 @@
+import { isEnvironment } from './../../../company/repositories/implementations/CharacterizationRepository';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
@@ -129,6 +130,20 @@ export class RiskGroupDataRepository {
           },
         },
       });
+
+    riskFactorGroupDataEntity.data.map((data, index) => {
+      if (
+        data.homogeneousGroup.characterization &&
+        isEnvironment(data.homogeneousGroup.characterization.type)
+      ) {
+        riskFactorGroupDataEntity.data[index].homogeneousGroup.environment =
+          data.homogeneousGroup.characterization as any;
+        riskFactorGroupDataEntity.data[
+          index
+        ].homogeneousGroup.characterization = data.homogeneousGroup.characterization =
+          null;
+      }
+    });
 
     // const riskFactorGroupData = {
     //   ...riskFactorGroupDataEntity,

@@ -14,14 +14,38 @@ import { CompanyGroupEntity } from '../../entities/company-group.entity';
 export class CompanyGroupRepository {
   constructor(private prisma: PrismaService) {}
 
-  async upsert({ id, companyId, companies, ...data }: UpsertCompanyGroupDto) {
-    const accessGroup = await this.prisma.companyGroup.upsert({
-      update: { ...data },
-      create: { ...data, companyId },
+  async upsert({
+    id,
+    companyId,
+    companiesIds,
+    ...data
+  }: UpsertCompanyGroupDto) {
+    const group = await this.prisma.companyGroup.upsert({
+      update: {
+        ...data,
+        companies: companiesIds
+          ? {
+              set: companiesIds.map((companyId) => ({
+                id: companyId,
+              })),
+            }
+          : undefined,
+      },
+      create: {
+        ...data,
+        companyId,
+        companies: companiesIds
+          ? {
+              connect: companiesIds.map((companyId) => ({
+                id: companyId,
+              })),
+            }
+          : undefined,
+      },
       where: { id_companyId: { id: id || 0, companyId } },
     });
 
-    return new CompanyGroupEntity(accessGroup);
+    return new CompanyGroupEntity(group);
   }
 
   async findById(
@@ -29,12 +53,12 @@ export class CompanyGroupRepository {
     companyId: string,
     options: Prisma.CompanyGroupFindFirstArgs = {},
   ) {
-    const accessGroup = await this.prisma.companyGroup.findFirst({
+    const group = await this.prisma.companyGroup.findFirst({
       where: { companyId, id },
       ...options,
     });
 
-    return new CompanyGroupEntity(accessGroup);
+    return new CompanyGroupEntity(group);
   }
 
   async findAvailable(
@@ -44,7 +68,7 @@ export class CompanyGroupRepository {
     options: Prisma.CompanyGroupFindManyArgs = {},
   ) {
     const where = {
-      AND: [{ OR: [{ companyId }, { system: true }] }],
+      AND: [{ companyId }],
     } as typeof options.where;
 
     if ('search' in query) {

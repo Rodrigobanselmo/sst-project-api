@@ -37,10 +37,6 @@ export class UpsertCharacterizationDto {
   @IsOptional()
   description?: string;
 
-  @IsOptional()
-  @IsString({ each: true })
-  considerations?: string[];
-
   @IsString({ each: true })
   @IsOptional()
   photos?: string[];
@@ -52,6 +48,38 @@ export class UpsertCharacterizationDto {
   @IsOptional()
   @IsString({ each: true })
   hierarchyIds?: string[];
+
+  @IsOptional()
+  @IsString({ each: true })
+  considerations?: string[];
+
+  @IsOptional()
+  @IsString({ each: true })
+  activities?: string[];
+
+  @IsOptional()
+  @IsString()
+  noiseValue?: string;
+
+  @IsOptional()
+  @IsString()
+  temperature?: string;
+
+  @IsOptional()
+  @IsString()
+  moisturePercentage?: string;
+
+  @IsOptional()
+  @IsString()
+  luminosity?: string;
+
+  @IsOptional()
+  @IsString()
+  profileName: string;
+
+  @IsOptional()
+  @IsString()
+  profileParentId: string;
 }
 
 export class AddPhotoCharacterizationDto {

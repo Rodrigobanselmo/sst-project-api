@@ -1,4 +1,4 @@
-import { CompanyEnvironmentTypesEnum } from '@prisma/client';
+import { CharacterizationTypeEnum } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import {
   IsEnum,
@@ -27,10 +27,10 @@ export class UpsertEnvironmentDto {
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsString()
   @IsOptional()
-  @IsEnum(CompanyEnvironmentTypesEnum, {
-    message: `type must be one of: ${KeysOfEnum(CompanyEnvironmentTypesEnum)}`,
+  @IsEnum(CharacterizationTypeEnum, {
+    message: `type must be one of: ${KeysOfEnum(CharacterizationTypeEnum)}`,
   })
-  type?: CompanyEnvironmentTypesEnum;
+  type?: CharacterizationTypeEnum;
 
   @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
   @IsString()
@@ -45,10 +45,6 @@ export class UpsertEnvironmentDto {
   @IsOptional()
   order?: number;
 
-  @IsString()
-  @IsOptional()
-  parentEnvironmentId?: string;
-
   @IsOptional()
   @IsString({ each: true })
   hierarchyIds?: string[];
@@ -56,6 +52,10 @@ export class UpsertEnvironmentDto {
   @IsOptional()
   @IsString({ each: true })
   considerations?: string[];
+
+  @IsOptional()
+  @IsString({ each: true })
+  activities?: string[];
 
   @IsOptional()
   @IsString()
@@ -72,15 +72,19 @@ export class UpsertEnvironmentDto {
   @IsOptional()
   @IsString()
   luminosity?: string;
+
+  @IsOptional()
+  @IsString()
+  profileName: string;
+
+  @IsOptional()
+  @IsString()
+  profileParentId: string;
 }
 
 export class AddPhotoEnvironmentDto {
   @IsString()
-  companyEnvironmentId: string;
-
-  @IsInt()
-  @IsOptional()
-  order: number;
+  companyCharacterizationId: string;
 
   @Transform(StringCapitalizeTransform, { toClassOnly: true })
   @IsString()

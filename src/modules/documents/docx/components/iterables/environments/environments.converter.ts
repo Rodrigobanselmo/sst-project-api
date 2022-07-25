@@ -14,16 +14,25 @@ import { RiskFactorsEntity } from './../../../../../checklist/entities/risk.enti
 import { CharacterizationPhotoEntity } from './../../../../../company/entities/characterization-photo.entity';
 import { EnvironmentPhotoEntity } from './../../../../../company/entities/environment-photo.entity';
 import { EnvironmentEntity } from './../../../../../company/entities/environment.entity';
+import { CharacterizationTypeEnum } from '@prisma/client';
 
-export const environmentsConverter = (
-  environments: EnvironmentEntity[],
-): {
+export interface IEnvironmentConvertResponse {
   variables: IDocVariables;
   elements: ReturnType<typeof getLayouts>;
   risks: RiskFactorsEntity[];
   considerations: string[];
+  activities: string[];
   breakPage: boolean;
-}[] => {
+  type: CharacterizationTypeEnum;
+  id: string;
+  profileParentId?: string;
+  profileName?: string;
+  profiles?: EnvironmentEntity[];
+}
+
+export const environmentsConverter = (
+  environments: EnvironmentEntity[],
+): IEnvironmentConvertResponse[] => {
   return environments
     .sort((a, b) => sortNumber(a, b, 'order'))
     .map((environment) => {
@@ -38,8 +47,16 @@ export const environmentsConverter = (
       const breakPage =
         imagesVertical.length > 0 || imagesHorizontal.length > 0;
       const elements = getLayouts(imagesVertical, imagesHorizontal);
+
+      const profileName = environment.profileParentId
+        ? environment.name
+        : environment.profileName
+        ? `${environment.profileName} (${environment.name})`
+        : environment.name;
+
       const variables = {
         [VariablesPGREnum.ENVIRONMENT_NAME]: environment.name || '',
+        [VariablesPGREnum.PROFILE_NAME]: profileName || '',
         [VariablesPGREnum.ENVIRONMENT_DESCRIPTION]:
           environment.description || '',
         [VariablesPGREnum.ENVIRONMENT_NOISE]: environment.noiseValue || '',
@@ -55,8 +72,25 @@ export const environmentsConverter = (
       );
 
       const considerations = environment.considerations;
+      const activities = environment.activities;
+      const type = environment.type;
+      const id = environment.id;
+      const profileParentId = environment.profileParentId;
+      const profiles = environment.profiles;
 
-      return { elements, variables, risks, considerations, breakPage };
+      return {
+        elements,
+        variables,
+        type,
+        id,
+        risks,
+        considerations,
+        breakPage,
+        activities,
+        profileParentId,
+        profileName,
+        profiles,
+      };
     });
 };
 

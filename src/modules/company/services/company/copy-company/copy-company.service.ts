@@ -1,3 +1,4 @@
+import { isEnvironment } from './../../../repositories/implementations/CharacterizationRepository';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { HierarchyEnum, HomogeneousGroup } from '@prisma/client';
 import { v4 } from 'uuid';
@@ -84,6 +85,16 @@ export class CopyCompanyService {
       },
     );
 
+    homoGroups.map((homoGroup, i) => {
+      if (
+        homoGroup.characterization &&
+        isEnvironment(homoGroup.characterization.type)
+      ) {
+        homoGroups[i].environment = homoGroup.characterization as any;
+        homoGroups[i].characterization = null;
+      }
+    });
+
     const newRiskGroupData = await this.riskGroupDataRepository.upsert({
       companyId,
       approvedBy: fromRiskDataGroup.approvedBy,
@@ -110,6 +121,12 @@ export class CopyCompanyService {
 
     await Promise.all(
       homoGroups.map(async (group) => {
+        if (
+          group.characterization &&
+          isEnvironment(group.characterization.type)
+        )
+          group.environment = group.characterization;
+
         const hierarchies: HierarchyEntity[] = [];
         group.hierarchies.map((hierarchy) => {
           group.workspaceIds.map((workspaceId) => {
@@ -169,13 +186,14 @@ export class CopyCompanyService {
           group.environment &&
           equalWorkspace[group.environment.workspaceId]
         ) {
-          await this.prisma.companyEnvironment.create({
+          await this.prisma.companyCharacterization.create({
             data: {
               id: newHomoGroup.id,
               description: group.environment.description,
               name: group.environment.name,
               type: group.environment.type,
               considerations: group.environment.considerations,
+              activities: group.environment.activities,
               companyId: companyId,
               workspaceId: equalWorkspace[group.environment.workspaceId].id,
             },
@@ -192,6 +210,7 @@ export class CopyCompanyService {
               description: group.characterization.description,
               name: group.characterization.name,
               type: group.characterization.type,
+              activities: group.environment.activities,
               considerations: group.characterization.considerations,
               companyId: companyId,
               workspaceId:

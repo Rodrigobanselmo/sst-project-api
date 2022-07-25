@@ -20,7 +20,7 @@ export class UpsertCompanyGroupDto {
 
   @ValidateIf((o) => !o.id)
   @IsString({ each: true })
-  companies: string[];
+  companiesIds: string[];
 }
 
 export class FindCompanyGroupDto extends PaginationQueryDto {

@@ -1,23 +1,19 @@
-import {
-  CharacterizationTypeEnum,
-  CompanyEnvironmentTypesEnum,
-  HierarchyEnum,
-} from '@prisma/client';
+import { CharacterizationTypeEnum, HierarchyEnum } from '@prisma/client';
 
 export const originRiskMap: Record<string, { name: string; type: string }> = {
-  [CompanyEnvironmentTypesEnum.GENERAL]: {
+  [CharacterizationTypeEnum.GENERAL]: {
     name: 'Visão Geral',
     type: 'Ambiente',
   },
-  [CompanyEnvironmentTypesEnum.ADMINISTRATIVE]: {
+  [CharacterizationTypeEnum.ADMINISTRATIVE]: {
     name: 'Ambiente Administrativo',
     type: 'Ambiente',
   },
-  [CompanyEnvironmentTypesEnum.OPERATION]: {
+  [CharacterizationTypeEnum.OPERATION]: {
     name: 'Ambiente Operacional',
     type: 'Ambiente',
   },
-  [CompanyEnvironmentTypesEnum.SUPPORT]: {
+  [CharacterizationTypeEnum.SUPPORT]: {
     name: 'Ambiente de Apoio',
     type: 'Ambiente',
   },

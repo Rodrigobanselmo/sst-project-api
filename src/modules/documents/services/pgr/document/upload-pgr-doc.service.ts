@@ -50,6 +50,7 @@ export class PgrUploadService {
     const companyId = upsertPgrDto.companyId;
     const workspaceId = upsertPgrDto.workspaceId;
 
+    console.log('start: query data');
     // eslint-disable-next-line prettier/prettier
     const riskGroupData = await this.riskGroupDataRepository.findAllDataById(upsertPgrDto.riskGroupId, workspaceId, companyId);
     // eslint-disable-next-line prettier/prettier
@@ -76,6 +77,7 @@ export class PgrUploadService {
           characterization: {
             include: {
               photos: true,
+              profiles: true,
               homogeneousGroup: {
                 include: { riskFactorData: { include: { riskFactor: true } } },
               },
@@ -86,7 +88,6 @@ export class PgrUploadService {
         },
       },
     );
-    console.log('done: query data');
 
     const logo = company.logoUrl
       ? await downloadImageFile(
@@ -96,12 +97,12 @@ export class PgrUploadService {
       : '';
     // return;
 
+    console.log('start: photos');
     const { environments, characterizations, photosPath } =
       await this.downloadPhotos(company);
     // const environments = [];
     // const characterizations = [];
     // const photosPath = [];
-    console.log('done: photos');
 
     try {
       const {
@@ -114,6 +115,7 @@ export class PgrUploadService {
       // const actionPlanUrl = ' ';
       // const urlAPR = ' ';
       // const urlGroupAPR = ' ';
+      console.log('start: attachment');
       const { actionPlanUrl, urlAPR, urlGroupAPR } =
         await this.generateAttachment(
           riskGroupData,
@@ -123,7 +125,6 @@ export class PgrUploadService {
           homoGroupTree,
           upsertPgrDto,
         );
-      console.log('done: attachment');
 
       const version = new RiskDocumentEntity({
         version: upsertPgrDto.version,
@@ -162,6 +163,7 @@ export class PgrUploadService {
         version.created_at,
       )} - REV. ${version.version}`;
 
+      console.log('start: build document');
       const sections: ISectionOptions[] = new DocumentBuildPGR({
         version: versionString,
         document: riskGroupData,
@@ -190,15 +192,14 @@ export class PgrUploadService {
       }).build();
 
       const doc = createBaseDocument(sections);
-      console.log('done: build document');
 
       const b64string = await Packer.toBase64String(doc);
       const buffer = Buffer.from(b64string, 'base64');
 
       const fileName = this.getFileName(upsertPgrDto, riskGroupData);
 
+      console.log('start: upload');
       const url = await this.upload(buffer, fileName, upsertPgrDto);
-      console.log('done: upload');
 
       await this.riskDocumentRepository.upsert({
         ...upsertPgrDto,

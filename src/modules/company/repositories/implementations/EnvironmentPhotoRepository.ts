@@ -10,8 +10,7 @@ import { EnvironmentPhotoEntity } from '../../entities/environment-photo.entity'
 export interface IEnvironmentPhoto extends Partial<AddPhotoEnvironmentDto> {
   photoUrl: string;
   isVertical: boolean;
-  companyEnvironmentId: string;
-  order?: number;
+  companyCharacterizationId: string;
   name: string;
   id?: string;
 }
@@ -21,11 +20,12 @@ export class EnvironmentPhotoRepository {
   constructor(private prisma: PrismaService) {}
 
   async createMany(environmentPhoto: IEnvironmentPhoto[]) {
-    const environments = await this.prisma.companyEnvironmentPhoto.createMany({
-      data: environmentPhoto.map(({ ...rest }) => ({
-        ...rest,
-      })),
-    });
+    const environments =
+      await this.prisma.companyCharacterizationPhoto.createMany({
+        data: environmentPhoto.map(({ ...rest }) => ({
+          ...rest,
+        })),
+      });
 
     return environments;
   }
@@ -34,7 +34,7 @@ export class EnvironmentPhotoRepository {
     id,
     ...environmentPhotoDto
   }: UpdatePhotoEnvironmentDto): Promise<EnvironmentPhotoEntity> {
-    const environment = await this.prisma.companyEnvironmentPhoto.update({
+    const environment = await this.prisma.companyCharacterizationPhoto.update({
       where: { id: id || 'no-id' },
       data: {
         ...environmentPhotoDto,
@@ -45,17 +45,19 @@ export class EnvironmentPhotoRepository {
   }
 
   async findById(id: string) {
-    const environment = await this.prisma.companyEnvironmentPhoto.findUnique({
-      where: { id },
-    });
+    const environment =
+      await this.prisma.companyCharacterizationPhoto.findUnique({
+        where: { id },
+      });
 
     return new EnvironmentPhotoEntity(environment);
   }
 
   async findByEnvironment(environmentId: string) {
-    const environments = await this.prisma.companyEnvironmentPhoto.findMany({
-      where: { companyEnvironmentId: environmentId },
-    });
+    const environments =
+      await this.prisma.companyCharacterizationPhoto.findMany({
+        where: { companyCharacterizationId: environmentId },
+      });
 
     return environments.map(
       (environment) => new EnvironmentPhotoEntity(environment),
@@ -63,7 +65,7 @@ export class EnvironmentPhotoRepository {
   }
 
   async delete(id: string) {
-    const environment = await this.prisma.companyEnvironmentPhoto.delete({
+    const environment = await this.prisma.companyCharacterizationPhoto.delete({
       where: { id },
     });
 

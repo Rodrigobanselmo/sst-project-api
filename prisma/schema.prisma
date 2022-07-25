@@ -63,6 +63,10 @@ enum CharacterizationTypeEnum {
   WORKSTATION
   EQUIPMENT
   ACTIVITIES
+  GENERAL
+  SUPPORT
+  OPERATION
+  ADMINISTRATIVE
 }
 
 enum MeasuresTypeEnum {
@@ -258,10 +262,19 @@ model CompanyCharacterization {
   description String?
   created_at DateTime @default(now())
   considerations String[]
+  activities String[]  
+  profiles CompanyCharacterization[]  @relation(name:"profiles") 
+  profileName String?  
+  profileParent CompanyCharacterization? @relation(name:"profiles", fields: [profileParentId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
+  profileParentId String?
   order Int?
   deleted_at DateTime? 
   updated_at  DateTime   @updatedAt
   type CharacterizationTypeEnum
+  noiseValue String?  
+  temperature String?  
+  luminosity String?  
+  moisturePercentage String?   
   workspaceId String
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
   homogeneousGroup HomogeneousGroup? @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: Cascade) 
@@ -291,6 +304,7 @@ model CompanyEnvironment {
   description String?
   order Int?
   considerations String[]
+  activities String[]  
   created_at DateTime @default(now())
   deleted_at DateTime? 
   updated_at  DateTime   @updatedAt

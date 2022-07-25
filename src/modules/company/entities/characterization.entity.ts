@@ -44,6 +44,15 @@ export class CharacterizationEntity implements CompanyCharacterization {
   updated_at: Date;
   workspaceId: string;
   companyId: string;
+  activities: string[];
+  noiseValue: string;
+  temperature: string;
+  luminosity: string;
+  moisturePercentage: string;
+  profileName: string;
+  profileParentId: string;
+  profileParent?: CharacterizationEntity;
+  profiles?: CharacterizationEntity[];
 
   constructor(partial: Partial<CharacterizationEntity>) {
     Object.assign(this, partial);

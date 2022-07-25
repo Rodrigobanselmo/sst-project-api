@@ -16,6 +16,8 @@ export const sortString = function (
     arrayB = arrayB[field2];
   }
 
+  if (!arrayA || !arrayB) return 0;
+
   if (
     arrayA
       .toLowerCase()
