@@ -6,8 +6,8 @@ import {
   PGRSectionChildrenTypeEnum,
 } from '../../../builders/pgr/types/elements.types';
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
-import { EnvironmentEntity } from './../../../../../company/entities/environment.entity';
-import { environmentsConverter } from './environments.converter';
+import { EnvironmentEntity } from '../../../../../company/entities/environment.entity';
+import { environmentsConverter } from './all-characterization.converter';
 
 export const environmentIterable = (
   environments: EnvironmentEntity[],

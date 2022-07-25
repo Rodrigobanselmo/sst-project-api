@@ -75,11 +75,11 @@ export class UpsertCharacterizationDto {
 
   @IsOptional()
   @IsString()
-  profileName: string;
+  profileName?: string;
 
   @IsOptional()
   @IsString()
-  profileParentId: string;
+  profileParentId?: string;
 }
 
 export class AddPhotoCharacterizationDto {

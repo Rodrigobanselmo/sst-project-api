@@ -15,24 +15,12 @@ async function main() {
     // await prisma.userCompany.deleteMany({
     //   where: { user: { email: 'marcelo.alves@grupoevicon.com.br' } },
     // });
-    await deleteCompany('4c8c2000-c70c-4285-992d-26d7d8f683cb', prisma);
+    // await deleteCompany('4c8c2000-c70c-4285-992d-26d7d8f683cb', prisma);
     //? trocar env to char
-    // const env = await prisma.companyEnvironment.findMany();
-    // Promise.all(
-    //   env.map(async ({ parentEnvironmentId, ...e }) => {
-    //     await prisma.companyCharacterization.create({
-    //       data: { ...e },
-    //     });
-    //   }),
-    // );
-    // const envPhoto = await prisma.companyEnvironmentPhoto.findMany();
-    // Promise.all(
-    //   envPhoto.map(async ({ order, companyEnvironmentId, ...e }) => {
-    //     await prisma.companyCharacterizationPhoto.create({
-    //       data: { ...e, companyCharacterizationId: companyEnvironmentId },
-    //     });
-    //   }),
-    // );
+    const envPhoto = await prisma.companyEnvironmentPhoto.deleteMany();
+    const env = await prisma.companyEnvironment.deleteMany();
+    console.log('done');
+    console.log('done');
   } catch (error) {
     console.log(error);
     console.log('error: end');

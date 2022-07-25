@@ -18,15 +18,12 @@ import { measureHierarchyImage } from '../../../components/images/measureHierarc
 import { rsDocumentImage } from '../../../components/images/rsDocument';
 import { attachmentsIterable } from '../../../components/iterables/attachments/attachments.iterable';
 import { bulletTextIterable } from '../../../components/iterables/bullets/bullets.iterable';
-import { characterizationIterable } from '../../../components/iterables/characterization/characterization.iterable';
 import { complementaryDocsIterable } from '../../../components/iterables/complementaryDocs/complementaryDocs.iterable';
 import { complementarySystemsIterable } from '../../../components/iterables/complementarySystems/complementarySystems.iterable';
 import { emergencyIterable } from '../../../components/iterables/emergency/emergency.iterable';
-import { environmentIterable } from '../../../components/iterables/environments/environments.iterable';
 import { professionalsIterable } from '../../../components/iterables/professionals/professionals.iterable';
 import { recommendationsIterable } from '../../../components/iterables/recommendations/recommendations.iterable';
 import { actionPlanTableSection } from '../../../components/tables/actionPlan/actionPlan.section';
-import { APPRTableSection } from '../../../components/tables/appr/appr.section';
 import { hierarchyHomoOrgSection } from '../../../components/tables/hierarchyHomoOrg/hierarchyHomoOrg.section';
 import { hierarchyPrioritizationPage } from '../../../components/tables/hierarchyPrioritization/hierarchyPrioritization.page';
 import { hierarchyRisksTableAllSections } from '../../../components/tables/hierarchyRisks/hierarchyRisks.section';
@@ -154,55 +151,6 @@ export class ElementsMapClass {
     [PGRSectionChildrenTypeEnum.TABLE_VERSION_CONTROL]: () => [
       versionControlTable(this.versions),
     ],
-    [PGRSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS_GENERAL]: () =>
-      environmentIterable(
-        this.environments.filter(
-          (e) => e.type === CharacterizationTypeEnum.GENERAL,
-        ),
-        (x, v) => this.convertToDocx(x, v),
-      ),
-    [PGRSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS_ADM]: () =>
-      environmentIterable(
-        this.environments.filter(
-          (e) => e.type === CharacterizationTypeEnum.ADMINISTRATIVE,
-        ),
-        (x, v) => this.convertToDocx(x, v),
-      ),
-    [PGRSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS_OP]: () =>
-      environmentIterable(
-        this.environments.filter(
-          (e) => e.type === CharacterizationTypeEnum.OPERATION,
-        ),
-        (x, v) => this.convertToDocx(x, v),
-      ),
-    [PGRSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS_SUP]: () =>
-      environmentIterable(
-        this.environments.filter(
-          (e) => e.type === CharacterizationTypeEnum.SUPPORT,
-        ),
-        (x, v) => this.convertToDocx(x, v),
-      ),
-    [PGRSectionChildrenTypeEnum.ITERABLE_CHARACTERIZATION_WORKSTATION]: () =>
-      characterizationIterable(
-        this.characterizations.filter(
-          (e) => e.type === CharacterizationTypeEnum.WORKSTATION,
-        ),
-        (x, v) => this.convertToDocx(x, v),
-      ),
-    [PGRSectionChildrenTypeEnum.ITERABLE_CHARACTERIZATION_ACTIVIT]: () =>
-      characterizationIterable(
-        this.characterizations.filter(
-          (e) => e.type === CharacterizationTypeEnum.ACTIVITIES,
-        ),
-        (x, v) => this.convertToDocx(x, v),
-      ),
-    [PGRSectionChildrenTypeEnum.ITERABLE_CHARACTERIZATION_EQUIP]: () =>
-      characterizationIterable(
-        this.characterizations.filter(
-          (e) => e.type === CharacterizationTypeEnum.EQUIPMENT,
-        ),
-        (x, v) => this.convertToDocx(x, v),
-      ),
     [PGRSectionChildrenTypeEnum.TABLE_GSE]: () =>
       hierarchyHomoOrgSection(this.hierarchy, this.homogeneousGroup, {
         showDescription: false,

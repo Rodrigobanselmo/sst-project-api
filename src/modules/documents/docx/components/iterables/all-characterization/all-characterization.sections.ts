@@ -1,4 +1,4 @@
-import { CharacterizationTypeEnum, HomoTypeEnum } from '@prisma/client';
+import { CharacterizationTypeEnum } from '@prisma/client';
 import { AlignmentType, BorderStyle, Paragraph, Table } from 'docx';
 import { sortString } from '../../../../../../shared/utils/sorts/string.sort';
 
@@ -13,11 +13,12 @@ import {
   IHomoGroupMap,
 } from '../../../converter/hierarchy.converter';
 import { hierarchyHomoOrgTable } from '../../tables/hierarchyHomoOrg/hierarchyHomoOrg.table';
-import { EnvironmentEntity } from './../../../../../company/entities/environment.entity';
+import { EnvironmentEntity } from '../../../../../company/entities/environment.entity';
 import {
   environmentsConverter,
   IEnvironmentConvertResponse,
-} from './environments.converter';
+} from './all-characterization.converter';
+import { getCharacterizationType } from '../../../../../../modules/company/repositories/implementations/CharacterizationRepository';
 
 const getData = (
   hierarchiesTreeOrg: IHierarchyData,
@@ -33,6 +34,7 @@ const getData = (
     risks,
     considerations: cons,
     activities: ac,
+    type,
   }: Partial<IEnvironmentConvertResponse>,
 ) => {
   const parameters: ISectionChildrenType[] = [];
@@ -149,24 +151,22 @@ const getData = (
     {
       showDescription: false,
       showHomogeneous: true,
-      type: HomoTypeEnum.ENVIRONMENT,
+      type: getCharacterizationType(type),
       groupIdFilter: id,
     },
   );
 
-  console.log(missingBody);
+  if (!missingBody) {
+    const titleTable = [
+      {
+        type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE,
+        text: `Cargos  lotados no ${titleSection} ??${VariablesPGREnum.CHARACTERIZATION_NAME}??`,
+      },
+    ] as ISectionChildrenType[];
 
-  // if (!missingBody) {
-  const titleTable = [
-    {
-      type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE,
-      text: `Cargos  lotados no ${titleSection} ??${VariablesPGREnum.CHARACTERIZATION_NAME}??`,
-    },
-  ] as ISectionChildrenType[];
-
-  offices.push(...convertToDocx(titleTable, variables));
-  offices.push(officesTable);
-  // }
+    offices.push(...convertToDocx(titleTable, variables));
+    offices.push(officesTable);
+  }
 
   const section = [
     ...convertToDocx([...ProfileTitle], variables),
@@ -191,10 +191,48 @@ const getData = (
   return section;
 };
 
-export const environmentSections = (
+const environmentTypes = [
+  {
+    title: 'Visão Geral',
+    type: CharacterizationTypeEnum.GENERAL,
+    desc: 'Geral',
+  },
+  {
+    title: 'Ambientes Administrativos',
+    desc: 'Ambiente Administrativo',
+    type: CharacterizationTypeEnum.ADMINISTRATIVE,
+  },
+  {
+    title: 'Ambientes Operacionais',
+    desc: 'Ambiente Operacional',
+    type: CharacterizationTypeEnum.OPERATION,
+  },
+  { title: 'Ambiente de Apoio', type: CharacterizationTypeEnum.SUPPORT },
+];
+
+const characterizationTypes = [
+  {
+    title: 'Posto de Trabalho',
+    desc: 'Posto de Trabalho',
+    type: CharacterizationTypeEnum.WORKSTATION,
+  },
+  {
+    title: 'Atividades',
+    desc: 'Atividades',
+    type: CharacterizationTypeEnum.ACTIVITIES,
+  },
+  {
+    title: 'Equipamentos',
+    desc: 'Equipamentos',
+    type: CharacterizationTypeEnum.EQUIPMENT,
+  },
+];
+
+export const allCharacterizationSections = (
   environmentsData: EnvironmentEntity[],
   hierarchiesTreeOrg: IHierarchyData,
   homoGroupTree: IHomoGroupMap,
+  type = 'char' as 'env' | 'char',
   convertToDocx: (
     data: ISectionChildrenType[],
     variables?: IDocVariables,
@@ -202,115 +240,101 @@ export const environmentSections = (
 ) => {
   const sections: (Paragraph | Table)[][] = [];
 
-  [
-    {
-      title: 'Visão Geral',
-      type: CharacterizationTypeEnum.GENERAL,
-      desc: 'Geral',
-    },
-    {
-      title: 'Ambientes Administrativos',
-      desc: 'Ambiente Administrativo',
-      type: CharacterizationTypeEnum.ADMINISTRATIVE,
-    },
-    {
-      title: 'Ambientes Operacionais',
-      desc: 'Ambiente Operacional',
-      type: CharacterizationTypeEnum.OPERATION,
-    },
-    { title: 'Ambiente de Apoio', type: CharacterizationTypeEnum.SUPPORT },
-  ].forEach(({ type, title: titleSection, desc }) => {
-    const environments = environmentsData.filter(
-      (e) => e.type === type || !!e.profileParentId,
-    );
-    if (!environments?.length) return;
+  (type === 'char' ? characterizationTypes : environmentTypes).forEach(
+    ({ type, title: titleSection, desc }) => {
+      const environments = environmentsData.filter(
+        (e) => e.type === type || !!e.profileParentId,
+      );
+      if (!environments?.length) return;
 
-    const sectionProfiles: Record<string, (Paragraph | Table)[]> = {};
-    const environmentData = environmentsConverter(environments);
-    environmentData
-      .sort((a, b) => sortString(b, a, 'profileParentId'))
-      .forEach(
-        (
-          {
-            variables,
-            elements,
-            id,
-            risks,
-            considerations: cons,
-            breakPage,
-            activities: ac,
-            profileParentId,
-            profiles,
-          },
-          index,
-        ) => {
-          console.log(!!profileParentId);
-          const title = [
-            {
-              type: PGRSectionChildrenTypeEnum.H3,
-              text: `${desc}: ??${VariablesPGREnum.ENVIRONMENT_NAME}??`,
-            },
-          ] as ISectionChildrenType[];
-
-          const otherSections = getData(
-            hierarchiesTreeOrg,
-            homoGroupTree,
-            titleSection,
-            convertToDocx,
+      const sectionProfiles: Record<string, (Paragraph | Table)[]> = {};
+      const environmentData = environmentsConverter(environments);
+      environmentData
+        .sort((a, b) => sortString(b, a, 'profileParentId'))
+        .forEach(
+          (
             {
               variables,
+              elements,
               id,
               risks,
               considerations: cons,
+              breakPage,
               activities: ac,
+              profileParentId,
+              profiles,
+              type,
             },
-          );
+            index,
+          ) => {
+            const title = [
+              {
+                type: PGRSectionChildrenTypeEnum.H3,
+                text: `${desc}: ??${VariablesPGREnum.ENVIRONMENT_NAME}??`,
+              },
+            ] as ISectionChildrenType[];
 
-          if (profileParentId) {
-            otherSections.push(
-              ...convertToDocx(
-                [
-                  {
-                    type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-                    text: ``,
-                  },
-                ],
+            const otherSections = getData(
+              hierarchiesTreeOrg,
+              homoGroupTree,
+              titleSection,
+              convertToDocx,
+              {
                 variables,
-              ),
+                id,
+                risks,
+                considerations: cons,
+                activities: ac,
+                type,
+              },
             );
 
-            return (sectionProfiles[id] = otherSections);
-          }
+            if (profileParentId) {
+              otherSections.unshift(
+                ...convertToDocx(
+                  [
+                    {
+                      type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+                      text: ``,
+                    },
+                  ],
+                  variables,
+                ),
+              );
 
-          const section = [
-            ...convertToDocx([...title], variables),
-            ...elements,
-            ...otherSections,
-            ...profiles
-              .map((profile) => sectionProfiles[profile.id])
-              .reduce((acc, curr) => (curr ? [...acc, ...curr] : acc), []),
-          ];
+              return (sectionProfiles[id] = otherSections);
+            }
 
-          if (index == 0)
-            section.unshift(
-              ...convertToDocx([
-                {
-                  type: PGRSectionChildrenTypeEnum.H2,
-                  text: titleSection,
-                },
-              ]),
-            );
-
-          if (breakPage || sections.length === 0) sections.push(section);
-          else {
-            sections[sections.length - 1] = [
-              ...(sections[sections.length - 1] || []),
-              ...section,
+            const section = [
+              ...convertToDocx([...title], variables),
+              ...elements,
+              ...otherSections,
+              ...profiles
+                .map((profile) => sectionProfiles[profile.id])
+                .reduce((acc, curr) => (curr ? [...acc, ...curr] : acc), []),
             ];
-          }
-        },
-      );
-  });
+
+            if (index == 0)
+              section.unshift(
+                ...convertToDocx([
+                  {
+                    type: PGRSectionChildrenTypeEnum.H2,
+                    text: titleSection,
+                  },
+                ]),
+              );
+
+            if (breakPage || sections.length === 0) sections.push(section);
+            else {
+              sections[sections.length - 1] = [
+                ...(sections[sections.length - 1] || []),
+                ...section,
+              ];
+            }
+          },
+        );
+    },
+  );
 
   return sections.map((section) => ({
     footerText: `??${VariablesPGREnum.CHAPTER_2}??`,

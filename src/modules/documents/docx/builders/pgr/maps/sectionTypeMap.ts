@@ -6,9 +6,6 @@ import { chapterSection } from '../../../base/layouts/chapter/chapter';
 import { coverSections } from '../../../base/layouts/cover/cover';
 import { headerAndFooter } from '../../../base/layouts/headerAndFooter/headerAndFooter';
 import { summarySections } from '../../../base/layouts/summary/summary';
-import { characterizationSections } from '../../../components/iterables/characterization/characterization.sections';
-import { environmentSections } from '../../../components/iterables/environments/environments.sections';
-import { APPRTableSection } from '../../../components/tables/appr/appr.section';
 import {
   HierarchyMapData,
   IHomoGroupMap,
@@ -27,6 +24,7 @@ import {
 import { RiskFactorGroupDataEntity } from './../../../../../checklist/entities/riskGroupData.entity';
 import { EnvironmentEntity } from './../../../../../company/entities/environment.entity';
 import { IMapElementDocumentType } from './elementTypeMap';
+import { allCharacterizationSections } from '../../../components/iterables/all-characterization/all-characterization.sections';
 
 type IMapSectionDocumentType = Record<
   string,
@@ -92,10 +90,11 @@ export class SectionsMapClass {
       ...sectionLandscapeProperties,
     }),
     [PGRSectionTypeEnum.ITERABLE_ENVIRONMENTS]: (): ISectionOptions[] =>
-      environmentSections(
+      allCharacterizationSections(
         this.environments,
         this.hierarchy,
         this.homogeneousGroup,
+        'env',
         (x, v) => this.convertToDocx(x, v),
       ).map(({ footerText, children }) => ({
         children,
@@ -103,10 +102,11 @@ export class SectionsMapClass {
         ...sectionLandscapeProperties,
       })),
     [PGRSectionTypeEnum.ITERABLE_CHARACTERIZATION]: (): ISectionOptions[] =>
-      characterizationSections(
+      allCharacterizationSections(
         this.characterizations,
         this.hierarchy,
         this.homogeneousGroup,
+        'char',
         (x, v) => this.convertToDocx(x, v),
       ).map(({ footerText, children }) => ({
         children,

@@ -1,4 +1,4 @@
-import { sortNumber } from './../../../../../../shared/utils/sorts/number.sort';
+import { sortNumber } from '../../../../../../shared/utils/sorts/number.sort';
 import { Paragraph, Table } from 'docx';
 
 import { HFullWidthImage } from '../../../base/elements/imagesLayout/hFullWidthImage';
@@ -10,10 +10,10 @@ import { VThreeImages } from '../../../base/elements/imagesLayout/vThreeImages';
 import { VTwoImages } from '../../../base/elements/imagesLayout/vTwoImages';
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
-import { RiskFactorsEntity } from './../../../../../checklist/entities/risk.entity';
-import { CharacterizationPhotoEntity } from './../../../../../company/entities/characterization-photo.entity';
-import { EnvironmentPhotoEntity } from './../../../../../company/entities/environment-photo.entity';
-import { EnvironmentEntity } from './../../../../../company/entities/environment.entity';
+import { RiskFactorsEntity } from '../../../../../checklist/entities/risk.entity';
+import { CharacterizationPhotoEntity } from '../../../../../company/entities/characterization-photo.entity';
+import { EnvironmentPhotoEntity } from '../../../../../company/entities/environment-photo.entity';
+import { EnvironmentEntity } from '../../../../../company/entities/environment.entity';
 import { CharacterizationTypeEnum } from '@prisma/client';
 
 export interface IEnvironmentConvertResponse {

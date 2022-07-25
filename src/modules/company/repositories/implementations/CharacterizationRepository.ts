@@ -46,6 +46,16 @@ export class CharacterizationRepository {
   }: ICompanyCharacterization): Promise<CharacterizationEntity> {
     const newId = v4();
 
+    console.log({
+      id,
+      companyId,
+      workspaceId,
+      hierarchyIds,
+      type,
+      profileParentId,
+      ...characterizationDto,
+    });
+
     const homogeneousGroup = await this.prisma.homogeneousGroup.upsert({
       where: { id: id || 'no-id' },
       create: {
@@ -57,6 +67,7 @@ export class CharacterizationRepository {
         type: getCharacterizationType(type),
       },
       update: {
+        type: getCharacterizationType(type),
         description: characterizationDto.name + '(//)' + type,
       },
     });
@@ -86,7 +97,7 @@ export class CharacterizationRepository {
       ),
     );
 
-    const characterization = await this.prisma.companyCharacterization.upsert({
+    const characterization = (await this.prisma.companyCharacterization.upsert({
       where: {
         workspaceId_companyId_id: { id: id || 'no-id', companyId, workspaceId },
       },
@@ -105,7 +116,22 @@ export class CharacterizationRepository {
         ...characterizationDto,
       },
       include: { profiles: true },
-    });
+    })) as CharacterizationEntity;
+
+    characterization.profiles = await Promise.all(
+      characterization.profiles?.map((profile) => {
+        return this.upsert({
+          id: profile.id,
+          companyId,
+          workspaceId,
+          type,
+          profileParentId: profile.profileParentId,
+          ...(characterizationDto && {
+            name: `${characterizationDto.name} - (${profile.profileName})`,
+          }),
+        });
+      }),
+    );
 
     return new CharacterizationEntity(characterization);
   }
