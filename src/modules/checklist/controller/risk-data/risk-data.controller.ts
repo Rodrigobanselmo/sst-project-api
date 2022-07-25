@@ -150,8 +150,8 @@ export class RiskDataController {
     isContract: true,
     isMember: true,
   })
-  @Delete('/:companyId/:groupId/delete/many')
-  Post(
+  @Post('/:companyId/:groupId/delete/many')
+  delete(
     @Body() upsertRiskDataDto: DeleteManyRiskDataDto,
     @Param('groupId') groupId: string,
   ) {

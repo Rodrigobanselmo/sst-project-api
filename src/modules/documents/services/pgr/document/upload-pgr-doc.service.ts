@@ -2,6 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { StatusEnum } from '@prisma/client';
 import { ISectionOptions, Packer } from 'docx';
 import fs from 'fs';
+import { removeDuplicate } from 'src/shared/utils/removeDuplicate';
 import { v4 } from 'uuid';
 
 import { CompanyRepository } from '../../../../../modules/company/repositories/implementations/CompanyRepository';
@@ -281,7 +282,15 @@ export class PgrUploadService {
           return { ...environment, photos };
         }),
       );
-      return { environments, characterizations, photosPath };
+      const allChar = removeDuplicate([...characterizations, ...environments], {
+        removeById: 'id',
+      });
+
+      return {
+        environments: allChar,
+        characterizations: allChar,
+        photosPath,
+      };
     } catch (error) {
       photosPath.forEach((path) => fs.unlinkSync(path));
 

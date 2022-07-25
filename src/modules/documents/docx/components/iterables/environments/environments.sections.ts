@@ -23,21 +23,16 @@ const getData = (
   hierarchiesTreeOrg: IHierarchyData,
   homoGroupTree: IHomoGroupMap,
   titleSection: string,
-  desc: string,
   convertToDocx: (
     data: ISectionChildrenType[],
     variables?: IDocVariables,
   ) => (Paragraph | Table)[],
   {
     variables,
-    elements,
     id,
     risks,
     considerations: cons,
-    breakPage,
     activities: ac,
-    profileParentId,
-    profiles,
   }: Partial<IEnvironmentConvertResponse>,
 ) => {
   const parameters: ISectionChildrenType[] = [];
@@ -100,15 +95,6 @@ const getData = (
       text: `${risk.name} (${risk.type})`,
       alignment: AlignmentType.START,
     });
-
-    // if (index === risks.length - 1)
-    //   riskFactors.push({
-    //     type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-    //     text: '',
-    //     removeWithSomeEmptyVars: [
-    //       VariablesPGREnum.ENVIRONMENT_DESCRIPTION,
-    //     ],
-    //   });
   });
 
   cons.forEach((consideration, index) => {
@@ -168,17 +154,19 @@ const getData = (
     },
   );
 
-  if (!missingBody) {
-    const titleTable = [
-      {
-        type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE,
-        text: `Cargos  lotados no ${titleSection} ??${VariablesPGREnum.CHARACTERIZATION_NAME}??`,
-      },
-    ] as ISectionChildrenType[];
+  console.log(missingBody);
 
-    offices.push(...convertToDocx(titleTable, variables));
-    offices.push(officesTable);
-  }
+  // if (!missingBody) {
+  const titleTable = [
+    {
+      type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE,
+      text: `Cargos  lotados no ${titleSection} ??${VariablesPGREnum.CHARACTERIZATION_NAME}??`,
+    },
+  ] as ISectionChildrenType[];
+
+  offices.push(...convertToDocx(titleTable, variables));
+  offices.push(officesTable);
+  // }
 
   const section = [
     ...convertToDocx([...ProfileTitle], variables),
@@ -232,13 +220,15 @@ export const environmentSections = (
     },
     { title: 'Ambiente de Apoio', type: CharacterizationTypeEnum.SUPPORT },
   ].forEach(({ type, title: titleSection, desc }) => {
-    const environments = environmentsData.filter((e) => e.type === type);
+    const environments = environmentsData.filter(
+      (e) => e.type === type || !!e.profileParentId,
+    );
     if (!environments?.length) return;
 
     const sectionProfiles: Record<string, (Paragraph | Table)[]> = {};
     const environmentData = environmentsConverter(environments);
     environmentData
-      .sort((a, b) => sortString(a, b, 'profileParentId'))
+      .sort((a, b) => sortString(b, a, 'profileParentId'))
       .forEach(
         (
           {
@@ -254,6 +244,7 @@ export const environmentSections = (
           },
           index,
         ) => {
+          console.log(!!profileParentId);
           const title = [
             {
               type: PGRSectionChildrenTypeEnum.H3,
@@ -265,18 +256,13 @@ export const environmentSections = (
             hierarchiesTreeOrg,
             homoGroupTree,
             titleSection,
-            desc,
             convertToDocx,
             {
               variables,
-              elements,
               id,
               risks,
               considerations: cons,
-              breakPage,
               activities: ac,
-              profileParentId,
-              profiles,
             },
           );
 
@@ -302,7 +288,7 @@ export const environmentSections = (
             ...otherSections,
             ...profiles
               .map((profile) => sectionProfiles[profile.id])
-              .reduce((acc, curr) => [...acc, ...curr], []),
+              .reduce((acc, curr) => (curr ? [...acc, ...curr] : acc), []),
           ];
 
           if (index == 0)
