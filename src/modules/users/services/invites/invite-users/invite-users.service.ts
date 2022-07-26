@@ -1,3 +1,4 @@
+import { CompanyEntity } from './../../../../company/entities/company.entity';
 import { AccessGroupsEntity } from './../../../../auth/entities/access-groups.entity';
 import { RoleEnum } from './../../../../../shared/constants/enum/authorization';
 import { CompanyRepository } from './../../../../company/repositories/implementations/CompanyRepository';
@@ -94,11 +95,23 @@ export class InviteUsersService {
         throw new BadRequestException(ErrorInvitesEnum.USER_ALREADY_EXIST);
     }
 
-    const companies = await this.companyRepository.findAllRelatedByCompanyId(
-      inviteUserDto.companyId,
-      { companiesIds: inviteUserDto?.companiesIds || [] },
-      { skip: 0, take: 100 },
-    );
+    let companies = {} as {
+      data: CompanyEntity[];
+      count: number;
+    };
+
+    if (!userRoles.includes(RoleEnum.MASTER))
+      companies = await this.companyRepository.findAllRelatedByCompanyId(
+        inviteUserDto.companyId,
+        { companiesIds: inviteUserDto?.companiesIds || [] },
+        { skip: 0, take: 100 },
+      );
+
+    if (userRoles.includes(RoleEnum.MASTER))
+      companies = await this.companyRepository.findAll(
+        { companiesIds: inviteUserDto?.companiesIds || [] },
+        { skip: 0, take: 100 },
+      );
 
     const expires_date = this.dateProvider.addDay(new Date(), 7);
 

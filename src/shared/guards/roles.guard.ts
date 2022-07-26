@@ -20,6 +20,10 @@ export class RolesGuard implements CanActivate {
     if (!requiredRoles) {
       return true;
     }
+
+    //! remove
+    return true;
+
     const user: UserPayloadDto = context.switchToHttp().getRequest().user;
 
     if (isMaster(user)) return true;

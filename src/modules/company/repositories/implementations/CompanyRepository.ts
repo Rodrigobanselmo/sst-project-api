@@ -574,6 +574,13 @@ export class CompanyRepository implements ICompanyRepository {
       delete query.groupId;
     }
 
+    if ('companiesIds' in query) {
+      (where.AND as any).push({
+        id: { in: query.companiesIds },
+      } as typeof options.where);
+      delete query.companiesIds;
+    }
+
     Object.entries(query).forEach(([key, value]) => {
       if (value)
         (where.AND as any).push({

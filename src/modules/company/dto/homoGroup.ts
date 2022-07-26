@@ -1,6 +1,7 @@
 import { HomoTypeEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import {
+  IsBoolean,
   IsEnum,
   IsOptional,
   IsString,
@@ -82,4 +83,29 @@ export class UpdateHomoGroupDto {
   @IsOptional()
   @Type(() => HierarchyOnHomoDto)
   readonly hierarchies?: HierarchyOnHomoDto[];
+}
+
+export class CopyHomogeneousGroupDto {
+  @IsString()
+  actualGroupId: string;
+
+  @IsString()
+  riskGroupId: string;
+
+  @IsString()
+  copyFromHomoGroupId: string;
+
+  @IsString()
+  companyIdFrom: string;
+
+  @IsString()
+  riskGroupIdFrom: string;
+
+  @IsOptional()
+  @IsString()
+  type?: HomoTypeEnum;
+
+  @IsOptional()
+  @IsString()
+  workspaceId?: string;
 }

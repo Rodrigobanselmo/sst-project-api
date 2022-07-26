@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 
 import { CompanyModule } from '../company/company.module';
 import { ChecklistController } from './controller/checklist/checklist.controller';
@@ -103,7 +103,13 @@ import { UpdateRiskService } from './services/risk/update-risk/update-risk.servi
     RiskDataRecRepository,
     UpsertRiskDataRecService,
   ],
-  exports: [RiskRepository, RiskGroupDataRepository, RiskDocumentRepository],
-  imports: [CompanyModule],
+  exports: [
+    RiskRepository,
+    RiskGroupDataRepository,
+    RiskDocumentRepository,
+    UpsertManyRiskDataService,
+    RiskDataRepository,
+  ],
+  imports: [forwardRef(() => CompanyModule)],
 })
 export class ChecklistModule {}

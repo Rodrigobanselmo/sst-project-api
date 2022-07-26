@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 
 import { ExcelProvider } from '../../shared/providers/ExcelProvider/implementations/ExcelProvider';
 import { AmazonStorageProvider } from '../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
@@ -64,8 +64,11 @@ import { CompanyGroupRepository } from './repositories/implementations/CompanyGr
 import { FindAvailableCompanyGroupsService } from './services/group/find-company-groups-group/find-company-groups-group.service';
 import { UpsertCompanyGroupsService } from './services/group/upsert-company-group/upsert-company-group.service';
 import { FindAllUserCompaniesService } from './services/company/find-all-user-companies /find-all-companies.service';
+import { CopyHomoGroupService } from './services/homoGroup/copy-homo-group/copy-homo-group.service';
+import { ChecklistModule } from '../checklist/checklist.module';
 
 @Module({
+  imports: [forwardRef(() => ChecklistModule)],
   controllers: [
     CompanyController,
     EmployeeController,
@@ -133,6 +136,7 @@ import { FindAllUserCompaniesService } from './services/company/find-all-user-co
     FindAvailableCompanyGroupsService,
     UpsertCompanyGroupsService,
     FindAllUserCompaniesService,
+    CopyHomoGroupService,
   ],
   exports: [
     CompanyRepository,

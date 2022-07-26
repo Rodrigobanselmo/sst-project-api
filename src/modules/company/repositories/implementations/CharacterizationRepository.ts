@@ -224,18 +224,20 @@ export class CharacterizationRepository {
         include: { photos: true, profiles: true, ...options.include },
       })) as CharacterizationEntity;
 
-    const characterizationChildrenWithRisk = await Promise.all(
-      characterization.profiles?.map(async (child) => {
-        const profile = await this.getHierarchiesAndRisks(
-          child.id,
-          child,
-          options,
-        );
-        return profile;
-      }),
-    );
+    if (characterization) {
+      const characterizationChildrenWithRisk = await Promise.all(
+        characterization.profiles?.map(async (child) => {
+          const profile = await this.getHierarchiesAndRisks(
+            child.id,
+            child,
+            options,
+          );
+          return profile;
+        }),
+      );
 
-    characterization.profiles = characterizationChildrenWithRisk;
+      characterization.profiles = characterizationChildrenWithRisk;
+    }
 
     return this.getHierarchiesAndRisks(id, characterization, options);
   }

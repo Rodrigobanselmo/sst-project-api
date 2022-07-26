@@ -1,11 +1,7 @@
-import {
-  CharacterizationTypeEnum,
-  HomoTypeEnum,
-  RiskFactorsEnum,
-} from '@prisma/client';
+import { HomoTypeEnum, RiskFactorsEnum } from '@prisma/client';
 import { Paragraph, Table } from 'docx';
-import { removeDuplicate } from '../../../../../../shared/utils/removeDuplicate';
 
+import { removeDuplicate } from '../../../../../../shared/utils/removeDuplicate';
 import { RiskDocumentEntity } from '../../../../../checklist/entities/riskDocument.entity';
 import { bulletsNormal, bulletsSpace } from '../../../base/elements/bullets';
 import { h1, h2, h3, h4, h5, h6, title } from '../../../base/elements/heading';
