@@ -250,6 +250,8 @@ export class CharacterizationRepository {
       getRiskData?: boolean;
     } = {},
   ) {
+    if (!characterization) return characterization;
+
     const hierarchies = await this.prisma.hierarchy.findMany({
       where: {
         hierarchyOnHomogeneous: {

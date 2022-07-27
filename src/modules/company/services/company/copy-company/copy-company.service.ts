@@ -274,10 +274,12 @@ export class CopyCompanyService {
 
               if (riskFactorFromData.epis && riskFactorFromData.epis.length)
                 await this.prisma.epiToRiskFactorData.createMany({
-                  data: riskFactorFromData.epiToRiskFactorData.map((data) => ({
-                    ...data,
-                    riskFactorDataId: newRiskFactorData.id,
-                  })),
+                  data: riskFactorFromData.epiToRiskFactorData.map(
+                    ({ epi, ...data }) => ({
+                      ...data,
+                      riskFactorDataId: newRiskFactorData.id,
+                    }),
+                  ),
                 });
 
               return newRiskFactorData;

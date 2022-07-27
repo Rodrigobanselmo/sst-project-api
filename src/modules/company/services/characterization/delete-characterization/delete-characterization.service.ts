@@ -35,15 +35,31 @@ export class DeleteCharacterizationService {
         await this.characterizationPhotoRepository.delete(photo.id);
       }),
     );
+
     const characterizations = await this.characterizationRepository.findById(
       id,
     );
+
     if (characterizations.companyId !== userPayloadDto.targetCompanyId) {
       throw new BadRequestException(
         ErrorMessageEnum.NOT_FOUND_ON_COMPANY_TO_DELETE,
       );
     }
 
+    characterizations.profiles.forEach(async (profile) => {
+      await this.characterizationRepository.delete(
+        profile.id,
+        userPayloadDto.targetCompanyId,
+        workspaceId,
+      );
+      await this.homoGroupRepository.deleteById(profile.id);
+    });
+
+    await this.characterizationRepository.delete(
+      id,
+      userPayloadDto.targetCompanyId,
+      workspaceId,
+    );
     await this.homoGroupRepository.deleteById(id);
 
     return characterizations;

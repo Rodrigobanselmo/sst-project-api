@@ -101,6 +101,7 @@ export class PgrUploadService {
     console.log('start: photos');
     const { environments, characterizations, photosPath } =
       await this.downloadPhotos(company);
+    console.log('end: photos');
     // const environments = [];
     // const characterizations = [];
     // const photosPath = [];
@@ -292,6 +293,7 @@ export class PgrUploadService {
         photosPath,
       };
     } catch (error) {
+      console.log(error);
       photosPath.forEach((path) => fs.unlinkSync(path));
 
       throw new InternalServerErrorException(error);
