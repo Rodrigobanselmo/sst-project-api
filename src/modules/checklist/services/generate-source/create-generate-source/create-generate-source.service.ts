@@ -17,7 +17,7 @@ export class CreateGenerateSourceService {
     const user = isMaster(userPayloadDto);
 
     const system =
-      user.isMaster && user.companyId === createGenerateSourceDto.companyId;
+      user.isSystem && user.companyId === createGenerateSourceDto.companyId;
 
     const GenerateSourceFactor = await this.generateSourceRepository.create(
       createGenerateSourceDto,

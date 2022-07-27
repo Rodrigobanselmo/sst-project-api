@@ -11,7 +11,7 @@ export class CreateChecklistService {
     if (!createChecklistDto.data)
       throw new BadRequestException('Data is missing');
 
-    const system = user.isMaster;
+    const system = user.isSystem;
 
     const ChecklistFactor = await this.checklistRepository.create(
       { ...createChecklistDto },

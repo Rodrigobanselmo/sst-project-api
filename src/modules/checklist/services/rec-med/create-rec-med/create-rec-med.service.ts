@@ -12,10 +12,10 @@ export class CreateRecMedService {
     createRecMedDto: CreateRecMedDto,
     userPayloadDto: UserPayloadDto,
   ) {
-    const user = isMaster(userPayloadDto);
+    const user = isMaster(userPayloadDto, createRecMedDto.companyId);
 
     const system =
-      user.isMaster && user.companyId === createRecMedDto.companyId;
+      user.isSystem && user.companyId === createRecMedDto.companyId;
 
     const RecMedFactor = await this.recMedRepository.create(
       createRecMedDto,

@@ -3,8 +3,9 @@ import { RoleEnum } from '../constants/enum/authorization';
 import { UserPayloadDto } from '../dto/user-payload.dto';
 
 export interface IMasterReturn {
-  isMaster: boolean;
+  isSystem: boolean;
   companyId: string;
+  targetCompanyId: string;
 }
 
 export const isMaster = (
@@ -16,7 +17,8 @@ export const isMaster = (
   const sameCompany = companyId ? user.companyId === companyId : true;
 
   return {
-    isMaster: includeMaster && sameCompany,
+    isMaster: includeMaster,
+    isSystem: includeMaster && sameCompany,
     companyId: user.companyId,
     targetCompanyId: companyId || user.companyId,
   };

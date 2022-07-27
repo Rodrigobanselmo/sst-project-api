@@ -29,7 +29,7 @@ export class UploadCnaeDataService {
 
     const riskWorkbook = workbooksConstant[WorkbooksEnum.CNAE];
 
-    const system = userPayloadDto.isMaster;
+    const system = userPayloadDto.isSystem;
     const companyId = userPayloadDto.targetCompanyId;
 
     // get risk table with actual version

@@ -260,6 +260,29 @@ export class RiskDataRepository {
     return riskFactorData.map((data) => new RiskFactorDataEntity(data));
   }
 
+  async findAllByHierarchyId(
+    companyId: string,
+    riskFactorGroupDataId: string,
+    hierarchyId: string,
+  ) {
+    const riskFactorData = await this.prisma.riskFactorData.findMany({
+      where: {
+        riskFactorGroupDataId,
+        companyId,
+        homogeneousGroup: { hierarchyOnHomogeneous: { some: { hierarchyId } } },
+      },
+      include: {
+        adms: true,
+        recs: true,
+        engs: true,
+        generateSources: true,
+        epis: true,
+      },
+    });
+
+    return riskFactorData.map((data) => new RiskFactorDataEntity(data));
+  }
+
   async deleteById(id: string) {
     const riskFactorData = await this.prisma.riskFactorData.delete({
       where: { id },

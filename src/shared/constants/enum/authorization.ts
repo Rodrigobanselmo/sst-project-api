@@ -20,7 +20,7 @@ export enum RoleEnum {
   PGR = '5',
   ACTION_PLAN = '5',
 
-  CONTRACTS = '4',
+  CONTRACTS = '40',
   DOCS = '4',
   RISK = '4',
   DATABASE = '5',

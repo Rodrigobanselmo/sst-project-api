@@ -397,9 +397,29 @@ model Epi {
   created_at DateTime @default(now())
   deleted_at DateTime? 
   riskFactorData RiskFactorData[]
+  epiToRiskFactorData EpiToRiskFactorData[]
 
   @@index(ca)
   @@unique([ca, status])
+} 
+
+model EpiToRiskFactorData {
+  epiId    Int   
+  riskFactorDataId String
+  riskFactorData RiskFactorData  @relation(fields: [riskFactorDataId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  epi Epi  @relation(fields: [epiId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  lifeTimeInDays DateTime?
+  efficientlyCheck Boolean @default(false)
+  epcCheck Boolean @default(false)
+  longPeriodsCheck Boolean @default(false)
+  validationCheck Boolean @default(false)
+  tradeSignCheck Boolean @default(false)
+  sanitationCheck Boolean @default(false)
+  maintenanceCheck Boolean @default(false)
+  unstoppedCheck Boolean @default(false)
+  trainingCheck Boolean @default(false)
+
+  @@id([epiId, riskFactorDataId])
 } 
 
 model GenerateSource {
@@ -661,6 +681,7 @@ model RiskFactorData {
   dataRecs RiskFactorDataRec[]
   json Json?
   level    Int?
+  epiToRiskFactorData EpiToRiskFactorData[]
 
   @@unique([id, companyId])
   @@unique([homogeneousGroupId, riskId, riskFactorGroupDataId])

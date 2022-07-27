@@ -1,3 +1,4 @@
+import { HierarchyRepository } from './../../../repositories/implementations/HierarchyRepository';
 import { RiskFactorDataEntity } from './../../../../checklist/entities/riskData.entity';
 import { asyncEach } from './../../../../../shared/utils/asyncEach';
 import { UpsertManyRiskDataService } from './../../../../checklist/services/risk-data/upsert-many-risk-data/upsert-many-risk-data.service';
@@ -12,6 +13,7 @@ import { HomoGroupRepository } from '../../../repositories/implementations/HomoG
 @Injectable()
 export class CopyHomoGroupService {
   constructor(
+    private readonly hierarchyRepository: HierarchyRepository,
     private readonly homoGroupRepository: HomoGroupRepository,
     private readonly riskDataRepository: RiskDataRepository,
     private readonly upsertManyRiskDataService: UpsertManyRiskDataService,
@@ -24,31 +26,45 @@ export class CopyHomoGroupService {
       copyFromHomoGroupId,
       riskGroupIdFrom,
       companyIdFrom,
+      hierarchyId,
       ...rest
     }: CopyHomogeneousGroupDto,
     userPayloadDto: UserPayloadDto,
   ) {
     const companyId = userPayloadDto.targetCompanyId;
+
+    const getRiskData = async () => {
+      if (actualGroupId) {
+        const foundCopyFromHomoGroup =
+          await this.homoGroupRepository.findHomoGroupByCompanyAndId(
+            copyFromHomoGroupId,
+            companyIdFrom,
+          );
+
+        if (!foundCopyFromHomoGroup?.id)
+          throw new BadRequestException(ErrorCompanyEnum.GHO_NOT_FOUND);
+
+        return this.riskDataRepository.findAllByHomogeneousGroupId(
+          companyIdFrom,
+          riskGroupIdFrom,
+          foundCopyFromHomoGroup.id,
+        );
+      }
+
+      if (hierarchyId) {
+        return this.riskDataRepository.findAllByHierarchyId(
+          companyIdFrom,
+          riskGroupIdFrom,
+          hierarchyId,
+        );
+      }
+    };
+
     const foundHomoGroup =
       await this.homoGroupRepository.findHomoGroupByCompanyAndId(
         actualGroupId,
         companyId,
       );
-
-    const foundCopyFromHomoGroup =
-      await this.homoGroupRepository.findHomoGroupByCompanyAndId(
-        copyFromHomoGroupId,
-        companyIdFrom,
-      );
-
-    if (!foundCopyFromHomoGroup?.id)
-      throw new BadRequestException(ErrorCompanyEnum.GHO_NOT_FOUND);
-
-    const riskData = await this.riskDataRepository.findAllByHomogeneousGroupId(
-      companyId,
-      riskGroupIdFrom,
-      foundCopyFromHomoGroup.id,
-    );
 
     const save = async (riskData: RiskFactorDataEntity, index: number) => {
       const data = {
@@ -84,6 +100,8 @@ export class CopyHomoGroupService {
       delete data.workspaceId;
       return this.riskDataRepository.upsertMany(data);
     };
+
+    const riskData = await getRiskData();
 
     await asyncEach(riskData, save);
   }

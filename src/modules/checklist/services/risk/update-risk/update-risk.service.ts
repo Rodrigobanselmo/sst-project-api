@@ -12,7 +12,7 @@ export class UpdateRiskService {
     updateRiskDto: UpdateRiskDto,
     user: UserPayloadDto,
   ) {
-    const system = user.isMaster;
+    const system = user.isSystem;
     const companyId = user.targetCompanyId;
 
     const risk = await this.riskRepository.update(

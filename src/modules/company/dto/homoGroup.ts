@@ -6,6 +6,7 @@ import {
   IsOptional,
   IsString,
   MaxLength,
+  ValidateIf,
   ValidateNested,
 } from 'class-validator';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
@@ -86,6 +87,7 @@ export class UpdateHomoGroupDto {
 }
 
 export class CopyHomogeneousGroupDto {
+  @ValidateIf((o) => !o.hierarchyId || o.actualGroupId)
   @IsString()
   actualGroupId: string;
 
@@ -108,4 +110,9 @@ export class CopyHomogeneousGroupDto {
   @IsOptional()
   @IsString()
   workspaceId?: string;
+
+  @ValidateIf((o) => !o.actualGroupId || o.hierarchyId)
+  @IsOptional()
+  @IsString()
+  hierarchyId?: string;
 }

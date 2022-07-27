@@ -28,6 +28,9 @@ export class UserPayloadDto extends UserCompanyDto {
   @IsBoolean()
   isMaster: boolean;
 
+  @IsBoolean()
+  isSystem: boolean;
+
   @IsOptional()
   @IsString()
   targetCompanyId?: string;

@@ -12,12 +12,13 @@ export class FindAllCompaniesService {
     user: UserPayloadDto,
     { skip, take, ...query }: FindCompaniesDto,
   ) {
-    return await this.companyRepository.findAll(query, { skip, take });
     if (!user.isMaster)
       return await this.companyRepository.findAllRelatedByCompanyId(
         user.companyId,
         query,
         { skip, take },
       );
+
+    return await this.companyRepository.findAll(query, { skip, take });
   }
 }

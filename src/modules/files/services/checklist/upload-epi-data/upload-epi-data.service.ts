@@ -28,7 +28,7 @@ export class UploadEpiDataService {
 
     const riskWorkbook = workbooksConstant[WorkbooksEnum.EPI];
 
-    const system = userPayloadDto.isMaster;
+    const system = userPayloadDto.isSystem;
     const companyId = userPayloadDto.targetCompanyId;
 
     // get risk table with actual version

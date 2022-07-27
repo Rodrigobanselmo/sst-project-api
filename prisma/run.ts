@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { convertEpi } from './run/convert-epi';
 import { deleteCompany } from './run/delete-company';
 
 const prisma = new PrismaClient();
@@ -17,10 +18,7 @@ async function main() {
     // });
     // await deleteCompany('4c8c2000-c70c-4285-992d-26d7d8f683cb', prisma);
     //? trocar env to char
-    const envPhoto = await prisma.companyEnvironmentPhoto.deleteMany();
-    const env = await prisma.companyEnvironment.deleteMany();
-    console.log('done');
-    console.log('done');
+    convertEpi(prisma);
   } catch (error) {
     console.log(error);
     console.log('error: end');

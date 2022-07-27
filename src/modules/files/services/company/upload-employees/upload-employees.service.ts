@@ -40,7 +40,7 @@ export class UploadEmployeesService {
 
     const Workbook = workbooksConstant[WorkbooksEnum.EMPLOYEES];
 
-    const system = userPayloadDto.isMaster;
+    const system = userPayloadDto.isSystem;
     const companyId = userPayloadDto.targetCompanyId;
 
     //! fetching twice company (also on findAllEmployees)

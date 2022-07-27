@@ -8,7 +8,7 @@ export class CreateRiskService {
   constructor(private readonly riskRepository: RiskRepository) {}
 
   async execute(createRiskDto: CreateRiskDto, user: UserPayloadDto) {
-    const system = user.isMaster;
+    const system = user.isSystem;
 
     const riskFactor = await this.riskRepository.create(createRiskDto, system);
 

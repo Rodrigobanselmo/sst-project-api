@@ -15,11 +15,11 @@ export class UpdateGenerateSourceService {
     updateGenerateSourceDto: UpdateGenerateSourceDto,
     userPayloadDto: UserPayloadDto,
   ) {
-    const user = isMaster(userPayloadDto);
+    const user = isMaster(userPayloadDto, updateGenerateSourceDto.companyId);
     const companyId = user.companyId;
 
     const system =
-      user.isMaster && user.companyId === updateGenerateSourceDto.companyId;
+      user.isSystem && user.companyId === updateGenerateSourceDto.companyId;
 
     const generateSource = await this.generateSourceRepository.findById(
       id,

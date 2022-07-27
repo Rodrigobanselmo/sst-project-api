@@ -12,7 +12,7 @@ export class UpsertAccessGroupsService {
     UpsertAccessGroupsDto: UpsertAccessGroupDto,
     user: UserPayloadDto,
   ) {
-    const system = user.isMaster;
+    const system = user.isSystem;
     const company = await this.authGroupRepository.upsert(
       {
         ...UpsertAccessGroupsDto,

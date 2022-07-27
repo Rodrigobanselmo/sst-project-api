@@ -46,16 +46,6 @@ export class CharacterizationRepository {
   }: ICompanyCharacterization): Promise<CharacterizationEntity> {
     const newId = v4();
 
-    console.log({
-      id,
-      companyId,
-      workspaceId,
-      hierarchyIds,
-      type,
-      profileParentId,
-      ...characterizationDto,
-    });
-
     const homogeneousGroup = await this.prisma.homogeneousGroup.upsert({
       where: { id: id || 'no-id' },
       create: {
