@@ -1,16 +1,17 @@
 import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
 import { HomoTypeEnum, Prisma } from '@prisma/client';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsEnum,
-  IsInt,
   IsNumber,
   IsOptional,
   IsString,
   ValidateIf,
+  ValidateNested,
 } from 'class-validator';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
+import { EpiRoRiskDataDto } from './epi-risk-data.dto';
 
 export class UpsertRiskDataDto {
   @IsString()
@@ -74,9 +75,10 @@ export class UpsertRiskDataDto {
   @IsString({ each: true })
   generateSources?: string[];
 
-  @IsInt({ each: true })
+  @ValidateNested({ each: true })
   @IsOptional()
-  epis?: number[];
+  @Type(() => EpiRoRiskDataDto)
+  epis?: EpiRoRiskDataDto[];
 
   @IsOptional()
   keepEmpty?: boolean;
@@ -155,9 +157,10 @@ export class UpsertManyRiskDataDto {
   @IsString({ each: true })
   generateSources?: string[];
 
-  @IsInt({ each: true })
+  @ValidateNested({ each: true })
   @IsOptional()
-  epis?: number[];
+  @Type(() => EpiRoRiskDataDto)
+  epis?: EpiRoRiskDataDto[];
 
   @IsOptional()
   json?: Prisma.JsonValue;

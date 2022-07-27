@@ -396,7 +396,6 @@ model Epi {
   status StatusEnum @default(ACTIVE)
   created_at DateTime @default(now())
   deleted_at DateTime? 
-  riskFactorData RiskFactorData[]
   epiToRiskFactorData EpiToRiskFactorData[]
 
   @@index(ca)
@@ -404,11 +403,11 @@ model Epi {
 } 
 
 model EpiToRiskFactorData {
-  epiId    Int   
-  riskFactorDataId String
+  epiId    Int   @map("A") 
+  riskFactorDataId String @map("B") 
   riskFactorData RiskFactorData  @relation(fields: [riskFactorDataId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   epi Epi  @relation(fields: [epiId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  lifeTimeInDays DateTime?
+  lifeTimeInDays Int?
   efficientlyCheck Boolean @default(false)
   epcCheck Boolean @default(false)
   longPeriodsCheck Boolean @default(false)
@@ -419,7 +418,8 @@ model EpiToRiskFactorData {
   unstoppedCheck Boolean @default(false)
   trainingCheck Boolean @default(false)
 
-  @@id([epiId, riskFactorDataId])
+  @@id([riskFactorDataId, epiId])
+  @@map("_EpiToRiskFactorData")
 } 
 
 model GenerateSource {
@@ -677,7 +677,6 @@ model RiskFactorData {
   recs RecMed[]  @relation(name: "recs")
   engs RecMed[]  @relation(name: "engs")
   adms RecMed[]  @relation(name: "adms")
-  epis Epi[]
   dataRecs RiskFactorDataRec[]
   json Json?
   level    Int?

@@ -73,7 +73,7 @@ export class CopyCompanyService {
               recs: true,
               engs: true,
               generateSources: true,
-              epis: true,
+              epiToRiskFactorData: { include: { epi: true } },
               hierarchy: true,
               riskFactor: true,
               probabilityCalc: true,
@@ -233,14 +233,6 @@ export class CopyCompanyService {
                     json: riskFactorFromData.json || undefined,
                     // probabilityAfterCalc: {create:{chancesOfHappening:riskFactorFromData.probabilityAfter}}, //! missing this
                     companyId,
-                    epis:
-                      riskFactorFromData.epis && riskFactorFromData.epis.length
-                        ? {
-                            connect: riskFactorFromData.epis.map(({ id }) => ({
-                              id,
-                            })),
-                          }
-                        : undefined,
                     generateSources:
                       riskFactorFromData.generateSources &&
                       riskFactorFromData.generateSources.length
@@ -279,6 +271,15 @@ export class CopyCompanyService {
                   },
                 },
               );
+
+              if (riskFactorFromData.epis && riskFactorFromData.epis.length)
+                await this.prisma.epiToRiskFactorData.createMany({
+                  data: riskFactorFromData.epiToRiskFactorData.map((data) => ({
+                    ...data,
+                    riskFactorDataId: newRiskFactorData.id,
+                  })),
+                });
+
               return newRiskFactorData;
             }),
           );

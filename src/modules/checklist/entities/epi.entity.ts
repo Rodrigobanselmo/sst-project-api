@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { Epi } from '.prisma/client';
 import { StatusEnum } from '@prisma/client';
+import { EpiRiskDataEntity } from './epiRiskData';
 
 export class EpiEntity implements Epi {
   @ApiProperty({
@@ -47,6 +48,8 @@ export class EpiEntity implements Epi {
 
   @ApiProperty({ description: 'The deleted date of data' })
   deleted_at: Date | null;
+
+  epiRiskData: EpiRiskDataEntity;
 
   constructor(partial: Partial<EpiEntity>) {
     Object.assign(this, partial);

@@ -32,7 +32,6 @@ export class UpsertRiskDataService {
         type,
         workspaceId,
       });
-
     const riskData = await this.riskDataRepository.upsert(upsertRiskDataDto);
 
     if (!keepEmpty) {

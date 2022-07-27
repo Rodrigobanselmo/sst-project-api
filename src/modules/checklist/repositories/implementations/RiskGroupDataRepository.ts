@@ -6,6 +6,7 @@ import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { UpsertRiskGroupDataDto } from '../../dto/risk-group-data.dto';
 import { RiskFactorGroupDataEntity } from '../../entities/riskGroupData.entity';
+import { RiskFactorDataEntity } from '../../entities/riskData.entity';
 
 @Injectable()
 export class RiskGroupDataRepository {
@@ -117,7 +118,7 @@ export class RiskGroupDataRepository {
               recs: true,
               engs: true,
               generateSources: true,
-              epis: true,
+              epiToRiskFactorData: { include: { epi: true } },
               riskFactor: true,
               dataRecs: true,
               hierarchy: {

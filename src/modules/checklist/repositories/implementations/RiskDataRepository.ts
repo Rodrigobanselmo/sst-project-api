@@ -13,6 +13,9 @@ import {
 import { RiskFactorDataEntity } from '../../entities/riskData.entity';
 import { Prisma, PrismaPromise } from '@prisma/client';
 import { getMatrizRisk } from '../../../../shared/utils/matriz';
+import { EpiEntity } from '../../entities/epi.entity';
+import { EpiRiskDataEntity } from '../../entities/epiRiskData';
+import { EpiRoRiskDataDto } from '../../dto/epi-risk-data.dto';
 
 @Injectable()
 export class RiskDataRepository {
@@ -40,8 +43,8 @@ export class RiskDataRepository {
       const level = await this.addLevel(upsertManyRiskDataDto);
       if (level) upsertManyRiskDataDto.level = level;
 
-      const data = await this.prisma.$transaction(
-        homogeneousGroupIds.map((homogeneousGroupId) =>
+      const data = await Promise.all(
+        homogeneousGroupIds.map(async (homogeneousGroupId) =>
           this.upsertConnectPrisma({
             homogeneousGroupId,
             ...upsertManyRiskDataDto,
@@ -68,8 +71,8 @@ export class RiskDataRepository {
       const level = await this.addLevel(upsertManyRiskDataDto);
       if (level) upsertManyRiskDataDto.level = level;
 
-      const data = await this.prisma.$transaction(
-        homogeneousGroupIds.map((homogeneousGroupId) =>
+      const data = await Promise.all(
+        homogeneousGroupIds.map(async (homogeneousGroupId) =>
           this.upsertPrisma({
             homogeneousGroupId,
             ...upsertManyRiskDataDto,
@@ -92,9 +95,9 @@ export class RiskDataRepository {
         recs: true,
         engs: true,
         generateSources: true,
-        epis: true,
         hierarchy: true,
         riskFactor: true,
+        epiToRiskFactorData: { include: { epi: true } },
         homogeneousGroup: {
           include: {
             hierarchyOnHomogeneous: { include: { hierarchy: true } }, //!
@@ -120,16 +123,16 @@ export class RiskDataRepository {
     riskId: string,
     companyId: string,
   ) {
-    const riskFactorData = await this.prisma.riskFactorData.findMany({
+    const riskFactorData = (await this.prisma.riskFactorData.findMany({
       where: { riskFactorGroupDataId, companyId, riskId },
       include: {
         adms: true,
         recs: true,
         engs: true,
         generateSources: true,
-        epis: true,
+        epiToRiskFactorData: { include: { epi: true } },
       },
-    });
+    })) as RiskFactorDataEntity[];
 
     return riskFactorData.map((data) => new RiskFactorDataEntity(data));
   }
@@ -199,8 +202,8 @@ export class RiskDataRepository {
           engs: true,
           generateSources: true,
           riskFactor: true,
-          epis: true,
           dataRecs: { include: { comments: true } },
+          epiToRiskFactorData: { include: { epi: true } },
           homogeneousGroup: {
             include: { characterization: true, environment: true },
           },
@@ -246,16 +249,16 @@ export class RiskDataRepository {
     riskFactorGroupDataId: string,
     homogeneousGroupId: string,
   ) {
-    const riskFactorData = await this.prisma.riskFactorData.findMany({
+    const riskFactorData = (await this.prisma.riskFactorData.findMany({
       where: { riskFactorGroupDataId, companyId, homogeneousGroupId },
       include: {
         adms: true,
         recs: true,
         engs: true,
+        epiToRiskFactorData: { include: { epi: true } },
         generateSources: true,
-        epis: true,
       },
-    });
+    })) as RiskFactorDataEntity[];
 
     return riskFactorData.map((data) => new RiskFactorDataEntity(data));
   }
@@ -265,7 +268,7 @@ export class RiskDataRepository {
     riskFactorGroupDataId: string,
     hierarchyId: string,
   ) {
-    const riskFactorData = await this.prisma.riskFactorData.findMany({
+    const riskFactorData = (await this.prisma.riskFactorData.findMany({
       where: {
         riskFactorGroupDataId,
         companyId,
@@ -276,9 +279,9 @@ export class RiskDataRepository {
         recs: true,
         engs: true,
         generateSources: true,
-        epis: true,
+        epiToRiskFactorData: { include: { epi: true } },
       },
-    });
+    })) as RiskFactorDataEntity[];
 
     return riskFactorData.map((data) => new RiskFactorDataEntity(data));
   }
@@ -317,7 +320,7 @@ export class RiskDataRepository {
     return riskFactorData;
   }
 
-  private upsertPrisma({
+  private async upsertPrisma({
     recs,
     adms,
     engs,
@@ -327,15 +330,10 @@ export class RiskDataRepository {
     id,
     ...createDto
   }: Omit<UpsertRiskDataDto, 'keepEmpty'>) {
-    return this.prisma.riskFactorData.upsert({
+    const riskData = (await this.prisma.riskFactorData.upsert({
       create: {
         ...createDto,
         companyId,
-        epis: epis
-          ? {
-              connect: epis.map((id) => ({ id })),
-            }
-          : undefined,
         generateSources: generateSources
           ? {
               connect: generateSources.map((id) => ({
@@ -396,11 +394,6 @@ export class RiskDataRepository {
               })),
             }
           : undefined,
-        epis: epis
-          ? {
-              set: epis.map((id) => ({ id })),
-            }
-          : undefined,
       },
       where: {
         homogeneousGroupId_riskId_riskFactorGroupDataId: {
@@ -414,12 +407,35 @@ export class RiskDataRepository {
         recs: true,
         engs: true,
         generateSources: true,
-        epis: true,
+        epiToRiskFactorData: { include: { epi: true } },
       },
-    });
+    })) as RiskFactorDataEntity;
+
+    if (epis) {
+      if (riskData.epiToRiskFactorData?.length) {
+        await this.prisma.epiToRiskFactorData.deleteMany({
+          where: {
+            epiId: {
+              in: riskData.epiToRiskFactorData
+                .filter(
+                  (actualEpis) =>
+                    !!epis.find((epi) => epi.epiId !== actualEpis.epiId),
+                )
+                .map((actualEpis) => actualEpis.epiId),
+            },
+          },
+        });
+      }
+
+      riskData.epiToRiskFactorData = await this.setEpis(
+        epis.map((epi) => ({ ...epi, riskFactorDataId: riskData.id })),
+      );
+    }
+
+    return riskData;
   }
 
-  private upsertConnectPrisma({
+  private async upsertConnectPrisma({
     recs,
     adms,
     engs,
@@ -429,15 +445,10 @@ export class RiskDataRepository {
     id,
     ...createDto
   }: Omit<UpsertRiskDataDto, 'keepEmpty'>) {
-    return this.prisma.riskFactorData.upsert({
+    const riskData = (await this.prisma.riskFactorData.upsert({
       create: {
         ...createDto,
         companyId,
-        epis: epis
-          ? {
-              connect: epis.map((id) => ({ id })),
-            }
-          : undefined,
         generateSources: generateSources
           ? {
               connect: generateSources.map((id) => ({
@@ -498,11 +509,6 @@ export class RiskDataRepository {
               })),
             }
           : undefined,
-        epis: epis
-          ? {
-              connect: epis.map((id) => ({ id })),
-            }
-          : undefined,
       },
       where: {
         homogeneousGroupId_riskId_riskFactorGroupDataId: {
@@ -516,9 +522,38 @@ export class RiskDataRepository {
         recs: true,
         engs: true,
         generateSources: true,
-        epis: true,
+        epiToRiskFactorData: !epis ? { include: { epi: true } } : undefined,
       },
-    });
+    })) as RiskFactorDataEntity;
+
+    if (epis)
+      riskData.epiToRiskFactorData = await this.setEpis(
+        epis.map((epi) => ({
+          ...epi,
+          riskFactorDataId: riskData.id,
+        })),
+      );
+
+    return riskData;
+  }
+
+  private async setEpis(epis: EpiRoRiskDataDto[]) {
+    if (epis.length === 0) return [];
+
+    const data = await this.prisma.$transaction(
+      epis.map(({ riskFactorDataId, epiId, ...epiRelation }) =>
+        this.prisma.epiToRiskFactorData.upsert({
+          create: { riskFactorDataId, epiId, ...epiRelation },
+          update: { riskFactorDataId, epiId, ...epiRelation },
+          where: {
+            riskFactorDataId_epiId: { riskFactorDataId, epiId },
+          },
+          include: { epi: true },
+        }),
+      ),
+    );
+
+    return data as EpiRiskDataEntity[];
   }
 
   private async addLevel({

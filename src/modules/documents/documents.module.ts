@@ -29,7 +29,7 @@ import { PgrActionPlanUploadTableService } from './services/pgr/action-plan/uplo
     AmazonStorageProvider,
     PgrDownloadAttachmentsService,
     AddQueuePGRDocumentService,
-    // PgrConsumer,
+    PgrConsumer,
     PgrActionPlanUploadTableService,
   ],
 })

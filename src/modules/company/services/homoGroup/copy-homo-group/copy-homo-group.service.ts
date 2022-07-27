@@ -1,14 +1,14 @@
-import { HierarchyRepository } from './../../../repositories/implementations/HierarchyRepository';
-import { RiskFactorDataEntity } from './../../../../checklist/entities/riskData.entity';
-import { asyncEach } from './../../../../../shared/utils/asyncEach';
-import { UpsertManyRiskDataService } from './../../../../checklist/services/risk-data/upsert-many-risk-data/upsert-many-risk-data.service';
-import { CopyHomogeneousGroupDto } from './../../../dto/homoGroup';
-import { RiskDataRepository } from './../../../../checklist/repositories/implementations/RiskDataRepository';
 import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { ErrorCompanyEnum } from '../../../../../shared/constants/enum/errorMessage';
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { HomoGroupRepository } from '../../../repositories/implementations/HomoGroupRepository';
+import { asyncEach } from './../../../../../shared/utils/asyncEach';
+import { RiskFactorDataEntity } from './../../../../checklist/entities/riskData.entity';
+import { RiskDataRepository } from './../../../../checklist/repositories/implementations/RiskDataRepository';
+import { UpsertManyRiskDataService } from './../../../../checklist/services/risk-data/upsert-many-risk-data/upsert-many-risk-data.service';
+import { CopyHomogeneousGroupDto } from './../../../dto/homoGroup';
+import { HierarchyRepository } from './../../../repositories/implementations/HierarchyRepository';
 
 @Injectable()
 export class CopyHomoGroupService {
@@ -80,9 +80,9 @@ export class CopyHomoGroupService {
         engs: !(riskData?.engs?.length > 0)
           ? undefined
           : riskData.engs.map(({ id }) => id),
-        epis: !(riskData?.epis?.length > 0)
+        epis: !(riskData?.epiToRiskFactorData?.length > 0)
           ? undefined
-          : riskData.epis.map(({ id }) => id),
+          : riskData.epiToRiskFactorData,
         recs: !(riskData?.recs?.length > 0)
           ? undefined
           : riskData.recs.map(({ id }) => id),
