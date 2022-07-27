@@ -62,6 +62,7 @@ export class CharacterizationRepository {
       },
     });
 
+    // make it better
     await this.prisma.hierarchyOnHomogeneous.deleteMany({
       where: { homogeneousGroupId: homogeneousGroup.id },
     });
