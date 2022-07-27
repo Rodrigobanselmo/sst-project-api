@@ -24,7 +24,7 @@ export class AmazonStorageProvider implements IStorageProvider {
       .upload({
         Bucket: this.bucket,
         Key: process.env.APP_HOST.includes('localhost')
-          ? `${test}/${fileName}`
+          ? `${'test'}/${fileName}`
           : fileName,
         Body: file,
         ContentType: this.contentType(fileName),

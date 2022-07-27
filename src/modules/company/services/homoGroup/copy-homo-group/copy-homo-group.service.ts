@@ -82,7 +82,7 @@ export class CopyHomoGroupService {
           : riskData.engs.map(({ id }) => id),
         epis: !(riskData?.epiToRiskFactorData?.length > 0)
           ? undefined
-          : riskData.epiToRiskFactorData,
+          : riskData.epiToRiskFactorData.map(({ epi, ...rest }) => rest),
         recs: !(riskData?.recs?.length > 0)
           ? undefined
           : riskData.recs.map(({ id }) => id),
