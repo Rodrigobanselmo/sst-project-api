@@ -28,6 +28,7 @@ import { booleanVariables } from './functions/getVariables/boolean.variables';
 export class DocumentBuildPGR {
   private version: string;
   private logoImagePath: string;
+  private consultantLogoImagePath: string;
   private company: CompanyEntity;
   private workspace: WorkspaceEntity;
   private docSections: IDocumentPGRSectionGroups;
@@ -44,6 +45,7 @@ export class DocumentBuildPGR {
   constructor({
     version,
     logo,
+    consultantLogo,
     company,
     workspace,
     versions,
@@ -57,6 +59,7 @@ export class DocumentBuildPGR {
   }: ICreatePGR) {
     this.version = version;
     this.logoImagePath = logo;
+    this.consultantLogoImagePath = consultantLogo;
     this.company = company;
     this.workspace = workspace;
     this.docSections = docPGRSections;
@@ -128,6 +131,7 @@ export class DocumentBuildPGR {
     const sectionsMap = new SectionsMapClass({
       variables: this.variables,
       logoImagePath: this.logoImagePath,
+      consultantLogoImagePath: this.consultantLogoImagePath,
       version: this.version,
       elementsMap,
       document: this.document,

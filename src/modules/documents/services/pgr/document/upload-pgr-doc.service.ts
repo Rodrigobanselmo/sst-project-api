@@ -86,9 +86,31 @@ export class PgrUploadService {
             where: { workspaceId },
           },
           professionals: true,
+          receivingServiceContracts: {
+            include: { applyingServiceCompany: true },
+          },
         },
       },
     );
+
+    const getConsultantLogo = () => {
+      if (company.receivingServiceContracts?.length == 1) {
+        return company.receivingServiceContracts[0]?.applyingServiceCompany
+          ?.logoUrl;
+      }
+
+      if (company.receivingServiceContracts?.length > 1) {
+        return;
+      }
+    };
+
+    const getLogo = getConsultantLogo();
+    const consultantLogo = getLogo
+      ? await downloadImageFile(
+          getLogo,
+          `tmp/${v4()}.${getExtensionFromUrl(getLogo)}`,
+        )
+      : '';
 
     const logo = company.logoUrl
       ? await downloadImageFile(
@@ -183,6 +205,7 @@ export class PgrUploadService {
           };
         }),
         logo,
+        consultantLogo,
         company,
         workspace,
         versions,
@@ -293,8 +316,9 @@ export class PgrUploadService {
         photosPath,
       };
     } catch (error) {
+      console.log('unlink photo on error');
       photosPath.forEach((path) => fs.unlinkSync(path));
-
+      console.log(error);
       throw new InternalServerErrorException(error);
     }
   }

@@ -1,19 +1,25 @@
+import { setNiceProportion } from './../../../../../../shared/utils/setNiceProportion';
 import {
   AlignmentType,
   BorderStyle,
   Footer,
+  ImageRun,
   ITableBordersOptions,
   Paragraph,
   Table,
   TableCell,
   TableRow,
   TextRun,
+  VerticalAlign,
   WidthType,
 } from 'docx';
 import { palette } from '../../../../../../shared/constants/palette';
+import sizeOf from 'image-size';
+import fs from 'fs';
 
 interface IFooterProps {
   footerText: string;
+  consultantLogoPath: string;
   version: string;
 }
 const borderStyle: ITableBordersOptions = {
@@ -75,39 +81,81 @@ const firstCell = (footerText: string, version: string) =>
     ],
   });
 
-const secondCell = () =>
-  new TableCell({
+const secondCell = (consultantLogoPath: string) => {
+  if (!consultantLogoPath)
+    new TableCell({
+      children: [
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: 'SIMPLE',
+              size: 42,
+              color: palette.text.main.string,
+              bold: true,
+            }),
+            new TextRun({
+              text: 'SST',
+              size: 42,
+              color: palette.text.simple.string,
+              bold: true,
+            }),
+          ],
+          alignment: AlignmentType.END,
+          spacing: { after: 0, before: 0 },
+        }),
+      ],
+    });
+
+  const getProportion = () => {
+    const { height: imgHeight, width: imgWidth } = sizeOf(
+      fs.readFileSync(consultantLogoPath),
+    );
+
+    const maxWidth = 250;
+    const maxHeight = 30;
+
+    const { height, width } = setNiceProportion(
+      maxWidth,
+      maxHeight,
+      imgWidth,
+      imgHeight,
+    );
+    return { height, width };
+  };
+
+  const image = consultantLogoPath
+    ? new ImageRun({
+        data: fs.readFileSync(consultantLogoPath),
+        transformation: getProportion(),
+      })
+    : undefined;
+
+  return new TableCell({
+    verticalAlign: VerticalAlign.CENTER,
     children: [
       new Paragraph({
-        children: [
-          new TextRun({
-            text: 'SIMPLE',
-            size: 42,
-            color: palette.text.main.string,
-            bold: true,
-          }),
-          new TextRun({
-            text: 'SST',
-            size: 42,
-            color: palette.text.simple.string,
-            bold: true,
-          }),
-        ],
+        children: [image],
         alignment: AlignmentType.END,
-        spacing: { after: 0, before: 0 },
+        spacing: { after: 0, before: 100 },
       }),
     ],
+    margins: { top: 0 },
   });
+};
 
-const row = (footerText: string, version: string) =>
+const row = (footerText: string, version: string, consultantLogoPath: string) =>
   new TableRow({
-    children: [firstCell(footerText, version), secondCell()],
+    children: [firstCell(footerText, version), secondCell(consultantLogoPath)],
   });
 
-export const createFooter = ({ footerText, version }: IFooterProps) => {
+export const createFooter = ({
+  footerText,
+  version,
+  consultantLogoPath,
+}: IFooterProps) => {
   const footer = {
     default: new Footer({
-      children: [table([row(footerText, version)])],
+      children: [table([row(footerText, version, consultantLogoPath)])],
     }),
     first: new Footer({
       children: [],

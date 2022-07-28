@@ -10,6 +10,7 @@ import { WorkspaceEntity } from './workspace.entity';
 import { EnvironmentEntity } from './environment.entity';
 import { ActivityEntity } from './activity.entity';
 import { CharacterizationEntity } from './characterization.entity';
+import { ContractEntity } from './contract.entity';
 
 export class CompanyEntity implements Company {
   @ApiProperty({ description: 'The id of the Company' })
@@ -101,6 +102,8 @@ export class CompanyEntity implements Company {
   hierarchyCount?: number;
   shortName: string;
   operationTime: string;
+  receivingServiceContracts?: ContractEntity[];
+  applyingServiceContracts?: ContractEntity[];
 
   constructor(partial: Partial<CompanyEntity>) {
     Object.assign(this, partial);

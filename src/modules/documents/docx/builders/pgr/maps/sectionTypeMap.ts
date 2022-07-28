@@ -33,6 +33,7 @@ type IMapSectionDocumentType = Record<
 
 type IDocumentClassType = {
   variables?: IDocVariables;
+  consultantLogoImagePath: string;
   logoImagePath?: string;
   version?: string;
   elementsMap: IMapElementDocumentType;
@@ -46,6 +47,7 @@ type IDocumentClassType = {
 export class SectionsMapClass {
   private variables: IDocVariables;
   private logoPath: string;
+  private consultantLogoPath: string;
   private version: string;
   private elementsMap: IMapElementDocumentType;
   private document: RiskFactorGroupDataEntity;
@@ -55,10 +57,11 @@ export class SectionsMapClass {
   private hierarchy: Map<string, HierarchyMapData>;
 
   // eslint-disable-next-line prettier/prettier
-  constructor({ variables, version, logoImagePath, elementsMap, document, hierarchy, homogeneousGroup,environments,characterizations }: IDocumentClassType) {
+  constructor({ variables, version, logoImagePath, elementsMap, document, hierarchy, homogeneousGroup,environments,characterizations, consultantLogoImagePath }: IDocumentClassType) {
     this.variables = variables;
     this.version = version;
     this.logoPath = logoImagePath;
+    this.consultantLogoPath = consultantLogoImagePath;
     this.elementsMap = elementsMap;
     this.document = document;
     this.hierarchy = hierarchy;
@@ -121,6 +124,7 @@ export class SectionsMapClass {
     return headerAndFooter({
       footerText: replaceAllVariables(footerText, this.variables),
       logoPath: this.logoPath,
+      consultantLogoPath: this.consultantLogoPath,
       version: this.version,
     });
   };

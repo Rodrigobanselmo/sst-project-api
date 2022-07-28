@@ -20,6 +20,7 @@ export interface ICreatePGR {
   environments: EnvironmentEntity[];
   document: RiskFactorGroupDataEntity;
   homogeneousGroup: IHomoGroupMap;
+  consultantLogo: string;
   hierarchy: Map<string, HierarchyMapData>;
   characterizations: CharacterizationEntity[];
   attachments: AttachmentEntity[];

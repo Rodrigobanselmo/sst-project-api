@@ -54,6 +54,7 @@ const firstCell = (path?: string) => {
     );
     return { height, width };
   };
+
   const image = path
     ? new ImageRun({
         data: fs.readFileSync(path),
@@ -70,6 +71,7 @@ const firstCell = (path?: string) => {
     ],
   });
 };
+
 const secondCell = () =>
   new TableCell({
     verticalAlign: VerticalAlign.CENTER,
