@@ -81,9 +81,14 @@ export class HomoGroupRepository {
     return this.getHomoGroupData(homoGroup);
   }
 
-  async findHomoGroupByCompanyAndId(id: string, companyId: string) {
+  async findHomoGroupByCompanyAndId(
+    id: string,
+    companyId: string,
+    options?: Prisma.HomogeneousGroupFindFirstArgs,
+  ) {
     const hierarchies = await this.prisma.homogeneousGroup.findFirst({
       where: { companyId, id },
+      ...options,
     });
 
     return new HomoGroupEntity(hierarchies);

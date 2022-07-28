@@ -1,3 +1,5 @@
+import { CharacterizationEntity } from './../../../entities/characterization.entity';
+import { HomoGroupEntity } from './../../../entities/homoGroup.entity';
 import { isEnvironment } from './../../../repositories/implementations/CharacterizationRepository';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { HierarchyEnum, HomogeneousGroup } from '@prisma/client';
@@ -65,8 +67,16 @@ export class CopyCompanyService {
       companyCopyFromId,
       {
         include: {
-          characterization: true,
-          environment: true,
+          characterization: {
+            include: {
+              profiles: {
+                include: {
+                  homogeneousGroup: true,
+                },
+              },
+            },
+          },
+          // environment: true,
           riskFactorData: {
             include: {
               adms: true,
@@ -84,16 +94,6 @@ export class CopyCompanyService {
         },
       },
     );
-
-    homoGroups.map((homoGroup, i) => {
-      if (
-        homoGroup.characterization &&
-        isEnvironment(homoGroup.characterization.type)
-      ) {
-        homoGroups[i].environment = homoGroup.characterization as any;
-        homoGroups[i].characterization = null;
-      }
-    });
 
     const newRiskGroupData = await this.riskGroupDataRepository.upsert({
       companyId,
@@ -119,196 +119,220 @@ export class CopyCompanyService {
       validityStart: fromRiskDataGroup.validityStart,
     });
 
-    await Promise.all(
-      homoGroups.map(async (group) => {
+    const createHomogeneous = async (
+      homoGroupsCreation: HomoGroupEntity[],
+      profileParentId?: string,
+    ) => {
+      homoGroupsCreation.map((homoGroup, i) => {
         if (
-          group.characterization &&
-          isEnvironment(group.characterization.type)
-        )
-          group.environment = group.characterization;
+          homoGroup.characterization &&
+          isEnvironment(homoGroup.characterization.type)
+        ) {
+          homoGroupsCreation[i].environment = homoGroup.characterization as any;
+          homoGroupsCreation[i].characterization = null;
+        }
+      });
 
-        const hierarchies: HierarchyEntity[] = [];
-        group.hierarchies.map((hierarchy) => {
-          group.workspaceIds.map((workspaceId) => {
-            const hierarchyFound =
-              equalHierarchy[hierarchy.id + '//' + workspaceId];
+      await Promise.all(
+        homoGroupsCreation.map(async (group) => {
+          if (!profileParentId && group?.characterization?.profileParentId)
+            return console.log('skip profile');
+          if (profileParentId && !group?.characterization?.profileParentId)
+            return console.log('skip not profile');
 
-            if (hierarchyFound && equalWorkspace[workspaceId])
-              hierarchyFound.forEach((h) => {
-                hierarchies.push({
-                  ...h,
-                  workspaceId: equalWorkspace[workspaceId].id,
+          if (
+            group.characterization &&
+            isEnvironment(group.characterization.type)
+          )
+            group.environment = group.characterization;
+
+          const hierarchies: HierarchyEntity[] = [];
+          group.hierarchies.map((hierarchy) => {
+            group.workspaceIds.map((workspaceId) => {
+              const hierarchyFound =
+                equalHierarchy[hierarchy.id + '//' + workspaceId];
+
+              if (hierarchyFound && equalWorkspace[workspaceId])
+                hierarchyFound.forEach((h) => {
+                  hierarchies.push({
+                    ...h,
+                    workspaceId: equalWorkspace[workspaceId].id,
+                  });
                 });
-              });
+            });
           });
-        });
 
-        if (hierarchies.length === 0) return;
-        const foundHomo = await this.prisma.homogeneousGroup.findUnique({
-          where: {
-            name_companyId: { name: group.name, companyId: companyId },
-          },
-        });
-
-        let newHomoGroup: HomogeneousGroup;
-        const newHomoGroupId = v4();
-
-        if (!foundHomo) {
-          newHomoGroup = await this.prisma.homogeneousGroup.create({
-            data: {
-              description: group.description,
-              name:
-                group.environment || group.characterization
-                  ? newHomoGroupId
-                  : group.name,
-              companyId: companyId,
-              type: group.type,
+          if (hierarchies.length === 0) return;
+          const foundHomo = await this.prisma.homogeneousGroup.findUnique({
+            where: {
+              name_companyId: { name: group.name, companyId: companyId },
             },
           });
-        } else {
-          newHomoGroup = await this.prisma.homogeneousGroup.update({
-            where: { id: foundHomo.id },
-            data: {
-              companyId: companyId,
-              name:
-                group.environment || group.characterization
-                  ? foundHomo.id
-                  : group.name,
-              type: group.type,
-              description: foundHomo.description
-                ? group.description || undefined
-                : undefined,
-            },
-          });
-        }
 
-        if (
-          group.environment &&
-          equalWorkspace[group.environment.workspaceId]
-        ) {
-          await this.prisma.companyCharacterization.create({
-            data: {
-              id: newHomoGroup.id,
-              description: group.environment.description,
-              name: group.environment.name,
-              type: group.environment.type,
-              considerations: group.environment.considerations,
-              activities: group.environment.activities,
-              companyId: companyId,
-              workspaceId: equalWorkspace[group.environment.workspaceId].id,
-            },
-          });
-        }
+          let newHomoGroup: HomogeneousGroup;
+          const newHomoGroupId = v4();
 
-        if (
-          group.characterization &&
-          equalWorkspace[group.characterization.workspaceId]
-        ) {
-          await this.prisma.companyCharacterization.create({
-            data: {
-              id: newHomoGroup.id,
-              description: group.characterization.description,
-              name: group.characterization.name,
-              type: group.characterization.type,
-              activities: group.characterization.activities,
-              paragraphs: group.characterization.paragraphs,
-              considerations: group.characterization.considerations,
-              companyId: companyId,
-              workspaceId:
-                equalWorkspace[group.characterization.workspaceId].id,
-            },
-          });
-        }
+          if (!foundHomo) {
+            newHomoGroup = await this.prisma.homogeneousGroup.create({
+              data: {
+                description: group.description,
+                name:
+                  group.environment || group.characterization
+                    ? newHomoGroupId
+                    : group.name,
+                companyId: companyId,
+                type: group.type,
+              },
+            });
+          } else {
+            newHomoGroup = await this.prisma.homogeneousGroup.update({
+              where: { id: foundHomo.id },
+              data: {
+                companyId: companyId,
+                name:
+                  group.environment || group.characterization
+                    ? foundHomo.id
+                    : group.name,
+                type: group.type,
+                description: foundHomo.description
+                  ? group.description || undefined
+                  : undefined,
+              },
+            });
+          }
 
-        if (group.riskFactorData && group.riskFactorData.length) {
+          if (
+            group.characterization &&
+            equalWorkspace[group.characterization.workspaceId]
+          ) {
+            await this.prisma.companyCharacterization.create({
+              data: {
+                id: newHomoGroup.id,
+                description: group.characterization.description,
+                name: group.characterization.name,
+                type: group.characterization.type,
+                activities: group.characterization.activities,
+                paragraphs: group.characterization.paragraphs,
+                considerations: group.characterization.considerations,
+                companyId: companyId,
+                profileName: group.characterization.profileName,
+                profileParentId: profileParentId || undefined,
+                order: group.characterization.order,
+                workspaceId:
+                  equalWorkspace[group.characterization.workspaceId].id,
+              },
+            });
+          }
+
+          if (group.riskFactorData && group.riskFactorData.length) {
+            await Promise.all(
+              group.riskFactorData.map(async (riskFactorFromData) => {
+                const newRiskFactorData =
+                  await this.prisma.riskFactorData.create({
+                    data: {
+                      homogeneousGroupId: newHomoGroup.id,
+                      riskId: riskFactorFromData.riskId,
+                      riskFactorGroupDataId: newRiskGroupData.id,
+                      probabilityAfter: riskFactorFromData.probabilityAfter,
+                      probability: riskFactorFromData.probability,
+                      json: riskFactorFromData.json || undefined,
+                      // probabilityAfterCalc: {create:{chancesOfHappening:riskFactorFromData.probabilityAfter}}, //! missing this
+                      companyId,
+                      generateSources:
+                        riskFactorFromData.generateSources &&
+                        riskFactorFromData.generateSources.length
+                          ? {
+                              connect: riskFactorFromData.generateSources.map(
+                                ({ id }) => ({
+                                  id,
+                                }),
+                              ),
+                            }
+                          : undefined,
+                      recs:
+                        riskFactorFromData.recs &&
+                        riskFactorFromData.recs.length
+                          ? {
+                              connect: riskFactorFromData.recs.map(
+                                ({ id }) => ({
+                                  id,
+                                }),
+                              ),
+                            }
+                          : undefined,
+                      adms:
+                        riskFactorFromData.adms &&
+                        riskFactorFromData.adms.length
+                          ? {
+                              connect: riskFactorFromData.adms.map(
+                                ({ id }) => ({
+                                  id,
+                                }),
+                              ),
+                            }
+                          : undefined,
+                      engs:
+                        riskFactorFromData.engs &&
+                        riskFactorFromData.engs.length
+                          ? {
+                              connect: riskFactorFromData.engs.map(
+                                ({ id }) => ({
+                                  id,
+                                }),
+                              ),
+                            }
+                          : undefined,
+                    },
+                  });
+
+                if (riskFactorFromData.epis && riskFactorFromData.epis.length)
+                  await this.prisma.epiToRiskFactorData.createMany({
+                    data: riskFactorFromData.epiToRiskFactorData.map(
+                      ({ epi, ...data }) => ({
+                        ...data,
+                        riskFactorDataId: newRiskFactorData.id,
+                      }),
+                    ),
+                  });
+
+                return newRiskFactorData;
+              }),
+            );
+          }
+
           await Promise.all(
-            group.riskFactorData.map(async (riskFactorFromData) => {
-              const newRiskFactorData = await this.prisma.riskFactorData.create(
-                {
-                  data: {
+            hierarchies.map(async (hierarchy) => {
+              await this.prisma.hierarchyOnHomogeneous.upsert({
+                where: {
+                  hierarchyId_homogeneousGroupId_workspaceId: {
+                    hierarchyId: hierarchy.id,
                     homogeneousGroupId: newHomoGroup.id,
-                    riskId: riskFactorFromData.riskId,
-                    riskFactorGroupDataId: newRiskGroupData.id,
-                    probabilityAfter: riskFactorFromData.probabilityAfter,
-                    probability: riskFactorFromData.probability,
-                    json: riskFactorFromData.json || undefined,
-                    // probabilityAfterCalc: {create:{chancesOfHappening:riskFactorFromData.probabilityAfter}}, //! missing this
-                    companyId,
-                    generateSources:
-                      riskFactorFromData.generateSources &&
-                      riskFactorFromData.generateSources.length
-                        ? {
-                            connect: riskFactorFromData.generateSources.map(
-                              ({ id }) => ({
-                                id,
-                              }),
-                            ),
-                          }
-                        : undefined,
-                    recs:
-                      riskFactorFromData.recs && riskFactorFromData.recs.length
-                        ? {
-                            connect: riskFactorFromData.recs.map(({ id }) => ({
-                              id,
-                            })),
-                          }
-                        : undefined,
-                    adms:
-                      riskFactorFromData.adms && riskFactorFromData.adms.length
-                        ? {
-                            connect: riskFactorFromData.adms.map(({ id }) => ({
-                              id,
-                            })),
-                          }
-                        : undefined,
-                    engs:
-                      riskFactorFromData.engs && riskFactorFromData.engs.length
-                        ? {
-                            connect: riskFactorFromData.engs.map(({ id }) => ({
-                              id,
-                            })),
-                          }
-                        : undefined,
+                    workspaceId: hierarchy.workspaceId,
                   },
                 },
-              );
-
-              if (riskFactorFromData.epis && riskFactorFromData.epis.length)
-                await this.prisma.epiToRiskFactorData.createMany({
-                  data: riskFactorFromData.epiToRiskFactorData.map(
-                    ({ epi, ...data }) => ({
-                      ...data,
-                      riskFactorDataId: newRiskFactorData.id,
-                    }),
-                  ),
-                });
-
-              return newRiskFactorData;
-            }),
-          );
-        }
-
-        await Promise.all(
-          hierarchies.map(async (hierarchy) => {
-            await this.prisma.hierarchyOnHomogeneous.upsert({
-              where: {
-                hierarchyId_homogeneousGroupId_workspaceId: {
+                create: {
                   hierarchyId: hierarchy.id,
                   homogeneousGroupId: newHomoGroup.id,
                   workspaceId: hierarchy.workspaceId,
                 },
-              },
-              create: {
-                hierarchyId: hierarchy.id,
-                homogeneousGroupId: newHomoGroup.id,
-                workspaceId: hierarchy.workspaceId,
-              },
-              update: {},
-            });
-          }),
-        );
-      }),
-    );
+                update: {},
+              });
+            }),
+          );
+
+          if (group.characterization?.profiles) {
+            const profilesHomoGroups = group.characterization.profiles
+              .map((profile) => {
+                return homoGroups.find((homo) => homo.id === profile.id);
+              })
+              .filter((i) => i?.id);
+            await createHomogeneous(profilesHomoGroups, newHomoGroup.id);
+          }
+        }),
+      );
+    };
+
+    await createHomogeneous(homoGroups);
 
     return {};
   }

@@ -66,6 +66,10 @@ export class CopyHomoGroupService {
         companyId,
       );
 
+    if (!foundHomoGroup.type) {
+      // get al risk data from homogeneous group with ALL RISK combined
+    }
+
     const save = async (riskData: RiskFactorDataEntity, index: number) => {
       const data = {
         riskId: riskData.riskId,

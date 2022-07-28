@@ -35,15 +35,18 @@ export const getCharacterizationType = (type: CharacterizationTypeEnum) => {
 export class CharacterizationRepository {
   constructor(private prisma: PrismaService) {}
 
-  async upsert({
-    id,
-    companyId,
-    workspaceId,
-    hierarchyIds = [],
-    type,
-    profileParentId,
-    ...characterizationDto
-  }: ICompanyCharacterization): Promise<CharacterizationEntity> {
+  async upsert(
+    {
+      id,
+      companyId,
+      workspaceId,
+      hierarchyIds = [],
+      type,
+      profileParentId,
+      ...characterizationDto
+    }: ICompanyCharacterization,
+    isProfile?: boolean,
+  ): Promise<CharacterizationEntity> {
     const newId = v4();
 
     const homogeneousGroup = await this.prisma.homogeneousGroup.upsert({
@@ -60,12 +63,20 @@ export class CharacterizationRepository {
         type: getCharacterizationType(type),
         description: characterizationDto.name + '(//)' + type,
       },
+      include: { hierarchyOnHomogeneous: true },
     });
 
-    // make it better
-    await this.prisma.hierarchyOnHomogeneous.deleteMany({
-      where: { homogeneousGroupId: homogeneousGroup.id },
-    });
+    if (!isProfile)
+      await this.prisma.hierarchyOnHomogeneous.deleteMany({
+        where: {
+          homogeneousGroupId: homogeneousGroup.id,
+          hierarchyId: {
+            in: homogeneousGroup.hierarchyOnHomogeneous
+              .map((h) => h.hierarchyId)
+              .filter((hierarchyId) => !hierarchyIds.includes(hierarchyId)),
+          },
+        },
+      });
 
     await Promise.all(
       hierarchyIds.map(
@@ -111,16 +122,19 @@ export class CharacterizationRepository {
 
     characterization.profiles = await Promise.all(
       characterization.profiles?.map((profile) => {
-        return this.upsert({
-          id: profile.id,
-          companyId,
-          workspaceId,
-          type,
-          profileParentId: profile.profileParentId,
-          ...(characterizationDto && {
-            name: `${characterizationDto.name} - (${profile.profileName})`,
-          }),
-        });
+        return this.upsert(
+          {
+            id: profile.id,
+            companyId,
+            workspaceId,
+            type,
+            profileParentId: profile.profileParentId,
+            ...(!!characterizationDto && {
+              name: `${characterizationDto.name} - (${profile.profileName})`,
+            }),
+          },
+          true,
+        );
       }),
     );
 

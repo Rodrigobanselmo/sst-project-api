@@ -17,26 +17,26 @@ export const createBaseDocument = (sections: ISectionOptions[]) => {
               text: '%1.%2.',
               format: LevelFormat.DECIMAL,
             },
-            {
-              level: 2,
-              text: '%1.%2.%3.',
-              format: LevelFormat.DECIMAL,
-            },
-            {
-              level: 3,
-              text: '%1.%2.%3.%4.',
-              format: LevelFormat.DECIMAL,
-            },
-            {
-              level: 4,
-              text: '%1.%2.%3.%4.%5.',
-              format: LevelFormat.DECIMAL,
-            },
-            {
-              level: 5,
-              text: '%1.%2.%3.%4.%5.%6.',
-              format: LevelFormat.DECIMAL,
-            },
+            // {
+            //   level: 2,
+            //   text: '%1.%2.%3.',
+            //   format: LevelFormat.DECIMAL,
+            // },
+            // {
+            //   level: 3,
+            //   text: '%1.%2.%3.%4.',
+            //   format: LevelFormat.DECIMAL,
+            // },
+            // {
+            //   level: 4,
+            //   text: '%1.%2.%3.%4.%5.',
+            //   format: LevelFormat.DECIMAL,
+            // },
+            // {
+            //   level: 5,
+            //   text: '%1.%2.%3.%4.%5.%6.',
+            //   format: LevelFormat.DECIMAL,
+            // },
           ],
         },
         {
