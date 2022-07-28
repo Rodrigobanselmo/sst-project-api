@@ -1,5 +1,6 @@
 import { EpiToRiskFactorData } from '@prisma/client';
 import { EpiEntity } from './epi.entity';
+import { RiskFactorDataEntity } from './riskData.entity';
 
 export class EpiRiskDataEntity implements EpiToRiskFactorData {
   epiId: number;
@@ -15,6 +16,7 @@ export class EpiRiskDataEntity implements EpiToRiskFactorData {
   unstoppedCheck: boolean;
   trainingCheck: boolean;
   epi?: EpiEntity;
+  riskData?: RiskFactorDataEntity;
 
   constructor(partial: Partial<EpiRiskDataEntity>) {
     Object.assign(this, partial);

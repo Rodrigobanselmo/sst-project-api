@@ -1,7 +1,8 @@
-import { RiskFactorGroupDataEntity } from './../../../../../checklist/entities/riskGroupData.entity';
+import { HierarchyEnum } from '@prisma/client';
 import { Paragraph, Table, WidthType } from 'docx';
+import { palette } from 'src/shared/constants/palette';
 
-import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
+import { borderStyleGlobal } from '../../../base/config/styles';
 import {
   ISectionChildrenType,
   PGRSectionChildrenTypeEnum,
@@ -11,11 +12,10 @@ import {
   IHierarchyData,
   IHierarchyMap,
 } from '../../../converter/hierarchy.converter';
-import { IHierarchyPrioritizationOptions } from './hierarchyPrioritization.converter';
-import { HierarchyEnum } from '@prisma/client';
-import { hierarchyPrioritizationTables } from './hierarchyPrioritization.tables';
-import { TableHeaderElements } from './elements/header';
+import { RiskFactorGroupDataEntity } from './../../../../../checklist/entities/riskGroupData.entity';
 import { bodyTableProps, TableBodyElements } from './elements/body';
+import { IHierarchyPrioritizationOptions } from './hierarchyPrioritization.converter';
+import { hierarchyPrioritizationTables } from './hierarchyPrioritization.tables';
 
 export const hierarchyPrioritizationPage = (
   riskFactorGroupData: RiskFactorGroupDataEntity,
@@ -56,8 +56,15 @@ export const hierarchyPrioritizationPage = (
             tableBodyElements.tableRow(
               (
                 [
-                  { text: 'Avaliação Qualitativa' },
-                  { text: 'Avaliação Quantitativa', shaded: true },
+                  {
+                    text: 'Avaliação Qualitativa',
+                    borders: borderStyleGlobal(palette.common.white.string),
+                  },
+                  {
+                    text: 'Avaliação Quantitativa',
+                    borders: borderStyleGlobal(palette.common.white.string),
+                    shaded: true,
+                  },
                 ] as bodyTableProps[]
               ).map(tableBodyElements.tableCell),
             ),

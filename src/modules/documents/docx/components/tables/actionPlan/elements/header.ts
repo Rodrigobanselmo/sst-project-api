@@ -1,3 +1,4 @@
+import { borderStyleGlobal } from './../../../../base/config/styles';
 import {
   AlignmentType,
   HeightRule,
@@ -15,6 +16,7 @@ export interface headerTableProps {
   text: string;
   size?: number;
   position?: number;
+  borders: any;
 }
 
 export class TableHeaderElements {
@@ -47,6 +49,7 @@ export class TableHeaderElements {
           verticalAlign: VerticalAlign.CENTER,
           columnSpan,
           margins: { top: 150, bottom: 150 },
+          borders: borderStyleGlobal(palette.common.white.string),
         }),
       ],
     });

@@ -4,17 +4,26 @@ export const hexToColors = (hex: string) => {
 
 export const palette = {
   table: {
-    header: hexToColors('#fca557'),
-    row: hexToColors('#fcf2e8'),
+    // header: hexToColors('#fca557'),
+    // row: hexToColors('#fcf2e8'),
+    // attention: hexToColors('#3cbe7d'),
+    // rowDark: hexToColors('#fce2c9'),
+    header: hexToColors('#82b2e8'),
+    row: hexToColors('#d2e0f0'),
     attention: hexToColors('#3cbe7d'),
-    rowDark: hexToColors('#fce2c9'),
+    rowDark: hexToColors('#acccf0'),
+    // header: hexToColors('#014DA2'),
+    // row: hexToColors('#00C0F3'),
+    // attention: hexToColors('#3cbe7d'),
+    // rowDark: hexToColors('#00C0F3'),
   },
   common: {
     white: hexToColors('#ffffff'),
     black: hexToColors('#000000'),
   },
   text: {
-    simple: hexToColors('#fca557'),
+    // simple: hexToColors('#fca557'),
+    simple: hexToColors('#0AB14B'),
     main: hexToColors('#000000'),
     attention: hexToColors('#ff0000'),
   },

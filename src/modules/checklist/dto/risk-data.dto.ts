@@ -11,7 +11,7 @@ import {
 } from 'class-validator';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
-import { EpiRoRiskDataDto } from './epi-risk-data.dto';
+import { EpiRoRiskDataDto as EpiToRiskDataDto } from './epi-risk-data.dto';
 
 export class UpsertRiskDataDto {
   @IsString()
@@ -77,8 +77,8 @@ export class UpsertRiskDataDto {
 
   @ValidateNested({ each: true })
   @IsOptional()
-  @Type(() => EpiRoRiskDataDto)
-  epis?: EpiRoRiskDataDto[];
+  @Type(() => EpiToRiskDataDto)
+  epis?: EpiToRiskDataDto[];
 
   @IsOptional()
   keepEmpty?: boolean;
@@ -159,8 +159,8 @@ export class UpsertManyRiskDataDto {
 
   @ValidateNested({ each: true })
   @IsOptional()
-  @Type(() => EpiRoRiskDataDto)
-  epis?: EpiRoRiskDataDto[];
+  @Type(() => EpiToRiskDataDto)
+  epis?: EpiToRiskDataDto[];
 
   @IsOptional()
   json?: Prisma.JsonValue;

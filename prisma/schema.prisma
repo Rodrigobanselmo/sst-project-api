@@ -552,8 +552,19 @@ model RecMed {
   engs RiskFactorData[]  @relation(name: "engs")
   adms RiskFactorData[]  @relation(name: "adms")
   dataRecs RiskFactorDataRec[]
+  recMedToRiskFactorData RecMedToRiskFactorData[]
 
   @@unique([id, companyId])
+} 
+
+model RecMedToRiskFactorData {
+  recMedId    String  
+  riskFactorDataId String 
+  riskFactorData RiskFactorData  @relation(fields: [riskFactorDataId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  recMed RecMed  @relation(fields: [recMedId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  efficientlyCheck Boolean @default(false)
+
+  @@id([riskFactorDataId, recMedId])
 } 
 
 model RefreshToken {
@@ -683,6 +694,7 @@ model RiskFactorData {
   json Json?
   level    Int?
   epiToRiskFactorData EpiToRiskFactorData[]
+  recMedToRiskFactorData RecMedToRiskFactorData[]
 
   @@unique([id, companyId])
   @@unique([homogeneousGroupId, riskId, riskFactorGroupDataId])

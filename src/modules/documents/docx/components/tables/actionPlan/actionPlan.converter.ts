@@ -6,6 +6,8 @@ import { getMatrizRisk } from '../../../../../../shared/utils/matriz';
 import { HomoTypeEnum } from '@prisma/client';
 import { IHierarchyMap } from '../../../converter/hierarchy.converter';
 import { dayjs } from '../../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
+import { borderStyleGlobal } from '../../../base/config/styles';
+import { palette } from '../../../../../../shared/constants/palette';
 
 export const actionPlanConverter = (
   riskGroup: RiskFactorGroupDataEntity,
@@ -56,43 +58,63 @@ export const actionPlanConverter = (
       const due = getDue();
       const dueText = due ? due.format('D [de] MMMM YYYY') : 'sem prazo';
 
-      cells[ActionPlanColumnEnum.ITEM] = { text: '', size: 2 };
-      cells[ActionPlanColumnEnum.ORIGIN] = { text: origin || '', size: 5 };
+      cells[ActionPlanColumnEnum.ITEM] = {
+        text: '',
+        size: 2,
+        borders: borderStyleGlobal(palette.common.white.string),
+      };
+      cells[ActionPlanColumnEnum.ORIGIN] = {
+        text: origin || '',
+        size: 5,
+        borders: borderStyleGlobal(palette.common.white.string),
+      };
       cells[ActionPlanColumnEnum.RISK] = {
         text: riskData.riskFactor.name,
         size: 10,
+        borders: borderStyleGlobal(palette.common.white.string),
       };
       cells[ActionPlanColumnEnum.SOURCE] = {
         text: riskData.generateSources.map((gs) => gs.name).join('\n'),
         size: 10,
+        borders: borderStyleGlobal(palette.common.white.string),
       };
       cells[ActionPlanColumnEnum.SEVERITY] = {
         text: String(riskData.riskFactor.severity),
         size: 1,
+        borders: borderStyleGlobal(palette.common.white.string),
       };
       cells[ActionPlanColumnEnum.PROBABILITY] = {
         text: String(riskData.probability || '-'),
         size: 1,
+        borders: borderStyleGlobal(palette.common.white.string),
       };
       cells[ActionPlanColumnEnum.RO] = {
         text: getMatrizRisk(riskData.riskFactor.severity, riskData.probability)
           .label,
         size: 5,
+        borders: borderStyleGlobal(palette.common.white.string),
       };
       cells[ActionPlanColumnEnum.INTERVENTION] = {
         text: getMatrizRisk(riskData.riskFactor.severity, riskData.probability)
           .intervention,
         size: 5,
+        borders: borderStyleGlobal(palette.common.white.string),
       };
       cells[ActionPlanColumnEnum.RECOMMENDATION] = {
         text: rec.recName,
         size: 10,
+        borders: borderStyleGlobal(palette.common.white.string),
       };
       cells[ActionPlanColumnEnum.RESPONSIBLE] = {
         text: responsibleName,
         size: 5,
+        borders: borderStyleGlobal(palette.common.white.string),
       };
-      cells[ActionPlanColumnEnum.DUE] = { text: dueText, size: 5 };
+      cells[ActionPlanColumnEnum.DUE] = {
+        text: dueText,
+        size: 5,
+        borders: borderStyleGlobal(palette.common.white.string),
+      };
 
       const rows = homogeneousGroupsMap.get(riskData.homogeneousGroupId) || [];
       homogeneousGroupsMap.set(riskData.homogeneousGroupId, [...rows, cells]);

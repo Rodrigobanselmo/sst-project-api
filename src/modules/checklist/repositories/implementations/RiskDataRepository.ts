@@ -539,7 +539,6 @@ export class RiskDataRepository {
 
   private async setEpis(epis: EpiRoRiskDataDto[]) {
     if (epis.length === 0) return [];
-
     const data = await this.prisma.$transaction(
       epis.map(({ riskFactorDataId, epiId, ...epiRelation }) =>
         this.prisma.epiToRiskFactorData.upsert({

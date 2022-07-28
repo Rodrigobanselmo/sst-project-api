@@ -4,6 +4,7 @@ import { palette } from '../../../../../../shared/constants/palette';
 import { removeDuplicate } from '../../../../../../shared/utils/removeDuplicate';
 import { sortString } from '../../../../../../shared/utils/sorts/string.sort';
 import { RiskFactorGroupDataEntity } from '../../../../../checklist/entities/riskGroupData.entity';
+import { borderStyleGlobal } from '../../../base/config/styles';
 import {
   IHierarchyData,
   IHierarchyMap,
@@ -112,6 +113,7 @@ export const hierarchyRisksConverter = (
         return {
           text: risk.name,
           font: header.length >= 20 ? 8 : header.length >= 10 ? 10 : 12,
+          borders: borderStyleGlobal(palette.common.white.string),
         };
       });
 
@@ -120,6 +122,7 @@ export const hierarchyRisksConverter = (
       position: 0,
       textDirection: undefined,
       size: row.length < 6 ? 1 : Math.ceil(row.length / 6),
+      borders: borderStyleGlobal(palette.common.white.string),
     });
 
     return row;
@@ -133,19 +136,25 @@ export const hierarchyRisksConverter = (
       .sort((a, b) => sortString(a, b, 'name'))
       .map<bodyTableProps[]>((hierarchy) => {
         const row: bodyTableProps[] = Array.from({ length: columnsLength }).map(
-          () => ({}),
+          () => ({
+            borders: borderStyleGlobal(palette.common.white.string),
+          }),
         );
 
         row[0] = {
           text: hierarchy.name,
           shading: { fill: palette.table.header.string },
+          borders: borderStyleGlobal(palette.common.white.string),
         };
 
         hierarchy.homogeneousGroupIds.forEach((homogeneousGroupId) => {
           const homoPosition = HomoPositionMap.get(homogeneousGroupId);
           if (homoPosition) {
             homoPosition.position.forEach((position) => {
-              row[position] = { text: 'X' };
+              row[position] = {
+                text: 'X',
+                borders: borderStyleGlobal(palette.common.white.string),
+              };
             });
           }
         });

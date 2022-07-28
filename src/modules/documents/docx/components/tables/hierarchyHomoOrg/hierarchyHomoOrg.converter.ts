@@ -14,6 +14,7 @@ import {
   HierarchyPlanColumnEnum,
   HierarchyPlanMap,
 } from './hierarchyHomoOrg.constant';
+import { borderStyleGlobal } from '../../../base/config/styles';
 
 export type ConverterProps = {
   showHomogeneous?: boolean;
@@ -202,10 +203,14 @@ export const hierarchyPlanConverter = (
         const row = generateRow();
         const firstPosition = rowsPosition;
         if (showHomogeneous) {
-          row[0] = { text: name };
+          row[0] = {
+            text: name,
+            borders: borderStyleGlobal(palette.common.white.string),
+          };
           if (showHomogeneousDescription)
             row[1] = {
               text: homo.description || ' ',
+              borders: borderStyleGlobal(palette.common.white.string),
             };
         }
         rows[rowsPosition] = row;
@@ -226,6 +231,7 @@ export const hierarchyPlanConverter = (
               text: hierarchyData.name,
               employee: hierarchyData.numEmployees,
               description: hierarchyData.description,
+              borders: borderStyleGlobal(palette.common.white.string),
             };
 
             const childrenRowsToSpan = loop(hierarchyData.data);
@@ -268,18 +274,26 @@ export const hierarchyPlanConverter = (
     const description = row[row.length - 1].description;
 
     if (showDescription && hasAtLeastOneDescription)
-      row[row.length] = { text: description };
-    row[row.length] = { text: employees };
+      row[row.length] = {
+        text: description,
+        borders: borderStyleGlobal(palette.common.white.string),
+      };
+    row[row.length] = {
+      text: employees,
+      borders: borderStyleGlobal(palette.common.white.string),
+    };
   });
 
   if (showDescription && hasAtLeastOneDescription)
     headerData[headerData.length] = {
       text: 'Descrição do cargo',
+      borders: borderStyleGlobal(palette.common.white.string),
       size: 5,
     };
 
   headerData[headerData.length] = {
     text: 'Nº',
+    borders: borderStyleGlobal(palette.common.white.string),
     size: 1,
   };
 

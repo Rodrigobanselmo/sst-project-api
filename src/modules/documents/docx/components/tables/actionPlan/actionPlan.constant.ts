@@ -1,4 +1,5 @@
-/* eslint-disable prettier/prettier */
+import { palette } from '../../../../../../shared/constants/palette';
+import { borderStyleGlobal } from '../../../base/config/styles';
 import { headerTableProps } from './elements/header';
 
 export enum ActionPlanColumnEnum {
@@ -18,26 +19,68 @@ export enum ActionPlanColumnEnum {
 const NewActionPlanHeader = (): headerTableProps[] => {
   const header: headerTableProps[] = [];
 
-  header[ActionPlanColumnEnum.ITEM] = { text: 'ITEM', size: 2 }
-  header[ActionPlanColumnEnum.ORIGIN] = { text: 'ORIGEM', size: 5 }
-  header[ActionPlanColumnEnum.RISK] = { text: 'PERIGOS\nFATORES DE RISCO', size: 10 }
-  header[ActionPlanColumnEnum.SOURCE] = { text: 'FONTE GERADORA OU\nATIVIDADE DE RISCO', size: 10 }
-  header[ActionPlanColumnEnum.SEVERITY] = { text: 'SEVERIDADE', size: 1 }
-  header[ActionPlanColumnEnum.PROBABILITY] = { text: 'PROBABILIDADE', size: 1 }
-  header[ActionPlanColumnEnum.RO] = { text: 'RISCO OCUPACIONAL', size: 5 }
-  header[ActionPlanColumnEnum.INTERVENTION] = { text: 'INTERVENÇÃO', size: 5 }
-  header[ActionPlanColumnEnum.RECOMMENDATION] = { text: 'RECOMENDAÇÕES', size: 10 }
-  header[ActionPlanColumnEnum.RESPONSIBLE] = { text: 'RESPONSÁVEL', size: 5 }
-  header[ActionPlanColumnEnum.DUE] = { text: 'PRAZO', size: 5 }
+  header[ActionPlanColumnEnum.ITEM] = {
+    text: 'ITEM',
+    size: 2,
+    borders: borderStyleGlobal(palette.common.white.string),
+  };
+  header[ActionPlanColumnEnum.ORIGIN] = {
+    text: 'ORIGEM',
+    size: 5,
+    borders: borderStyleGlobal(palette.common.white.string),
+  };
+  header[ActionPlanColumnEnum.RISK] = {
+    text: 'PERIGOS\nFATORES DE RISCO',
+    size: 10,
+    borders: borderStyleGlobal(palette.common.white.string),
+  };
+  header[ActionPlanColumnEnum.SOURCE] = {
+    text: 'FONTE GERADORA OU\nATIVIDADE DE RISCO',
+    size: 10,
+    borders: borderStyleGlobal(palette.common.white.string),
+  };
+  header[ActionPlanColumnEnum.SEVERITY] = {
+    text: 'SEVERIDADE',
+    size: 1,
+    borders: borderStyleGlobal(palette.common.white.string),
+  };
+  header[ActionPlanColumnEnum.PROBABILITY] = {
+    text: 'PROBABILIDADE',
+    size: 1,
+    borders: borderStyleGlobal(palette.common.white.string),
+  };
+  header[ActionPlanColumnEnum.RO] = {
+    text: 'RISCO OCUPACIONAL',
+    size: 5,
+    borders: borderStyleGlobal(palette.common.white.string),
+  };
+  header[ActionPlanColumnEnum.INTERVENTION] = {
+    text: 'INTERVENÇÃO',
+    size: 5,
+    borders: borderStyleGlobal(palette.common.white.string),
+  };
+  header[ActionPlanColumnEnum.RECOMMENDATION] = {
+    text: 'RECOMENDAÇÕES',
+    size: 10,
+    borders: borderStyleGlobal(palette.common.white.string),
+  };
+  header[ActionPlanColumnEnum.RESPONSIBLE] = {
+    text: 'RESPONSÁVEL',
+    size: 5,
+    borders: borderStyleGlobal(palette.common.white.string),
+  };
+  header[ActionPlanColumnEnum.DUE] = {
+    text: 'PRAZO',
+    size: 5,
+    borders: borderStyleGlobal(palette.common.white.string),
+  };
 
-  return header
+  return header;
 };
 
-export const actionPlanHeader = NewActionPlanHeader()
-
+export const actionPlanHeader = NewActionPlanHeader();
 
 export const actionPlanTitle: string[] = [
   'PLANO DE AÇÃO',
   'PGR - PROGRAMA DE GERENCIAMENTO DE RISCOS',
 ];
-

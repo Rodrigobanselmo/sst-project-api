@@ -13,6 +13,7 @@ import {
 import { hierarchyMap } from '../appr/parts/first/first.constant';
 import { bodyTableProps } from './elements/body';
 import { headerTableProps } from './elements/header';
+import { borderStyleGlobal } from '../../../base/config/styles';
 
 export interface IHierarchyPrioritizationOptions {
   isByGroup?: boolean;
@@ -205,6 +206,7 @@ export const hierarchyPrioritizationConverter = (
         return {
           text: risk.name,
           font: header.length >= 20 ? 8 : header.length >= 10 ? 10 : 12,
+          borders: borderStyleGlobal(palette.common.white.string),
         };
       });
 
@@ -220,6 +222,7 @@ export const hierarchyPrioritizationConverter = (
       position: 0,
       textDirection: undefined,
       size: row.length < 6 ? 1 : Math.ceil(row.length / 6),
+      borders: borderStyleGlobal(palette.common.white.string),
     });
 
     return row;
@@ -233,12 +236,15 @@ export const hierarchyPrioritizationConverter = (
       .sort((a, b) => sortString(a, b, 'name'))
       .map<bodyTableProps[]>((hierarchy) => {
         const row: bodyTableProps[] = Array.from({ length: columnsLength }).map(
-          () => ({}),
+          () => ({
+            borders: borderStyleGlobal(palette.common.white.string),
+          }),
         );
 
         row[0] = {
           text: hierarchy.name,
           shading: { fill: palette.table.header.string },
+          borders: borderStyleGlobal(palette.common.white.string),
         };
 
         const isDataRisk = 'riskDegree' in hierarchy && hierarchy.riskDegree;
@@ -254,6 +260,7 @@ export const hierarchyPrioritizationConverter = (
                 row[position] = {
                   text: riskDegree || isDataRisk,
                   shaded: isQuantity || isDataRiskQuantity,
+                  borders: borderStyleGlobal(palette.common.white.string),
                   attention:
                     (riskDegreeLevel || isDataRiskLevel) >= warnLevelStart,
                 };

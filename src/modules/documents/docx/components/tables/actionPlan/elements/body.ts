@@ -12,6 +12,7 @@ import { palette } from '../../../../../../../shared/constants/palette';
 export interface bodyTableProps {
   text: string;
   size?: number;
+  borders: any;
 }
 
 export class TableBodyElements {

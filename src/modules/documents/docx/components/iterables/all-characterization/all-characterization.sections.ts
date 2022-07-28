@@ -164,7 +164,7 @@ const getData = (
     const titleTable = [
       {
         type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE,
-        text: `Cargos  lotados no ${titleSection} ??${VariablesPGREnum.CHARACTERIZATION_NAME}??`,
+        text: `Cargos lotados no ${titleSection} ??${VariablesPGREnum.CHARACTERIZATION_NAME}??`,
       },
     ] as ISectionChildrenType[];
 
@@ -176,13 +176,13 @@ const getData = (
     ...convertToDocx([...ProfileTitle], variables),
     ...convertToDocx(
       [
-        ...riskFactors,
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
           text: `??${VariablesPGREnum.ENVIRONMENT_DESCRIPTION}??`,
           alignment: AlignmentType.START,
           removeWithSomeEmptyVars: [VariablesPGREnum.ENVIRONMENT_DESCRIPTION],
         },
+        ...riskFactors,
         ...paragraphSection,
         ...parameters,
         ...activities,
