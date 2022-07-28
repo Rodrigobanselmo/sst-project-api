@@ -239,7 +239,11 @@ const environmentTypes = [
     desc: 'Ambiente Operacional',
     type: CharacterizationTypeEnum.OPERATION,
   },
-  { title: 'Ambiente de Apoio', type: CharacterizationTypeEnum.SUPPORT },
+  {
+    title: 'Ambiente de Apoio',
+    desc: 'Ambiente de Apoio',
+    type: CharacterizationTypeEnum.SUPPORT,
+  },
 ];
 
 const characterizationTypes = [
