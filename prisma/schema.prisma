@@ -261,6 +261,7 @@ model CompanyCharacterization {
   photos CompanyCharacterizationPhoto[]
   description String?
   created_at DateTime @default(now())
+  paragraphs String[]
   considerations String[]
   activities String[]  
   profiles CompanyCharacterization[]  @relation(name:"profiles") 
@@ -302,6 +303,7 @@ model CompanyEnvironment {
   name String  
   photos CompanyEnvironmentPhoto[]
   description String?
+  paragraphs String[]
   order Int?
   considerations String[]
   activities String[]  

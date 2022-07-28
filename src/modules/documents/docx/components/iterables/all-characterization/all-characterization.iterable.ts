@@ -20,6 +20,33 @@ export const environmentIterable = (
 
   const environmentData = environmentsConverter(environments);
 
+  const getSentenceType = (sentence: string): ISectionChildrenType => {
+    const splitSentence = sentence.split('{type}=');
+    if (splitSentence.length == 2) {
+      const value = splitSentence[1] as unknown as any;
+
+      if (PGRSectionChildrenTypeEnum.PARAGRAPH == value) {
+        return {
+          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          text: splitSentence[0],
+        };
+      }
+
+      if (PGRSectionChildrenTypeEnum.BULLET == value.split('-')[0]) {
+        return {
+          type: PGRSectionChildrenTypeEnum.BULLET,
+          text: splitSentence[0],
+          level: value.split('-')[1] || 0,
+        };
+      }
+    }
+
+    return {
+      type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+      text: splitSentence[0],
+    };
+  };
+
   const iterableSections = environmentData
     .map(({ variables, elements, risks, considerations: cons, breakPage }) => {
       const parameters: ISectionChildrenType[] = [];
@@ -101,9 +128,7 @@ export const environmentIterable = (
           });
 
         considerations.push({
-          type: PGRSectionChildrenTypeEnum.BULLET,
-          level: 0,
-          text: consideration,
+          ...getSentenceType(consideration),
         });
       });
 

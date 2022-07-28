@@ -35,6 +35,7 @@ const getData = (
     considerations: cons,
     activities: ac,
     type,
+    paragraphs,
   }: Partial<IEnvironmentConvertResponse>,
 ) => {
   const parameters: ISectionChildrenType[] = [];
@@ -42,6 +43,7 @@ const getData = (
   const considerations: ISectionChildrenType[] = [];
   const offices: (Table | Paragraph)[] = [];
   const activities: ISectionChildrenType[] = [];
+  const paragraphSection: ISectionChildrenType[] = [];
 
   if (variables[VariablesPGREnum.ENVIRONMENT_NOISE]) {
     parameters.push({
@@ -99,6 +101,12 @@ const getData = (
     });
   });
 
+  paragraphs.forEach((paragraph) => {
+    paragraphSection.push({
+      ...getSentenceType(paragraph),
+    });
+  });
+
   cons.forEach((consideration, index) => {
     if (index === 0)
       considerations.push({
@@ -108,9 +116,7 @@ const getData = (
       });
 
     considerations.push({
-      type: PGRSectionChildrenTypeEnum.BULLET,
-      level: 0,
-      text: consideration,
+      ...getSentenceType(consideration),
     });
   });
 
@@ -123,9 +129,7 @@ const getData = (
       });
 
     activities.push({
-      type: PGRSectionChildrenTypeEnum.BULLET,
-      level: 0,
-      text: activity,
+      ...getSentenceType(activity),
     });
   });
 
@@ -179,6 +183,7 @@ const getData = (
           alignment: AlignmentType.START,
           removeWithSomeEmptyVars: [VariablesPGREnum.ENVIRONMENT_DESCRIPTION],
         },
+        ...paragraphSection,
         ...parameters,
         ...activities,
         ...considerations,
@@ -189,6 +194,33 @@ const getData = (
   ];
 
   return section;
+};
+
+const getSentenceType = (sentence: string): ISectionChildrenType => {
+  const splitSentence = sentence.split('{type}=');
+  if (splitSentence.length == 2) {
+    const value = splitSentence[1] as unknown as any;
+
+    if (PGRSectionChildrenTypeEnum.PARAGRAPH == value) {
+      return {
+        type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+        text: splitSentence[0],
+      };
+    }
+
+    if (PGRSectionChildrenTypeEnum.BULLET == value.split('-')[0]) {
+      return {
+        type: PGRSectionChildrenTypeEnum.BULLET,
+        text: splitSentence[0],
+        level: value.split('-')[1] || 0,
+      };
+    }
+  }
+
+  return {
+    type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+    text: splitSentence[0],
+  };
 };
 
 const environmentTypes = [
@@ -264,6 +296,7 @@ export const allCharacterizationSections = (
               profileParentId,
               profiles,
               type,
+              paragraphs,
             },
             index,
           ) => {
@@ -286,6 +319,7 @@ export const allCharacterizationSections = (
                 considerations: cons,
                 activities: ac,
                 type,
+                paragraphs,
               },
             );
 

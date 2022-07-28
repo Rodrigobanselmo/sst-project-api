@@ -22,6 +22,7 @@ export interface IEnvironmentConvertResponse {
   risks: RiskFactorsEntity[];
   considerations: string[];
   activities: string[];
+  paragraphs: string[];
   breakPage: boolean;
   type: CharacterizationTypeEnum;
   id: string;
@@ -77,6 +78,7 @@ export const environmentsConverter = (
       const id = environment.id;
       const profileParentId = environment.profileParentId;
       const profiles = environment.profiles;
+      const paragraphs = environment.paragraphs;
 
       return {
         elements,
@@ -90,6 +92,7 @@ export const environmentsConverter = (
         profileParentId,
         profileName,
         profiles,
+        paragraphs,
       };
     });
 };

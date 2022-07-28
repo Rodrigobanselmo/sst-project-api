@@ -50,6 +50,7 @@ export class EnvironmentEntity implements CompanyCharacterization {
   workspaceId: string;
   activities: string[];
   considerations: string[];
+  paragraphs: string[];
   companyId: string;
   profileName: string;
   profileParentId: string;

@@ -293,7 +293,6 @@ export class PgrUploadService {
         photosPath,
       };
     } catch (error) {
-      console.log(error);
       photosPath.forEach((path) => fs.unlinkSync(path));
 
       throw new InternalServerErrorException(error);

@@ -45,6 +45,7 @@ export class CharacterizationEntity implements CompanyCharacterization {
   workspaceId: string;
   companyId: string;
   activities: string[];
+  paragraphs: string[];
   noiseValue: string;
   temperature: string;
   luminosity: string;

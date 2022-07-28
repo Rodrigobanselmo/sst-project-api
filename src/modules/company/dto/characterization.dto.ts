@@ -51,6 +51,10 @@ export class UpsertCharacterizationDto {
 
   @IsOptional()
   @IsString({ each: true })
+  paragraphs?: string[];
+
+  @IsOptional()
+  @IsString({ each: true })
   considerations?: string[];
 
   @IsOptional()
