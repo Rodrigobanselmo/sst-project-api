@@ -210,7 +210,8 @@ export class CopyCompanyService {
               description: group.characterization.description,
               name: group.characterization.name,
               type: group.characterization.type,
-              activities: group.environment.activities,
+              activities: group.characterization.activities,
+              paragraphs: group.characterization.paragraphs,
               considerations: group.characterization.considerations,
               companyId: companyId,
               workspaceId:
