@@ -275,6 +275,7 @@ export const allCharacterizationSections = (
   ) => (Paragraph | Table)[],
 ) => {
   const sections: (Paragraph | Table)[][] = [];
+  const sectionProfiles: Record<string, (Paragraph | Table)[]> = {};
 
   (type === 'char' ? characterizationTypes : environmentTypes).forEach(
     ({ type, title: titleSection, desc }) => {
@@ -283,8 +284,8 @@ export const allCharacterizationSections = (
       );
       if (!environments?.length) return;
 
-      const sectionProfiles: Record<string, (Paragraph | Table)[]> = {};
       const environmentData = environmentsConverter(environments);
+
       environmentData
         .sort((a, b) => sortString(b, a, 'profileParentId'))
         .forEach(
@@ -340,9 +341,20 @@ export const allCharacterizationSections = (
                 ),
               );
 
-              return (sectionProfiles[id] = otherSections);
+              sectionProfiles[id] = otherSections;
+              return;
             }
-
+            // console.log(2, profiles);
+            // console.log(3, profileParentId);
+            // console.log(
+            //   4,
+            //   profiles.map((profile) => sectionProfiles[profile.id]),
+            //   sectionProfiles,
+            // );
+            // console.log(
+            //   5,
+            //   profiles.map((profile) => profile.id),
+            // );
             const section = [
               ...convertToDocx([...title], variables),
               ...elements,
