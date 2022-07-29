@@ -1,9 +1,9 @@
 import { IsBoolean, IsInt, IsOptional, IsString } from 'class-validator';
 
-export class RecMedRiskDataDto {
-  @IsInt()
+export class EngsRiskDataDto {
+  @IsString()
   @IsOptional()
-  recMedId?: number;
+  recMedId?: string;
 
   @IsString()
   @IsOptional()

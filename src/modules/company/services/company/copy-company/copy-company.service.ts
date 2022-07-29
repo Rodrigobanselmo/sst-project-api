@@ -69,6 +69,7 @@ export class CopyCompanyService {
         include: {
           characterization: {
             include: {
+              photos: true,
               profiles: {
                 include: {
                   homogeneousGroup: true,
@@ -81,9 +82,9 @@ export class CopyCompanyService {
             include: {
               adms: true,
               recs: true,
-              engs: true,
               generateSources: true,
               epiToRiskFactorData: { include: { epi: true } },
+              engsToRiskFactorData: { include: { recMed: true } },
               hierarchy: true,
               riskFactor: true,
               probabilityCalc: true,
@@ -222,6 +223,16 @@ export class CopyCompanyService {
                   equalWorkspace[group.characterization.workspaceId].id,
               },
             });
+
+            if (group.characterization.photos)
+              await this.prisma.companyCharacterizationPhoto.createMany({
+                data: group.characterization.photos.map(
+                  ({ id, created_at, updated_at, deleted_at, ...photo }) => ({
+                    ...photo,
+                    companyCharacterizationId: newHomoGroup.id,
+                  }),
+                ),
+              });
           }
 
           if (group.riskFactorData && group.riskFactorData.length) {
@@ -271,17 +282,6 @@ export class CopyCompanyService {
                               ),
                             }
                           : undefined,
-                      engs:
-                        riskFactorFromData.engs &&
-                        riskFactorFromData.engs.length
-                          ? {
-                              connect: riskFactorFromData.engs.map(
-                                ({ id }) => ({
-                                  id,
-                                }),
-                              ),
-                            }
-                          : undefined,
                     },
                   });
 
@@ -289,6 +289,16 @@ export class CopyCompanyService {
                   await this.prisma.epiToRiskFactorData.createMany({
                     data: riskFactorFromData.epiToRiskFactorData.map(
                       ({ epi, ...data }) => ({
+                        ...data,
+                        riskFactorDataId: newRiskFactorData.id,
+                      }),
+                    ),
+                  });
+
+                if (riskFactorFromData.engs && riskFactorFromData.engs.length)
+                  await this.prisma.engsToRiskFactorData.createMany({
+                    data: riskFactorFromData.engsToRiskFactorData.map(
+                      ({ recMed, ...data }) => ({
                         ...data,
                         riskFactorDataId: newRiskFactorData.id,
                       }),

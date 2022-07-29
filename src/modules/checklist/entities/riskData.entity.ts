@@ -26,6 +26,7 @@ import { RiskFactorsEntity } from './risk.entity';
 import { Prisma, RiskFactorData } from '.prisma/client';
 import { RiskDataRecEntity } from './riskDataRec.entity';
 import { EpiRiskDataEntity } from './epiRiskData';
+import { EngsRiskDataEntity } from './engsRiskData';
 
 export class RiskFactorDataEntity implements RiskFactorData {
   @ApiProperty({ description: 'The id of the Company' })
@@ -101,6 +102,7 @@ export class RiskFactorDataEntity implements RiskFactorData {
   intervention?: string;
   progress?: number;
   epiToRiskFactorData?: EpiRiskDataEntity[];
+  engsToRiskFactorData?: EngsRiskDataEntity[];
 
   constructor(partial: Partial<RiskFactorDataEntity>) {
     Object.assign(this, partial);
@@ -116,6 +118,21 @@ export class RiskFactorDataEntity implements RiskFactorData {
           new EpiEntity({
             ...epi,
             epiRiskData: epiToRiskFactorData,
+          }),
+      );
+    }
+
+    if (!this.engs) this.engs = [];
+    if (partial.engsToRiskFactorData) {
+      this.engsToRiskFactorData = partial.engsToRiskFactorData.map(
+        (engsToRiskFactorData) => new EngsRiskDataEntity(engsToRiskFactorData),
+      );
+
+      this.engs = this.engsToRiskFactorData.map(
+        ({ recMed, ...engsToRiskFactorData }) =>
+          new RecMedEntity({
+            ...recMed,
+            engsRiskData: engsToRiskFactorData,
           }),
       );
     }

@@ -116,9 +116,9 @@ export class RiskGroupDataRepository {
             include: {
               adms: true,
               recs: true,
-              engs: true,
               generateSources: true,
               epiToRiskFactorData: { include: { epi: true } },
+              engsToRiskFactorData: { include: { recMed: true } },
               riskFactor: true,
               dataRecs: true,
               hierarchy: {

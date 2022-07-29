@@ -12,6 +12,7 @@ import {
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
 import { EpiRoRiskDataDto as EpiToRiskDataDto } from './epi-risk-data.dto';
+import { EngsRiskDataDto } from './engs-risk-data.dto';
 
 export class UpsertRiskDataDto {
   @IsString()
@@ -65,10 +66,6 @@ export class UpsertRiskDataDto {
 
   @IsString({ each: true })
   @IsOptional()
-  engs?: string[];
-
-  @IsString({ each: true })
-  @IsOptional()
   adms?: string[];
 
   @IsOptional()
@@ -79,6 +76,11 @@ export class UpsertRiskDataDto {
   @IsOptional()
   @Type(() => EpiToRiskDataDto)
   epis?: EpiToRiskDataDto[];
+
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @Type(() => EngsRiskDataDto)
+  engs?: EngsRiskDataDto[];
 
   @IsOptional()
   keepEmpty?: boolean;
@@ -147,10 +149,6 @@ export class UpsertManyRiskDataDto {
 
   @IsString({ each: true })
   @IsOptional()
-  engs?: string[];
-
-  @IsString({ each: true })
-  @IsOptional()
   adms?: string[];
 
   @IsOptional()
@@ -161,6 +159,11 @@ export class UpsertManyRiskDataDto {
   @IsOptional()
   @Type(() => EpiToRiskDataDto)
   epis?: EpiToRiskDataDto[];
+
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @Type(() => EngsRiskDataDto)
+  engs?: EngsRiskDataDto[];
 
   @IsOptional()
   json?: Prisma.JsonValue;

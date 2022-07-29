@@ -15,7 +15,7 @@ export const getDocxFileName = ({
   }${companyName}${typeName}-v${version}.docx`
     .normalize('NFD')
     .replace(/\s+/g, '_')
-    .replace(/[^a-zA-Z0-9s_/.!\\={}?()-]/g, '');
+    .replace(/[^a-zA-Z0-9._-]/g, '');
 
   return fileAprName;
 };

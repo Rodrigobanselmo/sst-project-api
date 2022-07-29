@@ -17,7 +17,8 @@ export class EpiRiskDataEntity implements EpiToRiskFactorData {
   trainingCheck: boolean;
   epi?: EpiEntity;
   riskData?: RiskFactorDataEntity;
-
+  startDate: Date;
+  endDate: Date;
   constructor(partial: Partial<EpiRiskDataEntity>) {
     Object.assign(this, partial);
   }

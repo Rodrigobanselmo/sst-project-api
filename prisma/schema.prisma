@@ -384,6 +384,20 @@ model Employee {
   @@unique([cpf, companyId])
 } 
 
+model EngsToRiskFactorData {
+  recMedId    String   @map("A") 
+  riskFactorDataId String @map("B") 
+  riskFactorData RiskFactorData  @relation(fields: [riskFactorDataId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  recMed RecMed  @relation(fields: [recMedId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  efficientlyCheck Boolean @default(false)
+  startDate DateTime?
+  endDate DateTime?
+
+  @@id([riskFactorDataId, recMedId])
+  @@map("_engs")
+} 
+
+
 model Epi {
   id    Int     @default(autoincrement()) @id
   ca String
@@ -419,6 +433,8 @@ model EpiToRiskFactorData {
   maintenanceCheck Boolean @default(false)
   unstoppedCheck Boolean @default(false)
   trainingCheck Boolean @default(false)
+  startDate DateTime?
+  endDate DateTime?
 
   @@id([riskFactorDataId, epiId])
   @@map("_EpiToRiskFactorData")
@@ -549,22 +565,11 @@ model RecMed {
   deleted_at DateTime? 
   created_at DateTime @default(now())
   recs RiskFactorData[]  @relation(name: "recs")
-  engs RiskFactorData[]  @relation(name: "engs")
   adms RiskFactorData[]  @relation(name: "adms")
   dataRecs RiskFactorDataRec[]
-  recMedToRiskFactorData RecMedToRiskFactorData[]
+  engsToRiskFactorData EngsToRiskFactorData[]
 
   @@unique([id, companyId])
-} 
-
-model RecMedToRiskFactorData {
-  recMedId    String  
-  riskFactorDataId String 
-  riskFactorData RiskFactorData  @relation(fields: [riskFactorDataId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  recMed RecMed  @relation(fields: [recMedId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  efficientlyCheck Boolean @default(false)
-
-  @@id([riskFactorDataId, recMedId])
 } 
 
 model RefreshToken {
@@ -688,13 +693,12 @@ model RiskFactorData {
   riskFactorGroupData RiskFactorGroupData @relation(fields: [riskFactorGroupDataId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   generateSources GenerateSource[]
   recs RecMed[]  @relation(name: "recs")
-  engs RecMed[]  @relation(name: "engs")
   adms RecMed[]  @relation(name: "adms")
   dataRecs RiskFactorDataRec[]
   json Json?
   level    Int?
   epiToRiskFactorData EpiToRiskFactorData[]
-  recMedToRiskFactorData RecMedToRiskFactorData[]
+  engsToRiskFactorData EngsToRiskFactorData[]
 
   @@unique([id, companyId])
   @@unique([homogeneousGroupId, riskId, riskFactorGroupDataId])

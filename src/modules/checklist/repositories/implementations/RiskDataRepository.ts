@@ -16,6 +16,8 @@ import { getMatrizRisk } from '../../../../shared/utils/matriz';
 import { EpiEntity } from '../../entities/epi.entity';
 import { EpiRiskDataEntity } from '../../entities/epiRiskData';
 import { EpiRoRiskDataDto } from '../../dto/epi-risk-data.dto';
+import { EngsRiskDataDto } from '../../dto/engs-risk-data.dto';
+import { EngsRiskDataEntity } from '../../entities/engsRiskData';
 
 @Injectable()
 export class RiskDataRepository {
@@ -93,11 +95,11 @@ export class RiskDataRepository {
       include: {
         adms: true,
         recs: true,
-        engs: true,
         generateSources: true,
         hierarchy: true,
         riskFactor: true,
         epiToRiskFactorData: { include: { epi: true } },
+        engsToRiskFactorData: { include: { recMed: true } },
         homogeneousGroup: {
           include: {
             hierarchyOnHomogeneous: { include: { hierarchy: true } }, //!
@@ -128,9 +130,9 @@ export class RiskDataRepository {
       include: {
         adms: true,
         recs: true,
-        engs: true,
         generateSources: true,
         epiToRiskFactorData: { include: { epi: true } },
+        engsToRiskFactorData: { include: { recMed: true } },
       },
     })) as RiskFactorDataEntity[];
 
@@ -199,11 +201,11 @@ export class RiskDataRepository {
         include: {
           adms: true,
           recs: true,
-          engs: true,
           generateSources: true,
           riskFactor: true,
           dataRecs: { include: { comments: true } },
           epiToRiskFactorData: { include: { epi: true } },
+          engsToRiskFactorData: { include: { recMed: true } },
           homogeneousGroup: {
             include: { characterization: true, environment: true },
           },
@@ -254,8 +256,8 @@ export class RiskDataRepository {
       include: {
         adms: true,
         recs: true,
-        engs: true,
         epiToRiskFactorData: { include: { epi: true } },
+        engsToRiskFactorData: { include: { recMed: true } },
         generateSources: true,
       },
     })) as RiskFactorDataEntity[];
@@ -277,9 +279,9 @@ export class RiskDataRepository {
       include: {
         adms: true,
         recs: true,
-        engs: true,
         generateSources: true,
         epiToRiskFactorData: { include: { epi: true } },
+        engsToRiskFactorData: { include: { recMed: true } },
       },
     })) as RiskFactorDataEntity[];
 
@@ -355,13 +357,6 @@ export class RiskDataRepository {
               })),
             }
           : undefined,
-        engs: engs
-          ? {
-              connect: engs.map((id) => ({
-                id,
-              })),
-            }
-          : undefined,
       },
       update: {
         ...createDto,
@@ -376,13 +371,6 @@ export class RiskDataRepository {
         adms: adms
           ? {
               set: adms.map((id) => ({
-                id,
-              })),
-            }
-          : undefined,
-        engs: engs
-          ? {
-              set: engs.map((id) => ({
                 id,
               })),
             }
@@ -405,9 +393,9 @@ export class RiskDataRepository {
       include: {
         adms: true,
         recs: true,
-        engs: true,
         generateSources: true,
         epiToRiskFactorData: { include: { epi: true } },
+        engsToRiskFactorData: !engs ? { include: { recMed: true } } : undefined,
       },
     })) as RiskFactorDataEntity;
 
@@ -432,6 +420,29 @@ export class RiskDataRepository {
       );
     }
 
+    if (engs) {
+      if (riskData.engsToRiskFactorData?.length) {
+        await this.prisma.engsToRiskFactorData.deleteMany({
+          where: {
+            recMedId: {
+              in: riskData.engsToRiskFactorData
+                .filter(
+                  (actualEngs) =>
+                    !!engs.find((eng) => eng.recMedId !== actualEngs.recMedId),
+                )
+                .map((actualEngs) => actualEngs.recMedId),
+            },
+          },
+        });
+      }
+
+      riskData.engsToRiskFactorData = await this.setEngs(
+        engs.map((eng) => ({
+          ...eng,
+          riskFactorDataId: riskData.id,
+        })),
+      );
+    }
     return riskData;
   }
 
@@ -470,13 +481,6 @@ export class RiskDataRepository {
               })),
             }
           : undefined,
-        engs: engs
-          ? {
-              connect: engs.map((id) => ({
-                id,
-              })),
-            }
-          : undefined,
       },
       update: {
         ...createDto,
@@ -491,13 +495,6 @@ export class RiskDataRepository {
         adms: adms
           ? {
               connect: adms.map((id) => ({
-                id,
-              })),
-            }
-          : undefined,
-        engs: engs
-          ? {
-              connect: engs.map((id) => ({
                 id,
               })),
             }
@@ -520,9 +517,9 @@ export class RiskDataRepository {
       include: {
         adms: true,
         recs: true,
-        engs: true,
         generateSources: true,
         epiToRiskFactorData: !epis ? { include: { epi: true } } : undefined,
+        engsToRiskFactorData: !engs ? { include: { recMed: true } } : undefined,
       },
     })) as RiskFactorDataEntity;
 
@@ -530,6 +527,14 @@ export class RiskDataRepository {
       riskData.epiToRiskFactorData = await this.setEpis(
         epis.map((epi) => ({
           ...epi,
+          riskFactorDataId: riskData.id,
+        })),
+      );
+
+    if (engs)
+      riskData.engsToRiskFactorData = await this.setEngs(
+        engs.map((eng) => ({
+          ...eng,
           riskFactorDataId: riskData.id,
         })),
       );
@@ -553,6 +558,24 @@ export class RiskDataRepository {
     );
 
     return data as EpiRiskDataEntity[];
+  }
+
+  private async setEngs(engs: EngsRiskDataDto[]) {
+    if (engs.length === 0) return [];
+    const data = await this.prisma.$transaction(
+      engs.map(({ riskFactorDataId, recMedId, ...rest }) =>
+        this.prisma.engsToRiskFactorData.upsert({
+          create: { riskFactorDataId, recMedId, ...rest },
+          update: { riskFactorDataId, recMedId, ...rest },
+          where: {
+            riskFactorDataId_recMedId: { riskFactorDataId, recMedId },
+          },
+          include: { recMed: true },
+        }),
+      ),
+    );
+
+    return data as EngsRiskDataEntity[];
   }
 
   private async addLevel({

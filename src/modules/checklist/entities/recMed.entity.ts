@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { RecMed, RecTypeEnum } from '.prisma/client';
 import { MeasuresTypeEnum, StatusEnum } from '@prisma/client';
-import { RecMedRiskDataEntity } from './recMedRiskData';
+import { EngsRiskDataEntity } from './engsRiskData';
 
 export class RecMedEntity implements RecMed {
   @ApiProperty({
@@ -55,7 +55,7 @@ export class RecMedEntity implements RecMed {
 
   recType: RecTypeEnum;
 
-  recMedToRiskFactorData?: RecMedRiskDataEntity;
+  engsRiskData?: EngsRiskDataEntity;
 
   constructor(partial: Partial<RecMedEntity>) {
     Object.assign(this, partial);
