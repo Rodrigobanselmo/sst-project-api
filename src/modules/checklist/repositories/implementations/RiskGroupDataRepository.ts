@@ -18,6 +18,7 @@ export class RiskGroupDataRepository {
     usersIds,
     ...createDto
   }: UpsertRiskGroupDataDto): Promise<RiskFactorGroupDataEntity> {
+    console.log(usersIds);
     const riskFactorGroupDataEntity =
       await this.prisma.riskFactorGroupData.upsert({
         create: {
@@ -32,10 +33,13 @@ export class RiskGroupDataRepository {
           companyId,
           usersSignatures: usersIds
             ? {
-                connect: usersIds.map((user) => ({
-                  userId_riskFactorGroupDataId: {
-                    userId: user,
-                    riskFactorGroupDataId: id,
+                connectOrCreate: usersIds.map((user) => ({
+                  create: { userId: user },
+                  where: {
+                    userId_riskFactorGroupDataId: {
+                      userId: user,
+                      riskFactorGroupDataId: id,
+                    },
                   },
                 })),
               }
