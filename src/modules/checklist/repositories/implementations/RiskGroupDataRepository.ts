@@ -23,9 +23,6 @@ export class RiskGroupDataRepository {
         create: {
           ...createDto,
           companyId,
-          users: usersIds
-            ? { connect: usersIds.map((user) => ({ id: user })) }
-            : undefined,
           professionals: professionalsIds
             ? { connect: professionalsIds.map((prof) => ({ id: prof })) }
             : undefined,
@@ -33,8 +30,15 @@ export class RiskGroupDataRepository {
         update: {
           ...createDto,
           companyId,
-          users: usersIds
-            ? { connect: usersIds.map((user) => ({ id: user })) }
+          usersSignatures: usersIds
+            ? {
+                connect: usersIds.map((user) => ({
+                  userId_riskFactorGroupDataId: {
+                    userId: user,
+                    riskFactorGroupDataId: id,
+                  },
+                })),
+              }
             : undefined,
           professionals: professionalsIds
             ? { connect: professionalsIds.map((prof) => ({ id: prof })) }
@@ -89,7 +93,7 @@ export class RiskGroupDataRepository {
         include: {
           company: true,
           professionals: true,
-          users: true,
+          usersSignatures: { include: { user: true } },
           data: {
             where: {
               OR: [

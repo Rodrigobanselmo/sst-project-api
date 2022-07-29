@@ -1,3 +1,4 @@
+import { UsersRiskGroupEntity } from './../../checklist/entities/usersRiskGroup';
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 
@@ -36,6 +37,7 @@ export class UserEntity implements User {
   crea: string;
   googleExternalId: string;
   facebookExternalId: string;
+  userPgrSignature?: UsersRiskGroupEntity;
 
   constructor(partial: Partial<UserEntity>) {
     Object.assign(this, partial);

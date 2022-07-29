@@ -21,7 +21,6 @@ export class UpsertCharacterizationDto {
   @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
   @IsString()
   @IsOptional()
-  @MaxLength(100)
   name?: string;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
@@ -92,7 +91,9 @@ export class AddPhotoCharacterizationDto {
 
   @Transform(StringCapitalizeTransform, { toClassOnly: true })
   @IsString()
-  @MaxLength(100)
+  @MaxLength(250, {
+    message: 'A imagem deve ter uma descrição com até 250 caracteres',
+  })
   name: string;
 }
 

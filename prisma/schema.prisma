@@ -397,7 +397,6 @@ model EngsToRiskFactorData {
   @@map("_engs")
 } 
 
-
 model Epi {
   id    Int     @default(autoincrement()) @id
   ca String
@@ -664,7 +663,7 @@ model RiskFactorGroupData {
   docs RiskFactorDocument[]
   status StatusEnum @default(PROGRESS)
   professionals Professional[]
-  users User[]
+  usersSignatures RiskFactorGroupDataToUser[]
   complementaryDocs String[]
   complementarySystems String[]
   months_period_level_5 Int @default(3)
@@ -674,6 +673,17 @@ model RiskFactorGroupData {
 
   @@unique([id, companyId])
 }
+
+model RiskFactorGroupDataToUser {
+  riskFactorGroupDataId    String   @map("A") 
+  userId Int @map("B") 
+  riskFactorData RiskFactorGroupData  @relation(fields: [riskFactorGroupDataId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  isSigner Boolean @default(false)
+
+  @@id([userId, riskFactorGroupDataId])
+  @@map("_RiskFactorGroupDataToUser")
+} 
 
 model RiskFactorData {
   id    String   @id  @default(uuid())
@@ -774,7 +784,7 @@ model User {
   deleted_at DateTime? 
   refresh_token RefreshToken[]
   companies UserCompany[]
-  riskFactorGroupData RiskFactorGroupData[]
+  usersPgrSignatures RiskFactorGroupDataToUser[]
   
   @@unique([id, name])
 }

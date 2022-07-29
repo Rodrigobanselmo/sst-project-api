@@ -18,7 +18,6 @@ import { StringUppercaseTransform } from '../../../shared/transformers/string-up
 export class CreateHierarchyDto {
   @Transform(StringCapitalizeTransform, { toClassOnly: true })
   @IsString()
-  @MaxLength(100)
   name: string;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })

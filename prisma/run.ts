@@ -23,39 +23,15 @@ async function main() {
     //   },
     //   include: { characterization: { include: { photos: true } } },
     // });
-
-    const data = await prisma.companyCharacterization.findMany();
-    await Promise.all(
-      data.map(async (characterization) => {
-        if (characterization.description) {
-          await prisma.companyCharacterization.update({
-            data: {
-              description: '',
-              paragraphs: [characterization.description],
-            },
-            where: { id: characterization.id },
-          });
-        }
-      }),
-    );
-    // Promise.all(
-    //   test
-    //     .filter((item) => !item.characterization && !item.environment)
-    //     .map(async ({ id }) => {
-    //       await prisma.hierarchyOnHomogeneous.deleteMany({
-    //         where: { homogeneousGroupId: id },
-    //       });
-
-    //       await prisma.riskFactorData.deleteMany({
-    //         where: { homogeneousGroupId: id },
-    //       });
-
-    //       await prisma.homogeneousGroup.delete({
-    //         where: { id },
-    //       });
-    //     }),
-    // );
-
+    // const data = await prisma.riskFactorGroupData.upsert({
+    //   create: {
+    //     name: 'uhui',usersSignatures
+    //   },
+    //   update: {},
+    //   where: {
+    //     id: 'iohio',
+    //   },
+    // });
     // console.log('test', test);
     // convertEpi(prisma);
   } catch (error) {

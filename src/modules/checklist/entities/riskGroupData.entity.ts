@@ -7,6 +7,7 @@ import { RiskFactorDataEntity } from './riskData.entity';
 import { ProfessionalEntity } from '../../../modules/users/entities/professional.entity';
 import { UserEntity } from '../../../modules/users/entities/user.entity';
 import { dayjs } from '../../../shared/providers/DateProvider/implementations/DayJSProvider';
+import { UsersRiskGroupEntity } from './usersRiskGroup';
 
 export class RiskFactorGroupDataEntity implements RiskFactorGroupData {
   @ApiProperty({ description: 'The id of the risk group data' })
@@ -53,6 +54,7 @@ export class RiskFactorGroupDataEntity implements RiskFactorGroupData {
   validityStart: Date;
   professionals?: ProfessionalEntity[];
   users?: UserEntity[];
+  usersSignatures?: UsersRiskGroupEntity[];
   months_period_level_5: number;
   months_period_level_4: number;
   months_period_level_3: number;
@@ -63,6 +65,21 @@ export class RiskFactorGroupDataEntity implements RiskFactorGroupData {
 
     if (partial?.data) {
       this.data = partial.data.map((d) => new RiskFactorDataEntity(d));
+    }
+
+    if (!this.users) this.users = [];
+    if (partial.usersSignatures) {
+      this.usersSignatures = partial.usersSignatures.map(
+        (epiToRiskFactorData) => new UsersRiskGroupEntity(epiToRiskFactorData),
+      );
+
+      this.users = this.usersSignatures.map(
+        ({ user, ...epiToRiskFactorData }) =>
+          new UserEntity({
+            ...user,
+            userPgrSignature: epiToRiskFactorData,
+          }),
+      );
     }
 
     if (this.validityStart && this.validityEnd) {
