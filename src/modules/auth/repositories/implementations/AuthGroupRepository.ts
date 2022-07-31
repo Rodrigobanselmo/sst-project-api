@@ -33,7 +33,12 @@ export class AuthGroupRepository {
     options: Prisma.AccessGroupsFindFirstArgs = {},
   ) {
     const accessGroup = await this.prisma.accessGroups.findFirst({
-      where: { companyId, id },
+      where: {
+        OR: [
+          { companyId, id },
+          { system: true, id },
+        ],
+      },
       ...options,
     });
 
