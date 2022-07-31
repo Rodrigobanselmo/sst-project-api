@@ -26,7 +26,7 @@ export const matrixRiskMap = {
     color: palette.matrix[2].string,
   },
   [3]: {
-    label: 'Médio',
+    label: 'Moderado',
     short: 'M',
     intervention: 'AÇÃO PARA MÉDIO PRAZO',
     table: 'Moderado\n(Aceitável)',
@@ -54,15 +54,15 @@ export const matrixRiskMap = {
     short: 'IA',
     intervention: 'INTERROMPER ATIVIDADES',
     table: 'Interromper\nAtividades',
-    color: palette.matrix[5].string,
-    level: 5,
+    color: palette.matrix[6].string,
+    level: 6,
   },
 };
 
 export const matrixRisk = [
-  [2, 3, 4, 5, 5],
-  [2, 3, 3, 4, 5],
-  [2, 2, 3, 3, 4],
-  [1, 2, 2, 3, 3],
-  [1, 1, 2, 2, 2],
+  [2, 3, 4, 5, 5, 6],
+  [2, 3, 3, 4, 5, 6],
+  [2, 2, 3, 3, 4, 6],
+  [1, 2, 2, 3, 3, 6],
+  [1, 1, 2, 2, 2, 6],
 ];

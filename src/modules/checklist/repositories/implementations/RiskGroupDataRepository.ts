@@ -7,6 +7,8 @@ import { PrismaService } from '../../../../prisma/prisma.service';
 import { UpsertRiskGroupDataDto } from '../../dto/risk-group-data.dto';
 import { RiskFactorGroupDataEntity } from '../../entities/riskGroupData.entity';
 import { RiskFactorDataEntity } from '../../entities/riskData.entity';
+import { m2mGetDeletedIds } from 'src/shared/utils/m2mFilterIds';
+import { UsersRiskGroupEntity } from '../../entities/usersRiskGroup';
 
 @Injectable()
 export class RiskGroupDataRepository {
@@ -15,10 +17,9 @@ export class RiskGroupDataRepository {
     companyId,
     id,
     professionalsIds,
-    usersIds,
+    users,
     ...createDto
   }: UpsertRiskGroupDataDto): Promise<RiskFactorGroupDataEntity> {
-    console.log(usersIds);
     const riskFactorGroupDataEntity =
       await this.prisma.riskFactorGroupData.upsert({
         create: {
@@ -31,25 +32,39 @@ export class RiskGroupDataRepository {
         update: {
           ...createDto,
           companyId,
-          usersSignatures: usersIds
-            ? {
-                connectOrCreate: usersIds.map((user) => ({
-                  create: { userId: user },
-                  where: {
-                    userId_riskFactorGroupDataId: {
-                      userId: user,
-                      riskFactorGroupDataId: id,
-                    },
-                  },
-                })),
-              }
-            : undefined,
           professionals: professionalsIds
             ? { connect: professionalsIds.map((prof) => ({ id: prof })) }
             : undefined,
         },
         where: { id_companyId: { companyId, id: id || 'not-found' } },
+        include: {
+          usersSignatures: !!users,
+        },
       });
+
+    if (users) {
+      if (riskFactorGroupDataEntity.usersSignatures?.length) {
+        await this.prisma.riskFactorGroupDataToUser.deleteMany({
+          where: {
+            userId: {
+              in: m2mGetDeletedIds(
+                riskFactorGroupDataEntity.usersSignatures,
+                users,
+                'userId',
+              ),
+            },
+            riskFactorGroupDataId: riskFactorGroupDataEntity.id,
+          },
+        });
+      }
+
+      riskFactorGroupDataEntity.usersSignatures = await this.setUsersSignatures(
+        users.map((user) => ({
+          ...user,
+          riskFactorGroupDataId: riskFactorGroupDataEntity.id,
+        })),
+      );
+    }
 
     return new RiskFactorGroupDataEntity(riskFactorGroupDataEntity);
   }
@@ -177,5 +192,23 @@ export class RiskGroupDataRepository {
     // );
 
     return new RiskFactorGroupDataEntity(riskFactorGroupDataEntity);
+  }
+
+  private async setUsersSignatures(usersSignatures: UsersRiskGroupEntity[]) {
+    if (usersSignatures.length === 0) return [];
+    const data = await this.prisma.$transaction(
+      usersSignatures.map(({ user, userId, riskFactorGroupDataId, ...rest }) =>
+        this.prisma.riskFactorGroupDataToUser.upsert({
+          create: { riskFactorGroupDataId, userId, ...rest },
+          update: { riskFactorGroupDataId, userId, ...rest },
+          where: {
+            userId_riskFactorGroupDataId: { riskFactorGroupDataId, userId },
+          },
+          include: { user: true },
+        }),
+      ),
+    );
+
+    return data as UsersRiskGroupEntity[];
   }
 }

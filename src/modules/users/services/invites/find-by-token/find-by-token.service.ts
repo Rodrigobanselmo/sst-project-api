@@ -7,7 +7,7 @@ export class FindByTokenService {
   async execute(token: string) {
     const invite = await this.inviteUsersRepository.findById(token);
 
-    if (!invite) throw new BadRequestException('Invite token not found');
+    if (!invite?.id) throw new BadRequestException('Invite token not found');
 
     return invite;
   }

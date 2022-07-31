@@ -16,6 +16,7 @@ export enum ErrorCompanyEnum {
   HOMOGENEOUS_SAME_NAME = 'Já existe um grupo homogêneo com o mesmo nome',
   WORKSPACE_NOT_FOUND = 'O Estabelecimento (área de trabalho) informada não foi encontrada, verifique a sigla utilizada',
   CPF_CONFLICT = 'CPF já cadastrado',
+  EMPLOYEE_NOT_FOUND = 'Empregado não encontrado',
 }
 
 export enum ErrorInvitesEnum {
@@ -23,9 +24,12 @@ export enum ErrorInvitesEnum {
   TOKEN_EXPIRES = 'O Convite expirou',
   TOKEN_NOT_VALID_EMAIL = 'O Convite não é válido para esse email',
   FORBIDDEN_INSUFFICIENT_PERMISSIONS = 'Você não tem permissão para criar/editar um usuário com essas credênciais',
+  USER_NOT_FOUND = 'Usuário não encontrado',
   USER_ALREADY_EXIST = 'Usuário já cadastrado',
   GOOGLE_USER_NOT_EXIST = 'Nenhum usuário econtrado que esteja vinculado a esta conta Google',
   AUTH_GROUP_NOT_FOUND = 'Grupo de permissões não enontrado',
+  EMAIL_NOT_FOUND = 'Usuário com o :v1 não encontrado',
+  TOKEN_NOT_FOUND = 'Convite não encontrado',
 }
 
 export enum ErrorChecklistEnum {

@@ -52,7 +52,7 @@ export class CopyCompanyService {
 
     const company = await this.companyRepository.findById(companyCopyFromId, {
       include: {
-        riskFactorGroupData: true,
+        riskFactorGroupData: { include: { usersSignatures: true } },
       },
     });
 
@@ -60,7 +60,7 @@ export class CopyCompanyService {
       (doc) => riskGroupFromId === doc.id,
     );
 
-    if (!fromRiskDataGroup)
+    if (!fromRiskDataGroup?.id)
       throw new BadRequestException('Documeto não encontrado');
 
     const homoGroups = await this.homoGroupRepository.findHomoGroupByCompany(
@@ -109,9 +109,14 @@ export class CopyCompanyService {
         fromRiskDataGroup.professionals.length
           ? fromRiskDataGroup.professionals.map((p) => p.id)
           : undefined,
-      usersIds:
-        fromRiskDataGroup.users && fromRiskDataGroup.users.length
-          ? fromRiskDataGroup.users.map((p) => p.id)
+      users:
+        fromRiskDataGroup.usersSignatures &&
+        fromRiskDataGroup.usersSignatures.length
+          ? fromRiskDataGroup.usersSignatures.map((s) => ({
+              isSigner: s.isSigner,
+              userId: s.userId,
+              riskFactorGroupDataId: s.riskFactorGroupDataId,
+            }))
           : undefined,
       revisionBy: fromRiskDataGroup.revisionBy,
       source: fromRiskDataGroup.source,
@@ -137,9 +142,9 @@ export class CopyCompanyService {
       await Promise.all(
         homoGroupsCreation.map(async (group) => {
           if (!profileParentId && group?.characterization?.profileParentId)
-            return console.log('skip profile');
+            return; //log('skip profile');
           if (profileParentId && !group?.characterization?.profileParentId)
-            return console.log('skip not profile');
+            return; //log('skip not profile');
 
           if (
             group.characterization &&

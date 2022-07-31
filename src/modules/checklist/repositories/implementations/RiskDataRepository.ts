@@ -1,3 +1,4 @@
+import { m2mGetDeletedIds } from 'src/shared/utils/m2mFilterIds';
 import { isEnvironment } from './../../../company/repositories/implementations/CharacterizationRepository';
 import { PaginationQueryDto } from './../../../../shared/dto/pagination.dto';
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -401,15 +402,14 @@ export class RiskDataRepository {
 
     if (epis) {
       if (riskData.epiToRiskFactorData?.length) {
+        console.log(
+          m2mGetDeletedIds(riskData.epiToRiskFactorData, epis, 'epiId'),
+        );
         await this.prisma.epiToRiskFactorData.deleteMany({
           where: {
+            riskFactorDataId: riskData.id,
             epiId: {
-              in: riskData.epiToRiskFactorData
-                .filter(
-                  (actualEpis) =>
-                    !!epis.find((epi) => epi.epiId !== actualEpis.epiId),
-                )
-                .map((actualEpis) => actualEpis.epiId),
+              in: m2mGetDeletedIds(riskData.epiToRiskFactorData, epis, 'epiId'),
             },
           },
         });
@@ -424,13 +424,13 @@ export class RiskDataRepository {
       if (riskData.engsToRiskFactorData?.length) {
         await this.prisma.engsToRiskFactorData.deleteMany({
           where: {
+            riskFactorDataId: riskData.id,
             recMedId: {
-              in: riskData.engsToRiskFactorData
-                .filter(
-                  (actualEngs) =>
-                    !!engs.find((eng) => eng.recMedId !== actualEngs.recMedId),
-                )
-                .map((actualEngs) => actualEngs.recMedId),
+              in: m2mGetDeletedIds(
+                riskData.engsToRiskFactorData,
+                engs,
+                'recMedId',
+              ),
             },
           },
         });
@@ -443,6 +443,7 @@ export class RiskDataRepository {
         })),
       );
     }
+
     return riskData;
   }
 
@@ -597,7 +598,6 @@ export class RiskDataRepository {
         const matriz = getMatrizRisk(risk.severity, probability);
 
         level = matriz.level;
-        risk.severity;
       }
     }
 

@@ -19,6 +19,7 @@ import { complementarySystemsIterable } from '../../../components/iterables/comp
 import { emergencyIterable } from '../../../components/iterables/emergency/emergency.iterable';
 import { professionalsIterable } from '../../../components/iterables/professionals/professionals.iterable';
 import { recommendationsIterable } from '../../../components/iterables/recommendations/recommendations.iterable';
+import { signaturesIterable } from '../../../components/iterables/signatures/signatures.iterable';
 import { actionPlanTableSection } from '../../../components/tables/actionPlan/actionPlan.section';
 import { hierarchyHomoOrgSection } from '../../../components/tables/hierarchyHomoOrg/hierarchyHomoOrg.section';
 import { hierarchyPrioritizationPage } from '../../../components/tables/hierarchyPrioritization/hierarchyPrioritization.page';
@@ -169,6 +170,10 @@ export class ElementsMapClass {
           HomoTypeEnum.WORKSTATION,
         ],
       })['children'],
+    [PGRSectionChildrenTypeEnum.PROFESSIONALS_SIGNATURES]: () =>
+      signaturesIterable(this.professionals, (x, v) =>
+        this.convertToDocx(x, v),
+      ),
     [PGRSectionChildrenTypeEnum.TABLE_PRIORITIZATION]: () =>
       hierarchyPrioritizationPage(
         this.document,

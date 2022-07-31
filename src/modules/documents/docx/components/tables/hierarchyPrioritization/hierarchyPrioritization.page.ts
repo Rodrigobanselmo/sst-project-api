@@ -1,6 +1,6 @@
 import { HierarchyEnum } from '@prisma/client';
 import { Paragraph, Table, WidthType } from 'docx';
-import { palette } from 'src/shared/constants/palette';
+import { palette } from '../../../../../../shared/constants/palette';
 
 import { borderStyleGlobal } from '../../../base/config/styles';
 import {

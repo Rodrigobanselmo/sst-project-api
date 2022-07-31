@@ -1,3 +1,4 @@
+import { ProfessionalRiskGroupEntity } from './../../checklist/entities/usersRiskGroup';
 import { Professional } from '@prisma/client';
 
 export class ProfessionalEntity implements Professional {
@@ -11,6 +12,7 @@ export class ProfessionalEntity implements Professional {
   certifications: string[];
   crea: string;
   cpf: string;
+  userPgrSignature?: ProfessionalRiskGroupEntity;
 
   constructor(partial: Partial<ProfessionalEntity>) {
     Object.assign(this, partial);

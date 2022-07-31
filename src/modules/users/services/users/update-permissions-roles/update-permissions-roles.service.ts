@@ -44,7 +44,7 @@ export class UpdatePermissionsRolesService {
         userPayloadDto.companyId,
       );
 
-      if (!authGroup)
+      if (!authGroup?.id)
         throw new BadRequestException(ErrorInvitesEnum.AUTH_GROUP_NOT_FOUND);
 
       addPermissions.push(...authGroup.permissions);

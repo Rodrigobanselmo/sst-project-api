@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { StatusEnum } from '@prisma/client';
 import { ISectionOptions, Packer } from 'docx';
 import fs from 'fs';
-import { removeDuplicate } from 'src/shared/utils/removeDuplicate';
+import { removeDuplicate } from '../../../../../shared/utils/removeDuplicate';
 import { v4 } from 'uuid';
 
 import { CompanyRepository } from '../../../../../modules/company/repositories/implementations/CompanyRepository';
@@ -65,6 +65,7 @@ export class PgrUploadService {
       workspaceId,
       {
         include: {
+          primary_activity: true,
           address: true,
           environments: {
             include: {
@@ -87,7 +88,7 @@ export class PgrUploadService {
           },
           professionals: true,
           receivingServiceContracts: {
-            include: { applyingServiceCompany: true },
+            include: { applyingServiceCompany: { include: { address: true } } },
           },
         },
       },
@@ -95,6 +96,7 @@ export class PgrUploadService {
 
     const getConsultantLogo = () => {
       if (company.receivingServiceContracts?.length == 1) {
+        //! make it work for many contract companies
         return company.receivingServiceContracts[0]?.applyingServiceCompany
           ?.logoUrl;
       }

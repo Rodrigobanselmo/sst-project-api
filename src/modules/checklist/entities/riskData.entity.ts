@@ -168,6 +168,7 @@ export class RiskFactorDataEntity implements RiskFactorData {
       this.intervention = matrix.intervention;
     }
   }
+
   private getOrigin() {
     if (this.homogeneousGroup) {
       // eslint-disable-next-line prettier/prettier
@@ -222,8 +223,8 @@ export class RiskFactorDataEntity implements RiskFactorData {
   }
 
   private noiseProb(data: IRiskDataJsonNoise) {
-    const limitQ3List = [75, 79, 82, 85, 115];
-    const limitQ5List = [64.4, 75, 80, 85, 115];
+    const limitQ3List = [75, 79, 82, 85, 115, 10000000];
+    const limitQ5List = [64.4, 75, 80, 85, 115, 10000000];
 
     const ltcatq3 = this.valuesCheck(data.ltcatq3, limitQ3List);
     const ltcatq5 = this.valuesCheck(data.ltcatq5, limitQ5List);
@@ -236,8 +237,8 @@ export class RiskFactorDataEntity implements RiskFactorData {
   }
 
   private vibProb(data: IRiskDataJsonVibration) {
-    const limitArenList = [0.1, 0.5, 0.9, 1.101, 10000000000];
-    const limitVcvrList = [2.1, 9.1, 16.4, 21.01, 10000000000];
+    const limitArenList = [0, 0.1, 0.5, 0.9, 1.101, 10000000000];
+    const limitVcvrList = [0, 2.1, 9.1, 16.4, 21.01, 10000000000];
 
     const arenValue = this.valuesCheck(data?.aren, limitArenList);
     const vdvrValeu = data?.vdvr
@@ -253,7 +254,7 @@ export class RiskFactorDataEntity implements RiskFactorData {
   }
 
   private vibLProb(data: IRiskDataJsonVibration) {
-    const limitArenList = [0.5, 2.5, 3.5, 5.01, 10000000000];
+    const limitArenList = [0, 0.5, 2.5, 3.5, 5.01, 10000000000];
 
     const arenValue = this.valuesCheck(data?.aren, limitArenList);
 

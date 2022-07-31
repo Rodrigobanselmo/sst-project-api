@@ -1,13 +1,15 @@
-import { originRiskMap } from './../../../../../../shared/constants/maps/origin-risk';
+import { HomoTypeEnum } from '@prisma/client';
+import clone from 'clone';
+
+import { palette } from '../../../../../../shared/constants/palette';
+import { dayjs } from '../../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
+import { getMatrizRisk } from '../../../../../../shared/utils/matriz';
 import { RiskFactorGroupDataEntity } from '../../../../../checklist/entities/riskGroupData.entity';
+import { borderStyleGlobal } from '../../../base/config/styles';
+import { IHierarchyMap } from '../../../converter/hierarchy.converter';
+import { originRiskMap } from './../../../../../../shared/constants/maps/origin-risk';
 import { ActionPlanColumnEnum } from './actionPlan.constant';
 import { bodyTableProps } from './elements/body';
-import { getMatrizRisk } from '../../../../../../shared/utils/matriz';
-import { HomoTypeEnum } from '@prisma/client';
-import { IHierarchyMap } from '../../../converter/hierarchy.converter';
-import { dayjs } from '../../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
-import { borderStyleGlobal } from '../../../base/config/styles';
-import { palette } from '../../../../../../shared/constants/palette';
 
 export const actionPlanConverter = (
   riskGroup: RiskFactorGroupDataEntity,
@@ -17,8 +19,6 @@ export const actionPlanConverter = (
   const actionPlanData: bodyTableProps[][] = [];
 
   riskGroup.data.forEach((riskData) => {
-    const cells: bodyTableProps[] = [];
-
     let origin: string;
     // eslint-disable-next-line prettier/prettier
     if (riskData.homogeneousGroup.environment) origin = `${riskData.homogeneousGroup.environment.name}\n(${originRiskMap[riskData.homogeneousGroup.environment.type].name})`
@@ -36,6 +36,8 @@ export const actionPlanConverter = (
 
     const dataRecs = riskData.dataRecs;
     riskData.recs.forEach((rec) => {
+      const cells: bodyTableProps[] = [];
+
       const dataRecFound = dataRecs?.find(
         (dataRec) => dataRec.recMedId == rec.id,
       );
@@ -56,7 +58,11 @@ export const actionPlanConverter = (
       };
 
       const due = getDue();
-      const dueText = due ? due.format('D [de] MMMM YYYY') : 'sem prazo';
+      const dueText = due
+        ? due.format('D [de] MMMM YYYY')
+        : level === 6
+        ? 'ação imediata'
+        : 'sem prazo';
 
       cells[ActionPlanColumnEnum.ITEM] = {
         text: '',

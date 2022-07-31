@@ -7,11 +7,11 @@ import {
   IsInt,
   IsOptional,
   IsString,
+  ValidateNested,
 } from 'class-validator';
-import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
-import { DateFormat } from '../../../shared/transformers/date-format';
-import { StringCapitalizeTransform } from '../../../shared/transformers/string-capitalize';
 
+import { StringCapitalizeTransform } from '../../../shared/transformers/string-capitalize';
+import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
 
@@ -75,10 +75,6 @@ export class UpsertRiskGroupDataDto {
   professionalsIds?: string[];
 
   @IsOptional()
-  @IsInt({ each: true })
-  usersIds?: number[];
-
-  @IsOptional()
   @IsString({ each: true })
   complementarySystems?: string[];
 
@@ -86,21 +82,38 @@ export class UpsertRiskGroupDataDto {
   @IsString({ each: true })
   complementaryDocs: string[];
 
-  @Transform(DateFormat, { toClassOnly: true })
+  // @Transform(DateFormat, { toClassOnly: true })
   @IsOptional()
   @IsDate()
   @Type(() => Date)
   visitDate: Date;
 
-  @Transform(DateFormat, { toClassOnly: true })
+  // @Transform(DateFormat, { toClassOnly: true })
   @IsOptional()
   @IsDate()
   @Type(() => Date)
   validityEnd?: Date;
 
-  @Transform(DateFormat, { toClassOnly: true })
+  // @Transform(DateFormat, { toClassOnly: true })
   @IsOptional()
   @IsDate()
   @Type(() => Date)
   validityStart?: Date;
+
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @Type(() => UsersToRiskDataGroupDto)
+  users?: UsersToRiskDataGroupDto[];
+}
+export class UsersToRiskDataGroupDto {
+  @IsOptional()
+  @IsString()
+  riskFactorGroupDataId: string;
+
+  @IsInt()
+  userId: number;
+
+  @IsBoolean()
+  @IsOptional()
+  isSigner: boolean;
 }

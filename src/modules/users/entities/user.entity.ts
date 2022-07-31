@@ -38,6 +38,7 @@ export class UserEntity implements User {
   googleExternalId: string;
   facebookExternalId: string;
   userPgrSignature?: UsersRiskGroupEntity;
+  usersPgrSignatures?: UsersRiskGroupEntity[];
 
   constructor(partial: Partial<UserEntity>) {
     Object.assign(this, partial);

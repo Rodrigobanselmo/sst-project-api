@@ -15,7 +15,7 @@ export class UpdateHomoGroupService {
         userPayloadDto.targetCompanyId,
       );
 
-    if (!foundHomoGroup)
+    if (!foundHomoGroup?.id)
       throw new BadRequestException(ErrorCompanyEnum.GHO_NOT_FOUND);
 
     const hierarchies = await this.homoGroupRepository.update(homoGroup);

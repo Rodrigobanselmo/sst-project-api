@@ -69,7 +69,7 @@ export class SessionService {
   async validateUser(email: string, password: string) {
     const user = await this.usersRepository.findByEmail(email);
 
-    if (!user) {
+    if (!user?.id) {
       throw new BadRequestException('Email or password incorrect');
     }
 

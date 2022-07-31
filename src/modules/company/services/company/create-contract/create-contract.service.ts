@@ -19,7 +19,7 @@ export class CreateContractService {
       user.companyId,
     );
 
-    if (!license) throw new BadRequestException('license not found');
+    if (!license?.id) throw new BadRequestException('license not found');
 
     const company = await this.companyRepository.create({
       ...createContractDto,

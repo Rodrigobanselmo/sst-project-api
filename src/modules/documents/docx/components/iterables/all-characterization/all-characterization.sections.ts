@@ -344,17 +344,7 @@ export const allCharacterizationSections = (
               sectionProfiles[id] = otherSections;
               return;
             }
-            // console.log(2, profiles);
-            // console.log(3, profileParentId);
-            // console.log(
-            //   4,
-            //   profiles.map((profile) => sectionProfiles[profile.id]),
-            //   sectionProfiles,
-            // );
-            // console.log(
-            //   5,
-            //   profiles.map((profile) => profile.id),
-            // );
+
             const section = [
               ...convertToDocx([...title], variables),
               ...elements,

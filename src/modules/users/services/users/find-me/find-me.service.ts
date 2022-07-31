@@ -1,3 +1,4 @@
+import { ErrorInvitesEnum } from './../../../../../shared/constants/enum/errorMessage';
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { UsersRepository } from '../../../repositories/implementations/UsersRepository';
 
@@ -6,7 +7,8 @@ export class FindMeService {
   constructor(private readonly userRepository: UsersRepository) {}
   async execute(id: number, companyId?: string) {
     const user = await this.userRepository.findById(id);
-    if (!user) throw new BadRequestException(`user with id ${id} not found`);
+    if (!user?.id)
+      throw new BadRequestException(ErrorInvitesEnum.USER_NOT_FOUND);
 
     const companies = user.companies
       .map(({ companyId, permissions, roles, status }) => {

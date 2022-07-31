@@ -23,7 +23,8 @@ export const palette = {
   },
   text: {
     // simple: hexToColors('#fca557'),
-    simple: hexToColors('#0AB14B'),
+    // simple: hexToColors('#0AB14B'),
+    simple: hexToColors('#014DA2'),
     main: hexToColors('#000000'),
     attention: hexToColors('#ff0000'),
   },
@@ -34,5 +35,6 @@ export const palette = {
     3: hexToColors('#d9d10b'),
     4: hexToColors('#d96c2f'),
     5: hexToColors('#F44336'),
+    6: hexToColors('#000000'),
   },
 };

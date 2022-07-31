@@ -11,7 +11,7 @@ import {
 } from 'class-validator';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
-import { EpiRoRiskDataDto as EpiToRiskDataDto } from './epi-risk-data.dto';
+import { EpiRoRiskDataDto } from './epi-risk-data.dto';
 import { EngsRiskDataDto } from './engs-risk-data.dto';
 
 export class UpsertRiskDataDto {
@@ -74,8 +74,8 @@ export class UpsertRiskDataDto {
 
   @ValidateNested({ each: true })
   @IsOptional()
-  @Type(() => EpiToRiskDataDto)
-  epis?: EpiToRiskDataDto[];
+  @Type(() => EpiRoRiskDataDto)
+  epis?: EpiRoRiskDataDto[];
 
   @ValidateNested({ each: true })
   @IsOptional()
@@ -157,8 +157,8 @@ export class UpsertManyRiskDataDto {
 
   @ValidateNested({ each: true })
   @IsOptional()
-  @Type(() => EpiToRiskDataDto)
-  epis?: EpiToRiskDataDto[];
+  @Type(() => EpiRoRiskDataDto)
+  epis?: EpiRoRiskDataDto[];
 
   @ValidateNested({ each: true })
   @IsOptional()

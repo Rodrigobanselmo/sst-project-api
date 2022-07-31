@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { ErrorCompanyEnum } from 'src/shared/constants/enum/errorMessage';
 import { EmployeeRepository } from '../../../../../modules/company/repositories/implementations/EmployeeRepository';
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 
@@ -12,8 +13,8 @@ export class FindEmployeeService {
       user.targetCompanyId,
     );
 
-    if (!employee)
-      throw new BadRequestException(`employee with id ${id} not found`);
+    if (!employee?.id)
+      throw new BadRequestException(ErrorCompanyEnum.EMPLOYEE_NOT_FOUND);
 
     return employee;
   }

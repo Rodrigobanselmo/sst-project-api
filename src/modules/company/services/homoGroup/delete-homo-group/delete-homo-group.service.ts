@@ -14,7 +14,7 @@ export class DeleteHomoGroupService {
         userPayloadDto.targetCompanyId,
       );
 
-    if (!foundHomoGroup)
+    if (!foundHomoGroup?.id)
       throw new BadRequestException(ErrorCompanyEnum.GHO_NOT_FOUND);
 
     const homoGroups = await this.homoGroupRepository.deleteById(id);

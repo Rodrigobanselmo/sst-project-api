@@ -36,10 +36,15 @@ interface IHierarchyDataType {
 
 interface IRiskDataMap {
   name: string;
-  isQuantity: boolean;
-  riskDegree: string;
-  homogeneousGroupIds: string[];
-  riskDegreeLevel?: number;
+  // isQuantity: boolean;
+  // riskDegree: string;
+  // riskDegreeLevel?: number;
+  homogeneousGroupIds: {
+    id: string;
+    isQuantity: boolean;
+    riskDegree: string;
+    riskDegreeLevel?: number;
+  }[];
 }
 
 export const hierarchyPrioritizationConverter = (
@@ -130,31 +135,24 @@ export const hierarchyPrioritizationConverter = (
 
   (function getAllRiskFactors() {
     riskGroup.data.forEach((riskData) => {
-      riskData.homogeneousGroupId;
-
       const hasRisk = allRiskRecord[riskData.riskId] || {
         homogeneousGroupIds: [],
-        riskDegree: '',
-        riskDegreeLevel: 0,
       };
+      const dataRisk = {} as IRiskDataMap['homogeneousGroupIds'][0];
 
       const severity = riskData.riskFactor.severity;
       const probability = riskData.probability;
 
-      if (!hasRisk.riskDegree) {
-        const riskDegree = getMatrizRisk(severity, probability);
-        hasRisk.riskDegree = riskDegree.short;
-        hasRisk.riskDegreeLevel = riskDegree.level;
-      }
+      const riskDegree = getMatrizRisk(severity, probability);
+      dataRisk.riskDegree = riskDegree.short;
+      dataRisk.riskDegreeLevel = riskDegree.level;
+      dataRisk.isQuantity = riskData.isQuantity;
+      dataRisk.id = riskData.homogeneousGroupId;
 
       allRiskRecord[riskData.riskId] = {
         ...hasRisk,
-        isQuantity: riskData.isQuantity,
         name: riskData.riskFactor.name,
-        homogeneousGroupIds: [
-          ...hasRisk.homogeneousGroupIds,
-          riskData.homogeneousGroupId,
-        ],
+        homogeneousGroupIds: [...hasRisk.homogeneousGroupIds, dataRisk],
       };
     });
   })();
@@ -181,15 +179,20 @@ export const hierarchyPrioritizationConverter = (
     const row = header
       .sort((a, b) => sortString(a, b, 'name'))
       .map<headerTableProps>((risk, index) => {
-        risk.homogeneousGroupIds.forEach((homogeneousGroupId) => {
+        risk.homogeneousGroupIds.forEach((homogeneousGroup) => {
+          const homogeneousGroupId = homogeneousGroup.id;
+
           const homoPosition = HomoPositionMap.get(homogeneousGroupId) || {
             data: [],
           };
 
-          const isQuantity = 'isQuantity' in risk && !!risk.isQuantity;
-          const isDataRisk = 'riskDegree' in risk && risk.riskDegree;
+          const isQuantity =
+            'isQuantity' in homogeneousGroup && !!homogeneousGroup.isQuantity;
+          const isDataRisk =
+            'riskDegree' in homogeneousGroup && homogeneousGroup.riskDegree;
           const isDataRiskLevel =
-            'riskDegreeLevel' in risk && risk.riskDegreeLevel;
+            'riskDegreeLevel' in homogeneousGroup &&
+            homogeneousGroup.riskDegreeLevel;
 
           HomoPositionMap.set(homogeneousGroupId, {
             data: [
@@ -247,12 +250,26 @@ export const hierarchyPrioritizationConverter = (
           borders: borderStyleGlobal(palette.common.white.string),
         };
 
-        const isDataRisk = 'riskDegree' in hierarchy && hierarchy.riskDegree;
-        const isDataRiskLevel =
-          'riskDegree' in hierarchy && hierarchy.riskDegreeLevel;
-        const isDataRiskQuantity =
-          'isQuantity' in hierarchy && !!hierarchy.isQuantity;
-        hierarchy.homogeneousGroupIds.forEach((homogeneousGroupId) => {
+        hierarchy.homogeneousGroupIds.forEach((homogeneousGroup) => {
+          const isString = typeof homogeneousGroup === 'string';
+
+          const homogeneousGroupId = isString
+            ? homogeneousGroup
+            : homogeneousGroup.id;
+
+          const isDataRisk =
+            !isString &&
+            'riskDegree' in homogeneousGroup &&
+            homogeneousGroup.riskDegree;
+          const isDataRiskLevel =
+            !isString &&
+            'riskDegree' in homogeneousGroup &&
+            homogeneousGroup.riskDegreeLevel;
+          const isDataRiskQuantity =
+            !isString &&
+            'isQuantity' in homogeneousGroup &&
+            !!homogeneousGroup.isQuantity;
+
           const homoPosition = HomoPositionMap.get(homogeneousGroupId);
           if (homoPosition) {
             homoPosition.data.forEach(

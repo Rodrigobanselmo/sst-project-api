@@ -29,7 +29,8 @@ export class PgrDownloadAttachmentsService {
     const attachment = riskDoc.attachments.find(
       (attachment) => attachment.id === attachmentId,
     );
-    if (!attachment) throw new BadRequestException(ErrorDocumentEnum.NOT_FOUND);
+    if (!attachment?.id)
+      throw new BadRequestException(ErrorDocumentEnum.NOT_FOUND);
 
     const fileKey = attachment.url.split('.com/').pop();
 

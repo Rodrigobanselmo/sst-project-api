@@ -19,7 +19,7 @@ export class VerifyGoogleLoginService {
         result.user.uid,
       );
 
-      if (!user) {
+      if (!user?.id) {
         throw new BadRequestException(ErrorInvitesEnum.GOOGLE_USER_NOT_EXIST);
       }
 

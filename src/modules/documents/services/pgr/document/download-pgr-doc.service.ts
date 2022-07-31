@@ -19,7 +19,8 @@ export class PgrDownloadService {
       companyId,
     );
 
-    if (!riskDoc) throw new BadRequestException(ErrorDocumentEnum.NOT_FOUND);
+    if (!riskDoc?.id)
+      throw new BadRequestException(ErrorDocumentEnum.NOT_FOUND);
 
     const fileKey = riskDoc.fileUrl.split('.com/').pop();
 

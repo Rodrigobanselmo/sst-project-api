@@ -14,7 +14,7 @@ export class DeleteHierarchyService {
         user.targetCompanyId,
       );
 
-    if (!hierarchy)
+    if (!hierarchy?.id)
       throw new BadRequestException(
         ErrorMessageEnum.NOT_FOUND_ON_COMPANY_TO_DELETE,
       );

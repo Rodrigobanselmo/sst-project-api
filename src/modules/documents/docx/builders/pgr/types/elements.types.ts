@@ -51,6 +51,7 @@ export enum PGRSectionChildrenTypeEnum {
   RS_IMAGE = 'RS_IMAGE',
   PARAGRAPH_FIGURE = 'PARAGRAPH_FIGURE',
   PROFESSIONAL = 'PROFESSIONAL',
+  PROFESSIONALS_SIGNATURES = 'PROFESSIONALS_SIGNATURES',
   COMPLEMENTARY_DOCS = 'COMPLEMENTARY_DOCS',
   COMPLEMENTARY_SYSTEMS = 'COMPLEMENTARY_SYSTEMS',
   HEALTH_EFFECT_TABLES = 'HEALTH_EFFECT_TABLES',
@@ -179,6 +180,10 @@ export type ICharacterizationWork = {
 
 export type IProfessional = {
   type: PGRSectionChildrenTypeEnum.PROFESSIONAL;
+} & IBase;
+
+export type IProfessionalSignature = {
+  type: PGRSectionChildrenTypeEnum.PROFESSIONALS_SIGNATURES;
 } & IBase;
 
 export type IComplementaryDocs = {
@@ -374,4 +379,5 @@ export type ISectionChildrenType =
   | IIterableErg
   | IIterableArc
   | IAttachments
+  | IProfessionalSignature
   | IProfessional;
