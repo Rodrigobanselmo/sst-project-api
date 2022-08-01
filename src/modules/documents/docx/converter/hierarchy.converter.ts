@@ -49,7 +49,10 @@ const setMapHierarchies = (hierarchyData: HierarchyEntity[]) => {
       if (!hierarchyTree[hierarchy.parentId].employees)
         hierarchyTree[hierarchy.parentId].employees = [];
 
-      hierarchyTree[hierarchy.parentId].employees.push(...hierarchy.employees);
+      if (hierarchy.type !== 'SUB_OFFICE')
+        hierarchyTree[hierarchy.parentId].employees.push(
+          ...hierarchy.employees,
+        );
     }
   });
 

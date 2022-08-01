@@ -463,6 +463,10 @@ export class HierarchyRepository {
             },
           },
         },
+        subOfficeEmployees: {
+          where: { workspaces: { some: { id: workspaceId } } },
+          include: { subOffices: true },
+        },
         employees: { where: { workspaces: { some: { id: workspaceId } } } },
         workspaces: true,
       },

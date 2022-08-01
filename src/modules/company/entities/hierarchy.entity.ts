@@ -56,6 +56,7 @@ export class HierarchyEntity implements Hierarchy {
   @ApiProperty({ description: 'The workspace of the Hierarchy' })
   employees?: EmployeeEntity[];
 
+  subOfficeEmployees?: EmployeeEntity[];
   workspaceIds?: string[];
   parent?: Hierarchy;
   children?: Hierarchy[];

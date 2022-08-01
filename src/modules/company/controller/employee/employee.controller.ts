@@ -3,15 +3,15 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Query,
-  Patch,
 } from '@nestjs/common';
+
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import {
   CreateEmployeeDto,
-  DeleteSubOfficeEmployeeDto,
   FindEmployeeDto,
   UpdateEmployeeDto,
 } from '../../dto/employee.dto';

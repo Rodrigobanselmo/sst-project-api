@@ -34,6 +34,7 @@ import {
   IHierarchyMap,
   IHomoGroupMap,
 } from './../../../docx/converter/hierarchy.converter';
+import { EmployeeEntity } from 'src/modules/company/entities/employee.entity';
 
 @Injectable()
 export class PgrUploadService {
@@ -55,7 +56,20 @@ export class PgrUploadService {
     // eslint-disable-next-line prettier/prettier
     const riskGroupData = await this.riskGroupDataRepository.findAllDataById(upsertPgrDto.riskGroupId, workspaceId, companyId);
     // eslint-disable-next-line prettier/prettier
-    const hierarchyHierarchy =  await this.hierarchyRepository.findAllDataHierarchyByCompany(companyId, workspaceId);
+    const hierarchyHierarchy = (await this.hierarchyRepository.findAllDataHierarchyByCompany(companyId, workspaceId)).map(hierarchy=>({
+      ...hierarchy,
+      employees: [
+        ...hierarchy.employees,
+        ...hierarchy.subOfficeEmployees
+          ?.map((employee) => {
+            return employee?.subOffices?.map((subOffice) => ({
+              hierarchyId: subOffice.id,
+              ...employee,
+            }));
+          })
+          .reduce((acc, curr) => [...acc, ...curr], []),
+      ],
+    }));
     // eslint-disable-next-line prettier/prettier
     const versions = (await this.riskDocumentRepository.findByRiskGroupAndCompany(upsertPgrDto.riskGroupId, companyId)).filter(riskDocument => riskDocument.version.includes('.0.0'));
 
