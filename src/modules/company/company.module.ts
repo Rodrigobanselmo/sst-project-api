@@ -66,6 +66,8 @@ import { UpsertCompanyGroupsService } from './services/group/upsert-company-grou
 import { FindAllUserCompaniesService } from './services/company/find-all-user-companies /find-all-companies.service';
 import { CopyHomoGroupService } from './services/homoGroup/copy-homo-group/copy-homo-group.service';
 import { ChecklistModule } from '../checklist/checklist.module';
+import { CreateSubHierarchyService } from './services/hierarchy/create-sub-hierarchies/create-sub-hierarchies.service';
+import { DeleteSubOfficeEmployeeService } from './services/employee/delete-sub-office-employee/delete-sub-office-employee.service';
 
 @Module({
   imports: [forwardRef(() => ChecklistModule)],
@@ -137,6 +139,8 @@ import { ChecklistModule } from '../checklist/checklist.module';
     UpsertCompanyGroupsService,
     FindAllUserCompaniesService,
     CopyHomoGroupService,
+    CreateSubHierarchyService,
+    DeleteSubOfficeEmployeeService,
   ],
   exports: [
     CompanyRepository,

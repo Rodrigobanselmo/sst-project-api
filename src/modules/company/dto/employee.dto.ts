@@ -54,6 +54,17 @@ export class UpdateEmployeeDto extends PartialType(CreateEmployeeDto) {
   companyId: string;
 }
 
+export class DeleteSubOfficeEmployeeDto {
+  @IsNumber()
+  id: number;
+
+  @IsString()
+  subOfficeId: string;
+
+  @IsString()
+  companyId: string;
+}
+
 export class FindEmployeeDto extends PaginationQueryDto {
   @IsString()
   @IsOptional()
@@ -74,4 +85,8 @@ export class FindEmployeeDto extends PaginationQueryDto {
   @IsString()
   @IsOptional()
   hierarchyId?: string;
+
+  @IsString()
+  @IsOptional()
+  hierarchySubOfficeId?: string;
 }

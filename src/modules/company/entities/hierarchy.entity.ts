@@ -64,6 +64,14 @@ export class HierarchyEntity implements Hierarchy {
 
   constructor(partial: Partial<HierarchyEntity>) {
     Object.assign(this, partial);
+
+    if (!this.workspaceIds) {
+      this.workspaceIds = [];
+
+      if (this.workspaces) {
+        this.workspaceIds = this.workspaces.map((workspace) => workspace.id);
+      }
+    }
   }
   refName: string;
 }

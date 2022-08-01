@@ -11,10 +11,12 @@ import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import {
   CreateEmployeeDto,
+  DeleteSubOfficeEmployeeDto,
   FindEmployeeDto,
   UpdateEmployeeDto,
 } from '../../dto/employee.dto';
 import { CreateEmployeeService } from '../../services/employee/create-employee/create-employee.service';
+import { DeleteSubOfficeEmployeeService } from '../../services/employee/delete-sub-office-employee/delete-sub-office-employee.service';
 import { FindAllAvailableEmployeesService } from '../../services/employee/find-all-available-employees/find-all-available-employees.service';
 import { FindEmployeeService } from '../../services/employee/find-employee/find-employee.service';
 import { UpdateEmployeeService } from '../../services/employee/update-employee/update-employee.service';
@@ -26,11 +28,30 @@ export class EmployeeController {
     private readonly updateEmployeeService: UpdateEmployeeService,
     private readonly findEmployeeService: FindEmployeeService,
     private readonly findAllAvailableEmployeesService: FindAllAvailableEmployeesService,
+    private readonly deleteSubOfficeEmployeeService: DeleteSubOfficeEmployeeService,
   ) {}
 
   @Post()
   create(@Body() createEmployeeDto: CreateEmployeeDto) {
     return this.createEmployeeService.execute(createEmployeeDto);
+  }
+
+  @Post('/:employeeId/sub-office/:subOfficeId/:companyId')
+  deleteSubOffice(
+    @Param('employeeId') employeeId: number,
+    @Param('companyId') companyId: string,
+    @Param('subOfficeId') subOfficeId: string,
+  ) {
+    console.log({
+      id: employeeId,
+      subOfficeId,
+      companyId,
+    });
+    return this.deleteSubOfficeEmployeeService.execute({
+      id: employeeId,
+      subOfficeId,
+      companyId,
+    });
   }
 
   @Patch('/:companyId?')

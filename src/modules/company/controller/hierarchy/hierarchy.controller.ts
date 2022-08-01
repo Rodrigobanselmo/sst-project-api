@@ -11,6 +11,7 @@ import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import {
   CreateHierarchyDto,
+  CreateSubHierarchyDto,
   UpdateHierarchyDto,
   UpdateSimpleManyHierarchyDto,
   UpsertManyHierarchyDto,
@@ -23,6 +24,7 @@ import { FindAllHierarchyService } from '../../services/hierarchy/find-all-hiera
 import { UpdateHierarchyService } from '../../services/hierarchy/update-hierarchies/update-hierarchies.service';
 import { UpsertManyHierarchyService } from '../../services/hierarchy/upsert-many-hierarchies/upsert-many-hierarchies.service';
 import { UpdateSimpleManyHierarchyService } from '../../services/hierarchy/update-simple-many-hierarchies /upsert-many-hierarchies.service';
+import { CreateSubHierarchyService } from '../../services/hierarchy/create-sub-hierarchies/create-sub-hierarchies.service';
 
 @Controller('hierarchy')
 export class HierarchyController {
@@ -34,6 +36,7 @@ export class HierarchyController {
     private readonly deleteHierarchyService: DeleteHierarchyService,
     private readonly findHierarchyService: FindHierarchyService,
     private readonly updateSimpleManyHierarchyService: UpdateSimpleManyHierarchyService,
+    private readonly createSubHierarchyService: CreateSubHierarchyService,
   ) {}
 
   @Get('/:companyId?')
@@ -94,5 +97,16 @@ export class HierarchyController {
   @Delete('/:id/:companyId?')
   delete(@Param('id') id: string, @User() userPayloadDto: UserPayloadDto) {
     return this.deleteHierarchyService.execute(id, userPayloadDto);
+  }
+
+  @Post('/sub-office/:companyId?')
+  upsert(
+    @Body() createSubHierarchyDto: CreateSubHierarchyDto,
+    @User() userPayloadDto: UserPayloadDto,
+  ) {
+    return this.createSubHierarchyService.execute(
+      createSubHierarchyDto,
+      userPayloadDto,
+    );
   }
 }

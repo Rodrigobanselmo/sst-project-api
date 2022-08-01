@@ -56,13 +56,16 @@ export class EmployeeRepository {
     }
   }
 
-  async update({
-    workspaceIds,
-    hierarchyId,
-    companyId,
-    id,
-    ...createCompanyDto
-  }: UpdateEmployeeDto): Promise<EmployeeEntity> {
+  async update(
+    {
+      workspaceIds,
+      hierarchyId,
+      companyId,
+      id,
+      ...createCompanyDto
+    }: UpdateEmployeeDto,
+    removeSubOffices?: boolean,
+  ): Promise<EmployeeEntity> {
     const hierarchy = hierarchyId
       ? await this.prisma.hierarchy.findUnique({
           where: { id: hierarchyId },
@@ -86,6 +89,7 @@ export class EmployeeRepository {
           : {
               connect: { id: hierarchyId },
             },
+        subOffices: removeSubOffices ? { set: [] } : undefined,
       },
       where: { id_companyId: { companyId, id } },
     });
@@ -192,6 +196,13 @@ export class EmployeeRepository {
       delete query.search;
     }
 
+    if ('hierarchySubOfficeId' in query) {
+      (where.AND as any).push({
+        subOffices: { some: { id: query.hierarchySubOfficeId } },
+      } as typeof options.where);
+      delete query.hierarchySubOfficeId;
+    }
+
     Object.entries(query).forEach(([key, value]) => {
       if (value)
         (where.AND as any).push({
@@ -219,5 +230,54 @@ export class EmployeeRepository {
       data: response[1].map((employee) => new EmployeeEntity(employee)),
       count: response[0],
     };
+  }
+
+  async findNude(options: Prisma.EmployeeFindManyArgs = {}) {
+    const employees = await this.prisma.employee.findMany({
+      ...options,
+    });
+
+    return employees.map((employee) => new EmployeeEntity(employee));
+  }
+
+  async findFirstNude(options: Prisma.EmployeeFindFirstArgs = {}) {
+    const employee = await this.prisma.employee.findFirst({
+      ...options,
+    });
+
+    return new EmployeeEntity(employee);
+  }
+
+  async disconnectSubOffices(
+    employeesIds: number[],
+    companyId: string,
+  ): Promise<EmployeeEntity[]> {
+    const response = await this.prisma.$transaction([
+      ...employeesIds.map((id) => {
+        return this.prisma.employee.update({
+          data: {
+            subOffices: { set: [] },
+          },
+          where: { id_companyId: { companyId, id } },
+        });
+      }),
+    ]);
+
+    return response.map((employee) => new EmployeeEntity(employee));
+  }
+
+  async disconnectUniqueSubOffice(
+    employeeId: number,
+    subOfficeId: string,
+    companyId: string,
+  ): Promise<EmployeeEntity> {
+    const employee = await this.prisma.employee.update({
+      data: {
+        subOffices: { disconnect: { id: subOfficeId } },
+      },
+      where: { id_companyId: { companyId, id: employeeId } },
+    });
+
+    return new EmployeeEntity(employee);
   }
 }

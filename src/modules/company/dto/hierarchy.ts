@@ -158,3 +158,36 @@ export class UpdateSimpleManyHierarchyDto {
   @Type(() => UpdateSimpleHierarchyDto)
   readonly data: UpdateSimpleHierarchyDto[];
 }
+
+export class CreateSubHierarchyDto {
+  @IsOptional()
+  @IsString()
+  id: string;
+
+  @Transform(StringCapitalizeTransform, { toClassOnly: true })
+  @IsString()
+  name: string;
+
+  @Transform(StringCapitalizeTransform, { toClassOnly: true })
+  @IsOptional()
+  @IsString()
+  realDescription: string;
+
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsString()
+  @IsOptional()
+  @IsEnum(StatusEnum, {
+    message: `status must be one of: ${StatusEnum.ACTIVE} or ${StatusEnum.INACTIVE}`,
+  })
+  status: StatusEnum;
+
+  @IsString()
+  companyId: string;
+
+  @IsInt({ each: true })
+  @IsOptional()
+  employeesIds?: number[];
+
+  @IsString()
+  parentId?: string;
+}

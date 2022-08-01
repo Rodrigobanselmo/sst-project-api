@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { HierarchyEnum, Prisma } from '@prisma/client';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import {
@@ -81,6 +81,7 @@ export class HierarchyRepository {
           name,
           ...upsertHierarchy
         }) => {
+          const isSubOffice = upsertHierarchy?.type == HierarchyEnum.SUB_OFFICE;
           const HierarchyOnHomo = !workspaceIds
             ? []
             : workspaceIds
@@ -103,7 +104,7 @@ export class HierarchyRepository {
               name: name.split('//')[0],
               id,
               company: { connect: { id: companyId } },
-              employees:
+              [isSubOffice ? 'subOfficeEmployees' : 'employees']:
                 employeesIds && employeesIds.length
                   ? {
                       connect: employeesIds.map((id) => ({
@@ -134,7 +135,7 @@ export class HierarchyRepository {
                       id_companyId: { companyId, id },
                     })),
                   },
-              employees:
+              [isSubOffice ? 'subOfficeEmployees' : 'employees']:
                 employeesIds && employeesIds.length
                   ? {
                       connect: employeesIds.map((id) => ({
@@ -151,6 +152,7 @@ export class HierarchyRepository {
                   },
             },
             where: { id: id || 'none' },
+            include: { workspaces: true },
           });
         },
       ),
@@ -208,6 +210,8 @@ export class HierarchyRepository {
     }: UpdateHierarchyDto,
     companyId: string,
   ): Promise<HierarchyEntity> {
+    const isSubOffice = updateHierarchy?.type == HierarchyEnum.SUB_OFFICE;
+
     const data = await this.prisma.hierarchy.update({
       where: { id },
       data: {
@@ -220,7 +224,7 @@ export class HierarchyRepository {
                 id_companyId: { companyId, id },
               })),
             },
-        employees:
+        [isSubOffice ? 'subOfficeEmployees' : 'employees']:
           employeesIds && employeesIds.length
             ? {
                 connect: employeesIds.map((id) => ({
@@ -254,6 +258,8 @@ export class HierarchyRepository {
     }: CreateHierarchyDto & { id?: string },
     companyId: string,
   ): Promise<HierarchyEntity> {
+    const isSubOffice = upsertHierarchy?.type == HierarchyEnum.SUB_OFFICE;
+
     const data = await this.prisma.hierarchy.upsert({
       create: {
         ...upsertHierarchy,
@@ -265,7 +271,7 @@ export class HierarchyRepository {
             id_companyId: { companyId, id },
           })),
         },
-        employees:
+        [isSubOffice ? 'subOfficeEmployees' : 'employees']:
           employeesIds && employeesIds.length
             ? {
                 connect: employeesIds.map((id) => ({
@@ -282,7 +288,7 @@ export class HierarchyRepository {
       update: {
         ...upsertHierarchy,
         name: name.split('//')[0],
-        employees:
+        [isSubOffice ? 'subOfficeEmployees' : 'employees']:
           employeesIds && employeesIds.length
             ? {
                 connect: employeesIds.map((id) => ({
@@ -304,6 +310,71 @@ export class HierarchyRepository {
             },
       },
       where: { id: id || 'none' },
+    });
+
+    return new HierarchyEntity(data);
+  }
+
+  async upsertSubOffice({
+    companyId,
+    id,
+    workspaceIds,
+    parentId,
+    name,
+    employeesIds,
+    ...upsertHierarchy
+  }: Omit<CreateHierarchyDto, 'children' | 'ghoName'> & {
+    id?: string;
+  }): Promise<HierarchyEntity> {
+    const data = await this.prisma.hierarchy.upsert({
+      create: {
+        ...upsertHierarchy,
+        id,
+        name: name.split('//')[0],
+        company: { connect: { id: companyId } },
+        workspaces: {
+          connect: workspaceIds.map((id) => ({
+            id_companyId: { companyId, id },
+          })),
+        },
+        subOfficeEmployees:
+          employeesIds && employeesIds.length
+            ? {
+                connect: employeesIds.map((id) => ({
+                  id_companyId: { companyId, id },
+                })),
+              }
+            : undefined,
+        parent: {
+          connect: { id: parentId },
+        },
+      },
+      update: {
+        ...upsertHierarchy,
+        name: name.split('//')[0],
+        subOfficeEmployees:
+          employeesIds && employeesIds.length
+            ? {
+                connect: employeesIds.map((id) => ({
+                  id_companyId: { companyId, id },
+                })),
+              }
+            : undefined,
+        workspaces: !workspaceIds
+          ? undefined
+          : {
+              set: workspaceIds.map((id) => ({
+                id_companyId: { companyId, id },
+              })),
+            },
+        parent: !parentId
+          ? undefined
+          : {
+              connect: { id: parentId },
+            },
+      },
+      where: { id: id || 'none' },
+      include: { workspaces: true },
     });
 
     return new HierarchyEntity(data);

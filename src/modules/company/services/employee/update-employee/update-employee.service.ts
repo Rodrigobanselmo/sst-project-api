@@ -7,10 +7,25 @@ export class UpdateEmployeeService {
   constructor(private readonly employeeRepository: EmployeeRepository) {}
 
   async execute(updateEmployeeDto: UpdateEmployeeDto) {
-    const company = await this.employeeRepository.update({
-      ...updateEmployeeDto,
-    });
+    let removeSubOffices = false;
+    if (updateEmployeeDto.hierarchyId) {
+      const employeeFound = await this.employeeRepository.findById(
+        updateEmployeeDto.id,
+        updateEmployeeDto.companyId,
+      );
 
-    return company;
+      if (employeeFound.hierarchyId !== updateEmployeeDto.hierarchyId) {
+        removeSubOffices = true;
+      }
+    }
+
+    const employee = await this.employeeRepository.update(
+      {
+        ...updateEmployeeDto,
+      },
+      removeSubOffices,
+    );
+
+    return employee;
   }
 }
