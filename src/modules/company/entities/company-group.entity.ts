@@ -10,6 +10,9 @@ export class CompanyGroupEntity implements CompanyGroup {
   created_at: Date;
   updated_at: Date;
   companyId: string;
+  numAsos: number;
+  blockResignationExam: boolean;
+  esocialStart: Date;
 
   constructor(partial: Partial<CompanyGroupEntity>) {
     Object.assign(this, partial);

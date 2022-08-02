@@ -1,5 +1,14 @@
 import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
-import { IsNumber, IsOptional, IsString, ValidateIf } from 'class-validator';
+import {
+  IsBoolean,
+  IsDate,
+  IsInt,
+  IsNumber,
+  IsOptional,
+  IsString,
+  ValidateIf,
+} from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class UpsertCompanyGroupDto {
   @IsOptional()
@@ -17,6 +26,19 @@ export class UpsertCompanyGroupDto {
   @IsString()
   @IsOptional()
   companyId: string;
+
+  @IsOptional()
+  @IsInt()
+  numAsos?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  blockResignationExam?: boolean;
+
+  @IsOptional()
+  @IsDate()
+  @Type(() => Date)
+  esocialStart?: Date;
 
   @ValidateIf((o) => !o.id)
   @IsString({ each: true })

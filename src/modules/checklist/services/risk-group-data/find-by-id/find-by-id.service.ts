@@ -13,8 +13,8 @@ export class FindByIdService {
       companyId,
       {
         include: {
-          professionals: true,
           usersSignatures: { include: { user: true } },
+          professionalsSignatures: { include: { professional: true } },
         },
       },
     );

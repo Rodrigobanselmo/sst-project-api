@@ -291,16 +291,22 @@ export class PgrUploadService {
     try {
       const environments = await Promise.all(
         company.environments.map(async (environment) => {
-          const photos = await Promise.all(
-            environment.photos.map(async (photo) => {
-              const path = await downloadImageFile(
-                photo.photoUrl,
-                `tmp/${v4()}.${getExtensionFromUrl(photo.photoUrl)}`,
-              );
-              photosPath.push(path);
-              return { ...photo, photoUrl: path };
-            }),
-          );
+          const photos = (
+            await Promise.all(
+              environment.photos.map(async (photo) => {
+                try {
+                  const path = await downloadImageFile(
+                    photo.photoUrl,
+                    `tmp/${v4()}.${getExtensionFromUrl(photo.photoUrl)}`,
+                  );
+                  if (path) photosPath.push(path);
+                  return { ...photo, photoUrl: path };
+                } catch (error) {
+                  return { ...photo, photoUrl: null };
+                }
+              }),
+            )
+          ).filter((photo) => photo.photoUrl);
 
           return { ...environment, photos };
         }),
@@ -308,16 +314,22 @@ export class PgrUploadService {
 
       const characterizations = await Promise.all(
         company.characterization.map(async (environment) => {
-          const photos = await Promise.all(
-            environment.photos.map(async (photo) => {
-              const path = await downloadImageFile(
-                photo.photoUrl,
-                `tmp/${v4()}.${getExtensionFromUrl(photo.photoUrl)}`,
-              );
-              photosPath.push(path);
-              return { ...photo, photoUrl: path };
-            }),
-          );
+          const photos = (
+            await Promise.all(
+              environment.photos.map(async (photo) => {
+                try {
+                  const path = await downloadImageFile(
+                    photo.photoUrl,
+                    `tmp/${v4()}.${getExtensionFromUrl(photo.photoUrl)}`,
+                  );
+                  if (path) photosPath.push(path);
+                  return { ...photo, photoUrl: path };
+                } catch (error) {
+                  return { ...photo, photoUrl: null };
+                }
+              }),
+            )
+          ).filter((photo) => photo.photoUrl);
 
           return { ...environment, photos };
         }),

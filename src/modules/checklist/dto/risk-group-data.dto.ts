@@ -72,10 +72,6 @@ export class UpsertRiskGroupDataDto {
 
   @IsOptional()
   @IsString({ each: true })
-  professionalsIds?: string[];
-
-  @IsOptional()
-  @IsString({ each: true })
   complementarySystems?: string[];
 
   @IsOptional()
@@ -104,6 +100,11 @@ export class UpsertRiskGroupDataDto {
   @IsOptional()
   @Type(() => UsersToRiskDataGroupDto)
   users?: UsersToRiskDataGroupDto[];
+
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @Type(() => ProfessionalToRiskDataGroupDto)
+  professionals?: ProfessionalToRiskDataGroupDto[];
 }
 export class UsersToRiskDataGroupDto {
   @IsOptional()
@@ -116,4 +117,25 @@ export class UsersToRiskDataGroupDto {
   @IsBoolean()
   @IsOptional()
   isSigner: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  isElaborator: boolean;
+}
+
+export class ProfessionalToRiskDataGroupDto {
+  @IsOptional()
+  @IsString()
+  riskFactorGroupDataId: string;
+
+  @IsInt()
+  professionalId: number;
+
+  @IsBoolean()
+  @IsOptional()
+  isSigner: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  isElaborator: boolean;
 }

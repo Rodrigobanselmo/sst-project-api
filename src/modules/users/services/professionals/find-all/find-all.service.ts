@@ -1,3 +1,4 @@
+import { FindProfessionalsDto } from './../../../dto/professional.dto';
 import { Injectable } from '@nestjs/common';
 
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
@@ -8,9 +9,13 @@ export class FindAllProfessionalsByCompanyService {
   constructor(
     private readonly professionalRepository: ProfessionalRepository,
   ) {}
-  async execute(user: UserPayloadDto) {
+  async execute(
+    { skip, take, ...query }: FindProfessionalsDto,
+    user: UserPayloadDto,
+  ) {
     const professionals = await this.professionalRepository.findByCompanyId(
-      user.targetCompanyId,
+      { ...query, companyId: user.targetCompanyId },
+      { skip, take },
     );
 
     return professionals;

@@ -20,7 +20,9 @@ import { FindAllByCompanyIdService } from './services/invites/find-by-companyId/
 import { FindAllByEmailService } from './services/invites/find-by-email/find-by-email.service';
 import { FindByTokenService } from './services/invites/find-by-token/find-by-token.service';
 import { InviteUsersService } from './services/invites/invite-users/invite-users.service';
+import { CreateProfessionalService } from './services/professionals/create-professional/create-professional.service';
 import { FindAllProfessionalsByCompanyService } from './services/professionals/find-all/find-all.service';
+import { UpdateProfessionalService } from './services/professionals/update-professional/update-professional.service';
 import { CreateUserService } from './services/users/create-user/create-user.service';
 import { FindAllByCompanyService } from './services/users/find-all/find-all.service';
 import { FindByEmailService } from './services/users/find-by-email/find-by-email.service';
@@ -58,6 +60,8 @@ import { UpdateUserService } from './services/users/update-user/update-user.serv
     ProfessionalRepository,
     FindAllProfessionalsByCompanyService,
     FirebaseProvider,
+    UpdateProfessionalService,
+    CreateProfessionalService,
   ],
   exports: [UsersRepository, ProfessionalRepository],
 })

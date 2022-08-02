@@ -2,7 +2,9 @@ import { CompanyTypesEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import {
   IsBoolean,
+  IsDate,
   IsEnum,
+  IsInt,
   IsOptional,
   IsString,
   Length,
@@ -143,4 +145,17 @@ export class UpdateCompanyDto {
   @IsOptional()
   @IsString()
   email?: string;
+
+  @IsOptional()
+  @IsInt()
+  numAsos?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  blockResignationExam?: boolean;
+
+  @IsOptional()
+  @IsDate()
+  @Type(() => Date)
+  esocialStart?: Date;
 }

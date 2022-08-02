@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
+import { ProfessionalTypeEnum } from '@prisma/client';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { CreateUserDto } from '../../dto/create-user.dto';
@@ -18,7 +19,17 @@ export class UsersRepository implements IUsersRepository {
     userCompanyDto: UserCompanyDto[],
   ) {
     const user = await this.prisma.user.create({
-      data: { ...createUserDto, companies: { create: userCompanyDto } },
+      data: {
+        ...createUserDto,
+        professional: {
+          create: {
+            type: ProfessionalTypeEnum.USER,
+            name: '',
+            email: createUserDto.email,
+          },
+        },
+        companies: { create: userCompanyDto },
+      },
       include: { companies: true },
     });
 
@@ -27,13 +38,58 @@ export class UsersRepository implements IUsersRepository {
 
   async update(
     id: number,
-    { oldPassword, ...updateUserDto }: UpdateUserDto,
+    {
+      oldPassword,
+      certifications,
+      councilId,
+      councilUF,
+      councilType,
+      crm,
+      crea,
+      cpf,
+      phone,
+      formation,
+      type,
+      name,
+      ...updateUserDto
+    }: UpdateUserDto,
     userCompanyDto: UserCompanyDto[] = [],
   ) {
+    const professional = {
+      certifications,
+      councilId,
+      councilUF,
+      councilType,
+      crm,
+      crea,
+      cpf,
+      phone,
+      formation,
+      name,
+      type,
+    };
+
     const user = await this.prisma.user.update({
       where: { id: id },
-      data: { ...updateUserDto, companies: { create: userCompanyDto } },
-      include: { companies: true },
+      data: {
+        ...updateUserDto,
+        cpf,
+        name,
+        phone,
+        professional: {
+          upsert: {
+            update: {
+              ...professional,
+            },
+            create: {
+              ...professional,
+              name: name || '',
+            },
+          },
+        },
+        companies: { create: userCompanyDto },
+      },
+      include: { companies: true, professional: true },
     });
     if (!user) return;
     return new UserEntity(user);
@@ -50,6 +106,7 @@ export class UsersRepository implements IUsersRepository {
       where: { companies: { some: { companyId } } },
       include: {
         companies: { include: { group: true }, where: { companyId } },
+        professional: true,
       },
     });
     return users.map((user) => new UserEntity(user));
@@ -58,7 +115,7 @@ export class UsersRepository implements IUsersRepository {
   async findByEmail(email: string) {
     const user = await this.prisma.user.findUnique({
       where: { email },
-      include: { companies: true },
+      include: { companies: true, professional: true },
     });
     if (!user) return;
     return new UserEntity(user);
@@ -67,7 +124,7 @@ export class UsersRepository implements IUsersRepository {
   async findById(id: number) {
     const user = await this.prisma.user.findUnique({
       where: { id },
-      include: { companies: true },
+      include: { companies: true, professional: true },
     });
     if (!user) return;
     return new UserEntity(user);
@@ -76,7 +133,7 @@ export class UsersRepository implements IUsersRepository {
   async findByGoogleExternalId(id: string) {
     const user = await this.prisma.user.findFirst({
       where: { googleExternalId: id },
-      include: { companies: true },
+      include: { companies: true, professional: true },
     });
     if (!user) return;
     return new UserEntity(user);

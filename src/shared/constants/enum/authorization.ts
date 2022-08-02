@@ -32,6 +32,7 @@ export enum PermissionEnum {
   MASTER = 'master',
   USER = '1',
   ACCESS_GROUP = '1.1',
+  PROFESSIONALS = '1.2',
   EPI = '3',
   MANAGEMENT = '4',
   RISK = '4.0',

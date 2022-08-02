@@ -17,13 +17,18 @@ export const downloadImageFile = async (
   return axios({
     url,
     responseType: 'stream',
-  }).then(
-    (response) =>
-      new Promise<string>((resolve, reject) => {
-        response.data
-          .pipe(fs.createWriteStream(image_path))
-          .on('finish', () => resolve(image_path))
-          .on('error', (e) => reject(e));
-      }),
-  );
+  })
+    .then(
+      (response) =>
+        new Promise<string>((resolve, reject) => {
+          response.data
+            .pipe(fs.createWriteStream(image_path))
+            .on('finish', () => resolve(image_path))
+            .on('error', (e) => reject(e));
+        }),
+    )
+    .catch((e) => {
+      console.log(e);
+      return null;
+    });
 };

@@ -102,11 +102,16 @@ export class CompanyEntity implements Company {
   hierarchyCount?: number;
   shortName: string;
   operationTime: string;
+
+  numAsos: number;
+  blockResignationExam: boolean;
+  esocialStart: Date;
+  coordinatorName: string;
+
   receivingServiceContracts?: ContractEntity[];
   applyingServiceContracts?: ContractEntity[];
 
   constructor(partial: Partial<CompanyEntity>) {
     Object.assign(this, partial);
   }
-  coordinatorName: string;
 }

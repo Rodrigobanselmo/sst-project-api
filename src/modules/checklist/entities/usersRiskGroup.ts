@@ -1,5 +1,8 @@
 import { ProfessionalEntity } from './../../users/entities/professional.entity';
-import { RiskFactorGroupDataToUser } from '@prisma/client';
+import {
+  RiskFactorGroupDataToUser,
+  RiskFactorGroupDataToProfessional,
+} from '@prisma/client';
 
 import { UserEntity } from './../../users/entities/user.entity';
 
@@ -7,6 +10,7 @@ export class UsersRiskGroupEntity implements RiskFactorGroupDataToUser {
   riskFactorGroupDataId: string;
   userId: number;
   isSigner: boolean;
+  isElaborator: boolean;
   user?: UserEntity;
 
   constructor(partial: Partial<UsersRiskGroupEntity>) {
@@ -14,10 +18,13 @@ export class UsersRiskGroupEntity implements RiskFactorGroupDataToUser {
   }
 }
 
-export class ProfessionalRiskGroupEntity implements RiskFactorGroupDataToUser {
+export class ProfessionalRiskGroupEntity
+  implements RiskFactorGroupDataToProfessional
+{
   riskFactorGroupDataId: string;
-  userId: number;
+  professionalId: number;
   isSigner: boolean;
+  isElaborator: boolean;
   professional?: ProfessionalEntity;
 
   constructor(partial: Partial<UsersRiskGroupEntity>) {

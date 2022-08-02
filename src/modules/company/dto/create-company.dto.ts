@@ -3,6 +3,7 @@ import { CompanyTypesEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import {
   IsBoolean,
+  IsDate,
   IsDefined,
   IsEnum,
   IsInt,
@@ -128,6 +129,19 @@ export class CreateCompanyDto {
   @IsOptional()
   @IsString()
   email?: string;
+
+  @IsOptional()
+  @IsInt()
+  numAsos?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  blockResignationExam?: boolean;
+
+  @IsOptional()
+  @IsDate()
+  @Type(() => Date)
+  esocialStart?: Date;
 }
 
 export class FindCompaniesDto extends PaginationQueryDto {

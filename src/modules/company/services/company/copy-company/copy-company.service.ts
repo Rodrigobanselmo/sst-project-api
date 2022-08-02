@@ -1,4 +1,3 @@
-import { CharacterizationEntity } from './../../../entities/characterization.entity';
 import { HomoGroupEntity } from './../../../entities/homoGroup.entity';
 import { isEnvironment } from './../../../repositories/implementations/CharacterizationRepository';
 import { BadRequestException, Injectable } from '@nestjs/common';
@@ -52,7 +51,9 @@ export class CopyCompanyService {
 
     const company = await this.companyRepository.findById(companyCopyFromId, {
       include: {
-        riskFactorGroupData: { include: { usersSignatures: true } },
+        riskFactorGroupData: {
+          include: { usersSignatures: true, professionalsSignatures: true },
+        },
       },
     });
 
@@ -104,15 +105,21 @@ export class CopyCompanyService {
       coordinatorBy: fromRiskDataGroup.coordinatorBy,
       elaboratedBy: fromRiskDataGroup.elaboratedBy,
       name: fromRiskDataGroup.name,
-      professionalsIds:
-        fromRiskDataGroup.professionals &&
-        fromRiskDataGroup.professionals.length
-          ? fromRiskDataGroup.professionals.map((p) => p.id)
+      professionals:
+        fromRiskDataGroup.professionalsSignatures &&
+        fromRiskDataGroup.professionalsSignatures.length
+          ? fromRiskDataGroup.professionalsSignatures.map((s) => ({
+              isSigner: s.isSigner,
+              isElaborator: s.isElaborator,
+              professionalId: s.professionalId,
+              riskFactorGroupDataId: s.riskFactorGroupDataId,
+            }))
           : undefined,
       users:
         fromRiskDataGroup.usersSignatures &&
         fromRiskDataGroup.usersSignatures.length
           ? fromRiskDataGroup.usersSignatures.map((s) => ({
+              isElaborator: s.isElaborator,
               isSigner: s.isSigner,
               userId: s.userId,
               riskFactorGroupDataId: s.riskFactorGroupDataId,

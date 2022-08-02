@@ -3,16 +3,39 @@ import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
 import { ProfessionalEntity } from '../../../../../users/entities/professional.entity';
 
+export const getCredential = (row: ProfessionalEntity | UserEntity) => {
+  if ('councilId' in row) {
+    return `${row?.councilType ? row.councilType + ' :' : ''}${row.councilId}${
+      row?.councilUF ? ' - ' + row.councilUF : ''
+    }`;
+  }
+};
+
 export const ProfessionalsConverter = (
   professionalEntity: (ProfessionalEntity | UserEntity)[],
 ): IDocVariables[] => {
-  return professionalEntity.map((professional) => ({
-    [VariablesPGREnum.PROFESSIONAL_CERTIFICATIONS]:
-      professional.certifications.join(' -- ') || '',
-    [VariablesPGREnum.PROFESSIONAL_CREA]: professional.crea || '',
-    [VariablesPGREnum.PROFESSIONAL_FORMATION]:
-      professional.formation.join('/') || '',
-    [VariablesPGREnum.PROFESSIONAL_NAME]: professional.name || '',
-    [VariablesPGREnum.PROFESSIONAL_CPF]: professional.cpf || '',
-  }));
+  return professionalEntity
+    .filter((professional) =>
+      'professionalPgrSignature' in professional
+        ? professional.professionalPgrSignature.isElaborator
+        : 'professionalPgrSignature' in professional
+        ? professional.professionalPgrSignature.isElaborator
+        : false,
+    )
+    .map((professional) => {
+      const crea =
+        professional?.councilType === 'CREA'
+          ? getCredential(professional)
+          : professional.crea;
+
+      return {
+        [VariablesPGREnum.PROFESSIONAL_CERTIFICATIONS]:
+          professional.certifications.join(' -- ') || '',
+        [VariablesPGREnum.PROFESSIONAL_CREA]: crea || '',
+        [VariablesPGREnum.PROFESSIONAL_FORMATION]:
+          professional.formation.join('/') || '',
+        [VariablesPGREnum.PROFESSIONAL_NAME]: professional.name || '',
+        [VariablesPGREnum.PROFESSIONAL_CPF]: professional.cpf || '',
+      };
+    });
 };
