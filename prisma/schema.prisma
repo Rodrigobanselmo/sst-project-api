@@ -215,15 +215,22 @@ model Company {
   operationTime String?
   logoUrl String?
   responsibleName String?
+  responsibleNit String?
+  responsibleCpf String?
   mission String?
   vision String?
   values String?
   numAsos Int?
   blockResignationExam Boolean @default(true)
   esocialStart  DateTime?
+  initials String?
+  unit String?
+  stateRegistration String?
   created_at DateTime @default(now())
   deleted_at DateTime? 
   updated_at  DateTime   @updatedAt
+  doctorResponsibleId  Int?
+  tecResponsibleId  Int?
   status StatusEnum @default(ACTIVE)
   type CompanyTypesEnum @default(MATRIZ)
   accessGroups AccessGroups[]
@@ -253,6 +260,8 @@ model Company {
   secondary_activity Activity[] @relation(name: "secondary_activity")
   users UserCompany[]
   workspace Workspace[]
+  doctorResponsible  Professional? @relation(name:"doctors_company_responsibles", fields: [doctorResponsibleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  tecResponsible  Professional? @relation(name:"tec_company_responsibles", fields: [tecResponsibleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
 }
 
 model CompanyGroup {
@@ -267,6 +276,8 @@ model CompanyGroup {
   numAsos Int?
   blockResignationExam Boolean @default(true)
   esocialStart  DateTime?
+  doctorResponsibleId  Int?
+  doctorResponsible  Professional? @relation(name:"doctors_group_responsibles", fields: [doctorResponsibleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
 
   @@unique([id, companyId])
 }
@@ -574,7 +585,9 @@ model Professional {
   status StatusEnum @default(ACTIVE)
   userId Int? @unique
   user User? @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
-
+  doctorGroupResponsible  CompanyGroup[] @relation(name:"doctors_group_responsibles")
+  doctorCompanyResponsible  Company[] @relation(name:"doctors_company_responsibles")
+  tecCompanyResponsible  Company[] @relation(name:"tec_company_responsibles")
 
   @@unique([id, companyId])
 }

@@ -40,6 +40,10 @@ export class UpsertCompanyGroupDto {
   @Type(() => Date)
   esocialStart?: Date;
 
+  @IsOptional()
+  @IsInt()
+  doctorResponsibleId: number;
+
   @ValidateIf((o) => !o.id)
   @IsString({ each: true })
   companiesIds: string[];

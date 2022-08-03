@@ -18,11 +18,15 @@ export class CompanyGroupRepository {
     id,
     companyId,
     companiesIds,
+    doctorResponsibleId,
     ...data
   }: UpsertCompanyGroupDto) {
     const group = await this.prisma.companyGroup.upsert({
       update: {
         ...data,
+        doctorResponsible: doctorResponsibleId
+          ? { connect: { id: doctorResponsibleId } }
+          : undefined,
         companies: companiesIds
           ? {
               set: companiesIds.map((companyId) => ({
@@ -34,6 +38,7 @@ export class CompanyGroupRepository {
       create: {
         ...data,
         companyId,
+        doctorResponsibleId: doctorResponsibleId,
         companies: companiesIds
           ? {
               connect: companiesIds.map((companyId) => ({
@@ -41,8 +46,9 @@ export class CompanyGroupRepository {
               })),
             }
           : undefined,
-      },
+      } as any,
       where: { id_companyId: { id: id || 0, companyId } },
+      include: { doctorResponsible: true },
     });
 
     return new CompanyGroupEntity(group);
@@ -55,6 +61,7 @@ export class CompanyGroupRepository {
   ) {
     const group = await this.prisma.companyGroup.findFirst({
       where: { companyId, id },
+      include: { doctorResponsible: true },
       ...options,
     });
 
@@ -98,6 +105,7 @@ export class CompanyGroupRepository {
         take: pagination.take || 20,
         skip: pagination.skip || 0,
         orderBy: { name: 'asc' },
+        include: { doctorResponsible: true },
       }),
     ]);
 

@@ -114,4 +114,11 @@ export class CompanyEntity implements Company {
   constructor(partial: Partial<CompanyEntity>) {
     Object.assign(this, partial);
   }
+  responsibleNit: string;
+  responsibleCpf: string;
+  initials: string;
+  unit: string;
+  stateRegistration: string;
+  doctorResponsibleId: number;
+  tecResponsibleId: number;
 }

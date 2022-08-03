@@ -142,6 +142,34 @@ export class CreateCompanyDto {
   @IsDate()
   @Type(() => Date)
   esocialStart?: Date;
+
+  @IsOptional()
+  @IsString()
+  responsibleNit?: string;
+
+  @IsOptional()
+  @IsString()
+  responsibleCpf?: string;
+
+  @IsOptional()
+  @IsString()
+  initials?: string;
+
+  @IsOptional()
+  @IsString()
+  unit?: string;
+
+  @IsOptional()
+  @IsString()
+  stateRegistration?: string;
+
+  @IsOptional()
+  @IsInt()
+  doctorResponsibleId?: number;
+
+  @IsOptional()
+  @IsInt()
+  tecResponsibleId?: number;
 }
 
 export class FindCompaniesDto extends PaginationQueryDto {

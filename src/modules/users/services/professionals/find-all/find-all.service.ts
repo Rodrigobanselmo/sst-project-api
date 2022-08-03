@@ -14,7 +14,11 @@ export class FindAllProfessionalsByCompanyService {
     user: UserPayloadDto,
   ) {
     const professionals = await this.professionalRepository.findByCompanyId(
-      { ...query, companyId: user.targetCompanyId },
+      {
+        ...query,
+        companyId: user.targetCompanyId,
+        userCompanyId: user.companyId,
+      },
       { skip, take },
     );
 

@@ -13,6 +13,7 @@ export class CompanyGroupEntity implements CompanyGroup {
   numAsos: number;
   blockResignationExam: boolean;
   esocialStart: Date;
+  doctorResponsibleId: number;
 
   constructor(partial: Partial<CompanyGroupEntity>) {
     Object.assign(this, partial);

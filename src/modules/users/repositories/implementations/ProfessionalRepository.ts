@@ -36,13 +36,12 @@ export class ProfessionalRepository {
 
   async update(
     { id, ...data }: UpdateProfessionalDto,
-    companyId: string,
     options: Partial<Prisma.ProfessionalUpdateArgs> = {},
   ) {
     const professional = await this.prisma.professional.update({
       ...options,
-      data: { ...data, companyId },
-      where: { id_companyId: { id, companyId } },
+      data: { ...data },
+      where: { id },
       include: { user: true, ...options.include },
     });
 
@@ -58,38 +57,50 @@ export class ProfessionalRepository {
     options: Prisma.ProfessionalFindManyArgs = {},
   ) {
     const companyId = query.companyId;
+    const userCompanyId = query.userCompanyId;
     delete query.companyId;
+    delete query.userCompanyId;
 
     const where = {
       AND: [
         {
           OR: [
-            { companyId },
+            { companyId: { in: [userCompanyId, companyId] } },
             {
-              company: {
-                applyingServiceContracts: {
-                  some: { receivingServiceCompanyId: companyId },
+              user: {
+                companies: {
+                  some: {
+                    companyId: { in: [userCompanyId, companyId] },
+                    status: 'ACTIVE',
+                  },
                 },
               },
             },
-            {
-              user: {
-                OR: [
-                  { companies: { some: { companyId, status: 'ACTIVE' } } },
-                  {
-                    companies: {
-                      some: {
-                        company: {
-                          applyingServiceContracts: {
-                            some: { receivingServiceCompanyId: companyId },
-                          },
-                        },
-                      },
-                    },
-                  },
-                ],
-              },
-            },
+            // {
+            //   company: {
+            //     applyingServiceContracts: {
+            //       some: { receivingServiceCompanyId: companyId }, // macDonald can see connapa's professionals
+            //     },
+            //   },
+            // },
+            // {
+            //   user: {
+            //     OR: [
+            //       { companies: { some: { companyId, status: 'ACTIVE' } } },
+            //       {
+            //         companies: {
+            //           some: {
+            //             company: {
+            //               applyingServiceContracts: {
+            //                 some: { receivingServiceCompanyId: companyId },
+            //               },
+            //             },
+            //           },
+            //         },
+            //       },
+            //     ],
+            //   },
+            // },
           ],
         },
       ],
@@ -97,9 +108,19 @@ export class ProfessionalRepository {
 
     if ('search' in query) {
       (where.AND as any).push({
-        OR: [{ name: { contains: query.search, mode: 'insensitive' } }],
+        OR: [
+          { name: { contains: query.search, mode: 'insensitive' } },
+          { councilId: { contains: query.search, mode: 'insensitive' } },
+        ],
       } as typeof options.where);
       delete query.search;
+    }
+
+    if ('companies' in query) {
+      (where.AND as any).push({
+        company: { in: [query.companies] },
+      } as typeof options.where);
+      delete query.companies;
     }
 
     Object.entries(query).forEach(([key, value]) => {
@@ -137,5 +158,13 @@ export class ProfessionalRepository {
       ),
       count: response[0],
     };
+  }
+
+  async findFirstNude(options: Prisma.ProfessionalFindFirstArgs = {}) {
+    const professional = await this.prisma.professional.findFirst({
+      ...options,
+    });
+
+    return new ProfessionalEntity(professional);
   }
 }

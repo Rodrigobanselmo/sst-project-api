@@ -5,6 +5,7 @@ import { IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
 
 import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
 import { CpfFormatTransform } from './../../../shared/transformers/cpf-format.transform';
+import { QueryArray } from './../../../shared/transformers/query-array';
 import { StringCapitalizeTransform } from './../../../shared/transformers/string-capitalize';
 import { StringUppercaseTransform } from './../../../shared/transformers/string-uppercase.transform';
 
@@ -93,8 +94,22 @@ export class FindProfessionalsDto extends PaginationQueryDto {
   @IsOptional()
   companyId?: string;
 
-  @IsOptional()
+  @Transform(QueryArray, { toClassOnly: true })
   @IsString({ each: true })
+  @IsOptional()
+  companies?: string[];
+
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsInt({ each: true })
+  @IsOptional()
+  id?: number[];
+
+  @IsString()
+  @IsOptional()
+  userCompanyId?: string;
+
+  @IsOptional()
+  @Transform(QueryArray, { toClassOnly: true })
   @IsEnum(ProfessionalTypeEnum, {
     message: `Tipo de profissional inválido`,
     each: true,

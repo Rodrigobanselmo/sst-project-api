@@ -31,6 +31,8 @@ export class CompanyRepository implements ICompanyRepository {
     license,
     address,
     companyId,
+    doctorResponsibleId,
+    tecResponsibleId,
     ...createCompanyDto
   }: ICreateCompany): Promise<CompanyEntity> {
     const companyUUId = uuidV4();
@@ -39,6 +41,12 @@ export class CompanyRepository implements ICompanyRepository {
       data: {
         id: companyUUId,
         ...createCompanyDto,
+        doctorResponsible: doctorResponsibleId
+          ? { connect: { id: doctorResponsibleId } }
+          : undefined,
+        tecResponsible: tecResponsibleId
+          ? { connect: { id: tecResponsibleId } }
+          : undefined,
         license:
           Object.keys(license).length === 0
             ? undefined
@@ -114,6 +122,8 @@ export class CompanyRepository implements ICompanyRepository {
       users = [],
       address,
       companyId,
+      doctorResponsibleId,
+      tecResponsibleId,
       ...updateCompanyDto
     }: UpdateCompanyDto,
     options?: IPrismaOptions<{
@@ -138,6 +148,12 @@ export class CompanyRepository implements ICompanyRepository {
       where: { id: companyId },
       data: {
         ...updateCompanyDto,
+        doctorResponsible: doctorResponsibleId
+          ? { connect: { id: doctorResponsibleId } }
+          : undefined,
+        tecResponsible: tecResponsibleId
+          ? { connect: { id: tecResponsibleId } }
+          : undefined,
         users: {
           upsert: [
             ...users.map(({ userId, ...user }) => {
