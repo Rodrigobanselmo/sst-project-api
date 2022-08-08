@@ -4,6 +4,7 @@ import { CompanyModule } from '../company/company.module';
 import { ChecklistController } from './controller/checklist/checklist.controller';
 import { DocumentPgrController } from './controller/doc-pgr/doc-pgr.controller';
 import { EpiController } from './controller/epi/epi.controller';
+import { ExamController } from './controller/exam/exam.controller';
 import { GenerateSourceController } from './controller/generate-source/generate-source.controller';
 import { RecMedController } from './controller/rec-med/rec-med.controller';
 import { RiskDataRecController } from './controller/risk-data-rec/risk-data-rec.controller';
@@ -12,6 +13,8 @@ import { RiskGroupDataController } from './controller/risk-group-data/risk-group
 import { RiskController } from './controller/risk/risk.controller';
 import { ChecklistRepository } from './repositories/implementations/ChecklistRepository';
 import { EpiRepository } from './repositories/implementations/EpiRepository';
+import { ExamRepository } from './repositories/implementations/ExamRepository';
+import { ExamToClinicRepository } from './repositories/implementations/ExamToClinicRepository';
 import { GenerateSourceRepository } from './repositories/implementations/GenerateSourceRepository';
 import { RecMedRepository } from './repositories/implementations/RecMedRepository';
 import { RiskDataRecRepository } from './repositories/implementations/RiskDataRecRepository';
@@ -27,6 +30,12 @@ import { CreateEpiService } from './services/epi/create-epi/create-epi.service';
 import { FindByCAEpiService } from './services/epi/find-ca-epi /find-ca-epi.service';
 import { FindEpiService } from './services/epi/find-epi/find-epi.service';
 import { UpdateEpiService } from './services/epi/update-epi/update-epi.service';
+import { CreateExamService } from './services/exam/create-exam/create-exam.service';
+import { DeleteSoftExamService } from './services/exam/delete-soft-exam/delete-soft-exam.service';
+import { FindExamService } from './services/exam/find-exam/find-exam.service';
+import { UpdateExamService } from './services/exam/update-exam/update-exam.service';
+import { FindExamToClinicService } from './services/examToClinic/find-exam-to-clinic/find-exam-to-clinic.service';
+import { UpsertExamToClinicService } from './services/examToClinic/upsert-exam-to-clinic/upsert-exam-to-clinic.service';
 import { CreateGenerateSourceService } from './services/generate-source/create-generate-source/create-generate-source.service';
 import { DeleteSoftGenerateSourceService } from './services/generate-source/delete-soft-generate-source/delete-soft-generate-source.service';
 import { UpdateGenerateSourceService } from './services/generate-source/update-generate-source/update-generate-source.service';
@@ -61,6 +70,7 @@ import { UpdateRiskService } from './services/risk/update-risk/update-risk.servi
     RiskDataController,
     DocumentPgrController,
     RiskDataRecController,
+    ExamController,
   ],
   providers: [
     CreateChecklistService,
@@ -102,6 +112,14 @@ import { UpdateRiskService } from './services/risk/update-risk/update-risk.servi
     FindAllActionPlanService,
     RiskDataRecRepository,
     UpsertRiskDataRecService,
+    FindExamService,
+    CreateExamService,
+    UpdateExamService,
+    DeleteSoftExamService,
+    ExamRepository,
+    ExamToClinicRepository,
+    UpsertExamToClinicService,
+    FindExamToClinicService,
   ],
   exports: [
     RiskRepository,

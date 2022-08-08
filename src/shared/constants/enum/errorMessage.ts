@@ -6,6 +6,9 @@ export enum ErrorMessageEnum {
 
   //* PROFESSIONALS
   PROFESSIONAL_NOT_FOUND = 'Profissional não encontrado ou sem premissões de acesso',
+  //* CONTACTS
+  CONTACT_NOT_FOUND = 'Contato não encontrado ou sem premissões de acesso',
+  CONTACT_IS_PRINCIPAL = 'Você não pode deletar o contato principal',
 }
 
 export enum ErrorCompanyEnum {

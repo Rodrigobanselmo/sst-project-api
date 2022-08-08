@@ -284,7 +284,6 @@ export class RiskRepository implements IRiskRepository {
   }
 
   async findAllAvailable(
-    companyId: string,
     userCompanyId: string,
     {
       representAll,
@@ -296,38 +295,42 @@ export class RiskRepository implements IRiskRepository {
     } = {},
   ): Promise<RiskFactorsEntity[]> {
     const include = options.include || {};
-    const rall =
-      typeof representAll === 'boolean' ? { representAll: representAll } : {};
 
-    const companyIds = [userCompanyId, companyId];
-
-    const parentCompaniesIds = await this.prisma.contract.findMany({
-      where: {
-        receivingServiceCompanyId: { equals: userCompanyId },
+    // const tenant: Prisma.RiskFactorsFindManyArgs['where']['AND'] = [
+    const tenant = [
+      {
+        OR: [
+          { companyId: userCompanyId },
+          {
+            company: {
+              applyingServiceContracts: {
+                some: { receivingServiceCompanyId: userCompanyId },
+              },
+            },
+          },
+          //! fix on front and back to only get from it's on company, but can see the risk (riskData) from other companies
+          {
+            company: {
+              receivingServiceContracts: {
+                some: { applyingServiceCompanyId: userCompanyId },
+              },
+            },
+          },
+          { system: true },
+        ],
       },
-      select: { applyingServiceCompanyId: true },
-    });
-
-    parentCompaniesIds.map((companyId) =>
-      companyIds.push(companyId.applyingServiceCompanyId),
-    );
+    ];
 
     const risks = await this.prisma.riskFactors.findMany({
       where: {
-        AND: [
-          {
-            OR: [
-              ...removeDuplicate(companyIds, { simpleCompare: true }).map(
-                (c) => ({ companyId: c }),
-              ),
-              { system: true },
-            ],
-          },
-          rall,
-        ],
+        AND: [...tenant],
         deleted_at: null,
       },
-      ...options,
+      include: {
+        recMed: { where: { deleted_at: null, AND: [...tenant] } },
+        generateSource: { where: { deleted_at: null, AND: [...tenant] } },
+        ...include,
+      },
     });
 
     return risks.map((risk) => new RiskFactorsEntity(risk));

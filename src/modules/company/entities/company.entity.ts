@@ -11,6 +11,8 @@ import { EnvironmentEntity } from './environment.entity';
 import { ActivityEntity } from './activity.entity';
 import { CharacterizationEntity } from './characterization.entity';
 import { ContractEntity } from './contract.entity';
+import { ContactEntity } from './contact.entity';
+import { CompanyStepEnum } from 'src/shared/constants/enum/stepCompany.enum';
 
 export class CompanyEntity implements Company {
   @ApiProperty({ description: 'The id of the Company' })
@@ -74,8 +76,6 @@ export class CompanyEntity implements Company {
   @ApiProperty({ description: 'The deleted date of data' })
   deleted_at: Date | null;
 
-  description: string;
-
   primary_activity?: ActivityEntity[];
   secondary_activity?: ActivityEntity[];
   environments?: EnvironmentEntity[];
@@ -85,40 +85,125 @@ export class CompanyEntity implements Company {
   email: string;
   logoUrl: string;
   responsibleName: string;
-  mission: string;
-  vision: string;
-  values: string;
-  size: string;
   phone: string;
-  legal_nature: string;
-  cadastral_situation: string;
-  activity_start_date: string;
-  cadastral_situation_date: string;
-  legal_nature_code: string;
-  cadastral_situation_description: string;
+  operationTime: string;
+  activityStartDate: Date;
+  receivingServiceContracts?: ContractEntity[];
+  applyingServiceContracts?: ContractEntity[];
+  responsibleNit: string;
+  responsibleCpf: string;
+  initials: string;
+  description: string;
+  unit: string;
+  numAsos: number;
+  blockResignationExam: boolean;
+  esocialStart: Date;
+  doctorResponsibleId: number;
+  tecResponsibleId: number;
+  contacts: ContactEntity[];
+  isClinic: boolean;
+
   employeeCount?: number;
   riskGroupCount?: number;
   homogenousGroupCount?: number;
   hierarchyCount?: number;
-  shortName: string;
-  operationTime: string;
-
-  numAsos: number;
-  blockResignationExam: boolean;
-  esocialStart: Date;
-  coordinatorName: string;
-
-  receivingServiceContracts?: ContractEntity[];
-  applyingServiceContracts?: ContractEntity[];
+  professionalCount?: number;
+  examCount?: number;
+  usersCount?: number;
+  step?: CompanyStepEnum;
+  steps?: CompanyStepEnum[];
 
   constructor(partial: Partial<CompanyEntity>) {
     Object.assign(this, partial);
+
+    if (this.isClinic) {
+      this.getClinicStep();
+    } else {
+      this.getCompanyStep();
+    }
   }
-  responsibleNit: string;
-  responsibleCpf: string;
-  initials: string;
-  unit: string;
+
+  mission: string;
+  vision: string;
+  values: string;
+
+  activity_start_date: string;
+  cadastral_situation_date: string;
+  legal_nature_code: string;
+  size: string;
+  legal_nature: string;
+  cadastral_situation: string;
+  cadastral_situation_description: string;
+
+  coordinatorName: string; // remover
   stateRegistration: string;
-  doctorResponsibleId: number;
-  tecResponsibleId: number;
+  shortName: string;
+  obs: string;
+
+  private getCompanyStep() {
+    this.steps = [
+      CompanyStepEnum.WORKSPACE,
+      CompanyStepEnum.EMPLOYEE,
+      CompanyStepEnum.HIERARCHY,
+      CompanyStepEnum.HOMO_GROUP,
+      CompanyStepEnum.RISK_GROUP,
+      CompanyStepEnum.RISKS,
+      CompanyStepEnum.NONE,
+    ];
+
+    const workspaceStep = this.workspace && this.workspace.length == 0;
+    const employeeStep = this.employeeCount == 0;
+    const hierarchyStep = this.hierarchyCount == 0;
+    const homoStep = this.homogenousGroupCount == 0;
+    const riskGroupStep = this.riskGroupCount == 0;
+
+    if (workspaceStep) {
+      return (this.step = CompanyStepEnum.WORKSPACE);
+    }
+
+    if (employeeStep && hierarchyStep) {
+      return (this.step = CompanyStepEnum.EMPLOYEE);
+    }
+
+    if (hierarchyStep) {
+      return (this.step = CompanyStepEnum.HIERARCHY);
+    }
+
+    if (homoStep && riskGroupStep) {
+      return (this.step = CompanyStepEnum.HOMO_GROUP);
+    }
+
+    if (riskGroupStep) {
+      return (this.step = CompanyStepEnum.RISK_GROUP);
+    }
+
+    return (this.step = CompanyStepEnum.RISKS);
+  }
+
+  private getClinicStep() {
+    this.steps = [
+      CompanyStepEnum.EXAMS,
+      CompanyStepEnum.PROFESSIONALS,
+      CompanyStepEnum.USERS,
+      CompanyStepEnum.NONE,
+    ];
+
+    const professionalStep = this.professionalCount == 0;
+    const examStep = this.examCount == 0;
+    const usersStep = this.usersCount == 0;
+
+    if (examStep) {
+      return (this.step = CompanyStepEnum.EXAMS);
+    }
+
+    if (professionalStep) {
+      return (this.step = CompanyStepEnum.PROFESSIONALS);
+    }
+
+    if (usersStep) {
+      return (this.step = CompanyStepEnum.USERS);
+    }
+
+    return (this.step = CompanyStepEnum.NONE);
+  }
 }

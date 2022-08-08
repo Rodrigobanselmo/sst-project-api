@@ -5,6 +5,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ChecklistModule } from './modules/checklist/checklist.module';
 import { CompanyModule } from './modules/company/company.module';
 import { DocumentsModule } from './modules/documents/documents.module';
+import { EsocialModule } from './modules/esocial/esocial.module';
 import { FilesModule } from './modules/files/files.module';
 import { UsersModule } from './modules/users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -21,6 +22,7 @@ import { RolesGuard } from './shared/guards/roles.guard';
     ChecklistModule,
     FilesModule,
     DocumentsModule,
+    EsocialModule,
   ],
   providers: [
     {

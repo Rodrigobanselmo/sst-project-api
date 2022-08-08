@@ -47,7 +47,7 @@ export class PgrUploadTableService {
       homoGroupTree,
       hierarchyHighLevelsData,
       hierarchyTree,
-    } = hierarchyConverter(hierarchyHierarchy);
+    } = hierarchyConverter(hierarchyHierarchy, [], { workspaceId });
 
     const sections: ISectionOptions[] = [
       // riskCharacterizationTableSection(riskGroupData),

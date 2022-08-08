@@ -1,3 +1,4 @@
+import { QueryArray } from './../../../shared/transformers/query-array';
 import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
 import { CompanyTypesEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
@@ -49,13 +50,17 @@ export class CreateCompanyDto {
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsString()
   @IsEnum(CompanyTypesEnum, {
-    message: `type must be one of: ${KeysOfEnum(CompanyTypesEnum)}`,
+    message: `Tiop de empresa inválido`,
   })
   type: CompanyTypesEnum;
 
   @IsOptional()
   @IsBoolean()
   isConsulting: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  isClinic?: boolean;
 
   @ValidateNested()
   @IsOptional()
@@ -164,6 +169,10 @@ export class CreateCompanyDto {
   stateRegistration?: string;
 
   @IsOptional()
+  @IsString()
+  obs?: string;
+
+  @IsOptional()
   @IsInt()
   doctorResponsibleId?: number;
 
@@ -185,6 +194,24 @@ export class FindCompaniesDto extends PaginationQueryDto {
   @IsOptional()
   groupId?: number;
 
+  @IsBoolean()
+  @IsOptional()
+  isClinic?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  isConsulting?: boolean;
+
+  @IsOptional()
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsEnum(CompanyTypesEnum, {
+    message: `Tiop de empresa inválido`,
+    each: true,
+  })
+  type?: CompanyTypesEnum[];
+
+  @Transform(QueryArray, { toClassOnly: true })
   @IsString({ each: true })
   @IsOptional()
   companiesIds?: string[];

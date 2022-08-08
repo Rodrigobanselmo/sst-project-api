@@ -68,6 +68,13 @@ import { CopyHomoGroupService } from './services/homoGroup/copy-homo-group/copy-
 import { ChecklistModule } from '../checklist/checklist.module';
 import { CreateSubHierarchyService } from './services/hierarchy/create-sub-hierarchies/create-sub-hierarchies.service';
 import { DeleteSubOfficeEmployeeService } from './services/employee/delete-sub-office-employee/delete-sub-office-employee.service';
+import { ContactRepository } from './repositories/implementations/ContactRepository';
+import { UpdateContactsService } from './services/contact/update-contact/update-contact.service';
+import { FindContactsService } from './services/contact/find-contact/find-company-groups-group.service';
+import { CreateContactsService } from './services/contact/create-contact/create-contact.service';
+import { ContactController } from './controller/contact/contact.controller';
+import { DeleteContactsService } from './services/contact/delete-contact/delete-contact.service';
+import { FindCnaeService } from './services/company/find-cnae/find-cnae.service';
 
 @Module({
   imports: [forwardRef(() => ChecklistModule)],
@@ -79,6 +86,7 @@ import { DeleteSubOfficeEmployeeService } from './services/employee/delete-sub-o
     EnvironmentController,
     CharacterizationController,
     CompanyGroupController,
+    ContactController,
   ],
   providers: [
     CreateCompanyService,
@@ -141,6 +149,12 @@ import { DeleteSubOfficeEmployeeService } from './services/employee/delete-sub-o
     CopyHomoGroupService,
     CreateSubHierarchyService,
     DeleteSubOfficeEmployeeService,
+    ContactRepository,
+    UpdateContactsService,
+    CreateContactsService,
+    FindContactsService,
+    DeleteContactsService,
+    FindCnaeService,
   ],
   exports: [
     CompanyRepository,

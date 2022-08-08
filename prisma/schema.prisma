@@ -7,6 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
 enum CompanyTypesEnum {
   MATRIZ
   FILIAL
@@ -18,6 +19,12 @@ enum CompanyEnvironmentTypesEnum {
   SUPPORT
   OPERATION
   ADMINISTRATIVE
+}
+enum ExamTypeEnum {
+  LAB
+  AUDIO
+  VISUAL
+  OTHERS
 }
 
 enum HierarchyEnum {
@@ -195,19 +202,13 @@ model ChecklistData {
 
 model Company {
   id   String    @id @default(uuid())
-  cnpj String
+  cnpj String?
   name String  
   shortName String?
   fantasy String?
   description String?
-  size String?
-  legal_nature String?
-  cadastral_situation String?
-  activity_start_date String?
-  cadastral_situation_date String?
-  legal_nature_code String?
-  cadastral_situation_description String?
   isConsulting Boolean @default(false)
+  isClinic Boolean @default(false)
   licenseId Int? 
   groupId Int? 
   phone String?
@@ -225,7 +226,8 @@ model Company {
   esocialStart  DateTime?
   initials String?
   unit String?
-  stateRegistration String?
+  obs String?
+  activityStartDate DateTime? 
   created_at DateTime @default(now())
   deleted_at DateTime? 
   updated_at  DateTime   @updatedAt
@@ -252,6 +254,8 @@ model Company {
   professionals Professional[]
   receivingServiceContracts Contract[]
   recMed RecMed[] 
+  exams Exam[] 
+  clinicExams ExamToClinic[] 
   riskFactorData RiskFactorData[] 
   riskFactorDataRec RiskFactorDataRec[] 
   riskFactorDocument RiskFactorDocument[] 
@@ -260,8 +264,17 @@ model Company {
   secondary_activity Activity[] @relation(name: "secondary_activity")
   users UserCompany[]
   workspace Workspace[]
+  contacts Contact[]
   doctorResponsible  Professional? @relation(name:"doctors_company_responsibles", fields: [doctorResponsibleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   tecResponsible  Professional? @relation(name:"tec_company_responsibles", fields: [tecResponsibleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  stateRegistration String? // not in use
+  size String? // not in use
+  legal_nature String? // not in use
+  cadastral_situation String? // not in use
+  activity_start_date String? // not in use
+  cadastral_situation_date String? // not in use
+  legal_nature_code String? // not in use
+  cadastral_situation_description String? // not in use
 }
 
 model CompanyGroup {
@@ -367,6 +380,23 @@ model CompanyEnvironmentPhoto {
   companyEnvironment CompanyEnvironment @relation(fields: [companyEnvironmentId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
 }
 
+model Contact {
+  id    Int   @id  @default(autoincrement())
+  name String? 
+  phone String? 
+  phone_1 String? 
+  email String? 
+  isPrincipal Boolean @default(false)
+  obs String? 
+  companyId String 
+  updated_at  DateTime   @updatedAt
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  status StatusEnum @default(ACTIVE)
+  created_at DateTime @default(now())
+
+  @@unique([id, companyId])
+}
+
 model Contract {
   receivingServiceCompany   Company @relation(fields: [receivingServiceCompanyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   applyingServiceCompany  Company @relation(name: "contracts", fields: [applyingServiceCompanyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
@@ -467,6 +497,85 @@ model EpiToRiskFactorData {
   @@id([riskFactorDataId, epiId])
   @@map("_EpiToRiskFactorData")
 } 
+
+model Exam {
+  id    Int   @id  @default(autoincrement())
+  name String
+  analyses String? 
+  instruction String? 
+  material String? 
+  companyId String 
+  status StatusEnum @default(ACTIVE)
+  type ExamTypeEnum?
+  isAttendance Boolean @default(false)
+  updated_at  DateTime   @updatedAt
+  created_at DateTime @default(now())
+  deleted_at DateTime?
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  system Boolean @default(false)
+  examToRisk ExamToRisk[]
+  examToRiskData ExamToRiskData[]
+  examToClinic ExamToClinic[] 
+
+  @@unique([id, companyId])
+}
+
+model ExamToClinic {
+  id     Int   @id @default(autoincrement())
+  exam   Exam @relation(fields: [examId], references: [id])
+  company    Company  @relation(fields: [companyId], references: [id])
+  examId  Int
+  companyId String
+  dueInDays Int?
+  isScheduled Boolean @default(false)
+  observation String?
+  pricing ExamToClinicPricing[]
+  schedules ExamToClinicSchedule[]
+  status StatusEnum @default(ACTIVE)
+
+  @@unique([examId, companyId])
+}
+
+model ExamToClinicPricing {
+  id     Int   @id @default(autoincrement())
+  examToClinic   ExamToClinic @relation(fields: [examToClinicId], references: [id])
+  examToClinicId  Int
+  price  Int
+  startDate DateTime @default(now())
+  observation String?
+}
+
+model ExamToClinicSchedule {
+  id     Int   @id @default(autoincrement())
+  examToClinic   ExamToClinic @relation(fields: [examToClinicId], references: [id])
+  examToClinicId  Int
+  startDate DateTime?
+  endDate DateTime?
+  startTime String
+  endTime String
+  observation String?
+}
+
+model ExamToRisk {
+  id     Int   @id @default(autoincrement())
+  exam   Exam? @relation(fields: [examId], references: [id])
+  risk    RiskFactors?  @relation(fields: [riskId], references: [id])
+  examId  Int?
+  riskId String?
+
+  @@unique([examId, riskId])
+}
+
+model ExamToRiskData {
+  id     Int   @id @default(autoincrement())
+  exam   Exam? @relation(fields: [examId], references: [id])
+  risk    RiskFactorData?  @relation(fields: [riskDataId], references: [id])
+  examId  Int?
+  riskDataId String?
+
+  @@unique([examId, riskDataId])
+}
+
 
 model GenerateSource {
   id    String   @id  @default(uuid())
@@ -659,6 +768,7 @@ model RiskFactors {
   representAll Boolean @default(false)
   riskFactorData RiskFactorData[]
   riskFactorProbability RiskFactorProbability[]
+  examToRisk ExamToRisk[]
   json Json?
   
   @@unique([id, companyId])
@@ -763,6 +873,7 @@ model RiskFactorData {
   recs RecMed[]  @relation(name: "recs")
   adms RecMed[]  @relation(name: "adms")
   dataRecs RiskFactorDataRec[]
+  examToRiskData ExamToRiskData[]
   json Json?
   level    Int?
   epiToRiskFactorData EpiToRiskFactorData[]

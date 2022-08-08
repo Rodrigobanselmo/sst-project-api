@@ -150,7 +150,7 @@ export class PgrUploadService {
         hierarchyHighLevelsData,
         homoGroupTree,
         hierarchyTree,
-      } = hierarchyConverter(hierarchyHierarchy, environments);
+      } = hierarchyConverter(hierarchyHierarchy, environments, { workspaceId });
 
       // const actionPlanUrl = ' ';
       // const urlAPR = ' ';

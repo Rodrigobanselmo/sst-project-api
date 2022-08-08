@@ -14,6 +14,7 @@ import { ApiTags } from '@nestjs/swagger';
 
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
+import { FindActivityDto } from '../../dto/activity.dto';
 import {
   CreateCompanyDto,
   FindCompaniesDto,
@@ -26,6 +27,7 @@ import { CreateContractService } from '../../services/company/create-contract/cr
 import { FindAllCompaniesService } from '../../services/company/find-all-companies/find-all-companies.service';
 import { FindAllUserCompaniesService } from '../../services/company/find-all-user-companies /find-all-companies.service';
 import { FindCepService } from '../../services/company/find-cep/find-cep.service';
+import { FindCnaeService } from '../../services/company/find-cnae/find-cnae.service';
 import { FindCnpjService } from '../../services/company/find-cnpj/find-cnpj.service';
 import { FindCompanyService } from '../../services/company/find-company/find-company.service';
 import { UpdateCompanyService } from '../../services/company/update-company/update-company.service';
@@ -43,6 +45,7 @@ export class CompanyController {
     private readonly findCompanyService: FindCompanyService,
     private readonly findCnpjService: FindCnpjService,
     private readonly findCepService: FindCepService,
+    private readonly findCnaeService: FindCnaeService,
     private readonly copyCompanyService: CopyCompanyService,
   ) {}
 
@@ -60,6 +63,12 @@ export class CompanyController {
     @Query() query: FindCompaniesDto,
   ) {
     return this.findAllUserCompaniesService.execute(userPayloadDto, query);
+  }
+
+  @Get('/cnae')
+  findCNAE(@Query() query: FindActivityDto) {
+    console.log(query);
+    return this.findCnaeService.execute(query);
   }
 
   @Get('/:companyId')

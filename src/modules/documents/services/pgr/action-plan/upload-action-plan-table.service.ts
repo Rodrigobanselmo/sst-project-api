@@ -49,7 +49,9 @@ export class PgrActionPlanUploadTableService {
         workspaceId,
       );
 
-    const { hierarchyTree } = hierarchyConverter(hierarchyHierarchy);
+    const { hierarchyTree } = hierarchyConverter(hierarchyHierarchy, [], {
+      workspaceId,
+    });
 
     const sections: ISectionOptions[] = [
       actionPlanTableSection(riskGroupData, hierarchyTree),

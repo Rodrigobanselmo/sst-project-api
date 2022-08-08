@@ -1,3 +1,4 @@
+import { prismaFilter } from './../../../../shared/utils/filters/prisma.filters';
 import { PaginationQueryDto } from './../../../../shared/dto/pagination.dto';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
@@ -33,6 +34,8 @@ export class CompanyRepository implements ICompanyRepository {
     companyId,
     doctorResponsibleId,
     tecResponsibleId,
+    phone,
+    email,
     ...createCompanyDto
   }: ICreateCompany): Promise<CompanyEntity> {
     const companyUUId = uuidV4();
@@ -99,6 +102,9 @@ export class CompanyRepository implements ICompanyRepository {
               ],
             }
           : undefined,
+        contacts: {
+          create: [{ email, phone, name: 'Principal', isPrincipal: true }],
+        },
       },
       include: {
         workspace: { include: { address: true } },
@@ -107,6 +113,8 @@ export class CompanyRepository implements ICompanyRepository {
         secondary_activity: true,
         license: true,
         address: true,
+        doctorResponsible: true,
+        tecResponsible: true,
       },
     });
 
@@ -263,12 +271,24 @@ export class CompanyRepository implements ICompanyRepository {
         secondary_activity: !!include.secondary_activity,
         license: !!include.license,
         users: !!include.users,
+        doctorResponsible: true,
+        tecResponsible: true,
         group: true,
         employees: !!include.employees
           ? { include: { workspaces: true } }
           : false,
       },
     });
+
+    // if (updateCompanyDto.phone || updateCompanyDto.email) {
+    //   await this.prisma.contact.findFirst({
+    //     where: { companyId, isPrincipal: true },
+    //   });
+
+    //   await this.prisma.contacts.update({
+    //     where: { id: companyId },
+    //   });
+    // }
 
     if (prismaRef) return companyPrisma;
 
@@ -376,6 +396,8 @@ export class CompanyRepository implements ICompanyRepository {
               license: !!include.license,
               users: !!include.users,
               group: true,
+              doctorResponsible: true,
+              tecResponsible: true,
               employees: !!include.employees
                 ? { include: { workspaces: true } }
                 : false,
@@ -428,6 +450,8 @@ export class CompanyRepository implements ICompanyRepository {
         secondary_activity: true,
         group: true,
         license: true,
+        doctorResponsible: true,
+        tecResponsible: true,
       },
     });
 
@@ -445,7 +469,10 @@ export class CompanyRepository implements ICompanyRepository {
     })) as CompanyEntity;
 
     const employeeCount = await this.prisma.employee.count({
-      where: { companyId: id, workspaces: { some: { id: workspaceId } } },
+      where: {
+        companyId: id,
+        hierarchy: { workspaces: { some: { id: workspaceId } } },
+      },
     });
 
     company.environments = [];
@@ -461,11 +488,12 @@ export class CompanyRepository implements ICompanyRepository {
 
   async findAllRelatedByCompanyId(
     companyId: string | null,
-    query: FindCompaniesDto,
+    queryFind: FindCompaniesDto,
     pagination: PaginationQueryDto,
     options: Partial<Prisma.CompanyFindManyArgs> = { where: undefined },
   ) {
-    const where = {
+    const query = { isClinic: false, ...queryFind };
+    const whereInit = {
       AND: [
         ...(companyId
           ? [
@@ -485,11 +513,17 @@ export class CompanyRepository implements ICompanyRepository {
       ],
     } as typeof options.where;
 
+    const { where } = prismaFilter(whereInit, {
+      query,
+      skip: ['search', 'userId', 'groupId', 'companiesIds'],
+    });
+
     if ('search' in query) {
       (where.AND as any).push({
         OR: [
           { group: { name: { contains: query.search, mode: 'insensitive' } } },
           { name: { contains: query.search, mode: 'insensitive' } },
+          { initials: { contains: query.search, mode: 'insensitive' } },
           {
             cnpj: {
               contains: query.search ? onlyNumbers(query.search) || 'no' : '',
@@ -497,39 +531,25 @@ export class CompanyRepository implements ICompanyRepository {
           },
         ],
       } as typeof options.where);
-      delete query.search;
     }
 
     if ('userId' in query) {
       (where.AND as any).push({
         users: { some: { userId: query.userId } },
       } as typeof options.where);
-      delete query.userId;
     }
 
     if ('groupId' in query) {
       (where.AND as any).push({
         group: { id: query.groupId },
       } as typeof options.where);
-      delete query.groupId;
     }
 
     if ('companiesIds' in query) {
       (where.AND as any).push({
         id: { in: query.companiesIds },
       } as typeof options.where);
-      delete query.companiesIds;
     }
-
-    Object.entries(query).forEach(([key, value]) => {
-      if (value)
-        (where.AND as any).push({
-          [key]: {
-            contains: value,
-            mode: 'insensitive',
-          },
-        } as typeof options.where);
-    });
 
     const response = await this.prisma.$transaction([
       this.prisma.company.count({
@@ -541,10 +561,15 @@ export class CompanyRepository implements ICompanyRepository {
         include: {
           workspace: { include: { address: true } },
           group: true,
+          doctorResponsible: true,
+          tecResponsible: true,
+          address: true,
+          contacts: { where: { isPrincipal: true } },
           ...options?.include,
         },
         take: pagination.take || 20,
         skip: pagination.skip || 0,
+        orderBy: { name: 'asc' },
       }),
     ]);
 
@@ -559,13 +584,20 @@ export class CompanyRepository implements ICompanyRepository {
     pagination: PaginationQueryDto,
     options: Partial<Prisma.CompanyFindManyArgs> = {},
   ) {
-    const where = { AND: [] } as typeof options.where;
+    const whereInit = { AND: [] } as typeof options.where;
+
+    const { where } = prismaFilter(whereInit, {
+      query,
+      skip: ['search', 'userId', 'groupId', 'companiesIds'],
+    });
 
     if ('search' in query) {
       (where.AND as any).push({
         OR: [
           { group: { name: { contains: query.search, mode: 'insensitive' } } },
           { name: { contains: query.search, mode: 'insensitive' } },
+          { initials: { contains: query.search, mode: 'insensitive' } },
+          { unit: { contains: query.search, mode: 'insensitive' } },
           {
             cnpj: {
               contains: query.search ? onlyNumbers(query.search) || 'no' : '',
@@ -573,39 +605,25 @@ export class CompanyRepository implements ICompanyRepository {
           },
         ],
       } as typeof options.where);
-      delete query.search;
     }
 
     if ('userId' in query) {
       (where.AND as any).push({
         users: { some: { userId: query.userId } },
       } as typeof options.where);
-      delete query.userId;
     }
 
     if ('groupId' in query) {
       (where.AND as any).push({
         group: { id: query.groupId },
       } as typeof options.where);
-      delete query.groupId;
     }
 
     if ('companiesIds' in query) {
       (where.AND as any).push({
         id: { in: query.companiesIds },
       } as typeof options.where);
-      delete query.companiesIds;
     }
-
-    Object.entries(query).forEach(([key, value]) => {
-      if (value)
-        (where.AND as any).push({
-          [key]: {
-            contains: value,
-            mode: 'insensitive',
-          },
-        } as typeof options.where);
-    });
 
     const response = await this.prisma.$transaction([
       this.prisma.company.count({
@@ -617,6 +635,10 @@ export class CompanyRepository implements ICompanyRepository {
         include: {
           workspace: { include: { address: true } },
           group: true,
+          doctorResponsible: true,
+          tecResponsible: true,
+          address: true,
+          contacts: { where: { isPrincipal: true } },
           ...options?.include,
         },
         take: pagination.take || 20,
@@ -653,6 +675,18 @@ export class CompanyRepository implements ICompanyRepository {
       where: { companyId: id },
     });
 
+    const professionalCount = await this.prisma.professional.count({
+      where: { companyId: id },
+    });
+
+    const examCount = await this.prisma.exam.count({
+      where: { companyId: id },
+    });
+
+    const usersCount = await this.prisma.userCompany.count({
+      where: { companyId: id },
+    });
+
     const company = await this.prisma.company.findUnique({
       where: { id },
       include: {
@@ -667,6 +701,8 @@ export class CompanyRepository implements ICompanyRepository {
           ? { include: { workspaces: true } }
           : false,
         address: true,
+        doctorResponsible: true,
+        tecResponsible: true,
       },
     });
 
@@ -674,7 +710,11 @@ export class CompanyRepository implements ICompanyRepository {
       company.workspace = await Promise.all(
         company.workspace.map(async (workspace) => {
           const employeeCount = await this.prisma.employee.count({
-            where: { workspaces: { some: { id: workspace.id } } },
+            where: {
+              OR: [
+                { hierarchy: { workspaces: { some: { id: workspace.id } } } },
+              ],
+            },
           });
 
           return { ...workspace, employeeCount };
@@ -688,6 +728,36 @@ export class CompanyRepository implements ICompanyRepository {
       riskGroupCount: riskGroupCount,
       homogenousGroupCount,
       hierarchyCount,
+      professionalCount,
+      examCount,
+      usersCount,
     });
+  }
+
+  async countRelations(
+    id: string,
+    options?: {
+      riskGroupCount?: boolean;
+      hierarchyCount?: boolean;
+      homogenousGroupCount?: boolean;
+    },
+  ) {
+    const riskGroupCount = await this.prisma.riskFactorGroupData.count({
+      where: { companyId: id },
+    });
+
+    const hierarchyCount = await this.prisma.hierarchy.count({
+      where: { companyId: id },
+    });
+
+    const homogenousGroupCount = await this.prisma.homogeneousGroup.count({
+      where: { companyId: id },
+    });
+
+    return {
+      riskGroupCount: riskGroupCount,
+      homogenousGroupCount,
+      hierarchyCount,
+    };
   }
 }

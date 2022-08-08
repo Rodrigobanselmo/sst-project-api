@@ -1,5 +1,5 @@
-import { RoleEnum } from './../../../../../shared/constants/enum/authorization';
 import { CompanyRepository } from './../../../../company/repositories/implementations/CompanyRepository';
+import { RoleEnum } from './../../../../../shared/constants/enum/authorization';
 import { AuthGroupRepository } from './../../../../auth/repositories/implementations/AuthGroupRepository';
 import { ErrorInvitesEnum } from './../../../../../shared/constants/enum/errorMessage';
 import { UserPayloadDto } from './../../../../../shared/dto/user-payload.dto';

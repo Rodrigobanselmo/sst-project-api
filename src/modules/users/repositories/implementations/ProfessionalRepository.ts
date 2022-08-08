@@ -118,7 +118,7 @@ export class ProfessionalRepository {
 
     if ('companies' in query) {
       (where.AND as any).push({
-        company: { in: [query.companies] },
+        company: { id: { in: query.companies } },
       } as typeof options.where);
       delete query.companies;
     }

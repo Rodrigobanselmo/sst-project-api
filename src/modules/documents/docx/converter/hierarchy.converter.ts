@@ -97,6 +97,7 @@ const setMapHierarchies = (hierarchyData: HierarchyEntity[]) => {
 export const hierarchyConverter = (
   hierarchies: HierarchyEntity[],
   environments = [] as EnvironmentEntity[],
+  { workspaceId }: { workspaceId?: string } = {},
 ) => {
   const { hierarchyTree, homoGroupTree } = setMapHierarchies(hierarchies);
   const hierarchyData = new Map<string, HierarchyMapData>();
@@ -181,10 +182,16 @@ export const hierarchyConverter = (
       [HierarchyEnum.OFFICE, HierarchyEnum.SUB_OFFICE] as HierarchyEnum[]
     ).includes(hierarchy.type);
 
+    const workspace = workspaceId
+      ? hierarchy.workspaces.find(
+          (workspace) => workspace.id === workspaceId,
+        ) || hierarchy.workspaces[0]
+      : hierarchy.workspaces[0];
+
     if (isOffice)
       hierarchyData.set(hierarchy.id, {
         org: hierarchyArrayData.filter((hierarchyInfo) => hierarchyInfo),
-        workspace: hierarchy.workspaces[0].name, //! Make it possible for many workspaces
+        workspace: workspace.name, //! (done, just test now) Make it possible for many workspaces
         descRh: hierarchy.description,
         descReal: hierarchy.realDescription,
         employeesLength: hierarchy?.employees?.length || 0,
@@ -195,7 +202,7 @@ export const hierarchyConverter = (
 
     hierarchyHighLevelsData.set(hierarchy.id, {
       org: hierarchyArrayData.filter((hierarchyInfo) => hierarchyInfo),
-      workspace: hierarchy.workspaces[0].name, //! Make it possible for many workspaces
+      workspace: workspace.name, //! (done, just test now) Make it possible for many workspaces
       descRh: hierarchy.description,
       descReal: hierarchy.realDescription,
       employeesLength: hierarchy?.employees?.length || 0,

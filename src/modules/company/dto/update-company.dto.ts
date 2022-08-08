@@ -186,4 +186,8 @@ export class UpdateCompanyDto {
   @IsOptional()
   @IsInt()
   tecResponsibleId?: number;
+
+  @IsOptional()
+  @IsString()
+  obs?: string;
 }

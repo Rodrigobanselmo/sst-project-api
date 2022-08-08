@@ -27,7 +27,7 @@ export class ProfessionalRiskGroupEntity
   isElaborator: boolean;
   professional?: ProfessionalEntity;
 
-  constructor(partial: Partial<UsersRiskGroupEntity>) {
+  constructor(partial: Partial<ProfessionalRiskGroupEntity>) {
     Object.assign(this, partial);
   }
 }

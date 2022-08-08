@@ -1,8 +1,11 @@
+import { prismaFilter } from './../../../../shared/utils/filters/prisma.filters';
+import { PaginationQueryDto } from './../../../../shared/dto/pagination.dto';
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
-import { ActivityDto } from '../../dto/activity.dto';
+import { ActivityDto, FindActivityDto } from '../../dto/activity.dto';
 import { ActivityEntity } from '../../entities/activity.entity';
+import { Prisma } from '@prisma/client';
 
 let i = 0;
 
@@ -33,5 +36,47 @@ export class ActivityRepository {
     );
 
     return data.map((activity) => new ActivityEntity(activity));
+  }
+
+  async find(
+    query: Partial<FindActivityDto>,
+    pagination: PaginationQueryDto,
+    options: Prisma.ActivityFindManyArgs = {},
+  ) {
+    const whereInit = {
+      AND: [],
+    } as typeof options.where;
+
+    const { where } = prismaFilter(whereInit, {
+      query,
+      skip: ['search'],
+    });
+
+    if ('search' in query) {
+      (where.AND as any).push({
+        OR: [
+          // { name: { contains: query.search, mode: 'insensitive' } },
+          { code: { contains: query.search } },
+        ],
+      } as typeof options.where);
+    }
+
+    const response = await this.prisma.$transaction([
+      this.prisma.activity.count({
+        where,
+      }),
+      this.prisma.activity.findMany({
+        ...options,
+        where,
+        take: pagination.take || 20,
+        skip: pagination.skip || 0,
+        orderBy: { name: 'asc' },
+      }),
+    ]);
+
+    return {
+      data: response[1].map((contact) => new ActivityEntity(contact)),
+      count: response[0],
+    };
   }
 }

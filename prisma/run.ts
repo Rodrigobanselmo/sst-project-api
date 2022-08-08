@@ -7,7 +7,11 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('start');
   try {
-    await convertProf(prisma);
+    const x = await prisma.activity.delete({
+      where: { code: '0' },
+    });
+    console.log(x);
+    // await convertProf(prisma);
   } catch (error) {
     console.log(error);
     console.log('error: end');
