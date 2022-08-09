@@ -142,7 +142,7 @@ export class CopyCompanyService {
           isEnvironment(homoGroup.characterization.type)
         ) {
           homoGroupsCreation[i].environment = homoGroup.characterization as any;
-          homoGroupsCreation[i].characterization = null;
+          // homoGroupsCreation[i].characterization = null;
         }
       });
 
