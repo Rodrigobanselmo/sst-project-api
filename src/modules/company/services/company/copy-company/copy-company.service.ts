@@ -70,7 +70,7 @@ export class CopyCompanyService {
         include: {
           characterization: {
             include: {
-              photos: true,
+              // photos: true,
               profiles: {
                 include: {
                   homogeneousGroup: true,
@@ -236,15 +236,16 @@ export class CopyCompanyService {
               },
             });
 
-            if (group.characterization.photos)
-              await this.prisma.companyCharacterizationPhoto.createMany({
-                data: group.characterization.photos.map(
-                  ({ id, created_at, updated_at, deleted_at, ...photo }) => ({
-                    ...photo,
-                    companyCharacterizationId: newHomoGroup.id,
-                  }),
-                ),
-              });
+            //! don't include photos
+            // if (group.characterization.photos)
+            //   await this.prisma.companyCharacterizationPhoto.createMany({
+            //     data: group.characterization.photos.map(
+            //       ({ id, created_at, updated_at, deleted_at, ...photo }) => ({
+            //         ...photo,
+            //         companyCharacterizationId: newHomoGroup.id,
+            //       }),
+            //     ),
+            //   });
           }
 
           if (group.riskFactorData && group.riskFactorData.length) {
