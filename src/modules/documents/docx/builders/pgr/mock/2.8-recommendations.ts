@@ -46,15 +46,26 @@ export const recommendationsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          text: `A ??${VariablesPGREnum.COMPANY_SHORT_NAME}?? deverá divulgar e manter atualizado o Plano de Resposta a Emergência para todos os colaboradores da empresa.`,
+          removeWithSomeEmptyVars: [VariablesPGREnum.HAS_EMERGENCY],
+          addWithAllVars: [
+            VariablesPGREnum.HAS_EMERGENCY_PLAN,
+            VariablesPGREnum.IS_WORKSPACE_OWNER,
+          ],
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
           text: `A ??${VariablesPGREnum.COMPANY_SHORT_NAME}?? deverá elaborar o seu Plano de Resposta a Emergência, para saber qual conduta adotar, em casos de acidentes ou mal súbito de colaborador próprio, princípio de incêndio, ou outros eventos de consequências catastróficas.  Para isso, também será de fundamental importância, formar a sua Brigada de Emergência e promover simulados de abandono do local de trabalho, se for o caso.`,
           removeWithSomeEmptyVars: [VariablesPGREnum.HAS_EMERGENCY],
           addWithAllVars: [VariablesPGREnum.IS_WORKSPACE_OWNER],
+          removeWithAllValidVars: [VariablesPGREnum.HAS_EMERGENCY_PLAN],
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
           text: 'O Plano de Atendimento à Emergência deve conter as definições de responsabilidade e ações para atender a uma emergência. Deverá analisar os riscos inerentes a cada ponto sensível levantado e deverá prever todas as ações a serem desenvolvidas para neutralizar ou minimizar as consequências de acidentes, proteger a vida humana, descontaminação e recuperação do meio ambiente e proteção da propriedade particular. É um documento desenvolvido com o intuito de treinar, organizar, orientar, facilitar, agilizar e uniformizar as ações necessárias às respostas de controle e combate às ocorrências anormais.',
           removeWithSomeEmptyVars: [VariablesPGREnum.HAS_EMERGENCY],
           addWithAllVars: [VariablesPGREnum.IS_WORKSPACE_OWNER],
+          removeWithAllValidVars: [VariablesPGREnum.HAS_EMERGENCY_PLAN],
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,

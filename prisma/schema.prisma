@@ -800,6 +800,7 @@ model RiskFactorGroupData {
   validity String?
   visitDate DateTime?
   isQ5 Boolean @default(false)
+  hasEmergencyPlan Boolean @default(false)
   validityStart DateTime?
   validityEnd DateTime?
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)

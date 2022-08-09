@@ -145,7 +145,7 @@ export class CompanyRepository implements ICompanyRepository {
     prismaRef?: boolean,
   ) {
     const include = options?.include || {};
-
+    console.log(workspace);
     if (primary_activity.length)
       await this.prisma.company.update({
         where: { id: companyId },
@@ -232,13 +232,15 @@ export class CompanyRepository implements ICompanyRepository {
         address: address ? { update: { ...address } } : undefined,
         workspace: {
           upsert: [
-            ...workspace.map(({ id, address, ...work }) => ({
+            ...workspace.map(({ id, address, companyJson, ...work }) => ({
               create: {
                 ...work,
                 address: { create: address },
+                companyJson: companyJson || undefined,
               },
               update: {
                 ...work,
+                companyJson: companyJson || undefined,
                 address: { update: address },
               },
               where: {

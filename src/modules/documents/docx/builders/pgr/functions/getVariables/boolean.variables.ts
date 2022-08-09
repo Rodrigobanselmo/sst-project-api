@@ -191,5 +191,8 @@ export const booleanVariables = (
       : '',
     [VariablesPGREnum.IS_WORKSPACE_OWNER]: workspace.isOwner ? 'true' : '',
     [VariablesPGREnum.IS_NOT_WORKSPACE_OWNER]: !workspace.isOwner ? 'true' : '',
+    [VariablesPGREnum.HAS_EMERGENCY_PLAN]: document.hasEmergencyPlan
+      ? 'true'
+      : '',
   };
 };

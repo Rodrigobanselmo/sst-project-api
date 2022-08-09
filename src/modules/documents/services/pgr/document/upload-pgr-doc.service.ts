@@ -239,7 +239,6 @@ export class PgrUploadService {
 
       const fileName = this.getFileName(upsertPgrDto, riskGroupData);
 
-      console.log('start: upload');
       const url = await this.upload(buffer, fileName, upsertPgrDto);
 
       await this.riskDocumentRepository.upsert({
@@ -253,12 +252,16 @@ export class PgrUploadService {
 
       // return doc; //?remove
 
-      [logo, ...photosPath].forEach((path) => path && fs.unlinkSync(path));
+      [logo, consultantLogo, ...photosPath].forEach(
+        (path) => path && fs.unlinkSync(path),
+      );
       console.log('done: unlink photos');
 
       return { buffer, fileName };
     } catch (error) {
-      [logo, ...photosPath].forEach((path) => path && fs.unlinkSync(path));
+      [logo, consultantLogo, ...photosPath].forEach(
+        (path) => path && fs.unlinkSync(path),
+      );
       console.log('error: unlink photos', error);
 
       if (upsertPgrDto.id)

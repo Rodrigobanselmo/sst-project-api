@@ -71,6 +71,10 @@ export class UpsertRiskGroupDataDto {
   isQ5?: boolean;
 
   @IsOptional()
+  @IsBoolean()
+  hasEmergencyPlan?: boolean;
+
+  @IsOptional()
   @IsString({ each: true })
   complementarySystems?: string[];
 
@@ -122,7 +126,6 @@ export class UsersToRiskDataGroupDto {
   @IsOptional()
   isElaborator: boolean;
 }
-
 export class ProfessionalToRiskDataGroupDto {
   @IsOptional()
   @IsString()

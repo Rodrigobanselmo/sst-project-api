@@ -52,6 +52,7 @@ export class RiskFactorGroupDataEntity implements RiskFactorGroupData {
   complementarySystems: string[];
   complementaryDocs: string[];
   coordinatorBy: string;
+  hasEmergencyPlan: boolean;
   isQ5: boolean;
   validityEnd: Date;
   validityStart: Date;

@@ -1,6 +1,7 @@
 import { RiskFactorsEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import {
+  IsBoolean,
   IsEnum,
   IsNumber,
   IsOptional,
@@ -47,6 +48,10 @@ export class CreateRiskDto {
 
   @IsString()
   companyId: string;
+
+  @IsBoolean()
+  @IsOptional()
+  isEmergency: boolean;
 
   @IsString()
   @IsOptional()
@@ -122,6 +127,10 @@ export class UpdateRiskDto {
   @IsString()
   @IsOptional()
   symptoms: string;
+
+  @IsBoolean()
+  @IsOptional()
+  isEmergency: boolean;
 
   @ValidateNested({ each: true })
   @IsOptional()

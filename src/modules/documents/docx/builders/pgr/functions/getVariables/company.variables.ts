@@ -24,8 +24,8 @@ export const companyVariables = (
       ? `${consultant.address.city} – ${consultant.address.state}`
       : `${company.address.city} – ${company.address.state}`,
     [VariablesPGREnum.COMPANY_CNAE]: company?.primary_activity
-      ? `${formatCnae(company?.primary_activity[0].code)} – ${
-          company?.primary_activity[0].name
+      ? `${formatCnae(company?.primary_activity[0]?.code || '')} – ${
+          company?.primary_activity[0]?.name || ''
         }`
       : '',
     [VariablesPGREnum.COMPANY_RISK_DEGREE]:

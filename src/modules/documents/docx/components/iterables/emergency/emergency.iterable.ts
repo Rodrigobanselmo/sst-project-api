@@ -7,6 +7,7 @@ import {
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
 import { RiskFactorDataEntity } from '../../../../../checklist/entities/riskData.entity';
 import { emergencyConverter } from './emergency.converter';
+import { removeDuplicate } from 'src/shared/utils/removeDuplicate';
 
 export const emergencyIterable = (
   riskData: Partial<RiskFactorDataEntity>[],
@@ -17,7 +18,9 @@ export const emergencyIterable = (
 ) => {
   const emergencyVarArray = emergencyConverter(riskData);
 
-  const iterableSections = emergencyVarArray
+  const iterableSections = removeDuplicate(emergencyVarArray, {
+    simpleCompare: true,
+  })
     .map((risk) => {
       if (!risk) return;
 
