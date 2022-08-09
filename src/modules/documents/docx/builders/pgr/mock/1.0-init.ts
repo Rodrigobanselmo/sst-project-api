@@ -196,6 +196,7 @@ export const initSection: IDocumentPGRSectionGroup = {
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
           text: `**E-mail**: ??${VariablesPGREnum.COMPANY_EMAIL}??`,
+          removeWithSomeEmptyVars: [VariablesPGREnum.COMPANY_EMAIL],
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -204,14 +205,17 @@ export const initSection: IDocumentPGRSectionGroup = {
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
           text: `**Grau de Risco**: ??${VariablesPGREnum.COMPANY_RISK_DEGREE}??`,
+          removeWithSomeEmptyVars: [VariablesPGREnum.COMPANY_RISK_DEGREE],
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
           text: `**CNAE**: ??${VariablesPGREnum.COMPANY_CNAE}??`,
+          removeWithSomeEmptyVars: [VariablesPGREnum.COMPANY_CNAE],
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: `**Horário de Trabalho**: ??${VariablesPGREnum.COMPANY_WORK_TIME}??`,
+          text: `**Horário de Funcionamento do Estabelecimento**: ??${VariablesPGREnum.COMPANY_WORK_TIME}??`,
+          removeWithSomeEmptyVars: [VariablesPGREnum.COMPANY_WORK_TIME],
         },
         {
           type: PGRSectionChildrenTypeEnum.H2,
@@ -238,11 +242,7 @@ export const initSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**SIMPLESST**',
-        },
-        {
-          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '',
+          text: `**??${VariablesPGREnum.CONSULTANT_NAME}??**`,
         },
         {
           type: PGRSectionChildrenTypeEnum.PROFESSIONAL,
@@ -279,7 +279,7 @@ export const initSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: ` VIGÊNCIA: ${VariablesPGREnum.DOC_VALIDITY}`,
+          text: ` VIGÊNCIA: ??${VariablesPGREnum.DOC_VALIDITY}??`,
           size: 8,
           spacing: { before: 0, after: 0, line: 300 },
           shading: { fill: palette.table.header.string },

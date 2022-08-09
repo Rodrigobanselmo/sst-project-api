@@ -139,6 +139,7 @@ export class DocumentBuildPGR {
       hierarchy: this.hierarchy,
       environments: this.environments ?? [],
       characterizations: this.characterizations ?? [],
+      company: this.company,
     }).map;
 
     data.forEach((child) => {

@@ -65,7 +65,9 @@ export class ExamToClinicRepository {
 
     if ('search' in query) {
       (where.AND as any).push({
-        OR: [{ name: { contains: query.search, mode: 'insensitive' } }],
+        OR: [
+          { exam: { name: { contains: query.search, mode: 'insensitive' } } },
+        ],
       } as typeof options.where);
     }
 

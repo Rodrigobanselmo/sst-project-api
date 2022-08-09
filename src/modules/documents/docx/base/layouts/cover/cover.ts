@@ -1,6 +1,12 @@
 import { setNiceProportion } from './../../../../../../shared/utils/setNiceProportion';
 import sizeOf from 'image-size';
-import { ImageRun, ISectionOptions, Paragraph, TextRun } from 'docx';
+import {
+  AlignmentType,
+  ImageRun,
+  ISectionOptions,
+  Paragraph,
+  TextRun,
+} from 'docx';
 import fs from 'fs';
 
 import { sectionCoverProperties } from '../../config/styles';
@@ -8,6 +14,7 @@ import { sectionCoverProperties } from '../../config/styles';
 interface IHeaderProps {
   version: string;
   imgPath: string;
+  companyName: string;
 }
 
 const title = () =>
@@ -22,7 +29,7 @@ const title = () =>
     spacing: { after: 400, before: 0 },
   });
 
-const versionDate = (version: string) =>
+const textShow = (version: string) =>
   new Paragraph({
     children: [
       new TextRun({
@@ -58,23 +65,34 @@ const imageCover = (imgPath: string) => {
         },
       }),
     ],
+    alignment: AlignmentType.CENTER,
   });
 };
 
 export const createCover = ({
   version,
   imgPath,
+  companyName,
 }: IHeaderProps): Paragraph[] => {
   if (!imgPath) return [title()];
-  return [title(), versionDate(version), imageCover(imgPath)];
+  return [
+    title(),
+    textShow(version),
+    textShow(''),
+    imageCover(imgPath),
+    textShow(''),
+    textShow(''),
+    textShow(companyName),
+  ];
 };
 
 export const coverSections = ({
   version,
   imgPath,
+  companyName,
 }: IHeaderProps): ISectionOptions => {
   return {
-    children: [...createCover({ version, imgPath })],
+    children: [...createCover({ version, imgPath, companyName })],
     properties: sectionCoverProperties,
   };
 };

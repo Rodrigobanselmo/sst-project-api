@@ -1,3 +1,4 @@
+import { CompanyEntity } from './../../../../../company/entities/company.entity';
 import { CharacterizationEntity } from './../../../../../company/entities/characterization.entity';
 import { ISectionOptions } from 'docx';
 
@@ -42,6 +43,7 @@ type IDocumentClassType = {
   hierarchy: Map<string, HierarchyMapData>;
   characterizations: CharacterizationEntity[];
   environments: EnvironmentEntity[];
+  company: CompanyEntity;
 };
 
 export class SectionsMapClass {
@@ -55,9 +57,10 @@ export class SectionsMapClass {
   private environments: EnvironmentEntity[];
   private characterizations: CharacterizationEntity[];
   private hierarchy: Map<string, HierarchyMapData>;
+  private company: CompanyEntity;
 
   // eslint-disable-next-line prettier/prettier
-  constructor({ variables, version, logoImagePath, elementsMap, document, hierarchy, homogeneousGroup,environments,characterizations, consultantLogoImagePath }: IDocumentClassType) {
+  constructor({ variables, company, version, logoImagePath, elementsMap, document, hierarchy, homogeneousGroup,environments,characterizations, consultantLogoImagePath }: IDocumentClassType) {
     this.variables = variables;
     this.version = version;
     this.logoPath = logoImagePath;
@@ -68,6 +71,7 @@ export class SectionsMapClass {
     this.homogeneousGroup = homogeneousGroup;
     this.environments = environments;
     this.characterizations = characterizations;
+    this.company = company;
   }
 
   public map: IMapSectionDocumentType = {
@@ -76,11 +80,15 @@ export class SectionsMapClass {
       coverSections({
         imgPath: this.logoPath,
         version: this.version,
+        companyName: `${this.company.name} ${
+          this.company.initials ? `(${this.company.initials})` : ''
+        }`,
       }),
     [PGRSectionTypeEnum.CHAPTER]: ({ text }: IChapter) =>
       chapterSection({
         version: this.version,
         chapter: replaceAllVariables(text, this.variables),
+        imagePath: this.logoPath,
       }),
     [PGRSectionTypeEnum.SECTION]: ({
       children,

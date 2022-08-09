@@ -9,8 +9,8 @@ import { FindExamDto } from '../../dto/exam.dto';
 import { FindExamToClinicService } from '../../services/examToClinic/find-exam-to-clinic/find-exam-to-clinic.service';
 import { UpsertExamToClinicService } from '../../services/examToClinic/upsert-exam-to-clinic/upsert-exam-to-clinic.service';
 
-@Controller('clinic-exam')
-export class ExamController {
+@Controller('/clinic-exam')
+export class ExamToClinicController {
   constructor(
     private readonly upsertExamToClinicService: UpsertExamToClinicService,
     private readonly findExamToClinicService: FindExamToClinicService,

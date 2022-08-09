@@ -69,6 +69,8 @@ export class AmazonStorageProvider implements IStorageProvider {
   async delete({
     fileName,
   }: FileStorage.Delete.Params): Promise<FileStorage.Delete.Result> {
+    if (process.env.APP_HOST.includes('localhost')) return;
+
     await this.s3
       .deleteObject({ Bucket: this.bucket, Key: fileName })
       .promise();

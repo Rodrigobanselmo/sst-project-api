@@ -1,5 +1,5 @@
 import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
-import { StatusEnum } from '@prisma/client';
+import { Prisma, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import {
   IsBoolean,
@@ -31,6 +31,13 @@ export class UpsertExamToClinicDto {
   @IsString()
   @IsOptional()
   observation: string;
+
+  @IsInt()
+  @IsOptional()
+  price: number;
+
+  @IsOptional()
+  scheduleRange?: Prisma.JsonValue;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsOptional()

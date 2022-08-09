@@ -17,6 +17,9 @@ export const companyVariables = (
     company.receivingServiceContracts[0]?.applyingServiceCompany;
 
   return {
+    [VariablesPGREnum.CONSULTANT_NAME]: consultant
+      ? `${consultant.name} `
+      : `${company.name}`,
     [VariablesPGREnum.COMPANY_SIGNER_CITY]: consultant
       ? `${consultant.address.city} – ${consultant.address.state}`
       : `${company.address.city} – ${company.address.state}`,
@@ -29,6 +32,7 @@ export const companyVariables = (
       company?.primary_activity && company?.primary_activity[0]
         ? String(company?.primary_activity[0].riskDegree)
         : '',
+    [VariablesPGREnum.COMPANY_INITIAL]: `(${company?.initials})` || '',
     [VariablesPGREnum.COMPANY_CNPJ]: formatCNPJ(company?.cnpj) || '',
     [VariablesPGREnum.COMPANY_EMAIL]: company?.email || '',
     [VariablesPGREnum.COMPANY_NAME]: company?.name || '',
@@ -47,7 +51,8 @@ export const companyVariables = (
     [VariablesPGREnum.COMPANY_VISION]: company?.vision || '',
     [VariablesPGREnum.COMPANY_VALUES]: company?.values || '',
     [VariablesPGREnum.COMPANY_RESPONSIBLE]: company?.responsibleName || '',
-    [VariablesPGREnum.WORKSPACE_CNPJ]: workspace?.cnpj || '',
+    [VariablesPGREnum.WORKSPACE_CNPJ]:
+      formatCNPJ(workspace?.cnpj) || formatCNPJ(company?.cnpj) || '',
     [VariablesPGREnum.IS_RS]: address?.state === 'RS' ? 'true' : '',
     [VariablesPGREnum.COMPANY_EMPLOYEES_TOTAL]:
       String(company?.employeeCount) || '',

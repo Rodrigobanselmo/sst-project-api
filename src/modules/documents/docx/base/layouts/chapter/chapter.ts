@@ -1,8 +1,10 @@
+import { setNiceProportion } from './../../../../../../shared/utils/setNiceProportion';
 import {
   AlignmentType,
   Footer,
   Header,
   HeightRule,
+  ImageRun,
   ISectionOptions,
   Paragraph,
   Table,
@@ -12,12 +14,14 @@ import {
   VerticalAlign,
   WidthType,
 } from 'docx';
-
+import fs from 'fs';
+import sizeOf from 'image-size';
 import { borderNoneStyle, sectionCoverProperties } from '../../config/styles';
 
 interface IChapterProps {
   version: string;
   chapter: string;
+  imagePath: string;
 }
 
 const text = (text: string, verticalAlign: VerticalAlign) =>
@@ -45,13 +49,56 @@ const table = (rows: TableRow[]) =>
     borders: borderNoneStyle,
   });
 
-export const createChapterPage = ({ version, chapter }: IChapterProps) => {
+const imageCover = (imgPath: string, verticalAlign: VerticalAlign) => {
+  const { height: imgHeight, width: imgWidth } = sizeOf(
+    fs.readFileSync(imgPath),
+  );
+
+  const maxWidth = 630;
+  const maxHeight = 200;
+
+  const { height, width } = setNiceProportion(
+    maxWidth,
+    maxHeight,
+    imgWidth,
+    imgHeight,
+  );
+
+  return new TableCell({
+    width: { size: 100, type: WidthType.PERCENTAGE },
+    children: [
+      new Paragraph({
+        children: [
+          new ImageRun({
+            data: fs.readFileSync(imgPath),
+            transformation: {
+              width,
+              height,
+            },
+          }),
+        ],
+        alignment: AlignmentType.CENTER,
+      }),
+    ],
+    verticalAlign,
+  });
+};
+
+export const createChapterPage = ({
+  version,
+  chapter,
+  imagePath,
+}: IChapterProps) => {
   return table([
     new TableRow({
       children: [
         text('PROGRAMA DE GERENCIAMENTO DE RISCOS – PGR', VerticalAlign.TOP),
       ],
-      height: { value: 4500, rule: HeightRule.EXACT },
+      height: { value: 1500, rule: HeightRule.EXACT },
+    }),
+    new TableRow({
+      children: [imageCover(imagePath, VerticalAlign.CENTER)],
+      height: { value: 3000, rule: HeightRule.EXACT },
     }),
     new TableRow({
       children: [text(chapter, VerticalAlign.CENTER)],
@@ -67,9 +114,10 @@ export const createChapterPage = ({ version, chapter }: IChapterProps) => {
 export const chapterSection = ({
   version,
   chapter,
+  imagePath,
 }: IChapterProps): ISectionOptions => {
   return {
-    children: [createChapterPage({ version, chapter })],
+    children: [createChapterPage({ version, chapter, imagePath })],
     properties: sectionCoverProperties,
     footers: {
       default: new Footer({

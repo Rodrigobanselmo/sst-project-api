@@ -201,88 +201,92 @@ export const investigation: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: 'Em caso de morte, a comunicação deverá ser imediata.',
+          text: 'A CAT deve ser gerada através do evento S-2210 do eSocial e deve ser registrada até o primeiro dia útil seguinte ao da ocorrência e, em caso de morte, de imediato.',
         },
-        {
-          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: 'A empresa que não informar o acidente de trabalho no prazo legal estará sujeita à aplicação de multa, conforme disposto nos artigos 286 e 336 do Decreto n.º 3.048/1999. ',
-        },
-        {
-          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: 'Se a empresa não fizer o registro da CAT, o próprio trabalhador, o dependente, a entidade sindical, o médico ou a autoridade pública (magistrados, membros do Ministério Público e dos serviços jurídicos da União e dos Estados ou do Distrito Federal e comandantes de unidades do Exército, da Marinha, da Aeronáutica, do Corpo de Bombeiros e da Polícia Militar) poderão efetivar a qualquer tempo o registro deste instrumento junto à Previdência Social, o que não exclui a possibilidade da aplicação da multa à empresa.',
-        },
-        {
-          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: 'O INSS permite o Registro da CAT de forma online, desde que preenchidos todos os campos obrigatórios. O sistema também permite gerar o formulário da CAT em branco para, em último caso, ser preenchido de forma manual.',
-        },
-        {
-          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: 'Para fazer o cadastro deve-se acessar o site:',
-        },
-        {
-          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '<link>https://cadastro-cat.inss.gov.br/CATInternet/faces/pages/cadastramento/cadastramentoCat.xhtml.|https://cadastro-cat.inss.gov.br/CATInternet/faces/pages<link>',
-        },
-        {
-          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: 'Nos casos em que não for possível o registro da CAT de forma online e para que a empresa não esteja sujeita a aplicação da multa por descumprimento de prazo, o registro da CAT poderá ser feito em uma das agências do INSS (consulte a agência mais próxima). Para tanto, o formulário da CAT deverá estar inteiramente preenchido e assinado, principalmente os dados referentes ao atendimento médico. Preencha agora o formulário da CAT. Em caso de dúvidas, o site disponibiliza as instruções para preenchimento do formulário.',
-        },
-        {
-          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: 'Para ser atendido nas agências do INSS, no mínimo deverá ser apresentado um documento de identificação com foto e o número do CPF.',
-        },
-        {
-          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: 'Para qualquer dos casos indicados acima, deverão ser emitidas quatro vias sendo:',
-        },
-        {
-          type: PGRSectionChildrenTypeEnum.BULLET,
-          text: '1ª via ao INSS;',
-          level: 0,
-        },
-        {
-          type: PGRSectionChildrenTypeEnum.BULLET,
-          text: '2ª via ao segurado ou dependente;',
-          level: 0,
-        },
-        {
-          type: PGRSectionChildrenTypeEnum.BULLET,
-          text: '3ª via ao sindicato de classe do trabalhador;',
-          level: 0,
-        },
-        {
-          type: PGRSectionChildrenTypeEnum.BULLET,
-          text: '4ª via à empresa.',
-          level: 0,
-        },
-        {
-          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: 'Outras informações',
-        },
-        {
-          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: 'caso a área de informações referente ao atestado médico do formulário não esteja preenchida e assinada pelo médico assistente, deverá ser apresentado o atestado médico, desde que nele conste a devida descrição do local/data/hora de atendimento, bem como o diagnóstico com o CID (Classificação Estatística Internacional de Doenças e Problemas Relacionados com a Saúde) e o período provável para o tratamento, contendo a assinatura, o número do Conselho Regional de Medicina (CRM) e o carimbo do médico responsável pelo atendimento, seja particular, de convênio ou do SUS;',
-        },
-        {
-          type: PGRSectionChildrenTypeEnum.BULLET,
-          text: 'A CAT inicial irá se referir a acidente de trabalho típico, trajeto, doença profissional, do trabalho ou óbito imediato;',
-          level: 0,
-        },
-        {
-          type: PGRSectionChildrenTypeEnum.BULLET,
-          text: 'A CAT de reabertura será utilizada para casos de afastamento por agravamento de lesão de acidente do trabalho ou de doença profissional ou do trabalho;',
-          level: 0,
-        },
-        {
-          type: PGRSectionChildrenTypeEnum.BULLET,
-          text: 'A CAT de comunicação de óbito, será emitida exclusivamente para casos de falecimento decorrente de acidente ou doença profissional ou do trabalho, após o registro da CAT inicial;',
-          level: 0,
-        },
-        {
-          type: PGRSectionChildrenTypeEnum.BULLET,
-          text: 'Na CAT de reabertura, deverão constar as mesmas informações da época do acidente, exceto quanto ao afastamento, último dia trabalhado, atestado médico e data da emissão, que serão relativos à data da reabertura. Não será considerada CAT de reabertura a situação de simples assistência médica ou de afastamento com menos de 15 dias consecutivos.',
-          level: 0,
-        },
+        // {
+        //   type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+        //   text: 'Em caso de morte, a comunicação deverá ser imediata.',
+        // },
+        // {
+        //   type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+        //   text: 'A empresa que não informar o acidente de trabalho no prazo legal estará sujeita à aplicação de multa, conforme disposto nos artigos 286 e 336 do Decreto n.º 3.048/1999. ',
+        // },
+        // {
+        //   type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+        //   text: 'Se a empresa não fizer o registro da CAT, o próprio trabalhador, o dependente, a entidade sindical, o médico ou a autoridade pública (magistrados, membros do Ministério Público e dos serviços jurídicos da União e dos Estados ou do Distrito Federal e comandantes de unidades do Exército, da Marinha, da Aeronáutica, do Corpo de Bombeiros e da Polícia Militar) poderão efetivar a qualquer tempo o registro deste instrumento junto à Previdência Social, o que não exclui a possibilidade da aplicação da multa à empresa.',
+        // },
+        // {
+        //   type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+        //   text: 'O INSS permite o Registro da CAT de forma online, desde que preenchidos todos os campos obrigatórios. O sistema também permite gerar o formulário da CAT em branco para, em último caso, ser preenchido de forma manual.',
+        // },
+        // {
+        //   type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+        //   text: 'Para fazer o cadastro deve-se acessar o site:',
+        // },
+        // {
+        //   type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+        //   text: '<link>https://cadastro-cat.inss.gov.br/CATInternet/faces/pages/cadastramento/cadastramentoCat.xhtml.|https://cadastro-cat.inss.gov.br/CATInternet/faces/pages<link>',
+        // },
+        // {
+        //   type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+        //   text: 'Nos casos em que não for possível o registro da CAT de forma online e para que a empresa não esteja sujeita a aplicação da multa por descumprimento de prazo, o registro da CAT poderá ser feito em uma das agências do INSS (consulte a agência mais próxima). Para tanto, o formulário da CAT deverá estar inteiramente preenchido e assinado, principalmente os dados referentes ao atendimento médico. Preencha agora o formulário da CAT. Em caso de dúvidas, o site disponibiliza as instruções para preenchimento do formulário.',
+        // },
+        // {
+        //   type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+        //   text: 'Para ser atendido nas agências do INSS, no mínimo deverá ser apresentado um documento de identificação com foto e o número do CPF.',
+        // },
+        // {
+        //   type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+        //   text: 'Para qualquer dos casos indicados acima, deverão ser emitidas quatro vias sendo:',
+        // },
+        // {
+        //   type: PGRSectionChildrenTypeEnum.BULLET,
+        //   text: '1ª via ao INSS;',
+        //   level: 0,
+        // },
+        // {
+        //   type: PGRSectionChildrenTypeEnum.BULLET,
+        //   text: '2ª via ao segurado ou dependente;',
+        //   level: 0,
+        // },
+        // {
+        //   type: PGRSectionChildrenTypeEnum.BULLET,
+        //   text: '3ª via ao sindicato de classe do trabalhador;',
+        //   level: 0,
+        // },
+        // {
+        //   type: PGRSectionChildrenTypeEnum.BULLET,
+        //   text: '4ª via à empresa.',
+        //   level: 0,
+        // },
+        // {
+        //   type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+        //   text: 'Outras informações',
+        // },
+        // {
+        //   type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+        //   text: 'caso a área de informações referente ao atestado médico do formulário não esteja preenchida e assinada pelo médico assistente, deverá ser apresentado o atestado médico, desde que nele conste a devida descrição do local/data/hora de atendimento, bem como o diagnóstico com o CID (Classificação Estatística Internacional de Doenças e Problemas Relacionados com a Saúde) e o período provável para o tratamento, contendo a assinatura, o número do Conselho Regional de Medicina (CRM) e o carimbo do médico responsável pelo atendimento, seja particular, de convênio ou do SUS;',
+        // },
+        // {
+        //   type: PGRSectionChildrenTypeEnum.BULLET,
+        //   text: 'A CAT inicial irá se referir a acidente de trabalho típico, trajeto, doença profissional, do trabalho ou óbito imediato;',
+        //   level: 0,
+        // },
+        // {
+        //   type: PGRSectionChildrenTypeEnum.BULLET,
+        //   text: 'A CAT de reabertura será utilizada para casos de afastamento por agravamento de lesão de acidente do trabalho ou de doença profissional ou do trabalho;',
+        //   level: 0,
+        // },
+        // {
+        //   type: PGRSectionChildrenTypeEnum.BULLET,
+        //   text: 'A CAT de comunicação de óbito, será emitida exclusivamente para casos de falecimento decorrente de acidente ou doença profissional ou do trabalho, após o registro da CAT inicial;',
+        //   level: 0,
+        // },
+        // {
+        //   type: PGRSectionChildrenTypeEnum.BULLET,
+        //   text: 'Na CAT de reabertura, deverão constar as mesmas informações da época do acidente, exceto quanto ao afastamento, último dia trabalhado, atestado médico e data da emissão, que serão relativos à data da reabertura. Não será considerada CAT de reabertura a situação de simples assistência médica ou de afastamento com menos de 15 dias consecutivos.',
+        //   level: 0,
+        // },
       ],
     },
   ],

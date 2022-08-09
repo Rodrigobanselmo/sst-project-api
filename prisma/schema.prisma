@@ -529,8 +529,8 @@ model ExamToClinic {
   dueInDays Int?
   isScheduled Boolean @default(false)
   observation String?
-  pricing ExamToClinicPricing[]
-  schedules ExamToClinicSchedule[]
+  scheduleRange Json?
+  pricings ExamToClinicPricing[]
   status StatusEnum @default(ACTIVE)
 
   @@unique([examId, companyId])
@@ -542,17 +542,6 @@ model ExamToClinicPricing {
   examToClinicId  Int
   price  Int
   startDate DateTime @default(now())
-  observation String?
-}
-
-model ExamToClinicSchedule {
-  id     Int   @id @default(autoincrement())
-  examToClinic   ExamToClinic @relation(fields: [examToClinicId], references: [id])
-  examToClinicId  Int
-  startDate DateTime?
-  endDate DateTime?
-  startTime String
-  endTime String
   observation String?
 }
 

@@ -2,7 +2,13 @@ import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
 import { PartialType } from '@nestjs/swagger';
 import { ExamTypeEnum, StatusEnum } from '@prisma/client';
 import { Transform } from 'class-transformer';
-import { IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
@@ -27,6 +33,10 @@ export class CreateExamDto {
   @IsOptional()
   @IsString()
   material?: string;
+
+  @IsBoolean()
+  @IsString()
+  isAttendance?: boolean;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsOptional()

@@ -4,6 +4,7 @@ import { CompanyModule } from '../company/company.module';
 import { ChecklistController } from './controller/checklist/checklist.controller';
 import { DocumentPgrController } from './controller/doc-pgr/doc-pgr.controller';
 import { EpiController } from './controller/epi/epi.controller';
+import { ExamToClinicController } from './controller/exam-to-clinic/exam-to-clinic.controller';
 import { ExamController } from './controller/exam/exam.controller';
 import { GenerateSourceController } from './controller/generate-source/generate-source.controller';
 import { RecMedController } from './controller/rec-med/rec-med.controller';
@@ -71,6 +72,7 @@ import { UpdateRiskService } from './services/risk/update-risk/update-risk.servi
     DocumentPgrController,
     RiskDataRecController,
     ExamController,
+    ExamToClinicController,
   ],
   providers: [
     CreateChecklistService,
