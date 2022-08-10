@@ -21,7 +21,7 @@ export class ExamToClinicEntity implements ExamToClinic {
   scheduleRange: Prisma.JsonValue;
   status: StatusEnum;
   exam?: ExamEntity;
-  examMinDuration: string;
+  examMinDuration: number;
   scheduleType: ClinicScheduleTypeEnum;
 
   constructor(
