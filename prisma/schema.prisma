@@ -7,6 +7,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum ClinicScheduleTypeEnum {
+  PHONE
+  EMAIL
+  ONLINE
+  ASK
+  NONE
+}
+
+enum CompanyPaymentTypeEnum {
+  ANTICIPATED
+  DEBIT
+}
 
 enum CompanyTypesEnum {
   MATRIZ
@@ -20,6 +32,7 @@ enum CompanyEnvironmentTypesEnum {
   OPERATION
   ADMINISTRATIVE
 }
+
 enum ExamTypeEnum {
   LAB
   AUDIO
@@ -237,6 +250,8 @@ model Company {
   type CompanyTypesEnum @default(MATRIZ)
   accessGroups AccessGroups[]
   address AddressCompany?
+  paymentType CompanyPaymentTypeEnum?
+  paymentDay Int?
   applyingServiceContracts Contract[]  @relation(name: "contracts")
   characterization CompanyCharacterization[] 
   checklist Checklist[] 
@@ -516,6 +531,7 @@ model Exam {
   examToRisk ExamToRisk[]
   examToRiskData ExamToRiskData[]
   examToClinic ExamToClinic[] 
+  esocial27Code String?
 
   @@unique([id, companyId])
 }
@@ -529,7 +545,9 @@ model ExamToClinic {
   dueInDays Int?
   isScheduled Boolean @default(false)
   observation String?
+  examMinDuration Int?
   scheduleRange Json?
+  scheduleType ClinicScheduleTypeEnum?
   pricings ExamToClinicPricing[]
   status StatusEnum @default(ACTIVE)
 

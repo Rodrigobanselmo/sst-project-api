@@ -1,6 +1,10 @@
 import { RiskFactorGroupDataEntity } from './../../checklist/entities/riskGroupData.entity';
 import { ProfessionalEntity } from './../../users/entities/professional.entity';
-import { Company, CompanyTypesEnum } from '.prisma/client';
+import {
+  Company,
+  CompanyPaymentTypeEnum,
+  CompanyTypesEnum,
+} from '.prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 import { StatusEnum } from '@prisma/client';
 import { AddressCompanyEntity } from './address-company.entity';
@@ -112,6 +116,8 @@ export class CompanyEntity implements Company {
   usersCount?: number;
   step?: CompanyStepEnum;
   steps?: CompanyStepEnum[];
+  paymentType: CompanyPaymentTypeEnum;
+  paymentDay: number;
 
   constructor(partial: Partial<CompanyEntity>) {
     Object.assign(this, partial);

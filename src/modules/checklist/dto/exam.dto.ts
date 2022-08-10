@@ -34,6 +34,10 @@ export class CreateExamDto {
   @IsString()
   material?: string;
 
+  @IsOptional()
+  @IsString()
+  esocial27Code?: string;
+
   @IsBoolean()
   @IsString()
   isAttendance?: boolean;

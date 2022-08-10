@@ -1,7 +1,7 @@
 import { HomoGroupEntity } from './../../../entities/homoGroup.entity';
 import { isEnvironment } from './../../../repositories/implementations/CharacterizationRepository';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { HierarchyEnum, HomogeneousGroup } from '@prisma/client';
+import { HierarchyEnum, HomogeneousGroup, HomoTypeEnum } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
@@ -188,9 +188,12 @@ export class CopyCompanyService {
           if (!foundHomo) {
             newHomoGroup = await this.prisma.homogeneousGroup.create({
               data: {
+                id: newHomoGroupId,
                 description: group.description,
                 name:
-                  group.environment || group.characterization
+                  group.environment ||
+                  group.characterization ||
+                  group.type === HomoTypeEnum.HIERARCHY
                     ? newHomoGroupId
                     : group.name,
                 companyId: companyId,
@@ -203,7 +206,9 @@ export class CopyCompanyService {
               data: {
                 companyId: companyId,
                 name:
-                  group.environment || group.characterization
+                  group.environment ||
+                  group.characterization ||
+                  group.type === HomoTypeEnum.HIERARCHY
                     ? foundHomo.id
                     : group.name,
                 type: group.type,

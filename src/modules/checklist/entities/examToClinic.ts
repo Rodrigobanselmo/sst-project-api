@@ -5,6 +5,7 @@ import {
   StatusEnum,
   Exam,
   Prisma,
+  ClinicScheduleTypeEnum,
 } from '@prisma/client';
 import { ExamEntity } from './exam.entity';
 
@@ -20,6 +21,8 @@ export class ExamToClinicEntity implements ExamToClinic {
   scheduleRange: Prisma.JsonValue;
   status: StatusEnum;
   exam?: ExamEntity;
+  examMinDuration: string;
+  scheduleType: ClinicScheduleTypeEnum;
 
   constructor(
     partial: Partial<Omit<ExamToClinicEntity, 'exam'> & { exam: Exam }>,

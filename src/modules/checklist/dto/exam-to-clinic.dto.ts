@@ -1,5 +1,5 @@
 import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
-import { Prisma, StatusEnum } from '@prisma/client';
+import { ClinicScheduleTypeEnum, Prisma, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import {
   IsBoolean,
@@ -39,6 +39,18 @@ export class UpsertExamToClinicDto {
   @IsOptional()
   scheduleRange?: Prisma.JsonValue;
 
+  @IsString()
+  @IsOptional()
+  examMinDuration: string;
+
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsOptional()
+  @IsString()
+  @IsEnum(ClinicScheduleTypeEnum, {
+    message: `Tipo de agendamento inválido`,
+  })
+  scheduleType: ClinicScheduleTypeEnum;
+
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsOptional()
   @IsString()
@@ -66,40 +78,6 @@ export class CreateExamToClinicPricingDto {
   @IsDate()
   @Type(() => Date)
   startDate?: Date;
-}
-
-export class CreateExamToClinicScheduleDto {
-  @IsInt()
-  @IsOptional()
-  examToClinicId: number;
-
-  @IsInt()
-  @IsOptional()
-  price: number;
-
-  @IsString()
-  @IsOptional()
-  startTime: string;
-
-  @IsString()
-  @IsOptional()
-  observation: string;
-
-  @IsString()
-  @IsOptional()
-  endTime: string;
-
-  @Transform(DateFormat, { toClassOnly: true })
-  @IsOptional()
-  @IsDate()
-  @Type(() => Date)
-  startDate?: Date;
-
-  @Transform(DateFormat, { toClassOnly: true })
-  @IsOptional()
-  @IsDate()
-  @Type(() => Date)
-  endDate?: Date;
 }
 
 export class FindExamToClinicDto extends PaginationQueryDto {
