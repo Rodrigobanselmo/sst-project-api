@@ -39,9 +39,9 @@ export class UpsertExamToClinicDto {
   @IsOptional()
   scheduleRange?: Prisma.JsonValue;
 
-  @IsString()
+  @IsInt()
   @IsOptional()
-  examMinDuration: string;
+  examMinDuration: number;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsOptional()

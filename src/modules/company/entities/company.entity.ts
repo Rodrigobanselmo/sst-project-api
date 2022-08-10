@@ -118,6 +118,8 @@ export class CompanyEntity implements Company {
   steps?: CompanyStepEnum[];
   paymentType: CompanyPaymentTypeEnum;
   paymentDay: number;
+  isTaxNote: boolean;
+  observationBank: string;
 
   constructor(partial: Partial<CompanyEntity>) {
     Object.assign(this, partial);

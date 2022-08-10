@@ -1,6 +1,10 @@
 import { QueryArray } from './../../../shared/transformers/query-array';
 import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
-import { CompanyTypesEnum, StatusEnum } from '@prisma/client';
+import {
+  CompanyPaymentTypeEnum,
+  CompanyTypesEnum,
+  StatusEnum,
+} from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import {
   IsBoolean,
@@ -171,6 +175,25 @@ export class CreateCompanyDto {
   @IsOptional()
   @IsString()
   obs?: string;
+
+  @IsInt()
+  @IsOptional()
+  paymentDay?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  isTaxNote?: boolean;
+
+  @IsOptional()
+  @IsString()
+  observationBank?: string;
+
+  @IsOptional()
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsEnum(CompanyPaymentTypeEnum, {
+    message: `Tiop de pagamento inválido`,
+  })
+  paymentType?: CompanyPaymentTypeEnum;
 
   @IsOptional()
   @IsInt()

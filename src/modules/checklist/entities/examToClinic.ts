@@ -25,7 +25,12 @@ export class ExamToClinicEntity implements ExamToClinic {
   scheduleType: ClinicScheduleTypeEnum;
 
   constructor(
-    partial: Partial<Omit<ExamToClinicEntity, 'exam'> & { exam: Exam }>,
+    partial: Partial<
+      Omit<ExamToClinicEntity, 'exam' | 'pricings'> & {
+        exam: Exam;
+        pricings: ExamToClinicPricing[];
+      }
+    >,
   ) {
     Object.assign(this, partial);
   }

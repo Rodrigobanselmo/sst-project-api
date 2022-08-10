@@ -252,6 +252,8 @@ model Company {
   address AddressCompany?
   paymentType CompanyPaymentTypeEnum?
   paymentDay Int?
+  isTaxNote Boolean @default(false)
+  observationBank String?
   applyingServiceContracts Contract[]  @relation(name: "contracts")
   characterization CompanyCharacterization[] 
   checklist Checklist[] 
@@ -547,21 +549,14 @@ model ExamToClinic {
   observation String?
   examMinDuration Int?
   scheduleRange Json?
+  price  Int?
+  startDate DateTime @default(now())
   scheduleType ClinicScheduleTypeEnum?
-  pricings ExamToClinicPricing[]
   status StatusEnum @default(ACTIVE)
 
   @@unique([examId, companyId])
 }
 
-model ExamToClinicPricing {
-  id     Int   @id @default(autoincrement())
-  examToClinic   ExamToClinic @relation(fields: [examToClinicId], references: [id])
-  examToClinicId  Int
-  price  Int
-  startDate DateTime @default(now())
-  observation String?
-}
 
 model ExamToRisk {
   id     Int   @id @default(autoincrement())

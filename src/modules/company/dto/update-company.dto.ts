@@ -1,4 +1,8 @@
-import { CompanyTypesEnum, StatusEnum } from '@prisma/client';
+import {
+  CompanyPaymentTypeEnum,
+  CompanyTypesEnum,
+  StatusEnum,
+} from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import {
   IsBoolean,
@@ -190,4 +194,23 @@ export class UpdateCompanyDto {
   @IsOptional()
   @IsString()
   obs?: string;
+
+  @IsInt()
+  @IsOptional()
+  paymentDay?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  isTaxNote?: boolean;
+
+  @IsOptional()
+  @IsString()
+  observationBank?: string;
+
+  @IsOptional()
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsEnum(CompanyPaymentTypeEnum, {
+    message: `Tiop de pagamento inválido`,
+  })
+  paymentType?: CompanyPaymentTypeEnum;
 }

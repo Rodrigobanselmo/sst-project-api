@@ -24,9 +24,6 @@ export class ExamRepository {
     const redMed = await this.prisma.exam.create({
       data: {
         ...createExamDto,
-        // examToRisk: riskIds
-        //   ? { create: riskIds.map((riskId) => ({ riskId })) }
-        //   : undefined,
       },
     });
 
@@ -38,6 +35,7 @@ export class ExamRepository {
     companyId,
     ...createExamDto
   }: UpdateExamDto & { id: number }): Promise<ExamEntity> {
+    console.log(createExamDto);
     const Exam = await this.prisma.exam.update({
       data: {
         ...createExamDto,

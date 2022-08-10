@@ -17,13 +17,22 @@ export class ExamToClinicRepository {
   async upsert({
     examId,
     companyId,
+    price,
     ...createExamToClinicDto
   }: UpsertExamToClinicDto): Promise<ExamToClinicEntity> {
-    const redMed = await this.prisma.examToClinic.upsert({
+    const examEntity = await this.prisma.examToClinic.upsert({
       create: {
         ...createExamToClinicDto,
         companyId,
         examId,
+        pricings: price
+          ? {
+              create: {
+                price,
+                startDate: new Date(),
+              },
+            }
+          : undefined,
       },
       update: {
         ...createExamToClinicDto,
@@ -31,7 +40,7 @@ export class ExamToClinicRepository {
       where: { examId_companyId: { companyId, examId } },
     });
 
-    return new ExamToClinicEntity(redMed);
+    return new ExamToClinicEntity(examEntity);
   }
 
   async update({
@@ -77,7 +86,11 @@ export class ExamToClinicRepository {
       }),
       this.prisma.examToClinic.findMany({
         where,
-        include: { exam: true, ...options?.include },
+        include: {
+          exam: true,
+          pricings: { take: 1, orderBy: { startDate: 'desc' } },
+          ...options?.include,
+        },
         take: pagination.take || 20,
         skip: pagination.skip || 0,
         orderBy: { exam: { name: 'asc' } },

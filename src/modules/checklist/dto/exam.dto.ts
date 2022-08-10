@@ -38,8 +38,8 @@ export class CreateExamDto {
   @IsString()
   esocial27Code?: string;
 
+  @IsOptional()
   @IsBoolean()
-  @IsString()
   isAttendance?: boolean;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
