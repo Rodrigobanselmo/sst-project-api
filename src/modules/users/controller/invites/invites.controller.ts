@@ -9,23 +9,19 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { classToClass } from 'class-transformer';
-import { ErrorInvitesEnum } from '../../../../shared/constants/enum/errorMessage';
-import { ValidateEmailPipe } from '../../../../shared/pipes/validate-email.pipe';
 
+import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
+import { ErrorInvitesEnum } from '../../../../shared/constants/enum/errorMessage';
+import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
+import { ValidateEmailPipe } from '../../../../shared/pipes/validate-email.pipe';
 import { InviteUserDto } from '../../dto/invite-user.dto';
 import { DeleteExpiredInvitesService } from '../../services/invites/delete-expired-invites/delete-expired-invites.service';
 import { DeleteInvitesService } from '../../services/invites/delete-invites/delete-invites.service';
 import { FindAllByCompanyIdService } from '../../services/invites/find-by-companyId/find-by-companyId.service';
 import { FindAllByEmailService } from '../../services/invites/find-by-email/find-by-email.service';
 import { InviteUsersService } from '../../services/invites/invite-users/invite-users.service';
-import { Permissions } from '../../../../shared/decorators/permissions.decorator';
-import {
-  PermissionEnum,
-  RoleEnum,
-} from '../../../../shared/constants/enum/authorization';
-import { Roles } from '../../../../shared/decorators/roles.decorator';
 
 @ApiTags('invites')
 @Controller('invites')

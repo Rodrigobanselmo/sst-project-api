@@ -8,6 +8,7 @@ import { JwtTokenProvider } from '../../../../../shared/providers/TokenProvider/
 import { LoginUserDto } from '../../../dto/login-user.dto';
 import { PayloadTokenDto } from '../../../dto/payload-token.dto';
 import { RefreshTokensRepository } from '../../../repositories/implementations/RefreshTokensRepository';
+import { ErrorMessageEnum } from 'src/shared/constants/enum/errorMessage';
 
 @Injectable()
 export class SessionService {
@@ -70,7 +71,7 @@ export class SessionService {
     const user = await this.usersRepository.findByEmail(email);
 
     if (!user?.id) {
-      throw new BadRequestException('Email or password incorrect');
+      throw new BadRequestException(ErrorMessageEnum.WRONG_EMAIL_PASS);
     }
 
     const passwordMatch = await this.hashProvider.compare(
@@ -79,7 +80,7 @@ export class SessionService {
     );
 
     if (!passwordMatch) {
-      throw new BadRequestException('Email or password incorrect');
+      throw new BadRequestException(ErrorMessageEnum.WRONG_EMAIL_PASS);
     }
 
     return user;

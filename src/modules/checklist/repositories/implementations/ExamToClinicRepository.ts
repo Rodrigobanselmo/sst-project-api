@@ -1,6 +1,5 @@
-import { prismaFilter } from './../../../../shared/utils/filters/prisma.filters';
-import { PaginationQueryDto } from './../../../../shared/dto/pagination.dto';
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import {
@@ -8,54 +7,70 @@ import {
   UpsertExamToClinicDto,
 } from '../../dto/exam-to-clinic.dto';
 import { ExamToClinicEntity } from '../../entities/examToClinic';
-import { Prisma } from '@prisma/client';
+import { PaginationQueryDto } from './../../../../shared/dto/pagination.dto';
+import { prismaFilter } from './../../../../shared/utils/filters/prisma.filters';
 
 @Injectable()
 export class ExamToClinicRepository {
   constructor(private prisma: PrismaService) {}
 
-  async upsert({
-    examId,
-    companyId,
-    price,
+  async create({
     ...createExamToClinicDto
   }: UpsertExamToClinicDto): Promise<ExamToClinicEntity> {
-    const examEntity = await this.prisma.examToClinic.upsert({
-      create: {
-        ...createExamToClinicDto,
-        companyId,
-        examId,
-        pricings: price
-          ? {
-              create: {
-                price,
-                startDate: new Date(),
-              },
-            }
-          : undefined,
-      },
-      update: {
+    const examEntity = await this.prisma.examToClinic.create({
+      data: {
         ...createExamToClinicDto,
       },
-      where: { examId_companyId: { companyId, examId } },
     });
 
     return new ExamToClinicEntity(examEntity);
   }
 
   async update({
-    examId,
-    companyId,
+    id,
     ...createExamToClinicDto
-  }: UpsertExamToClinicDto): Promise<ExamToClinicEntity> {
+  }: UpsertExamToClinicDto & {
+    id: number;
+    endDate?: Date;
+  }): Promise<ExamToClinicEntity> {
     const ExamToClinic = await this.prisma.examToClinic.update({
       data: {
         ...createExamToClinicDto,
       },
-      where: { examId_companyId: { companyId, examId } },
+      where: { id },
     });
 
     return new ExamToClinicEntity(ExamToClinic);
+  }
+
+  async upsert({
+    examId,
+    companyId,
+    startDate,
+    ...createExamToClinicDto
+  }: UpsertExamToClinicDto): Promise<ExamToClinicEntity> {
+    const examEntity = await this.prisma.examToClinic.upsert({
+      create: {
+        examId,
+        companyId,
+        startDate,
+        ...createExamToClinicDto,
+      },
+      update: {
+        ...createExamToClinicDto,
+      },
+      where: { examId_companyId_startDate: { examId, companyId, startDate } },
+    });
+
+    return new ExamToClinicEntity(examEntity);
+  }
+
+  async findNude(options: Prisma.ExamToClinicFindManyArgs) {
+    const data = await this.prisma.examToClinic.findMany({
+      ...options,
+    });
+
+    return data.map((exam) => new ExamToClinicEntity(exam));
   }
 
   async find(
@@ -66,6 +81,10 @@ export class ExamToClinicRepository {
     const whereInit = {
       AND: [],
     } as typeof options.where;
+
+    let orderBy = { exam: { name: 'asc' } } as typeof options.orderBy;
+    if ('orderBy' in query)
+      orderBy = { [query.orderBy]: query?.orderByDirection ?? 'asc' };
 
     const { where } = prismaFilter(whereInit, {
       query,
@@ -88,12 +107,12 @@ export class ExamToClinicRepository {
         where,
         include: {
           exam: true,
-          pricings: { take: 1, orderBy: { startDate: 'desc' } },
           ...options?.include,
         },
         take: pagination.take || 20,
         skip: pagination.skip || 0,
-        orderBy: { exam: { name: 'asc' } },
+        // distinct: ['companyId', 'examId'],
+        orderBy,
       }),
     ]);
 

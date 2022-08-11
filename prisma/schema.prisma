@@ -551,10 +551,11 @@ model ExamToClinic {
   scheduleRange Json?
   price  Int?
   startDate DateTime @default(now())
+  endDate DateTime?
   scheduleType ClinicScheduleTypeEnum?
   status StatusEnum @default(ACTIVE)
 
-  @@unique([examId, companyId])
+  @@unique([examId, companyId, startDate])
 }
 
 

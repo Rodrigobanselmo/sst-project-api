@@ -73,7 +73,7 @@ export class RiskFactorGroupDataEntity implements RiskFactorGroupData {
     }
 
     if (!this.users) this.users = [];
-    if (partial.usersSignatures) {
+    if (partial?.usersSignatures) {
       this.usersSignatures = partial.usersSignatures.map(
         (epiToRiskFactorData) => new UsersRiskGroupEntity(epiToRiskFactorData),
       );
@@ -87,8 +87,8 @@ export class RiskFactorGroupDataEntity implements RiskFactorGroupData {
       );
     }
 
-    if (!this.professionals) this.professionals = [];
-    if (partial.professionalsSignatures) {
+    if (!this?.professionals) this.professionals = [];
+    if (partial?.professionalsSignatures) {
       this.professionalsSignatures = partial.professionalsSignatures.map(
         (epiToRiskFactorData) =>
           new ProfessionalRiskGroupEntity(epiToRiskFactorData),

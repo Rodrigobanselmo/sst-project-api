@@ -13,6 +13,8 @@ export const prismaFilter = <T>(
     ...prismaWhere,
   };
 
+  skip = ['orderBy', 'orderByDirection', ...skip];
+
   Object.entries(query).forEach(([key, value]) => {
     if (skip && skip.includes(key)) return;
     if (Array.isArray(value)) {
@@ -26,9 +28,13 @@ export const prismaFilter = <T>(
           mode: 'insensitive',
         },
       });
-    } else if (value) {
+    } else if (value || value === 0) {
       ((where as any).AND as any).push({
         [key]: value,
+      });
+    } else if (value === undefined) {
+      ((where as any).AND as any).push({
+        [key]: null,
       });
     }
   });

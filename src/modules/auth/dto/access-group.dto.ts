@@ -1,5 +1,6 @@
+import { RoleEnum } from './../../../shared/constants/enum/authorization';
 import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class UpsertAccessGroupDto {
   @IsOptional()
@@ -20,11 +21,14 @@ export class UpsertAccessGroupDto {
 
   @IsString({ each: true })
   @IsOptional()
-  roles: string[];
+  readonly permissions: string[];
 
-  @IsOptional()
   @IsString({ each: true })
-  permissions: string[];
+  @IsEnum(RoleEnum, {
+    message: `Acesso enviado inválido. `,
+    each: true,
+  })
+  readonly roles?: RoleEnum[];
 }
 
 export class FindAccessGroupDto extends PaginationQueryDto {

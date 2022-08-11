@@ -9,6 +9,8 @@ export enum ErrorMessageEnum {
   //* CONTACTS
   CONTACT_NOT_FOUND = 'Contato não encontrado ou sem premissões de acesso',
   CONTACT_IS_PRINCIPAL = 'Você não pode deletar o contato principal',
+  //* USERS
+  WRONG_EMAIL_PASS = 'Email ou senha incorreto',
 }
 
 export enum ErrorCompanyEnum {

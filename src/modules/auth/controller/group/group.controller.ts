@@ -10,11 +10,7 @@ import { UpsertAccessGroupsService } from '../../services/group/upsert-access-gr
 import { User } from './../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from './../../../../shared/dto/user-payload.dto';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
-import {
-  PermissionEnum,
-  RoleEnum,
-} from '../../../../shared/constants/enum/authorization';
-import { Roles } from '../../../../shared/decorators/roles.decorator';
+import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
 
 @ApiTags('access-group')
 @Controller('auth/group/:companyId')

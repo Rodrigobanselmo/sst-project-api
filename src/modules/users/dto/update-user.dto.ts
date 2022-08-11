@@ -47,6 +47,10 @@ export class UpdateUserDto {
   @IsOptional()
   crea?: string;
 
+  @IsString()
+  @IsOptional()
+  crm?: string;
+
   @IsString({ each: true })
   @IsOptional()
   certifications?: string[];
@@ -66,10 +70,6 @@ export class UpdateUserDto {
   @IsString()
   @IsOptional()
   councilId?: string;
-
-  @IsString()
-  @IsOptional()
-  crm?: string;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsString()

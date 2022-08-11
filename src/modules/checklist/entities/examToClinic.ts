@@ -1,7 +1,6 @@
 import { CompanyEntity } from './../../company/entities/company.entity';
 import {
   ExamToClinic,
-  ExamToClinicPricing,
   StatusEnum,
   Exam,
   Prisma,
@@ -17,7 +16,9 @@ export class ExamToClinicEntity implements ExamToClinic {
   isScheduled: boolean;
   observation: string;
   company: CompanyEntity;
-  pricings?: ExamToClinicPricingEntity[];
+  price: number;
+  startDate: Date;
+  endDate: Date;
   scheduleRange: Prisma.JsonValue;
   status: StatusEnum;
   exam?: ExamEntity;
@@ -26,25 +27,11 @@ export class ExamToClinicEntity implements ExamToClinic {
 
   constructor(
     partial: Partial<
-      Omit<ExamToClinicEntity, 'exam' | 'pricings'> & {
-        exam: Exam;
-        pricings: ExamToClinicPricing[];
+      Omit<ExamToClinicEntity, 'exam'> & {
+        exam?: Exam;
       }
     >,
   ) {
-    Object.assign(this, partial);
-  }
-}
-
-export class ExamToClinicPricingEntity implements ExamToClinicPricing {
-  id: number;
-  examToClinicId: number;
-  price: number;
-  startDate: Date;
-  observation: string;
-  examToClinic: ExamToClinicEntity;
-
-  constructor(partial: Partial<ExamToClinicPricingEntity>) {
     Object.assign(this, partial);
   }
 }

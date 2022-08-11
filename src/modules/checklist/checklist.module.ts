@@ -1,4 +1,5 @@
 import { Module, forwardRef } from '@nestjs/common';
+import { DayJSProvider } from '../../shared/providers/DateProvider/implementations/DayJSProvider';
 
 import { CompanyModule } from '../company/company.module';
 import { ChecklistController } from './controller/checklist/checklist.controller';
@@ -122,6 +123,7 @@ import { UpdateRiskService } from './services/risk/update-risk/update-risk.servi
     ExamToClinicRepository,
     UpsertExamToClinicService,
     FindExamToClinicService,
+    DayJSProvider,
   ],
   exports: [
     RiskRepository,

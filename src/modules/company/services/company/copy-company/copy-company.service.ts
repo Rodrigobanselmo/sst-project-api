@@ -160,6 +160,7 @@ export class CopyCompanyService {
             group.environment = group.characterization;
 
           const hierarchies: HierarchyEntity[] = [];
+
           group.hierarchies.map((hierarchy) => {
             group.workspaceIds.map((workspaceId) => {
               const hierarchyFound =
@@ -176,7 +177,8 @@ export class CopyCompanyService {
           });
 
           if (hierarchies.length === 0) return;
-          const foundHomo = await this.prisma.homogeneousGroup.findUnique({
+
+          let foundHomo = await this.prisma.homogeneousGroup.findUnique({
             where: {
               name_companyId: { name: group.name, companyId: companyId },
             },
@@ -185,81 +187,57 @@ export class CopyCompanyService {
           let newHomoGroup: HomogeneousGroup;
           const newHomoGroupId = v4();
 
-          if (!foundHomo) {
-            newHomoGroup = await this.prisma.homogeneousGroup.create({
-              data: {
-                id: newHomoGroupId,
-                description: group.description,
-                name:
-                  group.environment ||
-                  group.characterization ||
-                  group.type === HomoTypeEnum.HIERARCHY
-                    ? newHomoGroupId
-                    : group.name,
-                companyId: companyId,
-                type: group.type,
-              },
-            });
-          } else {
-            newHomoGroup = await this.prisma.homogeneousGroup.update({
-              where: { id: foundHomo.id },
-              data: {
-                companyId: companyId,
-                name:
-                  group.environment ||
-                  group.characterization ||
-                  group.type === HomoTypeEnum.HIERARCHY
-                    ? foundHomo.id
-                    : group.name,
-                type: group.type,
-                description: foundHomo.description
-                  ? group.description || undefined
-                  : undefined,
-              },
-            });
-          }
+          const createUpdateHomo = async (_newHomoGroupId: string) => {
+            if (group.type === HomoTypeEnum.HIERARCHY) {
+              foundHomo = await this.prisma.homogeneousGroup.findUnique({
+                where: {
+                  id: _newHomoGroupId,
+                },
+              });
+            }
 
-          if (
-            group.characterization &&
-            equalWorkspace[group.characterization.workspaceId]
-          ) {
-            await this.prisma.companyCharacterization.create({
-              data: {
-                id: newHomoGroup.id,
-                description: group.characterization.description,
-                name: group.characterization.name,
-                type: group.characterization.type,
-                activities: group.characterization.activities,
-                paragraphs: group.characterization.paragraphs,
-                considerations: group.characterization.considerations,
-                companyId: companyId,
-                profileName: group.characterization.profileName,
-                profileParentId: profileParentId || undefined,
-                order: group.characterization.order,
-                workspaceId:
-                  equalWorkspace[group.characterization.workspaceId].id,
-              },
-            });
+            if (!foundHomo) {
+              newHomoGroup = await this.prisma.homogeneousGroup.create({
+                data: {
+                  id: _newHomoGroupId,
+                  description: group.description,
+                  name:
+                    group.environment ||
+                    group.characterization ||
+                    group.type === HomoTypeEnum.HIERARCHY
+                      ? _newHomoGroupId
+                      : group.name,
+                  companyId: companyId,
+                  type: group.type,
+                },
+              });
+            } else {
+              newHomoGroup = await this.prisma.homogeneousGroup.update({
+                where: { id: foundHomo.id },
+                data: {
+                  companyId: companyId,
+                  name:
+                    group.environment ||
+                    group.characterization ||
+                    group.type === HomoTypeEnum.HIERARCHY
+                      ? foundHomo.id
+                      : group.name,
+                  type: group.type,
+                  description: foundHomo.description
+                    ? group.description || undefined
+                    : undefined,
+                },
+              });
+            }
+          };
 
-            //! don't include photos
-            // if (group.characterization.photos)
-            //   await this.prisma.companyCharacterizationPhoto.createMany({
-            //     data: group.characterization.photos.map(
-            //       ({ id, created_at, updated_at, deleted_at, ...photo }) => ({
-            //         ...photo,
-            //         companyCharacterizationId: newHomoGroup.id,
-            //       }),
-            //     ),
-            //   });
-          }
-
-          if (group.riskFactorData && group.riskFactorData.length) {
+          const createRiskFactorData = async (_newHomoGroupId) => {
             await Promise.all(
               group.riskFactorData.map(async (riskFactorFromData) => {
                 const newRiskFactorData =
                   await this.prisma.riskFactorData.create({
                     data: {
-                      homogeneousGroupId: newHomoGroup.id,
+                      homogeneousGroupId: _newHomoGroupId,
                       riskId: riskFactorFromData.riskId,
                       riskFactorGroupDataId: newRiskGroupData.id,
                       probabilityAfter: riskFactorFromData.probabilityAfter,
@@ -303,7 +281,10 @@ export class CopyCompanyService {
                     },
                   });
 
-                if (riskFactorFromData.epis && riskFactorFromData.epis.length)
+                if (
+                  riskFactorFromData.epiToRiskFactorData &&
+                  riskFactorFromData.epiToRiskFactorData.length
+                )
                   await this.prisma.epiToRiskFactorData.createMany({
                     data: riskFactorFromData.epiToRiskFactorData.map(
                       ({ epi, ...data }) => ({
@@ -313,7 +294,10 @@ export class CopyCompanyService {
                     ),
                   });
 
-                if (riskFactorFromData.engs && riskFactorFromData.engs.length)
+                if (
+                  riskFactorFromData.engsToRiskFactorData &&
+                  riskFactorFromData.engsToRiskFactorData.length
+                )
                   await this.prisma.engsToRiskFactorData.createMany({
                     data: riskFactorFromData.engsToRiskFactorData.map(
                       ({ recMed, ...data }) => ({
@@ -326,6 +310,59 @@ export class CopyCompanyService {
                 return newRiskFactorData;
               }),
             );
+          };
+
+          if (group.type === HomoTypeEnum.HIERARCHY) {
+            newHomoGroup = { ...group };
+
+            await Promise.all(
+              hierarchies.map(async (hierarchy) => {
+                await createUpdateHomo(hierarchy.id);
+                if (group.riskFactorData && group.riskFactorData.length) {
+                  await createRiskFactorData(hierarchy.id);
+                }
+              }),
+            );
+          } else {
+            await createUpdateHomo(newHomoGroupId);
+
+            if (
+              group.characterization &&
+              equalWorkspace[group.characterization.workspaceId]
+            ) {
+              await this.prisma.companyCharacterization.create({
+                data: {
+                  id: newHomoGroup.id,
+                  description: group.characterization.description,
+                  name: group.characterization.name,
+                  type: group.characterization.type,
+                  activities: group.characterization.activities,
+                  paragraphs: group.characterization.paragraphs,
+                  considerations: group.characterization.considerations,
+                  companyId: companyId,
+                  profileName: group.characterization.profileName,
+                  profileParentId: profileParentId || undefined,
+                  order: group.characterization.order,
+                  workspaceId:
+                    equalWorkspace[group.characterization.workspaceId].id,
+                },
+              });
+
+              //! don't include photos
+              // if (group.characterization.photos)
+              //   await this.prisma.companyCharacterizationPhoto.createMany({
+              //     data: group.characterization.photos.map(
+              //       ({ id, created_at, updated_at, deleted_at, ...photo }) => ({
+              //         ...photo,
+              //         companyCharacterizationId: newHomoGroup.id,
+              //       }),
+              //     ),
+              //   });
+            }
+
+            if (group.riskFactorData && group.riskFactorData.length) {
+              await createRiskFactorData(newHomoGroup.id);
+            }
           }
 
           await Promise.all(
@@ -334,13 +371,19 @@ export class CopyCompanyService {
                 where: {
                   hierarchyId_homogeneousGroupId_workspaceId: {
                     hierarchyId: hierarchy.id,
-                    homogeneousGroupId: newHomoGroup.id,
+                    homogeneousGroupId:
+                      newHomoGroup.type === 'HIERARCHY'
+                        ? hierarchy.id
+                        : newHomoGroup.id,
                     workspaceId: hierarchy.workspaceId,
                   },
                 },
                 create: {
                   hierarchyId: hierarchy.id,
-                  homogeneousGroupId: newHomoGroup.id,
+                  homogeneousGroupId:
+                    newHomoGroup.type === 'HIERARCHY'
+                      ? hierarchy.id
+                      : newHomoGroup.id,
                   workspaceId: hierarchy.workspaceId,
                 },
                 update: {},

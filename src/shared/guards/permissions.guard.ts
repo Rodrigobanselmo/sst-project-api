@@ -102,9 +102,6 @@ export class PermissionsGuard implements CanActivate {
     const method: IMethods = req.method;
     const CRUD = methodToCrud(method);
 
-    //! remove
-    return true;
-
     if (user)
       return await asyncSome(
         requiredPermissionsOptions,
@@ -120,14 +117,19 @@ export class PermissionsGuard implements CanActivate {
           if (affectedCompanyId === false)
             throw new ForbiddenException('Accesso negado');
 
-          const isPermissionPresent = checkPermissions(
-            user,
-            PermissionOption,
-            CRUD,
-          );
+          //! add
+          // const isPermissionPresent = checkPermissions(
+          //   user,
+          //   PermissionOption,
+          //   CRUD,
+          // );
 
-          if (!isPermissionPresent)
-            throw new ForbiddenException('Accesso negado');
+          //! remove
+          const isPermissionPresent = true;
+
+          //! add
+          // if (!isPermissionPresent)
+          //   throw new ForbiddenException('Accesso negado');
 
           if (!isMember && !isContract && isPermissionPresent) return true;
 

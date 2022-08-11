@@ -30,18 +30,18 @@ export class UpsertExamToClinicDto {
 
   @IsString()
   @IsOptional()
-  observation: string;
+  observation?: string;
 
   @IsInt()
   @IsOptional()
-  price: number;
+  price?: number;
 
   @IsOptional()
   scheduleRange?: Prisma.JsonValue;
 
   @IsInt()
   @IsOptional()
-  examMinDuration: number;
+  examMinDuration?: number;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsOptional()
@@ -49,7 +49,18 @@ export class UpsertExamToClinicDto {
   @IsEnum(ClinicScheduleTypeEnum, {
     message: `Tipo de agendamento inválido`,
   })
-  scheduleType: ClinicScheduleTypeEnum;
+  scheduleType?: ClinicScheduleTypeEnum;
+
+  @Transform(DateFormat, { toClassOnly: true })
+  @IsDate({ message: 'Data de início inválida' })
+  @Type(() => Date)
+  startDate: Date;
+
+  @IsOptional()
+  @Transform(DateFormat, { toClassOnly: true })
+  @IsDate({ message: 'Data de fim inválida' })
+  @Type(() => Date)
+  endDate: Date;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsOptional()
@@ -58,26 +69,6 @@ export class UpsertExamToClinicDto {
     message: `Tipo de status inválido`,
   })
   status?: StatusEnum;
-}
-
-export class CreateExamToClinicPricingDto {
-  @IsInt()
-  @IsOptional()
-  examToClinicId: number;
-
-  @IsInt()
-  @IsOptional()
-  price: number;
-
-  @IsString()
-  @IsOptional()
-  observation: string;
-
-  @Transform(DateFormat, { toClassOnly: true })
-  @IsOptional()
-  @IsDate()
-  @Type(() => Date)
-  startDate?: Date;
 }
 
 export class FindExamToClinicDto extends PaginationQueryDto {
@@ -92,4 +83,22 @@ export class FindExamToClinicDto extends PaginationQueryDto {
   @IsString()
   @IsOptional()
   companyId?: string;
+
+  @IsInt()
+  @IsOptional()
+  examId?: number;
+
+  @IsOptional()
+  @Transform(DateFormat, { toClassOnly: true })
+  @IsDate({ message: 'Data de início inválida' })
+  @Type(() => Date)
+  endDate!: Date | null;
+
+  @IsString()
+  @IsOptional()
+  orderBy?: string;
+
+  @IsString()
+  @IsOptional()
+  orderByDirection?: 'asc' | 'desc';
 }

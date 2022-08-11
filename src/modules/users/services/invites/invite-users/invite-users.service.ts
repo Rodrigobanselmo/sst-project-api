@@ -59,7 +59,6 @@ export class InviteUsersService {
       if (!authGroup?.id)
         throw new BadRequestException(ErrorInvitesEnum.AUTH_GROUP_NOT_FOUND);
 
-      console.log(authGroup);
       addPermissions.push(...authGroup.permissions);
       addRoles.push(...authGroup.roles);
     }

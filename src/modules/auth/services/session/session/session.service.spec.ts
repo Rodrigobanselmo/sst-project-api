@@ -1,3 +1,4 @@
+import { ErrorMessageEnum } from './../../../../../shared/constants/enum/errorMessage';
 import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
@@ -83,7 +84,7 @@ describe('SessionService', () => {
       throw new Error('error');
     } catch (err) {
       expect(err).toEqual(
-        new BadRequestException('Email or password incorrect'),
+        new BadRequestException(ErrorMessageEnum.WRONG_EMAIL_PASS),
       );
     }
   });
@@ -96,7 +97,7 @@ describe('SessionService', () => {
       throw new Error('error');
     } catch (err) {
       expect(err).toEqual(
-        new BadRequestException('Email or password incorrect'),
+        new BadRequestException(ErrorMessageEnum.WRONG_EMAIL_PASS),
       );
     }
   });

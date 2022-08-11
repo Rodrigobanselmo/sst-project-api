@@ -29,6 +29,15 @@ class DayJSProvider implements IDateProvider {
       .toDate();
   }
 
+  onlyDate(date: Date): Date {
+    return dayjs(date)
+      .set('h', 0)
+      .set('m', 0)
+      .set('s', 0)
+      .set('ms', 0)
+      .toDate();
+  }
+
   compareIfBefore(start_date: Date, end_date: Date): boolean {
     return dayjs(start_date).isBefore(end_date);
   }
