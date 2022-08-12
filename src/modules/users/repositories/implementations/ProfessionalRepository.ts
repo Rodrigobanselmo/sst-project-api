@@ -163,6 +163,7 @@ export class ProfessionalRepository {
   async findFirstNude(options: Prisma.ProfessionalFindFirstArgs = {}) {
     const professional = await this.prisma.professional.findFirst({
       ...options,
+      // include: { user: { select: { email: true, id: true } } },
     });
 
     return new ProfessionalEntity(professional);

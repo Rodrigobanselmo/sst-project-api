@@ -47,10 +47,11 @@ const isParentCompany = async (
       },
     },
   });
+  console.log(parentRelation);
 
-  if (!parentRelation) throw new ForbiddenException('Accesso negado');
+  if (!parentRelation) throw new ForbiddenException('Acesso negado');
   if (parentRelation.status !== 'ACTIVE')
-    throw new ForbiddenException('Accesso negado');
+    throw new ForbiddenException('Acesso negado');
 
   return true;
 };
@@ -115,7 +116,7 @@ export class PermissionsGuard implements CanActivate {
 
           // is being send an array of items with different companies Ids
           if (affectedCompanyId === false)
-            throw new ForbiddenException('Accesso negado');
+            throw new ForbiddenException('Acesso negado');
 
           //! add
           // const isPermissionPresent = checkPermissions(
@@ -129,7 +130,7 @@ export class PermissionsGuard implements CanActivate {
 
           //! add
           // if (!isPermissionPresent)
-          //   throw new ForbiddenException('Accesso negado');
+          //   throw new ForbiddenException('Acesso negado');
 
           if (!isMember && !isContract && isPermissionPresent) return true;
 
@@ -140,9 +141,9 @@ export class PermissionsGuard implements CanActivate {
 
           if (isContract && isPermissionPresent) {
             if (!affectedCompanyId)
-              throw new ForbiddenException('Accesso negado');
+              throw new ForbiddenException('Acesso negado');
             if (affectedCompanyId == userCompanyId)
-              throw new ForbiddenException('Accesso negado');
+              throw new ForbiddenException('Acesso negado');
 
             const isCompanyContract = await isParentCompany(
               this.prisma,
@@ -153,9 +154,9 @@ export class PermissionsGuard implements CanActivate {
             if (isCompanyContract) return true;
           }
 
-          throw new ForbiddenException('Accesso negado');
+          throw new ForbiddenException('Acesso negado');
         },
       );
-    throw new ForbiddenException('Accesso negado');
+    throw new ForbiddenException('Acesso negado');
   }
 }

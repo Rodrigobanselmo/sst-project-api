@@ -6,6 +6,7 @@ import {
   Get,
   Param,
   Post,
+  Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { classToClass } from 'class-transformer';
@@ -16,11 +17,13 @@ import { Permissions } from '../../../../shared/decorators/permissions.decorator
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import { ValidateEmailPipe } from '../../../../shared/pipes/validate-email.pipe';
-import { InviteUserDto } from '../../dto/invite-user.dto';
+import { FindInvitesDto, InviteUserDto } from '../../dto/invite-user.dto';
 import { DeleteExpiredInvitesService } from '../../services/invites/delete-expired-invites/delete-expired-invites.service';
 import { DeleteInvitesService } from '../../services/invites/delete-invites/delete-invites.service';
+import { FindAvailableService } from '../../services/invites/find-available/find-available.service';
 import { FindAllByCompanyIdService } from '../../services/invites/find-by-companyId/find-by-companyId.service';
 import { FindAllByEmailService } from '../../services/invites/find-by-email/find-by-email.service';
+import { FindByTokenService } from '../../services/invites/find-by-token/find-by-token.service';
 import { InviteUsersService } from '../../services/invites/invite-users/invite-users.service';
 
 @ApiTags('invites')
@@ -30,6 +33,8 @@ export class InvitesController {
     private readonly inviteUsersService: InviteUsersService,
     private readonly findAllByCompanyIdService: FindAllByCompanyIdService,
     private readonly findAllByEmailService: FindAllByEmailService,
+    private readonly findAvailableService: FindAvailableService,
+    private readonly findByTokenService: FindByTokenService,
     private readonly deleteInvitesService: DeleteInvitesService,
     private readonly deleteExpiredInvitesService: DeleteExpiredInvitesService,
   ) {}
@@ -56,6 +61,16 @@ export class InvitesController {
         ErrorInvitesEnum.FORBIDDEN_ACCESS_USER_INVITE_LIST,
       );
     return classToClass(this.findAllByEmailService.execute(email));
+  }
+
+  @Get('/token/:tokenId')
+  async findByToken(@Param('tokenId') tokenId: string) {
+    return classToClass(this.findByTokenService.execute(tokenId));
+  }
+
+  @Get()
+  async find(@User() user: UserPayloadDto, @Query() query: FindInvitesDto) {
+    return classToClass(this.findAvailableService.execute(query, user));
   }
 
   @Permissions({

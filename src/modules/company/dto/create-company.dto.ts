@@ -16,6 +16,7 @@ import {
   IsString,
   Length,
   MaxLength,
+  ValidateIf,
   ValidateNested,
 } from 'class-validator';
 
@@ -191,7 +192,7 @@ export class CreateCompanyDto {
   @IsOptional()
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsEnum(CompanyPaymentTypeEnum, {
-    message: `Tiop de pagamento inválido`,
+    message: `Tipo de pagamento inválido`,
   })
   paymentType?: CompanyPaymentTypeEnum;
 

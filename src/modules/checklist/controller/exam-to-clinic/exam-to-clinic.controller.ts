@@ -22,6 +22,7 @@ export class ExamToClinicController {
     code: PermissionEnum.EXAM,
     crud: true,
     isMember: true,
+    isContract: true,
   })
   @Post()
   create(
@@ -38,6 +39,7 @@ export class ExamToClinicController {
     code: PermissionEnum.EXAM,
     crud: true,
     isMember: true,
+    isContract: true,
   })
   @Get('/:companyId?')
   findAllAvailable(

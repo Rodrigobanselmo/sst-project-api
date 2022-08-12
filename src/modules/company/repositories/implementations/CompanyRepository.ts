@@ -681,7 +681,7 @@ export class CompanyRepository implements ICompanyRepository {
       where: { companyId: id },
     });
 
-    const examCount = await this.prisma.exam.count({
+    const examCount = await this.prisma.examToClinic.count({
       where: { companyId: id },
     });
 

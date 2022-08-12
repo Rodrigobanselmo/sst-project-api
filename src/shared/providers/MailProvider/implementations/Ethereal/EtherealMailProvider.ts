@@ -35,6 +35,7 @@ class EtherealMailProvider implements IMailProvider {
     variables,
   }: ISendMailData): Promise<any> {
     if (process.env.NODE_ENV === 'test') return;
+    if (process.env.NODE_ENV === 'development') return;
 
     const templateFileContent = fs.readFileSync(path).toString('utf-8');
 

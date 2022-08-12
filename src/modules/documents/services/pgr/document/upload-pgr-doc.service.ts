@@ -34,7 +34,6 @@ import {
   IHierarchyMap,
   IHomoGroupMap,
 } from './../../../docx/converter/hierarchy.converter';
-import { EmployeeEntity } from 'src/modules/company/entities/employee.entity';
 
 @Injectable()
 export class PgrUploadService {

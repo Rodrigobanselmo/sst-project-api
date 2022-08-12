@@ -210,7 +210,7 @@ export class UpdateCompanyDto {
   @IsOptional()
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsEnum(CompanyPaymentTypeEnum, {
-    message: `Tiop de pagamento inválido`,
+    message: `Tipo de pagamento inválido`,
   })
   paymentType?: CompanyPaymentTypeEnum;
 }

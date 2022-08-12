@@ -56,18 +56,17 @@ export class UpdateUserService {
       updateUserDto.password = passHash;
     }
 
-    const { companies, email, companyId } = await getCompanyPermissionByToken(
+    const { companies, invite, companyId } = await getCompanyPermissionByToken(
       token,
-      userData.email,
       this.findByTokenService,
       this.dateProvider,
     );
 
     const user = await this.userRepository.update(id, updateUserDto, companies);
-    if (email && companyId)
+    if (invite && invite.email && companyId)
       await this.inviteUsersRepository.deleteByCompanyIdAndEmail(
         companyId,
-        email,
+        invite.email,
       );
 
     return user;

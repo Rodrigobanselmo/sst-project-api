@@ -27,9 +27,13 @@ export class InviteUsersEntity implements InviteUsers {
   @ApiProperty()
   companyName?: string;
 
+  @ApiProperty()
+  logo?: string;
+
   constructor(partial: Partial<InviteUsersEntity>) {
     Object.assign(this, partial);
   }
   companiesIds: string[];
   groupId: number;
+  professionalId: number;
 }

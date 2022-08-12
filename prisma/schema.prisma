@@ -268,7 +268,7 @@ model Company {
   invites InviteUsers[] 
   license License? @relation(name:"license",fields: [licenseId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
   primary_activity Activity[] @relation(name: "primary_activity")
-  professionals Professional[]
+  professionals Professional[] //! will be removed doc not working
   receivingServiceContracts Contract[]
   recMed RecMed[] 
   exams Exam[] 
@@ -284,6 +284,7 @@ model Company {
   contacts Contact[]
   doctorResponsible  Professional? @relation(name:"doctors_company_responsibles", fields: [doctorResponsibleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   tecResponsible  Professional? @relation(name:"tec_company_responsibles", fields: [tecResponsibleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  // professionals Professional[] @relation(name:"companies_related") 
   stateRegistration String? // not in use
   size String? // not in use
   legal_nature String? // not in use
@@ -657,7 +658,9 @@ model InviteUsers {
   companyId String
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   companiesIds String[]
-  email String 
+  email String? 
+  professionalId Int? 
+  professional Professional? @relation(fields: [professionalId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   roles String[]
   permissions String[]
   groupId Int?
@@ -700,6 +703,8 @@ model Professional {
   doctorGroupResponsible  CompanyGroup[] @relation(name:"doctors_group_responsibles")
   doctorCompanyResponsible  Company[] @relation(name:"doctors_company_responsibles")
   tecCompanyResponsible  Company[] @relation(name:"tec_company_responsibles")
+  invites  InviteUsers[]
+  // companies Company[] @relation(name:"companies_related") 
 
   @@unique([id, companyId])
 }

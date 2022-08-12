@@ -22,6 +22,7 @@ import {
 } from '../../dto/professional.dto';
 import { CreateProfessionalService } from '../../services/professionals/create-professional/create-professional.service';
 import { FindAllProfessionalsByCompanyService } from '../../services/professionals/find-all/find-all.service';
+import { FindFirstProfessionalService } from '../../services/professionals/find-first/find-first.service';
 import { UpdateProfessionalService } from '../../services/professionals/update-professional/update-professional.service';
 
 @ApiTags('professionals')
@@ -31,6 +32,7 @@ export class ProfessionalsController {
     private readonly findAllByCompanyService: FindAllProfessionalsByCompanyService,
     private readonly createProfessionalService: CreateProfessionalService,
     private readonly updateProfessionalService: UpdateProfessionalService,
+    private readonly findFirstProfessionalService: FindFirstProfessionalService,
   ) {}
 
   @Permissions(
@@ -58,6 +60,22 @@ export class ProfessionalsController {
     return classToClass(
       this.findAllByCompanyService.execute(query, userPayloadDto),
     );
+  }
+
+  @Permissions(
+    {
+      code: PermissionEnum.PROFESSIONALS,
+    },
+    {
+      code: PermissionEnum.USER,
+    },
+    {
+      code: PermissionEnum.MANAGEMENT,
+    },
+  )
+  @Get('/find')
+  findFirst(@Query() query: FindProfessionalsDto) {
+    return classToClass(this.findFirstProfessionalService.execute(query));
   }
 
   @Permissions(

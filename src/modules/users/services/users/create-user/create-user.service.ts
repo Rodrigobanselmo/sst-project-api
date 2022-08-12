@@ -31,9 +31,8 @@ export class CreateUserService {
     if (userAlreadyExist)
       throw new BadRequestException(ErrorAuthEnum.USER_ALREADY_EXIST);
 
-    const { companies, email, companyId } = await getCompanyPermissionByToken(
+    const { companies, companyId, invite } = await getCompanyPermissionByToken(
       token,
-      restCreateUserDto.email,
       this.findByTokenService,
       this.dateProvider,
     );
@@ -44,10 +43,10 @@ export class CreateUserService {
     };
 
     const user = await this.userRepository.create(userData, companies);
-    if (email && companyId)
+    if (invite && invite.email && companyId)
       await this.inviteUsersRepository.deleteByCompanyIdAndEmail(
         companyId,
-        email,
+        invite.email,
       );
 
     delete user.password;
@@ -57,7 +56,6 @@ export class CreateUserService {
 
 export const getCompanyPermissionByToken = async (
   token: string,
-  email: string,
   findByTokenService: FindByTokenService,
   dateProvider: DayJSProvider,
 ) => {
@@ -67,9 +65,6 @@ export const getCompanyPermissionByToken = async (
 
   const currentDate = dateProvider.dateNow();
   const expires_date = new Date(dateProvider.convertToUTC(invite.expires_date));
-
-  if (invite.email !== email)
-    throw new BadRequestException(ErrorInvitesEnum.TOKEN_NOT_VALID_EMAIL);
 
   if (currentDate > expires_date)
     throw new BadRequestException(ErrorInvitesEnum.TOKEN_EXPIRES);
@@ -89,5 +84,5 @@ export const getCompanyPermissionByToken = async (
       },
     ];
 
-  return { companies, email: invite.email, companyId: invite.companyId };
+  return { companies, companyId: invite.companyId, invite };
 };

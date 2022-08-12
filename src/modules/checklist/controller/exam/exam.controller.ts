@@ -33,6 +33,7 @@ export class ExamController {
     code: PermissionEnum.EXAM,
     crud: true,
     isMember: true,
+    isContract: true,
   })
   @Post()
   create(
@@ -54,6 +55,7 @@ export class ExamController {
     code: PermissionEnum.EXAM,
     crud: true,
     isMember: true,
+    isContract: true,
   })
   @Patch('/:id/:companyId')
   async update(
@@ -68,6 +70,7 @@ export class ExamController {
     code: PermissionEnum.EXAM,
     crud: true,
     isMember: true,
+    isContract: true,
   })
   @Delete('/:id/:companyId')
   async deleteSoft(

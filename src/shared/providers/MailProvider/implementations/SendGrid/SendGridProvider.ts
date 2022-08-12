@@ -23,6 +23,9 @@ class SendGridProvider implements IMailProvider {
     source = EmailsEnum.VALIDATION,
   }: ISendMailData): Promise<any> {
     try {
+      if (process.env.NODE_ENV === 'development') return;
+      if (!to) return;
+
       const templateFileContent = fs.readFileSync(path).toString('utf-8');
 
       const templateParse = handlebars.compile(templateFileContent);

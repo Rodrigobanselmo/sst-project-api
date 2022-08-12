@@ -65,8 +65,8 @@ export class UsersRepository implements IUsersRepository {
       cpf,
       phone,
       formation,
-      name,
       type,
+      name,
     };
 
     const user = await this.prisma.user.update({

@@ -19,6 +19,7 @@ import { InviteUsersEntity } from '../../../entities/invite-users.entity';
 import { InviteUsersRepository } from '../../../repositories/implementations/InviteUsersRepository';
 import { UsersRepository } from '../../../repositories/implementations/UsersRepository';
 import { ErrorInvitesEnum } from './../../../../../shared/constants/enum/errorMessage';
+import { v4 } from 'uuid';
 
 @Injectable()
 export class InviteUsersService {
@@ -122,6 +123,7 @@ export class InviteUsersService {
 
     const invite = await this.inviteUsersRepository.create(
       {
+        email: v4(),
         ...inviteUserDto,
         companiesIds: companies.data.map((company) => company.id),
       },

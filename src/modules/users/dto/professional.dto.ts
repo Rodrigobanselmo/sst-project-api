@@ -92,6 +92,22 @@ export class FindProfessionalsDto extends PaginationQueryDto {
 
   @IsString()
   @IsOptional()
+  email?: string;
+
+  @IsString()
+  @IsOptional()
+  councilType?: string;
+
+  @IsString()
+  @IsOptional()
+  councilUF?: string;
+
+  @IsString()
+  @IsOptional()
+  councilId?: string;
+
+  @IsString()
+  @IsOptional()
   companyId?: string;
 
   @Transform(QueryArray, { toClassOnly: true })

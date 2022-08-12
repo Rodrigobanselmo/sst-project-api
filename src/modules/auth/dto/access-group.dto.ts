@@ -38,7 +38,7 @@ export class FindAccessGroupDto extends PaginationQueryDto {
 
   @IsString()
   @IsOptional()
-  search: string[];
+  search: string;
 
   @IsString({ each: true })
   @IsOptional()

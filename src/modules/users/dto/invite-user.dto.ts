@@ -1,7 +1,18 @@
-import { IsEmail, IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+  ValidateIf,
+} from 'class-validator';
 import { RoleEnum } from '../../../shared/constants/enum/authorization';
-
+import { QueryArray } from './../../../shared/transformers/query-array';
+import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
+import { Transform } from 'class-transformer';
 export class InviteUserDto {
+  @ValidateIf((o) => o.email)
+  @IsOptional()
   @IsString()
   @IsEmail()
   readonly email: string;
@@ -27,4 +38,11 @@ export class InviteUserDto {
     each: true,
   })
   readonly roles?: RoleEnum[];
+}
+
+export class FindInvitesDto extends PaginationQueryDto {
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsString({ each: true })
+  @IsOptional()
+  ids?: string[];
 }
