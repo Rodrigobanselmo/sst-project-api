@@ -17,11 +17,11 @@ export const createBaseDocument = (sections: ISectionOptions[]) => {
               text: '%1.%2.',
               format: LevelFormat.DECIMAL,
             },
-            // {
-            //   level: 2,
-            //   text: '%1.%2.%3.',
-            //   format: LevelFormat.DECIMAL,
-            // },
+            {
+              level: 2,
+              text: '%1.%2.%3.',
+              format: LevelFormat.DECIMAL,
+            },
             // {
             //   level: 3,
             //   text: '%1.%2.%3.%4.',

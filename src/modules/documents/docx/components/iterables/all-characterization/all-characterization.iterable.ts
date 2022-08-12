@@ -134,7 +134,7 @@ export const environmentIterable = (
 
       const title = [
         {
-          type: PGRSectionChildrenTypeEnum.H3,
+          type: PGRSectionChildrenTypeEnum.H2,
           text: `??${VariablesPGREnum.ENVIRONMENT_NAME}??`,
         },
       ] as ISectionChildrenType[];

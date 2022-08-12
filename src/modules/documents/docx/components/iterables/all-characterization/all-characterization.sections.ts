@@ -285,30 +285,28 @@ export const allCharacterizationSections = (
       if (!environments?.length) return;
 
       const environmentData = environmentsConverter(environments);
+      let firstPass = true;
 
       environmentData
         .sort((a, b) => sortString(b, a, 'profileParentId'))
         .forEach(
-          (
-            {
-              variables,
-              elements,
-              id,
-              risks,
-              considerations: cons,
-              breakPage,
-              activities: ac,
-              profileParentId,
-              profiles,
-              type,
-              paragraphs,
-            },
-            index,
-          ) => {
+          ({
+            variables,
+            elements,
+            id,
+            risks,
+            considerations: cons,
+            breakPage,
+            activities: ac,
+            profileParentId,
+            profiles,
+            type,
+            paragraphs,
+          }) => {
             const title = [
               {
                 type: PGRSectionChildrenTypeEnum.H3,
-                text: `${desc}: ??${VariablesPGREnum.ENVIRONMENT_NAME}??`,
+                text: `${desc}: ??${VariablesPGREnum.ENVIRONMENT_NAME}??2`,
               },
             ] as ISectionChildrenType[];
 
@@ -354,7 +352,7 @@ export const allCharacterizationSections = (
                 .reduce((acc, curr) => (curr ? [...acc, ...curr] : acc), []),
             ];
 
-            if (index == 0)
+            if (firstPass) {
               section.unshift(
                 ...convertToDocx([
                   {
@@ -363,6 +361,8 @@ export const allCharacterizationSections = (
                   },
                 ]),
               );
+              firstPass = false;
+            }
 
             if (breakPage || sections.length === 0) sections.push(section);
             else {
