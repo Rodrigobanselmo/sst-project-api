@@ -103,7 +103,9 @@ export class CompanyRepository implements ICompanyRepository {
             }
           : undefined,
         contacts: {
-          create: [{ email, phone, name: 'Principal', isPrincipal: true }],
+          create: [
+            { email, phone, name: 'Contato principal', isPrincipal: true },
+          ],
         },
       },
       include: {
