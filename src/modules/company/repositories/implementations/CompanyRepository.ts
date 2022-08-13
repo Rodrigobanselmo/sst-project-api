@@ -147,7 +147,6 @@ export class CompanyRepository implements ICompanyRepository {
     prismaRef?: boolean,
   ) {
     const include = options?.include || {};
-    console.log(workspace);
     if (primary_activity.length)
       await this.prisma.company.update({
         where: { id: companyId },

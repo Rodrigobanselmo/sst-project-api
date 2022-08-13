@@ -17,9 +17,7 @@ export const SignaturesConverter = (
     )
     .map((signature) => {
       const crea =
-        signature?.councilType === 'CREA'
-          ? getCredential(signature)
-          : signature.crea;
+        signature?.councilType === 'CREA' ? getCredential(signature) : '';
 
       return {
         [VariablesPGREnum.PROFESSIONAL_CERTIFICATIONS]:

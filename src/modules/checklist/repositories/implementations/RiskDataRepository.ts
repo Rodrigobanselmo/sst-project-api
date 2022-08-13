@@ -402,9 +402,6 @@ export class RiskDataRepository {
 
     if (epis) {
       if (riskData.epiToRiskFactorData?.length) {
-        console.log(
-          m2mGetDeletedIds(riskData.epiToRiskFactorData, epis, 'epiId'),
-        );
         await this.prisma.epiToRiskFactorData.deleteMany({
           where: {
             riskFactorDataId: riskData.id,

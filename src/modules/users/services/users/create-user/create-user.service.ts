@@ -1,3 +1,4 @@
+import { ProfessionalRepository } from './../../../repositories/implementations/ProfessionalRepository';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InviteUsersRepository } from '../../../../../modules/users/repositories/implementations/InviteUsersRepository';
 import {
@@ -16,6 +17,7 @@ import { FindByTokenService } from '../../invites/find-by-token/find-by-token.se
 export class CreateUserService {
   constructor(
     private readonly userRepository: UsersRepository,
+    private readonly professionalRepository: ProfessionalRepository,
     private readonly findByTokenService: FindByTokenService,
     private readonly dateProvider: DayJSProvider,
     private readonly hashProvider: HashProvider,
@@ -42,7 +44,14 @@ export class CreateUserService {
       password: passHash,
     };
 
-    const user = await this.userRepository.create(userData, companies);
+    const professional = invite?.professional;
+
+    const user = await this.userRepository.create(
+      userData,
+      companies,
+      professional,
+    );
+
     if (invite && invite.email && companyId)
       await this.inviteUsersRepository.deleteByCompanyIdAndEmail(
         companyId,

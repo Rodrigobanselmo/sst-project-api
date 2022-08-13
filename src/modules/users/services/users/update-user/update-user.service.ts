@@ -62,7 +62,31 @@ export class UpdateUserService {
       this.dateProvider,
     );
 
-    const user = await this.userRepository.update(id, updateUserDto, companies);
+    const user = await this.userRepository.update(
+      id,
+      {
+        ...updateUserDto,
+        ...(invite &&
+          invite?.professional && {
+            ...(invite?.professional.councilId && {
+              councilId: invite.professional.councilId,
+            }),
+            ...(invite?.professional.councilType && {
+              councilType: invite.professional.councilType,
+            }),
+            ...(invite?.professional.councilUF && {
+              councilUF: invite.professional.councilUF,
+            }),
+            ...(invite?.professional.phone && {
+              phone: invite.professional.phone,
+            }),
+            ...(invite?.professional.type && {
+              type: invite.professional.type,
+            }),
+          }),
+      },
+      companies,
+    );
     if (invite && invite.email && companyId)
       await this.inviteUsersRepository.deleteByCompanyIdAndEmail(
         companyId,

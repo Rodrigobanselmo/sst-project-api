@@ -1,3 +1,4 @@
+import { ProfessionalEntity } from './../../entities/professional.entity';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
 import { ProfessionalTypeEnum } from '@prisma/client';
@@ -17,6 +18,7 @@ export class UsersRepository implements IUsersRepository {
   async create(
     createUserDto: Omit<CreateUserDto, 'token'>,
     userCompanyDto: UserCompanyDto[],
+    professional?: ProfessionalEntity,
   ) {
     const user = await this.prisma.user.create({
       data: {
@@ -26,6 +28,15 @@ export class UsersRepository implements IUsersRepository {
             type: ProfessionalTypeEnum.USER,
             name: '',
             email: createUserDto.email,
+            ...(professional && {
+              councilId: professional?.councilId,
+              councilType: professional?.councilType,
+              councilUF: professional?.councilUF,
+              phone: professional?.phone,
+              cpf: professional?.cpf,
+              type: professional?.type,
+              name: professional?.name,
+            }),
           },
         },
         companies: { create: userCompanyDto },
@@ -44,8 +55,6 @@ export class UsersRepository implements IUsersRepository {
       councilId,
       councilUF,
       councilType,
-      crm,
-      crea,
       cpf,
       phone,
       formation,
@@ -60,8 +69,6 @@ export class UsersRepository implements IUsersRepository {
       councilId,
       councilUF,
       councilType,
-      crm,
-      crea,
       cpf,
       phone,
       formation,
@@ -92,7 +99,10 @@ export class UsersRepository implements IUsersRepository {
       include: { companies: true, professional: true },
     });
     if (!user) return;
-    return new UserEntity(user);
+    return new UserEntity({
+      ...user,
+      professional: new ProfessionalEntity(user?.professional),
+    });
   }
 
   async removeById(id: number) {
@@ -109,7 +119,13 @@ export class UsersRepository implements IUsersRepository {
         professional: true,
       },
     });
-    return users.map((user) => new UserEntity(user));
+    return users.map(
+      (user) =>
+        new UserEntity({
+          ...user,
+          professional: new ProfessionalEntity(user?.professional),
+        }),
+    );
   }
 
   async findByEmail(email: string) {
@@ -118,7 +134,10 @@ export class UsersRepository implements IUsersRepository {
       include: { companies: true, professional: true },
     });
     if (!user) return;
-    return new UserEntity(user);
+    return new UserEntity({
+      ...user,
+      professional: new ProfessionalEntity(user?.professional),
+    });
   }
 
   async findById(id: number) {
@@ -127,7 +146,10 @@ export class UsersRepository implements IUsersRepository {
       include: { companies: true, professional: true },
     });
     if (!user) return;
-    return new UserEntity(user);
+    return new UserEntity({
+      ...user,
+      professional: new ProfessionalEntity(user?.professional),
+    });
   }
 
   async findByGoogleExternalId(id: string) {
@@ -136,6 +158,9 @@ export class UsersRepository implements IUsersRepository {
       include: { companies: true, professional: true },
     });
     if (!user) return;
-    return new UserEntity(user);
+    return new UserEntity({
+      ...user,
+      professional: new ProfessionalEntity(user?.professional),
+    });
   }
 }

@@ -43,14 +43,6 @@ export class UpdateUserDto {
   @IsOptional()
   phone?: string;
 
-  @IsString()
-  @IsOptional()
-  crea?: string;
-
-  @IsString()
-  @IsOptional()
-  crm?: string;
-
   @IsString({ each: true })
   @IsOptional()
   certifications?: string[];

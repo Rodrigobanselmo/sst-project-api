@@ -24,9 +24,7 @@ export const ProfessionalsConverter = (
     )
     .map((professional) => {
       const crea =
-        professional?.councilType === 'CREA'
-          ? getCredential(professional)
-          : professional.crea;
+        professional?.councilType === 'CREA' ? getCredential(professional) : '';
 
       return {
         [VariablesPGREnum.PROFESSIONAL_CERTIFICATIONS]:

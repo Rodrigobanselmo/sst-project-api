@@ -42,11 +42,6 @@ export class EmployeeController {
     @Param('companyId') companyId: string,
     @Param('subOfficeId') subOfficeId: string,
   ) {
-    console.log({
-      id: employeeId,
-      subOfficeId,
-      companyId,
-    });
     return this.deleteSubOfficeEmployeeService.execute({
       id: employeeId,
       subOfficeId,

@@ -1,7 +1,13 @@
 import { PartialType } from '@nestjs/swagger';
 import { ProfessionalTypeEnum, StatusEnum } from '@prisma/client';
 import { Transform } from 'class-transformer';
-import { IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
 import { CpfFormatTransform } from './../../../shared/transformers/cpf-format.transform';
@@ -39,14 +45,6 @@ export class CreateProfessionalDto {
   @IsOptional()
   councilId?: string;
 
-  @IsString()
-  @IsOptional()
-  crm?: string;
-
-  @IsString()
-  @IsOptional()
-  crea?: string;
-
   @IsString({ each: true })
   @IsOptional()
   certifications?: string[];
@@ -69,6 +67,18 @@ export class CreateProfessionalDto {
     message: `Tipo de status inválido`,
   })
   status?: StatusEnum;
+
+  @IsString()
+  @IsOptional()
+  inviteId?: string;
+
+  @IsInt()
+  @IsOptional()
+  userId?: number;
+
+  @IsBoolean()
+  @IsOptional()
+  sendEmail?: boolean;
 }
 
 export class UpdateProfessionalDto extends PartialType(CreateProfessionalDto) {

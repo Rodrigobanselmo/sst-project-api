@@ -136,7 +136,7 @@ export class InviteUsersService {
   }
 }
 
-const inviteNewUser = async (
+export const inviteNewUser = async (
   mailProvider: SendGridProvider,
   invite: InviteUsersEntity,
 ) => {

@@ -659,12 +659,11 @@ model InviteUsers {
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   companiesIds String[]
   email String? 
-  professionalId Int? 
-  professional Professional? @relation(fields: [professionalId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   roles String[]
   permissions String[]
   groupId Int?
   group AccessGroups? @relation(fields: [groupId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
+  professional Professional?
 }
 
 model License {
@@ -693,8 +692,6 @@ model Professional {
   updated_at  DateTime   @updatedAt
   type ProfessionalTypeEnum? @default(USER)
   companyId String?
-  crea String? 
-  crm String? 
   company Company? @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
   professionalPgrSignature RiskFactorGroupDataToProfessional[]
   status StatusEnum @default(ACTIVE)
@@ -703,7 +700,8 @@ model Professional {
   doctorGroupResponsible  CompanyGroup[] @relation(name:"doctors_group_responsibles")
   doctorCompanyResponsible  Company[] @relation(name:"doctors_company_responsibles")
   tecCompanyResponsible  Company[] @relation(name:"tec_company_responsibles")
-  invites  InviteUsers[]
+  inviteId String? @unique
+  invite InviteUsers? @relation(fields: [inviteId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   // companies Company[] @relation(name:"companies_related") 
 
   @@unique([id, companyId])
@@ -950,8 +948,6 @@ model User {
   id    Int     @default(autoincrement()) @id
   email String  @unique
   name String?
-  formation String[]
-  certifications String[]
   phone String?
   cpf String?
   googleExternalId String? 
@@ -960,11 +956,6 @@ model User {
   created_at DateTime @default(now())
   updated_at  DateTime   @updatedAt
   deleted_at DateTime? 
-  crea String? 
-  crm String? 
-  councilType String?
-  councilUF String?
-  councilId String?
   usersPgrSignatures RiskFactorGroupDataToUser[]
   refresh_token RefreshToken[]
   companies UserCompany[]

@@ -7,10 +7,12 @@ export class FindByTokenService {
   constructor(private readonly inviteUsersRepository: InviteUsersRepository) {}
   async execute(token: string) {
     const invite = await this.inviteUsersRepository.findById(token, {
-      include: { company: { select: { name: true, logoUrl: true } } },
+      include: {
+        company: { select: { name: true, logoUrl: true } },
+        professional: true,
+      },
     });
 
-    console.log(invite);
     if (!invite?.id) throw new BadRequestException('Invite token not found');
     if ((invite as any)?.company?.name)
       invite.companyName = (invite as any).company.name;

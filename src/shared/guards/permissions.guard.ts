@@ -47,7 +47,6 @@ const isParentCompany = async (
       },
     },
   });
-  console.log(parentRelation);
 
   if (!parentRelation) throw new ForbiddenException('Acesso negado');
   if (parentRelation.status !== 'ACTIVE')

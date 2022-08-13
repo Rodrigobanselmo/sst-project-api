@@ -13,18 +13,21 @@ export class FindFirstProfessionalService {
     councilType,
     councilUF,
     cpf,
+    email,
   }: FindProfessionalsDto) {
     const professionals = await this.professionalRepository.findFirstNude({
       where: {
         OR: [
           {
             AND: [
-              { councilId: { equals: councilId } },
-              { councilType: { equals: councilType } },
-              { councilUF: { equals: councilUF } },
+              { councilId: { equals: councilId || 'not-found' } },
+              { councilType: { equals: councilType || 'not-found' } },
+              { councilUF: { equals: councilUF || 'not-found' } },
             ],
           },
-          { cpf: { equals: cpf } },
+          { cpf: { equals: cpf || 'not-found' } },
+          { user: { email: { equals: email || 'not-found' } } },
+          { email: { equals: email || 'not-found' } },
         ],
       },
     });

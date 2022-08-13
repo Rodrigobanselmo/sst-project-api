@@ -67,7 +67,6 @@ export class CompanyController {
 
   @Get('/cnae')
   findCNAE(@Query() query: FindActivityDto) {
-    console.log(query);
     return this.findCnaeService.execute(query);
   }
 

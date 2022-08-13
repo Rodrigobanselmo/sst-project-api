@@ -46,7 +46,6 @@ export class ExamToClinicController {
     @User() userPayloadDto: UserPayloadDto,
     @Query() query: FindExamToClinicDto,
   ) {
-    console.log(query);
     return this.findExamToClinicService.execute(query, userPayloadDto);
   }
 }

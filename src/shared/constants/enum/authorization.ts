@@ -25,6 +25,7 @@ export enum RoleEnum {
   EXAM = '6.1',
   RISK = '8',
   DOCS = '8',
+  DOCTOR = '10',
 
   DATABASE = '99',
   CHECKLIST = '98',

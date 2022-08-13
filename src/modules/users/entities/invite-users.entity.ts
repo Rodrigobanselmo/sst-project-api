@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 import { InviteUsers } from '.prisma/client';
+import { ProfessionalEntity } from './professional.entity';
 
 export class InviteUsersEntity implements InviteUsers {
   @ApiProperty({ description: 'The id of the invite token' })
@@ -35,5 +36,5 @@ export class InviteUsersEntity implements InviteUsers {
   }
   companiesIds: string[];
   groupId: number;
-  professionalId: number;
+  professional: ProfessionalEntity;
 }

@@ -12,30 +12,61 @@ import {
 import { ProfessionalEntity } from '../../entities/professional.entity';
 import { UserEntity } from '../../entities/user.entity';
 import { UserCompanyEntity } from '../../entities/userCompany.entity';
+import dayjs from 'dayjs';
+import { RoleEnum } from 'src/shared/constants/enum/authorization';
+import { InviteUsersEntity } from '../../entities/invite-users.entity';
 
 @Injectable()
 export class ProfessionalRepository {
   constructor(private prisma: PrismaService) {}
 
   async create(
-    data: CreateProfessionalDto,
+    {
+      inviteId,
+      roles,
+      ...data
+    }: Omit<
+      CreateProfessionalDto & { roles?: string[] },
+      'sendEmail' | 'userId'
+    >,
     companyId: string,
     options: Partial<Prisma.ProfessionalCreateArgs> = {},
   ) {
+    const invite = await this.prisma.inviteUsers.create({
+      data: {
+        id: inviteId,
+        expires_date: dayjs().add(100, 'y').toDate(),
+        email: data.email,
+        companyId,
+        companiesIds: [companyId],
+        permissions: [],
+        roles: roles || [],
+      },
+    });
+
     const professional = await this.prisma.professional.create({
       ...options,
-      data: { ...data, companyId },
+      data: {
+        ...data,
+        companyId,
+        inviteId: invite.id,
+      },
       include: { user: true, ...options.include },
     });
 
     return new ProfessionalEntity({
       ...professional,
       user: new UserEntity(professional.user),
+      invite: new InviteUsersEntity(invite),
     });
   }
 
   async update(
-    { id, ...data }: UpdateProfessionalDto,
+    {
+      id,
+      inviteId,
+      ...data
+    }: Omit<UpdateProfessionalDto, 'sendEmail' | 'userId'>,
     options: Partial<Prisma.ProfessionalUpdateArgs> = {},
   ) {
     const professional = await this.prisma.professional.update({
@@ -118,7 +149,21 @@ export class ProfessionalRepository {
 
     if ('companies' in query) {
       (where.AND as any).push({
-        company: { id: { in: query.companies } },
+        OR: [
+          {
+            company: { id: { in: query.companies } },
+          },
+          {
+            user: {
+              companies: {
+                some: {
+                  companyId: { in: query.companies },
+                  status: 'ACTIVE',
+                },
+              },
+            },
+          },
+        ],
       } as typeof options.where);
       delete query.companies;
     }
