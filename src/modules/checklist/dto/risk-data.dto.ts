@@ -13,6 +13,7 @@ import { StringUppercaseTransform } from '../../../shared/transformers/string-up
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
 import { EpiRoRiskDataDto } from './epi-risk-data.dto';
 import { EngsRiskDataDto } from './engs-risk-data.dto';
+import { ExamsRiskDataDto } from './exams-risk-data.dto';
 
 export class UpsertRiskDataDto {
   @IsString()
@@ -81,6 +82,11 @@ export class UpsertRiskDataDto {
   @IsOptional()
   @Type(() => EngsRiskDataDto)
   engs?: EngsRiskDataDto[];
+
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @Type(() => ExamsRiskDataDto)
+  exams?: ExamsRiskDataDto[];
 
   @IsOptional()
   keepEmpty?: boolean;
@@ -164,6 +170,11 @@ export class UpsertManyRiskDataDto {
   @IsOptional()
   @Type(() => EngsRiskDataDto)
   engs?: EngsRiskDataDto[];
+
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @Type(() => ExamsRiskDataDto)
+  exams?: ExamsRiskDataDto[];
 
   @IsOptional()
   json?: Prisma.JsonValue;

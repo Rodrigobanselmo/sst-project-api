@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { Epi } from '.prisma/client';
 import { StatusEnum } from '@prisma/client';
-import { EpiRiskDataEntity } from './epiRiskData';
+import { EpiRiskDataEntity } from './epiRiskData.entity';
 
 export class EpiEntity implements Epi {
   @ApiProperty({

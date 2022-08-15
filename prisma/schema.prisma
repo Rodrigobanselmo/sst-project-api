@@ -571,13 +571,22 @@ model ExamToRisk {
 }
 
 model ExamToRiskData {
-  id     Int   @id @default(autoincrement())
-  exam   Exam? @relation(fields: [examId], references: [id])
-  risk    RiskFactorData?  @relation(fields: [riskDataId], references: [id])
-  examId  Int?
-  riskDataId String?
+  exam   Exam @relation(fields: [examId], references: [id])
+  risk    RiskFactorData  @relation(fields: [riskFactorDataId], references: [id])
+  examId  Int
+  riskFactorDataId String
+  isMale Boolean @default(false)
+  isFemale Boolean @default(false)
+  isPeriodic Boolean @default(false)
+  isChange Boolean @default(false)
+  isAdmission Boolean @default(false)
+  isReturn Boolean @default(false)
+  isDismissal Boolean @default(false)
+  validityInMonths Int?
+  fromAge Int?
+  toAge Int?
 
-  @@unique([examId, riskDataId])
+  @@id([examId, riskFactorDataId])
 }
 
 
@@ -880,11 +889,11 @@ model RiskFactorData {
   recs RecMed[]  @relation(name: "recs")
   adms RecMed[]  @relation(name: "adms")
   dataRecs RiskFactorDataRec[]
-  examToRiskData ExamToRiskData[]
   json Json?
   level    Int?
   epiToRiskFactorData EpiToRiskFactorData[]
   engsToRiskFactorData EngsToRiskFactorData[]
+  examsToRiskFactorData ExamToRiskData[]
 
   @@unique([id, companyId])
   @@unique([homogeneousGroupId, riskId, riskFactorGroupDataId])

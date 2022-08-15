@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Exam, ExamTypeEnum, StatusEnum } from '@prisma/client';
+import { ExamRiskDataEntity } from './examRiskData.entity';
 import { ExamToClinicEntity } from './examToClinic';
 
 export class ExamEntity implements Exam {
@@ -20,7 +21,7 @@ export class ExamEntity implements Exam {
   isAttendance: boolean;
   esocial27Code: string;
   // examToRisk: ExamToRiskEntity[]
-  // examToRiskData: ExamToRiskDataEntity[]
+  examsRiskData: ExamRiskDataEntity;
 
   constructor(partial: Partial<ExamEntity>) {
     Object.assign(this, partial);

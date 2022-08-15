@@ -40,6 +40,7 @@ export class UpsertRiskDataService {
         riskData.recs.length === 0 &&
         riskData.engs.length === 0 &&
         riskData.epis.length === 0 &&
+        riskData.exams.length === 0 &&
         riskData.generateSources.length === 0 &&
         !riskData.probability;
 

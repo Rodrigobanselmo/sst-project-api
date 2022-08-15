@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { RecMed, RecTypeEnum } from '.prisma/client';
 import { MeasuresTypeEnum, StatusEnum } from '@prisma/client';
-import { EngsRiskDataEntity } from './engsRiskData';
+import { EngsRiskDataEntity } from './engsRiskData.entity';
 
 export class RecMedEntity implements RecMed {
   @ApiProperty({

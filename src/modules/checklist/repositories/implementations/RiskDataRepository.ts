@@ -14,11 +14,12 @@ import {
 import { RiskFactorDataEntity } from '../../entities/riskData.entity';
 import { Prisma, PrismaPromise } from '@prisma/client';
 import { getMatrizRisk } from '../../../../shared/utils/matriz';
-import { EpiEntity } from '../../entities/epi.entity';
-import { EpiRiskDataEntity } from '../../entities/epiRiskData';
+import { EpiRiskDataEntity } from '../../entities/epiRiskData.entity';
 import { EpiRoRiskDataDto } from '../../dto/epi-risk-data.dto';
 import { EngsRiskDataDto } from '../../dto/engs-risk-data.dto';
-import { EngsRiskDataEntity } from '../../entities/engsRiskData';
+import { EngsRiskDataEntity } from '../../entities/engsRiskData.entity';
+import { ExamsRiskDataDto } from '../../dto/exams-risk-data.dto';
+import { ExamRiskDataEntity } from '../../entities/examRiskData.entity';
 
 @Injectable()
 export class RiskDataRepository {
@@ -101,6 +102,7 @@ export class RiskDataRepository {
         riskFactor: true,
         epiToRiskFactorData: { include: { epi: true } },
         engsToRiskFactorData: { include: { recMed: true } },
+        examsToRiskFactorData: { include: { exam: true } },
         homogeneousGroup: {
           include: {
             hierarchyOnHomogeneous: { include: { hierarchy: true } }, //!
@@ -134,6 +136,7 @@ export class RiskDataRepository {
         generateSources: true,
         epiToRiskFactorData: { include: { epi: true } },
         engsToRiskFactorData: { include: { recMed: true } },
+        examsToRiskFactorData: { include: { exam: true } },
       },
     })) as RiskFactorDataEntity[];
 
@@ -207,6 +210,7 @@ export class RiskDataRepository {
           dataRecs: { include: { comments: true } },
           epiToRiskFactorData: { include: { epi: true } },
           engsToRiskFactorData: { include: { recMed: true } },
+          examsToRiskFactorData: { include: { exam: true } },
           homogeneousGroup: {
             include: { characterization: true, environment: true },
           },
@@ -259,6 +263,7 @@ export class RiskDataRepository {
         recs: true,
         epiToRiskFactorData: { include: { epi: true } },
         engsToRiskFactorData: { include: { recMed: true } },
+        examsToRiskFactorData: { include: { exam: true } },
         generateSources: true,
       },
     })) as RiskFactorDataEntity[];
@@ -283,6 +288,7 @@ export class RiskDataRepository {
         generateSources: true,
         epiToRiskFactorData: { include: { epi: true } },
         engsToRiskFactorData: { include: { recMed: true } },
+        examsToRiskFactorData: { include: { exam: true } },
       },
     })) as RiskFactorDataEntity[];
 
@@ -328,6 +334,7 @@ export class RiskDataRepository {
     adms,
     engs,
     epis,
+    exams,
     generateSources,
     companyId,
     id,
@@ -397,6 +404,7 @@ export class RiskDataRepository {
         generateSources: true,
         epiToRiskFactorData: { include: { epi: true } },
         engsToRiskFactorData: !engs ? { include: { recMed: true } } : undefined,
+        examsToRiskFactorData: { include: { exam: true } },
       },
     })) as RiskFactorDataEntity;
 
@@ -441,6 +449,27 @@ export class RiskDataRepository {
       );
     }
 
+    if (exams) {
+      if (riskData.examsToRiskFactorData?.length) {
+        await this.prisma.examToRiskData.deleteMany({
+          where: {
+            riskFactorDataId: riskData.id,
+            examId: {
+              in: m2mGetDeletedIds(
+                riskData.examsToRiskFactorData,
+                exams,
+                'examId',
+              ),
+            },
+          },
+        });
+      }
+
+      riskData.examsToRiskFactorData = await this.setExams(
+        exams.map((exam) => ({ ...exam, riskFactorDataId: riskData.id })),
+      );
+    }
+
     return riskData;
   }
 
@@ -449,6 +478,7 @@ export class RiskDataRepository {
     adms,
     engs,
     epis,
+    exams,
     generateSources,
     companyId,
     id,
@@ -518,6 +548,7 @@ export class RiskDataRepository {
         generateSources: true,
         epiToRiskFactorData: !epis ? { include: { epi: true } } : undefined,
         engsToRiskFactorData: !engs ? { include: { recMed: true } } : undefined,
+        examsToRiskFactorData: !exams ? { include: { exam: true } } : undefined,
       },
     })) as RiskFactorDataEntity;
 
@@ -533,6 +564,14 @@ export class RiskDataRepository {
       riskData.engsToRiskFactorData = await this.setEngs(
         engs.map((eng) => ({
           ...eng,
+          riskFactorDataId: riskData.id,
+        })),
+      );
+
+    if (exams)
+      riskData.examsToRiskFactorData = await this.setExams(
+        exams.map((exam) => ({
+          ...exam,
           riskFactorDataId: riskData.id,
         })),
       );
@@ -556,6 +595,24 @@ export class RiskDataRepository {
     );
 
     return data as EpiRiskDataEntity[];
+  }
+
+  private async setExams(exams: ExamsRiskDataDto[]) {
+    if (exams.length === 0) return [];
+    const data = await this.prisma.$transaction(
+      exams.map(({ riskFactorDataId, examId, ...examRelation }) =>
+        this.prisma.examToRiskData.upsert({
+          create: { riskFactorDataId, examId, ...examRelation },
+          update: { riskFactorDataId, examId, ...examRelation },
+          where: {
+            examId_riskFactorDataId: { riskFactorDataId, examId },
+          },
+          include: { exam: true },
+        }),
+      ),
+    );
+
+    return data as ExamRiskDataEntity[];
   }
 
   private async setEngs(engs: EngsRiskDataDto[]) {

@@ -25,8 +25,10 @@ import { RecMedEntity } from './recMed.entity';
 import { RiskFactorsEntity } from './risk.entity';
 import { Prisma, RiskFactorData } from '.prisma/client';
 import { RiskDataRecEntity } from './riskDataRec.entity';
-import { EpiRiskDataEntity } from './epiRiskData';
-import { EngsRiskDataEntity } from './engsRiskData';
+import { EpiRiskDataEntity } from './epiRiskData.entity';
+import { EngsRiskDataEntity } from './engsRiskData.entity';
+import { ExamRiskDataEntity } from './examRiskData.entity';
+import { ExamEntity } from './exam.entity';
 
 export class RiskFactorDataEntity implements RiskFactorData {
   @ApiProperty({ description: 'The id of the Company' })
@@ -89,6 +91,9 @@ export class RiskFactorDataEntity implements RiskFactorData {
   @ApiProperty({ description: 'The array with generate source data' })
   epis?: EpiEntity[];
 
+  @ApiProperty({ description: 'The array with exam data' })
+  exams?: ExamEntity[];
+
   dataRecs?: RiskDataRecEntity[];
   level: number;
   json: Prisma.JsonValue;
@@ -103,6 +108,7 @@ export class RiskFactorDataEntity implements RiskFactorData {
   progress?: number;
   epiToRiskFactorData?: EpiRiskDataEntity[];
   engsToRiskFactorData?: EngsRiskDataEntity[];
+  examsToRiskFactorData?: ExamRiskDataEntity[];
 
   constructor(partial: Partial<RiskFactorDataEntity>) {
     Object.assign(this, partial);
@@ -133,6 +139,22 @@ export class RiskFactorDataEntity implements RiskFactorData {
           new RecMedEntity({
             ...recMed,
             engsRiskData: engsToRiskFactorData,
+          }),
+      );
+    }
+
+    if (!this.exams) this.exams = [];
+    if (partial.examsToRiskFactorData) {
+      this.examsToRiskFactorData = partial.examsToRiskFactorData.map(
+        (examsToRiskFactorData) =>
+          new ExamRiskDataEntity(examsToRiskFactorData),
+      );
+
+      this.exams = this.examsToRiskFactorData.map(
+        ({ exam, ...examsToRiskFactorData }) =>
+          new ExamEntity({
+            ...exam,
+            examsRiskData: examsToRiskFactorData,
           }),
       );
     }

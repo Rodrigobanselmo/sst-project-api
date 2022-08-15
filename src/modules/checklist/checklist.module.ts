@@ -50,6 +50,7 @@ import { UpsertRiskDataRecService } from './services/risk-data-rec/upsert-risk-d
 import { DeleteManyRiskDataService } from './services/risk-data/delete-many-risk-data/delete-many-risk-data.service';
 import { FindAllActionPlanService } from './services/risk-data/find-all-action-plan/find-all-action-plan.service';
 import { FindAllByGroupAndRiskService } from './services/risk-data/find-by-group-risk/find-by-group-risk.service';
+import { FindAllByHierarchyService } from './services/risk-data/find-by-hierarchy/find-by-hierarchy.service';
 import { FindAllByHomogeneousGroupService } from './services/risk-data/find-by-homogeneous-group/find-by-homogeneous-group.service';
 import { UpsertManyRiskDataService } from './services/risk-data/upsert-many-risk-data/upsert-many-risk-data.service';
 import { UpsertRiskDataService } from './services/risk-data/upsert-risk-data/upsert-risk.service';
@@ -124,6 +125,7 @@ import { UpdateRiskService } from './services/risk/update-risk/update-risk.servi
     UpsertExamToClinicService,
     FindExamToClinicService,
     DayJSProvider,
+    FindAllByHierarchyService,
   ],
   exports: [
     RiskRepository,
