@@ -10,6 +10,23 @@ export class FindAllByHierarchyService {
       companyId,
       groupId,
       hierarchyId,
+      {
+        include: {
+          riskFactor: {
+            select: { name: true, severity: true, type: true, id: true },
+          },
+          homogeneousGroup: {
+            include: {
+              characterization: { select: { name: true, type: true } },
+              environment: { select: { name: true, type: true } },
+            },
+          },
+          generateSources: false,
+          adms: false,
+          engsToRiskFactorData: false,
+          epiToRiskFactorData: false,
+        },
+      },
     );
 
     return riskData;

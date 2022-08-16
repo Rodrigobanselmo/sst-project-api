@@ -275,6 +275,7 @@ export class RiskDataRepository {
     companyId: string,
     riskFactorGroupDataId: string,
     hierarchyId: string,
+    options: Prisma.RiskFactorDataFindManyArgs = {},
   ) {
     const riskFactorData = (await this.prisma.riskFactorData.findMany({
       where: {
@@ -282,6 +283,7 @@ export class RiskDataRepository {
         companyId,
         homogeneousGroup: { hierarchyOnHomogeneous: { some: { hierarchyId } } },
       },
+      ...options,
       include: {
         adms: true,
         recs: true,
@@ -289,6 +291,7 @@ export class RiskDataRepository {
         epiToRiskFactorData: { include: { epi: true } },
         engsToRiskFactorData: { include: { recMed: true } },
         examsToRiskFactorData: { include: { exam: true } },
+        ...options.include,
       },
     })) as RiskFactorDataEntity[];
 
