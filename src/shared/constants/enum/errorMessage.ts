@@ -11,6 +11,8 @@ export enum ErrorMessageEnum {
   CONTACT_IS_PRINCIPAL = 'Você não pode deletar o contato principal',
   //* USERS
   WRONG_EMAIL_PASS = 'Email ou senha incorreto',
+  //* EXAMS_TO_CLINICS
+  CLINIC_EXAM_ALREADY_EXIST = 'Exame já cadastrado para está clínica',
 }
 
 export enum ErrorCompanyEnum {

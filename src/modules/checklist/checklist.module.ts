@@ -6,6 +6,7 @@ import { ChecklistController } from './controller/checklist/checklist.controller
 import { DocumentPgrController } from './controller/doc-pgr/doc-pgr.controller';
 import { EpiController } from './controller/epi/epi.controller';
 import { ExamToClinicController } from './controller/exam-to-clinic/exam-to-clinic.controller';
+import { ExamRiskController } from './controller/exam-to-risk/examToRisk.controller';
 import { ExamController } from './controller/exam/exam.controller';
 import { GenerateSourceController } from './controller/generate-source/generate-source.controller';
 import { RecMedController } from './controller/rec-med/rec-med.controller';
@@ -16,6 +17,7 @@ import { RiskController } from './controller/risk/risk.controller';
 import { ChecklistRepository } from './repositories/implementations/ChecklistRepository';
 import { EpiRepository } from './repositories/implementations/EpiRepository';
 import { ExamRepository } from './repositories/implementations/ExamRepository';
+import { ExamRiskRepository } from './repositories/implementations/ExamRiskRepository';
 import { ExamToClinicRepository } from './repositories/implementations/ExamToClinicRepository';
 import { GenerateSourceRepository } from './repositories/implementations/GenerateSourceRepository';
 import { RecMedRepository } from './repositories/implementations/RecMedRepository';
@@ -38,6 +40,9 @@ import { FindExamService } from './services/exam/find-exam/find-exam.service';
 import { UpdateExamService } from './services/exam/update-exam/update-exam.service';
 import { FindExamToClinicService } from './services/examToClinic/find-exam-to-clinic/find-exam-to-clinic.service';
 import { UpsertExamToClinicService } from './services/examToClinic/upsert-exam-to-clinic/upsert-exam-to-clinic.service';
+import { CreateExamRiskService } from './services/examToRisk/create-exam/create-exam.service';
+import { FindExamRiskService } from './services/examToRisk/find-exam/find-exam.service';
+import { UpdateExamRiskService } from './services/examToRisk/update-exam/update-exam.service';
 import { CreateGenerateSourceService } from './services/generate-source/create-generate-source/create-generate-source.service';
 import { DeleteSoftGenerateSourceService } from './services/generate-source/delete-soft-generate-source/delete-soft-generate-source.service';
 import { UpdateGenerateSourceService } from './services/generate-source/update-generate-source/update-generate-source.service';
@@ -75,57 +80,62 @@ import { UpdateRiskService } from './services/risk/update-risk/update-risk.servi
     RiskDataRecController,
     ExamController,
     ExamToClinicController,
+    ExamRiskController,
   ],
   providers: [
-    CreateChecklistService,
-    RiskRepository,
-    CreateRiskService,
-    UpdateRiskService,
-    RecMedRepository,
-    DeleteSoftGenerateSourceService,
-    EpiRepository,
-    CreateRecMedService,
-    UpdateRecMedService,
-    CreateEpiService,
-    UpdateEpiService,
-    GenerateSourceRepository,
-    CreateGenerateSourceService,
-    UpdateGenerateSourceService,
     ChecklistRepository,
-    FindAvailableChecklistService,
-    FindChecklistDataService,
-    FindAllByHomogeneousGroupService,
-    UpdateChecklistService,
+    CreateChecklistService,
+    CreateEpiService,
+    CreateExamService,
+    CreateGenerateSourceService,
+    CreateRecMedService,
+    CreateRiskService,
+    DayJSProvider,
+    DeleteManyRiskDataService,
+    DeleteSoftExamService,
+    DeleteSoftGenerateSourceService,
+    DeleteSoftRecMedService,
+    DeleteSoftRiskService,
+    EpiRepository,
+    ExamRepository,
+    ExamRiskRepository,
+    ExamToClinicRepository,
+    FindAllActionPlanService,
     FindAllAvailableRiskService,
+    FindAllByCompanyService,
+    FindAllByGroupAndRiskService,
+    FindAllByHierarchyService,
+    FindAllByHomogeneousGroupService,
+    FindAvailableChecklistService,
     FindByCAEpiService,
+    FindByIdDocumentsService,
+    FindByIdService,
+    FindChecklistDataService,
     FindDocumentsService,
     FindEpiService,
-    DeleteSoftRiskService,
-    DeleteSoftRecMedService,
-    FindAllByGroupAndRiskService,
-    UpsertRiskDataService,
-    FindAllByCompanyService,
-    UpsertRiskGroupDataService,
-    RiskDataRepository,
-    RiskGroupDataRepository,
-    RiskDocumentRepository,
-    FindByIdService,
-    UpsertManyRiskDataService,
-    DeleteManyRiskDataService,
-    FindByIdDocumentsService,
-    FindAllActionPlanService,
-    RiskDataRecRepository,
-    UpsertRiskDataRecService,
     FindExamService,
-    CreateExamService,
-    UpdateExamService,
-    DeleteSoftExamService,
-    ExamRepository,
-    ExamToClinicRepository,
-    UpsertExamToClinicService,
     FindExamToClinicService,
-    DayJSProvider,
-    FindAllByHierarchyService,
+    GenerateSourceRepository,
+    RecMedRepository,
+    RiskDataRecRepository,
+    RiskDataRepository,
+    RiskDocumentRepository,
+    RiskGroupDataRepository,
+    RiskRepository,
+    UpdateChecklistService,
+    UpdateEpiService,
+    UpdateExamService,
+    UpdateGenerateSourceService,
+    UpdateRecMedService,
+    UpdateRiskService,
+    UpsertExamToClinicService,
+    UpsertManyRiskDataService,
+    UpsertRiskDataRecService,
+    UpsertRiskDataService,
+    UpsertRiskGroupDataService,
+    UpdateExamRiskService,
+    FindExamRiskService,
+    CreateExamRiskService,
   ],
   exports: [
     RiskRepository,

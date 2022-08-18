@@ -17,6 +17,7 @@ import { CharacterizationEntity } from './characterization.entity';
 import { ContractEntity } from './contract.entity';
 import { ContactEntity } from './contact.entity';
 import { CompanyStepEnum } from 'src/shared/constants/enum/stepCompany.enum';
+import { DocumentCoverEntity } from './document-cover.entity';
 
 export class CompanyEntity implements Company {
   @ApiProperty({ description: 'The id of the Company' })
@@ -105,6 +106,7 @@ export class CompanyEntity implements Company {
   doctorResponsibleId: number;
   tecResponsibleId: number;
   contacts: ContactEntity[];
+  covers: DocumentCoverEntity[];
   isClinic: boolean;
 
   employeeCount?: number;

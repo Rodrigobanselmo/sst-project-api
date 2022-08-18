@@ -23,6 +23,8 @@ export class EmployeeRepository {
     workspaceIds,
     hierarchyId,
     companyId,
+    shiftId,
+    cidId,
     ...createCompanyDto
   }: CreateEmployeeDto): Promise<EmployeeEntity> {
     const hierarchy = await this.prisma.hierarchy.findUnique({
@@ -43,9 +45,21 @@ export class EmployeeRepository {
                   })),
                 }
               : undefined,
-          hierarchy: {
-            connect: { id: hierarchyId },
-          },
+          hierarchy: hierarchyId
+            ? {
+                connect: { id: hierarchyId },
+              }
+            : undefined,
+          shift: shiftId
+            ? {
+                connect: { id: shiftId },
+              }
+            : undefined,
+          cid: cidId
+            ? {
+                connect: { cid: cidId },
+              }
+            : undefined,
         },
       });
       return new EmployeeEntity(employee);
@@ -61,6 +75,8 @@ export class EmployeeRepository {
       workspaceIds,
       hierarchyId,
       companyId,
+      shiftId,
+      cidId,
       id,
       ...createCompanyDto
     }: UpdateEmployeeDto,
@@ -90,6 +106,16 @@ export class EmployeeRepository {
               connect: { id: hierarchyId },
             },
         subOffices: removeSubOffices ? { set: [] } : undefined,
+        shift: shiftId
+          ? {
+              connect: { id: shiftId },
+            }
+          : undefined,
+        cid: cidId
+          ? {
+              connect: { cid: cidId },
+            }
+          : undefined,
       },
       where: { id_companyId: { companyId, id } },
     });
@@ -108,6 +134,8 @@ export class EmployeeRepository {
           id,
           workspaceIds,
           hierarchyId,
+          shiftId,
+          cidId,
           ...upsertEmployeeDto
         }) =>
           this.prisma.employee.upsert({
@@ -122,6 +150,16 @@ export class EmployeeRepository {
               hierarchy: {
                 connect: { id: hierarchyId },
               },
+              shift: shiftId
+                ? {
+                    connect: { id: shiftId },
+                  }
+                : undefined,
+              cid: cidId
+                ? {
+                    connect: { cid: cidId },
+                  }
+                : undefined,
             },
             update: {
               ...upsertEmployeeDto,
@@ -137,6 +175,16 @@ export class EmployeeRepository {
                 : {
                     connect: { id: hierarchyId },
                   },
+              shift: shiftId
+                ? {
+                    connect: { id: shiftId },
+                  }
+                : undefined,
+              cid: cidId
+                ? {
+                    connect: { cid: cidId },
+                  }
+                : undefined,
             },
             where: { id_companyId: { companyId, id: id || -1 } },
           }),

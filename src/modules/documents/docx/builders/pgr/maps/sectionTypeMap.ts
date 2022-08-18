@@ -1,3 +1,4 @@
+import { DocumentCoverEntity } from './../../../../../company/entities/document-cover.entity';
 import { CompanyEntity } from './../../../../../company/entities/company.entity';
 import { CharacterizationEntity } from './../../../../../company/entities/characterization.entity';
 import { ISectionOptions } from 'docx';
@@ -37,6 +38,7 @@ type IDocumentClassType = {
   consultantLogoImagePath: string;
   logoImagePath?: string;
   version?: string;
+  cover: DocumentCoverEntity;
   elementsMap: IMapElementDocumentType;
   document: RiskFactorGroupDataEntity;
   homogeneousGroup: IHomoGroupMap;
@@ -52,6 +54,7 @@ export class SectionsMapClass {
   private consultantLogoPath: string;
   private version: string;
   private elementsMap: IMapElementDocumentType;
+  private cover: DocumentCoverEntity;
   private document: RiskFactorGroupDataEntity;
   private homogeneousGroup: IHomoGroupMap;
   private environments: EnvironmentEntity[];
@@ -60,7 +63,7 @@ export class SectionsMapClass {
   private company: CompanyEntity;
 
   // eslint-disable-next-line prettier/prettier
-  constructor({ variables, company, version, logoImagePath, elementsMap, document, hierarchy, homogeneousGroup,environments,characterizations, consultantLogoImagePath }: IDocumentClassType) {
+  constructor({ variables,cover, company, version, logoImagePath, elementsMap, document, hierarchy, homogeneousGroup,environments,characterizations, consultantLogoImagePath }: IDocumentClassType) {
     this.variables = variables;
     this.version = version;
     this.logoPath = logoImagePath;
@@ -72,6 +75,7 @@ export class SectionsMapClass {
     this.environments = environments;
     this.characterizations = characterizations;
     this.company = company;
+    this.cover = cover;
   }
 
   public map: IMapSectionDocumentType = {
@@ -83,6 +87,7 @@ export class SectionsMapClass {
         companyName: `${this.company.name} ${
           this.company.initials ? `(${this.company.initials})` : ''
         }`,
+        ...(this.cover && (this.cover.json as any)),
       }),
     [PGRSectionTypeEnum.CHAPTER]: ({ text }: IChapter) =>
       chapterSection({

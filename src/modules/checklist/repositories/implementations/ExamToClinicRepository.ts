@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { v4 } from 'uuid';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import {
@@ -47,19 +48,29 @@ export class ExamToClinicRepository {
     examId,
     companyId,
     startDate,
+    groupId,
     ...createExamToClinicDto
   }: UpsertExamToClinicDto): Promise<ExamToClinicEntity> {
+    const GROUP_ID = groupId || v4();
     const examEntity = await this.prisma.examToClinic.upsert({
       create: {
         examId,
         companyId,
         startDate,
+        groupId: GROUP_ID,
         ...createExamToClinicDto,
       },
       update: {
         ...createExamToClinicDto,
       },
-      where: { examId_companyId_startDate: { examId, companyId, startDate } },
+      where: {
+        examId_companyId_startDate_groupId: {
+          examId,
+          companyId,
+          startDate,
+          groupId: GROUP_ID,
+        },
+      },
     });
 
     return new ExamToClinicEntity(examEntity);

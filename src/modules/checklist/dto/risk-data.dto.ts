@@ -2,6 +2,7 @@ import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
 import { HomoTypeEnum, Prisma } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import {
+  IsBoolean,
   IsEnum,
   IsNumber,
   IsOptional,
@@ -43,6 +44,10 @@ export class UpsertRiskDataDto {
   @IsOptional()
   @IsNumber()
   probabilityAfter?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  standardExams?: boolean;
 
   @IsString()
   companyId: string;
@@ -126,6 +131,10 @@ export class UpsertManyRiskDataDto {
   @IsOptional()
   @IsNumber()
   probabilityAfter?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  standardExams?: boolean;
 
   @IsString()
   companyId: string;

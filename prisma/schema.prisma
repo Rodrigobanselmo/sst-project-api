@@ -7,6 +7,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum CharacterizationTypeEnum {
+  WORKSTATION
+  EQUIPMENT
+  ACTIVITIES
+  GENERAL
+  SUPPORT
+  OPERATION
+  ADMINISTRATIVE
+}
+
 enum ClinicScheduleTypeEnum {
   PHONE
   EMAIL
@@ -33,11 +43,25 @@ enum CompanyEnvironmentTypesEnum {
   ADMINISTRATIVE
 }
 
+enum CoverTypeEnum {
+  PGR
+  PCSMO
+}
+
 enum ExamTypeEnum {
   LAB
   AUDIO
   VISUAL
   OTHERS
+}
+
+enum EmployeeHierarchyMotiveTypeEnum {
+  ADM
+  TRANS
+  ALOC
+  PROM
+  TRANS_PROM
+  DEM
 }
 
 enum HierarchyEnum {
@@ -49,12 +73,22 @@ enum HierarchyEnum {
   SUB_OFFICE
 }
 
-enum RiskFactorsEnum {
-  BIO 
-  QUI
-  FIS
-  ERG
-  ACI
+enum HomoTypeEnum {
+  HIERARCHY
+  ENVIRONMENT
+  WORKSTATION
+  EQUIPMENT
+  ACTIVITIES
+}
+
+enum MeasuresTypeEnum {
+  ADM
+  ENG
+}
+
+enum SexTypeEnum {
+  M
+  F
 }
 
 enum StatusEnum {
@@ -71,43 +105,18 @@ enum StatusEnum {
   DONE
 }
 
-enum HomoTypeEnum {
-  HIERARCHY
-  ENVIRONMENT
-  WORKSTATION
-  EQUIPMENT
-  ACTIVITIES
-}
-
-enum CharacterizationTypeEnum {
-  WORKSTATION
-  EQUIPMENT
-  ACTIVITIES
-  GENERAL
-  SUPPORT
-  OPERATION
-  ADMINISTRATIVE
-}
-
-enum MeasuresTypeEnum {
-  ADM
-  ENG
-}
-
-enum ProfessionalTypeEnum {
-  DOCTOR
-  NURSE
-  SPEECH_THERAPIST
-  TECHNICIAN
-  ENGINEER
-  USER
-  OTHER
-}
-
 enum RecTypeEnum {
   ADM
   ENG
   EPI
+}
+
+enum RiskFactorsEnum {
+  BIO 
+  QUI
+  FIS
+  ERG
+  ACI
 }
 
 enum RiskRecTypeEnum {
@@ -123,6 +132,15 @@ enum RiskRecTextTypeEnum {
   OTHER
 }
 
+enum ProfessionalTypeEnum {
+  DOCTOR
+  NURSE
+  SPEECH_THERAPIST
+  TECHNICIAN
+  ENGINEER
+  USER
+  OTHER
+}
 // START TABLES
 
 model AccessGroups {
@@ -213,6 +231,12 @@ model ChecklistData {
   @@id([checklistId, companyId])
 } 
 
+model Cid {
+  cid String @id 
+  description   String?
+  employees Employee[] 
+} 
+
 model Company {
   id   String    @id @default(uuid())
   cnpj String?
@@ -231,9 +255,6 @@ model Company {
   responsibleName String?
   responsibleNit String?
   responsibleCpf String?
-  mission String?
-  vision String?
-  values String?
   numAsos Int?
   blockResignationExam Boolean @default(true)
   esocialStart  DateTime?
@@ -272,6 +293,7 @@ model Company {
   receivingServiceContracts Contract[]
   recMed RecMed[] 
   exams Exam[] 
+  examsToRisk ExamToRisk[] 
   clinicExams ExamToClinic[] 
   riskFactorData RiskFactorData[] 
   riskFactorDataRec RiskFactorDataRec[] 
@@ -282,6 +304,8 @@ model Company {
   users UserCompany[]
   workspace Workspace[]
   contacts Contact[]
+  shifts CompanyShift[]
+  covers DocumentCover[]
   doctorResponsible  Professional? @relation(name:"doctors_company_responsibles", fields: [doctorResponsibleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   tecResponsible  Professional? @relation(name:"tec_company_responsibles", fields: [tecResponsibleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   // professionals Professional[] @relation(name:"companies_related") 
@@ -293,6 +317,10 @@ model Company {
   cadastral_situation_date String? // not in use
   legal_nature_code String? // not in use
   cadastral_situation_description String? // not in use
+
+  mission String?
+  vision String?
+  values String?
 }
 
 model CompanyGroup {
@@ -398,6 +426,19 @@ model CompanyEnvironmentPhoto {
   companyEnvironment CompanyEnvironment @relation(fields: [companyEnvironmentId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
 }
 
+model CompanyShift {
+  id    Int   @id  @default(autoincrement())
+  name String  
+  description String?
+  companyId String
+  created_at DateTime @default(now())
+  updated_at  DateTime   @updatedAt
+  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
+  employees Employee[]
+
+  @@unique([id, companyId])
+}
+
 model Contact {
   id    Int   @id  @default(autoincrement())
   name String? 
@@ -440,6 +481,17 @@ model DatabaseTable {
   @@id([id, companyId])
 } 
 
+model DocumentCover {
+  id    Int   @id  @default(autoincrement())
+  name String?
+  json Json
+  companyId String
+  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
+  acceptType CoverTypeEnum[]  
+
+  @@unique([id, companyId])
+}
+
 model Employee {
   id    Int   @id  @default(autoincrement())
   created_at DateTime @default(now())
@@ -447,18 +499,55 @@ model Employee {
   status StatusEnum @default(ACTIVE)
   name String 
   cpf String 
-  companyId String
+  esocialCode String?
+  socialName String?
+  nickname String?
+  phone String?
+  email String?
+  isComorbidity Boolean? @default(false)
+  birthday DateTime?
+  admissionDate DateTime? //!remove
+  sex SexTypeEnum? 
   hierarchyId String
-  birthdate DateTime?
-  admissionDate DateTime?
-  workspaces Workspace[]
   hierarchy Hierarchy @relation(fields: [hierarchyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  companyId String
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  cidId String?
+  cid Cid? @relation(fields: [cidId], references: [cid], onDelete: Restrict, onUpdate: Cascade)
+  shiftId Int?
+  shift CompanyShift? @relation(fields: [shiftId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   subOffices Hierarchy[] @relation(name: "sub_offices")
-  
+  workspaces Workspace[]
+  hierarchyHistory EmployeeHierarchyHistory[]
+  examsHistory EmployeeExamsHistory[]
   
   @@unique([id, companyId])
   @@unique([cpf, companyId])
+} 
+
+model EmployeeHierarchyHistory {
+  id    Int   @id  @default(autoincrement())
+  created_at DateTime @default(now())
+  updated_at  DateTime   @updatedAt
+  motive EmployeeHierarchyMotiveTypeEnum
+  startDate DateTime?
+  hierarchyId String
+  hierarchy Hierarchy @relation(fields: [hierarchyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  employeeId Int
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+} 
+
+model EmployeeExamsHistory {
+  id    Int   @id  @default(autoincrement())
+  created_at DateTime @default(now())
+  updated_at  DateTime   @updatedAt
+  doneDate DateTime?
+  validityInMonths Int?
+  time String?
+  examId Int
+  exam Exam @relation(fields: [examId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  employeeId Int
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Restrict, onUpdate: Cascade)
 } 
 
 model EngsToRiskFactorData {
@@ -535,6 +624,7 @@ model Exam {
   examToRiskData ExamToRiskData[]
   examToClinic ExamToClinic[] 
   esocial27Code String?
+  employeesHistory EmployeeExamsHistory[] 
 
   @@unique([id, companyId])
 }
@@ -551,12 +641,18 @@ model ExamToClinic {
   examMinDuration Int?
   scheduleRange Json?
   price  Int?
+  groupId String? @default(uuid())
+  isPeriodic Boolean @default(true)
+  isChange Boolean @default(true)
+  isAdmission Boolean @default(true)
+  isReturn Boolean @default(true)
+  isDismissal Boolean @default(true)
   startDate DateTime @default(now())
   endDate DateTime?
   scheduleType ClinicScheduleTypeEnum?
   status StatusEnum @default(ACTIVE)
 
-  @@unique([examId, companyId, startDate])
+  @@unique([examId, companyId, startDate, groupId])
 }
 
 
@@ -566,8 +662,23 @@ model ExamToRisk {
   risk    RiskFactors?  @relation(fields: [riskId], references: [id])
   examId  Int?
   riskId String?
-
-  @@unique([examId, riskId])
+  companyId String 
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  isMale Boolean @default(false)
+  isFemale Boolean @default(false)
+  isPeriodic Boolean @default(false)
+  isChange Boolean @default(false)
+  isAdmission Boolean @default(false)
+  isReturn Boolean @default(false)
+  isDismissal Boolean @default(false)
+  validityInMonths Int?
+  lowValidityInMonths Int?
+  fromAge Int?
+  toAge Int?
+  startDate DateTime @default(now())
+  endDate DateTime?
+  
+  @@unique([id, companyId])
 }
 
 model ExamToRiskData {
@@ -583,6 +694,7 @@ model ExamToRiskData {
   isReturn Boolean @default(false)
   isDismissal Boolean @default(false)
   validityInMonths Int?
+  lowValidityInMonths Int?
   fromAge Int?
   toAge Int?
 
@@ -626,6 +738,7 @@ model Hierarchy {
   subOfficeEmployees Employee[] @relation(name: "sub_offices")
   hierarchyOnHomogeneous HierarchyOnHomogeneous[]
   riskFactorDatas RiskFactorData[] 
+  hierarchyHistory EmployeeHierarchyHistory[]
 
   @@unique([id, companyId])
   @@index(companyId)
@@ -891,6 +1004,7 @@ model RiskFactorData {
   dataRecs RiskFactorDataRec[]
   json Json?
   level    Int?
+  standardExams Boolean @default(true)
   epiToRiskFactorData EpiToRiskFactorData[]
   engsToRiskFactorData EngsToRiskFactorData[]
   examsToRiskFactorData ExamToRiskData[]

@@ -43,6 +43,10 @@ export class ExamsRiskDataDto {
 
   @IsInt()
   @IsOptional()
+  lowValidityInMonths: number;
+
+  @IsInt()
+  @IsOptional()
   fromAge: number;
 
   @IsInt()

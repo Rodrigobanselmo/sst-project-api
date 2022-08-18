@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { ErrorMessageEnum } from 'src/shared/constants/enum/errorMessage';
 
 import { UpsertExamToClinicDto } from '../../../../../modules/checklist/dto/exam-to-clinic.dto';
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
@@ -18,11 +19,33 @@ export class UpsertExamToClinicService {
         where: {
           examId: createExamDto.examId,
           companyId: user.targetCompanyId,
+          groupId: createExamDto.groupId || 'not-found',
         },
         orderBy: { startDate: 'desc' },
         take: 2,
       });
 
+    if (!clinicExamActual) {
+      const foundEqual = await this.examToClinicRepository.findNude({
+        where: {
+          examId: createExamDto.examId,
+          companyId: user.targetCompanyId,
+          isAdmission: createExamDto.isAdmission,
+          isReturn: createExamDto.isReturn,
+          isChange: createExamDto.isChange,
+          isDismissal: createExamDto.isDismissal,
+          isPeriodic: createExamDto.isPeriodic,
+        },
+        take: 1,
+      });
+
+      if (foundEqual.length > 0)
+        throw new BadRequestException(
+          ErrorMessageEnum.CLINIC_EXAM_ALREADY_EXIST,
+        );
+    }
+
+    // if company already have an exam in the same date or future date, update it
     if (
       clinicExamActual &&
       clinicExamActual.startDate >= this.dayjs.dateNow() &&
@@ -46,6 +69,7 @@ export class UpsertExamToClinicService {
       return newExam;
     }
 
+    // if exam is before last startDate, will create and end the created exam
     const newExam = await this.examToClinicRepository.upsert({
       ...createExamDto,
       companyId: user.targetCompanyId,
@@ -55,6 +79,7 @@ export class UpsertExamToClinicService {
           : undefined,
     });
 
+    // if actual exam is before the new created exam, will end the actual and the created one becomes the last one
     if (clinicExamActual?.startDate < createExamDto?.startDate)
       await this.examToClinicRepository.update({
         examId: createExamDto.examId,

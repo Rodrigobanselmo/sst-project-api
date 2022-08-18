@@ -75,8 +75,9 @@ export const getCompanyPermissionByToken = async (
   const currentDate = dateProvider.dateNow();
   const expires_date = new Date(dateProvider.convertToUTC(invite.expires_date));
 
-  if (currentDate > expires_date)
+  if (currentDate > expires_date) {
     throw new BadRequestException(ErrorInvitesEnum.TOKEN_EXPIRES);
+  }
 
   let companies: UserCompanyDto[] = invite.companiesIds.map((companyId) => ({
     permissions: invite.permissions,

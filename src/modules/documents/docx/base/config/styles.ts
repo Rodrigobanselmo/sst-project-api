@@ -6,6 +6,27 @@ import {
   PageOrientation,
 } from 'docx';
 
+const EMU = 1014400;
+export const pageWidth = 790;
+export const pageHeight = 1125;
+export const pageWidthEmu = EMU * 7.42;
+export const pageHeightEmu = EMU * 10.5;
+export const pageWidthParagraph = 11000;
+export const pageWidthParagraphBox = 12000;
+
+export const convertToEmu = (value: number, type: 'w' | 'h') => {
+  if (type === 'h') return Math.floor(value * (pageHeightEmu / pageHeight));
+  if (type === 'w') return Math.floor(value * (pageWidthEmu / pageWidth));
+};
+
+export const convertToParagraph = (value: number) => {
+  return Math.floor(value * (pageWidthParagraph / pageWidth));
+};
+
+export const convertToParagraphBox = (value: number) => {
+  return Math.floor(value * (pageWidthParagraphBox / pageWidth));
+};
+
 export const sectionProperties: ISectionPropertiesOptions = {
   page: {
     margin: {

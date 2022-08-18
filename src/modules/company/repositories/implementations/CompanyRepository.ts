@@ -225,6 +225,11 @@ export class CompanyRepository implements ICompanyRepository {
                       : undefined,
                   },
                   where: { cpf_companyId: { cpf: rest.cpf, companyId } },
+                  // cpf_esocialCode_companyId: {
+                  //   cpf: rest.cpf,
+                  //   esocialCode: rest.esocialCode,
+                  //   companyId,
+                  // },
                 };
               },
             ),

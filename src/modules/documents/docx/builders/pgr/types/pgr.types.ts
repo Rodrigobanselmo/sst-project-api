@@ -1,3 +1,4 @@
+import { DocumentCoverEntity } from './../../../../../company/entities/document-cover.entity';
 import { AttachmentEntity } from './../../../../../checklist/entities/attachment.entity';
 import { CharacterizationEntity } from './../../../../../company/entities/characterization.entity';
 import { EnvironmentEntity } from './../../../../../company/entities/environment.entity';
@@ -14,6 +15,7 @@ import {
 export interface ICreatePGR {
   version: string;
   logo: string;
+  cover: DocumentCoverEntity;
   company: CompanyEntity;
   workspace: WorkspaceEntity;
   versions: RiskDocumentEntity[];

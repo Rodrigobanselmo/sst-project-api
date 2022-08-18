@@ -44,6 +44,8 @@ export enum PermissionEnum {
   RISK_DATA = '4.3',
   PGR = '4.4',
   ACTION_PLAN = '4.4.1',
+  PCMSO = '4.5',
+  EXAM_RISK = '4.5.6',
   CLINIC = '5',
   EXAM = '5.1',
 

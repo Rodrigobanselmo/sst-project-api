@@ -14,11 +14,19 @@ import { DateFormat } from './../../../shared/transformers/date-format';
 import { StringUppercaseTransform } from './../../../shared/transformers/string-uppercase.transform';
 
 export class UpsertExamToClinicDto {
+  @IsOptional()
+  @IsInt()
+  id?: number;
+
   @IsInt()
   examId: number;
 
   @IsString()
   companyId: string;
+
+  @IsString()
+  @IsOptional()
+  groupId?: string;
 
   @IsOptional()
   @IsInt()
@@ -42,6 +50,26 @@ export class UpsertExamToClinicDto {
   @IsInt()
   @IsOptional()
   examMinDuration?: number;
+
+  @IsBoolean()
+  @IsOptional()
+  isPeriodic?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  isChange?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  isAdmission?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  isReturn?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  isDismissal?: boolean;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsOptional()

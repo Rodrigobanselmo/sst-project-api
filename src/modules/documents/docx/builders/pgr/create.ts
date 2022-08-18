@@ -1,3 +1,4 @@
+import { DocumentCoverEntity } from './../../../../company/entities/document-cover.entity';
 import { AttachmentEntity } from './../../../../checklist/entities/attachment.entity';
 import { CharacterizationEntity } from './../../../../company/entities/characterization.entity';
 import { RiskFactorGroupDataEntity } from './../../../../checklist/entities/riskGroupData.entity';
@@ -29,6 +30,7 @@ export class DocumentBuildPGR {
   private version: string;
   private logoImagePath: string;
   private consultantLogoImagePath: string;
+  private cover: DocumentCoverEntity;
   private company: CompanyEntity;
   private workspace: WorkspaceEntity;
   private docSections: IDocumentPGRSectionGroups;
@@ -56,9 +58,11 @@ export class DocumentBuildPGR {
     characterizations,
     attachments,
     hierarchyTree,
+    cover,
   }: ICreatePGR) {
     this.version = version;
     this.logoImagePath = logo;
+    this.cover = cover;
     this.consultantLogoImagePath = consultantLogo;
     this.company = company;
     this.workspace = workspace;
@@ -140,6 +144,7 @@ export class DocumentBuildPGR {
       environments: this.environments ?? [],
       characterizations: this.characterizations ?? [],
       company: this.company,
+      cover: this.cover,
     }).map;
 
     data.forEach((child) => {

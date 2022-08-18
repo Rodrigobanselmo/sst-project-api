@@ -1,20 +1,24 @@
-import { ErrorCompanyEnum } from './../../../shared/constants/enum/errorMessage';
 import { PartialType } from '@nestjs/swagger';
-import { HierarchyEnum, StatusEnum } from '@prisma/client';
-import { Transform } from 'class-transformer';
+import { SexTypeEnum, StatusEnum } from '@prisma/client';
+import { Transform, Type } from 'class-transformer';
 import {
+  IsBoolean,
+  IsDate,
   IsEnum,
+  IsInt,
   IsNumber,
   IsOptional,
   IsString,
   Length,
   MaxLength,
 } from 'class-validator';
+
 import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
 import { CpfFormatTransform } from '../../../shared/transformers/cpf-format.transform';
-
 import { StringCapitalizeTransform } from '../../../shared/transformers/string-capitalize';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
+import { ErrorCompanyEnum } from './../../../shared/constants/enum/errorMessage';
+import { DateFormat } from './../../../shared/transformers/date-format';
 
 export class CreateEmployeeDto {
   @Transform(CpfFormatTransform, { toClassOnly: true })
@@ -43,6 +47,51 @@ export class CreateEmployeeDto {
 
   @IsString()
   hierarchyId: string;
+
+  @IsString()
+  @IsOptional()
+  esocialCode: string;
+
+  @IsString()
+  @IsOptional()
+  socialName: string;
+
+  @IsString()
+  @IsOptional()
+  nickname: string;
+
+  @IsString()
+  @IsOptional()
+  phone: string;
+
+  @IsString()
+  @IsOptional()
+  email: string;
+
+  @IsBoolean()
+  @IsOptional()
+  isComorbidity: boolean;
+
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsString()
+  @IsEnum(SexTypeEnum, {
+    message: `Sexo inválido`,
+  })
+  sex: SexTypeEnum;
+
+  @IsString()
+  @IsOptional()
+  cidId: string;
+
+  @IsInt()
+  @IsOptional()
+  shiftId: number;
+
+  @IsOptional()
+  @Transform(DateFormat, { toClassOnly: true })
+  @IsDate({ message: 'Data de aniversário inválida' })
+  @Type(() => Date)
+  birthdate: Date;
 }
 
 export class UpdateEmployeeDto extends PartialType(CreateEmployeeDto) {

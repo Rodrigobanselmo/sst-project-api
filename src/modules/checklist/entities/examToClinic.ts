@@ -12,6 +12,7 @@ export class ExamToClinicEntity implements ExamToClinic {
   id: number;
   examId: number;
   companyId: string;
+  groupId: string;
   dueInDays: number;
   isScheduled: boolean;
   observation: string;
@@ -24,6 +25,11 @@ export class ExamToClinicEntity implements ExamToClinic {
   exam?: ExamEntity;
   examMinDuration: number;
   scheduleType: ClinicScheduleTypeEnum;
+  isPeriodic: boolean;
+  isChange: boolean;
+  isAdmission: boolean;
+  isReturn: boolean;
+  isDismissal: boolean;
 
   constructor(
     partial: Partial<

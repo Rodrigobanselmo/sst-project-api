@@ -13,6 +13,7 @@ export class ExamRiskDataEntity implements ExamToRiskData {
   isReturn: boolean;
   isDismissal: boolean;
   validityInMonths: number;
+  lowValidityInMonths: number;
   fromAge: number;
   toAge: number;
   riskData?: RiskFactorDataEntity;

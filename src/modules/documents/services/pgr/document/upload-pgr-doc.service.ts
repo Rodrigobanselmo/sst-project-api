@@ -80,6 +80,7 @@ export class PgrUploadService {
         include: {
           primary_activity: true,
           address: true,
+          covers: true,
           environments: {
             include: {
               photos: true,
@@ -101,17 +102,20 @@ export class PgrUploadService {
           },
           professionals: true,
           receivingServiceContracts: {
-            include: { applyingServiceCompany: { include: { address: true } } },
+            include: {
+              applyingServiceCompany: {
+                include: { address: true, covers: true },
+              },
+            },
           },
         },
       },
     );
 
-    const getConsultantLogo = () => {
+    const getConsultant = () => {
       if (company.receivingServiceContracts?.length == 1) {
         //! make it work for many contract companies
-        return company.receivingServiceContracts[0]?.applyingServiceCompany
-          ?.logoUrl;
+        return company.receivingServiceContracts[0]?.applyingServiceCompany;
       }
 
       if (company.receivingServiceContracts?.length > 1) {
@@ -119,11 +123,11 @@ export class PgrUploadService {
       }
     };
 
-    const getLogo = getConsultantLogo();
-    const consultantLogo = getLogo
+    const consultant = getConsultant();
+    const consultantLogo = consultant
       ? await downloadImageFile(
-          getLogo,
-          `tmp/${v4()}.${getExtensionFromUrl(getLogo)}`,
+          consultant?.logoUrl,
+          `tmp/${v4()}.${getExtensionFromUrl(consultant?.logoUrl)}`,
         )
       : '';
 
@@ -133,15 +137,16 @@ export class PgrUploadService {
           `tmp/${v4()}.${getExtensionFromUrl(company.logoUrl)}`,
         )
       : '';
-    // return;
+
+    const cover = company?.covers?.[0] || consultant?.covers?.[0];
 
     console.log('start: photos');
-    const { environments, characterizations, photosPath } =
-      await this.downloadPhotos(company);
+    // const { environments, characterizations, photosPath } =
+    //   await this.downloadPhotos(company);
     console.log('end: photos');
-    // const environments = [];
-    // const characterizations = [];
-    // const photosPath = [];
+    const environments = [];
+    const characterizations = [];
+    const photosPath = [];
 
     try {
       const {
@@ -229,6 +234,7 @@ export class PgrUploadService {
         homogeneousGroup: homoGroupTree,
         characterizations,
         hierarchyTree,
+        cover,
       }).build();
 
       const doc = createBaseDocument(sections);
@@ -258,7 +264,7 @@ export class PgrUploadService {
 
       return { buffer, fileName };
     } catch (error) {
-      [logo, consultantLogo, ...photosPath].forEach(
+      [logo, consultantLogo, cover, ...photosPath].forEach(
         (path) => path && fs.unlinkSync(path),
       );
       console.log('error: unlink photos', error);
