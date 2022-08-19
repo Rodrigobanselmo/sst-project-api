@@ -141,12 +141,12 @@ export class PgrUploadService {
     const cover = company?.covers?.[0] || consultant?.covers?.[0];
 
     console.log('start: photos');
-    // const { environments, characterizations, photosPath } =
-    //   await this.downloadPhotos(company);
+    const { environments, characterizations, photosPath } =
+      await this.downloadPhotos(company);
     console.log('end: photos');
-    const environments = [];
-    const characterizations = [];
-    const photosPath = [];
+    // const environments = [];
+    // const characterizations = [];
+    // const photosPath = [];
 
     try {
       const {
