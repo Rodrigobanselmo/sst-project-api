@@ -75,6 +75,12 @@ import { CreateContactsService } from './services/contact/create-contact/create-
 import { ContactController } from './controller/contact/contact.controller';
 import { DeleteContactsService } from './services/contact/delete-contact/delete-contact.service';
 import { FindCnaeService } from './services/company/find-cnae/find-cnae.service';
+import { CreateEmployeeHierarchyHistoryService } from './services/employee/0-history/hierarchy/create/create.service';
+import { DeleteEmployeeHierarchyHistoryService } from './services/employee/0-history/hierarchy/delete/delete.service';
+import { FindEmployeeHierarchyHistoryService } from './services/employee/0-history/hierarchy/find/find.service';
+import { EmployeeHierarchyHistoryRepository } from './repositories/implementations/EmployeeHierarchyHistoryRepository';
+import { EmployeeHierarchyHistoryController } from './controller/employee/employee-hierarchy-history.controller';
+import { UpdateEmployeeHierarchyHistoryService } from './services/employee/0-history/hierarchy/update/update.service';
 
 @Module({
   imports: [forwardRef(() => ChecklistModule)],
@@ -87,6 +93,7 @@ import { FindCnaeService } from './services/company/find-cnae/find-cnae.service'
     CharacterizationController,
     CompanyGroupController,
     ContactController,
+    EmployeeHierarchyHistoryController,
   ],
   providers: [
     CreateCompanyService,
@@ -155,6 +162,12 @@ import { FindCnaeService } from './services/company/find-cnae/find-cnae.service'
     FindContactsService,
     DeleteContactsService,
     FindCnaeService,
+    EmployeeHierarchyHistoryRepository,
+    CreateEmployeeHierarchyHistoryService,
+    CreateEmployeeHierarchyHistoryService,
+    DeleteEmployeeHierarchyHistoryService,
+    FindEmployeeHierarchyHistoryService,
+    UpdateEmployeeHierarchyHistoryService,
   ],
   exports: [
     CompanyRepository,

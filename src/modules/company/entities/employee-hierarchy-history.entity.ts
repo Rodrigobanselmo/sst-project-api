@@ -18,6 +18,10 @@ export class EmployeeHierarchyHistoryEntity
   created_at: Date;
   updated_at: Date;
   hierarchy: HierarchyEntity;
+  directory?: string;
+  management?: string;
+  sector?: string;
+  office?: string;
 
   constructor(partial: Partial<EmployeeHierarchyHistoryEntity>) {
     Object.assign(this, partial);

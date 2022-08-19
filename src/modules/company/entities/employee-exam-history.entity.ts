@@ -14,9 +14,9 @@ export class EmployeeExamsHistoryEntity implements EmployeeExamsHistory {
   employeeId: number;
   employee: EmployeeEntity;
   exam: ExamEntity;
+  motive: string;
 
   constructor(partial: Partial<EmployeeExamsHistoryEntity>) {
     Object.assign(this, partial);
   }
-  motive: string;
 }

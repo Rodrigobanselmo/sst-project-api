@@ -13,6 +13,8 @@ export enum ErrorMessageEnum {
   WRONG_EMAIL_PASS = 'Email ou senha incorreto',
   //* EXAMS_TO_CLINICS
   CLINIC_EXAM_ALREADY_EXIST = 'Exame já cadastrado para está clínica',
+  //* EMPLOYEES
+  EMPLOYEE_NOT_FOUND = 'Empregado não encontrado para esta empresa',
 }
 
 export enum ErrorCompanyEnum {

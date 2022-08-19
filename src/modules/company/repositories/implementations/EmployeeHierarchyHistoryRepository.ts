@@ -1,3 +1,4 @@
+import { transformStringToObject } from './../../../../shared/utils/transformStringToObject';
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 
@@ -50,6 +51,13 @@ export class EmployeeHierarchyHistoryRepository {
       skip: ['companyId'],
     });
 
+    const optionsFind = transformStringToObject(
+      Array.from({ length: 5 })
+        .map(() => 'include.parent')
+        .join('.'),
+      true,
+    );
+    console.log(where);
     const response = await this.prisma.$transaction([
       this.prisma.employeeHierarchyHistory.count({
         where,
@@ -59,6 +67,14 @@ export class EmployeeHierarchyHistoryRepository {
         where,
         take: pagination.take || 20,
         skip: pagination.skip || 0,
+        include: {
+          hierarchy: {
+            include: {
+              company: { select: { initials: true, name: true } },
+              ...optionsFind.include,
+            },
+          },
+        },
         orderBy: { startDate: 'desc' },
       }),
     ]);

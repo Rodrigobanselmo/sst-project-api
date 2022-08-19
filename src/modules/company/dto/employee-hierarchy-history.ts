@@ -46,7 +46,7 @@ export class FindEmployeeHierarchyHistoryDto extends PaginationQueryDto {
   @IsOptional()
   hierarchyId?: string;
 
-  @IsString()
   @IsOptional()
-  employeeId?: string;
+  @IsInt()
+  employeeId?: number;
 }

@@ -13,12 +13,14 @@ const jsonCover = {
       boxX: 464,
       boxY: 0,
       size: 28,
+      color: 'FFFFFF',
     },
     versionProps: {
       x: 163,
       y: 480,
       boxX: 464,
       boxY: 0,
+      color: 'FFFFFF',
       size: 14,
     },
     companyProps: {
@@ -26,16 +28,27 @@ const jsonCover = {
       y: 510,
       boxX: 464,
       boxY: 0,
+      color: 'FFFFFF',
       size: 14,
     },
   },
 };
 
 export const connapaCover = async (prisma: PrismaClient) => {
-  await prisma.documentCover.create({
+  // await prisma.documentCover.create({
+  //   data: {
+  //     json: jsonCover,
+  //     companyId: connapaId,
+  //   },
+  // });
+  const connapa = await prisma.documentCover.findFirst({
+    where: { companyId: connapaId },
+  });
+  await prisma.documentCover.update({
     data: {
       json: jsonCover,
       companyId: connapaId,
     },
+    where: { id: connapa.id },
   });
 };

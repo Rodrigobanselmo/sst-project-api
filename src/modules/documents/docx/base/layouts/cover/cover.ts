@@ -29,6 +29,8 @@ interface ITextProps {
   boxX?: number;
   boxY?: number;
   size?: number;
+  color?: string;
+  bold?: boolean;
 }
 interface IHeaderProps {
   version: string;
@@ -55,7 +57,10 @@ const title = (props: IHeaderProps) =>
       new TextRun({
         text: props.title || 'PROGRAMA DE GERENCIAMENTO DE RISCOS – PGR',
         size: (props?.coverProps?.titleProps?.size || 0) * 2 || 96,
-        bold: true,
+        bold: props?.coverProps?.titleProps?.bold ?? true,
+        ...(props?.coverProps?.titleProps?.color && {
+          color: props?.coverProps?.titleProps?.color,
+        }),
       }),
     ],
     spacing: { after: 400, before: 0 },
@@ -86,6 +91,10 @@ const textShow = (text?: string, props?: ITextProps) =>
       new TextRun({
         text: text || '',
         size: (props?.size || 0) * 2 || 40,
+        bold: props?.bold ?? false,
+        ...(props?.color && {
+          color: props?.color,
+        }),
       }),
     ],
     spacing: { after: 100, before: 0 },
