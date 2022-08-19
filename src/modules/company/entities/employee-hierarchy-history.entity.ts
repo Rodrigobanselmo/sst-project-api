@@ -25,5 +25,9 @@ export class EmployeeHierarchyHistoryEntity
 
   constructor(partial: Partial<EmployeeHierarchyHistoryEntity>) {
     Object.assign(this, partial);
+
+    if (partial?.hierarchy) {
+      this.hierarchy = new HierarchyEntity(partial.hierarchy);
+    }
   }
 }

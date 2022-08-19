@@ -13,6 +13,7 @@ import { createBaseDocument } from '../../../docx/base/config/document';
 import { actionPlanTableSection } from '../../../docx/components/tables/actionPlan/actionPlan.section';
 import { hierarchyConverter } from '../../../docx/converter/hierarchy.converter';
 import { UploadPgrActionPlanDto } from '../../../dto/pgr.dto';
+import { dayjs } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 
 @Injectable()
 export class PgrActionPlanUploadTableService {
@@ -64,9 +65,14 @@ export class PgrActionPlanUploadTableService {
 
     const fileName = getDocxFileName({
       name: version[0] ? version[0]?.name || '' : '',
-      companyName: riskGroupData.company.name,
-      typeName: '--PLANO_DE_ACAO',
+      companyName:
+        (riskGroupData.company?.fantasy || riskGroupData.company.name) +
+        (riskGroupData.company.initials
+          ? '-' + riskGroupData.company.initials
+          : ''),
+      typeName: 'PGR-PLANO_DE_ACAO',
       version: version[0] ? version[0]?.version || '0.0.0' : '0.0.0',
+      date: dayjs(riskGroupData.documentDate || new Date()).format('MMMM-YYYY'),
     });
 
     await this.upload(buffer, fileName, riskGroupData.company);

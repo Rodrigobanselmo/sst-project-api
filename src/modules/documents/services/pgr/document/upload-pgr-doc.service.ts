@@ -6,7 +6,10 @@ import { removeDuplicate } from '../../../../../shared/utils/removeDuplicate';
 import { v4 } from 'uuid';
 
 import { CompanyRepository } from '../../../../../modules/company/repositories/implementations/CompanyRepository';
-import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
+import {
+  dayjs,
+  DayJSProvider,
+} from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { AmazonStorageProvider } from '../../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
 import {
   downloadImageFile,
@@ -376,7 +379,7 @@ export class PgrUploadService {
       riskGroupData,
       upsertPgrDto,
       aprSection,
-      '--APR',
+      'PGR-APR',
     );
 
     // APRs Groups
@@ -393,7 +396,7 @@ export class PgrUploadService {
       riskGroupData,
       upsertPgrDto,
       aprGroupSection,
-      '--APR-GSE',
+      'PGR-APR-GSE',
     );
 
     // ACTION PLAN
@@ -405,7 +408,7 @@ export class PgrUploadService {
       riskGroupData,
       upsertPgrDto,
       actionPlanSections,
-      '--PLANO_DE_ACAO',
+      'PGR-PLANO_DE_ACAO',
     );
 
     return { urlAPR, urlGroupAPR, actionPlanUrl };
@@ -414,13 +417,18 @@ export class PgrUploadService {
   private getFileName = (
     upsertPgrDto: UpsertPgrDto,
     riskGroupData: RiskFactorGroupDataEntity,
-    typeName = '',
+    typeName = 'PGR',
   ) => {
     return getDocxFileName({
       name: upsertPgrDto.name,
-      companyName: riskGroupData.company.name,
+      companyName:
+        (riskGroupData.company?.fantasy || riskGroupData.company.name) +
+        (riskGroupData.company.initials
+          ? '-' + riskGroupData.company.initials
+          : ''),
       version: upsertPgrDto.version,
       typeName,
+      date: dayjs(riskGroupData.documentDate || new Date()).format('MMMM-YYYY'),
     });
   };
 

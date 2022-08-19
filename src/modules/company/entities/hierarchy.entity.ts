@@ -59,6 +59,7 @@ export class HierarchyEntity implements Hierarchy {
   subOfficeEmployees?: EmployeeEntity[];
   workspaceIds?: string[];
   parent?: Hierarchy;
+  parents?: HierarchyEntity[];
   children?: Hierarchy[];
   workspaceId?: string;
   employeesCount?: number;
@@ -68,6 +69,31 @@ export class HierarchyEntity implements Hierarchy {
 
     if (!this.workspaceIds) {
       this.workspaceIds = [];
+
+      if (this.workspaces) {
+        this.workspaceIds = this.workspaces.map((workspace) => workspace.id);
+      }
+    }
+
+    if (this.parent) {
+      this.parents = [this.parent];
+      const parent = this.parent as any;
+
+      if (parent?.parent) {
+        this.parents.push(parent.parent);
+        if (parent.parent?.parent) {
+          this.parents.push(parent.parent.parent);
+          if (parent.parent.parent?.parent) {
+            this.parents.push(parent.parent.parent.parent);
+            if (parent.parent.parent.parent?.parent) {
+              this.parents.push(parent.parent.parent.parent.parent);
+              if (parent.parent.parent.parent.parent?.parent) {
+                this.parents.push(parent.parent.parent.parent.parent.parent);
+              }
+            }
+          }
+        }
+      }
 
       if (this.workspaces) {
         this.workspaceIds = this.workspaces.map((workspace) => workspace.id);

@@ -3,16 +3,18 @@ export const getDocxFileName = ({
   typeName = '',
   companyName,
   version,
+  date,
 }: {
   name: string;
   typeName: string;
   companyName: string;
   version: string;
+  date: string;
 }) => {
   const docName = name.replace(/\s+/g, '');
   const fileAprName = `${
     docName.length > 0 ? docName + '-' : ''
-  }${companyName}${typeName}-v${version}.docx`
+  }${typeName}-${companyName}-${date}-Rev${version}.docx`
     .normalize('NFD')
     .replace(/\s+/g, '_')
     .replace(/[^a-zA-Z0-9._-]/g, '');
