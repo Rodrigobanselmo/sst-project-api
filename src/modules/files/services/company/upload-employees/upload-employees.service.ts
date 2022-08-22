@@ -167,16 +167,17 @@ export class UploadEmployeesService {
       return newEmployee;
     });
 
-    const restEMployees = employees.map((employee) => {
+    const restEmployees = employees.map((employee) => {
       delete employee.description;
       delete employee.ghoDescription;
       delete employee.realDescription;
       delete employee.workspaceIds;
+      delete employee.ghoName;
       return employee;
     });
 
     // update or create all
-    await this.employeeRepository.upsertMany(restEMployees, companyId);
+    await this.employeeRepository.upsertMany(restEmployees, companyId);
 
     return await this.uploadExcelProvider.newTableData({
       findAll: (sheet) =>
