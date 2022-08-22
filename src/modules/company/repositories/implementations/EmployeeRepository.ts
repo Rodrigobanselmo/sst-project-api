@@ -27,24 +27,11 @@ export class EmployeeRepository {
     cidId,
     ...createCompanyDto
   }: CreateEmployeeDto): Promise<EmployeeEntity> {
-    const hierarchy = await this.prisma.hierarchy.findUnique({
-      where: { id: hierarchyId },
-      include: { workspaces: true },
-    });
-
     try {
       const employee = await this.prisma.employee.create({
         data: {
           ...createCompanyDto,
           company: { connect: { id: companyId } },
-          workspaces:
-            hierarchy.workspaces.length > 0
-              ? {
-                  connect: hierarchy.workspaces.map((workspace) => ({
-                    id_companyId: { companyId, id: workspace.id },
-                  })),
-                }
-              : undefined,
           hierarchy: hierarchyId
             ? {
                 connect: { id: hierarchyId },
@@ -82,24 +69,9 @@ export class EmployeeRepository {
     }: UpdateEmployeeDto,
     removeSubOffices?: boolean,
   ): Promise<EmployeeEntity> {
-    const hierarchy = hierarchyId
-      ? await this.prisma.hierarchy.findUnique({
-          where: { id: hierarchyId },
-          include: { workspaces: true },
-        })
-      : undefined;
-
     const employee = await this.prisma.employee.update({
       data: {
         ...createCompanyDto,
-        workspaces:
-          hierarchy && hierarchy.workspaces.length > 0
-            ? {
-                connect: hierarchy.workspaces.map((workspace) => ({
-                  id_companyId: { companyId, id: workspace.id },
-                })),
-              }
-            : undefined,
         hierarchy: !hierarchyId
           ? undefined
           : {
@@ -124,9 +96,16 @@ export class EmployeeRepository {
   }
 
   async upsertMany(
-    upsertEmployeeMany: (CreateEmployeeDto & { id: number })[],
+    upsertEmployeeMany: (CreateEmployeeDto & {
+      id: number;
+      admissionDate?: Date;
+    })[],
     companyId: string,
   ): Promise<EmployeeEntity[]> {
+    const employeeHistory = await this.prisma.employeeHierarchyHistory.findMany(
+      { where: { hierarchy: { companyId } }, include: { employee: true } },
+    );
+
     const data = await this.prisma.$transaction(
       upsertEmployeeMany.map(
         ({
@@ -136,20 +115,18 @@ export class EmployeeRepository {
           hierarchyId,
           shiftId,
           cidId,
+          admissionDate,
           ...upsertEmployeeDto
         }) =>
           this.prisma.employee.upsert({
             create: {
               ...upsertEmployeeDto,
               company: { connect: { id: companyId } },
-              workspaces: {
-                connect: workspaceIds.map((id) => ({
-                  id_companyId: { companyId, id },
-                })),
-              },
-              hierarchy: {
-                connect: { id: hierarchyId },
-              },
+              hierarchy: hierarchyId
+                ? {
+                    connect: { id: hierarchyId },
+                  }
+                : undefined,
               shift: shiftId
                 ? {
                     connect: { id: shiftId },
@@ -160,16 +137,18 @@ export class EmployeeRepository {
                     connect: { cid: cidId },
                   }
                 : undefined,
+              hierarchyHistory: hierarchyId
+                ? {
+                    create: {
+                      motive: 'ADM',
+                      startDate: admissionDate,
+                      hierarchyId: hierarchyId,
+                    },
+                  }
+                : undefined,
             },
             update: {
               ...upsertEmployeeDto,
-              workspaces: !workspaceIds
-                ? undefined
-                : {
-                    set: workspaceIds.map((id) => ({
-                      id_companyId: { companyId, id },
-                    })),
-                  },
               hierarchy: !hierarchyId
                 ? undefined
                 : {
@@ -185,8 +164,31 @@ export class EmployeeRepository {
                     connect: { cid: cidId },
                   }
                 : undefined,
+              hierarchyHistory: hierarchyId
+                ? {
+                    upsert: {
+                      where: {
+                        id:
+                          employeeHistory.find(
+                            ({ employee }) =>
+                              employee.cpf === upsertEmployeeDto.cpf,
+                          )?.id || -1,
+                      },
+                      create: {
+                        motive: 'ADM',
+                        startDate: admissionDate,
+                        hierarchyId: hierarchyId,
+                      },
+                      update: {
+                        motive: 'ADM',
+                        startDate: admissionDate,
+                        hierarchyId: hierarchyId,
+                      },
+                    },
+                  }
+                : undefined,
             },
-            where: { id_companyId: { companyId, id: id || -1 } },
+            where: { cpf_companyId: { companyId, cpf: upsertEmployeeDto.cpf } },
           }),
       ),
     );

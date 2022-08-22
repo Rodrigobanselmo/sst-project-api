@@ -1,4 +1,3 @@
-import { transformStringToObject } from './../../../../shared/utils/transformStringToObject';
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 
@@ -11,26 +10,47 @@ import {
   UpdateEmployeeHierarchyHistoryDto,
 } from '../../dto/employee-hierarchy-history';
 import { EmployeeHierarchyHistoryEntity } from '../../entities/employee-hierarchy-history.entity';
+import { transformStringToObject } from './../../../../shared/utils/transformStringToObject';
 
 @Injectable()
 export class EmployeeHierarchyHistoryRepository {
   constructor(private prisma: PrismaService) {}
 
-  async create(createData: CreateEmployeeHierarchyHistoryDto) {
-    const data = await this.prisma.employeeHierarchyHistory.create({
-      data: createData,
-    });
+  async create(
+    createData: CreateEmployeeHierarchyHistoryDto,
+    employeeId: number,
+    hierarchyId?: string | null,
+  ) {
+    const response = await this.prisma.$transaction([
+      this.prisma.employeeHierarchyHistory.create({
+        data: createData,
+      }),
+      this.prisma.employee.update({
+        data: hierarchyId !== undefined ? { hierarchyId } : {},
+        where: { id: employeeId },
+      }),
+    ]);
 
-    return new EmployeeHierarchyHistoryEntity(data);
+    return new EmployeeHierarchyHistoryEntity(response[0]);
   }
 
-  async update({ id, ...updateData }: UpdateEmployeeHierarchyHistoryDto) {
-    const data = await this.prisma.employeeHierarchyHistory.update({
-      data: updateData,
-      where: { id },
-    });
+  async update(
+    { id, ...updateData }: UpdateEmployeeHierarchyHistoryDto,
+    employeeId: number,
+    hierarchyId?: string | null,
+  ) {
+    const response = await this.prisma.$transaction([
+      this.prisma.employeeHierarchyHistory.update({
+        data: updateData,
+        where: { id },
+      }),
+      this.prisma.employee.update({
+        data: hierarchyId !== undefined ? { hierarchyId } : {},
+        where: { id: employeeId },
+      }),
+    ]);
 
-    return new EmployeeHierarchyHistoryEntity(data);
+    return new EmployeeHierarchyHistoryEntity(response[0]);
   }
 
   async find(
@@ -57,7 +77,7 @@ export class EmployeeHierarchyHistoryRepository {
         .join('.'),
       true,
     );
-    console.log(where);
+
     const response = await this.prisma.$transaction([
       this.prisma.employeeHierarchyHistory.count({
         where,
@@ -103,11 +123,17 @@ export class EmployeeHierarchyHistoryRepository {
     return new EmployeeHierarchyHistoryEntity(data);
   }
 
-  async delete(id: number) {
-    const data = await this.prisma.employeeHierarchyHistory.delete({
-      where: { id },
-    });
+  async delete(id: number, employeeId: number, hierarchyId?: string | null) {
+    const response = await this.prisma.$transaction([
+      this.prisma.employeeHierarchyHistory.delete({
+        where: { id },
+      }),
+      this.prisma.employee.update({
+        data: hierarchyId !== undefined ? { hierarchyId } : {},
+        where: { id: employeeId },
+      }),
+    ]);
 
-    return new EmployeeHierarchyHistoryEntity(data);
+    return new EmployeeHierarchyHistoryEntity(response[0]);
   }
 }

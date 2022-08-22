@@ -23,6 +23,8 @@ export class FindAllByHierarchyService {
           },
           generateSources: false,
           adms: false,
+          recs: false,
+          dataRecs: false,
           engsToRiskFactorData: false,
           epiToRiskFactorData: false,
         },

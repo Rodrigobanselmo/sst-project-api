@@ -31,3 +31,45 @@ export class EmployeeHierarchyHistoryEntity
     }
   }
 }
+
+// eslint-disable-next-line prettier/prettier
+const base = [ EmployeeHierarchyMotiveTypeEnum.ALOC, EmployeeHierarchyMotiveTypeEnum.PROM, EmployeeHierarchyMotiveTypeEnum.TRANS, EmployeeHierarchyMotiveTypeEnum.TRANS_PROM ];
+const adm = EmployeeHierarchyMotiveTypeEnum.ADM;
+const dem = EmployeeHierarchyMotiveTypeEnum.DEM;
+export const historyRules: Record<any, any> = {
+  [EmployeeHierarchyMotiveTypeEnum.ADM]: {
+    before: [null, dem],
+    after: [...base, dem, null],
+    canHaveHierarchy: false,
+  },
+  [EmployeeHierarchyMotiveTypeEnum.TRANS]: {
+    before: [...base, adm],
+    after: [...base, dem, null],
+    canHaveHierarchy: true,
+  },
+  [EmployeeHierarchyMotiveTypeEnum.PROM]: {
+    before: [...base, adm],
+    after: [...base, dem, null],
+    canHaveHierarchy: true,
+  },
+  [EmployeeHierarchyMotiveTypeEnum.ALOC]: {
+    before: [...base, adm],
+    after: [...base, dem, null],
+    canHaveHierarchy: true,
+  },
+  [EmployeeHierarchyMotiveTypeEnum.TRANS_PROM]: {
+    before: [...base, adm],
+    after: [...base, dem, null],
+    canHaveHierarchy: true,
+  },
+  [EmployeeHierarchyMotiveTypeEnum.DEM]: {
+    before: [...base, adm],
+    after: [adm, null],
+    canHaveHierarchy: true,
+  },
+  ['null']: {
+    before: [...base, adm, dem, null],
+    after: [adm, null],
+    canHaveHierarchy: true,
+  },
+};

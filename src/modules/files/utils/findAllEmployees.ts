@@ -41,6 +41,7 @@ export const findAllEmployees = async (
             },
           },
         },
+        workspaces: true,
       },
     },
   );
@@ -90,18 +91,26 @@ export const findAllEmployees = async (
     return employee;
   });
 
-  const workspaces = await workspaceRepository.findByCompany(companyId);
+  const workspaces = company.workspace;
 
   company.employees = company.employees.map((employee) => {
+    const hierarchyWorkspace = hierarchies.find(
+      (hierarchy) => hierarchy.id === employee.hierarchyId,
+    )?.workspaceIds;
+
+    console.log(
+      hierarchies.find((hierarchy) => hierarchy.id === employee.hierarchyId),
+    );
+
     const workspace = workspaces.find(
       (workspace) =>
-        employee.workspaces &&
-        employee.workspaces.find((w) => w.id == workspace.id),
+        hierarchyWorkspace &&
+        hierarchyWorkspace.find((id) => id == workspace.id),
     );
 
     return {
       ...employee,
-      abbreviation: workspace.abbreviation,
+      abbreviation: workspace?.abbreviation,
     };
   });
 

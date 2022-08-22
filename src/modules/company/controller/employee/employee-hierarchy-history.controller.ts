@@ -68,13 +68,15 @@ export class EmployeeHierarchyHistoryController {
     );
   }
 
-  @Delete('/:id/:companyId?')
+  @Delete('/:employeeId/:id/:companyId?')
   delete(
     @User() userPayloadDto: UserPayloadDto,
     @Param('id', ParseIntPipe) id: number,
+    @Param('employeeId', ParseIntPipe) employeeId: number,
   ) {
     return this.deleteEmployeeHierarchyHistoryService.execute(
       id,
+      employeeId,
       userPayloadDto,
     );
   }

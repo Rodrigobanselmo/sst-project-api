@@ -168,6 +168,7 @@ export class RiskGroupDataRepository {
               riskFactor: true,
               dataRecs: true,
               hierarchy: {
+                //! edit employee
                 include: { employees: { select: { _count: true } } },
               },
               homogeneousGroup: {

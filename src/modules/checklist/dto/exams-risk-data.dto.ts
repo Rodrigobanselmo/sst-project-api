@@ -1,4 +1,10 @@
-import { IsBoolean, IsInt, IsOptional, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsInt,
+  IsOptional,
+  IsString,
+  ValidateIf,
+} from 'class-validator';
 
 export class ExamsRiskDataDto {
   @IsInt()
@@ -37,18 +43,22 @@ export class ExamsRiskDataDto {
   @IsOptional()
   isDismissal: boolean;
 
+  @ValidateIf((o) => o.validityInMonths !== null)
   @IsInt()
   @IsOptional()
   validityInMonths: number;
 
+  @ValidateIf((o) => o.lowValidityInMonths !== null)
   @IsInt()
   @IsOptional()
   lowValidityInMonths: number;
 
+  @ValidateIf((o) => o.fromAge !== null)
   @IsInt()
   @IsOptional()
   fromAge: number;
 
+  @ValidateIf((o) => o.toAge !== null)
   @IsInt()
   @IsOptional()
   toAge: number;

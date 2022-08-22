@@ -117,6 +117,7 @@ enum RiskFactorsEnum {
   FIS
   ERG
   ACI
+  OTH
 }
 
 enum RiskRecTypeEnum {
@@ -508,8 +509,8 @@ model Employee {
   birthday DateTime?
   admissionDate DateTime? //!remove
   sex SexTypeEnum? 
-  hierarchyId String
-  hierarchy Hierarchy @relation(fields: [hierarchyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  hierarchyId String?
+  hierarchy Hierarchy? @relation(fields: [hierarchyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   companyId String
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   cidId String?
@@ -517,7 +518,6 @@ model Employee {
   shiftId Int?
   shift CompanyShift? @relation(fields: [shiftId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   subOffices Hierarchy[] @relation(name: "sub_offices")
-  workspaces Workspace[]
   hierarchyHistory EmployeeHierarchyHistory[]
   examsHistory EmployeeExamsHistory[]
   
@@ -675,6 +675,8 @@ model ExamToRisk {
   lowValidityInMonths Int?
   fromAge Int?
   toAge Int?
+  minRiskDegreeQuantity Int? @default(1)
+  minRiskDegree Int? @default(1)
   startDate DateTime @default(now())
   endDate DateTime?
   
@@ -1117,7 +1119,6 @@ model Workspace {
   status StatusEnum @default(ACTIVE)
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   address Address?
-  employee Employee[]
   riskFactorDocument RiskFactorDocument[]
   hierarchyOnHomogeneous HierarchyOnHomogeneous[]
   hierarchy Hierarchy[]

@@ -22,7 +22,8 @@ export class ExamRiskEntity implements ExamToRisk {
   exam?: ExamEntity;
   startDate: Date;
   endDate: Date;
-
+  minRiskDegreeQuantity: number;
+  minRiskDegree: number;
   isOld: boolean; // not used
 
   constructor(partial: Partial<ExamRiskEntity>) {

@@ -42,6 +42,7 @@ export class EmployeeExamsHistoryRepository {
       AND: [
         {
           employee: {
+            //! edit employee
             hierarchy: { companyId: query.companyId },
           },
         },

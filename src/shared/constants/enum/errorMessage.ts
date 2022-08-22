@@ -15,6 +15,11 @@ export enum ErrorMessageEnum {
   CLINIC_EXAM_ALREADY_EXIST = 'Exame já cadastrado para está clínica',
   //* EMPLOYEES
   EMPLOYEE_NOT_FOUND = 'Empregado não encontrado para esta empresa',
+  //* EMPLOYEES HISTORY
+  EMPLOYEE_FORBIDDEN_ADM_TWICE = 'Funcionário já possui uma lotação ativa',
+  EMPLOYEE_MISSING_HIERARCHY = 'É necessario informar o cargo do funcionário',
+  EMPLOYEE_NOT_IN_HIERARCHY = 'Funcionário sem vínculo empregatício para esse tipo de lotação',
+  EMPLOYEE_BLOCK_HISTORY = 'histórico bagunçado, verifique se sua ação é válida',
 }
 
 export enum ErrorCompanyEnum {

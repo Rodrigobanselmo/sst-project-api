@@ -27,7 +27,7 @@ export const employeesColumnsConstant = [
     checkHandler: checkIsString,
   },
   {
-    databaseName: 'birthdate',
+    databaseName: 'birthday',
     excelName: 'Nascimento',
     isArray: false,
     required: false,

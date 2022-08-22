@@ -1,3 +1,4 @@
+import { EmployeeRepository } from './../../../../company/repositories/implementations/EmployeeRepository';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { HierarchyEnum } from '@prisma/client';
 import { CompanyRepository } from '../../../../company/repositories/implementations/CompanyRepository';
@@ -27,6 +28,7 @@ export class UploadEmployeesService {
   constructor(
     private readonly excelProvider: ExcelProvider,
     private readonly companyRepository: CompanyRepository,
+    private readonly employeeRepository: EmployeeRepository,
     private readonly workspaceRepository: WorkspaceRepository,
     private readonly databaseTableRepository: DatabaseTableRepository,
     private readonly uploadExcelProvider: UploadExcelProvider,
@@ -165,12 +167,16 @@ export class UploadEmployeesService {
       return newEmployee;
     });
 
-    // update or create all
-    await this.companyRepository.update({
-      companyId,
-      employees,
-      users: [],
+    const restEMployees = employees.map((employee) => {
+      delete employee.description;
+      delete employee.ghoDescription;
+      delete employee.realDescription;
+      delete employee.workspaceIds;
+      return employee;
     });
+
+    // update or create all
+    await this.employeeRepository.upsertMany(restEMployees, companyId);
 
     return await this.uploadExcelProvider.newTableData({
       findAll: (sheet) =>

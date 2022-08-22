@@ -46,6 +46,7 @@ export class CreateEmployeeDto {
   workspaceIds: string[];
 
   @IsString()
+  @IsOptional()
   hierarchyId: string;
 
   @IsString()
@@ -91,7 +92,7 @@ export class CreateEmployeeDto {
   @Transform(DateFormat, { toClassOnly: true })
   @IsDate({ message: 'Data de aniversário inválida' })
   @Type(() => Date)
-  birthdate: Date;
+  birthday: Date;
 }
 
 export class UpdateEmployeeDto extends PartialType(CreateEmployeeDto) {

@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 
-import { connapaCover } from './run/connapa-cover';
+import { representAll } from './run/represent-all';
 
 const prisma = new PrismaClient();
 
@@ -21,7 +21,7 @@ async function main() {
   //   console.log(error);
   //   console.log('error: end');
   // }
-  connapaCover(prisma);
+  representAll(prisma);
   console.log('end');
 }
 

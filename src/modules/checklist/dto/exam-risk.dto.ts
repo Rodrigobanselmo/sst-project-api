@@ -6,6 +6,7 @@ import {
   IsInt,
   IsOptional,
   IsString,
+  ValidateIf,
 } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { PartialType } from '@nestjs/swagger';
@@ -48,14 +49,17 @@ export class CreateExamsRiskDto {
   @IsOptional()
   isDismissal: boolean;
 
+  @ValidateIf((o) => o.validityInMonths !== null)
   @IsInt()
   @IsOptional()
   validityInMonths: number;
 
+  @ValidateIf((o) => o.lowValidityInMonths !== null)
   @IsInt()
   @IsOptional()
   lowValidityInMonths: number;
 
+  @ValidateIf((o) => o.fromAge !== null)
   @IsInt()
   @IsOptional()
   fromAge: number;
@@ -63,6 +67,14 @@ export class CreateExamsRiskDto {
   @IsInt()
   @IsOptional()
   toAge: number;
+
+  @IsInt()
+  @IsOptional()
+  minRiskDegree: number;
+
+  @IsInt()
+  @IsOptional()
+  minRiskDegreeQuantity: number;
 
   @IsOptional()
   @Transform(DateFormat, { toClassOnly: true })

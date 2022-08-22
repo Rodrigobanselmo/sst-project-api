@@ -178,6 +178,7 @@ export class CompanyRepository implements ICompanyRepository {
           ],
         },
         employees: {
+          //! edit employee
           upsert: [
             ...employees.map(
               ({
@@ -192,20 +193,20 @@ export class CompanyRepository implements ICompanyRepository {
                 return {
                   create: {
                     ...rest,
-                    hierarchy: hierarchyId
+                    hierarchy: hierarchyId //! edit employee
                       ? {
                           connect: {
                             id_companyId: { companyId, id: hierarchyId },
                           },
                         }
                       : undefined,
-                    workspaces: workspaceIds
-                      ? {
-                          connect: workspaceIds.map((workspaceId) => ({
-                            id_companyId: { companyId, id: workspaceId },
-                          })),
-                        }
-                      : undefined,
+                    // workspaces: workspaceIds
+                    //   ? {
+                    //       connect: workspaceIds.map((workspaceId) => ({
+                    //         id_companyId: { companyId, id: workspaceId },
+                    //       })),
+                    //     }
+                    //   : undefined,
                   },
                   update: {
                     ...rest,
@@ -216,13 +217,13 @@ export class CompanyRepository implements ICompanyRepository {
                           },
                         }
                       : undefined,
-                    workspaces: workspaceIds
-                      ? {
-                          set: workspaceIds.map((workspaceId) => ({
-                            id_companyId: { companyId, id: workspaceId },
-                          })),
-                        }
-                      : undefined,
+                    // workspaces: workspaceIds
+                    //   ? {
+                    //       set: workspaceIds.map((workspaceId) => ({
+                    //         id_companyId: { companyId, id: workspaceId },
+                    //       })),
+                    //     }
+                    //   : undefined,
                   },
                   where: { cpf_companyId: { cpf: rest.cpf, companyId } },
                   // cpf_esocialCode_companyId: {
@@ -282,9 +283,7 @@ export class CompanyRepository implements ICompanyRepository {
         doctorResponsible: true,
         tecResponsible: true,
         group: true,
-        employees: !!include.employees
-          ? { include: { workspaces: true } }
-          : false,
+        employees: !!include.employees ? true : false,
       },
     });
 
@@ -406,9 +405,7 @@ export class CompanyRepository implements ICompanyRepository {
               group: true,
               doctorResponsible: true,
               tecResponsible: true,
-              employees: !!include.employees
-                ? { include: { workspaces: true } }
-                : false,
+              employees: !!include.employees ? true : false,
             },
           }),
       ),
@@ -478,7 +475,7 @@ export class CompanyRepository implements ICompanyRepository {
 
     const employeeCount = await this.prisma.employee.count({
       where: {
-        companyId: id,
+        companyId: id, //! edit employee
         hierarchy: { workspaces: { some: { id: workspaceId } } },
       },
     });
@@ -705,9 +702,7 @@ export class CompanyRepository implements ICompanyRepository {
         workspace: !!include?.workspace
           ? { include: { address: true } }
           : false,
-        employees: !!include.employees
-          ? { include: { workspaces: true } }
-          : false,
+        employees: !!include.employees ? true : false,
         address: true,
         doctorResponsible: true,
         tecResponsible: true,
@@ -720,6 +715,7 @@ export class CompanyRepository implements ICompanyRepository {
           const employeeCount = await this.prisma.employee.count({
             where: {
               OR: [
+                //! edit employee
                 { hierarchy: { workspaces: { some: { id: workspace.id } } } },
               ],
             },
