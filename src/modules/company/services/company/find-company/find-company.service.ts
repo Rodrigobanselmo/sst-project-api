@@ -15,6 +15,7 @@ export class FindCompanyService {
           workspace: true,
           primary_activity: true,
           secondary_activity: true,
+          clinicsAvailable: true,
         },
       },
     );

@@ -10,7 +10,7 @@ export const representAll = async (prisma: PrismaClient) => {
       companyId: 'b8635456-334e-4d6e-ac43-cfe5663aee17',
       severity: 0,
       representAll: true,
-      type: 'OTH',
+      type: 'OUTROS',
     },
   });
 };

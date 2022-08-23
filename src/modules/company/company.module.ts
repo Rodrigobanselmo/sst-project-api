@@ -14,6 +14,7 @@ import { CharacterizationPhotoRepository } from './repositories/implementations/
 import { CharacterizationRepository } from './repositories/implementations/CharacterizationRepository';
 import { CompanyRepository } from './repositories/implementations/CompanyRepository';
 import { EmployeeRepository } from './repositories/implementations/EmployeeRepository';
+import { CompanyClinicRepository } from './repositories/implementations/CompanyClinicRepository';
 import { EnvironmentPhotoRepository } from './repositories/implementations/EnvironmentPhotoRepository';
 import { EnvironmentRepository } from './repositories/implementations/EnvironmentRepository';
 import { HierarchyRepository } from './repositories/implementations/HierarchyRepository';
@@ -81,6 +82,7 @@ import { FindEmployeeHierarchyHistoryService } from './services/employee/0-histo
 import { EmployeeHierarchyHistoryRepository } from './repositories/implementations/EmployeeHierarchyHistoryRepository';
 import { EmployeeHierarchyHistoryController } from './controller/employee/employee-hierarchy-history.controller';
 import { UpdateEmployeeHierarchyHistoryService } from './services/employee/0-history/hierarchy/update/update.service';
+import { SetCompanyClinicsService } from './services/company/set-company-clinics/set-company-clinics.service';
 
 @Module({
   imports: [forwardRef(() => ChecklistModule)],
@@ -168,6 +170,8 @@ import { UpdateEmployeeHierarchyHistoryService } from './services/employee/0-his
     DeleteEmployeeHierarchyHistoryService,
     FindEmployeeHierarchyHistoryService,
     UpdateEmployeeHierarchyHistoryService,
+    SetCompanyClinicsService,
+    CompanyClinicRepository,
   ],
   exports: [
     CompanyRepository,

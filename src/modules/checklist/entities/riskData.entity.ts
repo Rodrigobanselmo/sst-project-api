@@ -114,6 +114,70 @@ export class RiskFactorDataEntity implements RiskFactorData {
   constructor(partial: Partial<RiskFactorDataEntity>) {
     Object.assign(this, partial);
 
+    this.getOrigin();
+
+    if (partial.riskFactor) {
+      this.riskFactor = new RiskFactorsEntity(partial.riskFactor);
+      this.getMatrix();
+    }
+
+    this.progress = 0;
+    this.isQuantity = false;
+
+    if (this.json && typeof this.json === 'object') {
+      const json = this.json as unknown as IRiskDataJson;
+
+      if (json.type === QuantityTypeEnum.QUI) this.quiProb(json);
+      if (json.type === QuantityTypeEnum.NOISE) this.noiseProb(json);
+      if (json.type === QuantityTypeEnum.VFB) this.vibProb(json);
+      if (json.type === QuantityTypeEnum.VL) this.vibLProb(json);
+      if (json.type === QuantityTypeEnum.RADIATION) this.radProb(json);
+      if (json.type === QuantityTypeEnum.HEAT) this.heatProb(json);
+    }
+
+    this.getBaseExams();
+    this.setRecMedExamData(partial);
+  }
+
+  private getBaseExams() {
+    if (this.riskFactor && this.riskFactor?.examToRisk && this.standardExams) {
+      this.riskFactor?.examToRisk.forEach((examData) => {
+        if (
+          examData?.minRiskDegreeQuantity &&
+          this.isQuantity &&
+          this.level < examData?.minRiskDegreeQuantity
+        )
+          return;
+
+        if (
+          examData?.minRiskDegree &&
+          (!this.isQuantity || !examData?.minRiskDegreeQuantity) &&
+          this.level < examData?.minRiskDegree
+        )
+          return;
+
+        this.examsToRiskFactorData.push({
+          examId: examData.examId,
+          fromAge: examData.fromAge,
+          isAdmission: examData.isAdmission,
+          isChange: examData.isChange,
+          isDismissal: examData.isDismissal,
+          isFemale: examData.isFemale,
+          isMale: examData.isMale,
+          isPeriodic: examData.isPeriodic,
+          isReturn: examData.isReturn,
+          lowValidityInMonths: examData.lowValidityInMonths,
+          riskFactorDataId: this.id,
+          toAge: examData.toAge,
+          validityInMonths: examData.validityInMonths,
+          isStandard: true,
+          exam: examData?.exam,
+        });
+      });
+    }
+  }
+
+  private setRecMedExamData(partial: Partial<RiskFactorDataEntity>) {
     if (!this.epis) this.epis = [];
     if (partial.epiToRiskFactorData) {
       this.epiToRiskFactorData = partial.epiToRiskFactorData.map(
@@ -158,27 +222,6 @@ export class RiskFactorDataEntity implements RiskFactorData {
             examsRiskData: examsToRiskFactorData,
           }),
       );
-    }
-
-    this.getOrigin();
-
-    if (partial.riskFactor) {
-      this.riskFactor = new RiskFactorsEntity(partial.riskFactor);
-      this.getMatrix();
-    }
-
-    this.progress = 0;
-    this.isQuantity = false;
-
-    if (this.json && typeof this.json === 'object') {
-      const json = this.json as unknown as IRiskDataJson;
-
-      if (json.type === QuantityTypeEnum.QUI) this.quiProb(json);
-      if (json.type === QuantityTypeEnum.NOISE) this.noiseProb(json);
-      if (json.type === QuantityTypeEnum.VFB) this.vibProb(json);
-      if (json.type === QuantityTypeEnum.VL) this.vibLProb(json);
-      if (json.type === QuantityTypeEnum.RADIATION) this.radProb(json);
-      if (json.type === QuantityTypeEnum.HEAT) this.heatProb(json);
     }
   }
 

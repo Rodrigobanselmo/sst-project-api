@@ -17,7 +17,16 @@ export const findAllCompanies = async (
       {},
       { take: 100000 },
       {
-        include: { primary_activity: true, secondary_activity: true },
+        include: {
+          primary_activity: true,
+          secondary_activity: true,
+          workspace: { include: { address: true } },
+          group: true,
+          doctorResponsible: true,
+          tecResponsible: true,
+          address: true,
+          contacts: { where: { isPrincipal: true } },
+        },
       },
     );
     data = response.data;

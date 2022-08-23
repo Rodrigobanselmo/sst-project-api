@@ -18,6 +18,7 @@ import { ContractEntity } from './contract.entity';
 import { ContactEntity } from './contact.entity';
 import { CompanyStepEnum } from 'src/shared/constants/enum/stepCompany.enum';
 import { DocumentCoverEntity } from './document-cover.entity';
+import { CompanyClinicsEntity } from './company-clinics.entity';
 
 export class CompanyEntity implements Company {
   @ApiProperty({ description: 'The id of the Company' })
@@ -122,6 +123,8 @@ export class CompanyEntity implements Company {
   paymentDay: number;
   isTaxNote: boolean;
   observationBank: string;
+  companiesToClinicAvailable: CompanyClinicsEntity;
+  clinicsAvailable: CompanyClinicsEntity;
 
   constructor(partial: Partial<CompanyEntity>) {
     Object.assign(this, partial);

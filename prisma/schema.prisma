@@ -117,7 +117,7 @@ enum RiskFactorsEnum {
   FIS
   ERG
   ACI
-  OTH
+  OUTROS
 }
 
 enum RiskRecTypeEnum {
@@ -309,6 +309,8 @@ model Company {
   covers DocumentCover[]
   doctorResponsible  Professional? @relation(name:"doctors_company_responsibles", fields: [doctorResponsibleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   tecResponsible  Professional? @relation(name:"tec_company_responsibles", fields: [tecResponsibleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  clinicsAvailable CompanyClinics[]  @relation(name: "companies_available")
+  companiesToClinicAvailable CompanyClinics[]  @relation(name: "clinics_available")
   // professionals Professional[] @relation(name:"companies_related") 
   stateRegistration String? // not in use
   size String? // not in use
@@ -322,6 +324,16 @@ model Company {
   mission String?
   vision String?
   values String?
+}
+
+model CompanyClinics {
+  company   Company @relation(name: "companies_available",fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  clinic  Company @relation(name: "clinics_available", fields: [clinicId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  companyId String 
+  clinicId String 
+  created_at DateTime @default(now())
+ 
+  @@id([companyId, clinicId])
 }
 
 model CompanyGroup {
@@ -685,7 +697,7 @@ model ExamToRisk {
 
 model ExamToRiskData {
   exam   Exam @relation(fields: [examId], references: [id])
-  risk    RiskFactorData  @relation(fields: [riskFactorDataId], references: [id])
+  risk    RiskFactorData  @relation(fields: [riskFactorDataId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   examId  Int
   riskFactorDataId String
   isMale Boolean @default(false)

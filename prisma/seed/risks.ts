@@ -61,7 +61,7 @@ export const seedRisks = async (prisma: PrismaClient, companyId: string) => {
         companyId: companyId,
         name: 'Todos',
         system: true,
-        type: 'OTH',
+        type: 'OUTROS',
         representAll: true,
         severity: 0,
       },

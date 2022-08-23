@@ -210,6 +210,10 @@ export class FindCompaniesDto extends PaginationQueryDto {
   @IsOptional()
   search?: string;
 
+  @IsString()
+  @IsOptional()
+  fantasy?: string;
+
   @IsInt()
   @IsOptional()
   userId?: number;
@@ -221,6 +225,10 @@ export class FindCompaniesDto extends PaginationQueryDto {
   @IsBoolean()
   @IsOptional()
   isClinic?: boolean;
+
+  @IsString()
+  @IsOptional()
+  clinicsCompanyId?: string;
 
   @IsBoolean()
   @IsOptional()

@@ -13,7 +13,16 @@ export class FindAllByHierarchyService {
       {
         include: {
           riskFactor: {
-            select: { name: true, severity: true, type: true, id: true },
+            select: {
+              name: true,
+              severity: true,
+              type: true,
+              representAll: true,
+              id: true,
+              examToRisk: {
+                include: { exam: { select: { name: true, id: true } } },
+              },
+            },
           },
           homogeneousGroup: {
             include: {

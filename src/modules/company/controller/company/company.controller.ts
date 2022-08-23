@@ -15,6 +15,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import { FindActivityDto } from '../../dto/activity.dto';
+import { SetCompanyClinicDto } from '../../dto/company-clinic.dto';
 import {
   CreateCompanyDto,
   FindCompaniesDto,
@@ -30,6 +31,7 @@ import { FindCepService } from '../../services/company/find-cep/find-cep.service
 import { FindCnaeService } from '../../services/company/find-cnae/find-cnae.service';
 import { FindCnpjService } from '../../services/company/find-cnpj/find-cnpj.service';
 import { FindCompanyService } from '../../services/company/find-company/find-company.service';
+import { SetCompanyClinicsService } from '../../services/company/set-company-clinics/set-company-clinics.service';
 import { UpdateCompanyService } from '../../services/company/update-company/update-company.service';
 
 @ApiTags('company')
@@ -47,6 +49,7 @@ export class CompanyController {
     private readonly findCepService: FindCepService,
     private readonly findCnaeService: FindCnaeService,
     private readonly copyCompanyService: CopyCompanyService,
+    private readonly setCompanyClinicsService: SetCompanyClinicsService,
   ) {}
 
   @Get()
@@ -57,7 +60,7 @@ export class CompanyController {
     return this.findAllCompaniesService.execute(userPayloadDto, query);
   }
 
-  @Get('user')
+  @Get('by-user')
   findAllByUser(
     @User() userPayloadDto: UserPayloadDto,
     @Query() query: FindCompaniesDto,
@@ -105,12 +108,6 @@ export class CompanyController {
     return this.addCompanyPhotoService.execute(userPayloadDto, file);
   }
 
-  // @Post('contract')
-  // createChild(@Body() createContractDto: CreateContractDto) {
-  //   return this.createContractService.execute(createContractDto);
-  // }
-
-  // edit company data or create if does not exist like workspace / primary_activity
   @Patch()
   update(@Body() updateCompanyDto: UpdateCompanyDto) {
     return this.updateCompanyService.execute(updateCompanyDto);
@@ -129,17 +126,14 @@ export class CompanyController {
     );
   }
 
-  // TODO: create disconnect users or activities or...
-  // @Patch('update/disconnect/:companyId')
-  // updateDisconnect(
-  //   @Param('companyId') id: string,
-  //   @Body() updateCompanyDto: UpdateCompanyDto,
-  // ) {
-  //   delete updateCompanyDto.myCompanyId;
-  //   delete updateCompanyDto.isConsulting;
-  //   delete updateCompanyDto.cnpj;
-  //   delete updateCompanyDto.license;
-
-  //   return this.updateCompanyService.execute(id, updateCompanyDto);
-  // }
+  @Post('/:companyId/set-clinics')
+  setClinics(
+    @Body() setCompanyClinicDto: SetCompanyClinicDto,
+    @User() userPayloadDto: UserPayloadDto,
+  ) {
+    return this.setCompanyClinicsService.execute(
+      setCompanyClinicDto,
+      userPayloadDto,
+    );
+  }
 }

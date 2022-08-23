@@ -520,7 +520,7 @@ export class CompanyRepository implements ICompanyRepository {
 
     const { where } = prismaFilter(whereInit, {
       query,
-      skip: ['search', 'userId', 'groupId', 'companiesIds'],
+      skip: ['search', 'userId', 'groupId', 'companiesIds', 'clinicsCompanyId'],
     });
 
     if ('search' in query) {
@@ -556,6 +556,12 @@ export class CompanyRepository implements ICompanyRepository {
       } as typeof options.where);
     }
 
+    if ('clinicsCompanyId' in query) {
+      (where.AND as any).push({
+        clinicsAvailable: { some: { companyId: query.clinicsCompanyId } },
+      } as typeof options.where);
+    }
+
     const response = await this.prisma.$transaction([
       this.prisma.company.count({
         where,
@@ -563,20 +569,18 @@ export class CompanyRepository implements ICompanyRepository {
       this.prisma.company.findMany({
         ...options,
         where,
-        include: {
-          workspace: { include: { address: true } },
-          group: true,
-          doctorResponsible: true,
-          tecResponsible: true,
-          address: true,
-          contacts: { where: { isPrincipal: true } },
-          ...options?.include,
-        },
         take: pagination.take || 20,
         skip: pagination.skip || 0,
         orderBy: { name: 'asc' },
       }),
     ]);
+
+    //     workspace: { include: { address: true } },
+    // group: true,
+    // doctorResponsible: true,
+    // tecResponsible: true,
+    // address: true,
+    // contacts: { where: { isPrincipal: true } },
 
     return {
       data: response[1].map((company) => new CompanyEntity(company)),

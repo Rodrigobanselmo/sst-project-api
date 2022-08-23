@@ -3,6 +3,7 @@ export enum ErrorMessageEnum {
   EMAIL_NOT_SEND = 'Erro no envio de email',
   NOT_FOUND_ON_COMPANY_TO_DELETE = 'Dado a ser deletado não foi encontrado nesta empresa',
   PRISMA_ERROR = 'Desculpe, algo de errado acontenceu, informe o suporte para mais detalhes',
+  FORBIDDEN_ACCESS = 'Você não tem permissão para realizar essa esta ação',
 
   //* PROFESSIONALS
   PROFESSIONAL_NOT_FOUND = 'Profissional não encontrado ou sem premissões de acesso',
