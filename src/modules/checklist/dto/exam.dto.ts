@@ -1,3 +1,4 @@
+import { QueryArray } from './../../../shared/transformers/query-array';
 import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
 import { PartialType } from '@nestjs/swagger';
 import { ExamTypeEnum, StatusEnum } from '@prisma/client';
@@ -83,4 +84,13 @@ export class FindExamDto extends PaginationQueryDto {
   @IsString()
   @IsOptional()
   companyId?: string;
+
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsOptional()
+  @IsString({ each: true })
+  @IsEnum(StatusEnum, {
+    message: `type must be one of: ${KeysOfEnum(StatusEnum)}`,
+    each: true,
+  })
+  status?: StatusEnum;
 }

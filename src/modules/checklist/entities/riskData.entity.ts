@@ -156,6 +156,8 @@ export class RiskFactorDataEntity implements RiskFactorData {
         )
           return;
 
+        if (!this.examsToRiskFactorData) this.examsToRiskFactorData = [];
+
         this.examsToRiskFactorData.push({
           examId: examData.examId,
           fromAge: examData.fromAge,

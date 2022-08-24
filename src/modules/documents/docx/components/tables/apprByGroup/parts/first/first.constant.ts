@@ -27,6 +27,7 @@ const RewRiskInventoryHeader = (): bodyTableProps[] => {
 
 export const firstRiskInventoryHeader = RewRiskInventoryHeader();
 
+//! have two of these
 export const hierarchyMap: Record<string, {text:string; index:number}> = {
   [HierarchyEnum.DIRECTORY]: {text:'DIRETORIA:', index: 0 },
   [HierarchyEnum.MANAGEMENT]: {text:'Gerência:', index: 1 },

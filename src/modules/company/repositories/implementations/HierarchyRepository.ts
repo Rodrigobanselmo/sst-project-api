@@ -549,4 +549,34 @@ export class HierarchyRepository {
 
     return new HierarchyEntity(AllChildrenHierarchies);
   }
+
+  async findByIdWithParent(id: string, companyId: string) {
+    const hierarchies = (await this.prisma.hierarchy.findUnique({
+      where: { id_companyId: { id, companyId } },
+      include: {
+        workspaces: true,
+        parent: {
+          include: {
+            parent: {
+              include: {
+                parent: {
+                  include: {
+                    parent: {
+                      include: {
+                        parent: {
+                          include: { parent: true },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    })) as HierarchyEntity;
+
+    return new HierarchyEntity(hierarchies);
+  }
 }

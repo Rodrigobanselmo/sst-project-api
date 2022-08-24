@@ -5,6 +5,7 @@ import { StatusEnum } from '@prisma/client';
 import { RecMedEntity } from './recMed.entity';
 import { GenerateSourceEntity } from './generateSource.entity';
 import { ExamRiskEntity } from './examRisk.entity';
+import { RiskFactorDataEntity } from './riskData.entity';
 
 export class RiskFactorsEntity implements RiskFactors {
   @ApiProperty({ description: 'The id of the Company' })
@@ -81,6 +82,7 @@ export class RiskFactorsEntity implements RiskFactors {
   carnogenicityACGIH: string;
   carnogenicityLinach: string;
   examToRisk: ExamRiskEntity[];
+  riskFactorData: RiskFactorDataEntity[];
 
   constructor(partial: Partial<RiskFactorsEntity>) {
     Object.assign(this, partial);

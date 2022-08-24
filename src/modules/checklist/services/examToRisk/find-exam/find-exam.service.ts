@@ -17,7 +17,7 @@ export class FindExamRiskService {
       { skip, take },
       {
         include: {
-          exam: { select: { name: true, id: true } },
+          exam: { select: { name: true, id: true, isAttendance: true } },
           risk: { select: { name: true, id: true, type: true } },
         },
       },

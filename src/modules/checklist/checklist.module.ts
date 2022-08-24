@@ -36,6 +36,7 @@ import { FindEpiService } from './services/epi/find-epi/find-epi.service';
 import { UpdateEpiService } from './services/epi/update-epi/update-epi.service';
 import { CreateExamService } from './services/exam/create-exam/create-exam.service';
 import { DeleteSoftExamService } from './services/exam/delete-soft-exam/delete-soft-exam.service';
+import { FindExamByHierarchyService } from './services/exam/find-by-hierarchy /find-exam-by-hierarchy.service';
 import { FindExamService } from './services/exam/find-exam/find-exam.service';
 import { UpdateExamService } from './services/exam/update-exam/update-exam.service';
 import { FindExamToClinicService } from './services/examToClinic/find-exam-to-clinic/find-exam-to-clinic.service';
@@ -136,6 +137,7 @@ import { UpdateRiskService } from './services/risk/update-risk/update-risk.servi
     UpdateExamRiskService,
     FindExamRiskService,
     CreateExamRiskService,
+    FindExamByHierarchyService,
   ],
   exports: [
     RiskRepository,

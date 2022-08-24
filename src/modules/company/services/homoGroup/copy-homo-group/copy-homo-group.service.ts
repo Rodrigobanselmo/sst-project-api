@@ -54,7 +54,7 @@ export class CopyHomoGroupService {
       if (hierarchyId) {
         return this.riskDataRepository.findAllByHierarchyId(
           companyIdFrom,
-          riskGroupIdFrom,
+          // riskGroupIdFrom,
           hierarchyId,
         );
       }

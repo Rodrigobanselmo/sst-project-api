@@ -19,6 +19,7 @@ import { UpdateExamService } from '../../services/exam/update-exam/update-exam.s
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
 import { FindExamService } from '../../services/exam/find-exam/find-exam.service';
+import { FindExamByHierarchyService } from '../../services/exam/find-by-hierarchy /find-exam-by-hierarchy.service';
 
 @Controller('exam')
 export class ExamController {
@@ -27,6 +28,7 @@ export class ExamController {
     private readonly findExamService: FindExamService,
     private readonly updateExamService: UpdateExamService,
     private readonly deleteSoftExamService: DeleteSoftExamService,
+    private readonly findExamByHierarchyService: FindExamByHierarchyService,
   ) {}
 
   @Permissions({
@@ -49,6 +51,14 @@ export class ExamController {
     @Query() query: FindExamDto,
   ) {
     return this.findExamService.execute(query, userPayloadDto);
+  }
+
+  @Get('/hierarchy/:hierarchyId/:companyId')
+  findByHierarchy(
+    @User() userPayloadDto: UserPayloadDto,
+    @Param('hierarchyId') hierarchyId: string,
+  ) {
+    return this.findExamByHierarchyService.execute(hierarchyId, userPayloadDto);
   }
 
   @Permissions({

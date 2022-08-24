@@ -23,5 +23,7 @@ export class ExamRiskDataEntity implements ExamToRiskData {
 
   constructor(partial: Partial<ExamRiskDataEntity>) {
     Object.assign(this, partial);
+
+    if (this?.riskData) this.riskData = new RiskFactorDataEntity(this.riskData);
   }
 }

@@ -154,14 +154,14 @@ export class RiskDataController {
   @Get('/:companyId/:groupId/hierarchy/:hierarchyId')
   findAllAvailableByHierarchy(
     @User() userPayloadDto: UserPayloadDto,
-    @Param('groupId') groupId: string,
+    // @Param('groupId') groupId: string,
     @Param('hierarchyId') hierarchyId: string,
   ) {
     const companyId = userPayloadDto.targetCompanyId;
 
     return this.findAllByHierarchyService.execute(
       hierarchyId,
-      groupId,
+      // groupId,
       companyId,
     );
   }

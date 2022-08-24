@@ -273,29 +273,67 @@ export class RiskDataRepository {
 
   async findAllByHierarchyId(
     companyId: string,
-    riskFactorGroupDataId: string,
+    // riskFactorGroupDataId: string,
     hierarchyId: string,
     options: Prisma.RiskFactorDataFindManyArgs = {},
   ) {
     const riskFactorData = (await this.prisma.riskFactorData.findMany({
+      ...options,
       where: {
-        riskFactorGroupDataId,
+        // riskFactorGroupDataId,
         companyId,
         homogeneousGroup: { hierarchyOnHomogeneous: { some: { hierarchyId } } },
+        ...options?.where,
       },
-      ...options,
       include: {
-        adms: true,
-        recs: true,
+        adms: {
+          select: {
+            medName: true,
+            medType: true,
+            id: true,
+            riskId: true,
+          },
+        },
+        recs: {
+          select: {
+            recName: true,
+            recType: true,
+            id: true,
+            riskId: true,
+          },
+        },
         generateSources: true,
         epiToRiskFactorData: { include: { epi: true } },
-        engsToRiskFactorData: { include: { recMed: true } },
-        examsToRiskFactorData: { include: { exam: true } },
+        engsToRiskFactorData: {
+          include: {
+            recMed: {
+              select: {
+                medName: true,
+                medType: true,
+                id: true,
+                riskId: true,
+              },
+            },
+          },
+        },
+        examsToRiskFactorData: {
+          include: {
+            exam: { select: { name: true, status: true } },
+          },
+        },
         ...options.include,
       },
     })) as RiskFactorDataEntity[];
 
     return riskFactorData.map((data) => new RiskFactorDataEntity(data));
+  }
+
+  async findNude(options: Prisma.RiskFactorDataFindManyArgs = {}) {
+    const response = await this.prisma.riskFactorData.findMany({
+      ...options,
+    });
+
+    return response.map((exam) => new RiskFactorDataEntity(exam));
   }
 
   async deleteById(id: string) {

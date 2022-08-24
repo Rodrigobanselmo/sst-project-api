@@ -1,6 +1,9 @@
 import { CharacterizationTypeEnum, HierarchyEnum } from '@prisma/client';
 
-export const originRiskMap: Record<string, { name: string; type: string }> = {
+export const originRiskMap: Record<
+  string,
+  { name: string; type: string; prioritization?: number }
+> = {
   [CharacterizationTypeEnum.GENERAL]: {
     name: 'Visão Geral',
     type: 'Ambiente',
@@ -29,13 +32,34 @@ export const originRiskMap: Record<string, { name: string; type: string }> = {
     name: 'Posto de Trabalho',
     type: 'Mão de Obra',
   },
-  [HierarchyEnum.DIRECTORY]: { name: 'Diretoria', type: 'Nível Hierarquico' },
-  [HierarchyEnum.MANAGEMENT]: { name: 'Gerência', type: 'Nível Hierarquico' },
-  [HierarchyEnum.SECTOR]: { name: 'Setor', type: 'Nível Hierarquico' },
-  [HierarchyEnum.SUB_SECTOR]: { name: 'Sub Setor', type: 'Nível Hierarquico' },
-  [HierarchyEnum.OFFICE]: { name: 'Cargo', type: 'Nível Hierarquico' },
+  [HierarchyEnum.DIRECTORY]: {
+    name: 'Diretoria',
+    type: 'Nível Hierarquico',
+    prioritization: 7,
+  },
+  [HierarchyEnum.MANAGEMENT]: {
+    name: 'Gerência',
+    type: 'Nível Hierarquico',
+    prioritization: 6,
+  },
+  [HierarchyEnum.SECTOR]: {
+    name: 'Setor',
+    type: 'Nível Hierarquico',
+    prioritization: 5,
+  },
+  [HierarchyEnum.SUB_SECTOR]: {
+    name: 'Sub Setor',
+    type: 'Nível Hierarquico',
+    prioritization: 4,
+  },
+  [HierarchyEnum.OFFICE]: {
+    name: 'Cargo',
+    type: 'Nível Hierarquico',
+    prioritization: 2,
+  },
   [HierarchyEnum.SUB_OFFICE]: {
     name: 'Cargo Desenvolvido',
     type: 'Nível Hierarquico',
+    prioritization: 1,
   },
 };

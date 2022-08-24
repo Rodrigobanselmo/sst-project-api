@@ -5,10 +5,14 @@ import { RiskDataRepository } from '../../../repositories/implementations/RiskDa
 export class FindAllByHierarchyService {
   constructor(private readonly riskDataRepository: RiskDataRepository) {}
 
-  async execute(hierarchyId: string, groupId: string, companyId: string) {
+  async execute(
+    hierarchyId: string,
+    // groupId: string,
+    companyId: string,
+  ) {
     const riskData = await this.riskDataRepository.findAllByHierarchyId(
       companyId,
-      groupId,
+      // groupId,
       hierarchyId,
       {
         include: {
@@ -21,6 +25,7 @@ export class FindAllByHierarchyService {
               id: true,
               examToRisk: {
                 include: { exam: { select: { name: true, id: true } } },
+                where: { companyId },
               },
             },
           },
@@ -37,6 +42,7 @@ export class FindAllByHierarchyService {
           engsToRiskFactorData: false,
           epiToRiskFactorData: false,
         },
+        where: { riskFactor: { representAll: false } }, // remove standard risk
       },
     );
 

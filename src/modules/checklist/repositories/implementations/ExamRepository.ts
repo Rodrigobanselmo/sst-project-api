@@ -71,8 +71,9 @@ export class ExamRepository {
   ) {
     const whereInit = {
       AND: [],
+      ...options.where,
     } as typeof options.where;
-
+    console.log(query);
     const include = { ...options?.include };
 
     const { where } = prismaFilter(whereInit, {
@@ -88,14 +89,30 @@ export class ExamRepository {
 
     const response = await this.prisma.$transaction([
       this.prisma.exam.count({
-        where,
+        where: { OR: [where, { system: true }] },
       }),
       this.prisma.exam.findMany({
-        where,
+        where: { OR: [where, { system: true }] },
         include: Object.keys(include).length > 0 ? include : undefined,
         take: pagination.take || 20,
         skip: pagination.skip || 0,
         orderBy: { name: 'asc' },
+      }),
+    ]);
+
+    return {
+      data: response[1].map((exam) => new ExamEntity(exam)),
+      count: response[0],
+    };
+  }
+
+  async findNude(options: Prisma.ExamFindManyArgs = {}) {
+    const response = await this.prisma.$transaction([
+      this.prisma.exam.count({
+        where: options.where,
+      }),
+      this.prisma.exam.findMany({
+        ...options,
       }),
     ]);
 

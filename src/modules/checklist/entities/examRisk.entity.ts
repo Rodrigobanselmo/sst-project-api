@@ -1,6 +1,7 @@
 import { ExamToRisk, RiskFactors } from '@prisma/client';
 
 import { ExamEntity } from './exam.entity';
+import { RiskFactorsEntity } from './risk.entity';
 
 export class ExamRiskEntity implements ExamToRisk {
   id: number;
@@ -18,7 +19,7 @@ export class ExamRiskEntity implements ExamToRisk {
   lowValidityInMonths: number;
   fromAge: number;
   toAge: number;
-  risk?: RiskFactors;
+  risk?: RiskFactorsEntity;
   exam?: ExamEntity;
   startDate: Date;
   endDate: Date;
