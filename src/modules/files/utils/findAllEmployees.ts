@@ -98,10 +98,6 @@ export const findAllEmployees = async (
       (hierarchy) => hierarchy.id === employee.hierarchyId,
     )?.workspaceIds;
 
-    console.log(
-      hierarchies.find((hierarchy) => hierarchy.id === employee.hierarchyId),
-    );
-
     const workspace = workspaces.find(
       (workspace) =>
         hierarchyWorkspace &&

@@ -12,7 +12,12 @@ import {
 
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
-import { CreateExamDto, FindExamDto, UpdateExamDto } from '../../dto/exam.dto';
+import {
+  CreateExamDto,
+  FindExamDto,
+  FindExamHierarchyDto,
+  UpdateExamDto,
+} from '../../dto/exam.dto';
 import { CreateExamService } from '../../services/exam/create-exam/create-exam.service';
 import { DeleteSoftExamService } from '../../services/exam/delete-soft-exam/delete-soft-exam.service';
 import { UpdateExamService } from '../../services/exam/update-exam/update-exam.service';
@@ -57,8 +62,13 @@ export class ExamController {
   findByHierarchy(
     @User() userPayloadDto: UserPayloadDto,
     @Param('hierarchyId') hierarchyId: string,
+    @Query() query: FindExamHierarchyDto,
   ) {
-    return this.findExamByHierarchyService.execute(hierarchyId, userPayloadDto);
+    return this.findExamByHierarchyService.execute(
+      hierarchyId,
+      userPayloadDto,
+      query,
+    );
   }
 
   @Permissions({

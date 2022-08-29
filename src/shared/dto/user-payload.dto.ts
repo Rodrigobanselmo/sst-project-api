@@ -1,6 +1,7 @@
 import {
   IsBoolean,
   IsEmail,
+  IsInt,
   IsNumber,
   IsOptional,
   IsString,
@@ -18,7 +19,7 @@ export class UserCompanyDto {
 }
 
 export class UserPayloadDto extends UserCompanyDto {
-  @IsString()
+  @IsInt()
   readonly userId: number;
 
   @IsString()

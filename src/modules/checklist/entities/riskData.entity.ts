@@ -169,6 +169,7 @@ export class RiskFactorDataEntity implements RiskFactorData {
           isPeriodic: examData.isPeriodic,
           isReturn: examData.isReturn,
           lowValidityInMonths: examData.lowValidityInMonths,
+          considerBetweenDays: examData.considerBetweenDays,
           riskFactorDataId: this.id,
           toAge: examData.toAge,
           validityInMonths: examData.validityInMonths,

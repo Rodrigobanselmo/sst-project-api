@@ -1,6 +1,10 @@
+import { FindExamHierarchyDto } from './../../../dto/exam.dto';
+import { ExamRiskEntity } from './../../../entities/examRisk.entity';
+import { EmployeeEntity } from './../../../../company/entities/employee.entity';
+import { EmployeeRepository } from './../../../../company/repositories/implementations/EmployeeRepository';
 import { IExamOriginData } from './../../../entities/exam.entity';
 import { Injectable } from '@nestjs/common';
-import { HomoTypeEnum } from '@prisma/client';
+import { HomoTypeEnum, SexTypeEnum } from '@prisma/client';
 
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { HierarchyRepository } from '../../../../company/repositories/implementations/HierarchyRepository';
@@ -9,16 +13,25 @@ import { originRiskMap } from './../../../../../shared/constants/maps/origin-ris
 import { RiskDataRepository } from './../../../repositories/implementations/RiskDataRepository';
 import { sortNumber } from '../../../../../shared/utils/sorts/number.sort';
 import { sortString } from '../../../../../shared/utils/sorts/string.sort';
+import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 
 @Injectable()
 export class FindExamByHierarchyService {
+  private employee: EmployeeEntity;
+
   constructor(
+    private readonly employeeRepository: EmployeeRepository,
     private readonly examRepository: ExamRepository,
     private readonly riskDataRepository: RiskDataRepository,
     private readonly hierarchyRepository: HierarchyRepository,
+    private readonly dayjs: DayJSProvider,
   ) {}
 
-  async execute(hierarchyId: string, user: UserPayloadDto) {
+  async execute(
+    hierarchyId: string,
+    user: UserPayloadDto,
+    query: FindExamHierarchyDto,
+  ) {
     const companyId = user.targetCompanyId;
     const hierarchy = await this.hierarchyRepository.findByIdWithParent(
       hierarchyId,
@@ -27,6 +40,13 @@ export class FindExamByHierarchyService {
 
     const hierarchies = [hierarchy, ...(hierarchy?.parents || [])];
     const hierarchyIds = hierarchies.map(({ id }) => id);
+
+    if (query.employeeId) {
+      this.employee = await this.employeeRepository.findById(
+        query.employeeId,
+        companyId,
+      );
+    }
 
     const riskData = await this.riskDataRepository.findNude({
       include: {
@@ -93,6 +113,7 @@ export class FindExamByHierarchyService {
           origin: examData.isStandard ? 'Padrão' : rd.origin,
           prioritization: (examData.isStandard ? 100 : rd.prioritization) || 3,
           homogeneousGroup: rd.homogeneousGroup,
+          skipEmployee: this.checkIfSkipEmployee(examData),
           risk: rd.riskFactor,
         });
       });
@@ -159,6 +180,7 @@ export class FindExamByHierarchyService {
             isAttendance: !!exam?.isAttendance,
           } as any,
           prioritization: 100,
+          skipEmployee: this.checkIfSkipEmployee(examToRisk),
           risk: examToRisk.risk,
         });
       });
@@ -306,5 +328,23 @@ export class FindExamByHierarchyService {
     // });
 
     return { data: examsDataReturn };
+  }
+
+  checkIfSkipEmployee(examRisk: IExamOriginData) {
+    if (!this.employee) return null;
+
+    const age = this.dayjs.dayjs().diff(this.employee.birthday, 'years');
+    if (
+      (examRisk.fromAge && examRisk.fromAge > age) ||
+      (examRisk.toAge && examRisk.toAge < age)
+    )
+      return true;
+
+    const isMale = this.employee.sex === SexTypeEnum.M;
+
+    if (isMale && !examRisk.isMale) return true;
+    if (!isMale && !examRisk.isFemale) return true;
+
+    return false;
   }
 }

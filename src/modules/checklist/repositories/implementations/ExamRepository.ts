@@ -35,7 +35,6 @@ export class ExamRepository {
     companyId,
     ...createExamDto
   }: UpdateExamDto & { id: number }): Promise<ExamEntity> {
-    console.log(createExamDto);
     const Exam = await this.prisma.exam.update({
       data: {
         ...createExamDto,

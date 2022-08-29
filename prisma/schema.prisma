@@ -64,6 +64,31 @@ enum EmployeeHierarchyMotiveTypeEnum {
   DEM
 }
 
+enum ExamHistoryTypeEnum {
+  ADMI
+  PERI
+  RETU
+  CHAN
+  EVAL
+  DEMI
+}
+
+enum ExamHistoryEvaluationEnum {
+  NONE
+  APTO
+  INAPT
+  INCONCLUSIVE
+}
+
+enum ExamHistoryConclusionEnum {
+  NORMAL
+  ALTER
+  ALTER_1
+  ALTER_2
+  ALTER_3
+  NONE
+}
+
 enum HierarchyEnum {
   DIRECTORY 
   MANAGEMENT
@@ -311,6 +336,7 @@ model Company {
   tecResponsible  Professional? @relation(name:"tec_company_responsibles", fields: [tecResponsibleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   clinicsAvailable CompanyClinics[]  @relation(name: "companies_available")
   companiesToClinicAvailable CompanyClinics[]  @relation(name: "clinics_available")
+  examClinicHistory EmployeeExamsHistory[]  
   // professionals Professional[] @relation(name:"companies_related") 
   stateRegistration String? // not in use
   size String? // not in use
@@ -553,9 +579,25 @@ model EmployeeExamsHistory {
   id    Int   @id  @default(autoincrement())
   created_at DateTime @default(now())
   updated_at  DateTime   @updatedAt
+  
   doneDate DateTime?
-  validityInMonths Int?
   time String?
+  validityInMonths Int?
+  examType ExamHistoryTypeEnum?
+  evaluationType ExamHistoryEvaluationEnum?
+  conclusion ExamHistoryConclusionEnum?
+  obs String?
+  status StatusEnum @default(DONE)
+  
+
+  userScheduleId Int?
+  userSchedule User? @relation(name: "user_schedule", fields: [userScheduleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  userDoneId Int?
+  userDone User? @relation(name: "user_done", fields: [userDoneId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  doctorId Int?
+  doctor Professional? @relation(fields: [doctorId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  clinicId String?
+  clinic Company? @relation(fields: [clinicId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   examId Int
   exam Exam @relation(fields: [examId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   employeeId Int
@@ -685,6 +727,7 @@ model ExamToRisk {
   isDismissal Boolean @default(false)
   validityInMonths Int?
   lowValidityInMonths Int?
+  considerBetweenDays Int?
   fromAge Int?
   toAge Int?
   minRiskDegreeQuantity Int? @default(1)
@@ -709,6 +752,7 @@ model ExamToRiskData {
   isDismissal Boolean @default(false)
   validityInMonths Int?
   lowValidityInMonths Int?
+  considerBetweenDays Int?
   fromAge Int?
   toAge Int?
 
@@ -838,6 +882,7 @@ model Professional {
   tecCompanyResponsible  Company[] @relation(name:"tec_company_responsibles")
   inviteId String? @unique
   invite InviteUsers? @relation(fields: [inviteId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  examDoctorHistory EmployeeExamsHistory[]  
   // companies Company[] @relation(name:"companies_related") 
 
   @@unique([id, companyId])
@@ -1096,6 +1141,8 @@ model User {
   usersPgrSignatures RiskFactorGroupDataToUser[]
   refresh_token RefreshToken[]
   companies UserCompany[]
+  examDone EmployeeExamsHistory[] @relation(name: "user_done")
+  examSchedules EmployeeExamsHistory[] @relation(name: "user_schedule")
   professional Professional? 
 
   @@unique([id, name])

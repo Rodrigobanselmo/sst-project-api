@@ -94,3 +94,9 @@ export class FindExamDto extends PaginationQueryDto {
   })
   status?: StatusEnum;
 }
+
+export class FindExamHierarchyDto {
+  @IsInt()
+  @IsOptional()
+  employeeId?: number;
+}

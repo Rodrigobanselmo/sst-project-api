@@ -11,6 +11,8 @@ dayjs.extend(utc);
 dayjs.extend(utc);
 dayjs.extend(timezone);
 class DayJSProvider implements IDateProvider {
+  dayjs = dayjs;
+
   addSeconds(date: Date, seconds: number): Date {
     return dayjs(date).add(seconds, 'seconds').toDate();
   }

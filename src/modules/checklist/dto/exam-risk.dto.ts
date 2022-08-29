@@ -59,6 +59,11 @@ export class CreateExamsRiskDto {
   @IsOptional()
   lowValidityInMonths: number;
 
+  @ValidateIf((o) => o.considerBetweenDays !== null)
+  @IsInt()
+  @IsOptional()
+  considerBetweenDays: number;
+
   @ValidateIf((o) => o.fromAge !== null)
   @IsInt()
   @IsOptional()

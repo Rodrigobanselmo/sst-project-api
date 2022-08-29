@@ -17,6 +17,7 @@ export class ExamRiskEntity implements ExamToRisk {
   isDismissal: boolean;
   validityInMonths: number;
   lowValidityInMonths: number;
+  considerBetweenDays: number;
   fromAge: number;
   toAge: number;
   risk?: RiskFactorsEntity;

@@ -9,6 +9,7 @@ import { RiskFactorDataEntity } from './riskData.entity';
 export interface IExamOriginData extends Partial<ExamRiskDataEntity> {
   origin?: string;
   prioritization?: number;
+  skipEmployee?: boolean;
   homogeneousGroup?: HomoGroupEntity;
   risk?: { name: string; id: string };
 }

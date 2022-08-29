@@ -16,12 +16,25 @@ import { EmployeeExamsHistoryEntity } from '../../entities/employee-exam-history
 export class EmployeeExamsHistoryRepository {
   constructor(private prisma: PrismaService) {}
 
-  async create(createData: CreateEmployeeExamHistoryDto) {
-    const data = await this.prisma.employeeExamsHistory.create({
-      data: createData,
+  async create({
+    examsData = [],
+    ...createData
+  }: CreateEmployeeExamHistoryDto & {
+    userDoneId?: number;
+    userScheduleId?: number;
+  }) {
+    const data = await this.prisma.employeeExamsHistory.createMany({
+      data: [
+        createData,
+        ...examsData.map((exam) => ({
+          employeeId: createData.employeeId,
+          userDoneId: createData.userDoneId,
+          ...exam,
+        })),
+      ],
     });
 
-    return new EmployeeExamsHistoryEntity(data);
+    return data;
   }
 
   async update({ id, ...updateData }: UpdateEmployeeExamHistoryDto) {

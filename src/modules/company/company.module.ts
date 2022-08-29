@@ -83,6 +83,12 @@ import { EmployeeHierarchyHistoryRepository } from './repositories/implementatio
 import { EmployeeHierarchyHistoryController } from './controller/employee/employee-hierarchy-history.controller';
 import { UpdateEmployeeHierarchyHistoryService } from './services/employee/0-history/hierarchy/update/update.service';
 import { SetCompanyClinicsService } from './services/company/set-company-clinics/set-company-clinics.service';
+import { FindEmployeeExamHistoryService } from './services/employee/0-history/exams/find/find.service';
+import { EmployeeExamsHistoryRepository } from './repositories/implementations/EmployeeExamsHistoryRepository';
+import { CreateEmployeeExamHistoryService } from './services/employee/0-history/exams/create/create.service';
+import { UpdateEmployeeExamHistoryService } from './services/employee/0-history/exams/update/update.service';
+import { DeleteEmployeeExamHistoryService } from './services/employee/0-history/exams/delete/delete.service';
+import { EmployeeExamHistoryController } from './controller/employee/employee-exam-history.controller';
 
 @Module({
   imports: [forwardRef(() => ChecklistModule)],
@@ -96,6 +102,7 @@ import { SetCompanyClinicsService } from './services/company/set-company-clinics
     CompanyGroupController,
     ContactController,
     EmployeeHierarchyHistoryController,
+    EmployeeExamHistoryController,
   ],
   providers: [
     CreateCompanyService,
@@ -172,6 +179,11 @@ import { SetCompanyClinicsService } from './services/company/set-company-clinics
     UpdateEmployeeHierarchyHistoryService,
     SetCompanyClinicsService,
     CompanyClinicRepository,
+    FindEmployeeExamHistoryService,
+    EmployeeExamsHistoryRepository,
+    CreateEmployeeExamHistoryService,
+    UpdateEmployeeExamHistoryService,
+    DeleteEmployeeExamHistoryService,
   ],
   exports: [
     CompanyRepository,
