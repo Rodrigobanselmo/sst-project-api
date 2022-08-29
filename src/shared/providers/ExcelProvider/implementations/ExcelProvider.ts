@@ -208,7 +208,7 @@ class ExcelProvider implements IExcelProvider {
 
         if (cellSchema.isArray) {
           if (typeof cellValue === 'string') cellValue = [cellValue];
-          cellValue.forEach((value, indexRow) => {
+          (cellValue || []).forEach((value, indexRow) => {
             if (!rows[indexRow]) rows[indexRow] = [];
             if (typeof value === 'object') {
               if (indexRow !== 0) rows[indexRow][0] = '-';
