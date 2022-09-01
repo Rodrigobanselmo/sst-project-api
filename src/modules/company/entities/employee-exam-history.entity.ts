@@ -4,6 +4,8 @@ import {
   ExamHistoryConclusionEnum,
   ExamHistoryTypeEnum,
   StatusEnum,
+  User,
+  Exam,
 } from '@prisma/client';
 import { UserEntity } from '../../../modules/users/entities/user.entity';
 import { ExamEntity } from '../../../modules/checklist/entities/exam.entity';
@@ -16,6 +18,7 @@ export class EmployeeExamsHistoryEntity implements EmployeeExamsHistory {
   id: number;
   created_at: Date;
   updated_at: Date;
+  expiredDate: Date;
   doneDate: Date;
   validityInMonths: number;
   time: string;
@@ -33,15 +36,23 @@ export class EmployeeExamsHistoryEntity implements EmployeeExamsHistory {
   examId: number;
   employeeId: number;
   employee: EmployeeEntity;
-  exam: ExamEntity;
+  exam?: ExamEntity;
   userScheduleId: number;
-  userSchedule: UserEntity;
+  userSchedule?: UserEntity;
   userDoneId: number;
-  userDone: UserEntity;
+  userDone?: UserEntity;
 
   validation: string;
 
-  constructor(partial: Partial<EmployeeExamsHistoryEntity>) {
+  constructor(
+    partial: Partial<
+      Omit<EmployeeExamsHistoryEntity, 'userSchedule' | 'userDone' | 'exam'> & {
+        userSchedule?: User;
+        userDone?: User;
+        exam?: Exam;
+      }
+    >,
+  ) {
     Object.assign(this, partial);
   }
 }

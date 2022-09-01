@@ -45,6 +45,11 @@ export class FindExamByHierarchyService {
       this.employee = await this.employeeRepository.findById(
         query.employeeId,
         companyId,
+        {
+          include: {
+            examsHistory: { where: { expiredDate: { gte: new Date() } } },
+          },
+        },
       );
     }
 
@@ -84,7 +89,13 @@ export class FindExamByHierarchyService {
             some: { hierarchyId: { in: hierarchyIds } },
           },
         },
-        examsToRiskFactorData: { some: { examId: { gt: 0 } } },
+        OR: [
+          { examsToRiskFactorData: { some: { examId: { gt: 0 } } } },
+          {
+            riskFactor: { examToRisk: { some: { examId: { gt: 0 } } } },
+            standardExams: true,
+          },
+        ],
       },
     });
 
@@ -115,6 +126,7 @@ export class FindExamByHierarchyService {
           homogeneousGroup: rd.homogeneousGroup,
           skipEmployee: this.checkIfSkipEmployee(examData),
           risk: rd.riskFactor,
+          ...this.checkExpiredDate(examData),
         });
       });
       // exams
@@ -182,6 +194,7 @@ export class FindExamByHierarchyService {
           prioritization: 100,
           skipEmployee: this.checkIfSkipEmployee(examToRisk),
           risk: examToRisk.risk,
+          ...this.checkExpiredDate(examToRisk),
         });
       });
     });
@@ -204,147 +217,180 @@ export class FindExamByHierarchyService {
         sortNumber(b.exam.isAttendance ? 1 : 0, a.exam.isAttendance ? 1 : 0),
       );
 
-    // const Exam = await this.examRepository.findNude({
-    //   include: {
-    //     examToRisk: {
-    //       include: {
-    //         risk: {
-    //           select: {
-    //             name: true,
-    //             id: true,
-    //             representAll: true,
-    //             riskFactorData: {
-    //               // include: {
-    //               //   homogeneousGroup: { include: { characterization: true } },
-    //               // },
-    //               where: {
-    //                 companyId,
-    //                 homogeneousGroup: {
-    //                   hierarchyOnHomogeneous: {
-    //                     some: {
-    //                       hierarchyId: { in: hierarchyIds },
-    //                     },
-    //                   },
-    //                 },
-    //               },
-    //             },
-    //           },
-    //         },
-    //       },
-    //       where: { companyId },
-    //     },
-    //     examToRiskData: {
-    //       include: {
-    //         risk: {
-    //           include: {
-    //             riskFactor: {
-    //               select: { name: true, id: true },
-    //             },
-    //           },
-    //         },
-    //       },
-    //     },
-    //   },
-    //   where: {
-    //     AND: [
-    //       {
-    //         //tenant
-    //         OR: [
-    //           { system: true },
-    //           { companyId },
-    //           {
-    //             company: {
-    //               applyingServiceContracts: {
-    //                 some: { receivingServiceCompanyId: companyId },
-    //               },
-    //             },
-    //           },
-    //           {
-    //             company: {
-    //               receivingServiceContracts: {
-    //                 some: { applyingServiceCompanyId: companyId },
-    //               },
-    //             },
-    //           },
-    //         ],
-    //       },
-    //       {
-    //         // rules
-    //         OR: [
-    //           {
-    //             examToRisk: {
-    //               some: {
-    //                 companyId: companyId,
-    //                 risk: {
-    //                   riskFactorData: {
-    //                     some: {
-    //                       examsToRiskFactorData: {
-    //                         some: {
-    //                           risk: {
-    //                             companyId: companyId,
-    //                             homogeneousGroup: {
-    //                               hierarchyOnHomogeneous: {
-    //                                 some: {
-    //                                   hierarchyId: { in: hierarchyIds },
-    //                                 },
-    //                               },
-    //                             },
-    //                           },
-    //                         },
-    //                       },
-    //                     },
-    //                   },
-    //                 },
-    //               },
-    //             },
-    //           },
-    //           {
-    //             examToRisk: {
-    //               some: {
-    //                 companyId: companyId,
-    //                 risk: { representAll: true },
-    //               },
-    //             },
-    //           },
-    //           {
-    //             examToRiskData: {
-    //               some: {
-    //                 risk: {
-    //                   companyId: companyId,
-    //                   examsToRiskFactorData: { some: { examId: { gt: 0 } } },
-    //                   homogeneousGroup: {
-    //                     hierarchyOnHomogeneous: {
-    //                       some: { hierarchyId: { in: hierarchyIds } },
-    //                     },
-    //                   },
-    //                 },
-    //               },
-    //             },
-    //           },
-    //         ],
-    //       },
-    //     ],
-    //   },
-    // });
-
     return { data: examsDataReturn };
   }
 
   checkIfSkipEmployee(examRisk: IExamOriginData) {
     if (!this.employee) return null;
-
     const age = this.dayjs.dayjs().diff(this.employee.birthday, 'years');
-    if (
+    const isOutOfAgeRange =
       (examRisk.fromAge && examRisk.fromAge > age) ||
-      (examRisk.toAge && examRisk.toAge < age)
-    )
-      return true;
+      (examRisk.toAge && examRisk.toAge < age);
+
+    if (isOutOfAgeRange) return true;
 
     const isMale = this.employee.sex === SexTypeEnum.M;
+    const isNotIncludeMale = this.employee.sex && isMale && !examRisk.isMale;
+    const isNotIncludeFemale =
+      this.employee.sex && !isMale && !examRisk.isFemale;
 
-    if (isMale && !examRisk.isMale) return true;
-    if (!isMale && !examRisk.isFemale) return true;
+    if (isNotIncludeMale) return true;
+    if (isNotIncludeFemale) return true;
+
+    // const isExamValid = this.employee.examsHistory.some(
+    //   (exam) =>
+    //     exam.examId === examRisk.examId &&
+    //     this.dayjs.compareTime(
+    //       this.dayjs.dateNow(),
+    //       exam.expiredDate,
+    //       'days',
+    //     ) >= examRisk.considerBetweenDays,
+    // );
+
+    // if (isExamValid) return true;
 
     return false;
   }
+
+  checkExpiredDate(examRisk: IExamOriginData) {
+    if (!this.employee) return null;
+
+    const foundExamHistory = this.employee.examsHistory.find(
+      (exam) => exam.examId === examRisk.examId,
+    );
+    if (!foundExamHistory) return {};
+
+    const closeToExpired =
+      examRisk.considerBetweenDays !== null &&
+      this.dayjs.compareTime(
+        this.dayjs.dateNow(),
+        foundExamHistory.expiredDate,
+        'days',
+      ) >= examRisk.considerBetweenDays;
+
+    return { closeToExpired, expiredDate: foundExamHistory.expiredDate };
+  }
 }
+
+// const Exam = await this.examRepository.findNude({
+//   include: {
+//     examToRisk: {
+//       include: {
+//         risk: {
+//           select: {
+//             name: true,
+//             id: true,
+//             representAll: true,
+//             riskFactorData: {
+//               // include: {
+//               //   homogeneousGroup: { include: { characterization: true } },
+//               // },
+//               where: {
+//                 companyId,
+//                 homogeneousGroup: {
+//                   hierarchyOnHomogeneous: {
+//                     some: {
+//                       hierarchyId: { in: hierarchyIds },
+//                     },
+//                   },
+//                 },
+//               },
+//             },
+//           },
+//         },
+//       },
+//       where: { companyId },
+//     },
+//     examToRiskData: {
+//       include: {
+//         risk: {
+//           include: {
+//             riskFactor: {
+//               select: { name: true, id: true },
+//             },
+//           },
+//         },
+//       },
+//     },
+//   },
+//   where: {
+//     AND: [
+//       {
+//         //tenant
+//         OR: [
+//           { system: true },
+//           { companyId },
+//           {
+//             company: {
+//               applyingServiceContracts: {
+//                 some: { receivingServiceCompanyId: companyId },
+//               },
+//             },
+//           },
+//           {
+//             company: {
+//               receivingServiceContracts: {
+//                 some: { applyingServiceCompanyId: companyId },
+//               },
+//             },
+//           },
+//         ],
+//       },
+//       {
+//         // rules
+//         OR: [
+//           {
+//             examToRisk: {
+//               some: {
+//                 companyId: companyId,
+//                 risk: {
+//                   riskFactorData: {
+//                     some: {
+//                       examsToRiskFactorData: {
+//                         some: {
+//                           risk: {
+//                             companyId: companyId,
+//                             homogeneousGroup: {
+//                               hierarchyOnHomogeneous: {
+//                                 some: {
+//                                   hierarchyId: { in: hierarchyIds },
+//                                 },
+//                               },
+//                             },
+//                           },
+//                         },
+//                       },
+//                     },
+//                   },
+//                 },
+//               },
+//             },
+//           },
+//           {
+//             examToRisk: {
+//               some: {
+//                 companyId: companyId,
+//                 risk: { representAll: true },
+//               },
+//             },
+//           },
+//           {
+//             examToRiskData: {
+//               some: {
+//                 risk: {
+//                   companyId: companyId,
+//                   examsToRiskFactorData: { some: { examId: { gt: 0 } } },
+//                   homogeneousGroup: {
+//                     hierarchyOnHomogeneous: {
+//                       some: { hierarchyId: { in: hierarchyIds } },
+//                     },
+//                   },
+//                 },
+//               },
+//             },
+//           },
+//         ],
+//       },
+//     ],
+//   },
+// });

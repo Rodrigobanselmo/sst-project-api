@@ -1,15 +1,17 @@
-import { HomoGroupEntity } from './../../company/entities/homoGroup.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Exam, ExamTypeEnum, StatusEnum } from '@prisma/client';
+
+import { HomoGroupEntity } from './../../company/entities/homoGroup.entity';
 import { ExamRiskEntity } from './examRisk.entity';
 import { ExamRiskDataEntity } from './examRiskData.entity';
 import { ExamToClinicEntity } from './examToClinic';
-import { RiskFactorDataEntity } from './riskData.entity';
 
 export interface IExamOriginData extends Partial<ExamRiskDataEntity> {
   origin?: string;
   prioritization?: number;
   skipEmployee?: boolean;
+  closeToExpired?: boolean;
+  expiredDate?: Date | null;
   homogeneousGroup?: HomoGroupEntity;
   risk?: { name: string; id: string };
 }

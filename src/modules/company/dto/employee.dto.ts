@@ -139,4 +139,8 @@ export class FindEmployeeDto extends PaginationQueryDto {
   @IsString()
   @IsOptional()
   hierarchySubOfficeId?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  all?: boolean;
 }

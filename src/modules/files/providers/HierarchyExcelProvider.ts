@@ -109,9 +109,26 @@ export class HierarchyExcelProvider {
   compare(allMap: hierarchyMap, compareMap: hierarchyMap) {
     const newHierarchy = { ...compareMap } as Record<string, any>;
 
-    const isEqualHierarchy = (h1, h2, parent?) => {
-      const firstEqual = h1.name === h2.name && h1.type === h2.type;
-      //&& h1.workspaceId === h2.workspaceId; //!
+    const isEqualHierarchy = (
+      h1: HierarchyEntity & {
+        children: (string | number)[];
+      },
+      h2: HierarchyEntity & {
+        children: (string | number)[];
+      },
+      parent?,
+    ) => {
+      const firstEqual =
+        (h1.name || '')
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[^a-zA-Z0-9s]/g, '') ===
+          (h2.name || '')
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[^a-zA-Z0-9s]/g, '') &&
+        h1.type === h2.type &&
+        h1.workspaceIds.some((i) => h2.workspaceIds.includes(i));
 
       if (parent) {
         if (newHierarchy[h1.parentId] && newHierarchy[h2.parentId]) {

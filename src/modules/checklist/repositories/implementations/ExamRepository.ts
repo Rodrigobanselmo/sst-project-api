@@ -72,7 +72,6 @@ export class ExamRepository {
       AND: [],
       ...options.where,
     } as typeof options.where;
-    console.log(query);
     const include = { ...options?.include };
 
     const { where } = prismaFilter(whereInit, {

@@ -1,3 +1,4 @@
+import { prismaFilter } from './../../../../shared/utils/filters/prisma.filters';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ConflictException, Injectable } from '@nestjs/common';
 import { IPrismaOptions } from '../../../../shared/interfaces/prisma-options.types';
@@ -137,6 +138,7 @@ export class EmployeeRepository {
                     connect: { cid: cidId },
                   }
                 : undefined,
+              status: 'ACTIVE',
               hierarchyHistory: hierarchyId
                 ? {
                     create: {
@@ -164,6 +166,7 @@ export class EmployeeRepository {
                     connect: { cid: cidId },
                   }
                 : undefined,
+              status: 'ACTIVE',
               hierarchyHistory: hierarchyId
                 ? {
                     upsert: {
@@ -199,14 +202,14 @@ export class EmployeeRepository {
   async findById(
     id: number,
     companyId: string,
-    options?: IPrismaOptions<{ hierarchy?: boolean; company?: string }>,
+    options: Prisma.EmployeeFindManyArgs = {},
   ): Promise<EmployeeEntity> {
     const include = options?.include || {};
 
     const employee = await this.prisma.employee.findUnique({
       where: { id_companyId: { companyId, id } },
       include: {
-        company: !!include?.company,
+        ...include,
         hierarchy: !!include?.hierarchy
           ? false
           : {
@@ -223,26 +226,66 @@ export class EmployeeRepository {
     return new EmployeeEntity(employee);
   }
 
-  async findAllByCompany(
+  async find(
     query: Partial<FindEmployeeDto>,
     pagination: PaginationQueryDto,
     options: Prisma.EmployeeFindManyArgs = {},
   ) {
-    const where = {
+    const whereInit = {
       AND: [],
+      ...options.where,
     } as typeof options.where;
+    const select: Prisma.EmployeeSelect = {
+      id: true,
+      cpf: true,
+      email: true,
+      hierarchyId: true,
+      name: true,
+      status: true,
+      ...options?.select,
+    };
 
-    if ('search' in query) {
-      (where.AND as any).push({
+    if ('all' in query) {
+      select.company = {
+        select: { fantasy: true, name: true, cnpj: true, initials: true },
+      };
+
+      (whereInit.AND as any).push({
         OR: [
-          { name: { contains: query.search, mode: 'insensitive' } },
+          { companyId: query.companyId, status: 'ACTIVE' },
           {
-            cpf: {
-              contains: query.search ? onlyNumbers(query.search) || 'no' : '',
+            company: {
+              receivingServiceContracts: {
+                some: { applyingServiceCompanyId: query.companyId },
+              },
             },
+            status: 'ACTIVE',
           },
         ],
       } as typeof options.where);
+      delete query.companyId;
+    }
+
+    const { where } = prismaFilter(whereInit, {
+      query,
+      skip: ['search', 'hierarchySubOfficeId', 'all'],
+    });
+
+    if ('search' in query) {
+      const OR = [];
+      const CPF = onlyNumbers(query.search);
+      const isCPF = CPF.length == 11;
+
+      if (!isCPF) {
+        OR.push({ name: { contains: query.search, mode: 'insensitive' } });
+        OR.push({ email: { contains: query.search, mode: 'insensitive' } });
+      } else {
+        OR.push({
+          cpf: CPF,
+        });
+      }
+
+      (where.AND as any).push({ OR } as typeof options.where);
       delete query.search;
     }
 
@@ -253,22 +296,13 @@ export class EmployeeRepository {
       delete query.hierarchySubOfficeId;
     }
 
-    Object.entries(query).forEach(([key, value]) => {
-      if (value)
-        (where.AND as any).push({
-          [key]: {
-            contains: value,
-            mode: 'insensitive',
-          },
-        } as typeof options.where);
-    });
-
     const response = await this.prisma.$transaction([
       this.prisma.employee.count({
         where,
       }),
       this.prisma.employee.findMany({
         ...options,
+        select,
         where,
         take: pagination.take || 20,
         skip: pagination.skip || 0,

@@ -21,6 +21,7 @@ import {
 
 import { CreateEmployeeExamHistoryService } from '../../services/employee/0-history/exams/create/create.service';
 import { DeleteEmployeeExamHistoryService } from '../../services/employee/0-history/exams/delete/delete.service';
+import { FindByIdEmployeeExamHistoryService } from '../../services/employee/0-history/exams/find-by-id/find-by-id.service';
 import { FindEmployeeExamHistoryService } from '../../services/employee/0-history/exams/find/find.service';
 import { UpdateEmployeeExamHistoryService } from '../../services/employee/0-history/exams/update/update.service';
 
@@ -31,6 +32,7 @@ export class EmployeeExamHistoryController {
     private readonly createEmployeeExamHistoryService: CreateEmployeeExamHistoryService,
     private readonly updateEmployeeExamHistoryService: UpdateEmployeeExamHistoryService,
     private readonly findEmployeeExamHistoryService: FindEmployeeExamHistoryService,
+    private readonly findByIdEmployeeExamHistoryService: FindByIdEmployeeExamHistoryService,
     private readonly deleteEmployeeExamHistoryService: DeleteEmployeeExamHistoryService,
   ) {}
 
@@ -40,6 +42,14 @@ export class EmployeeExamHistoryController {
     @Query() query: FindEmployeeExamHistoryDto,
   ) {
     return this.findEmployeeExamHistoryService.execute(query, userPayloadDto);
+  }
+
+  @Get('/:id/:companyId')
+  findById(
+    @User() userPayloadDto: UserPayloadDto,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.findByIdEmployeeExamHistoryService.execute(id, userPayloadDto);
   }
 
   @Post('/:companyId?')

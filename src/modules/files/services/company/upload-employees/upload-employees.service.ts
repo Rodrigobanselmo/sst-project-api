@@ -82,7 +82,7 @@ export class UploadEmployeesService {
                 employee?.abbreviation.includes(work.abbreviation),
             );
 
-      if (!workspace)
+      if (workspace.length === 0)
         throw new BadRequestException(ErrorCompanyEnum.WORKSPACE_NOT_FOUND);
 
       if (employee.ghoName) {

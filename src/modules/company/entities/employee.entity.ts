@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Employee, SexTypeEnum, StatusEnum } from '@prisma/client';
+import { EmployeeExamsHistoryEntity } from './employee-exam-history.entity';
+import { EmployeeHierarchyHistoryEntity } from './employee-hierarchy-history.entity';
 import { HierarchyEntity } from './hierarchy.entity';
 
 import { WorkspaceEntity } from './workspace.entity';
@@ -64,4 +66,6 @@ export class EmployeeEntity implements Employee {
   shiftId: number;
   birthday: Date;
   admissionDate: Date;
+  examsHistory?: EmployeeExamsHistoryEntity[];
+  hierarchyHistory?: EmployeeHierarchyHistoryEntity[];
 }

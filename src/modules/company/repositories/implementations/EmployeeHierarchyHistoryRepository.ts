@@ -21,12 +21,14 @@ export class EmployeeHierarchyHistoryRepository {
     employeeId: number,
     hierarchyId?: string | null,
   ) {
+    const status = createData.motive === 'DEM' ? 'INACTIVE' : 'ACTIVE';
+
     const response = await this.prisma.$transaction([
       this.prisma.employeeHierarchyHistory.create({
         data: createData,
       }),
       this.prisma.employee.update({
-        data: hierarchyId !== undefined ? { hierarchyId } : {},
+        data: hierarchyId !== undefined ? { hierarchyId, status } : { status },
         where: { id: employeeId },
       }),
     ]);
@@ -39,13 +41,15 @@ export class EmployeeHierarchyHistoryRepository {
     employeeId: number,
     hierarchyId?: string | null,
   ) {
+    const status = updateData.motive === 'DEM' ? 'INACTIVE' : 'ACTIVE';
+
     const response = await this.prisma.$transaction([
       this.prisma.employeeHierarchyHistory.update({
         data: updateData,
         where: { id },
       }),
       this.prisma.employee.update({
-        data: hierarchyId !== undefined ? { hierarchyId } : {},
+        data: hierarchyId !== undefined ? { hierarchyId, status } : { status },
         where: { id: employeeId },
       }),
     ]);

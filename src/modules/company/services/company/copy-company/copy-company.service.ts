@@ -29,20 +29,22 @@ export class CopyCompanyService {
   ) {
     const companyId = user.targetCompanyId;
 
-    const fromHierarchies =
+    const fromHierarchies = (
       await this.hierarchyRepository.findAllHierarchyByCompany(
         companyCopyFromId,
         {
           include: { workspaces: true },
           returnWorkspace: true,
         },
-      );
+      )
+    ).filter((hierarchy) => hierarchy.workspaces.length > 0);
 
-    const targetHierarchies =
+    const targetHierarchies = (
       await this.hierarchyRepository.findAllHierarchyByCompany(companyId, {
         include: { workspaces: true },
         returnWorkspace: true,
-      });
+      })
+    ).filter((hierarchy) => hierarchy.workspaces.length > 0);
 
     const { equalHierarchy, equalWorkspace } = await this.getCommonHierarchy(
       targetHierarchies,

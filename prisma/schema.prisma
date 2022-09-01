@@ -535,7 +535,7 @@ model Employee {
   id    Int   @id  @default(autoincrement())
   created_at DateTime @default(now())
   updated_at  DateTime   @updatedAt
-  status StatusEnum @default(ACTIVE)
+  status StatusEnum @default(PENDING)
   name String 
   cpf String 
   esocialCode String?
@@ -561,6 +561,9 @@ model Employee {
   
   @@unique([id, companyId])
   @@unique([cpf, companyId])
+  @@index([cpf], type: Hash)
+  @@index(name)
+  @@index(email)
 } 
 
 model EmployeeHierarchyHistory {
@@ -583,6 +586,7 @@ model EmployeeExamsHistory {
   doneDate DateTime?
   time String?
   validityInMonths Int?
+  expiredDate DateTime?
   examType ExamHistoryTypeEnum?
   evaluationType ExamHistoryEvaluationEnum?
   conclusion ExamHistoryConclusionEnum?
@@ -709,7 +713,6 @@ model ExamToClinic {
   @@unique([examId, companyId, startDate, groupId])
 }
 
-
 model ExamToRisk {
   id     Int   @id @default(autoincrement())
   exam   Exam? @relation(fields: [examId], references: [id])
@@ -758,7 +761,6 @@ model ExamToRiskData {
 
   @@id([examId, riskFactorDataId])
 }
-
 
 model GenerateSource {
   id    String   @id  @default(uuid())

@@ -11,7 +11,7 @@ export class FindAllAvailableEmployeesService {
     { skip, take, ...query }: FindEmployeeDto,
     user: UserPayloadDto,
   ) {
-    const employees = await this.employeeRepository.findAllByCompany(
+    const employees = await this.employeeRepository.find(
       { ...query, companyId: user.targetCompanyId },
       { skip, take },
     );

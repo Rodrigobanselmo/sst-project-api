@@ -89,6 +89,8 @@ import { CreateEmployeeExamHistoryService } from './services/employee/0-history/
 import { UpdateEmployeeExamHistoryService } from './services/employee/0-history/exams/update/update.service';
 import { DeleteEmployeeExamHistoryService } from './services/employee/0-history/exams/delete/delete.service';
 import { EmployeeExamHistoryController } from './controller/employee/employee-exam-history.controller';
+import { FindByIdEmployeeExamHistoryService } from './services/employee/0-history/exams/find-by-id/find-by-id.service';
+import { DayJSProvider } from '../../shared/providers/DateProvider/implementations/DayJSProvider';
 
 @Module({
   imports: [forwardRef(() => ChecklistModule)],
@@ -184,6 +186,8 @@ import { EmployeeExamHistoryController } from './controller/employee/employee-ex
     CreateEmployeeExamHistoryService,
     UpdateEmployeeExamHistoryService,
     DeleteEmployeeExamHistoryService,
+    FindByIdEmployeeExamHistoryService,
+    DayJSProvider,
   ],
   exports: [
     CompanyRepository,

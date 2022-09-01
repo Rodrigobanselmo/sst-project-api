@@ -7,6 +7,7 @@ import {
   IsInt,
   IsOptional,
   IsString,
+  ValidateIf,
   ValidateNested,
 } from 'class-validator';
 
@@ -26,7 +27,7 @@ export class EmployeeComplementaryExamHistoryDto {
   @IsInt()
   validityInMonths: number;
 
-  @IsInt()
+  @IsString()
   clinicId: string;
 
   @Transform(DateFormat, { toClassOnly: true })
@@ -43,12 +44,15 @@ export class EmployeeComplementaryExamHistoryDto {
   status: StatusEnum;
 }
 export class CreateEmployeeExamHistoryDto {
+  @ValidateIf((o) => !!o.examId)
   @IsInt()
   examId: number;
 
+  @ValidateIf((o) => !!o.examId)
   @IsInt()
   employeeId: number;
 
+  @ValidateIf((o) => !!o.examId)
   @IsString()
   time: string;
 
@@ -56,20 +60,25 @@ export class CreateEmployeeExamHistoryDto {
   @IsOptional()
   obs: string;
 
+  @ValidateIf((o) => !!o.examId)
   @IsInt()
   validityInMonths: number;
 
+  @ValidateIf((o) => !!o.examId)
   @IsInt()
   doctorId: number;
 
-  @IsInt()
+  @ValidateIf((o) => !!o.examId)
+  @IsString()
   clinicId: string;
 
+  @ValidateIf((o) => !!o.examId)
   @Transform(DateFormat, { toClassOnly: true })
   @IsDate({ message: 'Data de realização de exame inválida' })
   @Type(() => Date)
   doneDate: Date;
 
+  @ValidateIf((o) => !!o.examId)
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsString()
   @IsEnum(ExamHistoryTypeEnum, {
@@ -77,6 +86,7 @@ export class CreateEmployeeExamHistoryDto {
   })
   examType: ExamHistoryTypeEnum;
 
+  @ValidateIf((o) => !!o.examId)
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsString()
   @IsEnum(ExamHistoryEvaluationEnum, {
@@ -84,6 +94,7 @@ export class CreateEmployeeExamHistoryDto {
   })
   evaluationType: ExamHistoryEvaluationEnum;
 
+  @ValidateIf((o) => !!o.examId)
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsString()
   @IsEnum(ExamHistoryConclusionEnum, {
@@ -111,17 +122,41 @@ export class UpdateEmployeeExamHistoryDto extends PartialType(
   @IsInt()
   @IsOptional()
   id: number;
+
+  @IsInt()
+  @IsOptional()
+  doctorId: number;
+
+  @IsString()
+  @IsOptional()
+  time: string;
+
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsOptional()
+  @IsString()
+  @IsEnum(ExamHistoryEvaluationEnum, {
+    message: `tipo de avaliação inválido`,
+  })
+  evaluationType: ExamHistoryEvaluationEnum;
+
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsOptional()
+  @IsString()
+  @IsEnum(ExamHistoryConclusionEnum, {
+    message: `tipo de conclusão inválido`,
+  })
+  conclusion: ExamHistoryConclusionEnum;
 }
 
 export class FindEmployeeExamHistoryDto extends PaginationQueryDto {
   @IsString()
   companyId?: string;
 
-  @IsString()
+  @IsInt()
   @IsOptional()
-  examId?: string;
+  examId?: number;
 
-  @IsString()
+  @IsInt()
   @IsOptional()
-  employeeId?: string;
+  employeeId?: number;
 }

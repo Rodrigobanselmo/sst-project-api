@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { DayJSProvider } from '../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
@@ -14,7 +15,7 @@ import { EmployeeExamsHistoryEntity } from '../../entities/employee-exam-history
 
 @Injectable()
 export class EmployeeExamsHistoryRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private dayjs: DayJSProvider) {}
 
   async create({
     examsData = [],
@@ -25,10 +26,23 @@ export class EmployeeExamsHistoryRepository {
   }) {
     const data = await this.prisma.employeeExamsHistory.createMany({
       data: [
-        createData,
+        ...[
+          createData.examId && {
+            ...createData,
+            expiredDate: this.dayjs
+              .dayjs(createData.doneDate)
+              .add(createData.validityInMonths || 0, 'months')
+              .toDate(),
+          },
+        ].filter((i) => i),
         ...examsData.map((exam) => ({
           employeeId: createData.employeeId,
           userDoneId: createData.userDoneId,
+          examType: createData.examType || undefined,
+          expiredDate: this.dayjs
+            .dayjs(exam.doneDate)
+            .add(exam.validityInMonths || 0, 'months')
+            .toDate(),
           ...exam,
         })),
       ],
@@ -37,9 +51,19 @@ export class EmployeeExamsHistoryRepository {
     return data;
   }
 
-  async update({ id, ...updateData }: UpdateEmployeeExamHistoryDto) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async update({ id, examsData, ...updateData }: UpdateEmployeeExamHistoryDto) {
     const data = await this.prisma.employeeExamsHistory.update({
-      data: updateData,
+      data: {
+        ...updateData,
+        expiredDate:
+          updateData.validityInMonths && updateData.doneDate
+            ? this.dayjs
+                .dayjs(updateData.doneDate)
+                .add(updateData.validityInMonths || 0, 'months')
+                .toDate()
+            : undefined,
+      },
       where: { id },
     });
 
@@ -55,7 +79,6 @@ export class EmployeeExamsHistoryRepository {
       AND: [
         {
           employee: {
-            //! edit employee
             hierarchy: { companyId: query.companyId },
           },
         },
@@ -73,6 +96,12 @@ export class EmployeeExamsHistoryRepository {
       }),
       this.prisma.employeeExamsHistory.findMany({
         ...options,
+        include: {
+          exam: { select: { isAttendance: true, id: true, name: true } },
+          userDone: { select: { email: true, name: true } },
+          userSchedule: { select: { email: true, name: true } },
+          ...options.include,
+        },
         where,
         take: pagination.take || 20,
         skip: pagination.skip || 0,
@@ -96,6 +125,14 @@ export class EmployeeExamsHistoryRepository {
 
   async findFirstNude(options: Prisma.EmployeeExamsHistoryFindFirstArgs = {}) {
     const data = await this.prisma.employeeExamsHistory.findFirst({
+      ...options,
+    });
+
+    return new EmployeeExamsHistoryEntity(data);
+  }
+
+  async findUniqueNude(options: Prisma.EmployeeExamsHistoryFindUniqueArgs) {
+    const data = await this.prisma.employeeExamsHistory.findUnique({
       ...options,
     });
 
