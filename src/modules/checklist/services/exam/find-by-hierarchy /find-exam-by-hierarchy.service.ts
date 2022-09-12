@@ -47,7 +47,11 @@ export class FindExamByHierarchyService {
         companyId,
         {
           include: {
-            examsHistory: { where: { expiredDate: { gte: new Date() } } },
+            examsHistory: {
+              where: {
+                AND: [{ expiredDate: { gte: new Date() } }, { status: 'DONE' }],
+              },
+            },
           },
         },
       );
@@ -268,7 +272,11 @@ export class FindExamByHierarchyService {
         'days',
       ) >= examRisk.considerBetweenDays;
 
-    return { closeToExpired, expiredDate: foundExamHistory.expiredDate };
+    return {
+      closeToExpired,
+      expiredDate: foundExamHistory.expiredDate,
+      status: foundExamHistory.status,
+    };
   }
 }
 

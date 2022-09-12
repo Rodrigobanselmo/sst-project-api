@@ -91,6 +91,7 @@ import { DeleteEmployeeExamHistoryService } from './services/employee/0-history/
 import { EmployeeExamHistoryController } from './controller/employee/employee-exam-history.controller';
 import { FindByIdEmployeeExamHistoryService } from './services/employee/0-history/exams/find-by-id/find-by-id.service';
 import { DayJSProvider } from '../../shared/providers/DateProvider/implementations/DayJSProvider';
+import { FindClinicService } from './services/company/find-clinic/find-clinic.service';
 
 @Module({
   imports: [forwardRef(() => ChecklistModule)],
@@ -187,6 +188,7 @@ import { DayJSProvider } from '../../shared/providers/DateProvider/implementatio
     UpdateEmployeeExamHistoryService,
     DeleteEmployeeExamHistoryService,
     FindByIdEmployeeExamHistoryService,
+    FindClinicService,
     DayJSProvider,
   ],
   exports: [

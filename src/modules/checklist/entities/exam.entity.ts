@@ -8,6 +8,7 @@ import { ExamToClinicEntity } from './examToClinic';
 
 export interface IExamOriginData extends Partial<ExamRiskDataEntity> {
   origin?: string;
+  status?: StatusEnum;
   prioritization?: number;
   skipEmployee?: boolean;
   closeToExpired?: boolean;

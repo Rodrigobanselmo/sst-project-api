@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Employee, SexTypeEnum, StatusEnum } from '@prisma/client';
+import { Employee, Hierarchy, SexTypeEnum, StatusEnum } from '@prisma/client';
 import { EmployeeExamsHistoryEntity } from './employee-exam-history.entity';
 import { EmployeeHierarchyHistoryEntity } from './employee-hierarchy-history.entity';
 import { HierarchyEntity } from './hierarchy.entity';
@@ -52,9 +52,6 @@ export class EmployeeEntity implements Employee {
   office?: string;
   sub_office?: string;
 
-  constructor(partial: Partial<EmployeeEntity>) {
-    Object.assign(this, partial);
-  }
   esocialCode: string;
   socialName: string;
   nickname: string;
@@ -68,4 +65,12 @@ export class EmployeeEntity implements Employee {
   admissionDate: Date;
   examsHistory?: EmployeeExamsHistoryEntity[];
   hierarchyHistory?: EmployeeHierarchyHistoryEntity[];
+
+  constructor(partial: Partial<EmployeeEntity> & { hierarchy?: Hierarchy }) {
+    Object.assign(this, partial);
+
+    if (this.hierarchy) {
+      this.hierarchy = new HierarchyEntity(this.hierarchy);
+    }
+  }
 }

@@ -71,6 +71,7 @@ enum ExamHistoryTypeEnum {
   CHAN
   EVAL
   DEMI
+  OFFI
 }
 
 enum ExamHistoryEvaluationEnum {
@@ -562,6 +563,7 @@ model Employee {
   @@unique([id, companyId])
   @@unique([cpf, companyId])
   @@index([cpf], type: Hash)
+  @@index(esocialCode)
   @@index(name)
   @@index(email)
 } 
@@ -590,9 +592,16 @@ model EmployeeExamsHistory {
   examType ExamHistoryTypeEnum?
   evaluationType ExamHistoryEvaluationEnum?
   conclusion ExamHistoryConclusionEnum?
-  obs String?
   status StatusEnum @default(DONE)
   
+  obs String?
+  clinicObs String?
+  scheduleType ClinicScheduleTypeEnum?
+  changeHierarchyDate DateTime?
+  changeHierarchyAnyway Boolean @default(false)
+  hierarchyId String?
+  hierarchy Hierarchy? @relation(fields: [hierarchyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  isScheduleMain Boolean?
 
   userScheduleId Int?
   userSchedule User? @relation(name: "user_schedule", fields: [userScheduleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
@@ -606,6 +615,10 @@ model EmployeeExamsHistory {
   exam Exam @relation(fields: [examId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   employeeId Int
   employee Employee @relation(fields: [employeeId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@index(status)
+  @@index(employeeId)
+  @@index(clinicId)
 } 
 
 model EngsToRiskFactorData {
@@ -762,6 +775,7 @@ model ExamToRiskData {
   @@id([examId, riskFactorDataId])
 }
 
+
 model GenerateSource {
   id    String   @id  @default(uuid())
   riskId    String    
@@ -799,6 +813,7 @@ model Hierarchy {
   hierarchyOnHomogeneous HierarchyOnHomogeneous[]
   riskFactorDatas RiskFactorData[] 
   hierarchyHistory EmployeeHierarchyHistory[]
+  employeeExamsHistory EmployeeExamsHistory[]
 
   @@unique([id, companyId])
   @@index(companyId)

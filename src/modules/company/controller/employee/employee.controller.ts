@@ -62,7 +62,7 @@ export class EmployeeController {
     return this.findAllAvailableEmployeesService.execute(query, userPayloadDto);
   }
 
-  @Get('/:employeeId/:companyId?')
+  @Get('/id/:employeeId/:companyId?')
   findOne(
     @User() userPayloadDto: UserPayloadDto,
     @Param('employeeId') employeeId: number,

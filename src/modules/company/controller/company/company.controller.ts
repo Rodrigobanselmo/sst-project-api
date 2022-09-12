@@ -28,6 +28,7 @@ import { CreateContractService } from '../../services/company/create-contract/cr
 import { FindAllCompaniesService } from '../../services/company/find-all-companies/find-all-companies.service';
 import { FindAllUserCompaniesService } from '../../services/company/find-all-user-companies /find-all-companies.service';
 import { FindCepService } from '../../services/company/find-cep/find-cep.service';
+import { FindClinicService } from '../../services/company/find-clinic/find-clinic.service';
 import { FindCnaeService } from '../../services/company/find-cnae/find-cnae.service';
 import { FindCnpjService } from '../../services/company/find-cnpj/find-cnpj.service';
 import { FindCompanyService } from '../../services/company/find-company/find-company.service';
@@ -50,6 +51,7 @@ export class CompanyController {
     private readonly findCnaeService: FindCnaeService,
     private readonly copyCompanyService: CopyCompanyService,
     private readonly setCompanyClinicsService: SetCompanyClinicsService,
+    private readonly findClinicService: FindClinicService,
   ) {}
 
   @Get()
@@ -76,6 +78,11 @@ export class CompanyController {
   @Get('/:companyId')
   findOne(@User() userPayloadDto: UserPayloadDto) {
     return this.findCompanyService.execute(userPayloadDto);
+  }
+
+  @Get('/clinic/:companyId')
+  findClinicOne(@User() userPayloadDto: UserPayloadDto) {
+    return this.findClinicService.execute(userPayloadDto);
   }
 
   @Get('cnpj/:cnpj')

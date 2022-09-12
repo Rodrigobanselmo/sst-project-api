@@ -2,6 +2,7 @@ import { StringUppercaseTransform } from './../../../shared/transformers/string-
 import { DateFormat } from './../../../shared/transformers/date-format';
 import { PartialType } from '@nestjs/swagger';
 import {
+  IsBoolean,
   IsDate,
   IsEnum,
   IsInt,
@@ -14,6 +15,7 @@ import {
 import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
 import { Transform, Type } from 'class-transformer';
 import {
+  ClinicScheduleTypeEnum,
   ExamHistoryConclusionEnum,
   ExamHistoryEvaluationEnum,
   ExamHistoryTypeEnum,
@@ -30,6 +32,10 @@ export class EmployeeComplementaryExamHistoryDto {
   @IsString()
   clinicId: string;
 
+  @IsOptional()
+  @IsString()
+  time: string;
+
   @Transform(DateFormat, { toClassOnly: true })
   @IsDate({ message: 'Data de realização de exame inválida' })
   @Type(() => Date)
@@ -42,6 +48,14 @@ export class EmployeeComplementaryExamHistoryDto {
     message: `status inválido`,
   })
   status: StatusEnum;
+
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsOptional()
+  @IsString()
+  @IsEnum(ClinicScheduleTypeEnum, {
+    message: `tipo de conclusão inválido`,
+  })
+  scheduleType: ClinicScheduleTypeEnum;
 }
 export class CreateEmployeeExamHistoryDto {
   @ValidateIf((o) => !!o.examId)
@@ -59,6 +73,10 @@ export class CreateEmployeeExamHistoryDto {
   @IsString()
   @IsOptional()
   obs: string;
+
+  @IsString()
+  @IsOptional()
+  clinicObs: string;
 
   @ValidateIf((o) => !!o.examId)
   @IsInt()
@@ -109,6 +127,28 @@ export class CreateEmployeeExamHistoryDto {
     message: `status inválido`,
   })
   status: StatusEnum;
+
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsOptional()
+  @IsString()
+  @IsEnum(ClinicScheduleTypeEnum, {
+    message: `tipo de conclusão inválido`,
+  })
+  scheduleType?: ClinicScheduleTypeEnum;
+
+  @Transform(DateFormat, { toClassOnly: true })
+  @IsOptional()
+  @IsDate({ message: 'Data inválida' })
+  @Type(() => Date)
+  changeHierarchyDate?: Date;
+
+  @IsOptional()
+  @IsBoolean()
+  changeHierarchyAnyway?: boolean;
+
+  @IsOptional()
+  @IsString()
+  hierarchyId?: string;
 
   @ValidateNested({ each: true })
   @IsOptional()

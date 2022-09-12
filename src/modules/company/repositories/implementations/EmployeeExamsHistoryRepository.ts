@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, StatusEnum } from '@prisma/client';
 import { DayJSProvider } from '../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
@@ -29,21 +29,27 @@ export class EmployeeExamsHistoryRepository {
         ...[
           createData.examId && {
             ...createData,
+            isScheduleMain: true,
             expiredDate: this.dayjs
               .dayjs(createData.doneDate)
               .add(createData.validityInMonths || 0, 'months')
               .toDate(),
           },
         ].filter((i) => i),
-        ...examsData.map((exam) => ({
+        ...examsData.map((exam, index) => ({
           employeeId: createData.employeeId,
           userDoneId: createData.userDoneId,
+          userScheduleId: createData.userScheduleId,
           examType: createData.examType || undefined,
           expiredDate: this.dayjs
             .dayjs(exam.doneDate)
             .add(exam.validityInMonths || 0, 'months')
             .toDate(),
           ...exam,
+          ...(!createData.examId &&
+            index === 0 && {
+              isScheduleMain: true,
+            }),
         })),
       ],
     });
@@ -51,8 +57,12 @@ export class EmployeeExamsHistoryRepository {
     return data;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async update({ id, examsData, ...updateData }: UpdateEmployeeExamHistoryDto) {
+  async update({
+    id,
+    examsData,
+    hierarchyId,
+    ...updateData
+  }: UpdateEmployeeExamHistoryDto) {
     const data = await this.prisma.employeeExamsHistory.update({
       data: {
         ...updateData,
@@ -68,6 +78,12 @@ export class EmployeeExamsHistoryRepository {
     });
 
     return new EmployeeExamsHistoryEntity(data);
+  }
+
+  async updateByIds(options: Prisma.EmployeeExamsHistoryUpdateManyArgs) {
+    await this.prisma.employeeExamsHistory.updateMany({
+      ...options,
+    });
   }
 
   async find(

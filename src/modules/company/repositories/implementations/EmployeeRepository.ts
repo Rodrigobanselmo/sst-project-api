@@ -210,16 +210,12 @@ export class EmployeeRepository {
       where: { id_companyId: { companyId, id } },
       include: {
         ...include,
+        company: {
+          select: { fantasy: true, name: true, cnpj: true, initials: true },
+        },
         hierarchy: !!include?.hierarchy
           ? false
-          : {
-              ...transformStringToObject(
-                Array.from({ length: 6 })
-                  .map(() => 'include.parent')
-                  .join('.'),
-                true,
-              ),
-            },
+          : { select: this.parentInclude() },
       },
     });
 
@@ -241,6 +237,7 @@ export class EmployeeRepository {
       email: true,
       hierarchyId: true,
       name: true,
+      companyId: true,
       status: true,
       ...options?.select,
     };
@@ -363,5 +360,24 @@ export class EmployeeRepository {
     });
 
     return new EmployeeEntity(employee);
+  }
+
+  private parentInclude() {
+    const objectSelect = (children?: any) => {
+      return {
+        parent: {
+          ...(children && { select: { ...children } }),
+        },
+        id: true,
+        name: true,
+        parentId: true,
+        status: true,
+        type: true,
+      } as Prisma.HierarchyFindManyArgs['select'];
+    };
+
+    return objectSelect(
+      objectSelect(objectSelect(objectSelect(objectSelect()))),
+    );
   }
 }

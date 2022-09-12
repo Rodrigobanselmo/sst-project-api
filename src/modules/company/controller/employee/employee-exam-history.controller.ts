@@ -63,6 +63,17 @@ export class EmployeeExamHistoryController {
     );
   }
 
+  @Post('/schedule/:companyId?')
+  createSchedule(
+    @Body() upsertAccessGroupDto: CreateEmployeeExamHistoryDto,
+    @User() userPayloadDto: UserPayloadDto,
+  ) {
+    return this.createEmployeeExamHistoryService.execute(
+      upsertAccessGroupDto,
+      userPayloadDto,
+    );
+  }
+
   @Patch('/:id/:companyId?')
   update(
     @Body() upsertAccessGroupDto: UpdateEmployeeExamHistoryDto,

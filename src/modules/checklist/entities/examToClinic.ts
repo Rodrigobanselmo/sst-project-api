@@ -14,7 +14,7 @@ export class ExamToClinicEntity implements ExamToClinic {
   companyId: string;
   groupId: string;
   dueInDays: number;
-  isScheduled: boolean;
+  isScheduled: boolean; //hora agendada
   observation: string;
   company: CompanyEntity;
   price: number;

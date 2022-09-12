@@ -28,6 +28,7 @@ import { ActivityDto } from './activity.dto';
 import { AddressDto } from './address.dto';
 import { LicenseDto } from './license.dto';
 import { WorkspaceDto } from './workspace.dto';
+import { StringNormalizeTransform } from '../../../shared/transformers/string-normalize.transform';
 
 export class CreateCompanyDto {
   @Transform(CnpjFormatTransform, { toClassOnly: true })
@@ -206,6 +207,7 @@ export class CreateCompanyDto {
 }
 
 export class FindCompaniesDto extends PaginationQueryDto {
+  // @Transform(StringNormalizeTransform, { toClassOnly: true })
   @IsString()
   @IsOptional()
   search?: string;
@@ -234,6 +236,22 @@ export class FindCompaniesDto extends PaginationQueryDto {
   @IsOptional()
   isConsulting?: boolean;
 
+  @IsBoolean()
+  @IsOptional()
+  isPeriodic?: boolean;
+  @IsBoolean()
+  @IsOptional()
+  isChange?: boolean;
+  @IsBoolean()
+  @IsOptional()
+  isAdmission?: boolean;
+  @IsBoolean()
+  @IsOptional()
+  isReturn?: boolean;
+  @IsBoolean()
+  @IsOptional()
+  isDismissal?: boolean;
+
   @IsOptional()
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @Transform(QueryArray, { toClassOnly: true })
@@ -247,4 +265,9 @@ export class FindCompaniesDto extends PaginationQueryDto {
   @IsString({ each: true })
   @IsOptional()
   companiesIds?: string[];
+
+  @Transform((t) => QueryArray(t, (v) => Number(v)), { toClassOnly: true })
+  @IsInt({ each: true })
+  @IsOptional()
+  clinicExamsIds?: number[];
 }

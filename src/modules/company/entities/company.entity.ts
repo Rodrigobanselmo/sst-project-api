@@ -125,6 +125,7 @@ export class CompanyEntity implements Company {
   observationBank: string;
   companiesToClinicAvailable: CompanyClinicsEntity;
   clinicsAvailable: CompanyClinicsEntity;
+  clinicExams: any;
 
   constructor(partial: Partial<CompanyEntity>) {
     Object.assign(this, partial);

@@ -520,7 +520,19 @@ export class CompanyRepository implements ICompanyRepository {
 
     const { where } = prismaFilter(whereInit, {
       query,
-      skip: ['search', 'userId', 'groupId', 'companiesIds', 'clinicsCompanyId'],
+      skip: [
+        'search',
+        'userId',
+        'groupId',
+        'companiesIds',
+        'clinicsCompanyId',
+        'clinicExamsIds',
+        'isPeriodic',
+        'isChange',
+        'isAdmission',
+        'isReturn',
+        'isDismissal',
+      ],
     });
 
     if ('search' in query) {
@@ -528,6 +540,7 @@ export class CompanyRepository implements ICompanyRepository {
         OR: [
           { group: { name: { contains: query.search, mode: 'insensitive' } } },
           { name: { contains: query.search, mode: 'insensitive' } },
+          { fantasy: { contains: query.search, mode: 'insensitive' } },
           { initials: { contains: query.search, mode: 'insensitive' } },
           {
             cnpj: {
@@ -559,6 +572,21 @@ export class CompanyRepository implements ICompanyRepository {
     if ('clinicsCompanyId' in query) {
       (where.AND as any).push({
         clinicsAvailable: { some: { companyId: query.clinicsCompanyId } },
+      } as typeof options.where);
+    }
+
+    if ('clinicExamsIds' in query) {
+      (where.AND as any).push({
+        clinicExams: {
+          some: {
+            examId: { in: query.clinicExamsIds },
+            ...('isPeriodic' in query && { isPeriodic: query?.isPeriodic }),
+            ...('isChange' in query && { isChange: query?.isChange }),
+            ...('isAdmission' in query && { isAdmission: query?.isAdmission }),
+            ...('isReturn' in query && { isReturn: query?.isReturn }),
+            ...('isDismissal' in query && { isDismissal: query?.isDismissal }),
+          },
+        },
       } as typeof options.where);
     }
 
@@ -740,6 +768,14 @@ export class CompanyRepository implements ICompanyRepository {
       examCount,
       usersCount,
     });
+  }
+
+  async findFirstNude(options: Prisma.CompanyFindFirstArgs = {}) {
+    const data = await this.prisma.company.findFirst({
+      ...options,
+    });
+
+    return new CompanyEntity(data);
   }
 
   async countRelations(

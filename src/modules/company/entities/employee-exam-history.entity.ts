@@ -6,6 +6,8 @@ import {
   StatusEnum,
   User,
   Exam,
+  ClinicScheduleTypeEnum,
+  Hierarchy,
 } from '@prisma/client';
 import { UserEntity } from '../../../modules/users/entities/user.entity';
 import { ExamEntity } from '../../../modules/checklist/entities/exam.entity';
@@ -13,6 +15,8 @@ import { ProfessionalEntity } from '../../../modules/users/entities/professional
 import { CompanyEntity } from './company.entity';
 
 import { EmployeeEntity } from './employee.entity';
+import { HierarchyEntity } from './hierarchy.entity';
+import dayjs from 'dayjs';
 
 export class EmployeeExamsHistoryEntity implements EmployeeExamsHistory {
   id: number;
@@ -42,17 +46,38 @@ export class EmployeeExamsHistoryEntity implements EmployeeExamsHistory {
   userDoneId: number;
   userDone?: UserEntity;
 
-  validation: string;
+  clinicObs: string;
+  scheduleType: ClinicScheduleTypeEnum;
+  changeHierarchyDate: Date;
+  changeHierarchyAnyway: boolean;
+  isScheduleMain: boolean;
+  hierarchyId: string;
+  hierarchy?: HierarchyEntity;
 
   constructor(
     partial: Partial<
-      Omit<EmployeeExamsHistoryEntity, 'userSchedule' | 'userDone' | 'exam'> & {
+      Omit<
+        EmployeeExamsHistoryEntity,
+        'userSchedule' | 'userDone' | 'exam' | 'hierarchy'
+      > & {
         userSchedule?: User;
         userDone?: User;
         exam?: Exam;
+        hierarchy?: Hierarchy;
       }
     >,
   ) {
     Object.assign(this, partial);
+
+    //! testar
+    if (
+      [StatusEnum.PENDING, StatusEnum.PROCESSING].includes(
+        this.status as any,
+      ) &&
+      dayjs(this.doneDate).isBefore(dayjs())
+    )
+      this.status = StatusEnum.EXPIRED;
+
+    if (this.hierarchy) this.hierarchy = new HierarchyEntity(this.hierarchy);
   }
 }

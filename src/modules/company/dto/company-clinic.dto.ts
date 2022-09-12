@@ -1,3 +1,4 @@
+import { StringNormalizeTransform } from './../../../shared/transformers/string-normalize.transform';
 import { PartialType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
@@ -30,6 +31,7 @@ export class SetCompanyClinicDto {
 }
 
 export class FindCompanyClinicDto extends PaginationQueryDto {
+  // @Transform(StringNormalizeTransform, { toClassOnly: true })
   @IsString()
   @IsOptional()
   search?: string;
