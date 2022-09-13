@@ -21,6 +21,7 @@ import {
   ExamHistoryTypeEnum,
   StatusEnum,
 } from '@prisma/client';
+import { QueryArray } from './../../../shared/transformers/query-array';
 
 export class EmployeeComplementaryExamHistoryDto {
   @IsInt()
@@ -58,7 +59,7 @@ export class EmployeeComplementaryExamHistoryDto {
   scheduleType: ClinicScheduleTypeEnum;
 }
 export class CreateEmployeeExamHistoryDto {
-  @ValidateIf((o) => !!o.examId)
+  @ValidateIf((o) => !!o.examId && o.status == StatusEnum.DONE)
   @IsInt()
   examId: number;
 
@@ -78,11 +79,11 @@ export class CreateEmployeeExamHistoryDto {
   @IsOptional()
   clinicObs: string;
 
-  @ValidateIf((o) => !!o.examId)
+  @ValidateIf((o) => !!o.examId && o.status == StatusEnum.DONE)
   @IsInt()
   validityInMonths: number;
 
-  @ValidateIf((o) => !!o.examId)
+  @ValidateIf((o) => !!o.examId && o.status == StatusEnum.DONE)
   @IsInt()
   doctorId: number;
 
@@ -104,7 +105,7 @@ export class CreateEmployeeExamHistoryDto {
   })
   examType: ExamHistoryTypeEnum;
 
-  @ValidateIf((o) => !!o.examId)
+  @ValidateIf((o) => !!o.examId && o.status == StatusEnum.DONE)
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsString()
   @IsEnum(ExamHistoryEvaluationEnum, {
@@ -112,7 +113,7 @@ export class CreateEmployeeExamHistoryDto {
   })
   evaluationType: ExamHistoryEvaluationEnum;
 
-  @ValidateIf((o) => !!o.examId)
+  @ValidateIf((o) => !!o.examId && o.status == StatusEnum.DONE)
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsString()
   @IsEnum(ExamHistoryConclusionEnum, {
@@ -199,4 +200,13 @@ export class FindEmployeeExamHistoryDto extends PaginationQueryDto {
   @IsInt()
   @IsOptional()
   employeeId?: number;
+
+  @IsBoolean()
+  @IsOptional()
+  allCompanies?: boolean;
+
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsString({ each: true })
+  @IsOptional()
+  status?: string[];
 }

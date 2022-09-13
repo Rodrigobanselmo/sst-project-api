@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Employee, Hierarchy, SexTypeEnum, StatusEnum } from '@prisma/client';
+import {
+  Company,
+  Employee,
+  Hierarchy,
+  SexTypeEnum,
+  StatusEnum,
+} from '@prisma/client';
+import { CompanyEntity } from './company.entity';
 import { EmployeeExamsHistoryEntity } from './employee-exam-history.entity';
 import { EmployeeHierarchyHistoryEntity } from './employee-hierarchy-history.entity';
 import { HierarchyEntity } from './hierarchy.entity';
@@ -63,14 +70,24 @@ export class EmployeeEntity implements Employee {
   shiftId: number;
   birthday: Date;
   admissionDate: Date;
+  company?: CompanyEntity;
   examsHistory?: EmployeeExamsHistoryEntity[];
   hierarchyHistory?: EmployeeHierarchyHistoryEntity[];
 
-  constructor(partial: Partial<EmployeeEntity> & { hierarchy?: Hierarchy }) {
+  constructor(
+    partial: Partial<Omit<EmployeeEntity, 'company'>> & {
+      hierarchy?: Hierarchy;
+      company?: Partial<Company>;
+    },
+  ) {
     Object.assign(this, partial);
 
     if (this.hierarchy) {
       this.hierarchy = new HierarchyEntity(this.hierarchy);
+    }
+
+    if (this.company) {
+      this.company = new CompanyEntity(this.company);
     }
   }
 }

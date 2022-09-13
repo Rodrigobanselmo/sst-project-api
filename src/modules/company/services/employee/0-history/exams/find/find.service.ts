@@ -17,6 +17,13 @@ export class FindEmployeeExamHistoryService {
     const access = await this.employeeExamHistoryRepository.find(
       { companyId: user.targetCompanyId, ...query },
       { skip, take },
+      {
+        include: {
+          exam: { select: { isAttendance: true, id: true, name: true } },
+          userDone: { select: { email: true, name: true } },
+          userSchedule: { select: { email: true, name: true } },
+        },
+      },
     );
 
     return access;

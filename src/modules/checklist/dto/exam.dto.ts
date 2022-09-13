@@ -99,4 +99,20 @@ export class FindExamHierarchyDto {
   @IsInt()
   @IsOptional()
   employeeId?: number;
+
+  @IsBoolean()
+  @IsOptional()
+  isPeriodic?: boolean;
+  @IsBoolean()
+  @IsOptional()
+  isChange?: boolean;
+  @IsBoolean()
+  @IsOptional()
+  isAdmission?: boolean;
+  @IsBoolean()
+  @IsOptional()
+  isReturn?: boolean;
+  @IsBoolean()
+  @IsOptional()
+  isDismissal?: boolean;
 }

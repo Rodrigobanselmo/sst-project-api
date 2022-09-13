@@ -50,7 +50,6 @@ export class EmployeeExamsHistoryEntity implements EmployeeExamsHistory {
   scheduleType: ClinicScheduleTypeEnum;
   changeHierarchyDate: Date;
   changeHierarchyAnyway: boolean;
-  isScheduleMain: boolean;
   hierarchyId: string;
   hierarchy?: HierarchyEntity;
 
@@ -69,7 +68,6 @@ export class EmployeeExamsHistoryEntity implements EmployeeExamsHistory {
   ) {
     Object.assign(this, partial);
 
-    //! testar
     if (
       [StatusEnum.PENDING, StatusEnum.PROCESSING].includes(
         this.status as any,

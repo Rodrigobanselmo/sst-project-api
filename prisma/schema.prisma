@@ -601,7 +601,6 @@ model EmployeeExamsHistory {
   changeHierarchyAnyway Boolean @default(false)
   hierarchyId String?
   hierarchy Hierarchy? @relation(fields: [hierarchyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  isScheduleMain Boolean?
 
   userScheduleId Int?
   userSchedule User? @relation(name: "user_schedule", fields: [userScheduleId], references: [id], onDelete: Restrict, onUpdate: Cascade)

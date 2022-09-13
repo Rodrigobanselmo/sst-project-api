@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, StatusEnum } from '@prisma/client';
-import { DayJSProvider } from '../../../../shared/providers/DateProvider/implementations/DayJSProvider';
+import { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
-
+import { DayJSProvider } from '../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { prismaFilter } from '../../../../shared/utils/filters/prisma.filters';
 import {
   CreateEmployeeExamHistoryDto,
@@ -29,14 +28,13 @@ export class EmployeeExamsHistoryRepository {
         ...[
           createData.examId && {
             ...createData,
-            isScheduleMain: true,
             expiredDate: this.dayjs
               .dayjs(createData.doneDate)
               .add(createData.validityInMonths || 0, 'months')
               .toDate(),
           },
         ].filter((i) => i),
-        ...examsData.map((exam, index) => ({
+        ...examsData.map((exam) => ({
           employeeId: createData.employeeId,
           userDoneId: createData.userDoneId,
           userScheduleId: createData.userScheduleId,
@@ -46,10 +44,6 @@ export class EmployeeExamsHistoryRepository {
             .add(exam.validityInMonths || 0, 'months')
             .toDate(),
           ...exam,
-          ...(!createData.examId &&
-            index === 0 && {
-              isScheduleMain: true,
-            }),
         })),
       ],
     });
@@ -94,16 +88,36 @@ export class EmployeeExamsHistoryRepository {
     const whereInit = {
       AND: [
         {
-          employee: {
-            hierarchy: { companyId: query.companyId },
-          },
+          ...(!query.allCompanies && {
+            employee: {
+              companyId: query.companyId,
+            },
+          }),
+          ...(query.allCompanies && {
+            OR: [
+              {
+                employee: {
+                  companyId: query.companyId,
+                },
+              },
+              {
+                employee: {
+                  company: {
+                    receivingServiceContracts: {
+                      some: { applyingServiceCompanyId: query.companyId },
+                    },
+                  },
+                },
+              },
+            ],
+          }),
         },
       ],
     } as typeof options.where;
 
     const { where } = prismaFilter(whereInit, {
       query,
-      skip: ['companyId'],
+      skip: ['companyId', 'allCompanies'],
     });
 
     const response = await this.prisma.$transaction([
@@ -111,17 +125,11 @@ export class EmployeeExamsHistoryRepository {
         where,
       }),
       this.prisma.employeeExamsHistory.findMany({
-        ...options,
-        include: {
-          exam: { select: { isAttendance: true, id: true, name: true } },
-          userDone: { select: { email: true, name: true } },
-          userSchedule: { select: { email: true, name: true } },
-          ...options.include,
-        },
         where,
         take: pagination.take || 20,
         skip: pagination.skip || 0,
         orderBy: { doneDate: 'desc' },
+        ...options,
       }),
     ]);
 

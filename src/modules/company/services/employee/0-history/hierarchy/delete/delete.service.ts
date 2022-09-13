@@ -77,16 +77,16 @@ export class DeleteEmployeeHierarchyHistoryService {
       const beforeMotive = beforeHistory?.motive || null;
 
       const isAfterOk =
-        historyRules[String(afterMotive)].before.includes(beforeMotive);
+        historyRules[String(afterMotive)]?.before?.includes(beforeMotive);
       const isBeforeOk =
-        historyRules[String(beforeMotive)].after.includes(afterMotive);
+        historyRules[String(beforeMotive)]?.after?.includes(afterMotive);
 
       if (!isAfterOk || !isBeforeOk)
         throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_BLOCK_HISTORY);
     }
 
     const getActualEmployeeHierarchy = () => {
-      if (afterHistory === null) {
+      if (afterHistory === undefined) {
         if (beforeHistory.motive === EmployeeHierarchyMotiveTypeEnum.DEM)
           return null;
         if (beforeHistory.hierarchyId) return beforeHistory.hierarchyId;

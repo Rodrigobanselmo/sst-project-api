@@ -211,7 +211,14 @@ export class EmployeeRepository {
       include: {
         ...include,
         company: {
-          select: { fantasy: true, name: true, cnpj: true, initials: true },
+          select: {
+            fantasy: true,
+            name: true,
+            cnpj: true,
+            initials: true,
+            blockResignationExam: true,
+            primary_activity: true,
+          },
         },
         hierarchy: !!include?.hierarchy
           ? false
@@ -319,6 +326,27 @@ export class EmployeeRepository {
     });
 
     return employees.map((employee) => new EmployeeEntity(employee));
+  }
+
+  async findCountNude(
+    options: Prisma.EmployeeFindManyArgs = {},
+    pagination: PaginationQueryDto,
+  ) {
+    const response = await this.prisma.$transaction([
+      this.prisma.employee.count({
+        where: options.where,
+      }),
+      this.prisma.employee.findMany({
+        take: pagination.take || 20,
+        skip: pagination.skip || 0,
+        ...options,
+      }),
+    ]);
+
+    return {
+      data: response[1].map((employee) => new EmployeeEntity(employee)),
+      count: response[0],
+    };
   }
 
   async findFirstNude(options: Prisma.EmployeeFindFirstArgs = {}) {

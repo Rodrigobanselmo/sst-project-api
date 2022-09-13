@@ -133,7 +133,8 @@ export class EmployeeHierarchyHistoryRepository {
         where: { id },
       }),
       this.prisma.employee.update({
-        data: hierarchyId !== undefined ? { hierarchyId } : {},
+        data:
+          hierarchyId !== undefined ? { hierarchyId, status: 'ACTIVE' } : {},
         where: { id: employeeId },
       }),
     ]);

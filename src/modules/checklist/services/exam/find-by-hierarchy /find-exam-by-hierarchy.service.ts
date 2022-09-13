@@ -40,6 +40,19 @@ export class FindExamByHierarchyService {
 
     const hierarchies = [hierarchy, ...(hierarchy?.parents || [])];
     const hierarchyIds = hierarchies.map(({ id }) => id);
+    const examType = {
+      ...('isPeriodic' in query && {
+        isPeriodic: query?.isPeriodic,
+      }),
+      ...('isChange' in query && { isChange: query?.isChange }),
+      ...('isAdmission' in query && {
+        isAdmission: query?.isAdmission,
+      }),
+      ...('isReturn' in query && { isReturn: query?.isReturn }),
+      ...('isDismissal' in query && {
+        isDismissal: query?.isDismissal,
+      }),
+    };
 
     if (query.employeeId) {
       this.employee = await this.employeeRepository.findById(
@@ -49,7 +62,12 @@ export class FindExamByHierarchyService {
           include: {
             examsHistory: {
               where: {
-                AND: [{ expiredDate: { gte: new Date() } }, { status: 'DONE' }],
+                AND: [
+                  { expiredDate: { gte: new Date() } },
+                  {
+                    status: 'DONE',
+                  },
+                ],
               },
             },
           },
@@ -70,7 +88,7 @@ export class FindExamByHierarchyService {
               include: {
                 exam: { select: { name: true, id: true, isAttendance: true } },
               },
-              where: { companyId, exam: { isAttendance: false } },
+              where: { companyId, exam: { isAttendance: false }, ...examType },
             },
           },
         },
@@ -84,6 +102,7 @@ export class FindExamByHierarchyService {
           include: {
             exam: { select: { name: true, id: true, isAttendance: true } },
           },
+          where: { ...examType },
         },
       },
       where: {
@@ -94,9 +113,13 @@ export class FindExamByHierarchyService {
           },
         },
         OR: [
-          { examsToRiskFactorData: { some: { examId: { gt: 0 } } } },
           {
-            riskFactor: { examToRisk: { some: { examId: { gt: 0 } } } },
+            examsToRiskFactorData: { some: { examId: { gt: 0 } } },
+          },
+          {
+            riskFactor: {
+              examToRisk: { some: { examId: { gt: 0 } } },
+            },
             standardExams: true,
           },
         ],
@@ -138,7 +161,7 @@ export class FindExamByHierarchyService {
 
     const examRepresentAll = await this.examRepository.findNude({
       select: {
-        examToRisk: { where: { companyId } },
+        examToRisk: { where: { companyId, ...examType } },
         name: true,
         id: true,
         isAttendance: true,
@@ -198,7 +221,7 @@ export class FindExamByHierarchyService {
           prioritization: 100,
           skipEmployee: this.checkIfSkipEmployee(examToRisk),
           risk: examToRisk.risk,
-          ...this.checkExpiredDate(examToRisk),
+          ...this.checkExpiredDate({ ...examToRisk, exam }),
         });
       });
     });
@@ -221,7 +244,7 @@ export class FindExamByHierarchyService {
         sortNumber(b.exam.isAttendance ? 1 : 0, a.exam.isAttendance ? 1 : 0),
       );
 
-    return { data: examsDataReturn };
+    return { data: this.checkCloseToExpiredDate(examsDataReturn) };
   }
 
   checkIfSkipEmployee(examRisk: IExamOriginData) {
@@ -277,6 +300,42 @@ export class FindExamByHierarchyService {
       expiredDate: foundExamHistory.expiredDate,
       status: foundExamHistory.status,
     };
+  }
+
+  checkCloseToExpiredDate(
+    examsDataReturn: {
+      exam: {
+        id: string;
+        name: string;
+        isAttendance: boolean;
+      };
+      origins: IExamOriginData[];
+    }[],
+  ) {
+    const foundExam = examsDataReturn.find((exam) => exam?.exam?.isAttendance);
+    if (!foundExam) return examsDataReturn;
+
+    const clinicValidityInMonths = foundExam.origins.find(
+      (exam) => !exam.skipEmployee,
+    )?.validityInMonths;
+
+    return examsDataReturn.map((examsData) => {
+      examsData.origins = examsData.origins.map((origin) => {
+        // const closeToExpired =
+        //   considerBetweenDays !== null &&
+        //   this.dayjs.compareTime(
+        //     this.dayjs.dateNow(),
+        //     origin.expiredDate,
+        //     'days',
+        //   ) >= considerBetweenDays;
+
+        // if (closeToExpired) origin.closeToExpired = closeToExpired;
+
+        return origin;
+      });
+
+      return examsData;
+    });
   }
 }
 

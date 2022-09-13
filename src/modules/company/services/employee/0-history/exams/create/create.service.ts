@@ -5,6 +5,7 @@ import { ErrorMessageEnum } from 'src/shared/constants/enum/errorMessage';
 
 import { UserPayloadDto } from '../../../../../../../shared/dto/user-payload.dto';
 import { EmployeeRepository } from '../../../../../repositories/implementations/EmployeeRepository';
+import { CreateEmployeeHierarchyHistoryService } from '../../hierarchy/create/create.service';
 import { CreateEmployeeExamHistoryDto } from './../../../../../dto/employee-exam-history';
 import { EmployeeExamsHistoryRepository } from './../../../../../repositories/implementations/EmployeeExamsHistoryRepository';
 
@@ -12,6 +13,7 @@ import { EmployeeExamsHistoryRepository } from './../../../../../repositories/im
 export class CreateEmployeeExamHistoryService {
   constructor(
     private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository,
+    private readonly createEmployeeHierarchyHistoryService: CreateEmployeeHierarchyHistoryService,
     private readonly employeeRepository: EmployeeRepository,
   ) {}
 
@@ -25,6 +27,7 @@ export class CreateEmployeeExamHistoryService {
       throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_NOT_FOUND);
 
     await this.checkOtherSchedulesAndCancel(dataDto, found);
+    await this.changeHierarchy(dataDto, user);
 
     const history = await this.employeeExamHistoryRepository.create({
       ...dataDto,
@@ -78,5 +81,40 @@ export class CreateEmployeeExamHistoryService {
       data: { status: StatusEnum.CANCELED },
       where: { id: { in: cancelIds } },
     });
+  }
+
+  async changeHierarchy(
+    dataDto: CreateEmployeeExamHistoryDto,
+    user: UserPayloadDto,
+  ) {
+    if (
+      dataDto.changeHierarchyAnyway &&
+      dataDto.changeHierarchyDate &&
+      dataDto.hierarchyId
+    )
+      await this.createEmployeeHierarchyHistoryService.execute(
+        {
+          employeeId: dataDto.employeeId,
+          hierarchyId: dataDto.hierarchyId,
+          motive: dataDto.examType === 'ADMI' ? 'ADM' : 'TRANS_PROM',
+          startDate: dataDto.changeHierarchyDate,
+        },
+        user,
+      );
+
+    if (
+      dataDto.examType === 'DEMI' &&
+      dataDto.changeHierarchyDate &&
+      !dataDto.hierarchyId
+    )
+      await this.createEmployeeHierarchyHistoryService.execute(
+        {
+          employeeId: dataDto.employeeId,
+          hierarchyId: null,
+          motive: 'DEM',
+          startDate: dataDto.changeHierarchyDate,
+        },
+        user,
+      );
   }
 }

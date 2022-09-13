@@ -126,9 +126,14 @@ export class CompanyEntity implements Company {
   companiesToClinicAvailable: CompanyClinicsEntity;
   clinicsAvailable: CompanyClinicsEntity;
   clinicExams: any;
+  riskDegree?: number;
 
   constructor(partial: Partial<CompanyEntity>) {
     Object.assign(this, partial);
+
+    if (this.primary_activity && this.primary_activity[0]) {
+      this.riskDegree = this.primary_activity[0].riskDegree;
+    }
 
     if (this.isClinic) {
       this.getClinicStep();
