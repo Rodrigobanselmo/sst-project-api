@@ -1,13 +1,19 @@
+import { StringCapitalizeTransform } from './../../../shared/transformers/string-capitalize';
+import { ErrorCompanyEnum } from './../../../shared/constants/enum/errorMessage';
+import { CpfFormatTransform } from './../../../shared/transformers/cpf-format.transform';
 import { StringUppercaseTransform } from './../../../shared/transformers/string-uppercase.transform';
 import { DateFormat } from './../../../shared/transformers/date-format';
 import { PartialType } from '@nestjs/swagger';
 import {
   IsBoolean,
   IsDate,
+  IsDefined,
   IsEnum,
   IsInt,
   IsOptional,
   IsString,
+  Length,
+  MaxLength,
   ValidateIf,
   ValidateNested,
 } from 'class-validator';
@@ -19,6 +25,7 @@ import {
   ExamHistoryConclusionEnum,
   ExamHistoryEvaluationEnum,
   ExamHistoryTypeEnum,
+  SexTypeEnum,
   StatusEnum,
 } from '@prisma/client';
 import { QueryArray } from './../../../shared/transformers/query-array';
@@ -189,7 +196,54 @@ export class UpdateEmployeeExamHistoryDto extends PartialType(
   conclusion: ExamHistoryConclusionEnum;
 }
 
+export class UpdateManyScheduleExamDto {
+  @IsOptional()
+  @Transform(CpfFormatTransform, { toClassOnly: true })
+  @Length(11, 11, { message: ErrorCompanyEnum.INVALID_CPF })
+  cpf: string;
+
+  @Transform(StringCapitalizeTransform, { toClassOnly: true })
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  name: string;
+
+  @IsString()
+  @IsOptional()
+  phone: string;
+
+  @IsString()
+  @IsOptional()
+  email: string;
+
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsString()
+  @IsOptional()
+  @IsEnum(SexTypeEnum, {
+    message: `Sexo inválido`,
+  })
+  sex: SexTypeEnum;
+
+  @IsOptional()
+  @Transform(DateFormat, { toClassOnly: true })
+  @IsDate({ message: 'Data de aniversário inválida' })
+  @Type(() => Date)
+  birthday: Date;
+
+  @IsBoolean()
+  @IsOptional()
+  isClinic: boolean;
+
+  @ValidateNested({ each: true })
+  @IsDefined()
+  @Type(() => UpdateEmployeeExamHistoryDto)
+  data?: UpdateEmployeeExamHistoryDto[];
+}
+
 export class FindEmployeeExamHistoryDto extends PaginationQueryDto {
+  @IsString()
+  search?: string;
+
   @IsString()
   companyId?: string;
 
@@ -205,8 +259,30 @@ export class FindEmployeeExamHistoryDto extends PaginationQueryDto {
   @IsOptional()
   allCompanies?: boolean;
 
+  @IsBoolean()
+  @IsOptional()
+  allExams?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  orderByCreation?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  includeClinic?: boolean;
+
   @Transform(QueryArray, { toClassOnly: true })
   @IsString({ each: true })
   @IsOptional()
   status?: string[];
+}
+
+export class FindClinicEmployeeExamHistoryDto {
+  @IsString()
+  companyId?: string;
+
+  @Transform(DateFormat, { toClassOnly: true })
+  @IsDate({ message: 'Data inválida' })
+  @Type(() => Date)
+  date: Date;
 }

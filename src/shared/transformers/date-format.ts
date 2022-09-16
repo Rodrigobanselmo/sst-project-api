@@ -1,6 +1,10 @@
 import { TransformFnParams } from 'class-transformer';
+import { dayjs } from '../providers/DateProvider/implementations/DayJSProvider';
 
-export const DateFormat = (data: TransformFnParams) => {
+export const DateFormat = (
+  data: TransformFnParams,
+  options: { onlyDate?: boolean } = { onlyDate: true },
+) => {
   const str = data.obj[data.key];
   if (!str) return;
 
@@ -18,7 +22,11 @@ export const DateFormat = (data: TransformFnParams) => {
         return date;
       }
     }
-    return new Date(str);
+
+    if (options.onlyDate) {
+      return dayjs(str).hour(0).minute(0).second(0).millisecond(0).toDate();
+    }
+    return dayjs(str).toDate();
   }
 
   return str;

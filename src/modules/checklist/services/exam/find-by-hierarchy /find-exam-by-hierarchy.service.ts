@@ -65,7 +65,9 @@ export class FindExamByHierarchyService {
                 AND: [
                   { expiredDate: { gte: new Date() } },
                   {
-                    status: 'DONE',
+                    status: query.isPendingExams
+                      ? { in: ['PENDING', 'PROCESSING'] }
+                      : 'DONE',
                   },
                 ],
               },

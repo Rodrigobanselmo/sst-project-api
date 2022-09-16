@@ -1,3 +1,4 @@
+import { onlyNumbers } from '@brazilian-utils/brazilian-utils';
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 
@@ -9,6 +10,7 @@ import {
   CreateEmployeeExamHistoryDto,
   FindEmployeeExamHistoryDto,
   UpdateEmployeeExamHistoryDto,
+  UpdateManyScheduleExamDto,
 } from '../../dto/employee-exam-history';
 import { EmployeeExamsHistoryEntity } from '../../entities/employee-exam-history.entity';
 
@@ -18,6 +20,7 @@ export class EmployeeExamsHistoryRepository {
 
   async create({
     examsData = [],
+    hierarchyId,
     ...createData
   }: CreateEmployeeExamHistoryDto & {
     userDoneId?: number;
@@ -28,6 +31,7 @@ export class EmployeeExamsHistoryRepository {
         ...[
           createData.examId && {
             ...createData,
+            hierarchyId,
             expiredDate: this.dayjs
               .dayjs(createData.doneDate)
               .add(createData.validityInMonths || 0, 'months')
@@ -74,6 +78,28 @@ export class EmployeeExamsHistoryRepository {
     return new EmployeeExamsHistoryEntity(data);
   }
 
+  async updateMany(updateManyDto: Pick<UpdateManyScheduleExamDto, 'data'>) {
+    const data = await this.prisma.$transaction(
+      updateManyDto.data.map(({ id, examsData, hierarchyId, ...updateData }) =>
+        this.prisma.employeeExamsHistory.update({
+          data: {
+            ...updateData,
+            expiredDate:
+              updateData.validityInMonths && updateData.doneDate
+                ? this.dayjs
+                    .dayjs(updateData.doneDate)
+                    .add(updateData.validityInMonths || 0, 'months')
+                    .toDate()
+                : undefined,
+          },
+          where: { id },
+        }),
+      ),
+    );
+
+    return data.map((data) => new EmployeeExamsHistoryEntity(data));
+  }
+
   async updateByIds(options: Prisma.EmployeeExamsHistoryUpdateManyArgs) {
     await this.prisma.employeeExamsHistory.updateMany({
       ...options,
@@ -117,8 +143,28 @@ export class EmployeeExamsHistoryRepository {
 
     const { where } = prismaFilter(whereInit, {
       query,
-      skip: ['companyId', 'allCompanies'],
+      skip: ['search', 'companyId', 'allCompanies'],
     });
+
+    if ('search' in query) {
+      const OR = [];
+      const CPF = onlyNumbers(query.search);
+      const isCPF = CPF.length == 11;
+
+      if (!isCPF) {
+        OR.push({ name: { contains: query.search, mode: 'insensitive' } });
+        OR.push({
+          esocialCode: { contains: query.search, mode: 'insensitive' },
+        });
+      } else {
+        OR.push({
+          cpf: CPF,
+        });
+      }
+
+      (where.AND as any).push({ employee: { OR } } as typeof options.where);
+      delete query.search;
+    }
 
     const response = await this.prisma.$transaction([
       this.prisma.employeeExamsHistory.count({

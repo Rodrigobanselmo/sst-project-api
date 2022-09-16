@@ -12,43 +12,57 @@ export class FindScheduleEmployeeExamHistoryService {
   ) {}
 
   async execute(
-    { skip, take, ...query }: FindEmployeeExamHistoryDto,
+    { skip, take, allExams, ...query }: FindEmployeeExamHistoryDto,
     user: UserPayloadDto,
   ) {
     const companyId = user.targetCompanyId;
+    const status: StatusEnum[] = [StatusEnum.PENDING];
+    if (allExams) status.push(StatusEnum.PROCESSING);
 
     const access = await this.employeeExamHistoryRepository.find(
       {
         companyId: companyId,
-        status: [StatusEnum.PENDING],
+        status,
         ...query,
       },
       { skip, take },
       {
         orderBy: { created_at: 'asc' },
-        distinct: ['employeeId'],
+        ...(!allExams && { distinct: ['employeeId'] }),
         select: {
-          created_at: true,
-          doneDate: true,
+          id: true,
           status: true,
-          time: true,
+          created_at: true,
+          ...(allExams && {
+            exam: { select: { name: true, id: true, isAttendance: true } },
+            hierarchy: { select: { id: true, name: true } },
+            time: true,
+            doneDate: true,
+            clinicId: true,
+            clinicObs: true,
+            scheduleType: true,
+          }),
           examType: true,
-          userSchedule: { select: { name: true, email: true, id: true } },
-          employee: {
-            select: {
-              name: true,
-              cpf: true,
-              company: {
-                select: {
-                  cnpj: true,
-                  name: true,
-                  fantasy: true,
-                  initials: true,
-                  address: { select: { state: true } },
+          ...(!allExams && {
+            userSchedule: { select: { name: true, email: true, id: true } },
+            employee: {
+              select: {
+                name: true,
+                id: true,
+                cpf: true,
+                company: {
+                  select: {
+                    cnpj: true,
+                    name: true,
+                    id: true,
+                    fantasy: true,
+                    initials: true,
+                    address: { select: { state: true } },
+                  },
                 },
               },
             },
-          },
+          }),
         },
       },
     );

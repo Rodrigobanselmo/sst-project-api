@@ -102,6 +102,10 @@ export class FindExamHierarchyDto {
 
   @IsBoolean()
   @IsOptional()
+  isPendingExams?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
   isPeriodic?: boolean;
   @IsBoolean()
   @IsOptional()

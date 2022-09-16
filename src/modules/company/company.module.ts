@@ -1,3 +1,4 @@
+import { UpdateManyScheduleExamHistoryService } from './services/employee/0-history/exams/update-many/update-many.service';
 import { Module, forwardRef } from '@nestjs/common';
 
 import { ExcelProvider } from '../../shared/providers/ExcelProvider/implementations/ExcelProvider';
@@ -93,6 +94,7 @@ import { FindByIdEmployeeExamHistoryService } from './services/employee/0-histor
 import { DayJSProvider } from '../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { FindClinicService } from './services/company/find-clinic/find-clinic.service';
 import { FindScheduleEmployeeExamHistoryService } from './services/employee/0-history/exams/find-schedule/find-schedule.service';
+import { FindClinicScheduleEmployeeExamHistoryService } from './services/employee/0-history/exams/find-clinic-schedules/find-clinic-schedules.service';
 
 @Module({
   imports: [forwardRef(() => ChecklistModule)],
@@ -190,7 +192,9 @@ import { FindScheduleEmployeeExamHistoryService } from './services/employee/0-hi
     DeleteEmployeeExamHistoryService,
     FindByIdEmployeeExamHistoryService,
     FindScheduleEmployeeExamHistoryService,
+    UpdateManyScheduleExamHistoryService,
     FindClinicService,
+    FindClinicScheduleEmployeeExamHistoryService,
     DayJSProvider,
   ],
   exports: [

@@ -283,6 +283,9 @@ export class EmployeeRepository {
       if (!isCPF) {
         OR.push({ name: { contains: query.search, mode: 'insensitive' } });
         OR.push({ email: { contains: query.search, mode: 'insensitive' } });
+        OR.push({
+          esocialCode: { contains: query.search, mode: 'insensitive' },
+        });
       } else {
         OR.push({
           cpf: CPF,

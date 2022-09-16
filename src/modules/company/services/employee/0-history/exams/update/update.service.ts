@@ -1,18 +1,16 @@
-import { UpdateEmployeeExamHistoryDto } from './../../../../../dto/employee-exam-history';
-import { EmployeeExamsHistoryRepository } from './../../../../../repositories/implementations/EmployeeExamsHistoryRepository';
+import { ErrorMessageEnum } from './../../../../../../../shared/constants/enum/errorMessage';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { ErrorMessageEnum } from 'src/shared/constants/enum/errorMessage';
 
 import { UserPayloadDto } from '../../../../../../../shared/dto/user-payload.dto';
 import { EmployeeRepository } from '../../../../../repositories/implementations/EmployeeRepository';
-import { CreateEmployeeExamHistoryService } from '../create/create.service';
+import { UpdateEmployeeExamHistoryDto } from './../../../../../dto/employee-exam-history';
+import { EmployeeExamsHistoryRepository } from './../../../../../repositories/implementations/EmployeeExamsHistoryRepository';
 
 @Injectable()
 export class UpdateEmployeeExamHistoryService {
   constructor(
     private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository,
     private readonly employeeRepository: EmployeeRepository,
-    private readonly createEmployeeExamHistoryService: CreateEmployeeExamHistoryService,
   ) {}
 
   async execute(dataDto: UpdateEmployeeExamHistoryDto, user: UserPayloadDto) {
@@ -21,6 +19,7 @@ export class UpdateEmployeeExamHistoryService {
       user.targetCompanyId,
     );
 
+    //tenant
     if (!found?.id)
       throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_NOT_FOUND);
 

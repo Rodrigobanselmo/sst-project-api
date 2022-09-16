@@ -15,8 +15,10 @@ import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import {
   CreateEmployeeExamHistoryDto,
+  FindClinicEmployeeExamHistoryDto,
   FindEmployeeExamHistoryDto,
   UpdateEmployeeExamHistoryDto,
+  UpdateManyScheduleExamDto,
 } from '../../dto/employee-exam-history';
 
 import { CreateEmployeeExamHistoryService } from '../../services/employee/0-history/exams/create/create.service';
@@ -25,6 +27,8 @@ import { FindScheduleEmployeeExamHistoryService } from '../../services/employee/
 import { FindByIdEmployeeExamHistoryService } from '../../services/employee/0-history/exams/find-by-id/find-by-id.service';
 import { FindEmployeeExamHistoryService } from '../../services/employee/0-history/exams/find/find.service';
 import { UpdateEmployeeExamHistoryService } from '../../services/employee/0-history/exams/update/update.service';
+import { UpdateManyScheduleExamHistoryService } from '../../services/employee/0-history/exams/update-many/update-many.service';
+import { FindClinicScheduleEmployeeExamHistoryService } from '../../services/employee/0-history/exams/find-clinic-schedules/find-clinic-schedules.service';
 
 @ApiTags('employee-history-exam')
 @Controller('employee-history/exam')
@@ -34,8 +38,10 @@ export class EmployeeExamHistoryController {
     private readonly updateEmployeeExamHistoryService: UpdateEmployeeExamHistoryService,
     private readonly findEmployeeExamHistoryService: FindEmployeeExamHistoryService,
     private readonly findAskEmployeeExamHistoryService: FindScheduleEmployeeExamHistoryService,
+    private readonly findClinicScheduleEmployeeExamHistoryService: FindClinicScheduleEmployeeExamHistoryService,
     private readonly findByIdEmployeeExamHistoryService: FindByIdEmployeeExamHistoryService,
     private readonly deleteEmployeeExamHistoryService: DeleteEmployeeExamHistoryService,
+    private readonly updateManyScheduleExamHistoryService: UpdateManyScheduleExamHistoryService,
   ) {}
 
   @Get()
@@ -45,12 +51,24 @@ export class EmployeeExamHistoryController {
   ) {
     return this.findEmployeeExamHistoryService.execute(query, userPayloadDto);
   }
+
   @Get('schedule')
   findSchedule(
     @User() userPayloadDto: UserPayloadDto,
     @Query() query: FindEmployeeExamHistoryDto,
   ) {
     return this.findAskEmployeeExamHistoryService.execute(
+      query,
+      userPayloadDto,
+    );
+  }
+
+  @Get('schedule/clinic')
+  findClinicSchedule(
+    @User() userPayloadDto: UserPayloadDto,
+    @Query() query: FindClinicEmployeeExamHistoryDto,
+  ) {
+    return this.findClinicScheduleEmployeeExamHistoryService.execute(
       query,
       userPayloadDto,
     );
@@ -81,6 +99,17 @@ export class EmployeeExamHistoryController {
     @User() userPayloadDto: UserPayloadDto,
   ) {
     return this.createEmployeeExamHistoryService.execute(
+      upsertAccessGroupDto,
+      userPayloadDto,
+    );
+  }
+
+  @Post('/update-many-schedule/:companyId?')
+  updateSchedule(
+    @Body() upsertAccessGroupDto: UpdateManyScheduleExamDto,
+    @User() userPayloadDto: UserPayloadDto,
+  ) {
+    return this.updateManyScheduleExamHistoryService.execute(
       upsertAccessGroupDto,
       userPayloadDto,
     );

@@ -72,7 +72,7 @@ export class EmployeeExamsHistoryEntity implements EmployeeExamsHistory {
       [StatusEnum.PENDING, StatusEnum.PROCESSING].includes(
         this.status as any,
       ) &&
-      dayjs(this.doneDate).isBefore(dayjs())
+      dayjs(this.doneDate).isBefore(dayjs().add(-1, 'day'))
     )
       this.status = StatusEnum.EXPIRED;
 
