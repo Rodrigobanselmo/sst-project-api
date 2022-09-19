@@ -18,7 +18,12 @@ import { UploadCompaniesService } from '../../services/company/upload-companies/
 import { UploadEmployeesService } from '../../services/company/upload-employees/upload-employees.service';
 import { UploadHierarchiesService } from '../../services/company/upload-hierarchies/upload-hierarchies.service';
 import { UploadUniqueCompanyService } from '../../services/company/upload-unique-company/upload-unique-company.service';
-
+import { Permissions } from '../../../../shared/decorators/permissions.decorator';
+import {
+  PermissionEnum,
+  RoleEnum,
+} from '../../../../shared/constants/enum/authorization';
+import { Roles } from '../../../../shared/decorators/roles.decorator';
 @Controller('files/company')
 export class FilesCompanyController {
   constructor(
@@ -32,6 +37,12 @@ export class FilesCompanyController {
     private readonly downloadHierarchiesService: DownloadHierarchiesService,
   ) {}
 
+  @Roles(RoleEnum.DATABASE)
+  @Permissions({
+    code: PermissionEnum.COMPANY,
+    isContract: true,
+    isMember: true,
+  })
   @Post('/upload/unique')
   @UseInterceptors(FileInterceptor('file'))
   async uploadCompanyFile(
@@ -48,6 +59,12 @@ export class FilesCompanyController {
     });
   }
 
+  @Roles(RoleEnum.DATABASE, RoleEnum.MANAGEMENT)
+  @Permissions({
+    code: PermissionEnum.EMPLOYEE,
+    isContract: true,
+    isMember: true,
+  })
   @Post('employees/upload/:companyId?')
   @UseInterceptors(FileInterceptor('file'))
   async uploadEmployeesFile(
@@ -66,6 +83,13 @@ export class FilesCompanyController {
     });
   }
 
+  @Roles(RoleEnum.DATABASE, RoleEnum.MANAGEMENT)
+  @Permissions({
+    code: PermissionEnum.EMPLOYEE,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
   @Post('hierarchies/upload/:companyId?')
   @UseInterceptors(FileInterceptor('file'))
   async uploadHierarchiesFile(
@@ -76,6 +100,13 @@ export class FilesCompanyController {
     return 'sucesso';
   }
 
+  @Roles(RoleEnum.DATABASE)
+  @Permissions({
+    code: PermissionEnum.COMPANY,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
   @Post('/upload/:companyId?')
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(
@@ -94,6 +125,12 @@ export class FilesCompanyController {
     });
   }
 
+  @Roles(RoleEnum.DATABASE)
+  @Permissions({
+    code: PermissionEnum.COMPANY,
+    isContract: true,
+    isMember: true,
+  })
   @Get('/download/:companyId?')
   async download(@User() userPayloadDto: UserPayloadDto, @Res() res) {
     const { workbook, filename } = await this.downloadCompaniesService.execute(
@@ -106,6 +143,12 @@ export class FilesCompanyController {
     });
   }
 
+  @Roles(RoleEnum.DATABASE)
+  @Permissions({
+    code: PermissionEnum.COMPANY,
+    isContract: true,
+    isMember: true,
+  })
   @Get('/download/unique/:companyId?')
   async downloadUnique(@User() userPayloadDto: UserPayloadDto, @Res() res) {
     const { workbook, filename } =
@@ -117,6 +160,12 @@ export class FilesCompanyController {
     });
   }
 
+  @Roles(RoleEnum.DATABASE)
+  @Permissions({
+    code: PermissionEnum.EMPLOYEE,
+    isContract: true,
+    isMember: true,
+  })
   @Get('/employees/download/:companyId?')
   async downloadEmployees(@User() userPayloadDto: UserPayloadDto, @Res() res) {
     const { workbook, filename } = await this.downloadEmployeesService.execute(
@@ -129,6 +178,12 @@ export class FilesCompanyController {
     });
   }
 
+  @Roles(RoleEnum.DATABASE)
+  @Permissions({
+    code: PermissionEnum.EMPLOYEE,
+    isContract: true,
+    isMember: true,
+  })
   @Get('/hierarchies/download/:companyId?')
   async downloadHierarchies(
     @User() userPayloadDto: UserPayloadDto,

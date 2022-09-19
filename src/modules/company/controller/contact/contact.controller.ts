@@ -22,6 +22,12 @@ import { CreateContactsService } from '../../services/contact/create-contact/cre
 import { DeleteContactsService } from '../../services/contact/delete-contact/delete-contact.service';
 import { FindContactsService } from '../../services/contact/find-contact/find-company-groups-group.service';
 import { UpdateContactsService } from '../../services/contact/update-contact/update-contact.service';
+import { Permissions } from '../../../../shared/decorators/permissions.decorator';
+import {
+  PermissionEnum,
+  RoleEnum,
+} from '../../../../shared/constants/enum/authorization';
+import { Roles } from '../../../../shared/decorators/roles.decorator';
 
 @ApiTags('contact')
 @Controller('company/:companyId/contact')
@@ -33,11 +39,31 @@ export class ContactController {
     private readonly deleteContactsService: DeleteContactsService,
   ) {}
 
+  @Permissions(
+    {
+      code: PermissionEnum.COMPANY,
+      isContract: true,
+      isMember: true,
+      crud: true,
+    },
+    {
+      code: PermissionEnum.MANAGEMENT,
+      isContract: true,
+      isMember: true,
+      crud: true,
+    },
+  )
   @Get()
   find(@User() userPayloadDto: UserPayloadDto, @Query() query: FindContactDto) {
     return this.findAvailableContactsService.execute(query, userPayloadDto);
   }
 
+  @Permissions({
+    code: PermissionEnum.COMPANY,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
   @Post()
   create(
     @Body() upsertAccessGroupDto: CreateContactDto,
@@ -49,6 +75,12 @@ export class ContactController {
     );
   }
 
+  @Permissions({
+    code: PermissionEnum.COMPANY,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
   @Patch('/:id')
   update(
     @Body() upsertAccessGroupDto: UpdateContactDto,
@@ -61,6 +93,12 @@ export class ContactController {
     );
   }
 
+  @Permissions({
+    code: PermissionEnum.COMPANY,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
   @Delete('/:id')
   delete(
     @User() userPayloadDto: UserPayloadDto,

@@ -12,6 +12,7 @@ import {
 } from '../../dto/risk.dto';
 import { RiskFactorsEntity } from '../../entities/risk.entity';
 import { IRiskRepository } from '../IRiskRepository.types';
+import { PaginationQueryDto } from 'src/shared/dto/pagination.dto';
 
 @Injectable()
 export class RiskRepository implements IRiskRepository {
@@ -281,6 +282,35 @@ export class RiskRepository implements IRiskRepository {
     });
 
     return risks.map((risk) => new RiskFactorsEntity(risk));
+  }
+
+  async findNude(options: Prisma.RiskFactorsFindManyArgs = {}) {
+    const risks = await this.prisma.riskFactors.findMany({
+      ...options,
+    });
+
+    return risks.map((companyClinic) => new RiskFactorsEntity(companyClinic));
+  }
+
+  async findCountNude(
+    pagination: PaginationQueryDto,
+    options: Prisma.RiskFactorsFindManyArgs = {},
+  ) {
+    const response = await this.prisma.$transaction([
+      this.prisma.riskFactors.count({
+        where: options.where,
+      }),
+      this.prisma.riskFactors.findMany({
+        take: pagination.take || 20,
+        skip: pagination.skip || 0,
+        ...options,
+      }),
+    ]);
+
+    return {
+      data: response[1].map((employee) => new RiskFactorsEntity(employee)),
+      count: response[0],
+    };
   }
 
   async findAllAvailable(

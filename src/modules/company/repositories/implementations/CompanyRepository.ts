@@ -497,7 +497,13 @@ export class CompanyRepository implements ICompanyRepository {
     pagination: PaginationQueryDto,
     options: Partial<Prisma.CompanyFindManyArgs> = { where: undefined },
   ) {
-    const query = { isClinic: false, ...queryFind };
+    const query = { isGroup: false, isClinic: false, ...queryFind };
+    if (query.findAll) {
+      delete query.isGroup;
+      delete query.isClinic;
+      delete query.findAll;
+    }
+
     const whereInit = {
       AND: [
         ...(companyId
@@ -510,6 +516,9 @@ export class CompanyRepository implements ICompanyRepository {
                       some: { applyingServiceCompanyId: companyId },
                     },
                   },
+                  ...(query.isClinic
+                    ? [{ companiesToClinicAvailable: { some: { companyId } } }]
+                    : []),
                 ],
                 ...options?.where,
               },
@@ -532,6 +541,7 @@ export class CompanyRepository implements ICompanyRepository {
         'isAdmission',
         'isReturn',
         'isDismissal',
+        'findAll',
       ],
     });
 
@@ -622,6 +632,12 @@ export class CompanyRepository implements ICompanyRepository {
     options: Partial<Prisma.CompanyFindManyArgs> = {},
   ) {
     const whereInit = { AND: [] } as typeof options.where;
+
+    if (query.findAll) {
+      delete query.isGroup;
+      delete query.isClinic;
+      delete query.findAll;
+    }
 
     const { where } = prismaFilter(whereInit, {
       query,
@@ -768,6 +784,14 @@ export class CompanyRepository implements ICompanyRepository {
       examCount,
       usersCount,
     });
+  }
+
+  async findNude(options: Prisma.CompanyFindManyArgs = {}) {
+    const data = await this.prisma.company.findMany({
+      ...options,
+    });
+
+    return data.map((data) => new CompanyEntity(data));
   }
 
   async findFirstNude(options: Prisma.CompanyFindFirstArgs = {}) {

@@ -114,6 +114,10 @@ export class RiskFactorDataEntity implements RiskFactorData {
   constructor(partial: Partial<RiskFactorDataEntity>) {
     Object.assign(this, partial);
 
+    if (partial.homogeneousGroup) {
+      this.homogeneousGroup = new HomoGroupEntity(partial.homogeneousGroup);
+    }
+
     this.getOrigin();
 
     if (partial.riskFactor) {

@@ -1,51 +1,75 @@
 import { Injectable } from '@nestjs/common';
-import { RiskDataRepository } from '../../../repositories/implementations/RiskDataRepository';
+import clone from 'clone';
+
+import { RiskRepository } from '../../../repositories/implementations/RiskRepository';
+import { RiskFactorDataEntity } from './../../../entities/riskData.entity';
 
 @Injectable()
 export class FindAllByHierarchyService {
-  constructor(private readonly riskDataRepository: RiskDataRepository) {}
+  constructor(private readonly riskRepository: RiskRepository) {}
 
-  async execute(
-    hierarchyId: string,
-    // groupId: string,
-    companyId: string,
-  ) {
-    const riskData = await this.riskDataRepository.findAllByHierarchyId(
-      companyId,
-      // groupId,
-      hierarchyId,
-      {
-        include: {
-          riskFactor: {
-            select: {
-              name: true,
-              severity: true,
-              type: true,
-              representAll: true,
-              id: true,
-              examToRisk: {
-                include: { exam: { select: { name: true, id: true } } },
-                where: { companyId },
+  async execute(hierarchyId: string, companyId: string) {
+    const risks = await this.riskRepository.findNude({
+      where: {
+        representAll: false, // remove standard risk
+        riskFactorData: {
+          some: {
+            companyId,
+            homogeneousGroup: {
+              hierarchyOnHomogeneous: { some: { hierarchyId } },
+            },
+          },
+        },
+      },
+      select: {
+        name: true,
+        severity: true,
+        type: true,
+        representAll: true,
+        id: true,
+        docInfo: {
+          where: { companyId, OR: [{ hierarchyId }, { hierarchyId: null }] },
+        },
+        examToRisk: {
+          include: { exam: { select: { name: true, id: true } } },
+          where: { companyId },
+        },
+        riskFactorData: {
+          where: {
+            companyId,
+            homogeneousGroup: {
+              hierarchyOnHomogeneous: { some: { hierarchyId } },
+            },
+          },
+          include: {
+            examsToRiskFactorData: {
+              include: {
+                exam: { select: { name: true, status: true } },
+              },
+            },
+            homogeneousGroup: {
+              include: {
+                characterization: { select: { name: true, type: true } },
+                environment: { select: { name: true, type: true } },
               },
             },
           },
-          homogeneousGroup: {
-            include: {
-              characterization: { select: { name: true, type: true } },
-              environment: { select: { name: true, type: true } },
-            },
-          },
-          generateSources: false,
-          adms: false,
-          recs: false,
-          dataRecs: false,
-          engsToRiskFactorData: false,
-          epiToRiskFactorData: false,
         },
-        where: { riskFactor: { representAll: false } }, // remove standard risk
       },
-    );
+    });
 
-    return riskData;
+    const riskDataReturn: RiskFactorDataEntity[] = [];
+
+    risks.forEach((risk) => {
+      risk.riskFactorData.forEach((riskData) => {
+        const riskCopy = clone(risk);
+        riskCopy.riskFactorData = undefined;
+
+        riskData.riskFactor = riskCopy;
+        riskDataReturn.push(riskData);
+      });
+    });
+
+    return riskDataReturn.map((riskData) => new RiskFactorDataEntity(riskData));
   }
 }

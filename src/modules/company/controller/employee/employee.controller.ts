@@ -8,6 +8,8 @@ import {
   Query,
 } from '@nestjs/common';
 
+import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
+import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import {
@@ -31,11 +33,23 @@ export class EmployeeController {
     private readonly deleteSubOfficeEmployeeService: DeleteSubOfficeEmployeeService,
   ) {}
 
+  @Permissions({
+    code: PermissionEnum.EMPLOYEE,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
   @Post()
   create(@Body() createEmployeeDto: CreateEmployeeDto) {
     return this.createEmployeeService.execute(createEmployeeDto);
   }
 
+  @Permissions({
+    code: PermissionEnum.EMPLOYEE,
+    isContract: true,
+    isMember: true,
+    crud: 'u',
+  })
   @Post('/:employeeId/sub-office/:subOfficeId/:companyId')
   deleteSubOffice(
     @Param('employeeId') employeeId: number,
@@ -49,11 +63,34 @@ export class EmployeeController {
     });
   }
 
+  @Permissions({
+    code: PermissionEnum.EMPLOYEE,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
   @Patch('/:companyId?')
   update(@Body() updateEmployee: UpdateEmployeeDto) {
     return this.updateEmployeeService.execute(updateEmployee);
   }
 
+  @Permissions(
+    {
+      code: PermissionEnum.EMPLOYEE,
+      isContract: true,
+      isMember: true,
+    },
+    {
+      code: PermissionEnum.COMPANY,
+      isContract: true,
+      isMember: true,
+    },
+    {
+      code: PermissionEnum.MANAGEMENT,
+      isContract: true,
+      isMember: true,
+    },
+  )
   @Get('/:companyId?')
   FindAllAvailable(
     @User() userPayloadDto: UserPayloadDto,
@@ -62,6 +99,23 @@ export class EmployeeController {
     return this.findAllAvailableEmployeesService.execute(query, userPayloadDto);
   }
 
+  @Permissions(
+    {
+      code: PermissionEnum.EMPLOYEE,
+      isContract: true,
+      isMember: true,
+    },
+    {
+      code: PermissionEnum.COMPANY,
+      isContract: true,
+      isMember: true,
+    },
+    {
+      code: PermissionEnum.MANAGEMENT,
+      isContract: true,
+      isMember: true,
+    },
+  )
   @Get('/id/:employeeId/:companyId?')
   findOne(
     @User() userPayloadDto: UserPayloadDto,

@@ -1,3 +1,4 @@
+import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
 import { RiskFactorsEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import {
@@ -141,4 +142,10 @@ export class UpdateRiskDto {
   @IsOptional()
   @Type(() => RiskUpdateGenerateSourceDto)
   generateSource?: RiskUpdateGenerateSourceDto[];
+}
+
+export class FindRiskDto extends PaginationQueryDto {
+  @IsString()
+  @IsOptional()
+  search: string;
 }

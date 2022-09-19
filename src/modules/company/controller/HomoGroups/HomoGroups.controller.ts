@@ -8,6 +8,9 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
+
+import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
+import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import {
@@ -31,11 +34,39 @@ export class HomoGroupsController {
     private readonly copyHomoGroupService: CopyHomoGroupService,
   ) {}
 
+  @Permissions(
+    {
+      code: PermissionEnum.EMPLOYEE,
+      isContract: true,
+      isMember: true,
+    },
+    {
+      code: PermissionEnum.HOMO_GROUP,
+      isContract: true,
+      isMember: true,
+    },
+    {
+      code: PermissionEnum.COMPANY,
+      isContract: true,
+      isMember: true,
+    },
+    {
+      code: PermissionEnum.MANAGEMENT,
+      isContract: true,
+      isMember: true,
+    },
+  )
   @Get('/:companyId?')
   findByCompany(@User() userPayloadDto: UserPayloadDto) {
     return this.findByCompanyHomoGroupService.execute(userPayloadDto);
   }
 
+  @Permissions({
+    code: PermissionEnum.HOMO_GROUP,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
   @Post()
   create(
     @Body() createHomoGroupsDto: CreateHomoGroupDto,
@@ -47,6 +78,12 @@ export class HomoGroupsController {
     );
   }
 
+  @Permissions({
+    code: PermissionEnum.HOMO_GROUP,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
   @Patch('/:id/:companyId?')
   update(
     @Body() updateHomoGroupsDto: UpdateHomoGroupDto,
@@ -59,11 +96,31 @@ export class HomoGroupsController {
     );
   }
 
+  @Permissions({
+    code: PermissionEnum.HOMO_GROUP,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
   @Delete('/:id/:companyId?')
   delete(@Param('id') id: string, @User() userPayloadDto: UserPayloadDto) {
     return this.deleteHomoGroupsService.execute(id, userPayloadDto);
   }
 
+  @Permissions(
+    {
+      code: PermissionEnum.HOMO_GROUP,
+      isContract: true,
+      isMember: true,
+      crud: true,
+    },
+    {
+      code: PermissionEnum.RISK_DATA,
+      isContract: true,
+      isMember: true,
+      crud: true,
+    },
+  )
   @Post('copy/:companyId?')
   @HttpCode(200)
   copy(

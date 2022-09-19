@@ -50,6 +50,12 @@ export class ExamController {
     return this.createExamService.execute(createExamDto, userPayloadDto);
   }
 
+  @Permissions({
+    code: PermissionEnum.EXAM,
+    crud: true,
+    isMember: true,
+    isContract: true,
+  })
   @Get('/:companyId?')
   findAllAvailable(
     @User() userPayloadDto: UserPayloadDto,
@@ -58,17 +64,20 @@ export class ExamController {
     return this.findExamService.execute(query, userPayloadDto);
   }
 
-  @Get('/hierarchy/:hierarchyId/:companyId')
+  @Permissions({
+    code: PermissionEnum.EXAM,
+    crud: true,
+    isMember: true,
+    isContract: true,
+  })
+  @Get('/hierarchy/:companyId')
   findByHierarchy(
     @User() userPayloadDto: UserPayloadDto,
-    @Param('hierarchyId') hierarchyId: string,
     @Query() query: FindExamHierarchyDto,
   ) {
-    return this.findExamByHierarchyService.execute(
-      hierarchyId,
-      userPayloadDto,
-      query,
-    );
+    return this.findExamByHierarchyService.execute(userPayloadDto, {
+      ...query,
+    });
   }
 
   @Permissions({

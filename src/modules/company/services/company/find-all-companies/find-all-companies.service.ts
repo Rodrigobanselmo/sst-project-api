@@ -15,7 +15,7 @@ export class FindAllCompaniesService {
     if (!user.isMaster)
       return await this.companyRepository.findAllRelatedByCompanyId(
         user.companyId,
-        query,
+        { ...query },
         { skip, take },
         {
           select: {

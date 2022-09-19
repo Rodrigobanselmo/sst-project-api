@@ -242,6 +242,7 @@ export class UpdateManyScheduleExamDto {
 
 export class FindEmployeeExamHistoryDto extends PaginationQueryDto {
   @IsString()
+  @IsOptional()
   search?: string;
 
   @IsString()

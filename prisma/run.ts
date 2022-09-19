@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { levelRiskData } from './run/level-risk-data';
 
 import { representAll } from './run/represent-all';
 
@@ -21,7 +22,8 @@ async function main() {
   //   console.log(error);
   //   console.log('error: end');
   // }
-  representAll(prisma);
+  await levelRiskData(prisma);
+  await representAll(prisma);
   console.log('end');
 }
 

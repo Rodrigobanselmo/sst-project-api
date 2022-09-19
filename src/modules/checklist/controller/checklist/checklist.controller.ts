@@ -8,6 +8,8 @@ import { CreateChecklistService } from '../../services/checklist/create-checklis
 import { FindAvailableChecklistService } from '../../services/checklist/find-available-checklist/find-available-checklist.service';
 import { FindChecklistDataService } from '../../services/checklist/find-checklist-data/find-checklist-data.service';
 import { UpdateChecklistService } from '../../services/checklist/update-checklist/update-checklist.service';
+import { Permissions } from '../../../../shared/decorators/permissions.decorator';
+import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
 
 @Controller('checklist')
 export class ChecklistController {

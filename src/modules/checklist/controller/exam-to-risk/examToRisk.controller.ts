@@ -59,6 +59,11 @@ export class ExamRiskController {
     return this.updateExamService.execute(id, updateRiskDto, userPayloadDto);
   }
 
+  @Permissions({
+    code: PermissionEnum.EXAM_RISK,
+    isMember: true,
+    isContract: true,
+  })
   @Get('/:companyId?')
   findAllAvailable(
     @User() userPayloadDto: UserPayloadDto,

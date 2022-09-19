@@ -13,15 +13,28 @@ import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import { DownloadRiskDataService } from '../../services/checklist/download-risk-data/download-risk-data.service';
 import { UploadChecklistDataService } from '../../services/checklist/upload-risk-data/upload-risk-data.service';
 import { UploadEpiDataService } from '../../services/checklist/upload-epi-data/upload-epi-data.service';
+import { Permissions } from '../../../../shared/decorators/permissions.decorator';
+import {
+  PermissionEnum,
+  RoleEnum,
+} from '../../../../shared/constants/enum/authorization';
+import { Roles } from '../../../../shared/decorators/roles.decorator';
 
 @Controller('files/checklist')
 export class FilesChecklistController {
   constructor(
     private readonly uploadEpiDataService: UploadEpiDataService,
-    private readonly uploadChecklistDataService: UploadChecklistDataService,
-    private readonly downloadRiskDataService: DownloadRiskDataService,
+    private readonly uploadRiskService: UploadChecklistDataService,
+    private readonly downloadRiskService: DownloadRiskDataService,
   ) {}
 
+  @Roles(RoleEnum.DATABASE)
+  @Permissions({
+    code: PermissionEnum.COMPANY,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
   @Post('/upload/:companyId?')
   @UseInterceptors(FileInterceptor('file'))
   async uploadRiskFile(
@@ -29,18 +42,8 @@ export class FilesChecklistController {
     @User() userPayloadDto: UserPayloadDto,
     @Res() res,
   ) {
-    const { workbook, filename } =
-      await this.uploadChecklistDataService.execute(file, userPayloadDto);
-
-    res.attachment(filename);
-    workbook.xlsx.write(res).then(function () {
-      res.end();
-    });
-  }
-
-  @Get('/download/:companyId?')
-  async downloadRisks(@User() userPayloadDto: UserPayloadDto, @Res() res) {
-    const { workbook, filename } = await this.downloadRiskDataService.execute(
+    const { workbook, filename } = await this.uploadRiskService.execute(
+      file,
       userPayloadDto,
     );
 
@@ -50,6 +53,30 @@ export class FilesChecklistController {
     });
   }
 
+  @Roles(RoleEnum.DATABASE)
+  @Permissions({
+    code: PermissionEnum.COMPANY,
+    isContract: true,
+    isMember: true,
+  })
+  @Get('/download/:companyId?')
+  async downloadRisks(@User() userPayloadDto: UserPayloadDto, @Res() res) {
+    const { workbook, filename } = await this.downloadRiskService.execute(
+      userPayloadDto,
+    );
+
+    res.attachment(filename);
+    workbook.xlsx.write(res).then(function () {
+      res.end();
+    });
+  }
+
+  @Roles(RoleEnum.DATABASE)
+  @Permissions({
+    code: PermissionEnum.COMPANY,
+    isContract: true,
+    isMember: true,
+  })
   @Post('epi/upload/:companyId?')
   @UseInterceptors(FileInterceptor('file'))
   async uploadEpiFile(

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { v4 } from 'uuid';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
@@ -21,6 +22,7 @@ export class CompanyGroupRepository {
     doctorResponsibleId,
     ...data
   }: UpsertCompanyGroupDto) {
+    const uuid = v4();
     const group = await this.prisma.companyGroup.upsert({
       update: {
         ...data,
@@ -46,7 +48,24 @@ export class CompanyGroupRepository {
               })),
             }
           : undefined,
-      } as any,
+        companyGroup: {
+          create: {
+            id: uuid,
+            name: `(GRUPO EMPRESARIAL) ${data.name}`,
+            isGroup: true,
+            applyingServiceContracts: {
+              createMany: {
+                data: companiesIds.map((companyId) => ({
+                  receivingServiceCompanyId: companyId,
+                })),
+              },
+            },
+            receivingServiceContracts: {
+              createMany: { data: [{ applyingServiceCompanyId: companyId }] },
+            },
+          },
+        },
+      },
       where: { id_companyId: { id: id || 0, companyId } },
       include: { doctorResponsible: true },
     });

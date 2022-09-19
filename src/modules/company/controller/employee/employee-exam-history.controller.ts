@@ -29,6 +29,12 @@ import { FindEmployeeExamHistoryService } from '../../services/employee/0-histor
 import { UpdateEmployeeExamHistoryService } from '../../services/employee/0-history/exams/update/update.service';
 import { UpdateManyScheduleExamHistoryService } from '../../services/employee/0-history/exams/update-many/update-many.service';
 import { FindClinicScheduleEmployeeExamHistoryService } from '../../services/employee/0-history/exams/find-clinic-schedules/find-clinic-schedules.service';
+import { Permissions } from '../../../../shared/decorators/permissions.decorator';
+import {
+  PermissionEnum,
+  RoleEnum,
+} from '../../../../shared/constants/enum/authorization';
+import { Roles } from '../../../../shared/decorators/roles.decorator';
 
 @ApiTags('employee-history-exam')
 @Controller('employee-history/exam')
@@ -44,6 +50,20 @@ export class EmployeeExamHistoryController {
     private readonly updateManyScheduleExamHistoryService: UpdateManyScheduleExamHistoryService,
   ) {}
 
+  @Permissions(
+    {
+      code: PermissionEnum.EMPLOYEE_HISTORY,
+      isContract: true,
+      isMember: true,
+      crud: true,
+    },
+    {
+      code: PermissionEnum.COMPANY_SCHEDULE,
+      isContract: true,
+      isMember: true,
+      crud: true,
+    },
+  )
   @Get()
   find(
     @User() userPayloadDto: UserPayloadDto,
@@ -52,6 +72,20 @@ export class EmployeeExamHistoryController {
     return this.findEmployeeExamHistoryService.execute(query, userPayloadDto);
   }
 
+  @Permissions(
+    {
+      code: PermissionEnum.EMPLOYEE_HISTORY,
+      isContract: true,
+      isMember: true,
+      crud: true,
+    },
+    {
+      code: PermissionEnum.COMPANY_SCHEDULE,
+      isContract: true,
+      isMember: true,
+      crud: true,
+    },
+  )
   @Get('schedule')
   findSchedule(
     @User() userPayloadDto: UserPayloadDto,
@@ -63,6 +97,20 @@ export class EmployeeExamHistoryController {
     );
   }
 
+  @Permissions(
+    {
+      code: PermissionEnum.EMPLOYEE_HISTORY,
+      isContract: true,
+      isMember: true,
+      crud: true,
+    },
+    {
+      code: PermissionEnum.COMPANY_SCHEDULE,
+      isContract: true,
+      isMember: true,
+      crud: true,
+    },
+  )
   @Get('schedule/clinic')
   findClinicSchedule(
     @User() userPayloadDto: UserPayloadDto,
@@ -74,6 +122,20 @@ export class EmployeeExamHistoryController {
     );
   }
 
+  @Permissions(
+    {
+      code: PermissionEnum.EMPLOYEE_HISTORY,
+      isContract: true,
+      isMember: true,
+      crud: true,
+    },
+    {
+      code: PermissionEnum.COMPANY_SCHEDULE,
+      isContract: true,
+      isMember: true,
+      crud: true,
+    },
+  )
   @Get('/:id/:companyId')
   findById(
     @User() userPayloadDto: UserPayloadDto,
@@ -82,6 +144,12 @@ export class EmployeeExamHistoryController {
     return this.findByIdEmployeeExamHistoryService.execute(id, userPayloadDto);
   }
 
+  @Permissions({
+    code: PermissionEnum.EMPLOYEE_HISTORY,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
   @Post('/:companyId?')
   create(
     @Body() upsertAccessGroupDto: CreateEmployeeExamHistoryDto,
@@ -93,6 +161,20 @@ export class EmployeeExamHistoryController {
     );
   }
 
+  @Permissions(
+    {
+      code: PermissionEnum.EMPLOYEE_HISTORY,
+      isContract: true,
+      isMember: true,
+      crud: true,
+    },
+    {
+      code: PermissionEnum.COMPANY_SCHEDULE,
+      isContract: true,
+      isMember: true,
+      crud: true,
+    },
+  )
   @Post('/schedule/:companyId?')
   createSchedule(
     @Body() upsertAccessGroupDto: CreateEmployeeExamHistoryDto,
@@ -104,6 +186,18 @@ export class EmployeeExamHistoryController {
     );
   }
 
+  @Permissions(
+    {
+      code: PermissionEnum.EMPLOYEE_HISTORY,
+      isContract: true,
+      isMember: true,
+      crud: true,
+    },
+    {
+      code: PermissionEnum.CLINIC_SCHEDULE,
+      isMember: true,
+    },
+  )
   @Post('/update-many-schedule/:companyId?')
   updateSchedule(
     @Body() upsertAccessGroupDto: UpdateManyScheduleExamDto,
@@ -115,6 +209,12 @@ export class EmployeeExamHistoryController {
     );
   }
 
+  @Permissions({
+    code: PermissionEnum.EMPLOYEE_HISTORY,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
   @Patch('/:id/:companyId?')
   update(
     @Body() upsertAccessGroupDto: UpdateEmployeeExamHistoryDto,
@@ -127,6 +227,12 @@ export class EmployeeExamHistoryController {
     );
   }
 
+  @Permissions({
+    code: PermissionEnum.EMPLOYEE_HISTORY,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
   @Delete('/:employeeId/:id/:companyId?')
   delete(
     @User() userPayloadDto: UserPayloadDto,

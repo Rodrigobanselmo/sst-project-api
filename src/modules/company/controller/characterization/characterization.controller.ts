@@ -27,6 +27,12 @@ import { AddCharacterizationPhotoService } from '../../services/characterization
 import { DeleteCharacterizationPhotoService } from '../../services/characterization/delete-characterization-photo/delete-characterization-photo.service';
 import { FindByIdCharacterizationService } from '../../services/characterization/find-by-id-characterization/find-by-id-characterization.service';
 import { UpdateCharacterizationPhotoService } from '../../services/characterization/update-characterization-photo/update-characterization-photo.service';
+import { Permissions } from '../../../../shared/decorators/permissions.decorator';
+import {
+  PermissionEnum,
+  RoleEnum,
+} from '../../../../shared/constants/enum/authorization';
+import { Roles } from '../../../../shared/decorators/roles.decorator';
 
 @ApiTags('characterizations')
 @Controller('/company/:companyId/workspace/:workspaceId/characterizations')
@@ -41,6 +47,18 @@ export class CharacterizationController {
     private readonly updateCharacterizationPhotoService: UpdateCharacterizationPhotoService,
   ) {}
 
+  @Permissions(
+    {
+      code: PermissionEnum.MANAGEMENT,
+      isContract: true,
+      isMember: true,
+    },
+    {
+      code: PermissionEnum.CHARACTERIZATION,
+      isContract: true,
+      isMember: true,
+    },
+  )
   @Get()
   findAll(
     @User() userPayloadDto: UserPayloadDto,
@@ -52,11 +70,29 @@ export class CharacterizationController {
     );
   }
 
+  @Permissions(
+    {
+      code: PermissionEnum.MANAGEMENT,
+      isContract: true,
+      isMember: true,
+    },
+    {
+      code: PermissionEnum.CHARACTERIZATION,
+      isContract: true,
+      isMember: true,
+    },
+  )
   @Get('/:id')
   findById(@User() userPayloadDto: UserPayloadDto, @Param('id') id: string) {
     return this.findByIdCharacterizationService.execute(id, userPayloadDto);
   }
 
+  @Permissions({
+    code: PermissionEnum.CHARACTERIZATION,
+    isContract: true,
+    isMember: true,
+    crud: 'cu',
+  })
   @Post()
   @UseInterceptors(
     FilesInterceptor('files[]', 5, { fileFilter: pngFileFilter }),
@@ -75,6 +111,12 @@ export class CharacterizationController {
     );
   }
 
+  @Permissions({
+    code: PermissionEnum.CHARACTERIZATION,
+    isContract: true,
+    isMember: true,
+    crud: 'cu',
+  })
   @Post('/photo')
   @UseInterceptors(FileInterceptor('file'))
   async uploadRiskFile(
@@ -89,6 +131,12 @@ export class CharacterizationController {
     );
   }
 
+  @Permissions({
+    code: PermissionEnum.CHARACTERIZATION,
+    isContract: true,
+    isMember: true,
+    crud: 'cu',
+  })
   @Post('/photo/:id')
   async update(
     @Body() updatePhotoCharacterizationDto: UpdatePhotoCharacterizationDto,
@@ -100,12 +148,24 @@ export class CharacterizationController {
     );
   }
 
+  @Permissions({
+    code: PermissionEnum.CHARACTERIZATION,
+    isContract: true,
+    isMember: true,
+    crud: 'cu',
+  })
   @Delete('/photo/:id')
   @UseInterceptors(FileInterceptor('file'))
   deletePhoto(@Param('id') id: string) {
     return this.deleteCharacterizationPhotoService.execute(id);
   }
 
+  @Permissions({
+    code: PermissionEnum.CHARACTERIZATION,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
   @Delete('/:id')
   delete(
     @Param('id') id: string,

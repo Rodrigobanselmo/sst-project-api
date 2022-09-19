@@ -7,9 +7,9 @@ import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 export class FindClinicService {
   constructor(private readonly companyRepository: CompanyRepository) {}
 
-  async execute(user: UserPayloadDto) {
+  async execute(clinicId: string, user: UserPayloadDto) {
     const company = await this.companyRepository.findFirstNude({
-      where: { id: user.targetCompanyId },
+      where: { id: clinicId },
       select: {
         id: true,
         address: true,
@@ -19,7 +19,6 @@ export class FindClinicService {
         fantasy: true,
         name: true,
         initials: true,
-        // clinicExams: true,
         clinicExams: {
           where: {
             startDate: { lte: new Date() },

@@ -34,6 +34,12 @@ import { FindCnpjService } from '../../services/company/find-cnpj/find-cnpj.serv
 import { FindCompanyService } from '../../services/company/find-company/find-company.service';
 import { SetCompanyClinicsService } from '../../services/company/set-company-clinics/set-company-clinics.service';
 import { UpdateCompanyService } from '../../services/company/update-company/update-company.service';
+import { Permissions } from '../../../../shared/decorators/permissions.decorator';
+import {
+  PermissionEnum,
+  RoleEnum,
+} from '../../../../shared/constants/enum/authorization';
+import { Roles } from '../../../../shared/decorators/roles.decorator';
 
 @ApiTags('company')
 @Controller('company')
@@ -54,6 +60,18 @@ export class CompanyController {
     private readonly findClinicService: FindClinicService,
   ) {}
 
+  @Permissions(
+    {
+      code: PermissionEnum.COMPANY,
+      isContract: true,
+      isMember: true,
+    },
+    {
+      code: PermissionEnum.MANAGEMENT,
+      isContract: true,
+      isMember: true,
+    },
+  )
   @Get()
   findAll(
     @User() userPayloadDto: UserPayloadDto,
@@ -62,6 +80,18 @@ export class CompanyController {
     return this.findAllCompaniesService.execute(userPayloadDto, query);
   }
 
+  @Permissions(
+    {
+      code: PermissionEnum.COMPANY,
+      isContract: true,
+      isMember: true,
+    },
+    {
+      code: PermissionEnum.MANAGEMENT,
+      isContract: true,
+      isMember: true,
+    },
+  )
   @Get('by-user')
   findAllByUser(
     @User() userPayloadDto: UserPayloadDto,
@@ -70,31 +100,62 @@ export class CompanyController {
     return this.findAllUserCompaniesService.execute(userPayloadDto, query);
   }
 
+  @Roles(RoleEnum.MANAGEMENT, RoleEnum.COMPANY)
   @Get('/cnae')
   findCNAE(@Query() query: FindActivityDto) {
     return this.findCnaeService.execute(query);
   }
 
+  @Permissions(
+    {
+      code: PermissionEnum.MANAGEMENT,
+      isContract: true,
+      isMember: true,
+    },
+    {
+      code: PermissionEnum.COMPANY,
+      isContract: true,
+      isMember: true,
+    },
+  )
   @Get('/:companyId')
   findOne(@User() userPayloadDto: UserPayloadDto) {
     return this.findCompanyService.execute(userPayloadDto);
   }
 
-  @Get('/clinic/:companyId')
-  findClinicOne(@User() userPayloadDto: UserPayloadDto) {
-    return this.findClinicService.execute(userPayloadDto);
+  @Permissions(
+    {
+      code: PermissionEnum.MANAGEMENT,
+      isContract: true,
+      isMember: true,
+    },
+    {
+      code: PermissionEnum.COMPANY,
+      isContract: true,
+      isMember: true,
+    },
+  )
+  @Get('/clinic/:clinicId')
+  findClinicOne(
+    @Param('clinicId') clinicId: string,
+    @User() userPayloadDto: UserPayloadDto,
+  ) {
+    return this.findClinicService.execute(clinicId, userPayloadDto);
   }
 
+  @Roles(RoleEnum.MANAGEMENT, RoleEnum.COMPANY)
   @Get('cnpj/:cnpj')
   findCNPJ(@Param('cnpj') cnpj: string) {
     return this.findCnpjService.execute(cnpj);
   }
 
+  @Roles(RoleEnum.MANAGEMENT, RoleEnum.COMPANY)
   @Get('cep/:cep')
   findCEP(@Param('cep') cep: string) {
     return this.findCepService.execute(cep);
   }
 
+  @Roles(RoleEnum.CONTRACTS)
   @Post()
   create(
     @Body() createCompanyDto: CreateCompanyDto,
@@ -106,6 +167,12 @@ export class CompanyController {
     return this.createContractService.execute(createCompanyDto, userPayloadDto);
   }
 
+  @Permissions({
+    code: PermissionEnum.COMPANY,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
   @Post('/:companyId/photo')
   @UseInterceptors(FileInterceptor('file'))
   async uploadRiskFile(
@@ -115,11 +182,23 @@ export class CompanyController {
     return this.addCompanyPhotoService.execute(userPayloadDto, file);
   }
 
+  @Permissions({
+    code: PermissionEnum.COMPANY,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
   @Patch()
   update(@Body() updateCompanyDto: UpdateCompanyDto) {
     return this.updateCompanyService.execute(updateCompanyDto);
   }
 
+  @Permissions({
+    code: PermissionEnum.COMPANY,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
   @Post('/copy/:copyFromCompanyId/:riskGroupId/:companyId')
   copy(
     @Param('copyFromCompanyId') copyFromCompanyId: string,
@@ -133,6 +212,12 @@ export class CompanyController {
     );
   }
 
+  @Permissions({
+    code: PermissionEnum.COMPANY,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
   @Post('/:companyId/set-clinics')
   setClinics(
     @Body() setCompanyClinicDto: SetCompanyClinicDto,

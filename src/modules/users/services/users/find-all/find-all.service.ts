@@ -12,15 +12,15 @@ export class FindAllByCompanyService {
     );
 
     return users.map((userCompany) => {
-      userCompany.companies = userCompany.companies
-        .map((company) => {
-          if (company.companyId === user.targetCompanyId) {
-            return company;
-          }
+      // userCompany.companies = userCompany.companies
+      //   .map((company) => {
+      //     if (company.companyId === user.targetCompanyId) {
+      //       return company;
+      //     }
 
-          return null;
-        })
-        .filter((company) => company !== null);
+      //     return null;
+      //   })
+      //   .filter((company) => company !== null);
 
       delete userCompany.password;
       return userCompany;

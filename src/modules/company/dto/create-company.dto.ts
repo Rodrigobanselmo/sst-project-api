@@ -228,6 +228,14 @@ export class FindCompaniesDto extends PaginationQueryDto {
   @IsOptional()
   isClinic?: boolean;
 
+  @IsBoolean()
+  @IsOptional()
+  isGroup?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  findAll?: boolean;
+
   @IsString()
   @IsOptional()
   clinicsCompanyId?: string;

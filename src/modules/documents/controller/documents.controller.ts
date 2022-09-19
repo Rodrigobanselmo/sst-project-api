@@ -1,5 +1,7 @@
 import { Body, Controller, Get, Param, Post, Res } from '@nestjs/common';
 
+import { PermissionEnum } from '../../../shared/constants/enum/authorization';
+import { Permissions } from '../../../shared/decorators/permissions.decorator';
 import { User } from '../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../shared/dto/user-payload.dto';
 import { UploadPgrActionPlanDto, UpsertPgrDto } from '../dto/pgr.dto';
@@ -21,6 +23,11 @@ export class DocumentsController {
     private readonly addQueuePGRDocumentService: AddQueuePGRDocumentService,
   ) {}
 
+  @Permissions({
+    code: PermissionEnum.PGR,
+    isMember: true,
+    isContract: true,
+  })
   @Get('/:docId/attachment/:attachmentId/:companyId?')
   async downloadAttachment(
     @Res() res,
@@ -48,6 +55,11 @@ export class DocumentsController {
     fileStream.pipe(res);
   }
 
+  @Permissions({
+    code: PermissionEnum.PGR,
+    isMember: true,
+    isContract: true,
+  })
   @Get('/:docId/:companyId?')
   async downloadPGR(
     @Res() res,
@@ -72,6 +84,12 @@ export class DocumentsController {
     fileStream.pipe(res);
   }
 
+  @Permissions({
+    code: PermissionEnum.PGR,
+    isMember: true,
+    isContract: true,
+    crud: true,
+  })
   @Post()
   async uploadPGRDoc(
     @Res() res,
@@ -86,6 +104,19 @@ export class DocumentsController {
     res.send(file);
   }
 
+  @Permissions(
+    {
+      code: PermissionEnum.PGR,
+      isMember: true,
+      isContract: true,
+      crud: true,
+    },
+    {
+      code: PermissionEnum.ACTION_PLAN,
+      isMember: true,
+      isContract: true,
+    },
+  )
   @Post('action-plan')
   async uploadPGRActionPlanDoc(
     @Res() res,
@@ -102,6 +133,12 @@ export class DocumentsController {
     res.send(file);
   }
 
+  @Permissions({
+    code: PermissionEnum.PGR,
+    isMember: true,
+    isContract: true,
+    crud: true,
+  })
   @Post('/add-queue')
   async addQueuePGRDoc(
     @User() userPayloadDto: UserPayloadDto,

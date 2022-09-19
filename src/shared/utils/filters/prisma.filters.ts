@@ -28,7 +28,7 @@ export const prismaFilter = <T>(
           mode: 'insensitive',
         },
       });
-    } else if (value || value === 0) {
+    } else if (value || value === 0 || typeof value == 'boolean') {
       ((where as any).AND as any).push({
         [key]: value,
       });

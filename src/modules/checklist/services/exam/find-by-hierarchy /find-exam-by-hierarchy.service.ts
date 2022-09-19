@@ -1,3 +1,4 @@
+import { RiskFactorDataEntity } from './../../../entities/riskData.entity';
 import { FindExamHierarchyDto } from './../../../dto/exam.dto';
 import { ExamRiskEntity } from './../../../entities/examRisk.entity';
 import { EmployeeEntity } from './../../../../company/entities/employee.entity';
@@ -27,18 +28,20 @@ export class FindExamByHierarchyService {
     private readonly dayjs: DayJSProvider,
   ) {}
 
-  async execute(
-    hierarchyId: string,
-    user: UserPayloadDto,
-    query: FindExamHierarchyDto,
-  ) {
+  async execute(user: UserPayloadDto, query: FindExamHierarchyDto) {
+    const hierarchyId = query.hierarchyId;
     const companyId = user.targetCompanyId;
-    const hierarchy = await this.hierarchyRepository.findByIdWithParent(
-      hierarchyId,
-      companyId,
+    const hierarchy = hierarchyId
+      ? await this.hierarchyRepository.findByIdWithParent(
+          hierarchyId,
+          companyId,
+        )
+      : undefined;
+
+    const hierarchies = [hierarchy, ...(hierarchy?.parents || [])].filter(
+      (h) => h,
     );
 
-    const hierarchies = [hierarchy, ...(hierarchy?.parents || [])];
     const hierarchyIds = hierarchies.map(({ id }) => id);
     const examType = {
       ...('isPeriodic' in query && {
@@ -96,6 +99,12 @@ export class FindExamByHierarchyService {
         },
         homogeneousGroup: {
           include: {
+            hierarchyOnHomogeneous: {
+              select: {
+                hierarchy: true,
+              },
+              where: { homogeneousGroup: { type: 'HIERARCHY' } },
+            },
             characterization: { select: { name: true, type: true } },
             environment: { select: { name: true, type: true } },
           },
@@ -109,35 +118,36 @@ export class FindExamByHierarchyService {
       },
       where: {
         companyId,
-        homogeneousGroup: {
-          hierarchyOnHomogeneous: {
-            some: { hierarchyId: { in: hierarchyIds } },
+        ...(hierarchyIds.length > 0 && {
+          homogeneousGroup: {
+            hierarchyOnHomogeneous: {
+              some: { hierarchyId: { in: hierarchyIds } },
+            },
           },
-        },
+        }),
         OR: [
           {
             examsToRiskFactorData: { some: { examId: { gt: 0 } } },
           },
-          {
-            riskFactor: {
-              examToRisk: { some: { examId: { gt: 0 } } },
-            },
-            standardExams: true,
-          },
+          ...(hierarchyIds.length > 0
+            ? [
+                {
+                  riskFactor: {
+                    examToRisk: { some: { examId: { gt: 0 } } },
+                  },
+                  standardExams: true,
+                },
+              ]
+            : []),
         ],
       },
     });
 
     const riskDataOrigin = riskData.map((rd) => {
       let prioritization: number;
-      if (rd.homogeneousGroup.type === HomoTypeEnum.HIERARCHY) {
-        const hierarchyFound = hierarchies?.find(
-          (hierarchy) => hierarchy.id === rd.homogeneousGroupId,
-        ) || { name: '', type: '' };
-        rd.origin = `${hierarchyFound.name} (${
-          originRiskMap[hierarchyFound.type]?.name || ''
-        })`;
-        prioritization = originRiskMap[hierarchyFound.type]?.prioritization;
+
+      if (rd.homogeneousGroup.type === HomoTypeEnum.HIERARCHY && rd.hierarchy) {
+        prioritization = originRiskMap[rd.hierarchy.type]?.prioritization;
       }
 
       return { ...rd, prioritization };
@@ -161,52 +171,55 @@ export class FindExamByHierarchyService {
       // exams
     });
 
-    const examRepresentAll = await this.examRepository.findNude({
-      select: {
-        examToRisk: { where: { companyId, ...examType } },
-        name: true,
-        id: true,
-        isAttendance: true,
-      },
-      where: {
-        AND: [
-          {
-            //tenant
-            OR: [
-              { system: true },
-              { companyId },
-              {
-                company: {
-                  applyingServiceContracts: {
-                    some: { receivingServiceCompanyId: companyId },
-                  },
+    const examRepresentAll =
+      hierarchyIds.length > 0
+        ? await this.examRepository.findNude({
+            select: {
+              examToRisk: { where: { companyId, ...examType } },
+              name: true,
+              id: true,
+              isAttendance: true,
+            },
+            where: {
+              AND: [
+                {
+                  //tenant
+                  OR: [
+                    { system: true },
+                    { companyId },
+                    {
+                      company: {
+                        applyingServiceContracts: {
+                          some: { receivingServiceCompanyId: companyId },
+                        },
+                      },
+                    },
+                    {
+                      company: {
+                        receivingServiceContracts: {
+                          some: { applyingServiceCompanyId: companyId },
+                        },
+                      },
+                    },
+                  ],
                 },
-              },
-              {
-                company: {
-                  receivingServiceContracts: {
-                    some: { applyingServiceCompanyId: companyId },
-                  },
+                {
+                  // rules
+                  OR: [
+                    {
+                      examToRisk: {
+                        some: {
+                          companyId: companyId,
+                          risk: { representAll: true },
+                        },
+                      },
+                    },
+                  ],
                 },
-              },
-            ],
-          },
-          {
-            // rules
-            OR: [
-              {
-                examToRisk: {
-                  some: {
-                    companyId: companyId,
-                    risk: { representAll: true },
-                  },
-                },
-              },
-            ],
-          },
-        ],
-      },
-    });
+              ],
+            },
+          })
+        : { data: [] };
 
     examRepresentAll.data.map((exam) => {
       exam.examToRisk.map((examToRisk) => {

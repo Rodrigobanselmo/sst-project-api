@@ -138,9 +138,9 @@ enum RecTypeEnum {
 }
 
 enum RiskFactorsEnum {
-  BIO 
-  QUI
   FIS
+  QUI
+  BIO 
   ERG
   ACI
   OUTROS
@@ -210,6 +210,7 @@ model Address {
   
   @@unique([workspaceId, companyId])
   @@unique([id,companyId])
+  @@index(companyId)
 }
 
 model AddressCompany {
@@ -273,6 +274,7 @@ model Company {
   description String?
   isConsulting Boolean @default(false)
   isClinic Boolean @default(false)
+  isGroup Boolean @default(false)
   licenseId Int? 
   groupId Int? 
   phone String?
@@ -305,7 +307,7 @@ model Company {
   applyingServiceContracts Contract[]  @relation(name: "contracts")
   characterization CompanyCharacterization[] 
   checklist Checklist[] 
-  companyGroups CompanyGroup[] 
+  companyGroups CompanyGroup[] @relation(name:"company")
   databaseTable DatabaseTable[] 
   employees Employee[] 
   environments CompanyEnvironment[] 
@@ -338,6 +340,10 @@ model Company {
   clinicsAvailable CompanyClinics[]  @relation(name: "companies_available")
   companiesToClinicAvailable CompanyClinics[]  @relation(name: "clinics_available")
   examClinicHistory EmployeeExamsHistory[]  
+  riskDocInfo RiskFactorsDocInfo[]
+  companyGroupId Int? @unique
+  companyGroup CompanyGroup? @relation(name:"company_group", fields: [companyGroupId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
+
   // professionals Professional[] @relation(name:"companies_related") 
   stateRegistration String? // not in use
   size String? // not in use
@@ -351,6 +357,13 @@ model Company {
   mission String?
   vision String?
   values String?
+ 
+  @@index(name)
+  @@index(isClinic)
+  @@index(isConsulting)
+  @@index(initials)
+  @@index(fantasy)
+  @@index(cnpj)
 }
 
 model CompanyClinics {
@@ -371,12 +384,14 @@ model CompanyGroup {
   updated_at  DateTime   @updatedAt
   companies Company[] @relation(name:"group") 
   companyId String
-  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
+  company Company @relation(name:"company", fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
   numAsos Int?
   blockResignationExam Boolean @default(true)
   esocialStart  DateTime?
   doctorResponsibleId  Int?
   doctorResponsible  Professional? @relation(name:"doctors_group_responsibles", fields: [doctorResponsibleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  
+  companyGroup Company? @relation(name:"company_group") 
 
   @@unique([id, companyId])
 }
@@ -697,6 +712,7 @@ model Exam {
   employeesHistory EmployeeExamsHistory[] 
 
   @@unique([id, companyId])
+  @@index(companyId)
 }
 
 model ExamToClinic {
@@ -813,6 +829,7 @@ model Hierarchy {
   riskFactorDatas RiskFactorData[] 
   hierarchyHistory EmployeeHierarchyHistory[]
   employeeExamsHistory EmployeeExamsHistory[]
+  riskDocInfo RiskFactorsDocInfo[]
 
   @@unique([id, companyId])
   @@index(companyId)
@@ -972,9 +989,28 @@ model RiskFactors {
   riskFactorData RiskFactorData[]
   riskFactorProbability RiskFactorProbability[]
   examToRisk ExamToRisk[]
+  docInfo RiskFactorsDocInfo[]
   json Json?
   
   @@unique([id, companyId])
+}
+
+model RiskFactorsDocInfo {
+  id    Int     @default(autoincrement()) @id
+  risk   RiskFactors @relation(fields: [riskId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  hierarchy   Hierarchy? @relation(fields: [hierarchyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  riskId String 
+  companyId String 
+  hierarchyId String? 
+  isAso Boolean  @default(true)
+  isPGR Boolean  @default(true)
+  isPCMSO Boolean  @default(true)
+  isPPP Boolean  @default(true)
+  created_at DateTime @default(now())
+ 
+  @@index(companyId)
+  @@unique([companyId,riskId,hierarchyId])
 }
 
 model RiskFactorDocument {
@@ -1088,6 +1124,7 @@ model RiskFactorData {
   @@unique([homogeneousGroupId, riskId, riskFactorGroupDataId])
   @@unique([hierarchyId, riskId, riskFactorGroupDataId])
   @@unique([id, riskId, riskFactorGroupDataId])
+  @@index(companyId)
 }
 
 model RiskFactorProbability {
@@ -1162,6 +1199,7 @@ model User {
   professional Professional? 
 
   @@unique([id, name])
+  @@index(email)
 }
 
 model UserCompany {
@@ -1178,6 +1216,7 @@ model UserCompany {
   updated_at  DateTime   @updatedAt
   
   @@id([companyId, userId])
+  @@index(companyId)
 }
 
 model Workspace {
@@ -1202,6 +1241,7 @@ model Workspace {
 
   @@unique([abbreviation, companyId])
   @@unique([id, companyId])
+  @@index(companyId)
 }
 
 

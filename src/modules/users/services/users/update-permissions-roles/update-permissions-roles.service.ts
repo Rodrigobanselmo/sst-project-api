@@ -73,13 +73,22 @@ export class UpdatePermissionsRolesService {
       }
     }
 
-    const companies = await this.companyRepository.findAllRelatedByCompanyId(
-      updateUserCompanyDto.companyId,
-      { companiesIds: updateUserCompanyDto?.companiesIds || [] },
-      { skip: 0, take: 100 },
-    );
+    const companyId = updateUserCompanyDto.companyId;
+    const companies = await this.companyRepository.findNude({
+      where: {
+        id: { in: updateUserCompanyDto?.companiesIds || [] },
+        OR: [
+          { id: companyId },
+          {
+            receivingServiceContracts: {
+              some: { applyingServiceCompanyId: companyId },
+            },
+          },
+        ],
+      },
+    });
 
-    if (companies && companies.data && companies.data.length > 0) {
+    if (companies && companies && companies.length > 0) {
       await this.usersCompanyRepository.deleteAllFromConsultant(
         updateUserCompanyDto.userId,
         updateUserCompanyDto.companyId,
@@ -87,7 +96,7 @@ export class UpdatePermissionsRolesService {
 
       await this.usersCompanyRepository.upsertMany({
         ...updateUserCompanyDto,
-        companiesIds: companies.data.map((company) => company.id),
+        companiesIds: companies.map((company) => company.id),
       });
     } else await this.usersCompanyRepository.update(updateUserCompanyDto);
   }

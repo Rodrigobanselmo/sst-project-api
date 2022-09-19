@@ -52,6 +52,17 @@ export class HomoGroupEntity implements HomogeneousGroup {
 
   constructor(partial: Partial<HomoGroupEntity>) {
     Object.assign(this, partial);
+
+    if (
+      this.type === 'HIERARCHY' &&
+      !this.hierarchy &&
+      this.hierarchyOnHomogeneous &&
+      this.hierarchyOnHomogeneous[0]
+    ) {
+      this.hierarchy = new HierarchyEntity(
+        this.hierarchyOnHomogeneous[0].hierarchy,
+      );
+    }
   }
 }
 

@@ -23,6 +23,12 @@ import { CreateEmployeeHierarchyHistoryService } from '../../services/employee/0
 import { DeleteEmployeeHierarchyHistoryService } from '../../services/employee/0-history/hierarchy/delete/delete.service';
 import { FindEmployeeHierarchyHistoryService } from '../../services/employee/0-history/hierarchy/find/find.service';
 import { UpdateEmployeeHierarchyHistoryService } from '../../services/employee/0-history/hierarchy/update/update.service';
+import { Permissions } from '../../../../shared/decorators/permissions.decorator';
+import {
+  PermissionEnum,
+  RoleEnum,
+} from '../../../../shared/constants/enum/authorization';
+import { Roles } from '../../../../shared/decorators/roles.decorator';
 
 @ApiTags('employee-history-hierarchy')
 @Controller('employee-history/hierarchy')
@@ -34,6 +40,11 @@ export class EmployeeHierarchyHistoryController {
     private readonly deleteEmployeeHierarchyHistoryService: DeleteEmployeeHierarchyHistoryService,
   ) {}
 
+  @Permissions({
+    code: PermissionEnum.EMPLOYEE,
+    isContract: true,
+    isMember: true,
+  })
   @Get()
   find(
     @User() userPayloadDto: UserPayloadDto,
@@ -45,6 +56,12 @@ export class EmployeeHierarchyHistoryController {
     );
   }
 
+  @Permissions({
+    code: PermissionEnum.EMPLOYEE_HISTORY,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
   @Post('/:companyId?')
   create(
     @Body() upsertAccessGroupDto: CreateEmployeeHierarchyHistoryDto,
@@ -56,6 +73,12 @@ export class EmployeeHierarchyHistoryController {
     );
   }
 
+  @Permissions({
+    code: PermissionEnum.EMPLOYEE_HISTORY,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
   @Patch('/:id/:companyId?')
   update(
     @Body() upsertAccessGroupDto: UpdateEmployeeHierarchyHistoryDto,
@@ -68,6 +91,12 @@ export class EmployeeHierarchyHistoryController {
     );
   }
 
+  @Permissions({
+    code: PermissionEnum.EMPLOYEE_HISTORY,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
   @Delete('/:employeeId/:id/:companyId?')
   delete(
     @User() userPayloadDto: UserPayloadDto,

@@ -12,6 +12,7 @@ import { GenerateSourceController } from './controller/generate-source/generate-
 import { RecMedController } from './controller/rec-med/rec-med.controller';
 import { RiskDataRecController } from './controller/risk-data-rec/risk-data-rec.controller';
 import { RiskDataController } from './controller/risk-data/risk-data.controller';
+import { RiskDocInfoController } from './controller/risk-doc-info/risk-doc-info.controller';
 import { RiskGroupDataController } from './controller/risk-group-data/risk-group-data.controller';
 import { RiskController } from './controller/risk/risk.controller';
 import { ChecklistRepository } from './repositories/implementations/ChecklistRepository';
@@ -23,6 +24,7 @@ import { GenerateSourceRepository } from './repositories/implementations/Generat
 import { RecMedRepository } from './repositories/implementations/RecMedRepository';
 import { RiskDataRecRepository } from './repositories/implementations/RiskDataRecRepository';
 import { RiskDataRepository } from './repositories/implementations/RiskDataRepository';
+import { RiskDocInfoRepository } from './repositories/implementations/RiskDocInfoRepository';
 import { RiskDocumentRepository } from './repositories/implementations/RiskDocumentRepository';
 import { RiskGroupDataRepository } from './repositories/implementations/RiskGroupDataRepository';
 import { RiskRepository } from './repositories/implementations/RiskRepository';
@@ -60,12 +62,14 @@ import { FindAllByHierarchyService } from './services/risk-data/find-by-hierarch
 import { FindAllByHomogeneousGroupService } from './services/risk-data/find-by-homogeneous-group/find-by-homogeneous-group.service';
 import { UpsertManyRiskDataService } from './services/risk-data/upsert-many-risk-data/upsert-many-risk-data.service';
 import { UpsertRiskDataService } from './services/risk-data/upsert-risk-data/upsert-risk.service';
+import { UpsertRiskDocInfoService } from './services/risk-doc-info/upsert-risk-doc-info/upsert-risk-doc-info.service';
 import { FindAllByCompanyService } from './services/risk-group-data/find-by-company/find-by-company.service';
 import { FindByIdService } from './services/risk-group-data/find-by-id/find-by-id.service';
 import { UpsertRiskGroupDataService } from './services/risk-group-data/upsert-risk-group-data/upsert-risk-group-data.service';
 import { CreateRiskService } from './services/risk/create-risk/create-risk.service';
 import { DeleteSoftRiskService } from './services/risk/delete-soft-risk/delete-soft-risk.service';
 import { FindAllAvailableRiskService } from './services/risk/find-all-available-risk/find-all-available-risk.service';
+import { FindRisksByCompanyService } from './services/risk/find-by-company/find-by-company.service';
 import { UpdateRiskService } from './services/risk/update-risk/update-risk.service';
 
 @Module({
@@ -82,6 +86,7 @@ import { UpdateRiskService } from './services/risk/update-risk/update-risk.servi
     ExamController,
     ExamToClinicController,
     ExamRiskController,
+    RiskDocInfoController,
   ],
   providers: [
     ChecklistRepository,
@@ -138,6 +143,9 @@ import { UpdateRiskService } from './services/risk/update-risk/update-risk.servi
     FindExamRiskService,
     CreateExamRiskService,
     FindExamByHierarchyService,
+    RiskDocInfoRepository,
+    UpsertRiskDocInfoService,
+    FindRisksByCompanyService,
   ],
   exports: [
     RiskRepository,

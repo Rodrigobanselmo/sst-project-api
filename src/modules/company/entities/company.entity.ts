@@ -127,6 +127,8 @@ export class CompanyEntity implements Company {
   clinicsAvailable: CompanyClinicsEntity;
   clinicExams: any;
   riskDegree?: number;
+  isGroup: boolean;
+  companyGroupId: number;
 
   constructor(partial: Partial<CompanyEntity>) {
     Object.assign(this, partial);

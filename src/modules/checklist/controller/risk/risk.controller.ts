@@ -6,11 +6,12 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 
-import { CreateRiskDto, UpdateRiskDto } from '../../dto/risk.dto';
+import { CreateRiskDto, FindRiskDto, UpdateRiskDto } from '../../dto/risk.dto';
 import { CreateRiskService } from '../../services/risk/create-risk/create-risk.service';
 import { DeleteSoftRiskService } from '../../services/risk/delete-soft-risk/delete-soft-risk.service';
 import { FindAllAvailableRiskService } from '../../services/risk/find-all-available-risk/find-all-available-risk.service';
@@ -21,6 +22,7 @@ import {
   RoleEnum,
 } from '../../../../shared/constants/enum/authorization';
 import { Roles } from '../../../../shared/decorators/roles.decorator';
+import { FindRisksByCompanyService } from '../../services/risk/find-by-company/find-by-company.service';
 
 @Controller('risk')
 export class RiskController {
@@ -28,6 +30,7 @@ export class RiskController {
     private readonly createRiskService: CreateRiskService,
     private readonly updateRiskService: UpdateRiskService,
     private readonly findAllAvailableRiskService: FindAllAvailableRiskService,
+    private readonly findRisksByCompanyService: FindRisksByCompanyService,
     private readonly deleteSoftRiskService: DeleteSoftRiskService,
   ) {}
 
@@ -66,10 +69,32 @@ export class RiskController {
     {
       code: PermissionEnum.MANAGEMENT,
       isMember: true,
+      isContract: true,
     },
     {
       code: PermissionEnum.RISK,
       isMember: true,
+      isContract: true,
+    },
+  )
+  @Get('company/:companyId?')
+  findByCompany(
+    @User() userPayloadDto: UserPayloadDto,
+    @Query() query: FindRiskDto,
+  ) {
+    return this.findRisksByCompanyService.execute(query, userPayloadDto);
+  }
+
+  @Permissions(
+    {
+      code: PermissionEnum.MANAGEMENT,
+      isMember: true,
+      isContract: true,
+    },
+    {
+      code: PermissionEnum.RISK,
+      isMember: true,
+      isContract: true,
     },
   )
   @Get('/:companyId?')

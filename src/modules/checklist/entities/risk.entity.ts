@@ -6,6 +6,7 @@ import { RecMedEntity } from './recMed.entity';
 import { GenerateSourceEntity } from './generateSource.entity';
 import { ExamRiskEntity } from './examRisk.entity';
 import { RiskFactorDataEntity } from './riskData.entity';
+import { RiskDocInfoEntity } from './riskDocInfo.entity';
 
 export class RiskFactorsEntity implements RiskFactors {
   @ApiProperty({ description: 'The id of the Company' })
@@ -83,10 +84,17 @@ export class RiskFactorsEntity implements RiskFactors {
   carnogenicityLinach: string;
   examToRisk: ExamRiskEntity[];
   riskFactorData: RiskFactorDataEntity[];
+  docInfo?: RiskDocInfoEntity[];
 
   constructor(partial: Partial<RiskFactorsEntity>) {
     Object.assign(this, partial);
     this.vmp = String(this.getVMP(this?.nr15lt || ''));
+
+    if (this.riskFactorData) {
+      this.riskFactorData = this.riskFactorData.map(
+        (riskData) => new RiskFactorDataEntity(riskData),
+      );
+    }
   }
 
   private getVMP(nr15lt?: string) {

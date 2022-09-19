@@ -11,6 +11,12 @@ import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import { DownloadCnaeService } from '../../services/cnae/download-cnae/download-cnae.service';
 import { UploadCnaeDataService } from '../../services/cnae/upload-cnae/upload-cnae.service';
+import { Permissions } from '../../../../shared/decorators/permissions.decorator';
+import {
+  PermissionEnum,
+  RoleEnum,
+} from '../../../../shared/constants/enum/authorization';
+import { Roles } from '../../../../shared/decorators/roles.decorator';
 
 @Controller('files/cnae')
 export class FilesCnaeController {
@@ -19,6 +25,7 @@ export class FilesCnaeController {
     private readonly uploadCnaeService: UploadCnaeDataService,
   ) {}
 
+  @Roles(RoleEnum.MASTER)
   @Post('/upload')
   @UseInterceptors(FileInterceptor('file'))
   async uploadCnaeFile(
@@ -37,6 +44,7 @@ export class FilesCnaeController {
     });
   }
 
+  @Roles(RoleEnum.MASTER)
   @Get('/download')
   async download(@User() userPayloadDto: UserPayloadDto, @Res() res) {
     const { workbook, filename } = await this.downloadCnaeService.execute(

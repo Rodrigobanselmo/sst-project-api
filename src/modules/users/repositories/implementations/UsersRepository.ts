@@ -113,9 +113,44 @@ export class UsersRepository implements IUsersRepository {
 
   async findAllByCompany(companyId?: string) {
     const users = await this.prisma.user.findMany({
-      where: { companies: { some: { companyId } } },
+      where: {
+        companies: {
+          some: {
+            OR: [
+              {
+                companyId,
+              },
+              {
+                company: {
+                  receivingServiceContracts: {
+                    some: { applyingServiceCompanyId: companyId },
+                  },
+                },
+              },
+            ],
+          },
+        },
+      },
       include: {
-        companies: { include: { group: true }, where: { companyId } },
+        companies: {
+          include: { group: true },
+          where: {
+            OR: [
+              {
+                companyId,
+              },
+              {
+                company: {
+                  receivingServiceContracts: {
+                    some: { applyingServiceCompanyId: companyId },
+                  },
+                },
+              },
+            ],
+          },
+          // take: 1,
+          orderBy: { status: 'asc' },
+        },
         professional: true,
       },
     });

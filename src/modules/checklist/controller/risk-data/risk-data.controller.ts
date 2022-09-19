@@ -97,33 +97,6 @@ export class RiskDataController {
       isMember: true,
     },
   )
-  @Get('/:companyId/:riskGroupId/:riskId')
-  findAllAvailable(
-    @User() userPayloadDto: UserPayloadDto,
-    @Param('riskId') riskId: string,
-    @Param('riskGroupId') groupId: string,
-  ) {
-    const companyId = userPayloadDto.targetCompanyId;
-
-    return this.findAllByGroupAndRiskService.execute(
-      riskId,
-      groupId,
-      companyId,
-    );
-  }
-
-  @Permissions(
-    {
-      code: PermissionEnum.MANAGEMENT,
-      isContract: true,
-      isMember: true,
-    },
-    {
-      code: PermissionEnum.RISK_DATA,
-      isContract: true,
-      isMember: true,
-    },
-  )
   @Get('/:companyId/:groupId/homogeneous/:homogeneousGroupId')
   findAllAvailableByHomogenousGroup(
     @User() userPayloadDto: UserPayloadDto,
@@ -151,17 +124,40 @@ export class RiskDataController {
       isMember: true,
     },
   )
-  @Get('/:companyId/:groupId/hierarchy/:hierarchyId')
+  @Get('/:companyId/hierarchy/:hierarchyId')
   findAllAvailableByHierarchy(
     @User() userPayloadDto: UserPayloadDto,
-    // @Param('groupId') groupId: string,
     @Param('hierarchyId') hierarchyId: string,
   ) {
     const companyId = userPayloadDto.targetCompanyId;
+    console.log(companyId);
 
-    return this.findAllByHierarchyService.execute(
-      hierarchyId,
-      // groupId,
+    return this.findAllByHierarchyService.execute(hierarchyId, companyId);
+  }
+
+  @Permissions(
+    {
+      code: PermissionEnum.MANAGEMENT,
+      isContract: true,
+      isMember: true,
+    },
+    {
+      code: PermissionEnum.RISK_DATA,
+      isContract: true,
+      isMember: true,
+    },
+  )
+  @Get('/:companyId/:riskGroupId/:riskId')
+  findAllAvailable(
+    @User() userPayloadDto: UserPayloadDto,
+    @Param('riskId') riskId: string,
+    @Param('riskGroupId') groupId: string,
+  ) {
+    const companyId = userPayloadDto.targetCompanyId;
+
+    return this.findAllByGroupAndRiskService.execute(
+      riskId,
+      groupId,
       companyId,
     );
   }

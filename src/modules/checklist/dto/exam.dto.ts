@@ -96,6 +96,10 @@ export class FindExamDto extends PaginationQueryDto {
 }
 
 export class FindExamHierarchyDto {
+  @IsString()
+  @IsOptional()
+  hierarchyId?: string;
+
   @IsInt()
   @IsOptional()
   employeeId?: number;
