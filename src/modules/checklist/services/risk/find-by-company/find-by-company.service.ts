@@ -34,7 +34,18 @@ export class FindRisksByCompanyService {
           companyId: true,
           id: true,
           docInfo: {
-            where: { companyId },
+            where: {
+              OR: [
+                { companyId },
+                {
+                  company: {
+                    applyingServiceContracts: {
+                      some: { receivingServiceCompanyId: companyId },
+                    },
+                  },
+                },
+              ],
+            },
             include: { hierarchy: { select: { name: true, id: true } } },
           },
           examToRisk: {

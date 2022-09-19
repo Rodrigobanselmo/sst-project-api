@@ -14,8 +14,7 @@ export class RiskDocInfoController {
   ) {}
 
   @Permissions({
-    code: PermissionEnum.RISK_DATA,
-    crud: true,
+    code: PermissionEnum.RISK_DOC_INFO,
     isContract: true,
     isMember: true,
   })
