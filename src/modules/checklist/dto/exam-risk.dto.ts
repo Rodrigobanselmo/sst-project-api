@@ -100,6 +100,23 @@ export class UpdateExamRiskDto extends PartialType(CreateExamsRiskDto) {
   id?: number;
 }
 
+export class CopyExamsRiskDto {
+  @IsString()
+  fromCompanyId: string;
+
+  @IsString()
+  companyId: string;
+
+  @IsBoolean()
+  @IsOptional()
+  overwrite?: boolean;
+}
+
+export class UpsertManyExamsRiskDto {
+  data: UpdateExamRiskDto[];
+  companyId: string;
+}
+
 export class FindExamRiskDto extends PaginationQueryDto {
   @IsString()
   @IsOptional()

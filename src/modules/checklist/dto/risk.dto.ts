@@ -148,4 +148,12 @@ export class FindRiskDto extends PaginationQueryDto {
   @IsString()
   @IsOptional()
   search: string;
+
+  @IsString()
+  @IsOptional()
+  companyId: string;
+
+  @IsBoolean()
+  @IsOptional()
+  representAll: boolean;
 }

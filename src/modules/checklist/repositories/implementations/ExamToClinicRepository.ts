@@ -6,6 +6,7 @@ import { PrismaService } from '../../../../prisma/prisma.service';
 import {
   FindExamToClinicDto,
   UpsertExamToClinicDto,
+  UpsertManyExamToClinicDto,
 } from '../../dto/exam-to-clinic.dto';
 import { ExamToClinicEntity } from '../../entities/examToClinic';
 import { PaginationQueryDto } from './../../../../shared/dto/pagination.dto';
@@ -74,6 +75,15 @@ export class ExamToClinicRepository {
     });
 
     return new ExamToClinicEntity(examEntity);
+  }
+
+  async createMany({ companyId, data }: UpsertManyExamToClinicDto) {
+    await this.prisma.examToClinic.createMany({
+      data: data.map(({ id, endDate, groupId, ...examRisk }) => ({
+        ...examRisk,
+        companyId,
+      })),
+    });
   }
 
   async findNude(options: Prisma.ExamToClinicFindManyArgs) {

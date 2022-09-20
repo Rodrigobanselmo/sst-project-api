@@ -23,6 +23,7 @@ import {
 } from '../../../../shared/constants/enum/authorization';
 import { Roles } from '../../../../shared/decorators/roles.decorator';
 import { FindRisksByCompanyService } from '../../services/risk/find-by-company/find-by-company.service';
+import { FindRiskService } from '../../services/risk/find/find.service';
 
 @Controller('risk')
 export class RiskController {
@@ -31,6 +32,7 @@ export class RiskController {
     private readonly updateRiskService: UpdateRiskService,
     private readonly findAllAvailableRiskService: FindAllAvailableRiskService,
     private readonly findRisksByCompanyService: FindRisksByCompanyService,
+    private readonly findRiskService: FindRiskService,
     private readonly deleteSoftRiskService: DeleteSoftRiskService,
   ) {}
 
@@ -97,9 +99,26 @@ export class RiskController {
       isContract: true,
     },
   )
-  @Get('/:companyId?')
+  @Get('all/:companyId?')
   findAllAvailable(@User() userPayloadDto: UserPayloadDto) {
     return this.findAllAvailableRiskService.execute(userPayloadDto);
+  }
+
+  @Permissions(
+    {
+      code: PermissionEnum.MANAGEMENT,
+      isMember: true,
+      isContract: true,
+    },
+    {
+      code: PermissionEnum.RISK,
+      isMember: true,
+      isContract: true,
+    },
+  )
+  @Get('/:companyId?')
+  find(@User() userPayloadDto: UserPayloadDto, @Query() query: FindRiskDto) {
+    return this.findRiskService.execute(query, userPayloadDto);
   }
 
   @Permissions({

@@ -9,6 +9,7 @@ import {
   CreateExamsRiskDto,
   FindExamRiskDto,
   UpdateExamRiskDto,
+  UpsertManyExamsRiskDto,
 } from '../../dto/exam-risk.dto';
 import { ExamRiskEntity } from '../../entities/examRisk.entity';
 
@@ -87,8 +88,38 @@ export class ExamRiskRepository {
     };
   }
 
-  async findAll(): Promise<ExamRiskEntity[]> {
-    const exams = await this.prisma.examToRisk.findMany();
+  async createMany({ companyId, data }: UpsertManyExamsRiskDto) {
+    await this.prisma.examToRisk.createMany({
+      data: data.map(({ id, endDate, startDate, ...examRisk }) => ({
+        ...examRisk,
+        companyId,
+      })),
+    });
+  }
+
+  async upsertMany({ companyId, data }: UpsertManyExamsRiskDto) {
+    const dataUpsert = await this.prisma.$transaction(
+      data.map(({ id, ...examRisk }) =>
+        this.prisma.examToRisk.upsert({
+          create: {
+            ...examRisk,
+            companyId,
+          },
+          update: {
+            ...examRisk,
+          },
+          where: { id },
+        }),
+      ),
+    );
+
+    return dataUpsert.map((risk) => new ExamRiskEntity(risk));
+  }
+
+  async findNude(
+    options: Prisma.ExamToRiskFindManyArgs = {},
+  ): Promise<ExamRiskEntity[]> {
+    const exams = await this.prisma.examToRisk.findMany(options);
 
     return exams.map((exam) => new ExamRiskEntity(exam));
   }

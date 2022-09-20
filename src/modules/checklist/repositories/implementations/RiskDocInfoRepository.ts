@@ -21,14 +21,27 @@ export class RiskDocInfoRepository {
         companyId,
       },
       where: {
-        companyId_riskId_hierarchyId: {
-          companyId,
-          riskId: createDto.riskId,
-          hierarchyId: createDto?.hierarchyId || '',
-        },
+        ...(!createDto.id && {
+          companyId_riskId_hierarchyId: {
+            companyId,
+            riskId: createDto.riskId,
+            hierarchyId: createDto?.hierarchyId || '',
+          },
+        }),
+        ...(createDto.id && {
+          id: createDto.id,
+        }),
       },
     });
 
     return new RiskDocInfoEntity(riskFactorDocEntity);
+  }
+
+  async findFirstNude(options: Prisma.RiskFactorsDocInfoFindManyArgs = {}) {
+    const companyClinic = await this.prisma.riskFactorsDocInfo.findFirst({
+      ...options,
+    });
+
+    return new RiskDocInfoEntity(companyClinic);
   }
 }

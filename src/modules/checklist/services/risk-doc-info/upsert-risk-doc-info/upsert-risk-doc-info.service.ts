@@ -1,3 +1,4 @@
+import { RiskDocInfoEntity } from './../../../entities/riskDocInfo.entity';
 import { Injectable } from '@nestjs/common';
 
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
@@ -9,9 +10,19 @@ export class UpsertRiskDocInfoService {
   constructor(private readonly riskDocInfoRepository: RiskDocInfoRepository) {}
 
   async execute(upsertRiskDataDto: UpsertRiskDocInfoDto, user: UserPayloadDto) {
+    const riskDocInfo = upsertRiskDataDto.hierarchyId
+      ? ({} as RiskDocInfoEntity)
+      : await this.riskDocInfoRepository.findFirstNude({
+          where: {
+            companyId: user.targetCompanyId,
+            riskId: upsertRiskDataDto.riskId,
+          },
+        });
+
     const data = await this.riskDocInfoRepository.upsert({
       ...upsertRiskDataDto,
       companyId: user.targetCompanyId,
+      id: riskDocInfo?.id,
     });
     return data;
   }

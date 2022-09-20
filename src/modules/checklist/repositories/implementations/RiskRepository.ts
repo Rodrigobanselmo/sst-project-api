@@ -1,3 +1,4 @@
+import { prismaFilter } from './../../../../shared/utils/filters/prisma.filters';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
@@ -7,6 +8,7 @@ import { PrismaService } from '../../../../prisma/prisma.service';
 import { IPrismaOptions } from '../../../../shared/interfaces/prisma-options.types';
 import {
   CreateRiskDto,
+  FindRiskDto,
   UpdateRiskDto,
   UpsertRiskDto,
 } from '../../dto/risk.dto';
@@ -236,6 +238,47 @@ export class RiskRepository implements IRiskRepository {
     );
 
     return data.map((risk) => new RiskFactorsEntity(risk));
+  }
+
+  async find(
+    query: Partial<FindRiskDto>,
+    pagination: PaginationQueryDto,
+    options: Prisma.RiskFactorsFindManyArgs = {},
+  ) {
+    const whereInit = {
+      AND: [{ OR: [{ companyId: query.companyId }, { system: true }] }],
+    } as typeof options.where;
+
+    const { where } = prismaFilter(whereInit, {
+      query,
+      skip: ['search', 'companyId'],
+    });
+
+    if ('search' in query) {
+      const OR = [];
+      OR.push({ name: { contains: query.search, mode: 'insensitive' } });
+
+      (where.AND as any).push({ OR } as typeof options.where);
+      delete query.search;
+    }
+
+    const response = await this.prisma.$transaction([
+      this.prisma.riskFactors.count({
+        where,
+      }),
+      this.prisma.riskFactors.findMany({
+        where,
+        take: pagination.take || 20,
+        skip: pagination.skip || 0,
+        orderBy: [{ type: 'asc' }, { name: 'asc' }],
+        ...options,
+      }),
+    ]);
+
+    return {
+      data: response[1].map((data) => new RiskFactorsEntity(data)),
+      count: response[0],
+    };
   }
 
   async findById(

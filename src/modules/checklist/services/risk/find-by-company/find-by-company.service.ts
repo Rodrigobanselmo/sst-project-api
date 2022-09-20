@@ -23,7 +23,7 @@ export class FindRisksByCompanyService {
             },
           },
           ...(query.search && {
-            name: query.search,
+            name: { contains: query.search, mode: 'insensitive' },
           }),
         },
         select: {

@@ -41,8 +41,10 @@ import { DeleteSoftExamService } from './services/exam/delete-soft-exam/delete-s
 import { FindExamByHierarchyService } from './services/exam/find-by-hierarchy /find-exam-by-hierarchy.service';
 import { FindExamService } from './services/exam/find-exam/find-exam.service';
 import { UpdateExamService } from './services/exam/update-exam/update-exam.service';
+import { CopyExamToClinicService } from './services/examToClinic/copy-exam-to-clinic/copy-exam-to-clinic.service';
 import { FindExamToClinicService } from './services/examToClinic/find-exam-to-clinic/find-exam-to-clinic.service';
 import { UpsertExamToClinicService } from './services/examToClinic/upsert-exam-to-clinic/upsert-exam-to-clinic.service';
+import { CopyExamRiskService } from './services/examToRisk/copy-exam/copy-exam.service';
 import { CreateExamRiskService } from './services/examToRisk/create-exam/create-exam.service';
 import { FindExamRiskService } from './services/examToRisk/find-exam/find-exam.service';
 import { UpdateExamRiskService } from './services/examToRisk/update-exam/update-exam.service';
@@ -70,6 +72,7 @@ import { CreateRiskService } from './services/risk/create-risk/create-risk.servi
 import { DeleteSoftRiskService } from './services/risk/delete-soft-risk/delete-soft-risk.service';
 import { FindAllAvailableRiskService } from './services/risk/find-all-available-risk/find-all-available-risk.service';
 import { FindRisksByCompanyService } from './services/risk/find-by-company/find-by-company.service';
+import { FindRiskService } from './services/risk/find/find.service';
 import { UpdateRiskService } from './services/risk/update-risk/update-risk.service';
 
 @Module({
@@ -146,6 +149,9 @@ import { UpdateRiskService } from './services/risk/update-risk/update-risk.servi
     RiskDocInfoRepository,
     UpsertRiskDocInfoService,
     FindRisksByCompanyService,
+    CopyExamRiskService,
+    CopyExamToClinicService,
+    FindRiskService,
   ],
   exports: [
     RiskRepository,

@@ -99,6 +99,23 @@ export class UpsertExamToClinicDto {
   status?: StatusEnum;
 }
 
+export class UpsertManyExamToClinicDto {
+  data: UpsertExamToClinicDto[];
+  companyId: string;
+}
+
+export class CopyExamsToClinicDto {
+  @IsString()
+  fromCompanyId: string;
+
+  @IsString()
+  companyId: string;
+
+  @IsBoolean()
+  @IsOptional()
+  overwrite?: boolean;
+}
+
 export class FindExamToClinicDto extends PaginationQueryDto {
   @IsString()
   @IsOptional()
