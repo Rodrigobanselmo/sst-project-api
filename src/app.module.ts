@@ -7,6 +7,7 @@ import { CompanyModule } from './modules/company/company.module';
 import { DocumentsModule } from './modules/documents/documents.module';
 import { EsocialModule } from './modules/esocial/esocial.module';
 import { FilesModule } from './modules/files/files.module';
+import { NotificationModule } from './modules/notifications/notifications.module';
 import { UsersModule } from './modules/users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { JwtAuthGuard } from './shared/guards/jwt-auth.guard';
@@ -23,6 +24,7 @@ import { RolesGuard } from './shared/guards/roles.guard';
     FilesModule,
     DocumentsModule,
     EsocialModule,
+    NotificationModule,
   ],
   providers: [
     {

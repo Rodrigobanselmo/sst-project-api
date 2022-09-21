@@ -20,10 +20,11 @@ class SendGridProvider implements IMailProvider {
     subject,
     to,
     variables,
+    attachments,
     source = EmailsEnum.VALIDATION,
   }: ISendMailData): Promise<any> {
     try {
-      if (process.env.NODE_ENV === 'development') return;
+      // if (process.env.NODE_ENV === 'development') return;
       if (!to) return;
 
       const templateFileContent = fs.readFileSync(path).toString('utf-8');
@@ -39,8 +40,10 @@ class SendGridProvider implements IMailProvider {
         from: source.replace(':id', random),
         subject: subject,
         html: templateHTML,
+        attachments,
       });
     } catch (error) {
+      console.error(error);
       throw new UnprocessableEntityException(ErrorMessageEnum.EMAIL_NOT_SEND);
     }
   }
