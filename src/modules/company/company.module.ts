@@ -95,9 +95,13 @@ import { DayJSProvider } from '../../shared/providers/DateProvider/implementatio
 import { FindClinicService } from './services/company/find-clinic/find-clinic.service';
 import { FindScheduleEmployeeExamHistoryService } from './services/employee/0-history/exams/find-schedule/find-schedule.service';
 import { FindClinicScheduleEmployeeExamHistoryService } from './services/employee/0-history/exams/find-clinic-schedules/find-clinic-schedules.service';
+import { NotificationModule } from '../notifications/notifications.module';
 
 @Module({
-  imports: [forwardRef(() => ChecklistModule)],
+  imports: [
+    forwardRef(() => ChecklistModule),
+    forwardRef(() => NotificationModule),
+  ],
   controllers: [
     CompanyController,
     EmployeeController,

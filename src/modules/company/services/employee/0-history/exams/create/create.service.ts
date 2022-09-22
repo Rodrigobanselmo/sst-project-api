@@ -1,3 +1,4 @@
+import { NotificationRepository } from './../../../../../../notifications/repositories/implementations/NotificationRepository';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { StatusEnum } from '@prisma/client';
 import { EmployeeEntity } from 'src/modules/company/entities/employee.entity';
@@ -15,6 +16,7 @@ export class CreateEmployeeExamHistoryService {
     private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository,
     private readonly createEmployeeHierarchyHistoryService: CreateEmployeeHierarchyHistoryService,
     private readonly employeeRepository: EmployeeRepository,
+    private readonly notificationRepository: NotificationRepository,
   ) {}
 
   async execute(dataDto: CreateEmployeeExamHistoryDto, user: UserPayloadDto) {

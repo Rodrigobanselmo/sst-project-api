@@ -310,6 +310,7 @@ model Company {
   companyGroups CompanyGroup[] @relation(name:"company")
   databaseTable DatabaseTable[] 
   employees Employee[] 
+  notification Notification[] 
   environments CompanyEnvironment[] 
   generateSource GenerateSource[] 
   group CompanyGroup? @relation(name:"group", fields: [groupId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
@@ -343,6 +344,7 @@ model Company {
   riskDocInfo RiskFactorsDocInfo[]
   companyGroupId Int? @unique
   companyGroup CompanyGroup? @relation(name:"company_group", fields: [companyGroupId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
+  notifications Notification[]  @relation(name: "owner_notification_company")
 
   // professionals Professional[] @relation(name:"companies_related") 
   stateRegistration String? // not in use
@@ -889,6 +891,29 @@ model License {
   @@index(companyId)
 }
 
+model Notification {
+  id    Int     @default(autoincrement()) @id
+  created_at DateTime @default(now())
+  json Json
+  repeatId String? 
+  isClinic Boolean? 
+  isConsulting Boolean? 
+  isCompany Boolean? 
+  system Boolean? 
+
+  companies Company[]
+  users User[]
+  confirmations User[]@relation(name: "user_notification_confirm")
+
+  companyId String
+  company Company @relation(name: "owner_notification_company", fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
+
+  @@index(system)
+  @@index(isCompany)
+  @@index(isConsulting)
+  @@index(companyId)
+}
+
 model Professional {
   id    Int     @default(autoincrement()) @id
   name String
@@ -1197,6 +1222,8 @@ model User {
   examDone EmployeeExamsHistory[] @relation(name: "user_done")
   examSchedules EmployeeExamsHistory[] @relation(name: "user_schedule")
   professional Professional? 
+  notification Notification[] 
+  notificationConfirm Notification[] @relation(name: "user_notification_confirm")
 
   @@unique([id, name])
   @@index(email)

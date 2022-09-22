@@ -482,7 +482,7 @@ export const organizationSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET,
-          text: 'Plano de Metas Anual.',
+          text: 'Gestão do Plano de Ação.',
           level: 0,
         },
         {
