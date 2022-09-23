@@ -81,7 +81,13 @@ export class FindExamByHierarchyService {
     }
 
     const riskData = await this.riskDataRepository.findNude({
-      include: {
+      select: {
+        examsToRiskFactorData: {
+          include: {
+            exam: { select: { name: true, id: true, isAttendance: true } },
+          },
+          where: { ...examType },
+        },
         riskFactor: {
           select: {
             name: true,
@@ -109,12 +115,18 @@ export class FindExamByHierarchyService {
             environment: { select: { name: true, type: true } },
           },
         },
-        examsToRiskFactorData: {
-          include: {
-            exam: { select: { name: true, id: true, isAttendance: true } },
-          },
-          where: { ...examType },
-        },
+        id: true,
+        probability: true,
+        probabilityAfter: true,
+        companyId: true,
+        hierarchyId: true,
+        homogeneousGroupId: true,
+        riskId: true,
+        dataRecs: true,
+        level: true,
+        json: true,
+        standardExams: true,
+        riskFactorGroupDataId: true,
       },
       where: {
         companyId,
@@ -143,6 +155,17 @@ export class FindExamByHierarchyService {
       },
     });
 
+    riskData.map((rd) => {
+      rd.examsToRiskFactorData.forEach((examData) => {
+        console.log(
+          rd.id,
+          examData.riskFactorDataId,
+          examData.examId,
+          examData.validityInMonths,
+        );
+      });
+    });
+
     const riskDataOrigin = riskData.map((rd) => {
       let prioritization: number;
 
@@ -150,9 +173,28 @@ export class FindExamByHierarchyService {
         prioritization = originRiskMap[rd.hierarchy.type]?.prioritization;
       }
 
+      rd.examsToRiskFactorData = rd.examsToRiskFactorData.filter(
+        (item, index, self) =>
+          index ===
+          self.findIndex(
+            (t) =>
+              t.examId == item.examId &&
+              t.isMale == item.isMale &&
+              t.isAdmission == item.isAdmission &&
+              t.isDismissal == item.isDismissal &&
+              t.isPeriodic == item.isPeriodic &&
+              t.isReturn == item.isReturn &&
+              t.isMale == item.isMale &&
+              t.isFemale == item.isFemale &&
+              t.fromAge == item.fromAge &&
+              t.toAge == item.toAge &&
+              t.validityInMonths == item.validityInMonths &&
+              t.riskFactorDataId == item.riskFactorDataId,
+          ),
+      );
+
       return { ...rd, prioritization };
     });
-
     const exams: Record<string, IExamOriginData[]> = {};
 
     riskDataOrigin.forEach((rd) => {
@@ -175,7 +217,21 @@ export class FindExamByHierarchyService {
       hierarchyIds.length > 0
         ? await this.examRepository.findNude({
             select: {
-              examToRisk: { where: { companyId, ...examType } },
+              examToRisk: {
+                where: { companyId, ...examType },
+                distinct: [
+                  'isMale',
+                  'isAdmission',
+                  'isDismissal',
+                  'isPeriodic',
+                  'isReturn',
+                  'isMale',
+                  'isFemale',
+                  'fromAge',
+                  'toAge',
+                  'validityInMonths',
+                ],
+              },
               name: true,
               id: true,
               isAttendance: true,
@@ -220,7 +276,6 @@ export class FindExamByHierarchyService {
             },
           })
         : { data: [] };
-
     examRepresentAll.data.map((exam) => {
       exam.examToRisk.map((examToRisk) => {
         if (!exams[examToRisk.examId]) exams[examToRisk.examId] = [];

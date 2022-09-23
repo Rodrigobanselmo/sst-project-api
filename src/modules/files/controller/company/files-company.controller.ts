@@ -59,7 +59,6 @@ export class FilesCompanyController {
     });
   }
 
-  @Roles(RoleEnum.DATABASE, RoleEnum.MANAGEMENT)
   @Permissions({
     code: PermissionEnum.EMPLOYEE,
     isContract: true,
@@ -83,7 +82,6 @@ export class FilesCompanyController {
     });
   }
 
-  @Roles(RoleEnum.DATABASE, RoleEnum.MANAGEMENT)
   @Permissions({
     code: PermissionEnum.EMPLOYEE,
     isContract: true,
@@ -160,7 +158,6 @@ export class FilesCompanyController {
     });
   }
 
-  @Roles(RoleEnum.DATABASE)
   @Permissions({
     code: PermissionEnum.EMPLOYEE,
     isContract: true,
@@ -178,7 +175,6 @@ export class FilesCompanyController {
     });
   }
 
-  @Roles(RoleEnum.DATABASE)
   @Permissions({
     code: PermissionEnum.EMPLOYEE,
     isContract: true,

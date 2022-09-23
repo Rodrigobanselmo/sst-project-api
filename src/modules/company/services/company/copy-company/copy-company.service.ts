@@ -351,15 +351,15 @@ export class CopyCompanyService {
               });
 
               //! don't include photos
-              // if (group.characterization.photos)
-              //   await this.prisma.companyCharacterizationPhoto.createMany({
-              //     data: group.characterization.photos.map(
-              //       ({ id, created_at, updated_at, deleted_at, ...photo }) => ({
-              //         ...photo,
-              //         companyCharacterizationId: newHomoGroup.id,
-              //       }),
-              //     ),
-              //   });
+              if (group.characterization.photos)
+                await this.prisma.companyCharacterizationPhoto.createMany({
+                  data: group.characterization.photos.map(
+                    ({ id, created_at, updated_at, deleted_at, ...photo }) => ({
+                      ...photo,
+                      companyCharacterizationId: newHomoGroup.id,
+                    }),
+                  ),
+                });
             }
 
             if (group.riskFactorData && group.riskFactorData.length) {
