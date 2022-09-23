@@ -5,6 +5,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { InternalServerExceptionFilter } from './shared/filters/internal-server-exception.filter';
 import { PrismaDbExceptionFilter } from './shared/filters/prisma-db-exception.filter';
+import { urlencoded, json } from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -37,6 +38,9 @@ async function bootstrap() {
     exposedHeaders: ['Content-Disposition'],
     origin: '*',
   });
+
+  app.use(json({ limit: '50mb' }));
+  app.use(urlencoded({ extended: true, limit: '50mb' }));
   await app.listen(process.env.PORT);
 }
 bootstrap();
