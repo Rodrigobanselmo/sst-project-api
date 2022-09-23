@@ -12,8 +12,7 @@ import { CharacterizationRepository } from '../../../repositories/implementation
 export class UpsertCharacterizationService {
   constructor(
     private readonly characterizationRepository: CharacterizationRepository,
-    private readonly characterizationPhotoRepository: CharacterizationPhotoRepository,
-    private readonly amazonStorageProvider: AmazonStorageProvider,
+    private readonly characterizationPhotoRepository: CharacterizationPhotoRepository, // private readonly amazonStorageProvider: any,
   ) {}
 
   async execute(
@@ -56,16 +55,16 @@ export class UpsertCharacterizationService {
           file.originalname.split('.')[file.originalname.split('.').length - 1];
         const path = companyId + '/characterization/' + v4() + '.' + fileType;
 
-        const { url } = await this.amazonStorageProvider.upload({
-          file: file.buffer,
-          isPublic: true,
-          fileName: path,
-        });
+        // const { url } = await this.amazonStorageProvider.upload({
+        //   file: file.buffer,
+        //   isPublic: true,
+        //   fileName: path,
+        // });
 
         const dimensions = sizeOf(file.buffer);
         const isVertical = dimensions.width < dimensions.height;
 
-        return [url, isVertical] as [string, boolean];
+        // return [url, isVertical] as [string, boolean];
       }),
     );
 

@@ -175,7 +175,11 @@ export const hierarchyPlanConverter = (
       Array.from({ length: columnsLength }).map(() => ({}));
 
     Object.entries(allHierarchyPlan)
-      .sort(([, c], [, d]) => sortString(c[0], d[0], 'name'))
+      .sort(([a, c], [b, d]) =>
+        showHomogeneous
+          ? sortString(homoGroupTree[a], homoGroupTree[b], 'name')
+          : sortString(c[0], d[0], 'name'),
+      )
       .forEach(([homogeneousGroupId, firstHierarchyPlan]) => {
         const homo = homoGroupTree[homogeneousGroupId];
         let name = homo ? homo.name : '';
@@ -297,5 +301,8 @@ export const hierarchyPlanConverter = (
     size: 1,
   };
 
-  return { bodyData, headerData };
+  return {
+    bodyData,
+    headerData,
+  };
 };

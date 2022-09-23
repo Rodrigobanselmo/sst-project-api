@@ -792,7 +792,6 @@ model ExamToRiskData {
   @@id([examId, riskFactorDataId])
 }
 
-
 model GenerateSource {
   id    String   @id  @default(uuid())
   riskId    String    
@@ -834,6 +833,7 @@ model Hierarchy {
   riskDocInfo RiskFactorsDocInfo[]
 
   @@unique([id, companyId])
+  @@unique([parentId, name])
   @@index(companyId)
 }
 

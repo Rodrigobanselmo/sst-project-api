@@ -124,7 +124,7 @@ const getData = (
     if (index === 0)
       activities.push({
         type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-        text: '**Descrição dos processos de trabalho:**',
+        text: '**Descrição das Atividades:**',
         spacing: { after: 100 },
       });
 
@@ -306,7 +306,7 @@ export const allCharacterizationSections = (
             const title = [
               {
                 type: PGRSectionChildrenTypeEnum.H3,
-                text: `${desc}: ??${VariablesPGREnum.ENVIRONMENT_NAME}??2`,
+                text: `${desc}: ??${VariablesPGREnum.ENVIRONMENT_NAME}??`,
               },
             ] as ISectionChildrenType[];
 

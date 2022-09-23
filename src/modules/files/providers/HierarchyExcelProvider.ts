@@ -199,7 +199,7 @@ export class HierarchyExcelProvider {
 
           //get if exist on database and replace
           const equalAllHierarchy = Object.values(allMap).find((i) =>
-            isEqualHierarchy(i, hierarchy),
+            isEqualHierarchy(i, hierarchy, true),
           );
 
           if (equalAllHierarchy) {

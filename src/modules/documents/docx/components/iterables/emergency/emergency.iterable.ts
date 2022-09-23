@@ -28,7 +28,7 @@ export const emergencyIterable = (
         {
           type: PGRSectionChildrenTypeEnum.BULLET,
           text: risk,
-          size: 8,
+          size: 10,
         },
       ]);
     })

@@ -18,6 +18,10 @@ export const recommendationsSection: IDocumentPGRSectionGroup = {
           text: 'RECOMENDAÇÕES (NR-01 ‘item’ 1.5.3.4)',
         },
         {
+          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          text: `Os itens a seguir, foram compilados do Plano de Ação, onde encontra-se os fatores de risco e perigos incluindo as fontes geradoras e Cargos/GSE's expostos e demais informações que justificam as recomendações abaixo`,
+        },
+        {
           type: PGRSectionChildrenTypeEnum.H2,
           text: 'Monitoramento (Quando aplicável)',
         },
