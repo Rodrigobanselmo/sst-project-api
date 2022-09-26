@@ -8,7 +8,7 @@ import { ProfessionalEntity } from '../../../../../users/entities/professional.e
 
 export const getCredential = (row: CouncilEntity) => {
   if (row && 'councilId' in row) {
-    return `${row?.councilType ? row.councilType + ' :' : ''}${row.councilId}${
+    return `${row?.councilType ? row.councilType + ': ' : ''}${row.councilId}${
       row?.councilUF ? ' - ' + row.councilUF : ''
     }`;
   }
@@ -28,6 +28,7 @@ export const ProfessionalsConverter = (
         : false,
     )
     .map((professional) => {
+      console.log(professional);
       const council =
         professional?.councils?.find(
           (c) =>

@@ -36,7 +36,7 @@ export const signaturesIterable = (
     // eslint-disable-next-line prettier/prettier
       if (variables[VariablesPGREnum.PROFESSIONAL_FORMATION]) credentials.push(`??${VariablesPGREnum.PROFESSIONAL_FORMATION}??`)
     // eslint-disable-next-line prettier/prettier
-      if (variables[VariablesPGREnum.PROFESSIONAL_CREA]) credentials.push(`CREA: ??${VariablesPGREnum.PROFESSIONAL_CREA}??`)
+      if (variables[VariablesPGREnum.PROFESSIONAL_CREA]) credentials.push(`??${VariablesPGREnum.PROFESSIONAL_CREA}??`)
     // eslint-disable-next-line prettier/prettier
       if (variables[VariablesPGREnum.PROFESSIONAL_CPF]) credentials.push(`CPF: ${variables[VariablesPGREnum.PROFESSIONAL_CPF]}`)
     // eslint-disable-next-line prettier/prettier

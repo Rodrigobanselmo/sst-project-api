@@ -134,8 +134,16 @@ export class RiskGroupDataRepository {
         where: { id_companyId: { id, companyId } },
         include: {
           company: true,
-          professionalsSignatures: { include: { professional: true } },
-          usersSignatures: { include: { user: true } },
+          professionalsSignatures: {
+            include: { professional: { include: { councils: true } } },
+          },
+          usersSignatures: {
+            include: {
+              user: {
+                include: { professional: { include: { councils: true } } },
+              },
+            },
+          },
           data: {
             where: {
               OR: [

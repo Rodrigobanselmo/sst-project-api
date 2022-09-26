@@ -41,7 +41,7 @@ export const professionalsIterable = (
       // eslint-disable-next-line prettier/prettier
       if (variables[VariablesPGREnum.PROFESSIONAL_FORMATION]) text = `??${VariablesPGREnum.PROFESSIONAL_FORMATION}??\n`
       // eslint-disable-next-line prettier/prettier
-      if (variables[VariablesPGREnum.PROFESSIONAL_CREA]) text = `${text}CREA: ??${VariablesPGREnum.PROFESSIONAL_CREA}??\n`
+      if (variables[VariablesPGREnum.PROFESSIONAL_CREA]) text = `${text}??${VariablesPGREnum.PROFESSIONAL_CREA}??\n`
       // eslint-disable-next-line prettier/prettier
       if (variables[VariablesPGREnum.PROFESSIONAL_CPF]) text = `${text}CPF: ${variables[VariablesPGREnum.PROFESSIONAL_CPF]}\n`
       // eslint-disable-next-line prettier/prettier
