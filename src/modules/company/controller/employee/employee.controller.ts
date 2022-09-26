@@ -74,23 +74,11 @@ export class EmployeeController {
     return this.updateEmployeeService.execute(updateEmployee);
   }
 
-  @Permissions(
-    {
-      code: PermissionEnum.EMPLOYEE,
-      isContract: true,
-      isMember: true,
-    },
-    {
-      code: PermissionEnum.COMPANY,
-      isContract: true,
-      isMember: true,
-    },
-    {
-      code: PermissionEnum.MANAGEMENT,
-      isContract: true,
-      isMember: true,
-    },
-  )
+  @Permissions({
+    code: PermissionEnum.EMPLOYEE,
+    isContract: true,
+    isMember: true,
+  })
   @Get('/:companyId?')
   FindAllAvailable(
     @User() userPayloadDto: UserPayloadDto,
@@ -99,23 +87,11 @@ export class EmployeeController {
     return this.findAllAvailableEmployeesService.execute(query, userPayloadDto);
   }
 
-  @Permissions(
-    {
-      code: PermissionEnum.EMPLOYEE,
-      isContract: true,
-      isMember: true,
-    },
-    {
-      code: PermissionEnum.COMPANY,
-      isContract: true,
-      isMember: true,
-    },
-    {
-      code: PermissionEnum.MANAGEMENT,
-      isContract: true,
-      isMember: true,
-    },
-  )
+  @Permissions({
+    code: PermissionEnum.EMPLOYEE,
+    isContract: true,
+    isMember: true,
+  })
   @Get('/id/:employeeId/:companyId?')
   findOne(
     @User() userPayloadDto: UserPayloadDto,

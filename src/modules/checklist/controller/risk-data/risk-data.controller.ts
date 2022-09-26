@@ -54,11 +54,6 @@ export class RiskDataController {
 
   @Permissions(
     {
-      code: PermissionEnum.MANAGEMENT,
-      isContract: true,
-      isMember: true,
-    },
-    {
       code: PermissionEnum.RISK_DATA,
       isContract: true,
       isMember: true,
@@ -85,18 +80,11 @@ export class RiskDataController {
     );
   }
 
-  @Permissions(
-    {
-      code: PermissionEnum.MANAGEMENT,
-      isContract: true,
-      isMember: true,
-    },
-    {
-      code: PermissionEnum.RISK_DATA,
-      isContract: true,
-      isMember: true,
-    },
-  )
+  @Permissions({
+    code: PermissionEnum.RISK_DATA,
+    isContract: true,
+    isMember: true,
+  })
   @Get('/:companyId/:groupId/homogeneous/:homogeneousGroupId')
   findAllAvailableByHomogenousGroup(
     @User() userPayloadDto: UserPayloadDto,
@@ -112,18 +100,11 @@ export class RiskDataController {
     );
   }
 
-  @Permissions(
-    {
-      code: PermissionEnum.MANAGEMENT,
-      isContract: true,
-      isMember: true,
-    },
-    {
-      code: PermissionEnum.RISK_DATA,
-      isContract: true,
-      isMember: true,
-    },
-  )
+  @Permissions({
+    code: PermissionEnum.RISK_DATA,
+    isContract: true,
+    isMember: true,
+  })
   @Get('/:companyId/hierarchy/:hierarchyId')
   findAllAvailableByHierarchy(
     @User() userPayloadDto: UserPayloadDto,
@@ -135,18 +116,11 @@ export class RiskDataController {
     return this.findAllByHierarchyService.execute(hierarchyId, companyId);
   }
 
-  @Permissions(
-    {
-      code: PermissionEnum.MANAGEMENT,
-      isContract: true,
-      isMember: true,
-    },
-    {
-      code: PermissionEnum.RISK_DATA,
-      isContract: true,
-      isMember: true,
-    },
-  )
+  @Permissions({
+    code: PermissionEnum.RISK_DATA,
+    isContract: true,
+    isMember: true,
+  })
   @Get('/:companyId/:riskGroupId/:riskId')
   findAllAvailable(
     @User() userPayloadDto: UserPayloadDto,

@@ -39,20 +39,12 @@ export class ContactController {
     private readonly deleteContactsService: DeleteContactsService,
   ) {}
 
-  @Permissions(
-    {
-      code: PermissionEnum.COMPANY,
-      isContract: true,
-      isMember: true,
-      crud: true,
-    },
-    {
-      code: PermissionEnum.MANAGEMENT,
-      isContract: true,
-      isMember: true,
-      crud: true,
-    },
-  )
+  @Permissions({
+    code: PermissionEnum.COMPANY,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
   @Get()
   find(@User() userPayloadDto: UserPayloadDto, @Query() query: FindContactDto) {
     return this.findAvailableContactsService.execute(query, userPayloadDto);

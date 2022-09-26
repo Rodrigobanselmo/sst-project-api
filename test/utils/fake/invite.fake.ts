@@ -13,7 +13,7 @@ export class FakeInvite implements InviteUserDto {
   permissions: string[] = [
     PermissionEnum.USER,
     PermissionEnum.USER,
-    PermissionEnum.CREATE_COMPANY,
+    PermissionEnum.DOCUMENTS,
   ];
 
   pushPermissions(permission: string) {

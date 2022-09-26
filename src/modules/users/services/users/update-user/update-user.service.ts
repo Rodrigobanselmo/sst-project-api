@@ -68,6 +68,7 @@ export class UpdateUserService {
         ...updateUserDto,
         ...(invite &&
           invite?.professional && {
+            //! delete
             ...(invite?.professional.councilId && {
               councilId: invite.professional.councilId,
             }),
@@ -76,6 +77,17 @@ export class UpdateUserService {
             }),
             ...(invite?.professional.councilUF && {
               councilUF: invite.professional.councilUF,
+            }),
+            //!
+
+            ...(invite?.professional.councils && {
+              councils: invite.professional.councils.map(
+                ({ councilId, councilType, councilUF }) => ({
+                  councilId,
+                  councilType,
+                  councilUF,
+                }),
+              ),
             }),
             ...(invite?.professional.phone && {
               phone: invite.professional.phone,

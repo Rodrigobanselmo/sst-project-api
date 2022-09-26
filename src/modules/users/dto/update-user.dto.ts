@@ -1,16 +1,18 @@
 import { StringUppercaseTransform } from './../../../shared/transformers/string-uppercase.transform';
 import { ApiProperty } from '@nestjs/swagger';
 import { ProfessionalTypeEnum } from '@prisma/client';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsEnum,
   IsOptional,
   IsString,
   MaxLength,
   MinLength,
+  ValidateNested,
 } from 'class-validator';
 import { CpfFormatTransform } from '../../../shared/transformers/cpf-format.transform';
 import { StringCapitalizeTransform } from '../../../shared/transformers/string-capitalize';
+import { CouncilDto } from './council.dto';
 
 export class UpdateUserDto {
   @ApiProperty({ description: 'user older password' })
@@ -74,4 +76,9 @@ export class UpdateUserDto {
   @IsString()
   @IsOptional()
   readonly token?: string;
+
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @Type(() => CouncilDto)
+  councils?: CouncilDto[];
 }

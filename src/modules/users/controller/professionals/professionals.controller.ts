@@ -46,11 +46,6 @@ export class ProfessionalsController {
       isMember: true,
       isContract: true,
     },
-    {
-      code: PermissionEnum.MANAGEMENT,
-      isMember: true,
-      isContract: true,
-    },
   )
   @Get('/company/:companyId?')
   findAllByCompany(
@@ -68,9 +63,6 @@ export class ProfessionalsController {
     },
     {
       code: PermissionEnum.USER,
-    },
-    {
-      code: PermissionEnum.MANAGEMENT,
     },
   )
   @Get('/find')

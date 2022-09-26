@@ -22,7 +22,7 @@ export class ExamToClinicController {
   ) {}
 
   @Permissions({
-    code: PermissionEnum.EXAM,
+    code: PermissionEnum.EXAM_CLINIC,
     crud: true,
     isMember: true,
     isContract: true,
@@ -39,7 +39,7 @@ export class ExamToClinicController {
   }
 
   @Permissions({
-    code: PermissionEnum.EXAM,
+    code: PermissionEnum.EXAM_CLINIC,
     crud: true,
     isMember: true,
     isContract: true,
@@ -53,7 +53,7 @@ export class ExamToClinicController {
   }
 
   @Permissions({
-    code: PermissionEnum.EXAM,
+    code: PermissionEnum.EXAM_CLINIC,
     crud: true,
     isMember: true,
     isContract: true,

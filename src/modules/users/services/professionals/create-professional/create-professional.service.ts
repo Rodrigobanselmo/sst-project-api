@@ -34,9 +34,13 @@ export class CreateProfessionalService {
           { cpf: createDataDto.cpf || 'not-found' },
           { user: { email: createDataDto.email || 'not-found' } },
           {
-            councilId: createDataDto.councilId || 'not-found',
-            councilType: createDataDto.councilType || 'not-found',
-            councilUF: createDataDto.councilUF || 'not-found',
+            councils: {
+              some: {
+                councilId: createDataDto.councilId || 'not-found',
+                councilType: createDataDto.councilType || 'not-found',
+                councilUF: createDataDto.councilUF || 'not-found',
+              },
+            },
           },
         ],
       },

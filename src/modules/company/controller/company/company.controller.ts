@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -60,18 +61,8 @@ export class CompanyController {
     private readonly findClinicService: FindClinicService,
   ) {}
 
-  @Permissions(
-    {
-      code: PermissionEnum.COMPANY,
-      isContract: true,
-      isMember: true,
-    },
-    {
-      code: PermissionEnum.MANAGEMENT,
-      isContract: true,
-      isMember: true,
-    },
-  )
+  @Roles(RoleEnum.COMPANY, RoleEnum.CONTRACTS, RoleEnum.CLINICS, RoleEnum.USER)
+  @Permissions({ isContract: true, isMember: true })
   @Get()
   findAll(
     @User() userPayloadDto: UserPayloadDto,
@@ -80,18 +71,6 @@ export class CompanyController {
     return this.findAllCompaniesService.execute(userPayloadDto, query);
   }
 
-  @Permissions(
-    {
-      code: PermissionEnum.COMPANY,
-      isContract: true,
-      isMember: true,
-    },
-    {
-      code: PermissionEnum.MANAGEMENT,
-      isContract: true,
-      isMember: true,
-    },
-  )
   @Get('by-user')
   findAllByUser(
     @User() userPayloadDto: UserPayloadDto,
@@ -100,7 +79,6 @@ export class CompanyController {
     return this.findAllUserCompaniesService.execute(userPayloadDto, query);
   }
 
-  @Roles(RoleEnum.MANAGEMENT, RoleEnum.COMPANY)
   @Get('/cnae')
   findCNAE(@Query() query: FindActivityDto) {
     return this.findCnaeService.execute(query);
@@ -108,12 +86,12 @@ export class CompanyController {
 
   @Permissions(
     {
-      code: PermissionEnum.MANAGEMENT,
+      code: PermissionEnum.COMPANY,
       isContract: true,
       isMember: true,
     },
     {
-      code: PermissionEnum.COMPANY,
+      code: PermissionEnum.CLINIC,
       isContract: true,
       isMember: true,
     },
@@ -125,12 +103,12 @@ export class CompanyController {
 
   @Permissions(
     {
-      code: PermissionEnum.MANAGEMENT,
+      code: PermissionEnum.COMPANY,
       isContract: true,
       isMember: true,
     },
     {
-      code: PermissionEnum.COMPANY,
+      code: PermissionEnum.CLINIC,
       isContract: true,
       isMember: true,
     },
@@ -143,19 +121,23 @@ export class CompanyController {
     return this.findClinicService.execute(clinicId, userPayloadDto);
   }
 
-  @Roles(RoleEnum.MANAGEMENT, RoleEnum.COMPANY)
   @Get('cnpj/:cnpj')
   findCNPJ(@Param('cnpj') cnpj: string) {
     return this.findCnpjService.execute(cnpj);
   }
 
-  @Roles(RoleEnum.MANAGEMENT, RoleEnum.COMPANY)
   @Get('cep/:cep')
   findCEP(@Param('cep') cep: string) {
     return this.findCepService.execute(cep);
   }
 
   @Roles(RoleEnum.CONTRACTS)
+  @Permissions({
+    code: PermissionEnum.CONTRACTS,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
   @Post()
   create(
     @Body() createCompanyDto: CreateCompanyDto,
@@ -164,6 +146,23 @@ export class CompanyController {
     if (userPayloadDto.isMaster) {
       return this.createCompanyService.execute(createCompanyDto);
     }
+    return this.createContractService.execute(createCompanyDto, userPayloadDto);
+  }
+
+  @Permissions({
+    code: PermissionEnum.CLINIC,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
+  @Post('clinic')
+  createClinic(
+    @Body() createCompanyDto: CreateCompanyDto,
+    @User() userPayloadDto: UserPayloadDto,
+  ) {
+    if (!createCompanyDto.isClinic)
+      throw new BadRequestException('Erro ao criar clínica');
+
     return this.createContractService.execute(createCompanyDto, userPayloadDto);
   }
 

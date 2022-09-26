@@ -5,7 +5,6 @@ import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import { UpsertRiskGroupDataDto } from '../../dto/risk-group-data.dto';
 import { FindAllByCompanyService } from '../../services/risk-group-data/find-by-company/find-by-company.service';
 import { FindByIdService } from '../../services/risk-group-data/find-by-id/find-by-id.service';
-import { FindDocumentsService } from '../../services/pgr-doc/find-documents/find-documents.service';
 import { UpsertRiskGroupDataService } from '../../services/risk-group-data/upsert-risk-group-data/upsert-risk-group-data.service';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
@@ -18,7 +17,7 @@ export class RiskGroupDataController {
   ) {}
 
   @Permissions({
-    code: PermissionEnum.MANAGEMENT,
+    code: PermissionEnum.COMPANY,
     isContract: true,
     isMember: true,
     crud: 'cu',
@@ -29,7 +28,7 @@ export class RiskGroupDataController {
   }
 
   @Permissions({
-    code: PermissionEnum.MANAGEMENT,
+    code: PermissionEnum.COMPANY,
     isContract: true,
     isMember: true,
   })
@@ -40,7 +39,7 @@ export class RiskGroupDataController {
   }
 
   @Permissions({
-    code: PermissionEnum.MANAGEMENT,
+    code: PermissionEnum.COMPANY,
     isContract: true,
     isMember: true,
   })

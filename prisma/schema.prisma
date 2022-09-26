@@ -941,9 +941,22 @@ model Professional {
   inviteId String? @unique
   invite InviteUsers? @relation(fields: [inviteId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   examDoctorHistory EmployeeExamsHistory[]  
-  // companies Company[] @relation(name:"companies_related") 
+  councils ProfessionalCouncil[]  
 
   @@unique([id, companyId])
+}
+
+model ProfessionalCouncil {
+  id    Int     @default(autoincrement()) @id
+  councilType String
+  councilUF String
+  councilId String
+  created_at DateTime @default(now())
+  updated_at  DateTime   @updatedAt
+  professionalId Int
+  professional Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
+  
+  @@unique([councilType, councilUF, councilId, professionalId])
 }
 
 model RecMed {

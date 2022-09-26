@@ -20,9 +20,15 @@ export class FindFirstProfessionalService {
         OR: [
           {
             AND: [
-              { councilId: { equals: councilId || 'not-found' } },
-              { councilType: { equals: councilType || 'not-found' } },
-              { councilUF: { equals: councilUF || 'not-found' } },
+              {
+                councils: {
+                  some: {
+                    councilId: { equals: councilId || 'not-found' },
+                    councilType: { equals: councilType || 'not-found' },
+                    councilUF: { equals: councilUF || 'not-found' },
+                  },
+                },
+              },
             ],
           },
           { cpf: { equals: cpf || 'not-found' } },
@@ -30,6 +36,7 @@ export class FindFirstProfessionalService {
           { email: { equals: email || 'not-found' } },
         ],
       },
+      include: { councils: true },
     });
 
     return professionals;

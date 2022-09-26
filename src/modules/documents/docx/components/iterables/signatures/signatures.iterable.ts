@@ -1,3 +1,4 @@
+import { WorkspaceEntity } from './../../../../../company/entities/workspace.entity';
 import { AlignmentType, Paragraph, Table, WidthType } from 'docx';
 import { arrayChunks } from 'src/shared/utils/arrayChunks';
 
@@ -14,6 +15,7 @@ import { SignaturesConverter } from './signatures.converter';
 
 export const signaturesIterable = (
   signatureEntity: (ProfessionalEntity | UserEntity)[],
+  workspace: WorkspaceEntity,
   convertToDocx: (
     data: ISectionChildrenType[],
     variables?: IDocVariables,
@@ -21,7 +23,10 @@ export const signaturesIterable = (
 ) => {
   if (!signatureEntity?.length) return [];
 
-  const signaturesVariablesArray = SignaturesConverter(signatureEntity);
+  const signaturesVariablesArray = SignaturesConverter(
+    signatureEntity,
+    workspace,
+  );
 
   const iterableSections = signaturesVariablesArray.map((variables) => {
     const credentials = [] as string[];

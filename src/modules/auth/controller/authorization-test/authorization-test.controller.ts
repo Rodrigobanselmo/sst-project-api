@@ -29,7 +29,7 @@ export class AuthorizationTestController {
       isMember: true,
     },
     {
-      code: PermissionEnum.CREATE_COMPANY,
+      code: PermissionEnum.DOCUMENTS,
       crud: true,
       isMember: true,
     },
@@ -40,7 +40,7 @@ export class AuthorizationTestController {
   }
 
   @Permissions({
-    code: PermissionEnum.CREATE_COMPANY,
+    code: PermissionEnum.DOCUMENTS,
     crud: true,
     isMember: true,
   })
@@ -61,7 +61,7 @@ export class AuthorizationTestController {
       isContract: true,
     },
     {
-      code: PermissionEnum.CREATE_COMPANY,
+      code: PermissionEnum.DOCUMENTS,
       crud: true,
       isContract: true,
     },
@@ -97,7 +97,7 @@ export class AuthorizationTestController {
   }
 
   @Permissions({
-    code: PermissionEnum.CREATE_COMPANY,
+    code: PermissionEnum.DOCUMENTS,
     isContract: true,
   })
   @Get('8')

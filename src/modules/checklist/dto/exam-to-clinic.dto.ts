@@ -145,5 +145,9 @@ export class FindExamToClinicDto extends PaginationQueryDto {
 
   @IsString()
   @IsOptional()
+  groupId?: string;
+
+  @IsString()
+  @IsOptional()
   orderByDirection?: 'asc' | 'desc';
 }

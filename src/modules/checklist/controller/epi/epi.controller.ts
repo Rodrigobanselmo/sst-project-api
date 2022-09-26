@@ -49,13 +49,12 @@ export class EpiController {
     return this.updateEpiService.execute(epiId, updateEpiDto);
   }
 
-  @Roles(RoleEnum.MANAGEMENT, RoleEnum.EPI)
+  // @Roles(RoleEnum.SECURITY, RoleEnum.EPI)
   @Get('/:ca')
   async findByCA(@Param('ca') ca: string) {
     return this.findByCAEpiService.execute(ca);
   }
 
-  @Roles(RoleEnum.MANAGEMENT, RoleEnum.EPI)
   @Get()
   async find(@Query() query: FindEpiDto) {
     return this.findEpiService.execute(query);

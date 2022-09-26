@@ -2,6 +2,7 @@ import { ProfessionalRiskGroupEntity } from './../../checklist/entities/usersRis
 import { Professional, ProfessionalTypeEnum, StatusEnum } from '@prisma/client';
 import { UserEntity } from './user.entity';
 import { InviteUsersEntity } from './invite-users.entity';
+import { CouncilEntity } from './council.entity';
 
 export class ProfessionalEntity implements Professional {
   id: number;
@@ -26,8 +27,9 @@ export class ProfessionalEntity implements Professional {
   professionalsPgrSignatures?: ProfessionalRiskGroupEntity[];
   invite: InviteUsersEntity;
   inviteId: string;
+  councils?: CouncilEntity[];
 
-  constructor(partial: Partial<ProfessionalEntity>) {
+  constructor(partial: Partial<ProfessionalEntity & { councils: any }>) {
     Object.assign(this, partial);
 
     if (partial?.user) {

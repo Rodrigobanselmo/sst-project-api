@@ -24,6 +24,7 @@ export class ProfessionalRepository {
     {
       inviteId,
       roles,
+      councils,
       ...data
     }: Omit<
       CreateProfessionalDto & { roles?: string[] },
@@ -50,6 +51,18 @@ export class ProfessionalRepository {
         ...data,
         companyId,
         inviteId: invite.id,
+        ...(councils &&
+          councils.length > 0 && {
+            councils: {
+              createMany: {
+                data: councils.map((c) => ({
+                  councilId: c.councilId,
+                  councilUF: c.councilUF,
+                  councilType: c.councilType,
+                })),
+              },
+            },
+          }),
       },
       include: { user: true, ...options.include },
     });
@@ -65,6 +78,7 @@ export class ProfessionalRepository {
     {
       id,
       inviteId,
+      councils,
       ...data
     }: Omit<UpdateProfessionalDto, 'sendEmail' | 'userId'>,
     options: Partial<Prisma.ProfessionalUpdateArgs> = {},
@@ -75,6 +89,37 @@ export class ProfessionalRepository {
       where: { id },
       include: { user: true, ...options.include },
     });
+
+    if (professional?.id && councils) {
+      await this.prisma.professionalCouncil.deleteMany({
+        where: { professionalId: professional.id },
+      });
+
+      const councilsCreate = await Promise.all(
+        councils.map(async ({ councilId, councilType, councilUF }) => {
+          if (councilId && councilType && councilUF)
+            await this.prisma.professionalCouncil.upsert({
+              create: {
+                councilId,
+                councilType,
+                councilUF,
+                professionalId: professional.id,
+              },
+              update: {},
+              where: {
+                councilType_councilUF_councilId_professionalId: {
+                  councilId,
+                  councilType,
+                  councilUF,
+                  professionalId: professional.id,
+                },
+              },
+            });
+        }),
+      );
+
+      (professional as any).councils = councilsCreate.filter((i) => i);
+    }
 
     return new ProfessionalEntity({
       ...professional,
@@ -141,7 +186,7 @@ export class ProfessionalRepository {
       (where.AND as any).push({
         OR: [
           { name: { contains: query.search, mode: 'insensitive' } },
-          { councilId: { contains: query.search, mode: 'insensitive' } },
+          // { councilId: { contains: query.search, mode: 'insensitive' } },
         ],
       } as typeof options.where);
       delete query.search;
@@ -192,7 +237,7 @@ export class ProfessionalRepository {
         take: pagination.take || 10,
         skip: pagination.skip || 0,
         orderBy: { name: 'asc' },
-        include: { user: true },
+        include: { user: true, councils: true },
       }),
     ]);
 

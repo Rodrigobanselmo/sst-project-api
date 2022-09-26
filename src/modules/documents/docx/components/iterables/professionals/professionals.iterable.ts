@@ -1,3 +1,5 @@
+import { WorkspaceEntity } from './../../../../../company/entities/workspace.entity';
+import { CompanyEntity } from './../../../../../company/entities/company.entity';
 import { UserEntity } from './../../../../../users/entities/user.entity';
 import { ProfessionalEntity } from '../../../../../users/entities/professional.entity';
 
@@ -12,6 +14,7 @@ import { AlignmentType, Paragraph, Table } from 'docx';
 
 export const professionalsIterable = (
   professionalEntity: (ProfessionalEntity | UserEntity)[],
+  workspace: WorkspaceEntity,
   convertToDocx: (
     data: ISectionChildrenType[],
     variables?: IDocVariables,
@@ -19,8 +22,10 @@ export const professionalsIterable = (
 ) => {
   if (!professionalEntity?.length) return [];
 
-  const professionalsVariablesArray =
-    ProfessionalsConverter(professionalEntity);
+  const professionalsVariablesArray = ProfessionalsConverter(
+    professionalEntity,
+    workspace,
+  );
 
   const baseSection: ISectionChildrenType[] = [
     {

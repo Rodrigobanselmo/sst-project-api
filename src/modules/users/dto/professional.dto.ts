@@ -1,12 +1,13 @@
 import { PartialType } from '@nestjs/swagger';
 import { ProfessionalTypeEnum, StatusEnum } from '@prisma/client';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsBoolean,
   IsEnum,
   IsInt,
   IsOptional,
   IsString,
+  ValidateNested,
 } from 'class-validator';
 
 import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
@@ -14,6 +15,7 @@ import { CpfFormatTransform } from './../../../shared/transformers/cpf-format.tr
 import { QueryArray } from './../../../shared/transformers/query-array';
 import { StringCapitalizeTransform } from './../../../shared/transformers/string-capitalize';
 import { StringUppercaseTransform } from './../../../shared/transformers/string-uppercase.transform';
+import { CouncilDto } from './council.dto';
 
 export class CreateProfessionalDto {
   @Transform(StringCapitalizeTransform, { toClassOnly: true })
@@ -79,12 +81,22 @@ export class CreateProfessionalDto {
   @IsBoolean()
   @IsOptional()
   sendEmail?: boolean;
+
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @Type(() => CouncilDto)
+  councils?: CouncilDto[];
 }
 
 export class UpdateProfessionalDto extends PartialType(CreateProfessionalDto) {
   @IsInt()
   @IsOptional()
   readonly id: number;
+
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @Type(() => CouncilDto)
+  councils?: CouncilDto[];
 }
 
 export class FindProfessionalsDto extends PaginationQueryDto {

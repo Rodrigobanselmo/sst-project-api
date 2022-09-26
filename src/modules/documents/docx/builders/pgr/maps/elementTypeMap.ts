@@ -1,3 +1,5 @@
+import { WorkspaceEntity } from './../../../../../company/entities/workspace.entity';
+import { CompanyEntity } from './../../../../../company/entities/company.entity';
 import { HomoTypeEnum, RiskFactorsEnum } from '@prisma/client';
 import { Paragraph, Table } from 'docx';
 
@@ -83,12 +85,14 @@ type IDocumentClassType = {
   hierarchy: Map<string, HierarchyMapData>;
   characterizations: CharacterizationEntity[];
   attachments: AttachmentEntity[];
+  workspace: WorkspaceEntity;
   hierarchyTree: IHierarchyMap;
 };
 
 export class ElementsMapClass {
   private variables: IDocVariables;
   private versions: RiskDocumentEntity[];
+  private workspace: WorkspaceEntity;
   private professionals: (ProfessionalEntity | UserEntity)[];
   private environments: EnvironmentEntity[];
   private characterizations: CharacterizationEntity[];
@@ -109,6 +113,7 @@ export class ElementsMapClass {
     hierarchy,
     attachments,
     hierarchyTree,
+    workspace,
   }: IDocumentClassType) {
     this.variables = variables;
     this.versions = versions;
@@ -120,6 +125,7 @@ export class ElementsMapClass {
     this.hierarchy = hierarchy;
     this.attachments = attachments;
     this.hierarchyTree = hierarchyTree;
+    this.workspace = workspace;
   }
 
   public map: IMapElementDocumentType = {
@@ -171,7 +177,7 @@ export class ElementsMapClass {
         ],
       })['children'],
     [PGRSectionChildrenTypeEnum.PROFESSIONALS_SIGNATURES]: () =>
-      signaturesIterable(this.professionals, (x, v) =>
+      signaturesIterable(this.professionals, this.workspace, (x, v) =>
         this.convertToDocx(x, v),
       ),
     [PGRSectionChildrenTypeEnum.TABLE_PRIORITIZATION]: () =>
@@ -318,7 +324,7 @@ export class ElementsMapClass {
       bulletsSpace(text),
     ],
     [PGRSectionChildrenTypeEnum.PROFESSIONAL]: () =>
-      professionalsIterable(this.professionals, (x, v) =>
+      professionalsIterable(this.professionals, this.workspace, (x, v) =>
         this.convertToDocx(x, v),
       ),
     [PGRSectionChildrenTypeEnum.COMPLEMENTARY_DOCS]: () =>

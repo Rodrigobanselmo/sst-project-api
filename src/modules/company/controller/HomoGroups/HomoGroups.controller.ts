@@ -34,28 +34,11 @@ export class HomoGroupsController {
     private readonly copyHomoGroupService: CopyHomoGroupService,
   ) {}
 
-  @Permissions(
-    {
-      code: PermissionEnum.EMPLOYEE,
-      isContract: true,
-      isMember: true,
-    },
-    {
-      code: PermissionEnum.HOMO_GROUP,
-      isContract: true,
-      isMember: true,
-    },
-    {
-      code: PermissionEnum.COMPANY,
-      isContract: true,
-      isMember: true,
-    },
-    {
-      code: PermissionEnum.MANAGEMENT,
-      isContract: true,
-      isMember: true,
-    },
-  )
+  @Permissions({
+    code: PermissionEnum.HOMO_GROUP,
+    isContract: true,
+    isMember: true,
+  })
   @Get('/:companyId?')
   findByCompany(@User() userPayloadDto: UserPayloadDto) {
     return this.findByCompanyHomoGroupService.execute(userPayloadDto);

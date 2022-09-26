@@ -67,18 +67,11 @@ export class RiskController {
     );
   }
 
-  @Permissions(
-    {
-      code: PermissionEnum.MANAGEMENT,
-      isMember: true,
-      isContract: true,
-    },
-    {
-      code: PermissionEnum.RISK,
-      isMember: true,
-      isContract: true,
-    },
-  )
+  @Permissions({
+    code: PermissionEnum.RISK,
+    isMember: true,
+    isContract: true,
+  })
   @Get('company/:companyId?')
   findByCompany(
     @User() userPayloadDto: UserPayloadDto,
@@ -87,35 +80,21 @@ export class RiskController {
     return this.findRisksByCompanyService.execute(query, userPayloadDto);
   }
 
-  @Permissions(
-    {
-      code: PermissionEnum.MANAGEMENT,
-      isMember: true,
-      isContract: true,
-    },
-    {
-      code: PermissionEnum.RISK,
-      isMember: true,
-      isContract: true,
-    },
-  )
+  @Permissions({
+    code: PermissionEnum.RISK,
+    isMember: true,
+    isContract: true,
+  })
   @Get('all/:companyId?')
   findAllAvailable(@User() userPayloadDto: UserPayloadDto) {
     return this.findAllAvailableRiskService.execute(userPayloadDto);
   }
 
-  @Permissions(
-    {
-      code: PermissionEnum.MANAGEMENT,
-      isMember: true,
-      isContract: true,
-    },
-    {
-      code: PermissionEnum.RISK,
-      isMember: true,
-      isContract: true,
-    },
-  )
+  @Permissions({
+    code: PermissionEnum.RISK,
+    isMember: true,
+    isContract: true,
+  })
   @Get('/:companyId?')
   find(@User() userPayloadDto: UserPayloadDto, @Query() query: FindRiskDto) {
     return this.findRiskService.execute(query, userPayloadDto);

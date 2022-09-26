@@ -42,7 +42,7 @@ export class UpdateProfessionalService {
               },
             ],
           },
-          include: { user: { include: { companies: true } } },
+          include: { user: { include: { companies: true } }, councils: true },
         },
       );
 

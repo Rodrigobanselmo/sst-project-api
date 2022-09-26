@@ -47,18 +47,11 @@ export class CharacterizationController {
     private readonly updateCharacterizationPhotoService: UpdateCharacterizationPhotoService,
   ) {}
 
-  @Permissions(
-    {
-      code: PermissionEnum.MANAGEMENT,
-      isContract: true,
-      isMember: true,
-    },
-    {
-      code: PermissionEnum.CHARACTERIZATION,
-      isContract: true,
-      isMember: true,
-    },
-  )
+  @Permissions({
+    code: PermissionEnum.CHARACTERIZATION,
+    isContract: true,
+    isMember: true,
+  })
   @Get()
   findAll(
     @User() userPayloadDto: UserPayloadDto,
@@ -70,18 +63,11 @@ export class CharacterizationController {
     );
   }
 
-  @Permissions(
-    {
-      code: PermissionEnum.MANAGEMENT,
-      isContract: true,
-      isMember: true,
-    },
-    {
-      code: PermissionEnum.CHARACTERIZATION,
-      isContract: true,
-      isMember: true,
-    },
-  )
+  @Permissions({
+    code: PermissionEnum.CHARACTERIZATION,
+    isContract: true,
+    isMember: true,
+  })
   @Get('/:id')
   findById(@User() userPayloadDto: UserPayloadDto, @Param('id') id: string) {
     return this.findByIdCharacterizationService.execute(id, userPayloadDto);

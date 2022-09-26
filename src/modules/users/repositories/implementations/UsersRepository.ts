@@ -37,6 +37,18 @@ export class UsersRepository implements IUsersRepository {
               type: professional?.type,
               name: professional?.name,
             }),
+            ...(professional?.councils &&
+              professional.councils.length > 0 && {
+                councils: {
+                  createMany: {
+                    data: professional.councils.map((c) => ({
+                      councilId: c.councilId,
+                      councilUF: c.councilUF,
+                      councilType: c.councilType,
+                    })),
+                  },
+                },
+              }),
           },
         },
         companies: { create: userCompanyDto },
@@ -60,6 +72,7 @@ export class UsersRepository implements IUsersRepository {
       formation,
       type,
       name,
+      councils,
       ...updateUserDto
     }: UpdateUserDto,
     userCompanyDto: UserCompanyDto[] = [],
@@ -96,9 +109,44 @@ export class UsersRepository implements IUsersRepository {
         },
         companies: { create: userCompanyDto },
       },
-      include: { companies: true, professional: true },
+      include: {
+        companies: true,
+        professional: { include: { councils: true } },
+      },
     });
     if (!user) return;
+
+    if (user.professional && councils) {
+      await this.prisma.professionalCouncil.deleteMany({
+        where: { professionalId: user.professional.id },
+      });
+
+      const councilsCreate = await Promise.all(
+        councils.map(async ({ councilId, councilType, councilUF }) => {
+          if (councilId && councilType && councilUF)
+            await this.prisma.professionalCouncil.upsert({
+              create: {
+                councilId,
+                councilType,
+                councilUF,
+                professionalId: user.professional.id,
+              },
+              update: {},
+              where: {
+                councilType_councilUF_councilId_professionalId: {
+                  councilId,
+                  councilType,
+                  councilUF,
+                  professionalId: user.professional.id,
+                },
+              },
+            });
+        }),
+      );
+
+      (user.professional as any).councils = councilsCreate;
+    }
+
     return new UserEntity({
       ...user,
       professional: new ProfessionalEntity(user?.professional),
@@ -151,14 +199,14 @@ export class UsersRepository implements IUsersRepository {
           // take: 1,
           orderBy: { status: 'asc' },
         },
-        professional: true,
+        professional: { include: { councils: true } },
       },
     });
     return users.map(
       (user) =>
         new UserEntity({
           ...user,
-          professional: new ProfessionalEntity(user?.professional),
+          professional: new ProfessionalEntity(user?.professional as any),
         }),
     );
   }
@@ -166,7 +214,10 @@ export class UsersRepository implements IUsersRepository {
   async findByEmail(email: string) {
     const user = await this.prisma.user.findUnique({
       where: { email },
-      include: { companies: true, professional: true },
+      include: {
+        companies: true,
+        professional: { include: { councils: true } },
+      },
     });
     if (!user) return;
     return new UserEntity({
@@ -178,7 +229,10 @@ export class UsersRepository implements IUsersRepository {
   async findById(id: number) {
     const user = await this.prisma.user.findUnique({
       where: { id },
-      include: { companies: true, professional: true },
+      include: {
+        companies: true,
+        professional: { include: { councils: true } },
+      },
     });
     if (!user) return;
     return new UserEntity({
@@ -190,7 +244,10 @@ export class UsersRepository implements IUsersRepository {
   async findByGoogleExternalId(id: string) {
     const user = await this.prisma.user.findFirst({
       where: { googleExternalId: id },
-      include: { companies: true, professional: true },
+      include: {
+        companies: true,
+        professional: { include: { councils: true } },
+      },
     });
     if (!user) return;
     return new UserEntity({

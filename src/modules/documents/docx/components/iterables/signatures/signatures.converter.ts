@@ -1,3 +1,4 @@
+import { WorkspaceEntity } from './../../../../../company/entities/workspace.entity';
 import { UserEntity } from './../../../../../users/entities/user.entity';
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
@@ -6,6 +7,7 @@ import { getCredential } from '../professionals/professionals.converter';
 
 export const SignaturesConverter = (
   signatureEntity: (ProfessionalEntity | UserEntity)[],
+  workspace: WorkspaceEntity,
 ): IDocVariables[] => {
   return signatureEntity
     .filter((professional) =>
@@ -16,8 +18,14 @@ export const SignaturesConverter = (
         : false,
     )
     .map((signature) => {
-      const crea =
-        signature?.councilType === 'CREA' ? getCredential(signature) : '';
+      const council =
+        signature?.councils.find(
+          (c) =>
+            c.councilType === 'CREA' &&
+            c.councilUF === workspace?.address?.state,
+        ) || signature?.councils?.[0];
+
+      const crea = getCredential(council);
 
       return {
         [VariablesPGREnum.PROFESSIONAL_CERTIFICATIONS]:

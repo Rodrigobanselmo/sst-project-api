@@ -52,11 +52,6 @@ export class HierarchyController {
       isContract: true,
       isMember: true,
     },
-    {
-      code: PermissionEnum.MANAGEMENT,
-      isContract: true,
-      isMember: true,
-    },
   )
   @Get('/:companyId?')
   findAllAvailable(@User() userPayloadDto: UserPayloadDto) {
@@ -71,11 +66,6 @@ export class HierarchyController {
     },
     {
       code: PermissionEnum.COMPANY,
-      isContract: true,
-      isMember: true,
-    },
-    {
-      code: PermissionEnum.MANAGEMENT,
       isContract: true,
       isMember: true,
     },

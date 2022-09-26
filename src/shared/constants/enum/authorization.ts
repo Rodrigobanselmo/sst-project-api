@@ -15,19 +15,19 @@ export enum RoleEnum {
   MASTER = 'master',
   ADMIN = '0',
   USER = '1',
-  PROFESSIONALS = '1.2',
   COMPANY = '2',
   EPI = '3',
-  MANAGEMENT = '4',
   CONTRACTS = '4.1',
-  PGR = '5',
-  ACTION_PLAN = '5.1',
+  ACTION_PLAN = '5',
   CLINICS = '6',
   EXAM = '6.1',
   SCHEDULE_EXAM = '7',
   RISK = '8',
   DOCTOR = '10',
   NOTIFICATION = '11',
+  SECURITY = '12',
+  MEDICINE = '13',
+  DOCUMENTS = '14',
 
   DATABASE = '99',
   CHECKLIST = '98',
@@ -43,7 +43,6 @@ export enum PermissionEnum {
   EMPLOYEE_HISTORY = '2.2', //*new
   COMPANY_SCHEDULE = '2.3', //*new
   EPI = '3',
-  MANAGEMENT = '4',
   RISK = '4.0',
   GS = '4.1',
   REC_MED = '4.2',
@@ -53,13 +52,13 @@ export enum PermissionEnum {
   CHARACTERIZATION = '4.6',
   PCMSO = '4.7',
   EXAM_RISK = '4.8',
+  EXAM_CLINIC = '4.9',
   CLINIC_SCHEDULE = '5', //*new
   HOMO_GROUP = '6', //*new
   EXAM = '7',
-  RISK_DOC_INFO = '8',
-  // COMPANY_GROUPS = '4.9',
-
-  CREATE_COMPANY = '2.1',
-  // CONTRACT = '3',
-  // CREATE_RISK = '10',
+  RISK_DOC_INFO = '8', //*new
+  COMPANY_GROUPS = '9', //*new
+  DOCUMENTS = '10', //* new
+  CONTRACTS = '11', //* new
+  CLINIC = '12',
 }

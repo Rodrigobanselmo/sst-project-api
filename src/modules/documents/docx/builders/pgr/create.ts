@@ -130,6 +130,7 @@ export class DocumentBuildPGR {
       hierarchy: this.hierarchy,
       attachments: this.attachments,
       hierarchyTree: this.hierarchyTree,
+      workspace: this.workspace,
     }).map;
 
     const sectionsMap = new SectionsMapClass({
