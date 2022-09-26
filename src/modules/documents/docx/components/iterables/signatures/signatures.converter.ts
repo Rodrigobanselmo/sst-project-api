@@ -19,7 +19,7 @@ export const SignaturesConverter = (
     )
     .map((signature) => {
       const council =
-        signature?.councils.find(
+        signature?.councils?.find(
           (c) =>
             c.councilType === 'CREA' &&
             c.councilUF === workspace?.address?.state,

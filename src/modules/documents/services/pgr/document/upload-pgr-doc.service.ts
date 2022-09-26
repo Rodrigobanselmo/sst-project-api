@@ -103,7 +103,7 @@ export class PgrUploadService {
             },
             where: { workspaceId },
           },
-          professionals: true,
+          professionals: { include: { councils: true } },
           receivingServiceContracts: {
             include: {
               applyingServiceCompany: {
@@ -267,9 +267,9 @@ export class PgrUploadService {
 
       return { buffer, fileName };
     } catch (error) {
-      [logo, consultantLogo, cover, ...photosPath].forEach(
-        (path) => path && fs.unlinkSync(path),
-      );
+      [logo, consultantLogo, ...photosPath].forEach((path) => {
+        path && fs.unlinkSync(path);
+      });
       console.log('error: unlink photos', error);
 
       if (upsertPgrDto.id)

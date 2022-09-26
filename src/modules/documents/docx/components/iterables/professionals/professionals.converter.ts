@@ -7,11 +7,12 @@ import { IDocVariables } from '../../../builders/pgr/types/section.types';
 import { ProfessionalEntity } from '../../../../../users/entities/professional.entity';
 
 export const getCredential = (row: CouncilEntity) => {
-  if ('councilId' in row) {
+  if (row && 'councilId' in row) {
     return `${row?.councilType ? row.councilType + ' :' : ''}${row.councilId}${
       row?.councilUF ? ' - ' + row.councilUF : ''
     }`;
   }
+  return '';
 };
 
 export const ProfessionalsConverter = (
@@ -28,7 +29,7 @@ export const ProfessionalsConverter = (
     )
     .map((professional) => {
       const council =
-        professional?.councils.find(
+        professional?.councils?.find(
           (c) =>
             c.councilType === 'CREA' &&
             c.councilUF === workspace?.address?.state,
