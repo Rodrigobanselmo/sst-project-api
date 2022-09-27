@@ -110,6 +110,12 @@ export class EmployeeExamHistoryController {
       isMember: true,
       crud: true,
     },
+    {
+      code: PermissionEnum.CLINIC_SCHEDULE,
+      isContract: true,
+      isMember: true,
+      crud: true,
+    },
   )
   @Get('schedule/clinic')
   findClinicSchedule(
@@ -144,12 +150,20 @@ export class EmployeeExamHistoryController {
     return this.findByIdEmployeeExamHistoryService.execute(id, userPayloadDto);
   }
 
-  @Permissions({
-    code: PermissionEnum.EMPLOYEE_HISTORY,
-    isContract: true,
-    isMember: true,
-    crud: true,
-  })
+  @Permissions(
+    {
+      code: PermissionEnum.EMPLOYEE_HISTORY,
+      isContract: true,
+      isMember: true,
+      crud: true,
+    },
+    {
+      code: PermissionEnum.COMPANY_SCHEDULE,
+      isContract: true,
+      isMember: true,
+      crud: true,
+    },
+  )
   @Post('/:companyId?')
   create(
     @Body() upsertAccessGroupDto: CreateEmployeeExamHistoryDto,

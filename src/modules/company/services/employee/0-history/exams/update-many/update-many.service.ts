@@ -73,13 +73,13 @@ export class UpdateManyScheduleExamHistoryService {
       await this.changeHierarchy({ data, isClinic, ...dataDto }, user, found);
     } catch (err) {
       //! do something with error
-      console.log(err);
+      console.error(err);
     }
 
     try {
       await this.sendNotification({ data, isClinic, ...dataDto }, user, found);
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
 
     return history;
@@ -112,7 +112,7 @@ export class UpdateManyScheduleExamHistoryService {
           startDate:
             clinicHistory?.changeHierarchyDate || this.dayJSProvider.dateNow(),
         },
-        user,
+        { ...user, targetCompanyId: employee.companyId },
       );
 
     if (clinicHistory.examType === 'DEMI' && !clinicHistory.hierarchyId)
@@ -124,7 +124,7 @@ export class UpdateManyScheduleExamHistoryService {
           startDate:
             clinicHistory?.changeHierarchyDate || this.dayJSProvider.dateNow(),
         },
-        user,
+        { ...user, targetCompanyId: employee.companyId },
       );
   }
 

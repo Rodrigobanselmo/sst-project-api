@@ -205,7 +205,7 @@ export class UsersRepository implements IUsersRepository {
     return users.map(
       (user) =>
         new UserEntity({
-          ...user,
+          ...(user as any),
           professional: new ProfessionalEntity(user?.professional as any),
         }),
     );
@@ -230,13 +230,13 @@ export class UsersRepository implements IUsersRepository {
     const user = await this.prisma.user.findUnique({
       where: { id },
       include: {
-        companies: true,
+        companies: { include: { group: true } },
         professional: { include: { councils: true } },
       },
     });
     if (!user) return;
     return new UserEntity({
-      ...user,
+      ...(user as any),
       professional: new ProfessionalEntity(user?.professional),
     });
   }

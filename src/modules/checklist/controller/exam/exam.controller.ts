@@ -64,12 +64,20 @@ export class ExamController {
     return this.findExamService.execute(query, userPayloadDto);
   }
 
-  @Permissions({
-    code: PermissionEnum.EXAM,
-    crud: true,
-    isMember: true,
-    isContract: true,
-  })
+  @Permissions(
+    {
+      code: PermissionEnum.EXAM,
+      crud: true,
+      isMember: true,
+      isContract: true,
+    },
+    {
+      code: PermissionEnum.COMPANY_SCHEDULE,
+      crud: true,
+      isMember: true,
+      isContract: true,
+    },
+  )
   @Get('/hierarchy/:companyId')
   findByHierarchy(
     @User() userPayloadDto: UserPayloadDto,

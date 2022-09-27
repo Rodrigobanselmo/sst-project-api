@@ -8,6 +8,7 @@ import { FindInvitesDto, InviteUserDto } from '../../dto/invite-user.dto';
 import { InviteUsersEntity } from '../../entities/invite-users.entity';
 import { IInviteUsersRepository } from '../IInviteUsersRepository.types';
 import { Prisma } from '.prisma/client';
+import { dayjs } from '../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 
 @Injectable()
 export class InviteUsersRepository implements IInviteUsersRepository {
@@ -50,7 +51,10 @@ export class InviteUsersRepository implements IInviteUsersRepository {
 
   async findAllByCompanyId(companyId: string): Promise<InviteUsersEntity[]> {
     const invites = await this.prisma.inviteUsers.findMany({
-      where: { companyId },
+      where: {
+        companyId,
+        expires_date: { lte: dayjs().add(10, 'year').toDate() },
+      },
     });
 
     return invites.map((invite) => new InviteUsersEntity(invite));
@@ -85,12 +89,18 @@ export class InviteUsersRepository implements IInviteUsersRepository {
 
     const { where } = prismaFilter(whereInit, {
       query,
-      skip: ['ids'],
+      skip: ['ids', 'showProfessionals'],
     });
 
     if ('ids' in query) {
       (where.AND as any).push({
         id: { in: query.ids },
+      } as typeof options.where);
+    }
+
+    if (!('showProfessionals' in query)) {
+      (where.AND as any).push({
+        expires_date: { lte: dayjs().add(10, 'year').toDate() },
       } as typeof options.where);
     }
 

@@ -102,8 +102,8 @@ export class PermissionsGuard implements CanActivate {
     const method: IMethods = req.method;
     const CRUD = methodToCrud(method);
 
-    if (user)
-      return await asyncSome(
+    if (user) {
+      const isValidPermission = await asyncSome(
         requiredPermissionsOptions,
         async (PermissionOption) => {
           const { isContract, isMember } = PermissionOption;
@@ -114,22 +114,20 @@ export class PermissionsGuard implements CanActivate {
           const affectedCompanyId = getCompanyId(req);
 
           // is being send an array of items with different companies Ids
-          if (affectedCompanyId === false)
-            throw new ForbiddenException('Acesso negado');
+          if (affectedCompanyId === false) return false;
 
           //! add
-          // const isPermissionPresent = checkPermissions(
-          //   user,
-          //   PermissionOption,
-          //   CRUD,
-          // );
+          const isPermissionPresent = checkPermissions(
+            user,
+            PermissionOption,
+            CRUD,
+          );
 
           //! remove
-          const isPermissionPresent = true;
+          // const isPermissionPresent = true;
 
           //! add
-          // if (!isPermissionPresent)
-          //   throw new ForbiddenException('Acesso negado');
+          if (!isPermissionPresent) return false;
 
           if (!isMember && !isContract && isPermissionPresent) return true;
 
@@ -139,10 +137,8 @@ export class PermissionsGuard implements CanActivate {
           }
 
           if (isContract && isPermissionPresent) {
-            if (!affectedCompanyId)
-              throw new ForbiddenException('Acesso negado');
-            if (affectedCompanyId == userCompanyId)
-              throw new ForbiddenException('Acesso negado');
+            if (!affectedCompanyId) return false;
+            if (affectedCompanyId == userCompanyId) return false;
 
             const isCompanyContract = await isParentCompany(
               this.prisma,
@@ -153,9 +149,13 @@ export class PermissionsGuard implements CanActivate {
             if (isCompanyContract) return true;
           }
 
-          throw new ForbiddenException('Acesso negado');
+          return false;
         },
       );
+
+      if (!isValidPermission) throw new ForbiddenException('Acesso negado');
+      return true;
+    }
     throw new ForbiddenException('Acesso negado');
   }
 }

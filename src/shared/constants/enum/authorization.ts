@@ -28,6 +28,7 @@ export enum RoleEnum {
   SECURITY = '12',
   MEDICINE = '13',
   DOCUMENTS = '14',
+  EMPLOYEE = '15',
 
   DATABASE = '99',
   CHECKLIST = '98',

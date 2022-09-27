@@ -120,8 +120,8 @@ export class CreateEmployeeExamHistoryDto {
   })
   evaluationType: ExamHistoryEvaluationEnum;
 
-  @ValidateIf((o) => !!o.examId && o.status == StatusEnum.DONE)
   @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsOptional()
   @IsString()
   @IsEnum(ExamHistoryConclusionEnum, {
     message: `tipo de conclusão inválido`,

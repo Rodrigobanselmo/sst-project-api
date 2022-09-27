@@ -44,13 +44,18 @@ export class RefreshTokenService {
     const user = await this.usersRepository.findById(userId);
 
     const companies = user.companies
-      .map(({ companyId, permissions, roles, status }) => {
+      .map(({ companyId, permissions, roles, status, group }) => {
         if (status.toUpperCase() !== 'ACTIVE') return null;
 
         return {
           companyId,
           permissions,
           roles,
+          ...(group &&
+            group?.roles && {
+              permissions: group.permissions,
+              roles: group.roles,
+            }),
         };
       })
       .filter((i) => i);

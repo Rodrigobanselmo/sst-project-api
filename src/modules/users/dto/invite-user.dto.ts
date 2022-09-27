@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsEmail,
   IsEnum,
   IsInt,
@@ -45,4 +46,8 @@ export class FindInvitesDto extends PaginationQueryDto {
   @IsString({ each: true })
   @IsOptional()
   ids?: string[];
+
+  @IsOptional()
+  @IsBoolean()
+  showProfessionals?: boolean;
 }

@@ -34,19 +34,21 @@ async function main() {
   // });
   // console.log(data);
 
-  const professional = await prisma.professional.findMany();
+  //! rodar
+  // const professional = await prisma.professional.findMany();
 
-  await Promise.all(
-    professional.map(async (data) => {
-      const councilId = data.councilId;
-      const councilType = data.councilType;
-      const councilUF = data.councilUF;
-      if (councilType && councilType && councilUF)
-        await prisma.professionalCouncil.create({
-          data: { councilId, councilType, councilUF, professionalId: data.id },
-        });
-    }),
-  );
+  // await Promise.all(
+  //   professional.map(async (data) => {
+  //     const councilId = data.councilId;
+  //     const councilType = data.councilType;
+  //     const councilUF = data.councilUF;
+  //     if (councilType && councilType && councilUF)
+  //       await prisma.professionalCouncil.create({
+  //         data: { councilId, councilType, councilUF, professionalId: data.id },
+  //       });
+  //   }),
+  // );
+  //! rodar
 
   //await deleteWithNameCompany('Deletar', prisma);
   // await levelRiskData(prisma);

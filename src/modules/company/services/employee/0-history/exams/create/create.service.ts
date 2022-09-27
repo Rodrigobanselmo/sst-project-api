@@ -25,6 +25,8 @@ export class CreateEmployeeExamHistoryService {
       user.targetCompanyId,
     );
 
+    console.log(dataDto);
+
     if (!found?.id)
       throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_NOT_FOUND);
 

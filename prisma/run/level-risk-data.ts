@@ -11,8 +11,8 @@ export const levelRiskData = async (prisma: PrismaClient) => {
 
   await Promise.all(
     riskData.map(async (rd) => {
-      if (!rd.riskFactor.severity) return null;
-      if (!rd.probability) return null;
+      if (!rd?.riskFactor?.severity) return null;
+      if (!rd?.probability) return null;
       const matrix = getMatrizRisk(rd.riskFactor.severity, rd.probability);
 
       await prisma.riskFactorData.update({
