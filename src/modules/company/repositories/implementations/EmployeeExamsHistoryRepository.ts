@@ -13,6 +13,7 @@ import {
   UpdateManyScheduleExamDto,
 } from '../../dto/employee-exam-history';
 import { EmployeeExamsHistoryEntity } from '../../entities/employee-exam-history.entity';
+import clone from 'clone';
 
 @Injectable()
 export class EmployeeExamsHistoryRepository {
@@ -39,6 +40,7 @@ export class EmployeeExamsHistoryRepository {
           },
         ].filter((i) => i),
         ...examsData.map((exam) => ({
+          hierarchyId,
           employeeId: createData.employeeId,
           userDoneId: createData.userDoneId,
           userScheduleId: createData.userScheduleId,
@@ -109,8 +111,12 @@ export class EmployeeExamsHistoryRepository {
   async find(
     query: Partial<FindEmployeeExamHistoryDto>,
     pagination: PaginationQueryDto,
-    options: Prisma.EmployeeExamsHistoryFindManyArgs = {},
+    {
+      where: whereOptions,
+      ...options
+    }: Prisma.EmployeeExamsHistoryFindManyArgs = {},
   ) {
+    const whereOptionsCopy = clone(whereOptions);
     const whereInit = {
       AND: [
         {
@@ -138,8 +144,12 @@ export class EmployeeExamsHistoryRepository {
             ],
           }),
         },
+        ...(whereOptionsCopy && (whereOptionsCopy as any)?.AND
+          ? (whereOptionsCopy as any).AND
+          : []),
       ],
-    } as typeof options.where;
+      ...whereOptions,
+    } as typeof whereOptions;
 
     const { where } = prismaFilter(whereInit, {
       query,
@@ -162,7 +172,7 @@ export class EmployeeExamsHistoryRepository {
         });
       }
 
-      (where.AND as any).push({ employee: { OR } } as typeof options.where);
+      (where.AND as any).push({ employee: { OR } } as typeof whereOptions);
       delete query.search;
     }
 

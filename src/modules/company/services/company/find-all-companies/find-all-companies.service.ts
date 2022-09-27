@@ -24,6 +24,7 @@ export class FindAllCompaniesService {
             name: true,
             fantasy: true,
             initials: true,
+            isConsulting: true,
             status: true,
             id: true,
             address: true,

@@ -17,7 +17,6 @@ export class SendEmailService {
     dto: EmailDto,
     files?: Array<Express.Multer.File>,
   ) {
-    console.log(files);
     const templatePath = resolve(
       __dirname,
       '..',

@@ -96,6 +96,7 @@ import { FindClinicService } from './services/company/find-clinic/find-clinic.se
 import { FindScheduleEmployeeExamHistoryService } from './services/employee/0-history/exams/find-schedule/find-schedule.service';
 import { FindClinicScheduleEmployeeExamHistoryService } from './services/employee/0-history/exams/find-clinic-schedules/find-clinic-schedules.service';
 import { NotificationModule } from '../notifications/notifications.module';
+import { FindCompanyScheduleEmployeeExamHistoryService } from './services/employee/0-history/exams/find-company-schedules/find-company-schedules.service';
 
 @Module({
   imports: [
@@ -199,6 +200,7 @@ import { NotificationModule } from '../notifications/notifications.module';
     UpdateManyScheduleExamHistoryService,
     FindClinicService,
     FindClinicScheduleEmployeeExamHistoryService,
+    FindCompanyScheduleEmployeeExamHistoryService,
     DayJSProvider,
   ],
   exports: [

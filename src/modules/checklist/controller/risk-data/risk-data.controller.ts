@@ -111,7 +111,6 @@ export class RiskDataController {
     @Param('hierarchyId') hierarchyId: string,
   ) {
     const companyId = userPayloadDto.targetCompanyId;
-    console.log(companyId);
 
     return this.findAllByHierarchyService.execute(hierarchyId, companyId);
   }

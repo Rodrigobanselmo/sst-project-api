@@ -16,6 +16,7 @@ import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import {
   CreateEmployeeExamHistoryDto,
   FindClinicEmployeeExamHistoryDto,
+  FindCompanyEmployeeExamHistoryDto,
   FindEmployeeExamHistoryDto,
   UpdateEmployeeExamHistoryDto,
   UpdateManyScheduleExamDto,
@@ -35,6 +36,7 @@ import {
   RoleEnum,
 } from '../../../../shared/constants/enum/authorization';
 import { Roles } from '../../../../shared/decorators/roles.decorator';
+import { FindCompanyScheduleEmployeeExamHistoryService } from '../../services/employee/0-history/exams/find-company-schedules/find-company-schedules.service';
 
 @ApiTags('employee-history-exam')
 @Controller('employee-history/exam')
@@ -45,6 +47,7 @@ export class EmployeeExamHistoryController {
     private readonly findEmployeeExamHistoryService: FindEmployeeExamHistoryService,
     private readonly findAskEmployeeExamHistoryService: FindScheduleEmployeeExamHistoryService,
     private readonly findClinicScheduleEmployeeExamHistoryService: FindClinicScheduleEmployeeExamHistoryService,
+    private readonly findCompanyScheduleEmployeeExamHistoryService: FindCompanyScheduleEmployeeExamHistoryService,
     private readonly findByIdEmployeeExamHistoryService: FindByIdEmployeeExamHistoryService,
     private readonly deleteEmployeeExamHistoryService: DeleteEmployeeExamHistoryService,
     private readonly updateManyScheduleExamHistoryService: UpdateManyScheduleExamHistoryService,
@@ -92,6 +95,31 @@ export class EmployeeExamHistoryController {
     @Query() query: FindEmployeeExamHistoryDto,
   ) {
     return this.findAskEmployeeExamHistoryService.execute(
+      query,
+      userPayloadDto,
+    );
+  }
+
+  @Permissions(
+    {
+      code: PermissionEnum.EMPLOYEE_HISTORY,
+      isContract: true,
+      isMember: true,
+      crud: true,
+    },
+    {
+      code: PermissionEnum.COMPANY_SCHEDULE,
+      isContract: true,
+      isMember: true,
+      crud: true,
+    },
+  )
+  @Get('schedule/company')
+  findCompanySchedule(
+    @User() userPayloadDto: UserPayloadDto,
+    @Query() query: FindCompanyEmployeeExamHistoryDto,
+  ) {
+    return this.findCompanyScheduleEmployeeExamHistoryService.execute(
       query,
       userPayloadDto,
     );

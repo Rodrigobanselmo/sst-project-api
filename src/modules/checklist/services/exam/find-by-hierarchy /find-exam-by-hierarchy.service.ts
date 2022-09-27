@@ -155,17 +155,6 @@ export class FindExamByHierarchyService {
       },
     });
 
-    riskData.map((rd) => {
-      rd.examsToRiskFactorData.forEach((examData) => {
-        console.log(
-          rd.id,
-          examData.riskFactorDataId,
-          examData.examId,
-          examData.validityInMonths,
-        );
-      });
-    });
-
     const riskDataOrigin = riskData.map((rd) => {
       let prioritization: number;
 
@@ -363,7 +352,7 @@ export class FindExamByHierarchyService {
         this.dayjs.dateNow(),
         foundExamHistory.expiredDate,
         'days',
-      ) >= examRisk.considerBetweenDays;
+      ) <= examRisk.considerBetweenDays;
 
     return {
       closeToExpired,

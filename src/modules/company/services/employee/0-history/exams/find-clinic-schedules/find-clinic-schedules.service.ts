@@ -1,10 +1,10 @@
-import { EmployeeRepository } from './../../../../../repositories/implementations/EmployeeRepository';
 import { Injectable } from '@nestjs/common';
 import { StatusEnum } from '@prisma/client';
 
 import { UserPayloadDto } from '../../../../../../../shared/dto/user-payload.dto';
 import { FindClinicEmployeeExamHistoryDto } from '../../../../../dto/employee-exam-history';
 import { EmployeeExamsHistoryRepository } from '../../../../../repositories/implementations/EmployeeExamsHistoryRepository';
+import { EmployeeRepository } from './../../../../../repositories/implementations/EmployeeRepository';
 
 @Injectable()
 export class FindClinicScheduleEmployeeExamHistoryService {
@@ -29,7 +29,13 @@ export class FindClinicScheduleEmployeeExamHistoryService {
         phone: true,
         sex: true,
         company: {
-          select: { name: true, initials: true, fantasy: true, id: true },
+          select: {
+            name: true,
+            initials: true,
+            fantasy: true,
+            id: true,
+            cnpj: true,
+          },
         },
         examsHistory: {
           select: {

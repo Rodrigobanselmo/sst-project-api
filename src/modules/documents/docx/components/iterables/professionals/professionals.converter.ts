@@ -28,7 +28,6 @@ export const ProfessionalsConverter = (
         : false,
     )
     .map((professional) => {
-      console.log(professional);
       const council =
         professional?.councils?.find(
           (c) =>
