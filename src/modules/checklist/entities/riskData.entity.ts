@@ -281,7 +281,10 @@ export class RiskFactorDataEntity implements RiskFactorData {
     if (nr15ltProb || stelProb || twaProb || vmpProb) {
       this.isQuantity = true;
       this.probability =
-        Math.max(nr15ltProb, stelProb, twaProb, vmpProb) || undefined;
+        nr15ltProb || stelProb || twaProb || vmpProb || undefined;
+
+      //! get max probability when some prop is passed
+      // this.probability = Math.max(nr15ltProb, stelProb, twaProb, vmpProb) || undefined;
 
       (this.json as unknown as IRiskDataJsonQui).isNr15Teto = isNr15Teto;
       (this.json as unknown as IRiskDataJsonQui).isStelTeto = isStelTeto;

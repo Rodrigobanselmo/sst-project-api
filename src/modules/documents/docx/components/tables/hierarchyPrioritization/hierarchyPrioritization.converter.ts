@@ -1,5 +1,7 @@
+import { sortNumber } from './../../../../../../shared/utils/sorts/number.sort';
+import { riskMap } from './../../../../constants/risks.constant';
 import { originRiskMap } from './../../../../../../shared/constants/maps/origin-risk';
-import { HierarchyEnum, HomoTypeEnum } from '@prisma/client';
+import { HierarchyEnum, HomoTypeEnum, RiskFactorsEnum } from '@prisma/client';
 
 import { palette } from '../../../../../../shared/constants/palette';
 import { removeDuplicate } from '../../../../../../shared/utils/removeDuplicate';
@@ -32,10 +34,12 @@ interface IHomoPositionData {
 interface IHierarchyDataType {
   name: string;
   homogeneousGroupIds: string[];
+  type?: RiskFactorsEnum;
 }
 
 interface IRiskDataMap {
   name: string;
+  type?: RiskFactorsEnum;
   // isQuantity: boolean;
   // riskDegree: string;
   // riskDegreeLevel?: number;
@@ -151,7 +155,8 @@ export const hierarchyPrioritizationConverter = (
 
       allRiskRecord[riskData.riskId] = {
         ...hasRisk,
-        name: riskData.riskFactor.name,
+        name: `(${riskData.riskFactor?.type}) ${riskData.riskFactor.name}`,
+        type: riskData.riskFactor?.type,
         homogeneousGroupIds: [...hasRisk.homogeneousGroupIds, dataRisk],
       };
     });
@@ -178,6 +183,9 @@ export const hierarchyPrioritizationConverter = (
   function setHeaderTable() {
     const row = header
       .sort((a, b) => sortString(a, b, 'name'))
+      .sort((a, b) =>
+        sortNumber(riskMap[a.type as any], riskMap[b.type as any], 'order'),
+      )
       .map<headerTableProps>((risk, index) => {
         risk.homogeneousGroupIds.forEach((homogeneousGroup) => {
           const homogeneousGroupId = homogeneousGroup.id;
@@ -237,6 +245,9 @@ export const hierarchyPrioritizationConverter = (
   function setBodyTable() {
     return body
       .sort((a, b) => sortString(a, b, 'name'))
+      .sort((a, b) =>
+        sortNumber(riskMap[a.type as any], riskMap[b.type as any], 'order'),
+      )
       .map<bodyTableProps[]>((hierarchy) => {
         const row: bodyTableProps[] = Array.from({ length: columnsLength }).map(
           () => ({

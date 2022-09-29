@@ -1,8 +1,10 @@
-import { HierarchyEnum } from '@prisma/client';
+import { riskMap } from './../../../../constants/risks.constant';
+import { HierarchyEnum, RiskFactorsEnum } from '@prisma/client';
 
 import { palette } from '../../../../../../shared/constants/palette';
 import { removeDuplicate } from '../../../../../../shared/utils/removeDuplicate';
 import { sortString } from '../../../../../../shared/utils/sorts/string.sort';
+import { sortNumber } from '../../../../../../shared/utils/sorts/number.sort';
 import { RiskFactorGroupDataEntity } from '../../../../../checklist/entities/riskGroupData.entity';
 import { borderStyleGlobal } from '../../../base/config/styles';
 import {
@@ -24,10 +26,12 @@ interface IHomoPositionData {
 interface IHierarchyDataType {
   name: string;
   homogeneousGroupIds: string[];
+  type?: RiskFactorsEnum;
 }
 
 interface IRiskDataMap {
   name: string;
+  type?: RiskFactorsEnum;
   homogeneousGroupIds: string[];
 }
 
@@ -76,7 +80,8 @@ export const hierarchyRisksConverter = (
       };
 
       allRiskRecord[riskData.riskId] = {
-        name: riskData.riskFactor.name,
+        name: `(${riskData.riskFactor?.type}) ${riskData.riskFactor.name}`,
+        type: riskData.riskFactor?.type,
         homogeneousGroupIds: [
           ...hasRisk.homogeneousGroupIds,
           riskData.homogeneousGroupId,
@@ -101,6 +106,9 @@ export const hierarchyRisksConverter = (
   function setHeaderTable() {
     const row = header
       .sort((a, b) => sortString(a, b, 'name'))
+      .sort((a, b) =>
+        sortNumber(riskMap[a.type as any], riskMap[b.type as any], 'order'),
+      )
       .map<headerTableProps>((risk, index) => {
         risk.homogeneousGroupIds.forEach((homogeneousGroupId) => {
           const homoPosition = HomoPositionMap.get(homogeneousGroupId) || {
@@ -134,6 +142,7 @@ export const hierarchyRisksConverter = (
   function setBodyTable() {
     return body
       .sort((a, b) => sortString(a, b, 'name'))
+      .sort((a, b) => sortNumber(riskMap[a as any], riskMap[b as any], 'order'))
       .map<bodyTableProps[]>((hierarchy) => {
         const row: bodyTableProps[] = Array.from({ length: columnsLength }).map(
           () => ({
