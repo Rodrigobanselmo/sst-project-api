@@ -86,4 +86,16 @@ export const quiColumnsConstant: ITableSchema[] = [
     required: false,
     checkHandler: checkIsString,
   },
+  {
+    databaseName: 'fraction',
+    excelName: 'Fração',
+    required: false,
+    checkHandler: checkIsString,
+  },
+  {
+    databaseName: 'tlv',
+    excelName: 'Base do TLV',
+    required: false,
+    checkHandler: checkIsString,
+  },
 ];

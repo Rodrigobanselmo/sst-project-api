@@ -80,6 +80,8 @@ export class RiskFactorsEntity implements RiskFactors {
   ipvs: string;
   pv: string;
   pe: string;
+  fraction: string;
+  tlv: string;
   carnogenicityACGIH: string;
   carnogenicityLinach: string;
   examToRisk: ExamRiskEntity[];

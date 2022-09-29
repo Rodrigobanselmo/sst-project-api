@@ -1013,6 +1013,8 @@ model RiskFactors {
   ipvs String?
   pv String?
   pe String?
+  fraction String?
+  tlv String?
   isEmergency Boolean  @default(false)
   carnogenicityACGIH String?
   carnogenicityLinach String?
