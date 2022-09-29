@@ -28,6 +28,8 @@ class AwsSesProvider implements IMailProvider {
 
     if (process.env.APP_HOST.includes('localhost')) return;
 
+    if (!(typeof to === 'string')) return;
+
     const message = await this.client
       .sendEmail({
         Source: source.replace(':id', random),

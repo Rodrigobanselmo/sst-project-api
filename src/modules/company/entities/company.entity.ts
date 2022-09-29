@@ -1,3 +1,4 @@
+import { ExamToClinicEntity } from './../../checklist/entities/examToClinic';
 import { RiskFactorGroupDataEntity } from './../../checklist/entities/riskGroupData.entity';
 import { ProfessionalEntity } from './../../users/entities/professional.entity';
 import {
@@ -125,7 +126,7 @@ export class CompanyEntity implements Company {
   observationBank: string;
   companiesToClinicAvailable: CompanyClinicsEntity;
   clinicsAvailable: CompanyClinicsEntity;
-  clinicExams: any;
+  clinicExams: ExamToClinicEntity[];
   riskDegree?: number;
   isGroup: boolean;
   companyGroupId: number;

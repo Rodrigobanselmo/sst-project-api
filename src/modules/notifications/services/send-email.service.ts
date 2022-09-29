@@ -1,3 +1,4 @@
+import { EmailsTemplatesEnum } from 'src/shared/constants/enum/emailsTemplates';
 import { PrismaService } from './../../../prisma/prisma.service';
 import { UserPayloadDto } from '../../../shared/dto/user-payload.dto';
 import { Injectable } from '@nestjs/common';
@@ -17,6 +18,16 @@ export class SendEmailService {
     dto: EmailDto,
     files?: Array<Express.Multer.File>,
   ) {
+    if (dto.template === EmailsTemplatesEnum.REFERRAL_GUIDE) {
+      this.sendReferralGuide(user, dto, files);
+    }
+  }
+
+  async sendReferralGuide(
+    user: UserPayloadDto,
+    dto: EmailDto,
+    files?: Array<Express.Multer.File>,
+  ) {
     const templatePath = resolve(
       __dirname,
       '..',
@@ -31,40 +42,14 @@ export class SendEmailService {
     await this.mailProvider.sendMail({
       path: templatePath,
       subject: 'Guia Exame Médico',
-      to: 'rodrigoanselmo.dev@gmail.com',
+      to: dto.emails,
       attachments: files.map((file) => {
         return {
           content: file.buffer.toString('base64'),
           type: 'application/pdf',
-          filename: 'attachment.pdf',
+          filename: 'guia-de-encaminhamento.pdf',
         };
       }),
-      // variables,
     });
   }
-
-  // async sendReferralGuide(
-  //   user: UserPayloadDto,
-  //   dto: EmailDto,
-  //   files?: Array<Express.Multer.File>,
-  // ) {
-  //   const templatePath = resolve(
-  //     __dirname,
-  //     '..',
-  //     '..',
-  //     '..',
-  //     '..',
-  //     '..',
-  //     'templates',
-  //     'email',
-  //     'referralGuide.hbs',
-  //   );
-
-  //   await this.mailProvider.sendMail({
-  //     path: templatePath,
-  //     subject: 'Convite para se tornar membro',
-  //     to: invite.email,
-  //     variables,
-  //   });
-  // }
 }

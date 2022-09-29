@@ -7,7 +7,7 @@ export interface ISendMailAttachmentData {
 }
 
 export interface ISendMailData {
-  to: string;
+  to: string | string[];
   subject: string;
   variables?: Record<string, unknown>;
   path: string;

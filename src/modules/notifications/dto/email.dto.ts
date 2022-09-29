@@ -9,4 +9,7 @@ export class EmailDto {
     message: `templates disponíveis: ${KeysOfEnum(EmailsTemplatesEnum)}`,
   })
   template: EmailsTemplatesEnum;
+
+  @IsString({ each: true })
+  emails: string[];
 }

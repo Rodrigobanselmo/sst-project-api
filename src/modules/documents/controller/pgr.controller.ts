@@ -13,7 +13,7 @@ import { PgrUploadService } from '../services/pgr/document/upload-pgr-doc.servic
 import { PgrUploadTableService } from '../services/pgr/tables/upload-pgr-table.service';
 
 @Controller('documents/pgr')
-export class DocumentsController {
+export class DocumentsPgrController {
   constructor(
     private readonly pgrDownloadAttachmentsService: PgrDownloadAttachmentsService,
     private readonly pgrUploadService: PgrUploadTableService,
