@@ -1,3 +1,4 @@
+import { RiskRepository } from './../../../repositories/implementations/RiskRepository';
 import { RiskDocInfoEntity } from './../../../entities/riskDocInfo.entity';
 import { Injectable } from '@nestjs/common';
 
@@ -7,9 +8,28 @@ import { RiskDocInfoRepository } from './../../../repositories/implementations/R
 
 @Injectable()
 export class UpsertRiskDocInfoService {
-  constructor(private readonly riskDocInfoRepository: RiskDocInfoRepository) {}
+  constructor(
+    private readonly riskDocInfoRepository: RiskDocInfoRepository,
+    private readonly riskRepository: RiskRepository,
+  ) {}
 
   async execute(upsertRiskDataDto: UpsertRiskDocInfoDto, user: UserPayloadDto) {
+    if (user.isMaster && user.targetCompanyId === user.companyId) {
+      const risk = await this.riskRepository.update(
+        {
+          companyId: user.targetCompanyId,
+          id: upsertRiskDataDto.riskId,
+          isAso: upsertRiskDataDto.isAso,
+          isPGR: upsertRiskDataDto.isPGR,
+          isPPP: upsertRiskDataDto.isPPP,
+          isPCMSO: upsertRiskDataDto.isPCMSO,
+        },
+        true,
+        user.targetCompanyId,
+      );
+      return risk;
+    }
+
     const riskDocInfo = upsertRiskDataDto.hierarchyId
       ? ({} as RiskDocInfoEntity)
       : await this.riskDocInfoRepository.findFirstNude({

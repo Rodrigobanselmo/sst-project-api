@@ -13,8 +13,9 @@ import { dataConverter } from './third.converter';
 export const thirdRiskInventoryTableSection = (
   riskFactorGroupData: RiskFactorGroupDataEntity,
   hierarchyData: HierarchyMapData,
+  isByGroup: boolean,
 ) => {
-  const data = dataConverter(riskFactorGroupData, hierarchyData);
+  const data = dataConverter(riskFactorGroupData, hierarchyData, isByGroup);
 
   const tableHeaderElements = new TableHeaderElements();
   const tableBodyElements = new TableBodyElements();

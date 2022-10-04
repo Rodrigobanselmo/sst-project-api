@@ -175,7 +175,11 @@ class ExcelProvider implements IExcelProvider {
         await addHeader(worksheet, sheet.tableHeader, this.prisma, companyId);
 
         sheet.rows.forEach((row) => {
-          worksheet.addRow(row);
+          worksheet.addRow(
+            row.map((row) =>
+              typeof row === 'boolean' ? (row ? 'VERDADEIRO' : 'FALSO') : row,
+            ),
+          );
         });
       }),
     );
@@ -388,7 +392,10 @@ class ExcelProvider implements IExcelProvider {
     if (databaseRows.length === 0 && !transformStep.startMap)
       throw new BadRequestException(ErrorMessageEnum.FILE_WRONG_TABLE_HEAD);
 
-    return { rows: databaseRows, version: transformStep.version };
+    return {
+      rows: databaseRows,
+      version: transformStep.version,
+    };
   }
 }
 

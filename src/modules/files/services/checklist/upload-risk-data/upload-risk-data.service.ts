@@ -43,7 +43,6 @@ export class UploadChecklistDataService {
       read: readRisks,
       DatabaseTable: riskDatabaseTable,
     });
-
     // update or create all risks
     await this.riskRepository.upsertMany(allRisks, system, companyId);
 

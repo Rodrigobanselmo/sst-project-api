@@ -33,6 +33,10 @@ export class FindRisksByCompanyService {
           representAll: true,
           companyId: true,
           id: true,
+          isPGR: true,
+          isAso: true,
+          isPPP: true,
+          isPCMSO: true,
           docInfo: {
             where: {
               OR: [

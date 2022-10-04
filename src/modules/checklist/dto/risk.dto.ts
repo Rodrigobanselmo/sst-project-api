@@ -71,6 +71,22 @@ export class CreateRiskDto {
   @IsOptional()
   @Type(() => RiskCreateGenerateSourceDto)
   generateSource?: RiskCreateGenerateSourceDto[];
+
+  @IsOptional()
+  @IsBoolean()
+  isAso?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  isPGR?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  isPCMSO?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  isPPP?: boolean;
 }
 
 export class UpsertRiskDto extends CreateRiskDto {
@@ -108,7 +124,7 @@ export class UpdateRiskDto {
 
   @IsNumber()
   @IsOptional()
-  severity: number;
+  severity?: number;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsOptional()
@@ -123,15 +139,15 @@ export class UpdateRiskDto {
 
   @IsString()
   @IsOptional()
-  risk: string;
+  risk?: string;
 
   @IsString()
   @IsOptional()
-  symptoms: string;
+  symptoms?: string;
 
   @IsBoolean()
   @IsOptional()
-  isEmergency: boolean;
+  isEmergency?: boolean;
 
   @ValidateNested({ each: true })
   @IsOptional()

@@ -1,5 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { StatusEnum } from '@prisma/client';
+import { HomoTypeEnum, StatusEnum } from '@prisma/client';
 import { ISectionOptions, Packer } from 'docx';
 import fs from 'fs';
 import { removeDuplicate } from '../../../../../shared/utils/removeDuplicate';
@@ -37,6 +37,31 @@ import {
   IHierarchyMap,
   IHomoGroupMap,
 } from './../../../docx/converter/hierarchy.converter';
+import { RiskFactorsEntity } from 'src/modules/checklist/entities/risk.entity';
+
+export const getRiskDoc = (
+  risk: RiskFactorsEntity,
+  { companyId, hierarchyId }: { companyId?: string; hierarchyId?: string },
+) => {
+  if (hierarchyId) {
+    const data = risk?.docInfo?.find(
+      (i) => i.hierarchyId && i.hierarchyId == hierarchyId,
+    );
+    if (data) return data;
+  }
+
+  if (companyId) {
+    const first = risk?.docInfo?.find(
+      (i) => !i.hierarchyId && i.companyId === companyId,
+    );
+    if (first) return first;
+  }
+
+  const second = risk?.docInfo?.find((i) => !i.hierarchyId);
+  if (second) return second;
+
+  return risk;
+};
 
 @Injectable()
 export class PgrUploadService {
@@ -57,6 +82,7 @@ export class PgrUploadService {
     console.log('start: query data');
     // eslint-disable-next-line prettier/prettier
     const riskGroupData = await this.riskGroupDataRepository.findAllDataById(upsertPgrDto.riskGroupId, workspaceId, companyId);
+
     // eslint-disable-next-line prettier/prettier
     const hierarchyHierarchy = (await this.hierarchyRepository.findAllDataHierarchyByCompany(companyId, workspaceId)).map(hierarchy=>({
       ...hierarchy,
@@ -114,6 +140,25 @@ export class PgrUploadService {
         },
       },
     );
+
+    riskGroupData.data = riskGroupData.data.filter((riskData) => {
+      if (riskData.homogeneousGroup.type == HomoTypeEnum.HIERARCHY) {
+        const foundHierarchyDoc = riskData.riskFactor.docInfo.find(
+          (doc) => doc.hierarchyId == riskData.homogeneousGroupId,
+        );
+
+        if (foundHierarchyDoc) return foundHierarchyDoc.isPGR;
+      }
+
+      const isHierarchyPgr = riskData.riskFactor.docInfo.find(
+        (riskData) => riskData.hierarchyId && riskData.isPGR,
+      );
+
+      const docInfo = getRiskDoc(riskData.riskFactor, { companyId });
+      if (docInfo.isPGR || isHierarchyPgr) return true;
+
+      return false;
+    });
 
     const getConsultant = () => {
       if (company.receivingServiceContracts?.length == 1) {

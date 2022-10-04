@@ -48,6 +48,12 @@ enum CoverTypeEnum {
   PCSMO
 }
 
+enum DocumentTypeEnum {
+  PGR
+  PCSMO
+  OTHER
+}
+
 enum ExamTypeEnum {
   LAB
   AUDIO
@@ -336,6 +342,7 @@ model Company {
   contacts Contact[]
   shifts CompanyShift[]
   covers DocumentCover[]
+  documents Document[]
   doctorResponsible  Professional? @relation(name:"doctors_company_responsibles", fields: [doctorResponsibleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   tecResponsible  Professional? @relation(name:"tec_company_responsibles", fields: [tecResponsibleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   clinicsAvailable CompanyClinics[]  @relation(name: "companies_available")
@@ -548,6 +555,31 @@ model DocumentCover {
 
   @@unique([id, companyId])
 }
+
+model Document {
+  id    Int   @id  @default(autoincrement())
+  fileUrl String?
+  name String? 
+  description String?
+  startDate DateTime @default(now())
+  endDate DateTime?
+  type DocumentTypeEnum  @default(OTHER)
+  status StatusEnum @default(ACTIVE)
+  created_at DateTime @default(now())
+  updated_at  DateTime   @updatedAt
+  oldDocuments Document[] @relation(name: "document_parent")
+  parentDocumentId Int?
+  companyId String
+  workspaceId String?
+  workspace Workspace? @relation(fields: [workspaceId,companyId], references: [id,companyId], onDelete: Cascade, onUpdate: Cascade)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  parentDocument Document? @relation(name: "document_parent", fields: [parentDocumentId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  
+  @@unique([id, companyId])
+  @@index(type)
+  @@index(companyId)
+  @@index(parentDocumentId)
+} 
 
 model Employee {
   id    Int   @id  @default(autoincrement())
@@ -1015,6 +1047,10 @@ model RiskFactors {
   pe String?
   fraction String?
   tlv String?
+  isAso Boolean  @default(true)
+  isPGR Boolean  @default(true)
+  isPCMSO Boolean  @default(true)
+  isPPP Boolean  @default(true)
   isEmergency Boolean  @default(false)
   carnogenicityACGIH String?
   carnogenicityLinach String?
@@ -1280,6 +1316,7 @@ model Workspace {
   hierarchy Hierarchy[]
   companyEnvironment CompanyEnvironment[]
   characterization CompanyCharacterization[]
+  documents Document[]
 
   @@unique([abbreviation, companyId])
   @@unique([id, companyId])

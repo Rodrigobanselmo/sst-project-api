@@ -1,3 +1,4 @@
+import { getRiskDoc } from './../../../../documents/services/pgr/document/upload-pgr-doc.service';
 import { RiskFactorDataEntity } from './../../../entities/riskData.entity';
 import { FindExamHierarchyDto } from './../../../dto/exam.dto';
 import { ExamRiskEntity } from './../../../entities/examRisk.entity';
@@ -80,80 +81,107 @@ export class FindExamByHierarchyService {
       );
     }
 
-    const riskData = await this.riskDataRepository.findNude({
-      select: {
-        examsToRiskFactorData: {
-          include: {
-            exam: { select: { name: true, id: true, isAttendance: true } },
-          },
-          where: { ...examType },
-        },
-        riskFactor: {
-          select: {
-            name: true,
-            severity: true,
-            type: true,
-            representAll: true,
-            id: true,
-            examToRisk: {
-              include: {
-                exam: { select: { name: true, id: true, isAttendance: true } },
-              },
-              where: { companyId, exam: { isAttendance: false }, ...examType },
+    const riskData = (
+      await this.riskDataRepository.findNude({
+        select: {
+          examsToRiskFactorData: {
+            include: {
+              exam: { select: { name: true, id: true, isAttendance: true } },
             },
+            where: { ...examType },
           },
-        },
-        homogeneousGroup: {
-          include: {
-            hierarchyOnHomogeneous: {
-              select: {
-                hierarchy: true,
-              },
-              where: { homogeneousGroup: { type: 'HIERARCHY' } },
-            },
-            characterization: { select: { name: true, type: true } },
-            environment: { select: { name: true, type: true } },
-          },
-        },
-        id: true,
-        probability: true,
-        probabilityAfter: true,
-        companyId: true,
-        hierarchyId: true,
-        homogeneousGroupId: true,
-        riskId: true,
-        dataRecs: true,
-        level: true,
-        json: true,
-        standardExams: true,
-        riskFactorGroupDataId: true,
-      },
-      where: {
-        companyId,
-        ...(hierarchyIds.length > 0 && {
-          homogeneousGroup: {
-            hierarchyOnHomogeneous: {
-              some: { hierarchyId: { in: hierarchyIds } },
-            },
-          },
-        }),
-        OR: [
-          {
-            examsToRiskFactorData: { some: { examId: { gt: 0 } } },
-          },
-          ...(hierarchyIds.length > 0
-            ? [
-                {
-                  riskFactor: {
-                    examToRisk: { some: { examId: { gt: 0 } } },
-                  },
-                  standardExams: true,
+          riskFactor: {
+            select: {
+              name: true,
+              severity: true,
+              type: true,
+              representAll: true,
+              id: true,
+              isAso: true,
+              isPCMSO: true,
+              docInfo: {
+                where: {
+                  OR: [
+                    { companyId },
+                    {
+                      company: {
+                        applyingServiceContracts: {
+                          some: { receivingServiceCompanyId: companyId },
+                        },
+                      },
+                    },
+                  ],
                 },
-              ]
-            : []),
-        ],
-      },
-    });
+              },
+              examToRisk: {
+                include: {
+                  exam: {
+                    select: { name: true, id: true, isAttendance: true },
+                  },
+                },
+                where: {
+                  companyId,
+                  exam: { isAttendance: false },
+                  ...examType,
+                },
+              },
+            },
+          },
+          homogeneousGroup: {
+            include: {
+              hierarchyOnHomogeneous: {
+                select: {
+                  hierarchy: true,
+                },
+                where: { homogeneousGroup: { type: 'HIERARCHY' } },
+              },
+              characterization: { select: { name: true, type: true } },
+              environment: { select: { name: true, type: true } },
+            },
+          },
+          id: true,
+          probability: true,
+          probabilityAfter: true,
+          companyId: true,
+          hierarchyId: true,
+          homogeneousGroupId: true,
+          riskId: true,
+          dataRecs: true,
+          level: true,
+          json: true,
+          standardExams: true,
+          riskFactorGroupDataId: true,
+        },
+        where: {
+          companyId,
+          ...(hierarchyIds.length > 0 && {
+            homogeneousGroup: {
+              hierarchyOnHomogeneous: {
+                some: { hierarchyId: { in: hierarchyIds } },
+              },
+            },
+          }),
+          OR: [
+            {
+              examsToRiskFactorData: { some: { examId: { gt: 0 } } },
+            },
+            ...(hierarchyIds.length > 0
+              ? [
+                  {
+                    riskFactor: {
+                      examToRisk: { some: { examId: { gt: 0 } } },
+                    },
+                    standardExams: true,
+                  },
+                ]
+              : []),
+          ],
+        },
+      })
+    ).filter(
+      (riskData) =>
+        getRiskDoc(riskData.riskFactor, { companyId, hierarchyId })?.isAso,
+    );
 
     const riskDataOrigin = riskData.map((rd) => {
       let prioritization: number;

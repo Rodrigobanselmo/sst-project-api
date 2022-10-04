@@ -10,6 +10,9 @@ export enum ErrorMessageEnum {
   //* CONTACTS
   CONTACT_NOT_FOUND = 'Contato não encontrado ou sem premissões de acesso',
   CONTACT_IS_PRINCIPAL = 'Você não pode deletar o contato principal',
+  //* DOCUMENTS
+  DOCUMENT_NOT_FOUND = 'Documento não encontrado ou sem premissões de acesso',
+  DOCUMENT_IS_PRINCIPAL = 'Você não pode deletar o Documento principal',
   //* USERS
   WRONG_EMAIL_PASS = 'Email ou senha incorreto',
   //* EXAMS_TO_CLINICS

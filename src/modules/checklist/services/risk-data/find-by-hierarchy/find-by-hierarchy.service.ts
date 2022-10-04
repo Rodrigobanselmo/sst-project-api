@@ -27,8 +27,28 @@ export class FindAllByHierarchyService {
         type: true,
         representAll: true,
         id: true,
+        isPGR: true,
+        isAso: true,
+        isPPP: true,
+        isPCMSO: true,
         docInfo: {
-          where: { companyId, OR: [{ hierarchyId }, { hierarchyId: null }] },
+          where: {
+            AND: [
+              {
+                OR: [
+                  { companyId },
+                  {
+                    company: {
+                      applyingServiceContracts: {
+                        some: { receivingServiceCompanyId: companyId },
+                      },
+                    },
+                  },
+                ],
+              },
+              { OR: [{ hierarchyId }, { hierarchyId: null }] },
+            ],
+          },
         },
         examToRisk: {
           include: { exam: { select: { name: true, id: true } } },

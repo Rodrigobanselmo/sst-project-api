@@ -88,6 +88,11 @@ export class RiskFactorsEntity implements RiskFactors {
   riskFactorData: RiskFactorDataEntity[];
   docInfo?: RiskDocInfoEntity[];
 
+  isAso: boolean;
+  isPGR: boolean;
+  isPCMSO: boolean;
+  isPPP: boolean;
+
   constructor(partial: Partial<RiskFactorsEntity>) {
     Object.assign(this, partial);
     this.vmp = String(this.getVMP(this?.nr15lt || ''));

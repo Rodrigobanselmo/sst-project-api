@@ -1,3 +1,4 @@
+import { checkIsTrue } from './../../../../utils/validators/checkIsTrue';
 import { ITableSchema } from '../../../../../shared/providers/ExcelProvider/models/IExcelProvider.types';
 import { checkIsNumber } from '../../../../../shared/utils/validators/checkIdNumber';
 import { checkIsString } from '../../../../../shared/utils/validators/checkIsString';
@@ -41,6 +42,38 @@ export const riskColumnsConstant = [
     excelName: 'Meio de propagação',
     required: false,
     checkHandler: checkIsString,
+  },
+  {
+    isArray: false,
+    databaseName: 'isPGR',
+    excelName: 'PGR',
+    required: false,
+    checkHandler: checkIsTrue,
+    notes: () => ['VERDADEIRO', 'FALSO'],
+  },
+  {
+    isArray: false,
+    databaseName: 'isPCMSO',
+    excelName: 'PCMSO',
+    required: false,
+    checkHandler: checkIsTrue,
+    notes: () => ['VERDADEIRO', 'FALSO'],
+  },
+  {
+    isArray: false,
+    databaseName: 'isAso',
+    excelName: 'ASO',
+    required: false,
+    checkHandler: checkIsTrue,
+    notes: () => ['VERDADEIRO', 'FALSO'],
+  },
+  {
+    isArray: false,
+    databaseName: 'isPPP',
+    excelName: 'PPP',
+    required: false,
+    checkHandler: checkIsTrue,
+    notes: () => ['VERDADEIRO', 'FALSO'],
   },
   // {
   //   isId: true,

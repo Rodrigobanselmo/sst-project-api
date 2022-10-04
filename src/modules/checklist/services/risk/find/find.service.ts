@@ -24,9 +24,23 @@ export class FindRiskService {
           risk: true,
           isEmergency: true,
 
+          isPGR: true,
+          isAso: true,
+          isPPP: true,
+          isPCMSO: true,
+
           docInfo: {
             where: {
-              companyId: user.targetCompanyId,
+              OR: [
+                { companyId: user.targetCompanyId },
+                {
+                  company: {
+                    applyingServiceContracts: {
+                      some: { receivingServiceCompanyId: user.targetCompanyId },
+                    },
+                  },
+                },
+              ],
               hierarchyId: null,
             },
           },

@@ -14,6 +14,7 @@ import { originRiskMap } from '../../../../../../../../shared/constants/maps/ori
 export const dataConverter = (
   riskGroup: RiskFactorGroupDataEntity,
   hierarchyData: HierarchyMapData,
+  isByGroup: boolean,
 ) => {
   const riskFactorsMap = new Map<RiskFactorsEnum, bodyTableProps[][]>();
   const riskInventoryData: bodyTableProps[][] = [];
@@ -25,6 +26,16 @@ export const dataConverter = (
       )
     )
       return;
+
+    if (!isByGroup) {
+      const foundHierarchy = riskData.riskFactor.docInfo.find(
+        (doc) =>
+          !!hierarchyData.org.find(
+            (hierarchy) => hierarchy.id === doc.hierarchyId,
+          ),
+      );
+      if (foundHierarchy && foundHierarchy.isPGR === false) return;
+    }
 
     const cells: bodyTableProps[] = [];
     // eslint-disable-next-line prettier/prettier

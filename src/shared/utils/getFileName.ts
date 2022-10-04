@@ -21,3 +21,12 @@ export const getDocxFileName = ({
 
   return fileAprName;
 };
+
+export const getNormalizeFileName = ({ name }: { name: string }) => {
+  const fileName = name
+    .normalize('NFD')
+    .replace(/\s+/g, '_')
+    .replace(/[^a-zA-Z0-9._-]/g, '');
+
+  return fileName;
+};

@@ -60,7 +60,17 @@ export class RiskRepository implements IRiskRepository {
   }
 
   async update(
-    { recMed, generateSource, id, ...createRiskDto }: UpdateRiskDto,
+    {
+      recMed,
+      generateSource,
+      id,
+      ...createRiskDto
+    }: UpdateRiskDto & {
+      isAso?: boolean;
+      isPGR?: boolean;
+      isPCMSO?: boolean;
+      isPPP?: boolean;
+    },
     system: boolean,
     companyId: string,
   ): Promise<RiskFactorsEntity> {
@@ -180,6 +190,7 @@ export class RiskRepository implements IRiskRepository {
           this.prisma.riskFactors.upsert({
             create: {
               ...upsertRiskDto,
+              // isEmergency: upsertRiskDto.isEmergency?'':
               system,
               companyId,
               recMed: {

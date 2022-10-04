@@ -146,26 +146,22 @@ export class RiskGroupDataRepository {
           },
           data: {
             where: {
-              OR: [
-                {
-                  homogeneousGroup: {
-                    hierarchyOnHomogeneous: {
-                      some: {
-                        OR: [
-                          { workspaceId: workspaceId },
-                          {
-                            hierarchy: {
-                              workspaces: {
-                                some: { id: workspaceId },
-                              },
-                            },
+              homogeneousGroup: {
+                hierarchyOnHomogeneous: {
+                  some: {
+                    OR: [
+                      { workspaceId: workspaceId },
+                      {
+                        hierarchy: {
+                          workspaces: {
+                            some: { id: workspaceId },
                           },
-                        ],
+                        },
                       },
-                    },
+                    ],
                   },
                 },
-              ],
+              },
             },
             include: {
               adms: true,
@@ -173,7 +169,25 @@ export class RiskGroupDataRepository {
               generateSources: true,
               epiToRiskFactorData: { include: { epi: true } },
               engsToRiskFactorData: { include: { recMed: true } },
-              riskFactor: true,
+              // riskFactor: true,
+              riskFactor: {
+                include: {
+                  docInfo: {
+                    where: {
+                      OR: [
+                        { companyId },
+                        {
+                          company: {
+                            applyingServiceContracts: {
+                              some: { receivingServiceCompanyId: companyId },
+                            },
+                          },
+                        },
+                      ],
+                    },
+                  },
+                },
+              },
               dataRecs: true,
               hierarchy: {
                 //! edit employee

@@ -20,5 +20,6 @@ export const aciColumnsConstant: ITableSchema[] = [
     excelName: 'Plano de Atendimento a Emergência',
     required: false,
     checkHandler: checkIsTrue,
+    notes: () => ['VERDADEIRO', 'FALSO'],
   },
 ];

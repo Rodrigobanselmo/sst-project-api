@@ -29,7 +29,15 @@ export class UploadExcelProvider {
     const allData = [];
 
     allSeparatedArray.forEach((data) => {
-      allData.push(...data);
+      allData.push(
+        ...data.map((databaseObj) => {
+          Object.entries(databaseObj).forEach(([key, value]) => {
+            if (value == 'true') databaseObj[key] = true;
+            if (value == 'false') databaseObj[key] = false;
+          });
+          return databaseObj;
+        }),
+      );
     });
 
     return allData;

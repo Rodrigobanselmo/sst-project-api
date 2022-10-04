@@ -40,6 +40,7 @@ export const APPRTableSection = (
       const thirdTable = thirdRiskInventoryTableSection(
         riskFactorGroupData,
         hierarchy,
+        isByGroup,
       );
 
       sectionsTables.push([firstTable, ...secondTable, ...thirdTable]);

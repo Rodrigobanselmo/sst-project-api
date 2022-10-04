@@ -97,6 +97,14 @@ import { FindScheduleEmployeeExamHistoryService } from './services/employee/0-hi
 import { FindClinicScheduleEmployeeExamHistoryService } from './services/employee/0-history/exams/find-clinic-schedules/find-clinic-schedules.service';
 import { NotificationModule } from '../notifications/notifications.module';
 import { FindCompanyScheduleEmployeeExamHistoryService } from './services/employee/0-history/exams/find-company-schedules/find-company-schedules.service';
+import { DocumentRepository } from './repositories/implementations/DocumentRepository';
+import { DocumentController } from './controller/document/document.controller';
+import { DeleteDocumentService } from './services/document/delete-document/delete-document.service';
+import { FindDocumentService } from './services/document/find-document/find-document.service';
+import { CreateDocumentService } from './services/document/create-document/create-document.service';
+import { UpdateDocumentService } from './services/document/update-document/update-document.service';
+import { FindByIdDocumentService } from './services/document/find-by-id-document/find-by-id-document.service';
+import { DownloadDocumentService } from './services/document/download-document/download-document.service';
 
 @Module({
   imports: [
@@ -114,6 +122,7 @@ import { FindCompanyScheduleEmployeeExamHistoryService } from './services/employ
     ContactController,
     EmployeeHierarchyHistoryController,
     EmployeeExamHistoryController,
+    DocumentController,
   ],
   providers: [
     CreateCompanyService,
@@ -181,6 +190,10 @@ import { FindCompanyScheduleEmployeeExamHistoryService } from './services/employ
     CreateContactsService,
     FindContactsService,
     DeleteContactsService,
+    UpdateDocumentService,
+    CreateDocumentService,
+    FindDocumentService,
+    DeleteDocumentService,
     FindCnaeService,
     EmployeeHierarchyHistoryRepository,
     CreateEmployeeHierarchyHistoryService,
@@ -201,7 +214,10 @@ import { FindCompanyScheduleEmployeeExamHistoryService } from './services/employ
     FindClinicService,
     FindClinicScheduleEmployeeExamHistoryService,
     FindCompanyScheduleEmployeeExamHistoryService,
+    DocumentRepository,
+    FindByIdDocumentService,
     DayJSProvider,
+    DownloadDocumentService,
   ],
   exports: [
     CompanyRepository,
