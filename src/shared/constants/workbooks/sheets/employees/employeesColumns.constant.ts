@@ -1,3 +1,9 @@
+import {
+  ExamHistoryTypeEnumTranslateBrToUs,
+  ExamHistoryTypeEnumTranslated,
+  examHistoryTypeEnumTranslatedList,
+  examHistoryTypeEnumTranslatedNotes,
+} from './../../../../utils/translate/examType.translate';
 import { checkIsValidCpf } from './../../../../utils/validators/checkIsValidCpf';
 import { StatusEnum } from '@prisma/client';
 import { checkIsValidDate } from '../../../../../shared/utils/validators/checkIsValidDate';
@@ -134,13 +140,37 @@ export const employeesColumnsConstant = [
     checkHandler: checkIsString,
   },
   {
-    databaseName: 'status',
-    excelName: 'Status',
-    isEnum: [StatusEnumTranslated.ACTIVE, StatusEnumTranslated.INACTIVE],
+    databaseName: 'esocialCode',
+    excelName: 'Matricula eSocial',
     isArray: false,
-    notes: [StatusEnumTranslated.ACTIVE, StatusEnumTranslated.INACTIVE],
+    required: false,
+    checkHandler: checkIsString,
+  },
+  {
+    databaseName: 'examDate',
+    excelName: 'Data último exame',
+    isArray: false,
+    required: false,
+    checkHandler: checkIsValidDate,
+  },
+  {
+    databaseName: 'examType',
+    excelName: 'Tipo do último exame',
+    isEnum: examHistoryTypeEnumTranslatedList,
+    isArray: false,
+    notes: examHistoryTypeEnumTranslatedNotes,
     required: false,
     checkHandler: (value: any) =>
-      checkIsEnum(statusEnumTranslateBrToUs(value), StatusEnum),
+      checkIsEnum(ExamHistoryTypeEnumTranslateBrToUs(value), StatusEnum),
   },
+  // {
+  //   databaseName: 'status',
+  //   excelName: 'Status',
+  //   isEnum: [StatusEnumTranslated.ACTIVE, StatusEnumTranslated.INACTIVE],
+  //   isArray: false,
+  //   notes: [StatusEnumTranslated.ACTIVE, StatusEnumTranslated.INACTIVE],
+  //   required: false,
+  //   checkHandler: (value: any) =>
+  //     checkIsEnum(statusEnumTranslateBrToUs(value), StatusEnum),
+  // },
 ] as ITableSchema[];

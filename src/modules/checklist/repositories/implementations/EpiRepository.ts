@@ -94,6 +94,7 @@ export class EpiRepository {
     if (Object.keys(where).length === 0) {
       const epis = await this.prisma.epi.findMany({
         where: { ca: { in: ['0', '1', '2'] } },
+        orderBy: { ca: 'asc' },
       });
 
       standardEpis.push(...epis);

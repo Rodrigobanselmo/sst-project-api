@@ -101,7 +101,7 @@ const addHeader = async (
         notesTexts.push(
           {
             font: {
-              size: 12,
+              size: 6,
               bold: true,
               color: { theme: 1 },
               name: 'Calibri',
@@ -111,7 +111,7 @@ const addHeader = async (
           ...notes[excelName].map((note) => {
             return {
               font: {
-                size: 12,
+                size: 8,
                 color: { theme: 1 },
                 name: 'Calibri',
               },

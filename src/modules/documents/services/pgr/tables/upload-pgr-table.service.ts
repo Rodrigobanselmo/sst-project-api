@@ -99,7 +99,8 @@ export class PgrUploadTableService {
   ) {
     const { url } = await this.amazonStorageProvider.upload({
       file: fileBuffer,
-      fileName: company.id + '/pgr/' + fileName,
+      fileName: '/temp-files-7-days/' + fileName,
+      // fileName: company.id + '/pgr/' + fileName,
     });
 
     const doc = await this.riskDocumentRepository.upsert({
