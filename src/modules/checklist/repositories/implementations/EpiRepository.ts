@@ -69,7 +69,9 @@ export class EpiRepository {
   }
 
   async find(query: Partial<FindEpiDto>, pagination: PaginationQueryDto) {
-    const where = {};
+    const where = {
+      AND: [{ ca: { notIn: ['0', '1', '2', query?.ca || '0'] } }],
+    };
 
     Object.entries(query).forEach(([key, value]) => {
       if (value)
@@ -87,18 +89,18 @@ export class EpiRepository {
         where,
         take: pagination.take || 20,
         skip: pagination.skip || 0,
+        // orderBy: { ca: 'asc' },
       }),
     ]);
 
     const standardEpis = [];
-    if (Object.keys(where).length === 0) {
-      const epis = await this.prisma.epi.findMany({
-        where: { ca: { in: ['0', '1', '2'] } },
-        orderBy: { ca: 'asc' },
-      });
+    // if (Object.keys(where).length === 0) {
+    const epis = await this.prisma.epi.findMany({
+      where: { ca: { in: query?.ca || ['0', '1', '2'] } },
+    });
 
-      standardEpis.push(...epis);
-    }
+    standardEpis.push(...epis);
+    // }
 
     const count = response[0];
 

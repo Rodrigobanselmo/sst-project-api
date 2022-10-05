@@ -9,7 +9,6 @@ export class FindEpiService {
 
   async execute({ skip, take, ...query }: FindEpiDto) {
     const Epi = await this.epiRepository.find(query, { skip, take });
-
     return Epi;
   }
 }
