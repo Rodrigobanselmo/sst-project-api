@@ -22,7 +22,7 @@ export class ListNotificationService {
           id: true,
           created_at: true,
           json: true,
-          confirmations: { where: { id: user.userId } },
+          confirmations: { where: { id: user.userId }, select: { id: true } },
         },
         where: {
           OR: [

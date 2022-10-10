@@ -20,6 +20,7 @@ export class FindClinicScheduleEmployeeExamHistoryService {
       StatusEnum.PROCESSING,
       StatusEnum.INACTIVE,
     ];
+
     const employees = await this.employeeRepository.findNude({
       select: {
         name: true,
@@ -41,6 +42,7 @@ export class FindClinicScheduleEmployeeExamHistoryService {
           select: {
             id: true,
             doneDate: true,
+            fileUrl: true,
             conclusion: true,
             examType: true,
             doctor: { select: { id: true, name: true } },
@@ -51,17 +53,19 @@ export class FindClinicScheduleEmployeeExamHistoryService {
           },
           where: {
             status: { in: status },
-            doneDate: query.date,
+            ...(query.date && { doneDate: query.date }),
           },
-          orderBy: { exam: { isAttendance: 'desc' } },
+          orderBy: { doneDate: 'desc' },
+          distinct: ['examId'],
         },
       },
       where: {
+        ...(query.employeeId && { id: query.employeeId }),
         examsHistory: {
           some: {
             clinicId: companyId,
             status: { in: status },
-            doneDate: query.date,
+            ...(query.date && { doneDate: query.date }),
           },
         },
       },

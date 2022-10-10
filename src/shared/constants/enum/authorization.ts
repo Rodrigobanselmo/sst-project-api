@@ -43,6 +43,7 @@ export enum PermissionEnum {
   EMPLOYEE = '2.1',
   EMPLOYEE_HISTORY = '2.2', //*new
   COMPANY_SCHEDULE = '2.3', //*new
+  EMPLOYEE_HISTORY_FILE = '2.4', //*new
   EPI = '3',
   RISK = '4.0',
   GS = '4.1',

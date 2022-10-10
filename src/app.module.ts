@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
+import { ScheduleModule } from '@nestjs/schedule';
 
 import { AuthModule } from './modules/auth/auth.module';
 import { ChecklistModule } from './modules/checklist/checklist.module';
@@ -25,6 +26,7 @@ import { RolesGuard } from './shared/guards/roles.guard';
     DocumentsModule,
     EsocialModule,
     NotificationModule,
+    ScheduleModule.forRoot(),
   ],
   providers: [
     {

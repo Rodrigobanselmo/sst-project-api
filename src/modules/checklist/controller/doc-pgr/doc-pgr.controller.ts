@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
@@ -6,6 +6,7 @@ import { FindByIdDocumentsService } from '../../services/pgr-doc/find-by-id-docu
 import { FindDocumentsService } from '../../services/pgr-doc/find-documents/find-documents.service';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
+import { FindDocPgrDto } from '../../dto/doc-pgr.dto';
 @Controller('/risk-group-data/documents/:riskGroupId/pgr/:companyId')
 export class DocumentPgrController {
   constructor(
@@ -19,12 +20,16 @@ export class DocumentPgrController {
     isContract: true,
   })
   @Get()
-  findDocuments(
+  find(
     @Param('riskGroupId') riskGroupId: string,
     @User() userPayloadDto: UserPayloadDto,
+    @Query() query: FindDocPgrDto,
   ) {
-    const companyId = userPayloadDto.targetCompanyId;
-    return this.findDocumentsService.execute(riskGroupId, companyId);
+    return this.findDocumentsService.execute(
+      riskGroupId,
+      query,
+      userPayloadDto,
+    );
   }
 
   @Permissions({

@@ -159,6 +159,7 @@ import { UpdateRiskService } from './services/risk/update-risk/update-risk.servi
     RiskDocumentRepository,
     UpsertManyRiskDataService,
     RiskDataRepository,
+    FindExamByHierarchyService,
   ],
   imports: [forwardRef(() => CompanyModule)],
 })

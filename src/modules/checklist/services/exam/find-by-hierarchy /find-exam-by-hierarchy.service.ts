@@ -1,3 +1,4 @@
+import { EmployeeExamsHistoryEntity } from './../../../../company/entities/employee-exam-history.entity';
 import { getRiskDoc } from './../../../../documents/services/pgr/document/upload-pgr-doc.service';
 import { RiskFactorDataEntity } from './../../../entities/riskData.entity';
 import { FindExamHierarchyDto } from './../../../dto/exam.dto';
@@ -6,7 +7,7 @@ import { EmployeeEntity } from './../../../../company/entities/employee.entity';
 import { EmployeeRepository } from './../../../../company/repositories/implementations/EmployeeRepository';
 import { IExamOriginData } from './../../../entities/exam.entity';
 import { Injectable } from '@nestjs/common';
-import { HomoTypeEnum, SexTypeEnum } from '@prisma/client';
+import { HomoTypeEnum, SexTypeEnum, StatusEnum } from '@prisma/client';
 
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { HierarchyRepository } from '../../../../company/repositories/implementations/HierarchyRepository';
@@ -17,6 +18,14 @@ import { sortNumber } from '../../../../../shared/utils/sorts/number.sort';
 import { sortString } from '../../../../../shared/utils/sorts/string.sort';
 import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 
+export const getValidityInMonths = (
+  employee: EmployeeEntity,
+  examRisk: { validityInMonths?: number; lowValidityInMonths?: number },
+) => {
+  return employee.isComorbidity
+    ? examRisk.lowValidityInMonths || examRisk.validityInMonths
+    : examRisk.validityInMonths;
+};
 @Injectable()
 export class FindExamByHierarchyService {
   private employee: EmployeeEntity;
@@ -43,7 +52,6 @@ export class FindExamByHierarchyService {
       (h) => h,
     );
 
-    const hierarchyIds = hierarchies.map(({ id }) => id);
     const examType = {
       ...('isPeriodic' in query && {
         isPeriodic: query?.isPeriodic,
@@ -64,6 +72,7 @@ export class FindExamByHierarchyService {
         companyId,
         {
           include: {
+            subOffices: { select: { id: true } },
             examsHistory: {
               where: {
                 AND: [
@@ -79,7 +88,12 @@ export class FindExamByHierarchyService {
           },
         },
       );
+      if (this.employee && !query.isOffice) {
+        hierarchies.push(...(this.employee?.subOffices || []));
+      }
     }
+
+    const hierarchyIds = hierarchies.map(({ id }) => id);
 
     const riskData = (
       await this.riskDataRepository.findNude({
@@ -131,9 +145,11 @@ export class FindExamByHierarchyService {
             include: {
               hierarchyOnHomogeneous: {
                 select: {
-                  hierarchy: true,
+                  hierarchy: { select: { id: true, type: true, name: true } },
                 },
-                where: { homogeneousGroup: { type: 'HIERARCHY' } },
+                ...(hierarchyId && {
+                  where: { homogeneousGroup: { type: 'HIERARCHY' } },
+                }),
               },
               characterization: { select: { name: true, type: true } },
               environment: { select: { name: true, type: true } },
@@ -163,31 +179,46 @@ export class FindExamByHierarchyService {
           }),
           OR: [
             {
-              examsToRiskFactorData: { some: { examId: { gt: 0 } } },
+              examsToRiskFactorData: {
+                some: {
+                  examId: { gt: 0 },
+                  ...(query.onlyAttendance && { exam: { isAttendance: true } }),
+                },
+              },
             },
-            ...(hierarchyIds.length > 0
-              ? [
-                  {
-                    riskFactor: {
-                      examToRisk: { some: { examId: { gt: 0 } } },
-                    },
-                    standardExams: true,
+            // ...(hierarchyIds.length > 0
+            // ? [
+            {
+              riskFactor: {
+                examToRisk: {
+                  some: {
+                    examId: { gt: 0 },
+                    ...(query.onlyAttendance && {
+                      exam: { isAttendance: true },
+                    }),
                   },
-                ]
-              : []),
+                },
+              },
+              standardExams: true,
+            },
+            // ]
+            // : []),
           ],
         },
       })
-    ).filter(
-      (riskData) =>
-        getRiskDoc(riskData.riskFactor, { companyId, hierarchyId })?.isAso,
-    );
+    ).filter((riskData) => {
+      return getRiskDoc(riskData.riskFactor, { companyId, hierarchyId })?.isAso;
+    });
 
     const riskDataOrigin = riskData.map((rd) => {
       let prioritization: number;
 
-      if (rd.homogeneousGroup.type === HomoTypeEnum.HIERARCHY && rd.hierarchy) {
-        prioritization = originRiskMap[rd.hierarchy.type]?.prioritization;
+      if (
+        rd.homogeneousGroup.type === HomoTypeEnum.HIERARCHY &&
+        rd.homogeneousGroup.hierarchy
+      ) {
+        prioritization =
+          originRiskMap[rd.homogeneousGroup.hierarchy.type]?.prioritization;
       }
 
       rd.examsToRiskFactorData = rd.examsToRiskFactorData.filter(
@@ -222,77 +253,82 @@ export class FindExamByHierarchyService {
           origin: examData.isStandard ? 'Padrão' : rd.origin,
           prioritization: (examData.isStandard ? 100 : rd.prioritization) || 3,
           homogeneousGroup: rd.homogeneousGroup,
-          skipEmployee: this.checkIfSkipEmployee(examData),
+          skipEmployee: this.checkIfSkipEmployee(examData, this.employee),
           risk: rd.riskFactor,
-          ...this.checkExpiredDate(examData),
+          ...this.checkExpiredDate(examData, this.employee),
         });
       });
       // exams
     });
 
     const examRepresentAll =
-      hierarchyIds.length > 0
-        ? await this.examRepository.findNude({
-            select: {
-              examToRisk: {
-                where: { companyId, ...examType },
-                distinct: [
-                  'isMale',
-                  'isAdmission',
-                  'isDismissal',
-                  'isPeriodic',
-                  'isReturn',
-                  'isMale',
-                  'isFemale',
-                  'fromAge',
-                  'toAge',
-                  'validityInMonths',
-                ],
-              },
-              name: true,
-              id: true,
-              isAttendance: true,
-            },
-            where: {
-              AND: [
+      // hierarchyIds.length > 0
+      // ?
+      await this.examRepository.findNude({
+        select: {
+          examToRisk: {
+            where: { companyId, ...examType },
+            distinct: [
+              'isMale',
+              'isAdmission',
+              'isDismissal',
+              'isPeriodic',
+              'isReturn',
+              'isMale',
+              'isFemale',
+              'fromAge',
+              'toAge',
+              'validityInMonths',
+            ],
+          },
+          name: true,
+          id: true,
+          isAttendance: true,
+        },
+        where: {
+          AND: [
+            {
+              //tenant
+              OR: [
+                { system: true },
+                { companyId },
                 {
-                  //tenant
-                  OR: [
-                    { system: true },
-                    { companyId },
-                    {
-                      company: {
-                        applyingServiceContracts: {
-                          some: { receivingServiceCompanyId: companyId },
-                        },
-                      },
+                  company: {
+                    applyingServiceContracts: {
+                      some: { receivingServiceCompanyId: companyId },
                     },
-                    {
-                      company: {
-                        receivingServiceContracts: {
-                          some: { applyingServiceCompanyId: companyId },
-                        },
-                      },
-                    },
-                  ],
+                  },
                 },
                 {
-                  // rules
-                  OR: [
-                    {
-                      examToRisk: {
-                        some: {
-                          companyId: companyId,
-                          risk: { representAll: true },
-                        },
-                      },
+                  company: {
+                    receivingServiceContracts: {
+                      some: { applyingServiceCompanyId: companyId },
                     },
-                  ],
+                  },
                 },
               ],
             },
-          })
-        : { data: [] };
+            {
+              // rules
+              OR: [
+                {
+                  examToRisk: {
+                    some: {
+                      companyId: companyId,
+                      risk: { representAll: true },
+                    },
+                  },
+                  ...(query.onlyAttendance && {
+                    isAttendance: true,
+                  }),
+                },
+              ],
+            },
+          ],
+        },
+      });
+    // : { data: [] };
+
     examRepresentAll.data.map((exam) => {
       exam.examToRisk.map((examToRisk) => {
         if (!exams[examToRisk.examId]) exams[examToRisk.examId] = [];
@@ -306,52 +342,102 @@ export class FindExamByHierarchyService {
             isAttendance: !!exam?.isAttendance,
           } as any,
           prioritization: 100,
-          skipEmployee: this.checkIfSkipEmployee(examToRisk),
+          skipEmployee: this.checkIfSkipEmployee(examToRisk, this.employee),
           risk: examToRisk.risk,
-          ...this.checkExpiredDate({ ...examToRisk, exam }),
+          ...this.checkExpiredDate({ ...examToRisk, exam }, this.employee),
         });
       });
     });
 
-    const examsDataReturn = Object.entries(exams)
-      .map(([examId, examData]) => {
-        return {
-          exam: {
-            id: examId,
-            name: examData[0]?.exam?.name,
-            isAttendance: examData[0]?.exam?.isAttendance,
-          },
-          origins: examData
-            .sort((a, b) => sortNumber(a, b, 'validityInMonths'))
-            .sort((a, b) => sortNumber(a, b, 'prioritization')),
-        };
-      })
-      .sort((a, b) => sortString(a.exam, b.exam, 'name'))
-      .sort((a, b) =>
-        sortNumber(b.exam.isAttendance ? 1 : 0, a.exam.isAttendance ? 1 : 0),
-      );
+    const lastClinicExam = {
+      expiredDate: new Date(),
+      closeToExpired: true,
+    };
 
-    return { data: this.checkCloseToExpiredDate(examsDataReturn) };
+    const examsDataReturn = (
+      Object.entries(exams)
+        .map(([examId, examData]) => {
+          const origins = examData
+            .sort((a, b) => sortNumber(a, b, 'validityInMonths'))
+            .sort((a, b) =>
+              sortNumber(a, b, 'prioritization'),
+            ) as IExamOriginData[];
+
+          const isAttendance = examData[0]?.exam?.isAttendance;
+
+          if (isAttendance) {
+            const origin = origins.find((a) => !a.skipEmployee);
+            if (origin) {
+              lastClinicExam.expiredDate = origin.expiredDate;
+              lastClinicExam.closeToExpired = origin.closeToExpired;
+            }
+          }
+
+          return {
+            exam: {
+              id: examId,
+              name: examData[0]?.exam?.name,
+              isAttendance,
+            },
+            origins,
+          };
+        })
+        .sort((a, b) => sortString(a.exam, b.exam, 'name'))
+        .sort((a, b) =>
+          sortNumber(b.exam.isAttendance ? 1 : 0, a.exam.isAttendance ? 1 : 0),
+        ) as any
+    ).map((data) => {
+      data.origins = data.origins.map((origin) => {
+        if (origin.status == StatusEnum.ACTIVE) {
+          origin.status = StatusEnum.DONE;
+          origin.closeToExpired = lastClinicExam.closeToExpired;
+          origin.expiredDate = lastClinicExam.expiredDate;
+        }
+        return origin;
+      });
+
+      return data;
+    });
+
+    return {
+      data: examsDataReturn as {
+        exam: {
+          id: string;
+          name: string;
+          isAttendance: boolean;
+        };
+        origins: IExamOriginData[];
+      }[],
+    };
   }
 
-  checkIfSkipEmployee(examRisk: IExamOriginData) {
-    if (!this.employee) return null;
-    const age = this.dayjs.dayjs().diff(this.employee.birthday, 'years');
+  checkIfSkipEmployee(examRisk: IExamOriginData, employee: EmployeeEntity) {
+    if (!employee) return null;
+
+    // if (employee.lastExam) {
+    // const lastExamValid = this.dayjs
+    //   .dayjs(employee.lastExam)
+    //   .add(getValidityInMonths(employee, examRisk), 'month')
+    //   .isAfter(this.dayjs.dayjs());
+
+    // if (lastExamValid) return true;
+    // }
+
+    const age = this.dayjs.dayjs().diff(employee.birthday, 'years');
     const isOutOfAgeRange =
       (examRisk.fromAge && examRisk.fromAge > age) ||
       (examRisk.toAge && examRisk.toAge < age);
 
     if (isOutOfAgeRange) return true;
 
-    const isMale = this.employee.sex === SexTypeEnum.M;
-    const isNotIncludeMale = this.employee.sex && isMale && !examRisk.isMale;
-    const isNotIncludeFemale =
-      this.employee.sex && !isMale && !examRisk.isFemale;
+    const isMale = employee.sex === SexTypeEnum.M;
+    const isNotIncludeMale = employee.sex && isMale && !examRisk.isMale;
+    const isNotIncludeFemale = employee.sex && !isMale && !examRisk.isFemale;
 
     if (isNotIncludeMale) return true;
     if (isNotIncludeFemale) return true;
 
-    // const isExamValid = this.employee.examsHistory.some(
+    // const isExamValid = employee.examsHistory.some(
     //   (exam) =>
     //     exam.examId === examRisk.examId &&
     //     this.dayjs.compareTime(
@@ -366,13 +452,23 @@ export class FindExamByHierarchyService {
     return false;
   }
 
-  checkExpiredDate(examRisk: IExamOriginData) {
-    if (!this.employee) return null;
+  checkExpiredDate(examRisk: IExamOriginData, employee: EmployeeEntity) {
+    if (!employee) return null;
 
-    const foundExamHistory = this.employee.examsHistory.find(
-      (exam) => exam.examId === examRisk.examId,
-    );
-    if (!foundExamHistory) return {};
+    const foundExamHistory =
+      employee?.examsHistory?.find((exam) => exam.examId === examRisk.examId) ||
+      ({} as EmployeeExamsHistoryEntity);
+
+    if (!foundExamHistory?.expiredDate && employee.lastExam) {
+      foundExamHistory.expiredDate = this.dayjs
+        .dayjs(employee.lastExam)
+        .add(getValidityInMonths(employee, examRisk), 'month')
+        .toDate();
+
+      foundExamHistory.status = StatusEnum.ACTIVE;
+    }
+
+    if (!foundExamHistory?.expiredDate) return {};
 
     const closeToExpired =
       examRisk.considerBetweenDays !== null &&

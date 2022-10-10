@@ -1,5 +1,5 @@
 import { DocumentEntity } from './../../../entities/document.entity';
-import { ErrorMessageEnum } from 'src/shared/constants/enum/errorMessage';
+import { ErrorMessageEnum } from '../../../../../shared/constants/enum/errorMessage';
 import { AmazonStorageProvider } from './../../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
 import { UpdateDocumentDto } from '../../../dto/document.dto';
 import { DocumentRepository } from '../../../repositories/implementations/DocumentRepository';

@@ -247,7 +247,7 @@ export class RiskFactorDataEntity implements RiskFactorData {
       // eslint-disable-next-line prettier/prettier
       if (this.homogeneousGroup.environment) this.origin = `${this.homogeneousGroup.environment.name}\n(${originRiskMap[this.homogeneousGroup.environment.type].name})`
       // eslint-disable-next-line prettier/prettier
-      if (this.homogeneousGroup.hierarchy) this.origin =`${this.homogeneousGroup.hierarchy.name}\n(${originRiskMap[this.homogeneousGroup.hierarchy.type].name})`;
+      if (this.homogeneousGroup.hierarchy && this.homogeneousGroup.hierarchy.name) this.origin =`${this.homogeneousGroup.hierarchy.name}\n(${originRiskMap[this.homogeneousGroup.hierarchy.type].name})`;
       // eslint-disable-next-line prettier/prettier
       if (this.homogeneousGroup.characterization) this.origin =`${this.homogeneousGroup.characterization.name}\n(${originRiskMap[this.homogeneousGroup.characterization.type].name})`;
       // eslint-disable-next-line prettier/prettier

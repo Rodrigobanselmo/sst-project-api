@@ -27,6 +27,7 @@ export class EmployeeExamsHistoryEntity implements EmployeeExamsHistory {
   validityInMonths: number;
   time: string;
   obs: string;
+  fileUrl: string;
 
   examType: ExamHistoryTypeEnum;
   evaluationType: ExamHistoryEvaluationEnum;
@@ -51,7 +52,9 @@ export class EmployeeExamsHistoryEntity implements EmployeeExamsHistory {
   changeHierarchyDate: Date;
   changeHierarchyAnyway: boolean;
   hierarchyId: string;
+  subOfficeId: string;
   hierarchy?: HierarchyEntity;
+  subOffice?: HierarchyEntity;
 
   constructor(
     partial: Partial<

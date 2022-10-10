@@ -35,8 +35,10 @@ export class FindCompanyScheduleEmployeeExamHistoryService {
           id: true,
           doneDate: true,
           examType: true,
+          clinicId: true,
           employeeId: true,
           hierarchyId: true,
+          subOfficeId: true,
           exam: { select: { id: true, name: true, isAttendance: true } },
           status: true,
           employee: {

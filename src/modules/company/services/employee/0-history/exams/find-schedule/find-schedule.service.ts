@@ -33,9 +33,11 @@ export class FindScheduleEmployeeExamHistoryService {
           id: true,
           status: true,
           created_at: true,
+          fileUrl: true,
           ...(allExams && {
             exam: { select: { name: true, id: true, isAttendance: true } },
             hierarchy: { select: { id: true, name: true } },
+            subOffice: { select: { id: true, name: true } },
             time: true,
             doneDate: true,
             clinicId: true,

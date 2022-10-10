@@ -17,7 +17,7 @@ export class EmployeeHierarchyHistoryRepository {
   constructor(private prisma: PrismaService) {}
 
   async create(
-    createData: CreateEmployeeHierarchyHistoryDto,
+    { subOfficeId, ...createData }: CreateEmployeeHierarchyHistoryDto,
     employeeId: number,
     hierarchyId?: string | null,
   ) {
@@ -28,7 +28,16 @@ export class EmployeeHierarchyHistoryRepository {
         data: createData,
       }),
       this.prisma.employee.update({
-        data: hierarchyId !== undefined ? { hierarchyId, status } : { status },
+        data:
+          hierarchyId !== undefined
+            ? {
+                hierarchyId,
+                status,
+                ...(subOfficeId && {
+                  subOffices: { connect: { id: subOfficeId } },
+                }),
+              }
+            : { status },
         where: { id: employeeId },
       }),
     ]);
@@ -37,7 +46,7 @@ export class EmployeeHierarchyHistoryRepository {
   }
 
   async update(
-    { id, ...updateData }: UpdateEmployeeHierarchyHistoryDto,
+    { id, subOfficeId, ...updateData }: UpdateEmployeeHierarchyHistoryDto,
     employeeId: number,
     hierarchyId?: string | null,
   ) {
@@ -49,7 +58,16 @@ export class EmployeeHierarchyHistoryRepository {
         where: { id },
       }),
       this.prisma.employee.update({
-        data: hierarchyId !== undefined ? { hierarchyId, status } : { status },
+        data:
+          hierarchyId !== undefined
+            ? {
+                hierarchyId,
+                status,
+                ...(subOfficeId && {
+                  subOffices: { connect: { id: subOfficeId } },
+                }),
+              }
+            : { status },
         where: { id: employeeId },
       }),
     ]);

@@ -335,7 +335,7 @@ export class PgrUploadService {
     const { url } = await this.amazonStorageProvider.upload({
       file: fileBuffer,
       // fileName: upsertPgrDto.companyId + '/pgr/' + fileName,
-      fileName: '/temp-files-7-days/' + fileName,
+      fileName: 'temp-files-7-days/' + fileName,
       // isPublic: true,
     });
 

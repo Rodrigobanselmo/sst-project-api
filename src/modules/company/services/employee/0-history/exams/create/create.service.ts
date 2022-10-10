@@ -100,6 +100,7 @@ export class CreateEmployeeExamHistoryService {
           hierarchyId: dataDto.hierarchyId,
           motive: dataDto.examType === 'ADMI' ? 'ADM' : 'TRANS_PROM',
           startDate: dataDto.changeHierarchyDate,
+          subOfficeId: dataDto.subOfficeId,
         },
         user,
       );

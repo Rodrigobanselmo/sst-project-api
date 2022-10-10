@@ -596,6 +596,7 @@ model Employee {
   isComorbidity Boolean? @default(false)
   birthday DateTime?
   admissionDate DateTime? //!remove
+  lastExam DateTime?
   sex SexTypeEnum? 
   hierarchyId String?
   hierarchy Hierarchy? @relation(fields: [hierarchyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
@@ -642,6 +643,7 @@ model EmployeeExamsHistory {
   evaluationType ExamHistoryEvaluationEnum?
   conclusion ExamHistoryConclusionEnum?
   status StatusEnum @default(DONE)
+  fileUrl String?
   
   obs String?
   clinicObs String?
@@ -650,6 +652,8 @@ model EmployeeExamsHistory {
   changeHierarchyAnyway Boolean @default(false)
   hierarchyId String?
   hierarchy Hierarchy? @relation(fields: [hierarchyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  subOfficeId String?
+  subOffice Hierarchy? @relation(name: "subOffice_employee_exam",fields: [subOfficeId], references: [id], onDelete: Restrict, onUpdate: Cascade)
 
   userScheduleId Int?
   userSchedule User? @relation(name: "user_schedule", fields: [userScheduleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
@@ -666,6 +670,7 @@ model EmployeeExamsHistory {
 
   @@index(status)
   @@index(employeeId)
+  @@index(fileUrl)
   @@index(clinicId)
 } 
 
@@ -862,6 +867,7 @@ model Hierarchy {
   riskFactorDatas RiskFactorData[] 
   hierarchyHistory EmployeeHierarchyHistory[]
   employeeExamsHistory EmployeeExamsHistory[]
+  employeeExamsHistorySubOffice EmployeeExamsHistory[] @relation(name: "subOffice_employee_exam")
   riskDocInfo RiskFactorsDocInfo[]
 
   @@unique([id, companyId])

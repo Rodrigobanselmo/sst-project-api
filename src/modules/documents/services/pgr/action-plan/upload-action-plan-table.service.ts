@@ -88,7 +88,7 @@ export class PgrActionPlanUploadTableService {
     const { url } = await this.amazonStorageProvider.upload({
       file: fileBuffer,
       // fileName: company.id + '/pgr/' + fileName,
-      fileName: '/temp-files-7-days/' + fileName,
+      fileName: 'temp-files-7-days/' + fileName,
     });
 
     return url;

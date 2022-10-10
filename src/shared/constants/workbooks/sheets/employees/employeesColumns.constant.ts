@@ -147,22 +147,22 @@ export const employeesColumnsConstant = [
     checkHandler: checkIsString,
   },
   {
-    databaseName: 'examDate',
+    databaseName: 'lastExam',
     excelName: 'Data último exame',
     isArray: false,
     required: false,
     checkHandler: checkIsValidDate,
   },
-  {
-    databaseName: 'examType',
-    excelName: 'Tipo do último exame',
-    isEnum: examHistoryTypeEnumTranslatedList,
-    isArray: false,
-    notes: examHistoryTypeEnumTranslatedNotes,
-    required: false,
-    checkHandler: (value: any) =>
-      checkIsEnum(ExamHistoryTypeEnumTranslateBrToUs(value), StatusEnum),
-  },
+  // {
+  //   databaseName: 'examType',
+  //   excelName: 'Tipo do último exame',
+  //   isEnum: examHistoryTypeEnumTranslatedList,
+  //   isArray: false,
+  //   notes: examHistoryTypeEnumTranslatedNotes,
+  //   required: false,
+  //   checkHandler: (value: any) =>
+  //     checkIsEnum(ExamHistoryTypeEnumTranslateBrToUs(value), StatusEnum),
+  // },
   // {
   //   databaseName: 'status',
   //   excelName: 'Status',

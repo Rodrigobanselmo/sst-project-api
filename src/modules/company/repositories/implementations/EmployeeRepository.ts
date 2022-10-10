@@ -331,6 +331,14 @@ export class EmployeeRepository {
     return employees.map((employee) => new EmployeeEntity(employee));
   }
 
+  async findOnlyCountNude(options: Prisma.EmployeeFindManyArgs = {}) {
+    const count = await this.prisma.employee.count({
+      where: options.where,
+    });
+
+    return count;
+  }
+
   async findCountNude(
     options: Prisma.EmployeeFindManyArgs = {},
     pagination: PaginationQueryDto,

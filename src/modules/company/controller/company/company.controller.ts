@@ -41,6 +41,8 @@ import {
   RoleEnum,
 } from '../../../../shared/constants/enum/authorization';
 import { Roles } from '../../../../shared/decorators/roles.decorator';
+import { DashboardCompanyService } from '../../services/dashboard/dashboard-company/dashboard-company.service';
+import { FindCompanyDashDto } from '../../dto/dashboard.dto';
 
 @ApiTags('company')
 @Controller('company')
@@ -59,7 +61,18 @@ export class CompanyController {
     private readonly copyCompanyService: CopyCompanyService,
     private readonly setCompanyClinicsService: SetCompanyClinicsService,
     private readonly findClinicService: FindClinicService,
+    private readonly dashboardCompanyService: DashboardCompanyService,
   ) {}
+
+  @Roles(RoleEnum.COMPANY, RoleEnum.CONTRACTS, RoleEnum.CLINICS, RoleEnum.USER)
+  @Permissions({ isContract: true, isMember: true })
+  @Get('/:companyId/dashboard')
+  dashboard(
+    @User() userPayloadDto: UserPayloadDto,
+    @Query() query: FindCompanyDashDto,
+  ) {
+    return this.dashboardCompanyService.execute(query, userPayloadDto);
+  }
 
   @Roles(RoleEnum.COMPANY, RoleEnum.CONTRACTS, RoleEnum.CLINICS, RoleEnum.USER)
   @Permissions({ isContract: true, isMember: true })

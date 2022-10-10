@@ -134,8 +134,14 @@ export class NotificationRepository {
       this.prisma.notification.count({
         where: {
           ...where,
-          created_at: { gte: dayjs().add(-7, 'day').toDate() },
-          confirmations: { some: { id: query.userId } },
+          OR: [
+            {
+              created_at: { gte: dayjs().add(-7, 'day').toDate() },
+            },
+            {
+              confirmations: { some: { id: query.userId } },
+            },
+          ],
         },
       }),
       this.prisma.notification.findMany({
@@ -149,7 +155,7 @@ export class NotificationRepository {
 
     return {
       data: response[2].map((exam) => new NotificationEntity(exam)),
-      countUnread: response[0] - response[1],
+      countUnread: response[0] > response[1] ? response[0] - response[1] : 0,
       count: response[0],
     };
   }

@@ -1,3 +1,7 @@
+import { EmployeeExamCronService } from './crons/employee-exam/employee-exam.cron';
+import { DeleteExamFileService } from './services/employee/0-history/exams/delete-exam-file/delete-exam-file.service';
+import { DownloadExamService } from './services/employee/0-history/exams/download-exam/download-exam.service';
+import { UploadExamFileService } from './services/employee/0-history/exams/upload-exam-file/upload-exam-file.service';
 import { UpdateManyScheduleExamHistoryService } from './services/employee/0-history/exams/update-many/update-many.service';
 import { Module, forwardRef } from '@nestjs/common';
 
@@ -105,6 +109,7 @@ import { CreateDocumentService } from './services/document/create-document/creat
 import { UpdateDocumentService } from './services/document/update-document/update-document.service';
 import { FindByIdDocumentService } from './services/document/find-by-id-document/find-by-id-document.service';
 import { DownloadDocumentService } from './services/document/download-document/download-document.service';
+import { DashboardCompanyService } from './services/dashboard/dashboard-company/dashboard-company.service';
 
 @Module({
   imports: [
@@ -218,6 +223,11 @@ import { DownloadDocumentService } from './services/document/download-document/d
     FindByIdDocumentService,
     DayJSProvider,
     DownloadDocumentService,
+    UploadExamFileService,
+    DeleteExamFileService,
+    DownloadExamService,
+    DashboardCompanyService,
+    EmployeeExamCronService,
   ],
   exports: [
     CompanyRepository,

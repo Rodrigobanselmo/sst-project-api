@@ -1,23 +1,22 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { ErrorMessageEnum } from 'src/shared/constants/enum/errorMessage';
 
+import { ErrorMessageEnum } from '../../../../../../../shared/constants/enum/errorMessage';
 import { UserPayloadDto } from '../../../../../../../shared/dto/user-payload.dto';
-import { AmazonStorageProvider } from './../../../../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
+import { AmazonStorageProvider } from '../../../../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
 import { EmployeeExamsHistoryRepository } from './../../../../../repositories/implementations/EmployeeExamsHistoryRepository';
 
 @Injectable()
-export class DeleteEmployeeExamHistoryService {
+export class DeleteExamFileService {
   constructor(
-    private readonly amazonStorageProvider: AmazonStorageProvider,
     private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository,
+    private readonly amazonStorageProvider: AmazonStorageProvider,
   ) {}
 
-  async execute(id: number, employeeId: number, user: UserPayloadDto) {
+  async execute(id: number, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;
     const found = await this.employeeExamHistoryRepository.findFirstNude({
       where: {
         id,
-        employeeId,
         employee: { companyId },
       },
       select: {
@@ -27,7 +26,9 @@ export class DeleteEmployeeExamHistoryService {
     });
 
     if (!found?.id)
-      throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_NOT_FOUND);
+      throw new BadRequestException(
+        ErrorMessageEnum.EMPLOYEE_HISTORY_NOT_FOUND,
+      );
 
     if (found?.fileUrl) {
       const foundByFileUrl = await this.employeeExamHistoryRepository.findNude({
@@ -49,8 +50,11 @@ export class DeleteEmployeeExamHistoryService {
       }
     }
 
-    const history = await this.employeeExamHistoryRepository.delete(id);
+    const document = await this.employeeExamHistoryRepository.update({
+      id,
+      fileUrl: null,
+    });
 
-    return history;
+    return document;
   }
 }

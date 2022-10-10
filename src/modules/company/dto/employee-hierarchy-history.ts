@@ -16,6 +16,10 @@ export class CreateEmployeeHierarchyHistoryDto {
   @IsOptional()
   hierarchyId: string;
 
+  @IsString()
+  @IsOptional()
+  subOfficeId?: string;
+
   @IsOptional()
   @Transform(DateFormat, { toClassOnly: true })
   @IsDate({ message: 'Data de realização de exame inválida' })

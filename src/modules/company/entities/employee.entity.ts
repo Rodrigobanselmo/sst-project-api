@@ -70,6 +70,7 @@ export class EmployeeEntity implements Employee {
   shiftId: number;
   birthday: Date;
   admissionDate: Date;
+  lastExam: Date;
   company?: CompanyEntity;
   examsHistory?: EmployeeExamsHistoryEntity[];
   hierarchyHistory?: EmployeeHierarchyHistoryEntity[];

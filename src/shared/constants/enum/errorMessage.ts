@@ -24,6 +24,8 @@ export enum ErrorMessageEnum {
   EMPLOYEE_MISSING_HIERARCHY = 'É necessario informar o cargo do funcionário',
   EMPLOYEE_NOT_IN_HIERARCHY = 'Funcionário sem vínculo empregatício para esse tipo de lotação',
   EMPLOYEE_BLOCK_HISTORY = 'histórico bagunçado, verifique se sua ação é válida',
+  EMPLOYEE_HISTORY_NOT_FOUND = 'histórico de exame não encontrado',
+  EMPLOYEE_HISTORY_FILE_NOT_UPLOADED = 'não foi possivel fazer upload do arquivo',
 }
 
 export enum ErrorCompanyEnum {

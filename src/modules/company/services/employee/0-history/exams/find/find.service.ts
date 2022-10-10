@@ -25,7 +25,13 @@ export class FindEmployeeExamHistoryService {
       { skip, take },
       {
         include: {
-          exam: { select: { isAttendance: true, id: true, name: true } },
+          exam: {
+            select: {
+              isAttendance: true,
+              id: true,
+              name: true,
+            },
+          },
           userDone: { select: { email: true, name: true } },
           userSchedule: { select: { email: true, name: true } },
           ...(!query.employeeId && {

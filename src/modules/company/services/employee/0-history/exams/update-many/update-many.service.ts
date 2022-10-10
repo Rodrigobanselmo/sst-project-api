@@ -111,6 +111,7 @@ export class UpdateManyScheduleExamHistoryService {
           motive: clinicHistory.examType === 'ADMI' ? 'ADM' : 'TRANS_PROM',
           startDate:
             clinicHistory?.changeHierarchyDate || this.dayJSProvider.dateNow(),
+          subOfficeId: clinicHistory.subOfficeId,
         },
         { ...user, targetCompanyId: employee.companyId },
       );

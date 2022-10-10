@@ -101,7 +101,7 @@ export class PdfGuideDataService {
           select: { email: true, phone: true, phone_1: true },
         },
         clinicExams: {
-          select: { isScheduled: true, examId: true },
+          select: { isScheduled: true, examId: true, scheduleRange: true },
           where: { examId: { in: examIds } },
         },
       },

@@ -158,6 +158,10 @@ export class CreateEmployeeExamHistoryDto {
   @IsString()
   hierarchyId?: string;
 
+  @IsOptional()
+  @IsString()
+  subOfficeId?: string;
+
   @ValidateNested({ each: true })
   @IsOptional()
   @Type(() => EmployeeComplementaryExamHistoryDto)
@@ -173,11 +177,11 @@ export class UpdateEmployeeExamHistoryDto extends PartialType(
 
   @IsInt()
   @IsOptional()
-  doctorId: number;
+  doctorId?: number;
 
   @IsString()
   @IsOptional()
-  time: string;
+  time?: string;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsOptional()
@@ -185,7 +189,7 @@ export class UpdateEmployeeExamHistoryDto extends PartialType(
   @IsEnum(ExamHistoryEvaluationEnum, {
     message: `tipo de avaliação inválido`,
   })
-  evaluationType: ExamHistoryEvaluationEnum;
+  evaluationType?: ExamHistoryEvaluationEnum;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsOptional()
@@ -193,7 +197,7 @@ export class UpdateEmployeeExamHistoryDto extends PartialType(
   @IsEnum(ExamHistoryConclusionEnum, {
     message: `tipo de conclusão inválido`,
   })
-  conclusion: ExamHistoryConclusionEnum;
+  conclusion?: ExamHistoryConclusionEnum;
 }
 
 export class UpdateManyScheduleExamDto {
@@ -240,6 +244,11 @@ export class UpdateManyScheduleExamDto {
   data?: UpdateEmployeeExamHistoryDto[];
 }
 
+export class UpdateFileExamDto {
+  @IsOptional()
+  ids: number[];
+}
+
 export class FindEmployeeExamHistoryDto extends PaginationQueryDto {
   @IsString()
   @IsOptional()
@@ -282,6 +291,11 @@ export class FindClinicEmployeeExamHistoryDto {
   @IsString()
   companyId?: string;
 
+  @IsOptional()
+  @IsInt()
+  employeeId?: number;
+
+  @ValidateIf((o) => !o.employeeId)
   @Transform(DateFormat, { toClassOnly: true })
   @IsDate({ message: 'Data inválida' })
   @Type(() => Date)
