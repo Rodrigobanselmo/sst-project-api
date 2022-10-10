@@ -33,10 +33,18 @@ export function arrayChunks<T>(
       ) {
         const item = chuckArray[index].pop();
         chuckArray[lastChunkIndex].push(item);
-        index--;
+
+        if (chuckArray[index - 1]) index--;
+        if (!chuckArray[index - 1]) index = secondLastChunkIndex;
       }
     }
   }
+
+  // console.log(chuckArray.length);
+  // console.log(chuckArray.map((chuckArray) => chuckArray.length));
+  // console.log(array.length);
+
+  // throw new Error();
 
   return chuckArray;
 }

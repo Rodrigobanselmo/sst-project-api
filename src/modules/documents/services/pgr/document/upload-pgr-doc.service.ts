@@ -79,6 +79,7 @@ export class PgrUploadService {
     const companyId = upsertPgrDto.companyId;
     const workspaceId = upsertPgrDto.workspaceId;
 
+    // throw new Error();
     console.log('start: query data');
     // eslint-disable-next-line prettier/prettier
     const riskGroupData = await this.riskGroupDataRepository.findAllDataById(upsertPgrDto.riskGroupId, workspaceId, companyId);
@@ -284,11 +285,14 @@ export class PgrUploadService {
         hierarchyTree,
         cover,
       }).build();
+      console.log('end: build document part 1');
 
       const doc = createBaseDocument(sections);
+      console.log('end: build document part 2');
 
       const b64string = await Packer.toBase64String(doc);
       const buffer = Buffer.from(b64string, 'base64');
+      console.log('end: build document part 3');
 
       const fileName = this.getFileName(upsertPgrDto, riskGroupData);
 
