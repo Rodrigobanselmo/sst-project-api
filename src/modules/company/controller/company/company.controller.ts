@@ -41,8 +41,9 @@ import {
   RoleEnum,
 } from '../../../../shared/constants/enum/authorization';
 import { Roles } from '../../../../shared/decorators/roles.decorator';
-import { DashboardCompanyService } from '../../services/dashboard/dashboard-company/dashboard-company.service';
+import { UpdateAllCompaniesService } from '../../services/report/update-all-companies/update-all-companies.service';
 import { FindCompanyDashDto } from '../../dto/dashboard.dto';
+import { DashboardCompanyService } from '../../services/report/dashboard-company/dashboard-company.service';
 
 @ApiTags('company')
 @Controller('company')
@@ -62,6 +63,7 @@ export class CompanyController {
     private readonly setCompanyClinicsService: SetCompanyClinicsService,
     private readonly findClinicService: FindClinicService,
     private readonly dashboardCompanyService: DashboardCompanyService,
+    private readonly updateAllCompaniesService: UpdateAllCompaniesService,
   ) {}
 
   @Roles(RoleEnum.COMPANY, RoleEnum.CONTRACTS, RoleEnum.CLINICS, RoleEnum.USER)
@@ -71,7 +73,8 @@ export class CompanyController {
     @User() userPayloadDto: UserPayloadDto,
     @Query() query: FindCompanyDashDto,
   ) {
-    return this.dashboardCompanyService.execute(query, userPayloadDto);
+    // return this.dashboardCompanyService.execute(query, userPayloadDto);
+    return this.updateAllCompaniesService.execute(userPayloadDto);
   }
 
   @Roles(RoleEnum.COMPANY, RoleEnum.CONTRACTS, RoleEnum.CLINICS, RoleEnum.USER)

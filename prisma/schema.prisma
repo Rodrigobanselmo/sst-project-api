@@ -352,6 +352,7 @@ model Company {
   companyGroupId Int? @unique
   companyGroup CompanyGroup? @relation(name:"company_group", fields: [companyGroupId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
   notifications Notification[]  @relation(name: "owner_notification_company")
+  report CompanyReport?
 
   // professionals Professional[] @relation(name:"companies_related") 
   stateRegistration String? // not in use
@@ -446,8 +447,20 @@ model CompanyCharacterizationPhoto {
   updated_at  DateTime   @updatedAt
   companyCharacterizationId String
   companyEnvironment CompanyCharacterization @relation(fields: [companyCharacterizationId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
-}
+ }
 
+model CompanyReport {
+  id    Int   @id  @default(autoincrement())
+  lastDailyReport DateTime? 
+  dailyReport Json?  
+  created_at DateTime @default(now())
+  updated_at  DateTime   @updatedAt
+  companyId String @unique
+  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
+
+
+  @@unique([id, companyId])
+}
 model CompanyEnvironment {
   id   String    @id @default(uuid())
   name String  
@@ -597,6 +610,7 @@ model Employee {
   birthday DateTime?
   admissionDate DateTime? //!remove
   lastExam DateTime?
+  expiredDateExam DateTime?
   sex SexTypeEnum? 
   hierarchyId String?
   hierarchy Hierarchy? @relation(fields: [hierarchyId], references: [id], onDelete: Restrict, onUpdate: Cascade)

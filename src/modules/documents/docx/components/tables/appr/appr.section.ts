@@ -1,5 +1,6 @@
 import { HierarchyEnum, HomogeneousGroup } from '@prisma/client';
 import { ISectionOptions, PageOrientation } from 'docx';
+import { sortString } from '../../../../../../shared/utils/sorts/string.sort';
 import { RiskFactorGroupDataEntity } from '../../../../../checklist/entities/riskGroupData.entity';
 import { HierarchyEntity } from '../../../../../company/entities/hierarchy.entity';
 
@@ -28,57 +29,67 @@ export const APPRTableSection = (
 
   const map = new Map<string, boolean>();
 
-  hierarchyData.forEach((hierarchy) => {
-    const createTable = () => {
-      const firstTable = firstRiskInventoryTableSection(
-        riskFactorGroupData,
-        homoGroupTree,
-        hierarchy,
-        isByGroup,
-      );
-      const secondTable = secondRiskInventoryTableSection(hierarchy, isByGroup);
-      const thirdTable = thirdRiskInventoryTableSection(
-        riskFactorGroupData,
-        hierarchy,
-        isByGroup,
-      );
+  Array.from(hierarchyData.values())
+    .sort((a, b) =>
+      sortString(
+        a.org.map((o) => o.name).join(),
+        b.org.map((o) => o.name).join(),
+      ),
+    )
+    .forEach((hierarchy) => {
+      const createTable = () => {
+        const firstTable = firstRiskInventoryTableSection(
+          riskFactorGroupData,
+          homoGroupTree,
+          hierarchy,
+          isByGroup,
+        );
+        const secondTable = secondRiskInventoryTableSection(
+          hierarchy,
+          isByGroup,
+        );
+        const thirdTable = thirdRiskInventoryTableSection(
+          riskFactorGroupData,
+          hierarchy,
+          isByGroup,
+        );
 
-      sectionsTables.push([firstTable, ...secondTable, ...thirdTable]);
-    };
-
-    const description = hierarchy.descReal;
-
-    const homoGroupsIds = hierarchy.org.reduce((acc, hierarchy) => {
-      if (hierarchy.homogeneousGroupIds)
-        return [...acc, ...hierarchy.homogeneousGroupIds];
-      return acc;
-    }, []);
-
-    homoGroupsIds.forEach((homoGroupID) => {
-      if (map.get(homoGroupID)) {
-        return;
-      }
-
-      const homoGroup = homoGroupTree[homoGroupID] || {
-        description: '',
-        type: null,
+        sectionsTables.push([firstTable, ...secondTable, ...thirdTable]);
       };
 
-      map.set(homoGroupID, true);
+      const description = hierarchy.descReal;
 
-      // eslint-disable-next-line prettier/prettier
+      const homoGroupsIds = hierarchy.org.reduce((acc, hierarchy) => {
+        if (hierarchy.homogeneousGroupIds)
+          return [...acc, ...hierarchy.homogeneousGroupIds];
+        return acc;
+      }, []);
+
+      homoGroupsIds.forEach((homoGroupID) => {
+        if (map.get(homoGroupID)) {
+          return;
+        }
+
+        const homoGroup = homoGroupTree[homoGroupID] || {
+          description: '',
+          type: null,
+        };
+
+        map.set(homoGroupID, true);
+
+        // eslint-disable-next-line prettier/prettier
       if (!description && !homoGroup.type)  hierarchy.descReal = homoGroup?.description;
-      if (!homoGroup.type && isByGroup)
-        hierarchy.descReal =
-          homoGroup?.description || hierarchy.descReal || hierarchy.descRh;
+        if (!homoGroup.type && isByGroup)
+          hierarchy.descReal =
+            homoGroup?.description || hierarchy.descReal || hierarchy.descRh;
 
-      if (isByGroup) createTable();
+        if (isByGroup) createTable();
+      });
+
+      if (isByGroup) return;
+
+      createTable();
     });
-
-    if (isByGroup) return;
-
-    createTable();
-  });
 
   const setSection = (tables: any[]) => ({
     children: [...tables],

@@ -16,6 +16,7 @@ import { firstRiskInventoryTableSection } from './parts/first/first.table';
 import { secondRiskInventoryTableSection } from './parts/second/second.table';
 import { thirdRiskInventoryTableSection } from './parts/third/third.table';
 import { officeRiskInventoryTableSection } from './parts/2-offices/offices.table';
+import { sortString } from '../../../../../../shared/utils/sorts/string.sort';
 
 export interface IAPPRTableOptions {
   isByGroup?: boolean;
@@ -112,64 +113,68 @@ export const APPRByGroupTableSection = (
     } as any);
   };
 
-  Object.values(homoGroupTree).forEach((homo) => {
-    if (homo.type) return;
+  Object.values(homoGroupTree)
+    .sort((a, b) => sortString(a.name, b.name))
+    .forEach((homo) => {
+      if (homo.type) return;
 
-    const foundHomo = hierarchyDataHomoGroup.get(homo.id);
+      const foundHomo = hierarchyDataHomoGroup.get(homo.id);
 
-    if (!foundHomo) setHomoGroup(homo);
-    everyHomoFound.push(homo.id);
+      if (!foundHomo) setHomoGroup(homo);
+      everyHomoFound.push(homo.id);
 
-    homoGroupTree[homo.id].hierarchies.forEach((hierarchy, i, hierarchies) => {
-      const allHomogeneousGroupIds = (
-        hierarchyData.get(hierarchy.id) || { allHomogeneousGroupIds: [] }
-      )?.allHomogeneousGroupIds;
-
-      removeDuplicate(
-        [
-          ...allHomogeneousGroupIds.map((id) => ({ id })),
-          ...hierarchy.homogeneousGroups,
-        ],
-        { removeById: 'id' },
-      ).forEach((homoGroup) => {
-        const isOnEvery = hierarchies.every((hierarchyEvery) => {
-          const everyAllHomogeneousGroupIds = (
-            hierarchyData.get(hierarchyEvery.id) || {
-              allHomogeneousGroupIds: [],
-            }
+      homoGroupTree[homo.id].hierarchies.forEach(
+        (hierarchy, i, hierarchies) => {
+          const allHomogeneousGroupIds = (
+            hierarchyData.get(hierarchy.id) || { allHomogeneousGroupIds: [] }
           )?.allHomogeneousGroupIds;
 
-          return [
-            ...everyAllHomogeneousGroupIds.map((id) => ({ id })),
-            ...hierarchyEvery.homogeneousGroups,
-          ].find((h) => h.id === homoGroup.id);
-        });
+          removeDuplicate(
+            [
+              ...allHomogeneousGroupIds.map((id) => ({ id })),
+              ...hierarchy.homogeneousGroups,
+            ],
+            { removeById: 'id' },
+          ).forEach((homoGroup) => {
+            const isOnEvery = hierarchies.every((hierarchyEvery) => {
+              const everyAllHomogeneousGroupIds = (
+                hierarchyData.get(hierarchyEvery.id) || {
+                  allHomogeneousGroupIds: [],
+                }
+              )?.allHomogeneousGroupIds;
 
-        const mapDataHomo = hierarchyDataHomoGroup.get(homo.id);
-        const isHomoAdded = mapDataHomo.allHomogeneousGroupIds.find(
-          (homoId) => homoId === homoGroup.id,
-        );
+              return [
+                ...everyAllHomogeneousGroupIds.map((id) => ({ id })),
+                ...hierarchyEvery.homogeneousGroups,
+              ].find((h) => h.id === homoGroup.id);
+            });
 
-        if (isOnEvery && !isHomoAdded) {
-          everyHomoFound.push(homoGroup.id);
-          const allHomogeneousGroupIds = [
-            ...mapDataHomo.allHomogeneousGroupIds,
-            homoGroup.id,
-          ];
+            const mapDataHomo = hierarchyDataHomoGroup.get(homo.id);
+            const isHomoAdded = mapDataHomo.allHomogeneousGroupIds.find(
+              (homoId) => homoId === homoGroup.id,
+            );
 
-          hierarchyDataHomoGroup.set(homo.id, {
-            ...mapDataHomo,
-            allHomogeneousGroupIds,
-            hierarchies: homoGroupTree[homo.id].hierarchies,
+            if (isOnEvery && !isHomoAdded) {
+              everyHomoFound.push(homoGroup.id);
+              const allHomogeneousGroupIds = [
+                ...mapDataHomo.allHomogeneousGroupIds,
+                homoGroup.id,
+              ];
+
+              hierarchyDataHomoGroup.set(homo.id, {
+                ...mapDataHomo,
+                allHomogeneousGroupIds,
+                hierarchies: homoGroupTree[homo.id].hierarchies,
+              });
+            }
+
+            if (!isOnEvery) {
+              everyHomoNotFound.push(homoGroup.id);
+            }
           });
-        }
-
-        if (!isOnEvery) {
-          everyHomoNotFound.push(homoGroup.id);
-        }
-      });
+        },
+      );
     });
-  });
 
   Object.values(homoGroupTree).forEach((homo) => {
     const hasFound = everyHomoFound.includes(homo.id);

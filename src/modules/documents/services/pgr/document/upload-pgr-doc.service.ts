@@ -65,6 +65,8 @@ export const getRiskDoc = (
 
 @Injectable()
 export class PgrUploadService {
+  private attachments_remove: any[] = []; //!
+
   constructor(
     private readonly riskGroupDataRepository: RiskGroupDataRepository,
     private readonly riskDocumentRepository: RiskDocumentRepository,
@@ -76,9 +78,10 @@ export class PgrUploadService {
     private readonly dayJSProvider: DayJSProvider,
   ) {}
   async execute(upsertPgrDto: UpsertPgrDto) {
+    this.attachments_remove = []; //!
+
     const companyId = upsertPgrDto.companyId;
     const workspaceId = upsertPgrDto.workspaceId;
-
     // throw new Error();
     console.log('start: query data');
     // eslint-disable-next-line prettier/prettier
@@ -218,6 +221,10 @@ export class PgrUploadService {
           homoGroupTree,
           upsertPgrDto,
         );
+
+      // return { buffer: this.attachments_remove[0], fileName: '1.docx' }; //!
+      // return { buffer: this.attachments_remove[1], fileName: '2.docx' }; //!
+      return { buffer: this.attachments_remove[2], fileName: '3.docx' }; //!
 
       const version = new RiskDocumentEntity({
         version: upsertPgrDto.version,
@@ -492,6 +499,8 @@ export class PgrUploadService {
 
     const b64string = await Packer.toBase64String(Doc);
     const buffer = Buffer.from(b64string, 'base64');
+
+    this.attachments_remove.push(buffer); //!
 
     const fileName = this.getFileName(upsertPgrDto, riskGroupData, text);
 

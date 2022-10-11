@@ -71,6 +71,7 @@ export class EmployeeEntity implements Employee {
   birthday: Date;
   admissionDate: Date;
   lastExam: Date;
+  expiredDateExam: Date;
   company?: CompanyEntity;
   examsHistory?: EmployeeExamsHistoryEntity[];
   hierarchyHistory?: EmployeeHierarchyHistoryEntity[];

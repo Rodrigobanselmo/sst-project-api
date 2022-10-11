@@ -12,7 +12,7 @@ export const quantityRadSection: IDocumentPGRSectionGroup = {
     {
       type: PGRSectionTypeEnum.SECTION,
       footerText: `??${VariablesPGREnum.CHAPTER_3}??`,
-      removeWithSomeEmptyVars: [VariablesPGREnum.HAS_QUANTITY_VFB],
+      removeWithSomeEmptyVars: [VariablesPGREnum.HAS_QUANTITY_RAD],
       children: [
         {
           type: PGRSectionChildrenTypeEnum.H2,

@@ -109,12 +109,18 @@ import { CreateDocumentService } from './services/document/create-document/creat
 import { UpdateDocumentService } from './services/document/update-document/update-document.service';
 import { FindByIdDocumentService } from './services/document/find-by-id-document/find-by-id-document.service';
 import { DownloadDocumentService } from './services/document/download-document/download-document.service';
-import { DashboardCompanyService } from './services/dashboard/dashboard-company/dashboard-company.service';
+import { UpdateAllCompaniesService } from './services/report/update-all-companies/update-all-companies.service';
+import { DashboardCompanyService } from './services/report/dashboard-company/dashboard-company.service';
+import { TelegramModule } from 'nestjs-telegram';
+import { CompanyReportRepository } from './repositories/implementations/CompanyReportRepository';
 
 @Module({
   imports: [
     forwardRef(() => ChecklistModule),
     forwardRef(() => NotificationModule),
+    TelegramModule.forRoot({
+      botKey: process.env.TELEGRAM_TOKEN,
+    }),
   ],
   controllers: [
     CompanyController,
@@ -226,8 +232,10 @@ import { DashboardCompanyService } from './services/dashboard/dashboard-company/
     UploadExamFileService,
     DeleteExamFileService,
     DownloadExamService,
-    DashboardCompanyService,
+    UpdateAllCompaniesService,
     EmployeeExamCronService,
+    DashboardCompanyService,
+    CompanyReportRepository,
   ],
   exports: [
     CompanyRepository,

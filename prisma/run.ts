@@ -51,7 +51,7 @@ async function main() {
   //! rodar
 
   //await deleteWithNameCompany('Deletar', prisma);
-  // await levelRiskData(prisma);
+  await levelRiskData(prisma);
   // await representAll(prisma);
 
   console.log('end');

@@ -118,7 +118,7 @@ export const quantityQuiConverter = (
           borders: borderStyleGlobal(palette.common.white.string, {}),
         };
         cells[QuantityQuiColumnEnum.IJ] = {
-          text: String(ij) || '-',
+          text: String(ij.toFixed(5)) || '-',
           shading: { fill: palette.table.row.string },
           borders: borderStyleGlobal(palette.common.white.string, {}),
         };

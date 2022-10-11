@@ -38,7 +38,10 @@ export class FindExamByHierarchyService {
     private readonly dayjs: DayJSProvider,
   ) {}
 
-  async execute(user: UserPayloadDto, query: FindExamHierarchyDto) {
+  async execute(
+    user: Pick<UserPayloadDto, 'targetCompanyId'>,
+    query: FindExamHierarchyDto,
+  ) {
     const hierarchyId = query.hierarchyId;
     const companyId = user.targetCompanyId;
     const hierarchy = hierarchyId

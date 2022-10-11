@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
+import { TelegramModule } from 'nestjs-telegram';
 
 import { AuthModule } from './modules/auth/auth.module';
 import { ChecklistModule } from './modules/checklist/checklist.module';

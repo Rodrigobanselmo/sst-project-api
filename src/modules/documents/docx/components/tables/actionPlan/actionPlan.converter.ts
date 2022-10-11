@@ -1,3 +1,5 @@
+import { sortString } from './../../../../../../shared/utils/sorts/string.sort';
+import { sortNumber } from './../../../../../../shared/utils/sorts/number.sort';
 import { HomoTypeEnum } from '@prisma/client';
 import clone from 'clone';
 
@@ -18,114 +20,125 @@ export const actionPlanConverter = (
   const homogeneousGroupsMap = new Map<string, bodyTableProps[][]>();
   const actionPlanData: bodyTableProps[][] = [];
 
-  riskGroup.data.forEach((riskData) => {
-    let origin: string;
-    // eslint-disable-next-line prettier/prettier
+  riskGroup.data
+    .sort((a, b) => sortString(a.riskFactor.name, b.riskFactor.name))
+    .sort((a, b) => sortNumber(b.level, a.level))
+    .map((riskData) => {
+      let origin: string;
+      // eslint-disable-next-line prettier/prettier
     if (riskData.homogeneousGroup.environment) origin = `${riskData.homogeneousGroup.environment.name}\n(${originRiskMap[riskData.homogeneousGroup.environment.type].name})`
-    // eslint-disable-next-line prettier/prettier
+      // eslint-disable-next-line prettier/prettier
     if (riskData.homogeneousGroup.characterization) origin =`${riskData.homogeneousGroup.characterization.name}\n(${originRiskMap[riskData.homogeneousGroup.characterization.type].name})`;
-    // eslint-disable-next-line prettier/prettier
+      // eslint-disable-next-line prettier/prettier
     if (!riskData.homogeneousGroup.type) origin = `${riskData.homogeneousGroup.name}\n(GSE)`;
 
-    if (riskData.homogeneousGroup.type == HomoTypeEnum.HIERARCHY) {
-      const hierarchy = hierarchyTree[riskData.homogeneousGroup.id];
+      if (riskData.homogeneousGroup.type == HomoTypeEnum.HIERARCHY) {
+        const hierarchy = hierarchyTree[riskData.homogeneousGroup.id];
 
-      if (hierarchy)
-        origin = `${hierarchy.name}\n(${originRiskMap[hierarchy.type].name})`;
-    }
+        if (hierarchy)
+          origin = `${hierarchy.name}\n(${originRiskMap[hierarchy.type].name})`;
+      }
+      return { ...riskData, origin };
+    })
+    .sort((a, b) => sortString(a.origin, b.origin))
+    .forEach(({ origin, ...riskData }) => {
+      const dataRecs = riskData.dataRecs;
+      riskData.recs.forEach((rec) => {
+        const cells: bodyTableProps[] = [];
 
-    const dataRecs = riskData.dataRecs;
-    riskData.recs.forEach((rec) => {
-      const cells: bodyTableProps[] = [];
+        const dataRecFound = dataRecs?.find(
+          (dataRec) => dataRec.recMedId == rec.id,
+        );
+        const responsibleName = dataRecFound?.responsibleName || '';
+        const level = riskData.level || 0;
 
-      const dataRecFound = dataRecs?.find(
-        (dataRec) => dataRec.recMedId == rec.id,
-      );
-      const responsibleName = dataRecFound?.responsibleName || '';
-      const level = riskData.level || 0;
+        const getDue = () => {
+          const months = riskGroup[`months_period_level_${level}`];
 
-      const getDue = () => {
-        const months = riskGroup[`months_period_level_${level}`];
+          if (dataRecFound && dataRecFound.endDate) {
+            return dayjs(dataRecFound.endDate);
+          }
 
-        if (dataRecFound && dataRecFound.endDate) {
-          return dayjs(dataRecFound.endDate);
-        }
+          if (months)
+            return dayjs(riskGroup?.validityStart).add(months + 1, 'months');
 
-        if (months)
-          return dayjs(riskGroup?.validityStart).add(months + 1, 'months');
+          return false;
+        };
 
-        return false;
-      };
+        const due = getDue();
+        const dueText = due
+          ? due.format('D [de] MMMM YYYY')
+          : level === 6
+          ? 'ação imediata'
+          : 'sem prazo';
 
-      const due = getDue();
-      const dueText = due
-        ? due.format('D [de] MMMM YYYY')
-        : level === 6
-        ? 'ação imediata'
-        : 'sem prazo';
+        cells[ActionPlanColumnEnum.ITEM] = {
+          text: '',
+          size: 2,
+          borders: borderStyleGlobal(palette.common.white.string),
+        };
+        cells[ActionPlanColumnEnum.ORIGIN] = {
+          text: origin || '',
+          size: 5,
+          borders: borderStyleGlobal(palette.common.white.string),
+        };
+        cells[ActionPlanColumnEnum.RISK] = {
+          text: riskData.riskFactor.name,
+          size: 10,
+          borders: borderStyleGlobal(palette.common.white.string),
+        };
+        cells[ActionPlanColumnEnum.SOURCE] = {
+          text: riskData.generateSources.map((gs) => gs.name).join('\n'),
+          size: 10,
+          borders: borderStyleGlobal(palette.common.white.string),
+        };
+        cells[ActionPlanColumnEnum.SEVERITY] = {
+          text: String(riskData.riskFactor.severity),
+          size: 1,
+          borders: borderStyleGlobal(palette.common.white.string),
+        };
+        cells[ActionPlanColumnEnum.PROBABILITY] = {
+          text: String(riskData.probability || '-'),
+          size: 1,
+          borders: borderStyleGlobal(palette.common.white.string),
+        };
+        cells[ActionPlanColumnEnum.RO] = {
+          text: getMatrizRisk(
+            riskData.riskFactor.severity,
+            riskData.probability,
+          ).label,
+          size: 5,
+          borders: borderStyleGlobal(palette.common.white.string),
+        };
+        cells[ActionPlanColumnEnum.INTERVENTION] = {
+          text: getMatrizRisk(
+            riskData.riskFactor.severity,
+            riskData.probability,
+          ).intervention,
+          size: 5,
+          borders: borderStyleGlobal(palette.common.white.string),
+        };
+        cells[ActionPlanColumnEnum.RECOMMENDATION] = {
+          text: rec.recName,
+          size: 10,
+          borders: borderStyleGlobal(palette.common.white.string),
+        };
+        cells[ActionPlanColumnEnum.RESPONSIBLE] = {
+          text: responsibleName,
+          size: 5,
+          borders: borderStyleGlobal(palette.common.white.string),
+        };
+        cells[ActionPlanColumnEnum.DUE] = {
+          text: dueText,
+          size: 5,
+          borders: borderStyleGlobal(palette.common.white.string),
+        };
 
-      cells[ActionPlanColumnEnum.ITEM] = {
-        text: '',
-        size: 2,
-        borders: borderStyleGlobal(palette.common.white.string),
-      };
-      cells[ActionPlanColumnEnum.ORIGIN] = {
-        text: origin || '',
-        size: 5,
-        borders: borderStyleGlobal(palette.common.white.string),
-      };
-      cells[ActionPlanColumnEnum.RISK] = {
-        text: riskData.riskFactor.name,
-        size: 10,
-        borders: borderStyleGlobal(palette.common.white.string),
-      };
-      cells[ActionPlanColumnEnum.SOURCE] = {
-        text: riskData.generateSources.map((gs) => gs.name).join('\n'),
-        size: 10,
-        borders: borderStyleGlobal(palette.common.white.string),
-      };
-      cells[ActionPlanColumnEnum.SEVERITY] = {
-        text: String(riskData.riskFactor.severity),
-        size: 1,
-        borders: borderStyleGlobal(palette.common.white.string),
-      };
-      cells[ActionPlanColumnEnum.PROBABILITY] = {
-        text: String(riskData.probability || '-'),
-        size: 1,
-        borders: borderStyleGlobal(palette.common.white.string),
-      };
-      cells[ActionPlanColumnEnum.RO] = {
-        text: getMatrizRisk(riskData.riskFactor.severity, riskData.probability)
-          .label,
-        size: 5,
-        borders: borderStyleGlobal(palette.common.white.string),
-      };
-      cells[ActionPlanColumnEnum.INTERVENTION] = {
-        text: getMatrizRisk(riskData.riskFactor.severity, riskData.probability)
-          .intervention,
-        size: 5,
-        borders: borderStyleGlobal(palette.common.white.string),
-      };
-      cells[ActionPlanColumnEnum.RECOMMENDATION] = {
-        text: rec.recName,
-        size: 10,
-        borders: borderStyleGlobal(palette.common.white.string),
-      };
-      cells[ActionPlanColumnEnum.RESPONSIBLE] = {
-        text: responsibleName,
-        size: 5,
-        borders: borderStyleGlobal(palette.common.white.string),
-      };
-      cells[ActionPlanColumnEnum.DUE] = {
-        text: dueText,
-        size: 5,
-        borders: borderStyleGlobal(palette.common.white.string),
-      };
-
-      const rows = homogeneousGroupsMap.get(riskData.homogeneousGroupId) || [];
-      homogeneousGroupsMap.set(riskData.homogeneousGroupId, [...rows, cells]);
+        const rows =
+          homogeneousGroupsMap.get(riskData.homogeneousGroupId) || [];
+        homogeneousGroupsMap.set(riskData.homogeneousGroupId, [...rows, cells]);
+      });
     });
-  });
 
   let i = 1;
 

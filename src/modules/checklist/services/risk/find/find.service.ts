@@ -29,6 +29,10 @@ export class FindRiskService {
           isPPP: true,
           isPCMSO: true,
 
+          twa: true,
+          nr15lt: true,
+          stel: true,
+
           docInfo: {
             where: {
               OR: [

@@ -1,8 +1,8 @@
-import { DocumentRepository } from './../../../repositories/implementations/DocumentRepository';
-import { IExamOriginData } from './../../../../checklist/entities/exam.entity';
-import { FindExamByHierarchyService } from './../../../../checklist/services/exam/find-by-hierarchy /find-exam-by-hierarchy.service';
-import { FindCompanyDashDto } from './../../../dto/dashboard.dto';
-import { EmployeeRepository } from './../../../repositories/implementations/EmployeeRepository';
+import { DocumentRepository } from '../../../repositories/implementations/DocumentRepository';
+import { IExamOriginData } from '../../../../checklist/entities/exam.entity';
+import { FindExamByHierarchyService } from '../../../../checklist/services/exam/find-by-hierarchy /find-exam-by-hierarchy.service';
+import { FindCompanyDashDto } from '../../../dto/dashboard.dto';
+import { EmployeeRepository } from '../../../repositories/implementations/EmployeeRepository';
 import { Injectable } from '@nestjs/common';
 import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 
