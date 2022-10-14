@@ -143,4 +143,13 @@ export class FindEmployeeDto extends PaginationQueryDto {
   @IsBoolean()
   @IsOptional()
   all?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  expiredExam?: boolean;
+
+  @IsOptional()
+  @IsDate({ message: 'Data inválida' })
+  @Type(() => Date)
+  expiredDateExam: Date;
 }

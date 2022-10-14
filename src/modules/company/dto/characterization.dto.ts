@@ -112,3 +112,14 @@ export class UpdatePhotoCharacterizationDto {
   @MaxLength(100)
   name: string;
 }
+
+export class CopyCharacterizationDto {
+  @IsString()
+  companyCopyFromId: string;
+
+  @IsString()
+  workspaceId: string;
+
+  @IsString({ each: true })
+  characterizationIds: string[];
+}

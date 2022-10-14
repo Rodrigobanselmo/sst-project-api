@@ -1,3 +1,4 @@
+import { UpsertCompanyReportDto } from './../../../dto/company-report.dto';
 import { EmployeeEntity } from 'src/modules/company/entities/employee.entity';
 import { CompanyEntity } from './../../../entities/company.entity';
 import { CompanyRepository } from '../../../repositories/implementations/CompanyRepository';
@@ -14,10 +15,14 @@ import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { CreateContactDto } from '../../../dto/contact.dto';
 import { ContactRepository } from '../../../repositories/implementations/ContactRepository';
 import { TelegramService } from 'nestjs-telegram';
+import { CompanyReportRepository } from '../../../../../modules/company/repositories/implementations/CompanyReportRepository';
+import { arrayChunks } from '../../../../../shared/utils/arrayChunks';
+import { asyncBatch } from '../../../../../shared/utils/asyncBatch';
 
 @Injectable()
 export class UpdateAllCompaniesService {
   private chatId = 1301254235;
+  private standardDate = '1900-01-01';
   private errorCompanies = [];
   private error: Error;
 
@@ -27,89 +32,155 @@ export class UpdateAllCompaniesService {
     private readonly companyRepository: CompanyRepository,
     private readonly dayjs: DayJSProvider,
     private readonly telegram: TelegramService,
+    private readonly companyReportRepository: CompanyReportRepository,
   ) {}
 
   async execute(user?: UserPayloadDto) {
-    const companyId = user.targetCompanyId;
+    const companyId = user?.targetCompanyId;
 
+    console.log('start cron(1): update all');
     const allCompanies = await this.companyRepository.findNude({
       select: {
         id: true,
-        ...(!companyId && {
-          applyingServiceContracts: {
-            select: { receivingServiceCompanyId: true },
-          },
-        }),
+        // report: { select: { id: true } },
+        applyingServiceContracts: {
+          select: { receivingServiceCompanyId: true },
+        },
       },
       where: {
         status: 'ACTIVE',
         isClinic: false,
-        isGroup: false,
-        ...(companyId && { id: companyId }),
+        // ...(!companyId && {
+        //   OR: [
+        //     {
+        //       report: {
+        //         lastDailyReport: {
+        //           lte: this.dayjs.addTime(new Date(), -3, 'hours'),
+        //         },
+        //       },
+        //     },
+        //     { report: null },
+        //   ],
+        // }),
+        ...(companyId && {
+          OR: [
+            { id: companyId },
+            {
+              receivingServiceContracts: {
+                some: { applyingServiceCompanyId: companyId },
+              },
+            },
+          ],
+        }),
       },
     });
 
-    const data = await asyncEach(allCompanies, (v) =>
-      this.addEmployeeExamTime(v),
+    console.log('start cron(2): update employees');
+    const employeeExams = (
+      await asyncEach(allCompanies, (v) => this.addEmployeeExamTime(v))
+    ).map((report): UpsertCompanyReportDto & { company: CompanyEntity } => {
+      const expired =
+        report.allWithExamExpired.length + report.allWithMissingExam.length;
+
+      return {
+        company: report.company,
+        companyId: report.company.id,
+        lastDailyReport: this.dayjs.dateNow(),
+        dailyReport: {
+          exam: {
+            all: report.all.length,
+            expired,
+            good: report.all.length - expired,
+            schedule: report.allWithExamSchedule.length,
+            expired30: report.closeToExpire30.length,
+            expired90: report.closeToExpire90.length,
+          },
+        },
+      };
+    });
+
+    const employeeExamsData = employeeExams.map(
+      ({ company, ...report }): UpsertCompanyReportDto => {
+        const companyIds =
+          company?.applyingServiceContracts?.map(
+            (c) => c.receivingServiceCompanyId,
+          ) || [];
+
+        if (companyIds.length === 0) return report;
+
+        employeeExams.forEach((employeeExam) => {
+          if (companyIds.includes(employeeExam.companyId)) {
+            Object.entries(employeeExam.dailyReport.exam).map(([k, v]) => {
+              if (typeof v === 'number') {
+                report.dailyReport.exam[k] = report.dailyReport.exam[k] + v;
+              }
+            });
+          }
+        });
+
+        return report;
+      },
     );
 
-    const messageHtml = `
-UPDATE ALL COMPANIES EXAMS:
+    console.log('start cron(3): telegram');
+    this.telegramMessage(allCompanies);
 
-DONE: ${allCompanies.length - this.errorCompanies.length}
-ERRORS: ${this.errorCompanies.length}
-TOTAL: ${allCompanies.length}
-    `;
+    console.log('start cron(4): reports');
+    await asyncBatch(employeeExamsData, 50, async (report) => {
+      await this.companyReportRepository.upsert(report);
+    });
+    console.log('end cron(4): reports');
 
-    try {
-      console.log(messageHtml);
-      // await this.telegram
-      //   .sendMessage({
-      //     chat_id: this.chatId,
-      //     text: messageHtml,
-      //     parse_mode: 'html',
-      //   })
-      //   .toPromise();
-    } catch (e) {
-      console.error('TELEGRAM', e);
-    }
-
-    return data;
+    this.errorCompanies = [];
+    this.error = undefined;
+    return employeeExamsData;
   }
 
   async addEmployeeExamTime(company: CompanyEntity) {
     const companyId = company.id;
+    const date = this.dayjs.dayjs(this.standardDate).toDate();
     try {
-      const allEmployees = await this.employeeRepository.findNude({
-        where: {
-          companyId,
-        },
-        select: {
-          id: true,
-          lastExam: true,
-          hierarchyId: true,
-          subOffices: { select: { id: true } },
-          examsHistory: {
-            select: { expiredDate: true, status: true, evaluationType: true },
-            where: {
-              exam: { isAttendance: true },
-              status: { in: ['DONE', 'PROCESSING', 'PENDING'] },
-            },
-            distinct: ['status'],
-            take: 2,
-            orderBy: { doneDate: 'desc' },
+      const allEmployees = (
+        await this.employeeRepository.findNude({
+          where: {
+            companyId,
+            hierarchyId: { not: null }, // dismissal not on where
           },
-        },
-      });
+          select: {
+            id: true,
+            lastExam: true,
+            expiredDateExam: true,
+            hierarchyId: true,
+            subOffices: { select: { id: true } },
+            examsHistory: {
+              select: {
+                doneDate: true,
+                expiredDate: true,
+                status: true,
+                evaluationType: true,
+                validityInMonths: true,
+              },
+              where: {
+                exam: { isAttendance: true },
+                status: { in: ['DONE', 'PROCESSING', 'PENDING'] },
+              },
+              orderBy: { doneDate: 'desc' },
+            },
+          },
+        })
+      ).map((e) => ({ ...e, expiredDateExamOld: e.expiredDateExam }));
 
       const allWithExam = [] as EmployeeEntity[];
       const allWithExamExpired = [] as EmployeeEntity[];
       const allWithExamSchedule = [] as EmployeeEntity[];
 
-      const missingExam = [] as EmployeeEntity[];
+      const allWithMissingExam = [] as EmployeeEntity[];
 
       allEmployees.forEach((employee) => {
-        if (employee?.examsHistory?.length > 0) {
+        const hasExam = employee?.examsHistory?.length > 0;
+        const missingExam = employee?.examsHistory?.length == 0;
+
+        if (hasExam) {
           //--> add expired Date
           const doneExamFound = employee.examsHistory.find((exam) => {
             const isDone = exam.status === 'DONE';
@@ -155,6 +226,7 @@ TOTAL: ${allCompanies.length}
               if (isExpired) allWithExamExpired.push(employee);
             } else {
               if (!doneExamFound && scheduleExamFound && employee.lastExam) {
+                console.log(employee.expiredDateExam);
                 const isExpired = this.dayjs
                   .dayjs(employee.expiredDateExam)
                   .isBefore(this.dayjs.dateNow());
@@ -173,8 +245,8 @@ TOTAL: ${allCompanies.length}
         }
 
         // missingExam
-        if (employee?.examsHistory?.length == 0) {
-          missingExam.push(employee);
+        if (missingExam) {
+          allWithMissingExam.push(employee);
         }
       });
 
@@ -185,7 +257,7 @@ TOTAL: ${allCompanies.length}
         },
       );
 
-      const getExpired = missingExam.map((employee) => {
+      const getExpired = allWithMissingExam.map((employee) => {
         const ids = [
           ...employee.subOffices.map(({ id }) => id),
           employee.hierarchyId,
@@ -221,6 +293,7 @@ TOTAL: ${allCompanies.length}
 
         const expired = expiredDate ? { expiredDate } : {};
 
+        if (expiredDate) employee.expiredDateExam = expiredDate;
         return { ...employee, ...expired };
       });
 
@@ -235,118 +308,73 @@ TOTAL: ${allCompanies.length}
         return false;
       });
 
-      //
-
-      const withExamAndExpired = await this.employeeRepository.findNude({
-        where: {
-          companyId,
-          examsHistory: {
-            some: { id: { gt: 0 } },
-            none: {
-              expiredDate: { gt: this.dayjs.dateNow() },
-              exam: { isAttendance: true },
-              status: 'DONE',
-            },
-          },
-        },
-        select: {
-          id: true,
-        },
-      });
-
-      const withSchedule = await this.employeeRepository.findNude({
-        where: {
-          companyId,
-          examsHistory: {
-            some: {
-              id: { gt: 0 },
-              doneDate: { gte: this.dayjs.dateNow() },
-              status: { in: ['PENDING', 'PROCESSING'] },
-              exam: { isAttendance: true },
-            },
-          },
-        },
-        select: {
-          id: true,
-        },
-      });
-
-      const missingExam2 = await this.employeeRepository.findNude({
-        where: { companyId, examsHistory: { none: { id: { gte: 0 } } } },
-        select: {
-          id: true,
-          name: true,
-          lastExam: true,
-          hierarchyId: true,
-          subOffices: { select: { id: true } },
-        },
-      });
-
-      const getExpired2 = missingExam2.map((employee) => {
-        const ids = [
-          ...employee.subOffices.map(({ id }) => id),
-          employee.hierarchyId,
-        ];
-
-        let expiredDate: Date;
-        exams.data.find(({ exam, origins }) => {
-          if (!exam.isAttendance) return false;
-
-          origins.find((origin) => {
-            const isPartOfHomo = origin?.homogeneousGroup
-              ? origin.homogeneousGroup?.hierarchyOnHomogeneous?.find(
-                  (homoHier) => ids.includes(homoHier?.hierarchy?.id),
-                )
-              : true;
-            if (!isPartOfHomo) return;
-
-            const skip = this.findExamByHierarchyService.checkIfSkipEmployee(
-              origin,
-              employee,
-            );
-            if (skip) return;
-
-            const expired = this.findExamByHierarchyService.checkExpiredDate(
-              origin,
-              employee,
-            );
-            if (!expired.expiredDate) return;
-            expiredDate = expired.expiredDate;
-            return true;
+      await asyncBatch(allEmployees, 100, async (e) => {
+        if (e.expiredDateExam && e.expiredDateExam != e.expiredDateExamOld)
+          await this.employeeRepository.updateNude({
+            where: { id: e.id },
+            data: { expiredDateExam: e.expiredDateExam },
           });
-        });
-
-        const expired = expiredDate ? { expiredDate } : {};
-
-        return { ...employee, ...expired };
+        if (e.expiredDateExam === null && e.expiredDateExamOld != date)
+          await this.employeeRepository.updateNude({
+            where: { id: e.id },
+            data: { expiredDateExam: date },
+          });
       });
 
-      const missingExamExpired2 = getExpired2.filter((e) => {
-        if (!e.expiredDate) return true;
-
-        const lastExamValid = this.dayjs
-          .dayjs(e.expiredDate)
-          .isAfter(this.dayjs.dayjs());
-
-        if (!lastExamValid) return true;
-        return false;
-      });
-
+      const _30_DaysFromNow = this.dayjs.addDay(this.dayjs.dateNow(), 30);
       return {
+        company,
+        all: allEmployees,
         allWithExam,
         allWithExamExpired,
         allWithExamSchedule,
+        allWithMissingExam,
         missingExamExpired,
-        exams: {
-          exams: exams.data,
-          withSchedule,
-          missingExam2,
-          expired: { missingExamExpired2, withExamAndExpired },
-        },
+        closeToExpire30: allEmployees.filter((e) => {
+          if (!e.expiredDateExam) return;
+
+          return (
+            this.dayjs.dayjs(_30_DaysFromNow).isAfter(e.expiredDateExam) &&
+            this.dayjs.dayjs().isBefore(e.expiredDateExam)
+          );
+        }),
+        closeToExpire90: allEmployees.filter((e) => {
+          if (!e.expiredDateExam) return;
+          const _90_DaysFromNow = this.dayjs.addDay(this.dayjs.dateNow(), 90);
+
+          return (
+            this.dayjs.dayjs(_90_DaysFromNow).isAfter(e.expiredDateExam) &&
+            this.dayjs.dayjs(_30_DaysFromNow).isBefore(e.expiredDateExam)
+          );
+        }),
       };
     } catch (e) {
       this.errorCompanies.push(companyId);
       this.error = e;
+    }
+  }
+
+  async telegramMessage(allCompanies: CompanyEntity[]) {
+    try {
+      const messageHtml = this.errorCompanies.length
+        ? `
+UPDATE ALL COMPANIES EXAMS:
+
+DONE: ${allCompanies.length - this.errorCompanies.length}
+ERRORS: ${this.errorCompanies.length}
+TOTAL: ${allCompanies.length}
+      `
+        : 'ALL GOOD';
+
+      await this.telegram
+        .sendMessage({
+          chat_id: this.chatId,
+          text: messageHtml,
+          parse_mode: 'html',
+        })
+        .toPromise();
+    } catch (e) {
+      console.error('TELEGRAM', e);
     }
   }
 }

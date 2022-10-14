@@ -177,9 +177,14 @@ export class EmployeeExamsHistoryRepository {
     }
 
     const response = await this.prisma.$transaction([
-      this.prisma.employeeExamsHistory.count({
-        where,
-      }),
+      options?.distinct
+        ? this.prisma.employeeExamsHistory.findMany({
+            where,
+            ...(options?.distinct && { distinct: options.distinct }),
+            select: { id: true },
+            take: 1000,
+          })
+        : this.prisma.employeeExamsHistory.count({ where }),
       this.prisma.employeeExamsHistory.findMany({
         where,
         take: pagination.take || 20,
@@ -191,7 +196,7 @@ export class EmployeeExamsHistoryRepository {
 
     return {
       data: response[1].map((data) => new EmployeeExamsHistoryEntity(data)),
-      count: response[0],
+      count: Array.isArray(response[0]) ? response[0].length : response[0],
     };
   }
 

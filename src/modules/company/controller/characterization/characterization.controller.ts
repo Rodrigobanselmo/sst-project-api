@@ -19,6 +19,7 @@ import {
   UpsertCharacterizationDto,
   AddPhotoCharacterizationDto,
   UpdatePhotoCharacterizationDto,
+  CopyCharacterizationDto,
 } from '../../dto/characterization.dto';
 import { DeleteCharacterizationService } from '../../services/characterization/delete-characterization/delete-characterization.service';
 import { FindAllCharacterizationService } from '../../services/characterization/find-all-characterization/find-all-characterization.service';
@@ -33,6 +34,7 @@ import {
   RoleEnum,
 } from '../../../../shared/constants/enum/authorization';
 import { Roles } from '../../../../shared/decorators/roles.decorator';
+import { CopyCharacterizationService } from '../../services/characterization/copy-characterization/copy-characterization.service';
 
 @ApiTags('characterizations')
 @Controller('/company/:companyId/workspace/:workspaceId/characterizations')
@@ -45,6 +47,7 @@ export class CharacterizationController {
     private readonly deleteCharacterizationPhotoService: DeleteCharacterizationPhotoService,
     private readonly findByIdCharacterizationService: FindByIdCharacterizationService,
     private readonly updateCharacterizationPhotoService: UpdateCharacterizationPhotoService,
+    private readonly copyCharacterizationService: CopyCharacterizationService,
   ) {}
 
   @Permissions({
@@ -161,6 +164,24 @@ export class CharacterizationController {
     return this.deleteCharacterizationService.execute(
       id,
       workspaceId,
+      userPayloadDto,
+    );
+  }
+
+  @Permissions({
+    code: PermissionEnum.CHARACTERIZATION,
+    isContract: true,
+    isMember: true,
+    crud: 'cu',
+  })
+  @Post('/copy')
+  async copy(
+    @Body() copyCharacterizationDto: CopyCharacterizationDto,
+    @Param('workspaceId') workspaceId: string,
+    @User() userPayloadDto: UserPayloadDto,
+  ) {
+    return this.copyCharacterizationService.execute(
+      { ...copyCharacterizationDto, workspaceId },
       userPayloadDto,
     );
   }

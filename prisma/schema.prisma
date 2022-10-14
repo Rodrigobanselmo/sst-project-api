@@ -449,17 +449,18 @@ model CompanyCharacterizationPhoto {
   companyEnvironment CompanyCharacterization @relation(fields: [companyCharacterizationId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
  }
 
+
 model CompanyReport {
   id    Int   @id  @default(autoincrement())
   lastDailyReport DateTime? 
   dailyReport Json?  
   created_at DateTime @default(now())
   updated_at  DateTime   @updatedAt
-  companyId String @unique
+  companyId String 
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
 
-
-  @@unique([id, companyId])
+  @@unique(companyId)
+  @@index(companyId)
 }
 model CompanyEnvironment {
   id   String    @id @default(uuid())

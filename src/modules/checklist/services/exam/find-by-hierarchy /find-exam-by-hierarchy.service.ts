@@ -29,6 +29,7 @@ export const getValidityInMonths = (
 @Injectable()
 export class FindExamByHierarchyService {
   private employee: EmployeeEntity;
+  private clinicExamCloseToExpire = 45;
 
   constructor(
     private readonly employeeRepository: EmployeeRepository,
@@ -473,13 +474,17 @@ export class FindExamByHierarchyService {
 
     if (!foundExamHistory?.expiredDate) return {};
 
+    const closeValidated =
+      examRisk.considerBetweenDays ||
+      (examRisk.exam.isAttendance ? this.clinicExamCloseToExpire : null);
+
     const closeToExpired =
-      examRisk.considerBetweenDays !== null &&
+      closeValidated !== null &&
       this.dayjs.compareTime(
         this.dayjs.dateNow(),
         foundExamHistory.expiredDate,
         'days',
-      ) <= examRisk.considerBetweenDays;
+      ) <= closeValidated;
 
     return {
       closeToExpired,

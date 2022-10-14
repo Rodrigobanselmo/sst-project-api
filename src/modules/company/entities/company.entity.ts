@@ -20,6 +20,7 @@ import { ContactEntity } from './contact.entity';
 import { CompanyStepEnum } from 'src/shared/constants/enum/stepCompany.enum';
 import { DocumentCoverEntity } from './document-cover.entity';
 import { CompanyClinicsEntity } from './company-clinics.entity';
+import { CompanyReportEntity } from './report.entity';
 
 export class CompanyEntity implements Company {
   @ApiProperty({ description: 'The id of the Company' })
@@ -127,6 +128,7 @@ export class CompanyEntity implements Company {
   companiesToClinicAvailable: CompanyClinicsEntity;
   clinicsAvailable: CompanyClinicsEntity;
   clinicExams: ExamToClinicEntity[];
+  report: CompanyReportEntity;
   riskDegree?: number;
   isGroup: boolean;
   companyGroupId: number;

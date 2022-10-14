@@ -747,7 +747,7 @@ export class CompanyRepository implements ICompanyRepository {
     const include = options?.include || {};
 
     const employeeCount = await this.prisma.employee.count({
-      where: { companyId: id },
+      where: { companyId: id, hierarchyId: { not: null } },
     });
 
     const riskGroupCount = await this.prisma.riskFactorGroupData.count({

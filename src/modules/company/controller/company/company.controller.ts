@@ -73,8 +73,8 @@ export class CompanyController {
     @User() userPayloadDto: UserPayloadDto,
     @Query() query: FindCompanyDashDto,
   ) {
-    // return this.dashboardCompanyService.execute(query, userPayloadDto);
-    return this.updateAllCompaniesService.execute(userPayloadDto);
+    return this.dashboardCompanyService.execute(query, userPayloadDto);
+    // return this.updateAllCompaniesService.execute(userPayloadDto);
   }
 
   @Roles(RoleEnum.COMPANY, RoleEnum.CONTRACTS, RoleEnum.CLINICS, RoleEnum.USER)

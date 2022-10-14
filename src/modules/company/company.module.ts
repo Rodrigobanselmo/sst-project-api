@@ -113,6 +113,7 @@ import { UpdateAllCompaniesService } from './services/report/update-all-companie
 import { DashboardCompanyService } from './services/report/dashboard-company/dashboard-company.service';
 import { TelegramModule } from 'nestjs-telegram';
 import { CompanyReportRepository } from './repositories/implementations/CompanyReportRepository';
+import { CopyCharacterizationService } from './services/characterization/copy-characterization/copy-characterization.service';
 
 @Module({
   imports: [
@@ -236,6 +237,7 @@ import { CompanyReportRepository } from './repositories/implementations/CompanyR
     EmployeeExamCronService,
     DashboardCompanyService,
     CompanyReportRepository,
+    CopyCharacterizationService,
   ],
   exports: [
     CompanyRepository,

@@ -243,7 +243,9 @@ export class EmployeeExamHistoryController {
     },
     {
       code: PermissionEnum.CLINIC_SCHEDULE,
+      isContract: true,
       isMember: true,
+      crud: true,
     },
   )
   @Post('/update-many-schedule/:companyId?')

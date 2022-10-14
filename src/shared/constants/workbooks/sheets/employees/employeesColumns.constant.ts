@@ -43,7 +43,7 @@ export const employeesColumnsConstant = [
     databaseName: 'admissionDate',
     excelName: 'Admissão',
     isArray: false,
-    required: false,
+    required: true,
     checkHandler: checkIsValidDate,
   },
   {

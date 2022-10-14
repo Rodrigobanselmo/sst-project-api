@@ -96,6 +96,12 @@ export class EmployeeRepository {
     return new EmployeeEntity(employee);
   }
 
+  async updateNude(options: Prisma.EmployeeUpdateArgs) {
+    const employee = await this.prisma.employee.update(options);
+
+    return new EmployeeEntity(employee);
+  }
+
   async upsertMany(
     upsertEmployeeMany: (CreateEmployeeDto & {
       id: number;
@@ -238,7 +244,12 @@ export class EmployeeRepository {
       AND: [],
       ...options.where,
     } as typeof options.where;
-    const select: Prisma.EmployeeSelect = {
+
+    options.orderBy = {
+      name: 'asc',
+    };
+
+    options.select = {
       id: true,
       cpf: true,
       email: true,
@@ -250,7 +261,7 @@ export class EmployeeRepository {
     };
 
     if ('all' in query) {
-      select.company = {
+      options.select.company = {
         select: { fantasy: true, name: true, cnpj: true, initials: true },
       };
 
@@ -270,9 +281,32 @@ export class EmployeeRepository {
       delete query.companyId;
     }
 
+    if ('expiredExam' in query) {
+      options.orderBy = [{ expiredDateExam: 'asc' }, { name: 'asc' }];
+      options.select.expiredDateExam = true;
+      options.select.examsHistory = {
+        select: {
+          status: true,
+          id: true,
+          doneDate: true,
+          evaluationType: true,
+          hierarchyId: true,
+          subOfficeId: true,
+          examType: true,
+          expiredDate: true,
+        },
+        where: {
+          exam: { isAttendance: true },
+          status: { in: ['PENDING', 'PROCESSING', 'DONE'] },
+        },
+        take: 1,
+        orderBy: { created_at: 'desc' },
+      };
+    }
+
     const { where } = prismaFilter(whereInit, {
       query,
-      skip: ['search', 'hierarchySubOfficeId', 'all'],
+      skip: ['search', 'hierarchySubOfficeId', 'all', 'expiredExam'],
     });
 
     if ('search' in query) {
@@ -308,12 +342,10 @@ export class EmployeeRepository {
         where,
       }),
       this.prisma.employee.findMany({
-        ...options,
-        select,
-        where,
         take: pagination.take || 20,
         skip: pagination.skip || 0,
-        orderBy: { name: 'asc' },
+        ...options,
+        where,
       }),
     ]);
 

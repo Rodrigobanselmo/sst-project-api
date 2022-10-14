@@ -12,11 +12,12 @@ import { UpdateAllCompaniesService } from '../../services/report/update-all-comp
 @Injectable()
 export class EmployeeExamCronService {
   constructor(
-    private readonly dashboardCompanyService: UpdateAllCompaniesService,
+    private readonly updateAllCompaniesService: UpdateAllCompaniesService,
   ) {}
 
-  @Cron(CronExpression.EVERY_11_HOURS)
+  @Cron(CronExpression.EVERY_DAY_AT_11PM)
+  // @Cron(CronExpression.EVERY_5_SECONDS)
   async handleCron() {
-    this.dashboardCompanyService.execute();
+    this.updateAllCompaniesService.execute();
   }
 }

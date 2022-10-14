@@ -55,6 +55,7 @@ export class PrismaDbExceptionFilter implements ExceptionFilter {
       console.log(`error`, exception);
       console.log('Do something to warn me');
     }
+
     response.status(status).json({
       statusCode: status,
       timestamp: new Date().toISOString(),
