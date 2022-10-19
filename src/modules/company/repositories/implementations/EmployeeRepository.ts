@@ -112,7 +112,6 @@ export class EmployeeRepository {
     const employeeHistory = await this.prisma.employeeHierarchyHistory.findMany(
       { where: { hierarchy: { companyId } }, include: { employee: true } },
     );
-
     const data = await this.prisma.$transaction(
       upsertEmployeeMany.map(
         ({

@@ -1,5 +1,5 @@
-import { FindDocPgrDto } from './../../../dto/doc-pgr.dto';
-import { UserPayloadDto } from './../../../../../shared/dto/user-payload.dto';
+import { FindDocVersionDto } from '../../../dto/doc-version.dto';
+import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { Injectable } from '@nestjs/common';
 import { RiskDocumentRepository } from '../../../repositories/implementations/RiskDocumentRepository';
 
@@ -10,15 +10,13 @@ export class FindDocumentsService {
   ) {}
 
   async execute(
-    riskGroupId: string,
-    { skip, take, ...query }: FindDocPgrDto,
+    { skip, take, ...query }: FindDocVersionDto,
     user: UserPayloadDto,
   ) {
     const companyId = user.targetCompanyId;
 
     const riskGroupData = await this.riskDocumentRepository.find(
       {
-        riskGroupId,
         companyId,
         ...query,
       },

@@ -16,7 +16,7 @@ import { hierarchyPrioritizationTableSections } from '../../../docx/components/t
 import { hierarchyRisksTableSections } from '../../../docx/components/tables/hierarchyRisks/hierarchyRisks.section';
 import { riskCharacterizationTableSection } from '../../../docx/components/tables/riskCharacterization/riskCharacterization.section';
 import { hierarchyConverter } from '../../../docx/converter/hierarchy.converter';
-import { UpsertPgrDto } from '../../../dto/pgr.dto';
+import { UpsertDocumentDto } from '../../../dto/pgr.dto';
 
 @Injectable()
 export class PgrUploadTableService {
@@ -26,7 +26,10 @@ export class PgrUploadTableService {
     private readonly amazonStorageProvider: AmazonStorageProvider,
     private readonly hierarchyRepository: HierarchyRepository,
   ) {}
-  async execute(upsertPgrDto: UpsertPgrDto, userPayloadDto: UserPayloadDto) {
+  async execute(
+    upsertPgrDto: UpsertDocumentDto,
+    userPayloadDto: UserPayloadDto,
+  ) {
     const companyId = userPayloadDto.targetCompanyId;
     const workspaceId = upsertPgrDto.workspaceId;
 
@@ -94,7 +97,7 @@ export class PgrUploadTableService {
   private async upload(
     fileBuffer: Buffer,
     fileName: string,
-    upsertPgrDto: UpsertPgrDto,
+    upsertPgrDto: UpsertDocumentDto,
     company: Partial<CompanyEntity>,
   ) {
     const { url } = await this.amazonStorageProvider.upload({

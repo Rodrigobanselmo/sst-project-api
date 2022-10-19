@@ -6,7 +6,7 @@ import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { ErrorDocumentEnum } from '../../../../../shared/constants/enum/errorMessage';
 
 @Injectable()
-export class PgrDownloadAttachmentsService {
+export class DownloadAttachmentsService {
   constructor(
     private readonly amazonStorageProvider: AmazonStorageProvider,
     private readonly riskDocumentRepository: RiskDocumentRepository,

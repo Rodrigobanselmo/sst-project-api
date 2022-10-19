@@ -6,34 +6,43 @@ import { ExcelProvider } from '../../shared/providers/ExcelProvider/implementati
 import { ChecklistModule } from '../checklist/checklist.module';
 import { CompanyModule } from '../company/company.module';
 import { DocumentsPgrController } from './controller/pgr.controller';
-import { PgrDownloadService } from './services/pgr/document/download-pgr-doc.service';
+import { DownloadDocumentService } from './services/pgr/document/download-doc.service';
 import { PgrUploadService } from './services/pgr/document/upload-pgr-doc.service';
 import { PgrDownloadTableService } from './services/pgr/tables/download-pgr-table.service';
 import { PgrUploadTableService } from './services/pgr/tables/upload-pgr-table.service';
 import { DayJSProvider } from '../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { UsersModule } from '../users/users.module';
-import { PgrDownloadAttachmentsService } from './services/pgr/document/download-pgr-attachment-doc.service';
-import { AddQueuePGRDocumentService } from './services/pgr/document/add-queue-pgr-doc.service';
-import { PgrConsumer } from './consumers/pgr/documents.consumer';
+import { DownloadAttachmentsService } from './services/pgr/document/download-attachment-doc.service';
+import { AddQueueDocumentService } from './services/pgr/document/add-queue-doc.service';
+import { PgrConsumer } from './consumers/document/documents.consumer';
 import { PgrActionPlanUploadTableService } from './services/pgr/action-plan/upload-action-plan-table.service';
 import { DocumentsPdfController } from './controller/pdf.controller';
+import { PcmsoUploadService } from './services/pgr/document/upload-pcmso-doc.service';
+import { DocumentsPcmsoController } from './controller/pcmso.controller';
+// import { DocumentsBaseController } from './controller/doc.controller';
 
 @Module({
-  controllers: [DocumentsPgrController, DocumentsPdfController],
+  controllers: [
+    DocumentsPgrController,
+    DocumentsPdfController,
+    DocumentsPcmsoController,
+  ],
   imports: [ChecklistModule, CompanyModule, UsersModule],
   providers: [
     ExcelProvider,
-    PgrDownloadService,
+    DownloadDocumentService,
     PgrUploadService,
     PgrDownloadTableService,
     PgrUploadTableService,
     DayJSProvider,
     AmazonStorageProvider,
-    PgrDownloadAttachmentsService,
-    AddQueuePGRDocumentService,
+    DownloadAttachmentsService,
+    AddQueueDocumentService,
     PgrConsumer,
     PgrActionPlanUploadTableService,
     PdfGuideDataService,
+    PcmsoUploadService,
+    // DocumentsBaseController,
   ],
 })
 export class DocumentsModule {}

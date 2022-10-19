@@ -80,9 +80,11 @@ export class CreateEmployeeDto {
   })
   sex: SexTypeEnum;
 
+  // @IsString({ each: true })
   @IsString()
   @IsOptional()
   cidId: string;
+  // cidId: string[];
 
   @IsInt()
   @IsOptional()

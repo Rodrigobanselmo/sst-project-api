@@ -2,6 +2,7 @@ import { ProfessionalEntity } from './../../users/entities/professional.entity';
 import {
   RiskFactorGroupDataToUser,
   RiskFactorGroupDataToProfessional,
+  DocumentPCMSOToProfessional,
 } from '@prisma/client';
 
 import { UserEntity } from './../../users/entities/user.entity';
@@ -28,6 +29,18 @@ export class ProfessionalRiskGroupEntity
   professional?: ProfessionalEntity;
 
   constructor(partial: Partial<ProfessionalRiskGroupEntity>) {
+    Object.assign(this, partial);
+  }
+}
+
+export class ProfessionalPCMSOEntity implements DocumentPCMSOToProfessional {
+  documentPCMSOId: string;
+  professionalId: number;
+  isSigner: boolean;
+  isElaborator: boolean;
+  professional?: ProfessionalEntity;
+
+  constructor(partial: Partial<ProfessionalPCMSOEntity>) {
     Object.assign(this, partial);
   }
 }

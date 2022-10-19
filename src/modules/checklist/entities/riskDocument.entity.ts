@@ -30,7 +30,6 @@ export class RiskDocumentEntity implements RiskFactorDocument {
   fileUrl: string;
   description: string;
   version: string;
-  riskGroupId: string;
   updated_at: Date;
   workspaceName: string;
   workspaceId: string;
@@ -40,6 +39,9 @@ export class RiskDocumentEntity implements RiskFactorDocument {
   validity: string;
   complementaryDocs: string[];
   attachments: AttachmentEntity[];
+
+  riskGroupId: string;
+  pcmsoId: string;
 
   constructor(partial: Partial<RiskDocumentEntity>) {
     Object.assign(this, partial);

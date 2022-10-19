@@ -36,7 +36,7 @@ export class RiskGroupDataRepository {
         where: { id_companyId: { companyId, id: id || 'not-found' } },
         include: {
           usersSignatures: !!users,
-          professionalsSignatures: !!users,
+          professionalsSignatures: !!professionals,
         },
       });
 
@@ -66,9 +66,9 @@ export class RiskGroupDataRepository {
 
     if (professionals) {
       if (riskFactorGroupDataEntity.professionalsSignatures?.length) {
-        await this.prisma.riskFactorGroupDataToUser.deleteMany({
+        await this.prisma.riskFactorGroupDataToProfessional.deleteMany({
           where: {
-            userId: {
+            professionalId: {
               in: m2mGetDeletedIds(
                 riskFactorGroupDataEntity.professionalsSignatures,
                 professionals,

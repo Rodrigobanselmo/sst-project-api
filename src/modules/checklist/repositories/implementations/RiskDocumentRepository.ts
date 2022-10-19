@@ -7,7 +7,7 @@ import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { UpsertRiskDocumentDto } from '../../dto/risk-document.dto';
 import { RiskDocumentEntity } from '../../entities/riskDocument.entity';
-import { FindDocPgrDto } from '../../dto/doc-pgr.dto';
+import { FindDocVersionDto } from '../../dto/doc-version.dto';
 
 @Injectable()
 export class RiskDocumentRepository {
@@ -55,7 +55,7 @@ export class RiskDocumentRepository {
   }
 
   async find(
-    query: Partial<FindDocPgrDto & { companyId: string; riskGroupId: string }>,
+    query: Partial<FindDocVersionDto & { companyId: string }>,
     pagination: PaginationQueryDto,
     options: Prisma.RiskFactorDocumentFindManyArgs = {},
   ) {
@@ -66,12 +66,24 @@ export class RiskDocumentRepository {
 
     const { where } = prismaFilter(whereInit, {
       query,
-      skip: ['search'],
+      skip: ['search', 'isPCMSO', 'isPGR'],
     });
 
     if ('search' in query) {
       (where.AND as any).push({
         OR: [{ name: { contains: query.search, mode: 'insensitive' } }],
+      } as typeof options.where);
+    }
+
+    if ('isPCMSO' in query) {
+      (where.AND as any).push({
+        pcmsoId: { not: null },
+      } as typeof options.where);
+    }
+
+    if ('isPGR' in query) {
+      (where.AND as any).push({
+        riskGroupId: { not: null },
       } as typeof options.where);
     }
 

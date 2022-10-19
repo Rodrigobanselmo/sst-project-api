@@ -11,7 +11,7 @@ export interface ITableSchema {
   required: boolean;
   checkHandler: (value: any) => string | false | true;
   isId?: boolean;
-  isArray?: boolean;
+  isArray?: boolean | string;
   notes?: (
     prisma: PrismaService,
     companyId: string,

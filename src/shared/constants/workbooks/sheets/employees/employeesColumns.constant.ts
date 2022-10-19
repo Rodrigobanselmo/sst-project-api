@@ -16,6 +16,7 @@ import {
 } from '../../../../utils/translate/statusEnum.translate';
 import { checkIsEnum } from '../../../../utils/validators/checkIsEnum';
 import { checkIsString } from '../../../../utils/validators/checkIsString';
+import { checkIsValidCid } from '../../../../../shared/utils/validators/checkIsValidCid';
 
 export const employeesColumnsConstant = [
   {
@@ -31,6 +32,13 @@ export const employeesColumnsConstant = [
     isArray: false,
     required: true,
     checkHandler: checkIsString,
+  },
+  {
+    databaseName: 'cid',
+    excelName: 'CID',
+    isArray: false,
+    required: false,
+    checkHandler: checkIsValidCid,
   },
   {
     databaseName: 'birthday',
@@ -149,6 +157,13 @@ export const employeesColumnsConstant = [
   {
     databaseName: 'lastExam',
     excelName: 'Data último exame',
+    isArray: false,
+    required: false,
+    checkHandler: checkIsValidDate,
+  },
+  {
+    databaseName: 'updated_at',
+    excelName: 'Última atualização',
     isArray: false,
     required: false,
     checkHandler: checkIsValidDate,

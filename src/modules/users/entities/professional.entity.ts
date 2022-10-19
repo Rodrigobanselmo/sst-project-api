@@ -1,4 +1,7 @@
-import { ProfessionalRiskGroupEntity } from './../../checklist/entities/usersRiskGroup';
+import {
+  ProfessionalPCMSOEntity,
+  ProfessionalRiskGroupEntity,
+} from './../../checklist/entities/usersRiskGroup';
 import { Professional, ProfessionalTypeEnum, StatusEnum } from '@prisma/client';
 import { UserEntity } from './user.entity';
 import { InviteUsersEntity } from './invite-users.entity';
@@ -23,11 +26,14 @@ export class ProfessionalEntity implements Professional {
   status: StatusEnum;
   user?: UserEntity;
   userId: number;
-  professionalPgrSignature?: ProfessionalRiskGroupEntity;
-  professionalsPgrSignatures?: ProfessionalRiskGroupEntity[];
   invite: InviteUsersEntity;
   inviteId: string;
   councils?: CouncilEntity[];
+  professionalPgrSignature?: ProfessionalRiskGroupEntity;
+  professionalsPgrSignatures?: ProfessionalRiskGroupEntity[];
+
+  professionalPcmsoSignature?: ProfessionalPCMSOEntity;
+  professionalsPcmsoSignatures?: ProfessionalPCMSOEntity[];
 
   constructor(partial: Partial<ProfessionalEntity & { councils: any }>) {
     Object.assign(this, partial);

@@ -5,12 +5,33 @@ import { PrismaService } from '../../../../prisma/prisma.service';
 import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
 
 import { prismaFilter } from '../../../../shared/utils/filters/prisma.filters';
-import { FindCidDto } from '../../dto/cid.dto';
+import { CidDto, FindCidDto } from '../../dto/cid.dto';
 import { CidEntity } from '../../entities/cid.entity';
+
+let i = 0;
 
 @Injectable()
 export class CidRepository {
   constructor(private prisma: PrismaService) {}
+
+  async upsertMany(cidsDto: CidDto[]) {
+    i++;
+    console.log('batch' + i);
+    const data = await this.prisma.$transaction(
+      cidsDto.map(({ cid, ...rest }) =>
+        this.prisma.cid.upsert({
+          where: { cid },
+          create: {
+            ...rest,
+            cid,
+          },
+          update: rest,
+        }),
+      ),
+    );
+
+    return data.map((cid) => new CidEntity(cid));
+  }
 
   async find(
     query: Partial<FindCidDto>,

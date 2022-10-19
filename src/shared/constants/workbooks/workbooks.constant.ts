@@ -1,4 +1,5 @@
 import { WorkbooksEnum } from '../../../shared/constants/workbooks/workbooks.enum';
+import { cidSheetConstant } from './sheets/cid/cidSheet.constant';
 import { cnaeSheetConstant } from './sheets/cnae/cnaeSheet.constant';
 import { companySheetConstant } from './sheets/company/companySheet.constant';
 import { companyUniqueSheetConstant } from './sheets/companyUnique/companyUniqueSheet.constant';
@@ -48,5 +49,11 @@ export const workbooksConstant = {
     id: WorkbooksEnum.CNAE,
     sheets: cnaeSheetConstant,
     path: 'files/cnae',
+  },
+  [WorkbooksEnum.CID]: {
+    name: 'CID',
+    id: WorkbooksEnum.CID,
+    sheets: cidSheetConstant,
+    path: 'files/cid',
   },
 };

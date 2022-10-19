@@ -334,6 +334,7 @@ model Company {
   riskFactorData RiskFactorData[] 
   riskFactorDataRec RiskFactorDataRec[] 
   riskFactorDocument RiskFactorDocument[] 
+  documentPCMSO DocumentPCMSO?
   riskFactorGroupData RiskFactorGroupData[] 
   riskFactors RiskFactors[] 
   secondary_activity Activity[] @relation(name: "secondary_activity")
@@ -559,16 +560,6 @@ model DatabaseTable {
   @@id([id, companyId])
 } 
 
-model DocumentCover {
-  id    Int   @id  @default(autoincrement())
-  name String?
-  json Json
-  companyId String
-  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
-  acceptType CoverTypeEnum[]  
-
-  @@unique([id, companyId])
-}
 
 model Document {
   id    Int   @id  @default(autoincrement())
@@ -594,6 +585,38 @@ model Document {
   @@index(companyId)
   @@index(parentDocumentId)
 } 
+
+model DocumentCover {
+  id    Int   @id  @default(autoincrement())
+  name String?
+  json Json
+  companyId String
+  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
+  acceptType CoverTypeEnum[]  
+
+  @@unique([id, companyId])
+}
+
+model DocumentPCMSO {
+  id    String   @id  @default(uuid())
+  name String?
+  created_at DateTime @default(now())
+  companyId String @unique
+  elaboratedBy String?
+  coordinatorBy String?
+  revisionBy String?
+  approvedBy String?
+  // validity String?
+  validityStart DateTime?
+  validityEnd DateTime?
+  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  docs RiskFactorDocument[]
+  status StatusEnum @default(PROGRESS)
+  professionalsSignatures DocumentPCMSOToProfessional[]
+  // usersSignatures RiskFactorGroupDataToUser[]
+
+  @@unique([id, companyId])
+}
 
 model Employee {
   id    Int   @id  @default(autoincrement())
@@ -984,7 +1007,6 @@ model Professional {
   type ProfessionalTypeEnum? @default(USER)
   companyId String?
   company Company? @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
-  professionalPgrSignature RiskFactorGroupDataToProfessional[]
   status StatusEnum @default(ACTIVE)
   userId Int? @unique
   user User? @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
@@ -994,6 +1016,8 @@ model Professional {
   inviteId String? @unique
   invite InviteUsers? @relation(fields: [inviteId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   examDoctorHistory EmployeeExamsHistory[]  
+  professionalPgrSignature RiskFactorGroupDataToProfessional[]
+  professionalPcmsoSignature DocumentPCMSOToProfessional[]
   councils ProfessionalCouncil[]  
 
   @@unique([id, companyId])
@@ -1117,7 +1141,8 @@ model RiskFactorDocument {
   description String @default("")
   version String  @default("1.0.0")
   companyId String
-  riskGroupId String
+  riskGroupId String?
+  pcmsoId String?
   workspaceName String
   workspaceId String
   elaboratedBy String?
@@ -1129,7 +1154,8 @@ model RiskFactorDocument {
   created_at DateTime @default(now())
   updated_at  DateTime   @updatedAt
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  riskGroup RiskFactorGroupData @relation(fields: [riskGroupId, companyId], references: [id, companyId], onDelete: Restrict, onUpdate: Cascade)
+  riskGroup RiskFactorGroupData? @relation(fields: [riskGroupId, companyId], references: [id, companyId], onDelete: Restrict, onUpdate: Cascade)
+  pcmso DocumentPCMSO? @relation(fields: [pcmsoId, companyId], references: [id, companyId], onDelete: Restrict, onUpdate: Cascade)
   attachments Attachments[]
   @@unique([id, companyId])
 } 
@@ -1188,6 +1214,18 @@ model RiskFactorGroupDataToProfessional {
 
   @@id([riskFactorGroupDataId, professionalId])
   @@map("_ProfessionalToRiskFactorGroupData")
+} 
+
+model DocumentPCMSOToProfessional {
+  documentPCMSOId    String   @map("B") 
+  professionalId Int @map("A") 
+  documentPCMSO DocumentPCMSO  @relation(fields: [documentPCMSOId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  professional Professional  @relation(fields: [professionalId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  isSigner Boolean @default(false)
+  isElaborator Boolean @default(false)
+
+  @@id([documentPCMSOId, professionalId])
+  @@map("_DocumentPCMSOToProfessional")
 } 
 
 model RiskFactorData {

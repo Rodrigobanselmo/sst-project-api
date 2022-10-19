@@ -173,6 +173,7 @@ export class UploadEmployeesService {
       delete employee.realDescription;
       delete employee.workspaceIds;
       delete employee.ghoName;
+      delete employee.updated_at;
       return employee;
     });
 

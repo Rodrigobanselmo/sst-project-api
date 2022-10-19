@@ -4,31 +4,23 @@ import { PermissionEnum } from '../../../shared/constants/enum/authorization';
 import { Permissions } from '../../../shared/decorators/permissions.decorator';
 import { User } from '../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../shared/dto/user-payload.dto';
-import {
-  UploadPgrActionPlanDto,
-  UpsertDocumentDto,
-  UpsertPgrDocumentDto,
-} from '../dto/pgr.dto';
-import { PgrActionPlanUploadTableService } from '../services/pgr/action-plan/upload-action-plan-table.service';
+import { UpsertDocumentDto, UpsertPcmsoDocumentDto } from '../dto/pgr.dto';
 import { AddQueueDocumentService } from '../services/pgr/document/add-queue-doc.service';
 import { DownloadAttachmentsService } from '../services/pgr/document/download-attachment-doc.service';
 import { DownloadDocumentService } from '../services/pgr/document/download-doc.service';
-import { PgrUploadService } from '../services/pgr/document/upload-pgr-doc.service';
-import { PgrUploadTableService } from '../services/pgr/tables/upload-pgr-table.service';
+import { PcmsoUploadService } from '../services/pgr/document/upload-pcmso-doc.service';
 
-@Controller('documents/pgr')
-export class DocumentsPgrController {
+@Controller('documents/pcmso')
+export class DocumentsPcmsoController {
   constructor(
-    private readonly pgrDownloadAttachmentsService: DownloadAttachmentsService,
-    private readonly pgrUploadService: PgrUploadTableService,
-    private readonly pgrActionPlanUploadTableService: PgrActionPlanUploadTableService,
-    private readonly pgrDownloadDocService: DownloadDocumentService,
-    private readonly pgrUploadDocService: PgrUploadService,
-    private readonly addQueuePGRDocumentService: AddQueueDocumentService,
+    private readonly pcmsoDownloadAttachmentsService: DownloadAttachmentsService,
+    private readonly pcmsoDownloadDocService: DownloadDocumentService,
+    private readonly pcmsoUploadDocService: PcmsoUploadService,
+    private readonly addQueuePCMSODocumentService: AddQueueDocumentService,
   ) {}
 
   @Permissions({
-    code: PermissionEnum.PGR,
+    code: PermissionEnum.PCMSO,
     isMember: true,
     isContract: true,
   })
@@ -40,7 +32,7 @@ export class DocumentsPgrController {
     @Param('attachmentId') attachmentId: string,
   ) {
     const { fileKey, fileStream } =
-      await this.pgrDownloadAttachmentsService.execute(
+      await this.pcmsoDownloadAttachmentsService.execute(
         userPayloadDto,
         docId,
         attachmentId,
@@ -60,17 +52,17 @@ export class DocumentsPgrController {
   }
 
   @Permissions({
-    code: PermissionEnum.PGR,
+    code: PermissionEnum.PCMSO,
     isMember: true,
     isContract: true,
   })
   @Get('/:docId/:companyId?')
-  async downloadPGR(
+  async downloadPCMSO(
     @Res() res,
     @User() userPayloadDto: UserPayloadDto,
     @Param('docId') docId: string,
   ) {
-    const { fileKey, fileStream } = await this.pgrDownloadDocService.execute(
+    const { fileKey, fileStream } = await this.pcmsoDownloadDocService.execute(
       userPayloadDto,
       docId,
     );
@@ -89,70 +81,40 @@ export class DocumentsPgrController {
   }
 
   @Permissions({
-    code: PermissionEnum.PGR,
+    code: PermissionEnum.PCMSO,
     isMember: true,
     isContract: true,
     crud: true,
   })
   @Post()
-  async uploadPGRDoc(
+  async uploadPCMSODoc(
     @Res() res,
     @User() userPayloadDto: UserPayloadDto,
-    @Body() upsertPgrDto: UpsertPgrDocumentDto,
+    @Body() upsertPcmsoDto: UpsertPcmsoDocumentDto,
   ) {
-    const { buffer: file, fileName } = await this.pgrUploadDocService.execute({
-      ...upsertPgrDto,
-      companyId: userPayloadDto.targetCompanyId,
-    });
-    res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
-    res.send(file);
-  }
-
-  @Permissions(
-    {
-      code: PermissionEnum.PGR,
-      isMember: true,
-      isContract: true,
-      crud: true,
-    },
-    {
-      code: PermissionEnum.ACTION_PLAN,
-      isMember: true,
-      isContract: true,
-    },
-  )
-  @Post('action-plan')
-  async uploadPGRActionPlanDoc(
-    @Res() res,
-    @User() userPayloadDto: UserPayloadDto,
-    @Body() upsertPgrDto: UploadPgrActionPlanDto,
-  ) {
-    const { buffer: file, fileName } =
-      await this.pgrActionPlanUploadTableService.execute(
-        upsertPgrDto,
-        userPayloadDto,
-      );
-
+    const { buffer: file, fileName } = await this.pcmsoUploadDocService.execute(
+      {
+        ...upsertPcmsoDto,
+        companyId: userPayloadDto.targetCompanyId,
+      },
+    );
     res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
     res.send(file);
   }
 
   @Permissions({
-    code: PermissionEnum.PGR,
+    code: PermissionEnum.PCMSO,
     isMember: true,
     isContract: true,
     crud: true,
   })
   @Post('/add-queue')
-  async addQueuePGRDoc(
-    @User() userPayloadDto: UserPayloadDto,
-    @Body() upsertPgrDto: UpsertDocumentDto,
+  async addQueuePCMSODoc(
+    @User() user: UserPayloadDto,
+    @Body() dto: UpsertDocumentDto,
   ) {
-    upsertPgrDto.isPGR = true;
-    return this.addQueuePGRDocumentService.execute(
-      upsertPgrDto,
-      userPayloadDto,
-    );
+    dto.isPCMSO = true;
+    return this.addQueuePCMSODocumentService.execute(dto, user);
   }
 }
 

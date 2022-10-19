@@ -1,9 +1,10 @@
+import { UpsertDocumentPCMSOService } from './services/documentPcmso/upsert-document-pcmso/upsert-document-pcmso.service';
 import { Module, forwardRef } from '@nestjs/common';
 import { DayJSProvider } from '../../shared/providers/DateProvider/implementations/DayJSProvider';
 
 import { CompanyModule } from '../company/company.module';
 import { ChecklistController } from './controller/checklist/checklist.controller';
-import { DocumentPgrController } from './controller/doc-pgr/doc-pgr.controller';
+import { DocumentPgrController } from './controller/doc-version/doc-version.controller';
 import { EpiController } from './controller/epi/epi.controller';
 import { ExamToClinicController } from './controller/exam-to-clinic/exam-to-clinic.controller';
 import { ExamRiskController } from './controller/exam-to-risk/examToRisk.controller';
@@ -16,6 +17,7 @@ import { RiskDocInfoController } from './controller/risk-doc-info/risk-doc-info.
 import { RiskGroupDataController } from './controller/risk-group-data/risk-group-data.controller';
 import { RiskController } from './controller/risk/risk.controller';
 import { ChecklistRepository } from './repositories/implementations/ChecklistRepository';
+import { DocumentPCMSORepository } from './repositories/implementations/DocumentPCMSORepository';
 import { EpiRepository } from './repositories/implementations/EpiRepository';
 import { ExamRepository } from './repositories/implementations/ExamRepository';
 import { ExamRiskRepository } from './repositories/implementations/ExamRiskRepository';
@@ -51,8 +53,8 @@ import { UpdateExamRiskService } from './services/examToRisk/update-exam/update-
 import { CreateGenerateSourceService } from './services/generate-source/create-generate-source/create-generate-source.service';
 import { DeleteSoftGenerateSourceService } from './services/generate-source/delete-soft-generate-source/delete-soft-generate-source.service';
 import { UpdateGenerateSourceService } from './services/generate-source/update-generate-source/update-generate-source.service';
-import { FindByIdDocumentsService } from './services/pgr-doc/find-by-id-documents/find-by-id-documents.service';
-import { FindDocumentsService } from './services/pgr-doc/find-documents/find-documents.service';
+import { FindByIdDocumentsService } from './services/docVersion/find-by-id-documents/find-by-id-documents.service';
+import { FindDocumentsService } from './services/docVersion/find-documents/find-documents.service';
 import { CreateRecMedService } from './services/rec-med/create-rec-med/create-rec-med.service';
 import { DeleteSoftRecMedService } from './services/rec-med/delete-soft-rec-med/delete-soft-rec-med.service';
 import { UpdateRecMedService } from './services/rec-med/update-rec-med/update-rec-med.service';
@@ -74,6 +76,8 @@ import { FindAllAvailableRiskService } from './services/risk/find-all-available-
 import { FindRisksByCompanyService } from './services/risk/find-by-company/find-by-company.service';
 import { FindRiskService } from './services/risk/find/find.service';
 import { UpdateRiskService } from './services/risk/update-risk/update-risk.service';
+import { FindByIdDocumentPCMSOService } from './services/documentPcmso/find-by-id/find-by-id.service';
+import { DocumentPCMSOController } from './controller/document-pcmso/document-pcmso.controller';
 
 @Module({
   controllers: [
@@ -90,6 +94,7 @@ import { UpdateRiskService } from './services/risk/update-risk/update-risk.servi
     ExamToClinicController,
     ExamRiskController,
     RiskDocInfoController,
+    DocumentPCMSOController,
   ],
   providers: [
     ChecklistRepository,
@@ -152,6 +157,9 @@ import { UpdateRiskService } from './services/risk/update-risk/update-risk.servi
     CopyExamRiskService,
     CopyExamToClinicService,
     FindRiskService,
+    DocumentPCMSORepository,
+    UpsertDocumentPCMSOService,
+    FindByIdDocumentPCMSOService,
   ],
   exports: [
     RiskRepository,

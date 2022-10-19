@@ -6,4 +6,5 @@ export enum WorkbooksEnum {
   EMPLOYEES,
   HIERARCHIES,
   CNAE,
+  CID,
 }

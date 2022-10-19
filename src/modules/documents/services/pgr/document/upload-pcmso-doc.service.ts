@@ -2,10 +2,9 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { HomoTypeEnum, StatusEnum } from '@prisma/client';
 import { ISectionOptions, Packer } from 'docx';
 import fs from 'fs';
-import { removeDuplicate } from '../../../../../shared/utils/removeDuplicate';
+import { RiskFactorsEntity } from 'src/modules/checklist/entities/risk.entity';
 import { v4 } from 'uuid';
 
-import { CompanyRepository } from '../../../../company/repositories/implementations/CompanyRepository';
 import {
   dayjs,
   DayJSProvider,
@@ -15,19 +14,20 @@ import {
   downloadImageFile,
   getExtensionFromUrl,
 } from '../../../../../shared/utils/downloadImageFile';
+import { getDocxFileName } from '../../../../../shared/utils/getFileName';
+import { removeDuplicate } from '../../../../../shared/utils/removeDuplicate';
+import { AttachmentEntity } from '../../../../checklist/entities/attachment.entity';
 import { RiskDocumentEntity } from '../../../../checklist/entities/riskDocument.entity';
+import { RiskFactorGroupDataEntity } from '../../../../checklist/entities/riskGroupData.entity';
 import { RiskDocumentRepository } from '../../../../checklist/repositories/implementations/RiskDocumentRepository';
 import { RiskGroupDataRepository } from '../../../../checklist/repositories/implementations/RiskGroupDataRepository';
 import { CompanyEntity } from '../../../../company/entities/company.entity';
+import { CompanyRepository } from '../../../../company/repositories/implementations/CompanyRepository';
 import { HierarchyRepository } from '../../../../company/repositories/implementations/HierarchyRepository';
+import { WorkspaceRepository } from '../../../../company/repositories/implementations/WorkspaceRepository';
 import { ProfessionalRepository } from '../../../../users/repositories/implementations/ProfessionalRepository';
 import { createBaseDocument } from '../../../docx/base/config/document';
 import { DocumentBuildPGR } from '../../../docx/builders/pgr/create';
-import { UpsertDocumentDto, UpsertPgrDocumentDto } from '../../../dto/pgr.dto';
-import { getDocxFileName } from '../../../../../shared/utils/getFileName';
-import { AttachmentEntity } from '../../../../checklist/entities/attachment.entity';
-import { RiskFactorGroupDataEntity } from '../../../../checklist/entities/riskGroupData.entity';
-import { WorkspaceRepository } from '../../../../company/repositories/implementations/WorkspaceRepository';
 import { actionPlanTableSection } from '../../../docx/components/tables/actionPlan/actionPlan.section';
 import { APPRTableSection } from '../../../docx/components/tables/appr/appr.section';
 import { APPRByGroupTableSection } from '../../../docx/components/tables/apprByGroup/appr-group.section';
@@ -37,7 +37,10 @@ import {
   IHierarchyMap,
   IHomoGroupMap,
 } from '../../../docx/converter/hierarchy.converter';
-import { RiskFactorsEntity } from 'src/modules/checklist/entities/risk.entity';
+import {
+  UpsertDocumentDto,
+  UpsertPcmsoDocumentDto,
+} from '../../../dto/pgr.dto';
 
 export const getRiskDoc = (
   risk: RiskFactorsEntity,
@@ -64,7 +67,7 @@ export const getRiskDoc = (
 };
 
 @Injectable()
-export class PgrUploadService {
+export class PcmsoUploadService {
   private attachments_remove: any[] = []; //!
 
   constructor(
@@ -77,40 +80,19 @@ export class PgrUploadService {
     private readonly professionalRepository: ProfessionalRepository,
     private readonly dayJSProvider: DayJSProvider,
   ) {}
-  async execute(upsertPgrDto: UpsertPgrDocumentDto) {
+  async execute(upsertPgrDto: UpsertPcmsoDocumentDto) {
     this.attachments_remove = []; //!
 
     const companyId = upsertPgrDto.companyId;
     const workspaceId = upsertPgrDto.workspaceId;
     // throw new Error();
     console.log('start: query data');
-    // eslint-disable-next-line prettier/prettier
-    const riskGroupData = await this.riskGroupDataRepository.findAllDataById(upsertPgrDto.riskGroupId, workspaceId, companyId);
-
-    // eslint-disable-next-line prettier/prettier
-    const hierarchyHierarchy = (await this.hierarchyRepository.findAllDataHierarchyByCompany(companyId, workspaceId)).map(hierarchy=>({
-      ...hierarchy,
-      employees: [
-        ...hierarchy.employees,
-        ...hierarchy.subOfficeEmployees
-          ?.map((employee) => {
-            return employee?.subOffices?.map((subOffice) => ({
-              hierarchyId: subOffice.id,
-              ...employee,
-            }));
-          })
-          .reduce((acc, curr) => [...acc, ...curr], []),
-      ],
-    }));
-    // eslint-disable-next-line prettier/prettier
-    const versions = (await this.riskDocumentRepository.findByRiskGroupAndCompany(upsertPgrDto.riskGroupId, companyId)).filter(riskDocument => riskDocument.version.includes('.0.0'));
-
-    const workspace = await this.workspaceRepository.findById(workspaceId);
     const company = await this.companyRepository.findByIdAll(
       companyId,
       workspaceId,
       {
         include: {
+          riskFactorGroupData: true,
           primary_activity: true,
           address: true,
           covers: true,
@@ -144,6 +126,29 @@ export class PgrUploadService {
         },
       },
     );
+
+    // eslint-disable-next-line prettier/prettier
+    const riskGroupData = await this.riskGroupDataRepository.findAllDataById(company.riskFactorGroupData[0].id, workspaceId, companyId);
+
+    // eslint-disable-next-line prettier/prettier
+    const hierarchyHierarchy = (await this.hierarchyRepository.findAllDataHierarchyByCompany(companyId, workspaceId)).map(hierarchy=>({
+      ...hierarchy,
+      employees: [
+        ...hierarchy.employees,
+        ...hierarchy.subOfficeEmployees
+          ?.map((employee) => {
+            return employee?.subOffices?.map((subOffice) => ({
+              hierarchyId: subOffice.id,
+              ...employee,
+            }));
+          })
+          .reduce((acc, curr) => [...acc, ...curr], []),
+      ],
+    }));
+    // eslint-disable-next-line prettier/prettier
+    const versions = (await this.riskDocumentRepository.findByRiskGroupAndCompany(upsertPgrDto.riskGroupId, companyId)).filter(riskDocument => riskDocument.version.includes('.0.0'));
+
+    const workspace = await this.workspaceRepository.findById(workspaceId);
 
     riskGroupData.data = riskGroupData.data.filter((riskData) => {
       if (riskData.homogeneousGroup.type == HomoTypeEnum.HIERARCHY) {
@@ -192,13 +197,9 @@ export class PgrUploadService {
 
     const cover = company?.covers?.[0] || consultant?.covers?.[0];
 
-    console.log('start: photos');
-    const { environments, characterizations, photosPath } =
-      await this.downloadPhotos(company);
-    console.log('end: photos');
-    // const environments = [];
-    // const characterizations = [];
-    // const photosPath = [];
+    const environments = [];
+    const characterizations = [];
+    const photosPath = [];
 
     try {
       const {
@@ -208,19 +209,16 @@ export class PgrUploadService {
         hierarchyTree,
       } = hierarchyConverter(hierarchyHierarchy, environments, { workspaceId });
 
-      // const actionPlanUrl = ' ';
-      // const urlAPR = ' ';
-      // const urlGroupAPR = ' ';
-      console.log('start: attachment');
-      const { actionPlanUrl, urlAPR, urlGroupAPR } =
-        await this.generateAttachment(
-          riskGroupData,
-          hierarchyData,
-          hierarchyHighLevelsData,
-          hierarchyTree,
-          homoGroupTree,
-          upsertPgrDto,
-        );
+      const actionPlanUrl = ' ';
+      // console.log('start: attachment');
+      // // const { actionPlanUrl } = await this.generateAttachment(
+      // //   riskGroupData,
+      // //   hierarchyData,
+      // //   hierarchyHighLevelsData,
+      // //   hierarchyTree,
+      // //   homoGroupTree,
+      // //   upsertPgrDto,
+      // // );
 
       // return { buffer: this.attachments_remove[0], fileName: '1.docx' }; //!
       // return { buffer: this.attachments_remove[1], fileName: '2.docx' }; //!
@@ -239,22 +237,10 @@ export class PgrUploadService {
 
       const docId = upsertPgrDto.id || v4();
 
-      const actionPlanName = 'Plano de Ação Detalhado';
-
       const attachments = [
         new AttachmentEntity({
           id: v4(),
-          name: 'Inventário de Risco por Função (APR)',
-          url: urlAPR,
-        }),
-        new AttachmentEntity({
-          id: v4(),
-          name: 'Inventário de Risco por GSE (APR)',
-          url: urlGroupAPR,
-        }),
-        new AttachmentEntity({
-          id: v4(),
-          name: actionPlanName,
+          name: 'Relatório Analítico',
           url: actionPlanUrl,
         }),
       ];
@@ -268,12 +254,12 @@ export class PgrUploadService {
         version: versionString,
         document: riskGroupData,
         attachments: attachments.map((attachment) => {
-          if (actionPlanName === attachment.name) {
-            return {
-              ...attachment,
-              url: `${process.env.APP_HOST}/dashboard/empresas/${companyId}/${workspaceId}/plano-de-acao/${riskGroupData.id}`,
-            };
-          }
+          // if (actionPlanName === attachment.name) {
+          //   return {
+          //     ...attachment,
+          //     url: `${process.env.APP_HOST}/dashboard/empresas/${companyId}/${workspaceId}/plano-de-acao/${riskGroupData.id}`,
+          //   };
+          // }
 
           return {
             ...attachment,
@@ -375,6 +361,7 @@ export class PgrUploadService {
                   if (path) photosPath.push(path);
                   return { ...photo, photoUrl: path };
                 } catch (error) {
+                  console.error(error);
                   return { ...photo, photoUrl: null };
                 }
               }),
@@ -419,7 +406,7 @@ export class PgrUploadService {
     } catch (error) {
       console.log('unlink photo on error');
       photosPath.forEach((path) => fs.unlinkSync(path));
-      console.log(error);
+      console.error(error);
       throw new InternalServerErrorException(error);
     }
   }
@@ -432,35 +419,6 @@ export class PgrUploadService {
     homoGroupTree: IHomoGroupMap,
     upsertPgrDto: UpsertDocumentDto,
   ) {
-    // APRs
-    const aprSection: ISectionOptions[] = [
-      ...APPRTableSection(riskGroupData, hierarchyData, homoGroupTree),
-    ];
-
-    const urlAPR = await this.save(
-      riskGroupData,
-      upsertPgrDto,
-      aprSection,
-      'PGR-APR',
-    );
-
-    // APRs Groups
-    const aprGroupSection: ISectionOptions[] = [
-      ...APPRByGroupTableSection(
-        riskGroupData,
-        hierarchyHighLevelsData,
-        hierarchyTree,
-        homoGroupTree,
-      ),
-    ];
-
-    const urlGroupAPR = await this.save(
-      riskGroupData,
-      upsertPgrDto,
-      aprGroupSection,
-      'PGR-APR-GSE',
-    );
-
     // ACTION PLAN
     const actionPlanSections: ISectionOptions[] = [
       actionPlanTableSection(riskGroupData, hierarchyTree),
@@ -473,7 +431,7 @@ export class PgrUploadService {
       'PGR-PLANO_DE_ACAO',
     );
 
-    return { urlAPR, urlGroupAPR, actionPlanUrl };
+    return { actionPlanUrl };
   }
 
   private getFileName = (

@@ -25,6 +25,9 @@ import { EnvironmentPhotoRepository } from '../company/repositories/implementati
 import { DownloadCnaeService } from './services/cnae/download-cnae/download-cnae.service';
 import { UploadCnaeDataService } from './services/cnae/upload-cnae/upload-cnae.service';
 import { FilesCnaeController } from './controller/cnae/files-cnae.controller';
+import { UploadCidDataService } from './services/cid/upload-cid/upload-cid.service';
+import { DownloadCidService } from './services/cid/download-cid/download-cid.service';
+import { FilesCidController } from './controller/cid/files-cid.controller';
 
 @Module({
   controllers: [
@@ -32,6 +35,7 @@ import { FilesCnaeController } from './controller/cnae/files-cnae.controller';
     FilesCompanyController,
     FilesCnaeController,
     FilesController,
+    FilesCidController,
   ],
   imports: [ChecklistModule, CompanyModule],
   providers: [
@@ -55,6 +59,8 @@ import { FilesCnaeController } from './controller/cnae/files-cnae.controller';
     DownloadHierarchiesService,
     DownloadCnaeService,
     UploadCnaeDataService,
+    DownloadCidService,
+    UploadCidDataService,
   ],
 })
 export class FilesModule {}

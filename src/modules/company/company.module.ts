@@ -114,6 +114,7 @@ import { DashboardCompanyService } from './services/report/dashboard-company/das
 import { TelegramModule } from 'nestjs-telegram';
 import { CompanyReportRepository } from './repositories/implementations/CompanyReportRepository';
 import { CopyCharacterizationService } from './services/characterization/copy-characterization/copy-characterization.service';
+import { CidRepository } from './repositories/implementations/CidRepository';
 
 @Module({
   imports: [
@@ -238,6 +239,7 @@ import { CopyCharacterizationService } from './services/characterization/copy-ch
     DashboardCompanyService,
     CompanyReportRepository,
     CopyCharacterizationService,
+    CidRepository,
   ],
   exports: [
     CompanyRepository,
@@ -247,6 +249,7 @@ import { CopyCharacterizationService } from './services/characterization/copy-ch
     EnvironmentRepository,
     HomoGroupRepository,
     ActivityRepository,
+    CidRepository,
   ],
 })
 export class CompanyModule {}

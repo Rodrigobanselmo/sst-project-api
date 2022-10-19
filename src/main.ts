@@ -6,9 +6,43 @@ import { AppModule } from './app.module';
 import { InternalServerExceptionFilter } from './shared/filters/internal-server-exception.filter';
 import { PrismaDbExceptionFilter } from './shared/filters/prisma-db-exception.filter';
 import { urlencoded, json } from 'express';
+import chalk from 'chalk';
+
+export function logger(req, res, next) {
+  if (process.env.NODE_ENV !== 'development') {
+    next();
+    return;
+  }
+  if (req.method === 'OPTIONS') {
+    next();
+    return;
+  }
+
+  const shortPath = (req?.url as string)
+    .split('?')[0]
+    .split('/')
+    .map((path) => (path.split('-').length == 5 ? path.split('-')[0] : path))
+    .join('/');
+
+  const queryParams = ((req?.url as string).split('?')[1] || '')
+    .split('&')
+    .map((path) => (path.split('-').length == 5 ? path.split('-')[0] : path))
+    .join('&');
+
+  console.log(
+    (req.method === 'GET' ? chalk.cyan : chalk.red)(`[${req.method}]: `) +
+      chalk.blue(`${shortPath}`) +
+      chalk.gray(`?${queryParams}`),
+  );
+
+  next();
+}
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.use(logger);
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

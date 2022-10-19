@@ -210,7 +210,7 @@ class ExcelProvider implements IExcelProvider {
         let cellValue = data[cellSchema.databaseName.split('.')[0]];
         if (!rows[0]) rows[0] = [];
 
-        if (cellSchema.isArray) {
+        if (cellSchema.isArray === true) {
           if (typeof cellValue === 'string') cellValue = [cellValue];
           (cellValue || []).forEach((value, indexRow) => {
             if (!rows[indexRow]) rows[indexRow] = [];
@@ -225,6 +225,9 @@ class ExcelProvider implements IExcelProvider {
               rows[indexRow][indexCell] = value;
             }
           });
+        } else if (typeof cellSchema.isArray === 'string') {
+          //! should get array and add separator on join string
+          rows[0][indexCell] = cellValue;
         } else {
           rows[0][indexCell] = cellValue;
         }

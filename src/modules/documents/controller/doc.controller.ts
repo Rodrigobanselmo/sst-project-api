@@ -4,11 +4,7 @@ import { PermissionEnum } from '../../../shared/constants/enum/authorization';
 import { Permissions } from '../../../shared/decorators/permissions.decorator';
 import { User } from '../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../shared/dto/user-payload.dto';
-import {
-  UploadPgrActionPlanDto,
-  UpsertDocumentDto,
-  UpsertPgrDocumentDto,
-} from '../dto/pgr.dto';
+import { UploadPgrActionPlanDto, UpsertDocumentDto } from '../dto/pgr.dto';
 import { PgrActionPlanUploadTableService } from '../services/pgr/action-plan/upload-action-plan-table.service';
 import { AddQueueDocumentService } from '../services/pgr/document/add-queue-doc.service';
 import { DownloadAttachmentsService } from '../services/pgr/document/download-attachment-doc.service';
@@ -16,8 +12,8 @@ import { DownloadDocumentService } from '../services/pgr/document/download-doc.s
 import { PgrUploadService } from '../services/pgr/document/upload-pgr-doc.service';
 import { PgrUploadTableService } from '../services/pgr/tables/upload-pgr-table.service';
 
-@Controller('documents/pgr')
-export class DocumentsPgrController {
+@Controller('documents/base')
+export class DocumentsBaseController {
   constructor(
     private readonly pgrDownloadAttachmentsService: DownloadAttachmentsService,
     private readonly pgrUploadService: PgrUploadTableService,
@@ -27,11 +23,18 @@ export class DocumentsPgrController {
     private readonly addQueuePGRDocumentService: AddQueueDocumentService,
   ) {}
 
-  @Permissions({
-    code: PermissionEnum.PGR,
-    isMember: true,
-    isContract: true,
-  })
+  @Permissions(
+    {
+      code: PermissionEnum.PGR,
+      isMember: true,
+      isContract: true,
+    },
+    {
+      code: PermissionEnum.PCMSO,
+      isMember: true,
+      isContract: true,
+    },
+  )
   @Get('/:docId/attachment/:attachmentId/:companyId?')
   async downloadAttachment(
     @Res() res,
@@ -59,11 +62,18 @@ export class DocumentsPgrController {
     fileStream.pipe(res);
   }
 
-  @Permissions({
-    code: PermissionEnum.PGR,
-    isMember: true,
-    isContract: true,
-  })
+  @Permissions(
+    {
+      code: PermissionEnum.PGR,
+      isMember: true,
+      isContract: true,
+    },
+    {
+      code: PermissionEnum.PCMSO,
+      isMember: true,
+      isContract: true,
+    },
+  )
   @Get('/:docId/:companyId?')
   async downloadPGR(
     @Res() res,
@@ -88,26 +98,6 @@ export class DocumentsPgrController {
     fileStream.pipe(res);
   }
 
-  @Permissions({
-    code: PermissionEnum.PGR,
-    isMember: true,
-    isContract: true,
-    crud: true,
-  })
-  @Post()
-  async uploadPGRDoc(
-    @Res() res,
-    @User() userPayloadDto: UserPayloadDto,
-    @Body() upsertPgrDto: UpsertPgrDocumentDto,
-  ) {
-    const { buffer: file, fileName } = await this.pgrUploadDocService.execute({
-      ...upsertPgrDto,
-      companyId: userPayloadDto.targetCompanyId,
-    });
-    res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
-    res.send(file);
-  }
-
   @Permissions(
     {
       code: PermissionEnum.PGR,
@@ -116,39 +106,16 @@ export class DocumentsPgrController {
       crud: true,
     },
     {
-      code: PermissionEnum.ACTION_PLAN,
+      code: PermissionEnum.PCMSO,
       isMember: true,
       isContract: true,
     },
   )
-  @Post('action-plan')
-  async uploadPGRActionPlanDoc(
-    @Res() res,
-    @User() userPayloadDto: UserPayloadDto,
-    @Body() upsertPgrDto: UploadPgrActionPlanDto,
-  ) {
-    const { buffer: file, fileName } =
-      await this.pgrActionPlanUploadTableService.execute(
-        upsertPgrDto,
-        userPayloadDto,
-      );
-
-    res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
-    res.send(file);
-  }
-
-  @Permissions({
-    code: PermissionEnum.PGR,
-    isMember: true,
-    isContract: true,
-    crud: true,
-  })
   @Post('/add-queue')
   async addQueuePGRDoc(
     @User() userPayloadDto: UserPayloadDto,
     @Body() upsertPgrDto: UpsertDocumentDto,
   ) {
-    upsertPgrDto.isPGR = true;
     return this.addQueuePGRDocumentService.execute(
       upsertPgrDto,
       userPayloadDto,

@@ -1,3 +1,4 @@
+import { EmployeeEntity } from 'src/modules/company/entities/employee.entity';
 import { HierarchyEnum, StatusEnum } from '@prisma/client';
 import { hierarchyList } from '../../../shared/constants/lists/hierarchy.list';
 
@@ -49,47 +50,69 @@ export const findAllEmployees = async (
   const hierarchyTree =
     hierarchyExcel.transformArrayToHierarchyMapTree(hierarchies);
 
-  company.employees = company.employees.map((employee) => {
-    const hierarchyId = employee.hierarchyId;
-    if (hierarchyId) {
-      const pathIds = getPathIdTreeMap(hierarchyId, hierarchyTree);
-      const pathsHierarchy = pathIds.map((id) => hierarchyTree[id]);
+  company.employees = company.employees
+    .map((employee) => {
+      const hierarchyId = employee.hierarchyId;
+      if (hierarchyId) {
+        const pathIds = getPathIdTreeMap(hierarchyId, hierarchyTree);
+        const pathsHierarchy = pathIds.map((id) => hierarchyTree[id]);
 
-      const newEmployee = { ...employee };
-      newEmployee.status = statusEnumTranslateUsToBr(
-        newEmployee.status,
-      ) as StatusEnum;
+        const newEmployee = { ...employee };
+        newEmployee.status = statusEnumTranslateUsToBr(
+          newEmployee.status,
+        ) as StatusEnum;
 
-      hierarchyList.forEach((type) => {
-        const hierarchy = pathsHierarchy.find(
-          (h) => h.type === type,
-        ) as HierarchyEntity;
+        hierarchyList.forEach((type) => {
+          const hierarchy = pathsHierarchy.find(
+            (h) => h.type === type,
+          ) as HierarchyEntity;
 
-        if (hierarchy) {
-          //* update here to add more on download
-          newEmployee[type.toLocaleLowerCase()] = hierarchy.name;
+          if (hierarchy) {
+            //* update here to add more on download
+            newEmployee[type.toLocaleLowerCase()] = hierarchy.name;
 
-          if (hierarchy.homogeneousGroups) {
-            const foundHomo = hierarchy.homogeneousGroups
-              .reverse()
-              .find((hierarchy) => !hierarchy.type);
+            if (hierarchy.homogeneousGroups) {
+              const foundHomo = hierarchy.homogeneousGroups
+                .reverse()
+                .filter((hierarchy) => !hierarchy.type);
 
-            (newEmployee as any).ghoName = foundHomo?.name || '';
-            (newEmployee as any).ghoDescription = foundHomo?.description || '';
+              (newEmployee as any).ghoName = foundHomo.map(
+                (h) => h?.name || '',
+              );
+              (newEmployee as any).ghoDescription = foundHomo.map(
+                (h) => h?.description || '',
+              );
+            }
+
+            if ([HierarchyEnum.OFFICE].includes(type.toUpperCase() as any)) {
+              (newEmployee as any).description = hierarchy?.description || '';
+              (newEmployee as any).realDescription =
+                hierarchy?.realDescription || '';
+            }
           }
+        });
 
-          if ([HierarchyEnum.OFFICE].includes(type.toUpperCase() as any)) {
-            (newEmployee as any).description = hierarchy?.description || '';
-            (newEmployee as any).realDescription =
-              hierarchy?.realDescription || '';
-          }
-        }
-      });
+        return newEmployee;
+      }
+      return employee;
+    })
+    .reduce((acc, curr) => {
+      const actual = [...acc];
 
-      return newEmployee;
-    }
-    return employee;
-  });
+      if ((curr as any).ghoName && (curr as any).ghoName.length > 0) {
+        (curr as any).ghoName.forEach((h, index) => {
+          const currCopy = { ...curr } as any;
+
+          currCopy.ghoName = h;
+          currCopy.ghoDescription = curr[index]?.ghoDescription || '';
+          actual.push(currCopy);
+        });
+      } else {
+        actual.push(curr);
+      }
+
+      return actual;
+    }, [] as EmployeeEntity[]);
 
   const workspaces = company.workspace;
 

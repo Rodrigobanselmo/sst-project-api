@@ -1,5 +1,5 @@
 import { EmployeeExamsHistoryEntity } from './../../../../company/entities/employee-exam-history.entity';
-import { getRiskDoc } from './../../../../documents/services/pgr/document/upload-pgr-doc.service';
+import { getRiskDoc } from '../../../../documents/services/pgr/document/upload-pgr-doc.service';
 import { RiskFactorDataEntity } from './../../../entities/riskData.entity';
 import { FindExamHierarchyDto } from './../../../dto/exam.dto';
 import { ExamRiskEntity } from './../../../entities/examRisk.entity';
