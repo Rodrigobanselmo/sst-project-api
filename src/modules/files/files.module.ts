@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ExcelProvider } from '../../shared/providers/ExcelProvider/implementations/ExcelProvider';
-import { ChecklistModule } from '../checklist/checklist.module';
+import { ChecklistModule } from '../sst/checklist.module';
 import { FilesChecklistController } from './controller/managment/files-checklist.controller';
 import { DatabaseTableRepository } from './repositories/implementations/DatabaseTableRepository';
 import { UploadChecklistDataService } from './services/checklist/upload-risk-data/upload-risk-data.service';
@@ -15,7 +15,7 @@ import { DownloadUniqueCompanyService } from './services/company/download-unique
 import { UploadUniqueCompanyService } from './services/company/upload-unique-company/upload-unique-company.service';
 import { DownloadExcelProvider } from './providers/donwlodExcelProvider';
 import { UploadEpiDataService } from './services/checklist/upload-epi-data/upload-epi-data.service';
-import { EpiRepository } from '../checklist/repositories/implementations/EpiRepository';
+import { EpiRepository } from '../sst/repositories/implementations/EpiRepository';
 import { WorkspaceRepository } from '../company/repositories/implementations/WorkspaceRepository';
 import { DownloadEmployeesService } from './services/company/download-employees/download-employees.service';
 import { UploadEmployeesService } from './services/company/upload-employees/upload-employees.service';

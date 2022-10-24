@@ -1,6 +1,6 @@
 import { PageOrientation } from 'docx';
 
-import { RiskFactorGroupDataEntity } from '../../../../../../checklist/entities/riskGroupData.entity';
+import { RiskFactorGroupDataEntity } from '../../../../../../sst/entities/riskGroupData.entity';
 import { IHierarchyMap } from '../../../../converter/hierarchy.converter';
 import { quantityVFBTable } from './quantityVFB.table';
 

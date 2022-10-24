@@ -3,7 +3,7 @@ import { StatusEnum } from '@prisma/client';
 import AWS from 'aws-sdk';
 
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
-import { RiskDocumentRepository } from '../../../../checklist/repositories/implementations/RiskDocumentRepository';
+import { RiskDocumentRepository } from '../../../../sst/repositories/implementations/RiskDocumentRepository';
 import { UpsertDocumentDto } from '../../../dto/pgr.dto';
 
 @Injectable()

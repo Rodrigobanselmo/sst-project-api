@@ -1,6 +1,6 @@
 import { asyncEach } from './../../../../shared/utils/asyncEach';
 import { DocumentRepository } from './../../repositories/implementations/DocumentRepository';
-import { FindExamByHierarchyService } from './../../../checklist/services/exam/find-by-hierarchy /find-exam-by-hierarchy.service';
+import { FindExamByHierarchyService } from '../../../sst/services/exam/find-by-hierarchy /find-exam-by-hierarchy.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { EmployeeRepository } from '../../repositories/implementations/EmployeeRepository';

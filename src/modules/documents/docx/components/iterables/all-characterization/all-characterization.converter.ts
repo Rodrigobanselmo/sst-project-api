@@ -10,7 +10,7 @@ import { VThreeImages } from '../../../base/elements/imagesLayout/vThreeImages';
 import { VTwoImages } from '../../../base/elements/imagesLayout/vTwoImages';
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
-import { RiskFactorsEntity } from '../../../../../checklist/entities/risk.entity';
+import { RiskFactorsEntity } from '../../../../../sst/entities/risk.entity';
 import { CharacterizationPhotoEntity } from '../../../../../company/entities/characterization-photo.entity';
 import { EnvironmentPhotoEntity } from '../../../../../company/entities/environment-photo.entity';
 import { EnvironmentEntity } from '../../../../../company/entities/environment.entity';

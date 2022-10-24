@@ -3,7 +3,7 @@ import {
   QuantityTypeEnum,
 } from './../../../../../../company/interfaces/risk-data-json.types';
 import { WorkspaceEntity } from './../../../../../../company/entities/workspace.entity';
-import { RiskFactorGroupDataEntity } from './../../../../../../checklist/entities/riskGroupData.entity';
+import { RiskFactorGroupDataEntity } from '../../../../../../sst/entities/riskGroupData.entity';
 import { HierarchyMapData } from './../../../../converter/hierarchy.converter';
 import { CompanyEntity } from '../../../../../../company/entities/company.entity';
 import { VariablesPGREnum } from '../../enums/variables.enum';

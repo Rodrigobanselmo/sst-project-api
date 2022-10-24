@@ -6,7 +6,7 @@ import {
   PGRSectionChildrenTypeEnum,
 } from '../../../builders/pgr/types/elements.types';
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
-import { AttachmentEntity } from './../../../../../checklist/entities/attachment.entity';
+import { AttachmentEntity } from '../../../../../sst/entities/attachment.entity';
 import { attachmentsConverter } from './attachments.converter';
 
 export const attachmentsIterable = (

@@ -1,4 +1,4 @@
-import { RiskRepository } from '../../../modules/checklist/repositories/implementations/RiskRepository';
+import { RiskRepository } from '../../sst/repositories/implementations/RiskRepository';
 import { IRiskSheet } from '../../../shared/constants/workbooks/sheets/risk/riskSheet.constant';
 import { ExcelProvider } from '../../../shared/providers/ExcelProvider/implementations/ExcelProvider';
 

@@ -6,7 +6,7 @@ import { HierarchyEnum, HomoTypeEnum, RiskFactorsEnum } from '@prisma/client';
 import { palette } from '../../../../../../shared/constants/palette';
 import { removeDuplicate } from '../../../../../../shared/utils/removeDuplicate';
 import { sortString } from '../../../../../../shared/utils/sorts/string.sort';
-import { RiskFactorGroupDataEntity } from '../../../../../checklist/entities/riskGroupData.entity';
+import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
 import { getMatrizRisk } from '../../../../../../shared/utils/matriz';
 import {
   IHierarchyData,

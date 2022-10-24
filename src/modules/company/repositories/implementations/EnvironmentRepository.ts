@@ -6,8 +6,8 @@ import { PrismaService } from '../../../../prisma/prisma.service';
 import { UpsertCharacterizationDto } from '../../dto/characterization.dto';
 import { EnvironmentEntity } from '../../entities/environment.entity';
 import { HierarchyEntity } from '../../entities/hierarchy.entity';
-import { RiskFactorsEntity } from './../../../checklist/entities/risk.entity';
-import { RiskFactorDataEntity } from './../../../checklist/entities/riskData.entity';
+import { RiskFactorsEntity } from '../../../sst/entities/risk.entity';
+import { RiskFactorDataEntity } from '../../../sst/entities/riskData.entity';
 
 interface ICompanyCharacterization
   extends Omit<UpsertCharacterizationDto, 'photos'> {

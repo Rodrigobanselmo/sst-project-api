@@ -1,5 +1,5 @@
-import { ExamToClinicEntity } from './../../checklist/entities/examToClinic';
-import { RiskFactorGroupDataEntity } from './../../checklist/entities/riskGroupData.entity';
+import { ExamToClinicEntity } from '../../sst/entities/examToClinic';
+import { RiskFactorGroupDataEntity } from '../../sst/entities/riskGroupData.entity';
 import { ProfessionalEntity } from './../../users/entities/professional.entity';
 import {
   Company,

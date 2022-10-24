@@ -1,6 +1,6 @@
 import { PageOrientation, Table, WidthType } from 'docx';
 
-import { RiskFactorGroupDataEntity } from '../../../../../checklist/entities/riskGroupData.entity';
+import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
 import { IHierarchyMap } from '../../../converter/hierarchy.converter';
 import { actionPlanHeader, actionPlanTitle } from './actionPlan.constant';
 import { actionPlanConverter } from './actionPlan.converter';

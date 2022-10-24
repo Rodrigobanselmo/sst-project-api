@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { RiskDocumentRepository } from '../../../../checklist/repositories/implementations/RiskDocumentRepository';
+import { RiskDocumentRepository } from '../../../../sst/repositories/implementations/RiskDocumentRepository';
 import { AmazonStorageProvider } from '../../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
 
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';

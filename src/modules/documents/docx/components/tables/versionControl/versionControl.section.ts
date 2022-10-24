@@ -1,6 +1,6 @@
 import { PageOrientation } from 'docx';
 
-import { RiskDocumentEntity } from '../../../../../checklist/entities/riskDocument.entity';
+import { RiskDocumentEntity } from '../../../../../sst/entities/riskDocument.entity';
 import { versionControlTable } from './versionControl.table';
 
 export const versionControlTableSection = (

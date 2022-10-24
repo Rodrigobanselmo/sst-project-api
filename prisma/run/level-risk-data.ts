@@ -1,4 +1,4 @@
-import { RiskFactorDataEntity } from './../../src/modules/checklist/entities/riskData.entity';
+import { RiskFactorDataEntity } from '../../src/modules/sst/entities/riskData.entity';
 import { getMatrizRisk } from '../../src/shared/utils/matriz';
 import { asyncEach } from '../../src/shared/utils/asyncEach';
 import { PrismaClient } from '@prisma/client';

@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { RiskRepository } from '../../../../checklist/repositories/implementations/RiskRepository';
+import { RiskRepository } from '../../../../sst/repositories/implementations/RiskRepository';
 import { UploadExcelProvider } from '../../../providers/uploadExcelProvider';
 import { IRiskSheet } from '../../../../../shared/constants/workbooks/sheets/risk/riskSheet.constant';
 import { workbooksConstant } from '../../../../../shared/constants/workbooks/workbooks.constant';

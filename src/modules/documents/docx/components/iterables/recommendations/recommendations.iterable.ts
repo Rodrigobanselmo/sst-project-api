@@ -5,7 +5,7 @@ import {
   PGRSectionChildrenTypeEnum,
 } from '../../../builders/pgr/types/elements.types';
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
-import { RiskFactorDataEntity } from './../../../../../checklist/entities/riskData.entity';
+import { RiskFactorDataEntity } from '../../../../../sst/entities/riskData.entity';
 import { recommendationsConverter } from './recommendations.converter';
 
 export const recommendationsIterable = (

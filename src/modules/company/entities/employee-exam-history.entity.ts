@@ -10,7 +10,7 @@ import {
   Hierarchy,
 } from '@prisma/client';
 import { UserEntity } from '../../../modules/users/entities/user.entity';
-import { ExamEntity } from '../../../modules/checklist/entities/exam.entity';
+import { ExamEntity } from '../../sst/entities/exam.entity';
 import { ProfessionalEntity } from '../../../modules/users/entities/professional.entity';
 import { CompanyEntity } from './company.entity';
 

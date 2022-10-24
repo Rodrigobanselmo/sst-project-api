@@ -15,9 +15,9 @@ import {
   downloadImageFile,
   getExtensionFromUrl,
 } from '../../../../../shared/utils/downloadImageFile';
-import { RiskDocumentEntity } from '../../../../checklist/entities/riskDocument.entity';
-import { RiskDocumentRepository } from '../../../../checklist/repositories/implementations/RiskDocumentRepository';
-import { RiskGroupDataRepository } from '../../../../checklist/repositories/implementations/RiskGroupDataRepository';
+import { RiskDocumentEntity } from '../../../../sst/entities/riskDocument.entity';
+import { RiskDocumentRepository } from '../../../../sst/repositories/implementations/RiskDocumentRepository';
+import { RiskGroupDataRepository } from '../../../../sst/repositories/implementations/RiskGroupDataRepository';
 import { CompanyEntity } from '../../../../company/entities/company.entity';
 import { HierarchyRepository } from '../../../../company/repositories/implementations/HierarchyRepository';
 import { ProfessionalRepository } from '../../../../users/repositories/implementations/ProfessionalRepository';
@@ -25,8 +25,8 @@ import { createBaseDocument } from '../../../docx/base/config/document';
 import { DocumentBuildPGR } from '../../../docx/builders/pgr/create';
 import { UpsertDocumentDto, UpsertPgrDocumentDto } from '../../../dto/pgr.dto';
 import { getDocxFileName } from '../../../../../shared/utils/getFileName';
-import { AttachmentEntity } from '../../../../checklist/entities/attachment.entity';
-import { RiskFactorGroupDataEntity } from '../../../../checklist/entities/riskGroupData.entity';
+import { AttachmentEntity } from '../../../../sst/entities/attachment.entity';
+import { RiskFactorGroupDataEntity } from '../../../../sst/entities/riskGroupData.entity';
 import { WorkspaceRepository } from '../../../../company/repositories/implementations/WorkspaceRepository';
 import { actionPlanTableSection } from '../../../docx/components/tables/actionPlan/actionPlan.section';
 import { APPRTableSection } from '../../../docx/components/tables/appr/appr.section';
@@ -37,7 +37,7 @@ import {
   IHierarchyMap,
   IHomoGroupMap,
 } from '../../../docx/converter/hierarchy.converter';
-import { RiskFactorsEntity } from 'src/modules/checklist/entities/risk.entity';
+import { RiskFactorsEntity } from 'src/modules/sst/entities/risk.entity';
 
 export const getRiskDoc = (
   risk: RiskFactorsEntity,

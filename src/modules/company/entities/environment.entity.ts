@@ -4,7 +4,7 @@ import {
   CompanyCharacterization,
 } from '@prisma/client';
 
-import { RiskFactorDataEntity } from '../../../modules/checklist/entities/riskData.entity';
+import { RiskFactorDataEntity } from '../../sst/entities/riskData.entity';
 import { CharacterizationPhotoEntity } from './characterization-photo.entity';
 import { HierarchyEntity } from './hierarchy.entity';
 import { HomoGroupEntity } from './homoGroup.entity';

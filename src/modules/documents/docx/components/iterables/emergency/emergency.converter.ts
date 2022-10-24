@@ -1,4 +1,4 @@
-import { RiskFactorDataEntity } from '../../../../../checklist/entities/riskData.entity';
+import { RiskFactorDataEntity } from '../../../../../sst/entities/riskData.entity';
 
 export const emergencyConverter = (
   riskData: Partial<RiskFactorDataEntity>[],

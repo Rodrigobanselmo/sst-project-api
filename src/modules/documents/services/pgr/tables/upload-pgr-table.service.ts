@@ -2,8 +2,8 @@ import { APPRByGroupTableSection } from './../../../docx/components/tables/apprB
 import { Injectable } from '@nestjs/common';
 import { ISectionOptions, Packer } from 'docx';
 
-import { RiskDocumentRepository } from '../../../../../modules/checklist/repositories/implementations/RiskDocumentRepository';
-import { RiskGroupDataRepository } from '../../../../../modules/checklist/repositories/implementations/RiskGroupDataRepository';
+import { RiskDocumentRepository } from '../../../../sst/repositories/implementations/RiskDocumentRepository';
+import { RiskGroupDataRepository } from '../../../../sst/repositories/implementations/RiskGroupDataRepository';
 import { CompanyEntity } from '../../../../../modules/company/entities/company.entity';
 import { HierarchyRepository } from '../../../../../modules/company/repositories/implementations/HierarchyRepository';
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';

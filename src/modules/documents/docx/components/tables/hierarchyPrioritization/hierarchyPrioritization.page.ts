@@ -12,7 +12,7 @@ import {
   IHierarchyData,
   IHierarchyMap,
 } from '../../../converter/hierarchy.converter';
-import { RiskFactorGroupDataEntity } from './../../../../../checklist/entities/riskGroupData.entity';
+import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
 import { bodyTableProps, TableBodyElements } from './elements/body';
 import { IHierarchyPrioritizationOptions } from './hierarchyPrioritization.converter';
 import { hierarchyPrioritizationTables } from './hierarchyPrioritization.tables';

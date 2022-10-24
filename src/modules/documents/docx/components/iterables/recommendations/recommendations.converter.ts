@@ -1,6 +1,6 @@
 import { RecTypeEnum } from '@prisma/client';
 
-import { RiskFactorDataEntity } from './../../../../../checklist/entities/riskData.entity';
+import { RiskFactorDataEntity } from '../../../../../sst/entities/riskData.entity';
 
 export const recommendationsConverter = (
   riskData: Partial<RiskFactorDataEntity>[],

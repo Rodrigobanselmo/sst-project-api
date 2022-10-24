@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
-import { FindAllTable27Service } from '../../services/tables/find-all-27';
+import { FindAllTable27Service } from '../../services/tables/find-all-27.service';
 
 @ApiTags('tables')
 @Controller('esocial/table-27')

@@ -1,7 +1,7 @@
 import { sortNumber } from './../../../../../../../../shared/utils/sorts/number.sort';
 import { HomoTypeEnum, RiskFactorsEnum } from '@prisma/client';
 import { AlignmentType } from 'docx';
-import { RiskFactorGroupDataEntity } from '../../../../../../../checklist/entities/riskGroupData.entity';
+import { RiskFactorGroupDataEntity } from '../../../../../../../sst/entities/riskGroupData.entity';
 import { riskMap } from '../../../../../../constants/risks.constant';
 import { getMatrizRisk } from '../../../../../../../../shared/utils/matriz';
 import { palette } from '../../../../../../../../shared/constants/palette';

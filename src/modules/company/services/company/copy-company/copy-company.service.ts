@@ -7,7 +7,7 @@ import { v4 } from 'uuid';
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { CompanyRepository } from '../../../repositories/implementations/CompanyRepository';
 import { PrismaService } from './../../../../../prisma/prisma.service';
-import { RiskGroupDataRepository } from './../../../../checklist/repositories/implementations/RiskGroupDataRepository';
+import { RiskGroupDataRepository } from '../../../../sst/repositories/implementations/RiskGroupDataRepository';
 import { HierarchyEntity } from './../../../entities/hierarchy.entity';
 import { WorkspaceEntity } from './../../../entities/workspace.entity';
 import { HierarchyRepository } from './../../../repositories/implementations/HierarchyRepository';

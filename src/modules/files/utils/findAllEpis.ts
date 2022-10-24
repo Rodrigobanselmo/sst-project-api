@@ -1,6 +1,6 @@
 import { IRiskSheet } from '../../../shared/constants/workbooks/sheets/risk/riskSheet.constant';
 import { ExcelProvider } from '../../../shared/providers/ExcelProvider/implementations/ExcelProvider';
-import { EpiRepository } from '../../checklist/repositories/implementations/EpiRepository';
+import { EpiRepository } from '../../sst/repositories/implementations/EpiRepository';
 
 export const findAllEpis = async (
   excelProvider: ExcelProvider,

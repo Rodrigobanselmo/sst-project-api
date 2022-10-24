@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { RiskRepository } from '../../../../../modules/checklist/repositories/implementations/RiskRepository';
+import { RiskRepository } from '../../../../sst/repositories/implementations/RiskRepository';
 import { DownloadExcelProvider } from '../../../../../modules/files/providers/donwlodExcelProvider';
 import { workbooksConstant } from '../../../../../shared/constants/workbooks/workbooks.constant';
 import { WorkbooksEnum } from '../../../../../shared/constants/workbooks/workbooks.enum';

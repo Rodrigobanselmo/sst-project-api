@@ -1,5 +1,5 @@
-import { RiskFactorsEntity } from './../../../checklist/entities/risk.entity';
-import { RiskFactorDataEntity } from './../../../checklist/entities/riskData.entity';
+import { RiskFactorsEntity } from '../../../sst/entities/risk.entity';
+import { RiskFactorDataEntity } from '../../../sst/entities/riskData.entity';
 import { Injectable } from '@nestjs/common';
 import { CharacterizationTypeEnum, HomoTypeEnum, Prisma } from '@prisma/client';
 import { v4 } from 'uuid';

@@ -1,11 +1,11 @@
 import { PageOrientation, Table, WidthType } from 'docx';
-import { RiskFactorGroupDataEntity } from '../../../../../checklist/entities/riskGroupData.entity';
+import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
 import { versionControlHeader } from './versionControl.constant';
 
 import { TableBodyElements } from './elements/body';
 import { TableHeaderElements } from './elements/header';
 import { versionControlConverter } from './versionControl.converter';
-import { RiskDocumentEntity } from '../../../../../checklist/entities/riskDocument.entity';
+import { RiskDocumentEntity } from '../../../../../sst/entities/riskDocument.entity';
 
 export const versionControlTable = (
   riskDocumentEntity: RiskDocumentEntity[],

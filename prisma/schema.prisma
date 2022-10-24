@@ -353,6 +353,8 @@ model Company {
   companyGroupId Int? @unique
   companyGroup CompanyGroup? @relation(name:"company_group", fields: [companyGroupId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
   notifications Notification[]  @relation(name: "owner_notification_company")
+  protocol Protocol[]
+  protocolToRisk ProtocolToRisk[]
   report CompanyReport?
 
   // professionals Professional[] @relation(name:"companies_related") 
@@ -448,8 +450,7 @@ model CompanyCharacterizationPhoto {
   updated_at  DateTime   @updatedAt
   companyCharacterizationId String
   companyEnvironment CompanyCharacterization @relation(fields: [companyCharacterizationId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
- }
-
+}
 
 model CompanyReport {
   id    Int   @id  @default(autoincrement())
@@ -1036,6 +1037,32 @@ model ProfessionalCouncil {
   @@unique([councilType, councilUF, councilId, professionalId])
 }
 
+model Protocol {
+  id    Int     @default(autoincrement()) @id
+  name String
+  created_at DateTime @default(now())
+  deleted_at DateTime? 
+  updated_at  DateTime   @updatedAt
+  companyId String?
+  company Company? @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
+  protocolToRisk ProtocolToRisk[]
+
+  @@unique([id, companyId])
+}
+
+model ProtocolToRisk {
+  id     Int   @id @default(autoincrement())
+  protocol   Protocol? @relation(fields: [protocolId], references: [id])
+  risk    RiskFactors?  @relation(fields: [riskId], references: [id])
+  protocolId  Int?
+  riskId String?
+  companyId String 
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  
+  @@unique([id, companyId])
+}
+
 model RecMed {
   id    String   @id  @default(uuid())
   riskId    String    
@@ -1111,6 +1138,7 @@ model RiskFactors {
   riskFactorProbability RiskFactorProbability[]
   examToRisk ExamToRisk[]
   docInfo RiskFactorsDocInfo[]
+  protocolToRisk ProtocolToRisk[]
   json Json?
   
   @@unique([id, companyId])

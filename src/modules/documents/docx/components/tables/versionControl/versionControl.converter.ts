@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { RiskDocumentEntity } from '../../../../../checklist/entities/riskDocument.entity';
+import { RiskDocumentEntity } from '../../../../../sst/entities/riskDocument.entity';
 import { dayjs } from '../../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { sortData } from '../../../../../../shared/utils/sorts/data.sort';
 import { bodyTableProps } from './elements/body';

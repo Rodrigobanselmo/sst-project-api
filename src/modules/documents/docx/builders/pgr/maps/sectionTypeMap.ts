@@ -23,7 +23,7 @@ import {
   ISection,
   PGRSectionTypeEnum,
 } from '../types/section.types';
-import { RiskFactorGroupDataEntity } from './../../../../../checklist/entities/riskGroupData.entity';
+import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
 import { EnvironmentEntity } from './../../../../../company/entities/environment.entity';
 import { IMapElementDocumentType } from './elementTypeMap';
 import { allCharacterizationSections } from '../../../components/iterables/all-characterization/all-characterization.sections';

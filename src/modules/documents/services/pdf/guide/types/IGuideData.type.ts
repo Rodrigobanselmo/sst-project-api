@@ -1,6 +1,6 @@
 import { EmployeeEntity } from 'src/modules/company/entities/employee.entity';
 import { ExamHistoryTypeEnum } from '@prisma/client';
-import { ExamEntity } from '../../../../../checklist/entities/exam.entity';
+import { ExamEntity } from '../../../../../sst/entities/exam.entity';
 import { CompanyEntity } from '../../../../../company/entities/company.entity';
 export interface IGuideDataType {}
 

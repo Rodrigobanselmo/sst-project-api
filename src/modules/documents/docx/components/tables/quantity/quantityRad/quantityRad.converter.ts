@@ -4,7 +4,7 @@ import { originRiskMap } from '../../../../../../../shared/constants/maps/origin
 import { palette } from '../../../../../../../shared/constants/palette';
 import { getMatrizRisk } from '../../../../../../../shared/utils/matriz';
 import { sortData } from '../../../../../../../shared/utils/sorts/data.sort';
-import { RiskFactorGroupDataEntity } from '../../../../../../checklist/entities/riskGroupData.entity';
+import { RiskFactorGroupDataEntity } from '../../../../../../sst/entities/riskGroupData.entity';
 import {
   IRiskDataJson,
   IRiskDataJsonRadiation,

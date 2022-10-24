@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { ProfessionalTypeEnum } from '@prisma/client';
 import { Exclude } from 'class-transformer';
 
-import { UsersRiskGroupEntity } from './../../checklist/entities/usersRiskGroup';
+import { UsersRiskGroupEntity } from '../../sst/entities/usersRiskGroup';
 import { ProfessionalEntity } from './professional.entity';
 import { UserCompanyEntity } from './userCompany.entity';
 import { User } from '.prisma/client';

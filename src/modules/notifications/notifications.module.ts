@@ -1,7 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { SendGridProvider } from '../../shared/providers/MailProvider/implementations/SendGrid/SendGridProvider';
 
-import { ChecklistModule } from '../checklist/checklist.module';
+import { ChecklistModule } from '../sst/checklist.module';
 import { CompanyModule } from '../company/company.module';
 import { NotificationController } from './controller/notification.controller';
 import { NotificationRepository } from './repositories/implementations/NotificationRepository';

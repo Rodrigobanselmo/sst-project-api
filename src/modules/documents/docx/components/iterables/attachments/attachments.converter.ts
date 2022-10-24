@@ -1,6 +1,6 @@
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
-import { AttachmentEntity } from './../../../../../checklist/entities/attachment.entity';
+import { AttachmentEntity } from '../../../../../sst/entities/attachment.entity';
 
 export const attachmentsConverter = (
   attachments: AttachmentEntity[],

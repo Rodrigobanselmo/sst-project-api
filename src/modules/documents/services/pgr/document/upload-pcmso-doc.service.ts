@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { HomoTypeEnum, StatusEnum } from '@prisma/client';
 import { ISectionOptions, Packer } from 'docx';
 import fs from 'fs';
-import { RiskFactorsEntity } from 'src/modules/checklist/entities/risk.entity';
+import { RiskFactorsEntity } from 'src/modules/sst/entities/risk.entity';
 import { v4 } from 'uuid';
 
 import {
@@ -16,11 +16,11 @@ import {
 } from '../../../../../shared/utils/downloadImageFile';
 import { getDocxFileName } from '../../../../../shared/utils/getFileName';
 import { removeDuplicate } from '../../../../../shared/utils/removeDuplicate';
-import { AttachmentEntity } from '../../../../checklist/entities/attachment.entity';
-import { RiskDocumentEntity } from '../../../../checklist/entities/riskDocument.entity';
-import { RiskFactorGroupDataEntity } from '../../../../checklist/entities/riskGroupData.entity';
-import { RiskDocumentRepository } from '../../../../checklist/repositories/implementations/RiskDocumentRepository';
-import { RiskGroupDataRepository } from '../../../../checklist/repositories/implementations/RiskGroupDataRepository';
+import { AttachmentEntity } from '../../../../sst/entities/attachment.entity';
+import { RiskDocumentEntity } from '../../../../sst/entities/riskDocument.entity';
+import { RiskFactorGroupDataEntity } from '../../../../sst/entities/riskGroupData.entity';
+import { RiskDocumentRepository } from '../../../../sst/repositories/implementations/RiskDocumentRepository';
+import { RiskGroupDataRepository } from '../../../../sst/repositories/implementations/RiskGroupDataRepository';
 import { CompanyEntity } from '../../../../company/entities/company.entity';
 import { CompanyRepository } from '../../../../company/repositories/implementations/CompanyRepository';
 import { HierarchyRepository } from '../../../../company/repositories/implementations/HierarchyRepository';

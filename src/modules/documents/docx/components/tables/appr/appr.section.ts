@@ -1,7 +1,7 @@
 import { HierarchyEnum, HomogeneousGroup } from '@prisma/client';
 import { ISectionOptions, PageOrientation } from 'docx';
 import { sortString } from '../../../../../../shared/utils/sorts/string.sort';
-import { RiskFactorGroupDataEntity } from '../../../../../checklist/entities/riskGroupData.entity';
+import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
 import { HierarchyEntity } from '../../../../../company/entities/hierarchy.entity';
 
 import {

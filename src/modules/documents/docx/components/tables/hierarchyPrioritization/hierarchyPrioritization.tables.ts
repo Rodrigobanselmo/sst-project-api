@@ -2,7 +2,7 @@ import { HierarchyEnum } from '@prisma/client';
 import { PageOrientation, Table, WidthType } from 'docx';
 
 import { arrayChunks } from '../../../../../../shared/utils/arrayChunks';
-import { RiskFactorGroupDataEntity } from '../../../../../checklist/entities/riskGroupData.entity';
+import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
 import {
   IHierarchyData,
   IHierarchyMap,

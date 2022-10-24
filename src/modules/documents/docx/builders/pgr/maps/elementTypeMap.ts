@@ -4,7 +4,7 @@ import { HomoTypeEnum, RiskFactorsEnum } from '@prisma/client';
 import { Paragraph, Table } from 'docx';
 
 import { removeDuplicate } from '../../../../../../shared/utils/removeDuplicate';
-import { RiskDocumentEntity } from '../../../../../checklist/entities/riskDocument.entity';
+import { RiskDocumentEntity } from '../../../../../sst/entities/riskDocument.entity';
 import { bulletsNormal, bulletsSpace } from '../../../base/elements/bullets';
 import { h1, h2, h3, h4, h5, h6, title } from '../../../base/elements/heading';
 import {
@@ -59,8 +59,8 @@ import {
   PGRSectionChildrenTypeEnum,
 } from '../types/elements.types';
 import { IDocVariables } from '../types/section.types';
-import { AttachmentEntity } from './../../../../../checklist/entities/attachment.entity';
-import { RiskFactorGroupDataEntity } from './../../../../../checklist/entities/riskGroupData.entity';
+import { AttachmentEntity } from '../../../../../sst/entities/attachment.entity';
+import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
 import { CharacterizationEntity } from './../../../../../company/entities/characterization.entity';
 import { EnvironmentEntity } from './../../../../../company/entities/environment.entity';
 import { ProfessionalEntity } from './../../../../../users/entities/professional.entity';

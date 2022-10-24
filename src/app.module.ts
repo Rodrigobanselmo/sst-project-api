@@ -4,7 +4,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { TelegramModule } from 'nestjs-telegram';
 
 import { AuthModule } from './modules/auth/auth.module';
-import { ChecklistModule } from './modules/checklist/checklist.module';
+import { ChecklistModule } from './modules/sst/checklist.module';
 import { CompanyModule } from './modules/company/company.module';
 import { DocumentsModule } from './modules/documents/documents.module';
 import { EsocialModule } from './modules/esocial/esocial.module';

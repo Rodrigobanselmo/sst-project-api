@@ -4,7 +4,7 @@ import { ISectionOptions, PageOrientation } from 'docx';
 import { removeDuplicate } from '../../../../../../shared/utils/removeDuplicate';
 
 import { originRiskMap } from '../../../../../../shared/constants/maps/origin-risk';
-import { RiskFactorGroupDataEntity } from '../../../../../checklist/entities/riskGroupData.entity';
+import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
 import { HomoGroupEntity } from '../../../../../company/entities/homoGroup.entity';
 import {
   HierarchyMapData,

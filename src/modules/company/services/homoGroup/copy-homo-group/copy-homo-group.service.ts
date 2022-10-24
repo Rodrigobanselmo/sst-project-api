@@ -4,9 +4,9 @@ import { ErrorCompanyEnum } from '../../../../../shared/constants/enum/errorMess
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { HomoGroupRepository } from '../../../repositories/implementations/HomoGroupRepository';
 import { asyncEach } from './../../../../../shared/utils/asyncEach';
-import { RiskFactorDataEntity } from './../../../../checklist/entities/riskData.entity';
-import { RiskDataRepository } from './../../../../checklist/repositories/implementations/RiskDataRepository';
-import { UpsertManyRiskDataService } from './../../../../checklist/services/risk-data/upsert-many-risk-data/upsert-many-risk-data.service';
+import { RiskFactorDataEntity } from '../../../../sst/entities/riskData.entity';
+import { RiskDataRepository } from '../../../../sst/repositories/implementations/RiskDataRepository';
+import { UpsertManyRiskDataService } from '../../../../sst/services/risk-data/upsert-many-risk-data/upsert-many-risk-data.service';
 import { CopyHomogeneousGroupDto } from './../../../dto/homoGroup';
 import { HierarchyRepository } from './../../../repositories/implementations/HierarchyRepository';
 

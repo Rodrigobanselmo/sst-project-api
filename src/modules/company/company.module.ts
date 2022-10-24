@@ -7,7 +7,7 @@ import { Module, forwardRef } from '@nestjs/common';
 
 import { ExcelProvider } from '../../shared/providers/ExcelProvider/implementations/ExcelProvider';
 import { AmazonStorageProvider } from '../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
-import { RiskGroupDataRepository } from '../checklist/repositories/implementations/RiskGroupDataRepository';
+import { RiskGroupDataRepository } from '../sst/repositories/implementations/RiskGroupDataRepository';
 import { CharacterizationController } from './controller/characterization/characterization.controller';
 import { CompanyController } from './controller/company/company.controller';
 import { EmployeeController } from './controller/employee/employee.controller';
@@ -63,7 +63,7 @@ import { FindByCompanyHomoGroupService } from './services/homoGroup/find-by-comp
 import { UpdateHomoGroupService } from './services/homoGroup/update-homo-group/update-homo-group.service';
 import { UpdateEnvironmentPhotoService } from './services/environment/update-environment-photo/update-environment-photo.service';
 import { UpdateCharacterizationPhotoService } from './services/characterization/update-characterization-photo/update-characterization-photo.service';
-import { RiskDataRepository } from '../checklist/repositories/implementations/RiskDataRepository';
+import { RiskDataRepository } from '../sst/repositories/implementations/RiskDataRepository';
 import { UpdateSimpleManyHierarchyService } from './services/hierarchy/update-simple-many-hierarchies /upsert-many-hierarchies.service';
 import { CompanyGroupController } from './controller/group/group.controller';
 import { CompanyGroupRepository } from './repositories/implementations/CompanyGroupRepository';
@@ -71,7 +71,7 @@ import { FindAvailableCompanyGroupsService } from './services/group/find-company
 import { UpsertCompanyGroupsService } from './services/group/upsert-company-group/upsert-company-group.service';
 import { FindAllUserCompaniesService } from './services/company/find-all-user-companies /find-all-companies.service';
 import { CopyHomoGroupService } from './services/homoGroup/copy-homo-group/copy-homo-group.service';
-import { ChecklistModule } from '../checklist/checklist.module';
+import { ChecklistModule } from '../sst/checklist.module';
 import { CreateSubHierarchyService } from './services/hierarchy/create-sub-hierarchies/create-sub-hierarchies.service';
 import { DeleteSubOfficeEmployeeService } from './services/employee/delete-sub-office-employee/delete-sub-office-employee.service';
 import { ContactRepository } from './repositories/implementations/ContactRepository';
