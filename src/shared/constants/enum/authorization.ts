@@ -63,4 +63,5 @@ export enum PermissionEnum {
   DOCUMENTS = '10', //* new
   CONTRACTS = '11', //* new
   CLINIC = '12',
+  PROTOCOL = '13',
 }

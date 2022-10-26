@@ -1052,15 +1052,16 @@ model Protocol {
 
 model ProtocolToRisk {
   id     Int   @id @default(autoincrement())
-  protocol   Protocol? @relation(fields: [protocolId], references: [id])
-  risk    RiskFactors?  @relation(fields: [riskId], references: [id])
   protocolId  Int?
   riskId String?
   companyId String 
+  protocol   Protocol? @relation(fields: [protocolId], references: [id])
+  risk    RiskFactors?  @relation(fields: [riskId], references: [id])
   company   Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
 
   
   @@unique([id, companyId])
+  @@unique([riskId, protocolId])
 }
 
 model RecMed {

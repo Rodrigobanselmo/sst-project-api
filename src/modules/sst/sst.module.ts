@@ -78,6 +78,13 @@ import { FindRiskService } from './services/risk/find/find.service';
 import { UpdateRiskService } from './services/risk/update-risk/update-risk.service';
 import { FindByIdDocumentPCMSOService } from './services/documentPcmso/find-by-id/find-by-id.service';
 import { DocumentPCMSOController } from './controller/document-pcmso/document-pcmso.controller';
+import { UpdateProtocolsService } from './services/protocol/update-protocol/update-protocol.service';
+import { CreateProtocolsService } from './services/protocol/create-protocol/create-protocol.service';
+import { FindProtocolsService } from './services/protocol/find-protocol/find-protocol.service';
+import { DeleteProtocolsService } from './services/protocol/delete-protocol/delete-protocol.service';
+import { ProtocolController } from './controller/protocol/protocol.controller';
+import { UpdateRiskProtocolsService } from './services/protocol/update-risk-protocol/update-risk-protocol.service';
+import { ProtocolRepository } from './repositories/implementations/ProtocolRepository';
 
 @Module({
   controllers: [
@@ -95,6 +102,7 @@ import { DocumentPCMSOController } from './controller/document-pcmso/document-pc
     ExamRiskController,
     RiskDocInfoController,
     DocumentPCMSOController,
+    ProtocolController,
   ],
   providers: [
     ChecklistRepository,
@@ -160,6 +168,12 @@ import { DocumentPCMSOController } from './controller/document-pcmso/document-pc
     DocumentPCMSORepository,
     UpsertDocumentPCMSOService,
     FindByIdDocumentPCMSOService,
+    UpdateProtocolsService,
+    CreateProtocolsService,
+    FindProtocolsService,
+    DeleteProtocolsService,
+    UpdateRiskProtocolsService,
+    ProtocolRepository,
   ],
   exports: [
     RiskRepository,

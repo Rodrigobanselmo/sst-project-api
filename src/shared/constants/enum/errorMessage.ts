@@ -26,6 +26,8 @@ export enum ErrorMessageEnum {
   EMPLOYEE_BLOCK_HISTORY = 'histórico bagunçado, verifique se sua ação é válida',
   EMPLOYEE_HISTORY_NOT_FOUND = 'histórico de exame não encontrado',
   EMPLOYEE_HISTORY_FILE_NOT_UPLOADED = 'não foi possivel fazer upload do arquivo',
+  //* PROTOCOL
+  PROTOCOL_NOT_FOUND = 'Protocolo não encontrado ou sem premissões de acesso',
 }
 
 export enum ErrorCompanyEnum {

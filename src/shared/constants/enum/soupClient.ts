@@ -1,0 +1,4 @@
+export enum SoupClientEnum {
+  PRODUCTION = 'PRODUCTION',
+  PRODUCTION_RESTRICT = 'PRODUCTION_RESTRICT',
+}

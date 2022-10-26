@@ -3,7 +3,7 @@ import { Module } from '@nestjs/common';
 import { AmazonStorageProvider } from '../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
 
 import { ExcelProvider } from '../../shared/providers/ExcelProvider/implementations/ExcelProvider';
-import { ChecklistModule } from '../sst/checklist.module';
+import { ChecklistModule } from '../sst/sst.module';
 import { CompanyModule } from '../company/company.module';
 import { DocumentsPgrController } from './controller/pgr.controller';
 import { DownloadDocumentService } from './services/pgr/document/download-doc.service';

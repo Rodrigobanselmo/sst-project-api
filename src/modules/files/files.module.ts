@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ExcelProvider } from '../../shared/providers/ExcelProvider/implementations/ExcelProvider';
-import { ChecklistModule } from '../sst/checklist.module';
+import { ChecklistModule } from '../sst/sst.module';
 import { FilesChecklistController } from './controller/managment/files-checklist.controller';
 import { DatabaseTableRepository } from './repositories/implementations/DatabaseTableRepository';
 import { UploadChecklistDataService } from './services/checklist/upload-risk-data/upload-risk-data.service';

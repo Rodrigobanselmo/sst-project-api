@@ -1,14 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { TecnoSpeedESocialProvider } from '../../../../../shared/providers/ESocialEventProvider/implementations/TecnoSpeedESocialProvider';
+import { ESocialEventProvider } from '../../../../../shared/providers/ESocialEventProvider/implementations/ESocialEventProvider';
 
 @Injectable()
 export class AddCertificationESocialService {
-  constructor(
-    private readonly tecnoSpeedESocialProvider: TecnoSpeedESocialProvider,
-  ) {}
+  constructor(private readonly eSocialEventProvider: ESocialEventProvider) {}
 
   async execute() {
-    this.tecnoSpeedESocialProvider.addCertification();
+    this.eSocialEventProvider.addCertification();
     return;
   }
 }
+import { Client } from 'nestjs-soap';

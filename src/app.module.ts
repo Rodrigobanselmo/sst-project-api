@@ -4,7 +4,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { TelegramModule } from 'nestjs-telegram';
 
 import { AuthModule } from './modules/auth/auth.module';
-import { ChecklistModule } from './modules/sst/checklist.module';
+import { ChecklistModule } from './modules/sst/sst.module';
 import { CompanyModule } from './modules/company/company.module';
 import { DocumentsModule } from './modules/documents/documents.module';
 import { EsocialModule } from './modules/esocial/esocial.module';
@@ -15,6 +15,8 @@ import { PrismaModule } from './prisma/prisma.module';
 import { JwtAuthGuard } from './shared/guards/jwt-auth.guard';
 import { PermissionsGuard } from './shared/guards/permissions.guard';
 import { RolesGuard } from './shared/guards/roles.guard';
+import { SoapModule } from 'nestjs-soap';
+import { SoupClientEnum } from './shared/constants/enum/soupClient';
 
 @Module({
   imports: [
