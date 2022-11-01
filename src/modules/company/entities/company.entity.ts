@@ -105,7 +105,6 @@ export class CompanyEntity implements Company {
   unit: string;
   numAsos: number;
   blockResignationExam: boolean;
-  esocialStart: Date;
   doctorResponsibleId: number;
   tecResponsibleId: number;
   contacts: ContactEntity[];
@@ -132,6 +131,8 @@ export class CompanyEntity implements Company {
   riskDegree?: number;
   isGroup: boolean;
   companyGroupId: number;
+  esocialStart: Date;
+  esocialLastTransmission: Date;
 
   constructor(partial: Partial<CompanyEntity>) {
     Object.assign(this, partial);

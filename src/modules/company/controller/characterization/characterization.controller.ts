@@ -87,13 +87,18 @@ export class CharacterizationController {
     FilesInterceptor('files[]', 5, { fileFilter: pngFileFilter }),
   )
   upsert(
-    @Body() upsertCharacterizationDto: UpsertCharacterizationDto,
+    @Body() body: UpsertCharacterizationDto,
     @User() userPayloadDto: UserPayloadDto,
     @Param('workspaceId') workspaceId: string,
     @UploadedFiles() files?: Array<Express.Multer.File>,
   ) {
+    if (!('considerations' in body)) body.considerations = [];
+    if (!('activities' in body)) body.activities = [];
+    if (!('paragraphs' in body)) body.paragraphs = [];
+    if (!('photos' in body)) body.photos = [];
+
     return this.upsertCharacterizationService.execute(
-      upsertCharacterizationDto,
+      body,
       workspaceId,
       userPayloadDto,
       files,

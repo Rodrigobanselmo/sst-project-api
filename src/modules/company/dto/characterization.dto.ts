@@ -1,6 +1,7 @@
 import { CharacterizationTypeEnum } from '@prisma/client';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
+  IsDate,
   IsEnum,
   IsInt,
   IsOptional,
@@ -83,6 +84,16 @@ export class UpsertCharacterizationDto {
   @IsOptional()
   @IsString()
   profileParentId?: string;
+
+  @IsOptional()
+  @IsDate()
+  @Type(() => Date)
+  startDate?: Date;
+
+  @IsOptional()
+  @IsDate()
+  @Type(() => Date)
+  endDate?: Date;
 }
 
 export class AddPhotoCharacterizationDto {

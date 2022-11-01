@@ -1868,6 +1868,11 @@
   resolved "https://registry.yarnpkg.com/@xmldom/xmldom/-/xmldom-0.7.6.tgz#6f55073fa73e65776bd85826958b98c8cd1457b5"
   integrity sha512-HHXP9hskkFQHy8QxxUXkS7946FFIhYVfGqsk0WLwllmexN9x/+R4UBLvurHEuyXRfVEObVR8APuQehykLviwSQ==
 
+"@xmldom/xmldom@^0.8.3":
+  version "0.8.3"
+  resolved "https://registry.yarnpkg.com/@xmldom/xmldom/-/xmldom-0.8.3.tgz#beaf980612532aa9a3004aff7e428943aeaa0711"
+  integrity sha512-Lv2vySXypg4nfa51LY1nU8yDAGo/5YwF+EY/rUZgIbfvwVARcd67ttCM8SMsTeJy51YhHYavEq+FS6R0hW9PFQ==
+
 "@xtuc/ieee754@^1.2.0":
   version "1.2.0"
   resolved "https://registry.npmjs.org/@xtuc/ieee754/-/ieee754-1.2.0.tgz"
@@ -2478,6 +2483,11 @@ buffer@^5.5.0:
     base64-js "^1.3.1"
     ieee754 "^1.1.13"
 
+"bufferjs@>= 1.0.2":
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/bufferjs/-/bufferjs-3.0.1.tgz#0692e829cb10a10550e647390b035eb06c38e8ef"
+  integrity sha512-qrCIGPcd9ODawCNyqR2o55zgaC/r7XHZ7oUh2s99uk+NVBS3SjIHigxS1S2KXpt8wsoQxAN55iPi8GIH8TGMRg==
+
 buffers@~0.1.1:
   version "0.1.1"
   resolved "https://registry.npmjs.org/buffers/-/buffers-0.1.1.tgz"
@@ -2949,12 +2959,17 @@ data-urls@^2.0.0:
     whatwg-mimetype "^2.3.0"
     whatwg-url "^8.0.0"
 
+dateformat@>=1.0.2-1.2.3:
+  version "5.0.3"
+  resolved "https://registry.yarnpkg.com/dateformat/-/dateformat-5.0.3.tgz#fe2223eff3cc70ce716931cb3038b59a9280696e"
+  integrity sha512-Kvr6HmPXUMerlLcLF+Pwq3K7apHpYmGDVqrxcDasBg86UcKeTSNWbEzU8bwdXnxnR44FtMhJAxI4Bov6Y/KUfA==
+
 dayjs@^1.10.7, dayjs@^1.8.34:
   version "1.10.7"
   resolved "https://registry.npmjs.org/dayjs/-/dayjs-1.10.7.tgz"
   integrity sha512-P6twpd70BcPK34K26uJ1KT3wlhpuOAPoMwJzpsIWUxHZ7wpmbdZL/hQqBDfz7hGurYSa5PhzdhDHtt319hL3ig==
 
-debug@2.6.9:
+debug@2.6.9, debug@^2.3.0:
   version "2.6.9"
   resolved "https://registry.npmjs.org/debug/-/debug-2.6.9.tgz"
   integrity sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==
@@ -3869,6 +3884,11 @@ form-data@~2.3.2:
     asynckit "^0.4.0"
     combined-stream "^1.0.6"
     mime-types "^2.1.12"
+
+formidable@=1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/formidable/-/formidable-1.1.1.tgz#96b8886f7c3c3508b932d6bd70c4d3a88f35f1a9"
+  integrity sha512-JHWvnUXVLZ6gZRggImTzYDdqIEHRXLKZt74HMK0DQskHIBGXW0aEXydyuLtc7f2KbyFc2ScRy2m6bxvDbQuStQ==
 
 formidable@^1.2.2:
   version "1.2.2"
@@ -6310,6 +6330,11 @@ punycode@^2.1.0, punycode@^2.1.1:
   resolved "https://registry.npmjs.org/punycode/-/punycode-2.1.1.tgz"
   integrity sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==
 
+q@^1.4.0:
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/q/-/q-1.5.1.tgz#7e32f75b41381291d04611f1bf14109ac00651d7"
+  integrity sha512-kV/CThkXo6xyFEZUugw/+pIOywXcDbFYgSct5cT3gqlbkBE1SJdwy6UQoZvodiWF/ckQLZyDE/Bu1M6gVu5lVw==
+
 qs@6.7.0:
   version "6.7.0"
   resolved "https://registry.npmjs.org/qs/-/qs-6.7.0.tgz"
@@ -6465,7 +6490,7 @@ request-promise@^4.2.2:
     stealthy-require "^1.1.1"
     tough-cookie "^2.3.3"
 
-request@^2.83.0:
+request@>=2.9.100, request@^2.79.0, request@^2.83.0:
   version "2.88.2"
   resolved "https://registry.yarnpkg.com/request/-/request-2.88.2.tgz#d73c918731cb5a87da047e207234146f664d12b3"
   integrity sha512-MsvtOrfG9ZcrOwAW+Qi+F6HbD0CWXEh9ou77uOb7FM2WPhwT7smM833PzanhJLsgXjN89Ir6V2PczXNnMpwKhw==
@@ -6778,6 +6803,16 @@ slice-ansi@^4.0.0:
     ansi-styles "^4.0.0"
     astral-regex "^2.0.0"
     is-fullwidth-code-point "^3.0.0"
+
+soap-x509-http@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/soap-x509-http/-/soap-x509-http-1.0.2.tgz#5fedb81e02126163e55bcf254362050511ce322f"
+  integrity sha512-rsVqs7Re5mor2Oc3Ej8BT1yQ5sMadd3O+FXlPHwfTVlaJ0wiH1VQ7sBpbmzBoVRUVStHCP6OtFjO26vbYGNzMw==
+  dependencies:
+    debug "^2.3.0"
+    q "^1.4.0"
+    request "^2.79.0"
+    ws.js "~2.0.0"
 
 soap@^0.45.0:
   version "0.45.0"
@@ -7757,6 +7792,18 @@ write-file-atomic@^3.0.0:
     signal-exit "^3.0.2"
     typedarray-to-buffer "^3.1.5"
 
+ws.js@~2.0.0:
+  version "2.0.23"
+  resolved "https://registry.yarnpkg.com/ws.js/-/ws.js-2.0.23.tgz#e763be58463915b0309caa7b14f3dae8b1f74493"
+  integrity sha512-nFZjm/AKiODl3u6p0LEde1EwnFv1ENUbDGow8k9xOaarYxHY035ooskRtvSi/ADvQEgO6j55ve1/FFefKAskgw==
+  dependencies:
+    bufferjs ">= 1.0.2"
+    dateformat ">=1.0.2-1.2.3"
+    formidable "=1.1.1"
+    request ">=2.9.100"
+    xml-crypto ">=0.0.4"
+    xmldom "=0.1.7"
+
 ws@>=7.4.6:
   version "8.8.1"
   resolved "https://registry.yarnpkg.com/ws/-/ws-8.8.1.tgz#5dbad0feb7ade8ecc99b830c1d77c913d4955ff0"
@@ -7779,6 +7826,14 @@ xlsx@^0.17.4:
     ssf "~0.11.2"
     wmf "~1.0.1"
     word "~0.3.0"
+
+xml-crypto@>=0.0.4:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/xml-crypto/-/xml-crypto-3.0.0.tgz#e3342f9c9a94455d4700431ac9803493bf51cf81"
+  integrity sha512-vdmZOsWgjnFxYGY7OwCgxs+HLWzwvLgX2n0NSYWh3gudckQyNOmtJTT6ooOWEvDZSpC9qRjRs2bEXqKFi1oCHw==
+  dependencies:
+    "@xmldom/xmldom" "^0.8.3"
+    xpath "0.0.32"
 
 xml-crypto@^2.1.3:
   version "2.1.4"
@@ -7822,6 +7877,11 @@ xmlchars@^2.2.0:
   version "2.2.0"
   resolved "https://registry.npmjs.org/xmlchars/-/xmlchars-2.2.0.tgz"
   integrity sha512-JZnDKK8B0RCDw84FNdDAIpZK+JuJw+s7Lz8nksI7SIuU3UXJJslUthsi+uWBUYOwPFwW7W7PRLRfUKpxjtjFCw==
+
+xmldom@=0.1.7:
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/xmldom/-/xmldom-0.1.7.tgz#c338f1cd9893a623d1603c0a7fea7df439a120b8"
+  integrity sha512-Mll6+TdSWkocqsYPaIfN0W2tB7jRvS16L2FmgZrdGEMnzlLUq0ZIsSZ5/qeJ4q9qhjqNSiCs2oaSjy8jesE9kg==
 
 xpath@0.0.32:
   version "0.0.32"

@@ -1,7 +1,9 @@
+import { PaginationQueryDto } from 'src/shared/dto/pagination.dto';
 import { PartialType } from '@nestjs/swagger';
 import { HierarchyEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import {
+  IsDate,
   IsEnum,
   IsInt,
   IsOptional,
@@ -190,4 +192,31 @@ export class CreateSubHierarchyDto {
 
   @IsString()
   parentId?: string;
+}
+
+export class FindHierarchyDto extends PaginationQueryDto {
+  @IsString()
+  @IsOptional()
+  search?: string;
+
+  @IsString()
+  @IsOptional()
+  name?: string;
+
+  @IsString()
+  @IsOptional()
+  companyId?: string;
+
+  @IsString()
+  @IsOptional()
+  hierarchyId?: string;
+
+  @IsString()
+  @IsOptional()
+  homogeneousGroupId?: string;
+
+  @IsOptional()
+  @IsDate({ message: 'Data inválida' })
+  @Type(() => Date)
+  endDate: Date;
 }

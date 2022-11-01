@@ -1,3 +1,5 @@
+import { prismaFilter } from './../../../../shared/utils/filters/prisma.filters';
+import { PaginationQueryDto } from 'src/shared/dto/pagination.dto';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
 import { HierarchyEnum, Prisma } from '@prisma/client';
@@ -5,6 +7,7 @@ import { HierarchyEnum, Prisma } from '@prisma/client';
 import { PrismaService } from '../../../../prisma/prisma.service';
 import {
   CreateHierarchyDto,
+  FindHierarchyDto,
   UpdateHierarchyDto,
   UpdateSimpleManyHierarchyDto,
 } from '../../dto/hierarchy';
@@ -65,8 +68,29 @@ export class HierarchyRepository {
       hierarchyId: string;
       homogeneousGroupId: any;
       workspaceId: string;
+      endDate: Date;
     }[] = [];
     // const data = await this.prisma.homogeneousGroup.upsert({create:{companyId, name: }});
+
+    const hierarchyOnHomogeneous = {};
+    const foundHomogeneousGroups =
+      await this.prisma.hierarchyOnHomogeneous.findMany({
+        where: {
+          hierarchyId: { in: upsertHierarchyMany.map((h) => h.id) },
+        },
+      });
+
+    foundHomogeneousGroups.forEach((hg) => {
+      const max = foundHomogeneousGroups.reduce((a, b) => {
+        if (hg.hierarchyId !== b.hierarchyId) return a;
+        return Math.max(a, b?.endDate?.getTime());
+      }, 0);
+
+      if ((hg?.endDate?.getTime() || 0) == max) {
+        hierarchyOnHomogeneous[hg.hierarchyId] = {};
+        hierarchyOnHomogeneous[hg.hierarchyId].id = hg.id;
+      }
+    });
 
     const data = await this.prisma.$transaction(
       upsertHierarchyMany.map(
@@ -91,6 +115,7 @@ export class HierarchyRepository {
                     (homogeneous) => homogeneous.name === ghoName,
                   )?.id,
                   workspaceId,
+                  endDate: null,
                 }))
                 .filter(
                   (hierarchyOnHomo) => hierarchyOnHomo.homogeneousGroupId,
@@ -163,10 +188,12 @@ export class HierarchyRepository {
         return this.prisma.hierarchyOnHomogeneous.upsert({
           create: {
             ...hierarchyOnHomoGroup,
+            startDate: null,
           },
-          update: {},
+          update: { endDate: null },
           where: {
-            hierarchyId_homogeneousGroupId_workspaceId: hierarchyOnHomoGroup,
+            id:
+              hierarchyOnHomogeneous[hierarchyOnHomoGroup.hierarchyId]?.id || 0,
           },
         });
       }),
@@ -462,6 +489,7 @@ export class HierarchyRepository {
               include: { characterization: true, environment: true },
             },
           },
+          where: { endDate: null },
         },
         subOfficeEmployees: {
           where: { hierarchy: { workspaces: { some: { id: workspaceId } } } },
@@ -578,5 +606,71 @@ export class HierarchyRepository {
     })) as HierarchyEntity;
 
     return new HierarchyEntity(hierarchies);
+  }
+
+  async find(
+    query: Partial<FindHierarchyDto>,
+    pagination: PaginationQueryDto,
+    options: Prisma.HierarchyFindManyArgs = {},
+  ) {
+    const whereInit = {
+      AND: [],
+      ...options.where,
+    } as typeof options.where;
+
+    options.orderBy = {
+      name: 'asc',
+    };
+
+    options.select = {
+      id: true,
+      name: true,
+      companyId: true,
+      parentId: true,
+      type: true,
+      ...options?.select,
+    };
+
+    const { where } = prismaFilter(whereInit, {
+      query,
+      skip: ['search', 'homogeneousGroupId'],
+    });
+
+    if ('search' in query) {
+      (where.AND as any).push({
+        OR: [{ name: { contains: query.search, mode: 'insensitive' } }],
+      } as typeof options.where);
+      delete query.search;
+    }
+
+    if ('homogeneousGroupId' in query) {
+      (where.AND as any).push({
+        hierarchyOnHomogeneous: {
+          some: { homogeneousGroupId: query.homogeneousGroupId },
+        },
+      } as typeof options.where);
+
+      options.select.hierarchyOnHomogeneous = {
+        where: { homogeneousGroupId: query.homogeneousGroupId },
+      };
+      delete query.search;
+    }
+
+    const response = await this.prisma.$transaction([
+      this.prisma.hierarchy.count({
+        where,
+      }),
+      this.prisma.hierarchy.findMany({
+        ...options,
+        where,
+        take: pagination.take || 20,
+        skip: pagination.skip || 0,
+      }),
+    ]);
+
+    return {
+      data: response[1].map((hierarchy) => new HierarchyEntity(hierarchy)),
+      count: response[0],
+    };
   }
 }

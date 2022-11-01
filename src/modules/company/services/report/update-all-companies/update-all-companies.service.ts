@@ -50,7 +50,7 @@ export class UpdateAllCompaniesService {
       where: {
         status: 'ACTIVE',
         isClinic: false,
-        // ...(!companyId && {
+        // ...(!companyId && { //? does not get companies that had updated report recently
         //   OR: [
         //     {
         //       report: {

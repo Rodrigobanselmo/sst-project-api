@@ -110,6 +110,8 @@ export class RiskFactorDataEntity implements RiskFactorData {
   engsToRiskFactorData?: EngsRiskDataEntity[];
   examsToRiskFactorData?: ExamRiskDataEntity[];
   standardExams: boolean;
+  endDate: Date;
+  startDate: Date;
 
   constructor(partial: Partial<RiskFactorDataEntity>) {
     Object.assign(this, partial);

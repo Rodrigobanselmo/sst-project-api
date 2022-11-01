@@ -1,10 +1,18 @@
+import { prismaFilter } from './../../../../shared/utils/filters/prisma.filters';
+import { PaginationQueryDto } from 'src/shared/dto/pagination.dto';
+import { sortData } from './../../../../shared/utils/sorts/data.sort';
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { removeDuplicate } from '../../../../shared/utils/removeDuplicate';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { asyncEach } from '../../../../shared/utils/asyncEach';
-import { CreateHomoGroupDto, UpdateHomoGroupDto } from '../../dto/homoGroup';
+import {
+  CreateHomoGroupDto,
+  FindHomogeneousGroupDto,
+  UpdateHierarchyHomoGroupDto,
+  UpdateHomoGroupDto,
+} from '../../dto/homoGroup';
 import { HierarchyEntity } from '../../entities/hierarchy.entity';
 import { HomoGroupEntity } from '../../entities/homoGroup.entity';
 import { Prisma } from '@prisma/client';
@@ -14,7 +22,12 @@ export class HomoGroupRepository {
   constructor(private prisma: PrismaService) {}
 
   async create(
-    { ...createHomoGroupDto }: CreateHomoGroupDto,
+    {
+      hierarchies,
+      endDate = null,
+      startDate = null,
+      ...createHomoGroupDto
+    }: CreateHomoGroupDto,
     companyId: string,
   ): Promise<HomoGroupEntity> {
     const data = await this.prisma.homogeneousGroup.create({
@@ -24,37 +37,139 @@ export class HomoGroupRepository {
       },
     });
 
+    if (hierarchies) {
+      await Promise.all(
+        hierarchies.map(
+          async ({ id: hierarchyId, workspaceId }) =>
+            await this.prisma.hierarchyOnHomogeneous.create({
+              data: {
+                hierarchyId,
+                workspaceId,
+                homogeneousGroupId: data.id,
+                startDate,
+                endDate,
+              },
+            }),
+        ),
+      );
+    }
+
     return this.getHomoGroupData(data);
   }
 
   async update({
     id,
     hierarchies,
+    endDate = null,
+    startDate = null,
     ...updateHomoGroup
   }: UpdateHomoGroupDto): Promise<HomoGroupEntity> {
-    let homoHierarchies = [];
     if (hierarchies) {
-      homoHierarchies = hierarchies.map((hierarchy) => ({
-        hierarchyId_homogeneousGroupId_workspaceId: {
-          hierarchyId: hierarchy.id,
-          homogeneousGroupId: id,
-          workspaceId: hierarchy.workspaceId,
-        },
-      }));
-
-      await this.prisma.hierarchyOnHomogeneous.deleteMany({
-        where: { homogeneousGroupId: id },
-      });
-
-      const addHomoHierarchies = async (value: typeof homoHierarchies[0]) => {
-        await this.prisma.hierarchyOnHomogeneous.upsert({
-          create: { ...value.hierarchyId_homogeneousGroupId_workspaceId },
-          update: {},
-          where: value,
+      const hierarchyOnHomogeneous = {};
+      const foundHomogeneousGroups =
+        await this.prisma.hierarchyOnHomogeneous.findMany({
+          where: {
+            homogeneousGroupId: id,
+            hierarchyId: { in: hierarchies.map((h) => h.id) },
+          },
         });
-      };
 
-      await asyncEach(homoHierarchies, addHomoHierarchies);
+      foundHomogeneousGroups
+        .sort((a, b) =>
+          sortData(
+            b?.endDate || new Date('3000-01-01T00:00:00.00Z'),
+            a?.endDate || new Date('3000-01-01T00:00:00.00Z'),
+          ),
+        )
+        .forEach((hg) => {
+          if (hierarchyOnHomogeneous[hg.hierarchyId + hg.workspaceId]) return;
+
+          if (!hg.startDate && !hg.endDate) {
+            hierarchyOnHomogeneous[hg.hierarchyId + hg.workspaceId] = {};
+            hierarchyOnHomogeneous[hg.hierarchyId + hg.workspaceId].id = hg.id;
+            return;
+          }
+
+          if (endDate && !startDate) {
+            if (hg.startDate && !hg.endDate && hg.startDate < endDate) {
+              hierarchyOnHomogeneous[hg.hierarchyId + hg.workspaceId] = {};
+              // eslint-disable-next-line prettier/prettier
+              hierarchyOnHomogeneous[hg.hierarchyId+hg.workspaceId].id = hg.id;
+              // eslint-disable-next-line prettier/prettier
+              hierarchyOnHomogeneous[hg.hierarchyId+hg.workspaceId].startDate = undefined;
+              return;
+            }
+          }
+
+          const sameDate = hg.startDate == startDate || hg.endDate == endDate;
+          if (sameDate) {
+            hierarchyOnHomogeneous[hg.hierarchyId + hg.workspaceId] = {};
+            return (hierarchyOnHomogeneous[hg.hierarchyId + hg.workspaceId].id =
+              hg.id);
+          }
+
+          //!
+          // if (startDate && !endDate) {
+          //   const max = foundHomogeneousGroups.reduce((a, b) => {
+          //     if (hg.hierarchyId !== b.hierarchyId) return a;
+          //     return Math.max(a, b?.endDate?.getTime());
+          //   }, 0);
+
+          //   if (hg.endDate?.getTime() == max) {
+          //     hierarchyOnHomogeneous[hg.hierarchyId+hg.workspaceId] = {};
+          //     hierarchyOnHomogeneous[hg.hierarchyId+hg.workspaceId].id = hg.id;
+          //     hierarchyOnHomogeneous[hg.hierarchyId+hg.workspaceId].endDate = undefined;
+          //   }
+          // }
+
+          // if (endDate && !startDate) {
+          //   const min = foundHomogeneousGroups.reduce((a, b) => {
+          //     if (hg.hierarchyId !== b.hierarchyId) return a;
+          //     return a
+          //       ? Math.max(a, b?.startDate?.getTime())
+          //       : b?.startDate?.getTime() || 0;
+          //   }, 0);
+
+          //   if ((hg?.startDate?.getTime() || 0) == min) {
+          //     hierarchyOnHomogeneous[hg.hierarchyId+hg.workspaceId] = {};
+          //     hierarchyOnHomogeneous[hg.hierarchyId+hg.workspaceId].id = hg.id;
+          //     hierarchyOnHomogeneous[hg.hierarchyId+hg.workspaceId].startDate = undefined;
+          //   }
+          // }
+          //!
+        });
+
+      await Promise.all(
+        hierarchies.map(
+          async ({ id: hierarchyId, workspaceId }) =>
+            await this.prisma.hierarchyOnHomogeneous.upsert({
+              where: {
+                id: hierarchyOnHomogeneous[hierarchyId + workspaceId]?.id || 0,
+              },
+              create: {
+                hierarchyId,
+                workspaceId,
+                homogeneousGroupId: id,
+                startDate,
+                endDate,
+              },
+              update: {
+                startDate:
+                  hierarchyOnHomogeneous[hierarchyId + workspaceId] &&
+                  'startDate' in
+                    hierarchyOnHomogeneous[hierarchyId + workspaceId]
+                    ? hierarchyOnHomogeneous[hierarchyId + workspaceId]
+                        .startDate
+                    : startDate,
+                endDate:
+                  hierarchyOnHomogeneous[hierarchyId + workspaceId] &&
+                  'endDate' in hierarchyOnHomogeneous[hierarchyId + workspaceId]
+                    ? hierarchyOnHomogeneous[hierarchyId + workspaceId].endDate
+                    : endDate,
+              },
+            }),
+        ),
+      );
     }
 
     const data = await this.prisma.homogeneousGroup.update({
@@ -62,11 +177,6 @@ export class HomoGroupRepository {
       include: { hierarchyOnHomogeneous: { include: { hierarchy: true } } },
       data: {
         ...updateHomoGroup,
-        hierarchyOnHomogeneous: homoHierarchies.length
-          ? {
-              set: homoHierarchies,
-            }
-          : undefined,
       },
     });
 
@@ -81,6 +191,21 @@ export class HomoGroupRepository {
     return this.getHomoGroupData(homoGroup);
   }
 
+  async updateHierarchyHomo({
+    ids,
+    workspaceId,
+    endDate = null,
+    startDate = null,
+  }: UpdateHierarchyHomoGroupDto) {
+    return this.prisma.hierarchyOnHomogeneous.updateMany({
+      where: { id: { in: ids }, workspaceId },
+      data: {
+        startDate,
+        endDate,
+      },
+    });
+  }
+
   async findHomoGroupByCompanyAndId(
     id: string,
     companyId: string,
@@ -92,6 +217,97 @@ export class HomoGroupRepository {
     });
 
     return new HomoGroupEntity(hierarchies);
+  }
+
+  async find(
+    query: Partial<FindHomogeneousGroupDto>,
+    pagination: PaginationQueryDto,
+    options: Prisma.HomogeneousGroupFindManyArgs = {},
+  ) {
+    const whereInit = {
+      AND: [],
+      type: null,
+      ...options.where,
+    } as typeof options.where;
+
+    options.orderBy = {
+      name: 'asc',
+    };
+
+    options.select = {
+      id: true,
+      name: true,
+      companyId: true,
+      status: true,
+      type: true,
+      ...options?.select,
+    };
+
+    const { where } = prismaFilter(whereInit, {
+      query,
+      skip: ['search', 'type'],
+    });
+
+    if ('search' in query) {
+      (where.AND as any).push({
+        name: { contains: query.search, mode: 'insensitive' },
+      } as typeof options.where);
+    }
+    if ('type' in query) {
+      (where.type as any).type = { in: query.type };
+    }
+
+    const response = await this.prisma.$transaction([
+      this.prisma.homogeneousGroup.count({
+        where,
+      }),
+      this.prisma.homogeneousGroup.findMany({
+        take: pagination.take || 20,
+        skip: pagination.skip || 0,
+        ...options,
+        where,
+      }),
+    ]);
+
+    return {
+      data: response[1].map((employee) => new HomoGroupEntity(employee)),
+      count: response[0],
+    };
+  }
+
+  async findFirstNude(options?: Prisma.HomogeneousGroupFindFirstArgs) {
+    const homo = await this.prisma.homogeneousGroup.findFirst({
+      ...options,
+    });
+
+    return new HomoGroupEntity(homo);
+  }
+
+  async findById(
+    id: string,
+    companyId: string,
+    options?: Prisma.HomogeneousGroupFindFirstArgs,
+  ) {
+    const homo = await this.prisma.homogeneousGroup.findFirst({
+      where: { id, companyId },
+      include: {
+        hierarchyOnHomogeneous: {
+          include: {
+            hierarchy: {
+              select: {
+                id: true,
+                name: true,
+                type: true,
+                workspaces: { select: { id: true } },
+              },
+            },
+          },
+        },
+      },
+      ...options,
+    });
+
+    return new HomoGroupEntity(homo);
   }
 
   async findHomoGroupByCompanyAndName(name: string, companyId: string) {

@@ -15,8 +15,6 @@ import { PrismaModule } from './prisma/prisma.module';
 import { JwtAuthGuard } from './shared/guards/jwt-auth.guard';
 import { PermissionsGuard } from './shared/guards/permissions.guard';
 import { RolesGuard } from './shared/guards/roles.guard';
-import { SoapModule } from 'nestjs-soap';
-import { SoupClientEnum } from './shared/constants/enum/soupClient';
 
 @Module({
   imports: [

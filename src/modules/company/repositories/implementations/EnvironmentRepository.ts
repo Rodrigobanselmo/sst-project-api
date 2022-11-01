@@ -50,27 +50,28 @@ export class EnvironmentRepository {
     });
 
     //homoHierarchy
-    await Promise.all(
-      hierarchyIds.map(
-        async (hierarchyId) =>
-          await this.prisma.hierarchyOnHomogeneous.upsert({
-            where: {
-              hierarchyId_homogeneousGroupId_workspaceId: {
-                hierarchyId,
-                workspaceId,
-                homogeneousGroupId: homogeneousGroup.id,
-              },
-            },
-            create: {
-              hierarchyId,
-              workspaceId,
-              homogeneousGroupId: homogeneousGroup.id,
-            },
-            update: {},
-            // include: { hierarchy: true },
-          }),
-      ),
-    );
+    // await Promise.all(
+    //   hierarchyIds.map(
+    //     async (hierarchyId) =>
+    //       await this.prisma.hierarchyOnHomogeneous.upsert({
+    //         where: {
+    //           hierarchyId_homogeneousGroupId_workspaceId_endDate: {
+    //             hierarchyId,
+    //             workspaceId,
+    //             homogeneousGroupId: homogeneousGroup.id,
+    //             endDate: new Date('3000-01-01T00:00:00.00Z'),
+    //           },
+    //         },
+    //         create: {
+    //           hierarchyId,
+    //           workspaceId,
+    //           homogeneousGroupId: homogeneousGroup.id,
+    //         },
+    //         update: {},
+    //         // include: { hierarchy: true },
+    //       }),
+    //   ),
+    // );
     const characterization = (await this.prisma.companyCharacterization.upsert({
       where: {
         workspaceId_companyId_id: { id: id || 'no-id', companyId, workspaceId },

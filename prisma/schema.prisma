@@ -70,6 +70,21 @@ enum EmployeeHierarchyMotiveTypeEnum {
   DEM
 }
 
+enum EmployeeESocialRefTypeEnum {
+  CAT
+  EXAM
+  HIERARCHY
+  HOMO_GROUP
+  RISK_DATA
+  SUB_OFFICE
+}
+
+enum EmployeeESocialTransmissionTypeEnum {
+  CAT_2210
+  EXAM_2220
+  RISK_2240
+}
+
 enum ExamHistoryTypeEnum {
   ADMI
   PERI
@@ -300,6 +315,7 @@ model Company {
   created_at DateTime @default(now())
   deleted_at DateTime? 
   updated_at  DateTime   @updatedAt
+  esocialLastTransmission DateTime? 
   doctorResponsibleId  Int?
   tecResponsibleId  Int?
   status StatusEnum @default(ACTIVE)
@@ -355,6 +371,7 @@ model Company {
   notifications Notification[]  @relation(name: "owner_notification_company")
   protocol Protocol[]
   protocolToRisk ProtocolToRisk[]
+  esocialTransmission EmployeeESocialTransmission[]
   report CompanyReport?
 
   // professionals Professional[] @relation(name:"companies_related") 
@@ -648,6 +665,7 @@ model Employee {
   subOffices Hierarchy[] @relation(name: "sub_offices")
   hierarchyHistory EmployeeHierarchyHistory[]
   examsHistory EmployeeExamsHistory[]
+  esocialTransmission EmployeeESocialTransmission[]
   
   @@unique([id, companyId])
   @@unique([cpf, companyId])
@@ -711,6 +729,31 @@ model EmployeeExamsHistory {
   @@index(employeeId)
   @@index(fileUrl)
   @@index(clinicId)
+} 
+
+model EmployeeESocialTransmission {
+  id    Int   @id  @default(autoincrement())
+  created_at DateTime @default(now())
+  updated_at  DateTime   @updatedAt  
+  
+  refType EmployeeESocialRefTypeEnum
+  refId String
+  eventsDate DateTime
+  eventsType EmployeeESocialTransmissionTypeEnum
+  status StatusEnum @default(DONE)
+
+  userTransmissionId Int?
+  userTransmission User? @relation(fields: [userTransmissionId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  employeeId Int
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  companyId String
+  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@index(refType)
+  @@index(refId)
+  @@index(status)
+  @@index(eventsDate)
+  // @@index(employeeId)
 } 
 
 model EngsToRiskFactorData {
@@ -915,14 +958,18 @@ model Hierarchy {
 }
 
 model HierarchyOnHomogeneous {
+  id     Int   @id @default(autoincrement())
   hierarchy       Hierarchy     @relation(fields: [hierarchyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   hierarchyId     String
   homogeneousGroup   HomogeneousGroup @relation(fields: [homogeneousGroupId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   homogeneousGroupId     String
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   workspaceId     String
+  endDate DateTime?
+  startDate DateTime?
 
-  @@id([hierarchyId, homogeneousGroupId, workspaceId])
+  // @@unique([hierarchyId, homogeneousGroupId, workspaceId, endDate])
+  @@index(endDate)
 }
 
 model HomogeneousGroup {
@@ -1283,6 +1330,9 @@ model RiskFactorData {
   epiToRiskFactorData EpiToRiskFactorData[]
   engsToRiskFactorData EngsToRiskFactorData[]
   examsToRiskFactorData ExamToRiskData[]
+  endDate DateTime?
+  startDate DateTime?
+
 
   @@unique([id, companyId])
   @@unique([homogeneousGroupId, riskId, riskFactorGroupDataId])
@@ -1363,6 +1413,7 @@ model User {
   professional Professional? 
   notification Notification[] 
   notificationConfirm Notification[] @relation(name: "user_notification_confirm")
+  esocialTransmission EmployeeESocialTransmission[] 
 
   @@unique([id, name])
   @@index(email)

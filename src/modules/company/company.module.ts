@@ -115,6 +115,9 @@ import { TelegramModule } from 'nestjs-telegram';
 import { CompanyReportRepository } from './repositories/implementations/CompanyReportRepository';
 import { CopyCharacterizationService } from './services/characterization/copy-characterization/copy-characterization.service';
 import { CidRepository } from './repositories/implementations/CidRepository';
+import { UpdateHierarchyHomoGroupService } from './services/homoGroup/update-hierarchy-homo-group/update-hierarchy-homo-group.service';
+import { FindHomogenousGroupService } from './services/homoGroup/find-homo-group/find-homo-group.service';
+import { FindHomogenousGroupByIdService } from './services/homoGroup/find-homo-group-by-id/find-homo-group-by-id.service';
 
 @Module({
   imports: [
@@ -240,6 +243,9 @@ import { CidRepository } from './repositories/implementations/CidRepository';
     CompanyReportRepository,
     CopyCharacterizationService,
     CidRepository,
+    UpdateHierarchyHomoGroupService,
+    FindHomogenousGroupService,
+    FindHomogenousGroupByIdService,
   ],
   exports: [
     CompanyRepository,

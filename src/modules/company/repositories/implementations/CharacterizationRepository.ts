@@ -1,6 +1,7 @@
+import { sortData } from './../../../../shared/utils/sorts/data.sort';
 import { RiskFactorsEntity } from '../../../sst/entities/risk.entity';
 import { RiskFactorDataEntity } from '../../../sst/entities/riskData.entity';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CharacterizationTypeEnum, HomoTypeEnum, Prisma } from '@prisma/client';
 import { v4 } from 'uuid';
 
@@ -40,64 +41,108 @@ export class CharacterizationRepository {
       id,
       companyId,
       workspaceId,
-      hierarchyIds = [],
+      hierarchyIds,
       type,
       profileParentId,
+      startDate = null,
+      endDate = null,
       ...characterizationDto
     }: ICompanyCharacterization,
     isProfile?: boolean,
   ): Promise<CharacterizationEntity> {
     const newId = v4();
 
-    const homogeneousGroup = await this.prisma.homogeneousGroup.upsert({
-      where: { id: id || 'no-id' },
-      create: {
-        id: newId,
-        name: newId,
-        //! optimization here nd on characterization
-        description: characterizationDto.name + '(//)' + type,
-        companyId: companyId,
-        type: getCharacterizationType(type),
-      },
-      update: {
-        type: getCharacterizationType(type),
-        description: characterizationDto.name + '(//)' + type,
-      },
-      include: { hierarchyOnHomogeneous: true },
-    });
+    if (hierarchyIds) {
+      if (!workspaceId)
+        throw new BadRequestException(
+          'Faltou identificar o estabelecimento para cadastrar os cargos',
+        );
 
-    if (!isProfile)
-      await this.prisma.hierarchyOnHomogeneous.deleteMany({
-        where: {
-          homogeneousGroupId: homogeneousGroup.id,
-          hierarchyId: {
-            in: homogeneousGroup.hierarchyOnHomogeneous
-              .map((h) => h.hierarchyId)
-              .filter((hierarchyId) => !hierarchyIds.includes(hierarchyId)),
+      const homogeneousGroup = await this.prisma.homogeneousGroup.upsert({
+        where: { id: id || 'no-id' },
+        create: {
+          id: newId,
+          name: newId,
+          //! optimization here nd on characterization
+          description: characterizationDto.name + '(//)' + type,
+          companyId: companyId,
+          type: getCharacterizationType(type),
+        },
+        update: {
+          type: getCharacterizationType(type),
+          description: characterizationDto.name + '(//)' + type,
+        },
+        include: {
+          hierarchyOnHomogeneous: {
+            where: {
+              hierarchyId: { in: hierarchyIds },
+              workspaceId,
+            },
           },
         },
       });
 
-    await Promise.all(
-      hierarchyIds.map(
-        async (hierarchyId) =>
-          await this.prisma.hierarchyOnHomogeneous.upsert({
-            where: {
-              hierarchyId_homogeneousGroupId_workspaceId: {
+      const hierarchyOnHomogeneous = {};
+      homogeneousGroup.hierarchyOnHomogeneous
+        .sort((a, b) =>
+          sortData(
+            b?.endDate || new Date('3000-01-01T00:00:00.00Z'),
+            a?.endDate || new Date('3000-01-01T00:00:00.00Z'),
+          ),
+        )
+        .forEach((hg) => {
+          if (hierarchyOnHomogeneous[hg.hierarchyId]) return;
+
+          if (!hg.startDate && !hg.endDate) {
+            hierarchyOnHomogeneous[hg.hierarchyId] = {};
+            hierarchyOnHomogeneous[hg.hierarchyId].id = hg.id;
+            return;
+          }
+
+          if (endDate && !startDate) {
+            if (hg.startDate && !hg.endDate && hg.startDate < endDate) {
+              hierarchyOnHomogeneous[hg.hierarchyId] = {};
+              hierarchyOnHomogeneous[hg.hierarchyId].id = hg.id;
+              hierarchyOnHomogeneous[hg.hierarchyId].startDate = undefined;
+              return;
+            }
+          }
+
+          const sameDate = hg.startDate == startDate || hg.endDate == endDate;
+          if (sameDate) {
+            hierarchyOnHomogeneous[hg.hierarchyId] = {};
+            return (hierarchyOnHomogeneous[hg.hierarchyId].id = hg.id);
+          }
+        });
+
+      await Promise.all(
+        hierarchyIds.map(
+          async (hierarchyId) =>
+            await this.prisma.hierarchyOnHomogeneous.upsert({
+              where: { id: hierarchyOnHomogeneous[hierarchyId]?.id || 0 },
+              create: {
                 hierarchyId,
                 workspaceId,
                 homogeneousGroupId: homogeneousGroup.id,
+                startDate,
+                endDate,
               },
-            },
-            create: {
-              hierarchyId,
-              workspaceId,
-              homogeneousGroupId: homogeneousGroup.id,
-            },
-            update: {},
-          }),
-      ),
-    );
+              update: {
+                startDate:
+                  hierarchyOnHomogeneous[hierarchyId] &&
+                  'startDate' in hierarchyOnHomogeneous[hierarchyId]
+                    ? hierarchyOnHomogeneous[hierarchyId].startDate
+                    : startDate,
+                endDate:
+                  hierarchyOnHomogeneous[hierarchyId] &&
+                  'endDate' in hierarchyOnHomogeneous[hierarchyId]
+                    ? hierarchyOnHomogeneous[hierarchyId].endDate
+                    : endDate,
+              },
+            }),
+        ),
+      );
+    }
 
     const characterization = (await this.prisma.companyCharacterization.upsert({
       where: {
@@ -270,6 +315,11 @@ export class CharacterizationRepository {
       where: {
         hierarchyOnHomogeneous: {
           some: { homogeneousGroupId: characterization.id },
+        },
+      },
+      include: {
+        hierarchyOnHomogeneous: {
+          where: { homogeneousGroupId: characterization.id },
         },
       },
     });

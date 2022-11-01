@@ -371,14 +371,16 @@ export class CopyCompanyService {
             hierarchies.map(async (hierarchy) => {
               await this.prisma.hierarchyOnHomogeneous.upsert({
                 where: {
-                  hierarchyId_homogeneousGroupId_workspaceId: {
-                    hierarchyId: hierarchy.id,
-                    homogeneousGroupId:
-                      newHomoGroup.type === 'HIERARCHY'
-                        ? hierarchy.id
-                        : newHomoGroup.id,
-                    workspaceId: hierarchy.workspaceId,
-                  },
+                  id: 0,
+                  // hierarchyId_homogeneousGroupId_workspaceId_endDate: {
+                  //   hierarchyId: hierarchy.id,
+                  //   homogeneousGroupId:
+                  //     newHomoGroup.type === 'HIERARCHY'
+                  //       ? hierarchy.id
+                  //       : newHomoGroup.id,
+                  //   workspaceId: hierarchy.workspaceId,
+                  //   endDate: new Date('3000-01-01T00:00:00.00Z'),
+                  // },
                 },
                 create: {
                   hierarchyId: hierarchy.id,

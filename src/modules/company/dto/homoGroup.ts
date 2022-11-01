@@ -1,18 +1,21 @@
+import { QueryArray } from './../../../shared/transformers/query-array';
+import { PaginationQueryDto } from 'src/shared/dto/pagination.dto';
 import { HomoTypeEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import {
-  IsBoolean,
+  IsDate,
   IsEnum,
+  IsInt,
   IsOptional,
   IsString,
   MaxLength,
   ValidateIf,
   ValidateNested,
 } from 'class-validator';
-import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
-import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
 
+import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
+import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
 
 export class HierarchyOnHomoDto {
   @IsString()
@@ -54,6 +57,21 @@ export class CreateHomoGroupDto {
 
   @IsString()
   companyId: string;
+
+  @IsOptional()
+  @IsDate()
+  @Type(() => Date)
+  startDate?: Date;
+
+  @IsOptional()
+  @IsDate()
+  @Type(() => Date)
+  endDate?: Date;
+
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @Type(() => HierarchyOnHomoDto)
+  readonly hierarchies?: HierarchyOnHomoDto[];
 }
 
 export class UpdateHomoGroupDto {
@@ -80,10 +98,38 @@ export class UpdateHomoGroupDto {
   @MaxLength(100)
   name: string;
 
+  @IsOptional()
+  @IsDate()
+  @Type(() => Date)
+  startDate?: Date;
+
+  @IsOptional()
+  @IsDate()
+  @Type(() => Date)
+  endDate?: Date;
+
   @ValidateNested({ each: true })
   @IsOptional()
   @Type(() => HierarchyOnHomoDto)
   readonly hierarchies?: HierarchyOnHomoDto[];
+}
+
+export class UpdateHierarchyHomoGroupDto {
+  @IsInt({ each: true })
+  ids: number[];
+
+  @IsOptional()
+  @IsDate()
+  @Type(() => Date)
+  startDate?: Date;
+
+  @IsOptional()
+  @IsDate()
+  @Type(() => Date)
+  endDate?: Date;
+
+  @IsString()
+  workspaceId: string;
 }
 
 export class CopyHomogeneousGroupDto {
@@ -115,4 +161,31 @@ export class CopyHomogeneousGroupDto {
   @IsOptional()
   @IsString()
   hierarchyId?: string;
+}
+
+export class FindHomogeneousGroupDto extends PaginationQueryDto {
+  @IsString()
+  @IsOptional()
+  search?: string;
+
+  @IsString()
+  @IsOptional()
+  name?: string;
+
+  @IsString()
+  @IsOptional()
+  companyId?: string;
+
+  // @IsString()
+  // @IsOptional()
+  // hierarchyId?: string;
+
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsOptional()
+  @IsString({ each: true })
+  @IsEnum(HomoTypeEnum, {
+    each: true,
+    message: `type must be one of: ${KeysOfEnum(HomoTypeEnum)}`,
+  })
+  type?: HomoTypeEnum[];
 }

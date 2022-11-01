@@ -10,4 +10,3 @@ export class AddCertificationESocialService {
     return;
   }
 }
-import { Client } from 'nestjs-soap';

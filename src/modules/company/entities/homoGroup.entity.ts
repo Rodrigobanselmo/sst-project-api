@@ -63,16 +63,34 @@ export class HomoGroupEntity implements HomogeneousGroup {
         this.hierarchyOnHomogeneous[0].hierarchy,
       );
     }
+
+    if (this.hierarchyOnHomogeneous && !this.hierarchies) {
+      this.hierarchies = Object.values(
+        this.hierarchyOnHomogeneous.reduce((acc, curr) => {
+          if (!curr.hierarchy) return acc;
+          if (!acc[curr.hierarchyId]) acc[curr.hierarchyId] = curr.hierarchy;
+          if (!acc[curr.hierarchyId].hierarchyOnHomogeneous)
+            acc[curr.hierarchyId].hierarchyOnHomogeneous = [];
+
+          delete curr.hierarchy;
+          acc[curr.hierarchyId].hierarchyOnHomogeneous.push(curr);
+          return acc;
+        }, {} as Record<string, HierarchyEntity>),
+      );
+    }
   }
 }
 
 export class HierarchyOnHomogeneousEntity implements HierarchyOnHomogeneous {
+  id: number;
   hierarchyId: string;
   homogeneousGroupId: string;
   workspaceId: string;
   hierarchy?: HierarchyEntity;
   workspace?: WorkspaceEntity;
   homogeneousGroup?: HomoGroupEntity;
+  endDate: Date;
+  startDate: Date;
 
   constructor(partial: Partial<HomoGroupEntity>) {
     Object.assign(this, partial);

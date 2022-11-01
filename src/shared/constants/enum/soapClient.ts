@@ -1,4 +1,4 @@
-export enum SoupClientEnum {
+export enum SoapClientEnum {
   PRODUCTION = 'PRODUCTION',
   PRODUCTION_RESTRICT = 'PRODUCTION_RESTRICT',
 }

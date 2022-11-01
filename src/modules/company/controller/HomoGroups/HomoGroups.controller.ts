@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 
 import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
@@ -16,22 +17,30 @@ import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import {
   CopyHomogeneousGroupDto,
   CreateHomoGroupDto,
+  FindHomogeneousGroupDto,
+  UpdateHierarchyHomoGroupDto,
   UpdateHomoGroupDto,
 } from '../../dto/homoGroup';
 import { CopyHomoGroupService } from '../../services/homoGroup/copy-homo-group/copy-homo-group.service';
 import { CreateHomoGroupService } from '../../services/homoGroup/create-homo-group/create-homo-group.service';
 import { DeleteHomoGroupService } from '../../services/homoGroup/delete-homo-group/delete-homo-group.service';
 import { FindByCompanyHomoGroupService } from '../../services/homoGroup/find-by-company-homo-group/find-by-company-homo-group.service';
+import { FindHomogenousGroupByIdService } from '../../services/homoGroup/find-homo-group-by-id/find-homo-group-by-id.service';
+import { FindHomogenousGroupService } from '../../services/homoGroup/find-homo-group/find-homo-group.service';
+import { UpdateHierarchyHomoGroupService } from '../../services/homoGroup/update-hierarchy-homo-group/update-hierarchy-homo-group.service';
 import { UpdateHomoGroupService } from '../../services/homoGroup/update-homo-group/update-homo-group.service';
 
 @Controller('homogeneous-groups')
 export class HomoGroupsController {
   constructor(
     private readonly findByCompanyHomoGroupService: FindByCompanyHomoGroupService,
+    private readonly findHomogenousGroupService: FindHomogenousGroupService,
+    private readonly findHomogenousGroupByIdService: FindHomogenousGroupByIdService,
     private readonly createHomoGroupsService: CreateHomoGroupService,
     private readonly updateHomoGroupsService: UpdateHomoGroupService,
     private readonly deleteHomoGroupsService: DeleteHomoGroupService,
     private readonly copyHomoGroupService: CopyHomoGroupService,
+    private readonly updateHierarchyHomoGroupService: UpdateHierarchyHomoGroupService,
   ) {}
 
   @Permissions({
@@ -40,8 +49,48 @@ export class HomoGroupsController {
     isMember: true,
   })
   @Get('/:companyId?')
+  find(
+    @Query() query: FindHomogeneousGroupDto,
+    @User() userPayloadDto: UserPayloadDto,
+  ) {
+    return this.findHomogenousGroupService.execute(query, userPayloadDto);
+  }
+
+  @Permissions({
+    code: PermissionEnum.HOMO_GROUP,
+    isContract: true,
+    isMember: true,
+  })
+  @Get('all/:companyId?')
   findByCompany(@User() userPayloadDto: UserPayloadDto) {
     return this.findByCompanyHomoGroupService.execute(userPayloadDto);
+  }
+
+  @Permissions({
+    code: PermissionEnum.HOMO_GROUP,
+    isContract: true,
+    isMember: true,
+  })
+  @Get(':id/:companyId?')
+  findById(@Param('id') id: string, @User() userPayloadDto: UserPayloadDto) {
+    return this.findHomogenousGroupByIdService.execute(id, userPayloadDto);
+  }
+
+  @Permissions({
+    code: PermissionEnum.HOMO_GROUP,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
+  @Post('/hierarchy-homo/:companyId')
+  updateHierarchyHomo(
+    @Body() updateHomoGroupsDto: UpdateHierarchyHomoGroupDto,
+    @User() userPayloadDto: UserPayloadDto,
+  ) {
+    return this.updateHierarchyHomoGroupService.execute(
+      { ...updateHomoGroupsDto },
+      userPayloadDto,
+    );
   }
 
   @Permissions({
