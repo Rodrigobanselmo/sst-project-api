@@ -14,8 +14,8 @@ import { EmployeeExamsHistoryRepository } from './../../../../../repositories/im
 export class CreateEmployeeExamHistoryService {
   constructor(
     private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository,
-    private readonly createEmployeeHierarchyHistoryService: CreateEmployeeHierarchyHistoryService,
     private readonly employeeRepository: EmployeeRepository,
+    private readonly createEmployeeHierarchyHistoryService: CreateEmployeeHierarchyHistoryService,
     private readonly notificationRepository: NotificationRepository,
   ) {}
 

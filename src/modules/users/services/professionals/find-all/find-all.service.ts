@@ -13,14 +13,15 @@ export class FindAllProfessionalsByCompanyService {
     { skip, take, ...query }: FindProfessionalsDto,
     user: UserPayloadDto,
   ) {
-    const professionals = await this.professionalRepository.findByCompanyId(
-      {
-        ...query,
-        companyId: user.targetCompanyId,
-        userCompanyId: user.companyId,
-      },
-      { skip, take },
-    );
+    const professionals =
+      await this.professionalRepository.findCouncilByCompanyId(
+        {
+          ...query,
+          companyId: user.targetCompanyId,
+          userCompanyId: user.companyId,
+        },
+        { skip, take },
+      );
 
     return professionals;
   }

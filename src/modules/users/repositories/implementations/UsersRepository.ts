@@ -20,6 +20,19 @@ export class UsersRepository implements IUsersRepository {
     userCompanyDto: UserCompanyDto[],
     professional?: ProfessionalEntity,
   ) {
+    const hasCouncil =
+      professional?.councils && professional.councils.length > 0;
+
+    if (!hasCouncil) {
+      professional.councils = [
+        {
+          councilId: '',
+          councilUF: '',
+          councilType: '',
+        } as any,
+      ];
+    }
+
     const user = await this.prisma.user.create({
       data: {
         ...createUserDto,
@@ -37,18 +50,15 @@ export class UsersRepository implements IUsersRepository {
               type: professional?.type,
               name: professional?.name,
             }),
-            ...(professional?.councils &&
-              professional.councils.length > 0 && {
-                councils: {
-                  createMany: {
-                    data: professional.councils.map((c) => ({
-                      councilId: c.councilId,
-                      councilUF: c.councilUF,
-                      councilType: c.councilType,
-                    })),
-                  },
-                },
-              }),
+            councils: {
+              createMany: {
+                data: professional.councils.map((c) => ({
+                  councilId: c.councilId,
+                  councilUF: c.councilUF,
+                  councilType: c.councilType,
+                })),
+              },
+            },
           },
         },
         companies: { create: userCompanyDto },
@@ -117,14 +127,18 @@ export class UsersRepository implements IUsersRepository {
     if (!user) return;
 
     if (user.professional && councils) {
-      await this.prisma.professionalCouncil.deleteMany({
-        where: { professionalId: user.professional.id },
-      });
+      councils = councils.filter((c) => c.councilId !== '');
+      if (councils.length == 0) {
+        councils.push({ councilId: '', councilType: '', councilUF: '' });
+      }
 
       const councilsCreate = await Promise.all(
         councils.map(async ({ councilId, councilType, councilUF }) => {
-          if (councilId && councilType && councilUF)
-            await this.prisma.professionalCouncil.upsert({
+          if (
+            (councilId && councilType && councilUF) ||
+            (councilId == '' && councilType == '' && councilUF == '')
+          )
+            return await this.prisma.professionalCouncil.upsert({
               create: {
                 councilId,
                 councilType,
@@ -141,6 +155,19 @@ export class UsersRepository implements IUsersRepository {
                 },
               },
             });
+        }),
+      );
+
+      await Promise.all(
+        user.professional.councils.map(async (c) => {
+          if (councilsCreate.find((cCreated) => cCreated?.id == c.id)) return;
+          try {
+            await this.prisma.professionalCouncil.delete({
+              where: {
+                id: c.id,
+              },
+            });
+          } catch (err) {}
         }),
       );
 

@@ -115,7 +115,7 @@ export class PcmsoUploadService {
             },
             where: { workspaceId },
           },
-          professionals: { include: { councils: true } },
+          // professionals: { include: { councils: true } },
           receivingServiceContracts: {
             include: {
               applyingServiceCompany: {

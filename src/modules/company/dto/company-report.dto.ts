@@ -12,6 +12,12 @@ export interface DailyCompanyReportDto {
     expired30?: number;
     expired90?: number;
   };
+  esocial: {
+    pending?: number;
+    done?: number;
+    transmitted?: number;
+    rejected?: number;
+  };
 }
 
 export class UpsertCompanyReportDto {

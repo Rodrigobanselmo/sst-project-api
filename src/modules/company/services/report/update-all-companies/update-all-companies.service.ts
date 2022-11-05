@@ -18,6 +18,7 @@ import { TelegramService } from 'nestjs-telegram';
 import { CompanyReportRepository } from '../../../../../modules/company/repositories/implementations/CompanyReportRepository';
 import { arrayChunks } from '../../../../../shared/utils/arrayChunks';
 import { asyncBatch } from '../../../../../shared/utils/asyncBatch';
+import { ESocialEventProvider } from '../../../../../shared/providers/ESocialProvider/implementations/ESocialEventProvider';
 
 @Injectable()
 export class UpdateAllCompaniesService {
@@ -32,6 +33,7 @@ export class UpdateAllCompaniesService {
     private readonly companyRepository: CompanyRepository,
     private readonly dayjs: DayJSProvider,
     private readonly telegram: TelegramService,
+    private readonly eSocialEventProvider: ESocialEventProvider,
     private readonly companyReportRepository: CompanyReportRepository,
   ) {}
 
@@ -43,6 +45,8 @@ export class UpdateAllCompaniesService {
       select: {
         id: true,
         // report: { select: { id: true } },
+        esocialStart: true,
+        // esocialEvents:{select:{}}.
         applyingServiceContracts: {
           select: { receivingServiceCompanyId: true },
         },
@@ -77,27 +81,41 @@ export class UpdateAllCompaniesService {
 
     console.log('start cron(2): update employees');
     const employeeExams = (
-      await asyncEach(allCompanies, (v) => this.addEmployeeExamTime(v))
-    ).map((report): UpsertCompanyReportDto & { company: CompanyEntity } => {
-      const expired =
-        report.allWithExamExpired.length + report.allWithMissingExam.length;
+      await asyncEach(allCompanies, (v) => this.addReport(v))
+    ).map(
+      ({
+        company,
+        examTime,
+        esocialEvents,
+      }): UpsertCompanyReportDto & { company: CompanyEntity } => {
+        const expired =
+          (examTime?.allWithExamExpired?.length || 0) +
+          (examTime?.allWithMissingExam?.length || 0);
 
-      return {
-        company: report.company,
-        companyId: report.company.id,
-        lastDailyReport: this.dayjs.dateNow(),
-        dailyReport: {
-          exam: {
-            all: report.all.length,
-            expired,
-            good: report.all.length - expired,
-            schedule: report.allWithExamSchedule.length,
-            expired30: report.closeToExpire30.length,
-            expired90: report.closeToExpire90.length,
+        return {
+          company: company,
+          companyId: company.id,
+          lastDailyReport: this.dayjs.dateNow(),
+          dailyReport: {
+            exam: {
+              ...(examTime && {
+                all: examTime?.all?.length || 0,
+                expired,
+                good: (examTime?.all?.length || 0) - expired,
+                schedule: examTime?.allWithExamSchedule?.length || 0,
+                expired30: examTime?.closeToExpire30?.length || 0,
+                expired90: examTime?.closeToExpire90?.length || 0,
+              }),
+            },
+            esocial: {
+              ...(esocialEvents && {
+                pending: esocialEvents?.pending || 0,
+              }),
+            },
           },
-        },
-      };
-    });
+        };
+      },
+    );
 
     const employeeExamsData = employeeExams.map(
       ({ company, ...report }): UpsertCompanyReportDto => {
@@ -113,6 +131,12 @@ export class UpdateAllCompaniesService {
             Object.entries(employeeExam.dailyReport.exam).map(([k, v]) => {
               if (typeof v === 'number') {
                 report.dailyReport.exam[k] = report.dailyReport.exam[k] + v;
+              }
+            });
+            Object.entries(employeeExam.dailyReport.esocial).map(([k, v]) => {
+              if (typeof v === 'number') {
+                report.dailyReport.esocial[k] =
+                  report.dailyReport.esocial[k] + v;
               }
             });
           }
@@ -134,6 +158,13 @@ export class UpdateAllCompaniesService {
     this.errorCompanies = [];
     this.error = undefined;
     return employeeExamsData;
+  }
+
+  async addReport(company: CompanyEntity) {
+    const examTime = await this.addEmployeeExamTime(company);
+    const esocialEvents = await this.addEmployeeEsocial(company);
+
+    return { examTime, esocialEvents, company };
   }
 
   async addEmployeeExamTime(company: CompanyEntity) {
@@ -347,6 +378,34 @@ export class UpdateAllCompaniesService {
             this.dayjs.dayjs(_30_DaysFromNow).isBefore(e.expiredDateExam)
           );
         }),
+      };
+    } catch (e) {
+      this.errorCompanies.push(companyId);
+      this.error = e;
+    }
+  }
+
+  async addEmployeeEsocial(company: CompanyEntity) {
+    const companyId = company.id;
+    try {
+      const { data: employees } = await this.employeeRepository.findEvent2220(
+        {
+          startDate: company.esocialStart,
+          companyId,
+        },
+        { take: 100 },
+      );
+
+      const eventsStruct = this.eSocialEventProvider.convertToEventStruct(
+        company,
+        employees,
+      );
+
+      return {
+        pending: eventsStruct.length,
+        //         done:company.,
+        // transmitted:,
+        // rejected:,
       };
     } catch (e) {
       this.errorCompanies.push(companyId);

@@ -22,6 +22,7 @@ export class EmployeeHierarchyHistoryEntity
   management?: string;
   sector?: string;
   office?: string;
+  deletedAt: Date;
 
   constructor(partial: Partial<EmployeeHierarchyHistoryEntity>) {
     Object.assign(this, partial);

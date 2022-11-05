@@ -45,24 +45,32 @@ export class ProfessionalRepository {
       },
     });
 
+    const hasCouncil = councils && councils.length > 0;
+    if (!hasCouncil) {
+      councils = [
+        {
+          councilId: '',
+          councilUF: '',
+          councilType: '',
+        },
+      ];
+    }
+
     const professional = await this.prisma.professional.create({
       ...options,
       data: {
         ...data,
         companyId,
         inviteId: invite.id,
-        ...(councils &&
-          councils.length > 0 && {
-            councils: {
-              createMany: {
-                data: councils.map((c) => ({
-                  councilId: c.councilId,
-                  councilUF: c.councilUF,
-                  councilType: c.councilType,
-                })),
-              },
-            },
-          }),
+        councils: {
+          createMany: {
+            data: councils.map((c) => ({
+              councilId: c.councilId,
+              councilUF: c.councilUF,
+              councilType: c.councilType,
+            })),
+          },
+        },
       },
       include: { user: true, ...options.include },
     });
@@ -87,18 +95,23 @@ export class ProfessionalRepository {
       ...options,
       data: { ...data },
       where: { id },
-      include: { user: true, ...options.include },
+      include: { user: true, ...options.include, councils: true },
     });
 
     if (professional?.id && councils) {
-      await this.prisma.professionalCouncil.deleteMany({
-        where: { professionalId: professional.id },
-      });
+      councils = councils.filter((c) => c.councilId !== '');
+
+      if (councils.length == 0) {
+        councils.push({ councilId: '', councilType: '', councilUF: '' });
+      }
 
       const councilsCreate = await Promise.all(
         councils.map(async ({ councilId, councilType, councilUF }) => {
-          if (councilId && councilType && councilUF)
-            await this.prisma.professionalCouncil.upsert({
+          if (
+            (councilId && councilType && councilUF) ||
+            (councilId == '' && councilType == '' && councilUF == '')
+          )
+            return await this.prisma.professionalCouncil.upsert({
               create: {
                 councilId,
                 councilType,
@@ -115,6 +128,19 @@ export class ProfessionalRepository {
                 },
               },
             });
+        }),
+      );
+
+      await Promise.all(
+        professional.councils.map(async (c) => {
+          if (councilsCreate.find((cCreated) => cCreated?.id == c.id)) return;
+          try {
+            await this.prisma.professionalCouncil.delete({
+              where: {
+                id: c.id,
+              },
+            });
+          } catch (err) {}
         }),
       );
 
@@ -240,6 +266,150 @@ export class ProfessionalRepository {
         include: { user: true, councils: true },
       }),
     ]);
+
+    return {
+      data: response[1].map(
+        (prof) =>
+          new ProfessionalEntity({ ...prof, user: new UserEntity(prof.user) }),
+      ),
+      count: response[0],
+    };
+  }
+
+  async findCouncilByCompanyId(
+    query: Partial<FindProfessionalsDto>,
+    pagination: PaginationQueryDto,
+    options: Prisma.ProfessionalFindManyArgs = {},
+  ) {
+    const companyId = query.companyId;
+    const userCompanyId = query.userCompanyId;
+    const byCouncil = query.byCouncil;
+    delete query.companyId;
+    delete query.byCouncil;
+    delete query.userCompanyId;
+
+    const where = {
+      AND: [
+        {
+          OR: [
+            { companyId: { in: [userCompanyId, companyId] } },
+            {
+              user: {
+                companies: {
+                  some: {
+                    companyId: { in: [userCompanyId, companyId] },
+                    status: 'ACTIVE',
+                  },
+                },
+              },
+            },
+            // {
+            //   company: {
+            //     applyingServiceContracts: {
+            //       some: { receivingServiceCompanyId: companyId }, // macDonald can see connapa's professionals
+            //     },
+            //   },
+            // },
+            // {
+            //   user: {
+            //     OR: [
+            //       { companies: { some: { companyId, status: 'ACTIVE' } } },
+            //       {
+            //         companies: {
+            //           some: {
+            //             company: {
+            //               applyingServiceContracts: {
+            //                 some: { receivingServiceCompanyId: companyId },
+            //               },
+            //             },
+            //           },
+            //         },
+            //       },
+            //     ],
+            //   },
+            // },
+          ],
+        },
+      ],
+    } as typeof options.where;
+
+    if ('search' in query) {
+      (where.AND as any).push({
+        OR: [
+          { name: { contains: query.search, mode: 'insensitive' } },
+          // { councilId: { contains: query.search, mode: 'insensitive' } },
+        ],
+      } as typeof options.where);
+      delete query.search;
+    }
+
+    if ('companies' in query) {
+      (where.AND as any).push({
+        OR: [
+          {
+            company: { id: { in: query.companies } },
+          },
+          {
+            user: {
+              companies: {
+                some: {
+                  companyId: { in: query.companies },
+                  status: 'ACTIVE',
+                },
+              },
+            },
+          },
+        ],
+      } as typeof options.where);
+      delete query.companies;
+    }
+
+    Object.entries(query).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        (where.AND as any).push({
+          [key]: { in: value },
+        } as typeof options.where);
+      } else if (value) {
+        (where.AND as any).push({
+          [key]: {
+            contains: value,
+            mode: 'insensitive',
+          },
+        } as typeof options.where);
+      }
+    });
+
+    const response = byCouncil
+      ? await this.prisma.$transaction([
+          this.prisma.professionalCouncil.count({
+            where: {
+              professional: where,
+            },
+          }),
+          this.prisma.professionalCouncil.findMany({
+            where: {
+              professional: where,
+            },
+            take: pagination.take || 10,
+            skip: pagination.skip || 0,
+            orderBy: { professional: { name: 'asc' } },
+            include: {
+              professional: { include: { user: true } },
+            },
+          }),
+        ])
+      : await this.prisma.$transaction([
+          this.prisma.professional.count({
+            where,
+          }),
+          this.prisma.professional.findMany({
+            where,
+            take: pagination.take || 10,
+            skip: pagination.skip || 0,
+            orderBy: { name: 'asc' },
+            include: { user: true, councils: true },
+          }),
+        ]);
 
     return {
       data: response[1].map(

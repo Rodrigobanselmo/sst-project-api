@@ -7,54 +7,47 @@ import { levelRiskData } from './run/level-risk-data';
 
 import { representAll } from './run/represent-all';
 import { CharacterizationPhotoRepository } from '../src/modules/company/repositories/implementations/CharacterizationPhotoRepository';
+import { deleteProfessionalsConnections } from './run/delete-professionals-connections';
+import { addProfCOuncilNUll } from './run/create-professional-council';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('start');
+  try {
+    console.log('start');
 
-  // fs.readFile('text.txt', 'utf8', function (err, data) {
-  //   if (err) throw err;
-  //   console.log(data.split('\n'));
-  // });
+    // fs.readFile('text.txt', 'utf8', function (err, data) {
+    //   if (err) throw err;
+    //   console.log(data.split('\n'));
+    // });
 
-  // try {
-  //   const x = await prisma.activity.delete({
-  //     where: { code: '0' },
-  //   });
-  //   console.log(x);
-  //   // await convertProf(prisma);
-  // } catch (error) {
-  //   console.log(error);
-  //   console.log('error: end');
-  // }
+    // try {
+    //   const x = await prisma.activity.delete({
+    //     where: { code: '0' },
+    //   });
+    //   console.log(x);
+    //   // await convertProf(prisma);
+    // } catch (error) {
+    //   console.log(error);
+    //   console.log('error: end');
+    // }
 
-  // const data = await prisma.companyCharacterization.findMany({
-  //   where: { companyId: '3e992a87-d72c-4d6e-8373-b73dbd9a43f1' },
-  // });
-  // console.log(data);
+    // const data = await prisma.companyCharacterization.findMany({
+    //   where: { companyId: '3e992a87-d72c-4d6e-8373-b73dbd9a43f1' },
+    // });
+    // console.log(data);
 
-  //! rodar
-  // const professional = await prisma.professional.findMany();
+    //await deleteWithNameCompany('Deletar', prisma);
+    // await levelRiskData(prisma);
+    // await representAll(prisma);
 
-  // await Promise.all(
-  //   professional.map(async (data) => {
-  //     const councilId = data.councilId;
-  //     const councilType = data.councilType;
-  //     const councilUF = data.councilUF;
-  //     if (councilType && councilType && councilUF)
-  //       await prisma.professionalCouncil.create({
-  //         data: { councilId, councilType, councilUF, professionalId: data.id },
-  //       });
-  //   }),
-  // );
-  //! rodar
+    // await deleteProfessionalsConnections(prisma);
+    await addProfCOuncilNUll(prisma);
 
-  //await deleteWithNameCompany('Deletar', prisma);
-  // await levelRiskData(prisma);
-  // await representAll(prisma);
-
-  console.log('end');
+    console.log('end');
+  } catch (err) {
+    console.error(err);
+  }
 }
 
 main()

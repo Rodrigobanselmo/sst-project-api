@@ -1,10 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { ESocialEventProvider } from '../../../../../shared/providers/ESocialEventProvider/implementations/ESocialEventProvider';
+import { ESocialEventProvider } from '../../../../../../shared/providers/ESocialProvider/implementations/ESocialEventProvider';
 // import { Client as SoupCLient } from 'nestjs-soap';
 import { createClient, createClientAsync, listen } from 'soap';
 import fs from 'fs';
 import request from 'request';
-import { SoapClientEnum } from '../../../../../shared/constants/enum/soapClient';
+import { SoapClientEnum } from '../../../../../../shared/constants/enum/soapClient';
 import X509HttpClient from 'soap-x509-http';
 import axios from 'axios';
 import https from 'https';

@@ -90,15 +90,15 @@ export class RiskFactorGroupDataEntity implements RiskFactorGroupData {
     if (!this?.professionals) this.professionals = [];
     if (partial?.professionalsSignatures) {
       this.professionalsSignatures = partial.professionalsSignatures.map(
-        (epiToRiskFactorData) =>
-          new ProfessionalRiskGroupEntity(epiToRiskFactorData),
+        (prof) => new ProfessionalRiskGroupEntity(prof),
       );
 
+      console.log(partial.professionalsSignatures);
       this.professionals = this.professionalsSignatures.map(
-        ({ professional, ...epiToRiskFactorData }) =>
+        ({ professional, ...rest }) =>
           new ProfessionalEntity({
             ...professional,
-            professionalPgrSignature: epiToRiskFactorData,
+            professionalPgrSignature: rest,
           }),
       );
     }

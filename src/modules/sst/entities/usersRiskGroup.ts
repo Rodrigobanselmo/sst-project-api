@@ -30,6 +30,10 @@ export class ProfessionalRiskGroupEntity
 
   constructor(partial: Partial<ProfessionalRiskGroupEntity>) {
     Object.assign(this, partial);
+
+    if (partial.professional) {
+      this.professional = new ProfessionalEntity(partial.professional);
+    }
   }
 }
 

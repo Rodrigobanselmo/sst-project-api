@@ -18,14 +18,14 @@ export const SignaturesConverter = (
         : false,
     )
     .map((signature) => {
-      const council =
-        signature?.councils?.find(
-          (c) =>
-            c.councilType === 'CREA' &&
-            c.councilUF === workspace?.address?.state,
-        ) || signature?.councils?.[0];
+      // const council =
+      //   signature?.councils?.find(
+      //     (c) =>
+      //       c.councilType === 'CREA' &&
+      //       c.councilUF === workspace?.address?.state,
+      //   ) || signature?.councils?.[0];
 
-      const crea = getCredential(council);
+      const crea = getCredential(signature as ProfessionalEntity);
 
       return {
         [VariablesPGREnum.PROFESSIONAL_CERTIFICATIONS]:

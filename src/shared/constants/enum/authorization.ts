@@ -29,6 +29,7 @@ export enum RoleEnum {
   MEDICINE = '13',
   DOCUMENTS = '14',
   EMPLOYEE = '15',
+  ESOCIAL = '16',
 
   DATABASE = '99',
   CHECKLIST = '98',
@@ -64,4 +65,5 @@ export enum PermissionEnum {
   CONTRACTS = '11', //* new
   CLINIC = '12',
   PROTOCOL = '13',
+  ESOCIAL = '14',
 }

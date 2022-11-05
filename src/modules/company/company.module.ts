@@ -118,11 +118,13 @@ import { CidRepository } from './repositories/implementations/CidRepository';
 import { UpdateHierarchyHomoGroupService } from './services/homoGroup/update-hierarchy-homo-group/update-hierarchy-homo-group.service';
 import { FindHomogenousGroupService } from './services/homoGroup/find-homo-group/find-homo-group.service';
 import { FindHomogenousGroupByIdService } from './services/homoGroup/find-homo-group-by-id/find-homo-group-by-id.service';
+import { EsocialModule } from '../esocial/esocial.module';
 
 @Module({
   imports: [
     forwardRef(() => ChecklistModule),
     forwardRef(() => NotificationModule),
+    forwardRef(() => EsocialModule),
     TelegramModule.forRoot({
       botKey: process.env.TELEGRAM_TOKEN,
     }),
@@ -256,6 +258,8 @@ import { FindHomogenousGroupByIdService } from './services/homoGroup/find-homo-g
     HomoGroupRepository,
     ActivityRepository,
     CidRepository,
+    EmployeeExamsHistoryRepository,
+    EmployeeHierarchyHistoryRepository,
   ],
 })
 export class CompanyModule {}

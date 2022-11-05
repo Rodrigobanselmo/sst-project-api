@@ -13,7 +13,9 @@ export class FindByIdDocumentPCMSOService {
       {
         include: {
           // usersSignatures: { include: { user: true } },
-          professionalsSignatures: { include: { professional: true } },
+          professionalsSignatures: {
+            include: { professional: { include: { professional: true } } },
+          },
         },
       },
     );

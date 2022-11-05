@@ -381,6 +381,27 @@ export class RiskDataRepository {
     id,
     ...createDto
   }: Omit<UpsertRiskDataDto, 'keepEmpty'>) {
+    const isCreation = !id;
+    if (isCreation) {
+      const foundRiskData = await this.prisma.riskFactorData.findMany({
+        where: {
+          riskFactorGroupDataId: createDto.riskFactorGroupDataId,
+          riskId: createDto.riskId,
+          homogeneousGroupId: createDto.homogeneousGroupId,
+        },
+        orderBy: { endDate: 'desc' },
+      });
+
+      if (foundRiskData.length !== 0) {
+        const findEndDateNull = foundRiskData.find(
+          (riskData) => riskData.endDate == null,
+        );
+        if (findEndDateNull) id = findEndDateNull.id;
+      }
+    }
+
+    console.log(id, createDto);
+
     const riskData = (await this.prisma.riskFactorData.upsert({
       create: {
         ...createDto,
@@ -433,11 +454,7 @@ export class RiskDataRepository {
           : undefined,
       },
       where: {
-        homogeneousGroupId_riskId_riskFactorGroupDataId: {
-          riskFactorGroupDataId: createDto.riskFactorGroupDataId,
-          riskId: createDto.riskId,
-          homogeneousGroupId: createDto.homogeneousGroupId,
-        },
+        id: id || 'no-id',
       },
       include: {
         adms: true,
@@ -525,6 +542,22 @@ export class RiskDataRepository {
     id,
     ...createDto
   }: Omit<UpsertRiskDataDto, 'keepEmpty'>) {
+    const foundRiskData = await this.prisma.riskFactorData.findMany({
+      where: {
+        riskFactorGroupDataId: createDto.riskFactorGroupDataId,
+        riskId: createDto.riskId,
+        homogeneousGroupId: createDto.homogeneousGroupId,
+      },
+      orderBy: { endDate: 'desc' },
+    });
+
+    if (foundRiskData.length !== 0) {
+      const findEndDateNull = foundRiskData.find(
+        (riskData) => riskData.endDate == null,
+      );
+      if (findEndDateNull) id = findEndDateNull.id;
+    }
+
     const riskData = (await this.prisma.riskFactorData.upsert({
       create: {
         ...createDto,
@@ -577,11 +610,7 @@ export class RiskDataRepository {
           : undefined,
       },
       where: {
-        homogeneousGroupId_riskId_riskFactorGroupDataId: {
-          riskFactorGroupDataId: createDto.riskFactorGroupDataId,
-          riskId: createDto.riskId,
-          homogeneousGroupId: createDto.homogeneousGroupId,
-        },
+        id: id || 'no-id',
       },
       include: {
         adms: true,

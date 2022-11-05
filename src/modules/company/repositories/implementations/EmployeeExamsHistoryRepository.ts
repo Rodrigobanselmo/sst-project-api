@@ -33,6 +33,7 @@ export class EmployeeExamsHistoryRepository {
           createData.examId && {
             ...createData,
             hierarchyId,
+            // isASO: true,
             expiredDate: this.dayjs
               .dayjs(createData.doneDate)
               .add(createData.validityInMonths || 0, 'months')
@@ -206,6 +207,14 @@ export class EmployeeExamsHistoryRepository {
     });
 
     return data.map((data) => new EmployeeExamsHistoryEntity(data));
+  }
+
+  async countNude(options: Prisma.EmployeeExamsHistoryCountArgs = {}) {
+    const data = await this.prisma.employeeExamsHistory.count({
+      ...options,
+    });
+
+    return data;
   }
 
   async findFirstNude(options: Prisma.EmployeeExamsHistoryFindFirstArgs = {}) {

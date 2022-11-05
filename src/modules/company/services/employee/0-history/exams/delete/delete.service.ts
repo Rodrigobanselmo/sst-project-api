@@ -14,6 +14,7 @@ export class DeleteEmployeeExamHistoryService {
 
   async execute(id: number, employeeId: number, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;
+    return;
     const found = await this.employeeExamHistoryRepository.findFirstNude({
       where: {
         id,

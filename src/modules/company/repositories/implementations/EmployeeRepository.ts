@@ -1,3 +1,4 @@
+import { FindEvents2220Dto } from './../../../esocial/dto/event.dto';
 import { prismaFilter } from './../../../../shared/utils/filters/prisma.filters';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ConflictException, Injectable } from '@nestjs/common';
@@ -354,12 +355,168 @@ export class EmployeeRepository {
     };
   }
 
+  async findEvent2220(
+    query: FindEvents2220Dto & { startDate: Date },
+    pagination: PaginationQueryDto,
+    options: Prisma.EmployeeFindManyArgs = {},
+  ) {
+    const companyId = query.companyId;
+
+    const whereInit = {
+      AND: [
+        {
+          hierarchyHistory: { some: { id: { gt: 0 } } },
+          examsHistory: {
+            some: {
+              doneDate: { gte: query.startDate },
+              sendEvent: true,
+              exam: { esocial27Code: { not: null } },
+              OR: [
+                { status: 'DONE' },
+                { status: 'CANCELED', event: { id: { gt: 0 } } },
+              ],
+            },
+          },
+        },
+      ],
+      ...options.where,
+    } as typeof options.where;
+
+    options.orderBy = {
+      name: 'asc',
+    };
+
+    options.select = {
+      id: true,
+      companyId: true,
+      cpf: true,
+      esocialCode: true,
+      examsHistory: {
+        where: {
+          doneDate: { gte: query.startDate },
+          OR: [
+            { status: 'DONE' },
+            { status: 'CANCELED', event: { id: { gt: 0 } } },
+          ],
+          exam: {
+            AND: [
+              { esocial27Code: { not: null } },
+              { esocial27Code: { not: '' } },
+            ],
+          },
+        },
+        orderBy: { doneDate: 'asc' },
+        select: {
+          id: true,
+          examType: true,
+          evaluationType: true,
+          doneDate: true,
+          status: true,
+          employeeId: true,
+          sendEvent: true,
+          event: true,
+          doctor: {
+            include: { professional: { select: { name: true, cpf: true } } },
+          },
+          exam: {
+            select: {
+              id: true,
+              isAttendance: true,
+              esocial27Code: true,
+              obsProc: true,
+              name: true,
+            },
+          },
+        },
+      },
+      ...options?.select,
+    };
+
+    if ('all' in query) {
+      options.select.company = {
+        select: { fantasy: true, name: true, cnpj: true, initials: true },
+      };
+
+      (whereInit.AND as any).push({
+        OR: [
+          { companyId: query.companyId, status: 'ACTIVE' },
+          {
+            company: {
+              receivingServiceContracts: {
+                some: { applyingServiceCompanyId: companyId },
+              },
+            },
+            status: 'ACTIVE',
+          },
+        ],
+      } as typeof options.where);
+      delete query.companyId;
+    }
+
+    const { where } = prismaFilter(whereInit, {
+      query,
+      skip: ['search', 'companiesIds', 'startDate', 'all'],
+    });
+
+    if ('search' in query) {
+      const OR = [];
+      const CPF = onlyNumbers(query.search);
+      const isCPF = CPF.length == 11;
+
+      if (!isCPF) {
+        OR.push({ name: { contains: query.search, mode: 'insensitive' } });
+        OR.push({ email: { contains: query.search, mode: 'insensitive' } });
+        OR.push({
+          esocialCode: { contains: query.search, mode: 'insensitive' },
+        });
+      } else {
+        OR.push({
+          cpf: CPF,
+        });
+      }
+
+      (where.AND as any).push({ OR } as typeof options.where);
+      delete query.search;
+    }
+
+    if ('companiesIds' in query) {
+      (where.AND as any).push({
+        companyId: { in: query.companiesIds },
+      } as typeof options.where);
+    }
+
+    const response = await this.prisma.$transaction([
+      this.prisma.employee.count({
+        where,
+      }),
+      this.prisma.employee.findMany({
+        take: pagination.take || 20,
+        skip: pagination.skip || 0,
+        ...options,
+        where,
+      }),
+    ]);
+
+    return {
+      data: response[1].map((employee) => new EmployeeEntity(employee)),
+      count: response[0],
+    };
+  }
+
   async findNude(options: Prisma.EmployeeFindManyArgs = {}) {
     const employees = await this.prisma.employee.findMany({
       ...options,
     });
 
     return employees.map((employee) => new EmployeeEntity(employee));
+  }
+
+  async countNude(options: Prisma.EmployeeCountArgs = {}) {
+    const employees = await this.prisma.employee.count({
+      ...options,
+    });
+
+    return employees;
   }
 
   async findOnlyCountNude(options: Prisma.EmployeeFindManyArgs = {}) {

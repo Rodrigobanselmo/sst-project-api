@@ -1,8 +1,10 @@
+import { DateFormat } from './../../../shared/transformers/date-format';
 import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
 import { HomoTypeEnum, Prisma } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import {
   IsBoolean,
+  IsDate,
   IsEnum,
   IsNumber,
   IsOptional,
@@ -98,6 +100,18 @@ export class UpsertRiskDataDto {
 
   @IsOptional()
   json?: Prisma.JsonValue;
+
+  @IsOptional()
+  @Transform(DateFormat, { toClassOnly: true })
+  @IsDate({ message: 'Data de início inválida' })
+  @Type(() => Date)
+  startDate?: Date;
+
+  @IsOptional()
+  @Transform(DateFormat, { toClassOnly: true })
+  @IsDate({ message: 'Data de fim inválida' })
+  @Type(() => Date)
+  endDate?: Date;
 }
 
 export class UpsertManyRiskDataDto {
@@ -187,6 +201,18 @@ export class UpsertManyRiskDataDto {
 
   @IsOptional()
   json?: Prisma.JsonValue;
+
+  @IsOptional()
+  @Transform(DateFormat, { toClassOnly: true })
+  @IsDate({ message: 'Data de início inválida' })
+  @Type(() => Date)
+  startDate?: Date;
+
+  @IsOptional()
+  @Transform(DateFormat, { toClassOnly: true })
+  @IsDate({ message: 'Data de fim inválida' })
+  @Type(() => Date)
+  endDate?: Date;
 }
 
 export class DeleteManyRiskDataDto {

@@ -14,7 +14,9 @@ export class FindByIdService {
       {
         include: {
           usersSignatures: { include: { user: true } },
-          professionalsSignatures: { include: { professional: true } },
+          professionalsSignatures: {
+            include: { professional: { include: { professional: true } } },
+          },
         },
       },
     );

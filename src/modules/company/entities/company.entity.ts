@@ -7,7 +7,7 @@ import {
   CompanyTypesEnum,
 } from '.prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
-import { StatusEnum } from '@prisma/client';
+import { ProfessionalCouncil, StatusEnum } from '@prisma/client';
 import { AddressCompanyEntity } from './address-company.entity';
 import { EmployeeEntity } from './employee.entity';
 import { LicenseEntity } from './license.entity';
@@ -17,10 +17,12 @@ import { ActivityEntity } from './activity.entity';
 import { CharacterizationEntity } from './characterization.entity';
 import { ContractEntity } from './contract.entity';
 import { ContactEntity } from './contact.entity';
-import { CompanyStepEnum } from 'src/shared/constants/enum/stepCompany.enum';
+import { CompanyStepEnum } from '../../../shared/constants/enum/stepCompany.enum';
 import { DocumentCoverEntity } from './document-cover.entity';
 import { CompanyClinicsEntity } from './company-clinics.entity';
 import { CompanyReportEntity } from './report.entity';
+import { CompanyGroupEntity } from './company-group.entity';
+import { CompanyCertEntity } from '../../../modules/esocial/entities/companyCert.entity';
 
 export class CompanyEntity implements Company {
   @ApiProperty({ description: 'The id of the Company' })
@@ -133,12 +135,42 @@ export class CompanyEntity implements Company {
   companyGroupId: number;
   esocialStart: Date;
   esocialLastTransmission: Date;
+  group?: Partial<CompanyGroupEntity>;
+  cert?: CompanyCertEntity;
+
+  doctorResponsible?: Partial<ProfessionalEntity>;
+  tecResponsible?: Partial<ProfessionalEntity>;
 
   constructor(partial: Partial<CompanyEntity>) {
     Object.assign(this, partial);
 
     if (this.primary_activity && this.primary_activity[0]) {
       this.riskDegree = this.primary_activity[0].riskDegree;
+    }
+
+    if (this.group) {
+      if (!this.doctorResponsibleId) {
+        this.doctorResponsible = this.group?.doctorResponsible;
+        this.doctorResponsibleId = this.group?.doctorResponsibleId;
+      }
+
+      if (!this.tecResponsibleId) {
+        this.tecResponsible = this.group?.tecResponsible;
+        this.tecResponsibleId = this.group?.tecResponsibleId;
+      }
+
+      if (!this.esocialStart) this.esocialStart = this.group?.esocialStart;
+      if (!this.numAsos) this.numAsos = this.group?.numAsos;
+      if (!this.blockResignationExam)
+        this.blockResignationExam = this.group?.blockResignationExam;
+    }
+
+    if (this.doctorResponsible) {
+      this.doctorResponsible = new ProfessionalEntity(this.doctorResponsible);
+    }
+
+    if (this.tecResponsible) {
+      this.tecResponsible = new ProfessionalEntity(this.tecResponsible);
     }
 
     if (this.isClinic) {

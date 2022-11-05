@@ -135,7 +135,7 @@ export class RiskGroupDataRepository {
         include: {
           company: true,
           professionalsSignatures: {
-            include: { professional: { include: { councils: true } } },
+            include: { professional: { include: { professional: true } } },
           },
           usersSignatures: {
             include: {

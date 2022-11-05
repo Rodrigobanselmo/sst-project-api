@@ -45,7 +45,9 @@ export class FindClinicScheduleEmployeeExamHistoryService {
             fileUrl: true,
             conclusion: true,
             examType: true,
-            doctor: { select: { id: true, name: true } },
+            doctor: {
+              select: { professional: { select: { id: true, name: true } } },
+            },
             exam: { select: { id: true, name: true, isAttendance: true } },
             time: true,
             evaluationType: true,

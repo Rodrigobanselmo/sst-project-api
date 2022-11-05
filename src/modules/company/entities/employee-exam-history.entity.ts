@@ -1,3 +1,5 @@
+import { EmployeeESocialEventEntity } from './../../esocial/entities/employeeEsocialEvent.entity';
+import { CouncilEntity } from './../../users/entities/council.entity';
 import {
   EmployeeExamsHistory,
   ExamHistoryEvaluationEnum,
@@ -55,6 +57,15 @@ export class EmployeeExamsHistoryEntity implements EmployeeExamsHistory {
   subOfficeId: string;
   hierarchy?: HierarchyEntity;
   subOffice?: HierarchyEntity;
+  deletedAt: Date;
+
+  isSequential: boolean;
+  sendEvent: boolean;
+  // isASO: boolean;
+  event: EmployeeESocialEventEntity;
+  asoExamId: number;
+  asoExam?: EmployeeExamsHistoryEntity;
+  complementaryExams?: EmployeeExamsHistoryEntity[];
 
   constructor(
     partial: Partial<
@@ -70,6 +81,14 @@ export class EmployeeExamsHistoryEntity implements EmployeeExamsHistory {
     >,
   ) {
     Object.assign(this, partial);
+
+    if (this.doctor) {
+      this.doctor = new ProfessionalEntity(this.doctor);
+    }
+
+    // if (this.doctor && this.doctor.professional) {
+    //   this.doctor = { ...this.doctor, ...this.doctor.professional };
+    // }
 
     if (
       [StatusEnum.PENDING, StatusEnum.PROCESSING].includes(

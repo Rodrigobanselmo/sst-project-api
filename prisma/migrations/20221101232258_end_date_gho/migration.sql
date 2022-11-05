@@ -10,18 +10,38 @@ CREATE TYPE "EmployeeESocialRefTypeEnum" AS ENUM ('CAT', 'EXAM', 'HIERARCHY', 'H
 -- CreateEnum
 CREATE TYPE "EmployeeESocialTransmissionTypeEnum" AS ENUM ('CAT_2210', 'EXAM_2220', 'RISK_2240');
 
+-- DropIndex
+DROP INDEX "RiskFactorData_hierarchyId_riskId_riskFactorGroupDataId_key";
+
+-- DropIndex
+DROP INDEX "RiskFactorData_homogeneousGroupId_riskId_riskFactorGroupDat_key";
+
 -- AlterTable
 ALTER TABLE "Company" ADD COLUMN     "esocialLastTransmission" TIMESTAMP(3);
 
 -- AlterTable
+ALTER TABLE "EmployeeExamsHistory" ADD COLUMN     "deletedAt" TIMESTAMP(3);
+
+-- AlterTable
+ALTER TABLE "EmployeeHierarchyHistory" ADD COLUMN     "deletedAt" TIMESTAMP(3);
+
+-- AlterTable
+ALTER TABLE "Hierarchy" ADD COLUMN     "deletedAt" TIMESTAMP(3);
+
+-- AlterTable
 ALTER TABLE "HierarchyOnHomogeneous" DROP CONSTRAINT "HierarchyOnHomogeneous_pkey",
+ADD COLUMN     "deletedAt" TIMESTAMP(3),
 ADD COLUMN     "endDate" TIMESTAMP(3),
 ADD COLUMN     "id" SERIAL NOT NULL,
 ADD COLUMN     "startDate" TIMESTAMP(3),
 ADD CONSTRAINT "HierarchyOnHomogeneous_pkey" PRIMARY KEY ("id");
 
 -- AlterTable
-ALTER TABLE "RiskFactorData" ADD COLUMN     "endDate" TIMESTAMP(3),
+ALTER TABLE "HomogeneousGroup" ADD COLUMN     "deletedAt" TIMESTAMP(3);
+
+-- AlterTable
+ALTER TABLE "RiskFactorData" ADD COLUMN     "deletedAt" TIMESTAMP(3),
+ADD COLUMN     "endDate" TIMESTAMP(3),
 ADD COLUMN     "startDate" TIMESTAMP(3);
 
 -- CreateTable
@@ -85,7 +105,31 @@ CREATE UNIQUE INDEX "ProtocolToRisk_id_companyId_key" ON "ProtocolToRisk"("id", 
 CREATE UNIQUE INDEX "ProtocolToRisk_riskId_protocolId_key" ON "ProtocolToRisk"("riskId", "protocolId");
 
 -- CreateIndex
+CREATE INDEX "EmployeeExamsHistory_deletedAt_idx" ON "EmployeeExamsHistory"("deletedAt");
+
+-- CreateIndex
+CREATE INDEX "EmployeeHierarchyHistory_deletedAt_idx" ON "EmployeeHierarchyHistory"("deletedAt");
+
+-- CreateIndex
+CREATE INDEX "Hierarchy_deletedAt_idx" ON "Hierarchy"("deletedAt");
+
+-- CreateIndex
+CREATE INDEX "HierarchyOnHomogeneous_deletedAt_idx" ON "HierarchyOnHomogeneous"("deletedAt");
+
+-- CreateIndex
 CREATE INDEX "HierarchyOnHomogeneous_endDate_idx" ON "HierarchyOnHomogeneous"("endDate");
+
+-- CreateIndex
+CREATE INDEX "HomogeneousGroup_deletedAt_idx" ON "HomogeneousGroup"("deletedAt");
+
+-- CreateIndex
+CREATE INDEX "RiskFactorData_riskId_idx" ON "RiskFactorData"("riskId");
+
+-- CreateIndex
+CREATE INDEX "RiskFactorData_hierarchyId_idx" ON "RiskFactorData"("hierarchyId");
+
+-- CreateIndex
+CREATE INDEX "RiskFactorData_deletedAt_idx" ON "RiskFactorData"("deletedAt");
 
 -- AddForeignKey
 ALTER TABLE "EmployeeESocialTransmission" ADD CONSTRAINT "EmployeeESocialTransmission_userTransmissionId_fkey" FOREIGN KEY ("userTransmissionId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

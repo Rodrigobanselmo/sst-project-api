@@ -44,6 +44,10 @@ export class UpsertCompanyGroupDto {
   @IsInt()
   doctorResponsibleId: number;
 
+  @IsOptional()
+  @IsInt()
+  tecResponsibleId?: number;
+
   @ValidateIf((o) => !o.id)
   @IsString({ each: true })
   companiesIds: string[];

@@ -22,7 +22,7 @@ export class UpdateEmployeeExamHistoryService {
     //tenant
     if (!found?.id)
       throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_NOT_FOUND);
-
+    console.log(dataDto.status);
     const history = await this.employeeExamHistoryRepository.update({
       ...dataDto,
     });

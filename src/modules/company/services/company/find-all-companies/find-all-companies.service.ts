@@ -17,19 +17,6 @@ export class FindAllCompaniesService {
         user.companyId,
         { ...query },
         { skip, take },
-        {
-          select: {
-            companyGroups: { select: { id: true, name: true } },
-            cnpj: true,
-            name: true,
-            fantasy: true,
-            initials: true,
-            isConsulting: true,
-            status: true,
-            id: true,
-            address: true,
-          },
-        },
       );
 
     return await this.companyRepository.findAll(query, { skip, take });

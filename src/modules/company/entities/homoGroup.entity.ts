@@ -47,6 +47,7 @@ export class HomoGroupEntity implements HomogeneousGroup {
   characterization?: CharacterizationEntity;
   environment?: EnvironmentEntity;
   hierarchy?: HierarchyEntity;
+  deletedAt: Date;
 
   employeeCount?: number;
 
@@ -91,6 +92,7 @@ export class HierarchyOnHomogeneousEntity implements HierarchyOnHomogeneous {
   homogeneousGroup?: HomoGroupEntity;
   endDate: Date;
   startDate: Date;
+  deletedAt: Date;
 
   constructor(partial: Partial<HomoGroupEntity>) {
     Object.assign(this, partial);

@@ -113,6 +113,9 @@ export class PermissionsGuard implements CanActivate {
 
           const affectedCompanyId = getCompanyId(req);
 
+          //! missing companiesIds check
+          // const affectedCompanyIds = getCompanyIds(req);
+
           // is being send an array of items with different companies Ids
           if (affectedCompanyId === false) return false;
 

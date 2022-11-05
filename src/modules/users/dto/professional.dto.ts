@@ -147,6 +147,10 @@ export class FindProfessionalsDto extends PaginationQueryDto {
   userCompanyId?: string;
 
   @IsOptional()
+  @IsBoolean()
+  byCouncil?: boolean;
+
+  @IsOptional()
   @Transform(QueryArray, { toClassOnly: true })
   @IsEnum(ProfessionalTypeEnum, {
     message: `Tipo de profissional inválido`,

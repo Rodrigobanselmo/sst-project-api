@@ -19,9 +19,6 @@ export class ProfessionalEntity implements Professional {
   certifications: string[];
   cpf: string;
   phone: string;
-  councilType: string;
-  councilUF: string;
-  councilId: string;
   type: ProfessionalTypeEnum;
   status: StatusEnum;
   user?: UserEntity;
@@ -35,8 +32,20 @@ export class ProfessionalEntity implements Professional {
   professionalPcmsoSignature?: ProfessionalPCMSOEntity;
   professionalsPcmsoSignatures?: ProfessionalPCMSOEntity[];
 
+  professionalId?: number;
+  professional?: Partial<ProfessionalEntity>;
+  councilType: string;
+  councilUF: string;
+  councilId: string;
+
   constructor(partial: Partial<ProfessionalEntity & { councils: any }>) {
     Object.assign(this, partial);
+
+    if (this.professional) {
+      delete this.professional.id;
+      Object.assign(this, this.professional);
+      delete this.professional;
+    }
 
     if (partial?.user) {
       this.user = new UserEntity({ ...partial.user });

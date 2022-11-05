@@ -106,12 +106,14 @@ export class InviteUsersService {
         inviteUserDto.companyId,
         { companiesIds: inviteUserDto?.companiesIds || [] },
         { skip: 0, take: 100 },
+        { select: { id: true } },
       );
 
     if (userRoles.includes(RoleEnum.MASTER))
       companies = await this.companyRepository.findAll(
         { companiesIds: inviteUserDto?.companiesIds || [] },
         { skip: 0, take: 100 },
+        { select: { id: true } },
       );
 
     const expires_date = this.dateProvider.addDay(new Date(), 7);

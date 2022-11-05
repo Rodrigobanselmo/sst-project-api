@@ -107,6 +107,9 @@ export class CopyHomoGroupService {
 
     const riskData = await getRiskData();
 
-    await asyncEach(riskData, save);
+    await asyncEach(
+      riskData.filter((r) => r.endDate == null),
+      save,
+    );
   }
 }

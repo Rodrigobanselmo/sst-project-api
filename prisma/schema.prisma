@@ -79,7 +79,7 @@ enum EmployeeESocialRefTypeEnum {
   SUB_OFFICE
 }
 
-enum EmployeeESocialTransmissionTypeEnum {
+enum EmployeeESocialEventTypeEnum {
   CAT_2210
   EXAM_2220
   RISK_2240
@@ -149,6 +149,7 @@ enum StatusEnum {
   INVALID
   ERROR
   CANCELED
+  MODIFIED
   DONE
 }
 
@@ -315,7 +316,7 @@ model Company {
   created_at DateTime @default(now())
   deleted_at DateTime? 
   updated_at  DateTime   @updatedAt
-  esocialLastTransmission DateTime? 
+  esocialLastTransmission DateTime? //! remove
   doctorResponsibleId  Int?
   tecResponsibleId  Int?
   status StatusEnum @default(ACTIVE)
@@ -360,8 +361,8 @@ model Company {
   shifts CompanyShift[]
   covers DocumentCover[]
   documents Document[]
-  doctorResponsible  Professional? @relation(name:"doctors_company_responsibles", fields: [doctorResponsibleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  tecResponsible  Professional? @relation(name:"tec_company_responsibles", fields: [tecResponsibleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  doctorResponsible  ProfessionalCouncil? @relation(name:"doctors_council_company_responsibles", fields: [doctorResponsibleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  tecResponsible  ProfessionalCouncil? @relation(name:"tec_council_company_responsibles", fields: [tecResponsibleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   clinicsAvailable CompanyClinics[]  @relation(name: "companies_available")
   companiesToClinicAvailable CompanyClinics[]  @relation(name: "clinics_available")
   examClinicHistory EmployeeExamsHistory[]  
@@ -371,8 +372,10 @@ model Company {
   notifications Notification[]  @relation(name: "owner_notification_company")
   protocol Protocol[]
   protocolToRisk ProtocolToRisk[]
-  esocialTransmission EmployeeESocialTransmission[]
+  esocialEvents EmployeeESocialEvent[]
+  esocialTransmissions EmployeeESocialBatch[]
   report CompanyReport?
+  cert CompanyCert?
 
   // professionals Professional[] @relation(name:"companies_related") 
   stateRegistration String? // not in use
@@ -395,6 +398,16 @@ model Company {
   @@index(fantasy)
   @@index(cnpj)
 }
+
+model CompanyCert {
+  id   String    @id @default(uuid())
+  key String
+  certificate String
+  notAfter   DateTime
+  notBefore   DateTime
+  companyId String @unique
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+} 
 
 model CompanyClinics {
   company   Company @relation(name: "companies_available",fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
@@ -419,8 +432,10 @@ model CompanyGroup {
   blockResignationExam Boolean @default(true)
   esocialStart  DateTime?
   doctorResponsibleId  Int?
-  doctorResponsible  Professional? @relation(name:"doctors_group_responsibles", fields: [doctorResponsibleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  
+  doctorResponsible  ProfessionalCouncil? @relation(name:"doctors_council_group_responsibles", fields: [doctorResponsibleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  tecResponsibleId  Int?
+  tecResponsible  ProfessionalCouncil? @relation(name:"tec_council_group_responsibles", fields: [tecResponsibleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+ 
   companyGroup Company? @relation(name:"company_group") 
 
   @@unique([id, companyId])
@@ -665,7 +680,7 @@ model Employee {
   subOffices Hierarchy[] @relation(name: "sub_offices")
   hierarchyHistory EmployeeHierarchyHistory[]
   examsHistory EmployeeExamsHistory[]
-  esocialTransmission EmployeeESocialTransmission[]
+  esocialEvents EmployeeESocialEvent[]
   
   @@unique([id, companyId])
   @@unique([cpf, companyId])
@@ -685,6 +700,10 @@ model EmployeeHierarchyHistory {
   hierarchy Hierarchy @relation(fields: [hierarchyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   employeeId Int
   employee Employee @relation(fields: [employeeId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  deletedAt DateTime?
+  // esocialCode String?
+
+  @@index(deletedAt)
 } 
 
 model EmployeeExamsHistory {
@@ -703,6 +722,7 @@ model EmployeeExamsHistory {
   fileUrl String?
   
   obs String?
+  isSequential Boolean?
   clinicObs String?
   scheduleType ClinicScheduleTypeEnum?
   changeHierarchyDate DateTime?
@@ -711,49 +731,75 @@ model EmployeeExamsHistory {
   hierarchy Hierarchy? @relation(fields: [hierarchyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   subOfficeId String?
   subOffice Hierarchy? @relation(name: "subOffice_employee_exam",fields: [subOfficeId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  deletedAt DateTime?
 
+  asoExamId Int?
+  asoExam EmployeeExamsHistory? @relation(name: "aso_exam_relation", fields: [asoExamId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  complementaryExams EmployeeExamsHistory[] @relation(name: "aso_exam_relation")
+  
   userScheduleId Int?
   userSchedule User? @relation(name: "user_schedule", fields: [userScheduleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   userDoneId Int?
   userDone User? @relation(name: "user_done", fields: [userDoneId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   doctorId Int?
-  doctor Professional? @relation(fields: [doctorId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  doctor ProfessionalCouncil? @relation(fields: [doctorId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   clinicId String?
   clinic Company? @relation(fields: [clinicId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   examId Int
   exam Exam @relation(fields: [examId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   employeeId Int
   employee Employee @relation(fields: [employeeId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  event EmployeeESocialEvent?
+  sendEvent Boolean @default(true) 
 
   @@index(status)
+  @@index(deletedAt)
   @@index(employeeId)
   @@index(fileUrl)
   @@index(clinicId)
 } 
 
-model EmployeeESocialTransmission {
+model EmployeeESocialBatch {
   id    Int   @id  @default(autoincrement())
   created_at DateTime @default(now())
   updated_at  DateTime   @updatedAt  
-  
-  refType EmployeeESocialRefTypeEnum
-  refId String
-  eventsDate DateTime
-  eventsType EmployeeESocialTransmissionTypeEnum
-  status StatusEnum @default(DONE)
+  environment Int?
+  status StatusEnum @default(PENDING)
+  events EmployeeESocialEvent[]
 
   userTransmissionId Int?
   userTransmission User? @relation(fields: [userTransmissionId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  companyId String
+  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@index(status)
+} 
+
+model EmployeeESocialEvent {
+  id    Int   @id  @default(autoincrement())
+  created_at DateTime @default(now())
+  updated_at  DateTime   @updatedAt  
+  batchId Int?
+  batch EmployeeESocialBatch? @relation(fields: [batchId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  eventsDate DateTime
+  status StatusEnum @default(PENDING)
+  // eventsType EmployeeESocialEventTypeEnum
+  // snapshot Json?
+
+  eventXml String
+  responseXml String
   employeeId Int
   employee Employee @relation(fields: [employeeId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   companyId String
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  examHistoryId Int? @unique
+  exam EmployeeExamsHistory? @relation(fields: [examHistoryId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  // refType EmployeeESocialRefTypeEnum
+  // @@index(refType)
+  // @@index(employeeId)
 
-  @@index(refType)
-  @@index(refId)
   @@index(status)
   @@index(eventsDate)
-  // @@index(employeeId)
 } 
 
 model EngsToRiskFactorData {
@@ -831,6 +877,7 @@ model Exam {
   examToClinic ExamToClinic[] 
   esocial27Code String?
   employeesHistory EmployeeExamsHistory[] 
+  obsProc String?
 
   @@unique([id, companyId])
   @@index(companyId)
@@ -951,7 +998,9 @@ model Hierarchy {
   employeeExamsHistory EmployeeExamsHistory[]
   employeeExamsHistorySubOffice EmployeeExamsHistory[] @relation(name: "subOffice_employee_exam")
   riskDocInfo RiskFactorsDocInfo[]
-
+  deletedAt DateTime?
+  
+  @@index(deletedAt)
   @@unique([id, companyId])
   @@unique([parentId, name])
   @@index(companyId)
@@ -967,8 +1016,10 @@ model HierarchyOnHomogeneous {
   workspaceId     String
   endDate DateTime?
   startDate DateTime?
+  deletedAt DateTime?
 
   // @@unique([hierarchyId, homogeneousGroupId, workspaceId, endDate])
+  @@index(deletedAt)
   @@index(endDate)
 }
 
@@ -985,9 +1036,11 @@ model HomogeneousGroup {
   created_at DateTime @default(now())
   riskFactorData RiskFactorData[] 
   type HomoTypeEnum?
+  deletedAt DateTime?
   
   @@unique([name, companyId])
   @@index(name)
+  @@index(deletedAt)
   @@index(companyId)
 }
 
@@ -1044,9 +1097,6 @@ model Professional {
   cpf String?
   phone String?
   email String?
-  councilType String?
-  councilUF String?
-  councilId String?
   formation String[]
   certifications String[]
   created_at DateTime @default(now())
@@ -1058,14 +1108,8 @@ model Professional {
   status StatusEnum @default(ACTIVE)
   userId Int? @unique
   user User? @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
-  doctorGroupResponsible  CompanyGroup[] @relation(name:"doctors_group_responsibles")
-  doctorCompanyResponsible  Company[] @relation(name:"doctors_company_responsibles")
-  tecCompanyResponsible  Company[] @relation(name:"tec_company_responsibles")
   inviteId String? @unique
   invite InviteUsers? @relation(fields: [inviteId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  examDoctorHistory EmployeeExamsHistory[]  
-  professionalPgrSignature RiskFactorGroupDataToProfessional[]
-  professionalPcmsoSignature DocumentPCMSOToProfessional[]
   councils ProfessionalCouncil[]  
 
   @@unique([id, companyId])
@@ -1080,6 +1124,13 @@ model ProfessionalCouncil {
   updated_at  DateTime   @updatedAt
   professionalId Int
   professional Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
+  doctorGroupResponsible  CompanyGroup[] @relation(name:"doctors_council_group_responsibles")
+  tecGroupResponsible  CompanyGroup[] @relation(name:"tec_council_group_responsibles")
+  doctorCompanyResponsible  Company[] @relation(name:"doctors_council_company_responsibles")
+  tecCompanyResponsible  Company[] @relation(name:"tec_council_company_responsibles")
+  examDoctorHistory EmployeeExamsHistory[]  
+  professionalPgrSignature RiskFactorGroupDataToProfessional[]
+  professionalPcmsoSignature DocumentPCMSOToProfessional[]
   
   @@unique([councilType, councilUF, councilId, professionalId])
 }
@@ -1284,7 +1335,7 @@ model RiskFactorGroupDataToProfessional {
   riskFactorGroupDataId    String   @map("B") 
   professionalId Int @map("A") 
   riskFactorData RiskFactorGroupData  @relation(fields: [riskFactorGroupDataId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  professional Professional  @relation(fields: [professionalId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  professional ProfessionalCouncil  @relation(fields: [professionalId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   isSigner Boolean @default(false)
   isElaborator Boolean @default(false)
 
@@ -1296,7 +1347,7 @@ model DocumentPCMSOToProfessional {
   documentPCMSOId    String   @map("B") 
   professionalId Int @map("A") 
   documentPCMSO DocumentPCMSO  @relation(fields: [documentPCMSOId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  professional Professional  @relation(fields: [professionalId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  professional ProfessionalCouncil  @relation(fields: [professionalId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   isSigner Boolean @default(false)
   isElaborator Boolean @default(false)
 
@@ -1332,12 +1383,16 @@ model RiskFactorData {
   examsToRiskFactorData ExamToRiskData[]
   endDate DateTime?
   startDate DateTime?
+  deletedAt DateTime?
 
 
+  // @@unique([homogeneousGroupId, riskId, riskFactorGroupDataId])
+  // @@unique([hierarchyId, riskId, riskFactorGroupDataId])
   @@unique([id, companyId])
-  @@unique([homogeneousGroupId, riskId, riskFactorGroupDataId])
-  @@unique([hierarchyId, riskId, riskFactorGroupDataId])
   @@unique([id, riskId, riskFactorGroupDataId])
+  @@index(riskId)
+  @@index(hierarchyId)
+  @@index(deletedAt)
   @@index(companyId)
 }
 
@@ -1413,7 +1468,7 @@ model User {
   professional Professional? 
   notification Notification[] 
   notificationConfirm Notification[] @relation(name: "user_notification_confirm")
-  esocialTransmission EmployeeESocialTransmission[] 
+  esocialTransmission EmployeeESocialBatch[] 
 
   @@unique([id, name])
   @@index(email)

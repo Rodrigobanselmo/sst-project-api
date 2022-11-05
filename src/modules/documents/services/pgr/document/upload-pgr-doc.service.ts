@@ -133,7 +133,7 @@ export class PgrUploadService {
             },
             where: { workspaceId },
           },
-          professionals: { include: { councils: true } },
+          // professionals: { include: { councils: true } },
           receivingServiceContracts: {
             include: {
               applyingServiceCompany: {

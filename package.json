@@ -42,6 +42,7 @@
     "@nestjs/swagger": "^5.1.4",
     "@prisma/client": "^4.1.0",
     "@sendgrid/mail": "^7.7.0",
+    "@types/xml-crypto": "^1.4.2",
     "aws-sdk": "^2.1140.0",
     "axios": "^0.27.0",
     "bcrypt": "^5.0.1",
@@ -63,6 +64,7 @@
     "nodemailer": "^6.7.0",
     "passport": "^0.5.0",
     "passport-jwt": "^4.0.0",
+    "pfx-to-pem": "^1.0.2",
     "pg": "^8.7.1",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
@@ -71,7 +73,10 @@
     "soap-x509-http": "^1.0.2",
     "sqs-consumer": "^5.7.0",
     "swagger-ui-express": "^4.1.6",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "xml-crypto": "^3.0.1",
+    "xml-formatter": "^2.6.1",
+    "xml-js": "^1.6.11"
   },
   "devDependencies": {
     "@nestjs/cli": "^8.0.0",

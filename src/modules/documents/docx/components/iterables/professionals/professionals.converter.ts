@@ -6,7 +6,7 @@ import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
 import { ProfessionalEntity } from '../../../../../users/entities/professional.entity';
 
-export const getCredential = (row: CouncilEntity) => {
+export const getCredential = (row: ProfessionalEntity) => {
   if (row && 'councilId' in row) {
     return `${row?.councilType ? row.councilType + ': ' : ''}${row.councilId}${
       row?.councilUF ? ' - ' + row.councilUF : ''
@@ -28,14 +28,14 @@ export const ProfessionalsConverter = (
         : false,
     )
     .map((professional) => {
-      const council =
-        professional?.councils?.find(
-          (c) =>
-            c.councilType === 'CREA' &&
-            c.councilUF === workspace?.address?.state,
-        ) || professional?.councils?.[0];
+      // const council =professional
+      //   professional?.councils?.find(
+      //     (c) =>
+      //       c.councilType === 'CREA' &&
+      //       c.councilUF === workspace?.address?.state,
+      //   ) || professional?.councils?.[0];
 
-      const crea = getCredential(council);
+      const crea = getCredential(professional as ProfessionalEntity);
 
       return {
         [VariablesPGREnum.PROFESSIONAL_CERTIFICATIONS]:

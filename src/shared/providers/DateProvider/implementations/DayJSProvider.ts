@@ -62,8 +62,8 @@ class DayJSProvider implements IDateProvider {
     return dayjs().toDate();
   }
 
-  format(date: Date): string {
-    return dayjs(date).format('DD/MM/YYYY');
+  format(date: Date, format?: string): string {
+    return dayjs(date).format(format || 'DD/MM/YYYY');
   }
 }
 

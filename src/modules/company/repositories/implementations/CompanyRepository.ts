@@ -115,8 +115,8 @@ export class CompanyRepository implements ICompanyRepository {
         secondary_activity: true,
         license: true,
         address: true,
-        doctorResponsible: true,
-        tecResponsible: true,
+        doctorResponsible: { include: { professional: true } },
+        tecResponsible: { include: { professional: true } },
       },
     });
 
@@ -280,8 +280,8 @@ export class CompanyRepository implements ICompanyRepository {
         secondary_activity: !!include.secondary_activity,
         license: !!include.license,
         users: !!include.users,
-        doctorResponsible: true,
-        tecResponsible: true,
+        doctorResponsible: { include: { professional: true } },
+        tecResponsible: { include: { professional: true } },
         group: true,
         employees: !!include.employees ? true : false,
       },
@@ -403,8 +403,8 @@ export class CompanyRepository implements ICompanyRepository {
               license: !!include.license,
               users: !!include.users,
               group: true,
-              doctorResponsible: true,
-              tecResponsible: true,
+              doctorResponsible: { include: { professional: true } },
+              tecResponsible: { include: { professional: true } },
               employees: !!include.employees ? true : false,
             },
           }),
@@ -455,8 +455,8 @@ export class CompanyRepository implements ICompanyRepository {
         secondary_activity: true,
         group: true,
         license: true,
-        doctorResponsible: true,
-        tecResponsible: true,
+        doctorResponsible: { include: { professional: true } },
+        tecResponsible: { include: { professional: true } },
       },
     });
 
@@ -527,6 +527,24 @@ export class CompanyRepository implements ICompanyRepository {
       ],
     } as typeof options.where;
 
+    if (!options.orderBy)
+      options.orderBy = {
+        name: 'asc',
+      };
+
+    if (!options.select)
+      options.select = {
+        id: true,
+        name: true,
+        status: true,
+        group: { select: { id: true, name: true } },
+        cnpj: true,
+        fantasy: true,
+        initials: true,
+        isConsulting: true,
+        address: true,
+      };
+
     const { where } = prismaFilter(whereInit, {
       query,
       skip: [
@@ -539,6 +557,7 @@ export class CompanyRepository implements ICompanyRepository {
         'isPeriodic',
         'isChange',
         'isAdmission',
+        'selectReport',
         'isReturn',
         'isDismissal',
         'findAll',
@@ -600,6 +619,10 @@ export class CompanyRepository implements ICompanyRepository {
       } as typeof options.where);
     }
 
+    if ('selectReport' in query) {
+      options.select.report = true;
+    }
+
     const response = await this.prisma.$transaction([
       this.prisma.company.count({
         where,
@@ -609,14 +632,13 @@ export class CompanyRepository implements ICompanyRepository {
         where,
         take: pagination.take || 20,
         skip: pagination.skip || 0,
-        orderBy: { name: 'asc' },
       }),
     ]);
 
     //     workspace: { include: { address: true } },
     // group: true,
-    // doctorResponsible: true,
-    // tecResponsible: true,
+    // doctorResponsible: { include: { professional: true } },
+    // tecResponsible: { include: { professional: true } },
     // address: true,
     // contacts: { where: { isPrincipal: true } },
 
@@ -721,9 +743,9 @@ export class CompanyRepository implements ICompanyRepository {
         where,
         include: {
           workspace: { include: { address: true } },
+          doctorResponsible: { include: { professional: true } },
           group: true,
-          doctorResponsible: true,
-          tecResponsible: true,
+          tecResponsible: { include: { professional: true } },
           address: true,
           contacts: { where: { isPrincipal: true } },
           ...options?.include,
@@ -778,7 +800,12 @@ export class CompanyRepository implements ICompanyRepository {
       where: { id },
       include: {
         ...include,
-        group: true,
+        group: {
+          include: {
+            doctorResponsible: { include: { professional: true } },
+            tecResponsible: { include: { professional: true } },
+          },
+        },
         primary_activity: !!include?.primary_activity,
         secondary_activity: !!include?.secondary_activity,
         workspace: !!include?.workspace
@@ -786,8 +813,8 @@ export class CompanyRepository implements ICompanyRepository {
           : false,
         employees: !!include.employees ? true : false,
         address: true,
-        doctorResponsible: true,
-        tecResponsible: true,
+        doctorResponsible: { include: { professional: true } },
+        tecResponsible: { include: { professional: true } },
       },
     });
 

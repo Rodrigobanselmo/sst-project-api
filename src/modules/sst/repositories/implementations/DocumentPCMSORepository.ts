@@ -179,7 +179,7 @@ export class DocumentPCMSORepository {
           },
         },
         professionalsSignatures: {
-          include: { professional: { include: { councils: true } } },
+          include: { professional: { include: { professional: true } } },
         },
         // usersSignatures: {
         //   include: {

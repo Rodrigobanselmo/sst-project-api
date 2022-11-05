@@ -20,6 +20,7 @@ export class CompanyGroupRepository {
     companyId,
     companiesIds,
     doctorResponsibleId,
+    tecResponsibleId,
     ...data
   }: UpsertCompanyGroupDto) {
     const uuid = v4();
@@ -28,6 +29,9 @@ export class CompanyGroupRepository {
         ...data,
         doctorResponsible: doctorResponsibleId
           ? { connect: { id: doctorResponsibleId } }
+          : undefined,
+        tecResponsible: tecResponsibleId
+          ? { connect: { id: tecResponsibleId } }
           : undefined,
         companies: companiesIds
           ? {
@@ -41,6 +45,7 @@ export class CompanyGroupRepository {
         ...data,
         companyId,
         doctorResponsibleId: doctorResponsibleId,
+        tecResponsibleId: tecResponsibleId,
         companies: companiesIds
           ? {
               connect: companiesIds.map((companyId) => ({
@@ -67,7 +72,40 @@ export class CompanyGroupRepository {
         },
       },
       where: { id_companyId: { id: id || 0, companyId } },
-      include: { doctorResponsible: true },
+      include: {
+        doctorResponsible: {
+          include: {
+            professional: {
+              select: {
+                name: true,
+                id: true,
+                type: true,
+                cpf: true,
+                userId: true,
+                companyId: true,
+                email: true,
+                phone: true,
+              },
+            },
+          },
+        },
+        tecResponsible: {
+          include: {
+            professional: {
+              select: {
+                name: true,
+                id: true,
+                type: true,
+                cpf: true,
+                userId: true,
+                companyId: true,
+                email: true,
+                phone: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     return new CompanyGroupEntity(group);
@@ -80,7 +118,40 @@ export class CompanyGroupRepository {
   ) {
     const group = await this.prisma.companyGroup.findFirst({
       where: { companyId, id },
-      include: { doctorResponsible: true },
+      include: {
+        doctorResponsible: {
+          include: {
+            professional: {
+              select: {
+                name: true,
+                id: true,
+                type: true,
+                cpf: true,
+                userId: true,
+                companyId: true,
+                email: true,
+                phone: true,
+              },
+            },
+          },
+        },
+        tecResponsible: {
+          include: {
+            professional: {
+              select: {
+                name: true,
+                id: true,
+                type: true,
+                cpf: true,
+                userId: true,
+                companyId: true,
+                email: true,
+                phone: true,
+              },
+            },
+          },
+        },
+      },
       ...options,
     });
 
@@ -124,7 +195,40 @@ export class CompanyGroupRepository {
         take: pagination.take || 20,
         skip: pagination.skip || 0,
         orderBy: { name: 'asc' },
-        include: { doctorResponsible: true },
+        include: {
+          doctorResponsible: {
+            include: {
+              professional: {
+                select: {
+                  name: true,
+                  id: true,
+                  type: true,
+                  cpf: true,
+                  userId: true,
+                  companyId: true,
+                  email: true,
+                  phone: true,
+                },
+              },
+            },
+          },
+          tecResponsible: {
+            include: {
+              professional: {
+                select: {
+                  name: true,
+                  id: true,
+                  type: true,
+                  cpf: true,
+                  userId: true,
+                  companyId: true,
+                  email: true,
+                  phone: true,
+                },
+              },
+            },
+          },
+        },
       }),
     ]);
 

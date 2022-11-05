@@ -23,6 +23,7 @@ export class ExamEntity implements Exam {
   instruction: string;
   material: string;
   companyId: string;
+  obsProc: string;
   status: StatusEnum;
   type: ExamTypeEnum;
   updated_at: Date;

@@ -112,11 +112,12 @@ export class RiskFactorDataEntity implements RiskFactorData {
   standardExams: boolean;
   endDate: Date;
   startDate: Date;
+  deletedAt: Date;
 
   constructor(partial: Partial<RiskFactorDataEntity>) {
     Object.assign(this, partial);
 
-    if (partial.homogeneousGroup) {
+    if (partial?.homogeneousGroup) {
       this.homogeneousGroup = new HomoGroupEntity(partial.homogeneousGroup);
     }
 

@@ -20,9 +20,13 @@ export class FindByIdEmployeeExamHistoryService {
             councilId: true,
             councilType: true,
             councilUF: true,
-            cpf: true,
-            name: true,
-            id: true,
+            professional: {
+              select: {
+                cpf: true,
+                name: true,
+                id: true,
+              },
+            },
           },
         },
       },
