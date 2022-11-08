@@ -620,6 +620,8 @@ export class CompanyRepository implements ICompanyRepository {
     }
 
     if ('selectReport' in query) {
+      options.select.esocialStart = true;
+      options.select.esocialSend = true;
       options.select.report = true;
     }
 

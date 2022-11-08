@@ -46,7 +46,20 @@ export class UpdateAllCompaniesService {
         id: true,
         // report: { select: { id: true } },
         esocialStart: true,
+        cnpj: true,
         // esocialEvents:{select:{}}.
+        doctorResponsible: {
+          include: { professional: { select: { name: true } } },
+        },
+        group: {
+          select: {
+            doctorResponsible: {
+              include: { professional: { select: { name: true } } },
+            },
+            esocialStart: true,
+            company: { select: { cert: true } },
+          },
+        },
         applyingServiceContracts: {
           select: { receivingServiceCompanyId: true },
         },
@@ -387,6 +400,8 @@ export class UpdateAllCompaniesService {
 
   async addEmployeeEsocial(company: CompanyEntity) {
     const companyId = company.id;
+    if (!company.esocialStart) return {};
+
     try {
       const { data: employees } = await this.employeeRepository.findEvent2220(
         {
@@ -396,10 +411,12 @@ export class UpdateAllCompaniesService {
         { take: 100 },
       );
 
-      const eventsStruct = this.eSocialEventProvider.convertToEventStruct(
+      const eventsStruct = this.eSocialEventProvider.convertToEvent2220Struct(
         company,
         employees,
       );
+
+      console.log(company.cnpj, employees);
 
       return {
         pending: eventsStruct.length,
@@ -414,6 +431,7 @@ export class UpdateAllCompaniesService {
   }
 
   async telegramMessage(allCompanies: CompanyEntity[]) {
+    return;
     try {
       const messageHtml = this.errorCompanies.length
         ? `

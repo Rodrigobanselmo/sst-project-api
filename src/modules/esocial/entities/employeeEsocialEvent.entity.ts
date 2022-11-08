@@ -1,5 +1,12 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { EmployeeESocialEvent, Prisma, StatusEnum } from '@prisma/client';
+import {
+  EmployeeESocialEvent,
+  EmployeeESocialEventTypeEnum,
+  StatusEnum,
+} from '@prisma/client';
+
+import { CompanyEntity } from './../../company/entities/company.entity';
+import { EmployeeEntity } from './../../company/entities/employee.entity';
+import { EmployeeESocialBatchEntity } from './employeeEsocialBatch.entity';
 
 export class EmployeeESocialEventEntity implements EmployeeESocialEvent {
   id: number;
@@ -9,12 +16,18 @@ export class EmployeeESocialEventEntity implements EmployeeESocialEvent {
   environment: number;
   eventsDate: Date;
   status: StatusEnum;
-  snapshot: Prisma.JsonValue;
   eventXml: string;
   responseXml: string;
   employeeId: number;
   companyId: string;
+  type: EmployeeESocialEventTypeEnum;
   examHistoryId: number;
+  receipt: string;
+  eventId: string;
+  employee?: EmployeeEntity;
+  company?: CompanyEntity;
+  batch?: EmployeeESocialBatchEntity;
+  // snapshot: Prisma.JsonValue;
 
   constructor(partial: Partial<EmployeeESocialEventEntity>) {
     Object.assign(this, partial);

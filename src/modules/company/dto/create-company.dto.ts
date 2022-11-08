@@ -204,6 +204,10 @@ export class CreateCompanyDto {
   @IsOptional()
   @IsInt()
   tecResponsibleId?: number;
+
+  @IsBoolean()
+  @IsOptional()
+  esocialSend?: boolean;
 }
 
 export class FindCompaniesDto extends PaginationQueryDto {
@@ -259,6 +263,10 @@ export class FindCompaniesDto extends PaginationQueryDto {
   @IsBoolean()
   @IsOptional()
   isDismissal?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  selectReport?: boolean;
 
   @IsOptional()
   @Transform(StringUppercaseTransform, { toClassOnly: true })

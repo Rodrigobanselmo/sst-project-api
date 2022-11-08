@@ -1,3 +1,5 @@
+import { getCompanyName } from './../../../utils/companyName';
+import { CompanyEntity } from './../../../../modules/company/entities/company.entity';
 import {
   BadRequestException,
   Injectable,
@@ -14,13 +16,17 @@ import {
   DayJSProvider,
 } from '../../DateProvider/implementations/DayJSProvider';
 import {
+  ICompanyOptions,
   IConvertPfx,
   IConvertPfxReturn,
+  ICreateZipFolder,
   IESocialEventProvider,
   IIdOptions,
   ISignEvent,
 } from '../models/IESocialMethodProvider';
-
+import JSZip from 'jszip';
+import { Readable } from 'stream';
+import format from 'xml-formatter';
 class ESocialGenerateId {
   private cpfCnpj: string;
   private type: number;
@@ -49,7 +55,7 @@ class ESocialMethodsProvider implements IESocialEventProvider {
     private readonly dayJSProvider?: DayJSProvider,
   ) {}
 
-  public signEvent({ cert: { certificate, key }, xml }: ISignEvent) {
+  public signEvent({ cert: { certificate, key }, xml, path }: ISignEvent) {
     const sig = new SignedXml();
 
     function MyKeyInfo() {
@@ -68,7 +74,7 @@ class ESocialMethodsProvider implements IESocialEventProvider {
     }
 
     sig.addReference(
-      '/eSocial',
+      `//*[local-name(.)='${path}']`,
       [
         'http://www.w3.org/2000/09/xmldsig#enveloped-signature',
         'http://www.w3.org/TR/2001/REC-xml-c14n-20010315',
@@ -111,31 +117,40 @@ class ESocialMethodsProvider implements IESocialEventProvider {
     return new ESocialGenerateId(cpfCnpj, options);
   }
 
-  public async getCompanyCert(companyId: string) {
+  public async getCompany(companyId: string, options?: ICompanyOptions) {
     const company = await this.companyRepository.findFirstNude({
       where: { id: companyId },
       select: {
         id: true,
         esocialStart: true,
+        esocialSend: true,
         cnpj: true,
         doctorResponsible: {
-          include: { professional: { select: { name: true } } },
+          include: { professional: { select: { name: true, cpf: true } } },
         },
-        cert: true,
-        receivingServiceContracts: {
-          select: {
-            applyingServiceCompany: {
-              select: { cert: true },
+        cert: !!options?.cert,
+        ...(!!options?.report && {
+          report: true,
+        }),
+        ...(!!options?.cert && {
+          receivingServiceContracts: {
+            select: {
+              applyingServiceCompany: {
+                select: { cert: true },
+              },
             },
           },
-        },
+        }),
         group: {
           select: {
             doctorResponsible: {
-              include: { professional: { select: { name: true } } },
+              include: { professional: { select: { name: true, cpf: true } } },
             },
             esocialStart: true,
-            company: { select: { cert: true } },
+            ...(!!options?.cert && {
+              company: { select: { cert: true } },
+            }),
+            esocialSend: true,
           },
         },
       },
@@ -146,10 +161,32 @@ class ESocialMethodsProvider implements IESocialEventProvider {
       company?.group?.cert ||
       company?.receivingServiceContracts?.[0].applyingServiceCompany?.cert;
 
-    if (!cert)
+    if (options?.cert && !cert)
       throw new BadRequestException('Certificado digital não cadastrado');
 
     return { cert, company };
+  }
+
+  public async createZipFolder({ company, eventsXml, type }: ICreateZipFolder) {
+    const today = this.dayJSProvider.format(new Date(), 'DD-MM-YYYY');
+    const fileName = `eSocial ${getCompanyName(company)} ${today} - S${type}`;
+    const zip = new JSZip();
+    const folder = zip.folder(fileName);
+
+    eventsXml.forEach((event) => {
+      folder.file(
+        `EXAME_${event.id}.xml`,
+        format(event.xml, {
+          indentation: '  ',
+          filter: (node) => node.type !== 'Comment',
+          collapseContent: true,
+          lineSeparator: '\n',
+        }),
+      );
+    });
+
+    const zipFile = await zip.generateAsync({ type: 'nodebuffer' });
+    return { zipFile, fileName };
   }
 
   public async convertPfxToPem({

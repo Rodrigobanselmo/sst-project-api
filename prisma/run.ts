@@ -42,8 +42,14 @@ async function main() {
     // await representAll(prisma);
 
     // await deleteProfessionalsConnections(prisma);
-    await addProfCOuncilNUll(prisma);
+    // await addProfCOuncilNUll(prisma);
 
+    const group = await prisma.employeeESocialEvent.groupBy({
+      by: ['status'],
+      _count: true,
+    });
+
+    console.log(group);
     console.log('end');
   } catch (err) {
     console.error(err);

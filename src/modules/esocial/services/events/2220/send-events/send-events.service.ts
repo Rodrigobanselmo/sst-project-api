@@ -1,4 +1,9 @@
+import { getCompanyName } from './../../../../../../shared/utils/companyName';
+import { CreateESocialEvent } from './../../../../dto/esocial-batch.dto';
+import { ESocialBatchRepository } from './../../../../repositories/implementations/ESocialBatchRepository';
 import { BadRequestException, Injectable } from '@nestjs/common';
+import JSZip from 'jszip';
+import { Readable } from 'stream';
 import format from 'xml-formatter';
 
 import { UserPayloadDto } from '../../../../../../shared/dto/user-payload.dto';
@@ -8,6 +13,9 @@ import { CompanyRepository } from '../../../../../company/repositories/implement
 import { EmployeeExamsHistoryRepository } from '../../../../../company/repositories/implementations/EmployeeExamsHistoryRepository';
 import { EmployeeRepository } from '../../../../../company/repositories/implementations/EmployeeRepository';
 import { Event2220Dto } from './../../../../dto/event.dto';
+import { EmployeeESocialEventTypeEnum, StatusEnum } from '@prisma/client';
+import { DayJSProvider } from '../../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
+import { CompanyReportRepository } from '../../../../../../modules/company/repositories/implementations/CompanyReportRepository';
 
 @Injectable()
 export class SendEvents2220ESocialService {
@@ -17,18 +25,25 @@ export class SendEvents2220ESocialService {
     private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository,
     private readonly employeeRepository: EmployeeRepository,
     private readonly companyRepository: CompanyRepository,
+    private readonly companyReportRepository: CompanyReportRepository,
+    private readonly eSocialBatchRepository: ESocialBatchRepository,
+    private readonly dayJSProvider: DayJSProvider,
   ) {}
 
   async execute(body: Event2220Dto, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;
-    const { company, cert } = await this.eSocialMethodsProvider.getCompanyCert(
+    const { company, cert } = await this.eSocialMethodsProvider.getCompany(
       companyId,
+      { cert: true, report: true },
     );
 
     const startDate = company.esocialStart;
+    const esocialSend = company.esocialSend;
 
-    if (!startDate)
-      throw new BadRequestException('Data de início do eSocial não informado');
+    if (!startDate || esocialSend == null)
+      throw new BadRequestException(
+        'Data de início do eSocial ou tipo de envio não informado para essa empresa',
+      );
 
     const { data: employees } = await this.employeeRepository.findEvent2220(
       {
@@ -38,148 +53,66 @@ export class SendEvents2220ESocialService {
       { take: 1000 },
     );
 
-    const eventsStruct = this.eSocialEventProvider.convertToEventStruct(
+    const eventsStruct = this.eSocialEventProvider.convertToEvent2220Struct(
       company,
       employees,
       body,
     );
 
-    const eventsXml = eventsStruct.map((data) => {
-      const xmlResult = this.eSocialEventProvider.generateXmlEvent2220(
-        data.event,
-      );
+    const eventsXml = eventsStruct
+      .map(({ event, ...data }) => {
+        const errors = this.eSocialEventProvider.errorsEvent2220(event);
+        if (errors.length > 0) return;
 
-      return format(xmlResult, {
-        indentation: '  ',
-        filter: (node) => node.type !== 'Comment',
-        collapseContent: true,
-        lineSeparator: '\n',
-      });
+        const xmlResult = this.eSocialEventProvider.generateXmlEvent2220(
+          event,
+          { declarations: !esocialSend },
+        );
+
+        const signedXml: string | null = esocialSend
+          ? this.eSocialMethodsProvider.signEvent({
+              xml: xmlResult,
+              cert,
+              path: 'evtMonit',
+            })
+          : null;
+
+        return { signedXml, xml: xmlResult, ...data };
+      })
+      .filter((i) => i);
+
+    const examsIds: number[] = [];
+    const events: CreateESocialEvent[] = eventsXml.map(
+      ({ examIds: ids, ...event }) => {
+        examsIds.push(...ids);
+        return {
+          employeeId: event.employee.id,
+          eventsDate: event.eventDate,
+          eventXml: event.xml,
+          examHistoryId: event.asoId,
+        };
+      },
+    );
+
+    await this.eSocialBatchRepository.create({
+      companyId,
+      environment: body.tpAmb || 1,
+      status: esocialSend ? StatusEnum.PENDING : StatusEnum.TRANSMITTED,
+      type: EmployeeESocialEventTypeEnum.EXAM_2220,
+      userTransmissionId: user.userId,
+      events,
+      examsIds,
     });
 
-    return eventsXml[0];
-    // console.log(xmlResult);
+    await this.companyReportRepository.updateESocial(companyId, events.length);
 
-    //*
-    // const signedXml = this.eSocialEventProvider.signEvent({
-    //   xml: xmlResult,
-    //   cert,
-    // });
+    const { zipFile, fileName } =
+      await this.eSocialMethodsProvider.createZipFolder({
+        company,
+        eventsXml,
+        type: '2220',
+      });
 
-    // return signedXml;
+    return { fileStream: Readable.from(zipFile) as any, fileName };
   }
 }
-
-// const generateId = this.eSocialMethodsProvider.classGenerateId(companyId);
-// const eventsInterface = employeesFound.reduce<
-//   {
-//     event: IEvent2220Props;
-//     asoId: number;
-//     employeeId: number;
-//     companyId: string;
-//   }[]
-// >((acc, employee) => {
-//   const examsGroup = employee.examsHistory.reduce<
-//     EmployeeExamsHistoryEntity[][]
-//   >(
-//     (_acc, exam) => {
-//       const cloneAcc = clone(_acc);
-//       const lastIndex = cloneAcc.length - 1;
-
-//       cloneAcc[lastIndex].push(exam);
-
-//       if (exam.exam.isAttendance) {
-//         cloneAcc.push([]);
-//       }
-
-//       return cloneAcc;
-//     },
-//     [[]],
-//   );
-
-//   const examsWithAso = examsGroup.filter((exams) =>
-//     exams.some((e) => e.exam.isAttendance),
-//   );
-
-//   const eventsJs = examsWithAso.map<{
-//     event: IEvent2220Props;
-//     asoId: number;
-//     employeeId: number;
-//     companyId: string;
-//   }>((exams) => {
-//     const aso = exams[exams.length - 1];
-//     const eventMed: IEvent2220Props['exMedOcup'] = {
-//       respMonit: {
-//         cpfResp: company?.doctorResponsible?.cpf,
-//         nmResp: company?.doctorResponsible?.name,
-//         nrCRM: company?.doctorResponsible?.councilId,
-//         ufCRM: company?.doctorResponsible?.councilUF,
-//       },
-//       tpExameOcup: mapResAso[aso.examType],
-//       aso: {
-//         dtAso: aso.doneDate,
-//         resAso: mapTpExameOcup[aso.evaluationType],
-//         medico: {
-//           nmMed: aso?.doctor?.name,
-//           nrCRM: aso?.doctor?.councilId,
-//           ufCRM: aso?.doctor?.councilUF,
-//         },
-//         exame: exams.map((exam) => {
-//           let isSequential: boolean | null = null;
-//           let obsProc: string | null = null;
-//           const esocial27Code = exam.exam?.esocial27Code;
-//           if (requiredOrdExams.includes(esocial27Code)) {
-//             isSequential =
-//               !!employee.examsHistory.filter(
-//                 (e) =>
-//                   e.status === 'DONE' &&
-//                   e?.exam?.esocial27Code === exam.exam.esocial27Code,
-//               )[1] ||
-//               (examsWithAso.length === 1 &&
-//                 aso.examType !== ExamHistoryTypeEnum.ADMI);
-//           }
-
-//           if (requiredObsProc.includes(esocial27Code)) {
-//             obsProc = exam.exam?.obsProc;
-//           }
-
-//           return {
-//             examName: exam.exam.name,
-//             dtExm: exam.doneDate,
-//             procRealizado: esocial27Code,
-//             ...(isSequential != null && {
-//               ordExame: isSequential ? 2 : 1,
-//             }),
-//             ...(obsProc != null && { obsProc }),
-//           };
-//         }),
-//       },
-//     };
-
-//     // aso.event. //?
-
-//     const event: IEvent2220Props = {
-//       id: generateId.newId(),
-//       exMedOcup: eventMed,
-//       ideEmpregador: { nrInsc: company.cnpj },
-//       ideVinculo: {
-//         cpfTrab: employee.cpf,
-//         matricula: employee.esocialCode,
-//       },
-//       ideEvento: {
-//         tpAmb: body.tpAmb,
-//         procEmi: body.procEmi,
-//       },
-//     };
-
-//     return {
-//       event: event,
-//       asoId: aso.id,
-//       employeeId: employee.id,
-//       companyId: employee.companyId,
-//     };
-//   });
-
-//   acc = [...eventsJs, ...acc];
-//   return acc;
-// }, []);

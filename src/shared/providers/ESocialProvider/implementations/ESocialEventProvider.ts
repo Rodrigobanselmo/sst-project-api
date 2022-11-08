@@ -1,12 +1,10 @@
-import { CompanyEntity } from './../../../../modules/company/entities/company.entity';
-import { EmployeeExamsHistoryEntity } from './../../../../modules/company/entities/employee-exam-history.entity';
-import { EmployeeEntity } from 'src/modules/company/entities/employee.entity';
-import { Injectable } from '@nestjs/common';
-import { js2xml } from 'xml-js';
+import { Inject, Injectable } from '@nestjs/common';
+import { ExamHistoryTypeEnum } from '@prisma/client';
 import clone from 'clone';
+import { Client } from 'nestjs-soap';
+import { EmployeeEntity } from 'src/modules/company/entities/employee.entity';
+import { js2xml } from 'xml-js';
 
-import { PrismaService } from '../../../../prisma/prisma.service';
-import { DayJSProvider } from '../../DateProvider/implementations/DayJSProvider';
 import {
   IEvent2220Props,
   mapResAso,
@@ -15,7 +13,12 @@ import {
   requiredOrdExams,
 } from '../../../../modules/esocial/interfaces/event-2220';
 import { IEventProps } from '../../../../modules/esocial/interfaces/event-batch';
-import { ExamHistoryTypeEnum } from '@prisma/client';
+import { PrismaService } from '../../../../prisma/prisma.service';
+import { DayJSProvider } from '../../DateProvider/implementations/DayJSProvider';
+import { CompanyEntity } from './../../../../modules/company/entities/company.entity';
+import { EmployeeExamsHistoryEntity } from './../../../../modules/company/entities/employee-exam-history.entity';
+import { SoapClientEnum } from './../../../constants/enum/soapClient';
+import { sortNumber } from './../../../utils/sorts/number.sort';
 import { ESocialMethodsProvider } from './ESocialMethodsProvider';
 
 @Injectable()
@@ -27,12 +30,19 @@ class ESocialEventProvider {
   private tpInsc = 1;
 
   constructor(
+    @Inject(SoapClientEnum.PRODUCTION)
+    private readonly clientProduction: Client,
+    @Inject(SoapClientEnum.PRODUCTION_RESTRICT)
+    private readonly clientRestrict: Client,
     private readonly prisma: PrismaService,
     private readonly dayJSProvider: DayJSProvider,
     private readonly eSocialMethodsProvider: ESocialMethodsProvider,
   ) {}
 
-  public generateXmlEvent2220(event: IEvent2220Props) {
+  generateXmlEvent2220(
+    event: IEvent2220Props,
+    options?: { declarations?: boolean },
+  ) {
     const baseEvent = this.generateEventBase(event);
     const exMedOcup = event.exMedOcup;
     const respMonit = exMedOcup.respMonit;
@@ -41,6 +51,14 @@ class ESocialEventProvider {
     const exams = aso.exame;
 
     const eventJs = {
+      ...(options?.declarations && {
+        _declaration: {
+          _attributes: {
+            version: '1.0',
+            encoding: 'UTF-8',
+          },
+        },
+      }),
       eSocial: {
         ['_attributes']: {
           xmlns: 'http://www.esocial.gov.br/schema/evt/evtMonit/v_S_01_00_00',
@@ -81,12 +99,13 @@ class ESocialEventProvider {
       },
     };
 
-    const xml = js2xml(eventJs, { compact: true })?.replace('<?xml?>', '');
+    let xml = js2xml(eventJs, { compact: true });
+    if (options?.declarations) xml = xml?.replace('<?xml?>', '');
 
     return xml;
   }
 
-  public errorsEvent2220(event: IEvent2220Props) {
+  errorsEvent2220(event: IEvent2220Props) {
     const exMedOcup = event.exMedOcup;
     const respMonit = exMedOcup.respMonit;
     const aso = exMedOcup.aso;
@@ -94,7 +113,7 @@ class ESocialEventProvider {
     const exams = aso.exame;
     const ideVinculo = event.ideVinculo;
 
-    const errors = [];
+    const errors: { message: string }[] = [];
 
     {
       if (!ideVinculo.cpfTrab)
@@ -104,31 +123,43 @@ class ESocialEventProvider {
     }
 
     {
-      if (!respMonit.cpfResp)
+      if (!respMonit.cpfResp && !respMonit.nmResp) {
         errors.push({
-          message: 'Informar "CPF" do médico coordenador do PCMSO',
+          message: 'Informar o médico coordenador do PCMSO',
         });
-      if (!respMonit.nrCRM || !respMonit.ufCRM)
-        errors.push({
-          message: 'Informar "CRM" do médico coordenador do PCMSO',
-        });
-      if (!respMonit.nmResp)
-        errors.push({
-          message: 'Informar "nome" do médico coordenador do PCMSO',
-        });
+      } else {
+        if (!respMonit.cpfResp)
+          errors.push({
+            message: 'Informar "CPF" do médico coordenador do PCMSO',
+          });
+        if (!respMonit.nmResp)
+          errors.push({
+            message: 'Informar "nome" do médico coordenador do PCMSO',
+          });
+        if (!respMonit.nrCRM || !respMonit.ufCRM)
+          errors.push({
+            message: 'Informar "CRM" do médico coordenador do PCMSO',
+          });
+      }
     }
 
     {
-      if (!asoDoctor.nrCRM || !asoDoctor.ufCRM)
-        errors.push({ message: 'Informar "CRM" do médico emitente do ASO' });
-      if (!asoDoctor.nmMed)
+      if (!respMonit.nmResp && !asoDoctor.nrCRM && !asoDoctor.ufCRM) {
         errors.push({
-          message: 'Informar "nome" do médico emitente do ASO',
+          message: 'Informar o médico emitente do ASO',
         });
+      } else {
+        if (!asoDoctor.nrCRM || !asoDoctor.ufCRM)
+          errors.push({ message: 'Informar "CRM" do médico emitente do ASO' });
+        if (!asoDoctor.nmMed)
+          errors.push({
+            message: 'Informar "nome" do médico emitente do ASO',
+          });
+      }
     }
 
     {
-      if (!exMedOcup.tpExameOcup)
+      if (!exMedOcup.tpExameOcup && exMedOcup.tpExameOcup != 0)
         errors.push({
           message: 'Informar "tipo de exame" (ex: Admissional) do empregado',
         });
@@ -155,48 +186,62 @@ class ESocialEventProvider {
     return errors;
   }
 
-  public convertToEventStruct(
+  convertToEvent2220Struct(
     company: CompanyEntity,
     employees: EmployeeEntity[],
     ideEvento?: IEventProps['ideEvento'],
   ) {
-    const companyId = company.id;
-    const generateId = this.eSocialMethodsProvider.classGenerateId(companyId);
+    const generateId = this.eSocialMethodsProvider.classGenerateId(
+      company.cnpj,
+    );
     const eventsStruct = employees.reduce<
       {
         event: IEvent2220Props;
         employee: EmployeeEntity;
         asoId: number;
+        examIds: number[];
+        eventDate: Date;
+        id: string;
       }[]
     >((acc, employee) => {
-      const examsGroup = employee.examsHistory.reduce<
-        EmployeeExamsHistoryEntity[][]
-      >(
-        (_acc, exam) => {
-          const cloneAcc = clone(_acc);
-          const lastIndex = cloneAcc.length - 1;
+      const examsGroup = employee.examsHistory
+        .sort((a, b) =>
+          sortNumber(a.exam.isAttendance ? 1 : 0, b.exam.isAttendance ? 1 : 0),
+        )
+        .sort((a, b) => sortNumber(a.doneDate, b.doneDate))
+        .reduce<EmployeeExamsHistoryEntity[][]>(
+          (_acc, exam) => {
+            const cloneAcc = clone(_acc);
+            const lastIndex = cloneAcc.length - 1;
 
-          cloneAcc[lastIndex].push(exam);
+            cloneAcc[lastIndex].push(exam);
 
-          if (exam.exam.isAttendance) {
-            cloneAcc.push([]);
-          }
+            if (exam.exam.isAttendance) {
+              cloneAcc.push([]);
+            }
 
-          return cloneAcc;
-        },
-        [[]],
-      );
+            return cloneAcc;
+          },
+          [[]],
+        );
 
-      const examsWithAso = examsGroup.filter((exams) =>
-        exams.some((e) => e.exam.isAttendance),
+      const examsWithAso = examsGroup.filter(
+        (exams) =>
+          exams.some((e) => e.exam.isAttendance) &&
+          exams.some((e) => e.sendEvent),
       );
 
       const eventsJs = examsWithAso.map<{
         event: IEvent2220Props;
         employee: EmployeeEntity;
+        examIds: number[];
         asoId: number;
+        eventDate: Date;
+        id: string;
       }>((exams) => {
         const aso = exams[exams.length - 1];
+        const examIds = [];
+        const id = generateId.newId();
         const eventMed: IEvent2220Props['exMedOcup'] = {
           respMonit: {
             cpfResp: company?.doctorResponsible?.cpf,
@@ -232,6 +277,8 @@ class ESocialEventProvider {
                 obsProc = exam.exam?.obsProc;
               }
 
+              examIds.push(exam.id);
+
               return {
                 examName: exam.exam.name,
                 dtExm: exam.doneDate,
@@ -248,7 +295,7 @@ class ESocialEventProvider {
         // aso.event. //?
 
         const event: IEvent2220Props = {
-          id: generateId.newId(),
+          id,
           exMedOcup: eventMed,
           ideEmpregador: { nrInsc: company.cnpj },
           ideVinculo: {
@@ -262,8 +309,11 @@ class ESocialEventProvider {
         };
 
         return {
+          id,
           event: event,
+          eventDate: aso.doneDate,
           asoId: aso.id,
+          examIds,
           employee: employee,
         };
       });
@@ -275,7 +325,7 @@ class ESocialEventProvider {
     return eventsStruct;
   }
 
-  public convertDate(date: Date) {
+  convertDate(date: Date) {
     return this.dayJSProvider.format(date, 'YYYY-MM-DD');
   }
 
@@ -319,6 +369,27 @@ class ESocialEventProvider {
     };
 
     return eventJs;
+  }
+
+  public async sendEvent2220ToESocial(
+    eventsXml: {
+      employee: EmployeeEntity;
+      asoId: number;
+      examIds: number[];
+      eventDate: Date;
+      id: string;
+      signedXml: string;
+      xml: string;
+    }[],
+    options?: {
+      environment?: number;
+    },
+  ) {
+    //* >> Criar grupo de lotes com 10-30 eventos assinados
+    //* >> crio client e envio verificando um a um se foi enviado
+    //* >>
+
+    return;
   }
 }
 

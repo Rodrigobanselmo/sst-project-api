@@ -260,6 +260,7 @@ import { EsocialModule } from '../esocial/esocial.module';
     CidRepository,
     EmployeeExamsHistoryRepository,
     EmployeeHierarchyHistoryRepository,
+    CompanyReportRepository,
   ],
 })
 export class CompanyModule {}

@@ -26,6 +26,14 @@ export const mapTpExameOcup: Record<
   [ExamHistoryEvaluationEnum.INCONCLUSIVE]: null,
 };
 
+export const mapInverseTpExameOcup: Record<
+  EnumResAso,
+  ExamHistoryEvaluationEnum
+> = {
+  [EnumResAso.APT]: ExamHistoryEvaluationEnum.APTO,
+  [EnumResAso.INAPT]: ExamHistoryEvaluationEnum.INAPT,
+};
+
 export const mapResAso: Record<ExamHistoryTypeEnum, EnumTpExameOcup | null> = {
   [ExamHistoryTypeEnum.ADMI]: EnumTpExameOcup.ADMI,
   [ExamHistoryTypeEnum.PERI]: EnumTpExameOcup.PERI,
@@ -34,6 +42,18 @@ export const mapResAso: Record<ExamHistoryTypeEnum, EnumTpExameOcup | null> = {
   [ExamHistoryTypeEnum.OFFI]: EnumTpExameOcup.CHAN,
   [ExamHistoryTypeEnum.EVAL]: EnumTpExameOcup.EVAL,
   [ExamHistoryTypeEnum.DEMI]: EnumTpExameOcup.DEMI,
+};
+
+export const mapInverseResAso: Record<
+  EnumTpExameOcup,
+  ExamHistoryTypeEnum | null
+> = {
+  [EnumTpExameOcup.ADMI]: ExamHistoryTypeEnum.ADMI,
+  [EnumTpExameOcup.PERI]: ExamHistoryTypeEnum.PERI,
+  [EnumTpExameOcup.RETU]: ExamHistoryTypeEnum.RETU,
+  [EnumTpExameOcup.CHAN]: ExamHistoryTypeEnum.CHAN,
+  [EnumTpExameOcup.EVAL]: ExamHistoryTypeEnum.EVAL,
+  [EnumTpExameOcup.DEMI]: ExamHistoryTypeEnum.DEMI,
 };
 
 export const requiredOrdExams = ['0281'];

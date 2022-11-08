@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { FindEvents2220ESocialService } from '../../../../../modules/esocial/services/events/2220/find-events/find-events.service';
@@ -15,6 +15,12 @@ export class ESocialEvent2220Controller {
     private readonly findEvents2220ESocialService: FindEvents2220ESocialService,
   ) {}
 
+  // @Permissions({
+  //   code: PermissionEnum.ESOCIAL,
+  //   isContract: true,
+  //   isMember: true,
+  //   crud: true,
+  // })
   @Get(':companyId?')
   find(
     @Query() query: FindEvents2220Dto,
@@ -30,10 +36,22 @@ export class ESocialEvent2220Controller {
   //   crud: true,
   // })
   @Post()
-  sendBatch(
+  async sendBatch(
+    @Res() res,
     @Body() body: Event2220Dto,
     @User() userPayloadDto: UserPayloadDto,
   ) {
-    return this.sendEvents2220ESocialService.execute(body, userPayloadDto);
+    const { fileStream, fileName } =
+      await this.sendEvents2220ESocialService.execute(body, userPayloadDto);
+
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=${fileName}.zip`,
+    );
+    fileStream.on('error', function (e) {
+      res.status(500).send(e);
+    });
+
+    fileStream.pipe(res);
   }
 }

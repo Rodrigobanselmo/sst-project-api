@@ -11,6 +11,7 @@ export class CompanyGroupEntity implements CompanyGroup {
   id: number;
   name: string;
   description: string;
+  esocialSend: boolean;
   created_at: Date;
   updated_at: Date;
   companyId: string;

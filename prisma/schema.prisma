@@ -148,6 +148,7 @@ enum StatusEnum {
   VALID
   INVALID
   ERROR
+  TRANSMITTED
   CANCELED
   MODIFIED
   DONE
@@ -309,6 +310,7 @@ model Company {
   numAsos Int?
   blockResignationExam Boolean @default(true)
   esocialStart  DateTime?
+  esocialSend  Boolean?
   initials String?
   unit String?
   obs String?
@@ -431,6 +433,7 @@ model CompanyGroup {
   numAsos Int?
   blockResignationExam Boolean @default(true)
   esocialStart  DateTime?
+  esocialSend  Boolean?
   doctorResponsibleId  Int?
   doctorResponsible  ProfessionalCouncil? @relation(name:"doctors_council_group_responsibles", fields: [doctorResponsibleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   tecResponsibleId  Int?
@@ -766,6 +769,8 @@ model EmployeeESocialBatch {
   environment Int?
   status StatusEnum @default(PENDING)
   events EmployeeESocialEvent[]
+  type EmployeeESocialEventTypeEnum
+  protocolId String?
 
   userTransmissionId Int?
   userTransmission User? @relation(fields: [userTransmissionId], references: [id], onDelete: Restrict, onUpdate: Cascade)
@@ -780,14 +785,17 @@ model EmployeeESocialEvent {
   created_at DateTime @default(now())
   updated_at  DateTime   @updatedAt  
   batchId Int?
+  type EmployeeESocialEventTypeEnum
   batch EmployeeESocialBatch? @relation(fields: [batchId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   eventsDate DateTime
   status StatusEnum @default(PENDING)
   // eventsType EmployeeESocialEventTypeEnum
   // snapshot Json?
 
+  receipt String?
+  eventId String?
   eventXml String
-  responseXml String
+  responseXml String?
   employeeId Int
   employee Employee @relation(fields: [employeeId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   companyId String

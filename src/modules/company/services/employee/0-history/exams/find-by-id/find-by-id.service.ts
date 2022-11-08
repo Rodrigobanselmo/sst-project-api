@@ -17,6 +17,7 @@ export class FindByIdEmployeeExamHistoryService {
         clinic: { select: { id: true, fantasy: true, address: true } },
         doctor: {
           select: {
+            id: true,
             councilId: true,
             councilType: true,
             councilUF: true,

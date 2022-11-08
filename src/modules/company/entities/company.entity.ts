@@ -132,6 +132,7 @@ export class CompanyEntity implements Company {
   report: CompanyReportEntity;
   riskDegree?: number;
   isGroup: boolean;
+  esocialSend: boolean;
   companyGroupId: number;
   esocialStart: Date;
   esocialLastTransmission: Date;
@@ -149,15 +150,15 @@ export class CompanyEntity implements Company {
     }
 
     if (this.group) {
-      if (!this.doctorResponsibleId) {
+      if (!this.doctorResponsible)
         this.doctorResponsible = this.group?.doctorResponsible;
+      if (!this.doctorResponsibleId)
         this.doctorResponsibleId = this.group?.doctorResponsibleId;
-      }
 
-      if (!this.tecResponsibleId) {
+      if (!this.tecResponsible)
         this.tecResponsible = this.group?.tecResponsible;
+      if (!this.tecResponsibleId)
         this.tecResponsibleId = this.group?.tecResponsibleId;
-      }
 
       if (!this.esocialStart) this.esocialStart = this.group?.esocialStart;
       if (!this.numAsos) this.numAsos = this.group?.numAsos;

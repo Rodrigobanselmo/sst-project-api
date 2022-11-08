@@ -56,6 +56,7 @@
     "firebase": "^9.9.0",
     "handlebars": "^4.7.7",
     "image-size": "^1.0.1",
+    "jszip": "^3.10.1",
     "mime-types": "^2.1.35",
     "nestjs-soap": "^3.0.0",
     "nestjs-telegram": "^1.2.0",

@@ -91,5 +91,18 @@ export class EmployeeEntity implements Employee {
     if (this.company) {
       this.company = new CompanyEntity(this.company);
     }
+
+    if (this.examsHistory) {
+      this.examsHistory = this.examsHistory.map(
+        (examsHistory) => new EmployeeExamsHistoryEntity(examsHistory),
+      );
+    }
+
+    if (this.hierarchyHistory) {
+      this.hierarchyHistory = this.hierarchyHistory.map(
+        (hierarchyHistory) =>
+          new EmployeeHierarchyHistoryEntity(hierarchyHistory),
+      );
+    }
   }
 }

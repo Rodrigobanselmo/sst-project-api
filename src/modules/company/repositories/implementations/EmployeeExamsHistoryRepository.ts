@@ -190,7 +190,7 @@ export class EmployeeExamsHistoryRepository {
         where,
         take: pagination.take || 20,
         skip: pagination.skip || 0,
-        orderBy: { doneDate: 'desc' },
+        orderBy: [{ doneDate: 'desc' }, { exam: { isAttendance: 'desc' } }],
         ...options,
       }),
     ]);

@@ -48,6 +48,10 @@ export class UpsertCompanyGroupDto {
   @IsInt()
   tecResponsibleId?: number;
 
+  @IsBoolean()
+  @IsOptional()
+  esocialSend?: boolean;
+
   @ValidateIf((o) => !o.id)
   @IsString({ each: true })
   companiesIds: string[];

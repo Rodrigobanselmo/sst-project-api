@@ -163,6 +163,10 @@ export class UpdateCompanyDto {
   @Type(() => Date)
   esocialStart?: Date;
 
+  @IsBoolean()
+  @IsOptional()
+  esocialSend?: boolean;
+
   @IsOptional()
   @IsString()
   responsibleNit?: string;
