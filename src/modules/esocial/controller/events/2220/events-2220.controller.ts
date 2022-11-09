@@ -41,8 +41,11 @@ export class ESocialEvent2220Controller {
     @Body() body: Event2220Dto,
     @User() userPayloadDto: UserPayloadDto,
   ) {
+    // return this.sendEvents2220ESocialService.execute(body, userPayloadDto);
     const { fileStream, fileName } =
       await this.sendEvents2220ESocialService.execute(body, userPayloadDto);
+
+    if (!fileStream) return res.status(200).send('Lotes enviados com sucessos');
 
     res.setHeader(
       'Content-Disposition',

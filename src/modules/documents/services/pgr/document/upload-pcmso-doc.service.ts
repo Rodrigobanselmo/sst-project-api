@@ -307,16 +307,12 @@ export class PcmsoUploadService {
 
       // return doc; //?remove
 
-      [logo, consultantLogo, ...photosPath].forEach(
-        (path) => path && fs.unlinkSync(path),
-      );
+      this.unlinkFiles([logo, consultantLogo, ...photosPath]);
       console.log('done: unlink photos');
 
       return { buffer, fileName };
     } catch (error) {
-      [logo, consultantLogo, ...photosPath].forEach((path) => {
-        path && fs.unlinkSync(path);
-      });
+      this.unlinkFiles([logo, consultantLogo, ...photosPath]);
       console.log('error: unlink photos', error);
 
       if (upsertPgrDto.id)
@@ -405,7 +401,7 @@ export class PcmsoUploadService {
       };
     } catch (error) {
       console.log('unlink photo on error');
-      photosPath.forEach((path) => fs.unlinkSync(path));
+      this.unlinkFiles(photosPath);
       console.error(error);
       throw new InternalServerErrorException(error);
     }
@@ -470,5 +466,16 @@ export class PcmsoUploadService {
     const url = await this.upload(buffer, fileName, upsertPgrDto);
 
     return url;
+  }
+
+  private async unlinkFiles(paths: string[]) {
+    paths
+      .filter((i) => !!i && typeof i == 'string')
+      .forEach((path) => {
+        try {
+          console.log('paths', path);
+          fs.unlinkSync(path);
+        } catch (e) {}
+      });
   }
 }

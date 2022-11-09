@@ -20,6 +20,4 @@ export const addProfCOuncilNUll = async (prisma: PrismaClient) => {
       });
     }),
   );
-
-  console.log(prof);
 };

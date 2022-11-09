@@ -275,9 +275,9 @@ class ExcelProvider implements IExcelProvider {
 
       if (transformStep.startMap) {
         tableSchema.forEach((tableSchemaCell, indexCell) => {
-          const actualCell = ` spreadsheet ${excelReadData.name}, row ${
+          const actualCell = ` spreadsheet ${excelReadData.name}, linha ${
             indexRow + 1
-          } and column ${indexCell + 1}`;
+          } e coluna ${indexCell + 1}`;
 
           const excelCell = excelRow[indexCell];
           const isEmptyCell =
@@ -304,7 +304,7 @@ class ExcelProvider implements IExcelProvider {
 
           if (isMissingField || isMissingArrayField)
             throw new BadRequestException(
-              `Is missing an required field value on ${actualCell}`,
+              `Esta faltando um campo obrigatório na ${actualCell}`,
             );
 
           if (isArrayData && !tableSchemaCell.isArray && !isEmptyCell)
@@ -317,7 +317,7 @@ class ExcelProvider implements IExcelProvider {
           let checkedData = tableSchemaCell.checkHandler(excelCell);
 
           if (checkedData === false && excelCell != '-')
-            throw new BadRequestException(`Invalid data on ${actualCell}`);
+            throw new BadRequestException(`Dado inválido na ${actualCell}`);
 
           if (checkedData === 'false') checkedData = false;
 

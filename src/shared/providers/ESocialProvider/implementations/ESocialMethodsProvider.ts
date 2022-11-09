@@ -209,7 +209,7 @@ class ESocialMethodsProvider implements IESocialEventProvider {
       fs.unlinkSync(path);
 
       const passError = err.message.includes('password?');
-      if (passError) throw new BadRequestException('Senha inválida');
+      if (passError) throw new BadRequestException('Senha informada inválida');
       const certNotFOund = err.message.includes('such file or direct');
       if (certNotFOund)
         throw new InternalServerErrorException('Certificado não encontrado');

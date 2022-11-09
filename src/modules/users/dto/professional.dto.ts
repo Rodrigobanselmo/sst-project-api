@@ -35,17 +35,17 @@ export class CreateProfessionalDto {
   @IsOptional()
   email?: string;
 
-  @IsString()
-  @IsOptional()
-  councilType?: string;
+  // @IsString()
+  // @IsOptional()
+  // councilType?: string;
 
-  @IsString()
-  @IsOptional()
-  councilUF?: string;
+  // @IsString()
+  // @IsOptional()
+  // councilUF?: string;
 
-  @IsString()
-  @IsOptional()
-  councilId?: string;
+  // @IsString()
+  // @IsOptional()
+  // councilId?: string;
 
   @IsString({ each: true })
   @IsOptional()

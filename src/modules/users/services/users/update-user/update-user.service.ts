@@ -68,18 +68,6 @@ export class UpdateUserService {
         ...updateUserDto,
         ...(invite &&
           invite?.professional && {
-            //! delete
-            ...(invite?.professional.councilId && {
-              councilId: invite.professional.councilId,
-            }),
-            ...(invite?.professional.councilType && {
-              councilType: invite.professional.councilType,
-            }),
-            ...(invite?.professional.councilUF && {
-              councilUF: invite.professional.councilUF,
-            }),
-            //!
-
             ...(invite?.professional.councils && {
               councils: invite.professional.councils.map(
                 ({ councilId, councilType, councilUF }) => ({

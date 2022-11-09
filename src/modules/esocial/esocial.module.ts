@@ -40,7 +40,7 @@ import { FindESocialEventService } from './services/events/all/find-events/find-
         const httpsAgent = new https.Agent({
           rejectUnauthorized: false,
           pfx: fs.readFileSync('cert/cert.pfx'),
-          passphrase: process.env.VITAE_PFX_PASSWORD,
+          passphrase: process.env.TRANSMISSION_PFX_PASSWORD,
         });
 
         const api = axios.create({
@@ -60,7 +60,7 @@ import { FindESocialEventService } from './services/events/all/find-events/find-
         const httpsAgent = new https.Agent({
           rejectUnauthorized: false,
           pfx: fs.readFileSync('cert/cert.pfx'),
-          passphrase: process.env.VITAE_PFX_PASSWORD,
+          passphrase: process.env.TRANSMISSION_PFX_PASSWORD,
         });
 
         const api = axios.create({

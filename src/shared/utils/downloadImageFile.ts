@@ -28,7 +28,7 @@ export const downloadImageFile = async (
         }),
     )
     .catch((e) => {
-      console.log(e);
+      console.log('downloadImageFile', e);
       return null;
     });
 };

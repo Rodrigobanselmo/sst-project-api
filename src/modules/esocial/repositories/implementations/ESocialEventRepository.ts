@@ -51,7 +51,7 @@ export class ESocialEventRepository {
       type: true,
       employee: { select: { name: true, id: true, cpf: true } },
       eventXml: true,
-      responseXml: true,
+      response: true,
       employeeId: true,
       receipt: true,
       batchId: true,

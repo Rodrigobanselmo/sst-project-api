@@ -1,8 +1,17 @@
+import { IEsocialSendBatchResponse } from './../../../../modules/esocial/interfaces/esocial';
+import {
+  EventGroupEnum,
+  IBatchProps,
+  IndRetifEnum,
+  TpAmbEnum,
+} from './../../../../modules/esocial/interfaces/event-batch';
 import { Inject, Injectable } from '@nestjs/common';
 import { ExamHistoryTypeEnum } from '@prisma/client';
 import clone from 'clone';
+import fs from 'fs';
 import { Client } from 'nestjs-soap';
-import { EmployeeEntity } from 'src/modules/company/entities/employee.entity';
+import { EmployeeEntity } from '../../../../modules/company/entities/employee.entity';
+import { arrayChunks } from '../../../..//shared/utils/arrayChunks';
 import { js2xml } from 'xml-js';
 
 import {
@@ -12,7 +21,11 @@ import {
   requiredObsProc,
   requiredOrdExams,
 } from '../../../../modules/esocial/interfaces/event-2220';
-import { IEventProps } from '../../../../modules/esocial/interfaces/event-batch';
+import {
+  IEventProps,
+  ProcEmiEnum,
+  TpIncsEnum,
+} from '../../../../modules/esocial/interfaces/event-batch';
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { DayJSProvider } from '../../DateProvider/implementations/DayJSProvider';
 import { CompanyEntity } from './../../../../modules/company/entities/company.entity';
@@ -20,14 +33,21 @@ import { EmployeeExamsHistoryEntity } from './../../../../modules/company/entiti
 import { SoapClientEnum } from './../../../constants/enum/soapClient';
 import { sortNumber } from './../../../utils/sorts/number.sort';
 import { ESocialMethodsProvider } from './ESocialMethodsProvider';
+import {
+  IESocialSendEventOptions,
+  IESocialStruck2220,
+  IESocialXmlStruck2220,
+} from '../models/IESocialMethodProvider';
+import format from 'xml-formatter';
 
 @Injectable()
 class ESocialEventProvider {
   private verProc = 'Simple_SST_eSocial 1.0';
-  private indRetif = 1;
-  private tpAmb = 1;
-  private procEmi = 1;
-  private tpInsc = 1;
+  private indRetif = IndRetifEnum.ORIGINAL;
+  private tpAmb = TpAmbEnum.PROD_REST;
+  private procEmi = ProcEmiEnum.SOFTWARE;
+  private tpInsc = TpIncsEnum.CNPJ;
+  private eventGroup = EventGroupEnum.NO_PERIODIC;
 
   constructor(
     @Inject(SoapClientEnum.PRODUCTION)
@@ -41,7 +61,7 @@ class ESocialEventProvider {
 
   generateXmlEvent2220(
     event: IEvent2220Props,
-    options?: { declarations?: boolean },
+    // options?: { declarations?: boolean },
   ) {
     const baseEvent = this.generateEventBase(event);
     const exMedOcup = event.exMedOcup;
@@ -51,14 +71,14 @@ class ESocialEventProvider {
     const exams = aso.exame;
 
     const eventJs = {
-      ...(options?.declarations && {
-        _declaration: {
-          _attributes: {
-            version: '1.0',
-            encoding: 'UTF-8',
-          },
-        },
-      }),
+      // ...(options?.declarations && {
+      //   _declaration: {
+      //     _attributes: {
+      //       version: '1.0',
+      //       encoding: 'UTF-8',
+      //     },
+      //   },
+      // }),
       eSocial: {
         ['_attributes']: {
           xmlns: 'http://www.esocial.gov.br/schema/evt/evtMonit/v_S_01_00_00',
@@ -99,8 +119,8 @@ class ESocialEventProvider {
       },
     };
 
-    let xml = js2xml(eventJs, { compact: true });
-    if (options?.declarations) xml = xml?.replace('<?xml?>', '');
+    const xml = js2xml(eventJs, { compact: true });
+    // if (options?.declarations) xml = xml?.replace('<?xml?>', '');
 
     return xml;
   }
@@ -194,133 +214,123 @@ class ESocialEventProvider {
     const generateId = this.eSocialMethodsProvider.classGenerateId(
       company.cnpj,
     );
-    const eventsStruct = employees.reduce<
-      {
-        event: IEvent2220Props;
-        employee: EmployeeEntity;
-        asoId: number;
-        examIds: number[];
-        eventDate: Date;
-        id: string;
-      }[]
-    >((acc, employee) => {
-      const examsGroup = employee.examsHistory
-        .sort((a, b) =>
-          sortNumber(a.exam.isAttendance ? 1 : 0, b.exam.isAttendance ? 1 : 0),
-        )
-        .sort((a, b) => sortNumber(a.doneDate, b.doneDate))
-        .reduce<EmployeeExamsHistoryEntity[][]>(
-          (_acc, exam) => {
-            const cloneAcc = clone(_acc);
-            const lastIndex = cloneAcc.length - 1;
+    const eventsStruct = employees.reduce<IESocialStruck2220[]>(
+      (acc, employee) => {
+        const examsGroup = employee.examsHistory
+          .sort((a, b) =>
+            sortNumber(
+              a.exam.isAttendance ? 1 : 0,
+              b.exam.isAttendance ? 1 : 0,
+            ),
+          )
+          .sort((a, b) => sortNumber(a.doneDate, b.doneDate))
+          .reduce<EmployeeExamsHistoryEntity[][]>(
+            (_acc, exam) => {
+              const cloneAcc = clone(_acc);
+              const lastIndex = cloneAcc.length - 1;
 
-            cloneAcc[lastIndex].push(exam);
+              cloneAcc[lastIndex].push(exam);
 
-            if (exam.exam.isAttendance) {
-              cloneAcc.push([]);
-            }
+              if (exam.exam.isAttendance) {
+                cloneAcc.push([]);
+              }
 
-            return cloneAcc;
-          },
-          [[]],
+              return cloneAcc;
+            },
+            [[]],
+          );
+
+        const examsWithAso = examsGroup.filter(
+          (exams) =>
+            exams.some((e) => e.exam.isAttendance) &&
+            exams.some((e) => e.sendEvent),
         );
 
-      const examsWithAso = examsGroup.filter(
-        (exams) =>
-          exams.some((e) => e.exam.isAttendance) &&
-          exams.some((e) => e.sendEvent),
-      );
-
-      const eventsJs = examsWithAso.map<{
-        event: IEvent2220Props;
-        employee: EmployeeEntity;
-        examIds: number[];
-        asoId: number;
-        eventDate: Date;
-        id: string;
-      }>((exams) => {
-        const aso = exams[exams.length - 1];
-        const examIds = [];
-        const id = generateId.newId();
-        const eventMed: IEvent2220Props['exMedOcup'] = {
-          respMonit: {
-            cpfResp: company?.doctorResponsible?.cpf,
-            nmResp: company?.doctorResponsible?.name,
-            nrCRM: company?.doctorResponsible?.councilId,
-            ufCRM: company?.doctorResponsible?.councilUF,
-          },
-          tpExameOcup: mapResAso[aso.examType],
-          aso: {
-            dtAso: aso.doneDate,
-            resAso: mapTpExameOcup[aso.evaluationType],
-            medico: {
-              nmMed: aso?.doctor?.name,
-              nrCRM: aso?.doctor?.councilId,
-              ufCRM: aso?.doctor?.councilUF,
+        const eventsJs = examsWithAso.map<IESocialStruck2220>((exams) => {
+          const aso = exams[exams.length - 1];
+          const examIds = [];
+          const id = generateId.newId();
+          const eventMed: IEvent2220Props['exMedOcup'] = {
+            respMonit: {
+              cpfResp: company?.doctorResponsible?.cpf,
+              nmResp: company?.doctorResponsible?.name,
+              nrCRM: company?.doctorResponsible?.councilId,
+              ufCRM: company?.doctorResponsible?.councilUF,
             },
-            exame: exams.map((exam) => {
-              let isSequential: boolean | null = null;
-              let obsProc: string | null = null;
-              const esocial27Code = exam.exam?.esocial27Code;
-              if (requiredOrdExams.includes(esocial27Code)) {
-                isSequential =
-                  !!employee.examsHistory.filter(
-                    (e) =>
-                      e.status === 'DONE' &&
-                      e?.exam?.esocial27Code === exam.exam.esocial27Code,
-                  )[1] ||
-                  (examsWithAso.length === 1 &&
-                    aso.examType !== ExamHistoryTypeEnum.ADMI);
-              }
+            tpExameOcup: mapResAso[aso.examType],
+            aso: {
+              dtAso: aso.doneDate,
+              resAso: mapTpExameOcup[aso.evaluationType],
+              medico: {
+                nmMed: aso?.doctor?.name,
+                nrCRM: aso?.doctor?.councilId,
+                ufCRM: aso?.doctor?.councilUF,
+              },
+              exame: exams.map((exam) => {
+                let isSequential: boolean | null = null;
+                let obsProc: string | null = null;
+                const esocial27Code = exam.exam?.esocial27Code;
+                if (requiredOrdExams.includes(esocial27Code)) {
+                  isSequential =
+                    !!employee.examsHistory.filter(
+                      (e) =>
+                        e.status === 'DONE' &&
+                        e?.exam?.esocial27Code === exam.exam.esocial27Code,
+                    )[1] ||
+                    (examsWithAso.length === 1 &&
+                      aso.examType !== ExamHistoryTypeEnum.ADMI);
+                }
 
-              if (requiredObsProc.includes(esocial27Code)) {
-                obsProc = exam.exam?.obsProc;
-              }
+                if (requiredObsProc.includes(esocial27Code)) {
+                  obsProc = exam.exam?.obsProc;
+                }
 
-              examIds.push(exam.id);
+                examIds.push(exam.id);
 
-              return {
-                examName: exam.exam.name,
-                dtExm: exam.doneDate,
-                procRealizado: esocial27Code,
-                ...(isSequential != null && {
-                  ordExame: isSequential ? 2 : 1,
-                }),
-                ...(obsProc != null && { obsProc }),
-              };
-            }),
-          },
-        };
+                return {
+                  examName: exam.exam.name,
+                  dtExm: exam.doneDate,
+                  procRealizado: esocial27Code,
+                  ...(isSequential != null && {
+                    ordExame: isSequential ? 2 : 1,
+                  }),
+                  ...(obsProc != null && { obsProc }),
+                };
+              }),
+            },
+          };
 
-        // aso.event. //?
+          // aso.event. //?
 
-        const event: IEvent2220Props = {
-          id,
-          exMedOcup: eventMed,
-          ideEmpregador: { nrInsc: company.cnpj },
-          ideVinculo: {
-            cpfTrab: employee.cpf,
-            matricula: employee.esocialCode,
-          },
-          ideEvento: {
-            tpAmb: ideEvento?.tpAmb,
-            procEmi: ideEvento?.procEmi,
-          },
-        };
+          const event: IEvent2220Props = {
+            id,
+            exMedOcup: eventMed,
+            ideEmpregador: { nrInsc: company.cnpj },
+            ideVinculo: {
+              cpfTrab: employee.cpf,
+              matricula: employee.esocialCode,
+            },
+            ideEvento: {
+              tpAmb: ideEvento?.tpAmb,
+              procEmi: ideEvento?.procEmi,
+            },
+          };
 
-        return {
-          id,
-          event: event,
-          eventDate: aso.doneDate,
-          asoId: aso.id,
-          examIds,
-          employee: employee,
-        };
-      });
+          return {
+            id,
+            event: event,
+            eventDate: aso.doneDate,
+            asoId: aso.id,
+            examIds,
+            employee: employee,
+          };
+        });
 
-      acc = [...eventsJs, ...acc];
-      return acc;
-    }, []);
+        acc = [...eventsJs, ...acc];
+        return acc;
+      },
+      [],
+    );
 
     return eventsStruct;
   }
@@ -371,25 +381,128 @@ class ESocialEventProvider {
     return eventJs;
   }
 
-  public async sendEvent2220ToESocial(
-    eventsXml: {
-      employee: EmployeeEntity;
-      asoId: number;
-      examIds: number[];
-      eventDate: Date;
-      id: string;
-      signedXml: string;
-      xml: string;
-    }[],
-    options?: {
-      environment?: number;
-    },
+  private generateBatchXML(
+    events: IESocialXmlStruck2220[],
+    event: IBatchProps,
   ) {
-    //* >> Criar grupo de lotes com 10-30 eventos assinados
-    //* >> crio client e envio verificando um a um se foi enviado
-    //* >>
+    const xmlEvents = events
+      .map((event) => `<evento Id="${event.id}">${event.signedXml}</evento>`)
+      .join('');
 
-    return;
+    const replaceText = 'xml_replace_data';
+    const eventJs = {
+      // _declaration: {
+      //   _attributes: {
+      //     version: '1.0',
+      //     encoding: 'UTF-8',
+      //   },
+      // },
+      eSocial: {
+        ['_attributes']: {
+          xmlns: 'http://www.esocial.gov.br/schema/lote/eventos/envio/v1_1_1',
+        },
+        envioLoteEventos: {
+          ['_attributes']: {
+            grupo: event.eventGroup || this.eventGroup,
+          },
+          ideEmpregador: {
+            tpInsc: {
+              ['_text']: event.ideEmpregador.tpInsc || this.tpInsc,
+            },
+            nrInsc: {
+              ['_text']: event.ideEmpregador.nrInsc,
+            },
+          },
+          ideTransmissor: {
+            tpInsc: {
+              ['_text']: this.tpInsc,
+            },
+            nrInsc: {
+              ['_text']: process.env.TRANSMISSION_CNPJ,
+            },
+          },
+          eventos: {
+            ['_text']: replaceText,
+          },
+        },
+      },
+    };
+
+    const xml = js2xml(eventJs, { compact: true }).replace(
+      replaceText,
+      xmlEvents,
+    );
+
+    return xml;
+  }
+
+  public async sendEvent2220ToESocial(
+    events: IESocialXmlStruck2220[],
+    options: IESocialSendEventOptions,
+  ) {
+    // const eventChunks = arrayChunks(  Array.from({ length: 100 }).map(() => events[0]),  100,);
+    const tpAmb = options?.environment || this.tpAmb;
+    const eventChunks = arrayChunks(events, 40);
+
+    const responseBatchEvents = await Promise.all(
+      eventChunks.map(async (events) => {
+        const batchXML = this.generateBatchXML(events, {
+          eventGroup: 2,
+          ideEmpregador: { nrInsc: options.company?.cnpj },
+        });
+
+        const client =
+          tpAmb == TpAmbEnum.PROD ? this.clientProduction : this.clientRestrict;
+
+        const sendEventBatch = new Promise<IEsocialSendBatchResponse>(
+          (resolve) => {
+            client.ServicoEnviarLoteEventos.WsEnviarLoteEventos.EnviarLoteEventos(
+              batchXML,
+              (e, s) => {
+                if (e)
+                  return resolve({
+                    status: {
+                      cdResposta: '500',
+                      descResposta: e?.message?.slice(0, 200) + '...',
+                    },
+                  });
+
+                if (
+                  !s?.EnviarLoteEventosResult?.eSocial?.retornoEnvioLoteEventos
+                )
+                  return resolve({
+                    status: {
+                      cdResposta: '500',
+                      descResposta:
+                        'value of (s?.EnviarLoteEventosResult?.eSocial?.retornoEnvioLoteEventos) is undefined',
+                    },
+                  });
+
+                resolve(
+                  s.EnviarLoteEventosResult.eSocial.retornoEnvioLoteEventos,
+                );
+              },
+            );
+          },
+        );
+
+        const response = await sendEventBatch;
+
+        return { events, response };
+      }),
+    );
+
+    // fs.writeFileSync(
+    //   'tmp/test.xml',
+    //   format(batchEvents[0], {
+    //     indentation: '  ',
+    //     filter: (node) => node.type !== 'Comment',
+    //     collapseContent: true,
+    //     lineSeparator: '\n',
+    //   }),
+    // );
+
+    return responseBatchEvents;
   }
 }
 

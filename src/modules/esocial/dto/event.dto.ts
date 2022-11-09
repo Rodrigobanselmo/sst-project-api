@@ -1,15 +1,30 @@
-import { QueryArray } from './../../../shared/transformers/query-array';
-import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
-import { IsBoolean, IsInt, IsOptional, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
+import {
+  IsBoolean,
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+} from 'class-validator';
+
+import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
+import { ProcEmiEnum, TpAmbEnum } from '../interfaces/event-batch';
+import { QueryArray } from './../../../shared/transformers/query-array';
+import { KeysOfEnum } from './../../../shared/utils/keysOfEnum.utils';
 
 export class BaseEventDto {
   @IsOptional()
   @IsInt()
-  tpAmb?: number;
+  @IsEnum(TpAmbEnum, {
+    message: `status must be one of: ${KeysOfEnum(TpAmbEnum)}`,
+  })
+  tpAmb?: TpAmbEnum;
 
   @IsOptional()
   @IsInt()
+  @IsEnum(ProcEmiEnum, {
+    message: `status must be one of: ${KeysOfEnum(ProcEmiEnum)}`,
+  })
   procEmi?: number;
 
   @IsOptional()

@@ -9,7 +9,8 @@ export const checkIsValidCnpj = (value: any) => {
   }
 
   if (typeof transformToString === 'string') {
-    if (isValidCNPJ(transformToString)) return onlyNumbers(transformToString);
+    if (isValidCNPJ(transformToString.padStart(14, '0')))
+      return onlyNumbers(transformToString.padStart(14, '0'));
   }
 
   return false;

@@ -23,14 +23,18 @@ export class PgrConsumer {
     const body: UpsertDocumentDto = JSON.parse(message.Body);
 
     try {
-      if (body.isPGR)
+      if (body.isPGR) {
+        delete body.isPGR;
         await this.pgrUploadDocService.execute({
           ...body,
         });
-      if (body.isPCMSO)
+      }
+      if (body.isPCMSO) {
+        delete body.isPCMSO;
         await this.pcmsoUploadService.execute({
           ...body,
         });
+      }
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException();

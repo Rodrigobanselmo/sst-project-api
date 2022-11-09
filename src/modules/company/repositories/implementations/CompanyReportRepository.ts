@@ -29,8 +29,11 @@ export class CompanyReportRepository {
   async updateESocial(
     companyId: string,
     removePending = 0,
-    options: Partial<Prisma.CompanyReportUpdateArgs> = {},
+    options: Partial<Prisma.CompanyReportUpdateArgs> & {
+      isTrans?: boolean;
+    } = {},
   ) {
+    const { isTrans, ...rest } = options;
     let report = await this.prisma.companyReport.findFirst({
       where: { companyId },
     });
@@ -74,7 +77,7 @@ export class CompanyReportRepository {
     await this.prisma.companyReport.update({
       where: { companyId },
       data: { dailyReport: dailyReport as any },
-      ...options,
+      ...rest,
     });
 
     return new CompanyReportEntity(report);

@@ -770,6 +770,7 @@ model EmployeeESocialBatch {
   status StatusEnum @default(PENDING)
   events EmployeeESocialEvent[]
   type EmployeeESocialEventTypeEnum
+  response Json?
   protocolId String?
 
   userTransmissionId Int?
@@ -795,7 +796,7 @@ model EmployeeESocialEvent {
   receipt String?
   eventId String?
   eventXml String
-  responseXml String?
+  response Json?
   employeeId Int
   employee Employee @relation(fields: [employeeId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   companyId String

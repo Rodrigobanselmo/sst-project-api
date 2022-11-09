@@ -20,7 +20,7 @@ export class AmazonStorageProvider implements IStorageProvider {
     fileName,
     isPublic,
   }: FileStorage.Upload.Params): Promise<FileStorage.Upload.Result> {
-    if (process.env.APP_HOST.includes('localhost')) return { url: 'edwq' };
+    // if (process.env.APP_HOST.includes('localhost')) return { url: 'edwq' };
 
     const { Location: url } = await this.s3
       .upload({

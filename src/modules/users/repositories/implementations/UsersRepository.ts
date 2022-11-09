@@ -21,17 +21,19 @@ export class UsersRepository implements IUsersRepository {
     professional?: ProfessionalEntity,
   ) {
     const hasCouncil =
-      professional?.councils && professional.councils.length > 0;
+      professional &&
+      professional?.councils &&
+      professional.councils.length > 0;
 
-    if (!hasCouncil) {
-      professional.councils = [
-        {
-          councilId: '',
-          councilUF: '',
-          councilType: '',
-        } as any,
-      ];
-    }
+    const councils = hasCouncil
+      ? professional.councils
+      : [
+          {
+            councilId: '',
+            councilUF: '',
+            councilType: '',
+          } as any,
+        ];
 
     const user = await this.prisma.user.create({
       data: {
@@ -42,9 +44,6 @@ export class UsersRepository implements IUsersRepository {
             name: '',
             email: createUserDto.email,
             ...(professional && {
-              councilId: professional?.councilId,
-              councilType: professional?.councilType,
-              councilUF: professional?.councilUF,
               phone: professional?.phone,
               cpf: professional?.cpf,
               type: professional?.type,
@@ -52,7 +51,7 @@ export class UsersRepository implements IUsersRepository {
             }),
             councils: {
               createMany: {
-                data: professional.councils.map((c) => ({
+                data: councils.map((c) => ({
                   councilId: c.councilId,
                   councilUF: c.councilUF,
                   councilType: c.councilType,

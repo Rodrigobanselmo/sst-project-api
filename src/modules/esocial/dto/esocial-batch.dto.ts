@@ -1,4 +1,8 @@
-import { EmployeeESocialEventTypeEnum, StatusEnum } from '@prisma/client';
+import {
+  EmployeeESocialEventTypeEnum,
+  Prisma,
+  StatusEnum,
+} from '@prisma/client';
 import { IsOptional, IsString } from 'class-validator';
 import { PaginationQueryDto } from 'src/shared/dto/pagination.dto';
 
@@ -15,9 +19,11 @@ export class CreateESocialBatch {
   status: StatusEnum;
   userTransmissionId: number;
   companyId: string;
+  response?: any;
   events?: CreateESocialEvent[];
   examsIds?: number[];
   type: EmployeeESocialEventTypeEnum;
+  protocolId?: string;
 }
 
 export class FindESocialBatchDto extends PaginationQueryDto {

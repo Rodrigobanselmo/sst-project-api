@@ -93,7 +93,6 @@ export class RiskFactorGroupDataEntity implements RiskFactorGroupData {
         (prof) => new ProfessionalRiskGroupEntity(prof),
       );
 
-      console.log(partial.professionalsSignatures);
       this.professionals = this.professionalsSignatures.map(
         ({ professional, ...rest }) =>
           new ProfessionalEntity({

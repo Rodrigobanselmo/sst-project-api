@@ -270,7 +270,6 @@ export class UpdateAllCompaniesService {
               if (isExpired) allWithExamExpired.push(employee);
             } else {
               if (!doneExamFound && scheduleExamFound && employee.lastExam) {
-                console.log(employee.expiredDateExam);
                 const isExpired = this.dayjs
                   .dayjs(employee.expiredDateExam)
                   .isBefore(this.dayjs.dateNow());
@@ -415,8 +414,6 @@ export class UpdateAllCompaniesService {
         company,
         employees,
       );
-
-      console.log(company.cnpj, employees);
 
       return {
         pending: eventsStruct.length,

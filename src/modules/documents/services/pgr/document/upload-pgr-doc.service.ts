@@ -38,6 +38,7 @@ import {
   IHomoGroupMap,
 } from '../../../docx/converter/hierarchy.converter';
 import { RiskFactorsEntity } from 'src/modules/sst/entities/risk.entity';
+import { files } from 'jszip';
 
 export const getRiskDoc = (
   risk: RiskFactorsEntity,
@@ -321,21 +322,25 @@ export class PgrUploadService {
 
       // return doc; //?remove
 
-      [logo, consultantLogo, ...photosPath].forEach(
-        (path) => path && fs.unlinkSync(path),
-      );
+      this.unlinkFiles([logo, consultantLogo, ...photosPath]);
       console.log('done: unlink photos');
 
       return { buffer, fileName };
     } catch (error) {
-      [logo, consultantLogo, ...photosPath].forEach((path) => {
-        path && fs.unlinkSync(path);
-      });
+      this.unlinkFiles([logo, consultantLogo, ...photosPath]);
+
       console.log('error: unlink photos', error);
 
       if (upsertPgrDto.id)
         await this.riskDocumentRepository.upsert({
-          ...upsertPgrDto,
+          id: upsertPgrDto.id,
+          companyId: company.id,
+          name: upsertPgrDto.name,
+          version: upsertPgrDto.version,
+          riskGroupId: upsertPgrDto.riskGroupId,
+          description: upsertPgrDto.description,
+          workspaceId: upsertPgrDto.workspaceId,
+          workspaceName: upsertPgrDto.workspaceName,
           status: StatusEnum.ERROR,
         });
 
@@ -418,7 +423,7 @@ export class PgrUploadService {
       };
     } catch (error) {
       console.log('unlink photo on error');
-      photosPath.forEach((path) => fs.unlinkSync(path));
+      this.unlinkFiles(photosPath);
       console.log(error);
       throw new InternalServerErrorException(error);
     }
@@ -512,5 +517,16 @@ export class PgrUploadService {
     const url = await this.upload(buffer, fileName, upsertPgrDto);
 
     return url;
+  }
+
+  private async unlinkFiles(paths: string[]) {
+    paths
+      .filter((i) => !!i && typeof i == 'string')
+      .forEach((path) => {
+        try {
+          console.log('paths', path);
+          fs.unlinkSync(path);
+        } catch (e) {}
+      });
   }
 }

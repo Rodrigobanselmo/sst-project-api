@@ -33,15 +33,15 @@ export class CreateProfessionalService {
         OR: [
           { cpf: createDataDto.cpf || 'not-found' },
           { user: { email: createDataDto.email || 'not-found' } },
-          {
+          ...createDataDto.councils.map((council) => ({
             councils: {
               some: {
-                councilId: createDataDto.councilId || 'not-found',
-                councilType: createDataDto.councilType || 'not-found',
-                councilUF: createDataDto.councilUF || 'not-found',
+                councilId: council.councilId || 'not-found',
+                councilType: council.councilType || 'not-found',
+                councilUF: council.councilUF || 'not-found',
               },
             },
-          },
+          })),
         ],
       },
     });
@@ -74,9 +74,6 @@ export class CreateProfessionalService {
       const userPayload = await this.userRepository.update(
         createDataDto.userId,
         {
-          councilId: createDataDto.councilId || undefined,
-          councilType: createDataDto.councilType || undefined,
-          councilUF: createDataDto.councilUF || undefined,
           type: createDataDto.type || undefined,
           phone: createDataDto.phone || undefined,
         },

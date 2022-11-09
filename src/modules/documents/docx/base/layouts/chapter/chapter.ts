@@ -96,10 +96,14 @@ export const createChapterPage = ({
       ],
       height: { value: 1500, rule: HeightRule.EXACT },
     }),
-    new TableRow({
-      children: [imageCover(imagePath, VerticalAlign.CENTER)],
-      height: { value: 3000, rule: HeightRule.EXACT },
-    }),
+    ...(imagePath
+      ? [
+          new TableRow({
+            children: [imageCover(imagePath, VerticalAlign.CENTER)],
+            height: { value: 3000, rule: HeightRule.EXACT },
+          }),
+        ]
+      : []),
     new TableRow({
       children: [text(chapter, VerticalAlign.CENTER)],
       height: { value: 4500, rule: HeightRule.EXACT },

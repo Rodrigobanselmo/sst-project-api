@@ -1,6 +1,7 @@
 import {
   EmployeeESocialEvent,
   EmployeeESocialEventTypeEnum,
+  Prisma,
   StatusEnum,
 } from '@prisma/client';
 
@@ -17,7 +18,6 @@ export class EmployeeESocialEventEntity implements EmployeeESocialEvent {
   eventsDate: Date;
   status: StatusEnum;
   eventXml: string;
-  responseXml: string;
   employeeId: number;
   companyId: string;
   type: EmployeeESocialEventTypeEnum;
@@ -27,6 +27,7 @@ export class EmployeeESocialEventEntity implements EmployeeESocialEvent {
   employee?: EmployeeEntity;
   company?: CompanyEntity;
   batch?: EmployeeESocialBatchEntity;
+  response: Prisma.JsonValue;
   // snapshot: Prisma.JsonValue;
 
   constructor(partial: Partial<EmployeeESocialEventEntity>) {

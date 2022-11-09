@@ -8,7 +8,7 @@ import {
   FindESocialBatchDto,
 } from '../../dto/esocial-batch.dto';
 import { EmployeeESocialBatchEntity } from '../../entities/employeeEsocialBatch.entity';
-import { Prisma } from '@prisma/client';
+import { Prisma, StatusEnum } from '@prisma/client';
 import { onlyNumbers } from '@brazilian-utils/brazilian-utils';
 
 @Injectable()
@@ -30,17 +30,23 @@ export class ESocialBatchRepository {
         companyId,
         status,
         environment,
-        events: {
-          connectOrCreate: events.map((event) => ({
-            create: {
-              companyId,
-              type,
-              status,
-              ...event,
+        ...(events.length > 0 &&
+          status != StatusEnum.ERROR && {
+            events: {
+              connectOrCreate: events.map((event) => ({
+                create: {
+                  companyId,
+                  type,
+                  status:
+                    status == StatusEnum.TRANSMITTED
+                      ? StatusEnum.TRANSMITTED
+                      : StatusEnum.PROCESSING,
+                  ...event,
+                },
+                where: { examHistoryId: event.examHistoryId },
+              })),
             },
-            where: { examHistoryId: event.examHistoryId },
-          })),
-        },
+          }),
         ...rest,
       },
     });
@@ -92,6 +98,7 @@ export class ESocialBatchRepository {
       environment: true,
       created_at: true,
       type: true,
+      response: true,
       userTransmission: { select: { name: true, email: true } },
       company: {
         select: {

@@ -1,3 +1,8 @@
+import { IEsocialSendBatchResponse } from './../../../../interfaces/esocial';
+import {
+  IESocialSendEventOptions,
+  IESocialXmlStruck2220,
+} from './../../../../../../shared/providers/ESocialProvider/models/IESocialMethodProvider';
 import { getCompanyName } from './../../../../../../shared/utils/companyName';
 import { CreateESocialEvent } from './../../../../dto/esocial-batch.dto';
 import { ESocialBatchRepository } from './../../../../repositories/implementations/ESocialBatchRepository';
@@ -59,52 +64,84 @@ export class SendEvents2220ESocialService {
       body,
     );
 
-    const eventsXml = eventsStruct
+    // prepare event to send to eSocial
+    const eventsXml: IESocialXmlStruck2220[] = eventsStruct
       .map(({ event, ...data }) => {
         const errors = this.eSocialEventProvider.errorsEvent2220(event);
         if (errors.length > 0) return;
 
         const xmlResult = this.eSocialEventProvider.generateXmlEvent2220(
           event,
-          { declarations: !esocialSend },
+          // { declarations: !esocialSend },
         );
 
-        const signedXml: string | null = esocialSend
+        const signedXml: string = esocialSend
           ? this.eSocialMethodsProvider.signEvent({
               xml: xmlResult,
               cert,
               path: 'evtMonit',
             })
-          : null;
+          : '';
 
         return { signedXml, xml: xmlResult, ...data };
       })
       .filter((i) => i);
 
-    const examsIds: number[] = [];
-    const events: CreateESocialEvent[] = eventsXml.map(
-      ({ examIds: ids, ...event }) => {
-        examsIds.push(...ids);
-        return {
-          employeeId: event.employee.id,
-          eventsDate: event.eventDate,
-          eventXml: event.xml,
-          examHistoryId: event.asoId,
-        };
-      },
+    // get response after sending to esocial
+    const sendEventResponse = esocialSend
+      ? await this.eSocialEventProvider.sendEvent2220ToESocial(eventsXml, {
+          company,
+          environment: body.tpAmb,
+        })
+      : [
+          {
+            events: eventsXml,
+            response: {
+              status: { cdResposta: '201' },
+            } as IEsocialSendBatchResponse,
+          },
+        ];
+
+    // save on database
+    let eventsLength = 0;
+    await Promise.all(
+      sendEventResponse.map(async (resp) => {
+        const examsIds: number[] = [];
+        const isOk = resp.response?.status?.cdResposta == '201';
+        const events: CreateESocialEvent[] = isOk
+          ? resp.events.map(({ examIds: ids, ...event }) => {
+              examsIds.push(...ids);
+              return {
+                employeeId: event.employee.id,
+                eventsDate: event.eventDate,
+                eventXml: event.xml,
+                examHistoryId: event.asoId,
+              };
+            })
+          : [];
+
+        await this.eSocialBatchRepository.create({
+          companyId,
+          environment: body.tpAmb || 1,
+          status: esocialSend
+            ? isOk
+              ? StatusEnum.DONE
+              : StatusEnum.ERROR
+            : StatusEnum.TRANSMITTED,
+          type: EmployeeESocialEventTypeEnum.EXAM_2220,
+          userTransmissionId: user.userId,
+          events,
+          examsIds,
+          response: resp.response,
+        });
+
+        eventsLength = events.length + eventsLength;
+      }),
     );
 
-    await this.eSocialBatchRepository.create({
-      companyId,
-      environment: body.tpAmb || 1,
-      status: esocialSend ? StatusEnum.PENDING : StatusEnum.TRANSMITTED,
-      type: EmployeeESocialEventTypeEnum.EXAM_2220,
-      userTransmissionId: user.userId,
-      events,
-      examsIds,
-    });
+    await this.companyReportRepository.updateESocial(companyId, eventsLength);
 
-    await this.companyReportRepository.updateESocial(companyId, events.length);
+    if (esocialSend) return { fileStream: null, fileName: '' };
 
     const { zipFile, fileName } =
       await this.eSocialMethodsProvider.createZipFolder({
