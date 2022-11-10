@@ -174,6 +174,7 @@ export class UpdateAllCompaniesService {
   }
 
   async addReport(company: CompanyEntity) {
+    //! optimization here => query only once employees and then apply filters
     const examTime = await this.addEmployeeExamTime(company);
     const esocialEvents = await this.addEmployeeEsocial(company);
 

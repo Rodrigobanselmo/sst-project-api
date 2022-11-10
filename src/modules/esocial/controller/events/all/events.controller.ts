@@ -1,3 +1,4 @@
+import { FetchESocialBatchEventsService } from './../../../services/events/all/fetch-batch-events/fetch-batch-events.service';
 import { FindESocialBatchDto } from './../../../dto/esocial-batch.dto';
 import { FindESocialEventService } from './../../../services/events/all/find-events/find-events.service';
 import { FindESocialEventDto } from './../../../dto/esocial-event.dto';
@@ -30,6 +31,7 @@ export class ESocialEventController {
     private readonly sendBatchESocialService: SendBatchESocialService,
     private readonly findESocialEventService: FindESocialEventService,
     private readonly findESocialBatchService: FindESocialBatchService,
+    private readonly fetchESocialBatchEventsService: FetchESocialBatchEventsService,
   ) {}
 
   @Post('certificate')
@@ -46,6 +48,12 @@ export class ESocialEventController {
   @Post('send-batch')
   sendBatch() {
     return this.sendBatchESocialService.execute();
+  }
+
+  @Public()
+  @Post('fetch-batch')
+  fetch() {
+    return this.fetchESocialBatchEventsService.execute();
   }
 
   @Get('events/:companyId?')

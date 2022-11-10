@@ -25,6 +25,7 @@ import { AddCertificationESocialService } from './services/events/all/add-certif
 import { SendBatchESocialService } from './services/events/all/send-batch/send-batch.service';
 import { FindAllTable27Service } from './services/tables/find-all-27.service';
 import { FindESocialEventService } from './services/events/all/find-events/find-events.service';
+import { FetchESocialBatchEventsService } from './services/events/all/fetch-batch-events/fetch-batch-events.service';
 
 @Module({
   controllers: [
@@ -78,6 +79,7 @@ import { FindESocialEventService } from './services/events/all/find-events/find-
     forwardRef(() => CompanyModule),
   ],
   providers: [
+    FetchESocialBatchEventsService,
     ESocialMethodsProvider,
     ESocialEventProvider,
     FindAllTable27Service,
