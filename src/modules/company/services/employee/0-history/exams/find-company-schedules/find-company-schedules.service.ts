@@ -17,7 +17,6 @@ export class FindCompanyScheduleEmployeeExamHistoryService {
     { skip, take, ...query }: FindCompanyEmployeeExamHistoryDto,
     user: UserPayloadDto,
   ) {
-    const companyId = user.targetCompanyId;
     // const status: StatusEnum[] = [
     //   StatusEnum.DONE,
     //   StatusEnum.PROCESSING,
@@ -26,8 +25,9 @@ export class FindCompanyScheduleEmployeeExamHistoryService {
 
     const employeesExams = await this.employeeExamHistoryRepository.find(
       {
-        companyId: companyId,
         ...query,
+        companyId: user.targetCompanyId,
+        userCompany: user.companyId,
       },
       { skip, take },
       {

@@ -110,7 +110,7 @@ export class EmployeeExamsHistoryRepository {
   }
 
   async find(
-    query: Partial<FindEmployeeExamHistoryDto>,
+    query: Partial<FindEmployeeExamHistoryDto> & { userCompany?: string },
     pagination: PaginationQueryDto,
     {
       where: whereOptions,
@@ -119,8 +119,12 @@ export class EmployeeExamsHistoryRepository {
   ) {
     const whereOptionsCopy = clone(whereOptions);
     const whereInit = {
+      ...whereOptions,
       AND: [
         {
+          employee: {
+            companyId: query.companyId,
+          },
           ...(!query.allCompanies && {
             employee: {
               companyId: query.companyId,
@@ -149,12 +153,11 @@ export class EmployeeExamsHistoryRepository {
           ? (whereOptionsCopy as any).AND
           : []),
       ],
-      ...whereOptions,
     } as typeof whereOptions;
 
     const { where } = prismaFilter(whereInit, {
       query,
-      skip: ['search', 'companyId', 'allCompanies'],
+      skip: ['search', 'companyId', 'allCompanies', 'userCompany'],
     });
 
     if ('search' in query) {
@@ -164,6 +167,7 @@ export class EmployeeExamsHistoryRepository {
 
       if (!isCPF) {
         OR.push({ name: { contains: query.search, mode: 'insensitive' } });
+        OR.push({ email: { contains: query.search, mode: 'insensitive' } });
         OR.push({
           esocialCode: { contains: query.search, mode: 'insensitive' },
         });

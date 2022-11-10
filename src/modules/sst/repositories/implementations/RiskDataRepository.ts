@@ -400,8 +400,6 @@ export class RiskDataRepository {
       }
     }
 
-    console.log(id, createDto);
-
     const riskData = (await this.prisma.riskFactorData.upsert({
       create: {
         ...createDto,
@@ -706,12 +704,21 @@ export class RiskDataRepository {
   private async addLevel({
     riskId,
     probability,
+    json,
   }: {
     riskId?: string;
+    json?: any;
     probability?: number;
   }) {
     let level = 0;
-    if (probability && riskId) {
+    let realProbability = probability;
+
+    if (json) {
+      const riskData = new RiskFactorDataEntity({ json });
+      if (riskData.probability) realProbability = riskData.probability;
+    }
+
+    if (realProbability && riskId) {
       const risk = await this.prisma.riskFactors.findUnique({
         where: {
           id: riskId,
@@ -719,7 +726,7 @@ export class RiskDataRepository {
       });
 
       if (risk && risk.severity) {
-        const matriz = getMatrizRisk(risk.severity, probability);
+        const matriz = getMatrizRisk(risk.severity, realProbability);
 
         level = matriz.level;
       }
