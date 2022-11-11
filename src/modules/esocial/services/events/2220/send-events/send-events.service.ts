@@ -8,6 +8,7 @@ import { CreateESocialEvent } from './../../../../dto/esocial-batch.dto';
 import { ESocialBatchRepository } from './../../../../repositories/implementations/ESocialBatchRepository';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import JSZip from 'jszip';
+import fs from 'fs';
 import { Readable } from 'stream';
 import format from 'xml-formatter';
 
@@ -87,6 +88,28 @@ export class SendEvents2220ESocialService {
       })
       .filter((i) => i);
 
+    // fs.writeFileSync('tmp/test-sign.xml', eventsXml[0].signedXml);
+
+    fs.writeFileSync(
+      'tmp/test-sign-no.xml',
+      format(eventsXml[0].signedXml, {
+        indentation: '  ',
+        filter: (node) => node.type !== 'Comment',
+        collapseContent: true,
+        lineSeparator: '\n',
+      }),
+    );
+    // fs.writeFileSync(
+    //   'tmp/test.xml',
+    //   format(eventsXml[0].xml, {
+    //     indentation: '  ',
+    //     filter: (node) => node.type !== 'Comment',
+    //     collapseContent: true,
+    //     lineSeparator: '\n',
+    //   }),
+    // );
+    return;
+
     // get response after sending to esocial
     const sendEventResponse = esocialSend
       ? await this.eSocialEventProvider.sendEvent2220ToESocial(eventsXml, {
@@ -132,6 +155,7 @@ export class SendEvents2220ESocialService {
           userTransmissionId: user.userId,
           events,
           examsIds,
+          protocolId: resp.response?.dadosRecepcaoLote?.protocoloEnvio,
           response: resp.response,
         });
 
