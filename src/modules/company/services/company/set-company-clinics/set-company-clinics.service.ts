@@ -1,5 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { ErrorMessageEnum } from 'src/shared/constants/enum/errorMessage';
+import { ErrorMessageEnum } from '../../../../../shared/constants/enum/errorMessage';
 
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { CompanyRepository } from '../../../repositories/implementations/CompanyRepository';

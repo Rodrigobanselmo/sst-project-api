@@ -1,19 +1,15 @@
-import { IEsocialSendBatchResponse } from './../../../../modules/esocial/interfaces/esocial';
-import {
-  EventGroupEnum,
-  IBatchProps,
-  IndRetifEnum,
-  TpAmbEnum,
-} from './../../../../modules/esocial/interfaces/event-batch';
-import { Inject, Injectable } from '@nestjs/common';
+import { asyncEach } from './../../../utils/asyncEach';
+import { EmployeeESocialBatchEntity } from './../../../../modules/esocial/entities/employeeEsocialBatch.entity';
+import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { ExamHistoryTypeEnum } from '@prisma/client';
+import { Cache } from 'cache-manager';
 import clone from 'clone';
-import fs from 'fs';
 import { Client } from 'nestjs-soap';
-import { EmployeeEntity } from '../../../../modules/company/entities/employee.entity';
-import { arrayChunks } from '../../../..//shared/utils/arrayChunks';
+import { CacheEnum } from 'src/shared/constants/enum/cache';
 import { js2xml } from 'xml-js';
 
+import { arrayChunks } from '../../../..//shared/utils/arrayChunks';
+import { EmployeeEntity } from '../../../../modules/company/entities/employee.entity';
 import {
   IEvent2220Props,
   mapResAso,
@@ -28,21 +24,33 @@ import {
 } from '../../../../modules/esocial/interfaces/event-batch';
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { DayJSProvider } from '../../DateProvider/implementations/DayJSProvider';
-import { CompanyEntity } from './../../../../modules/company/entities/company.entity';
-import { EmployeeExamsHistoryEntity } from './../../../../modules/company/entities/employee-exam-history.entity';
-import { SoapClientEnum } from './../../../constants/enum/soapClient';
-import { sortNumber } from './../../../utils/sorts/number.sort';
-import { ESocialMethodsProvider } from './ESocialMethodsProvider';
 import {
+  IESocialFetchEventOptions,
   IESocialSendEventOptions,
   IESocialStruck2220,
   IESocialXmlStruck2220,
 } from '../models/IESocialMethodProvider';
+import { CompanyEntity } from './../../../../modules/company/entities/company.entity';
+import { EmployeeExamsHistoryEntity } from './../../../../modules/company/entities/employee-exam-history.entity';
+import {
+  IEsocialFetchBatch,
+  IEsocialSendBatchResponse,
+} from './../../../../modules/esocial/interfaces/esocial';
+import {
+  EventGroupEnum,
+  IBatchProps,
+  IndRetifEnum,
+  TpAmbEnum,
+} from './../../../../modules/esocial/interfaces/event-batch';
+import { SoapClientEnum } from './../../../constants/enum/soapClient';
+import { ICacheEventBatchType } from './../../../interfaces/cache.types';
+import { sortNumber } from './../../../utils/sorts/number.sort';
+import { ESocialMethodsProvider } from './ESocialMethodsProvider';
 import format from 'xml-formatter';
 
 @Injectable()
 class ESocialEventProvider {
-  private verProc = 'Simple_SST_eSocial 1.0';
+  private verProc = 'SimplesSST_1.0';
   private indRetif = IndRetifEnum.ORIGINAL;
   private tpAmb = TpAmbEnum.PROD_REST;
   private procEmi = ProcEmiEnum.SOFTWARE;
@@ -50,80 +58,19 @@ class ESocialEventProvider {
   private eventGroup = EventGroupEnum.NO_PERIODIC;
 
   constructor(
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     @Inject(SoapClientEnum.PRODUCTION)
     private readonly clientProduction: Client,
     @Inject(SoapClientEnum.PRODUCTION_RESTRICT)
     private readonly clientRestrict: Client,
+    @Inject(SoapClientEnum.CONSULT_PRODUCTION)
+    private readonly clientConsultProduction: Client,
+    @Inject(SoapClientEnum.CONSULT_PRODUCTION_RESTRICT)
+    private readonly clientConsultRestrict: Client,
     private readonly prisma: PrismaService,
     private readonly dayJSProvider: DayJSProvider,
     private readonly eSocialMethodsProvider: ESocialMethodsProvider,
   ) {}
-
-  generateXmlEvent2220(
-    event: IEvent2220Props,
-    // options?: { declarations?: boolean },
-  ) {
-    const baseEvent = this.generateEventBase(event);
-    const exMedOcup = event.exMedOcup;
-    const respMonit = exMedOcup.respMonit;
-    const aso = exMedOcup.aso;
-    const asoDoctor = aso.medico;
-    const exams = aso.exame;
-
-    const eventJs = {
-      // ...(options?.declarations && {
-      //   _declaration: {
-      //     _attributes: {
-      //       version: '1.0',
-      //       encoding: 'UTF-8',
-      //     },
-      //   },
-      // }),
-      eSocial: {
-        ['_attributes']: {
-          xmlns: 'http://www.esocial.gov.br/schema/evt/evtMonit/v_S_01_00_00',
-        },
-        evtMonit: {
-          ['_attributes']: {
-            Id: event.id,
-          },
-          ...baseEvent,
-          exMedOcup: {
-            tpExameOcup: { ['_text']: exMedOcup.tpExameOcup },
-            aso: {
-              dtAso: {
-                ['_text']: this.convertDate(aso.dtAso),
-              },
-              resAso: { ['_text']: aso.resAso },
-              medico: {
-                nmMed: { ['_text']: asoDoctor.nmMed },
-                nrCRM: { ['_text']: asoDoctor.nrCRM },
-                ufCRM: { ['_text']: asoDoctor.ufCRM },
-              },
-              exame: exams.map((exam) => ({
-                dtExm: { ['_text']: this.convertDate(exam.dtExm) },
-                procRealizado: { ['_text']: exam.procRealizado },
-                ...(exam.ordExame && { ['_text']: exam.ordExame }),
-                ...(exam.obsProc && { ['_text']: exam.obsProc }),
-                ...(exam.indResult && { ['_text']: exam.indResult }),
-              })),
-            },
-            respMonit: {
-              cpfResp: { ['_text']: respMonit.cpfResp },
-              nmResp: { ['_text']: respMonit.nmResp },
-              nrCRM: { ['_text']: respMonit.nrCRM },
-              ufCRM: { ['_text']: respMonit.ufCRM },
-            },
-          },
-        },
-      },
-    };
-
-    const xml = js2xml(eventJs, { compact: true });
-    // if (options?.declarations) xml = xml?.replace('<?xml?>', '');
-
-    return xml;
-  }
 
   errorsEvent2220(event: IEvent2220Props) {
     const exMedOcup = event.exMedOcup;
@@ -148,10 +95,10 @@ class ESocialEventProvider {
           message: 'Informar o médico coordenador do PCMSO',
         });
       } else {
-        if (!respMonit.cpfResp)
-          errors.push({
-            message: 'Informar "CPF" do médico coordenador do PCMSO',
-          });
+        // if (!respMonit.cpfResp)
+        //   errors.push({
+        //     message: 'Informar "CPF" do médico coordenador do PCMSO',
+        //   });
         if (!respMonit.nmResp)
           errors.push({
             message: 'Informar "nome" do médico coordenador do PCMSO',
@@ -252,7 +199,7 @@ class ESocialEventProvider {
           const id = generateId.newId();
           const eventMed: IEvent2220Props['exMedOcup'] = {
             respMonit: {
-              cpfResp: company?.doctorResponsible?.cpf,
+              // cpfResp: company?.doctorResponsible?.cpf,
               nmResp: company?.doctorResponsible?.name,
               nrCRM: company?.doctorResponsible?.councilId,
               ufCRM: company?.doctorResponsible?.councilUF,
@@ -337,6 +284,72 @@ class ESocialEventProvider {
 
   convertDate(date: Date) {
     return this.dayJSProvider.format(date, 'YYYY-MM-DD');
+  }
+
+  generateXmlEvent2220(
+    event: IEvent2220Props,
+    options?: { declarations?: boolean },
+  ) {
+    const baseEvent = this.generateEventBase(event);
+    const exMedOcup = event.exMedOcup;
+    const respMonit = exMedOcup.respMonit;
+    const aso = exMedOcup.aso;
+    const asoDoctor = aso.medico;
+    const exams = aso.exame;
+
+    const eventJs = {
+      ...(options?.declarations && {
+        _declaration: {
+          _attributes: {
+            version: '1.0',
+            encoding: 'UTF-8',
+          },
+        },
+      }),
+      eSocial: {
+        ['_attributes']: {
+          xmlns: 'http://www.esocial.gov.br/schema/evt/evtMonit/v_S_01_00_00',
+        },
+        evtMonit: {
+          ['_attributes']: {
+            Id: event.id,
+          },
+          ...baseEvent,
+          exMedOcup: {
+            tpExameOcup: { ['_text']: exMedOcup.tpExameOcup },
+            aso: {
+              dtAso: {
+                ['_text']: this.convertDate(aso.dtAso),
+              },
+              resAso: { ['_text']: aso.resAso },
+              exame: exams.map((exam) => ({
+                dtExm: { ['_text']: this.convertDate(exam.dtExm) },
+                procRealizado: { ['_text']: exam.procRealizado },
+                ...(exam.ordExame && { ['_text']: exam.ordExame }),
+                ...(exam.obsProc && { ['_text']: exam.obsProc }),
+                ...(exam.indResult && { ['_text']: exam.indResult }),
+              })),
+              medico: {
+                nmMed: { ['_text']: asoDoctor.nmMed },
+                nrCRM: { ['_text']: asoDoctor.nrCRM },
+                ufCRM: { ['_text']: asoDoctor.ufCRM },
+              },
+            },
+            respMonit: {
+              // cpfResp: { ['_text']: respMonit.cpfResp },
+              nmResp: { ['_text']: respMonit.nmResp },
+              nrCRM: { ['_text']: respMonit.nrCRM },
+              ufCRM: { ['_text']: respMonit.ufCRM },
+            },
+          },
+        },
+      },
+    };
+
+    const xml = js2xml(eventJs, { compact: true });
+    // if (options?.declarations) xml = xml?.replace('<?xml?>', '');
+
+    return xml;
   }
 
   private generateEventBase(event: IEventProps) {
@@ -428,11 +441,29 @@ class ESocialEventProvider {
       },
     };
 
-    const xml = js2xml(eventJs, { compact: true }).replace(
-      replaceText,
-      xmlEvents,
-    );
+    const xml = js2xml(eventJs, { compact: true })
+      .replace(replaceText, xmlEvents)
+      .replace('<?xml version="1.0" encoding="UTF-8"?>', '');
 
+    return xml;
+  }
+
+  private generateFetchBatchXML(protocolId: string) {
+    const eventJs = {
+      eSocial: {
+        ['_attributes']: {
+          xmlns:
+            'http://www.esocial.gov.br/schema/lote/eventos/envio/consulta/retornoProcessamento/v1_0_0',
+        },
+        consultaLoteEventos: {
+          protocoloEnvio: {
+            ['_text']: protocolId,
+          },
+        },
+      },
+    };
+
+    const xml = js2xml(eventJs, { compact: true });
     return xml;
   }
 
@@ -502,7 +533,63 @@ class ESocialEventProvider {
     //   }),
     // );
 
+    const cacheValue: ICacheEventBatchType = false;
+    await this.cacheManager.set(CacheEnum.ESOCIAL_FETCH_EVENT, cacheValue, 360);
+
     return responseBatchEvents;
+  }
+
+  public async fetchEventToESocial(
+    batch: EmployeeESocialBatchEntity,
+    // options?: IESocialFetchEventOptions,
+  ) {
+    const protocolId =
+      batch.protocolId || batch.response?.dadosRecepcaoLote?.protocoloEnvio;
+
+    const XML = this.generateFetchBatchXML(protocolId);
+    const tpAmb = batch.environment || this.tpAmb;
+
+    const client =
+      tpAmb == TpAmbEnum.PROD
+        ? this.clientConsultProduction
+        : this.clientConsultRestrict;
+
+    const fetchEventBatch = new Promise<IEsocialFetchBatch.Response>(
+      (resolve) => {
+        client.ServicoConsultarLoteEventos[
+          'Servicos.Empregador_ServicoConsultarLoteEventos'
+        ].ConsultarLoteEventos(XML, (e, s) => {
+          if (e)
+            return resolve({
+              status: {
+                cdResposta: '500',
+                descResposta: e?.message?.slice(0, 200) + '...',
+              },
+            });
+
+          if (
+            !s?.ConsultarLoteEventosResult?.eSocial
+              ?.retornoProcessamentoLoteEventos
+          )
+            return resolve({
+              status: {
+                cdResposta: '500',
+                descResposta:
+                  'value of (s?.ConsultarLoteEventosResult?.eSocial?.retornoProcessamentoLoteEventos) is undefined',
+              },
+            });
+
+          resolve(
+            s.ConsultarLoteEventosResult.eSocial
+              .retornoProcessamentoLoteEventos,
+          );
+        });
+      },
+    );
+
+    const response = await fetchEventBatch;
+
+    return { batch, response };
   }
 }
 

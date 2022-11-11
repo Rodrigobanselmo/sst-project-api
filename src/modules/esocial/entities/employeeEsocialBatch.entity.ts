@@ -4,7 +4,6 @@ import {
   EmployeeESocialBatch,
   StatusEnum,
   EmployeeESocialEventTypeEnum,
-  Prisma,
 } from '@prisma/client';
 import { EmployeeESocialEventEntity } from './employeeEsocialEvent.entity';
 
@@ -21,7 +20,7 @@ export class EmployeeESocialBatchEntity implements EmployeeESocialBatch {
   company?: CompanyEntity;
   userTransmission?: UserEntity;
   events?: EmployeeESocialEventEntity[];
-  response: Prisma.JsonValue;
+  response: any;
 
   constructor(partial: Partial<EmployeeESocialBatchEntity>) {
     Object.assign(this, partial);

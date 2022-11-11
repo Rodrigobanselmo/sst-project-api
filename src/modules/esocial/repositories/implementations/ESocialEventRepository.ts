@@ -121,4 +121,14 @@ export class ESocialEventRepository {
       count: response[0],
     };
   }
+
+  async updateNude(options: Prisma.EmployeeESocialEventUpdateArgs) {
+    const employee = await this.prisma.employeeESocialEvent.update(options);
+
+    return new EmployeeESocialEventEntity(employee);
+  }
+
+  async updateManyNude(options: Prisma.EmployeeESocialEventUpdateManyArgs) {
+    await this.prisma.employeeESocialEvent.updateMany(options);
+  }
 }

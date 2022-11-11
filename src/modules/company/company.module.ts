@@ -119,6 +119,7 @@ import { UpdateHierarchyHomoGroupService } from './services/homoGroup/update-hie
 import { FindHomogenousGroupService } from './services/homoGroup/find-homo-group/find-homo-group.service';
 import { FindHomogenousGroupByIdService } from './services/homoGroup/find-homo-group-by-id/find-homo-group-by-id.service';
 import { EsocialModule } from '../esocial/esocial.module';
+import { UpdateESocialReportService } from './services/report/update-esocial-report/update-esocial-report.service';
 
 @Module({
   imports: [
@@ -248,6 +249,7 @@ import { EsocialModule } from '../esocial/esocial.module';
     UpdateHierarchyHomoGroupService,
     FindHomogenousGroupService,
     FindHomogenousGroupByIdService,
+    UpdateESocialReportService,
   ],
   exports: [
     CompanyRepository,
@@ -261,6 +263,7 @@ import { EsocialModule } from '../esocial/esocial.module';
     EmployeeExamsHistoryRepository,
     EmployeeHierarchyHistoryRepository,
     CompanyReportRepository,
+    UpdateESocialReportService,
   ],
 })
 export class CompanyModule {}

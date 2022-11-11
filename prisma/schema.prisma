@@ -807,6 +807,7 @@ model EmployeeESocialEvent {
   // @@index(refType)
   // @@index(employeeId)
 
+  @@index(eventId)
   @@index(status)
   @@index(eventsDate)
 } 

@@ -46,7 +46,7 @@
     "aws-sdk": "^2.1140.0",
     "axios": "^0.27.0",
     "bcrypt": "^5.0.1",
-    "cache-manager": "^5.1.3",
+    "cache-manager": "^4",
     "chalk": "4.1.2",
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.1",
@@ -78,13 +78,15 @@
     "uuid": "^8.3.2",
     "xml-crypto": "^3.0.1",
     "xml-formatter": "^2.6.1",
-    "xml-js": "^1.6.11"
+    "xml-js": "^1.6.11",
+    "xmldom": "^0.6.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^8.0.0",
     "@nestjs/schematics": "^8.0.0",
     "@nestjs/testing": "^8.0.0",
     "@types/bcrypt": "^5.0.0",
+    "@types/cache-manager": "^4.0.2",
     "@types/cron": "^2.0.0",
     "@types/express": "^4.17.13",
     "@types/faker": "^5.5.9",

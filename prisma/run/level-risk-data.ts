@@ -1,8 +1,7 @@
+import { PrismaClient } from '@prisma/client';
+
 import { RiskFactorDataEntity } from '../../src/modules/sst/entities/riskData.entity';
 import { getMatrizRisk } from '../../src/shared/utils/matriz';
-import { asyncEach } from '../../src/shared/utils/asyncEach';
-import { PrismaClient } from '@prisma/client';
-import { arrayChunks } from '../../src/shared/utils/arrayChunks';
 
 export const levelRiskData = async (prisma: PrismaClient) => {
   const riskDataPrisma = await prisma.riskFactorData.findMany({

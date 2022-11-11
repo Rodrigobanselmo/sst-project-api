@@ -51,13 +51,22 @@ export class ESocialBatchRepository {
       },
     });
 
-    if (examsIds)
-      await this.prisma.employeeExamsHistory.updateMany({
-        where: { id: { in: examsIds } },
-        data: { sendEvent: false },
-      });
+    //! add here when done testing
+    // if (examsIds)
+    //   await this.prisma.employeeExamsHistory.updateMany({
+    //     where: { id: { in: examsIds } },
+    //     data: { sendEvent: false },
+    //   });
 
     return new EmployeeESocialBatchEntity(batch);
+  }
+
+  async findNude(options: Prisma.EmployeeESocialBatchFindManyArgs = {}) {
+    const data = await this.prisma.employeeESocialBatch.findMany({
+      ...options,
+    });
+
+    return data.map((data) => new EmployeeESocialBatchEntity(data));
   }
 
   async find(
@@ -159,5 +168,11 @@ export class ESocialBatchRepository {
       ),
       count: response[0],
     };
+  }
+
+  async updateNude(options: Prisma.EmployeeESocialBatchUpdateArgs) {
+    const employee = await this.prisma.employeeESocialBatch.update(options);
+
+    return new EmployeeESocialBatchEntity(employee);
   }
 }

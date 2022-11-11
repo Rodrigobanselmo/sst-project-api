@@ -1,12 +1,9 @@
-import { prismaFilter } from './../../../../shared/utils/filters/prisma.filters';
-import { PaginationQueryDto } from 'src/shared/dto/pagination.dto';
-import { sortData } from './../../../../shared/utils/sorts/data.sort';
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { removeDuplicate } from '../../../../shared/utils/removeDuplicate';
+import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
-import { asyncEach } from '../../../../shared/utils/asyncEach';
+import { removeDuplicate } from '../../../../shared/utils/removeDuplicate';
 import {
   CreateHomoGroupDto,
   FindHomogeneousGroupDto,
@@ -15,8 +12,10 @@ import {
 } from '../../dto/homoGroup';
 import { HierarchyEntity } from '../../entities/hierarchy.entity';
 import { HomoGroupEntity } from '../../entities/homoGroup.entity';
-import { Prisma } from '@prisma/client';
+import { prismaFilter } from './../../../../shared/utils/filters/prisma.filters';
+import { sortData } from './../../../../shared/utils/sorts/data.sort';
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
 @Injectable()
 export class HomoGroupRepository {
   constructor(private prisma: PrismaService) {}

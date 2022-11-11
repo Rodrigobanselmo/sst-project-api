@@ -9,7 +9,9 @@ import request from 'request';
 import { SoapClientEnum } from '../../../../../../shared/constants/enum/soapClient';
 import X509HttpClient from 'soap-x509-http';
 import axios from 'axios';
+import format from 'xml-formatter';
 import https from 'https';
+import { ESocialMethodsProvider } from 'src/shared/providers/ESocialProvider/implementations/ESocialMethodsProvider';
 const xml = `<eSocial xmlns="http://www.esocial.gov.br/schema/lote/eventos/envio/v1_1_1">
   <envioLoteEventos grupo="2">
     <ideEmpregador>
@@ -97,9 +99,37 @@ export class SendBatchESocialService {
     @Inject(SoapClientEnum.PRODUCTION_RESTRICT)
     private readonly soupClient: Client,
     private readonly eSocialEventProvider: ESocialEventProvider,
+    private readonly eSocialMethodsProvider: ESocialMethodsProvider,
   ) {}
 
   async execute() {
+    const { company, cert } = await this.eSocialMethodsProvider.getCompany(
+      'd1309cad-19d4-4102-9bf9-231f91095c20',
+      { cert: true, report: true },
+    );
+    const xml =
+      '<library>' +
+      '<book Id="ID1034952680000002022100418283200001">' +
+      '<name>Harry Potter</name>' +
+      '</book>' +
+      '</library>';
+
+    const s = await this.eSocialMethodsProvider.signEvent({
+      xml,
+      cert,
+    });
+
+    fs.writeFileSync(
+      'tmp/test-sign-no.xml',
+      format(s, {
+        indentation: '  ',
+        filter: (node) => node.type !== 'Comment',
+        collapseContent: true,
+        lineSeparator: '\n',
+      }),
+    );
+
+    return { s };
     console.log('start');
     console.log(JSON.stringify(this.soupClient.describe()));
     const promise = new Promise((resolve) => {

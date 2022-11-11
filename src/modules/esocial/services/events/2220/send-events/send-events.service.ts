@@ -1,3 +1,4 @@
+import { UpdateESocialReportService } from './../../../../../company/services/report/update-esocial-report/update-esocial-report.service';
 import { IEsocialSendBatchResponse } from './../../../../interfaces/esocial';
 import {
   IESocialSendEventOptions,
@@ -32,6 +33,7 @@ export class SendEvents2220ESocialService {
     private readonly employeeRepository: EmployeeRepository,
     private readonly companyRepository: CompanyRepository,
     private readonly companyReportRepository: CompanyReportRepository,
+    private readonly updateESocialReportService: UpdateESocialReportService,
     private readonly eSocialBatchRepository: ESocialBatchRepository,
     private readonly dayJSProvider: DayJSProvider,
   ) {}
@@ -80,35 +82,29 @@ export class SendEvents2220ESocialService {
           ? this.eSocialMethodsProvider.signEvent({
               xml: xmlResult,
               cert,
-              path: 'evtMonit',
             })
           : '';
+
+        // if (signedXml) {
+        //   this.eSocialMethodsProvider.checkSignature({
+        //     xml: signedXml,
+        //     cert,
+        //   });
+        // }
 
         return { signedXml, xml: xmlResult, ...data };
       })
       .filter((i) => i);
 
-    // fs.writeFileSync('tmp/test-sign.xml', eventsXml[0].signedXml);
-
-    fs.writeFileSync(
-      'tmp/test-sign-no.xml',
-      format(eventsXml[0].signedXml, {
-        indentation: '  ',
-        filter: (node) => node.type !== 'Comment',
-        collapseContent: true,
-        lineSeparator: '\n',
-      }),
-    );
     // fs.writeFileSync(
-    //   'tmp/test.xml',
-    //   format(eventsXml[0].xml, {
+    //   'tmp/test-sign-no.xml',
+    //   format(eventsXml[0].signedXml, {
     //     indentation: '  ',
     //     filter: (node) => node.type !== 'Comment',
     //     collapseContent: true,
     //     lineSeparator: '\n',
     //   }),
     // );
-    return;
 
     // get response after sending to esocial
     const sendEventResponse = esocialSend
@@ -148,8 +144,8 @@ export class SendEvents2220ESocialService {
           environment: body.tpAmb || 1,
           status: esocialSend
             ? isOk
-              ? StatusEnum.DONE
-              : StatusEnum.ERROR
+              ? StatusEnum.PROCESSING
+              : StatusEnum.INVALID
             : StatusEnum.TRANSMITTED,
           type: EmployeeESocialEventTypeEnum.EXAM_2220,
           userTransmissionId: user.userId,
@@ -163,7 +159,7 @@ export class SendEvents2220ESocialService {
       }),
     );
 
-    await this.companyReportRepository.updateESocial(companyId, eventsLength);
+    await this.updateESocialReportService.execute({ companyId });
 
     if (esocialSend) return { fileStream: null, fileName: '' };
 

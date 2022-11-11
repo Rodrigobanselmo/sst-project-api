@@ -1,7 +1,4 @@
-import { getMatrizRisk } from '../../src/shared/utils/matriz';
-import { asyncEach } from '../../src/shared/utils/asyncEach';
 import { PrismaClient } from '@prisma/client';
-import { arrayChunks } from '../../src/shared/utils/arrayChunks';
 
 export const riskDataRecsAll = async (prisma: PrismaClient) => {
   const companyIds = [

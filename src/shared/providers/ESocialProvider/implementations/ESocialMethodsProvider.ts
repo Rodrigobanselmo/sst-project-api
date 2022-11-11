@@ -1,14 +1,16 @@
-import { getCompanyName } from './../../../utils/companyName';
-import { CompanyEntity } from './../../../../modules/company/entities/company.entity';
+'use strict';
 import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { DOMParser } from '@xmldom/xmldom';
 import fs from 'fs';
+import JSZip from 'jszip';
 import PfxToPem from 'pfx-to-pem';
 import { v4 } from 'uuid';
-import { SignedXml } from 'xml-crypto';
+import { SignedXml, xpath } from 'xml-crypto';
+import format from 'xml-formatter';
 
 import { CompanyRepository } from '../../../../modules/company/repositories/implementations/CompanyRepository';
 import {
@@ -24,9 +26,8 @@ import {
   IIdOptions,
   ISignEvent,
 } from '../models/IESocialMethodProvider';
-import JSZip from 'jszip';
-import { Readable } from 'stream';
-import format from 'xml-formatter';
+import { getCompanyName } from './../../../utils/companyName';
+
 class ESocialGenerateId {
   private cpfCnpj: string;
   private type: number;
@@ -55,11 +56,11 @@ class ESocialMethodsProvider implements IESocialEventProvider {
     private readonly dayJSProvider?: DayJSProvider,
   ) {}
 
-  public signEvent({ cert: { certificate, key }, xml, path }: ISignEvent) {
+  public signEvent({ cert: { certificate, key }, xml }: ISignEvent) {
     const sig = new SignedXml();
 
     function MyKeyInfo() {
-      this.getKeyInfo = function (key, prefix) {
+      this.getKeyInfo = function () {
         return `<X509Data><X509Certificate>${certificate
           .replace('-----BEGIN CERTIFICATE-----', '')
           .replaceAll('\n', '')
@@ -68,36 +69,65 @@ class ESocialMethodsProvider implements IESocialEventProvider {
             '',
           )}</X509Certificate></X509Data>`;
       };
-      this.getKey = function (keyInfo) {
-        return;
+      this.getKey = function () {
+        return certificate;
       };
     }
 
-    sig.addReference(
-      `//*[local-name(.)='${path}']`,
-      [
-        'http://www.w3.org/2000/09/xmldsig#enveloped-signature',
-        'http://www.w3.org/TR/2001/REC-xml-c14n-20010315',
-      ],
-      'http://www.w3.org/2001/04/xmlenc#sha256',
-      '',
-      '',
-      '',
-      true,
-    );
-
-    sig.signingKey = key;
     sig.canonicalizationAlgorithm =
       'http://www.w3.org/TR/2001/REC-xml-c14n-20010315';
     sig.signatureAlgorithm =
       'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256';
     sig.keyInfoProvider = new MyKeyInfo();
+    sig.signingKey = key;
+    sig.references = [
+      {
+        xpath: '/*',
+        transforms: [
+          'http://www.w3.org/2000/09/xmldsig#enveloped-signature',
+          'http://www.w3.org/TR/2001/REC-xml-c14n-20010315',
+        ],
+        digestAlgorithm: 'http://www.w3.org/2001/04/xmlenc#sha256',
+        isEmptyUri: true,
+        // uri: '',
+        // digestValue: '4jyM3Mma3Wo1zTUT8njmv9wHWVnsf2cz4bAS2POf6Do=',
+        // inclusiveNamespacesPrefixList?: string | undefined;
+        // isEmptyUri?: boolean | undefined;
+      },
+    ];
 
     sig.computeSignature(xml, {
-      // location: { reference: '/library/book/name', action: 'append' },
+      // existingPrefixes: 'ds',
+      // location: { reference: '/library', action: 'append' },
     });
 
-    return sig.getSignedXml();
+    const signXML = sig.getSignedXml();
+
+    return signXML;
+  }
+
+  public checkSignature({ cert: { certificate }, xml: signXML }: ISignEvent) {
+    function MyKeyInfo() {
+      this.getKey = function () {
+        return certificate;
+      };
+    }
+
+    const doc = new DOMParser().parseFromString(signXML.toString());
+    const signature = xpath(
+      doc,
+      "//*[local-name(.)='Signature' and namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#']",
+    )[0];
+
+    const sig2 = new SignedXml();
+
+    sig2.keyInfoProvider = new MyKeyInfo();
+    sig2.loadSignature(signature as any);
+    const res = sig2.checkSignature(signXML);
+    if (!res) console.log('validate signXML errors: ', sig2.validationErrors);
+    console.log('is valid signature: ', res);
+
+    return signXML;
   }
 
   public generateId(cpfCnpj: string, { type, seqNum, index }: IIdOptions) {

@@ -1,5 +1,5 @@
 import { QueryArray } from './../../../shared/transformers/query-array';
-import { KeysOfEnum } from 'src/shared/utils/keysOfEnum.utils';
+import { KeysOfEnum } from './../../../shared/utils/keysOfEnum.utils';
 import { StringUppercaseTransform } from './../../../shared/transformers/string-uppercase.transform';
 import { DateFormat } from './../../../shared/transformers/date-format';
 import {

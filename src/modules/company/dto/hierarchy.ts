@@ -1,4 +1,4 @@
-import { PaginationQueryDto } from 'src/shared/dto/pagination.dto';
+import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
 import { PartialType } from '@nestjs/swagger';
 import { HierarchyEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';

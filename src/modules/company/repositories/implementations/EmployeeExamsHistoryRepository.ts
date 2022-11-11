@@ -103,6 +103,10 @@ export class EmployeeExamsHistoryRepository {
     return data.map((data) => new EmployeeExamsHistoryEntity(data));
   }
 
+  async updateManyNude(options: Prisma.EmployeeExamsHistoryUpdateManyArgs) {
+    await this.prisma.employeeExamsHistory.updateMany(options);
+  }
+
   async updateByIds(options: Prisma.EmployeeExamsHistoryUpdateManyArgs) {
     await this.prisma.employeeExamsHistory.updateMany({
       ...options,

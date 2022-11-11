@@ -1,5 +1,5 @@
 import { prismaFilter } from './../../../../shared/utils/filters/prisma.filters';
-import { PaginationQueryDto } from 'src/shared/dto/pagination.dto';
+import { PaginationQueryDto } from './../../../../shared/dto/pagination.dto';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
 import { HierarchyEnum, Prisma } from '@prisma/client';

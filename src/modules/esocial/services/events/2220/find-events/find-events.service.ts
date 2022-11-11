@@ -59,6 +59,7 @@ export class FindEvents2220ESocialService {
       const eventErrors = this.eSocialEventProvider.errorsEvent2220(data.event);
       const xmlResult = this.eSocialEventProvider.generateXmlEvent2220(
         data.event,
+        // { declarations: true },
       );
 
       const company = data.employee?.company;

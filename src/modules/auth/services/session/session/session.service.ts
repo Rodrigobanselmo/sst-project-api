@@ -8,7 +8,7 @@ import { JwtTokenProvider } from '../../../../../shared/providers/TokenProvider/
 import { LoginUserDto } from '../../../dto/login-user.dto';
 import { PayloadTokenDto } from '../../../dto/payload-token.dto';
 import { RefreshTokensRepository } from '../../../repositories/implementations/RefreshTokensRepository';
-import { ErrorMessageEnum } from 'src/shared/constants/enum/errorMessage';
+import { ErrorMessageEnum } from '../../../../../shared/constants/enum/errorMessage';
 
 @Injectable()
 export class SessionService {

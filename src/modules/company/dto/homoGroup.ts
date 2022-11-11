@@ -1,5 +1,5 @@
 import { QueryArray } from './../../../shared/transformers/query-array';
-import { PaginationQueryDto } from 'src/shared/dto/pagination.dto';
+import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
 import { HomoTypeEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import {

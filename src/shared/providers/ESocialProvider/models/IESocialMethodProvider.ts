@@ -24,7 +24,6 @@ export interface IConvertPfxReturn {
 export interface ISignEvent {
   cert: CompanyCertEntity;
   xml: string;
-  path: string;
 }
 
 interface IIdOptions {
@@ -50,6 +49,10 @@ export interface IESocialXmlStruck2220
 export interface IESocialSendEventOptions {
   environment: TpAmbEnum;
   company: CompanyEntity;
+}
+
+export interface IESocialFetchEventOptions {
+  environment: TpAmbEnum;
 }
 
 export interface ICompanyOptions {

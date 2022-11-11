@@ -1,5 +1,5 @@
 import { UpsertCompanyReportDto } from './../../../dto/company-report.dto';
-import { EmployeeEntity } from 'src/modules/company/entities/employee.entity';
+import { EmployeeEntity } from '../../../../../modules/company/entities/employee.entity';
 import { CompanyEntity } from './../../../entities/company.entity';
 import { CompanyRepository } from '../../../repositories/implementations/CompanyRepository';
 import { asyncEach } from '../../../../../shared/utils/asyncEach';
@@ -19,6 +19,7 @@ import { CompanyReportRepository } from '../../../../../modules/company/reposito
 import { arrayChunks } from '../../../../../shared/utils/arrayChunks';
 import { asyncBatch } from '../../../../../shared/utils/asyncBatch';
 import { ESocialEventProvider } from '../../../../../shared/providers/ESocialProvider/implementations/ESocialEventProvider';
+import { UpdateESocialReportService } from '../update-esocial-report/update-esocial-report.service';
 
 @Injectable()
 export class UpdateAllCompaniesService {
@@ -35,6 +36,7 @@ export class UpdateAllCompaniesService {
     private readonly telegram: TelegramService,
     private readonly eSocialEventProvider: ESocialEventProvider,
     private readonly companyReportRepository: CompanyReportRepository,
+    private readonly updateESocialReportService: UpdateESocialReportService,
   ) {}
 
   async execute(user?: UserPayloadDto) {
@@ -176,7 +178,7 @@ export class UpdateAllCompaniesService {
   async addReport(company: CompanyEntity) {
     //! optimization here => query only once employees and then apply filters
     const examTime = await this.addEmployeeExamTime(company);
-    const esocialEvents = await this.addEmployeeEsocial(company);
+    const esocialEvents = await this.addCompanyEsocial(company);
 
     return { examTime, esocialEvents, company };
   }
@@ -398,30 +400,15 @@ export class UpdateAllCompaniesService {
     }
   }
 
-  async addEmployeeEsocial(company: CompanyEntity) {
+  async addCompanyEsocial(company: CompanyEntity) {
     const companyId = company.id;
     if (!company.esocialStart) return {};
 
     try {
-      const { data: employees } = await this.employeeRepository.findEvent2220(
-        {
-          startDate: company.esocialStart,
-          companyId,
-        },
-        { take: 100 },
-      );
-
-      const eventsStruct = this.eSocialEventProvider.convertToEvent2220Struct(
+      const esocial = await this.updateESocialReportService.addCompanyEsocial(
         company,
-        employees,
       );
-
-      return {
-        pending: eventsStruct.length,
-        //         done:company.,
-        // transmitted:,
-        // rejected:,
-      };
+      return esocial;
     } catch (e) {
       this.errorCompanies.push(companyId);
       this.error = e;

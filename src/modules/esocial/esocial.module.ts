@@ -1,5 +1,5 @@
 import { FindESocialBatchService } from './services/events/all/find-batch/find-batch.service';
-import { forwardRef, Module } from '@nestjs/common';
+import { CacheModule, forwardRef, Module } from '@nestjs/common';
 import axios from 'axios';
 import fs from 'fs';
 import https from 'https';
@@ -75,8 +75,49 @@ import { FetchESocialBatchEventsService } from './services/events/all/fetch-batc
         };
       },
     }),
+    SoapModule.forRootAsync({
+      clientName: SoapClientEnum.CONSULT_PRODUCTION_RESTRICT,
+      useFactory: async (): Promise<SoapModuleOptions> => {
+        const httpsAgent = new https.Agent({
+          rejectUnauthorized: false,
+          pfx: fs.readFileSync('cert/cert.pfx'),
+          passphrase: process.env.TRANSMISSION_PFX_PASSWORD,
+        });
+
+        const api = axios.create({
+          httpsAgent,
+        });
+
+        return {
+          clientName: SoapClientEnum.CONSULT_PRODUCTION_RESTRICT,
+          uri: process.env.ESOCIAL_CONSULT_URL_PROD_RESTRICT,
+          clientOptions: { request: api, escapeXML: false },
+        };
+      },
+    }),
+    SoapModule.forRootAsync({
+      clientName: SoapClientEnum.CONSULT_PRODUCTION,
+      useFactory: async (): Promise<SoapModuleOptions> => {
+        const httpsAgent = new https.Agent({
+          rejectUnauthorized: false,
+          pfx: fs.readFileSync('cert/cert.pfx'),
+          passphrase: process.env.TRANSMISSION_PFX_PASSWORD,
+        });
+
+        const api = axios.create({
+          httpsAgent,
+        });
+
+        return {
+          clientName: SoapClientEnum.CONSULT_PRODUCTION,
+          uri: process.env.ESOCIAL_CONSULT_URL_PROD,
+          clientOptions: { request: api, escapeXML: false },
+        };
+      },
+    }),
     forwardRef(() => AuthModule),
     forwardRef(() => CompanyModule),
+    CacheModule.register(),
   ],
   providers: [
     FetchESocialBatchEventsService,

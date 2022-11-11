@@ -1,4 +1,4 @@
-import { ErrorMessageEnum } from 'src/shared/constants/enum/errorMessage';
+import { ErrorMessageEnum } from './../../../../../shared/constants/enum/errorMessage';
 import { AmazonStorageProvider } from './../../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
 import { BadRequestException, Injectable } from '@nestjs/common';
 

@@ -1,6 +1,4 @@
-import { asyncEach } from '../../src/shared/utils/asyncEach';
 import { PrismaClient } from '@prisma/client';
-import { arrayChunks } from '../../src/shared/utils/arrayChunks';
 
 export const convertProf = async (prisma: PrismaClient) => {
   const users = await prisma.user.findMany();

@@ -6,7 +6,7 @@ import { sortData } from './../../../../../../../shared/utils/sorts/data.sort';
 import { EmployeeEntity } from './../../../../../entities/employee.entity';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { EmployeeHierarchyMotiveTypeEnum } from '@prisma/client';
-import { ErrorMessageEnum } from 'src/shared/constants/enum/errorMessage';
+import { ErrorMessageEnum } from './../../../../../../../shared/constants/enum/errorMessage';
 
 import { UserPayloadDto } from '../../../../../../../shared/dto/user-payload.dto';
 import { EmployeeHierarchyHistoryRepository } from './../../../../../repositories/implementations/EmployeeHierarchyHistoryRepository';

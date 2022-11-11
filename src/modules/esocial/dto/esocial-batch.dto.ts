@@ -1,10 +1,13 @@
+import { KeysOfEnum } from './../../../shared/utils/keysOfEnum.utils';
+import { QueryArray } from './../../../shared/transformers/query-array';
 import {
   EmployeeESocialEventTypeEnum,
   Prisma,
   StatusEnum,
 } from '@prisma/client';
-import { IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
 import { PaginationQueryDto } from 'src/shared/dto/pagination.dto';
+import { Transform } from 'class-transformer';
 
 export class CreateESocialEvent {
   eventsDate: Date;
@@ -34,4 +37,13 @@ export class FindESocialBatchDto extends PaginationQueryDto {
   @IsString()
   @IsOptional()
   companyId: string;
+
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsOptional()
+  @IsString({ each: true })
+  @IsEnum(StatusEnum, {
+    each: true,
+    message: `Erro ao enviar status`,
+  })
+  status?: StatusEnum[];
 }

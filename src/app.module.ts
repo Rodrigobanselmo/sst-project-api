@@ -27,7 +27,6 @@ import { RolesGuard } from './shared/guards/roles.guard';
     EsocialModule,
     NotificationModule,
     ScheduleModule.forRoot(),
-    CacheModule.register(),
   ],
   providers: [
     {
@@ -43,6 +42,5 @@ import { RolesGuard } from './shared/guards/roles.guard';
       useClass: PermissionsGuard,
     },
   ],
-  controllers: [],
 })
 export class AppModule {}

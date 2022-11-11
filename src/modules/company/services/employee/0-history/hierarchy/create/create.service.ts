@@ -6,7 +6,7 @@ import {
 } from './../../../../../entities/employee-hierarchy-history.entity';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { EmployeeHierarchyMotiveTypeEnum } from '@prisma/client';
-import { ErrorMessageEnum } from 'src/shared/constants/enum/errorMessage';
+import { ErrorMessageEnum } from './../../../../../../../shared/constants/enum/errorMessage';
 
 import { UserPayloadDto } from '../../../../../../../shared/dto/user-payload.dto';
 import { CreateEmployeeHierarchyHistoryDto } from '../../../../../dto/employee-hierarchy-history';

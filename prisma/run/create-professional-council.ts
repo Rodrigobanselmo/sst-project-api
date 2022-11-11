@@ -1,6 +1,4 @@
-import { asyncEach } from '../../src/shared/utils/asyncEach';
 import { PrismaClient } from '@prisma/client';
-import { arrayChunks } from '../../src/shared/utils/arrayChunks';
 
 export const addProfCOuncilNUll = async (prisma: PrismaClient) => {
   const prof = await prisma.professional.findMany({

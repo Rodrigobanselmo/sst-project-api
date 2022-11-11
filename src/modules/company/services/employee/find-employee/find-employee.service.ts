@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { ErrorCompanyEnum } from 'src/shared/constants/enum/errorMessage';
+import { ErrorCompanyEnum } from '../../../../../shared/constants/enum/errorMessage';
 import { EmployeeRepository } from '../../../../../modules/company/repositories/implementations/EmployeeRepository';
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 

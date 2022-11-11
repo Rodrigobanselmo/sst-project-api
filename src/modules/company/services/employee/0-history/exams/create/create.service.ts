@@ -1,8 +1,8 @@
 import { NotificationRepository } from './../../../../../../notifications/repositories/implementations/NotificationRepository';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { StatusEnum } from '@prisma/client';
-import { EmployeeEntity } from 'src/modules/company/entities/employee.entity';
-import { ErrorMessageEnum } from 'src/shared/constants/enum/errorMessage';
+import { EmployeeEntity } from '../../../../../../../modules/company/entities/employee.entity';
+import { ErrorMessageEnum } from '../../../../../../../shared/constants/enum/errorMessage';
 
 import { UserPayloadDto } from '../../../../../../../shared/dto/user-payload.dto';
 import { EmployeeRepository } from '../../../../../repositories/implementations/EmployeeRepository';

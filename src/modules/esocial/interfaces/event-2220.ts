@@ -82,7 +82,7 @@ export interface IEvent2220Props extends IEventProps {
       }[];
     };
     respMonit: {
-      cpfResp: string;
+      cpfResp?: string;
       nmResp: string;
       nrCRM: string;
       ufCRM: string;

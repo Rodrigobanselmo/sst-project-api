@@ -29,11 +29,8 @@ export class CompanyReportRepository {
   async updateESocial(
     companyId: string,
     removePending = 0,
-    options: Partial<Prisma.CompanyReportUpdateArgs> & {
-      isTrans?: boolean;
-    } = {},
+    options: Partial<Prisma.CompanyReportUpdateArgs> = {},
   ) {
-    const { isTrans, ...rest } = options;
     let report = await this.prisma.companyReport.findFirst({
       where: { companyId },
     });
@@ -56,31 +53,98 @@ export class CompanyReportRepository {
     });
 
     const done = group.find((g) => g.status === 'DONE')?._count || 0;
-    const transmitted =
-      group.find((g) => g.status === 'TRANSMITTED')?._count || 0;
-    const processing =
-      group.find((g) => g.status === 'PROCESSING')?._count || 0;
-    const rejected = group.find((g) => g.status === 'ERROR')?._count || 0;
+    // eslint-disable-next-line prettier/prettier
+    const transmitted = group.find((g) => g.status === 'TRANSMITTED')?._count || 0;
+    // eslint-disable-next-line prettier/prettier
+    const processing = group.find((g) => g.status === 'PROCESSING')?._count || 0;
+    // eslint-disable-next-line prettier/prettier
+    const rejected = group.find((g) => g.status === 'INVALID' || g.status === 'ERROR') ?._count || 0;
 
     if (typeof done == 'number') dailyReport.esocial.done = done;
-    if (typeof transmitted == 'number')
-      dailyReport.esocial.transmitted = transmitted;
-    if (typeof processing == 'number')
-      dailyReport.esocial.processing = processing;
+    // eslint-disable-next-line prettier/prettier
     if (typeof rejected == 'number') dailyReport.esocial.rejected = rejected;
+    // eslint-disable-next-line prettier/prettier
+    if (typeof processing == 'number') dailyReport.esocial.processing = processing;
+    // eslint-disable-next-line prettier/prettier
+    if (typeof transmitted == 'number') dailyReport.esocial.transmitted = transmitted;
 
-    dailyReport.esocial.pending =
-      (dailyReport.esocial?.pending || 0) - removePending;
+    // eslint-disable-next-line prettier/prettier
+    dailyReport.esocial.pending = (dailyReport.esocial?.pending || 0) - removePending;
 
     if (dailyReport.esocial.pending < 0) dailyReport.esocial.pending = 0;
 
     await this.prisma.companyReport.update({
       where: { companyId },
       data: { dailyReport: dailyReport as any },
-      ...rest,
+      ...options,
     });
 
     return new CompanyReportEntity(report);
+  }
+
+  async updateESocialReport(
+    companyId: string,
+    dailyReport: Partial<DailyCompanyReportDto>,
+    options: Partial<Prisma.CompanyReportUpdateArgs> = {},
+  ) {
+    let report = await this.prisma.companyReport.findFirst({
+      where: { companyId },
+    });
+
+    if (!report) {
+      report = await this.upsert({
+        companyId,
+        dailyReport: { esocial: {}, exam: {} },
+      });
+    }
+
+    const newDailyReport = (report?.dailyReport || {
+      esocial: {},
+      exam: {},
+    }) as unknown as DailyCompanyReportDto;
+
+    newDailyReport.esocial = {
+      ...newDailyReport.esocial,
+      ...dailyReport?.esocial,
+    };
+
+    newDailyReport.exam = {
+      ...newDailyReport.exam,
+      ...dailyReport?.exam,
+    };
+
+    await this.prisma.companyReport.update({
+      where: { companyId },
+      data: { dailyReport: newDailyReport as any },
+      ...options,
+    });
+
+    return new CompanyReportEntity(report);
+  }
+
+  async getESocialNewReport(companyId: string) {
+    const esocial = {} as DailyCompanyReportDto['esocial'];
+
+    const group = await this.prisma.employeeESocialEvent.groupBy({
+      by: ['status'],
+      where: { companyId },
+      _count: true,
+    });
+
+    const done = group.find((g) => g.status === 'DONE')?._count || 0;
+    // eslint-disable-next-line prettier/prettier
+    const transmitted = group.find((g) => g.status === 'TRANSMITTED')?._count || 0;
+    // eslint-disable-next-line prettier/prettier
+    const processing = group.find((g) => g.status === 'PROCESSING')?._count || 0;
+    // eslint-disable-next-line prettier/prettier
+    const rejected = group.find((g) => g.status === 'INVALID' || g.status === 'ERROR') ?._count || 0;
+
+    esocial.done = done;
+    esocial.rejected = rejected;
+    esocial.processing = processing;
+    esocial.transmitted = transmitted;
+
+    return esocial;
   }
 
   async findNude(
