@@ -11,7 +11,7 @@ import X509HttpClient from 'soap-x509-http';
 import axios from 'axios';
 import format from 'xml-formatter';
 import https from 'https';
-import { ESocialMethodsProvider } from 'src/shared/providers/ESocialProvider/implementations/ESocialMethodsProvider';
+import { ESocialMethodsProvider } from '../../../../../../shared/providers/ESocialProvider/implementations/ESocialMethodsProvider';
 const xml = `<eSocial xmlns="http://www.esocial.gov.br/schema/lote/eventos/envio/v1_1_1">
   <envioLoteEventos grupo="2">
     <ideEmpregador>

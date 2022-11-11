@@ -14,7 +14,7 @@ import {
 } from '../../dto/risk.dto';
 import { RiskFactorsEntity } from '../../entities/risk.entity';
 import { IRiskRepository } from '../IRiskRepository.types';
-import { PaginationQueryDto } from 'src/shared/dto/pagination.dto';
+import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
 
 @Injectable()
 export class RiskRepository implements IRiskRepository {

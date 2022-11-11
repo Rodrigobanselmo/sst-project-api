@@ -1,5 +1,5 @@
 import { IsOptional, IsString } from 'class-validator';
-import { PaginationQueryDto } from 'src/shared/dto/pagination.dto';
+import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
 
 export class FindESocialEventDto extends PaginationQueryDto {
   @IsString()

@@ -2,7 +2,7 @@ import {
   DailyCompanyReportDto,
   UpsertCompanyReportDto,
 } from '../../../dto/company-report.dto';
-import { EmployeeEntity } from 'src/modules/company/entities/employee.entity';
+import { EmployeeEntity } from '../../../../../modules/company/entities/employee.entity';
 import { CompanyEntity } from '../../../entities/company.entity';
 import { CompanyRepository } from '../../../repositories/implementations/CompanyRepository';
 import { asyncEach } from '../../../../../shared/utils/asyncEach';

@@ -13,7 +13,6 @@ import { ProfessionalEntity } from '../../entities/professional.entity';
 import { UserEntity } from '../../entities/user.entity';
 import { UserCompanyEntity } from '../../entities/userCompany.entity';
 import dayjs from 'dayjs';
-import { RoleEnum } from 'src/shared/constants/enum/authorization';
 import { InviteUsersEntity } from '../../entities/invite-users.entity';
 
 @Injectable()

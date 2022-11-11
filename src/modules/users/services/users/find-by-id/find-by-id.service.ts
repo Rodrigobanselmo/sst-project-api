@@ -1,5 +1,5 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { ErrorInvitesEnum } from 'src/shared/constants/enum/errorMessage';
+import { ErrorInvitesEnum } from '../../../../../shared/constants/enum/errorMessage';
 import { UsersRepository } from '../../../repositories/implementations/UsersRepository';
 
 @Injectable()

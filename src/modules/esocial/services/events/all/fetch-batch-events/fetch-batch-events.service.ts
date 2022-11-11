@@ -1,7 +1,7 @@
 import { UpdateESocialReportService } from './../../../../../company/services/report/update-esocial-report/update-esocial-report.service';
 import { asyncEach } from './../../../../../../shared/utils/asyncEach';
 import { ICacheEventBatchType } from './../../../../../../shared/interfaces/cache.types';
-import { CacheEnum } from 'src/shared/constants/enum/cache';
+import { CacheEnum } from './../../../../../../shared/constants/enum/cache';
 import {
   IEsocialFetchBatch,
   IEsocialSendBatchResponse,

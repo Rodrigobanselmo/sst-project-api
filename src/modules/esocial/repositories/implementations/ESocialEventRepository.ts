@@ -1,4 +1,4 @@
-import { PaginationQueryDto } from 'src/shared/dto/pagination.dto';
+import { PaginationQueryDto } from './../../../../shared/dto/pagination.dto';
 import { prismaFilter } from './../../../../shared/utils/filters/prisma.filters';
 import { onlyNumbers } from '@brazilian-utils/brazilian-utils';
 import { Injectable } from '@nestjs/common';

@@ -1,13 +1,9 @@
-import { KeysOfEnum } from './../../../shared/utils/keysOfEnum.utils';
-import { QueryArray } from './../../../shared/transformers/query-array';
-import {
-  EmployeeESocialEventTypeEnum,
-  Prisma,
-  StatusEnum,
-} from '@prisma/client';
-import { IsEnum, IsOptional, IsString } from 'class-validator';
-import { PaginationQueryDto } from 'src/shared/dto/pagination.dto';
+import { EmployeeESocialEventTypeEnum, StatusEnum } from '@prisma/client';
 import { Transform } from 'class-transformer';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
+
+import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
+import { QueryArray } from './../../../shared/transformers/query-array';
 
 export class CreateESocialEvent {
   eventsDate: Date;

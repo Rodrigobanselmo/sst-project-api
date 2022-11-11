@@ -1,5 +1,5 @@
 import { IsEnum, IsOptional, IsString } from 'class-validator';
-import { EmailsTemplatesEnum } from 'src/shared/constants/enum/emailsTemplates';
+import { EmailsTemplatesEnum } from '../../../shared/constants/enum/emailsTemplates';
 
 import { KeysOfEnum } from './../../../shared/utils/keysOfEnum.utils';
 

@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { HomoTypeEnum, StatusEnum } from '@prisma/client';
 import { ISectionOptions, Packer } from 'docx';
 import fs from 'fs';
-import { RiskFactorsEntity } from 'src/modules/sst/entities/risk.entity';
+import { RiskFactorsEntity } from '../../../../../modules/sst/entities/risk.entity';
 import { v4 } from 'uuid';
 
 import {

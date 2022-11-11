@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { m2mGetDeletedIds } from 'src/shared/utils/m2mFilterIds';
+import { m2mGetDeletedIds } from './../../../../shared/utils/m2mFilterIds';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { isEnvironment } from '../../../company/repositories/implementations/CharacterizationRepository';

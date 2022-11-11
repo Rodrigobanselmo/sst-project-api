@@ -1,6 +1,6 @@
 import { Transform } from 'class-transformer';
 import { IsInt, IsNumber, IsOptional, IsString } from 'class-validator';
-import { PaginationQueryDto } from 'src/shared/dto/pagination.dto';
+import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
 
 import { QueryArray } from './../../../shared/transformers/query-array';
 

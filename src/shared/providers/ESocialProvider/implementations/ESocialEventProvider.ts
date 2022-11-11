@@ -5,10 +5,10 @@ import { ExamHistoryTypeEnum } from '@prisma/client';
 import { Cache } from 'cache-manager';
 import clone from 'clone';
 import { Client } from 'nestjs-soap';
-import { CacheEnum } from 'src/shared/constants/enum/cache';
+import { CacheEnum } from '../../../../shared/constants/enum/cache';
 import { js2xml } from 'xml-js';
 
-import { arrayChunks } from '../../../..//shared/utils/arrayChunks';
+import { arrayChunks } from '../../../../shared/utils/arrayChunks';
 import { EmployeeEntity } from '../../../../modules/company/entities/employee.entity';
 import {
   IEvent2220Props,

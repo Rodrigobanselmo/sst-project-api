@@ -1,4 +1,4 @@
-import { EmployeeEntity } from 'src/modules/company/entities/employee.entity';
+import { EmployeeEntity } from '../../..//modules/company/entities/employee.entity';
 import { HierarchyEnum, StatusEnum } from '@prisma/client';
 import { hierarchyList } from '../../../shared/constants/lists/hierarchy.list';
 

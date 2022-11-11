@@ -1,5 +1,5 @@
 import { prismaFilter } from './../../../../shared/utils/filters/prisma.filters';
-import { PaginationQueryDto } from 'src/shared/dto/pagination.dto';
+import { PaginationQueryDto } from './../../../../shared/dto/pagination.dto';
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../../../../prisma/prisma.service';

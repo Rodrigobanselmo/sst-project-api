@@ -7,7 +7,7 @@ import {
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
 import { RiskFactorDataEntity } from '../../../../../sst/entities/riskData.entity';
 import { emergencyConverter } from './emergency.converter';
-import { removeDuplicate } from 'src/shared/utils/removeDuplicate';
+import { removeDuplicate } from '../../../../../../shared/utils/removeDuplicate';
 
 export const emergencyIterable = (
   riskData: Partial<RiskFactorDataEntity>[],

@@ -37,8 +37,7 @@ import {
   IHierarchyMap,
   IHomoGroupMap,
 } from '../../../docx/converter/hierarchy.converter';
-import { RiskFactorsEntity } from 'src/modules/sst/entities/risk.entity';
-import { files } from 'jszip';
+import { RiskFactorsEntity } from '../../../../../modules/sst/entities/risk.entity';
 
 export const getRiskDoc = (
   risk: RiskFactorsEntity,

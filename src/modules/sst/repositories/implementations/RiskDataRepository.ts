@@ -1,4 +1,4 @@
-import { m2mGetDeletedIds } from 'src/shared/utils/m2mFilterIds';
+import { m2mGetDeletedIds } from './../../../../shared/utils/m2mFilterIds';
 import { isEnvironment } from '../../../company/repositories/implementations/CharacterizationRepository';
 import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
 /* eslint-disable @typescript-eslint/no-unused-vars */

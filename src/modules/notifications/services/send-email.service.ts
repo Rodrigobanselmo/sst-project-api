@@ -1,4 +1,4 @@
-import { EmailsTemplatesEnum } from 'src/shared/constants/enum/emailsTemplates';
+import { EmailsTemplatesEnum } from './../../../shared/constants/enum/emailsTemplates';
 import { PrismaService } from './../../../prisma/prisma.service';
 import { UserPayloadDto } from '../../../shared/dto/user-payload.dto';
 import { Injectable } from '@nestjs/common';

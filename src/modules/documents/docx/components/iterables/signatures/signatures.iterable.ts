@@ -1,6 +1,6 @@
 import { WorkspaceEntity } from './../../../../../company/entities/workspace.entity';
 import { AlignmentType, Paragraph, Table, WidthType } from 'docx';
-import { arrayChunks } from 'src/shared/utils/arrayChunks';
+import { arrayChunks } from '../../../../../../shared/utils/arrayChunks';
 
 import { ProfessionalEntity } from '../../../../../users/entities/professional.entity';
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';

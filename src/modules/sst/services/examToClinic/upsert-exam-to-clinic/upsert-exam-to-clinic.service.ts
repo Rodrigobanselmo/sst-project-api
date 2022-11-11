@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { ErrorMessageEnum } from 'src/shared/constants/enum/errorMessage';
+import { ErrorMessageEnum } from '../../../../../shared/constants/enum/errorMessage';
 
 import { UpsertExamToClinicDto } from '../../../dto/exam-to-clinic.dto';
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';

@@ -7,7 +7,7 @@ import { PrismaService } from '../../../../prisma/prisma.service';
 import { UpsertRiskGroupDataDto } from '../../dto/risk-group-data.dto';
 import { RiskFactorGroupDataEntity } from '../../entities/riskGroupData.entity';
 import { RiskFactorDataEntity } from '../../entities/riskData.entity';
-import { m2mGetDeletedIds } from 'src/shared/utils/m2mFilterIds';
+import { m2mGetDeletedIds } from './../../../../shared/utils/m2mFilterIds';
 import {
   ProfessionalRiskGroupEntity,
   UsersRiskGroupEntity,
