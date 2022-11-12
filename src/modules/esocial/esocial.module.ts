@@ -1,4 +1,3 @@
-import { FindESocialBatchService } from './services/events/all/find-batch/find-batch.service';
 import { CacheModule, forwardRef, Module } from '@nestjs/common';
 import axios from 'axios';
 import fs from 'fs';
@@ -15,6 +14,7 @@ import { SoapClientEnum } from './../../shared/constants/enum/soapClient';
 import { ESocialEvent2220Controller } from './controller/events/2220/events-2220.controller';
 import { ESocialEventController } from './controller/events/all/events.controller';
 import { TablesController } from './controller/tables/tables.controller';
+import { EsocialFetchBatchCron } from './crons/esocial-fetch-batch/esocial-fetch-batch.cron';
 import { CompanyCertRepository } from './repositories/implementations/CompanyCertRepository';
 import { ESocial27TableRepository } from './repositories/implementations/ESocial27TableRepository';
 import { ESocialBatchRepository } from './repositories/implementations/ESocialBatchRepository';
@@ -22,10 +22,11 @@ import { ESocialEventRepository } from './repositories/implementations/ESocialEv
 import { FindEvents2220ESocialService } from './services/events/2220/find-events/find-events.service';
 import { SendEvents2220ESocialService } from './services/events/2220/send-events/send-events.service';
 import { AddCertificationESocialService } from './services/events/all/add-certificate/add-certificate.service';
+import { FetchESocialBatchEventsService } from './services/events/all/fetch-batch-events/fetch-batch-events.service';
+import { FindESocialBatchService } from './services/events/all/find-batch/find-batch.service';
+import { FindESocialEventService } from './services/events/all/find-events/find-events.service';
 import { SendBatchESocialService } from './services/events/all/send-batch/send-batch.service';
 import { FindAllTable27Service } from './services/tables/find-all-27.service';
-import { FindESocialEventService } from './services/events/all/find-events/find-events.service';
-import { FetchESocialBatchEventsService } from './services/events/all/fetch-batch-events/fetch-batch-events.service';
 
 @Module({
   controllers: [
@@ -135,6 +136,7 @@ import { FetchESocialBatchEventsService } from './services/events/all/fetch-batc
     FindESocialBatchService,
     FindESocialEventService,
     ESocialEventRepository,
+    EsocialFetchBatchCron,
   ],
 })
 export class EsocialModule {}

@@ -51,12 +51,12 @@ export class ESocialBatchRepository {
       },
     });
 
-    //! add here when done testing
-    // if (examsIds)
-    //   await this.prisma.employeeExamsHistory.updateMany({
-    //     where: { id: { in: examsIds } },
-    //     data: { sendEvent: false },
-    //   });
+    //!test ==> add here when done or remove when testing
+    if (examsIds)
+      await this.prisma.employeeExamsHistory.updateMany({
+        where: { id: { in: examsIds } },
+        data: { sendEvent: false },
+      });
 
     return new EmployeeESocialBatchEntity(batch);
   }

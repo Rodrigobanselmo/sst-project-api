@@ -63,7 +63,7 @@ export class EmployeeExamsHistoryRepository {
     examsData,
     hierarchyId,
     ...updateData
-  }: UpdateEmployeeExamHistoryDto & { fileUrl?: string }) {
+  }: UpdateEmployeeExamHistoryDto & { fileUrl?: string; sendEvent?: boolean }) {
     const data = await this.prisma.employeeExamsHistory.update({
       data: {
         ...updateData,

@@ -37,6 +37,7 @@ export class UpdateESocialReportService {
       select: {
         id: true,
         esocialStart: true,
+        cnpj: true,
         group: {
           select: {
             doctorResponsible: {

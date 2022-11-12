@@ -1,4 +1,4 @@
-import { EmployeeExamCronService } from './crons/employee-exam/employee-exam.cron';
+import { UpdateCompaniesReportCron } from './crons/employee-exam/employee-exam.cron';
 import { DeleteExamFileService } from './services/employee/0-history/exams/delete-exam-file/delete-exam-file.service';
 import { DownloadExamService } from './services/employee/0-history/exams/download-exam/download-exam.service';
 import { UploadExamFileService } from './services/employee/0-history/exams/upload-exam-file/upload-exam-file.service';
@@ -241,7 +241,7 @@ import { UpdateESocialReportService } from './services/report/update-esocial-rep
     DeleteExamFileService,
     DownloadExamService,
     UpdateAllCompaniesService,
-    EmployeeExamCronService,
+    UpdateCompaniesReportCron,
     DashboardCompanyService,
     CompanyReportRepository,
     CopyCharacterizationService,

@@ -9,6 +9,7 @@ export class CreateESocialEvent {
   eventsDate: Date;
   eventXml: string;
   employeeId: number;
+  eventId: string;
   examHistoryId?: number;
   // responseXml: string;
 }

@@ -4,7 +4,7 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { UpdateAllCompaniesService } from '../../services/report/update-all-companies/update-all-companies.service';
 
 @Injectable()
-export class EmployeeExamCronService {
+export class UpdateCompaniesReportCron {
   constructor(
     private readonly updateAllCompaniesService: UpdateAllCompaniesService,
   ) {}

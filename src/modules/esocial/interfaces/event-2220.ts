@@ -81,11 +81,11 @@ export interface IEvent2220Props extends IEventProps {
         indResult?: number;
       }[];
     };
-    respMonit: {
+    respMonit?: {
       cpfResp?: string;
-      nmResp: string;
-      nrCRM: string;
-      ufCRM: string;
+      nmResp?: string;
+      nrCRM?: string;
+      ufCRM?: string;
     };
   };
 }

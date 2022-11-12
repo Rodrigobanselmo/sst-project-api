@@ -39,6 +39,8 @@ export function logger(req, res, next) {
 }
 
 async function bootstrap() {
+  console.log('STARTED');
+
   const app = await NestFactory.create(AppModule);
 
   app.use(logger);

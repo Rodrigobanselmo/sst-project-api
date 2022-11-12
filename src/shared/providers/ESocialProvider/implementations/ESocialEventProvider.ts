@@ -58,7 +58,6 @@ class ESocialEventProvider {
   private eventGroup = EventGroupEnum.NO_PERIODIC;
 
   constructor(
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     @Inject(SoapClientEnum.PRODUCTION)
     private readonly clientProduction: Client,
     @Inject(SoapClientEnum.PRODUCTION_RESTRICT)
@@ -89,29 +88,30 @@ class ESocialEventProvider {
         errors.push({ message: 'Informar "matricula" do empregado' });
     }
 
-    {
-      if (!respMonit.cpfResp && !respMonit.nmResp) {
-        errors.push({
-          message: 'Informar o médico coordenador do PCMSO',
-        });
-      } else {
-        // if (!respMonit.cpfResp)
-        //   errors.push({
-        //     message: 'Informar "CPF" do médico coordenador do PCMSO',
-        //   });
-        if (!respMonit.nmResp)
-          errors.push({
-            message: 'Informar "nome" do médico coordenador do PCMSO',
-          });
-        if (!respMonit.nrCRM || !respMonit.ufCRM)
-          errors.push({
-            message: 'Informar "CRM" do médico coordenador do PCMSO',
-          });
-      }
-    }
+    //? doctor is no more need as an required field
+    // {
+    //   if (!respMonit.cpfResp && !respMonit.nmResp) {
+    //     errors.push({
+    //       message: 'Informar o médico coordenador do PCMSO',
+    //     });
+    //   } else {
+    //     // if (!respMonit.cpfResp)
+    //     //   errors.push({
+    //     //     message: 'Informar "CPF" do médico coordenador do PCMSO',
+    //     //   });
+    //     if (!respMonit.nmResp)
+    //       errors.push({
+    //         message: 'Informar "nome" do médico coordenador do PCMSO',
+    //       });
+    //     if (!respMonit.nrCRM || !respMonit.ufCRM)
+    //       errors.push({
+    //         message: 'Informar "CRM" do médico coordenador do PCMSO',
+    //       });
+    //   }
+    // }
 
     {
-      if (!respMonit.nmResp && !asoDoctor.nrCRM && !asoDoctor.ufCRM) {
+      if (!asoDoctor.nmMed && !asoDoctor.nrCRM && !asoDoctor.ufCRM) {
         errors.push({
           message: 'Informar o médico emitente do ASO',
         });
@@ -156,7 +156,7 @@ class ESocialEventProvider {
   convertToEvent2220Struct(
     company: CompanyEntity,
     employees: EmployeeEntity[],
-    ideEvento?: IEventProps['ideEvento'],
+    options?: { ideEvento?: IEventProps['ideEvento'] },
   ) {
     const generateId = this.eSocialMethodsProvider.classGenerateId(
       company.cnpj,
@@ -197,21 +197,35 @@ class ESocialEventProvider {
           const aso = exams[exams.length - 1];
           const examIds = [];
           const id = generateId.newId();
+          const doctorResponsible = company?.doctorResponsible;
+
+          const isDoctorAvailable =
+            doctorResponsible &&
+            doctorResponsible?.name &&
+            doctorResponsible?.councilId &&
+            doctorResponsible?.councilUF;
+
+          const asoDoctor = aso?.doctor;
+
           const eventMed: IEvent2220Props['exMedOcup'] = {
-            respMonit: {
-              // cpfResp: company?.doctorResponsible?.cpf,
-              nmResp: company?.doctorResponsible?.name,
-              nrCRM: company?.doctorResponsible?.councilId,
-              ufCRM: company?.doctorResponsible?.councilUF,
-            },
+            ...(isDoctorAvailable && {
+              respMonit: {
+                ...(doctorResponsible?.cpf && {
+                  cpfResp: doctorResponsible.cpf,
+                }),
+                nmResp: doctorResponsible.name,
+                nrCRM: doctorResponsible.councilId,
+                ufCRM: doctorResponsible.councilUF,
+              },
+            }),
             tpExameOcup: mapResAso[aso.examType],
             aso: {
               dtAso: aso.doneDate,
               resAso: mapTpExameOcup[aso.evaluationType],
               medico: {
-                nmMed: aso?.doctor?.name,
-                nrCRM: aso?.doctor?.councilId,
-                ufCRM: aso?.doctor?.councilUF,
+                nmMed: asoDoctor?.name,
+                nrCRM: asoDoctor?.councilId,
+                ufCRM: asoDoctor?.councilUF,
               },
               exame: exams.map((exam) => {
                 let isSequential: boolean | null = null;
@@ -258,8 +272,8 @@ class ESocialEventProvider {
               matricula: employee.esocialCode,
             },
             ideEvento: {
-              tpAmb: ideEvento?.tpAmb,
-              procEmi: ideEvento?.procEmi,
+              tpAmb: options?.ideEvento?.tpAmb,
+              procEmi: options?.ideEvento?.procEmi,
             },
           };
 
@@ -532,9 +546,6 @@ class ESocialEventProvider {
     //     lineSeparator: '\n',
     //   }),
     // );
-
-    const cacheValue: ICacheEventBatchType = false;
-    await this.cacheManager.set(CacheEnum.ESOCIAL_FETCH_EVENT, cacheValue, 360);
 
     return responseBatchEvents;
   }
