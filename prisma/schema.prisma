@@ -497,6 +497,10 @@ model CompanyReport {
   id    Int   @id  @default(autoincrement())
   lastDailyReport DateTime? 
   dailyReport Json?  
+  esocialPendent Int @default(0)
+  esocialReject Int @default(0)
+  esocialDone Int @default(0)
+  esocialProgress Int @default(0)
   created_at DateTime @default(now())
   updated_at  DateTime   @updatedAt
   companyId String 

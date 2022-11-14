@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "CompanyReport" ADD COLUMN     "esocialDone" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "esocialPendent" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "esocialPregress" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "esocialReject" INTEGER NOT NULL DEFAULT 0;

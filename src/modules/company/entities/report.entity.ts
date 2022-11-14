@@ -13,4 +13,8 @@ export class CompanyReportEntity implements CompanyReport {
   constructor(partial: Partial<CompanyReportEntity>) {
     Object.assign(this, partial);
   }
+  esocialPendent: number;
+  esocialReject: number;
+  esocialDone: number;
+  esocialProgress: number;
 }

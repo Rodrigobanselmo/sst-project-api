@@ -623,6 +623,10 @@ export class CompanyRepository implements ICompanyRepository {
       options.select.esocialStart = true;
       options.select.esocialSend = true;
       options.select.report = true;
+      options.orderBy = [
+        { report: { esocialReject: 'desc' } },
+        { report: { esocialPendent: 'desc' } },
+      ];
     }
 
     const response = await this.prisma.$transaction([
