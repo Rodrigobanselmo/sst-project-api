@@ -1,8 +1,14 @@
+import { IEsocialSendBatchResponse } from './../../../../modules/esocial/interfaces/esocial';
+import { UserPayloadDto } from './../../../dto/user-payload.dto';
+import { BaseEventDto } from './../../../../modules/esocial/dto/event.dto';
+import { EmployeeExamsHistoryEntity } from './../../../../modules/company/entities/employee-exam-history.entity';
 import { TpAmbEnum } from './../../../../modules/esocial/interfaces/event-batch';
 import { EmployeeEntity } from './../../../../modules/company/entities/employee.entity';
 import { IEvent2220Props } from './../../../../modules/esocial/interfaces/event-2220';
 import { CompanyEntity } from '../../../../modules/company/entities/company.entity';
 import { CompanyCertEntity } from '../../../../modules/esocial/entities/companyCert.entity';
+import { IEvent3000Props } from '../../../../modules/esocial/interfaces/event-3000';
+import { EmployeeESocialEventTypeEnum } from '@prisma/client';
 export interface IConvertPfx {
   file: Express.Multer.File;
   password: string;
@@ -31,19 +37,72 @@ interface IIdOptions {
   seqNum?: number;
   index?: number;
 }
-export interface IESocialStruck2220 {
-  event: IEvent2220Props;
-  employee: EmployeeEntity;
-  asoId: number;
-  examIds: number[];
-  eventDate: Date;
-  id: string;
+
+export declare namespace IESocial2220 {
+  export interface StructureReturn {
+    event: IEvent2220Props;
+    employee: EmployeeEntity;
+    asoId: number;
+    aso: EmployeeExamsHistoryEntity;
+    historyExams: EmployeeExamsHistoryEntity[];
+    examIds: number[];
+    eventDate: Date;
+    id: string;
+  }
+
+  export interface XmlReturn extends Omit<StructureReturn, 'event'> {
+    signedXml: string;
+    xml: string;
+  }
 }
 
-export interface IESocialXmlStruck2220
-  extends Omit<IESocialStruck2220, 'event'> {
-  signedXml: string;
-  xml: string;
+export declare namespace IESocial3000 {
+  export interface Event {
+    receipt: string;
+    cpf: string;
+    eventType: EmployeeESocialEventTypeEnum;
+    employee: EmployeeEntity;
+
+    aso?: EmployeeExamsHistoryEntity;
+  }
+
+  export interface StructureEntry {
+    cnpj: string;
+    event: Event[];
+  }
+
+  export interface StructureReturn extends Event {
+    id: string;
+    event: IEvent3000Props;
+  }
+
+  export interface XmlReturn extends Omit<StructureReturn, 'event'> {
+    signedXml: string;
+    xml: string;
+  }
+
+  export interface SendEntry {
+    company: CompanyEntity;
+    cert: CompanyCertEntity;
+    events: Event[];
+    esocialSend?: boolean;
+    body: BaseEventDto;
+    user: UserPayloadDto;
+    type: EmployeeESocialEventTypeEnum;
+  }
+}
+
+export interface IBatchDatabaseSave {
+  company: CompanyEntity;
+  body: BaseEventDto;
+  user: UserPayloadDto;
+  type: EmployeeESocialEventTypeEnum;
+  sendEvents: {
+    events: (IESocial3000.XmlReturn | IESocial2220.XmlReturn)[];
+    response: IEsocialSendBatchResponse;
+  }[];
+
+  esocialSend?: boolean;
 }
 
 export interface IESocialSendEventOptions {
@@ -59,6 +118,7 @@ export interface ICompanyOptions {
   cert?: boolean;
   report?: boolean;
 }
+
 interface IESocialMethodProvider {
   convertPfxToPem(data: IConvertPfx): Promise<IConvertPfxReturn>;
   generateId(cpfCnpj: string, options?: IIdOptions): void;

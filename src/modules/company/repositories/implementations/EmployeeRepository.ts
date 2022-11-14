@@ -1,22 +1,20 @@
-import { FindEvents2220Dto } from './../../../esocial/dto/event.dto';
-import { prismaFilter } from './../../../../shared/utils/filters/prisma.filters';
-/* eslint-disable @typescript-eslint/no-unused-vars */
+import { onlyNumbers } from '@brazilian-utils/brazilian-utils';
 import { ConflictException, Injectable } from '@nestjs/common';
-import { IPrismaOptions } from '../../../../shared/interfaces/prisma-options.types';
-import { transformStringToObject } from '../../../../shared/utils/transformStringToObject';
+import { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
+import { ErrorCompanyEnum } from '../../../../shared/constants/enum/errorMessage';
+import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
 import {
   CreateEmployeeDto,
   FindEmployeeDto,
   UpdateEmployeeDto,
 } from '../../dto/employee.dto';
 import { EmployeeEntity } from '../../entities/employee.entity';
-import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
-import { Prisma } from '@prisma/client';
-import { ErrorCompanyEnum } from '../../../../shared/constants/enum/errorMessage';
-import { onlyNumbers } from '@brazilian-utils/brazilian-utils';
+import { prismaFilter } from './../../../../shared/utils/filters/prisma.filters';
+import { FindEvents2220Dto } from './../../../esocial/dto/event.dto';
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
 @Injectable()
 export class EmployeeRepository {
   constructor(private prisma: PrismaService) {}
@@ -373,7 +371,21 @@ export class EmployeeRepository {
               exam: { esocial27Code: { not: null } },
               OR: [
                 { status: 'DONE' },
-                { status: 'CANCELED', event: { id: { gt: 0 } } },
+                {
+                  status: 'CANCELED',
+                  AND: [
+                    {
+                      events: {
+                        every: { id: { gt: 0 }, action: { not: 'EXCLUDE' } },
+                      },
+                    },
+                    {
+                      events: {
+                        some: { id: { gt: 0 }, receipt: { not: null } },
+                      },
+                    },
+                  ],
+                },
               ],
             },
           },
@@ -396,7 +408,21 @@ export class EmployeeRepository {
           doneDate: { gte: query.startDate },
           OR: [
             { status: 'DONE' },
-            { status: 'CANCELED', event: { id: { gt: 0 } } },
+            {
+              status: 'CANCELED',
+              AND: [
+                {
+                  events: {
+                    every: { id: { gt: 0 }, action: { not: 'EXCLUDE' } },
+                  },
+                },
+                {
+                  events: {
+                    some: { id: { gt: 0 }, receipt: { not: null } },
+                  },
+                },
+              ],
+            },
           ],
           exam: {
             AND: [
@@ -405,7 +431,7 @@ export class EmployeeRepository {
             ],
           },
         },
-        orderBy: { doneDate: 'asc' },
+        orderBy: [{ doneDate: 'asc' }, { exam: { isAttendance: 'asc' } }],
         select: {
           id: true,
           examType: true,
@@ -414,7 +440,7 @@ export class EmployeeRepository {
           status: true,
           employeeId: true,
           sendEvent: true,
-          event: true,
+          events: true,
           doctor: {
             include: { professional: { select: { name: true, cpf: true } } },
           },

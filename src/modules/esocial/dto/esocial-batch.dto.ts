@@ -1,4 +1,8 @@
-import { EmployeeESocialEventTypeEnum, StatusEnum } from '@prisma/client';
+import {
+  EmployeeESocialEventActionEnum,
+  EmployeeESocialEventTypeEnum,
+  StatusEnum,
+} from '@prisma/client';
 import { Transform } from 'class-transformer';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
 
@@ -6,11 +10,12 @@ import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
 import { QueryArray } from './../../../shared/transformers/query-array';
 
 export class CreateESocialEvent {
-  eventsDate: Date;
+  eventsDate?: Date;
   eventXml: string;
   employeeId: number;
   eventId: string;
   examHistoryId?: number;
+  action?: EmployeeESocialEventActionEnum;
   // responseXml: string;
 }
 

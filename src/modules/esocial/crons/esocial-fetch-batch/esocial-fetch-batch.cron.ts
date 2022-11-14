@@ -32,7 +32,7 @@ export class EsocialFetchBatchCron {
           cacheValue,
           360,
         );
-        return;
+        // return;
         await this.fetchESocialBatchEventsService.execute();
       }
     }

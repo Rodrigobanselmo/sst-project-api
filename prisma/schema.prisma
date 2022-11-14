@@ -85,6 +85,12 @@ enum EmployeeESocialEventTypeEnum {
   RISK_2240
 }
 
+enum EmployeeESocialEventActionEnum {
+  SEND
+  EXCLUDE
+  MODIFY
+}
+
 enum ExamHistoryTypeEnum {
   ADMI
   PERI
@@ -752,7 +758,7 @@ model EmployeeExamsHistory {
   exam Exam @relation(fields: [examId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   employeeId Int
   employee Employee @relation(fields: [employeeId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  event EmployeeESocialEvent?
+  events EmployeeESocialEvent[]
   sendEvent Boolean @default(true) 
 
   @@index(status)
@@ -788,11 +794,12 @@ model EmployeeESocialEvent {
   batchId Int?
   type EmployeeESocialEventTypeEnum
   batch EmployeeESocialBatch? @relation(fields: [batchId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  eventsDate DateTime
+  eventsDate DateTime?
   status StatusEnum @default(PENDING)
   // eventsType EmployeeESocialEventTypeEnum
   // snapshot Json?
 
+  action EmployeeESocialEventActionEnum?
   receipt String?
   eventId String?
   eventXml String
@@ -801,7 +808,7 @@ model EmployeeESocialEvent {
   employee Employee @relation(fields: [employeeId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   companyId String
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  examHistoryId Int? @unique
+  examHistoryId Int?
   exam EmployeeExamsHistory? @relation(fields: [examHistoryId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   // refType EmployeeESocialRefTypeEnum
   // @@index(refType)

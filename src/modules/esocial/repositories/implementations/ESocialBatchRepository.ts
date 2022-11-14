@@ -33,17 +33,14 @@ export class ESocialBatchRepository {
         ...(events.length > 0 &&
           status != StatusEnum.ERROR && {
             events: {
-              connectOrCreate: events.map((event) => ({
-                create: {
-                  companyId,
-                  type,
-                  status:
-                    status == StatusEnum.TRANSMITTED
-                      ? StatusEnum.TRANSMITTED
-                      : StatusEnum.PROCESSING,
-                  ...event,
-                },
-                where: { examHistoryId: event.examHistoryId },
+              create: events.map((event) => ({
+                companyId,
+                type,
+                status:
+                  status == StatusEnum.TRANSMITTED
+                    ? StatusEnum.TRANSMITTED
+                    : StatusEnum.PROCESSING,
+                ...event,
               })),
             },
           }),

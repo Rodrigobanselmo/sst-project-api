@@ -1,36 +1,32 @@
-import { CacheEnum } from './../../../../../../shared/constants/enum/cache';
-import { ICacheEventBatchType } from './../../../../../../shared/interfaces/cache.types';
-import { UpdateESocialReportService } from './../../../../../company/services/report/update-esocial-report/update-esocial-report.service';
-import { IEsocialSendBatchResponse } from './../../../../interfaces/esocial';
-import {
-  IESocialSendEventOptions,
-  IESocialXmlStruck2220,
-} from './../../../../../../shared/providers/ESocialProvider/models/IESocialMethodProvider';
-import { getCompanyName } from './../../../../../../shared/utils/companyName';
-import { CreateESocialEvent } from './../../../../dto/esocial-batch.dto';
-import { ESocialBatchRepository } from './../../../../repositories/implementations/ESocialBatchRepository';
+import { sortData } from './../../../../../../shared/utils/sorts/data.sort';
 import {
   BadRequestException,
   CACHE_MANAGER,
   Inject,
   Injectable,
 } from '@nestjs/common';
-import JSZip from 'jszip';
-import fs from 'fs';
+import { EmployeeESocialEventTypeEnum } from '@prisma/client';
+import { Cache } from 'cache-manager';
 import { Readable } from 'stream';
-import format from 'xml-formatter';
 
+import { CompanyReportRepository } from '../../../../../../modules/company/repositories/implementations/CompanyReportRepository';
 import { UserPayloadDto } from '../../../../../../shared/dto/user-payload.dto';
+import { DayJSProvider } from '../../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { ESocialEventProvider } from '../../../../../../shared/providers/ESocialProvider/implementations/ESocialEventProvider';
 import { ESocialMethodsProvider } from '../../../../../../shared/providers/ESocialProvider/implementations/ESocialMethodsProvider';
 import { CompanyRepository } from '../../../../../company/repositories/implementations/CompanyRepository';
 import { EmployeeExamsHistoryRepository } from '../../../../../company/repositories/implementations/EmployeeExamsHistoryRepository';
 import { EmployeeRepository } from '../../../../../company/repositories/implementations/EmployeeRepository';
+import { CacheEnum } from './../../../../../../shared/constants/enum/cache';
+import { ICacheEventBatchType } from './../../../../../../shared/interfaces/cache.types';
+import {
+  IESocial2220,
+  IESocial3000,
+} from './../../../../../../shared/providers/ESocialProvider/models/IESocialMethodProvider';
+import { UpdateESocialReportService } from './../../../../../company/services/report/update-esocial-report/update-esocial-report.service';
 import { Event2220Dto } from './../../../../dto/event.dto';
-import { EmployeeESocialEventTypeEnum, StatusEnum } from '@prisma/client';
-import { DayJSProvider } from '../../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
-import { CompanyReportRepository } from '../../../../../../modules/company/repositories/implementations/CompanyReportRepository';
-import { Cache } from 'cache-manager';
+import { IEsocialSendBatchResponse } from './../../../../interfaces/esocial';
+import { ESocialBatchRepository } from './../../../../repositories/implementations/ESocialBatchRepository';
 
 @Injectable()
 export class SendEvents2220ESocialService {
@@ -76,9 +72,48 @@ export class SendEvents2220ESocialService {
       { ideEvento: body },
     );
 
+    // prepare event to exclude from eSocial
+    const excludeEvents = eventsStruct.filter((event) => {
+      return (
+        event.aso?.status === 'CANCELED' &&
+        event.aso?.events?.find((e) => e.receipt)
+      );
+    });
+
+    const excludeEntry = excludeEvents.map<IESocial3000.Event>((event) => {
+      const eventAso = event.aso?.events
+        ?.sort((b, a) => sortData(a, b))
+        ?.find((e) => e.receipt);
+
+      return {
+        cpf: event.employee.cpf,
+        eventType: EmployeeESocialEventTypeEnum.EXAM_2220,
+        receipt: eventAso?.receipt,
+        employee: event.employee,
+        aso: event.aso,
+      };
+    });
+
+    console.log(excludeEntry);
+
+    // send exclusion event
+    await this.eSocialEventProvider.sendExclusionToESocial({
+      body,
+      cert,
+      company,
+      events: excludeEntry,
+      type: EmployeeESocialEventTypeEnum.EXAM_2220,
+      user,
+      esocialSend,
+    });
+
     // prepare event to send to eSocial
-    const eventsXml: IESocialXmlStruck2220[] = eventsStruct
+    const eventsXml: IESocial2220.XmlReturn[] = eventsStruct
       .map(({ event, ...data }) => {
+        // eslint-disable-next-line prettier/prettier
+        const canceled = data.aso?.status == 'CANCELED';
+        if (canceled) return;
+
         const errors = this.eSocialEventProvider.errorsEvent2220(event);
         if (errors.length > 0) return;
 
@@ -106,19 +141,9 @@ export class SendEvents2220ESocialService {
       })
       .filter((i) => i);
 
-    // fs.writeFileSync(
-    //   'tmp/test-sign-no.xml',
-    //   format(eventsXml[0].signedXml, {
-    //     indentation: '  ',
-    //     filter: (node) => node.type !== 'Comment',
-    //     collapseContent: true,
-    //     lineSeparator: '\n',
-    //   }),
-    // );
-
     // get response after sending to esocial
     const sendEventResponse = esocialSend
-      ? await this.eSocialEventProvider.sendEvent2220ToESocial(eventsXml, {
+      ? await this.eSocialEventProvider.sendEventToESocial(eventsXml, {
           company,
           environment: body?.tpAmb,
         })
@@ -132,40 +157,14 @@ export class SendEvents2220ESocialService {
         ];
 
     // save on database
-    await Promise.all(
-      sendEventResponse.map(async (resp) => {
-        const examsIds: number[] = [];
-        const isOk = resp.response?.status?.cdResposta == '201';
-        const events: CreateESocialEvent[] = isOk
-          ? resp.events.map(({ examIds: ids, ...event }) => {
-              examsIds.push(...ids);
-              return {
-                employeeId: event.employee.id,
-                eventsDate: event.eventDate,
-                eventXml: event.xml,
-                examHistoryId: event.asoId,
-                eventId: event.id,
-              };
-            })
-          : [];
-
-        await this.eSocialBatchRepository.create({
-          companyId,
-          environment: body?.tpAmb || 1,
-          status: esocialSend
-            ? isOk
-              ? StatusEnum.DONE
-              : StatusEnum.INVALID
-            : StatusEnum.TRANSMITTED,
-          type: EmployeeESocialEventTypeEnum.EXAM_2220,
-          userTransmissionId: user.userId,
-          events,
-          examsIds,
-          protocolId: resp.response?.dadosRecepcaoLote?.protocoloEnvio,
-          response: resp.response,
-        });
-      }),
-    );
+    await this.eSocialEventProvider.saveDatabaseBatchEvent({
+      body,
+      user,
+      company,
+      esocialSend,
+      type: EmployeeESocialEventTypeEnum.EXAM_2220,
+      sendEvents: sendEventResponse,
+    });
 
     const cacheValue: ICacheEventBatchType = false;
     await this.cacheManager.set(CacheEnum.ESOCIAL_FETCH_EVENT, cacheValue, 360);

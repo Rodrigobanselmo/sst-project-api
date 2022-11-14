@@ -42,119 +42,142 @@ export class FetchESocialBatchEventsService {
       orderBy: { created_at: 'desc' },
     });
 
-    await asyncEach(arrayChunks(batches, 20), async (batchChunk) => {
-      await Promise.all(
-        batchChunk.map(async (batch) => {
-          let response: IEsocialFetchBatch.Response;
-          try {
-            const batchResponse =
-              await this.eSocialEventProvider.fetchEventToESocial(batch);
+    if (batches.length > 0) {
+      await asyncEach(arrayChunks(batches, 20), async (batchChunk) => {
+        await Promise.all(
+          batchChunk.map(async (batch) => {
+            let response: IEsocialFetchBatch.Response;
+            try {
+              const batchResponse =
+                await this.eSocialEventProvider.fetchEventToESocial(batch);
 
-            response = batchResponse.response;
-            const status = batchResponse.response?.status;
-            const inProgress = status?.cdResposta == '101';
+              response = batchResponse.response;
+              const status = batchResponse.response?.status;
+              const inProgress = status?.cdResposta == '101';
 
-            if (inProgress) {
-              isInProgress = true;
-              return;
-            }
+              if (inProgress) {
+                isInProgress = true;
+                return;
+              }
 
-            const rejectedBatch = !['101', '201', '202'].includes(
-              status?.cdResposta,
-            );
+              const rejectedBatch = !['101', '201', '202'].includes(
+                status?.cdResposta,
+              );
 
-            if (rejectedBatch) throw new Error('Erro ao consultar lote');
-            response = undefined;
+              if (rejectedBatch) throw new Error('Erro ao consultar lote');
+              response = undefined;
 
-            const eventsResponse =
-              batchResponse.response?.retornoEventos?.evento;
+              const eventsResponse =
+                batchResponse.response?.retornoEventos?.evento;
 
-            const eventsResponseArray = Array.isArray(eventsResponse)
-              ? eventsResponse
-              : [eventsResponse];
+              const eventsResponseArray = Array.isArray(eventsResponse)
+                ? eventsResponse
+                : [eventsResponse];
 
-            await Promise.all(
-              eventsResponseArray.map(async (eventResponse) => {
-                try {
-                  const id = eventResponse.attributes.Id;
-                  const event =
-                    eventResponse?.retornoEvento?.eSocial?.retornoEvento;
+              await Promise.all(
+                eventsResponseArray.map(async (eventResponse) => {
+                  try {
+                    const id = eventResponse.attributes.Id;
+                    const event =
+                      eventResponse?.retornoEvento?.eSocial?.retornoEvento;
 
-                  const process = event?.processamento;
-                  const inProgress = process?.cdResposta == '101';
+                    const process = event?.processamento;
+                    const inProgress = process?.cdResposta == '101';
 
-                  if (inProgress) {
-                    isInProgress = true;
-                    return;
+                    if (inProgress) {
+                      isInProgress = true;
+                      return;
+                    }
+
+                    const rejectedEvent = !['101', '201', '202'].includes(
+                      process?.cdResposta,
+                    );
+
+                    if (rejectedEvent) {
+                      await this.eSocialEventRepository.updateManyNude({
+                        where: { eventId: id },
+                        data: {
+                          status: rejectedEvent ? 'INVALID' : 'DONE',
+                          response: process as any,
+                        },
+                      });
+                    } else {
+                      const found =
+                        await this.eSocialEventRepository.findFirstNude({
+                          where: { eventId: id },
+                          select: { id: true },
+                        });
+
+                      await this.eSocialEventRepository.updateNude({
+                        where: { id: found.id },
+                        data: {
+                          status: rejectedEvent ? 'INVALID' : 'DONE',
+                          response: process as any,
+                          ...(found.examHistoryId && {
+                            exam: { update: { sendEvent: true } },
+                          }),
+                        },
+                      });
+                    }
+                  } catch (err) {
+                    console.log('error on process event', err);
                   }
-
-                  const rejectedEvent = !['101', '201', '202'].includes(
-                    process?.cdResposta,
-                  );
-
-                  await this.eSocialEventRepository.updateManyNude({
-                    where: { eventId: id },
-                    data: {
-                      status: rejectedEvent ? 'INVALID' : 'DONE',
-                      response: process as any,
-                    },
-                  });
-                } catch (err) {
-                  console.log('error on process event', err);
-                }
-              }),
-            );
-          } catch (err) {
-            await this.eSocialBatchRepository.updateNude({
-              where: { id: batch.id },
-              select: {},
-              data: {
-                response: response as any,
-                status: 'INVALID',
-              },
-            });
-
-            await this.eSocialEventRepository.updateManyNude({
-              where: { batchId: { in: batchChunk.map((batch) => batch.id) } },
-              data: {
-                status: 'ERROR',
-                response: response?.status || err?.message.slice(0, 500),
-                //! set null other events to 2240 // 2210 ...
-                eventId: null,
-              },
-            });
-
-            await this.employeeExamHistoryRepository.updateManyNude({
-              where: {
-                event: {
-                  batchId: { in: batchChunk.map((batch) => batch.id) },
+                }),
+              );
+            } catch (err) {
+              await this.eSocialBatchRepository.updateNude({
+                where: { id: batch.id },
+                select: {},
+                data: {
+                  response: response as any,
+                  status: 'INVALID',
                 },
-              },
-              data: { sendEvent: true },
-            });
-            // reject batch, to be send again
-          }
-        }),
-      );
-    });
+              });
 
-    // update companies esocial report
-    await Promise.all(
-      removeDuplicate(batches, { removeById: 'companyId' }).map(
-        async (batch) => {
-          const companyId = batch.companyId;
-          await this.updateESocialReportService.execute({ companyId });
-        },
-      ),
-    );
+              await this.eSocialEventRepository.updateManyNude({
+                where: { batchId: { in: batchChunk.map((batch) => batch.id) } },
+                data: {
+                  status: 'ERROR',
+                  response: response?.status || err?.message.slice(0, 500),
+                  //! set null other events to 2240 // 2210 ...
+                  eventId: null,
+                },
+              });
 
-    if (!isInProgress) {
-      const cacheValue: ICacheEventBatchType = true;
-      await this.cacheManager.set(
-        CacheEnum.ESOCIAL_FETCH_EVENT,
-        cacheValue,
-        360,
+              await this.employeeExamHistoryRepository.updateManyNude({
+                where: {
+                  events: {
+                    some: {
+                      batchId: { in: batchChunk.map((batch) => batch.id) },
+                    },
+                  },
+                },
+                data: { sendEvent: true },
+              });
+              // reject batch, to be send again
+            }
+          }),
+        );
+      });
+
+      // update companies esocial report
+      await Promise.all(
+        removeDuplicate(batches, { removeById: 'companyId' }).map(
+          async (batch) => {
+            const companyId = batch.companyId;
+            await this.updateESocialReportService.execute({ companyId });
+          },
+        ),
       );
+
+      if (!isInProgress) {
+        const cacheValue: ICacheEventBatchType = true;
+        await this.cacheManager.set(
+          CacheEnum.ESOCIAL_FETCH_EVENT,
+          cacheValue,
+          360,
+        );
+      }
     }
 
     return;

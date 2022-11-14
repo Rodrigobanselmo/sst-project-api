@@ -1,3 +1,7 @@
+import {
+  checkExamFields,
+  compareFieldValues,
+} from './../../../../../../../shared/utils/compareFieldValues';
 import { MessageEnum } from './../../../../../../../shared/constants/enum/message.enum';
 import { MessageNotificationDto } from './../../../../../../notifications/dto/nofication.dto';
 import { NotificationRepository } from './../../../../../../notifications/repositories/implementations/NotificationRepository';
@@ -33,27 +37,28 @@ export class UpdateManyScheduleExamHistoryService {
       ? data[0]?.employeeId
       : 0;
 
-    let found: EmployeeEntity;
-    if (!isClinic)
-      found = await this.employeeRepository.findFirstNude({
-        select: { id: true, companyId: true },
-        where: {
-          companyId: user.targetCompanyId,
-          id: employeeId,
-        },
-      });
+    const allExamsIds = data.map((dt) => dt.id);
 
-    if (isClinic)
-      found = await this.employeeRepository.findFirstNude({
-        select: { id: true, companyId: true },
-        where: {
+    const found = await this.employeeRepository.findFirstNude({
+      select: {
+        id: true,
+        companyId: true,
+        examsHistory: { where: { id: { in: allExamsIds } } },
+      },
+      where: {
+        ...(isClinic && {
           OR: [
             { examsHistory: { some: { clinicId: user.targetCompanyId } } },
             { companyId: user.targetCompanyId },
           ],
           id: employeeId,
-        },
-      });
+        }),
+        ...(!isClinic && {
+          companyId: user.targetCompanyId,
+          id: employeeId,
+        }),
+      },
+    });
 
     //tenant
     if (!found?.id)
@@ -63,6 +68,19 @@ export class UpdateManyScheduleExamHistoryService {
       companyId: found.companyId,
       id: employeeId,
       ...dataDto,
+    });
+
+    data = data.map((exam) => {
+      const foundExam = found.examsHistory.find((e) => e.id === exam.id);
+
+      const isEqual = compareFieldValues(foundExam, exam, {
+        fields: checkExamFields,
+      });
+
+      return {
+        ...(isEqual && { sendEvent: true }),
+        ...exam,
+      };
     });
 
     const history = await this.employeeExamHistoryRepository.updateMany({

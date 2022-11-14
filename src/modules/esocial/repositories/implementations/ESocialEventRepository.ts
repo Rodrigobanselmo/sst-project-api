@@ -53,6 +53,7 @@ export class ESocialEventRepository {
       eventXml: true,
       response: true,
       employeeId: true,
+      action: true,
       receipt: true,
       batchId: true,
       batch: { select: { environment: true } },
@@ -78,26 +79,36 @@ export class ESocialEventRepository {
 
     if ('search' in query) {
       (where.AND as any).push({
-        employee: {
-          cpf: {
-            contains: query.search ? onlyNumbers(query.search) || 'no' : '',
-          },
-        },
-        company: {
-          OR: [
-            {
-              group: { name: { contains: query.search, mode: 'insensitive' } },
-            },
-            { name: { contains: query.search, mode: 'insensitive' } },
-            { fantasy: { contains: query.search, mode: 'insensitive' } },
-            { initials: { contains: query.search, mode: 'insensitive' } },
-            {
-              cnpj: {
+        OR: [
+          {
+            employee: {
+              cpf: {
                 contains: query.search ? onlyNumbers(query.search) || 'no' : '',
               },
             },
-          ],
-        },
+          },
+          {
+            company: {
+              OR: [
+                {
+                  group: {
+                    name: { contains: query.search, mode: 'insensitive' },
+                  },
+                },
+                { name: { contains: query.search, mode: 'insensitive' } },
+                { fantasy: { contains: query.search, mode: 'insensitive' } },
+                { initials: { contains: query.search, mode: 'insensitive' } },
+                {
+                  cnpj: {
+                    contains: query.search
+                      ? onlyNumbers(query.search) || 'no'
+                      : '',
+                  },
+                },
+              ],
+            },
+          },
+        ],
       } as typeof options.where);
       delete query.search;
     }
@@ -124,6 +135,11 @@ export class ESocialEventRepository {
 
   async updateNude(options: Prisma.EmployeeESocialEventUpdateArgs) {
     const employee = await this.prisma.employeeESocialEvent.update(options);
+
+    return new EmployeeESocialEventEntity(employee);
+  }
+  async findFirstNude(options: Prisma.EmployeeESocialEventFindFirstArgs) {
+    const employee = await this.prisma.employeeESocialEvent.findFirst(options);
 
     return new EmployeeESocialEventEntity(employee);
   }

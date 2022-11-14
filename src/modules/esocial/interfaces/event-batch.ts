@@ -38,7 +38,7 @@ export interface IEventProps {
     nrRecibo?: string;
   };
   ideEmpregador: { tpInsc?: TpIncsEnum; nrInsc: string };
-  ideVinculo: {
+  ideVinculo?: {
     cpfTrab: string;
     matricula: string;
     // codCateg?: string;

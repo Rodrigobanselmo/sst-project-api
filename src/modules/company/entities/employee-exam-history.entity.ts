@@ -62,7 +62,7 @@ export class EmployeeExamsHistoryEntity implements EmployeeExamsHistory {
   isSequential: boolean;
   sendEvent: boolean;
   // isASO: boolean;
-  event: EmployeeESocialEventEntity;
+  events: EmployeeESocialEventEntity[];
   asoExamId: number;
   asoExam?: EmployeeExamsHistoryEntity;
   complementaryExams?: EmployeeExamsHistoryEntity[];

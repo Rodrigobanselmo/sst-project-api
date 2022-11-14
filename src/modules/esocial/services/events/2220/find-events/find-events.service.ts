@@ -1,15 +1,16 @@
+import { Injectable } from '@nestjs/common';
+
+import { ESocialSendEnum } from '../../../../../../shared/constants/enum/esocial';
+import { UserPayloadDto } from '../../../../../../shared/dto/user-payload.dto';
+import { ESocialEventProvider } from '../../../../../../shared/providers/ESocialProvider/implementations/ESocialEventProvider';
+import { ESocialMethodsProvider } from '../../../../../../shared/providers/ESocialProvider/implementations/ESocialMethodsProvider';
+import { CompanyRepository } from '../../../../../company/repositories/implementations/CompanyRepository';
+import { EmployeeRepository } from '../../../../../company/repositories/implementations/EmployeeRepository';
+import { FindEvents2220Dto } from './../../../../dto/event.dto';
 import {
   mapInverseResAso,
   mapInverseTpExameOcup,
 } from './../../../../interfaces/event-2220';
-import { Injectable } from '@nestjs/common';
-
-import { UserPayloadDto } from '../../../../../../shared/dto/user-payload.dto';
-import { ESocialEventProvider } from '../../../../../../shared/providers/ESocialProvider/implementations/ESocialEventProvider';
-import { CompanyRepository } from '../../../../../company/repositories/implementations/CompanyRepository';
-import { EmployeeRepository } from '../../../../../company/repositories/implementations/EmployeeRepository';
-import { FindEvents2220Dto } from './../../../../dto/event.dto';
-import { ESocialMethodsProvider } from '../../../../../../shared/providers/ESocialProvider/implementations/ESocialMethodsProvider';
 
 @Injectable()
 export class FindEvents2220ESocialService {
@@ -65,6 +66,18 @@ export class FindEvents2220ESocialService {
       const company = data.employee?.company;
       delete data.employee?.company;
 
+      let type: ESocialSendEnum = ESocialSendEnum.SEND;
+      console.log(data.aso);
+      if (
+        data.aso?.events?.some((e) =>
+          ['DONE', 'TRANSMITTED'].includes(e.status),
+        )
+      ) {
+        const isExclude = data.aso.status === 'CANCELED';
+        if (isExclude) type = ESocialSendEnum.EXCLUDE;
+        if (!isExclude) type = ESocialSendEnum.MODIFIED;
+      }
+
       return {
         company,
         doneDate: data.event.exMedOcup.aso.dtAso,
@@ -72,6 +85,7 @@ export class FindEvents2220ESocialService {
         evaluationType: mapInverseTpExameOcup[data.event.exMedOcup.aso?.resAso],
         errors: eventErrors,
         employee: data.employee,
+        type,
         xml: xmlResult,
       };
     });

@@ -3,6 +3,7 @@ import {
   EmployeeESocialEventTypeEnum,
   Prisma,
   StatusEnum,
+  EmployeeESocialEventActionEnum,
 } from '@prisma/client';
 
 import { CompanyEntity } from './../../company/entities/company.entity';
@@ -16,7 +17,7 @@ export class EmployeeESocialEventEntity implements EmployeeESocialEvent {
   batchId: number;
   environment: number;
   eventsDate: Date;
-  status: StatusEnum;
+  status: StatusEnum; // DONE - TRANSMITTED - PROGRESS - INACTIVE - ERROR
   eventXml: string;
   employeeId: number;
   companyId: string;
@@ -29,6 +30,7 @@ export class EmployeeESocialEventEntity implements EmployeeESocialEvent {
   batch?: EmployeeESocialBatchEntity;
   response: Prisma.JsonValue;
   // snapshot: Prisma.JsonValue;
+  action: EmployeeESocialEventActionEnum;
 
   constructor(partial: Partial<EmployeeESocialEventEntity>) {
     Object.assign(this, partial);
