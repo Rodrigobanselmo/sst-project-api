@@ -67,7 +67,6 @@ export class FindEvents2220ESocialService {
       delete data.employee?.company;
 
       let type: ESocialSendEnum = ESocialSendEnum.SEND;
-      console.log(data.aso);
       if (
         data.aso?.events?.some((e) =>
           ['DONE', 'TRANSMITTED'].includes(e.status),

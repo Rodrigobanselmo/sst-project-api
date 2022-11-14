@@ -94,8 +94,6 @@ export class SendEvents2220ESocialService {
       };
     });
 
-    console.log(excludeEntry);
-
     // send exclusion event
     await this.eSocialEventProvider.sendExclusionToESocial({
       body,

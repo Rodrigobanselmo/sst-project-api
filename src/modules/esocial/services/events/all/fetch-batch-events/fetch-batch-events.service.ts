@@ -93,32 +93,22 @@ export class FetchESocialBatchEventsService {
                       process?.cdResposta,
                     );
 
-                    if (rejectedEvent) {
-                      await this.eSocialEventRepository.updateManyNude({
+                    const found =
+                      await this.eSocialEventRepository.findFirstNude({
                         where: { eventId: id },
-                        data: {
-                          status: rejectedEvent ? 'INVALID' : 'DONE',
-                          response: process as any,
-                        },
+                        select: { id: true, examHistoryId: true },
                       });
-                    } else {
-                      const found =
-                        await this.eSocialEventRepository.findFirstNude({
-                          where: { eventId: id },
-                          select: { id: true },
-                        });
 
-                      await this.eSocialEventRepository.updateNude({
-                        where: { id: found.id },
-                        data: {
-                          status: rejectedEvent ? 'INVALID' : 'DONE',
-                          response: process as any,
-                          ...(found.examHistoryId && {
-                            exam: { update: { sendEvent: true } },
-                          }),
-                        },
-                      });
-                    }
+                    await this.eSocialEventRepository.updateNude({
+                      where: { id: found.id },
+                      data: {
+                        status: rejectedEvent ? 'INVALID' : 'DONE',
+                        response: process as any,
+                        ...(found.examHistoryId && {
+                          exam: { update: { sendEvent: true } },
+                        }),
+                      },
+                    });
                   } catch (err) {
                     console.log('error on process event', err);
                   }
