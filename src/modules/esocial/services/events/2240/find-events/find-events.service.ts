@@ -26,6 +26,8 @@ import { DayJSProvider } from '../../../../../../shared/providers/DateProvider/i
 
 @Injectable()
 export class FindEvents2240ESocialService {
+  private end = true;
+  private start = false;
   constructor(
     private readonly eSocialEventProvider: ESocialEventProvider,
     private readonly eSocialMethodsProvider: ESocialMethodsProvider,
@@ -57,14 +59,14 @@ export class FindEvents2240ESocialService {
 
     const employeeTree = {} as Record<string, EmployeeEntity & { actualPPPHistory?: EmployeePPPHistoryEntity[] }>;
     companyFound.employees.forEach((employee) => {
-      const riskTimelineTree = {};
+      const timeline = {};
 
       employee.hierarchyHistory.forEach((history, index) => {
-        const startDate = new Date(history.startDate);
-        const endDate = employee.hierarchyHistory[index + 1] ? new Date(employee.hierarchyHistory[index + 1].startDate) : null;
+        const startDate = this.onGetDate(history.startDate);
+        const endDate = this.onGetDate(employee.hierarchyHistory[index + 1].startDate);
 
-        riskTimelineTree[this.dayjsProvider.format(startDate, 'YYYYMMDD')] = {};
-        if (endDate) riskTimelineTree[this.dayjsProvider.format(endDate, 'YYYYMMDD')] = {};
+        timeline[this.dayjsProvider.format(startDate, 'YYYYMMDD')] = {};
+        if (endDate) timeline[this.dayjsProvider.format(endDate, 'YYYYMMDD')] = {};
 
         const hierarchyIds = [history.hierarchyId, ...history.subHierarchies.map((i) => i.id)];
 
@@ -73,6 +75,37 @@ export class FindEvents2240ESocialService {
           .reduce((acc, curr) => {
             return [...acc, ...curr];
           }, []);
+
+        hierarchyOnHomogeneous.forEach((hh) => {
+          const hhStartDate = this.onGetDate(hh.startDate);
+          const hhEndDate = this.onGetDate(hh.endDate, true);
+
+          const isValidOnStart = this.isDateBetween(startDate, hhStartDate, hhEndDate);
+          const isValidOnEnd = this.isDateBetween(endDate, hhStartDate, hhEndDate);
+
+          if (!isValidOnStart && !isValidOnEnd) return;
+
+          let actualStart = startDate;
+          if (!isValidOnStart) actualStart = hhStartDate;
+          let actualEnd = endDate;
+          if (!isValidOnEnd) actualEnd = hhEndDate;
+
+          hh.homogeneousGroup.riskFactorData.forEach((riskData) => {
+            const rdStartDate = this.onGetDate(riskData.startDate);
+            const rdEndDate = this.onGetDate(riskData.endDate, true);
+
+            const isValidOnStart = this.isDateBetween(actualStart, rdStartDate, rdEndDate);
+            const isValidOnEnd = this.isDateBetween(actualEnd, rdStartDate, rdEndDate);
+
+            if (!isValidOnStart && !isValidOnEnd) return;
+
+            if (!isValidOnStart) {
+            }
+
+            if (!isValidOnEnd) {
+            }
+          });
+        });
 
         // hierarchyOnHomogeneous.
 
@@ -109,7 +142,7 @@ export class FindEvents2240ESocialService {
     //     xml: xmlResult,
     //   }[];
 
-    return employeeTree;
+    return hierarchyTree;
 
     // return riskDataReturn.map((riskData) => new RiskFactorDataEntity(riskData));
 
@@ -405,9 +438,40 @@ export class FindEvents2240ESocialService {
       })
       .filter((i) => i);
 
-    const hierarchiesTree = {} as Record<string, HierarchyEntity>;
+    const hierarchiesTree = {} as Record<string, HierarchyEntity & { timeline: ReturnType<typeof this.addTimeline> }>;
     hierarchies.forEach((rd) => {
-      hierarchiesTree[rd.id] = rd;
+      const timeline: ReturnType<typeof this.addTimeline>[] = [];
+      rd.hierarchyOnHomogeneous.forEach((hh) => {
+        const startDate = this.onGetDate(hh.startDate);
+        const endDate = this.onGetDate(hh.endDate, this.end);
+
+        hh.homogeneousGroup.riskFactorData.forEach((rd) => {
+          const rdStartDate = this.onGetDate(rd.startDate);
+          const rdEndDate = this.onGetDate(rd.endDate, this.end);
+
+          const isValidOnStart = this.isDateBetween(startDate, rdStartDate, rdEndDate);
+          const isValidOnEnd = this.isDateBetween(endDate, rdStartDate, rdEndDate);
+
+          if (!isValidOnStart && !isValidOnEnd) return;
+
+          if (!isValidOnStart) {
+            timeline.push(this.addTimeline(rdStartDate, rd.id, this.start));
+            if (endDate) timeline.push(this.addTimeline(endDate, rd.id, this.end));
+            return;
+          }
+
+          if (!isValidOnEnd) {
+            timeline.push(this.addTimeline(startDate, rd.id, this.start));
+            if (rdEndDate) timeline.push(this.addTimeline(rdEndDate, rd.id, this.end));
+            return;
+          }
+
+          timeline.push(this.addTimeline(startDate, rd.id, this.start));
+          if (endDate) timeline.push(this.addTimeline(endDate, rd.id, this.end));
+        });
+      });
+
+      hierarchiesTree[rd.id] = { ...rd, timeline: timeline.sort((a, b) => sortNumber(a.date, b.date)) };
     });
 
     return hierarchiesTree;
@@ -527,5 +591,44 @@ export class FindEvents2240ESocialService {
 
       return data;
     });
+  };
+
+  onGetDate = (date: Date | null, isEnd?: boolean) => {
+    const nullV = isEnd ? null : new Date(0);
+    if (!date) return nullV;
+    return new Date(date) || nullV;
+  };
+
+  isDateBetween = (date: Date | null, startDate: Date | null, endDate: Date | null) => {
+    const isStartBefore = !startDate || !date || date >= startDate;
+    if (!isStartBefore) return false;
+    const isEndAfter = !endDate || !date || date < endDate;
+    return isStartBefore && isEndAfter;
+  };
+
+  isDateAfterEndDate = (testDate: Date | null, endDate: Date | null) => {
+    if (!endDate) return false;
+    if (!testDate) return true;
+
+    if (endDate < testDate) return false;
+
+    return true;
+  };
+
+  isDateBeforeStartDate = (testDate: Date | null, startDate: Date | null) => {
+    if (!startDate) return false;
+    if (!testDate) return true;
+
+    if (testDate < startDate) return true;
+
+    return false;
+  };
+
+  addTimeline = (date: Date, id: string, isEnd: boolean) => {
+    return {
+      date,
+      id,
+      remove: isEnd,
+    };
   };
 }
