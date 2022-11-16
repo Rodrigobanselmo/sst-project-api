@@ -15,12 +15,9 @@ export const quantityResultsFBVTable = () => {
   const table = new Table({
     width: { size: 100, type: WidthType.PERCENTAGE },
     rows: [
-      tableHeaderElements.headerRow(
-        NewHeaderC5(headerFBV).map(tableHeaderElements.headerCell),
-        {
-          height: { value: 550, rule: HeightRule.EXACT },
-        },
-      ),
+      tableHeaderElements.headerRow(NewHeaderC5(headerFBV).map(tableHeaderElements.headerCell), {
+        height: { value: 550, rule: HeightRule.EXACT },
+      }),
       ...NewBodyC6(rowBodyFullBodyVibration).map((data) =>
         tableBodyElements.tableRow(data.map(tableBodyElements.tableCell), {
           height: { value: 550, rule: HeightRule.ATLEAST },

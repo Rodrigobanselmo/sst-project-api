@@ -9,9 +9,7 @@ describe.skip('UploadUniqueCompanyService', () => {
       providers: [UploadUniqueCompanyService],
     }).compile();
 
-    service = module.get<UploadUniqueCompanyService>(
-      UploadUniqueCompanyService,
-    );
+    service = module.get<UploadUniqueCompanyService>(UploadUniqueCompanyService);
   });
 
   it('should be defined', () => {

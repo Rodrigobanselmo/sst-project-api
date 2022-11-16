@@ -5,9 +5,7 @@ import { DocumentPCMSORepository } from '../../../repositories/implementations/D
 
 @Injectable()
 export class UpsertDocumentPCMSOService {
-  constructor(
-    private readonly documentPCMSORepository: DocumentPCMSORepository,
-  ) {}
+  constructor(private readonly documentPCMSORepository: DocumentPCMSORepository) {}
 
   async execute(dto: UpsertDocumentPCMSODto) {
     const riskData = await this.documentPCMSORepository.upsert(dto);

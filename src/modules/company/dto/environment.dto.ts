@@ -1,12 +1,6 @@
 import { CharacterizationTypeEnum } from '@prisma/client';
 import { Transform } from 'class-transformer';
-import {
-  IsEnum,
-  IsInt,
-  IsOptional,
-  IsString,
-  MaxLength,
-} from 'class-validator';
+import { IsEnum, IsInt, IsOptional, IsString, MaxLength } from 'class-validator';
 import { StringCapitalizeTransform } from '../../../shared/transformers/string-capitalize';
 import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';

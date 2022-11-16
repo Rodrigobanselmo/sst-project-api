@@ -1,9 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { CompanyCharacterizationPhoto } from '@prisma/client';
 
-export class CharacterizationPhotoEntity
-  implements CompanyCharacterizationPhoto
-{
+export class CharacterizationPhotoEntity implements CompanyCharacterizationPhoto {
   @ApiProperty({ description: 'The id of the company environment photo' })
   id: string;
 

@@ -6,22 +6,16 @@ import { ProfessionalRepository } from './../../../repositories/implementations/
 
 @Injectable()
 export class FindAllProfessionalsByCompanyService {
-  constructor(
-    private readonly professionalRepository: ProfessionalRepository,
-  ) {}
-  async execute(
-    { skip, take, ...query }: FindProfessionalsDto,
-    user: UserPayloadDto,
-  ) {
-    const professionals =
-      await this.professionalRepository.findCouncilByCompanyId(
-        {
-          ...query,
-          companyId: user.targetCompanyId,
-          userCompanyId: user.companyId,
-        },
-        { skip, take },
-      );
+  constructor(private readonly professionalRepository: ProfessionalRepository) {}
+  async execute({ skip, take, ...query }: FindProfessionalsDto, user: UserPayloadDto) {
+    const professionals = await this.professionalRepository.findCouncilByCompanyId(
+      {
+        ...query,
+        companyId: user.targetCompanyId,
+        userCompanyId: user.companyId,
+      },
+      { skip, take },
+    );
 
     return professionals;
   }

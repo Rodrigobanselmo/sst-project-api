@@ -1,30 +1,15 @@
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import ExcelJS from 'exceljs';
 import xlsx from 'node-xlsx';
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { ErrorMessageEnum } from '../../../../shared/constants/enum/errorMessage';
 import { sheetStylesConstant } from '../../../../shared/constants/workbooks/styles/sheet-styles.constant';
 import { IWorkbookExcel } from '../../../../shared/interfaces/worksheet.types';
-import {
-  getObjectValueFromString,
-  transformStringToObject,
-} from '../../../../shared/utils/transformStringToObject';
+import { getObjectValueFromString, transformStringToObject } from '../../../../shared/utils/transformStringToObject';
 
-import {
-  IExcelProvider,
-  IExcelReadData,
-  ITableSchema,
-} from '../models/IExcelProvider.types';
+import { IExcelProvider, IExcelReadData, ITableSchema } from '../models/IExcelProvider.types';
 
-const addVersion = (
-  worksheet: ExcelJS.Worksheet,
-  version: number,
-  lastUpdate: Date,
-) => {
+const addVersion = (worksheet: ExcelJS.Worksheet, version: number, lastUpdate: Date) => {
   worksheet.addRow(['Versão', version, new Date(lastUpdate)]);
 
   const row = worksheet.lastRow;
@@ -51,12 +36,7 @@ const addRules = (worksheet: ExcelJS.Worksheet) => {
   row.getCell(3).border = sheetStylesConstant.border.addMore;
 };
 
-const addHeader = async (
-  worksheet: ExcelJS.Worksheet,
-  columns: ITableSchema[],
-  prisma?: PrismaService,
-  companyId?: string,
-) => {
+const addHeader = async (worksheet: ExcelJS.Worksheet, columns: ITableSchema[], prisma?: PrismaService, companyId?: string) => {
   const rows = columns.map((row) => row.excelName);
   const columnsWidth = columns.map((row) => ({
     width: row.excelName.length > 20 ? row.excelName.length : 18,
@@ -161,11 +141,7 @@ class ExcelProvider implements IExcelProvider {
         });
 
         if (workbookExcel.version) {
-          addVersion(
-            worksheet,
-            workbookExcel.version,
-            workbookExcel.lastUpdate,
-          );
+          addVersion(worksheet, workbookExcel.version, workbookExcel.lastUpdate);
           addEmptyRow(worksheet);
         }
 
@@ -196,10 +172,7 @@ class ExcelProvider implements IExcelProvider {
       const workSheetsFromBuffer = xlsx.parse(buffer);
       return workSheetsFromBuffer as IExcelReadData[];
     } catch (error) {
-      throw new InternalServerErrorException(
-        error,
-        'Error occurred when reading the file',
-      );
+      throw new InternalServerErrorException(error, 'Error occurred when reading the file');
     }
   }
 
@@ -218,10 +191,7 @@ class ExcelProvider implements IExcelProvider {
             if (typeof value === 'object') {
               if (indexRow !== 0) rows[indexRow][0] = '-';
 
-              rows[indexRow][indexCell] = getObjectValueFromString(
-                cellSchema.databaseName.split('.').slice(1).join('.'),
-                value,
-              );
+              rows[indexRow][indexCell] = getObjectValueFromString(cellSchema.databaseName.split('.').slice(1).join('.'), value);
             } else {
               rows[indexRow][indexCell] = value;
             }
@@ -240,11 +210,7 @@ class ExcelProvider implements IExcelProvider {
     return rowsData;
   }
 
-  async transformToTableData(
-    excelReadData: IExcelReadData,
-    tableSchema: ITableSchema[],
-    options?: { isArrayWithMissingFirstData?: boolean },
-  ) {
+  async transformToTableData(excelReadData: IExcelReadData, tableSchema: ITableSchema[], options?: { isArrayWithMissingFirstData?: boolean }) {
     const transformStep = {
       startMap: false,
       row: 0,
@@ -255,16 +221,11 @@ class ExcelProvider implements IExcelProvider {
     let databaseRow = {} as any;
 
     excelReadData.data.forEach((excelRow, indexRow) => {
-      const isArrayData =
-        excelRow[0] === '-' ||
-        (options && options.isArrayWithMissingFirstData && !excelRow[0]);
+      const isArrayData = excelRow[0] === '-' || (options && options.isArrayWithMissingFirstData && !excelRow[0]);
 
       const isNextArrayData =
         excelReadData.data[indexRow + 1] &&
-        (excelReadData.data[indexRow + 1][0] === '-' ||
-          (options &&
-            options.isArrayWithMissingFirstData &&
-            excelReadData.data[indexRow + 1].some((row) => row)));
+        (excelReadData.data[indexRow + 1][0] === '-' || (options && options.isArrayWithMissingFirstData && excelReadData.data[indexRow + 1].some((row) => row)));
 
       const saveIndexes = {
         hasSaved: false,
@@ -276,18 +237,12 @@ class ExcelProvider implements IExcelProvider {
 
       if (transformStep.startMap) {
         tableSchema.forEach((tableSchemaCell, indexCell) => {
-          const actualCell = ` spreadsheet ${excelReadData.name}, linha ${
-            indexRow + 1
-          } e coluna ${indexCell + 1}`;
+          const actualCell = ` spreadsheet ${excelReadData.name}, linha ${indexRow + 1} e coluna ${indexCell + 1}`;
 
           const excelCell = excelRow[indexCell];
-          const isEmptyCell =
-            excelCell === null ||
-            excelCell === undefined ||
-            (excelCell === '-' && indexCell == 0);
+          const isEmptyCell = excelCell === null || excelCell === undefined || (excelCell === '-' && indexCell == 0);
 
-          const isMissingField =
-            isEmptyCell && !isArrayData && tableSchemaCell.required;
+          const isMissingField = isEmptyCell && !isArrayData && tableSchemaCell.required;
 
           const isMissingArrayField =
             isEmptyCell &&
@@ -295,41 +250,25 @@ class ExcelProvider implements IExcelProvider {
             tableSchemaCell.required &&
             tableSchemaCell.isArray &&
             !tableSchema.every((tCell, idxCell) => {
-              return (
-                tCell.databaseName.split('.')[0] !==
-                  tableSchemaCell.databaseName.split('.')[0] ||
-                excelRow[idxCell] === null ||
-                excelRow[idxCell] === undefined
-              );
+              return tCell.databaseName.split('.')[0] !== tableSchemaCell.databaseName.split('.')[0] || excelRow[idxCell] === null || excelRow[idxCell] === undefined;
             });
 
-          if (isMissingField || isMissingArrayField)
-            throw new BadRequestException(
-              `Esta faltando um campo obrigatório na ${actualCell}`,
-            );
+          if (isMissingField || isMissingArrayField) throw new BadRequestException(`Esta faltando um campo obrigatório na ${actualCell}`);
 
-          if (isArrayData && !tableSchemaCell.isArray && !isEmptyCell)
-            throw new BadRequestException(
-              `This is not an array property on ${actualCell}`,
-            );
+          if (isArrayData && !tableSchemaCell.isArray && !isEmptyCell) throw new BadRequestException(`This is not an array property on ${actualCell}`);
 
           if (isEmptyCell) return;
 
           let checkedData = tableSchemaCell.checkHandler(excelCell);
 
-          if (checkedData === false && excelCell != '-')
-            throw new BadRequestException(`Dado inválido na ${actualCell}`);
+          if (checkedData === false && excelCell != '-') throw new BadRequestException(`Dado inválido na ${actualCell}`);
 
           if (checkedData === 'false') checkedData = false;
 
-          const nestedObject = transformStringToObject(
-            tableSchemaCell.databaseName,
-            checkedData,
-          );
+          const nestedObject = transformStringToObject(tableSchemaCell.databaseName, checkedData);
 
           const firstParam = tableSchemaCell.databaseName.split('.')[0];
-          const isMultipleParams =
-            tableSchemaCell.databaseName.split('.').length > 1;
+          const isMultipleParams = tableSchemaCell.databaseName.split('.').length > 1;
 
           if (tableSchemaCell.isArray) {
             if (!databaseRow[firstParam]) databaseRow[firstParam] = [];
@@ -342,8 +281,7 @@ class ExcelProvider implements IExcelProvider {
             const indexRowArray = saveIndexes.indexDatabase;
 
             if (isMultipleParams) {
-              if (!databaseRow[firstParam][indexRowArray])
-                databaseRow[firstParam][indexRowArray] = {};
+              if (!databaseRow[firstParam][indexRowArray]) databaseRow[firstParam][indexRowArray] = {};
 
               return (databaseRow[firstParam][indexRowArray] = {
                 ...databaseRow[firstParam][indexRowArray],
@@ -352,8 +290,7 @@ class ExcelProvider implements IExcelProvider {
             }
 
             if (!isMultipleParams) {
-              return (databaseRow[firstParam][indexRowArray] =
-                nestedObject[firstParam]);
+              return (databaseRow[firstParam][indexRowArray] = nestedObject[firstParam]);
             }
           }
 
@@ -386,15 +323,12 @@ class ExcelProvider implements IExcelProvider {
 
       if (!sameLength) return;
 
-      const isTableHeader = excelHeader.every(
-        (column, i) => excelRow[i] == column,
-      );
+      const isTableHeader = excelHeader.every((column, i) => excelRow[i] == column);
 
       if (isTableHeader) transformStep.startMap = true;
     });
 
-    if (databaseRows.length === 0 && !transformStep.startMap)
-      throw new BadRequestException(ErrorMessageEnum.FILE_WRONG_TABLE_HEAD);
+    if (databaseRows.length === 0 && !transformStep.startMap) throw new BadRequestException(ErrorMessageEnum.FILE_WRONG_TABLE_HEAD);
 
     return {
       rows: databaseRows,

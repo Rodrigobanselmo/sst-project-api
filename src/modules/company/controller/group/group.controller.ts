@@ -1,18 +1,12 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import {
-  FindCompanyGroupDto,
-  UpsertCompanyGroupDto,
-} from '../../dto/company-group.dto';
+import { FindCompanyGroupDto, UpsertCompanyGroupDto } from '../../dto/company-group.dto';
 import { FindAvailableCompanyGroupsService } from '../../services/group/find-company-groups-group/find-company-groups-group.service';
 import { UpsertCompanyGroupsService } from '../../services/group/upsert-company-group/upsert-company-group.service';
 
 import { User } from './../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from './../../../../shared/dto/user-payload.dto';
-import {
-  PermissionEnum,
-  RoleEnum,
-} from '../../../../shared/constants/enum/authorization';
+import { PermissionEnum, RoleEnum } from '../../../../shared/constants/enum/authorization';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 import { Roles } from '../../../../shared/decorators/roles.decorator';
 @ApiTags('company-group')
@@ -25,14 +19,8 @@ export class CompanyGroupController {
 
   @Roles(RoleEnum.COMPANY, RoleEnum.CONTRACTS, RoleEnum.USER)
   @Get()
-  find(
-    @User() userPayloadDto: UserPayloadDto,
-    @Query() query: FindCompanyGroupDto,
-  ) {
-    return this.findAvailableCompanyGroupsService.execute(
-      query,
-      userPayloadDto,
-    );
+  find(@User() userPayloadDto: UserPayloadDto, @Query() query: FindCompanyGroupDto) {
+    return this.findAvailableCompanyGroupsService.execute(query, userPayloadDto);
   }
 
   @Permissions({
@@ -41,13 +29,7 @@ export class CompanyGroupController {
     isMember: true,
   })
   @Post()
-  upsert(
-    @Body() upsertAccessGroupDto: UpsertCompanyGroupDto,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
-    return this.upsertCompanyGroupsService.execute(
-      upsertAccessGroupDto,
-      userPayloadDto,
-    );
+  upsert(@Body() upsertAccessGroupDto: UpsertCompanyGroupDto, @User() userPayloadDto: UserPayloadDto) {
+    return this.upsertCompanyGroupsService.execute(upsertAccessGroupDto, userPayloadDto);
   }
 }

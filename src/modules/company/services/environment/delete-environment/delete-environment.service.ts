@@ -16,11 +16,7 @@ export class DeleteEnvironmentService {
     private readonly homoGroupRepository: HomoGroupRepository,
   ) {}
 
-  async execute(
-    id: string,
-    workspaceId: string,
-    userPayloadDto: UserPayloadDto,
-  ) {
+  async execute(id: string, workspaceId: string, userPayloadDto: UserPayloadDto) {
     const photos = await this.environmentPhotoRepository.findByEnvironment(id);
 
     await Promise.all(
@@ -38,9 +34,7 @@ export class DeleteEnvironmentService {
     const environments = await this.environmentRepository.findById(id);
 
     if (environments.companyId !== userPayloadDto.targetCompanyId) {
-      throw new BadRequestException(
-        ErrorMessageEnum.NOT_FOUND_ON_COMPANY_TO_DELETE,
-      );
+      throw new BadRequestException(ErrorMessageEnum.NOT_FOUND_ON_COMPANY_TO_DELETE);
     }
 
     await this.homoGroupRepository.deleteById(id);

@@ -16,8 +16,7 @@ export class FindByIdEnvironmentService {
       },
     });
 
-    if (environment.companyId != userPayloadDto.targetCompanyId)
-      throw new BadRequestException(ErrorCompanyEnum.ENVIRONMENT_NOT_FOUND);
+    if (environment.companyId != userPayloadDto.targetCompanyId) throw new BadRequestException(ErrorCompanyEnum.ENVIRONMENT_NOT_FOUND);
 
     return environment;
   }

@@ -8,30 +8,17 @@ import { chapterSection } from '../../../base/layouts/chapter/chapter';
 import { coverSections } from '../../../base/layouts/cover/cover';
 import { headerAndFooter } from '../../../base/layouts/headerAndFooter/headerAndFooter';
 import { summarySections } from '../../../base/layouts/summary/summary';
-import {
-  HierarchyMapData,
-  IHomoGroupMap,
-} from '../../../converter/hierarchy.converter';
+import { HierarchyMapData, IHomoGroupMap } from '../../../converter/hierarchy.converter';
 import { convertToDocxHelper } from '../functions/convertToDocx';
 import { replaceAllVariables } from '../functions/replaceAllVariables';
 import { ISectionChildrenType } from '../types/elements.types';
-import {
-  IAllSectionTypesPGR,
-  IChapter,
-  ICover,
-  IDocVariables,
-  ISection,
-  PGRSectionTypeEnum,
-} from '../types/section.types';
+import { IAllSectionTypesPGR, IChapter, ICover, IDocVariables, ISection, PGRSectionTypeEnum } from '../types/section.types';
 import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
 import { EnvironmentEntity } from './../../../../../company/entities/environment.entity';
 import { IMapElementDocumentType } from './elementTypeMap';
 import { allCharacterizationSections } from '../../../components/iterables/all-characterization/all-characterization.sections';
 
-type IMapSectionDocumentType = Record<
-  string,
-  (arg: IAllSectionTypesPGR) => ISectionOptions | ISectionOptions[]
->;
+type IMapSectionDocumentType = Record<string, (arg: IAllSectionTypesPGR) => ISectionOptions | ISectionOptions[]>;
 
 type IDocumentClassType = {
   variables?: IDocVariables;
@@ -96,9 +83,7 @@ export class SectionsMapClass {
       coverSections({
         imgPath: this.logoPath,
         version: this.version,
-        companyName: `${this.company.name} ${
-          this.company.initials ? `(${this.company.initials})` : ''
-        }`,
+        companyName: `${this.company.name} ${this.company.initials ? `(${this.company.initials})` : ''}`,
         ...(this.cover && (this.cover.json as any)),
       }),
     [PGRSectionTypeEnum.CHAPTER]: ({ text }: IChapter) =>
@@ -107,40 +92,28 @@ export class SectionsMapClass {
         chapter: replaceAllVariables(text, this.variables),
         imagePath: this.logoPath,
       }),
-    [PGRSectionTypeEnum.SECTION]: ({
-      children,
-      footerText,
-      ...rest
-    }: ISection) => ({
+    [PGRSectionTypeEnum.SECTION]: ({ children, footerText, ...rest }: ISection) => ({
       children: this.convertToDocx(children),
       ...this.getFooterHeader(footerText),
       ...rest,
       ...sectionLandscapeProperties,
     }),
     [PGRSectionTypeEnum.ITERABLE_ENVIRONMENTS]: (): ISectionOptions[] =>
-      allCharacterizationSections(
-        this.environments,
-        this.hierarchy,
-        this.homogeneousGroup,
-        'env',
-        (x, v) => this.convertToDocx(x, v),
-      ).map(({ footerText, children }) => ({
-        children,
-        ...this.getFooterHeader(footerText),
-        ...sectionLandscapeProperties,
-      })),
+      allCharacterizationSections(this.environments, this.hierarchy, this.homogeneousGroup, 'env', (x, v) => this.convertToDocx(x, v)).map(
+        ({ footerText, children }) => ({
+          children,
+          ...this.getFooterHeader(footerText),
+          ...sectionLandscapeProperties,
+        }),
+      ),
     [PGRSectionTypeEnum.ITERABLE_CHARACTERIZATION]: (): ISectionOptions[] =>
-      allCharacterizationSections(
-        this.characterizations,
-        this.hierarchy,
-        this.homogeneousGroup,
-        'char',
-        (x, v) => this.convertToDocx(x, v),
-      ).map(({ footerText, children }) => ({
-        children,
-        ...this.getFooterHeader(footerText),
-        ...sectionLandscapeProperties,
-      })),
+      allCharacterizationSections(this.characterizations, this.hierarchy, this.homogeneousGroup, 'char', (x, v) => this.convertToDocx(x, v)).map(
+        ({ footerText, children }) => ({
+          children,
+          ...this.getFooterHeader(footerText),
+          ...sectionLandscapeProperties,
+        }),
+      ),
     // [PGRSectionTypeEnum.APR]: () =>
     //   APPRTableSection(this.document, this.hierarchy, this.homogeneousGroup),
   };
@@ -154,10 +127,7 @@ export class SectionsMapClass {
     });
   };
 
-  private convertToDocx(
-    data: ISectionChildrenType[],
-    variables = {} as IDocVariables,
-  ) {
+  private convertToDocx(data: ISectionChildrenType[], variables = {} as IDocVariables) {
     return data
       .map((child) => {
         const childData = convertToDocxHelper(child, {

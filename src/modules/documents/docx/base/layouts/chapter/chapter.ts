@@ -1,19 +1,5 @@
 import { setNiceProportion } from './../../../../../../shared/utils/setNiceProportion';
-import {
-  AlignmentType,
-  Footer,
-  Header,
-  HeightRule,
-  ImageRun,
-  ISectionOptions,
-  Paragraph,
-  Table,
-  TableCell,
-  TableRow,
-  TextRun,
-  VerticalAlign,
-  WidthType,
-} from 'docx';
+import { AlignmentType, Footer, Header, HeightRule, ImageRun, ISectionOptions, Paragraph, Table, TableCell, TableRow, TextRun, VerticalAlign, WidthType } from 'docx';
 import fs from 'fs';
 import sizeOf from 'image-size';
 import { borderNoneStyle, sectionCoverProperties } from '../../config/styles';
@@ -50,19 +36,12 @@ const table = (rows: TableRow[]) =>
   });
 
 const imageCover = (imgPath: string, verticalAlign: VerticalAlign) => {
-  const { height: imgHeight, width: imgWidth } = sizeOf(
-    fs.readFileSync(imgPath),
-  );
+  const { height: imgHeight, width: imgWidth } = sizeOf(fs.readFileSync(imgPath));
 
   const maxWidth = 630;
   const maxHeight = 200;
 
-  const { height, width } = setNiceProportion(
-    maxWidth,
-    maxHeight,
-    imgWidth,
-    imgHeight,
-  );
+  const { height, width } = setNiceProportion(maxWidth, maxHeight, imgWidth, imgHeight);
 
   return new TableCell({
     width: { size: 100, type: WidthType.PERCENTAGE },
@@ -84,16 +63,10 @@ const imageCover = (imgPath: string, verticalAlign: VerticalAlign) => {
   });
 };
 
-export const createChapterPage = ({
-  version,
-  chapter,
-  imagePath,
-}: IChapterProps) => {
+export const createChapterPage = ({ version, chapter, imagePath }: IChapterProps) => {
   return table([
     new TableRow({
-      children: [
-        text('PROGRAMA DE GERENCIAMENTO DE RISCOS – PGR', VerticalAlign.TOP),
-      ],
+      children: [text('PROGRAMA DE GERENCIAMENTO DE RISCOS – PGR', VerticalAlign.TOP)],
       height: { value: 1500, rule: HeightRule.EXACT },
     }),
     ...(imagePath
@@ -115,11 +88,7 @@ export const createChapterPage = ({
   ]);
 };
 
-export const chapterSection = ({
-  version,
-  chapter,
-  imagePath,
-}: IChapterProps): ISectionOptions => {
+export const chapterSection = ({ version, chapter, imagePath }: IChapterProps): ISectionOptions => {
   return {
     children: [createChapterPage({ version, chapter, imagePath })],
     properties: sectionCoverProperties,

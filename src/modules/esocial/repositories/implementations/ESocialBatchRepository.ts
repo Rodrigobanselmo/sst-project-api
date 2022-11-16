@@ -3,10 +3,7 @@ import { PaginationQueryDto } from './../../../../shared/dto/pagination.dto';
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
-import {
-  CreateESocialBatch,
-  FindESocialBatchDto,
-} from '../../dto/esocial-batch.dto';
+import { CreateESocialBatch, FindESocialBatchDto } from '../../dto/esocial-batch.dto';
 import { EmployeeESocialBatchEntity } from '../../entities/employeeEsocialBatch.entity';
 import { Prisma, StatusEnum } from '@prisma/client';
 import { onlyNumbers } from '@brazilian-utils/brazilian-utils';
@@ -15,15 +12,7 @@ import { onlyNumbers } from '@brazilian-utils/brazilian-utils';
 export class ESocialBatchRepository {
   constructor(private prisma: PrismaService) {}
 
-  async create({
-    companyId,
-    events,
-    environment,
-    status,
-    type,
-    examsIds,
-    ...rest
-  }: CreateESocialBatch) {
+  async create({ companyId, events, environment, status, type, examsIds, ...rest }: CreateESocialBatch) {
     const batch = await this.prisma.employeeESocialBatch.create({
       data: {
         type,
@@ -36,10 +25,7 @@ export class ESocialBatchRepository {
               create: events.map((event) => ({
                 companyId,
                 type,
-                status:
-                  status == StatusEnum.TRANSMITTED
-                    ? StatusEnum.TRANSMITTED
-                    : StatusEnum.PROCESSING,
+                status: status == StatusEnum.TRANSMITTED ? StatusEnum.TRANSMITTED : StatusEnum.PROCESSING,
                 ...event,
               })),
             },
@@ -66,11 +52,7 @@ export class ESocialBatchRepository {
     return data.map((data) => new EmployeeESocialBatchEntity(data));
   }
 
-  async find(
-    query: Partial<FindESocialBatchDto>,
-    pagination: PaginationQueryDto,
-    options: Prisma.EmployeeESocialBatchFindManyArgs = {},
-  ) {
+  async find(query: Partial<FindESocialBatchDto>, pagination: PaginationQueryDto, options: Prisma.EmployeeESocialBatchFindManyArgs = {}) {
     const companyId = query.companyId;
     const whereInit = {
       AND: [
@@ -160,9 +142,7 @@ export class ESocialBatchRepository {
     ]);
 
     return {
-      data: response[1].map(
-        (employee) => new EmployeeESocialBatchEntity(employee),
-      ),
+      data: response[1].map((employee) => new EmployeeESocialBatchEntity(employee)),
       count: response[0],
     };
   }

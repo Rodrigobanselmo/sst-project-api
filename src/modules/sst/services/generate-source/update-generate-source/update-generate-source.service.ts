@@ -6,25 +6,15 @@ import { isMaster } from '../../../../../shared/utils/isMater';
 
 @Injectable()
 export class UpdateGenerateSourceService {
-  constructor(
-    private readonly generateSourceRepository: GenerateSourceRepository,
-  ) {}
+  constructor(private readonly generateSourceRepository: GenerateSourceRepository) {}
 
-  async execute(
-    id: string,
-    updateGenerateSourceDto: UpdateGenerateSourceDto,
-    userPayloadDto: UserPayloadDto,
-  ) {
+  async execute(id: string, updateGenerateSourceDto: UpdateGenerateSourceDto, userPayloadDto: UserPayloadDto) {
     const user = isMaster(userPayloadDto, updateGenerateSourceDto.companyId);
     const companyId = user.companyId;
 
-    const system =
-      user.isSystem && user.companyId === updateGenerateSourceDto.companyId;
+    const system = user.isSystem && user.companyId === updateGenerateSourceDto.companyId;
 
-    const generateSource = await this.generateSourceRepository.findById(
-      id,
-      companyId,
-    );
+    const generateSource = await this.generateSourceRepository.findById(id, companyId);
 
     if (!generateSource?.id) throw new NotFoundException('data not found');
 
@@ -38,8 +28,7 @@ export class UpdateGenerateSourceService {
       companyId,
     );
 
-    if (!generateSourceUpdated.id)
-      throw new NotFoundException('data not found');
+    if (!generateSourceUpdated.id) throw new NotFoundException('data not found');
 
     return generateSourceUpdated;
   }

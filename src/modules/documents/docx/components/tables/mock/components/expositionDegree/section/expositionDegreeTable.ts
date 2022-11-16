@@ -1,21 +1,13 @@
 import { Paragraph, Table } from 'docx';
 
-import {
-  ISectionChildrenType,
-  PGRSectionChildrenTypeEnum,
-} from '../../../../../../builders/pgr/types/elements.types';
+import { ISectionChildrenType, PGRSectionChildrenTypeEnum } from '../../../../../../builders/pgr/types/elements.types';
 import { IDocVariables } from '../../../../../../builders/pgr/types/section.types';
 import { expositionDegreeATable } from '../tables/expositionDegreeATable';
 import { expositionDegreeBTable } from '../tables/expositionDegreeBTable';
 import { expositionDegreeETable } from '../tables/expositionDegreeETable';
 import { expositionDegreeFQTable } from '../tables/expositionDegreeFQTable';
 
-export const expositionDegreeTable = (
-  convertToDocx: (
-    data: ISectionChildrenType[],
-    variables?: IDocVariables,
-  ) => (Paragraph | Table)[],
-) => {
+export const expositionDegreeTable = (convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[]) => {
   const table1 = convertToDocx([
     {
       type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE,

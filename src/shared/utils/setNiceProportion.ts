@@ -1,9 +1,4 @@
-export const setNiceProportion = (
-  maxWidth: number,
-  maxHeight: number,
-  imgWidth: number,
-  imgHeight: number,
-) => {
+export const setNiceProportion = (maxWidth: number, maxHeight: number, imgWidth: number, imgHeight: number) => {
   let width = maxWidth;
   let height = maxHeight;
 

@@ -9,8 +9,7 @@ export const checkIsValidCpf = (value: any) => {
   }
 
   if (typeof transformToString === 'string') {
-    if (isValidCPF(transformToString.padStart(11, '0')))
-      return onlyNumbers(transformToString.padStart(11, '0'));
+    if (isValidCPF(transformToString.padStart(11, '0'))) return onlyNumbers(transformToString.padStart(11, '0'));
   }
 
   return false;

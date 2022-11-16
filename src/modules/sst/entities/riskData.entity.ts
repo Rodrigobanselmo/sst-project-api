@@ -13,12 +13,7 @@ import {
   IRiskDataJsonVibration,
   QuantityTypeEnum,
 } from '../../company/interfaces/risk-data-json.types';
-import {
-  heatTableLEOConstant,
-  heatTableLIIConstant,
-  heatTableNAConstant,
-  heatTableTETOConstant,
-} from '../../documents/constants/heatTable.constant';
+import { heatTableLEOConstant, heatTableLIIConstant, heatTableNAConstant, heatTableTETOConstant } from '../../documents/constants/heatTable.constant';
 import { EpiEntity } from './epi.entity';
 import { GenerateSourceEntity } from './generateSource.entity';
 import { RecMedEntity } from './recMed.entity';
@@ -150,19 +145,9 @@ export class RiskFactorDataEntity implements RiskFactorData {
   private getBaseExams() {
     if (this.riskFactor && this.riskFactor?.examToRisk && this.standardExams) {
       this.riskFactor?.examToRisk.forEach((examData) => {
-        if (
-          examData?.minRiskDegreeQuantity &&
-          this.isQuantity &&
-          this.level < examData?.minRiskDegreeQuantity
-        )
-          return;
+        if (examData?.minRiskDegreeQuantity && this.isQuantity && this.level < examData?.minRiskDegreeQuantity) return;
 
-        if (
-          examData?.minRiskDegree &&
-          (!this.isQuantity || !examData?.minRiskDegreeQuantity) &&
-          this.level < examData?.minRiskDegree
-        )
-          return;
+        if (examData?.minRiskDegree && (!this.isQuantity || !examData?.minRiskDegreeQuantity) && this.level < examData?.minRiskDegree) return;
 
         if (!this.examsToRiskFactorData) this.examsToRiskFactorData = [];
 
@@ -191,9 +176,7 @@ export class RiskFactorDataEntity implements RiskFactorData {
   private setRecMedExamData(partial: Partial<RiskFactorDataEntity>) {
     if (!this.epis) this.epis = [];
     if (partial.epiToRiskFactorData) {
-      this.epiToRiskFactorData = partial.epiToRiskFactorData.map(
-        (epiToRiskFactorData) => new EpiRiskDataEntity(epiToRiskFactorData),
-      );
+      this.epiToRiskFactorData = partial.epiToRiskFactorData.map((epiToRiskFactorData) => new EpiRiskDataEntity(epiToRiskFactorData));
 
       this.epis = this.epiToRiskFactorData.map(
         ({ epi, ...epiToRiskFactorData }) =>
@@ -206,9 +189,7 @@ export class RiskFactorDataEntity implements RiskFactorData {
 
     if (!this.engs) this.engs = [];
     if (partial.engsToRiskFactorData) {
-      this.engsToRiskFactorData = partial.engsToRiskFactorData.map(
-        (engsToRiskFactorData) => new EngsRiskDataEntity(engsToRiskFactorData),
-      );
+      this.engsToRiskFactorData = partial.engsToRiskFactorData.map((engsToRiskFactorData) => new EngsRiskDataEntity(engsToRiskFactorData));
 
       this.engs = this.engsToRiskFactorData.map(
         ({ recMed, ...engsToRiskFactorData }) =>
@@ -221,10 +202,7 @@ export class RiskFactorDataEntity implements RiskFactorData {
 
     if (!this.exams) this.exams = [];
     if (partial.examsToRiskFactorData) {
-      this.examsToRiskFactorData = partial.examsToRiskFactorData.map(
-        (examsToRiskFactorData) =>
-          new ExamRiskDataEntity(examsToRiskFactorData),
-      );
+      this.examsToRiskFactorData = partial.examsToRiskFactorData.map((examsToRiskFactorData) => new ExamRiskDataEntity(examsToRiskFactorData));
 
       this.exams = this.examsToRiskFactorData.map(
         ({ exam, ...examsToRiskFactorData }) =>
@@ -248,26 +226,15 @@ export class RiskFactorDataEntity implements RiskFactorData {
 
   private getOrigin() {
     if (this.homogeneousGroup) {
-      if (this.homogeneousGroup.environment)
-        this.origin = `${this.homogeneousGroup.environment.name}\n(${
-          originRiskMap[this.homogeneousGroup.environment.type].name
-        })`;
+      if (this.homogeneousGroup.environment) this.origin = `${this.homogeneousGroup.environment.name}\n(${originRiskMap[this.homogeneousGroup.environment.type].name})`;
 
-      if (
-        this.homogeneousGroup.hierarchy &&
-        this.homogeneousGroup.hierarchy.name
-      )
-        this.origin = `${this.homogeneousGroup.hierarchy.name}\n(${
-          originRiskMap[this.homogeneousGroup.hierarchy.type].name
-        })`;
+      if (this.homogeneousGroup.hierarchy && this.homogeneousGroup.hierarchy.name)
+        this.origin = `${this.homogeneousGroup.hierarchy.name}\n(${originRiskMap[this.homogeneousGroup.hierarchy.type].name})`;
 
       if (this.homogeneousGroup.characterization)
-        this.origin = `${this.homogeneousGroup.characterization.name}\n(${
-          originRiskMap[this.homogeneousGroup.characterization.type].name
-        })`;
+        this.origin = `${this.homogeneousGroup.characterization.name}\n(${originRiskMap[this.homogeneousGroup.characterization.type].name})`;
 
-      if (!this.homogeneousGroup.type)
-        this.origin = `${this.homogeneousGroup.name}\n(GSE)`;
+      if (!this.homogeneousGroup.type) this.origin = `${this.homogeneousGroup.name}\n(GSE)`;
     }
   }
 
@@ -277,27 +244,14 @@ export class RiskFactorDataEntity implements RiskFactorData {
     const isTwaTeto = data.twa && data.twa.includes('C');
     const isVmpTeto = data.vmp && data.vmp.includes('T');
 
-    const nr15ltProb = this.percentageCheck(
-      data.nr15ltValue,
-      data.nr15lt,
-      isNr15Teto ? 1 : 5,
-    );
-    const stelProb = this.percentageCheck(
-      data.stelValue,
-      data.stel,
-      isStelTeto ? 1 : 5,
-    );
-    const twaProb = this.percentageCheck(
-      data.twaValue,
-      data.twa,
-      isTwaTeto ? 1 : 5,
-    );
+    const nr15ltProb = this.percentageCheck(data.nr15ltValue, data.nr15lt, isNr15Teto ? 1 : 5);
+    const stelProb = this.percentageCheck(data.stelValue, data.stel, isStelTeto ? 1 : 5);
+    const twaProb = this.percentageCheck(data.twaValue, data.twa, isTwaTeto ? 1 : 5);
     const vmpProb = this.percentageCheck(data.vmpValue, data.vmp, 1);
 
     if (nr15ltProb || stelProb || twaProb || vmpProb) {
       this.isQuantity = true;
-      this.probability =
-        nr15ltProb || stelProb || twaProb || vmpProb || undefined;
+      this.probability = nr15ltProb || stelProb || twaProb || vmpProb || undefined;
 
       //! get max probability when some prop is passed
       // this.probability = Math.max(nr15ltProb, stelProb, twaProb, vmpProb) || undefined;
@@ -333,9 +287,7 @@ export class RiskFactorDataEntity implements RiskFactorData {
     const limitVcvrList = [0, 2.1, 9.1, 16.4, 21.01, 10000000000];
 
     const arenValue = this.valuesCheck(data?.aren, limitArenList);
-    const vdvrValeu = data?.vdvr
-      ? this.valuesCheck(data?.vdvr, limitVcvrList)
-      : 0;
+    const vdvrValeu = data?.vdvr ? this.valuesCheck(data?.vdvr, limitVcvrList) : 0;
 
     if (arenValue || vdvrValeu) {
       this.isQuantity = true;
@@ -369,38 +321,18 @@ export class RiskFactorDataEntity implements RiskFactorData {
 
     const doseHand = this.percentageCheck(data.doseHand, '500');
 
-    const prob = Math.max(
-      doseFB,
-      doseFBPublic,
-      doseEye,
-      doseEyePublic,
-      doseSkin,
-      doseHand,
-      doseSkinPublic,
-    );
+    const prob = Math.max(doseFB, doseFBPublic, doseEye, doseEyePublic, doseSkin, doseHand, doseSkinPublic);
     if (prob) {
       this.isQuantity = true;
       this.probability = prob;
 
-      if (doseFB)
-        (this.json as unknown as IRiskDataJsonRadiation).doseFBProb = doseFB;
-      if (doseFBPublic)
-        (this.json as unknown as IRiskDataJsonRadiation).doseFBPublicProb =
-          doseFBPublic;
-      if (doseEye)
-        (this.json as unknown as IRiskDataJsonRadiation).doseEyeProb = doseFB;
-      if (doseEyePublic)
-        (this.json as unknown as IRiskDataJsonRadiation).doseEyePublicProb =
-          doseEyePublic;
-      if (doseSkin)
-        (this.json as unknown as IRiskDataJsonRadiation).doseSkinProb =
-          doseSkin;
-      if (doseSkinPublic)
-        (this.json as unknown as IRiskDataJsonRadiation).doseSkinPublicProb =
-          doseSkinPublic;
-      if (doseSkinPublic)
-        (this.json as unknown as IRiskDataJsonRadiation).doseSkinPublicProb =
-          doseSkinPublic;
+      if (doseFB) (this.json as unknown as IRiskDataJsonRadiation).doseFBProb = doseFB;
+      if (doseFBPublic) (this.json as unknown as IRiskDataJsonRadiation).doseFBPublicProb = doseFBPublic;
+      if (doseEye) (this.json as unknown as IRiskDataJsonRadiation).doseEyeProb = doseFB;
+      if (doseEyePublic) (this.json as unknown as IRiskDataJsonRadiation).doseEyePublicProb = doseEyePublic;
+      if (doseSkin) (this.json as unknown as IRiskDataJsonRadiation).doseSkinProb = doseSkin;
+      if (doseSkinPublic) (this.json as unknown as IRiskDataJsonRadiation).doseSkinPublicProb = doseSkinPublic;
+      if (doseSkinPublic) (this.json as unknown as IRiskDataJsonRadiation).doseSkinPublicProb = doseSkinPublic;
     }
   }
 
@@ -420,14 +352,7 @@ export class RiskFactorDataEntity implements RiskFactorData {
         const ibtugNA = this.mapCheck(mw, 100, 602, heatTableNAConstant);
 
         if (!isAcclimatized) {
-          const ibtugNAList = [
-            ibtugNA.ibtug - 2,
-            ibtugNA.ibtug - 1.5,
-            ibtugNA.ibtug - 1,
-            ibtugNA.ibtug - 0.5,
-            ibtugNA.ibtug,
-            10000,
-          ];
+          const ibtugNAList = [ibtugNA.ibtug - 2, ibtugNA.ibtug - 1.5, ibtugNA.ibtug - 1, ibtugNA.ibtug - 0.5, ibtugNA.ibtug, 10000];
 
           return this.valuesCheck(String(ibtug), ibtugNAList, 5);
         }
@@ -452,11 +377,7 @@ export class RiskFactorDataEntity implements RiskFactorData {
     }
   }
 
-  private percentageCheck(
-    value: string,
-    limit: string,
-    maxLimitMultiplier?: number,
-  ) {
+  private percentageCheck(value: string, limit: string, maxLimitMultiplier?: number) {
     if (!value || !limit) return 0;
 
     value = value.replace(/[^0-9.]/g, '');
@@ -489,12 +410,7 @@ export class RiskFactorDataEntity implements RiskFactorData {
     return highValue && returnValue > highValue ? highValue : returnValue;
   }
 
-  private mapCheck<T>(
-    mw: number,
-    min: number,
-    max: number,
-    map: Record<number, T>,
-  ) {
+  private mapCheck<T>(mw: number, min: number, max: number, map: Record<number, T>) {
     let valueMap: T;
     for (let index = 0; index < 100; index++) {
       const key = mw + index;

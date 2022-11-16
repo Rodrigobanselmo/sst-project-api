@@ -1,13 +1,4 @@
-import {
-  AlignmentType,
-  ITableCellOptions,
-  Paragraph,
-  TableCell,
-  TableRow,
-  TextRun,
-  VerticalAlign,
-  WidthType,
-} from 'docx';
+import { AlignmentType, ITableCellOptions, Paragraph, TableCell, TableRow, TextRun, VerticalAlign, WidthType } from 'docx';
 import { palette } from '../../../../../../../shared/constants/palette';
 
 export interface bodyTableProps extends Partial<ITableCellOptions> {
@@ -31,9 +22,7 @@ export class TableBodyElements {
             new TextRun({
               text: text || '',
               size: 12,
-              color: attention
-                ? palette.text.attention.string
-                : palette.text.main.string,
+              color: attention ? palette.text.attention.string : palette.text.main.string,
               bold: !!attention,
             }),
           ],

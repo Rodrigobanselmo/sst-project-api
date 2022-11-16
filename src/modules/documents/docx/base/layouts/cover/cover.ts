@@ -14,14 +14,7 @@ import fs from 'fs';
 import sizeOf from 'image-size';
 
 import { setNiceProportion } from '../../../../../../shared/utils/setNiceProportion';
-import {
-  convertToEmu,
-  convertToParagraph,
-  convertToParagraphBox,
-  pageHeight,
-  pageWidth,
-  sectionCoverProperties,
-} from '../../config/styles';
+import { convertToEmu, convertToParagraph, convertToParagraphBox, pageHeight, pageWidth, sectionCoverProperties } from '../../config/styles';
 
 interface ITextProps {
   x?: number;
@@ -147,18 +140,11 @@ const imageCover = (props: IHeaderProps) => {
 };
 
 const imageLogo = (props: IHeaderProps) => {
-  const { height: imgHeight, width: imgWidth } = sizeOf(
-    fs.readFileSync(props.imgPath),
-  );
+  const { height: imgHeight, width: imgWidth } = sizeOf(fs.readFileSync(props.imgPath));
 
   const logoProps = props?.coverProps?.logoProps;
 
-  const { height, width } = setNiceProportion(
-    logoProps?.maxLogoWidth || 630,
-    logoProps?.maxLogoHeight || 354,
-    imgWidth,
-    imgHeight,
-  );
+  const { height, width } = setNiceProportion(logoProps?.maxLogoWidth || 630, logoProps?.maxLogoHeight || 354, imgWidth, imgHeight);
 
   return new Paragraph({
     children: [
@@ -175,10 +161,7 @@ const imageLogo = (props: IHeaderProps) => {
               offset: convertToEmu(logoProps.x, 'w'),
             },
             verticalPosition: {
-              offset: convertToEmu(
-                logoProps.y + ((logoProps?.maxLogoHeight ?? 0) - height) / 2,
-                'h',
-              ),
+              offset: convertToEmu(logoProps.y + ((logoProps?.maxLogoHeight ?? 0) - height) / 2, 'h'),
             },
             behindDocument: true,
           },
@@ -192,8 +175,7 @@ const imageLogo = (props: IHeaderProps) => {
 export const createCover = (props: IHeaderProps): Paragraph[] => {
   const coverSection = [] as Paragraph[];
 
-  if (props?.coverProps?.backgroundImagePath)
-    coverSection.push(imageCover(props));
+  if (props?.coverProps?.backgroundImagePath) coverSection.push(imageCover(props));
 
   coverSection.push(title(props));
   coverSection.push(textShow(props.version, props?.coverProps?.versionProps));
@@ -201,9 +183,7 @@ export const createCover = (props: IHeaderProps): Paragraph[] => {
   if (props.imgPath) coverSection.push(imageLogo(props));
   coverSection.push(textShow(''));
   coverSection.push(textShow(''));
-  coverSection.push(
-    textShow(props.companyName, props?.coverProps?.companyProps),
-  );
+  coverSection.push(textShow(props.companyName, props?.coverProps?.companyProps));
 
   return coverSection;
 };

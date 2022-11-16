@@ -3,10 +3,7 @@ interface IFilter {
   skip?: string[];
 }
 
-export const prismaFilter = <T>(
-  prismaWhere: T,
-  { query: routeQuery, skip }: IFilter,
-) => {
+export const prismaFilter = <T>(prismaWhere: T, { query: routeQuery, skip }: IFilter) => {
   const query = { ...routeQuery };
   const where: T = {
     AND: [],

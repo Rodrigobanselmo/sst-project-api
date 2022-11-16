@@ -5,10 +5,7 @@ import { IDocVariables } from '../../../builders/pgr/types/section.types';
 import { ProfessionalEntity } from '../../../../../users/entities/professional.entity';
 import { getCredential } from '../professionals/professionals.converter';
 
-export const SignaturesConverter = (
-  signatureEntity: (ProfessionalEntity | UserEntity)[],
-  workspace: WorkspaceEntity,
-): IDocVariables[] => {
+export const SignaturesConverter = (signatureEntity: (ProfessionalEntity | UserEntity)[], workspace: WorkspaceEntity): IDocVariables[] => {
   return signatureEntity
     .filter((professional) =>
       'professionalPgrSignature' in professional
@@ -28,11 +25,9 @@ export const SignaturesConverter = (
       const crea = getCredential(signature as ProfessionalEntity);
 
       return {
-        [VariablesPGREnum.PROFESSIONAL_CERTIFICATIONS]:
-          signature.certifications.join(' -- ') || '',
+        [VariablesPGREnum.PROFESSIONAL_CERTIFICATIONS]: signature.certifications.join(' -- ') || '',
         [VariablesPGREnum.PROFESSIONAL_CREA]: crea || '',
-        [VariablesPGREnum.PROFESSIONAL_FORMATION]:
-          signature.formation.join('/') || '',
+        [VariablesPGREnum.PROFESSIONAL_FORMATION]: signature.formation.join('/') || '',
         [VariablesPGREnum.PROFESSIONAL_NAME]: signature.name || '',
         [VariablesPGREnum.PROFESSIONAL_CPF]: signature.cpf || '',
       };

@@ -9,9 +9,7 @@ import { UpsertRiskDocInfoDto } from '../../dto/risk-doc-info.dto';
 
 @Controller('risk-doc-info')
 export class RiskDocInfoController {
-  constructor(
-    private readonly upsertRiskDocInfoService: UpsertRiskDocInfoService,
-  ) {}
+  constructor(private readonly upsertRiskDocInfoService: UpsertRiskDocInfoService) {}
 
   @Permissions({
     code: PermissionEnum.RISK_DOC_INFO,
@@ -19,13 +17,7 @@ export class RiskDocInfoController {
     isMember: true,
   })
   @Post()
-  upsert(
-    @Body() upsertRiskDataDto: UpsertRiskDocInfoDto,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
-    return this.upsertRiskDocInfoService.execute(
-      upsertRiskDataDto,
-      userPayloadDto,
-    );
+  upsert(@Body() upsertRiskDataDto: UpsertRiskDocInfoDto, @User() userPayloadDto: UserPayloadDto) {
+    return this.upsertRiskDocInfoService.execute(upsertRiskDataDto, userPayloadDto);
   }
 }

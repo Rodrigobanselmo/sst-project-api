@@ -1,11 +1,4 @@
-import {
-  ImageRun,
-  Paragraph,
-  Table,
-  TableCell,
-  TableRow,
-  WidthType,
-} from 'docx';
+import { ImageRun, Paragraph, Table, TableCell, TableRow, WidthType } from 'docx';
 import fs from 'fs';
 
 import { borderNoneStyle } from '../../config/styles';
@@ -13,11 +6,7 @@ import { paragraphFigure } from '../paragraphs';
 
 const fullWidth = 718;
 
-export const HTwoImages = (
-  images: [string, string],
-  texts: [string, string],
-  removeLegend?: boolean,
-) => {
+export const HTwoImages = (images: [string, string], texts: [string, string], removeLegend?: boolean) => {
   if (texts[0] == texts[1]) {
     texts[1] = '';
   }

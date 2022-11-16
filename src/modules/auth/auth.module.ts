@@ -33,11 +33,7 @@ import { AuthGroupController } from './controller/group/group.controller';
       },
     }),
   ],
-  controllers: [
-    AuthController,
-    AuthorizationTestController,
-    AuthGroupController,
-  ],
+  controllers: [AuthController, AuthorizationTestController, AuthGroupController],
   providers: [
     SessionService,
     RefreshTokenService,

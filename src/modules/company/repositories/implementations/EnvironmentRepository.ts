@@ -9,8 +9,7 @@ import { HierarchyEntity } from '../../entities/hierarchy.entity';
 import { RiskFactorsEntity } from '../../../sst/entities/risk.entity';
 import { RiskFactorDataEntity } from '../../../sst/entities/riskData.entity';
 
-interface ICompanyCharacterization
-  extends Omit<UpsertCharacterizationDto, 'photos'> {
+interface ICompanyCharacterization extends Omit<UpsertCharacterizationDto, 'photos'> {
   companyId: string;
   workspaceId: string;
 }
@@ -19,13 +18,7 @@ interface ICompanyCharacterization
 export class EnvironmentRepository {
   constructor(private prisma: PrismaService) {}
 
-  async upsert({
-    id,
-    companyId,
-    workspaceId,
-    hierarchyIds = [],
-    ...characterizationDto
-  }: ICompanyCharacterization): Promise<EnvironmentEntity> {
+  async upsert({ id, companyId, workspaceId, hierarchyIds = [], ...characterizationDto }: ICompanyCharacterization): Promise<EnvironmentEntity> {
     const newId = v4();
 
     const homogeneousGroup = await this.prisma.homogeneousGroup.upsert({
@@ -34,14 +27,12 @@ export class EnvironmentRepository {
         id: newId,
         name: newId,
         //! optimization here nd on characterization
-        description:
-          characterizationDto.name + '(//)' + characterizationDto.type,
+        description: characterizationDto.name + '(//)' + characterizationDto.type,
         companyId: companyId,
         type: HomoTypeEnum.ENVIRONMENT,
       },
       update: {
-        description:
-          characterizationDto.name + '(//)' + characterizationDto.type,
+        description: characterizationDto.name + '(//)' + characterizationDto.type,
       },
     });
 
@@ -92,27 +83,17 @@ export class EnvironmentRepository {
     return new EnvironmentEntity(characterization);
   }
 
-  async findAll(
-    companyId: string,
-    workspaceId: string,
-    options?: Prisma.CompanyCharacterizationFindManyArgs,
-  ) {
-    const characterization =
-      (await this.prisma.companyCharacterization.findMany({
-        where: {
-          workspaceId,
-          companyId,
-          type: {
-            in: [
-              CharacterizationTypeEnum.ADMINISTRATIVE,
-              CharacterizationTypeEnum.GENERAL,
-              CharacterizationTypeEnum.OPERATION,
-              CharacterizationTypeEnum.SUPPORT,
-            ],
-          },
+  async findAll(companyId: string, workspaceId: string, options?: Prisma.CompanyCharacterizationFindManyArgs) {
+    const characterization = (await this.prisma.companyCharacterization.findMany({
+      where: {
+        workspaceId,
+        companyId,
+        type: {
+          in: [CharacterizationTypeEnum.ADMINISTRATIVE, CharacterizationTypeEnum.GENERAL, CharacterizationTypeEnum.OPERATION, CharacterizationTypeEnum.SUPPORT],
         },
-        ...options,
-      })) as EnvironmentEntity[];
+      },
+      ...options,
+    })) as EnvironmentEntity[];
 
     return [...characterization.map((env) => new EnvironmentEntity(env))];
   }
@@ -125,11 +106,10 @@ export class EnvironmentRepository {
       }
     > = {},
   ) {
-    const characterization =
-      (await this.prisma.companyCharacterization.findUnique({
-        where: { id },
-        include: { photos: true, ...options.include },
-      })) as EnvironmentEntity;
+    const characterization = (await this.prisma.companyCharacterization.findUnique({
+      where: { id },
+      include: { photos: true, ...options.include },
+    })) as EnvironmentEntity;
 
     const hierarchies = await this.prisma.hierarchy.findMany({
       where: {
@@ -150,16 +130,12 @@ export class EnvironmentRepository {
       characterization.riskData = riskData.map(({ riskFactor, ...risk }) => {
         return new RiskFactorDataEntity({
           ...risk,
-          ...(riskFactor
-            ? { riskFactor: new RiskFactorsEntity(riskFactor) }
-            : {}),
+          ...(riskFactor ? { riskFactor: new RiskFactorsEntity(riskFactor) } : {}),
         });
       });
     }
 
-    characterization.hierarchies = hierarchies.map(
-      (hierarchy) => new HierarchyEntity(hierarchy),
-    );
+    characterization.hierarchies = hierarchies.map((hierarchy) => new HierarchyEntity(hierarchy));
 
     return new EnvironmentEntity(characterization);
   }

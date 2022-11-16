@@ -6,8 +6,7 @@ export const checkIsTrue = (value: any) => {
   }
 
   if (typeof transformToString === 'string') {
-    if (transformToString != 'VERDADEIRO' && transformToString != 'FALSO')
-      return false;
+    if (transformToString != 'VERDADEIRO' && transformToString != 'FALSO') return false;
     return transformToString == 'VERDADEIRO' ? 'true' : 'false';
   }
 

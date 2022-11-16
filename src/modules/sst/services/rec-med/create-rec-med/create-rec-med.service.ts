@@ -8,19 +8,12 @@ import { isMaster } from '../../../../../shared/utils/isMater';
 export class CreateRecMedService {
   constructor(private readonly recMedRepository: RecMedRepository) {}
 
-  async execute(
-    createRecMedDto: CreateRecMedDto,
-    userPayloadDto: UserPayloadDto,
-  ) {
+  async execute(createRecMedDto: CreateRecMedDto, userPayloadDto: UserPayloadDto) {
     const user = isMaster(userPayloadDto, createRecMedDto.companyId);
 
-    const system =
-      user.isSystem && user.companyId === createRecMedDto.companyId;
+    const system = user.isSystem && user.companyId === createRecMedDto.companyId;
 
-    const RecMedFactor = await this.recMedRepository.create(
-      createRecMedDto,
-      system,
-    );
+    const RecMedFactor = await this.recMedRepository.create(createRecMedDto, system);
 
     return RecMedFactor;
   }

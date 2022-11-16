@@ -9,9 +9,7 @@ describe.skip('CreateGenerateSourceService', () => {
       providers: [CreateGenerateSourceService],
     }).compile();
 
-    service = module.get<CreateGenerateSourceService>(
-      CreateGenerateSourceService,
-    );
+    service = module.get<CreateGenerateSourceService>(CreateGenerateSourceService);
   });
 
   it('should be defined', () => {

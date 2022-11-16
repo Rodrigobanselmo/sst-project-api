@@ -9,9 +9,7 @@ describe.skip('UploadChecklistDataService', () => {
       providers: [UploadChecklistDataService],
     }).compile();
 
-    service = module.get<UploadChecklistDataService>(
-      UploadChecklistDataService,
-    );
+    service = module.get<UploadChecklistDataService>(UploadChecklistDataService);
   });
 
   it('should be defined', () => {

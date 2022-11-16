@@ -1,11 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  Company,
-  Employee,
-  Hierarchy,
-  SexTypeEnum,
-  StatusEnum,
-} from '@prisma/client';
+import { Company, Employee, Hierarchy, SexTypeEnum, StatusEnum } from '@prisma/client';
 import { EmployeePPPHistoryEntity } from './employee-ppp-history.entity';
 import { CompanyEntity } from './company.entity';
 import { EmployeeExamsHistoryEntity } from './employee-exam-history.entity';
@@ -95,16 +89,11 @@ export class EmployeeEntity implements Employee {
     }
 
     if (this.examsHistory) {
-      this.examsHistory = this.examsHistory.map(
-        (examsHistory) => new EmployeeExamsHistoryEntity(examsHistory),
-      );
+      this.examsHistory = this.examsHistory.map((examsHistory) => new EmployeeExamsHistoryEntity(examsHistory));
     }
 
     if (this.hierarchyHistory) {
-      this.hierarchyHistory = this.hierarchyHistory.map(
-        (hierarchyHistory) =>
-          new EmployeeHierarchyHistoryEntity(hierarchyHistory),
-      );
+      this.hierarchyHistory = this.hierarchyHistory.map((hierarchyHistory) => new EmployeeHierarchyHistoryEntity(hierarchyHistory));
     }
   }
 }

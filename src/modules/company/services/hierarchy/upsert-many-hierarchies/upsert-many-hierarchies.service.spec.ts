@@ -9,9 +9,7 @@ describe.skip('UpsertHierarchyService', () => {
       providers: [UpsertManyHierarchyService],
     }).compile();
 
-    service = module.get<UpsertManyHierarchyService>(
-      UpsertManyHierarchyService,
-    );
+    service = module.get<UpsertManyHierarchyService>(UpsertManyHierarchyService);
   });
 
   it('should be defined', () => {

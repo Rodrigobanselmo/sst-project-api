@@ -7,8 +7,7 @@ export class FindByIdService {
   constructor(private readonly userRepository: UsersRepository) {}
   async execute(id: number) {
     const user = await this.userRepository.findById(id);
-    if (!user?.id)
-      throw new BadRequestException(ErrorInvitesEnum.USER_NOT_FOUND);
+    if (!user?.id) throw new BadRequestException(ErrorInvitesEnum.USER_NOT_FOUND);
     delete user.password;
     return user;
   }

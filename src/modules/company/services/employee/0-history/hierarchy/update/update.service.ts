@@ -16,26 +16,17 @@ export class UpdateEmployeeHierarchyHistoryService {
     private readonly createEmployeeHierarchyHistoryService: CreateEmployeeHierarchyHistoryService,
   ) {}
 
-  async execute(
-    dataDto: UpdateEmployeeHierarchyHistoryDto,
-    user: UserPayloadDto,
-  ) {
-    const found = await this.employeeRepository.findById(
-      dataDto.employeeId,
-      user.targetCompanyId,
-    );
+  async execute(dataDto: UpdateEmployeeHierarchyHistoryDto, user: UserPayloadDto) {
+    const found = await this.employeeRepository.findById(dataDto.employeeId, user.targetCompanyId);
 
-    if (!found?.id)
-      throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_NOT_FOUND);
+    if (!found?.id) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_NOT_FOUND);
 
-    const { hierarchyId, beforeHistory } =
-      await this.createEmployeeHierarchyHistoryService.check({
-        dataDto,
-        foundEmployee: found,
-      });
+    const { hierarchyId, beforeHistory } = await this.createEmployeeHierarchyHistoryService.check({
+      dataDto,
+      foundEmployee: found,
+    });
 
-    if (dataDto.motive === EmployeeHierarchyMotiveTypeEnum.DEM)
-      dataDto.hierarchyId = beforeHistory.hierarchyId;
+    if (dataDto.motive === EmployeeHierarchyMotiveTypeEnum.DEM) dataDto.hierarchyId = beforeHistory.hierarchyId;
 
     const history = await this.employeeHierarchyHistoryRepository.update(
       {

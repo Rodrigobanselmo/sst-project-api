@@ -7,8 +7,7 @@ export class FindMeService {
   constructor(private readonly userRepository: UsersRepository) {}
   async execute(id: number, companyId?: string) {
     const user = await this.userRepository.findById(id);
-    if (!user?.id)
-      throw new BadRequestException(ErrorInvitesEnum.USER_NOT_FOUND);
+    if (!user?.id) throw new BadRequestException(ErrorInvitesEnum.USER_NOT_FOUND);
 
     const companies = user.companies
       .map(({ companyId, permissions, roles, status, group }) => {
@@ -27,10 +26,7 @@ export class FindMeService {
       })
       .filter((i) => i);
 
-    const company =
-      companies.find((c) => c.companyId === companyId) ||
-      companies[0] ||
-      ({} as typeof companies[0]);
+    const company = companies.find((c) => c.companyId === companyId) || companies[0] || ({} as typeof companies[0]);
 
     delete user.password;
 

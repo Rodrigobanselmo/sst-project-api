@@ -1,13 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Post,
-  Query,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { classToClass } from 'class-transformer';
 import { SessionService } from '../../../auth/services/session/session/session.service';
@@ -29,10 +20,7 @@ import { ResetPasswordService } from '../../services/users/reset-password/reset-
 import { UpdatePermissionsRolesService } from '../../services/users/update-permissions-roles/update-permissions-roles.service';
 import { UpdateUserService } from '../../services/users/update-user/update-user.service';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
-import {
-  PermissionEnum,
-  RoleEnum,
-} from '../../../../shared/constants/enum/authorization';
+import { PermissionEnum, RoleEnum } from '../../../../shared/constants/enum/authorization';
 import { Roles } from '../../../../shared/decorators/roles.decorator';
 
 @ApiTags('users')
@@ -52,12 +40,7 @@ export class UsersController {
 
   @Get('me')
   async findMe(@User() userPayloadDto: UserPayloadDto) {
-    return classToClass(
-      this.findMeService.execute(
-        userPayloadDto.userId,
-        userPayloadDto.companyId,
-      ),
-    );
+    return classToClass(this.findMeService.execute(userPayloadDto.userId, userPayloadDto.companyId));
   }
 
   @Permissions({
@@ -95,10 +78,7 @@ export class UsersController {
   }
 
   @Patch()
-  update(
-    @Body() updateUserDto: UpdateUserDto,
-    @User() { userId }: UserPayloadDto,
-  ) {
+  update(@Body() updateUserDto: UpdateUserDto, @User() { userId }: UserPayloadDto) {
     return classToClass(this.updateUserService.execute(+userId, updateUserDto));
   }
 
@@ -109,13 +89,8 @@ export class UsersController {
     crud: true,
   })
   @Patch('/company')
-  async updatePermissionsRoles(
-    @Body() updateUserCompanyDto: UpdateUserCompanyDto,
-    @User() user: UserPayloadDto,
-  ) {
-    return classToClass(
-      this.updatePermissionsRolesService.execute(updateUserCompanyDto, user),
-    );
+  async updatePermissionsRoles(@Body() updateUserCompanyDto: UpdateUserCompanyDto, @User() user: UserPayloadDto) {
+    return classToClass(this.updatePermissionsRolesService.execute(updateUserCompanyDto, user));
   }
 
   @Public()

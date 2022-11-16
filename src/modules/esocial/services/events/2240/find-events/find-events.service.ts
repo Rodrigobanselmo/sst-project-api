@@ -18,14 +18,8 @@ import { ESocialMethodsProvider } from '../../../../../../shared/providers/ESoci
 import { CompanyRepository } from '../../../../../company/repositories/implementations/CompanyRepository';
 import { EmployeeRepository } from '../../../../../company/repositories/implementations/EmployeeRepository';
 import { FindEvents2240Dto } from '../../../../dto/event.dto';
-import {
-  mapInverseResAso,
-  mapInverseTpExameOcup,
-} from '../../../../interfaces/event-2220';
-import {
-  HierarchyOnHomogeneousEntity,
-  HomoGroupEntity,
-} from '../../../../../company/entities/homoGroup.entity';
+import { mapInverseResAso, mapInverseTpExameOcup } from '../../../../interfaces/event-2220';
+import { HierarchyOnHomogeneousEntity, HomoGroupEntity } from '../../../../../company/entities/homoGroup.entity';
 import { HierarchyEnum, HomogeneousGroup } from '@prisma/client';
 import { RiskFactorsEntity } from '../../../../../../modules/sst/entities/risk.entity';
 import { DayJSProvider } from '../../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
@@ -41,10 +35,7 @@ export class FindEvents2240ESocialService {
     private readonly dayjsProvider: DayJSProvider,
   ) {}
 
-  async execute(
-    { skip, take, ...query }: FindEvents2240Dto,
-    user: UserPayloadDto,
-  ) {
+  async execute({ skip, take, ...query }: FindEvents2240Dto, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;
     const { company } = await this.eSocialMethodsProvider.getCompany(companyId);
 
@@ -55,40 +46,27 @@ export class FindEvents2240ESocialService {
         data: [],
         count: 0,
         error: {
-          message:
-            'Data de início do eSocial ou tipo de envio não informado para essa empresa',
+          message: 'Data de início do eSocial ou tipo de envio não informado para essa empresa',
         },
       };
 
     const companyFound = await this.getCompany(companyId);
     const homogeneousTree = await this.getHomoTree(companyFound);
     const riskDataTree = await this.getRiskData(companyFound, homogeneousTree);
-    const hierarchyTree = await this.getHierarchyTree(
-      companyFound,
-      riskDataTree,
-    );
+    const hierarchyTree = await this.getHierarchyTree(companyFound, riskDataTree);
 
-    const employeeTree = {} as Record<
-      string,
-      EmployeeEntity & { actualPPPHistory?: EmployeePPPHistoryEntity[] }
-    >;
+    const employeeTree = {} as Record<string, EmployeeEntity & { actualPPPHistory?: EmployeePPPHistoryEntity[] }>;
     companyFound.employees.forEach((employee) => {
       const riskTimelineTree = {};
 
       employee.hierarchyHistory.forEach((history, index) => {
         const startDate = new Date(history.startDate);
-        const endDate = employee.hierarchyHistory[index + 1]
-          ? new Date(employee.hierarchyHistory[index + 1].startDate)
-          : null;
+        const endDate = employee.hierarchyHistory[index + 1] ? new Date(employee.hierarchyHistory[index + 1].startDate) : null;
 
         riskTimelineTree[this.dayjsProvider.format(startDate, 'YYYYMMDD')] = {};
-        if (endDate)
-          riskTimelineTree[this.dayjsProvider.format(endDate, 'YYYYMMDD')] = {};
+        if (endDate) riskTimelineTree[this.dayjsProvider.format(endDate, 'YYYYMMDD')] = {};
 
-        const hierarchyIds = [
-          history.hierarchyId,
-          ...history.subHierarchies.map((i) => i.id),
-        ];
+        const hierarchyIds = [history.hierarchyId, ...history.subHierarchies.map((i) => i.id)];
 
         const hierarchyOnHomogeneous = hierarchyIds
           .map((id) => hierarchyTree[id].hierarchyOnHomogeneous)
@@ -174,21 +152,17 @@ export class FindEvents2240ESocialService {
 
     return;
 
-    const { data: employees3, count } =
-      await this.employeeRepository.findEvent2220(
-        {
-          startDate,
-          companyId,
-          ...query,
-        },
-        { take: 1000 },
-        { select: { name: true } },
-      );
-
-    const eventsStruct = this.eSocialEventProvider.convertToEvent2220Struct(
-      company,
-      employees3,
+    const { data: employees3, count } = await this.employeeRepository.findEvent2220(
+      {
+        startDate,
+        companyId,
+        ...query,
+      },
+      { take: 1000 },
+      { select: { name: true } },
     );
+
+    const eventsStruct = this.eSocialEventProvider.convertToEvent2220Struct(company, employees3);
 
     const eventsXml = eventsStruct.map((data) => {
       const eventErrors = this.eSocialEventProvider.errorsEvent2220(data.event);
@@ -201,11 +175,7 @@ export class FindEvents2240ESocialService {
       delete data.employee?.company;
 
       let type: ESocialSendEnum = ESocialSendEnum.SEND;
-      if (
-        data.aso?.events?.some((e) =>
-          ['DONE', 'TRANSMITTED'].includes(e.status),
-        )
-      ) {
+      if (data.aso?.events?.some((e) => ['DONE', 'TRANSMITTED'].includes(e.status))) {
         const isExclude = data.aso.status === 'CANCELED';
         if (isExclude) type = ESocialSendEnum.EXCLUDE;
         if (!isExclude) type = ESocialSendEnum.MODIFIED;
@@ -226,10 +196,7 @@ export class FindEvents2240ESocialService {
     return { data: eventsXml, count };
   }
 
-  async getRiskData(
-    company: CompanyEntity,
-    homoTree: Record<string, HomogeneousGroup>,
-  ) {
+  async getRiskData(company: CompanyEntity, homoTree: Record<string, HomogeneousGroup>) {
     const companyId = company.id;
 
     const risks = await this.riskRepository.findNude({
@@ -287,8 +254,7 @@ export class FindEvents2240ESocialService {
         const riskCopy = clone(risk);
         riskCopy.riskFactorData = undefined;
 
-        if (!homoTree[_riskData.homogeneousGroupId])
-          _riskData.prioritization = 0;
+        if (!homoTree[_riskData.homogeneousGroupId]) _riskData.prioritization = 0;
         else _riskData.prioritization = 3;
 
         _riskData.riskFactor = riskCopy;
@@ -303,8 +269,7 @@ export class FindEvents2240ESocialService {
 
     const riskDataTree = {} as Record<string, RiskFactorDataEntity[]>;
     riskData.forEach((rd) => {
-      if (!riskDataTree[rd.homogeneousGroupId])
-        riskDataTree[rd.homogeneousGroupId] = [];
+      if (!riskDataTree[rd.homogeneousGroupId]) riskDataTree[rd.homogeneousGroupId] = [];
 
       riskDataTree[rd.homogeneousGroupId].push(rd);
     });
@@ -386,29 +351,23 @@ export class FindEvents2240ESocialService {
     return homoTree;
   }
 
-  async getHierarchyTree(
-    company: CompanyEntity,
-    riskDataTree: Record<string, RiskFactorDataEntity[]>,
-  ) {
+  async getHierarchyTree(company: CompanyEntity, riskDataTree: Record<string, RiskFactorDataEntity[]>) {
     const hierarchyTree = {} as Record<string, HierarchyEntity>;
     company.hierarchy.forEach((hierarchy) => {
       const prioritization = originRiskMap[hierarchy.type]?.prioritization;
 
       hierarchyTree[hierarchy.id] = {
-        hierarchyOnHomogeneous: hierarchy.hierarchyOnHomogeneous.map(
-          (hierOnHomo) => {
-            hierOnHomo.homogeneousGroup = {
-              riskFactorData:
-                riskDataTree?.[hierOnHomo.homogeneousGroupId]?.map((rd) => {
-                  if (prioritization && !rd.prioritization)
-                    rd.prioritization = prioritization;
-                  return rd;
-                }) || [],
-            } as HomoGroupEntity;
+        hierarchyOnHomogeneous: hierarchy.hierarchyOnHomogeneous.map((hierOnHomo) => {
+          hierOnHomo.homogeneousGroup = {
+            riskFactorData:
+              riskDataTree?.[hierOnHomo.homogeneousGroupId]?.map((rd) => {
+                if (prioritization && !rd.prioritization) rd.prioritization = prioritization;
+                return rd;
+              }) || [],
+          } as HomoGroupEntity;
 
-            return hierOnHomo;
-          },
-        ),
+          return hierOnHomo;
+        }),
         ...hierarchy,
       };
     });
@@ -420,9 +379,7 @@ export class FindEvents2240ESocialService {
 
         if (!isOffice && !isSubOffice) return;
 
-        const hierOnHomo: HierarchyOnHomogeneousEntity[] = [
-          ...h.hierarchyOnHomogeneous,
-        ];
+        const hierOnHomo: HierarchyOnHomogeneousEntity[] = [...h.hierarchyOnHomogeneous];
 
         if (isOffice) {
           function loop(parent?: HierarchyEntity) {
@@ -522,10 +479,7 @@ export class FindEvents2240ESocialService {
         employees: {
           where: {
             companyId,
-            OR: [
-              { pppHistory: { none: { id: { gt: 0 } } } },
-              { pppHistory: { some: { sendEvent: true } } },
-            ],
+            OR: [{ pppHistory: { none: { id: { gt: 0 } } } }, { pppHistory: { some: { sendEvent: true } } }],
           },
           select: {
             id: true,
@@ -550,10 +504,7 @@ export class FindEvents2240ESocialService {
   }
 
   onGetRisks = (riskData: RiskFactorDataEntity[]) => {
-    const risks: Record<
-      string,
-      { riskData: RiskFactorDataEntity[]; riskFactor: RiskFactorsEntity }
-    > = {};
+    const risks: Record<string, { riskData: RiskFactorDataEntity[]; riskFactor: RiskFactorsEntity }> = {};
 
     riskData.forEach((_rd) => {
       if (_rd?.riskFactor?.representAll) return;

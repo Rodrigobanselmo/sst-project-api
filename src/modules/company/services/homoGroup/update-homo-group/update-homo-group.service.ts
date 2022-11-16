@@ -9,14 +9,9 @@ export class UpdateHomoGroupService {
   constructor(private readonly homoGroupRepository: HomoGroupRepository) {}
 
   async execute(homoGroup: UpdateHomoGroupDto, userPayloadDto: UserPayloadDto) {
-    const foundHomoGroup =
-      await this.homoGroupRepository.findHomoGroupByCompanyAndId(
-        homoGroup.id,
-        userPayloadDto.targetCompanyId,
-      );
+    const foundHomoGroup = await this.homoGroupRepository.findHomoGroupByCompanyAndId(homoGroup.id, userPayloadDto.targetCompanyId);
 
-    if (!foundHomoGroup?.id)
-      throw new BadRequestException(ErrorCompanyEnum.GHO_NOT_FOUND);
+    if (!foundHomoGroup?.id) throw new BadRequestException(ErrorCompanyEnum.GHO_NOT_FOUND);
 
     const hierarchies = await this.homoGroupRepository.update(homoGroup);
 

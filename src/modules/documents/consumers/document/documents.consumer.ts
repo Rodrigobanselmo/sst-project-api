@@ -8,10 +8,7 @@ import { PcmsoUploadService } from '../../services/pgr/document/upload-pcmso-doc
 
 @Injectable()
 export class PgrConsumer {
-  constructor(
-    private readonly pgrUploadDocService: PgrUploadService,
-    private readonly pcmsoUploadService: PcmsoUploadService,
-  ) {
+  constructor(private readonly pgrUploadDocService: PgrUploadService, private readonly pcmsoUploadService: PcmsoUploadService) {
     Consumer.create({
       queueUrl: process.env.AWS_SQS_PGR_URL,
       handleMessage: (message) => this.consume(message as any),

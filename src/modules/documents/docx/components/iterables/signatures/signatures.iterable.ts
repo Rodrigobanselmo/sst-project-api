@@ -4,10 +4,7 @@ import { arrayChunks } from '../../../../../../shared/utils/arrayChunks';
 
 import { ProfessionalEntity } from '../../../../../users/entities/professional.entity';
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
-import {
-  ISectionChildrenType,
-  PGRSectionChildrenTypeEnum,
-} from '../../../builders/pgr/types/elements.types';
+import { ISectionChildrenType, PGRSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
 import { UserEntity } from './../../../../../users/entities/user.entity';
 import { TableBodyElements } from './elements/body';
@@ -16,32 +13,22 @@ import { SignaturesConverter } from './signatures.converter';
 export const signaturesIterable = (
   signatureEntity: (ProfessionalEntity | UserEntity)[],
   workspace: WorkspaceEntity,
-  convertToDocx: (
-    data: ISectionChildrenType[],
-    variables?: IDocVariables,
-  ) => (Paragraph | Table)[],
+  convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[],
 ) => {
   if (!signatureEntity?.length) return [];
 
-  const signaturesVariablesArray = SignaturesConverter(
-    signatureEntity,
-    workspace,
-  );
+  const signaturesVariablesArray = SignaturesConverter(signatureEntity, workspace);
 
   const iterableSections = signaturesVariablesArray.map((variables) => {
     const credentials = [] as string[];
 
-    if (variables[VariablesPGREnum.PROFESSIONAL_NAME])
-      credentials.push(`**??${VariablesPGREnum.PROFESSIONAL_NAME}??**`);
+    if (variables[VariablesPGREnum.PROFESSIONAL_NAME]) credentials.push(`**??${VariablesPGREnum.PROFESSIONAL_NAME}??**`);
 
-    if (variables[VariablesPGREnum.PROFESSIONAL_FORMATION])
-      credentials.push(`??${VariablesPGREnum.PROFESSIONAL_FORMATION}??`);
+    if (variables[VariablesPGREnum.PROFESSIONAL_FORMATION]) credentials.push(`??${VariablesPGREnum.PROFESSIONAL_FORMATION}??`);
 
-    if (variables[VariablesPGREnum.PROFESSIONAL_CREA])
-      credentials.push(`??${VariablesPGREnum.PROFESSIONAL_CREA}??`);
+    if (variables[VariablesPGREnum.PROFESSIONAL_CREA]) credentials.push(`??${VariablesPGREnum.PROFESSIONAL_CREA}??`);
 
-    if (variables[VariablesPGREnum.PROFESSIONAL_CPF])
-      credentials.push(`CPF: ${variables[VariablesPGREnum.PROFESSIONAL_CPF]}`);
+    if (variables[VariablesPGREnum.PROFESSIONAL_CPF]) credentials.push(`CPF: ${variables[VariablesPGREnum.PROFESSIONAL_CPF]}`);
 
     // if (variables[VariablesPGREnum.PROFESSIONAL_CERTIFICATIONS]) text = `${text}${variables[VariablesPGREnum.PROFESSIONAL_CERTIFICATIONS]}`
     return convertToDocx(
@@ -87,11 +74,7 @@ export const signaturesIterable = (
     }
 
     if (dataChuck.length == 1) {
-      return [
-        emptyParagraph,
-        tableBodyElements.tableCell({ data: dataChuck[0] as Paragraph[] }),
-        emptyParagraph,
-      ];
+      return [emptyParagraph, tableBodyElements.tableCell({ data: dataChuck[0] as Paragraph[] }), emptyParagraph];
     }
     if (dataChuck.length == 2) {
       return [
@@ -117,12 +100,7 @@ export const signaturesIterable = (
 
   const table = new Table({
     width: { size: 100, type: WidthType.PERCENTAGE },
-    rows: [
-      tableBodyElements.tableRow([marginParagraph]),
-      ...iterableSectionsChunks.map((dataChuck) =>
-        tableBodyElements.tableRow([...getRows(dataChuck)]),
-      ),
-    ],
+    rows: [tableBodyElements.tableRow([marginParagraph]), ...iterableSectionsChunks.map((dataChuck) => tableBodyElements.tableRow([...getRows(dataChuck)]))],
   });
 
   return [table];

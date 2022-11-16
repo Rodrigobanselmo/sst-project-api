@@ -59,9 +59,7 @@ describe('[Feature] Users - /users', () => {
       password: '12345678',
     };
 
-    const data = await request(app.getHttpServer())
-      .post('/session')
-      .send(sessionUser);
+    const data = await request(app.getHttpServer()).post('/session').send(sessionUser);
 
     sessionAdmin = data.body;
   });
@@ -73,19 +71,12 @@ describe('[Feature] Users - /users', () => {
         password: user.password,
       };
 
-      const { body: session } = await request(app.getHttpServer())
-        .post('/session')
-        .send(sessionUser);
+      const { body: session } = await request(app.getHttpServer()).post('/session').send(sessionUser);
 
       // trying to access route without token
-      await request(app.getHttpServer())
-        .get('/users/me')
-        .expect(HttpStatus.UNAUTHORIZED);
+      await request(app.getHttpServer()).get('/users/me').expect(HttpStatus.UNAUTHORIZED);
 
-      const userMe = await request(app.getHttpServer())
-        .get('/users/me')
-        .set('Authorization', `Bearer ${session.token}`)
-        .expect(HttpStatus.OK);
+      const userMe = await request(app.getHttpServer()).get('/users/me').set('Authorization', `Bearer ${session.token}`).expect(HttpStatus.OK);
 
       expect(userMe.body).not.toHaveProperty('password');
 
@@ -98,10 +89,7 @@ describe('[Feature] Users - /users', () => {
       const createUser = new FakerUser();
       delete createUser.token;
 
-      const user = await request(app.getHttpServer())
-        .post('/users')
-        .send(createUser)
-        .expect(HttpStatus.CREATED);
+      const user = await request(app.getHttpServer()).post('/users').send(createUser).expect(HttpStatus.CREATED);
 
       expect(user.body).not.toHaveProperty('password');
 
@@ -112,26 +100,17 @@ describe('[Feature] Users - /users', () => {
       const createUser = new FakerUser({ email: user.email });
       delete createUser.token;
 
-      return await request(app.getHttpServer())
-        .post('/users')
-        .send(createUser)
-        .expect(HttpStatus.BAD_REQUEST);
+      return await request(app.getHttpServer()).post('/users').send(createUser).expect(HttpStatus.BAD_REQUEST);
     });
 
     it('should validate fields', async () => {
       const createUser = new FakerUser({ email: '123' });
-      return await request(app.getHttpServer())
-        .post('/users')
-        .send(createUser)
-        .expect(HttpStatus.BAD_REQUEST);
+      return await request(app.getHttpServer()).post('/users').send(createUser).expect(HttpStatus.BAD_REQUEST);
     });
 
     it('should validate token', async () => {
       const createUser = new FakerUser({ token: '123' });
-      return await request(app.getHttpServer())
-        .post('/users')
-        .send(createUser)
-        .expect(HttpStatus.BAD_REQUEST);
+      return await request(app.getHttpServer()).post('/users').send(createUser).expect(HttpStatus.BAD_REQUEST);
     });
 
     it('should create token and add permissions on create user', async () => {
@@ -148,10 +127,7 @@ describe('[Feature] Users - /users', () => {
         email: invite.email,
       });
 
-      const user = await request(app.getHttpServer())
-        .post('/users')
-        .send(createUser)
-        .expect(HttpStatus.CREATED);
+      const user = await request(app.getHttpServer()).post('/users').send(createUser).expect(HttpStatus.CREATED);
 
       return expect(user.body.companies).not.toEqual([]);
     });
@@ -169,27 +145,17 @@ describe('[Feature] Users - /users', () => {
         token: invite.id,
       });
 
-      await request(app.getHttpServer())
-        .post('/users')
-        .send(createUser)
-        .expect(HttpStatus.BAD_REQUEST);
+      await request(app.getHttpServer()).post('/users').send(createUser).expect(HttpStatus.BAD_REQUEST);
 
       const createUserInvite = new FakerUser({
         email: invite.email,
         token: invite.id,
       });
 
-      await request(app.getHttpServer())
-        .post('/users')
-        .send(createUserInvite)
-        .expect(HttpStatus.CREATED);
+      await request(app.getHttpServer()).post('/users').send(createUserInvite).expect(HttpStatus.CREATED);
 
       // user already exist in this company
-      return await request(app.getHttpServer())
-        .post('/invites')
-        .send(createInvite)
-        .set('Authorization', `Bearer ${sessionAdmin.token}`)
-        .expect(HttpStatus.BAD_REQUEST);
+      return await request(app.getHttpServer()).post('/invites').send(createInvite).set('Authorization', `Bearer ${sessionAdmin.token}`).expect(HttpStatus.BAD_REQUEST);
     });
   });
 
@@ -204,15 +170,9 @@ describe('[Feature] Users - /users', () => {
         password: createUser.password,
       };
 
-      await request(app.getHttpServer())
-        .post('/users')
-        .send(createUser)
-        .expect(HttpStatus.CREATED);
+      await request(app.getHttpServer()).post('/users').send(createUser).expect(HttpStatus.CREATED);
 
-      const { body: session } = await request(app.getHttpServer())
-        .post('/session')
-        .send(sessionUser)
-        .expect(HttpStatus.OK);
+      const { body: session } = await request(app.getHttpServer()).post('/session').send(sessionUser).expect(HttpStatus.OK);
 
       return request(app.getHttpServer())
         .patch(`/users/update`)
@@ -240,15 +200,9 @@ describe('[Feature] Users - /users', () => {
         password: createUser.password,
       };
 
-      await request(app.getHttpServer())
-        .post('/users')
-        .send(createUser)
-        .expect(HttpStatus.CREATED);
+      await request(app.getHttpServer()).post('/users').send(createUser).expect(HttpStatus.CREATED);
 
-      const { body: session } = await request(app.getHttpServer())
-        .post('/session')
-        .send(sessionUser)
-        .expect(HttpStatus.OK);
+      const { body: session } = await request(app.getHttpServer()).post('/session').send(sessionUser).expect(HttpStatus.OK);
 
       await request(app.getHttpServer())
         .patch(`/users/update`)
@@ -288,15 +242,9 @@ describe('[Feature] Users - /users', () => {
         password: createUser.password,
       };
 
-      await request(app.getHttpServer())
-        .post('/users')
-        .send(createUser)
-        .expect(HttpStatus.CREATED);
+      await request(app.getHttpServer()).post('/users').send(createUser).expect(HttpStatus.CREATED);
 
-      const { body: session } = await request(app.getHttpServer())
-        .post('/session')
-        .send(sessionUser)
-        .expect(HttpStatus.OK);
+      const { body: session } = await request(app.getHttpServer()).post('/session').send(sessionUser).expect(HttpStatus.OK);
 
       const createInvite = new FakeInvite({ email: createUser.email });
 
@@ -312,9 +260,7 @@ describe('[Feature] Users - /users', () => {
         .send({ token: invite.id })
         .expect(HttpStatus.OK)
         .then(({ body }) => {
-          expect(body.companies[0].permissions).toEqual(
-            createInvite.permissions,
-          );
+          expect(body.companies[0].permissions).toEqual(createInvite.permissions);
           expect(body.companies[0].roles).toEqual(createInvite.roles);
         });
     });

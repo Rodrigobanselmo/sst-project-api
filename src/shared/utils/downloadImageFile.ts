@@ -8,10 +8,7 @@ export const getExtensionFromUrl = (url: string) => {
   return urlFile[urlFile.length - 1].split('.')[1];
 };
 
-export const downloadImageFile = async (
-  url: string | null,
-  image_path: string,
-): Promise<string | null> => {
+export const downloadImageFile = async (url: string | null, image_path: string): Promise<string | null> => {
   if (!url) return null;
 
   return axios({

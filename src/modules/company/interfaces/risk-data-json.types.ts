@@ -71,9 +71,4 @@ export interface IRiskDataJsonVibration {
   type: QuantityTypeEnum.VFB | QuantityTypeEnum.VL;
 }
 
-export type IRiskDataJson =
-  | IRiskDataJsonNoise
-  | IRiskDataJsonQui
-  | IRiskDataJsonRadiation
-  | IRiskDataJsonHeat
-  | IRiskDataJsonVibration;
+export type IRiskDataJson = IRiskDataJsonNoise | IRiskDataJsonQui | IRiskDataJsonRadiation | IRiskDataJsonHeat | IRiskDataJsonVibration;

@@ -8,10 +8,7 @@ export class FindByEmailService {
   constructor(private readonly userRepository: UsersRepository) {}
   async execute(email: string) {
     const user = await this.userRepository.findByEmail(email);
-    if (!user?.id)
-      throw new BadRequestException(
-        ErrorInvitesEnum.EMAIL_NOT_FOUND.replace(':v1', email),
-      );
+    if (!user?.id) throw new BadRequestException(ErrorInvitesEnum.EMAIL_NOT_FOUND.replace(':v1', email));
     delete user.password;
     return user;
   }

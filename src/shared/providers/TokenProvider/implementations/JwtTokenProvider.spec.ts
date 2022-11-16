@@ -16,8 +16,7 @@ describe('JwtTokenProvider', () => {
             sign: jest.fn().mockReturnValue('token'),
             verify: jest.fn((token, options) => {
               if (token === 'expired') throw new Error('jwt expired');
-              if (token !== options.secret)
-                throw new Error('invalid signature');
+              if (token !== options.secret) throw new Error('invalid signature');
 
               return { sub: 'userId' };
             }),
@@ -45,10 +44,7 @@ describe('JwtTokenProvider', () => {
   });
 
   it('should generate refresh token and refresh token expiration date', () => {
-    expect(jwtTokenProvider.generateRefreshToken({} as any)).toEqual([
-      'token',
-      new Date(2020, 1, 1),
-    ]);
+    expect(jwtTokenProvider.generateRefreshToken({} as any)).toEqual(['token', new Date(2020, 1, 1)]);
   });
 
   it('should verify a valid token', () => {

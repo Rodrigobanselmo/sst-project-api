@@ -2,10 +2,7 @@ import { AlignmentType, TextDirection, VerticalAlign } from 'docx';
 import { palette } from '../../../../../../../../shared/constants/palette';
 import { borderStyleGlobal } from '../../../../../base/config/styles';
 import { bodyTableProps } from '../../elements/body';
-import {
-  matrixRisk,
-  matrixRiskMap,
-} from '../../../../../../constants/matrizRisk.constant';
+import { matrixRisk, matrixRiskMap } from '../../../../../../constants/matrizRisk.constant';
 
 export const NewTableData = (): bodyTableProps[][] => {
   const legend = {

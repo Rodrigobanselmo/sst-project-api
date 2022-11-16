@@ -6,12 +6,7 @@ import { PrismaService } from '../../../../prisma/prisma.service';
 
 import { Prisma } from '@prisma/client';
 import { NotificationEntity } from '../../entities/notification.entity';
-import {
-  CreateNotificationDto,
-  FindNotificationDto,
-  UpdateNotificationDto,
-  UpdateUserNotificationDto,
-} from '../../dto/nofication.dto';
+import { CreateNotificationDto, FindNotificationDto, UpdateNotificationDto, UpdateUserNotificationDto } from '../../dto/nofication.dto';
 import dayjs from 'dayjs';
 
 @Injectable()
@@ -31,32 +26,20 @@ export class NotificationRepository {
       data: {
         ...createNotificationDto,
         json: json as any,
-        companies: companiesIds
-          ? { connect: companiesIds.map((id) => ({ id })) }
-          : undefined,
-        users: usersIds
-          ? { connect: usersIds.map((id) => ({ id })) }
-          : undefined,
+        companies: companiesIds ? { connect: companiesIds.map((id) => ({ id })) } : undefined,
+        users: usersIds ? { connect: usersIds.map((id) => ({ id })) } : undefined,
       },
     });
 
     return new NotificationEntity(notification);
   }
 
-  async update({
-    id,
-    companiesIds,
-    usersIds,
-    json,
-    ...createNotificationDto
-  }: UpdateNotificationDto): Promise<NotificationEntity> {
+  async update({ id, companiesIds, usersIds, json, ...createNotificationDto }: UpdateNotificationDto): Promise<NotificationEntity> {
     const notification = await this.prisma.notification.update({
       data: {
         ...createNotificationDto,
         json: json as any,
-        companies: companiesIds
-          ? { set: companiesIds.map((id) => ({ id })) }
-          : undefined,
+        companies: companiesIds ? { set: companiesIds.map((id) => ({ id })) } : undefined,
         users: usersIds ? { set: usersIds.map((id) => ({ id })) } : undefined,
       },
       where: { id },
@@ -65,10 +48,7 @@ export class NotificationRepository {
     return new NotificationEntity(notification);
   }
 
-  async confirm({
-    userId,
-    id,
-  }: UpdateUserNotificationDto): Promise<NotificationEntity> {
+  async confirm({ userId, id }: UpdateUserNotificationDto): Promise<NotificationEntity> {
     const notification = await this.prisma.notification.update({
       data: {
         confirmations: { connect: { id: userId } },
@@ -94,11 +74,7 @@ export class NotificationRepository {
     return data.map((exam) => new NotificationEntity(exam));
   }
 
-  async find(
-    query: Partial<FindNotificationDto> & { userId: number },
-    pagination: PaginationQueryDto,
-    options: Prisma.NotificationFindManyArgs = {},
-  ) {
+  async find(query: Partial<FindNotificationDto> & { userId: number }, pagination: PaginationQueryDto, options: Prisma.NotificationFindManyArgs = {}) {
     const whereInit = {
       AND: [],
       ...options.where,
@@ -176,17 +152,13 @@ export class NotificationRepository {
     };
   }
 
-  async findNude(
-    options: Prisma.NotificationFindManyArgs = {},
-  ): Promise<NotificationEntity[]> {
+  async findNude(options: Prisma.NotificationFindManyArgs = {}): Promise<NotificationEntity[]> {
     const notification = await this.prisma.notification.findMany(options);
 
     return notification.map((exam) => new NotificationEntity(exam));
   }
 
-  async findFirstNude(
-    options: Prisma.NotificationFindFirstArgs = {},
-  ): Promise<NotificationEntity> {
+  async findFirstNude(options: Prisma.NotificationFindFirstArgs = {}): Promise<NotificationEntity> {
     const notification = await this.prisma.notification.findFirst(options);
 
     return new NotificationEntity(notification);

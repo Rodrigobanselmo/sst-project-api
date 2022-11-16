@@ -1,10 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
-import {
-  CreateGenerateSourceDto,
-  UpdateGenerateSourceDto,
-} from '../../dto/generate-source.dto';
+import { CreateGenerateSourceDto, UpdateGenerateSourceDto } from '../../dto/generate-source.dto';
 import { GenerateSourceEntity } from '../../entities/generateSource.entity';
 import { IGenerateSourceRepository } from '../IGenerateSourceRepository.types';
 
@@ -12,13 +9,8 @@ import { IGenerateSourceRepository } from '../IGenerateSourceRepository.types';
 export class GenerateSourceRepository implements IGenerateSourceRepository {
   constructor(private prisma: PrismaService) {}
 
-  async create(
-    { recMeds, ...createGenerateSourceDto }: CreateGenerateSourceDto,
-    system: boolean,
-  ): Promise<GenerateSourceEntity> {
-    const hasRecMed = recMeds
-      ? recMeds.filter(({ recName, medName }) => recName || medName).length > 0
-      : false;
+  async create({ recMeds, ...createGenerateSourceDto }: CreateGenerateSourceDto, system: boolean): Promise<GenerateSourceEntity> {
+    const hasRecMed = recMeds ? recMeds.filter(({ recName, medName }) => recName || medName).length > 0 : false;
 
     const redMed = await this.prisma.generateSource.create({
       data: {
@@ -45,12 +37,7 @@ export class GenerateSourceRepository implements IGenerateSourceRepository {
   }
 
   async update(
-    {
-      id,
-      recMeds,
-      riskId,
-      ...createGenerateSourceDto
-    }: UpdateGenerateSourceDto & { id: string; riskId?: string },
+    { id, recMeds, riskId, ...createGenerateSourceDto }: UpdateGenerateSourceDto & { id: string; riskId?: string },
     system: boolean,
     companyId: string,
   ): Promise<GenerateSourceEntity> {
@@ -101,10 +88,7 @@ export class GenerateSourceRepository implements IGenerateSourceRepository {
     return new GenerateSourceEntity(generate);
   }
 
-  async DeleteByCompanyAndIdSoft(
-    id: string,
-    companyId: string,
-  ): Promise<GenerateSourceEntity> {
+  async DeleteByCompanyAndIdSoft(id: string, companyId: string): Promise<GenerateSourceEntity> {
     const generate = await this.prisma.generateSource.update({
       where: { id_companyId: { id, companyId } },
       data: { deleted_at: new Date() },

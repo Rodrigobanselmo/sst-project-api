@@ -18,8 +18,7 @@ export class GenerateSourceEntity implements GenerateSource {
   name: string;
 
   @ApiProperty({
-    description:
-      'The company id related to the generate source or control measure',
+    description: 'The company id related to the generate source or control measure',
   })
   companyId: string;
 

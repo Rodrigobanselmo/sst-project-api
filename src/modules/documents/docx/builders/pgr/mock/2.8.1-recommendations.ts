@@ -1,9 +1,6 @@
 import { VariablesPGREnum } from '../enums/variables.enum';
 import { PGRSectionChildrenTypeEnum } from '../types/elements.types';
-import {
-  IDocumentPGRSectionGroup,
-  PGRSectionTypeEnum,
-} from '../types/section.types';
+import { IDocumentPGRSectionGroup, PGRSectionTypeEnum } from '../types/section.types';
 
 export const recommendations1Section: IDocumentPGRSectionGroup = {
   footer: true,
@@ -12,11 +9,7 @@ export const recommendations1Section: IDocumentPGRSectionGroup = {
     {
       type: PGRSectionTypeEnum.SECTION,
       footerText: `??${VariablesPGREnum.CHAPTER_3}??`,
-      removeWithAllEmptyVars: [
-        VariablesPGREnum.HAS_HEAT,
-        VariablesPGREnum.HAS_VFB,
-        VariablesPGREnum.HAS_VL,
-      ],
+      removeWithAllEmptyVars: [VariablesPGREnum.HAS_HEAT, VariablesPGREnum.HAS_VFB, VariablesPGREnum.HAS_VL],
       children: [
         {
           type: PGRSectionChildrenTypeEnum.H3,

@@ -3,10 +3,7 @@ import { dayjs } from '../../../../../../shared/providers/DateProvider/implement
 import { sectionLandscapeProperties } from '../../../base/config/styles';
 import { VariablesPGREnum } from '../enums/variables.enum';
 import { PGRSectionChildrenTypeEnum } from '../types/elements.types';
-import {
-  IDocumentPGRSectionGroup,
-  PGRSectionTypeEnum,
-} from '../types/section.types';
+import { IDocumentPGRSectionGroup, PGRSectionTypeEnum } from '../types/section.types';
 
 export const endSection: IDocumentPGRSectionGroup = {
   footer: true,
@@ -30,9 +27,7 @@ export const endSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: `??${VariablesPGREnum.COMPANY_SIGNER_CITY}??, ${dayjs().format(
-            'D [de] MMMM [de] YYYY',
-          )}`,
+          text: `??${VariablesPGREnum.COMPANY_SIGNER_CITY}??, ${dayjs().format('D [de] MMMM [de] YYYY')}`,
           alignment: AlignmentType.RIGHT,
         },
         {

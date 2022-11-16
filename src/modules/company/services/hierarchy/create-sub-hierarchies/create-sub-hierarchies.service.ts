@@ -9,10 +9,7 @@ import { HierarchyRepository } from '../../../repositories/implementations/Hiera
 
 @Injectable()
 export class CreateSubHierarchyService {
-  constructor(
-    private readonly hierarchyRepository: HierarchyRepository,
-    private readonly employeeRepository: EmployeeRepository,
-  ) {}
+  constructor(private readonly hierarchyRepository: HierarchyRepository, private readonly employeeRepository: EmployeeRepository) {}
 
   async execute(hierarchy: CreateSubHierarchyDto, user: UserPayloadDto) {
     const employees = await this.employeeRepository.findNude({
@@ -23,14 +20,9 @@ export class CreateSubHierarchyService {
       },
     });
 
-    const isEveryoneFromSameOffice = employees.every((employee) =>
-      employees.every((e) => (e.hierarchyId = employee?.hierarchyId)),
-    );
+    const isEveryoneFromSameOffice = employees.every((employee) => employees.every((e) => (e.hierarchyId = employee?.hierarchyId)));
 
-    if (!isEveryoneFromSameOffice)
-      throw new BadRequestException(
-        ErrorCompanyEnum.EVERYONE_NOT_FROM_SAME_OFFICE,
-      );
+    if (!isEveryoneFromSameOffice) throw new BadRequestException(ErrorCompanyEnum.EVERYONE_NOT_FROM_SAME_OFFICE);
 
     const office = employees[0].hierarchy;
     const workspaceIds = office.workspaces.map((workspace) => workspace.id);

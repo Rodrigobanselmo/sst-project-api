@@ -9,19 +9,11 @@ export class CreateHomoGroupService {
   constructor(private readonly homoGroupRepository: HomoGroupRepository) {}
 
   async execute(homoGroup: CreateHomoGroupDto, user: UserPayloadDto) {
-    const hasHomoSameName =
-      await this.homoGroupRepository.findHomoGroupByCompanyAndName(
-        homoGroup.name,
-        user.targetCompanyId,
-      );
+    const hasHomoSameName = await this.homoGroupRepository.findHomoGroupByCompanyAndName(homoGroup.name, user.targetCompanyId);
 
-    if (hasHomoSameName?.id)
-      throw new ConflictException(ErrorCompanyEnum.HOMOGENEOUS_SAME_NAME);
+    if (hasHomoSameName?.id) throw new ConflictException(ErrorCompanyEnum.HOMOGENEOUS_SAME_NAME);
 
-    const homoGroups = await this.homoGroupRepository.create(
-      homoGroup,
-      user.targetCompanyId,
-    );
+    const homoGroups = await this.homoGroupRepository.create(homoGroup, user.targetCompanyId);
 
     return homoGroups;
   }

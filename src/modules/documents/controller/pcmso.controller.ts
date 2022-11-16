@@ -25,25 +25,10 @@ export class DocumentsPcmsoController {
     isContract: true,
   })
   @Get('/:docId/attachment/:attachmentId/:companyId?')
-  async downloadAttachment(
-    @Res() res,
-    @User() userPayloadDto: UserPayloadDto,
-    @Param('docId') docId: string,
-    @Param('attachmentId') attachmentId: string,
-  ) {
-    const { fileKey, fileStream } =
-      await this.pcmsoDownloadAttachmentsService.execute(
-        userPayloadDto,
-        docId,
-        attachmentId,
-      );
+  async downloadAttachment(@Res() res, @User() userPayloadDto: UserPayloadDto, @Param('docId') docId: string, @Param('attachmentId') attachmentId: string) {
+    const { fileKey, fileStream } = await this.pcmsoDownloadAttachmentsService.execute(userPayloadDto, docId, attachmentId);
 
-    res.setHeader(
-      'Content-Disposition',
-      `attachment; filename=${
-        fileKey.split('/')[fileKey.split('/').length - 1]
-      }`,
-    );
+    res.setHeader('Content-Disposition', `attachment; filename=${fileKey.split('/')[fileKey.split('/').length - 1]}`);
     fileStream.on('error', function (e) {
       res.status(500).send(e);
     });
@@ -57,22 +42,10 @@ export class DocumentsPcmsoController {
     isContract: true,
   })
   @Get('/:docId/:companyId?')
-  async downloadPCMSO(
-    @Res() res,
-    @User() userPayloadDto: UserPayloadDto,
-    @Param('docId') docId: string,
-  ) {
-    const { fileKey, fileStream } = await this.pcmsoDownloadDocService.execute(
-      userPayloadDto,
-      docId,
-    );
+  async downloadPCMSO(@Res() res, @User() userPayloadDto: UserPayloadDto, @Param('docId') docId: string) {
+    const { fileKey, fileStream } = await this.pcmsoDownloadDocService.execute(userPayloadDto, docId);
 
-    res.setHeader(
-      'Content-Disposition',
-      `attachment; filename=${
-        fileKey.split('/')[fileKey.split('/').length - 1]
-      }`,
-    );
+    res.setHeader('Content-Disposition', `attachment; filename=${fileKey.split('/')[fileKey.split('/').length - 1]}`);
     fileStream.on('error', function (e) {
       res.status(500).send(e);
     });
@@ -87,17 +60,11 @@ export class DocumentsPcmsoController {
     crud: true,
   })
   @Post()
-  async uploadPCMSODoc(
-    @Res() res,
-    @User() userPayloadDto: UserPayloadDto,
-    @Body() upsertPcmsoDto: UpsertPcmsoDocumentDto,
-  ) {
-    const { buffer: file, fileName } = await this.pcmsoUploadDocService.execute(
-      {
-        ...upsertPcmsoDto,
-        companyId: userPayloadDto.targetCompanyId,
-      },
-    );
+  async uploadPCMSODoc(@Res() res, @User() userPayloadDto: UserPayloadDto, @Body() upsertPcmsoDto: UpsertPcmsoDocumentDto) {
+    const { buffer: file, fileName } = await this.pcmsoUploadDocService.execute({
+      ...upsertPcmsoDto,
+      companyId: userPayloadDto.targetCompanyId,
+    });
     res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
     res.send(file);
   }
@@ -109,10 +76,7 @@ export class DocumentsPcmsoController {
     crud: true,
   })
   @Post('/add-queue')
-  async addQueuePCMSODoc(
-    @User() user: UserPayloadDto,
-    @Body() dto: UpsertDocumentDto,
-  ) {
+  async addQueuePCMSODoc(@User() user: UserPayloadDto, @Body() dto: UpsertDocumentDto) {
     dto.isPCMSO = true;
     return this.addQueuePCMSODocumentService.execute(dto, user);
   }

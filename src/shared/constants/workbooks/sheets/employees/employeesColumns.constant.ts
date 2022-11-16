@@ -10,10 +10,7 @@ import { checkIsValidDate } from '../../../../../shared/utils/validators/checkIs
 
 import { excelWorkspaceNotes } from '../../../../../modules/files/utils/notes/excel-workspace-notes';
 import { ITableSchema } from '../../../../providers/ExcelProvider/models/IExcelProvider.types';
-import {
-  statusEnumTranslateBrToUs,
-  StatusEnumTranslated,
-} from '../../../../utils/translate/statusEnum.translate';
+import { statusEnumTranslateBrToUs, StatusEnumTranslated } from '../../../../utils/translate/statusEnum.translate';
 import { checkIsEnum } from '../../../../utils/validators/checkIsEnum';
 import { checkIsString } from '../../../../utils/validators/checkIsString';
 import { checkIsValidCid } from '../../../../../shared/utils/validators/checkIsValidCid';
@@ -68,8 +65,7 @@ export const employeesColumnsConstant = [
     isArray: false,
     required: false,
     checkHandler: checkIsString,
-    notes:
-      'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
+    notes: 'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
   },
   {
     databaseName: 'management',
@@ -77,8 +73,7 @@ export const employeesColumnsConstant = [
     isArray: false,
     required: false,
     checkHandler: checkIsString,
-    notes:
-      'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
+    notes: 'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
   },
   {
     databaseName: 'sector',
@@ -86,8 +81,7 @@ export const employeesColumnsConstant = [
     isArray: false,
     required: true,
     checkHandler: checkIsString,
-    notes:
-      'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
+    notes: 'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
   },
   {
     databaseName: 'sub_sector',
@@ -95,8 +89,7 @@ export const employeesColumnsConstant = [
     isArray: false,
     required: false,
     checkHandler: checkIsString,
-    notes:
-      'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
+    notes: 'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
   },
   {
     databaseName: 'office',
@@ -104,8 +97,7 @@ export const employeesColumnsConstant = [
     isArray: false,
     required: true,
     checkHandler: checkIsString,
-    notes:
-      'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
+    notes: 'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
   },
   {
     databaseName: 'sub_office',
@@ -113,8 +105,7 @@ export const employeesColumnsConstant = [
     isArray: false,
     required: false,
     checkHandler: checkIsString,
-    notes:
-      'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
+    notes: 'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
   },
   {
     databaseName: 'description',
@@ -135,9 +126,7 @@ export const employeesColumnsConstant = [
     excelName: 'GSE',
     isArray: false,
     required: false,
-    notes: [
-      'somente conecta um GSE ao cargo, para remover-lo deve-se usar o sistema',
-    ],
+    notes: ['somente conecta um GSE ao cargo, para remover-lo deve-se usar o sistema'],
     checkHandler: checkIsString,
   },
   {

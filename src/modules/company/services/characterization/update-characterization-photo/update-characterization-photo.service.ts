@@ -11,19 +11,13 @@ export class UpdateCharacterizationPhotoService {
     private readonly characterizationPhotoRepository: CharacterizationPhotoRepository,
   ) {}
 
-  async execute(
-    id: string,
-    updatePhotoCharacterizationDto: UpdatePhotoCharacterizationDto,
-  ) {
-    const characterizationPhoto =
-      await this.characterizationPhotoRepository.update({
-        ...updatePhotoCharacterizationDto,
-        id,
-      });
+  async execute(id: string, updatePhotoCharacterizationDto: UpdatePhotoCharacterizationDto) {
+    const characterizationPhoto = await this.characterizationPhotoRepository.update({
+      ...updatePhotoCharacterizationDto,
+      id,
+    });
 
-    const characterizationData = await this.characterizationRepository.findById(
-      characterizationPhoto.companyCharacterizationId,
-    );
+    const characterizationData = await this.characterizationRepository.findById(characterizationPhoto.companyCharacterizationId);
 
     return characterizationData;
   }

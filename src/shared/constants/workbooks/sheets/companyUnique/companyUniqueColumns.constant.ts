@@ -1,10 +1,7 @@
 import { StatusEnum } from '@prisma/client';
 import { excelWorkspaceNotes } from '../../../../../modules/files/utils/notes/excel-workspace-notes';
 import { ITableSchema } from '../../../../../shared/providers/ExcelProvider/models/IExcelProvider.types';
-import {
-  statusEnumTranslateBrToUs,
-  StatusEnumTranslated,
-} from '../../../../../shared/utils/translate/statusEnum.translate';
+import { statusEnumTranslateBrToUs, StatusEnumTranslated } from '../../../../../shared/utils/translate/statusEnum.translate';
 import { checkIsNumber } from '../../../../../shared/utils/validators/checkIdNumber';
 import { checkIsEnum } from '../../../../../shared/utils/validators/checkIsEnum';
 import { checkIsString } from '../../../../../shared/utils/validators/checkIsString';
@@ -115,7 +112,6 @@ export const companyUniqueColumnsConstant = [
     isArray: true,
     notes: [StatusEnumTranslated.ACTIVE, StatusEnumTranslated.INACTIVE],
     required: false,
-    checkHandler: (value: any) =>
-      checkIsEnum(statusEnumTranslateBrToUs(value), StatusEnum),
+    checkHandler: (value: any) => checkIsEnum(statusEnumTranslateBrToUs(value), StatusEnum),
   },
 ] as ITableSchema[];

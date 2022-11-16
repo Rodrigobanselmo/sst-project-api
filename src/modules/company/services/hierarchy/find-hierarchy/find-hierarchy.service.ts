@@ -7,10 +7,7 @@ export class FindHierarchyService {
   constructor(private readonly hierarchyRepository: HierarchyRepository) {}
 
   async execute(id: string, user: UserPayloadDto) {
-    const hierarchy = await this.hierarchyRepository.findById(
-      id,
-      user.targetCompanyId,
-    );
+    const hierarchy = await this.hierarchyRepository.findById(id, user.targetCompanyId);
 
     return hierarchy;
   }

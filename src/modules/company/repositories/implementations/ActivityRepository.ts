@@ -38,11 +38,7 @@ export class ActivityRepository {
     return data.map((activity) => new ActivityEntity(activity));
   }
 
-  async find(
-    query: Partial<FindActivityDto>,
-    pagination: PaginationQueryDto,
-    options: Prisma.ActivityFindManyArgs = {},
-  ) {
+  async find(query: Partial<FindActivityDto>, pagination: PaginationQueryDto, options: Prisma.ActivityFindManyArgs = {}) {
     const whereInit = {
       AND: [],
     } as typeof options.where;
@@ -54,10 +50,7 @@ export class ActivityRepository {
 
     if ('search' in query) {
       (where.AND as any).push({
-        OR: [
-          { name: { contains: query.search, mode: 'insensitive' } },
-          { code: { contains: query.search } },
-        ],
+        OR: [{ name: { contains: query.search, mode: 'insensitive' } }, { code: { contains: query.search } }],
       } as typeof options.where);
     }
 

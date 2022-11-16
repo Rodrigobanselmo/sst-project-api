@@ -5,11 +5,7 @@ import { paragraphFigure } from '../paragraphs';
 
 const fullWidth = 718 * 0.8;
 
-export const VFullWidthImage = (
-  image: string,
-  text: string,
-  options?: IParagraphOptions,
-) => {
+export const VFullWidthImage = (image: string, text: string, options?: IParagraphOptions) => {
   return [
     new Paragraph({
       children: [

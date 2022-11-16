@@ -7,30 +7,15 @@ import { ErrorDocumentEnum } from '../../../../../shared/constants/enum/errorMes
 
 @Injectable()
 export class DownloadAttachmentsService {
-  constructor(
-    private readonly amazonStorageProvider: AmazonStorageProvider,
-    private readonly riskDocumentRepository: RiskDocumentRepository,
-  ) {}
-  async execute(
-    userPayloadDto: UserPayloadDto,
-    docId: string,
-    attachmentId: string,
-  ) {
+  constructor(private readonly amazonStorageProvider: AmazonStorageProvider, private readonly riskDocumentRepository: RiskDocumentRepository) {}
+  async execute(userPayloadDto: UserPayloadDto, docId: string, attachmentId: string) {
     const companyId = userPayloadDto.targetCompanyId;
 
-    const riskDoc = await this.riskDocumentRepository.findById(
-      docId,
-      companyId,
-      { include: { attachments: true } },
-    );
-    if (!riskDoc?.id)
-      throw new BadRequestException(ErrorDocumentEnum.NOT_FOUND);
+    const riskDoc = await this.riskDocumentRepository.findById(docId, companyId, { include: { attachments: true } });
+    if (!riskDoc?.id) throw new BadRequestException(ErrorDocumentEnum.NOT_FOUND);
 
-    const attachment = riskDoc.attachments.find(
-      (attachment) => attachment.id === attachmentId,
-    );
-    if (!attachment?.id)
-      throw new BadRequestException(ErrorDocumentEnum.NOT_FOUND);
+    const attachment = riskDoc.attachments.find((attachment) => attachment.id === attachmentId);
+    if (!attachment?.id) throw new BadRequestException(ErrorDocumentEnum.NOT_FOUND);
 
     const fileKey = attachment.url.split('.com/').pop();
 

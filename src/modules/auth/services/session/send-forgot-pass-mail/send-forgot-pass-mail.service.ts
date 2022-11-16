@@ -22,25 +22,11 @@ export class SendForgotPassMailService {
       throw new BadRequestException('User does not exists');
     }
 
-    const templatePath = resolve(
-      __dirname,
-      '..',
-      '..',
-      '..',
-      '..',
-      '..',
-      'templates',
-      'email',
-      'forgotPassword.hbs',
-    );
+    const templatePath = resolve(__dirname, '..', '..', '..', '..', '..', 'templates', 'email', 'forgotPassword.hbs');
 
     const expires_date = this.dateProvider.addHours(new Date(), 3);
 
-    const refresh_token = await this.refreshTokensRepository.create(
-      'reset',
-      user.id,
-      expires_date,
-    );
+    const refresh_token = await this.refreshTokensRepository.create('reset', user.id, expires_date);
 
     const variables = {
       name: 'user.name',

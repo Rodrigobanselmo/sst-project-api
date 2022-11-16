@@ -8,18 +8,11 @@ import { EmployeeRepository } from './../../../../../repositories/implementation
 
 @Injectable()
 export class FindClinicScheduleEmployeeExamHistoryService {
-  constructor(
-    private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository,
-    private readonly employeeRepository: EmployeeRepository,
-  ) {}
+  constructor(private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository, private readonly employeeRepository: EmployeeRepository) {}
 
   async execute(query: FindClinicEmployeeExamHistoryDto, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;
-    const status: StatusEnum[] = [
-      StatusEnum.DONE,
-      StatusEnum.PROCESSING,
-      StatusEnum.INACTIVE,
-    ];
+    const status: StatusEnum[] = [StatusEnum.DONE, StatusEnum.PROCESSING, StatusEnum.INACTIVE];
 
     const employees = await this.employeeRepository.findNude({
       select: {

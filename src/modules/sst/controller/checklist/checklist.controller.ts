@@ -21,14 +21,8 @@ export class ChecklistController {
   ) {}
 
   @Post()
-  create(
-    @User() userPayloadDto: UserPayloadDto,
-    @Body() createChecklistDto: CreateChecklistDto,
-  ) {
-    return this.createChecklistService.execute(
-      createChecklistDto,
-      userPayloadDto,
-    );
+  create(@User() userPayloadDto: UserPayloadDto, @Body() createChecklistDto: CreateChecklistDto) {
+    return this.createChecklistService.execute(createChecklistDto, userPayloadDto);
   }
 
   @Get('/:companyId?')
@@ -37,18 +31,12 @@ export class ChecklistController {
   }
 
   @Get('/data/:checklistId/:companyId?')
-  findChecklistData(
-    @Param('checklistId') checklistId: number,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
+  findChecklistData(@Param('checklistId') checklistId: number, @User() userPayloadDto: UserPayloadDto) {
     return this.findChecklistDataService.execute(checklistId, userPayloadDto);
   }
 
   @Patch('/:checklistId')
-  async update(
-    @Param('checklistId') checklistId: number,
-    @Body() updateChecklistDto: UpdateChecklistDto,
-  ) {
+  async update(@Param('checklistId') checklistId: number, @Body() updateChecklistDto: UpdateChecklistDto) {
     return this.updateChecklistService.execute(checklistId, updateChecklistDto);
   }
 }

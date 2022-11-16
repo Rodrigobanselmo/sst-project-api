@@ -6,12 +6,8 @@ export interface ICnpjReceitaResponse {
   fantasia: string;
   porte: string;
   natureza_juridica: string;
-  atividade_principal?:
-    | AtividadePrincipalEntityOrAtividadesSecundariasEntity[]
-    | null;
-  atividades_secundarias?:
-    | AtividadePrincipalEntityOrAtividadesSecundariasEntity[]
-    | null;
+  atividade_principal?: AtividadePrincipalEntityOrAtividadesSecundariasEntity[] | null;
+  atividades_secundarias?: AtividadePrincipalEntityOrAtividadesSecundariasEntity[] | null;
   qsa?: QsaEntity[] | null;
   logradouro: string;
   numero: string;

@@ -1,10 +1,4 @@
-import {
-  BorderStyle,
-  IBorderOptions,
-  ISectionPropertiesOptions,
-  ITableBordersOptions,
-  PageOrientation,
-} from 'docx';
+import { BorderStyle, IBorderOptions, ISectionPropertiesOptions, ITableBordersOptions, PageOrientation } from 'docx';
 
 const EMU = 1014400;
 export const pageWidth = 790;

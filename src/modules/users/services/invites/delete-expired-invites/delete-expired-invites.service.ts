@@ -5,10 +5,7 @@ import { InviteUsersRepository } from '../../../repositories/implementations/Inv
 
 @Injectable()
 export class DeleteExpiredInvitesService {
-  constructor(
-    private readonly inviteUsersRepository: InviteUsersRepository,
-    private readonly dateProvider: DayJSProvider,
-  ) {}
+  constructor(private readonly inviteUsersRepository: InviteUsersRepository, private readonly dateProvider: DayJSProvider) {}
 
   async execute() {
     const currentDate = this.dateProvider.dateNow();

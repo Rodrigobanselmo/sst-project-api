@@ -4,16 +4,10 @@ import { hierarchyList } from '../../../../../../shared/constants/lists/hierarch
 import { palette } from '../../../../../../shared/constants/palette';
 import { sortNumber } from '../../../../../../shared/utils/sorts/number.sort';
 import { sortString } from '../../../../../../shared/utils/sorts/string.sort';
-import {
-  IHierarchyData,
-  IHomoGroupMap,
-} from '../../../converter/hierarchy.converter';
+import { IHierarchyData, IHomoGroupMap } from '../../../converter/hierarchy.converter';
 import { bodyTableProps, emptyCellName } from './elements/body';
 import { headerTableProps } from './elements/header';
-import {
-  HierarchyPlanColumnEnum,
-  HierarchyPlanMap,
-} from './hierarchyHomoOrg.constant';
+import { HierarchyPlanColumnEnum, HierarchyPlanMap } from './hierarchyHomoOrg.constant';
 import { borderStyleGlobal } from '../../../base/config/styles';
 
 export type ConverterProps = {
@@ -46,13 +40,7 @@ const hierarchyEmptyId = '0';
 export const hierarchyPlanConverter = (
   hierarchyData: IHierarchyData,
   homoGroupTree: IHomoGroupMap,
-  {
-    showDescription,
-    showHomogeneous,
-    showHomogeneousDescription,
-    type,
-    groupIdFilter,
-  }: ConverterProps = {
+  { showDescription, showHomogeneous, showHomogeneousDescription, type, groupIdFilter }: ConverterProps = {
     showHomogeneous: false,
     showHomogeneousDescription: false,
     showDescription: true,
@@ -69,9 +57,7 @@ export const hierarchyPlanConverter = (
       const highParent = hierarchiesData.org[0];
 
       const org = [...hierarchyList, 'EMPLOYEE'].map((orgType) => {
-        const hierarchyData = hierarchiesData.org.find(
-          (org) => org.typeEnum === orgType,
-        );
+        const hierarchyData = hierarchiesData.org.find((org) => org.typeEnum === orgType);
 
         if (hierarchiesData.descRh) hasAtLeastOneDescription = true;
 
@@ -97,24 +83,16 @@ export const hierarchyPlanConverter = (
       });
 
       hierarchiesData.org.forEach((hierarchyData) => {
-        (showHomogeneous
-          ? hierarchyData.homogeneousGroupIds
-          : [highParent.id]
-        ).forEach((homogeneousGroupId) => {
-          if (!allHierarchyPlan[homogeneousGroupId])
-            allHierarchyPlan[homogeneousGroupId] = {};
+        (showHomogeneous ? hierarchyData.homogeneousGroupIds : [highParent.id]).forEach((homogeneousGroupId) => {
+          if (!allHierarchyPlan[homogeneousGroupId]) allHierarchyPlan[homogeneousGroupId] = {};
 
-          const loop = (
-            allHierarchyPlanLoop: IHierarchyPlan<any>,
-            index: number,
-          ) => {
+          const loop = (allHierarchyPlanLoop: IHierarchyPlan<any>, index: number) => {
             const hierarchyId = org[index].id;
             const hierarchyName = org[index]?.name;
             const hierarchyType = org[index].typeEnum;
             const hierarchyEmployees = org[index]?.employeesLength || 0;
             const hierarchyDesc = org[index]?.description || 0;
-            if (hierarchyId !== hierarchyEmptyId)
-              hierarchyColumns[hierarchyType as any] = 0;
+            if (hierarchyId !== hierarchyEmptyId) hierarchyColumns[hierarchyType as any] = 0;
 
             if (!allHierarchyPlanLoop[hierarchyId])
               allHierarchyPlanLoop[hierarchyId] = {
@@ -136,10 +114,7 @@ export const hierarchyPlanConverter = (
     });
   })();
 
-  const mockedColumns = [
-    HierarchyPlanMap[HierarchyPlanColumnEnum.GSE],
-    HierarchyPlanMap[HierarchyPlanColumnEnum.DESCRIPTION],
-  ].map<headerTableProps>(({ ...column }) => {
+  const mockedColumns = [HierarchyPlanMap[HierarchyPlanColumnEnum.GSE], HierarchyPlanMap[HierarchyPlanColumnEnum.DESCRIPTION]].map<headerTableProps>(({ ...column }) => {
     delete column.position;
     return column;
   });
@@ -171,15 +146,10 @@ export const hierarchyPlanConverter = (
     let rowsPosition = 0;
     const rows: bodyTableProps[][] = [];
 
-    const generateRow = (): bodyTableProps[] =>
-      Array.from({ length: columnsLength }).map(() => ({}));
+    const generateRow = (): bodyTableProps[] => Array.from({ length: columnsLength }).map(() => ({}));
 
     Object.entries(allHierarchyPlan)
-      .sort(([a, c], [b, d]) =>
-        showHomogeneous
-          ? sortString(homoGroupTree[a], homoGroupTree[b], 'name')
-          : sortString(c[0], d[0], 'name'),
-      )
+      .sort(([a, c], [b, d]) => (showHomogeneous ? sortString(homoGroupTree[a], homoGroupTree[b], 'name') : sortString(c[0], d[0], 'name')))
       .forEach(([homogeneousGroupId, firstHierarchyPlan]) => {
         const homo = homoGroupTree[homogeneousGroupId];
         let name = homo ? homo.name : '';
@@ -193,15 +163,10 @@ export const hierarchyPlanConverter = (
           if (groupIdFilter && homo.id != groupIdFilter) return;
 
           if (homo.environment) {
-            name = `${homo.environment.name}\n(${
-              originRiskMap[homo.environment.type].name
-            })`;
+            name = `${homo.environment.name}\n(${originRiskMap[homo.environment.type].name})`;
           }
 
-          if (homo.characterization)
-            name = `${homo.characterization.name}\n(${
-              originRiskMap[homo.characterization.type].name
-            })`;
+          if (homo.characterization) name = `${homo.characterization.name}\n(${originRiskMap[homo.characterization.type].name})`;
         }
 
         const row = generateRow();
@@ -225,8 +190,7 @@ export const hierarchyPlanConverter = (
 
           hierarchyArray.forEach(([, hierarchyData]) => {
             const firstPosition = rowsPosition;
-            const hierarchyColumnTypePosition =
-              hierarchyColumns[hierarchyData.type];
+            const hierarchyColumnTypePosition = hierarchyColumns[hierarchyData.type];
             const indexRowSpan = hierarchyColumnTypePosition;
 
             if (!rows[rowsPosition]) rows[rowsPosition] = generateRow();

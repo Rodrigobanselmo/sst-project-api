@@ -2,15 +2,7 @@ import { FetchESocialBatchEventsService } from './../../../services/events/all/f
 import { FindESocialBatchDto } from './../../../dto/esocial-batch.dto';
 import { FindESocialEventService } from './../../../services/events/all/find-events/find-events.service';
 import { FindESocialEventDto } from './../../../dto/esocial-event.dto';
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Query,
-  UploadedFile,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -36,11 +28,7 @@ export class ESocialEventController {
 
   @Post('certificate')
   @UseInterceptors(FileInterceptor('file', { fileFilter: pfxFileFilter }))
-  addCert(
-    @UploadedFile() file: Express.Multer.File,
-    @User() user: UserPayloadDto,
-    @Body() body: AddCertDto,
-  ) {
+  addCert(@UploadedFile() file: Express.Multer.File, @User() user: UserPayloadDto, @Body() body: AddCertDto) {
     return this.addCertificationESocialService.execute(file, body, user);
   }
 
@@ -57,18 +45,12 @@ export class ESocialEventController {
   }
 
   @Get('events/:companyId?')
-  findEvents(
-    @User() userPayloadDto: UserPayloadDto,
-    @Query() query: FindESocialEventDto,
-  ) {
+  findEvents(@User() userPayloadDto: UserPayloadDto, @Query() query: FindESocialEventDto) {
     return this.findESocialEventService.execute(query, userPayloadDto);
   }
 
   @Get('batch/:companyId?')
-  findBatch(
-    @User() userPayloadDto: UserPayloadDto,
-    @Query() query: FindESocialBatchDto,
-  ) {
+  findBatch(@User() userPayloadDto: UserPayloadDto, @Query() query: FindESocialBatchDto) {
     return this.findESocialBatchService.execute(query, userPayloadDto);
   }
 }

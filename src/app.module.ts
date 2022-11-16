@@ -16,18 +16,7 @@ import { PermissionsGuard } from './shared/guards/permissions.guard';
 import { RolesGuard } from './shared/guards/roles.guard';
 
 @Module({
-  imports: [
-    PrismaModule,
-    UsersModule,
-    AuthModule,
-    CompanyModule,
-    SSTModule,
-    FilesModule,
-    DocumentsModule,
-    EsocialModule,
-    NotificationModule,
-    ScheduleModule.forRoot(),
-  ],
+  imports: [PrismaModule, UsersModule, AuthModule, CompanyModule, SSTModule, FilesModule, DocumentsModule, EsocialModule, NotificationModule, ScheduleModule.forRoot()],
   providers: [
     {
       provide: APP_GUARD,

@@ -41,9 +41,7 @@ export class UpsertCharacterizationService {
         })),
       );
 
-    const characterizationData = await this.characterizationRepository.findById(
-      characterization.id,
-    );
+    const characterizationData = await this.characterizationRepository.findById(characterization.id);
 
     return characterizationData;
   }
@@ -51,8 +49,7 @@ export class UpsertCharacterizationService {
   private async upload(companyId: string, files: Array<Express.Multer.File>) {
     const urls = await Promise.all(
       files.map(async (file) => {
-        const fileType =
-          file.originalname.split('.')[file.originalname.split('.').length - 1];
+        const fileType = file.originalname.split('.')[file.originalname.split('.').length - 1];
         const path = companyId + '/characterization/' + v4() + '.' + fileType;
 
         // const { url } = await this.amazonStorageProvider.upload({

@@ -1,10 +1,5 @@
 export const rowBodyFisQui: [string, string[]][] = [
-  [
-    '01\nDESPREZÍVEL',
-    [
-      '– Efeitos reversíveis de pouca importância ou nenhum agravamento a saúde conhecido.',
-    ],
-  ],
+  ['01\nDESPREZÍVEL', ['– Efeitos reversíveis de pouca importância ou nenhum agravamento a saúde conhecido.']],
   [
     '02\nPEQUENO',
     [

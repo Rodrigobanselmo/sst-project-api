@@ -22,11 +22,7 @@ import { DocumentsPcmsoController } from './controller/pcmso.controller';
 // import { DocumentsBaseController } from './controller/doc.controller';
 
 @Module({
-  controllers: [
-    DocumentsPgrController,
-    DocumentsPdfController,
-    DocumentsPcmsoController,
-  ],
+  controllers: [DocumentsPgrController, DocumentsPdfController, DocumentsPcmsoController],
   imports: [SSTModule, CompanyModule, UsersModule],
   providers: [
     ExcelProvider,

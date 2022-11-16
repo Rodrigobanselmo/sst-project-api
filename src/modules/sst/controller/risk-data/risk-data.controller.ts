@@ -11,12 +11,7 @@ import { FindAllByHierarchyService } from '../../services/risk-data/find-by-hier
 import { FindAllByHomogeneousGroupService } from '../../services/risk-data/find-by-homogeneous-group/find-by-homogeneous-group.service';
 import { UpsertManyRiskDataService } from '../../services/risk-data/upsert-many-risk-data/upsert-many-risk-data.service';
 import { UpsertRiskDataService } from '../../services/risk-data/upsert-risk-data/upsert-risk.service';
-import {
-  DeleteManyRiskDataDto,
-  FindRiskDataDto,
-  UpsertManyRiskDataDto,
-  UpsertRiskDataDto,
-} from '../../dto/risk-data.dto';
+import { DeleteManyRiskDataDto, FindRiskDataDto, UpsertManyRiskDataDto, UpsertRiskDataDto } from '../../dto/risk-data.dto';
 
 @Controller('risk-data')
 export class RiskDataController {
@@ -72,12 +67,7 @@ export class RiskDataController {
     @Query() query: FindRiskDataDto,
   ) {
     const companyId = userPayloadDto.targetCompanyId;
-    return this.findAllActionPlanService.execute(
-      groupId,
-      workspaceId,
-      companyId,
-      query,
-    );
+    return this.findAllActionPlanService.execute(groupId, workspaceId, companyId, query);
   }
 
   @Permissions({
@@ -86,18 +76,10 @@ export class RiskDataController {
     isMember: true,
   })
   @Get('/:companyId/:groupId/homogeneous/:homogeneousGroupId')
-  findAllAvailableByHomogenousGroup(
-    @User() userPayloadDto: UserPayloadDto,
-    @Param('groupId') groupId: string,
-    @Param('homogeneousGroupId') homogeneousGroupId: string,
-  ) {
+  findAllAvailableByHomogenousGroup(@User() userPayloadDto: UserPayloadDto, @Param('groupId') groupId: string, @Param('homogeneousGroupId') homogeneousGroupId: string) {
     const companyId = userPayloadDto.targetCompanyId;
 
-    return this.findAllByHomogeneousGroupService.execute(
-      homogeneousGroupId,
-      groupId,
-      companyId,
-    );
+    return this.findAllByHomogeneousGroupService.execute(homogeneousGroupId, groupId, companyId);
   }
 
   @Permissions({
@@ -106,10 +88,7 @@ export class RiskDataController {
     isMember: true,
   })
   @Get('/:companyId/hierarchy/:hierarchyId')
-  findAllAvailableByHierarchy(
-    @User() userPayloadDto: UserPayloadDto,
-    @Param('hierarchyId') hierarchyId: string,
-  ) {
+  findAllAvailableByHierarchy(@User() userPayloadDto: UserPayloadDto, @Param('hierarchyId') hierarchyId: string) {
     const companyId = userPayloadDto.targetCompanyId;
 
     return this.findAllByHierarchyService.execute(hierarchyId, companyId);
@@ -121,18 +100,10 @@ export class RiskDataController {
     isMember: true,
   })
   @Get('/:companyId/:riskGroupId/:riskId')
-  findAllAvailable(
-    @User() userPayloadDto: UserPayloadDto,
-    @Param('riskId') riskId: string,
-    @Param('riskGroupId') groupId: string,
-  ) {
+  findAllAvailable(@User() userPayloadDto: UserPayloadDto, @Param('riskId') riskId: string, @Param('riskGroupId') groupId: string) {
     const companyId = userPayloadDto.targetCompanyId;
 
-    return this.findAllByGroupAndRiskService.execute(
-      riskId,
-      groupId,
-      companyId,
-    );
+    return this.findAllByGroupAndRiskService.execute(riskId, groupId, companyId);
   }
 
   @Permissions({
@@ -142,10 +113,7 @@ export class RiskDataController {
     isMember: true,
   })
   @Post('/:companyId/:groupId/delete/many')
-  delete(
-    @Body() upsertRiskDataDto: DeleteManyRiskDataDto,
-    @Param('groupId') groupId: string,
-  ) {
+  delete(@Body() upsertRiskDataDto: DeleteManyRiskDataDto, @Param('groupId') groupId: string) {
     return this.deleteManyRiskDataService.execute(upsertRiskDataDto, groupId);
   }
 }

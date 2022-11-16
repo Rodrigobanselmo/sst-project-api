@@ -6,18 +6,11 @@ import { DatabaseTableRepository } from '../repositories/implementations/Databas
 
 @Injectable()
 export class DownloadExcelProvider {
-  constructor(
-    private readonly databaseTableRepository: DatabaseTableRepository,
-    private readonly excelProvider: ExcelProvider,
-  ) {}
+  constructor(private readonly databaseTableRepository: DatabaseTableRepository, private readonly excelProvider: ExcelProvider) {}
 
   async newTableData({ findAll, Workbook, companyId }) {
     // get risk table with actual version
-    const databaseTable =
-      await this.databaseTableRepository.findByNameAndCompany(
-        Workbook.name,
-        companyId,
-      );
+    const databaseTable = await this.databaseTableRepository.findByNameAndCompany(Workbook.name, companyId);
 
     // get all available data to generate a new table
     const allSheets = await Promise.all(

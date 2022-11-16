@@ -10,16 +10,9 @@ import dayjs from 'dayjs';
 
 @Injectable()
 export class CreateDocumentService {
-  constructor(
-    private readonly documentRepository: DocumentRepository,
-    private readonly amazonStorageProvider: AmazonStorageProvider,
-  ) {}
+  constructor(private readonly documentRepository: DocumentRepository, private readonly amazonStorageProvider: AmazonStorageProvider) {}
 
-  async execute(
-    { parentDocumentId, ...dto }: CreateDocumentDto,
-    user: UserPayloadDto,
-    file: Express.Multer.File,
-  ) {
+  async execute({ parentDocumentId, ...dto }: CreateDocumentDto, user: UserPayloadDto, file: Express.Multer.File) {
     const companyId = user.targetCompanyId;
 
     if (parentDocumentId) {
@@ -30,12 +23,9 @@ export class CreateDocumentService {
         },
       });
 
-      if (!documentFound?.id)
-        throw new BadRequestException(ErrorMessageEnum.DOCUMENT_NOT_FOUND);
+      if (!documentFound?.id) throw new BadRequestException(ErrorMessageEnum.DOCUMENT_NOT_FOUND);
 
-      const isNew = dto.endDate
-        ? dayjs(documentFound.endDate).isBefore(dto.endDate)
-        : false;
+      const isNew = dto.endDate ? dayjs(documentFound.endDate).isBefore(dto.endDate) : false;
 
       const oldData = {
         companyId: user.targetCompanyId,
@@ -93,15 +83,9 @@ export class CreateDocumentService {
     return document;
   }
 
-  private async upload(
-    companyId: string,
-    file: Express.Multer.File,
-    dto: CreateDocumentDto,
-  ) {
-    const fileType =
-      file.originalname.split('.')[file.originalname.split('.').length - 1];
-    const path =
-      companyId + '/documents/' + `${dto?.name || ''}-${v4()}` + '.' + fileType;
+  private async upload(companyId: string, file: Express.Multer.File, dto: CreateDocumentDto) {
+    const fileType = file.originalname.split('.')[file.originalname.split('.').length - 1];
+    const path = companyId + '/documents/' + `${dto?.name || ''}-${v4()}` + '.' + fileType;
 
     const { url } = await this.amazonStorageProvider.upload({
       file: file.buffer,

@@ -9,9 +9,7 @@ describe.skip('UpsertRiskGroupDataService', () => {
       providers: [UpsertRiskGroupDataService],
     }).compile();
 
-    service = module.get<UpsertRiskGroupDataService>(
-      UpsertRiskGroupDataService,
-    );
+    service = module.get<UpsertRiskGroupDataService>(UpsertRiskGroupDataService);
   });
 
   it('should be defined', () => {

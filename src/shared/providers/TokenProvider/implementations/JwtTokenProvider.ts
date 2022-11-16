@@ -6,10 +6,7 @@ import { IPayloadToken, ITokenProvider } from '../models/ITokenProvider.types';
 
 @Injectable()
 export class JwtTokenProvider implements ITokenProvider {
-  constructor(
-    private readonly jwtService: JwtService,
-    private readonly dateProvider: DayJSProvider,
-  ) {}
+  constructor(private readonly jwtService: JwtService, private readonly dateProvider: DayJSProvider) {}
 
   public generateToken(payload: IPayloadToken): string {
     const token = this.jwtService.sign(payload);
@@ -24,11 +21,7 @@ export class JwtTokenProvider implements ITokenProvider {
     const lastChar = expires_in_refresh_token.slice(-1);
     const timeValue = Number(expires_in_refresh_token.slice(0, -1));
 
-    const refreshTokenExpiresDate = this.dateProvider.addTime(
-      dateNow,
-      timeValue,
-      lastChar,
-    );
+    const refreshTokenExpiresDate = this.dateProvider.addTime(dateNow, timeValue, lastChar);
 
     const refresh_token = this.jwtService.sign(
       { sub: userId },
@@ -42,10 +35,7 @@ export class JwtTokenProvider implements ITokenProvider {
     return [refresh_token, refreshTokenExpiresDate];
   }
 
-  public verifyIsValidToken(
-    refresh_token: string,
-    secret_type?: 'refresh' | 'token',
-  ): number | 'expired' | 'invalid' {
+  public verifyIsValidToken(refresh_token: string, secret_type?: 'refresh' | 'token'): number | 'expired' | 'invalid' {
     let secret: string;
 
     if (secret_type === 'refresh') {
@@ -55,10 +45,7 @@ export class JwtTokenProvider implements ITokenProvider {
     }
 
     try {
-      const { sub }: Pick<IPayloadToken, 'sub'> = this.jwtService.verify(
-        refresh_token,
-        { secret, publicKey: secret },
-      );
+      const { sub }: Pick<IPayloadToken, 'sub'> = this.jwtService.verify(refresh_token, { secret, publicKey: secret });
       return sub;
     } catch (err) {
       if (err.message === 'jwt expired') {

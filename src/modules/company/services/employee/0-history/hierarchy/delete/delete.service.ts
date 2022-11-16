@@ -1,7 +1,4 @@
-import {
-  EmployeeHierarchyHistoryEntity,
-  historyRules,
-} from './../../../../../entities/employee-hierarchy-history.entity';
+import { EmployeeHierarchyHistoryEntity, historyRules } from './../../../../../entities/employee-hierarchy-history.entity';
 import { sortData } from './../../../../../../../shared/utils/sorts/data.sort';
 import { EmployeeEntity } from './../../../../../entities/employee.entity';
 import { BadRequestException, Injectable } from '@nestjs/common';
@@ -14,38 +11,21 @@ import { EmployeeRepository } from './../../../../../repositories/implementation
 
 @Injectable()
 export class DeleteEmployeeHierarchyHistoryService {
-  constructor(
-    private readonly employeeHierarchyHistoryRepository: EmployeeHierarchyHistoryRepository,
-    private readonly employeeRepository: EmployeeRepository,
-  ) {}
+  constructor(private readonly employeeHierarchyHistoryRepository: EmployeeHierarchyHistoryRepository, private readonly employeeRepository: EmployeeRepository) {}
 
   async execute(id: number, employeeId: number, user: UserPayloadDto) {
-    const found = await this.employeeRepository.findById(
-      employeeId,
-      user.targetCompanyId,
-    );
+    const found = await this.employeeRepository.findById(employeeId, user.targetCompanyId);
 
-    if (!found?.id)
-      throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_NOT_FOUND);
+    if (!found?.id) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_NOT_FOUND);
 
     const hierarchyId = await this.check({ id, foundEmployee: found });
 
-    const history = await this.employeeHierarchyHistoryRepository.delete(
-      id,
-      employeeId,
-      hierarchyId,
-    );
+    const history = await this.employeeHierarchyHistoryRepository.delete(id, employeeId, hierarchyId);
 
     return history;
   }
 
-  async check({
-    foundEmployee,
-    id,
-  }: {
-    foundEmployee: EmployeeEntity;
-    id: number;
-  }) {
+  async check({ foundEmployee, id }: { foundEmployee: EmployeeEntity; id: number }) {
     // CHECK AFTER
     let afterHistory: EmployeeHierarchyHistoryEntity;
     let beforeHistory: EmployeeHierarchyHistoryEntity;
@@ -61,14 +41,9 @@ export class DeleteEmployeeHierarchyHistoryService {
         .sort((a, b) => sortData(a.created_at, b.created_at))
         .sort((a, b) => sortData(a.startDate, b.startDate));
 
-      const actualHistoryIndex = allHistory.findIndex(
-        (history) => history.id === id,
-      );
+      const actualHistoryIndex = allHistory.findIndex((history) => history.id === id);
 
-      if (actualHistoryIndex === -1)
-        throw new BadRequestException(
-          ErrorMessageEnum.NOT_FOUND_ON_COMPANY_TO_DELETE,
-        );
+      if (actualHistoryIndex === -1) throw new BadRequestException(ErrorMessageEnum.NOT_FOUND_ON_COMPANY_TO_DELETE);
 
       afterHistory = allHistory[actualHistoryIndex + 1];
       beforeHistory = allHistory[actualHistoryIndex - 1];
@@ -76,24 +51,17 @@ export class DeleteEmployeeHierarchyHistoryService {
       const afterMotive = afterHistory?.motive || null;
       const beforeMotive = beforeHistory?.motive || null;
 
-      const isAfterOk =
-        historyRules[String(afterMotive)]?.before?.includes(beforeMotive);
-      const isBeforeOk =
-        historyRules[String(beforeMotive)]?.after?.includes(afterMotive);
+      const isAfterOk = historyRules[String(afterMotive)]?.before?.includes(beforeMotive);
+      const isBeforeOk = historyRules[String(beforeMotive)]?.after?.includes(afterMotive);
 
-      if (!isAfterOk || !isBeforeOk)
-        throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_BLOCK_HISTORY);
+      if (!isAfterOk || !isBeforeOk) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_BLOCK_HISTORY);
     }
 
     const getActualEmployeeHierarchy = () => {
       if (afterHistory === undefined) {
-        if (beforeHistory.motive === EmployeeHierarchyMotiveTypeEnum.DEM)
-          return null;
+        if (beforeHistory.motive === EmployeeHierarchyMotiveTypeEnum.DEM) return null;
         if (beforeHistory.hierarchyId) return beforeHistory.hierarchyId;
-        if (!beforeHistory.hierarchyId)
-          throw new BadRequestException(
-            ErrorMessageEnum.EMPLOYEE_MISSING_HIERARCHY,
-          );
+        if (!beforeHistory.hierarchyId) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_MISSING_HIERARCHY);
       }
 
       return undefined;

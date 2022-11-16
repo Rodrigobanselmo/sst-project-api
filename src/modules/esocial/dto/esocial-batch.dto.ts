@@ -1,8 +1,4 @@
-import {
-  EmployeeESocialEventActionEnum,
-  EmployeeESocialEventTypeEnum,
-  StatusEnum,
-} from '@prisma/client';
+import { EmployeeESocialEventActionEnum, EmployeeESocialEventTypeEnum, StatusEnum } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
 

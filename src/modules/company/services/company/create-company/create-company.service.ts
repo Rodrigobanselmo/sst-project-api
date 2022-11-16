@@ -8,9 +8,7 @@ export class CreateCompanyService {
   constructor(private readonly companyRepository: CompanyRepository) {}
 
   async execute(createCompanyDto: CreateCompanyDto) {
-    const statusLicense = createCompanyDto?.license
-      ? createCompanyDto?.license?.status
-      : StatusEnum.ACTIVE;
+    const statusLicense = createCompanyDto?.license ? createCompanyDto?.license?.status : StatusEnum.ACTIVE;
 
     const company = await this.companyRepository.create({
       license: {

@@ -5,10 +5,7 @@ import { ActivityDto } from '../../../src/modules/company/dto/activity.dto';
 import { CreateCompanyDto } from '../../../src/modules/company/dto/create-company.dto';
 import { WorkspaceDto } from '../../../src/modules/company/dto/workspace.dto';
 import { CreateUserDto } from '../../../src/modules/users/dto/create-user.dto';
-import {
-  format,
-  verifierDigit,
-} from '../../../src/shared/transformers/cnpj-format.transform';
+import { format, verifierDigit } from '../../../src/shared/transformers/cnpj-format.transform';
 
 export function generate(useFormat = false): string {
   let numbers = '';

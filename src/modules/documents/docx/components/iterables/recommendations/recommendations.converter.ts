@@ -2,9 +2,7 @@ import { RecTypeEnum } from '@prisma/client';
 
 import { RiskFactorDataEntity } from '../../../../../sst/entities/riskData.entity';
 
-export const recommendationsConverter = (
-  riskData: Partial<RiskFactorDataEntity>[],
-) => {
+export const recommendationsConverter = (riskData: Partial<RiskFactorDataEntity>[]) => {
   const remove = ['Não aplicável', 'Não identificada', 'Não informada'];
 
   const eng = {
@@ -38,8 +36,7 @@ export const recommendationsConverter = (
         if (!epi.data.find((r) => r == rec.recName)) epi.data.push(rec.recName);
       }
       if (!rec.recType) {
-        if (!others.data.find((r) => r == rec.recName))
-          others.data.push(rec.recName);
+        if (!others.data.find((r) => r == rec.recName)) others.data.push(rec.recName);
       }
     });
   });

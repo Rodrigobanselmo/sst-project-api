@@ -6,10 +6,7 @@ import { HierarchyRepository } from '../../../../company/repositories/implementa
 import { HierarchyExcelProvider } from '../../../providers/HierarchyExcelProvider';
 import { UploadExcelProvider } from '../../../providers/uploadExcelProvider';
 import { findAllEmployees } from '../../../utils/findAllEmployees';
-import {
-  ErrorCompanyEnum,
-  ErrorMessageEnum,
-} from '../../../../../shared/constants/enum/errorMessage';
+import { ErrorCompanyEnum, ErrorMessageEnum } from '../../../../../shared/constants/enum/errorMessage';
 import { ICompanySheet } from '../../../../../shared/constants/workbooks/sheets/company/companySheet.constant';
 import { workbooksConstant } from '../../../../../shared/constants/workbooks/workbooks.constant';
 import { WorkbooksEnum } from '../../../../../shared/constants/workbooks/workbooks.enum';
@@ -50,17 +47,10 @@ export class UploadEmployeesService {
       include: { workspace: true },
     });
 
-    if (company.workspace?.length === 1)
-      Workbook.sheets[0].columns = Workbook.sheets[0].columns.filter(
-        (column) => column.databaseName !== 'abbreviation',
-      );
+    if (company.workspace?.length === 1) Workbook.sheets[0].columns = Workbook.sheets[0].columns.filter((column) => column.databaseName !== 'abbreviation');
 
     // get risk table with actual version
-    const DatabaseTable =
-      await this.databaseTableRepository.findByNameAndCompany(
-        Workbook.name,
-        companyId,
-      );
+    const DatabaseTable = await this.databaseTableRepository.findByNameAndCompany(Workbook.name, companyId);
 
     let employeesData = await this.uploadExcelProvider.getAllData({
       buffer,
@@ -74,22 +64,12 @@ export class UploadEmployeesService {
 
     employeesData = employeesData.map((employee) => {
       const workspace =
-        company.workspace?.length === 1
-          ? workspaces
-          : workspaces.filter(
-              (work) =>
-                employee?.abbreviation &&
-                employee?.abbreviation.includes(work.abbreviation),
-            );
+        company.workspace?.length === 1 ? workspaces : workspaces.filter((work) => employee?.abbreviation && employee?.abbreviation.includes(work.abbreviation));
 
-      if (workspace.length === 0)
-        throw new BadRequestException(ErrorCompanyEnum.WORKSPACE_NOT_FOUND);
+      if (workspace.length === 0) throw new BadRequestException(ErrorCompanyEnum.WORKSPACE_NOT_FOUND);
 
       if (employee.ghoName) {
-        ghoNameDescriptionMap[employee.ghoName] =
-          ghoNameDescriptionMap[employee.ghoName] ||
-          employee.ghoDescription ||
-          '';
+        ghoNameDescriptionMap[employee.ghoName] = ghoNameDescriptionMap[employee.ghoName] || employee.ghoDescription || '';
       }
 
       if (employee?.abbreviation) delete employee.abbreviation;
@@ -102,13 +82,9 @@ export class UploadEmployeesService {
       }),
     );
 
-    const sheetHierarchyTree =
-      hierarchyExcel.createTreeMapFromHierarchyStruct(employeesData);
+    const sheetHierarchyTree = hierarchyExcel.createTreeMapFromHierarchyStruct(employeesData);
 
-    const hierarchyTree = hierarchyExcel.compare(
-      allHierarchyTree,
-      sheetHierarchyTree,
-    );
+    const hierarchyTree = hierarchyExcel.compare(allHierarchyTree, sheetHierarchyTree);
 
     const hierarchyArray = Object.values(hierarchyTree)
       .filter((hierarchy) => !hierarchy.refId)
@@ -142,17 +118,9 @@ export class UploadEmployeesService {
           delete newEmployee[key.toLocaleLowerCase()];
 
           if (hierarchyName) {
-            const children = hierarchy
-              ? hierarchy.children.map((child) => hierarchyTree[child])
-              : Object.values(hierarchyTree);
+            const children = hierarchy ? hierarchy.children.map((child) => hierarchyTree[child]) : Object.values(hierarchyTree);
 
-            const actualHierarchy = children.find(
-              (h) =>
-                h?.name &&
-                h?.type &&
-                h.name === hierarchyName &&
-                h.type === key,
-            );
+            const actualHierarchy = children.find((h) => h?.name && h?.type && h.name === hierarchyName && h.type === key);
 
             if (actualHierarchy) {
               hierarchy = actualHierarchy;
@@ -181,15 +149,7 @@ export class UploadEmployeesService {
     await this.employeeRepository.upsertMany(restEmployees, companyId);
 
     return await this.uploadExcelProvider.newTableData({
-      findAll: (sheet) =>
-        findAllEmployees(
-          this.excelProvider,
-          this.companyRepository,
-          this.workspaceRepository,
-          this.hierarchyRepository,
-          sheet,
-          companyId,
-        ),
+      findAll: (sheet) => findAllEmployees(this.excelProvider, this.companyRepository, this.workspaceRepository, this.hierarchyRepository, sheet, companyId),
       Workbook,
       system,
       companyId,
@@ -198,26 +158,14 @@ export class UploadEmployeesService {
   }
 }
 
-const read = async (
-  readFileData: IExcelReadData[],
-  excelProvider: ExcelProvider,
-  sheet: ICompanySheet,
-  databaseTable: DatabaseTableEntity,
-) => {
+const read = async (readFileData: IExcelReadData[], excelProvider: ExcelProvider, sheet: ICompanySheet, databaseTable: DatabaseTableEntity) => {
   const table = readFileData.find((data) => data.name === sheet.name);
 
-  if (!table)
-    throw new BadRequestException(
-      'The table you trying to insert has a different sheet name',
-    );
+  if (!table) throw new BadRequestException('The table you trying to insert has a different sheet name');
 
-  const database = await excelProvider.transformToTableData(
-    table,
-    sheet.columns,
-  );
+  const database = await excelProvider.transformToTableData(table, sheet.columns);
 
-  if (databaseTable?.version && database.version !== databaseTable.version)
-    throw new BadRequestException(ErrorMessageEnum.FILE_WRONG_TABLE_HEAD);
+  if (databaseTable?.version && database.version !== databaseTable.version) throw new BadRequestException(ErrorMessageEnum.FILE_WRONG_TABLE_HEAD);
 
   return database.rows;
 };

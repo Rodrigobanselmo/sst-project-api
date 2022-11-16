@@ -8,10 +8,7 @@ import { AuthGroupRepository } from './../../../repositories/implementations/Aut
 export class UpsertAccessGroupsService {
   constructor(private readonly authGroupRepository: AuthGroupRepository) {}
 
-  async execute(
-    UpsertAccessGroupsDto: UpsertAccessGroupDto,
-    user: UserPayloadDto,
-  ) {
+  async execute(UpsertAccessGroupsDto: UpsertAccessGroupDto, user: UserPayloadDto) {
     const system = user.isSystem;
     const company = await this.authGroupRepository.upsert(
       {

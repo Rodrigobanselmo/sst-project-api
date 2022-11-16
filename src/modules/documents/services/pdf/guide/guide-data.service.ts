@@ -6,11 +6,7 @@ import { removeDuplicate } from '../../../../../shared/utils/removeDuplicate';
 import { CompanyRepository } from '../../../../company/repositories/implementations/CompanyRepository';
 import { EmployeeExamsHistoryRepository } from '../../../../company/repositories/implementations/EmployeeExamsHistoryRepository';
 import { EmployeeRepository } from '../../../../company/repositories/implementations/EmployeeRepository';
-import {
-  IClinicComplementaryExamData,
-  IClinicExamData,
-  IPdfGuideData,
-} from './types/IGuideData.type';
+import { IClinicComplementaryExamData, IClinicExamData, IPdfGuideData } from './types/IGuideData.type';
 import { sortData } from '../../../../../shared/utils/sorts/data.sort';
 import { v4 } from 'uuid';
 
@@ -21,10 +17,7 @@ export class PdfGuideDataService {
     private readonly companyRepository: CompanyRepository,
     private readonly hierarchyRepository: HierarchyRepository,
   ) {}
-  async execute(
-    employeeId: number,
-    userPayloadDto: UserPayloadDto,
-  ): Promise<IPdfGuideData> {
+  async execute(employeeId: number, userPayloadDto: UserPayloadDto): Promise<IPdfGuideData> {
     const companyId = userPayloadDto.targetCompanyId;
 
     const data = await this.employeeRepository.findFirstNude({
@@ -108,8 +101,7 @@ export class PdfGuideDataService {
       where: { id: { in: clinicIds } },
     });
 
-    const consultantCompany =
-      data?.company?.receivingServiceContracts?.[0]?.applyingServiceCompany;
+    const consultantCompany = data?.company?.receivingServiceContracts?.[0]?.applyingServiceCompany;
     const actualCompany = data?.company;
     delete actualCompany?.receivingServiceContracts;
 
@@ -128,9 +120,7 @@ export class PdfGuideDataService {
 
       if (examHistory.exam.isAttendance) {
         const clinic = clinics.find((c) => c.id === examHistory.clinicId);
-        const exam = clinic.clinicExams.find(
-          (c) => c.examId === examHistory.exam.id,
-        );
+        const exam = clinic.clinicExams.find((c) => c.examId === examHistory.exam.id);
         clinicExamBlock.clinic = clinic;
         clinicExamBlock.doneDate = examHistory.doneDate;
         clinicExamBlock.exam = examHistory.exam;
@@ -147,9 +137,7 @@ export class PdfGuideDataService {
       }
 
       const clinic = clinics.find((c) => c.id === examHistory.clinicId);
-      const exam = clinic.clinicExams.find(
-        (c) => c.examId === examHistory.exam.id,
-      );
+      const exam = clinic.clinicExams.find((c) => c.examId === examHistory.exam.id);
 
       if (!clinicComplementaryExamBlocks[key])
         clinicComplementaryExamBlocks[key] = {
@@ -167,10 +155,7 @@ export class PdfGuideDataService {
     delete data.examsHistory;
 
     if (hierarchyId) {
-      const hierarchy = await this.hierarchyRepository.findById(
-        hierarchyId,
-        companyId,
-      );
+      const hierarchy = await this.hierarchyRepository.findById(hierarchyId, companyId);
 
       data.hierarchy = hierarchy;
     }
@@ -179,13 +164,9 @@ export class PdfGuideDataService {
       ...data,
       clinics,
       exams: examInstructions,
-      consultantCompany: consultantCompany?.id
-        ? consultantCompany
-        : actualCompany,
+      consultantCompany: consultantCompany?.id ? consultantCompany : actualCompany,
       company: actualCompany,
-      clinicComplementaryExams: Object.values(
-        clinicComplementaryExamBlocks,
-      ).sort((a, b) => sortData(a.doneDate, b.doneDate)),
+      clinicComplementaryExams: Object.values(clinicComplementaryExamBlocks).sort((a, b) => sortData(a.doneDate, b.doneDate)),
       clinicExam: clinicExamBlock,
       user: { email: userPayloadDto.email, id: v4() },
     };

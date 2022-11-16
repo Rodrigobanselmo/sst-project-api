@@ -4,12 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
-import {
-  CreateExamDto,
-  FindExamDto,
-  UpdateExamDto,
-  UpsertExamDto,
-} from '../../dto/exam.dto';
+import { CreateExamDto, FindExamDto, UpdateExamDto, UpsertExamDto } from '../../dto/exam.dto';
 import { Prisma } from '@prisma/client';
 
 let i = 0;
@@ -18,9 +13,7 @@ let i = 0;
 export class ExamRepository {
   constructor(private prisma: PrismaService) {}
 
-  async create({
-    ...createExamDto
-  }: CreateExamDto & { system: boolean }): Promise<ExamEntity> {
+  async create({ ...createExamDto }: CreateExamDto & { system: boolean }): Promise<ExamEntity> {
     const redMed = await this.prisma.exam.create({
       data: {
         ...createExamDto,
@@ -30,11 +23,7 @@ export class ExamRepository {
     return new ExamEntity(redMed);
   }
 
-  async update({
-    id,
-    companyId,
-    ...createExamDto
-  }: UpdateExamDto & { id: number }): Promise<ExamEntity> {
+  async update({ id, companyId, ...createExamDto }: UpdateExamDto & { id: number }): Promise<ExamEntity> {
     const Exam = await this.prisma.exam.update({
       data: {
         ...createExamDto,
@@ -63,11 +52,7 @@ export class ExamRepository {
     return data.map((exam) => new ExamEntity(exam));
   }
 
-  async find(
-    query: Partial<FindExamDto>,
-    pagination: PaginationQueryDto,
-    options: Prisma.ExamFindManyArgs = {},
-  ) {
+  async find(query: Partial<FindExamDto>, pagination: PaginationQueryDto, options: Prisma.ExamFindManyArgs = {}) {
     const whereInit = {
       AND: [],
       ...options.where,
@@ -135,10 +120,7 @@ export class ExamRepository {
     return new ExamEntity(exams);
   }
 
-  async DeleteByCompanyAndIdSoft(
-    id: number,
-    companyId: string,
-  ): Promise<ExamEntity> {
+  async DeleteByCompanyAndIdSoft(id: number, companyId: string): Promise<ExamEntity> {
     const exam = await this.prisma.exam.update({
       where: { id_companyId: { id, companyId } },
       data: { deleted_at: new Date() },

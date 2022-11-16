@@ -7,10 +7,7 @@ import { sortString } from '../../../../../../shared/utils/sorts/string.sort';
 import { sortNumber } from '../../../../../../shared/utils/sorts/number.sort';
 import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
 import { borderStyleGlobal } from '../../../base/config/styles';
-import {
-  IHierarchyData,
-  IHierarchyMap,
-} from '../../../converter/hierarchy.converter';
+import { IHierarchyData, IHierarchyMap } from '../../../converter/hierarchy.converter';
 import { hierarchyMap } from '../appr/parts/first/first.constant';
 import { bodyTableProps } from './elements/body';
 import { headerTableProps } from './elements/header';
@@ -58,13 +55,7 @@ export const hierarchyRisksConverter = (
         };
 
         allHierarchyRecord[hierarchy.id] = {
-          homogeneousGroupIds: removeDuplicate(
-            [
-              ...hierarchyMap.homogeneousGroupIds,
-              ...hierarchiesData.allHomogeneousGroupIds,
-            ],
-            { simpleCompare: true },
-          ),
+          homogeneousGroupIds: removeDuplicate([...hierarchyMap.homogeneousGroupIds, ...hierarchiesData.allHomogeneousGroupIds], { simpleCompare: true }),
           name: hierarchy.name,
         };
       }
@@ -82,10 +73,7 @@ export const hierarchyRisksConverter = (
       allRiskRecord[riskData.riskId] = {
         name: `(${riskData.riskFactor?.type}) ${riskData.riskFactor.name}`,
         type: riskData.riskFactor?.type,
-        homogeneousGroupIds: [
-          ...hasRisk.homogeneousGroupIds,
-          riskData.homogeneousGroupId,
-        ],
+        homogeneousGroupIds: [...hasRisk.homogeneousGroupIds, riskData.homogeneousGroupId],
       };
     });
   })();
@@ -106,9 +94,7 @@ export const hierarchyRisksConverter = (
   function setHeaderTable() {
     const row = header
       .sort((a, b) => sortString(a, b, 'name'))
-      .sort((a, b) =>
-        sortNumber(riskMap[a.type as any], riskMap[b.type as any], 'order'),
-      )
+      .sort((a, b) => sortNumber(riskMap[a.type as any], riskMap[b.type as any], 'order'))
       .map<headerTableProps>((risk, index) => {
         risk.homogeneousGroupIds.forEach((homogeneousGroupId) => {
           const homoPosition = HomoPositionMap.get(homogeneousGroupId) || {
@@ -144,11 +130,9 @@ export const hierarchyRisksConverter = (
       .sort((a, b) => sortString(a, b, 'name'))
       .sort((a, b) => sortNumber(riskMap[a as any], riskMap[b as any], 'order'))
       .map<bodyTableProps[]>((hierarchy) => {
-        const row: bodyTableProps[] = Array.from({ length: columnsLength }).map(
-          () => ({
-            borders: borderStyleGlobal(palette.common.white.string),
-          }),
-        );
+        const row: bodyTableProps[] = Array.from({ length: columnsLength }).map(() => ({
+          borders: borderStyleGlobal(palette.common.white.string),
+        }));
 
         row[0] = {
           text: hierarchy.name,

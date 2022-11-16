@@ -11,8 +11,7 @@ export const StringCapitalizeTransform = (data: TransformFnParams) => {
 
     for (const i in arrWords) {
       if (ignore.indexOf(arrWords[i]) === -1) {
-        arrWords[i] =
-          arrWords[i].charAt(0).toUpperCase() + arrWords[i].slice(1);
+        arrWords[i] = arrWords[i].charAt(0).toUpperCase() + arrWords[i].slice(1);
       }
     }
 

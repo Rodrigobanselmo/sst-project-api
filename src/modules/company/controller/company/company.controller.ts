@@ -1,15 +1,4 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-  UploadedFile,
-  UseInterceptors,
-} from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Patch, Post, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -17,10 +6,7 @@ import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import { FindActivityDto } from '../../dto/activity.dto';
 import { SetCompanyClinicDto } from '../../dto/company-clinic.dto';
-import {
-  CreateCompanyDto,
-  FindCompaniesDto,
-} from '../../dto/create-company.dto';
+import { CreateCompanyDto, FindCompaniesDto } from '../../dto/create-company.dto';
 import { UpdateCompanyDto } from '../../dto/update-company.dto';
 import { AddCompanyPhotoService } from '../../services/company/add-company-photo/add-company-photo.service';
 import { CopyCompanyService } from '../../services/company/copy-company/copy-company.service';
@@ -36,10 +22,7 @@ import { FindCompanyService } from '../../services/company/find-company/find-com
 import { SetCompanyClinicsService } from '../../services/company/set-company-clinics/set-company-clinics.service';
 import { UpdateCompanyService } from '../../services/company/update-company/update-company.service';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
-import {
-  PermissionEnum,
-  RoleEnum,
-} from '../../../../shared/constants/enum/authorization';
+import { PermissionEnum, RoleEnum } from '../../../../shared/constants/enum/authorization';
 import { Roles } from '../../../../shared/decorators/roles.decorator';
 import { UpdateAllCompaniesService } from '../../services/report/update-all-companies/update-all-companies.service';
 import { FindCompanyDashDto } from '../../dto/dashboard.dto';
@@ -69,10 +52,7 @@ export class CompanyController {
   @Roles(RoleEnum.COMPANY, RoleEnum.CONTRACTS, RoleEnum.CLINICS, RoleEnum.USER)
   @Permissions({ isContract: true, isMember: true })
   @Get('/:companyId/dashboard')
-  dashboard(
-    @User() userPayloadDto: UserPayloadDto,
-    @Query() query: FindCompanyDashDto,
-  ) {
+  dashboard(@User() userPayloadDto: UserPayloadDto, @Query() query: FindCompanyDashDto) {
     return this.dashboardCompanyService.execute(query, userPayloadDto);
     // return this.updateAllCompaniesService.execute(userPayloadDto);
   }
@@ -80,18 +60,12 @@ export class CompanyController {
   @Roles(RoleEnum.COMPANY, RoleEnum.CONTRACTS, RoleEnum.CLINICS, RoleEnum.USER)
   @Permissions({ isContract: true, isMember: true })
   @Get()
-  findAll(
-    @User() userPayloadDto: UserPayloadDto,
-    @Query() query: FindCompaniesDto,
-  ) {
+  findAll(@User() userPayloadDto: UserPayloadDto, @Query() query: FindCompaniesDto) {
     return this.findAllCompaniesService.execute(userPayloadDto, query);
   }
 
   @Get('by-user')
-  findAllByUser(
-    @User() userPayloadDto: UserPayloadDto,
-    @Query() query: FindCompaniesDto,
-  ) {
+  findAllByUser(@User() userPayloadDto: UserPayloadDto, @Query() query: FindCompaniesDto) {
     return this.findAllUserCompaniesService.execute(userPayloadDto, query);
   }
 
@@ -130,10 +104,7 @@ export class CompanyController {
     },
   )
   @Get('/clinic/:clinicId')
-  findClinicOne(
-    @Param('clinicId') clinicId: string,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
+  findClinicOne(@Param('clinicId') clinicId: string, @User() userPayloadDto: UserPayloadDto) {
     return this.findClinicService.execute(clinicId, userPayloadDto);
   }
 
@@ -155,10 +126,7 @@ export class CompanyController {
     crud: true,
   })
   @Post()
-  create(
-    @Body() createCompanyDto: CreateCompanyDto,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
+  create(@Body() createCompanyDto: CreateCompanyDto, @User() userPayloadDto: UserPayloadDto) {
     if (userPayloadDto.isMaster) {
       return this.createCompanyService.execute(createCompanyDto);
     }
@@ -172,12 +140,8 @@ export class CompanyController {
     crud: true,
   })
   @Post('clinic')
-  createClinic(
-    @Body() createCompanyDto: CreateCompanyDto,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
-    if (!createCompanyDto.isClinic)
-      throw new BadRequestException('Erro ao criar clínica');
+  createClinic(@Body() createCompanyDto: CreateCompanyDto, @User() userPayloadDto: UserPayloadDto) {
+    if (!createCompanyDto.isClinic) throw new BadRequestException('Erro ao criar clínica');
 
     return this.createContractService.execute(createCompanyDto, userPayloadDto);
   }
@@ -190,10 +154,7 @@ export class CompanyController {
   })
   @Post('/:companyId/photo')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadRiskFile(
-    @UploadedFile() file: Express.Multer.File,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
+  async uploadRiskFile(@UploadedFile() file: Express.Multer.File, @User() userPayloadDto: UserPayloadDto) {
     return this.addCompanyPhotoService.execute(userPayloadDto, file);
   }
 
@@ -215,16 +176,8 @@ export class CompanyController {
     crud: true,
   })
   @Post('/copy/:copyFromCompanyId/:riskGroupId/:companyId')
-  copy(
-    @Param('copyFromCompanyId') copyFromCompanyId: string,
-    @Param('riskGroupId') riskGroupId: string,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
-    return this.copyCompanyService.execute(
-      copyFromCompanyId,
-      riskGroupId,
-      userPayloadDto,
-    );
+  copy(@Param('copyFromCompanyId') copyFromCompanyId: string, @Param('riskGroupId') riskGroupId: string, @User() userPayloadDto: UserPayloadDto) {
+    return this.copyCompanyService.execute(copyFromCompanyId, riskGroupId, userPayloadDto);
   }
 
   @Permissions({
@@ -234,13 +187,7 @@ export class CompanyController {
     crud: true,
   })
   @Post('/:companyId/set-clinics')
-  setClinics(
-    @Body() setCompanyClinicDto: SetCompanyClinicDto,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
-    return this.setCompanyClinicsService.execute(
-      setCompanyClinicDto,
-      userPayloadDto,
-    );
+  setClinics(@Body() setCompanyClinicDto: SetCompanyClinicDto, @User() userPayloadDto: UserPayloadDto) {
+    return this.setCompanyClinicsService.execute(setCompanyClinicDto, userPayloadDto);
   }
 }

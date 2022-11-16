@@ -13,8 +13,7 @@ describe('EtherealProvider', () => {
       providers: [EtherealMailProvider],
     }).compile();
 
-    etherealMailProvider =
-      module.get<EtherealMailProvider>(EtherealMailProvider);
+    etherealMailProvider = module.get<EtherealMailProvider>(EtherealMailProvider);
   });
 
   it('should be defined', () => {

@@ -3,15 +3,9 @@ import { Paragraph, Table, WidthType } from 'docx';
 import { palette } from '../../../../../../shared/constants/palette';
 
 import { borderStyleGlobal } from '../../../base/config/styles';
-import {
-  ISectionChildrenType,
-  PGRSectionChildrenTypeEnum,
-} from '../../../builders/pgr/types/elements.types';
+import { ISectionChildrenType, PGRSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
-import {
-  IHierarchyData,
-  IHierarchyMap,
-} from '../../../converter/hierarchy.converter';
+import { IHierarchyData, IHierarchyMap } from '../../../converter/hierarchy.converter';
 import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
 import { bodyTableProps, TableBodyElements } from './elements/body';
 import { IHierarchyPrioritizationOptions } from './hierarchyPrioritization.converter';
@@ -25,17 +19,9 @@ export const hierarchyPrioritizationPage = (
     hierarchyType: HierarchyEnum.OFFICE,
     isByGroup: false,
   },
-  convertToDocx: (
-    data: ISectionChildrenType[],
-    variables?: IDocVariables,
-  ) => (Paragraph | Table)[],
+  convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[],
 ) => {
-  const tables = hierarchyPrioritizationTables(
-    riskFactorGroupData,
-    hierarchiesEntity,
-    hierarchyTree,
-    options,
-  );
+  const tables = hierarchyPrioritizationTables(riskFactorGroupData, hierarchiesEntity, hierarchyTree, options);
 
   const tableBodyElements = new TableBodyElements();
 

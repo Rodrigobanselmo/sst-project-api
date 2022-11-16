@@ -17,12 +17,7 @@ export class UpsertEnvironmentService {
     private readonly amazonStorageProvider: AmazonStorageProvider,
   ) {}
 
-  async execute(
-    { photos, ...upsertEnvironmentDto }: UpsertEnvironmentDto,
-    workspaceId: string,
-    userPayloadDto: UserPayloadDto,
-    files: Array<Express.Multer.File>,
-  ) {
+  async execute({ photos, ...upsertEnvironmentDto }: UpsertEnvironmentDto, workspaceId: string, userPayloadDto: UserPayloadDto, files: Array<Express.Multer.File>) {
     const companyId = userPayloadDto.targetCompanyId;
 
     const environment = await this.environmentRepository.upsert({
@@ -43,9 +38,7 @@ export class UpsertEnvironmentService {
         })),
       );
 
-    const environmentData = await this.environmentRepository.findById(
-      environment.id,
-    );
+    const environmentData = await this.environmentRepository.findById(environment.id);
 
     return environmentData;
   }
@@ -53,8 +46,7 @@ export class UpsertEnvironmentService {
   private async upload(companyId: string, files: Array<Express.Multer.File>) {
     const urls = await Promise.all(
       files.map(async (file) => {
-        const fileType =
-          file.originalname.split('.')[file.originalname.split('.').length - 1];
+        const fileType = file.originalname.split('.')[file.originalname.split('.').length - 1];
         const path = companyId + '/environment/' + v4() + '.' + fileType;
 
         const { url } = await this.amazonStorageProvider.upload({

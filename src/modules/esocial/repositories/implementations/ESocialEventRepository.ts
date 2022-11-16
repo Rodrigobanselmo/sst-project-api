@@ -11,11 +11,7 @@ import { EmployeeESocialEventEntity } from '../../entities/employeeEsocialEvent.
 @Injectable()
 export class ESocialEventRepository {
   constructor(private prisma: PrismaService) {}
-  async find(
-    query: Partial<FindESocialEventDto>,
-    pagination: PaginationQueryDto,
-    options: Prisma.EmployeeESocialEventFindManyArgs = {},
-  ) {
+  async find(query: Partial<FindESocialEventDto>, pagination: PaginationQueryDto, options: Prisma.EmployeeESocialEventFindManyArgs = {}) {
     const companyId = query.companyId;
     const whereInit = {
       AND: [
@@ -100,9 +96,7 @@ export class ESocialEventRepository {
                 { initials: { contains: query.search, mode: 'insensitive' } },
                 {
                   cnpj: {
-                    contains: query.search
-                      ? onlyNumbers(query.search) || 'no'
-                      : '',
+                    contains: query.search ? onlyNumbers(query.search) || 'no' : '',
                   },
                 },
               ],
@@ -126,9 +120,7 @@ export class ESocialEventRepository {
     ]);
 
     return {
-      data: response[1].map(
-        (employee) => new EmployeeESocialEventEntity(employee),
-      ),
+      data: response[1].map((employee) => new EmployeeESocialEventEntity(employee)),
       count: response[0],
     };
   }

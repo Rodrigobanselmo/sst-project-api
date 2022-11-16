@@ -1,11 +1,5 @@
 import { Transform } from 'class-transformer';
-import {
-  IsOptional,
-  IsString,
-  IsUppercase,
-  Length,
-  Matches,
-} from 'class-validator';
+import { IsOptional, IsString, IsUppercase, Length, Matches } from 'class-validator';
 
 import { CepFormatTransform } from '../../../shared/transformers/cep-format.transform';
 import { NumberFormat } from '../../../shared/transformers/number-format';

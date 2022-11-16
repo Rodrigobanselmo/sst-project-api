@@ -4,10 +4,7 @@ import { PaginationQueryDto } from './../../../../shared/dto/pagination.dto';
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
-import {
-  CreateCompanyDto,
-  FindCompaniesDto,
-} from '../../dto/create-company.dto';
+import { CreateCompanyDto, FindCompaniesDto } from '../../dto/create-company.dto';
 import { CompanyEntity } from '../../entities/company.entity';
 import { ICompanyRepository } from '../ICompanyRepository.types';
 import { v4 as uuidV4 } from 'uuid';
@@ -44,12 +41,8 @@ export class CompanyRepository implements ICompanyRepository {
       data: {
         id: companyUUId,
         ...createCompanyDto,
-        doctorResponsible: doctorResponsibleId
-          ? { connect: { id: doctorResponsibleId } }
-          : undefined,
-        tecResponsible: tecResponsibleId
-          ? { connect: { id: tecResponsibleId } }
-          : undefined,
+        doctorResponsible: doctorResponsibleId ? { connect: { id: doctorResponsibleId } } : undefined,
+        tecResponsible: tecResponsibleId ? { connect: { id: tecResponsibleId } } : undefined,
         license:
           Object.keys(license).length === 0
             ? undefined
@@ -103,9 +96,7 @@ export class CompanyRepository implements ICompanyRepository {
             }
           : undefined,
         contacts: {
-          create: [
-            { email, phone, name: 'Contato principal', isPrincipal: true },
-          ],
+          create: [{ email, phone, name: 'Contato principal', isPrincipal: true }],
         },
       },
       include: {
@@ -157,12 +148,8 @@ export class CompanyRepository implements ICompanyRepository {
       where: { id: companyId },
       data: {
         ...updateCompanyDto,
-        doctorResponsible: doctorResponsibleId
-          ? { connect: { id: doctorResponsibleId } }
-          : undefined,
-        tecResponsible: tecResponsibleId
-          ? { connect: { id: tecResponsibleId } }
-          : undefined,
+        doctorResponsible: doctorResponsibleId ? { connect: { id: doctorResponsibleId } } : undefined,
+        tecResponsible: tecResponsibleId ? { connect: { id: tecResponsibleId } } : undefined,
         users: {
           upsert: [
             ...users.map(({ userId, ...user }) => {
@@ -180,60 +167,50 @@ export class CompanyRepository implements ICompanyRepository {
         employees: {
           //! edit employee
           upsert: [
-            ...employees.map(
-              ({
-                id,
-                hierarchyId,
-                description,
-                ghoDescription,
-                realDescription,
-                workspaceIds,
-                ...rest
-              }: any) => {
-                return {
-                  create: {
-                    ...rest,
-                    hierarchy: hierarchyId //! edit employee
-                      ? {
-                          connect: {
-                            id_companyId: { companyId, id: hierarchyId },
-                          },
-                        }
-                      : undefined,
-                    // workspaces: workspaceIds
-                    //   ? {
-                    //       connect: workspaceIds.map((workspaceId) => ({
-                    //         id_companyId: { companyId, id: workspaceId },
-                    //       })),
-                    //     }
-                    //   : undefined,
-                  },
-                  update: {
-                    ...rest,
-                    hierarchy: hierarchyId
-                      ? {
-                          connect: {
-                            id_companyId: { companyId, id: hierarchyId },
-                          },
-                        }
-                      : undefined,
-                    // workspaces: workspaceIds
-                    //   ? {
-                    //       set: workspaceIds.map((workspaceId) => ({
-                    //         id_companyId: { companyId, id: workspaceId },
-                    //       })),
-                    //     }
-                    //   : undefined,
-                  },
-                  where: { cpf_companyId: { cpf: rest.cpf, companyId } },
-                  // cpf_esocialCode_companyId: {
-                  //   cpf: rest.cpf,
-                  //   esocialCode: rest.esocialCode,
-                  //   companyId,
-                  // },
-                };
-              },
-            ),
+            ...employees.map(({ id, hierarchyId, description, ghoDescription, realDescription, workspaceIds, ...rest }: any) => {
+              return {
+                create: {
+                  ...rest,
+                  hierarchy: hierarchyId //! edit employee
+                    ? {
+                        connect: {
+                          id_companyId: { companyId, id: hierarchyId },
+                        },
+                      }
+                    : undefined,
+                  // workspaces: workspaceIds
+                  //   ? {
+                  //       connect: workspaceIds.map((workspaceId) => ({
+                  //         id_companyId: { companyId, id: workspaceId },
+                  //       })),
+                  //     }
+                  //   : undefined,
+                },
+                update: {
+                  ...rest,
+                  hierarchy: hierarchyId
+                    ? {
+                        connect: {
+                          id_companyId: { companyId, id: hierarchyId },
+                        },
+                      }
+                    : undefined,
+                  // workspaces: workspaceIds
+                  //   ? {
+                  //       set: workspaceIds.map((workspaceId) => ({
+                  //         id_companyId: { companyId, id: workspaceId },
+                  //       })),
+                  //     }
+                  //   : undefined,
+                },
+                where: { cpf_companyId: { cpf: rest.cpf, companyId } },
+                // cpf_esocialCode_companyId: {
+                //   cpf: rest.cpf,
+                //   esocialCode: rest.esocialCode,
+                //   companyId,
+                // },
+              };
+            }),
           ],
         },
         address: address ? { update: { ...address } } : undefined,
@@ -269,9 +246,7 @@ export class CompanyRepository implements ICompanyRepository {
           ],
         },
         secondary_activity: {
-          connect: [
-            ...secondary_activity.map((activity) => ({ code: activity.code })),
-          ],
+          connect: [...secondary_activity.map((activity) => ({ code: activity.code }))],
         },
       },
       include: {
@@ -316,98 +291,86 @@ export class CompanyRepository implements ICompanyRepository {
     const include = options?.include || {};
 
     const data = await this.prisma.$transaction(
-      updateCompanyDto.map(
-        ({
-          secondary_activity = [],
-          primary_activity = [],
-          employees = [],
-          workspace = [],
-          address,
-          id,
-          users,
-          ...upsertRiskDto
-        }) =>
-          this.prisma.company.upsert({
-            where: { id: id || 'no-id' },
-            create: {
-              name: '',
-              cnpj: '',
-              fantasy: '',
-              ...upsertRiskDto,
-              workspace: {
-                create: [
-                  ...workspace.map(({ id, address, ...work }) => ({
+      updateCompanyDto.map(({ secondary_activity = [], primary_activity = [], employees = [], workspace = [], address, id, users, ...upsertRiskDto }) =>
+        this.prisma.company.upsert({
+          where: { id: id || 'no-id' },
+          create: {
+            name: '',
+            cnpj: '',
+            fantasy: '',
+            ...upsertRiskDto,
+            workspace: {
+              create: [
+                ...workspace.map(({ id, address, ...work }) => ({
+                  ...work,
+                  address: { create: address },
+                })),
+              ],
+            },
+            primary_activity: {
+              connect: [
+                ...primary_activity.map((activity) => ({
+                  code: activity.code,
+                })),
+              ],
+            },
+            secondary_activity: {
+              connect: [
+                ...secondary_activity.map((activity) => ({
+                  code: activity.code,
+                })),
+              ],
+            },
+          },
+          update: {
+            ...upsertRiskDto,
+            workspace: {
+              upsert: [
+                ...workspace.map(({ id, address, ...work }) => ({
+                  create: {
                     ...work,
                     address: { create: address },
-                  })),
-                ],
-              },
-              primary_activity: {
-                connect: [
-                  ...primary_activity.map((activity) => ({
-                    code: activity.code,
-                  })),
-                ],
-              },
-              secondary_activity: {
-                connect: [
-                  ...secondary_activity.map((activity) => ({
-                    code: activity.code,
-                  })),
-                ],
-              },
-            },
-            update: {
-              ...upsertRiskDto,
-              workspace: {
-                upsert: [
-                  ...workspace.map(({ id, address, ...work }) => ({
-                    create: {
-                      ...work,
-                      address: { create: address },
+                  },
+                  update: {
+                    ...work,
+                    address: { update: address },
+                  },
+                  where: {
+                    id_companyId: {
+                      companyId: upsertRiskDto.companyId,
+                      id: id || 'no-id',
                     },
-                    update: {
-                      ...work,
-                      address: { update: address },
-                    },
-                    where: {
-                      id_companyId: {
-                        companyId: upsertRiskDto.companyId,
-                        id: id || 'no-id',
-                      },
-                    },
-                  })),
-                ],
-              },
-              primary_activity: {
-                connect: [
-                  ...primary_activity.map((activity) => ({
-                    code: activity.code,
-                  })),
-                ],
-              },
-              secondary_activity: {
-                connect: [
-                  ...secondary_activity.map((activity) => ({
-                    code: activity.code,
-                  })),
-                ],
-              },
+                  },
+                })),
+              ],
             },
-            include: {
-              workspace: include.workspace
-                ? { include: { address: true } }
-                : false,
-              primary_activity: !!include.primary_activity,
-              secondary_activity: !!include.secondary_activity,
-              license: !!include.license,
-              users: !!include.users,
-              group: true,
-              doctorResponsible: { include: { professional: true } },
-              tecResponsible: { include: { professional: true } },
-              employees: !!include.employees ? true : false,
+            primary_activity: {
+              connect: [
+                ...primary_activity.map((activity) => ({
+                  code: activity.code,
+                })),
+              ],
             },
-          }),
+            secondary_activity: {
+              connect: [
+                ...secondary_activity.map((activity) => ({
+                  code: activity.code,
+                })),
+              ],
+            },
+          },
+          include: {
+            workspace: include.workspace ? { include: { address: true } } : false,
+            primary_activity: !!include.primary_activity,
+            secondary_activity: !!include.secondary_activity,
+            license: !!include.license,
+            users: !!include.users,
+            group: true,
+            doctorResponsible: { include: { professional: true } },
+            tecResponsible: { include: { professional: true } },
+            employees: !!include.employees ? true : false,
+          },
+        }),
       ),
     );
 
@@ -439,14 +402,10 @@ export class CompanyRepository implements ICompanyRepository {
           ],
         },
         primary_activity: {
-          disconnect: [
-            ...primary_activity.map((activity) => ({ code: activity.code })),
-          ],
+          disconnect: [...primary_activity.map((activity) => ({ code: activity.code }))],
         },
         secondary_activity: {
-          disconnect: [
-            ...secondary_activity.map((activity) => ({ code: activity.code })),
-          ],
+          disconnect: [...secondary_activity.map((activity) => ({ code: activity.code }))],
         },
       },
       include: {
@@ -463,11 +422,7 @@ export class CompanyRepository implements ICompanyRepository {
     return new CompanyEntity(company);
   }
 
-  async findByIdAll(
-    id: string,
-    workspaceId: string,
-    options?: Partial<Prisma.CompanyFindUniqueArgs>,
-  ): Promise<CompanyEntity> {
+  async findByIdAll(id: string, workspaceId: string, options?: Partial<Prisma.CompanyFindUniqueArgs>): Promise<CompanyEntity> {
     const company = (await this.prisma.company.findUnique({
       where: { id },
       ...options,
@@ -516,9 +471,7 @@ export class CompanyRepository implements ICompanyRepository {
                       some: { applyingServiceCompanyId: companyId },
                     },
                   },
-                  ...(query.isClinic
-                    ? [{ companiesToClinicAvailable: { some: { companyId } } }]
-                    : []),
+                  ...(query.isClinic ? [{ companiesToClinicAvailable: { some: { companyId } } }] : []),
                 ],
                 ...options?.where,
               },
@@ -623,10 +576,7 @@ export class CompanyRepository implements ICompanyRepository {
       options.select.esocialStart = true;
       options.select.esocialSend = true;
       options.select.report = true;
-      options.orderBy = [
-        { report: { esocialReject: 'desc' } },
-        { report: { esocialPendent: 'desc' } },
-      ];
+      options.orderBy = [{ report: { esocialReject: 'desc' } }, { report: { esocialPendent: 'desc' } }];
     }
 
     const response = await this.prisma.$transaction([
@@ -654,11 +604,7 @@ export class CompanyRepository implements ICompanyRepository {
     };
   }
 
-  async findAll(
-    query: FindCompaniesDto,
-    pagination: PaginationQueryDto,
-    options: Partial<Prisma.CompanyFindManyArgs> = {},
-  ) {
+  async findAll(query: FindCompaniesDto, pagination: PaginationQueryDto, options: Partial<Prisma.CompanyFindManyArgs> = {}) {
     const whereInit = { AND: [] } as typeof options.where;
 
     if (query.findAll) {
@@ -768,10 +714,7 @@ export class CompanyRepository implements ICompanyRepository {
     };
   }
 
-  async findById(
-    id: string,
-    options?: Partial<Prisma.CompanyFindManyArgs>,
-  ): Promise<CompanyEntity> {
+  async findById(id: string, options?: Partial<Prisma.CompanyFindManyArgs>): Promise<CompanyEntity> {
     const include = options?.include || {};
 
     const employeeCount = await this.prisma.employee.count({
@@ -814,9 +757,7 @@ export class CompanyRepository implements ICompanyRepository {
         },
         primary_activity: !!include?.primary_activity,
         secondary_activity: !!include?.secondary_activity,
-        workspace: !!include?.workspace
-          ? { include: { address: true } }
-          : false,
+        workspace: !!include?.workspace ? { include: { address: true } } : false,
         employees: !!include.employees ? true : false,
         address: true,
         doctorResponsible: { include: { professional: true } },

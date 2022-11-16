@@ -40,11 +40,7 @@ export class UploadUniqueCompanyService {
     const companyId = userPayloadDto.targetCompanyId;
 
     // get risk table with actual version
-    const DatabaseTable =
-      await this.databaseTableRepository.findByNameAndCompany(
-        Workbook.name,
-        companyId,
-      );
+    const DatabaseTable = await this.databaseTableRepository.findByNameAndCompany(Workbook.name, companyId);
 
     const company = await this.uploadExcelProvider.getAllData({
       buffer,
@@ -53,23 +49,15 @@ export class UploadUniqueCompanyService {
       DatabaseTable,
     });
 
-    if (company.length != 1)
-      throw new BadRequestException(`Only one company is allowed`);
+    if (company.length != 1) throw new BadRequestException(`Only one company is allowed`);
 
     // TODO: hierarchyId
 
-    const allHierarchyTree = hierarchyExcel.transformArrayToHierarchyMapTree(
-      await this.hierarchyRepository.findAllHierarchyByCompany(companyId),
-    );
+    const allHierarchyTree = hierarchyExcel.transformArrayToHierarchyMapTree(await this.hierarchyRepository.findAllHierarchyByCompany(companyId));
 
-    const sheetHierarchyTree = hierarchyExcel.createTreeMapFromHierarchyStruct(
-      company[0].employees,
-    );
+    const sheetHierarchyTree = hierarchyExcel.createTreeMapFromHierarchyStruct(company[0].employees);
 
-    const hierarchyTree = hierarchyExcel.compare(
-      allHierarchyTree,
-      sheetHierarchyTree,
-    );
+    const hierarchyTree = hierarchyExcel.compare(allHierarchyTree, sheetHierarchyTree);
 
     const hierarchyArray = Object.values(hierarchyTree)
       .filter((hierarchy) => !hierarchy.refId)
@@ -99,17 +87,9 @@ export class UploadUniqueCompanyService {
           delete newEmployee[key.toLocaleLowerCase()];
 
           if (hierarchyName) {
-            const children = hierarchy
-              ? hierarchy.children.map((child) => hierarchyTree[child])
-              : Object.values(hierarchyTree);
+            const children = hierarchy ? hierarchy.children.map((child) => hierarchyTree[child]) : Object.values(hierarchyTree);
 
-            const actualHierarchy = children.find(
-              (h) =>
-                h?.name &&
-                h?.type &&
-                h.name === hierarchyName &&
-                h.type === key,
-            );
+            const actualHierarchy = children.find((h) => h?.name && h?.type && h.name === hierarchyName && h.type === key);
 
             if (actualHierarchy) {
               hierarchy = actualHierarchy;
@@ -132,15 +112,7 @@ export class UploadUniqueCompanyService {
     });
 
     return await this.uploadExcelProvider.newTableData({
-      findAll: (sheet) =>
-        findAllEmployees(
-          this.excelProvider,
-          this.companyRepository,
-          this.workspaceRepository,
-          this.hierarchyRepository,
-          sheet,
-          companyId,
-        ),
+      findAll: (sheet) => findAllEmployees(this.excelProvider, this.companyRepository, this.workspaceRepository, this.hierarchyRepository, sheet, companyId),
       Workbook,
       system,
       companyId,
@@ -149,27 +121,14 @@ export class UploadUniqueCompanyService {
   }
 }
 
-const read = async (
-  readFileData: IExcelReadData[],
-  excelProvider: ExcelProvider,
-  sheet: ICompanySheet,
-  databaseTable: DatabaseTableEntity,
-) => {
+const read = async (readFileData: IExcelReadData[], excelProvider: ExcelProvider, sheet: ICompanySheet, databaseTable: DatabaseTableEntity) => {
   const table = readFileData.find((data) => data.name === sheet.name);
 
-  if (!table)
-    throw new BadRequestException(
-      'The table you trying to insert has a different sheet name',
-    );
+  if (!table) throw new BadRequestException('The table you trying to insert has a different sheet name');
 
-  const database = await excelProvider.transformToTableData(
-    table,
-    sheet.columns,
-    { isArrayWithMissingFirstData: true },
-  );
+  const database = await excelProvider.transformToTableData(table, sheet.columns, { isArrayWithMissingFirstData: true });
 
-  if (databaseTable?.version && database.version !== databaseTable.version)
-    throw new BadRequestException(ErrorMessageEnum.FILE_WRONG_TABLE_HEAD);
+  if (databaseTable?.version && database.version !== databaseTable.version) throw new BadRequestException(ErrorMessageEnum.FILE_WRONG_TABLE_HEAD);
 
   return database.rows;
 };

@@ -376,13 +376,11 @@ export class ESocial27TableRepository {
       },
       {
         code: '0091',
-        'name ':
-          'Ácido cis‐ 3‐(2,2‐diclorovinil)‐2,2‐dimetilciclopropanocarboxilico',
+        'name ': 'Ácido cis‐ 3‐(2,2‐diclorovinil)‐2,2‐dimetilciclopropanocarboxilico',
       },
       {
         code: '0092',
-        'name ':
-          'Ácido cis‐3‐(2,2‐dibromovinil)‐2,2‐dimetilciclopropanocarboxilico',
+        'name ': 'Ácido cis‐3‐(2,2‐dibromovinil)‐2,2‐dimetilciclopropanocarboxilico',
       },
       {
         code: '0093',
@@ -538,8 +536,7 @@ export class ESocial27TableRepository {
       },
       {
         code: '0131',
-        'name ':
-          'Ácido trans‐3‐(2,2‐diclorovinil)‐ 2,2‐dimetilciclopropanocarboxilico',
+        'name ': 'Ácido trans‐3‐(2,2‐diclorovinil)‐ 2,2‐dimetilciclopropanocarboxilico',
       },
       {
         code: '0132',
@@ -655,13 +652,11 @@ export class ESocial27TableRepository {
       },
       {
         code: '0158',
-        'name ':
-          'Agente da encefalopatia espongiforme bovina tipo-H (pesquisa)',
+        'name ': 'Agente da encefalopatia espongiforme bovina tipo-H (pesquisa)',
       },
       {
         code: '0159',
-        'name ':
-          'Agente da encefalopatia espongiforme em ungulados exóticos (pesquisa)',
+        'name ': 'Agente da encefalopatia espongiforme em ungulados exóticos (pesquisa)',
       },
       {
         code: '0160',
@@ -673,8 +668,7 @@ export class ESocial27TableRepository {
       },
       {
         code: '0162',
-        'name ':
-          'Agente da insônia fatal familiar de Gerstmann-Sträussler-Scheinker (pesquisa)',
+        'name ': 'Agente da insônia fatal familiar de Gerstmann-Sträussler-Scheinker (pesquisa)',
       },
       {
         code: '0163',
@@ -682,8 +676,7 @@ export class ESocial27TableRepository {
       },
       {
         code: '0164',
-        'name ':
-          'Agente da prionopatia- variante protease-resistente (pesquisa)',
+        'name ': 'Agente da prionopatia- variante protease-resistente (pesquisa)',
       },
       {
         code: '0165',
@@ -691,8 +684,7 @@ export class ESocial27TableRepository {
       },
       {
         code: '0166',
-        'name ':
-          'Agente do tremor epizoótico (Scrapie disease) atípico (pesquisa)',
+        'name ': 'Agente do tremor epizoótico (Scrapie disease) atípico (pesquisa)',
       },
       {
         code: '0167',
@@ -1172,48 +1164,39 @@ export class ESocial27TableRepository {
       },
       {
         code: '0286',
-        'name ':
-          'Avaliação Clínica com ênfase Cardiocirculatória (Anamnese e Exame físico)',
+        'name ': 'Avaliação Clínica com ênfase Cardiocirculatória (Anamnese e Exame físico)',
       },
       {
         code: '0287',
-        'name ':
-          'Avaliação Clínica com ênfase Dermatológica (Anamnese e Exame físico)',
+        'name ': 'Avaliação Clínica com ênfase Dermatológica (Anamnese e Exame físico)',
       },
       {
         code: '0288',
-        'name ':
-          'Avaliação Clínica com ênfase Gastrointestinal (Anamnese e Exame físico)',
+        'name ': 'Avaliação Clínica com ênfase Gastrointestinal (Anamnese e Exame físico)',
       },
       {
         code: '0289',
-        'name ':
-          'Avaliação Clínica com ênfase Mental (Anamnese e Exame físico)',
+        'name ': 'Avaliação Clínica com ênfase Mental (Anamnese e Exame físico)',
       },
       {
         code: '0290',
-        'name ':
-          'Avaliação Clínica com ênfase Neurológca (Anamnese e Exame físico)',
+        'name ': 'Avaliação Clínica com ênfase Neurológca (Anamnese e Exame físico)',
       },
       {
         code: '0291',
-        'name ':
-          'Avaliação Clínica com ênfase Neurossensorial (Anamnese e Exame físico)',
+        'name ': 'Avaliação Clínica com ênfase Neurossensorial (Anamnese e Exame físico)',
       },
       {
         code: '0292',
-        'name ':
-          'Avaliação Clínica com ênfase Ortopédica (Anamnese e Exame físico)',
+        'name ': 'Avaliação Clínica com ênfase Ortopédica (Anamnese e Exame físico)',
       },
       {
         code: '0293',
-        'name ':
-          'Avaliação Clínica com ênfase Respiratória (Anamnese e Exame físico)',
+        'name ': 'Avaliação Clínica com ênfase Respiratória (Anamnese e Exame físico)',
       },
       {
         code: '0294',
-        'name ':
-          'Avaliação Clínica com ênfase Urogenital (Anamnese e Exame físico)',
+        'name ': 'Avaliação Clínica com ênfase Urogenital (Anamnese e Exame físico)',
       },
       {
         code: '0295',
@@ -1517,8 +1500,7 @@ export class ESocial27TableRepository {
       },
       {
         code: '0370',
-        'name ':
-          'Catecolaminas fracionadas - dopamina, epinefrina, norepinefrina na urina',
+        'name ': 'Catecolaminas fracionadas - dopamina, epinefrina, norepinefrina na urina',
       },
       {
         code: '0371',
@@ -1802,8 +1784,7 @@ export class ESocial27TableRepository {
       },
       {
         code: '0441',
-        'name ':
-          'Coprológico funcional (caracteres, pH, digestibilidade, amônia, ácidos orgânicos e interpretação)  ',
+        'name ': 'Coprológico funcional (caracteres, pH, digestibilidade, amônia, ácidos orgânicos e interpretação)  ',
       },
       {
         code: '0442',
@@ -2292,8 +2273,7 @@ export class ESocial27TableRepository {
       },
       {
         code: '0562',
-        'name ':
-          'Ergoespirometria ou teste cardiopulmonar de exercício completo (espirometria forçada, consumo de O2, produção de CO2 e derivados, ECG, oximetria)',
+        'name ': 'Ergoespirometria ou teste cardiopulmonar de exercício completo (espirometria forçada, consumo de O2, produção de CO2 e derivados, ECG, oximetria)',
       },
       {
         code: '0563',
@@ -2481,8 +2461,7 @@ export class ESocial27TableRepository {
       },
       {
         code: '0610',
-        'name ':
-          'Fenotipagem do sistema Rh-Hr (anti Rho(D) + anti Rh(C) + anti Rh(E)  ',
+        'name ': 'Fenotipagem do sistema Rh-Hr (anti Rho(D) + anti Rh(C) + anti Rh(E)  ',
       },
       {
         code: '0611',
@@ -2818,8 +2797,7 @@ export class ESocial27TableRepository {
       },
       {
         code: '0693',
-        'name ':
-          'Hemograma com contagem de plaquetas ou frações (eritrograma, leucograma, plaquetas)  ',
+        'name ': 'Hemograma com contagem de plaquetas ou frações (eritrograma, leucograma, plaquetas)  ',
       },
       {
         code: '0694',
@@ -3055,8 +3033,7 @@ export class ESocial27TableRepository {
       },
       {
         code: '0751',
-        'name ':
-          'IGF BP3 (proteína ligadora dos fatores de crescimento "insulinlike")',
+        'name ': 'IGF BP3 (proteína ligadora dos fatores de crescimento "insulinlike")',
       },
       {
         code: '0752',
@@ -3096,13 +3073,11 @@ export class ESocial27TableRepository {
       },
       {
         code: '0761',
-        'name ':
-          'Imunofenotipagem para leucemias agudas ou sindrome mielodisplásica  ',
+        'name ': 'Imunofenotipagem para leucemias agudas ou sindrome mielodisplásica  ',
       },
       {
         code: '0762',
-        'name ':
-          'Imunofenotipagem para linfoma não hodgkin / sindrome linfoproliferativa crônica  ',
+        'name ': 'Imunofenotipagem para linfoma não hodgkin / sindrome linfoproliferativa crônica  ',
       },
       {
         code: '0763',
@@ -3170,8 +3145,7 @@ export class ESocial27TableRepository {
       },
       {
         code: '0779',
-        'name ':
-          'Isolamento de agentes específicos (vírus, bactérias, protozoários, fungos, outros parasitas)',
+        'name ': 'Isolamento de agentes específicos (vírus, bactérias, protozoários, fungos, outros parasitas)',
       },
       {
         code: '0780',
@@ -3459,8 +3433,7 @@ export class ESocial27TableRepository {
       },
       {
         code: '0851',
-        'name ':
-          'Metabólitos de atrazina urinários (Atrazina dealquilada, deetilada, deisoprpilada)',
+        'name ': 'Metabólitos de atrazina urinários (Atrazina dealquilada, deetilada, deisoprpilada)',
       },
       {
         code: '0852',
@@ -3520,28 +3493,23 @@ export class ESocial27TableRepository {
       },
       {
         code: '0866',
-        'name ':
-          'Métodos Diagnósticos por Imagem Antebraço Articulação acromioclavicular  ',
+        'name ': 'Métodos Diagnósticos por Imagem Antebraço Articulação acromioclavicular  ',
       },
       {
         code: '0867',
-        'name ':
-          'Métodos Diagnósticos por Imagem Articulação coxofemoral (quadril)  ',
+        'name ': 'Métodos Diagnósticos por Imagem Articulação coxofemoral (quadril)  ',
       },
       {
         code: '0868',
-        'name ':
-          'Métodos Diagnósticos por Imagem Articulação escapuloumeral (ombro)  ',
+        'name ': 'Métodos Diagnósticos por Imagem Articulação escapuloumeral (ombro)  ',
       },
       {
         code: '0869',
-        'name ':
-          'Métodos Diagnósticos por Imagem Articulação esternoclavicular  ',
+        'name ': 'Métodos Diagnósticos por Imagem Articulação esternoclavicular  ',
       },
       {
         code: '0870',
-        'name ':
-          'Métodos Diagnósticos por Imagem Articulação tibiotársica (tornozelo)',
+        'name ': 'Métodos Diagnósticos por Imagem Articulação tibiotársica (tornozelo)',
       },
       {
         code: '0871',
@@ -3613,8 +3581,7 @@ export class ESocial27TableRepository {
       },
       {
         code: '0883',
-        'name ':
-          'Métodos Diagnósticos por Imagem Laringe ou hipofaringe ou pescoço (partes moles)',
+        'name ': 'Métodos Diagnósticos por Imagem Laringe ou hipofaringe ou pescoço (partes moles)',
       },
       {
         code: '0884',
@@ -3626,8 +3593,7 @@ export class ESocial27TableRepository {
       },
       {
         code: '0886',
-        'name ':
-          'Métodos Diagnósticos por Imagem Panorâmica dos membros inferiores',
+        'name ': 'Métodos Diagnósticos por Imagem Panorâmica dos membros inferiores',
       },
       {
         code: '0887',
@@ -4407,13 +4373,11 @@ export class ESocial27TableRepository {
       },
       {
         code: '1078',
-        'name ':
-          'Radiografia de tórax (PA) Padrão OIT (o mais recente), com dois leitores habilitados',
+        'name ': 'Radiografia de tórax (PA) Padrão OIT (o mais recente), com dois leitores habilitados',
       },
       {
         code: '1415',
-        'name ':
-          'Radiografia de tórax (PA) Padrão OIT (o mais recente), com pelo menos um leitor habilitado',
+        'name ': 'Radiografia de tórax (PA) Padrão OIT (o mais recente), com pelo menos um leitor habilitado',
       },
       {
         code: '1079',
@@ -5029,18 +4993,15 @@ export class ESocial27TableRepository {
       },
       {
         code: '1231',
-        'name ':
-          'Ultrassonografia Abdome inferior feminino (bexiga, útero, ovário e anexos)',
+        'name ': 'Ultrassonografia Abdome inferior feminino (bexiga, útero, ovário e anexos)',
       },
       {
         code: '1232',
-        'name ':
-          'Ultrassonografia Abdome inferior masculino (bexiga, próstata e vesículas seminais)',
+        'name ': 'Ultrassonografia Abdome inferior masculino (bexiga, próstata e vesículas seminais)',
       },
       {
         code: '1233',
-        'name ':
-          'Ultrassonografia Abdome superior (fígado, vias biliares, vesícula, pâncreas, baço)',
+        'name ': 'Ultrassonografia Abdome superior (fígado, vias biliares, vesícula, pâncreas, baço)',
       },
       {
         code: '1234',
@@ -5048,13 +5009,11 @@ export class ESocial27TableRepository {
       },
       {
         code: '1235',
-        'name ':
-          'Ultrassonografia Aparelho urinário feminino (rins, ureteres e bexiga)',
+        'name ': 'Ultrassonografia Aparelho urinário feminino (rins, ureteres e bexiga)',
       },
       {
         code: '1236',
-        'name ':
-          'Ultrassonografia Aparelho urinário masculino (rins, ureteres, bexiga e próstata)',
+        'name ': 'Ultrassonografia Aparelho urinário masculino (rins, ureteres, bexiga e próstata)',
       },
       {
         code: '1237',
@@ -5202,13 +5161,11 @@ export class ESocial27TableRepository {
       },
       {
         code: '1273',
-        'name ':
-          'Vírus da Encefalite do carrapato da Europa Central (pesquisa)',
+        'name ': 'Vírus da Encefalite do carrapato da Europa Central (pesquisa)',
       },
       {
         code: '1274',
-        'name ':
-          'Vírus da Encefalite do carrapato do Extremo Oriente (pesquisa)',
+        'name ': 'Vírus da Encefalite do carrapato do Extremo Oriente (pesquisa)',
       },
       {
         code: '1275',
@@ -5400,8 +5357,7 @@ export class ESocial27TableRepository {
       },
       {
         code: '1322',
-        'name ':
-          'Vírus linfotrópico de células T de primatas, tipos 1 e 2 (pesquisa)',
+        'name ': 'Vírus linfotrópico de células T de primatas, tipos 1 e 2 (pesquisa)',
       },
       {
         code: '1323',
@@ -5717,28 +5673,23 @@ export class ESocial27TableRepository {
       },
       {
         code: '1993',
-        'name ':
-          'Detecção de agentes infecciosos não especificados anteriormente por ELISA',
+        'name ': 'Detecção de agentes infecciosos não especificados anteriormente por ELISA',
       },
       {
         code: '1994',
-        'name ':
-          'Detecção de agentes infecciosos não especificados anteriormente por Imunofluorescência',
+        'name ': 'Detecção de agentes infecciosos não especificados anteriormente por Imunofluorescência',
       },
       {
         code: '1995',
-        'name ':
-          'Detecção de agentes infecciosos não especificados anteriormente por Métodos Sorológicos',
+        'name ': 'Detecção de agentes infecciosos não especificados anteriormente por Métodos Sorológicos',
       },
       {
         code: '1996',
-        'name ':
-          'Detecção de agentes infecciosos não especificados anteriormente por PCR',
+        'name ': 'Detecção de agentes infecciosos não especificados anteriormente por PCR',
       },
       {
         code: '1997',
-        'name ':
-          'Detecção de agentes infecciosos não especificados anteriormente por Western blot',
+        'name ': 'Detecção de agentes infecciosos não especificados anteriormente por Western blot',
       },
       {
         code: '1998',
@@ -5746,13 +5697,11 @@ export class ESocial27TableRepository {
       },
       {
         code: '1999',
-        'name ':
-          'Métodos Diagnósticos por Imagem não especificados anteriormente',
+        'name ': 'Métodos Diagnósticos por Imagem não especificados anteriormente',
       },
       {
         code: '9999',
-        'name ':
-          'Outros procedimentos diagnósticos não descritos anteriormente',
+        'name ': 'Outros procedimentos diagnósticos não descritos anteriormente',
       },
     ];
   }

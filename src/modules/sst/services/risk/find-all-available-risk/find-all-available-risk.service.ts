@@ -7,9 +7,7 @@ export class FindAllAvailableRiskService {
   constructor(private readonly riskRepository: RiskRepository) {}
 
   async execute(userPayloadDto: UserPayloadDto) {
-    const ChecklistFactor = await this.riskRepository.findAllAvailable(
-      userPayloadDto.companyId,
-    );
+    const ChecklistFactor = await this.riskRepository.findAllAvailable(userPayloadDto.companyId);
 
     return ChecklistFactor;
   }

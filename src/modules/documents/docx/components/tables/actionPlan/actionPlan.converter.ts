@@ -13,10 +13,7 @@ import { originRiskMap } from './../../../../../../shared/constants/maps/origin-
 import { ActionPlanColumnEnum } from './actionPlan.constant';
 import { bodyTableProps } from './elements/body';
 
-export const actionPlanConverter = (
-  riskGroup: RiskFactorGroupDataEntity,
-  hierarchyTree: IHierarchyMap,
-) => {
+export const actionPlanConverter = (riskGroup: RiskFactorGroupDataEntity, hierarchyTree: IHierarchyMap) => {
   const homogeneousGroupsMap = new Map<string, bodyTableProps[][]>();
   const actionPlanData: bodyTableProps[][] = [];
 
@@ -25,25 +22,19 @@ export const actionPlanConverter = (
     .sort((a, b) => sortNumber(b.level, a.level))
     .map((riskData) => {
       let origin: string;
-      
+
       if (riskData.homogeneousGroup.environment)
-        origin = `${riskData.homogeneousGroup.environment.name}\n(${
-          originRiskMap[riskData.homogeneousGroup.environment.type].name
-        })`;
-      
+        origin = `${riskData.homogeneousGroup.environment.name}\n(${originRiskMap[riskData.homogeneousGroup.environment.type].name})`;
+
       if (riskData.homogeneousGroup.characterization)
-        origin = `${riskData.homogeneousGroup.characterization.name}\n(${
-          originRiskMap[riskData.homogeneousGroup.characterization.type].name
-        })`;
-      
-      if (!riskData.homogeneousGroup.type)
-        origin = `${riskData.homogeneousGroup.name}\n(GSE)`;
+        origin = `${riskData.homogeneousGroup.characterization.name}\n(${originRiskMap[riskData.homogeneousGroup.characterization.type].name})`;
+
+      if (!riskData.homogeneousGroup.type) origin = `${riskData.homogeneousGroup.name}\n(GSE)`;
 
       if (riskData.homogeneousGroup.type == HomoTypeEnum.HIERARCHY) {
         const hierarchy = hierarchyTree[riskData.homogeneousGroup.id];
 
-        if (hierarchy)
-          origin = `${hierarchy.name}\n(${originRiskMap[hierarchy.type].name})`;
+        if (hierarchy) origin = `${hierarchy.name}\n(${originRiskMap[hierarchy.type].name})`;
       }
       return { ...riskData, origin };
     })
@@ -53,9 +44,7 @@ export const actionPlanConverter = (
       riskData.recs.forEach((rec) => {
         const cells: bodyTableProps[] = [];
 
-        const dataRecFound = dataRecs?.find(
-          (dataRec) => dataRec.recMedId == rec.id,
-        );
+        const dataRecFound = dataRecs?.find((dataRec) => dataRec.recMedId == rec.id);
         const responsibleName = dataRecFound?.responsibleName || '';
         const level = riskData.level || 0;
 
@@ -66,18 +55,13 @@ export const actionPlanConverter = (
             return dayjs(dataRecFound.endDate);
           }
 
-          if (months)
-            return dayjs(riskGroup?.validityStart).add(months + 1, 'months');
+          if (months) return dayjs(riskGroup?.validityStart).add(months + 1, 'months');
 
           return false;
         };
 
         const due = getDue();
-        const dueText = due
-          ? due.format('D [de] MMMM YYYY')
-          : level === 6
-          ? 'ação imediata'
-          : 'sem prazo';
+        const dueText = due ? due.format('D [de] MMMM YYYY') : level === 6 ? 'ação imediata' : 'sem prazo';
 
         cells[ActionPlanColumnEnum.ITEM] = {
           text: '',
@@ -110,18 +94,12 @@ export const actionPlanConverter = (
           borders: borderStyleGlobal(palette.common.white.string),
         };
         cells[ActionPlanColumnEnum.RO] = {
-          text: getMatrizRisk(
-            riskData.riskFactor.severity,
-            riskData.probability,
-          ).label,
+          text: getMatrizRisk(riskData.riskFactor.severity, riskData.probability).label,
           size: 5,
           borders: borderStyleGlobal(palette.common.white.string),
         };
         cells[ActionPlanColumnEnum.INTERVENTION] = {
-          text: getMatrizRisk(
-            riskData.riskFactor.severity,
-            riskData.probability,
-          ).intervention,
+          text: getMatrizRisk(riskData.riskFactor.severity, riskData.probability).intervention,
           size: 5,
           borders: borderStyleGlobal(palette.common.white.string),
         };
@@ -141,8 +119,7 @@ export const actionPlanConverter = (
           borders: borderStyleGlobal(palette.common.white.string),
         };
 
-        const rows =
-          homogeneousGroupsMap.get(riskData.homogeneousGroupId) || [];
+        const rows = homogeneousGroupsMap.get(riskData.homogeneousGroupId) || [];
         homogeneousGroupsMap.set(riskData.homogeneousGroupId, [...rows, cells]);
       });
     });

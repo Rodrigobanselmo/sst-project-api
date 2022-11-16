@@ -9,9 +9,7 @@ describe.skip('FindAllAvailableEmployeesService', () => {
       providers: [FindAllAvailableEmployeesService],
     }).compile();
 
-    service = module.get<FindAllAvailableEmployeesService>(
-      FindAllAvailableEmployeesService,
-    );
+    service = module.get<FindAllAvailableEmployeesService>(FindAllAvailableEmployeesService);
   });
 
   it('should be defined', () => {

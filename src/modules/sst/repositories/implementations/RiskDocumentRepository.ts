@@ -12,11 +12,7 @@ import { FindDocVersionDto } from '../../dto/doc-version.dto';
 @Injectable()
 export class RiskDocumentRepository {
   constructor(private prisma: PrismaService) {}
-  async upsert({
-    companyId,
-    attachments,
-    ...createDto
-  }: UpsertRiskDocumentDto): Promise<RiskDocumentEntity> {
+  async upsert({ companyId, attachments, ...createDto }: UpsertRiskDocumentDto): Promise<RiskDocumentEntity> {
     const riskFactorDocEntity = await this.prisma.riskFactorDocument.upsert({
       create: {
         companyId,
@@ -54,11 +50,7 @@ export class RiskDocumentRepository {
     return riskDocumentEntity.map((data) => new RiskDocumentEntity(data));
   }
 
-  async find(
-    query: Partial<FindDocVersionDto & { companyId: string }>,
-    pagination: PaginationQueryDto,
-    options: Prisma.RiskFactorDocumentFindManyArgs = {},
-  ) {
+  async find(query: Partial<FindDocVersionDto & { companyId: string }>, pagination: PaginationQueryDto, options: Prisma.RiskFactorDocumentFindManyArgs = {}) {
     const whereInit = {
       AND: [],
       ...options.where,

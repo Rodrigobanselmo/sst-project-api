@@ -1,11 +1,5 @@
 import { CompanyEntity } from '../../company/entities/company.entity';
-import {
-  ExamToClinic,
-  StatusEnum,
-  Exam,
-  Prisma,
-  ClinicScheduleTypeEnum,
-} from '@prisma/client';
+import { ExamToClinic, StatusEnum, Exam, Prisma, ClinicScheduleTypeEnum } from '@prisma/client';
 import { ExamEntity } from './exam.entity';
 
 export class ExamToClinicEntity implements ExamToClinic {

@@ -1,7 +1,4 @@
-import {
-  checkExamFields,
-  compareFieldValues,
-} from './../../../../../../../shared/utils/compareFieldValues';
+import { checkExamFields, compareFieldValues } from './../../../../../../../shared/utils/compareFieldValues';
 import { ErrorMessageEnum } from './../../../../../../../shared/constants/enum/errorMessage';
 import { BadRequestException, Injectable } from '@nestjs/common';
 
@@ -12,10 +9,7 @@ import { EmployeeExamsHistoryRepository } from './../../../../../repositories/im
 
 @Injectable()
 export class UpdateEmployeeExamHistoryService {
-  constructor(
-    private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository,
-    private readonly employeeRepository: EmployeeRepository,
-  ) {}
+  constructor(private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository, private readonly employeeRepository: EmployeeRepository) {}
 
   async execute(dataDto: UpdateEmployeeExamHistoryDto, user: UserPayloadDto) {
     const found = await this.employeeExamHistoryRepository.findFirstNude({
@@ -29,8 +23,7 @@ export class UpdateEmployeeExamHistoryService {
     });
 
     //tenant
-    if (!found?.id)
-      throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_NOT_FOUND);
+    if (!found?.id) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_NOT_FOUND);
 
     // const ignoreFields = [];
     // if (dataDto.status != 'CANCELED') {

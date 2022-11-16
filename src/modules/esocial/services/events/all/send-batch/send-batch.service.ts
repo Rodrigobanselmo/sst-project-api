@@ -103,16 +103,8 @@ export class SendBatchESocialService {
   ) {}
 
   async execute() {
-    const { company, cert } = await this.eSocialMethodsProvider.getCompany(
-      'd1309cad-19d4-4102-9bf9-231f91095c20',
-      { cert: true, report: true },
-    );
-    const xml =
-      '<library>' +
-      '<book Id="ID1034952680000002022100418283200001">' +
-      '<name>Harry Potter</name>' +
-      '</book>' +
-      '</library>';
+    const { company, cert } = await this.eSocialMethodsProvider.getCompany('d1309cad-19d4-4102-9bf9-231f91095c20', { cert: true, report: true });
+    const xml = '<library>' + '<book Id="ID1034952680000002022100418283200001">' + '<name>Harry Potter</name>' + '</book>' + '</library>';
 
     const s = await this.eSocialMethodsProvider.signEvent({
       xml,
@@ -133,32 +125,28 @@ export class SendBatchESocialService {
     console.log('start');
     console.log(JSON.stringify(this.soupClient.describe()));
     const promise = new Promise((resolve) => {
-      this.soupClient.ServicoEnviarLoteEventos.WsEnviarLoteEventos.EnviarLoteEventos(
-        xml,
-        (e, s) => {
-          console.log('middle');
-          console.log('erro', e);
+      this.soupClient.ServicoEnviarLoteEventos.WsEnviarLoteEventos.EnviarLoteEventos(xml, (e, s) => {
+        console.log('middle');
+        console.log('erro', e);
 
-          if (e)
-            return resolve({
-              status: {
-                cdResposta: 500,
-                descResposta: e?.message?.slice(0, 200) + '...',
-              },
-            });
+        if (e)
+          return resolve({
+            status: {
+              cdResposta: 500,
+              descResposta: e?.message?.slice(0, 200) + '...',
+            },
+          });
 
-          if (!s?.EnviarLoteEventosResult?.eSocial?.retornoEnvioLoteEventos)
-            return resolve({
-              status: {
-                cdResposta: 500,
-                descResposta:
-                  'value of (s?.EnviarLoteEventosResult?.eSocial?.retornoEnvioLoteEventos) is undefined',
-              },
-            });
+        if (!s?.EnviarLoteEventosResult?.eSocial?.retornoEnvioLoteEventos)
+          return resolve({
+            status: {
+              cdResposta: 500,
+              descResposta: 'value of (s?.EnviarLoteEventosResult?.eSocial?.retornoEnvioLoteEventos) is undefined',
+            },
+          });
 
-          resolve(s.EnviarLoteEventosResult.eSocial.retornoEnvioLoteEventos);
-        },
-      );
+        resolve(s.EnviarLoteEventosResult.eSocial.retornoEnvioLoteEventos);
+      });
     });
 
     const res = (await promise) as IEsocialSendBatchResponse;

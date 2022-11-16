@@ -4,15 +4,8 @@ import { UserCompanyDto } from '../dto/user-company.dto';
 import { UserEntity } from '../entities/user.entity';
 
 interface IUsersRepository {
-  create(
-    createUserDto: CreateUserDto,
-    userCompanyDto: UserCompanyDto[],
-  ): Promise<UserEntity>;
-  update(
-    id: number,
-    updateUserDto: UpdateUserDto,
-    userCompanyDto: UserCompanyDto[],
-  ): Promise<UserEntity>;
+  create(createUserDto: CreateUserDto, userCompanyDto: UserCompanyDto[]): Promise<UserEntity>;
+  update(id: number, updateUserDto: UpdateUserDto, userCompanyDto: UserCompanyDto[]): Promise<UserEntity>;
   removeById(id: number): Promise<UserEntity>;
   findAllByCompany(company: string): Promise<UserEntity[]>;
   findByEmail(email: string): Promise<UserEntity>;

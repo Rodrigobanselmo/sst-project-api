@@ -7,15 +7,9 @@ import { removeDuplicate } from '../../../../../shared/utils/removeDuplicate';
 import { v4 } from 'uuid';
 
 import { CompanyRepository } from '../../../../company/repositories/implementations/CompanyRepository';
-import {
-  dayjs,
-  DayJSProvider,
-} from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
+import { dayjs, DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { AmazonStorageProvider } from '../../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
-import {
-  downloadImageFile,
-  getExtensionFromUrl,
-} from '../../../../../shared/utils/downloadImageFile';
+import { downloadImageFile, getExtensionFromUrl } from '../../../../../shared/utils/downloadImageFile';
 import { RiskDocumentEntity } from '../../../../sst/entities/riskDocument.entity';
 import { RiskDocumentRepository } from '../../../../sst/repositories/implementations/RiskDocumentRepository';
 import { RiskGroupDataRepository } from '../../../../sst/repositories/implementations/RiskGroupDataRepository';
@@ -32,32 +26,17 @@ import { WorkspaceRepository } from '../../../../company/repositories/implementa
 import { actionPlanTableSection } from '../../../docx/components/tables/actionPlan/actionPlan.section';
 import { APPRTableSection } from '../../../docx/components/tables/appr/appr.section';
 import { APPRByGroupTableSection } from '../../../docx/components/tables/apprByGroup/appr-group.section';
-import {
-  hierarchyConverter,
-  HierarchyMapData,
-  IHierarchyMap,
-  IHomoGroupMap,
-} from '../../../docx/converter/hierarchy.converter';
+import { hierarchyConverter, HierarchyMapData, IHierarchyMap, IHomoGroupMap } from '../../../docx/converter/hierarchy.converter';
 import { RiskFactorsEntity } from '../../../../../modules/sst/entities/risk.entity';
 import { RiskFactorDataEntity } from '../../../../../modules/sst/entities/riskData.entity';
 
-export const checkRiskDataDoc = (
-  riskData: RiskFactorDataEntity[],
-  {
-    companyId,
-    docType,
-  }: { companyId: string; docType: keyof RiskDocInfoEntity },
-) => {
+export const checkRiskDataDoc = (riskData: RiskFactorDataEntity[], { companyId, docType }: { companyId: string; docType: keyof RiskDocInfoEntity }) => {
   return riskData.filter((riskData) => {
-    const foundHierarchyDoc = riskData.riskFactor.docInfo.find(
-      (doc) => doc.hierarchyId == riskData.homogeneousGroupId,
-    );
+    const foundHierarchyDoc = riskData.riskFactor.docInfo.find((doc) => doc.hierarchyId == riskData.homogeneousGroupId);
 
     if (foundHierarchyDoc) return foundHierarchyDoc[docType];
 
-    const isChecked = riskData.riskFactor.docInfo.find(
-      (riskData) => riskData.hierarchyId && riskData[docType],
-    );
+    const isChecked = riskData.riskFactor.docInfo.find((riskData) => riskData.hierarchyId && riskData[docType]);
 
     const docInfo = getRiskDoc(riskData.riskFactor, { companyId });
     if (docInfo[docType] || isChecked) return true;
@@ -66,21 +45,14 @@ export const checkRiskDataDoc = (
   });
 };
 
-export const getRiskDoc = (
-  risk: RiskFactorsEntity,
-  { companyId, hierarchyId }: { companyId?: string; hierarchyId?: string },
-) => {
+export const getRiskDoc = (risk: RiskFactorsEntity, { companyId, hierarchyId }: { companyId?: string; hierarchyId?: string }) => {
   if (hierarchyId) {
-    const data = risk?.docInfo?.find(
-      (i) => i.hierarchyId && i.hierarchyId == hierarchyId,
-    );
+    const data = risk?.docInfo?.find((i) => i.hierarchyId && i.hierarchyId == hierarchyId);
     if (data) return data;
   }
 
   if (companyId) {
-    const first = risk?.docInfo?.find(
-      (i) => !i.hierarchyId && i.companyId === companyId,
-    );
+    const first = risk?.docInfo?.find((i) => !i.hierarchyId && i.companyId === companyId);
     if (first) return first;
   }
 
@@ -112,20 +84,10 @@ export class PgrUploadService {
     const fromDate = new Date();
     // throw new Error();
     console.log('start: query data');
-    
-    const riskGroupData = await this.riskGroupDataRepository.findAllDataById(
-      upsertPgrDto.riskGroupId,
-      workspaceId,
-      companyId,
-    );
 
-    
-    const hierarchyHierarchy = (
-      await this.hierarchyRepository.findAllDataHierarchyByCompany(
-        companyId,
-        workspaceId,
-      )
-    ).map((hierarchy) => ({
+    const riskGroupData = await this.riskGroupDataRepository.findAllDataById(upsertPgrDto.riskGroupId, workspaceId, companyId);
+
+    const hierarchyHierarchy = (await this.hierarchyRepository.findAllDataHierarchyByCompany(companyId, workspaceId)).map((hierarchy) => ({
       ...hierarchy,
       employees: [
         ...hierarchy.employees,
@@ -139,66 +101,55 @@ export class PgrUploadService {
           .reduce((acc, curr) => [...acc, ...curr], []),
       ],
     }));
-    
-    const versions = (
-      await this.riskDocumentRepository.findByRiskGroupAndCompany(
-        upsertPgrDto.riskGroupId,
-        companyId,
-      )
-    ).filter((riskDocument) => riskDocument.version.includes('.0.0'));
+
+    const versions = (await this.riskDocumentRepository.findByRiskGroupAndCompany(upsertPgrDto.riskGroupId, companyId)).filter((riskDocument) =>
+      riskDocument.version.includes('.0.0'),
+    );
 
     const workspace = await this.workspaceRepository.findById(workspaceId);
-    const company = await this.companyRepository.findByIdAll(
-      companyId,
-      workspaceId,
-      {
-        include: {
-          primary_activity: true,
-          address: true,
-          covers: true,
-          environments: {
-            include: {
-              photos: true,
-              homogeneousGroup: {
-                include: { riskFactorData: { include: { riskFactor: true } } },
-              },
+    const company = await this.companyRepository.findByIdAll(companyId, workspaceId, {
+      include: {
+        primary_activity: true,
+        address: true,
+        covers: true,
+        environments: {
+          include: {
+            photos: true,
+            homogeneousGroup: {
+              include: { riskFactorData: { include: { riskFactor: true } } },
             },
-            where: { workspaceId },
           },
-          characterization: {
-            include: {
-              photos: true,
-              profiles: true,
-              homogeneousGroup: {
-                include: { riskFactorData: { include: { riskFactor: true } } },
-              },
+          where: { workspaceId },
+        },
+        characterization: {
+          include: {
+            photos: true,
+            profiles: true,
+            homogeneousGroup: {
+              include: { riskFactorData: { include: { riskFactor: true } } },
             },
-            where: { workspaceId },
           },
-          // professionals: { include: { councils: true } },
-          receivingServiceContracts: {
-            include: {
-              applyingServiceCompany: {
-                include: { address: true, covers: true },
-              },
+          where: { workspaceId },
+        },
+        // professionals: { include: { councils: true } },
+        receivingServiceContracts: {
+          include: {
+            applyingServiceCompany: {
+              include: { address: true, covers: true },
             },
           },
         },
       },
-    );
+    });
 
     riskGroupData.data = riskGroupData.data.filter((riskData) => {
       if (riskData.homogeneousGroup.type == HomoTypeEnum.HIERARCHY) {
-        const foundHierarchyDoc = riskData.riskFactor.docInfo.find(
-          (doc) => doc.hierarchyId == riskData.homogeneousGroupId,
-        );
+        const foundHierarchyDoc = riskData.riskFactor.docInfo.find((doc) => doc.hierarchyId == riskData.homogeneousGroupId);
 
         if (foundHierarchyDoc) return foundHierarchyDoc.isPGR;
       }
 
-      const isHierarchyPgr = riskData.riskFactor.docInfo.find(
-        (riskData) => riskData.hierarchyId && riskData.isPGR,
-      );
+      const isHierarchyPgr = riskData.riskFactor.docInfo.find((riskData) => riskData.hierarchyId && riskData.isPGR);
 
       const docInfo = getRiskDoc(riskData.riskFactor, { companyId });
       if (docInfo.isPGR || isHierarchyPgr) return true;
@@ -218,51 +169,34 @@ export class PgrUploadService {
     };
 
     const consultant = getConsultant();
-    const consultantLogo = consultant
-      ? await downloadImageFile(
-          consultant?.logoUrl,
-          `tmp/${v4()}.${getExtensionFromUrl(consultant?.logoUrl)}`,
-        )
-      : '';
+    const consultantLogo = consultant ? await downloadImageFile(consultant?.logoUrl, `tmp/${v4()}.${getExtensionFromUrl(consultant?.logoUrl)}`) : '';
 
-    const logo = company.logoUrl
-      ? await downloadImageFile(
-          company.logoUrl,
-          `tmp/${v4()}.${getExtensionFromUrl(company.logoUrl)}`,
-        )
-      : '';
+    const logo = company.logoUrl ? await downloadImageFile(company.logoUrl, `tmp/${v4()}.${getExtensionFromUrl(company.logoUrl)}`) : '';
 
     const cover = company?.covers?.[0] || consultant?.covers?.[0];
 
     console.log('start: photos');
-    const { environments, characterizations, photosPath } =
-      await this.downloadPhotos(company);
+    const { environments, characterizations, photosPath } = await this.downloadPhotos(company);
     console.log('end: photos');
     // const environments = [];
     // const characterizations = [];
     // const photosPath = [];
 
     try {
-      const {
-        hierarchyData,
-        hierarchyHighLevelsData,
-        homoGroupTree,
-        hierarchyTree,
-      } = hierarchyConverter(hierarchyHierarchy, environments, { workspaceId });
+      const { hierarchyData, hierarchyHighLevelsData, homoGroupTree, hierarchyTree } = hierarchyConverter(hierarchyHierarchy, environments, { workspaceId });
 
       // const actionPlanUrl = ' ';
       // const urlAPR = ' ';
       // const urlGroupAPR = ' ';
       console.log('start: attachment');
-      const { actionPlanUrl, urlAPR, urlGroupAPR } =
-        await this.generateAttachment(
-          riskGroupData,
-          hierarchyData,
-          hierarchyHighLevelsData,
-          hierarchyTree,
-          homoGroupTree,
-          upsertPgrDto,
-        );
+      const { actionPlanUrl, urlAPR, urlGroupAPR } = await this.generateAttachment(
+        riskGroupData,
+        hierarchyData,
+        hierarchyHighLevelsData,
+        hierarchyTree,
+        homoGroupTree,
+        upsertPgrDto,
+      );
 
       // return { buffer: this.attachments_remove[0], fileName: '1.docx' }; //!
       // return { buffer: this.attachments_remove[1], fileName: '2.docx' }; //!
@@ -301,9 +235,7 @@ export class PgrUploadService {
         }),
       ];
 
-      const versionString = `${this.dayJSProvider.format(
-        version.created_at,
-      )} - REV. ${version.version}`;
+      const versionString = `${this.dayJSProvider.format(version.created_at)} - REV. ${version.version}`;
 
       console.log('start: build document');
       const sections: ISectionOptions[] = new DocumentBuildPGR({
@@ -389,11 +321,7 @@ export class PgrUploadService {
     }
   }
 
-  private async upload(
-    fileBuffer: Buffer,
-    fileName: string,
-    upsertPgrDto: UpsertDocumentDto,
-  ) {
+  private async upload(fileBuffer: Buffer, fileName: string, upsertPgrDto: UpsertDocumentDto) {
     const { url } = await this.amazonStorageProvider.upload({
       file: fileBuffer,
       // fileName: upsertPgrDto.companyId + '/pgr/' + fileName,
@@ -414,10 +342,7 @@ export class PgrUploadService {
             await Promise.all(
               environment.photos.map(async (photo) => {
                 try {
-                  const path = await downloadImageFile(
-                    photo.photoUrl,
-                    `tmp/${v4()}.${getExtensionFromUrl(photo.photoUrl)}`,
-                  );
+                  const path = await downloadImageFile(photo.photoUrl, `tmp/${v4()}.${getExtensionFromUrl(photo.photoUrl)}`);
                   if (path) photosPath.push(path);
                   return { ...photo, photoUrl: path };
                 } catch (error) {
@@ -437,10 +362,7 @@ export class PgrUploadService {
             await Promise.all(
               environment.photos.map(async (photo) => {
                 try {
-                  const path = await downloadImageFile(
-                    photo.photoUrl,
-                    `tmp/${v4()}.${getExtensionFromUrl(photo.photoUrl)}`,
-                  );
+                  const path = await downloadImageFile(photo.photoUrl, `tmp/${v4()}.${getExtensionFromUrl(photo.photoUrl)}`);
                   if (path) photosPath.push(path);
                   return { ...photo, photoUrl: path };
                 } catch (error) {
@@ -479,73 +401,34 @@ export class PgrUploadService {
     upsertPgrDto: UpsertDocumentDto,
   ) {
     // APRs
-    const aprSection: ISectionOptions[] = [
-      ...APPRTableSection(riskGroupData, hierarchyData, homoGroupTree),
-    ];
+    const aprSection: ISectionOptions[] = [...APPRTableSection(riskGroupData, hierarchyData, homoGroupTree)];
 
-    const urlAPR = await this.save(
-      riskGroupData,
-      upsertPgrDto,
-      aprSection,
-      'PGR-APR',
-    );
+    const urlAPR = await this.save(riskGroupData, upsertPgrDto, aprSection, 'PGR-APR');
 
     // APRs Groups
-    const aprGroupSection: ISectionOptions[] = [
-      ...APPRByGroupTableSection(
-        riskGroupData,
-        hierarchyHighLevelsData,
-        hierarchyTree,
-        homoGroupTree,
-      ),
-    ];
+    const aprGroupSection: ISectionOptions[] = [...APPRByGroupTableSection(riskGroupData, hierarchyHighLevelsData, hierarchyTree, homoGroupTree)];
 
-    const urlGroupAPR = await this.save(
-      riskGroupData,
-      upsertPgrDto,
-      aprGroupSection,
-      'PGR-APR-GSE',
-    );
+    const urlGroupAPR = await this.save(riskGroupData, upsertPgrDto, aprGroupSection, 'PGR-APR-GSE');
 
     // ACTION PLAN
-    const actionPlanSections: ISectionOptions[] = [
-      actionPlanTableSection(riskGroupData, hierarchyTree),
-    ];
+    const actionPlanSections: ISectionOptions[] = [actionPlanTableSection(riskGroupData, hierarchyTree)];
 
-    const actionPlanUrl = await this.save(
-      riskGroupData,
-      upsertPgrDto,
-      actionPlanSections,
-      'PGR-PLANO_DE_ACAO',
-    );
+    const actionPlanUrl = await this.save(riskGroupData, upsertPgrDto, actionPlanSections, 'PGR-PLANO_DE_ACAO');
 
     return { urlAPR, urlGroupAPR, actionPlanUrl };
   }
 
-  private getFileName = (
-    upsertPgrDto: UpsertDocumentDto,
-    riskGroupData: RiskFactorGroupDataEntity,
-    typeName = 'PGR',
-  ) => {
+  private getFileName = (upsertPgrDto: UpsertDocumentDto, riskGroupData: RiskFactorGroupDataEntity, typeName = 'PGR') => {
     return getDocxFileName({
       name: upsertPgrDto.name,
-      companyName:
-        (riskGroupData.company?.fantasy || riskGroupData.company.name) +
-        (riskGroupData.company.initials
-          ? '-' + riskGroupData.company.initials
-          : ''),
+      companyName: (riskGroupData.company?.fantasy || riskGroupData.company.name) + (riskGroupData.company.initials ? '-' + riskGroupData.company.initials : ''),
       version: upsertPgrDto.version,
       typeName,
       date: dayjs(riskGroupData.documentDate || new Date()).format('MMMM-YYYY'),
     });
   };
 
-  private async save(
-    riskGroupData: RiskFactorGroupDataEntity,
-    upsertPgrDto: UpsertDocumentDto,
-    sections: ISectionOptions[],
-    text: string,
-  ) {
+  private async save(riskGroupData: RiskFactorGroupDataEntity, upsertPgrDto: UpsertDocumentDto, sections: ISectionOptions[], text: string) {
     const Doc = createBaseDocument(sections);
 
     const b64string = await Packer.toBase64String(Doc);

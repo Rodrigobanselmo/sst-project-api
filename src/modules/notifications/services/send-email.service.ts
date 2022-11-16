@@ -8,36 +8,16 @@ import { SendGridProvider } from '../../../shared/providers/MailProvider/impleme
 
 @Injectable()
 export class SendEmailService {
-  constructor(
-    private readonly mailProvider: SendGridProvider,
-    private readonly prisma: PrismaService,
-  ) {}
+  constructor(private readonly mailProvider: SendGridProvider, private readonly prisma: PrismaService) {}
 
-  async execute(
-    user: UserPayloadDto,
-    dto: EmailDto,
-    files?: Array<Express.Multer.File>,
-  ) {
+  async execute(user: UserPayloadDto, dto: EmailDto, files?: Array<Express.Multer.File>) {
     if (dto.template === EmailsTemplatesEnum.REFERRAL_GUIDE) {
       this.sendReferralGuide(user, dto, files);
     }
   }
 
-  async sendReferralGuide(
-    user: UserPayloadDto,
-    dto: EmailDto,
-    files?: Array<Express.Multer.File>,
-  ) {
-    const templatePath = resolve(
-      __dirname,
-      '..',
-      '..',
-      '..',
-      '..',
-      'templates',
-      'email',
-      'referralGuide.hbs',
-    );
+  async sendReferralGuide(user: UserPayloadDto, dto: EmailDto, files?: Array<Express.Multer.File>) {
+    const templatePath = resolve(__dirname, '..', '..', '..', '..', 'templates', 'email', 'referralGuide.hbs');
 
     await this.mailProvider.sendMail({
       path: templatePath,

@@ -2,17 +2,9 @@ import { RiskFactorsEntity } from './../../sst/entities/risk.entity';
 import { ExamToClinicEntity } from '../../sst/entities/examToClinic';
 import { RiskFactorGroupDataEntity } from '../../sst/entities/riskGroupData.entity';
 import { ProfessionalEntity } from './../../users/entities/professional.entity';
-import {
-  Company,
-  CompanyPaymentTypeEnum,
-  CompanyTypesEnum,
-} from '.prisma/client';
+import { Company, CompanyPaymentTypeEnum, CompanyTypesEnum } from '.prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  ProfessionalCouncil,
-  StatusEnum,
-  HomogeneousGroup,
-} from '@prisma/client';
+import { ProfessionalCouncil, StatusEnum, HomogeneousGroup } from '@prisma/client';
 import { AddressCompanyEntity } from './address-company.entity';
 import { EmployeeEntity } from './employee.entity';
 import { LicenseEntity } from './license.entity';
@@ -160,26 +152,19 @@ export class CompanyEntity implements Company {
     }
 
     if (this.riskFactors) {
-      this.riskFactors = this.riskFactors.map(
-        (risk) => new RiskFactorsEntity(risk),
-      );
+      this.riskFactors = this.riskFactors.map((risk) => new RiskFactorsEntity(risk));
     }
 
     if (this.group) {
-      if (!this.doctorResponsible)
-        this.doctorResponsible = this.group?.doctorResponsible;
-      if (!this.doctorResponsibleId)
-        this.doctorResponsibleId = this.group?.doctorResponsibleId;
+      if (!this.doctorResponsible) this.doctorResponsible = this.group?.doctorResponsible;
+      if (!this.doctorResponsibleId) this.doctorResponsibleId = this.group?.doctorResponsibleId;
 
-      if (!this.tecResponsible)
-        this.tecResponsible = this.group?.tecResponsible;
-      if (!this.tecResponsibleId)
-        this.tecResponsibleId = this.group?.tecResponsibleId;
+      if (!this.tecResponsible) this.tecResponsible = this.group?.tecResponsible;
+      if (!this.tecResponsibleId) this.tecResponsibleId = this.group?.tecResponsibleId;
 
       if (!this.esocialStart) this.esocialStart = this.group?.esocialStart;
       if (!this.numAsos) this.numAsos = this.group?.numAsos;
-      if (!this.blockResignationExam)
-        this.blockResignationExam = this.group?.blockResignationExam;
+      if (!this.blockResignationExam) this.blockResignationExam = this.group?.blockResignationExam;
     }
 
     if (this.doctorResponsible) {
@@ -255,12 +240,7 @@ export class CompanyEntity implements Company {
   }
 
   private getClinicStep() {
-    this.steps = [
-      CompanyStepEnum.EXAMS,
-      CompanyStepEnum.PROFESSIONALS,
-      CompanyStepEnum.USERS,
-      CompanyStepEnum.NONE,
-    ];
+    this.steps = [CompanyStepEnum.EXAMS, CompanyStepEnum.PROFESSIONALS, CompanyStepEnum.USERS, CompanyStepEnum.NONE];
 
     const professionalStep = this.professionalCount == 0;
     const examStep = this.examCount == 0;

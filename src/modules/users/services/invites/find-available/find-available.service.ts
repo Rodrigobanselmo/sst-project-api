@@ -8,14 +8,8 @@ import { InviteUsersRepository } from '../../../repositories/implementations/Inv
 export class FindAvailableService {
   constructor(private readonly inviteUsersRepository: InviteUsersRepository) {}
 
-  async execute(
-    { skip, take, ...query }: FindInvitesDto,
-    user: UserPayloadDto,
-  ) {
-    const access = await this.inviteUsersRepository.find(
-      { ...query },
-      { skip, take },
-    );
+  async execute({ skip, take, ...query }: FindInvitesDto, user: UserPayloadDto) {
+    const access = await this.inviteUsersRepository.find({ ...query }, { skip, take });
 
     return access;
   }

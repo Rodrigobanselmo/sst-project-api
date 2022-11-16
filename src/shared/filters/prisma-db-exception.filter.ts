@@ -1,11 +1,4 @@
-import {
-  ArgumentsHost,
-  Catch,
-  ExceptionFilter,
-  HttpException,
-  HttpStatus,
-  BadRequestException,
-} from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, BadRequestException } from '@nestjs/common';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { Response } from 'express';
 import { ErrorMessageEnum } from '../constants/enum/errorMessage';
@@ -26,20 +19,13 @@ export class PrismaDbExceptionFilter implements ExceptionFilter {
 
     switch (code) {
       case 'P2002':
-        if (target)
-          error = new BadRequestException(
-            `Dado que está tentando criar já existe: ${target.join(
-              ', ',
-            )} está em conflito`,
-          );
+        if (target) error = new BadRequestException(`Dado que está tentando criar já existe: ${target.join(', ')} está em conflito`);
         break;
 
       case 'P2003':
         if (field_name)
           //Data you trying to create or delete requires an FK
-          error = new BadRequestException(
-            `está faltando campos para realizar essa operação: ${field_name}`,
-          );
+          error = new BadRequestException(`está faltando campos para realizar essa operação: ${field_name}`);
         break;
 
       case 'P2025':

@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Res,
-  UploadedFile,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Controller, Get, Post, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
@@ -14,10 +7,7 @@ import { DownloadRiskDataService } from '../../services/checklist/download-risk-
 import { UploadChecklistDataService } from '../../services/checklist/upload-risk-data/upload-risk-data.service';
 import { UploadEpiDataService } from '../../services/checklist/upload-epi-data/upload-epi-data.service';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
-import {
-  PermissionEnum,
-  RoleEnum,
-} from '../../../../shared/constants/enum/authorization';
+import { PermissionEnum, RoleEnum } from '../../../../shared/constants/enum/authorization';
 import { Roles } from '../../../../shared/decorators/roles.decorator';
 
 @Controller('files/checklist')
@@ -37,15 +27,8 @@ export class FilesChecklistController {
   })
   @Post('/upload/:companyId?')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadRiskFile(
-    @UploadedFile() file: Express.Multer.File,
-    @User() userPayloadDto: UserPayloadDto,
-    @Res() res,
-  ) {
-    const { workbook, filename } = await this.uploadRiskService.execute(
-      file,
-      userPayloadDto,
-    );
+  async uploadRiskFile(@UploadedFile() file: Express.Multer.File, @User() userPayloadDto: UserPayloadDto, @Res() res) {
+    const { workbook, filename } = await this.uploadRiskService.execute(file, userPayloadDto);
 
     res.attachment(filename);
     workbook.xlsx.write(res).then(function () {
@@ -61,9 +44,7 @@ export class FilesChecklistController {
   })
   @Get('/download/:companyId?')
   async downloadRisks(@User() userPayloadDto: UserPayloadDto, @Res() res) {
-    const { workbook, filename } = await this.downloadRiskService.execute(
-      userPayloadDto,
-    );
+    const { workbook, filename } = await this.downloadRiskService.execute(userPayloadDto);
 
     res.attachment(filename);
     workbook.xlsx.write(res).then(function () {
@@ -79,15 +60,8 @@ export class FilesChecklistController {
   })
   @Post('epi/upload/:companyId?')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadEpiFile(
-    @UploadedFile() file: Express.Multer.File,
-    @User() userPayloadDto: UserPayloadDto,
-    @Res() res,
-  ) {
-    const { workbook, filename } = await this.uploadEpiDataService.execute(
-      file,
-      userPayloadDto,
-    );
+  async uploadEpiFile(@UploadedFile() file: Express.Multer.File, @User() userPayloadDto: UserPayloadDto, @Res() res) {
+    const { workbook, filename } = await this.uploadEpiDataService.execute(file, userPayloadDto);
 
     res.attachment(filename);
     workbook.xlsx.write(res).then(function () {

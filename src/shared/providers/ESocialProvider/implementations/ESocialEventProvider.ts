@@ -1,52 +1,25 @@
 import { sortData } from './../../../utils/sorts/data.sort';
 import { Inject, Injectable } from '@nestjs/common';
-import {
-  EmployeeESocialEventActionEnum,
-  ExamHistoryTypeEnum,
-  StatusEnum,
-} from '@prisma/client';
+import { EmployeeESocialEventActionEnum, ExamHistoryTypeEnum, StatusEnum } from '@prisma/client';
 import clone from 'clone';
 import { Client } from 'nestjs-soap';
 import { IEvent3000Props } from 'src/modules/esocial/interfaces/event-3000';
 import { js2xml } from 'xml-js';
 
 import { EmployeeEntity } from '../../../../modules/company/entities/employee.entity';
-import {
-  IEvent2220Props,
-  mapResAso,
-  mapTpExameOcup,
-  requiredObsProc,
-  requiredOrdExams,
-} from '../../../../modules/esocial/interfaces/event-2220';
-import {
-  IEventProps,
-  ProcEmiEnum,
-  TpIncsEnum,
-} from '../../../../modules/esocial/interfaces/event-batch';
+import { IEvent2220Props, mapResAso, mapTpExameOcup, requiredObsProc, requiredOrdExams } from '../../../../modules/esocial/interfaces/event-2220';
+import { IEventProps, ProcEmiEnum, TpIncsEnum } from '../../../../modules/esocial/interfaces/event-batch';
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { arrayChunks } from '../../../../shared/utils/arrayChunks';
 import { DayJSProvider } from '../../DateProvider/implementations/DayJSProvider';
-import {
-  IBatchDatabaseSave,
-  IESocial2220,
-  IESocial3000,
-  IESocialSendEventOptions,
-} from '../models/IESocialMethodProvider';
+import { IBatchDatabaseSave, IESocial2220, IESocial3000, IESocialSendEventOptions } from '../models/IESocialMethodProvider';
 import { CompanyEntity } from './../../../../modules/company/entities/company.entity';
 import { EmployeeExamsHistoryEntity } from './../../../../modules/company/entities/employee-exam-history.entity';
 import { CreateESocialEvent } from './../../../../modules/esocial/dto/esocial-batch.dto';
 import { EmployeeESocialBatchEntity } from './../../../../modules/esocial/entities/employeeEsocialBatch.entity';
-import {
-  IEsocialFetchBatch,
-  IEsocialSendBatchResponse,
-} from './../../../../modules/esocial/interfaces/esocial';
+import { IEsocialFetchBatch, IEsocialSendBatchResponse } from './../../../../modules/esocial/interfaces/esocial';
 import { mapTpEvent } from './../../../../modules/esocial/interfaces/event-3000';
-import {
-  EventGroupEnum,
-  IBatchProps,
-  IndRetifEnum,
-  TpAmbEnum,
-} from './../../../../modules/esocial/interfaces/event-batch';
+import { EventGroupEnum, IBatchProps, IndRetifEnum, TpAmbEnum } from './../../../../modules/esocial/interfaces/event-batch';
 import { ESocialBatchRepository } from './../../../../modules/esocial/repositories/implementations/ESocialBatchRepository';
 import { SoapClientEnum } from './../../../constants/enum/soapClient';
 import { sortNumber } from './../../../utils/sorts/number.sort';
@@ -87,10 +60,8 @@ class ESocialEventProvider {
     const errors: { message: string }[] = [];
 
     {
-      if (!ideVinculo.cpfTrab)
-        errors.push({ message: 'Informar "CPF" do empregado' });
-      if (!ideVinculo.matricula)
-        errors.push({ message: 'Informar "matricula" do empregado' });
+      if (!ideVinculo.cpfTrab) errors.push({ message: 'Informar "CPF" do empregado' });
+      if (!ideVinculo.matricula) errors.push({ message: 'Informar "matricula" do empregado' });
     }
 
     //? doctor is no more need as an required field
@@ -121,8 +92,7 @@ class ESocialEventProvider {
           message: 'Informar o médico emitente do ASO',
         });
       } else {
-        if (!asoDoctor.nrCRM || !asoDoctor.ufCRM)
-          errors.push({ message: 'Informar "CRM" do médico emitente do ASO' });
+        if (!asoDoctor.nrCRM || !asoDoctor.ufCRM) errors.push({ message: 'Informar "CRM" do médico emitente do ASO' });
         if (!asoDoctor.nmMed)
           errors.push({
             message: 'Informar "nome" do médico emitente do ASO',
@@ -164,13 +134,11 @@ class ESocialEventProvider {
     const errors: { message: string }[] = [];
 
     {
-      if (!infoExclusao.ideTrabalhador.cpfTrab)
-        errors.push({ message: 'Informar "CPF" do empregado' });
+      if (!infoExclusao.ideTrabalhador.cpfTrab) errors.push({ message: 'Informar "CPF" do empregado' });
     }
 
     {
-      if (!infoExclusao.nrRecEvt)
-        errors.push({ message: 'Informar "recibo" do evento' });
+      if (!infoExclusao.nrRecEvt) errors.push({ message: 'Informar "recibo" do evento' });
       if (!infoExclusao.tpEvento)
         errors.push({
           message: 'Informar "tipo de evento" para a exclusão (ex: S-2240))',
@@ -184,168 +152,134 @@ class ESocialEventProvider {
     return this.dayJSProvider.format(date, 'YYYY-MM-DD');
   }
 
-  convertToEvent2220Struct(
-    company: CompanyEntity,
-    employees: EmployeeEntity[],
-    options?: { ideEvento?: IEventProps['ideEvento'] },
-  ) {
-    const generateId = this.eSocialMethodsProvider.classGenerateId(
-      company.cnpj,
-    );
-    const eventsStruct = employees.reduce<IESocial2220.StructureReturn[]>(
-      (acc, employee) => {
-        const examsGroup = employee.examsHistory
-          .sort((a, b) =>
-            sortNumber(
-              a.exam.isAttendance ? 1 : 0,
-              b.exam.isAttendance ? 1 : 0,
-            ),
-          )
-          .sort((a, b) => sortNumber(a.doneDate, b.doneDate))
-          .reduce<EmployeeExamsHistoryEntity[][]>(
-            (_acc, exam) => {
-              const cloneAcc = clone(_acc);
-              const lastIndex = cloneAcc.length - 1;
+  convertToEvent2220Struct(company: CompanyEntity, employees: EmployeeEntity[], options?: { ideEvento?: IEventProps['ideEvento'] }) {
+    const generateId = this.eSocialMethodsProvider.classGenerateId(company.cnpj);
+    const eventsStruct = employees.reduce<IESocial2220.StructureReturn[]>((acc, employee) => {
+      const examsGroup = employee.examsHistory
+        .sort((a, b) => sortNumber(a.exam.isAttendance ? 1 : 0, b.exam.isAttendance ? 1 : 0))
+        .sort((a, b) => sortNumber(a.doneDate, b.doneDate))
+        .reduce<EmployeeExamsHistoryEntity[][]>(
+          (_acc, exam) => {
+            const cloneAcc = clone(_acc);
+            const lastIndex = cloneAcc.length - 1;
 
-              if (exam.status === 'CANCELED') {
-                cloneAcc.unshift([exam]);
-                return cloneAcc;
-              }
-
-              cloneAcc[lastIndex].push(exam);
-
-              if (exam.exam.isAttendance) {
-                cloneAcc.push([]);
-              }
-
+            if (exam.status === 'CANCELED') {
+              cloneAcc.unshift([exam]);
               return cloneAcc;
-            },
-            [[]],
-          );
+            }
 
-        const examsWithAso = examsGroup.filter(
-          (exams) =>
-            exams.some((e) => e.exam.isAttendance) &&
-            exams.some((e) => e.sendEvent),
-        );
+            cloneAcc[lastIndex].push(exam);
 
-        const eventsJs = examsWithAso.map<IESocial2220.StructureReturn>(
-          (exams) => {
-            const aso = exams[exams.length - 1];
-            const historyExams = [];
-            const id = generateId.newId();
-            const doctorResponsible = company?.doctorResponsible;
+            if (exam.exam.isAttendance) {
+              cloneAcc.push([]);
+            }
 
-            const isDoctorAvailable =
-              doctorResponsible &&
-              doctorResponsible?.name &&
-              doctorResponsible?.councilId &&
-              doctorResponsible?.councilUF;
-
-            const asoDoctor = aso?.doctor;
-
-            const eventMed: IEvent2220Props['exMedOcup'] = {
-              ...(isDoctorAvailable && {
-                respMonit: {
-                  ...(doctorResponsible?.cpf && {
-                    cpfResp: doctorResponsible.cpf,
-                  }),
-                  nmResp: doctorResponsible.name,
-                  nrCRM: doctorResponsible.councilId,
-                  ufCRM: doctorResponsible.councilUF,
-                },
-              }),
-              tpExameOcup: mapResAso[aso.examType],
-              aso: {
-                dtAso: aso.doneDate,
-                resAso: mapTpExameOcup[aso.evaluationType],
-                medico: {
-                  nmMed: asoDoctor?.name,
-                  nrCRM: asoDoctor?.councilId,
-                  ufCRM: asoDoctor?.councilUF,
-                },
-                exame: exams.map((exam) => {
-                  let isSequential: boolean | null = null;
-                  let obsProc: string | null = null;
-                  const esocial27Code = exam.exam?.esocial27Code;
-                  if (requiredOrdExams.includes(esocial27Code)) {
-                    isSequential =
-                      !!employee.examsHistory.filter(
-                        (e) =>
-                          e.status === 'DONE' &&
-                          e?.exam?.esocial27Code === exam.exam.esocial27Code,
-                      )[1] ||
-                      (examsWithAso.length === 1 &&
-                        aso.examType !== ExamHistoryTypeEnum.ADMI);
-                  }
-
-                  if (requiredObsProc.includes(esocial27Code)) {
-                    obsProc = exam.exam?.obsProc;
-                  }
-
-                  historyExams.push(exam);
-
-                  return {
-                    examName: exam.exam.name,
-                    dtExm: exam.doneDate,
-                    procRealizado: esocial27Code,
-                    ...(isSequential != null && {
-                      ordExame: isSequential ? 2 : 1,
-                    }),
-                    ...(obsProc != null && { obsProc }),
-                  };
-                }),
-              },
-            };
-
-            const receipt = aso?.events
-              ?.sort((b, a) => sortData(a, b))
-              ?.find((e) => e.receipt)?.receipt;
-
-            const event: IEvent2220Props = {
-              id,
-              exMedOcup: eventMed,
-              ideEmpregador: { nrInsc: company.cnpj },
-              ideVinculo: {
-                cpfTrab: employee.cpf,
-                matricula: employee.esocialCode,
-              },
-              ideEvento: {
-                tpAmb: options?.ideEvento?.tpAmb,
-                procEmi: options?.ideEvento?.procEmi,
-                ...(receipt && {
-                  indRetif: IndRetifEnum.MODIFIED,
-                  nrRecibo: receipt,
-                }),
-              },
-            };
-
-            return {
-              id,
-              event: event,
-              eventDate: aso.doneDate,
-              asoId: aso.id,
-              aso: aso,
-              historyExams,
-              examIds: historyExams.map((i) => i.id),
-              employee: employee,
-            };
+            return cloneAcc;
           },
+          [[]],
         );
 
-        acc = [...eventsJs, ...acc];
-        return acc;
-      },
-      [],
-    );
+      const examsWithAso = examsGroup.filter((exams) => exams.some((e) => e.exam.isAttendance) && exams.some((e) => e.sendEvent));
+
+      const eventsJs = examsWithAso.map<IESocial2220.StructureReturn>((exams) => {
+        const aso = exams[exams.length - 1];
+        const historyExams = [];
+        const id = generateId.newId();
+        const doctorResponsible = company?.doctorResponsible;
+
+        const isDoctorAvailable = doctorResponsible && doctorResponsible?.name && doctorResponsible?.councilId && doctorResponsible?.councilUF;
+
+        const asoDoctor = aso?.doctor;
+
+        const eventMed: IEvent2220Props['exMedOcup'] = {
+          ...(isDoctorAvailable && {
+            respMonit: {
+              ...(doctorResponsible?.cpf && {
+                cpfResp: doctorResponsible.cpf,
+              }),
+              nmResp: doctorResponsible.name,
+              nrCRM: doctorResponsible.councilId,
+              ufCRM: doctorResponsible.councilUF,
+            },
+          }),
+          tpExameOcup: mapResAso[aso.examType],
+          aso: {
+            dtAso: aso.doneDate,
+            resAso: mapTpExameOcup[aso.evaluationType],
+            medico: {
+              nmMed: asoDoctor?.name,
+              nrCRM: asoDoctor?.councilId,
+              ufCRM: asoDoctor?.councilUF,
+            },
+            exame: exams.map((exam) => {
+              let isSequential: boolean | null = null;
+              let obsProc: string | null = null;
+              const esocial27Code = exam.exam?.esocial27Code;
+              if (requiredOrdExams.includes(esocial27Code)) {
+                isSequential =
+                  !!employee.examsHistory.filter((e) => e.status === 'DONE' && e?.exam?.esocial27Code === exam.exam.esocial27Code)[1] ||
+                  (examsWithAso.length === 1 && aso.examType !== ExamHistoryTypeEnum.ADMI);
+              }
+
+              if (requiredObsProc.includes(esocial27Code)) {
+                obsProc = exam.exam?.obsProc;
+              }
+
+              historyExams.push(exam);
+
+              return {
+                examName: exam.exam.name,
+                dtExm: exam.doneDate,
+                procRealizado: esocial27Code,
+                ...(isSequential != null && {
+                  ordExame: isSequential ? 2 : 1,
+                }),
+                ...(obsProc != null && { obsProc }),
+              };
+            }),
+          },
+        };
+
+        const receipt = aso?.events?.sort((b, a) => sortData(a, b))?.find((e) => e.receipt)?.receipt;
+
+        const event: IEvent2220Props = {
+          id,
+          exMedOcup: eventMed,
+          ideEmpregador: { nrInsc: company.cnpj },
+          ideVinculo: {
+            cpfTrab: employee.cpf,
+            matricula: employee.esocialCode,
+          },
+          ideEvento: {
+            tpAmb: options?.ideEvento?.tpAmb,
+            procEmi: options?.ideEvento?.procEmi,
+            ...(receipt && {
+              indRetif: IndRetifEnum.MODIFIED,
+              nrRecibo: receipt,
+            }),
+          },
+        };
+
+        return {
+          id,
+          event: event,
+          eventDate: aso.doneDate,
+          asoId: aso.id,
+          aso: aso,
+          historyExams,
+          examIds: historyExams.map((i) => i.id),
+          employee: employee,
+        };
+      });
+
+      acc = [...eventsJs, ...acc];
+      return acc;
+    }, []);
 
     return eventsStruct;
   }
 
-  convertToEvent3000Struct(
-    props: IESocial3000.StructureEntry,
-    options?: { ideEvento?: IEventProps['ideEvento'] },
-  ): IESocial3000.StructureReturn[] {
+  convertToEvent3000Struct(props: IESocial3000.StructureEntry, options?: { ideEvento?: IEventProps['ideEvento'] }): IESocial3000.StructureReturn[] {
     const generateId = this.eSocialMethodsProvider.classGenerateId(props.cnpj);
 
     const events = props.event.map((event) => {
@@ -370,10 +304,7 @@ class ESocialEventProvider {
     return events;
   }
 
-  generateXmlEvent2220(
-    event: IEvent2220Props,
-    options?: { declarations?: boolean },
-  ) {
+  generateXmlEvent2220(event: IEvent2220Props, options?: { declarations?: boolean }) {
     const baseEvent = this.generateEventBase(event);
     const exMedOcup = event.exMedOcup;
     const respMonit = exMedOcup.respMonit;
@@ -436,10 +367,7 @@ class ESocialEventProvider {
     return xml;
   }
 
-  generateXmlEvent3000(
-    event: IEvent3000Props,
-    options?: { declarations?: boolean },
-  ) {
+  generateXmlEvent3000(event: IEvent3000Props, options?: { declarations?: boolean }) {
     const baseEvent = this.generateEventBase(event);
     const infoExclusao = event?.infoExclusao;
 
@@ -523,13 +451,8 @@ class ESocialEventProvider {
     return eventJs;
   }
 
-  private generateBatchXML(
-    events: (IESocial2220.XmlReturn | IESocial3000.XmlReturn)[],
-    event: IBatchProps,
-  ) {
-    const xmlEvents = events
-      .map((event) => `<evento Id="${event.id}">${event.signedXml}</evento>`)
-      .join('');
+  private generateBatchXML(events: (IESocial2220.XmlReturn | IESocial3000.XmlReturn)[], event: IBatchProps) {
+    const xmlEvents = events.map((event) => `<evento Id="${event.id}">${event.signedXml}</evento>`).join('');
 
     const replaceText = 'xml_replace_data';
     const eventJs = {
@@ -570,9 +493,7 @@ class ESocialEventProvider {
       },
     };
 
-    const xml = js2xml(eventJs, { compact: true })
-      .replace(replaceText, xmlEvents)
-      .replace('<?xml version="1.0" encoding="UTF-8"?>', '');
+    const xml = js2xml(eventJs, { compact: true }).replace(replaceText, xmlEvents).replace('<?xml version="1.0" encoding="UTF-8"?>', '');
 
     return xml;
   }
@@ -581,8 +502,7 @@ class ESocialEventProvider {
     const eventJs = {
       eSocial: {
         ['_attributes']: {
-          xmlns:
-            'http://www.esocial.gov.br/schema/lote/eventos/envio/consulta/retornoProcessamento/v1_0_0',
+          xmlns: 'http://www.esocial.gov.br/schema/lote/eventos/envio/consulta/retornoProcessamento/v1_0_0',
         },
         consultaLoteEventos: {
           protocoloEnvio: {
@@ -596,10 +516,7 @@ class ESocialEventProvider {
     return xml;
   }
 
-  public async sendEventToESocial(
-    events: (IESocial2220.XmlReturn | IESocial3000.XmlReturn)[],
-    options: IESocialSendEventOptions,
-  ) {
+  public async sendEventToESocial(events: (IESocial2220.XmlReturn | IESocial3000.XmlReturn)[], options: IESocialSendEventOptions) {
     // const eventChunks = arrayChunks(  Array.from({ length: 100 }).map(() => events[0]),  100,);
     const tpAmb = options?.environment || this.tpAmb;
     const eventChunks = arrayChunks(events, 40);
@@ -611,40 +528,29 @@ class ESocialEventProvider {
           ideEmpregador: { nrInsc: options.company?.cnpj },
         });
 
-        const client =
-          tpAmb == TpAmbEnum.PROD ? this.clientProduction : this.clientRestrict;
+        const client = tpAmb == TpAmbEnum.PROD ? this.clientProduction : this.clientRestrict;
 
-        const sendEventBatch = new Promise<IEsocialSendBatchResponse>(
-          (resolve) => {
-            client.ServicoEnviarLoteEventos.WsEnviarLoteEventos.EnviarLoteEventos(
-              batchXML,
-              (e, s) => {
-                if (e)
-                  return resolve({
-                    status: {
-                      cdResposta: '500',
-                      descResposta: e?.message?.slice(0, 200) + '...',
-                    },
-                  });
+        const sendEventBatch = new Promise<IEsocialSendBatchResponse>((resolve) => {
+          client.ServicoEnviarLoteEventos.WsEnviarLoteEventos.EnviarLoteEventos(batchXML, (e, s) => {
+            if (e)
+              return resolve({
+                status: {
+                  cdResposta: '500',
+                  descResposta: e?.message?.slice(0, 200) + '...',
+                },
+              });
 
-                if (
-                  !s?.EnviarLoteEventosResult?.eSocial?.retornoEnvioLoteEventos
-                )
-                  return resolve({
-                    status: {
-                      cdResposta: '500',
-                      descResposta:
-                        'value of (s?.EnviarLoteEventosResult?.eSocial?.retornoEnvioLoteEventos) is undefined',
-                    },
-                  });
+            if (!s?.EnviarLoteEventosResult?.eSocial?.retornoEnvioLoteEventos)
+              return resolve({
+                status: {
+                  cdResposta: '500',
+                  descResposta: 'value of (s?.EnviarLoteEventosResult?.eSocial?.retornoEnvioLoteEventos) is undefined',
+                },
+              });
 
-                resolve(
-                  s.EnviarLoteEventosResult.eSocial.retornoEnvioLoteEventos,
-                );
-              },
-            );
-          },
-        );
+            resolve(s.EnviarLoteEventosResult.eSocial.retornoEnvioLoteEventos);
+          });
+        });
 
         const response = await sendEventBatch;
 
@@ -750,8 +656,7 @@ class ESocialEventProvider {
                 examsIds.push(...event.examIds);
               }
 
-              let action: EmployeeESocialEventActionEnum =
-                EmployeeESocialEventActionEnum.SEND;
+              let action: EmployeeESocialEventActionEnum = EmployeeESocialEventActionEnum.SEND;
 
               if (event.xml.includes('infoExclusao')) {
                 action = EmployeeESocialEventActionEnum.EXCLUDE;
@@ -777,11 +682,7 @@ class ESocialEventProvider {
         await this.eSocialBatchRepository.create({
           companyId,
           environment: body?.tpAmb || 1,
-          status: esocialSend
-            ? isOk
-              ? StatusEnum.DONE
-              : StatusEnum.INVALID
-            : StatusEnum.TRANSMITTED,
+          status: esocialSend ? (isOk ? StatusEnum.DONE : StatusEnum.INVALID) : StatusEnum.TRANSMITTED,
           type,
           userTransmissionId: user.userId,
           events,
@@ -797,49 +698,34 @@ class ESocialEventProvider {
     batch: EmployeeESocialBatchEntity,
     // options?: IESocialFetchEventOptions,
   ) {
-    const protocolId =
-      batch.protocolId || batch.response?.dadosRecepcaoLote?.protocoloEnvio;
+    const protocolId = batch.protocolId || batch.response?.dadosRecepcaoLote?.protocoloEnvio;
 
     const XML = this.generateFetchBatchXML(protocolId);
     const tpAmb = batch.environment || this.tpAmb;
 
-    const client =
-      tpAmb == TpAmbEnum.PROD
-        ? this.clientConsultProduction
-        : this.clientConsultRestrict;
+    const client = tpAmb == TpAmbEnum.PROD ? this.clientConsultProduction : this.clientConsultRestrict;
 
-    const fetchEventBatch = new Promise<IEsocialFetchBatch.Response>(
-      (resolve) => {
-        client.ServicoConsultarLoteEventos[
-          'Servicos.Empregador_ServicoConsultarLoteEventos'
-        ].ConsultarLoteEventos(XML, (e, s) => {
-          if (e)
-            return resolve({
-              status: {
-                cdResposta: '500',
-                descResposta: e?.message?.slice(0, 200) + '...',
-              },
-            });
+    const fetchEventBatch = new Promise<IEsocialFetchBatch.Response>((resolve) => {
+      client.ServicoConsultarLoteEventos['Servicos.Empregador_ServicoConsultarLoteEventos'].ConsultarLoteEventos(XML, (e, s) => {
+        if (e)
+          return resolve({
+            status: {
+              cdResposta: '500',
+              descResposta: e?.message?.slice(0, 200) + '...',
+            },
+          });
 
-          if (
-            !s?.ConsultarLoteEventosResult?.eSocial
-              ?.retornoProcessamentoLoteEventos
-          )
-            return resolve({
-              status: {
-                cdResposta: '500',
-                descResposta:
-                  'value of (s?.ConsultarLoteEventosResult?.eSocial?.retornoProcessamentoLoteEventos) is undefined',
-              },
-            });
+        if (!s?.ConsultarLoteEventosResult?.eSocial?.retornoProcessamentoLoteEventos)
+          return resolve({
+            status: {
+              cdResposta: '500',
+              descResposta: 'value of (s?.ConsultarLoteEventosResult?.eSocial?.retornoProcessamentoLoteEventos) is undefined',
+            },
+          });
 
-          resolve(
-            s.ConsultarLoteEventosResult.eSocial
-              .retornoProcessamentoLoteEventos,
-          );
-        });
-      },
-    );
+        resolve(s.ConsultarLoteEventosResult.eSocial.retornoProcessamentoLoteEventos);
+      });
+    });
 
     const response = await fetchEventBatch;
 

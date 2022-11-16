@@ -5,21 +5,14 @@ import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
 import { PrismaService } from '../../../../prisma/prisma.service';
 
 import { Prisma } from '@prisma/client';
-import {
-  CreateExamsRiskDto,
-  FindExamRiskDto,
-  UpdateExamRiskDto,
-  UpsertManyExamsRiskDto,
-} from '../../dto/exam-risk.dto';
+import { CreateExamsRiskDto, FindExamRiskDto, UpdateExamRiskDto, UpsertManyExamsRiskDto } from '../../dto/exam-risk.dto';
 import { ExamRiskEntity } from '../../entities/examRisk.entity';
 
 @Injectable()
 export class ExamRiskRepository {
   constructor(private prisma: PrismaService) {}
 
-  async create({
-    ...createExamsRiskDto
-  }: CreateExamsRiskDto): Promise<ExamRiskEntity> {
+  async create({ ...createExamsRiskDto }: CreateExamsRiskDto): Promise<ExamRiskEntity> {
     const redMed = await this.prisma.examToRisk.create({
       data: {
         ...createExamsRiskDto,
@@ -29,11 +22,7 @@ export class ExamRiskRepository {
     return new ExamRiskEntity(redMed);
   }
 
-  async update({
-    id,
-    companyId,
-    ...createExamsRiskDto
-  }: UpdateExamRiskDto): Promise<ExamRiskEntity> {
+  async update({ id, companyId, ...createExamsRiskDto }: UpdateExamRiskDto): Promise<ExamRiskEntity> {
     const Exam = await this.prisma.examToRisk.update({
       data: {
         ...createExamsRiskDto,
@@ -44,11 +33,7 @@ export class ExamRiskRepository {
     return new ExamRiskEntity(Exam);
   }
 
-  async find(
-    query: Partial<FindExamRiskDto>,
-    pagination: PaginationQueryDto,
-    options: Prisma.ExamToRiskFindManyArgs = {},
-  ) {
+  async find(query: Partial<FindExamRiskDto>, pagination: PaginationQueryDto, options: Prisma.ExamToRiskFindManyArgs = {}) {
     const whereInit = {
       AND: [],
     } as typeof options.where;
@@ -62,10 +47,7 @@ export class ExamRiskRepository {
 
     if ('search' in query) {
       (where.AND as any).push({
-        OR: [
-          { exam: { name: { contains: query.search, mode: 'insensitive' } } },
-          { risk: { name: { contains: query.search, mode: 'insensitive' } } },
-        ],
+        OR: [{ exam: { name: { contains: query.search, mode: 'insensitive' } } }, { risk: { name: { contains: query.search, mode: 'insensitive' } } }],
       } as typeof options.where);
     }
 
@@ -116,9 +98,7 @@ export class ExamRiskRepository {
     return dataUpsert.map((risk) => new ExamRiskEntity(risk));
   }
 
-  async findNude(
-    options: Prisma.ExamToRiskFindManyArgs = {},
-  ): Promise<ExamRiskEntity[]> {
+  async findNude(options: Prisma.ExamToRiskFindManyArgs = {}): Promise<ExamRiskEntity[]> {
     const exams = await this.prisma.examToRisk.findMany(options);
 
     return exams.map((exam) => new ExamRiskEntity(exam));

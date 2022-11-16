@@ -1,14 +1,9 @@
-import {
-  EmployeeHierarchyHistory,
-  EmployeeHierarchyMotiveTypeEnum,
-} from '@prisma/client';
+import { EmployeeHierarchyHistory, EmployeeHierarchyMotiveTypeEnum } from '@prisma/client';
 
 import { EmployeeEntity } from './employee.entity';
 import { HierarchyEntity } from './hierarchy.entity';
 
-export class EmployeeHierarchyHistoryEntity
-  implements EmployeeHierarchyHistory
-{
+export class EmployeeHierarchyHistoryEntity implements EmployeeHierarchyHistory {
   id: number;
   motive: EmployeeHierarchyMotiveTypeEnum;
   startDate: Date;

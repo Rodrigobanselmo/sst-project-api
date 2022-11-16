@@ -24,9 +24,7 @@ export const examHistoryTypeEnumTranslatedList = [
   ExamHistoryTypeEnumTranslated.DEMI,
 ];
 
-export const examHistoryTypeEnumTranslatedNotes = Object.entries(
-  ExamHistoryTypeEnumTranslated,
-).map(([key, value]) => `${value} : ${ExamHistoryTypeEnumNotes[key]}`);
+export const examHistoryTypeEnumTranslatedNotes = Object.entries(ExamHistoryTypeEnumTranslated).map(([key, value]) => `${value} : ${ExamHistoryTypeEnumNotes[key]}`);
 
 export const ExamHistoryTypeEnumTranslateBrToUs = (portugueseValue: string) => {
   let keyValue = '';

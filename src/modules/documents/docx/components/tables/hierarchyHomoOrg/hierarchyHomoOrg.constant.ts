@@ -7,10 +7,7 @@ export enum HierarchyPlanColumnEnum {
   DESCRIPTION = 'Description',
 }
 
-export const HierarchyPlanMap: Record<
-  string,
-  { text: string; size: number; position?: number; borders: any }
-> = {
+export const HierarchyPlanMap: Record<string, { text: string; size: number; position?: number; borders: any }> = {
   [HierarchyPlanColumnEnum.GSE]: {
     text: 'GSE',
     size: 2,

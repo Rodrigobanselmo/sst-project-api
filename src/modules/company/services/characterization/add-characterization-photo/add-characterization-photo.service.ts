@@ -17,35 +17,27 @@ export class AddCharacterizationPhotoService {
     private readonly amazonStorageProvider: AmazonStorageProvider,
   ) {}
 
-  async execute(
-    addPhotoCharacterizationDto: AddPhotoCharacterizationDto,
-    userPayloadDto: UserPayloadDto,
-    file: Express.Multer.File,
-  ) {
+  async execute(addPhotoCharacterizationDto: AddPhotoCharacterizationDto, userPayloadDto: UserPayloadDto, file: Express.Multer.File) {
     const companyId = userPayloadDto.targetCompanyId;
     const [photoUrl, isVertical] = await this.upload(companyId, file);
 
     await this.characterizationPhotoRepository.createMany([
       {
         ...addPhotoCharacterizationDto,
-        companyCharacterizationId:
-          addPhotoCharacterizationDto.companyCharacterizationId,
+        companyCharacterizationId: addPhotoCharacterizationDto.companyCharacterizationId,
         photoUrl,
         name: addPhotoCharacterizationDto.name,
         isVertical,
       },
     ]);
 
-    const characterizationData = await this.characterizationRepository.findById(
-      addPhotoCharacterizationDto.companyCharacterizationId,
-    );
+    const characterizationData = await this.characterizationRepository.findById(addPhotoCharacterizationDto.companyCharacterizationId);
 
     return characterizationData;
   }
 
   private async upload(companyId: string, file: Express.Multer.File) {
-    const fileType =
-      file.originalname.split('.')[file.originalname.split('.').length - 1];
+    const fileType = file.originalname.split('.')[file.originalname.split('.').length - 1];
     const path = companyId + '/characterization/' + v4() + '.' + fileType;
 
     const { url } = await this.amazonStorageProvider.upload({

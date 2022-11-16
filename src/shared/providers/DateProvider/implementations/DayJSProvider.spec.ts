@@ -48,20 +48,13 @@ describe('DayJSProvider', () => {
 
   it('should add one any time to a date (by seconds, minutes, hours, ...)', () => {
     const date = dayJSProvider.dateNow();
-    const addSeconds =
-      dayJSProvider.addTime(date, 1, 's').getTime() - date.getTime();
-    const addMinutes =
-      dayJSProvider.addTime(date, 1, 'm').getTime() - date.getTime();
-    const addHours =
-      dayJSProvider.addTime(date, 1, 'h').getTime() - date.getTime();
-    const addDays =
-      dayJSProvider.addTime(date, 1, 'd').getTime() - date.getTime();
-    const addWeeks =
-      dayJSProvider.addTime(date, 1, 'w').getTime() - date.getTime();
-    const addMonths =
-      dayJSProvider.addTime(date, 1, 'M').getTime() - date.getTime();
-    const addYears =
-      dayJSProvider.addTime(date, 1, 'y').getTime() - date.getTime();
+    const addSeconds = dayJSProvider.addTime(date, 1, 's').getTime() - date.getTime();
+    const addMinutes = dayJSProvider.addTime(date, 1, 'm').getTime() - date.getTime();
+    const addHours = dayJSProvider.addTime(date, 1, 'h').getTime() - date.getTime();
+    const addDays = dayJSProvider.addTime(date, 1, 'd').getTime() - date.getTime();
+    const addWeeks = dayJSProvider.addTime(date, 1, 'w').getTime() - date.getTime();
+    const addMonths = dayJSProvider.addTime(date, 1, 'M').getTime() - date.getTime();
+    const addYears = dayJSProvider.addTime(date, 1, 'y').getTime() - date.getTime();
 
     const day = 1000 * 60 * 60 * 24;
 

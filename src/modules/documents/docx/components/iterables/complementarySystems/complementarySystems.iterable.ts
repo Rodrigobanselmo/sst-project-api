@@ -1,19 +1,13 @@
 import { Paragraph, Table } from 'docx';
 
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
-import {
-  ISectionChildrenType,
-  PGRSectionChildrenTypeEnum,
-} from '../../../builders/pgr/types/elements.types';
+import { ISectionChildrenType, PGRSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
 import { complementarySystemsConverter } from './complementarySystems.converter';
 
 export const complementarySystemsIterable = (
   complementarySystems: string[],
-  convertToDocx: (
-    data: ISectionChildrenType[],
-    variables?: IDocVariables,
-  ) => (Paragraph | Table)[],
+  convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[],
 ) => {
   if (!complementarySystems?.length)
     return convertToDocx([
@@ -23,8 +17,7 @@ export const complementarySystemsIterable = (
       },
     ]);
 
-  const complementarySystemsVarArray =
-    complementarySystemsConverter(complementarySystems);
+  const complementarySystemsVarArray = complementarySystemsConverter(complementarySystems);
 
   const iterableSections = complementarySystemsVarArray
     .map((variables) => {

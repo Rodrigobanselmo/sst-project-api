@@ -11,13 +11,7 @@ class AwsSesProvider implements IMailProvider {
     this.client = new SES({ region: process.env.AWS_SES_REGION });
   }
 
-  async sendMail({
-    path,
-    subject,
-    to,
-    variables,
-    source = EmailsEnum.VALIDATION,
-  }: ISendMailData): Promise<any> {
+  async sendMail({ path, subject, to, variables, source = EmailsEnum.VALIDATION }: ISendMailData): Promise<any> {
     const templateFileContent = fs.readFileSync(path).toString('utf-8');
 
     const templateParse = handlebars.compile(templateFileContent);

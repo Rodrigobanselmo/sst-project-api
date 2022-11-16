@@ -1,26 +1,10 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpCode,
-  Param,
-  Patch,
-  Post,
-  Query,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Query } from '@nestjs/common';
 
 import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
-import {
-  CopyHomogeneousGroupDto,
-  CreateHomoGroupDto,
-  FindHomogeneousGroupDto,
-  UpdateHierarchyHomoGroupDto,
-  UpdateHomoGroupDto,
-} from '../../dto/homoGroup';
+import { CopyHomogeneousGroupDto, CreateHomoGroupDto, FindHomogeneousGroupDto, UpdateHierarchyHomoGroupDto, UpdateHomoGroupDto } from '../../dto/homoGroup';
 import { CopyHomoGroupService } from '../../services/homoGroup/copy-homo-group/copy-homo-group.service';
 import { CreateHomoGroupService } from '../../services/homoGroup/create-homo-group/create-homo-group.service';
 import { DeleteHomoGroupService } from '../../services/homoGroup/delete-homo-group/delete-homo-group.service';
@@ -49,10 +33,7 @@ export class HomoGroupsController {
     isMember: true,
   })
   @Get('/:companyId?')
-  find(
-    @Query() query: FindHomogeneousGroupDto,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
+  find(@Query() query: FindHomogeneousGroupDto, @User() userPayloadDto: UserPayloadDto) {
     return this.findHomogenousGroupService.execute(query, userPayloadDto);
   }
 
@@ -83,14 +64,8 @@ export class HomoGroupsController {
     crud: true,
   })
   @Post('/hierarchy-homo/:companyId')
-  updateHierarchyHomo(
-    @Body() updateHomoGroupsDto: UpdateHierarchyHomoGroupDto,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
-    return this.updateHierarchyHomoGroupService.execute(
-      { ...updateHomoGroupsDto },
-      userPayloadDto,
-    );
+  updateHierarchyHomo(@Body() updateHomoGroupsDto: UpdateHierarchyHomoGroupDto, @User() userPayloadDto: UserPayloadDto) {
+    return this.updateHierarchyHomoGroupService.execute({ ...updateHomoGroupsDto }, userPayloadDto);
   }
 
   @Permissions({
@@ -100,14 +75,8 @@ export class HomoGroupsController {
     crud: true,
   })
   @Post()
-  create(
-    @Body() createHomoGroupsDto: CreateHomoGroupDto,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
-    return this.createHomoGroupsService.execute(
-      createHomoGroupsDto,
-      userPayloadDto,
-    );
+  create(@Body() createHomoGroupsDto: CreateHomoGroupDto, @User() userPayloadDto: UserPayloadDto) {
+    return this.createHomoGroupsService.execute(createHomoGroupsDto, userPayloadDto);
   }
 
   @Permissions({
@@ -117,15 +86,8 @@ export class HomoGroupsController {
     crud: true,
   })
   @Patch('/:id/:companyId?')
-  update(
-    @Body() updateHomoGroupsDto: UpdateHomoGroupDto,
-    @Param('id') id: string,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
-    return this.updateHomoGroupsService.execute(
-      { id, ...updateHomoGroupsDto },
-      userPayloadDto,
-    );
+  update(@Body() updateHomoGroupsDto: UpdateHomoGroupDto, @Param('id') id: string, @User() userPayloadDto: UserPayloadDto) {
+    return this.updateHomoGroupsService.execute({ id, ...updateHomoGroupsDto }, userPayloadDto);
   }
 
   @Permissions({
@@ -155,13 +117,7 @@ export class HomoGroupsController {
   )
   @Post('copy/:companyId?')
   @HttpCode(200)
-  copy(
-    @Body() createHomoGroupsDto: CopyHomogeneousGroupDto,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
-    return this.copyHomoGroupService.execute(
-      createHomoGroupsDto,
-      userPayloadDto,
-    );
+  copy(@Body() createHomoGroupsDto: CopyHomogeneousGroupDto, @User() userPayloadDto: UserPayloadDto) {
+    return this.copyHomoGroupService.execute(createHomoGroupsDto, userPayloadDto);
   }
 }

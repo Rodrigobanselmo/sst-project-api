@@ -4,10 +4,7 @@ import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
 import { prismaFilter } from '../../../../shared/utils/filters/prisma.filters';
-import {
-  FindCompanyClinicDto,
-  SetCompanyClinicDto,
-} from '../../dto/company-clinic.dto';
+import { FindCompanyClinicDto, SetCompanyClinicDto } from '../../dto/company-clinic.dto';
 import { CompanyClinicsEntity } from '../../entities/company-clinics.entity';
 
 @Injectable()
@@ -26,11 +23,7 @@ export class CompanyClinicRepository {
     ]);
   }
 
-  async findAllByCompany(
-    query: Partial<FindCompanyClinicDto>,
-    pagination: PaginationQueryDto,
-    options: Prisma.CompanyClinicsFindManyArgs = {},
-  ) {
+  async findAllByCompany(query: Partial<FindCompanyClinicDto>, pagination: PaginationQueryDto, options: Prisma.CompanyClinicsFindManyArgs = {}) {
     const whereInit = {
       AND: [],
     } as typeof options.where;
@@ -57,9 +50,7 @@ export class CompanyClinicRepository {
     ]);
 
     return {
-      data: response[1].map(
-        (companyClinic) => new CompanyClinicsEntity(companyClinic),
-      ),
+      data: response[1].map((companyClinic) => new CompanyClinicsEntity(companyClinic)),
       count: response[0],
     };
   }
@@ -69,9 +60,7 @@ export class CompanyClinicRepository {
       ...options,
     });
 
-    return companyClinics.map(
-      (companyClinic) => new CompanyClinicsEntity(companyClinic),
-    );
+    return companyClinics.map((companyClinic) => new CompanyClinicsEntity(companyClinic));
   }
 
   async findFirstNude(options: Prisma.CompanyClinicsFindManyArgs = {}) {

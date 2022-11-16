@@ -10,10 +10,7 @@ import { IChecklistRepository } from '../IChecklistRepository.types';
 @Injectable()
 export class ChecklistRepository implements IChecklistRepository {
   constructor(private prisma: PrismaService) {}
-  async create(
-    { data, ...createChecklistDto }: CreateChecklistDto,
-    system: boolean,
-  ): Promise<ChecklistEntity> {
+  async create({ data, ...createChecklistDto }: CreateChecklistDto, system: boolean): Promise<ChecklistEntity> {
     const checklist = await this.prisma.checklist.create({
       data: {
         ...createChecklistDto,
@@ -44,10 +41,7 @@ export class ChecklistRepository implements IChecklistRepository {
     return new ChecklistEntity(checklist);
   }
 
-  async update(
-    id: number,
-    { data: { json }, companyId, ...updateChecklistDto }: UpdateChecklistDto,
-  ) {
+  async update(id: number, { data: { json }, companyId, ...updateChecklistDto }: UpdateChecklistDto) {
     const checklist = await this.prisma.checklist.update({
       data: { ...updateChecklistDto, data: { update: { json } } },
       where: { id_companyId: { id, companyId: companyId } },

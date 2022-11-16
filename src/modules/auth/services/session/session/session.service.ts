@@ -19,14 +19,8 @@ export class SessionService {
     private readonly jwtTokenProvider: JwtTokenProvider,
   ) {}
 
-  async execute({
-    email,
-    password,
-    userEntity,
-  }: LoginUserDto & { userEntity?: UserEntity }) {
-    const user = userEntity
-      ? userEntity
-      : await this.validateUser(email, password);
+  async execute({ email, password, userEntity }: LoginUserDto & { userEntity?: UserEntity }) {
+    const user = userEntity ? userEntity : await this.validateUser(email, password);
 
     const companies = user.companies
       .map(({ companyId, permissions, roles, status }) => {
@@ -50,14 +44,9 @@ export class SessionService {
 
     const token = this.jwtTokenProvider.generateToken(payload);
 
-    const [refresh_token, refreshTokenExpiresDate] =
-      this.jwtTokenProvider.generateRefreshToken(user.id);
+    const [refresh_token, refreshTokenExpiresDate] = this.jwtTokenProvider.generateRefreshToken(user.id);
 
-    const newRefreshToken = await this.refreshTokensRepository.create(
-      refresh_token,
-      user.id,
-      refreshTokenExpiresDate,
-    );
+    const newRefreshToken = await this.refreshTokensRepository.create(refresh_token, user.id, refreshTokenExpiresDate);
 
     return {
       token,
@@ -74,10 +63,7 @@ export class SessionService {
       throw new BadRequestException(ErrorMessageEnum.WRONG_EMAIL_PASS);
     }
 
-    const passwordMatch = await this.hashProvider.compare(
-      password,
-      user.password,
-    );
+    const passwordMatch = await this.hashProvider.compare(password, user.password);
 
     if (!passwordMatch) {
       throw new BadRequestException(ErrorMessageEnum.WRONG_EMAIL_PASS);

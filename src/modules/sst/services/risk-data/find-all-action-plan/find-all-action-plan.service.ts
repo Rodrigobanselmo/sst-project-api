@@ -6,19 +6,8 @@ import { RiskDataRepository } from '../../../repositories/implementations/RiskDa
 export class FindAllActionPlanService {
   constructor(private readonly riskDataRepository: RiskDataRepository) {}
 
-  async execute(
-    groupId: string,
-    workspaceId: string,
-    companyId: string,
-    { skip, take, ...query }: FindRiskDataDto,
-  ) {
-    const riskData = await this.riskDataRepository.findAllActionPlan(
-      groupId,
-      workspaceId,
-      companyId,
-      query,
-      { skip, take },
-    );
+  async execute(groupId: string, workspaceId: string, companyId: string, { skip, take, ...query }: FindRiskDataDto) {
+    const riskData = await this.riskDataRepository.findAllActionPlan(groupId, workspaceId, companyId, query, { skip, take });
 
     return riskData;
   }

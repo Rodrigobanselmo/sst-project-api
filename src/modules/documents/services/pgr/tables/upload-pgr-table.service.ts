@@ -26,31 +26,15 @@ export class PgrUploadTableService {
     private readonly amazonStorageProvider: AmazonStorageProvider,
     private readonly hierarchyRepository: HierarchyRepository,
   ) {}
-  async execute(
-    upsertPgrDto: UpsertDocumentDto,
-    userPayloadDto: UserPayloadDto,
-  ) {
+  async execute(upsertPgrDto: UpsertDocumentDto, userPayloadDto: UserPayloadDto) {
     const companyId = userPayloadDto.targetCompanyId;
     const workspaceId = upsertPgrDto.workspaceId;
 
-    const riskGroupData = await this.riskGroupDataRepository.findAllDataById(
-      upsertPgrDto.riskGroupId,
-      workspaceId,
-      companyId,
-    );
+    const riskGroupData = await this.riskGroupDataRepository.findAllDataById(upsertPgrDto.riskGroupId, workspaceId, companyId);
 
-    const hierarchyHierarchy =
-      await this.hierarchyRepository.findAllDataHierarchyByCompany(
-        companyId,
-        workspaceId,
-      );
+    const hierarchyHierarchy = await this.hierarchyRepository.findAllDataHierarchyByCompany(companyId, workspaceId);
 
-    const {
-      hierarchyData,
-      homoGroupTree,
-      hierarchyHighLevelsData,
-      hierarchyTree,
-    } = hierarchyConverter(hierarchyHierarchy, [], { workspaceId });
+    const { hierarchyData, homoGroupTree, hierarchyHighLevelsData, hierarchyTree } = hierarchyConverter(hierarchyHierarchy, [], { workspaceId });
 
     const sections: ISectionOptions[] = [
       // riskCharacterizationTableSection(riskGroupData),
@@ -67,13 +51,7 @@ export class PgrUploadTableService {
       // hierarchyHomoOrgSection(hierarchyData, homoGroupTree),
       // actionPlanTableSection(riskGroupData, hierarchyTree),
       // ...APPRTableSection(riskGroupData, hierarchyData, homoGroupTree),
-      ...APPRByGroupTableSection(
-        riskGroupData,
-        hierarchyHighLevelsData,
-        hierarchyTree,
-        homoGroupTree,
-        { isByGroup: true },
-      ),
+      ...APPRByGroupTableSection(riskGroupData, hierarchyHighLevelsData, hierarchyTree, homoGroupTree, { isByGroup: true }),
     ];
 
     const doc = createBaseDocument(sections);
@@ -82,9 +60,7 @@ export class PgrUploadTableService {
     const buffer = Buffer.from(b64string, 'base64');
     const docName = upsertPgrDto.name.replace(/\s+/g, '');
 
-    const fileName = `${docName.length > 0 ? docName + '-' : ''}${
-      riskGroupData.company.name
-    }-v${upsertPgrDto.version}.docx`
+    const fileName = `${docName.length > 0 ? docName + '-' : ''}${riskGroupData.company.name}-v${upsertPgrDto.version}.docx`
       .normalize('NFD')
       .replace(/\s+/g, '_')
       .replace(/[^a-zA-Z0-9s_/.!\\={}?()-]/g, '');
@@ -94,12 +70,7 @@ export class PgrUploadTableService {
     return { buffer, fileName };
   }
 
-  private async upload(
-    fileBuffer: Buffer,
-    fileName: string,
-    upsertPgrDto: UpsertDocumentDto,
-    company: Partial<CompanyEntity>,
-  ) {
+  private async upload(fileBuffer: Buffer, fileName: string, upsertPgrDto: UpsertDocumentDto, company: Partial<CompanyEntity>) {
     const { url } = await this.amazonStorageProvider.upload({
       file: fileBuffer,
       fileName: 'temp-files-7-days/' + fileName,

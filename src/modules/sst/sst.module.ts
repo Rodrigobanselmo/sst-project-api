@@ -175,14 +175,7 @@ import { ProtocolRepository } from './repositories/implementations/ProtocolRepos
     UpdateRiskProtocolsService,
     ProtocolRepository,
   ],
-  exports: [
-    RiskRepository,
-    RiskGroupDataRepository,
-    RiskDocumentRepository,
-    UpsertManyRiskDataService,
-    RiskDataRepository,
-    FindExamByHierarchyService,
-  ],
+  exports: [RiskRepository, RiskGroupDataRepository, RiskDocumentRepository, UpsertManyRiskDataService, RiskDataRepository, FindExamByHierarchyService],
   imports: [forwardRef(() => CompanyModule)],
 })
 export class SSTModule {}

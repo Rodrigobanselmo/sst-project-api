@@ -7,9 +7,7 @@ export class FindByCompanyHomoGroupService {
   constructor(private readonly homoGroupRepository: HomoGroupRepository) {}
 
   async execute(user: UserPayloadDto) {
-    const homoGroups = await this.homoGroupRepository.findHomoGroupByCompany(
-      user.targetCompanyId,
-    );
+    const homoGroups = await this.homoGroupRepository.findHomoGroupByCompany(user.targetCompanyId);
 
     return homoGroups;
   }

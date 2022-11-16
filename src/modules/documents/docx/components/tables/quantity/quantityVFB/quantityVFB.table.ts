@@ -7,10 +7,7 @@ import { TableHeaderElements } from './elements/header';
 import { NewQuantityVFBHeader } from './quantityVFB.constant';
 import { quantityVFBConverter } from './quantityVFB.converter';
 
-export const quantityVFBTable = (
-  riskGroupData: RiskFactorGroupDataEntity,
-  hierarchyTree: IHierarchyMap,
-) => {
+export const quantityVFBTable = (riskGroupData: RiskFactorGroupDataEntity, hierarchyTree: IHierarchyMap) => {
   const quantityVFBData = quantityVFBConverter(riskGroupData, hierarchyTree);
   const tableHeaderElements = new TableHeaderElements();
   const tableBodyElements = new TableBodyElements();
@@ -19,12 +16,8 @@ export const quantityVFBTable = (
   const table = new Table({
     width: { size: 100, type: WidthType.PERCENTAGE },
     rows: [
-      tableHeaderElements.headerRow(
-        quantityVFBHeader.map(tableHeaderElements.headerCell),
-      ),
-      ...quantityVFBData.map((data) =>
-        tableBodyElements.tableRow(data.map(tableBodyElements.tableCell)),
-      ),
+      tableHeaderElements.headerRow(quantityVFBHeader.map(tableHeaderElements.headerCell)),
+      ...quantityVFBData.map((data) => tableBodyElements.tableRow(data.map(tableBodyElements.tableCell))),
     ],
   });
 

@@ -9,12 +9,7 @@ import { IUsersCompanyRepository } from '../IUsersCompanyRepository.types';
 @Injectable()
 export class UsersCompanyRepository implements IUsersCompanyRepository {
   constructor(private prisma: PrismaService) {}
-  async upsertMany({
-    userId,
-    companyId,
-    companiesIds,
-    ...updateUserCompanyDto
-  }: UpdateUserCompanyDto) {
+  async upsertMany({ userId, companyId, companiesIds, ...updateUserCompanyDto }: UpdateUserCompanyDto) {
     const UserCompanies = await Promise.all(
       companiesIds.map(
         async (companyId) =>
@@ -27,17 +22,10 @@ export class UsersCompanyRepository implements IUsersCompanyRepository {
       ),
     );
 
-    return UserCompanies.map(
-      (UserCompany) => new UserCompanyEntity(UserCompany),
-    );
+    return UserCompanies.map((UserCompany) => new UserCompanyEntity(UserCompany));
   }
 
-  async update({
-    userId,
-    companyId,
-    companiesIds,
-    ...updateUserCompanyDto
-  }: UpdateUserCompanyDto) {
+  async update({ userId, companyId, companiesIds, ...updateUserCompanyDto }: UpdateUserCompanyDto) {
     const UserCompany = await this.prisma.userCompany.update({
       data: updateUserCompanyDto,
       where: { companyId_userId: { companyId, userId } },
@@ -47,10 +35,7 @@ export class UsersCompanyRepository implements IUsersCompanyRepository {
     return new UserCompanyEntity(UserCompany);
   }
 
-  async findByUserIdAndCompanyId(
-    userId: number,
-    companyId: string,
-  ): Promise<UserCompanyEntity> {
+  async findByUserIdAndCompanyId(userId: number, companyId: string): Promise<UserCompanyEntity> {
     const UserCompany = await this.prisma.userCompany.findUnique({
       where: { companyId_userId: { userId, companyId } },
     });

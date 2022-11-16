@@ -16,13 +16,9 @@ export class DeleteProtocolsService {
       },
     });
 
-    if (!protocolFound?.id)
-      throw new BadRequestException(ErrorMessageEnum.PROTOCOL_NOT_FOUND);
+    if (!protocolFound?.id) throw new BadRequestException(ErrorMessageEnum.PROTOCOL_NOT_FOUND);
 
-    const protocol = await this.protocolRepository.delete(
-      id,
-      user.targetCompanyId,
-    );
+    const protocol = await this.protocolRepository.delete(id, user.targetCompanyId);
 
     return protocol;
   }

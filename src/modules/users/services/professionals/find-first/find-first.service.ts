@@ -5,16 +5,8 @@ import { ProfessionalRepository } from '../../../repositories/implementations/Pr
 
 @Injectable()
 export class FindFirstProfessionalService {
-  constructor(
-    private readonly professionalRepository: ProfessionalRepository,
-  ) {}
-  async execute({
-    councilId,
-    councilType,
-    councilUF,
-    cpf,
-    email,
-  }: FindProfessionalsDto) {
+  constructor(private readonly professionalRepository: ProfessionalRepository) {}
+  async execute({ councilId, councilType, councilUF, cpf, email }: FindProfessionalsDto) {
     const professionals = await this.professionalRepository.findFirstNude({
       where: {
         OR: [

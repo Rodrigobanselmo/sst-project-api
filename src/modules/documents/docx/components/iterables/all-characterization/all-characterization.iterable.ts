@@ -1,20 +1,14 @@
 import { AlignmentType, Paragraph, Table } from 'docx';
 
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
-import {
-  ISectionChildrenType,
-  PGRSectionChildrenTypeEnum,
-} from '../../../builders/pgr/types/elements.types';
+import { ISectionChildrenType, PGRSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
 import { EnvironmentEntity } from '../../../../../company/entities/environment.entity';
 import { environmentsConverter } from './all-characterization.converter';
 
 export const environmentIterable = (
   environments: EnvironmentEntity[],
-  convertToDocx: (
-    data: ISectionChildrenType[],
-    variables?: IDocVariables,
-  ) => (Paragraph | Table)[],
+  convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[],
 ) => {
   if (!environments?.length) return [];
 
@@ -151,9 +145,7 @@ export const environmentIterable = (
               type: PGRSectionChildrenTypeEnum.PARAGRAPH,
               text: `??${VariablesPGREnum.ENVIRONMENT_DESCRIPTION}??`,
               alignment: AlignmentType.START,
-              removeWithSomeEmptyVars: [
-                VariablesPGREnum.ENVIRONMENT_DESCRIPTION,
-              ],
+              removeWithSomeEmptyVars: [VariablesPGREnum.ENVIRONMENT_DESCRIPTION],
             },
             ...parameters,
             ...considerations,

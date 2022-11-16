@@ -2,16 +2,7 @@ import { DateFormat } from './../../../shared/transformers/date-format';
 import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
 import { HomoTypeEnum, Prisma } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
-import {
-  IsBoolean,
-  IsDate,
-  IsEnum,
-  IsNumber,
-  IsOptional,
-  IsString,
-  ValidateIf,
-  ValidateNested,
-} from 'class-validator';
+import { IsBoolean, IsDate, IsEnum, IsNumber, IsOptional, IsString, ValidateIf, ValidateNested } from 'class-validator';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
 import { EpiRoRiskDataDto } from './epi-risk-data.dto';

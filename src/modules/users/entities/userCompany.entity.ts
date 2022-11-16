@@ -34,9 +34,7 @@ export class UserCompanyEntity implements UserCompany {
   groupId: number;
   group?: AccessGroupsEntity;
 
-  constructor(
-    partial: Partial<Omit<UserCompanyEntity, 'group'>> & { group?: any },
-  ) {
+  constructor(partial: Partial<Omit<UserCompanyEntity, 'group'>> & { group?: any }) {
     Object.assign(this, partial);
   }
 }

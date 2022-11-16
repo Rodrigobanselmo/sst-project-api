@@ -1,13 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  ForbiddenException,
-  Get,
-  Param,
-  Post,
-  Query,
-} from '@nestjs/common';
+import { Body, Controller, Delete, ForbiddenException, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { classToClass } from 'class-transformer';
 
@@ -46,20 +37,12 @@ export class InvitesController {
   })
   @Get('/:companyId?')
   async findAllByCompany(@User() user: UserPayloadDto) {
-    return classToClass(
-      this.findAllByCompanyIdService.execute(user.targetCompanyId),
-    );
+    return classToClass(this.findAllByCompanyIdService.execute(user.targetCompanyId));
   }
 
   @Get('/me/:email')
-  async findAllByEmail(
-    @Param('email', ValidateEmailPipe) email: string,
-    @User() user: UserPayloadDto,
-  ) {
-    if (user.email !== email)
-      throw new ForbiddenException(
-        ErrorInvitesEnum.FORBIDDEN_ACCESS_USER_INVITE_LIST,
-      );
+  async findAllByEmail(@Param('email', ValidateEmailPipe) email: string, @User() user: UserPayloadDto) {
+    if (user.email !== email) throw new ForbiddenException(ErrorInvitesEnum.FORBIDDEN_ACCESS_USER_INVITE_LIST);
     return classToClass(this.findAllByEmailService.execute(email));
   }
 
@@ -80,10 +63,7 @@ export class InvitesController {
     crud: true,
   })
   @Post()
-  async invite(
-    @Body() inviteUserDto: InviteUserDto,
-    @User() user: UserPayloadDto,
-  ) {
+  async invite(@Body() inviteUserDto: InviteUserDto, @User() user: UserPayloadDto) {
     return classToClass(this.inviteUsersService.execute(inviteUserDto, user));
   }
 

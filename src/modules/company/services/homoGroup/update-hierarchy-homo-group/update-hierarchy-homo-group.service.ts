@@ -8,10 +8,7 @@ import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 export class UpdateHierarchyHomoGroupService {
   constructor(private readonly homoGroupRepository: HomoGroupRepository) {}
 
-  async execute(
-    homoGroup: UpdateHierarchyHomoGroupDto,
-    userPayloadDto: UserPayloadDto,
-  ) {
+  async execute(homoGroup: UpdateHierarchyHomoGroupDto, userPayloadDto: UserPayloadDto) {
     const foundHomoGroup = await this.homoGroupRepository.findFirstNude({
       where: {
         companyId: userPayloadDto.targetCompanyId,
@@ -34,10 +31,8 @@ export class UpdateHierarchyHomoGroupService {
       },
     });
 
-    if (!foundHomoGroup?.id)
-      throw new BadRequestException(ErrorCompanyEnum.GHO_NOT_FOUND);
-    if (foundHomoGroup?.hierarchyOnHomogeneous.length !== homoGroup.ids.length)
-      throw new BadRequestException(ErrorCompanyEnum.GHO_NOT_FOUND);
+    if (!foundHomoGroup?.id) throw new BadRequestException(ErrorCompanyEnum.GHO_NOT_FOUND);
+    if (foundHomoGroup?.hierarchyOnHomogeneous.length !== homoGroup.ids.length) throw new BadRequestException(ErrorCompanyEnum.GHO_NOT_FOUND);
 
     const data = await this.homoGroupRepository.updateHierarchyHomo(homoGroup);
 

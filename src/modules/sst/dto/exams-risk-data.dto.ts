@@ -1,10 +1,4 @@
-import {
-  IsBoolean,
-  IsInt,
-  IsOptional,
-  IsString,
-  ValidateIf,
-} from 'class-validator';
+import { IsBoolean, IsInt, IsOptional, IsString, ValidateIf } from 'class-validator';
 
 export class ExamsRiskDataDto {
   @IsInt()

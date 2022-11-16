@@ -18,11 +18,7 @@ interface IWorkspaceCompany extends WorkspaceDto {
 export class WorkspaceRepository {
   constructor(private prisma: PrismaService) {}
 
-  async create({
-    address,
-    companyId,
-    ...workspaceDto
-  }: IWorkspaceCompany): Promise<WorkspaceEntity> {
+  async create({ address, companyId, ...workspaceDto }: IWorkspaceCompany): Promise<WorkspaceEntity> {
     const workspace = await this.prisma.workspace.create({
       data: {
         ...workspaceDto,

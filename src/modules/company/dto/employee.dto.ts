@@ -1,17 +1,7 @@
 import { PartialType } from '@nestjs/swagger';
 import { SexTypeEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
-import {
-  IsBoolean,
-  IsDate,
-  IsEnum,
-  IsInt,
-  IsNumber,
-  IsOptional,
-  IsString,
-  Length,
-  MaxLength,
-} from 'class-validator';
+import { IsBoolean, IsDate, IsEnum, IsInt, IsNumber, IsOptional, IsString, Length, MaxLength } from 'class-validator';
 
 import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
 import { CpfFormatTransform } from '../../../shared/transformers/cpf-format.transform';

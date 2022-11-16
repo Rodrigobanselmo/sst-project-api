@@ -1,8 +1,4 @@
-import {
-  EmployeeESocialEvent,
-  EmployeePPPHistory,
-  StatusEnum,
-} from '@prisma/client';
+import { EmployeeESocialEvent, EmployeePPPHistory, StatusEnum } from '@prisma/client';
 
 import { EmployeeEntity } from './employee.entity';
 

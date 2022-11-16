@@ -18,13 +18,8 @@ import { sortNumber } from '../../../../../shared/utils/sorts/number.sort';
 import { sortString } from '../../../../../shared/utils/sorts/string.sort';
 import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 
-export const getValidityInMonths = (
-  employee: EmployeeEntity,
-  examRisk: { validityInMonths?: number; lowValidityInMonths?: number },
-) => {
-  return employee.isComorbidity
-    ? examRisk.lowValidityInMonths || examRisk.validityInMonths
-    : examRisk.validityInMonths;
+export const getValidityInMonths = (employee: EmployeeEntity, examRisk: { validityInMonths?: number; lowValidityInMonths?: number }) => {
+  return employee.isComorbidity ? examRisk.lowValidityInMonths || examRisk.validityInMonths : examRisk.validityInMonths;
 };
 @Injectable()
 export class FindExamByHierarchyService {
@@ -39,22 +34,12 @@ export class FindExamByHierarchyService {
     private readonly dayjs: DayJSProvider,
   ) {}
 
-  async execute(
-    user: Pick<UserPayloadDto, 'targetCompanyId'>,
-    query: FindExamHierarchyDto,
-  ) {
+  async execute(user: Pick<UserPayloadDto, 'targetCompanyId'>, query: FindExamHierarchyDto) {
     const hierarchyId = query.hierarchyId;
     const companyId = user.targetCompanyId;
-    const hierarchy = hierarchyId
-      ? await this.hierarchyRepository.findByIdWithParent(
-          hierarchyId,
-          companyId,
-        )
-      : undefined;
+    const hierarchy = hierarchyId ? await this.hierarchyRepository.findByIdWithParent(hierarchyId, companyId) : undefined;
 
-    const hierarchies = [hierarchy, ...(hierarchy?.parents || [])].filter(
-      (h) => h,
-    );
+    const hierarchies = [hierarchy, ...(hierarchy?.parents || [])].filter((h) => h);
 
     const examType = {
       ...('isPeriodic' in query && {
@@ -71,27 +56,21 @@ export class FindExamByHierarchyService {
     };
 
     if (query.employeeId) {
-      this.employee = await this.employeeRepository.findById(
-        query.employeeId,
-        companyId,
-        {
-          include: {
-            subOffices: { select: { id: true } },
-            examsHistory: {
-              where: {
-                AND: [
-                  { expiredDate: { gte: new Date() } },
-                  {
-                    status: query.isPendingExams
-                      ? { in: ['PENDING', 'PROCESSING'] }
-                      : 'DONE',
-                  },
-                ],
-              },
+      this.employee = await this.employeeRepository.findById(query.employeeId, companyId, {
+        include: {
+          subOffices: { select: { id: true } },
+          examsHistory: {
+            where: {
+              AND: [
+                { expiredDate: { gte: new Date() } },
+                {
+                  status: query.isPendingExams ? { in: ['PENDING', 'PROCESSING'] } : 'DONE',
+                },
+              ],
             },
           },
         },
-      );
+      });
       if (this.employee && !query.isOffice) {
         hierarchies.push(...(this.employee?.subOffices || []));
       }
@@ -217,12 +196,8 @@ export class FindExamByHierarchyService {
     const riskDataOrigin = riskData.map((rd) => {
       let prioritization: number;
 
-      if (
-        rd.homogeneousGroup.type === HomoTypeEnum.HIERARCHY &&
-        rd.homogeneousGroup.hierarchy
-      ) {
-        prioritization =
-          originRiskMap[rd.homogeneousGroup.hierarchy.type]?.prioritization;
+      if (rd.homogeneousGroup.type === HomoTypeEnum.HIERARCHY && rd.homogeneousGroup.hierarchy) {
+        prioritization = originRiskMap[rd.homogeneousGroup.hierarchy.type]?.prioritization;
       }
 
       rd.examsToRiskFactorData = rd.examsToRiskFactorData.filter(
@@ -272,18 +247,7 @@ export class FindExamByHierarchyService {
         select: {
           examToRisk: {
             where: { companyId, ...examType },
-            distinct: [
-              'isMale',
-              'isAdmission',
-              'isDismissal',
-              'isPeriodic',
-              'isReturn',
-              'isMale',
-              'isFemale',
-              'fromAge',
-              'toAge',
-              'validityInMonths',
-            ],
+            distinct: ['isMale', 'isAdmission', 'isDismissal', 'isPeriodic', 'isReturn', 'isMale', 'isFemale', 'fromAge', 'toAge', 'validityInMonths'],
           },
           name: true,
           id: true,
@@ -361,11 +325,7 @@ export class FindExamByHierarchyService {
     const examsDataReturn = (
       Object.entries(exams)
         .map(([examId, examData]) => {
-          const origins = examData
-            .sort((a, b) => sortNumber(a, b, 'validityInMonths'))
-            .sort((a, b) =>
-              sortNumber(a, b, 'prioritization'),
-            ) as IExamOriginData[];
+          const origins = examData.sort((a, b) => sortNumber(a, b, 'validityInMonths')).sort((a, b) => sortNumber(a, b, 'prioritization')) as IExamOriginData[];
 
           const isAttendance = examData[0]?.exam?.isAttendance;
 
@@ -387,9 +347,7 @@ export class FindExamByHierarchyService {
           };
         })
         .sort((a, b) => sortString(a.exam, b.exam, 'name'))
-        .sort((a, b) =>
-          sortNumber(b.exam.isAttendance ? 1 : 0, a.exam.isAttendance ? 1 : 0),
-        ) as any
+        .sort((a, b) => sortNumber(b.exam.isAttendance ? 1 : 0, a.exam.isAttendance ? 1 : 0)) as any
     ).map((data) => {
       data.origins = data.origins.map((origin) => {
         if (origin.status == StatusEnum.ACTIVE) {
@@ -428,9 +386,7 @@ export class FindExamByHierarchyService {
     // }
 
     const age = this.dayjs.dayjs().diff(employee.birthday, 'years');
-    const isOutOfAgeRange =
-      (examRisk.fromAge && examRisk.fromAge > age) ||
-      (examRisk.toAge && examRisk.toAge < age);
+    const isOutOfAgeRange = (examRisk.fromAge && examRisk.fromAge > age) || (examRisk.toAge && examRisk.toAge < age);
 
     if (isOutOfAgeRange) return true;
 
@@ -459,32 +415,19 @@ export class FindExamByHierarchyService {
   checkExpiredDate(examRisk: IExamOriginData, employee: EmployeeEntity) {
     if (!employee) return null;
 
-    const foundExamHistory =
-      employee?.examsHistory?.find((exam) => exam.examId === examRisk.examId) ||
-      ({} as EmployeeExamsHistoryEntity);
+    const foundExamHistory = employee?.examsHistory?.find((exam) => exam.examId === examRisk.examId) || ({} as EmployeeExamsHistoryEntity);
 
     if (!foundExamHistory?.expiredDate && employee.lastExam) {
-      foundExamHistory.expiredDate = this.dayjs
-        .dayjs(employee.lastExam)
-        .add(getValidityInMonths(employee, examRisk), 'month')
-        .toDate();
+      foundExamHistory.expiredDate = this.dayjs.dayjs(employee.lastExam).add(getValidityInMonths(employee, examRisk), 'month').toDate();
 
       foundExamHistory.status = StatusEnum.ACTIVE;
     }
 
     if (!foundExamHistory?.expiredDate) return {};
 
-    const closeValidated =
-      examRisk.considerBetweenDays ||
-      (examRisk.exam.isAttendance ? this.clinicExamCloseToExpire : null);
+    const closeValidated = examRisk.considerBetweenDays || (examRisk.exam.isAttendance ? this.clinicExamCloseToExpire : null);
 
-    const closeToExpired =
-      closeValidated !== null &&
-      this.dayjs.compareTime(
-        this.dayjs.dateNow(),
-        foundExamHistory.expiredDate,
-        'days',
-      ) <= closeValidated;
+    const closeToExpired = closeValidated !== null && this.dayjs.compareTime(this.dayjs.dateNow(), foundExamHistory.expiredDate, 'days') <= closeValidated;
 
     return {
       closeToExpired,
@@ -506,9 +449,7 @@ export class FindExamByHierarchyService {
     const foundExam = examsDataReturn.find((exam) => exam?.exam?.isAttendance);
     if (!foundExam) return examsDataReturn;
 
-    const clinicValidityInMonths = foundExam.origins.find(
-      (exam) => !exam.skipEmployee,
-    )?.validityInMonths;
+    const clinicValidityInMonths = foundExam.origins.find((exam) => !exam.skipEmployee)?.validityInMonths;
 
     return examsDataReturn.map((examsData) => {
       examsData.origins = examsData.origins.map((origin) => {

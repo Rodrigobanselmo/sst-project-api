@@ -8,10 +8,7 @@ export class DeleteInvitesService {
   constructor(private readonly inviteUsersRepository: InviteUsersRepository) {}
 
   async execute({ companyId, id }: DeleteInviteDto) {
-    const deletedInvites = await this.inviteUsersRepository.deleteById(
-      companyId,
-      id,
-    );
+    const deletedInvites = await this.inviteUsersRepository.deleteById(companyId, id);
 
     return deletedInvites;
   }

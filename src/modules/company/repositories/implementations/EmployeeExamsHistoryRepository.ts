@@ -6,12 +6,7 @@ import { PrismaService } from '../../../../prisma/prisma.service';
 import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
 import { DayJSProvider } from '../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { prismaFilter } from '../../../../shared/utils/filters/prisma.filters';
-import {
-  CreateEmployeeExamHistoryDto,
-  FindEmployeeExamHistoryDto,
-  UpdateEmployeeExamHistoryDto,
-  UpdateManyScheduleExamDto,
-} from '../../dto/employee-exam-history';
+import { CreateEmployeeExamHistoryDto, FindEmployeeExamHistoryDto, UpdateEmployeeExamHistoryDto, UpdateManyScheduleExamDto } from '../../dto/employee-exam-history';
 import { EmployeeExamsHistoryEntity } from '../../entities/employee-exam-history.entity';
 import clone from 'clone';
 
@@ -58,12 +53,7 @@ export class EmployeeExamsHistoryRepository {
     return data;
   }
 
-  async update({
-    id,
-    examsData,
-    hierarchyId,
-    ...updateData
-  }: UpdateEmployeeExamHistoryDto & { fileUrl?: string; sendEvent?: boolean }) {
+  async update({ id, examsData, hierarchyId, ...updateData }: UpdateEmployeeExamHistoryDto & { fileUrl?: string; sendEvent?: boolean }) {
     const data = await this.prisma.employeeExamsHistory.update({
       data: {
         ...updateData,
@@ -116,10 +106,7 @@ export class EmployeeExamsHistoryRepository {
   async find(
     query: Partial<FindEmployeeExamHistoryDto> & { userCompany?: string },
     pagination: PaginationQueryDto,
-    {
-      where: whereOptions,
-      ...options
-    }: Prisma.EmployeeExamsHistoryFindManyArgs = {},
+    { where: whereOptions, ...options }: Prisma.EmployeeExamsHistoryFindManyArgs = {},
   ) {
     const whereOptionsCopy = clone(whereOptions);
     const whereInit = {
@@ -153,9 +140,7 @@ export class EmployeeExamsHistoryRepository {
             ],
           }),
         },
-        ...(whereOptionsCopy && (whereOptionsCopy as any)?.AND
-          ? (whereOptionsCopy as any).AND
-          : []),
+        ...(whereOptionsCopy && (whereOptionsCopy as any)?.AND ? (whereOptionsCopy as any).AND : []),
       ],
     } as typeof whereOptions;
 

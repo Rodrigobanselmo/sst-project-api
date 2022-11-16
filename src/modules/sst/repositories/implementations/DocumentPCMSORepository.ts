@@ -63,24 +63,19 @@ export class DocumentPCMSORepository {
         await this.prisma.documentPCMSOToProfessional.deleteMany({
           where: {
             professionalId: {
-              in: m2mGetDeletedIds(
-                documentPCMSO.professionalsSignatures,
-                professionals,
-                'professionalId',
-              ),
+              in: m2mGetDeletedIds(documentPCMSO.professionalsSignatures, professionals, 'professionalId'),
             },
             documentPCMSOId: documentPCMSO.id,
           },
         });
       }
 
-      documentPCMSO.professionalsSignatures =
-        await this.setProfessionalsSignatures(
-          professionals.map((user) => ({
-            ...user,
-            documentPCMSOId: documentPCMSO.id,
-          })),
-        );
+      documentPCMSO.professionalsSignatures = await this.setProfessionalsSignatures(
+        professionals.map((user) => ({
+          ...user,
+          documentPCMSOId: documentPCMSO.id,
+        })),
+      );
     }
 
     return new DocumentPCMSOEntity(documentPCMSO);
@@ -192,16 +187,9 @@ export class DocumentPCMSORepository {
     });
 
     docPCMSO.company.riskFactorData.map((data, index) => {
-      if (
-        data.homogeneousGroup.characterization &&
-        isEnvironment(data.homogeneousGroup.characterization.type)
-      ) {
-        docPCMSO.company.riskFactorData[index].homogeneousGroup.environment =
-          data.homogeneousGroup.characterization as any;
-        docPCMSO.company.riskFactorData[
-          index
-        ].homogeneousGroup.characterization = data.homogeneousGroup.characterization =
-          null;
+      if (data.homogeneousGroup.characterization && isEnvironment(data.homogeneousGroup.characterization.type)) {
+        docPCMSO.company.riskFactorData[index].homogeneousGroup.environment = data.homogeneousGroup.characterization as any;
+        docPCMSO.company.riskFactorData[index].homogeneousGroup.characterization = data.homogeneousGroup.characterization = null;
       }
     });
 
@@ -248,24 +236,21 @@ export class DocumentPCMSORepository {
   //   return data as UsersRiskGroupEntity[];
   // }
 
-  private async setProfessionalsSignatures(
-    professionalsSignatures: ProfessionalPCMSOEntity[],
-  ) {
+  private async setProfessionalsSignatures(professionalsSignatures: ProfessionalPCMSOEntity[]) {
     if (professionalsSignatures.length === 0) return [];
     const data = await this.prisma.$transaction(
-      professionalsSignatures.map(
-        ({ professional, professionalId, documentPCMSOId, ...rest }) =>
-          this.prisma.documentPCMSOToProfessional.upsert({
-            create: { documentPCMSOId, professionalId, ...rest },
-            update: { documentPCMSOId, professionalId, ...rest },
-            where: {
-              documentPCMSOId_professionalId: {
-                documentPCMSOId,
-                professionalId,
-              },
+      professionalsSignatures.map(({ professional, professionalId, documentPCMSOId, ...rest }) =>
+        this.prisma.documentPCMSOToProfessional.upsert({
+          create: { documentPCMSOId, professionalId, ...rest },
+          update: { documentPCMSOId, professionalId, ...rest },
+          where: {
+            documentPCMSOId_professionalId: {
+              documentPCMSOId,
+              professionalId,
             },
-            include: { professional: true },
-          }),
+          },
+          include: { professional: true },
+        }),
       ),
     );
 

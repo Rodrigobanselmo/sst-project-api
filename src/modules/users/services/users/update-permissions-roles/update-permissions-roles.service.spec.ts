@@ -9,9 +9,7 @@ describe.skip('UpdatePermissionsRolesService', () => {
       providers: [UpdatePermissionsRolesService],
     }).compile();
 
-    service = module.get<UpdatePermissionsRolesService>(
-      UpdatePermissionsRolesService,
-    );
+    service = module.get<UpdatePermissionsRolesService>(UpdatePermissionsRolesService);
   });
 
   it('should be defined', () => {

@@ -3,11 +3,7 @@ import { Prisma } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
-import {
-  FindExamToClinicDto,
-  UpsertExamToClinicDto,
-  UpsertManyExamToClinicDto,
-} from '../../dto/exam-to-clinic.dto';
+import { FindExamToClinicDto, UpsertExamToClinicDto, UpsertManyExamToClinicDto } from '../../dto/exam-to-clinic.dto';
 import { ExamToClinicEntity } from '../../entities/examToClinic';
 import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
 import { prismaFilter } from '../../../../shared/utils/filters/prisma.filters';
@@ -16,9 +12,7 @@ import { prismaFilter } from '../../../../shared/utils/filters/prisma.filters';
 export class ExamToClinicRepository {
   constructor(private prisma: PrismaService) {}
 
-  async create({
-    ...createExamToClinicDto
-  }: UpsertExamToClinicDto): Promise<ExamToClinicEntity> {
+  async create({ ...createExamToClinicDto }: UpsertExamToClinicDto): Promise<ExamToClinicEntity> {
     const examEntity = await this.prisma.examToClinic.create({
       data: {
         ...createExamToClinicDto,
@@ -45,13 +39,7 @@ export class ExamToClinicRepository {
     return new ExamToClinicEntity(ExamToClinic);
   }
 
-  async upsert({
-    examId,
-    companyId,
-    startDate,
-    groupId,
-    ...createExamToClinicDto
-  }: UpsertExamToClinicDto): Promise<ExamToClinicEntity> {
+  async upsert({ examId, companyId, startDate, groupId, ...createExamToClinicDto }: UpsertExamToClinicDto): Promise<ExamToClinicEntity> {
     const GROUP_ID = groupId || v4();
     const examEntity = await this.prisma.examToClinic.upsert({
       create: {
@@ -94,18 +82,13 @@ export class ExamToClinicRepository {
     return data.map((exam) => new ExamToClinicEntity(exam));
   }
 
-  async find(
-    query: Partial<FindExamToClinicDto>,
-    pagination: PaginationQueryDto,
-    options: Prisma.ExamToClinicFindManyArgs = {},
-  ) {
+  async find(query: Partial<FindExamToClinicDto>, pagination: PaginationQueryDto, options: Prisma.ExamToClinicFindManyArgs = {}) {
     const whereInit = {
       AND: [],
     } as typeof options.where;
 
     let orderBy = { exam: { name: 'asc' } } as typeof options.orderBy;
-    if ('orderBy' in query)
-      orderBy = { [query.orderBy]: query?.orderByDirection ?? 'asc' };
+    if ('orderBy' in query) orderBy = { [query.orderBy]: query?.orderByDirection ?? 'asc' };
 
     const { where } = prismaFilter(whereInit, {
       query,
@@ -114,9 +97,7 @@ export class ExamToClinicRepository {
 
     if ('search' in query) {
       (where.AND as any).push({
-        OR: [
-          { exam: { name: { contains: query.search, mode: 'insensitive' } } },
-        ],
+        OR: [{ exam: { name: { contains: query.search, mode: 'insensitive' } } }],
       } as typeof options.where);
     }
 

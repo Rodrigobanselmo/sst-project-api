@@ -3,11 +3,7 @@ import { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
-import {
-  CreateContactDto,
-  FindContactDto,
-  UpdateContactDto,
-} from '../../dto/contact.dto';
+import { CreateContactDto, FindContactDto, UpdateContactDto } from '../../dto/contact.dto';
 
 import { ContactEntity } from '../../entities/contact.entity';
 import { prismaFilter } from './../../../../shared/utils/filters/prisma.filters';
@@ -33,11 +29,7 @@ export class ContactRepository {
     return new ContactEntity(contact);
   }
 
-  async findAllByCompany(
-    query: Partial<FindContactDto>,
-    pagination: PaginationQueryDto,
-    options: Prisma.ContactFindManyArgs = {},
-  ) {
+  async findAllByCompany(query: Partial<FindContactDto>, pagination: PaginationQueryDto, options: Prisma.ContactFindManyArgs = {}) {
     const whereInit = {
       AND: [
         // {

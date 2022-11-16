@@ -8,22 +8,18 @@ import { ExamToClinicRepository } from '../../../repositories/implementations/Ex
 
 @Injectable()
 export class UpsertExamToClinicService {
-  constructor(
-    private readonly examToClinicRepository: ExamToClinicRepository,
-    private readonly dayjs: DayJSProvider,
-  ) {}
+  constructor(private readonly examToClinicRepository: ExamToClinicRepository, private readonly dayjs: DayJSProvider) {}
 
   async execute(createExamDto: UpsertExamToClinicDto, user: UserPayloadDto) {
-    const [clinicExamActual, clinicExamOld] =
-      await this.examToClinicRepository.findNude({
-        where: {
-          examId: createExamDto.examId,
-          companyId: user.targetCompanyId,
-          groupId: createExamDto.groupId || 'not-found',
-        },
-        orderBy: { startDate: 'desc' },
-        take: 2,
-      });
+    const [clinicExamActual, clinicExamOld] = await this.examToClinicRepository.findNude({
+      where: {
+        examId: createExamDto.examId,
+        companyId: user.targetCompanyId,
+        groupId: createExamDto.groupId || 'not-found',
+      },
+      orderBy: { startDate: 'desc' },
+      take: 2,
+    });
 
     if (!clinicExamActual) {
       const foundEqual = await this.examToClinicRepository.findNude({
@@ -39,18 +35,11 @@ export class UpsertExamToClinicService {
         take: 1,
       });
 
-      if (foundEqual.length > 0)
-        throw new BadRequestException(
-          ErrorMessageEnum.CLINIC_EXAM_ALREADY_EXIST,
-        );
+      if (foundEqual.length > 0) throw new BadRequestException(ErrorMessageEnum.CLINIC_EXAM_ALREADY_EXIST);
     }
 
     // if company already have an exam in the same date or future date, update it
-    if (
-      clinicExamActual &&
-      clinicExamActual.startDate >= this.dayjs.dateNow() &&
-      createExamDto.startDate >= this.dayjs.dateNow()
-    ) {
+    if (clinicExamActual && clinicExamActual.startDate >= this.dayjs.dateNow() && createExamDto.startDate >= this.dayjs.dateNow()) {
       const newExam = await this.examToClinicRepository.update({
         ...createExamDto,
         companyId: user.targetCompanyId,
@@ -73,10 +62,7 @@ export class UpsertExamToClinicService {
     const newExam = await this.examToClinicRepository.upsert({
       ...createExamDto,
       companyId: user.targetCompanyId,
-      endDate:
-        clinicExamActual?.startDate > createExamDto.startDate
-          ? clinicExamActual?.startDate
-          : undefined,
+      endDate: clinicExamActual?.startDate > createExamDto.startDate ? clinicExamActual?.startDate : undefined,
     });
 
     // if actual exam is before the new created exam, will end the actual and the created one becomes the last one

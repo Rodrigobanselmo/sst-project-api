@@ -30,13 +30,7 @@ import { DownloadCidService } from './services/cid/download-cid/download-cid.ser
 import { FilesCidController } from './controller/cid/files-cid.controller';
 
 @Module({
-  controllers: [
-    FilesChecklistController,
-    FilesCompanyController,
-    FilesCnaeController,
-    FilesController,
-    FilesCidController,
-  ],
+  controllers: [FilesChecklistController, FilesCompanyController, FilesCnaeController, FilesController, FilesCidController],
   imports: [SSTModule, CompanyModule],
   providers: [
     DownloadExcelProvider,

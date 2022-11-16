@@ -17,27 +17,23 @@ export class UpsertManyRiskDataService {
 
   async execute(upsertRiskDataDto: UpsertManyRiskDataDto) {
     (await Promise.all(
-      upsertRiskDataDto.homogeneousGroupIds.map(
-        async (homogeneousGroupId, index) => {
-          const workspaceId = upsertRiskDataDto.workspaceIds
-            ? upsertRiskDataDto.workspaceIds[index]
-            : upsertRiskDataDto.workspaceId;
+      upsertRiskDataDto.homogeneousGroupIds.map(async (homogeneousGroupId, index) => {
+        const workspaceId = upsertRiskDataDto.workspaceIds ? upsertRiskDataDto.workspaceIds[index] : upsertRiskDataDto.workspaceId;
 
-          const type = upsertRiskDataDto.type;
+        const type = upsertRiskDataDto.type;
 
-          const isTypeHierarchy = type && type == HomoTypeEnum.HIERARCHY;
-          if (isTypeHierarchy && workspaceId) {
-            await hierarchyCreateHomo({
-              homogeneousGroupId: homogeneousGroupId,
-              companyId: upsertRiskDataDto.companyId,
-              homoGroupRepository: this.homoGroupRepository,
-              hierarchyRepository: this.hierarchyRepository,
-              type,
-              workspaceId,
-            });
-          }
-        },
-      ),
+        const isTypeHierarchy = type && type == HomoTypeEnum.HIERARCHY;
+        if (isTypeHierarchy && workspaceId) {
+          await hierarchyCreateHomo({
+            homogeneousGroupId: homogeneousGroupId,
+            companyId: upsertRiskDataDto.companyId,
+            homoGroupRepository: this.homoGroupRepository,
+            hierarchyRepository: this.hierarchyRepository,
+            type,
+            workspaceId,
+          });
+        }
+      }),
     )) || [];
 
     delete upsertRiskDataDto.workspaceIds;
@@ -62,10 +58,7 @@ export class UpsertManyRiskDataService {
         }),
       )) || [];
 
-    if (upsertRiskDataDto.riskId)
-      risksDataMany.push(
-        await this.riskDataRepository.upsertMany(upsertRiskDataDto),
-      );
+    if (upsertRiskDataDto.riskId) risksDataMany.push(await this.riskDataRepository.upsertMany(upsertRiskDataDto));
 
     // const emptyRiskDataIds = risksDataMany.reduce((acc, riskDataSlice) => {
     //   return [

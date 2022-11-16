@@ -7,9 +7,7 @@ import { TableHeaderElements } from '../../elements/header';
 import { secondRiskInventoryHeader } from './offices.constant';
 import { dataConverter } from './offices.converter';
 
-export const officeRiskInventoryTableSection = (
-  hierarchyData: HierarchyMapData & { hierarchies: HierarchyEntity[] },
-) => {
+export const officeRiskInventoryTableSection = (hierarchyData: HierarchyMapData & { hierarchies: HierarchyEntity[] }) => {
   const data = dataConverter(hierarchyData);
 
   const tableHeaderElements = new TableHeaderElements();
@@ -18,11 +16,7 @@ export const officeRiskInventoryTableSection = (
   const table = new Table({
     width: { size: 100, type: WidthType.PERCENTAGE },
     rows: [
-      tableHeaderElements.headerRow(
-        secondRiskInventoryHeader().map((data) =>
-          tableHeaderElements.headerCell({ ...data }),
-        ),
-      ),
+      tableHeaderElements.headerRow(secondRiskInventoryHeader().map((data) => tableHeaderElements.headerCell({ ...data }))),
       tableBodyElements.tableRow(
         data.map((data) =>
           tableBodyElements.tableCell({

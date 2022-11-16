@@ -80,7 +80,4 @@ const NewActionPlanHeader = (): headerTableProps[] => {
 
 export const actionPlanHeader = NewActionPlanHeader();
 
-export const actionPlanTitle: string[] = [
-  'PLANO DE AÇÃO',
-  'PGR - PROGRAMA DE GERENCIAMENTO DE RISCOS',
-];
+export const actionPlanTitle: string[] = ['PLANO DE AÇÃO', 'PGR - PROGRAMA DE GERENCIAMENTO DE RISCOS'];

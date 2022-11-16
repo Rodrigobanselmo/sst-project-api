@@ -1,33 +1,15 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Post,
-  Query,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
-import {
-  CreateProtocolDto,
-  FindProtocolDto,
-  UpdateProtocolDto,
-  UpdateProtocolRiskDto,
-} from '../../dto/protocol.dto';
+import { CreateProtocolDto, FindProtocolDto, UpdateProtocolDto, UpdateProtocolRiskDto } from '../../dto/protocol.dto';
 import { CreateProtocolsService } from '../../services/protocol/create-protocol/create-protocol.service';
 import { DeleteProtocolsService } from '../../services/protocol/delete-protocol/delete-protocol.service';
 import { FindProtocolsService } from '../../services/protocol/find-protocol/find-protocol.service';
 import { UpdateProtocolsService } from '../../services/protocol/update-protocol/update-protocol.service';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
-import {
-  PermissionEnum,
-  RoleEnum,
-} from '../../../../shared/constants/enum/authorization';
+import { PermissionEnum, RoleEnum } from '../../../../shared/constants/enum/authorization';
 import { Roles } from '../../../../shared/decorators/roles.decorator';
 import { UpdateRiskProtocolsService } from '../../services/protocol/update-risk-protocol/update-risk-protocol.service';
 
@@ -49,10 +31,7 @@ export class ProtocolController {
     crud: true,
   })
   @Get()
-  find(
-    @User() userPayloadDto: UserPayloadDto,
-    @Query() query: FindProtocolDto,
-  ) {
+  find(@User() userPayloadDto: UserPayloadDto, @Query() query: FindProtocolDto) {
     return this.findAvailableProtocolsService.execute(query, userPayloadDto);
   }
 
@@ -63,14 +42,8 @@ export class ProtocolController {
     crud: true,
   })
   @Post()
-  create(
-    @Body() upsertAccessGroupDto: CreateProtocolDto,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
-    return this.createProtocolsService.execute(
-      upsertAccessGroupDto,
-      userPayloadDto,
-    );
+  create(@Body() upsertAccessGroupDto: CreateProtocolDto, @User() userPayloadDto: UserPayloadDto) {
+    return this.createProtocolsService.execute(upsertAccessGroupDto, userPayloadDto);
   }
 
   @Permissions(
@@ -88,14 +61,8 @@ export class ProtocolController {
     },
   )
   @Patch('/add-risks')
-  updateRisks(
-    @Body() upsertAccessGroupDto: UpdateProtocolRiskDto,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
-    return this.updateRiskProtocolsService.execute(
-      { ...upsertAccessGroupDto },
-      userPayloadDto,
-    );
+  updateRisks(@Body() upsertAccessGroupDto: UpdateProtocolRiskDto, @User() userPayloadDto: UserPayloadDto) {
+    return this.updateRiskProtocolsService.execute({ ...upsertAccessGroupDto }, userPayloadDto);
   }
 
   @Permissions({
@@ -105,15 +72,8 @@ export class ProtocolController {
     crud: true,
   })
   @Patch('/:id')
-  update(
-    @Body() upsertAccessGroupDto: UpdateProtocolDto,
-    @User() userPayloadDto: UserPayloadDto,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
-    return this.updateProtocolsService.execute(
-      { ...upsertAccessGroupDto, id },
-      userPayloadDto,
-    );
+  update(@Body() upsertAccessGroupDto: UpdateProtocolDto, @User() userPayloadDto: UserPayloadDto, @Param('id', ParseIntPipe) id: number) {
+    return this.updateProtocolsService.execute({ ...upsertAccessGroupDto, id }, userPayloadDto);
   }
 
   @Permissions({
@@ -123,10 +83,7 @@ export class ProtocolController {
     crud: true,
   })
   @Delete('/:id')
-  delete(
-    @User() userPayloadDto: UserPayloadDto,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
+  delete(@User() userPayloadDto: UserPayloadDto, @Param('id', ParseIntPipe) id: number) {
     return this.deleteProtocolsService.execute(id, userPayloadDto);
   }
 }

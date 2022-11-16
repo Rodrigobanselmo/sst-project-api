@@ -1,11 +1,5 @@
 import { Transform } from 'class-transformer';
-import {
-  IsBoolean,
-  IsEnum,
-  IsInt,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsBoolean, IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
 
 import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
 import { ProcEmiEnum, TpAmbEnum } from '../interfaces/event-batch';

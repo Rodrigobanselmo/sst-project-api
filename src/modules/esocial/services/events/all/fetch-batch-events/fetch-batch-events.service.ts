@@ -48,8 +48,7 @@ export class FetchESocialBatchEventsService {
           batchChunk.map(async (batch) => {
             let response: IEsocialFetchBatch.Response;
             try {
-              const batchResponse =
-                await this.eSocialEventProvider.fetchEventToESocial(batch);
+              const batchResponse = await this.eSocialEventProvider.fetchEventToESocial(batch);
 
               response = batchResponse.response;
               const status = batchResponse.response?.status;
@@ -60,26 +59,20 @@ export class FetchESocialBatchEventsService {
                 return;
               }
 
-              const rejectedBatch = !['101', '201', '202'].includes(
-                status?.cdResposta,
-              );
+              const rejectedBatch = !['101', '201', '202'].includes(status?.cdResposta);
 
               if (rejectedBatch) throw new Error('Erro ao consultar lote');
               response = undefined;
 
-              const eventsResponse =
-                batchResponse.response?.retornoEventos?.evento;
+              const eventsResponse = batchResponse.response?.retornoEventos?.evento;
 
-              const eventsResponseArray = Array.isArray(eventsResponse)
-                ? eventsResponse
-                : [eventsResponse];
+              const eventsResponseArray = Array.isArray(eventsResponse) ? eventsResponse : [eventsResponse];
 
               await Promise.all(
                 eventsResponseArray.map(async (eventResponse) => {
                   try {
                     const id = eventResponse.attributes.Id;
-                    const event =
-                      eventResponse?.retornoEvento?.eSocial?.retornoEvento;
+                    const event = eventResponse?.retornoEvento?.eSocial?.retornoEvento;
 
                     const process = event?.processamento;
                     const inProgress = process?.cdResposta == '101';
@@ -89,15 +82,12 @@ export class FetchESocialBatchEventsService {
                       return;
                     }
 
-                    const rejectedEvent = !['101', '201', '202'].includes(
-                      process?.cdResposta,
-                    );
+                    const rejectedEvent = !['101', '201', '202'].includes(process?.cdResposta);
 
-                    const found =
-                      await this.eSocialEventRepository.findFirstNude({
-                        where: { eventId: id },
-                        select: { id: true, examHistoryId: true },
-                      });
+                    const found = await this.eSocialEventRepository.findFirstNude({
+                      where: { eventId: id },
+                      select: { id: true, examHistoryId: true },
+                    });
 
                     await this.eSocialEventRepository.updateNude({
                       where: { id: found.id },
@@ -152,21 +142,15 @@ export class FetchESocialBatchEventsService {
 
       // update companies esocial report
       await Promise.all(
-        removeDuplicate(batches, { removeById: 'companyId' }).map(
-          async (batch) => {
-            const companyId = batch.companyId;
-            await this.updateESocialReportService.execute({ companyId });
-          },
-        ),
+        removeDuplicate(batches, { removeById: 'companyId' }).map(async (batch) => {
+          const companyId = batch.companyId;
+          await this.updateESocialReportService.execute({ companyId });
+        }),
       );
 
       if (!isInProgress) {
         const cacheValue: ICacheEventBatchType = true;
-        await this.cacheManager.set(
-          CacheEnum.ESOCIAL_FETCH_EVENT,
-          cacheValue,
-          360,
-        );
+        await this.cacheManager.set(CacheEnum.ESOCIAL_FETCH_EVENT, cacheValue, 360);
       }
     }
 

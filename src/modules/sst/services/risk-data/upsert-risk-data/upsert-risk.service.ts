@@ -79,16 +79,10 @@ export const hierarchyCreateHomo = async ({
   homogeneousGroupId: string;
   companyId: string;
 }) => {
-  const homo = await homoGroupRepository.findHomoGroupByCompanyAndId(
-    homogeneousGroupId,
-    companyId,
-  );
+  const homo = await homoGroupRepository.findHomoGroupByCompanyAndId(homogeneousGroupId, companyId);
 
   if (!homo?.id) {
-    const hierarchy = await hierarchyRepository.findAllHierarchyByCompanyAndId(
-      homogeneousGroupId,
-      companyId,
-    );
+    const hierarchy = await hierarchyRepository.findAllHierarchyByCompanyAndId(homogeneousGroupId, companyId);
 
     if (hierarchy?.id) {
       const gho = await homoGroupRepository.create(
@@ -111,9 +105,7 @@ export const hierarchyCreateHomo = async ({
             name: hierarchy.name,
             status: hierarchy.status,
             type: hierarchy.type,
-            workspaceIds: workspaceId
-              ? [workspaceId]
-              : hierarchy.workspaceIds || [],
+            workspaceIds: workspaceId ? [workspaceId] : hierarchy.workspaceIds || [],
           },
         ],
         companyId,

@@ -1,23 +1,8 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Post,
-  Query,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
-import {
-  CreateExamDto,
-  FindExamDto,
-  FindExamHierarchyDto,
-  UpdateExamDto,
-} from '../../dto/exam.dto';
+import { CreateExamDto, FindExamDto, FindExamHierarchyDto, UpdateExamDto } from '../../dto/exam.dto';
 import { CreateExamService } from '../../services/exam/create-exam/create-exam.service';
 import { DeleteSoftExamService } from '../../services/exam/delete-soft-exam/delete-soft-exam.service';
 import { UpdateExamService } from '../../services/exam/update-exam/update-exam.service';
@@ -43,10 +28,7 @@ export class ExamController {
     isContract: true,
   })
   @Post()
-  create(
-    @User() userPayloadDto: UserPayloadDto,
-    @Body() createExamDto: CreateExamDto,
-  ) {
+  create(@User() userPayloadDto: UserPayloadDto, @Body() createExamDto: CreateExamDto) {
     return this.createExamService.execute(createExamDto, userPayloadDto);
   }
 
@@ -57,10 +39,7 @@ export class ExamController {
     isContract: true,
   })
   @Get('/:companyId?')
-  findAllAvailable(
-    @User() userPayloadDto: UserPayloadDto,
-    @Query() query: FindExamDto,
-  ) {
+  findAllAvailable(@User() userPayloadDto: UserPayloadDto, @Query() query: FindExamDto) {
     return this.findExamService.execute(query, userPayloadDto);
   }
 
@@ -79,10 +58,7 @@ export class ExamController {
     },
   )
   @Get('/hierarchy/:companyId')
-  findByHierarchy(
-    @User() userPayloadDto: UserPayloadDto,
-    @Query() query: FindExamHierarchyDto,
-  ) {
+  findByHierarchy(@User() userPayloadDto: UserPayloadDto, @Query() query: FindExamHierarchyDto) {
     return this.findExamByHierarchyService.execute(userPayloadDto, {
       ...query,
     });
@@ -95,11 +71,7 @@ export class ExamController {
     isContract: true,
   })
   @Patch('/:id/:companyId')
-  async update(
-    @Param('id', ParseIntPipe) id: number,
-    @User() userPayloadDto: UserPayloadDto,
-    @Body() updateRiskDto: UpdateExamDto,
-  ) {
+  async update(@Param('id', ParseIntPipe) id: number, @User() userPayloadDto: UserPayloadDto, @Body() updateRiskDto: UpdateExamDto) {
     return this.updateExamService.execute(id, updateRiskDto, userPayloadDto);
   }
 
@@ -110,10 +82,7 @@ export class ExamController {
     isContract: true,
   })
   @Delete('/:id/:companyId')
-  async deleteSoft(
-    @Param('id', ParseIntPipe) id: number,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
+  async deleteSoft(@Param('id', ParseIntPipe) id: number, @User() userPayloadDto: UserPayloadDto) {
     return this.deleteSoftExamService.execute(id, userPayloadDto);
   }
 }

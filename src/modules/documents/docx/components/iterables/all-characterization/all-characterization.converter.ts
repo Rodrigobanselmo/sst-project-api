@@ -31,22 +31,15 @@ export interface IEnvironmentConvertResponse {
   profiles?: EnvironmentEntity[];
 }
 
-export const environmentsConverter = (
-  environments: EnvironmentEntity[],
-): IEnvironmentConvertResponse[] => {
+export const environmentsConverter = (environments: EnvironmentEntity[]): IEnvironmentConvertResponse[] => {
   return environments
     .sort((a, b) => sortNumber(a, b, 'order'))
     .map((environment) => {
-      const imagesVertical = environment.photos.filter(
-        (image) => image.isVertical,
-      );
+      const imagesVertical = environment.photos.filter((image) => image.isVertical);
 
-      const imagesHorizontal = environment.photos.filter(
-        (image) => !image.isVertical,
-      );
+      const imagesHorizontal = environment.photos.filter((image) => !image.isVertical);
 
-      const breakPage =
-        imagesVertical.length > 0 || imagesHorizontal.length > 0;
+      const breakPage = imagesVertical.length > 0 || imagesHorizontal.length > 0;
       const elements = getLayouts(imagesVertical, imagesHorizontal);
 
       const profileName = environment.profileParentId
@@ -58,19 +51,14 @@ export const environmentsConverter = (
       const variables = {
         [VariablesPGREnum.ENVIRONMENT_NAME]: environment.name || '',
         [VariablesPGREnum.PROFILE_NAME]: profileName || '',
-        [VariablesPGREnum.ENVIRONMENT_DESCRIPTION]:
-          environment.description || '',
+        [VariablesPGREnum.ENVIRONMENT_DESCRIPTION]: environment.description || '',
         [VariablesPGREnum.ENVIRONMENT_NOISE]: environment.noiseValue || '',
-        [VariablesPGREnum.ENVIRONMENT_TEMPERATURE]:
-          environment.temperature || '',
+        [VariablesPGREnum.ENVIRONMENT_TEMPERATURE]: environment.temperature || '',
         [VariablesPGREnum.ENVIRONMENT_LUMINOSITY]: environment.luminosity || '',
-        [VariablesPGREnum.ENVIRONMENT_MOISTURE]:
-          environment.moisturePercentage || '',
+        [VariablesPGREnum.ENVIRONMENT_MOISTURE]: environment.moisturePercentage || '',
       };
 
-      const risks = environment.homogeneousGroup.riskFactorData.map(
-        (risk) => risk.riskFactor,
-      );
+      const risks = environment.homogeneousGroup.riskFactorData.map((risk) => risk.riskFactor);
 
       const considerations = environment.considerations;
       const activities = environment.activities;
@@ -97,45 +85,27 @@ export const environmentsConverter = (
     });
 };
 
-export const getLayouts = (
-  vPhotos: (EnvironmentPhotoEntity | CharacterizationPhotoEntity)[],
-  hPhotos: (EnvironmentPhotoEntity | CharacterizationPhotoEntity)[],
-) => {
+export const getLayouts = (vPhotos: (EnvironmentPhotoEntity | CharacterizationPhotoEntity)[], hPhotos: (EnvironmentPhotoEntity | CharacterizationPhotoEntity)[]) => {
   const vLength = vPhotos.length;
   const hLength = hPhotos.length;
 
-  const isAllLegendEqual = [...vPhotos, ...hPhotos].every(
-    (photo) => vPhotos[0] && photo.name === vPhotos[0].name,
-  );
+  const isAllLegendEqual = [...vPhotos, ...hPhotos].every((photo) => vPhotos[0] && photo.name === vPhotos[0].name);
 
   const layouts: (Table[] | Paragraph[])[] = [];
 
-  const vLayout = (
-    vPhotos: (EnvironmentPhotoEntity | CharacterizationPhotoEntity)[],
-    length: number,
-    keepVTree = false,
-  ) => {
+  const vLayout = (vPhotos: (EnvironmentPhotoEntity | CharacterizationPhotoEntity)[], length: number, keepVTree = false) => {
     const hasDivider = layouts.length > 0;
 
     if (hasDivider) layouts.push([ImageDivider()]);
 
     // if ((length >= 3 && length - 3 !== 1) || (keepVTree && length > 0)) {
     if (length >= 3 || (keepVTree && length > 0)) {
-      const removeLegend =
-        isAllLegendEqual && (length - 3 !== 0 || hLength !== 0);
+      const removeLegend = isAllLegendEqual && (length - 3 !== 0 || hLength !== 0);
 
       layouts.push(
         VThreeImages(
-          [
-            vPhotos[0].photoUrl,
-            vPhotos[1] ? vPhotos[1].photoUrl : '',
-            vPhotos[2] ? vPhotos[2].photoUrl : '',
-          ],
-          [
-            vPhotos[0].name,
-            vPhotos[1] ? vPhotos[1].name : '',
-            vPhotos[2] ? vPhotos[2].name : '',
-          ],
+          [vPhotos[0].photoUrl, vPhotos[1] ? vPhotos[1].photoUrl : '', vPhotos[2] ? vPhotos[2].photoUrl : ''],
+          [vPhotos[0].name, vPhotos[1] ? vPhotos[1].name : '', vPhotos[2] ? vPhotos[2].name : ''],
           removeLegend,
         ),
       );
@@ -145,15 +115,8 @@ export const getLayouts = (
     }
 
     if (length >= 2) {
-      const removeLegend =
-        isAllLegendEqual && (length - 2 !== 0 || hLength !== 0);
-      layouts.push(
-        VTwoImages(
-          [vPhotos[0].photoUrl, vPhotos[1].photoUrl],
-          [vPhotos[0].name, vPhotos[1].name],
-          removeLegend,
-        ),
-      );
+      const removeLegend = isAllLegendEqual && (length - 2 !== 0 || hLength !== 0);
+      layouts.push(VTwoImages([vPhotos[0].photoUrl, vPhotos[1].photoUrl], [vPhotos[0].name, vPhotos[1].name], removeLegend));
 
       const restOfPhotos = vPhotos.slice(2);
       return vLayout(restOfPhotos, restOfPhotos.length);
@@ -180,13 +143,7 @@ export const getLayouts = (
       }
 
       if (hLength > 0) {
-        layouts.push(
-          VHImages(
-            [vPhotos[0].photoUrl, hPhotos[0].photoUrl],
-            [vPhotos[0].name, hPhotos[0].name],
-            removeLegend,
-          ),
-        );
+        layouts.push(VHImages([vPhotos[0].photoUrl, hPhotos[0].photoUrl], [vPhotos[0].name, hPhotos[0].name], removeLegend));
 
         const restOfPhotos = hPhotos.slice(1);
         return hLayout(restOfPhotos, [], restOfPhotos.length);
@@ -198,20 +155,13 @@ export const getLayouts = (
 
     if (hLength >= 2) {
       const removeLegend = isAllLegendEqual && hLength - 2 !== 0;
-      layouts.push(
-        HTwoImages(
-          [hPhotos[0].photoUrl, hPhotos[1].photoUrl],
-          [hPhotos[0].name, hPhotos[1].name],
-          removeLegend,
-        ),
-      );
+      layouts.push(HTwoImages([hPhotos[0].photoUrl, hPhotos[1].photoUrl], [hPhotos[0].name, hPhotos[1].name], removeLegend));
 
       const restOfPhotos = hPhotos.slice(2);
       return hLayout(restOfPhotos, [], restOfPhotos.length);
     }
 
-    if (hPhotos[0])
-      layouts.push(HFullWidthImage(hPhotos[0].photoUrl, hPhotos[0].name));
+    if (hPhotos[0]) layouts.push(HFullWidthImage(hPhotos[0].photoUrl, hPhotos[0].name));
   };
 
   const restOfVPhotos = vLayout(vPhotos, vLength);

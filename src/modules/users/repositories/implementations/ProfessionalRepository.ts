@@ -4,11 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
-import {
-  CreateProfessionalDto,
-  FindProfessionalsDto,
-  UpdateProfessionalDto,
-} from '../../dto/professional.dto';
+import { CreateProfessionalDto, FindProfessionalsDto, UpdateProfessionalDto } from '../../dto/professional.dto';
 import { ProfessionalEntity } from '../../entities/professional.entity';
 import { UserEntity } from '../../entities/user.entity';
 import { UserCompanyEntity } from '../../entities/userCompany.entity';
@@ -20,15 +16,7 @@ export class ProfessionalRepository {
   constructor(private prisma: PrismaService) {}
 
   async create(
-    {
-      inviteId,
-      roles,
-      councils,
-      ...data
-    }: Omit<
-      CreateProfessionalDto & { roles?: string[] },
-      'sendEmail' | 'userId'
-    >,
+    { inviteId, roles, councils, ...data }: Omit<CreateProfessionalDto & { roles?: string[] }, 'sendEmail' | 'userId'>,
     companyId: string,
     options: Partial<Prisma.ProfessionalCreateArgs> = {},
   ) {
@@ -81,15 +69,7 @@ export class ProfessionalRepository {
     });
   }
 
-  async update(
-    {
-      id,
-      inviteId,
-      councils,
-      ...data
-    }: Omit<UpdateProfessionalDto, 'sendEmail' | 'userId'>,
-    options: Partial<Prisma.ProfessionalUpdateArgs> = {},
-  ) {
+  async update({ id, inviteId, councils, ...data }: Omit<UpdateProfessionalDto, 'sendEmail' | 'userId'>, options: Partial<Prisma.ProfessionalUpdateArgs> = {}) {
     const professional = await this.prisma.professional.update({
       ...options,
       data: { ...data },
@@ -106,10 +86,7 @@ export class ProfessionalRepository {
 
       const councilsCreate = await Promise.all(
         councils.map(async ({ councilId, councilType, councilUF }) => {
-          if (
-            (councilId && councilType && councilUF) ||
-            (councilId == '' && councilType == '' && councilUF == '')
-          )
+          if ((councilId && councilType && councilUF) || (councilId == '' && councilType == '' && councilUF == ''))
             return await this.prisma.professionalCouncil.upsert({
               create: {
                 councilId,
@@ -152,11 +129,7 @@ export class ProfessionalRepository {
     });
   }
 
-  async findByCompanyId(
-    query: Partial<FindProfessionalsDto>,
-    pagination: PaginationQueryDto,
-    options: Prisma.ProfessionalFindManyArgs = {},
-  ) {
+  async findByCompanyId(query: Partial<FindProfessionalsDto>, pagination: PaginationQueryDto, options: Prisma.ProfessionalFindManyArgs = {}) {
     const companyId = query.companyId;
     const userCompanyId = query.userCompanyId;
     delete query.companyId;
@@ -267,19 +240,12 @@ export class ProfessionalRepository {
     ]);
 
     return {
-      data: response[1].map(
-        (prof) =>
-          new ProfessionalEntity({ ...prof, user: new UserEntity(prof.user) }),
-      ),
+      data: response[1].map((prof) => new ProfessionalEntity({ ...prof, user: new UserEntity(prof.user) })),
       count: response[0],
     };
   }
 
-  async findCouncilByCompanyId(
-    query: Partial<FindProfessionalsDto>,
-    pagination: PaginationQueryDto,
-    options: Prisma.ProfessionalFindManyArgs = {},
-  ) {
+  async findCouncilByCompanyId(query: Partial<FindProfessionalsDto>, pagination: PaginationQueryDto, options: Prisma.ProfessionalFindManyArgs = {}) {
     const companyId = query.companyId;
     const userCompanyId = query.userCompanyId;
     const byCouncil = query.byCouncil;
@@ -411,10 +377,7 @@ export class ProfessionalRepository {
         ]);
 
     return {
-      data: response[1].map(
-        (prof) =>
-          new ProfessionalEntity({ ...prof, user: new UserEntity(prof.user) }),
-      ),
+      data: response[1].map((prof) => new ProfessionalEntity({ ...prof, user: new UserEntity(prof.user) })),
       count: response[0],
     };
   }

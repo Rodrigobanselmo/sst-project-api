@@ -22,9 +22,7 @@ export class DeleteEnvironmentPhotoService {
 
     const deletedPhoto = await this.environmentPhotoRepository.delete(id);
 
-    const environmentData = await this.environmentRepository.findById(
-      deletedPhoto.companyCharacterizationId,
-    );
+    const environmentData = await this.environmentRepository.findById(deletedPhoto.companyCharacterizationId);
 
     return environmentData;
   }

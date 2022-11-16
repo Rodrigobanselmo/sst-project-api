@@ -23,60 +23,31 @@ import { FakerUser } from '../utils/fake/user.fake';
 import { FakeWorkspace } from '../utils/fake/workspace.fake';
 import { User } from '.prisma/client';
 
-const createToken = async (
-  app: INestApplication,
-  token: string,
-  options?: Partial<InviteUserDto>,
-) => {
+const createToken = async (app: INestApplication, token: string, options?: Partial<InviteUserDto>) => {
   const createInvite = new FakeInvite(options);
 
-  const { body: invite } = await request(app.getHttpServer())
-    .post('/invites')
-    .send(createInvite)
-    .set('Authorization', `Bearer ${token}`)
-    .expect(HttpStatus.CREATED);
+  const { body: invite } = await request(app.getHttpServer()).post('/invites').send(createInvite).set('Authorization', `Bearer ${token}`).expect(HttpStatus.CREATED);
 
   return invite;
 };
 
-const createSession = async (
-  app: INestApplication,
-  email = 'admin@simple.com',
-  password = '12345678',
-) => {
-  const { body } = await request(app.getHttpServer())
-    .post('/session')
-    .send({ email, password })
-    .expect(HttpStatus.OK);
+const createSession = async (app: INestApplication, email = 'admin@simple.com', password = '12345678') => {
+  const { body } = await request(app.getHttpServer()).post('/session').send({ email, password }).expect(HttpStatus.OK);
 
   return body;
 };
 
-const createUser = async (
-  app: INestApplication,
-  options?: Partial<CreateUserDto>,
-) => {
+const createUser = async (app: INestApplication, options?: Partial<CreateUserDto>) => {
   const createUser = new FakerUser(options);
   if (!createUser.token) delete createUser.token;
 
-  const { body: bodyUser } = await request(app.getHttpServer())
-    .post('/users')
-    .send(createUser)
-    .expect(HttpStatus.CREATED);
+  const { body: bodyUser } = await request(app.getHttpServer()).post('/users').send(createUser).expect(HttpStatus.CREATED);
 
   return bodyUser as UserEntity;
 };
 
-const editUsersRoles = async (
-  app: INestApplication,
-  token: string,
-  options: UpdateUserCompanyDto,
-) => {
-  const { body } = await request(app.getHttpServer())
-    .patch(`/users/update/authorization`)
-    .set('Authorization', `Bearer ${token}`)
-    .send(options)
-    .expect(HttpStatus.OK);
+const editUsersRoles = async (app: INestApplication, token: string, options: UpdateUserCompanyDto) => {
+  const { body } = await request(app.getHttpServer()).patch(`/users/update/authorization`).set('Authorization', `Bearer ${token}`).send(options).expect(HttpStatus.OK);
 
   const user = body as UserEntity;
   const session = await createSession(app, user.email, '12345678');
@@ -97,11 +68,7 @@ const createCompany = async (app: INestApplication, token: string) => {
   return bodyCompany as CompanyEntity;
 };
 
-const createContract = async (
-  app: INestApplication,
-  token: string,
-  companyId: string,
-) => {
+const createContract = async (app: INestApplication, token: string, companyId: string) => {
   const createCompany = new FakeCompany();
   createCompany.pushWorkspace(new FakeWorkspace());
 
@@ -170,11 +137,7 @@ describe('[Feature] Authorization', () => {
     userMain = await createUser(app, { token: invite.id, email: invite.email });
 
     // create new company contract
-    companyContract = await createContract(
-      app,
-      sessionAdmin.token,
-      companyMain.id,
-    );
+    companyContract = await createContract(app, sessionAdmin.token, companyMain.id);
 
     // create new user from company contract
     const inviteContract = await createToken(app, sessionAdmin.token, {
@@ -194,24 +157,15 @@ describe('[Feature] Authorization', () => {
 
   describe('Permissions And Roles [All]', () => {
     it('should not be able to access without permissions', async () => {
-      return await request(app.getHttpServer())
-        .get('/authorization-test')
-        .set('Authorization', `Bearer ${sessionContract.token}`)
-        .expect(HttpStatus.FORBIDDEN);
+      return await request(app.getHttpServer()).get('/authorization-test').set('Authorization', `Bearer ${sessionContract.token}`).expect(HttpStatus.FORBIDDEN);
     });
 
     it('should be able to have master access', async () => {
-      return await request(app.getHttpServer())
-        .get('/authorization-test')
-        .set('Authorization', `Bearer ${sessionAdmin.token}`)
-        .expect(HttpStatus.OK);
+      return await request(app.getHttpServer()).get('/authorization-test').set('Authorization', `Bearer ${sessionAdmin.token}`).expect(HttpStatus.OK);
     });
 
     it('should be able to access only with permission', async () => {
-      return await request(app.getHttpServer())
-        .get('/authorization-test')
-        .set('Authorization', `Bearer ${sessionMain.token}`)
-        .expect(HttpStatus.OK);
+      return await request(app.getHttpServer()).get('/authorization-test').set('Authorization', `Bearer ${sessionMain.token}`).expect(HttpStatus.OK);
     });
 
     it('should be able to access with crud on get', async () => {
@@ -227,10 +181,7 @@ describe('[Feature] Authorization', () => {
 
       const session = await createSession(app, user.email, '12345678');
 
-      await request(app.getHttpServer())
-        .get('/authorization-test')
-        .set('Authorization', `Bearer ${session.token}`)
-        .expect(HttpStatus.FORBIDDEN);
+      await request(app.getHttpServer()).get('/authorization-test').set('Authorization', `Bearer ${session.token}`).expect(HttpStatus.FORBIDDEN);
 
       const newSession = await editUsersRoles(app, sessionAdmin.token, {
         companyId: companyMain.id,
@@ -239,17 +190,11 @@ describe('[Feature] Authorization', () => {
         roles: [],
       });
 
-      return await request(app.getHttpServer())
-        .get('/authorization-test')
-        .set('Authorization', `Bearer ${newSession.token}`)
-        .expect(HttpStatus.OK);
+      return await request(app.getHttpServer()).get('/authorization-test').set('Authorization', `Bearer ${newSession.token}`).expect(HttpStatus.OK);
     });
 
     it('should be able to access with crud on post', async () => {
-      await request(app.getHttpServer())
-        .post('/authorization-test')
-        .set('Authorization', `Bearer ${sessionMain.token}`)
-        .expect(HttpStatus.FORBIDDEN);
+      await request(app.getHttpServer()).post('/authorization-test').set('Authorization', `Bearer ${sessionMain.token}`).expect(HttpStatus.FORBIDDEN);
 
       const invite = await createToken(app, sessionAdmin.token, {
         companyId: companyMain.id,
@@ -263,10 +208,7 @@ describe('[Feature] Authorization', () => {
 
       const session = await createSession(app, user.email, '12345678');
 
-      return await request(app.getHttpServer())
-        .post('/authorization-test')
-        .set('Authorization', `Bearer ${session.token}`)
-        .expect(HttpStatus.CREATED);
+      return await request(app.getHttpServer()).post('/authorization-test').set('Authorization', `Bearer ${session.token}`).expect(HttpStatus.CREATED);
     });
 
     it('should be able to access only with same company', async () => {
@@ -350,10 +292,7 @@ describe('[Feature] Authorization', () => {
     });
 
     it('should be able to access with crud on patch', async () => {
-      await request(app.getHttpServer())
-        .patch('/authorization-test')
-        .set('Authorization', `Bearer ${sessionMain.token}`)
-        .expect(HttpStatus.FORBIDDEN);
+      await request(app.getHttpServer()).patch('/authorization-test').set('Authorization', `Bearer ${sessionMain.token}`).expect(HttpStatus.FORBIDDEN);
 
       const invite = await createToken(app, sessionAdmin.token, {
         companyId: companyMain.id,
@@ -367,15 +306,9 @@ describe('[Feature] Authorization', () => {
 
       const session = await createSession(app, user.email, '12345678');
 
-      await request(app.getHttpServer())
-        .patch('/authorization-test')
-        .set('Authorization', `Bearer ${sessionAdmin.token}`)
-        .expect(HttpStatus.OK);
+      await request(app.getHttpServer()).patch('/authorization-test').set('Authorization', `Bearer ${sessionAdmin.token}`).expect(HttpStatus.OK);
 
-      return await request(app.getHttpServer())
-        .patch('/authorization-test')
-        .set('Authorization', `Bearer ${session.token}`)
-        .expect(HttpStatus.OK);
+      return await request(app.getHttpServer()).patch('/authorization-test').set('Authorization', `Bearer ${session.token}`).expect(HttpStatus.OK);
     });
 
     it('should be able to access only with company or contract', async () => {
@@ -389,11 +322,7 @@ describe('[Feature] Authorization', () => {
         email: inviteContractOK.email,
       });
 
-      const sessionContractOK = await createSession(
-        app,
-        userContractOK.email,
-        '12345678',
-      );
+      const sessionContractOK = await createSession(app, userContractOK.email, '12345678');
 
       const inviteMainOK = await createToken(app, sessionAdmin.token, {
         companyId: companyMain.id,
@@ -405,11 +334,7 @@ describe('[Feature] Authorization', () => {
         email: inviteMainOK.email,
       });
 
-      const sessionMainOK = await createSession(
-        app,
-        userMainOK.email,
-        '12345678',
-      );
+      const sessionMainOK = await createSession(app, userMainOK.email, '12345678');
 
       const companyMain2 = await createCompany(app, sessionAdmin.token);
 
@@ -423,11 +348,7 @@ describe('[Feature] Authorization', () => {
         email: inviteMain2.email,
       });
 
-      const sessionMain2 = await createSession(
-        app,
-        userMain2.email,
-        '12345678',
-      );
+      const sessionMain2 = await createSession(app, userMain2.email, '12345678');
 
       // admin ok
       await request(app.getHttpServer())
@@ -476,11 +397,7 @@ describe('[Feature] Authorization', () => {
         email: inviteContractOK.email,
       });
 
-      const sessionContractOK = await createSession(
-        app,
-        userContractOK.email,
-        '12345678',
-      );
+      const sessionContractOK = await createSession(app, userContractOK.email, '12345678');
 
       const inviteMainOK = await createToken(app, sessionAdmin.token, {
         companyId: companyMain.id,
@@ -492,11 +409,7 @@ describe('[Feature] Authorization', () => {
         email: inviteMainOK.email,
       });
 
-      const sessionMainOK = await createSession(
-        app,
-        userMainOK.email,
-        '12345678',
-      );
+      const sessionMainOK = await createSession(app, userMainOK.email, '12345678');
 
       const companyMain2 = await createCompany(app, sessionAdmin.token);
 
@@ -510,11 +423,7 @@ describe('[Feature] Authorization', () => {
         email: inviteMain2.email,
       });
 
-      const sessionMain2 = await createSession(
-        app,
-        userMain2.email,
-        '12345678',
-      );
+      const sessionMain2 = await createSession(app, userMain2.email, '12345678');
 
       // admin ok
       await request(app.getHttpServer())
@@ -553,10 +462,7 @@ describe('[Feature] Authorization', () => {
     });
 
     it('should be able to access with crud on delete', async () => {
-      await request(app.getHttpServer())
-        .delete('/authorization-test')
-        .set('Authorization', `Bearer ${sessionMain.token}`)
-        .expect(HttpStatus.FORBIDDEN);
+      await request(app.getHttpServer()).delete('/authorization-test').set('Authorization', `Bearer ${sessionMain.token}`).expect(HttpStatus.FORBIDDEN);
 
       const invite = await createToken(app, sessionAdmin.token, {
         companyId: companyMain.id,
@@ -570,15 +476,9 @@ describe('[Feature] Authorization', () => {
 
       const session = await createSession(app, user.email, '12345678');
 
-      await request(app.getHttpServer())
-        .delete('/authorization-test')
-        .set('Authorization', `Bearer ${sessionAdmin.token}`)
-        .expect(HttpStatus.OK);
+      await request(app.getHttpServer()).delete('/authorization-test').set('Authorization', `Bearer ${sessionAdmin.token}`).expect(HttpStatus.OK);
 
-      return await request(app.getHttpServer())
-        .delete('/authorization-test')
-        .set('Authorization', `Bearer ${session.token}`)
-        .expect(HttpStatus.OK);
+      return await request(app.getHttpServer()).delete('/authorization-test').set('Authorization', `Bearer ${session.token}`).expect(HttpStatus.OK);
     });
 
     it('should be able to access only if is company member', async () => {
@@ -592,11 +492,7 @@ describe('[Feature] Authorization', () => {
         email: inviteContractOK.email,
       });
 
-      const sessionContractOK = await createSession(
-        app,
-        userContractOK.email,
-        '12345678',
-      );
+      const sessionContractOK = await createSession(app, userContractOK.email, '12345678');
 
       const inviteMainOK = await createToken(app, sessionAdmin.token, {
         companyId: companyMain.id,
@@ -608,11 +504,7 @@ describe('[Feature] Authorization', () => {
         email: inviteMainOK.email,
       });
 
-      const sessionMainOK = await createSession(
-        app,
-        userMainOK.email,
-        '12345678',
-      );
+      const sessionMainOK = await createSession(app, userMainOK.email, '12345678');
 
       const companyMain2 = await createCompany(app, sessionAdmin.token);
 
@@ -626,11 +518,7 @@ describe('[Feature] Authorization', () => {
         email: inviteMain2.email,
       });
 
-      const sessionMain2 = await createSession(
-        app,
-        userMain2.email,
-        '12345678',
-      );
+      const sessionMain2 = await createSession(app, userMain2.email, '12345678');
 
       await request(app.getHttpServer())
         .get('/authorization-test/6')
@@ -674,11 +562,7 @@ describe('[Feature] Authorization', () => {
         email: inviteContractOK.email,
       });
 
-      const sessionContractOK = await createSession(
-        app,
-        userContractOK.email,
-        '12345678',
-      );
+      const sessionContractOK = await createSession(app, userContractOK.email, '12345678');
 
       const inviteMainOK = await createToken(app, sessionAdmin.token, {
         companyId: companyMain.id,
@@ -690,11 +574,7 @@ describe('[Feature] Authorization', () => {
         email: inviteMainOK.email,
       });
 
-      const sessionMainOK = await createSession(
-        app,
-        userMainOK.email,
-        '12345678',
-      );
+      const sessionMainOK = await createSession(app, userMainOK.email, '12345678');
 
       const companyMain2 = await createCompany(app, sessionAdmin.token);
 
@@ -708,11 +588,7 @@ describe('[Feature] Authorization', () => {
         email: inviteMain2.email,
       });
 
-      const sessionMain2 = await createSession(
-        app,
-        userMain2.email,
-        '12345678',
-      );
+      const sessionMain2 = await createSession(app, userMain2.email, '12345678');
 
       await request(app.getHttpServer())
         .get('/authorization-test/7')
@@ -762,11 +638,7 @@ describe('[Feature] Authorization', () => {
         email: inviteContractOK.email,
       });
 
-      const sessionContractOK = await createSession(
-        app,
-        userContractOK.email,
-        '12345678',
-      );
+      const sessionContractOK = await createSession(app, userContractOK.email, '12345678');
 
       const inviteMainOK = await createToken(app, sessionAdmin.token, {
         companyId: companyMain.id,
@@ -778,11 +650,7 @@ describe('[Feature] Authorization', () => {
         email: inviteMainOK.email,
       });
 
-      const sessionMainOK = await createSession(
-        app,
-        userMainOK.email,
-        '12345678',
-      );
+      const sessionMainOK = await createSession(app, userMainOK.email, '12345678');
 
       const companyMain2 = await createCompany(app, sessionAdmin.token);
 
@@ -796,11 +664,7 @@ describe('[Feature] Authorization', () => {
         email: inviteMain2.email,
       });
 
-      const sessionMain2 = await createSession(
-        app,
-        userMain2.email,
-        '12345678',
-      );
+      const sessionMain2 = await createSession(app, userMain2.email, '12345678');
 
       await request(app.getHttpServer())
         .get('/authorization-test/8')

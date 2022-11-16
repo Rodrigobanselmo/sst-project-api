@@ -1,18 +1,5 @@
 import { setNiceProportion } from './../../../../../../shared/utils/setNiceProportion';
-import {
-  AlignmentType,
-  BorderStyle,
-  Footer,
-  ImageRun,
-  ITableBordersOptions,
-  Paragraph,
-  Table,
-  TableCell,
-  TableRow,
-  TextRun,
-  VerticalAlign,
-  WidthType,
-} from 'docx';
+import { AlignmentType, BorderStyle, Footer, ImageRun, ITableBordersOptions, Paragraph, Table, TableCell, TableRow, TextRun, VerticalAlign, WidthType } from 'docx';
 import { palette } from '../../../../../../shared/constants/palette';
 import sizeOf from 'image-size';
 import fs from 'fs';
@@ -107,19 +94,12 @@ const secondCell = (consultantLogoPath: string) => {
     });
 
   const getProportion = () => {
-    const { height: imgHeight, width: imgWidth } = sizeOf(
-      fs.readFileSync(consultantLogoPath),
-    );
+    const { height: imgHeight, width: imgWidth } = sizeOf(fs.readFileSync(consultantLogoPath));
 
     const maxWidth = 250;
     const maxHeight = 30;
 
-    const { height, width } = setNiceProportion(
-      maxWidth,
-      maxHeight,
-      imgWidth,
-      imgHeight,
-    );
+    const { height, width } = setNiceProportion(maxWidth, maxHeight, imgWidth, imgHeight);
     return { height, width };
   };
 
@@ -148,11 +128,7 @@ const row = (footerText: string, version: string, consultantLogoPath: string) =>
     children: [firstCell(footerText, version), secondCell(consultantLogoPath)],
   });
 
-export const createFooter = ({
-  footerText,
-  version,
-  consultantLogoPath,
-}: IFooterProps) => {
+export const createFooter = ({ footerText, version, consultantLogoPath }: IFooterProps) => {
   const footer = {
     default: new Footer({
       children: [table([row(footerText, version, consultantLogoPath)])],

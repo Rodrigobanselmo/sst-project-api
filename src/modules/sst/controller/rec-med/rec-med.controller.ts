@@ -22,10 +22,7 @@ export class RecMedController {
     isMember: true,
   })
   @Post()
-  create(
-    @User() userPayloadDto: UserPayloadDto,
-    @Body() createRecMedDto: CreateRecMedDto,
-  ) {
+  create(@User() userPayloadDto: UserPayloadDto, @Body() createRecMedDto: CreateRecMedDto) {
     return this.createRecMedService.execute(createRecMedDto, userPayloadDto);
   }
 
@@ -35,16 +32,8 @@ export class RecMedController {
     isMember: true,
   })
   @Patch('/:recMedId')
-  async update(
-    @Param('recMedId') recMedId: string,
-    @User() userPayloadDto: UserPayloadDto,
-    @Body() updateRiskDto: UpdateRecMedDto,
-  ) {
-    return this.updateRecMedService.execute(
-      recMedId,
-      updateRiskDto,
-      userPayloadDto,
-    );
+  async update(@Param('recMedId') recMedId: string, @User() userPayloadDto: UserPayloadDto, @Body() updateRiskDto: UpdateRecMedDto) {
+    return this.updateRecMedService.execute(recMedId, updateRiskDto, userPayloadDto);
   }
 
   @Permissions({
@@ -53,10 +42,7 @@ export class RecMedController {
     isMember: true,
   })
   @Delete('/:recMedId')
-  async deleteSoft(
-    @Param('recMedId') recMedId: string,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
+  async deleteSoft(@Param('recMedId') recMedId: string, @User() userPayloadDto: UserPayloadDto) {
     return this.deleteSoftRecMedService.execute(recMedId, userPayloadDto);
   }
 }

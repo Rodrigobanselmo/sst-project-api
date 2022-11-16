@@ -1,17 +1,9 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  ForbiddenException,
-  Injectable,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
 import { PrismaService } from '../../prisma/prisma.service';
 import { PermissionEnum } from '../constants/enum/authorization';
-import {
-  IPermissionOptions,
-  PERMISSIONS_KEY,
-} from '../decorators/permissions.decorator';
+import { IPermissionOptions, PERMISSIONS_KEY } from '../decorators/permissions.decorator';
 import { UserPayloadDto } from '../dto/user-payload.dto';
 import { asyncSome } from '../utils/asyncSome.utils';
 import { getCompanyId } from '../utils/getCompanId';
@@ -34,11 +26,7 @@ const methodToCrud = (method: IMethods) => {
   }
 };
 
-const isParentCompany = async (
-  prisma: PrismaService,
-  requestCompanyId: string,
-  companyId: string,
-): Promise<boolean> => {
+const isParentCompany = async (prisma: PrismaService, requestCompanyId: string, companyId: string): Promise<boolean> => {
   const parentRelation = await prisma.contract.findUnique({
     where: {
       applyingServiceCompanyId_receivingServiceCompanyId: {
@@ -49,37 +37,22 @@ const isParentCompany = async (
   });
 
   if (!parentRelation) throw new ForbiddenException('Acesso negado');
-  if (parentRelation.status !== 'ACTIVE')
-    throw new ForbiddenException('Acesso negado');
+  if (parentRelation.status !== 'ACTIVE') throw new ForbiddenException('Acesso negado');
 
   return true;
 };
 
-const isMaster = (
-  user: UserPayloadDto,
-  options: IPermissionOptions,
-  CRUD: string,
-) => {
-  return checkPermissions(
-    user,
-    { ...options, code: PermissionEnum.MASTER },
-    CRUD,
-  );
+const isMaster = (user: UserPayloadDto, options: IPermissionOptions, CRUD: string) => {
+  return checkPermissions(user, { ...options, code: PermissionEnum.MASTER }, CRUD);
 };
 
-const checkPermissions = (
-  user: UserPayloadDto,
-  options: IPermissionOptions,
-  CRUD: string,
-) => {
+const checkPermissions = (user: UserPayloadDto, options: IPermissionOptions, CRUD: string) => {
   if (!options.code) return true;
   const crudString = typeof options.crud === 'string' ? options.crud : CRUD;
 
   return user.permissions.some((permission) => {
     const isEqualCode = permission.split('-')[0] === options.code;
-    const isEqualCrud = options.crud
-      ? Array.from(crudString).some((crud) => permission.includes(crud))
-      : true;
+    const isEqualCrud = options.crud ? Array.from(crudString).some((crud) => permission.includes(crud)) : true;
 
     return isEqualCode && isEqualCrud;
   });
@@ -90,9 +63,7 @@ export class PermissionsGuard implements CanActivate {
   constructor(private reflector: Reflector, private prisma: PrismaService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const requiredPermissionsOptions = this.reflector.getAllAndOverride<
-      IPermissionOptions[]
-    >(PERMISSIONS_KEY, [context.getHandler(), context.getClass()]);
+    const requiredPermissionsOptions = this.reflector.getAllAndOverride<IPermissionOptions[]>(PERMISSIONS_KEY, [context.getHandler(), context.getClass()]);
     if (!requiredPermissionsOptions) {
       return true;
     }
@@ -103,57 +74,50 @@ export class PermissionsGuard implements CanActivate {
     const CRUD = methodToCrud(method);
 
     if (user) {
-      const isValidPermission = await asyncSome(
-        requiredPermissionsOptions,
-        async (PermissionOption) => {
-          const { isContract, isMember } = PermissionOption;
-          const userCompanyId = user.companyId;
+      const isValidPermission = await asyncSome(requiredPermissionsOptions, async (PermissionOption) => {
+        const { isContract, isMember } = PermissionOption;
+        const userCompanyId = user.companyId;
 
-          if (isMaster(user, PermissionOption, CRUD)) return true;
+        if (isMaster(user, PermissionOption, CRUD)) return true;
 
-          const affectedCompanyId = getCompanyId(req);
+        const affectedCompanyId = getCompanyId(req);
 
-          //! missing companiesIds check
-          // const affectedCompanyIds = getCompanyIds(req);
+        //! missing companiesIds check
+        // const affectedCompanyIds = getCompanyIds(req);
 
-          // is being send an array of items with different companies Ids
-          if (affectedCompanyId === false) return false;
+        // is being send an array of items with different companies Ids
+        if (affectedCompanyId === false) return false;
 
-          //! add
-          // const isPermissionPresent = checkPermissions(
-          //   user,
-          //   PermissionOption,
-          //   CRUD,
-          // );
-          //! add
-          // if (!isPermissionPresent) return false;
+        //! add
+        // const isPermissionPresent = checkPermissions(
+        //   user,
+        //   PermissionOption,
+        //   CRUD,
+        // );
+        //! add
+        // if (!isPermissionPresent) return false;
 
-          //! remove
-          const isPermissionPresent = true;
+        //! remove
+        const isPermissionPresent = true;
 
-          if (!isMember && !isContract && isPermissionPresent) return true;
+        if (!isMember && !isContract && isPermissionPresent) return true;
 
-          if (isMember && isPermissionPresent) {
-            if (!affectedCompanyId) return true;
-            if (affectedCompanyId == userCompanyId) return true;
-          }
+        if (isMember && isPermissionPresent) {
+          if (!affectedCompanyId) return true;
+          if (affectedCompanyId == userCompanyId) return true;
+        }
 
-          if (isContract && isPermissionPresent) {
-            if (!affectedCompanyId) return false;
-            if (affectedCompanyId == userCompanyId) return false;
+        if (isContract && isPermissionPresent) {
+          if (!affectedCompanyId) return false;
+          if (affectedCompanyId == userCompanyId) return false;
 
-            const isCompanyContract = await isParentCompany(
-              this.prisma,
-              userCompanyId,
-              affectedCompanyId,
-            );
+          const isCompanyContract = await isParentCompany(this.prisma, userCompanyId, affectedCompanyId);
 
-            if (isCompanyContract) return true;
-          }
+          if (isCompanyContract) return true;
+        }
 
-          return false;
-        },
-      );
+        return false;
+      });
 
       if (!isValidPermission) throw new ForbiddenException('Acesso negado');
       return true;

@@ -3,10 +3,7 @@ import { Hierarchy, HierarchyEnum, StatusEnum } from '@prisma/client';
 import { EmployeeHierarchyHistoryEntity } from './employee-hierarchy-history.entity';
 
 import { EmployeeEntity } from './employee.entity';
-import {
-  HierarchyOnHomogeneousEntity,
-  HomoGroupEntity,
-} from './homoGroup.entity';
+import { HierarchyOnHomogeneousEntity, HomoGroupEntity } from './homoGroup.entity';
 import { WorkspaceEntity } from './workspace.entity';
 
 export class HierarchyEntity implements Hierarchy {

@@ -8,12 +8,8 @@ export interface IMasterReturn {
   targetCompanyId: string;
 }
 
-export const isMaster = (
-  user: UserPayloadDto | undefined,
-  companyId?: string | false,
-) => {
-  const includeMaster =
-    user && user.roles && user.roles.includes(RoleEnum.MASTER);
+export const isMaster = (user: UserPayloadDto | undefined, companyId?: string | false) => {
+  const includeMaster = user && user.roles && user.roles.includes(RoleEnum.MASTER);
   const sameCompany = companyId ? user.companyId === companyId : true;
 
   return {

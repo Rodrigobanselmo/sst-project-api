@@ -6,19 +6,12 @@ import { originRiskMap } from './../../../../../../../shared/constants/maps/orig
 import { getMatrizRisk } from './../../../../../../../shared/utils/matriz';
 import { RiskFactorGroupDataEntity } from '../../../../../../sst/entities/riskGroupData.entity';
 import { borderStyleGlobal } from './../../../../base/config/styles';
-import {
-  IRiskDataJson,
-  IRiskDataJsonNoise,
-  QuantityTypeEnum,
-} from './../../../../../../company/interfaces/risk-data-json.types';
+import { IRiskDataJson, IRiskDataJsonNoise, QuantityTypeEnum } from './../../../../../../company/interfaces/risk-data-json.types';
 import { IHierarchyMap } from './../../../../converter/hierarchy.converter';
 import { bodyTableProps } from './elements/body';
 import { QuantityNoiseColumnEnum } from './quantityNoise.constant';
 
-export const quantityNoiseConverter = (
-  riskGroupData: RiskFactorGroupDataEntity,
-  hierarchyTree: IHierarchyMap,
-) => {
+export const quantityNoiseConverter = (riskGroupData: RiskFactorGroupDataEntity, hierarchyTree: IHierarchyMap) => {
   const rows: bodyTableProps[][] = [];
 
   riskGroupData.data
@@ -43,35 +36,22 @@ export const quantityNoiseConverter = (
 
       let origin: string;
       if (riskData.homogeneousGroup.environment)
-        origin = `${riskData.homogeneousGroup.environment.name}\n(${
-          originRiskMap[riskData.homogeneousGroup.environment.type].name
-        })`;
+        origin = `${riskData.homogeneousGroup.environment.name}\n(${originRiskMap[riskData.homogeneousGroup.environment.type].name})`;
 
       if (riskData.homogeneousGroup.characterization)
-        origin = `${riskData.homogeneousGroup.characterization.name}\n(${
-          originRiskMap[riskData.homogeneousGroup.characterization.type].name
-        })`;
+        origin = `${riskData.homogeneousGroup.characterization.name}\n(${originRiskMap[riskData.homogeneousGroup.characterization.type].name})`;
 
-      if (!riskData.homogeneousGroup.type)
-        origin = `${riskData.homogeneousGroup.name}\n(GSE)`;
+      if (!riskData.homogeneousGroup.type) origin = `${riskData.homogeneousGroup.name}\n(GSE)`;
 
       if (riskData.homogeneousGroup.type == HomoTypeEnum.HIERARCHY) {
         const hierarchy = hierarchyTree[riskData.homogeneousGroup.id];
 
-        if (hierarchy)
-          origin = `${hierarchy.name}\n(${originRiskMap[hierarchy.type].name})`;
+        if (hierarchy) origin = `${hierarchy.name}\n(${originRiskMap[hierarchy.type].name})`;
       }
 
-      const value = riskGroupData.isQ5
-        ? String(
-            Math.max(Number(json?.ltcatq5 || 0), Number(json?.nr15q5 || 0)),
-          )
-        : json.ltcatq3;
+      const value = riskGroupData.isQ5 ? String(Math.max(Number(json?.ltcatq5 || 0), Number(json?.nr15q5 || 0))) : json.ltcatq3;
 
-      const ro = getMatrizRisk(
-        riskData.riskFactor.severity,
-        riskData.probability,
-      );
+      const ro = getMatrizRisk(riskData.riskFactor.severity, riskData.probability);
 
       cells[QuantityNoiseColumnEnum.ORIGIN] = {
         text: origin || '',

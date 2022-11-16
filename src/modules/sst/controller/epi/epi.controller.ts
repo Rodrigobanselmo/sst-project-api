@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
 
 import { CreateEpiDto, FindEpiDto, UpdateEpiDto } from '../../dto/epi.dto';
 import { CreateEpiService } from '../../services/epi/create-epi/create-epi.service';
@@ -14,10 +6,7 @@ import { FindByCAEpiService } from '../../services/epi/find-ca-epi /find-ca-epi.
 import { FindEpiService } from '../../services/epi/find-epi/find-epi.service';
 import { UpdateEpiService } from '../../services/epi/update-epi/update-epi.service';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
-import {
-  PermissionEnum,
-  RoleEnum,
-} from '../../../../shared/constants/enum/authorization';
+import { PermissionEnum, RoleEnum } from '../../../../shared/constants/enum/authorization';
 import { Roles } from '../../../../shared/decorators/roles.decorator';
 @Controller('epi')
 export class EpiController {
@@ -42,10 +31,7 @@ export class EpiController {
     crud: true,
   })
   @Patch('/:epiId')
-  async update(
-    @Param('epiId') epiId: number,
-    @Body() updateEpiDto: UpdateEpiDto,
-  ) {
+  async update(@Param('epiId') epiId: number, @Body() updateEpiDto: UpdateEpiDto) {
     return this.updateEpiService.execute(epiId, updateEpiDto);
   }
 

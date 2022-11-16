@@ -9,9 +9,7 @@ describe.skip('FindAllByGroupAndRisk', () => {
       providers: [FindAllByGroupAndRiskService],
     }).compile();
 
-    service = module.get<FindAllByGroupAndRiskService>(
-      FindAllByGroupAndRiskService,
-    );
+    service = module.get<FindAllByGroupAndRiskService>(FindAllByGroupAndRiskService);
   });
 
   it('should be defined', () => {

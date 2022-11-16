@@ -1,22 +1,10 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
 
 import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
-import {
-  CreateEmployeeDto,
-  FindEmployeeDto,
-  UpdateEmployeeDto,
-} from '../../dto/employee.dto';
+import { CreateEmployeeDto, FindEmployeeDto, UpdateEmployeeDto } from '../../dto/employee.dto';
 import { CreateEmployeeService } from '../../services/employee/create-employee/create-employee.service';
 import { DeleteSubOfficeEmployeeService } from '../../services/employee/delete-sub-office-employee/delete-sub-office-employee.service';
 import { FindAllAvailableEmployeesService } from '../../services/employee/find-all-available-employees/find-all-available-employees.service';
@@ -51,11 +39,7 @@ export class EmployeeController {
     crud: 'u',
   })
   @Post('/:employeeId/sub-office/:subOfficeId/:companyId')
-  deleteSubOffice(
-    @Param('employeeId') employeeId: number,
-    @Param('companyId') companyId: string,
-    @Param('subOfficeId') subOfficeId: string,
-  ) {
+  deleteSubOffice(@Param('employeeId') employeeId: number, @Param('companyId') companyId: string, @Param('subOfficeId') subOfficeId: string) {
     return this.deleteSubOfficeEmployeeService.execute({
       id: employeeId,
       subOfficeId,
@@ -80,10 +64,7 @@ export class EmployeeController {
     isMember: true,
   })
   @Get('/:companyId?')
-  FindAllAvailable(
-    @User() userPayloadDto: UserPayloadDto,
-    @Query() query: FindEmployeeDto,
-  ) {
+  FindAllAvailable(@User() userPayloadDto: UserPayloadDto, @Query() query: FindEmployeeDto) {
     return this.findAllAvailableEmployeesService.execute(query, userPayloadDto);
   }
 
@@ -93,10 +74,7 @@ export class EmployeeController {
     isMember: true,
   })
   @Get('/id/:employeeId/:companyId?')
-  findOne(
-    @User() userPayloadDto: UserPayloadDto,
-    @Param('employeeId') employeeId: number,
-  ) {
+  findOne(@User() userPayloadDto: UserPayloadDto, @Param('employeeId') employeeId: number) {
     return this.findEmployeeService.execute(employeeId, userPayloadDto);
   }
 }

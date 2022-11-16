@@ -8,16 +8,8 @@ import { FindCompaniesDto } from './../../../dto/create-company.dto';
 export class FindAllCompaniesService {
   constructor(private readonly companyRepository: CompanyRepository) {}
 
-  async execute(
-    user: UserPayloadDto,
-    { skip, take, ...query }: FindCompaniesDto,
-  ) {
-    if (!user.isMaster)
-      return await this.companyRepository.findAllRelatedByCompanyId(
-        user.companyId,
-        { ...query },
-        { skip, take },
-      );
+  async execute(user: UserPayloadDto, { skip, take, ...query }: FindCompaniesDto) {
+    if (!user.isMaster) return await this.companyRepository.findAllRelatedByCompanyId(user.companyId, { ...query }, { skip, take });
 
     return await this.companyRepository.findAll(query, { skip, take });
   }

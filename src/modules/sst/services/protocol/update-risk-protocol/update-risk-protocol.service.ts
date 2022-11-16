@@ -8,10 +8,7 @@ import { ProtocolRepository } from '../../../repositories/implementations/Protoc
 export class UpdateRiskProtocolsService {
   constructor(private readonly protocolRepository: ProtocolRepository) {}
 
-  async execute(
-    UpsertProtocolsDto: UpdateProtocolRiskDto,
-    user: UserPayloadDto,
-  ) {
+  async execute(UpsertProtocolsDto: UpdateProtocolRiskDto, user: UserPayloadDto) {
     const protocol = await this.protocolRepository.updateProtocolRisk({
       ...UpsertProtocolsDto,
       companyId: user.targetCompanyId,

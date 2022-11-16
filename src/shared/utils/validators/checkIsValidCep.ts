@@ -9,8 +9,7 @@ export const checkIsValidCep = (value: any) => {
   }
 
   if (typeof transformToString === 'string') {
-    if (isValidCEP(transformToString.padStart(8, '0')))
-      return onlyNumbers(transformToString.padStart(8, '0'));
+    if (isValidCEP(transformToString.padStart(8, '0'))) return onlyNumbers(transformToString.padStart(8, '0'));
   }
 
   return false;

@@ -8,13 +8,9 @@ export class FindEmployeeService {
   constructor(private readonly employeeRepository: EmployeeRepository) {}
 
   async execute(id: number, user: UserPayloadDto) {
-    const employee = await this.employeeRepository.findById(
-      id,
-      user.targetCompanyId,
-    );
+    const employee = await this.employeeRepository.findById(id, user.targetCompanyId);
 
-    if (!employee?.id)
-      throw new BadRequestException(ErrorCompanyEnum.EMPLOYEE_NOT_FOUND);
+    if (!employee?.id) throw new BadRequestException(ErrorCompanyEnum.EMPLOYEE_NOT_FOUND);
 
     return employee;
   }

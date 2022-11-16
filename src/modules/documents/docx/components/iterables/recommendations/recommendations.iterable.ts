@@ -1,19 +1,13 @@
 import { Paragraph, Table } from 'docx';
 
-import {
-  ISectionChildrenType,
-  PGRSectionChildrenTypeEnum,
-} from '../../../builders/pgr/types/elements.types';
+import { ISectionChildrenType, PGRSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
 import { RiskFactorDataEntity } from '../../../../../sst/entities/riskData.entity';
 import { recommendationsConverter } from './recommendations.converter';
 
 export const recommendationsIterable = (
   riskData: Partial<RiskFactorDataEntity>[],
-  convertToDocx: (
-    data: ISectionChildrenType[],
-    variables?: IDocVariables,
-  ) => (Paragraph | Table)[],
+  convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[],
 ) => {
   const recommendationsVarArray = recommendationsConverter(riskData);
 

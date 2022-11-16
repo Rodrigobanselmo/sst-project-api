@@ -1,9 +1,6 @@
 import { CharacterizationTypeEnum, HierarchyEnum } from '@prisma/client';
 
-export const originRiskMap: Record<
-  string,
-  { name: string; type: string; prioritization?: number }
-> = {
+export const originRiskMap: Record<string, { name: string; type: string; prioritization?: number }> = {
   [CharacterizationTypeEnum.GENERAL]: {
     name: 'Visão Geral',
     type: 'Ambiente',

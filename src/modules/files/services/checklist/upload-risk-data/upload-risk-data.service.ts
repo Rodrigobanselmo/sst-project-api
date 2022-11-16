@@ -31,11 +31,7 @@ export class UploadChecklistDataService {
     const companyId = userPayloadDto.targetCompanyId;
 
     // get risk table with actual version
-    const riskDatabaseTable =
-      await this.databaseTableRepository.findByNameAndCompany(
-        riskWorkbook.name,
-        companyId,
-      );
+    const riskDatabaseTable = await this.databaseTableRepository.findByNameAndCompany(riskWorkbook.name, companyId);
 
     const allRisks = await this.uploadExcelProvider.getAllData({
       buffer,
@@ -47,8 +43,7 @@ export class UploadChecklistDataService {
     await this.riskRepository.upsertMany(allRisks, system, companyId);
 
     return await this.uploadExcelProvider.newTableData({
-      findAll: (sheet) =>
-        findAllRisks(this.excelProvider, this.riskRepository, sheet, companyId),
+      findAll: (sheet) => findAllRisks(this.excelProvider, this.riskRepository, sheet, companyId),
       Workbook: riskWorkbook,
       system,
       companyId,
@@ -57,28 +52,15 @@ export class UploadChecklistDataService {
   }
 }
 
-const readRisks = async (
-  readFileData: IExcelReadData[],
-  excelProvider: ExcelProvider,
-  riskSheet: IRiskSheet,
-  databaseTable: DatabaseTableEntity,
-) => {
+const readRisks = async (readFileData: IExcelReadData[], excelProvider: ExcelProvider, riskSheet: IRiskSheet, databaseTable: DatabaseTableEntity) => {
   const risksTable = readFileData.find((data) => data.name === riskSheet.name);
 
-  if (!risksTable)
-    throw new BadRequestException(
-      'The table you trying to insert has a different sheet name',
-    );
+  if (!risksTable) throw new BadRequestException('The table you trying to insert has a different sheet name');
 
-  const riskDatabase = await excelProvider.transformToTableData(
-    risksTable,
-    riskSheet.columns,
-  );
+  const riskDatabase = await excelProvider.transformToTableData(risksTable, riskSheet.columns);
 
   if (databaseTable?.version && riskDatabase.version !== databaseTable.version)
-    throw new BadRequestException(
-      'The table you trying to insert has a different version, make sure you have the newest table version',
-    );
+    throw new BadRequestException('The table you trying to insert has a different version, make sure you have the newest table version');
 
   return riskDatabase.rows.map((risk) => ({ type: riskSheet.type, ...risk }));
 };

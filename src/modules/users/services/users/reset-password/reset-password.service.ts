@@ -17,8 +17,7 @@ export class ResetPasswordService {
   async execute({ tokenId, password }: ResetPasswordDto) {
     const refresh_token = await this.refreshTokensRepository.findById(tokenId);
 
-    if (!refresh_token?.id)
-      throw new BadRequestException(ErrorInvitesEnum.TOKEN_NOT_FOUND);
+    if (!refresh_token?.id) throw new BadRequestException(ErrorInvitesEnum.TOKEN_NOT_FOUND);
 
     const passHash = await this.hashProvider.createHash(password);
 

@@ -7,14 +7,8 @@ import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 export class FindAllAvailableEmployeesService {
   constructor(private readonly employeeRepository: EmployeeRepository) {}
 
-  async execute(
-    { skip, take, ...query }: FindEmployeeDto,
-    user: UserPayloadDto,
-  ) {
-    const employees = await this.employeeRepository.find(
-      { ...query, companyId: user.targetCompanyId },
-      { skip, take },
-    );
+  async execute({ skip, take, ...query }: FindEmployeeDto, user: UserPayloadDto) {
+    const employees = await this.employeeRepository.find({ ...query, companyId: user.targetCompanyId }, { skip, take });
 
     return employees;
   }

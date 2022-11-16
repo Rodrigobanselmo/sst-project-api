@@ -7,9 +7,7 @@ export class FindAllByCompanyIdService {
   constructor(private readonly inviteUsersRepository: InviteUsersRepository) {}
 
   async execute(companyId: string) {
-    const invite = await this.inviteUsersRepository.findAllByCompanyId(
-      companyId,
-    );
+    const invite = await this.inviteUsersRepository.findAllByCompanyId(companyId);
 
     return invite;
   }

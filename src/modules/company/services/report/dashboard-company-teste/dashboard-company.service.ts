@@ -73,10 +73,7 @@ export class DashboardCompanyService {
     });
 
     const getExpired = missingExam.map((employee) => {
-      const ids = [
-        ...employee.subOffices.map(({ id }) => id),
-        employee.hierarchyId,
-      ];
+      const ids = [...employee.subOffices.map(({ id }) => id), employee.hierarchyId];
 
       let expiredDate: Date;
       exams.data.find(({ exam, origins }) => {
@@ -84,22 +81,14 @@ export class DashboardCompanyService {
 
         origins.find((origin) => {
           const isPartOfHomo = origin?.homogeneousGroup
-            ? origin.homogeneousGroup?.hierarchyOnHomogeneous?.find(
-                (homoHier) => ids.includes(homoHier?.hierarchy?.id),
-              )
+            ? origin.homogeneousGroup?.hierarchyOnHomogeneous?.find((homoHier) => ids.includes(homoHier?.hierarchy?.id))
             : true;
           if (!isPartOfHomo) return;
 
-          const skip = this.findExamByHierarchyService.checkIfSkipEmployee(
-            origin,
-            employee,
-          );
+          const skip = this.findExamByHierarchyService.checkIfSkipEmployee(origin, employee);
           if (skip) return;
 
-          const expired = this.findExamByHierarchyService.checkExpiredDate(
-            origin,
-            employee,
-          );
+          const expired = this.findExamByHierarchyService.checkExpiredDate(origin, employee);
           if (!expired.expiredDate) return;
           expiredDate = expired.expiredDate;
           return true;
@@ -114,9 +103,7 @@ export class DashboardCompanyService {
     const missingExamExpired = getExpired.filter((e) => {
       if (!e.expiredDate) return true;
 
-      const lastExamValid = this.dayjs
-        .dayjs(e.expiredDate)
-        .isAfter(this.dayjs.dayjs());
+      const lastExamValid = this.dayjs.dayjs(e.expiredDate).isAfter(this.dayjs.dayjs());
 
       if (!lastExamValid) return true;
       return false;

@@ -1,9 +1,6 @@
 import { VariablesPGREnum } from '../enums/variables.enum';
 import { PGRSectionChildrenTypeEnum } from '../types/elements.types';
-import {
-  IDocumentPGRSectionGroup,
-  PGRSectionTypeEnum,
-} from '../types/section.types';
+import { IDocumentPGRSectionGroup, PGRSectionTypeEnum } from '../types/section.types';
 
 export const quantityQuiSection: IDocumentPGRSectionGroup = {
   footer: true,

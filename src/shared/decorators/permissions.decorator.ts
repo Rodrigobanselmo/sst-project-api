@@ -9,5 +9,4 @@ export interface IPermissionOptions {
 }
 
 export const PERMISSIONS_KEY = 'Permissions';
-export const Permissions = (...permissions: IPermissionOptions[]) =>
-  SetMetadata(PERMISSIONS_KEY, permissions);
+export const Permissions = (...permissions: IPermissionOptions[]) => SetMetadata(PERMISSIONS_KEY, permissions);

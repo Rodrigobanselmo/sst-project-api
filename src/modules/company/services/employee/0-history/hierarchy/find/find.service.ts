@@ -6,18 +6,10 @@ import { EmployeeHierarchyHistoryRepository } from './../../../../../repositorie
 
 @Injectable()
 export class FindEmployeeHierarchyHistoryService {
-  constructor(
-    private readonly employeeHierarchyHistoryRepository: EmployeeHierarchyHistoryRepository,
-  ) {}
+  constructor(private readonly employeeHierarchyHistoryRepository: EmployeeHierarchyHistoryRepository) {}
 
-  async execute(
-    { skip, take, ...query }: FindEmployeeHierarchyHistoryDto,
-    user: UserPayloadDto,
-  ) {
-    const access = await this.employeeHierarchyHistoryRepository.find(
-      { companyId: user.targetCompanyId, ...query },
-      { skip, take },
-    );
+  async execute({ skip, take, ...query }: FindEmployeeHierarchyHistoryDto, user: UserPayloadDto) {
+    const access = await this.employeeHierarchyHistoryRepository.find({ companyId: user.targetCompanyId, ...query }, { skip, take });
 
     return access;
   }

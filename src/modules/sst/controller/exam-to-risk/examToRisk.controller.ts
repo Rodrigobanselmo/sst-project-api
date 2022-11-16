@@ -1,24 +1,10 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Post,
-  Query,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 
 import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
-import {
-  CopyExamsRiskDto,
-  CreateExamsRiskDto,
-  FindExamRiskDto,
-  UpdateExamRiskDto,
-} from '../../dto/exam-risk.dto';
+import { CopyExamsRiskDto, CreateExamsRiskDto, FindExamRiskDto, UpdateExamRiskDto } from '../../dto/exam-risk.dto';
 import { CopyExamRiskService } from '../../services/examToRisk/copy-exam/copy-exam.service';
 import { CreateExamRiskService } from '../../services/examToRisk/create-exam/create-exam.service';
 import { FindExamRiskService } from '../../services/examToRisk/find-exam/find-exam.service';
@@ -40,10 +26,7 @@ export class ExamRiskController {
     isContract: true,
   })
   @Post()
-  create(
-    @User() userPayloadDto: UserPayloadDto,
-    @Body() createExamDto: CreateExamsRiskDto,
-  ) {
+  create(@User() userPayloadDto: UserPayloadDto, @Body() createExamDto: CreateExamsRiskDto) {
     return this.createExamService.execute(createExamDto, userPayloadDto);
   }
 
@@ -54,10 +37,7 @@ export class ExamRiskController {
     isContract: true,
   })
   @Post('copy')
-  copy(
-    @User() userPayloadDto: UserPayloadDto,
-    @Body() createExamDto: CopyExamsRiskDto,
-  ) {
+  copy(@User() userPayloadDto: UserPayloadDto, @Body() createExamDto: CopyExamsRiskDto) {
     return this.copyExamRiskService.execute(createExamDto, userPayloadDto);
   }
 
@@ -68,11 +48,7 @@ export class ExamRiskController {
     isContract: true,
   })
   @Patch('/:id/:companyId')
-  async update(
-    @Param('id', ParseIntPipe) id: number,
-    @User() userPayloadDto: UserPayloadDto,
-    @Body() updateRiskDto: UpdateExamRiskDto,
-  ) {
+  async update(@Param('id', ParseIntPipe) id: number, @User() userPayloadDto: UserPayloadDto, @Body() updateRiskDto: UpdateExamRiskDto) {
     return this.updateExamService.execute(id, updateRiskDto, userPayloadDto);
   }
 
@@ -82,10 +58,7 @@ export class ExamRiskController {
     isContract: true,
   })
   @Get('/:companyId?')
-  findAllAvailable(
-    @User() userPayloadDto: UserPayloadDto,
-    @Query() query: FindExamRiskDto,
-  ) {
+  findAllAvailable(@User() userPayloadDto: UserPayloadDto, @Query() query: FindExamRiskDto) {
     return this.findExamService.execute(query, userPayloadDto);
   }
 }

@@ -28,9 +28,7 @@ describe('SessionService', () => {
           provide: JwtTokenProvider,
           useValue: {
             generateToken: jest.fn().mockReturnValue('token'),
-            generateRefreshToken: jest
-              .fn()
-              .mockReturnValue(['refresh_token', new Date()]),
+            generateRefreshToken: jest.fn().mockReturnValue(['refresh_token', new Date()]),
           } as Partial<JwtTokenProvider>,
         },
         {
@@ -75,17 +73,13 @@ describe('SessionService', () => {
   });
 
   it('should throw error if user does not exist', async () => {
-    jest
-      .spyOn(usersRepository, 'findByEmail')
-      .mockImplementation(() => false as any);
+    jest.spyOn(usersRepository, 'findByEmail').mockImplementation(() => false as any);
 
     try {
       await service.execute({} as any);
       throw new Error('error');
     } catch (err) {
-      expect(err).toEqual(
-        new BadRequestException(ErrorMessageEnum.WRONG_EMAIL_PASS),
-      );
+      expect(err).toEqual(new BadRequestException(ErrorMessageEnum.WRONG_EMAIL_PASS));
     }
   });
 
@@ -96,9 +90,7 @@ describe('SessionService', () => {
       await service.execute({} as any);
       throw new Error('error');
     } catch (err) {
-      expect(err).toEqual(
-        new BadRequestException(ErrorMessageEnum.WRONG_EMAIL_PASS),
-      );
+      expect(err).toEqual(new BadRequestException(ErrorMessageEnum.WRONG_EMAIL_PASS));
     }
   });
 });

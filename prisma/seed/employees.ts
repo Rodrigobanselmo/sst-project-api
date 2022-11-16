@@ -1,10 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 
-export const seedEmployees = async (
-  prisma: PrismaClient,
-  companyId: string,
-  workId: string,
-) => {
+export const seedEmployees = async (prisma: PrismaClient, companyId: string, workId: string) => {
   await prisma.hierarchy.createMany({
     data: [
       {

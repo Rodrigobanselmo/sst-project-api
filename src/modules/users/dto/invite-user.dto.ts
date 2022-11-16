@@ -1,12 +1,4 @@
-import {
-  IsBoolean,
-  IsEmail,
-  IsEnum,
-  IsInt,
-  IsOptional,
-  IsString,
-  ValidateIf,
-} from 'class-validator';
+import { IsBoolean, IsEmail, IsEnum, IsInt, IsOptional, IsString, ValidateIf } from 'class-validator';
 import { RoleEnum } from '../../../shared/constants/enum/authorization';
 import { QueryArray } from './../../../shared/transformers/query-array';
 import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';

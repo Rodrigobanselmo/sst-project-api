@@ -1,6 +1,4 @@
-const getBodyCompanyId = (
-  company?: { companyId?: string } | { companyId?: string }[],
-) => {
+const getBodyCompanyId = (company?: { companyId?: string } | { companyId?: string }[]) => {
   if (!company) return;
 
   if (!Array.isArray(company) && typeof company === 'object') {

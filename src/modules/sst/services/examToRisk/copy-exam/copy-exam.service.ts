@@ -19,9 +19,7 @@ export class CopyExamRiskService {
     });
 
     const copyData = FromExamFactor.map((exam) => {
-      const found = ActualExamFactor.find(
-        (aExam) => aExam.examId === exam.examId && aExam.riskId === exam.riskId,
-      );
+      const found = ActualExamFactor.find((aExam) => aExam.examId === exam.examId && aExam.riskId === exam.riskId);
 
       if (found) return null;
 

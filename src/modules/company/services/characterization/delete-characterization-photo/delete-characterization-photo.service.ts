@@ -22,9 +22,7 @@ export class DeleteCharacterizationPhotoService {
 
     const deletedPhoto = await this.characterizationPhotoRepository.delete(id);
 
-    const characterizationData = await this.characterizationRepository.findById(
-      deletedPhoto.companyCharacterizationId,
-    );
+    const characterizationData = await this.characterizationRepository.findById(deletedPhoto.companyCharacterizationId);
 
     return characterizationData;
   }

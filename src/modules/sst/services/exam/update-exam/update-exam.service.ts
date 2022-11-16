@@ -8,11 +8,7 @@ import { ExamRepository } from '../../../repositories/implementations/ExamReposi
 export class UpdateExamService {
   constructor(private readonly examRepository: ExamRepository) {}
 
-  async execute(
-    id: number,
-    updateExamDto: UpdateExamDto,
-    user: UserPayloadDto,
-  ) {
+  async execute(id: number, updateExamDto: UpdateExamDto, user: UserPayloadDto) {
     const exam = await this.examRepository.update({
       id,
       companyId: user.targetCompanyId,

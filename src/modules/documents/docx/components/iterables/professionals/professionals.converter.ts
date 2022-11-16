@@ -8,17 +8,12 @@ import { ProfessionalEntity } from '../../../../../users/entities/professional.e
 
 export const getCredential = (row: ProfessionalEntity) => {
   if (row && 'councilId' in row) {
-    return `${row?.councilType ? row.councilType + ': ' : ''}${row.councilId}${
-      row?.councilUF ? ' - ' + row.councilUF : ''
-    }`;
+    return `${row?.councilType ? row.councilType + ': ' : ''}${row.councilId}${row?.councilUF ? ' - ' + row.councilUF : ''}`;
   }
   return '';
 };
 
-export const ProfessionalsConverter = (
-  professionalEntity: (ProfessionalEntity | UserEntity)[],
-  workspace: WorkspaceEntity,
-): IDocVariables[] => {
+export const ProfessionalsConverter = (professionalEntity: (ProfessionalEntity | UserEntity)[], workspace: WorkspaceEntity): IDocVariables[] => {
   return professionalEntity
     .filter((professional) =>
       'professionalPgrSignature' in professional
@@ -38,11 +33,9 @@ export const ProfessionalsConverter = (
       const crea = getCredential(professional as ProfessionalEntity);
 
       return {
-        [VariablesPGREnum.PROFESSIONAL_CERTIFICATIONS]:
-          professional.certifications.join(' -- ') || '',
+        [VariablesPGREnum.PROFESSIONAL_CERTIFICATIONS]: professional.certifications.join(' -- ') || '',
         [VariablesPGREnum.PROFESSIONAL_CREA]: crea || '',
-        [VariablesPGREnum.PROFESSIONAL_FORMATION]:
-          professional.formation.join('/') || '',
+        [VariablesPGREnum.PROFESSIONAL_FORMATION]: professional.formation.join('/') || '',
         [VariablesPGREnum.PROFESSIONAL_NAME]: professional.name || '',
         [VariablesPGREnum.PROFESSIONAL_CPF]: professional.cpf || '',
       };

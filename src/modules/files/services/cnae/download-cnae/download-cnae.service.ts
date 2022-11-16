@@ -21,8 +21,7 @@ export class DownloadCnaeService {
     const companyId = userPayloadDto.targetCompanyId;
 
     return this.downloadExcelProvider.newTableData({
-      findAll: (sheet) =>
-        findAllCnaes(this.excelProvider, this.activityRepository, sheet),
+      findAll: (sheet) => findAllCnaes(this.excelProvider, this.activityRepository, sheet),
       Workbook,
       companyId,
     });

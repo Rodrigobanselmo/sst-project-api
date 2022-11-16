@@ -5,11 +5,7 @@ import { CompanyRepository } from './../../../../company/repositories/implementa
 import { UsersCompanyRepository } from './../../../repositories/implementations/UsersCompanyRepository';
 import { UserPayloadDto } from './../../../../../shared/dto/user-payload.dto';
 import { AuthGroupRepository } from './../../../../auth/repositories/implementations/AuthGroupRepository';
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-} from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
 import { resolve } from 'path';
 
 import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
@@ -36,13 +32,9 @@ export class InviteUsersService {
     const userRoles = userPayloadDto.roles || [];
     const userPermissions = userPayloadDto.permissions || [];
 
-    const userToAdd = await this.usersRepository.findByEmail(
-      inviteUserDto.email,
-    );
+    const userToAdd = await this.usersRepository.findByEmail(inviteUserDto.email);
 
-    const company = await this.companyRepository.findById(
-      inviteUserDto.companyId,
-    );
+    const company = await this.companyRepository.findById(inviteUserDto.companyId);
 
     const isConsulting = company.isConsulting;
 
@@ -52,13 +44,9 @@ export class InviteUsersService {
     const addPermissions: string[] = [...(inviteUserDto.permissions || [])];
 
     if (inviteUserDto.groupId) {
-      const authGroup = await this.authGroupRepository.findById(
-        inviteUserDto.groupId,
-        userPayloadDto.companyId,
-      );
+      const authGroup = await this.authGroupRepository.findById(inviteUserDto.groupId, userPayloadDto.companyId);
 
-      if (!authGroup?.id)
-        throw new BadRequestException(ErrorInvitesEnum.AUTH_GROUP_NOT_FOUND);
+      if (!authGroup?.id) throw new BadRequestException(ErrorInvitesEnum.AUTH_GROUP_NOT_FOUND);
 
       addPermissions.push(...authGroup.permissions);
       addRoles.push(...authGroup.roles);
@@ -70,30 +58,19 @@ export class InviteUsersService {
         userPermissions.some(
           (userPermission) =>
             userPermission.split('-')[0] === addPermission.split('-')[0] &&
-            Array.from(addPermission.split('-')[1] || '').every((crud) =>
-              (userPermission.split('-')[1] || '').includes(crud),
-            ),
+            Array.from(addPermission.split('-')[1] || '').every((crud) => (userPermission.split('-')[1] || '').includes(crud)),
         ),
       );
 
-      if (!hasAllRoles || !hasAllPermissions)
-        throw new ForbiddenException(
-          ErrorInvitesEnum.FORBIDDEN_INSUFFICIENT_PERMISSIONS,
-        );
+      if (!hasAllRoles || !hasAllPermissions) throw new ForbiddenException(ErrorInvitesEnum.FORBIDDEN_INSUFFICIENT_PERMISSIONS);
     }
 
     if (userToAdd) {
-      let userAlreadyAdded = userToAdd.companies.some(
-        (company) => company.companyId === inviteUserDto.companyId,
-      );
+      let userAlreadyAdded = userToAdd.companies.some((company) => company.companyId === inviteUserDto.companyId);
 
-      if (isConsulting)
-        userAlreadyAdded = userToAdd.companies.some((company) =>
-          inviteUserDto.companiesIds.includes(company.companyId),
-        );
+      if (isConsulting) userAlreadyAdded = userToAdd.companies.some((company) => inviteUserDto.companiesIds.includes(company.companyId));
 
-      if (userAlreadyAdded)
-        throw new BadRequestException(ErrorInvitesEnum.USER_ALREADY_EXIST);
+      if (userAlreadyAdded) throw new BadRequestException(ErrorInvitesEnum.USER_ALREADY_EXIST);
     }
 
     let companies = {} as {
@@ -110,18 +87,11 @@ export class InviteUsersService {
       );
 
     if (userRoles.includes(RoleEnum.MASTER))
-      companies = await this.companyRepository.findAll(
-        { companiesIds: inviteUserDto?.companiesIds || [] },
-        { skip: 0, take: 100 },
-        { select: { id: true } },
-      );
+      companies = await this.companyRepository.findAll({ companiesIds: inviteUserDto?.companiesIds || [] }, { skip: 0, take: 100 }, { select: { id: true } });
 
     const expires_date = this.dateProvider.addDay(new Date(), 7);
 
-    await this.inviteUsersRepository.deleteByCompanyIdAndEmail(
-      inviteUserDto.companyId,
-      inviteUserDto.email,
-    );
+    await this.inviteUsersRepository.deleteByCompanyIdAndEmail(inviteUserDto.companyId, inviteUserDto.email);
 
     const invite = await this.inviteUsersRepository.create(
       {
@@ -138,22 +108,8 @@ export class InviteUsersService {
   }
 }
 
-export const inviteNewUser = async (
-  mailProvider: SendGridProvider,
-  invite: InviteUsersEntity,
-) => {
-  const templatePath = resolve(
-    __dirname,
-    '..',
-    '..',
-    '..',
-    '..',
-    '..',
-    '..',
-    'templates',
-    'email',
-    'inviteUser.hbs',
-  );
+export const inviteNewUser = async (mailProvider: SendGridProvider, invite: InviteUsersEntity) => {
+  const templatePath = resolve(__dirname, '..', '..', '..', '..', '..', '..', 'templates', 'email', 'inviteUser.hbs');
 
   // Todo: add company name
   const variables = {

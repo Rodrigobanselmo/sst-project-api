@@ -34,9 +34,7 @@ describe('ResetPasswordService', () => {
       ],
     }).compile();
 
-    refreshTokensRepository = module.get<RefreshTokensRepository>(
-      RefreshTokensRepository,
-    );
+    refreshTokensRepository = module.get<RefreshTokensRepository>(RefreshTokensRepository);
     service = module.get<ResetPasswordService>(ResetPasswordService);
   });
 
@@ -52,9 +50,7 @@ describe('ResetPasswordService', () => {
     expect(user).toEqual({});
   });
   it('should return error if token not found', async () => {
-    jest
-      .spyOn(refreshTokensRepository, 'findById')
-      .mockImplementation(() => null as any);
+    jest.spyOn(refreshTokensRepository, 'findById').mockImplementation(() => null as any);
 
     try {
       await service.execute({} as any);

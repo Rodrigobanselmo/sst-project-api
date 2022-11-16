@@ -4,10 +4,7 @@ import { RiskFactorGroupDataEntity } from '../../../../../../sst/entities/riskGr
 import { IHierarchyMap } from '../../../../converter/hierarchy.converter';
 import { quantityHeatTable } from './quantityHeat.table';
 
-export const quantityHeatTableSection = (
-  riskGroupData: RiskFactorGroupDataEntity,
-  hierarchyTree: IHierarchyMap,
-) => {
+export const quantityHeatTableSection = (riskGroupData: RiskFactorGroupDataEntity, hierarchyTree: IHierarchyMap) => {
   const table = quantityHeatTable(riskGroupData, hierarchyTree);
 
   const section = {

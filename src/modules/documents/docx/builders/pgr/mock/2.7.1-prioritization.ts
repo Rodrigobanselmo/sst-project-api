@@ -1,10 +1,7 @@
 import { sectionLandscapeProperties } from '../../../base/config/styles';
 import { VariablesPGREnum } from '../enums/variables.enum';
 import { PGRSectionChildrenTypeEnum } from '../types/elements.types';
-import {
-  IDocumentPGRSectionGroup,
-  PGRSectionTypeEnum,
-} from '../types/section.types';
+import { IDocumentPGRSectionGroup, PGRSectionTypeEnum } from '../types/section.types';
 
 export const prioritization2Section: IDocumentPGRSectionGroup = {
   footer: true,
@@ -44,9 +41,7 @@ export const prioritization2Section: IDocumentPGRSectionGroup = {
       properties: sectionLandscapeProperties,
       type: PGRSectionTypeEnum.SECTION,
       footerText: `??${VariablesPGREnum.CHAPTER_3}??`,
-      removeWithAllEmptyVars: [
-        VariablesPGREnum.COMPANY_HAS_CHARACTERIZATION_RISK,
-      ],
+      removeWithAllEmptyVars: [VariablesPGREnum.COMPANY_HAS_CHARACTERIZATION_RISK],
       children: [
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE,

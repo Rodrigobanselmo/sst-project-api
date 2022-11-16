@@ -5,12 +5,7 @@ import { Injectable } from '@nestjs/common';
 import { HierarchyEnum, Prisma } from '@prisma/client';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
-import {
-  CreateHierarchyDto,
-  FindHierarchyDto,
-  UpdateHierarchyDto,
-  UpdateSimpleManyHierarchyDto,
-} from '../../dto/hierarchy';
+import { CreateHierarchyDto, FindHierarchyDto, UpdateHierarchyDto, UpdateSimpleManyHierarchyDto } from '../../dto/hierarchy';
 import { HierarchyEntity } from '../../entities/hierarchy.entity';
 import { isEnvironment } from './CharacterizationRepository';
 
@@ -73,12 +68,11 @@ export class HierarchyRepository {
     // const data = await this.prisma.homogeneousGroup.upsert({create:{companyId, name: }});
 
     const hierarchyOnHomogeneous = {};
-    const foundHomogeneousGroups =
-      await this.prisma.hierarchyOnHomogeneous.findMany({
-        where: {
-          hierarchyId: { in: upsertHierarchyMany.map((h) => h.id) },
-        },
-      });
+    const foundHomogeneousGroups = await this.prisma.hierarchyOnHomogeneous.findMany({
+      where: {
+        hierarchyId: { in: upsertHierarchyMany.map((h) => h.id) },
+      },
+    });
 
     foundHomogeneousGroups.forEach((hg) => {
       const max = foundHomogeneousGroups.reduce((a, b) => {
@@ -93,94 +87,78 @@ export class HierarchyRepository {
     });
 
     const data = await this.prisma.$transaction(
-      upsertHierarchyMany.map(
-        ({
-          companyId: _,
-          id,
-          workspaceIds,
-          parentId,
-          children,
-          ghoName,
-          employeesIds,
-          name,
-          ...upsertHierarchy
-        }) => {
-          const isSubOffice = upsertHierarchy?.type == HierarchyEnum.SUB_OFFICE;
-          const HierarchyOnHomo = !workspaceIds
-            ? []
-            : workspaceIds
-                .map((workspaceId) => ({
-                  hierarchyId: id,
-                  homogeneousGroupId: homogeneousGroup.find(
-                    (homogeneous) => homogeneous.name === ghoName,
-                  )?.id,
-                  workspaceId,
-                  endDate: null,
-                }))
-                .filter(
-                  (hierarchyOnHomo) => hierarchyOnHomo.homogeneousGroupId,
-                );
+      upsertHierarchyMany.map(({ companyId: _, id, workspaceIds, parentId, children, ghoName, employeesIds, name, ...upsertHierarchy }) => {
+        const isSubOffice = upsertHierarchy?.type == HierarchyEnum.SUB_OFFICE;
+        const HierarchyOnHomo = !workspaceIds
+          ? []
+          : workspaceIds
+              .map((workspaceId) => ({
+                hierarchyId: id,
+                homogeneousGroupId: homogeneousGroup.find((homogeneous) => homogeneous.name === ghoName)?.id,
+                workspaceId,
+                endDate: null,
+              }))
+              .filter((hierarchyOnHomo) => hierarchyOnHomo.homogeneousGroupId);
 
-          HierarchyOnHomoGroup.push(...HierarchyOnHomo);
+        HierarchyOnHomoGroup.push(...HierarchyOnHomo);
 
-          return this.prisma.hierarchy.upsert({
-            create: {
-              ...upsertHierarchy,
-              name: name.split('//')[0],
-              id,
-              company: { connect: { id: companyId } },
-              [isSubOffice ? 'subOfficeEmployees' : 'employees']:
-                employeesIds && employeesIds.length
-                  ? {
-                      connect: employeesIds.map((id) => ({
-                        id_companyId: { companyId, id },
-                      })),
-                    }
-                  : undefined,
-              workspaces: workspaceIds
+        return this.prisma.hierarchy.upsert({
+          create: {
+            ...upsertHierarchy,
+            name: name.split('//')[0],
+            id,
+            company: { connect: { id: companyId } },
+            [isSubOffice ? 'subOfficeEmployees' : 'employees']:
+              employeesIds && employeesIds.length
                 ? {
-                    connect: workspaceIds.map((id) => ({
+                    connect: employeesIds.map((id) => ({
                       id_companyId: { companyId, id },
                     })),
                   }
                 : undefined,
-              parent: parentId
+            workspaces: workspaceIds
+              ? {
+                  connect: workspaceIds.map((id) => ({
+                    id_companyId: { companyId, id },
+                  })),
+                }
+              : undefined,
+            parent: parentId
+              ? {
+                  connect: { id: parentId },
+                }
+              : undefined,
+          },
+          update: {
+            ...upsertHierarchy,
+            name: name.split('//')[0],
+            workspaces: !workspaceIds
+              ? undefined
+              : {
+                  set: workspaceIds.map((id) => ({
+                    id_companyId: { companyId, id },
+                  })),
+                },
+            [isSubOffice ? 'subOfficeEmployees' : 'employees']:
+              employeesIds && employeesIds.length
                 ? {
-                    connect: { id: parentId },
-                  }
-                : undefined,
-            },
-            update: {
-              ...upsertHierarchy,
-              name: name.split('//')[0],
-              workspaces: !workspaceIds
-                ? undefined
-                : {
-                    set: workspaceIds.map((id) => ({
+                    connect: employeesIds.map((id) => ({
                       id_companyId: { companyId, id },
                     })),
-                  },
-              [isSubOffice ? 'subOfficeEmployees' : 'employees']:
-                employeesIds && employeesIds.length
-                  ? {
-                      connect: employeesIds.map((id) => ({
-                        id_companyId: { companyId, id },
-                      })),
-                    }
-                  : undefined,
-              parent: !parentId
-                ? parentId === null
-                  ? { disconnect: true }
-                  : undefined
-                : {
-                    connect: { id: parentId },
-                  },
-            },
-            where: { id: id || 'none' },
-            include: { workspaces: true },
-          });
-        },
-      ),
+                  }
+                : undefined,
+            parent: !parentId
+              ? parentId === null
+                ? { disconnect: true }
+                : undefined
+              : {
+                  connect: { id: parentId },
+                },
+          },
+          where: { id: id || 'none' },
+          include: { workspaces: true },
+        });
+      }),
     );
 
     await this.prisma.$transaction(
@@ -192,8 +170,7 @@ export class HierarchyRepository {
           },
           update: { endDate: null },
           where: {
-            id:
-              hierarchyOnHomogeneous[hierarchyOnHomoGroup.hierarchyId]?.id || 0,
+            id: hierarchyOnHomogeneous[hierarchyOnHomoGroup.hierarchyId]?.id || 0,
           },
         });
       }),
@@ -225,16 +202,7 @@ export class HierarchyRepository {
   }
 
   async update(
-    {
-      companyId: _,
-      workspaceIds,
-      parentId,
-      id,
-      children,
-      name,
-      employeesIds,
-      ...updateHierarchy
-    }: UpdateHierarchyDto,
+    { companyId: _, workspaceIds, parentId, id, children, name, employeesIds, ...updateHierarchy }: UpdateHierarchyDto,
     companyId: string,
   ): Promise<HierarchyEntity> {
     const isSubOffice = updateHierarchy?.type == HierarchyEnum.SUB_OFFICE;
@@ -273,16 +241,7 @@ export class HierarchyRepository {
   }
 
   async upsert(
-    {
-      companyId: _,
-      id,
-      workspaceIds,
-      parentId,
-      children,
-      name,
-      employeesIds,
-      ...upsertHierarchy
-    }: CreateHierarchyDto & { id?: string },
+    { companyId: _, id, workspaceIds, parentId, children, name, employeesIds, ...upsertHierarchy }: CreateHierarchyDto & { id?: string },
     companyId: string,
   ): Promise<HierarchyEntity> {
     const isSubOffice = upsertHierarchy?.type == HierarchyEnum.SUB_OFFICE;
@@ -438,9 +397,7 @@ export class HierarchyRepository {
 
     return hierarchies.map((hierarchy) => {
       if ((hierarchy as any)?.workspaces) {
-        (hierarchy as any).workspaceIds = (hierarchy as any)?.workspaces.map(
-          (workspace) => workspace.id,
-        );
+        (hierarchy as any).workspaceIds = (hierarchy as any)?.workspaces.map((workspace) => workspace.id);
 
         if (!returnWorkspace) delete (hierarchy as any).workspaces;
       }
@@ -448,21 +405,13 @@ export class HierarchyRepository {
       if ('hierarchyOnHomogeneous' in hierarchy) {
         const homogeneousGroup = { ...hierarchy } as HierarchyEntity;
         if ((hierarchy as any).hierarchyOnHomogeneous)
-          homogeneousGroup.homogeneousGroups = (
-            hierarchy as any
-          ).hierarchyOnHomogeneous.map((homo) => ({
+          homogeneousGroup.homogeneousGroups = (hierarchy as any).hierarchyOnHomogeneous.map((homo) => ({
             ...homo.homogeneousGroup,
             workspaceId: homo.workspaceId,
             environment:
-              homo.homogeneousGroup?.characterization &&
-              isEnvironment(homo.homogeneousGroup.characterization.type)
-                ? homo.homogeneousGroup.characterization
-                : undefined,
+              homo.homogeneousGroup?.characterization && isEnvironment(homo.homogeneousGroup.characterization.type) ? homo.homogeneousGroup.characterization : undefined,
             characterization:
-              homo.homogeneousGroup?.characterization &&
-              !isEnvironment(homo.homogeneousGroup.characterization.type)
-                ? homo.homogeneousGroup.characterization
-                : undefined,
+              homo.homogeneousGroup?.characterization && !isEnvironment(homo.homogeneousGroup.characterization.type) ? homo.homogeneousGroup.characterization : undefined,
           }));
         return new HierarchyEntity(homogeneousGroup);
       }
@@ -506,22 +455,14 @@ export class HierarchyRepository {
       const hierarchyCopy = { ...hierarchy } as HierarchyEntity;
 
       if (hierarchy.hierarchyOnHomogeneous)
-        hierarchyCopy.homogeneousGroups = hierarchy.hierarchyOnHomogeneous.map(
-          (homo) => ({
-            ...homo.homogeneousGroup,
-            workspaceId: homo.workspaceId,
-            characterization:
-              homo.homogeneousGroup?.characterization &&
-              !isEnvironment(homo.homogeneousGroup.characterization.type)
-                ? homo.homogeneousGroup.characterization
-                : undefined,
-            environment:
-              homo.homogeneousGroup?.characterization &&
-              isEnvironment(homo.homogeneousGroup.characterization.type)
-                ? homo.homogeneousGroup.characterization
-                : undefined,
-          }),
-        );
+        hierarchyCopy.homogeneousGroups = hierarchy.hierarchyOnHomogeneous.map((homo) => ({
+          ...homo.homogeneousGroup,
+          workspaceId: homo.workspaceId,
+          characterization:
+            homo.homogeneousGroup?.characterization && !isEnvironment(homo.homogeneousGroup.characterization.type) ? homo.homogeneousGroup.characterization : undefined,
+          environment:
+            homo.homogeneousGroup?.characterization && isEnvironment(homo.homogeneousGroup.characterization.type) ? homo.homogeneousGroup.characterization : undefined,
+        }));
       return new HierarchyEntity(hierarchyCopy);
     });
   }
@@ -657,11 +598,7 @@ export class HierarchyRepository {
     return new HierarchyEntity(hierarchies);
   }
 
-  async find(
-    query: Partial<FindHierarchyDto>,
-    pagination: PaginationQueryDto,
-    options: Prisma.HierarchyFindManyArgs = {},
-  ) {
+  async find(query: Partial<FindHierarchyDto>, pagination: PaginationQueryDto, options: Prisma.HierarchyFindManyArgs = {}) {
     const whereInit = {
       AND: [],
       ...options.where,

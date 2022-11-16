@@ -23,40 +23,21 @@ export class PgrActionPlanUploadTableService {
     private readonly amazonStorageProvider: AmazonStorageProvider,
     private readonly hierarchyRepository: HierarchyRepository,
   ) {}
-  async execute(
-    upsertPgrDto: UploadPgrActionPlanDto,
-    userPayloadDto: UserPayloadDto,
-  ) {
+  async execute(upsertPgrDto: UploadPgrActionPlanDto, userPayloadDto: UserPayloadDto) {
     const companyId = userPayloadDto.targetCompanyId;
     const workspaceId = upsertPgrDto.workspaceId;
 
-    const riskGroupData = await this.riskGroupDataRepository.findAllDataById(
-      upsertPgrDto.riskGroupId,
-      workspaceId,
-      companyId,
-    );
+    const riskGroupData = await this.riskGroupDataRepository.findAllDataById(upsertPgrDto.riskGroupId, workspaceId, companyId);
 
-    const version =
-      (
-        await this.riskDocumentRepository.findByRiskGroupAndCompany(
-          upsertPgrDto.riskGroupId,
-          companyId,
-        )
-      ).sort((a, b) => sortData(b, a, 'created_at')) || [];
+    const version = (await this.riskDocumentRepository.findByRiskGroupAndCompany(upsertPgrDto.riskGroupId, companyId)).sort((a, b) => sortData(b, a, 'created_at')) || [];
 
-    const hierarchyHierarchy =
-      await this.hierarchyRepository.findAllDataHierarchyByCompany(
-        companyId,
-        workspaceId,
-      );
+    const hierarchyHierarchy = await this.hierarchyRepository.findAllDataHierarchyByCompany(companyId, workspaceId);
 
     const { hierarchyTree } = hierarchyConverter(hierarchyHierarchy, [], {
       workspaceId,
     });
 
-    const sections: ISectionOptions[] = [
-      actionPlanTableSection(riskGroupData, hierarchyTree),
-    ];
+    const sections: ISectionOptions[] = [actionPlanTableSection(riskGroupData, hierarchyTree)];
 
     const doc = createBaseDocument(sections);
 
@@ -65,11 +46,7 @@ export class PgrActionPlanUploadTableService {
 
     const fileName = getDocxFileName({
       name: version[0] ? version[0]?.name || '' : '',
-      companyName:
-        (riskGroupData.company?.fantasy || riskGroupData.company.name) +
-        (riskGroupData.company.initials
-          ? '-' + riskGroupData.company.initials
-          : ''),
+      companyName: (riskGroupData.company?.fantasy || riskGroupData.company.name) + (riskGroupData.company.initials ? '-' + riskGroupData.company.initials : ''),
       typeName: 'PGR-PLANO_DE_ACAO',
       version: version[0] ? version[0]?.version || '0.0.0' : '0.0.0',
       date: dayjs(riskGroupData.documentDate || new Date()).format('MMMM-YYYY'),
@@ -80,11 +57,7 @@ export class PgrActionPlanUploadTableService {
     return { buffer, fileName };
   }
 
-  private async upload(
-    fileBuffer: Buffer,
-    fileName: string,
-    company: Partial<CompanyEntity>,
-  ) {
+  private async upload(fileBuffer: Buffer, fileName: string, company: Partial<CompanyEntity>) {
     const { url } = await this.amazonStorageProvider.upload({
       file: fileBuffer,
       // fileName: company.id + '/pgr/' + fileName,

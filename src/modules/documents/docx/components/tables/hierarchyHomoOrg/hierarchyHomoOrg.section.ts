@@ -1,27 +1,15 @@
 import { Footer, Header, PageOrientation, Table, WidthType } from 'docx';
 
-import {
-  IHierarchyData,
-  IHomoGroupMap,
-} from '../../../converter/hierarchy.converter';
+import { IHierarchyData, IHomoGroupMap } from '../../../converter/hierarchy.converter';
 import { TableBodyElements } from './elements/body';
 import { TableHeaderElements } from './elements/header';
-import {
-  ConverterProps,
-  hierarchyPlanConverter,
-} from './hierarchyHomoOrg.converter';
+import { ConverterProps, hierarchyPlanConverter } from './hierarchyHomoOrg.converter';
 import { hierarchyHomoOrgTable } from './hierarchyHomoOrg.table';
 
 export const hierarchyHomoOrgSection = (
   hierarchiesEntity: IHierarchyData,
   homoGroupTree: IHomoGroupMap,
-  {
-    showDescription,
-    showHomogeneous,
-    showHomogeneousDescription,
-    type,
-    groupIdFilter,
-  }: ConverterProps = {
+  { showDescription, showHomogeneous, showHomogeneousDescription, type, groupIdFilter }: ConverterProps = {
     showHomogeneous: true,
     showDescription: true,
     showHomogeneousDescription: false,

@@ -9,9 +9,7 @@ describe.skip('DeleteExpiredInvitesService', () => {
       providers: [DeleteExpiredInvitesService],
     }).compile();
 
-    service = module.get<DeleteExpiredInvitesService>(
-      DeleteExpiredInvitesService,
-    );
+    service = module.get<DeleteExpiredInvitesService>(DeleteExpiredInvitesService);
   });
 
   it('should be defined', () => {

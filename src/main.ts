@@ -29,11 +29,7 @@ export function logger(req, res, next) {
     .map((path) => (path.split('-').length == 5 ? path.split('-')[0] : path))
     .join('&');
 
-  console.log(
-    (req.method === 'GET' ? chalk.cyan : chalk.red)(`[${req.method}]: `) +
-      chalk.blue(`${shortPath}`) +
-      chalk.gray(`?${queryParams}`),
-  );
+  console.log((req.method === 'GET' ? chalk.cyan : chalk.red)(`[${req.method}]: `) + chalk.blue(`${shortPath}`) + chalk.gray(`?${queryParams}`));
 
   next();
 }
@@ -54,19 +50,12 @@ async function bootstrap() {
       },
     }),
   );
-  const options = new DocumentBuilder()
-    .setTitle('SST API')
-    .setDescription('SST Rest API Documentation')
-    .setVersion('1.0')
-    .addTag('Software')
-    .addBearerAuth()
-    .build();
+  const options = new DocumentBuilder().setTitle('SST API').setDescription('SST Rest API Documentation').setVersion('1.0').addTag('Software').addBearerAuth().build();
 
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api', app, document);
 
-  if (process.env.NODE_ENV === 'production')
-    app.useGlobalFilters(new InternalServerExceptionFilter());
+  if (process.env.NODE_ENV === 'production') app.useGlobalFilters(new InternalServerExceptionFilter());
 
   app.useGlobalFilters(new PrismaDbExceptionFilter());
 

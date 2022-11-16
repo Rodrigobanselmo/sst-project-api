@@ -1,32 +1,15 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Post,
-  Query,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
-import {
-  CreateContactDto,
-  FindContactDto,
-  UpdateContactDto,
-} from '../../dto/contact.dto';
+import { CreateContactDto, FindContactDto, UpdateContactDto } from '../../dto/contact.dto';
 import { CreateContactsService } from '../../services/contact/create-contact/create-contact.service';
 import { DeleteContactsService } from '../../services/contact/delete-contact/delete-contact.service';
 import { FindContactsService } from '../../services/contact/find-contact/find-company-groups-group.service';
 import { UpdateContactsService } from '../../services/contact/update-contact/update-contact.service';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
-import {
-  PermissionEnum,
-  RoleEnum,
-} from '../../../../shared/constants/enum/authorization';
+import { PermissionEnum, RoleEnum } from '../../../../shared/constants/enum/authorization';
 import { Roles } from '../../../../shared/decorators/roles.decorator';
 
 @ApiTags('contact')
@@ -57,14 +40,8 @@ export class ContactController {
     crud: true,
   })
   @Post()
-  create(
-    @Body() upsertAccessGroupDto: CreateContactDto,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
-    return this.createContactsService.execute(
-      upsertAccessGroupDto,
-      userPayloadDto,
-    );
+  create(@Body() upsertAccessGroupDto: CreateContactDto, @User() userPayloadDto: UserPayloadDto) {
+    return this.createContactsService.execute(upsertAccessGroupDto, userPayloadDto);
   }
 
   @Permissions({
@@ -74,15 +51,8 @@ export class ContactController {
     crud: true,
   })
   @Patch('/:id')
-  update(
-    @Body() upsertAccessGroupDto: UpdateContactDto,
-    @User() userPayloadDto: UserPayloadDto,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
-    return this.updateContactsService.execute(
-      { ...upsertAccessGroupDto, id },
-      userPayloadDto,
-    );
+  update(@Body() upsertAccessGroupDto: UpdateContactDto, @User() userPayloadDto: UserPayloadDto, @Param('id', ParseIntPipe) id: number) {
+    return this.updateContactsService.execute({ ...upsertAccessGroupDto, id }, userPayloadDto);
   }
 
   @Permissions({
@@ -92,10 +62,7 @@ export class ContactController {
     crud: true,
   })
   @Delete('/:id')
-  delete(
-    @User() userPayloadDto: UserPayloadDto,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
+  delete(@User() userPayloadDto: UserPayloadDto, @Param('id', ParseIntPipe) id: number) {
     return this.deleteContactsService.execute(id, userPayloadDto);
   }
 }

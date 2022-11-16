@@ -82,10 +82,8 @@ export const docPGRSections: IDocumentPGRSectionGroups = {
   ],
   variables: {
     [VariablesPGREnum.CHAPTER_1]: 'PARTE 01 – DOCUMENTO BASE',
-    [VariablesPGREnum.CHAPTER_2]:
-      'PARTE 02 – ANÁLISE PRELIMINAR E INDENTIFICAÇÃO DE PERIGOS',
-    [VariablesPGREnum.CHAPTER_3]:
-      'PARTE 03 – AVALIAÇÃO DOS RISCOS OCUPACIONAIS',
+    [VariablesPGREnum.CHAPTER_2]: 'PARTE 02 – ANÁLISE PRELIMINAR E INDENTIFICAÇÃO DE PERIGOS',
+    [VariablesPGREnum.CHAPTER_3]: 'PARTE 03 – AVALIAÇÃO DOS RISCOS OCUPACIONAIS',
     [VariablesPGREnum.CHAPTER_4]: 'PARTE 02 – DESENVOLVIMENTO',
   },
 };

@@ -6,14 +6,9 @@ import { NotificationRepository } from '../repositories/implementations/Notifica
 
 @Injectable()
 export class ListNotificationService {
-  constructor(
-    private readonly notificationRepository: NotificationRepository,
-  ) {}
+  constructor(private readonly notificationRepository: NotificationRepository) {}
 
-  async execute(
-    user: UserPayloadDto,
-    { skip, take, ...query }: FindNotificationDto,
-  ) {
+  async execute(user: UserPayloadDto, { skip, take, ...query }: FindNotificationDto) {
     const notification = await this.notificationRepository.find(
       { ...query, userId: user.userId },
       { skip, take },

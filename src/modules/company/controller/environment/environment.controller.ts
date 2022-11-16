@@ -1,26 +1,11 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  UploadedFile,
-  UploadedFiles,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UploadedFile, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
 import { pngFileFilter } from '../../../../shared/utils/filters/png.filters';
 
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
-import {
-  UpsertEnvironmentDto,
-  AddPhotoEnvironmentDto,
-  UpdatePhotoEnvironmentDto,
-} from '../../dto/environment.dto';
+import { UpsertEnvironmentDto, AddPhotoEnvironmentDto, UpdatePhotoEnvironmentDto } from '../../dto/environment.dto';
 import { DeleteEnvironmentService } from '../../services/environment/delete-environment/delete-environment.service';
 import { FindAllEnvironmentService } from '../../services/environment/find-all-environment/find-all-environment.service';
 import { UpsertEnvironmentService } from '../../services/environment/upsert-environment/upsert-environment.service';
@@ -43,10 +28,7 @@ export class EnvironmentController {
   ) {}
 
   @Get()
-  findAll(
-    @User() userPayloadDto: UserPayloadDto,
-    @Param('workspaceId') workspaceId: string,
-  ) {
+  findAll(@User() userPayloadDto: UserPayloadDto, @Param('workspaceId') workspaceId: string) {
     return this.findAllEnvironmentService.execute(workspaceId, userPayloadDto);
   }
 
@@ -56,46 +38,25 @@ export class EnvironmentController {
   }
 
   @Post()
-  @UseInterceptors(
-    FilesInterceptor('files[]', 5, { fileFilter: pngFileFilter }),
-  )
+  @UseInterceptors(FilesInterceptor('files[]', 5, { fileFilter: pngFileFilter }))
   upsert(
     @Body() upsertEnvironmentDto: UpsertEnvironmentDto,
     @User() userPayloadDto: UserPayloadDto,
     @Param('workspaceId') workspaceId: string,
     @UploadedFiles() files?: Array<Express.Multer.File>,
   ) {
-    return this.upsertEnvironmentService.execute(
-      upsertEnvironmentDto,
-      workspaceId,
-      userPayloadDto,
-      files,
-    );
+    return this.upsertEnvironmentService.execute(upsertEnvironmentDto, workspaceId, userPayloadDto, files);
   }
 
   @Post('/photo')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadRiskFile(
-    @UploadedFile() file: Express.Multer.File,
-    @Body() addPhotoEnvironmentDto: AddPhotoEnvironmentDto,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
-    return this.addEnvironmentPhotoService.execute(
-      addPhotoEnvironmentDto,
-      userPayloadDto,
-      file,
-    );
+  async uploadRiskFile(@UploadedFile() file: Express.Multer.File, @Body() addPhotoEnvironmentDto: AddPhotoEnvironmentDto, @User() userPayloadDto: UserPayloadDto) {
+    return this.addEnvironmentPhotoService.execute(addPhotoEnvironmentDto, userPayloadDto, file);
   }
 
   @Patch('/photo/:id')
-  async update(
-    @Body() updatePhotoEnvironmentDto: UpdatePhotoEnvironmentDto,
-    @Param('id') id: string,
-  ) {
-    return this.updateEnvironmentPhotoService.execute(
-      id,
-      updatePhotoEnvironmentDto,
-    );
+  async update(@Body() updatePhotoEnvironmentDto: UpdatePhotoEnvironmentDto, @Param('id') id: string) {
+    return this.updateEnvironmentPhotoService.execute(id, updatePhotoEnvironmentDto);
   }
 
   @Delete('/photo/:id')
@@ -105,15 +66,7 @@ export class EnvironmentController {
   }
 
   @Delete('/:id')
-  delete(
-    @Param('id') id: string,
-    @Param('workspaceId') workspaceId: string,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
-    return this.deleteEnvironmentService.execute(
-      id,
-      workspaceId,
-      userPayloadDto,
-    );
+  delete(@Param('id') id: string, @Param('workspaceId') workspaceId: string, @User() userPayloadDto: UserPayloadDto) {
+    return this.deleteEnvironmentService.execute(id, workspaceId, userPayloadDto);
   }
 }

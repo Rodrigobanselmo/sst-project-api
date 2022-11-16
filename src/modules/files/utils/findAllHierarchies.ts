@@ -9,10 +9,7 @@ export const findAllHierarchies = async (
   riskSheet: ICompanyUniqueSheet | IEmployeeSheet,
   companyId: string,
 ) => {
-  const excelRows = await excelProvider.transformToExcelData(
-    [],
-    riskSheet.columns,
-  );
+  const excelRows = await excelProvider.transformToExcelData([], riskSheet.columns);
 
   return {
     sheetName: riskSheet.name,

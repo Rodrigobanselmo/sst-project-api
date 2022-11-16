@@ -2,20 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
-import {
-  DailyCompanyReportDto,
-  UpsertCompanyReportDto,
-} from '../../dto/company-report.dto';
+import { DailyCompanyReportDto, UpsertCompanyReportDto } from '../../dto/company-report.dto';
 import { CompanyReportEntity } from '../../entities/report.entity';
 
 @Injectable()
 export class CompanyReportRepository {
   constructor(private prisma: PrismaService) {}
 
-  async upsert(
-    { companyId, dailyReport, lastDailyReport }: UpsertCompanyReportDto,
-    options: Partial<Prisma.CompanyReportUpsertArgs> = {},
-  ) {
+  async upsert({ companyId, dailyReport, lastDailyReport }: UpsertCompanyReportDto, options: Partial<Prisma.CompanyReportUpsertArgs> = {}) {
     const report = await this.prisma.companyReport.upsert({
       where: { companyId },
       create: { lastDailyReport, dailyReport: dailyReport as any, companyId },
@@ -26,11 +20,7 @@ export class CompanyReportRepository {
     return new CompanyReportEntity(report);
   }
 
-  async updateESocial(
-    companyId: string,
-    removePending = 0,
-    options: Partial<Prisma.CompanyReportUpdateArgs> = {},
-  ) {
+  async updateESocial(companyId: string, removePending = 0, options: Partial<Prisma.CompanyReportUpdateArgs> = {}) {
     let report = await this.prisma.companyReport.findFirst({
       where: { companyId },
     });
@@ -54,28 +44,21 @@ export class CompanyReportRepository {
 
     const done = group.find((g) => g.status === 'DONE')?._count || 0;
 
-    const transmitted =
-      group.find((g) => g.status === 'TRANSMITTED')?._count || 0;
+    const transmitted = group.find((g) => g.status === 'TRANSMITTED')?._count || 0;
 
-    const processing =
-      group.find((g) => g.status === 'PROCESSING')?._count || 0;
+    const processing = group.find((g) => g.status === 'PROCESSING')?._count || 0;
 
-    const rejected =
-      group.find((g) => g.status === 'INVALID' || g.status === 'ERROR')
-        ?._count || 0;
+    const rejected = group.find((g) => g.status === 'INVALID' || g.status === 'ERROR')?._count || 0;
 
     if (typeof done == 'number') dailyReport.esocial.done = done;
 
     if (typeof rejected == 'number') dailyReport.esocial.rejected = rejected;
 
-    if (typeof processing == 'number')
-      dailyReport.esocial.processing = processing;
+    if (typeof processing == 'number') dailyReport.esocial.processing = processing;
 
-    if (typeof transmitted == 'number')
-      dailyReport.esocial.transmitted = transmitted;
+    if (typeof transmitted == 'number') dailyReport.esocial.transmitted = transmitted;
 
-    dailyReport.esocial.pending =
-      (dailyReport.esocial?.pending || 0) - removePending;
+    dailyReport.esocial.pending = (dailyReport.esocial?.pending || 0) - removePending;
 
     if (dailyReport.esocial.pending < 0) dailyReport.esocial.pending = 0;
 
@@ -88,11 +71,7 @@ export class CompanyReportRepository {
     return new CompanyReportEntity(report);
   }
 
-  async updateESocialReport(
-    companyId: string,
-    dailyReport: Partial<DailyCompanyReportDto>,
-    options: Partial<Prisma.CompanyReportUpdateArgs> = {},
-  ) {
+  async updateESocialReport(companyId: string, dailyReport: Partial<DailyCompanyReportDto>, options: Partial<Prisma.CompanyReportUpdateArgs> = {}) {
     let report = await this.prisma.companyReport.findFirst({
       where: { companyId },
     });
@@ -134,26 +113,11 @@ export class CompanyReportRepository {
     };
 
     const esocial = {
-      processing:
-        (newDailyReport.esocial.S2210.processing || 0) +
-        (newDailyReport.esocial.S2220.processing || 0) +
-        (newDailyReport.esocial.S2240.processing || 0),
-      pending:
-        (newDailyReport.esocial.S2210.pending || 0) +
-        (newDailyReport.esocial.S2220.pending || 0) +
-        (newDailyReport.esocial.S2240.pending || 0),
-      done:
-        (newDailyReport.esocial.S2210.done || 0) +
-        (newDailyReport.esocial.S2220.done || 0) +
-        (newDailyReport.esocial.S2240.done || 0),
-      transmitted:
-        (newDailyReport.esocial.S2210.transmitted || 0) +
-        (newDailyReport.esocial.S2220.transmitted || 0) +
-        (newDailyReport.esocial.S2240.transmitted || 0),
-      rejected:
-        (newDailyReport.esocial.S2210.rejected || 0) +
-        (newDailyReport.esocial.S2220.rejected || 0) +
-        (newDailyReport.esocial.S2240.rejected || 0),
+      processing: (newDailyReport.esocial.S2210.processing || 0) + (newDailyReport.esocial.S2220.processing || 0) + (newDailyReport.esocial.S2240.processing || 0),
+      pending: (newDailyReport.esocial.S2210.pending || 0) + (newDailyReport.esocial.S2220.pending || 0) + (newDailyReport.esocial.S2240.pending || 0),
+      done: (newDailyReport.esocial.S2210.done || 0) + (newDailyReport.esocial.S2220.done || 0) + (newDailyReport.esocial.S2240.done || 0),
+      transmitted: (newDailyReport.esocial.S2210.transmitted || 0) + (newDailyReport.esocial.S2220.transmitted || 0) + (newDailyReport.esocial.S2240.transmitted || 0),
+      rejected: (newDailyReport.esocial.S2210.rejected || 0) + (newDailyReport.esocial.S2220.rejected || 0) + (newDailyReport.esocial.S2240.rejected || 0),
     };
 
     newDailyReport.esocial = {
@@ -171,9 +135,7 @@ export class CompanyReportRepository {
       data: {
         dailyReport: newDailyReport as any,
         esocialDone: newDailyReport.esocial?.done || 0,
-        esocialPendent:
-          (newDailyReport.esocial?.pending || 0) +
-          (newDailyReport.esocial?.transmitted || 0),
+        esocialPendent: (newDailyReport.esocial?.pending || 0) + (newDailyReport.esocial?.transmitted || 0),
         esocialProgress: newDailyReport.esocial?.processing || 0,
         esocialReject: newDailyReport.esocial?.rejected || 0,
       },
@@ -196,62 +158,29 @@ export class CompanyReportRepository {
       _count: true,
     });
 
-    const doneRisk =
-      group.find((g) => g.status === 'DONE' && g.type === 'RISK_2240')
-        ?._count || 0;
+    const doneRisk = group.find((g) => g.status === 'DONE' && g.type === 'RISK_2240')?._count || 0;
 
-    const doneExam =
-      group.find((g) => g.status === 'DONE' && g.type === 'EXAM_2220')
-        ?._count || 0;
+    const doneExam = group.find((g) => g.status === 'DONE' && g.type === 'EXAM_2220')?._count || 0;
 
-    const doneCat =
-      group.find((g) => g.status === 'DONE' && g.type === 'CAT_2210')?._count ||
-      0;
+    const doneCat = group.find((g) => g.status === 'DONE' && g.type === 'CAT_2210')?._count || 0;
 
-    const transmittedRisk =
-      group.find((g) => g.status === 'TRANSMITTED' && g.type === 'RISK_2240')
-        ?._count || 0;
+    const transmittedRisk = group.find((g) => g.status === 'TRANSMITTED' && g.type === 'RISK_2240')?._count || 0;
 
-    const transmittedExam =
-      group.find((g) => g.status === 'TRANSMITTED' && g.type === 'EXAM_2220')
-        ?._count || 0;
+    const transmittedExam = group.find((g) => g.status === 'TRANSMITTED' && g.type === 'EXAM_2220')?._count || 0;
 
-    const transmittedCat =
-      group.find((g) => g.status === 'TRANSMITTED' && g.type === 'CAT_2210')
-        ?._count || 0;
+    const transmittedCat = group.find((g) => g.status === 'TRANSMITTED' && g.type === 'CAT_2210')?._count || 0;
 
-    const processingRisk =
-      group.find((g) => g.status === 'PROCESSING' && g.type === 'RISK_2240')
-        ?._count || 0;
+    const processingRisk = group.find((g) => g.status === 'PROCESSING' && g.type === 'RISK_2240')?._count || 0;
 
-    const processingExam =
-      group.find((g) => g.status === 'PROCESSING' && g.type === 'EXAM_2220')
-        ?._count || 0;
+    const processingExam = group.find((g) => g.status === 'PROCESSING' && g.type === 'EXAM_2220')?._count || 0;
 
-    const processingCat =
-      group.find((g) => g.status === 'PROCESSING' && g.type === 'CAT_2210')
-        ?._count || 0;
+    const processingCat = group.find((g) => g.status === 'PROCESSING' && g.type === 'CAT_2210')?._count || 0;
 
-    const rejectedRisk =
-      group.find(
-        (g) =>
-          (g.status === 'INVALID' || g.status === 'ERROR') &&
-          g.type === 'RISK_2240',
-      )?._count || 0;
+    const rejectedRisk = group.find((g) => (g.status === 'INVALID' || g.status === 'ERROR') && g.type === 'RISK_2240')?._count || 0;
 
-    const rejectedExam =
-      group.find(
-        (g) =>
-          (g.status === 'INVALID' || g.status === 'ERROR') &&
-          g.type === 'EXAM_2220',
-      )?._count || 0;
+    const rejectedExam = group.find((g) => (g.status === 'INVALID' || g.status === 'ERROR') && g.type === 'EXAM_2220')?._count || 0;
 
-    const rejectedCat =
-      group.find(
-        (g) =>
-          (g.status === 'INVALID' || g.status === 'ERROR') &&
-          g.type === 'CAT_2210',
-      )?._count || 0;
+    const rejectedCat = group.find((g) => (g.status === 'INVALID' || g.status === 'ERROR') && g.type === 'CAT_2210')?._count || 0;
 
     esocial.S2240.done = doneRisk;
     esocial.S2240.rejected = rejectedRisk;
@@ -270,17 +199,13 @@ export class CompanyReportRepository {
     return esocial;
   }
 
-  async findNude(
-    options: Prisma.CompanyReportFindManyArgs = {},
-  ): Promise<CompanyReportEntity[]> {
+  async findNude(options: Prisma.CompanyReportFindManyArgs = {}): Promise<CompanyReportEntity[]> {
     const reports = await this.prisma.companyReport.findMany(options);
 
     return reports.map((exam) => new CompanyReportEntity(exam));
   }
 
-  async findFirstNude(
-    options: Prisma.CompanyReportFindFirstArgs = {},
-  ): Promise<CompanyReportEntity> {
+  async findFirstNude(options: Prisma.CompanyReportFindFirstArgs = {}): Promise<CompanyReportEntity> {
     const report = await this.prisma.companyReport.findFirst(options);
 
     return new CompanyReportEntity(report);

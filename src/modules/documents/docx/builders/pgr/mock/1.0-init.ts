@@ -2,10 +2,7 @@ import { BorderStyle } from 'docx';
 import { palette } from '../../../../../../shared/constants/palette';
 import { VariablesPGREnum } from '../enums/variables.enum';
 import { PGRSectionChildrenTypeEnum } from '../types/elements.types';
-import {
-  IDocumentPGRSectionGroup,
-  PGRSectionTypeEnum,
-} from '../types/section.types';
+import { IDocumentPGRSectionGroup, PGRSectionTypeEnum } from '../types/section.types';
 
 export const initSection: IDocumentPGRSectionGroup = {
   footer: true,

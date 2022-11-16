@@ -1,9 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 
-export const deleteWithNameCompany = async (
-  name: string,
-  prisma: PrismaClient,
-) => {
+export const deleteWithNameCompany = async (name: string, prisma: PrismaClient) => {
   const company = await prisma.company.findMany({
     where: { name },
   });

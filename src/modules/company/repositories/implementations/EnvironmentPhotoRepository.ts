@@ -1,10 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
-import {
-  AddPhotoEnvironmentDto,
-  UpdatePhotoEnvironmentDto,
-} from '../../dto/environment.dto';
+import { AddPhotoEnvironmentDto, UpdatePhotoEnvironmentDto } from '../../dto/environment.dto';
 import { EnvironmentPhotoEntity } from '../../entities/environment-photo.entity';
 
 export interface IEnvironmentPhoto extends Partial<AddPhotoEnvironmentDto> {
@@ -20,20 +17,16 @@ export class EnvironmentPhotoRepository {
   constructor(private prisma: PrismaService) {}
 
   async createMany(environmentPhoto: IEnvironmentPhoto[]) {
-    const environments =
-      await this.prisma.companyCharacterizationPhoto.createMany({
-        data: environmentPhoto.map(({ ...rest }) => ({
-          ...rest,
-        })),
-      });
+    const environments = await this.prisma.companyCharacterizationPhoto.createMany({
+      data: environmentPhoto.map(({ ...rest }) => ({
+        ...rest,
+      })),
+    });
 
     return environments;
   }
 
-  async update({
-    id,
-    ...environmentPhotoDto
-  }: UpdatePhotoEnvironmentDto): Promise<EnvironmentPhotoEntity> {
+  async update({ id, ...environmentPhotoDto }: UpdatePhotoEnvironmentDto): Promise<EnvironmentPhotoEntity> {
     const environment = await this.prisma.companyCharacterizationPhoto.update({
       where: { id: id || 'no-id' },
       data: {
@@ -45,23 +38,19 @@ export class EnvironmentPhotoRepository {
   }
 
   async findById(id: string) {
-    const environment =
-      await this.prisma.companyCharacterizationPhoto.findUnique({
-        where: { id },
-      });
+    const environment = await this.prisma.companyCharacterizationPhoto.findUnique({
+      where: { id },
+    });
 
     return new EnvironmentPhotoEntity(environment);
   }
 
   async findByEnvironment(environmentId: string) {
-    const environments =
-      await this.prisma.companyCharacterizationPhoto.findMany({
-        where: { companyCharacterizationId: environmentId },
-      });
+    const environments = await this.prisma.companyCharacterizationPhoto.findMany({
+      where: { companyCharacterizationId: environmentId },
+    });
 
-    return environments.map(
-      (environment) => new EnvironmentPhotoEntity(environment),
-    );
+    return environments.map((environment) => new EnvironmentPhotoEntity(environment));
   }
 
   async delete(id: string) {

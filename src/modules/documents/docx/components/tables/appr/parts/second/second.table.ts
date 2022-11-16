@@ -6,10 +6,7 @@ import { TableHeaderElements } from '../../elements/header';
 import { secondRiskInventoryHeader } from './second.constant';
 import { dataConverter } from './second.converter';
 
-export const secondRiskInventoryTableSection = (
-  hierarchyData: HierarchyMapData,
-  isByGroup: boolean,
-) => {
+export const secondRiskInventoryTableSection = (hierarchyData: HierarchyMapData, isByGroup: boolean) => {
   let data = dataConverter(hierarchyData);
 
   const tableHeaderElements = new TableHeaderElements();
@@ -20,11 +17,7 @@ export const secondRiskInventoryTableSection = (
   const table = new Table({
     width: { size: 100, type: WidthType.PERCENTAGE },
     rows: [
-      tableHeaderElements.headerRow(
-        secondRiskInventoryHeader(isByGroup).map(
-          tableHeaderElements.headerCell,
-        ),
-      ),
+      tableHeaderElements.headerRow(secondRiskInventoryHeader(isByGroup).map(tableHeaderElements.headerCell)),
       tableBodyElements.tableRow(
         data.map((data) =>
           tableBodyElements.tableCell({

@@ -14,20 +14,14 @@ import { dayjs } from '../../../../shared/providers/DateProvider/implementations
 export class InviteUsersRepository implements IInviteUsersRepository {
   constructor(private prisma: PrismaService) {}
 
-  async create(
-    inviteUserDto: InviteUserDto,
-    expires_date: Date,
-  ): Promise<InviteUsersEntity> {
+  async create(inviteUserDto: InviteUserDto, expires_date: Date): Promise<InviteUsersEntity> {
     const inviteUser = await this.prisma.inviteUsers.create({
       data: { ...inviteUserDto, expires_date },
     });
     return new InviteUsersEntity(inviteUser);
   }
 
-  async findByCompanyIdAndEmail(
-    companyId: string,
-    email: string,
-  ): Promise<InviteUsersEntity | undefined> {
+  async findByCompanyIdAndEmail(companyId: string, email: string): Promise<InviteUsersEntity | undefined> {
     const invite = await this.prisma.inviteUsers.findFirst({
       where: { email, companyId },
     });
@@ -36,10 +30,7 @@ export class InviteUsersRepository implements IInviteUsersRepository {
     return new InviteUsersEntity(invite);
   }
 
-  async findById(
-    id: string,
-    options?: Partial<Prisma.InviteUsersFindUniqueArgs>,
-  ): Promise<InviteUsersEntity | undefined> {
+  async findById(id: string, options?: Partial<Prisma.InviteUsersFindUniqueArgs>): Promise<InviteUsersEntity | undefined> {
     const invite = await this.prisma.inviteUsers.findUnique({
       where: { id },
       ...options,
@@ -76,11 +67,7 @@ export class InviteUsersRepository implements IInviteUsersRepository {
     );
   }
 
-  async find(
-    query: Partial<FindInvitesDto>,
-    pagination: PaginationQueryDto,
-    options: Prisma.InviteUsersFindManyArgs = {},
-  ) {
+  async find(query: Partial<FindInvitesDto>, pagination: PaginationQueryDto, options: Prisma.InviteUsersFindManyArgs = {}) {
     const whereInit = {
       AND: [],
     } as typeof options.where;
@@ -123,10 +110,7 @@ export class InviteUsersRepository implements IInviteUsersRepository {
     };
   }
 
-  async deleteById(
-    companyId: string,
-    id: string,
-  ): Promise<Prisma.BatchPayload> {
+  async deleteById(companyId: string, id: string): Promise<Prisma.BatchPayload> {
     const invite = await this.prisma.inviteUsers.deleteMany({
       where: { id, companyId },
     });
@@ -135,10 +119,7 @@ export class InviteUsersRepository implements IInviteUsersRepository {
     return invite;
   }
 
-  async deleteByCompanyIdAndEmail(
-    companyId: string,
-    email: string,
-  ): Promise<Prisma.BatchPayload> {
+  async deleteByCompanyIdAndEmail(companyId: string, email: string): Promise<Prisma.BatchPayload> {
     const invite = await this.prisma.inviteUsers.deleteMany({
       where: { email, companyId },
     });

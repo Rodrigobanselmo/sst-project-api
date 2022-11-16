@@ -26,8 +26,7 @@ export const riskColumnsConstant = [
   },
   {
     databaseName: 'risk',
-    excelName:
-      'Risco (Órgãos Alvo ou Maior Parte do Corpo Prejudicada -Resumo de Sintomas)',
+    excelName: 'Risco (Órgãos Alvo ou Maior Parte do Corpo Prejudicada -Resumo de Sintomas)',
     required: false,
     checkHandler: checkIsString,
   },

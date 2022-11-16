@@ -1,12 +1,6 @@
 import { setNiceProportion } from './../../../../../../shared/utils/setNiceProportion';
 import sizeOf from 'image-size';
-import {
-  AlignmentType,
-  ImageRun,
-  ISectionOptions,
-  Paragraph,
-  TextRun,
-} from 'docx';
+import { AlignmentType, ImageRun, ISectionOptions, Paragraph, TextRun } from 'docx';
 import fs from 'fs';
 
 import { sectionCoverProperties } from '../../config/styles';
@@ -41,19 +35,12 @@ const textShow = (version: string) =>
   });
 
 const imageCover = (imgPath: string) => {
-  const { height: imgHeight, width: imgWidth } = sizeOf(
-    fs.readFileSync(imgPath),
-  );
+  const { height: imgHeight, width: imgWidth } = sizeOf(fs.readFileSync(imgPath));
 
   const maxWidth = 630;
   const maxHeight = 354;
 
-  const { height, width } = setNiceProportion(
-    maxWidth,
-    maxHeight,
-    imgWidth,
-    imgHeight,
-  );
+  const { height, width } = setNiceProportion(maxWidth, maxHeight, imgWidth, imgHeight);
 
   return new Paragraph({
     children: [
@@ -69,28 +56,12 @@ const imageCover = (imgPath: string) => {
   });
 };
 
-export const createCover = ({
-  version,
-  imgPath,
-  companyName,
-}: IHeaderProps): Paragraph[] => {
+export const createCover = ({ version, imgPath, companyName }: IHeaderProps): Paragraph[] => {
   if (!imgPath) return [title()];
-  return [
-    title(),
-    textShow(version),
-    textShow(''),
-    imageCover(imgPath),
-    textShow(''),
-    textShow(''),
-    textShow(companyName),
-  ];
+  return [title(), textShow(version), textShow(''), imageCover(imgPath), textShow(''), textShow(''), textShow(companyName)];
 };
 
-export const coverSections = ({
-  version,
-  imgPath,
-  companyName,
-}: IHeaderProps): ISectionOptions => {
+export const coverSections = ({ version, imgPath, companyName }: IHeaderProps): ISectionOptions => {
   return {
     children: [...createCover({ version, imgPath, companyName })],
     properties: sectionCoverProperties,

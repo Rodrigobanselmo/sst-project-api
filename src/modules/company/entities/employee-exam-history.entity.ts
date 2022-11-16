@@ -69,10 +69,7 @@ export class EmployeeExamsHistoryEntity implements EmployeeExamsHistory {
 
   constructor(
     partial: Partial<
-      Omit<
-        EmployeeExamsHistoryEntity,
-        'userSchedule' | 'userDone' | 'exam' | 'hierarchy'
-      > & {
+      Omit<EmployeeExamsHistoryEntity, 'userSchedule' | 'userDone' | 'exam' | 'hierarchy'> & {
         userSchedule?: User;
         userDone?: User;
         exam?: Exam;
@@ -90,12 +87,7 @@ export class EmployeeExamsHistoryEntity implements EmployeeExamsHistory {
     //   this.doctor = { ...this.doctor, ...this.doctor.professional };
     // }
 
-    if (
-      [StatusEnum.PENDING, StatusEnum.PROCESSING].includes(
-        this.status as any,
-      ) &&
-      dayjs(this.doneDate).isBefore(dayjs().add(-1, 'day'))
-    )
+    if ([StatusEnum.PENDING, StatusEnum.PROCESSING].includes(this.status as any) && dayjs(this.doneDate).isBefore(dayjs().add(-1, 'day')))
       this.status = StatusEnum.EXPIRED;
 
     if (this.hierarchy) this.hierarchy = new HierarchyEntity(this.hierarchy);

@@ -1,14 +1,7 @@
 import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
 import { ClinicScheduleTypeEnum, Prisma, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
-import {
-  IsBoolean,
-  IsDate,
-  IsEnum,
-  IsInt,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsBoolean, IsDate, IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
 
 import { DateFormat } from '../../../shared/transformers/date-format';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';

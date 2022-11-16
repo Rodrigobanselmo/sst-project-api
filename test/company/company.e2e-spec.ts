@@ -63,9 +63,7 @@ describe('[Feature] Company - /company', () => {
       password: '12345678',
     };
 
-    const data = await request(app.getHttpServer())
-      .post('/session')
-      .send(sessionUser);
+    const data = await request(app.getHttpServer()).post('/session').send(sessionUser);
 
     sessionAdmin = data.body;
   });
@@ -74,11 +72,7 @@ describe('[Feature] Company - /company', () => {
     it('should not create company without workspace', async () => {
       const createCompany = new FakeCompany();
 
-      return await request(app.getHttpServer())
-        .post('/company')
-        .set('Authorization', `Bearer ${sessionAdmin.token}`)
-        .send(createCompany)
-        .expect(HttpStatus.BAD_REQUEST);
+      return await request(app.getHttpServer()).post('/company').set('Authorization', `Bearer ${sessionAdmin.token}`).send(createCompany).expect(HttpStatus.BAD_REQUEST);
     });
 
     it('should create company', async () => {

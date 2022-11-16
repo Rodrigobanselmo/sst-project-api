@@ -10,10 +10,7 @@ import { SendEvents2220ESocialService } from './../../../services/events/2220/se
 @ApiTags('events-2220')
 @Controller('esocial/events/2220')
 export class ESocialEvent2220Controller {
-  constructor(
-    private readonly sendEvents2220ESocialService: SendEvents2220ESocialService,
-    private readonly findEvents2220ESocialService: FindEvents2220ESocialService,
-  ) {}
+  constructor(private readonly sendEvents2220ESocialService: SendEvents2220ESocialService, private readonly findEvents2220ESocialService: FindEvents2220ESocialService) {}
 
   // @Permissions({
   //   code: PermissionEnum.ESOCIAL,
@@ -22,10 +19,7 @@ export class ESocialEvent2220Controller {
   //   crud: true,
   // })
   @Get(':companyId?')
-  find(
-    @Query() query: FindEvents2220Dto,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
+  find(@Query() query: FindEvents2220Dto, @User() userPayloadDto: UserPayloadDto) {
     return this.findEvents2220ESocialService.execute(query, userPayloadDto);
   }
 
@@ -36,21 +30,13 @@ export class ESocialEvent2220Controller {
   //   crud: true,
   // })
   @Post()
-  async sendBatch(
-    @Res() res,
-    @Body() body: Event2220Dto,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
+  async sendBatch(@Res() res, @Body() body: Event2220Dto, @User() userPayloadDto: UserPayloadDto) {
     // return this.sendEvents2220ESocialService.execute(body, userPayloadDto);
-    const { fileStream, fileName } =
-      await this.sendEvents2220ESocialService.execute(body, userPayloadDto);
+    const { fileStream, fileName } = await this.sendEvents2220ESocialService.execute(body, userPayloadDto);
 
     if (!fileStream) return res.status(200).send('Lotes enviados com sucessos');
 
-    res.setHeader(
-      'Content-Disposition',
-      `attachment; filename=${fileName}.zip`,
-    );
+    res.setHeader('Content-Disposition', `attachment; filename=${fileName}.zip`);
     fileStream.on('error', function (e) {
       res.status(500).send(e);
     });

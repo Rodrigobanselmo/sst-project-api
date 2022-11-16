@@ -4,20 +4,14 @@ import { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
-import {
-  FindAccessGroupDto,
-  UpsertAccessGroupDto,
-} from '../../dto/access-group.dto';
+import { FindAccessGroupDto, UpsertAccessGroupDto } from '../../dto/access-group.dto';
 import { AccessGroupsEntity } from '../../entities/access-groups.entity';
 
 @Injectable()
 export class AuthGroupRepository {
   constructor(private prisma: PrismaService) {}
 
-  async upsert(
-    { id, companyId, ...data }: UpsertAccessGroupDto,
-    system: boolean,
-  ) {
+  async upsert({ id, companyId, ...data }: UpsertAccessGroupDto, system: boolean) {
     const accessGroup = await this.prisma.accessGroups.upsert({
       update: { ...data, system },
       create: { ...data, system, companyId },
@@ -27,11 +21,7 @@ export class AuthGroupRepository {
     return new AccessGroupsEntity(accessGroup);
   }
 
-  async findById(
-    id: number,
-    companyId: string,
-    options: Prisma.AccessGroupsFindFirstArgs = {},
-  ) {
+  async findById(id: number, companyId: string, options: Prisma.AccessGroupsFindFirstArgs = {}) {
     const accessGroup = await this.prisma.accessGroups.findFirst({
       where: {
         OR: [
@@ -45,12 +35,7 @@ export class AuthGroupRepository {
     return new AccessGroupsEntity(accessGroup);
   }
 
-  async findAvailable(
-    companyId: string,
-    query: Partial<FindAccessGroupDto>,
-    pagination: PaginationQueryDto,
-    options: Prisma.AccessGroupsFindManyArgs = {},
-  ) {
+  async findAvailable(companyId: string, query: Partial<FindAccessGroupDto>, pagination: PaginationQueryDto, options: Prisma.AccessGroupsFindManyArgs = {}) {
     const where = {
       AND: [{ OR: [{ companyId }, { system: true }] }],
     } as typeof options.where;

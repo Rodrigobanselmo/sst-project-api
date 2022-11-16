@@ -13,12 +13,9 @@ export const healthSeverityAciTable = () => {
   const table = new Table({
     width: { size: 100, type: WidthType.PERCENTAGE },
     rows: [
-      tableHeaderElements.headerRow(
-        headerConverter.map(tableHeaderElements.headerCell),
-        {
-          height: { value: 550, rule: HeightRule.EXACT },
-        },
-      ),
+      tableHeaderElements.headerRow(headerConverter.map(tableHeaderElements.headerCell), {
+        height: { value: 550, rule: HeightRule.EXACT },
+      }),
       ...NewBody(rowBodyAci).map((data) =>
         tableBodyElements.tableRow(data.map(tableBodyElements.tableCell), {
           height: { value: 700, rule: HeightRule.ATLEAST },

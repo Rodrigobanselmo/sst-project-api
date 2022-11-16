@@ -15,12 +15,9 @@ export const quantityResultsLVTable = () => {
   const table = new Table({
     width: { size: 100, type: WidthType.PERCENTAGE },
     rows: [
-      tableHeaderElements.headerRow(
-        NewHeaderC4S(headerLV).map(tableHeaderElements.headerCell),
-        {
-          height: { value: 550, rule: HeightRule.EXACT },
-        },
-      ),
+      tableHeaderElements.headerRow(NewHeaderC4S(headerLV).map(tableHeaderElements.headerCell), {
+        height: { value: 550, rule: HeightRule.EXACT },
+      }),
       ...NewBodyC5(rowBodyLocalizationVibration).map((data) =>
         tableBodyElements.tableRow(data.map(tableBodyElements.tableCell), {
           height: { value: 550, rule: HeightRule.ATLEAST },

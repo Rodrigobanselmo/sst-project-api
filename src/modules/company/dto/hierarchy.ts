@@ -2,16 +2,7 @@ import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
 import { PartialType } from '@nestjs/swagger';
 import { HierarchyEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
-import {
-  IsDate,
-  IsEnum,
-  IsInt,
-  IsOptional,
-  IsString,
-  MaxLength,
-  ValidateIf,
-  ValidateNested,
-} from 'class-validator';
+import { IsDate, IsEnum, IsInt, IsOptional, IsString, MaxLength, ValidateIf, ValidateNested } from 'class-validator';
 import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
 
 import { StringCapitalizeTransform } from '../../../shared/transformers/string-capitalize';

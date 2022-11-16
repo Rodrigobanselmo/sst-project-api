@@ -7,17 +7,12 @@ import { LoginGoogleUserDto } from '../../../dto/login-user.dto';
 
 @Injectable()
 export class VerifyGoogleLoginService {
-  constructor(
-    private readonly usersRepository: UsersRepository,
-    private readonly firebaseProvider: FirebaseProvider,
-  ) {}
+  constructor(private readonly usersRepository: UsersRepository, private readonly firebaseProvider: FirebaseProvider) {}
 
   async execute({ token }: LoginGoogleUserDto) {
     try {
       const result = await this.firebaseProvider.validateGoogleToken(token);
-      const user = await this.usersRepository.findByGoogleExternalId(
-        result.user.uid,
-      );
+      const user = await this.usersRepository.findByGoogleExternalId(result.user.uid);
 
       if (!user?.id) {
         throw new BadRequestException(ErrorInvitesEnum.GOOGLE_USER_NOT_EXIST);

@@ -1,9 +1,5 @@
 'use strict';
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { DOMParser } from '@xmldom/xmldom';
 import fs from 'fs';
 import JSZip from 'jszip';
@@ -13,19 +9,8 @@ import { SignedXml, xpath } from 'xml-crypto';
 import format from 'xml-formatter';
 
 import { CompanyRepository } from '../../../../modules/company/repositories/implementations/CompanyRepository';
-import {
-  dayjs,
-  DayJSProvider,
-} from '../../DateProvider/implementations/DayJSProvider';
-import {
-  ICompanyOptions,
-  IConvertPfx,
-  IConvertPfxReturn,
-  ICreateZipFolder,
-  IESocialEventProvider,
-  IIdOptions,
-  ISignEvent,
-} from '../models/IESocialMethodProvider';
+import { dayjs, DayJSProvider } from '../../DateProvider/implementations/DayJSProvider';
+import { ICompanyOptions, IConvertPfx, IConvertPfxReturn, ICreateZipFolder, IESocialEventProvider, IIdOptions, ISignEvent } from '../models/IESocialMethodProvider';
 import { getCompanyName } from './../../../utils/companyName';
 
 class ESocialGenerateId {
@@ -40,9 +25,7 @@ class ESocialGenerateId {
 
   public newId() {
     const data = dayjs().format('YYYYMMDDHHmmss');
-    const ID = `ID${this.type || 1}${this.cpfCnpj.padStart(14)}${data}${String(
-      this.index,
-    ).padStart(5, '0')}`;
+    const ID = `ID${this.type || 1}${this.cpfCnpj.padStart(14)}${data}${String(this.index).padStart(5, '0')}`;
 
     this.index++;
     return ID;
@@ -51,10 +34,7 @@ class ESocialGenerateId {
 
 @Injectable()
 class ESocialMethodsProvider implements IESocialEventProvider {
-  constructor(
-    private readonly companyRepository: CompanyRepository,
-    private readonly dayJSProvider?: DayJSProvider,
-  ) {}
+  constructor(private readonly companyRepository: CompanyRepository, private readonly dayJSProvider?: DayJSProvider) {}
 
   public signEvent({ cert: { certificate, key }, xml }: ISignEvent) {
     const sig = new SignedXml();
@@ -64,29 +44,21 @@ class ESocialMethodsProvider implements IESocialEventProvider {
         return `<X509Data><X509Certificate>${certificate
           .replace('-----BEGIN CERTIFICATE-----', '')
           .replaceAll('\n', '')
-          .replace(
-            '-----END CERTIFICATE-----',
-            '',
-          )}</X509Certificate></X509Data>`;
+          .replace('-----END CERTIFICATE-----', '')}</X509Certificate></X509Data>`;
       };
       this.getKey = function () {
         return certificate;
       };
     }
 
-    sig.canonicalizationAlgorithm =
-      'http://www.w3.org/TR/2001/REC-xml-c14n-20010315';
-    sig.signatureAlgorithm =
-      'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256';
+    sig.canonicalizationAlgorithm = 'http://www.w3.org/TR/2001/REC-xml-c14n-20010315';
+    sig.signatureAlgorithm = 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256';
     sig.keyInfoProvider = new MyKeyInfo();
     sig.signingKey = key;
     sig.references = [
       {
         xpath: '/*',
-        transforms: [
-          'http://www.w3.org/2000/09/xmldsig#enveloped-signature',
-          'http://www.w3.org/TR/2001/REC-xml-c14n-20010315',
-        ],
+        transforms: ['http://www.w3.org/2000/09/xmldsig#enveloped-signature', 'http://www.w3.org/TR/2001/REC-xml-c14n-20010315'],
         digestAlgorithm: 'http://www.w3.org/2001/04/xmlenc#sha256',
         isEmptyUri: true,
         // uri: '',
@@ -114,10 +86,7 @@ class ESocialMethodsProvider implements IESocialEventProvider {
     }
 
     const doc = new DOMParser().parseFromString(signXML.toString());
-    const signature = xpath(
-      doc,
-      "//*[local-name(.)='Signature' and namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#']",
-    )[0];
+    const signature = xpath(doc, "//*[local-name(.)='Signature' and namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#']")[0];
 
     const sig2 = new SignedXml();
 
@@ -133,12 +102,7 @@ class ESocialMethodsProvider implements IESocialEventProvider {
   public generateId(cpfCnpj: string, { type, seqNum, index }: IIdOptions) {
     const data = this.dayJSProvider.dayjs().format('YYYYMMDDHHmmss');
 
-    const IDs = (index ? [index] : Array.from({ length: seqNum || 1 })).map(
-      (num) =>
-        `ID${type || 1}${cpfCnpj.padStart(14)}${data}${String(num).padStart(
-          5,
-        )}`,
-    );
+    const IDs = (index ? [index] : Array.from({ length: seqNum || 1 })).map((num) => `ID${type || 1}${cpfCnpj.padStart(14)}${data}${String(num).padStart(5)}`);
 
     return IDs;
   }
@@ -186,13 +150,9 @@ class ESocialMethodsProvider implements IESocialEventProvider {
       },
     });
 
-    const cert =
-      company?.cert ||
-      company?.group?.cert ||
-      company?.receivingServiceContracts?.[0].applyingServiceCompany?.cert;
+    const cert = company?.cert || company?.group?.cert || company?.receivingServiceContracts?.[0].applyingServiceCompany?.cert;
 
-    if (options?.cert && !cert)
-      throw new BadRequestException('Certificado digital não cadastrado');
+    if (options?.cert && !cert) throw new BadRequestException('Certificado digital não cadastrado');
 
     return { cert, company };
   }
@@ -219,10 +179,7 @@ class ESocialMethodsProvider implements IESocialEventProvider {
     return { zipFile, fileName };
   }
 
-  public async convertPfxToPem({
-    file,
-    password,
-  }: IConvertPfx): Promise<IConvertPfxReturn> {
+  public async convertPfxToPem({ file, password }: IConvertPfx): Promise<IConvertPfxReturn> {
     const path = `tmp/${v4()}.pfx`;
 
     fs.writeFileSync(path, file.buffer);
@@ -241,30 +198,17 @@ class ESocialMethodsProvider implements IESocialEventProvider {
       const passError = err.message.includes('password?');
       if (passError) throw new BadRequestException('Senha informada inválida');
       const certNotFOund = err.message.includes('such file or direct');
-      if (certNotFOund)
-        throw new InternalServerErrorException('Certificado não encontrado');
+      if (certNotFOund) throw new InternalServerErrorException('Certificado não encontrado');
 
-      throw new InternalServerErrorException(
-        'Não foi possivel converter o certificado',
-      );
+      throw new InternalServerErrorException('Não foi possivel converter o certificado');
     }
 
     const notAfter = this.dayJSProvider.dayjs(pem?.attributes?.notAfter);
     const notBefore = this.dayJSProvider.dayjs(pem?.attributes?.notBefore);
 
-    if (notAfter.toDate() < new Date())
-      throw new BadRequestException(
-        `Certificado digital da empresa vencido (${notAfter.format(
-          'DD/MM/YYYY',
-        )})`,
-      );
+    if (notAfter.toDate() < new Date()) throw new BadRequestException(`Certificado digital da empresa vencido (${notAfter.format('DD/MM/YYYY')})`);
 
-    if (notBefore.toDate() > new Date())
-      throw new BadRequestException(
-        `Certificado digital da empresa válido a partir de ${notBefore.format(
-          'DD/MM/YYYY',
-        )}`,
-      );
+    if (notBefore.toDate() > new Date()) throw new BadRequestException(`Certificado digital da empresa válido a partir de ${notBefore.format('DD/MM/YYYY')}`);
 
     return {
       certificate: pem.certificate,

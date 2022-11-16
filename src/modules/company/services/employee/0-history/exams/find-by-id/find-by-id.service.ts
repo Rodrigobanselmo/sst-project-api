@@ -6,9 +6,7 @@ import { EmployeeExamsHistoryRepository } from '../../../../../repositories/impl
 
 @Injectable()
 export class FindByIdEmployeeExamHistoryService {
-  constructor(
-    private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository,
-  ) {}
+  constructor(private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository) {}
 
   async execute(id: number, user: UserPayloadDto) {
     const found = await this.employeeExamHistoryRepository.findFirstNude({
@@ -33,8 +31,7 @@ export class FindByIdEmployeeExamHistoryService {
       },
     });
 
-    if (!found?.id)
-      throw new BadRequestException(ErrorMessageEnum.FORBIDDEN_ACCESS);
+    if (!found?.id) throw new BadRequestException(ErrorMessageEnum.FORBIDDEN_ACCESS);
 
     return found;
   }

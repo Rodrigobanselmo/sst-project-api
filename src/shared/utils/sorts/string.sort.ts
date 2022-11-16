@@ -1,10 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const sortString = function (
-  a: any,
-  b: any,
-  field?: string,
-  field2?: string,
-) {
+export const sortString = function (a: any, b: any, field?: string, field2?: string) {
   if (!a) return 0;
   if (!b) return 0;
 

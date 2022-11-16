@@ -8,11 +8,7 @@ export class DeleteManyRiskDataService {
   constructor(private readonly riskDataRepository: RiskDataRepository) {}
 
   async execute(upsertRiskDataDto: DeleteManyRiskDataDto, groupId: string) {
-    const deletedCount = await this.riskDataRepository.deleteByHomoAndRisk(
-      upsertRiskDataDto.homogeneousGroupIds,
-      upsertRiskDataDto.riskIds,
-      groupId,
-    );
+    const deletedCount = await this.riskDataRepository.deleteByHomoAndRisk(upsertRiskDataDto.homogeneousGroupIds, upsertRiskDataDto.riskIds, groupId);
 
     return deletedCount;
   }

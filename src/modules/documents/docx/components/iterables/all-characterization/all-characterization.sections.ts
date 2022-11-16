@@ -3,40 +3,20 @@ import { AlignmentType, BorderStyle, Paragraph, Table } from 'docx';
 import { sortString } from '../../../../../../shared/utils/sorts/string.sort';
 
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
-import {
-  ISectionChildrenType,
-  PGRSectionChildrenTypeEnum,
-} from '../../../builders/pgr/types/elements.types';
+import { ISectionChildrenType, PGRSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
-import {
-  IHierarchyData,
-  IHomoGroupMap,
-} from '../../../converter/hierarchy.converter';
+import { IHierarchyData, IHomoGroupMap } from '../../../converter/hierarchy.converter';
 import { hierarchyHomoOrgTable } from '../../tables/hierarchyHomoOrg/hierarchyHomoOrg.table';
 import { EnvironmentEntity } from '../../../../../company/entities/environment.entity';
-import {
-  environmentsConverter,
-  IEnvironmentConvertResponse,
-} from './all-characterization.converter';
+import { environmentsConverter, IEnvironmentConvertResponse } from './all-characterization.converter';
 import { getCharacterizationType } from '../../../../../../modules/company/repositories/implementations/CharacterizationRepository';
 
 const getData = (
   hierarchiesTreeOrg: IHierarchyData,
   homoGroupTree: IHomoGroupMap,
   titleSection: string,
-  convertToDocx: (
-    data: ISectionChildrenType[],
-    variables?: IDocVariables,
-  ) => (Paragraph | Table)[],
-  {
-    variables,
-    id,
-    risks,
-    considerations: cons,
-    activities: ac,
-    type,
-    paragraphs,
-  }: Partial<IEnvironmentConvertResponse>,
+  convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[],
+  { variables, id, risks, considerations: cons, activities: ac, type, paragraphs }: Partial<IEnvironmentConvertResponse>,
 ) => {
   const parameters: ISectionChildrenType[] = [];
   const riskFactors: ISectionChildrenType[] = [];
@@ -149,16 +129,12 @@ const getData = (
     },
   ] as ISectionChildrenType[];
 
-  const { table: officesTable, missingBody } = hierarchyHomoOrgTable(
-    hierarchiesTreeOrg,
-    homoGroupTree,
-    {
-      showDescription: false,
-      showHomogeneous: true,
-      type: getCharacterizationType(type),
-      groupIdFilter: id,
-    },
-  );
+  const { table: officesTable, missingBody } = hierarchyHomoOrgTable(hierarchiesTreeOrg, homoGroupTree, {
+    showDescription: false,
+    showHomogeneous: true,
+    type: getCharacterizationType(type),
+    groupIdFilter: id,
+  });
 
   if (!missingBody) {
     const titleTable = [
@@ -269,112 +245,80 @@ export const allCharacterizationSections = (
   hierarchiesTreeOrg: IHierarchyData,
   homoGroupTree: IHomoGroupMap,
   type = 'char' as 'env' | 'char',
-  convertToDocx: (
-    data: ISectionChildrenType[],
-    variables?: IDocVariables,
-  ) => (Paragraph | Table)[],
+  convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[],
 ) => {
   const sections: (Paragraph | Table)[][] = [];
   const sectionProfiles: Record<string, (Paragraph | Table)[]> = {};
 
-  (type === 'char' ? characterizationTypes : environmentTypes).forEach(
-    ({ type, title: titleSection, desc }) => {
-      const environments = environmentsData.filter(
-        (e) => e.type === type || !!e.profileParentId,
-      );
-      if (!environments?.length) return;
+  (type === 'char' ? characterizationTypes : environmentTypes).forEach(({ type, title: titleSection, desc }) => {
+    const environments = environmentsData.filter((e) => e.type === type || !!e.profileParentId);
+    if (!environments?.length) return;
 
-      const environmentData = environmentsConverter(environments);
-      let firstPass = true;
+    const environmentData = environmentsConverter(environments);
+    let firstPass = true;
 
-      environmentData
-        .sort((a, b) => sortString(b, a, 'profileParentId'))
-        .forEach(
-          ({
-            variables,
-            elements,
-            id,
-            risks,
-            considerations: cons,
-            breakPage,
-            activities: ac,
-            profileParentId,
-            profiles,
-            type,
-            paragraphs,
-          }) => {
-            const title = [
-              {
-                type: PGRSectionChildrenTypeEnum.H3,
-                text: `${desc}: ??${VariablesPGREnum.ENVIRONMENT_NAME}??`,
-              },
-            ] as ISectionChildrenType[];
-
-            const otherSections = getData(
-              hierarchiesTreeOrg,
-              homoGroupTree,
-              titleSection,
-              convertToDocx,
-              {
-                variables,
-                id,
-                risks,
-                considerations: cons,
-                activities: ac,
-                type,
-                paragraphs,
-              },
-            );
-
-            if (profileParentId) {
-              otherSections.unshift(
-                ...convertToDocx(
-                  [
-                    {
-                      type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-                      text: ``,
-                    },
-                  ],
-                  variables,
-                ),
-              );
-
-              sectionProfiles[id] = otherSections;
-              return;
-            }
-
-            const section = [
-              ...convertToDocx([...title], variables),
-              ...elements,
-              ...otherSections,
-              ...profiles
-                .map((profile) => sectionProfiles[profile.id])
-                .reduce((acc, curr) => (curr ? [...acc, ...curr] : acc), []),
-            ];
-
-            if (firstPass) {
-              section.unshift(
-                ...convertToDocx([
-                  {
-                    type: PGRSectionChildrenTypeEnum.H2,
-                    text: titleSection,
-                  },
-                ]),
-              );
-              firstPass = false;
-            }
-
-            if (breakPage || sections.length === 0) sections.push(section);
-            else {
-              sections[sections.length - 1] = [
-                ...(sections[sections.length - 1] || []),
-                ...section,
-              ];
-            }
+    environmentData
+      .sort((a, b) => sortString(b, a, 'profileParentId'))
+      .forEach(({ variables, elements, id, risks, considerations: cons, breakPage, activities: ac, profileParentId, profiles, type, paragraphs }) => {
+        const title = [
+          {
+            type: PGRSectionChildrenTypeEnum.H3,
+            text: `${desc}: ??${VariablesPGREnum.ENVIRONMENT_NAME}??`,
           },
-        );
-    },
-  );
+        ] as ISectionChildrenType[];
+
+        const otherSections = getData(hierarchiesTreeOrg, homoGroupTree, titleSection, convertToDocx, {
+          variables,
+          id,
+          risks,
+          considerations: cons,
+          activities: ac,
+          type,
+          paragraphs,
+        });
+
+        if (profileParentId) {
+          otherSections.unshift(
+            ...convertToDocx(
+              [
+                {
+                  type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+                  text: ``,
+                },
+              ],
+              variables,
+            ),
+          );
+
+          sectionProfiles[id] = otherSections;
+          return;
+        }
+
+        const section = [
+          ...convertToDocx([...title], variables),
+          ...elements,
+          ...otherSections,
+          ...profiles.map((profile) => sectionProfiles[profile.id]).reduce((acc, curr) => (curr ? [...acc, ...curr] : acc), []),
+        ];
+
+        if (firstPass) {
+          section.unshift(
+            ...convertToDocx([
+              {
+                type: PGRSectionChildrenTypeEnum.H2,
+                text: titleSection,
+              },
+            ]),
+          );
+          firstPass = false;
+        }
+
+        if (breakPage || sections.length === 0) sections.push(section);
+        else {
+          sections[sections.length - 1] = [...(sections[sections.length - 1] || []), ...section];
+        }
+      });
+  });
 
   return sections.map((section) => ({
     footerText: `??${VariablesPGREnum.CHAPTER_2}??`,

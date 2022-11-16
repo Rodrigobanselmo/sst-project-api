@@ -78,9 +78,7 @@ export class DocumentPCMSOEntity implements DocumentPCMSO {
 
     if (!this?.professionals) this.professionals = [];
     if (partial?.professionalsSignatures) {
-      this.professionalsSignatures = partial.professionalsSignatures.map(
-        (professionalSig) => new ProfessionalPCMSOEntity(professionalSig),
-      );
+      this.professionalsSignatures = partial.professionalsSignatures.map((professionalSig) => new ProfessionalPCMSOEntity(professionalSig));
 
       this.professionals = this.professionalsSignatures.map(
         ({ professional, ...rest }) =>
@@ -92,10 +90,7 @@ export class DocumentPCMSOEntity implements DocumentPCMSO {
     }
 
     if (this.validityStart && this.validityEnd) {
-      this.validity =
-        dayjs(this.validityStart).format('MM/YYYY') +
-        ' a ' +
-        dayjs(this.validityEnd).format('MM/YYYY');
+      this.validity = dayjs(this.validityStart).format('MM/YYYY') + ' a ' + dayjs(this.validityEnd).format('MM/YYYY');
     }
   }
 }

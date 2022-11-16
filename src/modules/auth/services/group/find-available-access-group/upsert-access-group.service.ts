@@ -8,15 +8,8 @@ import { AuthGroupRepository } from '../../../repositories/implementations/AuthG
 export class FindAvailableAccessGroupsService {
   constructor(private readonly authGroupRepository: AuthGroupRepository) {}
 
-  async execute(
-    { skip, take, ...query }: FindAccessGroupDto,
-    user: UserPayloadDto,
-  ) {
-    const access = await this.authGroupRepository.findAvailable(
-      user.targetCompanyId,
-      { ...query },
-      { skip, take },
-    );
+  async execute({ skip, take, ...query }: FindAccessGroupDto, user: UserPayloadDto) {
+    const access = await this.authGroupRepository.findAvailable(user.targetCompanyId, { ...query }, { skip, take });
 
     return access;
   }

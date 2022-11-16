@@ -5,16 +5,10 @@ import { CharacterizationRepository } from '../../../repositories/implementation
 
 @Injectable()
 export class FindAllCharacterizationService {
-  constructor(
-    private readonly characterizationRepository: CharacterizationRepository,
-  ) {}
+  constructor(private readonly characterizationRepository: CharacterizationRepository) {}
 
   async execute(workspaceId: string, userPayloadDto: UserPayloadDto) {
-    const characterizations = await this.characterizationRepository.findAll(
-      userPayloadDto.targetCompanyId,
-      workspaceId,
-      { include: { photos: true } },
-    );
+    const characterizations = await this.characterizationRepository.findAll(userPayloadDto.targetCompanyId, workspaceId, { include: { photos: true } });
 
     return characterizations;
   }

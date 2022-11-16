@@ -1,15 +1,5 @@
 import { textLink } from '../../../../base/elements/paragraphs';
-import {
-  AlignmentType,
-  ITableCellOptions,
-  ITableRowOptions,
-  Paragraph,
-  TableCell,
-  TableRow,
-  TextRun,
-  VerticalAlign,
-  WidthType,
-} from 'docx';
+import { AlignmentType, ITableCellOptions, ITableRowOptions, Paragraph, TableCell, TableRow, TextRun, VerticalAlign, WidthType } from 'docx';
 import { isOdd } from '../../../../../../../shared/utils/isOdd';
 import { borderStyleGlobal } from '../../../../base/config/styles';
 import { palette } from '../../../../../../../shared/constants/palette';

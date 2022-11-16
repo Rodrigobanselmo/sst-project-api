@@ -1,7 +1,4 @@
-import {
-  checkExamFields,
-  compareFieldValues,
-} from './../../../../../../../shared/utils/compareFieldValues';
+import { checkExamFields, compareFieldValues } from './../../../../../../../shared/utils/compareFieldValues';
 import { MessageEnum } from './../../../../../../../shared/constants/enum/message.enum';
 import { MessageNotificationDto } from './../../../../../../notifications/dto/nofication.dto';
 import { NotificationRepository } from './../../../../../../notifications/repositories/implementations/NotificationRepository';
@@ -27,15 +24,8 @@ export class UpdateManyScheduleExamHistoryService {
     private readonly notificationRepository: NotificationRepository,
   ) {}
 
-  async execute(
-    { data, isClinic, ...dataDto }: UpdateManyScheduleExamDto,
-    user: UserPayloadDto,
-  ) {
-    const employeeId = data.every(
-      (dt) => data?.[0]?.employeeId === dt?.employeeId,
-    )
-      ? data[0]?.employeeId
-      : 0;
+  async execute({ data, isClinic, ...dataDto }: UpdateManyScheduleExamDto, user: UserPayloadDto) {
+    const employeeId = data.every((dt) => data?.[0]?.employeeId === dt?.employeeId) ? data[0]?.employeeId : 0;
 
     const allExamsIds = data.map((dt) => dt.id);
 
@@ -47,10 +37,7 @@ export class UpdateManyScheduleExamHistoryService {
       },
       where: {
         ...(isClinic && {
-          OR: [
-            { examsHistory: { some: { clinicId: user.targetCompanyId } } },
-            { companyId: user.targetCompanyId },
-          ],
+          OR: [{ examsHistory: { some: { clinicId: user.targetCompanyId } } }, { companyId: user.targetCompanyId }],
           id: employeeId,
         }),
         ...(!isClinic && {
@@ -61,8 +48,7 @@ export class UpdateManyScheduleExamHistoryService {
     });
 
     //tenant
-    if (!found?.id)
-      throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_NOT_FOUND);
+    if (!found?.id) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_NOT_FOUND);
 
     await this.employeeRepository.update({
       companyId: found.companyId,
@@ -103,21 +89,14 @@ export class UpdateManyScheduleExamHistoryService {
     return history;
   }
 
-  async changeHierarchy(
-    dataDto: UpdateManyScheduleExamDto,
-    user: UserPayloadDto,
-    employee: EmployeeEntity,
-  ) {
-    const clinicExam = dataDto.data.find(
-      (e) => e.evaluationType === ExamHistoryEvaluationEnum.APTO,
-    );
+  async changeHierarchy(dataDto: UpdateManyScheduleExamDto, user: UserPayloadDto, employee: EmployeeEntity) {
+    const clinicExam = dataDto.data.find((e) => e.evaluationType === ExamHistoryEvaluationEnum.APTO);
 
     if (!clinicExam?.id) return;
 
-    const clinicHistory =
-      await this.employeeExamHistoryRepository.findUniqueNude({
-        where: { id: clinicExam.id },
-      });
+    const clinicHistory = await this.employeeExamHistoryRepository.findUniqueNude({
+      where: { id: clinicExam.id },
+    });
 
     if (clinicExam?.changeHierarchyAnyway) return;
 
@@ -127,8 +106,7 @@ export class UpdateManyScheduleExamHistoryService {
           employeeId: employee.id,
           hierarchyId: clinicHistory.hierarchyId,
           motive: clinicHistory.examType === 'ADMI' ? 'ADM' : 'TRANS_PROM',
-          startDate:
-            clinicHistory?.changeHierarchyDate || this.dayJSProvider.dateNow(),
+          startDate: clinicHistory?.changeHierarchyDate || this.dayJSProvider.dateNow(),
           subOfficeId: clinicHistory.subOfficeId,
         },
         { ...user, targetCompanyId: employee.companyId },
@@ -140,30 +118,22 @@ export class UpdateManyScheduleExamHistoryService {
           employeeId: employee.id,
           hierarchyId: null,
           motive: 'DEM',
-          startDate:
-            clinicHistory?.changeHierarchyDate || this.dayJSProvider.dateNow(),
+          startDate: clinicHistory?.changeHierarchyDate || this.dayJSProvider.dateNow(),
         },
         { ...user, targetCompanyId: employee.companyId },
       );
   }
 
-  async sendNotification(
-    dataDto: UpdateManyScheduleExamDto,
-    user: UserPayloadDto,
-    employee: EmployeeEntity,
-  ) {
+  async sendNotification(dataDto: UpdateManyScheduleExamDto, user: UserPayloadDto, employee: EmployeeEntity) {
     dataDto;
     if (dataDto?.isClinic) return;
 
-    const examData = dataDto.data.find(
-      (e) => e.status === StatusEnum.PROCESSING,
-    );
+    const examData = dataDto.data.find((e) => e.status === StatusEnum.PROCESSING);
 
     if (!examData?.id) return;
 
     const message: MessageNotificationDto = {
-      message:
-        'Seus exames tiveram o status alterado para "agendado", verifique sua agenda para mais informações',
+      message: 'Seus exames tiveram o status alterado para "agendado", verifique sua agenda para mais informações',
       title: 'Pedido de agenda atualizado',
       type: MessageEnum.SUCCESS,
     };

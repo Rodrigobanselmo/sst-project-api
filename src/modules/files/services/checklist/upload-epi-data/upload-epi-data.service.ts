@@ -32,11 +32,7 @@ export class UploadEpiDataService {
     const companyId = userPayloadDto.targetCompanyId;
 
     // get risk table with actual version
-    const riskDatabaseTable =
-      await this.databaseTableRepository.findByNameAndCompany(
-        riskWorkbook.name,
-        companyId,
-      );
+    const riskDatabaseTable = await this.databaseTableRepository.findByNameAndCompany(riskWorkbook.name, companyId);
 
     const allEpi = await this.uploadExcelProvider.getAllData({
       buffer,
@@ -60,15 +56,12 @@ export class UploadEpiDataService {
 
     console.log('start');
 
-    await Promise.all(
-      arr.map(async (data) => await this.epiRepository.upsertMany(data)),
-    );
+    await Promise.all(arr.map(async (data) => await this.epiRepository.upsertMany(data)));
 
     console.log('done');
 
     return await this.uploadExcelProvider.newTableData({
-      findAll: (sheet) =>
-        findAllEpis(this.excelProvider, this.epiRepository, sheet),
+      findAll: (sheet) => findAllEpis(this.excelProvider, this.epiRepository, sheet),
       Workbook: riskWorkbook,
       system,
       companyId,
@@ -77,30 +70,16 @@ export class UploadEpiDataService {
   }
 }
 
-const readEpis = async (
-  readFileData: IExcelReadData[],
-  excelProvider: ExcelProvider,
-  epiSheet: IEpiSheet,
-  databaseTable: DatabaseTableEntity,
-) => {
+const readEpis = async (readFileData: IExcelReadData[], excelProvider: ExcelProvider, epiSheet: IEpiSheet, databaseTable: DatabaseTableEntity) => {
   const episTable = readFileData.find((data) => data.name === epiSheet.name);
 
   if (!episTable)
-    throw new BadRequestException(
-      `The table you trying to insert has a different sheet name: ${readFileData.join(
-        ', ',
-      )} than the expected: ${epiSheet.name}`,
-    );
+    throw new BadRequestException(`The table you trying to insert has a different sheet name: ${readFileData.join(', ')} than the expected: ${epiSheet.name}`);
 
-  const epiDatabase = await excelProvider.transformToTableData(
-    episTable,
-    epiSheet.columns,
-  );
+  const epiDatabase = await excelProvider.transformToTableData(episTable, epiSheet.columns);
 
   if (databaseTable?.version && epiDatabase.version !== databaseTable.version)
-    throw new BadRequestException(
-      'The table you trying to insert has a different version, make sure you have the newest table version',
-    );
+    throw new BadRequestException('The table you trying to insert has a different version, make sure you have the newest table version');
 
   return epiDatabase.rows;
 };

@@ -7,9 +7,7 @@ import { UsersRepository } from '../../../repositories/implementations/UsersRepo
 export class FindAllByCompanyService {
   constructor(private readonly userRepository: UsersRepository) {}
   async execute(user: UserPayloadDto) {
-    const users = await this.userRepository.findAllByCompany(
-      user.targetCompanyId,
-    );
+    const users = await this.userRepository.findAllByCompany(user.targetCompanyId);
 
     return users.map((userCompany) => {
       // userCompany.companies = userCompany.companies

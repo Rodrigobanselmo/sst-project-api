@@ -8,17 +8,14 @@ export class FindCompanyService {
   constructor(private readonly companyRepository: CompanyRepository) {}
 
   async execute(user: UserPayloadDto) {
-    const company = await this.companyRepository.findById(
-      user.targetCompanyId,
-      {
-        include: {
-          workspace: true,
-          primary_activity: true,
-          secondary_activity: true,
-          clinicsAvailable: true,
-        },
+    const company = await this.companyRepository.findById(user.targetCompanyId, {
+      include: {
+        workspace: true,
+        primary_activity: true,
+        secondary_activity: true,
+        clinicsAvailable: true,
       },
-    );
+    });
 
     return company;
   }

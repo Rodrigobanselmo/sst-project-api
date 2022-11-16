@@ -59,18 +59,12 @@ export class HierarchyExcelProvider {
       }[];
 
       Object.entries(hierarchy).forEach(([key, value]) => {
-        if (key === 'directory' && value)
-          orderedHierarchy[0] = { key, value: value as string, id: v4() };
-        if (key === 'management' && value)
-          orderedHierarchy[1] = { key, value: value as string, id: v4() };
-        if (key === 'sector' && value)
-          orderedHierarchy[2] = { key, value: value as string, id: v4() };
-        if (key === 'sub_sector' && value)
-          orderedHierarchy[3] = { key, value: value as string, id: v4() };
-        if (key === 'office' && value)
-          orderedHierarchy[4] = { key, value: value as string, id: v4() };
-        if (key === 'sub_office' && value)
-          orderedHierarchy[5] = { key, value: value as string, id: v4() };
+        if (key === 'directory' && value) orderedHierarchy[0] = { key, value: value as string, id: v4() };
+        if (key === 'management' && value) orderedHierarchy[1] = { key, value: value as string, id: v4() };
+        if (key === 'sector' && value) orderedHierarchy[2] = { key, value: value as string, id: v4() };
+        if (key === 'sub_sector' && value) orderedHierarchy[3] = { key, value: value as string, id: v4() };
+        if (key === 'office' && value) orderedHierarchy[4] = { key, value: value as string, id: v4() };
+        if (key === 'sub_office' && value) orderedHierarchy[5] = { key, value: value as string, id: v4() };
       });
 
       orderedHierarchy = orderedHierarchy.filter((i) => i);
@@ -87,10 +81,8 @@ export class HierarchyExcelProvider {
           hierarchyMap[id].realDescription = hierarchy.realDescription;
           hierarchyMap[id].ghoName = hierarchy.ghoName;
           hierarchyMap[id].name = employeeWork.value;
-          hierarchyMap[id].type =
-            employeeWork.key.toUpperCase() as HierarchyEnum;
-          hierarchyMap[id].parentId =
-            index === 0 ? null : orderedHierarchy[index - 1].id;
+          hierarchyMap[id].type = employeeWork.key.toUpperCase() as HierarchyEnum;
+          hierarchyMap[id].parentId = index === 0 ? null : orderedHierarchy[index - 1].id;
 
           if (orderedHierarchy[index - 1] && index !== 0) {
             const _id = orderedHierarchy[index - 1].id;
@@ -132,16 +124,12 @@ export class HierarchyExcelProvider {
 
       if (parent) {
         if (newHierarchy[h1.parentId] && newHierarchy[h2.parentId]) {
-          const parentEqual = isEqualHierarchy(
-            newHierarchy[h1.parentId],
-            newHierarchy[h2.parentId],
-          );
+          const parentEqual = isEqualHierarchy(newHierarchy[h1.parentId], newHierarchy[h2.parentId]);
 
           return parentEqual && firstEqual;
         }
 
-        if (h1.parentId === h2.parentId && h2.parentId === null)
-          return firstEqual;
+        if (h1.parentId === h2.parentId && h2.parentId === null) return firstEqual;
 
         return false;
       }
@@ -154,35 +142,26 @@ export class HierarchyExcelProvider {
         newHierarchy[allHierarchy.id] = {
           ...allHierarchy,
           description: hierarchy?.description ?? allHierarchy.description,
-          realDescription:
-            hierarchy?.realDescription ?? allHierarchy.realDescription,
+          realDescription: hierarchy?.realDescription ?? allHierarchy.realDescription,
           ghoName: hierarchy?.ghoName ?? allHierarchy.ghoName,
           fromOld: true,
         };
 
       if (newHierarchy[allHierarchy.id].workspaceIds && hierarchy.workspaceId) {
-        newHierarchy[allHierarchy.id].workspaceIds = removeDuplicate(
-          [
-            ...newHierarchy[allHierarchy.id].workspaceIds,
-            ...hierarchy.workspaceId,
-          ],
-          {
-            simpleCompare: true,
-          },
-        );
+        newHierarchy[allHierarchy.id].workspaceIds = removeDuplicate([...newHierarchy[allHierarchy.id].workspaceIds, ...hierarchy.workspaceId], {
+          simpleCompare: true,
+        });
       }
       if (parentId) newHierarchy[allHierarchy.id].parentId = parentId;
 
       if (newHierarchy[hierarchy.id].children)
         newHierarchy[hierarchy.id].children.forEach((childId) => {
-          if (!newHierarchy[allHierarchy.id].children)
-            newHierarchy[allHierarchy.id].children = [];
+          if (!newHierarchy[allHierarchy.id].children) newHierarchy[allHierarchy.id].children = [];
 
           newHierarchy[allHierarchy.id].children.push(childId);
 
           newHierarchy[childId].parentId = allHierarchy.id;
-          newHierarchy[childId].connectedToOldId =
-            allHierarchy.connectedToOldId || allHierarchy.id;
+          newHierarchy[childId].connectedToOldId = allHierarchy.connectedToOldId || allHierarchy.id;
         });
 
       delete newHierarchy[hierarchy.id];
@@ -200,9 +179,7 @@ export class HierarchyExcelProvider {
           const connectedToOldId = newHierarchy[hierarchy.id].connectedToOldId;
 
           //get if exist on database and replace
-          const equalAllHierarchy = Object.values(allMap).find((i) =>
-            isEqualHierarchy(i, hierarchy, true),
-          );
+          const equalAllHierarchy = Object.values(allMap).find((i) => isEqualHierarchy(i, hierarchy, true));
 
           if (equalAllHierarchy) {
             if (!parentId || parentId === equalAllHierarchy.parentId) {
@@ -219,19 +196,11 @@ export class HierarchyExcelProvider {
             newHierarchy[newHierarchy[hierarchy.id].parentId] &&
             newHierarchy[newHierarchy[hierarchy.id].parentId].connectedToOldId
           ) {
-            newHierarchy[hierarchy.id].connectedToOldId =
-              newHierarchy[
-                newHierarchy[hierarchy.id].parentId
-              ].connectedToOldId;
+            newHierarchy[hierarchy.id].connectedToOldId = newHierarchy[newHierarchy[hierarchy.id].parentId].connectedToOldId;
           }
 
           //if has other equal hierarchy
-          const equalHierarchy = Object.values(newHierarchy).find(
-            (i) =>
-              !i.fromOld &&
-              i.id !== hierarchy.id &&
-              isEqualHierarchy(i, hierarchy, true),
-          );
+          const equalHierarchy = Object.values(newHierarchy).find((i) => !i.fromOld && i.id !== hierarchy.id && isEqualHierarchy(i, hierarchy, true));
 
           if (equalHierarchy && newHierarchy[hierarchy.id]) {
             replaceAndEditIfEqual(equalHierarchy, hierarchy);

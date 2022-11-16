@@ -12,9 +12,7 @@ export const levelRiskData = async (prisma: PrismaClient) => {
   });
 
   try {
-    const riskData = riskDataPrisma.map(
-      (rd) => new RiskFactorDataEntity(rd as any),
-    );
+    const riskData = riskDataPrisma.map((rd) => new RiskFactorDataEntity(rd as any));
 
     await Promise.all(
       riskData.map(async (rd) => {

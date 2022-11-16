@@ -15,12 +15,9 @@ export const quantityResultsHTable = () => {
   const table = new Table({
     width: { size: 100, type: WidthType.PERCENTAGE },
     rows: [
-      tableHeaderElements.headerRow(
-        NewHeader(headerH).map(tableHeaderElements.headerCell),
-        {
-          height: { value: 550, rule: HeightRule.EXACT },
-        },
-      ),
+      tableHeaderElements.headerRow(NewHeader(headerH).map(tableHeaderElements.headerCell), {
+        height: { value: 550, rule: HeightRule.EXACT },
+      }),
       ...NewBody(rowBodyHeat).map((data) =>
         tableBodyElements.tableRow(data.map(tableBodyElements.tableCell), {
           height: { value: 550, rule: HeightRule.ATLEAST },

@@ -46,21 +46,14 @@ const setMapHierarchies = (hierarchyData: HierarchyEntity[]) => {
   Object.values(hierarchyTree).forEach((hierarchy) => {
     if (hierarchy.parentId) {
       hierarchyTree[hierarchy.parentId].children.push(hierarchy.id);
-      if (!hierarchyTree[hierarchy.parentId].employees)
-        hierarchyTree[hierarchy.parentId].employees = [];
+      if (!hierarchyTree[hierarchy.parentId].employees) hierarchyTree[hierarchy.parentId].employees = [];
 
-      if (hierarchy.type !== 'SUB_OFFICE')
-        hierarchyTree[hierarchy.parentId].employees.push(
-          ...hierarchy.employees,
-        );
+      if (hierarchy.type !== 'SUB_OFFICE') hierarchyTree[hierarchy.parentId].employees.push(...hierarchy.employees);
     }
   });
 
   Object.values(hierarchyTree).forEach((h) => {
-    hierarchyTree[h.id].employees = removeDuplicate(
-      hierarchyTree[h.id].employees,
-      { removeById: 'id' },
-    );
+    hierarchyTree[h.id].employees = removeDuplicate(hierarchyTree[h.id].employees, { removeById: 'id' });
 
     const hierarchy = hierarchyTree[h.id];
 
@@ -72,10 +65,7 @@ const setMapHierarchies = (hierarchyData: HierarchyEntity[]) => {
 
       homoGroupTree[homogeneousGroup.id] = {
         ...homogeneousGroup,
-        hierarchies: [
-          ...homoGroupTree[homogeneousGroup.id].hierarchies,
-          hierarchy,
-        ],
+        hierarchies: [...homoGroupTree[homogeneousGroup.id].hierarchies, hierarchy],
       };
     });
   });
@@ -94,11 +84,7 @@ const setMapHierarchies = (hierarchyData: HierarchyEntity[]) => {
   return { hierarchyTree, homoGroupTree };
 };
 
-export const hierarchyConverter = (
-  hierarchies: HierarchyEntity[],
-  environments = [] as EnvironmentEntity[],
-  { workspaceId }: { workspaceId?: string } = {},
-) => {
+export const hierarchyConverter = (hierarchies: HierarchyEntity[], environments = [] as EnvironmentEntity[], { workspaceId }: { workspaceId?: string } = {}) => {
   const { hierarchyTree, homoGroupTree } = setMapHierarchies(hierarchies);
   const hierarchyData = new Map<string, HierarchyMapData>();
   const hierarchyHighLevelsData = new Map<string, HierarchyMapData>();
@@ -112,8 +98,7 @@ export const hierarchyConverter = (
       if (!parentId) return;
       const parent = hierarchyTree[parentId];
       const parentInfo = hierarchyMap[parent.type];
-      const homogeneousGroupIds =
-        parent?.homogeneousGroups?.map((group) => group.id) || [];
+      const homogeneousGroupIds = parent?.homogeneousGroups?.map((group) => group.id) || [];
 
       allHomogeneousGroupIds.push(...homogeneousGroupIds);
 
@@ -127,9 +112,7 @@ export const hierarchyConverter = (
           parent?.homogeneousGroups
             ?.map((group) => {
               if (group.type != HomoTypeEnum.ENVIRONMENT) return;
-              return (
-                (environments.find((e) => e.id === group.id) || {})?.name || ''
-              );
+              return (environments.find((e) => e.id === group.id) || {})?.name || '';
             })
             .filter((e) => e)
             .join(', ') || '',
@@ -146,8 +129,7 @@ export const hierarchyConverter = (
       loop(parent.parentId);
     };
 
-    const homogeneousGroupIds =
-      hierarchy?.homogeneousGroups?.map((group) => group.id) || [];
+    const homogeneousGroupIds = hierarchy?.homogeneousGroups?.map((group) => group.id) || [];
 
     hierarchyArrayData[hierarchyInfo.index] = {
       type: hierarchyInfo.text,
@@ -159,9 +141,7 @@ export const hierarchyConverter = (
         hierarchy?.homogeneousGroups
           ?.map((group) => {
             if (group.type != HomoTypeEnum.ENVIRONMENT) return;
-            return (
-              (environments.find((e) => e.id === group.id) || {})?.name || ''
-            );
+            return (environments.find((e) => e.id === group.id) || {})?.name || '';
           })
           .filter((e) => e)
           .join(', ') || '',
@@ -178,15 +158,9 @@ export const hierarchyConverter = (
     allHomogeneousGroupIds.push(...homogeneousGroupIds);
     loop(hierarchy.parentId);
 
-    const isOffice = (
-      [HierarchyEnum.OFFICE, HierarchyEnum.SUB_OFFICE] as HierarchyEnum[]
-    ).includes(hierarchy.type);
+    const isOffice = ([HierarchyEnum.OFFICE, HierarchyEnum.SUB_OFFICE] as HierarchyEnum[]).includes(hierarchy.type);
 
-    const workspace = workspaceId
-      ? hierarchy.workspaces.find(
-          (workspace) => workspace.id === workspaceId,
-        ) || hierarchy.workspaces[0]
-      : hierarchy.workspaces[0];
+    const workspace = workspaceId ? hierarchy.workspaces.find((workspace) => workspace.id === workspaceId) || hierarchy.workspaces[0] : hierarchy.workspaces[0];
 
     if (isOffice)
       hierarchyData.set(hierarchy.id, {

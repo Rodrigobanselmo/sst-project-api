@@ -5,14 +5,9 @@ import { RiskDocumentRepository } from '../../../repositories/implementations/Ri
 
 @Injectable()
 export class FindDocumentsService {
-  constructor(
-    private readonly riskDocumentRepository: RiskDocumentRepository,
-  ) {}
+  constructor(private readonly riskDocumentRepository: RiskDocumentRepository) {}
 
-  async execute(
-    { skip, take, ...query }: FindDocVersionDto,
-    user: UserPayloadDto,
-  ) {
+  async execute({ skip, take, ...query }: FindDocVersionDto, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;
 
     const riskGroupData = await this.riskDocumentRepository.find(

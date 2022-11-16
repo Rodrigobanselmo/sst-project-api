@@ -3,11 +3,7 @@ interface IChuckOptions {
   balanced: boolean;
 }
 
-export function arrayChunks<T>(
-  array: T[],
-  perChunk: number,
-  options?: IChuckOptions,
-): Array<T[]> {
+export function arrayChunks<T>(array: T[], perChunk: number, options?: IChuckOptions): Array<T[]> {
   const chuckArray = array.reduce((acc, item, index) => {
     const chunkIndex = Math.floor(index / perChunk);
 
@@ -27,10 +23,7 @@ export function arrayChunks<T>(
     let index = secondLastChunkIndex;
 
     if (chuckArray[secondLastChunkIndex]) {
-      while (
-        chuckArray[lastChunkIndex].length <
-        chuckArray[secondLastChunkIndex].length
-      ) {
+      while (chuckArray[lastChunkIndex].length < chuckArray[secondLastChunkIndex].length) {
         const item = chuckArray[index].pop();
         chuckArray[lastChunkIndex].push(item);
 

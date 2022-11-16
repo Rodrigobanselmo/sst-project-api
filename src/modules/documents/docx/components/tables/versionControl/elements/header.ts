@@ -1,14 +1,4 @@
-import {
-  AlignmentType,
-  HeightRule,
-  ITableCellOptions,
-  Paragraph,
-  TableCell,
-  TableRow,
-  TextRun,
-  VerticalAlign,
-  WidthType,
-} from 'docx';
+import { AlignmentType, HeightRule, ITableCellOptions, Paragraph, TableCell, TableRow, TextRun, VerticalAlign, WidthType } from 'docx';
 
 import { palette } from '../../../../../../../shared/constants/palette';
 import { borderStyle } from './body';

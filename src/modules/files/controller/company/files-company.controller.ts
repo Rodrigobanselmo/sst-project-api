@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Res,
-  UploadedFile,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Controller, Get, Post, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
@@ -19,10 +12,7 @@ import { UploadEmployeesService } from '../../services/company/upload-employees/
 import { UploadHierarchiesService } from '../../services/company/upload-hierarchies/upload-hierarchies.service';
 import { UploadUniqueCompanyService } from '../../services/company/upload-unique-company/upload-unique-company.service';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
-import {
-  PermissionEnum,
-  RoleEnum,
-} from '../../../../shared/constants/enum/authorization';
+import { PermissionEnum, RoleEnum } from '../../../../shared/constants/enum/authorization';
 import { Roles } from '../../../../shared/decorators/roles.decorator';
 @Controller('files/company')
 export class FilesCompanyController {
@@ -45,13 +35,8 @@ export class FilesCompanyController {
   })
   @Post('/upload/unique')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadCompanyFile(
-    @UploadedFile() file: Express.Multer.File,
-    @User() userPayloadDto: UserPayloadDto,
-    @Res() res,
-  ) {
-    const { workbook, filename } =
-      await this.uploadUniqueCompanyService.execute(file, userPayloadDto);
+  async uploadCompanyFile(@UploadedFile() file: Express.Multer.File, @User() userPayloadDto: UserPayloadDto, @Res() res) {
+    const { workbook, filename } = await this.uploadUniqueCompanyService.execute(file, userPayloadDto);
 
     res.attachment(filename);
     workbook.xlsx.write(res).then(function () {
@@ -66,15 +51,8 @@ export class FilesCompanyController {
   })
   @Post('employees/upload/:companyId?')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadEmployeesFile(
-    @UploadedFile() file: Express.Multer.File,
-    @User() userPayloadDto: UserPayloadDto,
-    @Res() res,
-  ) {
-    const { workbook, filename } = await this.uploadEmployeesService.execute(
-      file,
-      userPayloadDto,
-    );
+  async uploadEmployeesFile(@UploadedFile() file: Express.Multer.File, @User() userPayloadDto: UserPayloadDto, @Res() res) {
+    const { workbook, filename } = await this.uploadEmployeesService.execute(file, userPayloadDto);
 
     res.attachment(filename);
     workbook.xlsx.write(res).then(function () {
@@ -90,10 +68,7 @@ export class FilesCompanyController {
   })
   @Post('hierarchies/upload/:companyId?')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadHierarchiesFile(
-    @UploadedFile() file: Express.Multer.File,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
+  async uploadHierarchiesFile(@UploadedFile() file: Express.Multer.File, @User() userPayloadDto: UserPayloadDto) {
     await this.uploadHierarchiesService.execute(file, userPayloadDto);
     return 'sucesso';
   }
@@ -107,15 +82,8 @@ export class FilesCompanyController {
   })
   @Post('/upload/:companyId?')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadFile(
-    @UploadedFile() file: Express.Multer.File,
-    @User() userPayloadDto: UserPayloadDto,
-    @Res() res,
-  ) {
-    const { workbook, filename } = await this.uploadCompaniesService.execute(
-      file,
-      userPayloadDto,
-    );
+  async uploadFile(@UploadedFile() file: Express.Multer.File, @User() userPayloadDto: UserPayloadDto, @Res() res) {
+    const { workbook, filename } = await this.uploadCompaniesService.execute(file, userPayloadDto);
 
     res.attachment(filename);
     workbook.xlsx.write(res).then(function () {
@@ -131,9 +99,7 @@ export class FilesCompanyController {
   })
   @Get('/download/:companyId?')
   async download(@User() userPayloadDto: UserPayloadDto, @Res() res) {
-    const { workbook, filename } = await this.downloadCompaniesService.execute(
-      userPayloadDto,
-    );
+    const { workbook, filename } = await this.downloadCompaniesService.execute(userPayloadDto);
 
     res.attachment(filename);
     workbook.xlsx.write(res).then(function () {
@@ -149,8 +115,7 @@ export class FilesCompanyController {
   })
   @Get('/download/unique/:companyId?')
   async downloadUnique(@User() userPayloadDto: UserPayloadDto, @Res() res) {
-    const { workbook, filename } =
-      await this.downloadUniqueCompanyService.execute(userPayloadDto);
+    const { workbook, filename } = await this.downloadUniqueCompanyService.execute(userPayloadDto);
 
     res.attachment(filename);
     workbook.xlsx.write(res).then(function () {
@@ -165,9 +130,7 @@ export class FilesCompanyController {
   })
   @Get('/employees/download/:companyId?')
   async downloadEmployees(@User() userPayloadDto: UserPayloadDto, @Res() res) {
-    const { workbook, filename } = await this.downloadEmployeesService.execute(
-      userPayloadDto,
-    );
+    const { workbook, filename } = await this.downloadEmployeesService.execute(userPayloadDto);
 
     res.attachment(filename);
     workbook.xlsx.write(res).then(function () {
@@ -181,12 +144,8 @@ export class FilesCompanyController {
     isMember: true,
   })
   @Get('/hierarchies/download/:companyId?')
-  async downloadHierarchies(
-    @User() userPayloadDto: UserPayloadDto,
-    @Res() res,
-  ) {
-    const { workbook, filename } =
-      await this.downloadHierarchiesService.execute(userPayloadDto);
+  async downloadHierarchies(@User() userPayloadDto: UserPayloadDto, @Res() res) {
+    const { workbook, filename } = await this.downloadHierarchiesService.execute(userPayloadDto);
 
     res.attachment(filename);
     workbook.xlsx.write(res).then(function () {

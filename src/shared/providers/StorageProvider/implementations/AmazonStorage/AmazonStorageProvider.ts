@@ -1,10 +1,7 @@
 import * as AWS from 'aws-sdk';
 
 import MimeClass from '../../../../../shared/utils/mime';
-import {
-  FileStorage,
-  IStorageProvider,
-} from '../../models/StorageProvider.types';
+import { FileStorage, IStorageProvider } from '../../models/StorageProvider.types';
 
 export class AmazonStorageProvider implements IStorageProvider {
   private readonly s3: AWS.S3;
@@ -15,19 +12,13 @@ export class AmazonStorageProvider implements IStorageProvider {
     this.bucket = process.env.AWS_S3_BUCKET;
   }
 
-  async upload({
-    file,
-    fileName,
-    isPublic,
-  }: FileStorage.Upload.Params): Promise<FileStorage.Upload.Result> {
+  async upload({ file, fileName, isPublic }: FileStorage.Upload.Params): Promise<FileStorage.Upload.Result> {
     // if (process.env.APP_HOST.includes('localhost')) return { url: 'edwq' };
 
     const { Location: url } = await this.s3
       .upload({
         Bucket: this.bucket,
-        Key: process.env.APP_HOST.includes('localhost')
-          ? `${'test'}/${fileName}`
-          : fileName,
+        Key: process.env.APP_HOST.includes('localhost') ? `${'test'}/${fileName}` : fileName,
         Body: file,
         ContentType: this.contentType(fileName),
         ACL: isPublic ? 'public-read' : undefined,
@@ -36,11 +27,7 @@ export class AmazonStorageProvider implements IStorageProvider {
     return { url };
   }
 
-  async uploadLarge({
-    file,
-    fileName,
-    isPublic,
-  }: FileStorage.Upload.Params): Promise<FileStorage.Upload.Result> {
+  async uploadLarge({ file, fileName, isPublic }: FileStorage.Upload.Params): Promise<FileStorage.Upload.Result> {
     const { Location: url } = await this.s3
       .upload({
         Bucket: this.bucket,
@@ -53,9 +40,7 @@ export class AmazonStorageProvider implements IStorageProvider {
     return { url };
   }
 
-  download({
-    fileKey,
-  }: FileStorage.Download.Params): FileStorage.Download.Result {
+  download({ fileKey }: FileStorage.Download.Params): FileStorage.Download.Result {
     const fileStream = this.s3
       .getObject({
         Bucket: this.bucket,
@@ -66,14 +51,10 @@ export class AmazonStorageProvider implements IStorageProvider {
     return { file: fileStream };
   }
 
-  async delete({
-    fileName,
-  }: FileStorage.Delete.Params): Promise<FileStorage.Delete.Result> {
+  async delete({ fileName }: FileStorage.Delete.Params): Promise<FileStorage.Delete.Result> {
     if (process.env.APP_HOST.includes('localhost')) return;
 
-    await this.s3
-      .deleteObject({ Bucket: this.bucket, Key: fileName })
-      .promise();
+    await this.s3.deleteObject({ Bucket: this.bucket, Key: fileName }).promise();
   }
 
   private contentType(filename: string): string {

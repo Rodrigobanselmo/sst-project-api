@@ -103,9 +103,7 @@ export class RiskFactorsEntity implements RiskFactors {
     this.vmp = String(this.getVMP(this?.nr15lt || ''));
 
     if (this.riskFactorData) {
-      this.riskFactorData = this.riskFactorData.map(
-        (riskData) => new RiskFactorDataEntity(riskData),
-      );
+      this.riskFactorData = this.riskFactorData.map((riskData) => new RiskFactorDataEntity(riskData));
     }
   }
 

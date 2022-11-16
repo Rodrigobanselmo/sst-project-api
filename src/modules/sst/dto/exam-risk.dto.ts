@@ -1,13 +1,6 @@
 import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
 import { DateFormat } from '../../../shared/transformers/date-format';
-import {
-  IsBoolean,
-  IsDate,
-  IsInt,
-  IsOptional,
-  IsString,
-  ValidateIf,
-} from 'class-validator';
+import { IsBoolean, IsDate, IsInt, IsOptional, IsString, ValidateIf } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { PartialType } from '@nestjs/swagger';
 

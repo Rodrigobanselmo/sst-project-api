@@ -33,11 +33,7 @@ export class UploadCnaeDataService {
     const companyId = userPayloadDto.targetCompanyId;
 
     // get risk table with actual version
-    const riskDatabaseTable =
-      await this.databaseTableRepository.findByNameAndCompany(
-        riskWorkbook.name,
-        companyId,
-      );
+    const riskDatabaseTable = await this.databaseTableRepository.findByNameAndCompany(riskWorkbook.name, companyId);
 
     const allCnae = await this.uploadExcelProvider.getAllData({
       buffer,
@@ -61,15 +57,12 @@ export class UploadCnaeDataService {
 
     console.log('start');
 
-    await Promise.all(
-      arr.map(async (data) => await this.activityRepository.upsertMany(data)),
-    );
+    await Promise.all(arr.map(async (data) => await this.activityRepository.upsertMany(data)));
 
     console.log('done');
 
     return await this.uploadExcelProvider.newTableData({
-      findAll: (sheet) =>
-        findAllCnaes(this.excelProvider, this.activityRepository, sheet),
+      findAll: (sheet) => findAllCnaes(this.excelProvider, this.activityRepository, sheet),
       Workbook: riskWorkbook,
       system,
       companyId,
@@ -78,29 +71,14 @@ export class UploadCnaeDataService {
   }
 }
 
-const readCnaes = async (
-  readFileData: IExcelReadData[],
-  excelProvider: ExcelProvider,
-  cnaeSheet: ICnaeSheet,
-  databaseTable: DatabaseTableEntity,
-) => {
+const readCnaes = async (readFileData: IExcelReadData[], excelProvider: ExcelProvider, cnaeSheet: ICnaeSheet, databaseTable: DatabaseTableEntity) => {
   const cnaesTable = readFileData.find((data) => data.name === cnaeSheet.name);
 
-  if (!cnaesTable)
-    throw new BadRequestException(
-      ErrorFilesEnum.WRONG_TABLE_SHEET.replace(
-        '??FOUND??',
-        readFileData.join(', '),
-      ).replace('??EXPECTED??', cnaeSheet.name),
-    );
+  if (!cnaesTable) throw new BadRequestException(ErrorFilesEnum.WRONG_TABLE_SHEET.replace('??FOUND??', readFileData.join(', ')).replace('??EXPECTED??', cnaeSheet.name));
 
-  const cnaeDatabase = await excelProvider.transformToTableData(
-    cnaesTable,
-    cnaeSheet.columns,
-  );
+  const cnaeDatabase = await excelProvider.transformToTableData(cnaesTable, cnaeSheet.columns);
 
-  if (databaseTable?.version && cnaeDatabase.version !== databaseTable.version)
-    throw new BadRequestException(ErrorFilesEnum.WRONG_TABLE_VERSION);
+  if (databaseTable?.version && cnaeDatabase.version !== databaseTable.version) throw new BadRequestException(ErrorFilesEnum.WRONG_TABLE_VERSION);
 
   return cnaeDatabase.rows;
 };

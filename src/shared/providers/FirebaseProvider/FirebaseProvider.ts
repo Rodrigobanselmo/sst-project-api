@@ -1,11 +1,6 @@
 import { InternalServerErrorException } from '@nestjs/common';
 import { FirebaseApp, initializeApp } from 'firebase/app';
-import {
-  Auth,
-  getAuth,
-  GoogleAuthProvider,
-  signInWithCredential,
-} from 'firebase/auth';
+import { Auth, getAuth, GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
 
 class FirebaseProvider {
   private firebaseApp: FirebaseApp;
@@ -40,10 +35,7 @@ class FirebaseProvider {
 
   async validateGoogleToken(token: string) {
     const credential = GoogleAuthProvider.credential(token);
-    const result = await signInWithCredential(
-      this.firebaseAuth,
-      credential,
-    ).catch((error) => {
+    const result = await signInWithCredential(this.firebaseAuth, credential).catch((error) => {
       const errorMessage = error.message;
 
       throw new InternalServerErrorException(errorMessage);

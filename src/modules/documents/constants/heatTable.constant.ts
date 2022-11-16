@@ -1,7 +1,4 @@
-export const heatTableNAConstant: Record<
-  number,
-  { ibtug: number; mw: number }
-> = {
+export const heatTableNAConstant: Record<number, { ibtug: number; mw: number }> = {
   100: { ibtug: 31.7, mw: 100 },
   101: { ibtug: 31.6, mw: 101 },
   103: { ibtug: 31.5, mw: 103 },
@@ -114,10 +111,7 @@ export const heatTableNAConstant: Record<
   602: { ibtug: 20.7, mw: 602 },
 };
 
-export const heatTableLEOConstant: Record<
-  number,
-  { ibtug: number; mw: number }
-> = {
+export const heatTableLEOConstant: Record<number, { ibtug: number; mw: number }> = {
   100: { ibtug: 33.7, mw: 100 },
   102: { ibtug: 33.6, mw: 102 },
   104: { ibtug: 33.5, mw: 104 },
@@ -211,10 +205,7 @@ export const heatTableLEOConstant: Record<
   606: { ibtug: 24.7, mw: 606 },
 };
 
-export const heatTableLIIConstant: Record<
-  number,
-  { ibtugLII: number; ibtugLSI: number; mw: number }
-> = {
+export const heatTableLIIConstant: Record<number, { ibtugLII: number; ibtugLSI: number; mw: number }> = {
   100: { ibtugLII: 32.3, ibtugLSI: 33.7, mw: 100 },
   102: { ibtugLII: 32.2, ibtugLSI: 33.6, mw: 102 },
   104: { ibtugLII: 32.1, ibtugLSI: 33.5, mw: 104 },
@@ -308,10 +299,7 @@ export const heatTableLIIConstant: Record<
   606: { ibtugLII: 23.3, ibtugLSI: 24.7, mw: 606 },
 };
 
-export const heatTableTETOConstant: Record<
-  number,
-  { ibtug: number; mw: number }
-> = {
+export const heatTableTETOConstant: Record<number, { ibtug: number; mw: number }> = {
   240: { ibtug: 38.0, mw: 240 },
   244: { ibtug: 37.9, mw: 244 },
   248: { ibtug: 37.8, mw: 248 },

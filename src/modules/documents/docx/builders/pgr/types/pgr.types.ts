@@ -6,11 +6,7 @@ import { RiskDocumentEntity } from '../../../../../sst/entities/riskDocument.ent
 import { CompanyEntity } from '../../../../../company/entities/company.entity';
 import { WorkspaceEntity } from '../../../../../company/entities/workspace.entity';
 import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
-import {
-  HierarchyMapData,
-  IHierarchyMap,
-  IHomoGroupMap,
-} from '../../../converter/hierarchy.converter';
+import { HierarchyMapData, IHierarchyMap, IHomoGroupMap } from '../../../converter/hierarchy.converter';
 
 export interface ICreatePGR {
   version: string;

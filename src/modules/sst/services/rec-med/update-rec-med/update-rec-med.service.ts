@@ -7,11 +7,7 @@ import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 export class UpdateRecMedService {
   constructor(private readonly recMedRepository: RecMedRepository) {}
 
-  async execute(
-    id: string,
-    updateRecMedDto: UpdateRecMedDto,
-    user: UserPayloadDto,
-  ) {
+  async execute(id: string, updateRecMedDto: UpdateRecMedDto, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;
 
     const risk = await this.recMedRepository.update(

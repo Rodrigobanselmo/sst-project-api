@@ -22,21 +22,14 @@ export class CopyCompanyService {
     private readonly homoGroupRepository: HomoGroupRepository,
     private readonly riskGroupDataRepository: RiskGroupDataRepository,
   ) {}
-  async execute(
-    companyCopyFromId: string,
-    riskGroupFromId: string,
-    user: UserPayloadDto,
-  ) {
+  async execute(companyCopyFromId: string, riskGroupFromId: string, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;
 
     const fromHierarchies = (
-      await this.hierarchyRepository.findAllHierarchyByCompany(
-        companyCopyFromId,
-        {
-          include: { workspaces: true },
-          returnWorkspace: true,
-        },
-      )
+      await this.hierarchyRepository.findAllHierarchyByCompany(companyCopyFromId, {
+        include: { workspaces: true },
+        returnWorkspace: true,
+      })
     ).filter((hierarchy) => hierarchy.workspaces.length > 0);
 
     const targetHierarchies = (
@@ -46,10 +39,7 @@ export class CopyCompanyService {
       })
     ).filter((hierarchy) => hierarchy.workspaces.length > 0);
 
-    const { equalHierarchy, equalWorkspace } = await this.getCommonHierarchy(
-      targetHierarchies,
-      fromHierarchies,
-    );
+    const { equalHierarchy, equalWorkspace } = await this.getCommonHierarchy(targetHierarchies, fromHierarchies);
 
     const company = await this.companyRepository.findById(companyCopyFromId, {
       include: {
@@ -59,45 +49,39 @@ export class CopyCompanyService {
       },
     });
 
-    const fromRiskDataGroup = company.riskFactorGroupData.find(
-      (doc) => riskGroupFromId === doc.id,
-    );
+    const fromRiskDataGroup = company.riskFactorGroupData.find((doc) => riskGroupFromId === doc.id);
 
-    if (!fromRiskDataGroup?.id)
-      throw new BadRequestException('Documeto não encontrado');
+    if (!fromRiskDataGroup?.id) throw new BadRequestException('Documeto não encontrado');
 
-    const homoGroups = await this.homoGroupRepository.findHomoGroupByCompany(
-      companyCopyFromId,
-      {
-        include: {
-          characterization: {
-            include: {
-              // photos: true,
-              profiles: {
-                include: {
-                  homogeneousGroup: true,
-                },
+    const homoGroups = await this.homoGroupRepository.findHomoGroupByCompany(companyCopyFromId, {
+      include: {
+        characterization: {
+          include: {
+            // photos: true,
+            profiles: {
+              include: {
+                homogeneousGroup: true,
               },
             },
           },
-          // environment: true,
-          riskFactorData: {
-            include: {
-              adms: true,
-              recs: true,
-              generateSources: true,
-              epiToRiskFactorData: { include: { epi: true } },
-              engsToRiskFactorData: { include: { recMed: true } },
-              hierarchy: true,
-              riskFactor: true,
-              probabilityCalc: true,
-              probabilityAfterCalc: true,
-            },
-            where: { riskFactorGroupDataId: riskGroupFromId },
+        },
+        // environment: true,
+        riskFactorData: {
+          include: {
+            adms: true,
+            recs: true,
+            generateSources: true,
+            epiToRiskFactorData: { include: { epi: true } },
+            engsToRiskFactorData: { include: { recMed: true } },
+            hierarchy: true,
+            riskFactor: true,
+            probabilityCalc: true,
+            probabilityAfterCalc: true,
           },
+          where: { riskFactorGroupDataId: riskGroupFromId },
         },
       },
-    );
+    });
 
     const newRiskGroupData = await this.riskGroupDataRepository.upsert({
       companyId,
@@ -108,8 +92,7 @@ export class CopyCompanyService {
       elaboratedBy: fromRiskDataGroup.elaboratedBy,
       name: fromRiskDataGroup.name,
       professionals:
-        fromRiskDataGroup.professionalsSignatures &&
-        fromRiskDataGroup.professionalsSignatures.length
+        fromRiskDataGroup.professionalsSignatures && fromRiskDataGroup.professionalsSignatures.length
           ? fromRiskDataGroup.professionalsSignatures.map((s) => ({
               isSigner: s.isSigner,
               isElaborator: s.isElaborator,
@@ -118,8 +101,7 @@ export class CopyCompanyService {
             }))
           : undefined,
       users:
-        fromRiskDataGroup.usersSignatures &&
-        fromRiskDataGroup.usersSignatures.length
+        fromRiskDataGroup.usersSignatures && fromRiskDataGroup.usersSignatures.length
           ? fromRiskDataGroup.usersSignatures.map((s) => ({
               isElaborator: s.isElaborator,
               isSigner: s.isSigner,
@@ -134,15 +116,9 @@ export class CopyCompanyService {
       validityStart: fromRiskDataGroup.validityStart,
     });
 
-    const createHomogeneous = async (
-      homoGroupsCreation: HomoGroupEntity[],
-      profileParentId?: string,
-    ) => {
+    const createHomogeneous = async (homoGroupsCreation: HomoGroupEntity[], profileParentId?: string) => {
       homoGroupsCreation.map((homoGroup, i) => {
-        if (
-          homoGroup.characterization &&
-          isEnvironment(homoGroup.characterization.type)
-        ) {
+        if (homoGroup.characterization && isEnvironment(homoGroup.characterization.type)) {
           homoGroupsCreation[i].environment = homoGroup.characterization as any;
           // homoGroupsCreation[i].characterization = null;
         }
@@ -150,23 +126,16 @@ export class CopyCompanyService {
 
       await Promise.all(
         homoGroupsCreation.map(async (group) => {
-          if (!profileParentId && group?.characterization?.profileParentId)
-            return; //log('skip profile');
-          if (profileParentId && !group?.characterization?.profileParentId)
-            return; //log('skip not profile');
+          if (!profileParentId && group?.characterization?.profileParentId) return; //log('skip profile');
+          if (profileParentId && !group?.characterization?.profileParentId) return; //log('skip not profile');
 
-          if (
-            group.characterization &&
-            isEnvironment(group.characterization.type)
-          )
-            group.environment = group.characterization;
+          if (group.characterization && isEnvironment(group.characterization.type)) group.environment = group.characterization;
 
           const hierarchies: HierarchyEntity[] = [];
 
           group.hierarchies.map((hierarchy) => {
             group.workspaceIds.map((workspaceId) => {
-              const hierarchyFound =
-                equalHierarchy[hierarchy.id + '//' + workspaceId];
+              const hierarchyFound = equalHierarchy[hierarchy.id + '//' + workspaceId];
 
               if (hierarchyFound && equalWorkspace[workspaceId])
                 hierarchyFound.forEach((h) => {
@@ -203,12 +172,7 @@ export class CopyCompanyService {
                 data: {
                   id: _newHomoGroupId,
                   description: group.description,
-                  name:
-                    group.environment ||
-                    group.characterization ||
-                    group.type === HomoTypeEnum.HIERARCHY
-                      ? _newHomoGroupId
-                      : group.name,
+                  name: group.environment || group.characterization || group.type === HomoTypeEnum.HIERARCHY ? _newHomoGroupId : group.name,
                   companyId: companyId,
                   type: group.type,
                 },
@@ -218,16 +182,9 @@ export class CopyCompanyService {
                 where: { id: foundHomo.id },
                 data: {
                   companyId: companyId,
-                  name:
-                    group.environment ||
-                    group.characterization ||
-                    group.type === HomoTypeEnum.HIERARCHY
-                      ? foundHomo.id
-                      : group.name,
+                  name: group.environment || group.characterization || group.type === HomoTypeEnum.HIERARCHY ? foundHomo.id : group.name,
                   type: group.type,
-                  description: foundHomo.description
-                    ? group.description || undefined
-                    : undefined,
+                  description: foundHomo.description ? group.description || undefined : undefined,
                 },
               });
             }
@@ -236,77 +193,57 @@ export class CopyCompanyService {
           const createRiskFactorData = async (_newHomoGroupId) => {
             await Promise.all(
               group.riskFactorData.map(async (riskFactorFromData) => {
-                const newRiskFactorData =
-                  await this.prisma.riskFactorData.create({
-                    data: {
-                      homogeneousGroupId: _newHomoGroupId,
-                      riskId: riskFactorFromData.riskId,
-                      riskFactorGroupDataId: newRiskGroupData.id,
-                      probabilityAfter: riskFactorFromData.probabilityAfter,
-                      probability: riskFactorFromData.probability,
-                      json: riskFactorFromData.json || undefined,
-                      // probabilityAfterCalc: {create:{chancesOfHappening:riskFactorFromData.probabilityAfter}}, //! missing this
-                      companyId,
-                      generateSources:
-                        riskFactorFromData.generateSources &&
-                        riskFactorFromData.generateSources.length
-                          ? {
-                              connect: riskFactorFromData.generateSources.map(
-                                ({ id }) => ({
-                                  id,
-                                }),
-                              ),
-                            }
-                          : undefined,
-                      recs:
-                        riskFactorFromData.recs &&
-                        riskFactorFromData.recs.length
-                          ? {
-                              connect: riskFactorFromData.recs.map(
-                                ({ id }) => ({
-                                  id,
-                                }),
-                              ),
-                            }
-                          : undefined,
-                      adms:
-                        riskFactorFromData.adms &&
-                        riskFactorFromData.adms.length
-                          ? {
-                              connect: riskFactorFromData.adms.map(
-                                ({ id }) => ({
-                                  id,
-                                }),
-                              ),
-                            }
-                          : undefined,
-                    },
-                  });
+                const newRiskFactorData = await this.prisma.riskFactorData.create({
+                  data: {
+                    homogeneousGroupId: _newHomoGroupId,
+                    riskId: riskFactorFromData.riskId,
+                    riskFactorGroupDataId: newRiskGroupData.id,
+                    probabilityAfter: riskFactorFromData.probabilityAfter,
+                    probability: riskFactorFromData.probability,
+                    json: riskFactorFromData.json || undefined,
+                    // probabilityAfterCalc: {create:{chancesOfHappening:riskFactorFromData.probabilityAfter}}, //! missing this
+                    companyId,
+                    generateSources:
+                      riskFactorFromData.generateSources && riskFactorFromData.generateSources.length
+                        ? {
+                            connect: riskFactorFromData.generateSources.map(({ id }) => ({
+                              id,
+                            })),
+                          }
+                        : undefined,
+                    recs:
+                      riskFactorFromData.recs && riskFactorFromData.recs.length
+                        ? {
+                            connect: riskFactorFromData.recs.map(({ id }) => ({
+                              id,
+                            })),
+                          }
+                        : undefined,
+                    adms:
+                      riskFactorFromData.adms && riskFactorFromData.adms.length
+                        ? {
+                            connect: riskFactorFromData.adms.map(({ id }) => ({
+                              id,
+                            })),
+                          }
+                        : undefined,
+                  },
+                });
 
-                if (
-                  riskFactorFromData.epiToRiskFactorData &&
-                  riskFactorFromData.epiToRiskFactorData.length
-                )
+                if (riskFactorFromData.epiToRiskFactorData && riskFactorFromData.epiToRiskFactorData.length)
                   await this.prisma.epiToRiskFactorData.createMany({
-                    data: riskFactorFromData.epiToRiskFactorData.map(
-                      ({ epi, ...data }) => ({
-                        ...data,
-                        riskFactorDataId: newRiskFactorData.id,
-                      }),
-                    ),
+                    data: riskFactorFromData.epiToRiskFactorData.map(({ epi, ...data }) => ({
+                      ...data,
+                      riskFactorDataId: newRiskFactorData.id,
+                    })),
                   });
 
-                if (
-                  riskFactorFromData.engsToRiskFactorData &&
-                  riskFactorFromData.engsToRiskFactorData.length
-                )
+                if (riskFactorFromData.engsToRiskFactorData && riskFactorFromData.engsToRiskFactorData.length)
                   await this.prisma.engsToRiskFactorData.createMany({
-                    data: riskFactorFromData.engsToRiskFactorData.map(
-                      ({ recMed, ...data }) => ({
-                        ...data,
-                        riskFactorDataId: newRiskFactorData.id,
-                      }),
-                    ),
+                    data: riskFactorFromData.engsToRiskFactorData.map(({ recMed, ...data }) => ({
+                      ...data,
+                      riskFactorDataId: newRiskFactorData.id,
+                    })),
                   });
 
                 return newRiskFactorData;
@@ -328,10 +265,7 @@ export class CopyCompanyService {
           } else {
             await createUpdateHomo(newHomoGroupId);
 
-            if (
-              group.characterization &&
-              equalWorkspace[group.characterization.workspaceId]
-            ) {
+            if (group.characterization && equalWorkspace[group.characterization.workspaceId]) {
               await this.prisma.companyCharacterization.create({
                 data: {
                   id: newHomoGroup.id,
@@ -345,8 +279,7 @@ export class CopyCompanyService {
                   profileName: group.characterization.profileName,
                   profileParentId: profileParentId || undefined,
                   order: group.characterization.order,
-                  workspaceId:
-                    equalWorkspace[group.characterization.workspaceId].id,
+                  workspaceId: equalWorkspace[group.characterization.workspaceId].id,
                 },
               });
 
@@ -384,10 +317,7 @@ export class CopyCompanyService {
                 },
                 create: {
                   hierarchyId: hierarchy.id,
-                  homogeneousGroupId:
-                    newHomoGroup.type === 'HIERARCHY'
-                      ? hierarchy.id
-                      : newHomoGroup.id,
+                  homogeneousGroupId: newHomoGroup.type === 'HIERARCHY' ? hierarchy.id : newHomoGroup.id,
                   workspaceId: hierarchy.workspaceId,
                 },
                 update: {},
@@ -412,77 +342,63 @@ export class CopyCompanyService {
     return {};
   }
 
-  async getCommonHierarchy(
-    targetHierarchies: HierarchyEntity[],
-    fromHierarchies: HierarchyEntity[],
-  ) {
+  async getCommonHierarchy(targetHierarchies: HierarchyEntity[], fromHierarchies: HierarchyEntity[]) {
     const equalHierarchy: Record<string, HierarchyEntity[]> = {};
     const equalWorkspace: Record<string, WorkspaceEntity> = {};
-    [
-      HierarchyEnum.DIRECTORY,
-      HierarchyEnum.MANAGEMENT,
-      HierarchyEnum.SECTOR,
-      HierarchyEnum.SUB_SECTOR,
-      HierarchyEnum.OFFICE,
-      HierarchyEnum.SUB_OFFICE,
-    ].forEach((hierarchyType) => {
-      targetHierarchies.forEach((targetHierarchy) => {
-        if (targetHierarchy.type !== hierarchyType) return;
+    [HierarchyEnum.DIRECTORY, HierarchyEnum.MANAGEMENT, HierarchyEnum.SECTOR, HierarchyEnum.SUB_SECTOR, HierarchyEnum.OFFICE, HierarchyEnum.SUB_OFFICE].forEach(
+      (hierarchyType) => {
+        targetHierarchies.forEach((targetHierarchy) => {
+          if (targetHierarchy.type !== hierarchyType) return;
 
-        fromHierarchies.find((hierarchyFrom) => {
-          const same = hierarchyFrom.id === targetHierarchy.refName;
-          if (same) {
-            equalWorkspace[hierarchyFrom.workspaces[0].id] =
-              targetHierarchy.workspaces[0];
+          fromHierarchies.find((hierarchyFrom) => {
+            const same = hierarchyFrom.id === targetHierarchy.refName;
+            if (same) {
+              equalWorkspace[hierarchyFrom.workspaces[0].id] = targetHierarchy.workspaces[0];
 
-            const old =
-              equalHierarchy[
-                hierarchyFrom.id + '//' + hierarchyFrom.workspaces[0].id
-              ] || [];
+              const old = equalHierarchy[hierarchyFrom.id + '//' + hierarchyFrom.workspaces[0].id] || [];
 
-            equalHierarchy[
-              hierarchyFrom.id + '//' + hierarchyFrom.workspaces[0].id
-            ] = [targetHierarchy, ...old];
-          }
+              equalHierarchy[hierarchyFrom.id + '//' + hierarchyFrom.workspaces[0].id] = [targetHierarchy, ...old];
+            }
+          });
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          // targetHierarchy.workspaces.forEach((workspace) => {
+          // fromHierarchies.find((hierarchyFrom) => {
+          // if (hierarchyFrom.type !== hierarchyType) return;
+
+          //* check if same hierarchy
+          // const sameWorkspaceFrom = hierarchyFrom.workspaces.find(
+          //   (workspaceFrom) => {
+          //     const isTheSame =
+          //       workspaceFrom.name.toLowerCase() ===
+          //       workspace.name.toLowerCase();
+          //     if (isTheSame) equalWorkspace[workspaceFrom.id] = workspace;
+
+          //     return isTheSame;
+          //   },
+          // );
+
+          // const sameName =
+          //   hierarchyFrom.name.toLowerCase() ===
+          //   targetHierarchy.name.toLowerCase();
+
+          // const sameParent = targetHierarchy.parentId
+          //   ? equalHierarchy[
+          //       hierarchyFrom.parentId + '//' + sameWorkspaceFrom.id
+          //     ] &&
+          //     equalHierarchy[
+          //       hierarchyFrom.parentId + '//' + sameWorkspaceFrom.id
+          //     ].id === targetHierarchy.parentId
+          //   : true;
+
+          // if (sameWorkspaceFrom && sameName && sameParent) {
+          //   equalHierarchy[hierarchyFrom.id + '//' + sameWorkspaceFrom.id] =
+          //     targetHierarchy;
+          // }
+          // });
+          // });
         });
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        // targetHierarchy.workspaces.forEach((workspace) => {
-        // fromHierarchies.find((hierarchyFrom) => {
-        // if (hierarchyFrom.type !== hierarchyType) return;
-
-        //* check if same hierarchy
-        // const sameWorkspaceFrom = hierarchyFrom.workspaces.find(
-        //   (workspaceFrom) => {
-        //     const isTheSame =
-        //       workspaceFrom.name.toLowerCase() ===
-        //       workspace.name.toLowerCase();
-        //     if (isTheSame) equalWorkspace[workspaceFrom.id] = workspace;
-
-        //     return isTheSame;
-        //   },
-        // );
-
-        // const sameName =
-        //   hierarchyFrom.name.toLowerCase() ===
-        //   targetHierarchy.name.toLowerCase();
-
-        // const sameParent = targetHierarchy.parentId
-        //   ? equalHierarchy[
-        //       hierarchyFrom.parentId + '//' + sameWorkspaceFrom.id
-        //     ] &&
-        //     equalHierarchy[
-        //       hierarchyFrom.parentId + '//' + sameWorkspaceFrom.id
-        //     ].id === targetHierarchy.parentId
-        //   : true;
-
-        // if (sameWorkspaceFrom && sameName && sameParent) {
-        //   equalHierarchy[hierarchyFrom.id + '//' + sameWorkspaceFrom.id] =
-        //     targetHierarchy;
-        // }
-        // });
-        // });
-      });
-    });
+      },
+    );
 
     return { equalHierarchy, equalWorkspace };
   }

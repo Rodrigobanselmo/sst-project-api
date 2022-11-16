@@ -15,10 +15,7 @@ export class AddQueueDocumentService {
     this.sqs = new AWS.SQS({ region: process.env.AWS_SQS_PGR_REGION });
     this.queueUrl = process.env.AWS_SQS_PGR_URL;
   }
-  async execute(
-    upsertPgrDto: UpsertDocumentDto,
-    userPayloadDto: UserPayloadDto,
-  ) {
+  async execute(upsertPgrDto: UpsertDocumentDto, userPayloadDto: UserPayloadDto) {
     const companyId = userPayloadDto.targetCompanyId;
 
     const riskDoc = await this.riskDocumentRepository.upsert({

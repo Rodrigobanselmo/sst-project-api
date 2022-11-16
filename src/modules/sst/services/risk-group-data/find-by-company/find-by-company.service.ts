@@ -3,14 +3,10 @@ import { RiskGroupDataRepository } from '../../../repositories/implementations/R
 
 @Injectable()
 export class FindAllByCompanyService {
-  constructor(
-    private readonly riskGroupDataRepository: RiskGroupDataRepository,
-  ) {}
+  constructor(private readonly riskGroupDataRepository: RiskGroupDataRepository) {}
 
   async execute(companyId: string) {
-    const riskGroupData = await this.riskGroupDataRepository.findAllByCompany(
-      companyId,
-    );
+    const riskGroupData = await this.riskGroupDataRepository.findAllByCompany(companyId);
 
     return riskGroupData;
   }

@@ -1,14 +1,8 @@
 import { UsersRepository } from './../../../repositories/implementations/UsersRepository';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import {
-  PermissionEnum,
-  RoleEnum,
-} from '../../../../../shared/constants/enum/authorization';
+import { PermissionEnum, RoleEnum } from '../../../../../shared/constants/enum/authorization';
 
-import {
-  UserCompanyDto,
-  UserPayloadDto,
-} from './../../../../../shared/dto/user-payload.dto';
+import { UserCompanyDto, UserPayloadDto } from './../../../../../shared/dto/user-payload.dto';
 import { CreateProfessionalDto } from './../../../dto/professional.dto';
 import { ProfessionalRepository } from './../../../repositories/implementations/ProfessionalRepository';
 import { ProfessionalTypeEnum } from '@prisma/client';
@@ -23,10 +17,7 @@ export class CreateProfessionalService {
     private readonly mailProvider: SendGridProvider,
   ) {}
 
-  async execute(
-    { ...createDataDto }: CreateProfessionalDto,
-    user: UserPayloadDto,
-  ) {
+  async execute({ ...createDataDto }: CreateProfessionalDto, user: UserPayloadDto) {
     const professionalFound = await this.professionalRepository.findFirstNude({
       where: {
         companyId: user.targetCompanyId,
@@ -49,19 +40,11 @@ export class CreateProfessionalService {
     const permissions: string[] = [];
     const roles: string[] = [];
 
-    if (
-      (
-        [
-          ProfessionalTypeEnum.DOCTOR,
-          ProfessionalTypeEnum.NURSE,
-        ] as ProfessionalTypeEnum[]
-      ).includes(createDataDto.type)
-    ) {
+    if (([ProfessionalTypeEnum.DOCTOR, ProfessionalTypeEnum.NURSE] as ProfessionalTypeEnum[]).includes(createDataDto.type)) {
       roles.push(RoleEnum.DOCTOR);
     }
 
-    if (professionalFound?.id)
-      throw new BadRequestException('Professional já cadastrado');
+    if (professionalFound?.id) throw new BadRequestException('Professional já cadastrado');
     if (createDataDto.userId) {
       const useCompany: UserCompanyDto[] = [
         {
@@ -88,10 +71,7 @@ export class CreateProfessionalService {
     delete createDataDto.userId;
     delete createDataDto.sendEmail;
 
-    const professional = await this.professionalRepository.create(
-      { ...createDataDto, roles },
-      user.targetCompanyId,
-    );
+    const professional = await this.professionalRepository.create({ ...createDataDto, roles }, user.targetCompanyId);
 
     if (sendEmail) await inviteNewUser(this.mailProvider, professional.invite);
 

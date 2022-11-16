@@ -7,9 +7,7 @@ export class FindAvailableChecklistService {
   constructor(private readonly checklistRepository: ChecklistRepository) {}
 
   async execute(user: UserPayloadDto) {
-    const ChecklistFactor = await this.checklistRepository.findAllAvailable(
-      user.targetCompanyId,
-    );
+    const ChecklistFactor = await this.checklistRepository.findAllAvailable(user.targetCompanyId);
 
     return ChecklistFactor;
   }

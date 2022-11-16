@@ -9,10 +9,7 @@ export class UpdateEmployeeService {
   async execute(updateEmployeeDto: UpdateEmployeeDto) {
     let removeSubOffices = false;
     if (updateEmployeeDto.hierarchyId) {
-      const employeeFound = await this.employeeRepository.findById(
-        updateEmployeeDto.id,
-        updateEmployeeDto.companyId,
-      );
+      const employeeFound = await this.employeeRepository.findById(updateEmployeeDto.id, updateEmployeeDto.companyId);
 
       if (employeeFound.hierarchyId !== updateEmployeeDto.hierarchyId) {
         removeSubOffices = true;

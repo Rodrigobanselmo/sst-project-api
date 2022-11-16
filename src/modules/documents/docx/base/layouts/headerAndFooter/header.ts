@@ -39,19 +39,12 @@ const table = (rows: TableRow[]) =>
 
 const firstCell = (path?: string) => {
   const getProportion = () => {
-    const { height: imgHeight, width: imgWidth } = sizeOf(
-      fs.readFileSync(path),
-    );
+    const { height: imgHeight, width: imgWidth } = sizeOf(fs.readFileSync(path));
 
     const maxWidth = 100;
     const maxHeight = 25;
 
-    const { height, width } = setNiceProportion(
-      maxWidth,
-      maxHeight,
-      imgWidth,
-      imgHeight,
-    );
+    const { height, width } = setNiceProportion(maxWidth, maxHeight, imgWidth, imgHeight);
     return { height, width };
   };
 

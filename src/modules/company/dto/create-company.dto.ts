@@ -1,24 +1,8 @@
 import { QueryArray } from './../../../shared/transformers/query-array';
 import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
-import {
-  CompanyPaymentTypeEnum,
-  CompanyTypesEnum,
-  StatusEnum,
-} from '@prisma/client';
+import { CompanyPaymentTypeEnum, CompanyTypesEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
-import {
-  IsBoolean,
-  IsDate,
-  IsDefined,
-  IsEnum,
-  IsInt,
-  IsOptional,
-  IsString,
-  Length,
-  MaxLength,
-  ValidateIf,
-  ValidateNested,
-} from 'class-validator';
+import { IsBoolean, IsDate, IsDefined, IsEnum, IsInt, IsOptional, IsString, Length, MaxLength, ValidateIf, ValidateNested } from 'class-validator';
 
 import { CnpjFormatTransform } from '../../../shared/transformers/cnpj-format.transform';
 import { StringCapitalizeTransform } from '../../../shared/transformers/string-capitalize';

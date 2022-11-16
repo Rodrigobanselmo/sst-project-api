@@ -8,15 +8,11 @@ export class CreateChecklistService {
   constructor(private readonly checklistRepository: ChecklistRepository) {}
 
   async execute(createChecklistDto: CreateChecklistDto, user: UserPayloadDto) {
-    if (!createChecklistDto.data)
-      throw new BadRequestException('Data is missing');
+    if (!createChecklistDto.data) throw new BadRequestException('Data is missing');
 
     const system = user.isSystem;
 
-    const ChecklistFactor = await this.checklistRepository.create(
-      { ...createChecklistDto },
-      system,
-    );
+    const ChecklistFactor = await this.checklistRepository.create({ ...createChecklistDto }, system);
 
     return ChecklistFactor;
   }

@@ -3,9 +3,7 @@ import { palette } from '../../../../../../../../shared/constants/palette';
 import { bodyTableProps } from '../../elements/body';
 import { borderStyleGlobal } from '../../../../../base/config/styles';
 
-export const NewBodyC6 = (
-  body: [string, string, string, string, string, string][],
-) => {
+export const NewBodyC6 = (body: [string, string, string, string, string, string][]) => {
   const rows: bodyTableProps[][] = [];
 
   body.map((row) => {

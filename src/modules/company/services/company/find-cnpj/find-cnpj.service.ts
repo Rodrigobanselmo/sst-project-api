@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import axios, { AxiosResponse } from 'axios';
 import { ICnpjResponse } from '../../../../../modules/company/interfaces/cnpj';
 import { ICnpjBrasilResponse } from '../../../../../modules/company/interfaces/cnpj-brasil.types';
@@ -13,12 +9,9 @@ export class FindCnpjService {
     const cnpjString = cnpj.replace(/[ˆ\D ]/g, '');
     let response: AxiosResponse<ICnpjBrasilResponse, any>;
     try {
-      response = await axios.get<ICnpjBrasilResponse>(
-        `https://brasilapi.com.br/api/cnpj/v1/${cnpjString}`,
-      );
+      response = await axios.get<ICnpjBrasilResponse>(`https://brasilapi.com.br/api/cnpj/v1/${cnpjString}`);
     } catch (error) {
-      if (error.code === 'ERR_BAD_REQUEST')
-        throw new BadRequestException(error.response.data.message);
+      if (error.code === 'ERR_BAD_REQUEST') throw new BadRequestException(error.response.data.message);
 
       throw new InternalServerErrorException(error.response.data.message);
     }
@@ -37,15 +30,13 @@ export class FindCnpjService {
         street: response.data.logradouro,
         state: response.data.uf,
       },
-      cadastral_situation_description:
-        response.data.descricao_situacao_cadastral,
+      cadastral_situation_description: response.data.descricao_situacao_cadastral,
       fantasy: response.data.nome_fantasia,
       legal_nature: response.data.natureza_juridica,
       legal_nature_code: String(response.data.codigo_natureza_juridica),
       name: response.data.razao_social,
       phone: response.data.ddd_telefone_1 || response.data.ddd_telefone_2,
-      type:
-        response.data.identificador_matriz_filial == 1 ? 'MATRIZ' : 'FILIAL',
+      type: response.data.identificador_matriz_filial == 1 ? 'MATRIZ' : 'FILIAL',
       size: response.data.porte,
       primary_activity: [
         {

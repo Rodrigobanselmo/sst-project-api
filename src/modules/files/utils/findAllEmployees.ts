@@ -26,29 +26,22 @@ export const findAllEmployees = async (
     include: { employees: true, workspace: true },
   });
 
-  if (company.workspace?.length === 1)
-    riskSheet.columns = riskSheet.columns.filter(
-      (column) => column.databaseName !== 'abbreviation',
-    );
+  if (company.workspace?.length === 1) riskSheet.columns = riskSheet.columns.filter((column) => column.databaseName !== 'abbreviation');
 
-  const hierarchies = await hierarchyRepository.findAllHierarchyByCompany(
-    companyId,
-    {
-      include: {
-        hierarchyOnHomogeneous: {
-          include: {
-            homogeneousGroup: {
-              include: { characterization: true, environment: true },
-            },
+  const hierarchies = await hierarchyRepository.findAllHierarchyByCompany(companyId, {
+    include: {
+      hierarchyOnHomogeneous: {
+        include: {
+          homogeneousGroup: {
+            include: { characterization: true, environment: true },
           },
         },
-        workspaces: true,
       },
+      workspaces: true,
     },
-  );
+  });
 
-  const hierarchyTree =
-    hierarchyExcel.transformArrayToHierarchyMapTree(hierarchies);
+  const hierarchyTree = hierarchyExcel.transformArrayToHierarchyMapTree(hierarchies);
 
   company.employees = company.employees
     .map((employee) => {
@@ -58,36 +51,25 @@ export const findAllEmployees = async (
         const pathsHierarchy = pathIds.map((id) => hierarchyTree[id]);
 
         const newEmployee = { ...employee };
-        newEmployee.status = statusEnumTranslateUsToBr(
-          newEmployee.status,
-        ) as StatusEnum;
+        newEmployee.status = statusEnumTranslateUsToBr(newEmployee.status) as StatusEnum;
 
         hierarchyList.forEach((type) => {
-          const hierarchy = pathsHierarchy.find(
-            (h) => h.type === type,
-          ) as HierarchyEntity;
+          const hierarchy = pathsHierarchy.find((h) => h.type === type) as HierarchyEntity;
 
           if (hierarchy) {
             //* update here to add more on download
             newEmployee[type.toLocaleLowerCase()] = hierarchy.name;
 
             if (hierarchy.homogeneousGroups) {
-              const foundHomo = hierarchy.homogeneousGroups
-                .reverse()
-                .filter((hierarchy) => !hierarchy.type);
+              const foundHomo = hierarchy.homogeneousGroups.reverse().filter((hierarchy) => !hierarchy.type);
 
-              (newEmployee as any).ghoName = foundHomo.map(
-                (h) => h?.name || '',
-              );
-              (newEmployee as any).ghoDescription = foundHomo.map(
-                (h) => h?.description || '',
-              );
+              (newEmployee as any).ghoName = foundHomo.map((h) => h?.name || '');
+              (newEmployee as any).ghoDescription = foundHomo.map((h) => h?.description || '');
             }
 
             if ([HierarchyEnum.OFFICE].includes(type.toUpperCase() as any)) {
               (newEmployee as any).description = hierarchy?.description || '';
-              (newEmployee as any).realDescription =
-                hierarchy?.realDescription || '';
+              (newEmployee as any).realDescription = hierarchy?.realDescription || '';
             }
           }
         });
@@ -117,15 +99,9 @@ export const findAllEmployees = async (
   const workspaces = company.workspace;
 
   company.employees = company.employees.map((employee) => {
-    const hierarchyWorkspace = hierarchies.find(
-      (hierarchy) => hierarchy.id === employee.hierarchyId,
-    )?.workspaceIds;
+    const hierarchyWorkspace = hierarchies.find((hierarchy) => hierarchy.id === employee.hierarchyId)?.workspaceIds;
 
-    const workspace = workspaces.find(
-      (workspace) =>
-        hierarchyWorkspace &&
-        hierarchyWorkspace.find((id) => id == workspace.id),
-    );
+    const workspace = workspaces.find((workspace) => hierarchyWorkspace && hierarchyWorkspace.find((id) => id == workspace.id));
 
     return {
       ...employee,
@@ -133,10 +109,7 @@ export const findAllEmployees = async (
     };
   });
 
-  const excelRows = await excelProvider.transformToExcelData(
-    company.employees,
-    riskSheet.columns,
-  );
+  const excelRows = await excelProvider.transformToExcelData(company.employees, riskSheet.columns);
 
   return {
     sheetName: riskSheet.name,

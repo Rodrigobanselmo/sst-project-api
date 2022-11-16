@@ -7,14 +7,8 @@ import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 export class FindHomogenousGroupService {
   constructor(private readonly homoGroupRepository: HomoGroupRepository) {}
 
-  async execute(
-    { skip, take, ...query }: FindHomogeneousGroupDto,
-    user: UserPayloadDto,
-  ) {
-    const homo = await this.homoGroupRepository.find(
-      { ...query, companyId: user.targetCompanyId },
-      { skip, take },
-    );
+  async execute({ skip, take, ...query }: FindHomogeneousGroupDto, user: UserPayloadDto) {
+    const homo = await this.homoGroupRepository.find({ ...query, companyId: user.targetCompanyId }, { skip, take });
 
     return homo;
   }

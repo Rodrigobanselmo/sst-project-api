@@ -1,11 +1,6 @@
 import { RiskFactorDataEntity } from '../../sst/entities/riskData.entity';
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  HierarchyOnHomogeneous,
-  HomogeneousGroup,
-  HomoTypeEnum,
-  StatusEnum,
-} from '@prisma/client';
+import { HierarchyOnHomogeneous, HomogeneousGroup, HomoTypeEnum, StatusEnum } from '@prisma/client';
 import { HierarchyEntity } from './hierarchy.entity';
 import { WorkspaceEntity } from './workspace.entity';
 import { CharacterizationEntity } from './characterization.entity';
@@ -54,15 +49,8 @@ export class HomoGroupEntity implements HomogeneousGroup {
   constructor(partial: Partial<HomoGroupEntity>) {
     Object.assign(this, partial);
 
-    if (
-      this.type === 'HIERARCHY' &&
-      !this.hierarchy &&
-      this.hierarchyOnHomogeneous &&
-      this.hierarchyOnHomogeneous[0]
-    ) {
-      this.hierarchy = new HierarchyEntity(
-        this.hierarchyOnHomogeneous[0].hierarchy,
-      );
+    if (this.type === 'HIERARCHY' && !this.hierarchy && this.hierarchyOnHomogeneous && this.hierarchyOnHomogeneous[0]) {
+      this.hierarchy = new HierarchyEntity(this.hierarchyOnHomogeneous[0].hierarchy);
     }
 
     if (this.hierarchyOnHomogeneous && !this.hierarchies) {
@@ -70,8 +58,7 @@ export class HomoGroupEntity implements HomogeneousGroup {
         this.hierarchyOnHomogeneous.reduce((acc, curr) => {
           if (!curr.hierarchy) return acc;
           if (!acc[curr.hierarchyId]) acc[curr.hierarchyId] = curr.hierarchy;
-          if (!acc[curr.hierarchyId].hierarchyOnHomogeneous)
-            acc[curr.hierarchyId].hierarchyOnHomogeneous = [];
+          if (!acc[curr.hierarchyId].hierarchyOnHomogeneous) acc[curr.hierarchyId].hierarchyOnHomogeneous = [];
 
           delete curr.hierarchy;
           acc[curr.hierarchyId].hierarchyOnHomogeneous.push(curr);

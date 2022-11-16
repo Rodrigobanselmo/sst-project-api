@@ -6,12 +6,7 @@ import { removeDuplicate } from '../../../../../../shared/utils/removeDuplicate'
 import { originRiskMap } from '../../../../../../shared/constants/maps/origin-risk';
 import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
 import { HomoGroupEntity } from '../../../../../company/entities/homoGroup.entity';
-import {
-  HierarchyMapData,
-  IHierarchyData,
-  IHierarchyMap,
-  IHomoGroupMap,
-} from '../../../converter/hierarchy.converter';
+import { HierarchyMapData, IHierarchyData, IHierarchyMap, IHomoGroupMap } from '../../../converter/hierarchy.converter';
 import { firstRiskInventoryTableSection } from './parts/first/first.table';
 import { secondRiskInventoryTableSection } from './parts/second/second.table';
 import { thirdRiskInventoryTableSection } from './parts/third/third.table';
@@ -40,10 +35,7 @@ export const APPRByGroupTableSection = (
     if (hierarchy.workspace) workspace = hierarchy.workspace;
   });
 
-  const hierarchyDataHomoGroup = new Map<
-    string,
-    HierarchyMapData & { hierarchies: HierarchyEntity[] }
-  >();
+  const hierarchyDataHomoGroup = new Map<string, HierarchyMapData & { hierarchies: HierarchyEntity[] }>();
 
   const everyHomoFound = [] as string[];
   const everyHomoNotFound = [] as string[];
@@ -58,15 +50,11 @@ export const APPRByGroupTableSection = (
     if (homo.environment) {
       typeOrigin = 'GSE Desenvolvido (Ambiente)';
       desc = homo.environment.description;
-      nameOrigin = `${homo.environment.name} (${
-        originRiskMap[homo.environment.type].name
-      })`;
+      nameOrigin = `${homo.environment.name} (${originRiskMap[homo.environment.type].name})`;
     }
 
     if (homo.characterization) {
-      typeOrigin = `GSE Desenvolvido (${
-        originRiskMap[homo.characterization.type].name
-      })`;
+      typeOrigin = `GSE Desenvolvido (${originRiskMap[homo.characterization.type].name})`;
       desc = homo.characterization.description;
       nameOrigin = `${homo.characterization.name} `;
     }
@@ -102,10 +90,7 @@ export const APPRByGroupTableSection = (
           environments: '',
           homogeneousGroupIds: [homo.id],
           type: '',
-          typeEnum:
-            homo.type === HomoTypeEnum.HIERARCHY
-              ? hierarchyTree[homo.name].type
-              : ('' as any),
+          typeEnum: homo.type === HomoTypeEnum.HIERARCHY ? hierarchyTree[homo.name].type : ('' as any),
         },
       ],
       workspace,
@@ -123,57 +108,39 @@ export const APPRByGroupTableSection = (
       if (!foundHomo) setHomoGroup(homo);
       everyHomoFound.push(homo.id);
 
-      homoGroupTree[homo.id].hierarchies.forEach(
-        (hierarchy, i, hierarchies) => {
-          const allHomogeneousGroupIds = (
-            hierarchyData.get(hierarchy.id) || { allHomogeneousGroupIds: [] }
-          )?.allHomogeneousGroupIds;
+      homoGroupTree[homo.id].hierarchies.forEach((hierarchy, i, hierarchies) => {
+        const allHomogeneousGroupIds = (hierarchyData.get(hierarchy.id) || { allHomogeneousGroupIds: [] })?.allHomogeneousGroupIds;
 
-          removeDuplicate(
-            [
-              ...allHomogeneousGroupIds.map((id) => ({ id })),
-              ...hierarchy.homogeneousGroups,
-            ],
-            { removeById: 'id' },
-          ).forEach((homoGroup) => {
-            const isOnEvery = hierarchies.every((hierarchyEvery) => {
-              const everyAllHomogeneousGroupIds = (
-                hierarchyData.get(hierarchyEvery.id) || {
-                  allHomogeneousGroupIds: [],
-                }
-              )?.allHomogeneousGroupIds;
+        removeDuplicate([...allHomogeneousGroupIds.map((id) => ({ id })), ...hierarchy.homogeneousGroups], { removeById: 'id' }).forEach((homoGroup) => {
+          const isOnEvery = hierarchies.every((hierarchyEvery) => {
+            const everyAllHomogeneousGroupIds = (
+              hierarchyData.get(hierarchyEvery.id) || {
+                allHomogeneousGroupIds: [],
+              }
+            )?.allHomogeneousGroupIds;
 
-              return [
-                ...everyAllHomogeneousGroupIds.map((id) => ({ id })),
-                ...hierarchyEvery.homogeneousGroups,
-              ].find((h) => h.id === homoGroup.id);
-            });
-
-            const mapDataHomo = hierarchyDataHomoGroup.get(homo.id);
-            const isHomoAdded = mapDataHomo.allHomogeneousGroupIds.find(
-              (homoId) => homoId === homoGroup.id,
-            );
-
-            if (isOnEvery && !isHomoAdded) {
-              everyHomoFound.push(homoGroup.id);
-              const allHomogeneousGroupIds = [
-                ...mapDataHomo.allHomogeneousGroupIds,
-                homoGroup.id,
-              ];
-
-              hierarchyDataHomoGroup.set(homo.id, {
-                ...mapDataHomo,
-                allHomogeneousGroupIds,
-                hierarchies: homoGroupTree[homo.id].hierarchies,
-              });
-            }
-
-            if (!isOnEvery) {
-              everyHomoNotFound.push(homoGroup.id);
-            }
+            return [...everyAllHomogeneousGroupIds.map((id) => ({ id })), ...hierarchyEvery.homogeneousGroups].find((h) => h.id === homoGroup.id);
           });
-        },
-      );
+
+          const mapDataHomo = hierarchyDataHomoGroup.get(homo.id);
+          const isHomoAdded = mapDataHomo.allHomogeneousGroupIds.find((homoId) => homoId === homoGroup.id);
+
+          if (isOnEvery && !isHomoAdded) {
+            everyHomoFound.push(homoGroup.id);
+            const allHomogeneousGroupIds = [...mapDataHomo.allHomogeneousGroupIds, homoGroup.id];
+
+            hierarchyDataHomoGroup.set(homo.id, {
+              ...mapDataHomo,
+              allHomogeneousGroupIds,
+              hierarchies: homoGroupTree[homo.id].hierarchies,
+            });
+          }
+
+          if (!isOnEvery) {
+            everyHomoNotFound.push(homoGroup.id);
+          }
+        });
+      });
     });
 
   Object.values(homoGroupTree).forEach((homo) => {
@@ -186,26 +153,12 @@ export const APPRByGroupTableSection = (
 
   hierarchyDataHomoGroup.forEach((hierarchy) => {
     const createTable = () => {
-      const firstTable = firstRiskInventoryTableSection(
-        riskFactorGroupData,
-        homoGroupTree,
-        hierarchy,
-        isByGroup,
-      );
+      const firstTable = firstRiskInventoryTableSection(riskFactorGroupData, homoGroupTree, hierarchy, isByGroup);
       const officeTable = officeRiskInventoryTableSection(hierarchy);
       const secondTable = secondRiskInventoryTableSection(hierarchy, isByGroup);
-      const thirdTable = thirdRiskInventoryTableSection(
-        riskFactorGroupData,
-        hierarchy,
-        hierarchyTree,
-      );
+      const thirdTable = thirdRiskInventoryTableSection(riskFactorGroupData, hierarchy, hierarchyTree);
 
-      sectionsTables.push([
-        firstTable,
-        ...officeTable,
-        ...secondTable,
-        ...thirdTable,
-      ]);
+      sectionsTables.push([firstTable, ...officeTable, ...secondTable, ...thirdTable]);
     };
     createTable();
   });

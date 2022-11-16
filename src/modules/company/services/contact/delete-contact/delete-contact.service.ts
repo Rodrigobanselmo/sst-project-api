@@ -16,15 +16,10 @@ export class DeleteContactsService {
       },
     });
 
-    if (!contactFound?.id)
-      throw new BadRequestException(ErrorMessageEnum.CONTACT_NOT_FOUND);
-    if (contactFound?.isPrincipal)
-      throw new BadRequestException(ErrorMessageEnum.CONTACT_IS_PRINCIPAL);
+    if (!contactFound?.id) throw new BadRequestException(ErrorMessageEnum.CONTACT_NOT_FOUND);
+    if (contactFound?.isPrincipal) throw new BadRequestException(ErrorMessageEnum.CONTACT_IS_PRINCIPAL);
 
-    const contact = await this.contactRepository.delete(
-      id,
-      user.targetCompanyId,
-    );
+    const contact = await this.contactRepository.delete(id, user.targetCompanyId);
 
     return contact;
   }

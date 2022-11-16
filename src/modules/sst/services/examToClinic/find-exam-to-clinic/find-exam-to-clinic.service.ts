@@ -8,14 +8,8 @@ import { ExamToClinicRepository } from '../../../repositories/implementations/Ex
 export class FindExamToClinicService {
   constructor(private readonly examRepository: ExamToClinicRepository) {}
 
-  async execute(
-    { skip, take, ...query }: FindExamToClinicDto,
-    user: UserPayloadDto,
-  ) {
-    const Exam = await this.examRepository.find(
-      { companyId: user.targetCompanyId, ...query },
-      { skip, take },
-    );
+  async execute({ skip, take, ...query }: FindExamToClinicDto, user: UserPayloadDto) {
+    const Exam = await this.examRepository.find({ companyId: user.targetCompanyId, ...query }, { skip, take });
 
     return Exam;
   }

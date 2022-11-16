@@ -21,8 +21,7 @@ export class DownloadRiskDataService {
     const companyId = userPayloadDto.companyId;
 
     return this.downloadExcelProvider.newTableData({
-      findAll: (sheet) =>
-        findAllRisks(this.excelProvider, this.riskRepository, sheet, companyId),
+      findAll: (sheet) => findAllRisks(this.excelProvider, this.riskRepository, sheet, companyId),
       Workbook,
       companyId,
     });

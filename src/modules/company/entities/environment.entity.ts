@@ -1,8 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  CharacterizationTypeEnum,
-  CompanyCharacterization,
-} from '@prisma/client';
+import { CharacterizationTypeEnum, CompanyCharacterization } from '@prisma/client';
 
 import { RiskFactorDataEntity } from '../../sst/entities/riskData.entity';
 import { CharacterizationPhotoEntity } from './characterization-photo.entity';

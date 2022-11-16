@@ -1,7 +1,4 @@
-import {
-  ProfessionalPCMSOEntity,
-  ProfessionalRiskGroupEntity,
-} from '../../sst/entities/usersRiskGroup';
+import { ProfessionalPCMSOEntity, ProfessionalRiskGroupEntity } from '../../sst/entities/usersRiskGroup';
 import { Professional, ProfessionalTypeEnum, StatusEnum } from '@prisma/client';
 import { UserEntity } from './user.entity';
 import { InviteUsersEntity } from './invite-users.entity';

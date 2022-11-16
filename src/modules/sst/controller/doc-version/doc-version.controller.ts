@@ -9,10 +9,7 @@ import { PermissionEnum } from '../../../../shared/constants/enum/authorization'
 import { FindDocVersionDto } from '../../dto/doc-version.dto';
 @Controller('/document-version/:companyId')
 export class DocumentPgrController {
-  constructor(
-    private readonly findDocumentsService: FindDocumentsService,
-    private readonly findByIdDocumentsService: FindByIdDocumentsService,
-  ) {}
+  constructor(private readonly findDocumentsService: FindDocumentsService, private readonly findByIdDocumentsService: FindByIdDocumentsService) {}
 
   @Permissions(
     {
@@ -27,10 +24,7 @@ export class DocumentPgrController {
     },
   )
   @Get()
-  find(
-    @User() userPayloadDto: UserPayloadDto,
-    @Query() query: FindDocVersionDto,
-  ) {
+  find(@User() userPayloadDto: UserPayloadDto, @Query() query: FindDocVersionDto) {
     return this.findDocumentsService.execute(query, userPayloadDto);
   }
 

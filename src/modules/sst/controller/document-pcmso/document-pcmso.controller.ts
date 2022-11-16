@@ -10,10 +10,7 @@ import { UpsertDocumentPCMSOService } from '../../services/documentPcmso/upsert-
 
 @Controller('document-pcmso')
 export class DocumentPCMSOController {
-  constructor(
-    private readonly upsertDocumentPCMSOService: UpsertDocumentPCMSOService,
-    private readonly findByIdService: FindByIdDocumentPCMSOService,
-  ) {}
+  constructor(private readonly upsertDocumentPCMSOService: UpsertDocumentPCMSOService, private readonly findByIdService: FindByIdDocumentPCMSOService) {}
 
   @Permissions({
     code: PermissionEnum.COMPANY,

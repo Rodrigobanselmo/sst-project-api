@@ -56,20 +56,14 @@ export class UserEntity implements User {
       this.professional = new ProfessionalEntity({ ...partial.professional });
 
       //!
-      if (this.professional?.councilId)
-        this.councilId = this.professional.councilId;
-      if (this.professional?.councilUF)
-        this.councilUF = this.professional.councilUF;
-      if (this.professional?.councilType)
-        this.councilType = this.professional.councilType;
+      if (this.professional?.councilId) this.councilId = this.professional.councilId;
+      if (this.professional?.councilUF) this.councilUF = this.professional.councilUF;
+      if (this.professional?.councilType) this.councilType = this.professional.councilType;
       //!
-      if (this.professional?.councils)
-        this.councils = this.professional.councils;
+      if (this.professional?.councils) this.councils = this.professional.councils;
 
-      if (this.professional?.formation)
-        this.formation = this.professional.formation;
-      if (!this.professional?.certifications)
-        this.certifications = this.professional.certifications;
+      if (this.professional?.formation) this.formation = this.professional.formation;
+      if (!this.professional?.certifications) this.certifications = this.professional.certifications;
       if (!this?.type) this.type = this.professional.type;
       if (!this?.cpf) this.cpf = this.professional.cpf;
       if (!this?.phone) this.phone = this.professional.phone;

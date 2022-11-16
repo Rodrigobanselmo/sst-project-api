@@ -1,19 +1,6 @@
-import {
-  CompanyPaymentTypeEnum,
-  CompanyTypesEnum,
-  StatusEnum,
-} from '@prisma/client';
+import { CompanyPaymentTypeEnum, CompanyTypesEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
-import {
-  IsBoolean,
-  IsDate,
-  IsEnum,
-  IsInt,
-  IsOptional,
-  IsString,
-  Length,
-  ValidateNested,
-} from 'class-validator';
+import { IsBoolean, IsDate, IsEnum, IsInt, IsOptional, IsString, Length, ValidateNested } from 'class-validator';
 
 import { CnpjFormatTransform } from '../../../shared/transformers/cnpj-format.transform';
 import { StringCapitalizeTransform } from '../../../shared/transformers/string-capitalize';

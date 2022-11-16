@@ -2,12 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
-import {
-  CreateEpiDto,
-  FindEpiDto,
-  UpdateEpiDto,
-  UpsertEpiDto,
-} from '../../dto/epi.dto';
+import { CreateEpiDto, FindEpiDto, UpdateEpiDto, UpsertEpiDto } from '../../dto/epi.dto';
 import { EpiEntity } from '../../entities/epi.entity';
 
 let i = 0;
@@ -26,10 +21,7 @@ export class EpiRepository {
     return new EpiEntity(redMed);
   }
 
-  async update({
-    id,
-    ...createEpiDto
-  }: UpdateEpiDto & { id: number }): Promise<EpiEntity> {
+  async update({ id, ...createEpiDto }: UpdateEpiDto & { id: number }): Promise<EpiEntity> {
     const Epi = await this.prisma.epi.update({
       data: {
         ...createEpiDto,

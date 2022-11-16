@@ -9,10 +9,7 @@ import { CompanyRepository } from '../../../repositories/implementations/Company
 
 @Injectable()
 export class AddCompanyPhotoService {
-  constructor(
-    private readonly companyRepository: CompanyRepository,
-    private readonly amazonStorageProvider: AmazonStorageProvider,
-  ) {}
+  constructor(private readonly companyRepository: CompanyRepository, private readonly amazonStorageProvider: AmazonStorageProvider) {}
 
   async execute(userPayloadDto: UserPayloadDto, file: Express.Multer.File) {
     const companyId = userPayloadDto.targetCompanyId;
@@ -27,8 +24,7 @@ export class AddCompanyPhotoService {
   }
 
   private async upload(companyId: string, file: Express.Multer.File) {
-    const fileType =
-      file.originalname.split('.')[file.originalname.split('.').length - 1];
+    const fileType = file.originalname.split('.')[file.originalname.split('.').length - 1];
     const path = companyId + '/company/' + v4() + '.' + fileType;
 
     const { url } = await this.amazonStorageProvider.upload({

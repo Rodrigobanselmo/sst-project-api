@@ -7,21 +7,17 @@ import { DayJSProvider } from '../../../../../shared/providers/DateProvider/impl
 
 @Injectable()
 export class UpsertExamToClinicService {
-  constructor(
-    private readonly examToClinicRepository: ExamToClinicRepository,
-    private readonly dayjs: DayJSProvider,
-  ) {}
+  constructor(private readonly examToClinicRepository: ExamToClinicRepository, private readonly dayjs: DayJSProvider) {}
 
   async execute(createExamDto: UpsertExamToClinicDto, user: UserPayloadDto) {
-    const [clinicExamActual, clinicExamOld] =
-      await this.examToClinicRepository.findNude({
-        where: {
-          examId: createExamDto.examId,
-          companyId: user.targetCompanyId,
-        },
-        orderBy: { startDate: 'desc' },
-        take: 2,
-      });
+    const [clinicExamActual, clinicExamOld] = await this.examToClinicRepository.findNude({
+      where: {
+        examId: createExamDto.examId,
+        companyId: user.targetCompanyId,
+      },
+      orderBy: { startDate: 'desc' },
+      take: 2,
+    });
 
     // // prevent when future date is set
     // if (clinicExamOld && clinicExamOld.startDate >= createExamDto.startDate)
@@ -29,10 +25,7 @@ export class UpsertExamToClinicService {
     //     'A data de início deve ser maior que a data de início anterior',
     //   );
 
-    if (
-      clinicExamActual &&
-      clinicExamActual.startDate >= this.dayjs.dateNow()
-    ) {
+    if (clinicExamActual && clinicExamActual.startDate >= this.dayjs.dateNow()) {
       const newExam = await this.examToClinicRepository.update({
         ...createExamDto,
         companyId: user.targetCompanyId,
@@ -51,13 +44,8 @@ export class UpsertExamToClinicService {
     }
 
     // prevent when present date is set
-    if (
-      clinicExamActual &&
-      clinicExamActual.startDate > createExamDto.startDate
-    )
-      throw new BadRequestException(
-        'A data de início deve ser maior que a data de início anterior',
-      );
+    if (clinicExamActual && clinicExamActual.startDate > createExamDto.startDate)
+      throw new BadRequestException('A data de início deve ser maior que a data de início anterior');
 
     if (clinicExamActual)
       await this.examToClinicRepository.update({

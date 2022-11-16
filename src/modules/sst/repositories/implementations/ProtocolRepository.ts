@@ -3,12 +3,7 @@ import { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
-import {
-  CreateProtocolDto,
-  FindProtocolDto,
-  UpdateProtocolDto,
-  UpdateProtocolRiskDto,
-} from '../../dto/protocol.dto';
+import { CreateProtocolDto, FindProtocolDto, UpdateProtocolDto, UpdateProtocolRiskDto } from '../../dto/protocol.dto';
 
 import { ProtocolEntity } from '../../entities/protocol.entity';
 import { prismaFilter } from '../../../../shared/utils/filters/prisma.filters';
@@ -34,11 +29,7 @@ export class ProtocolRepository {
     return new ProtocolEntity(protocol);
   }
 
-  async updateProtocolRisk({
-    companyId,
-    protocolIds,
-    riskIds,
-  }: UpdateProtocolRiskDto) {
+  async updateProtocolRisk({ companyId, protocolIds, riskIds }: UpdateProtocolRiskDto) {
     const createArray = protocolIds
       .map((protocolId) => {
         return riskIds.map((riskId) =>
@@ -67,11 +58,7 @@ export class ProtocolRepository {
     return data.map((dt) => 'id' in dt && new ProtocolEntity(dt));
   }
 
-  async find(
-    query: Partial<FindProtocolDto>,
-    pagination: PaginationQueryDto,
-    options: Prisma.ProtocolFindManyArgs = {},
-  ) {
+  async find(query: Partial<FindProtocolDto>, pagination: PaginationQueryDto, options: Prisma.ProtocolFindManyArgs = {}) {
     const whereInit = {
       AND: [
         // {

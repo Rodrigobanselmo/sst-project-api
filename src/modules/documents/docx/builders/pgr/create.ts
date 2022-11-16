@@ -14,16 +14,8 @@ import { ElementsMapClass } from './maps/elementTypeMap';
 import { SectionsMapClass } from './maps/sectionTypeMap';
 import { docPGRSections } from './mock';
 import { ICreatePGR } from './types/pgr.types';
-import {
-  IAllSectionTypesPGR,
-  IDocumentPGRSectionGroups,
-  IDocVariables,
-} from './types/section.types';
-import {
-  HierarchyMapData,
-  IHierarchyMap,
-  IHomoGroupMap,
-} from '../../converter/hierarchy.converter';
+import { IAllSectionTypesPGR, IDocumentPGRSectionGroups, IDocVariables } from './types/section.types';
+import { HierarchyMapData, IHierarchyMap, IHomoGroupMap } from '../../converter/hierarchy.converter';
 import { booleanVariables } from './functions/getVariables/boolean.variables';
 
 export class DocumentBuildPGR {
@@ -98,17 +90,10 @@ export class DocumentBuildPGR {
     return {
       [VariablesPGREnum.VERSION]: this.version,
       [VariablesPGREnum.DOC_VALIDITY]: this.versions[0].validity,
-      [VariablesPGREnum.COMPANY_HAS_SST_CERTIFICATION]:
-        this.document?.complementarySystems?.length > 0 ? 'true' : '',
-      [VariablesPGREnum.DOCUMENT_COORDINATOR]:
-        this.document?.coordinatorBy || '',
+      [VariablesPGREnum.COMPANY_HAS_SST_CERTIFICATION]: this.document?.complementarySystems?.length > 0 ? 'true' : '',
+      [VariablesPGREnum.DOCUMENT_COORDINATOR]: this.document?.coordinatorBy || '',
       ...companyVariables(this.company, this.workspace, this.workspace.address),
-      ...booleanVariables(
-        this.company,
-        this.workspace,
-        this.hierarchy,
-        this.document,
-      ),
+      ...booleanVariables(this.company, this.workspace, this.hierarchy, this.document),
       ...this.docSections.variables,
     };
   }
@@ -119,10 +104,7 @@ export class DocumentBuildPGR {
     const elementsMap = new ElementsMapClass({
       versions: this.versions,
       variables: this.variables,
-      professionals: [
-        ...(this.document?.professionals || []),
-        ...(this.document?.users || []),
-      ],
+      professionals: [...(this.document?.professionals || []), ...(this.document?.users || [])],
       environments: this.environments ?? [],
       characterizations: this.characterizations ?? [],
       document: this.document,
@@ -150,36 +132,28 @@ export class DocumentBuildPGR {
 
     data.forEach((child) => {
       if ('removeWithSomeEmptyVars' in child) {
-        const isEmpty = child.removeWithSomeEmptyVars.some(
-          (variable) => !this.variables[variable],
-        );
+        const isEmpty = child.removeWithSomeEmptyVars.some((variable) => !this.variables[variable]);
         if (isEmpty) {
           return null;
         }
       }
 
       if ('removeWithAllEmptyVars' in child) {
-        const isEmpty = child.removeWithAllEmptyVars.every(
-          (variable) => !this.variables[variable],
-        );
+        const isEmpty = child.removeWithAllEmptyVars.every((variable) => !this.variables[variable]);
         if (isEmpty) {
           return null;
         }
       }
 
       if ('removeWithAllValidVars' in child) {
-        const isNotEmpty = child.removeWithAllValidVars.every(
-          (variable) => this.variables[variable],
-        );
+        const isNotEmpty = child.removeWithAllValidVars.every((variable) => this.variables[variable]);
         if (isNotEmpty) {
           return null;
         }
       }
 
       if ('addWithAllVars' in child) {
-        const isNotEmpty = child.addWithAllVars.every(
-          (variable) => this.variables[variable],
-        );
+        const isNotEmpty = child.addWithAllVars.every((variable) => this.variables[variable]);
         if (!isNotEmpty) {
           return null;
         }

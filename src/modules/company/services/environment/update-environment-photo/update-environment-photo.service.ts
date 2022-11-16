@@ -6,23 +6,15 @@ import { EnvironmentRepository } from '../../../repositories/implementations/Env
 
 @Injectable()
 export class UpdateEnvironmentPhotoService {
-  constructor(
-    private readonly environmentRepository: EnvironmentRepository,
-    private readonly environmentPhotoRepository: EnvironmentPhotoRepository,
-  ) {}
+  constructor(private readonly environmentRepository: EnvironmentRepository, private readonly environmentPhotoRepository: EnvironmentPhotoRepository) {}
 
-  async execute(
-    id: string,
-    updatePhotoEnvironmentDto: UpdatePhotoEnvironmentDto,
-  ) {
+  async execute(id: string, updatePhotoEnvironmentDto: UpdatePhotoEnvironmentDto) {
     const environmentPhoto = await this.environmentPhotoRepository.update({
       ...updatePhotoEnvironmentDto,
       id,
     });
 
-    const environmentData = await this.environmentRepository.findById(
-      environmentPhoto.companyCharacterizationId,
-    );
+    const environmentData = await this.environmentRepository.findById(environmentPhoto.companyCharacterizationId);
 
     return environmentData;
   }

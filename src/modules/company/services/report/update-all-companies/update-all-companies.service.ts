@@ -95,17 +95,9 @@ export class UpdateAllCompaniesService {
     });
 
     console.log('start cron(2): update employees');
-    const employeeExams = (
-      await asyncEach(allCompanies, (v) => this.addReport(v))
-    ).map(
-      ({
-        company,
-        examTime,
-        esocialEvents,
-      }): UpsertCompanyReportDto & { company: CompanyEntity } => {
-        const expired =
-          (examTime?.allWithExamExpired?.length || 0) +
-          (examTime?.allWithMissingExam?.length || 0);
+    const employeeExams = (await asyncEach(allCompanies, (v) => this.addReport(v))).map(
+      ({ company, examTime, esocialEvents }): UpsertCompanyReportDto & { company: CompanyEntity } => {
+        const expired = (examTime?.allWithExamExpired?.length || 0) + (examTime?.allWithMissingExam?.length || 0);
 
         return {
           company: company,
@@ -132,34 +124,28 @@ export class UpdateAllCompaniesService {
       },
     );
 
-    const employeeExamsData = employeeExams.map(
-      ({ company, ...report }): UpsertCompanyReportDto => {
-        const companyIds =
-          company?.applyingServiceContracts?.map(
-            (c) => c.receivingServiceCompanyId,
-          ) || [];
+    const employeeExamsData = employeeExams.map(({ company, ...report }): UpsertCompanyReportDto => {
+      const companyIds = company?.applyingServiceContracts?.map((c) => c.receivingServiceCompanyId) || [];
 
-        if (companyIds.length === 0) return report;
+      if (companyIds.length === 0) return report;
 
-        employeeExams.forEach((employeeExam) => {
-          if (companyIds.includes(employeeExam.companyId)) {
-            Object.entries(employeeExam.dailyReport.exam).map(([k, v]) => {
-              if (typeof v === 'number') {
-                report.dailyReport.exam[k] = report.dailyReport.exam[k] + v;
-              }
-            });
-            Object.entries(employeeExam.dailyReport.esocial).map(([k, v]) => {
-              if (typeof v === 'number') {
-                report.dailyReport.esocial[k] =
-                  report.dailyReport.esocial[k] + v;
-              }
-            });
-          }
-        });
+      employeeExams.forEach((employeeExam) => {
+        if (companyIds.includes(employeeExam.companyId)) {
+          Object.entries(employeeExam.dailyReport.exam).map(([k, v]) => {
+            if (typeof v === 'number') {
+              report.dailyReport.exam[k] = report.dailyReport.exam[k] + v;
+            }
+          });
+          Object.entries(employeeExam.dailyReport.esocial).map(([k, v]) => {
+            if (typeof v === 'number') {
+              report.dailyReport.esocial[k] = report.dailyReport.esocial[k] + v;
+            }
+          });
+        }
+      });
 
-        return report;
-      },
-    );
+      return report;
+    });
 
     console.log('start cron(3): telegram');
     this.telegramMessage(allCompanies);
@@ -239,21 +225,15 @@ export class UpdateAllCompaniesService {
             const isSchedule = ['PROCESSING', 'PENDING'].includes(exam.status);
             if (!isSchedule) return false;
 
-            const isDoneDateValid = this.dayjs
-              .dayjs(exam.doneDate)
-              .isAfter(this.dayjs.dateNow());
+            const isDoneDateValid = this.dayjs.dayjs(exam.doneDate).isAfter(this.dayjs.dateNow());
             if (!isDoneDateValid) return false;
 
             return true;
           });
 
-          if (doneExamFound)
-            employee.expiredDateExam = doneExamFound.expiredDate;
+          if (doneExamFound) employee.expiredDateExam = doneExamFound.expiredDate;
           if (!doneExamFound && scheduleExamFound && employee.lastExam) {
-            const expiredDate = this.dayjs
-              .dayjs(employee.lastExam)
-              .add(scheduleExamFound.validityInMonths, 'month')
-              .toDate();
+            const expiredDate = this.dayjs.dayjs(employee.lastExam).add(scheduleExamFound.validityInMonths, 'month').toDate();
             employee.expiredDateExam = expiredDate;
           }
           //--> add expired Date
@@ -266,16 +246,12 @@ export class UpdateAllCompaniesService {
           // allWithExamExpired
           {
             if (doneExamFound) {
-              const isExpired = this.dayjs
-                .dayjs(doneExamFound.expiredDate)
-                .isBefore(this.dayjs.dateNow());
+              const isExpired = this.dayjs.dayjs(doneExamFound.expiredDate).isBefore(this.dayjs.dateNow());
 
               if (isExpired) allWithExamExpired.push(employee);
             } else {
               if (!doneExamFound && scheduleExamFound && employee.lastExam) {
-                const isExpired = this.dayjs
-                  .dayjs(employee.expiredDateExam)
-                  .isBefore(this.dayjs.dateNow());
+                const isExpired = this.dayjs.dayjs(employee.expiredDateExam).isBefore(this.dayjs.dateNow());
 
                 if (isExpired) allWithExamExpired.push(employee);
               } else {
@@ -304,10 +280,7 @@ export class UpdateAllCompaniesService {
       );
 
       const getExpired = allWithMissingExam.map((employee) => {
-        const ids = [
-          ...employee.subOffices.map(({ id }) => id),
-          employee.hierarchyId,
-        ];
+        const ids = [...employee.subOffices.map(({ id }) => id), employee.hierarchyId];
 
         let expiredDate: Date;
         exams.data.find(({ exam, origins }) => {
@@ -315,22 +288,14 @@ export class UpdateAllCompaniesService {
 
           origins.find((origin) => {
             const isPartOfHomo = origin?.homogeneousGroup
-              ? origin.homogeneousGroup?.hierarchyOnHomogeneous?.find(
-                  (homoHier) => ids.includes(homoHier?.hierarchy?.id),
-                )
+              ? origin.homogeneousGroup?.hierarchyOnHomogeneous?.find((homoHier) => ids.includes(homoHier?.hierarchy?.id))
               : true;
             if (!isPartOfHomo) return;
 
-            const skip = this.findExamByHierarchyService.checkIfSkipEmployee(
-              origin,
-              employee,
-            );
+            const skip = this.findExamByHierarchyService.checkIfSkipEmployee(origin, employee);
             if (skip) return;
 
-            const expired = this.findExamByHierarchyService.checkExpiredDate(
-              origin,
-              employee,
-            );
+            const expired = this.findExamByHierarchyService.checkExpiredDate(origin, employee);
             if (!expired.expiredDate) return;
             expiredDate = expired.expiredDate;
             return true;
@@ -346,9 +311,7 @@ export class UpdateAllCompaniesService {
       const missingExamExpired = getExpired.filter((e) => {
         if (!e.expiredDate) return true;
 
-        const lastExamValid = this.dayjs
-          .dayjs(e.expiredDate)
-          .isAfter(this.dayjs.dayjs());
+        const lastExamValid = this.dayjs.dayjs(e.expiredDate).isAfter(this.dayjs.dayjs());
 
         if (!lastExamValid) return true;
         return false;
@@ -379,19 +342,13 @@ export class UpdateAllCompaniesService {
         closeToExpire30: allEmployees.filter((e) => {
           if (!e.expiredDateExam) return;
 
-          return (
-            this.dayjs.dayjs(_30_DaysFromNow).isAfter(e.expiredDateExam) &&
-            this.dayjs.dayjs().isBefore(e.expiredDateExam)
-          );
+          return this.dayjs.dayjs(_30_DaysFromNow).isAfter(e.expiredDateExam) && this.dayjs.dayjs().isBefore(e.expiredDateExam);
         }),
         closeToExpire90: allEmployees.filter((e) => {
           if (!e.expiredDateExam) return;
           const _90_DaysFromNow = this.dayjs.addDay(this.dayjs.dateNow(), 90);
 
-          return (
-            this.dayjs.dayjs(_90_DaysFromNow).isAfter(e.expiredDateExam) &&
-            this.dayjs.dayjs(_30_DaysFromNow).isBefore(e.expiredDateExam)
-          );
+          return this.dayjs.dayjs(_90_DaysFromNow).isAfter(e.expiredDateExam) && this.dayjs.dayjs(_30_DaysFromNow).isBefore(e.expiredDateExam);
         }),
       };
     } catch (e) {
@@ -405,9 +362,7 @@ export class UpdateAllCompaniesService {
     if (!company.esocialStart) return {};
 
     try {
-      const esocial = await this.updateESocialReportService.addCompanyEsocial(
-        company,
-      );
+      const esocial = await this.updateESocialReportService.addCompanyEsocial(company);
       return esocial;
     } catch (e) {
       this.errorCompanies.push(companyId);

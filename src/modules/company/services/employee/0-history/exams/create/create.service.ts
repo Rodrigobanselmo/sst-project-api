@@ -20,13 +20,9 @@ export class CreateEmployeeExamHistoryService {
   ) {}
 
   async execute(dataDto: CreateEmployeeExamHistoryDto, user: UserPayloadDto) {
-    const found = await this.employeeRepository.findById(
-      dataDto.employeeId,
-      user.targetCompanyId,
-    );
+    const found = await this.employeeRepository.findById(dataDto.employeeId, user.targetCompanyId);
 
-    if (!found?.id)
-      throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_NOT_FOUND);
+    if (!found?.id) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_NOT_FOUND);
 
     await this.checkOtherSchedulesAndCancel(dataDto, found);
     await this.changeHierarchy(dataDto, user);
@@ -40,16 +36,10 @@ export class CreateEmployeeExamHistoryService {
   }
 
   getUser(dataDto: CreateEmployeeExamHistoryDto, user: UserPayloadDto) {
-    const status =
-      dataDto.status || dataDto.examsData?.find((e) => e.status)?.status;
-    const isUserScheduleId =
-      status &&
-      ([StatusEnum.PENDING, StatusEnum.PROCESSING] as any).includes(status);
+    const status = dataDto.status || dataDto.examsData?.find((e) => e.status)?.status;
+    const isUserScheduleId = status && ([StatusEnum.PENDING, StatusEnum.PROCESSING] as any).includes(status);
 
-    const isUserDoneId =
-      !status ||
-      (status &&
-        ([StatusEnum.DONE, StatusEnum.CANCELED] as any).includes(status));
+    const isUserDoneId = !status || (status && ([StatusEnum.DONE, StatusEnum.CANCELED] as any).includes(status));
 
     return {
       ...(isUserDoneId && {
@@ -61,10 +51,7 @@ export class CreateEmployeeExamHistoryService {
     };
   }
 
-  async checkOtherSchedulesAndCancel(
-    dataDto: CreateEmployeeExamHistoryDto,
-    employee: EmployeeEntity,
-  ) {
+  async checkOtherSchedulesAndCancel(dataDto: CreateEmployeeExamHistoryDto, employee: EmployeeEntity) {
     const examsIds = dataDto.examsData.map((x) => x.examId);
 
     if (dataDto.examId) examsIds.push(dataDto.examId);
@@ -85,15 +72,8 @@ export class CreateEmployeeExamHistoryService {
     });
   }
 
-  async changeHierarchy(
-    dataDto: CreateEmployeeExamHistoryDto,
-    user: UserPayloadDto,
-  ) {
-    if (
-      dataDto.changeHierarchyAnyway &&
-      dataDto.changeHierarchyDate &&
-      dataDto.hierarchyId
-    )
+  async changeHierarchy(dataDto: CreateEmployeeExamHistoryDto, user: UserPayloadDto) {
+    if (dataDto.changeHierarchyAnyway && dataDto.changeHierarchyDate && dataDto.hierarchyId)
       await this.createEmployeeHierarchyHistoryService.execute(
         {
           employeeId: dataDto.employeeId,
@@ -105,11 +85,7 @@ export class CreateEmployeeExamHistoryService {
         user,
       );
 
-    if (
-      dataDto.examType === 'DEMI' &&
-      dataDto.changeHierarchyDate &&
-      !dataDto.hierarchyId
-    )
+    if (dataDto.examType === 'DEMI' && dataDto.changeHierarchyDate && !dataDto.hierarchyId)
       await this.createEmployeeHierarchyHistoryService.execute(
         {
           employeeId: dataDto.employeeId,

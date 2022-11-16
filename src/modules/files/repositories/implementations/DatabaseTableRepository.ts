@@ -9,12 +9,7 @@ import { DatabaseTableEntity } from './../../entities/databaseTable.entity';
 @Injectable()
 export class DatabaseTableRepository implements IDatabaseTableRepository {
   constructor(private prisma: PrismaService) {}
-  async upsert(
-    createDatabaseTableDto: CreateDatabaseTableDto,
-    companyId: string,
-    system: boolean,
-    id?: number,
-  ): Promise<DatabaseTableEntity> {
+  async upsert(createDatabaseTableDto: CreateDatabaseTableDto, companyId: string, system: boolean, id?: number): Promise<DatabaseTableEntity> {
     delete createDatabaseTableDto.companyId;
 
     const database = await this.prisma.databaseTable.upsert({
@@ -33,10 +28,7 @@ export class DatabaseTableRepository implements IDatabaseTableRepository {
     return new DatabaseTableEntity(database);
   }
 
-  async findByNameAndCompany(
-    name: string,
-    companyId: string,
-  ): Promise<DatabaseTableEntity> {
+  async findByNameAndCompany(name: string, companyId: string): Promise<DatabaseTableEntity> {
     const database = await this.prisma.databaseTable.findFirst({
       where: { name, companyId },
     });

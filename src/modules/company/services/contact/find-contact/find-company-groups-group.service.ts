@@ -7,14 +7,8 @@ import { Injectable } from '@nestjs/common';
 export class FindContactsService {
   constructor(private readonly contactRepository: ContactRepository) {}
 
-  async execute(
-    { skip, take, ...query }: FindContactDto,
-    user: UserPayloadDto,
-  ) {
-    const access = await this.contactRepository.findAllByCompany(
-      { companyId: user.targetCompanyId, ...query },
-      { skip, take },
-    );
+  async execute({ skip, take, ...query }: FindContactDto, user: UserPayloadDto) {
+    const access = await this.contactRepository.findAllByCompany({ companyId: user.targetCompanyId, ...query }, { skip, take });
 
     return access;
   }

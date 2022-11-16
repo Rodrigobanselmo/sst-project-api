@@ -7,20 +7,13 @@ import { ErrorDocumentEnum } from '../../../../../shared/constants/enum/errorMes
 
 @Injectable()
 export class PgrDownloadTableService {
-  constructor(
-    private readonly amazonStorageProvider: AmazonStorageProvider,
-    private readonly riskDocumentRepository: RiskDocumentRepository,
-  ) {}
+  constructor(private readonly amazonStorageProvider: AmazonStorageProvider, private readonly riskDocumentRepository: RiskDocumentRepository) {}
   async execute(userPayloadDto: UserPayloadDto, docId: string) {
     const companyId = userPayloadDto.targetCompanyId;
 
-    const riskDoc = await this.riskDocumentRepository.findById(
-      docId,
-      companyId,
-    );
+    const riskDoc = await this.riskDocumentRepository.findById(docId, companyId);
 
-    if (!riskDoc?.id)
-      throw new BadRequestException(ErrorDocumentEnum.NOT_FOUND);
+    if (!riskDoc?.id) throw new BadRequestException(ErrorDocumentEnum.NOT_FOUND);
 
     const fileKey = riskDoc.fileUrl.split('.com/').pop();
     const { file: fileStream } = this.amazonStorageProvider.download({

@@ -1,21 +1,13 @@
 import { Paragraph, Table } from 'docx';
 
-import {
-  ISectionChildrenType,
-  PGRSectionChildrenTypeEnum,
-} from '../../../../../../builders/pgr/types/elements.types';
+import { ISectionChildrenType, PGRSectionChildrenTypeEnum } from '../../../../../../builders/pgr/types/elements.types';
 import { IDocVariables } from '../../../../../../builders/pgr/types/section.types';
 import { healthSeverityAciTable } from '../tables/healthSeverityATable';
 import { healthSeverityBioTable } from '../tables/healthSeverityBTable';
 import { healthSeverityErgTable } from '../tables/healthSeverityETable';
 import { healthSeverityFisQuiTable } from '../tables/healthSeverityFQTable';
 
-export const healthEffectTable = (
-  convertToDocx: (
-    data: ISectionChildrenType[],
-    variables?: IDocVariables,
-  ) => (Paragraph | Table)[],
-) => {
+export const healthEffectTable = (convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[]) => {
   const table1 = convertToDocx([
     {
       type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE,

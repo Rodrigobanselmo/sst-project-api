@@ -4,12 +4,7 @@ import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { removeDuplicate } from '../../../../shared/utils/removeDuplicate';
-import {
-  CreateHomoGroupDto,
-  FindHomogeneousGroupDto,
-  UpdateHierarchyHomoGroupDto,
-  UpdateHomoGroupDto,
-} from '../../dto/homoGroup';
+import { CreateHomoGroupDto, FindHomogeneousGroupDto, UpdateHierarchyHomoGroupDto, UpdateHomoGroupDto } from '../../dto/homoGroup';
 import { HierarchyEntity } from '../../entities/hierarchy.entity';
 import { HomoGroupEntity } from '../../entities/homoGroup.entity';
 import { prismaFilter } from './../../../../shared/utils/filters/prisma.filters';
@@ -20,15 +15,7 @@ import { sortData } from './../../../../shared/utils/sorts/data.sort';
 export class HomoGroupRepository {
   constructor(private prisma: PrismaService) {}
 
-  async create(
-    {
-      hierarchies,
-      endDate = null,
-      startDate = null,
-      ...createHomoGroupDto
-    }: CreateHomoGroupDto,
-    companyId: string,
-  ): Promise<HomoGroupEntity> {
+  async create({ hierarchies, endDate = null, startDate = null, ...createHomoGroupDto }: CreateHomoGroupDto, companyId: string): Promise<HomoGroupEntity> {
     const data = await this.prisma.homogeneousGroup.create({
       data: {
         ...createHomoGroupDto,
@@ -56,30 +43,18 @@ export class HomoGroupRepository {
     return this.getHomoGroupData(data);
   }
 
-  async update({
-    id,
-    hierarchies,
-    endDate = null,
-    startDate = null,
-    ...updateHomoGroup
-  }: UpdateHomoGroupDto): Promise<HomoGroupEntity> {
+  async update({ id, hierarchies, endDate = null, startDate = null, ...updateHomoGroup }: UpdateHomoGroupDto): Promise<HomoGroupEntity> {
     if (hierarchies) {
       const hierarchyOnHomogeneous = {};
-      const foundHomogeneousGroups =
-        await this.prisma.hierarchyOnHomogeneous.findMany({
-          where: {
-            homogeneousGroupId: id,
-            hierarchyId: { in: hierarchies.map((h) => h.id) },
-          },
-        });
+      const foundHomogeneousGroups = await this.prisma.hierarchyOnHomogeneous.findMany({
+        where: {
+          homogeneousGroupId: id,
+          hierarchyId: { in: hierarchies.map((h) => h.id) },
+        },
+      });
 
       foundHomogeneousGroups
-        .sort((a, b) =>
-          sortData(
-            b?.endDate || new Date('3000-01-01T00:00:00.00Z'),
-            a?.endDate || new Date('3000-01-01T00:00:00.00Z'),
-          ),
-        )
+        .sort((a, b) => sortData(b?.endDate || new Date('3000-01-01T00:00:00.00Z'), a?.endDate || new Date('3000-01-01T00:00:00.00Z')))
         .forEach((hg) => {
           if (hierarchyOnHomogeneous[hg.hierarchyId + hg.workspaceId]) return;
 
@@ -93,12 +68,9 @@ export class HomoGroupRepository {
             if (hg.startDate && !hg.endDate && hg.startDate < endDate) {
               hierarchyOnHomogeneous[hg.hierarchyId + hg.workspaceId] = {};
 
-              hierarchyOnHomogeneous[hg.hierarchyId + hg.workspaceId].id =
-                hg.id;
+              hierarchyOnHomogeneous[hg.hierarchyId + hg.workspaceId].id = hg.id;
 
-              hierarchyOnHomogeneous[
-                hg.hierarchyId + hg.workspaceId
-              ].startDate = undefined;
+              hierarchyOnHomogeneous[hg.hierarchyId + hg.workspaceId].startDate = undefined;
               return;
             }
           }
@@ -106,8 +78,7 @@ export class HomoGroupRepository {
           const sameDate = hg.startDate == startDate || hg.endDate == endDate;
           if (sameDate) {
             hierarchyOnHomogeneous[hg.hierarchyId + hg.workspaceId] = {};
-            return (hierarchyOnHomogeneous[hg.hierarchyId + hg.workspaceId].id =
-              hg.id);
+            return (hierarchyOnHomogeneous[hg.hierarchyId + hg.workspaceId].id = hg.id);
           }
 
           //!
@@ -157,15 +128,11 @@ export class HomoGroupRepository {
               },
               update: {
                 startDate:
-                  hierarchyOnHomogeneous[hierarchyId + workspaceId] &&
-                  'startDate' in
-                    hierarchyOnHomogeneous[hierarchyId + workspaceId]
-                    ? hierarchyOnHomogeneous[hierarchyId + workspaceId]
-                        .startDate
+                  hierarchyOnHomogeneous[hierarchyId + workspaceId] && 'startDate' in hierarchyOnHomogeneous[hierarchyId + workspaceId]
+                    ? hierarchyOnHomogeneous[hierarchyId + workspaceId].startDate
                     : startDate,
                 endDate:
-                  hierarchyOnHomogeneous[hierarchyId + workspaceId] &&
-                  'endDate' in hierarchyOnHomogeneous[hierarchyId + workspaceId]
+                  hierarchyOnHomogeneous[hierarchyId + workspaceId] && 'endDate' in hierarchyOnHomogeneous[hierarchyId + workspaceId]
                     ? hierarchyOnHomogeneous[hierarchyId + workspaceId].endDate
                     : endDate,
               },
@@ -193,12 +160,7 @@ export class HomoGroupRepository {
     return this.getHomoGroupData(homoGroup);
   }
 
-  async updateHierarchyHomo({
-    ids,
-    workspaceId,
-    endDate = null,
-    startDate = null,
-  }: UpdateHierarchyHomoGroupDto) {
+  async updateHierarchyHomo({ ids, workspaceId, endDate = null, startDate = null }: UpdateHierarchyHomoGroupDto) {
     return this.prisma.hierarchyOnHomogeneous.updateMany({
       where: { id: { in: ids }, workspaceId },
       data: {
@@ -208,11 +170,7 @@ export class HomoGroupRepository {
     });
   }
 
-  async findHomoGroupByCompanyAndId(
-    id: string,
-    companyId: string,
-    options?: Prisma.HomogeneousGroupFindFirstArgs,
-  ) {
+  async findHomoGroupByCompanyAndId(id: string, companyId: string, options?: Prisma.HomogeneousGroupFindFirstArgs) {
     const hierarchies = await this.prisma.homogeneousGroup.findFirst({
       where: { companyId, id },
       ...options,
@@ -221,11 +179,7 @@ export class HomoGroupRepository {
     return new HomoGroupEntity(hierarchies);
   }
 
-  async find(
-    query: Partial<FindHomogeneousGroupDto>,
-    pagination: PaginationQueryDto,
-    options: Prisma.HomogeneousGroupFindManyArgs = {},
-  ) {
+  async find(query: Partial<FindHomogeneousGroupDto>, pagination: PaginationQueryDto, options: Prisma.HomogeneousGroupFindManyArgs = {}) {
     const whereInit = {
       AND: [],
       type: null,
@@ -285,11 +239,7 @@ export class HomoGroupRepository {
     return new HomoGroupEntity(homo);
   }
 
-  async findById(
-    id: string,
-    companyId: string,
-    options?: Prisma.HomogeneousGroupFindFirstArgs,
-  ) {
+  async findById(id: string, companyId: string, options?: Prisma.HomogeneousGroupFindFirstArgs) {
     const homo = await this.prisma.homogeneousGroup.findFirst({
       where: { id, companyId },
       include: {
@@ -350,21 +300,17 @@ export class HomoGroupRepository {
     const workplacesIds = new Set<string>();
 
     if (homoGroup.hierarchyOnHomogeneous)
-      homogeneousGroup.hierarchies = homoGroup.hierarchyOnHomogeneous.map(
-        (homo) => {
-          workplacesIds.add(homo.workspaceId);
-          return {
-            ...homo.hierarchy,
-            workspaceId: homo.workspaceId,
-          };
-        },
-      );
+      homogeneousGroup.hierarchies = homoGroup.hierarchyOnHomogeneous.map((homo) => {
+        workplacesIds.add(homo.workspaceId);
+        return {
+          ...homo.hierarchy,
+          workspaceId: homo.workspaceId,
+        };
+      });
 
     homogeneousGroup.workspaceIds = Array.from(workplacesIds);
 
-    const hierarchiesIds = homogeneousGroup.hierarchies
-      ? removeDuplicate(homogeneousGroup.hierarchies.map((h) => h.id))
-      : [];
+    const hierarchiesIds = homogeneousGroup.hierarchies ? removeDuplicate(homogeneousGroup.hierarchies.map((h) => h.id)) : [];
 
     const where = {
       companyId,
@@ -407,9 +353,7 @@ export class HomoGroupRepository {
       },
     });
 
-    const getAllHierarchiesChildren = async (
-      hierarchies: HierarchyEntity[],
-    ) => {
+    const getAllHierarchiesChildren = async (hierarchies: HierarchyEntity[]) => {
       hierarchies.forEach((hierarchy) => {
         hierarchiesIds.push(hierarchy.id);
 

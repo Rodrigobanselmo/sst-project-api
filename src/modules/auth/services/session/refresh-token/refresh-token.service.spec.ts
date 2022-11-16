@@ -17,9 +17,7 @@ describe('RefreshTokenService', () => {
         {
           provide: RefreshTokensRepository,
           useValue: {
-            findByUserIdAndRefreshToken: jest
-              .fn()
-              .mockResolvedValue({ id: 'uuid' }),
+            findByUserIdAndRefreshToken: jest.fn().mockResolvedValue({ id: 'uuid' }),
             create: jest.fn().mockResolvedValue({ refresh_token: 'string' }),
             deleteByRefreshToken: jest.fn().mockResolvedValue(undefined),
             deleteById: jest.fn().mockResolvedValue(undefined),
@@ -29,9 +27,7 @@ describe('RefreshTokenService', () => {
           provide: JwtTokenProvider,
           useValue: {
             generateToken: jest.fn().mockReturnValue('token'),
-            generateRefreshToken: jest
-              .fn()
-              .mockReturnValue(['refresh_token', new Date()]),
+            generateRefreshToken: jest.fn().mockReturnValue(['refresh_token', new Date()]),
             verifyIsValidToken: jest.fn().mockReturnValue(true),
           } as Partial<JwtTokenProvider>,
         },
@@ -45,9 +41,7 @@ describe('RefreshTokenService', () => {
     }).compile();
 
     jwtTokenProvider = module.get<JwtTokenProvider>(JwtTokenProvider);
-    refreshTokensRepository = module.get<RefreshTokensRepository>(
-      RefreshTokensRepository,
-    );
+    refreshTokensRepository = module.get<RefreshTokensRepository>(RefreshTokensRepository);
     service = module.get<RefreshTokenService>(RefreshTokenService);
   });
 
@@ -68,9 +62,7 @@ describe('RefreshTokenService', () => {
   });
 
   it('should return error if token is invalid', async () => {
-    jest
-      .spyOn(jwtTokenProvider, 'verifyIsValidToken')
-      .mockImplementation(() => 'invalid' as any);
+    jest.spyOn(jwtTokenProvider, 'verifyIsValidToken').mockImplementation(() => 'invalid' as any);
 
     try {
       await service.execute({} as any);
@@ -81,9 +73,7 @@ describe('RefreshTokenService', () => {
   });
 
   it('should return error if token is expired', async () => {
-    jest
-      .spyOn(jwtTokenProvider, 'verifyIsValidToken')
-      .mockImplementation(() => 'expired' as any);
+    jest.spyOn(jwtTokenProvider, 'verifyIsValidToken').mockImplementation(() => 'expired' as any);
 
     try {
       await service.execute({} as any);
@@ -94,32 +84,24 @@ describe('RefreshTokenService', () => {
   });
 
   it('should return error if token does not exists in database', async () => {
-    jest
-      .spyOn(refreshTokensRepository, 'findByUserIdAndRefreshToken')
-      .mockImplementation(() => null as any);
+    jest.spyOn(refreshTokensRepository, 'findByUserIdAndRefreshToken').mockImplementation(() => null as any);
 
     try {
       await service.execute({} as any);
       throw new Error('error');
     } catch (err) {
-      expect(err).toEqual(
-        new UnauthorizedException('Refresh Token does not exists!'),
-      );
+      expect(err).toEqual(new UnauthorizedException('Refresh Token does not exists!'));
     }
   });
 
   it('should return error if token does not exists in database', async () => {
-    jest
-      .spyOn(refreshTokensRepository, 'findByUserIdAndRefreshToken')
-      .mockImplementation(() => null as any);
+    jest.spyOn(refreshTokensRepository, 'findByUserIdAndRefreshToken').mockImplementation(() => null as any);
 
     try {
       await service.execute({} as any);
       throw new Error('error');
     } catch (err) {
-      expect(err).toEqual(
-        new UnauthorizedException('Refresh Token does not exists!'),
-      );
+      expect(err).toEqual(new UnauthorizedException('Refresh Token does not exists!'));
     }
   });
 });

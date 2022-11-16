@@ -152,5 +152,4 @@ const ThirdRiskInventoryColumnsHeader = (): bodyTableProps[] => {
   return header;
 };
 
-export const thirdRiskInventoryColumnsHeader =
-  ThirdRiskInventoryColumnsHeader();
+export const thirdRiskInventoryColumnsHeader = ThirdRiskInventoryColumnsHeader();

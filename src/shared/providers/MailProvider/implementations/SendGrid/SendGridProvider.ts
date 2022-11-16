@@ -15,14 +15,7 @@ class SendGridProvider implements IMailProvider {
     this.client = sgMail;
   }
 
-  async sendMail({
-    path,
-    subject,
-    to,
-    variables,
-    attachments,
-    source = EmailsEnum.VALIDATION,
-  }: ISendMailData): Promise<any> {
+  async sendMail({ path, subject, to, variables, attachments, source = EmailsEnum.VALIDATION }: ISendMailData): Promise<any> {
     try {
       // if (process.env.NODE_ENV === 'development') return;
       if (!to) return;

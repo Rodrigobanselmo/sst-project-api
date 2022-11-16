@@ -1,12 +1,4 @@
-import {
-  AlignmentType,
-  ExternalHyperlink,
-  IParagraphOptions,
-  PageBreak,
-  Paragraph,
-  SequentialIdentifier,
-  TextRun,
-} from 'docx';
+import { AlignmentType, ExternalHyperlink, IParagraphOptions, PageBreak, Paragraph, SequentialIdentifier, TextRun } from 'docx';
 import { isOdd } from '../../../../../shared/utils/isOdd';
 
 interface ParagraphProps extends IParagraphOptions {
@@ -19,10 +11,7 @@ interface ParagraphProps extends IParagraphOptions {
   color?: string;
 }
 
-export const paragraphNormal = (
-  text: string,
-  { children, color, ...options } = {} as ParagraphProps,
-) =>
+export const paragraphNormal = (text: string, { children, color, ...options } = {} as ParagraphProps) =>
   new Paragraph({
     children: [
       ...(children || []),
@@ -104,10 +93,7 @@ export const paragraphTable = (text: string, options = {} as ParagraphProps) =>
     spacing: { after: 70 },
   });
 
-export const paragraphTableLegend = (
-  text: string,
-  options = {} as ParagraphProps,
-) =>
+export const paragraphTableLegend = (text: string, options = {} as ParagraphProps) =>
   paragraphNormal(text, {
     spacing: { after: 300 },
     size: 8,
@@ -115,10 +101,7 @@ export const paragraphTableLegend = (
     ...options,
   });
 
-export const paragraphFigure = (
-  text: string,
-  options = {} as ParagraphProps & { spacingAfter?: number },
-) =>
+export const paragraphFigure = (text: string, options = {} as ParagraphProps & { spacingAfter?: number }) =>
   text
     ? paragraphNormal(text, {
         ...options,

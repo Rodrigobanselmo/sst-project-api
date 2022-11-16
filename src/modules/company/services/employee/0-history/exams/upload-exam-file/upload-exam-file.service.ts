@@ -11,16 +11,9 @@ import { removeDuplicate } from '../../../../../../../shared/utils/removeDuplica
 
 @Injectable()
 export class UploadExamFileService {
-  constructor(
-    private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository,
-    private readonly amazonStorageProvider: AmazonStorageProvider,
-  ) {}
+  constructor(private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository, private readonly amazonStorageProvider: AmazonStorageProvider) {}
 
-  async execute(
-    { ids }: UpdateFileExamDto,
-    user: UserPayloadDto,
-    file: Express.Multer.File,
-  ) {
+  async execute({ ids }: UpdateFileExamDto, user: UserPayloadDto, file: Express.Multer.File) {
     const companyId = user.targetCompanyId;
 
     const found = await this.employeeExamHistoryRepository.findNude({
@@ -32,10 +25,7 @@ export class UploadExamFileService {
     });
 
     //tenant
-    if (found.length != ids.length)
-      throw new BadRequestException(
-        ErrorMessageEnum.EMPLOYEE_HISTORY_NOT_FOUND,
-      );
+    if (found.length != ids.length) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_HISTORY_NOT_FOUND);
 
     let url: string;
 
@@ -53,11 +43,7 @@ export class UploadExamFileService {
     return document;
   }
 
-  private async upload(
-    companyId: string,
-    file: Express.Multer.File,
-    examFound: EmployeeExamsHistoryEntity[],
-  ) {
+  private async upload(companyId: string, file: Express.Multer.File, examFound: EmployeeExamsHistoryEntity[]) {
     const fileUrls = removeDuplicate(
       examFound.map((exam) => exam.fileUrl).filter((i) => i),
       { removeById: 'fileUrl' },
@@ -78,9 +64,7 @@ export class UploadExamFileService {
     try {
       await Promise.all(
         fileUrls.map(async (fileUrl) => {
-          const files = foundByFileUrl.filter(
-            (fileExam) => fileExam.fileUrl === fileUrl,
-          );
+          const files = foundByFileUrl.filter((fileExam) => fileExam.fileUrl === fileUrl);
           if (files.length === 1) {
             const splitUrl = fileUrl.split('.com/');
 
@@ -91,8 +75,7 @@ export class UploadExamFileService {
         }),
       );
 
-      const fileType =
-        file.originalname.split('.')[file.originalname.split('.').length - 1];
+      const fileType = file.originalname.split('.')[file.originalname.split('.').length - 1];
       const path = companyId + '/exams/' + `${v4()}` + '.' + fileType;
 
       const { url } = await this.amazonStorageProvider.upload({
@@ -104,9 +87,7 @@ export class UploadExamFileService {
       return url;
     } catch (err) {
       console.log('upload exam file', err);
-      throw new BadRequestException(
-        ErrorMessageEnum.EMPLOYEE_HISTORY_NOT_FOUND,
-      );
+      throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_HISTORY_NOT_FOUND);
     }
   }
 }

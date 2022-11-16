@@ -8,11 +8,7 @@ export class FindAllEnvironmentService {
   constructor(private readonly environmentRepository: EnvironmentRepository) {}
 
   async execute(workspaceId: string, userPayloadDto: UserPayloadDto) {
-    const environments = await this.environmentRepository.findAll(
-      userPayloadDto.targetCompanyId,
-      workspaceId,
-      { include: { photos: true } },
-    );
+    const environments = await this.environmentRepository.findAll(userPayloadDto.targetCompanyId, workspaceId, { include: { photos: true } });
 
     return environments;
   }

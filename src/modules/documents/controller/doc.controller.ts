@@ -36,25 +36,10 @@ export class DocumentsBaseController {
     },
   )
   @Get('/:docId/attachment/:attachmentId/:companyId?')
-  async downloadAttachment(
-    @Res() res,
-    @User() userPayloadDto: UserPayloadDto,
-    @Param('docId') docId: string,
-    @Param('attachmentId') attachmentId: string,
-  ) {
-    const { fileKey, fileStream } =
-      await this.pgrDownloadAttachmentsService.execute(
-        userPayloadDto,
-        docId,
-        attachmentId,
-      );
+  async downloadAttachment(@Res() res, @User() userPayloadDto: UserPayloadDto, @Param('docId') docId: string, @Param('attachmentId') attachmentId: string) {
+    const { fileKey, fileStream } = await this.pgrDownloadAttachmentsService.execute(userPayloadDto, docId, attachmentId);
 
-    res.setHeader(
-      'Content-Disposition',
-      `attachment; filename=${
-        fileKey.split('/')[fileKey.split('/').length - 1]
-      }`,
-    );
+    res.setHeader('Content-Disposition', `attachment; filename=${fileKey.split('/')[fileKey.split('/').length - 1]}`);
     fileStream.on('error', function (e) {
       res.status(500).send(e);
     });
@@ -75,22 +60,10 @@ export class DocumentsBaseController {
     },
   )
   @Get('/:docId/:companyId?')
-  async downloadPGR(
-    @Res() res,
-    @User() userPayloadDto: UserPayloadDto,
-    @Param('docId') docId: string,
-  ) {
-    const { fileKey, fileStream } = await this.pgrDownloadDocService.execute(
-      userPayloadDto,
-      docId,
-    );
+  async downloadPGR(@Res() res, @User() userPayloadDto: UserPayloadDto, @Param('docId') docId: string) {
+    const { fileKey, fileStream } = await this.pgrDownloadDocService.execute(userPayloadDto, docId);
 
-    res.setHeader(
-      'Content-Disposition',
-      `attachment; filename=${
-        fileKey.split('/')[fileKey.split('/').length - 1]
-      }`,
-    );
+    res.setHeader('Content-Disposition', `attachment; filename=${fileKey.split('/')[fileKey.split('/').length - 1]}`);
     fileStream.on('error', function (e) {
       res.status(500).send(e);
     });
@@ -112,14 +85,8 @@ export class DocumentsBaseController {
     },
   )
   @Post('/add-queue')
-  async addQueuePGRDoc(
-    @User() userPayloadDto: UserPayloadDto,
-    @Body() upsertPgrDto: UpsertDocumentDto,
-  ) {
-    return this.addQueuePGRDocumentService.execute(
-      upsertPgrDto,
-      userPayloadDto,
-    );
+  async addQueuePGRDoc(@User() userPayloadDto: UserPayloadDto, @Body() upsertPgrDto: UpsertDocumentDto) {
+    return this.addQueuePGRDocumentService.execute(upsertPgrDto, userPayloadDto);
   }
 }
 

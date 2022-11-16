@@ -6,11 +6,8 @@ import { TableBodyElements } from './elements/body';
 import { TableHeaderElements } from './elements/header';
 import { riskCharacterizationConverter } from './riskCharacterization.converter';
 
-export const riskCharacterizationTableSection = (
-  riskFactorGroupData: RiskFactorGroupDataEntity,
-) => {
-  const riskCharacterizationData =
-    riskCharacterizationConverter(riskFactorGroupData);
+export const riskCharacterizationTableSection = (riskFactorGroupData: RiskFactorGroupDataEntity) => {
+  const riskCharacterizationData = riskCharacterizationConverter(riskFactorGroupData);
 
   const tableHeaderElements = new TableHeaderElements();
   const tableBodyElements = new TableBodyElements();
@@ -18,12 +15,8 @@ export const riskCharacterizationTableSection = (
   const table = new Table({
     width: { size: 100, type: WidthType.PERCENTAGE },
     rows: [
-      tableHeaderElements.headerRow(
-        riskCharacterizationHeader.map(tableHeaderElements.headerCell),
-      ),
-      ...riskCharacterizationData.map((data) =>
-        tableBodyElements.tableRow(data.map(tableBodyElements.tableCell)),
-      ),
+      tableHeaderElements.headerRow(riskCharacterizationHeader.map(tableHeaderElements.headerCell)),
+      ...riskCharacterizationData.map((data) => tableBodyElements.tableRow(data.map(tableBodyElements.tableCell))),
     ],
   });
 

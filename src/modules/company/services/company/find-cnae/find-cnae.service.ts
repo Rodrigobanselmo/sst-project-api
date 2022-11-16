@@ -8,10 +8,7 @@ export class FindCnaeService {
   constructor(private readonly activityRepository: ActivityRepository) {}
 
   async execute({ skip, take, ...query }: FindActivityDto) {
-    const access = await this.activityRepository.find(
-      { ...query },
-      { skip, take },
-    );
+    const access = await this.activityRepository.find({ ...query }, { skip, take });
 
     return access;
   }

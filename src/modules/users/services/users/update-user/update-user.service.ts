@@ -18,10 +18,7 @@ export class UpdateUserService {
     private readonly inviteUsersRepository: InviteUsersRepository,
   ) {}
 
-  async execute(
-    id: number,
-    { password, oldPassword, token, ...restUpdateUserDto }: UpdateUserDto,
-  ) {
+  async execute(id: number, { password, oldPassword, token, ...restUpdateUserDto }: UpdateUserDto) {
     if (!id) throw new BadRequestException(`Bad Request`);
 
     const updateUserDto: UpdateUserDto = { ...restUpdateUserDto };
@@ -30,9 +27,7 @@ export class UpdateUserService {
     if (!userData) throw new BadRequestException(`user #${id} not found`);
 
     if (restUpdateUserDto.googleExternalId) {
-      const user = await this.userRepository.findByGoogleExternalId(
-        restUpdateUserDto.googleExternalId,
-      );
+      const user = await this.userRepository.findByGoogleExternalId(restUpdateUserDto.googleExternalId);
       if (user && user.id !== id) {
         await this.userRepository.update(user.id, {
           googleExternalId: null,
@@ -43,10 +38,7 @@ export class UpdateUserService {
     if (password) {
       if (!oldPassword) throw new BadRequestException(`Old password missing`);
 
-      const passwordMatch = await this.hashProvider.compare(
-        oldPassword,
-        userData.password,
-      );
+      const passwordMatch = await this.hashProvider.compare(oldPassword, userData.password);
 
       if (!passwordMatch) {
         throw new BadRequestException('password incorrect');
@@ -56,11 +48,7 @@ export class UpdateUserService {
       updateUserDto.password = passHash;
     }
 
-    const { companies, invite, companyId } = await getCompanyPermissionByToken(
-      token,
-      this.findByTokenService,
-      this.dateProvider,
-    );
+    const { companies, invite, companyId } = await getCompanyPermissionByToken(token, this.findByTokenService, this.dateProvider);
 
     const user = await this.userRepository.update(
       id,
@@ -69,13 +57,11 @@ export class UpdateUserService {
         ...(invite &&
           invite?.professional && {
             ...(invite?.professional.councils && {
-              councils: invite.professional.councils.map(
-                ({ councilId, councilType, councilUF }) => ({
-                  councilId,
-                  councilType,
-                  councilUF,
-                }),
-              ),
+              councils: invite.professional.councils.map(({ councilId, councilType, councilUF }) => ({
+                councilId,
+                councilType,
+                councilUF,
+              })),
             }),
             ...(invite?.professional.phone && {
               phone: invite.professional.phone,
@@ -87,11 +73,7 @@ export class UpdateUserService {
       },
       companies,
     );
-    if (invite && invite.email && companyId)
-      await this.inviteUsersRepository.deleteByCompanyIdAndEmail(
-        companyId,
-        invite.email,
-      );
+    if (invite && invite.email && companyId) await this.inviteUsersRepository.deleteByCompanyIdAndEmail(companyId, invite.email);
 
     return user;
   }

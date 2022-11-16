@@ -7,10 +7,7 @@ import { ESocialMethodsProvider } from '../../../../../../shared/providers/ESoci
 import { CompanyRepository } from '../../../../../company/repositories/implementations/CompanyRepository';
 import { EmployeeRepository } from '../../../../../company/repositories/implementations/EmployeeRepository';
 import { FindEvents2220Dto } from './../../../../dto/event.dto';
-import {
-  mapInverseResAso,
-  mapInverseTpExameOcup,
-} from './../../../../interfaces/event-2220';
+import { mapInverseResAso, mapInverseTpExameOcup } from './../../../../interfaces/event-2220';
 
 @Injectable()
 export class FindEvents2220ESocialService {
@@ -21,10 +18,7 @@ export class FindEvents2220ESocialService {
     private readonly companyRepository: CompanyRepository,
   ) {}
 
-  async execute(
-    { skip, take, ...query }: FindEvents2220Dto,
-    user: UserPayloadDto,
-  ) {
+  async execute({ skip, take, ...query }: FindEvents2220Dto, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;
     const { company } = await this.eSocialMethodsProvider.getCompany(companyId);
 
@@ -35,26 +29,21 @@ export class FindEvents2220ESocialService {
         data: [],
         count: 0,
         error: {
-          message:
-            'Data de início do eSocial ou tipo de envio não informado para essa empresa',
+          message: 'Data de início do eSocial ou tipo de envio não informado para essa empresa',
         },
       };
 
-    const { data: employees, count } =
-      await this.employeeRepository.findEvent2220(
-        {
-          startDate,
-          companyId,
-          ...query,
-        },
-        { take: 1000 },
-        { select: { name: true } },
-      );
-
-    const eventsStruct = this.eSocialEventProvider.convertToEvent2220Struct(
-      company,
-      employees,
+    const { data: employees, count } = await this.employeeRepository.findEvent2220(
+      {
+        startDate,
+        companyId,
+        ...query,
+      },
+      { take: 1000 },
+      { select: { name: true } },
     );
+
+    const eventsStruct = this.eSocialEventProvider.convertToEvent2220Struct(company, employees);
 
     const eventsXml = eventsStruct.map((data) => {
       const eventErrors = this.eSocialEventProvider.errorsEvent2220(data.event);
@@ -67,11 +56,7 @@ export class FindEvents2220ESocialService {
       delete data.employee?.company;
 
       let type: ESocialSendEnum = ESocialSendEnum.SEND;
-      if (
-        data.aso?.events?.some((e) =>
-          ['DONE', 'TRANSMITTED'].includes(e.status),
-        )
-      ) {
+      if (data.aso?.events?.some((e) => ['DONE', 'TRANSMITTED'].includes(e.status))) {
         const isExclude = data.aso.status === 'CANCELED';
         if (isExclude) type = ESocialSendEnum.EXCLUDE;
         if (!isExclude) type = ESocialSendEnum.MODIFIED;

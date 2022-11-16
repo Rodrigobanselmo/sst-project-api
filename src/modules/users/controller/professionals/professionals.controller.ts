@@ -1,13 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Post,
-  Query,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { classToClass } from 'class-transformer';
 
@@ -15,11 +6,7 @@ import { PermissionEnum } from '../../../../shared/constants/enum/authorization'
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
-import {
-  CreateProfessionalDto,
-  FindProfessionalsDto,
-  UpdateProfessionalDto,
-} from '../../dto/professional.dto';
+import { CreateProfessionalDto, FindProfessionalsDto, UpdateProfessionalDto } from '../../dto/professional.dto';
 import { CreateProfessionalService } from '../../services/professionals/create-professional/create-professional.service';
 import { FindAllProfessionalsByCompanyService } from '../../services/professionals/find-all/find-all.service';
 import { FindFirstProfessionalService } from '../../services/professionals/find-first/find-first.service';
@@ -48,13 +35,8 @@ export class ProfessionalsController {
     },
   )
   @Get('/company/:companyId?')
-  findAllByCompany(
-    @User() userPayloadDto: UserPayloadDto,
-    @Query() query: FindProfessionalsDto,
-  ) {
-    return classToClass(
-      this.findAllByCompanyService.execute(query, userPayloadDto),
-    );
+  findAllByCompany(@User() userPayloadDto: UserPayloadDto, @Query() query: FindProfessionalsDto) {
+    return classToClass(this.findAllByCompanyService.execute(query, userPayloadDto));
   }
 
   @Permissions(
@@ -85,10 +67,7 @@ export class ProfessionalsController {
     },
   )
   @Post()
-  async create(
-    @Body() createProfessionalDto: CreateProfessionalDto,
-    @User() user: UserPayloadDto,
-  ) {
+  async create(@Body() createProfessionalDto: CreateProfessionalDto, @User() user: UserPayloadDto) {
     return this.createProfessionalService.execute(createProfessionalDto, user);
   }
 
@@ -107,14 +86,7 @@ export class ProfessionalsController {
     },
   )
   @Patch('/:id')
-  async update(
-    @Body() updateProfessionalDto: UpdateProfessionalDto,
-    @User() user: UserPayloadDto,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
-    return this.updateProfessionalService.execute(
-      { id, ...updateProfessionalDto },
-      user,
-    );
+  async update(@Body() updateProfessionalDto: UpdateProfessionalDto, @User() user: UserPayloadDto, @Param('id', ParseIntPipe) id: number) {
+    return this.updateProfessionalService.execute({ id, ...updateProfessionalDto }, user);
   }
 }

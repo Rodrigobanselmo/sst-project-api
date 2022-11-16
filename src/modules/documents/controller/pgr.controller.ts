@@ -4,11 +4,7 @@ import { PermissionEnum } from '../../../shared/constants/enum/authorization';
 import { Permissions } from '../../../shared/decorators/permissions.decorator';
 import { User } from '../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../shared/dto/user-payload.dto';
-import {
-  UploadPgrActionPlanDto,
-  UpsertDocumentDto,
-  UpsertPgrDocumentDto,
-} from '../dto/pgr.dto';
+import { UploadPgrActionPlanDto, UpsertDocumentDto, UpsertPgrDocumentDto } from '../dto/pgr.dto';
 import { PgrActionPlanUploadTableService } from '../services/pgr/action-plan/upload-action-plan-table.service';
 import { AddQueueDocumentService } from '../services/pgr/document/add-queue-doc.service';
 import { DownloadAttachmentsService } from '../services/pgr/document/download-attachment-doc.service';
@@ -33,25 +29,10 @@ export class DocumentsPgrController {
     isContract: true,
   })
   @Get('/:docId/attachment/:attachmentId/:companyId?')
-  async downloadAttachment(
-    @Res() res,
-    @User() userPayloadDto: UserPayloadDto,
-    @Param('docId') docId: string,
-    @Param('attachmentId') attachmentId: string,
-  ) {
-    const { fileKey, fileStream } =
-      await this.pgrDownloadAttachmentsService.execute(
-        userPayloadDto,
-        docId,
-        attachmentId,
-      );
+  async downloadAttachment(@Res() res, @User() userPayloadDto: UserPayloadDto, @Param('docId') docId: string, @Param('attachmentId') attachmentId: string) {
+    const { fileKey, fileStream } = await this.pgrDownloadAttachmentsService.execute(userPayloadDto, docId, attachmentId);
 
-    res.setHeader(
-      'Content-Disposition',
-      `attachment; filename=${
-        fileKey.split('/')[fileKey.split('/').length - 1]
-      }`,
-    );
+    res.setHeader('Content-Disposition', `attachment; filename=${fileKey.split('/')[fileKey.split('/').length - 1]}`);
     fileStream.on('error', function (e) {
       res.status(500).send(e);
     });
@@ -65,22 +46,10 @@ export class DocumentsPgrController {
     isContract: true,
   })
   @Get('/:docId/:companyId?')
-  async downloadPGR(
-    @Res() res,
-    @User() userPayloadDto: UserPayloadDto,
-    @Param('docId') docId: string,
-  ) {
-    const { fileKey, fileStream } = await this.pgrDownloadDocService.execute(
-      userPayloadDto,
-      docId,
-    );
+  async downloadPGR(@Res() res, @User() userPayloadDto: UserPayloadDto, @Param('docId') docId: string) {
+    const { fileKey, fileStream } = await this.pgrDownloadDocService.execute(userPayloadDto, docId);
 
-    res.setHeader(
-      'Content-Disposition',
-      `attachment; filename=${
-        fileKey.split('/')[fileKey.split('/').length - 1]
-      }`,
-    );
+    res.setHeader('Content-Disposition', `attachment; filename=${fileKey.split('/')[fileKey.split('/').length - 1]}`);
     fileStream.on('error', function (e) {
       res.status(500).send(e);
     });
@@ -95,11 +64,7 @@ export class DocumentsPgrController {
     crud: true,
   })
   @Post()
-  async uploadPGRDoc(
-    @Res() res,
-    @User() userPayloadDto: UserPayloadDto,
-    @Body() upsertPgrDto: UpsertPgrDocumentDto,
-  ) {
+  async uploadPGRDoc(@Res() res, @User() userPayloadDto: UserPayloadDto, @Body() upsertPgrDto: UpsertPgrDocumentDto) {
     const { buffer: file, fileName } = await this.pgrUploadDocService.execute({
       ...upsertPgrDto,
       companyId: userPayloadDto.targetCompanyId,
@@ -122,16 +87,8 @@ export class DocumentsPgrController {
     },
   )
   @Post('action-plan')
-  async uploadPGRActionPlanDoc(
-    @Res() res,
-    @User() userPayloadDto: UserPayloadDto,
-    @Body() upsertPgrDto: UploadPgrActionPlanDto,
-  ) {
-    const { buffer: file, fileName } =
-      await this.pgrActionPlanUploadTableService.execute(
-        upsertPgrDto,
-        userPayloadDto,
-      );
+  async uploadPGRActionPlanDoc(@Res() res, @User() userPayloadDto: UserPayloadDto, @Body() upsertPgrDto: UploadPgrActionPlanDto) {
+    const { buffer: file, fileName } = await this.pgrActionPlanUploadTableService.execute(upsertPgrDto, userPayloadDto);
 
     res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
     res.send(file);
@@ -144,15 +101,9 @@ export class DocumentsPgrController {
     crud: true,
   })
   @Post('/add-queue')
-  async addQueuePGRDoc(
-    @User() userPayloadDto: UserPayloadDto,
-    @Body() upsertPgrDto: UpsertDocumentDto,
-  ) {
+  async addQueuePGRDoc(@User() userPayloadDto: UserPayloadDto, @Body() upsertPgrDto: UpsertDocumentDto) {
     upsertPgrDto.isPGR = true;
-    return this.addQueuePGRDocumentService.execute(
-      upsertPgrDto,
-      userPayloadDto,
-    );
+    return this.addQueuePGRDocumentService.execute(upsertPgrDto, userPayloadDto);
   }
 }
 

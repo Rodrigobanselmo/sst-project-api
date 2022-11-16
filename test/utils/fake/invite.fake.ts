@@ -10,11 +10,7 @@ export class FakeInvite implements InviteUserDto {
   email = faker.lorem.word() + faker.internet.email();
   companyId = '1';
   roles: string[] = ['admin'];
-  permissions: string[] = [
-    PermissionEnum.USER,
-    PermissionEnum.USER,
-    PermissionEnum.DOCUMENTS,
-  ];
+  permissions: string[] = [PermissionEnum.USER, PermissionEnum.USER, PermissionEnum.DOCUMENTS];
 
   pushPermissions(permission: string) {
     return this.permissions.push(permission);

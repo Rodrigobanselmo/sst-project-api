@@ -7,14 +7,8 @@ import { actionPlanConverter } from './actionPlan.converter';
 import { TableBodyElements } from './elements/body';
 import { TableHeaderElements } from './elements/header';
 
-export const actionPlanTableSection = (
-  riskFactorGroupData: RiskFactorGroupDataEntity,
-  hierarchyTree: IHierarchyMap,
-) => {
-  const actionPlanData = actionPlanConverter(
-    riskFactorGroupData,
-    hierarchyTree,
-  );
+export const actionPlanTableSection = (riskFactorGroupData: RiskFactorGroupDataEntity, hierarchyTree: IHierarchyMap) => {
+  const actionPlanData = actionPlanConverter(riskFactorGroupData, hierarchyTree);
 
   const tableHeaderElements = new TableHeaderElements();
   const tableBodyElements = new TableBodyElements();
@@ -23,12 +17,8 @@ export const actionPlanTableSection = (
     width: { size: 100, type: WidthType.PERCENTAGE },
     rows: [
       tableHeaderElements.headerTitle(actionPlanTitle, actionPlanHeader.length),
-      tableHeaderElements.headerRow(
-        actionPlanHeader.map(tableHeaderElements.headerCell),
-      ),
-      ...actionPlanData.map((data) =>
-        tableBodyElements.tableRow(data.map(tableBodyElements.tableCell)),
-      ),
+      tableHeaderElements.headerRow(actionPlanHeader.map(tableHeaderElements.headerCell)),
+      ...actionPlanData.map((data) => tableBodyElements.tableRow(data.map(tableBodyElements.tableCell))),
     ],
   });
 

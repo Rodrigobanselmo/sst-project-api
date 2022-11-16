@@ -7,10 +7,7 @@ export class UpdateChecklistService {
   constructor(private readonly checklistRepository: ChecklistRepository) {}
 
   async execute(id: number, updateChecklistDto: UpdateChecklistDto) {
-    const Checklist = await this.checklistRepository.update(
-      id,
-      updateChecklistDto,
-    );
+    const Checklist = await this.checklistRepository.update(id, updateChecklistDto);
 
     if (!Checklist.id) throw new NotFoundException('Checklist not found');
 

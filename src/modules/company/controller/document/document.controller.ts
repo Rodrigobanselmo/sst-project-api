@@ -1,17 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Post,
-  Query,
-  Res,
-  UploadedFile,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -19,11 +6,7 @@ import { PermissionEnum } from '../../../../shared/constants/enum/authorization'
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
-import {
-  CreateDocumentDto,
-  FindDocumentDto,
-  UpdateDocumentDto,
-} from '../../dto/document.dto';
+import { CreateDocumentDto, FindDocumentDto, UpdateDocumentDto } from '../../dto/document.dto';
 import { CreateDocumentService } from '../../services/document/create-document/create-document.service';
 import { DeleteDocumentService } from '../../services/document/delete-document/delete-document.service';
 import { DownloadDocumentService } from '../../services/document/download-document/download-document.service';
@@ -50,10 +33,7 @@ export class DocumentController {
     crud: true,
   })
   @Get()
-  find(
-    @User() userPayloadDto: UserPayloadDto,
-    @Query() query: FindDocumentDto,
-  ) {
+  find(@User() userPayloadDto: UserPayloadDto, @Query() query: FindDocumentDto) {
     return this.findDocumentService.execute(query, userPayloadDto);
   }
 
@@ -64,10 +44,7 @@ export class DocumentController {
     crud: true,
   })
   @Get('/:id')
-  findById(
-    @User() userPayloadDto: UserPayloadDto,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
+  findById(@User() userPayloadDto: UserPayloadDto, @Param('id', ParseIntPipe) id: number) {
     return this.findByIdDocumentService.execute(id, userPayloadDto);
   }
 
@@ -78,22 +55,10 @@ export class DocumentController {
     crud: true,
   })
   @Get('/:id/download')
-  async download(
-    @Res() res,
-    @User() userPayloadDto: UserPayloadDto,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
-    const { fileKey, fileStream } = await this.downloadDocumentService.execute(
-      id,
-      userPayloadDto,
-    );
+  async download(@Res() res, @User() userPayloadDto: UserPayloadDto, @Param('id', ParseIntPipe) id: number) {
+    const { fileKey, fileStream } = await this.downloadDocumentService.execute(id, userPayloadDto);
 
-    res.setHeader(
-      'Content-Disposition',
-      `attachment; filename=${
-        fileKey.split('/')[fileKey.split('/').length - 1]
-      }`,
-    );
+    res.setHeader('Content-Disposition', `attachment; filename=${fileKey.split('/')[fileKey.split('/').length - 1]}`);
 
     fileStream.on('error', function (e) {
       res.status(500).send(e);
@@ -109,14 +74,8 @@ export class DocumentController {
     crud: true,
   })
   @Post()
-  @UseInterceptors(
-    FileInterceptor('file', { limits: { fileSize: 1000000000 } }),
-  )
-  create(
-    @UploadedFile() file: Express.Multer.File,
-    @Body() createDto: CreateDocumentDto,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
+  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 1000000000 } }))
+  create(@UploadedFile() file: Express.Multer.File, @Body() createDto: CreateDocumentDto, @User() userPayloadDto: UserPayloadDto) {
     return this.createDocumentService.execute(createDto, userPayloadDto, file);
   }
 
@@ -127,20 +86,9 @@ export class DocumentController {
     crud: true,
   })
   @Patch('/:id')
-  @UseInterceptors(
-    FileInterceptor('file', { limits: { fileSize: 1000000000 } }),
-  )
-  update(
-    @UploadedFile() file: Express.Multer.File,
-    @Body() update: UpdateDocumentDto,
-    @User() userPayloadDto: UserPayloadDto,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
-    return this.updateDocumentService.execute(
-      { ...update, id },
-      userPayloadDto,
-      file,
-    );
+  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 1000000000 } }))
+  update(@UploadedFile() file: Express.Multer.File, @Body() update: UpdateDocumentDto, @User() userPayloadDto: UserPayloadDto, @Param('id', ParseIntPipe) id: number) {
+    return this.updateDocumentService.execute({ ...update, id }, userPayloadDto, file);
   }
 
   @Permissions({
@@ -150,10 +98,7 @@ export class DocumentController {
     crud: true,
   })
   @Delete('/:id')
-  delete(
-    @User() userPayloadDto: UserPayloadDto,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
+  delete(@User() userPayloadDto: UserPayloadDto, @Param('id', ParseIntPipe) id: number) {
     return this.deleteDocumentService.execute(id, userPayloadDto);
   }
 }

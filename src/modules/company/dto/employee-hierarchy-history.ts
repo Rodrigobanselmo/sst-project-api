@@ -34,9 +34,7 @@ export class CreateEmployeeHierarchyHistoryDto {
   motive: EmployeeHierarchyMotiveTypeEnum;
 }
 
-export class UpdateEmployeeHierarchyHistoryDto extends PartialType(
-  CreateEmployeeHierarchyHistoryDto,
-) {
+export class UpdateEmployeeHierarchyHistoryDto extends PartialType(CreateEmployeeHierarchyHistoryDto) {
   @IsInt()
   @IsOptional()
   id: number;

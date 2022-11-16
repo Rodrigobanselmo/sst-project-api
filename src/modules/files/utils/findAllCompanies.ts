@@ -44,10 +44,7 @@ export const findAllCompanies = async (
     data = response.data;
   }
 
-  const excelRows = await excelProvider.transformToExcelData(
-    data,
-    riskSheet.columns,
-  );
+  const excelRows = await excelProvider.transformToExcelData(data, riskSheet.columns);
 
   return {
     sheetName: riskSheet.name,

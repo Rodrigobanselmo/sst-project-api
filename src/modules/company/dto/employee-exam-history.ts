@@ -4,30 +4,11 @@ import { CpfFormatTransform } from './../../../shared/transformers/cpf-format.tr
 import { StringUppercaseTransform } from './../../../shared/transformers/string-uppercase.transform';
 import { DateFormat } from './../../../shared/transformers/date-format';
 import { PartialType } from '@nestjs/swagger';
-import {
-  IsBoolean,
-  IsDate,
-  IsDefined,
-  IsEnum,
-  IsInt,
-  IsOptional,
-  IsString,
-  Length,
-  MaxLength,
-  ValidateIf,
-  ValidateNested,
-} from 'class-validator';
+import { IsBoolean, IsDate, IsDefined, IsEnum, IsInt, IsOptional, IsString, Length, MaxLength, ValidateIf, ValidateNested } from 'class-validator';
 
 import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
 import { Transform, Type } from 'class-transformer';
-import {
-  ClinicScheduleTypeEnum,
-  ExamHistoryConclusionEnum,
-  ExamHistoryEvaluationEnum,
-  ExamHistoryTypeEnum,
-  SexTypeEnum,
-  StatusEnum,
-} from '@prisma/client';
+import { ClinicScheduleTypeEnum, ExamHistoryConclusionEnum, ExamHistoryEvaluationEnum, ExamHistoryTypeEnum, SexTypeEnum, StatusEnum } from '@prisma/client';
 import { QueryArray } from './../../../shared/transformers/query-array';
 
 export class EmployeeComplementaryExamHistoryDto {
@@ -168,9 +149,7 @@ export class CreateEmployeeExamHistoryDto {
   examsData?: EmployeeComplementaryExamHistoryDto[];
 }
 
-export class UpdateEmployeeExamHistoryDto extends PartialType(
-  CreateEmployeeExamHistoryDto,
-) {
+export class UpdateEmployeeExamHistoryDto extends PartialType(CreateEmployeeExamHistoryDto) {
   @IsInt()
   @IsOptional()
   id: number;

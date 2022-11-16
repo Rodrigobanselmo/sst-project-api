@@ -25,13 +25,7 @@ export class DownloadHierarchiesService {
     const companyId = userPayloadDto.targetCompanyId;
 
     return this.downloadExcelProvider.newTableData({
-      findAll: (sheet) =>
-        findAllHierarchies(
-          this.excelProvider,
-          this.hierarchyRepository,
-          sheet,
-          companyId,
-        ),
+      findAll: (sheet) => findAllHierarchies(this.excelProvider, this.hierarchyRepository, sheet, companyId),
       Workbook,
       companyId,
     });

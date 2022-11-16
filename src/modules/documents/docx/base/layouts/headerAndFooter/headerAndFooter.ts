@@ -9,12 +9,7 @@ export interface IHeaderFooterProps {
   consultantLogoPath: string;
 }
 
-export const headerAndFooter = ({
-  version,
-  footerText,
-  logoPath,
-  consultantLogoPath,
-}: IHeaderFooterProps) => {
+export const headerAndFooter = ({ version, footerText, logoPath, consultantLogoPath }: IHeaderFooterProps) => {
   return {
     footers: createFooter({
       footerText,

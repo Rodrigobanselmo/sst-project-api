@@ -8,11 +8,7 @@ import { ExamRiskRepository } from '../../../repositories/implementations/ExamRi
 export class UpdateExamRiskService {
   constructor(private readonly examRiskRepository: ExamRiskRepository) {}
 
-  async execute(
-    id: number,
-    updateExamDto: UpdateExamRiskDto,
-    user: UserPayloadDto,
-  ) {
+  async execute(id: number, updateExamDto: UpdateExamRiskDto, user: UserPayloadDto) {
     const exam = await this.examRiskRepository.update({
       id,
       companyId: user.targetCompanyId,

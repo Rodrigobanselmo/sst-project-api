@@ -2,15 +2,7 @@ import { QueryArray } from './../../../shared/transformers/query-array';
 import { KeysOfEnum } from './../../../shared/utils/keysOfEnum.utils';
 import { StringUppercaseTransform } from './../../../shared/transformers/string-uppercase.transform';
 import { DateFormat } from './../../../shared/transformers/date-format';
-import {
-  IsDate,
-  IsEnum,
-  IsInt,
-  IsOptional,
-  IsString,
-  ValidateIf,
-  ValidateNested,
-} from 'class-validator';
+import { IsDate, IsEnum, IsInt, IsOptional, IsString, ValidateIf, ValidateNested } from 'class-validator';
 
 import { Transform, Type } from 'class-transformer';
 import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';

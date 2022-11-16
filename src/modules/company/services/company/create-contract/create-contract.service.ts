@@ -7,17 +7,11 @@ import { LicenseRepository } from '../../../repositories/implementations/License
 
 @Injectable()
 export class CreateContractService {
-  constructor(
-    private readonly companyRepository: CompanyRepository,
-    private readonly licenseRepository: LicenseRepository,
-  ) {}
+  constructor(private readonly companyRepository: CompanyRepository, private readonly licenseRepository: LicenseRepository) {}
   async execute(createContractDto: CreateCompanyDto, user: UserPayloadDto) {
-    if ('isConsulting' in createContractDto)
-      delete createContractDto.isConsulting;
+    if ('isConsulting' in createContractDto) delete createContractDto.isConsulting;
 
-    const license = await this.licenseRepository.findByCompanyId(
-      user.companyId,
-    );
+    const license = await this.licenseRepository.findByCompanyId(user.companyId);
 
     if (!license?.id) throw new BadRequestException('license not found');
 

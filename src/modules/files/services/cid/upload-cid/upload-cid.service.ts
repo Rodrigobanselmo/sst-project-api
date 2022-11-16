@@ -33,11 +33,7 @@ export class UploadCidDataService {
     const companyId = userPayloadDto.targetCompanyId;
 
     // get risk table with actual version
-    const riskDatabaseTable =
-      await this.databaseTableRepository.findByNameAndCompany(
-        riskWorkbook.name,
-        companyId,
-      );
+    const riskDatabaseTable = await this.databaseTableRepository.findByNameAndCompany(riskWorkbook.name, companyId);
 
     const allCid = await this.uploadExcelProvider.getAllData({
       buffer,
@@ -61,9 +57,7 @@ export class UploadCidDataService {
 
     console.log('start');
 
-    await Promise.all(
-      arr.map(async (data) => await this.cidRepo.upsertMany(data)),
-    );
+    await Promise.all(arr.map(async (data) => await this.cidRepo.upsertMany(data)));
 
     console.log('done');
 
@@ -77,29 +71,14 @@ export class UploadCidDataService {
   }
 }
 
-const readCids = async (
-  readFileData: IExcelReadData[],
-  excelProvider: ExcelProvider,
-  cidSheet: ICidSheet,
-  databaseTable: DatabaseTableEntity,
-) => {
+const readCids = async (readFileData: IExcelReadData[], excelProvider: ExcelProvider, cidSheet: ICidSheet, databaseTable: DatabaseTableEntity) => {
   const cidsTable = readFileData.find((data) => data.name === cidSheet.name);
 
-  if (!cidsTable)
-    throw new BadRequestException(
-      ErrorFilesEnum.WRONG_TABLE_SHEET.replace(
-        '??FOUND??',
-        readFileData.join(', '),
-      ).replace('??EXPECTED??', cidSheet.name),
-    );
+  if (!cidsTable) throw new BadRequestException(ErrorFilesEnum.WRONG_TABLE_SHEET.replace('??FOUND??', readFileData.join(', ')).replace('??EXPECTED??', cidSheet.name));
 
-  const cidDatabase = await excelProvider.transformToTableData(
-    cidsTable,
-    cidSheet.columns,
-  );
+  const cidDatabase = await excelProvider.transformToTableData(cidsTable, cidSheet.columns);
 
-  if (databaseTable?.version && cidDatabase.version !== databaseTable.version)
-    throw new BadRequestException(ErrorFilesEnum.WRONG_TABLE_VERSION);
+  if (databaseTable?.version && cidDatabase.version !== databaseTable.version) throw new BadRequestException(ErrorFilesEnum.WRONG_TABLE_VERSION);
 
   return cidDatabase.rows;
 };

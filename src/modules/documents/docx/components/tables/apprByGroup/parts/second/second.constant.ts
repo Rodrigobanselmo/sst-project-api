@@ -7,9 +7,7 @@ export enum SecondRiskInventoryColumnEnum {
   REAL,
 }
 
-export const secondRiskInventoryHeader = (
-  isByGroup: boolean,
-): bodyTableProps[] => {
+export const secondRiskInventoryHeader = (isByGroup: boolean): bodyTableProps[] => {
   const header: bodyTableProps[] = [];
 
   if (isByGroup)

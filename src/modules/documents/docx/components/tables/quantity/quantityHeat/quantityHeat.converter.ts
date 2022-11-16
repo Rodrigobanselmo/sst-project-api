@@ -5,19 +5,13 @@ import { palette } from '../../../../../../../shared/constants/palette';
 import { getMatrizRisk } from '../../../../../../../shared/utils/matriz';
 import { sortData } from '../../../../../../../shared/utils/sorts/data.sort';
 import { RiskFactorGroupDataEntity } from '../../../../../../sst/entities/riskGroupData.entity';
-import {
-  IRiskDataJson,
-  QuantityTypeEnum,
-} from '../../../../../../company/interfaces/risk-data-json.types';
+import { IRiskDataJson, QuantityTypeEnum } from '../../../../../../company/interfaces/risk-data-json.types';
 import { borderStyleGlobal } from '../../../../base/config/styles';
 import { IHierarchyMap } from '../../../../converter/hierarchy.converter';
 import { bodyTableProps } from './elements/body';
 import { QuantityHeatColumnEnum } from './quantityHeat.constant';
 
-export const quantityHeatConverter = (
-  riskGroupData: RiskFactorGroupDataEntity,
-  hierarchyTree: IHierarchyMap,
-) => {
+export const quantityHeatConverter = (riskGroupData: RiskFactorGroupDataEntity, hierarchyTree: IHierarchyMap) => {
   const rows: bodyTableProps[][] = [];
 
   riskGroupData.data
@@ -35,32 +29,23 @@ export const quantityHeatConverter = (
       let origin: string;
 
       if (riskData.homogeneousGroup.environment)
-        origin = `${riskData.homogeneousGroup.environment.name}\n(${
-          originRiskMap[riskData.homogeneousGroup.environment.type].name
-        })`;
+        origin = `${riskData.homogeneousGroup.environment.name}\n(${originRiskMap[riskData.homogeneousGroup.environment.type].name})`;
 
       if (riskData.homogeneousGroup.characterization)
-        origin = `${riskData.homogeneousGroup.characterization.name}\n(${
-          originRiskMap[riskData.homogeneousGroup.characterization.type].name
-        })`;
+        origin = `${riskData.homogeneousGroup.characterization.name}\n(${originRiskMap[riskData.homogeneousGroup.characterization.type].name})`;
 
-      if (!riskData.homogeneousGroup.type)
-        origin = `${riskData.homogeneousGroup.name}\n(GSE)`;
+      if (!riskData.homogeneousGroup.type) origin = `${riskData.homogeneousGroup.name}\n(GSE)`;
 
       if (riskData.homogeneousGroup.type == HomoTypeEnum.HIERARCHY) {
         const hierarchy = hierarchyTree[riskData.homogeneousGroup.id];
 
-        if (hierarchy)
-          origin = `${hierarchy.name}\n(${originRiskMap[hierarchy.type].name})`;
+        if (hierarchy) origin = `${hierarchy.name}\n(${originRiskMap[hierarchy.type].name})`;
       }
 
       const value = riskData.ibtug;
       const limit = riskData.ibtugLEO;
 
-      const ro = getMatrizRisk(
-        riskData.riskFactor.severity,
-        riskData.probability,
-      );
+      const ro = getMatrizRisk(riskData.riskFactor.severity, riskData.probability);
 
       cells[QuantityHeatColumnEnum.ORIGIN] = {
         text: origin || '',

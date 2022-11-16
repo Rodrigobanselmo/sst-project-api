@@ -24,10 +24,7 @@ export type IClinicComplementaryData = {
   scheduleRange: any;
 };
 
-export type IClinicComplementaryExamData = Record<
-  string,
-  IClinicComplementaryData
->;
+export type IClinicComplementaryExamData = Record<string, IClinicComplementaryData>;
 
 export interface IPdfGuideData extends EmployeeEntity {
   clinics: CompanyEntity[];

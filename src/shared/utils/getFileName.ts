@@ -12,9 +12,7 @@ export const getDocxFileName = ({
   date: string;
 }) => {
   const docName = name.replace(/\s+/g, '');
-  const fileAprName = `${
-    docName.length > 0 ? docName + '-' : ''
-  }${typeName}-${companyName}-${date}-Rev${version}.docx`
+  const fileAprName = `${docName.length > 0 ? docName + '-' : ''}${typeName}-${companyName}-${date}-Rev${version}.docx`
     .normalize('NFD')
     .replace(/\s+/g, '_')
     .replace(/[^a-zA-Z0-9._-]/g, '');

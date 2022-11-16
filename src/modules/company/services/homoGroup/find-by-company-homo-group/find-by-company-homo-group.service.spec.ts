@@ -9,9 +9,7 @@ describe.skip('FindByCompanyHomoGroupService', () => {
       providers: [FindByCompanyHomoGroupService],
     }).compile();
 
-    service = module.get<FindByCompanyHomoGroupService>(
-      FindByCompanyHomoGroupService,
-    );
+    service = module.get<FindByCompanyHomoGroupService>(FindByCompanyHomoGroupService);
   });
 
   it('should be defined', () => {

@@ -5,11 +5,7 @@ import { PrismaService } from '../../../../prisma/prisma.service';
 import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
 
 import { prismaFilter } from '../../../../shared/utils/filters/prisma.filters';
-import {
-  CreateCompanyShiftDto,
-  FindCompanyShiftDto,
-  UpdateCompanyShiftDto,
-} from '../../dto/company-shift.dto';
+import { CreateCompanyShiftDto, FindCompanyShiftDto, UpdateCompanyShiftDto } from '../../dto/company-shift.dto';
 import { CompanyShiftEntity } from '../../entities/company-shift.entity';
 
 @Injectable()
@@ -33,11 +29,7 @@ export class CompanyShiftRepository {
     return new CompanyShiftEntity(data);
   }
 
-  async find(
-    query: Partial<FindCompanyShiftDto>,
-    pagination: PaginationQueryDto,
-    options: Prisma.CompanyShiftFindManyArgs = {},
-  ) {
+  async find(query: Partial<FindCompanyShiftDto>, pagination: PaginationQueryDto, options: Prisma.CompanyShiftFindManyArgs = {}) {
     const whereInit = {
       AND: [],
     } as typeof options.where;

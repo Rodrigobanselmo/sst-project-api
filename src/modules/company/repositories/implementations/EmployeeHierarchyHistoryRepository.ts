@@ -4,11 +4,7 @@ import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
 import { prismaFilter } from '../../../../shared/utils/filters/prisma.filters';
-import {
-  CreateEmployeeHierarchyHistoryDto,
-  FindEmployeeHierarchyHistoryDto,
-  UpdateEmployeeHierarchyHistoryDto,
-} from '../../dto/employee-hierarchy-history';
+import { CreateEmployeeHierarchyHistoryDto, FindEmployeeHierarchyHistoryDto, UpdateEmployeeHierarchyHistoryDto } from '../../dto/employee-hierarchy-history';
 import { EmployeeHierarchyHistoryEntity } from '../../entities/employee-hierarchy-history.entity';
 import { transformStringToObject } from './../../../../shared/utils/transformStringToObject';
 
@@ -16,11 +12,7 @@ import { transformStringToObject } from './../../../../shared/utils/transformStr
 export class EmployeeHierarchyHistoryRepository {
   constructor(private prisma: PrismaService) {}
 
-  async create(
-    { subOfficeId, ...createData }: CreateEmployeeHierarchyHistoryDto,
-    employeeId: number,
-    hierarchyId?: string | null,
-  ) {
+  async create({ subOfficeId, ...createData }: CreateEmployeeHierarchyHistoryDto, employeeId: number, hierarchyId?: string | null) {
     const status = createData.motive === 'DEM' ? 'INACTIVE' : 'ACTIVE';
 
     const response = await this.prisma.$transaction([
@@ -45,11 +37,7 @@ export class EmployeeHierarchyHistoryRepository {
     return new EmployeeHierarchyHistoryEntity(response[0]);
   }
 
-  async update(
-    { id, subOfficeId, ...updateData }: UpdateEmployeeHierarchyHistoryDto,
-    employeeId: number,
-    hierarchyId?: string | null,
-  ) {
+  async update({ id, subOfficeId, ...updateData }: UpdateEmployeeHierarchyHistoryDto, employeeId: number, hierarchyId?: string | null) {
     const status = updateData.motive === 'DEM' ? 'INACTIVE' : 'ACTIVE';
 
     const response = await this.prisma.$transaction([
@@ -75,11 +63,7 @@ export class EmployeeHierarchyHistoryRepository {
     return new EmployeeHierarchyHistoryEntity(response[0]);
   }
 
-  async find(
-    query: Partial<FindEmployeeHierarchyHistoryDto>,
-    pagination: PaginationQueryDto,
-    options: Prisma.EmployeeHierarchyHistoryFindManyArgs = {},
-  ) {
+  async find(query: Partial<FindEmployeeHierarchyHistoryDto>, pagination: PaginationQueryDto, options: Prisma.EmployeeHierarchyHistoryFindManyArgs = {}) {
     const whereInit = {
       AND: [
         {
@@ -135,9 +119,7 @@ export class EmployeeHierarchyHistoryRepository {
     return data.map((data) => new EmployeeHierarchyHistoryEntity(data));
   }
 
-  async findFirstNude(
-    options: Prisma.EmployeeHierarchyHistoryFindFirstArgs = {},
-  ) {
+  async findFirstNude(options: Prisma.EmployeeHierarchyHistoryFindFirstArgs = {}) {
     const data = await this.prisma.employeeHierarchyHistory.findFirst({
       ...options,
     });
@@ -151,8 +133,7 @@ export class EmployeeHierarchyHistoryRepository {
         where: { id },
       }),
       this.prisma.employee.update({
-        data:
-          hierarchyId !== undefined ? { hierarchyId, status: 'ACTIVE' } : {},
+        data: hierarchyId !== undefined ? { hierarchyId, status: 'ACTIVE' } : {},
         where: { id: employeeId },
       }),
     ]);

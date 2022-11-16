@@ -2,22 +2,11 @@ import dayjs from 'dayjs';
 import { AlignmentType } from 'docx';
 import { RiskFactorGroupDataEntity } from '../../../../../../../sst/entities/riskGroupData.entity';
 
-import {
-  HierarchyMapData,
-  IHomoGroupMap,
-} from '../../../../../converter/hierarchy.converter';
+import { HierarchyMapData, IHomoGroupMap } from '../../../../../converter/hierarchy.converter';
 import { bodyTableProps, borderNoneStyle } from '../../elements/body';
-import {
-  FirstRiskInventoryColumnEnum,
-  firstRiskInventoryHeader,
-} from './first.constant';
+import { FirstRiskInventoryColumnEnum, firstRiskInventoryHeader } from './first.constant';
 
-export const documentConverter = (
-  riskFactorGroupData: RiskFactorGroupDataEntity,
-  homoGroupTree: IHomoGroupMap,
-  hierarchy: HierarchyMapData,
-  isByGroup: boolean,
-) => {
+export const documentConverter = (riskFactorGroupData: RiskFactorGroupDataEntity, homoGroupTree: IHomoGroupMap, hierarchy: HierarchyMapData, isByGroup: boolean) => {
   const rows: bodyTableProps[][] = [];
   const homogeneousGroups = [];
   const environments = [];
@@ -32,16 +21,11 @@ export const documentConverter = (
 
   const docData = [];
 
-  docData[FirstRiskInventoryColumnEnum.SOURCE] =
-    riskFactorGroupData.source || '';
-  docData[FirstRiskInventoryColumnEnum.REVIEW] =
-    riskFactorGroupData.revisionBy || '';
-  docData[FirstRiskInventoryColumnEnum.ELABORATION_BY] =
-    riskFactorGroupData.elaboratedBy || '';
-  docData[FirstRiskInventoryColumnEnum.APPROVE_BY] =
-    riskFactorGroupData.approvedBy || '';
-  docData[FirstRiskInventoryColumnEnum.DATA] =
-    dayjs(riskFactorGroupData.visitDate).format('DD/MM/YYYY') || '';
+  docData[FirstRiskInventoryColumnEnum.SOURCE] = riskFactorGroupData.source || '';
+  docData[FirstRiskInventoryColumnEnum.REVIEW] = riskFactorGroupData.revisionBy || '';
+  docData[FirstRiskInventoryColumnEnum.ELABORATION_BY] = riskFactorGroupData.elaboratedBy || '';
+  docData[FirstRiskInventoryColumnEnum.APPROVE_BY] = riskFactorGroupData.approvedBy || '';
+  docData[FirstRiskInventoryColumnEnum.DATA] = dayjs(riskFactorGroupData.visitDate).format('DD/MM/YYYY') || '';
   docData[FirstRiskInventoryColumnEnum.UNIT] = hierarchy.workspace || '';
 
   rows.push(
@@ -55,8 +39,7 @@ export const documentConverter = (
   // add hierarchy table header
   rows.push(
     docData.map((_, index) => {
-      if (!hierarchy.org[index])
-        return { text: '', size: 10, borders: borderNoneStyle };
+      if (!hierarchy.org[index]) return { text: '', size: 10, borders: borderNoneStyle };
 
       if (hierarchy.org[index]?.homogeneousGroup) {
         homogeneousGroups.push(hierarchy.org[index].homogeneousGroup);
@@ -85,8 +68,7 @@ export const documentConverter = (
     docData.map((_, index) => {
       if (isByGroup) return { text: '', size: 20, borders: borderNoneStyle };
 
-      if (!hierarchy.org[index])
-        return { text: '', size: 20, borders: borderNoneStyle };
+      if (!hierarchy.org[index]) return { text: '', size: 20, borders: borderNoneStyle };
 
       return {
         text: hierarchy.org[index].name,
@@ -106,9 +88,7 @@ export const documentConverter = (
       if (last)
         return {
           title: `${(hierarchy as any)?.type || ''}:`,
-          text: homogeneousGroups.length
-            ? homogeneousGroups.filter((homo) => homo).join(', ')
-            : ' --',
+          text: homogeneousGroups.length ? homogeneousGroups.filter((homo) => homo).join(', ') : ' --',
           size: 30,
           borders: borderNoneStyle,
         };

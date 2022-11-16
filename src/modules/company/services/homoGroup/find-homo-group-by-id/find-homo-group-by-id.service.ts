@@ -8,10 +8,7 @@ export class FindHomogenousGroupByIdService {
   constructor(private readonly homoGroupRepository: HomoGroupRepository) {}
 
   async execute(id: string, user: UserPayloadDto) {
-    const homo = await this.homoGroupRepository.findById(
-      id,
-      user.targetCompanyId,
-    );
+    const homo = await this.homoGroupRepository.findById(id, user.targetCompanyId);
 
     return homo;
   }

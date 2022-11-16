@@ -15,15 +15,8 @@ export class UsersRepository implements IUsersRepository {
   private count = 0;
   constructor(private prisma: PrismaService) {}
 
-  async create(
-    createUserDto: Omit<CreateUserDto, 'token'>,
-    userCompanyDto: UserCompanyDto[],
-    professional?: ProfessionalEntity,
-  ) {
-    const hasCouncil =
-      professional &&
-      professional?.councils &&
-      professional.councils.length > 0;
+  async create(createUserDto: Omit<CreateUserDto, 'token'>, userCompanyDto: UserCompanyDto[], professional?: ProfessionalEntity) {
+    const hasCouncil = professional && professional?.councils && professional.councils.length > 0;
 
     const councils = hasCouncil
       ? professional.councils
@@ -70,20 +63,7 @@ export class UsersRepository implements IUsersRepository {
 
   async update(
     id: number,
-    {
-      oldPassword,
-      certifications,
-      councilId,
-      councilUF,
-      councilType,
-      cpf,
-      phone,
-      formation,
-      type,
-      name,
-      councils,
-      ...updateUserDto
-    }: UpdateUserDto,
+    { oldPassword, certifications, councilId, councilUF, councilType, cpf, phone, formation, type, name, councils, ...updateUserDto }: UpdateUserDto,
     userCompanyDto: UserCompanyDto[] = [],
   ) {
     const professional = {
@@ -133,10 +113,7 @@ export class UsersRepository implements IUsersRepository {
 
       const councilsCreate = await Promise.all(
         councils.map(async ({ councilId, councilType, councilUF }) => {
-          if (
-            (councilId && councilType && councilUF) ||
-            (councilId == '' && councilType == '' && councilUF == '')
-          )
+          if ((councilId && councilType && councilUF) || (councilId == '' && councilType == '' && councilUF == ''))
             return await this.prisma.professionalCouncil.upsert({
               create: {
                 councilId,

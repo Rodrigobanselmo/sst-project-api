@@ -37,11 +37,4 @@ export const compareFieldValues = (
   return isEqual;
 };
 
-export const checkExamFields: (keyof UpdateEmployeeExamHistoryDto)[] = [
-  'doctorId',
-  'doneDate',
-  'evaluationType',
-  'examId',
-  'examType',
-  'status',
-];
+export const checkExamFields: (keyof UpdateEmployeeExamHistoryDto)[] = ['doctorId', 'doneDate', 'evaluationType', 'examId', 'examType', 'status'];

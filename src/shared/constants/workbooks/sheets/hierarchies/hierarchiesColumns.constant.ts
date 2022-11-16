@@ -2,10 +2,7 @@ import { StatusEnum } from '@prisma/client';
 
 import { excelWorkspaceNotes } from '../../../../../modules/files/utils/notes/excel-workspace-notes';
 import { ITableSchema } from '../../../../providers/ExcelProvider/models/IExcelProvider.types';
-import {
-  statusEnumTranslateBrToUs,
-  StatusEnumTranslated,
-} from '../../../../utils/translate/statusEnum.translate';
+import { statusEnumTranslateBrToUs, StatusEnumTranslated } from '../../../../utils/translate/statusEnum.translate';
 import { checkIsEnum } from '../../../../utils/validators/checkIsEnum';
 import { checkIsString } from '../../../../utils/validators/checkIsString';
 
@@ -47,8 +44,7 @@ export const hierarchiesColumnsConstant = [
     isArray: false,
     required: false,
     checkHandler: checkIsString,
-    notes:
-      'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
+    notes: 'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
   },
   {
     databaseName: 'management',
@@ -56,8 +52,7 @@ export const hierarchiesColumnsConstant = [
     isArray: false,
     required: false,
     checkHandler: checkIsString,
-    notes:
-      'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
+    notes: 'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
   },
   {
     databaseName: 'sector',
@@ -65,8 +60,7 @@ export const hierarchiesColumnsConstant = [
     isArray: false,
     required: true,
     checkHandler: checkIsString,
-    notes:
-      'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
+    notes: 'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
   },
   {
     databaseName: 'sub_sector',
@@ -74,8 +68,7 @@ export const hierarchiesColumnsConstant = [
     isArray: false,
     required: false,
     checkHandler: checkIsString,
-    notes:
-      'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
+    notes: 'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
   },
   {
     databaseName: 'office',
@@ -83,8 +76,7 @@ export const hierarchiesColumnsConstant = [
     isArray: false,
     required: true,
     checkHandler: checkIsString,
-    notes:
-      'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
+    notes: 'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
   },
   {
     databaseName: 'sub_office',
@@ -92,8 +84,7 @@ export const hierarchiesColumnsConstant = [
     isArray: false,
     required: false,
     checkHandler: checkIsString,
-    notes:
-      'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
+    notes: 'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
   },
   {
     databaseName: 'description',
@@ -124,7 +115,6 @@ export const hierarchiesColumnsConstant = [
     isArray: false,
     notes: [StatusEnumTranslated.ACTIVE, StatusEnumTranslated.INACTIVE],
     required: false,
-    checkHandler: (value: any) =>
-      checkIsEnum(statusEnumTranslateBrToUs(value), StatusEnum),
+    checkHandler: (value: any) => checkIsEnum(statusEnumTranslateBrToUs(value), StatusEnum),
   },
 ] as ITableSchema[];

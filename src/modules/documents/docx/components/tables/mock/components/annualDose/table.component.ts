@@ -13,18 +13,12 @@ export const annualDoseTable = () => {
   const table = new Table({
     width: { size: 100, type: WidthType.PERCENTAGE },
     rows: [
-      tableHeaderElements.headerRow(
-        NewTopHeader().map(tableHeaderElements.headerCell),
-        {
-          height: { value: 300, rule: HeightRule.ATLEAST },
-        },
-      ),
-      tableHeaderElements.headerRow(
-        NewHeader().map(tableHeaderElements.headerCell),
-        {
-          height: { value: 350, rule: HeightRule.ATLEAST },
-        },
-      ),
+      tableHeaderElements.headerRow(NewTopHeader().map(tableHeaderElements.headerCell), {
+        height: { value: 300, rule: HeightRule.ATLEAST },
+      }),
+      tableHeaderElements.headerRow(NewHeader().map(tableHeaderElements.headerCell), {
+        height: { value: 350, rule: HeightRule.ATLEAST },
+      }),
       ...NewBody().map((data) =>
         tableBodyElements.tableRow(data.map(tableBodyElements.tableCell), {
           height: { value: 350, rule: HeightRule.ATLEAST },

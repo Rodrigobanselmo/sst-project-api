@@ -16,20 +16,14 @@ export enum EnumResAso {
   INAPT = 2,
 }
 
-export const mapTpExameOcup: Record<
-  ExamHistoryEvaluationEnum,
-  EnumResAso | null
-> = {
+export const mapTpExameOcup: Record<ExamHistoryEvaluationEnum, EnumResAso | null> = {
   [ExamHistoryEvaluationEnum.APTO]: EnumResAso.APT,
   [ExamHistoryEvaluationEnum.INAPT]: EnumResAso.INAPT,
   [ExamHistoryEvaluationEnum.NONE]: null,
   [ExamHistoryEvaluationEnum.INCONCLUSIVE]: null,
 };
 
-export const mapInverseTpExameOcup: Record<
-  EnumResAso,
-  ExamHistoryEvaluationEnum
-> = {
+export const mapInverseTpExameOcup: Record<EnumResAso, ExamHistoryEvaluationEnum> = {
   [EnumResAso.APT]: ExamHistoryEvaluationEnum.APTO,
   [EnumResAso.INAPT]: ExamHistoryEvaluationEnum.INAPT,
 };
@@ -44,10 +38,7 @@ export const mapResAso: Record<ExamHistoryTypeEnum, EnumTpExameOcup | null> = {
   [ExamHistoryTypeEnum.DEMI]: EnumTpExameOcup.DEMI,
 };
 
-export const mapInverseResAso: Record<
-  EnumTpExameOcup,
-  ExamHistoryTypeEnum | null
-> = {
+export const mapInverseResAso: Record<EnumTpExameOcup, ExamHistoryTypeEnum | null> = {
   [EnumTpExameOcup.ADMI]: ExamHistoryTypeEnum.ADMI,
   [EnumTpExameOcup.PERI]: ExamHistoryTypeEnum.PERI,
   [EnumTpExameOcup.RETU]: ExamHistoryTypeEnum.RETU,
@@ -58,22 +49,7 @@ export const mapInverseResAso: Record<
 
 export const requiredOrdExams = ['0281'];
 // eslint-disable-next-line prettier/prettier
-export const requiredObsProc = [
-  '0583',
-  '0998',
-  '0999',
-  '1128',
-  '1230',
-  '1992',
-  '1993',
-  '1994',
-  '1995',
-  '1996',
-  '1997',
-  '1998',
-  '1999',
-  '9999',
-];
+export const requiredObsProc = ['0583', '0998', '0999', '1128', '1230', '1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999', '9999'];
 
 export interface IEvent2220Props extends IEventProps {
   id: string;

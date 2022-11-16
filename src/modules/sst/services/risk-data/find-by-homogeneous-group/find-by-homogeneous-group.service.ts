@@ -5,16 +5,8 @@ import { RiskDataRepository } from '../../../repositories/implementations/RiskDa
 export class FindAllByHomogeneousGroupService {
   constructor(private readonly riskDataRepository: RiskDataRepository) {}
 
-  async execute(
-    homogeneousGroupId: string,
-    groupId: string,
-    companyId: string,
-  ) {
-    const riskData = await this.riskDataRepository.findAllByHomogeneousGroupId(
-      companyId,
-      groupId,
-      homogeneousGroupId,
-    );
+  async execute(homogeneousGroupId: string, groupId: string, companyId: string) {
+    const riskData = await this.riskDataRepository.findAllByHomogeneousGroupId(companyId, groupId, homogeneousGroupId);
 
     return riskData;
   }

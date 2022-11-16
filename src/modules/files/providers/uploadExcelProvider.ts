@@ -6,10 +6,7 @@ import { DatabaseTableRepository } from '../repositories/implementations/Databas
 
 @Injectable()
 export class UploadExcelProvider {
-  constructor(
-    private readonly databaseTableRepository: DatabaseTableRepository,
-    private readonly excelProvider: ExcelProvider,
-  ) {}
+  constructor(private readonly databaseTableRepository: DatabaseTableRepository, private readonly excelProvider: ExcelProvider) {}
 
   async getAllData({ buffer, Workbook, read, DatabaseTable }) {
     const readFileData = await this.excelProvider.read(buffer);
@@ -17,12 +14,7 @@ export class UploadExcelProvider {
     // read, validate and transform excel read response to rows and also check version
     const allSeparatedArray = await Promise.all(
       Object.values(Workbook.sheets).map(async (sheet) => {
-        return await read(
-          readFileData,
-          this.excelProvider,
-          sheet,
-          DatabaseTable,
-        );
+        return await read(readFileData, this.excelProvider, sheet, DatabaseTable);
       }),
     );
 

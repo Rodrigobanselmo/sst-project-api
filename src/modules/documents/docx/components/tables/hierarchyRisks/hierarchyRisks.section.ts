@@ -3,21 +3,12 @@ import { PageOrientation, Paragraph, Table, WidthType } from 'docx';
 import { arrayChunks } from '../../../../../../shared/utils/arrayChunks';
 
 import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
-import {
-  ISectionChildrenType,
-  PGRSectionChildrenTypeEnum,
-} from '../../../builders/pgr/types/elements.types';
+import { ISectionChildrenType, PGRSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
-import {
-  IHierarchyData,
-  IHierarchyMap,
-} from '../../../converter/hierarchy.converter';
+import { IHierarchyData, IHierarchyMap } from '../../../converter/hierarchy.converter';
 import { TableBodyElements } from './elements/body';
 import { TableHeaderElements } from './elements/header';
-import {
-  hierarchyRisksConverter,
-  IHierarchyRiskOptions,
-} from './hierarchyRisks.converter';
+import { hierarchyRisksConverter, IHierarchyRiskOptions } from './hierarchyRisks.converter';
 
 export const hierarchyRisksTableSections = (
   riskFactorGroupData: RiskFactorGroupDataEntity,
@@ -27,12 +18,7 @@ export const hierarchyRisksTableSections = (
     hierarchyType: HierarchyEnum.SECTOR,
   },
 ) => {
-  const { bodyData, headerData } = hierarchyRisksConverter(
-    riskFactorGroupData,
-    hierarchiesEntity,
-    hierarchyTree,
-    options,
-  );
+  const { bodyData, headerData } = hierarchyRisksConverter(riskFactorGroupData, hierarchiesEntity, hierarchyTree, options);
 
   const noData = headerData.length == 1 || bodyData.length == 0;
 
@@ -41,12 +27,10 @@ export const hierarchyRisksTableSections = (
   const tableHeaderElements = new TableHeaderElements();
   const tableBodyElements = new TableBodyElements();
 
-  const headerChunks = arrayChunks(headerData, 49, { balanced: true }).map(
-    (header, index) => {
-      if (index === 0) return header;
-      return [headerData[0], ...header];
-    },
-  );
+  const headerChunks = arrayChunks(headerData, 49, { balanced: true }).map((header, index) => {
+    if (index === 0) return header;
+    return [headerData[0], ...header];
+  });
 
   const bodyChunks = bodyData.map((body) =>
     arrayChunks(body, 49, { balanced: true }).map((bodyChuck, index) => {
@@ -59,14 +43,8 @@ export const hierarchyRisksTableSections = (
     return new Table({
       width: { size: 100, type: WidthType.PERCENTAGE },
       rows: [
-        tableHeaderElements.headerRow(
-          chunk.map(tableHeaderElements.headerCell),
-        ),
-        ...bodyChunks.map((data) =>
-          tableBodyElements.tableRow(
-            data[index].map(tableBodyElements.tableCell),
-          ),
-        ),
+        tableHeaderElements.headerRow(chunk.map(tableHeaderElements.headerCell)),
+        ...bodyChunks.map((data) => tableBodyElements.tableRow(data[index].map(tableBodyElements.tableCell))),
       ],
     });
   });
@@ -88,10 +66,7 @@ export const hierarchyRisksTableAllSections = (
   riskFactorGroupData: RiskFactorGroupDataEntity,
   hierarchiesEntity: IHierarchyData,
   hierarchyTree: IHierarchyMap,
-  convertToDocx: (
-    data: ISectionChildrenType[],
-    variables?: IDocVariables,
-  ) => (Paragraph | Table)[],
+  convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[],
 ) => {
   const table1 = convertToDocx([
     {
@@ -141,14 +116,9 @@ export const hierarchyRisksTableAllSections = (
   ].map(([type, tableConverted]) => {
     const tableHeader = tableConverted as (Paragraph | Table)[];
 
-    const section = hierarchyRisksTableSections(
-      riskFactorGroupData,
-      hierarchiesEntity,
-      hierarchyTree,
-      {
-        hierarchyType: type as any,
-      },
-    );
+    const section = hierarchyRisksTableSections(riskFactorGroupData, hierarchiesEntity, hierarchyTree, {
+      hierarchyType: type as any,
+    });
 
     if (section.length === 0) return null;
 

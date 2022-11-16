@@ -8,10 +8,7 @@ import { ExamRiskRepository } from '../../../repositories/implementations/ExamRi
 export class FindExamRiskService {
   constructor(private readonly examRiskRepository: ExamRiskRepository) {}
 
-  async execute(
-    { skip, take, ...query }: FindExamRiskDto,
-    user: UserPayloadDto,
-  ) {
+  async execute({ skip, take, ...query }: FindExamRiskDto, user: UserPayloadDto) {
     const Exam = await this.examRiskRepository.find(
       { companyId: user.targetCompanyId, ...query },
       { skip, take },

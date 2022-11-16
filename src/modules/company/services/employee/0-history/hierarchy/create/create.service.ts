@@ -1,9 +1,6 @@
 import { EmployeeEntity } from './../../../../../entities/employee.entity';
 import { sortData } from './../../../../../../../shared/utils/sorts/data.sort';
-import {
-  EmployeeHierarchyHistoryEntity,
-  historyRules,
-} from './../../../../../entities/employee-hierarchy-history.entity';
+import { EmployeeHierarchyHistoryEntity, historyRules } from './../../../../../entities/employee-hierarchy-history.entity';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { EmployeeHierarchyMotiveTypeEnum } from '@prisma/client';
 import { ErrorMessageEnum } from './../../../../../../../shared/constants/enum/errorMessage';
@@ -15,30 +12,19 @@ import { EmployeeRepository } from '../../../../../repositories/implementations/
 
 @Injectable()
 export class CreateEmployeeHierarchyHistoryService {
-  constructor(
-    private readonly employeeHierarchyHistoryRepository: EmployeeHierarchyHistoryRepository,
-    private readonly employeeRepository: EmployeeRepository,
-  ) {}
+  constructor(private readonly employeeHierarchyHistoryRepository: EmployeeHierarchyHistoryRepository, private readonly employeeRepository: EmployeeRepository) {}
 
-  async execute(
-    dataDto: CreateEmployeeHierarchyHistoryDto,
-    user: UserPayloadDto,
-  ) {
-    const found = await this.employeeRepository.findById(
-      dataDto.employeeId,
-      user.targetCompanyId,
-    );
+  async execute(dataDto: CreateEmployeeHierarchyHistoryDto, user: UserPayloadDto) {
+    const found = await this.employeeRepository.findById(dataDto.employeeId, user.targetCompanyId);
 
-    if (!found?.id)
-      throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_NOT_FOUND);
+    if (!found?.id) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_NOT_FOUND);
 
     const { hierarchyId, beforeHistory } = await this.check({
       dataDto,
       foundEmployee: found,
     });
 
-    if (dataDto.motive === EmployeeHierarchyMotiveTypeEnum.DEM)
-      dataDto.hierarchyId = beforeHistory.hierarchyId;
+    if (dataDto.motive === EmployeeHierarchyMotiveTypeEnum.DEM) dataDto.hierarchyId = beforeHistory.hierarchyId;
 
     const history = await this.employeeHierarchyHistoryRepository.create(
       {
@@ -51,13 +37,7 @@ export class CreateEmployeeHierarchyHistoryService {
     return history;
   }
 
-  async check({
-    dataDto,
-    foundEmployee,
-  }: {
-    dataDto: Partial<CreateEmployeeHierarchyHistoryDto>;
-    foundEmployee: EmployeeEntity;
-  }) {
+  async check({ dataDto, foundEmployee }: { dataDto: Partial<CreateEmployeeHierarchyHistoryDto>; foundEmployee: EmployeeEntity }) {
     if (!dataDto.startDate) throw new BadRequestException('missing start date');
     // CHECK ACTUAL
     // {
@@ -93,11 +73,9 @@ export class CreateEmployeeHierarchyHistoryService {
         .sort((a, b) => sortData(a.startDate, b.startDate))[0];
 
       afterMotive = afterHistory?.motive || null;
-      const isAfterOk =
-        historyRules[dataDto.motive].after.includes(afterMotive);
+      const isAfterOk = historyRules[dataDto.motive].after.includes(afterMotive);
 
-      if (!isAfterOk)
-        throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_BLOCK_HISTORY);
+      if (!isAfterOk) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_BLOCK_HISTORY);
     }
 
     // CHECK BEFORE
@@ -118,21 +96,16 @@ export class CreateEmployeeHierarchyHistoryService {
         .sort((a, b) => sortData(b.startDate, a.startDate))[0];
 
       beforeMotive = beforeHistory?.motive || null;
-      const isBeforeOk =
-        historyRules[dataDto.motive].before.includes(beforeMotive);
+      const isBeforeOk = historyRules[dataDto.motive].before.includes(beforeMotive);
 
-      if (!isBeforeOk)
-        throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_BLOCK_HISTORY);
+      if (!isBeforeOk) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_BLOCK_HISTORY);
     }
 
     const getActualEmployeeHierarchy = () => {
       if (afterMotive === null) {
         if (dataDto.motive === EmployeeHierarchyMotiveTypeEnum.DEM) return null;
         if (dataDto.hierarchyId) return dataDto.hierarchyId;
-        if (!dataDto.hierarchyId)
-          throw new BadRequestException(
-            ErrorMessageEnum.EMPLOYEE_MISSING_HIERARCHY,
-          );
+        if (!dataDto.hierarchyId) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_MISSING_HIERARCHY);
       }
 
       return undefined;

@@ -17,10 +17,7 @@ export class DeleteSoftRecMedService {
     if (user.isMaster) {
       recMed = await this.recMedRepository.DeleteByIdSoft(id);
     } else {
-      recMed = await this.recMedRepository.DeleteByCompanyAndIdSoft(
-        id,
-        companyId,
-      );
+      recMed = await this.recMedRepository.DeleteByCompanyAndIdSoft(id, companyId);
     }
 
     if (!recMed.id) throw new NotFoundException('data not found');

@@ -6,16 +6,9 @@ import { ESocialMethodsProvider } from '../../../../../../shared/providers/ESoci
 
 @Injectable()
 export class AddCertificationESocialService {
-  constructor(
-    private readonly companyCertRepository: CompanyCertRepository,
-    private readonly eSocialMethodsProvider: ESocialMethodsProvider,
-  ) {}
+  constructor(private readonly companyCertRepository: CompanyCertRepository, private readonly eSocialMethodsProvider: ESocialMethodsProvider) {}
 
-  async execute(
-    file: Express.Multer.File,
-    { password }: AddCertDto,
-    user: UserPayloadDto,
-  ) {
+  async execute(file: Express.Multer.File, { password }: AddCertDto, user: UserPayloadDto) {
     const convertedPem = await this.eSocialMethodsProvider.convertPfxToPem({
       file,
       password,

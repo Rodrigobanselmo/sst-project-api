@@ -1,14 +1,6 @@
 import { Prisma, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
-import {
-  IsBoolean,
-  IsDefined,
-  IsEnum,
-  IsOptional,
-  IsString,
-  MaxLength,
-  ValidateNested,
-} from 'class-validator';
+import { IsBoolean, IsDefined, IsEnum, IsOptional, IsString, MaxLength, ValidateNested } from 'class-validator';
 
 import { StringCapitalizeTransform } from '../../../shared/transformers/string-capitalize';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';

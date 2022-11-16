@@ -36,12 +36,9 @@ export class UpdateESocialReportService {
     });
 
     const esocial = await this.addCompanyEsocial(company);
-    const report = await this.companyReportRepository.updateESocialReport(
-      companyId,
-      {
-        esocial: esocial,
-      },
-    );
+    const report = await this.companyReportRepository.updateESocialReport(companyId, {
+      esocial: esocial,
+    });
 
     return report;
   }
@@ -58,14 +55,9 @@ export class UpdateESocialReportService {
       { take: 100 },
     );
 
-    const eventsStruct = this.eSocialEventProvider.convertToEvent2220Struct(
-      company,
-      employees,
-    );
+    const eventsStruct = this.eSocialEventProvider.convertToEvent2220Struct(company, employees);
 
-    const esocial = await this.companyReportRepository.getESocialNewReport(
-      companyId,
-    );
+    const esocial = await this.companyReportRepository.getESocialNewReport(companyId);
 
     esocial.S2220.pending = eventsStruct.length;
 

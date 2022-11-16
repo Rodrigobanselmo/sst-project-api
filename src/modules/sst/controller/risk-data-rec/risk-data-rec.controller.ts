@@ -8,9 +8,7 @@ import { Permissions } from '../../../../shared/decorators/permissions.decorator
 import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
 @Controller('risk-data-rec')
 export class RiskDataRecController {
-  constructor(
-    private readonly upsertRiskDataRecService: UpsertRiskDataRecService,
-  ) {}
+  constructor(private readonly upsertRiskDataRecService: UpsertRiskDataRecService) {}
 
   @Permissions(
     {
@@ -27,13 +25,7 @@ export class RiskDataRecController {
     },
   )
   @Post()
-  upsert(
-    @Body() upsertRiskDataDto: UpsertRiskDataRecDto,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
-    return this.upsertRiskDataRecService.execute(
-      upsertRiskDataDto,
-      userPayloadDto,
-    );
+  upsert(@Body() upsertRiskDataDto: UpsertRiskDataRecDto, @User() userPayloadDto: UserPayloadDto) {
+    return this.upsertRiskDataRecService.execute(upsertRiskDataDto, userPayloadDto);
   }
 }

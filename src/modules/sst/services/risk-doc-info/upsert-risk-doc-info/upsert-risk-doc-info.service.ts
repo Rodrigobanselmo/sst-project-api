@@ -8,10 +8,7 @@ import { RiskDocInfoRepository } from '../../../repositories/implementations/Ris
 
 @Injectable()
 export class UpsertRiskDocInfoService {
-  constructor(
-    private readonly riskDocInfoRepository: RiskDocInfoRepository,
-    private readonly riskRepository: RiskRepository,
-  ) {}
+  constructor(private readonly riskDocInfoRepository: RiskDocInfoRepository, private readonly riskRepository: RiskRepository) {}
 
   async execute(upsertRiskDataDto: UpsertRiskDocInfoDto, user: UserPayloadDto) {
     if (user.isMaster && user.targetCompanyId === user.companyId) {

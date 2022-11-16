@@ -6,9 +6,7 @@ import { NotificationRepository } from '../repositories/implementations/Notifica
 
 @Injectable()
 export class CreateNotificationService {
-  constructor(
-    private readonly notificationRepository: NotificationRepository,
-  ) {}
+  constructor(private readonly notificationRepository: NotificationRepository) {}
 
   async execute(user: UserPayloadDto, dto: CreateNotificationDto) {
     const notification = await this.notificationRepository.create({

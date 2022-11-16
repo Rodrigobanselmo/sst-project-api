@@ -22,8 +22,7 @@ export class RecMedEntity implements RecMed {
   medName: string;
 
   @ApiProperty({
-    description:
-      'The company id related to the recommendation or control measure',
+    description: 'The company id related to the recommendation or control measure',
   })
   companyId: string;
 

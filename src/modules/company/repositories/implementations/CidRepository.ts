@@ -33,11 +33,7 @@ export class CidRepository {
     return data.map((cid) => new CidEntity(cid));
   }
 
-  async find(
-    query: Partial<FindCidDto>,
-    pagination: PaginationQueryDto,
-    options: Prisma.CidFindManyArgs = {},
-  ) {
+  async find(query: Partial<FindCidDto>, pagination: PaginationQueryDto, options: Prisma.CidFindManyArgs = {}) {
     const whereInit = {
       AND: [],
     } as typeof options.where;

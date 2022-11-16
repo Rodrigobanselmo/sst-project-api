@@ -3,10 +3,7 @@ import { CompanyEntity } from './../../../../../company/entities/company.entity'
 import { UserEntity } from './../../../../../users/entities/user.entity';
 import { ProfessionalEntity } from '../../../../../users/entities/professional.entity';
 
-import {
-  ISectionChildrenType,
-  PGRSectionChildrenTypeEnum,
-} from '../../../builders/pgr/types/elements.types';
+import { ISectionChildrenType, PGRSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
 import { ProfessionalsConverter } from './professionals.converter';
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
@@ -15,17 +12,11 @@ import { AlignmentType, Paragraph, Table } from 'docx';
 export const professionalsIterable = (
   professionalEntity: (ProfessionalEntity | UserEntity)[],
   workspace: WorkspaceEntity,
-  convertToDocx: (
-    data: ISectionChildrenType[],
-    variables?: IDocVariables,
-  ) => (Paragraph | Table)[],
+  convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[],
 ) => {
   if (!professionalEntity?.length) return [];
 
-  const professionalsVariablesArray = ProfessionalsConverter(
-    professionalEntity,
-    workspace,
-  );
+  const professionalsVariablesArray = ProfessionalsConverter(professionalEntity, workspace);
 
   const baseSection: ISectionChildrenType[] = [
     {
@@ -38,19 +29,13 @@ export const professionalsIterable = (
     .map((variables) => {
       let text = '';
 
-      if (variables[VariablesPGREnum.PROFESSIONAL_FORMATION])
-        text = `??${VariablesPGREnum.PROFESSIONAL_FORMATION}??\n`;
+      if (variables[VariablesPGREnum.PROFESSIONAL_FORMATION]) text = `??${VariablesPGREnum.PROFESSIONAL_FORMATION}??\n`;
 
-      if (variables[VariablesPGREnum.PROFESSIONAL_CREA])
-        text = `${text}??${VariablesPGREnum.PROFESSIONAL_CREA}??\n`;
+      if (variables[VariablesPGREnum.PROFESSIONAL_CREA]) text = `${text}??${VariablesPGREnum.PROFESSIONAL_CREA}??\n`;
 
-      if (variables[VariablesPGREnum.PROFESSIONAL_CPF])
-        text = `${text}CPF: ${variables[VariablesPGREnum.PROFESSIONAL_CPF]}\n`;
+      if (variables[VariablesPGREnum.PROFESSIONAL_CPF]) text = `${text}CPF: ${variables[VariablesPGREnum.PROFESSIONAL_CPF]}\n`;
 
-      if (variables[VariablesPGREnum.PROFESSIONAL_CERTIFICATIONS])
-        text = `${text}${
-          variables[VariablesPGREnum.PROFESSIONAL_CERTIFICATIONS]
-        }`;
+      if (variables[VariablesPGREnum.PROFESSIONAL_CERTIFICATIONS]) text = `${text}${variables[VariablesPGREnum.PROFESSIONAL_CERTIFICATIONS]}`;
       return convertToDocx(
         [
           {

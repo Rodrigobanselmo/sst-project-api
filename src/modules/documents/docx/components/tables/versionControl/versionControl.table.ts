@@ -7,9 +7,7 @@ import { TableHeaderElements } from './elements/header';
 import { versionControlConverter } from './versionControl.converter';
 import { RiskDocumentEntity } from '../../../../../sst/entities/riskDocument.entity';
 
-export const versionControlTable = (
-  riskDocumentEntity: RiskDocumentEntity[],
-) => {
+export const versionControlTable = (riskDocumentEntity: RiskDocumentEntity[]) => {
   const versionControlData = versionControlConverter(riskDocumentEntity);
 
   const tableHeaderElements = new TableHeaderElements();
@@ -18,12 +16,8 @@ export const versionControlTable = (
   const table = new Table({
     width: { size: 100, type: WidthType.PERCENTAGE },
     rows: [
-      tableHeaderElements.headerRow(
-        versionControlHeader.map(tableHeaderElements.headerCell),
-      ),
-      ...versionControlData.map((data) =>
-        tableBodyElements.tableRow(data.map(tableBodyElements.tableCell)),
-      ),
+      tableHeaderElements.headerRow(versionControlHeader.map(tableHeaderElements.headerCell)),
+      ...versionControlData.map((data) => tableBodyElements.tableRow(data.map(tableBodyElements.tableCell))),
     ],
   });
 

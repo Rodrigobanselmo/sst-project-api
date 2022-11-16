@@ -13,37 +13,18 @@ import { ThirdRiskInventoryColumnEnum } from './third.constant';
 import { originRiskMap } from '../../../../../../../../shared/constants/maps/origin-risk';
 import { sortString } from '../../../../../../../../shared/utils/sorts/string.sort';
 
-export const dataConverter = (
-  riskGroup: RiskFactorGroupDataEntity,
-  hierarchyData: HierarchyMapData,
-  isByGroup: boolean,
-) => {
+export const dataConverter = (riskGroup: RiskFactorGroupDataEntity, hierarchyData: HierarchyMapData, isByGroup: boolean) => {
   const riskFactorsMap = new Map<RiskFactorsEnum, bodyTableProps[][]>();
   const riskInventoryData: bodyTableProps[][] = [];
 
   riskGroup.data
     .sort((a, b) => sortString(a.riskFactor.name, b.riskFactor.name))
-    .sort((a, b) =>
-      sortNumber(
-        riskMap[a.riskFactor.type]?.order,
-        riskMap[b.riskFactor.type]?.order,
-      ),
-    )
+    .sort((a, b) => sortNumber(riskMap[a.riskFactor.type]?.order, riskMap[b.riskFactor.type]?.order))
     .forEach((riskData) => {
-      if (
-        !hierarchyData.allHomogeneousGroupIds.includes(
-          riskData.homogeneousGroupId,
-        )
-      )
-        return;
+      if (!hierarchyData.allHomogeneousGroupIds.includes(riskData.homogeneousGroupId)) return;
 
       if (!isByGroup) {
-        const foundHierarchy = riskData.riskFactor.docInfo.find(
-          (doc) =>
-            !!hierarchyData.org.find(
-              (hierarchy) => hierarchy.id === doc.hierarchyId,
-            ),
-        );
+        const foundHierarchy = riskData.riskFactor.docInfo.find((doc) => !!hierarchyData.org.find((hierarchy) => hierarchy.id === doc.hierarchyId));
         if (foundHierarchy && foundHierarchy.isPGR === false) return;
       }
 
@@ -61,39 +42,23 @@ export const dataConverter = (
       const attention = { color: palette.text.attention.string, bold: true };
       const fill = { shading: { fill: palette.table.header.string } };
 
-      const riskOccupational = getMatrizRisk(
-        riskData.riskFactor.severity,
-        riskData.probability,
-      );
-      const riskOccupationalAfter = getMatrizRisk(
-        riskData.riskFactor.severity,
-        riskData.probability,
-      );
+      const riskOccupational = getMatrizRisk(riskData.riskFactor.severity, riskData.probability);
+      const riskOccupationalAfter = getMatrizRisk(riskData.riskFactor.severity, riskData.probability);
 
       let origin: string;
 
       if (riskData.homogeneousGroup.environment)
-        origin = `${riskData.homogeneousGroup.environment.name}\n(${
-          originRiskMap[riskData.homogeneousGroup.environment.type].name
-        })`;
+        origin = `${riskData.homogeneousGroup.environment.name}\n(${originRiskMap[riskData.homogeneousGroup.environment.type].name})`;
 
       if (riskData.homogeneousGroup.characterization)
-        origin = `${riskData.homogeneousGroup.characterization.name}\n(${
-          originRiskMap[riskData.homogeneousGroup.characterization.type].name
-        })`;
+        origin = `${riskData.homogeneousGroup.characterization.name}\n(${originRiskMap[riskData.homogeneousGroup.characterization.type].name})`;
 
-      if (!riskData.homogeneousGroup.type)
-        origin = `${riskData.homogeneousGroup.name}\n(GSE)`;
+      if (!riskData.homogeneousGroup.type) origin = `${riskData.homogeneousGroup.name}\n(GSE)`;
 
       if (riskData.homogeneousGroup.type == HomoTypeEnum.HIERARCHY) {
-        const hierarchy = hierarchyData.org.find(
-          (hierarchy) => hierarchy.id == riskData.homogeneousGroup.id,
-        );
+        const hierarchy = hierarchyData.org.find((hierarchy) => hierarchy.id == riskData.homogeneousGroup.id);
 
-        if (hierarchy)
-          origin = `${hierarchy.name}\n(${
-            originRiskMap[hierarchy.typeEnum].name
-          })`;
+        if (hierarchy) origin = `${hierarchy.name}\n(${originRiskMap[hierarchy.typeEnum].name})`;
       }
 
       cells[ThirdRiskInventoryColumnEnum.TYPE] = {
@@ -131,9 +96,7 @@ export const dataConverter = (
       };
 
       cells[ThirdRiskInventoryColumnEnum.EPI] = {
-        text: riskData.epis
-          .map((epi) => `${epi.equipment} CA: ${epi.ca}`)
-          .join('\n'),
+        text: riskData.epis.map((epi) => `${epi.equipment} CA: ${epi.ca}`).join('\n'),
         size: 7,
         ...base,
       };

@@ -5,14 +5,10 @@ import { RiskGroupDataRepository } from '../../../repositories/implementations/R
 
 @Injectable()
 export class UpsertRiskGroupDataService {
-  constructor(
-    private readonly riskGroupDataRepository: RiskGroupDataRepository,
-  ) {}
+  constructor(private readonly riskGroupDataRepository: RiskGroupDataRepository) {}
 
   async execute(upsertRiskDataDto: UpsertRiskGroupDataDto) {
-    const riskData = await this.riskGroupDataRepository.upsert(
-      upsertRiskDataDto,
-    );
+    const riskData = await this.riskGroupDataRepository.upsert(upsertRiskDataDto);
 
     return riskData;
   }

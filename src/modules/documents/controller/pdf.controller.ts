@@ -22,10 +22,7 @@ export class DocumentsPdfController {
     },
   )
   @Get('guide/:employeeId/:companyId')
-  async guide(
-    @User() userPayloadDto: UserPayloadDto,
-    @Param('employeeId', ParseIntPipe) employeeId: number,
-  ) {
+  async guide(@User() userPayloadDto: UserPayloadDto, @Param('employeeId', ParseIntPipe) employeeId: number) {
     return this.pdfGuideDataService.execute(employeeId, userPayloadDto);
   }
 }

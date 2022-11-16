@@ -9,9 +9,7 @@ describe.skip('FindAvailableChecklistService', () => {
       providers: [FindAvailableChecklistService],
     }).compile();
 
-    service = module.get<FindAvailableChecklistService>(
-      FindAvailableChecklistService,
-    );
+    service = module.get<FindAvailableChecklistService>(FindAvailableChecklistService);
   });
 
   it('should be defined', () => {

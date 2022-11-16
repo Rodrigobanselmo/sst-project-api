@@ -15,10 +15,7 @@ export class RefreshTokenService {
   ) {}
 
   async execute(refresh_token: string, companyId?: string) {
-    const sub = this.jwtTokenProvider.verifyIsValidToken(
-      refresh_token,
-      'refresh',
-    );
+    const sub = this.jwtTokenProvider.verifyIsValidToken(refresh_token, 'refresh');
 
     if (sub === 'expired') {
       await this.refreshTokensRepository.deleteByRefreshToken(refresh_token);
@@ -31,11 +28,7 @@ export class RefreshTokenService {
 
     const userId = Number(sub);
 
-    const userRefreshToken =
-      await this.refreshTokensRepository.findByUserIdAndRefreshToken(
-        userId,
-        refresh_token,
-      );
+    const userRefreshToken = await this.refreshTokensRepository.findByUserIdAndRefreshToken(userId, refresh_token);
 
     if (!userRefreshToken) {
       throw new UnauthorizedException('Refresh Token does not exists!');
@@ -60,10 +53,7 @@ export class RefreshTokenService {
       })
       .filter((i) => i);
 
-    const company =
-      companies.find((userCompany) => userCompany.companyId === companyId) ||
-      companies[0] ||
-      ({} as typeof companies[0]);
+    const company = companies.find((userCompany) => userCompany.companyId === companyId) || companies[0] || ({} as typeof companies[0]);
 
     const payloadToken: PayloadTokenDto = {
       email: user.email,
@@ -72,14 +62,9 @@ export class RefreshTokenService {
     };
 
     const token = this.jwtTokenProvider.generateToken(payloadToken);
-    const [new_refresh_token, refreshTokenExpiresDate] =
-      this.jwtTokenProvider.generateRefreshToken(user.id);
+    const [new_refresh_token, refreshTokenExpiresDate] = this.jwtTokenProvider.generateRefreshToken(user.id);
 
-    const refreshToken = await this.refreshTokensRepository.create(
-      new_refresh_token,
-      user.id,
-      refreshTokenExpiresDate,
-    );
+    const refreshToken = await this.refreshTokensRepository.create(new_refresh_token, user.id, refreshTokenExpiresDate);
 
     await this.refreshTokensRepository.deleteById(userRefreshToken.id);
 

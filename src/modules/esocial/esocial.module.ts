@@ -32,12 +32,7 @@ import { SendBatchESocialService } from './services/events/all/send-batch/send-b
 import { FindAllTable27Service } from './services/tables/find-all-27.service';
 
 @Module({
-  controllers: [
-    TablesController,
-    ESocialEventController,
-    ESocialEvent2220Controller,
-    ESocialEvent2240Controller,
-  ],
+  controllers: [TablesController, ESocialEventController, ESocialEvent2220Controller, ESocialEvent2240Controller],
   exports: [ESocialEventProvider],
   imports: [
     SoapModule.forRootAsync({

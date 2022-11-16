@@ -7,10 +7,7 @@ import { EmployeeExamsHistoryRepository } from './../../../../../repositories/im
 
 @Injectable()
 export class DeleteExamFileService {
-  constructor(
-    private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository,
-    private readonly amazonStorageProvider: AmazonStorageProvider,
-  ) {}
+  constructor(private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository, private readonly amazonStorageProvider: AmazonStorageProvider) {}
 
   async execute(id: number, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;
@@ -25,10 +22,7 @@ export class DeleteExamFileService {
       },
     });
 
-    if (!found?.id)
-      throw new BadRequestException(
-        ErrorMessageEnum.EMPLOYEE_HISTORY_NOT_FOUND,
-      );
+    if (!found?.id) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_HISTORY_NOT_FOUND);
 
     if (found?.fileUrl) {
       const foundByFileUrl = await this.employeeExamHistoryRepository.findNude({

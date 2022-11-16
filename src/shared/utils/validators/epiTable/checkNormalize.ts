@@ -31,9 +31,6 @@ export const checkNormalize = (value: any) => {
     .replace(/ì/g, '"')
     .replace(/î/g, '"');
 
-  return treatedString
-    .toLocaleLowerCase()
-    .replace(/∫ c/g, '°C')
-    .replace(/^./, treatedString[0].toUpperCase());
+  return treatedString.toLocaleLowerCase().replace(/∫ c/g, '°C').replace(/^./, treatedString[0].toUpperCase());
 };
 //∫ c

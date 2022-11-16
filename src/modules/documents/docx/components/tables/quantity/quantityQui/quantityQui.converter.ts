@@ -5,20 +5,13 @@ import { palette } from '../../../../../../../shared/constants/palette';
 import { getMatrizRisk } from '../../../../../../../shared/utils/matriz';
 import { sortData } from '../../../../../../../shared/utils/sorts/data.sort';
 import { RiskFactorGroupDataEntity } from '../../../../../../sst/entities/riskGroupData.entity';
-import {
-  IRiskDataJson,
-  IRiskDataJsonQui,
-  QuantityTypeEnum,
-} from '../../../../../../company/interfaces/risk-data-json.types';
+import { IRiskDataJson, IRiskDataJsonQui, QuantityTypeEnum } from '../../../../../../company/interfaces/risk-data-json.types';
 import { borderStyleGlobal } from '../../../../base/config/styles';
 import { IHierarchyMap } from '../../../../converter/hierarchy.converter';
 import { bodyTableProps } from './elements/body';
 import { QuantityQuiColumnEnum } from './quantityQui.constant';
 
-export const quantityQuiConverter = (
-  riskGroupData: RiskFactorGroupDataEntity,
-  hierarchyTree: IHierarchyMap,
-) => {
+export const quantityQuiConverter = (riskGroupData: RiskFactorGroupDataEntity, hierarchyTree: IHierarchyMap) => {
   const rows: bodyTableProps[][] = [];
 
   riskGroupData.data
@@ -34,23 +27,17 @@ export const quantityQuiConverter = (
       let origin: string;
 
       if (riskData.homogeneousGroup.environment)
-        origin = `${riskData.homogeneousGroup.environment.name}\n(${
-          originRiskMap[riskData.homogeneousGroup.environment.type].name
-        })`;
+        origin = `${riskData.homogeneousGroup.environment.name}\n(${originRiskMap[riskData.homogeneousGroup.environment.type].name})`;
 
       if (riskData.homogeneousGroup.characterization)
-        origin = `${riskData.homogeneousGroup.characterization.name}\n(${
-          originRiskMap[riskData.homogeneousGroup.characterization.type].name
-        })`;
+        origin = `${riskData.homogeneousGroup.characterization.name}\n(${originRiskMap[riskData.homogeneousGroup.characterization.type].name})`;
 
-      if (!riskData.homogeneousGroup.type)
-        origin = `${riskData.homogeneousGroup.name}\n(GSE)`;
+      if (!riskData.homogeneousGroup.type) origin = `${riskData.homogeneousGroup.name}\n(GSE)`;
 
       if (riskData.homogeneousGroup.type == HomoTypeEnum.HIERARCHY) {
         const hierarchy = hierarchyTree[riskData.homogeneousGroup.id];
 
-        if (hierarchy)
-          origin = `${hierarchy.name}\n(${originRiskMap[hierarchy.type].name})`;
+        if (hierarchy) origin = `${hierarchy.name}\n(${originRiskMap[hierarchy.type].name})`;
       }
 
       const json = riskData.json as unknown as IRiskDataJsonQui;
@@ -88,9 +75,7 @@ export const quantityQuiConverter = (
         if (!item?.result || !item?.leo || !item.prob) return;
 
         const ro = getMatrizRisk(riskData.riskFactor.severity, item.prob);
-        const ij =
-          Number(item.result.replace(/[^0-9.]/g, '')) /
-          Number(item.leo.replace(/[^0-9.]/g, ''));
+        const ij = Number(item.result.replace(/[^0-9.]/g, '')) / Number(item.leo.replace(/[^0-9.]/g, ''));
 
         cells[QuantityQuiColumnEnum.ORIGIN] = {
           text: origin || '',

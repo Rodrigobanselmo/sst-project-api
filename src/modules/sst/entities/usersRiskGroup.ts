@@ -1,9 +1,5 @@
 import { ProfessionalEntity } from '../../users/entities/professional.entity';
-import {
-  RiskFactorGroupDataToUser,
-  RiskFactorGroupDataToProfessional,
-  DocumentPCMSOToProfessional,
-} from '@prisma/client';
+import { RiskFactorGroupDataToUser, RiskFactorGroupDataToProfessional, DocumentPCMSOToProfessional } from '@prisma/client';
 
 import { UserEntity } from '../../users/entities/user.entity';
 
@@ -19,9 +15,7 @@ export class UsersRiskGroupEntity implements RiskFactorGroupDataToUser {
   }
 }
 
-export class ProfessionalRiskGroupEntity
-  implements RiskFactorGroupDataToProfessional
-{
+export class ProfessionalRiskGroupEntity implements RiskFactorGroupDataToProfessional {
   riskFactorGroupDataId: string;
   professionalId: number;
   isSigner: boolean;

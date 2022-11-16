@@ -1,11 +1,4 @@
-import {
-  ImageRun,
-  Paragraph,
-  Table,
-  TableCell,
-  TableRow,
-  WidthType,
-} from 'docx';
+import { ImageRun, Paragraph, Table, TableCell, TableRow, WidthType } from 'docx';
 import fs from 'fs';
 
 import { borderNoneStyle } from '../../config/styles';

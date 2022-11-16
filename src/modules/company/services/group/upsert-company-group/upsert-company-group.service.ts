@@ -5,14 +5,9 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class UpsertCompanyGroupsService {
-  constructor(
-    private readonly companyGroupRepository: CompanyGroupRepository,
-  ) {}
+  constructor(private readonly companyGroupRepository: CompanyGroupRepository) {}
 
-  async execute(
-    UpsertCompanyGroupsDto: UpsertCompanyGroupDto,
-    user: UserPayloadDto,
-  ) {
+  async execute(UpsertCompanyGroupsDto: UpsertCompanyGroupDto, user: UserPayloadDto) {
     const company = await this.companyGroupRepository.upsert({
       ...UpsertCompanyGroupsDto,
       companyId: user.targetCompanyId,

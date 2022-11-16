@@ -1,9 +1,6 @@
 import { VariablesPGREnum } from '../enums/variables.enum';
 import { PGRSectionChildrenTypeEnum } from '../types/elements.types';
-import {
-  IDocumentPGRSectionGroup,
-  PGRSectionTypeEnum,
-} from '../types/section.types';
+import { IDocumentPGRSectionGroup, PGRSectionTypeEnum } from '../types/section.types';
 
 export const available: IDocumentPGRSectionGroup = {
   footer: true,
@@ -76,16 +73,12 @@ export const available: IDocumentPGRSectionGroup = {
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
           text: `Como a empresa ??${VariablesPGREnum.COMPANY_SHORT_NAME}?? não possui sistemas de Gestão em SST esse PGR terá validade de dois anos.`,
-          removeWithAllValidVars: [
-            VariablesPGREnum.COMPANY_HAS_SST_CERTIFICATION,
-          ],
+          removeWithAllValidVars: [VariablesPGREnum.COMPANY_HAS_SST_CERTIFICATION],
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
           text: `Como a empresa ??${VariablesPGREnum.COMPANY_SHORT_NAME}?? possui sistemas de Gestão em SST esse PGR terá validade de três anos.`,
-          removeWithSomeEmptyVars: [
-            VariablesPGREnum.COMPANY_HAS_SST_CERTIFICATION,
-          ],
+          removeWithSomeEmptyVars: [VariablesPGREnum.COMPANY_HAS_SST_CERTIFICATION],
         },
       ],
     },

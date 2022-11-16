@@ -7,9 +7,7 @@ import { GenerateSourceRepository } from '../../../repositories/implementations/
 
 @Injectable()
 export class DeleteSoftGenerateSourceService {
-  constructor(
-    private readonly generateSourceRepository: GenerateSourceRepository,
-  ) {}
+  constructor(private readonly generateSourceRepository: GenerateSourceRepository) {}
 
   async execute(id: string, userPayloadDto: UserPayloadDto) {
     const user = isMaster(userPayloadDto);
@@ -19,11 +17,7 @@ export class DeleteSoftGenerateSourceService {
     if (user.isMaster) {
       generateSource = await this.generateSourceRepository.DeleteByIdSoft(id);
     } else {
-      generateSource =
-        await this.generateSourceRepository.DeleteByCompanyAndIdSoft(
-          id,
-          companyId,
-        );
+      generateSource = await this.generateSourceRepository.DeleteByCompanyAndIdSoft(id, companyId);
     }
 
     if (!generateSource.id) throw new NotFoundException('data not found');

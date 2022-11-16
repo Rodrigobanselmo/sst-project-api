@@ -3,11 +3,7 @@ import { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
-import {
-  CreateDocumentDto,
-  FindDocumentDto,
-  UpdateDocumentDto,
-} from '../../dto/document.dto';
+import { CreateDocumentDto, FindDocumentDto, UpdateDocumentDto } from '../../dto/document.dto';
 
 import { DocumentEntity } from '../../entities/document.entity';
 import { prismaFilter } from '../../../../shared/utils/filters/prisma.filters';
@@ -33,11 +29,7 @@ export class DocumentRepository {
     return new DocumentEntity(document);
   }
 
-  async find(
-    query: Partial<FindDocumentDto>,
-    pagination: PaginationQueryDto,
-    options: Prisma.DocumentFindManyArgs = {},
-  ) {
+  async find(query: Partial<FindDocumentDto>, pagination: PaginationQueryDto, options: Prisma.DocumentFindManyArgs = {}) {
     const whereInit = {
       AND: [],
       ...options.where,

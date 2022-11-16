@@ -1,10 +1,5 @@
 import { sortData } from '../../../../../../shared/utils/sorts/data.sort';
-import {
-  BadRequestException,
-  CACHE_MANAGER,
-  Inject,
-  Injectable,
-} from '@nestjs/common';
+import { BadRequestException, CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { EmployeeESocialEventTypeEnum } from '@prisma/client';
 import { Cache } from 'cache-manager';
 import { Readable } from 'stream';
@@ -19,10 +14,7 @@ import { EmployeeExamsHistoryRepository } from '../../../../../company/repositor
 import { EmployeeRepository } from '../../../../../company/repositories/implementations/EmployeeRepository';
 import { CacheEnum } from '../../../../../../shared/constants/enum/cache';
 import { ICacheEventBatchType } from '../../../../../../shared/interfaces/cache.types';
-import {
-  IESocial2220,
-  IESocial3000,
-} from '../../../../../../shared/providers/ESocialProvider/models/IESocialMethodProvider';
+import { IESocial2220, IESocial3000 } from '../../../../../../shared/providers/ESocialProvider/models/IESocialMethodProvider';
 import { UpdateESocialReportService } from '../../../../../company/services/report/update-esocial-report/update-esocial-report.service';
 import { Event2240Dto } from '../../../../dto/event.dto';
 import { IEsocialSendBatchResponse } from '../../../../interfaces/esocial';
@@ -45,18 +37,12 @@ export class SendEvents2220ESocialService {
 
   async execute(body: Event2240Dto, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;
-    const { company, cert } = await this.eSocialMethodsProvider.getCompany(
-      companyId,
-      { cert: true, report: true },
-    );
+    const { company, cert } = await this.eSocialMethodsProvider.getCompany(companyId, { cert: true, report: true });
 
     const startDate = company.esocialStart;
     const esocialSend = company.esocialSend;
 
-    if (!startDate || esocialSend == null)
-      throw new BadRequestException(
-        'Data de início do eSocial ou tipo de envio não informado para essa empresa',
-      );
+    if (!startDate || esocialSend == null) throw new BadRequestException('Data de início do eSocial ou tipo de envio não informado para essa empresa');
 
     const { data: employees } = await this.employeeRepository.findEvent2220(
       {
@@ -66,24 +52,15 @@ export class SendEvents2220ESocialService {
       { take: 1000 },
     );
 
-    const eventsStruct = this.eSocialEventProvider.convertToEvent2220Struct(
-      company,
-      employees,
-      { ideEvento: body },
-    );
+    const eventsStruct = this.eSocialEventProvider.convertToEvent2220Struct(company, employees, { ideEvento: body });
 
     // prepare event to exclude from eSocial
     const excludeEvents = eventsStruct.filter((event) => {
-      return (
-        event.aso?.status === 'CANCELED' &&
-        event.aso?.events?.find((e) => e.receipt)
-      );
+      return event.aso?.status === 'CANCELED' && event.aso?.events?.find((e) => e.receipt);
     });
 
     const excludeEntry = excludeEvents.map<IESocial3000.Event>((event) => {
-      const eventAso = event.aso?.events
-        ?.sort((b, a) => sortData(a, b))
-        ?.find((e) => e.receipt);
+      const eventAso = event.aso?.events?.sort((b, a) => sortData(a, b))?.find((e) => e.receipt);
 
       return {
         cpf: event.employee.cpf,
@@ -170,12 +147,11 @@ export class SendEvents2220ESocialService {
 
     if (esocialSend) return { fileStream: null, fileName: '' };
 
-    const { zipFile, fileName } =
-      await this.eSocialMethodsProvider.createZipFolder({
-        company,
-        eventsXml,
-        type: '2220',
-      });
+    const { zipFile, fileName } = await this.eSocialMethodsProvider.createZipFolder({
+      company,
+      eventsXml,
+      type: '2220',
+    });
 
     return { fileStream: Readable.from(zipFile) as any, fileName };
   }

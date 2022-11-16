@@ -4,10 +4,7 @@ import { RiskFactorGroupDataEntity } from '../../../../../../sst/entities/riskGr
 import { IHierarchyMap } from '../../../../converter/hierarchy.converter';
 import { quantityVLTable } from './quantityVL.table';
 
-export const quantityVLTableSection = (
-  riskGroupData: RiskFactorGroupDataEntity,
-  hierarchyTree: IHierarchyMap,
-) => {
+export const quantityVLTableSection = (riskGroupData: RiskFactorGroupDataEntity, hierarchyTree: IHierarchyMap) => {
   const table = quantityVLTable(riskGroupData, hierarchyTree);
 
   const section = {

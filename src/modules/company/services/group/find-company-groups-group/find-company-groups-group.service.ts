@@ -5,19 +5,10 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class FindAvailableCompanyGroupsService {
-  constructor(
-    private readonly companyGroupRepository: CompanyGroupRepository,
-  ) {}
+  constructor(private readonly companyGroupRepository: CompanyGroupRepository) {}
 
-  async execute(
-    { skip, take, ...query }: FindCompanyGroupDto,
-    user: UserPayloadDto,
-  ) {
-    const access = await this.companyGroupRepository.findAvailable(
-      user.targetCompanyId,
-      { ...query },
-      { skip, take },
-    );
+  async execute({ skip, take, ...query }: FindCompanyGroupDto, user: UserPayloadDto) {
+    const access = await this.companyGroupRepository.findAvailable(user.targetCompanyId, { ...query }, { skip, take });
 
     return access;
   }

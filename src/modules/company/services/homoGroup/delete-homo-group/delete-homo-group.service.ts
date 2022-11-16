@@ -8,14 +8,9 @@ export class DeleteHomoGroupService {
   constructor(private readonly homoGroupRepository: HomoGroupRepository) {}
 
   async execute(id: string, userPayloadDto: UserPayloadDto) {
-    const foundHomoGroup =
-      await this.homoGroupRepository.findHomoGroupByCompanyAndId(
-        id,
-        userPayloadDto.targetCompanyId,
-      );
+    const foundHomoGroup = await this.homoGroupRepository.findHomoGroupByCompanyAndId(id, userPayloadDto.targetCompanyId);
 
-    if (!foundHomoGroup?.id)
-      throw new BadRequestException(ErrorCompanyEnum.GHO_NOT_FOUND);
+    if (!foundHomoGroup?.id) throw new BadRequestException(ErrorCompanyEnum.GHO_NOT_FOUND);
 
     const homoGroups = await this.homoGroupRepository.deleteById(id);
 

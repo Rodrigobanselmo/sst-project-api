@@ -2,10 +2,7 @@ import { hierarchyList } from './../../../../../shared/constants/lists/hierarchy
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { HierarchyEnum } from '@prisma/client';
 
-import {
-  ErrorCompanyEnum,
-  ErrorMessageEnum,
-} from '../../../../../shared/constants/enum/errorMessage';
+import { ErrorCompanyEnum, ErrorMessageEnum } from '../../../../../shared/constants/enum/errorMessage';
 import { ICompanySheet } from '../../../../../shared/constants/workbooks/sheets/company/companySheet.constant';
 import { IHierarchiesColumns } from '../../../../../shared/constants/workbooks/sheets/hierarchies/hierarchiesColumns.constant';
 import { workbooksConstant } from '../../../../../shared/constants/workbooks/workbooks.constant';
@@ -49,32 +46,22 @@ export class UploadHierarchiesService {
     const companyId = userPayloadDto.targetCompanyId;
 
     // get risk table with actual version
-    const DatabaseTable =
-      await this.databaseTableRepository.findByNameAndCompany(
-        Workbook.name,
-        companyId,
-      );
+    const DatabaseTable = await this.databaseTableRepository.findByNameAndCompany(Workbook.name, companyId);
 
-    let hierarchiesExcelData: IHierarchiesColumns[] =
-      await this.uploadExcelProvider.getAllData({
-        buffer,
-        Workbook,
-        read,
-        DatabaseTable,
-      });
+    let hierarchiesExcelData: IHierarchiesColumns[] = await this.uploadExcelProvider.getAllData({
+      buffer,
+      Workbook,
+      read,
+      DatabaseTable,
+    });
 
     const workspaces = await this.workspaceRepository.findByCompany(companyId);
     const ghoNameDescriptionMap = {} as Record<string, string>;
 
     hierarchiesExcelData = hierarchiesExcelData.map((hierarchy) => {
-      const workspace = workspaces.filter(
-        (work) =>
-          hierarchy.abbreviation &&
-          hierarchy.abbreviation.includes(work.abbreviation),
-      );
+      const workspace = workspaces.filter((work) => hierarchy.abbreviation && hierarchy.abbreviation.includes(work.abbreviation));
 
-      if (!workspace)
-        throw new BadRequestException(ErrorCompanyEnum.WORKSPACE_NOT_FOUND);
+      if (!workspace) throw new BadRequestException(ErrorCompanyEnum.WORKSPACE_NOT_FOUND);
 
       if (hierarchy.ghoName) {
         ghoNameDescriptionMap[hierarchy.ghoName] = hierarchy.ghoDescription;
@@ -113,13 +100,9 @@ export class UploadHierarchiesService {
       }),
     );
 
-    const sheetHierarchyTree =
-      hierarchyExcel.createTreeMapFromHierarchyStruct(hierarchiesExcelData);
+    const sheetHierarchyTree = hierarchyExcel.createTreeMapFromHierarchyStruct(hierarchiesExcelData);
 
-    const hierarchyTree = hierarchyExcel.compare(
-      allHierarchyTree,
-      sheetHierarchyTree,
-    );
+    const hierarchyTree = hierarchyExcel.compare(allHierarchyTree, sheetHierarchyTree);
 
     const hierarchyArray = Object.values(hierarchyTree)
       .filter((hierarchy) => !hierarchy.refId)
@@ -160,26 +143,14 @@ export class UploadHierarchiesService {
   }
 }
 
-const read = async (
-  readFileData: IExcelReadData[],
-  excelProvider: ExcelProvider,
-  sheet: ICompanySheet,
-  databaseTable: DatabaseTableEntity,
-) => {
+const read = async (readFileData: IExcelReadData[], excelProvider: ExcelProvider, sheet: ICompanySheet, databaseTable: DatabaseTableEntity) => {
   const table = readFileData.find((data) => data.name === sheet.name);
 
-  if (!table)
-    throw new BadRequestException(
-      'The table you trying to insert has a different sheet name',
-    );
+  if (!table) throw new BadRequestException('The table you trying to insert has a different sheet name');
 
-  const database = await excelProvider.transformToTableData(
-    table,
-    sheet.columns,
-  );
+  const database = await excelProvider.transformToTableData(table, sheet.columns);
 
-  if (databaseTable?.version && database.version !== databaseTable.version)
-    throw new BadRequestException(ErrorMessageEnum.FILE_WRONG_TABLE_HEAD);
+  if (databaseTable?.version && database.version !== databaseTable.version) throw new BadRequestException(ErrorMessageEnum.FILE_WRONG_TABLE_HEAD);
 
   return database.rows;
 };

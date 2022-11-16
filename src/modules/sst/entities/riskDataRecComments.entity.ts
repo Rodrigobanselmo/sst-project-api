@@ -1,8 +1,4 @@
-import {
-  RiskFactorDataRecComments,
-  RiskRecTextTypeEnum,
-  RiskRecTypeEnum,
-} from '@prisma/client';
+import { RiskFactorDataRecComments, RiskRecTextTypeEnum, RiskRecTypeEnum } from '@prisma/client';
 
 export class RiskDataRecCommentsEntity implements RiskFactorDataRecComments {
   id: string;

@@ -18,8 +18,7 @@ export class FindByIdDocumentService {
       include: { oldDocuments: true },
     });
 
-    if (!documentFound?.id)
-      throw new BadRequestException(ErrorMessageEnum.DOCUMENT_NOT_FOUND);
+    if (!documentFound?.id) throw new BadRequestException(ErrorMessageEnum.DOCUMENT_NOT_FOUND);
 
     return documentFound;
   }

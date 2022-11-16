@@ -7,14 +7,8 @@ import { Injectable } from '@nestjs/common';
 export class FindProtocolsService {
   constructor(private readonly protocolRepository: ProtocolRepository) {}
 
-  async execute(
-    { skip, take, ...query }: FindProtocolDto,
-    user: UserPayloadDto,
-  ) {
-    const access = await this.protocolRepository.find(
-      { companyId: user.targetCompanyId, ...query },
-      { skip, take },
-    );
+  async execute({ skip, take, ...query }: FindProtocolDto, user: UserPayloadDto) {
+    const access = await this.protocolRepository.find({ companyId: user.targetCompanyId, ...query }, { skip, take });
 
     return access;
   }

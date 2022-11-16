@@ -1,24 +1,10 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 
 import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
-import {
-  CreateHierarchyDto,
-  CreateSubHierarchyDto,
-  UpdateHierarchyDto,
-  UpdateSimpleManyHierarchyDto,
-  UpsertManyHierarchyDto,
-} from '../../dto/hierarchy';
+import { CreateHierarchyDto, CreateSubHierarchyDto, UpdateHierarchyDto, UpdateSimpleManyHierarchyDto, UpsertManyHierarchyDto } from '../../dto/hierarchy';
 import { CreateHierarchyService } from '../../services/hierarchy/create-hierarchies/create-hierarchies.service';
 import { CreateSubHierarchyService } from '../../services/hierarchy/create-sub-hierarchies/create-sub-hierarchies.service';
 import { DeleteHierarchyService } from '../../services/hierarchy/delete-hierarchies/delete-hierarchies.service';
@@ -82,14 +68,8 @@ export class HierarchyController {
     crud: true,
   })
   @Post('/:companyId?')
-  create(
-    @Body() createHierarchyDto: CreateHierarchyDto,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
-    return this.createHierarchyService.execute(
-      createHierarchyDto,
-      userPayloadDto,
-    );
+  create(@Body() createHierarchyDto: CreateHierarchyDto, @User() userPayloadDto: UserPayloadDto) {
+    return this.createHierarchyService.execute(createHierarchyDto, userPayloadDto);
   }
 
   @Permissions({
@@ -99,15 +79,8 @@ export class HierarchyController {
     crud: true,
   })
   @Patch('/:id/:companyId?')
-  update(
-    @Body() updateHierarchyDto: UpdateHierarchyDto,
-    @Param('id') id: string,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
-    return this.updateHierarchyService.execute(
-      { id, ...updateHierarchyDto },
-      userPayloadDto,
-    );
+  update(@Body() updateHierarchyDto: UpdateHierarchyDto, @Param('id') id: string, @User() userPayloadDto: UserPayloadDto) {
+    return this.updateHierarchyService.execute({ id, ...updateHierarchyDto }, userPayloadDto);
   }
 
   @Permissions({
@@ -117,14 +90,8 @@ export class HierarchyController {
     crud: 'cu',
   })
   @Post('/upsert-many/:companyId?')
-  upsertMany(
-    @Body() upsertManyHierarchyDto: UpsertManyHierarchyDto,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
-    return this.upsertManyHierarchyService.execute(
-      upsertManyHierarchyDto.data,
-      userPayloadDto,
-    );
+  upsertMany(@Body() upsertManyHierarchyDto: UpsertManyHierarchyDto, @User() userPayloadDto: UserPayloadDto) {
+    return this.upsertManyHierarchyService.execute(upsertManyHierarchyDto.data, userPayloadDto);
   }
 
   @Permissions({
@@ -134,14 +101,8 @@ export class HierarchyController {
     crud: 'u',
   })
   @Post('/simple-update-many/:companyId?')
-  updateSimpleMany(
-    @Body() upsertManyHierarchyDto: UpdateSimpleManyHierarchyDto,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
-    return this.updateSimpleManyHierarchyService.execute(
-      upsertManyHierarchyDto.data,
-      userPayloadDto,
-    );
+  updateSimpleMany(@Body() upsertManyHierarchyDto: UpdateSimpleManyHierarchyDto, @User() userPayloadDto: UserPayloadDto) {
+    return this.updateSimpleManyHierarchyService.execute(upsertManyHierarchyDto.data, userPayloadDto);
   }
 
   @Permissions({
@@ -162,13 +123,7 @@ export class HierarchyController {
     crud: 'cu',
   })
   @Post('/sub-office/:companyId?')
-  upsert(
-    @Body() createSubHierarchyDto: CreateSubHierarchyDto,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
-    return this.createSubHierarchyService.execute(
-      createSubHierarchyDto,
-      userPayloadDto,
-    );
+  upsert(@Body() createSubHierarchyDto: CreateSubHierarchyDto, @User() userPayloadDto: UserPayloadDto) {
+    return this.createSubHierarchyService.execute(createSubHierarchyDto, userPayloadDto);
   }
 }

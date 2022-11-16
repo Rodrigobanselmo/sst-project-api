@@ -18,9 +18,7 @@ export class CopyExamToClinicService {
     });
 
     const copyData = FromExamFactor.map((exam) => {
-      const found = ActualExamFactor.find(
-        (aExam) => aExam.examId === exam.examId,
-      );
+      const found = ActualExamFactor.find((aExam) => aExam.examId === exam.examId);
 
       if (found) return null;
 

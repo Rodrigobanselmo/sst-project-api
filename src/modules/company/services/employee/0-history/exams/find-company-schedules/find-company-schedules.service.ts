@@ -8,15 +8,9 @@ import { EmployeeRepository } from '../../../../../repositories/implementations/
 
 @Injectable()
 export class FindCompanyScheduleEmployeeExamHistoryService {
-  constructor(
-    private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository,
-    private readonly employeeRepository: EmployeeRepository,
-  ) {}
+  constructor(private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository, private readonly employeeRepository: EmployeeRepository) {}
 
-  async execute(
-    { skip, take, ...query }: FindCompanyEmployeeExamHistoryDto,
-    user: UserPayloadDto,
-  ) {
+  async execute({ skip, take, ...query }: FindCompanyEmployeeExamHistoryDto, user: UserPayloadDto) {
     // const status: StatusEnum[] = [
     //   StatusEnum.DONE,
     //   StatusEnum.PROCESSING,

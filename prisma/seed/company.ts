@@ -1,14 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 import { v4 } from 'uuid';
 
-export const seedCompany = async (
-  prisma: PrismaClient,
-  options?: { skip?: true },
-) => {
-  const id =
-    process.env.NODE_ENV === 'test'
-      ? '1'
-      : 'b8635456-334e-4d6e-ac43-cfe5663aee17';
+export const seedCompany = async (prisma: PrismaClient, options?: { skip?: true }) => {
+  const id = process.env.NODE_ENV === 'test' ? '1' : 'b8635456-334e-4d6e-ac43-cfe5663aee17';
 
   const workId = v4();
 

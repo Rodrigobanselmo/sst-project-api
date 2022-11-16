@@ -8,36 +8,16 @@ import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 
 @Injectable()
 export class UpsertManyHierarchyService {
-  constructor(
-    private readonly hierarchyRepository: HierarchyRepository,
-    private readonly employeeRepository: EmployeeRepository,
-  ) {}
+  constructor(private readonly hierarchyRepository: HierarchyRepository, private readonly employeeRepository: EmployeeRepository) {}
 
   async execute(hierarchies: UpdateHierarchyDto[], user: UserPayloadDto) {
     await Promise.all(
       hierarchies.map(async (hierarchy) => {
-        if (
-          hierarchy.parentId &&
-          ([HierarchyEnum.DIRECTORY] as HierarchyEnum[]).includes(
-            hierarchy.type,
-          )
-        ) {
-          throw new BadRequestException(
-            ErrorCompanyEnum.UPDATE_HIERARCHY_WITH_PARENT,
-          );
+        if (hierarchy.parentId && ([HierarchyEnum.DIRECTORY] as HierarchyEnum[]).includes(hierarchy.type)) {
+          throw new BadRequestException(ErrorCompanyEnum.UPDATE_HIERARCHY_WITH_PARENT);
         }
-        if (
-          !hierarchy.parentId &&
-          (
-            [
-              HierarchyEnum.SUB_SECTOR,
-              HierarchyEnum.SUB_OFFICE,
-            ] as HierarchyEnum[]
-          ).includes(hierarchy.type)
-        ) {
-          throw new BadRequestException(
-            ErrorCompanyEnum.UPSERT_HIERARCHY_WITH_PARENT,
-          );
+        if (!hierarchy.parentId && ([HierarchyEnum.SUB_SECTOR, HierarchyEnum.SUB_OFFICE] as HierarchyEnum[]).includes(hierarchy.type)) {
+          throw new BadRequestException(ErrorCompanyEnum.UPSERT_HIERARCHY_WITH_PARENT);
         }
 
         if (hierarchy.type === HierarchyEnum.SUB_OFFICE) {
@@ -49,9 +29,7 @@ export class UpsertManyHierarchyService {
           });
 
           if (employeeFound?.id) {
-            throw new BadRequestException(
-              ErrorCompanyEnum.UPSERT_HIERARCHY_WITH_SUB_OFFICE_OTHER_OFFICE,
-            );
+            throw new BadRequestException(ErrorCompanyEnum.UPSERT_HIERARCHY_WITH_SUB_OFFICE_OTHER_OFFICE);
           }
 
           return;
@@ -70,18 +48,13 @@ export class UpsertManyHierarchyService {
           });
 
           if (employeeFound?.id) {
-            throw new BadRequestException(
-              ErrorCompanyEnum.UPSERT_HIERARCHY_WITH_EMPLOYEE_WITH_SUB_OFFICE,
-            );
+            throw new BadRequestException(ErrorCompanyEnum.UPSERT_HIERARCHY_WITH_EMPLOYEE_WITH_SUB_OFFICE);
           }
         }
       }),
     );
 
-    const allHierarchy = await this.hierarchyRepository.upsertMany(
-      hierarchies as any,
-      user.targetCompanyId,
-    );
+    const allHierarchy = await this.hierarchyRepository.upsertMany(hierarchies as any, user.targetCompanyId);
 
     return allHierarchy;
   }

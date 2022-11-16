@@ -1,11 +1,4 @@
-import {
-  IsBoolean,
-  IsEmail,
-  IsInt,
-  IsNumber,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsBoolean, IsEmail, IsInt, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class UserCompanyDto {
   @IsNumber()

@@ -3,22 +3,17 @@ import { DocumentPCMSORepository } from '../../../repositories/implementations/D
 
 @Injectable()
 export class FindByIdDocumentPCMSOService {
-  constructor(
-    private readonly documentPCMSORepository: DocumentPCMSORepository,
-  ) {}
+  constructor(private readonly documentPCMSORepository: DocumentPCMSORepository) {}
 
   async execute(companyId: string) {
-    const riskGroupData = await this.documentPCMSORepository.findById(
-      companyId,
-      {
-        include: {
-          // usersSignatures: { include: { user: true } },
-          professionalsSignatures: {
-            include: { professional: { include: { professional: true } } },
-          },
+    const riskGroupData = await this.documentPCMSORepository.findById(companyId, {
+      include: {
+        // usersSignatures: { include: { user: true } },
+        professionalsSignatures: {
+          include: { professional: { include: { professional: true } } },
         },
       },
-    );
+    });
 
     return riskGroupData;
   }

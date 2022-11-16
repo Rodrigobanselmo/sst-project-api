@@ -1,14 +1,4 @@
-import {
-  AlignmentType,
-  BorderStyle,
-  ITableCellOptions,
-  Paragraph,
-  TableCell,
-  TableRow,
-  TextRun,
-  VerticalAlign,
-  WidthType,
-} from 'docx';
+import { AlignmentType, BorderStyle, ITableCellOptions, Paragraph, TableCell, TableRow, TextRun, VerticalAlign, WidthType } from 'docx';
 import { palette } from '../../../../../../../shared/constants/palette';
 
 export interface bodyTableProps extends Partial<ITableCellOptions> {

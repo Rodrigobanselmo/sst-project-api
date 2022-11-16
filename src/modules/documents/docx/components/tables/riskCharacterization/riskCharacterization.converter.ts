@@ -8,9 +8,7 @@ import { borderStyleGlobal } from '../../../base/config/styles';
 import { bodyTableProps } from './elements/body';
 import { RiskCharacterizationColumnEnum } from './riskCharacterization.constant';
 
-export const riskCharacterizationConverter = (
-  riskGroup: RiskFactorGroupDataEntity,
-) => {
+export const riskCharacterizationConverter = (riskGroup: RiskFactorGroupDataEntity) => {
   const riskMap: Record<string, bodyTableProps[]> = {};
 
   riskGroup.data.forEach((riskData) => {
@@ -110,12 +108,8 @@ export const riskCharacterizationConverter = (
 
   const bodyData = Object.values(riskMap)
     .sort(([a], [b]) => sortString(a, b, 'text'))
-    .sort(([a], [b]) =>
-      sortNumber(RiskOrderEnum[a.type], RiskOrderEnum[b.type]),
-    )
-    .map((bodyRow, index) =>
-      bodyRow.map((cell) => ({ ...cell, darker: index % 2 != 0 })),
-    );
+    .sort(([a], [b]) => sortNumber(RiskOrderEnum[a.type], RiskOrderEnum[b.type]))
+    .map((bodyRow, index) => bodyRow.map((cell) => ({ ...cell, darker: index % 2 != 0 })));
 
   return bodyData;
 };

@@ -7,10 +7,7 @@ import { RiskFactorDataEntity } from './riskData.entity';
 import { ProfessionalEntity } from '../../users/entities/professional.entity';
 import { UserEntity } from '../../users/entities/user.entity';
 import { dayjs } from '../../../shared/providers/DateProvider/implementations/DayJSProvider';
-import {
-  ProfessionalRiskGroupEntity,
-  UsersRiskGroupEntity,
-} from './usersRiskGroup';
+import { ProfessionalRiskGroupEntity, UsersRiskGroupEntity } from './usersRiskGroup';
 
 export class RiskFactorGroupDataEntity implements RiskFactorGroupData {
   @ApiProperty({ description: 'The id of the risk group data' })
@@ -74,9 +71,7 @@ export class RiskFactorGroupDataEntity implements RiskFactorGroupData {
 
     if (!this.users) this.users = [];
     if (partial?.usersSignatures) {
-      this.usersSignatures = partial.usersSignatures.map(
-        (epiToRiskFactorData) => new UsersRiskGroupEntity(epiToRiskFactorData),
-      );
+      this.usersSignatures = partial.usersSignatures.map((epiToRiskFactorData) => new UsersRiskGroupEntity(epiToRiskFactorData));
 
       this.users = this.usersSignatures.map(
         ({ user, ...epiToRiskFactorData }) =>
@@ -89,9 +84,7 @@ export class RiskFactorGroupDataEntity implements RiskFactorGroupData {
 
     if (!this?.professionals) this.professionals = [];
     if (partial?.professionalsSignatures) {
-      this.professionalsSignatures = partial.professionalsSignatures.map(
-        (prof) => new ProfessionalRiskGroupEntity(prof),
-      );
+      this.professionalsSignatures = partial.professionalsSignatures.map((prof) => new ProfessionalRiskGroupEntity(prof));
 
       this.professionals = this.professionalsSignatures.map(
         ({ professional, ...rest }) =>
@@ -103,10 +96,7 @@ export class RiskFactorGroupDataEntity implements RiskFactorGroupData {
     }
 
     if (this.validityStart && this.validityEnd) {
-      this.validity =
-        dayjs(this.validityStart).format('MM/YYYY') +
-        ' a ' +
-        dayjs(this.validityEnd).format('MM/YYYY');
+      this.validity = dayjs(this.validityStart).format('MM/YYYY') + ' a ' + dayjs(this.validityEnd).format('MM/YYYY');
     }
   }
 }

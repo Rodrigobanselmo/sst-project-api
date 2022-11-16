@@ -1,9 +1,6 @@
 import { Paragraph, Table } from 'docx';
 
-import {
-  ISectionChildrenType,
-  PGRSectionChildrenTypeEnum,
-} from '../../../builders/pgr/types/elements.types';
+import { ISectionChildrenType, PGRSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
 import { RiskFactorDataEntity } from '../../../../../sst/entities/riskData.entity';
 import { emergencyConverter } from './emergency.converter';
@@ -11,10 +8,7 @@ import { removeDuplicate } from '../../../../../../shared/utils/removeDuplicate'
 
 export const emergencyIterable = (
   riskData: Partial<RiskFactorDataEntity>[],
-  convertToDocx: (
-    data: ISectionChildrenType[],
-    variables?: IDocVariables,
-  ) => (Paragraph | Table)[],
+  convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[],
 ) => {
   const emergencyVarArray = emergencyConverter(riskData);
 

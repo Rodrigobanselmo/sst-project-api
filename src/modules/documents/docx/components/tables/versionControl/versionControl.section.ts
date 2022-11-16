@@ -3,9 +3,7 @@ import { PageOrientation } from 'docx';
 import { RiskDocumentEntity } from '../../../../../sst/entities/riskDocument.entity';
 import { versionControlTable } from './versionControl.table';
 
-export const versionControlTableSection = (
-  riskDocumentEntity: RiskDocumentEntity[],
-) => {
+export const versionControlTableSection = (riskDocumentEntity: RiskDocumentEntity[]) => {
   const table = versionControlTable(riskDocumentEntity);
 
   const section = {

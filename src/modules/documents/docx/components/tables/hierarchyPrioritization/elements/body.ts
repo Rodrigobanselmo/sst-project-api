@@ -1,13 +1,4 @@
-import {
-  AlignmentType,
-  ITableCellOptions,
-  Paragraph,
-  TableCell,
-  TableRow,
-  TextRun,
-  VerticalAlign,
-  WidthType,
-} from 'docx';
+import { AlignmentType, ITableCellOptions, Paragraph, TableCell, TableRow, TextRun, VerticalAlign, WidthType } from 'docx';
 import { palette } from '../../../../../../../shared/constants/palette';
 
 export interface bodyTableProps extends Partial<ITableCellOptions> {
@@ -32,9 +23,7 @@ export class TableBodyElements {
             new TextRun({
               text: text || '',
               size: 12,
-              color: attention
-                ? palette.text.attention.string
-                : palette.text.main.string,
+              color: attention ? palette.text.attention.string : palette.text.main.string,
               bold: !!attention,
             }),
           ],
@@ -46,9 +35,7 @@ export class TableBodyElements {
         }),
       ],
       margins: { top: 20, bottom: 20 },
-      shading: shaded
-        ? { fill: palette.table.attention.string }
-        : { fill: palette.table.row.string },
+      shading: shaded ? { fill: palette.table.attention.string } : { fill: palette.table.row.string },
       verticalAlign: VerticalAlign.CENTER,
       width: { size, type: WidthType.PERCENTAGE },
       ...rest,

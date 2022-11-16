@@ -1,17 +1,7 @@
 import { DateFormat } from '../../../shared/transformers/date-format';
-import {
-  RiskRecTextTypeEnum,
-  RiskRecTypeEnum,
-  StatusEnum,
-} from '@prisma/client';
+import { RiskRecTextTypeEnum, RiskRecTypeEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
-import {
-  IsDate,
-  IsEnum,
-  IsOptional,
-  IsString,
-  ValidateNested,
-} from 'class-validator';
+import { IsDate, IsEnum, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';

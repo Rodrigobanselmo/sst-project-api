@@ -1,9 +1,6 @@
 import { VariablesPGREnum } from '../enums/variables.enum';
 import { PGRSectionChildrenTypeEnum } from '../types/elements.types';
-import {
-  IDocumentPGRSectionGroup,
-  PGRSectionTypeEnum,
-} from '../types/section.types';
+import { IDocumentPGRSectionGroup, PGRSectionTypeEnum } from '../types/section.types';
 
 export const recommendationsSection: IDocumentPGRSectionGroup = {
   footer: true,
@@ -52,10 +49,7 @@ export const recommendationsSection: IDocumentPGRSectionGroup = {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
           text: `A ??${VariablesPGREnum.COMPANY_SHORT_NAME}?? deverá divulgar e manter atualizado o Plano de Resposta a Emergência para todos os colaboradores da empresa.`,
           removeWithSomeEmptyVars: [VariablesPGREnum.HAS_EMERGENCY],
-          addWithAllVars: [
-            VariablesPGREnum.HAS_EMERGENCY_PLAN,
-            VariablesPGREnum.IS_WORKSPACE_OWNER,
-          ],
+          addWithAllVars: [VariablesPGREnum.HAS_EMERGENCY_PLAN, VariablesPGREnum.IS_WORKSPACE_OWNER],
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,

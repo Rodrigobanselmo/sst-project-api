@@ -5,11 +5,7 @@ import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { ErrorCompanyEnum } from '../../../../shared/constants/enum/errorMessage';
 import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
-import {
-  CreateEmployeeDto,
-  FindEmployeeDto,
-  UpdateEmployeeDto,
-} from '../../dto/employee.dto';
+import { CreateEmployeeDto, FindEmployeeDto, UpdateEmployeeDto } from '../../dto/employee.dto';
 import { EmployeeEntity } from '../../entities/employee.entity';
 import { prismaFilter } from './../../../../shared/utils/filters/prisma.filters';
 import { FindEvents2220Dto } from './../../../esocial/dto/event.dto';
@@ -19,14 +15,7 @@ import { FindEvents2220Dto } from './../../../esocial/dto/event.dto';
 export class EmployeeRepository {
   constructor(private prisma: PrismaService) {}
 
-  async create({
-    workspaceIds,
-    hierarchyId,
-    companyId,
-    shiftId,
-    cidId,
-    ...createCompanyDto
-  }: CreateEmployeeDto): Promise<EmployeeEntity> {
+  async create({ workspaceIds, hierarchyId, companyId, shiftId, cidId, ...createCompanyDto }: CreateEmployeeDto): Promise<EmployeeEntity> {
     try {
       const employee = await this.prisma.employee.create({
         data: {
@@ -51,22 +40,13 @@ export class EmployeeRepository {
       });
       return new EmployeeEntity(employee);
     } catch (error) {
-      if (error.code == 'P2002')
-        throw new ConflictException(ErrorCompanyEnum.CPF_CONFLICT);
+      if (error.code == 'P2002') throw new ConflictException(ErrorCompanyEnum.CPF_CONFLICT);
       throw new Error(error);
     }
   }
 
   async update(
-    {
-      workspaceIds,
-      hierarchyId,
-      companyId,
-      shiftId,
-      cidId,
-      id,
-      ...createCompanyDto
-    }: UpdateEmployeeDto,
+    { workspaceIds, hierarchyId, companyId, shiftId, cidId, id, ...createCompanyDto }: UpdateEmployeeDto,
     removeSubOffices?: boolean,
   ): Promise<EmployeeEntity> {
     const employee = await this.prisma.employee.update({
@@ -108,106 +88,86 @@ export class EmployeeRepository {
     })[],
     companyId: string,
   ): Promise<EmployeeEntity[]> {
-    const employeeHistory = await this.prisma.employeeHierarchyHistory.findMany(
-      { where: { hierarchy: { companyId } }, include: { employee: true } },
-    );
+    const employeeHistory = await this.prisma.employeeHierarchyHistory.findMany({ where: { hierarchy: { companyId } }, include: { employee: true } });
     const data = await this.prisma.$transaction(
-      upsertEmployeeMany.map(
-        ({
-          companyId: _,
-          id,
-          workspaceIds,
-          hierarchyId,
-          shiftId,
-          cidId,
-          admissionDate,
-          ...upsertEmployeeDto
-        }) =>
-          this.prisma.employee.upsert({
-            create: {
-              ...upsertEmployeeDto,
-              company: { connect: { id: companyId } },
-              hierarchy: hierarchyId
-                ? {
-                    connect: { id: hierarchyId },
-                  }
-                : undefined,
-              shift: shiftId
-                ? {
-                    connect: { id: shiftId },
-                  }
-                : undefined,
-              cid: cidId
-                ? {
-                    connect: { cid: cidId },
-                  }
-                : undefined,
-              status: 'ACTIVE',
-              hierarchyHistory: hierarchyId
-                ? {
+      upsertEmployeeMany.map(({ companyId: _, id, workspaceIds, hierarchyId, shiftId, cidId, admissionDate, ...upsertEmployeeDto }) =>
+        this.prisma.employee.upsert({
+          create: {
+            ...upsertEmployeeDto,
+            company: { connect: { id: companyId } },
+            hierarchy: hierarchyId
+              ? {
+                  connect: { id: hierarchyId },
+                }
+              : undefined,
+            shift: shiftId
+              ? {
+                  connect: { id: shiftId },
+                }
+              : undefined,
+            cid: cidId
+              ? {
+                  connect: { cid: cidId },
+                }
+              : undefined,
+            status: 'ACTIVE',
+            hierarchyHistory: hierarchyId
+              ? {
+                  create: {
+                    motive: 'ADM',
+                    startDate: admissionDate,
+                    hierarchyId: hierarchyId,
+                  },
+                }
+              : undefined,
+          },
+          update: {
+            ...upsertEmployeeDto,
+            hierarchy: !hierarchyId
+              ? undefined
+              : {
+                  connect: { id: hierarchyId },
+                },
+            shift: shiftId
+              ? {
+                  connect: { id: shiftId },
+                }
+              : undefined,
+            cid: cidId
+              ? {
+                  connect: { cid: cidId },
+                }
+              : undefined,
+            status: 'ACTIVE',
+            hierarchyHistory: hierarchyId
+              ? {
+                  upsert: {
+                    where: {
+                      id: employeeHistory.find(({ employee }) => employee.cpf === upsertEmployeeDto.cpf)?.id || -1,
+                    },
                     create: {
                       motive: 'ADM',
                       startDate: admissionDate,
                       hierarchyId: hierarchyId,
                     },
-                  }
-                : undefined,
-            },
-            update: {
-              ...upsertEmployeeDto,
-              hierarchy: !hierarchyId
-                ? undefined
-                : {
-                    connect: { id: hierarchyId },
-                  },
-              shift: shiftId
-                ? {
-                    connect: { id: shiftId },
-                  }
-                : undefined,
-              cid: cidId
-                ? {
-                    connect: { cid: cidId },
-                  }
-                : undefined,
-              status: 'ACTIVE',
-              hierarchyHistory: hierarchyId
-                ? {
-                    upsert: {
-                      where: {
-                        id:
-                          employeeHistory.find(
-                            ({ employee }) =>
-                              employee.cpf === upsertEmployeeDto.cpf,
-                          )?.id || -1,
-                      },
-                      create: {
-                        motive: 'ADM',
-                        startDate: admissionDate,
-                        hierarchyId: hierarchyId,
-                      },
-                      update: {
-                        motive: 'ADM',
-                        startDate: admissionDate,
-                        hierarchyId: hierarchyId,
-                      },
+                    update: {
+                      motive: 'ADM',
+                      startDate: admissionDate,
+                      hierarchyId: hierarchyId,
                     },
-                  }
-                : undefined,
-            },
-            where: { cpf_companyId: { companyId, cpf: upsertEmployeeDto.cpf } },
-          }),
+                  },
+                }
+              : undefined,
+          },
+          where: { cpf_companyId: { companyId, cpf: upsertEmployeeDto.cpf } },
+        }),
       ),
     );
 
     return data.map((employee) => new EmployeeEntity(employee));
   }
 
-  async findById(
-    id: number,
-    companyId: string,
-    options: Prisma.EmployeeFindManyArgs = {},
-  ): Promise<EmployeeEntity> {
+  async findById(id: number, companyId: string, options: Prisma.EmployeeFindManyArgs = {}): Promise<EmployeeEntity> {
     const include = options?.include || {};
 
     const employee = await this.prisma.employee.findUnique({
@@ -224,20 +184,14 @@ export class EmployeeRepository {
             primary_activity: true,
           },
         },
-        hierarchy: !!include?.hierarchy
-          ? false
-          : { select: this.parentInclude() },
+        hierarchy: !!include?.hierarchy ? false : { select: this.parentInclude() },
       },
     });
 
     return new EmployeeEntity(employee);
   }
 
-  async find(
-    query: Partial<FindEmployeeDto>,
-    pagination: PaginationQueryDto,
-    options: Prisma.EmployeeFindManyArgs = {},
-  ) {
+  async find(query: Partial<FindEmployeeDto>, pagination: PaginationQueryDto, options: Prisma.EmployeeFindManyArgs = {}) {
     const whereInit = {
       AND: [],
       ...options.where,
@@ -353,11 +307,7 @@ export class EmployeeRepository {
     };
   }
 
-  async findEvent2220(
-    query: FindEvents2220Dto & { startDate: Date },
-    pagination: PaginationQueryDto,
-    options: Prisma.EmployeeFindManyArgs = {},
-  ) {
+  async findEvent2220(query: FindEvents2220Dto & { startDate: Date }, pagination: PaginationQueryDto, options: Prisma.EmployeeFindManyArgs = {}) {
     const companyId = query.companyId;
 
     const whereInit = {
@@ -425,10 +375,7 @@ export class EmployeeRepository {
             },
           ],
           exam: {
-            AND: [
-              { esocial27Code: { not: null } },
-              { esocial27Code: { not: '' } },
-            ],
+            AND: [{ esocial27Code: { not: null } }, { esocial27Code: { not: '' } }],
           },
         },
         orderBy: [{ doneDate: 'asc' }, { exam: { isAttendance: 'asc' } }],
@@ -553,10 +500,7 @@ export class EmployeeRepository {
     return count;
   }
 
-  async findCountNude(
-    options: Prisma.EmployeeFindManyArgs = {},
-    pagination: PaginationQueryDto,
-  ) {
+  async findCountNude(options: Prisma.EmployeeFindManyArgs = {}, pagination: PaginationQueryDto) {
     const response = await this.prisma.$transaction([
       this.prisma.employee.count({
         where: options.where,
@@ -582,10 +526,7 @@ export class EmployeeRepository {
     return new EmployeeEntity(employee);
   }
 
-  async disconnectSubOffices(
-    employeesIds: number[],
-    companyId: string,
-  ): Promise<EmployeeEntity[]> {
+  async disconnectSubOffices(employeesIds: number[], companyId: string): Promise<EmployeeEntity[]> {
     const response = await this.prisma.$transaction([
       ...employeesIds.map((id) => {
         return this.prisma.employee.update({
@@ -600,11 +541,7 @@ export class EmployeeRepository {
     return response.map((employee) => new EmployeeEntity(employee));
   }
 
-  async disconnectUniqueSubOffice(
-    employeeId: number,
-    subOfficeId: string,
-    companyId: string,
-  ): Promise<EmployeeEntity> {
+  async disconnectUniqueSubOffice(employeeId: number, subOfficeId: string, companyId: string): Promise<EmployeeEntity> {
     const employee = await this.prisma.employee.update({
       data: {
         subOffices: { disconnect: { id: subOfficeId } },
@@ -629,8 +566,6 @@ export class EmployeeRepository {
       } as Prisma.HierarchyFindManyArgs['select'];
     };
 
-    return objectSelect(
-      objectSelect(objectSelect(objectSelect(objectSelect()))),
-    );
+    return objectSelect(objectSelect(objectSelect(objectSelect(objectSelect()))));
   }
 }

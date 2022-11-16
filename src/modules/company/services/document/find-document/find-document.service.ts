@@ -7,10 +7,7 @@ import { Injectable } from '@nestjs/common';
 export class FindDocumentService {
   constructor(private readonly documentRepository: DocumentRepository) {}
 
-  async execute(
-    { skip, take, ...query }: FindDocumentDto,
-    user: UserPayloadDto,
-  ) {
+  async execute({ skip, take, ...query }: FindDocumentDto, user: UserPayloadDto) {
     const access = await this.documentRepository.find(
       { companyId: user.targetCompanyId, ...query },
       { skip, take },

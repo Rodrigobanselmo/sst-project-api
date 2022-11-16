@@ -1,9 +1,6 @@
 import { PrismaService } from '../../../../prisma/prisma.service';
 
-export const excelWorkspaceNotes = async (
-  prisma: PrismaService,
-  companyId: string,
-) => {
+export const excelWorkspaceNotes = async (prisma: PrismaService, companyId: string) => {
   const workspaces = await prisma.workspace.findMany({
     where: { companyId },
   });

@@ -5,15 +5,9 @@ import fs from 'fs';
 import { RiskFactorsEntity } from '../../../../../modules/sst/entities/risk.entity';
 import { v4 } from 'uuid';
 
-import {
-  dayjs,
-  DayJSProvider,
-} from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
+import { dayjs, DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { AmazonStorageProvider } from '../../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
-import {
-  downloadImageFile,
-  getExtensionFromUrl,
-} from '../../../../../shared/utils/downloadImageFile';
+import { downloadImageFile, getExtensionFromUrl } from '../../../../../shared/utils/downloadImageFile';
 import { getDocxFileName } from '../../../../../shared/utils/getFileName';
 import { removeDuplicate } from '../../../../../shared/utils/removeDuplicate';
 import { AttachmentEntity } from '../../../../sst/entities/attachment.entity';
@@ -31,32 +25,17 @@ import { DocumentBuildPGR } from '../../../docx/builders/pgr/create';
 import { actionPlanTableSection } from '../../../docx/components/tables/actionPlan/actionPlan.section';
 import { APPRTableSection } from '../../../docx/components/tables/appr/appr.section';
 import { APPRByGroupTableSection } from '../../../docx/components/tables/apprByGroup/appr-group.section';
-import {
-  hierarchyConverter,
-  HierarchyMapData,
-  IHierarchyMap,
-  IHomoGroupMap,
-} from '../../../docx/converter/hierarchy.converter';
-import {
-  UpsertDocumentDto,
-  UpsertPcmsoDocumentDto,
-} from '../../../dto/pgr.dto';
+import { hierarchyConverter, HierarchyMapData, IHierarchyMap, IHomoGroupMap } from '../../../docx/converter/hierarchy.converter';
+import { UpsertDocumentDto, UpsertPcmsoDocumentDto } from '../../../dto/pgr.dto';
 
-export const getRiskDoc = (
-  risk: RiskFactorsEntity,
-  { companyId, hierarchyId }: { companyId?: string; hierarchyId?: string },
-) => {
+export const getRiskDoc = (risk: RiskFactorsEntity, { companyId, hierarchyId }: { companyId?: string; hierarchyId?: string }) => {
   if (hierarchyId) {
-    const data = risk?.docInfo?.find(
-      (i) => i.hierarchyId && i.hierarchyId == hierarchyId,
-    );
+    const data = risk?.docInfo?.find((i) => i.hierarchyId && i.hierarchyId == hierarchyId);
     if (data) return data;
   }
 
   if (companyId) {
-    const first = risk?.docInfo?.find(
-      (i) => !i.hierarchyId && i.companyId === companyId,
-    );
+    const first = risk?.docInfo?.find((i) => !i.hierarchyId && i.companyId === companyId);
     if (first) return first;
   }
 
@@ -87,60 +66,45 @@ export class PcmsoUploadService {
     const workspaceId = upsertPgrDto.workspaceId;
     // throw new Error();
     console.log('start: query data');
-    const company = await this.companyRepository.findByIdAll(
-      companyId,
-      workspaceId,
-      {
-        include: {
-          riskFactorGroupData: true,
-          primary_activity: true,
-          address: true,
-          covers: true,
-          environments: {
-            include: {
-              photos: true,
-              homogeneousGroup: {
-                include: { riskFactorData: { include: { riskFactor: true } } },
-              },
+    const company = await this.companyRepository.findByIdAll(companyId, workspaceId, {
+      include: {
+        riskFactorGroupData: true,
+        primary_activity: true,
+        address: true,
+        covers: true,
+        environments: {
+          include: {
+            photos: true,
+            homogeneousGroup: {
+              include: { riskFactorData: { include: { riskFactor: true } } },
             },
-            where: { workspaceId },
           },
-          characterization: {
-            include: {
-              photos: true,
-              profiles: true,
-              homogeneousGroup: {
-                include: { riskFactorData: { include: { riskFactor: true } } },
-              },
+          where: { workspaceId },
+        },
+        characterization: {
+          include: {
+            photos: true,
+            profiles: true,
+            homogeneousGroup: {
+              include: { riskFactorData: { include: { riskFactor: true } } },
             },
-            where: { workspaceId },
           },
-          // professionals: { include: { councils: true } },
-          receivingServiceContracts: {
-            include: {
-              applyingServiceCompany: {
-                include: { address: true, covers: true },
-              },
+          where: { workspaceId },
+        },
+        // professionals: { include: { councils: true } },
+        receivingServiceContracts: {
+          include: {
+            applyingServiceCompany: {
+              include: { address: true, covers: true },
             },
           },
         },
       },
-    );
+    });
 
-    
-    const riskGroupData = await this.riskGroupDataRepository.findAllDataById(
-      company.riskFactorGroupData[0].id,
-      workspaceId,
-      companyId,
-    );
+    const riskGroupData = await this.riskGroupDataRepository.findAllDataById(company.riskFactorGroupData[0].id, workspaceId, companyId);
 
-    
-    const hierarchyHierarchy = (
-      await this.hierarchyRepository.findAllDataHierarchyByCompany(
-        companyId,
-        workspaceId,
-      )
-    ).map((hierarchy) => ({
+    const hierarchyHierarchy = (await this.hierarchyRepository.findAllDataHierarchyByCompany(companyId, workspaceId)).map((hierarchy) => ({
       ...hierarchy,
       employees: [
         ...hierarchy.employees,
@@ -154,28 +118,21 @@ export class PcmsoUploadService {
           .reduce((acc, curr) => [...acc, ...curr], []),
       ],
     }));
-    
-    const versions = (
-      await this.riskDocumentRepository.findByRiskGroupAndCompany(
-        upsertPgrDto.riskGroupId,
-        companyId,
-      )
-    ).filter((riskDocument) => riskDocument.version.includes('.0.0'));
+
+    const versions = (await this.riskDocumentRepository.findByRiskGroupAndCompany(upsertPgrDto.riskGroupId, companyId)).filter((riskDocument) =>
+      riskDocument.version.includes('.0.0'),
+    );
 
     const workspace = await this.workspaceRepository.findById(workspaceId);
 
     riskGroupData.data = riskGroupData.data.filter((riskData) => {
       if (riskData.homogeneousGroup.type == HomoTypeEnum.HIERARCHY) {
-        const foundHierarchyDoc = riskData.riskFactor.docInfo.find(
-          (doc) => doc.hierarchyId == riskData.homogeneousGroupId,
-        );
+        const foundHierarchyDoc = riskData.riskFactor.docInfo.find((doc) => doc.hierarchyId == riskData.homogeneousGroupId);
 
         if (foundHierarchyDoc) return foundHierarchyDoc.isPGR;
       }
 
-      const isHierarchyPgr = riskData.riskFactor.docInfo.find(
-        (riskData) => riskData.hierarchyId && riskData.isPGR,
-      );
+      const isHierarchyPgr = riskData.riskFactor.docInfo.find((riskData) => riskData.hierarchyId && riskData.isPGR);
 
       const docInfo = getRiskDoc(riskData.riskFactor, { companyId });
       if (docInfo.isPGR || isHierarchyPgr) return true;
@@ -195,19 +152,9 @@ export class PcmsoUploadService {
     };
 
     const consultant = getConsultant();
-    const consultantLogo = consultant
-      ? await downloadImageFile(
-          consultant?.logoUrl,
-          `tmp/${v4()}.${getExtensionFromUrl(consultant?.logoUrl)}`,
-        )
-      : '';
+    const consultantLogo = consultant ? await downloadImageFile(consultant?.logoUrl, `tmp/${v4()}.${getExtensionFromUrl(consultant?.logoUrl)}`) : '';
 
-    const logo = company.logoUrl
-      ? await downloadImageFile(
-          company.logoUrl,
-          `tmp/${v4()}.${getExtensionFromUrl(company.logoUrl)}`,
-        )
-      : '';
+    const logo = company.logoUrl ? await downloadImageFile(company.logoUrl, `tmp/${v4()}.${getExtensionFromUrl(company.logoUrl)}`) : '';
 
     const cover = company?.covers?.[0] || consultant?.covers?.[0];
 
@@ -216,12 +163,7 @@ export class PcmsoUploadService {
     const photosPath = [];
 
     try {
-      const {
-        hierarchyData,
-        hierarchyHighLevelsData,
-        homoGroupTree,
-        hierarchyTree,
-      } = hierarchyConverter(hierarchyHierarchy, environments, { workspaceId });
+      const { hierarchyData, hierarchyHighLevelsData, homoGroupTree, hierarchyTree } = hierarchyConverter(hierarchyHierarchy, environments, { workspaceId });
 
       const actionPlanUrl = ' ';
       // console.log('start: attachment');
@@ -259,9 +201,7 @@ export class PcmsoUploadService {
         }),
       ];
 
-      const versionString = `${this.dayJSProvider.format(
-        version.created_at,
-      )} - REV. ${version.version}`;
+      const versionString = `${this.dayJSProvider.format(version.created_at)} - REV. ${version.version}`;
 
       console.log('start: build document');
       const sections: ISectionOptions[] = new DocumentBuildPGR({
@@ -339,11 +279,7 @@ export class PcmsoUploadService {
     }
   }
 
-  private async upload(
-    fileBuffer: Buffer,
-    fileName: string,
-    upsertPgrDto: UpsertDocumentDto,
-  ) {
+  private async upload(fileBuffer: Buffer, fileName: string, upsertPgrDto: UpsertDocumentDto) {
     const { url } = await this.amazonStorageProvider.upload({
       file: fileBuffer,
       // fileName: upsertPgrDto.companyId + '/pgr/' + fileName,
@@ -364,10 +300,7 @@ export class PcmsoUploadService {
             await Promise.all(
               environment.photos.map(async (photo) => {
                 try {
-                  const path = await downloadImageFile(
-                    photo.photoUrl,
-                    `tmp/${v4()}.${getExtensionFromUrl(photo.photoUrl)}`,
-                  );
+                  const path = await downloadImageFile(photo.photoUrl, `tmp/${v4()}.${getExtensionFromUrl(photo.photoUrl)}`);
                   if (path) photosPath.push(path);
                   return { ...photo, photoUrl: path };
                 } catch (error) {
@@ -388,10 +321,7 @@ export class PcmsoUploadService {
             await Promise.all(
               environment.photos.map(async (photo) => {
                 try {
-                  const path = await downloadImageFile(
-                    photo.photoUrl,
-                    `tmp/${v4()}.${getExtensionFromUrl(photo.photoUrl)}`,
-                  );
+                  const path = await downloadImageFile(photo.photoUrl, `tmp/${v4()}.${getExtensionFromUrl(photo.photoUrl)}`);
                   if (path) photosPath.push(path);
                   return { ...photo, photoUrl: path };
                 } catch (error) {
@@ -430,44 +360,24 @@ export class PcmsoUploadService {
     upsertPgrDto: UpsertDocumentDto,
   ) {
     // ACTION PLAN
-    const actionPlanSections: ISectionOptions[] = [
-      actionPlanTableSection(riskGroupData, hierarchyTree),
-    ];
+    const actionPlanSections: ISectionOptions[] = [actionPlanTableSection(riskGroupData, hierarchyTree)];
 
-    const actionPlanUrl = await this.save(
-      riskGroupData,
-      upsertPgrDto,
-      actionPlanSections,
-      'PGR-PLANO_DE_ACAO',
-    );
+    const actionPlanUrl = await this.save(riskGroupData, upsertPgrDto, actionPlanSections, 'PGR-PLANO_DE_ACAO');
 
     return { actionPlanUrl };
   }
 
-  private getFileName = (
-    upsertPgrDto: UpsertDocumentDto,
-    riskGroupData: RiskFactorGroupDataEntity,
-    typeName = 'PGR',
-  ) => {
+  private getFileName = (upsertPgrDto: UpsertDocumentDto, riskGroupData: RiskFactorGroupDataEntity, typeName = 'PGR') => {
     return getDocxFileName({
       name: upsertPgrDto.name,
-      companyName:
-        (riskGroupData.company?.fantasy || riskGroupData.company.name) +
-        (riskGroupData.company.initials
-          ? '-' + riskGroupData.company.initials
-          : ''),
+      companyName: (riskGroupData.company?.fantasy || riskGroupData.company.name) + (riskGroupData.company.initials ? '-' + riskGroupData.company.initials : ''),
       version: upsertPgrDto.version,
       typeName,
       date: dayjs(riskGroupData.documentDate || new Date()).format('MMMM-YYYY'),
     });
   };
 
-  private async save(
-    riskGroupData: RiskFactorGroupDataEntity,
-    upsertPgrDto: UpsertDocumentDto,
-    sections: ISectionOptions[],
-    text: string,
-  ) {
+  private async save(riskGroupData: RiskFactorGroupDataEntity, upsertPgrDto: UpsertDocumentDto, sections: ISectionOptions[], text: string) {
     const Doc = createBaseDocument(sections);
 
     const b64string = await Packer.toBase64String(Doc);

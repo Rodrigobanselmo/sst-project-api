@@ -7,11 +7,7 @@ import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 export class UpdateRiskService {
   constructor(private readonly riskRepository: RiskRepository) {}
 
-  async execute(
-    id: string,
-    updateRiskDto: UpdateRiskDto,
-    user: UserPayloadDto,
-  ) {
+  async execute(id: string, updateRiskDto: UpdateRiskDto, user: UserPayloadDto) {
     const system = user.isSystem;
     const companyId = user.targetCompanyId;
 

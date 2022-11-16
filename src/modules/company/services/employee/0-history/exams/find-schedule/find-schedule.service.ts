@@ -7,14 +7,9 @@ import { EmployeeExamsHistoryRepository } from '../../../../../repositories/impl
 
 @Injectable()
 export class FindScheduleEmployeeExamHistoryService {
-  constructor(
-    private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository,
-  ) {}
+  constructor(private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository) {}
 
-  async execute(
-    { skip, take, allExams, ...query }: FindEmployeeExamHistoryDto,
-    user: UserPayloadDto,
-  ) {
+  async execute({ skip, take, allExams, ...query }: FindEmployeeExamHistoryDto, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;
     const status: StatusEnum[] = [StatusEnum.PENDING];
     if (allExams) status.push(StatusEnum.PROCESSING);

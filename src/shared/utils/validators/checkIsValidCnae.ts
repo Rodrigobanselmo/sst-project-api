@@ -9,8 +9,7 @@ export const checkIsValidCnae = (value: any) => {
   }
 
   if (typeof transformToString === 'string') {
-    if (onlyNumbers(transformToString).length == 7)
-      return onlyNumbers(transformToString);
+    if (onlyNumbers(transformToString).length == 7) return onlyNumbers(transformToString);
   }
 
   return false;

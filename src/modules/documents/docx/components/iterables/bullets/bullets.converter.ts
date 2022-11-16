@@ -6,9 +6,5 @@ export const BulletTextConverter = (data: string[]): IDocVariables[] => {
     .map((doc) => ({
       [VariablesPGREnum.BULLET_TEXT]: doc || '',
     }))
-    .sort((a, b) =>
-      a[VariablesPGREnum.BULLET_TEXT].localeCompare(
-        b[VariablesPGREnum.BULLET_TEXT],
-      ),
-    );
+    .sort((a, b) => a[VariablesPGREnum.BULLET_TEXT].localeCompare(b[VariablesPGREnum.BULLET_TEXT]));
 };

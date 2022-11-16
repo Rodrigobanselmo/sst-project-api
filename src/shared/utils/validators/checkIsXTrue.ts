@@ -6,11 +6,7 @@ export const checkIsXTrue = (value: any) => {
   }
 
   if (typeof transformToString === 'string') {
-    if (
-      transformToString.length > 0 &&
-      transformToString.toLocaleLowerCase() != 'x'
-    )
-      return false;
+    if (transformToString.length > 0 && transformToString.toLocaleLowerCase() != 'x') return false;
     return transformToString.length > 0 ? 'true' : 'false';
   }
 

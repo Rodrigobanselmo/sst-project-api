@@ -9,16 +9,9 @@ import { v4 } from 'uuid';
 
 @Injectable()
 export class UpdateDocumentService {
-  constructor(
-    private readonly documentRepository: DocumentRepository,
-    private readonly amazonStorageProvider: AmazonStorageProvider,
-  ) {}
+  constructor(private readonly documentRepository: DocumentRepository, private readonly amazonStorageProvider: AmazonStorageProvider) {}
 
-  async execute(
-    updateDto: UpdateDocumentDto,
-    user: UserPayloadDto,
-    file: Express.Multer.File,
-  ) {
+  async execute(updateDto: UpdateDocumentDto, user: UserPayloadDto, file: Express.Multer.File) {
     const companyId = user.targetCompanyId;
     const documentFound = await this.documentRepository.findFirstNude({
       where: {
@@ -28,8 +21,7 @@ export class UpdateDocumentService {
       select: { id: true, fileUrl: true },
     });
 
-    if (!documentFound?.id)
-      throw new BadRequestException(ErrorMessageEnum.DOCUMENT_NOT_FOUND);
+    if (!documentFound?.id) throw new BadRequestException(ErrorMessageEnum.DOCUMENT_NOT_FOUND);
 
     let url: string;
 
@@ -46,11 +38,7 @@ export class UpdateDocumentService {
     return document;
   }
 
-  private async upload(
-    companyId: string,
-    file: Express.Multer.File,
-    documentFound: DocumentEntity,
-  ) {
+  private async upload(companyId: string, file: Express.Multer.File, documentFound: DocumentEntity) {
     if (documentFound?.fileUrl) {
       const splitUrl = documentFound.fileUrl.split('.com/');
 
@@ -59,14 +47,8 @@ export class UpdateDocumentService {
       });
     }
 
-    const fileType =
-      file.originalname.split('.')[file.originalname.split('.').length - 1];
-    const path =
-      companyId +
-      '/documents/' +
-      `${documentFound?.name || ''}-${v4()}` +
-      '.' +
-      fileType;
+    const fileType = file.originalname.split('.')[file.originalname.split('.').length - 1];
+    const path = companyId + '/documents/' + `${documentFound?.name || ''}-${v4()}` + '.' + fileType;
 
     const { url } = await this.amazonStorageProvider.upload({
       file: file.buffer,

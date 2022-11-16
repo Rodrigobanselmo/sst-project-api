@@ -1,17 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Post,
-  Query,
-  Res,
-  UploadedFile,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -74,10 +61,7 @@ export class EmployeeExamHistoryController {
     },
   )
   @Get()
-  find(
-    @User() userPayloadDto: UserPayloadDto,
-    @Query() query: FindEmployeeExamHistoryDto,
-  ) {
+  find(@User() userPayloadDto: UserPayloadDto, @Query() query: FindEmployeeExamHistoryDto) {
     return this.findEmployeeExamHistoryService.execute(query, userPayloadDto);
   }
 
@@ -96,14 +80,8 @@ export class EmployeeExamHistoryController {
     },
   )
   @Get('schedule')
-  findSchedule(
-    @User() userPayloadDto: UserPayloadDto,
-    @Query() query: FindEmployeeExamHistoryDto,
-  ) {
-    return this.findAskEmployeeExamHistoryService.execute(
-      query,
-      userPayloadDto,
-    );
+  findSchedule(@User() userPayloadDto: UserPayloadDto, @Query() query: FindEmployeeExamHistoryDto) {
+    return this.findAskEmployeeExamHistoryService.execute(query, userPayloadDto);
   }
 
   @Permissions(
@@ -121,14 +99,8 @@ export class EmployeeExamHistoryController {
     },
   )
   @Get('schedule/company')
-  findCompanySchedule(
-    @User() userPayloadDto: UserPayloadDto,
-    @Query() query: FindCompanyEmployeeExamHistoryDto,
-  ) {
-    return this.findCompanyScheduleEmployeeExamHistoryService.execute(
-      query,
-      userPayloadDto,
-    );
+  findCompanySchedule(@User() userPayloadDto: UserPayloadDto, @Query() query: FindCompanyEmployeeExamHistoryDto) {
+    return this.findCompanyScheduleEmployeeExamHistoryService.execute(query, userPayloadDto);
   }
 
   @Permissions(
@@ -152,14 +124,8 @@ export class EmployeeExamHistoryController {
     },
   )
   @Get('schedule/clinic')
-  findClinicSchedule(
-    @User() userPayloadDto: UserPayloadDto,
-    @Query() query: FindClinicEmployeeExamHistoryDto,
-  ) {
-    return this.findClinicScheduleEmployeeExamHistoryService.execute(
-      query,
-      userPayloadDto,
-    );
+  findClinicSchedule(@User() userPayloadDto: UserPayloadDto, @Query() query: FindClinicEmployeeExamHistoryDto) {
+    return this.findClinicScheduleEmployeeExamHistoryService.execute(query, userPayloadDto);
   }
 
   @Permissions(
@@ -177,10 +143,7 @@ export class EmployeeExamHistoryController {
     },
   )
   @Get('/:id/:companyId')
-  findById(
-    @User() userPayloadDto: UserPayloadDto,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
+  findById(@User() userPayloadDto: UserPayloadDto, @Param('id', ParseIntPipe) id: number) {
     return this.findByIdEmployeeExamHistoryService.execute(id, userPayloadDto);
   }
 
@@ -199,14 +162,8 @@ export class EmployeeExamHistoryController {
     },
   )
   @Post('/:companyId?')
-  create(
-    @Body() upsertAccessGroupDto: CreateEmployeeExamHistoryDto,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
-    return this.createEmployeeExamHistoryService.execute(
-      upsertAccessGroupDto,
-      userPayloadDto,
-    );
+  create(@Body() upsertAccessGroupDto: CreateEmployeeExamHistoryDto, @User() userPayloadDto: UserPayloadDto) {
+    return this.createEmployeeExamHistoryService.execute(upsertAccessGroupDto, userPayloadDto);
   }
 
   @Permissions(
@@ -224,14 +181,8 @@ export class EmployeeExamHistoryController {
     },
   )
   @Post('/schedule/:companyId?')
-  createSchedule(
-    @Body() upsertAccessGroupDto: CreateEmployeeExamHistoryDto,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
-    return this.createEmployeeExamHistoryService.execute(
-      upsertAccessGroupDto,
-      userPayloadDto,
-    );
+  createSchedule(@Body() upsertAccessGroupDto: CreateEmployeeExamHistoryDto, @User() userPayloadDto: UserPayloadDto) {
+    return this.createEmployeeExamHistoryService.execute(upsertAccessGroupDto, userPayloadDto);
   }
 
   @Permissions(
@@ -249,14 +200,8 @@ export class EmployeeExamHistoryController {
     },
   )
   @Post('/update-many-schedule/:companyId?')
-  updateSchedule(
-    @Body() upsertAccessGroupDto: UpdateManyScheduleExamDto,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
-    return this.updateManyScheduleExamHistoryService.execute(
-      upsertAccessGroupDto,
-      userPayloadDto,
-    );
+  updateSchedule(@Body() upsertAccessGroupDto: UpdateManyScheduleExamDto, @User() userPayloadDto: UserPayloadDto) {
+    return this.updateManyScheduleExamHistoryService.execute(upsertAccessGroupDto, userPayloadDto);
   }
 
   @Permissions({
@@ -266,15 +211,8 @@ export class EmployeeExamHistoryController {
     crud: true,
   })
   @Patch('/:id/:companyId?')
-  update(
-    @Body() upsertAccessGroupDto: UpdateEmployeeExamHistoryDto,
-    @User() userPayloadDto: UserPayloadDto,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
-    return this.updateEmployeeExamHistoryService.execute(
-      { ...upsertAccessGroupDto, id },
-      userPayloadDto,
-    );
+  update(@Body() upsertAccessGroupDto: UpdateEmployeeExamHistoryDto, @User() userPayloadDto: UserPayloadDto, @Param('id', ParseIntPipe) id: number) {
+    return this.updateEmployeeExamHistoryService.execute({ ...upsertAccessGroupDto, id }, userPayloadDto);
   }
 
   @Permissions({
@@ -284,16 +222,8 @@ export class EmployeeExamHistoryController {
     crud: true,
   })
   @Delete('/:employeeId/:id/:companyId?')
-  delete(
-    @User() userPayloadDto: UserPayloadDto,
-    @Param('id', ParseIntPipe) id: number,
-    @Param('employeeId', ParseIntPipe) employeeId: number,
-  ) {
-    return this.deleteEmployeeExamHistoryService.execute(
-      id,
-      employeeId,
-      userPayloadDto,
-    );
+  delete(@User() userPayloadDto: UserPayloadDto, @Param('id', ParseIntPipe) id: number, @Param('employeeId', ParseIntPipe) employeeId: number) {
+    return this.deleteEmployeeExamHistoryService.execute(id, employeeId, userPayloadDto);
   }
 
   @Permissions({
@@ -303,22 +233,10 @@ export class EmployeeExamHistoryController {
     crud: true,
   })
   @Get('/:id/download/:companyId')
-  async download(
-    @Res() res,
-    @User() userPayloadDto: UserPayloadDto,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
-    const { fileKey, fileStream } = await this.downloadExamService.execute(
-      id,
-      userPayloadDto,
-    );
+  async download(@Res() res, @User() userPayloadDto: UserPayloadDto, @Param('id', ParseIntPipe) id: number) {
+    const { fileKey, fileStream } = await this.downloadExamService.execute(id, userPayloadDto);
 
-    res.setHeader(
-      'Content-Disposition',
-      `attachment; filename=${
-        fileKey.split('/')[fileKey.split('/').length - 1]
-      }`,
-    );
+    res.setHeader('Content-Disposition', `attachment; filename=${fileKey.split('/')[fileKey.split('/').length - 1]}`);
 
     fileStream.on('error', function (e) {
       res.status(500).send(e);
@@ -335,11 +253,7 @@ export class EmployeeExamHistoryController {
   })
   @Post('upload/:companyId')
   @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 100000000 } }))
-  upload(
-    @UploadedFile() file: Express.Multer.File,
-    @Body() createDto: UpdateFileExamDto,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
+  upload(@UploadedFile() file: Express.Multer.File, @Body() createDto: UpdateFileExamDto, @User() userPayloadDto: UserPayloadDto) {
     createDto.ids = createDto.ids.map((id) => Number(id));
     return this.uploadExamFileService.execute(createDto, userPayloadDto, file);
   }
@@ -351,10 +265,7 @@ export class EmployeeExamHistoryController {
     crud: true,
   })
   @Delete('/file/:id')
-  deleteFile(
-    @User() userPayloadDto: UserPayloadDto,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
+  deleteFile(@User() userPayloadDto: UserPayloadDto, @Param('id', ParseIntPipe) id: number) {
     return this.deleteExamFileService.execute(id, userPayloadDto);
   }
 }

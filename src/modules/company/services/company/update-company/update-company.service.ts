@@ -6,33 +6,23 @@ import { CompanyRepository } from '../../../repositories/implementations/Company
 
 @Injectable()
 export class UpdateCompanyService {
-  constructor(
-    private readonly companyRepository: CompanyRepository,
-    private readonly workspaceRepository: WorkspaceRepository,
-  ) {}
+  constructor(private readonly companyRepository: CompanyRepository, private readonly workspaceRepository: WorkspaceRepository) {}
 
   async execute(updateCompanyDto: UpdateCompanyDto) {
     const newWorkspaces = [] as WorkspaceDto[];
 
     if (updateCompanyDto.workspace && updateCompanyDto.workspace.length > 0) {
-      const workspaces = await this.workspaceRepository.findByCompany(
-        updateCompanyDto.companyId,
-      );
+      const workspaces = await this.workspaceRepository.findByCompany(updateCompanyDto.companyId);
 
       updateCompanyDto.workspace.forEach(async (workspace) => {
         const loop = (abr: string, count = 0) => {
-          const found = workspaces.find(
-            (w) => w.abbreviation === abr && w.id !== workspace.id,
-          );
+          const found = workspaces.find((w) => w.abbreviation === abr && w.id !== workspace.id);
 
           if (!found) {
             return abr;
           }
 
-          return loop(
-            abr.split('-')[0] + (count ? '-' + String(count) : ''),
-            count + 1,
-          );
+          return loop(abr.split('-')[0] + (count ? '-' + String(count) : ''), count + 1);
         };
 
         let abr = workspace.name
@@ -42,8 +32,7 @@ export class UpdateCompanyService {
           .map((el) => el[0])
           .join('');
 
-        const abrWorkspace =
-          abr.length > 1 ? abr : abr + workspace.name.slice(1, 2).toUpperCase();
+        const abrWorkspace = abr.length > 1 ? abr : abr + workspace.name.slice(1, 2).toUpperCase();
 
         abr = loop(abrWorkspace) as string;
         newWorkspaces.push({

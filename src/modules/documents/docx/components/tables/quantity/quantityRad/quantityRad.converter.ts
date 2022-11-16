@@ -5,20 +5,13 @@ import { palette } from '../../../../../../../shared/constants/palette';
 import { getMatrizRisk } from '../../../../../../../shared/utils/matriz';
 import { sortData } from '../../../../../../../shared/utils/sorts/data.sort';
 import { RiskFactorGroupDataEntity } from '../../../../../../sst/entities/riskGroupData.entity';
-import {
-  IRiskDataJson,
-  IRiskDataJsonRadiation,
-  QuantityTypeEnum,
-} from '../../../../../../company/interfaces/risk-data-json.types';
+import { IRiskDataJson, IRiskDataJsonRadiation, QuantityTypeEnum } from '../../../../../../company/interfaces/risk-data-json.types';
 import { borderStyleGlobal } from '../../../../base/config/styles';
 import { IHierarchyMap } from '../../../../converter/hierarchy.converter';
 import { bodyTableProps } from './elements/body';
 import { QuantityRadColumnEnum } from './quantityRad.constant';
 
-export const quantityRadConverter = (
-  riskGroupData: RiskFactorGroupDataEntity,
-  hierarchyTree: IHierarchyMap,
-) => {
+export const quantityRadConverter = (riskGroupData: RiskFactorGroupDataEntity, hierarchyTree: IHierarchyMap) => {
   const rows: bodyTableProps[][] = [];
 
   riskGroupData.data
@@ -36,23 +29,17 @@ export const quantityRadConverter = (
       let origin: string;
 
       if (riskData.homogeneousGroup.environment)
-        origin = `${riskData.homogeneousGroup.environment.name}\n(${
-          originRiskMap[riskData.homogeneousGroup.environment.type].name
-        })`;
+        origin = `${riskData.homogeneousGroup.environment.name}\n(${originRiskMap[riskData.homogeneousGroup.environment.type].name})`;
 
       if (riskData.homogeneousGroup.characterization)
-        origin = `${riskData.homogeneousGroup.characterization.name}\n(${
-          originRiskMap[riskData.homogeneousGroup.characterization.type].name
-        })`;
+        origin = `${riskData.homogeneousGroup.characterization.name}\n(${originRiskMap[riskData.homogeneousGroup.characterization.type].name})`;
 
-      if (!riskData.homogeneousGroup.type)
-        origin = `${riskData.homogeneousGroup.name}\n(GSE)`;
+      if (!riskData.homogeneousGroup.type) origin = `${riskData.homogeneousGroup.name}\n(GSE)`;
 
       if (riskData.homogeneousGroup.type == HomoTypeEnum.HIERARCHY) {
         const hierarchy = hierarchyTree[riskData.homogeneousGroup.id];
 
-        if (hierarchy)
-          origin = `${hierarchy.name}\n(${originRiskMap[hierarchy.type].name})`;
+        if (hierarchy) origin = `${hierarchy.name}\n(${originRiskMap[hierarchy.type].name})`;
       }
 
       const json = riskData.json as unknown as IRiskDataJsonRadiation;
@@ -86,15 +73,9 @@ export const quantityRadConverter = (
       ];
       array.forEach((value) => {
         const cells: bodyTableProps[] = [];
-        if (
-          typeof value?.prob === 'number' ||
-          typeof value?.publicProb === 'number'
-        ) {
+        if (typeof value?.prob === 'number' || typeof value?.publicProb === 'number') {
           const prob = getMatrizRisk(riskData.riskFactor.severity, value.prob);
-          const publicProb = getMatrizRisk(
-            riskData.riskFactor.severity,
-            value.publicProb,
-          );
+          const publicProb = getMatrizRisk(riskData.riskFactor.severity, value.publicProb);
 
           cells[QuantityRadColumnEnum.ORIGIN] = {
             text: origin || '',

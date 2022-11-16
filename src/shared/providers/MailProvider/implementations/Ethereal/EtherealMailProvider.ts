@@ -28,12 +28,7 @@ class EtherealMailProvider implements IMailProvider {
         });
   }
 
-  async sendMail({
-    path,
-    subject,
-    to,
-    variables,
-  }: ISendMailData): Promise<any> {
+  async sendMail({ path, subject, to, variables }: ISendMailData): Promise<any> {
     if (process.env.NODE_ENV === 'test') return;
     if (process.env.NODE_ENV === 'development') return;
 

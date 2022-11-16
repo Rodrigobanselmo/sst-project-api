@@ -21,8 +21,7 @@ export class DownloadCidService {
     const companyId = userPayloadDto.targetCompanyId;
 
     return this.downloadExcelProvider.newTableData({
-      findAll: (sheet) =>
-        findAllCids(this.excelProvider, this.cidRepository, sheet),
+      findAll: (sheet) => findAllCids(this.excelProvider, this.cidRepository, sheet),
       Workbook,
       companyId,
     });

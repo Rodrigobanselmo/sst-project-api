@@ -6,20 +6,9 @@ import { EmployeeExamsHistoryRepository } from '../../../../../repositories/impl
 
 @Injectable()
 export class FindEmployeeExamHistoryService {
-  constructor(
-    private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository,
-  ) {}
+  constructor(private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository) {}
 
-  async execute(
-    {
-      skip,
-      take,
-      includeClinic,
-      orderByCreation,
-      ...query
-    }: FindEmployeeExamHistoryDto,
-    user: UserPayloadDto,
-  ) {
+  async execute({ skip, take, includeClinic, orderByCreation, ...query }: FindEmployeeExamHistoryDto, user: UserPayloadDto) {
     const access = await this.employeeExamHistoryRepository.find(
       { companyId: user.targetCompanyId, ...query },
       { skip, take },

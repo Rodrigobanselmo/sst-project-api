@@ -54,14 +54,7 @@ export type IAprTable = {
   properties?: ISectionPropertiesOptions;
 } & IBase;
 
-export type IAllSectionTypesPGR =
-  | IChapter
-  | ISection
-  | ICover
-  | ISectionEnv
-  | ISectionChar
-  | ITOC
-  | IAprTable;
+export type IAllSectionTypesPGR = IChapter | ISection | ICover | ISectionEnv | ISectionChar | ITOC | IAprTable;
 
 export type IDocumentPGRSectionGroup = {
   data: IAllSectionTypesPGR[];

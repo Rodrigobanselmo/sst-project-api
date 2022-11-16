@@ -5,9 +5,7 @@ import { sortData } from '../../../../../../shared/utils/sorts/data.sort';
 import { bodyTableProps } from './elements/body';
 import { VersionControlColumnEnum } from './versionControl.constant';
 
-export const versionControlConverter = (
-  documentsVersions: RiskDocumentEntity[],
-) => {
+export const versionControlConverter = (documentsVersions: RiskDocumentEntity[]) => {
   const rows: bodyTableProps[][] = [];
 
   documentsVersions
