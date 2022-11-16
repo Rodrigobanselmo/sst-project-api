@@ -31,16 +31,19 @@ export const signaturesIterable = (
   const iterableSections = signaturesVariablesArray.map((variables) => {
     const credentials = [] as string[];
 
-    // eslint-disable-next-line prettier/prettier
-      if (variables[VariablesPGREnum.PROFESSIONAL_NAME]) credentials.push(`**??${VariablesPGREnum.PROFESSIONAL_NAME}??**`)
-    // eslint-disable-next-line prettier/prettier
-      if (variables[VariablesPGREnum.PROFESSIONAL_FORMATION]) credentials.push(`??${VariablesPGREnum.PROFESSIONAL_FORMATION}??`)
-    // eslint-disable-next-line prettier/prettier
-      if (variables[VariablesPGREnum.PROFESSIONAL_CREA]) credentials.push(`??${VariablesPGREnum.PROFESSIONAL_CREA}??`)
-    // eslint-disable-next-line prettier/prettier
-      if (variables[VariablesPGREnum.PROFESSIONAL_CPF]) credentials.push(`CPF: ${variables[VariablesPGREnum.PROFESSIONAL_CPF]}`)
-    // eslint-disable-next-line prettier/prettier
-      // if (variables[VariablesPGREnum.PROFESSIONAL_CERTIFICATIONS]) text = `${text}${variables[VariablesPGREnum.PROFESSIONAL_CERTIFICATIONS]}`
+    if (variables[VariablesPGREnum.PROFESSIONAL_NAME])
+      credentials.push(`**??${VariablesPGREnum.PROFESSIONAL_NAME}??**`);
+
+    if (variables[VariablesPGREnum.PROFESSIONAL_FORMATION])
+      credentials.push(`??${VariablesPGREnum.PROFESSIONAL_FORMATION}??`);
+
+    if (variables[VariablesPGREnum.PROFESSIONAL_CREA])
+      credentials.push(`??${VariablesPGREnum.PROFESSIONAL_CREA}??`);
+
+    if (variables[VariablesPGREnum.PROFESSIONAL_CPF])
+      credentials.push(`CPF: ${variables[VariablesPGREnum.PROFESSIONAL_CPF]}`);
+
+    // if (variables[VariablesPGREnum.PROFESSIONAL_CERTIFICATIONS]) text = `${text}${variables[VariablesPGREnum.PROFESSIONAL_CERTIFICATIONS]}`
     return convertToDocx(
       [
         ...credentials.map<ISectionChildrenType>((credential) => ({

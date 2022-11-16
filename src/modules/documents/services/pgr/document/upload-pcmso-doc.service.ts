@@ -127,11 +127,20 @@ export class PcmsoUploadService {
       },
     );
 
-    // eslint-disable-next-line prettier/prettier
-    const riskGroupData = await this.riskGroupDataRepository.findAllDataById(company.riskFactorGroupData[0].id, workspaceId, companyId);
+    
+    const riskGroupData = await this.riskGroupDataRepository.findAllDataById(
+      company.riskFactorGroupData[0].id,
+      workspaceId,
+      companyId,
+    );
 
-    // eslint-disable-next-line prettier/prettier
-    const hierarchyHierarchy = (await this.hierarchyRepository.findAllDataHierarchyByCompany(companyId, workspaceId)).map(hierarchy=>({
+    
+    const hierarchyHierarchy = (
+      await this.hierarchyRepository.findAllDataHierarchyByCompany(
+        companyId,
+        workspaceId,
+      )
+    ).map((hierarchy) => ({
       ...hierarchy,
       employees: [
         ...hierarchy.employees,
@@ -145,8 +154,13 @@ export class PcmsoUploadService {
           .reduce((acc, curr) => [...acc, ...curr], []),
       ],
     }));
-    // eslint-disable-next-line prettier/prettier
-    const versions = (await this.riskDocumentRepository.findByRiskGroupAndCompany(upsertPgrDto.riskGroupId, companyId)).filter(riskDocument => riskDocument.version.includes('.0.0'));
+    
+    const versions = (
+      await this.riskDocumentRepository.findByRiskGroupAndCompany(
+        upsertPgrDto.riskGroupId,
+        companyId,
+      )
+    ).filter((riskDocument) => riskDocument.version.includes('.0.0'));
 
     const workspace = await this.workspaceRepository.findById(workspaceId);
 

@@ -1,3 +1,4 @@
+import { RiskDocInfoEntity } from './../../../../sst/entities/riskDocInfo.entity';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { HomoTypeEnum, StatusEnum } from '@prisma/client';
 import { ISectionOptions, Packer } from 'docx';
@@ -38,6 +39,32 @@ import {
   IHomoGroupMap,
 } from '../../../docx/converter/hierarchy.converter';
 import { RiskFactorsEntity } from '../../../../../modules/sst/entities/risk.entity';
+import { RiskFactorDataEntity } from '../../../../../modules/sst/entities/riskData.entity';
+
+export const checkRiskDataDoc = (
+  riskData: RiskFactorDataEntity[],
+  {
+    companyId,
+    docType,
+  }: { companyId: string; docType: keyof RiskDocInfoEntity },
+) => {
+  return riskData.filter((riskData) => {
+    const foundHierarchyDoc = riskData.riskFactor.docInfo.find(
+      (doc) => doc.hierarchyId == riskData.homogeneousGroupId,
+    );
+
+    if (foundHierarchyDoc) return foundHierarchyDoc[docType];
+
+    const isChecked = riskData.riskFactor.docInfo.find(
+      (riskData) => riskData.hierarchyId && riskData[docType],
+    );
+
+    const docInfo = getRiskDoc(riskData.riskFactor, { companyId });
+    if (docInfo[docType] || isChecked) return true;
+
+    return false;
+  });
+};
 
 export const getRiskDoc = (
   risk: RiskFactorsEntity,
@@ -82,13 +109,23 @@ export class PgrUploadService {
 
     const companyId = upsertPgrDto.companyId;
     const workspaceId = upsertPgrDto.workspaceId;
+    const fromDate = new Date();
     // throw new Error();
     console.log('start: query data');
-    // eslint-disable-next-line prettier/prettier
-    const riskGroupData = await this.riskGroupDataRepository.findAllDataById(upsertPgrDto.riskGroupId, workspaceId, companyId);
+    
+    const riskGroupData = await this.riskGroupDataRepository.findAllDataById(
+      upsertPgrDto.riskGroupId,
+      workspaceId,
+      companyId,
+    );
 
-    // eslint-disable-next-line prettier/prettier
-    const hierarchyHierarchy = (await this.hierarchyRepository.findAllDataHierarchyByCompany(companyId, workspaceId)).map(hierarchy=>({
+    
+    const hierarchyHierarchy = (
+      await this.hierarchyRepository.findAllDataHierarchyByCompany(
+        companyId,
+        workspaceId,
+      )
+    ).map((hierarchy) => ({
       ...hierarchy,
       employees: [
         ...hierarchy.employees,
@@ -102,8 +139,13 @@ export class PgrUploadService {
           .reduce((acc, curr) => [...acc, ...curr], []),
       ],
     }));
-    // eslint-disable-next-line prettier/prettier
-    const versions = (await this.riskDocumentRepository.findByRiskGroupAndCompany(upsertPgrDto.riskGroupId, companyId)).filter(riskDocument => riskDocument.version.includes('.0.0'));
+    
+    const versions = (
+      await this.riskDocumentRepository.findByRiskGroupAndCompany(
+        upsertPgrDto.riskGroupId,
+        companyId,
+      )
+    ).filter((riskDocument) => riskDocument.version.includes('.0.0'));
 
     const workspace = await this.workspaceRepository.findById(workspaceId);
     const company = await this.companyRepository.findByIdAll(

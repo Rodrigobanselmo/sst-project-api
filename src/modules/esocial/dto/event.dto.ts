@@ -33,6 +33,7 @@ export class BaseEventDto {
 }
 
 export class Event2220Dto extends BaseEventDto {}
+export class Event2240Dto extends BaseEventDto {}
 
 export class FindEvents2220Dto extends PaginationQueryDto {
   @IsString()
@@ -51,4 +52,14 @@ export class FindEvents2220Dto extends PaginationQueryDto {
   @IsString({ each: true })
   @IsOptional()
   companiesIds?: string[];
+}
+
+export class FindEvents2240Dto extends PaginationQueryDto {
+  @IsString()
+  @IsOptional()
+  search?: string;
+
+  @IsString()
+  @IsOptional()
+  companyId: string;
 }

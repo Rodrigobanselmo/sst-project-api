@@ -71,7 +71,7 @@ import { FindAvailableCompanyGroupsService } from './services/group/find-company
 import { UpsertCompanyGroupsService } from './services/group/upsert-company-group/upsert-company-group.service';
 import { FindAllUserCompaniesService } from './services/company/find-all-user-companies /find-all-companies.service';
 import { CopyHomoGroupService } from './services/homoGroup/copy-homo-group/copy-homo-group.service';
-import { ChecklistModule } from '../sst/sst.module';
+import { SSTModule } from '../sst/sst.module';
 import { CreateSubHierarchyService } from './services/hierarchy/create-sub-hierarchies/create-sub-hierarchies.service';
 import { DeleteSubOfficeEmployeeService } from './services/employee/delete-sub-office-employee/delete-sub-office-employee.service';
 import { ContactRepository } from './repositories/implementations/ContactRepository';
@@ -123,7 +123,7 @@ import { UpdateESocialReportService } from './services/report/update-esocial-rep
 
 @Module({
   imports: [
-    forwardRef(() => ChecklistModule),
+    forwardRef(() => SSTModule),
     forwardRef(() => NotificationModule),
     forwardRef(() => EsocialModule),
     TelegramModule.forRoot({

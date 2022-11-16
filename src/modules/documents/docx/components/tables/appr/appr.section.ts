@@ -77,8 +77,8 @@ export const APPRTableSection = (
 
         map.set(homoGroupID, true);
 
-        // eslint-disable-next-line prettier/prettier
-      if (!description && !homoGroup.type)  hierarchy.descReal = homoGroup?.description;
+        if (!description && !homoGroup.type)
+          hierarchy.descReal = homoGroup?.description;
         if (!homoGroup.type && isByGroup)
           hierarchy.descReal =
             homoGroup?.description || hierarchy.descReal || hierarchy.descRh;

@@ -53,23 +53,29 @@ export class CompanyReportRepository {
     });
 
     const done = group.find((g) => g.status === 'DONE')?._count || 0;
-    // eslint-disable-next-line prettier/prettier
-    const transmitted = group.find((g) => g.status === 'TRANSMITTED')?._count || 0;
-    // eslint-disable-next-line prettier/prettier
-    const processing = group.find((g) => g.status === 'PROCESSING')?._count || 0;
-    // eslint-disable-next-line prettier/prettier
-    const rejected = group.find((g) => g.status === 'INVALID' || g.status === 'ERROR') ?._count || 0;
+
+    const transmitted =
+      group.find((g) => g.status === 'TRANSMITTED')?._count || 0;
+
+    const processing =
+      group.find((g) => g.status === 'PROCESSING')?._count || 0;
+
+    const rejected =
+      group.find((g) => g.status === 'INVALID' || g.status === 'ERROR')
+        ?._count || 0;
 
     if (typeof done == 'number') dailyReport.esocial.done = done;
-    // eslint-disable-next-line prettier/prettier
-    if (typeof rejected == 'number') dailyReport.esocial.rejected = rejected;
-    // eslint-disable-next-line prettier/prettier
-    if (typeof processing == 'number') dailyReport.esocial.processing = processing;
-    // eslint-disable-next-line prettier/prettier
-    if (typeof transmitted == 'number') dailyReport.esocial.transmitted = transmitted;
 
-    // eslint-disable-next-line prettier/prettier
-    dailyReport.esocial.pending = (dailyReport.esocial?.pending || 0) - removePending;
+    if (typeof rejected == 'number') dailyReport.esocial.rejected = rejected;
+
+    if (typeof processing == 'number')
+      dailyReport.esocial.processing = processing;
+
+    if (typeof transmitted == 'number')
+      dailyReport.esocial.transmitted = transmitted;
+
+    dailyReport.esocial.pending =
+      (dailyReport.esocial?.pending || 0) - removePending;
 
     if (dailyReport.esocial.pending < 0) dailyReport.esocial.pending = 0;
 
@@ -189,33 +195,63 @@ export class CompanyReportRepository {
       where: { companyId },
       _count: true,
     });
-    // eslint-disable-next-line prettier/prettier
-    const doneRisk = group.find((g) => g.status === 'DONE'&& g.type === 'RISK_2240')?._count || 0;
-    // eslint-disable-next-line prettier/prettier
-    const doneExam = group.find((g) => g.status === 'DONE'&& g.type === 'EXAM_2220')?._count || 0;
-    // eslint-disable-next-line prettier/prettier
-    const doneCat = group.find((g) => g.status === 'DONE'&& g.type === 'CAT_2210')?._count || 0;
 
-    // eslint-disable-next-line prettier/prettier
-    const transmittedRisk = group.find((g) => g.status === 'TRANSMITTED' && g.type === 'RISK_2240')?._count || 0;
-    // eslint-disable-next-line prettier/prettier
-    const transmittedExam = group.find((g) => g.status === 'TRANSMITTED' && g.type === 'EXAM_2220')?._count || 0;
-    // eslint-disable-next-line prettier/prettier
-    const transmittedCat = group.find((g) => g.status === 'TRANSMITTED' && g.type === 'CAT_2210')?._count || 0;
+    const doneRisk =
+      group.find((g) => g.status === 'DONE' && g.type === 'RISK_2240')
+        ?._count || 0;
 
-    // eslint-disable-next-line prettier/prettier
-    const processingRisk = group.find((g) => g.status === 'PROCESSING' && g.type === 'RISK_2240')?._count || 0;
-    // eslint-disable-next-line prettier/prettier
-    const processingExam = group.find((g) => g.status === 'PROCESSING' && g.type === 'EXAM_2220')?._count || 0;
-    // eslint-disable-next-line prettier/prettier
-    const processingCat = group.find((g) => g.status === 'PROCESSING' && g.type === 'CAT_2210')?._count || 0;
+    const doneExam =
+      group.find((g) => g.status === 'DONE' && g.type === 'EXAM_2220')
+        ?._count || 0;
 
-    // eslint-disable-next-line prettier/prettier
-    const rejectedRisk = group.find((g) => (g.status === 'INVALID' || g.status === 'ERROR')&& g.type === 'RISK_2240')?._count || 0;
-    // eslint-disable-next-line prettier/prettier
-    const rejectedExam = group.find((g) => (g.status === 'INVALID' || g.status === 'ERROR')&& g.type === 'EXAM_2220')?._count || 0;
-    // eslint-disable-next-line prettier/prettier
-    const rejectedCat = group.find((g) => (g.status === 'INVALID' || g.status === 'ERROR')&& g.type === 'CAT_2210')?._count || 0;
+    const doneCat =
+      group.find((g) => g.status === 'DONE' && g.type === 'CAT_2210')?._count ||
+      0;
+
+    const transmittedRisk =
+      group.find((g) => g.status === 'TRANSMITTED' && g.type === 'RISK_2240')
+        ?._count || 0;
+
+    const transmittedExam =
+      group.find((g) => g.status === 'TRANSMITTED' && g.type === 'EXAM_2220')
+        ?._count || 0;
+
+    const transmittedCat =
+      group.find((g) => g.status === 'TRANSMITTED' && g.type === 'CAT_2210')
+        ?._count || 0;
+
+    const processingRisk =
+      group.find((g) => g.status === 'PROCESSING' && g.type === 'RISK_2240')
+        ?._count || 0;
+
+    const processingExam =
+      group.find((g) => g.status === 'PROCESSING' && g.type === 'EXAM_2220')
+        ?._count || 0;
+
+    const processingCat =
+      group.find((g) => g.status === 'PROCESSING' && g.type === 'CAT_2210')
+        ?._count || 0;
+
+    const rejectedRisk =
+      group.find(
+        (g) =>
+          (g.status === 'INVALID' || g.status === 'ERROR') &&
+          g.type === 'RISK_2240',
+      )?._count || 0;
+
+    const rejectedExam =
+      group.find(
+        (g) =>
+          (g.status === 'INVALID' || g.status === 'ERROR') &&
+          g.type === 'EXAM_2220',
+      )?._count || 0;
+
+    const rejectedCat =
+      group.find(
+        (g) =>
+          (g.status === 'INVALID' || g.status === 'ERROR') &&
+          g.type === 'CAT_2210',
+      )?._count || 0;
 
     esocial.S2240.done = doneRisk;
     esocial.S2240.rejected = rejectedRisk;

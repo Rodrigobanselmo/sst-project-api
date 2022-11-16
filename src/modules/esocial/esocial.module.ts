@@ -10,8 +10,10 @@ import { ESocialEventProvider } from '../../shared/providers/ESocialProvider/imp
 import { ESocialMethodsProvider } from '../../shared/providers/ESocialProvider/implementations/ESocialMethodsProvider';
 import { AuthModule } from '../auth/auth.module';
 import { CompanyModule } from '../company/company.module';
+import { SSTModule } from '../sst/sst.module';
 import { SoapClientEnum } from './../../shared/constants/enum/soapClient';
 import { ESocialEvent2220Controller } from './controller/events/2220/events-2220.controller';
+import { ESocialEvent2240Controller } from './controller/events/2240/events-2240.controller';
 import { ESocialEventController } from './controller/events/all/events.controller';
 import { TablesController } from './controller/tables/tables.controller';
 import { EsocialFetchBatchCron } from './crons/esocial-fetch-batch/esocial-fetch-batch.cron';
@@ -21,6 +23,7 @@ import { ESocialBatchRepository } from './repositories/implementations/ESocialBa
 import { ESocialEventRepository } from './repositories/implementations/ESocialEventRepository';
 import { FindEvents2220ESocialService } from './services/events/2220/find-events/find-events.service';
 import { SendEvents2220ESocialService } from './services/events/2220/send-events/send-events.service';
+import { FindEvents2240ESocialService } from './services/events/2240/find-events/find-events.service';
 import { AddCertificationESocialService } from './services/events/all/add-certificate/add-certificate.service';
 import { FetchESocialBatchEventsService } from './services/events/all/fetch-batch-events/fetch-batch-events.service';
 import { FindESocialBatchService } from './services/events/all/find-batch/find-batch.service';
@@ -33,6 +36,7 @@ import { FindAllTable27Service } from './services/tables/find-all-27.service';
     TablesController,
     ESocialEventController,
     ESocialEvent2220Controller,
+    ESocialEvent2240Controller,
   ],
   exports: [ESocialEventProvider],
   imports: [
@@ -118,6 +122,7 @@ import { FindAllTable27Service } from './services/tables/find-all-27.service';
     }),
     forwardRef(() => AuthModule),
     forwardRef(() => CompanyModule),
+    forwardRef(() => SSTModule),
     CacheModule.register(),
   ],
   providers: [
@@ -137,6 +142,7 @@ import { FindAllTable27Service } from './services/tables/find-all-27.service';
     FindESocialEventService,
     ESocialEventRepository,
     EsocialFetchBatchCron,
+    FindEvents2240ESocialService,
   ],
 })
 export class EsocialModule {}

@@ -9,9 +9,11 @@ export enum SecondRiskInventoryColumnEnum {
 export const secondRiskInventoryHeader = (): bodyTableProps[] => {
   const header: bodyTableProps[] = [];
 
-  
-  header[SecondRiskInventoryColumnEnum.OFFICIAL] = { text: 'ABRANGÊNCIA', bold: true, borders: borderNoneStyle  };
+  header[SecondRiskInventoryColumnEnum.OFFICIAL] = {
+    text: 'ABRANGÊNCIA',
+    bold: true,
+    borders: borderNoneStyle,
+  };
 
   return header;
 };
-

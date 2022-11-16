@@ -22,15 +22,16 @@ export class EmployeeESocialEventEntity implements EmployeeESocialEvent {
   employeeId: number;
   companyId: string;
   type: EmployeeESocialEventTypeEnum;
-  examHistoryId: number;
   receipt: string;
   eventId: string;
   employee?: EmployeeEntity;
   company?: CompanyEntity;
   batch?: EmployeeESocialBatchEntity;
   response: Prisma.JsonValue;
-  // snapshot: Prisma.JsonValue;
   action: EmployeeESocialEventActionEnum;
+  // snapshot: Prisma.JsonValue;
+  examHistoryId: number;
+  pppId: number;
 
   constructor(partial: Partial<EmployeeESocialEventEntity>) {
     Object.assign(this, partial);

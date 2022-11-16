@@ -177,7 +177,8 @@ class ExcelProvider implements IExcelProvider {
         sheet.rows.forEach((row) => {
           worksheet.addRow(
             row.map((row) =>
-              typeof row === 'boolean' ? (row ? 'VERDADEIRO' : 'FALSO') : row,
+              // typeof row === 'boolean' ? (row ? 'VERDADEIRO' : 'FALSO') : row,
+              typeof row === 'boolean' ? (row ? 'X' : '') : row,
             ),
           );
         });

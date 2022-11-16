@@ -1,3 +1,4 @@
+import { RiskFactorsEntity } from './../../sst/entities/risk.entity';
 import { ExamToClinicEntity } from '../../sst/entities/examToClinic';
 import { RiskFactorGroupDataEntity } from '../../sst/entities/riskGroupData.entity';
 import { ProfessionalEntity } from './../../users/entities/professional.entity';
@@ -7,7 +8,11 @@ import {
   CompanyTypesEnum,
 } from '.prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
-import { ProfessionalCouncil, StatusEnum } from '@prisma/client';
+import {
+  ProfessionalCouncil,
+  StatusEnum,
+  HomogeneousGroup,
+} from '@prisma/client';
 import { AddressCompanyEntity } from './address-company.entity';
 import { EmployeeEntity } from './employee.entity';
 import { LicenseEntity } from './license.entity';
@@ -23,6 +28,8 @@ import { CompanyClinicsEntity } from './company-clinics.entity';
 import { CompanyReportEntity } from './report.entity';
 import { CompanyGroupEntity } from './company-group.entity';
 import { CompanyCertEntity } from '../../../modules/esocial/entities/companyCert.entity';
+import { HierarchyEntity } from './hierarchy.entity';
+import { HomoGroupEntity } from './homoGroup.entity';
 
 export class CompanyEntity implements Company {
   @ApiProperty({ description: 'The id of the Company' })
@@ -138,6 +145,9 @@ export class CompanyEntity implements Company {
   esocialLastTransmission: Date;
   group?: Partial<CompanyGroupEntity>;
   cert?: CompanyCertEntity;
+  riskFactors?: RiskFactorsEntity[];
+  hierarchy?: HierarchyEntity[];
+  homogeneousGroup?: HomoGroupEntity[];
 
   doctorResponsible?: Partial<ProfessionalEntity>;
   tecResponsible?: Partial<ProfessionalEntity>;
@@ -147,6 +157,12 @@ export class CompanyEntity implements Company {
 
     if (this.primary_activity && this.primary_activity[0]) {
       this.riskDegree = this.primary_activity[0].riskDegree;
+    }
+
+    if (this.riskFactors) {
+      this.riskFactors = this.riskFactors.map(
+        (risk) => new RiskFactorsEntity(risk),
+      );
     }
 
     if (this.group) {

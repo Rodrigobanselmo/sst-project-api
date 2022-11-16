@@ -7,15 +7,22 @@ export const recommendationsConverter = (
 ) => {
   const remove = ['Não aplicável', 'Não identificada', 'Não informada'];
 
-  // eslint-disable-next-line prettier/prettier
-  const eng = { data: [] as string[], title: 'Medidas de Controle de Engenharia' };
-  // eslint-disable-next-line prettier/prettier
-  const adm = { data: [] as string[], title: 'Procedimentos de Trabalho e Controles Administrativos'}
-  // eslint-disable-next-line prettier/prettier
-  const epi = { data: [] as string[], title: 'Equipamentos de Proteção Individual (Quando aplicável)'}
-  // eslint-disable-next-line prettier/prettier
-  const others = { data: [] as string[], title: 'Outras Recomendações'}
+  const eng = {
+    data: [] as string[],
+    title: 'Medidas de Controle de Engenharia',
+  };
 
+  const adm = {
+    data: [] as string[],
+    title: 'Procedimentos de Trabalho e Controles Administrativos',
+  };
+
+  const epi = {
+    data: [] as string[],
+    title: 'Equipamentos de Proteção Individual (Quando aplicável)',
+  };
+
+  const others = { data: [] as string[], title: 'Outras Recomendações' };
 
   riskData.forEach((data) => {
     (data?.recs || []).forEach((rec) => {

@@ -23,6 +23,7 @@ export class EmployeeHierarchyHistoryEntity
   sector?: string;
   office?: string;
   deletedAt: Date;
+  subHierarchies: HierarchyEntity[];
 
   constructor(partial: Partial<EmployeeHierarchyHistoryEntity>) {
     Object.assign(this, partial);
@@ -34,7 +35,12 @@ export class EmployeeHierarchyHistoryEntity
 }
 
 // eslint-disable-next-line prettier/prettier
-const base = [ EmployeeHierarchyMotiveTypeEnum.ALOC, EmployeeHierarchyMotiveTypeEnum.PROM, EmployeeHierarchyMotiveTypeEnum.TRANS, EmployeeHierarchyMotiveTypeEnum.TRANS_PROM ];
+const base = [
+  EmployeeHierarchyMotiveTypeEnum.ALOC,
+  EmployeeHierarchyMotiveTypeEnum.PROM,
+  EmployeeHierarchyMotiveTypeEnum.TRANS,
+  EmployeeHierarchyMotiveTypeEnum.TRANS_PROM,
+];
 const adm = EmployeeHierarchyMotiveTypeEnum.ADM;
 const dem = EmployeeHierarchyMotiveTypeEnum.DEM;
 export const historyRules: Record<any, any> = {

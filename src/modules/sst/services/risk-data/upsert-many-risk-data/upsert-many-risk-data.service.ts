@@ -44,6 +44,14 @@ export class UpsertManyRiskDataService {
     delete upsertRiskDataDto.workspaceId;
     delete upsertRiskDataDto.type;
 
+    if ('startDate' in upsertRiskDataDto) {
+      if (!upsertRiskDataDto.startDate) upsertRiskDataDto.startDate = null;
+    }
+
+    if ('endDate' in upsertRiskDataDto) {
+      if (!upsertRiskDataDto.endDate) upsertRiskDataDto.endDate = null;
+    }
+
     const risksDataMany =
       (await Promise.all(
         upsertRiskDataDto.riskIds.map(async (riskId) => {

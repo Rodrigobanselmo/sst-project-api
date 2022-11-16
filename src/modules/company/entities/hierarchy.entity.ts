@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Hierarchy, HierarchyEnum, StatusEnum } from '@prisma/client';
+import { EmployeeHierarchyHistoryEntity } from './employee-hierarchy-history.entity';
 
 import { EmployeeEntity } from './employee.entity';
 import {
@@ -64,6 +65,9 @@ export class HierarchyEntity implements Hierarchy {
   workspaceId?: string;
   employeesCount?: number;
   deletedAt: Date;
+
+  subHierarchyHistory?: EmployeeHierarchyHistoryEntity[];
+  hierarchyHistory?: EmployeeHierarchyHistoryEntity[];
 
   constructor(partial: Partial<HierarchyEntity>) {
     Object.assign(this, partial);

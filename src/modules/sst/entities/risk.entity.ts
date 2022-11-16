@@ -7,6 +7,7 @@ import { GenerateSourceEntity } from './generateSource.entity';
 import { ExamRiskEntity } from './examRisk.entity';
 import { RiskFactorDataEntity } from './riskData.entity';
 import { RiskDocInfoEntity } from './riskDocInfo.entity';
+import { EsocialTable24Entity } from '../../../modules/esocial/entities/esocialTable24.entity';
 
 export class RiskFactorsEntity implements RiskFactors {
   @ApiProperty({ description: 'The id of the Company' })
@@ -82,6 +83,7 @@ export class RiskFactorsEntity implements RiskFactors {
   pe: string;
   fraction: string;
   tlv: string;
+  coments: string;
   carnogenicityACGIH: string;
   carnogenicityLinach: string;
   examToRisk: ExamRiskEntity[];
@@ -92,6 +94,9 @@ export class RiskFactorsEntity implements RiskFactors {
   isPGR: boolean;
   isPCMSO: boolean;
   isPPP: boolean;
+
+  esocialCode: string;
+  esocial?: EsocialTable24Entity;
 
   constructor(partial: Partial<RiskFactorsEntity>) {
     Object.assign(this, partial);

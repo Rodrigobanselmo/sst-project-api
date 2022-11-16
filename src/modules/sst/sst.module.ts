@@ -185,4 +185,4 @@ import { ProtocolRepository } from './repositories/implementations/ProtocolRepos
   ],
   imports: [forwardRef(() => CompanyModule)],
 })
-export class ChecklistModule {}
+export class SSTModule {}

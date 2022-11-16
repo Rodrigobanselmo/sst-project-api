@@ -526,6 +526,55 @@ export class HierarchyRepository {
     });
   }
 
+  // async findESocialHierarchies(
+  //   companyId: string,
+  //   options: {
+  //     include?: Prisma.HierarchyInclude;
+  //   } = {},
+  // ) {
+  //   const newOptions = { ...options };
+
+  //   const hierarchies = await this.prisma.hierarchy.findMany({
+  //     where: { companyId },
+  //     select: {
+  //       description: true,
+  //       parentId: true,
+  //       riskDocInfo: { select: { isPPP: true } },
+  //       hierarchyOnHomogeneous: true,
+  //       subOfficeEmployees: {
+  //         select:{}
+  //         include: { subOffices: true },
+  //       },
+  //       employees: {
+  //         select: { id: true, cpf: true },
+  //       },
+  //     },
+  //   });
+
+  //   return hierarchies.map((hierarchy) => {
+  //     const hierarchyCopy = { ...hierarchy } as HierarchyEntity;
+
+  //     if (hierarchy.hierarchyOnHomogeneous)
+  //       hierarchyCopy.homogeneousGroups = hierarchy.hierarchyOnHomogeneous.map(
+  //         (homo) => ({
+  //           ...homo.homogeneousGroup,
+  //           workspaceId: homo.workspaceId,
+  //           characterization:
+  //             homo.homogeneousGroup?.characterization &&
+  //             !isEnvironment(homo.homogeneousGroup.characterization.type)
+  //               ? homo.homogeneousGroup.characterization
+  //               : undefined,
+  //           environment:
+  //             homo.homogeneousGroup?.characterization &&
+  //             isEnvironment(homo.homogeneousGroup.characterization.type)
+  //               ? homo.homogeneousGroup.characterization
+  //               : undefined,
+  //         }),
+  //       );
+  //     return new HierarchyEntity(hierarchyCopy);
+  //   });
+  // }
+
   async findById(id: string, companyId: string) {
     const hierarchiesIds: string[] = [];
     const AllChildrenHierarchies = (await this.prisma.hierarchy.findFirst({

@@ -108,7 +108,6 @@ export class SendEvents2220ESocialService {
     // prepare event to send to eSocial
     const eventsXml: IESocial2220.XmlReturn[] = eventsStruct
       .map(({ event, ...data }) => {
-        // eslint-disable-next-line prettier/prettier
         const canceled = data.aso?.status == 'CANCELED';
         if (canceled) return;
 

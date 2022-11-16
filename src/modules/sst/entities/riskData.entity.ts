@@ -104,6 +104,7 @@ export class RiskFactorDataEntity implements RiskFactorData {
   probVdvr?: number;
   origin?: string;
   ro?: string;
+  prioritization?: number;
   intervention?: string;
   progress?: number;
   epiToRiskFactorData?: EpiRiskDataEntity[];
@@ -247,14 +248,26 @@ export class RiskFactorDataEntity implements RiskFactorData {
 
   private getOrigin() {
     if (this.homogeneousGroup) {
-      // eslint-disable-next-line prettier/prettier
-      if (this.homogeneousGroup.environment) this.origin = `${this.homogeneousGroup.environment.name}\n(${originRiskMap[this.homogeneousGroup.environment.type].name})`
-      // eslint-disable-next-line prettier/prettier
-      if (this.homogeneousGroup.hierarchy && this.homogeneousGroup.hierarchy.name) this.origin =`${this.homogeneousGroup.hierarchy.name}\n(${originRiskMap[this.homogeneousGroup.hierarchy.type].name})`;
-      // eslint-disable-next-line prettier/prettier
-      if (this.homogeneousGroup.characterization) this.origin =`${this.homogeneousGroup.characterization.name}\n(${originRiskMap[this.homogeneousGroup.characterization.type].name})`;
-      // eslint-disable-next-line prettier/prettier
-      if (!this.homogeneousGroup.type) this.origin = `${this.homogeneousGroup.name}\n(GSE)`;
+      if (this.homogeneousGroup.environment)
+        this.origin = `${this.homogeneousGroup.environment.name}\n(${
+          originRiskMap[this.homogeneousGroup.environment.type].name
+        })`;
+
+      if (
+        this.homogeneousGroup.hierarchy &&
+        this.homogeneousGroup.hierarchy.name
+      )
+        this.origin = `${this.homogeneousGroup.hierarchy.name}\n(${
+          originRiskMap[this.homogeneousGroup.hierarchy.type].name
+        })`;
+
+      if (this.homogeneousGroup.characterization)
+        this.origin = `${this.homogeneousGroup.characterization.name}\n(${
+          originRiskMap[this.homogeneousGroup.characterization.type].name
+        })`;
+
+      if (!this.homogeneousGroup.type)
+        this.origin = `${this.homogeneousGroup.name}\n(GSE)`;
     }
   }
 
@@ -356,8 +369,15 @@ export class RiskFactorDataEntity implements RiskFactorData {
 
     const doseHand = this.percentageCheck(data.doseHand, '500');
 
-    // eslint-disable-next-line prettier/prettier
-    const prob =Math.max(doseFB, doseFBPublic, doseEye, doseEyePublic, doseSkin, doseHand, doseSkinPublic)
+    const prob = Math.max(
+      doseFB,
+      doseFBPublic,
+      doseEye,
+      doseEyePublic,
+      doseSkin,
+      doseHand,
+      doseSkinPublic,
+    );
     if (prob) {
       this.isQuantity = true;
       this.probability = prob;

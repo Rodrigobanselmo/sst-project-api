@@ -33,12 +33,19 @@ export const quantityHeatConverter = (
       const cells: bodyTableProps[] = [];
 
       let origin: string;
-      // eslint-disable-next-line prettier/prettier
-      if (riskData.homogeneousGroup.environment) origin = `${riskData.homogeneousGroup.environment.name}\n(${originRiskMap[riskData.homogeneousGroup.environment.type].name})`
-      // eslint-disable-next-line prettier/prettier
-      if (riskData.homogeneousGroup.characterization) origin =`${riskData.homogeneousGroup.characterization.name}\n(${originRiskMap[riskData.homogeneousGroup.characterization.type].name})`;
-      // eslint-disable-next-line prettier/prettier
-      if (!riskData.homogeneousGroup.type) origin = `${riskData.homogeneousGroup.name}\n(GSE)`;
+
+      if (riskData.homogeneousGroup.environment)
+        origin = `${riskData.homogeneousGroup.environment.name}\n(${
+          originRiskMap[riskData.homogeneousGroup.environment.type].name
+        })`;
+
+      if (riskData.homogeneousGroup.characterization)
+        origin = `${riskData.homogeneousGroup.characterization.name}\n(${
+          originRiskMap[riskData.homogeneousGroup.characterization.type].name
+        })`;
+
+      if (!riskData.homogeneousGroup.type)
+        origin = `${riskData.homogeneousGroup.name}\n(GSE)`;
 
       if (riskData.homogeneousGroup.type == HomoTypeEnum.HIERARCHY) {
         const hierarchy = hierarchyTree[riskData.homogeneousGroup.id];

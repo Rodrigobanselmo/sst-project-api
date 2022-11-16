@@ -65,6 +65,7 @@ enum EmployeeHierarchyMotiveTypeEnum {
   ADM
   TRANS
   ALOC
+  SUB_OFFICE
   PROM
   TRANS_PROM
   DEM
@@ -652,7 +653,6 @@ model DocumentPCMSO {
   coordinatorBy String?
   revisionBy String?
   approvedBy String?
-  // validity String?
   validityStart DateTime?
   validityEnd DateTime?
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
@@ -660,6 +660,7 @@ model DocumentPCMSO {
   status StatusEnum @default(PROGRESS)
   professionalsSignatures DocumentPCMSOToProfessional[]
   // usersSignatures RiskFactorGroupDataToUser[]
+  // validity String?
 
   @@unique([id, companyId])
 }
@@ -694,6 +695,7 @@ model Employee {
   hierarchyHistory EmployeeHierarchyHistory[]
   examsHistory EmployeeExamsHistory[]
   esocialEvents EmployeeESocialEvent[]
+  pppHistory EmployeePPPHistory[] 
   
   @@unique([id, companyId])
   @@unique([cpf, companyId])
@@ -714,6 +716,8 @@ model EmployeeHierarchyHistory {
   employeeId Int
   employee Employee @relation(fields: [employeeId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   deletedAt DateTime?
+
+  subHierarchies Hierarchy[] @relation(name: "sub_offices_history")
   // esocialCode String?
 
   @@index(deletedAt)
@@ -814,6 +818,8 @@ model EmployeeESocialEvent {
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   examHistoryId Int?
   exam EmployeeExamsHistory? @relation(fields: [examHistoryId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  pppId Int?
+  ppp EmployeePPPHistory? @relation(fields: [pppId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   // refType EmployeeESocialRefTypeEnum
   // @@index(refType)
   // @@index(employeeId)
@@ -821,6 +827,23 @@ model EmployeeESocialEvent {
   @@index(eventId)
   @@index(status)
   @@index(eventsDate)
+} 
+
+model EmployeePPPHistory {
+  id    Int   @id  @default(autoincrement())
+  created_at DateTime @default(now())
+  updated_at  DateTime   @updatedAt
+  doneDate DateTime?
+  status StatusEnum @default(DONE)
+  sendEvent Boolean @default(true) 
+
+  employeeId Int
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  events EmployeeESocialEvent[]
+
+  @@index(status)
+  @@index(employeeId)
+  // @@index(doneDate)
 } 
 
 model EngsToRiskFactorData {
@@ -877,6 +900,15 @@ model EpiToRiskFactorData {
   @@id([riskFactorDataId, epiId])
   @@map("_EpiToRiskFactorData")
 } 
+
+model EsocialTable24 {
+  id    String   @id
+  name String 
+  group String
+  type RiskFactorsEnum
+  isQuantity Boolean @default(false)
+  risks RiskFactors[]
+}
 
 model Exam {
   id    Int   @id  @default(autoincrement())
@@ -1014,8 +1046,9 @@ model Hierarchy {
   employees Employee[] 
   subOfficeEmployees Employee[] @relation(name: "sub_offices")
   hierarchyOnHomogeneous HierarchyOnHomogeneous[]
-  riskFactorDatas RiskFactorData[] 
+  riskFactorDatas RiskFactorData[] //! rmeove
   hierarchyHistory EmployeeHierarchyHistory[]
+  subHierarchyHistory EmployeeHierarchyHistory[] @relation(name: "sub_offices_history")
   employeeExamsHistory EmployeeExamsHistory[]
   employeeExamsHistorySubOffice EmployeeExamsHistory[] @relation(name: "subOffice_employee_exam")
   riskDocInfo RiskFactorsDocInfo[]
@@ -1239,6 +1272,9 @@ model RiskFactors {
   pe String?
   fraction String?
   tlv String?
+  esocialCode String?
+  coments String?
+  esocial EsocialTable24? @relation(fields: [esocialCode], references: [id], onDelete: Restrict, onUpdate: Cascade)
   isAso Boolean  @default(true)
   isPGR Boolean  @default(true)
   isPCMSO Boolean  @default(true)
@@ -1262,6 +1298,7 @@ model RiskFactors {
   json Json?
   
   @@unique([id, companyId])
+  @@index(esocialCode)
 }
 
 model RiskFactorsDocInfo {
@@ -1388,8 +1425,8 @@ model RiskFactorData {
   riskFactor RiskFactors @relation(fields: [riskId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   homogeneousGroupId String?
   homogeneousGroup HomogeneousGroup? @relation(fields: [homogeneousGroupId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  hierarchyId String?
-  hierarchy Hierarchy? @relation(fields: [hierarchyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  hierarchyId String? //! remove
+  hierarchy Hierarchy? @relation(fields: [hierarchyId], references: [id], onDelete: Cascade, onUpdate: Cascade) //! remove
   riskFactorGroupDataId String
   riskFactorGroupData RiskFactorGroupData @relation(fields: [riskFactorGroupDataId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   generateSources GenerateSource[]

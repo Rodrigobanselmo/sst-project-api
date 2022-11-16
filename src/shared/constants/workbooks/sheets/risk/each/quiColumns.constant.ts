@@ -93,6 +93,12 @@ export const quiColumnsConstant: ITableSchema[] = [
     checkHandler: checkIsString,
   },
   {
+    databaseName: 'coments',
+    excelName: 'Respirador/Filtro (Comentários)',
+    required: false,
+    checkHandler: checkIsString,
+  },
+  {
     databaseName: 'tlv',
     excelName: 'Base do TLV',
     required: false,

@@ -6,6 +6,7 @@ import {
   SexTypeEnum,
   StatusEnum,
 } from '@prisma/client';
+import { EmployeePPPHistoryEntity } from './employee-ppp-history.entity';
 import { CompanyEntity } from './company.entity';
 import { EmployeeExamsHistoryEntity } from './employee-exam-history.entity';
 import { EmployeeHierarchyHistoryEntity } from './employee-hierarchy-history.entity';
@@ -75,6 +76,7 @@ export class EmployeeEntity implements Employee {
   company?: CompanyEntity;
   examsHistory?: EmployeeExamsHistoryEntity[];
   hierarchyHistory?: EmployeeHierarchyHistoryEntity[];
+  pppHistory?: EmployeePPPHistoryEntity[];
 
   constructor(
     partial: Partial<Omit<EmployeeEntity, 'company'>> & {

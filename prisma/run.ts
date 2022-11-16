@@ -9,6 +9,7 @@ import { representAll } from './run/represent-all';
 import { CharacterizationPhotoRepository } from '../src/modules/company/repositories/implementations/CharacterizationPhotoRepository';
 import { deleteProfessionalsConnections } from './run/delete-professionals-connections';
 import { addProfCOuncilNUll } from './run/create-professional-council';
+import { seedEsocial24 } from './seed/read_24';
 
 const prisma = new PrismaClient();
 
@@ -40,16 +41,16 @@ async function main() {
     //await deleteWithNameCompany('Deletar', prisma);
     // await levelRiskData(prisma);
     // await representAll(prisma);
+    await seedEsocial24(prisma);
 
     // await deleteProfessionalsConnections(prisma);
     // await addProfCOuncilNUll(prisma);
 
-    const group = await prisma.employeeESocialEvent.groupBy({
-      by: ['status'],
-      _count: true,
-    });
+    // const group = await prisma.employeeESocialEvent.groupBy({
+    //   by: ['status'],
+    //   _count: true,
+    // });
 
-    console.log(group);
     console.log('end');
   } catch (err) {
     console.error(err);

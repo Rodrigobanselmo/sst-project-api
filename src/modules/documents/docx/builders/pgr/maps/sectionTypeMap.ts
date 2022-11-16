@@ -62,8 +62,20 @@ export class SectionsMapClass {
   private hierarchy: Map<string, HierarchyMapData>;
   private company: CompanyEntity;
 
-  // eslint-disable-next-line prettier/prettier
-  constructor({ variables,cover, company, version, logoImagePath, elementsMap, document, hierarchy, homogeneousGroup,environments,characterizations, consultantLogoImagePath }: IDocumentClassType) {
+  constructor({
+    variables,
+    cover,
+    company,
+    version,
+    logoImagePath,
+    elementsMap,
+    document,
+    hierarchy,
+    homogeneousGroup,
+    environments,
+    characterizations,
+    consultantLogoImagePath,
+  }: IDocumentClassType) {
     this.variables = variables;
     this.version = version;
     this.logoPath = logoImagePath;

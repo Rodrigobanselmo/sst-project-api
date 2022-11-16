@@ -166,7 +166,9 @@ export class HierarchyExcelProvider {
             ...newHierarchy[allHierarchy.id].workspaceIds,
             ...hierarchy.workspaceId,
           ],
-          { simpleCompare: true },
+          {
+            simpleCompare: true,
+          },
         );
       }
       if (parentId) newHierarchy[allHierarchy.id].parentId = parentId;

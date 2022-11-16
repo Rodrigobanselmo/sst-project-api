@@ -22,6 +22,16 @@ export class UpsertRiskDataService {
     delete upsertRiskDataDto.workspaceId;
     delete upsertRiskDataDto.type;
 
+    if ('startDate' in upsertRiskDataDto) {
+      if (!upsertRiskDataDto.startDate) upsertRiskDataDto.startDate = null;
+    }
+
+    if ('endDate' in upsertRiskDataDto) {
+      if (!upsertRiskDataDto.endDate) upsertRiskDataDto.endDate = null;
+    }
+
+    console.log(upsertRiskDataDto);
+
     const isTypeHierarchy = type && type == HomoTypeEnum.HIERARCHY;
     if (isTypeHierarchy)
       await hierarchyCreateHomo({

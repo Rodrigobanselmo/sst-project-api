@@ -2,6 +2,7 @@ import { checkIsTrue } from './../../../../utils/validators/checkIsTrue';
 import { ITableSchema } from '../../../../../shared/providers/ExcelProvider/models/IExcelProvider.types';
 import { checkIsNumber } from '../../../../../shared/utils/validators/checkIdNumber';
 import { checkIsString } from '../../../../../shared/utils/validators/checkIsString';
+import { checkIsXTrue } from '../../../../../shared/utils/validators/checkIsXTrue';
 
 export const riskColumnsConstant = [
   {
@@ -48,32 +49,40 @@ export const riskColumnsConstant = [
     databaseName: 'isPGR',
     excelName: 'PGR',
     required: false,
-    checkHandler: checkIsTrue,
-    notes: () => ['VERDADEIRO', 'FALSO'],
+    checkHandler: checkIsXTrue,
+    notes: () => ['Marcar com "X" para VERDADEIRO e vazio para falso'],
   },
   {
     isArray: false,
     databaseName: 'isPCMSO',
     excelName: 'PCMSO',
     required: false,
-    checkHandler: checkIsTrue,
-    notes: () => ['VERDADEIRO', 'FALSO'],
+    checkHandler: checkIsXTrue,
+    notes: () => ['Marcar com "X" para VERDADEIRO e vazio para falso'],
   },
   {
     isArray: false,
     databaseName: 'isAso',
     excelName: 'ASO',
     required: false,
-    checkHandler: checkIsTrue,
-    notes: () => ['VERDADEIRO', 'FALSO'],
+    checkHandler: checkIsXTrue,
+    notes: () => ['Marcar com "X" para VERDADEIRO e vazio para falso'],
   },
   {
     isArray: false,
     databaseName: 'isPPP',
     excelName: 'PPP',
     required: false,
-    checkHandler: checkIsTrue,
-    notes: () => ['VERDADEIRO', 'FALSO'],
+    checkHandler: checkIsXTrue,
+    notes: () => ['Marcar com "X" para VERDADEIRO e vazio para falso'],
+  },
+  {
+    isArray: false,
+    databaseName: 'esocialCode',
+    excelName: 'Código eSocial',
+    required: false,
+    checkHandler: checkIsString,
+    notes: () => ['Código proveniente da tabela 24 do eSocial'],
   },
   // {
   //   isId: true,

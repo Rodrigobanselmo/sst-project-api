@@ -3,7 +3,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 
 import { AuthModule } from './modules/auth/auth.module';
-import { ChecklistModule } from './modules/sst/sst.module';
+import { SSTModule } from './modules/sst/sst.module';
 import { CompanyModule } from './modules/company/company.module';
 import { DocumentsModule } from './modules/documents/documents.module';
 import { EsocialModule } from './modules/esocial/esocial.module';
@@ -21,7 +21,7 @@ import { RolesGuard } from './shared/guards/roles.guard';
     UsersModule,
     AuthModule,
     CompanyModule,
-    ChecklistModule,
+    SSTModule,
     FilesModule,
     DocumentsModule,
     EsocialModule,

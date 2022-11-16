@@ -92,10 +92,13 @@ export class HomoGroupRepository {
           if (endDate && !startDate) {
             if (hg.startDate && !hg.endDate && hg.startDate < endDate) {
               hierarchyOnHomogeneous[hg.hierarchyId + hg.workspaceId] = {};
-              // eslint-disable-next-line prettier/prettier
-              hierarchyOnHomogeneous[hg.hierarchyId+hg.workspaceId].id = hg.id;
-              // eslint-disable-next-line prettier/prettier
-              hierarchyOnHomogeneous[hg.hierarchyId+hg.workspaceId].startDate = undefined;
+
+              hierarchyOnHomogeneous[hg.hierarchyId + hg.workspaceId].id =
+                hg.id;
+
+              hierarchyOnHomogeneous[
+                hg.hierarchyId + hg.workspaceId
+              ].startDate = undefined;
               return;
             }
           }

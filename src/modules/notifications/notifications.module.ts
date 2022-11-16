@@ -1,7 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { SendGridProvider } from '../../shared/providers/MailProvider/implementations/SendGrid/SendGridProvider';
 
-import { ChecklistModule } from '../sst/sst.module';
+import { SSTModule } from '../sst/sst.module';
 import { CompanyModule } from '../company/company.module';
 import { NotificationController } from './controller/notification.controller';
 import { NotificationRepository } from './repositories/implementations/NotificationRepository';
@@ -13,7 +13,7 @@ import { UpdateUserNotificationService } from './services/update-user-notificati
 
 @Module({
   controllers: [NotificationController],
-  imports: [forwardRef(() => CompanyModule), forwardRef(() => ChecklistModule)],
+  imports: [forwardRef(() => CompanyModule), forwardRef(() => SSTModule)],
   exports: [NotificationRepository],
   providers: [
     SendEmailService,
