@@ -24,6 +24,17 @@ import { HierarchyEnum, HomogeneousGroup } from '@prisma/client';
 import { RiskFactorsEntity } from '../../../../../../modules/sst/entities/risk.entity';
 import { DayJSProvider } from '../../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 
+interface ITimeline {
+  remove?: boolean;
+  date: Date;
+  id: string;
+}
+
+interface IHomoRiskData {
+  riskDataIds: string[];
+  timeline: ITimeline[];
+}
+
 @Injectable()
 export class FindEvents2240ESocialService {
   private end = true;
@@ -54,8 +65,8 @@ export class FindEvents2240ESocialService {
 
     const companyFound = await this.getCompany(companyId);
     const homogeneousTree = await this.getHomoTree(companyFound);
-    const riskDataTree = await this.getRiskData(companyFound, homogeneousTree);
-    const hierarchyTree = await this.getHierarchyTree(companyFound, riskDataTree);
+    const { riskDataTree, homoTimelineTree } = await this.getRiskData(companyFound, homogeneousTree);
+    const hierarchyTree = await this.getHierarchyTree(companyFound);
 
     const employeeTree = {} as Record<string, EmployeeEntity & { actualPPPHistory?: EmployeePPPHistoryEntity[] }>;
     companyFound.employees.forEach((employee) => {
@@ -63,7 +74,7 @@ export class FindEvents2240ESocialService {
 
       employee.hierarchyHistory.forEach((history, index) => {
         const startDate = this.onGetDate(history.startDate);
-        const endDate = this.onGetDate(employee.hierarchyHistory[index + 1].startDate);
+        const endDate = this.onGetDate(employee.hierarchyHistory[index + 1]?.startDate);
 
         timeline[this.dayjsProvider.format(startDate, 'YYYYMMDD')] = {};
         if (endDate) timeline[this.dayjsProvider.format(endDate, 'YYYYMMDD')] = {};
@@ -80,31 +91,7 @@ export class FindEvents2240ESocialService {
           const hhStartDate = this.onGetDate(hh.startDate);
           const hhEndDate = this.onGetDate(hh.endDate, true);
 
-          const isValidOnStart = this.isDateBetween(startDate, hhStartDate, hhEndDate);
-          const isValidOnEnd = this.isDateBetween(endDate, hhStartDate, hhEndDate);
-
-          if (!isValidOnStart && !isValidOnEnd) return;
-
-          let actualStart = startDate;
-          if (!isValidOnStart) actualStart = hhStartDate;
-          let actualEnd = endDate;
-          if (!isValidOnEnd) actualEnd = hhEndDate;
-
-          hh.homogeneousGroup.riskFactorData.forEach((riskData) => {
-            const rdStartDate = this.onGetDate(riskData.startDate);
-            const rdEndDate = this.onGetDate(riskData.endDate, true);
-
-            const isValidOnStart = this.isDateBetween(actualStart, rdStartDate, rdEndDate);
-            const isValidOnEnd = this.isDateBetween(actualEnd, rdStartDate, rdEndDate);
-
-            if (!isValidOnStart && !isValidOnEnd) return;
-
-            if (!isValidOnStart) {
-            }
-
-            if (!isValidOnEnd) {
-            }
-          });
+          const timeline = this.cutTimeline(homoTimelineTree[hh.homogeneousGroupId].timeline, [endDate, hhEndDate], hhStartDate);
         });
 
         // hierarchyOnHomogeneous.
@@ -142,7 +129,7 @@ export class FindEvents2240ESocialService {
     //     xml: xmlResult,
     //   }[];
 
-    return hierarchyTree;
+    return homoTimelineTree as any;
 
     // return riskDataReturn.map((riskData) => new RiskFactorDataEntity(riskData));
 
@@ -300,14 +287,27 @@ export class FindEvents2240ESocialService {
       companyId,
     });
 
-    const riskDataTree = {} as Record<string, RiskFactorDataEntity[]>;
-    riskData.forEach((rd) => {
-      if (!riskDataTree[rd.homogeneousGroupId]) riskDataTree[rd.homogeneousGroupId] = [];
+    const homoTimelineTree = {} as Record<string, IHomoRiskData>;
+    const riskDataTree = {} as Record<string, RiskFactorDataEntity>;
 
-      riskDataTree[rd.homogeneousGroupId].push(rd);
+    riskData.forEach((rd) => {
+      if (!homoTimelineTree[rd.homogeneousGroupId]) homoTimelineTree[rd.homogeneousGroupId] = { riskDataIds: [], timeline: [] };
+      homoTimelineTree[rd.homogeneousGroupId].riskDataIds.push(rd.id);
+      homoTimelineTree[rd.homogeneousGroupId].timeline.push(...this.addTimeline(rd));
+
+      riskDataTree[rd.id] = rd;
     });
 
-    return riskDataTree;
+    company.hierarchy.forEach((hierarchy) => {
+      const prioritization = originRiskMap[hierarchy.type]?.prioritization;
+      hierarchy.hierarchyOnHomogeneous.forEach((hierOnHomo) => {
+        homoTimelineTree?.[hierOnHomo.homogeneousGroupId]?.riskDataIds?.forEach((id) => {
+          if (prioritization && !riskDataTree[id].prioritization) riskDataTree[id].prioritization = prioritization;
+        });
+      });
+    });
+
+    return { homoTimelineTree, riskDataTree };
   }
 
   async getRisks(company: CompanyEntity) {
@@ -384,26 +384,9 @@ export class FindEvents2240ESocialService {
     return homoTree;
   }
 
-  async getHierarchyTree(company: CompanyEntity, riskDataTree: Record<string, RiskFactorDataEntity[]>) {
+  async getHierarchyTree(company: CompanyEntity) {
     const hierarchyTree = {} as Record<string, HierarchyEntity>;
-    company.hierarchy.forEach((hierarchy) => {
-      const prioritization = originRiskMap[hierarchy.type]?.prioritization;
-
-      hierarchyTree[hierarchy.id] = {
-        hierarchyOnHomogeneous: hierarchy.hierarchyOnHomogeneous.map((hierOnHomo) => {
-          hierOnHomo.homogeneousGroup = {
-            riskFactorData:
-              riskDataTree?.[hierOnHomo.homogeneousGroupId]?.map((rd) => {
-                if (prioritization && !rd.prioritization) rd.prioritization = prioritization;
-                return rd;
-              }) || [],
-          } as HomoGroupEntity;
-
-          return hierOnHomo;
-        }),
-        ...hierarchy,
-      };
-    });
+    // const riskDataTree = {} as Record<string, RiskFactorDataEntity>;
 
     const hierarchies = company.hierarchy
       .map((h) => {
@@ -438,40 +421,34 @@ export class FindEvents2240ESocialService {
       })
       .filter((i) => i);
 
-    const hierarchiesTree = {} as Record<string, HierarchyEntity & { timeline: ReturnType<typeof this.addTimeline> }>;
-    hierarchies.forEach((rd) => {
-      const timeline: ReturnType<typeof this.addTimeline>[] = [];
-      rd.hierarchyOnHomogeneous.forEach((hh) => {
-        const startDate = this.onGetDate(hh.startDate);
-        const endDate = this.onGetDate(hh.endDate, this.end);
+    const hierarchiesTree = {} as Record<string, HierarchyEntity>;
+    hierarchies.forEach((h) => {
+      hierarchiesTree[h.id] = h;
 
-        hh.homogeneousGroup.riskFactorData.forEach((rd) => {
-          const rdStartDate = this.onGetDate(rd.startDate);
-          const rdEndDate = this.onGetDate(rd.endDate, this.end);
-
-          const isValidOnStart = this.isDateBetween(startDate, rdStartDate, rdEndDate);
-          const isValidOnEnd = this.isDateBetween(endDate, rdStartDate, rdEndDate);
-
-          if (!isValidOnStart && !isValidOnEnd) return;
-
-          if (!isValidOnStart) {
-            timeline.push(this.addTimeline(rdStartDate, rd.id, this.start));
-            if (endDate) timeline.push(this.addTimeline(endDate, rd.id, this.end));
-            return;
-          }
-
-          if (!isValidOnEnd) {
-            timeline.push(this.addTimeline(startDate, rd.id, this.start));
-            if (rdEndDate) timeline.push(this.addTimeline(rdEndDate, rd.id, this.end));
-            return;
-          }
-
-          timeline.push(this.addTimeline(startDate, rd.id, this.start));
-          if (endDate) timeline.push(this.addTimeline(endDate, rd.id, this.end));
-        });
-      });
-
-      hierarchiesTree[rd.id] = { ...rd, timeline: timeline.sort((a, b) => sortNumber(a.date, b.date)) };
+      // const timeline: ReturnType<typeof this.addTimelineItem>[] = [];
+      // rd.hierarchyOnHomogeneous.forEach((hh) => {
+      //   const startDate = this.onGetDate(hh.startDate);
+      //   const endDate = this.onGetDate(hh.endDate, this.end);
+      //   hh.homogeneousGroup.riskFactorData.forEach((rd) => {
+      //     const rdStartDate = this.onGetDate(rd.startDate);
+      //     const rdEndDate = this.onGetDate(rd.endDate, this.end);
+      //     const isValidOnStart = this.isDateBetween(startDate, rdStartDate, rdEndDate);
+      //     const isValidOnEnd = this.isDateBetween(endDate, rdStartDate, rdEndDate);
+      //     if (!isValidOnStart && !isValidOnEnd) return;
+      //     if (!isValidOnStart) {
+      //       timeline.push(this.addTimelineItem(rdStartDate, rd.id, this.start));
+      //       if (endDate) timeline.push(this.addTimelineItem(endDate, rd.id, this.end));
+      //       return;
+      //     }
+      //     if (!isValidOnEnd) {
+      //       timeline.push(this.addTimelineItem(startDate, rd.id, this.start));
+      //       if (rdEndDate) timeline.push(this.addTimelineItem(rdEndDate, rd.id, this.end));
+      //       return;
+      //     }
+      //     timeline.push(this.addTimelineItem(startDate, rd.id, this.start));
+      //     if (endDate) timeline.push(this.addTimelineItem(endDate, rd.id, this.end));
+      //   });
+      // });
     });
 
     return hierarchiesTree;
@@ -596,7 +573,7 @@ export class FindEvents2240ESocialService {
   onGetDate = (date: Date | null, isEnd?: boolean) => {
     const nullV = isEnd ? null : new Date(0);
     if (!date) return nullV;
-    return new Date(date) || nullV;
+    return date || nullV;
   };
 
   isDateBetween = (date: Date | null, startDate: Date | null, endDate: Date | null) => {
@@ -624,11 +601,37 @@ export class FindEvents2240ESocialService {
     return false;
   };
 
-  addTimeline = (date: Date, id: string, isEnd: boolean) => {
+  cutTimeline = (timeline: ITimeline[], endDates: Date[], startDate: Date) => {
+    const startRemoveDate = {};
+    return timeline.filter((tLine) => {
+      const isBeforeStart = tLine.date < startDate;
+      const isAfterEnd = endDates.some((endDate) => endDate && tLine.date && tLine.date >= endDate);
+
+      if (isBeforeStart) {
+        // startRemoveDate[tLine.id]
+      }
+
+      return !isAfterEnd;
+    });
+  };
+
+  addTimeline = (rd: RiskFactorDataEntity): ITimeline[] => {
+    const timeline: ITimeline[] = [];
+
+    const startDate = this.onGetDate(rd.startDate);
+    const endDate = this.onGetDate(rd.endDate, this.end);
+
+    timeline.push(this.addTimelineItem(startDate, rd.id, this.start));
+    if (endDate) timeline.push(this.addTimelineItem(endDate, rd.id, this.end));
+
+    return timeline;
+  };
+
+  addTimelineItem = (date: Date, id: string, isEnd: boolean): ITimeline => {
     return {
       date,
       id,
-      remove: isEnd,
+      ...(isEnd && { remove: isEnd }),
     };
   };
 }
