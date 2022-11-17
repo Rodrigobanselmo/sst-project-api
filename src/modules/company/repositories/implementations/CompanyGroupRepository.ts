@@ -59,6 +59,7 @@ export class CompanyGroupRepository {
       },
       where: { id_companyId: { id: id || 0, companyId } },
       include: {
+        companyGroup: { select: { id: true } },
         doctorResponsible: {
           include: {
             professional: {
@@ -101,6 +102,7 @@ export class CompanyGroupRepository {
     const group = await this.prisma.companyGroup.findFirst({
       where: { companyId, id },
       include: {
+        companyGroup: { select: { id: true } },
         doctorResponsible: {
           include: {
             professional: {
@@ -145,6 +147,53 @@ export class CompanyGroupRepository {
       AND: [{ companyId }],
     } as typeof options.where;
 
+    options.select = {
+      companyGroup: { select: { id: true } },
+      description: true,
+      companyId: true,
+      name: true,
+      id: true,
+      blockResignationExam: true,
+      numAsos: true,
+      esocialSend: true,
+      esocialStart: true,
+      doctorResponsibleId: true,
+      tecResponsibleId: true,
+      doctorResponsible: {
+        include: {
+          professional: {
+            select: {
+              name: true,
+              id: true,
+              type: true,
+              cpf: true,
+              userId: true,
+              companyId: true,
+              email: true,
+              phone: true,
+            },
+          },
+        },
+      },
+      tecResponsible: {
+        include: {
+          professional: {
+            select: {
+              name: true,
+              id: true,
+              type: true,
+              cpf: true,
+              userId: true,
+              companyId: true,
+              email: true,
+              phone: true,
+            },
+          },
+        },
+      },
+      ...options.select,
+    };
+
     if ('search' in query) {
       (where.AND as any).push({
         OR: [{ name: { contains: query.search, mode: 'insensitive' } }],
@@ -172,40 +221,6 @@ export class CompanyGroupRepository {
         take: pagination.take || 20,
         skip: pagination.skip || 0,
         orderBy: { name: 'asc' },
-        include: {
-          doctorResponsible: {
-            include: {
-              professional: {
-                select: {
-                  name: true,
-                  id: true,
-                  type: true,
-                  cpf: true,
-                  userId: true,
-                  companyId: true,
-                  email: true,
-                  phone: true,
-                },
-              },
-            },
-          },
-          tecResponsible: {
-            include: {
-              professional: {
-                select: {
-                  name: true,
-                  id: true,
-                  type: true,
-                  cpf: true,
-                  userId: true,
-                  companyId: true,
-                  email: true,
-                  phone: true,
-                },
-              },
-            },
-          },
-        },
       }),
     ]);
 

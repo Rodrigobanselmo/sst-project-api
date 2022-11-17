@@ -22,11 +22,19 @@ export class CompanyGroupEntity implements CompanyGroup {
   tecResponsibleId: number;
   doctorResponsible?: Partial<ProfessionalEntity & ProfessionalCouncil>;
   tecResponsible?: Partial<ProfessionalEntity & ProfessionalCouncil>;
+  ambResponsible?: Partial<ProfessionalEntity & ProfessionalCouncil>;
   company?: Partial<CompanyEntity>;
   cert?: CompanyCertEntity;
+  companyGroup?: Partial<CompanyEntity>;
 
   constructor(partial: Partial<CompanyGroupEntity>) {
     Object.assign(this, partial);
+
+    if (this.companyGroup) {
+      this.companyGroup = new CompanyEntity(this.companyGroup);
+
+      this.ambResponsible = this.companyGroup.ambResponsible;
+    }
 
     if (this.company) {
       this.cert = this.company?.cert;

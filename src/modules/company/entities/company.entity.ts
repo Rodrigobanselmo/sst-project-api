@@ -1,3 +1,4 @@
+import { ProfessionalResponsibleEntity } from './../../users/entities/professional-responsible.entity';
 import { RiskFactorsEntity } from './../../sst/entities/risk.entity';
 import { ExamToClinicEntity } from '../../sst/entities/examToClinic';
 import { RiskFactorGroupDataEntity } from '../../sst/entities/riskGroupData.entity';
@@ -143,9 +144,17 @@ export class CompanyEntity implements Company {
 
   doctorResponsible?: Partial<ProfessionalEntity>;
   tecResponsible?: Partial<ProfessionalEntity>;
+  professionalsResponsibles?: Partial<ProfessionalResponsibleEntity>[];
+  ambResponsible?: Partial<ProfessionalEntity & ProfessionalCouncil>;
 
   constructor(partial: Partial<CompanyEntity>) {
     Object.assign(this, partial);
+
+    if (this.professionalsResponsibles) {
+      this.professionalsResponsibles = this.professionalsResponsibles.map((p) => new ProfessionalResponsibleEntity(p));
+      const professional = this.professionalsResponsibles.find((p) => p.type === 'AMB')?.professional;
+      this.ambResponsible = professional;
+    }
 
     if (this.primary_activity && this.primary_activity[0]) {
       this.riskDegree = this.primary_activity[0].riskDegree;
