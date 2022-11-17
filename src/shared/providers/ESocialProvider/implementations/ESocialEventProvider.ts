@@ -3,7 +3,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { EmployeeESocialEventActionEnum, ExamHistoryTypeEnum, StatusEnum } from '@prisma/client';
 import clone from 'clone';
 import { Client } from 'nestjs-soap';
-import { IEvent3000Props } from 'src/modules/esocial/interfaces/event-3000';
+import { IEvent3000Props } from '../../../../modules/esocial/interfaces/event-3000';
 import { js2xml } from 'xml-js';
 
 import { EmployeeEntity } from '../../../../modules/company/entities/employee.entity';

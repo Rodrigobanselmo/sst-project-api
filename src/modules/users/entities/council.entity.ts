@@ -1,7 +1,7 @@
 import { ProfessionalEntity } from './professional.entity';
 import { ProfessionalCouncil } from '.prisma/client';
 
-export class CouncilEntity implements ProfessionalCouncil {
+export class ProfessionalCouncilEntity implements ProfessionalCouncil {
   id: number;
   councilType: string;
   councilUF: string;
@@ -11,7 +11,7 @@ export class CouncilEntity implements ProfessionalCouncil {
   professionalId: number;
   professional: ProfessionalEntity;
 
-  constructor(partial: Partial<CouncilEntity>) {
+  constructor(partial: Partial<ProfessionalCouncilEntity>) {
     Object.assign(this, partial);
   }
 }

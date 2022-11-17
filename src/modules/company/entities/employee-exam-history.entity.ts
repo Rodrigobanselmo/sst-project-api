@@ -1,5 +1,5 @@
 import { EmployeeESocialEventEntity } from './../../esocial/entities/employeeEsocialEvent.entity';
-import { CouncilEntity } from './../../users/entities/council.entity';
+import { ProfessionalCouncilEntity } from './../../users/entities/council.entity';
 import {
   EmployeeExamsHistory,
   ExamHistoryEvaluationEnum,

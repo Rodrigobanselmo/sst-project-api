@@ -13,7 +13,18 @@ export class CreateSubHierarchyService {
 
   async execute(hierarchy: CreateSubHierarchyDto, user: UserPayloadDto) {
     const employees = await this.employeeRepository.findNude({
-      include: { hierarchy: { include: { workspaces: true } } },
+      select: {
+        hierarchyId: true,
+        id: true,
+        hierarchy: {
+          select: {
+            workspaces: { select: { id: true } },
+            description: true,
+            id: true,
+          },
+        },
+        hierarchyHistory: { orderBy: { startDate: 'desc' }, take: 1, select: { id: true } },
+      },
       where: {
         companyId: user.targetCompanyId,
         id: { in: hierarchy.employeesIds || [] },
@@ -38,6 +49,9 @@ export class CreateSubHierarchyService {
       type: HierarchyEnum.SUB_OFFICE,
       workspaceIds: workspaceIds,
       id: hierarchy.id,
+      historyIds: employees.reduce((acc, employee) => {
+        return [...acc, ...employee.hierarchyHistory.map((e) => e.id)];
+      }, [] as number[]),
     });
 
     return {

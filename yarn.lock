@@ -1630,6 +1630,11 @@
     "@types/mime" "^1"
     "@types/node" "*"
 
+"@types/sort-array@^4.1.0":
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/@types/sort-array/-/sort-array-4.1.0.tgz#daff70c883a3fb9a7d0539fdea7ff582562ebbbf"
+  integrity sha512-mnk6jrs36bAavj7EPYTzBEWqdybrzjS8muhV9knFY0YOCsI5HpBeq3+gN/E/nTSZxTKgSoW7+xVCrlTyD6+Rxw==
+
 "@types/stack-utils@^2.0.0":
   version "2.0.1"
   resolved "https://registry.npmjs.org/@types/stack-utils/-/stack-utils-2.0.1.tgz"
@@ -2133,6 +2138,11 @@ argparse@^1.0.7:
   integrity sha512-o5Roy6tNG4SL/FOkCAN6RzjiakZS25RLYFrcMttJqbdd8BWrnA+fGz57iN5Pb06pvBGvl5gQ0B48dJlslXvoTg==
   dependencies:
     sprintf-js "~1.0.2"
+
+array-back@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/array-back/-/array-back-5.0.0.tgz#e196609edcec48376236d163958df76e659a0d36"
+  integrity sha512-kgVWwJReZWmVuWOQKEOohXKJX+nD02JAZ54D1RRWlv8L0NebauKAaFxACKzB74RTclt1+WNz5KHaLRDAPZbDEw==
 
 array-flatten@1.1.1:
   version "1.1.1"
@@ -6885,6 +6895,14 @@ soap@^0.45.0:
     whatwg-mimetype "3.0.0"
     xml-crypto "^2.1.3"
 
+sort-array@^4.1.5:
+  version "4.1.5"
+  resolved "https://registry.yarnpkg.com/sort-array/-/sort-array-4.1.5.tgz#64b92aaba222aec606786f4df28ae4e3e3e68313"
+  integrity sha512-Ya4peoS1fgFN42RN1REk2FgdNOeLIEMKFGJvs7VTP3OklF8+kl2SkpVliZ4tk/PurWsrWRsdNdU+tgyOBkB9sA==
+  dependencies:
+    array-back "^5.0.0"
+    typical "^6.0.1"
+
 source-map-support@0.5.20, source-map-support@^0.5.6, source-map-support@~0.5.20:
   version "0.5.20"
   resolved "https://registry.npmjs.org/source-map-support/-/source-map-support-0.5.20.tgz"
@@ -7502,6 +7520,11 @@ typescript@^4.3.5:
   version "4.4.4"
   resolved "https://registry.npmjs.org/typescript/-/typescript-4.4.4.tgz"
   integrity sha512-DqGhF5IKoBl8WNf8C1gu8q0xZSInh9j1kJJMqT3a94w1JzVaBU4EXOSMrz9yDqMT0xt3selp83fuFMQ0uzv6qA==
+
+typical@^6.0.1:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/typical/-/typical-6.0.1.tgz#89bd1a6aa5e5e96fa907fb6b7579223bff558a06"
+  integrity sha512-+g3NEp7fJLe9DPa1TArHm9QAA7YciZmWnfAqEaFrBihQ7epOv9i99rjtgb6Iz0wh3WuQDjsCTDfgRoGnmHN81A==
 
 uglify-js@^3.1.4:
   version "3.14.3"

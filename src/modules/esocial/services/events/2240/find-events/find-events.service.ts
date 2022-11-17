@@ -23,6 +23,7 @@ import { HierarchyOnHomogeneousEntity, HomoGroupEntity } from '../../../../../co
 import { HierarchyEnum, HomogeneousGroup } from '@prisma/client';
 import { RiskFactorsEntity } from '../../../../../../modules/sst/entities/risk.entity';
 import { DayJSProvider } from '../../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
+import sortArray from 'sort-array';
 
 interface ITimeline {
   remove?: boolean;
@@ -30,9 +31,9 @@ interface ITimeline {
   id: string;
 }
 
-interface IHomoRiskData {
-  riskDataIds: string[];
-  timeline: ITimeline[];
+interface IBreakPointPPP {
+  riskData: RiskFactorDataEntity[];
+  date: Date;
 }
 
 @Injectable()
@@ -65,14 +66,14 @@ export class FindEvents2240ESocialService {
 
     const companyFound = await this.getCompany(companyId);
     const homogeneousTree = await this.getHomoTree(companyFound);
-    const { riskDataTree, homoTimelineTree } = await this.getRiskData(companyFound, homogeneousTree);
+    const homoRiskDataTree = await this.getRiskData(companyFound, homogeneousTree);
     const hierarchyTree = await this.getHierarchyTree(companyFound);
 
     const employeeTree = {} as Record<string, EmployeeEntity & { actualPPPHistory?: EmployeePPPHistoryEntity[] }>;
-    companyFound.employees.forEach((employee) => {
+    [companyFound.employees.find((e) => e.id == 5920)].forEach((employee) => {
       const timeline = {};
-
       employee.hierarchyHistory.forEach((history, index) => {
+        if (history.motive == 'DEM') return;
         const startDate = this.onGetDate(history.startDate);
         const endDate = this.onGetDate(employee.hierarchyHistory[index + 1]?.startDate);
 
@@ -87,18 +88,25 @@ export class FindEvents2240ESocialService {
             return [...acc, ...curr];
           }, []);
 
-        hierarchyOnHomogeneous.forEach((hh) => {
+        const pppSnapshot: Record<string, IBreakPointPPP> = {};
+        if (startDate) pppSnapshot[this.onGetStringDate(startDate)] = { riskData: [], date: startDate };
+
+        const riskTimeline = hierarchyOnHomogeneous.reduce<RiskFactorDataEntity[]>((acc, hh) => {
           const hhStartDate = this.onGetDate(hh.startDate);
-          const hhEndDate = this.onGetDate(hh.endDate, true);
+          const hhEndDate = this.onGetDate(hh.endDate);
 
-          const timeline = this.cutTimeline(homoTimelineTree[hh.homogeneousGroupId].timeline, [endDate, hhEndDate], hhStartDate);
-        });
+          const { timeline, breakPoint } = this.cutTimeline(homoRiskDataTree[hh.homogeneousGroupId], endDate, [endDate, hhEndDate], [startDate, hhStartDate]);
 
-        // hierarchyOnHomogeneous.
+          Object.assign(pppSnapshot, breakPoint);
 
-        //
-        (history as any).hierarchyOnHomogeneous = '';
-        return history;
+          return [...acc, ...timeline];
+        }, [] as RiskFactorDataEntity[]);
+
+        const timelinePPPSnapshots = this.createTimelinePPPSnapshot(riskTimeline, pppSnapshot);
+
+        // (history as any).riskTimeline = this.onGetRisks(riskTimeline);
+        (history as any).riskTimeline = riskTimeline;
+        (history as any).pppSnapshot = pppSnapshot;
       });
 
       employeeTree[employee.id] = {
@@ -129,32 +137,7 @@ export class FindEvents2240ESocialService {
     //     xml: xmlResult,
     //   }[];
 
-    return homoTimelineTree as any;
-
-    // return riskDataReturn.map((riskData) => new RiskFactorDataEntity(riskData));
-
-    // const employees = await this.employeeRepository.findNude({
-    //   where: {
-    //     companyId,
-    //     OR: [
-    //       { pppHistory: { none: { id: { gt: 0 } } } },
-    //       { pppHistory: { some: { sendEvent: true } } },
-    //     ],
-    //   },
-    //   select: {
-    //     id: true,
-    //     cpf: true,
-    //     pppHistory: true,
-    //     esocialCode: true,
-    //     hierarchyHistory: {
-    //       select: {
-    //         id: true,
-    //         startDate: true,
-    //         subHierarchies: { select: { id: true } },
-    //       },
-    //     },
-    //   },
-    // });
+    return employeeTree;
 
     // check hierarchy ppp risks if
     // -> risk data has been added / edited
@@ -165,10 +148,8 @@ export class FindEvents2240ESocialService {
 
     // check employee ppp risks if
     // -> hierarchy has been added / edited
+    // -> amb. engineering changed
     // ->
-    // ->
-
-    // return riskDataReturn.map((riskData) => new RiskFactorDataEntity(riskData));
 
     return;
 
@@ -257,6 +238,7 @@ export class FindEvents2240ESocialService {
           select: {
             endDate: true,
             startDate: true,
+            probability: true,
             homogeneousGroupId: true,
             id: true,
             level: true,
@@ -270,6 +252,7 @@ export class FindEvents2240ESocialService {
     const riskDataAll: RiskFactorDataEntity[] = [];
 
     risks.forEach((risk) => {
+      delete risk.vmp;
       risk.riskFactorData.forEach((_riskData) => {
         const riskCopy = clone(risk);
         riskCopy.riskFactorData = undefined;
@@ -287,13 +270,19 @@ export class FindEvents2240ESocialService {
       companyId,
     });
 
-    const homoTimelineTree = {} as Record<string, IHomoRiskData>;
+    const homoRiskDataIdsTree = {} as Record<string, string[]>;
     const riskDataTree = {} as Record<string, RiskFactorDataEntity>;
+    const homoRiskDataTree = {} as Record<string, RiskFactorDataEntity[]>;
 
     riskData.forEach((rd) => {
-      if (!homoTimelineTree[rd.homogeneousGroupId]) homoTimelineTree[rd.homogeneousGroupId] = { riskDataIds: [], timeline: [] };
-      homoTimelineTree[rd.homogeneousGroupId].riskDataIds.push(rd.id);
-      homoTimelineTree[rd.homogeneousGroupId].timeline.push(...this.addTimeline(rd));
+      if (rd.riskFactor?.docInfo) delete rd.riskFactor.docInfo;
+      delete rd.progress;
+      delete rd.epis;
+      delete rd.engs;
+      delete rd.exams;
+
+      if (!homoRiskDataIdsTree[rd.homogeneousGroupId]) homoRiskDataIdsTree[rd.homogeneousGroupId] = [];
+      homoRiskDataIdsTree[rd.homogeneousGroupId].push(rd.id);
 
       riskDataTree[rd.id] = rd;
     });
@@ -301,78 +290,21 @@ export class FindEvents2240ESocialService {
     company.hierarchy.forEach((hierarchy) => {
       const prioritization = originRiskMap[hierarchy.type]?.prioritization;
       hierarchy.hierarchyOnHomogeneous.forEach((hierOnHomo) => {
-        homoTimelineTree?.[hierOnHomo.homogeneousGroupId]?.riskDataIds?.forEach((id) => {
+        homoRiskDataIdsTree?.[hierOnHomo.homogeneousGroupId]?.forEach((id) => {
           if (prioritization && !riskDataTree[id].prioritization) riskDataTree[id].prioritization = prioritization;
         });
       });
     });
 
-    return { homoTimelineTree, riskDataTree };
-  }
+    Object.values(riskDataTree).forEach((rd) => {
+      if (!homoRiskDataTree[rd.homogeneousGroupId]) homoRiskDataTree[rd.homogeneousGroupId] = [];
+      rd.startDate = this.onGetDate(rd.startDate);
+      rd.endDate = this.onGetDate(rd.endDate);
 
-  async getRisks(company: CompanyEntity) {
-    const companyId = company.id;
-
-    const risksFound = await this.riskRepository.findNude({
-      where: {
-        representAll: false, // remove standard risk
-        riskFactorData: { some: { companyId } },
-      },
-      select: {
-        name: true,
-        severity: true,
-        type: true,
-        representAll: true,
-        id: true,
-        isPPP: true,
-        docInfo: {
-          where: {
-            AND: [
-              {
-                OR: [
-                  { companyId },
-                  {
-                    company: {
-                      applyingServiceContracts: {
-                        some: { receivingServiceCompanyId: companyId },
-                      },
-                    },
-                  },
-                ],
-              },
-            ],
-          },
-          select: { isPPP: true, hierarchyId: true, riskId: true },
-        },
-        riskFactorData: {
-          where: {
-            companyId,
-          },
-          select: {
-            endDate: true,
-            startDate: true,
-            homogeneousGroupId: true,
-            id: true,
-            level: true,
-            riskId: true,
-            json: true,
-          },
-        },
-      },
+      homoRiskDataTree[rd.homogeneousGroupId].push(rd);
     });
 
-    const riskDataAll: RiskFactorDataEntity[] = [];
-
-    const risks = risksFound.map((risk) => {
-      risk.riskFactorData = checkRiskDataDoc(risk.riskFactorData, {
-        docType: 'isPPP',
-        companyId,
-      });
-
-      return risk;
-    });
-
-    return risks;
+    return homoRiskDataTree;
   }
 
   async getHomoTree(company: CompanyEntity) {
@@ -386,7 +318,6 @@ export class FindEvents2240ESocialService {
 
   async getHierarchyTree(company: CompanyEntity) {
     const hierarchyTree = {} as Record<string, HierarchyEntity>;
-    // const riskDataTree = {} as Record<string, RiskFactorDataEntity>;
 
     const hierarchies = company.hierarchy
       .map((h) => {
@@ -412,11 +343,6 @@ export class FindEvents2240ESocialService {
 
         h.hierarchyOnHomogeneous = hierOnHomo;
 
-        // const riskFactorData = hierOnHomo.reduce((acc, homo) => {
-        //   acc = [...acc, ...homo.homogeneousGroup.riskFactorData];
-        //   return acc;
-        // }, [] as RiskFactorDataEntity[]);
-
         return h;
       })
       .filter((i) => i);
@@ -424,31 +350,6 @@ export class FindEvents2240ESocialService {
     const hierarchiesTree = {} as Record<string, HierarchyEntity>;
     hierarchies.forEach((h) => {
       hierarchiesTree[h.id] = h;
-
-      // const timeline: ReturnType<typeof this.addTimelineItem>[] = [];
-      // rd.hierarchyOnHomogeneous.forEach((hh) => {
-      //   const startDate = this.onGetDate(hh.startDate);
-      //   const endDate = this.onGetDate(hh.endDate, this.end);
-      //   hh.homogeneousGroup.riskFactorData.forEach((rd) => {
-      //     const rdStartDate = this.onGetDate(rd.startDate);
-      //     const rdEndDate = this.onGetDate(rd.endDate, this.end);
-      //     const isValidOnStart = this.isDateBetween(startDate, rdStartDate, rdEndDate);
-      //     const isValidOnEnd = this.isDateBetween(endDate, rdStartDate, rdEndDate);
-      //     if (!isValidOnStart && !isValidOnEnd) return;
-      //     if (!isValidOnStart) {
-      //       timeline.push(this.addTimelineItem(rdStartDate, rd.id, this.start));
-      //       if (endDate) timeline.push(this.addTimelineItem(endDate, rd.id, this.end));
-      //       return;
-      //     }
-      //     if (!isValidOnEnd) {
-      //       timeline.push(this.addTimelineItem(startDate, rd.id, this.start));
-      //       if (rdEndDate) timeline.push(this.addTimelineItem(rdEndDate, rd.id, this.end));
-      //       return;
-      //     }
-      //     timeline.push(this.addTimelineItem(startDate, rd.id, this.start));
-      //     if (endDate) timeline.push(this.addTimelineItem(endDate, rd.id, this.end));
-      //   });
-      // });
     });
 
     return hierarchiesTree;
@@ -528,9 +429,10 @@ export class FindEvents2240ESocialService {
             pppHistory: true,
             esocialCode: true,
             hierarchyHistory: {
-              where: { motive: { not: 'DEM' } },
+              // where: { motive: { not: 'DEM' } },
               select: {
                 startDate: true,
+                motive: true,
                 hierarchyId: true,
                 employeeId: true,
                 subHierarchies: { select: { id: true } },
@@ -561,19 +463,35 @@ export class FindEvents2240ESocialService {
     });
 
     return Object.values(risks).map((data) => {
-      data.riskData
-        .sort((a, b) => sortNumber(b.level, a.level))
-        .sort((a, b) => sortNumber(b.isQuantity ? 1 : 0, a.isQuantity ? 1 : 0))
-        .sort((a, b) => sortNumber(a.prioritization, b.prioritization));
+      data.riskData =
+        sortArray(data.riskData, {
+          by: ['prioritization', 'level', 'isQuantity'],
+          order: ['prioritization', 'level', 'isQuantity'],
+        }) || [];
 
-      return data;
+      return {
+        risk: data.riskFactor,
+        riskData: data.riskData[0],
+      };
     });
   };
 
-  onGetDate = (date: Date | null, isEnd?: boolean) => {
-    const nullV = isEnd ? null : new Date(0);
-    if (!date) return nullV;
-    return date || nullV;
+  onGetDate = (date: Date | null | number) => {
+    // return date ? new Date(date) : null;
+    if (typeof date === 'number') return this.dayjsProvider.dayjs(date).startOf('day').toDate();
+    return date ? this.dayjsProvider.dayjs(date).startOf('day').toDate() : null;
+  };
+
+  onGetNextDate = (date: Date | null | number) => {
+    // return date ? new Date(date) : null;
+    if (typeof date === 'number') return this.dayjsProvider.dayjs(date).add(1, 'day').startOf('day').toDate();
+    return date ? this.dayjsProvider.dayjs(date).add(1, 'day').startOf('day').toDate() : null;
+  };
+
+  onGetStringDate = (date: Date | number) => {
+    // return this.dayjsProvider.dayjs(date).startOf('day').toISOString();
+    if (typeof date === 'number') date = new Date(date);
+    return date.toISOString().slice(0, 10);
   };
 
   isDateBetween = (date: Date | null, startDate: Date | null, endDate: Date | null) => {
@@ -601,37 +519,69 @@ export class FindEvents2240ESocialService {
     return false;
   };
 
-  cutTimeline = (timeline: ITimeline[], endDates: Date[], startDate: Date) => {
-    const startRemoveDate = {};
-    return timeline.filter((tLine) => {
-      const isBeforeStart = tLine.date < startDate;
-      const isAfterEnd = endDates.some((endDate) => endDate && tLine.date && tLine.date >= endDate);
+  createTimelinePPPSnapshot = (riskData: RiskFactorDataEntity[], breakPoint: Record<string, IBreakPointPPP>) => {
+    const breakPointList = Object.entries(breakPoint);
+    // const breakPointPPP: Record<string, IBreakPointPPP> = {};
 
-      if (isBeforeStart) {
-        // startRemoveDate[tLine.id]
-      }
-
-      return !isAfterEnd;
+    riskData.forEach((rd) => {
+      breakPointList.forEach(([key, value]) => {
+        const isBetween = this.isDateBetween(value.date, rd.startDate, rd.endDate);
+        if (isBetween) breakPoint[key].riskData.push(rd);
+      });
     });
   };
 
-  addTimeline = (rd: RiskFactorDataEntity): ITimeline[] => {
-    const timeline: ITimeline[] = [];
+  cutTimeline = (riskData: RiskFactorDataEntity[], maxEndDate: Date, endDates: Date[], startDates: Date[]) => {
+    const minEndDate = Math.min(...endDates.map((e) => (e ? e.getTime() : 9999999999999))) || null;
+    const maxStartDate = Math.max(...startDates.map((e) => e?.getTime() ?? 0)) || null;
 
-    const startDate = this.onGetDate(rd.startDate);
-    const endDate = this.onGetDate(rd.endDate, this.end);
+    const breakPoint: Record<string, IBreakPointPPP> = {};
 
-    timeline.push(this.addTimelineItem(startDate, rd.id, this.start));
-    if (endDate) timeline.push(this.addTimelineItem(endDate, rd.id, this.end));
+    if (minEndDate != 9999999999999 && maxEndDate.getTime() != minEndDate)
+      breakPoint[this.onGetStringDate(minEndDate)] = { riskData: [], date: this.onGetDate(minEndDate) };
+    if (maxStartDate) breakPoint[this.onGetStringDate(maxStartDate)] = { riskData: [], date: this.onGetDate(maxStartDate) };
 
-    return timeline;
+    const timeline = riskData.reduce<RiskFactorDataEntity[]>((acc, rd) => {
+      const removeIfAfter = minEndDate && rd.startDate && rd.startDate.getTime() >= minEndDate;
+      if (removeIfAfter) return acc;
+
+      const removeIfBefore = maxStartDate && rd.endDate && rd.endDate.getTime() <= maxStartDate;
+      if (removeIfBefore) return acc;
+
+      const setEndDate = minEndDate && rd.endDate && rd.endDate.getTime() >= minEndDate;
+      const setStartDateOnly = maxStartDate && rd.startDate && rd.startDate.getTime() <= maxStartDate;
+
+      const rdClone = clone(rd);
+
+      if (setEndDate || !rd.endDate) rdClone.endDate = this.onGetDate(minEndDate);
+      else breakPoint[this.onGetStringDate(rdClone.endDate)] = { riskData: [], date: this.onGetDate(rdClone.endDate) };
+
+      if (setStartDateOnly || !rd.startDate) rdClone.startDate = this.onGetDate(maxStartDate);
+      else breakPoint[this.onGetStringDate(rdClone.startDate)] = { riskData: [], date: this.onGetDate(rdClone.startDate) };
+
+      return [...acc, rdClone];
+    }, [] as RiskFactorDataEntity[]);
+
+    return { timeline, breakPoint };
   };
 
-  addTimelineItem = (date: Date, id: string, isEnd: boolean): ITimeline => {
-    return {
-      date,
-      id,
-      ...(isEnd && { remove: isEnd }),
-    };
-  };
+  // addTimeline = (rd: RiskFactorDataEntity): ITimeline[] => {
+  //   const timeline: ITimeline[] = [];
+
+  //   const startDate = this.onGetDate(rd.startDate);
+  //   const endDate = this.onGetDate(rd.endDate, this.end);
+
+  //   timeline.push(this.addTimelineItem(startDate, rd.id, this.start));
+  //   if (endDate) timeline.push(this.addTimelineItem(endDate, rd.id, this.end));
+
+  //   return timeline;
+  // };
+
+  // addTimelineItem = (date: Date, id: string, isEnd: boolean): ITimeline => {
+  //   return {
+  //     date,
+  //     id,
+  //     ...(isEnd && { remove: isEnd }),
+  //   };
+  // };
 }

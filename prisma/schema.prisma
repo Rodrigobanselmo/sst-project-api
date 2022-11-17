@@ -198,6 +198,11 @@ enum ProfessionalTypeEnum {
   USER
   OTHER
 }
+
+enum ProfessionalRespTypeEnum {
+  AMB
+  BIO
+}
 // START TABLES
 
 model AccessGroups {
@@ -385,6 +390,7 @@ model Company {
   esocialTransmissions EmployeeESocialBatch[]
   report CompanyReport?
   cert CompanyCert?
+  professionalsResponsibles ProfessionalCouncilResponsible[]
 
   // professionals Professional[] @relation(name:"companies_related") 
   stateRegistration String? // not in use
@@ -1185,8 +1191,23 @@ model ProfessionalCouncil {
   examDoctorHistory EmployeeExamsHistory[]  
   professionalPgrSignature RiskFactorGroupDataToProfessional[]
   professionalPcmsoSignature DocumentPCMSOToProfessional[]
+  professionalsResponsibles ProfessionalCouncilResponsible[]
   
   @@unique([councilType, councilUF, councilId, professionalId])
+}
+
+model ProfessionalCouncilResponsible {
+  id    Int     @default(autoincrement()) @id
+  created_at DateTime @default(now())
+  updated_at  DateTime   @updatedAt
+  startDate DateTime
+  professionalCouncilId Int
+  professional ProfessionalCouncil @relation(fields: [professionalCouncilId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
+  companyId String
+  type ProfessionalRespTypeEnum @default(AMB)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
+
+  @@unique([companyId, professionalCouncilId, startDate])
 }
 
 model Protocol {

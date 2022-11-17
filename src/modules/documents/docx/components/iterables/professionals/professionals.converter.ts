@@ -1,4 +1,4 @@
-import { CouncilEntity } from './../../../../../users/entities/council.entity';
+import { ProfessionalCouncilEntity } from './../../../../../users/entities/council.entity';
 import { WorkspaceEntity } from './../../../../../company/entities/workspace.entity';
 import { CompanyEntity } from './../../../../../company/entities/company.entity';
 import { UserEntity } from './../../../../../users/entities/user.entity';

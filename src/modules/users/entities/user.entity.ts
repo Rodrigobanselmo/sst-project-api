@@ -6,7 +6,7 @@ import { UsersRiskGroupEntity } from '../../sst/entities/usersRiskGroup';
 import { ProfessionalEntity } from './professional.entity';
 import { UserCompanyEntity } from './userCompany.entity';
 import { User } from '.prisma/client';
-import { CouncilEntity } from './council.entity';
+import { ProfessionalCouncilEntity } from './council.entity';
 
 export class UserEntity implements User {
   @ApiProperty({ description: 'The id of the User' })
@@ -47,7 +47,7 @@ export class UserEntity implements User {
   professional?: ProfessionalEntity;
   userPgrSignature?: UsersRiskGroupEntity;
   usersPgrSignatures?: UsersRiskGroupEntity[];
-  councils?: CouncilEntity[];
+  councils?: ProfessionalCouncilEntity[];
 
   constructor(partial: Partial<UserEntity>) {
     Object.assign(this, partial);

@@ -2,7 +2,7 @@ import { ProfessionalPCMSOEntity, ProfessionalRiskGroupEntity } from '../../sst/
 import { Professional, ProfessionalTypeEnum, StatusEnum } from '@prisma/client';
 import { UserEntity } from './user.entity';
 import { InviteUsersEntity } from './invite-users.entity';
-import { CouncilEntity } from './council.entity';
+import { ProfessionalCouncilEntity } from './council.entity';
 
 export class ProfessionalEntity implements Professional {
   id: number;
@@ -22,7 +22,7 @@ export class ProfessionalEntity implements Professional {
   userId: number;
   invite: InviteUsersEntity;
   inviteId: string;
-  councils?: CouncilEntity[];
+  councils?: ProfessionalCouncilEntity[];
   professionalPgrSignature?: ProfessionalRiskGroupEntity;
   professionalsPgrSignatures?: ProfessionalRiskGroupEntity[];
 

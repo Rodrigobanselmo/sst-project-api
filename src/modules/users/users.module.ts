@@ -8,10 +8,12 @@ import { AuthModule } from '../auth/auth.module';
 import { RefreshTokensRepository } from '../auth/repositories/implementations/RefreshTokensRepository';
 import { CompanyModule } from '../company/company.module';
 import { InvitesController } from './controller/invites/invites.controller';
+import { ProfessionalResponsibleController } from './controller/professionals-responsible/professionals-responsible.controller';
 import { ProfessionalsController } from './controller/professionals/professionals.controller';
 import { UsersController } from './controller/users/users.controller';
 import { InviteUsersRepository } from './repositories/implementations/InviteUsersRepository';
 import { ProfessionalRepository } from './repositories/implementations/ProfessionalRepository';
+import { ProfessionalResponsibleRepository } from './repositories/implementations/ProfessionalResponsibleRepository';
 import { UsersCompanyRepository } from './repositories/implementations/UsersCompanyRepository';
 import { UsersRepository } from './repositories/implementations/UsersRepository';
 import { DeleteExpiredInvitesService } from './services/invites/delete-expired-invites/delete-expired-invites.service';
@@ -21,6 +23,10 @@ import { FindAllByCompanyIdService } from './services/invites/find-by-companyId/
 import { FindAllByEmailService } from './services/invites/find-by-email/find-by-email.service';
 import { FindByTokenService } from './services/invites/find-by-token/find-by-token.service';
 import { InviteUsersService } from './services/invites/invite-users/invite-users.service';
+import { CreateProfessionalResponsibleService } from './services/professionals-responsibles/create-professionals-responsibles/create-professional-responsiblea.service';
+import { DeleteProfessionalResponsibleService } from './services/professionals-responsibles/delete-professionals-responsibles/delete-professionals-responsibles.service';
+import { FindProfessionalResponsibleService } from './services/professionals-responsibles/find-professionals-responsibles/find-professionals-responsibles.service';
+import { UpdateProfessionalResponsibleService } from './services/professionals-responsibles/update-professionals-responsibles/update-professionals-responsibles.service';
 import { CreateProfessionalService } from './services/professionals/create-professional/create-professional.service';
 import { FindAllProfessionalsByCompanyService } from './services/professionals/find-all/find-all.service';
 import { FindFirstProfessionalService } from './services/professionals/find-first/find-first.service';
@@ -35,7 +41,7 @@ import { UpdatePermissionsRolesService } from './services/users/update-permissio
 import { UpdateUserService } from './services/users/update-user/update-user.service';
 
 @Module({
-  controllers: [UsersController, InvitesController, ProfessionalsController],
+  controllers: [UsersController, InvitesController, ProfessionalsController, ProfessionalResponsibleController],
   imports: [forwardRef(() => AuthModule), CompanyModule],
   providers: [
     HashProvider,
@@ -66,6 +72,11 @@ import { UpdateUserService } from './services/users/update-user/update-user.serv
     CreateProfessionalService,
     FindAvailableService,
     FindFirstProfessionalService,
+    CreateProfessionalResponsibleService,
+    UpdateProfessionalResponsibleService,
+    FindProfessionalResponsibleService,
+    DeleteProfessionalResponsibleService,
+    ProfessionalResponsibleRepository,
   ],
   exports: [UsersRepository, ProfessionalRepository],
 })

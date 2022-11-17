@@ -17,7 +17,12 @@ export class EmployeeHierarchyHistoryRepository {
 
     const response = await this.prisma.$transaction([
       this.prisma.employeeHierarchyHistory.create({
-        data: createData,
+        data: {
+          ...createData,
+          ...(subOfficeId && {
+            subHierarchies: { connect: { id: subOfficeId } },
+          }),
+        },
       }),
       this.prisma.employee.update({
         data:
@@ -27,6 +32,9 @@ export class EmployeeHierarchyHistoryRepository {
                 status,
                 ...(subOfficeId && {
                   subOffices: { connect: { id: subOfficeId } },
+                }),
+                ...(!subOfficeId && {
+                  subOffices: { set: [] },
                 }),
               }
             : { status },
@@ -42,7 +50,15 @@ export class EmployeeHierarchyHistoryRepository {
 
     const response = await this.prisma.$transaction([
       this.prisma.employeeHierarchyHistory.update({
-        data: updateData,
+        data: {
+          ...updateData,
+          ...(subOfficeId && {
+            subHierarchies: { connect: { id: subOfficeId } },
+          }),
+          ...(!subOfficeId && {
+            subHierarchies: { set: [] },
+          }),
+        },
         where: { id },
       }),
       this.prisma.employee.update({
@@ -53,6 +69,9 @@ export class EmployeeHierarchyHistoryRepository {
                 status,
                 ...(subOfficeId && {
                   subOffices: { connect: { id: subOfficeId } },
+                }),
+                ...(!subOfficeId && {
+                  subOffices: { set: [] },
                 }),
               }
             : { status },
@@ -94,6 +113,7 @@ export class EmployeeHierarchyHistoryRepository {
         take: pagination.take || 20,
         skip: pagination.skip || 0,
         include: {
+          subHierarchies: { select: { id: true, name: true } },
           hierarchy: {
             include: {
               company: { select: { initials: true, name: true } },

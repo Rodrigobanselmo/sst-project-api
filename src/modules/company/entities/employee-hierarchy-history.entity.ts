@@ -9,16 +9,16 @@ export class EmployeeHierarchyHistoryEntity implements EmployeeHierarchyHistory 
   startDate: Date;
   hierarchyId: string;
   employeeId: number;
-  employee: EmployeeEntity;
   created_at: Date;
   updated_at: Date;
-  hierarchy: HierarchyEntity;
   directory?: string;
   management?: string;
   sector?: string;
   office?: string;
   deletedAt: Date;
-  subHierarchies: HierarchyEntity[];
+  employee?: EmployeeEntity;
+  hierarchy?: HierarchyEntity;
+  subHierarchies?: Partial<HierarchyEntity>[];
 
   constructor(partial: Partial<EmployeeHierarchyHistoryEntity>) {
     Object.assign(this, partial);

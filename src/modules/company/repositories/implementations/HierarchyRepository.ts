@@ -308,9 +308,11 @@ export class HierarchyRepository {
     parentId,
     name,
     employeesIds,
+    historyIds,
     ...upsertHierarchy
   }: Omit<CreateHierarchyDto, 'children' | 'ghoName'> & {
     id?: string;
+    historyIds?: number[];
   }): Promise<HierarchyEntity> {
     const data = await this.prisma.hierarchy.upsert({
       create: {
@@ -323,14 +325,22 @@ export class HierarchyRepository {
             id_companyId: { companyId, id },
           })),
         },
-        subOfficeEmployees:
-          employeesIds && employeesIds.length
-            ? {
-                connect: employeesIds.map((id) => ({
-                  id_companyId: { companyId, id },
-                })),
-              }
-            : undefined,
+        ...(employeesIds &&
+          employeesIds.length && {
+            subOfficeEmployees: {
+              connect: employeesIds.map((id) => ({
+                id_companyId: { companyId, id },
+              })),
+            },
+            ...(historyIds &&
+              historyIds.length && {
+                subHierarchyHistory: {
+                  connect: historyIds.map((id) => ({
+                    id,
+                  })),
+                },
+              }),
+          }),
         parent: {
           connect: { id: parentId },
         },
@@ -338,6 +348,11 @@ export class HierarchyRepository {
       update: {
         ...upsertHierarchy,
         name: name.split('//')[0],
+        employeeExamsHistorySubOffice: {
+          connect: historyIds.map((id) => ({
+            id,
+          })),
+        },
         subOfficeEmployees:
           employeesIds && employeesIds.length
             ? {
