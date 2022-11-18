@@ -8,7 +8,7 @@ import { IEvent2220Props } from './../../../../modules/esocial/interfaces/event-
 import { CompanyEntity } from '../../../../modules/company/entities/company.entity';
 import { CompanyCertEntity } from '../../../../modules/esocial/entities/companyCert.entity';
 import { IEvent3000Props } from '../../../../modules/esocial/interfaces/event-3000';
-import { EmployeeESocialEventTypeEnum } from '@prisma/client';
+import { EmployeeESocialEventTypeEnum, Prisma } from '@prisma/client';
 export interface IConvertPfx {
   file: Express.Multer.File;
   password: string;
@@ -114,8 +114,9 @@ export interface IESocialFetchEventOptions {
   environment: TpAmbEnum;
 }
 
-export interface ICompanyOptions {
+export interface ICompanyOptions extends Prisma.CompanyFindFirstArgs {
   cert?: boolean;
+  doctor?: boolean;
   report?: boolean;
 }
 

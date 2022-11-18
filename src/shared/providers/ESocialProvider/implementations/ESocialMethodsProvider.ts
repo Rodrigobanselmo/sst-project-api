@@ -112,6 +112,7 @@ class ESocialMethodsProvider implements IESocialEventProvider {
   }
 
   public async getCompany(companyId: string, options?: ICompanyOptions) {
+    const groupSpreed = options.select?.group && typeof options.select?.group !== 'boolean' ? options.select?.group : {};
     const company = await this.companyRepository.findFirstNude({
       where: { id: companyId },
       select: {
@@ -119,9 +120,11 @@ class ESocialMethodsProvider implements IESocialEventProvider {
         esocialStart: true,
         esocialSend: true,
         cnpj: true,
-        doctorResponsible: {
-          include: { professional: { select: { name: true, cpf: true } } },
-        },
+        ...(!!options?.doctor && {
+          doctorResponsible: {
+            include: { professional: { select: { name: true, cpf: true } } },
+          },
+        }),
         cert: !!options?.cert,
         ...(!!options?.report && {
           report: true,
@@ -135,16 +138,20 @@ class ESocialMethodsProvider implements IESocialEventProvider {
             },
           },
         }),
+        ...options.select,
         group: {
           select: {
-            doctorResponsible: {
-              include: { professional: { select: { name: true, cpf: true } } },
-            },
+            ...(!!options?.doctor && {
+              doctorResponsible: {
+                include: { professional: { select: { name: true, cpf: true } } },
+              },
+            }),
             esocialStart: true,
             ...(!!options?.cert && {
               company: { select: { cert: true } },
             }),
             esocialSend: true,
+            ...groupSpreed.select,
           },
         },
       },

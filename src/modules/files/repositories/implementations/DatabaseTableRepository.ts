@@ -31,6 +31,15 @@ export class DatabaseTableRepository implements IDatabaseTableRepository {
   async findByNameAndCompany(name: string, companyId: string): Promise<DatabaseTableEntity> {
     const database = await this.prisma.databaseTable.findFirst({
       where: { name, companyId },
+      include: {
+        company: {
+          select: {
+            initials: true,
+            name: true,
+            fantasy: true,
+          },
+        },
+      },
     });
     if (!database) {
       return new DatabaseTableEntity({ version: 1, updated_at: new Date() });

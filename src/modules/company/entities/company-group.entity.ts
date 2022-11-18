@@ -32,8 +32,7 @@ export class CompanyGroupEntity implements CompanyGroup {
 
     if (this.companyGroup) {
       this.companyGroup = new CompanyEntity(this.companyGroup);
-
-      this.ambResponsible = this.companyGroup.ambResponsible;
+      this.ambResponsible = this.companyGroup?.ambResponsible;
     }
 
     if (this.company) {

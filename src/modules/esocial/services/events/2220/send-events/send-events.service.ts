@@ -37,7 +37,7 @@ export class SendEvents2220ESocialService {
 
   async execute(body: Event2220Dto, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;
-    const { company, cert } = await this.eSocialMethodsProvider.getCompany(companyId, { cert: true, report: true });
+    const { company, cert } = await this.eSocialMethodsProvider.getCompany(companyId, { cert: true, report: true, doctor: true });
 
     const startDate = company.esocialStart;
     const esocialSend = company.esocialSend;

@@ -162,12 +162,12 @@ export class RiskRepository implements IRiskRepository {
   }
 
   async upsertMany(upsertRiskDtoMany: UpsertRiskDto[], system: boolean, companyId: string): Promise<RiskFactorsEntity[]> {
-    const data = await this.prisma.$transaction(
-      upsertRiskDtoMany.map(({ companyId: _, id, recMed, generateSource, ...upsertRiskDto }) =>
-        this.prisma.riskFactors.upsert({
+    const data = await Promise.all(
+      upsertRiskDtoMany.map(async ({ companyId: _, id, esocialCode, recMed, generateSource, ...upsertRiskDto }) => {
+        return await this.prisma.riskFactors.upsert({
           create: {
             ...upsertRiskDto,
-            // isEmergency: upsertRiskDto.isEmergency?'':
+            esocialCode: esocialCode || null,
             system,
             companyId,
             recMed: {
@@ -195,6 +195,7 @@ export class RiskRepository implements IRiskRepository {
           },
           update: {
             ...upsertRiskDto,
+            esocialCode: esocialCode || null,
             system,
             recMed: {
               upsert: !recMed
@@ -221,8 +222,8 @@ export class RiskRepository implements IRiskRepository {
           },
           where: { id_companyId: { companyId, id: id || 'no-id' } },
           include: { recMed: true, generateSource: true },
-        }),
-      ),
+        });
+      }),
     );
 
     return data.map((risk) => new RiskFactorsEntity(risk));

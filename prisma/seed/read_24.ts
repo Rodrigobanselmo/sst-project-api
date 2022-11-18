@@ -35,9 +35,18 @@ export const seedEsocial24 = async (prisma: PrismaClient) => {
         };
       });
 
-    await prisma.esocialTable24.createMany({
-      data: json,
-    });
+    console.log(json);
+    await Promise.all(
+      json
+        .filter((i) => i)
+        .map(async (j) => {
+          await prisma.esocialTable24.upsert({
+            create: { ...j },
+            update: { ...j },
+            where: { id: j.id },
+          });
+        }),
+    );
   } catch (e) {
     console.log('Error:', e.stack);
   }

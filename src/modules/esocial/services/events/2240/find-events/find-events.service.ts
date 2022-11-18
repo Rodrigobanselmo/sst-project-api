@@ -1,3 +1,4 @@
+import { ProfessionalEntity } from './../../../../../users/entities/professional.entity';
 import { sortNumber } from './../../../../../../shared/utils/sorts/number.sort';
 import { originRiskMap } from './../../../../../../shared/constants/maps/origin-risk';
 import { EmployeePPPHistoryEntity } from './../../../../../company/entities/employee-ppp-history.entity';
@@ -24,15 +25,14 @@ import { HierarchyEnum, HomogeneousGroup } from '@prisma/client';
 import { RiskFactorsEntity } from '../../../../../../modules/sst/entities/risk.entity';
 import { DayJSProvider } from '../../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 import sortArray from 'sort-array';
+import { EmployeeHierarchyHistoryEntity } from '../../../../../../modules/company/entities/employee-hierarchy-history.entity';
 
-interface ITimeline {
-  remove?: boolean;
-  date: Date;
-  id: string;
-}
+type IPriorRiskData = { riskData: RiskFactorDataEntity; riskFactor: RiskFactorsEntity };
 
 interface IBreakPointPPP {
-  riskData: RiskFactorDataEntity[];
+  responsible?: Partial<ProfessionalEntity>;
+  risks?: IPriorRiskData[];
+  riskData?: RiskFactorDataEntity[];
   date: Date;
 }
 
@@ -51,7 +51,7 @@ export class FindEvents2240ESocialService {
 
   async execute({ skip, take, ...query }: FindEvents2240Dto, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;
-    const { company } = await this.eSocialMethodsProvider.getCompany(companyId);
+    const company = await this.getCompany(companyId);
 
     const startDate = company.esocialStart;
     const esocialSend = company.esocialSend;
@@ -64,57 +64,12 @@ export class FindEvents2240ESocialService {
         },
       };
 
-    const companyFound = await this.getCompany(companyId);
-    const homogeneousTree = await this.getHomoTree(companyFound);
-    const homoRiskDataTree = await this.getRiskData(companyFound, homogeneousTree);
-    const hierarchyTree = await this.getHierarchyTree(companyFound);
+    const homogeneousTree = await this.getHomoTree(company);
+    const homoRiskDataTree = await this.getRiskData(company, homogeneousTree);
+    const hierarchyTree = await this.getHierarchyTree(company);
+    const employeesData = await this.getEmployeesData(company, hierarchyTree, homoRiskDataTree);
 
-    const employeeTree = {} as Record<string, EmployeeEntity & { actualPPPHistory?: EmployeePPPHistoryEntity[] }>;
-    [companyFound.employees.find((e) => e.id == 5920)].forEach((employee) => {
-      const timeline = {};
-      employee.hierarchyHistory.forEach((history, index) => {
-        if (history.motive == 'DEM') return;
-        const startDate = this.onGetDate(history.startDate);
-        const endDate = this.onGetDate(employee.hierarchyHistory[index + 1]?.startDate);
-
-        timeline[this.dayjsProvider.format(startDate, 'YYYYMMDD')] = {};
-        if (endDate) timeline[this.dayjsProvider.format(endDate, 'YYYYMMDD')] = {};
-
-        const hierarchyIds = [history.hierarchyId, ...history.subHierarchies.map((i) => i.id)];
-
-        const hierarchyOnHomogeneous = hierarchyIds
-          .map((id) => hierarchyTree[id].hierarchyOnHomogeneous)
-          .reduce((acc, curr) => {
-            return [...acc, ...curr];
-          }, []);
-
-        const pppSnapshot: Record<string, IBreakPointPPP> = {};
-        if (startDate) pppSnapshot[this.onGetStringDate(startDate)] = { riskData: [], date: startDate };
-
-        const riskTimeline = hierarchyOnHomogeneous.reduce<RiskFactorDataEntity[]>((acc, hh) => {
-          const hhStartDate = this.onGetDate(hh.startDate);
-          const hhEndDate = this.onGetDate(hh.endDate);
-
-          const { timeline, breakPoint } = this.cutTimeline(homoRiskDataTree[hh.homogeneousGroupId], endDate, [endDate, hhEndDate], [startDate, hhStartDate]);
-
-          Object.assign(pppSnapshot, breakPoint);
-
-          return [...acc, ...timeline];
-        }, [] as RiskFactorDataEntity[]);
-
-        const timelinePPPSnapshots = this.createTimelinePPPSnapshot(riskTimeline, pppSnapshot);
-
-        // (history as any).riskTimeline = this.onGetRisks(riskTimeline);
-        (history as any).riskTimeline = riskTimeline;
-        (history as any).pppSnapshot = pppSnapshot;
-      });
-
-      employeeTree[employee.id] = {
-        ...employee,
-        actualPPPHistory: [],
-      };
-    });
-
+    return employeesData;
     // let type: ESocialSendEnum = ESocialSendEnum.SEND;
     // if (
     //   data.aso?.events?.some((e) =>
@@ -136,8 +91,6 @@ export class FindEvents2240ESocialService {
     //     type,
     //     xml: xmlResult,
     //   }[];
-
-    return employeeTree;
 
     // check hierarchy ppp risks if
     // -> risk data has been added / edited
@@ -355,42 +308,149 @@ export class FindEvents2240ESocialService {
     return hierarchiesTree;
   }
 
+  async getEmployeesData(company: CompanyEntity, hierarchyTree: Record<string, HierarchyEntity>, homoRiskDataTree: Record<string, RiskFactorDataEntity[]>) {
+    const employeeTree = {} as Record<string, EmployeeEntity & { actualPPPHistory?: (EmployeePPPHistoryEntity | any)[]; pppSnapshot?: Record<string, IBreakPointPPP>[] }>;
+    [company.employees.find((e) => e.id == 5920)].forEach((employee) => {
+      // const timeline = {};
+      const allHistory = employee.hierarchyHistory.reduce<(EmployeeHierarchyHistoryEntity & { ambProfessional?: Partial<ProfessionalEntity> })[]>(
+        (acc, history, index, array) => {
+          const startDate = this.onGetDate(history.startDate);
+          const endDate = this.onGetDate(array[index + 1]?.startDate);
+
+          const responsibles = company.professionalsResponsibles;
+          const newAcc: Record<number, typeof acc[0]> = {};
+          newAcc[startDate.getTime()] = history;
+
+          responsibles.forEach((professional) => {
+            const profStartDate = this.onGetDate(professional.startDate);
+            const newHistory = { ...history, ambProfessional: professional.professional };
+            if (profStartDate <= startDate) {
+              return (newAcc[startDate.getTime()] = newHistory);
+            }
+
+            const isBetween = this.isDateBetween(profStartDate, startDate, endDate);
+            if (isBetween) newAcc[profStartDate.getTime()] = { ...newHistory, startDate: profStartDate };
+          });
+
+          return [...acc, ...Object.values(newAcc)];
+        },
+        [],
+      );
+
+      const hierarchyHistory = sortArray(allHistory, { by: ['startDate'], order: 'asc' });
+
+      const timeline = hierarchyHistory
+        .map((history, index, array) => {
+          if (history.motive == 'DEM') return;
+          const startDate = this.onGetDate(history.startDate);
+          const endDate = this.onGetDate(array[index + 1]?.startDate);
+
+          if (startDate == endDate) return;
+
+          const hierarchyIds = [history.hierarchyId, ...history.subHierarchies.map((i) => i.id)];
+
+          const hierarchyOnHomogeneous = hierarchyIds
+            .map((id) => hierarchyTree[id].hierarchyOnHomogeneous)
+            .reduce((acc, curr) => {
+              return [...acc, ...curr];
+            }, []);
+
+          const pppSnapshot: Record<string, IBreakPointPPP> = {};
+          if (startDate) pppSnapshot[this.onGetStringDate(startDate)] = { riskData: [], date: startDate };
+
+          const riskTimeline = hierarchyOnHomogeneous.reduce<RiskFactorDataEntity[]>((acc, hh) => {
+            const hhStartDate = this.onGetDate(hh.startDate);
+            const hhEndDate = this.onGetDate(hh.endDate);
+
+            const { timeline, breakPoint } = this.cutTimeline(homoRiskDataTree[hh.homogeneousGroupId], [endDate, hhEndDate], [startDate, hhStartDate]);
+
+            Object.assign(pppSnapshot, breakPoint);
+
+            return [...acc, ...timeline];
+          }, [] as RiskFactorDataEntity[]);
+
+          this.createTimelinePPPSnapshot(riskTimeline, pppSnapshot);
+
+          Object.keys(pppSnapshot).forEach((key) => {
+            pppSnapshot[key].responsible = history.ambProfessional;
+          });
+
+          return pppSnapshot;
+        })
+        .filter((i) => i)
+        .reduce((acc, curr) => {
+          return { ...acc, ...curr };
+        });
+
+      Object.entries(timeline).forEach(([key, value]) => {
+        timeline[key].risks = this.onGetRisks(value.riskData);
+        delete timeline[key].riskData;
+      });
+
+      const actualPPPHistory: any[] = Object.values(timeline);
+
+      delete employee.hierarchyHistory;
+
+      (employeeTree as any)[employee.id] = {
+        ...employee,
+        actualPPPHistory,
+      };
+    });
+    return employeeTree;
+  }
+
   async getCompany(companyId: string) {
-    const company = await this.companyRepository.findFirstNude({
-      where: { id: companyId },
+    const { company } = await this.eSocialMethodsProvider.getCompany(companyId, {
       select: {
-        id: true,
-        esocialStart: true,
-        esocialSend: true,
-        cnpj: true,
-        // doctorResponsible: {
-        //   include: { professional: { select: { name: true, cpf: true } } },
-        // },
-        // cert: !!options?.cert,
-        // ...(!!options?.report && {
-        //   report: true,
-        // }),
-        // ...(!!options?.cert && {
-        //   receivingServiceContracts: {
-        //     select: {
-        //       applyingServiceCompany: {
-        //         select: { cert: true },
-        //       },
-        //     },
-        //   },
-        // }),
+        professionalsResponsibles: {
+          where: { type: 'AMB' },
+          orderBy: { startDate: 'desc' },
+          take: 1,
+          select: {
+            id: true,
+            type: true,
+            startDate: true,
+            professional: {
+              include: {
+                professional: {
+                  select: {
+                    cpf: true,
+                    name: true,
+                    id: true,
+                  },
+                },
+              },
+            },
+          },
+        },
 
         //* company group
         group: {
           select: {
-            // doctorResponsible: {
-            //   include: { professional: { select: { name: true, cpf: true } } },
-            // },
-            esocialStart: true,
-            // ...(!!options?.cert && {
-            //   company: { select: { cert: true } },
-            // }),
-            esocialSend: true,
+            companyGroup: {
+              select: {
+                professionalsResponsibles: {
+                  where: { type: 'AMB' },
+                  orderBy: { startDate: 'desc' },
+                  take: 1,
+                  select: {
+                    id: true,
+                    startDate: true,
+                    professional: {
+                      include: {
+                        professional: {
+                          select: {
+                            cpf: true,
+                            name: true,
+                            id: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
           },
         },
 
@@ -446,7 +506,7 @@ export class FindEvents2240ESocialService {
     return company;
   }
 
-  onGetRisks = (riskData: RiskFactorDataEntity[]) => {
+  onGetRisks = (riskData: RiskFactorDataEntity[]): IPriorRiskData[] => {
     const risks: Record<string, { riskData: RiskFactorDataEntity[]; riskFactor: RiskFactorsEntity }> = {};
 
     riskData.forEach((_rd) => {
@@ -470,7 +530,7 @@ export class FindEvents2240ESocialService {
         }) || [];
 
       return {
-        risk: data.riskFactor,
+        riskFactor: data.riskFactor,
         riskData: data.riskData[0],
       };
     });
@@ -495,6 +555,8 @@ export class FindEvents2240ESocialService {
   };
 
   isDateBetween = (date: Date | null, startDate: Date | null, endDate: Date | null) => {
+    // true if is (equal || greater || null) on start AND (lower || null) on end
+
     const isStartBefore = !startDate || !date || date >= startDate;
     if (!isStartBefore) return false;
     const isEndAfter = !endDate || !date || date < endDate;
@@ -531,13 +593,18 @@ export class FindEvents2240ESocialService {
     });
   };
 
-  cutTimeline = (riskData: RiskFactorDataEntity[], maxEndDate: Date, endDates: Date[], startDates: Date[]) => {
+  cutTimeline = (riskData: RiskFactorDataEntity[], endDates: Date[], startDates: Date[]) => {
     const minEndDate = Math.min(...endDates.map((e) => (e ? e.getTime() : 9999999999999))) || null;
     const maxStartDate = Math.max(...startDates.map((e) => e?.getTime() ?? 0)) || null;
 
+    const maxEndDate = endDates[0];
+    // const minStartDate = startDates[0];
+
     const breakPoint: Record<string, IBreakPointPPP> = {};
 
-    if (minEndDate != 9999999999999 && maxEndDate.getTime() != minEndDate)
+    if (maxStartDate >= minEndDate) return { timeline: [], breakPoint: {} };
+
+    if (minEndDate != 9999999999999 && maxEndDate && maxEndDate.getTime() != minEndDate)
       breakPoint[this.onGetStringDate(minEndDate)] = { riskData: [], date: this.onGetDate(minEndDate) };
     if (maxStartDate) breakPoint[this.onGetStringDate(maxStartDate)] = { riskData: [], date: this.onGetDate(maxStartDate) };
 

@@ -114,8 +114,7 @@ BIOLÓGICOS
 ASSOCIAÇÃO DE AGENTES NOCIVOS FÍSICOS, QUÍMICOS E BIOLÓGICOS
 04.01.001	Mineração subterrânea cujas atividades sejam exercidas afastadas das frentes de produção
 04.01.002	Trabalhos em atividades permanentes no subsolo de minerações subterrâneas em frente de produção
-ASSOCIAÇÃO DE AGENTES NOCIVOS FÍSICOS, QUÍMICOS E BIOLÓGICOS
-04.01.001	Mineração subterrânea cujas atividades sejam exercidas afastadas das frentes de produção
-04.01.002	Trabalhos em atividades permanentes no subsolo de minerações subterrâneas em frente de produção
+OUTROS AGENTES NOCIVOS
+05.01.001	Agentes nocivos não constantes no Anexo IV do Decreto 3.048/1999 e incluídos por força de decisão judicial ou administrativa
 USÊNCIA DE AGENTES NOCIVOS OU ATIVIDADES ESPECIAIS
 09.01.001	Ausência de agente nocivo ou de atividades previstas no Anexo IV do Decreto 3.048/1999

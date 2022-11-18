@@ -1,3 +1,4 @@
+import { CompanyEntity } from './../../company/entities/company.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { DatabaseTable, StatusEnum } from '@prisma/client';
 
@@ -27,6 +28,8 @@ export class DatabaseTableEntity implements DatabaseTable {
 
   @ApiProperty({ description: 'The last update of the table date' })
   updated_at: Date;
+
+  company?: Partial<CompanyEntity>;
 
   constructor(partial: Partial<DatabaseTableEntity>) {
     Object.assign(this, partial);

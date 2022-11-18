@@ -45,6 +45,10 @@ export class CreateRiskDto {
 
   @IsString()
   @IsOptional()
+  esocialCode: string;
+
+  @IsString()
+  @IsOptional()
   symptoms: string;
 
   @ValidateNested({ each: true })

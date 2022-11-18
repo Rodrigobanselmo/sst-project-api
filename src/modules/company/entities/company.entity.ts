@@ -171,6 +171,7 @@ export class CompanyEntity implements Company {
       if (!this.tecResponsible) this.tecResponsible = this.group?.tecResponsible;
       if (!this.tecResponsibleId) this.tecResponsibleId = this.group?.tecResponsibleId;
 
+      if (!this.ambResponsible) this.ambResponsible = this.group?.ambResponsible;
       if (!this.esocialStart) this.esocialStart = this.group?.esocialStart;
       if (!this.numAsos) this.numAsos = this.group?.numAsos;
       if (!this.blockResignationExam) this.blockResignationExam = this.group?.blockResignationExam;

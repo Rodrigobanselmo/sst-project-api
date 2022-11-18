@@ -1,3 +1,4 @@
+import { getCompanyName } from './../../../shared/utils/companyName';
 import { Injectable } from '@nestjs/common';
 import { ExcelProvider } from '../../../shared/providers/ExcelProvider/implementations/ExcelProvider';
 import { sortNumber } from '../../../shared/utils/sorts/number.sort';
@@ -24,7 +25,7 @@ export class DownloadExcelProvider {
     // create new table with new data
     const newExcelFile = await this.excelProvider.create(
       {
-        fileName: Workbook.name,
+        fileName: `${Workbook.name}-${getCompanyName(databaseTable.company)}`,
         version: databaseTable.version,
         lastUpdate: new Date(databaseTable.updated_at),
         sheets: allSheets,

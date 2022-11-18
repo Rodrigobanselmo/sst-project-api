@@ -1,19 +1,12 @@
-import {
-  ExamHistoryTypeEnumTranslateBrToUs,
-  ExamHistoryTypeEnumTranslated,
-  examHistoryTypeEnumTranslatedList,
-  examHistoryTypeEnumTranslatedNotes,
-} from './../../../../utils/translate/examType.translate';
-import { checkIsValidCpf } from './../../../../utils/validators/checkIsValidCpf';
-import { StatusEnum } from '@prisma/client';
-import { checkIsValidDate } from '../../../../../shared/utils/validators/checkIsValidDate';
+import { SexTypeEnum } from '@prisma/client';
 
 import { excelWorkspaceNotes } from '../../../../../modules/files/utils/notes/excel-workspace-notes';
+import { checkIsValidDate } from '../../../../../shared/utils/validators/checkIsValidDate';
 import { ITableSchema } from '../../../../providers/ExcelProvider/models/IExcelProvider.types';
-import { statusEnumTranslateBrToUs, StatusEnumTranslated } from '../../../../utils/translate/statusEnum.translate';
 import { checkIsEnum } from '../../../../utils/validators/checkIsEnum';
 import { checkIsString } from '../../../../utils/validators/checkIsString';
-import { checkIsValidCid } from '../../../../../shared/utils/validators/checkIsValidCid';
+import { SexTypeEnumTranslateBrToUs, SexTypeEnumTranslatedList, SexTypeEnumTranslatedNotes } from './../../../../utils/translate/sexType.translate';
+import { checkIsValidCpf } from './../../../../utils/validators/checkIsValidCpf';
 
 export const employeesColumnsConstant = [
   {
@@ -31,11 +24,20 @@ export const employeesColumnsConstant = [
     checkHandler: checkIsString,
   },
   {
-    databaseName: 'cid',
-    excelName: 'CID',
+    databaseName: 'sex',
+    excelName: 'Sexo',
+    isEnum: SexTypeEnumTranslatedList,
+    isArray: false,
+    notes: SexTypeEnumTranslatedNotes,
+    required: false,
+    checkHandler: (value: any) => checkIsEnum(SexTypeEnumTranslateBrToUs(value), SexTypeEnum),
+  },
+  {
+    databaseName: 'birthday',
+    excelName: 'Nascimento',
     isArray: false,
     required: false,
-    checkHandler: checkIsValidCid,
+    checkHandler: checkIsValidDate,
   },
   {
     databaseName: 'birthday',
@@ -65,7 +67,7 @@ export const employeesColumnsConstant = [
     isArray: false,
     required: false,
     checkHandler: checkIsString,
-    notes: 'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
+    // notes: 'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
   },
   {
     databaseName: 'management',
@@ -73,7 +75,7 @@ export const employeesColumnsConstant = [
     isArray: false,
     required: false,
     checkHandler: checkIsString,
-    notes: 'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
+    // notes: 'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
   },
   {
     databaseName: 'sector',
@@ -81,7 +83,7 @@ export const employeesColumnsConstant = [
     isArray: false,
     required: true,
     checkHandler: checkIsString,
-    notes: 'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
+    // notes: 'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
   },
   {
     databaseName: 'sub_sector',
@@ -97,7 +99,7 @@ export const employeesColumnsConstant = [
     isArray: false,
     required: true,
     checkHandler: checkIsString,
-    notes: 'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
+    // notes: 'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
   },
   {
     databaseName: 'sub_office',
@@ -105,7 +107,7 @@ export const employeesColumnsConstant = [
     isArray: false,
     required: false,
     checkHandler: checkIsString,
-    notes: 'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
+    // notes: 'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
   },
   {
     databaseName: 'description',

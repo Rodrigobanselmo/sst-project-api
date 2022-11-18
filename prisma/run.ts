@@ -41,7 +41,7 @@ async function main() {
     //await deleteWithNameCompany('Deletar', prisma);
     // await levelRiskData(prisma);
     // await representAll(prisma);
-    await seedEsocial24(prisma);
+    // await seedEsocial24(prisma);
 
     // await deleteProfessionalsConnections(prisma);
     // await addProfCOuncilNUll(prisma);

@@ -20,7 +20,7 @@ export class FindEvents2220ESocialService {
 
   async execute({ skip, take, ...query }: FindEvents2220Dto, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;
-    const { company } = await this.eSocialMethodsProvider.getCompany(companyId);
+    const { company } = await this.eSocialMethodsProvider.getCompany(companyId, { doctor: true });
 
     const startDate = company.esocialStart;
     const esocialSend = company.esocialSend;
