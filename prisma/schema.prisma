@@ -189,6 +189,36 @@ enum RiskRecTextTypeEnum {
   OTHER
 }
 
+enum UfStateEnum {
+  AC 
+  AL 
+  AP 
+  AM 
+  BA 
+  CE 
+  DF 
+  ES 
+  GO 
+  MA 
+  MT 
+  MS 
+  MG 
+  PA 
+  PB 
+  PR 
+  PE 
+  PI 
+  RJ 
+  RN 
+  RS 
+  RO 
+  RR 
+  SC 
+  SP 
+  SE 
+  TO
+}
+
 enum ProfessionalTypeEnum {
   DOCTOR
   NURSE
@@ -240,6 +270,7 @@ model Address {
   neighborhood String?
   city String?
   state String?
+  // uf UfStateEnum?
   workspaceId String?
   workspace Workspace? @relation(fields: [id,companyId], references: [id,companyId], onDelete: Cascade, onUpdate: Cascade)
   
@@ -257,6 +288,7 @@ model AddressCompany {
   neighborhood String?
   city String?
   state String?
+  uf UfStateEnum?
   companyId String @unique
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
@@ -842,6 +874,7 @@ model EmployeePPPHistory {
   doneDate DateTime?
   status StatusEnum @default(DONE)
   sendEvent Boolean @default(true) 
+  json Json
 
   employeeId Int
   employee Employee @relation(fields: [employeeId], references: [id], onDelete: Restrict, onUpdate: Cascade)

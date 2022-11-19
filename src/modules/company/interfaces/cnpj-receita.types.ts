@@ -1,3 +1,5 @@
+import { UfStateEnum } from '@prisma/client';
+
 export interface ICnpjReceitaResponse {
   abertura: string;
   situacao: string;
@@ -14,7 +16,7 @@ export interface ICnpjReceitaResponse {
   complemento: string;
   municipio: string;
   bairro: string;
-  uf: string;
+  uf: UfStateEnum;
   cep: string;
   email: string;
   telefone: string;

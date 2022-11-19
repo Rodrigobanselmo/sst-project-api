@@ -1,6 +1,7 @@
+import { QueryArray } from './../../../shared/transformers/query-array';
 import { StringUppercaseTransform } from './../../../shared/transformers/string-uppercase.transform';
 import { ApiProperty } from '@nestjs/swagger';
-import { ProfessionalTypeEnum } from '@prisma/client';
+import { ProfessionalTypeEnum, UfStateEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import { IsEnum, IsOptional, IsString, MaxLength, MinLength, ValidateNested } from 'class-validator';
 import { CpfFormatTransform } from '../../../shared/transformers/cpf-format.transform';
@@ -50,8 +51,13 @@ export class UpdateUserDto {
   @IsOptional()
   councilType?: string;
 
-  @IsString()
   @IsOptional()
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsEnum(UfStateEnum, {
+    message: `UF inválido`,
+    each: true,
+  })
   councilUF?: string;
 
   @IsString()

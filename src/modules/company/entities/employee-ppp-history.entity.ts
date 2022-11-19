@@ -12,6 +12,7 @@ export class EmployeePPPHistoryEntity implements EmployeePPPHistory {
   employeeId: number;
   employee: EmployeeEntity;
   events: EmployeeESocialEvent[];
+  json: any;
 
   constructor(partial: Partial<EmployeePPPHistoryEntity>) {
     Object.assign(this, partial);

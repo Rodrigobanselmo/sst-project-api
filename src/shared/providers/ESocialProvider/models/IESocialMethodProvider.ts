@@ -1,3 +1,4 @@
+import { IBreakPointPPP, IEmployee2240Data, IEvent2240Props } from './../../../../modules/esocial/interfaces/event-2240';
 import { IEsocialSendBatchResponse } from './../../../../modules/esocial/interfaces/esocial';
 import { UserPayloadDto } from './../../../dto/user-payload.dto';
 import { BaseEventDto } from './../../../../modules/esocial/dto/event.dto';
@@ -9,6 +10,7 @@ import { CompanyEntity } from '../../../../modules/company/entities/company.enti
 import { CompanyCertEntity } from '../../../../modules/esocial/entities/companyCert.entity';
 import { IEvent3000Props } from '../../../../modules/esocial/interfaces/event-3000';
 import { EmployeeESocialEventTypeEnum, Prisma } from '@prisma/client';
+import { EmployeePPPHistoryEntity } from './../../../../modules/company/entities/employee-ppp-history.entity';
 export interface IConvertPfx {
   file: Express.Multer.File;
   password: string;
@@ -48,6 +50,32 @@ export declare namespace IESocial2220 {
     examIds: number[];
     eventDate: Date;
     id: string;
+  }
+
+  export interface XmlReturn extends Omit<StructureReturn, 'event'> {
+    signedXml: string;
+    xml: string;
+  }
+}
+
+export declare namespace IESocial2240 {
+  export interface StructureEntry {
+    company: CompanyEntity;
+    employees: IEmployee2240Data[];
+  }
+
+  export interface StructureReturn {
+    event: IEvent2240Props;
+    employee: EmployeeEntity;
+    eventDate: Date;
+    id: string;
+    comparePPP: Record<
+      string,
+      {
+        old: EmployeePPPHistoryEntity;
+        actual: IBreakPointPPP;
+      }
+    >;
   }
 
   export interface XmlReturn extends Omit<StructureReturn, 'event'> {

@@ -1,5 +1,5 @@
 import { PartialType } from '@nestjs/swagger';
-import { ProfessionalTypeEnum, StatusEnum } from '@prisma/client';
+import { ProfessionalTypeEnum, StatusEnum, UfStateEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import { IsBoolean, IsEnum, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
 
@@ -113,8 +113,13 @@ export class FindProfessionalsDto extends PaginationQueryDto {
   @IsOptional()
   councilType?: string;
 
-  @IsString()
   @IsOptional()
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsEnum(UfStateEnum, {
+    message: `UF inválido`,
+    each: true,
+  })
   councilUF?: string;
 
   @IsString()

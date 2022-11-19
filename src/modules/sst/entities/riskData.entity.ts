@@ -99,6 +99,9 @@ export class RiskFactorDataEntity implements RiskFactorData {
   probVdvr?: number;
   origin?: string;
   ro?: string;
+  intensity?: number;
+  vdvrValue?: number;
+  arenValue?: number;
   prioritization?: number;
   intervention?: string;
   progress?: number;
@@ -249,6 +252,8 @@ export class RiskFactorDataEntity implements RiskFactorData {
     const twaProb = this.percentageCheck(data.twaValue, data.twa, isTwaTeto ? 1 : 5);
     const vmpProb = this.percentageCheck(data.vmpValue, data.vmp, 1);
 
+    this.intensity = this.convertNum(data.nr15ltValue);
+
     if (nr15ltProb || stelProb || twaProb || vmpProb) {
       this.isQuantity = true;
       this.probability = nr15ltProb || stelProb || twaProb || vmpProb || undefined;
@@ -276,6 +281,8 @@ export class RiskFactorDataEntity implements RiskFactorData {
     const ltcatq5 = this.valuesCheck(data.ltcatq5, limitQ5List);
     const nr15q5 = this.valuesCheck(data.nr15q5, limitQ5List);
 
+    this.intensity = this.convertNum(data.nr15q5);
+
     if (ltcatq3 || ltcatq5 || nr15q5) {
       this.isQuantity = true;
       this.probability = Math.max(ltcatq3, ltcatq5, nr15q5) || undefined;
@@ -284,16 +291,20 @@ export class RiskFactorDataEntity implements RiskFactorData {
 
   private vibProb(data: IRiskDataJsonVibration) {
     const limitArenList = [0, 0.1, 0.5, 0.9, 1.101, 10000000000];
-    const limitVcvrList = [0, 2.1, 9.1, 16.4, 21.01, 10000000000];
+    const limitVdvrList = [0, 2.1, 9.1, 16.4, 21.01, 10000000000];
 
     const arenValue = this.valuesCheck(data?.aren, limitArenList);
-    const vdvrValeu = data?.vdvr ? this.valuesCheck(data?.vdvr, limitVcvrList) : 0;
+    const vdvrValue = data?.vdvr ? this.valuesCheck(data?.vdvr, limitVdvrList) : 0;
 
-    if (arenValue || vdvrValeu) {
+    if (arenValue || vdvrValue) {
+      const maxProb = Math.max(arenValue, vdvrValue);
+      if (maxProb == arenValue) this.arenValue = this.convertNum(data.aren);
+      if (maxProb == vdvrValue) this.vdvrValue = this.convertNum(data.vdvr);
+
       this.isQuantity = true;
       this.probAren = arenValue;
-      this.probVdvr = vdvrValeu;
-      this.probability = Math.max(arenValue, vdvrValeu) || undefined;
+      this.probVdvr = vdvrValue;
+      this.probability = Math.max(arenValue, vdvrValue) || undefined;
     }
   }
 
@@ -301,6 +312,8 @@ export class RiskFactorDataEntity implements RiskFactorData {
     const limitArenList = [0, 0.5, 2.5, 3.5, 5.01, 10000000000];
 
     const arenValue = this.valuesCheck(data?.aren, limitArenList);
+    this.arenValue = this.convertNum(data.aren);
+    this.intensity = this.convertNum(data.aren);
 
     if (arenValue) {
       this.isQuantity = true;
@@ -310,6 +323,8 @@ export class RiskFactorDataEntity implements RiskFactorData {
   }
 
   private radProb(data: IRiskDataJsonRadiation) {
+    this.intensity = this.convertNum(data.doseFB);
+
     const doseFB = this.percentageCheck(data.doseFB, '20');
     const doseFBPublic = this.percentageCheck(data.doseFBPublic, '1');
 
@@ -373,6 +388,7 @@ export class RiskFactorDataEntity implements RiskFactorData {
         this.ibtugLEO = ibtugLEO.ibtug;
         this.ibtug = ibtug;
         this.probability = prob;
+        this.intensity = ibtug;
       }
     }
   }
@@ -433,5 +449,9 @@ export class RiskFactorDataEntity implements RiskFactorData {
     }
 
     return valueMap;
+  }
+
+  private convertNum(value: string) {
+    return Number(value);
   }
 }

@@ -1,5 +1,7 @@
+import { QueryArray } from './../../../shared/transformers/query-array';
+import { UfStateEnum } from '@prisma/client';
 import { Transform } from 'class-transformer';
-import { IsOptional, IsString, IsUppercase, Length, Matches } from 'class-validator';
+import { IsEnum, IsOptional, IsString, IsUppercase, Length, Matches } from 'class-validator';
 
 import { CepFormatTransform } from '../../../shared/transformers/cep-format.transform';
 import { NumberFormat } from '../../../shared/transformers/number-format';
@@ -38,9 +40,12 @@ export class AddressDto {
   @IsString()
   city: string;
 
-  @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsOptional()
-  @Length(2, 2)
-  @IsUppercase()
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsEnum(UfStateEnum, {
+    message: `UF inválido`,
+    each: true,
+  })
   state: string;
 }

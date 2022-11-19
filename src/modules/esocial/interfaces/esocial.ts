@@ -15,6 +15,12 @@ export interface IEsocialSendBatchResponse {
   }[];
 }
 
+export enum IdeOCEnum {
+  CRM = 1,
+  CREA = 4,
+  OTHER = 9,
+}
+
 export declare namespace IEsocialFetchBatch {
   export interface Event {
     attributes: {

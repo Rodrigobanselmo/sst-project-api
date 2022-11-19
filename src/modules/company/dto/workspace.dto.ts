@@ -1,6 +1,7 @@
+import { CnpjFormatTransform } from './../../../shared/transformers/cnpj-format.transform';
 import { Prisma, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
-import { IsBoolean, IsDefined, IsEnum, IsOptional, IsString, MaxLength, ValidateNested } from 'class-validator';
+import { IsBoolean, IsDefined, IsEnum, IsOptional, IsString, Length, MaxLength, ValidateNested } from 'class-validator';
 
 import { StringCapitalizeTransform } from '../../../shared/transformers/string-capitalize';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
@@ -19,6 +20,11 @@ export class WorkspaceDto {
   @IsOptional()
   @IsString()
   description?: string;
+
+  @Transform(CnpjFormatTransform, { toClassOnly: true })
+  @IsOptional()
+  @Length(14, 14, { message: 'invalid CNPJ' })
+  cnpj?: string;
 
   @IsOptional()
   @IsBoolean()

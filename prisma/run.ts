@@ -10,6 +10,8 @@ import { CharacterizationPhotoRepository } from '../src/modules/company/reposito
 import { deleteProfessionalsConnections } from './run/delete-professionals-connections';
 import { addProfCOuncilNUll } from './run/create-professional-council';
 import { seedEsocial24 } from './seed/read_24';
+import { normalizeUnitRisks } from './run/normalize-unit-risks';
+import { changeRecMed } from './run/change-rec-med';
 
 const prisma = new PrismaClient();
 
@@ -42,6 +44,7 @@ async function main() {
     // await levelRiskData(prisma);
     // await representAll(prisma);
     // await seedEsocial24(prisma);
+    await changeRecMed(prisma);
 
     // await deleteProfessionalsConnections(prisma);
     // await addProfCOuncilNUll(prisma);

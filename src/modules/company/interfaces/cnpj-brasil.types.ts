@@ -1,5 +1,7 @@
+import { UfStateEnum } from '@prisma/client';
+
 export interface ICnpjBrasilResponse {
-  uf: string;
+  uf: UfStateEnum;
   cep: string;
   qsa?: QsaEntity[] | null;
   cnpj: string;

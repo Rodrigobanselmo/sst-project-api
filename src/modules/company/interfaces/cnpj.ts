@@ -1,3 +1,5 @@
+import { UfStateEnum } from '@prisma/client';
+
 export interface ICnpjResponse {
   cnpj: string;
   name: string;
@@ -20,7 +22,7 @@ export interface ICnpjResponse {
     street: string;
     cep: string;
     complement: string;
-    state: string;
+    state: UfStateEnum;
   };
 }
 

@@ -12,18 +12,30 @@ import { IEventProps, ProcEmiEnum, TpIncsEnum } from '../../../../modules/esocia
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { arrayChunks } from '../../../../shared/utils/arrayChunks';
 import { DayJSProvider } from '../../DateProvider/implementations/DayJSProvider';
-import { IBatchDatabaseSave, IESocial2220, IESocial3000, IESocialSendEventOptions } from '../models/IESocialMethodProvider';
+import { IBatchDatabaseSave, IESocial2220, IESocial2240, IESocial3000, IESocialSendEventOptions } from '../models/IESocialMethodProvider';
 import { CompanyEntity } from './../../../../modules/company/entities/company.entity';
 import { EmployeeExamsHistoryEntity } from './../../../../modules/company/entities/employee-exam-history.entity';
 import { CreateESocialEvent } from './../../../../modules/esocial/dto/esocial-batch.dto';
 import { EmployeeESocialBatchEntity } from './../../../../modules/esocial/entities/employeeEsocialBatch.entity';
-import { IEsocialFetchBatch, IEsocialSendBatchResponse } from './../../../../modules/esocial/interfaces/esocial';
+import { IdeOCEnum, IEsocialFetchBatch, IEsocialSendBatchResponse } from './../../../../modules/esocial/interfaces/esocial';
 import { mapTpEvent } from './../../../../modules/esocial/interfaces/event-3000';
 import { EventGroupEnum, IBatchProps, IndRetifEnum, TpAmbEnum } from './../../../../modules/esocial/interfaces/event-batch';
 import { ESocialBatchRepository } from './../../../../modules/esocial/repositories/implementations/ESocialBatchRepository';
 import { SoapClientEnum } from './../../../constants/enum/soapClient';
 import { sortNumber } from './../../../utils/sorts/number.sort';
 import { ESocialMethodsProvider } from './ESocialMethodsProvider';
+import {
+  IEvent2240Props,
+  IPriorRiskData,
+  LocalAmbEnum,
+  requiredDescAg,
+  requiredLimTol,
+  requiredTpAval,
+  TpAvalEnum,
+  UnMedEnum,
+  utileEpiEpcEnum,
+  YesNoEnum,
+} from './../../../../modules/esocial/interfaces/event-2240';
 
 @Injectable()
 class ESocialEventProvider {
@@ -240,7 +252,7 @@ class ESocialEventProvider {
           },
         };
 
-        const receipt = aso?.events?.sort((b, a) => sortData(a, b))?.find((e) => e.receipt)?.receipt;
+        const receipt = aso?.events?.sort((a, b) => sortData(b.created_at, a.created_at))?.find((e) => e.receipt)?.receipt;
 
         const event: IEvent2220Props = {
           id,
@@ -269,6 +281,170 @@ class ESocialEventProvider {
           historyExams,
           examIds: historyExams.map((i) => i.id),
           employee: employee,
+        };
+      });
+
+      acc = [...eventsJs, ...acc];
+      return acc;
+    }, []);
+
+    return eventsStruct;
+  }
+
+  convertToEvent2240Struct(props: IESocial2240.StructureEntry, options?: { ideEvento?: IEventProps['ideEvento'] }) {
+    const company = props.company;
+    const employeesData = props.employees;
+    const generateId = this.eSocialMethodsProvider.classGenerateId(company.cnpj);
+    const eventsStruct = employeesData.reduce<IESocial2240.StructureReturn[]>((acc, employee) => {
+      // employee.actualPPPHistory[0].
+
+      const getEpcType = (risk: IPriorRiskData) => {
+        const isEPCPresent = !!(risk.riskData.engsToRiskFactorData[0]?.recMed?.medName != 'Não verificada');
+        const isEPCNotApplicable = !!(risk.riskData.engsToRiskFactorData[0]?.recMed?.medName == 'Não aplicável');
+        const isEPCNotImplemented = !!(risk.riskData.engsToRiskFactorData[0]?.recMed?.medName == 'Não implementada');
+
+        if (isEPCNotApplicable) return utileEpiEpcEnum.NOT_APT;
+        if (isEPCNotImplemented) return utileEpiEpcEnum.NOT_IMPLEMENTED;
+        if (isEPCPresent) return utileEpiEpcEnum.IMPLEMENTED;
+        return null;
+      };
+
+      const getEpiType = (risk: IPriorRiskData) => {
+        const isEPCNotApplicable = !!(risk.riskData.epiToRiskFactorData[0]?.epi.ca == 'Não aplicável');
+        const isEPCPresent = !isEPCNotApplicable && !!(risk.riskData.epiToRiskFactorData.length > 0);
+
+        if (isEPCNotApplicable) return utileEpiEpcEnum.NOT_APT;
+        if (isEPCPresent) return utileEpiEpcEnum.IMPLEMENTED;
+        return utileEpiEpcEnum.NOT_IMPLEMENTED;
+      };
+
+      const comparePPP = employee.pppHistory.reduce(
+        (acc, ppp) => {
+          const actualPPP = employee.actualPPPHistory.find((snapshot) => this.onGetDate(ppp.doneDate) == this.onGetDate(snapshot.date));
+          const record = {
+            [ppp.doneDate.toISOString()]: {
+              old: ppp,
+              actual: actualPPP,
+            },
+          };
+
+          return { ...acc, ...record };
+        },
+        {} as Record<
+          string,
+          {
+            old: typeof employee.pppHistory[0];
+            actual: typeof employee.actualPPPHistory[0];
+          }
+        >,
+      );
+
+      const eventsJs = employee.actualPPPHistory.map<IESocial2240.StructureReturn>((snapshot) => {
+        const risks = snapshot.risks;
+        const responsible = snapshot.responsible;
+        const environments = snapshot.environments;
+        const date = snapshot.date;
+        const id = generateId.newId();
+
+        const eventRisk: IEvent2240Props['evtExpRisco'] = {
+          infoExpRisco: {
+            dtIniCondicao: date,
+            infoAmb: environments.map((e) => ({
+              localAmb: e.isOwner ? LocalAmbEnum.OWNER : LocalAmbEnum.NOT_OWNER,
+              dscSetor: e.sectorName,
+              nrInsc: e.cnpj,
+            })),
+            infoAtiv: {
+              dscAtivDes: snapshot.desc,
+            },
+            agNoc: risks.map((risk) => {
+              const riskFactor = risk?.riskFactor;
+              const esocial = riskFactor?.esocial;
+              const code = esocial?.id;
+              const isEmptyRisk = requiredTpAval.includes(code);
+              const isRequiredDesc = requiredDescAg.includes(code);
+              const isRequiredLimit = requiredLimTol.includes(code);
+              const isQuantity = esocial?.isQuantity;
+              const limit = risk.riskData?.ibtugLEO || 100;
+              const intensity = risk.riskData?.vdvrValue || risk.riskData?.arenValue || risk.riskData?.intensity;
+              const useEpc = getEpcType(risk);
+              const useEpi = getEpiType(risk);
+              const isEPCEfficient = !!risk.riskData.engsToRiskFactorData.find((e) => e.efficientlyCheck);
+              const isEPIEfficient = !!risk.riskData.epiToRiskFactorData.find((e) => e.efficientlyCheck);
+
+              const isEPCImplemented = useEpc == utileEpiEpcEnum.IMPLEMENTED;
+              const isEPIImplemented = useEpi == utileEpiEpcEnum.IMPLEMENTED;
+
+              return {
+                codAgNoc: code || null,
+                ...(isRequiredDesc && { dscAgNoc: riskFactor?.name }),
+                ...(isEmptyRisk && { tpAval: isQuantity ? TpAvalEnum.QUANTITY : TpAvalEnum.QUALITY }),
+                ...(isQuantity && {
+                  intConc: intensity,
+                  ...(isRequiredLimit && { limTol: limit }),
+                  unMed: UnMedEnum[riskFactor?.unit],
+                  tecMedicao: riskFactor?.method != 'Qualitativo' ? riskFactor?.method : null,
+                  epcEpi: {
+                    utilizEPC: getEpcType(risk),
+                    utilizEPI: getEpiType(risk),
+                    ...(isEPCImplemented && { eficEpc: isEPCEfficient ? YesNoEnum.YES : YesNoEnum.NO }),
+                    ...(isEPIImplemented && { eficEpc: isEPIEfficient ? YesNoEnum.YES : YesNoEnum.NO }),
+                    ...(isEPIImplemented && { epi: risk.riskData.epiToRiskFactorData.map((e) => ({ docAval: e?.epi?.ca })) }),
+                    ...(isEPIImplemented && {
+                      epiCompl: {
+                        condFuncto: isEPIEfficient ? YesNoEnum.YES : YesNoEnum.NO,
+                        higienizacao: isEPIEfficient ? YesNoEnum.YES : YesNoEnum.NO,
+                        medProtecao: isEPIEfficient ? YesNoEnum.YES : YesNoEnum.NO,
+                        periodicTroca: isEPIEfficient ? YesNoEnum.YES : YesNoEnum.NO,
+                        przValid: isEPIEfficient ? YesNoEnum.YES : YesNoEnum.NO,
+                        usoInint: isEPIEfficient ? YesNoEnum.YES : YesNoEnum.NO,
+                      },
+                    }),
+                  },
+                }),
+              };
+            }),
+            respReg: [
+              {
+                cpfResp: responsible?.cpf,
+                ideOC: IdeOCEnum.CREA,
+                nrOC: responsible?.councilId,
+                ufOC: responsible?.councilUF,
+              },
+            ],
+          },
+        };
+
+        const oldPPP = comparePPP[snapshot.date.toISOString()]?.old;
+        const receipt = oldPPP?.events?.sort((b, a) => sortData(a, b))?.find((e) => e.receipt)?.receipt;
+
+        const event: IEvent2240Props = {
+          id,
+          evtExpRisco: eventRisk,
+          ideEmpregador: { nrInsc: company.cnpj },
+          ideVinculo: {
+            cpfTrab: employee.cpf,
+            matricula: employee.esocialCode,
+          },
+          ideEvento: {
+            tpAmb: options?.ideEvento?.tpAmb,
+            procEmi: options?.ideEvento?.procEmi,
+            ...(receipt && {
+              indRetif: IndRetifEnum.MODIFIED,
+              nrRecibo: receipt,
+            }),
+          },
+        };
+
+        delete employee.pppHistory;
+        delete employee.actualPPPHistory;
+
+        return {
+          id,
+          event: event,
+          employee: employee,
+          eventDate: date,
+          comparePPP,
         };
       });
 
@@ -515,6 +691,12 @@ class ESocialEventProvider {
     const xml = js2xml(eventJs, { compact: true });
     return xml;
   }
+
+  private onGetDate = (date: Date | null | number) => {
+    // return date ? new Date(date) : null;
+    if (typeof date === 'number') return this.dayJSProvider.dayjs(date).startOf('day').toDate();
+    return date ? this.dayJSProvider.dayjs(date).startOf('day').toDate() : null;
+  };
 
   public async sendEventToESocial(events: (IESocial2220.XmlReturn | IESocial3000.XmlReturn)[], options: IESocialSendEventOptions) {
     // const eventChunks = arrayChunks(  Array.from({ length: 100 }).map(() => events[0]),  100,);
