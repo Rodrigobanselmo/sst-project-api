@@ -12,6 +12,7 @@ import { addProfCOuncilNUll } from './run/create-professional-council';
 import { seedEsocial24 } from './seed/read_24';
 import { normalizeUnitRisks } from './run/normalize-unit-risks';
 import { changeRecMed } from './run/change-rec-med';
+import { CreateAbsenceRisk as createAbsenceRisk } from './run/create-no-risk';
 
 const prisma = new PrismaClient();
 
@@ -45,6 +46,7 @@ async function main() {
     // await representAll(prisma);
     // await seedEsocial24(prisma);
     await changeRecMed(prisma);
+    await createAbsenceRisk(prisma);
 
     // await deleteProfessionalsConnections(prisma);
     // await addProfCOuncilNUll(prisma);

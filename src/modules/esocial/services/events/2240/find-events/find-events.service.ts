@@ -59,28 +59,32 @@ export class FindEvents2240ESocialService {
     const employees2240 = await this.findEmployee2240(company);
 
     const eventsStruct = this.eSocialEventProvider.convertToEvent2240Struct({ company, employees: employees2240 });
-    return eventsStruct;
-    // let type: ESocialSendEnum = ESocialSendEnum.SEND;
-    // if (
-    //   data.aso?.events?.some((e) =>
-    //     ['DONE', 'TRANSMITTED'].includes(e.status),
-    //   )
-    // ) {
-    //   const isExclude = data.aso.status === 'CANCELED';
-    //   if (isExclude) type = ESocialSendEnum.EXCLUDE;
-    //   if (!isExclude) type = ESocialSendEnum.MODIFIED;
-    // }
 
-    //  return {
-    //     company,
-    //     doneDate: data.event.exMedOcup.aso.dtAso,
-    //     examType: mapInverseResAso[data.event.exMedOcup?.tpExameOcup],
-    //     evaluationType: mapInverseTpExameOcup[data.event.exMedOcup.aso?.resAso],
-    //     errors: eventErrors,
-    //     employee: data.employee,
-    //     type,
-    //     xml: xmlResult,
-    //   }[];
+    const eventsXml = eventsStruct
+      .filter((e) => !e.isSame)
+      .map((data) => {
+        const eventErrors = this.eSocialEventProvider.errorsEvent2240(data.event);
+
+        const xmlResult = !data.isExclude ? this.eSocialEventProvider.generateXmlEvent2240(data.event) : '';
+
+        data.eventDate;
+        data.event.evtExpRisco.infoExpRisco.dtIniCondicao;
+
+        const type: ESocialSendEnum = ESocialSendEnum.SEND;
+        if (data.isExclude) ESocialSendEnum.EXCLUDE;
+        if (data.event.ideEvento.nrRecibo) ESocialSendEnum.MODIFIED;
+
+        return {
+          doneDate: data.event.evtExpRisco.infoExpRisco.dtIniCondicao,
+          errors: eventErrors,
+          employee: data.employee,
+          type,
+          risks: data.event.evtExpRisco.infoExpRisco.agNoc.map((ag) => ag.nameAgNoc),
+          xml: xmlResult,
+        };
+      });
+
+    return { data: eventsXml, count: eventsXml.length };
 
     // check hierarchy ppp risks if
     // -> risk data has been added / edited
@@ -93,39 +97,6 @@ export class FindEvents2240ESocialService {
     // -> hierarchy has been added / edited
     // -> amb. engineering changed
     // ->
-
-    return;
-
-    // const eventsXml = eventsStruct.map((data) => {
-    //   const eventErrors = this.eSocialEventProvider.errorsEvent2220(data.event);
-    //   const xmlResult = this.eSocialEventProvider.generateXmlEvent2220(
-    //     data.event,
-    //     // { declarations: true },
-    //   );
-
-    //   const company = data.employee?.company;
-    //   delete data.employee?.company;
-
-    //   let type: ESocialSendEnum = ESocialSendEnum.SEND;
-    //   if (data.aso?.events?.some((e) => ['DONE', 'TRANSMITTED'].includes(e.status))) {
-    //     const isExclude = data.aso.status === 'CANCELED';
-    //     if (isExclude) type = ESocialSendEnum.EXCLUDE;
-    //     if (!isExclude) type = ESocialSendEnum.MODIFIED;
-    //   }
-
-    //   return {
-    //     company,
-    //     doneDate: data.event.exMedOcup.aso.dtAso,
-    //     examType: mapInverseResAso[data.event.exMedOcup?.tpExameOcup],
-    //     evaluationType: mapInverseTpExameOcup[data.event.exMedOcup.aso?.resAso],
-    //     errors: eventErrors,
-    //     employee: data.employee,
-    //     type,
-    //     xml: xmlResult,
-    //   };
-    // });
-
-    // return { data: eventsXml };
   }
 
   async findEmployee2240(company: CompanyEntity) {
@@ -151,6 +122,8 @@ export class FindEvents2240ESocialService {
         type: true,
         representAll: true,
         id: true,
+        unit: true,
+        method: true,
         nr15lt: true,
         isPPP: true,
         esocial: { select: { id: true, isQuantity: true } },
@@ -359,7 +332,7 @@ export class FindEvents2240ESocialService {
             const hhStartDate = this.onGetDate(hh.startDate);
             const hhEndDate = this.onGetDate(hh.endDate);
 
-            const { timeline, breakPoint } = this.cutTimeline(homoRiskDataTree[hh.homogeneousGroupId], [endDate, hhEndDate], [startDate, hhStartDate]);
+            const { timeline, breakPoint } = this.cutTimeline(homoRiskDataTree[hh.homogeneousGroupId] || [], [endDate, hhEndDate], [startDate, hhStartDate]);
 
             Object.assign(pppSnapshot, breakPoint);
 
@@ -487,7 +460,9 @@ export class FindEvents2240ESocialService {
           select: {
             id: true,
             cpf: true,
+            name: true,
             pppHistory: {
+              where: { events: { none: { action: 'EXCLUDE' } } },
               select: {
                 doneDate: true,
                 id: true,
@@ -519,17 +494,16 @@ export class FindEvents2240ESocialService {
   onGetRisks = (riskData: RiskFactorDataEntity[]): IPriorRiskData[] => {
     const risks: Record<string, { riskData: RiskFactorDataEntity[]; riskFactor: RiskFactorsEntity }> = {};
 
-    riskData.forEach((_rd) => {
-      if (_rd?.riskFactor?.representAll) return;
+    riskData.forEach(({ riskFactor, ..._rd }) => {
+      if (riskFactor?.representAll) return;
 
       if (!risks[_rd.riskId])
         risks[_rd.riskId] = {
           riskData: [],
-          riskFactor: _rd.riskFactor,
+          riskFactor: riskFactor,
         };
 
-      _rd.riskFactor = undefined;
-      risks[_rd.riskId].riskData.push(_rd);
+      risks[_rd.riskId].riskData.push(_rd as any);
     });
 
     return Object.values(risks).map((data) => {
@@ -627,26 +601,27 @@ export class FindEvents2240ESocialService {
       breakPoint[this.onGetStringDate(minEndDate)] = { riskData: [], date: this.onGetDate(minEndDate) };
     if (maxStartDate) breakPoint[this.onGetStringDate(maxStartDate)] = { riskData: [], date: this.onGetDate(maxStartDate) };
 
-    const timeline = riskData.reduce<RiskFactorDataEntity[]>((acc, rd) => {
-      const removeIfAfter = minEndDate && rd.startDate && rd.startDate.getTime() >= minEndDate;
-      if (removeIfAfter) return acc;
+    const timeline =
+      riskData?.reduce<RiskFactorDataEntity[]>((acc, rd) => {
+        const removeIfAfter = minEndDate && rd.startDate && rd.startDate.getTime() >= minEndDate;
+        if (removeIfAfter) return acc;
 
-      const removeIfBefore = maxStartDate && rd.endDate && rd.endDate.getTime() <= maxStartDate;
-      if (removeIfBefore) return acc;
+        const removeIfBefore = maxStartDate && rd.endDate && rd.endDate.getTime() <= maxStartDate;
+        if (removeIfBefore) return acc;
 
-      const setEndDate = minEndDate && rd.endDate && rd.endDate.getTime() >= minEndDate;
-      const setStartDateOnly = maxStartDate && rd.startDate && rd.startDate.getTime() <= maxStartDate;
+        const setEndDate = minEndDate && rd.endDate && rd.endDate.getTime() >= minEndDate;
+        const setStartDateOnly = maxStartDate && rd.startDate && rd.startDate.getTime() <= maxStartDate;
 
-      const rdClone = clone(rd);
+        const rdClone = clone(rd);
 
-      if (setEndDate || !rd.endDate) rdClone.endDate = this.onGetDate(minEndDate);
-      else breakPoint[this.onGetStringDate(rdClone.endDate)] = { riskData: [], date: this.onGetDate(rdClone.endDate) };
+        if (setEndDate || !rd.endDate) rdClone.endDate = this.onGetDate(minEndDate);
+        else breakPoint[this.onGetStringDate(rdClone.endDate)] = { riskData: [], date: this.onGetDate(rdClone.endDate) };
 
-      if (setStartDateOnly || !rd.startDate) rdClone.startDate = this.onGetDate(maxStartDate);
-      else breakPoint[this.onGetStringDate(rdClone.startDate)] = { riskData: [], date: this.onGetDate(rdClone.startDate) };
+        if (setStartDateOnly || !rd.startDate) rdClone.startDate = this.onGetDate(maxStartDate);
+        else breakPoint[this.onGetStringDate(rdClone.startDate)] = { riskData: [], date: this.onGetDate(rdClone.startDate) };
 
-      return [...acc, rdClone];
-    }, [] as RiskFactorDataEntity[]);
+        return [...acc, rdClone];
+      }, [] as RiskFactorDataEntity[]) || [];
 
     return { timeline, breakPoint };
   };

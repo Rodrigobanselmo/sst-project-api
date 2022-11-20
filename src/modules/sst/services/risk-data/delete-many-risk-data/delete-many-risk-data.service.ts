@@ -7,8 +7,9 @@ import { RiskDataRepository } from '../../../repositories/implementations/RiskDa
 export class DeleteManyRiskDataService {
   constructor(private readonly riskDataRepository: RiskDataRepository) {}
 
-  async execute(upsertRiskDataDto: DeleteManyRiskDataDto, groupId: string) {
-    const deletedCount = await this.riskDataRepository.deleteByHomoAndRisk(upsertRiskDataDto.homogeneousGroupIds, upsertRiskDataDto.riskIds, groupId);
+  async execute(upsertRiskDataDto: DeleteManyRiskDataDto, companyId: string) {
+    const deletedCount = await this.riskDataRepository.deleteByIdsAndCompany(upsertRiskDataDto.ids, companyId);
+    // const deletedCount = await this.riskDataRepository.deleteByHomoAndRisk(upsertRiskDataDto.homogeneousGroupIds, upsertRiskDataDto.riskIds, groupId);
 
     return deletedCount;
   }

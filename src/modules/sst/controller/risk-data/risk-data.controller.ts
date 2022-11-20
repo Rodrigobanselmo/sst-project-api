@@ -113,7 +113,7 @@ export class RiskDataController {
     isMember: true,
   })
   @Post('/:companyId/:groupId/delete/many')
-  delete(@Body() upsertRiskDataDto: DeleteManyRiskDataDto, @Param('groupId') groupId: string) {
-    return this.deleteManyRiskDataService.execute(upsertRiskDataDto, groupId);
+  delete(@Body() upsertRiskDataDto: DeleteManyRiskDataDto, @Param('companyId') companyId: string) {
+    return this.deleteManyRiskDataService.execute(upsertRiskDataDto, companyId);
   }
 }

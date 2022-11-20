@@ -85,7 +85,7 @@ export const seedRisks = async (prisma: PrismaClient, companyId: string) => {
     ),
   );
 
-  const recMed = ['Não aplicável', 'Não identificada', 'Não informada'];
+  const recMed = ['Não aplicável', 'Não verificada', 'Não implementada'];
   await Promise.all(
     ids.map(async (id) => {
       await Promise.all(

@@ -52,6 +52,8 @@ export class UpsertRiskDataService {
         riskData.epis.length === 0 &&
         riskData.exams.length === 0 &&
         riskData.generateSources.length === 0 &&
+        !riskData.endDate &&
+        !riskData.startDate &&
         !riskData.probability;
 
       if (isEmpty) {

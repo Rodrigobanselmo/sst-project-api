@@ -3,7 +3,7 @@ import { RecTypeEnum } from '@prisma/client';
 import { RiskFactorDataEntity } from '../../../../../sst/entities/riskData.entity';
 
 export const recommendationsConverter = (riskData: Partial<RiskFactorDataEntity>[]) => {
-  const remove = ['Não aplicável', 'Não identificada', 'Não informada'];
+  const remove = ['Não aplicável', 'Não verificada', 'Não implementada'];
 
   const eng = {
     data: [] as string[],

@@ -5,6 +5,7 @@ import clone from 'clone';
 import { Client } from 'nestjs-soap';
 import { IEvent3000Props } from '../../../../modules/esocial/interfaces/event-3000';
 import { js2xml } from 'xml-js';
+import deepEqual from 'deep-equal';
 
 import { EmployeeEntity } from '../../../../modules/company/entities/employee.entity';
 import { IEvent2220Props, mapResAso, mapTpExameOcup, requiredObsProc, requiredOrdExams } from '../../../../modules/esocial/interfaces/event-2220';
@@ -32,10 +33,12 @@ import {
   requiredLimTol,
   requiredTpAval,
   TpAvalEnum,
+  TpInscEnum,
   UnMedEnum,
   utileEpiEpcEnum,
   YesNoEnum,
 } from './../../../../modules/esocial/interfaces/event-2240';
+import sortArray from 'sort-array';
 
 @Injectable()
 class ESocialEventProvider {
@@ -136,6 +139,190 @@ class ESocialEventProvider {
         });
       }
     });
+
+    return errors;
+  }
+
+  errorsEvent2240(event: IEvent2240Props) {
+    if (!event) return [];
+    const infoExpRisco = event.evtExpRisco.infoExpRisco;
+    const respAmb = infoExpRisco.respReg;
+    const infoAmb = infoExpRisco.infoAmb;
+    const agNoc = infoExpRisco.agNoc;
+    const ideVinculo = event.ideVinculo;
+
+    const errors: { message: string }[] = [];
+
+    {
+      if (!ideVinculo.cpfTrab) errors.push({ message: 'Informar "CPF" do empregado' });
+      if (!ideVinculo.matricula) errors.push({ message: 'Informar "matricula" do empregado' });
+    }
+
+    {
+      if (respAmb.length == 0)
+        errors.push({
+          message: 'Informar o responsavél pelo monitoramento ambiental (PPP)',
+        });
+
+      respAmb.forEach((resp, index) => {
+        if (!resp.cpfResp) {
+          errors.push({
+            message: `${index}: Informar o responsavél pelo monitoramento ambiental (PPP)`,
+          });
+        } else {
+          if (!resp.ideOC || !resp.nrOC || !resp.ufOC)
+            errors.push({
+              message: `Profissional com CPF ${resp.cpfResp}: Informar o "CREA" do responsavél pelo monitoramento ambiental (PPP)`,
+            });
+        }
+      });
+    }
+
+    {
+      if (infoAmb.length == 0)
+        errors.push({
+          message: 'Informar o "local de trabalho (estbelecimento)" do cargp',
+        });
+
+      infoAmb.forEach((amb, index) => {
+        if (!amb.dscSetor) {
+          errors.push({
+            message: `${index}: Informar o "Nome do setor" ao qual o cargo está inserido`,
+          });
+        }
+        if (!amb.nrInsc) {
+          errors.push({
+            message: `${index}: Informar o "CNPJ" do estabelecimento (próprio ou de terceiros)`,
+          });
+        }
+      });
+    }
+
+    {
+      if (infoAmb.length == 0)
+        errors.push({
+          message: 'Informar o "local de trabalho (estbelecimento)" do cargp',
+        });
+
+      infoAmb.forEach((amb, index) => {
+        if (!amb.dscSetor) {
+          errors.push({
+            message: `${index}: Informar o "Nome do setor" ao qual o cargo está inserido`,
+          });
+        }
+        if (!amb.nrInsc) {
+          errors.push({
+            message: `${index}: Informar o "CNPJ" do estabelecimento (próprio ou de terceiros)`,
+          });
+        }
+      });
+    }
+
+    {
+      if (!infoExpRisco.dtIniCondicao)
+        errors.push({
+          message: 'Informar data de início de condição',
+        });
+
+      if (!infoExpRisco.infoAtiv.dscAtivDes)
+        errors.push({
+          message: 'Informar descrição de do cargo',
+        });
+    }
+    {
+      if (agNoc.length == 0) {
+        errors.push({
+          message: `Nenhum risco informado (utilizar "Ausência de risco" caso queira indicar essa condição)`,
+        });
+      }
+
+      agNoc.forEach((ag) => {
+        const code = ag.codAgNoc;
+
+        if (!code) {
+          errors.push({
+            message: `${ag.nameAgNoc}: Informar código do eSocial`,
+          });
+        }
+
+        const isEmptyRisk = requiredTpAval.includes(code);
+        const isRequiredDesc = requiredDescAg.includes(code);
+        const isRequiredLimit = requiredLimTol.includes(code);
+        const isQuantity = ag?.tpAval === TpAvalEnum.QUANTITY;
+        const epcEpi = ag?.epcEpi;
+        const isEPCImplemented = epcEpi?.utilizEPC == utileEpiEpcEnum.IMPLEMENTED;
+        const isEPIImplemented = epcEpi?.utilizEPI == utileEpiEpcEnum.IMPLEMENTED;
+
+        if (isEmptyRisk && agNoc.length > 1) {
+          errors.push({
+            message: `Não é possivel informar "Ausência de risco", juntamente com outros riscos`,
+          });
+          return;
+        }
+
+        if (!isEmptyRisk && !ag.tpAval) {
+          errors.push({
+            message: `${ag.nameAgNoc} (${code || '-'}): Informar se é Quantitativo ou Qualitativo (erro do sistema)`,
+          });
+        }
+
+        if (isRequiredDesc && !ag.dscAgNoc) {
+          errors.push({
+            message: `${ag.nameAgNoc} (${code || '-'}): Informar descrição complementar do agente nocivo (campo eSocial "dscAgNoc")`,
+          });
+        }
+
+        if (isRequiredLimit && !ag.limTol) {
+          errors.push({
+            message: `${ag.nameAgNoc} (${code || '-'}): Informar "limite de tolerância"`,
+          });
+        }
+
+        if (isQuantity) {
+          if (!ag.intConc)
+            errors.push({
+              message: `${ag.nameAgNoc} (${code || '-'}): Informar "valor de medição" para risco quantitativo (campo eSocial "intConc")`,
+            });
+
+          if (!ag.unMed)
+            errors.push({
+              message: `${ag.nameAgNoc} (${code || '-'}): Informar "unidade de medida" do valor de medição (campo eSocial "unMed")`,
+            });
+
+          if (!ag.tecMedicao)
+            errors.push({
+              message: `${ag.nameAgNoc} (${code || '-'}): Informar "Tecnica de medição" (campo eSocial "tecMedicao")`,
+            });
+        }
+
+        if (!isEmptyRisk) {
+          if (!epcEpi.utilizEPC)
+            errors.push({
+              message: `${ag.nameAgNoc} (${code || '-'}): Informar EPC's ou se é "não aplicavel" ou "não implementado"`,
+            });
+
+          if (!epcEpi.utilizEPI)
+            errors.push({
+              message: `${ag.nameAgNoc} (${code || '-'}): Informar EPI's ou se é "não aplicavel" ou "não implementado"`,
+            });
+
+          if (isEPCImplemented)
+            errors.push({
+              message: `${ag.nameAgNoc} (${code || '-'}): Informar eficácia do EPC`,
+            });
+
+          if (isEPIImplemented)
+            errors.push({
+              message: `${ag.nameAgNoc} (${code || '-'}): Informar eficácia do EPI`,
+            });
+
+          if (isEPIImplemented && !epcEpi?.epi?.length)
+            errors.push({
+              message: `${ag.nameAgNoc} (${code || '-'}): Informar ca's do EPI's`,
+            });
+        }
+      });
+    }
 
     return errors;
   }
@@ -296,12 +483,10 @@ class ESocialEventProvider {
     const employeesData = props.employees;
     const generateId = this.eSocialMethodsProvider.classGenerateId(company.cnpj);
     const eventsStruct = employeesData.reduce<IESocial2240.StructureReturn[]>((acc, employee) => {
-      // employee.actualPPPHistory[0].
-
       const getEpcType = (risk: IPriorRiskData) => {
-        const isEPCPresent = !!(risk.riskData.engsToRiskFactorData[0]?.recMed?.medName != 'Não verificada');
-        const isEPCNotApplicable = !!(risk.riskData.engsToRiskFactorData[0]?.recMed?.medName == 'Não aplicável');
-        const isEPCNotImplemented = !!(risk.riskData.engsToRiskFactorData[0]?.recMed?.medName == 'Não implementada');
+        const isEPCPresent = !!risk.riskData.engsToRiskFactorData.find((e) => e?.recMed?.medName == 'Não verificada');
+        const isEPCNotApplicable = !!risk.riskData.engsToRiskFactorData.find((e) => e?.recMed?.medName == 'Não aplicável');
+        const isEPCNotImplemented = !!risk.riskData.engsToRiskFactorData.find((e) => e?.recMed?.medName == 'Não implementada');
 
         if (isEPCNotApplicable) return utileEpiEpcEnum.NOT_APT;
         if (isEPCNotImplemented) return utileEpiEpcEnum.NOT_IMPLEMENTED;
@@ -310,36 +495,21 @@ class ESocialEventProvider {
       };
 
       const getEpiType = (risk: IPriorRiskData) => {
-        const isEPCNotApplicable = !!(risk.riskData.epiToRiskFactorData[0]?.epi.ca == 'Não aplicável');
-        const isEPCPresent = !isEPCNotApplicable && !!(risk.riskData.epiToRiskFactorData.length > 0);
+        const isEPINotApplicable = !!risk.riskData.epiToRiskFactorData.find((e) => e?.epi?.ca == '0');
+        const isEPIPresent = !isEPINotApplicable && !!(risk.riskData.epiToRiskFactorData.length > 0);
 
-        if (isEPCNotApplicable) return utileEpiEpcEnum.NOT_APT;
-        if (isEPCPresent) return utileEpiEpcEnum.IMPLEMENTED;
+        if (isEPINotApplicable) return utileEpiEpcEnum.NOT_APT;
+        if (isEPIPresent) return utileEpiEpcEnum.IMPLEMENTED;
         return utileEpiEpcEnum.NOT_IMPLEMENTED;
       };
 
-      const comparePPP = employee.pppHistory.reduce(
-        (acc, ppp) => {
-          const actualPPP = employee.actualPPPHistory.find((snapshot) => this.onGetDate(ppp.doneDate) == this.onGetDate(snapshot.date));
-          const record = {
-            [ppp.doneDate.toISOString()]: {
-              old: ppp,
-              actual: actualPPP,
-            },
-          };
+      const comparePPP = employee.pppHistory.reduce((acc, ppp) => {
+        return { ...acc, [ppp.doneDate.toISOString()]: { ppp, excluded: true } };
+      }, {} as Record<string, { ppp: typeof employee.pppHistory[0]; excluded?: boolean }>);
 
-          return { ...acc, ...record };
-        },
-        {} as Record<
-          string,
-          {
-            old: typeof employee.pppHistory[0];
-            actual: typeof employee.actualPPPHistory[0];
-          }
-        >,
-      );
+      let oldEventJs: IEvent2240Props['evtExpRisco'];
 
-      const eventsJs = employee.actualPPPHistory.map<IESocial2240.StructureReturn>((snapshot) => {
+      const eventsJs = sortArray(employee.actualPPPHistory, { by: 'date', order: 'asc' }).map<IESocial2240.StructureReturn>((snapshot) => {
         const risks = snapshot.risks;
         const responsible = snapshot.responsible;
         const environments = snapshot.environments;
@@ -376,20 +546,23 @@ class ESocialEventProvider {
               const isEPIImplemented = useEpi == utileEpiEpcEnum.IMPLEMENTED;
 
               return {
-                codAgNoc: code || null,
+                nameAgNoc: riskFactor.name,
+                codAgNoc: code || undefined,
                 ...(isRequiredDesc && { dscAgNoc: riskFactor?.name }),
-                ...(isEmptyRisk && { tpAval: isQuantity ? TpAvalEnum.QUANTITY : TpAvalEnum.QUALITY }),
+                ...(!isEmptyRisk && { tpAval: isQuantity ? TpAvalEnum.QUANTITY : TpAvalEnum.QUALITY }),
                 ...(isQuantity && {
                   intConc: intensity,
-                  ...(isRequiredLimit && { limTol: limit }),
-                  unMed: UnMedEnum[riskFactor?.unit],
-                  tecMedicao: riskFactor?.method != 'Qualitativo' ? riskFactor?.method : null,
+                  ...(isRequiredLimit && { limTol: limit || undefined }),
+                  unMed: UnMedEnum[riskFactor?.unit] || undefined,
+                  tecMedicao: riskFactor?.method != 'Qualitativo' ? riskFactor?.method : undefined,
+                }),
+                ...(!isEmptyRisk && {
                   epcEpi: {
-                    utilizEPC: getEpcType(risk),
-                    utilizEPI: getEpiType(risk),
+                    utilizEPC: getEpcType(risk) || undefined,
+                    utilizEPI: getEpiType(risk) || undefined,
                     ...(isEPCImplemented && { eficEpc: isEPCEfficient ? YesNoEnum.YES : YesNoEnum.NO }),
                     ...(isEPIImplemented && { eficEpc: isEPIEfficient ? YesNoEnum.YES : YesNoEnum.NO }),
-                    ...(isEPIImplemented && { epi: risk.riskData.epiToRiskFactorData.map((e) => ({ docAval: e?.epi?.ca })) }),
+                    ...(isEPIImplemented && { epi: risk.riskData.epiToRiskFactorData.map((e) => ({ docAval: e?.epi?.ca || undefined })) }),
                     ...(isEPIImplemented && {
                       epiCompl: {
                         condFuncto: isEPIEfficient ? YesNoEnum.YES : YesNoEnum.NO,
@@ -415,8 +588,28 @@ class ESocialEventProvider {
           },
         };
 
-        const oldPPP = comparePPP[snapshot.date.toISOString()]?.old;
-        const receipt = oldPPP?.events?.sort((b, a) => sortData(a, b))?.find((e) => e.receipt)?.receipt;
+        const oldPPP = comparePPP[snapshot.date.toISOString()]?.ppp;
+
+        let receipt = '';
+        let isSame = false;
+
+        if (oldPPP) {
+          comparePPP[snapshot.date.toISOString()].excluded = false;
+          isSame = deepEqual(oldPPP.json, eventRisk);
+          receipt = oldPPP?.events?.sort((b, a) => sortData(a, b))?.find((e) => e.receipt)?.receipt;
+        }
+
+        if (oldEventJs && !isSame) {
+          isSame = deepEqual(
+            { ...oldEventJs.infoExpRisco.agNoc, ...oldEventJs.infoExpRisco.infoAmb, ...oldEventJs.infoExpRisco.infoAtiv, ...oldEventJs.infoExpRisco.respReg },
+            {
+              ...eventRisk.infoExpRisco.agNoc,
+              ...eventRisk.infoExpRisco.infoAmb,
+              ...eventRisk.infoExpRisco.infoAtiv,
+              ...eventRisk.infoExpRisco.respReg,
+            },
+          );
+        }
 
         const event: IEvent2240Props = {
           id,
@@ -439,16 +632,28 @@ class ESocialEventProvider {
         delete employee.pppHistory;
         delete employee.actualPPPHistory;
 
+        oldEventJs = event.evtExpRisco;
+
         return {
           id,
           event: event,
           employee: employee,
           eventDate: date,
-          comparePPP,
+          isSame,
         };
       });
 
-      acc = [...eventsJs, ...acc];
+      const excludedEvents = Object.values(comparePPP)
+        .filter((ppp) => !ppp.excluded)
+        .map((ppp) => ({
+          id: '',
+          event: null,
+          employee: employee,
+          eventDate: ppp.ppp.doneDate,
+          isExclude: true,
+        }));
+
+      acc = [...eventsJs, ...acc, ...excludedEvents];
       return acc;
     }, []);
 
@@ -539,6 +744,103 @@ class ESocialEventProvider {
 
     const xml = js2xml(eventJs, { compact: true });
     // if (options?.declarations) xml = xml?.replace('<?xml?>', '');
+
+    return xml;
+  }
+
+  generateXmlEvent2240(event: IEvent2240Props, options?: { declarations?: boolean }) {
+    if (!event) return '';
+    const baseEvent = this.generateEventBase(event);
+    const infoExpRisco = event.evtExpRisco.infoExpRisco;
+    const respReg = infoExpRisco.respReg;
+    const dscAtivDes = infoExpRisco.infoAtiv.dscAtivDes;
+    const infoAmb = infoExpRisco.infoAmb;
+    const agNoc = infoExpRisco.agNoc;
+
+    const eventJs = {
+      ...(options?.declarations && {
+        _declaration: {
+          _attributes: {
+            version: '1.0',
+            encoding: 'UTF-8',
+          },
+        },
+      }),
+      eSocial: {
+        ['_attributes']: {
+          xmlns: 'http://www.esocial.gov.br/schema/evt/evtMonit/v_S_01_00_00',
+        },
+        evtExpRisco: {
+          ['_attributes']: {
+            Id: event.id,
+          },
+          ...baseEvent,
+          infoExpRisco: {
+            dtIniCondicao: { ['_text']: this.convertDate(infoExpRisco.dtIniCondicao) },
+            infoAmb: infoAmb.map((amb) => ({
+              localAmb: { ['_text']: amb.localAmb },
+              dscSetor: { ['_text']: amb.dscSetor },
+              tpInsc: { ['_text']: TpInscEnum.CNPJ },
+              nrInsc: { ['_text']: amb.nrInsc },
+            })),
+            infoAtiv: {
+              dscAtivDes: { ['_text']: dscAtivDes },
+            },
+            agNoc: agNoc.map((ag) => {
+              const code = ag.codAgNoc;
+              const isEmptyRisk = requiredTpAval.includes(code);
+              const isRequiredDesc = requiredDescAg.includes(code);
+              const isRequiredLimit = requiredLimTol.includes(code);
+              const isQuantity = ag?.tpAval === TpAvalEnum.QUANTITY;
+              const epcEpi = ag?.epcEpi;
+
+              const isEPCImplemented = epcEpi?.utilizEPC == utileEpiEpcEnum.IMPLEMENTED;
+              const isEPIImplemented = epcEpi?.utilizEPI == utileEpiEpcEnum.IMPLEMENTED;
+
+              return {
+                codAgNoc: code || undefined,
+                ...(isRequiredDesc && { dscAgNoc: { ['_text']: ag.dscAgNoc } }),
+                ...(!isEmptyRisk && { tpAval: { ['_text']: ag.tpAval } }),
+                ...(isQuantity && {
+                  intConc: { ['_text']: ag.intConc },
+                  ...(isRequiredLimit && { limTol: { ['_text']: ag.limTol } }),
+                  unMed: { ['_text']: ag.unMed },
+                  tecMedicao: { ['_text']: ag.tecMedicao },
+                }),
+                ...(!isEmptyRisk && {
+                  epcEpi: {
+                    utilizEPC: { ['_text']: epcEpi?.utilizEPC },
+                    utilizEPI: { ['_text']: epcEpi?.utilizEPI },
+                    ...(isEPCImplemented && { eficEpc: { ['_text']: epcEpi?.eficEpc } }),
+                    ...(isEPIImplemented && { eficEpc: { ['_text']: epcEpi?.eficEpi } }),
+                    ...(isEPIImplemented && { epi: epcEpi?.epi.map((e) => ({ docAval: { ['_text']: e.docAval } })) }),
+                    ...(isEPIImplemented && {
+                      epiCompl: {
+                        condFuncto: { ['_text']: epcEpi.epiCompl.condFuncto },
+                        higienizacao: { ['_text']: epcEpi.epiCompl.higienizacao },
+                        medProtecao: { ['_text']: epcEpi.epiCompl.medProtecao },
+                        periodicTroca: { ['_text']: epcEpi.epiCompl.periodicTroca },
+                        przValid: { ['_text']: epcEpi.epiCompl.przValid },
+                        usoInint: { ['_text']: epcEpi.epiCompl.usoInint },
+                      },
+                    }),
+                  },
+                }),
+              };
+            }),
+            respMonit: respReg.map((resp) => ({
+              cpfResp: { ['_text']: resp.cpfResp },
+              ideOC: { ['_text']: resp.ideOC },
+              ...(resp.dscOC && { dscOC: { ['_text']: resp.dscOC } }),
+              nrOC: { ['_text']: resp.nrOC },
+              ufOC: { ['_text']: resp.ufOC },
+            })),
+          },
+        },
+      },
+    };
+
+    const xml = js2xml(eventJs, { compact: true });
 
     return xml;
   }

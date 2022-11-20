@@ -207,12 +207,16 @@ export class UpsertManyRiskDataDto {
 }
 
 export class DeleteManyRiskDataDto {
-  @IsString({ each: true })
-  @IsOptional()
-  riskIds: string[];
+  // @IsString({ each: true })
+  // @IsOptional()
+  // riskIds: string[];
+
+  // @IsOptional()
+  // @IsString({ each: true })
+  // homogeneousGroupIds: string[];
 
   @IsString({ each: true })
-  homogeneousGroupIds: string[];
+  ids: string[];
 }
 
 export class FindRiskDataDto extends PaginationQueryDto {

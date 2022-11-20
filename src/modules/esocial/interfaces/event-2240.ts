@@ -104,6 +104,7 @@ export interface IEvent2240Props extends IEventProps {
         dscAtivDes: string;
       };
       agNoc: {
+        nameAgNoc: string;
         codAgNoc: string;
         dscAgNoc?: string;
         tpAval?: TpAvalEnum;

@@ -69,13 +69,8 @@ export declare namespace IESocial2240 {
     employee: EmployeeEntity;
     eventDate: Date;
     id: string;
-    comparePPP: Record<
-      string,
-      {
-        old: EmployeePPPHistoryEntity;
-        actual: IBreakPointPPP;
-      }
-    >;
+    isSame?: boolean;
+    isExclude?: boolean;
   }
 
   export interface XmlReturn extends Omit<StructureReturn, 'event'> {

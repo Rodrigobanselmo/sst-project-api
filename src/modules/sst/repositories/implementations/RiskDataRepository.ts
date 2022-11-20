@@ -316,6 +316,14 @@ export class RiskDataRepository {
     return riskFactorData;
   }
 
+  async deleteByIdsAndCompany(ids: string[], companyId: string) {
+    const riskFactorData = await this.prisma.riskFactorData.deleteMany({
+      where: { id: { in: ids }, companyId },
+    });
+
+    return riskFactorData;
+  }
+
   async deleteByHomoAndRisk(homogeneousGroupIds: string[], riskIds: string[], groupId: string) {
     const riskFactorData = await this.prisma.riskFactorData.deleteMany({
       where: {
