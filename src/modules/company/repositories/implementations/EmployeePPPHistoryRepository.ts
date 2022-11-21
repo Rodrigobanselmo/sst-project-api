@@ -28,12 +28,33 @@ export class EmployeePPPHistoryRepository {
     return data.map((data) => new EmployeePPPHistoryEntity(data));
   }
 
+  async upsertManyNude(createData: Pick<Prisma.EmployeePPPHistoryUpsertArgs, 'create' | 'update' | 'where'>[], options?: Partial<Prisma.EmployeePPPHistoryUpsertArgs>) {
+    const data = await this.prisma.$transaction(
+      createData.map((data) =>
+        this.prisma.employeePPPHistory.upsert({
+          ...data,
+          ...options,
+        }),
+      ),
+    );
+
+    return data.map((data) => new EmployeePPPHistoryEntity(data));
+  }
+
   async findNude(options: Prisma.EmployeePPPHistoryFindManyArgs = {}) {
     const data = await this.prisma.employeePPPHistory.findMany({
       ...options,
     });
 
     return data.map((data) => new EmployeePPPHistoryEntity(data));
+  }
+
+  async updateManyNude(options: Prisma.EmployeePPPHistoryUpdateManyArgs) {
+    const data = await this.prisma.employeePPPHistory.updateMany({
+      ...options,
+    });
+
+    return data;
   }
 
   async findFirstNude(options: Prisma.EmployeePPPHistoryFindFirstArgs = {}) {

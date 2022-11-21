@@ -1,3 +1,4 @@
+import { EmployeePPPHistoryRepository } from './../../../../company/repositories/implementations/EmployeePPPHistoryRepository';
 import { HierarchyRepository } from '../../../../company/repositories/implementations/HierarchyRepository';
 import { HomoGroupRepository } from '../../../../company/repositories/implementations/HomoGroupRepository';
 import { Injectable } from '@nestjs/common';
@@ -13,6 +14,7 @@ export class UpsertManyRiskDataService {
     private readonly riskDataRepository: RiskDataRepository,
     private readonly homoGroupRepository: HomoGroupRepository,
     private readonly hierarchyRepository: HierarchyRepository,
+    private readonly employeePPPHistoryRepository: EmployeePPPHistoryRepository,
   ) {}
 
   async execute(upsertRiskDataDto: UpsertManyRiskDataDto) {
@@ -59,6 +61,16 @@ export class UpsertManyRiskDataService {
       )) || [];
 
     if (upsertRiskDataDto.riskId) risksDataMany.push(await this.riskDataRepository.upsertMany(upsertRiskDataDto));
+
+    this.employeePPPHistoryRepository.updateManyNude({
+      data: { sendEvent: true },
+      where: {
+        employee: {
+          companyId: upsertRiskDataDto.companyId,
+          hierarchyHistory: { some: { hierarchy: { hierarchyOnHomogeneous: { some: { homogeneousGroupId: { in: upsertRiskDataDto.homogeneousGroupIds } } } } } },
+        },
+      },
+    });
 
     // const emptyRiskDataIds = risksDataMany.reduce((acc, riskDataSlice) => {
     //   return [

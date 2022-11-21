@@ -1,10 +1,11 @@
-import { HierarchyRepository } from '../../../../company/repositories/implementations/HierarchyRepository';
-import { HomoGroupRepository } from '../../../../company/repositories/implementations/HomoGroupRepository';
 import { Injectable } from '@nestjs/common';
 import { HomoTypeEnum } from '@prisma/client';
 
+import { HierarchyRepository } from '../../../../company/repositories/implementations/HierarchyRepository';
+import { HomoGroupRepository } from '../../../../company/repositories/implementations/HomoGroupRepository';
 import { UpsertRiskDataDto } from '../../../dto/risk-data.dto';
 import { RiskDataRepository } from '../../../repositories/implementations/RiskDataRepository';
+import { EmployeePPPHistoryRepository } from './../../../../company/repositories/implementations/EmployeePPPHistoryRepository';
 
 @Injectable()
 export class UpsertRiskDataService {
@@ -12,6 +13,7 @@ export class UpsertRiskDataService {
     private readonly riskDataRepository: RiskDataRepository,
     private readonly homoGroupRepository: HomoGroupRepository,
     private readonly hierarchyRepository: HierarchyRepository,
+    private readonly employeePPPHistoryRepository: EmployeePPPHistoryRepository,
   ) {}
 
   async execute(upsertRiskDataDto: UpsertRiskDataDto) {
@@ -30,8 +32,6 @@ export class UpsertRiskDataService {
       if (!upsertRiskDataDto.endDate) upsertRiskDataDto.endDate = null;
     }
 
-    console.log(upsertRiskDataDto);
-
     const isTypeHierarchy = type && type == HomoTypeEnum.HIERARCHY;
     if (isTypeHierarchy)
       await hierarchyCreateHomo({
@@ -43,6 +43,16 @@ export class UpsertRiskDataService {
         workspaceId,
       });
     const riskData = await this.riskDataRepository.upsert(upsertRiskDataDto);
+
+    this.employeePPPHistoryRepository.updateManyNude({
+      data: { sendEvent: true },
+      where: {
+        employee: {
+          companyId: upsertRiskDataDto.companyId,
+          hierarchyHistory: { some: { hierarchy: { hierarchyOnHomogeneous: { some: { homogeneousGroupId: upsertRiskDataDto.homogeneousGroupId } } } } },
+        },
+      },
+    });
 
     if (!keepEmpty) {
       const isEmpty =

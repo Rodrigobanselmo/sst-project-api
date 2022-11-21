@@ -1,3 +1,4 @@
+import { EmployeePPPHistoryRepository } from './../../../../../repositories/implementations/EmployeePPPHistoryRepository';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { EmployeeHierarchyMotiveTypeEnum } from '@prisma/client';
 import { ErrorMessageEnum } from './../../../../../../../shared/constants/enum/errorMessage';
@@ -13,6 +14,7 @@ export class UpdateEmployeeHierarchyHistoryService {
   constructor(
     private readonly employeeHierarchyHistoryRepository: EmployeeHierarchyHistoryRepository,
     private readonly employeeRepository: EmployeeRepository,
+    private readonly employeePPPHistoryRepository: EmployeePPPHistoryRepository,
     private readonly createEmployeeHierarchyHistoryService: CreateEmployeeHierarchyHistoryService,
   ) {}
 
@@ -35,6 +37,16 @@ export class UpdateEmployeeHierarchyHistoryService {
       found.id,
       hierarchyId,
     );
+
+    this.employeePPPHistoryRepository.updateManyNude({
+      data: { sendEvent: true },
+      where: {
+        employee: {
+          companyId: user.targetCompanyId,
+          id: dataDto.employeeId,
+        },
+      },
+    });
 
     return history;
   }

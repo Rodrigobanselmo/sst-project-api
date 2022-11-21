@@ -1,3 +1,4 @@
+import { EmployeePPPHistoryRepository } from './../../../../../repositories/implementations/EmployeePPPHistoryRepository';
 import { EmployeeHierarchyHistoryEntity, historyRules } from './../../../../../entities/employee-hierarchy-history.entity';
 import { sortData } from './../../../../../../../shared/utils/sorts/data.sort';
 import { EmployeeEntity } from './../../../../../entities/employee.entity';
@@ -11,7 +12,11 @@ import { EmployeeRepository } from './../../../../../repositories/implementation
 
 @Injectable()
 export class DeleteEmployeeHierarchyHistoryService {
-  constructor(private readonly employeeHierarchyHistoryRepository: EmployeeHierarchyHistoryRepository, private readonly employeeRepository: EmployeeRepository) {}
+  constructor(
+    private readonly employeeHierarchyHistoryRepository: EmployeeHierarchyHistoryRepository,
+    private readonly employeeRepository: EmployeeRepository,
+    private readonly employeePPPHistoryRepository: EmployeePPPHistoryRepository,
+  ) {}
 
   async execute(id: number, employeeId: number, user: UserPayloadDto) {
     const found = await this.employeeRepository.findById(employeeId, user.targetCompanyId);
@@ -21,6 +26,16 @@ export class DeleteEmployeeHierarchyHistoryService {
     const hierarchyId = await this.check({ id, foundEmployee: found });
 
     const history = await this.employeeHierarchyHistoryRepository.delete(id, employeeId, hierarchyId);
+
+    this.employeePPPHistoryRepository.updateManyNude({
+      data: { sendEvent: true },
+      where: {
+        employee: {
+          companyId: user.targetCompanyId,
+          id: employeeId,
+        },
+      },
+    });
 
     return history;
   }

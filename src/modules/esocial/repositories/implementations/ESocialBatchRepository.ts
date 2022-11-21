@@ -15,35 +15,31 @@ export class ESocialBatchRepository {
   async create({ companyId, events, environment, status, type, examsIds, pppJson, ...rest }: CreateESocialBatch) {
     const pppTree = {};
     if (pppJson) {
-      const data = await this.prisma.$transaction(
+      const pppHistory = await this.prisma.$transaction(
         pppJson.map((data) => {
-          if (data.event?.ppp?.id)
-            return this.prisma.employeePPPHistory.update({
-              data: {
-                json: data.json,
-                sendEvent: false,
-                // status: StatusEnum.PENDING,
-              },
-              where: { id: data.event.ppp.id },
-              select: { id: true },
-            });
+          const eventDate = (data as any).event.eventDate;
 
-          return this.prisma.employeePPPHistory.create({
-            data: {
+          return this.prisma.employeePPPHistory.upsert({
+            create: {
               json: data.json,
-              ...('eventDate' in data.event && {
-                doneDate: data.event.eventDate,
-              }),
+              doneDate: eventDate,
               employeeId: data.event.employee.id,
               sendEvent: false,
-              status: status == StatusEnum.TRANSMITTED ? StatusEnum.PENDING : StatusEnum.DONE,
+              status: status == StatusEnum.TRANSMITTED ? StatusEnum.DONE : StatusEnum.PENDING,
+            },
+            update: { json: data.json, sendEvent: false },
+            where: {
+              employeeId_doneDate: {
+                doneDate: eventDate,
+                employeeId: data.event.employee.id,
+              },
             },
             select: { id: true },
           });
         }),
       );
 
-      data.forEach((pppHistory, index) => {
+      pppHistory.forEach((pppHistory, index) => {
         const event = pppJson[index].event;
 
         pppTree[`${event.employee.id}${event.id}`] = pppHistory.id;

@@ -1,3 +1,4 @@
+import { EmployeePPPHistoryRepository } from './../../../../../repositories/implementations/EmployeePPPHistoryRepository';
 import { EmployeeEntity } from './../../../../../entities/employee.entity';
 import { sortData } from './../../../../../../../shared/utils/sorts/data.sort';
 import { EmployeeHierarchyHistoryEntity, historyRules } from './../../../../../entities/employee-hierarchy-history.entity';
@@ -12,7 +13,11 @@ import { EmployeeRepository } from '../../../../../repositories/implementations/
 
 @Injectable()
 export class CreateEmployeeHierarchyHistoryService {
-  constructor(private readonly employeeHierarchyHistoryRepository: EmployeeHierarchyHistoryRepository, private readonly employeeRepository: EmployeeRepository) {}
+  constructor(
+    private readonly employeeHierarchyHistoryRepository: EmployeeHierarchyHistoryRepository,
+    private readonly employeeRepository: EmployeeRepository,
+    private readonly employeePPPHistoryRepository: EmployeePPPHistoryRepository,
+  ) {}
 
   async execute(dataDto: CreateEmployeeHierarchyHistoryDto, user: UserPayloadDto) {
     const found = await this.employeeRepository.findById(dataDto.employeeId, user.targetCompanyId);
@@ -33,6 +38,16 @@ export class CreateEmployeeHierarchyHistoryService {
       found.id,
       hierarchyId,
     );
+
+    this.employeePPPHistoryRepository.updateManyNude({
+      data: { sendEvent: true },
+      where: {
+        employee: {
+          companyId: user.targetCompanyId,
+          id: dataDto.employeeId,
+        },
+      },
+    });
 
     return history;
   }

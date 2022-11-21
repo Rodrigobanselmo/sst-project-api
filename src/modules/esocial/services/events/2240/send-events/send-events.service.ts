@@ -75,13 +75,17 @@ export class SendEvents2240ESocialService {
       esocialSend,
     });
 
+    const errorsEventsPPP = [] as IESocial2240.StructureReturn[];
     // prepare event to send to eSocial
     const eventsXml: IESocial2240.XmlReturn[] = eventsStruct
       .map(({ event, ...data }) => {
         if (data.isExclude) return;
 
         const errors = this.eSocialEventProvider.errorsEvent2240(event);
-        if (errors.length > 0) return;
+        if (errors.length > 0) {
+          errorsEventsPPP.push({ event, ...data });
+          return;
+        }
 
         const xmlResult = this.eSocialEventProvider.generateXmlEvent2240(
           event,
@@ -98,6 +102,29 @@ export class SendEvents2240ESocialService {
         return { signedXml, xml: xmlResult, ...data };
       })
       .filter((i) => i);
+
+    await this.employeePPPHistoryRepository.upsertManyNude(
+      errorsEventsPPP.map((ev) => {
+        return {
+          create: {
+            sendEvent: true,
+            employeeId: ev.employee.id,
+            doneDate: ev.eventDate,
+            status: StatusEnum.INVALID,
+          },
+          update: {
+            sendEvent: true,
+            status: StatusEnum.INVALID,
+          },
+          where: {
+            employeeId_doneDate: {
+              employeeId: ev.employee.id,
+              doneDate: ev.eventDate,
+            },
+          },
+        };
+      }),
+    );
 
     // get response after sending to esocial
     const sendEventResponse = esocialSend

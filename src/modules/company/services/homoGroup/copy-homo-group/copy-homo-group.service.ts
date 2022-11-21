@@ -1,3 +1,4 @@
+import { EmployeePPPHistoryRepository } from './../../../repositories/implementations/EmployeePPPHistoryRepository';
 import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { ErrorCompanyEnum } from '../../../../../shared/constants/enum/errorMessage';
@@ -13,7 +14,7 @@ import { HierarchyRepository } from './../../../repositories/implementations/Hie
 @Injectable()
 export class CopyHomoGroupService {
   constructor(
-    private readonly hierarchyRepository: HierarchyRepository,
+    private readonly employeePPPHistoryRepository: EmployeePPPHistoryRepository,
     private readonly homoGroupRepository: HomoGroupRepository,
     private readonly riskDataRepository: RiskDataRepository,
     private readonly upsertManyRiskDataService: UpsertManyRiskDataService,
@@ -79,5 +80,15 @@ export class CopyHomoGroupService {
       riskData.filter((r) => r.endDate == null),
       save,
     );
+
+    this.employeePPPHistoryRepository.updateManyNude({
+      data: { sendEvent: true },
+      where: {
+        employee: {
+          companyId: userPayloadDto.targetCompanyId,
+          hierarchyHistory: { some: { hierarchy: { hierarchyOnHomogeneous: { some: { homogeneousGroupId: foundHomoGroup.id } } } } },
+        },
+      },
+    });
   }
 }

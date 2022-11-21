@@ -1,3 +1,4 @@
+import { PrismaService } from './../../../../../../prisma/prisma.service';
 import { ICompanyOptions } from './../../../../../../shared/providers/ESocialProvider/models/IESocialMethodProvider';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { HierarchyEnum, HomogeneousGroup } from '@prisma/client';
@@ -35,6 +36,7 @@ export class FindEvents2240ESocialService {
     private readonly companyRepository: CompanyRepository,
     private readonly riskRepository: RiskRepository,
     private readonly dayjsProvider: DayJSProvider,
+    private readonly prisma: PrismaService,
   ) {}
 
   async execute({ skip, take, ...query }: FindEvents2240Dto, user: UserPayloadDto) {
@@ -55,6 +57,14 @@ export class FindEvents2240ESocialService {
 
     const eventsStruct = this.eSocialEventProvider.convertToEvent2240Struct({ company, employees: employees2240 });
 
+    // update when is same as before
+    {
+      const updateIsSame = eventsStruct.filter((e) => e.isSame && e.receipt).map((e) => e.ppp.id);
+      await this.prisma.employeePPPHistory.updateMany({ where: { id: { in: updateIsSame } }, data: { sendEvent: false } });
+      const updateIsExcludeNotExist = eventsStruct.filter((e) => e.isExclude && !e.receipt).map((e) => e.ppp.id);
+      await this.prisma.employeePPPHistory.deleteMany({ where: { id: { in: updateIsExcludeNotExist } } });
+    }
+
     const eventsXml = eventsStruct
       .filter((e) => !e.isSame)
       .map((data) => {
@@ -62,19 +72,16 @@ export class FindEvents2240ESocialService {
 
         const xmlResult = !data.isExclude ? this.eSocialEventProvider.generateXmlEvent2240(data.event) : '';
 
-        data.eventDate;
-        data.event.evtExpRisco.infoExpRisco.dtIniCondicao;
-
-        const type: ESocialSendEnum = ESocialSendEnum.SEND;
-        if (data.isExclude) ESocialSendEnum.EXCLUDE;
-        if (data.event.ideEvento.nrRecibo) ESocialSendEnum.MODIFIED;
+        let type: ESocialSendEnum = ESocialSendEnum.SEND;
+        if (data?.isExclude) type = ESocialSendEnum.EXCLUDE;
+        if (data.event?.ideEvento.nrRecibo) type = ESocialSendEnum.MODIFIED;
 
         return {
-          doneDate: data.event.evtExpRisco.infoExpRisco.dtIniCondicao,
+          doneDate: data.event?.evtExpRisco.infoExpRisco.dtIniCondicao || new Date(),
           errors: eventErrors,
           employee: data.employee,
           type,
-          risks: data.event.evtExpRisco.infoExpRisco.agNoc.map((ag) => ag.nameAgNoc),
+          risks: data.event?.evtExpRisco.infoExpRisco.agNoc.map((ag) => ag.nameAgNoc) || [],
           xml: xmlResult,
         };
       });
@@ -467,7 +474,7 @@ export class FindEvents2240ESocialService {
         employees: {
           where: {
             companyId,
-            // OR: [{ pppHistory: { none: { id: { gt: 0 } } } }, { pppHistory: { some: { sendEvent: true } } }],
+            OR: [{ pppHistory: { every: { status: { in: ['DONE', 'TRANSMITTED'] } } } }, { pppHistory: { some: { sendEvent: true } } }],
           },
           select: {
             id: true,

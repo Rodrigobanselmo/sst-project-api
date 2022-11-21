@@ -734,7 +734,6 @@ model Employee {
   examsHistory EmployeeExamsHistory[]
   esocialEvents EmployeeESocialEvent[]
   pppHistory EmployeePPPHistory[] 
-  sendEvent Boolean @default(true)
   
   @@unique([id, companyId])
   @@unique([cpf, companyId])
@@ -858,7 +857,7 @@ model EmployeeESocialEvent {
   examHistoryId Int?
   exam EmployeeExamsHistory? @relation(fields: [examHistoryId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   pppId Int?
-  ppp EmployeePPPHistory? @relation(fields: [pppId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  ppp EmployeePPPHistory? @relation(fields: [pppId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   // refType EmployeeESocialRefTypeEnum
   // @@index(refType)
   // @@index(employeeId)
@@ -878,7 +877,7 @@ model EmployeePPPHistory {
   json Json?
 
   employeeId Int
-  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   events EmployeeESocialEvent[]
 
   @@index(status)

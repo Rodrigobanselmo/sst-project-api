@@ -1,7 +1,7 @@
 import { EmployeeESocialEventActionEnum, EmployeeESocialEventTypeEnum, Prisma, StatusEnum } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
-import { IESocial2240, IESocial3000 } from './../../../shared/providers/ESocialProvider/models/IESocialMethodProvider';
+import { IESocial2240, IESocial2220, IESocial3000 } from './../../../shared/providers/ESocialProvider/models/IESocialMethodProvider';
 
 import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
 import { QueryArray } from './../../../shared/transformers/query-array';
@@ -27,7 +27,7 @@ export class CreateESocialBatch {
   examsIds?: number[];
   pppJson?: {
     json: any;
-    event: IESocial3000.XmlReturn | IESocial2240.XmlReturn | IESocial2240.XmlReturn;
+    event: IESocial3000.XmlReturn | IESocial2220.XmlReturn | IESocial2240.XmlReturn;
   }[];
   type: EmployeeESocialEventTypeEnum;
   protocolId?: string;

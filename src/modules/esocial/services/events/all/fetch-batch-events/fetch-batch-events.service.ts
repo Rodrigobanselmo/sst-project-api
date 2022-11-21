@@ -88,8 +88,10 @@ export class FetchESocialBatchEventsService {
 
                     const found = await this.eSocialEventRepository.findFirstNude({
                       where: { eventId: id },
-                      select: { id: true, examHistoryId: true, ppp: { select: { id: true, status: true } } },
+                      select: { id: true, examHistoryId: true, pppId: true },
                     });
+
+                    if (!found) throw new Error(`Event not found ID:${id}`);
 
                     await this.eSocialEventRepository.updateNude({
                       where: { id: found.id },
@@ -97,15 +99,14 @@ export class FetchESocialBatchEventsService {
                         status: rejectedEvent ? 'INVALID' : 'DONE',
                         response: process as any,
                         ...(found.examHistoryId && {
-                          exam: { update: { sendEvent: false } },
+                          exam: { update: { sendEvent: rejectedEvent } },
                         }),
                         ...(rejectedEvent &&
-                          found?.ppp?.id &&
-                          found.ppp.status == 'PENDING' && {
-                            ppp: { disconnect: true, delete: true },
+                          found.pppId && {
+                            ppp: { update: { sendEvent: true, status: 'INVALID', json: null } },
                           }),
                         ...(!rejectedEvent &&
-                          found?.ppp?.id && {
+                          found.pppId && {
                             ppp: { update: { status: 'DONE' } },
                           }),
                       },

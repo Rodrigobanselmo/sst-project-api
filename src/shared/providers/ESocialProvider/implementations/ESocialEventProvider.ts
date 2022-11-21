@@ -306,12 +306,12 @@ class ESocialEventProvider {
               message: `${ag.nameAgNoc} (${code || '-'}): Informar EPI's ou se é "não aplicavel" ou "não implementado"`,
             });
 
-          if (isEPCImplemented)
+          if (isEPCImplemented && !epcEpi.eficEpc)
             errors.push({
               message: `${ag.nameAgNoc} (${code || '-'}): Informar eficácia do EPC`,
             });
 
-          if (isEPIImplemented)
+          if (isEPIImplemented && !epcEpi.eficEpi)
             errors.push({
               message: `${ag.nameAgNoc} (${code || '-'}): Informar eficácia do EPI`,
             });
@@ -561,7 +561,7 @@ class ESocialEventProvider {
                     utilizEPC: getEpcType(risk) || undefined,
                     utilizEPI: getEpiType(risk) || undefined,
                     ...(isEPCImplemented && { eficEpc: isEPCEfficient ? YesNoEnum.YES : YesNoEnum.NO }),
-                    ...(isEPIImplemented && { eficEpc: isEPIEfficient ? YesNoEnum.YES : YesNoEnum.NO }),
+                    ...(isEPIImplemented && { eficEpi: isEPIEfficient ? YesNoEnum.YES : YesNoEnum.NO }),
                     ...(isEPIImplemented && { epi: risk.riskData.epiToRiskFactorData.map((e) => ({ docAval: e?.epi?.ca || undefined })) }),
                     ...(isEPIImplemented && {
                       epiCompl: {
@@ -595,13 +595,15 @@ class ESocialEventProvider {
 
         if (oldPPP) {
           comparePPP[snapshot.date.toISOString()].excluded = false;
-          isSame = deepEqual(oldPPP.json, eventRisk);
+          eventRisk.infoExpRisco.dtIniCondicao;
+          isSame = deepEqual(oldPPP?.json?.infoExpRisco, { ...eventRisk.infoExpRisco, dtIniCondicao: eventRisk.infoExpRisco.dtIniCondicao.toISOString() });
           receipt = oldPPP?.events?.sort((b, a) => sortData(a, b))?.find((e) => e.receipt)?.receipt;
         }
 
         if (oldEventJs && !isSame) {
+          const oldRisks = oldEventJs?.infoExpRisco;
           isSame = deepEqual(
-            { ...oldEventJs.infoExpRisco.agNoc, ...oldEventJs.infoExpRisco.infoAmb, ...oldEventJs.infoExpRisco.infoAtiv, ...oldEventJs.infoExpRisco.respReg },
+            { ...oldRisks.agNoc, ...oldRisks.infoAmb, ...oldRisks.infoAtiv, ...oldRisks.respReg },
             {
               ...eventRisk.infoExpRisco.agNoc,
               ...eventRisk.infoExpRisco.infoAmb,
@@ -824,7 +826,7 @@ class ESocialEventProvider {
                     utilizEPC: { ['_text']: epcEpi?.utilizEPC },
                     utilizEPI: { ['_text']: epcEpi?.utilizEPI },
                     ...(isEPCImplemented && { eficEpc: { ['_text']: epcEpi?.eficEpc } }),
-                    ...(isEPIImplemented && { eficEpc: { ['_text']: epcEpi?.eficEpi } }),
+                    ...(isEPIImplemented && { eficEpi: { ['_text']: epcEpi?.eficEpi } }),
                     ...(isEPIImplemented && { epi: epcEpi?.epi.map((e) => ({ docAval: { ['_text']: e.docAval } })) }),
                     ...(isEPIImplemented && {
                       epiCompl: {

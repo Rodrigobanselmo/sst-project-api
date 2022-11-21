@@ -61,7 +61,12 @@ export class UpdateESocialReportService {
 
     esocial.S2220.pending = eventsStruct.length;
 
-    const employees2240 = await this.employeeRepository.countNude({ where: { sendEvent: true } });
+    const employees2240 = await this.employeeRepository.countNude({
+      where: {
+        companyId,
+        OR: [{ pppHistory: { none: { status: { in: ['DONE', 'TRANSMITTED'] } } } }, { pppHistory: { some: { sendEvent: true } } }],
+      },
+    });
 
     esocial.S2240.pending = employees2240;
 
