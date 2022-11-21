@@ -1,4 +1,5 @@
-import { EmployeeESocialEvent, EmployeeESocialEventTypeEnum, Prisma, StatusEnum, EmployeeESocialEventActionEnum } from '@prisma/client';
+import { EmployeePPPHistoryEntity } from './../../company/entities/employee-ppp-history.entity';
+import { EmployeeESocialEvent, EmployeeESocialEventTypeEnum, Prisma, StatusEnum, EmployeeESocialEventActionEnum, EmployeePPPHistory } from '@prisma/client';
 
 import { CompanyEntity } from './../../company/entities/company.entity';
 import { EmployeeEntity } from './../../company/entities/employee.entity';
@@ -25,6 +26,7 @@ export class EmployeeESocialEventEntity implements EmployeeESocialEvent {
   action: EmployeeESocialEventActionEnum;
   // snapshot: Prisma.JsonValue;
   examHistoryId: number;
+  ppp: EmployeePPPHistoryEntity;
   pppId: number;
 
   constructor(partial: Partial<EmployeeESocialEventEntity>) {

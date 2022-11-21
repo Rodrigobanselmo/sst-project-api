@@ -24,6 +24,7 @@ import { ESocialEventRepository } from './repositories/implementations/ESocialEv
 import { FindEvents2220ESocialService } from './services/events/2220/find-events/find-events.service';
 import { SendEvents2220ESocialService } from './services/events/2220/send-events/send-events.service';
 import { FindEvents2240ESocialService } from './services/events/2240/find-events/find-events.service';
+import { SendEvents2240ESocialService } from './services/events/2240/send-events/send-events.service';
 import { AddCertificationESocialService } from './services/events/all/add-certificate/add-certificate.service';
 import { FetchESocialBatchEventsService } from './services/events/all/fetch-batch-events/fetch-batch-events.service';
 import { FindESocialBatchService } from './services/events/all/find-batch/find-batch.service';
@@ -138,6 +139,7 @@ import { FindAllTable27Service } from './services/tables/find-all-27.service';
     ESocialEventRepository,
     EsocialFetchBatchCron,
     FindEvents2240ESocialService,
+    SendEvents2240ESocialService,
   ],
 })
 export class EsocialModule {}

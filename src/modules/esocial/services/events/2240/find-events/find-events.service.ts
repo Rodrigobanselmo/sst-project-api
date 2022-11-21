@@ -1,32 +1,28 @@
-import { IBreakPointPPP, IEmployee2240Data, IPriorRiskData } from './../../../../interfaces/event-2240';
-import { ProfessionalEntity } from './../../../../../users/entities/professional.entity';
-import { sortNumber } from './../../../../../../shared/utils/sorts/number.sort';
-import { originRiskMap } from './../../../../../../shared/constants/maps/origin-risk';
-import { EmployeePPPHistoryEntity } from './../../../../../company/entities/employee-ppp-history.entity';
-import { EmployeeEntity } from './../../../../../company/entities/employee.entity';
-import { CompanyEntity } from './../../../../../company/entities/company.entity';
-import { checkRiskDataDoc } from './../../../../../documents/services/pgr/document/upload-pgr-doc.service';
-import { HierarchyEntity } from './../../../../../company/entities/hierarchy.entity';
-import { IHierarchyMap } from './../../../../../documents/docx/converter/hierarchy.converter';
-import { RiskFactorDataEntity } from './../../../../../sst/entities/riskData.entity';
-import { RiskRepository } from './../../../../../sst/repositories/implementations/RiskRepository';
-import { Injectable } from '@nestjs/common';
+import { ICompanyOptions } from './../../../../../../shared/providers/ESocialProvider/models/IESocialMethodProvider';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { HierarchyEnum, HomogeneousGroup } from '@prisma/client';
 import clone from 'clone';
+import sortArray from 'sort-array';
 
+import { EmployeeHierarchyHistoryEntity } from '../../../../../../modules/company/entities/employee-hierarchy-history.entity';
+import { RiskFactorsEntity } from '../../../../../../modules/sst/entities/risk.entity';
 import { ESocialSendEnum } from '../../../../../../shared/constants/enum/esocial';
 import { UserPayloadDto } from '../../../../../../shared/dto/user-payload.dto';
+import { DayJSProvider } from '../../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { ESocialEventProvider } from '../../../../../../shared/providers/ESocialProvider/implementations/ESocialEventProvider';
 import { ESocialMethodsProvider } from '../../../../../../shared/providers/ESocialProvider/implementations/ESocialMethodsProvider';
+import { HierarchyOnHomogeneousEntity } from '../../../../../company/entities/homoGroup.entity';
 import { CompanyRepository } from '../../../../../company/repositories/implementations/CompanyRepository';
 import { EmployeeRepository } from '../../../../../company/repositories/implementations/EmployeeRepository';
 import { FindEvents2240Dto } from '../../../../dto/event.dto';
-import { mapInverseResAso, mapInverseTpExameOcup } from '../../../../interfaces/event-2220';
-import { HierarchyOnHomogeneousEntity, HomoGroupEntity } from '../../../../../company/entities/homoGroup.entity';
-import { HierarchyEnum, HomogeneousGroup } from '@prisma/client';
-import { RiskFactorsEntity } from '../../../../../../modules/sst/entities/risk.entity';
-import { DayJSProvider } from '../../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
-import sortArray from 'sort-array';
-import { EmployeeHierarchyHistoryEntity } from '../../../../../../modules/company/entities/employee-hierarchy-history.entity';
+import { originRiskMap } from './../../../../../../shared/constants/maps/origin-risk';
+import { CompanyEntity } from './../../../../../company/entities/company.entity';
+import { HierarchyEntity } from './../../../../../company/entities/hierarchy.entity';
+import { checkRiskDataDoc } from './../../../../../documents/services/pgr/document/upload-pgr-doc.service';
+import { RiskFactorDataEntity } from './../../../../../sst/entities/riskData.entity';
+import { RiskRepository } from './../../../../../sst/repositories/implementations/RiskRepository';
+import { ProfessionalEntity } from './../../../../../users/entities/professional.entity';
+import { IBreakPointPPP, IEmployee2240Data, IPriorRiskData } from './../../../../interfaces/event-2240';
 
 @Injectable()
 export class FindEvents2240ESocialService {
@@ -43,8 +39,7 @@ export class FindEvents2240ESocialService {
 
   async execute({ skip, take, ...query }: FindEvents2240Dto, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;
-    const company = await this.getCompany(companyId);
-
+    const { company } = await this.getCompany(companyId);
     const startDate = company.esocialStart;
     const esocialSend = company.esocialSend;
     if (!startDate || esocialSend === null)
@@ -371,7 +366,7 @@ export class FindEvents2240ESocialService {
     return employeesData;
   }
 
-  async getCompany(companyId: string) {
+  async getCompany(companyId: string, options?: ICompanyOptions) {
     const { company } = await this.eSocialMethodsProvider.getCompany(companyId, {
       select: {
         professionalsResponsibles: {
@@ -396,9 +391,26 @@ export class FindEvents2240ESocialService {
           },
         },
 
+        cert: !!options?.cert,
+        ...(!!options?.report && {
+          report: true,
+        }),
+        ...(!!options?.cert && {
+          receivingServiceContracts: {
+            select: {
+              applyingServiceCompany: {
+                select: { cert: true },
+              },
+            },
+          },
+        }),
+
         //* company group
         group: {
           select: {
+            ...(!!options?.cert && {
+              company: { select: { cert: true } },
+            }),
             companyGroup: {
               select: {
                 professionalsResponsibles: {
@@ -455,14 +467,19 @@ export class FindEvents2240ESocialService {
         employees: {
           where: {
             companyId,
-            OR: [{ pppHistory: { none: { id: { gt: 0 } } } }, { pppHistory: { some: { sendEvent: true } } }],
+            // OR: [{ pppHistory: { none: { id: { gt: 0 } } } }, { pppHistory: { some: { sendEvent: true } } }],
           },
           select: {
             id: true,
             cpf: true,
             name: true,
             pppHistory: {
-              where: { events: { none: { action: 'EXCLUDE' } } },
+              where: {
+                OR: [
+                  { events: { none: { action: 'EXCLUDE', status: { in: ['DONE', 'TRANSMITTED'] } } } },
+                  { events: { some: { status: { in: ['DONE', 'TRANSMITTED'] } } } },
+                ],
+              },
               select: {
                 doneDate: true,
                 id: true,
@@ -488,7 +505,11 @@ export class FindEvents2240ESocialService {
       },
     });
 
-    return company;
+    const cert = company?.cert || company?.group?.cert || company?.receivingServiceContracts?.[0].applyingServiceCompany?.cert;
+
+    if (options?.cert && !cert) throw new BadRequestException('Certificado digital não cadastrado');
+
+    return { cert, company };
   }
 
   onGetRisks = (riskData: RiskFactorDataEntity[]): IPriorRiskData[] => {

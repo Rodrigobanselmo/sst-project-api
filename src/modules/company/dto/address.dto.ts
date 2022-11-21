@@ -42,7 +42,6 @@ export class AddressDto {
 
   @IsOptional()
   @Transform(StringUppercaseTransform, { toClassOnly: true })
-  @Transform(QueryArray, { toClassOnly: true })
   @IsEnum(UfStateEnum, {
     message: `UF inválido`,
     each: true,

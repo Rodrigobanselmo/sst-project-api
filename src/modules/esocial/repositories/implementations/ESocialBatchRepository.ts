@@ -12,7 +12,44 @@ import { onlyNumbers } from '@brazilian-utils/brazilian-utils';
 export class ESocialBatchRepository {
   constructor(private prisma: PrismaService) {}
 
-  async create({ companyId, events, environment, status, type, examsIds, ...rest }: CreateESocialBatch) {
+  async create({ companyId, events, environment, status, type, examsIds, pppJson, ...rest }: CreateESocialBatch) {
+    const pppTree = {};
+    if (pppJson) {
+      const data = await this.prisma.$transaction(
+        pppJson.map((data) => {
+          if (data.event?.ppp?.id)
+            return this.prisma.employeePPPHistory.update({
+              data: {
+                json: data.json,
+                sendEvent: false,
+                // status: StatusEnum.PENDING,
+              },
+              where: { id: data.event.ppp.id },
+              select: { id: true },
+            });
+
+          return this.prisma.employeePPPHistory.create({
+            data: {
+              json: data.json,
+              ...('eventDate' in data.event && {
+                doneDate: data.event.eventDate,
+              }),
+              employeeId: data.event.employee.id,
+              sendEvent: false,
+              status: status == StatusEnum.TRANSMITTED ? StatusEnum.PENDING : StatusEnum.DONE,
+            },
+            select: { id: true },
+          });
+        }),
+      );
+
+      data.forEach((pppHistory, index) => {
+        const event = pppJson[index].event;
+
+        pppTree[`${event.employee.id}${event.id}`] = pppHistory.id;
+      });
+    }
+
     const batch = await this.prisma.employeeESocialBatch.create({
       data: {
         type,
@@ -25,6 +62,9 @@ export class ESocialBatchRepository {
               create: events.map((event) => ({
                 companyId,
                 type,
+                ...(pppTree[`${event.employeeId}${event.eventId}`] && {
+                  pppId: pppTree[`${event.employeeId}${event.eventId}`],
+                }),
                 status: status == StatusEnum.TRANSMITTED ? StatusEnum.TRANSMITTED : StatusEnum.PROCESSING,
                 ...event,
               })),
@@ -34,7 +74,6 @@ export class ESocialBatchRepository {
       },
     });
 
-    //!test ==> add here when done or remove when testing
     if (examsIds)
       await this.prisma.employeeExamsHistory.updateMany({
         where: { id: { in: examsIds } },

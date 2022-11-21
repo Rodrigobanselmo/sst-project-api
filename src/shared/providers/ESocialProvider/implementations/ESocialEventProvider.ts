@@ -1,6 +1,6 @@
 import { sortData } from './../../../utils/sorts/data.sort';
 import { Inject, Injectable } from '@nestjs/common';
-import { EmployeeESocialEventActionEnum, ExamHistoryTypeEnum, StatusEnum } from '@prisma/client';
+import { EmployeeESocialEventActionEnum, ExamHistoryTypeEnum, Prisma, StatusEnum } from '@prisma/client';
 import clone from 'clone';
 import { Client } from 'nestjs-soap';
 import { IEvent3000Props } from '../../../../modules/esocial/interfaces/event-3000';
@@ -639,19 +639,31 @@ class ESocialEventProvider {
           event: event,
           employee: employee,
           eventDate: date,
+          json: event.evtExpRisco,
           isSame,
+          ...(receipt && {
+            receipt,
+            ppp: oldPPP,
+          }),
         };
       });
 
       const excludedEvents = Object.values(comparePPP)
-        .filter((ppp) => !ppp.excluded)
-        .map((ppp) => ({
-          id: '',
-          event: null,
-          employee: employee,
-          eventDate: ppp.ppp.doneDate,
-          isExclude: true,
-        }));
+        .filter((compare) => compare.excluded)
+        .map((compare) => {
+          const receipt = compare.ppp?.events?.sort((b, a) => sortData(a, b))?.find((e) => e.receipt)?.receipt;
+          if (!receipt) return;
+          return {
+            id: '',
+            event: null,
+            employee: employee,
+            eventDate: compare.ppp.doneDate,
+            isExclude: true,
+            receipt,
+            ppp: compare.ppp,
+          };
+        })
+        .filter((i) => i);
 
       acc = [...eventsJs, ...acc, ...excludedEvents];
       return acc;
@@ -768,7 +780,7 @@ class ESocialEventProvider {
       }),
       eSocial: {
         ['_attributes']: {
-          xmlns: 'http://www.esocial.gov.br/schema/evt/evtMonit/v_S_01_00_00',
+          xmlns: 'http://www.esocial.gov.br/schema/evt/evtExpRisco/v_S_01_00_00',
         },
         evtExpRisco: {
           ['_attributes']: {
@@ -828,7 +840,7 @@ class ESocialEventProvider {
                 }),
               };
             }),
-            respMonit: respReg.map((resp) => ({
+            respReg: respReg.map((resp) => ({
               cpfResp: { ['_text']: resp.cpfResp },
               ideOC: { ['_text']: resp.ideOC },
               ...(resp.dscOC && { dscOC: { ['_text']: resp.dscOC } }),
@@ -860,7 +872,7 @@ class ESocialEventProvider {
       }),
       eSocial: {
         ['_attributes']: {
-          xmlns: 'http://www.esocial.gov.br/schema/evt/evtMonit/v_S_01_00_00',
+          xmlns: 'http://www.esocial.gov.br/schema/evt/evtExclusao/v_S_01_00_00',
         },
         evtExclusao: {
           ['_attributes']: {
@@ -929,7 +941,7 @@ class ESocialEventProvider {
     return eventJs;
   }
 
-  private generateBatchXML(events: (IESocial2220.XmlReturn | IESocial3000.XmlReturn)[], event: IBatchProps) {
+  private generateBatchXML(events: (IESocial2220.XmlReturn | IESocial3000.XmlReturn | IESocial2240.XmlReturn)[], event: IBatchProps) {
     const xmlEvents = events.map((event) => `<evento Id="${event.id}">${event.signedXml}</evento>`).join('');
 
     const replaceText = 'xml_replace_data';
@@ -1000,7 +1012,7 @@ class ESocialEventProvider {
     return date ? this.dayJSProvider.dayjs(date).startOf('day').toDate() : null;
   };
 
-  public async sendEventToESocial(events: (IESocial2220.XmlReturn | IESocial3000.XmlReturn)[], options: IESocialSendEventOptions) {
+  public async sendEventToESocial(events: (IESocial2220.XmlReturn | IESocial3000.XmlReturn | IESocial2240.XmlReturn)[], options: IESocialSendEventOptions) {
     // const eventChunks = arrayChunks(  Array.from({ length: 100 }).map(() => events[0]),  100,);
     const tpAmb = options?.environment || this.tpAmb;
     const eventChunks = arrayChunks(events, 40);
@@ -1071,6 +1083,7 @@ class ESocialEventProvider {
           receipt: event?.receipt,
           employee: event.employee,
           aso: event.aso,
+          ppp: event.ppp,
         };
       }),
     });
@@ -1130,6 +1143,7 @@ class ESocialEventProvider {
     await Promise.all(
       sendEvents.map(async (resp) => {
         const examsIds: number[] = [];
+        const pppJson: { json: any; event: typeof resp.events[0] }[] = [];
 
         const respEvents = resp.events;
         const isOk = ['201', '202'].includes(resp.response?.status?.cdResposta);
@@ -1150,15 +1164,24 @@ class ESocialEventProvider {
                 action = EmployeeESocialEventActionEnum.MODIFY;
               }
 
+              if ('json' in event) {
+                if (action != EmployeeESocialEventActionEnum.EXCLUDE) pppJson.push({ json: event.json, event });
+              }
+
               return {
                 employeeId: event.employee.id,
+                eventXml: event.xml,
+                eventId: event.id,
+                action,
                 ...('eventDate' in event && {
                   eventsDate: event?.eventDate,
                 }),
-                eventXml: event.xml,
-                examHistoryId: event.aso.id,
-                eventId: event.id,
-                action,
+                ...('aso' in event && {
+                  examHistoryId: event?.aso?.id,
+                }),
+                ...('ppp' in event && {
+                  pppId: event?.ppp?.id,
+                }),
               };
             })
           : [];
@@ -1170,6 +1193,7 @@ class ESocialEventProvider {
           type,
           userTransmissionId: user.userId,
           events,
+          pppJson,
           examsIds,
           protocolId: resp.response?.dadosRecepcaoLote?.protocoloEnvio,
           response: resp.response,

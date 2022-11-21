@@ -1,3 +1,4 @@
+import { PrismaService } from './../../../../../../prisma/prisma.service';
 import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 
@@ -22,6 +23,7 @@ export class FetchESocialBatchEventsService {
     private readonly eSocialBatchRepository: ESocialBatchRepository,
     private readonly eSocialEventRepository: ESocialEventRepository,
     private readonly updateESocialReportService: UpdateESocialReportService,
+    private prisma: PrismaService,
   ) {}
 
   async execute() {
@@ -86,7 +88,7 @@ export class FetchESocialBatchEventsService {
 
                     const found = await this.eSocialEventRepository.findFirstNude({
                       where: { eventId: id },
-                      select: { id: true, examHistoryId: true },
+                      select: { id: true, examHistoryId: true, ppp: { select: { id: true, status: true } } },
                     });
 
                     await this.eSocialEventRepository.updateNude({
@@ -95,8 +97,17 @@ export class FetchESocialBatchEventsService {
                         status: rejectedEvent ? 'INVALID' : 'DONE',
                         response: process as any,
                         ...(found.examHistoryId && {
-                          exam: { update: { sendEvent: true } },
+                          exam: { update: { sendEvent: false } },
                         }),
+                        ...(rejectedEvent &&
+                          found?.ppp?.id &&
+                          found.ppp.status == 'PENDING' && {
+                            ppp: { disconnect: true, delete: true },
+                          }),
+                        ...(!rejectedEvent &&
+                          found?.ppp?.id && {
+                            ppp: { update: { status: 'DONE' } },
+                          }),
                       },
                     });
                   } catch (err) {

@@ -61,6 +61,10 @@ export class UpdateESocialReportService {
 
     esocial.S2220.pending = eventsStruct.length;
 
+    const employees2240 = await this.employeeRepository.countNude({ where: { sendEvent: true } });
+
+    esocial.S2240.pending = employees2240;
+
     return esocial;
   }
 }

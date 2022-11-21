@@ -734,6 +734,7 @@ model Employee {
   examsHistory EmployeeExamsHistory[]
   esocialEvents EmployeeESocialEvent[]
   pppHistory EmployeePPPHistory[] 
+  sendEvent Boolean @default(true)
   
   @@unique([id, companyId])
   @@unique([cpf, companyId])
@@ -874,7 +875,7 @@ model EmployeePPPHistory {
   doneDate DateTime?
   status StatusEnum @default(DONE)
   sendEvent Boolean @default(true) 
-  json Json
+  json Json?
 
   employeeId Int
   employee Employee @relation(fields: [employeeId], references: [id], onDelete: Restrict, onUpdate: Cascade)
@@ -882,7 +883,7 @@ model EmployeePPPHistory {
 
   @@index(status)
   @@index(employeeId)
-  // @@index(doneDate)
+  @@unique([employeeId, doneDate])
 } 
 
 model EngsToRiskFactorData {

@@ -69,8 +69,11 @@ export declare namespace IESocial2240 {
     employee: EmployeeEntity;
     eventDate: Date;
     id: string;
+    receipt?: string;
     isSame?: boolean;
     isExclude?: boolean;
+    ppp?: EmployeePPPHistoryEntity;
+    json?: any;
   }
 
   export interface XmlReturn extends Omit<StructureReturn, 'event'> {
@@ -86,6 +89,7 @@ export declare namespace IESocial3000 {
     eventType: EmployeeESocialEventTypeEnum;
     employee: EmployeeEntity;
 
+    ppp?: EmployeePPPHistoryEntity;
     aso?: EmployeeExamsHistoryEntity;
   }
 
@@ -121,7 +125,7 @@ export interface IBatchDatabaseSave {
   user: UserPayloadDto;
   type: EmployeeESocialEventTypeEnum;
   sendEvents: {
-    events: (IESocial3000.XmlReturn | IESocial2220.XmlReturn)[];
+    events: (IESocial3000.XmlReturn | IESocial2220.XmlReturn | IESocial2240.XmlReturn)[];
     response: IEsocialSendBatchResponse;
   }[];
 
