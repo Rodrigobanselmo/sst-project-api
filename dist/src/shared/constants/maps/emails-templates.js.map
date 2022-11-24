@@ -1,0 +1,1 @@
+{"version":3,"file":"emails-templates.js","sourceRoot":"","sources":["../../../../../src/shared/constants/maps/emails-templates.ts"],"names":[],"mappings":";;;AAAA,6DAA8D;AAEjD,QAAA,gBAAgB,GAAG;IAC9B,CAAC,qCAAmB,CAAC,cAAc,CAAC,EAAE;QACpC,IAAI,EAAE,qCAAmB,CAAC,cAAc;QACxC,OAAO,EAAE,yDAAyD;KACnE;CACF,CAAC"}

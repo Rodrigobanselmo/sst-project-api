@@ -1,0 +1,106 @@
+import { DocumentRepository } from '../../../repositories/implementations/DocumentRepository';
+import { IExamOriginData } from '../../../../sst/entities/exam.entity';
+import { FindExamByHierarchyService } from '../../../../sst/services/exam/find-by-hierarchy /find-exam-by-hierarchy.service';
+import { FindCompanyDashDto } from '../../../dto/dashboard.dto';
+import { EmployeeRepository } from '../../../repositories/implementations/EmployeeRepository';
+import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
+import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
+export declare class DashboardCompanyService {
+    private readonly employeeRepository;
+    private readonly findExamByHierarchyService;
+    private readonly documentRepository;
+    private readonly dayjs;
+    constructor(employeeRepository: EmployeeRepository, findExamByHierarchyService: FindExamByHierarchyService, documentRepository: DocumentRepository, dayjs: DayJSProvider);
+    execute(UpsertContactsDto: FindCompanyDashDto, user: UserPayloadDto): Promise<{
+        exams: {
+            exams: {
+                exam: {
+                    id: string;
+                    name: string;
+                    isAttendance: boolean;
+                };
+                origins: IExamOriginData[];
+            }[];
+            total: import("../../../entities/employee.entity").EmployeeEntity[];
+            withExam: import("../../../entities/employee.entity").EmployeeEntity[];
+            withExamAndSchedule: import("../../../entities/employee.entity").EmployeeEntity[];
+            missingExam: import("../../../entities/employee.entity").EmployeeEntity[];
+            expired: {
+                missingExamExpired: ({
+                    expiredDate: Date;
+                    id: number;
+                    name: string;
+                    cpf: string;
+                    status: import(".prisma/client").StatusEnum;
+                    companyId: string;
+                    created_at: Date;
+                    updated_at: Date;
+                    hierarchyId: string;
+                    workspaces?: import("../../../entities/workspace.entity").WorkspaceEntity[];
+                    hierarchy?: Partial<import("../../../entities/hierarchy.entity").HierarchyEntity>;
+                    subOffices?: Partial<import("../../../entities/hierarchy.entity").HierarchyEntity>[];
+                    directory?: string;
+                    management?: string;
+                    sector?: string;
+                    sub_sector?: string;
+                    office?: string;
+                    sub_office?: string;
+                    esocialCode: string;
+                    socialName: string;
+                    nickname: string;
+                    phone: string;
+                    email: string;
+                    isComorbidity: boolean;
+                    sex: import(".prisma/client").SexTypeEnum;
+                    cidId: string;
+                    shiftId: number;
+                    birthday: Date;
+                    admissionDate: Date;
+                    lastExam: Date;
+                    expiredDateExam: Date;
+                    company?: import("../../../entities/company.entity").CompanyEntity;
+                    examsHistory?: import("../../../entities/employee-exam-history.entity").EmployeeExamsHistoryEntity[];
+                    hierarchyHistory?: import("../../../entities/employee-hierarchy-history.entity").EmployeeHierarchyHistoryEntity[];
+                    pppHistory?: import("../../../entities/employee-ppp-history.entity").EmployeePPPHistoryEntity[];
+                } | {
+                    expiredDate?: undefined;
+                    id: number;
+                    name: string;
+                    cpf: string;
+                    status: import(".prisma/client").StatusEnum;
+                    companyId: string;
+                    created_at: Date;
+                    updated_at: Date;
+                    hierarchyId: string;
+                    workspaces?: import("../../../entities/workspace.entity").WorkspaceEntity[];
+                    hierarchy?: Partial<import("../../../entities/hierarchy.entity").HierarchyEntity>;
+                    subOffices?: Partial<import("../../../entities/hierarchy.entity").HierarchyEntity>[];
+                    directory?: string;
+                    management?: string;
+                    sector?: string;
+                    sub_sector?: string;
+                    office?: string;
+                    sub_office?: string;
+                    esocialCode: string;
+                    socialName: string;
+                    nickname: string;
+                    phone: string;
+                    email: string;
+                    isComorbidity: boolean;
+                    sex: import(".prisma/client").SexTypeEnum;
+                    cidId: string;
+                    shiftId: number;
+                    birthday: Date;
+                    admissionDate: Date;
+                    lastExam: Date;
+                    expiredDateExam: Date;
+                    company?: import("../../../entities/company.entity").CompanyEntity;
+                    examsHistory?: import("../../../entities/employee-exam-history.entity").EmployeeExamsHistoryEntity[];
+                    hierarchyHistory?: import("../../../entities/employee-hierarchy-history.entity").EmployeeHierarchyHistoryEntity[];
+                    pppHistory?: import("../../../entities/employee-ppp-history.entity").EmployeePPPHistoryEntity[];
+                })[];
+                withExamAndExpired: import("../../../entities/employee.entity").EmployeeEntity[];
+            };
+        };
+    }>;
+}

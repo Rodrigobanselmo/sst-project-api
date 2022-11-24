@@ -1,0 +1,15 @@
+import { EmployeeESocialEvent, EmployeePPPHistory, StatusEnum } from '@prisma/client';
+import { EmployeeEntity } from './employee.entity';
+export declare class EmployeePPPHistoryEntity implements EmployeePPPHistory {
+    id: number;
+    created_at: Date;
+    updated_at: Date;
+    doneDate: Date;
+    status: StatusEnum;
+    sendEvent: boolean;
+    employeeId: number;
+    employee: EmployeeEntity;
+    events: EmployeeESocialEvent[];
+    json: any;
+    constructor(partial: Partial<EmployeePPPHistoryEntity>);
+}

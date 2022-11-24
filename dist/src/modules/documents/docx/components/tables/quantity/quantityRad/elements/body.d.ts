@@ -1,0 +1,10 @@
+import { ITableBordersOptions, ITableCellOptions, TableCell, TableRow } from 'docx';
+export interface bodyTableProps extends Partial<ITableCellOptions> {
+    text: string;
+    size?: number;
+}
+export declare const borderStyle: ITableBordersOptions;
+export declare class TableBodyElements {
+    tableRow(tableCell: TableCell[]): TableRow;
+    tableCell({ text, size, ...rest }: bodyTableProps): TableCell;
+}

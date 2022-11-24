@@ -1,0 +1,31 @@
+import { ProfessionalTypeEnum } from '@prisma/client';
+import { UsersRiskGroupEntity } from '../../sst/entities/usersRiskGroup';
+import { ProfessionalEntity } from './professional.entity';
+import { UserCompanyEntity } from './userCompany.entity';
+import { User } from '.prisma/client';
+import { ProfessionalCouncilEntity } from './council.entity';
+export declare class UserEntity implements User {
+    id: number;
+    email: string;
+    name: string;
+    password: string;
+    updated_at: Date;
+    created_at: Date;
+    deleted_at: Date | null;
+    companies?: UserCompanyEntity[];
+    formation: string[];
+    certifications: string[];
+    cpf: string;
+    phone: string;
+    googleExternalId: string;
+    facebookExternalId: string;
+    councilType: string;
+    councilUF: string;
+    councilId: string;
+    type: ProfessionalTypeEnum;
+    professional?: ProfessionalEntity;
+    userPgrSignature?: UsersRiskGroupEntity;
+    usersPgrSignatures?: UsersRiskGroupEntity[];
+    councils?: ProfessionalCouncilEntity[];
+    constructor(partial: Partial<UserEntity>);
+}
