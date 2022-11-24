@@ -57,34 +57,34 @@ export declare class CompanyController {
     create(createCompanyDto: CreateCompanyDto, userPayloadDto: UserPayloadDto): Promise<import("../../entities/company.entity").CompanyEntity>;
     createClinic(createCompanyDto: CreateCompanyDto, userPayloadDto: UserPayloadDto): Promise<import("../../entities/company.entity").CompanyEntity>;
     uploadRiskFile(file: Express.Multer.File, userPayloadDto: UserPayloadDto): Promise<import("../../entities/company.entity").CompanyEntity | (import(".prisma/client").Company & {
-        group: import(".prisma/client").CompanyGroup;
-        workspace: import(".prisma/client").Workspace[];
-        employees: import(".prisma/client").Employee[];
         users: import(".prisma/client").UserCompany[];
+        group: import(".prisma/client").CompanyGroup;
+        employees: import(".prisma/client").Employee[];
+        license: import(".prisma/client").License;
+        primary_activity: import(".prisma/client").Activity[];
+        secondary_activity: import(".prisma/client").Activity[];
+        workspace: import(".prisma/client").Workspace[];
         doctorResponsible: import(".prisma/client").ProfessionalCouncil & {
             professional: import(".prisma/client").Professional;
         };
         tecResponsible: import(".prisma/client").ProfessionalCouncil & {
             professional: import(".prisma/client").Professional;
         };
-        license: import(".prisma/client").License;
-        primary_activity: import(".prisma/client").Activity[];
-        secondary_activity: import(".prisma/client").Activity[];
     })>;
     update(updateCompanyDto: UpdateCompanyDto): Promise<import("../../entities/company.entity").CompanyEntity | (import(".prisma/client").Company & {
-        group: import(".prisma/client").CompanyGroup;
-        workspace: import(".prisma/client").Workspace[];
-        employees: import(".prisma/client").Employee[];
         users: import(".prisma/client").UserCompany[];
+        group: import(".prisma/client").CompanyGroup;
+        employees: import(".prisma/client").Employee[];
+        license: import(".prisma/client").License;
+        primary_activity: import(".prisma/client").Activity[];
+        secondary_activity: import(".prisma/client").Activity[];
+        workspace: import(".prisma/client").Workspace[];
         doctorResponsible: import(".prisma/client").ProfessionalCouncil & {
             professional: import(".prisma/client").Professional;
         };
         tecResponsible: import(".prisma/client").ProfessionalCouncil & {
             professional: import(".prisma/client").Professional;
         };
-        license: import(".prisma/client").License;
-        primary_activity: import(".prisma/client").Activity[];
-        secondary_activity: import(".prisma/client").Activity[];
     })>;
     copy(copyFromCompanyId: string, riskGroupId: string, userPayloadDto: UserPayloadDto): Promise<{}>;
     setClinics(setCompanyClinicDto: SetCompanyClinicDto, userPayloadDto: UserPayloadDto): Promise<void>;

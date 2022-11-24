@@ -11,7 +11,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateUserDto = void 0;
 const openapi = require("@nestjs/swagger");
-const query_array_1 = require("./../../../shared/transformers/query-array");
 const string_uppercase_transform_1 = require("./../../../shared/transformers/string-uppercase.transform");
 const swagger_1 = require("@nestjs/swagger");
 const client_1 = require("@prisma/client");
@@ -22,7 +21,7 @@ const string_capitalize_1 = require("../../../shared/transformers/string-capital
 const council_dto_1 = require("./council.dto");
 class UpdateUserDto {
     static _OPENAPI_METADATA_FACTORY() {
-        return { oldPassword: { required: false, type: () => String }, password: { required: false, type: () => String, minLength: 8, maxLength: 20 }, name: { required: false, type: () => String, maxLength: 100 }, cpf: { required: false, type: () => String }, googleExternalId: { required: false, type: () => String }, phone: { required: false, type: () => String }, certifications: { required: false, type: () => [String] }, formation: { required: false, type: () => [String] }, councilType: { required: false, type: () => String }, councilUF: { required: false, type: () => String }, councilId: { required: false, type: () => String }, type: { required: false, type: () => Object }, token: { required: false, type: () => String }, councils: { required: false, type: () => [require("./council.dto").CouncilDto] } };
+        return { oldPassword: { required: false, type: () => String }, password: { required: false, type: () => String, minLength: 8, maxLength: 20 }, name: { required: false, type: () => String, maxLength: 100 }, cpf: { required: false, type: () => String }, googleExternalId: { required: false, type: () => String }, phone: { required: false, type: () => String }, certifications: { required: false, type: () => [String] }, formation: { required: false, type: () => [String] }, type: { required: false, type: () => Object }, token: { required: false, type: () => String }, councils: { required: false, type: () => [require("./council.dto").CouncilDto] }, councilType: { required: false, type: () => String }, councilUF: { required: false, type: () => String }, councilId: { required: false, type: () => String } };
     }
 }
 __decorate([
@@ -71,27 +70,6 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Array)
 ], UpdateUserDto.prototype, "formation", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", String)
-], UpdateUserDto.prototype, "councilType", void 0);
-__decorate([
-    (0, class_validator_1.ValidateIf)((o) => !!o.councilUF),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_transformer_1.Transform)(string_uppercase_transform_1.StringUppercaseTransform, { toClassOnly: true }),
-    (0, class_transformer_1.Transform)(query_array_1.QueryArray, { toClassOnly: true }),
-    (0, class_validator_1.IsEnum)(client_1.UfStateEnum, {
-        message: `UF inválido`,
-        each: true,
-    }),
-    __metadata("design:type", String)
-], UpdateUserDto.prototype, "councilUF", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", String)
-], UpdateUserDto.prototype, "councilId", void 0);
 __decorate([
     (0, class_transformer_1.Transform)(string_uppercase_transform_1.StringUppercaseTransform, { toClassOnly: true }),
     (0, class_validator_1.IsString)(),

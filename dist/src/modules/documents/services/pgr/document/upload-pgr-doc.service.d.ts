@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import { RiskDocInfoEntity } from './../../../../sst/entities/riskDocInfo.entity';
 import { CompanyRepository } from '../../../../company/repositories/implementations/CompanyRepository';
 import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';

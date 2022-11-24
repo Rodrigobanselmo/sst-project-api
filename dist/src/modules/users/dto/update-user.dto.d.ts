@@ -9,10 +9,10 @@ export declare class UpdateUserDto {
     phone?: string;
     certifications?: string[];
     formation?: string[];
-    councilType?: string;
-    councilUF?: string;
-    councilId?: string;
     type?: ProfessionalTypeEnum;
     readonly token?: string;
     councils?: CouncilDto[];
+    councilType?: string;
+    councilUF?: string;
+    councilId?: string;
 }

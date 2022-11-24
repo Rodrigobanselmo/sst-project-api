@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import { RiskFactorsEntity } from '../../../../../modules/sst/entities/risk.entity';
 import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { AmazonStorageProvider } from '../../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';

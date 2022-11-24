@@ -11,7 +11,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CouncilDto = void 0;
 const openapi = require("@nestjs/swagger");
-const query_array_1 = require("./../../../shared/transformers/query-array");
 const string_uppercase_transform_1 = require("./../../../shared/transformers/string-uppercase.transform");
 const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
@@ -26,13 +25,11 @@ __decorate([
     __metadata("design:type", String)
 ], CouncilDto.prototype, "councilType", void 0);
 __decorate([
-    (0, class_validator_1.ValidateIf)((o) => !!o.councilUF),
+    (0, class_validator_1.ValidateIf)((o) => o.councilUF != ''),
     (0, class_validator_1.IsOptional)(),
     (0, class_transformer_1.Transform)(string_uppercase_transform_1.StringUppercaseTransform, { toClassOnly: true }),
-    (0, class_transformer_1.Transform)(query_array_1.QueryArray, { toClassOnly: true }),
     (0, class_validator_1.IsEnum)(client_1.UfStateEnum, {
         message: `UF inválido`,
-        each: true,
     }),
     __metadata("design:type", String)
 ], CouncilDto.prototype, "councilUF", void 0);

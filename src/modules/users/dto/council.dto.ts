@@ -8,13 +8,11 @@ export class CouncilDto {
   @IsString()
   councilType: string;
 
-  @ValidateIf((o) => !!o.councilUF)
+  @ValidateIf((o) => o.councilUF != '')
   @IsOptional()
   @Transform(StringUppercaseTransform, { toClassOnly: true })
-  @Transform(QueryArray, { toClassOnly: true })
   @IsEnum(UfStateEnum, {
     message: `UF inválido`,
-    each: true,
   })
   councilUF?: string;
 

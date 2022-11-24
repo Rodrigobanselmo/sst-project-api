@@ -47,24 +47,6 @@ export class UpdateUserDto {
   @IsOptional()
   formation?: string[];
 
-  @IsString()
-  @IsOptional()
-  councilType?: string;
-
-  @ValidateIf((o) => !!o.councilUF)
-  @IsOptional()
-  @Transform(StringUppercaseTransform, { toClassOnly: true })
-  @Transform(QueryArray, { toClassOnly: true })
-  @IsEnum(UfStateEnum, {
-    message: `UF inválido`,
-    each: true,
-  })
-  councilUF?: string;
-
-  @IsString()
-  @IsOptional()
-  councilId?: string;
-
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsString()
   @IsOptional()
@@ -81,4 +63,8 @@ export class UpdateUserDto {
   @IsOptional()
   @Type(() => CouncilDto)
   councils?: CouncilDto[];
+
+  councilType?: string;
+  councilUF?: string;
+  councilId?: string;
 }
