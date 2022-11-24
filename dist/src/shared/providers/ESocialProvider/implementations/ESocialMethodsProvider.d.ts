@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import { CompanyRepository } from '../../../../modules/company/repositories/implementations/CompanyRepository';
 import { DayJSProvider } from '../../DateProvider/implementations/DayJSProvider';
 import { ICompanyOptions, IConvertPfx, IConvertPfxReturn, ICreateZipFolder, IESocialEventProvider, IIdOptions, ISignEvent } from '../models/IESocialMethodProvider';

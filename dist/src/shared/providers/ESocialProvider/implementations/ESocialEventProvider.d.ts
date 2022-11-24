@@ -61,7 +61,7 @@ declare class ESocialEventProvider {
     private generateFetchBatchXML;
     private onGetDate;
     sendEventToESocial(events: (IESocial2220.XmlReturn | IESocial3000.XmlReturn | IESocial2240.XmlReturn)[], options: IESocialSendEventOptions): Promise<{
-        events: (IESocial2220.XmlReturn | IESocial2240.XmlReturn | IESocial3000.XmlReturn)[];
+        events: (IESocial3000.XmlReturn | IESocial2240.XmlReturn | IESocial2220.XmlReturn)[];
         response: IEsocialSendBatchResponse;
     }[]>;
     sendExclusionToESocial(props: IESocial3000.SendEntry): Promise<IESocial3000.XmlReturn[]>;

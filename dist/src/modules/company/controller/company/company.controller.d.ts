@@ -57,13 +57,13 @@ export declare class CompanyController {
     create(createCompanyDto: CreateCompanyDto, userPayloadDto: UserPayloadDto): Promise<import("../../entities/company.entity").CompanyEntity>;
     createClinic(createCompanyDto: CreateCompanyDto, userPayloadDto: UserPayloadDto): Promise<import("../../entities/company.entity").CompanyEntity>;
     uploadRiskFile(file: Express.Multer.File, userPayloadDto: UserPayloadDto): Promise<import("../../entities/company.entity").CompanyEntity | (import(".prisma/client").Company & {
-        users: import(".prisma/client").UserCompany[];
-        group: import(".prisma/client").CompanyGroup;
-        employees: import(".prisma/client").Employee[];
-        license: import(".prisma/client").License;
+        workspace: import(".prisma/client").Workspace[];
         primary_activity: import(".prisma/client").Activity[];
         secondary_activity: import(".prisma/client").Activity[];
-        workspace: import(".prisma/client").Workspace[];
+        license: import(".prisma/client").License;
+        employees: import(".prisma/client").Employee[];
+        group: import(".prisma/client").CompanyGroup;
+        users: import(".prisma/client").UserCompany[];
         doctorResponsible: import(".prisma/client").ProfessionalCouncil & {
             professional: import(".prisma/client").Professional;
         };
@@ -72,13 +72,13 @@ export declare class CompanyController {
         };
     })>;
     update(updateCompanyDto: UpdateCompanyDto): Promise<import("../../entities/company.entity").CompanyEntity | (import(".prisma/client").Company & {
-        users: import(".prisma/client").UserCompany[];
-        group: import(".prisma/client").CompanyGroup;
-        employees: import(".prisma/client").Employee[];
-        license: import(".prisma/client").License;
+        workspace: import(".prisma/client").Workspace[];
         primary_activity: import(".prisma/client").Activity[];
         secondary_activity: import(".prisma/client").Activity[];
-        workspace: import(".prisma/client").Workspace[];
+        license: import(".prisma/client").License;
+        employees: import(".prisma/client").Employee[];
+        group: import(".prisma/client").CompanyGroup;
+        users: import(".prisma/client").UserCompany[];
         doctorResponsible: import(".prisma/client").ProfessionalCouncil & {
             professional: import(".prisma/client").Professional;
         };

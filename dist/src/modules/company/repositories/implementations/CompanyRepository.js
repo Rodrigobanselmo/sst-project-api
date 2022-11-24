@@ -489,7 +489,9 @@ let CompanyRepository = class CompanyRepository {
             this.prisma.company.count({
                 where,
             }),
-            this.prisma.company.findMany(Object.assign(Object.assign({}, options), { where, include: Object.assign({ workspace: { include: { address: true } }, doctorResponsible: { include: { professional: true } }, group: true, tecResponsible: { include: { professional: true } }, address: true, contacts: { where: { isPrincipal: true } } }, options === null || options === void 0 ? void 0 : options.include), take: pagination.take || 20, skip: pagination.skip || 0, orderBy: { name: 'asc' } })),
+            this.prisma.company.findMany(Object.assign(Object.assign(Object.assign(Object.assign({}, options), { where }), (!(options === null || options === void 0 ? void 0 : options.select) && {
+                include: Object.assign({ workspace: { include: { address: true } }, doctorResponsible: { include: { professional: true } }, group: true, tecResponsible: { include: { professional: true } }, address: true, contacts: { where: { isPrincipal: true } } }, options === null || options === void 0 ? void 0 : options.include),
+            })), { take: pagination.take || 20, skip: pagination.skip || 0, orderBy: { name: 'asc' } })),
         ]);
         return {
             data: response[1].map((company) => new company_entity_1.CompanyEntity(company)),

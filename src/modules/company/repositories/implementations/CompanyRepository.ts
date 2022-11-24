@@ -693,15 +693,17 @@ export class CompanyRepository implements ICompanyRepository {
       this.prisma.company.findMany({
         ...options,
         where,
-        include: {
-          workspace: { include: { address: true } },
-          doctorResponsible: { include: { professional: true } },
-          group: true,
-          tecResponsible: { include: { professional: true } },
-          address: true,
-          contacts: { where: { isPrincipal: true } },
-          ...options?.include,
-        },
+        ...(!options?.select && {
+          include: {
+            workspace: { include: { address: true } },
+            doctorResponsible: { include: { professional: true } },
+            group: true,
+            tecResponsible: { include: { professional: true } },
+            address: true,
+            contacts: { where: { isPrincipal: true } },
+            ...options?.include,
+          },
+        }),
         take: pagination.take || 20,
         skip: pagination.skip || 0,
         orderBy: { name: 'asc' },

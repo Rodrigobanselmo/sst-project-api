@@ -21,9 +21,12 @@ export declare class CompanyRepository implements ICompanyRepository {
         license?: boolean;
         users?: boolean;
     }>, prismaRef?: boolean): Promise<CompanyEntity | (import(".prisma/client").Company & {
-        group: import(".prisma/client").CompanyGroup;
         workspace: import(".prisma/client").Workspace[];
+        primary_activity: import(".prisma/client").Activity[];
+        secondary_activity: import(".prisma/client").Activity[];
+        license: import(".prisma/client").License;
         employees: import(".prisma/client").Employee[];
+        group: import(".prisma/client").CompanyGroup;
         users: import(".prisma/client").UserCompany[];
         doctorResponsible: import(".prisma/client").ProfessionalCouncil & {
             professional: import(".prisma/client").Professional;
@@ -31,9 +34,6 @@ export declare class CompanyRepository implements ICompanyRepository {
         tecResponsible: import(".prisma/client").ProfessionalCouncil & {
             professional: import(".prisma/client").Professional;
         };
-        license: import(".prisma/client").License;
-        primary_activity: import(".prisma/client").Activity[];
-        secondary_activity: import(".prisma/client").Activity[];
     })>;
     upsertMany(updateCompanyDto: UpdateCompanyDto[], options?: IPrismaOptions<{
         primary_activity?: boolean;

@@ -7,9 +7,12 @@ export declare class AddCompanyPhotoService {
     private readonly amazonStorageProvider;
     constructor(companyRepository: CompanyRepository, amazonStorageProvider: AmazonStorageProvider);
     execute(userPayloadDto: UserPayloadDto, file: Express.Multer.File): Promise<import("../../../entities/company.entity").CompanyEntity | (import(".prisma/client").Company & {
-        group: import(".prisma/client").CompanyGroup;
         workspace: import(".prisma/client").Workspace[];
+        primary_activity: import(".prisma/client").Activity[];
+        secondary_activity: import(".prisma/client").Activity[];
+        license: import(".prisma/client").License;
         employees: import(".prisma/client").Employee[];
+        group: import(".prisma/client").CompanyGroup;
         users: import(".prisma/client").UserCompany[];
         doctorResponsible: import(".prisma/client").ProfessionalCouncil & {
             professional: import(".prisma/client").Professional;
@@ -17,9 +20,6 @@ export declare class AddCompanyPhotoService {
         tecResponsible: import(".prisma/client").ProfessionalCouncil & {
             professional: import(".prisma/client").Professional;
         };
-        license: import(".prisma/client").License;
-        primary_activity: import(".prisma/client").Activity[];
-        secondary_activity: import(".prisma/client").Activity[];
     })>;
     private upload;
 }
