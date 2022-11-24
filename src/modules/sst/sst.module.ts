@@ -81,10 +81,17 @@ import { DocumentPCMSOController } from './controller/document-pcmso/document-pc
 import { UpdateProtocolsService } from './services/protocol/update-protocol/update-protocol.service';
 import { CreateProtocolsService } from './services/protocol/create-protocol/create-protocol.service';
 import { FindProtocolsService } from './services/protocol/find-protocol/find-protocol.service';
-import { DeleteProtocolsService } from './services/protocol/delete-protocol/delete-protocol.service';
+import { DeleteSoftProtocolsService } from './services/protocol/delete-protocol/delete-protocol.service';
 import { ProtocolController } from './controller/protocol/protocol.controller';
 import { UpdateRiskProtocolsService } from './services/protocol/update-risk-protocol/update-risk-protocol.service';
 import { ProtocolRepository } from './repositories/implementations/ProtocolRepository';
+import { ProtocolToRiskRepository } from './repositories/implementations/ProtocolRiskRepository';
+import { UpdateProtocolToRiskService } from './services/protocolToRisk/update-protocol/update-protocol.service';
+import { FindProtocolToRiskService } from './services/protocolToRisk/find-protocol/find-protocol.service';
+import { CopyProtocolToRiskService } from './services/protocolToRisk/copy-protocol/copy-protocol.service';
+import { CreateProtocolToRiskService } from './services/protocolToRisk/create-protocol/create-protocol.service';
+import { ProtocolToRiskController } from './controller/protocol-to-risk/protocolToRisk.controller';
+import { FindAllRiskDataByEmployeeService } from './services/risk-data/find-by-employee/find-by-employee.service';
 
 @Module({
   controllers: [
@@ -103,6 +110,7 @@ import { ProtocolRepository } from './repositories/implementations/ProtocolRepos
     RiskDocInfoController,
     DocumentPCMSOController,
     ProtocolController,
+    ProtocolToRiskController,
   ],
   providers: [
     ChecklistRepository,
@@ -171,11 +179,27 @@ import { ProtocolRepository } from './repositories/implementations/ProtocolRepos
     UpdateProtocolsService,
     CreateProtocolsService,
     FindProtocolsService,
-    DeleteProtocolsService,
+    DeleteSoftProtocolsService,
     UpdateRiskProtocolsService,
     ProtocolRepository,
+    ProtocolToRiskRepository,
+    CopyProtocolToRiskService,
+    CreateProtocolToRiskService,
+    FindProtocolToRiskService,
+    UpdateProtocolToRiskService,
+    FindAllRiskDataByEmployeeService,
   ],
-  exports: [RiskRepository, RiskGroupDataRepository, RiskDocumentRepository, UpsertManyRiskDataService, RiskDataRepository, FindExamByHierarchyService],
+  exports: [
+    RiskRepository,
+    RiskGroupDataRepository,
+    RiskDocumentRepository,
+    UpsertManyRiskDataService,
+    RiskDataRepository,
+    FindExamByHierarchyService,
+    FindAllRiskDataByEmployeeService,
+    FindExamByHierarchyService,
+    ExamRepository,
+  ],
   imports: [forwardRef(() => CompanyModule)],
 })
 export class SSTModule {}

@@ -44,9 +44,9 @@ export class EmployeeEntity implements Employee {
   workspaces?: WorkspaceEntity[];
 
   @ApiProperty({ description: 'The hierarchy of the Employee' })
-  hierarchy?: HierarchyEntity;
+  hierarchy?: Partial<HierarchyEntity>;
 
-  subOffices?: HierarchyEntity[];
+  subOffices?: Partial<HierarchyEntity>[];
   directory?: string;
   management?: string;
   sector?: string;

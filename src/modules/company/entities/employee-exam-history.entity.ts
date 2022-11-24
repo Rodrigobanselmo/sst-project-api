@@ -79,6 +79,14 @@ export class EmployeeExamsHistoryEntity implements EmployeeExamsHistory {
   ) {
     Object.assign(this, partial);
 
+    if (this.clinic) {
+      this.clinic = new CompanyEntity(this.clinic);
+    }
+
+    if (this.employee) {
+      this.employee = new EmployeeEntity(this.employee as any);
+    }
+
     if (this.doctor) {
       this.doctor = new ProfessionalEntity(this.doctor);
     }

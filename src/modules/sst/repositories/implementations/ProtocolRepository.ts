@@ -1,12 +1,11 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
-import { CreateProtocolDto, FindProtocolDto, UpdateProtocolDto, UpdateProtocolRiskDto } from '../../dto/protocol.dto';
-
-import { ProtocolEntity } from '../../entities/protocol.entity';
 import { prismaFilter } from '../../../../shared/utils/filters/prisma.filters';
+import { CreateProtocolDto, FindProtocolDto, UpdateProtocolDto, UpdateProtocolRiskDto } from '../../dto/protocol.dto';
+import { ProtocolEntity } from '../../entities/protocol.entity';
 
 @Injectable()
 export class ProtocolRepository {
@@ -29,7 +28,7 @@ export class ProtocolRepository {
     return new ProtocolEntity(protocol);
   }
 
-  async updateProtocolRisk({ companyId, protocolIds, riskIds }: UpdateProtocolRiskDto) {
+  async updateProtocolRiskREMOVE({ companyId, protocolIds, riskIds }: UpdateProtocolRiskDto) {
     const createArray = protocolIds
       .map((protocolId) => {
         return riskIds.map((riskId) =>
@@ -132,9 +131,9 @@ export class ProtocolRepository {
     return new ProtocolEntity(protocol);
   }
 
-  async delete(id: number, companyId: string) {
+  async deleteSoft(id: number) {
     const protocol = await this.prisma.protocol.update({
-      where: { id_companyId: { companyId, id } },
+      where: { id },
       data: { deleted_at: new Date() },
     });
 

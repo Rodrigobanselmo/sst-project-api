@@ -9,7 +9,7 @@ export class UpdateRiskProtocolsService {
   constructor(private readonly protocolRepository: ProtocolRepository) {}
 
   async execute(UpsertProtocolsDto: UpdateProtocolRiskDto, user: UserPayloadDto) {
-    const protocol = await this.protocolRepository.updateProtocolRisk({
+    const protocol = await this.protocolRepository.updateProtocolRiskREMOVE({
       ...UpsertProtocolsDto,
       companyId: user.targetCompanyId,
     });

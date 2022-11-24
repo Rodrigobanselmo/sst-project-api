@@ -320,6 +320,99 @@ export class RiskRepository implements IRiskRepository {
     return risks.map((companyClinic) => new RiskFactorsEntity(companyClinic));
   }
 
+  async findRiskDataByHierarchies(hierarchyIds: string[], companyId: string, options: Prisma.RiskFactorsFindManyArgs & { date?: Date } = {}) {
+    const { date, ...rest } = options;
+
+    const risks = await this.findNude({
+      ...rest,
+      where: {
+        representAll: false, // remove standard risk
+        riskFactorData: {
+          some: {
+            ...(date && { AND: [{ OR: [{ startDate: { lte: date } }, { startDate: null }] }, { OR: [{ endDate: { gt: date } }, { endDate: null }] }] }),
+            companyId,
+            homogeneousGroup: {
+              hierarchyOnHomogeneous: {
+                some: {
+                  hierarchyId: { in: hierarchyIds },
+                  ...(date && { AND: [{ OR: [{ startDate: { lte: date } }, { startDate: null }] }, { OR: [{ endDate: { gt: date } }, { endDate: null }] }] }),
+                },
+              },
+            },
+          },
+        },
+        ...rest.where,
+      },
+      select: {
+        name: true,
+        severity: true,
+        type: true,
+        representAll: true,
+        id: true,
+        isPGR: true,
+        isAso: true,
+        isPPP: true,
+        isPCMSO: true,
+        protocolToRisk: {
+          select: { minRiskDegree: true, minRiskDegreeQuantity: true, id: true, protocol: { select: { name: true, id: true } } },
+        },
+        docInfo: {
+          where: {
+            AND: [
+              {
+                OR: [
+                  { companyId },
+                  {
+                    company: {
+                      applyingServiceContracts: {
+                        some: { receivingServiceCompanyId: companyId },
+                      },
+                    },
+                  },
+                ],
+              },
+              { OR: [{ hierarchyId: { in: hierarchyIds } }, { hierarchyId: null }] },
+            ],
+          },
+        },
+        examToRisk: {
+          include: { exam: { select: { name: true, id: true } } },
+          where: { companyId },
+        },
+        riskFactorData: {
+          where: {
+            ...(date && { AND: [{ OR: [{ startDate: { lte: date } }, { startDate: null }] }, { OR: [{ endDate: { gt: date } }, { endDate: null }] }] }),
+            companyId,
+            homogeneousGroup: {
+              hierarchyOnHomogeneous: {
+                some: {
+                  hierarchyId: { in: hierarchyIds },
+                  ...(date && { AND: [{ OR: [{ startDate: { lte: date } }, { startDate: null }] }, { OR: [{ endDate: { gt: date } }, { endDate: null }] }] }),
+                },
+              },
+            },
+          },
+          include: {
+            examsToRiskFactorData: {
+              include: {
+                exam: { select: { name: true, status: true } },
+              },
+            },
+            homogeneousGroup: {
+              include: {
+                characterization: { select: { name: true, type: true } },
+                environment: { select: { name: true, type: true } },
+              },
+            },
+          },
+        },
+        ...rest.select,
+      },
+    });
+
+    return risks;
+  }
+
   async findCountNude(pagination: PaginationQueryDto, options: Prisma.RiskFactorsFindManyArgs = {}) {
     const response = await this.prisma.$transaction([
       this.prisma.riskFactors.count({

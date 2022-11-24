@@ -24,6 +24,7 @@ import { RiskFactorDataEntity } from './../../../../../sst/entities/riskData.ent
 import { RiskRepository } from './../../../../../sst/repositories/implementations/RiskRepository';
 import { ProfessionalEntity } from './../../../../../users/entities/professional.entity';
 import { IBreakPointPPP, IEmployee2240Data, IPriorRiskData } from './../../../../interfaces/event-2240';
+import { onGetRisks } from '../../../../../../shared/utils/onGetRisks';
 
 @Injectable()
 export class FindEvents2240ESocialService {
@@ -520,32 +521,7 @@ export class FindEvents2240ESocialService {
   }
 
   onGetRisks = (riskData: RiskFactorDataEntity[]): IPriorRiskData[] => {
-    const risks: Record<string, { riskData: RiskFactorDataEntity[]; riskFactor: RiskFactorsEntity }> = {};
-
-    riskData.forEach(({ riskFactor, ..._rd }) => {
-      if (riskFactor?.representAll) return;
-
-      if (!risks[_rd.riskId])
-        risks[_rd.riskId] = {
-          riskData: [],
-          riskFactor: riskFactor,
-        };
-
-      risks[_rd.riskId].riskData.push(_rd as any);
-    });
-
-    return Object.values(risks).map((data) => {
-      data.riskData =
-        sortArray(data.riskData, {
-          by: ['prioritization', 'level', 'isQuantity'],
-          order: ['prioritization', 'level', 'isQuantity'],
-        }) || [];
-
-      return {
-        riskFactor: data.riskFactor,
-        riskData: data.riskData[0],
-      };
-    });
+    return onGetRisks(riskData).map((rd) => ({ riskData: rd.riskData[0], riskFactor: rd.riskFactor }));
   };
 
   onGetSector = (id: string, hierarchyTree: Record<string, HierarchyEntity>) => {

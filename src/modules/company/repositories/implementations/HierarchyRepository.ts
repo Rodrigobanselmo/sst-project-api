@@ -674,4 +674,12 @@ export class HierarchyRepository {
       count: response[0],
     };
   }
+
+  async findFirstNude(options: Prisma.HierarchyFindFirstArgs = {}) {
+    const data = await this.prisma.hierarchy.findFirst({
+      ...options,
+    });
+
+    return new HierarchyEntity(data);
+  }
 }

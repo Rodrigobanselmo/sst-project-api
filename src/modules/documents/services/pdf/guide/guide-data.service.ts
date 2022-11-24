@@ -1,5 +1,6 @@
+import { ErrorMessageEnum } from './../../../../../shared/constants/enum/errorMessage';
 import { HierarchyRepository } from './../../../../company/repositories/implementations/HierarchyRepository';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, ForbiddenException } from '@nestjs/common';
 
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { removeDuplicate } from '../../../../../shared/utils/removeDuplicate';
@@ -21,10 +22,12 @@ export class PdfGuideDataService {
     const companyId = userPayloadDto.targetCompanyId;
 
     const data = await this.employeeRepository.findFirstNude({
+      where: { id: employeeId, OR: [{ examsHistory: { some: { clinicId: companyId } } }, { companyId: companyId }] },
       select: {
         cpf: true,
         name: true,
         email: true,
+        companyId: true,
         hierarchy: { select: { name: true } },
         company: {
           select: {
@@ -44,6 +47,7 @@ export class PdfGuideDataService {
                     cnpj: true,
                     logoUrl: true,
                     fantasy: true,
+                    contacts: { select: { phone: true, id: true, isPrincipal: true, email: true }, take: 1, orderBy: { isPrincipal: 'desc' } },
                   },
                 },
               },
@@ -77,8 +81,9 @@ export class PdfGuideDataService {
           },
         },
       },
-      where: { id: employeeId, companyId },
     });
+
+    if (!data) throw new ForbiddenException(ErrorMessageEnum.FORBIDDEN_ACCESS);
 
     const clinicIds = data.examsHistory.map((data) => data.clinicId);
     const examIds = data.examsHistory.map((data) => data.examId);
@@ -155,7 +160,7 @@ export class PdfGuideDataService {
     delete data.examsHistory;
 
     if (hierarchyId) {
-      const hierarchy = await this.hierarchyRepository.findById(hierarchyId, companyId);
+      const hierarchy = await this.hierarchyRepository.findById(hierarchyId, data.companyId);
 
       data.hierarchy = hierarchy;
     }

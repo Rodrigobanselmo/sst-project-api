@@ -1,3 +1,4 @@
+import { ProtocolToRiskEntity } from './protocol.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 import { HierarchyEntity } from '../../company/entities/hierarchy.entity';
@@ -112,6 +113,7 @@ export class RiskFactorDataEntity implements RiskFactorData {
   endDate: Date;
   startDate: Date;
   deletedAt: Date;
+  protocolsToRisk: ProtocolToRiskEntity[];
 
   constructor(partial: Partial<RiskFactorDataEntity>) {
     Object.assign(this, partial);
@@ -124,6 +126,8 @@ export class RiskFactorDataEntity implements RiskFactorData {
 
     if (partial.riskFactor) {
       this.riskFactor = new RiskFactorsEntity(partial.riskFactor);
+
+      this.getProtocols();
       this.getMatrix();
     }
 
@@ -172,6 +176,20 @@ export class RiskFactorDataEntity implements RiskFactorData {
           isStandard: true,
           exam: examData?.exam,
         });
+      });
+    }
+  }
+
+  private getProtocols() {
+    if (this.riskFactor && this.riskFactor?.protocolToRisk) {
+      this.riskFactor?.protocolToRisk.forEach((protocolRisk) => {
+        if (protocolRisk?.minRiskDegreeQuantity && this.isQuantity && this.level < protocolRisk?.minRiskDegreeQuantity) return;
+
+        if (protocolRisk?.minRiskDegree && (!this.isQuantity || !protocolRisk?.minRiskDegreeQuantity) && this.level < protocolRisk?.minRiskDegree) return;
+
+        if (!this.protocolsToRisk) this.protocolsToRisk = [];
+
+        this.protocolsToRisk.push(protocolRisk);
       });
     }
   }

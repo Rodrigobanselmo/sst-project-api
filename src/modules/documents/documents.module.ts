@@ -19,6 +19,9 @@ import { PgrActionPlanUploadTableService } from './services/pgr/action-plan/uplo
 import { DocumentsPdfController } from './controller/pdf.controller';
 import { PcmsoUploadService } from './services/pgr/document/upload-pcmso-doc.service';
 import { DocumentsPcmsoController } from './controller/pcmso.controller';
+import { PdfKitDataService } from './services/pdf/kit/kit-data.service';
+import { PdfAsoDataService } from './services/pdf/aso/aso-data.service';
+import { PdfProntuarioDataService } from './services/pdf/prontuario/prontuario-data.service';
 // import { DocumentsBaseController } from './controller/doc.controller';
 
 @Module({
@@ -38,6 +41,9 @@ import { DocumentsPcmsoController } from './controller/pcmso.controller';
     PgrActionPlanUploadTableService,
     PdfGuideDataService,
     PcmsoUploadService,
+    PdfKitDataService,
+    PdfAsoDataService,
+    PdfProntuarioDataService,
     // DocumentsBaseController,
   ],
 })

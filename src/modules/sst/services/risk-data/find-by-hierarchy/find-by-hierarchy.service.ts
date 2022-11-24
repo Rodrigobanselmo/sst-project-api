@@ -9,75 +9,8 @@ export class FindAllByHierarchyService {
   constructor(private readonly riskRepository: RiskRepository) {}
 
   async execute(hierarchyId: string, companyId: string) {
-    const risks = await this.riskRepository.findNude({
-      where: {
-        representAll: false, // remove standard risk
-        riskFactorData: {
-          some: {
-            companyId,
-            homogeneousGroup: {
-              hierarchyOnHomogeneous: { some: { hierarchyId } },
-            },
-          },
-        },
-      },
-      select: {
-        name: true,
-        severity: true,
-        type: true,
-        representAll: true,
-        id: true,
-        isPGR: true,
-        isAso: true,
-        isPPP: true,
-        isPCMSO: true,
-        docInfo: {
-          where: {
-            AND: [
-              {
-                OR: [
-                  { companyId },
-                  {
-                    company: {
-                      applyingServiceContracts: {
-                        some: { receivingServiceCompanyId: companyId },
-                      },
-                    },
-                  },
-                ],
-              },
-              { OR: [{ hierarchyId }, { hierarchyId: null }] },
-            ],
-          },
-        },
-        examToRisk: {
-          include: { exam: { select: { name: true, id: true } } },
-          where: { companyId },
-        },
-        riskFactorData: {
-          where: {
-            companyId,
-            homogeneousGroup: {
-              hierarchyOnHomogeneous: { some: { hierarchyId } },
-            },
-          },
-          include: {
-            examsToRiskFactorData: {
-              include: {
-                exam: { select: { name: true, status: true } },
-              },
-            },
-            homogeneousGroup: {
-              include: {
-                characterization: { select: { name: true, type: true } },
-                environment: { select: { name: true, type: true } },
-              },
-            },
-          },
-        },
-      },
-    });
-
+    const risks = await this.riskRepository.findRiskDataByHierarchies([hierarchyId], companyId);
+    console.log(9);
     const riskDataReturn: RiskFactorDataEntity[] = [];
 
     risks.forEach((risk) => {

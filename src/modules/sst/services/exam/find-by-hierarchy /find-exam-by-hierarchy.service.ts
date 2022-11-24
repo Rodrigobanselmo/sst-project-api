@@ -1,22 +1,21 @@
-import { EmployeeExamsHistoryEntity } from '../../../../company/entities/employee-exam-history.entity';
-import { getRiskDoc } from '../../../../documents/services/pgr/document/upload-pgr-doc.service';
-import { RiskFactorDataEntity } from '../../../entities/riskData.entity';
-import { FindExamHierarchyDto } from '../../../dto/exam.dto';
-import { ExamRiskEntity } from '../../../entities/examRisk.entity';
-import { EmployeeEntity } from '../../../../company/entities/employee.entity';
-import { EmployeeRepository } from '../../../../company/repositories/implementations/EmployeeRepository';
-import { IExamOriginData } from '../../../entities/exam.entity';
+import { HierarchyEntity } from './../../../../company/entities/hierarchy.entity';
 import { Injectable } from '@nestjs/common';
-import { HomoTypeEnum, SexTypeEnum, StatusEnum } from '@prisma/client';
+import { HomoTypeEnum, Prisma, SexTypeEnum, StatusEnum } from '@prisma/client';
 
-import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
-import { HierarchyRepository } from '../../../../company/repositories/implementations/HierarchyRepository';
-import { ExamRepository } from '../../../repositories/implementations/ExamRepository';
 import { originRiskMap } from '../../../../../shared/constants/maps/origin-risk';
-import { RiskDataRepository } from '../../../repositories/implementations/RiskDataRepository';
+import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
+import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { sortNumber } from '../../../../../shared/utils/sorts/number.sort';
 import { sortString } from '../../../../../shared/utils/sorts/string.sort';
-import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
+import { EmployeeExamsHistoryEntity } from '../../../../company/entities/employee-exam-history.entity';
+import { EmployeeEntity } from '../../../../company/entities/employee.entity';
+import { EmployeeRepository } from '../../../../company/repositories/implementations/EmployeeRepository';
+import { HierarchyRepository } from '../../../../company/repositories/implementations/HierarchyRepository';
+import { getRiskDoc } from '../../../../documents/services/pgr/document/upload-pgr-doc.service';
+import { FindExamHierarchyDto } from '../../../dto/exam.dto';
+import { IExamOriginData, IExamEmployeeCheck } from '../../../entities/exam.entity';
+import { ExamRepository } from '../../../repositories/implementations/ExamRepository';
+import { RiskDataRepository } from '../../../repositories/implementations/RiskDataRepository';
 
 export const getValidityInMonths = (employee: EmployeeEntity, examRisk: { validityInMonths?: number; lowValidityInMonths?: number }) => {
   return employee.isComorbidity ? examRisk.lowValidityInMonths || examRisk.validityInMonths : examRisk.validityInMonths;
@@ -39,7 +38,8 @@ export class FindExamByHierarchyService {
     const companyId = user.targetCompanyId;
     const hierarchy = hierarchyId ? await this.hierarchyRepository.findByIdWithParent(hierarchyId, companyId) : undefined;
 
-    const hierarchies = [hierarchy, ...(hierarchy?.parents || [])].filter((h) => h);
+    const hierarchies: Partial<HierarchyEntity>[] = [hierarchy, ...(hierarchy?.parents || [])].filter((h) => h);
+    const date = new Date();
 
     const examType = {
       ...('isPeriodic' in query && {
@@ -75,7 +75,6 @@ export class FindExamByHierarchyService {
         hierarchies.push(...(this.employee?.subOffices || []));
       }
     }
-
     const hierarchyIds = hierarchies.map(({ id }) => id);
 
     const riskData = (
@@ -131,7 +130,10 @@ export class FindExamByHierarchyService {
                   hierarchy: { select: { id: true, type: true, name: true } },
                 },
                 ...(hierarchyId && {
-                  where: { homogeneousGroup: { type: 'HIERARCHY' } },
+                  where: {
+                    homogeneousGroup: { type: 'HIERARCHY' },
+                    ...(date && { AND: [{ OR: [{ startDate: { lte: date } }, { startDate: null }] }, { OR: [{ endDate: { gt: date } }, { endDate: null }] }] }),
+                  },
                 }),
               },
               characterization: { select: { name: true, type: true } },
@@ -152,14 +154,19 @@ export class FindExamByHierarchyService {
           riskFactorGroupDataId: true,
         },
         where: {
+          ...(date && { AND: [{ OR: [{ startDate: { lte: date } }, { startDate: null }] }, { OR: [{ endDate: { gt: date } }, { endDate: null }] }] }),
           companyId,
           ...(hierarchyIds.length > 0 && {
             homogeneousGroup: {
               hierarchyOnHomogeneous: {
-                some: { hierarchyId: { in: hierarchyIds } },
+                some: {
+                  ...(date && { AND: [{ OR: [{ startDate: { lte: date } }, { startDate: null }] }, { OR: [{ endDate: { gt: date } }, { endDate: null }] }] }),
+                  hierarchyId: { in: hierarchyIds },
+                },
               },
             },
           }),
+          // here we check if has standard exam and is check OR if exam is directly add to risk
           OR: [
             {
               examsToRiskFactorData: {
@@ -169,23 +176,23 @@ export class FindExamByHierarchyService {
                 },
               },
             },
-            // ...(hierarchyIds.length > 0
-            // ? [
-            {
-              riskFactor: {
-                examToRisk: {
-                  some: {
-                    examId: { gt: 0 },
-                    ...(query.onlyAttendance && {
-                      exam: { isAttendance: true },
-                    }),
+            ...(hierarchyIds.length > 0
+              ? [
+                  {
+                    riskFactor: {
+                      examToRisk: {
+                        some: {
+                          examId: { gt: 0 },
+                          ...(query.onlyAttendance && {
+                            exam: { isAttendance: true },
+                          }),
+                        },
+                      },
+                    },
+                    standardExams: true,
                   },
-                },
-              },
-              standardExams: true,
-            },
-            // ]
-            // : []),
+                ]
+              : []),
           ],
         },
       })
@@ -229,7 +236,7 @@ export class FindExamByHierarchyService {
         if (!exams[examData.examId]) exams[examData.examId] = [];
         exams[examData.examId].push({
           ...examData,
-          origin: examData.isStandard ? 'Padrão' : rd.origin,
+          origin: examData.isStandard ? `Padrão (${rd.origin && rd.origin})` : rd.origin,
           prioritization: (examData.isStandard ? 100 : rd.prioritization) || 3,
           homogeneousGroup: rd.homogeneousGroup,
           skipEmployee: this.checkIfSkipEmployee(examData, this.employee),
@@ -240,62 +247,7 @@ export class FindExamByHierarchyService {
       // exams
     });
 
-    const examRepresentAll =
-      // hierarchyIds.length > 0
-      // ?
-      await this.examRepository.findNude({
-        select: {
-          examToRisk: {
-            where: { companyId, ...examType },
-            distinct: ['isMale', 'isAdmission', 'isDismissal', 'isPeriodic', 'isReturn', 'isMale', 'isFemale', 'fromAge', 'toAge', 'validityInMonths'],
-          },
-          name: true,
-          id: true,
-          isAttendance: true,
-        },
-        where: {
-          AND: [
-            {
-              //tenant
-              OR: [
-                { system: true },
-                { companyId },
-                {
-                  company: {
-                    applyingServiceContracts: {
-                      some: { receivingServiceCompanyId: companyId },
-                    },
-                  },
-                },
-                {
-                  company: {
-                    receivingServiceContracts: {
-                      some: { applyingServiceCompanyId: companyId },
-                    },
-                  },
-                },
-              ],
-            },
-            {
-              // rules
-              OR: [
-                {
-                  examToRisk: {
-                    some: {
-                      companyId: companyId,
-                      risk: { representAll: true },
-                    },
-                  },
-                  ...(query.onlyAttendance && {
-                    isAttendance: true,
-                  }),
-                },
-              ],
-            },
-          ],
-        },
-      });
-    // : { data: [] };
+    const examRepresentAll = hierarchyIds.length > 0 ? await this.onGetAllExams(companyId, { examsTypes: examType, onlyAttendance: query.onlyAttendance }) : { data: [] };
 
     examRepresentAll.data.map((exam) => {
       exam.examToRisk.map((examToRisk) => {
@@ -373,7 +325,7 @@ export class FindExamByHierarchyService {
     };
   }
 
-  checkIfSkipEmployee(examRisk: IExamOriginData, employee: EmployeeEntity) {
+  checkIfSkipEmployee(examRisk: IExamEmployeeCheck, employee: EmployeeEntity) {
     if (!employee) return null;
 
     // if (employee.lastExam) {
@@ -468,6 +420,36 @@ export class FindExamByHierarchyService {
 
       return examsData;
     });
+  }
+
+  async onGetAllExams(companyId: string, options?: { examsTypes?: Prisma.ExamToRiskWhereInput; onlyAttendance?: boolean }) {
+    const examRepresentAll = await this.examRepository.findNude({
+      select: {
+        examToRisk: {
+          where: {
+            companyId,
+            risk: { representAll: true },
+            ...options?.examsTypes,
+          },
+        },
+        name: true,
+        id: true,
+        isAttendance: true,
+      },
+      where: {
+        examToRisk: {
+          some: {
+            companyId: companyId,
+            risk: { representAll: true },
+          },
+        },
+        ...(options?.onlyAttendance && {
+          isAttendance: true,
+        }),
+      },
+    });
+
+    return examRepresentAll;
   }
 }
 

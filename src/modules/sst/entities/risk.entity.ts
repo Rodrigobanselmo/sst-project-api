@@ -8,6 +8,7 @@ import { ExamRiskEntity } from './examRisk.entity';
 import { RiskFactorDataEntity } from './riskData.entity';
 import { RiskDocInfoEntity } from './riskDocInfo.entity';
 import { EsocialTable24Entity } from '../../../modules/esocial/entities/esocialTable24.entity';
+import { ProtocolToRiskEntity } from './protocol.entity';
 
 export class RiskFactorsEntity implements RiskFactors {
   @ApiProperty({ description: 'The id of the Company' })
@@ -89,6 +90,7 @@ export class RiskFactorsEntity implements RiskFactors {
   examToRisk: ExamRiskEntity[];
   riskFactorData: RiskFactorDataEntity[];
   docInfo?: RiskDocInfoEntity[];
+  protocolToRisk?: ProtocolToRiskEntity[];
 
   isAso: boolean;
   isPGR: boolean;

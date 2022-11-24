@@ -16,6 +16,14 @@ export interface IExamOriginData extends Partial<ExamRiskDataEntity> {
   homogeneousGroup?: HomoGroupEntity;
   risk?: { name: string; id: string };
 }
+
+export interface IExamEmployeeCheck {
+  isMale?: boolean;
+  isFemale?: boolean;
+  fromAge?: number;
+  toAge?: number;
+}
+
 export class ExamEntity implements Exam {
   @ApiProperty({ description: 'The id of the Company' })
   id: number;

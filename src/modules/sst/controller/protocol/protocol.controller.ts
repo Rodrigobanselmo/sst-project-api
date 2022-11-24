@@ -5,7 +5,7 @@ import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import { CreateProtocolDto, FindProtocolDto, UpdateProtocolDto, UpdateProtocolRiskDto } from '../../dto/protocol.dto';
 import { CreateProtocolsService } from '../../services/protocol/create-protocol/create-protocol.service';
-import { DeleteProtocolsService } from '../../services/protocol/delete-protocol/delete-protocol.service';
+import { DeleteSoftProtocolsService } from '../../services/protocol/delete-protocol/delete-protocol.service';
 import { FindProtocolsService } from '../../services/protocol/find-protocol/find-protocol.service';
 import { UpdateProtocolsService } from '../../services/protocol/update-protocol/update-protocol.service';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
@@ -14,13 +14,13 @@ import { Roles } from '../../../../shared/decorators/roles.decorator';
 import { UpdateRiskProtocolsService } from '../../services/protocol/update-risk-protocol/update-risk-protocol.service';
 
 @ApiTags('protocol')
-@Controller('company/:companyId/protocol')
+@Controller('protocol')
 export class ProtocolController {
   constructor(
     private readonly updateProtocolsService: UpdateProtocolsService,
     private readonly createProtocolsService: CreateProtocolsService,
     private readonly findAvailableProtocolsService: FindProtocolsService,
-    private readonly deleteProtocolsService: DeleteProtocolsService,
+    private readonly deleteSoftExamService: DeleteSoftProtocolsService,
     private readonly updateRiskProtocolsService: UpdateRiskProtocolsService,
   ) {}
 
@@ -30,7 +30,7 @@ export class ProtocolController {
     isMember: true,
     crud: true,
   })
-  @Get()
+  @Get('/:companyId?')
   find(@User() userPayloadDto: UserPayloadDto, @Query() query: FindProtocolDto) {
     return this.findAvailableProtocolsService.execute(query, userPayloadDto);
   }
@@ -46,24 +46,24 @@ export class ProtocolController {
     return this.createProtocolsService.execute(upsertAccessGroupDto, userPayloadDto);
   }
 
-  @Permissions(
-    {
-      code: PermissionEnum.PROTOCOL,
-      isContract: true,
-      isMember: true,
-      crud: true,
-    },
-    {
-      code: PermissionEnum.EXAM,
-      isContract: true,
-      isMember: true,
-      crud: true,
-    },
-  )
-  @Patch('/add-risks')
-  updateRisks(@Body() upsertAccessGroupDto: UpdateProtocolRiskDto, @User() userPayloadDto: UserPayloadDto) {
-    return this.updateRiskProtocolsService.execute({ ...upsertAccessGroupDto }, userPayloadDto);
-  }
+  // @Permissions(
+  //   {
+  //     code: PermissionEnum.PROTOCOL,
+  //     isContract: true,
+  //     isMember: true,
+  //     crud: true,
+  //   },
+  //   {
+  //     code: PermissionEnum.EXAM,
+  //     isContract: true,
+  //     isMember: true,
+  //     crud: true,
+  //   },
+  // )
+  // @Patch('/add-risks')
+  // updateRisks(@Body() upsertAccessGroupDto: UpdateProtocolRiskDto, @User() userPayloadDto: UserPayloadDto) {
+  //   return this.updateRiskProtocolsService.execute({ ...upsertAccessGroupDto }, userPayloadDto);
+  // }
 
   @Permissions({
     code: PermissionEnum.PROTOCOL,
@@ -71,7 +71,7 @@ export class ProtocolController {
     isMember: true,
     crud: true,
   })
-  @Patch('/:id')
+  @Patch('/:id/:companyId')
   update(@Body() upsertAccessGroupDto: UpdateProtocolDto, @User() userPayloadDto: UserPayloadDto, @Param('id', ParseIntPipe) id: number) {
     return this.updateProtocolsService.execute({ ...upsertAccessGroupDto, id }, userPayloadDto);
   }
@@ -82,8 +82,8 @@ export class ProtocolController {
     isMember: true,
     crud: true,
   })
-  @Delete('/:id')
-  delete(@User() userPayloadDto: UserPayloadDto, @Param('id', ParseIntPipe) id: number) {
-    return this.deleteProtocolsService.execute(id, userPayloadDto);
+  @Delete('/:id/:companyId')
+  deleteSoft(@User() userPayloadDto: UserPayloadDto, @Param('id', ParseIntPipe) id: number) {
+    return this.deleteSoftExamService.execute(id, userPayloadDto);
   }
 }
