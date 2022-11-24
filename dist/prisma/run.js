@@ -1,14 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("@prisma/client");
-const delete_professionals_connections_1 = require("./run/delete-professionals-connections");
-const create_professional_council_1 = require("./run/create-professional-council");
+const read_24_1 = require("./seed/read_24");
+const change_rec_med_1 = require("./run/change-rec-med");
+const create_no_risk_1 = require("./run/create-no-risk");
 const prisma = new client_1.PrismaClient();
 async function main() {
     try {
         console.log('start');
-        await (0, delete_professionals_connections_1.deleteProfessionalsConnections)(prisma);
-        await (0, create_professional_council_1.addProfCOuncilNUll)(prisma);
+        await (0, read_24_1.seedEsocial24)(prisma);
+        await (0, change_rec_med_1.changeRecMed)(prisma);
+        await (0, create_no_risk_1.CreateAbsenceRisk)(prisma);
         console.log('end');
     }
     catch (err) {

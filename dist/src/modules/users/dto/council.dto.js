@@ -26,6 +26,7 @@ __decorate([
     __metadata("design:type", String)
 ], CouncilDto.prototype, "councilType", void 0);
 __decorate([
+    (0, class_validator_1.ValidateIf)((o) => !!o.councilUF),
     (0, class_validator_1.IsOptional)(),
     (0, class_transformer_1.Transform)(string_uppercase_transform_1.StringUppercaseTransform, { toClassOnly: true }),
     (0, class_transformer_1.Transform)(query_array_1.QueryArray, { toClassOnly: true }),
