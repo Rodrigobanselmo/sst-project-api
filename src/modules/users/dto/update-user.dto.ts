@@ -3,7 +3,7 @@ import { StringUppercaseTransform } from './../../../shared/transformers/string-
 import { ApiProperty } from '@nestjs/swagger';
 import { ProfessionalTypeEnum, UfStateEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
-import { IsEnum, IsOptional, IsString, MaxLength, MinLength, ValidateNested } from 'class-validator';
+import { IsEnum, IsOptional, IsString, MaxLength, MinLength, ValidateIf, ValidateNested } from 'class-validator';
 import { CpfFormatTransform } from '../../../shared/transformers/cpf-format.transform';
 import { StringCapitalizeTransform } from '../../../shared/transformers/string-capitalize';
 import { CouncilDto } from './council.dto';
@@ -51,6 +51,7 @@ export class UpdateUserDto {
   @IsOptional()
   councilType?: string;
 
+  @ValidateIf((o) => !!o.councilUF)
   @IsOptional()
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @Transform(QueryArray, { toClassOnly: true })

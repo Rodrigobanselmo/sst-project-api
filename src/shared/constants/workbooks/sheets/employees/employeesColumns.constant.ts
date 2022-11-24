@@ -40,13 +40,6 @@ export const employeesColumnsConstant = [
     checkHandler: checkIsValidDate,
   },
   {
-    databaseName: 'birthday',
-    excelName: 'Nascimento',
-    isArray: false,
-    required: false,
-    checkHandler: checkIsValidDate,
-  },
-  {
     databaseName: 'admissionDate',
     excelName: 'Admissão',
     isArray: false,
