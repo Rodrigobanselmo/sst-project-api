@@ -1,0 +1,302 @@
+[
+ {
+   "id": 200004300,
+   "description": "Impacto de pessoa contra objeto parado",
+   "case": "Aplica-se a casos em que a lesão foi produzida por impacto da pessoa acidentada contra a fonte da lesão, tendo sido o movimento que produziu o contato originalmente o da pessoa, e não o da fonte da lesão, exceto quando o movimento do acidentado tiver sido provocado por queda.\nInclui casos de alguém chocar-se contra alguma coisa, tropeçar em alguma coisa, ser empurrado ou projetado contra alguma coisa, etc. Não inclui casos de salto para nível inferior."
+ },
+ {
+   "id": 200004600,
+   "description": "Impacto de pessoa contra objeto em movimento",
+   "case": "Aplica-se a casos em que a lesão foi produzida por impacto da pessoa acidentada contra a fonte da lesão, tendo sido o movimento que produziu o contato originalmente o da pessoa, e não o da fonte da lesão, exceto quando o movimento do acidentado tiver sido provocado por queda.\nInclui casos de alguém chocar-se contra alguma coisa, tropeçar em alguma coisa, ser empurrado ou projetado contra alguma coisa, etc. Não inclui casos de salto para nível inferior."
+ },
+ {
+   "id": 200008300,
+   "description": "Impacto sofrido por pessoa, de objeto que cai",
+   "case": "Aplica-se a casos em que a lesão foi produzida por impacto entre o acidentado e a fonte da lesão, tendo sido da fonte da lesão, e não do acidentado, o movimento que originou o contato."
+ },
+ {
+   "id": 200008600,
+   "description": "Impacto sofrido por pessoa, de objeto projetado",
+   "case": "Aplica-se a casos em que a lesão foi produzida por impacto entre o acidentado e a fonte da lesão, tendo sido da fonte da lesão, e não do acidentado, o movimento que originou o contato."
+ },
+ {
+   "id": 200008900,
+   "description": "Impacto sofrido por pessoa, NIC",
+   "case": "Aplica-se a casos em que a lesão foi produzida por impacto entre o acidentado e a fonte da lesão, tendo sido da fonte da lesão, e não do acidentado, o movimento que originou o contato."
+ },
+ {
+   "id": 200012200,
+   "description": "Queda de pessoa com diferença de nível de andaime, passagem, plataforma, etc",
+   "case": "Aplica-se a casos em que a lesão foi produzida por impacto entre o acidentado e a fonte da lesão, tendo sido do acidentado o movimento que produziu o contato, nas seguintes circunstâncias:\n1) O movimento do acidentado foi devido à ação da gravidade.\n2) O ponto de contato com a fonte da lesão estava abaixo da superfície que suportava o acidentado no início da queda.\nInclui salto para nível inferior."
+ },
+ {
+   "id": 200012300,
+   "description": "Queda de pessoa com diferença de nível de escada móvel ou fixada cujos degraus não permitem o apoio integral do pé",
+   "case": "Aplica-se a casos em que a lesão foi produzida por impacto entre o acidentado e a fonte da lesão, tendo sido do acidentado o movimento que produziu o contato, nas seguintes circunstâncias:\n1) O movimento do acidentado foi devido à ação da gravidade.\n2) O ponto de contato com a fonte da lesão estava abaixo da superfície que suportava o acidentado no início da queda.\nInclui salto para nível inferior."
+ },
+ {
+   "id": 200012400,
+   "description": "Queda de pessoa com diferença de nível de material empilhado",
+   "case": "Aplica-se a casos em que a lesão foi produzida por impacto entre o acidentado e a fonte da lesão, tendo sido do acidentado o movimento que produziu o contato, nas seguintes circunstâncias:\n1) O movimento do acidentado foi devido à ação da gravidade.\n2) O ponto de contato com a fonte da lesão estava abaixo da superfície que suportava o acidentado no início da queda.\nInclui salto para nível inferior."
+ },
+ {
+   "id": 200012500,
+   "description": "Queda de pessoa com diferença de nível de veículo",
+   "case": "Aplica-se a casos em que a lesão foi produzida por impacto entre o acidentado e a fonte da lesão, tendo sido do acidentado o movimento que produziu o contato, nas seguintes circunstâncias:\n1) O movimento do acidentado foi devido à ação da gravidade.\n2) O ponto de contato com a fonte da lesão estava abaixo da superfície que suportava o acidentado no início da queda.\nInclui salto para nível inferior."
+ },
+ {
+   "id": 200012600,
+   "description": "Queda de pessoa com diferença de nível em escada permanente cujos degraus permitem apoio integral do pé",
+   "case": "Aplica-se a casos em que a lesão foi produzida por impacto entre o acidentado e a fonte da lesão, tendo sido do acidentado o movimento que produziu o contato, nas seguintes circunstâncias:\n1) O movimento do acidentado foi devido à ação da gravidade.\n2) O ponto de contato com a fonte da lesão estava abaixo da superfície que suportava o acidentado no início da queda.\nInclui salto para nível inferior."
+ },
+ {
+   "id": 200012700,
+   "description": "Queda de pessoa com diferença de nível em poço, escavação, abertura no piso, etc. (da borda da abertura)",
+   "case": "Aplica-se a casos em que a lesão foi produzida por impacto entre o acidentado e a fonte da lesão, tendo sido do acidentado o movimento que produziu o contato, nas seguintes circunstâncias:\n1) O movimento do acidentado foi devido à ação da gravidade.\n2) O ponto de contato com a fonte da lesão estava abaixo da superfície que suportava o acidentado no início da queda.\nInclui salto para nível inferior."
+ },
+ {
+   "id": 200012900,
+   "description": "Queda de pessoa com diferença de nível, NIC",
+   "case": "Aplica-se a casos em que a lesão foi produzida por impacto entre o acidentado e a fonte da lesão, tendo sido do acidentado o movimento que produziu o contato, nas seguintes circunstâncias:\n1) O movimento do acidentado foi devido à ação da gravidade.\n2) O ponto de contato com a fonte da lesão estava abaixo da superfície que suportava o acidentado no início da queda.\nInclui salto para nível inferior."
+ },
+ {
+   "id": 200016300,
+   "description": "Queda de pessoa em mesmo nível em passagem ou superfície de sustentação",
+   "case": "Aplica-se a casos em que a lesão foi produzida por impacto entre o acidentado e um objeto externo, tendo sido do acidentado o movimento que produziu o contato, nas seguintes circunstâncias:\n1) O movimento do acidentado foi devido à ação da gravidade, com perda do equilíbrio e impossibilidade de manter-se de pé.\n2) O ponto de contato com a fonte da lesão estava, no momento do início da queda, ao nível ou acima da superfície que suportava o acidentado."
+ },
+ {
+   "id": 200016600,
+   "description": "Queda de pessoa em mesmo nível sobre ou contra alguma coisa",
+   "case": "Aplica-se a casos em que a lesão foi produzida por impacto entre o acidentado e um objeto externo, tendo sido do acidentado o movimento que produziu o contato, nas seguintes circunstâncias:\n1) O movimento do acidentado foi devido à ação da gravidade, com perda do equilíbrio e impossibilidade de manter-se de pé.\n2) O ponto de contato com a fonte da lesão estava, no momento do início da queda, ao nível ou acima da superfície que suportava o acidentado."
+ },
+ {
+   "id": 200016900,
+   "description": "Queda de pessoa em mesmo nível, NIC",
+   "case": "Aplica-se a casos em que a lesão foi produzida por impacto entre o acidentado e um objeto externo, tendo sido do acidentado o movimento que produziu o contato, nas seguintes circunstâncias:\n1) O movimento do acidentado foi devido à ação da gravidade, com perda do equilíbrio e impossibilidade de manter-se de pé.\n2) O ponto de contato com a fonte da lesão estava, no momento do início da queda, ao nível ou acima da superfície que suportava o acidentado."
+ },
+ {
+   "id": 200020100,
+   "description": "Aprisionamento em, sob ou entre objetos em movimento convergente (calandra) ou de encaixe",
+   "case": "Aplica-se a casos, sem impacto, em que a lesão foi produzida por compressão, pinçamento ou esmagamento entre um objeto em movimento e outro parado, entre dois objetos em movimento ou entre partes de um mesmo objeto.\nNão se aplica quando a fonte da lesão for um objeto livremente projetado ou em queda livre."
+ },
+ {
+   "id": 200020300,
+   "description": "Aprisionamento em, sob ou entre um objeto parado e outro em movimento",
+   "case": "Aplica-se a casos, sem impacto, em que a lesão foi produzida por compressão, pinçamento ou esmagamento entre um objeto em movimento e outro parado, entre dois objetos em movimento ou entre partes de um mesmo objeto.\nNão se aplica quando a fonte da lesão for um objeto livremente projetado ou em queda livre."
+ },
+ {
+   "id": 200020500,
+   "description": "Aprisionamento em, sob ou entre dois ou mais objetos em movimento (sem encaixe)",
+   "case": "Aplica-se a casos, sem impacto, em que a lesão foi produzida por compressão, pinçamento ou esmagamento entre um objeto em movimento e outro parado, entre dois objetos em movimento ou entre partes de um mesmo objeto.\nNão se aplica quando a fonte da lesão for um objeto livremente projetado ou em queda livre."
+ },
+ {
+   "id": 200020700,
+   "description": "Aprisionamento em, sob ou entre desabamento ou desmoronamento de edificação, barreira, etc",
+   "case": "Aplica-se a casos, sem impacto, em que a lesão foi produzida por compressão, pinçamento ou esmagamento entre um objeto em movimento e outro parado, entre dois objetos em movimento ou entre partes de um mesmo objeto.\nNão se aplica quando a fonte da lesão for um objeto livremente projetado ou em queda livre."
+ },
+ {
+   "id": 200020900,
+   "description": "Aprisionamento em, sob ou entre, NIC",
+   "case": "Aplica-se a casos, sem impacto, em que a lesão foi produzida por compressão, pinçamento ou esmagamento entre um objeto em movimento e outro parado, entre dois objetos em movimento ou entre partes de um mesmo objeto.\nNão se aplica quando a fonte da lesão for um objeto livremente projetado ou em queda livre."
+ },
+ {
+   "id": 200024300,
+   "description": "Atrito ou abrasão por encostar, pisar, ajoelhar ou sentar em objeto (não em vibração)",
+   "case": "Aplica-se a casos, sem impacto, em que a lesão foi produzida por pressão, vibração ou atrito entre o acidentado e a fonte da lesão."
+ },
+ {
+   "id": 200024400,
+   "description": "Atrito ou abrasão por manusear objeto (não em vibração)",
+   "case": "Aplica-se a casos, sem impacto, em que a lesão foi produzida por pressão, vibração ou atrito entre o acidentado e a fonte da lesão."
+ },
+ {
+   "id": 200024500,
+   "description": "Atrito ou abrasão por objeto em vibração",
+   "case": "Aplica-se a casos, sem impacto, em que a lesão foi produzida por pressão, vibração ou atrito entre o acidentado e a fonte da lesão."
+ },
+ {
+   "id": 200024600,
+   "description": "Atrito ou abrasão por corpo estranho no olho",
+   "case": "Aplica-se a casos, sem impacto, em que a lesão foi produzida por pressão, vibração ou atrito entre o acidentado e a fonte da lesão."
+ },
+ {
+   "id": 200024700,
+   "description": "Atrito ou abrasão por compressão repetitiva",
+   "case": "Aplica-se a casos, sem impacto, em que a lesão foi produzida por pressão, vibração ou atrito entre o acidentado e a fonte da lesão."
+ },
+ {
+   "id": 200024900,
+   "description": "Atrito ou abrasão, NIC",
+   "case": "Aplica-se a casos, sem impacto, em que a lesão foi produzida por pressão, vibração ou atrito entre o acidentado e a fonte da lesão."
+ },
+ {
+   "id": 200028300,
+   "description": "Reação do corpo a seus movimentos - movimento involuntário (escorregão sem queda, etc.)",
+   "case": "Aplica-se a casos, sem impacto, em que a lesão foi causada exclusivamente por movimento livre do corpo humano que causou tensão ou torção em alguma parte do corpo. Geralmente aplica-se à ocorrência de torções, distensões, rupturas ou outras lesões internas, resultantes da adoção de uma posição forçada ou de movimentos involuntários provocados por sustos ou esforços de recuperação da posição normal em casos de escorregão ou perda de equilíbrio.\nInclui casos de lesão muscular ou interna resultantes de movimentos individuais como andar, subir, correr, tentar alcançar algo, voltar-se, curvar-se, etc., quando tais movimentos forem a própria fonte da lesão.\nNão se aplica a esforço excessivo ao erguer, puxar ou empurrar objetos ou a casos em que o movimento do corpo, voluntário ou involuntário, tenha tido por resultado contato violento com algum objeto."
+ },
+ {
+   "id": 200028600,
+   "description": "Reação do corpo a seus movimentos - movimento voluntário",
+   "case": "Aplica-se a casos, sem impacto, em que a lesão foi causada exclusivamente por movimento livre do corpo humano que causou tensão ou torção em alguma parte do corpo. Geralmente aplica-se à ocorrência de torções, distensões, rupturas ou outras lesões internas, resultantes da adoção de uma posição forçada ou de movimentos involuntários provocados por sustos ou esforços de recuperação da posição normal em casos de escorregão ou perda de equilíbrio.\nInclui casos de lesão muscular ou interna resultantes de movimentos individuais como andar, subir, correr, tentar alcançar algo, voltar-se, curvar-se, etc., quando tais movimentos forem a própria fonte da lesão.\nNão se aplica a esforço excessivo ao erguer, puxar ou empurrar objetos ou a casos em que o movimento do corpo, voluntário ou involuntário, tenha tido por resultado contato violento com algum objeto."
+ },
+ {
+   "id": 200032200,
+   "description": "Esforço excessivo ao erguer objeto",
+   "case": "Ver explicações do código 200028600."
+ },
+ {
+   "id": 200032400,
+   "description": "Esforço excessivo ao empurrar ou puxar objeto",
+   "case": "Ver explicações do código 200028600."
+ },
+ {
+   "id": 200032600,
+   "description": "Esforço excessivo ao manejar, sacudir ou arremessar objeto",
+   "case": "Ver explicações do código 200028600."
+ },
+ {
+   "id": 200032900,
+   "description": "Esforço excessivo, NIC",
+   "case": "Ver explicações do código 200028600."
+ },
+ {
+   "id": 200036000,
+   "description": "Exposição à energia elétrica",
+   "case": "Aplica-se somente a casos sem impacto, em que a lesão consiste em choque elétrico, queimadura ou eletroplessão (eletrocussão)."
+ },
+ {
+   "id": 200040300,
+   "description": "Contato com objeto ou substância a temperatura muito alta",
+   "case": "Aplica-se somente a casos, sem impacto, em que a lesão consiste em queimadura, geladura, etc., resultante queimadura, geladura, etc., resultante de contato com objetos, ar, gases, vapores ou líquidos quentes ou frios.\nNão se aplica a casos em que a lesão foi provocada pelas características tóxicas ou cáusticas de produtos químicos ou a queimadura por descarga elétrica."
+ },
+ {
+   "id": 200040600,
+   "description": "Contato com objeto ou substância a temperatura muito baixa",
+   "case": "Aplica-se somente a casos, sem impacto, em que a lesão consiste em queimadura, geladura, etc., resultante queimadura, geladura, etc., resultante de contato com objetos, ar, gases, vapores ou líquidos quentes ou frios.\nNão se aplica a casos em que a lesão foi provocada pelas características tóxicas ou cáusticas de produtos químicos ou a queimadura por descarga elétrica."
+ },
+ {
+   "id": 200044300,
+   "description": "Exposição à temperatura ambiente elevada",
+   "case": "Não se aplica aos casos de lesão proveniente de exposição à radiação solar ou outras radiações. Também não se aplica a casos de queimadura ou geladura provocada por contato com objeto ou substância a temperaturas extremas ou queimadura devida à energia elétrica."
+ },
+ {
+   "id": 200044600,
+   "description": "Exposição à temperatura ambiente baixa",
+   "case": "Não se aplica aos casos de lesão proveniente de exposição à radiação solar ou outras radiações. Também não se aplica a casos de queimadura ou geladura provocada por contato com objeto ou substância a temperaturas extremas ou queimadura devida à energia elétrica."
+ },
+ {
+   "id": 200048200,
+   "description": "Inalação de substância cáustica, tóxica ou nociva",
+   "case": "Aplica-se somente a casos, sem impacto, em que a lesão foi provocada por inalação, absorção ou ingestão de substâncias nocivas. Geralmente refere-se a intoxicações, envenenamentos, queimaduras, irritações ou reações alérgicas por produtos químicos."
+ },
+ {
+   "id": 200048400,
+   "description": "Ingestão de substancia cáustica, tóxica ou nociva",
+   "case": "Aplica-se somente a casos, sem impacto, em que a lesão foi provocada por inalação, absorção ou ingestão de substâncias nocivas. Geralmente refere-se a intoxicações, envenenamentos, queimaduras, irritações ou reações alérgicas por produtos químicos."
+ },
+ {
+   "id": 200048600,
+   "description": "Absorção (por contato) de substância cáustica, tóxica ou nociva",
+   "case": "Aplica-se somente a casos, sem impacto, em que a lesão foi provocada por inalação, absorção ou ingestão de substâncias nocivas. Geralmente refere-se a intoxicações, envenenamentos, queimaduras, irritações ou reações alérgicas por produtos químicos."
+ },
+ {
+   "id": 200048900,
+   "description": "Inalação, ingestão e absorção, NIC",
+   "case": "Aplica-se somente a casos, sem impacto, em que a lesão foi provocada por inalação, absorção ou ingestão de substâncias nocivas. Geralmente refere-se a intoxicações, envenenamentos, queimaduras, irritações ou reações alérgicas por produtos químicos."
+ },
+ {
+   "id": 200052000,
+   "description": "Imersão",
+   "case": "Aplica-se aos acidentes que têm por consequência o afogamento."
+ },
+ {
+   "id": 200056000,
+   "description": "Exposição à radiação não ionizante",
+   "case": "Aplica-se a casos em que as lesões são provocadas por exposição à radiação solar ou outras radiações não ionizantes (por exemplo, ultravioleta e infravermelho)."
+ },
+ {
+   "id": 200060000,
+   "description": "Exposição à radiação ionizante",
+   "case": ""
+ },
+ {
+   "id": 200064000,
+   "description": "Exposição ao ruído",
+   "case": ""
+ },
+ {
+   "id": 200068000,
+   "description": "Exposição à vibração",
+   "case": ""
+ },
+ {
+   "id": 200072000,
+   "description": "Exposição à pressão ambiente",
+   "case": ""
+ },
+ {
+   "id": 200072300,
+   "description": "Exposição à pressão ambiente elevada",
+   "case": ""
+ },
+ {
+   "id": 200072600,
+   "description": "Exposição à pressão ambiente baixa",
+   "case": ""
+ },
+ {
+   "id": 200076200,
+   "description": "Exposição à poluição da água",
+   "case": ""
+ },
+ {
+   "id": 200076400,
+   "description": "Exposição à poluição do ar",
+   "case": ""
+ },
+ {
+   "id": 200076600,
+   "description": "Exposição à poluição do solo",
+   "case": ""
+ },
+ {
+   "id": 200076900,
+   "description": "Exposição à poluição, NIC",
+   "case": ""
+ },
+ {
+   "id": 200080200,
+   "description": "Ataque de ser vivo por mordedura, picada, chifrada, coice, etc",
+   "case": "Não se aplica no caso de haver peçonha ou transmissão de doença."
+ },
+ {
+   "id": 200080400,
+   "description": "Ataque de ser vivo com peçonha",
+   "case": ""
+ },
+ {
+   "id": 200080600,
+   "description": "Ataque de ser vivo com transmissão de doença",
+   "case": ""
+ },
+ {
+   "id": 200080900,
+   "description": "Ataque de ser vivo (inclusive do homem), NIC",
+   "case": ""
+ },
+ {
+   "id": 200080901,
+   "description": "Contato com pessoas doentes ou material infectocontagiante - agentes biológicos",
+   "case": ""
+ },
+ {
+   "id": 209000000,
+   "description": "Tipo, NIC",
+   "case": ""
+ },
+ {
+   "id": 209500000,
+   "description": "Tipo inexistente",
+   "case": ""
+ }
+]

@@ -7,6 +7,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// enum AbsenteeismTrafficEnum {
+//   COLLISION
+//   RUN_OVER
+//   OTHERS
+// }
+
+// enum AbsenteeismOnusEnum {
+//   EMPLOYER
+//   SINDICATE
+//   PART
+// }
+
 enum CharacterizationTypeEnum {
   WORKSTATION
   EQUIPMENT
@@ -47,6 +59,13 @@ enum CoverTypeEnum {
   PGR
   PCSMO
 }
+
+enum DateUnitEnum {
+  DAY
+  HOUR
+  MINUTE
+}
+
 
 enum DocumentTypeEnum {
   PGR
@@ -235,6 +254,59 @@ enum ProfessionalRespTypeEnum {
 }
 // START TABLES
 
+
+model Absenteeism {
+  id    Int   @id  @default(autoincrement())
+
+  startDate DateTime
+  endDate DateTime
+  // startTime Int?
+  // endTime Int? 
+  timeSpent Int
+  timeUnit DateUnitEnum 
+  isJustified Boolean?
+  isExtern Boolean?
+  local String?
+  status StatusEnum @default(ACTIVE)
+  
+  docId Int?
+  doc  ProfessionalCouncil? @relation( fields: [docId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  
+
+  observation String?
+  sameAsBefore Boolean?
+  traffic Int?
+
+  vacationStartDate DateTime?
+  vacationEndDate DateTime?
+
+  cnpjSind String?
+  infOnusRemun Int?
+
+  cnpjMandElet String?
+  
+  origRetif Int?
+  tpProc Int?
+  nrProc Int?
+
+
+  employeeId Int
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  motiveId Int?
+  motive AbsenteeismMotive? @relation(fields: [motiveId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  esocial18Motive Int?
+  esocial18 EsocialTable18Mot? @relation(fields: [esocial18Motive], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  cidId String?
+  cid Cid? @relation(fields: [cidId], references: [cid], onDelete: Restrict, onUpdate: Cascade)
+}
+
+model AbsenteeismMotive {
+  id    Int   @id  @default(autoincrement())
+  desc String
+
+  absenteeism Absenteeism[]
+}
+
 model AccessGroups {
   id    Int     @default(autoincrement()) @id
   roles String[]
@@ -304,6 +376,74 @@ model Attachments {
   riskFactorDocument RiskFactorDocument? @relation(fields: [riskFactorDocumentId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
 }
 
+model Cat {
+  id    Int   @id  @default(autoincrement())
+  status StatusEnum @default(ACTIVE)
+
+  dtAcid DateTime
+  tpAcid Int
+  hrAcid String?
+  hrsTrabAntesAcid String?
+  tpCat Int
+  isIndCatObito Boolean?
+  dtObito DateTime?
+  isIndComunPolicia Boolean?
+  codSitGeradora String 
+  esocialSitGeradora EsocialTable14And15Acid? @relation(name: "cat_sit_geradora", fields: [codSitGeradora], references: [code], onDelete: Restrict, onUpdate: Cascade)
+  iniciatCAT Int
+  obsCAT String?
+  ultDiaTrab DateTime?
+  houveAfast Boolean?
+
+  tpLocal Int
+  dscLocal String
+  tpLograd String? 
+  esocialLograd EsocialTable20Lograd? @relation(fields: [tpLograd], references: [code], onDelete: Restrict, onUpdate: Cascade)
+  dscLograd String
+  nrLograd String
+  complemento String?
+  bairro String?
+  cep String?
+  codMunic String?
+  city Cities? @relation(fields: [codMunic], references: [code], onDelete: Restrict, onUpdate: Cascade)
+  uf String?
+  uf_table Uf? @relation(fields: [uf], references: [uf], onDelete: Restrict, onUpdate: Cascade)
+  pais String?
+  countryCodeEsocial6 EsocialTable6Country? @relation(fields: [pais], references: [code], onDelete: Restrict, onUpdate: Cascade)
+  codPostal String?
+
+  ideLocalAcidTpInsc Int?
+  ideLocalAcidCnpj String?
+  
+  codParteAting String
+  codParteAtingEsocial13 EsocialTable13BodyPart @relation(fields: [codParteAting], references: [code], onDelete: Restrict, onUpdate: Cascade)
+  lateralidade Int
+  
+  codAgntCausador String 
+  esocialAgntCausador EsocialTable14And15Acid? @relation(name: "cat_ag_causador", fields: [codAgntCausador], references: [code], onDelete: Restrict, onUpdate: Cascade)
+
+  dtAtendimento DateTime 
+  hrAtendimento String 
+  isIndInternacao Boolean 
+  durTrat Int 
+  isIndAfast Boolean 
+  dscLesao String 
+  esocialLesao EsocialTable17Injury? @relation(fields: [dscLesao], references: [code], onDelete: Restrict, onUpdate: Cascade)
+  dscCompLesao String? 
+  diagProvavel String? 
+  codCID String
+  cid Cid @relation(fields: [codCID], references: [cid], onDelete: Restrict, onUpdate: Cascade)
+  observacao String?
+  
+  docId Int
+  doc  ProfessionalCouncil @relation( fields: [docId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  nrRecCatOrig String?
+
+  employeeId Int
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+}
+
 model Checklist {
   id    Int     @default(autoincrement())
   status StatusEnum @default(PROGRESS)
@@ -329,8 +469,23 @@ model ChecklistData {
 model Cid {
   cid String @id 
   description   String?
+  class   String?
+  sex   SexTypeEnum?
+  kill   Boolean?
   employees Employee[] 
+  absenteeisms Absenteeism[] 
+  cat Cat[] 
 } 
+
+model Cities {
+  code    String   @id
+  name    String   
+  ufCode String?
+  uf Uf? @relation(fields: [ufCode], references: [code], onDelete: Restrict, onUpdate: Cascade)
+
+  cat Cat[] 
+}
+
 
 model Company {
   id   String    @id @default(uuid())
@@ -734,6 +889,8 @@ model Employee {
   examsHistory EmployeeExamsHistory[]
   esocialEvents EmployeeESocialEvent[]
   pppHistory EmployeePPPHistory[] 
+  absenteeisms Absenteeism[] 
+  cat Cat[] 
   
   @@unique([id, companyId])
   @@unique([cpf, companyId])
@@ -940,6 +1097,54 @@ model EpiToRiskFactorData {
   @@map("_EpiToRiskFactorData")
 } 
 
+model EsocialTable18Mot {
+  id    Int   @id  @default(autoincrement())
+  code String @unique
+  description String 
+  absenteeisms Absenteeism[]
+}
+
+
+model EsocialTable6Country {
+  code    String   @id
+  name    String  
+
+  cat Cat[] 
+}
+
+
+model EsocialTable13BodyPart {
+  code    String   @id
+  desc    String  
+
+  cat Cat[] 
+}
+
+model EsocialTable14And15Acid {
+  code    String   @id
+  desc    String  
+  case    String?  
+  table   Int
+
+  cat_ag_causador Cat[] @relation(name: "cat_ag_causador")
+  cat_sit_geradora Cat[] @relation(name: "cat_sit_geradora")
+}
+
+model EsocialTable17Injury {
+  code    String   @id
+  desc    String  
+
+  cat Cat[] 
+}
+
+model EsocialTable20Lograd {
+  code    String   @id
+  desc    String  
+
+  cat Cat[] 
+}
+
+
 model EsocialTable24 {
   id    String   @id
   name String 
@@ -948,6 +1153,8 @@ model EsocialTable24 {
   isQuantity Boolean @default(false)
   risks RiskFactors[]
 }
+
+
 
 model Exam {
   id    Int   @id  @default(autoincrement())
@@ -1225,6 +1432,8 @@ model ProfessionalCouncil {
   professionalPgrSignature RiskFactorGroupDataToProfessional[]
   professionalPcmsoSignature DocumentPCMSOToProfessional[]
   professionalsResponsibles ProfessionalCouncilResponsible[]
+  absenteeisms Absenteeism[]
+  cats Cat[]
   
   @@unique([councilType, councilUF, councilId, professionalId])
 }
@@ -1605,6 +1814,17 @@ model UserCompany {
   @@id([companyId, userId])
   @@index(companyId)
 }
+
+
+model Uf {
+  code    String  @id
+  uf    String   @unique
+  name    String  
+
+  cat Cat[] 
+  cities Cities[] 
+}
+
 
 model Workspace {
   id    String  @id   @default(uuid()) 

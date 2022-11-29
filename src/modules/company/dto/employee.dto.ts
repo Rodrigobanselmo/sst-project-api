@@ -145,3 +145,9 @@ export class FindEmployeeDto extends PaginationQueryDto {
   @Type(() => Date)
   expiredDateExam: Date;
 }
+
+export class FindOneEmployeeDto {
+  @IsBoolean()
+  @IsOptional()
+  absenteeismLast60Days?: boolean;
+}

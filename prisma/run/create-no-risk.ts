@@ -16,4 +16,9 @@ export const CreateAbsenceRisk = async (prisma: PrismaClient) => {
       esocialCode: '09.01.001',
     },
   });
+
+  // await prisma.examToRiskData.deleteMany({});
+  // await prisma.examToRisk.deleteMany({});
+  // await prisma.examToClinic.deleteMany({});
+  // await prisma.exam.deleteMany({});
 };

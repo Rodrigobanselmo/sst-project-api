@@ -1,3 +1,4 @@
+import { removeDuplicitiesRisks } from './run/remove-duplicities-risks';
 import { AmazonStorageProvider } from './../src/shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
 import { CharacterizationRepository } from './../src/modules/company/repositories/implementations/CharacterizationRepository';
 import { UpsertCharacterizationService } from './../src/modules/company/services/characterization/upsert-characterization/upsert-characterization.service';
@@ -13,6 +14,9 @@ import { seedEsocial24 } from './seed/read_24';
 import { normalizeUnitRisks } from './run/normalize-unit-risks';
 import { changeRecMed } from './run/change-rec-med';
 import { CreateAbsenceRisk as createAbsenceRisk } from './run/create-no-risk';
+import { addEsocialTables } from './seed/addEsocialTables';
+import { motiveTables } from './seed/motiveTables';
+import { cid10Table } from './seed/cid10Table';
 
 const prisma = new PrismaClient();
 
@@ -42,11 +46,18 @@ async function main() {
     // console.log(data);
 
     //await deleteWithNameCompany('Deletar', prisma);
-    // await levelRiskData(prisma);
     // await representAll(prisma);
-    await seedEsocial24(prisma);
-    await changeRecMed(prisma);
-    await createAbsenceRisk(prisma);
+    // await seedEsocial24(prisma);
+    // await changeRecMed(prisma);
+    // await createAbsenceRisk(prisma);
+
+    // await levelRiskData(prisma);
+    // await removeDuplicitiesRisks(prisma);
+
+    //*next
+    await cid10Table(prisma);
+    // await addEsocialTables(prisma);
+    // await motiveTables(prisma);
 
     // await deleteProfessionalsConnections(prisma);
     // await addProfCOuncilNUll(prisma);

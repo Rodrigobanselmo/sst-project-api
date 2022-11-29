@@ -10,6 +10,6 @@ export class UpdateCompaniesReportCron {
   @Cron(CronExpression.EVERY_DAY_AT_2AM) //11pm on brazil
   // @Cron(CronExpression.EVERY_5_SECONDS)
   async handleCron() {
-    this.updateAllCompaniesService.execute();
+    await this.updateAllCompaniesService.execute();
   }
 }

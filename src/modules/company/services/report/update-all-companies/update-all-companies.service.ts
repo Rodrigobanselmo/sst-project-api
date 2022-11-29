@@ -115,9 +115,7 @@ export class UpdateAllCompaniesService {
               }),
             },
             esocial: {
-              ...(esocialEvents && {
-                pending: esocialEvents?.pending || 0,
-              }),
+              ...esocialEvents,
             },
           },
         };
@@ -133,12 +131,26 @@ export class UpdateAllCompaniesService {
         if (companyIds.includes(employeeExam.companyId)) {
           Object.entries(employeeExam.dailyReport.exam).map(([k, v]) => {
             if (typeof v === 'number') {
+              if (!report.dailyReport.exam[k]) report.dailyReport.exam[k] = 0;
               report.dailyReport.exam[k] = report.dailyReport.exam[k] + v;
             }
           });
           Object.entries(employeeExam.dailyReport.esocial).map(([k, v]) => {
             if (typeof v === 'number') {
+              if (!report.dailyReport.esocial[k]) report.dailyReport.esocial[k] = 0;
               report.dailyReport.esocial[k] = report.dailyReport.esocial[k] + v;
+            }
+
+            if (typeof v === 'object') {
+              Object.entries(v).map(([_k, _v]) => {
+                console.log(k, v);
+                if (!report.dailyReport.esocial[k]) report.dailyReport.esocial[k] = {};
+                if (!report.dailyReport.esocial[k][_k]) report.dailyReport.esocial[k][_k] = 0;
+
+                if (typeof _v === 'number') {
+                  report.dailyReport.esocial[k][_k] = report.dailyReport.esocial[k][_k] + _v;
+                }
+              });
             }
           });
         }
@@ -146,13 +158,12 @@ export class UpdateAllCompaniesService {
 
       return report;
     });
-
     console.log('start cron(3): telegram');
     this.telegramMessage(allCompanies);
 
     console.log('start cron(4): reports');
     await asyncBatch(employeeExamsData, 50, async (report) => {
-      await this.companyReportRepository.upsert(report);
+      await this.companyReportRepository.updateESocialReport(report.companyId, report.dailyReport);
     });
     console.log('end cron(4): reports');
 

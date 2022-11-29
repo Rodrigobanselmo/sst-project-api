@@ -121,6 +121,20 @@ import { FindHomogenousGroupByIdService } from './services/homoGroup/find-homo-g
 import { EsocialModule } from '../esocial/esocial.module';
 import { UpdateESocialReportService } from './services/report/update-esocial-report/update-esocial-report.service';
 import { EmployeePPPHistoryRepository } from './repositories/implementations/EmployeePPPHistoryRepository';
+import { CreateAbsenteeismsService } from './services/absenteeism/create-absenteeism/create-absenteeism.service';
+import { DeleteAbsenteeismsService } from './services/absenteeism/delete-absenteeism/delete-absenteeism.service';
+import { FindAbsenteeismsService } from './services/absenteeism/find-absenteeism/find-absenteeism.service';
+import { UpdateAbsenteeismsService } from './services/absenteeism/update-absenteeism/update-absenteeism.service';
+import { AbsenteeismRepository } from './repositories/implementations/AbsenteeismRepository';
+import { UpdateCatsService } from './services/cat/update-cat/update-cat.service';
+import { FindCatsService } from './services/cat/find-cat/find-cat.service';
+import { DeleteCatsService } from './services/cat/delete-cat/delete-cat.service';
+import { CreateCatsService } from './services/cat/create-cat/create-cat.service';
+import { CatRepository } from './repositories/implementations/CatRepository';
+import { AbsenteeismController } from './controller/absenteeism/absenteeism.controller';
+import { CatController } from './controller/cat/cat.controller';
+import { FindOneAbsenteeismsService } from './services/absenteeism/find-one-absenteeism/find-one-absenteeism.service';
+import { FindOneCatsService } from './services/cat/find-one-cat/find-one-cat.service';
 
 @Module({
   imports: [
@@ -143,6 +157,8 @@ import { EmployeePPPHistoryRepository } from './repositories/implementations/Emp
     EmployeeHierarchyHistoryController,
     EmployeeExamHistoryController,
     DocumentController,
+    CatController,
+    AbsenteeismController,
   ],
   providers: [
     CreateCompanyService,
@@ -252,6 +268,18 @@ import { EmployeePPPHistoryRepository } from './repositories/implementations/Emp
     FindHomogenousGroupByIdService,
     UpdateESocialReportService,
     EmployeePPPHistoryRepository,
+    UpdateAbsenteeismsService,
+    FindAbsenteeismsService,
+    DeleteAbsenteeismsService,
+    CreateAbsenteeismsService,
+    AbsenteeismRepository,
+    UpdateCatsService,
+    FindCatsService,
+    DeleteCatsService,
+    CreateCatsService,
+    CatRepository,
+    FindOneAbsenteeismsService,
+    FindOneCatsService,
   ],
   exports: [
     CompanyRepository,

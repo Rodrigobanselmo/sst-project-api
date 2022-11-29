@@ -167,25 +167,28 @@ export class EmployeeRepository {
     return data.map((employee) => new EmployeeEntity(employee));
   }
 
-  async findById(id: number, companyId: string, options: Prisma.EmployeeFindManyArgs = {}): Promise<EmployeeEntity> {
+  async findById(id: number, companyId: string, options: Partial<Prisma.EmployeeFindUniqueArgs> = {}): Promise<EmployeeEntity> {
     const include = options?.include || {};
 
     const employee = await this.prisma.employee.findUnique({
+      ...options,
       where: { id_companyId: { companyId, id } },
-      include: {
-        ...include,
-        company: {
-          select: {
-            fantasy: true,
-            name: true,
-            cnpj: true,
-            initials: true,
-            blockResignationExam: true,
-            primary_activity: true,
+      ...(!options.select && {
+        include: {
+          ...include,
+          company: {
+            select: {
+              fantasy: true,
+              name: true,
+              cnpj: true,
+              initials: true,
+              blockResignationExam: true,
+              primary_activity: true,
+            },
           },
+          hierarchy: !!include?.hierarchy ? false : { select: this.parentInclude() },
         },
-        hierarchy: !!include?.hierarchy ? false : { select: this.parentInclude() },
-      },
+      }),
     });
 
     return new EmployeeEntity(employee);

@@ -1,0 +1,43 @@
+01 || Acidente/doença do trabalho
+03 || Acidente/doença não relacionada ao trabalho
+05 || Afastamento/licença de servidor público prevista em estatuto, sem remuneração
+06 || Aposentadoria por invalidez
+07 || Acompanhamento - Licença para acompanhamento de membro da família enfermo
+10 || Afastamento/licença de servidor público prevista em estatuto, com remuneração
+11 || Cárcere
+12 || Cargo eletivo - Candidato a cargo eletivo - Art. 25, parágrafo único, da Lei 7.664/1988 - Celetistas em geral
+13 || Cargo eletivo - Candidato a cargo eletivo - Art. 1°, inciso II, alínea "l", da Lei Complementar 64/1990 - Servidor público, estatutário ou não, dos órgãos ou entidades da Administração Direta ou Indireta da União, dos Estados, do Distrito Federal, dos Municípios e dos Territórios, inclusive das fundações mantidas pelo Poder Público
+15 || Gozo de férias ou recesso - Afastamento temporário para o gozo de férias ou recesso
+16 || Licença remunerada - Lei, liberalidade da empresa ou Acordo/Convenção Coletiva de Trabalho
+17 || Licença maternidade
+18 || Licença maternidade - Prorrogação por 60 dias, Lei 11.770/2008 (Empresa Cidadã), inclusive para o cônjuge sobrevivente
+19 || Licença maternidade - Afastamento temporário por motivo de aborto não criminoso
+20 || Licença maternidade - Afastamento temporário por motivo de licença-maternidade para o cônjuge sobrevivente ou decorrente de adoção ou de guarda judicial de criança
+21 || Licença não remunerada ou sem vencimento
+22 || Mandato eleitoral - Afastamento temporário para o exercício de mandato eleitoral
+24 || Mandato sindical - Afastamento temporário para exercício de mandato sindical
+25 || Mulher vítima de violência - Art. 9º, § 2º, inciso II, da Lei 11.340/2006 - Lei Maria da Penha
+26 || Participação de empregado no Conselho Nacional de Previdência Social - CNPS - Art. 3º da Lei 8.213/1991
+27 || Qualificação - Afastamento por suspensão do contrato de acordo com o art. 476-A da CLT
+28 || Representante sindical - Afastamento pelo tempo que se fizer necessário, quando, na qualidade de representante de entidade sindical, estiver participando de reunião oficial de organismo internacional do qual o Brasil seja membro
+29 || Serviço militar - Afastamento temporário para prestar serviço militar obrigatório
+31 || Servidor público em disponibilidade
+34 || Inatividade do trabalhador avulso (portuário ou não portuário) por período superior a 90 dias
+35 || Licença maternidade - Antecipação e/ou prorrogação mediante atestado médico
+36 || Afastamento temporário de exercente de mandato eletivo para cargo em comissão
+38 || Impedimento de concorrência à escala para trabalho avulso
+39 || Suspensão de pagamento de servidor público por não recadastramento
+40 || Exercício em outro órgão de servidor ou empregado público cedido
+41 || Qualificação - Afastamento por suspensão do contrato de acordo com o art. 17 da MP 1.116/2022
+42 || Qualificação - Afastamento por suspensão do contrato de acordo com o art. 19 da MP 1.116/2022
+08 -- Afastamento do empregado para participar de atividade do Conselho Curador do FGTS - Art. 65, § 6º, do Decreto 99.684/1990 (Regulamento do FGTS)
+14 -- Cessão/Requisição
+17 -- Licença maternidade - 120 dias e suas prorrogações/antecipações, inclusive para o cônjuge sobrevivente
+17 -- Licença maternidade - 120 dias, inclusive para o cônjuge sobrevivente
+20 -- Licença maternidade - Afastamento temporário por motivo de licença-maternidade decorrente de adoção ou guarda judicial de criança, inclusive para o cônjuge sobrevivente
+22 -- Mandato eleitoral - Afastamento temporário para o exercício de mandato eleitoral, sem remuneração
+23 -- Mandato eleitoral - Afastamento temporário para o exercício de mandato eleitoral, com remuneração
+30 -- Suspensão disciplinar - Art. 474 da CLT
+33 -- Licença maternidade - 180 dias, Lei 13.301/2016
+37 -- Suspensão temporária do contrato de trabalho nos termos da Lei 14.020/2020 (conversão da MP 936/2020)
+37 -- Suspensão temporária do contrato de trabalho nos termos do Programa Emergencial de Manutenção do Emprego e da Renda	28/04/2021	25/08/2021	[1XX]

@@ -61,8 +61,24 @@ export class ExamRepository {
 
     const { where } = prismaFilter(whereInit, {
       query,
-      skip: ['search', 'clinicId'],
+      skip: ['search', 'clinicId', 'companyId'],
     });
+
+    if ('companyId' in query) {
+      (where.AND as any).push({
+        OR: [
+          { companyId: query.companyId },
+          {
+            company: {
+              applyingServiceContracts: {
+                some: { receivingServiceCompanyId: query.companyId },
+              },
+            },
+          },
+          { system: true },
+        ],
+      } as typeof options.where);
+    }
 
     if ('search' in query) {
       (where.AND as any).push({
@@ -72,7 +88,7 @@ export class ExamRepository {
 
     const response = await this.prisma.$transaction([
       this.prisma.exam.count({
-        where: { OR: [where, { system: true }] },
+        where,
       }),
       this.prisma.exam.findMany({
         where: { OR: [where, { system: true }] },

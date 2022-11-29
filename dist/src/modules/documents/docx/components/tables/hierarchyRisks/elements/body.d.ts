@@ -1,9 +1,0 @@
-import { ITableCellOptions, TableCell, TableRow } from 'docx';
-export interface bodyTableProps extends Partial<ITableCellOptions> {
-    text?: string;
-    size?: number;
-}
-export declare class TableBodyElements {
-    tableRow(tableCell: TableCell[]): TableRow;
-    tableCell({ text, size, ...rest }: bodyTableProps): TableCell;
-}

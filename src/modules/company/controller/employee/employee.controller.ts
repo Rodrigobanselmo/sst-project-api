@@ -4,7 +4,7 @@ import { PermissionEnum } from '../../../../shared/constants/enum/authorization'
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
-import { CreateEmployeeDto, FindEmployeeDto, UpdateEmployeeDto } from '../../dto/employee.dto';
+import { CreateEmployeeDto, FindEmployeeDto, FindOneEmployeeDto, UpdateEmployeeDto } from '../../dto/employee.dto';
 import { CreateEmployeeService } from '../../services/employee/create-employee/create-employee.service';
 import { DeleteSubOfficeEmployeeService } from '../../services/employee/delete-sub-office-employee/delete-sub-office-employee.service';
 import { FindAllAvailableEmployeesService } from '../../services/employee/find-all-available-employees/find-all-available-employees.service';
@@ -74,7 +74,7 @@ export class EmployeeController {
     isMember: true,
   })
   @Get('/id/:employeeId/:companyId?')
-  findOne(@User() userPayloadDto: UserPayloadDto, @Param('employeeId') employeeId: number) {
-    return this.findEmployeeService.execute(employeeId, userPayloadDto);
+  findOne(@User() userPayloadDto: UserPayloadDto, @Query() query: FindOneEmployeeDto, @Param('employeeId') employeeId: number) {
+    return this.findEmployeeService.execute(employeeId, query, userPayloadDto);
   }
 }
