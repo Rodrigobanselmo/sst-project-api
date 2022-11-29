@@ -43,6 +43,6 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           key: ${{ secrets.SSH_KEY }} 
           script: |
-            cd ~/app/api-rentx
+            cd ~/app/sst-project-api
             yarn
             yarn deploy:cd
