@@ -34,13 +34,21 @@ export class AbsenteeismEntity implements Absenteeism {
   cidId: string;
   employeeId: number;
 
-  cid?: CidEntity;
-  employee?: EmployeeEntity;
-  motive?: AbsenteeismMotive;
-  esocial18?: EsocialTable18Mot;
-  doc?: ProfessionalEntity;
+  cid?: Partial<CidEntity>;
+  employee?: Partial<EmployeeEntity>;
+  motive?: Partial<AbsenteeismMotive>;
+  esocial18?: Partial<EsocialTable18Mot>;
+  doc?: Partial<ProfessionalEntity>;
 
   constructor(partial: Partial<AbsenteeismEntity>) {
     Object.assign(this, partial);
+
+    if (this.doc) {
+      this.doc = new ProfessionalEntity(this.doc);
+    }
+
+    if (this.employee) {
+      this.employee = new EmployeeEntity(this.employee as any);
+    }
   }
 }

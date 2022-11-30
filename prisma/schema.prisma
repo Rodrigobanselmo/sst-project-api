@@ -298,6 +298,9 @@ model Absenteeism {
   esocial18 EsocialTable18Mot? @relation(fields: [esocial18Motive], references: [id], onDelete: Restrict, onUpdate: Cascade)
   cidId String?
   cid Cid? @relation(fields: [cidId], references: [cid], onDelete: Restrict, onUpdate: Cascade)
+  
+  @@index(startDate)
+  @@index(endDate)
 }
 
 model AbsenteeismMotive {
@@ -475,6 +478,8 @@ model Cid {
   employees Employee[] 
   absenteeisms Absenteeism[] 
   cat Cat[] 
+
+  @@index(description)
 } 
 
 model Cities {
@@ -484,6 +489,8 @@ model Cities {
   uf Uf? @relation(fields: [ufCode], references: [code], onDelete: Restrict, onUpdate: Cascade)
 
   cat Cat[] 
+
+  @@index(name)
 }
 
 

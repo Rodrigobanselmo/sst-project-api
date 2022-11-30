@@ -8,12 +8,12 @@ import { Transform, Type } from 'class-transformer';
 import { DateUnitEnum, StatusEnum } from '@prisma/client';
 
 export class CreateAbsenteeismDto {
-  @Transform(DateFormat, { toClassOnly: true })
+  // @Transform(DateFormat, { toClassOnly: true })
   @IsDate({ message: 'Data de início inválida' })
   @Type(() => Date)
   startDate: Date;
 
-  @Transform(DateFormat, { toClassOnly: true })
+  // @Transform(DateFormat, { toClassOnly: true })
   @IsDate({ message: 'Data de fim inválida' })
   @Type(() => Date)
   endDate: Date;

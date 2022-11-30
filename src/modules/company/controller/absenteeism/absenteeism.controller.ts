@@ -64,6 +64,8 @@ export class AbsenteeismController {
   })
   @Patch('/:companyId/:id')
   update(@Body() upsertAccessGroupDto: UpdateAbsenteeismDto, @User() userPayloadDto: UserPayloadDto, @Param('id', ParseIntPipe) id: number) {
+    console.log(upsertAccessGroupDto.startDate);
+    console.log(upsertAccessGroupDto.endDate);
     return this.updateAbsenteeismsService.execute({ ...upsertAccessGroupDto, id }, userPayloadDto);
   }
 

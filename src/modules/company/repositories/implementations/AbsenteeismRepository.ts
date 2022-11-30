@@ -39,6 +39,19 @@ export class AbsenteeismRepository {
       skip: ['search', 'companyId', 'companiesIds'],
     });
 
+    if (!options.select)
+      options.select = {
+        id: true,
+        employeeId: true,
+        motive: true,
+        esocial18: true,
+        timeSpent: true,
+        startDate: true,
+        endDate: true,
+        timeUnit: true,
+        employee: { select: { name: true, cpf: true, id: true, companyId: true, company: { select: { id: true, name: true, initials: true, fantasy: true } } } },
+      };
+
     if ('search' in query) {
       (where.AND as any).push({
         OR: [{ employee: { name: { contains: query.search, mode: 'insensitive' } } }],
@@ -48,7 +61,20 @@ export class AbsenteeismRepository {
 
     if ('companyId' in query) {
       (where.AND as any).push({
-        employee: { companyId: query.companyId },
+        employee: {
+          OR: [
+            {
+              companyId: query.companyId,
+            },
+            {
+              company: {
+                applyingServiceContracts: {
+                  some: { receivingServiceCompanyId: query.companyId },
+                },
+              },
+            },
+          ],
+        },
       } as typeof options.where);
       delete query.companiesIds;
     }
@@ -98,6 +124,7 @@ export class AbsenteeismRepository {
   async findById({ companyId, id }: { companyId: string; id: number }, options: Prisma.AbsenteeismFindFirstArgs = {}) {
     const absenteeism = await this.prisma.absenteeism.findFirst({
       where: { id, employee: { companyId } },
+      include: { esocial18: true, motive: true, doc: { include: { professional: { select: { name: true, id: true } } } }, cid: true },
       ...options,
     });
 

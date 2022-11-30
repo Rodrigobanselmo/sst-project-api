@@ -1,3 +1,4 @@
+import { EmployeeRepository } from './../../../repositories/implementations/EmployeeRepository';
 import { UpdateAbsenteeismDto } from '../../../dto/absenteeism.dto';
 import { AbsenteeismRepository } from '../../../repositories/implementations/AbsenteeismRepository';
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
@@ -6,12 +7,15 @@ import { DayJSProvider } from '../../../../../shared/providers/DateProvider/impl
 
 @Injectable()
 export class UpdateAbsenteeismsService {
-  constructor(private readonly absenteeismRepository: AbsenteeismRepository, private readonly dayjs: DayJSProvider) {}
-
+  constructor(
+    private readonly absenteeismRepository: AbsenteeismRepository,
+    private readonly employeeRepository: EmployeeRepository,
+    private readonly dayjs: DayJSProvider,
+  ) {}
   async execute(UpsertAbsenteeismsDto: UpdateAbsenteeismDto, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;
-    const employee = await this.absenteeismRepository.findFirstNude({
-      where: { employee: { companyId, id: UpsertAbsenteeismsDto.employeeId } },
+    const employee = await this.employeeRepository.findFirstNude({
+      where: { companyId, id: UpsertAbsenteeismsDto.employeeId },
       select: { id: true },
     });
 

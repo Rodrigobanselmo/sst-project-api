@@ -160,8 +160,8 @@ export class FetchESocialBatchEventsService {
         }),
       );
 
-      if (!isInProgress) {
-        const cacheValue: ICacheEventBatchType = true;
+      if (isInProgress) {
+        const cacheValue: ICacheEventBatchType = false;
         await this.cacheManager.set(CacheEnum.ESOCIAL_FETCH_EVENT, cacheValue, 360);
       }
     }

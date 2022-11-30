@@ -1,3 +1,4 @@
+import { EmployeeRepository } from './../../../repositories/implementations/EmployeeRepository';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 
@@ -7,12 +8,16 @@ import { AbsenteeismRepository } from '../../../repositories/implementations/Abs
 
 @Injectable()
 export class CreateAbsenteeismsService {
-  constructor(private readonly absenteeismRepository: AbsenteeismRepository, private readonly dayjs: DayJSProvider) {}
+  constructor(
+    private readonly absenteeismRepository: AbsenteeismRepository,
+    private readonly employeeRepository: EmployeeRepository,
+    private readonly dayjs: DayJSProvider,
+  ) {}
 
   async execute(UpsertAbsenteeismsDto: CreateAbsenteeismDto, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;
-    const employee = await this.absenteeismRepository.findFirstNude({
-      where: { employee: { companyId, id: UpsertAbsenteeismsDto.employeeId } },
+    const employee = await this.employeeRepository.findFirstNude({
+      where: { companyId, id: UpsertAbsenteeismsDto.employeeId },
       select: { id: true },
     });
 

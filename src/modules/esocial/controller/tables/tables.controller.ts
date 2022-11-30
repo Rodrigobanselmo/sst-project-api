@@ -11,9 +11,9 @@ export class TablesController {
   constructor(private readonly findAllTable27Service: FindAllTable27Service, private readonly prisma: PrismaService) {}
 
   @Get('cities')
-  findC(@Query() query: FindCitiesDto) {
+  async findC(@Query() query: FindCitiesDto) {
     const { skip, take, search } = query;
-    return this.prisma.cities.findMany({
+    const data = await this.prisma.cities.findMany({
       where: {
         ...(search && { name: { contains: search, mode: 'insensitive' } }),
       },
@@ -21,53 +21,82 @@ export class TablesController {
       take: take || 20,
       select: { code: true, name: true, uf: { select: { uf: true } } },
     });
+
+    return { data };
   }
 
-  @Get('table-motives')
-  findM() {
-    return this.prisma.absenteeismMotive.findMany({ select: { id: true, desc: true } });
+  @Get('cid')
+  async findCid(@Query() query: FindCitiesDto) {
+    const { skip, take, search } = query;
+    const data = await this.prisma.cid.findMany({
+      where: {
+        ...(search && { OR: [{ cid: { contains: search, mode: 'insensitive' } }, { description: { contains: search, mode: 'insensitive' } }] }),
+      },
+      skip: skip || 0,
+      take: take || 20,
+      select: { cid: true, description: true },
+      orderBy: { cid: 'asc' },
+    });
+
+    return { data };
+  }
+
+  @Get('absenteeism-motives')
+  async findM() {
+    const data = await this.prisma.absenteeismMotive.findMany({ select: { id: true, desc: true }, orderBy: { desc: 'asc' } });
+    return { data };
   }
 
   @Get('table-6')
-  find6() {
-    return this.prisma.esocialTable6Country.findMany({ select: { code: true, name: true } });
+  async find6() {
+    const data = await this.prisma.esocialTable6Country.findMany({ select: { code: true, name: true }, orderBy: { name: 'asc' } });
+    return { data };
   }
 
   @Get('table-13')
-  find13() {
-    return this.prisma.esocialTable13BodyPart.findMany({ select: { code: true, desc: true } });
+  async find13() {
+    const data = await this.prisma.esocialTable13BodyPart.findMany({ select: { code: true, desc: true }, orderBy: { desc: 'asc' } });
+    return { data };
   }
 
   @Get('table-14-15')
-  find1415() {
-    return this.prisma.esocialTable14And15Acid.findMany({ select: { code: true, desc: true, case: true } });
+  async find1415() {
+    const data = await this.prisma.esocialTable14And15Acid.findMany({ select: { code: true, desc: true, case: true }, orderBy: { desc: 'asc' } });
+    return { data };
   }
 
   @Get('table-15')
-  find15() {
-    return this.prisma.esocialTable14And15Acid.findMany({ select: { code: true, desc: true, case: true }, where: { table: 15 } });
+  async find15() {
+    const data = await this.prisma.esocialTable14And15Acid.findMany({ select: { code: true, desc: true, case: true }, where: { table: 15 }, orderBy: { desc: 'asc' } });
+    return { data };
   }
 
   @Get('table-17')
-  find17() {
-    return this.prisma.esocialTable17Injury.findMany({ select: { code: true, desc: true } });
+  async find17() {
+    const data = await this.prisma.esocialTable17Injury.findMany({ select: { code: true, desc: true }, orderBy: { desc: 'asc' } });
+    return { data };
   }
 
   @Get('table-18')
-  find18() {
-    return this.prisma.esocialTable18Mot.findMany({ select: { code: true, description: true, id: true } });
+  async find18() {
+    const data = await this.prisma.esocialTable18Mot.findMany({ select: { code: true, description: true, id: true }, orderBy: { description: 'asc' } });
+    return { data };
   }
 
   @Get('table-20')
-  find20() {
-    return this.prisma.esocialTable20Lograd.findMany({ select: { code: true, desc: true } });
+  async find20() {
+    const data = await this.prisma.esocialTable20Lograd.findMany({ select: { code: true, desc: true }, orderBy: { desc: 'asc' } });
+    return { data };
   }
 
+  //not been used
   @Get('table-24')
-  find24() {
-    return this.prisma.esocialTable24.findMany({ select: { id: true, name: true, type: true } });
+  async find24() {
+    const data = await this.prisma.esocialTable24.findMany({ select: { id: true, name: true, type: true }, orderBy: { name: 'asc' } });
+    return { data };
   }
 
+  //not been used
   @Get('table-27')
   find27() {
     return this.findAllTable27Service.execute();
