@@ -41,23 +41,21 @@ export class CharacterizationRepository {
   ): Promise<CharacterizationEntity> {
     const newId = v4();
 
-    if (hierarchyIds) {
-      if (!workspaceId) throw new BadRequestException('Faltou identificar o estabelecimento para cadastrar os cargos');
-
-      const homogeneousGroup = await this.prisma.homogeneousGroup.upsert({
-        where: { id: id || 'no-id' },
-        create: {
-          id: newId,
-          name: newId,
-          //! optimization here nd on characterization
-          description: characterizationDto.name + '(//)' + type,
-          companyId: companyId,
-          type: getCharacterizationType(type),
-        },
-        update: {
-          type: getCharacterizationType(type),
-          description: characterizationDto.name + '(//)' + type,
-        },
+    const homogeneousGroup = await this.prisma.homogeneousGroup.upsert({
+      where: { id: id || 'no-id' },
+      create: {
+        id: newId,
+        name: newId,
+        //! optimization here nd on characterization
+        description: characterizationDto.name + '(//)' + type,
+        companyId: companyId,
+        type: getCharacterizationType(type),
+      },
+      update: {
+        type: getCharacterizationType(type),
+        description: characterizationDto.name + '(//)' + type,
+      },
+      ...(hierarchyIds && {
         include: {
           hierarchyOnHomogeneous: {
             where: {
@@ -66,7 +64,11 @@ export class CharacterizationRepository {
             },
           },
         },
-      });
+      }),
+    });
+
+    if (hierarchyIds) {
+      if (!workspaceId) throw new BadRequestException('Faltou identificar o estabelecimento para cadastrar os cargos');
 
       const hierarchyOnHomogeneous = {};
       homogeneousGroup.hierarchyOnHomogeneous
