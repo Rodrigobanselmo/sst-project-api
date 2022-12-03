@@ -170,6 +170,12 @@ export class HomoGroupRepository {
     });
   }
 
+  async deleteHierarchyHomo({ ids, workspaceId }: UpdateHierarchyHomoGroupDto) {
+    return this.prisma.hierarchyOnHomogeneous.deleteMany({
+      where: { id: { in: ids }, workspaceId },
+    });
+  }
+
   async findHomoGroupByCompanyAndId(id: string, companyId: string, options?: Prisma.HomogeneousGroupFindFirstArgs) {
     const hierarchies = await this.prisma.homogeneousGroup.findFirst({
       where: { companyId, id },

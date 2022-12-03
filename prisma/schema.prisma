@@ -443,8 +443,15 @@ model Cat {
 
   nrRecCatOrig String?
 
+  catOriginId Int?
+  catOrigin Cat? @relation(name: "cat_oringin_fk",fields: [catOriginId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  catReopen Cat[] @relation(name: "cat_oringin_fk")
+  
   employeeId Int
   employee Employee @relation(fields: [employeeId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  sendEvent Boolean @default(true) 
+  events EmployeeESocialEvent[]
 }
 
 model Checklist {
@@ -1022,6 +1029,8 @@ model EmployeeESocialEvent {
   exam EmployeeExamsHistory? @relation(fields: [examHistoryId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   pppId Int?
   ppp EmployeePPPHistory? @relation(fields: [pppId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  catId Int?
+  cat Cat? @relation(fields: [catId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   // refType EmployeeESocialRefTypeEnum
   // @@index(refType)
   // @@index(employeeId)

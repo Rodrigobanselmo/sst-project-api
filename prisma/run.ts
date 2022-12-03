@@ -24,43 +24,21 @@ async function main() {
   try {
     console.log('start');
 
-    // fs.readFile('text.txt', 'utf8', function (err, data) {
-    //   if (err) throw err;
-    //   console.log(data.split('\n'));
-    // });
-
-    // try {
-    //   const x = await prisma.activity.delete({
-    //     where: { code: '0' },
-    //   });
-    //   console.log(x);
-    //   // await convertProf(prisma);
-    // } catch (error) {
-    //   console.log(error);
-    //   console.log('error: end');
-    // }
-
-    // const data = await prisma.companyCharacterization.findMany({
-    //   where: { companyId: '3e992a87-d72c-4d6e-8373-b73dbd9a43f1' },
-    // });
-    // console.log(data);
-
     //await deleteWithNameCompany('Deletar', prisma);
-    // await representAll(prisma);
-    // await seedEsocial24(prisma);
-    // await changeRecMed(prisma);
-    // await createAbsenceRisk(prisma);
+    // await representAll(prisma); //* DONE
+    // await changeRecMed(prisma); //* DONE
+    // await createAbsenceRisk(prisma); //* DONE
+    // await levelRiskData(prisma); //* DONE
+    // await removeDuplicitiesRisks(prisma); //* DONE
 
-    // await levelRiskData(prisma);
-    // await removeDuplicitiesRisks(prisma);
+    // await deleteProfessionalsConnections(prisma); //? DONE
+    // await addProfCOuncilNUll(prisma); //*? DONE
 
     //*next
-    await cid10Table(prisma);
+    // await seedEsocial24(prisma);
+    // await cid10Table(prisma);
     // await addEsocialTables(prisma);
     // await motiveTables(prisma);
-
-    // await deleteProfessionalsConnections(prisma);
-    // await addProfCOuncilNUll(prisma);
 
     // const group = await prisma.employeeESocialEvent.groupBy({
     //   by: ['status'],

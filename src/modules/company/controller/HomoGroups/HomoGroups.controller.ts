@@ -7,6 +7,7 @@ import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import { CopyHomogeneousGroupDto, CreateHomoGroupDto, FindHomogeneousGroupDto, UpdateHierarchyHomoGroupDto, UpdateHomoGroupDto } from '../../dto/homoGroup';
 import { CopyHomoGroupService } from '../../services/homoGroup/copy-homo-group/copy-homo-group.service';
 import { CreateHomoGroupService } from '../../services/homoGroup/create-homo-group/create-homo-group.service';
+import { DeleteHierarchyHomoGroupService } from '../../services/homoGroup/delete-hierarchy-homo-group/update-hierarchy-homo-group.service';
 import { DeleteHomoGroupService } from '../../services/homoGroup/delete-homo-group/delete-homo-group.service';
 import { FindByCompanyHomoGroupService } from '../../services/homoGroup/find-by-company-homo-group/find-by-company-homo-group.service';
 import { FindHomogenousGroupByIdService } from '../../services/homoGroup/find-homo-group-by-id/find-homo-group-by-id.service';
@@ -25,6 +26,7 @@ export class HomoGroupsController {
     private readonly deleteHomoGroupsService: DeleteHomoGroupService,
     private readonly copyHomoGroupService: CopyHomoGroupService,
     private readonly updateHierarchyHomoGroupService: UpdateHierarchyHomoGroupService,
+    private readonly deleteHierarchyHomoGroupService: DeleteHierarchyHomoGroupService,
   ) {}
 
   @Permissions({
@@ -66,6 +68,17 @@ export class HomoGroupsController {
   @Post('/hierarchy-homo/:companyId')
   updateHierarchyHomo(@Body() updateHomoGroupsDto: UpdateHierarchyHomoGroupDto, @User() userPayloadDto: UserPayloadDto) {
     return this.updateHierarchyHomoGroupService.execute({ ...updateHomoGroupsDto }, userPayloadDto);
+  }
+
+  @Permissions({
+    code: PermissionEnum.HOMO_GROUP,
+    isContract: true,
+    isMember: true,
+    crud: 'd',
+  })
+  @Post('/hierarchy-homo-delete/:companyId')
+  deleteHierarchyHomo(@Body() updateHomoGroupsDto: UpdateHierarchyHomoGroupDto, @User() userPayloadDto: UserPayloadDto) {
+    return this.deleteHierarchyHomoGroupService.execute({ ...updateHomoGroupsDto }, userPayloadDto);
   }
 
   @Permissions({

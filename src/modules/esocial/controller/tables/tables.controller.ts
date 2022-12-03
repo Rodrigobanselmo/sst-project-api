@@ -4,6 +4,7 @@ import { ApiTags } from '@nestjs/swagger';
 
 import { FindAllTable27Service } from '../../services/tables/find-all-27.service';
 import { FindCitiesDto } from '../../dto/cities.dto';
+import { Prisma } from '@prisma/client';
 
 @ApiTags('tables')
 @Controller('esocial')
@@ -13,16 +14,28 @@ export class TablesController {
   @Get('cities')
   async findC(@Query() query: FindCitiesDto) {
     const { skip, take, search } = query;
-    const data = await this.prisma.cities.findMany({
-      where: {
-        ...(search && { name: { contains: search, mode: 'insensitive' } }),
-      },
-      skip: skip || 0,
-      take: take || 20,
-      select: { code: true, name: true, uf: { select: { uf: true } } },
-    });
 
-    return { data };
+    const where: Prisma.CitiesFindManyArgs['where'] = {
+      ...(search && { name: { contains: search, mode: 'insensitive' } }),
+    };
+
+    const response = await this.prisma.$transaction([
+      this.prisma.cities.count({
+        where,
+      }),
+      this.prisma.cities.findMany({
+        where,
+        skip: skip || 0,
+        take: take || 20,
+        orderBy: { name: 'asc' },
+        select: { code: true, name: true, uf: { select: { uf: true } } },
+      }),
+    ]);
+
+    return {
+      data: response[1],
+      count: response[0],
+    };
   }
 
   @Get('cid')
@@ -48,8 +61,18 @@ export class TablesController {
   }
 
   @Get('table-6')
-  async find6() {
-    const data = await this.prisma.esocialTable6Country.findMany({ select: { code: true, name: true }, orderBy: { name: 'asc' } });
+  async find6(@Query() query: FindCitiesDto) {
+    const { skip, take, search } = query;
+    const data = await this.prisma.esocialTable6Country.findMany({
+      where: {
+        ...(search && { OR: [{ name: { contains: search, mode: 'insensitive' } }] }),
+      },
+      skip: skip || 0,
+      take: take || 20,
+      select: { code: true, name: true },
+      orderBy: { name: 'asc' },
+    });
+
     return { data };
   }
 
@@ -84,10 +107,45 @@ export class TablesController {
   }
 
   @Get('table-20')
-  async find20() {
-    const data = await this.prisma.esocialTable20Lograd.findMany({ select: { code: true, desc: true }, orderBy: { desc: 'asc' } });
-    return { data };
+  async find20(@Query() query: FindCitiesDto) {
+    const { skip, take, search } = query;
+
+    const where: Prisma.EsocialTable20LogradFindManyArgs['where'] = {
+      ...(search && { OR: [{ desc: { contains: search, mode: 'insensitive' } }] }),
+    };
+
+    const response = await this.prisma.$transaction([
+      this.prisma.esocialTable20Lograd.count({
+        where,
+      }),
+      this.prisma.esocialTable20Lograd.findMany({
+        where,
+        skip: skip || 0,
+        take: take || 20,
+        select: { code: true, desc: true },
+        orderBy: { desc: 'asc' },
+      }),
+    ]);
+
+    return {
+      data: response[1],
+      count: response[0],
+    };
   }
+  // async find20(@Query() query: FindCitiesDto) {
+  //   const { skip, take, search } = query;
+  //   const data = await this.prisma.esocialTable20Lograd.findMany({
+  //     where: {
+  //       ...(search && { OR: [{ desc: { contains: search, mode: 'insensitive' } }] }),
+  //     },
+  //     skip: skip || 0,
+  //     take: take || 20,
+  //     select: { code: true, desc: true },
+  //     orderBy: { desc: 'asc' },
+  //   });
+
+  //   return { data };
+  // }
 
   //not been used
   @Get('table-24')

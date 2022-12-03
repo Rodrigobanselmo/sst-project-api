@@ -59,6 +59,10 @@ export class CreateCatDto {
   @IsInt()
   employeeId: number;
 
+  @IsInt()
+  @IsOptional()
+  catOriginId?: number;
+
   @IsString()
   @IsOptional()
   hrAcid?: string;
@@ -146,17 +150,13 @@ export class CreateCatDto {
   @IsOptional()
   observacao?: string;
 
-  @IsString()
-  @IsOptional()
-  nrRecCatOrig?: string;
-
   @IsBoolean()
   @IsOptional()
   isIndCatObito?: boolean;
 
   @IsBoolean()
   @IsOptional()
-  isIndComunPolici?: boolean;
+  isIndComunPolicia?: boolean;
 
   @IsBoolean()
   @IsOptional()
@@ -194,6 +194,14 @@ export class FindCatDto extends PaginationQueryDto {
   @IsString()
   @IsOptional()
   companyId?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  onlyCompany?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  withReceipt?: boolean;
 
   @Transform(QueryArray, { toClassOnly: true })
   @IsString({ each: true })

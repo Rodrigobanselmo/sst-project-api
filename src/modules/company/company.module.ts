@@ -135,6 +135,7 @@ import { AbsenteeismController } from './controller/absenteeism/absenteeism.cont
 import { CatController } from './controller/cat/cat.controller';
 import { FindOneAbsenteeismsService } from './services/absenteeism/find-one-absenteeism/find-one-absenteeism.service';
 import { FindOneCatsService } from './services/cat/find-one-cat/find-one-cat.service';
+import { DeleteHierarchyHomoGroupService } from './services/homoGroup/delete-hierarchy-homo-group/update-hierarchy-homo-group.service';
 
 @Module({
   imports: [
@@ -280,6 +281,7 @@ import { FindOneCatsService } from './services/cat/find-one-cat/find-one-cat.ser
     CatRepository,
     FindOneAbsenteeismsService,
     FindOneCatsService,
+    DeleteHierarchyHomoGroupService,
   ],
   exports: [
     CompanyRepository,

@@ -1,3 +1,4 @@
+import { EmployeeESocialEventEntity } from './../../esocial/entities/employeeEsocialEvent.entity';
 import {
   Cat,
   Cities,
@@ -53,7 +54,7 @@ export class CatEntity implements Cat {
   esocialSitGeradora?: EsocialTable14And15Acid;
 
   docId: number;
-  doc?: ProfessionalEntity;
+  doc?: Partial<ProfessionalEntity>;
 
   codCID: string;
   cid?: CidEntity;
@@ -82,6 +83,13 @@ export class CatEntity implements Cat {
   codParteAting: string;
   codParteAtingEsocial13?: EsocialTable13BodyPart;
   status: StatusEnum;
+
+  catOriginId:number;
+  catOrigin: CatEntity;
+  catReopen: CatEntity[];
+
+  sendEvent: boolean;
+  events: EmployeeESocialEventEntity[];
 
   constructor(partial: Partial<CatEntity>) {
     Object.assign(this, partial);

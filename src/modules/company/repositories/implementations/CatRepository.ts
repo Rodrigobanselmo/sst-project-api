@@ -12,7 +12,8 @@ import { prismaFilter } from '../../../../shared/utils/filters/prisma.filters';
 export class CatRepository {
   constructor(private prisma: PrismaService) {}
 
-  async create(createCompanyDto: CreateCatDto) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async create({ companyId, ...createCompanyDto }: CreateCatDto) {
     const cat = await this.prisma.cat.create({
       data: createCompanyDto,
     });
@@ -20,7 +21,8 @@ export class CatRepository {
     return new CatEntity(cat);
   }
 
-  async update({ id, ...createCompanyDto }: UpdateCatDto) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async update({ id, companyId, ...createCompanyDto }: UpdateCatDto) {
     const cat = await this.prisma.cat.update({
       data: createCompanyDto,
       where: { id },
@@ -36,8 +38,18 @@ export class CatRepository {
 
     const { where } = prismaFilter(whereInit, {
       query,
-      skip: ['search', 'companyId', 'companiesIds'],
+      skip: ['search', 'companyId', 'companiesIds', 'onlyCompany', 'withReceipt'],
     });
+
+    if (!options.select)
+      options.select = {
+        id: true,
+        employeeId: true,
+        hrAcid: true,
+        houveAfast: true,
+        dtAcid: true,
+        employee: { select: { name: true, cpf: true, id: true, companyId: true, company: { select: { id: true, name: true, initials: true, fantasy: true } } } },
+      };
 
     if ('search' in query) {
       (where.AND as any).push({
@@ -46,9 +58,33 @@ export class CatRepository {
       delete query.search;
     }
 
+    if ('withReceipt' in query) {
+      (where.AND as any).push({
+        OR: [{ events: { some: { receipt: { not: null } } } }, { events: { every: { action: { not: 'EXCLUDE' } } } }],
+      } as typeof options.where);
+      delete query.search;
+    }
+
     if ('companyId' in query) {
       (where.AND as any).push({
-        employee: { companyId: query.companyId },
+        employee: {
+          OR: [
+            {
+              companyId: query.companyId,
+            },
+            ...(!query.onlyCompany
+              ? [
+                  {
+                    company: {
+                      receivingServiceContracts: {
+                        some: { applyingServiceCompanyId: query.companyId },
+                      },
+                    },
+                  },
+                ]
+              : []),
+          ],
+        },
       } as typeof options.where);
       delete query.companiesIds;
     }
@@ -90,10 +126,22 @@ export class CatRepository {
   async findById({ companyId, id }: { companyId: string; id: number }, options: Prisma.CatFindFirstArgs = {}) {
     const cat = await this.prisma.cat.findFirst({
       where: { id, employee: { companyId } },
+      include: {
+        cid: true,
+        city: true,
+        codParteAtingEsocial13: true,
+        countryCodeEsocial6: true,
+        doc: { select: { professional: true } },
+        esocialAgntCausador: true,
+        esocialLesao: true,
+        esocialLograd: true,
+        esocialSitGeradora: true,
+        catOrigin: { select: { id: true, esocialSitGeradora: true, dtAcid: true } },
+      },
       ...options,
     });
 
-    return new CatEntity(cat);
+    return new CatEntity(cat as any);
   }
 
   async findFirstNude(options: Prisma.CatFindFirstArgs = {}) {

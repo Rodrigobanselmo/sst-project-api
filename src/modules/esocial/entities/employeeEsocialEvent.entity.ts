@@ -1,7 +1,8 @@
-import { EmployeePPPHistoryEntity } from './../../company/entities/employee-ppp-history.entity';
-import { EmployeeESocialEvent, EmployeeESocialEventTypeEnum, Prisma, StatusEnum, EmployeeESocialEventActionEnum, EmployeePPPHistory } from '@prisma/client';
+import { EmployeeESocialEvent, EmployeeESocialEventActionEnum, EmployeeESocialEventTypeEnum, Prisma, StatusEnum } from '@prisma/client';
 
+import { CatEntity } from './../../company/entities/cat.entity';
 import { CompanyEntity } from './../../company/entities/company.entity';
+import { EmployeePPPHistoryEntity } from './../../company/entities/employee-ppp-history.entity';
 import { EmployeeEntity } from './../../company/entities/employee.entity';
 import { EmployeeESocialBatchEntity } from './employeeEsocialBatch.entity';
 
@@ -24,10 +25,11 @@ export class EmployeeESocialEventEntity implements EmployeeESocialEvent {
   batch?: EmployeeESocialBatchEntity;
   response: Prisma.JsonValue;
   action: EmployeeESocialEventActionEnum;
-  // snapshot: Prisma.JsonValue;
   examHistoryId: number;
   ppp: EmployeePPPHistoryEntity;
   pppId: number;
+  catId: number;
+  cat: CatEntity;
 
   constructor(partial: Partial<EmployeeESocialEventEntity>) {
     Object.assign(this, partial);

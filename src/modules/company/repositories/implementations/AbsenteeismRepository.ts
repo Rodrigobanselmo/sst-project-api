@@ -68,8 +68,8 @@ export class AbsenteeismRepository {
             },
             {
               company: {
-                applyingServiceContracts: {
-                  some: { receivingServiceCompanyId: query.companyId },
+                receivingServiceContracts: {
+                  some: { applyingServiceCompanyId: query.companyId },
                 },
               },
             },
