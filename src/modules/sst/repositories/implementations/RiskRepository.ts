@@ -320,7 +320,11 @@ export class RiskRepository implements IRiskRepository {
     return risks.map((companyClinic) => new RiskFactorsEntity(companyClinic));
   }
 
-  async findRiskDataByHierarchies(hierarchyIds: string[], companyId: string, options: Prisma.RiskFactorsFindManyArgs & { date?: Date } = {}) {
+  async findRiskDataByHierarchies(
+    hierarchyIds: string[],
+    companyId: string,
+    options: Prisma.RiskFactorsFindManyArgs & { date?: Date; selectEpi?: boolean; selectAdm?: boolean; selectEpc?: boolean } = {},
+  ) {
     const { date, ...rest } = options;
 
     const risks = await this.findNude({
@@ -404,6 +408,15 @@ export class RiskRepository implements IRiskRepository {
                 environment: { select: { name: true, type: true } },
               },
             },
+            ...(options?.selectAdm && {
+              engsToRiskFactorData: { select: { recMedId: true, recMed: { select: { medName: true, id: true } } } },
+            }),
+            ...(options?.selectEpc && {
+              adms: { select: { medName: true, id: true } },
+            }),
+            ...(options?.selectEpi && {
+              epiToRiskFactorData: { select: { epiId: true, epi: { select: { ca: true, equipment: true } } } },
+            }),
           },
         },
         ...rest.select,

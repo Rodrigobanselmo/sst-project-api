@@ -136,6 +136,11 @@ import { CatController } from './controller/cat/cat.controller';
 import { FindOneAbsenteeismsService } from './services/absenteeism/find-one-absenteeism/find-one-absenteeism.service';
 import { FindOneCatsService } from './services/cat/find-one-cat/find-one-cat.service';
 import { DeleteHierarchyHomoGroupService } from './services/homoGroup/delete-hierarchy-homo-group/update-hierarchy-homo-group.service';
+import { CompanyOSRepository } from './repositories/implementations/CompanyOSRepository';
+import { FindOneCompanyOSService } from './services/os/find-os/find-os.service';
+import { UpsertCompanyOSService } from './services/os/upsert-os/upsert-contact.service';
+import { CompanyOSController } from './controller/os/os.controller';
+import { DeleteCompanyOSService } from './services/os/delete-os/delete-os.service';
 
 @Module({
   imports: [
@@ -160,6 +165,7 @@ import { DeleteHierarchyHomoGroupService } from './services/homoGroup/delete-hie
     DocumentController,
     CatController,
     AbsenteeismController,
+    CompanyOSController,
   ],
   providers: [
     CreateCompanyService,
@@ -282,6 +288,10 @@ import { DeleteHierarchyHomoGroupService } from './services/homoGroup/delete-hie
     FindOneAbsenteeismsService,
     FindOneCatsService,
     DeleteHierarchyHomoGroupService,
+    CompanyOSRepository,
+    FindOneCompanyOSService,
+    DeleteCompanyOSService,
+    UpsertCompanyOSService,
   ],
   exports: [
     CompanyRepository,

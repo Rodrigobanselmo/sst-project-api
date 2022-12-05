@@ -222,14 +222,17 @@ export class EmployeeRepository {
 
       (whereInit.AND as any).push({
         OR: [
-          { companyId: query.companyId, status: 'ACTIVE' },
+          {
+            companyId: query.companyId,
+            // , status: 'ACTIVE'
+          },
           {
             company: {
               receivingServiceContracts: {
                 some: { applyingServiceCompanyId: query.companyId },
               },
             },
-            status: 'ACTIVE',
+            // status: 'ACTIVE',
           },
         ],
       } as typeof options.where);

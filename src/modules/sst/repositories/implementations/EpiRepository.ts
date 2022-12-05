@@ -4,6 +4,7 @@ import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { CreateEpiDto, FindEpiDto, UpdateEpiDto, UpsertEpiDto } from '../../dto/epi.dto';
 import { EpiEntity } from '../../entities/epi.entity';
+import { Prisma } from '@prisma/client';
 
 let i = 0;
 
@@ -100,6 +101,14 @@ export class EpiRepository {
       data: [...standardEpis, ...response[1]].map((epi) => new EpiEntity(epi)),
       count,
     };
+  }
+
+  async findNude(options: Prisma.EpiFindManyArgs = {}) {
+    const contacts = await this.prisma.epi.findMany({
+      ...options,
+    });
+
+    return contacts.map((contact) => new EpiEntity(contact));
   }
 
   async findAll(): Promise<EpiEntity[]> {

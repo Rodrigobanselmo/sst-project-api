@@ -199,6 +199,7 @@ import { FindAllRiskDataByEmployeeService } from './services/risk-data/find-by-e
     FindAllRiskDataByEmployeeService,
     FindExamByHierarchyService,
     ExamRepository,
+    EpiRepository,
   ],
   imports: [forwardRef(() => CompanyModule)],
 })

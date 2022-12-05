@@ -1,3 +1,4 @@
+import { CompanyOSEntity } from './os.entity';
 import { ProfessionalResponsibleEntity } from './../../users/entities/professional-responsible.entity';
 import { RiskFactorsEntity } from './../../sst/entities/risk.entity';
 import { ExamToClinicEntity } from '../../sst/entities/examToClinic';
@@ -5,7 +6,7 @@ import { RiskFactorGroupDataEntity } from '../../sst/entities/riskGroupData.enti
 import { ProfessionalEntity } from './../../users/entities/professional.entity';
 import { Company, CompanyPaymentTypeEnum, CompanyTypesEnum } from '.prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
-import { ProfessionalCouncil, StatusEnum, HomogeneousGroup } from '@prisma/client';
+import { ProfessionalCouncil, StatusEnum, HomogeneousGroup, CompanyOS } from '@prisma/client';
 import { AddressCompanyEntity } from './address-company.entity';
 import { EmployeeEntity } from './employee.entity';
 import { LicenseEntity } from './license.entity';
@@ -141,6 +142,7 @@ export class CompanyEntity implements Company {
   riskFactors?: RiskFactorsEntity[];
   hierarchy?: HierarchyEntity[];
   homogeneousGroup?: HomoGroupEntity[];
+  os?: CompanyOSEntity;
 
   doctorResponsible?: Partial<ProfessionalEntity>;
   tecResponsible?: Partial<ProfessionalEntity>;

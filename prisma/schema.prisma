@@ -591,6 +591,7 @@ model Company {
   esocialTransmissions EmployeeESocialBatch[]
   report CompanyReport?
   cert CompanyCert?
+  os CompanyOS?
   professionalsResponsibles ProfessionalCouncilResponsible[]
 
   // professionals Professional[] @relation(name:"companies_related") 
@@ -868,6 +869,26 @@ model DocumentPCMSO {
   professionalsSignatures DocumentPCMSOToProfessional[]
   // usersSignatures RiskFactorGroupDataToUser[]
   // validity String?
+
+  @@unique([id, companyId])
+}
+
+model CompanyOS {
+  id    Int   @id  @default(autoincrement())
+  created_at DateTime @default(now())
+  updated_at  DateTime   @updatedAt
+  status StatusEnum @default(ACTIVE)
+  socialName Json?
+  med Json?
+  rec Json?
+  obligations Json?
+  prohibitions Json?
+  procedures Json?
+  cipa Json?
+  declaration Json?
+  
+  companyId String @unique
+  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
 
   @@unique([id, companyId])
 }
