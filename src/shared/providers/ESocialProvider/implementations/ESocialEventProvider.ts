@@ -44,7 +44,7 @@ import sortArray from 'sort-array';
 class ESocialEventProvider {
   private verProc = 'SimplesSST_1.0';
   private indRetif = IndRetifEnum.ORIGINAL;
-  private tpAmb = TpAmbEnum.PROD_REST;
+  private tpAmb = TpAmbEnum.PROD;
   private procEmi = ProcEmiEnum.SOFTWARE;
   private tpInsc = TpIncsEnum.CNPJ;
   private eventGroup = EventGroupEnum.NO_PERIODIC;
