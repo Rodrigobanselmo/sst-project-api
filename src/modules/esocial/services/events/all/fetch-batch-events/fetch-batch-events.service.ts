@@ -119,7 +119,7 @@ export class FetchESocialBatchEventsService {
             } catch (err) {
               await this.eSocialBatchRepository.updateNude({
                 where: { id: batch.id },
-                select: {},
+                select: { id: true },
                 data: {
                   response: response as any,
                   status: 'INVALID',

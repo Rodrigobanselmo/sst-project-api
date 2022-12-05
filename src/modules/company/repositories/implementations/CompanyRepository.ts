@@ -510,10 +510,10 @@ export class CompanyRepository implements ICompanyRepository {
         'isPeriodic',
         'isChange',
         'isAdmission',
-        'selectReport',
         'isReturn',
         'isDismissal',
         'findAll',
+        'selectReport',
       ],
     });
 
@@ -628,6 +628,7 @@ export class CompanyRepository implements ICompanyRepository {
         'isReturn',
         'isDismissal',
         'findAll',
+        'selectReport',
       ],
     });
 
@@ -684,6 +685,13 @@ export class CompanyRepository implements ICompanyRepository {
           },
         },
       } as typeof options.where);
+    }
+
+    if ('selectReport' in query) {
+      options.select.esocialStart = true;
+      options.select.esocialSend = true;
+      options.select.report = true;
+      options.orderBy = [{ report: { esocialReject: 'desc' } }, { report: { esocialPendent: 'desc' } }];
     }
 
     const response = await this.prisma.$transaction([
