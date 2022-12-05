@@ -43,7 +43,6 @@ export class FetchESocialBatchEventsService {
       },
       orderBy: { created_at: 'desc' },
     });
-
     if (batches.length > 0) {
       await asyncEach(arrayChunks(batches, 20), async (batchChunk) => {
         await Promise.all(
@@ -88,10 +87,10 @@ export class FetchESocialBatchEventsService {
 
                     const found = await this.eSocialEventRepository.findFirstNude({
                       where: { eventId: id },
-                      select: { id: true, examHistoryId: true, pppId: true },
+                      select: { id: true, examHistoryId: true, pppId: true, catId: true },
                     });
 
-                    if (!found) throw new Error(`Event not found ID:${id}`);
+                    if (!found?.id) throw new Error(`Event not found ID:${id}`);
 
                     await this.eSocialEventRepository.updateNude({
                       where: { id: found.id },
@@ -132,7 +131,10 @@ export class FetchESocialBatchEventsService {
                   status: 'ERROR',
                   response: response?.status || err?.message.slice(0, 500),
                   //! set null other events to 2240 // 2210 ...
-                  eventId: null,
+                  // eventId: null,
+                  catId: null,
+                  pppId: null,
+                  examHistoryId: null,
                 },
               });
 
