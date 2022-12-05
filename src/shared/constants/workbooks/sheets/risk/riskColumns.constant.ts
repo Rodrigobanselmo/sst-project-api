@@ -44,6 +44,7 @@ export const riskColumnsConstant = [
     checkHandler: checkIsString,
   },
   {
+    isBoolean: true,
     isArray: false,
     databaseName: 'isPGR',
     excelName: 'PGR',
@@ -52,6 +53,7 @@ export const riskColumnsConstant = [
     notes: () => ['Marcar com "X" para VERDADEIRO e vazio para falso'],
   },
   {
+    isBoolean: true,
     isArray: false,
     databaseName: 'isPCMSO',
     excelName: 'PCMSO',
@@ -60,6 +62,7 @@ export const riskColumnsConstant = [
     notes: () => ['Marcar com "X" para VERDADEIRO e vazio para falso'],
   },
   {
+    isBoolean: true,
     isArray: false,
     databaseName: 'isAso',
     excelName: 'ASO',
@@ -68,6 +71,7 @@ export const riskColumnsConstant = [
     notes: () => ['Marcar com "X" para VERDADEIRO e vazio para falso'],
   },
   {
+    isBoolean: true,
     isArray: false,
     databaseName: 'isPPP',
     excelName: 'PPP',

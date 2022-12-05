@@ -9,6 +9,7 @@ export interface ITableSchema {
   databaseName: string;
   excelName: string;
   required: boolean;
+  isBoolean?: boolean;
   checkHandler: (value: any) => string | false | true;
   isId?: boolean;
   isArray?: boolean | string;

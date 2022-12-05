@@ -138,7 +138,7 @@ import { FindOneCatsService } from './services/cat/find-one-cat/find-one-cat.ser
 import { DeleteHierarchyHomoGroupService } from './services/homoGroup/delete-hierarchy-homo-group/update-hierarchy-homo-group.service';
 import { CompanyOSRepository } from './repositories/implementations/CompanyOSRepository';
 import { FindOneCompanyOSService } from './services/os/find-os/find-os.service';
-import { UpsertCompanyOSService } from './services/os/upsert-os/upsert-contact.service';
+import { UpsertCompanyOSService } from './services/os/upsert-os/upsert-os.service';
 import { CompanyOSController } from './controller/os/os.controller';
 import { DeleteCompanyOSService } from './services/os/delete-os/delete-os.service';
 

@@ -487,11 +487,36 @@ export class RiskRepository implements IRiskRepository {
         AND: [...tenant],
         deleted_at: null,
       },
-      include: {
+      select: {
+        companyId: true,
+        created_at: true,
+        esocialCode: true,
+        id: true,
+        isAso: true,
+        isPCMSO: true,
+        isPGR: true,
+        isEmergency: true,
+        isPPP: true,
+        json: true,
+        name: true,
+        nr15lt: true,
+        representAll: true,
+        severity: true,
+        status: true,
+        stel: true,
+        tlv: true,
+        twa: true,
+        system: true,
+        type: true,
+        unit: true,
         recMed: { where: { deleted_at: null, AND: [...tenant] } },
         generateSource: { where: { deleted_at: null, AND: [...tenant] } },
-        ...include,
       },
+      // include: {
+      //   recMed: { where: { deleted_at: null, AND: [...tenant] } },
+      //   generateSource: { where: { deleted_at: null, AND: [...tenant] } },
+      //   ...include,
+      // },
     });
 
     return risks.map((risk) => new RiskFactorsEntity(risk));

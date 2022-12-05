@@ -8,13 +8,33 @@ export class FindOneCompanyOSService {
   constructor(private readonly companyOSRepository: CompanyOSRepository) {}
 
   async execute(id: number, user: UserPayloadDto) {
-    const access = await this.companyOSRepository.findFirstNude({
+    const os = await this.companyOSRepository.findFirstNude({
       where: {
         id,
         companyId: user.targetCompanyId,
       },
     });
 
-    return access;
+    if (!os.id) {
+      const osConsultant = await this.companyOSRepository.findFirstNude({
+        where: {
+          company: {
+            applyingServiceContracts: {
+              some: {
+                receivingServiceCompanyId: user.targetCompanyId,
+                receivingServiceCompany: {
+                  isConsulting: true,
+                  isGroup: false,
+                  isClinic: false,
+                },
+              },
+            },
+          },
+        },
+      });
+      return osConsultant;
+    }
+
+    return os;
   }
 }

@@ -240,7 +240,7 @@ class ExcelProvider implements IExcelProvider {
           const actualCell = ` spreadsheet ${excelReadData.name}, linha ${indexRow + 1} e coluna ${indexCell + 1}`;
 
           const excelCell = excelRow[indexCell];
-          const isEmptyCell = excelCell === null || excelCell === undefined || (excelCell === '-' && indexCell == 0);
+          const isEmptyCell = !tableSchemaCell.isBoolean && (excelCell === null || excelCell === undefined || (excelCell === '-' && indexCell == 0));
 
           const isMissingField = isEmptyCell && !isArrayData && tableSchemaCell.required;
 
@@ -260,10 +260,10 @@ class ExcelProvider implements IExcelProvider {
           if (isEmptyCell) return;
 
           let checkedData = tableSchemaCell.checkHandler(excelCell);
-
           if (checkedData === false && excelCell != '-') throw new BadRequestException(`Dado inválido na ${actualCell}`);
 
           if (checkedData === 'false') checkedData = false;
+          if (checkedData === 'false') console.log(checkedData);
 
           const nestedObject = transformStringToObject(tableSchemaCell.databaseName, checkedData);
 

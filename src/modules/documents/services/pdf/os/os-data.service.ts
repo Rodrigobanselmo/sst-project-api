@@ -97,12 +97,16 @@ export class PdfOsDataService {
     const consultantCompany = employee?.company?.receivingServiceContracts?.[0]?.applyingServiceCompany;
     const actualCompany = employee.company;
     const sector = this.onGetSector(employee?.hierarchy);
+    const os = actualCompany.os || consultantCompany.os;
 
     delete actualCompany?.receivingServiceContracts;
+    delete actualCompany?.os;
+    delete consultantCompany?.os;
     delete employee?.company;
 
     return {
       consultantCompany,
+      os,
       actualCompany,
       employee,
       risks: osRisk.map((risk) => ({ riskData: risk.riskData[0], riskFactor: risk.riskFactor })),

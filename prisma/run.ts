@@ -35,7 +35,7 @@ async function main() {
     // await addProfCOuncilNUll(prisma); //*? DONE
 
     //*next
-    // await seedEsocial24(prisma);
+    await seedEsocial24(prisma);
     // await cid10Table(prisma);
     // await addEsocialTables(prisma);
     // await motiveTables(prisma);

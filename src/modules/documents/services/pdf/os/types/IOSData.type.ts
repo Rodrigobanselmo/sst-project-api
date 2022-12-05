@@ -10,8 +10,10 @@ import { EmployeeExamsHistoryEntity } from '../../../../../company/entities/empl
 import { RiskFactorDataEntity } from '../../../../../sst/entities/riskData.entity';
 import { ProfessionalEntity } from '../../../../../users/entities/professional.entity';
 import { EngsRiskDataEntity } from '../../../../../sst/entities/engsRiskData.entity';
+import { CompanyOSEntity } from '../../../../../../modules/company/entities/os.entity';
 
 export interface IPdfOSData {
+  os: CompanyOSEntity;
   employee: EmployeeEntity;
   consultantCompany: CompanyEntity;
   actualCompany: CompanyEntity;

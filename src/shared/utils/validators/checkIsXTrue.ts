@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 export const checkIsXTrue = (value: any) => {
-  const transformToString = String(value);
+  const transformToString = String(value || 'FALSO');
+
   if (!transformToString && transformToString !== '') {
     return false;
   }

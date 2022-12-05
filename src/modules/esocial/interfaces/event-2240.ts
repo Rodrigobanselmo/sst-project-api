@@ -1,3 +1,4 @@
+import { HierarchyEntity } from './../../company/entities/hierarchy.entity';
 import { EmployeeEntity } from './../../company/entities/employee.entity';
 import { ExamHistoryEvaluationEnum } from '@prisma/client';
 
@@ -157,4 +158,4 @@ export interface IBreakPointPPP {
   date: Date;
 }
 
-export type IEmployee2240Data = EmployeeEntity & { actualPPPHistory?: IBreakPointPPP[] };
+export type IEmployee2240Data = EmployeeEntity & { actualPPPHistory?: IBreakPointPPP[]; sectorHierarchy?: Partial<HierarchyEntity> };

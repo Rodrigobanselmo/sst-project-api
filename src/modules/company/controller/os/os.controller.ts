@@ -8,7 +8,7 @@ import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import { CompanyOSDto } from '../../dto/os.dto';
 import { DeleteCompanyOSService } from '../../services/os/delete-os/delete-os.service';
 import { FindOneCompanyOSService } from '../../services/os/find-os/find-os.service';
-import { UpsertCompanyOSService } from '../../services/os/upsert-os/upsert-contact.service';
+import { UpsertCompanyOSService } from '../../services/os/upsert-os/upsert-os.service';
 
 @ApiTags('os')
 @Controller('company/:companyId/os')

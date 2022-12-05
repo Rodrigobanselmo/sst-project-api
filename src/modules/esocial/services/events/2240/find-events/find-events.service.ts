@@ -281,7 +281,7 @@ export class FindEvents2240ESocialService {
   async getEmployeesData(company: CompanyEntity, hierarchyTree: Record<string, HierarchyEntity>, homoRiskDataTree: Record<string, RiskFactorDataEntity[]>) {
     const employeesData = [] as IEmployee2240Data[];
     //! company.employees.forEach((employee) => {
-    [company.employees.find((e) => e.id == 5920)].forEach((employee) => {
+    company.employees.forEach((employee) => {
       // const timeline = {};
       const allHistory = employee.hierarchyHistory.reduce<(EmployeeHierarchyHistoryEntity & { ambProfessional?: Partial<ProfessionalEntity> })[]>(
         (acc, history, index, array) => {
@@ -364,11 +364,16 @@ export class FindEvents2240ESocialService {
 
       const actualPPPHistory = Object.values(timeline);
 
+      const hierarchy = hierarchyTree[hierarchyHistory?.[0]?.hierarchyId];
+      let sectorHierarchy = hierarchyTree[hierarchy?.parentId];
+      if (sectorHierarchy && sectorHierarchy?.parentId && sectorHierarchy.type != 'SECTOR') sectorHierarchy = hierarchyTree[sectorHierarchy?.parentId];
       delete employee.hierarchyHistory;
 
       employeesData.push({
         ...employee,
         actualPPPHistory,
+        hierarchy: { id: hierarchy.id, name: hierarchy.name },
+        sectorHierarchy: { id: sectorHierarchy.id, name: sectorHierarchy.name },
       });
     });
     return employeesData;

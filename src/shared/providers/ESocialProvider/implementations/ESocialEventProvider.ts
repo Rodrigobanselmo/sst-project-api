@@ -527,56 +527,67 @@ class ESocialEventProvider {
             infoAtiv: {
               dscAtivDes: snapshot.desc,
             },
-            agNoc: risks.map((risk) => {
-              const riskFactor = risk?.riskFactor;
-              const esocial = riskFactor?.esocial;
-              const code = esocial?.id;
-              const isEmptyRisk = requiredTpAval.includes(code);
-              const isRequiredDesc = requiredDescAg.includes(code);
-              const isRequiredLimit = requiredLimTol.includes(code);
-              const isQuantity = esocial?.isQuantity;
-              const limit = risk.riskData?.ibtugLEO || 100;
-              const intensity = risk.riskData?.vdvrValue || risk.riskData?.arenValue || risk.riskData?.intensity;
-              const useEpc = getEpcType(risk);
-              const useEpi = getEpiType(risk);
-              const isEPCEfficient = !!risk.riskData.engsToRiskFactorData.find((e) => e.efficientlyCheck);
-              const isEPIEfficient = !!risk.riskData.epiToRiskFactorData.find((e) => e.efficientlyCheck);
+            agNoc: risks
+              .filter((risk) => {
+                if (risks.length <= 1) return true;
 
-              const isEPCImplemented = useEpc == utileEpiEpcEnum.IMPLEMENTED;
-              const isEPIImplemented = useEpi == utileEpiEpcEnum.IMPLEMENTED;
+                const riskFactor = risk?.riskFactor;
+                const esocial = riskFactor?.esocial;
+                const code = esocial?.id;
+                const isEmptyRisk = requiredTpAval.includes(code);
 
-              return {
-                nameAgNoc: riskFactor.name,
-                codAgNoc: code || undefined,
-                ...(isRequiredDesc && { dscAgNoc: riskFactor?.name }),
-                ...(!isEmptyRisk && { tpAval: isQuantity ? TpAvalEnum.QUANTITY : TpAvalEnum.QUALITY }),
-                ...(isQuantity && {
-                  intConc: intensity,
-                  ...(isRequiredLimit && { limTol: limit || undefined }),
-                  unMed: UnMedEnum[riskFactor?.unit] || undefined,
-                  tecMedicao: riskFactor?.method != 'Qualitativo' ? riskFactor?.method : undefined,
-                }),
-                ...(!isEmptyRisk && {
-                  epcEpi: {
-                    utilizEPC: getEpcType(risk) || undefined,
-                    utilizEPI: getEpiType(risk) || undefined,
-                    ...(isEPCImplemented && { eficEpc: isEPCEfficient ? YesNoEnum.YES : YesNoEnum.NO }),
-                    ...(isEPIImplemented && { eficEpi: isEPIEfficient ? YesNoEnum.YES : YesNoEnum.NO }),
-                    ...(isEPIImplemented && { epi: risk.riskData.epiToRiskFactorData.map((e) => ({ docAval: e?.epi?.ca || undefined })) }),
-                    ...(isEPIImplemented && {
-                      epiCompl: {
-                        condFuncto: isEPIEfficient ? YesNoEnum.YES : YesNoEnum.NO,
-                        higienizacao: isEPIEfficient ? YesNoEnum.YES : YesNoEnum.NO,
-                        medProtecao: isEPIEfficient ? YesNoEnum.YES : YesNoEnum.NO,
-                        periodicTroca: isEPIEfficient ? YesNoEnum.YES : YesNoEnum.NO,
-                        przValid: isEPIEfficient ? YesNoEnum.YES : YesNoEnum.NO,
-                        usoInint: isEPIEfficient ? YesNoEnum.YES : YesNoEnum.NO,
-                      },
-                    }),
-                  },
-                }),
-              };
-            }),
+                return !isEmptyRisk;
+              })
+              .map((risk) => {
+                const riskFactor = risk?.riskFactor;
+                const esocial = riskFactor?.esocial;
+                const code = esocial?.id;
+                const isEmptyRisk = requiredTpAval.includes(code);
+                const isRequiredDesc = requiredDescAg.includes(code);
+                const isRequiredLimit = requiredLimTol.includes(code);
+                const isQuantity = esocial?.isQuantity;
+                const limit = risk.riskData?.ibtugLEO || 100;
+                const intensity = risk.riskData?.vdvrValue || risk.riskData?.arenValue || risk.riskData?.intensity;
+                const useEpc = getEpcType(risk);
+                const useEpi = getEpiType(risk);
+                const isEPCEfficient = !!risk.riskData.engsToRiskFactorData.find((e) => e.efficientlyCheck);
+                const isEPIEfficient = !!risk.riskData.epiToRiskFactorData.find((e) => e.efficientlyCheck);
+
+                const isEPCImplemented = useEpc == utileEpiEpcEnum.IMPLEMENTED;
+                const isEPIImplemented = useEpi == utileEpiEpcEnum.IMPLEMENTED;
+
+                return {
+                  nameAgNoc: riskFactor.name,
+                  codAgNoc: code || undefined,
+                  ...(isRequiredDesc && { dscAgNoc: riskFactor?.name }),
+                  ...(!isEmptyRisk && { tpAval: isQuantity ? TpAvalEnum.QUANTITY : TpAvalEnum.QUALITY }),
+                  ...(isQuantity && {
+                    intConc: intensity,
+                    ...(isRequiredLimit && { limTol: limit || undefined }),
+                    unMed: UnMedEnum[riskFactor?.unit] || undefined,
+                    tecMedicao: riskFactor?.method != 'Qualitativo' ? riskFactor?.method : undefined,
+                  }),
+                  ...(!isEmptyRisk && {
+                    epcEpi: {
+                      utilizEPC: getEpcType(risk) || undefined,
+                      utilizEPI: getEpiType(risk) || undefined,
+                      ...(isEPCImplemented && { eficEpc: isEPCEfficient ? YesNoEnum.YES : YesNoEnum.NO }),
+                      ...(isEPIImplemented && { eficEpi: isEPIEfficient ? YesNoEnum.YES : YesNoEnum.NO }),
+                      ...(isEPIImplemented && { epi: risk.riskData.epiToRiskFactorData.map((e) => ({ docAval: e?.epi?.ca || undefined })) }),
+                      ...(isEPIImplemented && {
+                        epiCompl: {
+                          condFuncto: isEPIEfficient ? YesNoEnum.YES : YesNoEnum.NO,
+                          higienizacao: isEPIEfficient ? YesNoEnum.YES : YesNoEnum.NO,
+                          medProtecao: isEPIEfficient ? YesNoEnum.YES : YesNoEnum.NO,
+                          periodicTroca: isEPIEfficient ? YesNoEnum.YES : YesNoEnum.NO,
+                          przValid: isEPIEfficient ? YesNoEnum.YES : YesNoEnum.NO,
+                          usoInint: isEPIEfficient ? YesNoEnum.YES : YesNoEnum.NO,
+                        },
+                      }),
+                    },
+                  }),
+                };
+              }),
             respReg: [
               {
                 cpfResp: responsible?.cpf,
