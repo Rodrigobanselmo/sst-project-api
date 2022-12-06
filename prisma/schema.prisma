@@ -878,7 +878,6 @@ model CompanyOS {
   created_at DateTime @default(now())
   updated_at  DateTime   @updatedAt
   status StatusEnum @default(ACTIVE)
-  socialName Json?
   med Json?
   rec Json?
   obligations Json?

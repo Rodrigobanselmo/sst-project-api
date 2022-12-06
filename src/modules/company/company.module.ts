@@ -141,6 +141,7 @@ import { FindOneCompanyOSService } from './services/os/find-os/find-os.service';
 import { UpsertCompanyOSService } from './services/os/upsert-os/upsert-os.service';
 import { CompanyOSController } from './controller/os/os.controller';
 import { DeleteCompanyOSService } from './services/os/delete-os/delete-os.service';
+import { CopyCompanyOSService } from './services/os/copy-os/copy-os.service';
 
 @Module({
   imports: [
@@ -292,6 +293,7 @@ import { DeleteCompanyOSService } from './services/os/delete-os/delete-os.servic
     FindOneCompanyOSService,
     DeleteCompanyOSService,
     UpsertCompanyOSService,
+    CopyCompanyOSService,
   ],
   exports: [
     CompanyRepository,

@@ -7,10 +7,9 @@ import { CompanyOSRepository } from './../../../repositories/implementations/Com
 export class FindOneCompanyOSService {
   constructor(private readonly companyOSRepository: CompanyOSRepository) {}
 
-  async execute(id: number, user: UserPayloadDto) {
+  async execute(user: UserPayloadDto) {
     const os = await this.companyOSRepository.findFirstNude({
       where: {
-        id,
         companyId: user.targetCompanyId,
       },
     });

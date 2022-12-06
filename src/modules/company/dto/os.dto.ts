@@ -45,3 +45,11 @@ export class CompanyOSDto {
   })
   status?: StatusEnum;
 }
+
+export class CopyCompanyOSDto {
+  @IsString()
+  companyId: string;
+
+  @IsString()
+  copyFromCompanyId: string;
+}
