@@ -752,9 +752,9 @@ class ESocialEventProvider {
               exame: exams.map((exam) => ({
                 dtExm: { ['_text']: this.convertDate(exam.dtExm) },
                 procRealizado: { ['_text']: exam.procRealizado },
-                ...(exam.ordExame && { ['_text']: exam.ordExame }),
-                ...(exam.obsProc && { ['_text']: exam.obsProc }),
-                ...(exam.indResult && { ['_text']: exam.indResult }),
+                ...(exam.ordExame && { ordExame: { ['_text']: exam.ordExame } }),
+                ...(exam.obsProc && { obsProc: { ['_text']: exam.obsProc } }),
+                ...(exam.indResult && { indResult: { ['_text']: exam.indResult } }),
               })),
               medico: {
                 nmMed: { ['_text']: asoDoctor.nmMed },
