@@ -806,7 +806,7 @@ class ESocialEventProvider {
               localAmb: { ['_text']: amb.localAmb },
               dscSetor: { ['_text']: amb.dscSetor },
               tpInsc: { ['_text']: TpInscEnum.CNPJ },
-              nrInsc: { ['_text']: amb.nrInsc },
+              nrInsc: { ['_text']: amb.nrInsc.slice(0, 8) },
             })),
             infoAtiv: {
               dscAtivDes: { ['_text']: dscAtivDes },
