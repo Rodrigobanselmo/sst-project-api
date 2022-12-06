@@ -942,7 +942,7 @@ class ESocialEventProvider {
           ['_text']: event.ideEmpregador.tpInsc || this.tpInsc,
         },
         nrInsc: {
-          ['_text']: event.ideEmpregador.nrInsc,
+          ['_text']: event.ideEmpregador.nrInsc.slice(0, 8),
         },
       },
       ...(event?.ideVinculo && {
@@ -984,7 +984,7 @@ class ESocialEventProvider {
               ['_text']: event.ideEmpregador.tpInsc || this.tpInsc,
             },
             nrInsc: {
-              ['_text']: event.ideEmpregador.nrInsc,
+              ['_text']: event.ideEmpregador.nrInsc.slice(0, 8),
             },
           },
           ideTransmissor: {
