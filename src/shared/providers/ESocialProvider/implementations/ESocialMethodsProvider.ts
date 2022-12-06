@@ -25,10 +25,11 @@ class ESocialGenerateId {
 
   public newId() {
     const data = dayjs().format('YYYYMMDDHHmmss');
-    const ID = `ID${this.type || 1}${this.cpfCnpj.padStart(14)}${data}${String(this.index).padStart(5, '0')}`;
+    const ID = `ID${this.type || 1}${this.cpfCnpj.slice(0, 8).padEnd(14, '0')}${data}${String(this.index).padStart(5, '0')}`;
+    const IDFull = `ID${this.type || 1}${this.cpfCnpj.padEnd(14, '0')}${data}${String(this.index).padStart(5, '0')}`;
 
     this.index++;
-    return ID;
+    return { id: ID, idFull: IDFull };
   }
 }
 

@@ -38,6 +38,7 @@ interface IIdOptions {
   type?: number;
   seqNum?: number;
   index?: number;
+  shortCNPJ?: boolean;
 }
 
 export declare namespace IESocial2220 {
@@ -50,6 +51,7 @@ export declare namespace IESocial2220 {
     examIds: number[];
     eventDate: Date;
     id: string;
+    idFull?: string;
   }
 
   export interface XmlReturn extends Omit<StructureReturn, 'event'> {
@@ -74,6 +76,7 @@ export declare namespace IESocial2240 {
     isExclude?: boolean;
     ppp?: EmployeePPPHistoryEntity;
     json?: any;
+    idFull?: string;
   }
 
   export interface XmlReturn extends Omit<StructureReturn, 'event'> {
@@ -100,6 +103,7 @@ export declare namespace IESocial3000 {
 
   export interface StructureReturn extends Event {
     id: string;
+    idFull?: string;
     event: IEvent3000Props;
   }
 

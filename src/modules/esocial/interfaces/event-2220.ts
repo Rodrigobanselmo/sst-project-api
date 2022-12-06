@@ -53,6 +53,7 @@ export const requiredObsProc = ['0583', '0998', '0999', '1128', '1230', '1992', 
 
 export interface IEvent2220Props extends IEventProps {
   id: string;
+  idFull?: string;
   exMedOcup: {
     tpExameOcup: EnumTpExameOcup;
     aso: {

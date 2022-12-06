@@ -383,7 +383,7 @@ class ESocialEventProvider {
       const eventsJs = examsWithAso.map<IESocial2220.StructureReturn>((exams) => {
         const aso = exams[exams.length - 1];
         const historyExams = [];
-        const id = generateId.newId();
+        const { id } = generateId.newId();
         const doctorResponsible = company?.doctorResponsible;
 
         const isDoctorAvailable = doctorResponsible && doctorResponsible?.name && doctorResponsible?.councilId && doctorResponsible?.councilUF;
@@ -520,7 +520,7 @@ class ESocialEventProvider {
         const responsible = snapshot.responsible;
         const environments = snapshot.environments;
         const date = snapshot.date;
-        const id = generateId.newId();
+        const { id } = generateId.newId();
 
         const eventRisk: IEvent2240Props['evtExpRisco'] = {
           infoExpRisco: {
@@ -695,7 +695,7 @@ class ESocialEventProvider {
     const generateId = this.eSocialMethodsProvider.classGenerateId(props.cnpj);
 
     const events = props.event.map((event) => {
-      const id = generateId.newId();
+      const { id } = generateId.newId();
       const eventExclude: IEvent3000Props = {
         id,
         infoExclusao: {
@@ -763,7 +763,7 @@ class ESocialEventProvider {
               },
             },
             respMonit: {
-              ...(respMonit.cpfResp && { cpfResp: { ['_text']: respMonit.cpfResp } }),
+              // ...(respMonit.cpfResp && { cpfResp: { ['_text']: respMonit.cpfResp } }),
               nmResp: { ['_text']: respMonit.nmResp },
               nrCRM: { ['_text']: respMonit.nrCRM },
               ufCRM: { ['_text']: respMonit.ufCRM },
@@ -812,7 +812,7 @@ class ESocialEventProvider {
               localAmb: { ['_text']: amb.localAmb },
               dscSetor: { ['_text']: amb.dscSetor },
               tpInsc: { ['_text']: TpInscEnum.CNPJ },
-              nrInsc: { ['_text']: amb.nrInsc.slice(0, 8) },
+              nrInsc: { ['_text']: amb.nrInsc },
             })),
             infoAtiv: {
               dscAtivDes: { ['_text']: dscAtivDes },
@@ -961,7 +961,7 @@ class ESocialEventProvider {
   }
 
   private generateBatchXML(events: (IESocial2220.XmlReturn | IESocial3000.XmlReturn | IESocial2240.XmlReturn)[], event: IBatchProps) {
-    const xmlEvents = events.map((event) => `<evento Id="${event.id}">${event.signedXml}</evento>`).join('');
+    const xmlEvents = events.map((event) => `<evento Id="${event?.idFull || event.id}">${event.signedXml}</evento>`).join('');
 
     const replaceText = 'xml_replace_data';
     const eventJs = {
@@ -1042,6 +1042,8 @@ class ESocialEventProvider {
           eventGroup: 2,
           ideEmpregador: { nrInsc: options.company?.cnpj },
         });
+
+        console.log(batchXML);
 
         const client = tpAmb == TpAmbEnum.PROD ? this.clientProduction : this.clientRestrict;
 
@@ -1190,7 +1192,7 @@ class ESocialEventProvider {
               return {
                 employeeId: event.employee.id,
                 eventXml: event.xml,
-                eventId: event.id,
+                eventId: event.idFull || event.id,
                 action,
                 ...('eventDate' in event && {
                   eventsDate: event?.eventDate,
