@@ -411,14 +411,20 @@ class ESocialEventProvider {
               ufCRM: asoDoctor?.councilUF,
             },
             exame: exams.map((exam) => {
-              let isSequential: boolean | null = null;
+              let isSequential: boolean | null = true;
+              // let isSequential: boolean | null = null;
               let obsProc: string | null = null;
               const esocial27Code = exam.exam?.esocial27Code;
-              if (requiredOrdExams.includes(esocial27Code)) {
-                isSequential =
-                  !!employee.examsHistory.filter((e) => e.status === 'DONE' && e?.exam?.esocial27Code === exam.exam.esocial27Code)[1] ||
-                  (examsWithAso.length === 1 && aso.examType !== ExamHistoryTypeEnum.ADMI);
-              }
+
+              // if (requiredOrdExams.includes(esocial27Code)) {
+              //   isSequential =
+              //     !!employee.examsHistory.filter((e) => e.status === 'DONE' && e?.exam?.esocial27Code === exam.exam.esocial27Code)[1] ||
+              //     (examsWithAso.length === 1 && aso.examType !== ExamHistoryTypeEnum.ADMI);
+              // }
+
+              if (aso.examType == ExamHistoryTypeEnum.ADMI) isSequential = false;
+              if (aso.examType == ExamHistoryTypeEnum.OFFI) isSequential = false;
+              if (aso.examType == ExamHistoryTypeEnum.RETU) isSequential = false;
 
               if (requiredObsProc.includes(esocial27Code)) {
                 obsProc = exam.exam?.obsProc;
@@ -757,7 +763,7 @@ class ESocialEventProvider {
               },
             },
             respMonit: {
-              // cpfResp: { ['_text']: respMonit.cpfResp },
+              ...(respMonit.cpfResp && { cpfResp: { ['_text']: respMonit.cpfResp } }),
               nmResp: { ['_text']: respMonit.nmResp },
               nrCRM: { ['_text']: respMonit.nrCRM },
               ufCRM: { ['_text']: respMonit.ufCRM },
