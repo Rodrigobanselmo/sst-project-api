@@ -877,7 +877,7 @@ class ESocialEventProvider {
   }
 
   generateXmlEvent3000(event: IEvent3000Props, options?: { declarations?: boolean }) {
-    const baseEvent = this.generateEventBase(event);
+    const baseEvent = this.generateEventBase(event, { isExclude: true });
     const infoExclusao = event?.infoExclusao;
 
     const eventJs = {
@@ -914,18 +914,21 @@ class ESocialEventProvider {
     return xml;
   }
 
-  private generateEventBase(event: IEventProps) {
+  private generateEventBase(event: IEventProps, options?: { isExclude?: boolean }) {
     const eventJs = {
       ...(event?.ideEvento && {
         ideEvento: {
-          indRetif: {
-            ['_text']: event.ideEvento.indRetif || this.indRetif,
-          },
-          ...(event.ideEvento.nrRecibo && {
-            nrRecibo: {
-              ['_text']: event.ideEvento.nrRecibo,
+          ...(!options?.isExclude && {
+            indRetif: {
+              ['_text']: event.ideEvento.indRetif || this.indRetif,
             },
           }),
+          ...(!options?.isExclude &&
+            event.ideEvento.nrRecibo && {
+              nrRecibo: {
+                ['_text']: event.ideEvento.nrRecibo,
+              },
+            }),
           tpAmb: {
             ['_text']: event.ideEvento.tpAmb || this.tpAmb,
           },
