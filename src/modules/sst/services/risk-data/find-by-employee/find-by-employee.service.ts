@@ -23,7 +23,16 @@ export class FindAllRiskDataByEmployeeService {
   async getRiskData(
     employeeId: number,
     companyId?: string,
-    options?: { fromExam?: boolean; filterDate?: boolean; hierarchyData?: boolean; selectEpi?: boolean; selectAdm?: boolean; selectEpc?: boolean },
+    options?: {
+      fromExam?: boolean;
+      filterDate?: boolean;
+      hierarchyData?: boolean;
+      selectEpi?: boolean;
+      selectAdm?: boolean;
+      selectEpc?: boolean;
+      desc?: boolean;
+      selectFont?: boolean;
+    },
   ) {
     const employee = await this.employeeRepository.findFirstNude({
       where: { id: employeeId, ...(companyId && { companyId }) },
@@ -40,6 +49,7 @@ export class FindAllRiskDataByEmployeeService {
             hierarchy: {
               select: {
                 id: true,
+                ...(options?.desc && { description: true }),
                 ...(options?.hierarchyData && { type: true, name: true }),
                 parent: {
                   select: {
@@ -148,6 +158,7 @@ export class FindAllRiskDataByEmployeeService {
       selectAdm: options?.selectAdm,
       selectEpc: options?.selectEpc,
       selectEpi: options?.selectEpi,
+      selectFont: options?.selectFont,
     });
 
     const riskDataReturn: RiskFactorDataEntity[] = [];

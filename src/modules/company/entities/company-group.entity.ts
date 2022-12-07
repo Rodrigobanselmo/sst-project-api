@@ -5,6 +5,7 @@ import { CompanyGroup } from '.prisma/client';
 import { ProfessionalCouncil } from '@prisma/client';
 import { CompanyEntity } from './company.entity';
 import { CompanyCertEntity } from '../../../modules/esocial/entities/companyCert.entity';
+import { CompanyOSEntity } from './os.entity';
 
 export class CompanyGroupEntity implements CompanyGroup {
   @ApiProperty({ description: 'The id of the CompanyGroups' })
@@ -26,6 +27,7 @@ export class CompanyGroupEntity implements CompanyGroup {
   company?: Partial<CompanyEntity>;
   cert?: CompanyCertEntity;
   companyGroup?: Partial<CompanyEntity>;
+  os?: CompanyOSEntity;
 
   constructor(partial: Partial<CompanyGroupEntity>) {
     Object.assign(this, partial);
@@ -33,6 +35,8 @@ export class CompanyGroupEntity implements CompanyGroup {
     if (this.companyGroup) {
       this.companyGroup = new CompanyEntity(this.companyGroup);
       this.ambResponsible = this.companyGroup?.ambResponsible;
+      this.cert = this.companyGroup?.cert;
+      this.os = this.companyGroup?.os;
     }
 
     if (this.company) {

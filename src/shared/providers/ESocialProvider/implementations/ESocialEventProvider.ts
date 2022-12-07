@@ -921,6 +921,11 @@ class ESocialEventProvider {
           indRetif: {
             ['_text']: event.ideEvento.indRetif || this.indRetif,
           },
+          ...(event.ideEvento.nrRecibo && {
+            nrRecibo: {
+              ['_text']: event.ideEvento.nrRecibo,
+            },
+          }),
           tpAmb: {
             ['_text']: event.ideEvento.tpAmb || this.tpAmb,
           },
@@ -930,11 +935,6 @@ class ESocialEventProvider {
           verProc: {
             ['_text']: this.verProc,
           },
-          ...(event.ideEvento.nrRecibo && {
-            nrRecibo: {
-              ['_text']: event.ideEvento.nrRecibo,
-            },
-          }),
         },
       }),
       ideEmpregador: {
@@ -1042,8 +1042,6 @@ class ESocialEventProvider {
           eventGroup: 2,
           ideEmpregador: { nrInsc: options.company?.cnpj },
         });
-
-        console.log(batchXML);
 
         const client = tpAmb == TpAmbEnum.PROD ? this.clientProduction : this.clientRestrict;
 

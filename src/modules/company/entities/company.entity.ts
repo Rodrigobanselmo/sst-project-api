@@ -167,6 +167,8 @@ export class CompanyEntity implements Company {
     }
 
     if (this.group) {
+      this.group = new CompanyGroupEntity(this.group);
+
       if (!this.doctorResponsible) this.doctorResponsible = this.group?.doctorResponsible;
       if (!this.doctorResponsibleId) this.doctorResponsibleId = this.group?.doctorResponsibleId;
 
@@ -174,8 +176,11 @@ export class CompanyEntity implements Company {
       if (!this.tecResponsibleId) this.tecResponsibleId = this.group?.tecResponsibleId;
 
       if (!this.ambResponsible) this.ambResponsible = this.group?.ambResponsible;
+      if (!this.cert) this.cert = this.group?.cert;
+      if (!this.os) this.os = this.group?.os;
       if (!this.esocialStart) this.esocialStart = this.group?.esocialStart;
       if (!this.numAsos) this.numAsos = this.group?.numAsos;
+      if (!this.blockResignationExam) this.blockResignationExam = this.group?.blockResignationExam;
       if (!this.blockResignationExam) this.blockResignationExam = this.group?.blockResignationExam;
     }
 

@@ -59,7 +59,7 @@ export class UpdateAllCompaniesService {
               include: { professional: { select: { name: true } } },
             },
             esocialStart: true,
-            company: { select: { cert: true } },
+            companyGroup: { select: { cert: true } },
           },
         },
         applyingServiceContracts: {

@@ -1,3 +1,4 @@
+import { GenerateSourceEntity } from './../../../../../sst/entities/generateSource.entity';
 import { RecMedEntity } from './../../../../../sst/entities/recMed.entity';
 import { EpiRiskDataEntity } from './../../../../../sst/entities/epiRiskData.entity';
 import { ProtocolToRiskEntity } from '../../../../../sst/entities/protocol.entity';
@@ -20,6 +21,7 @@ export interface IPdfOSData {
   epis: EpiRiskDataEntity[];
   epcs: EngsRiskDataEntity[];
   adms: RecMedEntity[];
+  font: Record<string, GenerateSourceEntity[]>;
   sector: HierarchyEntity;
   risks: {
     riskData: RiskFactorDataEntity;

@@ -8,6 +8,7 @@ import { Permissions } from '../../../shared/decorators/permissions.decorator';
 import { PdfKitDataService } from '../services/pdf/kit/kit-data.service';
 import { PdfProntuarioDataService } from '../services/pdf/prontuario/prontuario-data.service';
 import { PdfAsoDataService } from '../services/pdf/aso/aso-data.service';
+import { PdfOsDataService } from '../services/pdf/os/os-data.service';
 @Controller('documents/pdf')
 export class DocumentsPdfController {
   constructor(
@@ -15,6 +16,7 @@ export class DocumentsPdfController {
     private readonly pdfKitDataService: PdfKitDataService,
     private readonly pdfAsoDataService: PdfAsoDataService,
     private readonly pdfProntuarioDataService: PdfProntuarioDataService,
+    private readonly pdfOsDataService: PdfOsDataService,
   ) {}
 
   @Permissions(
@@ -83,5 +85,15 @@ export class DocumentsPdfController {
   @Get('kit/:employeeId/:companyId/:asoId?')
   async kit(@User() userPayloadDto: UserPayloadDto, @Param('employeeId', ParseIntPipe) employeeId: number, @Param('asoId') asoId: number) {
     return this.pdfKitDataService.execute(employeeId, userPayloadDto, asoId ? Number(asoId) : asoId);
+  }
+
+  @Permissions({
+    code: PermissionEnum.COMPANY,
+    isMember: true,
+    isContract: true,
+  })
+  @Get('os/:employeeId/:companyId')
+  async os(@User() userPayloadDto: UserPayloadDto, @Param('employeeId', ParseIntPipe) employeeId: number) {
+    return this.pdfOsDataService.execute(employeeId, userPayloadDto);
   }
 }

@@ -48,6 +48,10 @@ export declare namespace IEsocialFetchBatch {
             versaoAppProcessamento: string;
             dhProcessamento: Date;
           };
+          recibo?: {
+            nrRecibo?: string;
+            hash?: string;
+          };
         };
       };
     };

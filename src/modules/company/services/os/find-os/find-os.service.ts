@@ -1,20 +1,24 @@
 import { Injectable } from '@nestjs/common';
+import { CompanyRepository } from '../../../../../modules/company/repositories/implementations/CompanyRepository';
 
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { CompanyOSRepository } from './../../../repositories/implementations/CompanyOSRepository';
 
 @Injectable()
 export class FindOneCompanyOSService {
-  constructor(private readonly companyOSRepository: CompanyOSRepository) {}
+  constructor(private readonly companyOSRepository: CompanyOSRepository, private readonly companyRepository: CompanyRepository) {}
 
   async execute(user: UserPayloadDto) {
-    const os = await this.companyOSRepository.findFirstNude({
+    const company = await this.companyRepository.findFirstNude({
       where: {
-        companyId: user.targetCompanyId,
+        id: user.targetCompanyId,
       },
+      select: { os: true, group: { select: { companyGroup: { select: { os: true } } } } },
     });
 
-    if (!os.id) {
+    const os = company?.os || company?.group?.os;
+
+    if (!os?.id) {
       const osConsultant = await this.companyOSRepository.findFirstNude({
         where: {
           company: {

@@ -1,3 +1,5 @@
+import { isNaEpi, isNaRecMed } from './../../../../../shared/utils/isNa';
+import { GenerateSourceEntity } from './../../../../sst/entities/generateSource.entity';
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { EngsRiskDataEntity } from 'src/modules/sst/entities/engsRiskData.entity';
 import { RecMedEntity } from 'src/modules/sst/entities/recMed.entity';
@@ -41,15 +43,18 @@ export class PdfOsDataService {
         companyId: true,
         name: true,
         cpf: true,
-        birthday: true,
-        sex: true,
+        esocialCode: true,
+        // birthday: true,
+        // sex: true,
         company: {
           select: {
             name: true,
             initials: true,
             logoUrl: true,
+            fantasy: true,
             os: true,
             cnpj: true,
+            group: { select: { companyGroup: { select: { os: true } } } },
             receivingServiceContracts: {
               select: {
                 applyingServiceCompany: {
@@ -86,6 +91,8 @@ export class PdfOsDataService {
       selectAdm: true,
       selectEpi: true,
       selectEpc: true,
+      selectFont: true,
+      desc: true,
     });
 
     const employee = { ...employeeRisk, ...employeeFound };
@@ -119,6 +126,7 @@ export class PdfOsDataService {
     const epis: EpiRiskDataEntity[] = [];
     const epcs: EngsRiskDataEntity[] = [];
     const adms: RecMedEntity[] = [];
+    const font: Record<string, GenerateSourceEntity[]> = {};
 
     //! should get all riskData epis and exams on other aso?
     osRisk?.forEach((data) => {
@@ -136,13 +144,21 @@ export class PdfOsDataService {
           rd.adms.forEach((e) => {
             adms.push(e);
           });
+
+          if (!font[rd.riskId]) font[rd.riskId] = [];
+          font[rd.riskId].push(...rd.generateSources);
         });
     });
 
+    Object.keys(font).forEach((key) => {
+      font[key] = removeDuplicate(font[key], { removeById: 'id' });
+    });
+
     return {
-      epis: removeDuplicate(epis, { removeById: 'epiId' }),
-      epcs: removeDuplicate(epcs, { removeById: 'recMedId' }),
-      adms: removeDuplicate(adms, { removeById: 'id' }),
+      epis: removeDuplicate(epis, { removeById: 'epiId' }).filter((e) => !isNaEpi(e.epi.ca)),
+      epcs: removeDuplicate(epcs, { removeById: 'recMedId' }).filter((e) => !isNaRecMed(e.recMed.medName)),
+      adms: removeDuplicate(adms, { removeById: 'id' }).filter((e) => !isNaRecMed(e.medName)),
+      font,
     };
   }
 

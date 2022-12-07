@@ -76,6 +76,8 @@ export class FetchESocialBatchEventsService {
                     const event = eventResponse?.retornoEvento?.eSocial?.retornoEvento;
 
                     const process = event?.processamento;
+                    const recepcao = event?.recepcao;
+                    const recibo = event?.recibo;
                     const inProgress = process?.cdResposta == '101';
 
                     if (inProgress) {
@@ -95,8 +97,9 @@ export class FetchESocialBatchEventsService {
                     await this.eSocialEventRepository.updateNude({
                       where: { id: found.id },
                       data: {
+                        receipt: recibo?.nrRecibo,
                         status: rejectedEvent ? 'INVALID' : 'DONE',
-                        response: process as any,
+                        response: { process, recepcao, recibo } as any,
                         ...(found.examHistoryId && {
                           exam: { update: { sendEvent: rejectedEvent } },
                         }),

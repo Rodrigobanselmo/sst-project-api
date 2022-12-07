@@ -149,7 +149,7 @@ class ESocialMethodsProvider implements IESocialEventProvider {
             }),
             esocialStart: true,
             ...(!!options?.cert && {
-              company: { select: { cert: true } },
+              companyGroup: { select: { cert: true } },
             }),
             esocialSend: true,
             ...groupSpreed.select,

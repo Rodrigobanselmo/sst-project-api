@@ -2,7 +2,7 @@ import { FetchESocialBatchEventsService } from './../../../services/events/all/f
 import { FindESocialBatchDto } from './../../../dto/esocial-batch.dto';
 import { FindESocialEventService } from './../../../services/events/all/find-events/find-events.service';
 import { FindESocialEventDto } from './../../../dto/esocial-event.dto';
-import { Body, Controller, Get, Post, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -14,6 +14,7 @@ import { AddCertDto } from '../../../dto/add-cert.dto';
 import { AddCertificationESocialService } from '../../../services/events/all/add-certificate/add-certificate.service';
 import { SendBatchESocialService } from '../../../services/events/all/send-batch/send-batch.service';
 import { FindESocialBatchService } from '../../../../../modules/esocial/services/events/all/find-batch/find-batch.service';
+import { FetchOneESocialBatchEventsService } from '../../../../../modules/esocial/services/events/all/fetch-one-batch-event/fetch-one-batch-event.service';
 
 @ApiTags('events')
 @Controller('esocial/events/all')
@@ -24,6 +25,7 @@ export class ESocialEventController {
     private readonly findESocialEventService: FindESocialEventService,
     private readonly findESocialBatchService: FindESocialBatchService,
     private readonly fetchESocialBatchEventsService: FetchESocialBatchEventsService,
+    private readonly fetchOneESocialBatchEventsService: FetchOneESocialBatchEventsService,
   ) {}
 
   @Post('certificate')
@@ -42,6 +44,12 @@ export class ESocialEventController {
   @Post('fetch-batch')
   fetch() {
     return this.fetchESocialBatchEventsService.execute();
+  }
+
+  @Public()
+  @Post('fetch-batch/:protoId')
+  fetchOne(@Param('protoId') protoId: string) {
+    return this.fetchOneESocialBatchEventsService.execute(protoId);
   }
 
   @Get('events/:companyId?')
