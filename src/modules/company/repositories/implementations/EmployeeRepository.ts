@@ -332,7 +332,12 @@ export class EmployeeRepository {
                   AND: [
                     {
                       events: {
-                        every: { id: { gt: 0 }, action: { not: 'EXCLUDE' }, status: 'DONE' },
+                        every: {
+                          OR: [
+                            { id: { gt: 0 }, action: { not: 'EXCLUDE' } },
+                            { id: { gt: 0 }, action: 'EXCLUDE', status: { in: ['INVALID', 'ERROR'] } },
+                          ],
+                        },
                       },
                     },
                     {
@@ -369,7 +374,12 @@ export class EmployeeRepository {
               AND: [
                 {
                   events: {
-                    every: { id: { gt: 0 }, action: { not: 'EXCLUDE' } },
+                    every: {
+                      OR: [
+                        { id: { gt: 0 }, action: { not: 'EXCLUDE' } },
+                        { id: { gt: 0 }, action: 'EXCLUDE', status: { in: ['INVALID', 'ERROR'] } },
+                      ],
+                    },
                   },
                 },
                 {
