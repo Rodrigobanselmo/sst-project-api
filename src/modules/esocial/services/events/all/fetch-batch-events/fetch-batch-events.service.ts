@@ -105,7 +105,7 @@ export class FetchESocialBatchEventsService {
                         }),
                         ...(rejectedEvent &&
                           found.pppId && {
-                            ppp: { update: { sendEvent: true, status: 'INVALID', json: null } },
+                            ppp: { update: { sendEvent: true, status: 'INVALID', json: '' } },
                           }),
                         ...(!rejectedEvent &&
                           found.pppId && {

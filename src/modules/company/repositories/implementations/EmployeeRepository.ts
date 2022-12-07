@@ -332,7 +332,7 @@ export class EmployeeRepository {
                   AND: [
                     {
                       events: {
-                        every: { id: { gt: 0 }, action: { not: 'EXCLUDE' } },
+                        every: { id: { gt: 0 }, action: { not: 'EXCLUDE' }, status: 'DONE' },
                       },
                     },
                     {
