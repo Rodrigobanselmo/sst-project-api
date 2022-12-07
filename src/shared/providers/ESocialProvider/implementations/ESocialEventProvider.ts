@@ -899,7 +899,7 @@ class ESocialEventProvider {
           },
           ...baseEvent,
           infoExclusao: {
-            tpExameOcup: { ['_text']: infoExclusao?.tpEvento },
+            tpEvento: { ['_text']: infoExclusao?.tpEvento },
             nrRecEvt: { ['_text']: infoExclusao?.nrRecEvt },
             ideTrabalhador: {
               cpfTrab: { ['_text']: infoExclusao.ideTrabalhador?.cpfTrab },
