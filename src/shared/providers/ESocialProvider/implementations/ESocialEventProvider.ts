@@ -487,6 +487,7 @@ class ESocialEventProvider {
   convertToEvent2240Struct(props: IESocial2240.StructureEntry, options?: { ideEvento?: IEventProps['ideEvento'] }) {
     const company = props.company;
     const employeesData = props.employees;
+    const startDate = props.esocialStartDate;
     const generateId = this.eSocialMethodsProvider.classGenerateId(company.cnpj);
     const eventsStruct = employeesData.reduce<IESocial2240.StructureReturn[]>((acc, employee) => {
       const getEpcType = (risk: IPriorRiskData) => {
@@ -519,7 +520,7 @@ class ESocialEventProvider {
         const risks = snapshot.risks;
         const responsible = snapshot.responsible;
         const environments = snapshot.environments;
-        const date = snapshot.date;
+        const date = snapshot.date > startDate ? snapshot.date : startDate;
         const { id } = generateId.newId();
 
         const eventRisk: IEvent2240Props['evtExpRisco'] = {
@@ -847,12 +848,12 @@ class ESocialEventProvider {
                     ...(isEPIImplemented && { epi: epcEpi?.epi.map((e) => ({ docAval: { ['_text']: e.docAval } })) }),
                     ...(isEPIImplemented && {
                       epiCompl: {
-                        condFuncto: { ['_text']: epcEpi.epiCompl.condFuncto },
-                        higienizacao: { ['_text']: epcEpi.epiCompl.higienizacao },
                         medProtecao: { ['_text']: epcEpi.epiCompl.medProtecao },
-                        periodicTroca: { ['_text']: epcEpi.epiCompl.periodicTroca },
-                        przValid: { ['_text']: epcEpi.epiCompl.przValid },
+                        condFuncto: { ['_text']: epcEpi.epiCompl.condFuncto },
                         usoInint: { ['_text']: epcEpi.epiCompl.usoInint },
+                        przValid: { ['_text']: epcEpi.epiCompl.przValid },
+                        periodicTroca: { ['_text']: epcEpi.epiCompl.periodicTroca },
+                        higienizacao: { ['_text']: epcEpi.epiCompl.higienizacao },
                       },
                     }),
                   },

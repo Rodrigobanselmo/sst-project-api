@@ -63,6 +63,7 @@ export declare namespace IESocial2220 {
 export declare namespace IESocial2240 {
   export interface StructureEntry {
     company: CompanyEntity;
+    esocialStartDate: Date;
     employees: IEmployee2240Data[];
   }
 

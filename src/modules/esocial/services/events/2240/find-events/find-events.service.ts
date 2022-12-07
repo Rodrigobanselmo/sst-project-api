@@ -56,7 +56,7 @@ export class FindEvents2240ESocialService {
 
     const employees2240 = await this.findEmployee2240(company);
 
-    const eventsStruct = this.eSocialEventProvider.convertToEvent2240Struct({ company, employees: employees2240 });
+    const eventsStruct = this.eSocialEventProvider.convertToEvent2240Struct({ company, esocialStartDate: startDate, employees: employees2240 });
 
     // update when is same as before
     {

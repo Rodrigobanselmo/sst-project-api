@@ -47,7 +47,7 @@ export class SendEvents2240ESocialService {
 
     const employees2240 = await this.findEvents2240ESocialService.findEmployee2240(company);
 
-    const eventsStruct = this.eSocialEventProvider.convertToEvent2240Struct({ company, employees: employees2240 });
+    const eventsStruct = this.eSocialEventProvider.convertToEvent2240Struct({ company, esocialStartDate: startDate, employees: employees2240 });
 
     // prepare event to exclude from eSocial
     const excludeEvents = eventsStruct.filter((e) => e.isExclude && e.receipt);
