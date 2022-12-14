@@ -9,6 +9,12 @@ export class FindAllAvailableRiskService {
   async execute(userPayloadDto: UserPayloadDto) {
     const ChecklistFactor = await this.riskRepository.findAllAvailable(userPayloadDto.companyId);
 
-    return ChecklistFactor;
+    return ChecklistFactor.map((risk) => {
+      Object.entries(risk).forEach(([key, value]) => {
+        if (value == '' || value == null) delete risk[key];
+      });
+
+      return risk;
+    });
   }
 }

@@ -113,7 +113,7 @@ class ESocialMethodsProvider implements IESocialEventProvider {
   }
 
   public async getCompany(companyId: string, options?: ICompanyOptions) {
-    const groupSpreed = options.select?.group && typeof options.select?.group !== 'boolean' ? options.select?.group : {};
+    const groupSpreed = options?.select?.group && typeof options.select?.group !== 'boolean' ? options.select?.group : {};
     const company = await this.companyRepository.findFirstNude({
       where: { id: companyId },
       select: {
@@ -139,7 +139,7 @@ class ESocialMethodsProvider implements IESocialEventProvider {
             },
           },
         }),
-        ...options.select,
+        ...options?.select,
         group: {
           select: {
             ...(!!options?.doctor && {
@@ -152,7 +152,7 @@ class ESocialMethodsProvider implements IESocialEventProvider {
               companyGroup: { select: { cert: true } },
             }),
             esocialSend: true,
-            ...groupSpreed.select,
+            ...groupSpreed?.select,
           },
         },
       },

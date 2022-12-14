@@ -1,3 +1,4 @@
+import { CatRepository } from './../../../repositories/implementations/CatRepository';
 import { Injectable } from '@nestjs/common';
 
 import { ESocialEventProvider } from '../../../../../shared/providers/ESocialProvider/implementations/ESocialEventProvider';
@@ -14,6 +15,7 @@ export class UpdateESocialReportService {
     private readonly companyRepository: CompanyRepository,
     private readonly eSocialEventProvider: ESocialEventProvider,
     private readonly companyReportRepository: CompanyReportRepository,
+    private readonly catRepository: CatRepository,
   ) {}
 
   async execute({ companyId }: { companyId: string }) {
@@ -69,6 +71,10 @@ export class UpdateESocialReportService {
     });
 
     esocial.S2240.pending = employees2240;
+
+    const employees2210 = await this.catRepository.countEvent2210();
+
+    esocial.S2210.pending = employees2210;
 
     return esocial;
   }

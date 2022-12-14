@@ -34,11 +34,12 @@ async function main() {
     // await deleteProfessionalsConnections(prisma); //? DONE
     // await addProfCOuncilNUll(prisma); //*? DONE
 
-    //*next
-    await seedEsocial24(prisma);
+    // await seedEsocial24(prisma);
     // await cid10Table(prisma);
     // await addEsocialTables(prisma);
     // await motiveTables(prisma);
+
+    //*next
 
     // const group = await prisma.employeeESocialEvent.groupBy({
     //   by: ['status'],

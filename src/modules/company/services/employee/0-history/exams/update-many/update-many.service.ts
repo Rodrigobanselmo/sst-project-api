@@ -1,3 +1,4 @@
+import { CheckEmployeeExamService } from './../../../../../../sst/services/exam/check-employee-exam/check-employee-exam.service';
 import { checkExamFields, compareFieldValues } from './../../../../../../../shared/utils/compareFieldValues';
 import { MessageEnum } from './../../../../../../../shared/constants/enum/message.enum';
 import { MessageNotificationDto } from './../../../../../../notifications/dto/nofication.dto';
@@ -22,6 +23,7 @@ export class UpdateManyScheduleExamHistoryService {
     private readonly createEmployeeHierarchyHistoryService: CreateEmployeeHierarchyHistoryService,
     private readonly dayJSProvider: DayJSProvider,
     private readonly notificationRepository: NotificationRepository,
+    private readonly checkEmployeeExamService: CheckEmployeeExamService,
   ) {}
 
   async execute({ data, isClinic, ...dataDto }: UpdateManyScheduleExamDto, user: UserPayloadDto) {
@@ -85,6 +87,10 @@ export class UpdateManyScheduleExamHistoryService {
     } catch (err) {
       console.error(err);
     }
+
+    this.checkEmployeeExamService.execute({
+      employeeId: employeeId,
+    });
 
     return history;
   }

@@ -17,6 +17,8 @@ export interface IEsocialSendBatchResponse {
 
 export enum IdeOCEnum {
   CRM = 1,
+  CRO = 2,
+  RMS = 3,
   CREA = 4,
   OTHER = 9,
 }
@@ -78,3 +80,15 @@ export declare namespace IEsocialFetchBatch {
     };
   }
 }
+
+export const checkTime = (time: string, limitHours: number) => {
+  if (!time) return { valid: false, message: 'informar valor de hora' };
+  const [h, m] = time.split(':');
+
+  if (!h || !m) return { valid: false, message: 'Formato de hora inválido' };
+
+  if (Number(h) >= limitHours) return { valid: false, message: `Hora não pode ser maior que ${limitHours} horas` };
+  if (Number(m) >= 59) return { valid: false, message: `Formato de hora inválido` };
+
+  return { valid: true, message: '' };
+};

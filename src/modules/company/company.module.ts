@@ -309,6 +309,7 @@ import { CopyCompanyOSService } from './services/os/copy-os/copy-os.service';
     CompanyReportRepository,
     UpdateESocialReportService,
     EmployeePPPHistoryRepository,
+    CatRepository,
   ],
 })
 export class CompanyModule {}

@@ -162,9 +162,11 @@ export class CreateCatDto {
   @IsOptional()
   houveAfast?: boolean;
 
+  @IsOptional()
   @IsBoolean()
   isIndInternacao: boolean;
 
+  @IsOptional()
   @IsBoolean()
   isIndAfast: boolean;
 

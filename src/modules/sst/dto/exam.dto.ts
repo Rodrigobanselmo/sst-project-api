@@ -1,7 +1,7 @@
 import { QueryArray } from '../../../shared/transformers/query-array';
 import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
 import { PartialType } from '@nestjs/swagger';
-import { ExamTypeEnum, StatusEnum } from '@prisma/client';
+import { ExamTypeEnum, StatusEnum, HomogeneousGroup } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import { IsBoolean, IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
 
@@ -60,6 +60,17 @@ export class CreateExamDto {
 
 export class UpdateExamDto extends PartialType(CreateExamDto) {}
 
+export class CheckEmployeeExamDto {
+  homogeneousGroupId?: string;
+
+  hierarchyId?: string;
+
+  employeeId?: number;
+
+  companyId?: string;
+  riskId?: string;
+}
+
 export class UpsertExamDto extends CreateExamDto {
   @IsInt()
   @IsOptional()
@@ -105,6 +116,10 @@ export class FindExamHierarchyDto {
   @IsBoolean()
   @IsOptional()
   onlyAttendance?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  skipNewExams?: boolean;
 
   @IsBoolean()
   @IsOptional()

@@ -98,6 +98,14 @@ export class ExamRiskRepository {
     return dataUpsert.map((risk) => new ExamRiskEntity(risk));
   }
 
+  async findFirstNude(options: Prisma.ExamToRiskFindFirstArgs = {}) {
+    const exam = await this.prisma.examToRisk.findFirst({
+      ...options,
+    });
+
+    return new ExamRiskEntity(exam);
+  }
+
   async findNude(options: Prisma.ExamToRiskFindManyArgs = {}): Promise<ExamRiskEntity[]> {
     const exams = await this.prisma.examToRisk.findMany(options);
 

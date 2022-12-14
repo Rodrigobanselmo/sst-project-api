@@ -1,3 +1,6 @@
+import { onlyNumbers } from '@brazilian-utils/brazilian-utils';
+import { isAskCompany, isCountryRequired, isLocalEmpty, isOriginCat, isShowOriginCat, isTypeReopen } from './../../../../modules/esocial/interfaces/event-2210';
+import { CatEntity } from './../../../../modules/company/entities/cat.entity';
 import { sortData } from './../../../utils/sorts/data.sort';
 import { Inject, Injectable } from '@nestjs/common';
 import { EmployeeESocialEventActionEnum, ExamHistoryTypeEnum, Prisma, StatusEnum } from '@prisma/client';
@@ -13,12 +16,12 @@ import { IEventProps, ProcEmiEnum, TpIncsEnum } from '../../../../modules/esocia
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { arrayChunks } from '../../../../shared/utils/arrayChunks';
 import { DayJSProvider } from '../../DateProvider/implementations/DayJSProvider';
-import { IBatchDatabaseSave, IESocial2220, IESocial2240, IESocial3000, IESocialSendEventOptions } from '../models/IESocialMethodProvider';
+import { IBatchDatabaseSave, IESocial2220, IESocial2240, IESocial2210, IESocial3000, IESocialSendEventOptions } from '../models/IESocialMethodProvider';
 import { CompanyEntity } from './../../../../modules/company/entities/company.entity';
 import { EmployeeExamsHistoryEntity } from './../../../../modules/company/entities/employee-exam-history.entity';
 import { CreateESocialEvent } from './../../../../modules/esocial/dto/esocial-batch.dto';
 import { EmployeeESocialBatchEntity } from './../../../../modules/esocial/entities/employeeEsocialBatch.entity';
-import { IdeOCEnum, IEsocialFetchBatch, IEsocialSendBatchResponse } from './../../../../modules/esocial/interfaces/esocial';
+import { checkTime, IdeOCEnum, IEsocialFetchBatch, IEsocialSendBatchResponse } from './../../../../modules/esocial/interfaces/esocial';
 import { mapTpEvent } from './../../../../modules/esocial/interfaces/event-3000';
 import { EventGroupEnum, IBatchProps, IndRetifEnum, TpAmbEnum } from './../../../../modules/esocial/interfaces/event-batch';
 import { ESocialBatchRepository } from './../../../../modules/esocial/repositories/implementations/ESocialBatchRepository';
@@ -39,6 +42,20 @@ import {
   YesNoEnum,
 } from './../../../../modules/esocial/interfaces/event-2240';
 import sortArray from 'sort-array';
+import {
+  IEvent2210Props,
+  isCepRequired,
+  isCityUfRequired,
+  isHrsWorked,
+  isIniciatCATList,
+  isLateralidadeList,
+  isTpAcidList,
+  isTpCatList,
+  isTpInscList,
+  isTpLocalList,
+  isWithDeath,
+  mapResIdeOC,
+} from '../../../../modules/esocial/interfaces/event-2210';
 
 @Injectable()
 class ESocialEventProvider {
@@ -63,6 +80,241 @@ class ESocialEventProvider {
     private readonly dayJSProvider: DayJSProvider,
     private readonly eSocialMethodsProvider: ESocialMethodsProvider,
   ) {}
+
+  errorsEvent2210(event: IEvent2210Props) {
+    const cat = event.cat;
+    const local = event.cat.localAcidente;
+    const empresa = event.cat.localAcidente.ideLocalAcid;
+    const body = event.cat.parteAtingida;
+    const ideVinculo = event.ideVinculo;
+    const atestado = event.cat.atestado;
+    const emitente = event.cat.atestado.emitente;
+    const nrRecCatOrig = event.cat?.catOrigem?.nrRecCatOrig;
+
+    const errors: { message: string }[] = [];
+
+    {
+      if (!ideVinculo.cpfTrab) errors.push({ message: 'Informar "CPF" do empregado' });
+      if (!ideVinculo.matricula) errors.push({ message: 'Informar "matricula" do empregado' });
+    }
+
+    {
+      if (!emitente.nmEmit && !emitente.nrOC && !emitente.ideOC) {
+        errors.push({
+          message: 'Informar o médico emitente do atestado',
+        });
+      } else {
+        if (!emitente.ideOC || !mapResIdeOC[emitente.ideOC]) errors.push({ message: 'Tipo de conselho emitente do atestado inválido' });
+        if (!emitente.nmEmit) errors.push({ message: 'Informar "nome" do médico emitente do atestdo' });
+        if (!emitente.nrOC) errors.push({ message: 'Informar "número de inscrição" do emitente do atestdo' });
+      }
+    }
+
+    {
+      if (!cat.dtAcid)
+        errors.push({
+          message: 'Informar "data do acidente" (dtAcid)',
+        });
+
+      if (!cat.tpAcid)
+        errors.push({
+          message: 'Informar "tipo de acidente" (tpAcid)',
+        });
+
+      if (isHrsWorked(cat.tpAcid) && !cat.hrAcid)
+        errors.push({
+          message: 'Informar "hora d0 acidente" (hrAcid)',
+        });
+
+      if (isHrsWorked(cat.tpAcid) && !cat.hrsTrabAntesAcid)
+        errors.push({
+          message: 'Informar horas de trabalhadas antes da ocorrência do acidente (hrsTrabAntesAcid)',
+        });
+
+      if (isWithDeath(cat.tpAcid) && !cat.dtObito)
+        errors.push({
+          message: 'Informar data de obito (dtObito)',
+        });
+
+      if (!cat.codSitGeradora)
+        errors.push({
+          message: 'Informar "Iniciativa da CAT" (codSitGeradora)',
+        });
+
+      if (!cat.codSitGeradora)
+        errors.push({
+          message: 'Informar "Iniciativa da CAT" (codSitGeradora)',
+        });
+
+      if (!cat.iniciatCAT)
+        errors.push({
+          message: 'Informar "codigo da situação geradora" (iniciatCAT)',
+        });
+
+      if (!cat.ultDiaTrab)
+        errors.push({
+          message: 'Informar "codigo da situação geradora" (iniciatCAT)',
+        });
+    }
+
+    {
+      if (!local.tpLocal)
+        errors.push({
+          message: 'Informar "tipo de local" (tpLocal)',
+        });
+
+      if (!local.dscLograd)
+        errors.push({
+          message: 'Informar "descrição do logradouro" (dscLograd)',
+        });
+
+      const isCep = isCepRequired(local.tpLocal);
+      const isCityUf = isCityUfRequired(local.tpLocal);
+      const isCountry = isCountryRequired(local.tpLocal);
+
+      if (isCep && !local.cep)
+        errors.push({
+          message: 'Informar "cep" do local do acidente',
+        });
+
+      if (isCep && local.cep && onlyNumbers(local.cep).length != 8)
+        errors.push({
+          message: 'Cep informado inválido (local.cep)',
+        });
+
+      if (isCityUf && !local.codMunic)
+        errors.push({
+          message: 'Informar "código de município" do local do acidente (codMunic)',
+        });
+
+      if (isCityUf && !local.uf)
+        errors.push({
+          message: 'Informar "uf" do local do acidente (uf)',
+        });
+
+      if (isCountry && !local.pais)
+        errors.push({
+          message: 'Informar "pais" do local do acidente',
+        });
+
+      if (isCountry && !local.codPostal)
+        errors.push({
+          message: 'Informar "código postal" do local do acidente (codPostal)',
+        });
+    }
+
+    {
+      const isCompany = isAskCompany(cat.tpCat);
+
+      if (isCompany && !empresa.tpInsc)
+        errors.push({
+          message: 'Informar "tipo de empresa" do local do acidente (tpInsc)',
+        });
+
+      if (isCompany && !empresa.nrInsc)
+        errors.push({
+          message: 'Informar "CNPJ/CAEPF/CNO" do local do acidente (nrInsc)',
+        });
+    }
+
+    {
+      if (!body.codParteAting)
+        errors.push({
+          message: 'Informar "parte atingida" do empregado (codParteAting)',
+        });
+
+      if (typeof body.lateralidade != 'number')
+        errors.push({
+          message: 'Informar "lateralidade" atingida no empregado (lateralidade)',
+        });
+
+      if (!cat.agenteCausador?.codAgntCausador)
+        errors.push({
+          message: 'Informar "agente causador" (codAgntCausador)',
+        });
+    }
+
+    {
+      if (!atestado.dtAtendimento)
+        errors.push({
+          message: 'Informar "data atendimento" do atestado (dtAtendimento)',
+        });
+
+      if (!atestado.hrAtendimento)
+        errors.push({
+          message: 'Informar "hora de atendimento" do atestado (hrAtendimento)',
+        });
+
+      if (!atestado.dscLesao)
+        errors.push({
+          message: 'Informar "descrição da lesão" (dscLesao)',
+        });
+
+      if (!atestado.codCID)
+        errors.push({
+          message: 'Informar código CID (codCID)',
+        });
+    }
+    {
+      const origin = isShowOriginCat(cat.tpCat);
+
+      if (origin && !nrRecCatOrig)
+        errors.push({
+          message: 'Informar CAT de origem',
+        });
+    }
+
+    {
+      if (cat.tpAcid && !isTpAcidList(cat.tpAcid))
+        errors.push({
+          message: 'Valor informado do tipo de acidente inválido (tpAcid)',
+        });
+
+      if (cat.tpCat && !isTpCatList(cat.tpCat))
+        errors.push({
+          message: 'Valor informado do tipo de CAT inválido (tpCat)',
+        });
+
+      if (cat.iniciatCAT && !isIniciatCATList(cat.iniciatCAT))
+        errors.push({
+          message: 'Valor informado da iniciativa de CAT inválido (iniciatCAT)',
+        });
+
+      if (cat.localAcidente?.tpLocal && !isTpLocalList(cat.localAcidente?.tpLocal))
+        errors.push({
+          message: 'Valor informado da tipo de local inválido (tpLocal)',
+        });
+
+      if (cat.localAcidente?.ideLocalAcid?.tpInsc && !isTpInscList(cat.localAcidente?.ideLocalAcid?.tpInsc))
+        errors.push({
+          message: 'Valor informado do tipo de inscrição inválido (tpInsc)',
+        });
+
+      if (typeof cat.parteAtingida?.lateralidade === 'number' && !isLateralidadeList(cat.parteAtingida.lateralidade))
+        errors.push({
+          message: 'Valor informado para lateralidade inválido (lateralidade)',
+        });
+    }
+
+    {
+      if (cat.hrAcid && !checkTime(cat.hrAcid, 23))
+        errors.push({
+          message: 'hora de acidente informado com formato inválido (hrAcid)',
+        });
+
+      if (cat.hrsTrabAntesAcid && !checkTime(cat.hrsTrabAntesAcid, 99))
+        errors.push({
+          message: 'horas trabalhadas formato inválido (hrsTrabAntesAcid)',
+        });
+
+      if (atestado.hrAtendimento && !checkTime(atestado.hrAtendimento, 23))
+        errors.push({
+          message: 'hora do atendimento com formato inválido (hrAtendimento)',
+        });
+    }
+
+    return errors;
+  }
 
   errorsEvent2220(event: IEvent2220Props) {
     const exMedOcup = event.exMedOcup;
@@ -351,6 +603,112 @@ class ESocialEventProvider {
     return this.dayJSProvider.format(date, 'YYYY-MM-DD');
   }
 
+  convertTime(time: string) {
+    return time.replace(':', '');
+  }
+
+  convertToEvent2210Struct(company: CompanyEntity, cats: CatEntity[], options?: { ideEvento?: IEventProps['ideEvento'] }) {
+    const generateId = this.eSocialMethodsProvider.classGenerateId(company.cnpj);
+    const eventsStruct = cats.map<IESocial2210.StructureReturn>((cat) => {
+      const employee = cat.employee;
+      const doctor = cat?.doc;
+      const events = cat?.events;
+      const catOriginRecipt = cat?.catOrigin?.events?.[0]?.receipt;
+      const { id } = generateId.newId();
+
+      const eventCat: IEvent2210Props['cat'] = {
+        dtAcid: cat.dtAcid,
+        tpAcid: cat.tpAcid,
+        hrAcid: cat.hrAcid,
+        hrsTrabAntesAcid: cat.hrsTrabAntesAcid,
+        tpCat: cat.tpCat,
+        indComunPolicia: cat.isIndComunPolicia,
+        dtObito: cat.dtObito,
+        codSitGeradora: cat.codAgntCausador,
+        iniciatCAT: cat.iniciatCAT,
+        obsCAT: cat.obsCAT,
+        ultDiaTrab: cat.ultDiaTrab,
+        houveAfast: cat.houveAfast,
+        localAcidente: {
+          tpLocal: cat.tpLocal,
+          dscLocal: cat.dscLocal,
+          tpLograd: cat.tpLograd,
+          dscLograd: cat.dscLograd,
+          nrLograd: cat.nrLograd,
+          complemento: cat.complemento,
+          bairro: cat.bairro,
+          cep: cat.cep,
+          codMunic: cat.codMunic,
+          uf: cat.uf,
+          pais: cat.pais,
+          codPostal: cat.codPostal,
+          ideLocalAcid: {
+            tpInsc: cat.ideLocalAcidTpInsc,
+            nrInsc: cat.ideLocalAcidCnpj,
+          },
+        },
+        parteAtingida: {
+          codParteAting: cat.codParteAting,
+          lateralidade: cat.lateralidade,
+        },
+        agenteCausador: {
+          codAgntCausador: cat.codAgntCausador,
+        },
+        atestado: {
+          dtAtendimento: cat.dtAtendimento,
+          hrAtendimento: cat.hrAtendimento,
+          indInternacao: cat.isIndInternacao,
+          durTrat: cat.durTrat,
+          indAfast: cat.isIndAfast,
+          dscLesao: cat.dscLesao,
+          dscCompLesao: cat.dscCompLesao,
+          diagProvavel: cat.diagProvavel,
+          codCID: cat.codCID,
+          observacao: cat.observacao,
+          emitente: {
+            nmEmit: doctor.name,
+            ideOC: doctor.councilType,
+            nrOC: doctor.councilId,
+            ufOC: doctor.councilUF,
+          },
+        },
+        catOrigem: {
+          nrRecCatOrig: catOriginRecipt,
+        },
+      };
+
+      const receipt = events?.sort((a, b) => sortData(b.created_at, a.created_at))?.find((e) => e.receipt)?.receipt;
+
+      const event: IEvent2210Props = {
+        id,
+        cat: eventCat,
+        ideEmpregador: { nrInsc: company.cnpj },
+        ideVinculo: {
+          cpfTrab: employee.cpf,
+          matricula: employee.esocialCode,
+        },
+        ideEvento: {
+          tpAmb: options?.ideEvento?.tpAmb,
+          procEmi: options?.ideEvento?.procEmi,
+          ...(receipt && {
+            indRetif: IndRetifEnum.MODIFIED,
+            nrRecibo: receipt,
+          }),
+        },
+      };
+
+      return {
+        id,
+        event: event,
+        eventDate: cat.dtAcid,
+        employee: employee,
+        cat,
+      };
+    });
+
+    return eventsStruct;
+  }
+
   convertToEvent2220Struct(company: CompanyEntity, employees: EmployeeEntity[], options?: { ideEvento?: IEventProps['ideEvento'] }) {
     const generateId = this.eSocialMethodsProvider.classGenerateId(company.cnpj);
     const eventsStruct = employees.reduce<IESocial2220.StructureReturn[]>((acc, employee) => {
@@ -517,11 +875,30 @@ class ESocialEventProvider {
       let oldEventJs: IEvent2240Props['evtExpRisco'];
 
       const eventsJs = sortArray(employee.actualPPPHistory, { by: 'date', order: 'asc' }).map<IESocial2240.StructureReturn>((snapshot) => {
-        const risks = snapshot.risks;
+        const risks = [] as IPriorRiskData[];
         const responsible = snapshot.responsible;
         const environments = snapshot.environments;
         const date = snapshot.date > startDate ? snapshot.date : startDate;
         const { id } = generateId.newId();
+
+        snapshot.risks.forEach((risk) => {
+          if (risk.riskFactor?.esocialCode == '02.01.003') {
+            if (risk.riskData?.arenValue) {
+              const copyRisk = clone(risk);
+              copyRisk.riskFactor.esocialCode = '02.01.003';
+              copyRisk.riskData.intensity = risk.riskData?.arenValue;
+              risks.push(copyRisk);
+            }
+            if (risk.riskData?.vdvrValue) {
+              const copyRisk = clone(risk);
+              copyRisk.riskFactor.esocialCode = '02.01.004';
+              copyRisk.riskData.intensity = risk.riskData?.vdvrValue;
+              risks.push(copyRisk);
+            }
+          } else {
+            risks.push(risk);
+          }
+        });
 
         const eventRisk: IEvent2240Props['evtExpRisco'] = {
           infoExpRisco: {
@@ -554,7 +931,7 @@ class ESocialEventProvider {
                 const isRequiredLimit = requiredLimTol.includes(code);
                 const isQuantity = esocial?.isQuantity;
                 const limit = risk.riskData?.ibtugLEO || 100;
-                const intensity = risk.riskData?.vdvrValue || risk.riskData?.arenValue || risk.riskData?.intensity;
+                const intensity = risk.riskData?.intensity;
                 const useEpc = getEpcType(risk);
                 const useEpi = getEpiType(risk);
                 const isEPCEfficient = !!risk.riskData.engsToRiskFactorData.find((e) => e.efficientlyCheck);
@@ -621,9 +998,9 @@ class ESocialEventProvider {
         if (oldEventJs && !isSame) {
           const oldRisks = oldEventJs?.infoExpRisco;
           isSame = deepEqual(
-            { ...oldRisks.agNoc, ...oldRisks.infoAmb, ...oldRisks.infoAtiv, ...oldRisks.respReg },
+            { agNoc: oldRisks.agNoc, ...oldRisks.infoAmb, ...oldRisks.infoAtiv, ...oldRisks.respReg },
             {
-              ...eventRisk.infoExpRisco.agNoc,
+              agNoc: eventRisk.infoExpRisco.agNoc,
               ...eventRisk.infoExpRisco.infoAmb,
               ...eventRisk.infoExpRisco.infoAtiv,
               ...eventRisk.infoExpRisco.respReg,
@@ -715,6 +1092,115 @@ class ESocialEventProvider {
     });
 
     return events;
+  }
+
+  generateXmlEvent2210(event: IEvent2210Props, options?: { declarations?: boolean }) {
+    const baseEvent = this.generateEventBase(event);
+    const cat = event.cat;
+    const atestado = cat?.atestado;
+    const emitente = atestado?.emitente;
+    const local = cat?.localAcidente;
+    const empresa = local?.ideLocalAcid;
+    const body = cat.parteAtingida;
+    const nrRecCatOrig = cat?.catOrigem?.nrRecCatOrig;
+
+    const isReopen = isTypeReopen(cat.tpAcid);
+    const isDeath = isWithDeath(cat.tpCat);
+    const isCompany = isAskCompany(cat.tpCat);
+    const isOrigin = isShowOriginCat(cat.tpCat);
+
+    const isNotBrazil = isCountryRequired(local.tpLocal);
+
+    const eventJs = {
+      ...(options?.declarations && {
+        _declaration: {
+          _attributes: {
+            version: '1.0',
+            encoding: 'UTF-8',
+          },
+        },
+      }),
+      eSocial: {
+        ['_attributes']: {
+          xmlns: 'http://www.esocial.gov.br/schema/evt/evtCAT/v_S_01_00_00',
+        },
+        evtCAT: {
+          ['_attributes']: {
+            Id: event.id,
+          },
+          ...baseEvent,
+          cat: {
+            dtAcid: { ['_text']: this.convertDate(cat.dtAcid) },
+            tpAcid: { ['_text']: cat.tpAcid },
+            ...(!isReopen && { hrAcid: { ['_text']: this.convertTime(cat.hrAcid || '0000') } }),
+            ...(!isReopen && { hrsTrabAntesAcid: { ['_text']: this.convertTime(cat.hrsTrabAntesAcid || '0000') } }),
+            tpCat: { ['_text']: cat.tpCat },
+            indCatObito: { ['_text']: isDeath ? 'S' : 'N' },
+            ...(isDeath && { dtObito: { ['_text']: this.convertDate(cat.dtObito) } }),
+            indComunPolicia: { ['_text']: cat.indComunPolicia ? 'S' : 'N' },
+            codSitGeradora: { ['_text']: cat.codSitGeradora },
+            iniciatCAT: { ['_text']: cat.iniciatCAT },
+            ...(cat.obsCAT && { obsCAT: { ['_text']: cat.obsCAT } }),
+            ultDiaTrab: { ['_text']: this.convertDate(cat.ultDiaTrab) },
+            houveAfast: { ['_text']: cat.houveAfast ? 'S' : 'N' },
+            localAcidente: {
+              tpLocal: { ['_text']: local.tpLocal },
+              ...(local.dscLocal && { dscLocal: { ['_text']: local.dscLocal } }),
+              ...(local.tpLograd && { tpLograd: { ['_text']: local.tpLograd } }),
+              dscLograd: { ['_text']: local.dscLograd },
+              nrLograd: { ['_text']: local.nrLograd || 'S/N' },
+              ...(local.complemento && { complemento: { ['_text']: local.complemento } }),
+              ...(local.bairro && { bairro: { ['_text']: local.bairro } }),
+              ...(!isNotBrazil && local.cep && { cep: { ['_text']: onlyNumbers(local.cep) } }),
+              ...(!isNotBrazil && local.codMunic && { codMunic: { ['_text']: local.codMunic } }),
+              ...(!isNotBrazil && local.uf && { uf: { ['_text']: local.uf } }),
+              ...(isNotBrazil && { pais: { ['_text']: local.pais } }),
+              ...(isNotBrazil && { codPostal: { ['_text']: local.codPostal } }),
+              ...(isCompany && {
+                ideLocalAcid: {
+                  tpInsc: { ['_text']: empresa.tpInsc },
+                  nrInsc: { ['_text']: onlyNumbers(empresa.nrInsc) },
+                },
+              }),
+            },
+            parteAtingida: {
+              codParteAting: { ['_text']: body.codParteAting },
+              lateralidade: { ['_text']: body.lateralidade },
+            },
+            agenteCausador: {
+              codAgntCausador: { ['_text']: cat.agenteCausador.codAgntCausador },
+            },
+            atestado: {
+              dtAtendimento: { ['_text']: this.convertDate(atestado.dtAtendimento) },
+              hrAtendimento: { ['_text']: this.convertTime(atestado.hrAtendimento || '0000') },
+              indInternacao: { ['_text']: atestado.indInternacao ? 'S' : 'N' },
+              durTrat: { ['_text']: atestado.durTrat || 0 },
+              indAfast: { ['_text']: atestado.indAfast ? 'S' : 'N' },
+              dscLesao: { ['_text']: atestado.dscLesao || 0 },
+              ...(atestado.dscCompLesao && { dscCompLesao: { ['_text']: atestado.dscCompLesao.slice(0, 200) } }),
+              ...(atestado.diagProvavel && { diagProvavel: { ['_text']: atestado.diagProvavel.slice(0, 100) } }),
+              codCID: { ['_text']: atestado.codCID },
+              ...(atestado.observacao && { observacao: { ['_text']: atestado.observacao.slice(0, 70) } }),
+              emitente: {
+                nmEmit: { ['_text']: emitente.nmEmit.slice(0, 254) },
+                ideOC: { ['_text']: mapResIdeOC[emitente.ideOC] },
+                nrOC: { ['_text']: emitente.nrOC },
+                ...(emitente.ufOC && { ufOC: { ['_text']: emitente.ufOC } }),
+              },
+            },
+            ...(isOrigin && {
+              catOrigem: {
+                nrRecCatOrig: nrRecCatOrig,
+              },
+            }),
+          },
+        },
+      },
+    };
+
+    const xml = js2xml(eventJs, { compact: true });
+
+    return xml;
   }
 
   generateXmlEvent2220(event: IEvent2220Props, options?: { declarations?: boolean }) {
@@ -1028,12 +1514,6 @@ class ESocialEventProvider {
     const xml = js2xml(eventJs, { compact: true });
     return xml;
   }
-
-  private onGetDate = (date: Date | null | number) => {
-    // return date ? new Date(date) : null;
-    if (typeof date === 'number') return this.dayJSProvider.dayjs(date).startOf('day').toDate();
-    return date ? this.dayJSProvider.dayjs(date).startOf('day').toDate() : null;
-  };
 
   public async sendEventToESocial(events: (IESocial2220.XmlReturn | IESocial3000.XmlReturn | IESocial2240.XmlReturn)[], options: IESocialSendEventOptions) {
     // const eventChunks = arrayChunks(  Array.from({ length: 100 }).map(() => events[0]),  100,);

@@ -1,3 +1,4 @@
+import { CheckEmployeeExamService } from './../../../../../../sst/services/exam/check-employee-exam/check-employee-exam.service';
 import { EmployeePPPHistoryRepository } from './../../../../../repositories/implementations/EmployeePPPHistoryRepository';
 import { EmployeeHierarchyHistoryEntity, historyRules } from './../../../../../entities/employee-hierarchy-history.entity';
 import { sortData } from './../../../../../../../shared/utils/sorts/data.sort';
@@ -16,6 +17,7 @@ export class DeleteEmployeeHierarchyHistoryService {
     private readonly employeeHierarchyHistoryRepository: EmployeeHierarchyHistoryRepository,
     private readonly employeeRepository: EmployeeRepository,
     private readonly employeePPPHistoryRepository: EmployeePPPHistoryRepository,
+    private readonly checkEmployeeExamService: CheckEmployeeExamService,
   ) {}
 
   async execute(id: number, employeeId: number, user: UserPayloadDto) {
@@ -35,6 +37,10 @@ export class DeleteEmployeeHierarchyHistoryService {
           id: employeeId,
         },
       },
+    });
+
+    this.checkEmployeeExamService.execute({
+      employeeId,
     });
 
     return history;

@@ -84,7 +84,7 @@ export class CatEntity implements Cat {
   codParteAtingEsocial13?: EsocialTable13BodyPart;
   status: StatusEnum;
 
-  catOriginId:number;
+  catOriginId: number;
   catOrigin: CatEntity;
   catReopen: CatEntity[];
 
@@ -96,6 +96,9 @@ export class CatEntity implements Cat {
 
     if (this.doc) {
       this.doc = new ProfessionalEntity(this.doc);
+    }
+    if (this.employee) {
+      this.employee = new EmployeeEntity(this.employee as any);
     }
   }
 }

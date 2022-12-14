@@ -12,6 +12,7 @@ import { AuthModule } from '../auth/auth.module';
 import { CompanyModule } from '../company/company.module';
 import { SSTModule } from '../sst/sst.module';
 import { SoapClientEnum } from './../../shared/constants/enum/soapClient';
+import { ESocialEvent2210Controller } from './controller/events/2210/events-2210.controller';
 import { ESocialEvent2220Controller } from './controller/events/2220/events-2220.controller';
 import { ESocialEvent2240Controller } from './controller/events/2240/events-2240.controller';
 import { ESocialEventController } from './controller/events/all/events.controller';
@@ -21,6 +22,8 @@ import { CompanyCertRepository } from './repositories/implementations/CompanyCer
 import { ESocial27TableRepository } from './repositories/implementations/ESocial27TableRepository';
 import { ESocialBatchRepository } from './repositories/implementations/ESocialBatchRepository';
 import { ESocialEventRepository } from './repositories/implementations/ESocialEventRepository';
+import { FindEvents2210ESocialService } from './services/events/2210/find-events/find-events-2210.service';
+import { SendEvents2210ESocialService } from './services/events/2210/send-events/send-events-2210.service';
 import { FindEvents2220ESocialService } from './services/events/2220/find-events/find-events.service';
 import { SendEvents2220ESocialService } from './services/events/2220/send-events/send-events.service';
 import { FindEvents2240ESocialService } from './services/events/2240/find-events/find-events.service';
@@ -34,7 +37,7 @@ import { SendBatchESocialService } from './services/events/all/send-batch/send-b
 import { FindAllTable27Service } from './services/tables/find-all-27.service';
 
 @Module({
-  controllers: [TablesController, ESocialEventController, ESocialEvent2220Controller, ESocialEvent2240Controller],
+  controllers: [TablesController, ESocialEventController, ESocialEvent2210Controller, ESocialEvent2220Controller, ESocialEvent2240Controller],
   exports: [ESocialEventProvider],
   imports: [
     SoapModule.forRootAsync({
@@ -141,6 +144,8 @@ import { FindAllTable27Service } from './services/tables/find-all-27.service';
     EsocialFetchBatchCron,
     FindEvents2240ESocialService,
     SendEvents2240ESocialService,
+    FindEvents2210ESocialService,
+    SendEvents2210ESocialService,
     FetchOneESocialBatchEventsService,
   ],
 })

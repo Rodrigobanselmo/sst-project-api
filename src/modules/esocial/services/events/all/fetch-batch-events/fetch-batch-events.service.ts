@@ -1,3 +1,4 @@
+import { CatRepository } from './../../../../../company/repositories/implementations/CatRepository';
 import { PrismaService } from './../../../../../../prisma/prisma.service';
 import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { Cache } from 'cache-manager';
@@ -13,6 +14,7 @@ import { CacheEnum } from './../../../../../../shared/constants/enum/cache';
 import { ICacheEventBatchType } from './../../../../../../shared/interfaces/cache.types';
 import { asyncEach } from './../../../../../../shared/utils/asyncEach';
 import { UpdateESocialReportService } from './../../../../../company/services/report/update-esocial-report/update-esocial-report.service';
+import { EmployeePPPHistoryRepository } from '../../../../../../modules/company/repositories/implementations/EmployeePPPHistoryRepository';
 
 @Injectable()
 export class FetchESocialBatchEventsService {
@@ -20,6 +22,8 @@ export class FetchESocialBatchEventsService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly eSocialEventProvider: ESocialEventProvider,
     private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository,
+    private readonly employeePPPHistoryRepository: EmployeePPPHistoryRepository,
+    private readonly catRepository: CatRepository,
     private readonly eSocialBatchRepository: ESocialBatchRepository,
     private readonly eSocialEventRepository: ESocialEventRepository,
     private readonly updateESocialReportService: UpdateESocialReportService,
@@ -111,6 +115,9 @@ export class FetchESocialBatchEventsService {
                           found.pppId && {
                             ppp: { update: { status: 'DONE' } },
                           }),
+                        ...(found.catId && {
+                          cat: { update: { sendEvent: rejectedEvent } },
+                        }),
                       },
                     });
                   } catch (err) {
@@ -142,6 +149,28 @@ export class FetchESocialBatchEventsService {
               });
 
               await this.employeeExamHistoryRepository.updateManyNude({
+                where: {
+                  events: {
+                    some: {
+                      batchId: { in: batchChunk.map((batch) => batch.id) },
+                    },
+                  },
+                },
+                data: { sendEvent: true },
+              });
+
+              await this.employeePPPHistoryRepository.updateManyNude({
+                where: {
+                  events: {
+                    some: {
+                      batchId: { in: batchChunk.map((batch) => batch.id) },
+                    },
+                  },
+                },
+                data: { sendEvent: true },
+              });
+
+              await this.catRepository.updateManyNude({
                 where: {
                   events: {
                     some: {

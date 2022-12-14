@@ -7,6 +7,7 @@ import { HomoTypeEnum } from '@prisma/client';
 import { UpsertManyRiskDataDto } from '../../../dto/risk-data.dto';
 import { RiskDataRepository } from '../../../repositories/implementations/RiskDataRepository';
 import { hierarchyCreateHomo } from '../upsert-risk-data/upsert-risk.service';
+import { CheckEmployeeExamService } from '../../exam/check-employee-exam/check-employee-exam.service';
 
 @Injectable()
 export class UpsertManyRiskDataService {
@@ -15,6 +16,7 @@ export class UpsertManyRiskDataService {
     private readonly homoGroupRepository: HomoGroupRepository,
     private readonly hierarchyRepository: HierarchyRepository,
     private readonly employeePPPHistoryRepository: EmployeePPPHistoryRepository,
+    private readonly checkEmployeeExamService: CheckEmployeeExamService,
   ) {}
 
   async execute(upsertRiskDataDto: UpsertManyRiskDataDto) {
@@ -61,6 +63,11 @@ export class UpsertManyRiskDataService {
       )) || [];
 
     if (upsertRiskDataDto.riskId) risksDataMany.push(await this.riskDataRepository.upsertMany(upsertRiskDataDto));
+
+    if (upsertRiskDataDto.exams)
+      upsertRiskDataDto.homogeneousGroupIds.forEach((id) => {
+        this.checkEmployeeExamService.execute({ homogeneousGroupId: id });
+      });
 
     this.employeePPPHistoryRepository.updateManyNude({
       data: { sendEvent: true },

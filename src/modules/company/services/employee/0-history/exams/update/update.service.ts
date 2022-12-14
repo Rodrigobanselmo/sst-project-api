@@ -1,3 +1,4 @@
+import { CheckEmployeeExamService } from './../../../../../../sst/services/exam/check-employee-exam/check-employee-exam.service';
 import { checkExamFields, compareFieldValues } from './../../../../../../../shared/utils/compareFieldValues';
 import { ErrorMessageEnum } from './../../../../../../../shared/constants/enum/errorMessage';
 import { BadRequestException, Injectable } from '@nestjs/common';
@@ -9,7 +10,11 @@ import { EmployeeExamsHistoryRepository } from './../../../../../repositories/im
 
 @Injectable()
 export class UpdateEmployeeExamHistoryService {
-  constructor(private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository, private readonly employeeRepository: EmployeeRepository) {}
+  constructor(
+    private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository,
+    private readonly employeeRepository: EmployeeRepository,
+    private readonly checkEmployeeExamService: CheckEmployeeExamService,
+  ) {}
 
   async execute(dataDto: UpdateEmployeeExamHistoryDto, user: UserPayloadDto) {
     const found = await this.employeeExamHistoryRepository.findFirstNude({
@@ -37,6 +42,10 @@ export class UpdateEmployeeExamHistoryService {
     const history = await this.employeeExamHistoryRepository.update({
       ...dataDto,
       ...(!isEqual && { sendEvent: true }),
+    });
+
+    this.checkEmployeeExamService.execute({
+      employeeId: dataDto.employeeId,
     });
 
     return history;

@@ -58,17 +58,27 @@ export const getCompanyPermissionByToken = async (token: string, findByTokenServ
   }
 
   let companies: UserCompanyDto[] = invite.companiesIds.map((companyId) => ({
-    permissions: invite.permissions,
-    roles: invite.roles,
     companyId,
+    ...(!invite.groupId && {
+      permissions: invite.permissions,
+      roles: invite.roles,
+    }),
+    ...(invite.groupId && {
+      groupId: invite.groupId,
+    }),
   }));
 
   if (companies.length === 0)
     companies = [
       {
-        permissions: invite.permissions,
-        roles: invite.roles,
         companyId: invite.companyId,
+        ...(!invite.groupId && {
+          permissions: invite.permissions,
+          roles: invite.roles,
+        }),
+        ...(invite.groupId && {
+          groupId: invite.groupId,
+        }),
       },
     ];
 

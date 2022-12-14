@@ -242,6 +242,7 @@ export class EmployeeRepository {
     if ('expiredExam' in query) {
       options.orderBy = [{ expiredDateExam: 'asc' }, { name: 'asc' }];
       options.select.expiredDateExam = true;
+      options.select.newExamAdded = true;
       options.select.examsHistory = {
         select: {
           status: true,

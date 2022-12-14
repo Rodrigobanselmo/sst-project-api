@@ -3,10 +3,11 @@ import { Injectable } from '@nestjs/common';
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { CopyExamsRiskDto } from '../../../dto/exam-risk.dto';
 import { ExamRiskRepository } from '../../../repositories/implementations/ExamRiskRepository';
+import { CheckEmployeeExamService } from '../../exam/check-employee-exam/check-employee-exam.service';
 
 @Injectable()
 export class CopyExamRiskService {
-  constructor(private readonly examRiskRepository: ExamRiskRepository) {}
+  constructor(private readonly examRiskRepository: ExamRiskRepository, private readonly checkEmployeeExamService: CheckEmployeeExamService) {}
 
   async execute(copyExamsRiskDto: CopyExamsRiskDto, user: UserPayloadDto) {
     const FromExamFactor = await this.examRiskRepository.findNude({
@@ -29,6 +30,13 @@ export class CopyExamRiskService {
     const ExamFactor = await this.examRiskRepository.createMany({
       data: copyData,
       companyId: user.targetCompanyId,
+    });
+
+    copyData.map((data) => {
+      this.checkEmployeeExamService.execute({
+        companyId: user.targetCompanyId,
+        riskId: data.riskId,
+      });
     });
 
     return ExamFactor;

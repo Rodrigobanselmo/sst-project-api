@@ -1,3 +1,4 @@
+import { CatEntity } from './../../../../modules/company/entities/cat.entity';
 import { IBreakPointPPP, IEmployee2240Data, IEvent2240Props } from './../../../../modules/esocial/interfaces/event-2240';
 import { IEsocialSendBatchResponse } from './../../../../modules/esocial/interfaces/esocial';
 import { UserPayloadDto } from './../../../dto/user-payload.dto';
@@ -11,6 +12,7 @@ import { CompanyCertEntity } from '../../../../modules/esocial/entities/companyC
 import { IEvent3000Props } from '../../../../modules/esocial/interfaces/event-3000';
 import { EmployeeESocialEventTypeEnum, Prisma } from '@prisma/client';
 import { EmployeePPPHistoryEntity } from './../../../../modules/company/entities/employee-ppp-history.entity';
+import { IEvent2210Props } from './../../../../modules/esocial/interfaces/event-2210';
 export interface IConvertPfx {
   file: Express.Multer.File;
   password: string;
@@ -39,6 +41,22 @@ interface IIdOptions {
   seqNum?: number;
   index?: number;
   shortCNPJ?: boolean;
+}
+
+export declare namespace IESocial2210 {
+  export interface StructureReturn {
+    event: IEvent2210Props;
+    employee: EmployeeEntity;
+    cat: CatEntity;
+    eventDate: Date;
+    id: string;
+    idFull?: string;
+  }
+
+  export interface XmlReturn extends Omit<StructureReturn, 'event'> {
+    signedXml: string;
+    xml: string;
+  }
 }
 
 export declare namespace IESocial2220 {

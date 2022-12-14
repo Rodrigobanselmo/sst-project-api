@@ -92,6 +92,7 @@ import { CopyProtocolToRiskService } from './services/protocolToRisk/copy-protoc
 import { CreateProtocolToRiskService } from './services/protocolToRisk/create-protocol/create-protocol.service';
 import { ProtocolToRiskController } from './controller/protocol-to-risk/protocolToRisk.controller';
 import { FindAllRiskDataByEmployeeService } from './services/risk-data/find-by-employee/find-by-employee.service';
+import { CheckEmployeeExamService } from './services/exam/check-employee-exam/check-employee-exam.service';
 
 @Module({
   controllers: [
@@ -188,6 +189,7 @@ import { FindAllRiskDataByEmployeeService } from './services/risk-data/find-by-e
     FindProtocolToRiskService,
     UpdateProtocolToRiskService,
     FindAllRiskDataByEmployeeService,
+    CheckEmployeeExamService,
   ],
   exports: [
     RiskRepository,
@@ -200,6 +202,7 @@ import { FindAllRiskDataByEmployeeService } from './services/risk-data/find-by-e
     FindExamByHierarchyService,
     ExamRepository,
     EpiRepository,
+    CheckEmployeeExamService,
   ],
   imports: [forwardRef(() => CompanyModule)],
 })

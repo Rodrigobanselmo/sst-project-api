@@ -22,7 +22,6 @@ export const getValidityInMonths = (employee: EmployeeEntity, examRisk: { validi
 };
 @Injectable()
 export class FindExamByHierarchyService {
-  private employee: EmployeeEntity;
   private clinicExamCloseToExpire = 45;
 
   constructor(
@@ -37,6 +36,7 @@ export class FindExamByHierarchyService {
     const hierarchyId = query.hierarchyId;
     const companyId = user.targetCompanyId;
     const hierarchy = hierarchyId ? await this.hierarchyRepository.findByIdWithParent(hierarchyId, companyId) : undefined;
+    let employee: EmployeeEntity;
 
     const hierarchies: Partial<HierarchyEntity>[] = [hierarchy, ...(hierarchy?.parents || [])].filter((h) => h);
     const date = new Date();
@@ -56,10 +56,11 @@ export class FindExamByHierarchyService {
     };
 
     if (query.employeeId) {
-      this.employee = await this.employeeRepository.findById(query.employeeId, companyId, {
+      employee = await this.employeeRepository.findById(query.employeeId, companyId, {
         include: {
           subOffices: { select: { id: true } },
           examsHistory: {
+            orderBy: { doneDate: 'desc' },
             where: {
               AND: [
                 { expiredDate: { gte: new Date() } },
@@ -71,10 +72,11 @@ export class FindExamByHierarchyService {
           },
         },
       });
-      if (this.employee && !query.isOffice) {
-        hierarchies.push(...(this.employee?.subOffices || []));
+      if (employee && !query.isOffice) {
+        hierarchies.push(...(employee?.subOffices || []));
       }
     }
+
     const hierarchyIds = hierarchies.map(({ id }) => id);
 
     const riskData = (
@@ -232,16 +234,18 @@ export class FindExamByHierarchyService {
     const exams: Record<string, IExamOriginData[]> = {};
 
     riskDataOrigin.forEach((rd) => {
-      rd.examsToRiskFactorData.forEach((examData) => {
+      [...rd.examsToRiskFactorData, ...rd.riskFactor.examToRisk].forEach((examData) => {
+        const isStandard = !('isStandard' in examData) || (examData as any)?.isStandard;
+
         if (!exams[examData.examId]) exams[examData.examId] = [];
         exams[examData.examId].push({
           ...examData,
-          origin: examData.isStandard ? `Padrão (${rd.origin && rd.origin})` : rd.origin,
-          prioritization: (examData.isStandard ? 100 : rd.prioritization) || 3,
+          origin: isStandard ? `Padrão (${rd.origin && rd.origin})` : rd.origin,
+          prioritization: (isStandard ? 100 : rd.prioritization) || 3,
           homogeneousGroup: rd.homogeneousGroup,
-          skipEmployee: this.checkIfSkipEmployee(examData, this.employee),
+          skipEmployee: this.checkIfSkipEmployee(examData, employee),
           risk: rd.riskFactor,
-          ...this.checkExpiredDate(examData, this.employee),
+          ...this.checkExpiredDate(examData, employee),
         });
       });
       // exams
@@ -262,9 +266,9 @@ export class FindExamByHierarchyService {
             isAttendance: !!exam?.isAttendance,
           } as any,
           prioritization: 100,
-          skipEmployee: this.checkIfSkipEmployee(examToRisk, this.employee),
+          skipEmployee: this.checkIfSkipEmployee(examToRisk, employee),
           risk: examToRisk.risk,
-          ...this.checkExpiredDate({ ...examToRisk, exam }, this.employee),
+          ...this.checkExpiredDate({ ...examToRisk, exam }, employee),
         });
       });
     });
@@ -322,6 +326,7 @@ export class FindExamByHierarchyService {
         };
         origins: IExamOriginData[];
       }[],
+      // employee,
     };
   }
 

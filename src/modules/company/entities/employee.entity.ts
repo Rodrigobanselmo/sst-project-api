@@ -67,11 +67,13 @@ export class EmployeeEntity implements Employee {
   admissionDate: Date;
   lastExam: Date;
   expiredDateExam: Date;
+  newExamAdded: Date;
   // sendEvent: boolean;
   company?: CompanyEntity;
   examsHistory?: EmployeeExamsHistoryEntity[];
   hierarchyHistory?: EmployeeHierarchyHistoryEntity[];
   pppHistory?: EmployeePPPHistoryEntity[];
+  sectorHierarchy?: HierarchyEntity;
 
   constructor(
     partial: Partial<Omit<EmployeeEntity, 'company'>> & {
@@ -81,8 +83,27 @@ export class EmployeeEntity implements Employee {
   ) {
     Object.assign(this, partial);
 
+    if (this.newExamAdded) {
+      if (!this.expiredDateExam) this.expiredDateExam = this.newExamAdded;
+      if (this.expiredDateExam > this.newExamAdded) this.expiredDateExam = this.newExamAdded;
+
+      if (this.examsHistory) {
+        this.examsHistory = this.examsHistory.map((e) => {
+          if ((e?.exam?.isAttendance || e.evaluationType == 'APTO') && e.doneDate <= this.newExamAdded) {
+            if (!e.expiredDate) e.expiredDate = this.newExamAdded;
+            if (e.expiredDate > this.newExamAdded) e.expiredDate = this.newExamAdded;
+          }
+          return e;
+        });
+      }
+    }
+
     if (this.hierarchy) {
       this.hierarchy = new HierarchyEntity(this.hierarchy);
+    }
+
+    if (this.hierarchy?.parents) {
+      this.sectorHierarchy = this.hierarchy.parents.find((p) => p?.type == 'SECTOR');
     }
 
     if (this.company) {

@@ -1,3 +1,4 @@
+import { CheckEmployeeExamService } from './../../../../../../sst/services/exam/check-employee-exam/check-employee-exam.service';
 import { NotificationRepository } from './../../../../../../notifications/repositories/implementations/NotificationRepository';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { StatusEnum } from '@prisma/client';
@@ -17,6 +18,7 @@ export class CreateEmployeeExamHistoryService {
     private readonly employeeRepository: EmployeeRepository,
     private readonly createEmployeeHierarchyHistoryService: CreateEmployeeHierarchyHistoryService,
     private readonly notificationRepository: NotificationRepository,
+    private readonly checkEmployeeExamService: CheckEmployeeExamService,
   ) {}
 
   async execute(dataDto: CreateEmployeeExamHistoryDto, user: UserPayloadDto) {
@@ -30,6 +32,10 @@ export class CreateEmployeeExamHistoryService {
     const history = await this.employeeExamHistoryRepository.create({
       ...dataDto,
       ...this.getUser(dataDto, user),
+    });
+
+    this.checkEmployeeExamService.execute({
+      employeeId: dataDto.employeeId,
     });
 
     return history;

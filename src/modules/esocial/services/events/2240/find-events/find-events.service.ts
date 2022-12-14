@@ -54,7 +54,7 @@ export class FindEvents2240ESocialService {
         },
       };
 
-    const employees2240 = await this.findEmployee2240(company);
+    const employees2240 = await this.findEmployee2240(company, startDate);
 
     const eventsStruct = this.eSocialEventProvider.convertToEvent2240Struct({ company, esocialStartDate: startDate, employees: employees2240 });
 
@@ -102,11 +102,11 @@ export class FindEvents2240ESocialService {
     // ->
   }
 
-  async findEmployee2240(company: CompanyEntity) {
+  async findEmployee2240(company: CompanyEntity, esocialStartDate: Date) {
     const homogeneousTree = await this.getHomoTree(company);
     const homoRiskDataTree = await this.getRiskData(company, homogeneousTree);
     const hierarchyTree = await this.getHierarchyTree(company);
-    const employeesData = await this.getEmployeesData(company, hierarchyTree, homoRiskDataTree);
+    const employeesData = await this.getEmployeesData(company, hierarchyTree, homoRiskDataTree, esocialStartDate);
 
     return employeesData;
   }
@@ -278,14 +278,19 @@ export class FindEvents2240ESocialService {
     return hierarchiesTree;
   }
 
-  async getEmployeesData(company: CompanyEntity, hierarchyTree: Record<string, HierarchyEntity>, homoRiskDataTree: Record<string, RiskFactorDataEntity[]>) {
+  async getEmployeesData(
+    company: CompanyEntity,
+    hierarchyTree: Record<string, HierarchyEntity>,
+    homoRiskDataTree: Record<string, RiskFactorDataEntity[]>,
+    esocialStartDate: Date,
+  ) {
     const employeesData = [] as IEmployee2240Data[];
     //! company.employees.forEach((employee) => {
     company.employees.forEach((employee) => {
       // const timeline = {};
       const allHistory = employee.hierarchyHistory.reduce<(EmployeeHierarchyHistoryEntity & { ambProfessional?: Partial<ProfessionalEntity> })[]>(
         (acc, history, index, array) => {
-          const startDate = this.onGetDate(history.startDate);
+          const startDate = this.onGetDate(history.startDate > esocialStartDate ? history.startDate : esocialStartDate);
           const endDate = this.onGetDate(array[index + 1]?.startDate);
 
           const responsibles = company.professionalsResponsibles;
@@ -313,7 +318,7 @@ export class FindEvents2240ESocialService {
       const timeline = hierarchyHistory
         .map((history, index, array) => {
           if (history.motive == 'DEM') return;
-          const startDate = this.onGetDate(history.startDate);
+          const startDate = this.onGetDate(history.startDate > esocialStartDate ? history.startDate : esocialStartDate);
           const endDate = this.onGetDate(array[index + 1]?.startDate);
 
           if (startDate == endDate) return;
@@ -373,7 +378,7 @@ export class FindEvents2240ESocialService {
         ...employee,
         actualPPPHistory,
         hierarchy: { id: hierarchy.id, name: hierarchy.name },
-        sectorHierarchy: { id: sectorHierarchy.id, name: sectorHierarchy.name },
+        sectorHierarchy: { id: sectorHierarchy.id, name: sectorHierarchy.name } as any,
       });
     });
     return employeesData;
@@ -480,7 +485,8 @@ export class FindEvents2240ESocialService {
         employees: {
           where: {
             companyId,
-            OR: [{ pppHistory: { every: { status: { in: ['DONE', 'TRANSMITTED'] } } } }, { pppHistory: { some: { sendEvent: true } } }],
+            // OR: [{ pppHistory: { every: { status: { in: ['DONE', 'TRANSMITTED'] } } } }, { pppHistory: { some: { sendEvent: true } } }],
+            OR: [{ pppHistory: { some: { sendEvent: true } } }],
           },
           select: {
             id: true,

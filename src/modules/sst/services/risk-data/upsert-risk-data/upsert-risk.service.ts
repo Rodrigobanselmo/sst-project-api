@@ -5,6 +5,7 @@ import { HierarchyRepository } from '../../../../company/repositories/implementa
 import { HomoGroupRepository } from '../../../../company/repositories/implementations/HomoGroupRepository';
 import { UpsertRiskDataDto } from '../../../dto/risk-data.dto';
 import { RiskDataRepository } from '../../../repositories/implementations/RiskDataRepository';
+import { CheckEmployeeExamService } from '../../exam/check-employee-exam/check-employee-exam.service';
 import { EmployeePPPHistoryRepository } from './../../../../company/repositories/implementations/EmployeePPPHistoryRepository';
 
 @Injectable()
@@ -14,6 +15,7 @@ export class UpsertRiskDataService {
     private readonly homoGroupRepository: HomoGroupRepository,
     private readonly hierarchyRepository: HierarchyRepository,
     private readonly employeePPPHistoryRepository: EmployeePPPHistoryRepository,
+    private readonly checkEmployeeExamService: CheckEmployeeExamService,
   ) {}
 
   async execute(upsertRiskDataDto: UpsertRiskDataDto) {
@@ -43,6 +45,8 @@ export class UpsertRiskDataService {
         workspaceId,
       });
     const riskData = await this.riskDataRepository.upsert(upsertRiskDataDto);
+
+    if (upsertRiskDataDto.exams) this.checkEmployeeExamService.execute({ homogeneousGroupId: upsertRiskDataDto.homogeneousGroupId });
 
     this.employeePPPHistoryRepository.updateManyNude({
       data: { sendEvent: true },

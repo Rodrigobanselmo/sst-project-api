@@ -33,16 +33,27 @@ export class CompanyRepository implements ICompanyRepository {
     tecResponsibleId,
     phone,
     email,
+    // initials,
     ...createCompanyDto
   }: ICreateCompany): Promise<CompanyEntity> {
     const companyUUId = uuidV4();
     const isReceivingService = !!companyId;
+
+    // if (!initials) {
+    //   initials =
+    //     (createCompanyDto.fantasy || createCompanyDto.name).slice(0, 1).toUpperCase() +
+    //     Math.floor(Math.random() * 10) +
+    //     Math.floor(Math.random() * 10) +
+    //     Math.floor(Math.random() * 10);
+    // }
+
     const company = await this.prisma.company.create({
       data: {
         id: companyUUId,
         ...createCompanyDto,
         doctorResponsible: doctorResponsibleId ? { connect: { id: doctorResponsibleId } } : undefined,
         tecResponsible: tecResponsibleId ? { connect: { id: tecResponsibleId } } : undefined,
+        // initials,
         license:
           Object.keys(license).length === 0
             ? undefined

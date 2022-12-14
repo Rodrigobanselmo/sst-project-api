@@ -143,7 +143,6 @@ export class UpdateAllCompaniesService {
 
             if (typeof v === 'object') {
               Object.entries(v).map(([_k, _v]) => {
-                console.log(k, v);
                 if (!report.dailyReport.esocial[k]) report.dailyReport.esocial[k] = {};
                 if (!report.dailyReport.esocial[k][_k]) report.dailyReport.esocial[k][_k] = 0;
 
@@ -172,6 +171,14 @@ export class UpdateAllCompaniesService {
     return employeeExamsData;
   }
 
+  // async updateExam(company: CompanyEntity) {
+  //   //! optimization here => query only once employees and then apply filters
+  //   const examTime = await this.addEmployeeExamTime(company);
+  //   const esocialEvents = await this.addCompanyEsocial(company);
+
+  //   return { examTime, esocialEvents, company };
+  // }
+
   async addReport(company: CompanyEntity) {
     //! optimization here => query only once employees and then apply filters
     const examTime = await this.addEmployeeExamTime(company);
@@ -195,6 +202,7 @@ export class UpdateAllCompaniesService {
             lastExam: true,
             expiredDateExam: true,
             hierarchyId: true,
+            newExamAdded: true,
             subOffices: { select: { id: true } },
             examsHistory: {
               select: {
@@ -241,6 +249,18 @@ export class UpdateAllCompaniesService {
 
             return true;
           });
+
+          // logic newExamAdded
+          {
+            if (doneExamFound) {
+              const doneDateExam = doneExamFound.doneDate;
+              if (doneDateExam <= employee.newExamAdded) {
+                employee.expiredDateExam = doneExamFound.expiredDate;
+              }
+
+              doneExamFound.expiredDate = employee.newExamAdded;
+            }
+          }
 
           if (doneExamFound) employee.expiredDateExam = doneExamFound.expiredDate;
           if (!doneExamFound && scheduleExamFound && employee.lastExam) {

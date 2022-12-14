@@ -123,6 +123,58 @@ export class CatRepository {
     return cats.map((cat) => new CatEntity(cat));
   }
 
+  async findEvent2210(options: Prisma.CatFindManyArgs = {}) {
+    return this.findNude({
+      ...options,
+      where: { sendEvent: true, events: { none: { action: 'EXCLUDE', status: { in: ['DONE', 'TRANSMITTED'] } } }, ...options?.where },
+      include: {
+        events: { select: { status: true, id: true, receipt: true, action: true } },
+        doc: { include: { professional: { select: { cpf: true, name: true, id: true } } } },
+        employee: {
+          select: {
+            name: true,
+            cpf: true,
+            esocialCode: true,
+            id: true,
+            companyId: true,
+            hierarchy: {
+              select: {
+                id: true,
+                name: true,
+                type: true,
+                parent: { select: { id: true, name: true, type: true, parent: { select: { id: true, name: true, type: true } } } },
+              },
+            },
+          },
+        },
+        catOrigin: {
+          select: {
+            dtAcid: true,
+            hrAcid: true,
+            events: { where: { receipt: { not: null }, status: { in: ['DONE', 'TRANSMITTED'] } }, select: { receipt: true, id: true, action: true } },
+          },
+        },
+        ...options?.include,
+      },
+    });
+  }
+
+  async countEvent2210(options: Prisma.CatCountArgs = {}) {
+    const count = await this.prisma.cat.count({
+      where: { sendEvent: true, events: { none: { action: 'EXCLUDE', status: { in: ['DONE', 'TRANSMITTED'] } } }, ...options?.where },
+    });
+
+    return count;
+  }
+
+  async countNude(options: Prisma.CatCountArgs = {}) {
+    const count = await this.prisma.cat.count({
+      ...options,
+    });
+
+    return count;
+  }
+
   async findById({ companyId, id }: { companyId: string; id: number }, options: Prisma.CatFindFirstArgs = {}) {
     const cat = await this.prisma.cat.findFirst({
       where: { id, employee: { companyId } },
@@ -131,12 +183,20 @@ export class CatRepository {
         city: true,
         codParteAtingEsocial13: true,
         countryCodeEsocial6: true,
-        doc: { select: { professional: true } },
+        doc: { include: { professional: true } },
         esocialAgntCausador: true,
         esocialLesao: true,
         esocialLograd: true,
         esocialSitGeradora: true,
-        catOrigin: { select: { id: true, esocialSitGeradora: true, dtAcid: true } },
+        catOrigin: {
+          select: {
+            id: true,
+            esocialSitGeradora: true,
+            dtAcid: true,
+            events: { where: { status: 'DONE' }, select: { id: true, receipt: true }, orderBy: { created_at: 'desc' } },
+          },
+        },
+        events: { where: { status: 'DONE' }, select: { status: true, id: true, receipt: true, eventId: true }, orderBy: { created_at: 'desc' } },
       },
       ...options,
     });
@@ -158,5 +218,13 @@ export class CatRepository {
     });
 
     return new CatEntity(cat);
+  }
+
+  async updateManyNude(options: Prisma.CatUpdateManyArgs) {
+    const data = await this.prisma.cat.updateMany({
+      ...options,
+    });
+
+    return data;
   }
 }

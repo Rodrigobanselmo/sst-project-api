@@ -909,6 +909,7 @@ model Employee {
   admissionDate DateTime? //!remove
   lastExam DateTime?
   expiredDateExam DateTime?
+  newExamAdded DateTime?
   sex SexTypeEnum? 
   hierarchyId String?
   hierarchy Hierarchy? @relation(fields: [hierarchyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
@@ -1140,14 +1141,12 @@ model EsocialTable18Mot {
   absenteeisms Absenteeism[]
 }
 
-
 model EsocialTable6Country {
   code    String   @id
   name    String  
 
   cat Cat[] 
 }
-
 
 model EsocialTable13BodyPart {
   code    String   @id
@@ -1180,7 +1179,6 @@ model EsocialTable20Lograd {
   cat Cat[] 
 }
 
-
 model EsocialTable24 {
   id    String   @id
   name String 
@@ -1189,8 +1187,6 @@ model EsocialTable24 {
   isQuantity Boolean @default(false)
   risks RiskFactors[]
 }
-
-
 
 model Exam {
   id    Int   @id  @default(autoincrement())
@@ -1850,7 +1846,6 @@ model UserCompany {
   @@id([companyId, userId])
   @@index(companyId)
 }
-
 
 model Uf {
   code    String  @id
