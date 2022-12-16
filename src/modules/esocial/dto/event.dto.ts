@@ -1,3 +1,4 @@
+import { RiskFactorsEnum } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import { IsBoolean, IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
 
@@ -71,4 +72,13 @@ export class FindEvents2210Dto extends PaginationQueryDto {
   @IsBoolean()
   @IsOptional()
   all?: boolean;
+}
+
+export class FindEsocialTable24Dto extends PaginationQueryDto {
+  @IsOptional()
+  @IsString()
+  @IsEnum(RiskFactorsEnum, {
+    message: `TIPO DE RISCO INVÁLIDO`,
+  })
+  type?: RiskFactorsEnum;
 }

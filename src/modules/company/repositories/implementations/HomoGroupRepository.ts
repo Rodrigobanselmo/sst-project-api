@@ -177,12 +177,12 @@ export class HomoGroupRepository {
   }
 
   async findHomoGroupByCompanyAndId(id: string, companyId: string, options?: Prisma.HomogeneousGroupFindFirstArgs) {
-    const hierarchies = await this.prisma.homogeneousGroup.findFirst({
+    const homo = await this.prisma.homogeneousGroup.findFirst({
       where: { companyId, id },
       ...options,
     });
 
-    return new HomoGroupEntity(hierarchies);
+    return new HomoGroupEntity(homo);
   }
 
   async find(query: Partial<FindHomogeneousGroupDto>, pagination: PaginationQueryDto, options: Prisma.HomogeneousGroupFindManyArgs = {}) {

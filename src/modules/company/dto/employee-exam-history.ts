@@ -294,3 +294,13 @@ export class FindCompanyEmployeeExamHistoryDto extends PaginationQueryDto {
   // @Type(() => Date)
   // date: Date;
 }
+
+export class FindClinicScheduleTimeDto {
+  @IsString()
+  clinicId: string;
+
+  @Transform(DateFormat, { toClassOnly: true })
+  @IsDate({ message: 'Data inválida' })
+  @Type(() => Date)
+  date: Date;
+}

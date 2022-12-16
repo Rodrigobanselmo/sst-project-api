@@ -1,3 +1,4 @@
+import sortArray from 'sort-array';
 import { HomoTypeEnum } from '@prisma/client';
 
 import { originRiskMap } from '../../../../../../../shared/constants/maps/origin-risk';
@@ -22,7 +23,6 @@ export const quantityQuiConverter = (riskGroupData: RiskFactorGroupDataEntity, h
       if (json.type !== QuantityTypeEnum.QUI) return false;
       return !!json.nr15ltProb || !!json.stelProb || !!json.twaProb;
     })
-    .sort((a, b) => sortData(a.homogeneousGroup, b.homogeneousGroup, 'name'))
     .map((riskData) => {
       let origin: string;
 
@@ -70,6 +70,7 @@ export const quantityQuiConverter = (riskGroupData: RiskFactorGroupDataEntity, h
           type: json.isVmpTeto ? 'NR-15 LT TETO' : 'NR-15 VMP',
         },
       ];
+
       array.forEach((item) => {
         const cells: bodyTableProps[] = [];
         if (!item?.result || !item?.leo || !item.prob) return;
@@ -126,5 +127,15 @@ export const quantityQuiConverter = (riskGroupData: RiskFactorGroupDataEntity, h
       });
     });
 
-  return rows;
+  return sortArray(rows, {
+    by: ['name', ''],
+    computed: {
+      name: (v) => {
+        return v[QuantityQuiColumnEnum.ORIGIN]?.text || '';
+      },
+      agent: (v) => {
+        return v[QuantityQuiColumnEnum.CHEMICAL]?.text || '';
+      },
+    },
+  });
 };

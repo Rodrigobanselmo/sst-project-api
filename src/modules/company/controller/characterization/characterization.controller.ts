@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, UploadedFile, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UploadedFile, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
 import { pngFileFilter } from '../../../../shared/utils/filters/png.filters';
@@ -96,7 +96,7 @@ export class CharacterizationController {
     isMember: true,
     crud: 'cu',
   })
-  @Post('/photo/:id')
+  @Patch('/photo/:id')
   async update(@Body() updatePhotoCharacterizationDto: UpdatePhotoCharacterizationDto, @Param('id') id: string) {
     return this.updateCharacterizationPhotoService.execute(id, updatePhotoCharacterizationDto);
   }

@@ -44,6 +44,10 @@ export const quantityQuiSection: IDocumentPGRSectionGroup = {
           text: '**Aceitável (RO: Baixo):** IJ < 0,10',
         },
         {
+          type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE,
+          text: 'Avaliações Quantitativas dos Riscos Químicos',
+        },
+        {
           type: PGRSectionChildrenTypeEnum.TABLE_QUANTITY_QUI,
         },
       ],

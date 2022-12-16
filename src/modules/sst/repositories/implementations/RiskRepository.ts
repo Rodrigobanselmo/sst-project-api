@@ -289,6 +289,20 @@ export class RiskRepository implements IRiskRepository {
     return new RiskFactorsEntity(risk);
   }
 
+  async findOneById(id: string, companyId: string, options?: Prisma.RiskFactorsFindUniqueArgs): Promise<RiskFactorsEntity> {
+    const risk = await this.prisma.riskFactors.findUnique({
+      where: { id_companyId: { id, companyId } },
+      include: {
+        recMed: true,
+        generateSource: true,
+        esocial: true,
+      },
+      ...options,
+    });
+
+    return new RiskFactorsEntity(risk);
+  }
+
   async findAllByCompanyId(
     companyId: string,
     options?: IPrismaOptions<{
@@ -353,6 +367,7 @@ export class RiskRepository implements IRiskRepository {
         type: true,
         representAll: true,
         id: true,
+        unit: true,
         isPGR: true,
         isAso: true,
         isPPP: true,

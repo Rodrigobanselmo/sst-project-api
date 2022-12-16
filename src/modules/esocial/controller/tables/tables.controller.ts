@@ -5,6 +5,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { FindAllTable27Service } from '../../services/tables/find-all-27.service';
 import { FindCitiesDto } from '../../dto/cities.dto';
 import { Prisma } from '@prisma/client';
+import { FindEsocialTable24Dto } from '../../dto/event.dto';
 
 @ApiTags('tables')
 @Controller('esocial')
@@ -149,8 +150,12 @@ export class TablesController {
 
   //not been used
   @Get('table-24')
-  async find24() {
-    const data = await this.prisma.esocialTable24.findMany({ select: { id: true, name: true, type: true }, orderBy: { name: 'asc' } });
+  async find24(@Query() query: FindEsocialTable24Dto) {
+    const data = await this.prisma.esocialTable24.findMany({
+      ...(query.type && { where: { type: query.type } }),
+      select: { id: true, name: true, type: true },
+      orderBy: { name: 'asc' },
+    });
     return { data };
   }
 

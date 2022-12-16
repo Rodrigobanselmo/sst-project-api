@@ -1,10 +1,11 @@
 import { RiskFactorDataEntity } from '../../sst/entities/riskData.entity';
 import { ApiProperty } from '@nestjs/swagger';
-import { HierarchyOnHomogeneous, HomogeneousGroup, HomoTypeEnum, StatusEnum } from '@prisma/client';
+import { HierarchyOnHomogeneous, HomogeneousGroup, HomoTypeEnum, StatusEnum, Company } from '@prisma/client';
 import { HierarchyEntity } from './hierarchy.entity';
 import { WorkspaceEntity } from './workspace.entity';
 import { CharacterizationEntity } from './characterization.entity';
 import { EnvironmentEntity } from './environment.entity';
+import { CompanyEntity } from './company.entity';
 
 export class HomoGroupEntity implements HomogeneousGroup {
   @ApiProperty({ description: 'The id of the HomogeneousGroup' })
@@ -45,6 +46,7 @@ export class HomoGroupEntity implements HomogeneousGroup {
   deletedAt: Date;
 
   employeeCount?: number;
+  company?: CompanyEntity;
 
   constructor(partial: Partial<HomoGroupEntity>) {
     Object.assign(this, partial);

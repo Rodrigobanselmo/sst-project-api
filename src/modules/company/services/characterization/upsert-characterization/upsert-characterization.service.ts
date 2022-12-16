@@ -23,7 +23,7 @@ export class UpsertCharacterizationService {
     files: Array<Express.Multer.File>,
   ) {
     const companyId = userPayloadDto.targetCompanyId;
-
+    console.log(upsertCharacterizationDto);
     const characterization = await this.characterizationRepository.upsert({
       ...upsertCharacterizationDto,
       companyId,

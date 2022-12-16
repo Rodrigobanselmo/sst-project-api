@@ -142,6 +142,7 @@ import { UpsertCompanyOSService } from './services/os/upsert-os/upsert-os.servic
 import { CompanyOSController } from './controller/os/os.controller';
 import { DeleteCompanyOSService } from './services/os/delete-os/delete-os.service';
 import { CopyCompanyOSService } from './services/os/copy-os/copy-os.service';
+import { FindClinicScheduleTimeService } from './services/employee/0-history/exams/find-clinic-time/find-clinic-time.service';
 
 @Module({
   imports: [
@@ -294,6 +295,7 @@ import { CopyCompanyOSService } from './services/os/copy-os/copy-os.service';
     DeleteCompanyOSService,
     UpsertCompanyOSService,
     CopyCompanyOSService,
+    FindClinicScheduleTimeService,
   ],
   exports: [
     CompanyRepository,

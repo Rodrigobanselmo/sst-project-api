@@ -39,6 +39,7 @@ export class FindClinicService {
             isDismissal: true,
             observation: true,
             isScheduled: true,
+            examMinDuration: true,
           },
         },
         //! this is loading all exams, could just load the exams required on schedule

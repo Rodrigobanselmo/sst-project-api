@@ -19,6 +19,7 @@ export class FindRiskService {
           id: true,
           type: true,
           severity: true,
+          unit: true,
 
           symptoms: true,
           risk: true,

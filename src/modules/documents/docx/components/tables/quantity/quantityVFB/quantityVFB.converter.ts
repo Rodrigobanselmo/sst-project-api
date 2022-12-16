@@ -10,6 +10,7 @@ import { borderStyleGlobal } from '../../../../base/config/styles';
 import { IHierarchyMap } from '../../../../converter/hierarchy.converter';
 import { bodyTableProps } from './elements/body';
 import { QuantityVFBColumnEnum } from './quantityVFB.constant';
+import sortArray from 'sort-array';
 
 export const quantityVFBConverter = (riskGroupData: RiskFactorGroupDataEntity, hierarchyTree: IHierarchyMap) => {
   const rows: bodyTableProps[][] = [];
@@ -83,5 +84,12 @@ export const quantityVFBConverter = (riskGroupData: RiskFactorGroupDataEntity, h
       rows.push(cells);
     });
 
-  return rows;
+  return sortArray(rows, {
+    by: ['name'],
+    computed: {
+      name: (v) => {
+        return v[QuantityVFBColumnEnum.ORIGIN]?.text || '';
+      },
+    },
+  });
 };

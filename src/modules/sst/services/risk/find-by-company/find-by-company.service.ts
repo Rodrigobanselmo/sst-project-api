@@ -32,6 +32,7 @@ export class FindRisksByCompanyService {
           type: true,
           representAll: true,
           companyId: true,
+          unit: true,
           id: true,
           isPGR: true,
           isAso: true,

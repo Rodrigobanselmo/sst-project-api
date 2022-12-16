@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
+import { Public } from '../../../../shared/decorators/public.decorator';
 
 import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
@@ -9,6 +10,7 @@ import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import {
   CreateEmployeeExamHistoryDto,
   FindClinicEmployeeExamHistoryDto,
+  FindClinicScheduleTimeDto,
   FindCompanyEmployeeExamHistoryDto,
   FindEmployeeExamHistoryDto,
   UpdateEmployeeExamHistoryDto,
@@ -21,6 +23,7 @@ import { DeleteEmployeeExamHistoryService } from '../../services/employee/0-hist
 import { DownloadExamService } from '../../services/employee/0-history/exams/download-exam/download-exam.service';
 import { FindByIdEmployeeExamHistoryService } from '../../services/employee/0-history/exams/find-by-id/find-by-id.service';
 import { FindClinicScheduleEmployeeExamHistoryService } from '../../services/employee/0-history/exams/find-clinic-schedules/find-clinic-schedules.service';
+import { FindClinicScheduleTimeService } from '../../services/employee/0-history/exams/find-clinic-time/find-clinic-time.service';
 import { FindCompanyScheduleEmployeeExamHistoryService } from '../../services/employee/0-history/exams/find-company-schedules/find-company-schedules.service';
 import { FindScheduleEmployeeExamHistoryService } from '../../services/employee/0-history/exams/find-schedule/find-schedule.service';
 import { FindEmployeeExamHistoryService } from '../../services/employee/0-history/exams/find/find.service';
@@ -44,6 +47,7 @@ export class EmployeeExamHistoryController {
     private readonly downloadExamService: DownloadExamService,
     private readonly uploadExamFileService: UploadExamFileService,
     private readonly deleteExamFileService: DeleteExamFileService,
+    private readonly findClinicScheduleTimeService: FindClinicScheduleTimeService,
   ) {}
 
   @Permissions(
@@ -126,6 +130,12 @@ export class EmployeeExamHistoryController {
   @Get('schedule/clinic')
   findClinicSchedule(@User() userPayloadDto: UserPayloadDto, @Query() query: FindClinicEmployeeExamHistoryDto) {
     return this.findClinicScheduleEmployeeExamHistoryService.execute(query, userPayloadDto);
+  }
+
+  @Public()
+  @Get('/schedule/clinic/time')
+  findScheduleTime(@Query() query: FindClinicScheduleTimeDto) {
+    return this.findClinicScheduleTimeService.execute(query);
   }
 
   @Permissions(

@@ -93,6 +93,7 @@ import { CreateProtocolToRiskService } from './services/protocolToRisk/create-pr
 import { ProtocolToRiskController } from './controller/protocol-to-risk/protocolToRisk.controller';
 import { FindAllRiskDataByEmployeeService } from './services/risk-data/find-by-employee/find-by-employee.service';
 import { CheckEmployeeExamService } from './services/exam/check-employee-exam/check-employee-exam.service';
+import { FindRiskByIdService } from './services/risk/find-one/find-one.service';
 
 @Module({
   controllers: [
@@ -190,6 +191,7 @@ import { CheckEmployeeExamService } from './services/exam/check-employee-exam/ch
     UpdateProtocolToRiskService,
     FindAllRiskDataByEmployeeService,
     CheckEmployeeExamService,
+    FindRiskByIdService,
   ],
   exports: [
     RiskRepository,

@@ -35,21 +35,9 @@ export class CreateRiskDto {
   @IsString()
   companyId: string;
 
-  @IsBoolean()
-  @IsOptional()
-  isEmergency: boolean;
-
   @IsString()
   @IsOptional()
-  risk: string;
-
-  @IsString()
-  @IsOptional()
-  esocialCode: string;
-
-  @IsString()
-  @IsOptional()
-  symptoms: string;
+  esocialCode?: string;
 
   @ValidateNested({ each: true })
   @IsOptional()
@@ -76,6 +64,90 @@ export class CreateRiskDto {
   @IsOptional()
   @IsBoolean()
   isPPP?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  isEmergency?: boolean;
+
+  @IsString()
+  @IsOptional()
+  risk?: string;
+
+  @IsString()
+  @IsOptional()
+  symptoms?: string;
+
+  @IsString()
+  @IsOptional()
+  method?: string;
+
+  @IsString({ each: true })
+  @IsOptional()
+  propagation?: string[];
+
+  //FIS QUI
+
+  @IsString()
+  @IsOptional()
+  unit?: string;
+
+  //QUI
+
+  @IsString()
+  @IsOptional()
+  cas?: string;
+
+  @IsString()
+  @IsOptional()
+  breather?: string;
+
+  @IsString()
+  @IsOptional()
+  nr15lt?: string;
+
+  @IsString()
+  @IsOptional()
+  twa?: string;
+
+  @IsString()
+  @IsOptional()
+  stel?: string;
+
+  @IsString()
+  @IsOptional()
+  vmp?: string;
+
+  @IsString()
+  @IsOptional()
+  ipvs?: string;
+
+  @IsString()
+  @IsOptional()
+  pv?: string;
+
+  @IsString()
+  @IsOptional()
+  pe?: string;
+
+  @IsString()
+  @IsOptional()
+  carnogenicityACGIH?: string;
+
+  @IsString()
+  @IsOptional()
+  carnogenicityLinach?: string;
+
+  @IsString()
+  @IsOptional()
+  fraction?: string;
+
+  @IsString()
+  @IsOptional()
+  tlv?: string;
+
+  @IsString()
+  @IsOptional()
+  coments?: string;
 }
 
 export class UpsertRiskDto extends CreateRiskDto {
@@ -126,6 +198,14 @@ export class UpdateRiskDto {
   @IsString()
   companyId: string;
 
+  @IsBoolean()
+  @IsOptional()
+  isEmergency?: boolean;
+
+  @IsString()
+  @IsOptional()
+  esocialCode?: string;
+
   @IsString()
   @IsOptional()
   risk?: string;
@@ -134,9 +214,73 @@ export class UpdateRiskDto {
   @IsOptional()
   symptoms?: string;
 
-  @IsBoolean()
+  @IsString()
   @IsOptional()
-  isEmergency?: boolean;
+  method?: string;
+
+  @IsString({ each: true })
+  @IsOptional()
+  propagation?: string[];
+
+  //FIS QUI
+
+  @IsString()
+  @IsOptional()
+  unit?: string;
+
+  //QUI
+
+  @IsString()
+  @IsOptional()
+  cas?: string;
+
+  @IsString()
+  @IsOptional()
+  breather?: string;
+
+  @IsString()
+  @IsOptional()
+  nr15lt?: string;
+
+  @IsString()
+  @IsOptional()
+  twa?: string;
+
+  @IsString()
+  @IsOptional()
+  stel?: string;
+
+  @IsString()
+  @IsOptional()
+  vmp?: string;
+
+  @IsString()
+  @IsOptional()
+  ipvs?: string;
+
+  @IsString()
+  @IsOptional()
+  pv?: string;
+
+  @IsString()
+  @IsOptional()
+  pe?: string;
+
+  @IsString()
+  @IsOptional()
+  carnogenicityACGIH?: string;
+
+  @IsString()
+  @IsOptional()
+  carnogenicityLinach?: string;
+
+  @IsString()
+  @IsOptional()
+  fraction?: string;
+
+  @IsString()
+  @IsOptional()
+  tlv?: string;
 
   @ValidateNested({ each: true })
   @IsOptional()
@@ -147,6 +291,26 @@ export class UpdateRiskDto {
   @IsOptional()
   @Type(() => RiskUpdateGenerateSourceDto)
   generateSource?: RiskUpdateGenerateSourceDto[];
+
+  @IsOptional()
+  @IsBoolean()
+  isAso?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  isPGR?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  isPCMSO?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  isPPP?: boolean;
+
+  @IsString()
+  @IsOptional()
+  coments?: string;
 }
 
 export class FindRiskDto extends PaginationQueryDto {

@@ -258,7 +258,8 @@ export class EmployeeRepository {
           exam: { isAttendance: true },
           status: { in: ['PENDING', 'PROCESSING', 'DONE'] },
         },
-        take: 1,
+        distinct: ['status'],
+        take: 3,
         orderBy: { created_at: 'desc' },
       };
     }

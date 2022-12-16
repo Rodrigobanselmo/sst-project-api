@@ -13,7 +13,7 @@ export class AmazonStorageProvider implements IStorageProvider {
   }
 
   async upload({ file, fileName, isPublic }: FileStorage.Upload.Params): Promise<FileStorage.Upload.Result> {
-    // if (process.env.APP_HOST.includes('localhost')) return { url: 'edwq' };
+    if (process.env.APP_HOST.includes('localhost')) return { url: 'edwq' };
 
     const { Location: url } = await this.s3
       .upload({
@@ -52,7 +52,7 @@ export class AmazonStorageProvider implements IStorageProvider {
   }
 
   async delete({ fileName }: FileStorage.Delete.Params): Promise<FileStorage.Delete.Result> {
-    if (process.env.APP_HOST.includes('localhost')) return;
+    if (process.env.APP_HOST.includes('localhost') && !fileName.includes('test')) return;
 
     await this.s3.deleteObject({ Bucket: this.bucket, Key: fileName }).promise();
   }

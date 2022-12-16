@@ -4,6 +4,7 @@ export enum ErrorMessageEnum {
   NOT_FOUND_ON_COMPANY_TO_DELETE = 'Dado a ser deletado não foi encontrado nesta empresa',
   PRISMA_ERROR = 'Desculpe, algo de errado acontenceu, informe o suporte para mais detalhes',
   FORBIDDEN_ACCESS = 'Você não tem permissão para realizar essa esta ação',
+  ESOCIAL_FORBIDDEN_DELETION = 'Eventos do eSocial vinculado. Você pode "INATIVAR" caso necessário',
 
   //* PROFESSIONALS
   PROFESSIONAL_NOT_FOUND = 'Profissional não encontrado ou sem premissões de acesso',
