@@ -17,12 +17,17 @@ import { CreateAbsenceRisk as createAbsenceRisk } from './run/create-no-risk';
 import { addEsocialTables } from './seed/addEsocialTables';
 import { motiveTables } from './seed/motiveTables';
 import { cid10Table } from './seed/cid10Table';
+import { deleteRecMed } from './run/delete-rec-med';
 
 const prisma = new PrismaClient();
 
 async function main() {
   try {
     console.log('start');
+    // const group = await prisma.employeeESocialEvent.groupBy({
+    //   by: ['status'],
+    //   _count: true,
+    // });
 
     //await deleteWithNameCompany('Deletar', prisma);
     // await representAll(prisma); //* DONE
@@ -41,10 +46,7 @@ async function main() {
 
     //*next
 
-    // const group = await prisma.employeeESocialEvent.groupBy({
-    //   by: ['status'],
-    //   _count: true,
-    // });
+    await deleteRecMed(prisma);
 
     console.log('end');
   } catch (err) {

@@ -1,7 +1,10 @@
+import { PaginationQueryDto } from './../../../../shared/dto/pagination.dto';
+import { prismaFilter } from './../../../../shared/utils/filters/prisma.filters';
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
-import { CreateGenerateSourceDto, UpdateGenerateSourceDto } from '../../dto/generate-source.dto';
+import { CreateGenerateSourceDto, FindGenerateSourceDto, UpdateGenerateSourceDto } from '../../dto/generate-source.dto';
 import { GenerateSourceEntity } from '../../entities/generateSource.entity';
 import { IGenerateSourceRepository } from '../IGenerateSourceRepository.types';
 
@@ -104,5 +107,84 @@ export class GenerateSourceRepository implements IGenerateSourceRepository {
     });
 
     return new GenerateSourceEntity(generate);
+  }
+
+  async find(query: Partial<FindGenerateSourceDto>, pagination: PaginationQueryDto, options: Prisma.GenerateSourceFindManyArgs = {}) {
+    const whereInit = {
+      AND: [],
+      ...options.where,
+    } as typeof options.where;
+    const include = { ...options?.include };
+
+    const { where } = prismaFilter(whereInit, {
+      query,
+      skip: ['search', 'companyId', 'riskIds'],
+    });
+
+    if ('riskIds' in query) {
+      (where.AND as any).push({
+        riskId: { in: query.riskIds },
+      } as typeof options.where);
+    }
+
+    if ('companyId' in query) {
+      (where.AND as any).push({
+        OR: [
+          { companyId: query.companyId },
+          {
+            company: {
+              applyingServiceContracts: {
+                some: { receivingServiceCompanyId: query.companyId },
+              },
+            },
+          },
+          { system: true },
+        ],
+      } as typeof options.where);
+    }
+
+    if ('search' in query) {
+      const OR = [] as any[];
+
+      OR.push({ name: { contains: query.search, mode: 'insensitive' } });
+
+      (where.AND as any).push({
+        OR,
+      } as typeof options.where);
+    }
+
+    const response = await this.prisma.$transaction([
+      this.prisma.generateSource.count({
+        where,
+      }),
+      this.prisma.generateSource.findMany({
+        where,
+        include: Object.keys(include).length > 0 ? include : undefined,
+        take: pagination.take || 20,
+        skip: pagination.skip || 0,
+        orderBy: { name: 'asc' },
+      }),
+    ]);
+
+    return {
+      data: response[1].map((generateSource) => new GenerateSourceEntity(generateSource)),
+      count: response[0],
+    };
+  }
+
+  async findNude(options: Prisma.GenerateSourceFindManyArgs = {}) {
+    const response = await this.prisma.$transaction([
+      this.prisma.generateSource.count({
+        where: options.where,
+      }),
+      this.prisma.generateSource.findMany({
+        ...options,
+      }),
+    ]);
+
+    return {
+      data: response[1].map((recMed) => new GenerateSourceEntity(recMed)),
+      count: response[0],
+    };
   }
 }

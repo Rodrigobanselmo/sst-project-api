@@ -1,7 +1,9 @@
+import { QueryArray } from './../../../shared/transformers/query-array';
+import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
 import { PartialType } from '@nestjs/swagger';
-import { MeasuresTypeEnum, RecTypeEnum, StatusEnum } from '@prisma/client';
+import { MeasuresTypeEnum, RecTypeEnum, RiskFactorsEnum, StatusEnum } from '@prisma/client';
 import { Transform } from 'class-transformer';
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsEnum, IsOptional, IsString } from 'class-validator';
 
 import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
@@ -150,4 +152,58 @@ export class RiskUpdateRecMedDto extends PartialType(RiskCreateRecMedDto) {
   @IsString()
   @IsOptional()
   id: string;
+}
+
+export class FindRecMedDto extends PaginationQueryDto {
+  @IsString()
+  @IsOptional()
+  search?: string;
+
+  @IsString()
+  @IsOptional()
+  companyId?: string;
+
+  @IsString()
+  @IsOptional()
+  riskType?: RiskFactorsEnum;
+
+  @IsBoolean()
+  @IsOptional()
+  onlyRec?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  onlyMed?: boolean;
+
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsOptional()
+  @IsString({ each: true })
+  riskIds?: string[];
+
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsOptional()
+  @IsString({ each: true })
+  @IsEnum(MeasuresTypeEnum, {
+    message: `${KeysOfEnum(MeasuresTypeEnum)}`,
+    each: true,
+  })
+  medType?: MeasuresTypeEnum[];
+
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsOptional()
+  @IsString({ each: true })
+  @IsEnum(RecTypeEnum, {
+    message: `${KeysOfEnum(RecTypeEnum)}`,
+    each: true,
+  })
+  recType?: RecTypeEnum[];
+
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsOptional()
+  @IsString({ each: true })
+  @IsEnum(StatusEnum, {
+    message: `type must be one of: ${KeysOfEnum(StatusEnum)}`,
+    each: true,
+  })
+  status?: StatusEnum[];
 }

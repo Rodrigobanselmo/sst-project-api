@@ -103,6 +103,14 @@ export class UpdateHomoGroupDto {
   @IsOptional()
   @Type(() => HierarchyOnHomoDto)
   readonly hierarchies?: HierarchyOnHomoDto[];
+
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsString()
+  @IsOptional()
+  @IsEnum(StatusEnum, {
+    message: `status must be one of: ${StatusEnum.ACTIVE} or ${StatusEnum.INACTIVE}`,
+  })
+  status?: StatusEnum;
 }
 
 export class UpdateHierarchyHomoGroupDto {

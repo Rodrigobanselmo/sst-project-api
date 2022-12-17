@@ -55,6 +55,7 @@ export class RecMedEntity implements RecMed {
   recType: RecTypeEnum;
 
   engsRiskData?: EngsRiskDataEntity;
+  isAll?: boolean;
 
   constructor(partial: Partial<RecMedEntity>) {
     Object.assign(this, partial);

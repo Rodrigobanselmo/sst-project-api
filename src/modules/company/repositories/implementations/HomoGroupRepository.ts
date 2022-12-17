@@ -284,7 +284,7 @@ export class HomoGroupRepository {
     } = {},
   ) {
     const hierarchies = await this.prisma.homogeneousGroup.findMany({
-      where: { companyId, ...options.where },
+      where: { companyId, status: 'ACTIVE', ...options.where },
       include: {
         hierarchyOnHomogeneous: { include: { hierarchy: true } },
         ...options.include,

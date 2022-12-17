@@ -1,4 +1,6 @@
-import { StatusEnum } from '@prisma/client';
+import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
+import { QueryArray } from './../../../shared/transformers/query-array';
+import { RiskFactorsEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import { IsEnum, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
@@ -78,4 +80,32 @@ export class RiskUpdateGenerateSourceDto extends RiskCreateGenerateSourceDto {
   @IsString()
   @IsOptional()
   id: string;
+}
+
+export class FindGenerateSourceDto extends PaginationQueryDto {
+  @IsString()
+  @IsOptional()
+  search?: string;
+
+  @IsString()
+  @IsOptional()
+  companyId?: string;
+
+  @IsString()
+  @IsOptional()
+  riskType?: RiskFactorsEnum;
+
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsOptional()
+  @IsString({ each: true })
+  riskIds?: string[];
+
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsOptional()
+  @IsString({ each: true })
+  @IsEnum(StatusEnum, {
+    message: `type must be one of: ${KeysOfEnum(StatusEnum)}`,
+    each: true,
+  })
+  status?: StatusEnum[];
 }

@@ -1,5 +1,5 @@
 import { UpsertDocumentPCMSOService } from './services/documentPcmso/upsert-document-pcmso/upsert-document-pcmso.service';
-import { Module, forwardRef } from '@nestjs/common';
+import { Module, forwardRef, CacheModule } from '@nestjs/common';
 import { DayJSProvider } from '../../shared/providers/DateProvider/implementations/DayJSProvider';
 
 import { CompanyModule } from '../company/company.module';
@@ -94,6 +94,8 @@ import { ProtocolToRiskController } from './controller/protocol-to-risk/protocol
 import { FindAllRiskDataByEmployeeService } from './services/risk-data/find-by-employee/find-by-employee.service';
 import { CheckEmployeeExamService } from './services/exam/check-employee-exam/check-employee-exam.service';
 import { FindRiskByIdService } from './services/risk/find-one/find-one.service';
+import { FindRecMedService } from './services/rec-med/find-rec-med/find-rec-med.service';
+import { FindGenerateSourceService } from './services/generate-source/find-generate-source/find-generate-source.service';
 
 @Module({
   controllers: [
@@ -192,6 +194,8 @@ import { FindRiskByIdService } from './services/risk/find-one/find-one.service';
     FindAllRiskDataByEmployeeService,
     CheckEmployeeExamService,
     FindRiskByIdService,
+    FindRecMedService,
+    FindGenerateSourceService,
   ],
   exports: [
     RiskRepository,
@@ -206,6 +210,6 @@ import { FindRiskByIdService } from './services/risk/find-one/find-one.service';
     EpiRepository,
     CheckEmployeeExamService,
   ],
-  imports: [forwardRef(() => CompanyModule)],
+  imports: [forwardRef(() => CompanyModule), CacheModule.register()],
 })
 export class SSTModule {}
