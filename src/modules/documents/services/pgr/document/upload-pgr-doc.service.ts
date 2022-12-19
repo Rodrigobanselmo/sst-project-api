@@ -129,7 +129,7 @@ export class PgrUploadService {
               include: { riskFactorData: { include: { riskFactor: true } } },
             },
           },
-          where: { workspaceId },
+          where: { workspaceId, status: 'ACTIVE' },
         },
         // professionals: { include: { councils: true } },
         receivingServiceContracts: {

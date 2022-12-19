@@ -1,6 +1,6 @@
 import { RiskFactorDataEntity } from '../../sst/entities/riskData.entity';
 import { ApiProperty } from '@nestjs/swagger';
-import { CharacterizationTypeEnum, CompanyCharacterization } from '@prisma/client';
+import { CharacterizationTypeEnum, CompanyCharacterization, StatusEnum } from '@prisma/client';
 
 import { CharacterizationPhotoEntity } from './characterization-photo.entity';
 import { HierarchyEntity } from './hierarchy.entity';
@@ -51,6 +51,7 @@ export class CharacterizationEntity implements CompanyCharacterization {
   profileParentId: string;
   profileParent?: CharacterizationEntity;
   profiles?: CharacterizationEntity[];
+  status: StatusEnum;
 
   constructor(partial: Partial<CharacterizationEntity>) {
     Object.assign(this, partial);

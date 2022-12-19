@@ -1,4 +1,4 @@
-import { ErrorMessageEnum } from './../../../../../shared/constants/enum/errorMessage';
+import { ErrorCompanyEnum, ErrorMessageEnum } from './../../../../../shared/constants/enum/errorMessage';
 import { HomoGroupRepository } from './../../../repositories/implementations/HomoGroupRepository';
 import { CharacterizationPhotoRepository } from './../../../repositories/implementations/CharacterizationPhotoRepository';
 import { AmazonStorageProvider } from './../../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
@@ -6,6 +6,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { CharacterizationRepository } from '../../../repositories/implementations/CharacterizationRepository';
+import { DeleteHomoGroupService } from '../../homoGroup/delete-homo-group/delete-homo-group.service';
 
 @Injectable()
 export class DeleteCharacterizationService {
@@ -14,9 +15,11 @@ export class DeleteCharacterizationService {
     private readonly characterizationPhotoRepository: CharacterizationPhotoRepository,
     private readonly amazonStorageProvider: AmazonStorageProvider,
     private readonly homoGroupRepository: HomoGroupRepository,
+    private readonly deleteHomoGroupService: DeleteHomoGroupService,
   ) {}
 
   async execute(id: string, workspaceId: string, userPayloadDto: UserPayloadDto) {
+    await this.deleteHomoGroupService.checkDeletion(id, userPayloadDto);
     const photos = await this.characterizationPhotoRepository.findByCharacterization(id);
 
     await Promise.all(

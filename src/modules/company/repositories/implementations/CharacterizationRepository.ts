@@ -54,6 +54,7 @@ export class CharacterizationRepository {
       update: {
         type: getCharacterizationType(type),
         description: characterizationDto.name + '(//)' + type,
+        ...(characterizationDto.status && { status: characterizationDto.status }),
       },
       ...(hierarchyIds && {
         include: {
@@ -247,6 +248,22 @@ export class CharacterizationRepository {
     }
 
     return this.getHierarchiesAndRisks(id, characterization, options);
+  }
+
+  async findNude(options: Prisma.CompanyCharacterizationFindManyArgs = {}) {
+    const char = await this.prisma.companyCharacterization.findMany({
+      ...options,
+    });
+
+    return char.map((char) => new CharacterizationEntity(char));
+  }
+
+  async findFirstNude(options: Prisma.CompanyCharacterizationFindManyArgs = {}) {
+    const companyClinic = await this.prisma.companyCharacterization.findFirst({
+      ...options,
+    });
+
+    return new CharacterizationEntity(companyClinic);
   }
 
   async delete(id: string, companyId: string, workspaceId: string) {

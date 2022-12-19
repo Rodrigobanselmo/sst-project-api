@@ -685,6 +685,7 @@ model CompanyCharacterization {
   homogeneousGroup HomogeneousGroup? @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: Cascade) 
   companyId String
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
+  status StatusEnum @default(ACTIVE)
   
   @@unique([workspaceId, companyId, id])
 }

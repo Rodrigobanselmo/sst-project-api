@@ -1,4 +1,4 @@
-import { CharacterizationTypeEnum } from '@prisma/client';
+import { CharacterizationTypeEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import { IsDate, IsEnum, IsInt, IsOptional, IsString, MaxLength } from 'class-validator';
 
@@ -87,6 +87,14 @@ export class UpsertCharacterizationDto {
   @IsDate()
   @Type(() => Date)
   endDate?: Date;
+
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsString()
+  @IsOptional()
+  @IsEnum(StatusEnum, {
+    message: `Status inválido`,
+  })
+  status?: StatusEnum;
 }
 
 export class AddPhotoCharacterizationDto {

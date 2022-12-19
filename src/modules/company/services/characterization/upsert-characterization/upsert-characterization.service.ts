@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { ErrorCompanyEnum } from './../../../../../shared/constants/enum/errorMessage';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import sizeOf from 'image-size';
 import { v4 } from 'uuid';
 
@@ -23,7 +24,29 @@ export class UpsertCharacterizationService {
     files: Array<Express.Multer.File>,
   ) {
     const companyId = userPayloadDto.targetCompanyId;
-    console.log(upsertCharacterizationDto);
+    const inactivating = upsertCharacterizationDto.status == 'INACTIVE';
+
+    if (inactivating) {
+      const foundHomoGroup = await this.characterizationRepository.findFirstNude({
+        where: {
+          id: upsertCharacterizationDto.id,
+          companyId,
+        },
+        select: {
+          id: true,
+          created_at: true,
+          ...(inactivating && { homogeneousGroup: { select: { hierarchyOnHomogeneous: { where: { endDate: null }, take: 1, select: { id: true } } } } }),
+        },
+      });
+
+      if (!foundHomoGroup?.id) throw new BadRequestException(ErrorCompanyEnum.CHAR_NOT_FOUND);
+
+      const forbidenInactivating = inactivating && foundHomoGroup.homogeneousGroup?.hierarchyOnHomogeneous[0]?.id;
+      if (forbidenInactivating) {
+        throw new BadRequestException(ErrorCompanyEnum.FORBIDEN_INACTIVATION);
+      }
+    }
+
     const characterization = await this.characterizationRepository.upsert({
       ...upsertCharacterizationDto,
       companyId,

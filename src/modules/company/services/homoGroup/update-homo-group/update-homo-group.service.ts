@@ -10,9 +10,21 @@ export class UpdateHomoGroupService {
   constructor(private readonly homoGroupRepository: HomoGroupRepository, private readonly employeePPPHistoryRepository: EmployeePPPHistoryRepository) {}
 
   async execute(homoGroup: UpdateHomoGroupDto, userPayloadDto: UserPayloadDto) {
-    const foundHomoGroup = await this.homoGroupRepository.findHomoGroupByCompanyAndId(homoGroup.id, userPayloadDto.targetCompanyId);
+    const inactivating = homoGroup.status == 'INACTIVE';
+    const foundHomoGroup = await this.homoGroupRepository.findHomoGroupByCompanyAndId(homoGroup.id, userPayloadDto.targetCompanyId, {
+      select: {
+        id: true,
+        created_at: true,
+        ...(inactivating && { hierarchyOnHomogeneous: { where: { endDate: null }, take: 1, select: { id: true } } }),
+      },
+    });
 
     if (!foundHomoGroup?.id) throw new BadRequestException(ErrorCompanyEnum.GHO_NOT_FOUND);
+
+    const forbidenInactivating = inactivating && foundHomoGroup.hierarchyOnHomogeneous[0]?.id;
+    if (forbidenInactivating) {
+      throw new BadRequestException(ErrorCompanyEnum.FORBIDEN_INACTIVATION);
+    }
 
     const homo = await this.homoGroupRepository.update(homoGroup);
 

@@ -40,6 +40,8 @@ export enum ErrorCompanyEnum {
   UPSERT_HIERARCHY_WITH_SUB_OFFICE_OTHER_OFFICE = 'Não é possivel adicionar um empregado de outro cargo a um cargo desenvolvido',
   EVERYONE_NOT_FROM_SAME_OFFICE = 'Os empregados precisam estar no mesmo cargo',
   GHO_NOT_FOUND = 'O GHO informado não foi encontrado nesta empresa',
+  CHAR_NOT_FOUND = 'Ambiente/Atividade não encontrado ou sem permissão',
+  FORBIDEN_INACTIVATION = 'Para inativar é necessario informar "Data Fim" para todos os cargos',
   ENVIRONMENT_NOT_FOUND = 'O Ambiente requisitado não foi encontrado nesta empresa',
   CHARACTERIZATION_NOT_FOUND = 'A Atividade requisitada não foi encontrado nesta empresa',
   HOMOGENEOUS_SAME_NAME = 'Já existe um grupo homogêneo com o mesmo nome',

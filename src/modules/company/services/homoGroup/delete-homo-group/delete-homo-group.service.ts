@@ -9,6 +9,13 @@ export class DeleteHomoGroupService {
   constructor(private readonly homoGroupRepository: HomoGroupRepository) {}
 
   async execute(id: string, userPayloadDto: UserPayloadDto) {
+    await this.checkDeletion(id, userPayloadDto);
+    const homoGroups = await this.homoGroupRepository.deleteById(id);
+
+    return homoGroups;
+  }
+
+  async checkDeletion(id: string, userPayloadDto: UserPayloadDto) {
     const foundHomoGroup = await this.homoGroupRepository.findHomoGroupByCompanyAndId(id, userPayloadDto.targetCompanyId, {
       select: {
         id: true,
@@ -16,7 +23,7 @@ export class DeleteHomoGroupService {
       },
     });
 
-    if (!foundHomoGroup?.id) throw new BadRequestException(ErrorCompanyEnum.GHO_NOT_FOUND);
+    if (!foundHomoGroup?.id) throw new BadRequestException(ErrorCompanyEnum.CHAR_NOT_FOUND);
 
     const foundHomoGroupEvent = await this.homoGroupRepository.findHomoGroupByCompanyAndId(id, userPayloadDto.targetCompanyId, {
       select: {
@@ -47,9 +54,5 @@ export class DeleteHomoGroupService {
     });
 
     if (foundHomoGroupEvent.hierarchyOnHomogeneous?.[0]?.id) throw new BadRequestException(ErrorMessageEnum.ESOCIAL_FORBIDDEN_DELETION);
-
-    const homoGroups = await this.homoGroupRepository.deleteById(id);
-
-    return homoGroups;
   }
 }

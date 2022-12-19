@@ -312,6 +312,7 @@ import { FindClinicScheduleTimeService } from './services/employee/0-history/exa
     UpdateESocialReportService,
     EmployeePPPHistoryRepository,
     CatRepository,
+    DeleteHomoGroupService,
   ],
 })
 export class CompanyModule {}
