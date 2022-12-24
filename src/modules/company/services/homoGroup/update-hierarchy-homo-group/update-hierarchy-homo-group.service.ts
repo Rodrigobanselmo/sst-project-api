@@ -4,10 +4,15 @@ import { UpdateHierarchyHomoGroupDto } from '../../../dto/homoGroup';
 import { HomoGroupRepository } from '../../../repositories/implementations/HomoGroupRepository';
 import { ErrorCompanyEnum } from '../../../../../shared/constants/enum/errorMessage';
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
+import { DeleteHierarchyHomoGroupService } from '../delete-hierarchy-homo-group/delete-hierarchy-homo-group.service';
 
 @Injectable()
 export class UpdateHierarchyHomoGroupService {
-  constructor(private readonly homoGroupRepository: HomoGroupRepository, private readonly employeePPPHistoryRepository: EmployeePPPHistoryRepository) {}
+  constructor(
+    private readonly homoGroupRepository: HomoGroupRepository,
+    private readonly deleteHierarchyHomoGroupService: DeleteHierarchyHomoGroupService,
+    private readonly employeePPPHistoryRepository: EmployeePPPHistoryRepository,
+  ) {}
 
   async execute(homoGroup: UpdateHierarchyHomoGroupDto, userPayloadDto: UserPayloadDto) {
     const foundHomoGroup = await this.homoGroupRepository.findFirstNude({
@@ -23,7 +28,7 @@ export class UpdateHierarchyHomoGroupService {
       select: {
         id: true,
         hierarchyOnHomogeneous: {
-          select: { id: true },
+          select: { id: true, startDate: true, endDate: true },
           where: {
             workspaceId: homoGroup.workspaceId,
             id: { in: homoGroup.ids },
@@ -34,6 +39,8 @@ export class UpdateHierarchyHomoGroupService {
 
     if (!foundHomoGroup?.id) throw new BadRequestException(ErrorCompanyEnum.GHO_NOT_FOUND);
     if (foundHomoGroup?.hierarchyOnHomogeneous.length !== homoGroup.ids.length) throw new BadRequestException(ErrorCompanyEnum.GHO_NOT_FOUND);
+
+    await this.deleteHierarchyHomoGroupService.checkDeletion(foundHomoGroup, userPayloadDto, { updateCheck: true, data: homoGroup });
 
     const data = await this.homoGroupRepository.updateHierarchyHomo(homoGroup);
 

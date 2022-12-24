@@ -10,7 +10,6 @@ export class FindAllByHierarchyService {
 
   async execute(hierarchyId: string, companyId: string) {
     const risks = await this.riskRepository.findRiskDataByHierarchies([hierarchyId], companyId);
-    console.log(9);
     const riskDataReturn: RiskFactorDataEntity[] = [];
 
     risks.forEach((risk) => {

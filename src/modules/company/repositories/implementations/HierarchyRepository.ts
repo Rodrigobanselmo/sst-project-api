@@ -132,7 +132,7 @@ export class HierarchyRepository {
           update: {
             ...upsertHierarchy,
             name: name.split('//')[0],
-            workspaces: !workspaceIds
+            workspaces: !(workspaceIds && workspaceIds.length > 0)
               ? undefined
               : {
                   set: workspaceIds.map((id) => ({
@@ -390,9 +390,10 @@ export class HierarchyRepository {
   async findAllHierarchyByCompanyAndId(id: string, companyId: string) {
     const hierarchy = await this.prisma.hierarchy.findFirst({
       where: { companyId, id },
+      include: { workspaces: { select: { id: true } } },
     });
 
-    return new HierarchyEntity(hierarchy);
+    return new HierarchyEntity(hierarchy as any);
   }
 
   async findAllHierarchyByCompany(

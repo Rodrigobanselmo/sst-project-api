@@ -5,6 +5,7 @@ export enum ErrorMessageEnum {
   PRISMA_ERROR = 'Desculpe, algo de errado acontenceu, informe o suporte para mais detalhes',
   FORBIDDEN_ACCESS = 'Você não tem permissão para realizar essa esta ação',
   ESOCIAL_FORBIDDEN_DELETION = 'Eventos do eSocial vinculado. Você pode "INATIVAR" caso necessário',
+  ESOCIAL_FORBIDDEN_HIER_DELETION = 'Eventos do eSocial vinculado. Você não possui permissão para alterar esse dado',
 
   //* PROFESSIONALS
   PROFESSIONAL_NOT_FOUND = 'Profissional não encontrado ou sem premissões de acesso',

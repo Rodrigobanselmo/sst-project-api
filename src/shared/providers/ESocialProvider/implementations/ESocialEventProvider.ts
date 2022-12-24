@@ -548,22 +548,22 @@ class ESocialEventProvider {
         }
 
         if (!isEmptyRisk) {
-          if (!epcEpi.utilizEPC)
-            errors.push({
-              message: `${ag.nameAgNoc} (${code || '-'}): Informar EPC's ou se é "não aplicavel" ou "não implementado"`,
-            });
+          // if (epcEpi.utilizEPC == null)
+          //   errors.push({
+          //     message: `${ag.nameAgNoc} (${code || '-'}): Informar EPC's ou se é "não aplicavel" ou "não implementado"`,
+          //   });
 
-          if (!epcEpi.utilizEPI)
-            errors.push({
-              message: `${ag.nameAgNoc} (${code || '-'}): Informar EPI's ou se é "não aplicavel" ou "não implementado"`,
-            });
+          // if (epcEpi.utilizEPI == null)
+          //   errors.push({
+          //     message: `${ag.nameAgNoc} (${code || '-'}): Informar EPI's ou se é "não aplicavel" ou "não implementado"`,
+          //   });
 
-          if (isEPCImplemented && !epcEpi.eficEpc)
+          if (isEPCImplemented && epcEpi.eficEpc == undefined)
             errors.push({
               message: `${ag.nameAgNoc} (${code || '-'}): Informar eficácia do EPC`,
             });
 
-          if (isEPIImplemented && !epcEpi.eficEpi)
+          if (isEPIImplemented && epcEpi.eficEpi == undefined)
             errors.push({
               message: `${ag.nameAgNoc} (${code || '-'}): Informar eficácia do EPI`,
             });
@@ -953,8 +953,8 @@ class ESocialEventProvider {
                   }),
                   ...(!isEmptyRisk && {
                     epcEpi: {
-                      utilizEPC: getEpcType(risk) || undefined,
-                      utilizEPI: getEpiType(risk) || undefined,
+                      utilizEPC: getEpcType(risk),
+                      utilizEPI: getEpiType(risk),
                       ...(isEPCImplemented && { eficEpc: isEPCEfficient ? YesNoEnum.YES : YesNoEnum.NO }),
                       ...(isEPIImplemented && { eficEpi: isEPIEfficient ? YesNoEnum.YES : YesNoEnum.NO }),
                       ...(isEPIImplemented && { epi: risk.riskData.epiToRiskFactorData.map((e) => ({ docAval: e?.epi?.ca || undefined })) }),
@@ -1327,8 +1327,8 @@ class ESocialEventProvider {
                 }),
                 ...(!isEmptyRisk && {
                   epcEpi: {
-                    utilizEPC: { ['_text']: epcEpi?.utilizEPC },
-                    utilizEPI: { ['_text']: epcEpi?.utilizEPI },
+                    utilizEPC: { ['_text']: epcEpi?.utilizEPC || utileEpiEpcEnum.NOT_APT },
+                    utilizEPI: { ['_text']: epcEpi?.utilizEPI || utileEpiEpcEnum.NOT_APT },
                     ...(isEPCImplemented && { eficEpc: { ['_text']: epcEpi?.eficEpc } }),
                     ...(isEPIImplemented && { eficEpi: { ['_text']: epcEpi?.eficEpi } }),
                     ...(isEPIImplemented && { epi: epcEpi?.epi.map((e) => ({ docAval: { ['_text']: e.docAval } })) }),

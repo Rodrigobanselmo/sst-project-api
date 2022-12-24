@@ -27,7 +27,7 @@ export class UpsertManyRiskDataService {
         const type = upsertRiskDataDto.type;
 
         const isTypeHierarchy = type && type == HomoTypeEnum.HIERARCHY;
-        if (isTypeHierarchy && workspaceId) {
+        if (isTypeHierarchy) {
           await hierarchyCreateHomo({
             homogeneousGroupId: homogeneousGroupId,
             companyId: upsertRiskDataDto.companyId,

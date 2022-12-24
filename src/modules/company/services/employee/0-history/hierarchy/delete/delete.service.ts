@@ -1,3 +1,4 @@
+import { RoleEnum } from './../../../../../../../shared/constants/enum/authorization';
 import { CheckEmployeeExamService } from './../../../../../../sst/services/exam/check-employee-exam/check-employee-exam.service';
 import { EmployeePPPHistoryRepository } from './../../../../../repositories/implementations/EmployeePPPHistoryRepository';
 import { EmployeeHierarchyHistoryEntity, historyRules } from './../../../../../entities/employee-hierarchy-history.entity';
@@ -21,13 +22,19 @@ export class DeleteEmployeeHierarchyHistoryService {
   ) {}
 
   async execute(id: number, employeeId: number, user: UserPayloadDto) {
-    const found = await this.employeeRepository.findById(employeeId, user.targetCompanyId);
+    const history = await this.employeeHierarchyHistoryRepository.findFirstNude({
+      where: { id, employeeId },
+      select: { id: true, employeeId: true, startDate: true, employee: { select: { id: true } } },
+    });
+
+    const found = history.employee;
 
     if (!found?.id) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_NOT_FOUND);
 
+    await this.checkDeletion(history, user);
     const hierarchyId = await this.check({ id, foundEmployee: found });
 
-    const history = await this.employeeHierarchyHistoryRepository.delete(id, employeeId, hierarchyId);
+    await this.employeeHierarchyHistoryRepository.delete(id, employeeId, hierarchyId);
 
     this.employeePPPHistoryRepository.updateManyNude({
       data: { sendEvent: true },
@@ -80,9 +87,9 @@ export class DeleteEmployeeHierarchyHistoryService {
 
     const getActualEmployeeHierarchy = () => {
       if (afterHistory === undefined) {
-        if (beforeHistory.motive === EmployeeHierarchyMotiveTypeEnum.DEM) return null;
-        if (beforeHistory.hierarchyId) return beforeHistory.hierarchyId;
-        if (!beforeHistory.hierarchyId) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_MISSING_HIERARCHY);
+        if (beforeHistory?.motive === EmployeeHierarchyMotiveTypeEnum.DEM) return null;
+        if (beforeHistory?.hierarchyId) return beforeHistory.hierarchyId;
+        if (!beforeHistory?.hierarchyId) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_MISSING_HIERARCHY);
       }
 
       return undefined;
@@ -90,5 +97,26 @@ export class DeleteEmployeeHierarchyHistoryService {
 
     const hierarchyId = getActualEmployeeHierarchy();
     return hierarchyId;
+  }
+
+  async checkDeletion(history: EmployeeHierarchyHistoryEntity, userPayloadDto: UserPayloadDto) {
+    if (userPayloadDto.roles.includes(RoleEnum.ESOCIAL_EDIT)) return;
+
+    const foundPPP = await this.employeePPPHistoryRepository.findFirstNude({
+      select: { id: true },
+      orderBy: { doneDate: 'desc' },
+      where: {
+        doneDate: { gte: history.startDate },
+        employeeId: history.employeeId,
+        events: {
+          some: {
+            status: { in: ['DONE', 'TRANSMITTED'] },
+            eventsDate: { gte: history.startDate },
+          },
+        },
+      },
+    });
+
+    if (foundPPP?.id) throw new BadRequestException(ErrorMessageEnum.ESOCIAL_FORBIDDEN_HIER_DELETION);
   }
 }

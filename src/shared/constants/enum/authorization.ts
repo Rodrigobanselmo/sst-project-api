@@ -32,6 +32,7 @@ export enum RoleEnum {
   ESOCIAL = '16',
   CAT = '17',
   ABSENTEEISM = '18',
+  ESOCIAL_EDIT = '19',
 
   DATABASE = '99',
   CHECKLIST = '98',

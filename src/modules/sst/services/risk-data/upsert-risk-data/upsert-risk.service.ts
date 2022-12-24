@@ -33,7 +33,6 @@ export class UpsertRiskDataService {
     if ('endDate' in upsertRiskDataDto) {
       if (!upsertRiskDataDto.endDate) upsertRiskDataDto.endDate = null;
     }
-
     const isTypeHierarchy = type && type == HomoTypeEnum.HIERARCHY;
     if (isTypeHierarchy)
       await hierarchyCreateHomo({
@@ -91,7 +90,7 @@ export const hierarchyCreateHomo = async ({
   homoGroupRepository: HomoGroupRepository;
   hierarchyRepository: HierarchyRepository;
   type: 'HIERARCHY';
-  workspaceId: string;
+  workspaceId?: string;
   homogeneousGroupId: string;
   companyId: string;
 }) => {
@@ -121,7 +120,7 @@ export const hierarchyCreateHomo = async ({
             name: hierarchy.name,
             status: hierarchy.status,
             type: hierarchy.type,
-            workspaceIds: workspaceId ? [workspaceId] : hierarchy.workspaceIds || [],
+            workspaceIds: workspaceId ? [workspaceId] : hierarchy.workspaceIds || hierarchy?.workspaces?.map((w) => w?.id) || [],
           },
         ],
         companyId,

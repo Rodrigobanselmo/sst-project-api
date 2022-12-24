@@ -58,7 +58,7 @@ export class CreateEmployeeHierarchyHistoryService {
     return history;
   }
 
-  async check({ dataDto, foundEmployee }: { dataDto: Partial<CreateEmployeeHierarchyHistoryDto>; foundEmployee: EmployeeEntity }) {
+  async check({ dataDto, foundEmployee }: { dataDto: Partial<CreateEmployeeHierarchyHistoryDto & { id?: number }>; foundEmployee: EmployeeEntity }) {
     if (!dataDto.startDate) throw new BadRequestException('missing start date');
     // CHECK ACTUAL
     // {
@@ -85,6 +85,7 @@ export class CreateEmployeeHierarchyHistoryService {
           where: {
             employeeId: foundEmployee.id,
             startDate: { gte: dataDto.startDate },
+            ...(dataDto.id && { id: { not: dataDto.id } }),
           },
           orderBy: { startDate: 'asc' },
           take: 3,
@@ -108,6 +109,7 @@ export class CreateEmployeeHierarchyHistoryService {
           where: {
             employeeId: foundEmployee.id,
             startDate: { lte: dataDto.startDate },
+            ...(dataDto.id && { id: { not: dataDto.id } }),
           },
           orderBy: { startDate: 'desc' },
           take: 3,

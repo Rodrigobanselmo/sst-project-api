@@ -135,7 +135,7 @@ import { AbsenteeismController } from './controller/absenteeism/absenteeism.cont
 import { CatController } from './controller/cat/cat.controller';
 import { FindOneAbsenteeismsService } from './services/absenteeism/find-one-absenteeism/find-one-absenteeism.service';
 import { FindOneCatsService } from './services/cat/find-one-cat/find-one-cat.service';
-import { DeleteHierarchyHomoGroupService } from './services/homoGroup/delete-hierarchy-homo-group/update-hierarchy-homo-group.service';
+import { DeleteHierarchyHomoGroupService } from './services/homoGroup/delete-hierarchy-homo-group/delete-hierarchy-homo-group.service';
 import { CompanyOSRepository } from './repositories/implementations/CompanyOSRepository';
 import { FindOneCompanyOSService } from './services/os/find-os/find-os.service';
 import { UpsertCompanyOSService } from './services/os/upsert-os/upsert-os.service';
