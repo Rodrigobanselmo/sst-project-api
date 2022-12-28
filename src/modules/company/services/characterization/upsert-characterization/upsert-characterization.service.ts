@@ -8,6 +8,8 @@ import { AmazonStorageProvider } from '../../../../../shared/providers/StoragePr
 import { UpsertCharacterizationDto } from '../../../dto/characterization.dto';
 import { CharacterizationPhotoRepository } from '../../../repositories/implementations/CharacterizationPhotoRepository';
 import { CharacterizationRepository } from '../../../repositories/implementations/CharacterizationRepository';
+import { DeleteHierarchyHomoGroupService } from '../../homoGroup/delete-hierarchy-homo-group/delete-hierarchy-homo-group.service';
+import { UpdateHomoGroupService } from '../../homoGroup/update-homo-group/update-homo-group.service';
 
 @Injectable()
 export class UpsertCharacterizationService {
@@ -15,6 +17,8 @@ export class UpsertCharacterizationService {
     private readonly characterizationRepository: CharacterizationRepository,
     private readonly characterizationPhotoRepository: CharacterizationPhotoRepository, // private readonly amazonStorageProvider: any,
     private readonly amazonStorageProvider: AmazonStorageProvider,
+    private readonly deleteHierarchyHomoGroupService: DeleteHierarchyHomoGroupService,
+    private readonly updateHomoGroupService: UpdateHomoGroupService,
   ) {}
 
   async execute(
@@ -26,7 +30,7 @@ export class UpsertCharacterizationService {
     const companyId = userPayloadDto.targetCompanyId;
     const inactivating = upsertCharacterizationDto.status == 'INACTIVE';
 
-    if (inactivating) {
+    if (upsertCharacterizationDto.id) {
       const foundHomoGroup = await this.characterizationRepository.findFirstNude({
         where: {
           id: upsertCharacterizationDto.id,
@@ -36,6 +40,21 @@ export class UpsertCharacterizationService {
           id: true,
           created_at: true,
           ...(inactivating && { homogeneousGroup: { select: { hierarchyOnHomogeneous: { where: { endDate: null }, take: 1, select: { id: true } } } } }),
+          ...(!!upsertCharacterizationDto?.hierarchyIds?.length && {
+            homogeneousGroup: {
+              select: {
+                hierarchyOnHomogeneous: {
+                  select: { id: true, startDate: true, endDate: true, hierarchyId: true },
+                  where: {
+                    endDate: null,
+                    hierarchy: {
+                      id: { in: upsertCharacterizationDto.hierarchyIds },
+                    },
+                  },
+                },
+              },
+            },
+          }),
         },
       });
 
@@ -45,6 +64,18 @@ export class UpsertCharacterizationService {
       if (forbidenInactivating) {
         throw new BadRequestException(ErrorCompanyEnum.FORBIDEN_INACTIVATION);
       }
+
+      await this.deleteHierarchyHomoGroupService.checkDeletion(foundHomoGroup.homogeneousGroup, userPayloadDto, {
+        updateCheck: true,
+        onlyEndPresentOk: true,
+        data: { endDate: upsertCharacterizationDto.endDate, startDate: upsertCharacterizationDto.startDate },
+      });
+
+      await this.updateHomoGroupService.checkDeletion(foundHomoGroup.homogeneousGroup, userPayloadDto, {
+        endDate: upsertCharacterizationDto.endDate,
+        startDate: upsertCharacterizationDto.startDate,
+        ids: upsertCharacterizationDto.hierarchyIds,
+      });
     }
 
     const characterization = await this.characterizationRepository.upsert({

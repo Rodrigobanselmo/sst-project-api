@@ -1350,6 +1350,7 @@ model HierarchyOnHomogeneous {
   endDate DateTime?
   startDate DateTime?
   deletedAt DateTime?
+  created_at DateTime @default(now())
 
   // @@unique([hierarchyId, homogeneousGroupId, workspaceId, endDate])
   @@index(deletedAt)

@@ -69,11 +69,12 @@ export class DeleteHierarchyHomoGroupService {
   async checkDeletion(
     homoGroup: HomoGroupEntity,
     userPayloadDto: UserPayloadDto,
-    check?: { deleteCheck?: boolean; updateCheck?: boolean; data?: UpdateHierarchyHomoGroupDto },
+    check?: { onlyEndPresentOk?: boolean; deleteCheck?: boolean; updateCheck?: boolean; data?: Pick<UpdateHierarchyHomoGroupDto, 'endDate' | 'startDate'> },
   ) {
     if (userPayloadDto.roles.includes(RoleEnum.ESOCIAL_EDIT)) return;
+    if (!homoGroup?.hierarchyOnHomogeneous?.length) return;
     const foundPPP = await this.employeePPPHistoryRepository.findFirstNude({
-      select: { id: true, doneDate: true },
+      select: { id: true, doneDate: true, created_at: true },
       orderBy: { doneDate: 'desc' },
       where: {
         employee: {
@@ -90,7 +91,7 @@ export class DeleteHierarchyHomoGroupService {
     const pppId = foundPPP?.id;
 
     if (check.deleteCheck) {
-      const isStartDateBefore = pppId && homoGroup.hierarchyOnHomogeneous.some((hh) => !hh.startDate || hh.startDate < foundPPP.doneDate);
+      const isStartDateBefore = pppId && homoGroup.hierarchyOnHomogeneous.some((hh) => foundPPP.created_at && (!hh.startDate || hh.startDate < foundPPP.doneDate));
 
       if (isStartDateBefore) throw new BadRequestException(ErrorMessageEnum.ESOCIAL_FORBIDDEN_HIER_DELETION);
     }
@@ -104,11 +105,17 @@ export class DeleteHierarchyHomoGroupService {
           const isSameStartDate = this.dayjsPropvider.format(hh.startDate) == this.dayjsPropvider.format(startDate);
           const isActualStartDateBeforePPP = !hh.startDate || hh.startDate < foundPPP.doneDate;
 
+          const isEndDateWithStartDate = check.onlyEndPresentOk && !isSameStartDate && !startDate && hh.startDate && endDate;
+
+          const isStartDateOK = isEndDateWithStartDate || !(isActualStartDateBeforePPP && !isSameStartDate);
+
           const isRequestEndDateBeforePPP = endDate && endDate < foundPPP.doneDate;
           const isActualEndDateBeforePPP = hh.endDate && hh.endDate < foundPPP.doneDate;
           const isSameEndDate = this.dayjsPropvider.format(hh.endDate) == this.dayjsPropvider.format(endDate);
 
-          return (isActualEndDateBeforePPP && !isSameEndDate) || (isActualStartDateBeforePPP && !isSameStartDate) || isRequestEndDateBeforePPP;
+          const isEndDateOK = !(isActualEndDateBeforePPP && !isSameEndDate) || !isRequestEndDateBeforePPP;
+
+          return !isEndDateOK || !isStartDateOK;
         });
 
       if (isError) throw new BadRequestException(ErrorMessageEnum.ESOCIAL_FORBIDDEN_HIER_DELETION);

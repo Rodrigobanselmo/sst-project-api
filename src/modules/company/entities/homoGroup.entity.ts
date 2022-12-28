@@ -82,6 +82,7 @@ export class HierarchyOnHomogeneousEntity implements HierarchyOnHomogeneous {
   endDate: Date;
   startDate: Date;
   deletedAt: Date;
+  created_at: Date;
 
   constructor(partial: Partial<HomoGroupEntity>) {
     Object.assign(this, partial);
