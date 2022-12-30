@@ -9,9 +9,10 @@ import { StringCapitalizeTransform } from '../../../shared/transformers/string-c
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 
 export class AddressDto {
-  @Matches(/[1-9][0-9]*/, {
-    message: 'The number address has an invalid format',
-  })
+  // @Matches(/[1-9][0-9]*/, {
+  //   message: 'The number address has an invalid format',
+  // })
+  @IsString()
   @Length(1, 12)
   @IsOptional()
   @Transform(NumberFormat, { toClassOnly: true })
