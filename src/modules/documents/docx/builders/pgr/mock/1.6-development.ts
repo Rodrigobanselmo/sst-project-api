@@ -103,7 +103,7 @@ export const developmentSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET,
-          text: 'Principais sintomas e efeitos crônicos à saúde;',
+          text: 'Principais sintomas, efeitos crônicos e agravos à saúde **(NR-07 item 7.5.4 alínea a)**;',
           level: 1,
         },
         {
@@ -128,12 +128,12 @@ export const developmentSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET,
-          text: 'Carcinogenicidade ACGIH **(NR-01 item 1.5.4.1);**',
+          text: 'Carcinogenicidade ACGIH **(NR-01 item 1.5.4.1 & Anexo V da NR-07 item 3.1);**',
           level: 1,
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET,
-          text: 'Carcinogenicidade LINACH **(NR-01 item 1.5.4.1);**',
+          text: 'Carcinogenicidade LINACH **(NR-01 item 1.5.4.1 & Anexo V da NR-07 item 3.1);**',
           level: 1,
         },
         {

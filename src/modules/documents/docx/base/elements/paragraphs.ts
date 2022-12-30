@@ -7,6 +7,7 @@ interface ParagraphProps extends IParagraphOptions {
   size?: number;
   align?: AlignmentType;
   isBold?: boolean;
+  isSuper?: boolean;
   isBreak?: boolean;
   color?: string;
 }
@@ -20,26 +21,34 @@ export const paragraphNormal = (text: string, { children, color, ...options } = 
         .map((text, index) => {
           const isBold = isOdd(index);
           return text
-            .split('\n')
+            .split('^^')
             .map((text, index) => {
-              const isBreak = index != 0;
-              return text.split('<link>').map((text, index) => {
-                const isLink = isOdd(index);
-                if (!isLink)
-                  return new TextRun({
-                    text: text,
-                    bold: isBold,
-                    break: isBreak ? 1 : 0,
-                    size: options?.size ? options?.size * 2 : undefined,
-                    ...(color ? { color: color } : {}),
+              const isSuper = isOdd(index);
+              return text
+                .split('\n')
+                .map((text, index) => {
+                  const isBreak = index != 0;
+                  return text.split('<link>').map((text, index) => {
+                    const isLink = isOdd(index);
+                    if (!isLink)
+                      return new TextRun({
+                        text: text,
+                        bold: isBold,
+                        superScript: isSuper,
+                        break: isBreak ? 1 : 0,
+                        size: options?.size ? options?.size * 2 : undefined,
+                        ...(color ? { color: color } : {}),
+                      });
+                    if (isLink)
+                      return textLink(text, {
+                        isBold,
+                        isBreak,
+                        isSuper,
+                        size: options?.size,
+                      });
                   });
-                if (isLink)
-                  return textLink(text, {
-                    isBold,
-                    isBreak,
-                    size: options?.size,
-                  });
-              });
+                })
+                .reduce((acc, curr) => [...acc, ...curr], []);
             })
             .reduce((acc, curr) => [...acc, ...curr], []);
         })
@@ -63,6 +72,7 @@ export const textLink = (text: string, options = {} as ParagraphProps) => {
       new TextRun({
         text: link[1],
         bold: options?.isBold ? options?.isBold : undefined,
+        superScript: options?.isSuper ? options?.isSuper : undefined,
         break: options?.isBreak ? 1 : undefined,
         size: options?.size ? options?.size * 2 : undefined,
         style: 'Hyperlink',

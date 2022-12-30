@@ -8,6 +8,7 @@ import { complementsSection } from './1.3-complements';
 import { mvvSection } from './1.4-mvv';
 import { organizationSection } from './1.5-organization';
 import { organization2Section } from './1.5-organization2';
+import { methodSection } from './1.5.2-method';
 import { developmentSection } from './1.6-development';
 import { qualityEvaluation } from './1.7-qualityEvaluation';
 import { prioritization } from './1.8-prioritization';
@@ -49,6 +50,7 @@ export const docPGRSections: IDocumentPGRSectionGroups = {
     mvvSection,
     organizationSection,
     organization2Section,
+    methodSection,
     developmentSection,
     qualityEvaluation,
     prioritization,

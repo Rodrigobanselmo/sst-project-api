@@ -48,7 +48,7 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Agente Químico:** Substância química, por si só ou em misturas, quer seja em seu estado natural, quer seja produzida, utili-zada ou gerada no processo de trabalho, que em função de sua natureza, concentração e exposição, é capaz de causar lesão ou agravo à saúde do trabalhador. **Exemplos:** fumos de cádmio, poeira mineral contendo sílica cristalina, vapores de tolueno, névoas de ácido sulfúrico. **(NR-01 Anexo I);**',
+          text: '**Agente Químico:** Substância química, por si só ou em misturas, quer seja em seu estado natural, quer seja produzida, utilizada ou gerada no processo de trabalho, que em função de sua natureza, concentração e exposição, é capaz de causar lesão ou agravo à saúde do trabalhador. **Exemplos:** fumos de cádmio, poeira mineral contendo sílica cristalina, vapores de tolueno, névoas de ácido sulfúrico. **(NR-01 Anexo I);**',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -156,11 +156,7 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Consequência/Dano:** é a medida do resultado de um acidente do trabalho ou de acidentes maiores. Também pode ser definido como sendo a gravidade da perda humana, material ou financeira, ou a redução da capacidade de desempenho de uma função pré-determinada em um dado sistema;',
-        },
-        {
-          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: 'Considerando os conceitos apresentados podemos classificar os riscos de uma instalação, da seguinte maneira:',
+          text: '**Consequência/Dano  (SEVERIDADE):** é a medida do resultado de um acidente do trabalho ou de acidentes maiores. Também pode ser definido como sendo a gravidade da perda humana, material ou financeira, ou a redução da capacidade de desempenho de uma função pré-determinada em um dado sistema;',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -304,10 +300,6 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Perigo:** Situação ou condição de risco com probabilidade de causar lesão física ou dano à saúde das pessoas por ausência de medidas de controle;',
-        },
-        {
-          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
           text: '**Prevenção:** o conjunto das disposições ou medidas tomadas ou previstas em todas as fases da atividade da organização, visando evitar, eliminar, minimizar ou controlar os riscos ocupacionais. **(NR-01 Anexo I);**',
         },
         {
@@ -329,26 +321,6 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
           text: '**Responsável técnico pela capacitação:** profissional legalmente habilitado ou trabalhador qualificado, conforme disposto em NR específica, responsável pela elaboração das capacitações e treinamentos. **(NR-01 Anexo I);**',
-        },
-        {
-          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Risco (Hazard):** uma ou mais condições de uma variável com potencial necessário para causar danos. Esses danos podem ser entendidos como lesões a pessoas, danos à equipamentos ou estruturas, perda de material em processo, ou redução da capacidade de desempenho de uma função pré-determinada. Havendo um risco, persistem as possibilidades de efeitos adversos;',
-        },
-        {
-          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Risco (Risk):** expressa uma probabilidade de possíveis danos dentro de um período específico ou número de ciclos operacionais. O valor quantitativo do risco de uma dada instalação ou processo industrial pode ser conseguido multiplicando-se a probabilidade de ocorrência (taxa de falha) de um acidente pela medida da consequência/dano (perda material ou humana) causada por este acidente;',
-        },
-        {
-          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Risco Ocupacional:** Combinação da **probabilidade** de ocorrer lesão ou agravo à saúde, causados por um evento perigoso, exposição a agente nocivo ou exigência da atividade de trabalho e da **severidade** dessa lesão ou agravo à saúde. **(NR-01 Anexo I);**',
-        },
-        {
-          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Risco:** Exposição de pessoas a perigos. O risco pode ser dimensionado em função da probabilidade e da gravidade do dano possível (GUIA DE ANÁLISE ACIDENTES DE TRABALHO – MTE 2010);',
-        },
-        {
-          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: '**Riscos Ambientais:** São os agentes físicos, químicos e biológicos existentes nos ambientes de trabalho que, em função de sua natureza, concentração ou intensidade e tempo de exposição são capazes de causar danos à saúde do trabalhador (NR-09);',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
@@ -421,6 +393,84 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
           text: '**VRT-Valor de Referência Tecnológico:** refere-se à concentração de benzeno no ar considerada exequível do ponto de vista técnico, definido em processo de negociação tripartite. O VRT deve ser considerado como referência para os programas de melhoria contínua das condições dos ambientes de trabalho. O cumprimento do VRT é obrigatório e não exclui risco à saúde.',
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.BREAK,
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.H1,
+          text: 'Risco',
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          text: 'O conceito de Risco merece uma atenção especial devido a sua importância e a existência de múltiplas interpretações nas normas técnicas e legislações, assim como, pela falta de uma definição específica no glossário da NR01.',
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          text: 'A seguir são apresentadas algumas das definições disponíveis na literatura:',
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          text: '**Risco (Hazard):** uma ou mais condições de uma variável com potencial necessário para causar danos. Esses danos podem ser entendidos como lesões a pessoas, danos à equipamentos ou estruturas, perda de material em processo, ou redução da capacidade de desempenho de uma função pré-determinada. Havendo um risco, persistem as possibilidades de efeitos adversos;',
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          text: '**Risco (Risk):** expressa uma probabilidade de possíveis danos dentro de um período específico ou número de ciclos operacionais. O valor quantitativo do risco de uma dada instalação ou processo industrial pode ser conseguido multiplicando-se a probabilidade de ocorrência (taxa de falha) de um acidente pela medida da consequência/dano (perda material ou humana) causada por este acidente;',
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          text: '**Risco:** Exposição de pessoas a perigos. O risco pode ser dimensionado em função da probabilidade e da gravidade do dano possível (GUIA DE ANÁLISE ACIDENTES DE TRABALHO – MTE 2010);',
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          text: '**Riscos Ambientais:** São os agentes físicos, químicos e biológicos existentes nos ambientes de trabalho que, em função de sua natureza, concentração ou intensidade e tempo de exposição são capazes de causar danos à saúde do trabalhador (NR-09);',
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          text: '**^^1^^Risco^^2^^ :** Efeito^^3^^  da incerteza^^4^^  nos objetivos^^5^^ **(Gestão de Risco - Vocabulário ABNT ISO GUIA 73-2009)**',
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          text: '**Risco Ocupacional:** Combinação da **probabilidade** de ocorrer lesão ou agravo à saúde, causados por um evento perigoso, exposição a agente nocivo ou exigência da atividade de trabalho e da **severidade** dessa lesão ou agravo à saúde. **(NR-01 Anexo I)**;',
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          text: '**Conclusão**',
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          text: 'Diante das definições apresentadas acima e considerando os objetivos deste PGR, o significado de RISCO buscará expressar o efeito indesejado desencadeado pelo evento perigoso capaz de resultando em **lesões ou agravos à saúde dos trabalhadores** por meio do potencial intrínseco dos **Perigos/Fatores de Riscos (P/FR)** de causar danos. Sendo assim, em alguns casos o **RISCO** poderá se confundir com o próprio dano causado pelo P/FR **(Marins, Alex)**.',
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.BREAK,
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.BREAK,
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          size: 8,
+          text: '^^1^^ O risco é muitas vezes caracterizado pela referência aos eventos perigosos potenciais e às consequências/DANOS (SEVERIDADE), ou uma combinação destes.',
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          size: 8,
+          text: '^^2^^ O risco é muitas vezes expresso em termos de uma combinação de consequências de um evento (incluindo mudanças nas circunstâncias) e a probabilidade de ocorrência associada (Conceito do Risco Ocupacional NR1).',
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          size: 8,
+          text: '^^3^^ Um efeito é um desvio em relação ao esperado — positivo elou negativo.',
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          size: 8,
+          text: '^^4^^ A incerteza é o estado, mesmo que parcial, da deficiência das informações relacionadas a um evento, sua compreensão, seu conhecimento, sua consequência ou sua probabilidade.',
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          size: 8,
+          text: '^^5^^ Os objetivos podem ter diferentes aspectos (tais corno metas financeiras, de saúde e segurança e ambientais) e podem aplicar-se em diferentes níveis (tais corno estratégico, em toda a organização, de projeto, de produto e de processo) (Para o PGR o objetivo restringe-se ocorrência de consequência/danos a integridade física e saúde dos trabalhadores).',
         },
       ],
     },

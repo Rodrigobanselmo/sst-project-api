@@ -502,7 +502,7 @@ export class RiskRepository implements IRiskRepository {
 
     const risks = await this.prisma.riskFactors.findMany({
       where: {
-        AND: [...tenant],
+        AND: [...tenant, { name: 'Todos' }],
         deleted_at: null,
         OR: [
           {
@@ -511,6 +511,9 @@ export class RiskRepository implements IRiskRepository {
           },
           {
             type: 'OUTROS',
+          },
+          {
+            representAll: true,
           },
         ],
       },

@@ -1,3 +1,4 @@
+import { hierarchyCreateHomo } from './../../../../sst/services/risk-data/upsert-risk-data/upsert-risk.service';
 import { EmployeePPPHistoryRepository } from './../../../repositories/implementations/EmployeePPPHistoryRepository';
 import { BadRequestException, Injectable } from '@nestjs/common';
 
@@ -10,6 +11,7 @@ import { RiskDataRepository } from '../../../../sst/repositories/implementations
 import { UpsertManyRiskDataService } from '../../../../sst/services/risk-data/upsert-many-risk-data/upsert-many-risk-data.service';
 import { CopyHomogeneousGroupDto } from './../../../dto/homoGroup';
 import { HierarchyRepository } from './../../../repositories/implementations/HierarchyRepository';
+import { HomoTypeEnum } from '@prisma/client';
 
 @Injectable()
 export class CopyHomoGroupService {
@@ -17,6 +19,7 @@ export class CopyHomoGroupService {
     private readonly employeePPPHistoryRepository: EmployeePPPHistoryRepository,
     private readonly homoGroupRepository: HomoGroupRepository,
     private readonly riskDataRepository: RiskDataRepository,
+    private readonly hierarchyRepository: HierarchyRepository,
     private readonly upsertManyRiskDataService: UpsertManyRiskDataService,
   ) {}
 
@@ -45,10 +48,18 @@ export class CopyHomoGroupService {
     };
 
     const foundHomoGroup = await this.homoGroupRepository.findHomoGroupByCompanyAndId(actualGroupId, companyId);
-
     if (!foundHomoGroup.type) {
       // get al risk data from homogeneous group with ALL RISK combined
     }
+
+    if (!foundHomoGroup.id)
+      await hierarchyCreateHomo({
+        homogeneousGroupId: actualGroupId,
+        companyId,
+        homoGroupRepository: this.homoGroupRepository,
+        hierarchyRepository: this.hierarchyRepository,
+        // workspaceId,
+      });
 
     const save = async (riskData: RiskFactorDataEntity, index: number) => {
       const data = {

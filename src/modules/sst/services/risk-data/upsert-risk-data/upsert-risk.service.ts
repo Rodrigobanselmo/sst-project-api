@@ -82,14 +82,14 @@ export class UpsertRiskDataService {
 export const hierarchyCreateHomo = async ({
   homoGroupRepository,
   hierarchyRepository,
-  type,
+  type = 'HIERARCHY',
   workspaceId,
   homogeneousGroupId,
   companyId,
 }: {
   homoGroupRepository: HomoGroupRepository;
   hierarchyRepository: HierarchyRepository;
-  type: 'HIERARCHY';
+  type?: 'HIERARCHY';
   workspaceId?: string;
   homogeneousGroupId: string;
   companyId: string;

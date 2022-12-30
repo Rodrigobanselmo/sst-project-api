@@ -237,6 +237,7 @@ export class ElementsMapClass {
     [PGRSectionChildrenTypeEnum.MEASURE_IMAGE]: () => measureHierarchyImage(),
     [PGRSectionChildrenTypeEnum.RS_IMAGE]: () => rsDocumentImage(),
     [PGRSectionChildrenTypeEnum.QUANTITY_RESULTS_TABLES]: () => quantityResultsTable((x, v) => this.convertToDocx(x, v)),
+    // [PGRSectionChildrenTypeEnum.QUANTITY_CONSIDERATION_TABLES]: () => quantityResultsTable((x, v) => this.convertToDocx(x, v)),
     [PGRSectionChildrenTypeEnum.HIERARCHY_ORG_TABLE]: () =>
       hierarchyHomoOrgSection(this.hierarchy, this.homogeneousGroup, {
         showDescription: false,
