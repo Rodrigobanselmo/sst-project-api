@@ -454,6 +454,13 @@ model Cat {
   events EmployeeESocialEvent[]
 }
 
+model Cbo {
+  code    String   @id
+  desc    String  
+
+  @@unique([code, desc])
+}
+
 model Checklist {
   id    Int     @default(autoincrement())
   status StatusEnum @default(PROGRESS)
@@ -499,7 +506,6 @@ model Cities {
 
   @@index(name)
 }
-
 
 model Company {
   id   String    @id @default(uuid())
@@ -816,7 +822,6 @@ model DatabaseTable {
   @@id([id, companyId])
 } 
 
-
 model Document {
   id    Int   @id  @default(autoincrement())
   fileUrl String?
@@ -913,6 +918,7 @@ model Employee {
   newExamAdded DateTime?
   sex SexTypeEnum? 
   hierarchyId String?
+  cbo String?
   hierarchy Hierarchy? @relation(fields: [hierarchyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   companyId String
   company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)

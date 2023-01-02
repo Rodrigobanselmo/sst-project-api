@@ -398,7 +398,7 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
           type: PGRSectionChildrenTypeEnum.BREAK,
         },
         {
-          type: PGRSectionChildrenTypeEnum.H1,
+          type: PGRSectionChildrenTypeEnum.H2,
           text: 'Risco',
         },
         {
@@ -442,34 +442,52 @@ export const definitionsSection: IDocumentPGRSectionGroup = {
           text: 'Diante das definições apresentadas acima e considerando os objetivos deste PGR, o significado de RISCO buscará expressar o efeito indesejado desencadeado pelo evento perigoso capaz de resultando em **lesões ou agravos à saúde dos trabalhadores** por meio do potencial intrínseco dos **Perigos/Fatores de Riscos (P/FR)** de causar danos. Sendo assim, em alguns casos o **RISCO** poderá se confundir com o próprio dano causado pelo P/FR **(Marins, Alex)**.',
         },
         {
-          type: PGRSectionChildrenTypeEnum.BREAK,
-        },
-        {
-          type: PGRSectionChildrenTypeEnum.BREAK,
+          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          text: '',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
           size: 8,
+          spacing: {
+            before: 100,
+            after: 90,
+          },
           text: '^^1^^ O risco é muitas vezes caracterizado pela referência aos eventos perigosos potenciais e às consequências/DANOS (SEVERIDADE), ou uma combinação destes.',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
           size: 8,
+          spacing: {
+            before: 100,
+            after: 90,
+          },
           text: '^^2^^ O risco é muitas vezes expresso em termos de uma combinação de consequências de um evento (incluindo mudanças nas circunstâncias) e a probabilidade de ocorrência associada (Conceito do Risco Ocupacional NR1).',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
           size: 8,
+          spacing: {
+            before: 100,
+            after: 90,
+          },
           text: '^^3^^ Um efeito é um desvio em relação ao esperado — positivo elou negativo.',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
           size: 8,
+          spacing: {
+            before: 100,
+            after: 90,
+          },
           text: '^^4^^ A incerteza é o estado, mesmo que parcial, da deficiência das informações relacionadas a um evento, sua compreensão, seu conhecimento, sua consequência ou sua probabilidade.',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
           size: 8,
+          spacing: {
+            before: 100,
+            after: 90,
+          },
           text: '^^5^^ Os objetivos podem ter diferentes aspectos (tais corno metas financeiras, de saúde e segurança e ambientais) e podem aplicar-se em diferentes níveis (tais corno estratégico, em toda a organização, de projeto, de produto e de processo) (Para o PGR o objetivo restringe-se ocorrência de consequência/danos a integridade física e saúde dos trabalhadores).',
         },
       ],

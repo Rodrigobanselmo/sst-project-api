@@ -27,7 +27,7 @@ export const endSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: `??${VariablesPGREnum.COMPANY_SIGNER_CITY}??, ${dayjs().format('D [de] MMMM [de] YYYY')}`,
+          text: `??${VariablesPGREnum.COMPANY_SIGNER_CITY}??, ${dayjs().format('D [de] MMMM [de] YYYY').toLocaleLowerCase()}`,
           alignment: AlignmentType.RIGHT,
         },
         {

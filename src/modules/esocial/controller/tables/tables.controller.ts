@@ -6,6 +6,7 @@ import { FindAllTable27Service } from '../../services/tables/find-all-27.service
 import { FindCitiesDto } from '../../dto/cities.dto';
 import { Prisma } from '@prisma/client';
 import { FindEsocialTable24Dto } from '../../dto/event.dto';
+import { onlyNumbers } from '@brazilian-utils/brazilian-utils';
 
 @ApiTags('tables')
 @Controller('esocial')
@@ -37,6 +38,25 @@ export class TablesController {
       data: response[1],
       count: response[0],
     };
+  }
+
+  @Get('cbo')
+  async findCbo(@Query() query: FindCitiesDto) {
+    const { skip, take, search } = query;
+
+    const code = onlyNumbers(search);
+
+    const data = await this.prisma.cbo.findMany({
+      where: {
+        ...(search && { OR: [...(code ? [{ code: { contains: code, mode: 'insensitive' } }] : ([] as any)), { desc: { contains: search, mode: 'insensitive' } }] }),
+      },
+      skip: skip || 0,
+      take: take || 20,
+      select: { code: true, desc: true },
+      orderBy: { desc: 'asc' },
+    });
+
+    return { data };
   }
 
   @Get('cid')

@@ -54,7 +54,11 @@ export class RecMedRepository implements IRecMedRepository {
 
   async find(query: Partial<FindRecMedDto>, pagination: PaginationQueryDto, options: Prisma.RecMedFindManyArgs = {}) {
     const whereInit = {
-      AND: [],
+      AND: [
+        {
+          deleted_at: null,
+        },
+      ],
       ...options.where,
     } as typeof options.where;
     const include = { ...options?.include };

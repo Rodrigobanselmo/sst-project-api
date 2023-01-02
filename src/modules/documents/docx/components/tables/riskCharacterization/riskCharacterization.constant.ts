@@ -97,7 +97,7 @@ const NewRiskCharacterizationHeader = (): headerTableProps[] => {
     borders: borderStyleGlobal(palette.common.white.string),
   };
   header[RiskCharacterizationColumnEnum.SYMPTOMS] = {
-    text: 'SINTOMAS',
+    text: 'RISCOS',
     size: 4,
     textDirection: TextDirection.LEFT_TO_RIGHT_TOP_TO_BOTTOM,
     borders: borderStyleGlobal(palette.common.white.string),

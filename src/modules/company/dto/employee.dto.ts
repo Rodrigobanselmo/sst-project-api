@@ -41,6 +41,10 @@ export class CreateEmployeeDto {
 
   @IsString()
   @IsOptional()
+  cbo: string;
+
+  @IsString()
+  @IsOptional()
   esocialCode: string;
 
   @IsString()

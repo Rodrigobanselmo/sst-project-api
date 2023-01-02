@@ -68,6 +68,7 @@ export class EmployeeEntity implements Employee {
   lastExam: Date;
   expiredDateExam: Date;
   newExamAdded: Date;
+  cbo: string;
   // sendEvent: boolean;
   company?: CompanyEntity;
   examsHistory?: EmployeeExamsHistoryEntity[];

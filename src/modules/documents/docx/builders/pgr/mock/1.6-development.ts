@@ -10,10 +10,10 @@ export const developmentSection: IDocumentPGRSectionGroup = {
       type: PGRSectionTypeEnum.SECTION,
       footerText: `??${VariablesPGREnum.CHAPTER_1}??`,
       children: [
-        {
-          type: PGRSectionChildrenTypeEnum.H1,
-          text: 'METODOLOGIA APLICADA',
-        },
+        // {
+        //   type: PGRSectionChildrenTypeEnum.H1,
+        //   text: 'METODOLOGIA APLICADA',
+        // },
         {
           type: PGRSectionChildrenTypeEnum.H2,
           text: 'Antecipação dos Riscos (NR-01 item 1.5.3.2 alínea a)',
@@ -68,7 +68,7 @@ export const developmentSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: 'A identificação e o reconhecimento dos Perigos e Fatores de Riscos requerem a aplicação de uma ferramenta específica que auxilie a sistematizar o risco no ambiente de trabalho e apresente como resultado as prioridades de controle ambiental do ponto de vista técnico. O reconhecimento dos riscos será um processo contínuo na empresa e incluirá a caracterização do ambiente de trabalho, da mão de obra e dos Fatores de Risco:',
+          text: 'A identificação e o reconhecimento dos Fatores de Riscos e Perigos requerem a aplicação de uma ferramenta específica que auxilie a sistematizar o risco no ambiente de trabalho e apresente como resultado as prioridades de controle ambiental do ponto de vista técnico. O reconhecimento dos riscos será um processo contínuo na empresa e incluirá a caracterização do ambiente de trabalho, da mão de obra e dos Fatores de Risco:',
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET,

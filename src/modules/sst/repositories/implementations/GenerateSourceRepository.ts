@@ -111,7 +111,11 @@ export class GenerateSourceRepository implements IGenerateSourceRepository {
 
   async find(query: Partial<FindGenerateSourceDto>, pagination: PaginationQueryDto, options: Prisma.GenerateSourceFindManyArgs = {}) {
     const whereInit = {
-      AND: [],
+      AND: [
+        {
+          deleted_at: null,
+        },
+      ],
       ...options.where,
     } as typeof options.where;
     const include = { ...options?.include };

@@ -227,6 +227,14 @@ export const initSection: IDocumentPGRSectionGroup = {
           text: `Este PGR compreende todo Estabelecimento inscrito no CNPJ: ??${VariablesPGREnum.WORKSPACE_CNPJ}??.`,
         },
         {
+          type: PGRSectionChildrenTypeEnum.H2,
+          text: 'Limitações e Restrições',
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          text: `Embora este PGR identifique Fatores de Riscos e Perigos (FR/P) que podem levar a ocorrência de Acidentes Ampliados e considera isto como um fator de aumento da severidade do risco ocupacional, haja visto que suas consequências se estendem a um número maior de pessoas/trabalhadores; por conseguinte, são mais severas. No entanto, não é objeto desde documento dar o devido diagnóstico e tratamento destes (FR/P) devendo a empresa tratá-los com ferramentas de análise de risco apropriadas e específicas para tais cenários`,
+        },
+        {
           type: PGRSectionChildrenTypeEnum.BREAK,
         },
         {

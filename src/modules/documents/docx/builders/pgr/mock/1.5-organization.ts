@@ -385,7 +385,7 @@ export const organizationSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,
-          text: 'É importante salientar que embora o PGR possa ser aceito como demonstração ambiental servindo de substituto de laudos como por exemplo, LTCAT e LIP este documento não foi elaborado com tal finalidade e não dispõem de todos os requisitos necessários para tal aplicação, pois o foco central é a gestão dos perigos e fatores de riscos a que os trabalhadores estão expostos, deixando os aspectos técnicos e legais relacionados a aposentadoria especial e pagamento de adicionais para os seus respectivos documentos.',
+          text: 'É importante salientar que embora o PGR possa ser aceito como demonstração ambiental servindo de substituto de laudos como por exemplo, LTCAT e LIP este documento não foi elaborado com tal finalidade e não dispõem de todos os requisitos necessários para tal aplicação, pois o foco central é a gestão dos fatores de riscos e perigos a que os trabalhadores estão expostos, deixando os aspectos técnicos e legais relacionados a aposentadoria especial e pagamento de adicionais para os seus respectivos documentos.',
         },
         {
           type: PGRSectionChildrenTypeEnum.H4,

@@ -18,6 +18,7 @@ import { addEsocialTables } from './seed/addEsocialTables';
 import { motiveTables } from './seed/motiveTables';
 import { cid10Table } from './seed/cid10Table';
 import { deleteRecMed } from './run/delete-rec-med';
+import { cboTable } from './seed/cboTable';
 
 const prisma = new PrismaClient();
 
@@ -44,9 +45,10 @@ async function main() {
     // await addEsocialTables(prisma);
     // await motiveTables(prisma);
 
+    // await deleteRecMed(prisma);
     //*next
 
-    await deleteRecMed(prisma);
+    await cboTable(prisma);
 
     console.log('end');
   } catch (err) {

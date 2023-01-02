@@ -95,6 +95,28 @@ export const qualityEvaluation: IDocumentPGRSectionGroup = {
         {
           type: PGRSectionChildrenTypeEnum.QUANTITY_RESULTS_TABLES,
         },
+        {
+          type: PGRSectionChildrenTypeEnum.BREAK,
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.H2,
+          text: `Considerações Quanto aos Critérios Quantitativos`,
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          text: `Todos os cálculos apresentados nas tabelas acima tiveram como premissa a coleta de amostras obedecendo uma estratégia de amostragem que subsidia um resultado representativo da exposição real do trabalhador, seja por avaliação de GSE’s ou por Cargos, logo, pressupõem um tratamento estatístico dos dados coletados tendo como resultado um Desvio Padrão Geométrico (DPG) menor ou igual a 1,25, caso contrário os critérios de aceitabilidade, assim como, a frequência de avaliação precisam obedecer um novo valor de referencia para o Nível de Ação (NA) conforme apresentado na tabela a seguir.`,
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.QUANTITY_CONSIDERATION_TABLES,
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          text: ``,
+        },
+        {
+          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          text: `Com base na tabela acima, o NA pode ser um parâmetro móvel e deve ser estabelecido para cada situação ou grupo de trabalhadoresavaliado, não sendo correto, portanto, o estabelecimento de um valorfixo. Na prática, valores de DPG abaixo de 1,3 indicam baixa variabilidadedas concentrações no ar e são dificilmente atingidos em atmosferascomplexas e de ambientes abertos. Por outro lado, valores de DPGentre 1,5 e 2,0 são mais encontrados, indicando que, ao se estabelecerum valor fixo, um nível de ação correspondente a 1/10 do limite seriao mais apropriado, pois estaria contemplando a maioria das situaçõesreais. Para valores de DPG acima de 2, a variabilidade já é muito grande e nenhum nível de ação pode ser sugerido. Nestas circunstâncias, medidas devem ser adotadas para reduzir a dispersão das concentrações. **(Guia Técnico sobre estratégia de amostragem e interpretação de resultados de avaliações quantitativas de agentes químicos em ambientes de trabalho – FUNDACENTRO 2018)**`,
+        },
       ],
     },
   ],

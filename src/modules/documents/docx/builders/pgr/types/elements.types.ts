@@ -223,6 +223,10 @@ export type IQuantityTable = {
   type: PGRSectionChildrenTypeEnum.QUANTITY_RESULTS_TABLES;
 } & IBase;
 
+export type IConsiderationsQuantityTable = {
+  type: PGRSectionChildrenTypeEnum.QUANTITY_CONSIDERATION_TABLES;
+} & IBase;
+
 export type IMeasureImage = {
   type: PGRSectionChildrenTypeEnum.MEASURE_IMAGE;
 } & IBase;
@@ -381,4 +385,5 @@ export type ISectionChildrenType =
   | IIterableArc
   | IAttachments
   | IProfessionalSignature
+  | IConsiderationsQuantityTable
   | IProfessional;

@@ -45,6 +45,7 @@ import { EnvironmentEntity } from './../../../../../company/entities/environment
 import { ProfessionalEntity } from './../../../../../users/entities/professional.entity';
 import { UserEntity } from './../../../../../users/entities/user.entity';
 import { paragraphFigure, paragraphTable } from './../../../base/elements/paragraphs';
+import { considerationsQuantityTable } from '../../../components/tables/mock/components/considerationsQuantity/table.component';
 
 export type IMapElementDocumentType = Record<string, (arg: ISectionChildrenType) => (Paragraph | Table)[]>;
 
@@ -237,7 +238,7 @@ export class ElementsMapClass {
     [PGRSectionChildrenTypeEnum.MEASURE_IMAGE]: () => measureHierarchyImage(),
     [PGRSectionChildrenTypeEnum.RS_IMAGE]: () => rsDocumentImage(),
     [PGRSectionChildrenTypeEnum.QUANTITY_RESULTS_TABLES]: () => quantityResultsTable((x, v) => this.convertToDocx(x, v)),
-    // [PGRSectionChildrenTypeEnum.QUANTITY_CONSIDERATION_TABLES]: () => quantityResultsTable((x, v) => this.convertToDocx(x, v)),
+    [PGRSectionChildrenTypeEnum.QUANTITY_CONSIDERATION_TABLES]: () => considerationsQuantityTable((x, v) => this.convertToDocx(x, v)),
     [PGRSectionChildrenTypeEnum.HIERARCHY_ORG_TABLE]: () =>
       hierarchyHomoOrgSection(this.hierarchy, this.homogeneousGroup, {
         showDescription: false,

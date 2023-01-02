@@ -12,9 +12,9 @@ export const definitions2Section: IDocumentPGRSectionGroup = {
       footerText: `??${VariablesPGREnum.CHAPTER_1}??`,
       children: [
         {
-          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          type: PGRSectionChildrenTypeEnum.H2,
           text: '**Definição do Risco de Acidente**',
-          alignment: AlignmentType.CENTER,
+          // alignment: AlignmentType.CENTER,
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,

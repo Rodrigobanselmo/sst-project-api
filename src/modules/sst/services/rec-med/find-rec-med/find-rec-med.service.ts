@@ -28,6 +28,8 @@ export class FindRecMedService {
           ...(query.onlyRec && { AND: [{ recName: { not: null } }, { recName: { not: '' } }] }),
           ...(query.onlyMed && { AND: [{ medName: { not: null } }, { medName: { not: '' } }] }),
           risk: { representAll: true, ...(riskType && { type: riskType }) },
+          id: { notIn: RecMed.data.map((i) => i.id) },
+          deleted_at: null,
         },
         distinct: ['medName', 'recName'],
       });
