@@ -131,7 +131,7 @@ export class FindAllRiskDataByEmployeeService {
 
     const hierarchyHistory = employee.hierarchyHistory?.[0];
     const examHistory = employee?.examsHistory?.[0];
-    let date = hierarchyHistory.startDate;
+    let date = hierarchyHistory?.startDate || new Date();
     if (hierarchyHistory) {
       employee.hierarchy = hierarchyHistory?.hierarchy;
       employee.subOffices = hierarchyHistory?.subHierarchies;

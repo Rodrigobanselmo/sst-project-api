@@ -289,6 +289,10 @@ export class FindCompanyEmployeeExamHistoryDto extends PaginationQueryDto {
   @IsString()
   companyId?: string;
 
+  @IsBoolean()
+  @IsOptional()
+  allCompanies?: boolean;
+
   // @Transform(DateFormat, { toClassOnly: true })
   // @IsDate({ message: 'Data inválida' })
   // @Type(() => Date)

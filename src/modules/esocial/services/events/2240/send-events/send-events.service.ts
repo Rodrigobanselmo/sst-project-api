@@ -78,6 +78,7 @@ export class SendEvents2240ESocialService {
     const errorsEventsPPP = [] as IESocial2240.StructureReturn[];
     // prepare event to send to eSocial
     const eventsXml: IESocial2240.XmlReturn[] = eventsStruct
+      .filter((e) => !e.isSame)
       .map(({ event, ...data }) => {
         if (data.isExclude) return;
 

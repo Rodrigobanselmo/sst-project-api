@@ -113,9 +113,6 @@ export class EmployeeExamsHistoryRepository {
       ...whereOptions,
       AND: [
         {
-          employee: {
-            companyId: query.companyId,
-          },
           ...(!query.allCompanies && {
             employee: {
               companyId: query.companyId,

@@ -41,6 +41,9 @@ export const findAllEmployees = async (
     },
   });
 
+  console.log('hh', 166, hierarchies.map((i) => i.hierarchyOnHomogeneous).flat(2).length);
+  console.log('history', 22, hierarchies.map((i) => i.hierarchyHistory).flat(2).length);
+
   const hierarchyTree = hierarchyExcel.transformArrayToHierarchyMapTree(hierarchies);
 
   company.employees = company.employees

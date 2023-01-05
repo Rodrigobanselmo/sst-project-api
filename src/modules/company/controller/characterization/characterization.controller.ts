@@ -59,7 +59,7 @@ export class CharacterizationController {
     crud: 'cu',
   })
   @Post()
-  @UseInterceptors(FilesInterceptor('files[]', 5, { fileFilter: pngFileFilter }))
+  @UseInterceptors(FilesInterceptor('files[]', 20, { fileFilter: pngFileFilter }))
   upsert(
     @Body() body: UpsertCharacterizationDto,
     @User() userPayloadDto: UserPayloadDto,

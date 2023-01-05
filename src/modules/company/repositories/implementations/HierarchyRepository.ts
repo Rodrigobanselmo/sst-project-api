@@ -74,15 +74,18 @@ export class HierarchyRepository {
       },
     });
 
-    foundHomogeneousGroups.forEach((hg) => {
-      const max = foundHomogeneousGroups.reduce((a, b) => {
-        if (hg.hierarchyId !== b.hierarchyId) return a;
-        return Math.max(a, b?.endDate?.getTime());
+    foundHomogeneousGroups.forEach((hh) => {
+      const max = foundHomogeneousGroups.reduce((acc, curr) => {
+        if (hh.hierarchyId !== curr.hierarchyId) return acc || 0;
+        return Math.max(acc, curr?.endDate?.getTime());
       }, 0);
 
-      if ((hg?.endDate?.getTime() || 0) == max) {
-        hierarchyOnHomogeneous[hg.hierarchyId] = {};
-        hierarchyOnHomogeneous[hg.hierarchyId].id = hg.id;
+      hierarchyOnHomogeneous[hh.hierarchyId] = {};
+      hierarchyOnHomogeneous[hh.hierarchyId].skip = true;
+
+      if ((hh?.endDate?.getTime() || 0) == max) {
+        hierarchyOnHomogeneous[hh.hierarchyId].id = hh.id;
+        hierarchyOnHomogeneous[hh.hierarchyId].skip = false;
       }
     });
 
@@ -162,7 +165,12 @@ export class HierarchyRepository {
     );
 
     await this.prisma.$transaction(
-      HierarchyOnHomoGroup.map((hierarchyOnHomoGroup) => {
+      HierarchyOnHomoGroup.filter((hh) => {
+        if (hierarchyOnHomogeneous[hh.hierarchyId]) {
+          if (hierarchyOnHomogeneous[hh.hierarchyId].skip) return false;
+        }
+        return true;
+      }).map((hierarchyOnHomoGroup) => {
         return this.prisma.hierarchyOnHomogeneous.upsert({
           create: {
             ...hierarchyOnHomoGroup,

@@ -17,14 +17,18 @@ class ESocialGenerateId {
   private cpfCnpj: string;
   private type: number;
   private index = 1;
+  private timeLess: number;
 
   constructor(cpfCnpj: string, options: IIdOptions) {
     this.cpfCnpj = cpfCnpj;
     this.type = options?.type;
+    this.timeLess = options?.timeLess;
   }
 
   public newId() {
-    const data = dayjs().format('YYYYMMDDHHmmss');
+    const date = dayjs();
+    if (this.timeLess) date.add(-this.timeLess, 'm').add(-this.timeLess, 's');
+    const data = date.format('YYYYMMDDHHmmss');
     const ID = `ID${this.type || 1}${this.cpfCnpj.slice(0, 8).padEnd(14, '0')}${data}${String(this.index).padStart(5, '0')}`;
     const IDFull = `ID${this.type || 1}${this.cpfCnpj.padEnd(14, '0')}${data}${String(this.index).padStart(5, '0')}`;
 

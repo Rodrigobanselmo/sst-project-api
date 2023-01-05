@@ -90,7 +90,7 @@ export class EmployeeRepository {
   ): Promise<EmployeeEntity[]> {
     const employeeHistory = await this.prisma.employeeHierarchyHistory.findMany({ where: { hierarchy: { companyId } }, include: { employee: true } });
     const data = await this.prisma.$transaction(
-      upsertEmployeeMany.map(({ companyId: _, id, workspaceIds, hierarchyId, shiftId, cidId, admissionDate, ...upsertEmployeeDto }) =>
+      upsertEmployeeMany.map(({ companyId: _, id, workspaceIds, hierarchyId, shiftId, cidId, cbo, admissionDate, ...upsertEmployeeDto }) =>
         this.prisma.employee.upsert({
           create: {
             ...upsertEmployeeDto,
@@ -120,6 +120,7 @@ export class EmployeeRepository {
                   },
                 }
               : undefined,
+            ...(cbo && { cbo: onlyNumbers(cbo) }),
           },
           update: {
             ...upsertEmployeeDto,
@@ -139,6 +140,7 @@ export class EmployeeRepository {
                 }
               : undefined,
             status: 'ACTIVE',
+            ...(cbo && { cbo: onlyNumbers(cbo) }),
             hierarchyHistory: hierarchyId
               ? {
                   upsert: {

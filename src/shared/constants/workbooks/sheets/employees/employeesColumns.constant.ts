@@ -132,6 +132,14 @@ export const employeesColumnsConstant = [
     checkHandler: checkIsString,
   },
   {
+    databaseName: 'cbo',
+    excelName: 'Código CBO',
+    isArray: false,
+    required: false,
+    notes: ['Exemplo: 0210-05'],
+    checkHandler: checkIsString,
+  },
+  {
     databaseName: 'esocialCode',
     excelName: 'Matricula eSocial',
     isArray: false,

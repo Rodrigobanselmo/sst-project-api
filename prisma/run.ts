@@ -19,6 +19,7 @@ import { motiveTables } from './seed/motiveTables';
 import { cid10Table } from './seed/cid10Table';
 import { deleteRecMed } from './run/delete-rec-med';
 import { cboTable } from './seed/cboTable';
+import { deleteReapeatHH } from './run/delete-hh-repeat';
 
 const prisma = new PrismaClient();
 
@@ -48,7 +49,8 @@ async function main() {
     // await deleteRecMed(prisma);
     //*next
 
-    await cboTable(prisma);
+    await deleteReapeatHH(prisma);
+    // await cboTable(prisma);
 
     console.log('end');
   } catch (err) {

@@ -1070,7 +1070,7 @@ class ESocialEventProvider {
   }
 
   convertToEvent3000Struct(props: IESocial3000.StructureEntry, options?: { ideEvento?: IEventProps['ideEvento'] }): IESocial3000.StructureReturn[] {
-    const generateId = this.eSocialMethodsProvider.classGenerateId(props.cnpj);
+    const generateId = this.eSocialMethodsProvider.classGenerateId(props.cnpj, { timeLess: 1 });
 
     const events = props.event.map((event) => {
       const { id } = generateId.newId();

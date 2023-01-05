@@ -40,6 +40,7 @@ interface IIdOptions {
   type?: number;
   seqNum?: number;
   index?: number;
+  timeLess?: number;
   shortCNPJ?: boolean;
 }
 

@@ -102,7 +102,7 @@ export class EmployeeExamHistoryController {
       crud: true,
     },
   )
-  @Get('schedule/company')
+  @Get('/schedule/company')
   findCompanySchedule(@User() userPayloadDto: UserPayloadDto, @Query() query: FindCompanyEmployeeExamHistoryDto) {
     return this.findCompanyScheduleEmployeeExamHistoryService.execute(query, userPayloadDto);
   }
