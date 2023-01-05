@@ -47,10 +47,9 @@ async function main() {
     // await motiveTables(prisma);
 
     // await deleteRecMed(prisma);
-    //*next
-
-    await deleteReapeatHH(prisma);
+    // await deleteReapeatHH(prisma);
     // await cboTable(prisma);
+    //*next
 
     console.log('end');
   } catch (err) {

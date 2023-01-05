@@ -20,6 +20,7 @@ export class CopyCharacterizationService {
   async execute({ companyCopyFromId, workspaceId, characterizationIds }: CopyCharacterizationDto, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;
     const sameCompany = companyId === companyCopyFromId;
+    const isMaster = user.isMaster;
     // a lele ama o digo
     const actualCompany = await this.prisma.company.findFirst({
       where: {
@@ -33,11 +34,12 @@ export class CopyCharacterizationService {
     const company = await this.prisma.company.findFirst({
       where: {
         id: companyCopyFromId,
-        ...(!sameCompany && {
-          receivingServiceContracts: {
-            some: { applyingServiceCompanyId: user.companyId },
-          },
-        }),
+        ...(!isMaster &&
+          !sameCompany && {
+            receivingServiceContracts: {
+              some: { applyingServiceCompanyId: user.companyId },
+            },
+          }),
       },
     });
 
