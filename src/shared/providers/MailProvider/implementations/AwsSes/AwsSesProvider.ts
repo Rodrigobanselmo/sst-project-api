@@ -41,7 +41,7 @@ class AwsSesProvider implements IMailProvider {
       })
       .promise();
 
-    console.log('Message sent: %s', message.MessageId);
+    console.info('Message sent: %s', message.MessageId);
   }
 }
 

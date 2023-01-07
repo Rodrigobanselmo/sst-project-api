@@ -121,7 +121,7 @@ export class FetchESocialBatchEventsService {
                       },
                     });
                   } catch (err) {
-                    console.log('error on process event', err);
+                    console.error('error on process event', err);
                   }
                 }),
               );

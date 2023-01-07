@@ -427,9 +427,9 @@ model Cat {
 
   dtAtendimento DateTime 
   hrAtendimento String 
-  isIndInternacao Boolean 
+  isIndInternacao Boolean? 
   durTrat Int 
-  isIndAfast Boolean 
+  isIndAfast Boolean? 
   dscLesao String 
   esocialLesao EsocialTable17Injury? @relation(fields: [dscLesao], references: [code], onDelete: Restrict, onUpdate: Cascade)
   dscCompLesao String? 

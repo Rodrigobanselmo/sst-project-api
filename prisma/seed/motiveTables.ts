@@ -17,7 +17,7 @@ export const motiveTables = async (prisma: PrismaClient) => {
         };
       });
     await asyncBatch(jsonMotive, 50, async (data: any) => {
-      console.log('jsonMotive');
+      console.info('jsonMotive');
       console.count();
 
       await prisma.absenteeismMotive.create({
@@ -25,6 +25,6 @@ export const motiveTables = async (prisma: PrismaClient) => {
       });
     });
   } catch (e) {
-    console.log('Error:', e.stack);
+    console.error('Error:', e.stack);
   }
 };

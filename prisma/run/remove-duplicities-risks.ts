@@ -15,6 +15,4 @@ export const removeDuplicitiesRisks = async (prisma: PrismaClient) => {
     where: { name: { in: risk.map((n) => n.name) }, system: { not: true } },
     data: { deleted_at: new Date() },
   });
-
-  console.log(up);
 };

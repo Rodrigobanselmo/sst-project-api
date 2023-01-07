@@ -35,7 +35,7 @@ export class EpiRepository {
 
   async upsertMany(upsertDtoMany: UpsertEpiDto[]): Promise<EpiEntity[]> {
     i++;
-    console.log('batch' + i);
+    console.info('batch' + i);
     const data = await this.prisma.$transaction(
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       upsertDtoMany.map(({ id: _, ca, ...upsertRiskDto }) =>

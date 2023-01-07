@@ -81,7 +81,6 @@ export class FindCompanyScheduleEmployeeExamHistoryService {
         distinct: ['doneDate', 'employeeId'],
       },
     );
-    // console.log(employeesExams);
 
     // const employees = await this.employeeRepository.findNude({
     //   select: {

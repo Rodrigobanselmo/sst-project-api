@@ -16,7 +16,6 @@ export class CidRepository {
 
   async upsertMany(cidsDto: CidDto[]) {
     i++;
-    console.log('batch' + i);
     const data = await this.prisma.$transaction(
       cidsDto.map(({ cid, ...rest }) =>
         this.prisma.cid.upsert({

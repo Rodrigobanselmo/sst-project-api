@@ -108,7 +108,6 @@ export const addEsocialTables = async (prisma: PrismaClient) => {
     await asyncBatch(uf_citiesJson, 50, async (data: any) => {
       if (data.UF_Nome) {
         console.count();
-        console.log(String(data.UF));
         await prisma.uf.upsert({
           create: { uf: data.UF_Nome, code: String(data.UF), name: data.state },
           update: { uf: data.UF_Nome, code: String(data.UF), name: data.state },
@@ -118,7 +117,6 @@ export const addEsocialTables = async (prisma: PrismaClient) => {
     });
 
     await asyncBatch(uf_citiesJson, 100, async (data: any) => {
-      console.log('cities: ', String(data.UF));
       console.count();
 
       await prisma.cities.upsert({
@@ -129,7 +127,7 @@ export const addEsocialTables = async (prisma: PrismaClient) => {
     });
 
     await asyncBatch(data6Json, 50, async (data: any) => {
-      console.log('data6Json');
+      console.info('data6Json');
       console.count();
 
       await prisma.esocialTable6Country.upsert({
@@ -140,7 +138,7 @@ export const addEsocialTables = async (prisma: PrismaClient) => {
     });
 
     await asyncBatch(json13, 50, async (data: any) => {
-      console.log('json13');
+      console.info('json13');
       console.count();
 
       await prisma.esocialTable13BodyPart.upsert({
@@ -151,7 +149,7 @@ export const addEsocialTables = async (prisma: PrismaClient) => {
     });
 
     await asyncBatch(json14, 50, async (data: any) => {
-      console.log('json14');
+      console.info('json14');
       console.count();
 
       await prisma.esocialTable14And15Acid.upsert({
@@ -162,7 +160,7 @@ export const addEsocialTables = async (prisma: PrismaClient) => {
     });
 
     await asyncBatch(data15Json, 50, async (data: any) => {
-      console.log('data15Json');
+      console.info('data15Json');
       console.count();
 
       await prisma.esocialTable14And15Acid.upsert({
@@ -173,7 +171,7 @@ export const addEsocialTables = async (prisma: PrismaClient) => {
     });
 
     await asyncBatch(json17, 50, async (data: any) => {
-      console.log('json17');
+      console.info('json17');
       console.count();
 
       await prisma.esocialTable17Injury.upsert({
@@ -184,7 +182,7 @@ export const addEsocialTables = async (prisma: PrismaClient) => {
     });
 
     await asyncBatch(json18, 50, async (data: any) => {
-      console.log('json18');
+      console.info('json18');
       console.count();
 
       await prisma.esocialTable18Mot.upsert({
@@ -195,7 +193,7 @@ export const addEsocialTables = async (prisma: PrismaClient) => {
     });
 
     await asyncBatch(json20, 50, async (data: any) => {
-      console.log('json20');
+      console.info('json20');
       console.count();
 
       await prisma.esocialTable20Lograd.upsert({
@@ -207,6 +205,6 @@ export const addEsocialTables = async (prisma: PrismaClient) => {
 
     return;
   } catch (e) {
-    console.log('Error:', e.stack);
+    console.info('Error:', e.stack);
   }
 };

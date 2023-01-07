@@ -40,9 +40,9 @@ export class UpdateAllCompaniesService {
   ) {}
 
   async execute(user?: UserPayloadDto) {
-    const companyId = user?.targetCompanyId;
+    const companyId = '9d5354b1-f4bf-4758-8bb6-73ed59ef3444' || user?.targetCompanyId;
 
-    console.log('start cron(1): update all');
+    console.info('start cron(1): update all');
     const allCompanies = await this.companyRepository.findNude({
       select: {
         id: true,
@@ -94,7 +94,7 @@ export class UpdateAllCompaniesService {
       },
     });
 
-    console.log('start cron(2): update employees');
+    console.info('start cron(2): update employees');
     const employeeExams = (await asyncEach(allCompanies, (v) => this.addReport(v))).map(
       ({ company, examTime, esocialEvents }): UpsertCompanyReportDto & { company: CompanyEntity } => {
         const expired = (examTime?.allWithExamExpired?.length || 0) + (examTime?.allWithMissingExam?.length || 0);
@@ -157,14 +157,14 @@ export class UpdateAllCompaniesService {
 
       return report;
     });
-    console.log('start cron(3): telegram');
+    console.info('start cron(3): telegram');
     this.telegramMessage(allCompanies);
 
-    console.log('start cron(4): reports');
+    console.info('start cron(4): reports');
     await asyncBatch(employeeExamsData, 50, async (report) => {
       await this.companyReportRepository.updateESocialReport(report.companyId, report.dailyReport);
     });
-    console.log('end cron(4): reports');
+    console.info('end cron(4): reports');
 
     this.errorCompanies = [];
     this.error = undefined;
@@ -310,6 +310,8 @@ export class UpdateAllCompaniesService {
         },
       );
 
+      console.log('test', exams);
+
       const getExpired = allWithMissingExam.map((employee) => {
         const ids = [...employee.subOffices.map(({ id }) => id), employee.hierarchyId];
 
@@ -402,17 +404,21 @@ export class UpdateAllCompaniesService {
   }
 
   async telegramMessage(allCompanies: CompanyEntity[]) {
-    return;
     try {
       const messageHtml = this.errorCompanies.length
         ? `
-UPDATE ALL COMPANIES EXAMS:
-
-DONE: ${allCompanies.length - this.errorCompanies.length}
-ERRORS: ${this.errorCompanies.length}
-TOTAL: ${allCompanies.length}
+      UPDATE ALL COMPANIES EXAMS:
+      
+      DONE: ${allCompanies.length - this.errorCompanies.length}
+      ERRORS: ${this.errorCompanies.length}
+      TOTAL: ${allCompanies.length}
       `
         : 'ALL GOOD';
+
+      if (process.env.APP_HOST.includes('localhost')) {
+        console.info(messageHtml);
+        return;
+      }
 
       await this.telegram
         .sendMessage({

@@ -98,8 +98,8 @@ class ESocialMethodsProvider implements IESocialEventProvider {
     sig2.keyInfoProvider = new MyKeyInfo();
     sig2.loadSignature(signature as any);
     const res = sig2.checkSignature(signXML);
-    if (!res) console.log('validate signXML errors: ', sig2.validationErrors);
-    console.log('is valid signature: ', res);
+    if (!res) console.warn('validate signXML errors: ', sig2.validationErrors);
+    console.warn('is valid signature: ', res);
 
     return signXML;
   }

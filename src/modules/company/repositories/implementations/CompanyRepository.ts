@@ -769,6 +769,7 @@ export class CompanyRepository implements ICompanyRepository {
     const company = await this.prisma.company.findUnique({
       where: { id },
       include: {
+        employees: !!include.employees ? true : false,
         ...include,
         group: {
           include: {
@@ -779,7 +780,6 @@ export class CompanyRepository implements ICompanyRepository {
         primary_activity: !!include?.primary_activity,
         secondary_activity: !!include?.secondary_activity,
         workspace: !!include?.workspace ? { include: { address: true } } : false,
-        employees: !!include.employees ? true : false,
         address: true,
         doctorResponsible: { include: { professional: true } },
         tecResponsible: { include: { professional: true } },

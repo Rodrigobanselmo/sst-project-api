@@ -16,10 +16,10 @@ export class EsocialFetchBatchCron {
     const shouldSkip: ICacheEventBatchType | null = await this.cacheManager.get(CacheEnum.ESOCIAL_FETCH_EVENT);
 
     if (!shouldSkip) {
-      console.log('FETCH NEXT');
+      console.info('FETCH NEXT');
       this.index++;
       if (this.index % 2 == 0) {
-        console.log('FETCH ESOCIAL');
+        console.info('FETCH ESOCIAL');
 
         const cacheValue: ICacheEventBatchType = true;
         await this.cacheManager.set(CacheEnum.ESOCIAL_FETCH_EVENT, cacheValue, 360);

@@ -35,6 +35,6 @@ export const cboTable = async (prisma: PrismaClient) => {
 
     return;
   } catch (e) {
-    console.log('Error:', e.stack);
+    console.error('Error:', e.stack);
   }
 };

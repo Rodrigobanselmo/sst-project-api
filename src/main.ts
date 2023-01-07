@@ -29,13 +29,13 @@ export function logger(req, res, next) {
     .map((path) => (path.split('-').length == 5 ? path.split('-')[0] : path))
     .join('&');
 
-  console.log((req.method === 'GET' ? chalk.cyan : chalk.red)(`[${req.method}]: `) + chalk.blue(`${shortPath}`) + chalk.gray(`?${queryParams}`));
+  console.info((req.method === 'GET' ? chalk.cyan : chalk.red)(`[${req.method}]: `) + chalk.blue(`${shortPath}`) + chalk.gray(`?${queryParams}`));
 
   next();
 }
 
 async function bootstrap() {
-  console.log('STARTED');
+  console.info('STARTED');
 
   const app = await NestFactory.create(AppModule);
 

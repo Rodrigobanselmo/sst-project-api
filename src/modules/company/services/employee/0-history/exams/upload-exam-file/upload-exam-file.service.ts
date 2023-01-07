@@ -86,7 +86,7 @@ export class UploadExamFileService {
 
       return url;
     } catch (err) {
-      console.log('upload exam file', err);
+      console.error('upload exam file', err);
       throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_HISTORY_NOT_FOUND);
     }
   }

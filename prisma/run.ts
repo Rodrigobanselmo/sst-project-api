@@ -25,7 +25,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   try {
-    console.log('start');
+    console.info('start');
     // const group = await prisma.employeeESocialEvent.groupBy({
     //   by: ['status'],
     //   _count: true,
@@ -51,7 +51,7 @@ async function main() {
     // await cboTable(prisma);
     //*next
 
-    console.log('end');
+    console.info('end');
   } catch (err) {
     console.error(err);
   }

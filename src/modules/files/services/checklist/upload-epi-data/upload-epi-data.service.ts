@@ -41,11 +41,11 @@ export class UploadEpiDataService {
       DatabaseTable: riskDatabaseTable,
     });
 
-    console.log('remove duplicates');
+    console.info('remove duplicates');
 
     const duplicates = removeDuplicate(allEpi, { removeById: 'ca' });
 
-    console.log('reduce');
+    console.info('reduce');
 
     const arr = duplicates.reduce((acc, epi, index) => {
       const i = Math.floor(index / 1000);
@@ -54,11 +54,11 @@ export class UploadEpiDataService {
       return acc;
     }, [] as any[]);
 
-    console.log('start');
+    console.info('start');
 
     await Promise.all(arr.map(async (data) => await this.epiRepository.upsertMany(data)));
 
-    console.log('done');
+    console.info('done');
 
     return await this.uploadExcelProvider.newTableData({
       findAll: (sheet) => findAllEpis(this.excelProvider, this.epiRepository, sheet),

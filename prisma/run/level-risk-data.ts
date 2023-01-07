@@ -27,6 +27,6 @@ export const levelRiskData = async (prisma: PrismaClient) => {
       }),
     );
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 };

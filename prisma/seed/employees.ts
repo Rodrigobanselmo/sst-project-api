@@ -83,6 +83,6 @@ export const seedEmployees = async (prisma: PrismaClient, companyId: string, wor
       },
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };

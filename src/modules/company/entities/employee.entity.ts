@@ -117,6 +117,8 @@ export class EmployeeEntity implements Employee {
 
     if (this.hierarchyHistory) {
       this.hierarchyHistory = this.hierarchyHistory.map((hierarchyHistory) => new EmployeeHierarchyHistoryEntity(hierarchyHistory));
+      const admissionDate = this.hierarchyHistory.find((h) => h?.motive == 'ADM')?.startDate;
+      if (admissionDate) this.admissionDate = admissionDate;
     }
   }
 }

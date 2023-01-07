@@ -252,6 +252,7 @@ export class FindExamByHierarchyService {
     });
 
     const examRepresentAll = hierarchyIds.length > 0 ? await this.onGetAllExams(companyId, { examsTypes: examType, onlyAttendance: query.onlyAttendance }) : { data: [] };
+    console.log('test', examRepresentAll);
 
     examRepresentAll.data.map((exam) => {
       exam.examToRisk.map((examToRisk) => {

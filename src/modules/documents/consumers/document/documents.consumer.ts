@@ -39,7 +39,7 @@ export class PgrConsumer {
         });
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       throw new InternalServerErrorException();
     }
   }

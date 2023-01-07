@@ -122,13 +122,8 @@ export class SendBatchESocialService {
     );
 
     return { s };
-    console.log('start');
-    console.log(JSON.stringify(this.soupClient.describe()));
     const promise = new Promise((resolve) => {
       this.soupClient.ServicoEnviarLoteEventos.WsEnviarLoteEventos.EnviarLoteEventos(xml, (e, s) => {
-        console.log('middle');
-        console.log('erro', e);
-
         if (e)
           return resolve({
             status: {
@@ -150,9 +145,6 @@ export class SendBatchESocialService {
     });
 
     const res = (await promise) as IEsocialSendBatchResponse;
-    console.log(res);
-
-    console.log('end');
 
     return;
 

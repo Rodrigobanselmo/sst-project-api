@@ -35,7 +35,7 @@ export const seedEsocial24 = async (prisma: PrismaClient) => {
         };
       });
 
-    console.log(json);
+    console.info(json);
     await Promise.all(
       json
         .filter((i) => i)
@@ -48,6 +48,6 @@ export const seedEsocial24 = async (prisma: PrismaClient) => {
         }),
     );
   } catch (e) {
-    console.log('Error:', e.stack);
+    console.error('Error:', e.stack);
   }
 };

@@ -40,7 +40,7 @@ export const hierarchiesColumnsConstant = [
   },
   {
     databaseName: 'directory',
-    excelName: 'Diretória',
+    excelName: 'Diretoria',
     isArray: false,
     required: false,
     checkHandler: checkIsString,
@@ -48,7 +48,7 @@ export const hierarchiesColumnsConstant = [
   },
   {
     databaseName: 'management',
-    excelName: 'Gereência',
+    excelName: 'Gerência',
     isArray: false,
     required: false,
     checkHandler: checkIsString,

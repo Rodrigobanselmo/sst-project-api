@@ -65,7 +65,7 @@ export class PcmsoUploadService {
     const companyId = upsertPgrDto.companyId;
     const workspaceId = upsertPgrDto.workspaceId;
     // throw new Error();
-    console.log('start: query data');
+    console.info('start: query data');
     const company = await this.companyRepository.findByIdAll(companyId, workspaceId, {
       include: {
         riskFactorGroupData: true,
@@ -166,7 +166,7 @@ export class PcmsoUploadService {
       const { hierarchyData, hierarchyHighLevelsData, homoGroupTree, hierarchyTree } = hierarchyConverter(hierarchyHierarchy, environments, { workspaceId });
 
       const actionPlanUrl = ' ';
-      // console.log('start: attachment');
+      // console.info('start: attachment');
       // // const { actionPlanUrl } = await this.generateAttachment(
       // //   riskGroupData,
       // //   hierarchyData,
@@ -203,7 +203,7 @@ export class PcmsoUploadService {
 
       const versionString = `${this.dayJSProvider.format(version.created_at)} - REV. ${version.version}`;
 
-      console.log('start: build document');
+      console.info('start: build document');
       const sections: ISectionOptions[] = new DocumentBuildPGR({
         version: versionString,
         document: riskGroupData,
@@ -232,14 +232,14 @@ export class PcmsoUploadService {
         hierarchyTree,
         cover,
       }).build();
-      console.log('end: build document part 1');
+      console.info('end: build document part 1');
 
       const doc = createBaseDocument(sections);
-      console.log('end: build document part 2');
+      console.info('end: build document part 2');
 
       const b64string = await Packer.toBase64String(doc);
       const buffer = Buffer.from(b64string, 'base64');
-      console.log('end: build document part 3');
+      console.info('end: build document part 3');
 
       const fileName = this.getFileName(upsertPgrDto, riskGroupData);
 
@@ -262,12 +262,12 @@ export class PcmsoUploadService {
       // return doc; //?remove
 
       this.unlinkFiles([logo, consultantLogo, ...photosPath]);
-      console.log('done: unlink photos');
+      console.info('done: unlink photos');
 
       return { buffer, fileName };
     } catch (error) {
       this.unlinkFiles([logo, consultantLogo, ...photosPath]);
-      console.log('error: unlink photos', error);
+      console.info('error: unlink photos', error);
 
       if (upsertPgrDto.id)
         await this.riskDocumentRepository.upsert({
@@ -344,7 +344,7 @@ export class PcmsoUploadService {
         photosPath,
       };
     } catch (error) {
-      console.log('unlink photo on error');
+      console.info('unlink photo on error');
       this.unlinkFiles(photosPath);
       console.error(error);
       throw new InternalServerErrorException(error);
@@ -397,7 +397,7 @@ export class PcmsoUploadService {
       .filter((i) => !!i && typeof i == 'string')
       .forEach((path) => {
         try {
-          console.log('paths', path);
+          console.info('paths', path);
           fs.unlinkSync(path);
         } catch (e) {}
       });

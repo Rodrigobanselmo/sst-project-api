@@ -12,10 +12,10 @@ export const deleteWithNameCompany = async (name: string, prisma: PrismaClient) 
       }),
     );
   } catch (error) {
-    console.log(error);
-    console.log('error: end');
+    console.error(error);
+    console.error('error: end');
   }
-  console.log('end');
+  console.error('end');
 };
 
 export const deleteCompany = async (id: string, prisma: PrismaClient) => {

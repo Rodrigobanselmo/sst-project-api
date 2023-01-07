@@ -16,7 +16,7 @@ export class InternalServerExceptionFilter implements ExceptionFilter {
     const message = exception ? exception?.message : 'Internal server error';
 
     if (status === HttpStatus.INTERNAL_SERVER_ERROR) {
-      console.log('o something to warn me');
+      console.error('o something to warn me');
     }
 
     response.status(status).json({

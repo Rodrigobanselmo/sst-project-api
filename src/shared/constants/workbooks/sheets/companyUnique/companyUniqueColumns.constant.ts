@@ -65,14 +65,14 @@ export const companyUniqueColumnsConstant = [
   },
   {
     databaseName: 'employees.directory',
-    excelName: 'Diretória',
+    excelName: 'Diretoria',
     isArray: true,
     required: false,
     checkHandler: checkIsString,
   },
   {
     databaseName: 'employees.management',
-    excelName: 'Gereência',
+    excelName: 'Gerência',
     isArray: true,
     required: false,
     checkHandler: checkIsString,

@@ -21,7 +21,7 @@ export class ActivityRepository {
 
   async upsertMany(activitiesDto: ActivityDto[]) {
     i++;
-    console.log('batch' + i);
+    console.info('batch' + i);
     const data = await this.prisma.$transaction(
       activitiesDto.map(({ code, ...activityDto }) =>
         this.prisma.activity.upsert({

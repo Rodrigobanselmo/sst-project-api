@@ -36,7 +36,7 @@ export class ExamRepository {
 
   async upsertMany(upsertDtoMany: UpsertExamDto[]): Promise<ExamEntity[]> {
     i++;
-    console.log('batch' + i);
+    console.info('batch' + i);
     const data = await this.prisma.$transaction(
       upsertDtoMany.map(({ id, ...upsertRiskDto }) =>
         this.prisma.exam.upsert({

@@ -42,11 +42,11 @@ export class UploadCnaeDataService {
       DatabaseTable: riskDatabaseTable,
     });
 
-    console.log('remove duplicates');
+    console.info('remove duplicates');
 
     const duplicates = removeDuplicate(allCnae, { removeById: 'code' });
 
-    console.log('reduce');
+    console.info('reduce');
 
     const arr = duplicates.reduce((acc, cnae, index) => {
       const i = Math.floor(index / 500);
@@ -55,11 +55,11 @@ export class UploadCnaeDataService {
       return acc;
     }, [] as any[]);
 
-    console.log('start');
+    console.info('start');
 
     await Promise.all(arr.map(async (data) => await this.activityRepository.upsertMany(data)));
 
-    console.log('done');
+    console.info('done');
 
     return await this.uploadExcelProvider.newTableData({
       findAll: (sheet) => findAllCnaes(this.excelProvider, this.activityRepository, sheet),

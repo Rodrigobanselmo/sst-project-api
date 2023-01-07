@@ -83,7 +83,7 @@ export class PgrUploadService {
     const workspaceId = upsertPgrDto.workspaceId;
     const fromDate = new Date();
     // throw new Error();
-    console.log('start: query data');
+    console.info('start: query data');
 
     const riskGroupData = await this.riskGroupDataRepository.findAllDataById(upsertPgrDto.riskGroupId, workspaceId, companyId);
 
@@ -175,9 +175,9 @@ export class PgrUploadService {
 
     const cover = company?.covers?.[0] || consultant?.covers?.[0];
 
-    console.log('start: photos');
+    console.info('start: photos');
     const { environments, characterizations, photosPath } = await this.downloadPhotos(company);
-    console.log('end: photos');
+    console.info('end: photos');
     // const environments = [];
     // const characterizations = [];
     // const photosPath = [];
@@ -188,7 +188,7 @@ export class PgrUploadService {
       // const actionPlanUrl = ' ';
       // const urlAPR = ' ';
       // const urlGroupAPR = ' ';
-      console.log('start: attachment');
+      console.info('start: attachment');
       const { actionPlanUrl, urlAPR, urlGroupAPR } = await this.generateAttachment(
         riskGroupData,
         hierarchyData,
@@ -237,7 +237,7 @@ export class PgrUploadService {
 
       const versionString = `${this.dayJSProvider.format(version.created_at)} - REV. ${version.version}`;
 
-      console.log('start: build document');
+      console.info('start: build document');
       const sections: ISectionOptions[] = new DocumentBuildPGR({
         version: versionString,
         document: riskGroupData,
@@ -266,14 +266,14 @@ export class PgrUploadService {
         hierarchyTree,
         cover,
       }).build();
-      console.log('end: build document part 1');
+      console.info('end: build document part 1');
 
       const doc = createBaseDocument(sections);
-      console.log('end: build document part 2');
+      console.info('end: build document part 2');
 
       const b64string = await Packer.toBase64String(doc);
       const buffer = Buffer.from(b64string, 'base64');
-      console.log('end: build document part 3');
+      console.info('end: build document part 3');
 
       const fileName = this.getFileName(upsertPgrDto, riskGroupData);
 
@@ -296,13 +296,13 @@ export class PgrUploadService {
       // return doc; //?remove
 
       this.unlinkFiles([logo, consultantLogo, ...photosPath]);
-      console.log('done: unlink photos');
+      console.info('done: unlink photos');
 
       return { buffer, fileName };
     } catch (error) {
       this.unlinkFiles([logo, consultantLogo, ...photosPath]);
 
-      console.log('error: unlink photos', error);
+      console.error('error: unlink photos', error);
 
       if (upsertPgrDto.id)
         await this.riskDocumentRepository.upsert({
@@ -385,9 +385,9 @@ export class PgrUploadService {
         photosPath,
       };
     } catch (error) {
-      console.log('unlink photo on error');
+      console.info('unlink photo on error');
       this.unlinkFiles(photosPath);
-      console.log(error);
+      console.info(error);
       throw new InternalServerErrorException(error);
     }
   }
@@ -448,7 +448,7 @@ export class PgrUploadService {
       .filter((i) => !!i && typeof i == 'string')
       .forEach((path) => {
         try {
-          console.log('paths', path);
+          console.info('paths', path);
           fs.unlinkSync(path);
         } catch (e) {}
       });

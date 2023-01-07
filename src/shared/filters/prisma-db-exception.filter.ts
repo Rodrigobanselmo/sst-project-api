@@ -15,7 +15,7 @@ export class PrismaDbExceptionFilter implements ExceptionFilter {
 
     const { cause, target, field_name } = meta;
 
-    console.log(exception);
+    console.error(exception);
 
     switch (code) {
       case 'P2002':
@@ -38,8 +38,8 @@ export class PrismaDbExceptionFilter implements ExceptionFilter {
     const status = error.getStatus();
 
     if (status === HttpStatus.INTERNAL_SERVER_ERROR) {
-      console.log(`error`, exception);
-      console.log('Do something to warn me');
+      console.error(`error`, exception);
+      console.error('Do something to warn me');
     }
 
     response.status(status).json({

@@ -23,7 +23,7 @@ const addVersion = (worksheet: ExcelJS.Worksheet, version: number, lastUpdate: D
 };
 
 const addRules = (worksheet: ExcelJS.Worksheet) => {
-  worksheet.addRow(['Obrigarótio', 'Opcinal']);
+  worksheet.addRow(['Obrigatório', 'Opcinal']);
 
   const row = worksheet.lastRow;
 
@@ -32,7 +32,8 @@ const addRules = (worksheet: ExcelJS.Worksheet) => {
 
   row.getCell(1).fill = sheetStylesConstant.fill.required;
   row.getCell(2).fill = sheetStylesConstant.fill.optional;
-  row.getCell(3).value = `Possivel adicionar \n + abaixo`;
+  // row.getCell(3).value = `Possivel adicionar \n + abaixo`;
+  row.getCell(3).value = ` `;
   row.getCell(3).border = sheetStylesConstant.border.addMore;
 };
 
@@ -263,7 +264,6 @@ class ExcelProvider implements IExcelProvider {
           if (checkedData === false && excelCell != '-') throw new BadRequestException(`Dado inválido na ${actualCell}`);
 
           if (checkedData === 'false') checkedData = false;
-          if (checkedData === 'false') console.log(checkedData);
 
           const nestedObject = transformStringToObject(tableSchemaCell.databaseName, checkedData);
 

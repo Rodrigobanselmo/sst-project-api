@@ -7,7 +7,6 @@ export const deleteReapeatHH = async (prisma: PrismaClient) => {
   });
 
   const toDelete = x.filter((i) => i._count > 1);
-  console.log(toDelete);
   Promise.all(
     toDelete.map(async ({ _count, ...del }) => {
       await prisma.hierarchyOnHomogeneous.deleteMany({

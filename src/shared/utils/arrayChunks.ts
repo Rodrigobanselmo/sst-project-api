@@ -33,11 +33,5 @@ export function arrayChunks<T>(array: T[], perChunk: number, options?: IChuckOpt
     }
   }
 
-  // console.log(chuckArray.length);
-  // console.log(chuckArray.map((chuckArray) => chuckArray.length));
-  // console.log(array.length);
-
-  // throw new Error();
-
   return chuckArray;
 }

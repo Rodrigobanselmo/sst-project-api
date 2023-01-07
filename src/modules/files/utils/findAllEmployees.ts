@@ -23,7 +23,13 @@ export const findAllEmployees = async (
 ) => {
   const hierarchyExcel = new HierarchyExcelProvider();
   const company = await companyRepository.findById(companyId, {
-    include: { employees: { orderBy: { name: 'asc' } }, workspace: true },
+    include: {
+      employees: {
+        orderBy: { name: 'asc' },
+        include: { hierarchyHistory: { where: { motive: 'ADM' }, select: { startDate: true, motive: true }, take: 1, orderBy: { startDate: 'desc' } } },
+      },
+      workspace: true,
+    },
   });
 
   if (company.workspace?.length === 1) riskSheet.columns = riskSheet.columns.filter((column) => column.databaseName !== 'abbreviation');
@@ -40,9 +46,6 @@ export const findAllEmployees = async (
       workspaces: true,
     },
   });
-
-  console.log('hh', 166, hierarchies.map((i) => i.hierarchyOnHomogeneous).flat(2).length);
-  console.log('history', 22, hierarchies.map((i) => i.hierarchyHistory).flat(2).length);
 
   const hierarchyTree = hierarchyExcel.transformArrayToHierarchyMapTree(hierarchies);
 
