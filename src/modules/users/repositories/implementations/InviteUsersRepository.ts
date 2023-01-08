@@ -9,6 +9,7 @@ import { InviteUsersEntity } from '../../entities/invite-users.entity';
 import { IInviteUsersRepository } from '../IInviteUsersRepository.types';
 import { Prisma } from '.prisma/client';
 import { dayjs } from '../../../../shared/providers/DateProvider/implementations/DayJSProvider';
+import { ProfessionalEntity } from '../../entities/professional.entity';
 
 @Injectable()
 export class InviteUsersRepository implements IInviteUsersRepository {
@@ -105,7 +106,7 @@ export class InviteUsersRepository implements IInviteUsersRepository {
     ]);
 
     return {
-      data: response[1].map((exam) => new InviteUsersEntity(exam)),
+      data: response[1].map((p) => new InviteUsersEntity({ ...p, ...(p.professional && { professional: new ProfessionalEntity(p.professional) }) })),
       count: response[0],
     };
   }

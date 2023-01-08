@@ -44,6 +44,7 @@ export class CatRepository {
     if (!options.select)
       options.select = {
         id: true,
+        status: true,
         employeeId: true,
         hrAcid: true,
         houveAfast: true,

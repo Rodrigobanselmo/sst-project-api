@@ -300,7 +300,7 @@ export class RiskRepository implements IRiskRepository {
       ...options,
     });
 
-    return new RiskFactorsEntity(risk);
+    return new RiskFactorsEntity(risk as any);
   }
 
   async findAllByCompanyId(

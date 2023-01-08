@@ -193,7 +193,7 @@ export class EmployeeRepository {
       }),
     });
 
-    return new EmployeeEntity(employee);
+    return new EmployeeEntity(employee as any);
   }
 
   async find(query: Partial<FindEmployeeDto>, pagination: PaginationQueryDto, options: Prisma.EmployeeFindManyArgs = {}) {

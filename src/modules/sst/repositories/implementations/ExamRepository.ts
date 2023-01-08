@@ -100,7 +100,7 @@ export class ExamRepository {
     ]);
 
     return {
-      data: response[1].map((exam) => new ExamEntity(exam)),
+      data: response[1].map((exam) => new ExamEntity(exam as any)),
       count: response[0],
     };
   }

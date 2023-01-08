@@ -529,17 +529,14 @@ export class CompanyRepository implements ICompanyRepository {
     });
 
     if ('search' in query) {
+      const cnpj = onlyNumbers(query.search);
       (where.AND as any).push({
         OR: [
           { group: { name: { contains: query.search, mode: 'insensitive' } } },
           { name: { contains: query.search, mode: 'insensitive' } },
           { fantasy: { contains: query.search, mode: 'insensitive' } },
           { initials: { contains: query.search, mode: 'insensitive' } },
-          {
-            cnpj: {
-              contains: query.search ? onlyNumbers(query.search) || 'no' : '',
-            },
-          },
+          ...(cnpj ? [{ cnpj: { contains: onlyNumbers(query.search) } }] : []),
         ],
       } as typeof options.where);
     }
@@ -730,7 +727,7 @@ export class CompanyRepository implements ICompanyRepository {
     ]);
 
     return {
-      data: response[1].map((company) => new CompanyEntity(company)),
+      data: response[1].map((company) => new CompanyEntity(company as any)),
       count: response[0],
     };
   }
@@ -812,7 +809,7 @@ export class CompanyRepository implements ICompanyRepository {
       professionalCount,
       examCount,
       usersCount,
-    });
+    } as any);
   }
 
   async findNude(options: Prisma.CompanyFindManyArgs = {}) {

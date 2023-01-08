@@ -1,23 +1,1590 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "fullTextIndex", "orderByNulls"]
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
 }
 
-// enum AbsenteeismTrafficEnum {
-//   COLLISION
-//   RUN_OVER
-//   OTHERS
-// }
+model Absenteeism {
+  id                Int                  @id @default(autoincrement())
+  observation       String?
+  sameAsBefore      Boolean?
+  startDate         DateTime
+  endDate           DateTime
+  traffic           Int?
+  vacationStartDate DateTime?
+  vacationEndDate   DateTime?
+  cnpjSind          String?
+  infOnusRemun      Int?
+  cnpjMandElet      String?
+  origRetif         Int?
+  tpProc            Int?
+  nrProc            Int?
+  motiveId          Int?
+  esocial18Motive   Int?
+  cidId             String?
+  employeeId        Int
+  docId             Int?
+  isExtern          Boolean?
+  isJustified       Boolean?
+  local             String?
+  status            StatusEnum           @default(ACTIVE)
+  timeSpent         Int
+  timeUnit          DateUnitEnum
+  cid               Cid?                 @relation(fields: [cidId], references: [cid], onDelete: Restrict)
+  doc               ProfessionalCouncil? @relation(fields: [docId], references: [id], onDelete: Restrict)
+  employee          Employee             @relation(fields: [employeeId], references: [id])
+  esocial18         EsocialTable18Mot?   @relation(fields: [esocial18Motive], references: [id], onDelete: Restrict)
+  motive            AbsenteeismMotive?   @relation(fields: [motiveId], references: [id], onDelete: Restrict)
 
-// enum AbsenteeismOnusEnum {
-//   EMPLOYER
-//   SINDICATE
-//   PART
-// }
+  @@index([startDate])
+  @@index([endDate])
+}
+
+model AbsenteeismMotive {
+  id          Int           @id @default(autoincrement())
+  desc        String
+  absenteeism Absenteeism[]
+}
+
+model AccessGroups {
+  id          Int           @id @default(autoincrement())
+  roles       String[]
+  permissions String[]
+  companyId   String
+  description String?
+  name        String
+  system      Boolean       @default(false)
+  company     Company       @relation(fields: [companyId], references: [id])
+  invites     InviteUsers[]
+  users       UserCompany[]
+
+  @@unique([id, companyId])
+}
+
+model Activity {
+  id                         Int       @id @default(autoincrement())
+  code                       String    @unique
+  name                       String
+  created_at                 DateTime  @default(now())
+  riskDegree                 Int       @default(0)
+  company_primary_activity   Company[] @relation("primary_activity")
+  company_secondary_activity Company[] @relation("secondary_activity")
+}
+
+model Address {
+  id           String    @id @default(uuid())
+  companyId    String
+  cep          String
+  street       String?
+  number       String?
+  complement   String?
+  neighborhood String?
+  city         String?
+  state        String?
+  workspaceId  String?
+  workspace    Workspace @relation(fields: [id, companyId], references: [id, companyId], onDelete: Cascade)
+
+  @@unique([workspaceId, companyId])
+  @@unique([id, companyId])
+  @@index([companyId])
+}
+
+model AddressCompany {
+  id           String       @id @default(uuid())
+  cep          String
+  street       String?
+  number       String?
+  complement   String?
+  neighborhood String?
+  city         String?
+  state        String?
+  companyId    String       @unique
+  uf           UfStateEnum?
+  company      Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+model Attachments {
+  id                   String              @id @default(uuid())
+  name                 String?
+  url                  String
+  created_at           DateTime            @default(now())
+  deleted_at           DateTime?
+  updated_at           DateTime            @updatedAt
+  riskFactorDocumentId String?
+  riskFactorDocument   RiskFactorDocument? @relation(fields: [riskFactorDocumentId], references: [id], onDelete: Restrict)
+}
+
+model Cat {
+  id                     Int                     @id @default(autoincrement())
+  dtAcid                 DateTime
+  tpAcid                 Int
+  hrAcid                 String?
+  hrsTrabAntesAcid       String?
+  tpCat                  Int
+  isIndCatObito          Boolean?
+  dtObito                DateTime?
+  isIndComunPolicia      Boolean?
+  codSitGeradora         String
+  iniciatCAT             Int
+  obsCAT                 String?
+  ultDiaTrab             DateTime?
+  houveAfast             Boolean?
+  tpLocal                Int
+  dscLocal               String
+  tpLograd               String?
+  dscLograd              String
+  nrLograd               String
+  complemento            String?
+  bairro                 String?
+  cep                    String?
+  codMunic               String?
+  uf                     String?
+  pais                   String?
+  codPostal              String?
+  ideLocalAcidTpInsc     Int?
+  ideLocalAcidCnpj       String?
+  codParteAting          String
+  lateralidade           Int
+  codAgntCausador        String
+  dtAtendimento          DateTime
+  hrAtendimento          String
+  isIndInternacao        Boolean
+  durTrat                Int
+  isIndAfast             Boolean
+  dscLesao               String
+  dscCompLesao           String?
+  diagProvavel           String?
+  codCID                 String
+  observacao             String?
+  nrRecCatOrig           String?
+  employeeId             Int
+  docId                  Int
+  status                 StatusEnum              @default(ACTIVE)
+  sendEvent              Boolean                 @default(true)
+  catOriginId            Int?
+  catOrigin              Cat?                    @relation("cat_oringin_fk", fields: [catOriginId], references: [id], onDelete: Restrict)
+  catReopen              Cat[]                   @relation("cat_oringin_fk")
+  esocialAgntCausador    EsocialTable14And15Acid @relation("cat_ag_causador", fields: [codAgntCausador], references: [code])
+  cid                    Cid                     @relation(fields: [codCID], references: [cid])
+  city                   Cities?                 @relation(fields: [codMunic], references: [code], onDelete: Restrict)
+  codParteAtingEsocial13 EsocialTable13BodyPart  @relation(fields: [codParteAting], references: [code])
+  esocialSitGeradora     EsocialTable14And15Acid @relation("cat_sit_geradora", fields: [codSitGeradora], references: [code])
+  doc                    ProfessionalCouncil     @relation(fields: [docId], references: [id])
+  esocialLesao           EsocialTable17Injury    @relation(fields: [dscLesao], references: [code])
+  employee               Employee                @relation(fields: [employeeId], references: [id])
+  countryCodeEsocial6    EsocialTable6Country?   @relation(fields: [pais], references: [code], onDelete: Restrict)
+  esocialLograd          EsocialTable20Lograd?   @relation(fields: [tpLograd], references: [code], onDelete: Restrict)
+  uf_table               Uf?                     @relation(fields: [uf], references: [uf], onDelete: Restrict)
+  events                 EmployeeESocialEvent[]
+}
+
+model Cbo {
+  code String @id
+  desc String
+
+  @@unique([code, desc])
+}
+
+model Checklist {
+  id         Int            @default(autoincrement())
+  status     StatusEnum     @default(PROGRESS)
+  name       String
+  companyId  String
+  system     Boolean
+  created_at DateTime       @default(now())
+  company    Company        @relation(fields: [companyId], references: [id])
+  data       ChecklistData?
+
+  @@id([id, companyId])
+}
+
+model ChecklistData {
+  json        Json
+  companyId   String
+  checklistId Int
+  checklist   Checklist @relation(fields: [checklistId, companyId], references: [id, companyId], onDelete: Cascade)
+
+  @@id([checklistId, companyId])
+}
+
+model Cid {
+  cid          String        @id
+  description  String?
+  class        String?
+  kill         Boolean?
+  sex          SexTypeEnum?
+  absenteeisms Absenteeism[]
+  cat          Cat[]
+  employees    Employee[]
+
+  @@index([description])
+}
+
+model Cities {
+  code   String  @id
+  name   String
+  ufCode String?
+  cat    Cat[]
+  uf     Uf?     @relation(fields: [ufCode], references: [code], onDelete: Restrict)
+
+  @@index([name])
+}
+
+model Company {
+  id                              String                           @id @default(uuid())
+  cnpj                            String?
+  name                            String
+  fantasy                         String?
+  description                     String?
+  size                            String?
+  phone                           String?
+  legal_nature                    String?
+  cadastral_situation             String?
+  activity_start_date             String?
+  cadastral_situation_date        String?
+  legal_nature_code               String?
+  cadastral_situation_description String?
+  isConsulting                    Boolean                          @default(false)
+  licenseId                       Int?
+  created_at                      DateTime                         @default(now())
+  updated_at                      DateTime                         @updatedAt
+  status                          StatusEnum                       @default(ACTIVE)
+  type                            CompanyTypesEnum                 @default(MATRIZ)
+  deleted_at                      DateTime?
+  email                           String?
+  logoUrl                         String?
+  mission                         String?
+  values                          String?
+  vision                          String?
+  operationTime                   String?
+  shortName                       String?
+  responsibleName                 String?
+  groupId                         Int?
+  blockResignationExam            Boolean                          @default(true)
+  esocialStart                    DateTime?
+  numAsos                         Int?
+  doctorResponsibleId             Int?
+  initials                        String?
+  responsibleCpf                  String?
+  responsibleNit                  String?
+  stateRegistration               String?
+  tecResponsibleId                Int?
+  unit                            String?
+  activityStartDate               DateTime?
+  obs                             String?
+  isClinic                        Boolean                          @default(false)
+  paymentDay                      Int?
+  paymentType                     CompanyPaymentTypeEnum?
+  isTaxNote                       Boolean                          @default(false)
+  observationBank                 String?
+  isGroup                         Boolean                          @default(false)
+  companyGroupId                  Int?                             @unique
+  esocialLastTransmission         DateTime?
+  esocialSend                     Boolean?
+  accessGroups                    AccessGroups[]
+  address                         AddressCompany?
+  checklist                       Checklist[]
+  companyGroup                    CompanyGroup?                    @relation("company_group", fields: [companyGroupId], references: [id], onDelete: Restrict)
+  doctorResponsible               ProfessionalCouncil?             @relation("doctors_council_company_responsibles", fields: [doctorResponsibleId], references: [id], onDelete: Restrict)
+  group                           CompanyGroup?                    @relation("group", fields: [groupId], references: [id], onDelete: Restrict)
+  license                         License?                         @relation("license", fields: [licenseId], references: [id], onDelete: Restrict)
+  tecResponsible                  ProfessionalCouncil?             @relation("tec_council_company_responsibles", fields: [tecResponsibleId], references: [id], onDelete: Restrict)
+  cert                            CompanyCert?
+  characterization                CompanyCharacterization[]
+  companiesToClinicAvailable      CompanyClinics[]                 @relation("clinics_available")
+  clinicsAvailable                CompanyClinics[]                 @relation("companies_available")
+  environments                    CompanyEnvironment[]
+  companyGroups                   CompanyGroup[]                   @relation("company")
+  os                              CompanyOS?
+  report                          CompanyReport?
+  shifts                          CompanyShift[]
+  contacts                        Contact[]
+  applyingServiceContracts        Contract[]                       @relation("contracts")
+  receivingServiceContracts       Contract[]
+  databaseTable                   DatabaseTable[]
+  documents                       Document[]
+  covers                          DocumentCover[]
+  documentPCMSO                   DocumentPCMSO?
+  employees                       Employee[]
+  esocialTransmissions            EmployeeESocialBatch[]
+  esocialEvents                   EmployeeESocialEvent[]
+  examClinicHistory               EmployeeExamsHistory[]
+  exams                           Exam[]
+  clinicExams                     ExamToClinic[]
+  examsToRisk                     ExamToRisk[]
+  generateSource                  GenerateSource[]
+  hierarchy                       Hierarchy[]
+  homogeneousGroup                HomogeneousGroup[]
+  invites                         InviteUsers[]
+  notifications                   Notification[]                   @relation("owner_notification_company")
+  professionals                   Professional[]
+  professionalsResponsibles       ProfessionalCouncilResponsible[]
+  protocol                        Protocol[]
+  protocolToRisk                  ProtocolToRisk[]
+  recMed                          RecMed[]
+  riskFactorData                  RiskFactorData[]
+  riskFactorDataRec               RiskFactorDataRec[]
+  riskFactorDocument              RiskFactorDocument[]
+  riskFactorGroupData             RiskFactorGroupData[]
+  riskFactors                     RiskFactors[]
+  riskDocInfo                     RiskFactorsDocInfo[]
+  users                           UserCompany[]
+  workspace                       Workspace[]
+  notification                    Notification[]                   @relation("CompanyToNotification")
+  primary_activity                Activity[]                       @relation("primary_activity")
+  secondary_activity              Activity[]                       @relation("secondary_activity")
+
+  @@index([name])
+  @@index([isClinic])
+  @@index([isConsulting])
+  @@index([initials])
+  @@index([fantasy])
+  @@index([cnpj])
+}
+
+model CompanyCert {
+  id          String   @id @default(uuid())
+  key         String
+  certificate String
+  notAfter    DateTime
+  notBefore   DateTime
+  companyId   String   @unique
+  company     Company  @relation(fields: [companyId], references: [id])
+}
+
+model CompanyClinics {
+  companyId  String
+  clinicId   String
+  created_at DateTime @default(now())
+  clinic     Company  @relation("clinics_available", fields: [clinicId], references: [id])
+  company    Company  @relation("companies_available", fields: [companyId], references: [id])
+
+  @@id([companyId, clinicId])
+}
+
+model CompanyGroup {
+  id                   Int                  @id @default(autoincrement())
+  name                 String
+  description          String?
+  created_at           DateTime             @default(now())
+  updated_at           DateTime             @updatedAt
+  companyId            String
+  blockResignationExam Boolean              @default(true)
+  esocialStart         DateTime?
+  numAsos              Int?
+  doctorResponsibleId  Int?
+  tecResponsibleId     Int?
+  esocialSend          Boolean?
+  companyGroup         Company?             @relation("company_group")
+  companies            Company[]            @relation("group")
+  company              Company              @relation("company", fields: [companyId], references: [id])
+  doctorResponsible    ProfessionalCouncil? @relation("doctors_council_group_responsibles", fields: [doctorResponsibleId], references: [id], onDelete: Restrict)
+  tecResponsible       ProfessionalCouncil? @relation("tec_council_group_responsibles", fields: [tecResponsibleId], references: [id], onDelete: Restrict)
+
+  @@unique([id, companyId])
+}
+
+model CompanyCharacterization {
+  id                 String                         @id @default(uuid())
+  name               String
+  description        String?
+  created_at         DateTime                       @default(now())
+  deleted_at         DateTime?
+  updated_at         DateTime                       @updatedAt
+  type               CharacterizationTypeEnum
+  workspaceId        String
+  companyId          String
+  considerations     String[]
+  order              Int?
+  activities         String[]
+  luminosity         String?
+  moisturePercentage String?
+  noiseValue         String?
+  temperature        String?
+  profileName        String?
+  profileParentId    String?
+  paragraphs         String[]
+  status             StatusEnum                     @default(ACTIVE)
+  company            Company                        @relation(fields: [companyId], references: [id])
+  homogeneousGroup   HomogeneousGroup               @relation(fields: [id], references: [id], onDelete: Cascade)
+  profileParent      CompanyCharacterization?       @relation("profiles", fields: [profileParentId], references: [id], onDelete: Cascade)
+  profiles           CompanyCharacterization[]      @relation("profiles")
+  workspace          Workspace                      @relation(fields: [workspaceId], references: [id])
+  photos             CompanyCharacterizationPhoto[]
+
+  @@unique([workspaceId, companyId, id])
+}
+
+model CompanyCharacterizationPhoto {
+  id                        String                  @id @default(uuid())
+  name                      String
+  isVertical                Boolean                 @default(false)
+  photoUrl                  String
+  created_at                DateTime                @default(now())
+  deleted_at                DateTime?
+  updated_at                DateTime                @updatedAt
+  companyCharacterizationId String
+  order                     Int?
+  companyEnvironment        CompanyCharacterization @relation(fields: [companyCharacterizationId], references: [id])
+}
+
+model CompanyReport {
+  id              Int       @id @default(autoincrement())
+  lastDailyReport DateTime?
+  dailyReport     Json?
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+  companyId       String    @unique
+  esocialDone     Int       @default(0)
+  esocialPendent  Int       @default(0)
+  esocialReject   Int       @default(0)
+  esocialProgress Int       @default(0)
+  company         Company   @relation(fields: [companyId], references: [id])
+
+  @@index([companyId])
+}
+
+model CompanyEnvironment {
+  id                  String                      @id @default(uuid())
+  name                String
+  description         String?
+  created_at          DateTime                    @default(now())
+  deleted_at          DateTime?
+  updated_at          DateTime                    @updatedAt
+  workspaceId         String
+  parentEnvironmentId String?
+  type                CompanyEnvironmentTypesEnum
+  companyId           String
+  moisturePercentage  String?
+  noiseValue          String?
+  temperature         String?
+  luminosity          String?
+  considerations      String[]
+  order               Int?
+  activities          String[]
+  paragraphs          String[]
+  company             Company                     @relation(fields: [companyId], references: [id])
+  homogeneousGroup    HomogeneousGroup            @relation(fields: [id], references: [id], onDelete: Cascade)
+  parentEnvironment   CompanyEnvironment?         @relation("parent_enviroment", fields: [parentEnvironmentId], references: [id], onDelete: Restrict)
+  childEnvironments   CompanyEnvironment[]        @relation("parent_enviroment")
+  workspace           Workspace                   @relation(fields: [workspaceId], references: [id])
+  photos              CompanyEnvironmentPhoto[]
+
+  @@unique([workspaceId, companyId, id])
+}
+
+model CompanyEnvironmentPhoto {
+  id                   String             @id @default(uuid())
+  name                 String
+  photoUrl             String
+  created_at           DateTime           @default(now())
+  deleted_at           DateTime?
+  updated_at           DateTime           @updatedAt
+  companyEnvironmentId String
+  isVertical           Boolean            @default(false)
+  order                Int?
+  companyEnvironment   CompanyEnvironment @relation(fields: [companyEnvironmentId], references: [id])
+}
+
+model CompanyShift {
+  id          Int        @id @default(autoincrement())
+  name        String
+  description String?
+  companyId   String
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+  company     Company    @relation(fields: [companyId], references: [id])
+  employees   Employee[]
+
+  @@unique([id, companyId])
+}
+
+model Contact {
+  id          Int        @id @default(autoincrement())
+  name        String?
+  phone       String?
+  phone_1     String?
+  email       String?
+  obs         String?
+  companyId   String
+  updated_at  DateTime   @updatedAt
+  status      StatusEnum @default(ACTIVE)
+  created_at  DateTime   @default(now())
+  isPrincipal Boolean    @default(false)
+  company     Company    @relation(fields: [companyId], references: [id])
+
+  @@unique([id, companyId])
+}
+
+model Contract {
+  applyingServiceCompanyId  String
+  receivingServiceCompanyId String
+  status                    StatusEnum @default(ACTIVE)
+  created_at                DateTime   @default(now())
+  applyingServiceCompany    Company    @relation("contracts", fields: [applyingServiceCompanyId], references: [id])
+  receivingServiceCompany   Company    @relation(fields: [receivingServiceCompanyId], references: [id])
+
+  @@id([applyingServiceCompanyId, receivingServiceCompanyId])
+}
+
+model DatabaseTable {
+  id         Int        @default(autoincrement())
+  name       String
+  version    Int        @default(1)
+  companyId  String
+  system     Boolean
+  status     StatusEnum @default(ACTIVE)
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
+  company    Company    @relation(fields: [companyId], references: [id])
+
+  @@id([id, companyId])
+}
+
+model Document {
+  id               Int              @id @default(autoincrement())
+  fileUrl          String?
+  name             String?
+  description      String?
+  startDate        DateTime         @default(now())
+  endDate          DateTime?
+  type             DocumentTypeEnum @default(OTHER)
+  status           StatusEnum       @default(ACTIVE)
+  created_at       DateTime         @default(now())
+  updated_at       DateTime         @updatedAt
+  parentDocumentId Int?
+  companyId        String
+  workspaceId      String?
+  company          Company          @relation(fields: [companyId], references: [id])
+  parentDocument   Document?        @relation("document_parent", fields: [parentDocumentId], references: [id], onDelete: Restrict)
+  oldDocuments     Document[]       @relation("document_parent")
+  workspace        Workspace?       @relation(fields: [workspaceId, companyId], references: [id, companyId], onDelete: Cascade)
+
+  @@unique([id, companyId])
+  @@index([type])
+  @@index([companyId])
+  @@index([parentDocumentId])
+}
+
+model DocumentCover {
+  id         Int             @id @default(autoincrement())
+  companyId  String
+  acceptType CoverTypeEnum[]
+  json       Json
+  name       String?
+  company    Company         @relation(fields: [companyId], references: [id])
+
+  @@unique([id, companyId])
+}
+
+model DocumentPCMSO {
+  id                      String                        @id @default(uuid())
+  name                    String?
+  created_at              DateTime                      @default(now())
+  companyId               String                        @unique
+  elaboratedBy            String?
+  coordinatorBy           String?
+  revisionBy              String?
+  approvedBy              String?
+  validityStart           DateTime?
+  validityEnd             DateTime?
+  status                  StatusEnum                    @default(PROGRESS)
+  company                 Company                       @relation(fields: [companyId], references: [id])
+  docs                    RiskFactorDocument[]
+  professionalsSignatures DocumentPCMSOToProfessional[]
+
+  @@unique([id, companyId])
+}
+
+model CompanyOS {
+  id           Int        @id @default(autoincrement())
+  created_at   DateTime   @default(now())
+  updated_at   DateTime   @updatedAt
+  status       StatusEnum @default(ACTIVE)
+  med          Json?
+  rec          Json?
+  obligations  Json?
+  prohibitions Json?
+  procedures   Json?
+  cipa         Json?
+  declaration  Json?
+  companyId    String     @unique
+  company      Company    @relation(fields: [companyId], references: [id])
+
+  @@unique([id, companyId])
+}
+
+model Employee {
+  id               Int                        @id @default(autoincrement())
+  created_at       DateTime                   @default(now())
+  updated_at       DateTime                   @updatedAt
+  status           StatusEnum                 @default(PENDING)
+  name             String
+  cpf              String
+  companyId        String
+  hierarchyId      String?
+  admissionDate    DateTime?
+  birthday         DateTime?
+  cidId            String?
+  email            String?
+  esocialCode      String?
+  isComorbidity    Boolean?                   @default(false)
+  nickname         String?
+  phone            String?
+  sex              SexTypeEnum?
+  shiftId          Int?
+  socialName       String?
+  lastExam         DateTime?
+  expiredDateExam  DateTime?
+  newExamAdded     DateTime?
+  cbo              String?
+  absenteeisms     Absenteeism[]
+  cat              Cat[]
+  cid              Cid?                       @relation(fields: [cidId], references: [cid], onDelete: Restrict)
+  company          Company                    @relation(fields: [companyId], references: [id])
+  hierarchy        Hierarchy?                 @relation(fields: [hierarchyId], references: [id], onDelete: Restrict)
+  shift            CompanyShift?              @relation(fields: [shiftId], references: [id], onDelete: Restrict)
+  esocialEvents    EmployeeESocialEvent[]
+  examsHistory     EmployeeExamsHistory[]
+  hierarchyHistory EmployeeHierarchyHistory[]
+  pppHistory       EmployeePPPHistory[]
+  subOffices       Hierarchy[]                @relation("sub_offices")
+
+  @@unique([id, companyId])
+  @@unique([cpf, companyId])
+  @@index([cpf], type: Hash)
+  @@index([esocialCode])
+  @@index([name])
+  @@index([email])
+}
+
+model EmployeeHierarchyHistory {
+  id             Int                             @id @default(autoincrement())
+  created_at     DateTime                        @default(now())
+  updated_at     DateTime                        @updatedAt
+  motive         EmployeeHierarchyMotiveTypeEnum
+  startDate      DateTime?
+  hierarchyId    String
+  employeeId     Int
+  deletedAt      DateTime?
+  employee       Employee                        @relation(fields: [employeeId], references: [id])
+  hierarchy      Hierarchy                       @relation(fields: [hierarchyId], references: [id])
+  subHierarchies Hierarchy[]                     @relation("sub_offices_history")
+
+  @@index([deletedAt])
+}
+
+model EmployeeExamsHistory {
+  id                    Int                        @id @default(autoincrement())
+  created_at            DateTime                   @default(now())
+  updated_at            DateTime                   @updatedAt
+  doneDate              DateTime?
+  validityInMonths      Int?
+  time                  String?
+  examId                Int
+  employeeId            Int
+  clinicId              String?
+  conclusion            ExamHistoryConclusionEnum?
+  doctorId              Int?
+  evaluationType        ExamHistoryEvaluationEnum?
+  examType              ExamHistoryTypeEnum?
+  obs                   String?
+  status                StatusEnum                 @default(DONE)
+  userDoneId            Int?
+  userScheduleId        Int?
+  expiredDate           DateTime?
+  changeHierarchyAnyway Boolean                    @default(false)
+  changeHierarchyDate   DateTime?
+  clinicObs             String?
+  hierarchyId           String?
+  scheduleType          ClinicScheduleTypeEnum?
+  fileUrl               String?
+  subOfficeId           String?
+  deletedAt             DateTime?
+  sendEvent             Boolean                    @default(true)
+  asoExamId             Int?
+  isSequential          Boolean?
+  events                EmployeeESocialEvent[]
+  asoExam               EmployeeExamsHistory?      @relation("aso_exam_relation", fields: [asoExamId], references: [id], onDelete: Restrict)
+  complementaryExams    EmployeeExamsHistory[]     @relation("aso_exam_relation")
+  clinic                Company?                   @relation(fields: [clinicId], references: [id], onDelete: Restrict)
+  doctor                ProfessionalCouncil?       @relation(fields: [doctorId], references: [id], onDelete: Restrict)
+  employee              Employee                   @relation(fields: [employeeId], references: [id])
+  exam                  Exam                       @relation(fields: [examId], references: [id])
+  hierarchy             Hierarchy?                 @relation(fields: [hierarchyId], references: [id], onDelete: Restrict)
+  subOffice             Hierarchy?                 @relation("subOffice_employee_exam", fields: [subOfficeId], references: [id], onDelete: Restrict)
+  userDone              User?                      @relation("user_done", fields: [userDoneId], references: [id], onDelete: Restrict)
+  userSchedule          User?                      @relation("user_schedule", fields: [userScheduleId], references: [id], onDelete: Restrict)
+
+  @@index([status])
+  @@index([deletedAt])
+  @@index([employeeId])
+  @@index([fileUrl])
+  @@index([clinicId])
+}
+
+model EmployeeESocialBatch {
+  id                 Int                          @id @default(autoincrement())
+  created_at         DateTime                     @default(now())
+  updated_at         DateTime                     @updatedAt
+  status             StatusEnum                   @default(PENDING)
+  userTransmissionId Int?
+  companyId          String
+  environment        Int?
+  type               EmployeeESocialEventTypeEnum
+  protocolId         String?
+  response           Json?
+  company            Company                      @relation(fields: [companyId], references: [id])
+  userTransmission   User?                        @relation(fields: [userTransmissionId], references: [id], onDelete: Restrict)
+  events             EmployeeESocialEvent[]
+
+  @@index([status])
+}
+
+model EmployeeESocialEvent {
+  id            Int                             @id @default(autoincrement())
+  created_at    DateTime                        @default(now())
+  updated_at    DateTime                        @updatedAt
+  batchId       Int?
+  eventsDate    DateTime?
+  status        StatusEnum                      @default(PENDING)
+  eventXml      String
+  employeeId    Int
+  companyId     String
+  examHistoryId Int?
+  type          EmployeeESocialEventTypeEnum
+  eventId       String?
+  receipt       String?
+  response      Json?
+  action        EmployeeESocialEventActionEnum?
+  pppId         Int?
+  catId         Int?
+  batch         EmployeeESocialBatch?           @relation(fields: [batchId], references: [id], onDelete: Restrict)
+  cat           Cat?                            @relation(fields: [catId], references: [id], onDelete: Cascade)
+  company       Company                         @relation(fields: [companyId], references: [id])
+  employee      Employee                        @relation(fields: [employeeId], references: [id])
+  exam          EmployeeExamsHistory?           @relation(fields: [examHistoryId], references: [id], onDelete: Restrict)
+  ppp           EmployeePPPHistory?             @relation(fields: [pppId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+  @@index([status])
+  @@index([eventsDate])
+}
+
+model EmployeePPPHistory {
+  id         Int                    @id @default(autoincrement())
+  created_at DateTime               @default(now())
+  updated_at DateTime               @updatedAt
+  doneDate   DateTime?
+  status     StatusEnum             @default(DONE)
+  sendEvent  Boolean                @default(true)
+  employeeId Int
+  json       Json?
+  events     EmployeeESocialEvent[]
+  employee   Employee               @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@unique([employeeId, doneDate])
+  @@index([status])
+  @@index([employeeId])
+}
+
+model EngsToRiskFactorData {
+  recMedId         String         @map("A")
+  riskFactorDataId String         @map("B")
+  efficientlyCheck Boolean        @default(false)
+  endDate          DateTime?
+  startDate        DateTime?
+  recMed           RecMed         @relation(fields: [recMedId], references: [id], onDelete: Cascade)
+  riskFactorData   RiskFactorData @relation(fields: [riskFactorDataId], references: [id], onDelete: Cascade)
+
+  @@id([riskFactorDataId, recMedId])
+  @@map("_engs")
+}
+
+model Epi {
+  id                  Int                   @id @default(autoincrement())
+  ca                  String
+  isValid             Boolean?
+  national            Boolean               @default(true)
+  expiredDate         DateTime?
+  description         String                @default("")
+  report              String                @default("")
+  restriction         String                @default("")
+  observation         String                @default("")
+  equipment           String                @default("")
+  status              StatusEnum            @default(ACTIVE)
+  created_at          DateTime              @default(now())
+  deleted_at          DateTime?
+  epiToRiskFactorData EpiToRiskFactorData[]
+
+  @@unique([ca, status])
+  @@index([ca])
+}
+
+model EpiToRiskFactorData {
+  epiId            Int            @map("A")
+  riskFactorDataId String         @map("B")
+  efficientlyCheck Boolean        @default(false)
+  epcCheck         Boolean        @default(false)
+  lifeTimeInDays   Int?
+  longPeriodsCheck Boolean        @default(false)
+  maintenanceCheck Boolean        @default(false)
+  sanitationCheck  Boolean        @default(false)
+  tradeSignCheck   Boolean        @default(false)
+  trainingCheck    Boolean        @default(false)
+  unstoppedCheck   Boolean        @default(false)
+  validationCheck  Boolean        @default(false)
+  endDate          DateTime?
+  startDate        DateTime?
+  epi              Epi            @relation(fields: [epiId], references: [id], onDelete: Cascade)
+  riskFactorData   RiskFactorData @relation(fields: [riskFactorDataId], references: [id], onDelete: Cascade)
+
+  @@id([riskFactorDataId, epiId])
+  @@map("_EpiToRiskFactorData")
+}
+
+model EsocialTable18Mot {
+  id           Int           @id @default(autoincrement())
+  code         String        @unique
+  description  String
+  absenteeisms Absenteeism[]
+}
+
+model EsocialTable6Country {
+  code String @id
+  name String
+  cat  Cat[]
+}
+
+model EsocialTable13BodyPart {
+  code String @id
+  desc String
+  cat  Cat[]
+}
+
+model EsocialTable14And15Acid {
+  code             String  @id
+  desc             String
+  case             String?
+  table            Int
+  cat_ag_causador  Cat[]   @relation("cat_ag_causador")
+  cat_sit_geradora Cat[]   @relation("cat_sit_geradora")
+}
+
+model EsocialTable17Injury {
+  code String @id
+  desc String
+  cat  Cat[]
+}
+
+model EsocialTable20Lograd {
+  code String @id
+  desc String
+  cat  Cat[]
+}
+
+model EsocialTable24 {
+  id         String          @id
+  name       String
+  group      String
+  type       RiskFactorsEnum
+  isQuantity Boolean         @default(false)
+  risks      RiskFactors[]
+}
+
+model Exam {
+  id               Int                    @id @default(autoincrement())
+  name             String
+  instruction      String?
+  material         String?
+  companyId        String
+  status           StatusEnum             @default(ACTIVE)
+  type             ExamTypeEnum?
+  updated_at       DateTime               @updatedAt
+  created_at       DateTime               @default(now())
+  system           Boolean                @default(false)
+  analyses         String?
+  deleted_at       DateTime?
+  isAttendance     Boolean                @default(false)
+  esocial27Code    String?
+  obsProc          String?
+  employeesHistory EmployeeExamsHistory[]
+  company          Company                @relation(fields: [companyId], references: [id])
+  examToClinic     ExamToClinic[]
+  examToRisk       ExamToRisk[]
+  examToRiskData   ExamToRiskData[]
+
+  @@unique([id, companyId])
+  @@index([companyId])
+}
+
+model ExamToClinic {
+  id              Int                     @id @default(autoincrement())
+  examId          Int
+  companyId       String
+  dueInDays       Int?
+  isScheduled     Boolean                 @default(false)
+  observation     String?
+  scheduleRange   Json?
+  status          StatusEnum              @default(ACTIVE)
+  scheduleType    ClinicScheduleTypeEnum?
+  examMinDuration Int?
+  price           Int?
+  startDate       DateTime                @default(now())
+  endDate         DateTime?
+  groupId         String?                 @default(uuid())
+  isAdmission     Boolean                 @default(true)
+  isChange        Boolean                 @default(true)
+  isDismissal     Boolean                 @default(true)
+  isPeriodic      Boolean                 @default(true)
+  isReturn        Boolean                 @default(true)
+  company         Company                 @relation(fields: [companyId], references: [id])
+  exam            Exam                    @relation(fields: [examId], references: [id])
+
+  @@unique([examId, companyId, startDate, groupId])
+}
+
+model ExamToRisk {
+  id                    Int          @id @default(autoincrement())
+  examId                Int?
+  riskId                String?
+  companyId             String
+  endDate               DateTime?
+  fromAge               Int?
+  isAdmission           Boolean      @default(false)
+  isChange              Boolean      @default(false)
+  isDismissal           Boolean      @default(false)
+  isFemale              Boolean      @default(false)
+  isMale                Boolean      @default(false)
+  isPeriodic            Boolean      @default(false)
+  isReturn              Boolean      @default(false)
+  startDate             DateTime     @default(now())
+  toAge                 Int?
+  validityInMonths      Int?
+  lowValidityInMonths   Int?
+  minRiskDegree         Int?         @default(1)
+  minRiskDegreeQuantity Int?         @default(1)
+  considerBetweenDays   Int?
+  company               Company      @relation(fields: [companyId], references: [id])
+  exam                  Exam?        @relation(fields: [examId], references: [id])
+  risk                  RiskFactors? @relation(fields: [riskId], references: [id])
+
+  @@unique([id, companyId])
+}
+
+model ExamToRiskData {
+  examId              Int
+  fromAge             Int?
+  isAdmission         Boolean        @default(false)
+  isChange            Boolean        @default(false)
+  isDismissal         Boolean        @default(false)
+  isFemale            Boolean        @default(false)
+  isMale              Boolean        @default(false)
+  isPeriodic          Boolean        @default(false)
+  isReturn            Boolean        @default(false)
+  riskFactorDataId    String
+  toAge               Int?
+  validityInMonths    Int?
+  lowValidityInMonths Int?
+  considerBetweenDays Int?
+  exam                Exam           @relation(fields: [examId], references: [id])
+  risk                RiskFactorData @relation(fields: [riskFactorDataId], references: [id], onDelete: Cascade)
+
+  @@id([examId, riskFactorDataId])
+}
+
+model GenerateSource {
+  id             String           @id @default(uuid())
+  riskId         String
+  name           String
+  companyId      String
+  system         Boolean          @default(false)
+  created_at     DateTime         @default(now())
+  status         StatusEnum       @default(ACTIVE)
+  deleted_at     DateTime?
+  company        Company          @relation(fields: [companyId], references: [id])
+  risk           RiskFactors      @relation(fields: [riskId], references: [id], onDelete: Cascade)
+  recMeds        RecMed[]
+  riskFactorData RiskFactorData[] @relation("GenerateSourceToRiskFactorData")
+
+  @@unique([id, companyId])
+}
+
+model Hierarchy {
+  id                            String                     @id @default(uuid())
+  created_at                    DateTime                   @default(now())
+  status                        StatusEnum                 @default(ACTIVE)
+  type                          HierarchyEnum
+  description                   String                     @default("")
+  realDescription               String                     @default("")
+  name                          String
+  companyId                     String
+  parentId                      String?
+  refName                       String?
+  deletedAt                     DateTime?
+  employees                     Employee[]
+  employeeExamsHistory          EmployeeExamsHistory[]
+  employeeExamsHistorySubOffice EmployeeExamsHistory[]     @relation("subOffice_employee_exam")
+  hierarchyHistory              EmployeeHierarchyHistory[]
+  company                       Company                    @relation(fields: [companyId], references: [id])
+  parent                        Hierarchy?                 @relation("children_parent", fields: [parentId], references: [id], onDelete: Cascade)
+  children                      Hierarchy[]                @relation("children_parent")
+  hierarchyOnHomogeneous        HierarchyOnHomogeneous[]
+  riskFactorDatas               RiskFactorData[]
+  riskDocInfo                   RiskFactorsDocInfo[]
+  workspaces                    Workspace[]                @relation("HierarchyToWorkspace")
+  subOfficeEmployees            Employee[]                 @relation("sub_offices")
+  subHierarchyHistory           EmployeeHierarchyHistory[] @relation("sub_offices_history")
+
+  @@unique([id, companyId])
+  @@unique([parentId, name])
+  @@index([deletedAt])
+  @@index([companyId])
+}
+
+model HierarchyOnHomogeneous {
+  hierarchyId        String
+  homogeneousGroupId String
+  workspaceId        String
+  deletedAt          DateTime?
+  endDate            DateTime?
+  id                 Int              @id @default(autoincrement())
+  startDate          DateTime?
+  created_at         DateTime         @default(now())
+  hierarchy          Hierarchy        @relation(fields: [hierarchyId], references: [id], onDelete: Cascade)
+  homogeneousGroup   HomogeneousGroup @relation(fields: [homogeneousGroupId], references: [id], onDelete: Cascade)
+  workspace          Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([hierarchyId, homogeneousGroupId, workspaceId, endDate, startDate])
+  @@index([deletedAt])
+  @@index([endDate])
+}
+
+model HomogeneousGroup {
+  id                     String                   @id @default(uuid())
+  name                   String
+  description            String
+  companyId              String
+  status                 StatusEnum               @default(ACTIVE)
+  created_at             DateTime                 @default(now())
+  type                   HomoTypeEnum?
+  deletedAt              DateTime?
+  characterization       CompanyCharacterization?
+  environment            CompanyEnvironment?
+  hierarchyOnHomogeneous HierarchyOnHomogeneous[]
+  company                Company                  @relation(fields: [companyId], references: [id])
+  riskFactorData         RiskFactorData[]
+
+  @@unique([name, companyId])
+  @@index([name])
+  @@index([deletedAt])
+  @@index([companyId])
+}
+
+model InviteUsers {
+  id           String        @id @default(uuid())
+  expires_date DateTime
+  companyId    String
+  email        String?
+  roles        String[]
+  permissions  String[]
+  groupId      Int?
+  companiesIds String[]
+  company      Company       @relation(fields: [companyId], references: [id])
+  group        AccessGroups? @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  professional Professional?
+}
+
+model License {
+  id         Int        @id @default(autoincrement())
+  companyId  String     @unique
+  status     StatusEnum @default(ACTIVE)
+  created_at DateTime   @default(now())
+  companies  Company[]  @relation("license")
+
+  @@index([companyId])
+}
+
+model Notification {
+  id            Int       @id @default(autoincrement())
+  created_at    DateTime  @default(now())
+  json          Json
+  repeatId      String?
+  isClinic      Boolean?
+  isConsulting  Boolean?
+  isCompany     Boolean?
+  system        Boolean?
+  companyId     String
+  company       Company   @relation("owner_notification_company", fields: [companyId], references: [id], onDelete: Cascade)
+  companies     Company[] @relation("CompanyToNotification")
+  users         User[]    @relation("NotificationToUser")
+  confirmations User[]    @relation("user_notification_confirm")
+
+  @@index([system])
+  @@index([isCompany])
+  @@index([isConsulting])
+  @@index([companyId])
+}
+
+model Professional {
+  name           String
+  formation      String[]
+  certifications String[]
+  created_at     DateTime              @default(now())
+  deleted_at     DateTime?
+  updated_at     DateTime              @updatedAt
+  companyId      String?
+  cpf            String?
+  email          String?
+  phone          String?
+  status         StatusEnum            @default(ACTIVE)
+  type           ProfessionalTypeEnum? @default(USER)
+  id             Int                   @id @default(autoincrement())
+  userId         Int?                  @unique
+  inviteId       String?               @unique
+  company        Company?              @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  invite         InviteUsers?          @relation(fields: [inviteId], references: [id], onDelete: Cascade)
+  user           User?                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  councils       ProfessionalCouncil[]
+
+  @@unique([id, companyId])
+}
+
+model ProfessionalCouncil {
+  id                         Int                                 @id @default(autoincrement())
+  councilType                String
+  councilUF                  String
+  councilId                  String
+  created_at                 DateTime                            @default(now())
+  updated_at                 DateTime                            @updatedAt
+  professionalId             Int
+  absenteeisms               Absenteeism[]
+  cats                       Cat[]
+  doctorCompanyResponsible   Company[]                           @relation("doctors_council_company_responsibles")
+  tecCompanyResponsible      Company[]                           @relation("tec_council_company_responsibles")
+  doctorGroupResponsible     CompanyGroup[]                      @relation("doctors_council_group_responsibles")
+  tecGroupResponsible        CompanyGroup[]                      @relation("tec_council_group_responsibles")
+  examDoctorHistory          EmployeeExamsHistory[]
+  professional               Professional                        @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+  professionalsResponsibles  ProfessionalCouncilResponsible[]
+  professionalPcmsoSignature DocumentPCMSOToProfessional[]
+  professionalPgrSignature   RiskFactorGroupDataToProfessional[]
+
+  @@unique([councilType, councilUF, councilId, professionalId])
+}
+
+model ProfessionalCouncilResponsible {
+  id                    Int                      @id @default(autoincrement())
+  created_at            DateTime                 @default(now())
+  updated_at            DateTime                 @updatedAt
+  startDate             DateTime
+  professionalCouncilId Int
+  companyId             String
+  type                  ProfessionalRespTypeEnum @default(AMB)
+  company               Company                  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  professional          ProfessionalCouncil      @relation(fields: [professionalCouncilId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, professionalCouncilId, startDate])
+}
+
+model Protocol {
+  id             Int              @id @default(autoincrement())
+  name           String
+  created_at     DateTime         @default(now())
+  deleted_at     DateTime?
+  updated_at     DateTime         @updatedAt
+  companyId      String?
+  status         StatusEnum       @default(ACTIVE)
+  system         Boolean?
+  company        Company?         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  protocolToRisk ProtocolToRisk[]
+
+  @@unique([id, companyId])
+}
+
+model ProtocolToRisk {
+  id                    Int          @id @default(autoincrement())
+  protocolId            Int?
+  riskId                String?
+  companyId             String
+  minRiskDegree         Int?         @default(1)
+  minRiskDegreeQuantity Int?         @default(1)
+  company               Company      @relation(fields: [companyId], references: [id])
+  protocol              Protocol?    @relation(fields: [protocolId], references: [id])
+  risk                  RiskFactors? @relation(fields: [riskId], references: [id])
+
+  @@unique([id, companyId])
+  @@unique([riskId, protocolId])
+}
+
+model RecMed {
+  id                   String                 @id @default(uuid())
+  riskId               String
+  recName              String?
+  medName              String?
+  companyId            String
+  generateSourceId     String?
+  system               Boolean
+  medType              MeasuresTypeEnum?
+  status               StatusEnum             @default(ACTIVE)
+  created_at           DateTime               @default(now())
+  deleted_at           DateTime?
+  recType              RecTypeEnum?
+  company              Company                @relation(fields: [companyId], references: [id])
+  generateSource       GenerateSource?        @relation(fields: [generateSourceId], references: [id], onDelete: Cascade)
+  risk                 RiskFactors            @relation(fields: [riskId], references: [id], onDelete: Cascade)
+  dataRecs             RiskFactorDataRec[]
+  engsToRiskFactorData EngsToRiskFactorData[]
+  adms                 RiskFactorData[]       @relation("adms")
+  recs                 RiskFactorData[]       @relation("recs")
+
+  @@unique([id, companyId])
+}
+
+model RefreshToken {
+  id            String   @id @default(uuid())
+  refresh_token String
+  expires_date  DateTime
+  created_at    DateTime @default(now())
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model RiskFactors {
+  id                    String                  @id @default(uuid())
+  name                  String
+  companyId             String
+  severity              Int                     @default(0)
+  system                Boolean                 @default(false)
+  appendix              String?
+  risk                  String?
+  propagation           String[]
+  exame                 String?
+  symptoms              String?
+  method                String?
+  unit                  String?
+  cas                   String?
+  breather              String?
+  nr15lt                String?
+  twa                   String?
+  stel                  String?
+  ipvs                  String?
+  pv                    String?
+  pe                    String?
+  carnogenicityACGIH    String?
+  carnogenicityLinach   String?
+  status                StatusEnum              @default(ACTIVE)
+  type                  RiskFactorsEnum
+  created_at            DateTime                @default(now())
+  representAll          Boolean                 @default(false)
+  deleted_at            DateTime?
+  isEmergency           Boolean                 @default(false)
+  json                  Json?
+  fraction              String?
+  tlv                   String?
+  isAso                 Boolean                 @default(true)
+  isPCMSO               Boolean                 @default(true)
+  isPGR                 Boolean                 @default(true)
+  isPPP                 Boolean                 @default(true)
+  esocialCode           String?
+  coments               String?
+  examToRisk            ExamToRisk[]
+  generateSource        GenerateSource[]
+  protocolToRisk        ProtocolToRisk[]
+  recMed                RecMed[]
+  riskFactorData        RiskFactorData[]
+  riskFactorProbability RiskFactorProbability[]
+  company               Company                 @relation(fields: [companyId], references: [id])
+  esocial               EsocialTable24?         @relation(fields: [esocialCode], references: [id], onDelete: Restrict)
+  docInfo               RiskFactorsDocInfo[]
+
+  @@unique([id, companyId])
+  @@index([esocialCode])
+}
+
+model RiskFactorsDocInfo {
+  id          Int         @id @default(autoincrement())
+  riskId      String
+  companyId   String
+  hierarchyId String?
+  isAso       Boolean     @default(true)
+  isPGR       Boolean     @default(true)
+  isPCMSO     Boolean     @default(true)
+  isPPP       Boolean     @default(true)
+  created_at  DateTime    @default(now())
+  company     Company     @relation(fields: [companyId], references: [id])
+  hierarchy   Hierarchy?  @relation(fields: [hierarchyId], references: [id], onDelete: Restrict)
+  risk        RiskFactors @relation(fields: [riskId], references: [id])
+
+  @@unique([companyId, riskId, hierarchyId])
+  @@index([companyId])
+}
+
+model RiskFactorDocument {
+  id            String               @id @default(uuid())
+  fileUrl       String?
+  name          String
+  description   String               @default("")
+  version       String               @default("1.0.0")
+  companyId     String
+  riskGroupId   String?
+  workspaceName String
+  workspaceId   String
+  status        StatusEnum           @default(ACTIVE)
+  created_at    DateTime             @default(now())
+  updated_at    DateTime             @updatedAt
+  approvedBy    String?
+  elaboratedBy  String?
+  revisionBy    String?
+  validity      String?
+  pcmsoId       String?
+  attachments   Attachments[]
+  company       Company              @relation(fields: [companyId], references: [id])
+  pcmso         DocumentPCMSO?       @relation(fields: [pcmsoId, companyId], references: [id, companyId])
+  riskGroup     RiskFactorGroupData? @relation(fields: [riskGroupId, companyId], references: [id, companyId])
+  workspace     Workspace            @relation(fields: [workspaceId, companyId], references: [id, companyId], onDelete: Cascade)
+
+  @@unique([id, companyId])
+}
+
+model RiskFactorGroupData {
+  id                      String                              @id @default(uuid())
+  name                    String?
+  created_at              DateTime                            @default(now())
+  companyId               String
+  source                  String?
+  elaboratedBy            String?
+  revisionBy              String?
+  approvedBy              String?
+  visitDate               DateTime?
+  status                  StatusEnum                          @default(PROGRESS)
+  validity                String?
+  complementaryDocs       String[]
+  complementarySystems    String[]
+  coordinatorBy           String?
+  validityEnd             DateTime?
+  validityStart           DateTime?
+  isQ5                    Boolean                             @default(false)
+  months_period_level_2   Int                                 @default(24)
+  months_period_level_3   Int                                 @default(12)
+  months_period_level_4   Int                                 @default(6)
+  months_period_level_5   Int                                 @default(3)
+  hasEmergencyPlan        Boolean                             @default(false)
+  data                    RiskFactorData[]
+  docs                    RiskFactorDocument[]
+  company                 Company                             @relation(fields: [companyId], references: [id])
+  professionalsSignatures RiskFactorGroupDataToProfessional[]
+  usersSignatures         RiskFactorGroupDataToUser[]
+
+  @@unique([id, companyId])
+}
+
+model RiskFactorGroupDataToUser {
+  riskFactorGroupDataId String              @map("A")
+  userId                Int                 @map("B")
+  isSigner              Boolean             @default(false)
+  isElaborator          Boolean             @default(false)
+  riskFactorData        RiskFactorGroupData @relation(fields: [riskFactorGroupDataId], references: [id], onDelete: Cascade)
+  user                  User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, riskFactorGroupDataId])
+  @@map("_RiskFactorGroupDataToUser")
+}
+
+model RiskFactorGroupDataToProfessional {
+  riskFactorGroupDataId String              @map("B")
+  professionalId        Int                 @map("A")
+  isSigner              Boolean             @default(false)
+  isElaborator          Boolean             @default(false)
+  professional          ProfessionalCouncil @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+  riskFactorData        RiskFactorGroupData @relation(fields: [riskFactorGroupDataId], references: [id], onDelete: Cascade)
+
+  @@id([riskFactorGroupDataId, professionalId])
+  @@map("_ProfessionalToRiskFactorGroupData")
+}
+
+model DocumentPCMSOToProfessional {
+  documentPCMSOId String              @map("B")
+  professionalId  Int                 @map("A")
+  isSigner        Boolean             @default(false)
+  isElaborator    Boolean             @default(false)
+  professional    ProfessionalCouncil @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+  documentPCMSO   DocumentPCMSO       @relation(fields: [documentPCMSOId], references: [id], onDelete: Cascade)
+
+  @@id([documentPCMSOId, professionalId])
+  @@map("_DocumentPCMSOToProfessional")
+}
+
+model RiskFactorData {
+  id                    String                 @id @default(uuid())
+  probability           Int?
+  probabilityAfter      Int?
+  companyId             String
+  riskId                String
+  homogeneousGroupId    String?
+  hierarchyId           String?
+  riskFactorGroupDataId String
+  json                  Json?
+  level                 Int?
+  standardExams         Boolean                @default(true)
+  deletedAt             DateTime?
+  endDate               DateTime?
+  startDate             DateTime?
+  examsToRiskFactorData ExamToRiskData[]
+  company               Company                @relation(fields: [companyId], references: [id])
+  hierarchy             Hierarchy?             @relation(fields: [hierarchyId], references: [id], onDelete: Cascade)
+  homogeneousGroup      HomogeneousGroup?      @relation(fields: [homogeneousGroupId], references: [id], onDelete: Cascade)
+  riskFactorGroupData   RiskFactorGroupData    @relation(fields: [riskFactorGroupDataId], references: [id])
+  riskFactor            RiskFactors            @relation(fields: [riskId], references: [id])
+  dataRecs              RiskFactorDataRec[]
+  probabilityAfterCalc  RiskFactorProbability? @relation("RiskFactorProbabilityAfter")
+  probabilityCalc       RiskFactorProbability? @relation("RiskFactorProbabilityBefore")
+  epiToRiskFactorData   EpiToRiskFactorData[]
+  engsToRiskFactorData  EngsToRiskFactorData[]
+  generateSources       GenerateSource[]       @relation("GenerateSourceToRiskFactorData")
+  adms                  RecMed[]               @relation("adms")
+  recs                  RecMed[]               @relation("recs")
+
+  @@unique([id, companyId])
+  @@unique([id, riskId, riskFactorGroupDataId])
+  @@index([riskId])
+  @@index([hierarchyId])
+  @@index([deletedAt])
+  @@index([companyId])
+}
+
+model RiskFactorProbability {
+  id                    String          @id @default(uuid())
+  intensity             Int?
+  intensityResult       Float?
+  intensityLt           Float?
+  minDurationJT         Int?
+  minDurationEO         Int?
+  chancesOfHappening    Int?
+  frequency             Int?
+  history               Int?
+  medsImplemented       Int?
+  riskFactorDataAfterId String?
+  riskFactorDataId      String?
+  riskId                String
+  riskFactorGroupDataId String?
+  riskFactorDataAfter   RiskFactorData? @relation("RiskFactorProbabilityAfter", fields: [riskFactorDataAfterId, riskId, riskFactorGroupDataId], references: [id, riskId, riskFactorGroupDataId])
+  riskFactorData        RiskFactorData? @relation("RiskFactorProbabilityBefore", fields: [riskFactorDataId, riskId, riskFactorGroupDataId], references: [id, riskId, riskFactorGroupDataId])
+  riskFactor            RiskFactors     @relation(fields: [riskId], references: [id])
+
+  @@unique([riskFactorDataId, riskId, riskFactorGroupDataId])
+  @@unique([riskFactorDataAfterId, riskId, riskFactorGroupDataId])
+}
+
+model RiskFactorDataRec {
+  id               String                      @id @default(uuid())
+  responsibleName  String?
+  endDate          DateTime?
+  status           StatusEnum                  @default(PENDING)
+  recMedId         String
+  riskFactorDataId String
+  companyId        String
+  created_at       DateTime                    @default(now())
+  updated_at       DateTime                    @updatedAt
+  company          Company                     @relation(fields: [companyId], references: [id])
+  recMed           RecMed                      @relation(fields: [recMedId], references: [id])
+  riskFactorData   RiskFactorData              @relation(fields: [riskFactorDataId], references: [id])
+  comments         RiskFactorDataRecComments[]
+
+  @@unique([riskFactorDataId, recMedId, companyId])
+}
+
+model RiskFactorDataRecComments {
+  id                  String              @id @default(uuid())
+  text                String
+  type                RiskRecTypeEnum
+  riskFactorDataRecId String
+  created_at          DateTime            @default(now())
+  updated_at          DateTime            @updatedAt
+  textType            RiskRecTextTypeEnum
+  riskFactorDataRec   RiskFactorDataRec   @relation(fields: [riskFactorDataRecId], references: [id])
+}
+
+model User {
+  id                  Int                         @id @default(autoincrement())
+  email               String                      @unique
+  name                String?
+  password            String
+  created_at          DateTime                    @default(now())
+  updated_at          DateTime                    @updatedAt
+  deleted_at          DateTime?
+  cpf                 String?
+  facebookExternalId  String?
+  googleExternalId    String?
+  phone               String?
+  esocialTransmission EmployeeESocialBatch[]
+  examDone            EmployeeExamsHistory[]      @relation("user_done")
+  examSchedules       EmployeeExamsHistory[]      @relation("user_schedule")
+  professional        Professional?
+  refresh_token       RefreshToken[]
+  companies           UserCompany[]
+  usersPgrSignatures  RiskFactorGroupDataToUser[]
+  notification        Notification[]              @relation("NotificationToUser")
+  notificationConfirm Notification[]              @relation("user_notification_confirm")
+
+  @@unique([id, name])
+  @@index([email])
+}
+
+model UserCompany {
+  roles       String[]
+  permissions String[]
+  status      StatusEnum    @default(ACTIVE)
+  userId      Int
+  companyId   String
+  created_at  DateTime      @default(now())
+  updated_at  DateTime      @updatedAt
+  groupId     Int?
+  company     Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  group       AccessGroups? @relation(fields: [groupId], references: [id])
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([companyId, userId])
+  @@index([companyId])
+}
+
+model Uf {
+  code   String   @id
+  uf     String   @unique
+  name   String
+  cat    Cat[]
+  cities Cities[]
+}
+
+model Workspace {
+  id                     String                    @id @default(uuid())
+  name                   String
+  abbreviation           String?
+  description            String?
+  created_at             DateTime                  @default(now())
+  updated_at             DateTime                  @updatedAt
+  companyId              String
+  status                 StatusEnum                @default(ACTIVE)
+  cnpj                   String?
+  isOwner                Boolean                   @default(true)
+  companyJson            Json?
+  address                Address?
+  characterization       CompanyCharacterization[]
+  companyEnvironment     CompanyEnvironment[]
+  documents              Document[]
+  hierarchyOnHomogeneous HierarchyOnHomogeneous[]
+  riskFactorDocument     RiskFactorDocument[]
+  company                Company                   @relation(fields: [companyId], references: [id])
+  hierarchy              Hierarchy[]               @relation("HierarchyToWorkspace")
+
+  @@unique([abbreviation, companyId])
+  @@unique([id, companyId])
+  @@index([companyId])
+}
 
 enum CharacterizationTypeEnum {
   WORKSTATION
@@ -49,10 +1616,10 @@ enum CompanyTypesEnum {
 }
 
 enum CompanyEnvironmentTypesEnum {
-  GENERAL
   SUPPORT
   OPERATION
   ADMINISTRATIVE
+  GENERAL
 }
 
 enum CoverTypeEnum {
@@ -65,7 +1632,6 @@ enum DateUnitEnum {
   HOUR
   MINUTE
 }
-
 
 enum DocumentTypeEnum {
   PGR
@@ -84,10 +1650,10 @@ enum EmployeeHierarchyMotiveTypeEnum {
   ADM
   TRANS
   ALOC
-  SUB_OFFICE
   PROM
   TRANS_PROM
   DEM
+  SUB_OFFICE
 }
 
 enum EmployeeESocialRefTypeEnum {
@@ -138,7 +1704,7 @@ enum ExamHistoryConclusionEnum {
 }
 
 enum HierarchyEnum {
-  DIRECTORY 
+  DIRECTORY
   MANAGEMENT
   SECTOR
   SUB_SECTOR
@@ -169,15 +1735,15 @@ enum StatusEnum {
   PROGRESS
   INACTIVE
   PENDING
+  CANCELED
   PROCESSING
   EXPIRED
   VALID
   INVALID
   ERROR
-  TRANSMITTED
-  CANCELED
-  MODIFIED
   DONE
+  MODIFIED
+  TRANSMITTED
 }
 
 enum RecTypeEnum {
@@ -187,9 +1753,9 @@ enum RecTypeEnum {
 }
 
 enum RiskFactorsEnum {
-  FIS
+  BIO
   QUI
-  BIO 
+  FIS
   ERG
   ACI
   OUTROS
@@ -209,32 +1775,32 @@ enum RiskRecTextTypeEnum {
 }
 
 enum UfStateEnum {
-  AC 
-  AL 
-  AP 
-  AM 
-  BA 
-  CE 
-  DF 
-  ES 
-  GO 
-  MA 
-  MT 
-  MS 
-  MG 
-  PA 
-  PB 
-  PR 
-  PE 
-  PI 
-  RJ 
-  RN 
-  RS 
-  RO 
-  RR 
-  SC 
-  SP 
-  SE 
+  AC
+  AL
+  AP
+  AM
+  BA
+  CE
+  DF
+  ES
+  GO
+  MA
+  MT
+  MS
+  MG
+  PA
+  PB
+  PR
+  PE
+  PI
+  RJ
+  RN
+  RS
+  RO
+  RR
+  SC
+  SP
+  SE
   TO
 }
 
@@ -252,1643 +1818,3 @@ enum ProfessionalRespTypeEnum {
   AMB
   BIO
 }
-// START TABLES
-
-
-model Absenteeism {
-  id    Int   @id  @default(autoincrement())
-
-  startDate DateTime
-  endDate DateTime
-  // startTime Int?
-  // endTime Int? 
-  timeSpent Int
-  timeUnit DateUnitEnum 
-  isJustified Boolean?
-  isExtern Boolean?
-  local String?
-  status StatusEnum @default(ACTIVE)
-  
-  docId Int?
-  doc  ProfessionalCouncil? @relation( fields: [docId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  
-
-  observation String?
-  sameAsBefore Boolean?
-  traffic Int?
-
-  vacationStartDate DateTime?
-  vacationEndDate DateTime?
-
-  cnpjSind String?
-  infOnusRemun Int?
-
-  cnpjMandElet String?
-  
-  origRetif Int?
-  tpProc Int?
-  nrProc Int?
-
-
-  employeeId Int
-  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  motiveId Int?
-  motive AbsenteeismMotive? @relation(fields: [motiveId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  esocial18Motive Int?
-  esocial18 EsocialTable18Mot? @relation(fields: [esocial18Motive], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  cidId String?
-  cid Cid? @relation(fields: [cidId], references: [cid], onDelete: Restrict, onUpdate: Cascade)
-  
-  @@index(startDate)
-  @@index(endDate)
-}
-
-model AbsenteeismMotive {
-  id    Int   @id  @default(autoincrement())
-  desc String
-
-  absenteeism Absenteeism[]
-}
-
-model AccessGroups {
-  id    Int     @default(autoincrement()) @id
-  roles String[]
-  permissions String[]
-  name String  
-  description String?  
-  companyId String  
-  system Boolean @default(false)  
-  users UserCompany[]
-  invites InviteUsers[]
-  company Company? @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
-
-  @@unique([id, companyId])
-} 
-
-model Activity {
-  id    Int     @default(autoincrement()) @id
-  code String @unique
-  name String
-  riskDegree Int @default(0)
-  created_at DateTime @default(now())
-  company_primary_activity Company[] @relation(name: "primary_activity")
-  company_secondary_activity Company[] @relation(name: "secondary_activity")
-}
-
-model Address {
-  id   String    @id @default(uuid())
-  companyId String
-  cep String 
-  street String?
-  number String?
-  complement String?
-  neighborhood String?
-  city String?
-  state String?
-  // uf UfStateEnum?
-  workspaceId String?
-  workspace Workspace? @relation(fields: [id,companyId], references: [id,companyId], onDelete: Cascade, onUpdate: Cascade)
-  
-  @@unique([workspaceId, companyId])
-  @@unique([id,companyId])
-  @@index(companyId)
-}
-
-model AddressCompany {
-  id   String    @id @default(uuid())
-  cep String 
-  street String?
-  number String?
-  complement String?
-  neighborhood String?
-  city String?
-  state String?
-  uf UfStateEnum?
-  companyId String @unique
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-}
-
-model Attachments {
-  id   String    @id @default(uuid())
-  name String?  
-  url String
-  created_at DateTime @default(now())
-  deleted_at DateTime? 
-  updated_at  DateTime   @updatedAt
-  riskFactorDocumentId String?
-  riskFactorDocument RiskFactorDocument? @relation(fields: [riskFactorDocumentId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
-}
-
-model Cat {
-  id    Int   @id  @default(autoincrement())
-  status StatusEnum @default(ACTIVE)
-
-  dtAcid DateTime
-  tpAcid Int
-  hrAcid String?
-  hrsTrabAntesAcid String?
-  tpCat Int
-  isIndCatObito Boolean?
-  dtObito DateTime?
-  isIndComunPolicia Boolean?
-  codSitGeradora String 
-  esocialSitGeradora EsocialTable14And15Acid? @relation(name: "cat_sit_geradora", fields: [codSitGeradora], references: [code], onDelete: Restrict, onUpdate: Cascade)
-  iniciatCAT Int
-  obsCAT String?
-  ultDiaTrab DateTime?
-  houveAfast Boolean?
-
-  tpLocal Int
-  dscLocal String
-  tpLograd String? 
-  esocialLograd EsocialTable20Lograd? @relation(fields: [tpLograd], references: [code], onDelete: Restrict, onUpdate: Cascade)
-  dscLograd String
-  nrLograd String
-  complemento String?
-  bairro String?
-  cep String?
-  codMunic String?
-  city Cities? @relation(fields: [codMunic], references: [code], onDelete: Restrict, onUpdate: Cascade)
-  uf String?
-  uf_table Uf? @relation(fields: [uf], references: [uf], onDelete: Restrict, onUpdate: Cascade)
-  pais String?
-  countryCodeEsocial6 EsocialTable6Country? @relation(fields: [pais], references: [code], onDelete: Restrict, onUpdate: Cascade)
-  codPostal String?
-
-  ideLocalAcidTpInsc Int?
-  ideLocalAcidCnpj String?
-  
-  codParteAting String
-  codParteAtingEsocial13 EsocialTable13BodyPart @relation(fields: [codParteAting], references: [code], onDelete: Restrict, onUpdate: Cascade)
-  lateralidade Int
-  
-  codAgntCausador String 
-  esocialAgntCausador EsocialTable14And15Acid? @relation(name: "cat_ag_causador", fields: [codAgntCausador], references: [code], onDelete: Restrict, onUpdate: Cascade)
-
-  dtAtendimento DateTime 
-  hrAtendimento String 
-  isIndInternacao Boolean? 
-  durTrat Int 
-  isIndAfast Boolean? 
-  dscLesao String 
-  esocialLesao EsocialTable17Injury? @relation(fields: [dscLesao], references: [code], onDelete: Restrict, onUpdate: Cascade)
-  dscCompLesao String? 
-  diagProvavel String? 
-  codCID String
-  cid Cid @relation(fields: [codCID], references: [cid], onDelete: Restrict, onUpdate: Cascade)
-  observacao String?
-  
-  docId Int
-  doc  ProfessionalCouncil @relation( fields: [docId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-
-  nrRecCatOrig String?
-
-  catOriginId Int?
-  catOrigin Cat? @relation(name: "cat_oringin_fk",fields: [catOriginId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  catReopen Cat[] @relation(name: "cat_oringin_fk")
-  
-  employeeId Int
-  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-
-  sendEvent Boolean @default(true) 
-  events EmployeeESocialEvent[]
-}
-
-model Cbo {
-  code    String   @id
-  desc    String  
-
-  @@unique([code, desc])
-}
-
-model Checklist {
-  id    Int     @default(autoincrement())
-  status StatusEnum @default(PROGRESS)
-  name String 
-  companyId String
-  system Boolean
-  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  data ChecklistData?
-  created_at DateTime @default(now())
-
-  @@id([id, companyId])
-} 
-
-model ChecklistData {
-  json Json
-  companyId String
-  checklistId    Int  
-  checklist Checklist @relation(fields: [checklistId,companyId], references: [id,companyId], onDelete: Cascade, onUpdate: Cascade)
-
-  @@id([checklistId, companyId])
-} 
-
-model Cid {
-  cid String @id 
-  description   String?
-  class   String?
-  sex   SexTypeEnum?
-  kill   Boolean?
-  employees Employee[] 
-  absenteeisms Absenteeism[] 
-  cat Cat[] 
-
-  @@index(description)
-} 
-
-model Cities {
-  code    String   @id
-  name    String   
-  ufCode String?
-  uf Uf? @relation(fields: [ufCode], references: [code], onDelete: Restrict, onUpdate: Cascade)
-
-  cat Cat[] 
-
-  @@index(name)
-}
-
-model Company {
-  id   String    @id @default(uuid())
-  cnpj String?
-  name String  
-  shortName String?
-  fantasy String?
-  description String?
-  isConsulting Boolean @default(false)
-  isClinic Boolean @default(false)
-  isGroup Boolean @default(false)
-  licenseId Int? 
-  groupId Int? 
-  phone String?
-  email String?
-  operationTime String?
-  logoUrl String?
-  responsibleName String?
-  responsibleNit String?
-  responsibleCpf String?
-  numAsos Int?
-  blockResignationExam Boolean @default(true)
-  esocialStart  DateTime?
-  esocialSend  Boolean?
-  initials String?
-  unit String?
-  obs String?
-  activityStartDate DateTime? 
-  created_at DateTime @default(now())
-  deleted_at DateTime? 
-  updated_at  DateTime   @updatedAt
-  esocialLastTransmission DateTime? //! remove
-  doctorResponsibleId  Int?
-  tecResponsibleId  Int?
-  status StatusEnum @default(ACTIVE)
-  type CompanyTypesEnum @default(MATRIZ)
-  accessGroups AccessGroups[]
-  address AddressCompany?
-  paymentType CompanyPaymentTypeEnum?
-  paymentDay Int?
-  isTaxNote Boolean @default(false)
-  observationBank String?
-  applyingServiceContracts Contract[]  @relation(name: "contracts")
-  characterization CompanyCharacterization[] 
-  checklist Checklist[] 
-  companyGroups CompanyGroup[] @relation(name:"company")
-  databaseTable DatabaseTable[] 
-  employees Employee[] 
-  notification Notification[] 
-  environments CompanyEnvironment[] 
-  generateSource GenerateSource[] 
-  group CompanyGroup? @relation(name:"group", fields: [groupId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
-  hierarchy Hierarchy[] 
-  homogeneousGroup HomogeneousGroup[] 
-  invites InviteUsers[] 
-  license License? @relation(name:"license",fields: [licenseId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
-  primary_activity Activity[] @relation(name: "primary_activity")
-  professionals Professional[] //! will be removed doc not working
-  receivingServiceContracts Contract[]
-  recMed RecMed[] 
-  exams Exam[] 
-  examsToRisk ExamToRisk[] 
-  clinicExams ExamToClinic[] 
-  riskFactorData RiskFactorData[] 
-  riskFactorDataRec RiskFactorDataRec[] 
-  riskFactorDocument RiskFactorDocument[] 
-  documentPCMSO DocumentPCMSO?
-  riskFactorGroupData RiskFactorGroupData[] 
-  riskFactors RiskFactors[] 
-  secondary_activity Activity[] @relation(name: "secondary_activity")
-  users UserCompany[]
-  workspace Workspace[]
-  contacts Contact[]
-  shifts CompanyShift[]
-  covers DocumentCover[]
-  documents Document[]
-  doctorResponsible  ProfessionalCouncil? @relation(name:"doctors_council_company_responsibles", fields: [doctorResponsibleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  tecResponsible  ProfessionalCouncil? @relation(name:"tec_council_company_responsibles", fields: [tecResponsibleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  clinicsAvailable CompanyClinics[]  @relation(name: "companies_available")
-  companiesToClinicAvailable CompanyClinics[]  @relation(name: "clinics_available")
-  examClinicHistory EmployeeExamsHistory[]  
-  riskDocInfo RiskFactorsDocInfo[]
-  companyGroupId Int? @unique
-  companyGroup CompanyGroup? @relation(name:"company_group", fields: [companyGroupId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
-  notifications Notification[]  @relation(name: "owner_notification_company")
-  protocol Protocol[]
-  protocolToRisk ProtocolToRisk[]
-  esocialEvents EmployeeESocialEvent[]
-  esocialTransmissions EmployeeESocialBatch[]
-  report CompanyReport?
-  cert CompanyCert?
-  os CompanyOS?
-  professionalsResponsibles ProfessionalCouncilResponsible[]
-
-  // professionals Professional[] @relation(name:"companies_related") 
-  stateRegistration String? // not in use
-  size String? // not in use
-  legal_nature String? // not in use
-  cadastral_situation String? // not in use
-  activity_start_date String? // not in use
-  cadastral_situation_date String? // not in use
-  legal_nature_code String? // not in use
-  cadastral_situation_description String? // not in use
-
-  mission String?
-  vision String?
-  values String?
- 
-  @@index(name)
-  @@index(isClinic)
-  @@index(isConsulting)
-  @@index(initials)
-  @@index(fantasy)
-  @@index(cnpj)
-}
-
-model CompanyCert {
-  id   String    @id @default(uuid())
-  key String
-  certificate String
-  notAfter   DateTime
-  notBefore   DateTime
-  companyId String @unique
-  company   Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-} 
-
-model CompanyClinics {
-  company   Company @relation(name: "companies_available",fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  clinic  Company @relation(name: "clinics_available", fields: [clinicId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  companyId String 
-  clinicId String 
-  created_at DateTime @default(now())
- 
-  @@id([companyId, clinicId])
-}
-
-model CompanyGroup {
-  id    Int   @id  @default(autoincrement())
-  name String  
-  description String?
-  created_at DateTime @default(now())
-  updated_at  DateTime   @updatedAt
-  companies Company[] @relation(name:"group") 
-  companyId String
-  company Company @relation(name:"company", fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
-  numAsos Int?
-  blockResignationExam Boolean @default(true)
-  esocialStart  DateTime?
-  esocialSend  Boolean?
-  doctorResponsibleId  Int?
-  doctorResponsible  ProfessionalCouncil? @relation(name:"doctors_council_group_responsibles", fields: [doctorResponsibleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  tecResponsibleId  Int?
-  tecResponsible  ProfessionalCouncil? @relation(name:"tec_council_group_responsibles", fields: [tecResponsibleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
- 
-  companyGroup Company? @relation(name:"company_group") 
-
-  @@unique([id, companyId])
-}
-
-model CompanyCharacterization {
-  id   String    @id @default(uuid())
-  name String  
-  photos CompanyCharacterizationPhoto[]
-  description String?
-  created_at DateTime @default(now())
-  paragraphs String[]
-  considerations String[]
-  activities String[]  
-  profiles CompanyCharacterization[]  @relation(name:"profiles") 
-  profileName String?  
-  profileParent CompanyCharacterization? @relation(name:"profiles", fields: [profileParentId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
-  profileParentId String?
-  order Int?
-  deleted_at DateTime? 
-  updated_at  DateTime   @updatedAt
-  type CharacterizationTypeEnum
-  noiseValue String?  
-  temperature String?  
-  luminosity String?  
-  moisturePercentage String?   
-  workspaceId String
-  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
-  homogeneousGroup HomogeneousGroup? @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: Cascade) 
-  companyId String
-  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
-  status StatusEnum @default(ACTIVE)
-  
-  @@unique([workspaceId, companyId, id])
-}
-
-model CompanyCharacterizationPhoto {
-  id   String    @id @default(uuid())
-  name String  
-  isVertical Boolean @default(false)
-  photoUrl String
-  created_at DateTime @default(now())
-  order Int?
-  deleted_at DateTime? 
-  updated_at  DateTime   @updatedAt
-  companyCharacterizationId String
-  companyEnvironment CompanyCharacterization @relation(fields: [companyCharacterizationId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
-}
-
-model CompanyReport {
-  id    Int   @id  @default(autoincrement())
-  lastDailyReport DateTime? 
-  dailyReport Json?  
-  esocialPendent Int @default(0)
-  esocialReject Int @default(0)
-  esocialDone Int @default(0)
-  esocialProgress Int @default(0)
-  created_at DateTime @default(now())
-  updated_at  DateTime   @updatedAt
-  companyId String 
-  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
-
-  @@unique(companyId)
-  @@index(companyId)
-}
-model CompanyEnvironment {
-  id   String    @id @default(uuid())
-  name String  
-  photos CompanyEnvironmentPhoto[]
-  description String?
-  paragraphs String[]
-  order Int?
-  considerations String[]
-  activities String[]  
-  created_at DateTime @default(now())
-  deleted_at DateTime? 
-  updated_at  DateTime   @updatedAt
-  type CompanyEnvironmentTypesEnum 
-  noiseValue String?  
-  temperature String?  
-  luminosity String?  
-  moisturePercentage String?   
-  workspaceId String
-  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
-  parentEnvironmentId String?
-  parentEnvironment CompanyEnvironment? @relation(name: "parent_enviroment",fields: [parentEnvironmentId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
-  childEnvironments CompanyEnvironment[] @relation(name: "parent_enviroment")
-  companyId String
-  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
-  homogeneousGroup HomogeneousGroup? @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: Cascade) 
-  
-  @@unique([workspaceId, companyId, id])
-}
-
-model CompanyEnvironmentPhoto {
-  id   String    @id @default(uuid())
-  name String  
-  isVertical Boolean @default(false)
-  order Int?
-  photoUrl String
-  created_at DateTime @default(now())
-  deleted_at DateTime? 
-  updated_at  DateTime   @updatedAt
-  companyEnvironmentId String
-  companyEnvironment CompanyEnvironment @relation(fields: [companyEnvironmentId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
-}
-
-model CompanyShift {
-  id    Int   @id  @default(autoincrement())
-  name String  
-  description String?
-  companyId String
-  created_at DateTime @default(now())
-  updated_at  DateTime   @updatedAt
-  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
-  employees Employee[]
-
-  @@unique([id, companyId])
-}
-
-model Contact {
-  id    Int   @id  @default(autoincrement())
-  name String? 
-  phone String? 
-  phone_1 String? 
-  email String? 
-  isPrincipal Boolean @default(false)
-  obs String? 
-  companyId String 
-  updated_at  DateTime   @updatedAt
-  company   Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  status StatusEnum @default(ACTIVE)
-  created_at DateTime @default(now())
-
-  @@unique([id, companyId])
-}
-
-model Contract {
-  receivingServiceCompany   Company @relation(fields: [receivingServiceCompanyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  applyingServiceCompany  Company @relation(name: "contracts", fields: [applyingServiceCompanyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  applyingServiceCompanyId String 
-  receivingServiceCompanyId String 
-  status StatusEnum @default(ACTIVE)
-  created_at DateTime @default(now())
- 
-  @@id([applyingServiceCompanyId, receivingServiceCompanyId])
-}
-
-model DatabaseTable {
-  id    Int     @default(autoincrement())
-  name String 
-  version Int  @default(1)
-  companyId String
-  system Boolean
-  status StatusEnum @default(ACTIVE)
-  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  created_at DateTime @default(now())
-  updated_at  DateTime   @updatedAt
-
-  @@id([id, companyId])
-} 
-
-model Document {
-  id    Int   @id  @default(autoincrement())
-  fileUrl String?
-  name String? 
-  description String?
-  startDate DateTime @default(now())
-  endDate DateTime?
-  type DocumentTypeEnum  @default(OTHER)
-  status StatusEnum @default(ACTIVE)
-  created_at DateTime @default(now())
-  updated_at  DateTime   @updatedAt
-  oldDocuments Document[] @relation(name: "document_parent")
-  parentDocumentId Int?
-  companyId String
-  workspaceId String?
-  workspace Workspace? @relation(fields: [workspaceId,companyId], references: [id,companyId], onDelete: Cascade, onUpdate: Cascade)
-  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  parentDocument Document? @relation(name: "document_parent", fields: [parentDocumentId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  
-  @@unique([id, companyId])
-  @@index(type)
-  @@index(companyId)
-  @@index(parentDocumentId)
-} 
-
-model DocumentCover {
-  id    Int   @id  @default(autoincrement())
-  name String?
-  json Json
-  companyId String
-  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade) 
-  acceptType CoverTypeEnum[]  
-
-  @@unique([id, companyId])
-}
-
-model DocumentPCMSO {
-  id    String   @id  @default(uuid())
-  name String?
-  created_at DateTime @default(now())
-  companyId String @unique
-  elaboratedBy String?
-  coordinatorBy String?
-  revisionBy String?
-  approvedBy String?
-  validityStart DateTime?
-  validityEnd DateTime?
-  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  docs RiskFactorDocument[]
-  status StatusEnum @default(PROGRESS)
-  professionalsSignatures DocumentPCMSOToProfessional[]
-  // usersSignatures RiskFactorGroupDataToUser[]
-  // validity String?
-
-  @@unique([id, companyId])
-}
-
-model CompanyOS {
-  id    Int   @id  @default(autoincrement())
-  created_at DateTime @default(now())
-  updated_at  DateTime   @updatedAt
-  status StatusEnum @default(ACTIVE)
-  med Json?
-  rec Json?
-  obligations Json?
-  prohibitions Json?
-  procedures Json?
-  cipa Json?
-  declaration Json?
-  
-  companyId String @unique
-  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-
-  @@unique([id, companyId])
-}
-
-model Employee {
-  id    Int   @id  @default(autoincrement())
-  created_at DateTime @default(now())
-  updated_at  DateTime   @updatedAt
-  status StatusEnum @default(PENDING)
-  name String 
-  cpf String 
-  esocialCode String?
-  socialName String?
-  nickname String?
-  phone String?
-  email String?
-  isComorbidity Boolean? @default(false)
-  birthday DateTime?
-  admissionDate DateTime? //!remove
-  lastExam DateTime?
-  expiredDateExam DateTime?
-  newExamAdded DateTime?
-  sex SexTypeEnum? 
-  hierarchyId String?
-  cbo String?
-  hierarchy Hierarchy? @relation(fields: [hierarchyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  companyId String
-  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  cidId String?
-  cid Cid? @relation(fields: [cidId], references: [cid], onDelete: Restrict, onUpdate: Cascade)
-  shiftId Int?
-  shift CompanyShift? @relation(fields: [shiftId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  subOffices Hierarchy[] @relation(name: "sub_offices")
-  hierarchyHistory EmployeeHierarchyHistory[]
-  examsHistory EmployeeExamsHistory[]
-  esocialEvents EmployeeESocialEvent[]
-  pppHistory EmployeePPPHistory[] 
-  absenteeisms Absenteeism[] 
-  cat Cat[] 
-  
-  @@unique([id, companyId])
-  @@unique([cpf, companyId])
-  @@index([cpf], type: Hash)
-  @@index(esocialCode)
-  @@index(name)
-  @@index(email)
-} 
-
-model EmployeeHierarchyHistory {
-  id    Int   @id  @default(autoincrement())
-  created_at DateTime @default(now())
-  updated_at  DateTime   @updatedAt
-  motive EmployeeHierarchyMotiveTypeEnum
-  startDate DateTime?
-  hierarchyId String
-  hierarchy Hierarchy @relation(fields: [hierarchyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  employeeId Int
-  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  deletedAt DateTime?
-
-  subHierarchies Hierarchy[] @relation(name: "sub_offices_history")
-  // esocialCode String?
-
-  @@index(deletedAt)
-} 
-
-model EmployeeExamsHistory {
-  id    Int   @id  @default(autoincrement())
-  created_at DateTime @default(now())
-  updated_at  DateTime   @updatedAt
-  
-  doneDate DateTime?
-  time String?
-  validityInMonths Int?
-  expiredDate DateTime?
-  examType ExamHistoryTypeEnum?
-  evaluationType ExamHistoryEvaluationEnum?
-  conclusion ExamHistoryConclusionEnum?
-  status StatusEnum @default(DONE)
-  fileUrl String?
-  
-  obs String?
-  isSequential Boolean?
-  clinicObs String?
-  scheduleType ClinicScheduleTypeEnum?
-  changeHierarchyDate DateTime?
-  changeHierarchyAnyway Boolean @default(false)
-  hierarchyId String?
-  hierarchy Hierarchy? @relation(fields: [hierarchyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  subOfficeId String?
-  subOffice Hierarchy? @relation(name: "subOffice_employee_exam",fields: [subOfficeId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  deletedAt DateTime?
-
-  asoExamId Int?
-  asoExam EmployeeExamsHistory? @relation(name: "aso_exam_relation", fields: [asoExamId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  complementaryExams EmployeeExamsHistory[] @relation(name: "aso_exam_relation")
-  
-  userScheduleId Int?
-  userSchedule User? @relation(name: "user_schedule", fields: [userScheduleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  userDoneId Int?
-  userDone User? @relation(name: "user_done", fields: [userDoneId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  doctorId Int?
-  doctor ProfessionalCouncil? @relation(fields: [doctorId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  clinicId String?
-  clinic Company? @relation(fields: [clinicId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  examId Int
-  exam Exam @relation(fields: [examId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  employeeId Int
-  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  events EmployeeESocialEvent[]
-  sendEvent Boolean @default(true) 
-
-  @@index(status)
-  @@index(deletedAt)
-  @@index(employeeId)
-  @@index(fileUrl)
-  @@index(clinicId)
-} 
-
-model EmployeeESocialBatch {
-  id    Int   @id  @default(autoincrement())
-  created_at DateTime @default(now())
-  updated_at  DateTime   @updatedAt  
-  environment Int?
-  status StatusEnum @default(PENDING)
-  events EmployeeESocialEvent[]
-  type EmployeeESocialEventTypeEnum
-  response Json?
-  protocolId String?
-
-  userTransmissionId Int?
-  userTransmission User? @relation(fields: [userTransmissionId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  companyId String
-  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-
-  @@index(status)
-} 
-
-model EmployeeESocialEvent {
-  id    Int   @id  @default(autoincrement())
-  created_at DateTime @default(now())
-  updated_at  DateTime   @updatedAt  
-  batchId Int?
-  type EmployeeESocialEventTypeEnum
-  batch EmployeeESocialBatch? @relation(fields: [batchId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  eventsDate DateTime?
-  status StatusEnum @default(PENDING)
-  // eventsType EmployeeESocialEventTypeEnum
-  // snapshot Json?
-
-  action EmployeeESocialEventActionEnum?
-  receipt String?
-  eventId String?
-  eventXml String
-  response Json?
-  employeeId Int
-  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  companyId String
-  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  examHistoryId Int?
-  exam EmployeeExamsHistory? @relation(fields: [examHistoryId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  pppId Int?
-  ppp EmployeePPPHistory? @relation(fields: [pppId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  catId Int?
-  cat Cat? @relation(fields: [catId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  // refType EmployeeESocialRefTypeEnum
-  // @@index(refType)
-  // @@index(employeeId)
-
-  @@index(eventId)
-  @@index(status)
-  @@index(eventsDate)
-} 
-
-model EmployeePPPHistory {
-  id    Int   @id  @default(autoincrement())
-  created_at DateTime @default(now())
-  updated_at  DateTime   @updatedAt
-  doneDate DateTime?
-  status StatusEnum @default(DONE)
-  sendEvent Boolean @default(true) 
-  json Json?
-
-  employeeId Int
-  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  events EmployeeESocialEvent[]
-
-  @@index(status)
-  @@index(employeeId)
-  @@unique([employeeId, doneDate])
-} 
-
-model EngsToRiskFactorData {
-  recMedId    String   @map("A") 
-  riskFactorDataId String @map("B") 
-  riskFactorData RiskFactorData  @relation(fields: [riskFactorDataId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  recMed RecMed  @relation(fields: [recMedId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  efficientlyCheck Boolean @default(false)
-  startDate DateTime?
-  endDate DateTime?
-
-  @@id([riskFactorDataId, recMedId])
-  @@map("_engs")
-} 
-
-model Epi {
-  id    Int     @default(autoincrement()) @id
-  ca String
-  isValid Boolean?  
-  national Boolean @default(true)
-  expiredDate DateTime?
-  description String @default("")
-  report String @default("")
-  restriction String @default("")
-  observation String @default("")
-  equipment String @default("")
-  status StatusEnum @default(ACTIVE)
-  created_at DateTime @default(now())
-  deleted_at DateTime? 
-  epiToRiskFactorData EpiToRiskFactorData[]
-
-  @@index(ca)
-  @@unique([ca, status])
-} 
-
-model EpiToRiskFactorData {
-  epiId    Int   @map("A") 
-  riskFactorDataId String @map("B") 
-  riskFactorData RiskFactorData  @relation(fields: [riskFactorDataId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  epi Epi  @relation(fields: [epiId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  lifeTimeInDays Int?
-  efficientlyCheck Boolean @default(false)
-  epcCheck Boolean @default(false)
-  longPeriodsCheck Boolean @default(false)
-  validationCheck Boolean @default(false)
-  tradeSignCheck Boolean @default(false)
-  sanitationCheck Boolean @default(false)
-  maintenanceCheck Boolean @default(false)
-  unstoppedCheck Boolean @default(false)
-  trainingCheck Boolean @default(false)
-  startDate DateTime?
-  endDate DateTime?
-
-  @@id([riskFactorDataId, epiId])
-  @@map("_EpiToRiskFactorData")
-} 
-
-model EsocialTable18Mot {
-  id    Int   @id  @default(autoincrement())
-  code String @unique
-  description String 
-  absenteeisms Absenteeism[]
-}
-
-model EsocialTable6Country {
-  code    String   @id
-  name    String  
-
-  cat Cat[] 
-}
-
-model EsocialTable13BodyPart {
-  code    String   @id
-  desc    String  
-
-  cat Cat[] 
-}
-
-model EsocialTable14And15Acid {
-  code    String   @id
-  desc    String  
-  case    String?  
-  table   Int
-
-  cat_ag_causador Cat[] @relation(name: "cat_ag_causador")
-  cat_sit_geradora Cat[] @relation(name: "cat_sit_geradora")
-}
-
-model EsocialTable17Injury {
-  code    String   @id
-  desc    String  
-
-  cat Cat[] 
-}
-
-model EsocialTable20Lograd {
-  code    String   @id
-  desc    String  
-
-  cat Cat[] 
-}
-
-model EsocialTable24 {
-  id    String   @id
-  name String 
-  group String
-  type RiskFactorsEnum
-  isQuantity Boolean @default(false)
-  risks RiskFactors[]
-}
-
-model Exam {
-  id    Int   @id  @default(autoincrement())
-  name String
-  analyses String? 
-  instruction String? 
-  material String? 
-  companyId String 
-  status StatusEnum @default(ACTIVE)
-  type ExamTypeEnum?
-  isAttendance Boolean @default(false)
-  updated_at  DateTime   @updatedAt
-  created_at DateTime @default(now())
-  deleted_at DateTime?
-  company   Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  system Boolean @default(false)
-  examToRisk ExamToRisk[]
-  examToRiskData ExamToRiskData[]
-  examToClinic ExamToClinic[] 
-  esocial27Code String?
-  employeesHistory EmployeeExamsHistory[] 
-  obsProc String?
-
-  @@unique([id, companyId])
-  @@index(companyId)
-}
-
-model ExamToClinic {
-  id     Int   @id @default(autoincrement())
-  exam   Exam @relation(fields: [examId], references: [id])
-  company    Company  @relation(fields: [companyId], references: [id])
-  examId  Int
-  companyId String
-  dueInDays Int?
-  isScheduled Boolean @default(false)
-  observation String?
-  examMinDuration Int?
-  scheduleRange Json?
-  price  Int?
-  groupId String? @default(uuid())
-  isPeriodic Boolean @default(true)
-  isChange Boolean @default(true)
-  isAdmission Boolean @default(true)
-  isReturn Boolean @default(true)
-  isDismissal Boolean @default(true)
-  startDate DateTime @default(now())
-  endDate DateTime?
-  scheduleType ClinicScheduleTypeEnum?
-  status StatusEnum @default(ACTIVE)
-
-  @@unique([examId, companyId, startDate, groupId])
-}
-
-model ExamToRisk {
-  id     Int   @id @default(autoincrement())
-  exam   Exam? @relation(fields: [examId], references: [id])
-  risk    RiskFactors?  @relation(fields: [riskId], references: [id])
-  examId  Int?
-  riskId String?
-  companyId String 
-  company   Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  isMale Boolean @default(false)
-  isFemale Boolean @default(false)
-  isPeriodic Boolean @default(false)
-  isChange Boolean @default(false)
-  isAdmission Boolean @default(false)
-  isReturn Boolean @default(false)
-  isDismissal Boolean @default(false)
-  validityInMonths Int?
-  lowValidityInMonths Int?
-  considerBetweenDays Int?
-  fromAge Int?
-  toAge Int?
-  minRiskDegreeQuantity Int? @default(1)
-  minRiskDegree Int? @default(1)
-  startDate DateTime @default(now())
-  endDate DateTime?
-  
-  @@unique([id, companyId])
-}
-
-model ExamToRiskData {
-  exam   Exam @relation(fields: [examId], references: [id])
-  risk    RiskFactorData  @relation(fields: [riskFactorDataId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  examId  Int
-  riskFactorDataId String
-  isMale Boolean @default(false)
-  isFemale Boolean @default(false)
-  isPeriodic Boolean @default(false)
-  isChange Boolean @default(false)
-  isAdmission Boolean @default(false)
-  isReturn Boolean @default(false)
-  isDismissal Boolean @default(false)
-  validityInMonths Int?
-  lowValidityInMonths Int?
-  considerBetweenDays Int?
-  fromAge Int?
-  toAge Int?
-
-  @@id([examId, riskFactorDataId])
-}
-
-model GenerateSource {
-  id    String   @id  @default(uuid())
-  riskId    String    
-  name String
-  companyId String
-  system Boolean @default(false)
-  created_at DateTime @default(now())
-  status StatusEnum @default(ACTIVE)
-  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  risk RiskFactors @relation(fields: [riskId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  deleted_at DateTime? 
-  recMeds RecMed[] 
-  riskFactorData RiskFactorData[]
-
-  @@unique([id, companyId])
-} 
-
-model Hierarchy {
-  id    String     @default(uuid())  @id
-  created_at DateTime @default(now())
-  status StatusEnum @default(ACTIVE)
-  type HierarchyEnum 
-  description String @default("")
-  realDescription String @default("")
-  name String   
-  companyId String
-  parentId  String?
-  refName  String?
-  workspaces Workspace[]
-  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  parent Hierarchy?  @relation(name: "children_parent", fields: [parentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  children Hierarchy[] @relation(name: "children_parent")
-  employees Employee[] 
-  subOfficeEmployees Employee[] @relation(name: "sub_offices")
-  hierarchyOnHomogeneous HierarchyOnHomogeneous[]
-  riskFactorDatas RiskFactorData[] //! rmeove
-  hierarchyHistory EmployeeHierarchyHistory[]
-  subHierarchyHistory EmployeeHierarchyHistory[] @relation(name: "sub_offices_history")
-  employeeExamsHistory EmployeeExamsHistory[]
-  employeeExamsHistorySubOffice EmployeeExamsHistory[] @relation(name: "subOffice_employee_exam")
-  riskDocInfo RiskFactorsDocInfo[]
-  deletedAt DateTime?
-  
-  @@index(deletedAt)
-  @@unique([id, companyId])
-  @@unique([parentId, name])
-  @@index(companyId)
-}
-
-model HierarchyOnHomogeneous {
-  id     Int   @id @default(autoincrement())
-  hierarchy       Hierarchy     @relation(fields: [hierarchyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  hierarchyId     String
-  homogeneousGroup   HomogeneousGroup @relation(fields: [homogeneousGroupId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  homogeneousGroupId     String
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  workspaceId     String
-  endDate DateTime?
-  startDate DateTime?
-  deletedAt DateTime?
-  created_at DateTime @default(now())
-
-  @@unique([hierarchyId, homogeneousGroupId, workspaceId, endDate, startDate])
-  @@index(deletedAt)
-  @@index(endDate)
-}
-
-model HomogeneousGroup {
-  id    String     @default(uuid()) @id
-  name String
-  description String 
-  companyId String
-  status StatusEnum @default(ACTIVE)
-  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  characterization CompanyCharacterization?
-  environment CompanyEnvironment?
-  hierarchyOnHomogeneous HierarchyOnHomogeneous[] 
-  created_at DateTime @default(now())
-  riskFactorData RiskFactorData[] 
-  type HomoTypeEnum?
-  deletedAt DateTime?
-  
-  @@unique([name, companyId])
-  @@index(name)
-  @@index(deletedAt)
-  @@index(companyId)
-}
-
-model InviteUsers {
-  id   String @id @default(uuid())
-  expires_date DateTime
-  companyId String
-  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  companiesIds String[]
-  email String? 
-  roles String[]
-  permissions String[]
-  groupId Int?
-  group AccessGroups? @relation(fields: [groupId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
-  professional Professional?
-}
-
-model License {
-  id    Int     @default(autoincrement()) @id
-  companies   Company[] @relation(name:"license")
-  companyId String  @unique
-  status StatusEnum @default(ACTIVE)
-  created_at DateTime @default(now())
-
-  @@index(companyId)
-}
-
-model Notification {
-  id    Int     @default(autoincrement()) @id
-  created_at DateTime @default(now())
-  json Json
-  repeatId String? 
-  isClinic Boolean? 
-  isConsulting Boolean? 
-  isCompany Boolean? 
-  system Boolean? 
-
-  companies Company[]
-  users User[]
-  confirmations User[]@relation(name: "user_notification_confirm")
-
-  companyId String
-  company Company @relation(name: "owner_notification_company", fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
-
-  @@index(system)
-  @@index(isCompany)
-  @@index(isConsulting)
-  @@index(companyId)
-}
-
-model Professional {
-  id    Int     @default(autoincrement()) @id
-  name String
-  cpf String?
-  phone String?
-  email String?
-  formation String[]
-  certifications String[]
-  created_at DateTime @default(now())
-  deleted_at DateTime? 
-  updated_at  DateTime   @updatedAt
-  type ProfessionalTypeEnum? @default(USER)
-  companyId String?
-  company Company? @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
-  status StatusEnum @default(ACTIVE)
-  userId Int? @unique
-  user User? @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
-  inviteId String? @unique
-  invite InviteUsers? @relation(fields: [inviteId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  councils ProfessionalCouncil[]  
-
-  @@unique([id, companyId])
-}
-
-model ProfessionalCouncil {
-  id    Int     @default(autoincrement()) @id
-  councilType String
-  councilUF String
-  councilId String
-  created_at DateTime @default(now())
-  updated_at  DateTime   @updatedAt
-  professionalId Int
-  professional Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
-  doctorGroupResponsible  CompanyGroup[] @relation(name:"doctors_council_group_responsibles")
-  tecGroupResponsible  CompanyGroup[] @relation(name:"tec_council_group_responsibles")
-  doctorCompanyResponsible  Company[] @relation(name:"doctors_council_company_responsibles")
-  tecCompanyResponsible  Company[] @relation(name:"tec_council_company_responsibles")
-  examDoctorHistory EmployeeExamsHistory[]  
-  professionalPgrSignature RiskFactorGroupDataToProfessional[]
-  professionalPcmsoSignature DocumentPCMSOToProfessional[]
-  professionalsResponsibles ProfessionalCouncilResponsible[]
-  absenteeisms Absenteeism[]
-  cats Cat[]
-  
-  @@unique([councilType, councilUF, councilId, professionalId])
-}
-
-model ProfessionalCouncilResponsible {
-  id    Int     @default(autoincrement()) @id
-  created_at DateTime @default(now())
-  updated_at  DateTime   @updatedAt
-  startDate DateTime
-  professionalCouncilId Int
-  professional ProfessionalCouncil @relation(fields: [professionalCouncilId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
-  companyId String
-  type ProfessionalRespTypeEnum @default(AMB)
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
-
-  @@unique([companyId, professionalCouncilId, startDate])
-}
-
-model Protocol {
-  id    Int     @default(autoincrement()) @id
-  name String
-  created_at DateTime @default(now())
-  system Boolean? 
-  deleted_at DateTime? 
-  updated_at  DateTime   @updatedAt
-  companyId String?
-  company Company? @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
-  protocolToRisk ProtocolToRisk[]
-  status StatusEnum @default(ACTIVE)
-
-  @@unique([id, companyId])
-}
-
-model ProtocolToRisk {
-  id     Int   @id @default(autoincrement())
-  protocolId  Int?
-  riskId String?
-  companyId String 
-  protocol   Protocol? @relation(fields: [protocolId], references: [id])
-  risk    RiskFactors?  @relation(fields: [riskId], references: [id])
-  company   Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  minRiskDegree Int? @default(1)
-  minRiskDegreeQuantity Int? @default(1)
-  
-  @@unique([id, companyId])
-  @@unique([riskId, protocolId])
-}
-
-model RecMed {
-  id    String   @id  @default(uuid())
-  riskId    String    
-  recName String? 
-  medName String? 
-  companyId String
-  generateSourceId    String?    
-  system Boolean 
-  medType MeasuresTypeEnum?
-  recType RecTypeEnum?
-  status StatusEnum @default(ACTIVE)
-  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  risk RiskFactors @relation(fields: [riskId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  generateSource GenerateSource? @relation(fields: [generateSourceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  deleted_at DateTime? 
-  created_at DateTime @default(now())
-  recs RiskFactorData[]  @relation(name: "recs")
-  adms RiskFactorData[]  @relation(name: "adms")
-  dataRecs RiskFactorDataRec[]
-  engsToRiskFactorData EngsToRiskFactorData[]
-
-  @@unique([id, companyId])
-} 
-
-model RefreshToken {
-  id   String @id @default(uuid())
-  refresh_token String
-  expires_date DateTime
-  created_at DateTime @default(now())
-  userId Int
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-}
-
-model RiskFactors {
-  id    String   @id  @default(uuid())
-  name String 
-  companyId String
-  severity Int  @default(0)
-  system Boolean @default(false)
-  appendix String? 
-  risk String? 
-  propagation String[] 
-  exame String?
-  symptoms String?
-  method String?
-  unit String?
-  cas String?
-  breather String?
-  nr15lt String?
-  twa String?
-  stel String?
-  ipvs String?
-  pv String?
-  pe String?
-  fraction String?
-  tlv String?
-  esocialCode String?
-  coments String?
-  esocial EsocialTable24? @relation(fields: [esocialCode], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  isAso Boolean  @default(true)
-  isPGR Boolean  @default(true)
-  isPCMSO Boolean  @default(true)
-  isPPP Boolean  @default(true)
-  isEmergency Boolean  @default(false)
-  carnogenicityACGIH String?
-  carnogenicityLinach String?
-  status StatusEnum @default(ACTIVE)
-  type RiskFactorsEnum
-  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  created_at DateTime @default(now())
-  deleted_at DateTime? 
-  recMed RecMed[]
-  generateSource GenerateSource[]
-  representAll Boolean @default(false)
-  riskFactorData RiskFactorData[]
-  riskFactorProbability RiskFactorProbability[]
-  examToRisk ExamToRisk[]
-  docInfo RiskFactorsDocInfo[]
-  protocolToRisk ProtocolToRisk[]
-  json Json?
-  
-  @@unique([id, companyId])
-  @@index(esocialCode)
-}
-
-model RiskFactorsDocInfo {
-  id    Int     @default(autoincrement()) @id
-  risk   RiskFactors @relation(fields: [riskId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  company   Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  hierarchy   Hierarchy? @relation(fields: [hierarchyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  riskId String 
-  companyId String 
-  hierarchyId String? 
-  isAso Boolean  @default(true)
-  isPGR Boolean  @default(true)
-  isPCMSO Boolean  @default(true)
-  isPPP Boolean  @default(true)
-  created_at DateTime @default(now())
- 
-  @@index(companyId)
-  @@unique([companyId,riskId,hierarchyId])
-}
-
-model RiskFactorDocument {
-  id    String   @id  @default(uuid())
-  fileUrl String?
-  name String 
-  description String @default("")
-  version String  @default("1.0.0")
-  companyId String
-  riskGroupId String?
-  pcmsoId String?
-  workspaceName String
-  workspaceId String
-  elaboratedBy String?
-  revisionBy String?
-  approvedBy String?
-  validity String?
-  workspace Workspace @relation(fields: [workspaceId,companyId], references: [id,companyId], onDelete: Cascade, onUpdate: Cascade)
-  status StatusEnum @default(ACTIVE)
-  created_at DateTime @default(now())
-  updated_at  DateTime   @updatedAt
-  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  riskGroup RiskFactorGroupData? @relation(fields: [riskGroupId, companyId], references: [id, companyId], onDelete: Restrict, onUpdate: Cascade)
-  pcmso DocumentPCMSO? @relation(fields: [pcmsoId, companyId], references: [id, companyId], onDelete: Restrict, onUpdate: Cascade)
-  attachments Attachments[]
-  @@unique([id, companyId])
-} 
-
-model RiskFactorGroupData {
-  id    String   @id  @default(uuid())
-  name String?
-  created_at DateTime @default(now())
-  companyId String
-  source String?
-  elaboratedBy String?
-  coordinatorBy String?
-  revisionBy String?
-  approvedBy String?
-  validity String?
-  visitDate DateTime?
-  isQ5 Boolean @default(false)
-  hasEmergencyPlan Boolean @default(false)
-  validityStart DateTime?
-  validityEnd DateTime?
-  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  data RiskFactorData[]
-  docs RiskFactorDocument[]
-  status StatusEnum @default(PROGRESS)
-  professionalsSignatures RiskFactorGroupDataToProfessional[]
-  usersSignatures RiskFactorGroupDataToUser[]
-  complementaryDocs String[]
-  complementarySystems String[]
-  months_period_level_5 Int @default(3)
-  months_period_level_4 Int @default(6)
-  months_period_level_3 Int @default(12)
-  months_period_level_2 Int @default(24)
-
-  @@unique([id, companyId])
-}
-
-model RiskFactorGroupDataToUser {
-  riskFactorGroupDataId    String   @map("A") 
-  userId Int @map("B") 
-  riskFactorData RiskFactorGroupData  @relation(fields: [riskFactorGroupDataId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  user User  @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  isSigner Boolean @default(false)
-  isElaborator Boolean @default(false)
-
-  @@id([userId, riskFactorGroupDataId])
-  @@map("_RiskFactorGroupDataToUser")
-} 
-
-model RiskFactorGroupDataToProfessional {
-  riskFactorGroupDataId    String   @map("B") 
-  professionalId Int @map("A") 
-  riskFactorData RiskFactorGroupData  @relation(fields: [riskFactorGroupDataId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  professional ProfessionalCouncil  @relation(fields: [professionalId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  isSigner Boolean @default(false)
-  isElaborator Boolean @default(false)
-
-  @@id([riskFactorGroupDataId, professionalId])
-  @@map("_ProfessionalToRiskFactorGroupData")
-} 
-
-model DocumentPCMSOToProfessional {
-  documentPCMSOId    String   @map("B") 
-  professionalId Int @map("A") 
-  documentPCMSO DocumentPCMSO  @relation(fields: [documentPCMSOId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  professional ProfessionalCouncil  @relation(fields: [professionalId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  isSigner Boolean @default(false)
-  isElaborator Boolean @default(false)
-
-  @@id([documentPCMSOId, professionalId])
-  @@map("_DocumentPCMSOToProfessional")
-} 
-
-model RiskFactorData {
-  id    String   @id  @default(uuid())
-  probability Int?
-  probabilityAfter Int?
-  probabilityCalc RiskFactorProbability? @relation(name: "RiskFactorProbabilityBefore")
-  probabilityAfterCalc RiskFactorProbability? @relation(name: "RiskFactorProbabilityAfter")
-  companyId String
-  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  riskId    String
-  riskFactor RiskFactors @relation(fields: [riskId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  homogeneousGroupId String?
-  homogeneousGroup HomogeneousGroup? @relation(fields: [homogeneousGroupId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  hierarchyId String? //! remove
-  hierarchy Hierarchy? @relation(fields: [hierarchyId], references: [id], onDelete: Cascade, onUpdate: Cascade) //! remove
-  riskFactorGroupDataId String
-  riskFactorGroupData RiskFactorGroupData @relation(fields: [riskFactorGroupDataId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  generateSources GenerateSource[]
-  recs RecMed[]  @relation(name: "recs")
-  adms RecMed[]  @relation(name: "adms")
-  dataRecs RiskFactorDataRec[]
-  json Json?
-  level    Int?
-  standardExams Boolean @default(true)
-  epiToRiskFactorData EpiToRiskFactorData[]
-  engsToRiskFactorData EngsToRiskFactorData[]
-  examsToRiskFactorData ExamToRiskData[]
-  endDate DateTime?
-  startDate DateTime?
-  deletedAt DateTime?
-
-
-  // @@unique([homogeneousGroupId, riskId, riskFactorGroupDataId])
-  // @@unique([hierarchyId, riskId, riskFactorGroupDataId])
-  @@unique([id, companyId])
-  @@unique([id, riskId, riskFactorGroupDataId])
-  @@index(riskId)
-  @@index(hierarchyId)
-  @@index(deletedAt)
-  @@index(companyId)
-}
-
-model RiskFactorProbability {
-  id    String   @id  @default(uuid())
-  intensity Int?
-  intensityResult Float?
-  intensityLt Float?
-  minDurationJT Int?
-  minDurationEO Int?
-  chancesOfHappening Int?
-  frequency Int?
-  history Int?
-  medsImplemented Int?
-  riskFactorDataAfterId String?
-  riskFactorDataId String?
-  riskId    String
-  riskFactorGroupDataId String?
-  riskFactor RiskFactors @relation(fields: [riskId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  riskFactorData RiskFactorData? @relation(name: "RiskFactorProbabilityBefore", fields: [riskFactorDataId,riskId,riskFactorGroupDataId], references: [id,riskId,riskFactorGroupDataId], onDelete: Restrict, onUpdate: Cascade)
-  riskFactorDataAfter RiskFactorData? @relation(name: "RiskFactorProbabilityAfter", fields: [riskFactorDataAfterId,riskId,riskFactorGroupDataId], references: [id,riskId,riskFactorGroupDataId], onDelete: Restrict, onUpdate: Cascade)
-
-  @@unique([riskFactorDataId,riskId,riskFactorGroupDataId])
-  @@unique([riskFactorDataAfterId,riskId,riskFactorGroupDataId])
-}
-
-model RiskFactorDataRec {
-  id    String   @id  @default(uuid())
-  responsibleName    String?
-  endDate    DateTime?
-  status    StatusEnum @default(PENDING)
-  recMedId String
-  riskFactorDataId String
-  recMed RecMed @relation(fields: [recMedId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  riskFactorData RiskFactorData @relation(fields: [riskFactorDataId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  comments RiskFactorDataRecComments[]
-  created_at DateTime @default(now())
-  updated_at  DateTime   @updatedAt
-  companyId String
-  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-
-  @@unique([riskFactorDataId, recMedId, companyId])
-}
-
-model RiskFactorDataRecComments {
-  id    String   @id  @default(uuid())
-  text    String
-  type    RiskRecTypeEnum
-  textType    RiskRecTextTypeEnum
-  riskFactorDataRecId String
-  riskFactorDataRec RiskFactorDataRec @relation(fields: [riskFactorDataRecId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  created_at DateTime @default(now())
-  updated_at  DateTime   @updatedAt
-}
-
-model User {
-  id    Int     @default(autoincrement()) @id
-  email String  @unique
-  name String?
-  phone String?
-  cpf String?
-  googleExternalId String? 
-  facebookExternalId String? 
-  password String
-  created_at DateTime @default(now())
-  updated_at  DateTime   @updatedAt
-  deleted_at DateTime? 
-  usersPgrSignatures RiskFactorGroupDataToUser[]
-  refresh_token RefreshToken[]
-  companies UserCompany[]
-  examDone EmployeeExamsHistory[] @relation(name: "user_done")
-  examSchedules EmployeeExamsHistory[] @relation(name: "user_schedule")
-  professional Professional? 
-  notification Notification[] 
-  notificationConfirm Notification[] @relation(name: "user_notification_confirm")
-  esocialTransmission EmployeeESocialBatch[] 
-
-  @@unique([id, name])
-  @@index(email)
-}
-
-model UserCompany {
-  roles String[]
-  permissions String[]
-  groupId Int?
-  group AccessGroups? @relation(fields: [groupId], references: [id], onDelete: SetNull, onUpdate: Cascade) 
-  status StatusEnum @default(ACTIVE)
-  userId Int
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
-  companyId String
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
-  created_at DateTime @default(now())
-  updated_at  DateTime   @updatedAt
-  
-  @@id([companyId, userId])
-  @@index(companyId)
-}
-
-model Uf {
-  code    String  @id
-  uf    String   @unique
-  name    String  
-
-  cat Cat[] 
-  cities Cities[] 
-}
-
-
-model Workspace {
-  id    String  @id   @default(uuid()) 
-  name String  
-  abbreviation String?
-  description String?  
-  cnpj String?  
-  companyJson Json?  
-  created_at DateTime @default(now())
-  isOwner Boolean @default(true)
-  updated_at  DateTime   @updatedAt
-  companyId String
-  status StatusEnum @default(ACTIVE)
-  company Company @relation(fields: [companyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  address Address?
-  riskFactorDocument RiskFactorDocument[]
-  hierarchyOnHomogeneous HierarchyOnHomogeneous[]
-  hierarchy Hierarchy[]
-  companyEnvironment CompanyEnvironment[]
-  characterization CompanyCharacterization[]
-  documents Document[]
-
-  @@unique([abbreviation, companyId])
-  @@unique([id, companyId])
-  @@index(companyId)
-}
-
-

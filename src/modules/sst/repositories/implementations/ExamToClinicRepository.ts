@@ -119,7 +119,7 @@ export class ExamToClinicRepository {
     ]);
 
     return {
-      data: response[1].map((exam) => new ExamToClinicEntity(exam)),
+      data: response[1].map((exam) => new ExamToClinicEntity(exam as any)),
       count: response[0],
     };
   }

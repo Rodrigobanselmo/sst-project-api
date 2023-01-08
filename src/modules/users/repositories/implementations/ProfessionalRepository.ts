@@ -126,7 +126,7 @@ export class ProfessionalRepository {
     return new ProfessionalEntity({
       ...professional,
       user: new UserEntity(professional.user),
-    });
+    } as any);
   }
 
   async findByCompanyId(query: Partial<FindProfessionalsDto>, pagination: PaginationQueryDto, options: Prisma.ProfessionalFindManyArgs = {}) {

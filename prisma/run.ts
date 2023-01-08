@@ -21,11 +21,21 @@ import { deleteRecMed } from './run/delete-rec-med';
 import { cboTable } from './seed/cboTable';
 import { deleteReapeatHH } from './run/delete-hh-repeat';
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  log: ['query'],
+});
 
 async function main() {
   try {
-    console.info('start');
+    const test = await prisma.user.findMany({
+      where: { name: { mode: 'insensitive', contains: 'araujo' } },
+      // where: { name: { search: 'araújo' } },
+      // where: {
+      //   // name: { mode: 'insensitive', contains: 'araújo' }
+      // },
+    });
+    console.log(test.map((m) => [m.name, m.id]));
+
     // const group = await prisma.employeeESocialEvent.groupBy({
     //   by: ['status'],
     //   _count: true,

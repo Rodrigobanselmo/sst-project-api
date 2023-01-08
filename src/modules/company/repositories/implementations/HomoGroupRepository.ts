@@ -265,7 +265,7 @@ export class HomoGroupRepository {
       ...options,
     });
 
-    return new HomoGroupEntity(homo);
+    return new HomoGroupEntity(homo as any);
   }
 
   async findHomoGroupByCompanyAndName(name: string, companyId: string) {
@@ -293,7 +293,7 @@ export class HomoGroupRepository {
 
     const homogeneousGroup = await Promise.all(
       hierarchies.map(async (homoGroup) => {
-        return await this.getHomoGroupData(homoGroup);
+        return await this.getHomoGroupData(homoGroup as any);
       }),
     );
 

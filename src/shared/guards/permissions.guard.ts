@@ -36,8 +36,8 @@ const isParentCompany = async (prisma: PrismaService, requestCompanyId: string, 
     },
   });
 
-  if (!parentRelation) throw new ForbiddenException('Acesso negado');
-  if (parentRelation.status !== 'ACTIVE') throw new ForbiddenException('Acesso negado');
+  if (!parentRelation) throw new ForbiddenException('Sem permissões para acesso');
+  if (parentRelation.status !== 'ACTIVE') throw new ForbiddenException('Sem permissões para acesso');
 
   return true;
 };
@@ -89,16 +89,12 @@ export class PermissionsGuard implements CanActivate {
         if (affectedCompanyId === false) return false;
 
         //! add
-        // const isPermissionPresent = checkPermissions(
-        //   user,
-        //   PermissionOption,
-        //   CRUD,
-        // );
+        const isPermissionPresent = checkPermissions(user, PermissionOption, CRUD);
+        if (!isPermissionPresent) return false;
         //! add
-        // if (!isPermissionPresent) return false;
 
         //! remove
-        const isPermissionPresent = true;
+        // const isPermissionPresent = true;
 
         if (!isMember && !isContract && isPermissionPresent) return true;
 
@@ -119,9 +115,9 @@ export class PermissionsGuard implements CanActivate {
         return false;
       });
 
-      if (!isValidPermission) throw new ForbiddenException('Acesso negado');
+      if (!isValidPermission) throw new ForbiddenException('Sem permissões para acesso');
       return true;
     }
-    throw new ForbiddenException('Acesso negado');
+    throw new ForbiddenException('Sem permissões para acesso');
   }
 }

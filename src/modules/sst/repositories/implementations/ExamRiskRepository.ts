@@ -65,7 +65,7 @@ export class ExamRiskRepository {
     ]);
 
     return {
-      data: response[1].map((exam) => new ExamRiskEntity(exam)),
+      data: response[1].map((exam) => new ExamRiskEntity(exam as any)),
       count: response[0],
     };
   }

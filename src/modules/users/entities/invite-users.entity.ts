@@ -31,10 +31,11 @@ export class InviteUsersEntity implements InviteUsers {
   @ApiProperty()
   logo?: string;
 
-  constructor(partial: Partial<InviteUsersEntity>) {
-    Object.assign(this, partial);
-  }
   companiesIds: string[];
   groupId: number;
   professional: ProfessionalEntity;
+
+  constructor(partial: Partial<InviteUsersEntity>) {
+    Object.assign(this, partial);
+  }
 }
