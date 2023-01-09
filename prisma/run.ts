@@ -20,22 +20,14 @@ import { cid10Table } from './seed/cid10Table';
 import { deleteRecMed } from './run/delete-rec-med';
 import { cboTable } from './seed/cboTable';
 import { deleteReapeatHH } from './run/delete-hh-repeat';
+import { normCityAddress } from './run/nomalize-city-address';
 
 const prisma = new PrismaClient({
-  log: ['query'],
+  // log: ['query'],
 });
 
 async function main() {
   try {
-    const test = await prisma.user.findMany({
-      where: { name: { mode: 'insensitive', contains: 'araujo' } },
-      // where: { name: { search: 'araújo' } },
-      // where: {
-      //   // name: { mode: 'insensitive', contains: 'araújo' }
-      // },
-    });
-    console.log(test.map((m) => [m.name, m.id]));
-
     // const group = await prisma.employeeESocialEvent.groupBy({
     //   by: ['status'],
     //   _count: true,
@@ -60,6 +52,8 @@ async function main() {
     // await deleteReapeatHH(prisma);
     // await cboTable(prisma);
     //*next
+
+    await normCityAddress(prisma);
 
     console.info('end');
   } catch (err) {

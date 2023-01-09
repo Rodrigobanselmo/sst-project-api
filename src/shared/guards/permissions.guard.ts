@@ -36,8 +36,8 @@ const isParentCompany = async (prisma: PrismaService, requestCompanyId: string, 
     },
   });
 
-  if (!parentRelation) throw new ForbiddenException('Sem permissões para acesso');
-  if (parentRelation.status !== 'ACTIVE') throw new ForbiddenException('Sem permissões para acesso');
+  if (!parentRelation) throw new ForbiddenException('Sem permissões para acesso (1)');
+  if (parentRelation.status !== 'ACTIVE') throw new ForbiddenException('Sem permissões para acesso (2)');
 
   return true;
 };
@@ -115,9 +115,9 @@ export class PermissionsGuard implements CanActivate {
         return false;
       });
 
-      if (!isValidPermission) throw new ForbiddenException('Sem permissões para acesso');
+      if (!isValidPermission) throw new ForbiddenException('Sem permissões para acesso (3)');
       return true;
     }
-    throw new ForbiddenException('Sem permissões para acesso');
+    throw new ForbiddenException('Sem permissões para acesso (4)');
   }
 }

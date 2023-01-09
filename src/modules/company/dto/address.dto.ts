@@ -7,6 +7,7 @@ import { CepFormatTransform } from '../../../shared/transformers/cep-format.tran
 import { NumberFormat } from '../../../shared/transformers/number-format';
 import { StringCapitalizeTransform } from '../../../shared/transformers/string-capitalize';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
+import { StringNormalizeTransform } from '../../../shared/transformers/string-normalize.transform';
 
 export class AddressDto {
   // @Matches(/[1-9][0-9]*/, {
@@ -36,8 +37,9 @@ export class AddressDto {
   @IsString()
   neighborhood: string;
 
-  @Transform(StringCapitalizeTransform, { toClassOnly: true })
   @IsOptional()
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @Transform(StringNormalizeTransform, { toClassOnly: true })
   @IsString()
   city: string;
 

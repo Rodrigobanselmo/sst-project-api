@@ -536,6 +536,8 @@ export class CompanyRepository implements ICompanyRepository {
           { name: { contains: query.search, mode: 'insensitive' } },
           { fantasy: { contains: query.search, mode: 'insensitive' } },
           { initials: { contains: query.search, mode: 'insensitive' } },
+
+          ...(query.isClinic ? [{ address: { city: { contains: query.search, mode: 'insensitive' } } }] : []),
           ...(cnpj ? [{ cnpj: { contains: onlyNumbers(query.search) } }] : []),
         ],
       } as typeof options.where);

@@ -96,7 +96,7 @@ export const findAllEmployees = async (
           actual.push(currCopy);
         });
       } else {
-        actual.push(curr);
+        actual.push({ ...curr, ghoName: '', ghoDescription: '' } as any);
       }
 
       return actual;

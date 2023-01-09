@@ -121,6 +121,8 @@ export class InviteUsersRepository implements IInviteUsersRepository {
   }
 
   async deleteByCompanyIdAndEmail(companyId: string, email: string): Promise<Prisma.BatchPayload> {
+    if (!email || !companyId) return;
+
     const invite = await this.prisma.inviteUsers.deleteMany({
       where: { email, companyId },
     });
