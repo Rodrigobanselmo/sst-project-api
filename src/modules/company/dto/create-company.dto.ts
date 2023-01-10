@@ -210,6 +210,10 @@ export class FindCompaniesDto extends PaginationQueryDto {
 
   @IsInt()
   @IsOptional()
+  scheduleBlockId?: number;
+
+  @IsInt()
+  @IsOptional()
   groupId?: number;
 
   @IsBoolean()

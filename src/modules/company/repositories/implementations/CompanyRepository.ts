@@ -525,6 +525,7 @@ export class CompanyRepository implements ICompanyRepository {
         'isDismissal',
         'findAll',
         'selectReport',
+        'scheduleBlockId',
       ],
     });
 
@@ -546,6 +547,12 @@ export class CompanyRepository implements ICompanyRepository {
     if ('userId' in query) {
       (where.AND as any).push({
         users: { some: { userId: query.userId } },
+      } as typeof options.where);
+    }
+
+    if ('scheduleBlockId' in query) {
+      (where.AND as any).push({
+        scheduleBlocks: { some: { id: query.scheduleBlockId } },
       } as typeof options.where);
     }
 

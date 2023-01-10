@@ -2,7 +2,7 @@ import { AccessGroupsEntity } from './../../auth/entities/access-groups.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 import { UserCompany } from '.prisma/client';
-import { StatusEnum } from '@prisma/client';
+import { AccessGroups, StatusEnum } from '@prisma/client';
 
 export class UserCompanyEntity implements UserCompany {
   @ApiProperty({ description: 'The id of the User' })
@@ -36,5 +36,10 @@ export class UserCompanyEntity implements UserCompany {
 
   constructor(partial: Partial<Omit<UserCompanyEntity, 'group'>> & { group?: any }) {
     Object.assign(this, partial);
+
+    if (this.group) {
+      if (this.group?.permissions) this.permissions = this.group.permissions;
+      if (this.group?.roles) this.roles = this.group.roles;
+    }
   }
 }

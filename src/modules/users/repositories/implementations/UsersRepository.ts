@@ -9,6 +9,7 @@ import { UpdateUserDto } from '../../dto/update-user.dto';
 import { UserCompanyDto } from '../../dto/user-company.dto';
 import { UserEntity } from '../../entities/user.entity';
 import { IUsersRepository } from '../IUsersRepository.types';
+import { UserCompanyEntity } from '../../entities/userCompany.entity';
 
 @Injectable()
 export class UsersRepository implements IUsersRepository {
@@ -218,13 +219,14 @@ export class UsersRepository implements IUsersRepository {
     const user = await this.prisma.user.findUnique({
       where: { email },
       include: {
-        companies: true,
+        companies: { include: { group: { select: { permissions: true, roles: true } } } },
         professional: { include: { councils: true } },
       },
     });
     if (!user) return;
     return new UserEntity({
       ...user,
+      companies: user.companies.map((c) => new UserCompanyEntity(c)),
       professional: new ProfessionalEntity(user?.professional),
     });
   }

@@ -337,6 +337,8 @@ model Company {
   notification                    Notification[]                   @relation("CompanyToNotification")
   primary_activity                Activity[]                       @relation("primary_activity")
   secondary_activity              Activity[]                       @relation("secondary_activity")
+  createdScheduleBlocks           ScheduleBlock[]                     
+  scheduleBlocks                  ScheduleBlock[]                  @relation(name: "schedule_block_m2m_companies")
 
   @@index([name])
   @@index([isClinic])
@@ -1509,6 +1511,36 @@ model RiskFactorDataRecComments {
   riskFactorDataRec   RiskFactorDataRec   @relation(fields: [riskFactorDataRecId], references: [id])
 }
 
+model ScheduleBlock {
+  id               Int                    @id @default(autoincrement())
+  name             String
+  description      String?
+  status           StatusEnum             @default(ACTIVE)
+  type             ScheduleBlockTypeEnum?
+  
+  yearRecurrence   Boolean                @default(false)
+  startDate        String?
+  endDate          String?
+
+  startTime        String?
+  endTime          String?
+  updated_at       DateTime               @updatedAt
+  created_at       DateTime               @default(now())
+  deleted_at       DateTime?
+  allCompanies      Boolean                @default(false)
+
+  companyId        String
+  company          Company                @relation(fields: [companyId], references: [id])
+  applyOnCompanies  Company[]              @relation(name: "schedule_block_m2m_companies")
+
+  @@unique([id, companyId])
+  @@index([companyId])
+  @@index(status)
+  @@index(startDate)
+  @@index(endDate)
+  @@index(name)
+}
+
 model User {
   id                  Int                         @id @default(autoincrement())
   email               String                      @unique
@@ -1724,6 +1756,14 @@ enum MeasuresTypeEnum {
   ADM
   ENG
 }
+
+enum ScheduleBlockTypeEnum {
+  NAT_HOLIDAY
+  MUN_HOLIDAY
+  ST_HOLIDAY
+  OTHER
+}
+
 
 enum SexTypeEnum {
   M

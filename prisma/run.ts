@@ -21,6 +21,7 @@ import { deleteRecMed } from './run/delete-rec-med';
 import { cboTable } from './seed/cboTable';
 import { deleteReapeatHH } from './run/delete-hh-repeat';
 import { normCityAddress } from './run/nomalize-city-address';
+import { scheduleBlockNational } from './seed/scheduleBlockNational';
 
 const prisma = new PrismaClient({
   // log: ['query'],
@@ -51,9 +52,10 @@ async function main() {
     // await deleteRecMed(prisma);
     // await deleteReapeatHH(prisma);
     // await cboTable(prisma);
+    // await normCityAddress(prisma);
     //*next
 
-    await normCityAddress(prisma);
+    await scheduleBlockNational(prisma);
 
     console.info('end');
   } catch (err) {

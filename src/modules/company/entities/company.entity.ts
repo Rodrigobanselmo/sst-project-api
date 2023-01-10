@@ -27,6 +27,7 @@ import { CompanyOSEntity } from './os.entity';
 import { CompanyReportEntity } from './report.entity';
 import { WorkspaceEntity } from './workspace.entity';
 import { Company, CompanyPaymentTypeEnum, CompanyTypesEnum } from '.prisma/client';
+import { ScheduleBlockEntity } from './schedule-block.entity';
 
 export class CompanyEntity implements Company {
   @ApiProperty({ description: 'The id of the Company' })
@@ -155,6 +156,8 @@ export class CompanyEntity implements Company {
   professionalsResponsibles?: Partial<ProfessionalResponsibleEntity>[];
   ambResponsible?: Partial<ProfessionalEntity & ProfessionalCouncil>;
 
+  scheduleBlocks?: ScheduleBlockEntity[];
+
   constructor(partial: Partial<CompanyEntity>) {
     Object.assign(this, partial);
 
@@ -170,6 +173,10 @@ export class CompanyEntity implements Company {
 
     if (this.riskFactors) {
       this.riskFactors = this.riskFactors.map((risk) => new RiskFactorsEntity(risk));
+    }
+
+    if (this.scheduleBlocks) {
+      this.scheduleBlocks = this.scheduleBlocks.map((s) => new ScheduleBlockEntity(s));
     }
 
     if (this.employees) {

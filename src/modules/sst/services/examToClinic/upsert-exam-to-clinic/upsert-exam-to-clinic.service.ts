@@ -38,6 +38,11 @@ export class UpsertExamToClinicService {
       if (foundEqual.length > 0) throw new BadRequestException(ErrorMessageEnum.CLINIC_EXAM_ALREADY_EXIST);
     }
 
+    // console.log('clinicExamActual', clinicExamActual.startDate);
+    // console.log('createExamDto', createExamDto.startDate);
+    // console.log('this.dayjs.dateNow()', this.dayjs.dateNow());
+    // console.log('createExamDto.startDate >= this.dayjs.dateNow(', createExamDto.startDate >= this.dayjs.dateNow());
+
     // if company already have an exam in the same date or future date, update it
     if (clinicExamActual && clinicExamActual.startDate >= this.dayjs.dateNow() && createExamDto.startDate >= this.dayjs.dateNow()) {
       const newExam = await this.examToClinicRepository.update({
@@ -57,6 +62,8 @@ export class UpsertExamToClinicService {
 
       return newExam;
     }
+
+    // return;
 
     // if exam is before last startDate, will create and end the created exam
     const newExam = await this.examToClinicRepository.upsert({

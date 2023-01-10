@@ -30,6 +30,9 @@ export enum ErrorMessageEnum {
   EMPLOYEE_HISTORY_FILE_NOT_UPLOADED = 'não foi possivel fazer upload do arquivo',
   //* PROTOCOL
   PROTOCOL_NOT_FOUND = 'Protocolo não encontrado ou sem premissões de acesso',
+  //* SCHEDULE BLOCK
+  SCHEDULE_BLOCK_NOT_FOUND = 'Bloqueio não encontrado para esta empresa ou sem premissões de acesso',
+  SCHEDULE_BLOCK_ACCESS = 'Sem premissões de acesso',
 }
 
 export enum ErrorCompanyEnum {

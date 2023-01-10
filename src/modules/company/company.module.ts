@@ -143,6 +143,13 @@ import { CompanyOSController } from './controller/os/os.controller';
 import { DeleteCompanyOSService } from './services/os/delete-os/delete-os.service';
 import { CopyCompanyOSService } from './services/os/copy-os/copy-os.service';
 import { FindClinicScheduleTimeService } from './services/employee/0-history/exams/find-clinic-time/find-clinic-time.service';
+import { ScheduleBlockRepository } from './repositories/implementations/ScheduleBlockRepository';
+import { UpdateScheduleBlocksService } from './services/scheduleBlock/update-schedule-block/update-schedule-block.service';
+import { FindScheduleBlocksService } from './services/scheduleBlock/find-schedule-block/find-schedule-block.service';
+import { DeleteScheduleBlocksService } from './services/scheduleBlock/delete-schedule-block/delete-schedule-block.service';
+import { CreateScheduleBlocksService } from './services/scheduleBlock/create-schedule-block/create-schedule-block.service';
+import { FindOneScheduleBlocksService } from './services/scheduleBlock/find-one-schedule-block/find-one-schedule-block.service';
+import { ScheduleBlockController } from './controller/scheduleBlock/scheduleBlock.controller';
 
 @Module({
   imports: [
@@ -168,6 +175,7 @@ import { FindClinicScheduleTimeService } from './services/employee/0-history/exa
     CatController,
     AbsenteeismController,
     CompanyOSController,
+    ScheduleBlockController,
   ],
   providers: [
     CreateCompanyService,
@@ -287,8 +295,8 @@ import { FindClinicScheduleTimeService } from './services/employee/0-history/exa
     DeleteCatsService,
     CreateCatsService,
     CatRepository,
-    FindOneAbsenteeismsService,
     FindOneCatsService,
+    FindOneAbsenteeismsService,
     DeleteHierarchyHomoGroupService,
     CompanyOSRepository,
     FindOneCompanyOSService,
@@ -296,6 +304,12 @@ import { FindClinicScheduleTimeService } from './services/employee/0-history/exa
     UpsertCompanyOSService,
     CopyCompanyOSService,
     FindClinicScheduleTimeService,
+    ScheduleBlockRepository,
+    UpdateScheduleBlocksService,
+    FindScheduleBlocksService,
+    DeleteScheduleBlocksService,
+    CreateScheduleBlocksService,
+    FindOneScheduleBlocksService,
   ],
   exports: [
     CompanyRepository,
@@ -313,6 +327,7 @@ import { FindClinicScheduleTimeService } from './services/employee/0-history/exa
     EmployeePPPHistoryRepository,
     CatRepository,
     DeleteHomoGroupService,
+    ScheduleBlockRepository,
   ],
 })
 export class CompanyModule {}

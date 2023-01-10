@@ -1,11 +1,17 @@
+import { ScheduleBlockRepository } from './../../../repositories/implementations/ScheduleBlockRepository';
 import { Injectable } from '@nestjs/common';
 
 import { CompanyRepository } from '../../../repositories/implementations/CompanyRepository';
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
+import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 
 @Injectable()
 export class FindClinicService {
-  constructor(private readonly companyRepository: CompanyRepository) {}
+  constructor(
+    private readonly scheduleBlocksRepository: ScheduleBlockRepository,
+    private readonly companyRepository: CompanyRepository,
+    private readonly dayjsProvider: DayJSProvider,
+  ) {}
 
   async execute(clinicId: string, user: UserPayloadDto) {
     const company = await this.companyRepository.findFirstNude({
@@ -19,6 +25,22 @@ export class FindClinicService {
         fantasy: true,
         name: true,
         initials: true,
+        scheduleBlocks: {
+          select: { startDate: true, endDate: true, endTime: true, startTime: true, yearRecurrence: true },
+          where: {
+            status: 'ACTIVE',
+            OR: [
+              {
+                yearRecurrence: false,
+                endDate: { gte: this.dayjsProvider.format(new Date(), 'YYYY-MM-DD') },
+              },
+              {
+                yearRecurrence: true,
+                endDate: { gte: this.dayjsProvider.format(new Date(), 'MM-DD') },
+              },
+            ],
+          },
+        },
         clinicExams: {
           where: {
             startDate: { lte: new Date() },
@@ -46,6 +68,24 @@ export class FindClinicService {
         // clinicExams: { where: { examId: { in: [] } } },
       },
     });
+
+    const schedules = await this.scheduleBlocksRepository.findNude({
+      where: {
+        allCompanies: true,
+        status: 'ACTIVE',
+        OR: [
+          {
+            yearRecurrence: false,
+            endDate: { gte: this.dayjsProvider.format(new Date(), 'YYYY-MM-DD') },
+          },
+          {
+            yearRecurrence: true,
+            endDate: { gte: this.dayjsProvider.format(new Date(), 'MM-DD') },
+          },
+        ],
+      },
+    });
+    company.scheduleBlocks.push(...schedules);
 
     return company;
   }
