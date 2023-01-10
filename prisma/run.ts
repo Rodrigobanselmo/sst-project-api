@@ -22,6 +22,7 @@ import { cboTable } from './seed/cboTable';
 import { deleteReapeatHH } from './run/delete-hh-repeat';
 import { normCityAddress } from './run/nomalize-city-address';
 import { scheduleBlockNational } from './seed/scheduleBlockNational';
+import { fixDate } from './run/fix-date';
 
 const prisma = new PrismaClient({
   // log: ['query'],
@@ -55,7 +56,8 @@ async function main() {
     // await normCityAddress(prisma);
     //*next
 
-    await scheduleBlockNational(prisma);
+    // await scheduleBlockNational(prisma);
+    await fixDate(prisma);
 
     console.info('end');
   } catch (err) {
