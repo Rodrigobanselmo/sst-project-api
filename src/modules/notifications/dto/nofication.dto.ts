@@ -4,6 +4,7 @@ import { Prisma } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import { IsBoolean, IsDefined, IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
 import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
+import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 import { KeysOfEnum } from './../../../shared/utils/keysOfEnum.utils';
 
 import { QueryArray } from './../../../shared/transformers/query-array';
@@ -38,12 +39,15 @@ export class CreateNotificationDto {
   usersIds?: number[];
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isClinic?: boolean;
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isConsulting?: boolean;
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isCompany?: boolean;
 
@@ -90,16 +94,20 @@ export class FindNotificationDto extends PaginationQueryDto {
   usersIds?: number[];
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isClinic?: boolean;
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isConsulting?: boolean;
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isCompany?: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isUnread?: boolean;
 }

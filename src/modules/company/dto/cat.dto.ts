@@ -2,6 +2,7 @@ import { PartialType } from '@nestjs/swagger';
 import { StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import { IsBoolean, IsDate, IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
+import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
 import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
 import { DateFormat } from '../../../shared/transformers/date-format';
@@ -151,23 +152,28 @@ export class CreateCatDto {
   observacao?: string;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isIndCatObito?: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isIndComunPolicia?: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   houveAfast?: boolean;
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   isIndInternacao: boolean;
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   isIndAfast: boolean;
 
   @IsString()
@@ -198,10 +204,12 @@ export class FindCatDto extends PaginationQueryDto {
   companyId?: string;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   onlyCompany?: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   withReceipt?: boolean;
 

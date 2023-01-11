@@ -539,7 +539,7 @@ export class CompanyRepository implements ICompanyRepository {
           { initials: { contains: query.search, mode: 'insensitive' } },
 
           ...(query.isClinic ? [{ address: { city: { contains: query.search, mode: 'insensitive' } } }] : []),
-          ...(cnpj ? [{ cnpj: { contains: onlyNumbers(query.search) } }] : []),
+          ...(cnpj && cnpj.length == query.search.length ? [{ cnpj: { contains: onlyNumbers(query.search) } }] : []),
         ],
       } as typeof options.where);
     }
@@ -650,17 +650,15 @@ export class CompanyRepository implements ICompanyRepository {
     });
 
     if ('search' in query) {
+      const cnpj = onlyNumbers(query.search);
       (where.AND as any).push({
         OR: [
           { group: { name: { contains: query.search, mode: 'insensitive' } } },
           { name: { contains: query.search, mode: 'insensitive' } },
           { initials: { contains: query.search, mode: 'insensitive' } },
           { unit: { contains: query.search, mode: 'insensitive' } },
-          {
-            cnpj: {
-              contains: query.search ? onlyNumbers(query.search) || 'no' : '',
-            },
-          },
+          ...(query.isClinic ? [{ address: { city: { contains: query.search, mode: 'insensitive' } } }] : []),
+          ...(cnpj && cnpj.length == query.search.length ? [{ cnpj: { contains: onlyNumbers(query.search) } }] : []),
         ],
       } as typeof options.where);
     }

@@ -28,9 +28,12 @@ import { FilesCnaeController } from './controller/cnae/files-cnae.controller';
 import { UploadCidDataService } from './services/cid/upload-cid/upload-cid.service';
 import { DownloadCidService } from './services/cid/download-cid/download-cid.service';
 import { FilesCidController } from './controller/cid/files-cid.controller';
+import { ReportClinicFactory } from './factories/report/products/ReportClinicFactory';
+import { ClinicReportService } from './services/reports/clinic-report/clinic-report.service';
+import { ReportsController } from './controller/reports/reports.controller';
 
 @Module({
-  controllers: [FilesChecklistController, FilesCompanyController, FilesCnaeController, FilesController, FilesCidController],
+  controllers: [FilesChecklistController, ReportsController, FilesCompanyController, FilesCnaeController, FilesController, FilesCidController],
   imports: [SSTModule, CompanyModule],
   providers: [
     DownloadExcelProvider,
@@ -55,6 +58,8 @@ import { FilesCidController } from './controller/cid/files-cid.controller';
     UploadCnaeDataService,
     DownloadCidService,
     UploadCidDataService,
+    ReportClinicFactory,
+    ClinicReportService,
   ],
 })
 export class FilesModule {}

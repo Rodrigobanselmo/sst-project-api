@@ -1,4 +1,5 @@
 import { IsBoolean, IsInt, IsOptional, IsString, ValidateIf } from 'class-validator';
+import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
 export class ExamsRiskDataDto {
   @IsInt()
@@ -10,30 +11,37 @@ export class ExamsRiskDataDto {
   riskFactorDataId?: string;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isMale?: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isFemale: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isPeriodic: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isChange: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isAdmission: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isReturn: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isDismissal: boolean;
 

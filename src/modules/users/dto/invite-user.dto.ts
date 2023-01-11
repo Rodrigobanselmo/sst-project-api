@@ -3,6 +3,8 @@ import { RoleEnum } from '../../../shared/constants/enum/authorization';
 import { QueryArray } from './../../../shared/transformers/query-array';
 import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
 import { Transform } from 'class-transformer';
+import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
+
 export class InviteUserDto {
   @ValidateIf((o) => o.email)
   @IsOptional()
@@ -41,5 +43,6 @@ export class FindInvitesDto extends PaginationQueryDto {
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   showProfessionals?: boolean;
 }

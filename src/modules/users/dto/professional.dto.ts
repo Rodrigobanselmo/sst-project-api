@@ -9,6 +9,7 @@ import { QueryArray } from './../../../shared/transformers/query-array';
 import { StringCapitalizeTransform } from './../../../shared/transformers/string-capitalize';
 import { StringUppercaseTransform } from './../../../shared/transformers/string-uppercase.transform';
 import { CouncilDto } from './council.dto';
+import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
 export class CreateProfessionalDto {
   @Transform(StringCapitalizeTransform, { toClassOnly: true })
@@ -72,6 +73,7 @@ export class CreateProfessionalDto {
   userId?: number;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   sendEmail?: boolean;
 
@@ -144,6 +146,7 @@ export class FindProfessionalsDto extends PaginationQueryDto {
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   byCouncil?: boolean;
 
   @IsOptional()

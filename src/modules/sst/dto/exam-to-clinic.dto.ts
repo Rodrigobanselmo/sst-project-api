@@ -2,6 +2,7 @@ import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
 import { ClinicScheduleTypeEnum, Prisma, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import { IsBoolean, IsDate, IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
+import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
 import { DateFormat } from '../../../shared/transformers/date-format';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
@@ -26,6 +27,7 @@ export class UpsertExamToClinicDto {
   dueInDays?: number;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isScheduled?: boolean;
 
@@ -45,22 +47,27 @@ export class UpsertExamToClinicDto {
   examMinDuration?: number;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isPeriodic?: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isChange?: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isAdmission?: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isReturn?: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isDismissal?: boolean;
 
@@ -105,6 +112,7 @@ export class CopyExamsToClinicDto {
   companyId: string;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   overwrite?: boolean;
 }

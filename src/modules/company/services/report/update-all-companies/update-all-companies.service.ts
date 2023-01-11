@@ -310,8 +310,6 @@ export class UpdateAllCompaniesService {
         },
       );
 
-      console.log('test', exams);
-
       const getExpired = allWithMissingExam.map((employee) => {
         const ids = [...employee.subOffices.map(({ id }) => id), employee.hierarchyId];
 

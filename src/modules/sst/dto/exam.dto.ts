@@ -4,6 +4,7 @@ import { PartialType } from '@nestjs/swagger';
 import { ExamTypeEnum, StatusEnum, HomogeneousGroup } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import { IsBoolean, IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
+import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
 import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
@@ -35,6 +36,7 @@ export class CreateExamDto {
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   isAttendance?: boolean;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
@@ -110,34 +112,43 @@ export class FindExamHierarchyDto {
   employeeId?: number;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isPendingExams?: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   onlyAttendance?: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   skipNewExams?: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isOffice?: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isPeriodic?: boolean;
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isChange?: boolean;
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isAdmission?: boolean;
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isReturn?: boolean;
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isDismissal?: boolean;
 }

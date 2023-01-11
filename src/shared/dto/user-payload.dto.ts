@@ -1,4 +1,5 @@
 import { IsBoolean, IsEmail, IsInt, IsNumber, IsOptional, IsString } from 'class-validator';
+import { ToBoolean } from './../../shared/decorators/boolean.decorator';
 
 export class UserCompanyDto {
   @IsNumber()
@@ -20,9 +21,11 @@ export class UserPayloadDto extends UserCompanyDto {
   readonly email: string;
 
   @IsBoolean()
+  @ToBoolean()
   isMaster: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   isSystem: boolean;
 
   @IsOptional()

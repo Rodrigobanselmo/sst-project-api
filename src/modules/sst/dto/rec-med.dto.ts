@@ -4,6 +4,7 @@ import { PartialType } from '@nestjs/swagger';
 import { MeasuresTypeEnum, RecTypeEnum, RiskFactorsEnum, StatusEnum } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import { IsBoolean, IsEnum, IsOptional, IsString } from 'class-validator';
+import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
 import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
@@ -168,10 +169,12 @@ export class FindRecMedDto extends PaginationQueryDto {
   riskType?: RiskFactorsEnum;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   onlyRec?: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   onlyMed?: boolean;
 

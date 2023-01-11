@@ -20,4 +20,16 @@ interface IExcelProvider {
   read(buffer: Buffer): Promise<IExcelReadData[]>;
 }
 
+export interface IReportExcellCell {
+  fill?: string;
+  color?: string;
+  mergeRight?: number | 'all';
+  width?: number;
+  content: string | number | Date;
+}
+
+export type IReportRow = IReportExcellCell[];
+export type IReportTable = IReportRow[];
+export type IReportSheet = { rows: IReportTable; name: string }[];
+
 export { IExcelProvider };

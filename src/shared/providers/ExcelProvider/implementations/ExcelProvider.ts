@@ -7,7 +7,7 @@ import { sheetStylesConstant } from '../../../../shared/constants/workbooks/styl
 import { IWorkbookExcel } from '../../../../shared/interfaces/worksheet.types';
 import { getObjectValueFromString, transformStringToObject } from '../../../../shared/utils/transformStringToObject';
 
-import { IExcelProvider, IExcelReadData, ITableSchema } from '../models/IExcelProvider.types';
+import { IExcelProvider, IExcelReadData, IReportRow, IReportSheet, ITableSchema } from '../models/IExcelProvider.types';
 
 const addVersion = (worksheet: ExcelJS.Worksheet, version: number, lastUpdate: Date) => {
   worksheet.addRow(['Versão', version, new Date(lastUpdate)]);
@@ -335,6 +335,51 @@ class ExcelProvider implements IExcelProvider {
       rows: databaseRows,
       version: transformStep.version,
     };
+  }
+
+  async createReportTable(sheets: IReportSheet, filename: string) {
+    const workbook = new ExcelJS.Workbook();
+    const columnsWidth: Partial<ExcelJS.Column>[] = [];
+
+    await Promise.all(
+      sheets.map(async (sheet) => {
+        const worksheet = workbook.addWorksheet(sheet.name, {
+          properties: { defaultColWidth: 20 },
+        });
+
+        sheet.rows.forEach((row) => {
+          this.addRow(worksheet, row, columnsWidth);
+        });
+
+        worksheet.columns = columnsWidth.map((column) => column || { width: 20 });
+      }),
+    );
+
+    return {
+      workbook,
+      filename: `${filename}.xlsx`,
+    };
+  }
+
+  addRow(worksheet: ExcelJS.Worksheet, rowData: IReportRow, columnsWidth: Partial<ExcelJS.Column>[]) {
+    worksheet.addRow(rowData.map((r) => (typeof r.content === 'boolean' ? (r.content ? 'Sim' : 'Não') : r.content)));
+
+    const row = worksheet.lastRow;
+
+    row.alignment = { vertical: 'middle', horizontal: 'left' };
+
+    row.eachCell((cell, colNumber) => {
+      const cellStyles = rowData[colNumber - 1];
+      if (cellStyles.width) columnsWidth[colNumber] = { width: cellStyles.width };
+
+      if (cellStyles.fill) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: cellStyles.fill.replace('#', '') } };
+      if (cellStyles.color) cell.font = { color: { argb: cellStyles.color.replace('#', '') } };
+      if (cellStyles.mergeRight) {
+        const currentRowIdx = worksheet.rowCount;
+        const endColumnIdx = cellStyles.mergeRight == 'all' ? worksheet.columnCount : cellStyles.mergeRight;
+        worksheet.mergeCells(currentRowIdx, 1, currentRowIdx, endColumnIdx);
+      }
+    });
   }
 }
 

@@ -1,6 +1,7 @@
 import { StatusEnum } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import { IsBoolean, IsEnum, IsOptional, IsString } from 'class-validator';
+import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
@@ -48,9 +49,11 @@ export class UpsertDocumentDto {
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   isPGR: boolean;
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   isPCMSO: boolean;
 }
 

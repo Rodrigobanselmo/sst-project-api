@@ -43,6 +43,6 @@ export const scheduleBlockNational = async (prisma: PrismaClient) => {
       );
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };

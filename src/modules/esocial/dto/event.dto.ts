@@ -1,6 +1,7 @@
 import { RiskFactorsEnum } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import { IsBoolean, IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
+import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
 import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
 import { ProcEmiEnum, TpAmbEnum } from '../interfaces/event-batch';
@@ -41,6 +42,7 @@ export class FindEvents2220Dto extends PaginationQueryDto {
   companyId: string;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   all?: boolean;
 
@@ -70,6 +72,7 @@ export class FindEvents2210Dto extends PaginationQueryDto {
   companyId: string;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   all?: boolean;
 }

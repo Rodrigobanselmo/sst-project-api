@@ -6,6 +6,7 @@ import { PartialType } from '@nestjs/swagger';
 import { IsBoolean, IsDate, IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { DateUnitEnum, StatusEnum } from '@prisma/client';
+import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
 export class CreateAbsenteeismDto {
   // @Transform(DateFormat, { toClassOnly: true })
@@ -39,10 +40,12 @@ export class CreateAbsenteeismDto {
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   isJustified?: boolean;
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   isExtern?: boolean;
 
   @IsString()
@@ -55,6 +58,7 @@ export class CreateAbsenteeismDto {
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   sameAsBefore?: boolean;
 
   @IsInt()

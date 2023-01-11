@@ -4,6 +4,7 @@ import { Transform, Type } from 'class-transformer';
 import { IsBoolean, IsDate, IsEnum, IsOptional, IsString } from 'class-validator';
 import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
 import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
+import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
@@ -17,6 +18,7 @@ export class CreateEpiDto {
   equipment: string;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   national?: boolean;
 
@@ -46,6 +48,7 @@ export class CreateEpiDto {
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   isValid?: boolean;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })

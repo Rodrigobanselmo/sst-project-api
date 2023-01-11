@@ -5,6 +5,7 @@ import { PartialType } from '@nestjs/swagger';
 import { IsBoolean, IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { StatusEnum } from '@prisma/client';
+import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
 export class CreateContactDto {
   @IsString()
@@ -19,6 +20,7 @@ export class CreateContactDto {
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   isPrincipal: boolean;
 
   @IsString()
@@ -40,6 +42,7 @@ export class UpdateContactDto extends PartialType(CreateContactDto) {
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   isPrincipal: boolean;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })

@@ -6,6 +6,7 @@ import { StringCapitalizeParagraphTransform } from '../../../shared/transformers
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
 import { RiskCreateGenerateSourceDto, RiskUpdateGenerateSourceDto, UpsertGenerateSourceDto } from './generate-source.dto';
+import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
 import { RiskCreateRecMedDto, RiskUpdateRecMedDto, UpsertRecMedDto } from './rec-med.dto';
 
@@ -51,22 +52,27 @@ export class CreateRiskDto {
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   isAso?: boolean;
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   isPGR?: boolean;
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   isPCMSO?: boolean;
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   isPPP?: boolean;
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   isEmergency?: boolean;
 
   @IsString()
@@ -199,6 +205,7 @@ export class UpdateRiskDto {
   companyId: string;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isEmergency?: boolean;
 
@@ -294,18 +301,22 @@ export class UpdateRiskDto {
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   isAso?: boolean;
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   isPGR?: boolean;
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   isPCMSO?: boolean;
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   isPPP?: boolean;
 
   @IsString()
@@ -323,6 +334,7 @@ export class FindRiskDto extends PaginationQueryDto {
   companyId: string;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   representAll: boolean;
 }

@@ -1,6 +1,7 @@
 import { CompanyPaymentTypeEnum, CompanyTypesEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import { IsBoolean, IsDate, IsEnum, IsInt, IsOptional, IsString, Length, ValidateNested } from 'class-validator';
+import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
 import { CnpjFormatTransform } from '../../../shared/transformers/cnpj-format.transform';
 import { StringCapitalizeTransform } from '../../../shared/transformers/string-capitalize';
@@ -68,6 +69,7 @@ export class UpdateCompanyDto {
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   isConsulting?: boolean;
 
   @IsOptional()
@@ -143,6 +145,7 @@ export class UpdateCompanyDto {
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   blockResignationExam?: boolean;
 
   @IsOptional()
@@ -151,6 +154,7 @@ export class UpdateCompanyDto {
   esocialStart?: Date;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   esocialSend?: boolean;
 
@@ -192,6 +196,7 @@ export class UpdateCompanyDto {
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   isTaxNote?: boolean;
 
   @IsOptional()

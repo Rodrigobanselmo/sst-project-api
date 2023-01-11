@@ -12,3 +12,10 @@ export interface IWorkbookExcel {
   fileName: string;
   sheets: IWorksheetsExcel[];
 }
+
+export interface IWorkbookExcel {
+  version?: number;
+  lastUpdate?: Date;
+  fileName: string;
+  sheets: IWorksheetsExcel[];
+}

@@ -3,6 +3,7 @@ import { DateFormat } from '../../../shared/transformers/date-format';
 import { IsBoolean, IsDate, IsInt, IsOptional, IsString, ValidateIf } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { PartialType } from '@nestjs/swagger';
+import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
 export class CreateExamsRiskDto {
   @IsInt()
@@ -15,30 +16,37 @@ export class CreateExamsRiskDto {
   companyId: string;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isMale?: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isFemale: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isPeriodic: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isChange: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isAdmission: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isReturn: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isDismissal: boolean;
 
@@ -101,6 +109,7 @@ export class CopyExamsRiskDto {
   companyId: string;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   overwrite?: boolean;
 }

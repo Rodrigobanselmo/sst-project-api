@@ -8,6 +8,7 @@ import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
 import { EpiRoRiskDataDto } from './epi-risk-data.dto';
 import { EngsRiskDataDto } from './engs-risk-data.dto';
 import { ExamsRiskDataDto } from './exams-risk-data.dto';
+import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
 export class UpsertRiskDataDto {
   @IsString()
@@ -40,6 +41,7 @@ export class UpsertRiskDataDto {
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   standardExams?: boolean;
 
   @IsString()
@@ -139,6 +141,7 @@ export class UpsertManyRiskDataDto {
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   standardExams?: boolean;
 
   @IsString()

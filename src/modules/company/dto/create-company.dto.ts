@@ -13,6 +13,7 @@ import { AddressDto } from './address.dto';
 import { LicenseDto } from './license.dto';
 import { WorkspaceDto } from './workspace.dto';
 import { StringNormalizeTransform } from '../../../shared/transformers/string-normalize.transform';
+import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
 export class CreateCompanyDto {
   @Transform(CnpjFormatTransform, { toClassOnly: true })
@@ -46,9 +47,11 @@ export class CreateCompanyDto {
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   isConsulting: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isClinic?: boolean;
 
@@ -131,6 +134,7 @@ export class CreateCompanyDto {
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   blockResignationExam?: boolean;
 
   @IsOptional()
@@ -168,6 +172,7 @@ export class CreateCompanyDto {
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   isTaxNote?: boolean;
 
   @IsOptional()
@@ -190,6 +195,7 @@ export class CreateCompanyDto {
   tecResponsibleId?: number;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   esocialSend?: boolean;
 }
@@ -216,15 +222,18 @@ export class FindCompaniesDto extends PaginationQueryDto {
   @IsOptional()
   groupId?: number;
 
-  @IsBoolean()
   @IsOptional()
+  @IsBoolean()
+  @ToBoolean()
   isClinic?: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isGroup?: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   findAll?: boolean;
 
@@ -233,26 +242,33 @@ export class FindCompaniesDto extends PaginationQueryDto {
   clinicsCompanyId?: string;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isConsulting?: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isPeriodic?: boolean;
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isChange?: boolean;
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isAdmission?: boolean;
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isReturn?: boolean;
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isDismissal?: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   selectReport?: boolean;
 

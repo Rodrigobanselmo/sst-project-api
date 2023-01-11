@@ -5,6 +5,7 @@ import { StringUppercaseTransform } from './../../../shared/transformers/string-
 import { DateFormat } from './../../../shared/transformers/date-format';
 import { PartialType } from '@nestjs/swagger';
 import { IsBoolean, IsDate, IsDefined, IsEnum, IsInt, IsOptional, IsString, Length, MaxLength, ValidateIf, ValidateNested } from 'class-validator';
+import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
 import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
 import { Transform, Type } from 'class-transformer';
@@ -133,6 +134,7 @@ export class CreateEmployeeExamHistoryDto {
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   changeHierarchyAnyway?: boolean;
 
   @IsOptional()
@@ -214,6 +216,7 @@ export class UpdateManyScheduleExamDto {
   birthday: Date;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isClinic: boolean;
 
@@ -245,18 +248,22 @@ export class FindEmployeeExamHistoryDto extends PaginationQueryDto {
   employeeId?: number;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   allCompanies?: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   allExams?: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   orderByCreation?: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   includeClinic?: boolean;
 
@@ -290,6 +297,7 @@ export class FindCompanyEmployeeExamHistoryDto extends PaginationQueryDto {
   companyId?: string;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   allCompanies?: boolean;
 

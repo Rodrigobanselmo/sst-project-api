@@ -448,7 +448,6 @@ export class PgrUploadService {
       .filter((i) => !!i && typeof i == 'string')
       .forEach((path) => {
         try {
-          console.info('paths', path);
           fs.unlinkSync(path);
         } catch (e) {}
       });

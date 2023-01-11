@@ -1,4 +1,5 @@
 import { IsBoolean, IsInt, IsOptional, IsString } from 'class-validator';
+import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
 export class EngsRiskDataDto {
   @IsString()
@@ -10,6 +11,7 @@ export class EngsRiskDataDto {
   riskFactorDataId?: string;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   efficientlyCheck?: boolean;
 }

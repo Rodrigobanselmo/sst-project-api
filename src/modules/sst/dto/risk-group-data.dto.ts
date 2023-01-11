@@ -1,6 +1,7 @@
 import { StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import { IsBoolean, IsDate, IsEnum, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
 import { StringCapitalizeTransform } from '../../../shared/transformers/string-capitalize';
 import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
@@ -60,10 +61,12 @@ export class UpsertRiskGroupDataDto {
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   isQ5?: boolean;
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   hasEmergencyPlan?: boolean;
 
   @IsOptional()
@@ -111,10 +114,12 @@ export class UsersToRiskDataGroupDto {
   userId: number;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isSigner: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isElaborator: boolean;
 }
@@ -127,10 +132,12 @@ export class ProfessionalToRiskDataGroupDto {
   professionalId: number;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isSigner: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isElaborator: boolean;
 }

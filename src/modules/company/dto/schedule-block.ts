@@ -2,6 +2,7 @@ import { PartialType } from '@nestjs/swagger';
 import { ScheduleBlockTypeEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import { IsBoolean, IsDate, IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
+import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
 import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
 import { DateFormat } from '../../../shared/transformers/date-format';
@@ -34,10 +35,12 @@ export class CreateScheduleBlockDto {
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   yearRecurrence: boolean;
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   allCompanies: boolean;
 
   @IsString()

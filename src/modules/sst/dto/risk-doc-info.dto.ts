@@ -1,4 +1,5 @@
 import { IsBoolean, IsInt, IsOptional, IsString } from 'class-validator';
+import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
 export class UpsertRiskDocInfoDto {
   @IsInt()
@@ -17,17 +18,21 @@ export class UpsertRiskDocInfoDto {
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   isAso?: boolean;
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   isPGR?: boolean;
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   isPCMSO?: boolean;
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   isPPP?: boolean;
 }

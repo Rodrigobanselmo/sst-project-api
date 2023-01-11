@@ -34,7 +34,6 @@ export class ScheduleBlockRepository {
   }
 
   async update({ id, name, yearRecurrence, startDate, endDate, companiesIds, companyId, ...data }: UpdateScheduleBlockDto) {
-    console.log(data);
     const scheduleBlock = await this.prisma.scheduleBlock.update({
       data: {
         ...data,

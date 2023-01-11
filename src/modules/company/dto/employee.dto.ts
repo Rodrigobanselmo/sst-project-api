@@ -2,6 +2,7 @@ import { PartialType } from '@nestjs/swagger';
 import { SexTypeEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import { IsBoolean, IsDate, IsEnum, IsInt, IsNumber, IsOptional, IsString, Length, MaxLength } from 'class-validator';
+import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
 import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
 import { CpfFormatTransform } from '../../../shared/transformers/cpf-format.transform';
@@ -64,6 +65,7 @@ export class CreateEmployeeDto {
   email: string;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   isComorbidity: boolean;
 
@@ -137,10 +139,12 @@ export class FindEmployeeDto extends PaginationQueryDto {
   hierarchySubOfficeId?: string;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   all?: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   expiredExam?: boolean;
 
@@ -152,6 +156,7 @@ export class FindEmployeeDto extends PaginationQueryDto {
 
 export class FindOneEmployeeDto {
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   absenteeismLast60Days?: boolean;
 }

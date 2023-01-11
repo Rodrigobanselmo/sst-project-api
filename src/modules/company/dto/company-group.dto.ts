@@ -1,6 +1,7 @@
 import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
 import { IsBoolean, IsDate, IsInt, IsNumber, IsOptional, IsString, ValidateIf } from 'class-validator';
 import { Type } from 'class-transformer';
+import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
 export class UpsertCompanyGroupDto {
   @IsOptional()
@@ -25,6 +26,7 @@ export class UpsertCompanyGroupDto {
 
   @IsOptional()
   @IsBoolean()
+  @ToBoolean()
   blockResignationExam?: boolean;
 
   @IsOptional()
@@ -41,6 +43,7 @@ export class UpsertCompanyGroupDto {
   tecResponsibleId?: number;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   esocialSend?: boolean;
 

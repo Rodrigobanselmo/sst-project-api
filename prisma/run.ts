@@ -56,7 +56,7 @@ async function main() {
     // await normCityAddress(prisma);
     //*next
 
-    // await scheduleBlockNational(prisma);
+    await scheduleBlockNational(prisma);
     await fixDate(prisma);
 
     console.info('end');

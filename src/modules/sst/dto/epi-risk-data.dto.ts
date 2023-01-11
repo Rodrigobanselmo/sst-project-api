@@ -1,4 +1,5 @@
 import { IsBoolean, IsInt, IsOptional, IsString } from 'class-validator';
+import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
 export class EpiRoRiskDataDto {
   @IsInt()
@@ -14,38 +15,47 @@ export class EpiRoRiskDataDto {
   lifeTimeInDays?: number;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   efficientlyCheck?: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   epcCheck?: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   longPeriodsCheck?: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   validationCheck?: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   tradeSignCheck?: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   sanitationCheck?: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   maintenanceCheck?: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   unstoppedCheck?: boolean;
 
   @IsBoolean()
+  @ToBoolean()
   @IsOptional()
   trainingCheck?: boolean;
 }

@@ -10,6 +10,7 @@ import { hierarchyHomoOrgTable } from '../../tables/hierarchyHomoOrg/hierarchyHo
 import { EnvironmentEntity } from '../../../../../company/entities/environment.entity';
 import { environmentsConverter, IEnvironmentConvertResponse } from './all-characterization.converter';
 import { getCharacterizationType } from '../../../../../../modules/company/repositories/implementations/CharacterizationRepository';
+import { sortNumber } from 'src/shared/utils/sorts/number.sort';
 
 const getData = (
   hierarchiesTreeOrg: IHierarchyData,
@@ -252,13 +253,14 @@ export const allCharacterizationSections = (
 
   (type === 'char' ? characterizationTypes : environmentTypes).forEach(({ type, title: titleSection, desc }) => {
     const environments = environmentsData.filter((e) => e.type === type || !!e.profileParentId);
+
     if (!environments?.length) return;
 
     const environmentData = environmentsConverter(environments);
     let firstPass = true;
 
     environmentData
-      .sort((a, b) => sortString(b, a, 'profileParentId'))
+      .sort((a, b) => sortNumber(b.profileParentId ? 1 : 0, a.profileParentId ? 1 : 0))
       .forEach(({ variables, elements, id, risks, considerations: cons, breakPage, activities: ac, profileParentId, profiles, type, paragraphs }) => {
         const title = [
           {
