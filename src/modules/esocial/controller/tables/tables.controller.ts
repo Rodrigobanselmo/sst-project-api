@@ -7,6 +7,7 @@ import { FindCitiesDto } from '../../dto/cities.dto';
 import { Prisma } from '@prisma/client';
 import { FindEsocialTable24Dto } from '../../dto/event.dto';
 import { onlyNumbers } from '@brazilian-utils/brazilian-utils';
+import { normalizeString } from 'src/shared/utils/normalizeString';
 
 @ApiTags('tables')
 @Controller('esocial')
@@ -18,7 +19,7 @@ export class TablesController {
     const { skip, take, search } = query;
 
     const where: Prisma.CitiesFindManyArgs['where'] = {
-      ...(search && { name: { contains: search, mode: 'insensitive' } }),
+      ...(search && { normalized: { contains: normalizeString(search).toLowerCase(), mode: 'insensitive' } }),
     };
 
     const response = await this.prisma.$transaction([
@@ -37,6 +38,23 @@ export class TablesController {
     return {
       data: response[1],
       count: response[0],
+    };
+  }
+
+  @Get('cities-address')
+  async findCAddress(@Query() query: FindCitiesDto) {
+    const { skip, take, search } = query;
+
+    const where: Prisma.AddressCompanyFindManyArgs['where'] = {
+      ...(search && { city: { contains: normalizeString(search).toLowerCase(), mode: 'insensitive' } }),
+    };
+
+    const add = await this.prisma.addressCompany.groupBy({ by: ['city', 'state'], orderBy: { city: 'asc' }, skip: skip || 0, take: take || 20, where });
+
+    console.log(add);
+    return {
+      data: add.map((c) => ({ name: c.city, ufCode: c.state })),
+      count: add.length,
     };
   }
 

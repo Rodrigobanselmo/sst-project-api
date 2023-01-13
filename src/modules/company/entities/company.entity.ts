@@ -132,7 +132,7 @@ export class CompanyEntity implements Company {
   isTaxNote: boolean;
   observationBank: string;
   companiesToClinicAvailable: CompanyClinicsEntity;
-  clinicsAvailable: CompanyClinicsEntity;
+  clinicsAvailable?: CompanyClinicsEntity;
   clinicExams: ExamToClinicEntity[];
   report: CompanyReportEntity;
   riskDegree?: number;

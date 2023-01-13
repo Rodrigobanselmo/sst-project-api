@@ -63,6 +63,7 @@ export class EmployeeEntity implements Employee {
   sex: SexTypeEnum;
   cidId: string;
   shiftId: number;
+  normalized: string;
   birthday: Date;
   admissionDate: Date;
   lastExam: Date;

@@ -39,7 +39,7 @@ import { CreateContractService } from './services/company/create-contract/create
 import { FindAllCompaniesService } from './services/company/find-all-companies/find-all-companies.service';
 import { FindCepService } from './services/company/find-cep/find-cep.service';
 import { FindCnpjService } from './services/company/find-cnpj/find-cnpj.service';
-import { FindCompanyService } from './services/company/find-company/find-company.service';
+import { FindCompanyService } from './services/company/find-one-company/find-company.service';
 import { UpdateCompanyService } from './services/company/update-company/update-company.service';
 import { CreateEmployeeService } from './services/employee/create-employee/create-employee.service';
 import { FindAllAvailableEmployeesService } from './services/employee/find-all-available-employees/find-all-available-employees.service';
@@ -96,7 +96,7 @@ import { DeleteEmployeeExamHistoryService } from './services/employee/0-history/
 import { EmployeeExamHistoryController } from './controller/employee/employee-exam-history.controller';
 import { FindByIdEmployeeExamHistoryService } from './services/employee/0-history/exams/find-by-id/find-by-id.service';
 import { DayJSProvider } from '../../shared/providers/DateProvider/implementations/DayJSProvider';
-import { FindClinicService } from './services/company/find-clinic/find-clinic.service';
+import { FindClinicService } from './services/company/find-one-clinic/find-clinic.service';
 import { FindScheduleEmployeeExamHistoryService } from './services/employee/0-history/exams/find-schedule/find-schedule.service';
 import { FindClinicScheduleEmployeeExamHistoryService } from './services/employee/0-history/exams/find-clinic-schedules/find-clinic-schedules.service';
 import { NotificationModule } from '../notifications/notifications.module';

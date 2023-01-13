@@ -526,6 +526,10 @@ export class CompanyRepository implements ICompanyRepository {
         'findAll',
         'selectReport',
         'scheduleBlockId',
+        'companyToClinicsId',
+        'companiesGroupIds',
+        'uf',
+        'cities',
       ],
     });
 
@@ -563,14 +567,58 @@ export class CompanyRepository implements ICompanyRepository {
     }
 
     if ('companiesIds' in query) {
+      if (query.isClinic) {
+        (where.AND as any).push({
+          OR: [
+            {
+              companiesToClinicAvailable: { some: { companyId: { in: query.companiesIds } } },
+            },
+            {
+              companiesToClinicAvailable: { some: { company: { companyGroup: { companies: { some: { id: { in: query.companiesIds } } } } } } },
+            },
+          ],
+        } as typeof options.where);
+      } else {
+        (where.AND as any).push({
+          id: { in: query.companiesIds },
+        } as typeof options.where);
+      }
+    }
+
+    if ('companiesGroupIds' in query) {
       (where.AND as any).push({
-        id: { in: query.companiesIds },
+        companiesToClinicAvailable: { some: { companyId: { in: query.companiesGroupIds } } },
+      } as typeof options.where);
+    }
+
+    if ('cities' in query) {
+      (where.AND as any).push({
+        address: { city: { in: query.cities } },
+      } as typeof options.where);
+    }
+
+    if ('uf' in query) {
+      (where.AND as any).push({
+        address: { state: { in: query.uf } },
       } as typeof options.where);
     }
 
     if ('clinicsCompanyId' in query) {
       (where.AND as any).push({
         clinicsAvailable: { some: { companyId: query.clinicsCompanyId } },
+      } as typeof options.where);
+    }
+
+    if ('companyToClinicsId' in query) {
+      (where.AND as any).push({
+        OR: [
+          {
+            companiesToClinicAvailable: { some: { companyId: query.companyToClinicsId } },
+          },
+          {
+            companiesToClinicAvailable: { some: { company: { companyGroup: { companies: { some: { id: query.companyToClinicsId } } } } } },
+          },
+        ],
       } as typeof options.where);
     }
 

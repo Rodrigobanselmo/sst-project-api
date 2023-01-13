@@ -227,6 +227,7 @@ model Cid {
 model Cities {
   code   String  @id
   name   String
+  normalized   String?
   ufCode String?
   cat    Cat[]
   uf     Uf?     @relation(fields: [ufCode], references: [code], onDelete: Restrict)
@@ -655,6 +656,7 @@ model Employee {
   hierarchyHistory EmployeeHierarchyHistory[]
   pppHistory       EmployeePPPHistory[]
   subOffices       Hierarchy[]                @relation("sub_offices")
+  normalized        String?
 
   @@unique([id, companyId])
   @@unique([cpf, companyId])

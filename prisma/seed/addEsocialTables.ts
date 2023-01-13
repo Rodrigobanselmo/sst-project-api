@@ -1,3 +1,4 @@
+import { normalizeString } from './../../src/shared/utils/normalizeString';
 import { PrismaClient, RiskFactorsEnum } from '@prisma/client';
 import fs from 'fs';
 import { asyncBatch } from '../../src/shared/utils/asyncBatch';
@@ -120,8 +121,8 @@ export const addEsocialTables = async (prisma: PrismaClient) => {
       console.count();
 
       await prisma.cities.upsert({
-        create: { ufCode: String(data.UF), code: String(data.code_mun), name: data.mun },
-        update: { ufCode: String(data.UF), code: String(data.code_mun), name: data.mun },
+        create: { ufCode: String(data.UF), code: String(data.code_mun), name: data.mun, normalized: normalizeString(data.mun).toLocaleLowerCase() },
+        update: { ufCode: String(data.UF), code: String(data.code_mun), name: data.mun, normalized: normalizeString(data.mun).toLocaleLowerCase() },
         where: { code: String(data.code_mun) },
       });
     });

@@ -241,6 +241,10 @@ export class FindCompaniesDto extends PaginationQueryDto {
   @IsOptional()
   clinicsCompanyId?: string;
 
+  @IsString()
+  @IsOptional()
+  companyToClinicsId?: string;
+
   @IsBoolean()
   @ToBoolean()
   @IsOptional()
@@ -281,13 +285,28 @@ export class FindCompaniesDto extends PaginationQueryDto {
   })
   type?: CompanyTypesEnum[];
 
+  @Transform((t) => QueryArray(t, (v) => Number(v)), { toClassOnly: true })
+  @IsInt({ each: true })
+  @IsOptional()
+  clinicExamsIds?: number[];
+
   @Transform(QueryArray, { toClassOnly: true })
   @IsString({ each: true })
   @IsOptional()
   companiesIds?: string[];
 
-  @Transform((t) => QueryArray(t, (v) => Number(v)), { toClassOnly: true })
-  @IsInt({ each: true })
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsString({ each: true })
   @IsOptional()
-  clinicExamsIds?: number[];
+  companiesGroupIds?: string[];
+
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsString({ each: true })
+  @IsOptional()
+  cities?: string[];
+
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsString({ each: true })
+  @IsOptional()
+  uf?: string[];
 }

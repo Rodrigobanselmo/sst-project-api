@@ -1,4 +1,4 @@
-import { ScheduleBlockRepository } from './../../../repositories/implementations/ScheduleBlockRepository';
+import { ScheduleBlockRepository } from '../../../repositories/implementations/ScheduleBlockRepository';
 import { Injectable } from '@nestjs/common';
 
 import { CompanyRepository } from '../../../repositories/implementations/CompanyRepository';

@@ -59,7 +59,7 @@ export class CompanyGroupRepository {
       },
       where: { id_companyId: { id: id || 0, companyId } },
       include: {
-        companyGroup: { select: { id: true } },
+        companyGroup: { select: { id: true, clinicsAvailable: true } },
         doctorResponsible: {
           include: {
             professional: {
@@ -95,14 +95,14 @@ export class CompanyGroupRepository {
       },
     });
 
-    return new CompanyGroupEntity(group);
+    return new CompanyGroupEntity(group as any);
   }
 
   async findById(id: number, companyId: string, options: Prisma.CompanyGroupFindFirstArgs = {}) {
     const group = await this.prisma.companyGroup.findFirst({
       where: { companyId, id },
       include: {
-        companyGroup: { select: { id: true } },
+        companyGroup: { select: { id: true, clinicsAvailable: true } },
         doctorResponsible: {
           include: {
             professional: {
@@ -139,7 +139,7 @@ export class CompanyGroupRepository {
       ...options,
     });
 
-    return new CompanyGroupEntity(group);
+    return new CompanyGroupEntity(group as any);
   }
 
   async findAvailable(companyId: string, query: Partial<FindCompanyGroupDto>, pagination: PaginationQueryDto, options: Prisma.CompanyGroupFindManyArgs = {}) {
@@ -148,7 +148,7 @@ export class CompanyGroupRepository {
     } as typeof options.where;
 
     options.select = {
-      companyGroup: { select: { id: true } },
+      companyGroup: { select: { id: true, clinicsAvailable: true } },
       description: true,
       companyId: true,
       name: true,

@@ -12,8 +12,8 @@ export class SetCompanyClinicsService {
   async execute(setCompanyClinicDto: SetCompanyClinicDto, user: UserPayloadDto) {
     if (!setCompanyClinicDto.ids.every((c) => c.companyId === user.targetCompanyId)) throw new ForbiddenException(ErrorMessageEnum.FORBIDDEN_ACCESS);
 
-    const clinics = await this.companyClinicRepository.set(setCompanyClinicDto, user.targetCompanyId);
+    await this.companyClinicRepository.set(setCompanyClinicDto, user.targetCompanyId);
 
-    return clinics;
+    return { companyId: user.targetCompanyId };
   }
 }

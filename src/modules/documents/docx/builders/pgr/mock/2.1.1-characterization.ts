@@ -28,7 +28,7 @@ export const characterizationSection: IDocumentPGRSectionGroup = {
         },
         {
           type: PGRSectionChildrenTypeEnum.BULLET,
-          text: '**Equipamentos:** Consiste na análise dos Fatores de Riscos e Perigos (FR/P) com base nas características dos equipamentos e ferramentas com que as principais tarefas são executadas, é fundamental para entender como estes "intrumentos" afetam as atividades executadas e consequentemente impactam no FR/P.',
+          text: '**Equipamentos:** Consiste na análise dos Fatores de Riscos e Perigos (FR/P) com base nas características dos equipamentos e ferramentas com que as principais tarefas são executadas, é fundamental para entender como estes "instrumentos" afetam as atividades executadas e consequentemente impactam no FR/P.',
         },
         {
           type: PGRSectionChildrenTypeEnum.PARAGRAPH,

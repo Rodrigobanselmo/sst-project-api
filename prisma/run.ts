@@ -23,6 +23,7 @@ import { deleteReapeatHH } from './run/delete-hh-repeat';
 import { normCityAddress } from './run/nomalize-city-address';
 import { scheduleBlockNational } from './seed/scheduleBlockNational';
 import { fixDate } from './run/fix-date';
+import { normCities } from './run/normalize-cities';
 
 const prisma = new PrismaClient({
   // log: ['query'],
@@ -54,11 +55,24 @@ async function main() {
     // await deleteReapeatHH(prisma);
     // await cboTable(prisma);
     // await normCityAddress(prisma);
+    // await scheduleBlockNational(prisma);
+    // await fixDate(prisma);
+
     //*next
 
-    await scheduleBlockNational(prisma);
-    await fixDate(prisma);
+    await normCities(prisma);
+    //   await prisma.$queryRaw`select
+    //   id, name
+    // from users
+    //   where LOWER(unaccent(name)) LIKE ${'filterText'};`.then((users) => console.log(users));
 
+    // await prisma.cities.findMany({
+    //   where: { name: { contains: 'Sa', mode: 'insensitive' } },
+    //   skip: 0,
+    //   take: 20,
+    //   orderBy: { name: 'asc' },
+    //   select: { code: true, name: true, uf: { select: { uf: true } } },
+    // }),
     console.info('end');
   } catch (err) {
     console.error(err);

@@ -15,10 +15,12 @@ export class CompanyClinicRepository {
     await this.prisma.$transaction([
       this.prisma.companyClinics.deleteMany({ where: { companyId } }),
       this.prisma.companyClinics.createMany({
-        data: createCompanyDto.ids.map(({ clinicId, companyId }) => ({
-          clinicId,
-          companyId,
-        })),
+        data: createCompanyDto.ids
+          .filter((data) => data.clinicId != data.companyId)
+          .map(({ clinicId, companyId }) => ({
+            clinicId,
+            companyId,
+          })),
       }),
     ]);
   }

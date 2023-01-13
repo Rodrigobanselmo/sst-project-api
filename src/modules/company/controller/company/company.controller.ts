@@ -15,10 +15,10 @@ import { CreateContractService } from '../../services/company/create-contract/cr
 import { FindAllCompaniesService } from '../../services/company/find-all-companies/find-all-companies.service';
 import { FindAllUserCompaniesService } from '../../services/company/find-all-user-companies /find-all-companies.service';
 import { FindCepService } from '../../services/company/find-cep/find-cep.service';
-import { FindClinicService } from '../../services/company/find-clinic/find-clinic.service';
+import { FindClinicService } from '../../services/company/find-one-clinic/find-clinic.service';
 import { FindCnaeService } from '../../services/company/find-cnae/find-cnae.service';
 import { FindCnpjService } from '../../services/company/find-cnpj/find-cnpj.service';
-import { FindCompanyService } from '../../services/company/find-company/find-company.service';
+import { FindCompanyService } from '../../services/company/find-one-company/find-company.service';
 import { SetCompanyClinicsService } from '../../services/company/set-company-clinics/set-company-clinics.service';
 import { UpdateCompanyService } from '../../services/company/update-company/update-company.service';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
