@@ -281,6 +281,11 @@ export class FindClinicEmployeeExamHistoryDto {
   @IsInt()
   employeeId?: number;
 
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  examIsAvaliation?: boolean;
+
   @ValidateIf((o) => !o.employeeId)
   @Transform(DateFormat, { toClassOnly: true })
   @IsDate({ message: 'Data inválida' })
@@ -310,6 +315,9 @@ export class FindCompanyEmployeeExamHistoryDto extends PaginationQueryDto {
 export class FindClinicScheduleTimeDto {
   @IsString()
   clinicId: string;
+
+  @IsInt()
+  examId: number;
 
   @Transform(DateFormat, { toClassOnly: true })
   @IsDate({ message: 'Data inválida' })

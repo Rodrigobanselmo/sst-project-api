@@ -86,6 +86,7 @@ export class EmployeeEntity implements Employee {
     Object.assign(this, partial);
 
     if (this.newExamAdded) {
+      //? to be able to say that the exam is no longer expired if is schedule to a future expired date
       if (!this.expiredDateExam) this.expiredDateExam = this.newExamAdded;
       if (this.expiredDateExam > this.newExamAdded) this.expiredDateExam = this.newExamAdded;
 

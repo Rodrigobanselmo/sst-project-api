@@ -914,6 +914,7 @@ model Exam {
   analyses         String?
   deleted_at       DateTime?
   isAttendance     Boolean                @default(false)
+  isAvaliation     Boolean                @default(false)
   esocial27Code    String?
   obsProc          String?
   employeesHistory EmployeeExamsHistory[]

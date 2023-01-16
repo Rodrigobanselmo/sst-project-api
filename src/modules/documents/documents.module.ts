@@ -23,6 +23,7 @@ import { PdfKitDataService } from './services/pdf/kit/kit-data.service';
 import { PdfAsoDataService } from './services/pdf/aso/aso-data.service';
 import { PdfProntuarioDataService } from './services/pdf/prontuario/prontuario-data.service';
 import { PdfOsDataService } from './services/pdf/os/os-data.service';
+import { PdfEvaluationDataService } from './services/pdf/evaluation/evaluation-data.service';
 // import { DocumentsBaseController } from './controller/doc.controller';
 
 @Module({
@@ -46,6 +47,7 @@ import { PdfOsDataService } from './services/pdf/os/os-data.service';
     PdfAsoDataService,
     PdfProntuarioDataService,
     PdfOsDataService,
+    PdfEvaluationDataService,
     // DocumentsBaseController,
   ],
 })

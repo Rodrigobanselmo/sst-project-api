@@ -9,11 +9,12 @@ import { EmployeeExamsHistoryRepository } from '../../../../../repositories/impl
 export class FindClinicScheduleTimeService {
   constructor(private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository) {}
 
-  async execute({ date, clinicId }: FindClinicScheduleTimeDto) {
+  async execute({ date, clinicId, examId }: FindClinicScheduleTimeDto) {
     const access = await this.employeeExamHistoryRepository.findNude({
       where: {
         clinicId: clinicId,
         doneDate: date,
+        examId: examId,
         status: { in: ['DONE', 'PROCESSING', 'PROGRESS'] },
       },
       select: {

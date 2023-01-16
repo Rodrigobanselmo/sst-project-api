@@ -250,7 +250,6 @@ export class UpdateAllCompaniesService {
             return true;
           });
 
-          // logic newExamAdded
           {
             if (doneExamFound) {
               const doneDateExam = doneExamFound.doneDate;

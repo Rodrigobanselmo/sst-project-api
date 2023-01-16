@@ -1,14 +1,14 @@
-import { IReportCell, IReportFactoryProductFindData, IReportHeader, IReportHeaderCell, IReportSanitizeData } from '../types/IReportFactory.types';
+import { formatCEP } from '@brazilian-utils/brazilian-utils';
+import { Injectable } from '@nestjs/common';
+
+import { clinicScheduleMap, companyPaymentScheduleMap } from '../../../../../shared/constants/maps/enumTraslate.map';
+import { ExcelProvider } from '../../../../../shared/providers/ExcelProvider/implementations/ExcelProvider';
+import { formatPhoneNumber } from '../../../../../shared/utils/formats';
 import { CompanyEntity } from '../../../../company/entities/company.entity';
 import { CompanyRepository } from '../../../../company/repositories/implementations/CompanyRepository';
-import { Injectable } from '@nestjs/common';
 import { ReportFactoryAbstractionCreator } from '../creator/ReportFactoryCreator';
-import { IReportFactoryProduct } from '../types/IReportFactory.types';
-import { formatCEP } from '@brazilian-utils/brazilian-utils';
-import { formatPhoneNumber } from '../../../../../shared/utils/formats';
-import { ExcelProvider } from '../../../../../shared/providers/ExcelProvider/implementations/ExcelProvider';
-import { clinicScheduleMap, companyPaymentScheduleMap } from '../../../../../shared/constants/maps/enumTraslate.map';
-import { DayJSProvider } from 'src/shared/providers/DateProvider/implementations/DayJSProvider';
+import { IReportCell, IReportFactoryProduct, IReportFactoryProductFindData, IReportHeader, IReportSanitizeData } from '../types/IReportFactory.types';
+import { FindCompaniesDto } from './../../../../company/dto/create-company.dto';
 
 @Injectable()
 export class ReportClinicFactory extends ReportFactoryAbstractionCreator {
@@ -24,30 +24,35 @@ export class ReportClinicFactory extends ReportFactoryAbstractionCreator {
 class ReportFactoryProduct implements IReportFactoryProduct {
   constructor(private readonly companyRepository: CompanyRepository) {}
 
-  public async findTableData() {
-    const clinics = await this.companyRepository.findNude({
-      where: { isClinic: true },
-      orderBy: { fantasy: 'asc' },
-      select: {
-        unit: true,
-        address: true,
-        fantasy: true,
-        paymentDay: true,
-        paymentType: true,
-        contacts: { select: { email: true, phone: true, phone_1: true }, where: { isPrincipal: true } },
-        clinicExams: {
-          take: 1,
-          where: { status: 'ACTIVE', scheduleType: { not: null } },
-          select: { scheduleType: true },
-          orderBy: { endDate: { nulls: 'first', sort: 'desc' } },
+  public async findTableData(companyId: string, { skip, take, ...query }: FindCompaniesDto) {
+    query.isClinic = true;
+    const clinics = await this.companyRepository.findAllRelatedByCompanyId(
+      companyId,
+      query,
+      { take: take || 10_000, skip: skip || 0 },
+      {
+        orderBy: { fantasy: 'asc' },
+        select: {
+          unit: true,
+          address: true,
+          fantasy: true,
+          paymentDay: true,
+          paymentType: true,
+          contacts: { select: { email: true, phone: true, phone_1: true }, where: { isPrincipal: true } },
+          clinicExams: {
+            take: 1,
+            where: { status: 'ACTIVE', scheduleType: { not: null } },
+            select: { scheduleType: true },
+            orderBy: { endDate: { nulls: 'first', sort: 'desc' } },
+          },
         },
       },
-    });
+    );
 
-    const sanitizeData = this.sanitizeData(clinics);
+    const sanitizeData = this.sanitizeData(clinics.data);
     const headerData = this.getHeader();
     const titleData = this.getTitle(headerData);
-    const infoData = this.getEndInformation(clinics.length);
+    const infoData = this.getEndInformation(clinics.data.length);
 
     const returnData: IReportFactoryProductFindData = { headerRow: headerData, titleRows: titleData, endRows: infoData, sanitizeData };
 
@@ -86,7 +91,7 @@ class ReportFactoryProduct implements IReportFactoryProduct {
 
   public getFilename(): string {
     const date = new Date();
-    const filename = `Relatorio de clínicas ${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
+    const filename = `Relatorio de clínicas ${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
     return filename;
   }
 

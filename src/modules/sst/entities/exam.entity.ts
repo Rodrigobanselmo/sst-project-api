@@ -41,6 +41,7 @@ export class ExamEntity implements Exam {
   deleted_at: Date;
   examToClinic: ExamToClinicEntity[];
   isAttendance: boolean;
+  isAvaliation: boolean;
   esocial27Code: string;
   examsRiskData?: ExamRiskDataEntity;
   examToRiskData?: ExamRiskDataEntity[];

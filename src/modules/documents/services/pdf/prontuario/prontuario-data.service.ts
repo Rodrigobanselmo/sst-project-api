@@ -13,7 +13,7 @@ import { checkRiskDataDoc } from '../../pgr/document/upload-pgr-doc.service';
 @Injectable()
 export class PdfProntuarioDataService {
   constructor(private readonly employeeRepository: EmployeeRepository, private readonly findAllRiskDataByEmployeeService: FindAllRiskDataByEmployeeService) {}
-  async execute(employeeId: number, userPayloadDto: UserPayloadDto): Promise<IPdfProntuarioData> {
+  async execute(employeeId: number, userPayloadDto: UserPayloadDto, options?: { isAvaliation?: boolean }): Promise<IPdfProntuarioData> {
     const companyId = userPayloadDto.targetCompanyId;
 
     const employeeData = await this.employeeRepository.findFirstNude({
@@ -23,6 +23,8 @@ export class PdfProntuarioDataService {
       },
       select: {
         name: true,
+        cpf: true,
+        birthday: true,
         sex: true,
         company: {
           select: {
@@ -62,8 +64,8 @@ export class PdfProntuarioDataService {
           },
         },
         examsHistory: {
-          where: { status: { in: ['PROCESSING', 'DONE'] }, exam: { isAttendance: true } },
-          select: { doneDate: true, changeHierarchyDate: true, examId: true },
+          where: { status: { in: ['PROCESSING', 'DONE'] }, exam: { isAttendance: true, ...(options?.isAvaliation && { isAvaliation: true, isAttendance: false }) } },
+          select: { doneDate: true, changeHierarchyDate: true, examId: true, examType: true },
           orderBy: { doneDate: 'desc' },
           take: 1,
         },

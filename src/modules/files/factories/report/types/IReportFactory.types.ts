@@ -5,7 +5,7 @@ export type IReportHeader = IReportHeaderCell[];
 export interface IReportFactoryProduct {
   getSheetName(): string;
   getFilename(): string;
-  findTableData(): Promise<IReportFactoryProductFindData>;
+  findTableData(companyId: string, query: any): Promise<IReportFactoryProductFindData>;
   sanitizeData(data: any[]): IReportSanitizeData[];
   getHeader(data?: any): IReportHeader;
   getTitle(header: IReportHeader): IReportCell[][];

@@ -41,13 +41,15 @@ export class FindClinicScheduleEmployeeExamHistoryService {
             doctor: {
               select: { professional: { select: { id: true, name: true } } },
             },
-            exam: { select: { id: true, name: true, isAttendance: true } },
+            exam: { select: { id: true, name: true, isAttendance: true, isAvaliation: true } },
             time: true,
             evaluationType: true,
             status: true,
           },
           where: {
             status: { in: status },
+            examType: { not: 'EVAL' },
+            ...(query.examIsAvaliation && { examType: 'EVAL' }),
             ...(query.date && { doneDate: query.date }),
           },
           orderBy: { doneDate: 'desc' },
@@ -60,7 +62,9 @@ export class FindClinicScheduleEmployeeExamHistoryService {
           some: {
             clinicId: companyId,
             status: { in: status },
+            examType: { not: 'EVAL' },
             ...(query.date && { doneDate: query.date }),
+            ...(query.examIsAvaliation && { examType: 'EVAL' }),
           },
         },
       },

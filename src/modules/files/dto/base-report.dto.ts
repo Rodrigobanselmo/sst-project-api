@@ -6,19 +6,14 @@ import { StringUppercaseTransform } from '../../../shared/transformers/string-up
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
 import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
+export enum ReportDownloadtypeEnum {
+  XML = 'XML',
+  HTML = 'HTML',
+  PDF = 'PDF',
+}
+
 export class BaseReportDto {
   @IsOptional()
-  @IsBoolean()
-  @ToBoolean()
-  isXml?: boolean;
-
-  @Transform(QueryArray, { toClassOnly: true })
-  @IsString({ each: true })
-  @IsOptional()
-  companiesIds?: string[];
-
-  @Transform(QueryArray, { toClassOnly: true })
-  @IsString({ each: true })
-  @IsOptional()
-  companiesGroupIds?: string[];
+  @IsString()
+  downloadType?: ReportDownloadtypeEnum;
 }

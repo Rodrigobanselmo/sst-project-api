@@ -33,7 +33,7 @@ export class FindCompanyScheduleEmployeeExamHistoryService {
           employeeId: true,
           hierarchyId: true,
           subOfficeId: true,
-          exam: { select: { id: true, name: true, isAttendance: true } },
+          exam: { select: { id: true, name: true, isAttendance: true, isAvaliation: true } },
           status: true,
           employee: {
             select: {
@@ -106,7 +106,7 @@ export class FindCompanyScheduleEmployeeExamHistoryService {
     //         conclusion: true,
     //         examType: true,
     //         doctor: { select: { id: true, name: true } },
-    //         exam: { select: { id: true, name: true, isAttendance: true } },
+    //         exam: { select: { id: true, name: true, isAttendance: true, isAvaliation: true } },
     //         time: true,
     //         evaluationType: true,
     //         status: true,

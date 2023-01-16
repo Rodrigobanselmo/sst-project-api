@@ -415,6 +415,7 @@ export class EmployeeRepository {
             select: {
               id: true,
               isAttendance: true,
+              isAvaliation: true,
               esocial27Code: true,
               obsProc: true,
               name: true,

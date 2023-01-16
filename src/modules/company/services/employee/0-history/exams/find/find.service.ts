@@ -16,6 +16,7 @@ export class FindEmployeeExamHistoryService {
         include: {
           exam: {
             select: {
+              isAvaliation: true,
               isAttendance: true,
               id: true,
               name: true,

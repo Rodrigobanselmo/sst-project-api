@@ -16,18 +16,18 @@ export abstract class ReportFactoryAbstractionCreator {
     return product;
   }
 
-  public async excelCompile(): Promise<{ workbook: Workbook; filename: string }> {
-    const { rows, filename: fileName, sheetName } = await this.getRows();
+  public async excelCompile(companyId: string, query: any): Promise<{ workbook: Workbook; filename: string }> {
+    const { rows, filename: fileName, sheetName } = await this.getRows(companyId, query);
 
     const { workbook, filename } = await this.excelProvider.createReportTable([{ rows, name: sheetName }], fileName);
 
     return { workbook, filename };
   }
 
-  public async getRows() {
+  public async getRows(companyId: string, query: any) {
     const product = this.create();
 
-    const tableData = await product.findTableData();
+    const tableData = await product.findTableData(companyId, query);
     const rows = this.organizeRows(tableData);
 
     return { rows, filename: product.getFilename(), sheetName: product.getSheetName() };

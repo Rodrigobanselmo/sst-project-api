@@ -9,6 +9,7 @@ import { PdfKitDataService } from '../services/pdf/kit/kit-data.service';
 import { PdfProntuarioDataService } from '../services/pdf/prontuario/prontuario-data.service';
 import { PdfAsoDataService } from '../services/pdf/aso/aso-data.service';
 import { PdfOsDataService } from '../services/pdf/os/os-data.service';
+import { PdfEvaluationDataService } from '../services/pdf/evaluation/evaluation-data.service';
 @Controller('documents/pdf')
 export class DocumentsPdfController {
   constructor(
@@ -16,6 +17,7 @@ export class DocumentsPdfController {
     private readonly pdfKitDataService: PdfKitDataService,
     private readonly pdfAsoDataService: PdfAsoDataService,
     private readonly pdfProntuarioDataService: PdfProntuarioDataService,
+    private readonly pdfEvaluationDataService: PdfEvaluationDataService,
     private readonly pdfOsDataService: PdfOsDataService,
   ) {}
 
@@ -68,6 +70,23 @@ export class DocumentsPdfController {
   @Get('prontuario/:employeeId/:companyId')
   async prontuario(@User() userPayloadDto: UserPayloadDto, @Param('employeeId', ParseIntPipe) employeeId: number) {
     return this.pdfProntuarioDataService.execute(employeeId, userPayloadDto);
+  }
+
+  @Permissions(
+    {
+      code: PermissionEnum.EMPLOYEE_HISTORY,
+      isMember: true,
+      isContract: true,
+    },
+    {
+      code: PermissionEnum.COMPANY_SCHEDULE,
+      isMember: true,
+      isContract: true,
+    },
+  )
+  @Get('prontuario-evaluation/:employeeId/:companyId')
+  async evaluation(@User() userPayloadDto: UserPayloadDto, @Param('employeeId', ParseIntPipe) employeeId: number) {
+    return this.pdfEvaluationDataService.execute(employeeId, userPayloadDto);
   }
 
   @Permissions(

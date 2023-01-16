@@ -713,6 +713,7 @@ class ESocialEventProvider {
     const generateId = this.eSocialMethodsProvider.classGenerateId(company.cnpj);
     const eventsStruct = employees.reduce<IESocial2220.StructureReturn[]>((acc, employee) => {
       const examsGroup = employee.examsHistory
+        .map((exam) => ({ ...exam, ...(exam.exam.isAvaliation && { isAttendance: true }) }))
         .sort((a, b) => sortNumber(a.exam.isAttendance ? 1 : 0, b.exam.isAttendance ? 1 : 0))
         .sort((a, b) => sortNumber(a.doneDate, b.doneDate))
         .reduce<EmployeeExamsHistoryEntity[][]>(

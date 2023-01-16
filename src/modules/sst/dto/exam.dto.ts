@@ -39,6 +39,11 @@ export class CreateExamDto {
   @ToBoolean()
   isAttendance?: boolean;
 
+  @IsOptional()
+  @IsBoolean()
+  @ToBoolean()
+  isAvaliation?: boolean;
+
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsOptional()
   @IsString()
@@ -83,6 +88,16 @@ export class FindExamDto extends PaginationQueryDto {
   @IsString()
   @IsOptional()
   name?: string;
+
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  isAttendance?: boolean;
+
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  isAvaliation?: boolean;
 
   @IsString()
   @IsOptional()
