@@ -1,4 +1,4 @@
-import { CreateCompanyDto } from '../dto/create-company.dto';
+import { CreateCompanyDto } from '../dto/company.dto';
 import { CompanyEntity } from '../entities/company.entity';
 
 interface ICompanyRepository {

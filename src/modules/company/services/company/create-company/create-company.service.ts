@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { StatusEnum } from '@prisma/client';
-import { CreateCompanyDto } from '../../../dto/create-company.dto';
+import { CreateCompanyDto } from '../../../dto/company.dto';
 import { CompanyRepository } from '../../../repositories/implementations/CompanyRepository';
 
 @Injectable()

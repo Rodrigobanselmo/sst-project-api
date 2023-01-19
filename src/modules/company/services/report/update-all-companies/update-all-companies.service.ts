@@ -21,10 +21,11 @@ import { asyncBatch } from '../../../../../shared/utils/asyncBatch';
 import { ESocialEventProvider } from '../../../../../shared/providers/ESocialProvider/implementations/ESocialEventProvider';
 import { UpdateESocialReportService } from '../update-esocial-report/update-esocial-report.service';
 
+export const standardDate = '1900-01-01';
 @Injectable()
 export class UpdateAllCompaniesService {
   private chatId = 1301254235;
-  private standardDate = '1900-01-01';
+  private standardDate = standardDate;
   private errorCompanies = [];
   private error: Error;
 
@@ -40,7 +41,7 @@ export class UpdateAllCompaniesService {
   ) {}
 
   async execute(user?: UserPayloadDto) {
-    const companyId = '9d5354b1-f4bf-4758-8bb6-73ed59ef3444' || user?.targetCompanyId;
+    const companyId = user?.targetCompanyId;
 
     console.info('start cron(1): update all');
     const allCompanies = await this.companyRepository.findNude({
@@ -250,14 +251,13 @@ export class UpdateAllCompaniesService {
             return true;
           });
 
+          // logic newExamAdded
           {
-            if (doneExamFound) {
+            if (employee.newExamAdded && doneExamFound) {
               const doneDateExam = doneExamFound.doneDate;
-              if (doneDateExam <= employee.newExamAdded) {
-                employee.expiredDateExam = doneExamFound.expiredDate;
+              if (doneDateExam > employee.newExamAdded) {
+                doneExamFound.expiredDate = employee.newExamAdded;
               }
-
-              doneExamFound.expiredDate = employee.newExamAdded;
             }
           }
 

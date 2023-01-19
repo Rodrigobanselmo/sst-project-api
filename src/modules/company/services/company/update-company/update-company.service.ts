@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
+import { UpdateCompanyDto } from '../../../../..//modules/company/dto/company.dto';
 import { WorkspaceDto } from '../../../../../modules/company/dto/workspace.dto';
 import { WorkspaceRepository } from '../../../../../modules/company/repositories/implementations/WorkspaceRepository';
-import { UpdateCompanyDto } from '../../../dto/update-company.dto';
 import { CompanyRepository } from '../../../repositories/implementations/CompanyRepository';
 
 @Injectable()

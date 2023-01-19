@@ -4,11 +4,10 @@ import { PaginationQueryDto } from './../../../../shared/dto/pagination.dto';
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
-import { CreateCompanyDto, FindCompaniesDto } from '../../dto/create-company.dto';
+import { CreateCompanyDto, FindCompaniesDto, UpdateCompanyDto } from '../../dto/company.dto';
 import { CompanyEntity } from '../../entities/company.entity';
 import { ICompanyRepository } from '../ICompanyRepository.types';
 import { v4 as uuidV4 } from 'uuid';
-import { UpdateCompanyDto } from '../../dto/update-company.dto';
 import { IPrismaOptions } from '../../../../shared/interfaces/prisma-options.types';
 import { Prisma } from '@prisma/client';
 import { onlyNumbers } from '@brazilian-utils/brazilian-utils';

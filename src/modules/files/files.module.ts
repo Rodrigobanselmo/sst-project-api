@@ -1,3 +1,4 @@
+import { DayJSProvider } from '../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { Module } from '@nestjs/common';
 import { ExcelProvider } from '../../shared/providers/ExcelProvider/implementations/ExcelProvider';
 import { SSTModule } from '../sst/sst.module';
@@ -29,13 +30,16 @@ import { UploadCidDataService } from './services/cid/upload-cid/upload-cid.servi
 import { DownloadCidService } from './services/cid/download-cid/download-cid.service';
 import { FilesCidController } from './controller/cid/files-cid.controller';
 import { ReportClinicFactory } from './factories/report/products/ReportClinicFactory';
+import { ReportExpiredExamFactory } from './factories/report/products/ReportExpiredExamFactory';
 import { ClinicReportService } from './services/reports/clinic-report/clinic-report.service';
 import { ReportsController } from './controller/reports/reports.controller';
+import { ExpiredExamReportService } from './services/reports/exam-report/expired-exam-report.service';
 
 @Module({
   controllers: [FilesChecklistController, ReportsController, FilesCompanyController, FilesCnaeController, FilesController, FilesCidController],
   imports: [SSTModule, CompanyModule],
   providers: [
+    DayJSProvider,
     DownloadExcelProvider,
     UploadExcelProvider,
     UploadChecklistDataService,
@@ -60,6 +64,8 @@ import { ReportsController } from './controller/reports/reports.controller';
     UploadCidDataService,
     ReportClinicFactory,
     ClinicReportService,
+    ExpiredExamReportService,
+    ReportExpiredExamFactory,
   ],
 })
 export class FilesModule {}

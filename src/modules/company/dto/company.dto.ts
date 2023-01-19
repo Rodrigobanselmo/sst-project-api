@@ -1,5 +1,5 @@
-import { QueryArray } from './../../../shared/transformers/query-array';
-import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
+import { QueryArray } from '../../../shared/transformers/query-array';
+import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
 import { CompanyPaymentTypeEnum, CompanyTypesEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import { IsBoolean, IsDate, IsDefined, IsEnum, IsInt, IsOptional, IsString, Length, MaxLength, ValidateIf, ValidateNested } from 'class-validator';
@@ -13,7 +13,9 @@ import { AddressDto } from './address.dto';
 import { LicenseDto } from './license.dto';
 import { WorkspaceDto } from './workspace.dto';
 import { StringNormalizeTransform } from '../../../shared/transformers/string-normalize.transform';
-import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
+import { ToBoolean } from '../../../shared/decorators/boolean.decorator';
+import { UserCompanyEditDto } from './update-user-company.dto';
+import { UpdateEmployeeDto } from './employee.dto';
 
 export class CreateCompanyDto {
   @Transform(CnpjFormatTransform, { toClassOnly: true })
@@ -198,6 +200,204 @@ export class CreateCompanyDto {
   @ToBoolean()
   @IsOptional()
   esocialSend?: boolean;
+}
+
+export class UpdateCompanyDto {
+  @IsString()
+  @IsOptional()
+  id?: string;
+
+  @IsString()
+  companyId: string;
+
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @Type(() => UserCompanyEditDto)
+  users?: UserCompanyEditDto[];
+
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @Type(() => UpdateEmployeeDto)
+  employees?: UpdateEmployeeDto[];
+
+  @Transform(CnpjFormatTransform, { toClassOnly: true })
+  @IsOptional()
+  @Length(14, 14, { message: 'invalid CNPJ' })
+  cnpj?: string;
+
+  @Transform(StringCapitalizeTransform, { toClassOnly: true })
+  @IsString()
+  @IsOptional()
+  name?: string;
+
+  @Transform(StringCapitalizeTransform, { toClassOnly: true })
+  @IsString()
+  @IsOptional()
+  fantasy?: string;
+
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsString()
+  @IsOptional()
+  @IsEnum(StatusEnum, {
+    message: `status must be one of: ${KeysOfEnum(StatusEnum)}`,
+  })
+  status?: StatusEnum;
+
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsOptional()
+  @IsString()
+  @IsEnum(CompanyTypesEnum, {
+    message: `type must be one of: ${KeysOfEnum(CompanyTypesEnum)}`,
+  })
+  type?: CompanyTypesEnum;
+
+  @ValidateNested()
+  @IsOptional()
+  @Type(() => AddressDto)
+  address?: AddressDto;
+
+  @IsOptional()
+  @IsBoolean()
+  @ToBoolean()
+  isConsulting?: boolean;
+
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => WorkspaceDto)
+  readonly workspace?: WorkspaceDto[];
+
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => ActivityDto)
+  readonly primary_activity?: ActivityDto[];
+
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @Type(() => ActivityDto)
+  readonly secondary_activity?: ActivityDto[];
+
+  @IsOptional()
+  @IsString()
+  size?: string;
+
+  @IsOptional()
+  @IsString()
+  logoUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  phone?: string;
+
+  @IsOptional()
+  @IsString()
+  legal_nature?: string;
+
+  @IsOptional()
+  @IsString()
+  cadastral_situation?: string;
+
+  @IsOptional()
+  @IsString()
+  activity_start_date?: string;
+
+  @IsOptional()
+  @IsString()
+  cadastral_situation_date?: string;
+
+  @IsOptional()
+  @IsString()
+  legal_nature_code?: string;
+
+  @IsOptional()
+  @IsString()
+  cadastral_situation_description?: string;
+
+  @IsOptional()
+  @IsString()
+  operationTime?: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @IsString()
+  responsibleName?: string;
+
+  @IsOptional()
+  @IsString()
+  email?: string;
+
+  @IsOptional()
+  @IsInt()
+  numAsos?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  @ToBoolean()
+  blockResignationExam?: boolean;
+
+  @IsOptional()
+  @IsDate()
+  @Type(() => Date)
+  esocialStart?: Date;
+
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  esocialSend?: boolean;
+
+  @IsOptional()
+  @IsString()
+  responsibleNit?: string;
+
+  @IsOptional()
+  @IsString()
+  responsibleCpf?: string;
+
+  @IsOptional()
+  @IsString()
+  initials?: string;
+
+  @IsOptional()
+  @IsString()
+  unit?: string;
+
+  @IsOptional()
+  @IsString()
+  stateRegistration?: string;
+
+  @IsOptional()
+  @IsInt()
+  doctorResponsibleId?: number;
+
+  @IsOptional()
+  @IsInt()
+  tecResponsibleId?: number;
+
+  @IsOptional()
+  @IsString()
+  obs?: string;
+
+  @IsInt()
+  @IsOptional()
+  paymentDay?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  @ToBoolean()
+  isTaxNote?: boolean;
+
+  @IsOptional()
+  @IsString()
+  observationBank?: string;
+
+  @IsOptional()
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsEnum(CompanyPaymentTypeEnum, {
+    message: `Tipo de pagamento inválido`,
+  })
+  paymentType?: CompanyPaymentTypeEnum;
 }
 
 export class FindCompaniesDto extends PaginationQueryDto {

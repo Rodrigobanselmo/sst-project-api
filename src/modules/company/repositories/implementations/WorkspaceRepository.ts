@@ -2,11 +2,6 @@
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
-import { CreateCompanyDto } from '../../dto/create-company.dto';
-import { CompanyEntity } from '../../entities/company.entity';
-import { v4 as uuidV4 } from 'uuid';
-import { UpdateCompanyDto } from '../../dto/update-company.dto';
-import { IPrismaOptions } from '../../../../shared/interfaces/prisma-options.types';
 import { WorkspaceDto } from '../../dto/workspace.dto';
 import { WorkspaceEntity } from '../../entities/workspace.entity';
 

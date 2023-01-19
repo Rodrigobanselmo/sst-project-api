@@ -235,7 +235,7 @@ export class UsersRepository implements IUsersRepository {
     const user = await this.prisma.user.findUnique({
       where: { id },
       include: {
-        companies: { include: { group: true } },
+        companies: { include: { group: { select: { permissions: true, roles: true } } } },
         professional: { include: { councils: true } },
       },
     });
@@ -243,6 +243,7 @@ export class UsersRepository implements IUsersRepository {
     return new UserEntity({
       ...(user as any),
       professional: new ProfessionalEntity(user?.professional),
+      companies: user.companies.map((c) => new UserCompanyEntity(c)),
     });
   }
 

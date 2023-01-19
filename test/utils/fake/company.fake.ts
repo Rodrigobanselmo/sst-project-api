@@ -2,7 +2,7 @@ import { StatusEnum } from '@prisma/client';
 import * as faker from 'faker';
 
 import { ActivityDto } from '../../../src/modules/company/dto/activity.dto';
-import { CreateCompanyDto } from '../../../src/modules/company/dto/create-company.dto';
+import { CreateCompanyDto } from '../../../src/modules/company/dto/company.dto';
 import { WorkspaceDto } from '../../../src/modules/company/dto/workspace.dto';
 import { CreateUserDto } from '../../../src/modules/users/dto/create-user.dto';
 import { format, verifierDigit } from '../../../src/shared/transformers/cnpj-format.transform';

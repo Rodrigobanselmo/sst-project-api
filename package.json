@@ -11,6 +11,7 @@
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "dev": "nest start --watch",
+    "dev:tsx": "tsx watch src/main.ts",
     "start:debug": "nest start --debug --watch",
     "seed": "node dist/prisma/seed.js",
     "prisma:run": "node dist/prisma/run.js",

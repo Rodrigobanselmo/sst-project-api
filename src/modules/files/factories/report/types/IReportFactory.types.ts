@@ -1,11 +1,11 @@
-import { ClinicScheduleTypeEnum, CompanyPaymentTypeEnum } from '@prisma/client';
+import { ReportDownloadtypeEnum } from '../../../../../modules/files/dto/base-report.dto';
 
 export type IReportHeader = IReportHeaderCell[];
 
-export interface IReportFactoryProduct {
+export interface IReportFactoryProduct<T> {
   getSheetName(): string;
   getFilename(): string;
-  findTableData(companyId: string, query: any): Promise<IReportFactoryProductFindData>;
+  findTableData(companyId: string, query: T): Promise<IReportFactoryProductFindData>;
   sanitizeData(data: any[]): IReportSanitizeData[];
   getHeader(data?: any): IReportHeader;
   getTitle(header: IReportHeader): IReportCell[][];
@@ -35,6 +35,11 @@ export interface IReportHeaderCell extends IReportCell {
 
 export type IReportRows = IReportCell[][];
 export type IReportSanitizeData = Record<string, IReportCell>;
+export type IReportGenerateType<T> = {
+  downloadType: ReportDownloadtypeEnum;
+  companyId: string;
+  body: T;
+};
 
 export enum ReportFillColorEnum {
   BLUE = '#1ea5ff',

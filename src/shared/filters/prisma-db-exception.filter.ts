@@ -16,6 +16,7 @@ export class PrismaDbExceptionFilter implements ExceptionFilter {
     const { cause, target, field_name } = meta;
 
     console.error(exception);
+    console.log(99);
 
     switch (code) {
       case 'P2002':

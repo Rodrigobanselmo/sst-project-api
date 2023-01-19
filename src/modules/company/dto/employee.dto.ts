@@ -1,5 +1,6 @@
+import { QueryArray } from 'src/shared/transformers/query-array';
 import { PartialType } from '@nestjs/swagger';
-import { SexTypeEnum, StatusEnum } from '@prisma/client';
+import { ExamHistoryEvaluationEnum, SexTypeEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import { IsBoolean, IsDate, IsEnum, IsInt, IsNumber, IsOptional, IsString, Length, MaxLength } from 'class-validator';
 import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
@@ -143,6 +144,11 @@ export class FindEmployeeDto extends PaginationQueryDto {
   @IsOptional()
   all?: boolean;
 
+  @IsOptional()
+  @IsDate({ message: 'Data inválida' })
+  @Type(() => Date)
+  lteExpiredDateExam: Date;
+
   @IsBoolean()
   @ToBoolean()
   @IsOptional()
@@ -152,6 +158,65 @@ export class FindEmployeeDto extends PaginationQueryDto {
   @IsDate({ message: 'Data inválida' })
   @Type(() => Date)
   expiredDateExam: Date;
+
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsString({ each: true })
+  @IsOptional()
+  companiesIds?: string[];
+
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsString({ each: true })
+  @IsOptional()
+  companiesGroupIds?: string[];
+
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsString({ each: true })
+  @IsOptional()
+  cities?: string[];
+
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsString({ each: true })
+  @IsOptional()
+  uf?: string[];
+
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsString({ each: true })
+  @IsOptional()
+  @IsEnum(StatusEnum, {
+    message: `status must be one of: ${StatusEnum.ACTIVE} or ${StatusEnum.INACTIVE}`,
+    each: true,
+  })
+  status: StatusEnum[];
+
+  // @IsBoolean()
+  // @ToBoolean()
+  // @IsOptional()
+  // isPeriodic?: boolean;
+  // @IsBoolean()
+  // @ToBoolean()
+  // @IsOptional()
+  // isChange?: boolean;
+  // @IsBoolean()
+  // @ToBoolean()
+  // @IsOptional()
+  // isAdmission?: boolean;
+  // @IsBoolean()
+  // @ToBoolean()
+  // @IsOptional()
+  // isReturn?: boolean;
+  // @IsBoolean()
+  // @ToBoolean()
+  // @IsOptional()
+  // isDismissal?: boolean;
+
+  // @Transform(QueryArray, { toClassOnly: true })
+  // @IsString({ each: true })
+  // @IsOptional()
+  // @IsEnum(ExamHistoryEvaluationEnum, {
+  //   message: `Typo de avaliação inválida`,
+  //   each: true,
+  // })
+  // notInEvaluationType?: ExamHistoryEvaluationEnum[];
 }
 
 export class FindOneEmployeeDto {

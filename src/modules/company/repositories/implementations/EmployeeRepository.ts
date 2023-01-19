@@ -219,7 +219,13 @@ export class EmployeeRepository {
 
     if ('all' in query) {
       options.select.company = {
-        select: { fantasy: true, name: true, cnpj: true, initials: true },
+        select: {
+          fantasy: true,
+          name: true,
+          cnpj: true,
+          initials: true,
+          ...(typeof options.select.company != 'boolean' && options.select.company?.select && options.select.company.select),
+        },
       };
 
       (whereInit.AND as any).push({
@@ -242,7 +248,7 @@ export class EmployeeRepository {
     }
 
     if ('expiredExam' in query) {
-      options.orderBy = [{ expiredDateExam: 'asc' }, { name: 'asc' }];
+      options.orderBy = [{ expiredDateExam: { sort: 'asc', nulls: 'first' } }, { company: { group: { name: 'asc' } } }, { company: { name: 'asc' } }, { name: 'asc' }];
       options.select.expiredDateExam = true;
       options.select.newExamAdded = true;
       options.select.examsHistory = {
@@ -268,7 +274,7 @@ export class EmployeeRepository {
 
     const { where } = prismaFilter(whereInit, {
       query,
-      skip: ['search', 'hierarchySubOfficeId', 'all', 'expiredExam'],
+      skip: ['search', 'hierarchySubOfficeId', 'lteExpiredDateExam', 'all', 'expiredExam', 'companiesIds', 'uf', 'cities', 'companiesGroupIds'],
     });
 
     if ('search' in query) {
@@ -297,6 +303,46 @@ export class EmployeeRepository {
         subOffices: { some: { id: query.hierarchySubOfficeId } },
       } as typeof options.where);
       delete query.hierarchySubOfficeId;
+    }
+
+    if ('companiesIds' in query) {
+      (where.AND as any).push({
+        company: {
+          id: { in: query.companiesIds },
+        },
+      } as typeof options.where);
+    }
+
+    if ('companiesGroupIds' in query) {
+      (where.AND as any).push({
+        company: {
+          group: { companyGroup: { id: { in: query.companiesGroupIds } } },
+        },
+      } as typeof options.where);
+    }
+
+    if ('cities' in query) {
+      (where.AND as any).push({
+        company: {
+          address: { city: { in: query.cities } },
+        },
+      } as typeof options.where);
+    }
+
+    if ('uf' in query) {
+      (where.AND as any).push({
+        company: {
+          address: { state: { in: query.uf } },
+        },
+      } as typeof options.where);
+    }
+
+    if ('lteExpiredDateExam' in query) {
+      (where.AND as any).push({
+        expiredDateExam: {
+          lte: query.lteExpiredDateExam,
+        },
+      } as typeof options.where);
     }
 
     const response = await this.prisma.$transaction([

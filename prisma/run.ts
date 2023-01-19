@@ -64,7 +64,7 @@ async function main() {
     //   await prisma.$queryRaw`select
     //   id, name
     // from users
-    //   where LOWER(unaccent(name)) LIKE ${'filterText'};`.then((users) => console.log(users));
+    //   where LOWER(unaccent(name)) LIKE ${'filterText'};`.then((users) => console.info(users));
 
     // await prisma.cities.findMany({
     //   where: { name: { contains: 'Sa', mode: 'insensitive' } },

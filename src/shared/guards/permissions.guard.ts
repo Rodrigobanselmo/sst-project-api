@@ -81,7 +81,6 @@ export class PermissionsGuard implements CanActivate {
         if (isMaster(user, PermissionOption, CRUD)) return true;
 
         const affectedCompanyId = getCompanyId(req);
-
         //! missing companiesIds check
         // const affectedCompanyIds = getCompanyIds(req);
 

@@ -76,6 +76,8 @@ export class EmployeeEntity implements Employee {
   hierarchyHistory?: EmployeeHierarchyHistoryEntity[];
   pppHistory?: EmployeePPPHistoryEntity[];
   sectorHierarchy?: HierarchyEntity;
+  scheduleExam?: EmployeeExamsHistoryEntity;
+  lastDoneExam?: EmployeeExamsHistoryEntity;
 
   constructor(
     partial: Partial<Omit<EmployeeEntity, 'company'>> & {
@@ -86,7 +88,7 @@ export class EmployeeEntity implements Employee {
     Object.assign(this, partial);
 
     if (this.newExamAdded) {
-      //? to be able to say that the exam is no longer expired if is schedule to a future expired date
+      //? toda vez que um novo exame é adicionado a um funcionario ou cargo e o funcionario possui um exame expirado, ele salva a data de hoje como newExamAdded
       if (!this.expiredDateExam) this.expiredDateExam = this.newExamAdded;
       if (this.expiredDateExam > this.newExamAdded) this.expiredDateExam = this.newExamAdded;
 
@@ -115,6 +117,8 @@ export class EmployeeEntity implements Employee {
 
     if (this.examsHistory) {
       this.examsHistory = this.examsHistory.map((examsHistory) => new EmployeeExamsHistoryEntity(examsHistory));
+      this.scheduleExam = this.examsHistory.find((p) => p?.status == 'PROCESSING');
+      this.lastDoneExam = this.examsHistory.find((p) => p?.status == 'DONE');
     }
 
     if (this.hierarchyHistory) {

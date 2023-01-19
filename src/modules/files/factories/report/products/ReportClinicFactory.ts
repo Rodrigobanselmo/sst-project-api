@@ -1,3 +1,4 @@
+import { PaginationQueryDto } from './../../../../../shared/dto/pagination.dto';
 import { formatCEP } from '@brazilian-utils/brazilian-utils';
 import { Injectable } from '@nestjs/common';
 
@@ -8,20 +9,20 @@ import { CompanyEntity } from '../../../../company/entities/company.entity';
 import { CompanyRepository } from '../../../../company/repositories/implementations/CompanyRepository';
 import { ReportFactoryAbstractionCreator } from '../creator/ReportFactoryCreator';
 import { IReportCell, IReportFactoryProduct, IReportFactoryProductFindData, IReportHeader, IReportSanitizeData } from '../types/IReportFactory.types';
-import { FindCompaniesDto } from './../../../../company/dto/create-company.dto';
+import { FindCompaniesDto } from '../../../../company/dto/company.dto';
 
 @Injectable()
-export class ReportClinicFactory extends ReportFactoryAbstractionCreator {
+export class ReportClinicFactory extends ReportFactoryAbstractionCreator<FindCompaniesDto> {
   constructor(private readonly companyRepository: CompanyRepository, private readonly excelProv: ExcelProvider) {
     super(excelProv);
   }
 
-  public factoryMethod(): IReportFactoryProduct {
+  public factoryMethod(): IReportFactoryProduct<FindCompaniesDto> {
     return new ReportFactoryProduct(this.companyRepository);
   }
 }
 
-class ReportFactoryProduct implements IReportFactoryProduct {
+class ReportFactoryProduct implements IReportFactoryProduct<FindCompaniesDto> {
   constructor(private readonly companyRepository: CompanyRepository) {}
 
   public async findTableData(companyId: string, { skip, take, ...query }: FindCompaniesDto) {

@@ -51,7 +51,6 @@ export class TablesController {
 
     const add = await this.prisma.addressCompany.groupBy({ by: ['city', 'state'], orderBy: { city: 'asc' }, skip: skip || 0, take: take || 20, where });
 
-    console.log(add);
     return {
       data: add.map((c) => ({ name: c.city, ufCode: c.state })),
       count: add.length,

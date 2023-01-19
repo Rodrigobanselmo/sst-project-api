@@ -1,9 +1,10 @@
+import { ReportDownloadtypeEnum } from 'src/modules/files/dto/base-report.dto';
 import { Workbook } from 'exceljs';
 import { ExcelProvider } from '../../../../../shared/providers/ExcelProvider/implementations/ExcelProvider';
-import { IReportCell, IReportFactoryProduct, IReportFactoryProductFindData, IReportRows, ReportFillColorEnum } from '../types/IReportFactory.types';
+import { IReportCell, IReportFactoryProduct, IReportFactoryProductFindData, IReportGenerateType, IReportRows, ReportFillColorEnum } from '../types/IReportFactory.types';
 
-export abstract class ReportFactoryAbstractionCreator {
-  public abstract factoryMethod(): IReportFactoryProduct;
+export abstract class ReportFactoryAbstractionCreator<T> {
+  public abstract factoryMethod(): IReportFactoryProduct<T>;
   private readonly excelProvider: ExcelProvider;
 
   constructor(excelProvider) {
@@ -16,7 +17,7 @@ export abstract class ReportFactoryAbstractionCreator {
     return product;
   }
 
-  public async excelCompile(companyId: string, query: any): Promise<{ workbook: Workbook; filename: string }> {
+  public async excelCompile(companyId: string, query: T): Promise<{ workbook: Workbook; filename: string }> {
     const { rows, filename: fileName, sheetName } = await this.getRows(companyId, query);
 
     const { workbook, filename } = await this.excelProvider.createReportTable([{ rows, name: sheetName }], fileName);
@@ -24,7 +25,7 @@ export abstract class ReportFactoryAbstractionCreator {
     return { workbook, filename };
   }
 
-  public async getRows(companyId: string, query: any) {
+  public async getRows(companyId: string, query: T) {
     const product = this.create();
 
     const tableData = await product.findTableData(companyId, query);
@@ -69,5 +70,15 @@ export abstract class ReportFactoryAbstractionCreator {
     });
 
     return headerMap;
+  }
+
+  public async execute({ downloadType, companyId, body }: IReportGenerateType<T>) {
+    if (!downloadType || downloadType == ReportDownloadtypeEnum.XML) {
+      const excelFile = await this.excelCompile(companyId, body);
+      return excelFile;
+    }
+
+    const rows = await this.getRows(companyId, body);
+    return rows;
   }
 }

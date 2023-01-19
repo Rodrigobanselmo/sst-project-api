@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 
-import { CreateCompanyDto } from '../../../../../modules/company/dto/create-company.dto';
+import { CreateCompanyDto } from '../../../dto/company.dto';
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { CompanyRepository } from '../../../repositories/implementations/CompanyRepository';
 import { LicenseRepository } from '../../../repositories/implementations/LicenseRepository';
