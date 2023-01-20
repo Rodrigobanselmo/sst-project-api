@@ -71,21 +71,24 @@ export class HierarchyRepository {
     const foundHomogeneousGroups = await this.prisma.hierarchyOnHomogeneous.findMany({
       where: {
         hierarchyId: { in: upsertHierarchyMany.map((h) => h.id) },
+        homogeneousGroup: { type: { equals: null } },
       },
     });
 
     foundHomogeneousGroups.forEach((hh) => {
       const max = foundHomogeneousGroups.reduce((acc, curr) => {
         if (hh.hierarchyId !== curr.hierarchyId) return acc || 0;
-        return Math.max(acc, curr?.endDate?.getTime());
+        if (hh.homogeneousGroupId !== curr.homogeneousGroupId) return acc || 0;
+
+        return curr?.endDate?.getTime() ? Math.max(acc, curr?.endDate?.getTime()) : acc;
       }, 0);
 
-      hierarchyOnHomogeneous[hh.hierarchyId] = {};
-      hierarchyOnHomogeneous[hh.hierarchyId].skip = true;
+      hierarchyOnHomogeneous[`${hh.hierarchyId}${hh.homogeneousGroupId}`] = {};
+      hierarchyOnHomogeneous[`${hh.hierarchyId}${hh.homogeneousGroupId}`].skip = true;
 
       if ((hh?.endDate?.getTime() || 0) == max) {
-        hierarchyOnHomogeneous[hh.hierarchyId].id = hh.id;
-        hierarchyOnHomogeneous[hh.hierarchyId].skip = false;
+        hierarchyOnHomogeneous[`${hh.hierarchyId}${hh.homogeneousGroupId}`].id = hh.id;
+        hierarchyOnHomogeneous[`${hh.hierarchyId}${hh.homogeneousGroupId}`].skip = false;
       }
     });
 
@@ -166,8 +169,8 @@ export class HierarchyRepository {
 
     await this.prisma.$transaction(
       HierarchyOnHomoGroup.filter((hh) => {
-        if (hierarchyOnHomogeneous[hh.hierarchyId]) {
-          if (hierarchyOnHomogeneous[hh.hierarchyId].skip) return false;
+        if (hierarchyOnHomogeneous[`${hh.hierarchyId}${hh.homogeneousGroupId}`]) {
+          if (hierarchyOnHomogeneous[`${hh.hierarchyId}${hh.homogeneousGroupId}`].skip) return false;
         }
         return true;
       }).map((hierarchyOnHomoGroup) => {
@@ -178,7 +181,7 @@ export class HierarchyRepository {
           },
           update: { endDate: null },
           where: {
-            id: hierarchyOnHomogeneous[hierarchyOnHomoGroup.hierarchyId]?.id || 0,
+            id: hierarchyOnHomogeneous[`${hierarchyOnHomoGroup.hierarchyId}${hierarchyOnHomoGroup.homogeneousGroupId}`]?.id || 0,
           },
         });
       }),

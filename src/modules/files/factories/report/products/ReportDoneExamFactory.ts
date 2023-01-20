@@ -1,7 +1,7 @@
 import { formatCurrency } from '@brazilian-utils/brazilian-utils';
 import { Injectable } from '@nestjs/common';
 import { StatusEnum } from '@prisma/client';
-import { DayJSProvider } from 'src/shared/providers/DateProvider/implementations/DayJSProvider';
+import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 
 import { EmployeeExamsHistoryEntity } from '../../../../../modules/company/entities/employee-exam-history.entity';
 import { ExcelProvider } from '../../../../../shared/providers/ExcelProvider/implementations/ExcelProvider';

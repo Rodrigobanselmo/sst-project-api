@@ -95,10 +95,6 @@ export class PermissionsGuard implements CanActivate {
         //! remove
         // const isPermissionPresent = true;
 
-        console.log('user', user);
-        console.log('isPermissionPresent', isPermissionPresent);
-        console.log('affectedCompanyId', affectedCompanyId);
-
         if (!isMember && !isContract && isPermissionPresent) return true;
 
         if (isMember && isPermissionPresent) {

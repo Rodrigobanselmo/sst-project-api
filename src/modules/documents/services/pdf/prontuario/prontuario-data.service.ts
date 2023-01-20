@@ -7,7 +7,7 @@ import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { EmployeeEntity } from '../../../../company/entities/employee.entity';
 import { EmployeeRepository } from '../../../../company/repositories/implementations/EmployeeRepository';
 import { IPdfProntuarioData, IProntuarioQuestion } from './types/IProntuarioData.type';
-import { onGetRisks } from 'src/shared/utils/onGetRisks';
+import { onGetRisks } from '../../../../../shared/utils/onGetRisks';
 import { checkRiskDataDoc } from '../../pgr/document/upload-pgr-doc.service';
 
 @Injectable()

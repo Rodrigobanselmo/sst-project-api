@@ -6,8 +6,8 @@ import { User } from '../../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { Event2210Dto, Event2220Dto, FindEvents2210Dto, FindEvents2220Dto } from '../../../dto/event.dto';
 import { SendEvents2220ESocialService } from '../../../services/events/2220/send-events/send-events.service';
-import { FindEvents2210ESocialService } from 'src/modules/esocial/services/events/2210/find-events/find-events-2210.service';
-import { SendEvents2210ESocialService } from 'src/modules/esocial/services/events/2210/send-events/send-events-2210.service';
+import { FindEvents2210ESocialService } from '../../../../../modules/esocial/services/events/2210/find-events/find-events-2210.service';
+import { SendEvents2210ESocialService } from '../../../../../modules/esocial/services/events/2210/send-events/send-events-2210.service';
 
 @ApiTags('events-2210')
 @Controller('esocial/events/2210')

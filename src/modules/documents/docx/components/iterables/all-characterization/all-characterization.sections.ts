@@ -10,7 +10,7 @@ import { hierarchyHomoOrgTable } from '../../tables/hierarchyHomoOrg/hierarchyHo
 import { EnvironmentEntity } from '../../../../../company/entities/environment.entity';
 import { environmentsConverter, IEnvironmentConvertResponse } from './all-characterization.converter';
 import { getCharacterizationType } from '../../../../../../modules/company/repositories/implementations/CharacterizationRepository';
-import { sortNumber } from 'src/shared/utils/sorts/number.sort';
+import { sortNumber } from '../../../../../../shared/utils/sorts/number.sort';
 
 const getData = (
   hierarchiesTreeOrg: IHierarchyData,

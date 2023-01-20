@@ -1,4 +1,4 @@
-import { QueryArray } from 'src/shared/transformers/query-array';
+import { QueryArray } from '../../../shared/transformers/query-array';
 import { PartialType } from '@nestjs/swagger';
 import { ExamHistoryEvaluationEnum, SexTypeEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';

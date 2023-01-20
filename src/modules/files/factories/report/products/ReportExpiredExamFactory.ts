@@ -8,7 +8,7 @@ import { FindEmployeeDto } from './../../../../company/dto/employee.dto';
 import { EmployeeEntity } from './../../../../company/entities/employee.entity';
 import { EmployeeRepository } from './../../../../company/repositories/implementations/EmployeeRepository';
 import { FindCompaniesDto } from '../../../../company/dto/company.dto';
-import { DayJSProvider } from 'src/shared/providers/DateProvider/implementations/DayJSProvider';
+import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 
 @Injectable()
 export class ReportExpiredExamFactory extends ReportFactoryAbstractionCreator<FindEmployeeDto> {

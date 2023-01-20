@@ -24,6 +24,7 @@ import { normCityAddress } from './run/nomalize-city-address';
 import { scheduleBlockNational } from './seed/scheduleBlockNational';
 import { fixDate } from './run/fix-date';
 import { normCities } from './run/normalize-cities';
+import { fixHierarchyHomo } from './run/fix-hierarchy-homo';
 
 const prisma = new PrismaClient({
   // log: ['query'],
@@ -57,10 +58,11 @@ async function main() {
     // await normCityAddress(prisma);
     // await scheduleBlockNational(prisma);
     // await fixDate(prisma);
+    // await normCities(prisma);
 
     //*next
+    await fixHierarchyHomo(prisma);
 
-    await normCities(prisma);
     //   await prisma.$queryRaw`select
     //   id, name
     // from users

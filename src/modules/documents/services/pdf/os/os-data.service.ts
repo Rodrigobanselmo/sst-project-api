@@ -1,8 +1,8 @@
 import { isNaEpi, isNaRecMed } from './../../../../../shared/utils/isNa';
 import { GenerateSourceEntity } from './../../../../sst/entities/generateSource.entity';
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { EngsRiskDataEntity } from 'src/modules/sst/entities/engsRiskData.entity';
-import { RecMedEntity } from 'src/modules/sst/entities/recMed.entity';
+import { EngsRiskDataEntity } from '../../../../../modules/sst/entities/engsRiskData.entity';
+import { RecMedEntity } from '../../../../../modules/sst/entities/recMed.entity';
 
 import { EpiRiskDataEntity } from '../../../../../modules/sst/entities/epiRiskData.entity';
 import { ErrorMessageEnum } from '../../../../../shared/constants/enum/errorMessage';

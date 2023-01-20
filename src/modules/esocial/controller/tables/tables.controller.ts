@@ -7,7 +7,7 @@ import { FindCitiesDto } from '../../dto/cities.dto';
 import { Prisma } from '@prisma/client';
 import { FindEsocialTable24Dto } from '../../dto/event.dto';
 import { onlyNumbers } from '@brazilian-utils/brazilian-utils';
-import { normalizeString } from 'src/shared/utils/normalizeString';
+import { normalizeString } from '../../../../shared/utils/normalizeString';
 
 @ApiTags('tables')
 @Controller('esocial')

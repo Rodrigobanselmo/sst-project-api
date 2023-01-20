@@ -1,4 +1,4 @@
-import { ReportDownloadtypeEnum } from 'src/modules/files/dto/base-report.dto';
+import { ReportDownloadtypeEnum } from '../../../../..//modules/files/dto/base-report.dto';
 import { Workbook } from 'exceljs';
 import { ExcelProvider } from '../../../../../shared/providers/ExcelProvider/implementations/ExcelProvider';
 import { IReportCell, IReportFactoryProduct, IReportFactoryProductFindData, IReportGenerateType, IReportRows, ReportFillColorEnum } from '../types/IReportFactory.types';
