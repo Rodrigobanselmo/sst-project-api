@@ -209,6 +209,7 @@ import { FindGenerateSourceService } from './services/generate-source/find-gener
     ExamRepository,
     EpiRepository,
     CheckEmployeeExamService,
+    ExamToClinicRepository,
   ],
   imports: [forwardRef(() => CompanyModule), CacheModule.register()],
 })

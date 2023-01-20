@@ -33,7 +33,9 @@ import { ReportClinicFactory } from './factories/report/products/ReportClinicFac
 import { ReportExpiredExamFactory } from './factories/report/products/ReportExpiredExamFactory';
 import { ClinicReportService } from './services/reports/clinic-report/clinic-report.service';
 import { ReportsController } from './controller/reports/reports.controller';
-import { ExpiredExamReportService } from './services/reports/exam-report/expired-exam-report.service';
+import { ExpiredExamReportService } from './services/reports/expired-exam-report/expired-exam-report.service';
+import { ReportDoneExamFactory } from './factories/report/products/ReportDoneExamFactory';
+import { DoneExamReportService } from './services/reports/done-exam-report/done-exam-report.service';
 
 @Module({
   controllers: [FilesChecklistController, ReportsController, FilesCompanyController, FilesCnaeController, FilesController, FilesCidController],
@@ -64,8 +66,10 @@ import { ExpiredExamReportService } from './services/reports/exam-report/expired
     UploadCidDataService,
     ReportClinicFactory,
     ClinicReportService,
+    DoneExamReportService,
     ExpiredExamReportService,
     ReportExpiredExamFactory,
+    ReportDoneExamFactory,
   ],
 })
 export class FilesModule {}

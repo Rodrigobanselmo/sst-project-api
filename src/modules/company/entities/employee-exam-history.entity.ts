@@ -66,6 +66,7 @@ export class EmployeeExamsHistoryEntity implements EmployeeExamsHistory {
   asoExamId: number;
   asoExam?: EmployeeExamsHistoryEntity;
   complementaryExams?: EmployeeExamsHistoryEntity[];
+  price?: number;
 
   constructor(
     partial: Partial<

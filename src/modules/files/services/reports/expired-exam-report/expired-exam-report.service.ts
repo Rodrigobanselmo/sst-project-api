@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { ReportExpiredExamFactory } from '../../../factories/report/products/ReportExpiredExamFactory';
-import { DownloudExpiredExamReportDto } from './../../../dto/expired-exam-report.dto';
+import { DownloudExpiredExamReportDto } from '../../../dto/expired-exam-report.dto';
 
 @Injectable()
 export class ExpiredExamReportService {

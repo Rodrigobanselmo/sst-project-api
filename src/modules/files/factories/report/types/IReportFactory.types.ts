@@ -6,10 +6,10 @@ export interface IReportFactoryProduct<T> {
   getSheetName(): string;
   getFilename(): string;
   findTableData(companyId: string, query: T): Promise<IReportFactoryProductFindData>;
-  sanitizeData(data: any[]): IReportSanitizeData[];
-  getHeader(data?: any): IReportHeader;
-  getTitle(header: IReportHeader): IReportCell[][];
-  getEndInformation(data?: any): IReportCell[][];
+  sanitizeData(...data: any): IReportSanitizeData[];
+  getHeader(...data: any): IReportHeader;
+  getTitle(header: IReportHeader, ...data: any): IReportCell[][];
+  getEndInformation(...data: any): IReportCell[][];
 }
 
 export interface IReportFactoryProductFindData {
@@ -43,9 +43,9 @@ export type IReportGenerateType<T> = {
 
 export enum ReportFillColorEnum {
   BLUE = '#1ea5ff',
-  YELLOW = '#1ea5ff',
-  RED = '#1ea5ff',
-  GREEN = '#1ea5ff',
+  YELLOW = '#d9d10b',
+  RED = '#F44336',
+  GREEN = '#3cbe7d',
   HEADER = '#faffae',
   TITLE = '#a1a1a1',
   END = '#faffae',
@@ -53,7 +53,7 @@ export enum ReportFillColorEnum {
 
 export enum ReportColorEnum {
   BLUE = '#1ea5ff',
-  YELLOW = '#1ea5ff',
-  RED = '#1ea5ff',
-  GREEN = '#1ea5ff',
+  YELLOW = '#d9d10b',
+  RED = '#F44336',
+  GREEN = '#3cbe7d',
 }

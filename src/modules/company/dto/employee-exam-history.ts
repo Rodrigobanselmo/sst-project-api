@@ -271,6 +271,49 @@ export class FindEmployeeExamHistoryDto extends PaginationQueryDto {
   @IsString({ each: true })
   @IsOptional()
   status?: string[];
+
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsString({ each: true })
+  @IsOptional()
+  companiesIds?: string[];
+
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsString({ each: true })
+  @IsOptional()
+  companiesGroupIds?: string[];
+
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsString({ each: true })
+  @IsOptional()
+  clinicsIds?: string[];
+
+  @IsOptional()
+  @IsDate()
+  @Type(() => Date)
+  startDate?: Date;
+
+  @IsOptional()
+  @IsDate()
+  @Type(() => Date)
+  endDate?: Date;
+
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsString({ each: true })
+  @IsOptional()
+  @IsEnum(ExamHistoryTypeEnum, {
+    message: `Typo de exame inválida`,
+    each: true,
+  })
+  notInExamType?: ExamHistoryTypeEnum[];
+
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsString({ each: true })
+  @IsOptional()
+  @IsEnum(ExamHistoryEvaluationEnum, {
+    message: `Typo de avaliação inválida`,
+    each: true,
+  })
+  notInEvaluationType?: ExamHistoryEvaluationEnum[];
 }
 
 export class FindClinicEmployeeExamHistoryDto {

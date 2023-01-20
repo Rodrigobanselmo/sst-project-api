@@ -143,7 +143,19 @@ export class EmployeeExamsHistoryRepository {
 
     const { where } = prismaFilter(whereInit, {
       query,
-      skip: ['search', 'companyId', 'allCompanies', 'userCompany'],
+      skip: [
+        'search',
+        'companyId',
+        'allCompanies',
+        'userCompany',
+        'companiesIds',
+        'companiesGroupIds',
+        'startDate',
+        'endDate',
+        'clinicsIds',
+        'notInEvaluationType',
+        'notInExamType',
+      ],
     });
 
     if ('search' in query) {
@@ -165,6 +177,54 @@ export class EmployeeExamsHistoryRepository {
 
       (where.AND as any).push({ employee: { OR } } as typeof whereOptions);
       delete query.search;
+    }
+
+    if ('companiesIds' in query) {
+      (where.AND as any).push({
+        employee: {
+          companyId: { in: query.companiesIds },
+        },
+      } as typeof whereOptions);
+    }
+
+    if ('companiesGroupIds' in query) {
+      (where.AND as any).push({
+        employee: {
+          company: {
+            group: { companyGroup: { id: { in: query.companiesGroupIds } } },
+          },
+        },
+      } as typeof whereOptions);
+    }
+
+    if ('clinicsIds' in query) {
+      (where.AND as any).push({
+        clinicId: { in: query.clinicsIds },
+      } as typeof whereOptions);
+    }
+
+    if ('notInEvaluationType' in query) {
+      (where.AND as any).push({
+        evaluationType: { notIn: query.notInEvaluationType },
+      } as typeof whereOptions);
+    }
+
+    if ('notInExamType' in query) {
+      (where.AND as any).push({
+        examType: { notIn: query.notInExamType },
+      } as typeof whereOptions);
+    }
+
+    if ('startDate' in query) {
+      (where.AND as any).push({
+        doneDate: { gte: query.startDate },
+      } as typeof whereOptions);
+    }
+
+    if ('endDate' in query) {
+      (where.AND as any).push({
+        doneDate: { lte: query.endDate },
+      } as typeof whereOptions);
     }
 
     const response = await this.prisma.$transaction([

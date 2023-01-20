@@ -187,36 +187,6 @@ export class FindEmployeeDto extends PaginationQueryDto {
     each: true,
   })
   status: StatusEnum[];
-
-  // @IsBoolean()
-  // @ToBoolean()
-  // @IsOptional()
-  // isPeriodic?: boolean;
-  // @IsBoolean()
-  // @ToBoolean()
-  // @IsOptional()
-  // isChange?: boolean;
-  // @IsBoolean()
-  // @ToBoolean()
-  // @IsOptional()
-  // isAdmission?: boolean;
-  // @IsBoolean()
-  // @ToBoolean()
-  // @IsOptional()
-  // isReturn?: boolean;
-  // @IsBoolean()
-  // @ToBoolean()
-  // @IsOptional()
-  // isDismissal?: boolean;
-
-  // @Transform(QueryArray, { toClassOnly: true })
-  // @IsString({ each: true })
-  // @IsOptional()
-  // @IsEnum(ExamHistoryEvaluationEnum, {
-  //   message: `Typo de avaliação inválida`,
-  //   each: true,
-  // })
-  // notInEvaluationType?: ExamHistoryEvaluationEnum[];
 }
 
 export class FindOneEmployeeDto {
