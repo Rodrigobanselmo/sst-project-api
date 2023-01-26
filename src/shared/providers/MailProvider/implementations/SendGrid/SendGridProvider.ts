@@ -29,7 +29,7 @@ class SendGridProvider implements IMailProvider {
       const random = String(Math.floor(Math.random() * 1000000));
 
       await this.client.send({
-        to: to,
+        to: to as string,
         from: source.replace(':id', random),
         subject: subject,
         html: templateHTML,

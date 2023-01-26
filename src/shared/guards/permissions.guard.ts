@@ -87,16 +87,10 @@ export class PermissionsGuard implements CanActivate {
         // is being send an array of items with different companies Ids
         if (affectedCompanyId === false) return false;
 
-        //! add
         const isPermissionPresent = checkPermissions(user, PermissionOption, CRUD);
         if (!isPermissionPresent) return false;
-        //! add
-
-        //! remove
-        // const isPermissionPresent = true;
 
         if (!isMember && !isContract && isPermissionPresent) return true;
-
         if (isMember && isPermissionPresent) {
           if (!affectedCompanyId) return true;
           if (affectedCompanyId == userCompanyId) return true;

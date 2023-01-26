@@ -1,9 +1,10 @@
+import { AlertReportCron } from './crons/alerts/alerts.cron';
 import { UpdateCompaniesReportCron } from './crons/employee-exam/employee-exam.cron';
 import { DeleteExamFileService } from './services/employee/0-history/exams/delete-exam-file/delete-exam-file.service';
 import { DownloadExamService } from './services/employee/0-history/exams/download-exam/download-exam.service';
 import { UploadExamFileService } from './services/employee/0-history/exams/upload-exam-file/upload-exam-file.service';
 import { UpdateManyScheduleExamHistoryService } from './services/employee/0-history/exams/update-many/update-many.service';
-import { Module, forwardRef } from '@nestjs/common';
+import { Module, forwardRef, CacheModule } from '@nestjs/common';
 
 import { ExcelProvider } from '../../shared/providers/ExcelProvider/implementations/ExcelProvider';
 import { AmazonStorageProvider } from '../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
@@ -150,9 +151,18 @@ import { DeleteScheduleBlocksService } from './services/scheduleBlock/delete-sch
 import { CreateScheduleBlocksService } from './services/scheduleBlock/create-schedule-block/create-schedule-block.service';
 import { FindOneScheduleBlocksService } from './services/scheduleBlock/find-one-schedule-block/find-one-schedule-block.service';
 import { ScheduleBlockController } from './controller/scheduleBlock/scheduleBlock.controller';
+import { AlertRepository } from './repositories/implementations/AlertRepository';
+import { DeleteAlertService } from './services/alert/delete-alert/delete-alert.service';
+import { FindOneAlertService } from './services/alert/find-alert/find-alert.service';
+import { UpsertAlertService } from './services/alert/upsert-alert/upsert-alert.service';
+import { AlertController } from './controller/alert/alert.controller';
+import { SendAlertService } from './services/alert/send-alert/send-alert.service';
+import { SendGridProvider } from '../../shared/providers/MailProvider/implementations/SendGrid/SendGridProvider';
+import { FindAlertsByTimeService } from './services/alert/find-alerts-by-time/find-alerts-by-time.service';
 
 @Module({
   imports: [
+    CacheModule.register(),
     forwardRef(() => SSTModule),
     forwardRef(() => NotificationModule),
     forwardRef(() => EsocialModule),
@@ -176,6 +186,7 @@ import { ScheduleBlockController } from './controller/scheduleBlock/scheduleBloc
     AbsenteeismController,
     CompanyOSController,
     ScheduleBlockController,
+    AlertController,
   ],
   providers: [
     CreateCompanyService,
@@ -310,6 +321,14 @@ import { ScheduleBlockController } from './controller/scheduleBlock/scheduleBloc
     DeleteScheduleBlocksService,
     CreateScheduleBlocksService,
     FindOneScheduleBlocksService,
+    AlertRepository,
+    UpsertAlertService,
+    FindOneAlertService,
+    DeleteAlertService,
+    SendGridProvider,
+    SendAlertService,
+    FindAlertsByTimeService,
+    AlertReportCron,
   ],
   exports: [
     CompanyRepository,

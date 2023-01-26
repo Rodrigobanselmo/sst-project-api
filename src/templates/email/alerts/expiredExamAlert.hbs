@@ -1,0 +1,115 @@
+<html>
+  <head>
+    <title>Relatório de exames</title>
+    <style>
+      body {
+        font-family: 'Open Sans', sans-serif;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+      }
+      th, td {
+        border: 1px solid #ddd;
+        padding: 5px 5px;
+        text-align: left;
+      }
+      th {
+        background-color: #f8f9fa;
+        font-weight: bold;
+      }
+
+      p {
+        padding: 0px;
+        margin: 0px;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      {{!-- <img src='https://i.imgur.com/oUAKMC5.png' alt='Logo Rentx' /> --}}
+      <p style='font-weight: bold; font-size: 20px;'>Relatório de exames</p>
+      <p style='
+          font-size: 16px;
+          margin-top: 10px;
+      '>Você tem <span style='color: red;'>{{expiredCount}}</span> exames vencidos</p>
+      
+      <p style='
+          font-size: 16px;
+          margin-bottom: 30px;
+      '>Você tem <span style='color: orange;'>{{expiringSoonCount}}</span> exames com vencimento em até 50 dias.</p>
+      
+      <div style='margin-bottom: 20px;'>
+        <a href="{{scheduleLink}}" style="
+          text-decoration: none;
+          background-color: #F27329;
+          color: white;
+          padding: 12px 20px;
+          border-radius: 4px;
+          border: none;
+          cursor: pointer;
+          font-size: 16px;
+          margin: 4px 2px;
+        " >
+          Agendar Exames Pelo Sistema
+        </a>
+      </div>
+
+      <h2>Exames Vencidos ou Proximos a Vencer</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style='text-align: left;'>Funcionário</th>
+            <th style='text-align: left;'>CPF</th>
+            <th style='text-align: left;'>Data Vencimento</th>
+            <th style='text-align: left;'>Dias Venc.</th>
+            {{!-- <th>Agendar</th> --}}
+          </tr>
+        </thead>
+        <tbody>
+          {{#each expired}}
+            <tr>
+              <td style='text-align: left; padding-right: 50px;'>{{employeeName}}</td>
+              <td style='text-align: left; padding-right: 50px;'>{{cpf}}</td>
+              <td style='text-align: left; padding-right: 50px;'>{{expirationDate}}</td>
+              {{#if isExpired}}
+                <td style='text-align: left; padding-right: 50px; color: red;'>{{daysToExpire}}</td>
+              {{else}}
+                <td style='text-align: left; padding-right: 50px;'>{{daysToExpire}}</td>
+              {{/if}}
+              {{!-- <td><a href="{{scheduleLink}}">Agendar</a></td> --}}
+            </tr>
+          {{/each}}
+          {{#if moreThanCanShow}}
+            <tr>
+              <td colspan="4">...</td>
+            </tr>
+            <tr>
+              <td colspan="4">Existem mais exames expirados do que mostrados na tabela. <a href="{{scheduleLink}}">Clique aqui</a> para ver todos.</td>
+            </tr>
+          {{/if}}
+          </tbody>
+      </table>
+
+      <div style='margin-bottom: 10px; margin-top: 10px;'>
+        <a href="{{scheduleLink}}" style="
+          text-decoration: none;
+          background-color: #2153b7;
+          color: white;
+          padding: 5px 10px;
+          border-radius: 4px;
+          border: none;
+          cursor: pointer;
+          font-size: 15px;
+          margin: 4px 2px;
+        " >
+          Agendar Pelo Sistema
+        </a>
+      </div>
+
+      <h3 class="tac">Equipe SimpleSST</h3>
+    </div>
+  </body>
+</html>
+

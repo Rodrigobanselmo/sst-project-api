@@ -25,10 +25,8 @@ class DayJSProvider implements IDateProvider {
     return dayjs(date).add(days, 'days').toDate();
   }
 
-  addTime(date: Date, value: number, type: string): Date {
-    return dayjs(date)
-      .add(value, type as any)
-      .toDate();
+  addTime(date: Date, value: number, type: ManipulateType): Date {
+    return dayjs(date).add(value, type).toDate();
   }
 
   onlyDate(date: Date): Date {

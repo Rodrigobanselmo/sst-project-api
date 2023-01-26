@@ -61,6 +61,7 @@ model AccessGroups {
   company     Company       @relation(fields: [companyId], references: [id])
   invites     InviteUsers[]
   users       UserCompany[]
+  alerts      Alert[]
 
   @@unique([id, companyId])
 }
@@ -340,6 +341,7 @@ model Company {
   secondary_activity              Activity[]                       @relation("secondary_activity")
   createdScheduleBlocks           ScheduleBlock[]                     
   scheduleBlocks                  ScheduleBlock[]                  @relation(name: "schedule_block_m2m_companies")
+  alerts                          Alert[]
 
   @@index([name])
   @@index([isClinic])
@@ -981,6 +983,23 @@ model ExamToRisk {
   @@unique([id, companyId])
 }
 
+model Alert {
+  id                    Int             @id @default(autoincrement())
+  type                  AlertsTypeEnum
+  companyId             String
+  system                Boolean          @default(false)
+  company               Company          @relation(fields: [companyId], references: [id])
+  groups                AccessGroups[]
+  users                 User[]
+  emails                String[]
+  nextAlert             DateTime?
+  configJson            Json?
+
+  @@unique([companyId, type])
+  @@unique([companyId, id])
+
+}
+
 model ExamToRiskData {
   examId              Int
   fromAge             Int?
@@ -1565,6 +1584,7 @@ model User {
   usersPgrSignatures  RiskFactorGroupDataToUser[]
   notification        Notification[]              @relation("NotificationToUser")
   notificationConfirm Notification[]              @relation("user_notification_confirm")
+  alerts              Alert[]             
 
   @@unique([id, name])
   @@index([email])
@@ -1860,4 +1880,9 @@ enum ProfessionalTypeEnum {
 enum ProfessionalRespTypeEnum {
   AMB
   BIO
+}
+
+enum AlertsTypeEnum {
+  CLINIC_NEXT_DAY_SCHEDULE
+  COMPANY_EXPIRED_EXAM
 }

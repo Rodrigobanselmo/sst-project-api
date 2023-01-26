@@ -21,7 +21,7 @@ export class JwtTokenProvider implements ITokenProvider {
     const lastChar = expires_in_refresh_token.slice(-1);
     const timeValue = Number(expires_in_refresh_token.slice(0, -1));
 
-    const refreshTokenExpiresDate = this.dateProvider.addTime(dateNow, timeValue, lastChar);
+    const refreshTokenExpiresDate = this.dateProvider.addTime(dateNow, timeValue, lastChar as any);
 
     const refresh_token = this.jwtService.sign(
       { sub: userId },

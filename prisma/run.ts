@@ -32,6 +32,8 @@ const prisma = new PrismaClient({
 
 async function main() {
   try {
+    console.info('start');
+
     // const group = await prisma.employeeESocialEvent.groupBy({
     //   by: ['status'],
     //   _count: true,
@@ -59,9 +61,9 @@ async function main() {
     // await scheduleBlockNational(prisma);
     // await fixDate(prisma);
     // await normCities(prisma);
+    // await fixHierarchyHomo(prisma);
 
     //*next
-    await fixHierarchyHomo(prisma);
 
     //   await prisma.$queryRaw`select
     //   id, name
@@ -75,6 +77,7 @@ async function main() {
     //   orderBy: { name: 'asc' },
     //   select: { code: true, name: true, uf: { select: { uf: true } } },
     // }),
+
     console.info('end');
   } catch (err) {
     console.error(err);

@@ -17,13 +17,13 @@ import { IExamOriginData, IExamEmployeeCheck } from '../../../entities/exam.enti
 import { ExamRepository } from '../../../repositories/implementations/ExamRepository';
 import { RiskDataRepository } from '../../../repositories/implementations/RiskDataRepository';
 
+export const clinicExamCloseToExpire = 45;
+
 export const getValidityInMonths = (employee: EmployeeEntity, examRisk: { validityInMonths?: number; lowValidityInMonths?: number }) => {
   return employee.isComorbidity ? examRisk.lowValidityInMonths || examRisk.validityInMonths : examRisk.validityInMonths;
 };
 @Injectable()
 export class FindExamByHierarchyService {
-  private clinicExamCloseToExpire = 45;
-
   constructor(
     private readonly employeeRepository: EmployeeRepository,
     private readonly examRepository: ExamRepository,
@@ -383,7 +383,7 @@ export class FindExamByHierarchyService {
 
     if (!foundExamHistory?.expiredDate) return {};
 
-    const closeValidated = examRisk.considerBetweenDays || (examRisk.exam.isAttendance ? this.clinicExamCloseToExpire : null);
+    const closeValidated = examRisk.considerBetweenDays || (examRisk.exam.isAttendance ? clinicExamCloseToExpire : null);
 
     const closeToExpired = closeValidated !== null && this.dayjs.compareTime(this.dayjs.dateNow(), foundExamHistory.expiredDate, 'days') <= closeValidated;
 

@@ -2,7 +2,7 @@ import { isValidCPF, onlyNumbers } from '@brazilian-utils/brazilian-utils';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 export const checkIsValidCpf = (value: any) => {
-  const transformToString = String(value);
+  const transformToString = onlyNumbers(String(value));
 
   if (!transformToString) {
     return false;

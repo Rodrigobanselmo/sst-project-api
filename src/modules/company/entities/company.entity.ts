@@ -28,6 +28,7 @@ import { CompanyReportEntity } from './report.entity';
 import { WorkspaceEntity } from './workspace.entity';
 import { Company, CompanyPaymentTypeEnum, CompanyTypesEnum } from '.prisma/client';
 import { ScheduleBlockEntity } from './schedule-block.entity';
+import { AlertEntity } from './alert.entity';
 
 export class CompanyEntity implements Company {
   @ApiProperty({ description: 'The id of the Company' })
@@ -157,6 +158,7 @@ export class CompanyEntity implements Company {
   ambResponsible?: Partial<ProfessionalEntity & ProfessionalCouncil>;
 
   scheduleBlocks?: ScheduleBlockEntity[];
+  alerts?: AlertEntity[];
 
   constructor(partial: Partial<CompanyEntity>) {
     Object.assign(this, partial);

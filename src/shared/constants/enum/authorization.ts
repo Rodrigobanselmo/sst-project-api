@@ -73,4 +73,5 @@ export enum PermissionEnum {
   CAT = '16',
   ABSENTEEISM = '17',
   SCHEDULE_BLOCK = '18',
+  ALERT = '19',
 }
