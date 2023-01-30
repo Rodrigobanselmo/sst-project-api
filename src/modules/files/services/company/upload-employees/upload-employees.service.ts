@@ -19,6 +19,8 @@ import { DatabaseTableEntity } from '../../../entities/databaseTable.entity';
 import { DatabaseTableRepository } from '../../../repositories/implementations/DatabaseTableRepository';
 import { WorkspaceRepository } from '../../../../../modules/company/repositories/implementations/WorkspaceRepository';
 import { hierarchyList } from '../../../../../shared/constants/lists/hierarchy.list';
+import { removeDuplicate } from '../../../../../shared/utils/removeDuplicate';
+import { v4 } from 'uuid';
 
 @Injectable()
 export class UploadEmployeesService {
@@ -94,6 +96,7 @@ export class UploadEmployeesService {
           ...hierarchy,
           type: type as HierarchyEnum,
           ghoName: type == HierarchyEnum.OFFICE ? hierarchy.ghoName : '',
+          ghoNames: type == HierarchyEnum.OFFICE ? hierarchy.ghoNames : undefined,
         }),
       );
 
@@ -109,17 +112,21 @@ export class UploadEmployeesService {
 
     const employees = employeesData.map((employee) => {
       if (employee.ghoName) delete employee.ghoName;
+
       const newEmployee = { ...employee };
       let hierarchy = null as any;
-
+      Object.keys(HierarchyEnum).forEach((key) => {
+        if (key != 'OFFICE') return;
+        const hierarchyName = newEmployee[key.toLocaleLowerCase()];
+        console.log(key.padEnd(10, '-'), newEmployee.name.padEnd(65, '-'), hierarchyName);
+      });
       const getByNameHierarchy = () => {
         Object.keys(HierarchyEnum).forEach((key) => {
           const hierarchyName = newEmployee[key.toLocaleLowerCase()];
           delete newEmployee[key.toLocaleLowerCase()];
-
+          if (key != 'OFFICE') return;
           if (hierarchyName) {
-            const children = hierarchy ? hierarchy.children.map((child) => hierarchyTree[child]) : Object.values(hierarchyTree);
-
+            const children = Object.values(hierarchyTree);
             const actualHierarchy = children.find((h) => h?.name && h?.type && h.name === hierarchyName && h.type === key);
 
             if (actualHierarchy) {
@@ -136,6 +143,7 @@ export class UploadEmployeesService {
     });
 
     const restEmployees = employees.map((employee) => {
+      console.log([hierarchyTree[employee.hierarchyId]].map(({ type, name }) => ({ type, name })));
       delete employee.description;
       delete employee.ghoDescription;
       delete employee.realDescription;
@@ -165,7 +173,7 @@ const read = async (readFileData: IExcelReadData[], excelProvider: ExcelProvider
 
   const database = await excelProvider.transformToTableData(table, sheet.columns);
 
-  if (databaseTable?.version && database.version !== databaseTable.version) throw new BadRequestException(ErrorMessageEnum.FILE_WRONG_TABLE_HEAD);
+  // if (databaseTable?.version && database.version !== databaseTable.version) throw new BadRequestException(ErrorMessageEnum.FILE_WRONG_TABLE_HEAD); //!
 
   return database.rows;
 };

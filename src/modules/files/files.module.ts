@@ -36,6 +36,8 @@ import { ReportsController } from './controller/reports/reports.controller';
 import { ExpiredExamReportService } from './services/reports/expired-exam-report/expired-exam-report.service';
 import { ReportDoneExamFactory } from './factories/report/products/ReportDoneExamFactory';
 import { DoneExamReportService } from './services/reports/done-exam-report/done-exam-report.service';
+import { FileCompanyStructureFactory } from './factories/upload/products/CompanyStructure/FileCompanyStructureFactory';
+import { UploadCompanyStructureService } from './services/company/upload-structure/upload-structure.service';
 
 @Module({
   controllers: [FilesChecklistController, ReportsController, FilesCompanyController, FilesCnaeController, FilesController, FilesCidController],
@@ -70,6 +72,8 @@ import { DoneExamReportService } from './services/reports/done-exam-report/done-
     ExpiredExamReportService,
     ReportExpiredExamFactory,
     ReportDoneExamFactory,
+    FileCompanyStructureFactory,
+    UploadCompanyStructureService,
   ],
 })
 export class FilesModule {}

@@ -202,6 +202,7 @@ import { FindGenerateSourceService } from './services/generate-source/find-gener
     RiskGroupDataRepository,
     RiskDocumentRepository,
     UpsertManyRiskDataService,
+    UpsertRiskDataService,
     RiskDataRepository,
     FindExamByHierarchyService,
     FindAllRiskDataByEmployeeService,
@@ -210,6 +211,9 @@ import { FindGenerateSourceService } from './services/generate-source/find-gener
     EpiRepository,
     CheckEmployeeExamService,
     ExamToClinicRepository,
+    FindAllAvailableRiskService,
+    CreateRecMedService,
+    CreateGenerateSourceService,
   ],
   imports: [forwardRef(() => CompanyModule), CacheModule.register()],
 })

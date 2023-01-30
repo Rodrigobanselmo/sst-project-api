@@ -50,7 +50,6 @@ export class HierarchyExcelProvider {
     }[],
   ) {
     const hierarchyMap = {} as any;
-
     hierarchies.forEach((hierarchy) => {
       let orderedHierarchy = [] as {
         key: string;
@@ -80,6 +79,10 @@ export class HierarchyExcelProvider {
           hierarchyMap[id].description = hierarchy.description;
           hierarchyMap[id].realDescription = hierarchy.realDescription;
           hierarchyMap[id].ghoName = hierarchy.ghoName;
+          if (hierarchy.ghoName) {
+            if (!hierarchyMap[id].ghoNames) hierarchyMap[id].ghoNames = [];
+            hierarchyMap[id].ghoNames.push(hierarchy.ghoName);
+          }
           hierarchyMap[id].name = employeeWork.value;
           hierarchyMap[id].type = employeeWork.key.toUpperCase() as HierarchyEnum;
           hierarchyMap[id].parentId = index === 0 ? null : orderedHierarchy[index - 1].id;
@@ -144,6 +147,7 @@ export class HierarchyExcelProvider {
           description: hierarchy?.description ?? allHierarchy.description,
           realDescription: hierarchy?.realDescription ?? allHierarchy.realDescription,
           ghoName: hierarchy?.ghoName ?? allHierarchy.ghoName,
+          ghoNames: [...hierarchy.ghoNames, ...(allHierarchy?.ghoName || [])],
           fromOld: true,
         };
 
@@ -153,6 +157,7 @@ export class HierarchyExcelProvider {
         });
       }
       if (parentId) newHierarchy[allHierarchy.id].parentId = parentId;
+      if (hierarchy.ghoName && !newHierarchy[allHierarchy.id]?.ghoNames?.includes(hierarchy.ghoName)) newHierarchy[allHierarchy.id].ghoNames.push(hierarchy.ghoName);
 
       if (newHierarchy[hierarchy.id].children)
         newHierarchy[hierarchy.id].children.forEach((childId) => {

@@ -130,6 +130,10 @@ const addEmptyRow = (worksheet: ExcelJS.Worksheet) => {
 
 @Injectable()
 class ExcelProvider implements IExcelProvider {
+  // eslint-disable-next-line prettier/prettier
+ excelColumns = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "AA", "AB", "AC", "AD", "AE", "AF", "AG", "AH", "AI", "AJ", "AK", "AL", "AM", "AN", "AO", "AP", "AQ", "AR", "AS", "AT", "AU", "AV", "AW", "AX", "AY", "AZ", "BA", "BB", "BC", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BK", "BL", "BM", "BN", "BO", "BP", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BX", "BY", "BZ", "CA", "CB", "CC", "CD", "CE", "CF", "CG", "CH", "CI", "CJ", "CK", "CL", "CM", "CN", "CO", "CP", "CQ", "CR", "CS", "CT", "CU", "CV", "CW", "CX", "CY", "CZ"];
+
+
   constructor(private readonly prisma?: PrismaService) {}
 
   async create(workbookExcel: IWorkbookExcel, companyId?: string) {
@@ -166,6 +170,29 @@ class ExcelProvider implements IExcelProvider {
       workbook,
       filename: `${workbookExcel.fileName}-${workbookExcel.version}.xlsx`,
     };
+  }
+
+  async readBuffer(buffer: Buffer) {
+    const workbook = new ExcelJS.Workbook();
+
+    try {
+      const workSheetsFromBuffer = await workbook.xlsx.load(buffer);
+      const workbookData: IExcelReadData[] = [];
+
+      workSheetsFromBuffer.eachSheet((sheet) => {
+        const workbookData: IExcelReadData = {
+          data: [],
+          name: sheet.name,
+        };
+        sheet.eachRow((row) => {
+          Array.isArray(row.values) && workbookData.data.push(row.values.map((v) => v as any));
+        });
+      });
+
+      return workbookData;
+    } catch (error) {
+      throw new InternalServerErrorException(error, 'Error occurred when reading the file');
+    }
   }
 
   async read(buffer: Buffer) {
@@ -380,6 +407,10 @@ class ExcelProvider implements IExcelProvider {
         worksheet.mergeCells(currentRowIdx, 1, currentRowIdx, endColumnIdx);
       }
     });
+  }
+
+  getColumnByIndex(index: number) {
+    return this.excelColumns[index];
   }
 }
 

@@ -36,6 +36,10 @@ export class CreateHierarchyDto {
   @IsOptional()
   ghoName: string;
 
+  @IsString({ each: true })
+  @IsOptional()
+  ghoNames?: string[];
+
   @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
   @ValidateIf((customer) => customer.description !== '')
   @IsString()

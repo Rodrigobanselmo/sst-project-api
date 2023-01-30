@@ -93,20 +93,23 @@ export class HierarchyRepository {
     });
 
     const data = await this.prisma.$transaction(
-      upsertHierarchyMany.map(({ companyId: _, id, workspaceIds, parentId, children, ghoName, employeesIds, name, ...upsertHierarchy }) => {
+      upsertHierarchyMany.map(({ companyId: _, id, workspaceIds, parentId, children, ghoName, ghoNames, employeesIds, name, ...upsertHierarchy }) => {
         const isSubOffice = upsertHierarchy?.type == HierarchyEnum.SUB_OFFICE;
-        const HierarchyOnHomo = !workspaceIds
-          ? []
-          : workspaceIds
-              .map((workspaceId) => ({
-                hierarchyId: id,
-                homogeneousGroupId: homogeneousGroup.find((homogeneous) => homogeneous.name === ghoName)?.id,
-                workspaceId,
-                endDate: null,
-              }))
-              .filter((hierarchyOnHomo) => hierarchyOnHomo.homogeneousGroupId);
 
-        HierarchyOnHomoGroup.push(...HierarchyOnHomo);
+        ghoNames?.forEach((ghoName) => {
+          const HierarchyOnHomo = !workspaceIds
+            ? []
+            : workspaceIds
+                .map((workspaceId) => ({
+                  hierarchyId: id,
+                  homogeneousGroupId: homogeneousGroup.find((homogeneous) => homogeneous.name === ghoName)?.id,
+                  workspaceId,
+                  endDate: null,
+                }))
+                .filter((hierarchyOnHomo) => hierarchyOnHomo.homogeneousGroupId);
+
+          HierarchyOnHomoGroup.push(...HierarchyOnHomo);
+        });
 
         return this.prisma.hierarchy.upsert({
           create: {
@@ -162,11 +165,11 @@ export class HierarchyRepository {
                 },
           },
           where: { id: id || 'none' },
+          // ...(parentId && { where: { parentId_name: { parentId, name: name.split('//')[0] } } }),
           include: { workspaces: true },
         });
       }),
     );
-
     await this.prisma.$transaction(
       HierarchyOnHomoGroup.filter((hh) => {
         if (hierarchyOnHomogeneous[`${hh.hierarchyId}${hh.homogeneousGroupId}`]) {

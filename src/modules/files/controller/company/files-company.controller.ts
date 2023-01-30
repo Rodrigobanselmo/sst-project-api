@@ -14,6 +14,7 @@ import { UploadUniqueCompanyService } from '../../services/company/upload-unique
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 import { PermissionEnum, RoleEnum } from '../../../../shared/constants/enum/authorization';
 import { Roles } from '../../../../shared/decorators/roles.decorator';
+import { UploadCompanyStructureService } from '../../services/company/upload-structure/upload-structure.service';
 @Controller('files/company')
 export class FilesCompanyController {
   constructor(
@@ -25,6 +26,7 @@ export class FilesCompanyController {
     private readonly downloadEmployeesService: DownloadEmployeesService,
     private readonly uploadHierarchiesService: UploadHierarchiesService,
     private readonly downloadHierarchiesService: DownloadHierarchiesService,
+    private readonly uploadCompanyStructureService: UploadCompanyStructureService,
   ) {}
 
   @Roles(RoleEnum.DATABASE)
@@ -151,5 +153,21 @@ export class FilesCompanyController {
     workbook.xlsx.write(res).then(function () {
       res.end();
     });
+  }
+
+  @Permissions({
+    code: PermissionEnum.RISK_DATA,
+    isContract: true,
+    isMember: true,
+  })
+  @Permissions({
+    code: PermissionEnum.COMPANY,
+    isContract: true,
+    isMember: true,
+  })
+  @Post('company-structure/upload/:companyId?')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadCompanyStruct(@UploadedFile() file: Express.Multer.File, @User() userPayloadDto: UserPayloadDto) {
+    await this.uploadCompanyStructureService.execute(file, userPayloadDto);
   }
 }

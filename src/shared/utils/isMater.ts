@@ -10,7 +10,7 @@ export interface IMasterReturn {
 
 export const isMaster = (user: UserPayloadDto | undefined, companyId?: string | false) => {
   const includeMaster = user && user.roles && user.roles.includes(RoleEnum.MASTER);
-  const sameCompany = companyId ? user.companyId === companyId : true;
+  const sameCompany = companyId ? user?.companyId === companyId : true;
 
   return {
     isMaster: includeMaster,

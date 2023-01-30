@@ -1327,6 +1327,8 @@ model RiskFactors {
   docInfo               RiskFactorsDocInfo[]
 
   @@unique([id, companyId])
+  @@unique([name])
+  @@index([name])
   @@index([esocialCode])
 }
 
