@@ -1,14 +1,17 @@
+import { PrismaService } from './../../../../../prisma/prisma.service';
 import { IExcelReadData } from './../../../../../shared/providers/ExcelProvider/models/IExcelProvider.types';
 import { ExcelProvider } from '../../../../../shared/providers/ExcelProvider/implementations/ExcelProvider';
-import { IColumnRuleMap, IFileFactoryProduct, ISheetData } from '../types/IFileFactory.types';
+import { IColumnRuleMap, IFileFactoryProduct, ISheetData, ISheetExtractedData } from '../types/IFileFactory.types';
 import { BadRequestException } from '@nestjs/common';
 
-export abstract class FileFactoryAbstractionCreator {
-  public abstract factoryMethod(): IFileFactoryProduct;
+export abstract class FileFactoryAbstractionCreator<T, R extends keyof any> {
+  public abstract factoryMethod(): IFileFactoryProduct<T, R>;
   private readonly excelProvider: ExcelProvider;
+  private readonly prismaService: PrismaService;
 
-  constructor(excelProvider) {
+  constructor(excelProvider, prisma) {
     this.excelProvider = excelProvider;
+    this.prismaService = prisma;
   }
 
   public create() {
@@ -17,11 +20,11 @@ export abstract class FileFactoryAbstractionCreator {
     return product;
   }
 
-  public async execute(buffer: Buffer) {
+  public async execute(buffer: Buffer, body: T) {
     const product = this.create();
     const readFileData = await this.read({ buffer });
 
-    const sheets = product.getSheets(readFileData);
+    const sheets = await product.getSheets(readFileData);
 
     const sheetsRows = sheets.map((sheet) => {
       const sheetRows = this.validationTransform(sheet);
@@ -29,10 +32,10 @@ export abstract class FileFactoryAbstractionCreator {
       return sheetRows;
     });
 
-    await product.saveData(sheetsRows);
+    await product.saveData(sheetsRows, body);
   }
 
-  async read({ buffer }) {
+  public async read({ buffer }) {
     const readFileData = await this.excelProvider.read(buffer);
     return readFileData;
   }
@@ -58,12 +61,12 @@ export abstract class FileFactoryAbstractionCreator {
   public validationTransform(sheet: ISheetData) {
     const { columnHandlerOrder, headerStartIndex } = this.getHeaderInfo(sheet);
 
-    const databaseRows = [] as any[];
+    const databaseRows = [] as ISheetExtractedData<R>;
 
     sheet.rows.slice(headerStartIndex + 1).forEach((excelRow, indexRow) => {
       if (!excelRow.length) return;
 
-      const databaseRow = {};
+      const databaseRow = {} as Record<R, any>;
 
       columnHandlerOrder.forEach((columnHandler, indexCell) => {
         const errorMessageMissing = `Esta faltando um campo obrigatório na linha "${indexRow + 1}", coluna "${this.excelProvider.getColumnByIndex(

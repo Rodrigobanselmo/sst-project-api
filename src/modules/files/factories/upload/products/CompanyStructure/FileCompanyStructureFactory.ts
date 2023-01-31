@@ -1,3 +1,4 @@
+import { HierarchyExcelProvider } from './../../../../providers/HierarchyExcelProvider';
 import { CreateGenerateSourceService } from './../../../../../sst/services/generate-source/create-generate-source/create-generate-source.service';
 import { CreateRecMedService } from './../../../../../sst/services/rec-med/create-rec-med/create-rec-med.service';
 import { QuantityTypeEnum } from './../../../../../company/interfaces/risk-data-json.types';
@@ -16,11 +17,14 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { ExcelProvider } from '../../../../../../shared/providers/ExcelProvider/implementations/ExcelProvider';
 import { FindCompaniesDto } from '../../../../../company/dto/company.dto';
 import { FileFactoryAbstractionCreator } from '../../creator/FileFactoryCreator';
-import { IColumnRuleMap, IFileFactoryProduct, ISheetData } from '../../types/IFileFactory.types';
-import { CompanyStructColumnMap, CompanyStructHeaderEnum } from './constants/company-struct.constants';
+import { IColumnRuleMap, IFileFactoryProduct, ISheetData, ISheetExtractedData } from '../../types/IFileFactory.types';
+import { CompanyStructColumnMap, CompanyStructHeaderEnum, emptyHierarchy } from './constants/company-struct.constants';
+import { IBodyCompStructFile, IWorkspaceData } from './types/company-struct.constants';
+import { HierarchyEnum } from '@prisma/client';
+import { FileHelperProvider } from '../../../../providers/FileHelperProvider';
 
 @Injectable()
-export class FileCompanyStructureFactory extends FileFactoryAbstractionCreator {
+export class FileCompanyStructureFactory extends FileFactoryAbstractionCreator<IBodyCompStructFile, CompanyStructHeaderEnum> {
   constructor(
     private readonly excelProv: ExcelProvider,
     private readonly prisma: PrismaService,
@@ -28,12 +32,22 @@ export class FileCompanyStructureFactory extends FileFactoryAbstractionCreator {
     private readonly findAllAvailableRiskService: FindAllAvailableRiskService,
     private readonly createRecMedService: CreateRecMedService,
     private readonly createGenerateSourceService: CreateGenerateSourceService,
+    private readonly hierarchyExcelProvider: HierarchyExcelProvider,
+    private readonly fileHelperProvider: FileHelperProvider,
   ) {
-    super(excelProv);
+    super(excelProv, prisma);
   }
 
   public factoryMethod(): IFileFactoryProduct {
-    return new FileFactoryProduct(this.prisma, this.upsertRiskDataService, this.findAllAvailableRiskService, this.createRecMedService, this.createGenerateSourceService);
+    return new FileFactoryProduct(
+      this.prisma,
+      this.upsertRiskDataService,
+      this.findAllAvailableRiskService,
+      this.createRecMedService,
+      this.createGenerateSourceService,
+      this.hierarchyExcelProvider,
+      this.fileHelperProvider,
+    );
   }
 }
 
@@ -44,20 +58,16 @@ class FileFactoryProduct implements IFileFactoryProduct {
     private readonly findAllAvailableRiskService: FindAllAvailableRiskService,
     private readonly createRecMedService: CreateRecMedService,
     private readonly createGenerateSourceService: CreateGenerateSourceService,
+    private readonly hierarchyExcelProvider: HierarchyExcelProvider,
+    private readonly fileHelperProvider: FileHelperProvider,
   ) {
     //
   }
 
-  public execute() {
-    const columnsMap = CompanyStructColumnMap;
+  public async getSheets(readFileData: IExcelReadData[]) {
+    const columnsMap = await this.getColumns();
 
-    return { columnsMap, startRowIndex: 2 };
-  }
-
-  public getSheets(readFileData: IExcelReadData[]) {
-    const columnsMap = CompanyStructColumnMap;
-
-    const sheets = readFileData
+    const sheets: ISheetData[] = readFileData
       .map((sheet) => {
         return { sheetName: sheet.name, rows: sheet.data, columnsMap };
       })
@@ -66,162 +76,156 @@ class FileFactoryProduct implements IFileFactoryProduct {
     return sheets;
   }
 
-  public async saveData(sheetsData: Record<Partial<CompanyStructHeaderEnum>, any>[][]) {
-    const cache = new Map();
+  public async saveData(sheetsData: ISheetExtractedData<CompanyStructHeaderEnum>[], body: IBodyCompStructFile) {
     const sheetData = sheetsData[0];
 
-    const groupByInitial = sheetData.reduce((acc, curr) => {
-      const initials = curr[CompanyStructHeaderEnum.COMPANY_SIGLA];
-      const workspaceName = curr[CompanyStructHeaderEnum.WORKSPACE];
+    //!
 
-      acc[`${initials}---${workspaceName}`] = [initials, workspaceName];
-      return acc;
-    }, {} as Record<string, [string, string]>);
+    // const cache = new Map();
+    // await Promise.all(
+    //   Object.values(groupByInitial).map(async ([initials]) => {
+    //     const companyKey = 'company' + initials;
+    //     if (!cache.get(companyKey)) {
+    //       const company = await this.prisma.company.findFirst({
+    //         where: { initials: initials },
+    //         select: { id: true, riskFactorGroupData: { select: { id: true } } },
+    //       });
 
-    await Promise.all(
-      Object.values(groupByInitial).map(async ([initials]) => {
-        const companyKey = 'company' + initials;
-        if (!cache.get(companyKey)) {
-          const company = await this.prisma.company.findFirst({
-            where: { initials: initials },
-            select: { id: true, riskFactorGroupData: { select: { id: true } } },
-          });
+    //       if (!company?.id) throw new BadRequestException(`Empresa não encontrada`);
+    //       console.log(company);
+    //       const companyId = company.id;
 
-          if (!company?.id) throw new BadRequestException(`Empresa não encontrada`);
-          console.log(company);
-          const companyId = company.id;
+    //       const homoGroups = await this.prisma.homogeneousGroup.findMany({ where: { companyId, status: 'ACTIVE' }, select: { name: true, id: true } });
+    //       const risk = await this.findAllAvailableRiskService.execute({ targetCompanyId: companyId } as any);
+    //       // const hierarchies = await this.prisma.hierarchy.findMany({ where: { companyId, workspaces: { some: { id: workspaceId } } } });
 
-          const homoGroups = await this.prisma.homogeneousGroup.findMany({ where: { companyId, status: 'ACTIVE' }, select: { name: true, id: true } });
-          const risk = await this.findAllAvailableRiskService.execute({ targetCompanyId: companyId } as any);
-          // const hierarchies = await this.prisma.hierarchy.findMany({ where: { companyId, workspaces: { some: { id: workspaceId } } } });
+    //       const homoGroupsMap: Record<string, string> = {};
+    //       const riskMap: Record<string, RiskFactorsEntity> = {};
 
-          const homoGroupsMap: Record<string, string> = {};
-          const riskMap: Record<string, RiskFactorsEntity> = {};
+    //       homoGroups.forEach((homo) => {
+    //         homoGroupsMap[homo.name] = homo.id;
+    //       });
 
-          homoGroups.forEach((homo) => {
-            homoGroupsMap[homo.name] = homo.id;
-          });
+    //       risk.forEach((risk) => {
+    //         riskMap[risk.name] = risk;
+    //       });
 
-          risk.forEach((risk) => {
-            riskMap[risk.name] = risk;
-          });
+    //       cache.set(companyKey, { company, homoGroupsMap, riskMap });
+    //     }
+    //   }),
+    // );
 
-          cache.set(companyKey, { company, homoGroupsMap, riskMap });
-        }
-      }),
-    );
+    // await asyncBatch(sheetData, 20, async (row) => {
+    //   const companyKey = 'company' + row[CompanyStructHeaderEnum.COMPANY_SIGLA];
 
-    await asyncBatch(sheetData, 20, async (row) => {
-      const companyKey = 'company' + row[CompanyStructHeaderEnum.COMPANY_SIGLA];
+    //   // if (!cache.get('workspace')) {
+    //   //   const workspace = await this.prisma.company.findFirst({ where: { initials: sheet[CompanyStructHeaderEnum.COMPANY_SIGLA] }, select: { id: true } });
+    //   //   cache.set('workspace', workspace);
+    //   // }
 
-      // if (!cache.get('workspace')) {
-      //   const workspace = await this.prisma.company.findFirst({ where: { initials: sheet[CompanyStructHeaderEnum.COMPANY_SIGLA] }, select: { id: true } });
-      //   cache.set('workspace', workspace);
-      // }
+    //   const companyDta = cache.get(companyKey) as {
+    //     company: CompanyEntity;
+    //     homoGroupsMap: Record<string, string>;
+    //     riskMap: Record<string, RiskFactorsEntity>;
+    //   };
 
-      const companyDta = cache.get(companyKey) as {
-        company: CompanyEntity;
-        homoGroupsMap: Record<string, string>;
-        riskMap: Record<string, RiskFactorsEntity>;
-      };
+    //   if (!companyDta) throw new BadRequestException(`Empresa não encontrada`);
 
-      if (!companyDta) throw new BadRequestException(`Empresa não encontrada`);
+    //   const { company, homoGroupsMap, riskMap } = companyDta;
 
-      const { company, homoGroupsMap, riskMap } = companyDta;
+    //   const companyId = company.id;
+    //   // const workspaceId = cache['workspace'].id;
 
-      const companyId = company.id;
-      // const workspaceId = cache['workspace'].id;
+    //   if (!riskMap[row[CompanyStructHeaderEnum.RISK]]) throw new BadRequestException(`Risco com nome "${row[CompanyStructHeaderEnum.RISK]}" não encontrado`);
 
-      if (!riskMap[row[CompanyStructHeaderEnum.RISK]]) throw new BadRequestException(`Risco com nome "${row[CompanyStructHeaderEnum.RISK]}" não encontrado`);
+    //   // if (!homoGroupsMap[row[CompanyStructHeaderEnum.GHO]])
+    //   //   throw new BadRequestException(`Grupo homogênio com nome "${row[CompanyStructHeaderEnum.GHO]}" não encontrado`);
+    //   if (!homoGroupsMap[row[CompanyStructHeaderEnum.GHO]]) return; //! remove and add above
 
-      // if (!homoGroupsMap[row[CompanyStructHeaderEnum.GHO]])
-      //   throw new BadRequestException(`Grupo homogênio com nome "${row[CompanyStructHeaderEnum.GHO]}" não encontrado`);
-      if (!homoGroupsMap[row[CompanyStructHeaderEnum.GHO]]) return; //! remove and add above
+    //   if (!company.riskFactorGroupData[0].id) throw new BadRequestException(`Sistema de gestão não cadatsrado`);
 
-      if (!company.riskFactorGroupData[0].id) throw new BadRequestException(`Sistema de gestão não cadatsrado`);
+    //   const json = this.getRiskDataJson(riskMap[row[CompanyStructHeaderEnum.RISK]], row);
+    //   const riskId = riskMap[row[CompanyStructHeaderEnum.RISK]].id;
+    //   let adms;
+    //   let engs;
+    //   let recs;
+    //   let epis;
+    //   let source;
 
-      const json = this.getRiskDataJson(riskMap[row[CompanyStructHeaderEnum.RISK]], row);
-      const riskId = riskMap[row[CompanyStructHeaderEnum.RISK]].id;
-      let adms;
-      let engs;
-      let recs;
-      let epis;
-      let source;
+    //   if (row[CompanyStructHeaderEnum.SOURCE]?.length) {
+    //     source = await Promise.all(
+    //       row[CompanyStructHeaderEnum.SOURCE].map(async (adm) => {
+    //         const source = await this.createGenerateSourceService.execute({ riskId, name: adm, companyId }, { targetCompanyId: companyId } as any, {
+    //           returnIfExist: true,
+    //         });
+    //         return source.id;
+    //       }),
+    //     );
+    //   }
 
-      if (row[CompanyStructHeaderEnum.SOURCE]?.length) {
-        source = await Promise.all(
-          row[CompanyStructHeaderEnum.SOURCE].map(async (adm) => {
-            const source = await this.createGenerateSourceService.execute({ riskId, name: adm, companyId }, { targetCompanyId: companyId } as any, {
-              returnIfExist: true,
-            });
-            return source.id;
-          }),
-        );
-      }
+    //   if (row[CompanyStructHeaderEnum.EPC_OTHERS]?.length) {
+    //     adms = await Promise.all(
+    //       row[CompanyStructHeaderEnum.EPC_OTHERS].map(async (adm) => {
+    //         const recMed = await this.createRecMedService.execute({ medType: 'ADM', riskId, medName: adm, companyId }, { targetCompanyId: companyId } as any, {
+    //           returnIfExist: true,
+    //         });
+    //         return recMed.id;
+    //       }),
+    //     );
+    //   }
 
-      if (row[CompanyStructHeaderEnum.EPC_OTHERS]?.length) {
-        adms = await Promise.all(
-          row[CompanyStructHeaderEnum.EPC_OTHERS].map(async (adm) => {
-            const recMed = await this.createRecMedService.execute({ medType: 'ADM', riskId, medName: adm, companyId }, { targetCompanyId: companyId } as any, {
-              returnIfExist: true,
-            });
-            return recMed.id;
-          }),
-        );
-      }
+    //   if (row[CompanyStructHeaderEnum.EPC]?.length) {
+    //     engs = await Promise.all(
+    //       row[CompanyStructHeaderEnum.EPC].map(async (adm) => {
+    //         const recMed = await this.createRecMedService.execute({ medType: 'ENG', riskId, medName: adm, companyId }, { targetCompanyId: companyId } as any, {
+    //           returnIfExist: true,
+    //         });
+    //         return { recMedId: recMed.id };
+    //       }),
+    //     );
+    //   }
 
-      if (row[CompanyStructHeaderEnum.EPC]?.length) {
-        engs = await Promise.all(
-          row[CompanyStructHeaderEnum.EPC].map(async (adm) => {
-            const recMed = await this.createRecMedService.execute({ medType: 'ENG', riskId, medName: adm, companyId }, { targetCompanyId: companyId } as any, {
-              returnIfExist: true,
-            });
-            return { recMedId: recMed.id };
-          }),
-        );
-      }
+    //   if (row[CompanyStructHeaderEnum.REC]?.length) {
+    //     recs = await Promise.all(
+    //       row[CompanyStructHeaderEnum.REC].map(async (adm) => {
+    //         const recMed = await this.createRecMedService.execute({ recType: 'ADM', riskId, recName: adm, companyId }, { targetCompanyId: companyId } as any, {
+    //           returnIfExist: true,
+    //         });
+    //         return recMed.id;
+    //       }),
+    //     );
+    //   }
 
-      if (row[CompanyStructHeaderEnum.REC]?.length) {
-        recs = await Promise.all(
-          row[CompanyStructHeaderEnum.REC].map(async (adm) => {
-            const recMed = await this.createRecMedService.execute({ recType: 'ADM', riskId, recName: adm, companyId }, { targetCompanyId: companyId } as any, {
-              returnIfExist: true,
-            });
-            return recMed.id;
-          }),
-        );
-      }
+    //   if (row[CompanyStructHeaderEnum.EPI_CA]?.length) {
+    //     epis = await Promise.all(
+    //       row[CompanyStructHeaderEnum.EPI_CA].map(async (ca) => {
+    //         const epi = await this.prisma.epi.findFirst({ where: { ca: ca }, select: { id: true } });
+    //         return { epiId: epi.id };
+    //       }),
+    //     );
+    //   }
 
-      if (row[CompanyStructHeaderEnum.EPI_CA]?.length) {
-        epis = await Promise.all(
-          row[CompanyStructHeaderEnum.EPI_CA].map(async (ca) => {
-            const epi = await this.prisma.epi.findFirst({ where: { ca: ca }, select: { id: true } });
-            return { epiId: epi.id };
-          }),
-        );
-      }
-
-      await this.upsertRiskDataService.execute({
-        companyId,
-        homogeneousGroupId: homoGroupsMap[row[CompanyStructHeaderEnum.GHO]],
-        riskId,
-        riskFactorGroupDataId: company.riskFactorGroupData[0].id,
-        adms,
-        engs,
-        recs,
-        epis,
-        generateSources: source,
-        keepEmpty: true,
-        probability: row[CompanyStructHeaderEnum.PROB],
-        probabilityAfter: row[CompanyStructHeaderEnum.PROB_REC],
-        ...(json && { json }),
-        ...(row[CompanyStructHeaderEnum.END_DATE] && { endDate: row[CompanyStructHeaderEnum.END_DATE] }),
-        ...(row[CompanyStructHeaderEnum.START_DATE] && { endDate: row[CompanyStructHeaderEnum.START_DATE] }),
-      });
-    });
+    //   await this.upsertRiskDataService.execute({
+    //     companyId,
+    //     homogeneousGroupId: homoGroupsMap[row[CompanyStructHeaderEnum.GHO]],
+    //     riskId,
+    //     riskFactorGroupDataId: company.riskFactorGroupData[0].id,
+    //     adms,
+    //     engs,
+    //     recs,
+    //     epis,
+    //     generateSources: source,
+    //     keepEmpty: true,
+    //     probability: row[CompanyStructHeaderEnum.PROB],
+    //     probabilityAfter: row[CompanyStructHeaderEnum.PROB_REC],
+    //     ...(json && { json }),
+    //     ...(row[CompanyStructHeaderEnum.END_DATE] && { endDate: row[CompanyStructHeaderEnum.END_DATE] }),
+    //     ...(row[CompanyStructHeaderEnum.START_DATE] && { endDate: row[CompanyStructHeaderEnum.START_DATE] }),
+    //   });
+    // });
   }
 
-  public getRiskDataJson(risk: RiskFactorsEntity, data: Record<Partial<CompanyStructHeaderEnum>, any>) {
+  private getRiskDataJson(risk: RiskFactorsEntity, data: Record<Partial<CompanyStructHeaderEnum>, any>) {
     const type = isRiskQuantity(risk);
     if (!type) return null;
     let submit = null;
@@ -272,5 +276,87 @@ class FileFactoryProduct implements IFileFactoryProduct {
       };
 
     return submit;
+  }
+
+  private getMapData(sheetData: ISheetExtractedData<CompanyStructHeaderEnum>) {
+    const workspaces: Record<string, Partial<IWorkspaceData>> = {};
+
+    sheetData.forEach((row) => {
+      if (!workspaces[row[CompanyStructHeaderEnum.WORKSPACE]])
+        workspaces[row[CompanyStructHeaderEnum.WORKSPACE]] = {
+          value: row[CompanyStructHeaderEnum.WORKSPACE],
+          hierarchies: {},
+          homogeneousGroup: {},
+          risk: {},
+          // characterization: {},
+        };
+
+      const hierarchyArray = Object.keys(HierarchyEnum).map((key) => (row[CompanyStructHeaderEnum[key]] as string) || emptyHierarchy);
+
+      const isHierarchy = !!hierarchyArray.find((i) => i != emptyHierarchy);
+      const isHomogeneousGroup = row[CompanyStructHeaderEnum.GHO];
+      const isRisk = !!row[CompanyStructHeaderEnum.RISK];
+
+      if (isHomogeneousGroup) {
+        workspaces[row[CompanyStructHeaderEnum.WORKSPACE]].homogeneousGroup[row[CompanyStructHeaderEnum.GHO]] = { value: row[CompanyStructHeaderEnum.GHO] };
+      }
+
+      if (isHierarchy) {
+        workspaces[row[CompanyStructHeaderEnum.WORKSPACE]].hierarchies[row[hierarchyArray.join('--')]] = hierarchyArray.map((h) => ({ value: h }));
+      }
+
+      if (isRisk) {
+        workspaces[row[CompanyStructHeaderEnum.WORKSPACE]].risk[row[CompanyStructHeaderEnum.RISK]] = {
+          value: row[CompanyStructHeaderEnum.RISK],
+          generateSource: {},
+          engs: {},
+          adms: {},
+          recs: {},
+          epis: {},
+        };
+
+        const isGenerateSource = !!row[CompanyStructHeaderEnum.SOURCE];
+        const isEngs = !!row[CompanyStructHeaderEnum.EPC];
+        const isAdm = !!row[CompanyStructHeaderEnum.EPC_OTHERS];
+        const isEpi = !!row[CompanyStructHeaderEnum.EPI_CA];
+        const isRec = !!row[CompanyStructHeaderEnum.REC];
+
+        if (isGenerateSource) {
+          workspaces[row[CompanyStructHeaderEnum.WORKSPACE]].risk[row[CompanyStructHeaderEnum.RISK]].generateSource[row[CompanyStructHeaderEnum.SOURCE]] = {
+            value: row[CompanyStructHeaderEnum.SOURCE],
+          };
+        }
+
+        if (isEngs) {
+          workspaces[row[CompanyStructHeaderEnum.WORKSPACE]].risk[row[CompanyStructHeaderEnum.RISK]].engs[row[CompanyStructHeaderEnum.EPC]] = {
+            value: row[CompanyStructHeaderEnum.EPC],
+          };
+        }
+
+        if (isAdm) {
+          workspaces[row[CompanyStructHeaderEnum.WORKSPACE]].risk[row[CompanyStructHeaderEnum.RISK]].adms[row[CompanyStructHeaderEnum.EPC_OTHERS]] = {
+            value: row[CompanyStructHeaderEnum.EPC_OTHERS],
+          };
+        }
+
+        if (isEpi) {
+          workspaces[row[CompanyStructHeaderEnum.WORKSPACE]].risk[row[CompanyStructHeaderEnum.RISK]].epis[row[CompanyStructHeaderEnum.EPI_CA]] = {
+            value: row[CompanyStructHeaderEnum.EPI_CA],
+          };
+        }
+
+        if (isRec) {
+          workspaces[row[CompanyStructHeaderEnum.WORKSPACE]].risk[row[CompanyStructHeaderEnum.RISK]].recs[row[CompanyStructHeaderEnum.REC]] = {
+            value: row[CompanyStructHeaderEnum.REC],
+          };
+        }
+      }
+    });
+
+    return workspaces;
+  }
+
+  public async getColumns() {
+    return CompanyStructColumnMap;
   }
 }

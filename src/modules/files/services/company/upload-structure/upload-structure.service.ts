@@ -38,7 +38,7 @@ export class UploadCompanyStructureService {
     if (!file) throw new BadRequestException(`file is not available`);
     const buffer = file.buffer;
 
-    await this.fileCompanyStructureFactory.execute(buffer);
+    await this.fileCompanyStructureFactory.execute(buffer, { companyId: userPayloadDto.targetCompanyId });
 
     const hierarchyExcel = new HierarchyExcelProvider();
 

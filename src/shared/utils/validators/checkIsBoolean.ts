@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-export const checkIsXTrue = (value: any) => {
+export const checkIsBoolean = (value: any) => {
   const transformToString = String(value || 'FALSO');
 
   if (!transformToString && transformToString !== '') {
@@ -9,6 +9,7 @@ export const checkIsXTrue = (value: any) => {
   if (typeof transformToString === 'string') {
     if (transformToString == 'VERDADEIRO') return 'true';
     if (transformToString == 'FALSO') return 'false';
+    if (transformToString.toLocaleLowerCase() == 'sim') return 'true';
 
     if (transformToString.length > 0 && transformToString.toLocaleLowerCase() != 'x') return false;
     return transformToString.length > 0 ? 'true' : 'false';

@@ -215,4 +215,34 @@ export class HierarchyExcelProvider {
 
     return newHierarchy;
   }
+
+  getHierarchyPathMap(hierarchies: HierarchyEntity[]) {
+    const map = this.transformArrayToHierarchyMapTree(hierarchies);
+
+    // const hierarchyTree = hierarchies.reduce((acc, node) => {
+    //   acc[node.id] = {
+    //     ...node,
+    //     parentId: node.parentId || null,
+    //     children: [],
+    //   };
+
+    //   return acc;
+    // }, {}) as hierarchyMap;
+
+    // return hierarchyTree;
+  }
+
+  getPath(map: hierarchyMap, id: string) {
+    const hierarchy = map[id];
+    if (hierarchy) {
+      const name = hierarchy.name;
+
+      if (hierarchy.parentId) {
+        const parentName = this.getPath(map, hierarchy.parentId);
+        return `${parentName}-${name}`;
+      }
+
+      return name;
+    }
+  }
 }

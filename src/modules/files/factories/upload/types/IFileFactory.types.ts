@@ -13,16 +13,18 @@ export type IColumnRuleMap<K extends keyof any = string> = {
 };
 
 export type ISheetRuleMap = Record<string, IColumnRuleMap>;
-export type ISheetData = { sheetName: string; columnsMap: IColumnRuleMap; rows: IExcelReadData['data']; indexStartHeader?: number };
+export type ISheetData = { sheetName: string; columnsMap: IColumnRuleMap; rows: IExcelReadData['data'] };
+export type ISheetExtractedData<T extends keyof any> = Record<T, any>[];
 
-export interface IFileFactoryProduct {
+export interface IFileFactoryProduct<T = any, R extends keyof any = any> {
   // getSheetName(): string;
   // getFilename(): string;
   // findTableData(companyId: string, query: T): Promise<IFileFactoryProductFindData>;
   // sanitizeData(...data: any): IFileSanitizeData[];
   // getHeaderIndex(readFileData: IExcelReadData, columnsMap: IColumnRuleMap): number;
-  getSheets(readFileData: IExcelReadData[]): ISheetData[];
-  saveData(data: any[]): any;
+  getSheets(readFileData: IExcelReadData[]): Promise<ISheetData[]>;
+  getColumns(): Promise<IColumnRuleMap>;
+  saveData(data: ISheetExtractedData<R>[], body: T): Promise<any>;
   // getTitle(header: IFileHeader, ...data: any): IFileCell[][];
   // getEndInformation(...data: any): IFileCell[][];
 }

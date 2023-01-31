@@ -164,15 +164,16 @@ export const hierarchyPrioritizationConverter = (
       .sort((a, b) => sortNumber(riskMap[a.type as any], riskMap[b.type as any], 'order'))
       .map<headerTableProps>((risk, index) => {
         risk.homogeneousGroupIds.forEach((homogeneousGroup) => {
-          const homogeneousGroupId = homogeneousGroup.id;
+          const isHomoString = typeof homogeneousGroup === 'string';
+          const homogeneousGroupId = isHomoString ? homogeneousGroup : homogeneousGroup.id;
 
           const homoPosition = HomoPositionMap.get(homogeneousGroupId) || {
             data: [],
           };
 
-          const isQuantity = 'isQuantity' in homogeneousGroup && !!homogeneousGroup.isQuantity;
-          const isDataRisk = 'riskDegree' in homogeneousGroup && homogeneousGroup.riskDegree;
-          const isDataRiskLevel = 'riskDegreeLevel' in homogeneousGroup && homogeneousGroup.riskDegreeLevel;
+          const isQuantity = !isHomoString && 'isQuantity' in homogeneousGroup && !!homogeneousGroup.isQuantity;
+          const isDataRisk = !isHomoString && 'riskDegree' in homogeneousGroup && homogeneousGroup.riskDegree;
+          const isDataRiskLevel = !isHomoString && 'riskDegreeLevel' in homogeneousGroup && homogeneousGroup.riskDegreeLevel;
 
           HomoPositionMap.set(homogeneousGroupId, {
             data: [

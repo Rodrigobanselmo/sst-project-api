@@ -1,11 +1,11 @@
 export enum ClothesIBTUG {
-  CLOTHES_0 = 'CLOTHES_0',
-  CLOTHES_1 = 'CLOTHES_1',
-  CLOTHES_2 = 'CLOTHES_2',
-  CLOTHES_3 = 'CLOTHES_3',
-  CLOTHES_4 = 'CLOTHES_4',
-  CLOTHES_5 = 'CLOTHES_5',
-  CLOTHES_6 = 'CLOTHES_6',
+  CLOTHES_0 = '1',
+  CLOTHES_1 = '2',
+  CLOTHES_2 = '3',
+  CLOTHES_3 = '4',
+  CLOTHES_4 = '5',
+  CLOTHES_5 = '6',
+  CLOTHES_6 = '7',
 }
 
 export const clothesMap = {

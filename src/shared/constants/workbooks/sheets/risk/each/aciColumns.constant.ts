@@ -1,6 +1,6 @@
 import { ITableSchema } from '../../../../../providers/ExcelProvider/models/IExcelProvider.types';
 import { checkIsString } from '../../../../../utils/validators/checkIsString';
-import { checkIsXTrue } from '../../../../../utils/validators/checkIsXTrue';
+import { checkIsBoolean } from '../../../../../utils/validators/checkIsBoolean';
 
 export const aciColumnsConstant: ITableSchema[] = [
   {
@@ -19,7 +19,7 @@ export const aciColumnsConstant: ITableSchema[] = [
     databaseName: 'isEmergency',
     excelName: 'Plano de Atendimento a Emergência',
     required: false,
-    checkHandler: checkIsXTrue,
+    checkHandler: checkIsBoolean,
     notes: () => ['Marcar com "X" para VERDADEIRO e vazio para falso'],
   },
 ];

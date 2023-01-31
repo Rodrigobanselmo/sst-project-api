@@ -38,6 +38,8 @@ import { ReportDoneExamFactory } from './factories/report/products/ReportDoneExa
 import { DoneExamReportService } from './services/reports/done-exam-report/done-exam-report.service';
 import { FileCompanyStructureFactory } from './factories/upload/products/CompanyStructure/FileCompanyStructureFactory';
 import { UploadCompanyStructureService } from './services/company/upload-structure/upload-structure.service';
+import { HierarchyExcelProvider } from './providers/HierarchyExcelProvider';
+import { FileHelperProvider } from './providers/FileHelperProvider';
 
 @Module({
   controllers: [FilesChecklistController, ReportsController, FilesCompanyController, FilesCnaeController, FilesController, FilesCidController],
@@ -74,6 +76,8 @@ import { UploadCompanyStructureService } from './services/company/upload-structu
     ReportDoneExamFactory,
     FileCompanyStructureFactory,
     UploadCompanyStructureService,
+    HierarchyExcelProvider,
+    FileHelperProvider,
   ],
 })
 export class FilesModule {}
