@@ -1,10 +1,10 @@
 import { IsOptional, IsString } from 'class-validator';
 
 import { FindEmployeeDto } from './../../company/dto/employee.dto';
-import { ReportDownloadtypeEnum } from './base-report.dto';
+import { ReportDownloadTypeEnum } from './base-report.dto';
 
-export class DownloudExpiredExamReportDto extends FindEmployeeDto {
+export class DownloadExpiredExamReportDto extends FindEmployeeDto {
   @IsOptional()
   @IsString()
-  downloadType?: ReportDownloadtypeEnum;
+  downloadType?: ReportDownloadTypeEnum;
 }

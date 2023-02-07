@@ -397,14 +397,49 @@ class ExcelProvider implements IExcelProvider {
 
     row.eachCell((cell, colNumber) => {
       const cellStyles = rowData[colNumber - 1];
-      if (cellStyles.width) columnsWidth[colNumber] = { width: cellStyles.width };
+      // if (cellStyles.width) columnsWidth[colNumber] = { width: cellStyles.width };
+      columnsWidth[colNumber] = { width: cellStyles.width || 20 };
 
+      if (cellStyles.align) cell.alignment = { ...cellStyles.align };
+      if (cellStyles.borders) cell.border = { ...cellStyles.borders };
       if (cellStyles.fill) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: cellStyles.fill.replace('#', '') } };
       if (cellStyles.color) cell.font = { color: { argb: cellStyles.color.replace('#', '') } };
       if (cellStyles.mergeRight) {
         const currentRowIdx = worksheet.rowCount;
-        const endColumnIdx = cellStyles.mergeRight == 'all' ? worksheet.columnCount : cellStyles.mergeRight;
-        worksheet.mergeCells(currentRowIdx, 1, currentRowIdx, endColumnIdx);
+        const startColumnIdx = cellStyles.mergeRight == 'all' ? 1 : colNumber;
+        const endColumnIdx = cellStyles.mergeRight == 'all' ? worksheet.columnCount : startColumnIdx + cellStyles.mergeRight;
+        worksheet.mergeCells(currentRowIdx, startColumnIdx, currentRowIdx, endColumnIdx);
+      }
+
+      if (cellStyles.notes) {
+        const notesTexts = [] as ExcelJS.RichText[];
+
+        notesTexts.push(
+          {
+            font: {
+              size: 6,
+              bold: true,
+              color: { theme: 1 },
+              name: 'Calibri',
+            },
+            text: 'Opções de valores: \n',
+          },
+          ...cellStyles.notes.map((note) => {
+            return {
+              font: {
+                size: 8,
+                color: { theme: 1 },
+                name: 'Calibri',
+              },
+              text: note + '\n',
+            } as ExcelJS.RichText;
+          }),
+        );
+
+        cell.note = {
+          editAs: 'oneCells',
+          texts: notesTexts,
+        };
       }
     });
   }

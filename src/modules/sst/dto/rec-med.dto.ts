@@ -178,6 +178,11 @@ export class FindRecMedDto extends PaginationQueryDto {
   @IsOptional()
   onlyMed?: boolean;
 
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  representAll?: boolean;
+
   @Transform(QueryArray, { toClassOnly: true })
   @IsOptional()
   @IsString({ each: true })

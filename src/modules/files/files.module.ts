@@ -40,6 +40,8 @@ import { FileCompanyStructureFactory } from './factories/upload/products/Company
 import { UploadCompanyStructureService } from './services/company/upload-structure/upload-structure.service';
 import { HierarchyExcelProvider } from './providers/HierarchyExcelProvider';
 import { FileHelperProvider } from './providers/FileHelperProvider';
+import { ReportRiskStructureFactory } from './factories/report/products/ReportRiskStructureFactory';
+import { RiskStructureReportService } from './services/reports/risk-structure-report/risk-structure-report.service';
 
 @Module({
   controllers: [FilesChecklistController, ReportsController, FilesCompanyController, FilesCnaeController, FilesController, FilesCidController],
@@ -78,6 +80,8 @@ import { FileHelperProvider } from './providers/FileHelperProvider';
     UploadCompanyStructureService,
     HierarchyExcelProvider,
     FileHelperProvider,
+    ReportRiskStructureFactory,
+    RiskStructureReportService,
   ],
 })
 export class FilesModule {}

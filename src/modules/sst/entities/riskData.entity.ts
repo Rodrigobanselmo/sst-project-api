@@ -428,8 +428,7 @@ export class RiskFactorDataEntity implements RiskFactorData {
 
   private valuesCheck(value: string, limits: number[], highValue?: number) {
     if (!value || !limits.length) return 0;
-
-    value = value.replace(/[^0-9.]/g, '');
+    value = String(value).replace(/[^0-9.]/g, '');
 
     let returnValue = 0;
 

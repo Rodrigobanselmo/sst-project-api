@@ -65,12 +65,23 @@ export class RecMedRepository implements IRecMedRepository {
 
     const { where } = prismaFilter(whereInit, {
       query,
-      skip: ['search', 'onlyMed', 'onlyRec', 'companyId', 'riskIds'],
+      skip: ['search', 'onlyMed', 'onlyRec', 'companyId', 'riskIds', 'representAll'],
     });
 
     if ('riskIds' in query) {
       (where.AND as any).push({
-        riskId: { in: query.riskIds },
+        OR: [
+          {
+            riskId: { in: query.riskIds },
+          },
+          ...(query?.representAll
+            ? [
+                {
+                  risk: { representAll: true },
+                },
+              ]
+            : []),
+        ],
       } as typeof options.where);
     }
 

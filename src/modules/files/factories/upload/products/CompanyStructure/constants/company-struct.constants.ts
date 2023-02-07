@@ -1,15 +1,16 @@
-import { ClothesIBTUG } from './../../../../../../../shared/constants/maps/ibtu-clothes.map';
+import { ReportColorEnum, ReportFillColorEnum } from './../../../../report/types/IReportFactory.types';
+import { ClothesIBTUG, clothesList } from './../../../../../../../shared/constants/maps/ibtu-clothes.map';
 import { checkIsValidDate } from './../../../../../../../shared/utils/validators/checkIsValidDate';
 import { checkIsBoolean } from '../../../../../../../shared/utils/validators/checkIsBoolean';
 import { checkIsNumber } from './../../../../../../../shared/utils/validators/checkIdNumber';
-import { IColumnRuleMap, ISheetRuleMap } from '../../../types/IFileFactory.types';
+import { IColumnRuleMap, ISheetHeaderList, ISheetRuleMap } from '../../../types/IFileFactory.types';
 import { checkIsString } from './../../../../../../../shared/utils/validators/checkIsString';
-import { checkIsEnum } from '../../../../../../..//shared/utils/validators/checkIsEnum';
+import { checkIsEnum } from '../../../../../../../shared/utils/validators/checkIsEnum';
 
 export const emptyHierarchy = '!!';
 
 export enum CompanyStructHeaderEnum {
-  COMPANY_SIGLA = 'Sigla (Empresa)',
+  // COMPANY_SIGLA = 'Sigla (Empresa)',
   WORKSPACE = 'Nome Estabelecimento',
   DIRECTORY = 'Diretoria',
   MANAGEMENT = 'Gerência',
@@ -27,14 +28,14 @@ export enum CompanyStructHeaderEnum {
   // EQUIPMENT = 'Equipamento',
   RISK = 'Risco',
   PROB = 'Probabilidade',
-  SOURCE = 'Fonte Geradora',
+  GENERATE_SOURCE = 'Fonte Geradora',
 
   AREN = 'AREN',
   VDVR = 'VDVR',
 
-  DBA_NR15_Q5 = 'db (A)',
-  DBA_LTCAT_Q5 = 'LTCAT db (A) Q5',
-  DBA_LTCAT_Q3 = 'LTCAT db (A) Q3',
+  DBA_NR15_Q5 = 'db(A)',
+  DBA_LTCAT_Q5 = 'LTCAT db(A) Q5',
+  DBA_LTCAT_Q3 = 'LTCAT db(A) Q3',
 
   NR15LT = 'NR15 / CMPT',
   TWA_ACGH = 'Valor TLV/TWA (ACGIH)',
@@ -42,7 +43,7 @@ export enum CompanyStructHeaderEnum {
   VMP = 'NR15 / VMP',
   UNIT = 'Unidade de médida (NR15 / ACGH)',
 
-  IBTU = 'IBUTG [°C]',
+  IBTUG = 'IBUTG [°C]',
   MW = 'Taxa metabólica M[W]',
   IS_ACCLIMATIZED = 'Trabalhador aclimatizado?',
   CLOTHES_TYPE = 'Tipo Vestimento (IBUTG)',
@@ -70,13 +71,14 @@ export enum CompanyStructHeaderEnum {
 export const CompanyStructSheetMap: ISheetRuleMap = {};
 
 export const CompanyStructColumnMap: IColumnRuleMap<CompanyStructHeaderEnum> = {
-  [CompanyStructHeaderEnum.COMPANY_SIGLA]: {
-    field: CompanyStructHeaderEnum.COMPANY_SIGLA,
-    checkHandler: checkIsString,
-  },
+  // [CompanyStructHeaderEnum.COMPANY_SIGLA]: {
+  //   field: CompanyStructHeaderEnum.COMPANY_SIGLA,
+  //   checkHandler: checkIsString,
+  // },
   [CompanyStructHeaderEnum.WORKSPACE]: {
     field: CompanyStructHeaderEnum.WORKSPACE,
     checkHandler: checkIsString,
+    width: 80,
   },
   [CompanyStructHeaderEnum.DIRECTORY]: {
     field: CompanyStructHeaderEnum.DIRECTORY,
@@ -105,6 +107,8 @@ export const CompanyStructColumnMap: IColumnRuleMap<CompanyStructHeaderEnum> = {
   [CompanyStructHeaderEnum.GHO]: {
     field: CompanyStructHeaderEnum.GHO,
     checkHandler: checkIsString,
+    fill: ReportFillColorEnum.HEADER_YELLOW,
+    width: 30,
   },
 
   // [CompanyStructHeaderEnum.AMB_GENERAL]: {
@@ -140,7 +144,7 @@ export const CompanyStructColumnMap: IColumnRuleMap<CompanyStructHeaderEnum> = {
     field: CompanyStructHeaderEnum.RISK,
     requiredIf: [
       CompanyStructHeaderEnum.PROB,
-      CompanyStructHeaderEnum.SOURCE,
+      CompanyStructHeaderEnum.GENERATE_SOURCE,
       CompanyStructHeaderEnum.DBA_NR15_Q5,
       CompanyStructHeaderEnum.DBA_LTCAT_Q5,
       CompanyStructHeaderEnum.DBA_LTCAT_Q3,
@@ -151,7 +155,7 @@ export const CompanyStructColumnMap: IColumnRuleMap<CompanyStructHeaderEnum> = {
       CompanyStructHeaderEnum.STEL,
       CompanyStructHeaderEnum.VMP,
       CompanyStructHeaderEnum.UNIT,
-      CompanyStructHeaderEnum.IBTU,
+      CompanyStructHeaderEnum.IBTUG,
       CompanyStructHeaderEnum.MW,
       CompanyStructHeaderEnum.IS_ACCLIMATIZED,
       CompanyStructHeaderEnum.CLOTHES_TYPE,
@@ -162,25 +166,18 @@ export const CompanyStructColumnMap: IColumnRuleMap<CompanyStructHeaderEnum> = {
       CompanyStructHeaderEnum.PROB_REC,
     ],
     checkHandler: checkIsString,
+    width: 70,
+    notes: ['Nome do Risco cadastrado no sistema'],
   },
   [CompanyStructHeaderEnum.PROB]: {
     field: CompanyStructHeaderEnum.PROB,
     checkHandler: (value) => value && checkIsNumber(value),
   },
-  [CompanyStructHeaderEnum.SOURCE]: {
-    field: CompanyStructHeaderEnum.SOURCE,
+  [CompanyStructHeaderEnum.GENERATE_SOURCE]: {
+    field: CompanyStructHeaderEnum.GENERATE_SOURCE,
     checkHandler: checkIsString,
     isArray: true,
-  },
-
-  //* Vibration
-  [CompanyStructHeaderEnum.AREN]: {
-    field: CompanyStructHeaderEnum.AREN,
-    checkHandler: checkIsNumber,
-  },
-  [CompanyStructHeaderEnum.VDVR]: {
-    field: CompanyStructHeaderEnum.VDVR,
-    checkHandler: checkIsNumber,
+    width: 50,
   },
 
   //* Ruido
@@ -194,6 +191,40 @@ export const CompanyStructColumnMap: IColumnRuleMap<CompanyStructHeaderEnum> = {
   },
   [CompanyStructHeaderEnum.DBA_LTCAT_Q3]: {
     field: CompanyStructHeaderEnum.DBA_LTCAT_Q3,
+    checkHandler: checkIsNumber,
+  },
+
+  //* HEAT
+  [CompanyStructHeaderEnum.IBTUG]: {
+    field: CompanyStructHeaderEnum.IBTUG,
+    checkHandler: checkIsNumber,
+    requiredIf: [CompanyStructHeaderEnum.MW, CompanyStructHeaderEnum.IS_ACCLIMATIZED, CompanyStructHeaderEnum.CLOTHES_TYPE],
+  },
+  [CompanyStructHeaderEnum.MW]: {
+    field: CompanyStructHeaderEnum.MW,
+    checkHandler: checkIsNumber,
+    requiredIf: [CompanyStructHeaderEnum.IBTUG],
+  },
+  [CompanyStructHeaderEnum.IS_ACCLIMATIZED]: {
+    field: CompanyStructHeaderEnum.IS_ACCLIMATIZED,
+    checkHandler: checkIsBoolean,
+    transform: (v) => Boolean(v),
+    requiredIf: [CompanyStructHeaderEnum.IBTUG],
+  },
+  [CompanyStructHeaderEnum.CLOTHES_TYPE]: {
+    field: CompanyStructHeaderEnum.CLOTHES_TYPE,
+    checkHandler: (value: any) => checkIsEnum(value, ClothesIBTUG),
+    requiredIf: [CompanyStructHeaderEnum.IBTUG],
+    notes: ['Utilizar valores: 0, 0.5, 2, 3, 4, 10, 12'],
+  },
+
+  //* Vibration
+  [CompanyStructHeaderEnum.AREN]: {
+    field: CompanyStructHeaderEnum.AREN,
+    checkHandler: checkIsNumber,
+  },
+  [CompanyStructHeaderEnum.VDVR]: {
+    field: CompanyStructHeaderEnum.VDVR,
     checkHandler: checkIsNumber,
   },
 
@@ -219,28 +250,7 @@ export const CompanyStructColumnMap: IColumnRuleMap<CompanyStructHeaderEnum> = {
   [CompanyStructHeaderEnum.UNIT]: {
     field: CompanyStructHeaderEnum.UNIT,
     checkHandler: checkIsString,
-  },
-
-  //* HEAT
-  [CompanyStructHeaderEnum.IBTU]: {
-    field: CompanyStructHeaderEnum.IBTU,
-    checkHandler: checkIsNumber,
-    requiredIf: [CompanyStructHeaderEnum.MW, CompanyStructHeaderEnum.IS_ACCLIMATIZED, CompanyStructHeaderEnum.CLOTHES_TYPE],
-  },
-  [CompanyStructHeaderEnum.MW]: {
-    field: CompanyStructHeaderEnum.MW,
-    checkHandler: checkIsNumber,
-    requiredIf: [CompanyStructHeaderEnum.IBTU],
-  },
-  [CompanyStructHeaderEnum.IS_ACCLIMATIZED]: {
-    field: CompanyStructHeaderEnum.IS_ACCLIMATIZED,
-    checkHandler: checkIsBoolean,
-    requiredIf: [CompanyStructHeaderEnum.IBTU],
-  },
-  [CompanyStructHeaderEnum.CLOTHES_TYPE]: {
-    field: CompanyStructHeaderEnum.CLOTHES_TYPE,
-    checkHandler: (value: any) => checkIsEnum(value, ClothesIBTUG),
-    requiredIf: [CompanyStructHeaderEnum.IBTU],
+    width: 30,
   },
 
   [CompanyStructHeaderEnum.EPI_CA]: {
@@ -262,68 +272,81 @@ export const CompanyStructColumnMap: IColumnRuleMap<CompanyStructHeaderEnum> = {
   [CompanyStructHeaderEnum.EPI_EFFICIENTLY]: {
     field: CompanyStructHeaderEnum.EPI_EFFICIENTLY,
     checkHandler: checkIsBoolean,
-    isArray: true,
+    transform: (v) => Boolean(v),
+    notes: ['S: Sim', 'N: Não'],
   },
   [CompanyStructHeaderEnum.EPI_EPC]: {
     field: CompanyStructHeaderEnum.EPI_EPC,
     checkHandler: checkIsBoolean,
-    isArray: true,
+    transform: (v) => Boolean(v),
+    notes: ['S: Sim', 'N: Não'],
   },
   [CompanyStructHeaderEnum.EPI_LONG_PERIODS]: {
     field: CompanyStructHeaderEnum.EPI_LONG_PERIODS,
     checkHandler: checkIsBoolean,
-    isArray: true,
+    transform: (v) => Boolean(v),
+    notes: ['S: Sim', 'N: Não'],
   },
   [CompanyStructHeaderEnum.EPI_VALIDATION]: {
     field: CompanyStructHeaderEnum.EPI_VALIDATION,
     checkHandler: checkIsBoolean,
-    isArray: true,
+    transform: (v) => Boolean(v),
+    notes: ['S: Sim', 'N: Não'],
   },
   [CompanyStructHeaderEnum.EPI_TRADE_SIGN]: {
     field: CompanyStructHeaderEnum.EPI_TRADE_SIGN,
     checkHandler: checkIsBoolean,
-    isArray: true,
+    transform: (v) => Boolean(v),
+    notes: ['S: Sim', 'N: Não'],
   },
   [CompanyStructHeaderEnum.EPI_SANITATION]: {
     field: CompanyStructHeaderEnum.EPI_SANITATION,
     checkHandler: checkIsBoolean,
-    isArray: true,
+    transform: (v) => Boolean(v),
+    notes: ['S: Sim', 'N: Não'],
   },
   [CompanyStructHeaderEnum.EPI_MAINTENANCE]: {
     field: CompanyStructHeaderEnum.EPI_MAINTENANCE,
     checkHandler: checkIsBoolean,
-    isArray: true,
+    transform: (v) => Boolean(v),
+    notes: ['S: Sim', 'N: Não'],
   },
   [CompanyStructHeaderEnum.EPI_UNSTOPPED]: {
     field: CompanyStructHeaderEnum.EPI_UNSTOPPED,
     checkHandler: checkIsBoolean,
-    isArray: true,
+    transform: (v) => Boolean(v),
+    notes: ['S: Sim', 'N: Não'],
   },
   [CompanyStructHeaderEnum.EPI_TRAINING]: {
     field: CompanyStructHeaderEnum.EPI_TRAINING,
     checkHandler: checkIsBoolean,
-    isArray: true,
+    transform: (v) => Boolean(v),
+    notes: ['S: Sim', 'N: Não'],
   },
   [CompanyStructHeaderEnum.EPC]: {
     field: CompanyStructHeaderEnum.EPC,
     checkHandler: checkIsString,
     requiredIf: [CompanyStructHeaderEnum.EPC_EFFICIENTLY],
     isArray: true,
+    width: 50,
   },
   [CompanyStructHeaderEnum.EPC_EFFICIENTLY]: {
     field: CompanyStructHeaderEnum.EPC_EFFICIENTLY,
-    checkHandler: checkIsString,
-    isArray: true,
+    checkHandler: checkIsBoolean,
+    transform: (v) => Boolean(v),
+    notes: ['S: Sim', 'N: Não'],
   },
   [CompanyStructHeaderEnum.EPC_OTHERS]: {
     field: CompanyStructHeaderEnum.EPC_OTHERS,
     checkHandler: checkIsString,
     isArray: true,
+    width: 50,
   },
   [CompanyStructHeaderEnum.REC]: {
     field: CompanyStructHeaderEnum.REC,
     checkHandler: checkIsString,
     isArray: true,
+    width: 50,
   },
   [CompanyStructHeaderEnum.PROB_REC]: {
     field: CompanyStructHeaderEnum.PROB_REC,
@@ -338,3 +361,87 @@ export const CompanyStructColumnMap: IColumnRuleMap<CompanyStructHeaderEnum> = {
     checkHandler: checkIsValidDate,
   },
 };
+
+export const CompanyStructColumnList: ISheetHeaderList = [
+  { group: [CompanyStructColumnMap[CompanyStructHeaderEnum.WORKSPACE]], name: 'Identifição Estabelecimento' },
+  {
+    group: [
+      CompanyStructColumnMap[CompanyStructHeaderEnum.DIRECTORY],
+      CompanyStructColumnMap[CompanyStructHeaderEnum.MANAGEMENT],
+      CompanyStructColumnMap[CompanyStructHeaderEnum.SECTOR],
+      CompanyStructColumnMap[CompanyStructHeaderEnum.SUB_SECTOR],
+      CompanyStructColumnMap[CompanyStructHeaderEnum.OFFICE],
+      CompanyStructColumnMap[CompanyStructHeaderEnum.SUB_OFFICE],
+      CompanyStructColumnMap[CompanyStructHeaderEnum.GHO],
+    ],
+    name: 'Identificação Cargo ou GSE Afetado',
+  },
+  {
+    group: [
+      CompanyStructColumnMap[CompanyStructHeaderEnum.RISK],
+      CompanyStructColumnMap[CompanyStructHeaderEnum.PROB],
+      CompanyStructColumnMap[CompanyStructHeaderEnum.GENERATE_SOURCE],
+    ],
+    name: 'Risco Ocupacional',
+  },
+  {
+    group: [
+      [
+        CompanyStructColumnMap[CompanyStructHeaderEnum.DBA_NR15_Q5],
+        CompanyStructColumnMap[CompanyStructHeaderEnum.DBA_LTCAT_Q5],
+        CompanyStructColumnMap[CompanyStructHeaderEnum.DBA_LTCAT_Q3],
+      ],
+
+      [
+        CompanyStructColumnMap[CompanyStructHeaderEnum.IBTUG],
+        CompanyStructColumnMap[CompanyStructHeaderEnum.MW],
+        CompanyStructColumnMap[CompanyStructHeaderEnum.IS_ACCLIMATIZED],
+        CompanyStructColumnMap[CompanyStructHeaderEnum.CLOTHES_TYPE],
+      ],
+
+      [CompanyStructColumnMap[CompanyStructHeaderEnum.AREN], CompanyStructColumnMap[CompanyStructHeaderEnum.VDVR]],
+
+      [
+        CompanyStructColumnMap[CompanyStructHeaderEnum.NR15LT],
+        CompanyStructColumnMap[CompanyStructHeaderEnum.TWA_ACGH],
+        CompanyStructColumnMap[CompanyStructHeaderEnum.STEL],
+        CompanyStructColumnMap[CompanyStructHeaderEnum.VMP],
+        CompanyStructColumnMap[CompanyStructHeaderEnum.UNIT],
+      ],
+    ],
+    name: 'Valores Quantitativos do Risco',
+    fillColors: [ReportFillColorEnum.HEADER_YELLOW, ReportFillColorEnum.HEADER_RED],
+  },
+  {
+    group: [
+      CompanyStructColumnMap[CompanyStructHeaderEnum.EPI_CA],
+      CompanyStructColumnMap[CompanyStructHeaderEnum.EPI_EFFICIENTLY],
+      CompanyStructColumnMap[CompanyStructHeaderEnum.EPI_EPC],
+      CompanyStructColumnMap[CompanyStructHeaderEnum.EPI_LONG_PERIODS],
+      CompanyStructColumnMap[CompanyStructHeaderEnum.EPI_VALIDATION],
+      CompanyStructColumnMap[CompanyStructHeaderEnum.EPI_TRADE_SIGN],
+      CompanyStructColumnMap[CompanyStructHeaderEnum.EPI_SANITATION],
+      CompanyStructColumnMap[CompanyStructHeaderEnum.EPI_MAINTENANCE],
+      CompanyStructColumnMap[CompanyStructHeaderEnum.EPI_UNSTOPPED],
+      CompanyStructColumnMap[CompanyStructHeaderEnum.EPI_TRAINING],
+    ],
+    name: 'Medidas de Controle (EPI)',
+  },
+  {
+    group: [CompanyStructColumnMap[CompanyStructHeaderEnum.EPC], CompanyStructColumnMap[CompanyStructHeaderEnum.EPC_EFFICIENTLY]],
+    name: 'Medidas de Controle de Engenharia (EPC)',
+  },
+  {
+    group: [CompanyStructColumnMap[CompanyStructHeaderEnum.EPC_OTHERS]],
+    name: 'Medidas de Controle Admnistrativa',
+  },
+  {
+    group: [CompanyStructColumnMap[CompanyStructHeaderEnum.REC], CompanyStructColumnMap[CompanyStructHeaderEnum.PROB_REC]],
+    name: 'Recomendações',
+  },
+  {
+    group: [CompanyStructColumnMap[CompanyStructHeaderEnum.START_DATE], CompanyStructColumnMap[CompanyStructHeaderEnum.END_DATE]],
+    name: 'Periódo de Exposição ao Risco',
+    fillColors: [ReportFillColorEnum.HEADER_RED],
+  },
+];

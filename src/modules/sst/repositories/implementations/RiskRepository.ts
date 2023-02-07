@@ -462,19 +462,7 @@ export class RiskRepository implements IRiskRepository {
     };
   }
 
-  async findAllAvailable(
-    userCompanyId: string,
-    {
-      representAll,
-      ...options
-    }: {
-      select?: Prisma.RiskFactorsSelect;
-      include?: Prisma.RiskFactorsInclude;
-      representAll?: boolean;
-    } = {},
-  ): Promise<RiskFactorsEntity[]> {
-    const include = options.include || {};
-
+  async findAllAvailable(userCompanyId: string, options: Prisma.RiskFactorsFindManyArgs = {}): Promise<RiskFactorsEntity[]> {
     // const tenant: Prisma.RiskFactorsFindManyArgs['where']['AND'] = [
     const tenant = [
       {
@@ -501,22 +489,6 @@ export class RiskRepository implements IRiskRepository {
     ];
 
     const risks = await this.prisma.riskFactors.findMany({
-      where: {
-        AND: [...tenant],
-        deleted_at: null,
-        OR: [
-          {
-            type: { not: 'OUTROS' },
-            severity: { not: 0 },
-          },
-          {
-            type: 'OUTROS',
-          },
-          {
-            representAll: true,
-          },
-        ],
-      },
       // orderBy: [{ type: 'asc' }, { name: 'asc' }],
       select: {
         id: true,
@@ -535,6 +507,23 @@ export class RiskRepository implements IRiskRepository {
         // recMed: { where: { deleted_at: null, AND: [...tenant] } },
         // generateSource: { where: { deleted_at: null, AND: [...tenant] } },
       },
+      ...options,
+      where: {
+        AND: [...tenant],
+        deleted_at: null,
+        OR: [
+          {
+            type: { not: 'OUTROS' },
+            severity: { not: 0 },
+          },
+          {
+            type: 'OUTROS',
+          },
+          {
+            representAll: true,
+          },
+        ],
+      },
       // include: {
       //   recMed: { where: { deleted_at: null, AND: [...tenant] } },
       //   generateSource: { where: { deleted_at: null, AND: [...tenant] } },
@@ -542,7 +531,7 @@ export class RiskRepository implements IRiskRepository {
       // },
     });
 
-    return risks.map((risk) => new RiskFactorsEntity(risk));
+    return risks.map((risk) => new RiskFactorsEntity(risk as any));
   }
 
   async DeleteByIdSoft(id: string): Promise<RiskFactorsEntity> {

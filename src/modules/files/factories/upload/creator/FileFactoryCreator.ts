@@ -8,6 +8,7 @@ export abstract class FileFactoryAbstractionCreator<T, R extends keyof any> {
   public abstract factoryMethod(): IFileFactoryProduct<T, R>;
   private readonly excelProvider: ExcelProvider;
   private readonly prismaService: PrismaService;
+  private splitter = '; ';
 
   constructor(excelProvider, prisma) {
     this.excelProvider = excelProvider;
@@ -16,6 +17,8 @@ export abstract class FileFactoryAbstractionCreator<T, R extends keyof any> {
 
   public create() {
     const product = this.factoryMethod();
+
+    if (product.splitter) this.splitter = product.splitter;
 
     return product;
   }
@@ -32,7 +35,7 @@ export abstract class FileFactoryAbstractionCreator<T, R extends keyof any> {
       return sheetRows;
     });
 
-    await product.saveData(sheetsRows, body);
+    return await product.saveData(sheetsRows, body);
   }
 
   public async read({ buffer }) {
@@ -41,7 +44,7 @@ export abstract class FileFactoryAbstractionCreator<T, R extends keyof any> {
   }
 
   public getHeaderInfo(sheet: ISheetData) {
-    const headerStartIndex = sheet.rows.findIndex((row) => row[0] && sheet.columnsMap[row[0]]);
+    const headerStartIndex = sheet.rows.findIndex((row) => row[0] && row[1] && sheet.columnsMap[row[0]] && sheet.columnsMap[row[1]]);
     if (headerStartIndex == -1) throw new BadRequestException(`Não foi encontrado a cabeçario da tabela na planilha "${sheet.sheetName}"`);
 
     const columnHandlerOrder = sheet.rows[headerStartIndex].map((cell, columnsIndex) => {
@@ -67,15 +70,14 @@ export abstract class FileFactoryAbstractionCreator<T, R extends keyof any> {
       if (!excelRow.length) return;
 
       const databaseRow = {} as Record<R, any>;
+      const rowIndex = indexRow + 1 + (headerStartIndex + 1);
 
       columnHandlerOrder.forEach((columnHandler, indexCell) => {
-        const errorMessageMissing = `Esta faltando um campo obrigatório na linha "${indexRow + 1}", coluna "${this.excelProvider.getColumnByIndex(
-          indexCell,
-        )}" da planilha ${sheet.sheetName}"`;
-
-        const errorMessageInvalid = `Dado inválido na linha "${indexRow + 1}", coluna "${this.excelProvider.getColumnByIndex(indexCell)}" da planilha ${
+        const errorMessageMissing = `Esta faltando um campo obrigatório na linha "${rowIndex}", coluna "${this.excelProvider.getColumnByIndex(indexCell)}" da planilha ${
           sheet.sheetName
         }"`;
+
+        const errorMessageInvalid = `Dado inválido na linha "${rowIndex}", coluna "${this.excelProvider.getColumnByIndex(indexCell)}" da planilha ${sheet.sheetName}"`;
 
         const excelCell = excelRow[indexCell];
         const isEmptyCell = excelCell === null || excelCell === undefined;
@@ -99,11 +101,12 @@ export abstract class FileFactoryAbstractionCreator<T, R extends keyof any> {
         let checkedData = columnHandler.checkHandler(excelCell);
         if (checkedData === false) throw new BadRequestException(errorMessageInvalid);
         if (checkedData === 'false') checkedData = false;
+        if (checkedData === 'true') checkedData = true;
 
         if (columnHandler.transform) checkedData = columnHandler.transform(checkedData);
 
         if (columnHandler.isArray) {
-          databaseRow[columnHandler.field] = checkedData.split('; ');
+          databaseRow[columnHandler.field] = checkedData.split(this.splitter);
         }
 
         if (!columnHandler.isArray) {

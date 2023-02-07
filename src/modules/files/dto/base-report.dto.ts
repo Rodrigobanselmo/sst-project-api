@@ -6,7 +6,7 @@ import { StringUppercaseTransform } from '../../../shared/transformers/string-up
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
 import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
-export enum ReportDownloadtypeEnum {
+export enum ReportDownloadTypeEnum {
   XML = 'XML',
   HTML = 'HTML',
   PDF = 'PDF',
@@ -15,5 +15,5 @@ export enum ReportDownloadtypeEnum {
 export class BaseReportDto {
   @IsOptional()
   @IsString()
-  downloadType?: ReportDownloadtypeEnum;
+  downloadType?: ReportDownloadTypeEnum;
 }

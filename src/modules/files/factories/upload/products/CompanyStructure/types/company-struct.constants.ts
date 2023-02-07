@@ -1,3 +1,4 @@
+import { RiskFactorsEntity } from './../../../../../../sst/entities/risk.entity';
 import { ClothesIBTUG } from '../../../../../../../shared/constants/maps/ibtu-clothes.map';
 import { checkIsValidDate } from '../../../../../../../shared/utils/validators/checkIsValidDate';
 import { checkIsBoolean } from '../../../../../../../shared/utils/validators/checkIsBoolean';
@@ -5,27 +6,49 @@ import { checkIsNumber } from '../../../../../../../shared/utils/validators/chec
 import { IColumnRuleMap, ISheetRuleMap } from '../../../types/IFileFactory.types';
 import { checkIsString } from '../../../../../../../shared/utils/validators/checkIsString';
 import { checkIsEnum } from '../../../../../../../shared/utils/validators/checkIsEnum';
-import { CharacterizationTypeEnum } from '@prisma/client';
+import { CharacterizationTypeEnum, HierarchyEnum, RiskFactors } from '@prisma/client';
 import { CompanyStructHeaderEnum } from '../constants/company-struct.constants';
 
-export interface IBodyCompStructFile {
-  companyId: string;
+type IDataReturn = { id?: string | number; value: string };
+export type IHierarchyDataReturn = {
+  id: string;
+  parentId: string;
+  name: string;
+  type: HierarchyEnum;
+  workspaces: {
+    id: string;
+  }[];
+};
+export type IHomoDataReturn = {
+  id: string;
+  name: string;
+};
+export type IWorkDataReturn = {
+  id: string;
+  name: string;
+  abbreviation: string;
+};
+export type IEpiReturn = {
+  id: number;
+  ca: string;
+};
+
+export interface IWorkspaceData extends IDataReturn {
+  hierarchies: Record<string, IDataReturn>;
+  homogeneousGroup: Record<string, IDataReturn>;
+  // characterization: Record<string, { type: CharacterizationTypeEnum } & IDataReturn>;
 }
 
-type IWorkspaceDataReturn = { id?: string | number; value: string };
+export interface IRiskAllData extends IDataReturn {
+  generateSource: Record<string, IDataReturn>;
+  adms: Record<string, IDataReturn>;
+  engs: Record<string, IDataReturn>;
+  recs: Record<string, IDataReturn>;
+  data: RiskFactorsEntity;
+}
 
-export interface IWorkspaceData extends IWorkspaceDataReturn {
-  hierarchies: Record<string, IWorkspaceDataReturn[]>;
-  homogeneousGroup: Record<string, IWorkspaceDataReturn>;
-  characterization: Record<string, { type: CharacterizationTypeEnum } & IWorkspaceDataReturn>;
-  risk: Record<
-    string,
-    {
-      generateSource: Record<string, IWorkspaceDataReturn>;
-      adms: Record<string, IWorkspaceDataReturn>;
-      engs: Record<string, IWorkspaceDataReturn>;
-      recs: Record<string, IWorkspaceDataReturn>;
-      epis: Record<string, IWorkspaceDataReturn>;
-    } & IWorkspaceDataReturn
-  >;
+export interface IMapData {
+  workspace: Record<string, IWorkspaceData>;
+  risk: Record<string, IRiskAllData>;
+  epis: Record<string, IDataReturn>;
 }

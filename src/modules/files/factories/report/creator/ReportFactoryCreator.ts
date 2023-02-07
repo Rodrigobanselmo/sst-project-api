@@ -1,4 +1,4 @@
-import { ReportDownloadtypeEnum } from '../../../../..//modules/files/dto/base-report.dto';
+import { ReportDownloadTypeEnum } from '../../../../..//modules/files/dto/base-report.dto';
 import { Workbook } from 'exceljs';
 import { ExcelProvider } from '../../../../../shared/providers/ExcelProvider/implementations/ExcelProvider';
 import { IReportCell, IReportFactoryProduct, IReportFactoryProductFindData, IReportGenerateType, IReportRows, ReportFillColorEnum } from '../types/IReportFactory.types';
@@ -73,7 +73,7 @@ export abstract class ReportFactoryAbstractionCreator<T> {
   }
 
   public async execute({ downloadType, companyId, body }: IReportGenerateType<T>) {
-    if (!downloadType || downloadType == ReportDownloadtypeEnum.XML) {
+    if (!downloadType || downloadType == ReportDownloadTypeEnum.XML) {
       const excelFile = await this.excelCompile(companyId, body);
       return excelFile;
     }

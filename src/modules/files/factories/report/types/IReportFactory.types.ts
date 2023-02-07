@@ -1,4 +1,5 @@
-import { ReportDownloadtypeEnum } from '../../../../../modules/files/dto/base-report.dto';
+import { ReportDownloadTypeEnum } from '../../../../../modules/files/dto/base-report.dto';
+import ExcelJS from 'exceljs';
 
 export type IReportHeader = IReportHeaderCell[];
 
@@ -27,6 +28,16 @@ export interface IReportCell {
   content: string | number | Date;
   mergeRight?: number | 'all';
   width?: number;
+  borders?: Partial<ExcelJS.Borders>;
+  align?: {
+    horizontal?: 'left' | 'center' | 'right' | 'fill' | 'justify' | 'centerContinuous' | 'distributed';
+    vertical?: 'top' | 'middle' | 'bottom' | 'distributed' | 'justify';
+    wrapText?: boolean;
+    shrinkToFit?: boolean;
+    indent?: number;
+    readingOrder?: 'rtl' | 'ltr';
+    textRotation?: number | 'vertical';
+  };
 }
 
 export interface IReportHeaderCell extends IReportCell {
@@ -36,7 +47,7 @@ export interface IReportHeaderCell extends IReportCell {
 export type IReportRows = IReportCell[][];
 export type IReportSanitizeData = Record<string, IReportCell>;
 export type IReportGenerateType<T> = {
-  downloadType: ReportDownloadtypeEnum;
+  downloadType: ReportDownloadTypeEnum;
   companyId: string;
   body: T;
 };
@@ -47,7 +58,13 @@ export enum ReportFillColorEnum {
   RED = '#F44336',
   GREEN = '#3cbe7d',
   HEADER = '#faffae',
+  HEADER_BLUE = '#d5e6f5',
+  HEADER_YELLOW = '#fdb409',
+  HEADER_PURPLE = '#c0b1d1',
+  HEADER_RED = '#f0a072',
+  HEADER_GREEN = '#dbecd1',
   TITLE = '#a1a1a1',
+  TITLE_LIGHT = '#d3d3d3',
   END = '#faffae',
 }
 
@@ -56,4 +73,5 @@ export enum ReportColorEnum {
   YELLOW = '#d9d10b',
   RED = '#F44336',
   GREEN = '#3cbe7d',
+  WHITE = '#ffffff',
 }

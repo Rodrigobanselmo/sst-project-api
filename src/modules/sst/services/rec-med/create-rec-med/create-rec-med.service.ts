@@ -17,24 +17,38 @@ export class CreateRecMedService {
 
     if (createRecMedDto.recName) {
       const foundRecFactor = await this.recMedRepository.find(
-        { companyId: createRecMedDto.companyId, search: createRecMedDto.recName, recType: [createRecMedDto.recType], riskIds: [createRecMedDto.riskId] },
+        {
+          companyId: createRecMedDto.companyId,
+          search: createRecMedDto.recName,
+          // ...(createRecMedDto.recType && { recType: [createRecMedDto.recType] }),
+          riskIds: [createRecMedDto.riskId],
+          onlyRec: true,
+          representAll: true,
+        },
         { take: 1, skip: 0 },
       );
 
       if (foundRecFactor.count > 0) {
-        if (options.returnIfExist) return foundRecFactor.data[0];
+        if (options?.returnIfExist) return foundRecFactor.data[0];
         throw new BadRequestException('Recomendação já exite');
       }
     }
 
     if (createRecMedDto.medName) {
       const foundMedFactor = await this.recMedRepository.find(
-        { companyId: createRecMedDto.companyId, search: createRecMedDto.medName, medType: [createRecMedDto.medType], riskIds: [createRecMedDto.riskId] },
+        {
+          companyId: createRecMedDto.companyId,
+          search: createRecMedDto.medName,
+          medType: [createRecMedDto.medType],
+          riskIds: [createRecMedDto.riskId],
+          onlyMed: true,
+          representAll: true,
+        },
         { take: 1, skip: 0 },
       );
 
       if (foundMedFactor.count > 0) {
-        if (options.returnIfExist) return foundMedFactor.data[0];
+        if (options?.returnIfExist) return foundMedFactor.data[0];
         throw new BadRequestException('Medida de controle já exite');
       }
     }

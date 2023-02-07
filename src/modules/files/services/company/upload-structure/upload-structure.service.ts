@@ -1,3 +1,4 @@
+import { UploadRiskStructureReportDto } from './../../../dto/risk-structure-report.dto';
 import { FileCompanyStructureFactory } from '../../../factories/upload/products/CompanyStructure/FileCompanyStructureFactory';
 import { EmployeeRepository } from '../../../../company/repositories/implementations/EmployeeRepository';
 import { BadRequestException, Injectable } from '@nestjs/common';
@@ -34,12 +35,13 @@ export class UploadCompanyStructureService {
     private readonly companyRepository: CompanyRepository,
   ) {}
 
-  async execute(file: Express.Multer.File, userPayloadDto: UserPayloadDto) {
+  async execute(file: Express.Multer.File, userPayloadDto: UserPayloadDto, body: UploadRiskStructureReportDto) {
     if (!file) throw new BadRequestException(`file is not available`);
     const buffer = file.buffer;
 
-    await this.fileCompanyStructureFactory.execute(buffer, { companyId: userPayloadDto.targetCompanyId });
+    const x = await this.fileCompanyStructureFactory.execute(buffer, { companyId: userPayloadDto.targetCompanyId, ...body });
 
+    return x;
     const hierarchyExcel = new HierarchyExcelProvider();
 
     const Workbook = workbooksConstant[WorkbooksEnum.EMPLOYEES];

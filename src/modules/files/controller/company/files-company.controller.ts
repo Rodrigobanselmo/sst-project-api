@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Post, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
@@ -15,6 +15,7 @@ import { Permissions } from '../../../../shared/decorators/permissions.decorator
 import { PermissionEnum, RoleEnum } from '../../../../shared/constants/enum/authorization';
 import { Roles } from '../../../../shared/decorators/roles.decorator';
 import { UploadCompanyStructureService } from '../../services/company/upload-structure/upload-structure.service';
+import { UploadRiskStructureReportDto } from '../../dto/risk-structure-report.dto';
 @Controller('files/company')
 export class FilesCompanyController {
   constructor(
@@ -165,9 +166,9 @@ export class FilesCompanyController {
     isContract: true,
     isMember: true,
   })
-  @Post('company-structure/upload/:companyId?')
+  @Post('company-structure/upload/:companyId')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadCompanyStruct(@UploadedFile() file: Express.Multer.File, @User() userPayloadDto: UserPayloadDto) {
-    await this.uploadCompanyStructureService.execute(file, userPayloadDto);
+  async uploadCompanyStruct(@UploadedFile() file: Express.Multer.File, @User() userPayloadDto: UserPayloadDto, @Body() body: UploadRiskStructureReportDto) {
+    return await this.uploadCompanyStructureService.execute(file, userPayloadDto, body);
   }
 }

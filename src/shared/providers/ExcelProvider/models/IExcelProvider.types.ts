@@ -1,4 +1,5 @@
 import { PrismaService } from '../../../../prisma/prisma.service';
+import ExcelJS from 'exceljs';
 
 export interface IExcelReadData {
   name: string;
@@ -26,6 +27,17 @@ export interface IReportExcellCell {
   mergeRight?: number | 'all';
   width?: number;
   content: string | number | Date;
+  notes?: string[];
+  borders?: Partial<ExcelJS.Borders>;
+  align?: {
+    horizontal?: 'left' | 'center' | 'right' | 'fill' | 'justify' | 'centerContinuous' | 'distributed';
+    vertical?: 'top' | 'middle' | 'bottom' | 'distributed' | 'justify';
+    wrapText?: boolean;
+    shrinkToFit?: boolean;
+    indent?: number;
+    readingOrder?: 'rtl' | 'ltr';
+    textRotation?: number | 'vertical';
+  };
 }
 
 export type IReportRow = IReportExcellCell[];

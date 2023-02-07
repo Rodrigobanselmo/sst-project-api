@@ -1,3 +1,4 @@
+import { DownloadRiskStructureReportDto } from './../../dto/risk-structure-report.dto';
 import { Body, Controller, HttpStatus, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
 
@@ -7,10 +8,11 @@ import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import { DownloudClinicReportDto } from '../../dto/clinic-report.dto';
 import { DownloudDoneExamReportDto } from '../../dto/done-exam-report.dto copy';
-import { DownloudExpiredExamReportDto } from '../../dto/expired-exam-report.dto';
+import { DownloadExpiredExamReportDto } from '../../dto/expired-exam-report.dto';
 import { ClinicReportService } from '../../services/reports/clinic-report/clinic-report.service';
 import { DoneExamReportService } from '../../services/reports/done-exam-report/done-exam-report.service';
 import { ExpiredExamReportService } from '../../services/reports/expired-exam-report/expired-exam-report.service';
+import { RiskStructureReportService } from '../../services/reports/risk-structure-report/risk-structure-report.service';
 
 const getResponse = (res: Response, data: any) => {
   if ('workbook' in data) {
@@ -29,6 +31,7 @@ export class ReportsController {
     private readonly clinicReportService: ClinicReportService,
     private readonly expiredExamReportService: ExpiredExamReportService,
     private readonly doneExamReportService: DoneExamReportService,
+    private readonly riskStructureReportService: RiskStructureReportService,
   ) {}
 
   @Permissions({ code: PermissionEnum.CLINIC, crud: true, isMember: true })
@@ -40,7 +43,7 @@ export class ReportsController {
 
   @Permissions({ code: PermissionEnum.CLINIC_SCHEDULE, crud: true, isMember: true })
   @Post('/expired-exam/:companyId')
-  async expiredExam(@Body() body: DownloudExpiredExamReportDto, @User() userPayloadDto: UserPayloadDto, @Res() res: Response) {
+  async expiredExam(@Body() body: DownloadExpiredExamReportDto, @User() userPayloadDto: UserPayloadDto, @Res() res: Response) {
     const data = await this.expiredExamReportService.execute(body, userPayloadDto);
     getResponse(res, data);
   }
@@ -49,6 +52,13 @@ export class ReportsController {
   @Post('/done-exam/:companyId')
   async doneExam(@Body() body: DownloudDoneExamReportDto, @User() userPayloadDto: UserPayloadDto, @Res() res: Response) {
     const data = await this.doneExamReportService.execute(body, userPayloadDto);
+    getResponse(res, data);
+  }
+
+  @Permissions({ code: PermissionEnum.RISK_DATA, crud: true, isMember: true })
+  @Post('/risk-structure/:companyId')
+  async riskStructure(@Body() body: DownloadRiskStructureReportDto, @User() userPayloadDto: UserPayloadDto, @Res() res: Response) {
+    const data = await this.riskStructureReportService.execute(body, userPayloadDto);
     getResponse(res, data);
   }
 }
