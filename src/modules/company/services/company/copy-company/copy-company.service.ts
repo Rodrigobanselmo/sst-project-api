@@ -55,6 +55,7 @@ export class CopyCompanyService {
 
     const homoGroups = await this.homoGroupRepository.findHomoGroupByCompany(companyCopyFromId, {
       include: {
+        workspaces: true,
         characterization: {
           include: {
             // photos: true,
@@ -117,12 +118,14 @@ export class CopyCompanyService {
     });
 
     const createHomogeneous = async (homoGroupsCreation: HomoGroupEntity[], profileParentId?: string) => {
-      homoGroupsCreation.map((homoGroup, i) => {
-        if (homoGroup.characterization && isEnvironment(homoGroup.characterization.type)) {
-          homoGroupsCreation[i].environment = homoGroup.characterization as any;
-          // homoGroupsCreation[i].characterization = null;
-        }
-      });
+      {
+        homoGroupsCreation.forEach((homoGroup, i) => {
+          if (homoGroup.characterization && isEnvironment(homoGroup.characterization.type)) {
+            homoGroupsCreation[i].environment = homoGroup.characterization as any;
+            // homoGroupsCreation[i].characterization = null;
+          }
+        });
+      }
 
       await Promise.all(
         homoGroupsCreation.map(async (group) => {
@@ -134,17 +137,14 @@ export class CopyCompanyService {
           const hierarchies: HierarchyEntity[] = [];
 
           group.hierarchies.map((hierarchy) => {
-            group.workspaceIds.map((workspaceId) => {
-              const hierarchyFound = equalHierarchy[hierarchy.id + '//' + workspaceId];
+            const hierarchyFound = equalHierarchy[hierarchy.id];
 
-              if (hierarchyFound && equalWorkspace[workspaceId])
-                hierarchyFound.forEach((h) => {
-                  hierarchies.push({
-                    ...h,
-                    workspaceId: equalWorkspace[workspaceId].id,
-                  });
+            if (hierarchyFound)
+              hierarchyFound.forEach((h) => {
+                hierarchies.push({
+                  ...h,
                 });
-            });
+              });
           });
 
           if (hierarchies.length === 0) return;
@@ -175,6 +175,9 @@ export class CopyCompanyService {
                   name: group.environment || group.characterization || group.type === HomoTypeEnum.HIERARCHY ? _newHomoGroupId : group.name,
                   companyId: companyId,
                   type: group.type,
+                  ...(group.workspaces?.length && {
+                    workspaces: { connect: group.workspaces.map(({ id }) => ({ id })) },
+                  }),
                 },
               });
             } else {
@@ -185,6 +188,9 @@ export class CopyCompanyService {
                   name: group.environment || group.characterization || group.type === HomoTypeEnum.HIERARCHY ? foundHomo.id : group.name,
                   type: group.type,
                   description: foundHomo.description ? group.description || undefined : undefined,
+                  ...(group.workspaces?.length && {
+                    workspaces: { connect: group.workspaces.map(({ id }) => ({ id })) },
+                  }),
                 },
               });
             }
@@ -302,25 +308,11 @@ export class CopyCompanyService {
 
           await Promise.all(
             hierarchies.map(async (hierarchy) => {
-              await this.prisma.hierarchyOnHomogeneous.upsert({
-                where: {
-                  id: 0,
-                  // hierarchyId_homogeneousGroupId_workspaceId_endDate: {
-                  //   hierarchyId: hierarchy.id,
-                  //   homogeneousGroupId:
-                  //     newHomoGroup.type === 'HIERARCHY'
-                  //       ? hierarchy.id
-                  //       : newHomoGroup.id,
-                  //   workspaceId: hierarchy.workspaceId,
-                  //   endDate: new Date('3000-01-01T00:00:00.00Z'),
-                  // },
-                },
-                create: {
+              await this.prisma.hierarchyOnHomogeneous.create({
+                data: {
                   hierarchyId: hierarchy.id,
                   homogeneousGroupId: newHomoGroup.type === 'HIERARCHY' ? hierarchy.id : newHomoGroup.id,
-                  workspaceId: hierarchy.workspaceId,
                 },
-                update: {},
               });
             }),
           );

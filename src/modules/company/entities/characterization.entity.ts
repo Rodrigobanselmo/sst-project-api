@@ -55,5 +55,9 @@ export class CharacterizationEntity implements CompanyCharacterization {
 
   constructor(partial: Partial<CharacterizationEntity>) {
     Object.assign(this, partial);
+
+    if (this.homogeneousGroup) {
+      this.homogeneousGroup = new HomoGroupEntity(this.homogeneousGroup);
+    }
   }
 }

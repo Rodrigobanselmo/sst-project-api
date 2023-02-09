@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { WorkspaceDto } from '../../dto/workspace.dto';
@@ -44,6 +45,14 @@ export class WorkspaceRepository {
   async findByCompany(companyId: string) {
     const workspaces = await this.prisma.workspace.findMany({
       where: { companyId },
+    });
+
+    return [...workspaces.map((workspace) => new WorkspaceEntity(workspace))];
+  }
+
+  async findNude(options: Prisma.WorkspaceFindManyArgs = {}) {
+    const workspaces = await this.prisma.workspace.findMany({
+      ...options,
     });
 
     return [...workspaces.map((workspace) => new WorkspaceEntity(workspace))];

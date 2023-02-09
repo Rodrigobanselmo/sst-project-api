@@ -57,7 +57,7 @@ export class UpdateHomoGroupService {
       ids: homoGroup?.hierarchies?.map((i) => i.id) || [],
     });
 
-    const homo = await this.homoGroupRepository.update(homoGroup);
+    const homo = await this.homoGroupRepository.update({ ...homoGroup, companyId: userPayloadDto.targetCompanyId });
 
     if ('startDate' in homoGroup || 'endDate' in homoGroup)
       this.employeePPPHistoryRepository.updateManyNude({

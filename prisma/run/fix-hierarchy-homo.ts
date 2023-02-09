@@ -8,16 +8,10 @@ export const fixHierarchyHomo = async (prisma: PrismaClient) => {
 
   Promise.all(
     riskFactorData.map(async (rd) => {
-      const hierarchy = await prisma.hierarchy.findFirst({
-        where: { id: rd.homogeneousGroupId },
-        select: { workspaces: { select: { id: true } } },
-      });
-
       await prisma.hierarchyOnHomogeneous.create({
         data: {
           homogeneousGroupId: rd.homogeneousGroupId,
           hierarchyId: rd.homogeneousGroupId,
-          workspaceId: hierarchy?.workspaces?.[0]?.id,
         },
       });
     }),

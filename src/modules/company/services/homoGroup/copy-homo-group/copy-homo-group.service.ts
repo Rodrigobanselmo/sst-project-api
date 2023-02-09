@@ -58,7 +58,6 @@ export class CopyHomoGroupService {
         companyId,
         homoGroupRepository: this.homoGroupRepository,
         hierarchyRepository: this.hierarchyRepository,
-        // workspaceId,
       });
 
     const save = async (riskData: RiskFactorDataEntity, index: number) => {
@@ -81,7 +80,6 @@ export class CopyHomoGroupService {
       };
       if (!foundHomoGroup?.id && index === 0) return this.upsertManyRiskDataService.execute(data);
       delete data.type;
-      delete data.workspaceId;
       return this.riskDataRepository.upsertMany(data);
     };
 

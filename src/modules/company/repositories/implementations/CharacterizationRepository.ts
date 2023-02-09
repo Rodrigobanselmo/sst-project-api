@@ -61,7 +61,6 @@ export class CharacterizationRepository {
           hierarchyOnHomogeneous: {
             where: {
               hierarchyId: { in: hierarchyIds },
-              workspaceId,
             },
           },
         },
@@ -106,7 +105,6 @@ export class CharacterizationRepository {
               where: { id: hierarchyOnHomogeneous[hierarchyId]?.id || 0 },
               create: {
                 hierarchyId,
-                workspaceId,
                 homogeneousGroupId: homogeneousGroup.id,
                 startDate,
                 endDate,
@@ -285,15 +283,49 @@ export class CharacterizationRepository {
   ) {
     if (!characterization) return characterization;
 
+    const select = {
+      id: true,
+      name: true,
+      type: true,
+    };
+
     const hierarchies = await this.prisma.hierarchy.findMany({
       where: {
         hierarchyOnHomogeneous: {
           some: { homogeneousGroupId: characterization.id },
         },
       },
-      include: {
+      select: {
+        id: true,
+        name: true,
+        type: true,
         hierarchyOnHomogeneous: {
           where: { homogeneousGroupId: characterization.id },
+        },
+        parent: {
+          select: {
+            ...select,
+            parent: {
+              select: {
+                ...select,
+                parent: {
+                  select: {
+                    ...select,
+                    parent: {
+                      select: {
+                        ...select,
+                        parent: {
+                          select: {
+                            ...select,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
       },
     });
@@ -314,7 +346,7 @@ export class CharacterizationRepository {
       });
     }
 
-    characterization.hierarchies = hierarchies.map((hierarchy) => new HierarchyEntity(hierarchy));
+    characterization.hierarchies = hierarchies.map((hierarchy) => new HierarchyEntity(hierarchy as any));
 
     return new CharacterizationEntity(characterization);
   }

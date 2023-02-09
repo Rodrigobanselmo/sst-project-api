@@ -126,7 +126,6 @@ export class RiskGroupDataRepository {
               hierarchyOnHomogeneous: {
                 some: {
                   OR: [
-                    { workspaceId: workspaceId }, //! remove
                     {
                       hierarchy: {
                         workspaces: {

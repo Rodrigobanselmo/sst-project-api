@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 
 export const deleteReapeatHH = async (prisma: PrismaClient) => {
   const x = await prisma.hierarchyOnHomogeneous.groupBy({
-    by: ['workspaceId', 'homogeneousGroupId', 'hierarchyId', 'endDate', 'startDate'],
+    by: ['homogeneousGroupId', 'hierarchyId', 'endDate', 'startDate'],
     _count: true,
   });
 

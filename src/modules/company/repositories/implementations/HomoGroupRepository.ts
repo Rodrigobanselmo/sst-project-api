@@ -15,22 +15,22 @@ import { sortData } from './../../../../shared/utils/sorts/data.sort';
 export class HomoGroupRepository {
   constructor(private prisma: PrismaService) {}
 
-  async create({ hierarchies, endDate = null, startDate = null, ...createHomoGroupDto }: CreateHomoGroupDto, companyId: string): Promise<HomoGroupEntity> {
+  async create({ workspaceIds, hierarchies, endDate = null, startDate = null, ...createHomoGroupDto }: CreateHomoGroupDto, companyId: string): Promise<HomoGroupEntity> {
     const data = await this.prisma.homogeneousGroup.create({
       data: {
         ...createHomoGroupDto,
         companyId,
+        ...(workspaceIds?.length && { workspaces: { connect: workspaceIds.map((id) => ({ id_companyId: { id, companyId } })) } }),
       },
     });
 
     if (hierarchies) {
       await Promise.all(
         hierarchies.map(
-          async ({ id: hierarchyId, workspaceId }) =>
+          async ({ id: hierarchyId }) =>
             await this.prisma.hierarchyOnHomogeneous.create({
               data: {
                 hierarchyId,
-                workspaceId,
                 homogeneousGroupId: data.id,
                 startDate,
                 endDate,
@@ -43,7 +43,7 @@ export class HomoGroupRepository {
     return this.getHomoGroupData(data);
   }
 
-  async update({ id, hierarchies, endDate = null, startDate = null, ...updateHomoGroup }: UpdateHomoGroupDto): Promise<HomoGroupEntity> {
+  async update({ workspaceIds, companyId, id, hierarchies, endDate = null, startDate = null, ...updateHomoGroup }: UpdateHomoGroupDto): Promise<HomoGroupEntity> {
     if (hierarchies) {
       const hierarchyOnHomogeneous = {};
       const foundHomogeneousGroups = await this.prisma.hierarchyOnHomogeneous.findMany({
@@ -56,29 +56,29 @@ export class HomoGroupRepository {
       foundHomogeneousGroups
         .sort((a, b) => sortData(b?.endDate || new Date('3000-01-01T00:00:00.00Z'), a?.endDate || new Date('3000-01-01T00:00:00.00Z')))
         .forEach((hg) => {
-          if (hierarchyOnHomogeneous[hg.hierarchyId + hg.workspaceId]) return;
+          if (hierarchyOnHomogeneous[hg.hierarchyId]) return;
 
           if (!hg.startDate && !hg.endDate) {
-            hierarchyOnHomogeneous[hg.hierarchyId + hg.workspaceId] = {};
-            hierarchyOnHomogeneous[hg.hierarchyId + hg.workspaceId].id = hg.id;
+            hierarchyOnHomogeneous[hg.hierarchyId] = {};
+            hierarchyOnHomogeneous[hg.hierarchyId].id = hg.id;
             return;
           }
 
           if (endDate && !startDate) {
             if (hg.startDate && !hg.endDate && hg.startDate < endDate) {
-              hierarchyOnHomogeneous[hg.hierarchyId + hg.workspaceId] = {};
+              hierarchyOnHomogeneous[hg.hierarchyId] = {};
 
-              hierarchyOnHomogeneous[hg.hierarchyId + hg.workspaceId].id = hg.id;
+              hierarchyOnHomogeneous[hg.hierarchyId].id = hg.id;
 
-              hierarchyOnHomogeneous[hg.hierarchyId + hg.workspaceId].startDate = undefined;
+              hierarchyOnHomogeneous[hg.hierarchyId].startDate = undefined;
               return;
             }
           }
 
           const sameDate = hg.startDate == startDate || hg.endDate == endDate;
           if (sameDate) {
-            hierarchyOnHomogeneous[hg.hierarchyId + hg.workspaceId] = {};
-            return (hierarchyOnHomogeneous[hg.hierarchyId + hg.workspaceId].id = hg.id);
+            hierarchyOnHomogeneous[hg.hierarchyId] = {};
+            return (hierarchyOnHomogeneous[hg.hierarchyId].id = hg.id);
           }
 
           //!
@@ -114,27 +114,21 @@ export class HomoGroupRepository {
 
       await Promise.all(
         hierarchies.map(
-          async ({ id: hierarchyId, workspaceId }) =>
+          async ({ id: hierarchyId }) =>
             await this.prisma.hierarchyOnHomogeneous.upsert({
               where: {
-                id: hierarchyOnHomogeneous[hierarchyId + workspaceId]?.id || 0,
+                id: hierarchyOnHomogeneous[hierarchyId]?.id || 0,
               },
               create: {
                 hierarchyId,
-                workspaceId,
                 homogeneousGroupId: id,
                 startDate,
                 endDate,
               },
               update: {
                 startDate:
-                  hierarchyOnHomogeneous[hierarchyId + workspaceId] && 'startDate' in hierarchyOnHomogeneous[hierarchyId + workspaceId]
-                    ? hierarchyOnHomogeneous[hierarchyId + workspaceId].startDate
-                    : startDate,
-                endDate:
-                  hierarchyOnHomogeneous[hierarchyId + workspaceId] && 'endDate' in hierarchyOnHomogeneous[hierarchyId + workspaceId]
-                    ? hierarchyOnHomogeneous[hierarchyId + workspaceId].endDate
-                    : endDate,
+                  hierarchyOnHomogeneous[hierarchyId] && 'startDate' in hierarchyOnHomogeneous[hierarchyId] ? hierarchyOnHomogeneous[hierarchyId].startDate : startDate,
+                endDate: hierarchyOnHomogeneous[hierarchyId] && 'endDate' in hierarchyOnHomogeneous[hierarchyId] ? hierarchyOnHomogeneous[hierarchyId].endDate : endDate,
               },
             }),
         ),
@@ -145,6 +139,7 @@ export class HomoGroupRepository {
       where: { id },
       include: { hierarchyOnHomogeneous: { include: { hierarchy: true } } },
       data: {
+        ...(workspaceIds?.length && { workspaces: { connect: workspaceIds.map((id) => ({ id_companyId: { id, companyId } })) } }),
         ...updateHomoGroup,
       },
     });
@@ -154,15 +149,14 @@ export class HomoGroupRepository {
     if (data.hierarchyOnHomogeneous)
       homoGroup.hierarchies = data.hierarchyOnHomogeneous.map((homo) => ({
         ...homo.hierarchy,
-        workspaceId: homo.workspaceId,
       }));
 
     return this.getHomoGroupData(homoGroup);
   }
 
-  async updateHierarchyHomo({ ids, workspaceId, endDate = null, startDate = null }: UpdateHierarchyHomoGroupDto) {
+  async updateHierarchyHomo({ ids, endDate = null, startDate = null }: UpdateHierarchyHomoGroupDto) {
     return this.prisma.hierarchyOnHomogeneous.updateMany({
-      where: { id: { in: ids }, workspaceId },
+      where: { id: { in: ids } },
       data: {
         startDate,
         endDate,
@@ -170,9 +164,9 @@ export class HomoGroupRepository {
     });
   }
 
-  async deleteHierarchyHomo({ ids, workspaceId }: UpdateHierarchyHomoGroupDto) {
+  async deleteHierarchyHomo({ ids }: UpdateHierarchyHomoGroupDto) {
     return this.prisma.hierarchyOnHomogeneous.deleteMany({
-      where: { id: { in: ids }, workspaceId },
+      where: { id: { in: ids } },
     });
   }
 
@@ -246,17 +240,47 @@ export class HomoGroupRepository {
   }
 
   async findById(id: string, companyId: string, options?: Prisma.HomogeneousGroupFindFirstArgs) {
+    const select = {
+      id: true,
+      name: true,
+      type: true,
+    };
+
     const homo = await this.prisma.homogeneousGroup.findFirst({
       where: { id, companyId },
       include: {
+        workspaces: { select: { id: true } },
         hierarchyOnHomogeneous: {
           include: {
             hierarchy: {
               select: {
-                id: true,
-                name: true,
-                type: true,
                 workspaces: { select: { id: true } },
+                ...select,
+                parent: {
+                  select: {
+                    ...select,
+                    parent: {
+                      select: {
+                        ...select,
+                        parent: {
+                          select: {
+                            ...select,
+                            parent: {
+                              select: {
+                                ...select,
+                                parent: {
+                                  select: {
+                                    ...select,
+                                  },
+                                },
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
               },
             },
           },
@@ -283,16 +307,17 @@ export class HomoGroupRepository {
       where?: Prisma.HomogeneousGroupWhereInput;
     } = {},
   ) {
-    const hierarchies = await this.prisma.homogeneousGroup.findMany({
+    const homo = await this.prisma.homogeneousGroup.findMany({
       where: { companyId, status: 'ACTIVE', ...options.where },
       include: {
+        workspaces: { select: { id: true } },
         hierarchyOnHomogeneous: { include: { hierarchy: true } },
         ...options.include,
       },
     });
 
     const homogeneousGroup = await Promise.all(
-      hierarchies.map(async (homoGroup) => {
+      homo.map(async (homoGroup) => {
         return await this.getHomoGroupData(homoGroup as any);
       }),
     );
@@ -303,49 +328,49 @@ export class HomoGroupRepository {
   private async getHomoGroupData(homoGroup: HomoGroupEntity) {
     const homogeneousGroup = { ...homoGroup } as HomoGroupEntity;
     const companyId = homoGroup.companyId;
-    const workplacesIds = new Set<string>();
 
     if (homoGroup.hierarchyOnHomogeneous)
       homogeneousGroup.hierarchies = homoGroup.hierarchyOnHomogeneous.map((homo) => {
-        workplacesIds.add(homo.workspaceId);
         return {
           ...homo.hierarchy,
-          workspaceId: homo.workspaceId,
         };
       });
-
-    homogeneousGroup.workspaceIds = Array.from(workplacesIds);
 
     const hierarchiesIds = homogeneousGroup.hierarchies ? removeDuplicate(homogeneousGroup.hierarchies.map((h) => h.id)) : [];
 
     const where = {
       companyId,
-      workspaces: {
-        some: {
-          OR: homogeneousGroup.workspaceIds.map((workspaceId) => ({
-            id: workspaceId,
-          })),
-        },
-      },
+    };
+
+    const select = {
+      id: true,
+      name: true,
+      parentId: true,
+      type: true,
     };
 
     const AllChildrenHierarchies = await this.prisma.hierarchy.findMany({
       where: { parentId: { in: hierarchiesIds }, ...where },
-      include: {
+      select: {
+        ...select,
         children: {
           where,
-          include: {
+          select: {
+            ...select,
             children: {
               where,
-              include: {
+              select: {
+                ...select,
                 children: {
                   where,
-                  include: {
+                  select: {
+                    ...select,
                     children: {
                       where,
-                      include: {
+                      select: {
+                        ...select,
                         children: {
-                          include: { children: true },
+                          select: { ...select },
                           where,
                         },
                       },
@@ -367,9 +392,10 @@ export class HomoGroupRepository {
       });
     };
 
-    await getAllHierarchiesChildren(AllChildrenHierarchies);
+    await getAllHierarchiesChildren(AllChildrenHierarchies as any);
 
     //only need this data on modal, can query only once
+    //! optimze here, only get employeecount when opening modal
     homogeneousGroup.employeeCount = await this.prisma.employee.count({
       where: {
         companyId,

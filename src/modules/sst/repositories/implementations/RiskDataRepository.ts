@@ -101,7 +101,6 @@ export class RiskDataRepository {
       if (data.homogeneousGroup && data.homogeneousGroup.hierarchyOnHomogeneous)
         riskData.homogeneousGroup.hierarchies = data.homogeneousGroup.hierarchyOnHomogeneous.map((homo) => ({
           ...homo.hierarchy,
-          workspaceId: homo.workspaceId,
         }));
 
       return new RiskFactorDataEntity(riskData);
@@ -135,7 +134,6 @@ export class RiskDataRepository {
             hierarchyOnHomogeneous: {
               some: {
                 OR: [
-                  { workspaceId: workspaceId },
                   {
                     hierarchy: {
                       workspaces: {

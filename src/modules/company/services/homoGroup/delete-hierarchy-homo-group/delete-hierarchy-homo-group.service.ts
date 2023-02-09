@@ -22,7 +22,6 @@ export class DeleteHierarchyHomoGroupService {
         companyId: userPayloadDto.targetCompanyId,
         hierarchyOnHomogeneous: {
           some: {
-            workspaceId: homoGroup.workspaceId,
             id: { in: homoGroup.ids },
           },
         },
@@ -32,7 +31,6 @@ export class DeleteHierarchyHomoGroupService {
         hierarchyOnHomogeneous: {
           select: { id: true, startDate: true, endDate: true },
           where: {
-            workspaceId: homoGroup.workspaceId,
             id: { in: homoGroup.ids },
           },
         },

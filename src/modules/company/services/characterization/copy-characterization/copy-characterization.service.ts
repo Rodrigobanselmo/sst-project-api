@@ -105,6 +105,7 @@ export class CopyCharacterizationService {
                 name: _newHomoGroupId,
                 companyId: companyId,
                 type: group.type,
+                ...(workspaceId && { workspaces: { connect: [workspaceId].map((id) => ({ id_companyId: { id, companyId } })) } }),
               },
             });
           };

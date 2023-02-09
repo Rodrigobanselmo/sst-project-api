@@ -22,6 +22,10 @@ export class HierarchyRepository {
     ghoNames?: Record<string, string>,
   ): Promise<HierarchyEntity[]> {
     let homogeneousGroup = [];
+    const workIds = upsertHierarchyMany
+      .map((h) => h.workspaceIds)
+      .filter((i) => i)
+      .flat(1);
     //create homogenies group
     if (upsertHierarchyMany && upsertHierarchyMany.length > 0)
       homogeneousGroup = ghoNames
@@ -32,9 +36,23 @@ export class HierarchyRepository {
                   company: { connect: { id: companyId } },
                   name: ghoName,
                   description: description || '',
+                  workspaces: workIds.length
+                    ? {
+                        connect: workIds.map((id) => ({
+                          id_companyId: { companyId, id },
+                        })),
+                      }
+                    : undefined,
                 },
                 update: {
                   name: ghoName,
+                  workspaces: workIds.length
+                    ? {
+                        connect: workIds.map((id) => ({
+                          id_companyId: { companyId, id },
+                        })),
+                      }
+                    : undefined,
                   ...(description ? { description: description } : {}),
                 },
                 where: { name_companyId: { companyId, name: ghoName } },
@@ -62,7 +80,6 @@ export class HierarchyRepository {
     const HierarchyOnHomoGroup: {
       hierarchyId: string;
       homogeneousGroupId: any;
-      workspaceId: string;
       endDate: Date;
     }[] = [];
     // const data = await this.prisma.homogeneousGroup.upsert({create:{companyId, name: }});
@@ -97,16 +114,13 @@ export class HierarchyRepository {
         const isSubOffice = upsertHierarchy?.type == HierarchyEnum.SUB_OFFICE;
 
         ghoNames?.forEach((ghoName) => {
-          const HierarchyOnHomo = !workspaceIds
-            ? []
-            : workspaceIds
-                .map((workspaceId) => ({
-                  hierarchyId: id,
-                  homogeneousGroupId: homogeneousGroup.find((homogeneous) => homogeneous.name === ghoName)?.id,
-                  workspaceId,
-                  endDate: null,
-                }))
-                .filter((hierarchyOnHomo) => hierarchyOnHomo.homogeneousGroupId);
+          const HierarchyOnHomo = [
+            {
+              hierarchyId: id,
+              homogeneousGroupId: homogeneousGroup.find((homogeneous) => homogeneous.name === ghoName)?.id,
+              endDate: null,
+            },
+          ].filter((hierarchyOnHomo) => hierarchyOnHomo.homogeneousGroupId);
 
           HierarchyOnHomoGroup.push(...HierarchyOnHomo);
         });
@@ -487,12 +501,12 @@ export class HierarchyRepository {
       if (hierarchy.hierarchyOnHomogeneous)
         hierarchyCopy.homogeneousGroups = hierarchy.hierarchyOnHomogeneous.map((homo) => ({
           ...homo.homogeneousGroup,
-          workspaceId: homo.workspaceId,
           characterization:
             homo.homogeneousGroup?.characterization && !isEnvironment(homo.homogeneousGroup.characterization.type) ? homo.homogeneousGroup.characterization : undefined,
           environment:
             homo.homogeneousGroup?.characterization && isEnvironment(homo.homogeneousGroup.characterization.type) ? homo.homogeneousGroup.characterization : undefined,
         }));
+
       return new HierarchyEntity(hierarchyCopy);
     });
   }

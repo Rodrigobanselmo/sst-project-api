@@ -10,9 +10,6 @@ import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
 
 export class HierarchyOnHomoDto {
   @IsString()
-  workspaceId: string;
-
-  @IsString()
   id: string;
 }
 export class CreateHomoGroupDto {
@@ -63,12 +60,20 @@ export class CreateHomoGroupDto {
   @IsOptional()
   @Type(() => HierarchyOnHomoDto)
   readonly hierarchies?: HierarchyOnHomoDto[];
+
+  @IsOptional()
+  @IsString({ each: true })
+  workspaceIds?: string[];
 }
 
 export class UpdateHomoGroupDto {
   @IsOptional()
   @IsString()
   id?: string;
+
+  @IsOptional()
+  @IsString()
+  companyId?: string;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsOptional()
@@ -111,6 +116,10 @@ export class UpdateHomoGroupDto {
     message: `status must be one of: ${StatusEnum.ACTIVE} or ${StatusEnum.INACTIVE}`,
   })
   status?: StatusEnum;
+
+  @IsOptional()
+  @IsString({ each: true })
+  workspaceIds?: string[];
 }
 
 export class UpdateHierarchyHomoGroupDto {
@@ -126,9 +135,6 @@ export class UpdateHierarchyHomoGroupDto {
   @IsDate()
   @Type(() => Date)
   endDate?: Date;
-
-  @IsString()
-  workspaceId: string;
 }
 
 export class CopyHomogeneousGroupDto {
@@ -151,10 +157,6 @@ export class CopyHomogeneousGroupDto {
   @IsOptional()
   @IsString()
   type?: HomoTypeEnum;
-
-  @IsOptional()
-  @IsString()
-  workspaceId?: string;
 
   @ValidateIf((o) => !o.actualGroupId || o.hierarchyId)
   @IsOptional()

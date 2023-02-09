@@ -15,7 +15,7 @@ import { FindEvents2220Dto } from './../../../esocial/dto/event.dto';
 export class EmployeeRepository {
   constructor(private prisma: PrismaService) {}
 
-  async create({ workspaceIds, hierarchyId, companyId, shiftId, cidId, ...createCompanyDto }: CreateEmployeeDto): Promise<EmployeeEntity> {
+  async create({ hierarchyId, companyId, shiftId, cidId, ...createCompanyDto }: CreateEmployeeDto): Promise<EmployeeEntity> {
     try {
       const employee = await this.prisma.employee.create({
         data: {
@@ -45,10 +45,7 @@ export class EmployeeRepository {
     }
   }
 
-  async update(
-    { workspaceIds, hierarchyId, companyId, shiftId, cidId, id, ...createCompanyDto }: UpdateEmployeeDto,
-    removeSubOffices?: boolean,
-  ): Promise<EmployeeEntity> {
+  async update({ hierarchyId, companyId, shiftId, cidId, id, ...createCompanyDto }: UpdateEmployeeDto, removeSubOffices?: boolean): Promise<EmployeeEntity> {
     const employee = await this.prisma.employee.update({
       data: {
         ...createCompanyDto,
@@ -90,7 +87,7 @@ export class EmployeeRepository {
   ): Promise<EmployeeEntity[]> {
     const employeeHistory = await this.prisma.employeeHierarchyHistory.findMany({ where: { hierarchy: { companyId } }, include: { employee: true } });
     const data = await this.prisma.$transaction(
-      upsertEmployeeMany.map(({ companyId: _, id, workspaceIds, hierarchyId, shiftId, cidId, cbo, admissionDate, ...upsertEmployeeDto }) =>
+      upsertEmployeeMany.map(({ companyId: _, id, hierarchyId, shiftId, cidId, cbo, admissionDate, ...upsertEmployeeDto }) =>
         this.prisma.employee.upsert({
           create: {
             ...upsertEmployeeDto,

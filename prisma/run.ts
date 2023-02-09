@@ -25,6 +25,7 @@ import { scheduleBlockNational } from './seed/scheduleBlockNational';
 import { fixDate } from './run/fix-date';
 import { normCities } from './run/normalize-cities';
 import { fixHierarchyHomo } from './run/fix-hierarchy-homo';
+import { removeDuplicatesRisks } from './run/removeDuplicatesRisks';
 
 const prisma = new PrismaClient({
   // log: ['query'],
@@ -77,6 +78,8 @@ async function main() {
     //   orderBy: { name: 'asc' },
     //   select: { code: true, name: true, uf: { select: { uf: true } } },
     // }),
+
+    await removeDuplicatesRisks(prisma); // run on simple
 
     console.info('end');
   } catch (err) {

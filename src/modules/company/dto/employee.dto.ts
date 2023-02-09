@@ -33,10 +33,6 @@ export class CreateEmployeeDto {
   @IsString()
   companyId: string;
 
-  @IsString({ each: true })
-  @IsOptional()
-  workspaceIds: string[];
-
   @IsString()
   @IsOptional()
   hierarchyId: string;

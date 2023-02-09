@@ -124,7 +124,6 @@ export class DocumentPCMSORepository {
                   hierarchyOnHomogeneous: {
                     some: {
                       OR: [
-                        { workspaceId: workspaceId },
                         {
                           hierarchy: {
                             workspaces: {

@@ -114,12 +114,7 @@ export class UploadEmployeesService {
       if (employee.ghoName) delete employee.ghoName;
 
       const newEmployee = { ...employee };
-      let hierarchy = null as any;
-      Object.keys(HierarchyEnum).forEach((key) => {
-        if (key != 'OFFICE') return;
-        const hierarchyName = newEmployee[key.toLocaleLowerCase()];
-        console.log(key.padEnd(10, '-'), newEmployee.name.padEnd(65, '-'), hierarchyName);
-      });
+
       const getByNameHierarchy = () => {
         Object.keys(HierarchyEnum).forEach((key) => {
           const hierarchyName = newEmployee[key.toLocaleLowerCase()];
@@ -130,7 +125,6 @@ export class UploadEmployeesService {
             const actualHierarchy = children.find((h) => h?.name && h?.type && h.name === hierarchyName && h.type === key);
 
             if (actualHierarchy) {
-              hierarchy = actualHierarchy;
               newEmployee.hierarchyId = actualHierarchy.id;
             }
           }

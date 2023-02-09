@@ -177,7 +177,7 @@ export class CompanyRepository implements ICompanyRepository {
         employees: {
           //! edit employee
           upsert: [
-            ...employees.map(({ id, hierarchyId, description, ghoDescription, realDescription, workspaceIds, ...rest }: any) => {
+            ...employees.map(({ id, hierarchyId, description, ghoDescription, realDescription, ...rest }: any) => {
               return {
                 create: {
                   ...rest,
@@ -188,13 +188,6 @@ export class CompanyRepository implements ICompanyRepository {
                         },
                       }
                     : undefined,
-                  // workspaces: workspaceIds
-                  //   ? {
-                  //       connect: workspaceIds.map((workspaceId) => ({
-                  //         id_companyId: { companyId, id: workspaceId },
-                  //       })),
-                  //     }
-                  //   : undefined,
                 },
                 update: {
                   ...rest,
@@ -205,20 +198,8 @@ export class CompanyRepository implements ICompanyRepository {
                         },
                       }
                     : undefined,
-                  // workspaces: workspaceIds
-                  //   ? {
-                  //       set: workspaceIds.map((workspaceId) => ({
-                  //         id_companyId: { companyId, id: workspaceId },
-                  //       })),
-                  //     }
-                  //   : undefined,
                 },
                 where: { cpf_companyId: { cpf: rest.cpf, companyId } },
-                // cpf_esocialCode_companyId: {
-                //   cpf: rest.cpf,
-                //   esocialCode: rest.esocialCode,
-                //   companyId,
-                // },
               };
             }),
           ],

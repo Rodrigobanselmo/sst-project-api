@@ -1073,7 +1073,6 @@ model Hierarchy {
 model HierarchyOnHomogeneous {
   hierarchyId        String
   homogeneousGroupId String
-  workspaceId        String
   deletedAt          DateTime?
   endDate            DateTime?
   id                 Int              @id @default(autoincrement())
@@ -1081,9 +1080,8 @@ model HierarchyOnHomogeneous {
   created_at         DateTime         @default(now())
   hierarchy          Hierarchy        @relation(fields: [hierarchyId], references: [id], onDelete: Cascade)
   homogeneousGroup   HomogeneousGroup @relation(fields: [homogeneousGroupId], references: [id], onDelete: Cascade)
-  workspace          Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
-  @@unique([hierarchyId, homogeneousGroupId, workspaceId, endDate, startDate])
+  @@unique([hierarchyId, homogeneousGroupId, endDate, startDate])
   @@index([deletedAt])
   @@index([endDate])
 }
@@ -1102,6 +1100,7 @@ model HomogeneousGroup {
   hierarchyOnHomogeneous HierarchyOnHomogeneous[]
   company                Company                  @relation(fields: [companyId], references: [id])
   riskFactorData         RiskFactorData[]
+  workspaces             Workspace[]               
 
   @@unique([name, companyId])
   @@index([name])
@@ -1327,7 +1326,6 @@ model RiskFactors {
   docInfo               RiskFactorsDocInfo[]
 
   @@unique([id, companyId])
-  @@unique([name])
   @@index([name])
   @@index([esocialCode])
 }
@@ -1633,10 +1631,10 @@ model Workspace {
   characterization       CompanyCharacterization[]
   companyEnvironment     CompanyEnvironment[]
   documents              Document[]
-  hierarchyOnHomogeneous HierarchyOnHomogeneous[]
   riskFactorDocument     RiskFactorDocument[]
   company                Company                   @relation(fields: [companyId], references: [id])
   hierarchy              Hierarchy[]               @relation("HierarchyToWorkspace")
+  homogeneousGroup       HomogeneousGroup[]              
 
   @@unique([abbreviation, companyId])
   @@unique([id, companyId])

@@ -37,13 +37,13 @@ export class HomoGroupEntity implements HomogeneousGroup {
   hierarchies?: HierarchyEntity[];
 
   type: HomoTypeEnum;
-  workspaceId?: string;
-  workspaceIds?: string[];
   riskFactorData?: RiskFactorDataEntity[];
   characterization?: CharacterizationEntity;
   environment?: EnvironmentEntity;
   hierarchy?: HierarchyEntity;
   deletedAt: Date;
+  workspaces?: WorkspaceEntity[];
+  workspaceIds?: string[];
 
   employeeCount?: number;
   company?: CompanyEntity;
@@ -54,12 +54,18 @@ export class HomoGroupEntity implements HomogeneousGroup {
     if (this.type === 'HIERARCHY' && !this.hierarchy && this.hierarchyOnHomogeneous && this.hierarchyOnHomogeneous[0]) {
       this.hierarchy = new HierarchyEntity(this.hierarchyOnHomogeneous[0].hierarchy);
     }
+    if (this.workspaces) {
+      this.workspaces = this.workspaces.map((w) => new WorkspaceEntity(w));
+    }
+    if (this.workspaces) {
+      this.workspaceIds = this.workspaces.map((w) => w.id);
+    }
 
     if (this.hierarchyOnHomogeneous && !this.hierarchies) {
       this.hierarchies = Object.values(
         this.hierarchyOnHomogeneous.reduce((acc, curr) => {
           if (!curr.hierarchy) return acc;
-          if (!acc[curr.hierarchyId]) acc[curr.hierarchyId] = curr.hierarchy;
+          if (!acc[curr.hierarchyId]) acc[curr.hierarchyId] = new HierarchyEntity(curr.hierarchy);
           if (!acc[curr.hierarchyId].hierarchyOnHomogeneous) acc[curr.hierarchyId].hierarchyOnHomogeneous = [];
 
           delete curr.hierarchy;
@@ -75,9 +81,7 @@ export class HierarchyOnHomogeneousEntity implements HierarchyOnHomogeneous {
   id: number;
   hierarchyId: string;
   homogeneousGroupId: string;
-  workspaceId: string;
   hierarchy?: HierarchyEntity;
-  workspace?: WorkspaceEntity;
   homogeneousGroup?: HomoGroupEntity;
   endDate: Date;
   startDate: Date;
