@@ -7,7 +7,7 @@ import { ISectionChildrenType, PGRSectionChildrenTypeEnum } from '../../../build
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
 import { IHierarchyData, IHomoGroupMap } from '../../../converter/hierarchy.converter';
 import { hierarchyHomoOrgTable } from '../../tables/hierarchyHomoOrg/hierarchyHomoOrg.table';
-import { EnvironmentEntity } from '../../../../../company/entities/environment.entity';
+import { CharacterizationEntity } from '../../../../../company/entities/characterization.entity';
 import { environmentsConverter, IEnvironmentConvertResponse } from './all-characterization.converter';
 import { getCharacterizationType } from '../../../../../../modules/company/repositories/implementations/CharacterizationRepository';
 import { sortNumber } from '../../../../../../shared/utils/sorts/number.sort';
@@ -242,7 +242,7 @@ const characterizationTypes = [
 ];
 
 export const allCharacterizationSections = (
-  environmentsData: EnvironmentEntity[],
+  environmentsData: CharacterizationEntity[],
   hierarchiesTreeOrg: IHierarchyData,
   homoGroupTree: IHomoGroupMap,
   type = 'char' as 'env' | 'char',

@@ -24,6 +24,7 @@ import { PdfAsoDataService } from './services/pdf/aso/aso-data.service';
 import { PdfProntuarioDataService } from './services/pdf/prontuario/prontuario-data.service';
 import { PdfOsDataService } from './services/pdf/os/os-data.service';
 import { PdfEvaluationDataService } from './services/pdf/evaluation/evaluation-data.service';
+import { DocumentPGRFactory } from './factories/document/products/PGR/DocumentPGRFactory';
 // import { DocumentsBaseController } from './controller/doc.controller';
 
 @Module({
@@ -48,6 +49,7 @@ import { PdfEvaluationDataService } from './services/pdf/evaluation/evaluation-d
     PdfProntuarioDataService,
     PdfOsDataService,
     PdfEvaluationDataService,
+    DocumentPGRFactory,
     // DocumentsBaseController,
   ],
 })

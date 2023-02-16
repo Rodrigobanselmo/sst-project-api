@@ -3,7 +3,7 @@ import { CacheTtlEnum } from './../../../../../shared/interfaces/cache.types';
 import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { Cache } from 'cache-manager';
-import { asyncBatch } from 'src/shared/utils/asyncBatch';
+import { asyncBatch } from '../../../../../shared/utils/asyncBatch';
 
 import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { AlertSendDto } from '../../../dto/alert.dto';

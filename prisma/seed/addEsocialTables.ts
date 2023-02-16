@@ -1,4 +1,4 @@
-import { normalizeString } from './../../src/shared/utils/normalizeString';
+import { normalizeString } from '../../src/shared/utils/normalizeString';
 import { PrismaClient, RiskFactorsEnum } from '@prisma/client';
 import fs from 'fs';
 import { asyncBatch } from '../../src/shared/utils/asyncBatch';

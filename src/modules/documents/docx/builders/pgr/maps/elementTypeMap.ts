@@ -41,7 +41,6 @@ import { IDocVariables } from '../types/section.types';
 import { AttachmentEntity } from '../../../../../sst/entities/attachment.entity';
 import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
 import { CharacterizationEntity } from './../../../../../company/entities/characterization.entity';
-import { EnvironmentEntity } from './../../../../../company/entities/environment.entity';
 import { ProfessionalEntity } from './../../../../../users/entities/professional.entity';
 import { UserEntity } from './../../../../../users/entities/user.entity';
 import { paragraphFigure, paragraphTable } from './../../../base/elements/paragraphs';
@@ -53,7 +52,7 @@ type IDocumentClassType = {
   variables: IDocVariables;
   versions: RiskDocumentEntity[];
   professionals: (ProfessionalEntity | UserEntity)[];
-  environments: EnvironmentEntity[];
+  environments: CharacterizationEntity[];
   document: RiskFactorGroupDataEntity;
   homogeneousGroup: IHomoGroupMap;
   hierarchy: Map<string, HierarchyMapData>;
@@ -68,7 +67,7 @@ export class ElementsMapClass {
   private versions: RiskDocumentEntity[];
   private workspace: WorkspaceEntity;
   private professionals: (ProfessionalEntity | UserEntity)[];
-  private environments: EnvironmentEntity[];
+  private environments: CharacterizationEntity[];
   private characterizations: CharacterizationEntity[];
   private document: RiskFactorGroupDataEntity;
   private attachments: AttachmentEntity[];

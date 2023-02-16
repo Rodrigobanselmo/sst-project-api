@@ -1,3 +1,4 @@
+import { checkRiskDataDoc } from './../../../../../shared/utils/getRiskDoc';
 import { isNaEpi, isNaRecMed } from './../../../../../shared/utils/isNa';
 import { GenerateSourceEntity } from './../../../../sst/entities/generateSource.entity';
 import { ForbiddenException, Injectable } from '@nestjs/common';
@@ -11,7 +12,6 @@ import { IPriorRiskData, onGetRisks } from '../../../../../shared/utils/onGetRis
 import { removeDuplicate } from '../../../../../shared/utils/removeDuplicate';
 import { HierarchyEntity } from '../../../../company/entities/hierarchy.entity';
 import { FindAllRiskDataByEmployeeService } from '../../../../sst/services/risk-data/find-by-employee/find-by-employee.service';
-import { checkRiskDataDoc } from '../../pgr/document/upload-pgr-doc.service';
 import { EmployeeRepository } from './../../../../company/repositories/implementations/EmployeeRepository';
 import { IPdfOSData } from './types/IOSData.type';
 

@@ -334,6 +334,12 @@ export class FindClinicEmployeeExamHistoryDto {
   @IsDate({ message: 'Data inválida' })
   @Type(() => Date)
   date: Date;
+
+  @IsOptional()
+  @Transform(DateFormat, { toClassOnly: true })
+  @IsDate({ message: 'Data inválida' })
+  @Type(() => Date)
+  notAfterDate: Date;
 }
 
 export class FindCompanyEmployeeExamHistoryDto extends PaginationQueryDto {

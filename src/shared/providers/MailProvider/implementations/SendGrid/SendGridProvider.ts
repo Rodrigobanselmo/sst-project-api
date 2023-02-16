@@ -17,7 +17,7 @@ class SendGridProvider implements IMailProvider {
 
   async sendMail({ path, subject, to, variables, attachments, source = EmailsEnum.VALIDATION }: ISendMailData): Promise<any> {
     try {
-      // if (process.env.NODE_ENV === 'development') return;
+      if (process.env.NODE_ENV === 'development') return;
       if (!to) return;
 
       const templateFileContent = fs.readFileSync(path).toString('utf-8');

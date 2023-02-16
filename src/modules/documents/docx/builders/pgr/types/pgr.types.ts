@@ -1,12 +1,11 @@
-import { DocumentCoverEntity } from './../../../../../company/entities/document-cover.entity';
-import { AttachmentEntity } from '../../../../../sst/entities/attachment.entity';
-import { CharacterizationEntity } from './../../../../../company/entities/characterization.entity';
-import { EnvironmentEntity } from './../../../../../company/entities/environment.entity';
-import { RiskDocumentEntity } from '../../../../../sst/entities/riskDocument.entity';
 import { CompanyEntity } from '../../../../../company/entities/company.entity';
 import { WorkspaceEntity } from '../../../../../company/entities/workspace.entity';
+import { AttachmentEntity } from '../../../../../sst/entities/attachment.entity';
+import { RiskDocumentEntity } from '../../../../../sst/entities/riskDocument.entity';
 import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
 import { HierarchyMapData, IHierarchyMap, IHomoGroupMap } from '../../../converter/hierarchy.converter';
+import { CharacterizationEntity } from './../../../../../company/entities/characterization.entity';
+import { DocumentCoverEntity } from './../../../../../company/entities/document-cover.entity';
 
 export interface ICreatePGR {
   version: string;
@@ -15,7 +14,7 @@ export interface ICreatePGR {
   company: CompanyEntity;
   workspace: WorkspaceEntity;
   versions: RiskDocumentEntity[];
-  environments: EnvironmentEntity[];
+  environments: CharacterizationEntity[];
   document: RiskFactorGroupDataEntity;
   homogeneousGroup: IHomoGroupMap;
   consultantLogo: string;

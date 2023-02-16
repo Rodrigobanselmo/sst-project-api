@@ -19,7 +19,6 @@ import { ContactEntity } from './contact.entity';
 import { ContractEntity } from './contract.entity';
 import { DocumentCoverEntity } from './document-cover.entity';
 import { EmployeeEntity } from './employee.entity';
-import { EnvironmentEntity } from './environment.entity';
 import { HierarchyEntity } from './hierarchy.entity';
 import { HomoGroupEntity } from './homoGroup.entity';
 import { LicenseEntity } from './license.entity';
@@ -94,7 +93,7 @@ export class CompanyEntity implements Company {
 
   primary_activity?: ActivityEntity[];
   secondary_activity?: ActivityEntity[];
-  environments?: EnvironmentEntity[];
+  environments?: CharacterizationEntity[];
   characterization?: CharacterizationEntity[];
   professionals?: ProfessionalEntity[];
   riskFactorGroupData?: RiskFactorGroupDataEntity[];
@@ -160,6 +159,25 @@ export class CompanyEntity implements Company {
   scheduleBlocks?: ScheduleBlockEntity[];
   alerts?: AlertEntity[];
 
+  //! remove >>>
+  mission: string;
+  vision: string;
+  values: string;
+
+  activity_start_date: string;
+  cadastral_situation_date: string;
+  legal_nature_code: string;
+  size: string;
+  legal_nature: string;
+  cadastral_situation: string;
+  cadastral_situation_description: string;
+
+  coordinatorName: string; // remover
+  stateRegistration: string;
+  shortName: string;
+  obs: string;
+  //! remove ^^^
+
   constructor(partial: Partial<CompanyEntity>) {
     Object.assign(this, partial);
 
@@ -217,23 +235,6 @@ export class CompanyEntity implements Company {
       this.getCompanyStep();
     }
   }
-
-  mission: string;
-  vision: string;
-  values: string;
-
-  activity_start_date: string;
-  cadastral_situation_date: string;
-  legal_nature_code: string;
-  size: string;
-  legal_nature: string;
-  cadastral_situation: string;
-  cadastral_situation_description: string;
-
-  coordinatorName: string; // remover
-  stateRegistration: string;
-  shortName: string;
-  obs: string;
 
   private getCompanyStep() {
     this.steps = [

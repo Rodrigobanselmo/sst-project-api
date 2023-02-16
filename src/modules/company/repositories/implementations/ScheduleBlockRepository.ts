@@ -7,7 +7,7 @@ import { DayJSProvider } from '../../../../shared/providers/DateProvider/impleme
 import { prismaFilter } from '../../../../shared/utils/filters/prisma.filters';
 import { CreateScheduleBlockDto, FindScheduleBlockDto, UpdateScheduleBlockDto } from '../../dto/schedule-block';
 import { ScheduleBlockEntity } from '../../entities/schedule-block.entity';
-import { normalizeString } from './../../../../shared/utils/normalizeString';
+import { normalizeString } from '../../../../shared/utils/normalizeString';
 
 @Injectable()
 export class ScheduleBlockRepository {

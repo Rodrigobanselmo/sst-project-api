@@ -1,30 +1,29 @@
-import { PrismaService } from './../../../../../../prisma/prisma.service';
-import { ICompanyOptions } from './../../../../../../shared/providers/ESocialProvider/models/IESocialMethodProvider';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { HierarchyEnum, HomogeneousGroup } from '@prisma/client';
 import clone from 'clone';
 import sortArray from 'sort-array';
 
 import { EmployeeHierarchyHistoryEntity } from '../../../../../../modules/company/entities/employee-hierarchy-history.entity';
-import { RiskFactorsEntity } from '../../../../../../modules/sst/entities/risk.entity';
 import { ESocialSendEnum } from '../../../../../../shared/constants/enum/esocial';
 import { UserPayloadDto } from '../../../../../../shared/dto/user-payload.dto';
 import { DayJSProvider } from '../../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { ESocialEventProvider } from '../../../../../../shared/providers/ESocialProvider/implementations/ESocialEventProvider';
 import { ESocialMethodsProvider } from '../../../../../../shared/providers/ESocialProvider/implementations/ESocialMethodsProvider';
+import { checkRiskDataDoc } from '../../../../../../shared/utils/getRiskDoc';
+import { onGetRisks } from '../../../../../../shared/utils/onGetRisks';
 import { HierarchyOnHomogeneousEntity } from '../../../../../company/entities/homoGroup.entity';
 import { CompanyRepository } from '../../../../../company/repositories/implementations/CompanyRepository';
 import { EmployeeRepository } from '../../../../../company/repositories/implementations/EmployeeRepository';
 import { FindEvents2240Dto } from '../../../../dto/event.dto';
+import { PrismaService } from './../../../../../../prisma/prisma.service';
 import { originRiskMap } from './../../../../../../shared/constants/maps/origin-risk';
+import { ICompanyOptions } from './../../../../../../shared/providers/ESocialProvider/models/IESocialMethodProvider';
 import { CompanyEntity } from './../../../../../company/entities/company.entity';
 import { HierarchyEntity } from './../../../../../company/entities/hierarchy.entity';
-import { checkRiskDataDoc } from './../../../../../documents/services/pgr/document/upload-pgr-doc.service';
 import { RiskFactorDataEntity } from './../../../../../sst/entities/riskData.entity';
 import { RiskRepository } from './../../../../../sst/repositories/implementations/RiskRepository';
 import { ProfessionalEntity } from './../../../../../users/entities/professional.entity';
 import { IBreakPointPPP, IEmployee2240Data, IPriorRiskData } from './../../../../interfaces/event-2240';
-import { onGetRisks } from '../../../../../../shared/utils/onGetRisks';
 
 @Injectable()
 export class FindEvents2240ESocialService {

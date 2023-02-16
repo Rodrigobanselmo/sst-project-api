@@ -12,8 +12,7 @@ import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
 import { RiskFactorsEntity } from '../../../../../sst/entities/risk.entity';
 import { CharacterizationPhotoEntity } from '../../../../../company/entities/characterization-photo.entity';
-import { EnvironmentPhotoEntity } from '../../../../../company/entities/environment-photo.entity';
-import { EnvironmentEntity } from '../../../../../company/entities/environment.entity';
+import { CharacterizationEntity } from '../../../../../company/entities/characterization.entity';
 import { CharacterizationTypeEnum } from '@prisma/client';
 
 export interface IEnvironmentConvertResponse {
@@ -28,10 +27,10 @@ export interface IEnvironmentConvertResponse {
   id: string;
   profileParentId?: string;
   profileName?: string;
-  profiles?: EnvironmentEntity[];
+  profiles?: CharacterizationEntity[];
 }
 
-export const environmentsConverter = (environments: EnvironmentEntity[]): IEnvironmentConvertResponse[] => {
+export const environmentsConverter = (environments: CharacterizationEntity[]): IEnvironmentConvertResponse[] => {
   return environments
     .sort((a, b) => sortNumber(a, b, 'order'))
     .map((environment) => {
@@ -85,7 +84,7 @@ export const environmentsConverter = (environments: EnvironmentEntity[]): IEnvir
     });
 };
 
-export const getLayouts = (vPhotos: (EnvironmentPhotoEntity | CharacterizationPhotoEntity)[], hPhotos: (EnvironmentPhotoEntity | CharacterizationPhotoEntity)[]) => {
+export const getLayouts = (vPhotos: CharacterizationPhotoEntity[], hPhotos: CharacterizationPhotoEntity[]) => {
   const vLength = vPhotos.length;
   const hLength = hPhotos.length;
 
@@ -93,7 +92,7 @@ export const getLayouts = (vPhotos: (EnvironmentPhotoEntity | CharacterizationPh
 
   const layouts: (Table[] | Paragraph[])[] = [];
 
-  const vLayout = (vPhotos: (EnvironmentPhotoEntity | CharacterizationPhotoEntity)[], length: number, keepVTree = false) => {
+  const vLayout = (vPhotos: CharacterizationPhotoEntity[], length: number, keepVTree = false) => {
     const hasDivider = layouts.length > 0;
 
     if (hasDivider) layouts.push([ImageDivider()]);
@@ -125,11 +124,7 @@ export const getLayouts = (vPhotos: (EnvironmentPhotoEntity | CharacterizationPh
     return vPhotos;
   };
 
-  const hLayout = (
-    hPhotos: (EnvironmentPhotoEntity | CharacterizationPhotoEntity)[],
-    vPhotos: (EnvironmentPhotoEntity | CharacterizationPhotoEntity)[],
-    hLength: number,
-  ) => {
+  const hLayout = (hPhotos: CharacterizationPhotoEntity[], vPhotos: CharacterizationPhotoEntity[], hLength: number) => {
     const hasDivider = layouts.length > 0;
 
     if (hasDivider) layouts.push([ImageDivider()]);

@@ -14,7 +14,6 @@ import { replaceAllVariables } from '../functions/replaceAllVariables';
 import { ISectionChildrenType } from '../types/elements.types';
 import { IAllSectionTypesPGR, IChapter, ICover, IDocVariables, ISection, PGRSectionTypeEnum } from '../types/section.types';
 import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
-import { EnvironmentEntity } from './../../../../../company/entities/environment.entity';
 import { IMapElementDocumentType } from './elementTypeMap';
 import { allCharacterizationSections } from '../../../components/iterables/all-characterization/all-characterization.sections';
 
@@ -31,7 +30,7 @@ type IDocumentClassType = {
   homogeneousGroup: IHomoGroupMap;
   hierarchy: Map<string, HierarchyMapData>;
   characterizations: CharacterizationEntity[];
-  environments: EnvironmentEntity[];
+  environments: CharacterizationEntity[];
   company: CompanyEntity;
 };
 
@@ -44,7 +43,7 @@ export class SectionsMapClass {
   private cover: DocumentCoverEntity;
   private document: RiskFactorGroupDataEntity;
   private homogeneousGroup: IHomoGroupMap;
-  private environments: EnvironmentEntity[];
+  private environments: CharacterizationEntity[];
   private characterizations: CharacterizationEntity[];
   private hierarchy: Map<string, HierarchyMapData>;
   private company: CompanyEntity;

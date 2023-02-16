@@ -140,7 +140,7 @@ export class FindAllRiskDataByEmployeeService {
     if (examHistory && examHistory?.hierarchy && (examHistory.doneDate > hierarchyHistory?.startDate || !hierarchyHistory?.startDate)) {
       date = examHistory.doneDate;
       employee.hierarchy = examHistory?.hierarchy;
-      employee.subOffices = [{ id: examHistory?.subOfficeId }];
+      if (examHistory?.subOfficeId) employee.subOffices = [{ id: examHistory?.subOfficeId }];
     }
 
     const hierarchyIds: string[] = [];

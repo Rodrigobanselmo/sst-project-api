@@ -22,7 +22,6 @@ import { DownloadEmployeesService } from './services/company/download-employees/
 import { UploadEmployeesService } from './services/company/upload-employees/upload-employees.service';
 import { UploadHierarchiesService } from './services/company/upload-hierarchies/upload-hierarchies.service';
 import { DownloadHierarchiesService } from './services/company/download-hierarchies/download-hierarchies.service';
-import { EnvironmentPhotoRepository } from '../company/repositories/implementations/EnvironmentPhotoRepository';
 import { DownloadCnaeService } from './services/cnae/download-cnae/download-cnae.service';
 import { UploadCnaeDataService } from './services/cnae/upload-cnae/upload-cnae.service';
 import { FilesCnaeController } from './controller/cnae/files-cnae.controller';
@@ -64,7 +63,6 @@ import { RiskStructureReportService } from './services/reports/risk-structure-re
     DownloadEmployeesService,
     UploadEmployeesService,
     UploadHierarchiesService,
-    EnvironmentPhotoRepository,
     DownloadHierarchiesService,
     DownloadCnaeService,
     UploadCnaeDataService,

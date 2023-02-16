@@ -51,6 +51,7 @@ export class FindClinicScheduleEmployeeExamHistoryService {
             examType: { not: 'EVAL' },
             ...(query.examIsAvaliation && { examType: 'EVAL' }),
             ...(query.date && { doneDate: query.date }),
+            ...(query.notAfterDate && { doneDate: { lte: query.notAfterDate } }),
           },
           orderBy: { doneDate: 'desc' },
           distinct: ['examId'],

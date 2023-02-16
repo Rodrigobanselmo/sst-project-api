@@ -144,7 +144,6 @@ export class RiskGroupDataRepository {
             generateSources: true,
             epiToRiskFactorData: { include: { epi: true } },
             engsToRiskFactorData: { include: { recMed: true } },
-            // riskFactor: true,
             riskFactor: {
               include: {
                 docInfo: {
@@ -169,7 +168,7 @@ export class RiskGroupDataRepository {
               include: { employees: { select: { _count: true } } },
             },
             homogeneousGroup: {
-              include: { characterization: true, environment: true },
+              include: { characterization: true },
             },
           },
         },
@@ -178,7 +177,7 @@ export class RiskGroupDataRepository {
 
     riskFactorGroupDataEntity.data.map((data, index) => {
       if (data.homogeneousGroup.characterization && isEnvironment(data.homogeneousGroup.characterization.type)) {
-        riskFactorGroupDataEntity.data[index].homogeneousGroup.environment = data.homogeneousGroup.characterization as any;
+        (riskFactorGroupDataEntity.data[index].homogeneousGroup as any).environment = data.homogeneousGroup.characterization as any;
         riskFactorGroupDataEntity.data[index].homogeneousGroup.characterization = data.homogeneousGroup.characterization = null;
       }
     });
@@ -206,6 +205,62 @@ export class RiskGroupDataRepository {
     // );
 
     return new RiskFactorGroupDataEntity(riskFactorGroupDataEntity);
+  }
+
+  async findDocumentData(id: string, companyId: string, options?: { workspaceId?: string }) {
+    const riskFactorGroupData = await this.prisma.riskFactorGroupData.findUnique({
+      where: { id_companyId: { id, companyId } },
+      include: {
+        professionalsSignatures: {
+          include: { professional: { include: { professional: true } } },
+        },
+        usersSignatures: {
+          include: {
+            user: {
+              include: { professional: { include: { councils: true } } },
+            },
+          },
+        },
+        data: {
+          where: {
+            homogeneousGroup: {
+              status: 'ACTIVE',
+              ...(options.workspaceId && {
+                workspaces: { some: { id: options.workspaceId } },
+              }),
+            },
+          },
+          include: {
+            adms: true,
+            recs: true,
+            generateSources: true,
+            epiToRiskFactorData: { include: { epi: true } },
+            engsToRiskFactorData: { include: { recMed: true } },
+            riskFactor: {
+              include: {
+                docInfo: {
+                  where: {
+                    OR: [
+                      { companyId },
+                      {
+                        company: {
+                          applyingServiceContracts: {
+                            some: { receivingServiceCompanyId: companyId },
+                          },
+                        },
+                      },
+                    ],
+                  },
+                },
+              },
+            },
+            dataRecs: true,
+          },
+        },
+      },
+    });
+
+    return new RiskFactorGroupDataEntity(riskFactorGroupData);
   }
 
   private async setUsersSignatures(usersSignatures: UsersRiskGroupEntity[]) {

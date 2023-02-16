@@ -5,6 +5,7 @@ export class AttachmentEntity implements Attachments {
   id: string;
   name: string;
   url: string;
+  link: string;
   created_at: Date;
   deleted_at: Date;
   updated_at: Date;

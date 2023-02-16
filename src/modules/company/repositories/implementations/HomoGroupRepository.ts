@@ -9,6 +9,7 @@ import { HierarchyEntity } from '../../entities/hierarchy.entity';
 import { HomoGroupEntity } from '../../entities/homoGroup.entity';
 import { prismaFilter } from './../../../../shared/utils/filters/prisma.filters';
 import { sortData } from './../../../../shared/utils/sorts/data.sort';
+import { isEnvironment } from './CharacterizationRepository';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 @Injectable()
@@ -323,6 +324,15 @@ export class HomoGroupRepository {
     );
 
     return homogeneousGroup;
+  }
+
+  async findDocumentData(companyId: string, options?: { workspaceId?: string }) {
+    const homogeneousGroups = await this.prisma.homogeneousGroup.findMany({
+      where: { companyId, ...(options.workspaceId && { workspaces: { some: { id: options.workspaceId } } }) },
+      include: { characterization: { include: { photos: true, profiles: true } } },
+    });
+
+    return homogeneousGroups.map((homo) => new HomoGroupEntity(homo));
   }
 
   private async getHomoGroupData(homoGroup: HomoGroupEntity) {

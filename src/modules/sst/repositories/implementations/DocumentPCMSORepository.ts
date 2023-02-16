@@ -166,7 +166,7 @@ export class DocumentPCMSORepository {
                   include: { employees: { select: { _count: true } } },
                 },
                 homogeneousGroup: {
-                  include: { characterization: true, environment: true },
+                  include: { characterization: true },
                 },
               },
             },
@@ -187,7 +187,7 @@ export class DocumentPCMSORepository {
 
     docPCMSO.company.riskFactorData.map((data, index) => {
       if (data.homogeneousGroup.characterization && isEnvironment(data.homogeneousGroup.characterization.type)) {
-        docPCMSO.company.riskFactorData[index].homogeneousGroup.environment = data.homogeneousGroup.characterization as any;
+        (docPCMSO.company.riskFactorData[index].homogeneousGroup as any).environment = data.homogeneousGroup.characterization as any;
         docPCMSO.company.riskFactorData[index].homogeneousGroup.characterization = data.homogeneousGroup.characterization = null;
       }
     });

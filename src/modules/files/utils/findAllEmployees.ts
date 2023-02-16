@@ -39,7 +39,7 @@ export const findAllEmployees = async (
       hierarchyOnHomogeneous: {
         include: {
           homogeneousGroup: {
-            include: { characterization: true, environment: true },
+            include: { characterization: true },
           },
         },
       },

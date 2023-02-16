@@ -1,3 +1,4 @@
+import { checkRiskDataDoc } from './../../../../../shared/utils/getRiskDoc';
 import { HierarchyEntity } from './../../../../company/entities/hierarchy.entity';
 import { FindAllRiskDataByEmployeeService } from './../../../../sst/services/risk-data/find-by-employee/find-by-employee.service';
 import { Injectable } from '@nestjs/common';
@@ -8,7 +9,6 @@ import { EmployeeEntity } from '../../../../company/entities/employee.entity';
 import { EmployeeRepository } from '../../../../company/repositories/implementations/EmployeeRepository';
 import { IPdfProntuarioData, IProntuarioQuestion } from './types/IProntuarioData.type';
 import { onGetRisks } from '../../../../../shared/utils/onGetRisks';
-import { checkRiskDataDoc } from '../../pgr/document/upload-pgr-doc.service';
 
 @Injectable()
 export class PdfProntuarioDataService {

@@ -4,7 +4,6 @@ import { HierarchyOnHomogeneous, HomogeneousGroup, HomoTypeEnum, StatusEnum, Com
 import { HierarchyEntity } from './hierarchy.entity';
 import { WorkspaceEntity } from './workspace.entity';
 import { CharacterizationEntity } from './characterization.entity';
-import { EnvironmentEntity } from './environment.entity';
 import { CompanyEntity } from './company.entity';
 
 export class HomoGroupEntity implements HomogeneousGroup {
@@ -39,7 +38,7 @@ export class HomoGroupEntity implements HomogeneousGroup {
   type: HomoTypeEnum;
   riskFactorData?: RiskFactorDataEntity[];
   characterization?: CharacterizationEntity;
-  environment?: EnvironmentEntity;
+  environment?: CharacterizationEntity;
   hierarchy?: HierarchyEntity;
   deletedAt: Date;
   workspaces?: WorkspaceEntity[];

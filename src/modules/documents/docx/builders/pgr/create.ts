@@ -2,7 +2,6 @@ import { DocumentCoverEntity } from './../../../../company/entities/document-cov
 import { AttachmentEntity } from '../../../../sst/entities/attachment.entity';
 import { CharacterizationEntity } from './../../../../company/entities/characterization.entity';
 import { RiskFactorGroupDataEntity } from '../../../../sst/entities/riskGroupData.entity';
-import { EnvironmentEntity } from './../../../../company/entities/environment.entity';
 import { ISectionOptions } from 'docx';
 import { RiskDocumentEntity } from '../../../../sst/entities/riskDocument.entity';
 
@@ -28,7 +27,7 @@ export class DocumentBuildPGR {
   private docSections: IDocumentPGRSectionGroups;
   private versions: RiskDocumentEntity[];
   private variables: IDocVariables;
-  private environments: EnvironmentEntity[];
+  private environments: CharacterizationEntity[];
   private document: RiskFactorGroupDataEntity;
   private homogeneousGroup: IHomoGroupMap;
   private hierarchy: Map<string, HierarchyMapData>;

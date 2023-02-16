@@ -112,6 +112,7 @@ model Attachments {
   id                   String              @id @default(uuid())
   name                 String?
   url                  String
+  link                 String?
   created_at           DateTime            @default(now())
   deleted_at           DateTime?
   updated_at           DateTime            @updatedAt

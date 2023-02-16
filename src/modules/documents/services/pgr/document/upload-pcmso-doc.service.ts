@@ -1,3 +1,4 @@
+import { getRiskDoc } from './../../../../../shared/utils/getRiskDoc';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { HomoTypeEnum, StatusEnum } from '@prisma/client';
 import { ISectionOptions, Packer } from 'docx';
@@ -28,23 +29,6 @@ import { APPRByGroupTableSection } from '../../../docx/components/tables/apprByG
 import { hierarchyConverter, HierarchyMapData, IHierarchyMap, IHomoGroupMap } from '../../../docx/converter/hierarchy.converter';
 import { UpsertDocumentDto, UpsertPcmsoDocumentDto } from '../../../dto/pgr.dto';
 
-export const getRiskDoc = (risk: RiskFactorsEntity, { companyId, hierarchyId }: { companyId?: string; hierarchyId?: string }) => {
-  if (hierarchyId) {
-    const data = risk?.docInfo?.find((i) => i.hierarchyId && i.hierarchyId == hierarchyId);
-    if (data) return data;
-  }
-
-  if (companyId) {
-    const first = risk?.docInfo?.find((i) => !i.hierarchyId && i.companyId === companyId);
-    if (first) return first;
-  }
-
-  const second = risk?.docInfo?.find((i) => !i.hierarchyId);
-  if (second) return second;
-
-  return risk;
-};
-
 @Injectable()
 export class PcmsoUploadService {
   private attachments_remove: any[] = []; //!
@@ -66,7 +50,7 @@ export class PcmsoUploadService {
     const workspaceId = upsertPgrDto.workspaceId;
     // throw new Error();
     console.info('start: query data');
-    const company = await this.companyRepository.findByIdAll(companyId, workspaceId, {
+    const company = await this.companyRepository.findAllCompanyData(companyId, workspaceId, {
       include: {
         riskFactorGroupData: true,
         primary_activity: true,

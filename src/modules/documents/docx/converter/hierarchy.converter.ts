@@ -5,7 +5,7 @@ import { HomoGroupEntity } from '../../../../modules/company/entities/homoGroup.
 import { removeDuplicate } from '../../../../shared/utils/removeDuplicate';
 import { HierarchyEntity } from '../../../company/entities/hierarchy.entity';
 import { hierarchyMap } from '../components/tables/appr/parts/first/first.constant';
-import { EnvironmentEntity } from './../../../company/entities/environment.entity';
+import { CharacterizationEntity } from './../../../company/entities/characterization.entity';
 
 export interface HierarchyMapData {
   org: {
@@ -84,7 +84,7 @@ const setMapHierarchies = (hierarchyData: HierarchyEntity[]) => {
   return { hierarchyTree, homoGroupTree };
 };
 
-export const hierarchyConverter = (hierarchies: HierarchyEntity[], environments = [] as EnvironmentEntity[], { workspaceId }: { workspaceId?: string } = {}) => {
+export const hierarchyConverter = (hierarchies: HierarchyEntity[], environments = [] as CharacterizationEntity[], { workspaceId }: { workspaceId?: string } = {}) => {
   const { hierarchyTree, homoGroupTree } = setMapHierarchies(hierarchies);
   const hierarchyData = new Map<string, HierarchyMapData>();
   const hierarchyHighLevelsData = new Map<string, HierarchyMapData>();

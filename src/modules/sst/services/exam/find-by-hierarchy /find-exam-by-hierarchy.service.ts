@@ -1,3 +1,4 @@
+import { getRiskDoc } from './../../../../../shared/utils/getRiskDoc';
 import { HierarchyEntity } from './../../../../company/entities/hierarchy.entity';
 import { Injectable } from '@nestjs/common';
 import { HomoTypeEnum, Prisma, SexTypeEnum, StatusEnum } from '@prisma/client';
@@ -11,7 +12,6 @@ import { EmployeeExamsHistoryEntity } from '../../../../company/entities/employe
 import { EmployeeEntity } from '../../../../company/entities/employee.entity';
 import { EmployeeRepository } from '../../../../company/repositories/implementations/EmployeeRepository';
 import { HierarchyRepository } from '../../../../company/repositories/implementations/HierarchyRepository';
-import { getRiskDoc } from '../../../../documents/services/pgr/document/upload-pgr-doc.service';
 import { FindExamHierarchyDto } from '../../../dto/exam.dto';
 import { IExamOriginData, IExamEmployeeCheck } from '../../../entities/exam.entity';
 import { ExamRepository } from '../../../repositories/implementations/ExamRepository';

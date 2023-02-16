@@ -26,6 +26,7 @@ import { fixDate } from './run/fix-date';
 import { normCities } from './run/normalize-cities';
 import { fixHierarchyHomo } from './run/fix-hierarchy-homo';
 import { removeDuplicatesRisks } from './run/removeDuplicatesRisks';
+import { setHomoWork } from './run/set-homo-work';
 
 const prisma = new PrismaClient({
   // log: ['query'],
@@ -80,6 +81,8 @@ async function main() {
     // }),
 
     await removeDuplicatesRisks(prisma); // run on simple
+    await setHomoWork(prisma); // run on simple
+    await fixHierarchyHomo(prisma); // run on simple
 
     console.info('end');
   } catch (err) {

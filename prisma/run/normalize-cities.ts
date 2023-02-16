@@ -1,4 +1,4 @@
-import { normalizeString } from './../../src/shared/utils/normalizeString';
+import { normalizeString } from '../../src/shared/utils/normalizeString';
 import { PrismaClient } from '@prisma/client';
 
 export const normCities = async (prisma: PrismaClient) => {

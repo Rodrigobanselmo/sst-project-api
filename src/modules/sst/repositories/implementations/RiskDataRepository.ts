@@ -185,7 +185,7 @@ export class RiskDataRepository {
           engsToRiskFactorData: { include: { recMed: true } },
           examsToRiskFactorData: { include: { exam: true } },
           homogeneousGroup: {
-            include: { characterization: true, environment: true },
+            include: { characterization: true },
           },
         },
       }),

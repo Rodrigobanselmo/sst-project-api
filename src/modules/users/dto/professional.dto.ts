@@ -130,6 +130,10 @@ export class FindProfessionalsDto extends PaginationQueryDto {
   @IsOptional()
   companyId?: string;
 
+  @IsString()
+  @IsOptional()
+  clinicId?: string;
+
   @Transform(QueryArray, { toClassOnly: true })
   @IsString({ each: true })
   @IsOptional()

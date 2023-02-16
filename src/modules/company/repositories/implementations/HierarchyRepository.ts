@@ -113,7 +113,11 @@ export class HierarchyRepository {
       upsertHierarchyMany.map(({ companyId: _, id, workspaceIds, parentId, children, ghoName, ghoNames, employeesIds, name, ...upsertHierarchy }) => {
         const isSubOffice = upsertHierarchy?.type == HierarchyEnum.SUB_OFFICE;
 
-        ghoNames?.forEach((ghoName) => {
+        const ghos = [];
+        if (ghoNames) ghos.push(...ghoNames);
+        if (ghoName) ghos.push(ghoName);
+
+        ghos?.forEach((ghoName) => {
           const HierarchyOnHomo = [
             {
               hierarchyId: id,
@@ -479,18 +483,19 @@ export class HierarchyRepository {
         hierarchyOnHomogeneous: {
           include: {
             homogeneousGroup: {
-              include: { characterization: true, environment: true },
+              include: { characterization: true },
             },
           },
           where: { endDate: null },
         },
         subOfficeEmployees: {
-          where: { hierarchy: { workspaces: { some: { id: workspaceId } } } },
+          // where: { hierarchy: { workspaces: { some: { id: workspaceId } } } },
           include: { subOffices: true },
         },
-        employees: {
-          where: { hierarchy: { workspaces: { some: { id: workspaceId } } } },
-        },
+        employees: true,
+        // employees: {
+        //   where: { hierarchy: { workspaces: { some: { id: workspaceId } } } },
+        // },
         workspaces: true,
       },
     });
@@ -710,5 +715,30 @@ export class HierarchyRepository {
     });
 
     return new HierarchyEntity(data);
+  }
+
+  async findDocumentData(
+    companyId: string,
+    options: {
+      workspaceId?: string;
+    } = {},
+  ) {
+    const hierarchies = await this.prisma.hierarchy.findMany({
+      where: { companyId, ...(options.workspaceId && { workspaces: { some: { id: options.workspaceId } } }) },
+      include: {
+        hierarchyOnHomogeneous: {
+          where: { endDate: null },
+        },
+        subOfficeEmployees: {
+          include: { subOffices: true },
+        },
+        employees: { select: { id: true, sex: true, hierarchyId: true } },
+        workspaces: { select: { id: true, name: true } },
+      },
+    });
+
+    return hierarchies.map((hierarchy) => {
+      return new HierarchyEntity(hierarchy as any);
+    });
   }
 }

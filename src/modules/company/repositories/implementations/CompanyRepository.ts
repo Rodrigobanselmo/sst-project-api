@@ -413,7 +413,7 @@ export class CompanyRepository implements ICompanyRepository {
     return new CompanyEntity(company);
   }
 
-  async findByIdAll(id: string, workspaceId: string, options?: Partial<Prisma.CompanyFindUniqueArgs>): Promise<CompanyEntity> {
+  async findAllCompanyData(id: string, workspaceId: string, options?: Partial<Prisma.CompanyFindUniqueArgs>): Promise<CompanyEntity> {
     const company = (await this.prisma.company.findUnique({
       where: { id },
       ...options,
@@ -861,6 +861,37 @@ export class CompanyRepository implements ICompanyRepository {
     });
 
     return new CompanyEntity(data);
+  }
+
+  async findDocumentData(companyId: string, workspaceId?: string) {
+    let company = (await this.prisma.company.findUnique({
+      where: { id: companyId },
+      include: {
+        primary_activity: true,
+        address: true,
+        covers: true,
+        receivingServiceContracts: {
+          include: {
+            applyingServiceCompany: {
+              include: { address: true, covers: true },
+            },
+          },
+        },
+      },
+    })) as CompanyEntity;
+
+    company = new CompanyEntity({ ...company });
+
+    if (workspaceId) {
+      company.employeeCount = await this.prisma.employee.count({
+        where: {
+          companyId,
+          hierarchy: { workspaces: { some: { id: workspaceId } } },
+        },
+      });
+    }
+
+    return company;
   }
 
   async countRelations(

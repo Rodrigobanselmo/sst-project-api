@@ -50,6 +50,21 @@ export class RiskDocumentRepository {
     return riskDocumentEntity.map((data) => new RiskDocumentEntity(data));
   }
 
+  async findDocumentData(
+    riskGroupId: string,
+    companyId: string,
+    options: {
+      isPGR?: boolean;
+      isPCMSO?: boolean;
+    },
+  ) {
+    const riskDocumentEntity = await this.prisma.riskFactorDocument.findMany({
+      where: { companyId, riskGroupId, version: { endsWith: '.0.0' }, ...(options?.isPGR && { pcmsoId: null }), ...(options?.isPCMSO && { pcmsoId: { not: null } }) },
+    });
+
+    return riskDocumentEntity.map((data) => new RiskDocumentEntity(data));
+  }
+
   async find(query: Partial<FindDocVersionDto & { companyId: string }>, pagination: PaginationQueryDto, options: Prisma.RiskFactorDocumentFindManyArgs = {}) {
     const whereInit = {
       AND: [],

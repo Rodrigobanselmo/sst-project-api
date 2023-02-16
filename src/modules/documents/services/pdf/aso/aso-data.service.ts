@@ -13,8 +13,8 @@ import { ExamRiskEntity } from '../../../../sst/entities/examRisk.entity';
 import { ExamRiskDataEntity } from '../../../../sst/entities/examRiskData.entity';
 import { FindExamByHierarchyService } from '../../../../sst/services/exam/find-by-hierarchy /find-exam-by-hierarchy.service';
 import { FindAllRiskDataByEmployeeService } from '../../../../sst/services/risk-data/find-by-employee/find-by-employee.service';
-import { checkRiskDataDoc } from '../../pgr/document/upload-pgr-doc.service';
 import { IPdfAsoData } from './types/IAsoData.type';
+import { checkRiskDataDoc } from '../../../../../shared/utils/getRiskDoc';
 
 export const checkExamType = (exam: ExamRiskDataEntity | ExamRiskEntity, examType: ExamHistoryTypeEnum) => {
   const isAdmission = examType == ExamHistoryTypeEnum.ADMI;

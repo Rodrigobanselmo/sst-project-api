@@ -249,20 +249,22 @@ export class ProfessionalRepository {
     const companyId = query.companyId;
     const userCompanyId = query.userCompanyId;
     const byCouncil = query.byCouncil;
+    const clinicId = query.clinicId;
     delete query.companyId;
     delete query.byCouncil;
     delete query.userCompanyId;
+    delete query.clinicId;
 
     const where = {
       AND: [
         {
           OR: [
-            { companyId: { in: [userCompanyId, companyId] } },
+            { companyId: { in: clinicId ? [companyId] : [userCompanyId, companyId] } },
             {
               user: {
                 companies: {
                   some: {
-                    companyId: { in: [userCompanyId, companyId] },
+                    companyId: { in: clinicId ? [companyId] : [userCompanyId, companyId] },
                     status: 'ACTIVE',
                   },
                 },
