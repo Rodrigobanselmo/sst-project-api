@@ -1,4 +1,4 @@
-import { UpsertPgrDocumentDto } from './../../../../../dto/pgr.dto';
+import { UploadDocumentDto } from '../../../../../dto/document.dto';
 import { CompanyEntity } from './../../../../../../company/entities/company.entity';
 
 export interface IGetDocumentFileName {
@@ -9,4 +9,4 @@ export interface IGetDocumentFileName {
   textType?: string;
 }
 
-export type IDocumentPGRBody = UpsertPgrDocumentDto;
+export type IDocumentPGRBody = UploadDocumentDto;

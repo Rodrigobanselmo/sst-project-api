@@ -1,3 +1,5 @@
+import { DocumentDataEntity } from './../../../../../../sst/entities/documentData.entity';
+import { DocumentDataPGRDto } from './../../../../../../sst/dto/document-data-pgr.dto';
 import { Table, WidthType } from 'docx';
 
 import { RiskFactorGroupDataEntity } from '../../../../../../sst/entities/riskGroupData.entity';
@@ -7,7 +9,7 @@ import { TableHeaderElements } from './elements/header';
 import { NewQuantityNoiseHeader } from './quantityNoise.constant';
 import { quantityNoiseConverter } from './quantityNoise.converter';
 
-export const quantityNoiseTable = (riskGroupData: RiskFactorGroupDataEntity, hierarchyTree: IHierarchyMap) => {
+export const quantityNoiseTable = (riskGroupData: RiskFactorGroupDataEntity & DocumentDataEntity & DocumentDataPGRDto, hierarchyTree: IHierarchyMap) => {
   const quantityNoiseData = quantityNoiseConverter(riskGroupData, hierarchyTree);
   const tableHeaderElements = new TableHeaderElements();
   const tableBodyElements = new TableBodyElements();

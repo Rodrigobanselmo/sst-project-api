@@ -1,3 +1,5 @@
+import { DocumentDataPGRDto } from './../../../../../sst/dto/document-data-pgr.dto';
+import { DocumentDataEntity } from '../../../../../../modules/sst/entities/documentData.entity';
 import { CompanyEntity } from '../../../../../company/entities/company.entity';
 import { WorkspaceEntity } from '../../../../../company/entities/workspace.entity';
 import { AttachmentEntity } from '../../../../../sst/entities/attachment.entity';
@@ -15,7 +17,7 @@ export interface ICreatePGR {
   workspace: WorkspaceEntity;
   versions: RiskDocumentEntity[];
   environments: CharacterizationEntity[];
-  document: RiskFactorGroupDataEntity;
+  document: RiskFactorGroupDataEntity & DocumentDataEntity & DocumentDataPGRDto;
   homogeneousGroup: IHomoGroupMap;
   consultantLogo: string;
   hierarchy: Map<string, HierarchyMapData>;

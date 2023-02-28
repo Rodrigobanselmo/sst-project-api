@@ -1,7 +1,7 @@
 import { ISectionPropertiesOptions } from 'docx';
 import { ISectionChildrenType } from './elements.types';
 
-export enum PGRSectionTypeEnum {
+export enum DocumentSectionTypeEnum {
   CHAPTER = 'CHAPTER',
   TOC = 'TOC',
   COVER = 'COVER',
@@ -16,41 +16,42 @@ interface IBase {
   removeWithAllEmptyVars?: string[];
   removeWithAllValidVars?: string[];
   addWithAllVars?: string[];
+  label?: string;
 }
 
 export type ICover = {
-  type: PGRSectionTypeEnum.COVER;
+  type: DocumentSectionTypeEnum.COVER;
   imgPath?: string;
   version?: string;
 } & IBase;
 
 export type ITOC = {
-  type: PGRSectionTypeEnum.TOC;
+  type: DocumentSectionTypeEnum.TOC;
 } & IBase;
 
 export type IChapter = {
-  type: PGRSectionTypeEnum.CHAPTER;
+  type: DocumentSectionTypeEnum.CHAPTER;
   text?: string;
   version?: string;
 } & IBase;
 
 export type ISection = {
-  type: PGRSectionTypeEnum.SECTION;
+  type: DocumentSectionTypeEnum.SECTION;
   children: ISectionChildrenType[];
   footerText?: string;
   properties?: ISectionPropertiesOptions;
 } & IBase;
 
 export type ISectionEnv = {
-  type: PGRSectionTypeEnum.ITERABLE_ENVIRONMENTS;
+  type: DocumentSectionTypeEnum.ITERABLE_ENVIRONMENTS;
 } & IBase;
 
 export type ISectionChar = {
-  type: PGRSectionTypeEnum.ITERABLE_CHARACTERIZATION;
+  type: DocumentSectionTypeEnum.ITERABLE_CHARACTERIZATION;
 } & IBase;
 
 export type IAprTable = {
-  type: PGRSectionTypeEnum.APR;
+  type: DocumentSectionTypeEnum.APR;
   properties?: ISectionPropertiesOptions;
 } & IBase;
 

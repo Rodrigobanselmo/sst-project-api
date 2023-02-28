@@ -1,46 +1,46 @@
 import { VariablesPGREnum } from '../enums/variables.enum';
-import { PGRSectionChildrenTypeEnum } from '../types/elements.types';
-import { IDocumentPGRSectionGroup, PGRSectionTypeEnum } from '../types/section.types';
+import { DocumentSectionChildrenTypeEnum } from '../types/elements.types';
+import { IDocumentPGRSectionGroup, DocumentSectionTypeEnum } from '../types/section.types';
 
 export const mvvSection: IDocumentPGRSectionGroup = {
   footer: true,
   header: true,
   data: [
     {
-      type: PGRSectionTypeEnum.SECTION,
+      type: DocumentSectionTypeEnum.SECTION,
       footerText: `??${VariablesPGREnum.CHAPTER_1}??`,
       removeWithSomeEmptyVars: [VariablesPGREnum.COMPANY_MISSION, VariablesPGREnum.COMPANY_VISION, VariablesPGREnum.COMPANY_VALUES],
       children: [
         {
-          type: PGRSectionChildrenTypeEnum.H1,
+          type: DocumentSectionChildrenTypeEnum.H1,
           text: 'POLÍTICA DE SAÚDE E SEGURANÇA OCUPACIONAL',
         },
         {
-          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
           text: `**Segue a Política de Qualidade da ??${VariablesPGREnum.COMPANY_SHORT_NAME}??**`,
         },
         {
-          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
           text: '**MISSÃO**',
         },
         {
-          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
           text: `??${VariablesPGREnum.COMPANY_MISSION}??`,
         },
         {
-          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
           text: '**VISÃO**',
         },
         {
-          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
           text: `??${VariablesPGREnum.COMPANY_VISION}??`,
         },
         {
-          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
           text: '**VALORES**',
         },
         {
-          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
           text: `??${VariablesPGREnum.COMPANY_VALUES}??`,
         },
       ],

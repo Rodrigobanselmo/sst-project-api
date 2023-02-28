@@ -1,7 +1,9 @@
-import { IsBoolean, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsEnum, IsOptional, IsString } from 'class-validator';
 import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
 import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
+import { DocumentTypeEnum } from '@prisma/client';
+import { KeysOfEnum } from './../../../shared/utils/keysOfEnum.utils';
 
 export class FindDocVersionDto extends PaginationQueryDto {
   @IsString()
@@ -14,19 +16,12 @@ export class FindDocVersionDto extends PaginationQueryDto {
 
   @IsString({ each: true })
   @IsOptional()
-  riskGroupId: string[];
+  documentDataId: string[];
 
-  @IsString({ each: true })
   @IsOptional()
-  pcmsoId: string[];
-
-  @IsBoolean()
-  @ToBoolean()
-  @IsOptional()
-  isPGR: boolean;
-
-  @IsBoolean()
-  @ToBoolean()
-  @IsOptional()
-  isPCMSO: boolean;
+  @IsString()
+  @IsEnum(DocumentTypeEnum, {
+    message: `type must be one of: ${KeysOfEnum(DocumentTypeEnum)}`,
+  })
+  type: DocumentTypeEnum;
 }

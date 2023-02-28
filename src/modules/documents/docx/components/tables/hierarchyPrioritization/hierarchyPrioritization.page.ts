@@ -3,7 +3,7 @@ import { Paragraph, Table, WidthType } from 'docx';
 import { palette } from '../../../../../../shared/constants/palette';
 
 import { borderStyleGlobal } from '../../../base/config/styles';
-import { ISectionChildrenType, PGRSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
+import { ISectionChildrenType, DocumentSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
 import { IHierarchyData, IHierarchyMap } from '../../../converter/hierarchy.converter';
 import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
@@ -31,7 +31,7 @@ export const hierarchyPrioritizationPage = (
         table,
         ...convertToDocx([
           {
-            type: PGRSectionChildrenTypeEnum.LEGEND,
+            type: DocumentSectionChildrenTypeEnum.LEGEND,
             text: '**Lengenda**',
             spacing: { after: 0 },
           },
@@ -58,12 +58,12 @@ export const hierarchyPrioritizationPage = (
         }),
         ...convertToDocx([
           {
-            type: PGRSectionChildrenTypeEnum.LEGEND,
+            type: DocumentSectionChildrenTypeEnum.LEGEND,
             text: '**MB =** Muito Baixo / **B =** Baixo / **M =** Moderado / **A =** Alto / **MA=** Muito Alto',
             spacing: { after: 0 },
           },
           {
-            type: PGRSectionChildrenTypeEnum.LEGEND,
+            type: DocumentSectionChildrenTypeEnum.LEGEND,
             text: 'Vermelho Indica Risco Priorizado Independente do critério ser Qualitativo ou Quantitativo, ou seja, Alto (A) e Muito Alto (A)',
             color: 'FF0000',
           },

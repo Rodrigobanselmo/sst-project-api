@@ -1,7 +1,7 @@
 import { sectionLandscapeProperties } from '../../../base/config/styles';
 import { VariablesPGREnum } from '../enums/variables.enum';
-import { PGRSectionChildrenTypeEnum } from '../types/elements.types';
-import { IDocumentPGRSectionGroup, PGRSectionTypeEnum } from '../types/section.types';
+import { DocumentSectionChildrenTypeEnum } from '../types/elements.types';
+import { IDocumentPGRSectionGroup, DocumentSectionTypeEnum } from '../types/section.types';
 
 export const gse2Section: IDocumentPGRSectionGroup = {
   footer: true,
@@ -9,16 +9,16 @@ export const gse2Section: IDocumentPGRSectionGroup = {
   data: [
     {
       properties: sectionLandscapeProperties,
-      type: PGRSectionTypeEnum.SECTION,
+      type: DocumentSectionTypeEnum.SECTION,
       footerText: `??${VariablesPGREnum.CHAPTER_2}??`,
       removeWithSomeEmptyVars: [VariablesPGREnum.COMPANY_HAS_GSE_RISK],
       children: [
         {
-          type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE,
+          type: DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE,
           text: "Definição dos Grupos Similares de Exposição (GSE's)",
         },
         {
-          type: PGRSectionChildrenTypeEnum.TABLE_GSE,
+          type: DocumentSectionChildrenTypeEnum.TABLE_GSE,
         },
       ],
     },

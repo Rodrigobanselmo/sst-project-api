@@ -365,6 +365,7 @@ export class RiskRepository implements IRiskRepository {
         name: true,
         severity: true,
         type: true,
+        esocialCode: true,
         representAll: true,
         id: true,
         unit: true,

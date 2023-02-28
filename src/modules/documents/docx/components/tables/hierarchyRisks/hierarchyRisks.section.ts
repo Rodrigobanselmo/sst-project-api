@@ -3,7 +3,7 @@ import { PageOrientation, Paragraph, Table, WidthType } from 'docx';
 import { arrayChunks } from '../../../../../../shared/utils/arrayChunks';
 
 import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
-import { ISectionChildrenType, PGRSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
+import { ISectionChildrenType, DocumentSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
 import { IHierarchyData, IHierarchyMap } from '../../../converter/hierarchy.converter';
 import { TableBodyElements } from './elements/body';
@@ -70,41 +70,41 @@ export const hierarchyRisksTableAllSections = (
 ) => {
   const table1 = convertToDocx([
     {
-      type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE,
+      type: DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE,
       text: 'Relação de Fatores de Risco e Perigos por Diretorias da Empresa',
     },
     {
-      type: PGRSectionChildrenTypeEnum.BREAK,
+      type: DocumentSectionChildrenTypeEnum.BREAK,
     },
   ]);
 
   const table2 = convertToDocx([
     {
-      type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE,
+      type: DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE,
       text: 'Relação de Fatores de Risco e Perigos por Gerências da Empresa',
     },
     {
-      type: PGRSectionChildrenTypeEnum.BREAK,
+      type: DocumentSectionChildrenTypeEnum.BREAK,
     },
   ]);
 
   const table3 = convertToDocx([
     {
-      type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE,
+      type: DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE,
       text: 'Relação de Fatores de Risco e Perigos por Setores da Empresa',
     },
     {
-      type: PGRSectionChildrenTypeEnum.BREAK,
+      type: DocumentSectionChildrenTypeEnum.BREAK,
     },
   ]);
 
   const table4 = convertToDocx([
     {
-      type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE,
+      type: DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE,
       text: 'Relação de Fatores de Risco e Perigos por Sub Setores da Empresa',
     },
     {
-      type: PGRSectionChildrenTypeEnum.BREAK,
+      type: DocumentSectionChildrenTypeEnum.BREAK,
     },
   ]);
 

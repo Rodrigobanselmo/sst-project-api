@@ -1,3 +1,5 @@
+import { DocumentDataPGRDto } from './../../../../../../../sst/dto/document-data-pgr.dto';
+import { DocumentDataEntity } from './../../../../../../../sst/entities/documentData.entity';
 import { sortNumber } from './../../../../../../../../shared/utils/sorts/number.sort';
 import { HomoTypeEnum, RiskFactorsEnum } from '@prisma/client';
 import { AlignmentType } from 'docx';
@@ -13,7 +15,11 @@ import { ThirdRiskInventoryColumnEnum } from './third.constant';
 import { originRiskMap } from '../../../../../../../../shared/constants/maps/origin-risk';
 import { sortString } from '../../../../../../../../shared/utils/sorts/string.sort';
 
-export const dataConverter = (riskGroup: RiskFactorGroupDataEntity, hierarchyData: HierarchyMapData, hierarchyTree: IHierarchyMap) => {
+export const dataConverter = (
+  riskGroup: RiskFactorGroupDataEntity & DocumentDataEntity & DocumentDataPGRDto,
+  hierarchyData: HierarchyMapData,
+  hierarchyTree: IHierarchyMap,
+) => {
   const riskFactorsMap = new Map<RiskFactorsEnum, bodyTableProps[][]>();
   const riskInventoryData: bodyTableProps[][] = [];
 

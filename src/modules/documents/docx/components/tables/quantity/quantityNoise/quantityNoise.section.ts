@@ -1,10 +1,12 @@
+import { DocumentDataPGRDto } from './../../../../../../sst/dto/document-data-pgr.dto';
+import { DocumentDataEntity } from './../../../../../../sst/entities/documentData.entity';
 import { PageOrientation } from 'docx';
 
 import { RiskFactorGroupDataEntity } from '../../../../../../sst/entities/riskGroupData.entity';
 import { IHierarchyMap } from './../../../../converter/hierarchy.converter';
 import { quantityNoiseTable } from './quantityNoise.table';
 
-export const quantityNoiseTableSection = (riskGroupData: RiskFactorGroupDataEntity, hierarchyTree: IHierarchyMap) => {
+export const quantityNoiseTableSection = (riskGroupData: RiskFactorGroupDataEntity & DocumentDataEntity & DocumentDataPGRDto, hierarchyTree: IHierarchyMap) => {
   const table = quantityNoiseTable(riskGroupData, hierarchyTree);
 
   const section = {

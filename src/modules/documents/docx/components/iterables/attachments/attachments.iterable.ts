@@ -1,7 +1,7 @@
 import { Paragraph, Table } from 'docx';
 
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
-import { ISectionChildrenType, PGRSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
+import { ISectionChildrenType, DocumentSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
 import { AttachmentEntity } from '../../../../../sst/entities/attachment.entity';
 import { attachmentsConverter } from './attachments.converter';
@@ -16,7 +16,7 @@ export const attachmentsIterable = (
       return convertToDocx(
         [
           {
-            type: PGRSectionChildrenTypeEnum.BULLET,
+            type: DocumentSectionChildrenTypeEnum.BULLET,
             text: `<link>??${VariablesPGREnum.ATTACHMENT_LINK}??|ANEXO 0${index + 1} – ??${VariablesPGREnum.ATTACHMENT_NAME}??<link>`,
           },
         ],

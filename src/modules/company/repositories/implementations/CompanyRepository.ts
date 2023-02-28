@@ -9,7 +9,7 @@ import { CompanyEntity } from '../../entities/company.entity';
 import { ICompanyRepository } from '../ICompanyRepository.types';
 import { v4 as uuidV4 } from 'uuid';
 import { IPrismaOptions } from '../../../../shared/interfaces/prisma-options.types';
-import { Prisma } from '@prisma/client';
+import { DocumentTypeEnum, Prisma } from '@prisma/client';
 import { onlyNumbers } from '@brazilian-utils/brazilian-utils';
 import { isEnvironment } from './CharacterizationRepository';
 
@@ -268,6 +268,18 @@ export class CompanyRepository implements ICompanyRepository {
     return new CompanyEntity(await companyPrisma);
   }
 
+  async updateApplyService(companyId: string, applyIds: string[]) {
+    await this.prisma.contract.deleteMany({
+      where: { receivingServiceCompanyId: companyId },
+    });
+
+    const contract = await this.prisma.contract.createMany({
+      data: applyIds.map((id) => ({ receivingServiceCompanyId: companyId, applyingServiceCompanyId: id })),
+    });
+
+    return contract;
+  }
+
   async upsertMany(
     updateCompanyDto: UpdateCompanyDto[],
     options?: IPrismaOptions<{
@@ -472,9 +484,12 @@ export class CompanyRepository implements ICompanyRepository {
     } as typeof options.where;
 
     if (!options.orderBy)
-      options.orderBy = {
-        name: 'asc',
-      };
+      options.orderBy = [
+        { status: 'asc' },
+        {
+          name: 'asc',
+        },
+      ];
 
     if (!options.select)
       options.select = {
@@ -567,7 +582,8 @@ export class CompanyRepository implements ICompanyRepository {
 
     if ('companiesGroupIds' in query) {
       (where.AND as any).push({
-        companiesToClinicAvailable: { some: { companyId: { in: query.companiesGroupIds } } },
+        ...(query.isClinic && { companiesToClinicAvailable: { some: { companyId: { in: query.companiesGroupIds } } } }),
+        ...(!query.isClinic && { group: { companyGroup: { id: { in: query.companiesGroupIds } } } }),
       } as typeof options.where);
     }
 
@@ -863,13 +879,28 @@ export class CompanyRepository implements ICompanyRepository {
     return new CompanyEntity(data);
   }
 
-  async findDocumentData(companyId: string, workspaceId?: string) {
+  async findDocumentData(companyId: string, options?: { workspaceId?: string; type?: DocumentTypeEnum }) {
+    const workspaceId = options?.workspaceId;
+    const type = options?.type;
+
     let company = (await this.prisma.company.findUnique({
       where: { id: companyId },
       include: {
+        ...(workspaceId &&
+          type && {
+            documentData: {
+              where: { workspaceId, type },
+              include: {
+                professionalsSignatures: {
+                  include: { professional: { include: { professional: true } } },
+                },
+              },
+            },
+          }),
         primary_activity: true,
         address: true,
         covers: true,
+        riskFactorGroupData: { select: { id: true } },
         receivingServiceContracts: {
           include: {
             applyingServiceCompany: {

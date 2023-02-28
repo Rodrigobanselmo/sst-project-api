@@ -1,14 +1,15 @@
-import { StatusEnum } from '@prisma/client';
+import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
+import { DocumentTypeEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import { IsBoolean, IsDate, IsEnum, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
-import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
+import { ToBoolean } from '../../../shared/decorators/boolean.decorator';
 import { StringCapitalizeTransform } from '../../../shared/transformers/string-capitalize';
 import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
 
-export class UpsertDocumentPCMSODto {
+export class UpsertDocumentDataDto {
   @IsString()
   @IsOptional()
   id?: string;
@@ -16,7 +17,7 @@ export class UpsertDocumentPCMSODto {
   @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
   @IsOptional()
   @IsString()
-  name: string;
+  name?: string;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsOptional()
@@ -28,33 +29,38 @@ export class UpsertDocumentPCMSODto {
 
   @IsOptional()
   @IsString()
+  @IsEnum(DocumentTypeEnum, {
+    message: `type must be one of: ${KeysOfEnum(DocumentTypeEnum)}`,
+  })
+  type: DocumentTypeEnum;
+
+  @IsOptional()
+  @IsString()
   companyId: string;
 
   @Transform(StringCapitalizeTransform, { toClassOnly: true })
   @IsOptional()
   @IsString()
-  elaboratedBy: string;
+  elaboratedBy?: string;
 
   @Transform(StringCapitalizeTransform, { toClassOnly: true })
   @IsOptional()
   @IsString()
-  approvedBy: string;
+  approvedBy?: string;
 
   @Transform(StringCapitalizeTransform, { toClassOnly: true })
   @IsOptional()
   @IsString()
-  revisionBy: string;
+  revisionBy?: string;
 
   @Transform(StringCapitalizeTransform, { toClassOnly: true })
   @IsOptional()
   @IsString()
-  coordinatorBy: string;
+  coordinatorBy?: string;
 
-  @IsOptional()
   @IsString()
-  workspaceId?: string;
+  workspaceId: string;
 
-  // @Transform(DateFormat, { toClassOnly: true })
   @IsOptional()
   @IsDate()
   @Type(() => Date)
@@ -65,39 +71,16 @@ export class UpsertDocumentPCMSODto {
   @Type(() => Date)
   validityStart?: Date;
 
-  // @ValidateNested({ each: true })
-  // @IsOptional()
-  // @Type(() => UsersToRiskDataGroupDto)
-  // users?: UsersToRiskDataGroupDto[];
-
   @ValidateNested({ each: true })
   @IsOptional()
-  @Type(() => ProfessionalDocumentPCMSODto)
-  professionals?: ProfessionalDocumentPCMSODto[];
+  @Type(() => ProfessionalDocumentDataDto)
+  professionals?: ProfessionalDocumentDataDto[];
 }
 
-// export class UsersToRiskDataGroupDto {
-//   @IsOptional()
-//   @IsString()
-//   riskFactorGroupDataId: string;
-
-//   @IsInt()
-//   userId: number;
-
-//   @IsBoolean()
-// @ToBoolean()
-//   @IsOptional()
-//   isSigner: boolean;
-
-//   @IsBoolean()
-// @ToBoolean()
-//   @IsOptional()
-//   isElaborator: boolean;
-// }
-export class ProfessionalDocumentPCMSODto {
+export class ProfessionalDocumentDataDto {
   @IsOptional()
   @IsString()
-  documentPCMSOId: string;
+  documentDataId: string;
 
   @IsInt()
   professionalId: number;
@@ -111,4 +94,19 @@ export class ProfessionalDocumentPCMSODto {
   @ToBoolean()
   @IsOptional()
   isElaborator: boolean;
+}
+
+export class FindOneDocumentDataDto extends PaginationQueryDto {
+  @IsString()
+  @IsEnum(DocumentTypeEnum, {
+    message: `type must be one of: ${KeysOfEnum(DocumentTypeEnum)}`,
+  })
+  type: DocumentTypeEnum;
+
+  @IsString()
+  workspaceId: string;
+
+  @IsOptional()
+  @IsString()
+  companyId: string;
 }

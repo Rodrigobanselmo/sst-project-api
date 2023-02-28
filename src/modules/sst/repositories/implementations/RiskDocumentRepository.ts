@@ -2,7 +2,7 @@ import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
 import { prismaFilter } from '../../../../shared/utils/filters/prisma.filters';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, DocumentTypeEnum } from '@prisma/client';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { UpsertRiskDocumentDto } from '../../dto/risk-document.dto';
@@ -15,7 +15,7 @@ export class RiskDocumentRepository {
   async upsert({ companyId, attachments, ...createDto }: UpsertRiskDocumentDto): Promise<RiskDocumentEntity> {
     const riskFactorDocEntity = await this.prisma.riskFactorDocument.upsert({
       create: {
-        companyId,
+        ...createDto,
         attachments: attachments
           ? {
               create: attachments.map((attachment) => ({
@@ -23,7 +23,7 @@ export class RiskDocumentRepository {
               })),
             }
           : undefined,
-        ...createDto,
+        companyId,
       },
       update: {
         ...createDto,
@@ -42,24 +42,17 @@ export class RiskDocumentRepository {
     return new RiskDocumentEntity(riskFactorDocEntity);
   }
 
-  async findByRiskGroupAndCompany(riskGroupId: string, companyId: string) {
+  async findByRiskGroupAndCompany(documentDataId: string, companyId: string) {
     const riskDocumentEntity = await this.prisma.riskFactorDocument.findMany({
-      where: { companyId, riskGroupId },
+      where: { companyId, documentDataId },
     });
 
     return riskDocumentEntity.map((data) => new RiskDocumentEntity(data));
   }
 
-  async findDocumentData(
-    riskGroupId: string,
-    companyId: string,
-    options: {
-      isPGR?: boolean;
-      isPCMSO?: boolean;
-    },
-  ) {
+  async findDocumentData(documentDataId: string, companyId: string, type: DocumentTypeEnum) {
     const riskDocumentEntity = await this.prisma.riskFactorDocument.findMany({
-      where: { companyId, riskGroupId, version: { endsWith: '.0.0' }, ...(options?.isPGR && { pcmsoId: null }), ...(options?.isPCMSO && { pcmsoId: { not: null } }) },
+      where: { companyId, documentDataId, version: { endsWith: '.0.0' }, documentData: { type } },
     });
 
     return riskDocumentEntity.map((data) => new RiskDocumentEntity(data));
@@ -73,7 +66,7 @@ export class RiskDocumentRepository {
 
     const { where } = prismaFilter(whereInit, {
       query,
-      skip: ['search', 'isPCMSO', 'isPGR'],
+      skip: ['search', 'type'],
     });
 
     if ('search' in query) {
@@ -82,15 +75,9 @@ export class RiskDocumentRepository {
       } as typeof options.where);
     }
 
-    if ('isPCMSO' in query) {
+    if ('type' in query) {
       (where.AND as any).push({
-        pcmsoId: { not: null },
-      } as typeof options.where);
-    }
-
-    if ('isPGR' in query) {
-      (where.AND as any).push({
-        riskGroupId: { not: null },
+        documentData: { type: query.type },
       } as typeof options.where);
     }
 

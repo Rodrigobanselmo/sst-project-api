@@ -1,6 +1,6 @@
 import { Paragraph, Table } from 'docx';
 
-import { ISectionChildrenType, PGRSectionChildrenTypeEnum } from '../../../../../../builders/pgr/types/elements.types';
+import { ISectionChildrenType, DocumentSectionChildrenTypeEnum } from '../../../../../../builders/pgr/types/elements.types';
 import { IDocVariables } from '../../../../../../builders/pgr/types/section.types';
 import { healthSeverityAciTable } from '../tables/healthSeverityATable';
 import { healthSeverityBioTable } from '../tables/healthSeverityBTable';
@@ -10,44 +10,44 @@ import { healthSeverityFisQuiTable } from '../tables/healthSeverityFQTable';
 export const healthEffectTable = (convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[]) => {
   const table1 = convertToDocx([
     {
-      type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE,
+      type: DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE,
       text: 'Grau de Efeito à Saúde dos Fatores de Risco Químicos & Físicos – (Severidade)',
     },
     {
-      type: PGRSectionChildrenTypeEnum.LEGEND,
+      type: DocumentSectionChildrenTypeEnum.LEGEND,
       text: '**Fonte:** [AIHA – A Strategy for Assessing and Managing Occupational Exposures, 2015]; [JMV GOBAL - Adaptado:  NR 03 - Embargo e Interdição; NRB 31000/2018; NBR 31010/2012; NBR 12100/2014; ISO 45001/2018; NBR 14153/2014; SCIS DNV; HRN;]',
     },
   ]);
 
   const table2 = convertToDocx([
     {
-      type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE,
+      type: DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE,
       text: 'Grau de Efeito à Saúde dos Fatores de Risco Biológicos – (Severidade)',
     },
     {
-      type: PGRSectionChildrenTypeEnum.LEGEND,
+      type: DocumentSectionChildrenTypeEnum.LEGEND,
       text: '**Fonte:** [AIHA – A Strategy for Assessing and Managing Occupational Exposures, 2015]; [JMVGLOBAL - Biológicos]',
     },
   ]);
 
   const table3 = convertToDocx([
     {
-      type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE,
+      type: DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE,
       text: 'Grau de Efeito à Saúde dos Fatores de Risco Ergonômicos (Severidade)',
     },
     {
-      type: PGRSectionChildrenTypeEnum.LEGEND,
+      type: DocumentSectionChildrenTypeEnum.LEGEND,
       text: '**Fonte:** [JMV GLOBAL Ergonômicos]',
     },
   ]);
 
   const table4 = convertToDocx([
     {
-      type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE,
+      type: DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE,
       text: 'Grau de Efeito à Saúde dos Fatores de Risco Acidentes (Severidade)',
     },
     {
-      type: PGRSectionChildrenTypeEnum.LEGEND,
+      type: DocumentSectionChildrenTypeEnum.LEGEND,
       text: '**Fonte:** [JMV Global – Acidentes]	',
     },
   ]);

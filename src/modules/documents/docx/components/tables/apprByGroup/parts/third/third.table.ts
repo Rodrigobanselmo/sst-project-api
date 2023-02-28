@@ -7,7 +7,7 @@ import { TableHeaderElements } from '../../elements/header';
 import { thirdRiskInventoryColumnsHeader, thirdRiskInventoryHeader } from './third.constant';
 import { dataConverter } from './third.converter';
 
-export const thirdRiskInventoryTableSection = (riskFactorGroupData: RiskFactorGroupDataEntity, hierarchyData: HierarchyMapData, hierarchyTree: IHierarchyMap) => {
+export const thirdRiskInventoryTableSection = (riskFactorGroupData: any, hierarchyData: HierarchyMapData, hierarchyTree: IHierarchyMap) => {
   const data = dataConverter(riskFactorGroupData, hierarchyData, hierarchyTree);
 
   const tableHeaderElements = new TableHeaderElements();

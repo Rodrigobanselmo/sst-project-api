@@ -85,6 +85,7 @@ import { FindCnpjService } from './services/company/find-cnpj/find-cnpj.service'
 import { FindClinicService } from './services/company/find-one-clinic/find-clinic.service';
 import { FindCompanyService } from './services/company/find-one-company/find-company.service';
 import { SetCompanyClinicsService } from './services/company/set-company-clinics/set-company-clinics.service';
+import { UpdateApplyServiceCompanyService } from './services/company/update-apply-service-company/update-apply-service-company.service';
 import { UpdateCompanyService } from './services/company/update-company/update-company.service';
 import { CreateContactsService } from './services/contact/create-contact/create-contact.service';
 import { DeleteContactsService } from './services/contact/delete-contact/delete-contact.service';
@@ -309,6 +310,7 @@ import { UpdateScheduleBlocksService } from './services/scheduleBlock/update-sch
     SendAlertService,
     FindAlertsByTimeService,
     AlertReportCron,
+    UpdateApplyServiceCompanyService,
   ],
   exports: [
     CompanyRepository,

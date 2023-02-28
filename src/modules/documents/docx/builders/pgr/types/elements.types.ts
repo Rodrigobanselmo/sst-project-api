@@ -1,6 +1,6 @@
 import { AlignmentType, IParagraphOptions } from 'docx';
 
-export enum PGRSectionChildrenTypeEnum {
+export enum DocumentSectionChildrenTypeEnum {
   TITLE = 'TITLE',
   H1 = 'H1',
   H2 = 'H2',
@@ -13,6 +13,13 @@ export enum PGRSectionChildrenTypeEnum {
   BULLET = 'BULLET',
   BULLET_SPACE = 'BULLET_SPACE',
   TABLE_VERSION_CONTROL = 'TABLE_VERSION_CONTROL',
+  ATTACHMENTS = 'ATTACHMENTS',
+  PARAGRAPH_TABLE = 'PARAGRAPH_TABLE',
+  LEGEND = 'LEGEND',
+  PROFESSIONAL = 'PROFESSIONAL',
+  PROFESSIONALS_SIGNATURES = 'PROFESSIONALS_SIGNATURES',
+  PARAGRAPH_FIGURE = 'PARAGRAPH_FIGURE',
+
   ITERABLE_ENVIRONMENTS_ADM = 'ITERABLE_ENVIRONMENTS',
   ITERABLE_ENVIRONMENTS_OP = 'ITERABLE_ENVIRONMENTS_OP',
   ITERABLE_ENVIRONMENTS_SUP = 'ITERABLE_ENVIRONMENTS_SUP',
@@ -45,13 +52,8 @@ export enum PGRSectionChildrenTypeEnum {
 
   HIERARCHY_RISK_TABLE = 'HIERARCHY_RISK_TABLE',
   RISK_TABLE = 'RISK_TABLE',
-  PARAGRAPH_TABLE = 'PARAGRAPH_TABLE',
-  LEGEND = 'LEGEND',
   MEASURE_IMAGE = 'MEASURE_IMAGE',
   RS_IMAGE = 'RS_IMAGE',
-  PARAGRAPH_FIGURE = 'PARAGRAPH_FIGURE',
-  PROFESSIONAL = 'PROFESSIONAL',
-  PROFESSIONALS_SIGNATURES = 'PROFESSIONALS_SIGNATURES',
   COMPLEMENTARY_DOCS = 'COMPLEMENTARY_DOCS',
   COMPLEMENTARY_SYSTEMS = 'COMPLEMENTARY_SYSTEMS',
   HEALTH_EFFECT_TABLES = 'HEALTH_EFFECT_TABLES',
@@ -62,7 +64,6 @@ export enum PGRSectionChildrenTypeEnum {
   MATRIX_TABLES = 'MATRIX_TABLES',
   APR_TABLE = 'APR_TABLE',
   PLAN_TABLE = 'PLAN_TABLE',
-  ATTACHMENTS = 'ATTACHMENTS',
 }
 
 interface IBase {
@@ -72,55 +73,18 @@ interface IBase {
   addWithAllVars?: string[];
 }
 
+export const optionsBulletLevel: Array<0 | 1 | 2 | 3 | 4 | 5 | 6> = [0, 1, 2, 3, 4, 5, 6];
+type OptionsLevel = typeof optionsBulletLevel[number];
+
 export type IBullet = Omit<IParagraphOptions, 'text'> & {
-  type: PGRSectionChildrenTypeEnum.BULLET;
-  level?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+  type: DocumentSectionChildrenTypeEnum.BULLET;
   text: string;
+  level?: OptionsLevel;
   size?: number;
 } & IBase;
 
-export type IBulletSpace = {
-  type: PGRSectionChildrenTypeEnum.BULLET_SPACE;
-  text: string;
-} & IBase;
-
-export type IH1 = {
-  type: PGRSectionChildrenTypeEnum.H1;
-  text: string;
-} & IBase;
-
-export type IH2 = {
-  type: PGRSectionChildrenTypeEnum.H2;
-  text: string;
-} & IBase;
-
-export type IH3 = {
-  type: PGRSectionChildrenTypeEnum.H3;
-  text: string;
-} & IBase;
-
-export type IH4 = {
-  type: PGRSectionChildrenTypeEnum.H4;
-  text: string;
-} & IBase;
-
-export type IH5 = {
-  text: string;
-  type: PGRSectionChildrenTypeEnum.H5;
-} & IBase;
-
-export type IH6 = {
-  type: PGRSectionChildrenTypeEnum.H6;
-  text: string;
-} & IBase;
-
-export type ITitle = {
-  type: PGRSectionChildrenTypeEnum.TITLE;
-  text: string;
-} & IBase;
-
 export type IParagraph = Omit<IParagraphOptions, 'text'> & {
-  type: PGRSectionChildrenTypeEnum.PARAGRAPH;
+  type: DocumentSectionChildrenTypeEnum.PARAGRAPH;
   text: string;
   size?: number;
   color?: string;
@@ -128,203 +92,243 @@ export type IParagraph = Omit<IParagraphOptions, 'text'> & {
 } & IBase;
 
 export type ILegend = Omit<IParagraphOptions, 'text'> & {
-  type: PGRSectionChildrenTypeEnum.LEGEND;
+  type: DocumentSectionChildrenTypeEnum.LEGEND;
   text: string;
   color?: string;
   size?: number;
   align?: AlignmentType;
 } & IBase;
 
+export type IBulletSpace = {
+  type: DocumentSectionChildrenTypeEnum.BULLET_SPACE;
+  text: string;
+} & IBase;
+
+export type IH1 = {
+  type: DocumentSectionChildrenTypeEnum.H1;
+  text: string;
+} & IBase;
+
+export type IH2 = {
+  type: DocumentSectionChildrenTypeEnum.H2;
+  text: string;
+} & IBase;
+
+export type IH3 = {
+  type: DocumentSectionChildrenTypeEnum.H3;
+  text: string;
+} & IBase;
+
+export type IH4 = {
+  type: DocumentSectionChildrenTypeEnum.H4;
+  text: string;
+} & IBase;
+
+export type IH5 = {
+  text: string;
+  type: DocumentSectionChildrenTypeEnum.H5;
+} & IBase;
+
+export type IH6 = {
+  type: DocumentSectionChildrenTypeEnum.H6;
+  text: string;
+} & IBase;
+
+export type ITitle = {
+  type: DocumentSectionChildrenTypeEnum.TITLE;
+  text: string;
+} & IBase;
+
 export type IParagraphTable = Omit<IParagraph, 'type'> & {
-  type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE;
+  type: DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE;
 } & IBase;
 
 export type IParagraphFigure = Omit<IParagraph, 'type'> & {
-  type: PGRSectionChildrenTypeEnum.PARAGRAPH_FIGURE;
+  type: DocumentSectionChildrenTypeEnum.PARAGRAPH_FIGURE;
 } & IBase;
 
 export type IBreak = {
-  type: PGRSectionChildrenTypeEnum.BREAK;
+  type: DocumentSectionChildrenTypeEnum.BREAK;
 } & IBase;
 
 export type ITableVersionControl = {
-  type: PGRSectionChildrenTypeEnum.TABLE_VERSION_CONTROL;
+  type: DocumentSectionChildrenTypeEnum.TABLE_VERSION_CONTROL;
 } & IBase;
 
 export type IEnvironmentsAdm = {
-  type: PGRSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS_ADM;
+  type: DocumentSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS_ADM;
 } & IBase;
 
 export type IEnvironmentsGeneral = {
-  type: PGRSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS_GENERAL;
+  type: DocumentSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS_GENERAL;
 } & IBase;
 
 export type IEnvironmentsOp = {
-  type: PGRSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS_OP;
+  type: DocumentSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS_OP;
 } & IBase;
 
 export type IEnvironmentsSup = {
-  type: PGRSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS_SUP;
+  type: DocumentSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS_SUP;
 } & IBase;
 
 export type ICharacterizationEquip = {
-  type: PGRSectionChildrenTypeEnum.ITERABLE_CHARACTERIZATION_EQUIP;
+  type: DocumentSectionChildrenTypeEnum.ITERABLE_CHARACTERIZATION_EQUIP;
 } & IBase;
 
 export type ICharacterizationActivity = {
-  type: PGRSectionChildrenTypeEnum.ITERABLE_CHARACTERIZATION_ACTIVIT;
+  type: DocumentSectionChildrenTypeEnum.ITERABLE_CHARACTERIZATION_ACTIVIT;
 } & IBase;
 
 export type ICharacterizationWork = {
-  type: PGRSectionChildrenTypeEnum.ITERABLE_CHARACTERIZATION_WORKSTATION;
+  type: DocumentSectionChildrenTypeEnum.ITERABLE_CHARACTERIZATION_WORKSTATION;
 } & IBase;
 
 export type IProfessional = {
-  type: PGRSectionChildrenTypeEnum.PROFESSIONAL;
+  type: DocumentSectionChildrenTypeEnum.PROFESSIONAL;
 } & IBase;
 
 export type IProfessionalSignature = {
-  type: PGRSectionChildrenTypeEnum.PROFESSIONALS_SIGNATURES;
+  type: DocumentSectionChildrenTypeEnum.PROFESSIONALS_SIGNATURES;
 } & IBase;
 
 export type IComplementaryDocs = {
-  type: PGRSectionChildrenTypeEnum.COMPLEMENTARY_DOCS;
+  type: DocumentSectionChildrenTypeEnum.COMPLEMENTARY_DOCS;
 } & IBase;
 
 export type IComplementarySystems = {
-  type: PGRSectionChildrenTypeEnum.COMPLEMENTARY_SYSTEMS;
+  type: DocumentSectionChildrenTypeEnum.COMPLEMENTARY_SYSTEMS;
 } & IBase;
 
 export type IHealthEffectTable = {
-  type: PGRSectionChildrenTypeEnum.HEALTH_EFFECT_TABLES;
+  type: DocumentSectionChildrenTypeEnum.HEALTH_EFFECT_TABLES;
 } & IBase;
 
 export type IExpositionTable = {
-  type: PGRSectionChildrenTypeEnum.EXPOSITION_DEGREE_TABLES;
+  type: DocumentSectionChildrenTypeEnum.EXPOSITION_DEGREE_TABLES;
 } & IBase;
 
 export type IGseTable = {
-  type: PGRSectionChildrenTypeEnum.TABLE_GSE;
+  type: DocumentSectionChildrenTypeEnum.TABLE_GSE;
 } & IBase;
 
 export type IGseEnvTable = {
-  type: PGRSectionChildrenTypeEnum.TABLE_HIERARCHY_ENV;
+  type: DocumentSectionChildrenTypeEnum.TABLE_HIERARCHY_ENV;
 } & IBase;
 
 export type IGseCharTable = {
-  type: PGRSectionChildrenTypeEnum.TABLE_HIERARCHY_CHAR;
+  type: DocumentSectionChildrenTypeEnum.TABLE_HIERARCHY_CHAR;
 } & IBase;
 
 export type IMatrix = {
-  type: PGRSectionChildrenTypeEnum.MATRIX_TABLES;
+  type: DocumentSectionChildrenTypeEnum.MATRIX_TABLES;
 } & IBase;
 
 export type IQuantityTable = {
-  type: PGRSectionChildrenTypeEnum.QUANTITY_RESULTS_TABLES;
+  type: DocumentSectionChildrenTypeEnum.QUANTITY_RESULTS_TABLES;
 } & IBase;
 
 export type IConsiderationsQuantityTable = {
-  type: PGRSectionChildrenTypeEnum.QUANTITY_CONSIDERATION_TABLES;
+  type: DocumentSectionChildrenTypeEnum.QUANTITY_CONSIDERATION_TABLES;
 } & IBase;
 
 export type IMeasureImage = {
-  type: PGRSectionChildrenTypeEnum.MEASURE_IMAGE;
+  type: DocumentSectionChildrenTypeEnum.MEASURE_IMAGE;
 } & IBase;
 
 export type IRSImage = {
-  type: PGRSectionChildrenTypeEnum.RS_IMAGE;
+  type: DocumentSectionChildrenTypeEnum.RS_IMAGE;
 } & IBase;
 
 export type IHierarchyTable = {
-  type: PGRSectionChildrenTypeEnum.HIERARCHY_ORG_TABLE;
+  type: DocumentSectionChildrenTypeEnum.HIERARCHY_ORG_TABLE;
 } & IBase;
 
 export type IHierarchyRiskTable = {
-  type: PGRSectionChildrenTypeEnum.HIERARCHY_RISK_TABLE;
+  type: DocumentSectionChildrenTypeEnum.HIERARCHY_RISK_TABLE;
 } & IBase;
 
 export type IRiskTable = {
-  type: PGRSectionChildrenTypeEnum.RISK_TABLE;
+  type: DocumentSectionChildrenTypeEnum.RISK_TABLE;
 } & IBase;
 
 export type IPrioritization = {
-  type: PGRSectionChildrenTypeEnum.TABLE_PRIORITIZATION;
+  type: DocumentSectionChildrenTypeEnum.TABLE_PRIORITIZATION;
 } & IBase;
 
 export type IPrioritizationH = {
-  type: PGRSectionChildrenTypeEnum.TABLE_PRIORITIZATION_HIERARCHY;
+  type: DocumentSectionChildrenTypeEnum.TABLE_PRIORITIZATION_HIERARCHY;
 } & IBase;
 
 export type IPrioritizationE = {
-  type: PGRSectionChildrenTypeEnum.TABLE_PRIORITIZATION_ENV;
+  type: DocumentSectionChildrenTypeEnum.TABLE_PRIORITIZATION_ENV;
 } & IBase;
 
 export type IPrioritizationC = {
-  type: PGRSectionChildrenTypeEnum.TABLE_PRIORITIZATION_CHAR;
+  type: DocumentSectionChildrenTypeEnum.TABLE_PRIORITIZATION_CHAR;
 } & IBase;
 
 export type IQuantityNoise = {
-  type: PGRSectionChildrenTypeEnum.TABLE_QUANTITY_NOISE;
+  type: DocumentSectionChildrenTypeEnum.TABLE_QUANTITY_NOISE;
 } & IBase;
 
 export type IQuantityQui = {
-  type: PGRSectionChildrenTypeEnum.TABLE_QUANTITY_QUI;
+  type: DocumentSectionChildrenTypeEnum.TABLE_QUANTITY_QUI;
 } & IBase;
 
 export type IQuantityHeat = {
-  type: PGRSectionChildrenTypeEnum.TABLE_QUANTITY_HEAT;
+  type: DocumentSectionChildrenTypeEnum.TABLE_QUANTITY_HEAT;
 } & IBase;
 
 export type IQuantityVFB = {
-  type: PGRSectionChildrenTypeEnum.TABLE_QUANTITY_VFB;
+  type: DocumentSectionChildrenTypeEnum.TABLE_QUANTITY_VFB;
 } & IBase;
 
 export type IQuantityVL = {
-  type: PGRSectionChildrenTypeEnum.TABLE_QUANTITY_VL;
+  type: DocumentSectionChildrenTypeEnum.TABLE_QUANTITY_VL;
 } & IBase;
 
 export type IQuantityRad = {
-  type: PGRSectionChildrenTypeEnum.TABLE_QUANTITY_RAD;
+  type: DocumentSectionChildrenTypeEnum.TABLE_QUANTITY_RAD;
 } & IBase;
 
 export type IRecommendations = {
-  type: PGRSectionChildrenTypeEnum.ITERABLE_RECOMMENDATIONS;
+  type: DocumentSectionChildrenTypeEnum.ITERABLE_RECOMMENDATIONS;
 } & IBase;
 
 export type IEmergency = {
-  type: PGRSectionChildrenTypeEnum.ITERABLE_EMERGENCY_RISKS;
+  type: DocumentSectionChildrenTypeEnum.ITERABLE_EMERGENCY_RISKS;
 } & IBase;
 
 export type IApr = {
-  type: PGRSectionChildrenTypeEnum.APR_TABLE;
+  type: DocumentSectionChildrenTypeEnum.APR_TABLE;
 } & IBase;
 
 export type IPlan = {
-  type: PGRSectionChildrenTypeEnum.PLAN_TABLE;
+  type: DocumentSectionChildrenTypeEnum.PLAN_TABLE;
 } & IBase;
 
 export type IAttachments = {
-  type: PGRSectionChildrenTypeEnum.ATTACHMENTS;
+  type: DocumentSectionChildrenTypeEnum.ATTACHMENTS;
 } & IBase;
 
 export type IIterableFis = {
-  type: PGRSectionChildrenTypeEnum.ITERABLE_QUALITY_FIS;
+  type: DocumentSectionChildrenTypeEnum.ITERABLE_QUALITY_FIS;
 } & IBase;
 
 export type IIterableQui = {
-  type: PGRSectionChildrenTypeEnum.ITERABLE_QUALITY_QUI;
+  type: DocumentSectionChildrenTypeEnum.ITERABLE_QUALITY_QUI;
 } & IBase;
 
 export type IIterableBio = {
-  type: PGRSectionChildrenTypeEnum.ITERABLE_QUALITY_BIO;
+  type: DocumentSectionChildrenTypeEnum.ITERABLE_QUALITY_BIO;
 } & IBase;
 
 export type IIterableErg = {
-  type: PGRSectionChildrenTypeEnum.ITERABLE_QUALITY_ERG;
+  type: DocumentSectionChildrenTypeEnum.ITERABLE_QUALITY_ERG;
 } & IBase;
 
 export type IIterableArc = {
-  type: PGRSectionChildrenTypeEnum.ITERABLE_QUALITY_ACI;
+  type: DocumentSectionChildrenTypeEnum.ITERABLE_QUALITY_ACI;
 } & IBase;
 
 export type ISectionChildrenType =

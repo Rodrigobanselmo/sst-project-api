@@ -400,6 +400,14 @@ export class UpdateCompanyDto {
   paymentType?: CompanyPaymentTypeEnum;
 }
 
+export class UpdateApplyServiceCompanyDto {
+  @IsString()
+  companyId: string;
+
+  @IsString({ each: true })
+  applyServiceIds?: string[];
+}
+
 export class FindCompaniesDto extends PaginationQueryDto {
   // @Transform(StringNormalizeTransform, { toClassOnly: true })
   @IsString()

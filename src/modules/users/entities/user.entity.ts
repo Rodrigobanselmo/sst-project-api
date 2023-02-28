@@ -2,7 +2,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import { ProfessionalTypeEnum } from '@prisma/client';
 import { Exclude } from 'class-transformer';
 
-import { UsersRiskGroupEntity } from '../../sst/entities/usersRiskGroup';
 import { ProfessionalEntity } from './professional.entity';
 import { UserCompanyEntity } from './userCompany.entity';
 import { User } from '.prisma/client';
@@ -45,8 +44,6 @@ export class UserEntity implements User {
   councilId: string;
   type: ProfessionalTypeEnum;
   professional?: ProfessionalEntity;
-  userPgrSignature?: UsersRiskGroupEntity;
-  usersPgrSignatures?: UsersRiskGroupEntity[];
   councils?: ProfessionalCouncilEntity[];
 
   constructor(partial: Partial<UserEntity>) {

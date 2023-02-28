@@ -1,55 +1,55 @@
 import { VariablesPGREnum } from '../enums/variables.enum';
-import { PGRSectionChildrenTypeEnum } from '../types/elements.types';
-import { IDocumentPGRSectionGroup, PGRSectionTypeEnum } from '../types/section.types';
+import { DocumentSectionChildrenTypeEnum } from '../types/elements.types';
+import { IDocumentPGRSectionGroup, DocumentSectionTypeEnum } from '../types/section.types';
 
 export const environmentSection: IDocumentPGRSectionGroup = {
   footer: true,
   header: true,
   data: [
     {
-      type: PGRSectionTypeEnum.CHAPTER,
+      type: DocumentSectionTypeEnum.CHAPTER,
       text: `??${VariablesPGREnum.CHAPTER_2}??`,
     },
     {
-      type: PGRSectionTypeEnum.SECTION,
+      type: DocumentSectionTypeEnum.SECTION,
       footerText: `??${VariablesPGREnum.CHAPTER_2}??`,
       children: [
         {
-          type: PGRSectionChildrenTypeEnum.TITLE,
+          type: DocumentSectionChildrenTypeEnum.TITLE,
           text: `??${VariablesPGREnum.CHAPTER_2}?? (NR-01 ‘itens’ 1.5.4.2 e 1.5.4.3)`,
         },
         {
-          type: PGRSectionChildrenTypeEnum.H1,
+          type: DocumentSectionChildrenTypeEnum.H1,
           text: 'CARACTERIZAÇÃO DOS PROCESSOS E AMBIENTES DE TRABALHO (NR-01 ‘itens’ 1.5.4.2 e 1.5.7.3.2 alínea a)',
         },
         {
-          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
           text: `A caracterização dos ambientes de trabalho é uma ferramenta importante na graduação do Risco Ocupacional dos empregados, pois fornece uma visão geral dos processos, dos riscos presentes e das fontes geradoras desses riscos. Através da análise de fluxogramas, layouts, diagramas e da própria descrição de cada processo de trabalho, podemos identificar oportunidades de implantação de medidas de controle capazes de minimizar ou até mesmo eliminar os riscos de exposição para os trabalhadores. Os ambientes de trabalho são classificados nas categorias a seguir:`,
         },
         {
-          type: PGRSectionChildrenTypeEnum.BULLET,
+          type: DocumentSectionChildrenTypeEnum.BULLET,
           text: '**Ambientes Gerais:** Nos ambientes considerados gerais são aqueles que não possuem uma destinação específica e certamente são isentos de riscos próprios, envolve áreas comuns de circulação e normalmente sem restrição de acesso ao público, tais como: Fachada da empresa, Roll de entrada, ambientes de espera, pátios, áreas de recreação, etc.',
         },
         {
-          type: PGRSectionChildrenTypeEnum.BULLET,
+          type: DocumentSectionChildrenTypeEnum.BULLET,
           text: '**Ambientes Administrativos:** Nos ambientes administrativos são executadas atividades diversas sem relação direta com o processo produtivo e pouco relacionadas com riscos físicos, químicos e biológicos, mas é possível encontrar alguns fatores de riscos ergonômicos e até mesmo de acidentes, no entanto de baixa severidade.',
         },
         {
-          type: PGRSectionChildrenTypeEnum.BULLET,
+          type: DocumentSectionChildrenTypeEnum.BULLET,
           text: '**Ambientes de Apoio:** Nos ambientes de apoio são executadas atividades que dão suporte às atividades operacionais da empresa, normalmente envolvem Fatores de Riscos e Perigos característicos ao que é executado nos seus postos de trabalho gerando exposições primárias, são exemplos os seguintes ambientes: Oficinas diversa, laboratórios, estações de tratamento (efluentes), pátios de resíduos, etc.',
         },
         {
-          type: PGRSectionChildrenTypeEnum.BULLET,
+          type: DocumentSectionChildrenTypeEnum.BULLET,
           text: '**Ambientes Operacionais:** Nos ambientes operacionais são executadas atividades que resultam no produto ou serviço fim da empresa, ou seja, onde ocorre o processo produtivo, normalmente são os ambientes de maior concentração de Fatores de Riscos e Perigos envolvendo quase sempre exposições primárias e secundárias.',
         },
         {
-          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
           text: `A seguir é apresentada uma relação dos diversos ambientes que compreendem a **??${VariablesPGREnum.COMPANY_SHORT_NAME}??** com suas respectivas atribuições e descrição dos seus respectivos processos produtivos.`,
         },
       ],
     },
     {
-      type: PGRSectionTypeEnum.ITERABLE_ENVIRONMENTS,
+      type: DocumentSectionTypeEnum.ITERABLE_ENVIRONMENTS,
     },
     // {
     //   type: PGRSectionTypeEnum.SECTION,

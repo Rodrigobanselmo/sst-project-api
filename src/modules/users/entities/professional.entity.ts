@@ -1,4 +1,4 @@
-import { ProfessionalPCMSOEntity, ProfessionalRiskGroupEntity } from '../../sst/entities/usersRiskGroup';
+import { ProfessionalDocumentDataEntity } from '../../sst/entities/usersRiskGroup';
 import { Professional, ProfessionalTypeEnum, StatusEnum } from '@prisma/client';
 import { UserEntity } from './user.entity';
 import { InviteUsersEntity } from './invite-users.entity';
@@ -23,11 +23,9 @@ export class ProfessionalEntity implements Professional {
   invite: InviteUsersEntity;
   inviteId: string;
   councils?: ProfessionalCouncilEntity[];
-  professionalPgrSignature?: ProfessionalRiskGroupEntity;
-  professionalsPgrSignatures?: ProfessionalRiskGroupEntity[];
 
-  professionalPcmsoSignature?: ProfessionalPCMSOEntity;
-  professionalsPcmsoSignatures?: ProfessionalPCMSOEntity[];
+  professionalDocumentDataSignature?: ProfessionalDocumentDataEntity;
+  professionalsDocumentDataSignatures?: ProfessionalDocumentDataEntity[];
 
   professionalId?: number;
   professional?: Partial<ProfessionalEntity>;

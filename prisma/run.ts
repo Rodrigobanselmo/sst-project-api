@@ -80,9 +80,9 @@ async function main() {
     //   select: { code: true, name: true, uf: { select: { uf: true } } },
     // }),
 
-    await removeDuplicatesRisks(prisma); // run on simple
-    await setHomoWork(prisma); // run on simple
-    await fixHierarchyHomo(prisma); // run on simple
+    // await removeDuplicatesRisks(prisma); // run on simple
+    // await setHomoWork(prisma); // run on simple
+    // await fixHierarchyHomo(prisma); // run on simple
 
     console.info('end');
   } catch (err) {

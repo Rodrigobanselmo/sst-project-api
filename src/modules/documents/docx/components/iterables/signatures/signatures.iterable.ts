@@ -4,7 +4,7 @@ import { arrayChunks } from '../../../../../../shared/utils/arrayChunks';
 
 import { ProfessionalEntity } from '../../../../../users/entities/professional.entity';
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
-import { ISectionChildrenType, PGRSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
+import { ISectionChildrenType, DocumentSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
 import { UserEntity } from './../../../../../users/entities/user.entity';
 import { TableBodyElements } from './elements/body';
@@ -34,7 +34,7 @@ export const signaturesIterable = (
     return convertToDocx(
       [
         ...credentials.map<ISectionChildrenType>((credential) => ({
-          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
           text: credential,
           align: AlignmentType.CENTER,
           spacing: { after: 0, before: 0 },

@@ -1,7 +1,7 @@
 import { Paragraph, Table } from 'docx';
 
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
-import { ISectionChildrenType, PGRSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
+import { ISectionChildrenType, DocumentSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
 import { ComplementaryDocsConverter } from './complementaryDocs.converter';
 
@@ -12,7 +12,7 @@ export const complementaryDocsIterable = (
   if (!complementaryDocs?.length)
     return convertToDocx([
       {
-        type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+        type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
         text: `Não há documentos complementares na elaboração do PGR.`,
       },
     ]);
@@ -24,7 +24,7 @@ export const complementaryDocsIterable = (
       return convertToDocx(
         [
           {
-            type: PGRSectionChildrenTypeEnum.BULLET,
+            type: DocumentSectionChildrenTypeEnum.BULLET,
             text: `**??${VariablesPGREnum.DOCUMENT_COMPLEMENTARY_DOCS}??**`,
             level: 0,
           },

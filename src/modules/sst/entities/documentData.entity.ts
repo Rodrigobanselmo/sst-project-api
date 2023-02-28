@@ -5,10 +5,10 @@ import { dayjs } from '../../../shared/providers/DateProvider/implementations/Da
 import { CompanyEntity } from '../../company/entities/company.entity';
 import { ProfessionalEntity } from '../../users/entities/professional.entity';
 import { RiskFactorDataEntity } from './riskData.entity';
-import { ProfessionalPCMSOEntity } from './usersRiskGroup';
-import { DocumentPCMSO } from '.prisma/client';
+import { ProfessionalDocumentDataEntity } from './usersRiskGroup';
+import { DocumentData, DocumentTypeEnum, Prisma } from '.prisma/client';
 
-export class DocumentPCMSOEntity implements DocumentPCMSO {
+export class DocumentDataEntity implements DocumentData {
   @ApiProperty({ description: 'The id of the risk group data' })
   id: string;
 
@@ -35,56 +35,40 @@ export class DocumentPCMSOEntity implements DocumentPCMSO {
   @ApiProperty({
     description: 'The array with risks data',
   })
-  workspaceId?: string;
-  elaboratedBy: string | null;
-  approvedBy: string | null;
-  revisionBy: string | null;
-  documentDate: Date | null;
-  visitDate: Date | null;
-  validity: string;
+  workspaceId: string;
+
+  elaboratedBy: string;
   coordinatorBy: string;
-  validityEnd: Date;
+  revisionBy: string;
+  approvedBy: string;
+
+  validity: string;
   validityStart: Date;
+  validityEnd: Date;
+
+  type: DocumentTypeEnum;
+  json: Prisma.JsonValue;
 
   company?: Partial<CompanyEntity>;
   professionals?: ProfessionalEntity[];
-  professionalsSignatures?: ProfessionalPCMSOEntity[];
+  professionalsSignatures?: ProfessionalDocumentDataEntity[];
 
-  // users?: UserEntity[];
-  // usersSignatures?: UsersRiskGroupEntity[];
-  // company?: CompanyEntity;
-
-  constructor(partial: Partial<DocumentPCMSOEntity>) {
+  constructor(partial: Partial<DocumentDataEntity>) {
     Object.assign(this, partial);
 
     if (partial?.data) {
       this.data = partial.data.map((d) => new RiskFactorDataEntity(d));
     }
 
-    // if (!this.users) this.users = [];
-    // if (partial?.usersSignatures) {
-    //   this.usersSignatures = partial.usersSignatures.map(
-    //     (epiToRiskFactorData) => new UsersRiskGroupEntity(epiToRiskFactorData),
-    //   );
-
-    //   this.users = this.usersSignatures.map(
-    //     ({ user, ...epiToRiskFactorData }) =>
-    //       new UserEntity({
-    //         ...user,
-    //         userPgrSignature: epiToRiskFactorData,
-    //       }),
-    //   );
-    // }
-
     if (!this?.professionals) this.professionals = [];
     if (partial?.professionalsSignatures) {
-      this.professionalsSignatures = partial.professionalsSignatures.map((professionalSig) => new ProfessionalPCMSOEntity(professionalSig));
+      this.professionalsSignatures = partial.professionalsSignatures.map((professionalSig) => new ProfessionalDocumentDataEntity(professionalSig));
 
       this.professionals = this.professionalsSignatures.map(
         ({ professional, ...rest }) =>
           new ProfessionalEntity({
             ...professional,
-            professionalPcmsoSignature: rest,
+            professionalDocumentDataSignature: rest,
           }),
       );
     }

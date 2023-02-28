@@ -1,3 +1,5 @@
+import { DocumentDataEntity } from './../../../../../sst/entities/documentData.entity';
+import { DocumentDataPGRDto } from './../../../../../sst/dto/document-data-pgr.dto';
 import { PageOrientation, Table, WidthType } from 'docx';
 
 import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
@@ -7,7 +9,7 @@ import { actionPlanConverter } from './actionPlan.converter';
 import { TableBodyElements } from './elements/body';
 import { TableHeaderElements } from './elements/header';
 
-export const actionPlanTableSection = (riskFactorGroupData: RiskFactorGroupDataEntity, hierarchyTree: IHierarchyMap) => {
+export const actionPlanTableSection = (riskFactorGroupData: RiskFactorGroupDataEntity & DocumentDataEntity & DocumentDataPGRDto, hierarchyTree: IHierarchyMap) => {
   const actionPlanData = actionPlanConverter(riskFactorGroupData, hierarchyTree);
 
   const tableHeaderElements = new TableHeaderElements();

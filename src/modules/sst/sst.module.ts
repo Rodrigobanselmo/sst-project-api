@@ -1,4 +1,4 @@
-import { UpsertDocumentPCMSOService } from './services/documentPcmso/upsert-document-pcmso/upsert-document-pcmso.service';
+import { UpsertDocumentDataService } from './services/documentData/upsert-document-data/upsert-document-data.service';
 import { Module, forwardRef, CacheModule } from '@nestjs/common';
 import { DayJSProvider } from '../../shared/providers/DateProvider/implementations/DayJSProvider';
 
@@ -17,7 +17,7 @@ import { RiskDocInfoController } from './controller/risk-doc-info/risk-doc-info.
 import { RiskGroupDataController } from './controller/risk-group-data/risk-group-data.controller';
 import { RiskController } from './controller/risk/risk.controller';
 import { ChecklistRepository } from './repositories/implementations/ChecklistRepository';
-import { DocumentPCMSORepository } from './repositories/implementations/DocumentPCMSORepository';
+import { DocumentDataRepository } from './repositories/implementations/DocumentDataRepository';
 import { EpiRepository } from './repositories/implementations/EpiRepository';
 import { ExamRepository } from './repositories/implementations/ExamRepository';
 import { ExamRiskRepository } from './repositories/implementations/ExamRiskRepository';
@@ -76,8 +76,8 @@ import { FindAllAvailableRiskService } from './services/risk/find-all-available-
 import { FindRisksByCompanyService } from './services/risk/find-by-company/find-by-company.service';
 import { FindRiskService } from './services/risk/find/find.service';
 import { UpdateRiskService } from './services/risk/update-risk/update-risk.service';
-import { FindByIdDocumentPCMSOService } from './services/documentPcmso/find-by-id/find-by-id.service';
-import { DocumentPCMSOController } from './controller/document-pcmso/document-pcmso.controller';
+import { FindByIdDocumentDataService } from './services/documentData/find-by-id/find-by-id.service';
+import { DocumentDataController } from './controller/document-data/document-data.controller';
 import { UpdateProtocolsService } from './services/protocol/update-protocol/update-protocol.service';
 import { CreateProtocolsService } from './services/protocol/create-protocol/create-protocol.service';
 import { FindProtocolsService } from './services/protocol/find-protocol/find-protocol.service';
@@ -112,7 +112,7 @@ import { FindGenerateSourceService } from './services/generate-source/find-gener
     ExamToClinicController,
     ExamRiskController,
     RiskDocInfoController,
-    DocumentPCMSOController,
+    DocumentDataController,
     ProtocolController,
     ProtocolToRiskController,
   ],
@@ -177,9 +177,9 @@ import { FindGenerateSourceService } from './services/generate-source/find-gener
     CopyExamRiskService,
     CopyExamToClinicService,
     FindRiskService,
-    DocumentPCMSORepository,
-    UpsertDocumentPCMSOService,
-    FindByIdDocumentPCMSOService,
+    DocumentDataRepository,
+    UpsertDocumentDataService,
+    FindByIdDocumentDataService,
     UpdateProtocolsService,
     CreateProtocolsService,
     FindProtocolsService,

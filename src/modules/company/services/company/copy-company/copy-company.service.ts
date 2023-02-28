@@ -43,9 +43,7 @@ export class CopyCompanyService {
 
     const company = await this.companyRepository.findById(companyCopyFromId, {
       include: {
-        riskFactorGroupData: {
-          include: { usersSignatures: true, professionalsSignatures: true },
-        },
+        riskFactorGroupData: true,
       },
     });
 
@@ -86,35 +84,26 @@ export class CopyCompanyService {
 
     const newRiskGroupData = await this.riskGroupDataRepository.upsert({
       companyId,
-      approvedBy: fromRiskDataGroup.approvedBy,
-      complementaryDocs: fromRiskDataGroup.complementaryDocs,
-      complementarySystems: fromRiskDataGroup.complementarySystems,
-      coordinatorBy: fromRiskDataGroup.coordinatorBy,
-      elaboratedBy: fromRiskDataGroup.elaboratedBy,
       name: fromRiskDataGroup.name,
-      professionals:
-        fromRiskDataGroup.professionalsSignatures && fromRiskDataGroup.professionalsSignatures.length
-          ? fromRiskDataGroup.professionalsSignatures.map((s) => ({
-              isSigner: s.isSigner,
-              isElaborator: s.isElaborator,
-              professionalId: s.professionalId,
-              riskFactorGroupDataId: s.riskFactorGroupDataId,
-            }))
-          : undefined,
-      users:
-        fromRiskDataGroup.usersSignatures && fromRiskDataGroup.usersSignatures.length
-          ? fromRiskDataGroup.usersSignatures.map((s) => ({
-              isElaborator: s.isElaborator,
-              isSigner: s.isSigner,
-              userId: s.userId,
-              riskFactorGroupDataId: s.riskFactorGroupDataId,
-            }))
-          : undefined,
-      revisionBy: fromRiskDataGroup.revisionBy,
-      source: fromRiskDataGroup.source,
-      visitDate: fromRiskDataGroup.visitDate,
-      validityEnd: fromRiskDataGroup.validityEnd,
-      validityStart: fromRiskDataGroup.validityStart,
+      // approvedBy: fromRiskDataGroup.approvedBy,
+      // complementaryDocs: fromRiskDataGroup.complementaryDocs,
+      // complementarySystems: fromRiskDataGroup.complementarySystems,
+      // coordinatorBy: fromRiskDataGroup.coordinatorBy,
+      // elaboratedBy: fromRiskDataGroup.elaboratedBy,
+      // professionals:
+      //   fromRiskDataGroup.professionalsSignatures && fromRiskDataGroup.professionalsSignatures.length
+      //     ? fromRiskDataGroup.professionalsSignatures.map((s) => ({
+      //         isSigner: s.isSigner,
+      //         isElaborator: s.isElaborator,
+      //         professionalId: s.professionalId,
+      //         riskFactorGroupDataId: s.riskFactorGroupDataId,
+      //       }))
+      //     : undefined,
+      // revisionBy: fromRiskDataGroup.revisionBy,
+      // source: fromRiskDataGroup.source,
+      // visitDate: fromRiskDataGroup.visitDate,
+      // validityEnd: fromRiskDataGroup.validityEnd,
+      // validityStart: fromRiskDataGroup.validityStart,
     });
 
     const createHomogeneous = async (homoGroupsCreation: HomoGroupEntity[], profileParentId?: string) => {

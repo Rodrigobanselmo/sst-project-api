@@ -8,10 +8,10 @@ import { getCredential } from '../professionals/professionals.converter';
 export const SignaturesConverter = (signatureEntity: (ProfessionalEntity | UserEntity)[], workspace: WorkspaceEntity): IDocVariables[] => {
   return signatureEntity
     .filter((professional) =>
-      'professionalPgrSignature' in professional
-        ? professional.professionalPgrSignature.isSigner
-        : 'professionalPgrSignature' in professional
-        ? professional.professionalPgrSignature.isSigner
+      'professionalDocumentDataSignature' in professional
+        ? professional.professionalDocumentDataSignature.isSigner
+        : 'professionalDocumentDataSignature' in professional
+        ? professional.professionalDocumentDataSignature.isSigner
         : false,
     )
     .map((signature) => {

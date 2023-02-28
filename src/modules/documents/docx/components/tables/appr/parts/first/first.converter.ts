@@ -1,3 +1,4 @@
+import { DocumentDataPGRDto } from './../../../../../../../sst/dto/document-data-pgr.dto';
 import dayjs from 'dayjs';
 import { AlignmentType } from 'docx';
 import { RiskFactorGroupDataEntity } from '../../../../../../../sst/entities/riskGroupData.entity';
@@ -5,8 +6,14 @@ import { RiskFactorGroupDataEntity } from '../../../../../../../sst/entities/ris
 import { HierarchyMapData, IHomoGroupMap } from '../../../../../converter/hierarchy.converter';
 import { bodyTableProps, borderNoneStyle } from '../../elements/body';
 import { FirstRiskInventoryColumnEnum, firstRiskInventoryHeader } from './first.constant';
+import { DocumentDataEntity } from 'src/modules/sst/entities/documentData.entity';
 
-export const documentConverter = (riskFactorGroupData: RiskFactorGroupDataEntity, homoGroupTree: IHomoGroupMap, hierarchy: HierarchyMapData, isByGroup: boolean) => {
+export const documentConverter = (
+  riskFactorGroupData: RiskFactorGroupDataEntity & DocumentDataEntity & DocumentDataPGRDto,
+  homoGroupTree: IHomoGroupMap,
+  hierarchy: HierarchyMapData,
+  isByGroup: boolean,
+) => {
   const rows: bodyTableProps[][] = [];
   const homogeneousGroups = [];
   const environments = [];

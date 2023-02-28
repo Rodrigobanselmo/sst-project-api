@@ -6,7 +6,7 @@ import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import { FindActivityDto } from '../../dto/activity.dto';
 import { SetCompanyClinicDto } from '../../dto/company-clinic.dto';
-import { CreateCompanyDto, FindCompaniesDto, UpdateCompanyDto } from '../../dto/company.dto';
+import { CreateCompanyDto, FindCompaniesDto, UpdateApplyServiceCompanyDto, UpdateCompanyDto } from '../../dto/company.dto';
 import { AddCompanyPhotoService } from '../../services/company/add-company-photo/add-company-photo.service';
 import { CopyCompanyService } from '../../services/company/copy-company/copy-company.service';
 import { CreateCompanyService } from '../../services/company/create-company/create-company.service';
@@ -26,6 +26,7 @@ import { Roles } from '../../../../shared/decorators/roles.decorator';
 import { UpdateAllCompaniesService } from '../../services/report/update-all-companies/update-all-companies.service';
 import { FindCompanyDashDto } from '../../dto/dashboard.dto';
 import { DashboardCompanyService } from '../../services/report/dashboard-company/dashboard-company.service';
+import { UpdateApplyServiceCompanyService } from '../../services/company/update-apply-service-company/update-apply-service-company.service';
 
 @ApiTags('company')
 @Controller('company')
@@ -46,6 +47,7 @@ export class CompanyController {
     private readonly findClinicService: FindClinicService,
     private readonly dashboardCompanyService: DashboardCompanyService,
     private readonly updateAllCompaniesService: UpdateAllCompaniesService,
+    private readonly updateApplyServiceCompanyService: UpdateApplyServiceCompanyService,
   ) {}
 
   @Roles(RoleEnum.COMPANY, RoleEnum.CONTRACTS, RoleEnum.CLINICS, RoleEnum.USER)
@@ -158,6 +160,17 @@ export class CompanyController {
   }
 
   @Permissions({
+    code: PermissionEnum.MASTER,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
+  @Post('/:companyId/set-apply-service')
+  updateService(@Body() body: UpdateApplyServiceCompanyDto, @User() userPayloadDto: UserPayloadDto) {
+    return this.updateApplyServiceCompanyService.execute(body, userPayloadDto.targetCompanyId);
+  }
+
+  @Permissions({
     code: PermissionEnum.COMPANY,
     isContract: true,
     isMember: true,
@@ -165,6 +178,18 @@ export class CompanyController {
   })
   @Patch()
   update(@Body() updateCompanyDto: UpdateCompanyDto) {
+    delete updateCompanyDto.status;
+    return this.updateCompanyService.execute(updateCompanyDto);
+  }
+
+  @Permissions({
+    code: PermissionEnum.COMPANY,
+    isContract: true,
+    isMember: true,
+    crud: 'd',
+  })
+  @Patch('all')
+  updateFull(@Body() updateCompanyDto: UpdateCompanyDto) {
     return this.updateCompanyService.execute(updateCompanyDto);
   }
 

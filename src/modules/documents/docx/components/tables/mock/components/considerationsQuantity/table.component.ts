@@ -1,5 +1,5 @@
 import { IDocVariables } from './../../../../../builders/pgr/types/section.types';
-import { ISectionChildrenType, PGRSectionChildrenTypeEnum } from './../../../../../builders/pgr/types/elements.types';
+import { ISectionChildrenType, DocumentSectionChildrenTypeEnum } from './../../../../../builders/pgr/types/elements.types';
 import { HeightRule, Paragraph, Table, WidthType } from 'docx';
 
 import { TableBodyElements } from '../../elements/body';
@@ -28,7 +28,7 @@ export const considerationsQuantityTable = (convertToDocx: (data: ISectionChildr
 
   const table = convertToDocx([
     {
-      type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE,
+      type: DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE,
       text: 'Nível de ação recomendado em função do DPG',
     },
   ]);

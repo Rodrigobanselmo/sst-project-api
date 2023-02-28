@@ -1,3 +1,5 @@
+import { DocumentDataPGRDto } from './../../../../../../sst/dto/document-data-pgr.dto';
+import { DocumentDataEntity } from './../../../../../../sst/entities/documentData.entity';
 import { HomoTypeEnum } from '@prisma/client';
 
 import { palette } from '../../../../../../../shared/constants/palette';
@@ -12,7 +14,7 @@ import { bodyTableProps } from './elements/body';
 import { QuantityNoiseColumnEnum } from './quantityNoise.constant';
 import sortArray from 'sort-array';
 
-export const quantityNoiseConverter = (riskGroupData: RiskFactorGroupDataEntity, hierarchyTree: IHierarchyMap) => {
+export const quantityNoiseConverter = (riskGroupData: RiskFactorGroupDataEntity & DocumentDataEntity & DocumentDataPGRDto, hierarchyTree: IHierarchyMap) => {
   const rows: bodyTableProps[][] = [];
 
   riskGroupData.data

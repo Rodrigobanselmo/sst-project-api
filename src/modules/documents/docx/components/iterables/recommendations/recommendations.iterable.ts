@@ -1,6 +1,6 @@
 import { Paragraph, Table } from 'docx';
 
-import { ISectionChildrenType, PGRSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
+import { ISectionChildrenType, DocumentSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
 import { RiskFactorDataEntity } from '../../../../../sst/entities/riskData.entity';
 import { recommendationsConverter } from './recommendations.converter';
@@ -17,12 +17,12 @@ export const recommendationsIterable = (
 
       return convertToDocx([
         {
-          type: PGRSectionChildrenTypeEnum.H2,
+          type: DocumentSectionChildrenTypeEnum.H2,
           text: title,
         },
         ...data.map(
           (rec): ISectionChildrenType => ({
-            type: PGRSectionChildrenTypeEnum.BULLET,
+            type: DocumentSectionChildrenTypeEnum.BULLET,
             text: rec,
             size: 8,
           }),

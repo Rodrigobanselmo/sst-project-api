@@ -1,7 +1,7 @@
 import { Paragraph, Table } from 'docx';
 
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
-import { ISectionChildrenType, PGRSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
+import { ISectionChildrenType, DocumentSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
 import { complementarySystemsConverter } from './complementarySystems.converter';
 
@@ -12,7 +12,7 @@ export const complementarySystemsIterable = (
   if (!complementarySystems?.length)
     return convertToDocx([
       {
-        type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+        type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
         text: `Não há um sistema de gestão “normatizado” implantado na unidade.`,
       },
     ]);
@@ -24,7 +24,7 @@ export const complementarySystemsIterable = (
       return convertToDocx(
         [
           {
-            type: PGRSectionChildrenTypeEnum.BULLET,
+            type: DocumentSectionChildrenTypeEnum.BULLET,
             text: `**??${VariablesPGREnum.DOCUMENT_COMPLEMENTARY_SYSTEMS}??**`,
             level: 0,
           },

@@ -4,7 +4,7 @@ import AWS from 'aws-sdk';
 
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { RiskDocumentRepository } from '../../../../sst/repositories/implementations/RiskDocumentRepository';
-import { UpsertDocumentDto } from '../../../dto/pgr.dto';
+import { UploadDocumentDto } from '../../../dto/document.dto';
 
 @Injectable()
 export class AddQueueDocumentService {
@@ -15,14 +15,13 @@ export class AddQueueDocumentService {
     this.sqs = new AWS.SQS({ region: process.env.AWS_SQS_PGR_REGION });
     this.queueUrl = process.env.AWS_SQS_PGR_URL;
   }
-  async execute(upsertPgrDto: UpsertDocumentDto, userPayloadDto: UserPayloadDto) {
+  async execute(upsertPgrDto: UploadDocumentDto, userPayloadDto: UserPayloadDto) {
     const companyId = userPayloadDto.targetCompanyId;
 
     const riskDoc = await this.riskDocumentRepository.upsert({
       id: upsertPgrDto.id,
       name: upsertPgrDto.name,
-      riskGroupId: upsertPgrDto.riskGroupId,
-      pcmsoId: upsertPgrDto.pcmsoId,
+      documentDataId: upsertPgrDto.documentDataId,
       version: upsertPgrDto.version,
       workspaceId: upsertPgrDto.workspaceId,
       workspaceName: upsertPgrDto.workspaceName,
@@ -30,7 +29,7 @@ export class AddQueueDocumentService {
       status: upsertPgrDto.status || StatusEnum.PROCESSING,
     });
 
-    const payload: UpsertDocumentDto = {
+    const payload: UploadDocumentDto = {
       ...upsertPgrDto,
       id: riskDoc.id,
     };

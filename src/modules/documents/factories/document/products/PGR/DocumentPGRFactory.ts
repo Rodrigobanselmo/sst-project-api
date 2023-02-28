@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import { HomoTypeEnum, StatusEnum } from '@prisma/client';
+import { DocumentDataPGRDto } from './../../../../../sst/dto/document-data-pgr.dto';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { DocumentTypeEnum, HomoTypeEnum, StatusEnum } from '@prisma/client';
 import { ISectionOptions } from 'docx';
 import { asyncBatch } from '../../../../../../shared/utils/asyncBatch';
 import { v4 } from 'uuid';
@@ -74,22 +75,27 @@ class DocumentFactoryProduct implements IDocumentFactoryProduct {
     //
   }
 
-  public async getData({ companyId, workspaceId, riskGroupId, ...body }: IDocumentPGRBody) {
-    const companyPromise = this.companyRepository.findDocumentData(companyId, workspaceId);
+  public async getData({ companyId, workspaceId, ...body }: IDocumentPGRBody) {
+    const company = await this.companyRepository.findDocumentData(companyId, { workspaceId, type: 'PGR' });
+    const riskGroupId = company.riskFactorGroupData?.[0]?.id;
+
+    if (!riskGroupId) throw new BadRequestException('Nenhum sistema de gestão cadastrado');
+
     const workspacePromise = this.workspaceRepository.findById(workspaceId);
     const riskGroupDataPromise = this.riskGroupDataRepository.findDocumentData(riskGroupId, companyId, { workspaceId }); // add homo
     const hierarchyPromise = this.hierarchyRepository.findDocumentData(companyId, { workspaceId }); // add homo
     const homogeneousGroupPromise = this.homoGroupRepository.findDocumentData(companyId, { workspaceId });
-    const versionsPromise = this.riskDocumentRepository.findDocumentData(riskGroupId, companyId, { isPGR: true });
+    const versionsPromise = this.riskDocumentRepository.findDocumentData(riskGroupId, companyId, DocumentTypeEnum.PGR);
 
-    const [company, workspace, riskGroupData, hierarchies, homogeneousGroupsFound, versions] = await Promise.all([
-      companyPromise,
+    const [workspace, riskGroupData, hierarchies, homogeneousGroupsFound, versions] = await Promise.all([
       workspacePromise,
       riskGroupDataPromise,
       hierarchyPromise,
       homogeneousGroupPromise,
       versionsPromise,
     ]);
+
+    if (company.documentData?.length == 0) throw new BadRequestException('Nenhum documento PGR cadastrado');
 
     riskGroupData.data = riskGroupData.data.map((riskData) => {
       const homo = homogeneousGroupsFound.find((homo) => homo.id == riskData.homogeneousGroupId);
@@ -113,6 +119,7 @@ class DocumentFactoryProduct implements IDocumentFactoryProduct {
     company.environments = characterization as any;
 
     const consultant = getConsultantCompany(company);
+    const documentData = company?.documentData?.[0];
 
     this.company = company;
 
@@ -137,9 +144,9 @@ class DocumentFactoryProduct implements IDocumentFactoryProduct {
     const version = new RiskDocumentEntity({
       version: body.version,
       description: body.description,
-      validity: riskGroupData.validity,
-      approvedBy: riskGroupData.approvedBy,
-      revisionBy: riskGroupData.revisionBy,
+      validity: documentData.validity,
+      approvedBy: documentData.approvedBy,
+      revisionBy: documentData.revisionBy,
       created_at: new Date(),
     });
 
@@ -154,6 +161,7 @@ class DocumentFactoryProduct implements IDocumentFactoryProduct {
       company,
       workspace,
       riskGroupData,
+      documentData,
       hierarchies,
       homogeneousGroups,
       consultant,
@@ -172,13 +180,31 @@ class DocumentFactoryProduct implements IDocumentFactoryProduct {
 
   public async getAttachments(data: PromiseInfer<ReturnType<typeof this.getData>>) {
     // APRs
-    const aprSection: ISectionOptions[] = [...APPRTableSection(data.riskGroupData, data.hierarchyData, data.homoGroupTree)];
+    const aprSection: ISectionOptions[] = [
+      ...APPRTableSection(
+        { ...data.riskGroupData, ...data.documentData, ...(data.documentData.json && ((data.documentData as any).json as DocumentDataPGRDto)) },
+        data.hierarchyData,
+        data.homoGroupTree,
+      ),
+    ];
 
     // APRs Groups
-    const aprGroupSection: ISectionOptions[] = [...APPRByGroupTableSection(data.riskGroupData, data.hierarchyHighLevelsData, data.hierarchyTree, data.homoGroupTree)];
+    const aprGroupSection: ISectionOptions[] = [
+      ...APPRByGroupTableSection(
+        { ...data.riskGroupData, ...data.documentData, ...(data.documentData.json && ((data.documentData as any).json as DocumentDataPGRDto)) },
+        data.hierarchyHighLevelsData,
+        data.hierarchyTree,
+        data.homoGroupTree,
+      ),
+    ];
 
     // ACTION PLAN
-    const actionPlanSections: ISectionOptions[] = [actionPlanTableSection(data.riskGroupData, data.hierarchyTree)];
+    const actionPlanSections: ISectionOptions[] = [
+      actionPlanTableSection(
+        { ...data.riskGroupData, ...data.documentData, ...(data.documentData.json && ((data.documentData as any).json as DocumentDataPGRDto)) },
+        data.hierarchyTree,
+      ),
+    ];
 
     const docId = data.docId;
     const companyId = data.company.id;
@@ -218,7 +244,7 @@ class DocumentFactoryProduct implements IDocumentFactoryProduct {
 
     const sections: ISectionOptions[] = new DocumentBuildPGR({
       version,
-      document: data.riskGroupData,
+      document: { ...data.riskGroupData, ...data.documentData, ...(data.documentData.json && ((data.documentData as any).json as DocumentDataPGRDto)) },
       attachments: attachments.map((attachment) => {
         return {
           ...attachment,
@@ -255,7 +281,7 @@ class DocumentFactoryProduct implements IDocumentFactoryProduct {
       attachments: attachments,
       name: body.name,
       version: body.version,
-      riskGroupId: body.riskGroupId,
+      documentDataId: body.documentDataId,
       description: body.description,
       workspaceId: body.workspaceId,
       workspaceName: data.workspace.name,
@@ -271,7 +297,7 @@ class DocumentFactoryProduct implements IDocumentFactoryProduct {
         companyId: body.companyId,
         name: body.name,
         version: body.version,
-        riskGroupId: body.riskGroupId,
+        documentDataId: body.documentDataId,
         description: body.description,
         workspaceId: body.workspaceId,
         workspaceName: body.workspaceName,

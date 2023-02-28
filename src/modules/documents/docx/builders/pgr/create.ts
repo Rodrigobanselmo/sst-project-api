@@ -1,3 +1,5 @@
+import { DocumentDataPGRDto } from './../../../../sst/dto/document-data-pgr.dto';
+import { DocumentDataEntity } from './../../../../sst/entities/documentData.entity';
 import { DocumentCoverEntity } from './../../../../company/entities/document-cover.entity';
 import { AttachmentEntity } from '../../../../sst/entities/attachment.entity';
 import { CharacterizationEntity } from './../../../../company/entities/characterization.entity';
@@ -28,7 +30,7 @@ export class DocumentBuildPGR {
   private versions: RiskDocumentEntity[];
   private variables: IDocVariables;
   private environments: CharacterizationEntity[];
-  private document: RiskFactorGroupDataEntity;
+  private document: RiskFactorGroupDataEntity & DocumentDataEntity & DocumentDataPGRDto;
   private homogeneousGroup: IHomoGroupMap;
   private hierarchy: Map<string, HierarchyMapData>;
   private characterizations: CharacterizationEntity[];
@@ -103,7 +105,7 @@ export class DocumentBuildPGR {
     const elementsMap = new ElementsMapClass({
       versions: this.versions,
       variables: this.variables,
-      professionals: [...(this.document?.professionals || []), ...(this.document?.users || [])],
+      professionals: [...(this.document?.professionals || [])],
       environments: this.environments ?? [],
       characterizations: this.characterizations ?? [],
       document: this.document,

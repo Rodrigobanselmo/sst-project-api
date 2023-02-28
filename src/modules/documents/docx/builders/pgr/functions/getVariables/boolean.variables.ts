@@ -1,3 +1,5 @@
+import { DocumentDataPGRDto } from './../../../../../../sst/dto/document-data-pgr.dto';
+import { DocumentDataEntity } from './../../../../../../sst/entities/documentData.entity';
 import { IRiskDataJson, QuantityTypeEnum } from './../../../../../../company/interfaces/risk-data-json.types';
 import { WorkspaceEntity } from './../../../../../../company/entities/workspace.entity';
 import { RiskFactorGroupDataEntity } from '../../../../../../sst/entities/riskGroupData.entity';
@@ -6,7 +8,12 @@ import { CompanyEntity } from '../../../../../../company/entities/company.entity
 import { VariablesPGREnum } from '../../enums/variables.enum';
 import { CharacterizationTypeEnum, RiskFactorsEnum } from '@prisma/client';
 
-export const booleanVariables = (company: CompanyEntity, workspace: WorkspaceEntity, hierarchy: Map<string, HierarchyMapData>, document: RiskFactorGroupDataEntity) => {
+export const booleanVariables = (
+  company: CompanyEntity,
+  workspace: WorkspaceEntity,
+  hierarchy: Map<string, HierarchyMapData>,
+  document: RiskFactorGroupDataEntity & DocumentDataEntity & DocumentDataPGRDto,
+) => {
   return {
     [VariablesPGREnum.IS_Q5]: document.isQ5 ? 'true' : '',
     [VariablesPGREnum.HAS_RISK_FIS]: (document.data || []).find((riskData) => riskData.riskFactor.type == RiskFactorsEnum.FIS) ? 'true' : '',

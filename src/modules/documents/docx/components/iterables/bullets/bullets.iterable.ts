@@ -1,7 +1,7 @@
 import { Paragraph, Table } from 'docx';
 
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
-import { ISectionChildrenType, PGRSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
+import { ISectionChildrenType, DocumentSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
 import { BulletTextConverter } from './bullets.converter';
 
@@ -13,7 +13,7 @@ export const bulletTextIterable = (bulletText: string[], convertToDocx: (data: I
       return convertToDocx(
         [
           {
-            type: PGRSectionChildrenTypeEnum.BULLET,
+            type: DocumentSectionChildrenTypeEnum.BULLET,
             text: `??${VariablesPGREnum.BULLET_TEXT}??`,
             level: 0,
           },

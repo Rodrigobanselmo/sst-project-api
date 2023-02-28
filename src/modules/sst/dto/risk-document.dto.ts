@@ -16,13 +16,9 @@ export class UpsertRiskDocumentDto {
   @IsString()
   name: string;
 
-  @IsOptional()
-  @IsString()
-  riskGroupId?: string;
-
   @IsString()
   @IsOptional()
-  pcmsoId?: string;
+  documentDataId: string;
 
   @IsString()
   version: string;

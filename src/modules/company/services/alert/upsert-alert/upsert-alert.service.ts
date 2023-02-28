@@ -29,7 +29,6 @@ export class UpsertAlertService {
 
     const emails = [...(findAlert?.emails || []), ...(body?.emails || [])].filter((email) => (removeEmails ? !removeEmails?.includes(email) : true));
     const nextAlert = this.getNextDate(body.configJson);
-    console.log(nextAlert);
 
     const alert = await this.alertRepository.upsert({
       ...body,
@@ -71,7 +70,6 @@ export class UpsertAlertService {
     if (!weeksRemaining) {
       const nextDay = cronWeekDays.find((cronDay) => actualDay < cronDay);
       daysRemaining = nextDay ? nextDay - actualDay : 7 - actualDay + cronMinWeekDay;
-      console.log('nextDay', nextDay);
 
       weeksRemaining = nextDay ? weeksRemaining : cronEveryNumbersOfWeeks - 1;
     } else {

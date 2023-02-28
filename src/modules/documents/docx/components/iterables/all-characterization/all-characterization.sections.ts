@@ -3,7 +3,7 @@ import { AlignmentType, BorderStyle, Paragraph, Table } from 'docx';
 import { sortString } from '../../../../../../shared/utils/sorts/string.sort';
 
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
-import { ISectionChildrenType, PGRSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
+import { ISectionChildrenType, DocumentSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
 import { IHierarchyData, IHomoGroupMap } from '../../../converter/hierarchy.converter';
 import { hierarchyHomoOrgTable } from '../../tables/hierarchyHomoOrg/hierarchyHomoOrg.table';
@@ -28,7 +28,7 @@ const getData = (
 
   if (variables[VariablesPGREnum.ENVIRONMENT_NOISE]) {
     parameters.push({
-      type: PGRSectionChildrenTypeEnum.BULLET,
+      type: DocumentSectionChildrenTypeEnum.BULLET,
       level: 0,
       text: `Ruído ambiente (Maior Valor Medido): ??${VariablesPGREnum.ENVIRONMENT_NOISE}?? dB(A)`,
     });
@@ -36,7 +36,7 @@ const getData = (
 
   if (variables[VariablesPGREnum.ENVIRONMENT_TEMPERATURE]) {
     parameters.push({
-      type: PGRSectionChildrenTypeEnum.BULLET,
+      type: DocumentSectionChildrenTypeEnum.BULLET,
       level: 0,
       text: `Temperatura do ar: ??${VariablesPGREnum.ENVIRONMENT_TEMPERATURE}?? ºC`,
     });
@@ -44,7 +44,7 @@ const getData = (
 
   if (variables[VariablesPGREnum.ENVIRONMENT_MOISTURE]) {
     parameters.push({
-      type: PGRSectionChildrenTypeEnum.BULLET,
+      type: DocumentSectionChildrenTypeEnum.BULLET,
       level: 0,
       text: `Umidade do ar: ??${VariablesPGREnum.ENVIRONMENT_MOISTURE}??%`,
     });
@@ -52,7 +52,7 @@ const getData = (
 
   if (variables[VariablesPGREnum.ENVIRONMENT_LUMINOSITY]) {
     parameters.push({
-      type: PGRSectionChildrenTypeEnum.BULLET,
+      type: DocumentSectionChildrenTypeEnum.BULLET,
       level: 0,
       text: `Iluminância: ??${VariablesPGREnum.ENVIRONMENT_LUMINOSITY}?? LUX`,
     });
@@ -60,7 +60,7 @@ const getData = (
 
   if (parameters.length) {
     parameters.unshift({
-      type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+      type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
       text: '**Parâmetros ambientais:**',
       spacing: { after: 100 },
     });
@@ -69,13 +69,13 @@ const getData = (
   risks.forEach((risk, index) => {
     if (index === 0)
       riskFactors.push({
-        type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+        type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
         text: '**Fatores de risco:**',
         spacing: { after: 100 },
       });
 
     riskFactors.push({
-      type: PGRSectionChildrenTypeEnum.BULLET,
+      type: DocumentSectionChildrenTypeEnum.BULLET,
       level: 0,
       text: `${risk.name} (${risk.type})`,
       alignment: AlignmentType.START,
@@ -91,7 +91,7 @@ const getData = (
   cons.forEach((consideration, index) => {
     if (index === 0)
       considerations.push({
-        type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+        type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
         text: '**Considerações:**',
         spacing: { after: 100 },
       });
@@ -104,7 +104,7 @@ const getData = (
   ac.forEach((activity, index) => {
     if (index === 0)
       activities.push({
-        type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+        type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
         text: '**Descrição das Atividades:**',
         spacing: { after: 100 },
       });
@@ -116,7 +116,7 @@ const getData = (
 
   const ProfileTitle = [
     {
-      type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+      type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
       text: `??${VariablesPGREnum.PROFILE_NAME}??`,
       size: 11,
       border: {
@@ -140,7 +140,7 @@ const getData = (
   if (!missingBody) {
     const titleTable = [
       {
-        type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE,
+        type: DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE,
         text: `Cargos lotados no ${titleSection} ??${VariablesPGREnum.CHARACTERIZATION_NAME}??`,
       },
     ] as ISectionChildrenType[];
@@ -154,7 +154,7 @@ const getData = (
     ...convertToDocx(
       [
         {
-          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
           text: `??${VariablesPGREnum.ENVIRONMENT_DESCRIPTION}??`,
           alignment: AlignmentType.START,
           removeWithSomeEmptyVars: [VariablesPGREnum.ENVIRONMENT_DESCRIPTION],
@@ -178,16 +178,16 @@ const getSentenceType = (sentence: string): ISectionChildrenType => {
   if (splitSentence.length == 2) {
     const value = splitSentence[1] as unknown as any;
 
-    if (PGRSectionChildrenTypeEnum.PARAGRAPH == value) {
+    if (DocumentSectionChildrenTypeEnum.PARAGRAPH == value) {
       return {
-        type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+        type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
         text: splitSentence[0],
       };
     }
 
-    if (PGRSectionChildrenTypeEnum.BULLET == value.split('-')[0]) {
+    if (DocumentSectionChildrenTypeEnum.BULLET == value.split('-')[0]) {
       return {
-        type: PGRSectionChildrenTypeEnum.BULLET,
+        type: DocumentSectionChildrenTypeEnum.BULLET,
         text: splitSentence[0],
         level: value.split('-')[1] || 0,
       };
@@ -195,7 +195,7 @@ const getSentenceType = (sentence: string): ISectionChildrenType => {
   }
 
   return {
-    type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+    type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
     text: splitSentence[0],
   };
 };
@@ -264,7 +264,7 @@ export const allCharacterizationSections = (
       .forEach(({ variables, elements, id, risks, considerations: cons, breakPage, activities: ac, profileParentId, profiles, type, paragraphs }) => {
         const title = [
           {
-            type: PGRSectionChildrenTypeEnum.H3,
+            type: DocumentSectionChildrenTypeEnum.H3,
             text: `${desc}: ??${VariablesPGREnum.ENVIRONMENT_NAME}??`,
           },
         ] as ISectionChildrenType[];
@@ -284,7 +284,7 @@ export const allCharacterizationSections = (
             ...convertToDocx(
               [
                 {
-                  type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+                  type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
                   text: ``,
                 },
               ],
@@ -307,7 +307,7 @@ export const allCharacterizationSections = (
           section.unshift(
             ...convertToDocx([
               {
-                type: PGRSectionChildrenTypeEnum.H2,
+                type: DocumentSectionChildrenTypeEnum.H2,
                 text: titleSection,
               },
             ]),

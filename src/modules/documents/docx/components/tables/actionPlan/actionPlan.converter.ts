@@ -1,3 +1,5 @@
+import { DocumentDataPGRDto } from './../../../../../sst/dto/document-data-pgr.dto';
+import { DocumentDataEntity } from './../../../../../sst/entities/documentData.entity';
 import { sortString } from './../../../../../../shared/utils/sorts/string.sort';
 import { sortNumber } from './../../../../../../shared/utils/sorts/number.sort';
 import { HomoTypeEnum } from '@prisma/client';
@@ -13,7 +15,7 @@ import { originRiskMap } from './../../../../../../shared/constants/maps/origin-
 import { ActionPlanColumnEnum } from './actionPlan.constant';
 import { bodyTableProps } from './elements/body';
 
-export const actionPlanConverter = (riskGroup: RiskFactorGroupDataEntity, hierarchyTree: IHierarchyMap) => {
+export const actionPlanConverter = (riskGroup: RiskFactorGroupDataEntity & DocumentDataEntity & DocumentDataPGRDto, hierarchyTree: IHierarchyMap) => {
   const homogeneousGroupsMap = new Map<string, bodyTableProps[][]>();
   const actionPlanData: bodyTableProps[][] = [];
 

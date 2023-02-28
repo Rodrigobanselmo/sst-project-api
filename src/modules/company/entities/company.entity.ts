@@ -1,3 +1,4 @@
+import { DocumentDataEntity } from './../../sst/entities/documentData.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { ProfessionalCouncil, StatusEnum } from '@prisma/client';
 
@@ -158,6 +159,7 @@ export class CompanyEntity implements Company {
 
   scheduleBlocks?: ScheduleBlockEntity[];
   alerts?: AlertEntity[];
+  documentData?: DocumentDataEntity[];
 
   //! remove >>>
   mission: string;

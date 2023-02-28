@@ -1,7 +1,7 @@
 import { AlignmentType, Paragraph, Table } from 'docx';
 
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
-import { ISectionChildrenType, PGRSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
+import { ISectionChildrenType, DocumentSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
 import { CharacterizationEntity } from '../../../../../company/entities/characterization.entity';
 import { environmentsConverter } from './all-characterization.converter';
@@ -19,16 +19,16 @@ export const environmentIterable = (
     if (splitSentence.length == 2) {
       const value = splitSentence[1] as unknown as any;
 
-      if (PGRSectionChildrenTypeEnum.PARAGRAPH == value) {
+      if (DocumentSectionChildrenTypeEnum.PARAGRAPH == value) {
         return {
-          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
           text: splitSentence[0],
         };
       }
 
-      if (PGRSectionChildrenTypeEnum.BULLET == value.split('-')[0]) {
+      if (DocumentSectionChildrenTypeEnum.BULLET == value.split('-')[0]) {
         return {
-          type: PGRSectionChildrenTypeEnum.BULLET,
+          type: DocumentSectionChildrenTypeEnum.BULLET,
           text: splitSentence[0],
           level: value.split('-')[1] || 0,
         };
@@ -36,7 +36,7 @@ export const environmentIterable = (
     }
 
     return {
-      type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+      type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
       text: splitSentence[0],
     };
   };
@@ -49,7 +49,7 @@ export const environmentIterable = (
 
       if (variables[VariablesPGREnum.ENVIRONMENT_NOISE]) {
         parameters.push({
-          type: PGRSectionChildrenTypeEnum.BULLET,
+          type: DocumentSectionChildrenTypeEnum.BULLET,
           level: 0,
           text: `Ruído ambiente (Maior Valor Medido): ??${VariablesPGREnum.ENVIRONMENT_NOISE}?? dB(A)`,
         });
@@ -57,7 +57,7 @@ export const environmentIterable = (
 
       if (variables[VariablesPGREnum.ENVIRONMENT_TEMPERATURE]) {
         parameters.push({
-          type: PGRSectionChildrenTypeEnum.BULLET,
+          type: DocumentSectionChildrenTypeEnum.BULLET,
           level: 0,
           text: `Temperatura do ar: ??${VariablesPGREnum.ENVIRONMENT_TEMPERATURE}?? ºC`,
         });
@@ -65,7 +65,7 @@ export const environmentIterable = (
 
       if (variables[VariablesPGREnum.ENVIRONMENT_MOISTURE]) {
         parameters.push({
-          type: PGRSectionChildrenTypeEnum.BULLET,
+          type: DocumentSectionChildrenTypeEnum.BULLET,
           level: 0,
           text: `Umidade do ar: ??${VariablesPGREnum.ENVIRONMENT_MOISTURE}??%`,
         });
@@ -73,7 +73,7 @@ export const environmentIterable = (
 
       if (variables[VariablesPGREnum.ENVIRONMENT_LUMINOSITY]) {
         parameters.push({
-          type: PGRSectionChildrenTypeEnum.BULLET,
+          type: DocumentSectionChildrenTypeEnum.BULLET,
           level: 0,
           text: `Umidade do ar: ??${VariablesPGREnum.ENVIRONMENT_LUMINOSITY}??%`,
         });
@@ -81,7 +81,7 @@ export const environmentIterable = (
 
       if (parameters.length) {
         parameters.unshift({
-          type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+          type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
           text: '**Parâmetros ambientais:**',
         });
 
@@ -95,12 +95,12 @@ export const environmentIterable = (
       risks.forEach((risk, index) => {
         if (index === 0)
           riskFactors.push({
-            type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+            type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
             text: '**Fatores de risco:**',
           });
 
         riskFactors.push({
-          type: PGRSectionChildrenTypeEnum.BULLET,
+          type: DocumentSectionChildrenTypeEnum.BULLET,
           level: 0,
           text: `${risk.name} (${risk.type})`,
           alignment: AlignmentType.START,
@@ -108,7 +108,7 @@ export const environmentIterable = (
 
         if (index === risks.length - 1)
           riskFactors.push({
-            type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+            type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
             text: '',
             removeWithSomeEmptyVars: [VariablesPGREnum.ENVIRONMENT_DESCRIPTION],
           });
@@ -117,7 +117,7 @@ export const environmentIterable = (
       cons.forEach((consideration, index) => {
         if (index === 0)
           considerations.push({
-            type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+            type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
             text: '**Considerações:**',
           });
 
@@ -128,12 +128,12 @@ export const environmentIterable = (
 
       const title = [
         {
-          type: PGRSectionChildrenTypeEnum.H2,
+          type: DocumentSectionChildrenTypeEnum.H2,
           text: `??${VariablesPGREnum.ENVIRONMENT_NAME}??`,
         },
       ] as ISectionChildrenType[];
 
-      if (breakPage) title.unshift({ type: PGRSectionChildrenTypeEnum.BREAK });
+      if (breakPage) title.unshift({ type: DocumentSectionChildrenTypeEnum.BREAK });
 
       return [
         ...convertToDocx([...title], variables),
@@ -142,7 +142,7 @@ export const environmentIterable = (
           [
             ...riskFactors,
             {
-              type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+              type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
               text: `??${VariablesPGREnum.ENVIRONMENT_DESCRIPTION}??`,
               alignment: AlignmentType.START,
               removeWithSomeEmptyVars: [VariablesPGREnum.ENVIRONMENT_DESCRIPTION],

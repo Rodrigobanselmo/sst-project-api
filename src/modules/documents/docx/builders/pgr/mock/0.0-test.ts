@@ -1,21 +1,21 @@
 import { VariablesPGREnum } from '../enums/variables.enum';
-import { PGRSectionChildrenTypeEnum } from '../types/elements.types';
-import { IDocumentPGRSectionGroup, PGRSectionTypeEnum } from '../types/section.types';
+import { DocumentSectionChildrenTypeEnum } from '../types/elements.types';
+import { IDocumentPGRSectionGroup, DocumentSectionTypeEnum } from '../types/section.types';
 
 export const testSection: IDocumentPGRSectionGroup = {
   footer: true,
   header: true,
   data: [
     {
-      type: PGRSectionTypeEnum.CHAPTER,
+      type: DocumentSectionTypeEnum.CHAPTER,
       text: `test`,
     },
     {
-      type: PGRSectionTypeEnum.SECTION,
+      type: DocumentSectionTypeEnum.SECTION,
       footerText: `test`,
       children: [
         {
-          type: PGRSectionChildrenTypeEnum.HEALTH_EFFECT_TABLES,
+          type: DocumentSectionChildrenTypeEnum.HEALTH_EFFECT_TABLES,
         },
       ],
     },

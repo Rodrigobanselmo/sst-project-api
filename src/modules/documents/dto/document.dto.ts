@@ -1,7 +1,6 @@
-import { StatusEnum } from '@prisma/client';
+import { DocumentTypeEnum, StatusEnum } from '@prisma/client';
 import { Transform } from 'class-transformer';
-import { IsBoolean, IsEnum, IsOptional, IsString } from 'class-validator';
-import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
 
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
@@ -11,13 +10,8 @@ export class UpsertDocumentDto {
   @IsOptional()
   id?: string;
 
-  @IsOptional()
   @IsString()
-  riskGroupId: string;
-
-  @IsOptional()
-  @IsString()
-  pcmsoId: string;
+  documentDataId: string;
 
   @IsString()
   name: string;
@@ -46,20 +40,27 @@ export class UpsertDocumentDto {
 
   @IsString()
   workspaceName: string;
-
-  @IsOptional()
-  @IsBoolean()
-  @ToBoolean()
-  isPGR: boolean;
-  @IsOptional()
-  @IsBoolean()
-  @ToBoolean()
-  isPCMSO: boolean;
 }
 
-export class UpsertPgrDocumentDto extends UpsertDocumentDto {}
+export class UploadDocumentDto extends UpsertDocumentDto {
+  @IsOptional()
+  @IsString()
+  @IsEnum(DocumentTypeEnum, {
+    message: `type must be one of: ${KeysOfEnum(DocumentTypeEnum)}`,
+  })
+  type: DocumentTypeEnum;
+}
 
-export class UpsertPcmsoDocumentDto extends UpsertDocumentDto {}
+export class IGetDocumentModel {
+  @IsString()
+  companyId: string;
+
+  @IsString()
+  @IsEnum(DocumentTypeEnum, {
+    message: `type must be one of: ${KeysOfEnum(DocumentTypeEnum)}`,
+  })
+  type: DocumentTypeEnum;
+}
 
 export class UploadPgrActionPlanDto {
   @IsString()

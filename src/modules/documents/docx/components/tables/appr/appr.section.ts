@@ -1,3 +1,5 @@
+import { DocumentDataEntity } from './../../../../../sst/entities/documentData.entity';
+import { DocumentDataPGRDto } from './../../../../../sst/dto/document-data-pgr.dto';
 import { HierarchyEnum, HomogeneousGroup } from '@prisma/client';
 import { ISectionOptions, PageOrientation } from 'docx';
 import { sortString } from '../../../../../../shared/utils/sorts/string.sort';
@@ -15,7 +17,7 @@ export interface IAPPRTableOptions {
 }
 
 export const APPRTableSection = (
-  riskFactorGroupData: RiskFactorGroupDataEntity,
+  riskFactorGroupData: RiskFactorGroupDataEntity & DocumentDataEntity & DocumentDataPGRDto,
   hierarchyData: IHierarchyData,
   homoGroupTree: IHomoGroupMap,
   // options: IAPPRTableOptions = {},

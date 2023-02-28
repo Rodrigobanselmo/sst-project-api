@@ -1,10 +1,12 @@
-import { MessageSQS } from '../../../../shared/interfaces/message-sqs';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { DocumentTypeEnum } from '@prisma/client';
 import * as AWS from 'aws-sdk';
 import { Consumer } from 'sqs-consumer';
-import { UpsertDocumentDto } from '../../dto/pgr.dto';
-import { PgrUploadService } from '../../services/pgr/document/upload-pgr-doc.service';
-import { PcmsoUploadService } from '../../services/pgr/document/upload-pcmso-doc.service';
+
+import { MessageSQS } from '../../../../shared/interfaces/message-sqs';
+import { UploadDocumentDto } from '../../dto/document.dto';
+import { PcmsoUploadService } from '../../services/document/document/upload-pcmso-doc.service';
+import { PgrUploadService } from '../../services/document/document/upload-pgr-doc.service';
 
 @Injectable()
 export class PgrConsumer {
@@ -23,17 +25,15 @@ export class PgrConsumer {
   }
 
   private async consume(message: MessageSQS): Promise<void> {
-    const body: UpsertDocumentDto = JSON.parse(message.Body);
+    const body: UploadDocumentDto = JSON.parse(message.Body);
 
     try {
-      if (body.isPGR) {
-        delete body.isPGR;
+      if (body.type == DocumentTypeEnum.PGR) {
         await this.pgrUploadDocService.execute({
           ...body,
         });
       }
-      if (body.isPCMSO) {
-        delete body.isPCMSO;
+      if (body.type == DocumentTypeEnum.PCSMO) {
         await this.pcmsoUploadService.execute({
           ...body,
         });

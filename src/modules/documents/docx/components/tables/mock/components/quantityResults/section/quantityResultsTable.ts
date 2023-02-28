@@ -1,6 +1,6 @@
 import { Paragraph, Table } from 'docx';
 
-import { ISectionChildrenType, PGRSectionChildrenTypeEnum } from '../../../../../../builders/pgr/types/elements.types';
+import { ISectionChildrenType, DocumentSectionChildrenTypeEnum } from '../../../../../../builders/pgr/types/elements.types';
 import { IDocVariables } from '../../../../../../builders/pgr/types/section.types';
 import { annualDoseTable } from '../../annualDose/table.component';
 import { quantityResultsFBVTable } from '../tables/quantityResultsFBVTable';
@@ -13,83 +13,83 @@ import { quantityResultsRTable } from '../tables/quantityResultsRTable';
 export const quantityResultsTable = (convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[]) => {
   const table1 = convertToDocx([
     {
-      type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE,
+      type: DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE,
       text: 'Critério de Interpretação de Resultados Quantitativos (Químicos) (NR-01 item 1.5.7.3.2 alínea f)',
     },
     {
-      type: PGRSectionChildrenTypeEnum.LEGEND,
+      type: DocumentSectionChildrenTypeEnum.LEGEND,
       text: '**Legenda:**\n**MVUE** = Estimativa da Média Verdadeira obtida por tratamento estatístico das avaliações;\n**LEO** = Limite de Exposição Ocupacional;\n**IJ** = Critério estatístico que representa a razão entre o MVUE e o LEO do agente de risco, fornece a porcentagem do MVUE em relação ao LEO.\n**Obs.:** Substâncias carcinogênicas (LINACH/ACGIH) e Fatores de Riscos Químicos cujo Limite de Exposição é valor Teto (NR15/ACGIH) serão monitorados pelo menos 1 vez por ano independente do Risco Ocupacional.',
     },
   ]);
 
   const table2 = convertToDocx([
     {
-      type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE,
+      type: DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE,
       text: 'Critério de Interpretação de Resultados Quantitativos (Ruído – Critérios NHO-01) (NR-01 item 1.5.7.3.2 alínea f)',
     },
     {
-      type: PGRSectionChildrenTypeEnum.LEGEND,
+      type: DocumentSectionChildrenTypeEnum.LEGEND,
       text: '**Legenda:**\n**MVUE** = Estimativa da Média Verdadeira obtida por tratamento estatístico das avaliações;\n**LEO** = Limite de Exposição Ocupacional;\n**IJ** = Critério estatístico que representa a razão entre o MVUE e o LEO do agente de risco, fornece a porcentagem do MVUE em relação ao LEO.',
     },
     {
-      type: PGRSectionChildrenTypeEnum.BREAK,
+      type: DocumentSectionChildrenTypeEnum.BREAK,
     },
   ]);
 
   const table3 = convertToDocx([
     {
-      type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE,
+      type: DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE,
       text: 'Critério de Interpretação de Resultados Quantitativos (Ruído – Critérios NR-15) (NR-01 item 1.5.7.3.2 alínea f)',
     },
     {
-      type: PGRSectionChildrenTypeEnum.LEGEND,
+      type: DocumentSectionChildrenTypeEnum.LEGEND,
       text: '**Legenda:**\n**MVUE** = Estimativa da Média Verdadeira obtida por tratamento estatístico das avaliações;\n**LEO** = Limite de Exposição Ocupacional;\n**IJ** = Critério estatístico que representa a razão entre o MVUE e o LEO do agente de risco, fornece a porcentagem do MVUE em relação ao LEO.',
     },
   ]);
 
   const table4 = convertToDocx([
     {
-      type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE,
+      type: DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE,
       text: 'Critério de Interpretação de Resultados Quantitativos para trabalhadores aclimatizados (CALOR) (NR-01 item 1.5.7.3.2 alínea f)',
     },
     {
-      type: PGRSectionChildrenTypeEnum.LEGEND,
+      type: DocumentSectionChildrenTypeEnum.LEGEND,
       text: '**Legenda:**\n**LEO** = Limite de Exposição Ocupacional;\n**NA** = Nível de Ação;\n**LII:** Limite Inferior de Incerteza;\n**LSI:** Limite Superior de Incerteza;\n**IBUTG** = Índice de Bulbo Úmido Termômetros de Globo – Unidade em ºC que representa a sobrecarga térmica do trabalhador.',
     },
     {
-      type: PGRSectionChildrenTypeEnum.BREAK,
+      type: DocumentSectionChildrenTypeEnum.BREAK,
     },
   ]);
 
   const table5 = convertToDocx([
     {
-      type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE,
+      type: DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE,
       text: 'Critério de Interpretação de Resultados Quantitativos (Vibração de Corpo Inteiro) (NR-01 item 1.5.7.3.2 alínea f)',
     },
     {
-      type: PGRSectionChildrenTypeEnum.LEGEND,
+      type: DocumentSectionChildrenTypeEnum.LEGEND,
       text: '**Legenda:**\n**aren** = Aceleração resultante de exposição normalizada – corresponde à aceleração resultante de exposição (are) convertida para uma jornada diária padrão de 8 horas;\n**VDVR** = Valor da dose de vibração resultante: corresponde ao valor da dose de vibração representativo da exposição ocupacional diária, considerando a resultante dos três eixos de medição.',
     },
   ]);
 
   const table6 = convertToDocx([
     {
-      type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE,
+      type: DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE,
       text: 'Critério de Interpretação de Resultados Quantitativos (Vibração Localizada – Mãos e Braços) (NR-01 item 1.5.7.3.2 alínea f)',
     },
     {
-      type: PGRSectionChildrenTypeEnum.LEGEND,
+      type: DocumentSectionChildrenTypeEnum.LEGEND,
       text: '**Legenda:**\n**aren** = Aceleração resultante de exposição normalizada – corresponde à aceleração resultante de exposição (are) convertida para uma jornada diária padrão de 8 horas.',
     },
   ]);
 
   const table7 = convertToDocx([
     {
-      type: PGRSectionChildrenTypeEnum.PARAGRAPH_TABLE,
+      type: DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE,
       text: 'Norma CNEN-NE 3.01 (NR-01 item 1.5.7.3.2 alínea f)',
     },
     {
-      type: PGRSectionChildrenTypeEnum.LEGEND,
+      type: DocumentSectionChildrenTypeEnum.LEGEND,
       text: '**Observação:** Para as atividades que envolvem exposição a Radiações Ionizantes (Raio-X, Alfa, Beta, Gama ou Nêutrons), conforme Anexo 5 da NR 15, consideramos os Limites de Tolerância determinados pela Norma CNEN NE 3.01, conforme tabela acima.',
     },
   ]);

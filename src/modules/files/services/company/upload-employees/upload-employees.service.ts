@@ -137,7 +137,6 @@ export class UploadEmployeesService {
     });
 
     const restEmployees = employees.map((employee) => {
-      console.log([hierarchyTree[employee.hierarchyId]].map(({ type, name }) => ({ type, name })));
       delete employee.description;
       delete employee.ghoDescription;
       delete employee.realDescription;

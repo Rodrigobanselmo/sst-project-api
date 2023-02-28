@@ -1,3 +1,5 @@
+import { DocumentDataEntity } from './../../../../../sst/entities/documentData.entity';
+import { DocumentDataPGRDto } from './../../../../../sst/dto/document-data-pgr.dto';
 import { DocumentCoverEntity } from './../../../../../company/entities/document-cover.entity';
 import { CompanyEntity } from './../../../../../company/entities/company.entity';
 import { CharacterizationEntity } from './../../../../../company/entities/characterization.entity';
@@ -12,7 +14,7 @@ import { HierarchyMapData, IHomoGroupMap } from '../../../converter/hierarchy.co
 import { convertToDocxHelper } from '../functions/convertToDocx';
 import { replaceAllVariables } from '../functions/replaceAllVariables';
 import { ISectionChildrenType } from '../types/elements.types';
-import { IAllSectionTypesPGR, IChapter, ICover, IDocVariables, ISection, PGRSectionTypeEnum } from '../types/section.types';
+import { IAllSectionTypesPGR, IChapter, ICover, IDocVariables, ISection, DocumentSectionTypeEnum } from '../types/section.types';
 import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
 import { IMapElementDocumentType } from './elementTypeMap';
 import { allCharacterizationSections } from '../../../components/iterables/all-characterization/all-characterization.sections';
@@ -26,7 +28,7 @@ type IDocumentClassType = {
   version?: string;
   cover: DocumentCoverEntity;
   elementsMap: IMapElementDocumentType;
-  document: RiskFactorGroupDataEntity;
+  document: RiskFactorGroupDataEntity & DocumentDataEntity & DocumentDataPGRDto;
   homogeneousGroup: IHomoGroupMap;
   hierarchy: Map<string, HierarchyMapData>;
   characterizations: CharacterizationEntity[];
@@ -41,7 +43,7 @@ export class SectionsMapClass {
   private version: string;
   private elementsMap: IMapElementDocumentType;
   private cover: DocumentCoverEntity;
-  private document: RiskFactorGroupDataEntity;
+  private document: RiskFactorGroupDataEntity & DocumentDataEntity & DocumentDataPGRDto;
   private homogeneousGroup: IHomoGroupMap;
   private environments: CharacterizationEntity[];
   private characterizations: CharacterizationEntity[];
@@ -77,27 +79,27 @@ export class SectionsMapClass {
   }
 
   public map: IMapSectionDocumentType = {
-    [PGRSectionTypeEnum.TOC]: () => summarySections(),
-    [PGRSectionTypeEnum.COVER]: ({}: ICover) =>
+    [DocumentSectionTypeEnum.TOC]: () => summarySections(),
+    [DocumentSectionTypeEnum.COVER]: ({}: ICover) =>
       coverSections({
         imgPath: this.logoPath,
         version: this.version,
         companyName: `${this.company.name} ${this.company.initials ? `(${this.company.initials})` : ''}`,
         ...(this.cover && (this.cover.json as any)),
       }),
-    [PGRSectionTypeEnum.CHAPTER]: ({ text }: IChapter) =>
+    [DocumentSectionTypeEnum.CHAPTER]: ({ text }: IChapter) =>
       chapterSection({
         version: this.version,
         chapter: replaceAllVariables(text, this.variables),
         imagePath: this.logoPath,
       }),
-    [PGRSectionTypeEnum.SECTION]: ({ children, footerText, ...rest }: ISection) => ({
+    [DocumentSectionTypeEnum.SECTION]: ({ children, footerText, ...rest }: ISection) => ({
       children: this.convertToDocx(children),
       ...this.getFooterHeader(footerText),
       ...rest,
       ...sectionLandscapeProperties,
     }),
-    [PGRSectionTypeEnum.ITERABLE_ENVIRONMENTS]: (): ISectionOptions[] =>
+    [DocumentSectionTypeEnum.ITERABLE_ENVIRONMENTS]: (): ISectionOptions[] =>
       allCharacterizationSections(this.environments, this.hierarchy, this.homogeneousGroup, 'env', (x, v) => this.convertToDocx(x, v)).map(
         ({ footerText, children }) => ({
           children,
@@ -105,7 +107,7 @@ export class SectionsMapClass {
           ...sectionLandscapeProperties,
         }),
       ),
-    [PGRSectionTypeEnum.ITERABLE_CHARACTERIZATION]: (): ISectionOptions[] =>
+    [DocumentSectionTypeEnum.ITERABLE_CHARACTERIZATION]: (): ISectionOptions[] =>
       allCharacterizationSections(this.characterizations, this.hierarchy, this.homogeneousGroup, 'char', (x, v) => this.convertToDocx(x, v)).map(
         ({ footerText, children }) => ({
           children,

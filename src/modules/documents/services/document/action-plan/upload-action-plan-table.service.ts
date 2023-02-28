@@ -12,7 +12,7 @@ import { HierarchyRepository } from '../../../../company/repositories/implementa
 import { createBaseDocument } from '../../../docx/base/config/document';
 import { actionPlanTableSection } from '../../../docx/components/tables/actionPlan/actionPlan.section';
 import { hierarchyConverter } from '../../../docx/converter/hierarchy.converter';
-import { UploadPgrActionPlanDto } from '../../../dto/pgr.dto';
+import { UploadPgrActionPlanDto } from '../../../dto/document.dto';
 import { dayjs } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 
 @Injectable()
@@ -37,7 +37,7 @@ export class PgrActionPlanUploadTableService {
       workspaceId,
     });
 
-    const sections: ISectionOptions[] = [actionPlanTableSection(riskGroupData, hierarchyTree)];
+    const sections: ISectionOptions[] = [actionPlanTableSection(riskGroupData as any, hierarchyTree)];
 
     const doc = createBaseDocument(sections);
 
@@ -49,7 +49,7 @@ export class PgrActionPlanUploadTableService {
       companyName: (riskGroupData.company?.fantasy || riskGroupData.company.name) + (riskGroupData.company.initials ? '-' + riskGroupData.company.initials : ''),
       typeName: 'PGR-PLANO_DE_ACAO',
       version: version[0] ? version[0]?.version || '0.0.0' : '0.0.0',
-      date: dayjs(riskGroupData.documentDate || new Date()).format('MMMM-YYYY'),
+      date: dayjs((riskGroupData as any).validityEnd || new Date()).format('MMMM-YYYY'),
     });
 
     await this.upload(buffer, fileName, riskGroupData.company);

@@ -14,6 +14,9 @@ export class FindCompanyService {
         primary_activity: true,
         secondary_activity: true,
         clinicsAvailable: true,
+        ...(user.isMaster && {
+          receivingServiceContracts: { select: { applyingServiceCompanyId: true } },
+        }),
       },
     });
 

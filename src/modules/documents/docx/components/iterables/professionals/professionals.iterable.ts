@@ -3,14 +3,14 @@ import { CompanyEntity } from './../../../../../company/entities/company.entity'
 import { UserEntity } from './../../../../../users/entities/user.entity';
 import { ProfessionalEntity } from '../../../../../users/entities/professional.entity';
 
-import { ISectionChildrenType, PGRSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
+import { ISectionChildrenType, DocumentSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
 import { ProfessionalsConverter } from './professionals.converter';
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
 import { AlignmentType, Paragraph, Table } from 'docx';
 
 export const professionalsIterable = (
-  professionalEntity: (ProfessionalEntity | UserEntity)[],
+  professionalEntity: ProfessionalEntity[],
   workspace: WorkspaceEntity,
   convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[],
 ) => {
@@ -20,7 +20,7 @@ export const professionalsIterable = (
 
   const baseSection: ISectionChildrenType[] = [
     {
-      type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+      type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
       text: '**Profissionais:**',
     },
   ];
@@ -39,11 +39,11 @@ export const professionalsIterable = (
       return convertToDocx(
         [
           {
-            type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+            type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
             text: `**??${VariablesPGREnum.PROFESSIONAL_NAME}??**`,
           },
           {
-            type: PGRSectionChildrenTypeEnum.PARAGRAPH,
+            type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
             text,
             align: AlignmentType.START,
           },

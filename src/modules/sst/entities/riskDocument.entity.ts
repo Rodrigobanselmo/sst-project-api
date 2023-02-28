@@ -40,8 +40,7 @@ export class RiskDocumentEntity implements RiskFactorDocument {
   complementaryDocs: string[];
   attachments: AttachmentEntity[];
 
-  riskGroupId: string;
-  pcmsoId: string;
+  documentDataId: string;
 
   constructor(partial: Partial<RiskDocumentEntity>) {
     Object.assign(this, partial);

@@ -311,7 +311,7 @@ model Company {
   databaseTable                   DatabaseTable[]
   documents                       Document[]
   covers                          DocumentCover[]
-  documentPCMSO                   DocumentPCMSO?
+  documentData                    DocumentData[]
   employees                       Employee[]
   esocialTransmissions            EmployeeESocialBatch[]
   esocialEvents                   EmployeeESocialEvent[]
@@ -587,23 +587,31 @@ model DocumentCover {
   @@unique([id, companyId])
 }
 
-model DocumentPCMSO {
+model DocumentData {
   id                      String                        @id @default(uuid())
   name                    String?
   created_at              DateTime                      @default(now())
   companyId               String                        @unique
+  workspaceId             String                        @unique
+  validityStart           DateTime?
+  validityEnd             DateTime?
+  status                  StatusEnum                    @default(PROGRESS)
+  type                    DocumentTypeEnum              
+
   elaboratedBy            String?
   coordinatorBy           String?
   revisionBy              String?
   approvedBy              String?
-  validityStart           DateTime?
-  validityEnd             DateTime?
-  status                  StatusEnum                    @default(PROGRESS)
+
+  json                    Json?
+
   company                 Company                       @relation(fields: [companyId], references: [id])
   docs                    RiskFactorDocument[]
-  professionalsSignatures DocumentPCMSOToProfessional[]
+  professionalsSignatures DocumentDataToProfessional[]
+  workspace               Workspace                     @relation(fields: [workspaceId], references: [id])
 
   @@unique([id, companyId])
+  @@unique([type, workspaceId, companyId])
 }
 
 model CompanyOS {
@@ -1195,8 +1203,7 @@ model ProfessionalCouncil {
   examDoctorHistory          EmployeeExamsHistory[]
   professional               Professional                        @relation(fields: [professionalId], references: [id], onDelete: Cascade)
   professionalsResponsibles  ProfessionalCouncilResponsible[]
-  professionalPcmsoSignature DocumentPCMSOToProfessional[]
-  professionalPgrSignature   RiskFactorGroupDataToProfessional[]
+  professionalDataSignature  DocumentDataToProfessional[]
 
   @@unique([councilType, councilUF, councilId, professionalId])
 }
@@ -1350,28 +1357,27 @@ model RiskFactorsDocInfo {
 }
 
 model RiskFactorDocument {
-  id            String               @id @default(uuid())
-  fileUrl       String?
-  name          String
-  description   String               @default("")
-  version       String               @default("1.0.0")
-  companyId     String
-  riskGroupId   String?
-  workspaceName String
-  workspaceId   String
-  status        StatusEnum           @default(ACTIVE)
-  created_at    DateTime             @default(now())
-  updated_at    DateTime             @updatedAt
-  approvedBy    String?
-  elaboratedBy  String?
-  revisionBy    String?
-  validity      String?
-  pcmsoId       String?
-  attachments   Attachments[]
-  company       Company              @relation(fields: [companyId], references: [id])
-  pcmso         DocumentPCMSO?       @relation(fields: [pcmsoId, companyId], references: [id, companyId])
-  riskGroup     RiskFactorGroupData? @relation(fields: [riskGroupId, companyId], references: [id, companyId])
-  workspace     Workspace            @relation(fields: [workspaceId, companyId], references: [id, companyId], onDelete: Cascade)
+  id                  String                  @id @default(uuid())
+  fileUrl             String?   
+  name                String    
+  description         String                  @default("")
+  version             String                  @default("1.0.0")
+  companyId           String    
+  workspaceName       String    
+  workspaceId         String    
+  status              StatusEnum              @default(ACTIVE)
+  created_at          DateTime                @default(now())
+  updated_at          DateTime                @updatedAt
+  attachments         Attachments[]   
+  company             Company                 @relation(fields: [companyId], references: [id])
+  documentDataId      String   
+  documentData        DocumentData           @relation(fields: [documentDataId, companyId], references: [id, companyId])
+  workspace           Workspace               @relation(fields: [workspaceId, companyId], references: [id, companyId], onDelete: Cascade)
+  
+  approvedBy          String?   
+  elaboratedBy        String?   
+  revisionBy          String?   
+  validity            String?   
 
   @@unique([id, companyId])
 }
@@ -1381,67 +1387,24 @@ model RiskFactorGroupData {
   name                    String?
   created_at              DateTime                            @default(now())
   companyId               String
-  source                  String?
-  elaboratedBy            String?
-  revisionBy              String?
-  approvedBy              String?
-  visitDate               DateTime?
   status                  StatusEnum                          @default(PROGRESS)
-  validity                String?
-  complementaryDocs       String[]
-  complementarySystems    String[]
-  coordinatorBy           String?
-  validityEnd             DateTime?
-  validityStart           DateTime?
-  isQ5                    Boolean                             @default(false)
-  months_period_level_2   Int                                 @default(24)
-  months_period_level_3   Int                                 @default(12)
-  months_period_level_4   Int                                 @default(6)
-  months_period_level_5   Int                                 @default(3)
-  hasEmergencyPlan        Boolean                             @default(false)
+ 
   data                    RiskFactorData[]
-  docs                    RiskFactorDocument[]
   company                 Company                             @relation(fields: [companyId], references: [id])
-  professionalsSignatures RiskFactorGroupDataToProfessional[]
-  usersSignatures         RiskFactorGroupDataToUser[]
 
   @@unique([id, companyId])
 }
 
-model RiskFactorGroupDataToUser {
-  riskFactorGroupDataId String              @map("A")
-  userId                Int                 @map("B")
-  isSigner              Boolean             @default(false)
-  isElaborator          Boolean             @default(false)
-  riskFactorData        RiskFactorGroupData @relation(fields: [riskFactorGroupDataId], references: [id], onDelete: Cascade)
-  user                  User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@id([userId, riskFactorGroupDataId])
-  @@map("_RiskFactorGroupDataToUser")
-}
-
-model RiskFactorGroupDataToProfessional {
-  riskFactorGroupDataId String              @map("B")
-  professionalId        Int                 @map("A")
-  isSigner              Boolean             @default(false)
-  isElaborator          Boolean             @default(false)
-  professional          ProfessionalCouncil @relation(fields: [professionalId], references: [id], onDelete: Cascade)
-  riskFactorData        RiskFactorGroupData @relation(fields: [riskFactorGroupDataId], references: [id], onDelete: Cascade)
-
-  @@id([riskFactorGroupDataId, professionalId])
-  @@map("_ProfessionalToRiskFactorGroupData")
-}
-
-model DocumentPCMSOToProfessional {
-  documentPCMSOId String              @map("B")
+model DocumentDataToProfessional {
+  documentDataId String              @map("B")
   professionalId  Int                 @map("A")
   isSigner        Boolean             @default(false)
   isElaborator    Boolean             @default(false)
   professional    ProfessionalCouncil @relation(fields: [professionalId], references: [id], onDelete: Cascade)
-  documentPCMSO   DocumentPCMSO       @relation(fields: [documentPCMSOId], references: [id], onDelete: Cascade)
+  documentData   DocumentData       @relation(fields: [documentDataId], references: [id], onDelete: Cascade)
 
-  @@id([documentPCMSOId, professionalId])
-  @@map("_DocumentPCMSOToProfessional")
+  @@id([documentDataId, professionalId])
+  @@map("_DocumentDataToProfessional")
 }
 
 model RiskFactorData {
@@ -1582,7 +1545,6 @@ model User {
   professional        Professional?
   refresh_token       RefreshToken[]
   companies           UserCompany[]
-  usersPgrSignatures  RiskFactorGroupDataToUser[]
   notification        Notification[]              @relation("NotificationToUser")
   notificationConfirm Notification[]              @relation("user_notification_confirm")
   alerts              Alert[]             
@@ -1636,6 +1598,7 @@ model Workspace {
   company                Company                   @relation(fields: [companyId], references: [id])
   hierarchy              Hierarchy[]               @relation("HierarchyToWorkspace")
   homogeneousGroup       HomogeneousGroup[]              
+  documentData          DocumentData?            
 
   @@unique([abbreviation, companyId])
   @@unique([id, companyId])
