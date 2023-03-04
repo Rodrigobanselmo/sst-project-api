@@ -12,7 +12,7 @@ export const attachmentsLinkSection: IDocumentPGRSectionGroup = {
     },
     {
       type: DocumentSectionTypeEnum.SECTION,
-      footerText: `??${VariablesPGREnum.CHAPTER_2}??`,
+      footerText: `Anexos`,
       children: [
         {
           type: DocumentSectionChildrenTypeEnum.H1,

@@ -1,3 +1,4 @@
+import { isNaEpi } from './../../../utils/isNa';
 import { onlyNumbers } from '@brazilian-utils/brazilian-utils';
 import { isAskCompany, isCountryRequired, isLocalEmpty, isOriginCat, isShowOriginCat, isTypeReopen } from './../../../../modules/esocial/interfaces/event-2210';
 import { CatEntity } from './../../../../modules/company/entities/cat.entity';
@@ -861,7 +862,7 @@ class ESocialEventProvider {
       };
 
       const getEpiType = (risk: IPriorRiskData) => {
-        const isEPINotApplicable = !!risk.riskData.epiToRiskFactorData.find((e) => e?.epi?.ca == '0');
+        const isEPINotApplicable = !!risk.riskData.epiToRiskFactorData.find((e) => isNaEpi(e?.epi?.ca));
         const isEPIPresent = !isEPINotApplicable && !!(risk.riskData.epiToRiskFactorData.length > 0);
 
         if (isEPINotApplicable) return utileEpiEpcEnum.NOT_APT;

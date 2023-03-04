@@ -3,25 +3,28 @@ import { DocumentSectionTypeEnum } from '../docx/builders/pgr/types/section.type
 
 type IDocumentSectionTypeMap = Record<
   DocumentSectionTypeEnum,
-  { type: DocumentSectionTypeEnum; accept: DocumentTypeEnum[]; label: string; active?: boolean; text?: string; isSection?: boolean }
+  { type: DocumentSectionTypeEnum; accept: DocumentTypeEnum[]; label: string; active?: boolean; text?: string; isSection?: boolean; isBreakSection?: boolean }
 >;
 
 export const documentSectionTypeMap: IDocumentSectionTypeMap = {
   [DocumentSectionTypeEnum.CHAPTER]: {
-    label: 'CAPÍTULO',
+    label: 'PÄGINA DE CAPÍTULO',
     type: DocumentSectionTypeEnum.CHAPTER,
     text: '',
+    isBreakSection: true,
     accept: [DocumentTypeEnum.OTHER],
   },
   [DocumentSectionTypeEnum.TOC]: {
     label: 'SÚMARIO',
     type: DocumentSectionTypeEnum.TOC,
     accept: [DocumentTypeEnum.OTHER],
+    isBreakSection: true,
   },
   [DocumentSectionTypeEnum.COVER]: {
-    label: 'CAPA',
+    label: 'CAPA DO DOCUMENTO',
     type: DocumentSectionTypeEnum.COVER,
     accept: [DocumentTypeEnum.OTHER],
+    isBreakSection: true,
   },
   [DocumentSectionTypeEnum.SECTION]: {
     label: 'SEÇÃO',

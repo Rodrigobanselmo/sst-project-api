@@ -51,17 +51,6 @@ export class UploadDocumentDto extends UpsertDocumentDto {
   type: DocumentTypeEnum;
 }
 
-export class IGetDocumentModel {
-  @IsString()
-  companyId: string;
-
-  @IsString()
-  @IsEnum(DocumentTypeEnum, {
-    message: `type must be one of: ${KeysOfEnum(DocumentTypeEnum)}`,
-  })
-  type: DocumentTypeEnum;
-}
-
 export class UploadPgrActionPlanDto {
   @IsString()
   riskGroupId: string;

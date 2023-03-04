@@ -1,3 +1,4 @@
+import { Public } from './../../../../shared/decorators/public.decorator';
 import { BadRequestException, Body, Controller, Get, Param, Patch, Post, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
@@ -5,7 +6,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import { FindActivityDto } from '../../dto/activity.dto';
-import { SetCompanyClinicDto } from '../../dto/company-clinic.dto';
+import { SetCompanyClinicDto, TestRoute123CompanyDto } from '../../dto/company-clinic.dto';
 import { CreateCompanyDto, FindCompaniesDto, UpdateApplyServiceCompanyDto, UpdateCompanyDto } from '../../dto/company.dto';
 import { AddCompanyPhotoService } from '../../services/company/add-company-photo/add-company-photo.service';
 import { CopyCompanyService } from '../../services/company/copy-company/copy-company.service';
@@ -213,5 +214,16 @@ export class CompanyController {
   @Post('/:companyId/set-clinics')
   setClinics(@Body() setCompanyClinicDto: SetCompanyClinicDto, @User() userPayloadDto: UserPayloadDto) {
     return this.setCompanyClinicsService.execute(setCompanyClinicDto, userPayloadDto);
+  }
+
+  @Public()
+  @Post('/test-route-123')
+  test(@Body() body: TestRoute123CompanyDto) {
+    // const x = {} as any;
+
+    // x.x.x;
+
+    throw new Error('niohoi');
+    return body;
   }
 }

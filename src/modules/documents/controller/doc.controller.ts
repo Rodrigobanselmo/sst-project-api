@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Res, Query } from '@nestjs/common';
 import { DocumentTypeEnum } from '@prisma/client';
 import { Readable } from 'stream';
 
@@ -6,7 +6,7 @@ import { PermissionEnum } from '../../../shared/constants/enum/authorization';
 import { Permissions } from '../../../shared/decorators/permissions.decorator';
 import { User } from '../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../shared/dto/user-payload.dto';
-import { IGetDocumentModel, UploadDocumentDto } from '../dto/document.dto';
+import { UploadDocumentDto } from '../dto/document.dto';
 import { AddQueueDocumentService } from '../services/document/document/add-queue-doc.service';
 import { DownloadAttachmentsService } from '../services/document/document/download-attachment-doc.service';
 import { DownloadDocumentService } from '../services/document/document/download-doc.service';
@@ -92,26 +92,5 @@ export class DocumentsBaseController {
   async addPCMSOQueueDoc(@User() userPayloadDto: UserPayloadDto, @Body() upsertPgrDto: UploadDocumentDto) {
     upsertPgrDto.type = DocumentTypeEnum.PCSMO;
     return this.addQueueDocumentService.execute(upsertPgrDto, userPayloadDto);
-  }
-
-  @Permissions({
-    code: PermissionEnum.PGR,
-    isMember: true,
-    isContract: true,
-    crud: true,
-  })
-  @Post('/model/pgr')
-  async getPGRDocumentModel(@Res() response: Response, @Body() body: IGetDocumentModel) {
-    body.type = DocumentTypeEnum.PGR;
-    const json = await this.getDocVariablesService.execute(body);
-    const jsonStream = new Readable({
-      read() {
-        this.push(JSON.stringify(json));
-        this.push(null);
-      },
-    });
-
-    response.setHeader('Content-Type', 'application/json');
-    jsonStream.pipe(response);
   }
 }

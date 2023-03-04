@@ -25,9 +25,15 @@ import { PdfEvaluationDataService } from './services/pdf/evaluation/evaluation-d
 import { DocumentPGRFactory } from './factories/document/products/PGR/DocumentPGRFactory';
 import { DocumentsBaseController } from './controller/doc.controller';
 import { GetDocVariablesService } from './services/document/document/get-doc-variables.service';
+import { DocumentModelRepository } from './repositories/implementations/DocumentModelRepository';
+import { CreateDocumentModelService } from './services/document/document-models/create-document-model.service';
+import { UpdateDocumentModelService } from './services/document/document-models/update-document-model.service';
+import { FindDocumentModelService } from './services/document/document-models/find-document-model.service';
+import { FindOneDocumentModelService } from './services/document/document-models/find-one-document-model.service';
+import { DocumentModelController } from './controller/document-model.controller';
 
 @Module({
-  controllers: [DocumentsPgrController, DocumentsPdfController, DocumentsBaseController],
+  controllers: [DocumentModelController, DocumentsPgrController, DocumentsPdfController, DocumentsBaseController],
   imports: [SSTModule, CompanyModule, UsersModule],
   providers: [
     ExcelProvider,
@@ -49,6 +55,11 @@ import { GetDocVariablesService } from './services/document/document/get-doc-var
     PdfEvaluationDataService,
     DocumentPGRFactory,
     GetDocVariablesService,
+    DocumentModelRepository,
+    UpdateDocumentModelService,
+    CreateDocumentModelService,
+    FindDocumentModelService,
+    FindOneDocumentModelService,
   ],
 })
 export class DocumentsModule {}

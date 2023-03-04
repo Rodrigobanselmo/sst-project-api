@@ -343,6 +343,7 @@ model Company {
   createdScheduleBlocks           ScheduleBlock[]                     
   scheduleBlocks                  ScheduleBlock[]                  @relation(name: "schedule_block_m2m_companies")
   alerts                          Alert[]
+  documentModels                  DocumentModel[]
 
   @@index([name])
   @@index([isClinic])
@@ -613,6 +614,23 @@ model DocumentData {
   @@unique([id, companyId])
   @@unique([type, workspaceId, companyId])
 }
+
+model DocumentModel {
+  id         Int                @default(autoincrement())
+  name       String       
+  description       String?       
+  companyId  String       
+  system     Boolean            @default(false)
+  status     StatusEnum         @default(ACTIVE)
+  created_at DateTime           @default(now())
+  updated_at DateTime           @updatedAt
+  company    Company            @relation(fields: [companyId], references: [id])
+  type       DocumentTypeEnum
+  data       Bytes       
+
+  @@id([id, companyId])
+}
+
 
 model CompanyOS {
   id           Int        @id @default(autoincrement())

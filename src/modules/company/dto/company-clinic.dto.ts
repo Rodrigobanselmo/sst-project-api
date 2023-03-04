@@ -1,7 +1,7 @@
 import { StringNormalizeTransform } from './../../../shared/transformers/string-normalize.transform';
 import { PartialType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
-import { IsDefined, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { ArrayNotEmpty, IsArray, IsDefined, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
 import { QueryArray } from '../../../shared/transformers/query-array';
@@ -12,6 +12,17 @@ export class CreateCompanyClinicDto {
 
   @IsString()
   clinicId: string;
+}
+
+export class TestRoute123CompanyDto {
+  @IsString()
+  companyId: string;
+
+  @IsArray()
+  @ArrayNotEmpty()
+  @ValidateNested({ each: true, message: 'ok' })
+  @Type(() => CreateCompanyClinicDto)
+  x: CreateCompanyClinicDto[];
 }
 
 export class UpdateCompanyClinicDto extends PartialType(CreateCompanyClinicDto) {}

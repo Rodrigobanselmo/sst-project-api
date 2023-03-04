@@ -16,6 +16,7 @@ interface IBase {
   removeWithAllEmptyVars?: string[];
   removeWithAllValidVars?: string[];
   addWithAllVars?: string[];
+  id?: string;
   label?: string;
 }
 
@@ -55,10 +56,10 @@ export type IAprTable = {
   properties?: ISectionPropertiesOptions;
 } & IBase;
 
-export type IAllSectionTypesPGR = IChapter | ISection | ICover | ISectionEnv | ISectionChar | ITOC | IAprTable;
+export type IAllDocumentSectionType = IChapter | ISection | ICover | ISectionEnv | ISectionChar | ITOC | IAprTable;
 
 export type IDocumentPGRSectionGroup = {
-  data: IAllSectionTypesPGR[];
+  data: IAllDocumentSectionType[];
   footer: boolean;
   header: boolean;
 };

@@ -54,7 +54,7 @@ export const prioritization: IDocumentPGRSectionGroup = {
           text: 'Hierarquia frente aos principais tipos de medidas de controle',
         },
         {
-          type: DocumentSectionChildrenTypeEnum.H4,
+          type: DocumentSectionChildrenTypeEnum.H3,
           text: 'Acompanhamento e Controle dos Riscos Ocupacionais (NR-01 item 1.5.3.2 alínea d)',
         },
         {

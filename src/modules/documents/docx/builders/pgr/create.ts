@@ -15,7 +15,7 @@ import { ElementsMapClass } from './maps/elementTypeMap';
 import { SectionsMapClass } from './maps/sectionTypeMap';
 import { docPGRSections } from './mock';
 import { ICreatePGR } from './types/pgr.types';
-import { IAllSectionTypesPGR, IDocumentPGRSectionGroups, IDocVariables } from './types/section.types';
+import { IAllDocumentSectionType, IDocumentPGRSectionGroups, IDocVariables } from './types/section.types';
 import { HierarchyMapData, IHierarchyMap, IHomoGroupMap } from '../../converter/hierarchy.converter';
 import { booleanVariables } from './functions/getVariables/boolean.variables';
 
@@ -99,7 +99,7 @@ export class DocumentBuildPGR {
     };
   }
 
-  private convertToSections(data: IAllSectionTypesPGR[]): ISectionOptions[] {
+  private convertToSections(data: IAllDocumentSectionType[]): ISectionOptions[] {
     const sections: ISectionOptions[] = [];
 
     const elementsMap = new ElementsMapClass({

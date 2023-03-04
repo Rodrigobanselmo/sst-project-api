@@ -14,12 +14,12 @@ import { HierarchyMapData, IHomoGroupMap } from '../../../converter/hierarchy.co
 import { convertToDocxHelper } from '../functions/convertToDocx';
 import { replaceAllVariables } from '../functions/replaceAllVariables';
 import { ISectionChildrenType } from '../types/elements.types';
-import { IAllSectionTypesPGR, IChapter, ICover, IDocVariables, ISection, DocumentSectionTypeEnum } from '../types/section.types';
+import { IAllDocumentSectionType, IChapter, ICover, IDocVariables, ISection, DocumentSectionTypeEnum } from '../types/section.types';
 import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
 import { IMapElementDocumentType } from './elementTypeMap';
 import { allCharacterizationSections } from '../../../components/iterables/all-characterization/all-characterization.sections';
 
-type IMapSectionDocumentType = Record<string, (arg: IAllSectionTypesPGR) => ISectionOptions | ISectionOptions[]>;
+type IMapSectionDocumentType = Record<string, (arg: IAllDocumentSectionType) => ISectionOptions | ISectionOptions[]>;
 
 type IDocumentClassType = {
   variables?: IDocVariables;

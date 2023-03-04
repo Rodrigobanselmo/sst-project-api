@@ -50,6 +50,7 @@ export class CharacterizationRepository {
         description: characterizationDto.name + '(//)' + type,
         companyId: companyId,
         type: getCharacterizationType(type),
+        workspaces: { connect: { id: workspaceId } },
       },
       update: {
         type: getCharacterizationType(type),
