@@ -3,7 +3,6 @@ import { DocumentSectionChildrenTypeEnum } from '../types/elements.types';
 import { IDocumentPGRSectionGroup, DocumentSectionTypeEnum } from '../types/section.types';
 
 export const investigation: IDocumentPGRSectionGroup = {
-
   data: [
     {
       type: DocumentSectionTypeEnum.SECTION,
