@@ -11,7 +11,7 @@ import { m2mGetDeletedIds } from './../../../../shared/utils/m2mFilterIds';
 
 @Injectable()
 export class RiskGroupDataRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(readonly prisma: PrismaService) {}
   async upsert({ companyId, id, ...createDto }: UpsertRiskGroupDataDto): Promise<RiskFactorGroupDataEntity> {
     const riskFactorGroupDataEntity = await this.prisma.riskFactorGroupData.upsert({
       create: {

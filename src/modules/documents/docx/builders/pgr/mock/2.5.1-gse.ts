@@ -4,8 +4,6 @@ import { DocumentSectionChildrenTypeEnum } from '../types/elements.types';
 import { IDocumentPGRSectionGroup, DocumentSectionTypeEnum } from '../types/section.types';
 
 export const gse2Section: IDocumentPGRSectionGroup = {
-  footer: true,
-  header: true,
   data: [
     {
       properties: sectionLandscapeProperties,

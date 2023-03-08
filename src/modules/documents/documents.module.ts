@@ -1,3 +1,4 @@
+import { FakeStorageProvider } from './../../shared/providers/StorageProvider/implementations/AmazonStorage/FakeStorageProvider';
 import { PdfGuideDataService } from './services/pdf/guide/guide-data.service';
 import { Module } from '@nestjs/common';
 import { AmazonStorageProvider } from '../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
@@ -31,6 +32,8 @@ import { UpdateDocumentModelService } from './services/document/document-models/
 import { FindDocumentModelService } from './services/document/document-models/find-document-model.service';
 import { FindOneDocumentModelService } from './services/document/document-models/find-one-document-model.service';
 import { DocumentModelController } from './controller/document-model.controller';
+import { DocumentPGRPreviewFactory } from './factories/document/products/PGR/DocumentPGRPreviewFactory';
+import { DownloadPreviewModel } from './services/document/document-models/download-preview-model.service';
 
 @Module({
   controllers: [DocumentModelController, DocumentsPgrController, DocumentsPdfController, DocumentsBaseController],
@@ -60,6 +63,9 @@ import { DocumentModelController } from './controller/document-model.controller'
     CreateDocumentModelService,
     FindDocumentModelService,
     FindOneDocumentModelService,
+    DocumentPGRPreviewFactory,
+    FakeStorageProvider,
+    DownloadPreviewModel,
   ],
 })
 export class DocumentsModule {}

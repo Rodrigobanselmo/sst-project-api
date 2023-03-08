@@ -1,3 +1,4 @@
+import { docPGRSections } from './../../../docx/builders/pgr/mock/index';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { DocumentTypeEnum } from '@prisma/client';
 
@@ -6,6 +7,7 @@ import { documentSectionTypeMap } from './../../../constants/documentSectionType
 import { variableMap } from './../../../constants/variables.constant';
 import { IGetDocumentModelData } from './../../../dto/document-model.dto';
 import { DocumentModelRepository } from './../../../repositories/implementations/DocumentModelRepository';
+import { v4 } from 'uuid';
 
 @Injectable()
 export class GetDocVariablesService {
@@ -55,5 +57,47 @@ export class GetDocVariablesService {
     if (!docData) throw new BadRequestException('Modelo não encontrado');
 
     return doc.data?.[0];
+  }
+
+  //!
+  private document2(id: number, companyId: string) {
+    const data = [];
+    const childrens = {};
+
+    docPGRSections.sections.forEach((section) => {
+      section.data.forEach((item) => {
+        const docId = v4();
+        const hasChildren = 'children' in item;
+        if (hasChildren) {
+          const children = item.children.map((child) => ({
+            id: v4(),
+            ...child,
+          }));
+
+          childrens[docId] = children;
+
+          delete item.children;
+        }
+
+        data.push({
+          ...item,
+          id: docId,
+          ...(hasChildren && {
+            hasChildren: true,
+          }),
+        });
+      });
+    });
+
+    return {
+      dataJson: {
+        sections: [{ data, children: childrens }],
+        variables: Object.entries(docPGRSections.variables).map(([key, value]) => ({
+          label: value,
+          type: key,
+        })),
+      },
+      type: DocumentTypeEnum.PGR,
+    };
   }
 }

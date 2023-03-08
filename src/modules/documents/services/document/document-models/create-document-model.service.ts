@@ -12,7 +12,7 @@ import { v4 } from 'uuid';
 export class CreateDocumentModelService {
   constructor(private readonly documentModelRepository: DocumentModelRepository) {}
 
-  async execute(body: CreateDocumentModelDto, user: UserPayloadDto) {
+  async execute({ copyFromId, ...body }: CreateDocumentModelDto, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;
     const system = user.isSystem;
 
@@ -36,9 +36,9 @@ export class CreateDocumentModelService {
         },
       ],
     };
-    if (body.copyFromId) {
+    if (copyFromId) {
       const copyDataModel = await this.documentModelRepository.find(
-        { showInactive: true, companyId: user.targetCompanyId, all: true, id: [body.copyFromId] },
+        { showInactive: true, companyId: user.targetCompanyId, all: true, id: [copyFromId] },
         { skip: 0, take: 1 },
         { select: { data: true } },
       );

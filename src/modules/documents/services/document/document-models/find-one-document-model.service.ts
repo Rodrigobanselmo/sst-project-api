@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { DocumentModelRepository } from '../../../repositories/implementations/DocumentModelRepository';
@@ -24,6 +24,8 @@ export class FindOneDocumentModelService {
         system: true,
       },
     });
+
+    if (!model?.id) throw new BadRequestException('Você não tem permissões para acessar esse modelo');
 
     return model;
   }

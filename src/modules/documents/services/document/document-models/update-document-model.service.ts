@@ -11,8 +11,17 @@ export class UpdateDocumentModelService {
 
   async execute(body: UpdateDocumentModelDto, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;
+    const isSystem = user.isSystem;
 
-    if (body.name) {
+    const foundActual = await this.documentModelRepository.find(
+      { id: [body.id], companyId, all: true, showInactive: true, ...(!isSystem && { system: false }) },
+      { skip: 0, take: 1 },
+      { select: { id: true, name: true } },
+    );
+
+    if (!foundActual.data[0]?.id) throw new BadRequestException('Você não tem premissão para editar esse modelo');
+
+    if (body.name && body.name != foundActual.data[0].name) {
       const found = await this.documentModelRepository.find(
         { name: body.name, showInactive: true, companyId: user.targetCompanyId, all: true },
         { skip: 0, take: 1 },

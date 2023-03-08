@@ -1,3 +1,4 @@
+import { IDocumentModelData } from './../../../types/document-mode.types';
 import { RiskDocumentEntity } from './../../../../sst/entities/riskDocument.entity';
 import { AttachmentEntity } from './../../../../sst/entities/attachment.entity';
 import { ISectionOptions } from 'docx';
@@ -35,6 +36,7 @@ export interface ISaveDocument<T, R> {
 
 export interface IDocumentFactoryProduct<T = any, R = any> {
   unlinkPaths: string[];
+  downloadPathImage(url: string): Promise<string>;
   getData(body: T): R;
   getAttachments(data: R, body: T): Promise<IDocumentAttachment[]>;
   getFileName(body: T, type?: string, ...args: any[]): string;
@@ -42,6 +44,7 @@ export interface IDocumentFactoryProduct<T = any, R = any> {
   getDocument(options: IGetDocument<T, R>): Promise<ISectionOptions[]>;
   save(options: ISaveDocument<T, R>): Promise<RiskDocumentEntity>;
   error(options: Pick<ISaveDocument<T, R>, 'body'>): Promise<void>;
+  documentModelData(id: number, companyId: string): Promise<IDocumentModelData>;
   // getFilename(): string;
   // findTableData(companyId: string, query: T): Promise<IFileFactoryProductFindData>;
   // sanitizeData(...data: any): IFileSanitizeData[];

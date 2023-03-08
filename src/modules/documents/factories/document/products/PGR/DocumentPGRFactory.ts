@@ -1,38 +1,42 @@
-import { DocumentDataPGRDto } from './../../../../../sst/dto/document-data-pgr.dto';
+import { parseModelData } from './../../helpers/parseModelData';
+import { IDocumentPGRSectionGroups, IDocVariables } from './../../../../docx/builders/pgr/types/section.types';
+import { IDocumentModelData } from './../../../../types/document-mode.types';
+import { DocumentDataPGRDto } from '../../../../../sst/dto/document-data-pgr.dto';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { DocumentTypeEnum, HomoTypeEnum, StatusEnum } from '@prisma/client';
 import { ISectionOptions } from 'docx';
 import { asyncBatch } from '../../../../../../shared/utils/asyncBatch';
 import { v4 } from 'uuid';
 
-import { actionPlanTableSection } from '../../../../../../modules/documents/docx/components/tables/actionPlan/actionPlan.section';
-import { APPRByGroupTableSection } from '../../../../../../modules/documents/docx/components/tables/apprByGroup/appr-group.section';
+import { actionPlanTableSection } from '../../../../docx/components/tables/actionPlan/actionPlan.section';
+import { APPRByGroupTableSection } from '../../../../docx/components/tables/apprByGroup/appr-group.section';
 import { dayjs } from '../../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { DocumentFactoryAbstractionCreator } from '../../creator/DocumentFactoryCreator';
 import { IDocumentFactoryProduct as IDocumentFactoryProduct } from '../../types/IDocumentFactory.types';
-import { PromiseInfer } from './../../../../../../shared/interfaces/promise-infer.types';
-import { AmazonStorageProvider } from './../../../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
-import { downloadPathImage, downloadPathImages } from './../../../../../../shared/utils/downloadPathImages';
-import { getConsultantCompany } from './../../../../../../shared/utils/getConsultantCompany';
-import { getDocxFileName } from './../../../../../../shared/utils/getFileName';
-import { getRiskDoc } from './../../../../../../shared/utils/getRiskDoc';
-import { CharacterizationEntity } from './../../../../../company/entities/characterization.entity';
-import { CompanyEntity } from './../../../../../company/entities/company.entity';
-import { HierarchyEntity } from './../../../../../company/entities/hierarchy.entity';
-import { HomoGroupEntity } from './../../../../../company/entities/homoGroup.entity';
-import { isEnvironment } from './../../../../../company/repositories/implementations/CharacterizationRepository';
-import { CompanyRepository } from './../../../../../company/repositories/implementations/CompanyRepository';
-import { HierarchyRepository } from './../../../../../company/repositories/implementations/HierarchyRepository';
-import { HomoGroupRepository } from './../../../../../company/repositories/implementations/HomoGroupRepository';
-import { WorkspaceRepository } from './../../../../../company/repositories/implementations/WorkspaceRepository';
-import { RiskDocumentEntity } from './../../../../../sst/entities/riskDocument.entity';
-import { RiskDocumentRepository } from './../../../../../sst/repositories/implementations/RiskDocumentRepository';
-import { RiskGroupDataRepository } from './../../../../../sst/repositories/implementations/RiskGroupDataRepository';
-import { DocumentBuildPGR } from './../../../../docx/builders/pgr/create';
-import { APPRTableSection } from './../../../../docx/components/tables/appr/appr.section';
-import { hierarchyConverter } from './../../../../docx/converter/hierarchy.converter';
-import { IGetDocument, ISaveDocument } from './../../types/IDocumentFactory.types';
+import { PromiseInfer } from '../../../../../../shared/interfaces/promise-infer.types';
+import { AmazonStorageProvider } from '../../../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
+import { downloadPathImage, downloadPathImages } from '../../../../../../shared/utils/downloadPathImages';
+import { getConsultantCompany } from '../../../../../../shared/utils/getConsultantCompany';
+import { getDocxFileName } from '../../../../../../shared/utils/getFileName';
+import { getRiskDoc } from '../../../../../../shared/utils/getRiskDoc';
+import { CharacterizationEntity } from '../../../../../company/entities/characterization.entity';
+import { CompanyEntity } from '../../../../../company/entities/company.entity';
+import { HierarchyEntity } from '../../../../../company/entities/hierarchy.entity';
+import { HomoGroupEntity } from '../../../../../company/entities/homoGroup.entity';
+import { isEnvironment } from '../../../../../company/repositories/implementations/CharacterizationRepository';
+import { CompanyRepository } from '../../../../../company/repositories/implementations/CompanyRepository';
+import { HierarchyRepository } from '../../../../../company/repositories/implementations/HierarchyRepository';
+import { HomoGroupRepository } from '../../../../../company/repositories/implementations/HomoGroupRepository';
+import { WorkspaceRepository } from '../../../../../company/repositories/implementations/WorkspaceRepository';
+import { RiskDocumentEntity } from '../../../../../sst/entities/riskDocument.entity';
+import { RiskDocumentRepository } from '../../../../../sst/repositories/implementations/RiskDocumentRepository';
+import { RiskGroupDataRepository } from '../../../../../sst/repositories/implementations/RiskGroupDataRepository';
+import { DocumentBuildPGR } from '../../../../docx/builders/pgr/create';
+import { APPRTableSection } from '../../../../docx/components/tables/appr/appr.section';
+import { hierarchyConverter } from '../../../../docx/converter/hierarchy.converter';
+import { IGetDocument, ISaveDocument } from '../../types/IDocumentFactory.types';
 import { IDocumentPGRBody } from './types/pgr.types';
+import { DocumentModelRepository } from '../../../../repositories/implementations/DocumentModelRepository';
 
 @Injectable()
 export class DocumentPGRFactory extends DocumentFactoryAbstractionCreator<IDocumentPGRBody, any> {
@@ -43,34 +47,37 @@ export class DocumentPGRFactory extends DocumentFactoryAbstractionCreator<IDocum
     private readonly companyRepository: CompanyRepository,
     private readonly homoGroupRepository: HomoGroupRepository,
     private readonly hierarchyRepository: HierarchyRepository,
+    private readonly documentModelRepository: DocumentModelRepository,
     private readonly storageProvider: AmazonStorageProvider,
   ) {
     super(storageProvider);
   }
 
   public factoryMethod(): IDocumentFactoryProduct {
-    return new DocumentFactoryProduct(
+    return new DocumentPGRFactoryProduct(
       this.riskGroupDataRepository,
       this.riskDocumentRepository,
       this.workspaceRepository,
       this.companyRepository,
       this.homoGroupRepository,
       this.hierarchyRepository,
+      this.documentModelRepository,
     );
   }
 }
 
-class DocumentFactoryProduct implements IDocumentFactoryProduct {
+export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
   public unlinkPaths = [];
   private company: CompanyEntity;
 
   constructor(
-    private readonly riskGroupDataRepository: RiskGroupDataRepository,
-    private readonly riskDocumentRepository: RiskDocumentRepository,
-    private readonly workspaceRepository: WorkspaceRepository,
-    private readonly companyRepository: CompanyRepository,
-    private readonly homoGroupRepository: HomoGroupRepository,
-    private readonly hierarchyRepository: HierarchyRepository,
+    protected readonly riskGroupDataRepository: RiskGroupDataRepository,
+    protected readonly riskDocumentRepository: RiskDocumentRepository,
+    protected readonly workspaceRepository: WorkspaceRepository,
+    protected readonly companyRepository: CompanyRepository,
+    protected readonly homoGroupRepository: HomoGroupRepository,
+    protected readonly hierarchyRepository: HierarchyRepository,
+    protected readonly documentModelRepository: DocumentModelRepository,
   ) {
     //
   }
@@ -79,6 +86,7 @@ class DocumentFactoryProduct implements IDocumentFactoryProduct {
     const company = await this.companyRepository.findDocumentData(companyId, { workspaceId, type: 'PGR' });
     const riskGroupId = company.riskFactorGroupData?.[0]?.id;
 
+    if (company.documentData?.length == 0) throw new BadRequestException('Nenhum documento PGR cadastrado');
     if (!riskGroupId) throw new BadRequestException('Nenhum sistema de gestão cadastrado');
 
     const workspacePromise = this.workspaceRepository.findById(workspaceId);
@@ -86,16 +94,16 @@ class DocumentFactoryProduct implements IDocumentFactoryProduct {
     const hierarchyPromise = this.hierarchyRepository.findDocumentData(companyId, { workspaceId }); // add homo
     const homogeneousGroupPromise = this.homoGroupRepository.findDocumentData(companyId, { workspaceId });
     const versionsPromise = this.riskDocumentRepository.findDocumentData(riskGroupId, companyId, DocumentTypeEnum.PGR);
+    const modelDataPromise = this.documentModelData(company.documentData[0].modelId, companyId);
 
-    const [workspace, riskGroupData, hierarchies, homogeneousGroupsFound, versions] = await Promise.all([
+    const [workspace, riskGroupData, hierarchies, homogeneousGroupsFound, versions, modelData] = await Promise.all([
       workspacePromise,
       riskGroupDataPromise,
       hierarchyPromise,
       homogeneousGroupPromise,
       versionsPromise,
+      modelDataPromise,
     ]);
-
-    if (company.documentData?.length == 0) throw new BadRequestException('Nenhum documento PGR cadastrado');
 
     riskGroupData.data = riskGroupData.data.map((riskData) => {
       const homo = homogeneousGroupsFound.find((homo) => homo.id == riskData.homogeneousGroupId);
@@ -124,7 +132,7 @@ class DocumentFactoryProduct implements IDocumentFactoryProduct {
     this.company = company;
 
     const { characterizations } = await this.downloadPhotos(homogeneousGroups);
-    const { hierarchyData, hierarchyHighLevelsData, homoGroupTree, hierarchyTree } = await this.getHierarchyData(homogeneousGroups, hierarchies, characterizations);
+    const { hierarchyData, hierarchyHighLevelsData, homoGroupTree, hierarchyTree } = this.getHierarchyData(homogeneousGroups, hierarchies, characterizations);
 
     riskGroupData.data = riskGroupData.data.filter((riskData) => {
       if (riskData.homogeneousGroup.type == HomoTypeEnum.HIERARCHY) {
@@ -175,6 +183,7 @@ class DocumentFactoryProduct implements IDocumentFactoryProduct {
       logo,
       characterizations,
       cover,
+      modelData: parseModelData(modelData),
     };
   }
 
@@ -262,6 +271,7 @@ class DocumentFactoryProduct implements IDocumentFactoryProduct {
       characterizations: data.characterizations,
       hierarchyTree: data.hierarchyTree,
       cover: data.cover,
+      docSections: data.modelData,
     }).build();
 
     return sections;
@@ -322,7 +332,7 @@ class DocumentFactoryProduct implements IDocumentFactoryProduct {
     });
   };
 
-  private async downloadLogos(company: CompanyEntity, consultant: CompanyEntity) {
+  public async downloadLogos(company: CompanyEntity, consultant: CompanyEntity) {
     const [logo, consultantLogo] = await downloadPathImages([company?.logoUrl, consultant?.logoUrl]);
 
     if (logo) this.unlinkPaths.push(logo);
@@ -331,7 +341,7 @@ class DocumentFactoryProduct implements IDocumentFactoryProduct {
     return { logo, consultantLogo };
   }
 
-  private async getHierarchyData(homogeneousGroups: HomoGroupEntity[], hierarchies: HierarchyEntity[], characterizations: CharacterizationEntity[]) {
+  private getHierarchyData(homogeneousGroups: HomoGroupEntity[], hierarchies: HierarchyEntity[], characterizations: CharacterizationEntity[]) {
     const homoMap: Record<string, HomoGroupEntity> = {};
 
     homogeneousGroups.forEach((homogeneousGroup) => {
@@ -390,7 +400,7 @@ class DocumentFactoryProduct implements IDocumentFactoryProduct {
                 if (!photo.photoUrl) return;
 
                 try {
-                  const path = await downloadPathImage(photo.photoUrl);
+                  const path = await this.downloadPathImage(photo.photoUrl);
                   if (path) photosPath.push(path);
                   return { ...photo, photoUrl: path };
                 } catch (error) {
@@ -409,5 +419,18 @@ class DocumentFactoryProduct implements IDocumentFactoryProduct {
     this.unlinkPaths.push(...photosPath);
 
     return { characterizations };
+  }
+
+  public async downloadPathImage(url: string) {
+    return downloadPathImage(url);
+  }
+
+  public async documentModelData(id: number, companyId: string) {
+    const doc = await this.documentModelRepository.find({ id: [id], companyId, all: true, showInactive: true }, { skip: 0, take: 1 }, { select: { data: true } });
+
+    const docData = doc.data?.[0]?.dataJson;
+    if (!docData) throw new BadRequestException('Modelo não encontrado');
+
+    return doc.data?.[0]?.dataJson;
   }
 }

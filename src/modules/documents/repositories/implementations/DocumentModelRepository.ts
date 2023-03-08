@@ -29,7 +29,7 @@ export class DocumentModelRepository {
 
     const document = await this.prisma.documentModel.update({
       data: { data: buffer, ...props },
-      where: { id_companyId: { id, companyId: props.companyId } },
+      where: { id },
       select: { id: true },
     });
 
@@ -56,7 +56,7 @@ export class DocumentModelRepository {
 
     const { where } = prismaFilter(whereInit, {
       query,
-      skip: ['showInactive', 'companyId', 'all', 'search'],
+      skip: ['showInactive', 'companyId', 'all', 'search', 'type'], //! remove type
     });
 
     if (!options.select)

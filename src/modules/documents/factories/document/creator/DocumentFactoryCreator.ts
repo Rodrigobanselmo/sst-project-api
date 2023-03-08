@@ -2,22 +2,22 @@ import { ISectionOptions, Packer } from 'docx';
 import fs from 'fs';
 
 import { IDocumentAttachment, IDocumentFactoryProduct as IDocumentFactoryProduct } from '../types/IDocumentFactory.types';
-import { AmazonStorageProvider } from './../../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
+import { IStorageProvider } from './../../../../../shared/providers/StorageProvider/models/StorageProvider.types';
 import { AttachmentEntity } from './../../../../sst/entities/attachment.entity';
 import { createBaseDocument } from './../../../docx/base/config/document';
 
 export abstract class DocumentFactoryAbstractionCreator<T, R> {
-  public abstract factoryMethod(): IDocumentFactoryProduct<T, R>;
+  public abstract factoryMethod(body: T): IDocumentFactoryProduct<T, R>;
 
-  constructor(private readonly amazonStorageProvider: AmazonStorageProvider) {}
+  constructor(private readonly amazonStorageProvider: IStorageProvider) {}
 
-  public create() {
-    const product = this.factoryMethod();
+  public create(body: T) {
+    const product = this.factoryMethod(body);
     return product;
   }
 
   public async execute(body: T) {
-    const product = this.create();
+    const product = this.create(body);
 
     try {
       const data = await product.getData(body);
@@ -68,7 +68,7 @@ export abstract class DocumentFactoryAbstractionCreator<T, R> {
     return { url, buffer, fileName };
   }
 
-  private async upload(fileBuffer: Buffer, fileName: string) {
+  async upload(fileBuffer: Buffer, fileName: string) {
     const { url } = await this.amazonStorageProvider.upload({
       file: fileBuffer,
       fileName: 'temp-files-7-days/' + fileName,
@@ -77,7 +77,7 @@ export abstract class DocumentFactoryAbstractionCreator<T, R> {
     return url;
   }
 
-  private async unlinkFiles(paths: string[]) {
+  public async unlinkFiles(paths: string[]) {
     paths
       .filter((i) => !!i && typeof i == 'string')
       .forEach((path) => {

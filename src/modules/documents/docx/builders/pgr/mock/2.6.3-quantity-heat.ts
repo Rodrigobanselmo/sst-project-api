@@ -3,8 +3,6 @@ import { DocumentSectionChildrenTypeEnum } from '../types/elements.types';
 import { IDocumentPGRSectionGroup, DocumentSectionTypeEnum } from '../types/section.types';
 
 export const quantityHeatSection: IDocumentPGRSectionGroup = {
-  footer: true,
-  header: true,
   data: [
     {
       type: DocumentSectionTypeEnum.SECTION,

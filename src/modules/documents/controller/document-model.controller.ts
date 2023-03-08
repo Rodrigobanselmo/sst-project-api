@@ -6,13 +6,15 @@ import { PermissionEnum } from '../../../shared/constants/enum/authorization';
 import { Permissions } from '../../../shared/decorators/permissions.decorator';
 import { User } from '../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../shared/dto/user-payload.dto';
-import { CreateDocumentModelDto, FindDocumentModelDto, IGetDocumentModelData, UpdateDocumentModelDto } from '../dto/document-model.dto';
+import { CreateDocumentModelDto, DownloadPreviewModelData, FindDocumentModelDto, IGetDocumentModelData, UpdateDocumentModelDto } from '../dto/document-model.dto';
 import { CreateDocumentModelService } from '../services/document/document-models/create-document-model.service';
 import { FindDocumentModelService } from '../services/document/document-models/find-document-model.service';
 import { FindOneDocumentModelService } from '../services/document/document-models/find-one-document-model.service';
 import { UpdateDocumentModelService } from '../services/document/document-models/update-document-model.service';
 import { GetDocVariablesService } from '../services/document/document/get-doc-variables.service';
 import { Response } from 'express';
+import { DocumentTypeEnum } from '@prisma/client';
+import { DownloadPreviewModel } from '../services/document/document-models/download-preview-model.service';
 
 @ApiTags('document-model')
 @Controller('document-model')
@@ -23,7 +25,21 @@ export class DocumentModelController {
     private readonly findAvailableDocumentModelService: FindDocumentModelService,
     private readonly findOneDocumentModelService: FindOneDocumentModelService,
     private readonly getDocVariablesService: GetDocVariablesService,
+    private readonly downloadPreviewModel: DownloadPreviewModel,
   ) {}
+
+  @Permissions({
+    code: PermissionEnum.DOCUMENT_MODEL,
+    isMember: true,
+    isContract: true,
+  })
+  @Post('/:companyId/preview')
+  async downloadPreview(@Res() res: Response, @User() userPayloadDto: UserPayloadDto, @Body() body: DownloadPreviewModelData) {
+    const { buffer: file, fileName } = await this.downloadPreviewModel.execute(body, userPayloadDto);
+
+    res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
+    res.send(file);
+  }
 
   @Get('/:companyId/:id/data')
   async findDocumentModelData(@Res() response: Response, @User() user: UserPayloadDto, @Param('id', ParseIntPipe) id: number, @Query() query: IGetDocumentModelData) {

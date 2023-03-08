@@ -1,12 +1,14 @@
+import { IDocumentModelData } from './../types/document-mode.types';
 import { QueryArray } from './../../../shared/transformers/query-array';
 import { DocumentTypeEnum, StatusEnum } from '@prisma/client';
 import { Transform } from 'class-transformer';
-import { IsEnum, IsOptional, IsString, IsInt, IsBoolean } from 'class-validator';
+import { IsEnum, IsOptional, IsString, IsInt, IsBoolean, IsDefined } from 'class-validator';
 import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
 import { ToBoolean } from '../../../shared/decorators/boolean.decorator';
 
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
+import { Types } from 'aws-sdk/clients/applicationautoscaling';
 
 export class CreateDocumentModelDto {
   @IsString()
@@ -17,7 +19,7 @@ export class CreateDocumentModelDto {
 
   @IsOptional()
   @IsInt()
-  copyFromId: number;
+  copyFromId?: number;
 
   @IsString()
   @IsOptional()
@@ -46,6 +48,7 @@ export class UpdateDocumentModelDto {
   data?: any;
 
   @IsString()
+  @IsOptional()
   description?: string;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
@@ -55,13 +58,6 @@ export class UpdateDocumentModelDto {
     message: `type must be one of: ${KeysOfEnum(StatusEnum)}`,
   })
   status?: StatusEnum;
-
-  @IsOptional()
-  @IsString()
-  @IsEnum(DocumentTypeEnum, {
-    message: `type must be one of: ${KeysOfEnum(DocumentTypeEnum)}`,
-  })
-  type?: DocumentTypeEnum;
 }
 
 export class FindDocumentModelDto extends PaginationQueryDto {
@@ -106,4 +102,19 @@ export class IGetDocumentModelData {
   @IsOptional()
   @IsString()
   companyId?: string;
+}
+
+export class DownloadPreviewModelData {
+  @IsDefined()
+  data: IDocumentModelData;
+
+  @IsOptional()
+  @IsString()
+  companyId?: string;
+
+  @IsString()
+  @IsEnum(DocumentTypeEnum, {
+    message: `type must be one of: ${KeysOfEnum(DocumentTypeEnum)}`,
+  })
+  type: DocumentTypeEnum;
 }

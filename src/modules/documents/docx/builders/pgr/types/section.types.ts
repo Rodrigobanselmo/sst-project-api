@@ -60,8 +60,6 @@ export type IAllDocumentSectionType = IChapter | ISection | ICover | ISectionEnv
 
 export type IDocumentPGRSectionGroup = {
   data: IAllDocumentSectionType[];
-  footer: boolean;
-  header: boolean;
 };
 
 export type IDocVariables = Record<string, string>;

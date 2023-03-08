@@ -3,8 +3,14 @@ import { DocumentSectionChildrenTypeEnum, ISectionChildrenType } from '../docx/b
 
 type IDocumentElementTypeMap = Record<
   DocumentSectionChildrenTypeEnum,
-  ISectionChildrenType & { label: string; accept: DocumentTypeEnum[]; active?: boolean; isParagraph?: boolean; isBullet?: boolean }
+  ISectionChildrenType & { label: string; accept: DocumentTypeEnum[]; active?: boolean; isParagraph?: boolean; isBullet?: boolean; order?: number }
 >;
+
+const primaryOrder = 1;
+const secondaryOrder = 2;
+const thirdOrder = 3;
+const fourthOrder = 4;
+const fifthOrder = 5;
 
 export const documentElementTypeMap: IDocumentElementTypeMap = {
   [DocumentSectionChildrenTypeEnum.TITLE]: {
@@ -12,42 +18,49 @@ export const documentElementTypeMap: IDocumentElementTypeMap = {
     type: DocumentSectionChildrenTypeEnum.TITLE,
     text: '',
     accept: ['OTHER'],
+    order: secondaryOrder,
   },
   [DocumentSectionChildrenTypeEnum.H1]: {
     label: 'H1',
     type: DocumentSectionChildrenTypeEnum.H1,
     text: '',
     accept: ['OTHER'],
+    order: secondaryOrder,
   },
   [DocumentSectionChildrenTypeEnum.H2]: {
     label: 'H2',
     type: DocumentSectionChildrenTypeEnum.H2,
     text: '',
     accept: ['OTHER'],
+    order: secondaryOrder,
   },
   [DocumentSectionChildrenTypeEnum.H3]: {
     label: 'H3',
     type: DocumentSectionChildrenTypeEnum.H3,
     text: '',
     accept: ['OTHER'],
+    order: secondaryOrder,
   },
   [DocumentSectionChildrenTypeEnum.H4]: {
     label: 'H4',
     type: DocumentSectionChildrenTypeEnum.H4,
     text: '',
     accept: ['OTHER'],
+    order: secondaryOrder,
   },
   [DocumentSectionChildrenTypeEnum.H5]: {
     label: 'H5',
     type: DocumentSectionChildrenTypeEnum.H5,
     text: '',
     accept: ['OTHER'],
+    order: secondaryOrder,
   },
   [DocumentSectionChildrenTypeEnum.H6]: {
     label: 'H6',
     type: DocumentSectionChildrenTypeEnum.H6,
     text: '',
     accept: ['OTHER'],
+    order: secondaryOrder,
   },
   [DocumentSectionChildrenTypeEnum.PARAGRAPH]: {
     label: 'Parágrafo',
@@ -55,12 +68,14 @@ export const documentElementTypeMap: IDocumentElementTypeMap = {
     text: '',
     isParagraph: true,
     accept: ['OTHER'],
+    order: primaryOrder,
   },
   [DocumentSectionChildrenTypeEnum.BREAK]: {
     label: 'Quebra de Página',
     type: DocumentSectionChildrenTypeEnum.BREAK,
     isParagraph: true,
     accept: ['OTHER'],
+    order: thirdOrder,
   },
   [DocumentSectionChildrenTypeEnum.BULLET]: {
     type: DocumentSectionChildrenTypeEnum.BULLET,
@@ -68,12 +83,14 @@ export const documentElementTypeMap: IDocumentElementTypeMap = {
     text: '',
     isBullet: true,
     accept: ['OTHER'],
+    order: primaryOrder,
   },
   [DocumentSectionChildrenTypeEnum.BULLET_SPACE]: {
     label: 'Marcador (Espaçamento)',
     type: DocumentSectionChildrenTypeEnum.BULLET_SPACE,
     text: '',
     accept: ['OTHER'],
+    order: thirdOrder,
   },
   [DocumentSectionChildrenTypeEnum.TABLE_VERSION_CONTROL]: {
     label: 'Tabela Controle de Versões',
@@ -90,6 +107,7 @@ export const documentElementTypeMap: IDocumentElementTypeMap = {
     type: DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE,
     text: '',
     accept: ['OTHER'],
+    order: fourthOrder,
   },
   [DocumentSectionChildrenTypeEnum.LEGEND]: {
     label: 'Legenda Tabela',
@@ -97,11 +115,13 @@ export const documentElementTypeMap: IDocumentElementTypeMap = {
     text: '',
     isParagraph: true,
     accept: ['OTHER'],
+    order: fourthOrder,
   },
   [DocumentSectionChildrenTypeEnum.PROFESSIONAL]: {
     label: 'Lista de Profissionais',
     type: DocumentSectionChildrenTypeEnum.PROFESSIONAL,
     accept: ['OTHER'],
+    order: fifthOrder,
   },
   [DocumentSectionChildrenTypeEnum.PROFESSIONALS_SIGNATURES]: {
     label: 'Tabela de Assinatura dos Profissionais',
@@ -113,6 +133,7 @@ export const documentElementTypeMap: IDocumentElementTypeMap = {
     type: DocumentSectionChildrenTypeEnum.PARAGRAPH_FIGURE,
     text: '',
     accept: ['OTHER'],
+    order: fourthOrder,
   },
 
   //*PGR string --------------------->

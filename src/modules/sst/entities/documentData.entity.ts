@@ -4,7 +4,7 @@ import { StatusEnum } from '@prisma/client';
 import { dayjs } from '../../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { CompanyEntity } from '../../company/entities/company.entity';
 import { ProfessionalEntity } from '../../users/entities/professional.entity';
-import { RiskFactorDataEntity } from './riskData.entity';
+import { DocumentModelEntity } from './../../documents/entities/document-model.entity';
 import { ProfessionalDocumentDataEntity } from './usersRiskGroup';
 import { DocumentData, DocumentTypeEnum, Prisma } from '.prisma/client';
 
@@ -30,11 +30,6 @@ export class DocumentDataEntity implements DocumentData {
   @ApiProperty({
     description: 'The array with risks data',
   })
-  data?: Partial<RiskFactorDataEntity>[];
-
-  @ApiProperty({
-    description: 'The array with risks data',
-  })
   workspaceId: string;
 
   elaboratedBy: string;
@@ -52,13 +47,11 @@ export class DocumentDataEntity implements DocumentData {
   company?: Partial<CompanyEntity>;
   professionals?: ProfessionalEntity[];
   professionalsSignatures?: ProfessionalDocumentDataEntity[];
+  modelId: number;
+  model: DocumentModelEntity;
 
   constructor(partial: Partial<DocumentDataEntity>) {
     Object.assign(this, partial);
-
-    if (partial?.data) {
-      this.data = partial.data.map((d) => new RiskFactorDataEntity(d));
-    }
 
     if (!this?.professionals) this.professionals = [];
     if (partial?.professionalsSignatures) {

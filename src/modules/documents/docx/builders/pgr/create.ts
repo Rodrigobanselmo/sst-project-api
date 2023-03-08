@@ -52,6 +52,7 @@ export class DocumentBuildPGR {
     attachments,
     hierarchyTree,
     cover,
+    docSections,
   }: ICreatePGR) {
     this.version = version;
     this.logoImagePath = logo;
@@ -59,7 +60,7 @@ export class DocumentBuildPGR {
     this.consultantLogoImagePath = consultantLogo;
     this.company = company;
     this.workspace = workspace;
-    this.docSections = docPGRSections;
+    this.docSections = docSections || docPGRSections;
     this.versions = versions;
     this.environments = environments;
     this.document = document;

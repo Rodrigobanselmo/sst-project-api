@@ -8,6 +8,7 @@ import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroup
 import { HierarchyMapData, IHierarchyMap, IHomoGroupMap } from '../../../converter/hierarchy.converter';
 import { CharacterizationEntity } from './../../../../../company/entities/characterization.entity';
 import { DocumentCoverEntity } from './../../../../../company/entities/document-cover.entity';
+import { IDocumentPGRSectionGroups } from './section.types';
 
 export interface ICreatePGR {
   version: string;
@@ -24,4 +25,5 @@ export interface ICreatePGR {
   characterizations: CharacterizationEntity[];
   attachments: AttachmentEntity[];
   hierarchyTree: IHierarchyMap;
+  docSections?: IDocumentPGRSectionGroups;
 }

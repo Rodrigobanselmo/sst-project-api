@@ -1,5 +1,5 @@
 import { ISectionChildrenType } from '../docx/builders/pgr/types/elements.types';
-import { IAllDocumentSectionType, IDocVariables } from '../docx/builders/pgr/types/section.types';
+import { IAllDocumentSectionType } from '../docx/builders/pgr/types/section.types';
 
 export type IDocumentModelVariables = Record<
   string,
@@ -17,6 +17,6 @@ export type IDocumentModelSectionGroup = {
 };
 
 export type IDocumentModelData = {
-  variables: IDocVariables;
+  variables: IDocumentModelVariables;
   sections: IDocumentModelSectionGroup[];
 };

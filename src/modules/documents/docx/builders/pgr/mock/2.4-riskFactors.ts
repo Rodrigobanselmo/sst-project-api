@@ -4,8 +4,7 @@ import { DocumentSectionChildrenTypeEnum } from '../types/elements.types';
 import { IDocumentPGRSectionGroup, DocumentSectionTypeEnum } from '../types/section.types';
 
 export const riskFactors3Section: IDocumentPGRSectionGroup = {
-  footer: true,
-  header: true,
+
   data: [
     {
       properties: sectionLandscapeProperties,

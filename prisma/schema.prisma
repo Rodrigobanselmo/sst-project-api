@@ -598,6 +598,7 @@ model DocumentData {
   validityEnd             DateTime?
   status                  StatusEnum                    @default(PROGRESS)
   type                    DocumentTypeEnum              
+  modelId                 Int?
 
   elaboratedBy            String?
   coordinatorBy           String?
@@ -607,6 +608,7 @@ model DocumentData {
   json                    Json?
 
   company                 Company                       @relation(fields: [companyId], references: [id])
+  model                   DocumentModel?                  @relation(fields: [modelId], references: [id])
   docs                    RiskFactorDocument[]
   professionalsSignatures DocumentDataToProfessional[]
   workspace               Workspace                     @relation(fields: [workspaceId], references: [id])
@@ -616,7 +618,7 @@ model DocumentData {
 }
 
 model DocumentModel {
-  id         Int                @default(autoincrement())
+  id         Int                @default(autoincrement()) @id
   name       String       
   description       String?       
   companyId  String       
@@ -626,9 +628,10 @@ model DocumentModel {
   updated_at DateTime           @updatedAt
   company    Company            @relation(fields: [companyId], references: [id])
   type       DocumentTypeEnum
-  data       Bytes       
+  data       Bytes      
+  documents  DocumentData[] 
 
-  @@id([id, companyId])
+  @@unique([id, companyId])
 }
 
 
@@ -646,6 +649,7 @@ model CompanyOS {
   declaration  Json?
   companyId    String     @unique
   company      Company    @relation(fields: [companyId], references: [id])
+
 
   @@unique([id, companyId])
 }
