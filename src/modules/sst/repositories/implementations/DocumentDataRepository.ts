@@ -64,6 +64,7 @@ export class DocumentDataRepository {
         professionalsSignatures: {
           include: { professional: { include: { professional: true } } },
         },
+        model: true,
       },
       ...options,
     });

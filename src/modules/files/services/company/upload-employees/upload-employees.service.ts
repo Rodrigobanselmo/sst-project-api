@@ -62,16 +62,22 @@ export class UploadEmployeesService {
     });
 
     const workspaces = await this.workspaceRepository.findByCompany(companyId);
-    const ghoNameDescriptionMap = {} as Record<string, string>;
+    const ghoNameDescriptionMap = {} as Record<string, { description: string; workIds: string[] }>;
 
     employeesData = employeesData.map((employee) => {
       const workspace =
-        company.workspace?.length === 1 ? workspaces : workspaces.filter((work) => employee?.abbreviation && employee?.abbreviation.includes(work.abbreviation));
+        company.workspace?.length === 1
+          ? workspaces
+          : workspaces.filter((work) => employee?.abbreviation && (employee?.abbreviation == work.abbreviation || employee?.abbreviation == work.name));
 
       if (workspace.length === 0) throw new BadRequestException(ErrorCompanyEnum.WORKSPACE_NOT_FOUND);
 
       if (employee.ghoName) {
-        ghoNameDescriptionMap[employee.ghoName] = ghoNameDescriptionMap[employee.ghoName] || employee.ghoDescription || '';
+        const workIds = ghoNameDescriptionMap[employee.ghoName]?.workIds || [];
+        ghoNameDescriptionMap[employee.ghoName] = {
+          description: ghoNameDescriptionMap?.[employee.ghoName]?.description || employee.ghoDescription || '',
+          workIds: removeDuplicate([...workIds, ...workspace.map((w) => w.id)], { simpleCompare: true }),
+        };
       }
 
       if (employee?.abbreviation) delete employee.abbreviation;

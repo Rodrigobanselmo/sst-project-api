@@ -38,6 +38,10 @@ export class UpsertDocumentDataDto {
   @IsString()
   companyId: string;
 
+  @IsOptional()
+  @IsInt()
+  modelId?: number;
+
   @Transform(StringCapitalizeTransform, { toClassOnly: true })
   @IsOptional()
   @IsString()

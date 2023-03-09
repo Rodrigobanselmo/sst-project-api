@@ -19,18 +19,56 @@ export class HierarchyRepository {
       workspaceIds: string[];
     })[],
     companyId: string,
-    ghoNames?: Record<string, string>,
+    ghoNames?:
+      | Record<string, string>
+      | Record<
+          string,
+          {
+            description: string;
+            workIds: string[];
+          }
+        >,
   ): Promise<HierarchyEntity[]> {
     let homogeneousGroup = [];
     const workIds = upsertHierarchyMany
       .map((h) => h.workspaceIds)
       .filter((i) => i)
-      .flat(1);
+      .flat(1)
+      .filter((i) => i);
     //create homogenies group
     if (upsertHierarchyMany && upsertHierarchyMany.length > 0)
       homogeneousGroup = ghoNames
         ? await this.prisma.$transaction(
             Object.entries(ghoNames).map(([ghoName, description]) => {
+              if (typeof description != 'string') {
+                return this.prisma.homogeneousGroup.upsert({
+                  create: {
+                    company: { connect: { id: companyId } },
+                    name: ghoName,
+                    description: description.description || '',
+                    workspaces: description.workIds.length
+                      ? {
+                          connect: description.workIds.map((id) => ({
+                            id_companyId: { companyId, id },
+                          })),
+                        }
+                      : undefined,
+                  },
+                  update: {
+                    name: ghoName,
+                    workspaces: description.workIds.length
+                      ? {
+                          connect: workIds.map((id) => ({
+                            id_companyId: { companyId, id },
+                          })),
+                        }
+                      : undefined,
+                    ...(description.description ? { description: description.description } : {}),
+                  },
+                  where: { name_companyId: { companyId, name: ghoName } },
+                });
+              }
+
               return this.prisma.homogeneousGroup.upsert({
                 create: {
                   company: { connect: { id: companyId } },

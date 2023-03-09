@@ -823,6 +823,7 @@ export class CompanyRepository implements ICompanyRepository {
           include: {
             doctorResponsible: { include: { professional: true } },
             tecResponsible: { include: { professional: true } },
+            companyGroup: { select: { id: true } },
           },
         },
         primary_activity: !!include?.primary_activity,

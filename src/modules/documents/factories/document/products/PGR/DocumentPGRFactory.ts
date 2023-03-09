@@ -187,7 +187,7 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
     };
   }
 
-  public async getAttachments(data: PromiseInfer<ReturnType<typeof this.getData>>) {
+  public async getAttachments(data: PromiseInfer<ReturnType<DocumentPGRFactoryProduct['getData']>>) {
     // APRs
     const aprSection: ISectionOptions[] = [
       ...APPRTableSection(
@@ -246,7 +246,7 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
     ];
   }
 
-  public async getDocument(options: IGetDocument<IDocumentPGRBody, PromiseInfer<ReturnType<typeof this.getData>>>) {
+  public async getDocument(options: IGetDocument<IDocumentPGRBody, PromiseInfer<ReturnType<DocumentPGRFactoryProduct['getData']>>>) {
     const data = options.data;
     const version = options.version;
     const attachments = options.attachments;
@@ -277,7 +277,7 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
     return sections;
   }
 
-  public async save(options: ISaveDocument<IDocumentPGRBody, PromiseInfer<ReturnType<typeof this.getData>>>) {
+  public async save(options: ISaveDocument<IDocumentPGRBody, PromiseInfer<ReturnType<DocumentPGRFactoryProduct['getData']>>>) {
     const data = options.data;
     const body = options.body;
     const url = options.url;
@@ -298,7 +298,7 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
     });
   }
 
-  public async error(options: Pick<ISaveDocument<IDocumentPGRBody, PromiseInfer<ReturnType<typeof this.getData>>>, 'body'>) {
+  public async error(options: Pick<ISaveDocument<IDocumentPGRBody, PromiseInfer<ReturnType<DocumentPGRFactoryProduct['getData']>>>, 'body'>) {
     const body = options.body;
 
     if (body.id)
@@ -315,7 +315,7 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
       });
   }
 
-  public getVersionName = (data: PromiseInfer<ReturnType<typeof this.getData>>) => {
+  public getVersionName = (data: PromiseInfer<ReturnType<DocumentPGRFactoryProduct['getData']>>) => {
     const version = data.versions?.[0];
 
     if (!version) return `${dayjs().format('MM_DD_YYYY')}`;
