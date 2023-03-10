@@ -197,6 +197,10 @@ export class CompanyEntity implements Company {
       this.riskFactors = this.riskFactors.map((risk) => new RiskFactorsEntity(risk));
     }
 
+    if (this.documentData) {
+      this.documentData = this.documentData.map((data) => new DocumentDataEntity(data));
+    }
+
     if (this.scheduleBlocks) {
       this.scheduleBlocks = this.scheduleBlocks.map((s) => new ScheduleBlockEntity(s));
     }

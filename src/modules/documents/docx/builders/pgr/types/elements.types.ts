@@ -66,11 +66,29 @@ export enum DocumentSectionChildrenTypeEnum {
   PLAN_TABLE = 'PLAN_TABLE',
 }
 
+export enum InlineStyleTypeEnum {
+  BOLD = 'BOLD',
+  ITALIC = 'ITALIC',
+  UNDERLINE = 'UNDERLINE',
+  SUPERSCRIPT = 'SUPERSCRIPT',
+  SUBSCRIPT = 'SUBSCRIPT',
+  COLOR = 'COLOR',
+  BG_COLOR = 'BG_COLOR',
+  FONTSIZE = 'FONTSIZE',
+}
+
 export interface IBaseDocumentModel {
   removeWithSomeEmptyVars?: string[];
   removeWithAllEmptyVars?: string[];
   removeWithAllValidVars?: string[];
   addWithAllVars?: string[];
+}
+
+export interface IInlineStyleRange {
+  offset: number;
+  length: number;
+  style: InlineStyleTypeEnum;
+  value?: string;
 }
 
 export const optionsBulletLevel: Array<0 | 1 | 2 | 3 | 4 | 5 | 6> = [0, 1, 2, 3, 4, 5, 6];
@@ -89,6 +107,7 @@ export type IParagraph = Omit<IParagraphOptions, 'text'> & {
   size?: number;
   color?: string;
   align?: AlignmentType;
+  inlineStyleRangeBlock?: IInlineStyleRange[];
 } & IBaseDocumentModel;
 
 export type ILegend = Omit<IParagraphOptions, 'text'> & {
@@ -97,11 +116,13 @@ export type ILegend = Omit<IParagraphOptions, 'text'> & {
   color?: string;
   size?: number;
   align?: AlignmentType;
+  inlineStyleRangeBlock?: IInlineStyleRange[];
 } & IBaseDocumentModel;
 
 export type IBulletSpace = {
   type: DocumentSectionChildrenTypeEnum.BULLET_SPACE;
   text: string;
+  inlineStyleRangeBlock?: IInlineStyleRange[];
 } & IBaseDocumentModel;
 
 export type IH1 = {
@@ -141,10 +162,12 @@ export type ITitle = {
 
 export type IParagraphTable = Omit<IParagraph, 'type'> & {
   type: DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE;
+  inlineStyleRangeBlock?: IInlineStyleRange[];
 } & IBaseDocumentModel;
 
 export type IParagraphFigure = Omit<IParagraph, 'type'> & {
   type: DocumentSectionChildrenTypeEnum.PARAGRAPH_FIGURE;
+  inlineStyleRangeBlock?: IInlineStyleRange[];
 } & IBaseDocumentModel;
 
 export type IBreak = {

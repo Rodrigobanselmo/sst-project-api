@@ -592,7 +592,7 @@ model DocumentData {
   id                      String                        @id @default(uuid())
   name                    String?
   created_at              DateTime                      @default(now())
-  companyId               String                        @unique
+  companyId               String                        
   workspaceId             String                        @unique
   validityStart           DateTime?
   validityEnd             DateTime?

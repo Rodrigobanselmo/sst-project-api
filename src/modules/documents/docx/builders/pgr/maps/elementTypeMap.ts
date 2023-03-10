@@ -116,6 +116,8 @@ export class ElementsMapClass {
     [DocumentSectionChildrenTypeEnum.LEGEND]: ({ text, ...rest }: IParagraph) => [paragraphTableLegend(text, rest)],
     [DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE]: ({ text, ...rest }: IParagraph) => [paragraphTable(text, rest)],
     [DocumentSectionChildrenTypeEnum.PARAGRAPH_FIGURE]: ({ text, ...rest }: IParagraph) => [paragraphFigure(text, rest)],
+    [DocumentSectionChildrenTypeEnum.BULLET]: ({ level = 0, text, ...rest }: IBullet) => [bulletsNormal(text, level, rest)],
+    [DocumentSectionChildrenTypeEnum.BULLET_SPACE]: ({ text }: IBullet) => [bulletsSpace(text)],
     [DocumentSectionChildrenTypeEnum.TABLE_VERSION_CONTROL]: () => [versionControlTable(this.versions)],
     [DocumentSectionChildrenTypeEnum.TABLE_GSE]: () =>
       hierarchyHomoOrgSection(this.hierarchy, this.homogeneousGroup, {
@@ -225,8 +227,6 @@ export class ElementsMapClass {
         ),
         (x, v) => this.convertToDocx(x, v),
       ),
-    [DocumentSectionChildrenTypeEnum.BULLET]: ({ level = 0, text, ...rest }: IBullet) => [bulletsNormal(text, level, rest)],
-    [DocumentSectionChildrenTypeEnum.BULLET_SPACE]: ({ text }: IBullet) => [bulletsSpace(text)],
     [DocumentSectionChildrenTypeEnum.PROFESSIONAL]: () => professionalsIterable(this.professionals, this.workspace, (x, v) => this.convertToDocx(x, v)),
     [DocumentSectionChildrenTypeEnum.COMPLEMENTARY_DOCS]: () => complementaryDocsIterable(this.document.complementaryDocs || [], (x, v) => this.convertToDocx(x, v)),
     [DocumentSectionChildrenTypeEnum.COMPLEMENTARY_SYSTEMS]: () =>
