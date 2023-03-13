@@ -66,10 +66,10 @@ export class CharacterizationController {
     @Param('workspaceId') workspaceId: string,
     @UploadedFiles() files?: Array<Express.Multer.File>,
   ) {
-    if (!('considerations' in body)) body.considerations = [];
-    if (!('activities' in body)) body.activities = [];
-    if (!('paragraphs' in body)) body.paragraphs = [];
-    if (!('photos' in body)) body.photos = [];
+    if ('considerations' in body) body.considerations = body.considerations.filter((item) => item !== '');
+    if ('activities' in body) body.activities = body.activities.filter((item) => item !== '');
+    if ('paragraphs' in body) body.paragraphs = body.paragraphs.filter((item) => item !== '');
+    // if (!('photos' in body)) body.photos = [];
 
     return this.upsertCharacterizationService.execute(body, workspaceId, userPayloadDto, files);
   }

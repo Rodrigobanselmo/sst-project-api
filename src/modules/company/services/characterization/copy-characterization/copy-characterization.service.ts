@@ -81,6 +81,8 @@ export class CopyCharacterizationService {
 
     const createHomogeneous = async (homoGroupsCreation: HomoGroupEntity[], profileParentId?: string) => {
       homoGroupsCreation.map((homoGroup, i) => {
+        homoGroup.characterization.name = homoGroup.characterization.name + ' [CÓPIA]';
+
         if (homoGroup.characterization && isEnvironment(homoGroup.characterization.type)) {
           homoGroupsCreation[i].environment = homoGroup.characterization as any;
           // homoGroupsCreation[i].characterization = null;
