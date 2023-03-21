@@ -75,4 +75,5 @@ export enum PermissionEnum {
   SCHEDULE_BLOCK = '18',
   ALERT = '19',
   DOCUMENT_MODEL = '20',
+  CLINIC_COMPANY_LINK = '21',
 }

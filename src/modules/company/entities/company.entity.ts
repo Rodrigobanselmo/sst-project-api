@@ -1,3 +1,4 @@
+import { RiskDocumentEntity } from './../../sst/entities/riskDocument.entity';
 import { DocumentDataEntity } from './../../sst/entities/documentData.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { ProfessionalCouncil, StatusEnum } from '@prisma/client';
@@ -124,8 +125,18 @@ export class CompanyEntity implements Company {
   homogenousGroupCount?: number;
   hierarchyCount?: number;
   professionalCount?: number;
-  examCount?: number;
+  examClinicCount?: number;
   usersCount?: number;
+  riskCount?: number;
+  examsCount?: number;
+  characterizationCount?: number;
+  lastDocumentVersion?: RiskDocumentEntity[];
+  employeeAwayCount?: number;
+  employeeInactiveCount?: number;
+  clinicsConnectedCount?: number;
+  protocolsCount?: number;
+  episCount?: number;
+
   step?: CompanyStepEnum;
   steps?: CompanyStepEnum[];
   paymentType: CompanyPaymentTypeEnum;
@@ -160,6 +171,12 @@ export class CompanyEntity implements Company {
   scheduleBlocks?: ScheduleBlockEntity[];
   alerts?: AlertEntity[];
   documentData?: DocumentDataEntity[];
+
+  isDocuments: boolean;
+  esocial: boolean;
+  schedule: boolean;
+  cat: boolean;
+  absenteeism: boolean;
 
   //! remove >>>
   mission: string;
@@ -286,7 +303,7 @@ export class CompanyEntity implements Company {
     this.steps = [CompanyStepEnum.EXAMS, CompanyStepEnum.PROFESSIONALS, CompanyStepEnum.USERS, CompanyStepEnum.NONE];
 
     const professionalStep = this.professionalCount == 0;
-    const examStep = this.examCount == 0;
+    const examStep = this.examClinicCount == 0;
     const usersStep = this.usersCount == 0;
 
     if (examStep) {

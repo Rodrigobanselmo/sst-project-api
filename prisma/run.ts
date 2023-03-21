@@ -28,6 +28,7 @@ import { fixHierarchyHomo } from './run/fix-hierarchy-homo';
 import { removeDuplicatesRisks } from './run/removeDuplicatesRisks';
 import { setHomoWork } from './run/set-homo-work';
 import { emptyDocTables } from './run/empty-doc-tables';
+import { createEpi } from './run/create-epi';
 
 const prisma = new PrismaClient({
   // log: ['query'],
@@ -81,10 +82,10 @@ async function main() {
     //   select: { code: true, name: true, uf: { select: { uf: true } } },
     // }),
 
-    await removeDuplicatesRisks(prisma); // run on simple
-    await setHomoWork(prisma); // run on simple
-    await emptyDocTables(prisma); // run on simple
-    await fixHierarchyHomo(prisma); // run on simple
+    // await removeDuplicatesRisks(prisma); // run on simple
+    // await setHomoWork(prisma); // run on simple
+    // await fixHierarchyHomo(prisma); // run on simple
+    await createEpi(prisma); // run on simple
 
     console.info('end');
   } catch (err) {

@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { RiskFactorDocument, StatusEnum } from '@prisma/client';
 import { CompanyEntity } from '../../company/entities/company.entity';
 import { AttachmentEntity } from './attachment.entity';
+import { DocumentDataEntity } from './documentData.entity';
 
 export class RiskDocumentEntity implements RiskFactorDocument {
   @ApiProperty({ description: 'The id of the risk group data' })
@@ -40,6 +41,7 @@ export class RiskDocumentEntity implements RiskFactorDocument {
   complementaryDocs: string[];
   attachments: AttachmentEntity[];
 
+  documentData?: DocumentDataEntity;
   documentDataId: string;
 
   constructor(partial: Partial<RiskDocumentEntity>) {

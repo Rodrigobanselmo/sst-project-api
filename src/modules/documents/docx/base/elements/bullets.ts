@@ -1,9 +1,9 @@
 import { IParagraphOptions, Paragraph } from 'docx';
 
-import { paragraphNormal } from './paragraphs';
+import { paragraphNewNormal, paragraphNormal } from './paragraphs';
 
 export const bulletsNormal = (text: string, level: 0 | 1 | 2 | 3 | 4 | 5 | 6 = 0, options?: IParagraphOptions) => {
-  return paragraphNormal(text, {
+  return paragraphNewNormal(text, {
     bullet: {
       level,
     },
@@ -13,7 +13,7 @@ export const bulletsNormal = (text: string, level: 0 | 1 | 2 | 3 | 4 | 5 | 6 = 0
 };
 
 export const bulletsSpace = (text: string, options?: IParagraphOptions) => {
-  return paragraphNormal(`         ${text}`, {
+  return paragraphNewNormal(`         ${text}`, {
     spacing: { line: 250, after: 80, before: 0 },
     ...options,
   });
@@ -21,7 +21,7 @@ export const bulletsSpace = (text: string, options?: IParagraphOptions) => {
 
 export const bulletsArray = (bullets: [string, number?][], options?: IParagraphOptions) => {
   return bullets.map(([text, level]) =>
-    paragraphNormal(text, {
+    paragraphNewNormal(text, {
       bullet: {
         level: level || 0,
       },
@@ -36,7 +36,7 @@ export const bulletsMoreLevels = (bullets: string[][] | string[], options?: IPar
     .map((text: string[] | string): Paragraph[] => {
       if (Array.isArray(text)) {
         return text.map((line, index) => {
-          return paragraphNormal(line, {
+          return paragraphNewNormal(line, {
             bullet: {
               level: index === 0 ? 0 : 1,
             },
@@ -47,7 +47,7 @@ export const bulletsMoreLevels = (bullets: string[][] | string[], options?: IPar
 
       if (typeof text === 'string') {
         return [
-          paragraphNormal(text, {
+          paragraphNewNormal(text, {
             bullet: {
               level: 0,
             },

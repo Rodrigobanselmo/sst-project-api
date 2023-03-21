@@ -90,6 +90,18 @@ export interface IInlineStyleRange {
   style: InlineStyleTypeEnum;
   value?: string;
 }
+export interface IEntityRange {
+  offset: number;
+  length: number;
+  data?: {
+    type: string;
+    mutability: string;
+    data: {
+      url: string;
+      targetOption: string;
+    };
+  };
+}
 
 export const optionsBulletLevel: Array<0 | 1 | 2 | 3 | 4 | 5 | 6> = [0, 1, 2, 3, 4, 5, 6];
 type OptionsLevel = typeof optionsBulletLevel[number];
@@ -107,7 +119,8 @@ export type IParagraph = Omit<IParagraphOptions, 'text'> & {
   size?: number;
   color?: string;
   align?: AlignmentType;
-  inlineStyleRangeBlock?: IInlineStyleRange[];
+  inlineStyleRangeBlock?: IInlineStyleRange[][];
+  entityRangeBlock?: IEntityRange[][];
 } & IBaseDocumentModel;
 
 export type ILegend = Omit<IParagraphOptions, 'text'> & {
@@ -116,13 +129,15 @@ export type ILegend = Omit<IParagraphOptions, 'text'> & {
   color?: string;
   size?: number;
   align?: AlignmentType;
-  inlineStyleRangeBlock?: IInlineStyleRange[];
+  inlineStyleRangeBlock?: IInlineStyleRange[][];
+  entityRangeBlock?: IEntityRange[][];
 } & IBaseDocumentModel;
 
 export type IBulletSpace = {
   type: DocumentSectionChildrenTypeEnum.BULLET_SPACE;
   text: string;
-  inlineStyleRangeBlock?: IInlineStyleRange[];
+  inlineStyleRangeBlock?: IInlineStyleRange[][];
+  entityRangeBlock?: IEntityRange[][];
 } & IBaseDocumentModel;
 
 export type IH1 = {
@@ -162,12 +177,14 @@ export type ITitle = {
 
 export type IParagraphTable = Omit<IParagraph, 'type'> & {
   type: DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE;
-  inlineStyleRangeBlock?: IInlineStyleRange[];
+  inlineStyleRangeBlock?: IInlineStyleRange[][];
+  entityRangeBlock?: IEntityRange[][];
 } & IBaseDocumentModel;
 
 export type IParagraphFigure = Omit<IParagraph, 'type'> & {
   type: DocumentSectionChildrenTypeEnum.PARAGRAPH_FIGURE;
-  inlineStyleRangeBlock?: IInlineStyleRange[];
+  inlineStyleRangeBlock?: IInlineStyleRange[][];
+  entityRangeBlock?: IEntityRange[][];
 } & IBaseDocumentModel;
 
 export type IBreak = {

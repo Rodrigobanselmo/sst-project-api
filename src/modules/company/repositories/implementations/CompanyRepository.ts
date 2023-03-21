@@ -786,35 +786,35 @@ export class CompanyRepository implements ICompanyRepository {
   async findById(id: string, options?: Partial<Prisma.CompanyFindManyArgs>): Promise<CompanyEntity> {
     const include = options?.include || {};
 
-    const employeeCount = await this.prisma.employee.count({
+    const employeeCountPromise = this.prisma.employee.count({
       where: { companyId: id, hierarchyId: { not: null } },
     });
 
-    const riskGroupCount = await this.prisma.riskFactorGroupData.count({
+    const riskGroupCountPromise = this.prisma.riskFactorGroupData.count({
       where: { companyId: id },
     });
 
-    const hierarchyCount = await this.prisma.hierarchy.count({
+    const hierarchyCountPromise = this.prisma.hierarchy.count({
+      where: { companyId: id, type: 'OFFICE' },
+    });
+
+    const homogenousGroupCountPromise = this.prisma.homogeneousGroup.count({
       where: { companyId: id },
     });
 
-    const homogenousGroupCount = await this.prisma.homogeneousGroup.count({
+    const professionalCountPromise = this.prisma.professional.count({
       where: { companyId: id },
     });
 
-    const professionalCount = await this.prisma.professional.count({
+    const examCountPromise = this.prisma.examToClinic.count({
       where: { companyId: id },
     });
 
-    const examCount = await this.prisma.examToClinic.count({
+    const usersCountPromise = this.prisma.userCompany.count({
       where: { companyId: id },
     });
 
-    const usersCount = await this.prisma.userCompany.count({
-      where: { companyId: id },
-    });
-
-    const company = await this.prisma.company.findUnique({
+    const companyPromise = this.prisma.company.findUnique({
       where: { id },
       include: {
         employees: !!include.employees ? true : false,
@@ -834,6 +834,83 @@ export class CompanyRepository implements ICompanyRepository {
         tecResponsible: { include: { professional: true } },
       },
     });
+
+    const riskCountPromise = this.prisma.riskFactors.count({
+      where: { riskFactorData: { some: { companyId: id } } },
+    });
+
+    const examsCountPromise = this.prisma.exam.count({
+      where: { OR: [{ examToRiskData: { some: { risk: { companyId: id } } } }, { examToRisk: { some: { companyId: id } } }] },
+    });
+
+    const characterizationCountPromise = this.prisma.companyCharacterization.count({
+      where: { companyId: id },
+    });
+
+    const documentVersionPromise = this.prisma.riskFactorDocument.findMany({
+      where: { companyId: id },
+      orderBy: { created_at: 'desc' },
+      select: { created_at: true, documentData: { select: { type: true } } },
+      distinct: ['documentDataId'],
+    });
+
+    const employeeAwayCountPromise = this.prisma.employee.count({
+      where: { companyId: id, hierarchyId: { not: null }, absenteeisms: { some: { endDate: { lt: new Date() } } } },
+    });
+
+    const employeeInactiveCountPromise = this.prisma.employee.count({
+      where: { companyId: id, hierarchyId: null },
+    });
+
+    const episCountPromise = this.prisma.epi.count({
+      where: { epiToRiskFactorData: { some: { riskFactorData: { companyId: id } } }, ca: { notIn: ['0', '1', '2'] } },
+    });
+
+    const clinicsConnectedCountPromise = this.prisma.companyClinics.count({
+      where: { companyId: id },
+    });
+
+    const protocolsCountPromise = this.prisma.protocol.count({
+      where: { protocolToRisk: { some: { companyId: id } } },
+    });
+
+    const [
+      company,
+      employeeCount,
+      riskGroupCount,
+      hierarchyCount,
+      homogenousGroupCount,
+      professionalCount,
+      examClinicCount,
+      usersCount,
+      riskCount,
+      examsCount,
+      characterizationCount,
+      lastDocumentVersion,
+      employeeAwayCount,
+      employeeInactiveCount,
+      clinicsConnectedCount,
+      protocolsCount,
+      episCount,
+    ] = await Promise.all([
+      companyPromise,
+      employeeCountPromise,
+      riskGroupCountPromise,
+      hierarchyCountPromise,
+      homogenousGroupCountPromise,
+      professionalCountPromise,
+      examCountPromise,
+      usersCountPromise,
+      riskCountPromise,
+      examsCountPromise,
+      characterizationCountPromise,
+      documentVersionPromise,
+      employeeAwayCountPromise,
+      employeeInactiveCountPromise,
+      clinicsConnectedCountPromise,
+      protocolsCountPromise,
+      episCountPromise,
+    ] as Promise<any>[]);
 
     if (company?.workspace) {
       company.workspace = await Promise.all(
@@ -859,8 +936,17 @@ export class CompanyRepository implements ICompanyRepository {
       homogenousGroupCount,
       hierarchyCount,
       professionalCount,
-      examCount,
+      examClinicCount,
       usersCount,
+      riskCount,
+      examsCount,
+      characterizationCount,
+      lastDocumentVersion,
+      employeeAwayCount,
+      employeeInactiveCount,
+      clinicsConnectedCount,
+      protocolsCount,
+      episCount,
     } as any);
   }
 

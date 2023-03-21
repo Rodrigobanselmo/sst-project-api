@@ -200,6 +200,31 @@ export class CreateCompanyDto {
   @ToBoolean()
   @IsOptional()
   esocialSend?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @ToBoolean()
+  isDocuments?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @ToBoolean()
+  esocial?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @ToBoolean()
+  schedule?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @ToBoolean()
+  cat?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @ToBoolean()
+  absenteeism?: boolean;
 }
 
 export class UpdateCompanyDto {
@@ -260,6 +285,31 @@ export class UpdateCompanyDto {
   @IsBoolean()
   @ToBoolean()
   isConsulting?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @ToBoolean()
+  isDocuments?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @ToBoolean()
+  esocial?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @ToBoolean()
+  schedule?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @ToBoolean()
+  cat?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @ToBoolean()
+  absenteeism?: boolean;
 
   @IsOptional()
   @ValidateNested({ each: true })

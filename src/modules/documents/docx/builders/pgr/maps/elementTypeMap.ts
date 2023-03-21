@@ -9,7 +9,7 @@ import { removeDuplicate } from '../../../../../../shared/utils/removeDuplicate'
 import { RiskDocumentEntity } from '../../../../../sst/entities/riskDocument.entity';
 import { bulletsNormal, bulletsSpace } from '../../../base/elements/bullets';
 import { h1, h2, h3, h4, h5, h6, title } from '../../../base/elements/heading';
-import { pageBreak, paragraphNormal, paragraphTableLegend } from '../../../base/elements/paragraphs';
+import { pageBreak, paragraphNewNormal, paragraphNormal, paragraphTableLegend } from '../../../base/elements/paragraphs';
 import { measureHierarchyImage } from '../../../components/images/measureHierarch';
 import { rsDocumentImage } from '../../../components/images/rsDocument';
 import { attachmentsIterable } from '../../../components/iterables/attachments/attachments.iterable';
@@ -112,7 +112,7 @@ export class ElementsMapClass {
     [DocumentSectionChildrenTypeEnum.H6]: ({ text }: IH6) => [h6(text)],
     [DocumentSectionChildrenTypeEnum.BREAK]: ({}: IBreak) => [pageBreak()],
     [DocumentSectionChildrenTypeEnum.TITLE]: ({ text }: ITitle) => [title(text)],
-    [DocumentSectionChildrenTypeEnum.PARAGRAPH]: ({ text, ...rest }: IParagraph) => [paragraphNormal(text, rest)],
+    [DocumentSectionChildrenTypeEnum.PARAGRAPH]: ({ text, ...rest }: IParagraph) => [paragraphNewNormal(text, rest)],
     [DocumentSectionChildrenTypeEnum.LEGEND]: ({ text, ...rest }: IParagraph) => [paragraphTableLegend(text, rest)],
     [DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE]: ({ text, ...rest }: IParagraph) => [paragraphTable(text, rest)],
     [DocumentSectionChildrenTypeEnum.PARAGRAPH_FIGURE]: ({ text, ...rest }: IParagraph) => [paragraphFigure(text, rest)],

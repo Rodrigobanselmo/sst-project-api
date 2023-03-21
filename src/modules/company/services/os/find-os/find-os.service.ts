@@ -22,14 +22,12 @@ export class FindOneCompanyOSService {
       const osConsultant = await this.companyOSRepository.findFirstNude({
         where: {
           company: {
+            isConsulting: true,
+            isGroup: false,
+            isClinic: false,
             applyingServiceContracts: {
               some: {
                 receivingServiceCompanyId: user.targetCompanyId,
-                receivingServiceCompany: {
-                  isConsulting: true,
-                  isGroup: false,
-                  isClinic: false,
-                },
               },
             },
           },

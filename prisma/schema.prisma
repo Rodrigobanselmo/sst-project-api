@@ -4,8 +4,8 @@ generator client {
 }
 
 datasource db {
-  provider   = "postgresql"
-  url        = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Absenteeism {
@@ -227,18 +227,18 @@ model Cid {
 }
 
 model Cities {
-  code   String  @id
-  name   String
-  normalized   String?
-  ufCode String?
-  cat    Cat[]
-  uf     Uf?     @relation(fields: [ufCode], references: [code], onDelete: Restrict)
+  code       String  @id
+  name       String
+  normalized String?
+  ufCode     String?
+  cat        Cat[]
+  uf         Uf?     @relation(fields: [ufCode], references: [code], onDelete: Restrict)
 
   @@index([name])
 }
 
 model Company {
-  id                              String                           @id @default(uuid())
+  id                              String                  @id @default(uuid())
   cnpj                            String?
   name                            String
   fantasy                         String?
@@ -251,12 +251,12 @@ model Company {
   cadastral_situation_date        String?
   legal_nature_code               String?
   cadastral_situation_description String?
-  isConsulting                    Boolean                          @default(false)
+  isConsulting                    Boolean                 @default(false)
   licenseId                       Int?
-  created_at                      DateTime                         @default(now())
-  updated_at                      DateTime                         @updatedAt
-  status                          StatusEnum                       @default(ACTIVE)
-  type                            CompanyTypesEnum                 @default(MATRIZ)
+  created_at                      DateTime                @default(now())
+  updated_at                      DateTime                @updatedAt
+  status                          StatusEnum              @default(ACTIVE)
+  type                            CompanyTypesEnum        @default(MATRIZ)
   deleted_at                      DateTime?
   email                           String?
   logoUrl                         String?
@@ -267,7 +267,7 @@ model Company {
   shortName                       String?
   responsibleName                 String?
   groupId                         Int?
-  blockResignationExam            Boolean                          @default(true)
+  blockResignationExam            Boolean                 @default(true)
   esocialStart                    DateTime?
   numAsos                         Int?
   doctorResponsibleId             Int?
@@ -279,71 +279,78 @@ model Company {
   unit                            String?
   activityStartDate               DateTime?
   obs                             String?
-  isClinic                        Boolean                          @default(false)
+  isClinic                        Boolean                 @default(false)
   paymentDay                      Int?
   paymentType                     CompanyPaymentTypeEnum?
-  isTaxNote                       Boolean                          @default(false)
+  isTaxNote                       Boolean                 @default(false)
   observationBank                 String?
-  isGroup                         Boolean                          @default(false)
-  companyGroupId                  Int?                             @unique
+  isGroup                         Boolean                 @default(false)
+  companyGroupId                  Int?                    @unique
   esocialLastTransmission         DateTime?
   esocialSend                     Boolean?
-  accessGroups                    AccessGroups[]
-  address                         AddressCompany?
-  checklist                       Checklist[]
-  companyGroup                    CompanyGroup?                    @relation("company_group", fields: [companyGroupId], references: [id], onDelete: Restrict)
-  doctorResponsible               ProfessionalCouncil?             @relation("doctors_council_company_responsibles", fields: [doctorResponsibleId], references: [id], onDelete: Restrict)
-  group                           CompanyGroup?                    @relation("group", fields: [groupId], references: [id], onDelete: Restrict)
-  license                         License?                         @relation("license", fields: [licenseId], references: [id], onDelete: Restrict)
-  tecResponsible                  ProfessionalCouncil?             @relation("tec_council_company_responsibles", fields: [tecResponsibleId], references: [id], onDelete: Restrict)
-  cert                            CompanyCert?
-  characterization                CompanyCharacterization[]
-  companiesToClinicAvailable      CompanyClinics[]                 @relation("clinics_available")
-  clinicsAvailable                CompanyClinics[]                 @relation("companies_available")
-  environments                    CompanyEnvironment[]
-  companyGroups                   CompanyGroup[]                   @relation("company")
-  os                              CompanyOS?
-  report                          CompanyReport?
-  shifts                          CompanyShift[]
-  contacts                        Contact[]
-  applyingServiceContracts        Contract[]                       @relation("contracts")
-  receivingServiceContracts       Contract[]
-  databaseTable                   DatabaseTable[]
-  documents                       Document[]
-  covers                          DocumentCover[]
-  documentData                    DocumentData[]
-  employees                       Employee[]
-  esocialTransmissions            EmployeeESocialBatch[]
-  esocialEvents                   EmployeeESocialEvent[]
-  examClinicHistory               EmployeeExamsHistory[]
-  exams                           Exam[]
-  clinicExams                     ExamToClinic[]
-  examsToRisk                     ExamToRisk[]
-  generateSource                  GenerateSource[]
-  hierarchy                       Hierarchy[]
-  homogeneousGroup                HomogeneousGroup[]
-  invites                         InviteUsers[]
-  notifications                   Notification[]                   @relation("owner_notification_company")
-  professionals                   Professional[]
-  professionalsResponsibles       ProfessionalCouncilResponsible[]
-  protocol                        Protocol[]
-  protocolToRisk                  ProtocolToRisk[]
-  recMed                          RecMed[]
-  riskFactorData                  RiskFactorData[]
-  riskFactorDataRec               RiskFactorDataRec[]
-  riskFactorDocument              RiskFactorDocument[]
-  riskFactorGroupData             RiskFactorGroupData[]
-  riskFactors                     RiskFactors[]
-  riskDocInfo                     RiskFactorsDocInfo[]
-  users                           UserCompany[]
-  workspace                       Workspace[]
-  notification                    Notification[]                   @relation("CompanyToNotification")
-  primary_activity                Activity[]                       @relation("primary_activity")
-  secondary_activity              Activity[]                       @relation("secondary_activity")
-  createdScheduleBlocks           ScheduleBlock[]                     
-  scheduleBlocks                  ScheduleBlock[]                  @relation(name: "schedule_block_m2m_companies")
-  alerts                          Alert[]
-  documentModels                  DocumentModel[]
+
+  isDocuments Boolean? @default(true)
+  esocial     Boolean? @default(true)
+  schedule    Boolean? @default(true)
+  cat         Boolean? @default(true)
+  absenteeism Boolean? @default(true)
+
+  accessGroups               AccessGroups[]
+  address                    AddressCompany?
+  checklist                  Checklist[]
+  companyGroup               CompanyGroup?                    @relation("company_group", fields: [companyGroupId], references: [id], onDelete: Restrict)
+  doctorResponsible          ProfessionalCouncil?             @relation("doctors_council_company_responsibles", fields: [doctorResponsibleId], references: [id], onDelete: Restrict)
+  group                      CompanyGroup?                    @relation("group", fields: [groupId], references: [id], onDelete: Restrict)
+  license                    License?                         @relation("license", fields: [licenseId], references: [id], onDelete: Restrict)
+  tecResponsible             ProfessionalCouncil?             @relation("tec_council_company_responsibles", fields: [tecResponsibleId], references: [id], onDelete: Restrict)
+  cert                       CompanyCert?
+  characterization           CompanyCharacterization[]
+  companiesToClinicAvailable CompanyClinics[]                 @relation("clinics_available")
+  clinicsAvailable           CompanyClinics[]                 @relation("companies_available")
+  environments               CompanyEnvironment[]
+  companyGroups              CompanyGroup[]                   @relation("company")
+  os                         CompanyOS?
+  report                     CompanyReport?
+  shifts                     CompanyShift[]
+  contacts                   Contact[]
+  applyingServiceContracts   Contract[]                       @relation("contracts")
+  receivingServiceContracts  Contract[]
+  databaseTable              DatabaseTable[]
+  documents                  Document[]
+  covers                     DocumentCover[]
+  documentData               DocumentData[]
+  employees                  Employee[]
+  esocialTransmissions       EmployeeESocialBatch[]
+  esocialEvents              EmployeeESocialEvent[]
+  examClinicHistory          EmployeeExamsHistory[]
+  exams                      Exam[]
+  clinicExams                ExamToClinic[]
+  examsToRisk                ExamToRisk[]
+  generateSource             GenerateSource[]
+  hierarchy                  Hierarchy[]
+  homogeneousGroup           HomogeneousGroup[]
+  invites                    InviteUsers[]
+  notifications              Notification[]                   @relation("owner_notification_company")
+  professionals              Professional[]
+  professionalsResponsibles  ProfessionalCouncilResponsible[]
+  protocol                   Protocol[]
+  protocolToRisk             ProtocolToRisk[]
+  recMed                     RecMed[]
+  riskFactorData             RiskFactorData[]
+  riskFactorDataRec          RiskFactorDataRec[]
+  riskFactorDocument         RiskFactorDocument[]
+  riskFactorGroupData        RiskFactorGroupData[]
+  riskFactors                RiskFactors[]
+  riskDocInfo                RiskFactorsDocInfo[]
+  users                      UserCompany[]
+  workspace                  Workspace[]
+  notification               Notification[]                   @relation("CompanyToNotification")
+  primary_activity           Activity[]                       @relation("primary_activity")
+  secondary_activity         Activity[]                       @relation("secondary_activity")
+  createdScheduleBlocks      ScheduleBlock[]
+  scheduleBlocks             ScheduleBlock[]                  @relation(name: "schedule_block_m2m_companies")
+  alerts                     Alert[]
+  documentModels             DocumentModel[]
 
   @@index([name])
   @@index([isClinic])
@@ -589,51 +596,50 @@ model DocumentCover {
 }
 
 model DocumentData {
-  id                      String                        @id @default(uuid())
-  name                    String?
-  created_at              DateTime                      @default(now())
-  companyId               String                        
-  workspaceId             String                        @unique
-  validityStart           DateTime?
-  validityEnd             DateTime?
-  status                  StatusEnum                    @default(PROGRESS)
-  type                    DocumentTypeEnum              
-  modelId                 Int?
+  id            String           @id @default(uuid())
+  name          String?
+  created_at    DateTime         @default(now())
+  companyId     String
+  workspaceId   String           @unique
+  validityStart DateTime?
+  validityEnd   DateTime?
+  status        StatusEnum       @default(PROGRESS)
+  type          DocumentTypeEnum
+  modelId       Int?
 
-  elaboratedBy            String?
-  coordinatorBy           String?
-  revisionBy              String?
-  approvedBy              String?
+  elaboratedBy  String?
+  coordinatorBy String?
+  revisionBy    String?
+  approvedBy    String?
 
-  json                    Json?
+  json Json?
 
-  company                 Company                       @relation(fields: [companyId], references: [id])
-  model                   DocumentModel?                  @relation(fields: [modelId], references: [id])
+  company                 Company                      @relation(fields: [companyId], references: [id])
+  model                   DocumentModel?               @relation(fields: [modelId], references: [id])
   docs                    RiskFactorDocument[]
   professionalsSignatures DocumentDataToProfessional[]
-  workspace               Workspace                     @relation(fields: [workspaceId], references: [id])
+  workspace               Workspace                    @relation(fields: [workspaceId], references: [id])
 
   @@unique([id, companyId])
   @@unique([type, workspaceId, companyId])
 }
 
 model DocumentModel {
-  id         Int                @default(autoincrement()) @id
-  name       String       
-  description       String?       
-  companyId  String       
-  system     Boolean            @default(false)
-  status     StatusEnum         @default(ACTIVE)
-  created_at DateTime           @default(now())
-  updated_at DateTime           @updatedAt
-  company    Company            @relation(fields: [companyId], references: [id])
-  type       DocumentTypeEnum
-  data       Bytes      
-  documents  DocumentData[] 
+  id          Int              @id @default(autoincrement())
+  name        String
+  description String?
+  companyId   String
+  system      Boolean          @default(false)
+  status      StatusEnum       @default(ACTIVE)
+  created_at  DateTime         @default(now())
+  updated_at  DateTime         @updatedAt
+  company     Company          @relation(fields: [companyId], references: [id])
+  type        DocumentTypeEnum
+  data        Bytes
+  documents   DocumentData[]
 
   @@unique([id, companyId])
 }
-
 
 model CompanyOS {
   id           Int        @id @default(autoincrement())
@@ -649,7 +655,6 @@ model CompanyOS {
   declaration  Json?
   companyId    String     @unique
   company      Company    @relation(fields: [companyId], references: [id])
-
 
   @@unique([id, companyId])
 }
@@ -689,7 +694,7 @@ model Employee {
   hierarchyHistory EmployeeHierarchyHistory[]
   pppHistory       EmployeePPPHistory[]
   subOffices       Hierarchy[]                @relation("sub_offices")
-  normalized        String?
+  normalized       String?
 
   @@unique([id, companyId])
   @@unique([cpf, companyId])
@@ -1015,20 +1020,19 @@ model ExamToRisk {
 }
 
 model Alert {
-  id                    Int             @id @default(autoincrement())
-  type                  AlertsTypeEnum
-  companyId             String
-  system                Boolean          @default(false)
-  company               Company          @relation(fields: [companyId], references: [id])
-  groups                AccessGroups[]
-  users                 User[]
-  emails                String[]
-  nextAlert             DateTime?
-  configJson            Json?
+  id         Int            @id @default(autoincrement())
+  type       AlertsTypeEnum
+  companyId  String
+  system     Boolean        @default(false)
+  company    Company        @relation(fields: [companyId], references: [id])
+  groups     AccessGroups[]
+  users      User[]
+  emails     String[]
+  nextAlert  DateTime?
+  configJson Json?
 
   @@unique([companyId, type])
   @@unique([companyId, id])
-
 }
 
 model ExamToRiskData {
@@ -1131,7 +1135,7 @@ model HomogeneousGroup {
   hierarchyOnHomogeneous HierarchyOnHomogeneous[]
   company                Company                  @relation(fields: [companyId], references: [id])
   riskFactorData         RiskFactorData[]
-  workspaces             Workspace[]               
+  workspaces             Workspace[]
 
   @@unique([name, companyId])
   @@index([name])
@@ -1209,23 +1213,23 @@ model Professional {
 }
 
 model ProfessionalCouncil {
-  id                         Int                                 @id @default(autoincrement())
-  councilType                String
-  councilUF                  String
-  councilId                  String
-  created_at                 DateTime                            @default(now())
-  updated_at                 DateTime                            @updatedAt
-  professionalId             Int
-  absenteeisms               Absenteeism[]
-  cats                       Cat[]
-  doctorCompanyResponsible   Company[]                           @relation("doctors_council_company_responsibles")
-  tecCompanyResponsible      Company[]                           @relation("tec_council_company_responsibles")
-  doctorGroupResponsible     CompanyGroup[]                      @relation("doctors_council_group_responsibles")
-  tecGroupResponsible        CompanyGroup[]                      @relation("tec_council_group_responsibles")
-  examDoctorHistory          EmployeeExamsHistory[]
-  professional               Professional                        @relation(fields: [professionalId], references: [id], onDelete: Cascade)
-  professionalsResponsibles  ProfessionalCouncilResponsible[]
-  professionalDataSignature  DocumentDataToProfessional[]
+  id                        Int                              @id @default(autoincrement())
+  councilType               String
+  councilUF                 String
+  councilId                 String
+  created_at                DateTime                         @default(now())
+  updated_at                DateTime                         @updatedAt
+  professionalId            Int
+  absenteeisms              Absenteeism[]
+  cats                      Cat[]
+  doctorCompanyResponsible  Company[]                        @relation("doctors_council_company_responsibles")
+  tecCompanyResponsible     Company[]                        @relation("tec_council_company_responsibles")
+  doctorGroupResponsible    CompanyGroup[]                   @relation("doctors_council_group_responsibles")
+  tecGroupResponsible       CompanyGroup[]                   @relation("tec_council_group_responsibles")
+  examDoctorHistory         EmployeeExamsHistory[]
+  professional              Professional                     @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+  professionalsResponsibles ProfessionalCouncilResponsible[]
+  professionalDataSignature DocumentDataToProfessional[]
 
   @@unique([councilType, councilUF, councilId, professionalId])
 }
@@ -1379,51 +1383,51 @@ model RiskFactorsDocInfo {
 }
 
 model RiskFactorDocument {
-  id                  String                  @id @default(uuid())
-  fileUrl             String?   
-  name                String    
-  description         String                  @default("")
-  version             String                  @default("1.0.0")
-  companyId           String    
-  workspaceName       String    
-  workspaceId         String    
-  status              StatusEnum              @default(ACTIVE)
-  created_at          DateTime                @default(now())
-  updated_at          DateTime                @updatedAt
-  attachments         Attachments[]   
-  company             Company                 @relation(fields: [companyId], references: [id])
-  documentDataId      String   
-  documentData        DocumentData           @relation(fields: [documentDataId, companyId], references: [id, companyId])
-  workspace           Workspace               @relation(fields: [workspaceId, companyId], references: [id, companyId], onDelete: Cascade)
-  
-  approvedBy          String?   
-  elaboratedBy        String?   
-  revisionBy          String?   
-  validity            String?   
+  id             String        @id @default(uuid())
+  fileUrl        String?
+  name           String
+  description    String        @default("")
+  version        String        @default("1.0.0")
+  companyId      String
+  workspaceName  String
+  workspaceId    String
+  status         StatusEnum    @default(ACTIVE)
+  created_at     DateTime      @default(now())
+  updated_at     DateTime      @updatedAt
+  attachments    Attachments[]
+  company        Company       @relation(fields: [companyId], references: [id])
+  documentDataId String
+  documentData   DocumentData  @relation(fields: [documentDataId, companyId], references: [id, companyId])
+  workspace      Workspace     @relation(fields: [workspaceId, companyId], references: [id, companyId], onDelete: Cascade)
+
+  approvedBy   String?
+  elaboratedBy String?
+  revisionBy   String?
+  validity     String?
 
   @@unique([id, companyId])
 }
 
 model RiskFactorGroupData {
-  id                      String                              @id @default(uuid())
-  name                    String?
-  created_at              DateTime                            @default(now())
-  companyId               String
-  status                  StatusEnum                          @default(PROGRESS)
- 
-  data                    RiskFactorData[]
-  company                 Company                             @relation(fields: [companyId], references: [id])
+  id         String     @id @default(uuid())
+  name       String?
+  created_at DateTime   @default(now())
+  companyId  String
+  status     StatusEnum @default(PROGRESS)
+
+  data    RiskFactorData[]
+  company Company          @relation(fields: [companyId], references: [id])
 
   @@unique([id, companyId])
 }
 
 model DocumentDataToProfessional {
   documentDataId String              @map("B")
-  professionalId  Int                 @map("A")
-  isSigner        Boolean             @default(false)
-  isElaborator    Boolean             @default(false)
-  professional    ProfessionalCouncil @relation(fields: [professionalId], references: [id], onDelete: Cascade)
-  documentData   DocumentData       @relation(fields: [documentDataId], references: [id], onDelete: Cascade)
+  professionalId Int                 @map("A")
+  isSigner       Boolean             @default(false)
+  isElaborator   Boolean             @default(false)
+  professional   ProfessionalCouncil @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+  documentData   DocumentData        @relation(fields: [documentDataId], references: [id], onDelete: Cascade)
 
   @@id([documentDataId, professionalId])
   @@map("_DocumentDataToProfessional")
@@ -1520,26 +1524,26 @@ model RiskFactorDataRecComments {
 }
 
 model ScheduleBlock {
-  id               Int                    @id @default(autoincrement())
-  name             String
-  description      String?
-  status           StatusEnum             @default(ACTIVE)
-  type             ScheduleBlockTypeEnum?
-  
-  yearRecurrence   Boolean                @default(false)
-  startDate        String?
-  endDate          String?
+  id          Int                    @id @default(autoincrement())
+  name        String
+  description String?
+  status      StatusEnum             @default(ACTIVE)
+  type        ScheduleBlockTypeEnum?
 
-  startTime        String?
-  endTime          String?
-  updated_at       DateTime               @updatedAt
-  created_at       DateTime               @default(now())
-  deleted_at       DateTime?
-  allCompanies      Boolean                @default(false)
+  yearRecurrence Boolean @default(false)
+  startDate      String?
+  endDate        String?
+
+  startTime    String?
+  endTime      String?
+  updated_at   DateTime  @updatedAt
+  created_at   DateTime  @default(now())
+  deleted_at   DateTime?
+  allCompanies Boolean   @default(false)
 
   companyId        String
-  company          Company                @relation(fields: [companyId], references: [id])
-  applyOnCompanies  Company[]              @relation(name: "schedule_block_m2m_companies")
+  company          Company   @relation(fields: [companyId], references: [id])
+  applyOnCompanies Company[] @relation(name: "schedule_block_m2m_companies")
 
   @@unique([id, companyId])
   @@index([companyId])
@@ -1550,26 +1554,26 @@ model ScheduleBlock {
 }
 
 model User {
-  id                  Int                         @id @default(autoincrement())
-  email               String                      @unique
+  id                  Int                    @id @default(autoincrement())
+  email               String                 @unique
   name                String?
   password            String
-  created_at          DateTime                    @default(now())
-  updated_at          DateTime                    @updatedAt
+  created_at          DateTime               @default(now())
+  updated_at          DateTime               @updatedAt
   deleted_at          DateTime?
   cpf                 String?
   facebookExternalId  String?
   googleExternalId    String?
   phone               String?
   esocialTransmission EmployeeESocialBatch[]
-  examDone            EmployeeExamsHistory[]      @relation("user_done")
-  examSchedules       EmployeeExamsHistory[]      @relation("user_schedule")
+  examDone            EmployeeExamsHistory[] @relation("user_done")
+  examSchedules       EmployeeExamsHistory[] @relation("user_schedule")
   professional        Professional?
   refresh_token       RefreshToken[]
   companies           UserCompany[]
-  notification        Notification[]              @relation("NotificationToUser")
-  notificationConfirm Notification[]              @relation("user_notification_confirm")
-  alerts              Alert[]             
+  notification        Notification[]         @relation("NotificationToUser")
+  notificationConfirm Notification[]         @relation("user_notification_confirm")
+  alerts              Alert[]
 
   @@unique([id, name])
   @@index([email])
@@ -1601,26 +1605,26 @@ model Uf {
 }
 
 model Workspace {
-  id                     String                    @id @default(uuid())
-  name                   String
-  abbreviation           String?
-  description            String?
-  created_at             DateTime                  @default(now())
-  updated_at             DateTime                  @updatedAt
-  companyId              String
-  status                 StatusEnum                @default(ACTIVE)
-  cnpj                   String?
-  isOwner                Boolean                   @default(true)
-  companyJson            Json?
-  address                Address?
-  characterization       CompanyCharacterization[]
-  companyEnvironment     CompanyEnvironment[]
-  documents              Document[]
-  riskFactorDocument     RiskFactorDocument[]
-  company                Company                   @relation(fields: [companyId], references: [id])
-  hierarchy              Hierarchy[]               @relation("HierarchyToWorkspace")
-  homogeneousGroup       HomogeneousGroup[]              
-  documentData          DocumentData?            
+  id                 String                    @id @default(uuid())
+  name               String
+  abbreviation       String?
+  description        String?
+  created_at         DateTime                  @default(now())
+  updated_at         DateTime                  @updatedAt
+  companyId          String
+  status             StatusEnum                @default(ACTIVE)
+  cnpj               String?
+  isOwner            Boolean                   @default(true)
+  companyJson        Json?
+  address            Address?
+  characterization   CompanyCharacterization[]
+  companyEnvironment CompanyEnvironment[]
+  documents          Document[]
+  riskFactorDocument RiskFactorDocument[]
+  company            Company                   @relation(fields: [companyId], references: [id])
+  hierarchy          Hierarchy[]               @relation("HierarchyToWorkspace")
+  homogeneousGroup   HomogeneousGroup[]
+  documentData       DocumentData?
 
   @@unique([abbreviation, companyId])
   @@unique([id, companyId])
@@ -1772,7 +1776,6 @@ enum ScheduleBlockTypeEnum {
   ST_HOLIDAY
   OTHER
 }
-
 
 enum SexTypeEnum {
   M

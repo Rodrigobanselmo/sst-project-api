@@ -15,6 +15,8 @@ export class CreateContractService {
 
     if (!license?.id) throw new BadRequestException('license not found');
 
+    createContractDto.initials = await this.findInitials(createContractDto);
+
     const company = await this.companyRepository.create({
       ...createContractDto,
       companyId: user.companyId,
@@ -22,5 +24,29 @@ export class CreateContractService {
     });
 
     return company;
+  }
+
+  async findInitials(createContractDto: CreateCompanyDto) {
+    let initials = createContractDto.initials;
+    let tries = 0;
+    if (!initials) {
+      const loop = async () => {
+        tries++;
+        if (tries > 5) return initials;
+
+        initials = Math.floor(Math.random() * 1000000).toString();
+        const company = await this.companyRepository.findFirstNude({
+          where: { initials: initials },
+        });
+
+        if (company) {
+          return loop();
+        }
+      };
+
+      loop();
+    }
+
+    return initials;
   }
 }

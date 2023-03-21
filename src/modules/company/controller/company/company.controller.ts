@@ -206,7 +206,7 @@ export class CompanyController {
   }
 
   @Permissions({
-    code: PermissionEnum.COMPANY,
+    code: PermissionEnum.CLINIC_COMPANY_LINK,
     isContract: true,
     isMember: true,
     crud: true,

@@ -67,7 +67,6 @@ export class CharacterizationRepository {
         },
       }),
     });
-    console.log(hierarchyIds);
     if (hierarchyIds) {
       if (!workspaceId) throw new BadRequestException('Faltou identificar o estabelecimento para cadastrar os cargos');
 

@@ -8,6 +8,7 @@ export class FindAllAvailableEmployeesService {
   constructor(private readonly employeeRepository: EmployeeRepository) {}
 
   async execute({ skip, take, ...query }: FindEmployeeDto, user: UserPayloadDto) {
+    console.log(query);
     const employees = await this.employeeRepository.find({ ...query, companyId: user.targetCompanyId }, { skip, take });
 
     return employees;

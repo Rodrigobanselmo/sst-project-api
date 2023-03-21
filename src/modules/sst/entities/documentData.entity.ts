@@ -44,10 +44,10 @@ export class DocumentDataEntity implements DocumentData {
   type: DocumentTypeEnum;
   json: Prisma.JsonValue;
 
+  modelId: number;
   company?: Partial<CompanyEntity>;
   professionals?: ProfessionalEntity[];
   professionalsSignatures?: ProfessionalDocumentDataEntity[];
-  modelId: number;
   model: DocumentModelEntity;
 
   constructor(partial: Partial<DocumentDataEntity>) {

@@ -56,7 +56,7 @@ export class DocumentModelRepository {
 
     const { where } = prismaFilter(whereInit, {
       query,
-      skip: ['showInactive', 'companyId', 'all', 'search', 'type'], //! remove type
+      skip: ['showInactive', 'companyId', 'all', 'search'],
     });
 
     if (!options.select)
