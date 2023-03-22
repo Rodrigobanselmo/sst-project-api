@@ -160,7 +160,6 @@ export const paragraphNewNormal = (text: string, { children, color, ...options }
           });
 
           const textRuns: (TextRun | ExternalHyperlink)[] = [];
-          console.log('arrayRange', arrayRange);
           arrayRange.forEach((key, index) => {
             const nextKey = arrayRange[index + 1];
             const filter = [...entityRange, ...inlineStyleRange].filter((s) => s.offset <= Number(key) && s.length + s.offset >= Number(nextKey));
@@ -201,10 +200,11 @@ export const paragraphNewNormal = (text: string, { children, color, ...options }
                   }
 
                   if (isLink) {
+                    const [link, textLink] = text.split('|');
                     const textRun = new ExternalHyperlink({
                       children: [
                         new TextRun({
-                          text,
+                          text: textLink,
                           size: options?.size ? options?.size * 2 : undefined,
                           ...(color ? { color: color } : {}),
                           ...styles,
