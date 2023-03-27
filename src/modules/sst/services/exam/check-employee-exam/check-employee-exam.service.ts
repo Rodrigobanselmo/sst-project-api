@@ -4,10 +4,15 @@ import { asyncBatch } from '../../../../../shared/utils/asyncBatch';
 import { EmployeeRepository } from '../../../../company/repositories/implementations/EmployeeRepository';
 import { CheckEmployeeExamDto } from '../../../dto/exam.dto';
 import { FindExamByHierarchyService } from '../find-by-hierarchy /find-exam-by-hierarchy.service';
+import { ReloadEmployeeExamTimeService } from '../reload-employee-exam-time/reload-employee-exam-time.service';
 
 @Injectable()
 export class CheckEmployeeExamService {
-  constructor(private readonly findExamByHierarchyService: FindExamByHierarchyService, private readonly employeeRepository: EmployeeRepository) {}
+  constructor(
+    private readonly findExamByHierarchyService: FindExamByHierarchyService,
+    private readonly employeeRepository: EmployeeRepository,
+    private readonly reloadEmployeeExamTimeService: ReloadEmployeeExamTimeService,
+  ) {}
 
   async execute(body: CheckEmployeeExamDto) {
     const homogeneousGroupId = body.homogeneousGroupId;
@@ -16,7 +21,7 @@ export class CheckEmployeeExamService {
     const companyId = body.companyId;
     const riskId = body.riskId;
 
-    const employees = await this.employeeRepository.findNude({
+    const employeesWithExpiredDatePromise = this.employeeRepository.findNude({
       where: {
         expiredDateExam: { gte: new Date() },
         examsHistory: { some: { examId: { gt: 0 } } },
@@ -29,13 +34,35 @@ export class CheckEmployeeExamService {
       select: { id: true, companyId: true, hierarchyId: true, newExamAdded: true },
     });
 
-    await asyncBatch(employees, 10, async (employee) => {
+    const employeesWithoutExpiredDatePromise = this.employeeRepository.findNude({
+      where: {
+        expiredDateExam: null,
+        ...(hierarchyId && { hierarchyId }),
+        ...(employeeId && { id: employeeId }),
+        ...(homogeneousGroupId && { hierarchy: { hierarchyOnHomogeneous: { some: { homogeneousGroupId: homogeneousGroupId } } } }),
+        ...(companyId &&
+          riskId && { companyId, hierarchy: { hierarchyOnHomogeneous: { some: { homogeneousGroup: { riskFactorData: { some: { riskId: riskId } } } } } } }),
+      },
+      select: { id: true, companyId: true, hierarchyId: true, newExamAdded: true },
+    });
+
+    const [employeesWithExpiredDate, employeesWithoutExpiredDate] = await Promise.all([employeesWithExpiredDatePromise, employeesWithoutExpiredDatePromise]);
+
+    const companiesWithExpiredDateIds = employeesWithExpiredDate.map((employee) => employee.companyId);
+    const companiesWithoutExpiredDateIds = employeesWithoutExpiredDate.map((employee) => employee.companyId);
+
+    await this.reloadExamExpired(
+      [...new Set(companiesWithoutExpiredDateIds)],
+      employeesWithoutExpiredDate.map((employee) => employee.id),
+    );
+
+    await asyncBatch(employeesWithExpiredDate, 10, async (employee) => {
       const exams = await this.findExamByHierarchyService.execute(
         { targetCompanyId: employee.companyId },
         { employeeId: employee.id, hierarchyId: employee.hierarchyId },
       );
 
-      const expiredExam = exams.data.find((examData) => {
+      const expiredComplementaryExam = exams.data.find((examData) => {
         if (examData.exam.isAttendance) return;
 
         const origin = examData.origins?.find((origin) => {
@@ -50,7 +77,7 @@ export class CheckEmployeeExamService {
         return isExpired;
       });
 
-      if (!!expiredExam || employee.newExamAdded) {
+      if (!!expiredComplementaryExam || employee.newExamAdded) {
         await this.employeeRepository.updateNude({
           where: {
             id_companyId: {
@@ -60,11 +87,24 @@ export class CheckEmployeeExamService {
           },
           data: {
             ...(employee.newExamAdded && { newExamAdded: null }),
-            ...(!!expiredExam && { newExamAdded: new Date() }),
+            ...(!!expiredComplementaryExam && { newExamAdded: new Date() }),
           },
           select: { id: true },
         });
       }
+    });
+
+    await this.reloadExamExpired(
+      [...new Set(companiesWithExpiredDateIds)],
+      employeesWithExpiredDate.map((employee) => employee.id),
+    );
+  }
+
+  async reloadExamExpired(companiesIdsWithoutDuplicates: string[], employeeIds: number[]) {
+    await asyncBatch(companiesIdsWithoutDuplicates, 1, async (companyId) => {
+      await this.reloadEmployeeExamTimeService.reloadEmployeeExamTime(companyId, {
+        employeeIds,
+      });
     });
   }
 }

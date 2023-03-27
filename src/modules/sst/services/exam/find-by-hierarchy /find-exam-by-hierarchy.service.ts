@@ -33,12 +33,11 @@ export class FindExamByHierarchyService {
   ) {}
 
   async execute(user: Pick<UserPayloadDto, 'targetCompanyId'>, query: FindExamHierarchyDto) {
-    const hierarchyId = query.hierarchyId;
+    let hierarchyId = query.hierarchyId;
     const companyId = user.targetCompanyId;
-    const hierarchy = hierarchyId ? await this.hierarchyRepository.findByIdWithParent(hierarchyId, companyId) : undefined;
     let employee: EmployeeEntity;
 
-    const hierarchies: Partial<HierarchyEntity>[] = [hierarchy, ...(hierarchy?.parents || [])].filter((h) => h);
+    const hierarchies: Partial<HierarchyEntity>[] = [];
     const date = new Date();
 
     const examType = {
@@ -50,15 +49,23 @@ export class FindExamByHierarchyService {
         isAdmission: query?.isAdmission,
       }),
       ...('isReturn' in query && { isReturn: query?.isReturn }),
-      ...('isDismissal' in query && {
-        isDismissal: query?.isDismissal,
-      }),
+      // ...('isDismissal' in query && {
+      //   isDismissal: query?.isDismissal,
+      // }),
     };
 
     if (query.employeeId) {
       employee = await this.employeeRepository.findById(query.employeeId, companyId, {
         include: {
           subOffices: { select: { id: true } },
+          ...(query?.isDismissal &&
+            !hierarchyId && {
+              hierarchyHistory: {
+                where: { motive: { not: 'DEM' } },
+                select: { hierarchyId: true, motive: true, startDate: true, subHierarchies: { select: { id: true } } },
+                take: 1,
+              },
+            }),
           examsHistory: {
             orderBy: { doneDate: 'desc' },
             where: {
@@ -72,10 +79,21 @@ export class FindExamByHierarchyService {
           },
         },
       });
+
+      if (query?.isDismissal && !hierarchyId && employee.hierarchyHistory && employee.hierarchyHistory?.length > 0) {
+        if (employee.hierarchyHistory[0]) {
+          hierarchyId = employee.hierarchyHistory[0].hierarchyId;
+          employee.subOffices = employee.hierarchyHistory[0].subHierarchies;
+        }
+      }
+
       if (employee && !query.isOffice) {
         hierarchies.push(...(employee?.subOffices || []));
       }
     }
+
+    const hierarchy = hierarchyId ? await this.hierarchyRepository.findByIdWithParent(hierarchyId, companyId) : undefined;
+    hierarchies.push(...[hierarchy, ...(hierarchy?.parents || [])].filter((h) => h));
 
     const hierarchyIds = hierarchies.map(({ id }) => id);
 

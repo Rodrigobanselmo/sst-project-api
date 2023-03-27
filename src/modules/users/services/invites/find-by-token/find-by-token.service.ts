@@ -9,7 +9,7 @@ export class FindByTokenService {
     const invite = await this.inviteUsersRepository.findById(token, {
       include: {
         company: { select: { name: true, logoUrl: true } },
-        professional: true,
+        professional: { include: { councils: true } },
       },
     });
 

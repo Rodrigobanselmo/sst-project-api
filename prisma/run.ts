@@ -3,7 +3,7 @@ import { AmazonStorageProvider } from './../src/shared/providers/StorageProvider
 import { CharacterizationRepository } from './../src/modules/company/repositories/implementations/CharacterizationRepository';
 import { UpsertCharacterizationService } from './../src/modules/company/services/characterization/upsert-characterization/upsert-characterization.service';
 import { PrismaClient } from '@prisma/client';
-import { deleteWithNameCompany } from './run/delete-company';
+import { deleteCompany, deleteWithNameCompany } from './run/delete-company';
 import { levelRiskData } from './run/level-risk-data';
 
 import { representAll } from './run/represent-all';
@@ -43,7 +43,6 @@ async function main() {
     //   _count: true,
     // });
 
-    //await deleteWithNameCompany('Deletar', prisma);
     // await representAll(prisma); //* DONE
     // await changeRecMed(prisma); //* DONE
     // await createAbsenceRisk(prisma); //* DONE
@@ -82,10 +81,12 @@ async function main() {
     //   select: { code: true, name: true, uf: { select: { uf: true } } },
     // }),
 
-    // await removeDuplicatesRisks(prisma); // run on simple
-    // await setHomoWork(prisma); // run on simple
-    // await fixHierarchyHomo(prisma); // run on simple
-    await createEpi(prisma); // run on simple
+    // await deleteWithNameCompany('Deletar', prisma);
+    await deleteCompany('a661bbe2-ef70-4343-b175-925c9ff9c298', prisma);
+
+    // await removeDuplicatesRisks(prisma);
+    // await setHomoWork(prisma);
+    // await fixHierarchyHomo(prisma);
 
     console.info('end');
   } catch (err) {

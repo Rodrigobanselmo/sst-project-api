@@ -47,7 +47,7 @@ export class UpdateEmployeeExamHistoryService {
     this.checkEmployeeExamService.execute({
       employeeId: dataDto.employeeId,
     });
-
+    console.log('history', history);
     return history;
   }
 }

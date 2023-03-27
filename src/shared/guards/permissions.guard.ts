@@ -50,6 +50,8 @@ const checkPermissions = (user: UserPayloadDto, options: IPermissionOptions, CRU
   if (!options.code) return true;
   const crudString = typeof options.crud === 'string' ? options.crud : CRUD;
 
+  if (user.permissions.length === 0) return true;
+
   return user.permissions.some((permission) => {
     const isEqualCode = permission.split('-')[0] === options.code;
     const isEqualCrud = options.crud ? Array.from(crudString).some((crud) => permission.includes(crud)) : true;
@@ -79,7 +81,6 @@ export class PermissionsGuard implements CanActivate {
         const userCompanyId = user.companyId;
 
         if (isMaster(user, PermissionOption, CRUD)) return true;
-
         const affectedCompanyId = getCompanyId(req);
         //! missing companiesIds check
         // const affectedCompanyIds = getCompanyIds(req);

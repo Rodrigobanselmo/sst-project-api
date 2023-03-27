@@ -7,6 +7,7 @@ import { SendGridProvider } from '../../shared/providers/MailProvider/implementa
 import { AuthModule } from '../auth/auth.module';
 import { RefreshTokensRepository } from '../auth/repositories/implementations/RefreshTokensRepository';
 import { CompanyModule } from '../company/company.module';
+import { CouncilController } from './controller/council/council.controller';
 import { InvitesController } from './controller/invites/invites.controller';
 import { ProfessionalResponsibleController } from './controller/professionals-responsible/professionals-responsible.controller';
 import { ProfessionalsController } from './controller/professionals/professionals.controller';
@@ -27,9 +28,12 @@ import { CreateProfessionalResponsibleService } from './services/professionals-r
 import { DeleteProfessionalResponsibleService } from './services/professionals-responsibles/delete-professionals-responsibles/delete-professionals-responsibles.service';
 import { FindProfessionalResponsibleService } from './services/professionals-responsibles/find-professionals-responsibles/find-professionals-responsibles.service';
 import { UpdateProfessionalResponsibleService } from './services/professionals-responsibles/update-professionals-responsibles/update-professionals-responsibles.service';
+import { CreateCouncilService } from './services/professionals/create-council/create-council.service';
 import { CreateProfessionalService } from './services/professionals/create-professional/create-professional.service';
+import { DeleteCouncilService } from './services/professionals/delete-council/delete-council.service';
 import { FindAllProfessionalsByCompanyService } from './services/professionals/find-all/find-all.service';
 import { FindFirstProfessionalService } from './services/professionals/find-first/find-first.service';
+import { UpdateCouncilService } from './services/professionals/update-council/update-council.service';
 import { UpdateProfessionalService } from './services/professionals/update-professional/update-professional.service';
 import { CreateUserService } from './services/users/create-user/create-user.service';
 import { FindAllByCompanyService } from './services/users/find-all/find-all.service';
@@ -41,7 +45,7 @@ import { UpdatePermissionsRolesService } from './services/users/update-permissio
 import { UpdateUserService } from './services/users/update-user/update-user.service';
 
 @Module({
-  controllers: [UsersController, InvitesController, ProfessionalsController, ProfessionalResponsibleController],
+  controllers: [UsersController, InvitesController, ProfessionalsController, ProfessionalResponsibleController, CouncilController],
   imports: [forwardRef(() => AuthModule), CompanyModule],
   providers: [
     HashProvider,
@@ -77,6 +81,9 @@ import { UpdateUserService } from './services/users/update-user/update-user.serv
     FindProfessionalResponsibleService,
     DeleteProfessionalResponsibleService,
     ProfessionalResponsibleRepository,
+    UpdateCouncilService,
+    DeleteCouncilService,
+    CreateCouncilService,
   ],
   exports: [UsersRepository, ProfessionalRepository],
 })

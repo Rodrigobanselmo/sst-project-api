@@ -111,6 +111,10 @@ export class InviteUsersService {
 export const inviteNewUser = async (mailProvider: SendGridProvider, invite: InviteUsersEntity) => {
   const templatePath = resolve(__dirname, '..', '..', '..', '..', '..', '..', 'templates', 'email', 'inviteUser.hbs');
 
+  if (!invite.email) {
+    throw new BadRequestException('Email não informado ou inválido');
+  }
+
   // Todo: add company name
   const variables = {
     company: invite.companyName,

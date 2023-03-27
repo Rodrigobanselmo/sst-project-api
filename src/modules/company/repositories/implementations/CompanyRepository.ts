@@ -622,6 +622,9 @@ export class CompanyRepository implements ICompanyRepository {
       (where.AND as any).push({
         clinicExams: {
           some: {
+            startDate: { lte: new Date() },
+            OR: [{ endDate: { gte: new Date() } }, { endDate: null }],
+            status: 'ACTIVE',
             examId: { in: query.clinicExamsIds },
             ...('isPeriodic' in query && { isPeriodic: query?.isPeriodic }),
             ...('isChange' in query && { isChange: query?.isChange }),
@@ -787,7 +790,7 @@ export class CompanyRepository implements ICompanyRepository {
     const include = options?.include || {};
 
     const employeeCountPromise = this.prisma.employee.count({
-      where: { companyId: id, hierarchyId: { not: null } },
+      where: { companyId: id, status: 'ACTIVE', hierarchyId: { not: null } },
     });
 
     const riskGroupCountPromise = this.prisma.riskFactorGroupData.count({
@@ -855,11 +858,11 @@ export class CompanyRepository implements ICompanyRepository {
     });
 
     const employeeAwayCountPromise = this.prisma.employee.count({
-      where: { companyId: id, hierarchyId: { not: null }, absenteeisms: { some: { endDate: { lt: new Date() } } } },
+      where: { companyId: id, hierarchyId: { not: null }, status: 'ACTIVE', absenteeisms: { some: { endDate: { lt: new Date() } } } },
     });
 
     const employeeInactiveCountPromise = this.prisma.employee.count({
-      where: { companyId: id, hierarchyId: null },
+      where: { companyId: id, hierarchyId: null, status: 'INACTIVE' },
     });
 
     const episCountPromise = this.prisma.epi.count({

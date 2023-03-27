@@ -660,41 +660,42 @@ model CompanyOS {
 }
 
 model Employee {
-  id               Int                        @id @default(autoincrement())
-  created_at       DateTime                   @default(now())
-  updated_at       DateTime                   @updatedAt
-  status           StatusEnum                 @default(PENDING)
-  name             String
-  cpf              String
-  companyId        String
-  hierarchyId      String?
-  admissionDate    DateTime?
-  birthday         DateTime?
-  cidId            String?
-  email            String?
-  esocialCode      String?
-  isComorbidity    Boolean?                   @default(false)
-  nickname         String?
-  phone            String?
-  sex              SexTypeEnum?
-  shiftId          Int?
-  socialName       String?
-  lastExam         DateTime?
-  expiredDateExam  DateTime?
-  newExamAdded     DateTime?
-  cbo              String?
-  absenteeisms     Absenteeism[]
-  cat              Cat[]
-  cid              Cid?                       @relation(fields: [cidId], references: [cid], onDelete: Restrict)
-  company          Company                    @relation(fields: [companyId], references: [id])
-  hierarchy        Hierarchy?                 @relation(fields: [hierarchyId], references: [id], onDelete: Restrict)
-  shift            CompanyShift?              @relation(fields: [shiftId], references: [id], onDelete: Restrict)
-  esocialEvents    EmployeeESocialEvent[]
-  examsHistory     EmployeeExamsHistory[]
-  hierarchyHistory EmployeeHierarchyHistory[]
-  pppHistory       EmployeePPPHistory[]
-  subOffices       Hierarchy[]                @relation("sub_offices")
-  normalized       String?
+  id                   Int                        @id @default(autoincrement())
+  created_at           DateTime                   @default(now())
+  updated_at           DateTime                   @updatedAt
+  status               StatusEnum                 @default(PENDING)
+  name                 String
+  cpf                  String
+  companyId            String
+  hierarchyId          String?
+  admissionDate        DateTime?
+  birthday             DateTime?
+  cidId                String?
+  email                String?
+  esocialCode          String?
+  isComorbidity        Boolean?                   @default(false)
+  nickname             String?
+  phone                String?
+  sex                  SexTypeEnum?
+  shiftId              Int?
+  socialName           String?
+  lastExam             DateTime?
+  skippedDismissalExam Boolean?
+  expiredDateExam      DateTime?
+  newExamAdded         DateTime?
+  cbo                  String?
+  absenteeisms         Absenteeism[]
+  cat                  Cat[]
+  cid                  Cid?                       @relation(fields: [cidId], references: [cid], onDelete: Restrict)
+  company              Company                    @relation(fields: [companyId], references: [id])
+  hierarchy            Hierarchy?                 @relation(fields: [hierarchyId], references: [id], onDelete: Restrict)
+  shift                CompanyShift?              @relation(fields: [shiftId], references: [id], onDelete: Restrict)
+  esocialEvents        EmployeeESocialEvent[]
+  examsHistory         EmployeeExamsHistory[]
+  hierarchyHistory     EmployeeHierarchyHistory[]
+  pppHistory           EmployeePPPHistory[]
+  subOffices           Hierarchy[]                @relation("sub_offices")
+  normalized           String?
 
   @@unique([id, companyId])
   @@unique([cpf, companyId])

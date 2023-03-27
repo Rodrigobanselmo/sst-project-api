@@ -60,6 +60,7 @@ export class EmployeeEntity implements Employee {
   phone: string;
   email: string;
   isComorbidity: boolean;
+  skippedDismissalExam: boolean;
   sex: SexTypeEnum;
   cidId: string;
   shiftId: number;
@@ -84,10 +85,11 @@ export class EmployeeEntity implements Employee {
       hierarchy?: Hierarchy;
       company?: Partial<Company>;
     },
+    options: { skipNewExamAdded?: boolean } = {},
   ) {
     Object.assign(this, partial);
 
-    if (this.newExamAdded) {
+    if (!options.skipNewExamAdded && this.newExamAdded) {
       //? toda vez que um novo exame é adicionado a um funcionario ou cargo e o funcionario possui um exame expirado, ele salva a data de hoje como newExamAdded
       if (!this.expiredDateExam) this.expiredDateExam = this.newExamAdded;
       if (this.expiredDateExam > this.newExamAdded) this.expiredDateExam = this.newExamAdded;

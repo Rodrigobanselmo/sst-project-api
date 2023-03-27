@@ -12,11 +12,25 @@ export class UpdateProfessionalService {
   constructor(private readonly mailProvider: SendGridProvider, private readonly professionalRepository: ProfessionalRepository) {}
 
   async execute({ ...updateDataDto }: UpdateProfessionalDto, user: UserPayloadDto) {
+    await this.checkIfCanUpdateProfessional(updateDataDto.id, user);
+
+    const sendEmail = updateDataDto.sendEmail;
+
+    delete updateDataDto.userId;
+    delete updateDataDto.sendEmail;
+    const professional = await this.professionalRepository.update(updateDataDto, { include: { invite: true } });
+
+    if (sendEmail) await inviteNewUser(this.mailProvider, professional.invite);
+
+    return professional;
+  }
+
+  async checkIfCanUpdateProfessional(id: number, user: UserPayloadDto, councilIds?: number[]) {
     if (!user.isMaster) {
       const foundProfessional = await this.professionalRepository.findFirstNude({
         where: {
           AND: [
-            { id: updateDataDto.id },
+            { id: id },
             {
               OR: [
                 {
@@ -35,22 +49,21 @@ export class UpdateProfessionalService {
             },
           ],
         },
-        include: { user: { include: { companies: true } }, councils: true },
+        select: { userId: true, id: true, councils: { select: { id: true } } },
       });
+
+      if (councilIds) {
+        const foundCouncilIds = foundProfessional?.councils.map((council) => council.id);
+        const notFoundCouncils = councilIds.filter((councilId) => !foundCouncilIds?.includes(councilId));
+
+        if (notFoundCouncils.length) throw new ForbiddenException(ErrorMessageEnum.PROFESSIONAL_NOT_FOUND);
+      }
 
       if (!foundProfessional?.id) {
         throw new ForbiddenException(ErrorMessageEnum.PROFESSIONAL_NOT_FOUND);
       }
+
+      return foundProfessional;
     }
-
-    const sendEmail = updateDataDto.sendEmail;
-
-    delete updateDataDto.userId;
-    delete updateDataDto.sendEmail;
-    const professional = await this.professionalRepository.update(updateDataDto);
-
-    if (sendEmail) await inviteNewUser(this.mailProvider, professional.invite);
-
-    return professional;
   }
 }

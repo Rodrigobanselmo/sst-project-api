@@ -51,7 +51,7 @@ export class CompanyController {
     private readonly updateApplyServiceCompanyService: UpdateApplyServiceCompanyService,
   ) {}
 
-  @Roles(RoleEnum.COMPANY, RoleEnum.CONTRACTS, RoleEnum.CLINICS, RoleEnum.USER)
+  @Roles(RoleEnum.COMPANY, RoleEnum.CONTRACTS, RoleEnum.CLINICS, RoleEnum.USER, RoleEnum.DOCTOR)
   @Permissions({ isContract: true, isMember: true })
   @Get('/:companyId/dashboard')
   dashboard(@User() userPayloadDto: UserPayloadDto, @Query() query: FindCompanyDashDto) {
@@ -77,6 +77,9 @@ export class CompanyController {
   }
 
   @Permissions(
+    {
+      isMember: true,
+    },
     {
       code: PermissionEnum.COMPANY,
       isContract: true,

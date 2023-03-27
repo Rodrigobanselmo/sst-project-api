@@ -33,9 +33,10 @@ export class EmployeeHierarchyHistoryRepository {
                 ...(subOfficeId && {
                   subOffices: { connect: { id: subOfficeId } },
                 }),
-                ...(!subOfficeId && {
-                  subOffices: { set: [] },
-                }),
+                ...(createData.motive !== 'DEM' &&
+                  !subOfficeId && {
+                    subOffices: { set: [] },
+                  }),
               }
             : { status },
         where: { id: employeeId },
@@ -70,9 +71,10 @@ export class EmployeeHierarchyHistoryRepository {
                 ...(subOfficeId && {
                   subOffices: { connect: { id: subOfficeId } },
                 }),
-                ...(!subOfficeId && {
-                  subOffices: { set: [] },
-                }),
+                ...(updateData.motive === 'DEM' &&
+                  !subOfficeId && {
+                    subOffices: { set: [] },
+                  }),
               }
             : { status },
         where: { id: employeeId },

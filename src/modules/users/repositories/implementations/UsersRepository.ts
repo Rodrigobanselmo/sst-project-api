@@ -113,7 +113,7 @@ export class UsersRepository implements IUsersRepository {
       }
 
       const councilsCreate = await Promise.all(
-        councils.map(async ({ councilId, councilType, councilUF }) => {
+        councils.map(async ({ councilId, councilType, councilUF, id }) => {
           if ((councilId && councilType && councilUF) || (councilId == '' && councilType == '' && councilUF == ''))
             return await this.prisma.professionalCouncil.upsert({
               create: {
@@ -122,14 +122,17 @@ export class UsersRepository implements IUsersRepository {
                 councilUF,
                 professionalId: user.professional.id,
               },
-              update: {},
+              update: { councilId, councilType, councilUF },
               where: {
-                councilType_councilUF_councilId_professionalId: {
-                  councilId,
-                  councilType,
-                  councilUF,
-                  professionalId: user.professional.id,
-                },
+                ...(!id && {
+                  councilType_councilUF_councilId_professionalId: {
+                    councilId,
+                    councilType,
+                    councilUF,
+                    professionalId: user.professional.id,
+                  },
+                }),
+                ...(id && { id }),
               },
             });
         }),

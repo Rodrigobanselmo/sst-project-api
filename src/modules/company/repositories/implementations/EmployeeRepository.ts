@@ -65,6 +65,10 @@ export class EmployeeRepository {
               connect: { cid: cidId },
             }
           : undefined,
+        ...('lastExam' in createCompanyDto &&
+          !createCompanyDto.lastExam && {
+            lastExam: null,
+          }),
       },
       where: { id_companyId: { companyId, id } },
     });
@@ -185,7 +189,7 @@ export class EmployeeRepository {
               primary_activity: true,
             },
           },
-          hierarchy: !!include?.hierarchy ? false : { select: this.parentInclude() },
+          hierarchy: { select: { id: true, name: true } },
         },
       }),
     });
@@ -210,7 +214,9 @@ export class EmployeeRepository {
       hierarchyId: true,
       name: true,
       companyId: true,
+      lastExam: true,
       status: true,
+      hierarchy: { select: { id: true, name: true, companyId: true } },
       ...options?.select,
     };
 
@@ -540,12 +546,12 @@ export class EmployeeRepository {
     };
   }
 
-  async findNude(options: Prisma.EmployeeFindManyArgs = {}) {
+  async findNude(options: Prisma.EmployeeFindManyArgs = {}, partial?: { skipNewExamAdded?: boolean }) {
     const employees = await this.prisma.employee.findMany({
       ...options,
     });
 
-    return employees.map((employee) => new EmployeeEntity(employee));
+    return employees.map((employee) => new EmployeeEntity(employee, partial));
   }
 
   async countNude(options: Prisma.EmployeeCountArgs = {}) {

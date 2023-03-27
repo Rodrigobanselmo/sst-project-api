@@ -96,6 +96,7 @@ import { CheckEmployeeExamService } from './services/exam/check-employee-exam/ch
 import { FindRiskByIdService } from './services/risk/find-one/find-one.service';
 import { FindRecMedService } from './services/rec-med/find-rec-med/find-rec-med.service';
 import { FindGenerateSourceService } from './services/generate-source/find-generate-source/find-generate-source.service';
+import { ReloadEmployeeExamTimeService } from './services/exam/reload-employee-exam-time/reload-employee-exam-time.service';
 
 @Module({
   controllers: [
@@ -196,6 +197,7 @@ import { FindGenerateSourceService } from './services/generate-source/find-gener
     FindRiskByIdService,
     FindRecMedService,
     FindGenerateSourceService,
+    ReloadEmployeeExamTimeService,
   ],
   exports: [
     RiskRepository,
@@ -214,6 +216,7 @@ import { FindGenerateSourceService } from './services/generate-source/find-gener
     FindAllAvailableRiskService,
     CreateRecMedService,
     CreateGenerateSourceService,
+    ReloadEmployeeExamTimeService,
   ],
   imports: [forwardRef(() => CompanyModule), CacheModule.register()],
 })

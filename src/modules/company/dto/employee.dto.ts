@@ -88,6 +88,12 @@ export class CreateEmployeeDto {
   @IsDate({ message: 'Data de aniversário inválida' })
   @Type(() => Date)
   birthday: Date;
+
+  @IsOptional()
+  @Transform(DateFormat, { toClassOnly: true })
+  @IsDate({ message: 'Data exame anterior ao contrato' })
+  @Type(() => Date)
+  lastExam: Date;
 }
 
 export class UpdateEmployeeDto extends PartialType(CreateEmployeeDto) {

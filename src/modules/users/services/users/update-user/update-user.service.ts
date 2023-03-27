@@ -57,10 +57,11 @@ export class UpdateUserService {
         ...(invite &&
           invite?.professional && {
             ...(invite?.professional.councils && {
-              councils: invite.professional.councils.map(({ councilId, councilType, councilUF }) => ({
+              councils: invite.professional.councils.map(({ councilId, councilType, councilUF, id }) => ({
                 councilId,
                 councilType,
                 councilUF,
+                id,
               })),
             }),
             ...(invite?.professional.phone && {

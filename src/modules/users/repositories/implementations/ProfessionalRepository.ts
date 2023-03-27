@@ -10,6 +10,8 @@ import { UserEntity } from '../../entities/user.entity';
 import { UserCompanyEntity } from '../../entities/userCompany.entity';
 import dayjs from 'dayjs';
 import { InviteUsersEntity } from '../../entities/invite-users.entity';
+import { CreateCouncilDto, UpdateCouncilDto } from '../../dto/council.dto';
+import { ProfessionalCouncilEntity } from '../../entities/council.entity';
 
 @Injectable()
 export class ProfessionalRepository {
@@ -85,7 +87,7 @@ export class ProfessionalRepository {
       }
 
       const councilsCreate = await Promise.all(
-        councils.map(async ({ councilId, councilType, councilUF }) => {
+        councils.map(async ({ councilId, councilType, councilUF, id }) => {
           if ((councilId && councilType && councilUF) || (councilId == '' && councilType == '' && councilUF == ''))
             return await this.prisma.professionalCouncil.upsert({
               create: {
@@ -94,14 +96,17 @@ export class ProfessionalRepository {
                 councilUF,
                 professionalId: professional.id,
               },
-              update: {},
+              update: { councilId, councilType, councilUF },
               where: {
-                councilType_councilUF_councilId_professionalId: {
-                  councilId,
-                  councilType,
-                  councilUF,
-                  professionalId: professional.id,
-                },
+                ...(!id && {
+                  councilType_councilUF_councilId_professionalId: {
+                    councilId,
+                    councilType,
+                    councilUF,
+                    professionalId: professional.id,
+                  },
+                }),
+                ...(id && { id }),
               },
             });
         }),
@@ -391,5 +396,42 @@ export class ProfessionalRepository {
     });
 
     return new ProfessionalEntity(professional);
+  }
+
+  async createCouncil(data: CreateCouncilDto, options: Partial<Prisma.ProfessionalCouncilCreateArgs> = {}) {
+    const council = await this.prisma.professionalCouncil.create({
+      data: {
+        councilId: data.councilId,
+        councilType: data.councilType,
+        councilUF: data.councilUF,
+        professionalId: data.professionalId,
+      },
+    });
+
+    return new ProfessionalCouncilEntity(council);
+  }
+
+  async updateCouncil(data: UpdateCouncilDto, options: Partial<Prisma.ProfessionalCouncilUpdateArgs> = {}) {
+    const council = await this.prisma.professionalCouncil.update({
+      data: {
+        councilId: data.councilId,
+        councilType: data.councilType,
+        councilUF: data.councilUF,
+        professionalId: data.professionalId,
+      },
+      where: {
+        id: data.id,
+      },
+    });
+
+    return new ProfessionalCouncilEntity(council);
+  }
+  async deleteCouncil(id: number, professionalId: number) {
+    await this.prisma.professionalCouncil.deleteMany({
+      where: {
+        id,
+        professionalId,
+      },
+    });
   }
 }
