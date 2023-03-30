@@ -1,3 +1,4 @@
+import { WorkspaceEntity } from './../../../../../company/entities/workspace.entity';
 import { GenerateSourceEntity } from './../../../../../sst/entities/generateSource.entity';
 import { RecMedEntity } from './../../../../../sst/entities/recMed.entity';
 import { EpiRiskDataEntity } from './../../../../../sst/entities/epiRiskData.entity';
@@ -16,6 +17,7 @@ import { CompanyOSEntity } from '../../../../../../modules/company/entities/os.e
 export interface IPdfOSData {
   os: CompanyOSEntity;
   employee: EmployeeEntity;
+  workspaces: WorkspaceEntity[];
   consultantCompany: CompanyEntity;
   actualCompany: CompanyEntity;
   epis: EpiRiskDataEntity[];
