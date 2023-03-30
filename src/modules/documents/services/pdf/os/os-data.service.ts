@@ -42,6 +42,7 @@ export class PdfOsDataService {
         id: true,
         companyId: true,
         name: true,
+        hierarchy: { select: { workspaces: { select: { name: true } } } },
         cpf: true,
         esocialCode: true,
         // birthday: true,
@@ -55,6 +56,7 @@ export class PdfOsDataService {
             os: true,
             cnpj: true,
             group: { select: { companyGroup: { select: { os: true } } } },
+            workspace: { select: { id: true } },
             receivingServiceContracts: {
               select: {
                 applyingServiceCompany: {
@@ -81,6 +83,9 @@ export class PdfOsDataService {
         },
       },
     });
+
+    const workspaces = employeeFound?.hierarchy?.workspaces;
+    delete employeeFound.hierarchy;
 
     if (!employeeFound?.id) throw new ForbiddenException(ErrorMessageEnum.FORBIDDEN_ACCESS);
 
@@ -118,6 +123,7 @@ export class PdfOsDataService {
       employee,
       risks: osRisk.map((risk) => ({ riskData: risk.riskData[0], riskFactor: risk.riskFactor })),
       sector,
+      workspaces,
       ...epiEpc,
     };
   }
