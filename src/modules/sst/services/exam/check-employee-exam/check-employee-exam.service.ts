@@ -1,3 +1,4 @@
+import { standardDate } from './../../../../company/services/report/update-all-companies/update-all-companies.service';
 import { Injectable } from '@nestjs/common';
 
 import { asyncBatch } from '../../../../../shared/utils/asyncBatch';
@@ -5,6 +6,8 @@ import { EmployeeRepository } from '../../../../company/repositories/implementat
 import { CheckEmployeeExamDto } from '../../../dto/exam.dto';
 import { FindExamByHierarchyService } from '../find-by-hierarchy /find-exam-by-hierarchy.service';
 import { ReloadEmployeeExamTimeService } from '../reload-employee-exam-time/reload-employee-exam-time.service';
+import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
+import { riskAllId } from '../../../../../shared/constants/ids';
 
 @Injectable()
 export class CheckEmployeeExamService {
@@ -12,6 +15,7 @@ export class CheckEmployeeExamService {
     private readonly findExamByHierarchyService: FindExamByHierarchyService,
     private readonly employeeRepository: EmployeeRepository,
     private readonly reloadEmployeeExamTimeService: ReloadEmployeeExamTimeService,
+    private readonly dayjs: DayJSProvider,
   ) {}
 
   async execute(body: CheckEmployeeExamDto) {
@@ -19,7 +23,7 @@ export class CheckEmployeeExamService {
     const hierarchyId = body.hierarchyId;
     const employeeId = body.employeeId;
     const companyId = body.companyId;
-    const riskId = body.riskId;
+    const riskId = riskAllId == body.riskId ? undefined : body.riskId;
 
     const employeesWithExpiredDatePromise = this.employeeRepository.findNude({
       where: {
@@ -28,6 +32,7 @@ export class CheckEmployeeExamService {
         ...(hierarchyId && { hierarchyId }),
         ...(employeeId && { id: employeeId }),
         ...(homogeneousGroupId && { hierarchy: { hierarchyOnHomogeneous: { some: { homogeneousGroupId: homogeneousGroupId } } } }),
+        ...(companyId && { companyId }),
         ...(companyId &&
           riskId && { companyId, hierarchy: { hierarchyOnHomogeneous: { some: { homogeneousGroup: { riskFactorData: { some: { riskId: riskId } } } } } } }),
       },
@@ -36,10 +41,18 @@ export class CheckEmployeeExamService {
 
     const employeesWithoutExpiredDatePromise = this.employeeRepository.findNude({
       where: {
-        expiredDateExam: null,
+        OR: [
+          {
+            expiredDateExam: null,
+          },
+          {
+            expiredDateExam: this.dayjs.dayjs(standardDate).toDate(),
+          },
+        ],
         ...(hierarchyId && { hierarchyId }),
         ...(employeeId && { id: employeeId }),
         ...(homogeneousGroupId && { hierarchy: { hierarchyOnHomogeneous: { some: { homogeneousGroupId: homogeneousGroupId } } } }),
+        ...(companyId && { companyId }),
         ...(companyId &&
           riskId && { companyId, hierarchy: { hierarchyOnHomogeneous: { some: { homogeneousGroup: { riskFactorData: { some: { riskId: riskId } } } } } } }),
       },

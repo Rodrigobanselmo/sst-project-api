@@ -1,3 +1,4 @@
+import { CheckEmployeeExamService } from './../../../../sst/services/exam/check-employee-exam/check-employee-exam.service';
 import { EmployeeRepository } from './../../../../company/repositories/implementations/EmployeeRepository';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { HierarchyEnum } from '@prisma/client';
@@ -32,6 +33,7 @@ export class UploadEmployeesService {
     private readonly databaseTableRepository: DatabaseTableRepository,
     private readonly uploadExcelProvider: UploadExcelProvider,
     private readonly hierarchyRepository: HierarchyRepository,
+    private readonly checkEmployeeExamService: CheckEmployeeExamService,
   ) {}
 
   async execute(file: Express.Multer.File, userPayloadDto: UserPayloadDto) {
@@ -154,6 +156,10 @@ export class UploadEmployeesService {
 
     // update or create all
     await this.employeeRepository.upsertMany(restEmployees, companyId);
+
+    this.checkEmployeeExamService.execute({
+      companyId: companyId,
+    });
 
     return await this.uploadExcelProvider.newTableData({
       findAll: (sheet) => findAllEmployees(this.excelProvider, this.companyRepository, this.workspaceRepository, this.hierarchyRepository, sheet, companyId),

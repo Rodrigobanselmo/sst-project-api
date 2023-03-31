@@ -147,7 +147,7 @@ export class HierarchyExcelProvider {
           description: hierarchy?.description ?? allHierarchy.description,
           realDescription: hierarchy?.realDescription ?? allHierarchy.realDescription,
           ghoName: hierarchy?.ghoName ?? allHierarchy.ghoName,
-          ghoNames: [...hierarchy.ghoNames, ...(allHierarchy?.ghoName || [])],
+          ghoNames: [...(hierarchy?.ghoNames || []), ...(allHierarchy?.ghoName || [])],
           fromOld: true,
         };
 

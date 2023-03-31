@@ -128,7 +128,6 @@ export class ReloadEmployeeExamTimeService {
               }
             }
           }
-          // >> logic newExamAdded
 
           if (doneExamFound) employee.expiredDateExam = doneExamFound.expiredDate;
           if (!doneExamFound && scheduleExamFound && employee.lastExam) {
