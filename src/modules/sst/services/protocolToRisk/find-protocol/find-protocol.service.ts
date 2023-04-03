@@ -16,6 +16,8 @@ export class FindProtocolToRiskService {
         include: {
           protocol: { select: { name: true, id: true } },
           risk: { select: { name: true, id: true, type: true } },
+          hierarchies: { select: { name: true, id: true, type: true } },
+          homoGroups: { select: { name: true, id: true, type: true, description: true } },
         },
       },
     );

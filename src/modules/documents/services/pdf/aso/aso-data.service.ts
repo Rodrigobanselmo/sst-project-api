@@ -1,3 +1,4 @@
+import { ProtocolToRiskRepository } from './../../../../sst/repositories/implementations/ProtocolRiskRepository';
 import { HierarchyEntity } from './../../../../company/entities/hierarchy.entity';
 import { HierarchyRepository } from './../../../../company/repositories/implementations/HierarchyRepository';
 import { ForbiddenException, Injectable } from '@nestjs/common';
@@ -15,6 +16,7 @@ import { FindExamByHierarchyService } from '../../../../sst/services/exam/find-b
 import { FindAllRiskDataByEmployeeService } from '../../../../sst/services/risk-data/find-by-employee/find-by-employee.service';
 import { IPdfAsoData } from './types/IAsoData.type';
 import { checkRiskDataDoc } from '../../../../../shared/utils/getRiskDoc';
+import { removeDuplicate } from 'src/shared/utils/removeDuplicate';
 
 export const checkExamType = (exam: ExamRiskDataEntity | ExamRiskEntity, examType: ExamHistoryTypeEnum) => {
   const isAdmission = examType == ExamHistoryTypeEnum.ADMI;
@@ -41,6 +43,7 @@ export class PdfAsoDataService {
     private readonly hierarchyRepository: HierarchyRepository,
     private readonly findAllRiskDataByEmployeeService: FindAllRiskDataByEmployeeService,
     private readonly findExamByHierarchyService: FindExamByHierarchyService,
+    private readonly protocolToRiskRepository: ProtocolToRiskRepository,
   ) {}
 
   async execute(employeeId: number, userPayloadDto: UserPayloadDto, asoId?: number): Promise<IPdfAsoData> {
@@ -122,13 +125,20 @@ export class PdfAsoDataService {
     const examType = clinicExam.examType;
     const admissionDate = clinicExam?.employee?.hierarchyHistory?.[0]?.startDate || clinicExam?.changeHierarchyDate;
 
-    const { risk: riskData, employee: employeeRisk } = await this.findAllRiskDataByEmployeeService.getRiskData(employeeId, undefined, {
+    const {
+      risk: riskData,
+      employee: employeeRisk,
+      date: startHierarchyDate,
+      hierarchyIds,
+    } = await this.findAllRiskDataByEmployeeService.getRiskData(employeeId, undefined, {
       fromExam: true,
       hierarchyData: true,
       filterDate: true,
     });
     const asoRiskData = checkRiskDataDoc(riskData, { docType: 'isAso', companyId: clinicExam.employee.companyId });
-    const asoRisk = onGetRisks(asoRiskData);
+    const asoRisk = onGetRisks(asoRiskData) || [];
+
+    const protocols = await this.protocolToRiskRepository.findByHierarchies(hierarchyIds, { date: startHierarchyDate });
 
     const employee = { ...employeeRisk, ...clinicExam.employee };
     const examsHistory = employee.examsHistory;
@@ -150,17 +160,8 @@ export class PdfAsoDataService {
       return { exam: examData.exam, doneDate: history?.doneDate };
     });
 
-    const protocols = asoRisk
-      .map((r) => r.riskData.map((rd) => rd.protocolsToRisk))
-      .reduce((acc, curr) => {
-        if (!curr) return acc;
-        return [...acc, ...curr];
-      }, [])
-      .reduce((acc, curr) => {
-        if (!curr) return acc;
-        return [...acc, ...curr];
-      }, []);
-
+    protocols.push(...asoRisk.map((r) => r.riskData.map((rd) => rd.protocolsToRisk)).flat(2));
+    protocols;
     return {
       doneExams,
       consultantCompany,
@@ -171,7 +172,10 @@ export class PdfAsoDataService {
       employee,
       risks: asoRisk.map((risk) => ({ riskData: risk.riskData[0], riskFactor: risk.riskFactor })),
       sector,
-      protocols,
+      protocols: removeDuplicate(
+        protocols.map((p) => ({ ...p, name: p.protocol.name })),
+        { removeById: 'name' },
+      ),
       admissionDate,
     };
   }

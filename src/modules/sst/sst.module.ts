@@ -217,6 +217,7 @@ import { ReloadEmployeeExamTimeService } from './services/exam/reload-employee-e
     CreateRecMedService,
     CreateGenerateSourceService,
     ReloadEmployeeExamTimeService,
+    ProtocolToRiskRepository,
   ],
   imports: [forwardRef(() => CompanyModule), CacheModule.register()],
 })

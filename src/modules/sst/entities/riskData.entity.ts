@@ -127,7 +127,6 @@ export class RiskFactorDataEntity implements RiskFactorData {
     if (partial.riskFactor) {
       this.riskFactor = new RiskFactorsEntity(partial.riskFactor);
 
-      this.getProtocols();
       this.getMatrix();
     }
 
@@ -145,6 +144,7 @@ export class RiskFactorDataEntity implements RiskFactorData {
       if (json.type === QuantityTypeEnum.HEAT) this.heatProb(json);
     }
 
+    this.getProtocols();
     this.getBaseExams();
     this.setRecMedExamData(partial);
   }
@@ -183,9 +183,9 @@ export class RiskFactorDataEntity implements RiskFactorData {
   private getProtocols() {
     if (this.riskFactor && this.riskFactor?.protocolToRisk) {
       this.riskFactor?.protocolToRisk.forEach((protocolRisk) => {
-        if (protocolRisk?.minRiskDegreeQuantity && this.isQuantity && this.level < protocolRisk?.minRiskDegreeQuantity) return;
+        if (this.level && protocolRisk?.minRiskDegreeQuantity && this.isQuantity && this.level < protocolRisk?.minRiskDegreeQuantity) return;
 
-        if (protocolRisk?.minRiskDegree && (!this.isQuantity || !protocolRisk?.minRiskDegreeQuantity) && this.level < protocolRisk?.minRiskDegree) return;
+        if (this.level && protocolRisk?.minRiskDegree && (!this.isQuantity || !protocolRisk?.minRiskDegreeQuantity) && this.level < protocolRisk?.minRiskDegree) return;
 
         if (!this.protocolsToRisk) this.protocolsToRisk = [];
 

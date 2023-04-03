@@ -11,20 +11,44 @@ import { ProtocolToRiskEntity } from '../../entities/protocol.entity';
 export class ProtocolToRiskRepository {
   constructor(private prisma: PrismaService) {}
 
-  async create({ ...createProtocolToRiskDto }: CreateProtocolToRiskDto): Promise<ProtocolToRiskEntity> {
+  async create({ hierarchyIds, homoGroupsIds, riskId, ...createProtocolToRiskDto }: CreateProtocolToRiskDto): Promise<ProtocolToRiskEntity> {
     const redMed = await this.prisma.protocolToRisk.create({
       data: {
         ...createProtocolToRiskDto,
+        ...(riskId && { riskId }),
+        ...(Array.isArray(hierarchyIds) &&
+          hierarchyIds.length != 0 && {
+            hierarchies: {
+              connect: hierarchyIds?.map((id) => ({ id })),
+            },
+          }),
+        ...(Array.isArray(homoGroupsIds) &&
+          homoGroupsIds.length != 0 && {
+            homoGroups: {
+              connect: homoGroupsIds?.map((id) => ({ id })),
+            },
+          }),
       },
     });
 
     return new ProtocolToRiskEntity(redMed);
   }
 
-  async update({ id, companyId, ...createProtocolToRiskDto }: UpdateProtocolToRiskDto): Promise<ProtocolToRiskEntity> {
+  async update({ id, companyId, riskId, hierarchyIds, homoGroupsIds, ...createProtocolToRiskDto }: UpdateProtocolToRiskDto): Promise<ProtocolToRiskEntity> {
     const Exam = await this.prisma.protocolToRisk.update({
       data: {
         ...createProtocolToRiskDto,
+        ...(riskId && { riskId }),
+        ...(Array.isArray(hierarchyIds) && {
+          hierarchies: {
+            set: hierarchyIds?.map((id) => ({ id })),
+          },
+        }),
+        ...(Array.isArray(homoGroupsIds) && {
+          homoGroups: {
+            set: homoGroupsIds?.map((id) => ({ id })),
+          },
+        }),
       },
       where: { id_companyId: { companyId, id: id || 0 } },
     });
@@ -71,23 +95,57 @@ export class ProtocolToRiskRepository {
 
   async createMany({ companyId, data }: UpsertManyProtocolToRiskDto) {
     await this.prisma.protocolToRisk.createMany({
-      data: data.map(({ id, ...examRisk }) => ({
+      data: data.map(({ id, hierarchyIds, homoGroupsIds, ...examRisk }) => ({
         ...examRisk,
         companyId,
+        ...(Array.isArray(hierarchyIds) &&
+          hierarchyIds.length != 0 && {
+            hierarchies: {
+              connect: hierarchyIds?.map((id) => ({ id })),
+            },
+          }),
+        ...(Array.isArray(homoGroupsIds) &&
+          homoGroupsIds.length != 0 && {
+            homoGroups: {
+              connect: homoGroupsIds?.map((id) => ({ id })),
+            },
+          }),
       })),
     });
   }
 
   async upsertMany({ companyId, data }: UpsertManyProtocolToRiskDto) {
     const dataUpsert = await this.prisma.$transaction(
-      data.map(({ id, ...examRisk }) =>
+      data.map(({ id, hierarchyIds, homoGroupsIds, ...examRisk }) =>
         this.prisma.protocolToRisk.upsert({
           create: {
             ...examRisk,
+            ...(Array.isArray(hierarchyIds) &&
+              hierarchyIds.length != 0 && {
+                hierarchies: {
+                  connect: hierarchyIds?.map((id) => ({ id })),
+                },
+              }),
+            ...(Array.isArray(homoGroupsIds) &&
+              homoGroupsIds.length != 0 && {
+                homoGroups: {
+                  connect: homoGroupsIds?.map((id) => ({ id })),
+                },
+              }),
             companyId,
           },
           update: {
             ...examRisk,
+            ...(Array.isArray(hierarchyIds) && {
+              hierarchies: {
+                set: hierarchyIds?.map((id) => ({ id })),
+              },
+            }),
+            ...(Array.isArray(homoGroupsIds) && {
+              homoGroups: {
+                set: homoGroupsIds?.map((id) => ({ id })),
+              },
+            }),
           },
           where: { id },
         }),
@@ -99,6 +157,41 @@ export class ProtocolToRiskRepository {
 
   async findNude(options: Prisma.ProtocolToRiskFindManyArgs = {}): Promise<ProtocolToRiskEntity[]> {
     const exams = await this.prisma.protocolToRisk.findMany(options);
+
+    return exams.map((exam) => new ProtocolToRiskEntity(exam));
+  }
+
+  async findByHierarchies(hierarchiesIds: string[], options: Prisma.ProtocolToRiskFindManyArgs & { date?: Date } = {}): Promise<ProtocolToRiskEntity[]> {
+    const { date, ...optionsRest } = options;
+
+    const exams = await this.prisma.protocolToRisk.findMany({
+      ...optionsRest,
+      where: {
+        homoGroups: {
+          some: {
+            hierarchyOnHomogeneous: {
+              some: {
+                hierarchyId: { in: hierarchiesIds },
+                ...(date && { AND: [{ OR: [{ startDate: { lte: date } }, { startDate: null }] }, { OR: [{ endDate: { gt: date } }, { endDate: null }] }] }),
+              },
+            },
+          },
+        },
+        hierarchies: { some: { id: { in: hierarchiesIds } } },
+        protocol: { status: 'ACTIVE' },
+        ...optionsRest.where,
+      },
+      select: {
+        id: true,
+        protocol: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        ...optionsRest.select,
+      },
+    });
 
     return exams.map((exam) => new ProtocolToRiskEntity(exam));
   }

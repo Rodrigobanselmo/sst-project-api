@@ -1,4 +1,4 @@
-import { CacheModule, Module } from '@nestjs/common';
+import { CacheModule, MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 
@@ -14,6 +14,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { JwtAuthGuard } from './shared/guards/jwt-auth.guard';
 import { PermissionsGuard } from './shared/guards/permissions.guard';
 import { RolesGuard } from './shared/guards/roles.guard';
+import { LoggerMiddleware } from './shared/middlewares/logger.middleware';
 
 @Module({
   imports: [PrismaModule, UsersModule, AuthModule, CompanyModule, SSTModule, FilesModule, DocumentsModule, EsocialModule, NotificationModule, ScheduleModule.forRoot()],
@@ -32,4 +33,8 @@ import { RolesGuard } from './shared/guards/roles.guard';
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes({ path: '*', method: RequestMethod.ALL });
+  }
+}

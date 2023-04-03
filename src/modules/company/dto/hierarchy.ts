@@ -5,11 +5,9 @@ import { Transform, Type } from 'class-transformer';
 import { IsDate, IsEnum, IsInt, IsOptional, IsString, MaxLength, ValidateIf, ValidateNested } from 'class-validator';
 import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
 
-import { StringCapitalizeTransform } from '../../../shared/transformers/string-capitalize';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 
 export class CreateHierarchyDto {
-  @Transform(StringCapitalizeTransform, { toClassOnly: true })
   @IsString()
   name: string;
 
@@ -31,7 +29,6 @@ export class CreateHierarchyDto {
   @IsString()
   companyId: string;
 
-  @Transform(StringCapitalizeTransform, { toClassOnly: true })
   @IsString()
   @IsOptional()
   ghoName: string;
@@ -79,7 +76,6 @@ export class UpsertHierarchyDto {
   @IsString()
   id?: string;
 
-  @Transform(StringCapitalizeTransform, { toClassOnly: true })
   @IsOptional()
   @IsString()
   @MaxLength(100)
@@ -161,11 +157,9 @@ export class CreateSubHierarchyDto {
   @IsString()
   id: string;
 
-  @Transform(StringCapitalizeTransform, { toClassOnly: true })
   @IsString()
   name: string;
 
-  @Transform(StringCapitalizeTransform, { toClassOnly: true })
   @IsOptional()
   @IsString()
   realDescription: string;

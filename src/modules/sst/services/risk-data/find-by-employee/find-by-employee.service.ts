@@ -173,6 +173,6 @@ export class FindAllRiskDataByEmployeeService {
       });
     });
 
-    return { risk: riskDataReturn.map((riskData) => new RiskFactorDataEntity(riskData)), employee };
+    return { date, hierarchyIds, risk: riskDataReturn.map((riskData) => new RiskFactorDataEntity(riskData)), employee };
   }
 }

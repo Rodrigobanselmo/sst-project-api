@@ -374,6 +374,11 @@ export class RiskRepository implements IRiskRepository {
         isPPP: true,
         isPCMSO: true,
         protocolToRisk: {
+          where: {
+            protocol: {
+              status: 'ACTIVE',
+            },
+          },
           select: { minRiskDegree: true, minRiskDegreeQuantity: true, id: true, protocol: { select: { name: true, id: true } } },
         },
         docInfo: {

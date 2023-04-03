@@ -30,11 +30,14 @@ export class HierarchyRepository {
         >,
   ): Promise<HierarchyEntity[]> {
     let homogeneousGroup = [];
+
+    //!!!!!!! qual o sentido disso, eu adiciono todos os workspaces da pagina no gse do cargo pq?
     const workIds = upsertHierarchyMany
       .map((h) => h.workspaceIds)
       .filter((i) => i)
       .flat(1)
       .filter((i) => i);
+
     //create homogenies group
     if (upsertHierarchyMany && upsertHierarchyMany.length > 0)
       homogeneousGroup = ghoNames
@@ -100,15 +103,29 @@ export class HierarchyRepository {
         : await this.prisma.$transaction(
             upsertHierarchyMany
               .filter(({ ghoName }) => ghoName)
-              .map(({ ghoName }) => {
+              .map(({ ghoName, workspaceIds }) => {
                 return this.prisma.homogeneousGroup.upsert({
                   create: {
                     company: { connect: { id: companyId } },
                     name: ghoName,
                     description: '',
+                    workspaces: workspaceIds.length
+                      ? {
+                          connect: workspaceIds.map((id) => ({
+                            id_companyId: { companyId, id },
+                          })),
+                        }
+                      : undefined,
                   },
                   update: {
                     name: ghoName,
+                    workspaces: workspaceIds.length
+                      ? {
+                          connect: workspaceIds.map((id) => ({
+                            id_companyId: { companyId, id },
+                          })),
+                        }
+                      : undefined,
                   },
                   where: { name_companyId: { companyId, name: ghoName } },
                 });
@@ -277,6 +294,22 @@ export class HierarchyRepository {
   ): Promise<HierarchyEntity> {
     const isSubOffice = updateHierarchy?.type == HierarchyEnum.SUB_OFFICE;
 
+    try {
+      if (workspaceIds.length)
+        this.prisma.homogeneousGroup.update({
+          data: {
+            workspaces: workspaceIds.length
+              ? {
+                  set: workspaceIds.map((id) => ({
+                    id_companyId: { companyId, id },
+                  })),
+                }
+              : undefined,
+          },
+          where: { id },
+        });
+    } catch (error) {}
+
     const data = await this.prisma.hierarchy.update({
       where: { id },
       data: {
@@ -316,6 +349,22 @@ export class HierarchyRepository {
   ): Promise<HierarchyEntity> {
     const isSubOffice = upsertHierarchy?.type == HierarchyEnum.SUB_OFFICE;
 
+    try {
+      if (workspaceIds.length)
+        this.prisma.homogeneousGroup.update({
+          data: {
+            workspaces: workspaceIds.length
+              ? {
+                  set: workspaceIds.map((id) => ({
+                    id_companyId: { companyId, id },
+                  })),
+                }
+              : undefined,
+          },
+          where: { id },
+        });
+    } catch (error) {}
+
     const data = await this.prisma.hierarchy.upsert({
       create: {
         ...upsertHierarchy,
@@ -347,7 +396,7 @@ export class HierarchyRepository {
         [isSubOffice ? 'subOfficeEmployees' : 'employees']:
           employeesIds && employeesIds.length
             ? {
-                connect: employeesIds.map((id) => ({
+                set: employeesIds.map((id) => ({
                   id_companyId: { companyId, id },
                 })),
               }
@@ -384,6 +433,22 @@ export class HierarchyRepository {
     id?: string;
     historyIds?: number[];
   }): Promise<HierarchyEntity> {
+    try {
+      if (workspaceIds.length)
+        this.prisma.homogeneousGroup.update({
+          data: {
+            workspaces: workspaceIds.length
+              ? {
+                  set: workspaceIds.map((id) => ({
+                    id_companyId: { companyId, id },
+                  })),
+                }
+              : undefined,
+          },
+          where: { id },
+        });
+    } catch (error) {}
+
     const data = await this.prisma.hierarchy.upsert({
       create: {
         ...upsertHierarchy,

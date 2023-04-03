@@ -7,6 +7,7 @@ import { formatCnae, formatPhoneNumber } from '../../../../../../../shared/utils
 
 export const companyVariables = (company: CompanyEntity, workspace: WorkspaceEntity, address: AddressEntity) => {
   const consultant = company.receivingServiceContracts[0]?.applyingServiceCompany;
+  const workspaceOwner = workspace.isOwner ? workspace.companyJson : undefined;
 
   return {
     [VariablesPGREnum.CONSULTANT_NAME]: consultant ? `${consultant.name} ` : `${company.name}`,

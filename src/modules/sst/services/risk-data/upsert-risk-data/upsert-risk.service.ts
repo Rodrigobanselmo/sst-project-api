@@ -107,6 +107,7 @@ export const hierarchyCreateHomo = async ({
           name: hierarchy.id,
           type: type,
           id: hierarchy.id,
+          workspaceIds: hierarchy.workspaceIds,
         },
         companyId,
       );
@@ -120,7 +121,7 @@ export const hierarchyCreateHomo = async ({
             name: hierarchy.name,
             status: hierarchy.status,
             type: hierarchy.type,
-            workspaceIds: workspaceId ? [workspaceId] : hierarchy.workspaceIds || hierarchy?.workspaces?.map((w) => w?.id) || [],
+            workspaceIds: hierarchy.workspaceIds,
           },
         ],
         companyId,

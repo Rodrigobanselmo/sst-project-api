@@ -1099,6 +1099,7 @@ model Hierarchy {
   workspaces                    Workspace[]                @relation("HierarchyToWorkspace")
   subOfficeEmployees            Employee[]                 @relation("sub_offices")
   subHierarchyHistory           EmployeeHierarchyHistory[] @relation("sub_offices_history")
+  protocolsData                 ProtocolToRisk[]
 
   @@unique([id, companyId])
   @@unique([parentId, name])
@@ -1137,6 +1138,7 @@ model HomogeneousGroup {
   company                Company                  @relation(fields: [companyId], references: [id])
   riskFactorData         RiskFactorData[]
   workspaces             Workspace[]
+  protocolsData          ProtocolToRisk[]
 
   @@unique([name, companyId])
   @@index([name])
@@ -1265,15 +1267,17 @@ model Protocol {
 }
 
 model ProtocolToRisk {
-  id                    Int          @id @default(autoincrement())
+  id                    Int                @id @default(autoincrement())
   protocolId            Int?
   riskId                String?
   companyId             String
-  minRiskDegree         Int?         @default(1)
-  minRiskDegreeQuantity Int?         @default(1)
-  company               Company      @relation(fields: [companyId], references: [id])
-  protocol              Protocol?    @relation(fields: [protocolId], references: [id])
-  risk                  RiskFactors? @relation(fields: [riskId], references: [id])
+  minRiskDegree         Int?               @default(1)
+  minRiskDegreeQuantity Int?               @default(1)
+  company               Company            @relation(fields: [companyId], references: [id])
+  protocol              Protocol?          @relation(fields: [protocolId], references: [id])
+  risk                  RiskFactors?       @relation(fields: [riskId], references: [id])
+  hierarchies           Hierarchy[]
+  homoGroups            HomogeneousGroup[]
 
   @@unique([id, companyId])
   @@unique([riskId, protocolId])

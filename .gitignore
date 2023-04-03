@@ -5,6 +5,7 @@
 /node_modules
 .env
 .env.prod
+.env.prod.old
 /tmp/*.png
 /tmp/*.jpeg
 # Logs

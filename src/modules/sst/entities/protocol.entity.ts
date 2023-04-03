@@ -1,5 +1,7 @@
+import { HomoGroupEntity } from './../../company/entities/homoGroup.entity';
+import { HierarchyEntity } from './../../company/entities/hierarchy.entity';
 import { Protocol, ProtocolToRisk } from '.prisma/client';
-import { StatusEnum } from '@prisma/client';
+import { StatusEnum, HomogeneousGroup } from '@prisma/client';
 import { RiskFactorsEntity } from './risk.entity';
 
 export class ProtocolToRiskEntity implements ProtocolToRisk {
@@ -12,6 +14,8 @@ export class ProtocolToRiskEntity implements ProtocolToRisk {
   companyId: string;
   protocol?: ProtocolEntity;
   risk?: RiskFactorsEntity;
+  hierarchies?: HierarchyEntity[];
+  homoGroups?: HomoGroupEntity[];
 
   constructor(partial: Partial<ProtocolEntity>) {
     Object.assign(this, partial);

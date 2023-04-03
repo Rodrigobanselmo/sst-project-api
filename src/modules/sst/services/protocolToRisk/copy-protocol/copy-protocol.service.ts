@@ -10,7 +10,7 @@ export class CopyProtocolToRiskService {
 
   async execute(copyProtocolToRiskDto: CopyProtocolToRiskDto, user: UserPayloadDto) {
     const FromProtocolFactor = await this.protocolToRiskRepository.findNude({
-      where: { companyId: copyProtocolToRiskDto.fromCompanyId },
+      where: { companyId: copyProtocolToRiskDto.fromCompanyId, riskId: { not: null } },
     });
 
     const ActualProtocolFactor = await this.protocolToRiskRepository.findNude({

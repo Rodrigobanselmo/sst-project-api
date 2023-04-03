@@ -6,7 +6,7 @@ export const StringCapitalizeTransform = (data: TransformFnParams) => {
   if (str != '' && !str) return null;
 
   if (typeof str === 'string') {
-    const ignore = ['de', 'da', 'das', 'do', 'dos', 'a', 'e', 'o'];
+    const ignore = ['de', 'da', 'das', 'do', 'dos', 'a', 'e', 'o', 'em'];
     const arrWords = str.replace(/\s+/g, ' ').trim().split(' ');
 
     for (const i in arrWords) {

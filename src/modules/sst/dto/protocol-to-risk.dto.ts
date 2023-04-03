@@ -9,6 +9,7 @@ export class CreateProtocolToRiskDto {
   protocolId: number;
 
   @IsString()
+  @IsOptional()
   riskId: string;
 
   @IsString()
@@ -21,6 +22,14 @@ export class CreateProtocolToRiskDto {
   @IsInt()
   @IsOptional()
   minRiskDegreeQuantity: number;
+
+  @IsOptional()
+  @IsString({ each: true })
+  hierarchyIds?: string[];
+
+  @IsOptional()
+  @IsString({ each: true })
+  homoGroupsIds?: string[];
 }
 
 export class UpdateProtocolToRiskDto extends PartialType(CreateProtocolToRiskDto) {
