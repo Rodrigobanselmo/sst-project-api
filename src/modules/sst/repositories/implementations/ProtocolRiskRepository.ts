@@ -167,17 +167,23 @@ export class ProtocolToRiskRepository {
     const exams = await this.prisma.protocolToRisk.findMany({
       ...optionsRest,
       where: {
-        homoGroups: {
-          some: {
-            hierarchyOnHomogeneous: {
+        OR: [
+          {
+            homoGroups: {
               some: {
-                hierarchyId: { in: hierarchiesIds },
-                ...(date && { AND: [{ OR: [{ startDate: { lte: date } }, { startDate: null }] }, { OR: [{ endDate: { gt: date } }, { endDate: null }] }] }),
+                hierarchyOnHomogeneous: {
+                  some: {
+                    hierarchyId: { in: hierarchiesIds },
+                    ...(date && { AND: [{ OR: [{ startDate: { lte: date } }, { startDate: null }] }, { OR: [{ endDate: { gt: date } }, { endDate: null }] }] }),
+                  },
+                },
               },
             },
           },
-        },
-        hierarchies: { some: { id: { in: hierarchiesIds } } },
+          {
+            hierarchies: { some: { id: { in: hierarchiesIds } } },
+          },
+        ],
         protocol: { status: 'ACTIVE' },
         ...optionsRest.where,
       },

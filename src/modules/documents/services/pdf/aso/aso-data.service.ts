@@ -139,7 +139,7 @@ export class PdfAsoDataService {
     const asoRisk = onGetRisks(asoRiskData) || [];
 
     const protocols = await this.protocolToRiskRepository.findByHierarchies(hierarchyIds, { date: startHierarchyDate });
-
+    console.log(protocols);
     const employee = { ...employeeRisk, ...clinicExam.employee };
     const examsHistory = employee.examsHistory;
     const consultantCompany = clinicExam.employee?.company?.receivingServiceContracts?.[0]?.applyingServiceCompany;
@@ -161,7 +161,7 @@ export class PdfAsoDataService {
     });
 
     protocols.push(...asoRisk.map((r) => r.riskData.map((rd) => rd.protocolsToRisk)).flat(2));
-    protocols;
+
     return {
       doneExams,
       consultantCompany,
