@@ -161,7 +161,6 @@ export class PdfAsoDataService {
     });
 
     protocols.push(...asoRisk.map((r) => r.riskData.map((rd) => rd.protocolsToRisk)).flat(2));
-
     return {
       doneExams,
       consultantCompany,
@@ -173,7 +172,7 @@ export class PdfAsoDataService {
       risks: asoRisk.map((risk) => ({ riskData: risk.riskData[0], riskFactor: risk.riskFactor })),
       sector,
       protocols: removeDuplicate(
-        protocols.map((p) => ({ ...p, name: p.protocol.name })),
+        protocols.filter((i) => i).map((p) => ({ ...p, name: p.protocol.name })),
         { removeById: 'name' },
       ),
       admissionDate,
