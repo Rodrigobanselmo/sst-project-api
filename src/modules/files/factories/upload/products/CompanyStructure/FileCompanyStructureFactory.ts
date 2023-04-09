@@ -1,4 +1,11 @@
-import { UploadRiskStructureReportDto } from './../../../../dto/risk-structure-report.dto';
+import { asyncEach } from './../../../../../../shared/utils/asyncEach';
+import { EmployeeEntity } from './../../../../../company/entities/employee.entity';
+import { UpsertEmployeeHierarchyHistoryService } from './../../../../../company/services/employee/0-history/hierarchy/upsert/upsert.service';
+import { EmployeeRepository } from './../../../../../company/repositories/implementations/EmployeeRepository';
+import { CreateHierarchyDto } from './../../../../../company/dto/hierarchy';
+import { CreateHomoGroupDto } from './../../../../../company/dto/homoGroup';
+import { HierarchyRepository } from './../../../../../company/repositories/implementations/HierarchyRepository';
+import { HomoGroupRepository } from './../../../../../company/repositories/implementations/HomoGroupRepository';
 import { HierarchyEntity } from './../../../../../company/entities/hierarchy.entity';
 import { RiskRepository } from './../../../../../sst/repositories/implementations/RiskRepository';
 import { HierarchyExcelProvider } from './../../../../providers/HierarchyExcelProvider';
@@ -22,14 +29,30 @@ import { FindCompaniesDto } from '../../../../../company/dto/company.dto';
 import { FileFactoryAbstractionCreator } from '../../creator/FileFactoryCreator';
 import { IColumnRuleMap, IFileFactoryProduct, ISheetData, ISheetExtractedData } from '../../types/IFileFactory.types';
 import { CompanyStructColumnMap, CompanyStructHeaderEnum, emptyHierarchy } from './constants/company-struct.constants';
-import { IEpiReturn, IHierarchyDataReturn, IHomoDataReturn, IMapData, IWorkDataReturn, IWorkspaceData } from './types/company-struct.constants';
-import { HierarchyEnum, Workspace, HomogeneousGroup } from '@prisma/client';
+import {
+  IBodyFileCompanyStruct,
+  ICompanyData,
+  IEmployeeReturn,
+  IEpiReturn,
+  IHierarchyDataReturn,
+  IHierarOnHomoDataReturn,
+  IHomoDataReturn,
+  IMapData,
+  IWorkDataReturn,
+  IWorkspaceData,
+} from './types/company-struct.constants';
+import { HierarchyEnum, Workspace, HomogeneousGroup, EmployeeHierarchyMotiveTypeEnum } from '@prisma/client';
 import { FileHelperProvider } from '../../../../providers/FileHelperProvider';
-import { hierarchyList } from '../../../../../../shared/constants/lists/hierarchy.list';
+import { hierarchyList, hierarchyListReversed } from '../../../../../../shared/constants/lists/hierarchy.list';
 import { EpiRoRiskDataDto } from '../../../../../../modules/sst/dto/epi-risk-data.dto';
+import { formatCPF } from '@brazilian-utils/brazilian-utils';
+import { CreateEmployeeService } from '../../../../../../modules/company/services/employee/create-employee/create-employee.service';
+import sortArray from 'sort-array';
+import clone from 'clone';
+import dayjs from 'dayjs';
 
 @Injectable()
-export class FileCompanyStructureFactory extends FileFactoryAbstractionCreator<UploadRiskStructureReportDto, CompanyStructHeaderEnum> {
+export class FileCompanyStructureFactory extends FileFactoryAbstractionCreator<IBodyFileCompanyStruct, CompanyStructHeaderEnum> {
   constructor(
     private readonly excelProv: ExcelProvider,
     private readonly prisma: PrismaService,
@@ -37,8 +60,10 @@ export class FileCompanyStructureFactory extends FileFactoryAbstractionCreator<U
     private readonly riskRepository: RiskRepository,
     private readonly createRecMedService: CreateRecMedService,
     private readonly createGenerateSourceService: CreateGenerateSourceService,
-    private readonly hierarchyExcelProvider: HierarchyExcelProvider,
-    private readonly fileHelperProvider: FileHelperProvider,
+    private readonly homoGroupRepository: HomoGroupRepository,
+    private readonly hierarchyRepository: HierarchyRepository,
+    private readonly employeeRepository: EmployeeRepository,
+    private readonly upsertEmployeeHierarchyHistoryService: UpsertEmployeeHierarchyHistoryService,
   ) {
     super(excelProv, prisma);
   }
@@ -50,14 +75,21 @@ export class FileCompanyStructureFactory extends FileFactoryAbstractionCreator<U
       this.riskRepository,
       this.createRecMedService,
       this.createGenerateSourceService,
-      this.hierarchyExcelProvider,
-      this.fileHelperProvider,
+      this.homoGroupRepository,
+      this.hierarchyRepository,
+      this.employeeRepository,
+      this.upsertEmployeeHierarchyHistoryService,
     );
   }
 }
 
 class FileFactoryProduct implements IFileFactoryProduct {
   public splitter = '; ';
+  public errors: string[] = [];
+  private throwError(message: string, options?: { stopFirstError?: boolean }) {
+    if (options?.stopFirstError) throw new BadRequestException(message);
+    if (!this.errors.includes(message)) this.errors.push(message);
+  }
 
   constructor(
     private readonly prisma: PrismaService,
@@ -65,8 +97,10 @@ class FileFactoryProduct implements IFileFactoryProduct {
     private readonly riskRepository: RiskRepository,
     private readonly createRecMedService: CreateRecMedService,
     private readonly createGenerateSourceService: CreateGenerateSourceService,
-    private readonly hierarchyExcelProvider: HierarchyExcelProvider,
-    private readonly fileHelperProvider: FileHelperProvider,
+    private readonly homoGroupRepository: HomoGroupRepository,
+    private readonly hierarchyRepository: HierarchyRepository,
+    private readonly employeeRepository: EmployeeRepository,
+    private readonly upsertEmployeeHierarchyHistoryService: UpsertEmployeeHierarchyHistoryService,
   ) {
     //
   }
@@ -89,7 +123,19 @@ class FileFactoryProduct implements IFileFactoryProduct {
     return hierarchyArray;
   }
 
-  public async saveData(sheetsData: ISheetExtractedData<CompanyStructHeaderEnum>[], body: UploadRiskStructureReportDto) {
+  public getHierarchyData(hierarchyArray: string[]) {
+    const reverseHierarchyArray = hierarchyArray.reverse();
+    const lastHierarchyNameIndex = reverseHierarchyArray.findIndex((i) => i != emptyHierarchy);
+    const type = hierarchyListReversed[lastHierarchyNameIndex];
+    const name = reverseHierarchyArray[lastHierarchyNameIndex];
+
+    reverseHierarchyArray[lastHierarchyNameIndex] = emptyHierarchy;
+    const parentHierarchyPath = reverseHierarchyArray.reverse();
+
+    return { parentHierarchyPath, type, name };
+  }
+
+  public async saveData(sheetsData: ISheetExtractedData<CompanyStructHeaderEnum>[], body: IBodyFileCompanyStruct) {
     const sheetData = sheetsData[0];
     const companyId = body.companyId;
 
@@ -102,60 +148,70 @@ class FileFactoryProduct implements IFileFactoryProduct {
       },
     });
 
-    const mapData = this.getMapData(sheetData);
-    const mapDataWithId = await this.getMapDataWithId(company, mapData);
+    const mapData = this.getMapData(sheetData, company);
+    console.log(JSON.stringify(mapData, null, 2)); //!
 
-    return mapDataWithId;
+    const mapDataWithId = await this.getMapDataWithId(company, mapData, body);
+    console.log(JSON.stringify(mapDataWithId, null, 2)); //!
 
-    if (!company.riskFactorGroupData[0].id) throw new BadRequestException(`Sistema de gestão não cadatsrado`);
+    if (this.errors.length) throw new BadRequestException(this.errors);
+
+    return { mapData, mapDataWithId };
+
+    const isRisk = !!Object.keys(mapData.risk).length;
+    if (!isRisk) if (!company.riskFactorGroupData[0].id) throw new BadRequestException(`Sistema de gestão não cadatsrado`);
 
     return await asyncBatch(sheetData, 20, async (row) => {
-      const json = this.getRiskDataJson(mapDataWithId.risk[row[CompanyStructHeaderEnum.RISK]].data, row);
-      const episMap = mapDataWithId.epis;
-      const riskMap = mapDataWithId.risk[row[CompanyStructHeaderEnum.RISK]];
+      const touchRisk = !!row[CompanyStructHeaderEnum.RISK];
       const workspaceMap = mapDataWithId.workspace[row[CompanyStructHeaderEnum.WORKSPACE]];
-
-      const adms = row[CompanyStructHeaderEnum.EPC_OTHERS]?.map((admName: string) => riskMap.adms[admName].id);
-      const engs = row[CompanyStructHeaderEnum.EPC]?.map((engName: string) => ({ recMedId: riskMap.engs[engName].id }));
-      const generateSources = row[CompanyStructHeaderEnum.GENERATE_SOURCE]?.map((gs: string) => riskMap.generateSource[gs].id);
-      const recs = row[CompanyStructHeaderEnum.REC]?.map((recName: string) => riskMap.recs[recName].id);
-      const epis = row[CompanyStructHeaderEnum.EPI_CA]?.map(
-        (ca: string) =>
-          ({
-            epiId: episMap[ca].id,
-            efficientlyCheck: row[CompanyStructHeaderEnum.EPI_EFFICIENTLY],
-            epcCheck: row[CompanyStructHeaderEnum.EPI_EPC],
-            longPeriodsCheck: row[CompanyStructHeaderEnum.EPI_LONG_PERIODS],
-            maintenanceCheck: row[CompanyStructHeaderEnum.EPI_MAINTENANCE],
-            sanitationCheck: row[CompanyStructHeaderEnum.EPI_SANITATION],
-            tradeSignCheck: row[CompanyStructHeaderEnum.EPI_TRADE_SIGN],
-            trainingCheck: row[CompanyStructHeaderEnum.EPI_TRAINING],
-            unstoppedCheck: row[CompanyStructHeaderEnum.EPI_UNSTOPPED],
-            validationCheck: row[CompanyStructHeaderEnum.EPI_VALIDATION],
-          } as EpiRoRiskDataDto),
-      );
+      const riskMap = mapDataWithId.risk[row[CompanyStructHeaderEnum.RISK]];
+      const episMap = mapDataWithId.epis;
 
       const hierarchyPath = this.getHierarchyPath(row).join('--');
-      const homogeneousGroupId = workspaceMap.homogeneousGroup[row[CompanyStructHeaderEnum.GHO]]?.id as string;
 
-      await this.upsertRiskDataService.execute({
-        companyId,
-        homogeneousGroupId,
-        ...(!homogeneousGroupId && { hierarchyId: workspaceMap.hierarchies[hierarchyPath]?.id as string }),
-        riskFactorGroupDataId: company.riskFactorGroupData[0]?.id,
-        adms,
-        engs,
-        recs,
-        epis,
-        generateSources,
-        keepEmpty: true,
-        riskId: riskMap?.id as string,
-        probability: row[CompanyStructHeaderEnum.PROB],
-        probabilityAfter: row[CompanyStructHeaderEnum.PROB_REC],
-        endDate: row[CompanyStructHeaderEnum.END_DATE],
-        startDate: row[CompanyStructHeaderEnum.START_DATE],
-        ...(json && { json }),
-      });
+      if (touchRisk) {
+        const json = this.getRiskDataJson(mapDataWithId.risk[row[CompanyStructHeaderEnum.RISK]].data, row);
+        const adms = row[CompanyStructHeaderEnum.EPC_OTHERS]?.map((admName: string) => riskMap.adms[admName].id);
+        const engs = row[CompanyStructHeaderEnum.EPC]?.map((engName: string) => ({ recMedId: riskMap.engs[engName].id }));
+        const generateSources = row[CompanyStructHeaderEnum.GENERATE_SOURCE]?.map((gs: string) => riskMap.generateSource[gs].id);
+        const recs = row[CompanyStructHeaderEnum.REC]?.map((recName: string) => riskMap.recs[recName].id);
+        const epis = row[CompanyStructHeaderEnum.EPI_CA]?.map(
+          (ca: string) =>
+            ({
+              epiId: episMap[ca].id,
+              efficientlyCheck: row[CompanyStructHeaderEnum.EPI_EFFICIENTLY],
+              epcCheck: row[CompanyStructHeaderEnum.EPI_EPC],
+              longPeriodsCheck: row[CompanyStructHeaderEnum.EPI_LONG_PERIODS],
+              maintenanceCheck: row[CompanyStructHeaderEnum.EPI_MAINTENANCE],
+              sanitationCheck: row[CompanyStructHeaderEnum.EPI_SANITATION],
+              tradeSignCheck: row[CompanyStructHeaderEnum.EPI_TRADE_SIGN],
+              trainingCheck: row[CompanyStructHeaderEnum.EPI_TRAINING],
+              unstoppedCheck: row[CompanyStructHeaderEnum.EPI_UNSTOPPED],
+              validationCheck: row[CompanyStructHeaderEnum.EPI_VALIDATION],
+            } as EpiRoRiskDataDto),
+        );
+
+        const homogeneousGroupId = workspaceMap.homogeneousGroup[row[CompanyStructHeaderEnum.GHO]]?.id as string;
+
+        await this.upsertRiskDataService.execute({
+          companyId,
+          homogeneousGroupId,
+          ...(!homogeneousGroupId && { hierarchyId: workspaceMap.hierarchies[hierarchyPath]?.id as string }),
+          riskFactorGroupDataId: company.riskFactorGroupData[0]?.id,
+          adms,
+          engs,
+          recs,
+          epis,
+          generateSources,
+          keepEmpty: true,
+          riskId: riskMap?.id as string,
+          probability: row[CompanyStructHeaderEnum.PROB],
+          probabilityAfter: row[CompanyStructHeaderEnum.PROB_REC],
+          endDate: row[CompanyStructHeaderEnum.END_DATE],
+          startDate: row[CompanyStructHeaderEnum.START_DATE],
+          ...(json && { json }),
+        });
+      }
     });
   }
 
@@ -212,37 +268,141 @@ class FileFactoryProduct implements IFileFactoryProduct {
     return submit;
   }
 
-  private getMapData(sheetData: ISheetExtractedData<CompanyStructHeaderEnum>) {
+  private getMapData(sheetData: ISheetExtractedData<CompanyStructHeaderEnum>, company: ICompanyData) {
     const mapData: IMapData = {
       workspace: {},
       risk: {},
       epis: {},
     };
 
+    const subOfficeIndex = hierarchyList.findIndex((i) => i == HierarchyEnum.SUB_OFFICE);
+    const officeIndex = hierarchyList.findIndex((i) => i == HierarchyEnum.OFFICE);
+
     sheetData.forEach((row) => {
+      if (!row[CompanyStructHeaderEnum.WORKSPACE]) row[CompanyStructHeaderEnum.WORKSPACE] = company?.workspace?.[0]?.name;
+      if (!row[CompanyStructHeaderEnum.WORKSPACE]) throw new BadRequestException('Cadastre ou informe um estabelecimento antes de importar os dado');
+
       if (!mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]])
         mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]] = {
           value: row[CompanyStructHeaderEnum.WORKSPACE],
           hierarchies: {},
           homogeneousGroup: {},
+          hierarchyOnHomogeneous: {},
+          employees: {},
           // characterization: {},
         };
 
       const hierarchyArray = this.getHierarchyPath(row);
 
+      const isEmployee = !!row[CompanyStructHeaderEnum.EMPLOYEE_CPF];
+      const isEmployeeHistory = !!row[CompanyStructHeaderEnum.EMPLOYEE_ADMISSION];
       const isHierarchy = !!hierarchyArray.find((i) => i != emptyHierarchy);
       const isHomogeneousGroup = row[CompanyStructHeaderEnum.GHO];
       const isRisk = !!row[CompanyStructHeaderEnum.RISK];
 
       if (isHomogeneousGroup) {
-        mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]].homogeneousGroup[row[CompanyStructHeaderEnum.GHO]] = { value: row[CompanyStructHeaderEnum.GHO] };
+        mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]].homogeneousGroup[row[CompanyStructHeaderEnum.GHO]] = {
+          value: row[CompanyStructHeaderEnum.GHO],
+          description: row[CompanyStructHeaderEnum.GHO_DESCRIPTION],
+        };
       }
 
       if (isHierarchy) {
-        mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]].hierarchies[hierarchyArray.join('--')] = { value: hierarchyArray.join('--') };
+        hierarchyArray.forEach((hierarchyName, index) => {
+          if (hierarchyName == emptyHierarchy) return;
+
+          const hierarchyNewArray = hierarchyArray.slice(0, index + 1).concat(hierarchyArray.slice(index + 1).map(() => emptyHierarchy));
+          const hierarchyPath = hierarchyNewArray.join('--');
+
+          if (mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]].hierarchies[hierarchyPath]) return;
+
+          const { parentHierarchyPath, name, type } = this.getHierarchyData(clone(hierarchyNewArray));
+          mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]].hierarchies[hierarchyPath] = {
+            name,
+            type,
+            value: hierarchyPath,
+            parentPath: parentHierarchyPath.join('--'),
+            cbo: row[CompanyStructHeaderEnum.CBO],
+            ...(index == officeIndex && {
+              description: row[CompanyStructHeaderEnum.OFFICE_DESCRIPTION],
+              realDescription: row[CompanyStructHeaderEnum.OFFICE_REAL_DESCRIPTION],
+            }),
+          };
+        });
+      }
+
+      if (isHierarchy && isHomogeneousGroup) {
+        const hierarchyPath = hierarchyArray.join('--');
+        const ghoName = row[CompanyStructHeaderEnum.GHO];
+        const value = ghoName + hierarchyPath;
+
+        mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]].hierarchyOnHomogeneous[value] = {
+          value,
+          ghoName,
+          hierarchyPath,
+        };
       }
 
       if (!isHierarchy && !isHomogeneousGroup) throw new BadRequestException(`Informe ao menos um Setor, Cargo ou Grupo homogênio (Obrigatório)`);
+      if (!isHierarchy && isEmployeeHistory) throw new BadRequestException(`Informe ao menos um Setor e Cargo (Obrigatório)`);
+
+      if (isEmployee) {
+        const isOffice = hierarchyArray?.[officeIndex] != emptyHierarchy;
+        const isSubOffice = hierarchyArray?.[subOfficeIndex] != emptyHierarchy;
+
+        if (!mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]].employees[row[CompanyStructHeaderEnum.EMPLOYEE_CPF]])
+          mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]].employees[row[CompanyStructHeaderEnum.EMPLOYEE_CPF]] = {
+            value: row[CompanyStructHeaderEnum.EMPLOYEE_CPF],
+            name: row[CompanyStructHeaderEnum.EMPLOYEE_NAME],
+            birth: row[CompanyStructHeaderEnum.EMPLOYEE_BIRTH],
+            email: row[CompanyStructHeaderEnum.EMPLOYEE_EMAIL],
+            isPcd: row[CompanyStructHeaderEnum.EMPLOYEE_IS_PCD],
+            esocialCode: row[CompanyStructHeaderEnum.ESOCIAL_CODE],
+            cbo: row[CompanyStructHeaderEnum.CBO],
+            phone: row[CompanyStructHeaderEnum.EMPLOYEE_PHONE],
+            rg: row[CompanyStructHeaderEnum.EMPLOYEE_RG],
+            lastExam: row[CompanyStructHeaderEnum.LAST_EXAM],
+            sex: row[CompanyStructHeaderEnum.EMPLOYEE_SEX],
+            socialName: row[CompanyStructHeaderEnum.EMPLOYEE_SOCIAL_NAME],
+            employeesHistory: {},
+          };
+
+        if (isEmployeeHistory) {
+          const adm = EmployeeHierarchyMotiveTypeEnum.ADM;
+          const dem = EmployeeHierarchyMotiveTypeEnum.DEM;
+
+          const admDate = row[CompanyStructHeaderEnum.EMPLOYEE_ADMISSION];
+          const demDate = row[CompanyStructHeaderEnum.EMPLOYEE_DEMISSION];
+
+          if (admDate && isOffice) {
+            const value = adm + dayjs(admDate).format('YYYY-MM-DD');
+            mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]].employees[row[CompanyStructHeaderEnum.EMPLOYEE_CPF]].employeesHistory[value] = {
+              value: value,
+              motive: adm,
+              startDate: row[CompanyStructHeaderEnum.EMPLOYEE_ADMISSION],
+              officePath: hierarchyArray
+                .slice(0, officeIndex + 1)
+                .concat(hierarchyArray.slice(officeIndex + 1).map(() => emptyHierarchy))
+                .join('--'),
+              ...(isSubOffice && {
+                subOfficePath: hierarchyArray
+                  .slice(0, subOfficeIndex + 1)
+                  .concat(hierarchyArray.slice(subOfficeIndex + 1).map(() => emptyHierarchy))
+                  .join('--'),
+              }),
+            };
+          }
+
+          if (demDate) {
+            const value = dem + dayjs(demDate).format('YYYY-MM-DD');
+            mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]].employees[row[CompanyStructHeaderEnum.EMPLOYEE_CPF]].employeesHistory[value] = {
+              value: value,
+              motive: dem,
+              startDate: row[CompanyStructHeaderEnum.EMPLOYEE_DEMISSION],
+            };
+          }
+        }
+      }
 
       if (isRisk) {
         if (!mapData.risk[row[CompanyStructHeaderEnum.RISK]])
@@ -307,50 +467,57 @@ class FileFactoryProduct implements IFileFactoryProduct {
     return mapData;
   }
 
-  private async getDatabaseMaps(
-    company: {
-      id: string;
-      workspace: {
-        id: string;
-        name: string;
-        abbreviation: string;
-      }[];
-    },
-    mapData: IMapData,
-    options?: { createHierarchy?: boolean; createHomo?: boolean },
-  ) {
+  // search on database for all data and create map
+  private async getDatabaseMaps(company: ICompanyData, mapData: IMapData, body: IBodyFileCompanyStruct) {
     const workspaces = company.workspace;
     const companyId = company.id;
 
     const episKeys = Object.keys(mapData.epis);
     const homoGroupsKeys = Object.keys(workspaces.map((w) => (mapData.workspace[w.name] || mapData.workspace[w.abbreviation])?.homogeneousGroup).flat(1));
     const hierarchyKeys = Object.keys(workspaces.map((w) => (mapData.workspace[w.name] || mapData.workspace[w.abbreviation])?.hierarchies).flat(1));
+    const employeeKeys = Object.keys(workspaces.map((w) => (mapData.workspace[w.name] || mapData.workspace[w.abbreviation])?.employees).flat(1));
     const riskKeys = Object.keys(mapData.risk);
 
-    const episPromise = this.prisma.epi.findMany({ where: { ca: { in: episKeys } }, select: { id: true, ca: true } });
-    const homoGroupsPromise = this.prisma.homogeneousGroup.findMany({ where: { companyId, status: 'ACTIVE' }, select: { name: true, id: true } }); //! should be by workspace
-    const hierarchiesPromise = this.prisma.hierarchy.findMany({
-      where: { companyId, status: 'ACTIVE' },
-      select: { id: true, name: true, parentId: true, type: true, workspaces: { select: { id: true } } },
-    });
+    const episPromise = episKeys.length ? this.prisma.epi.findMany({ where: { ca: { in: episKeys } }, select: { id: true, ca: true } }) : undefined;
 
-    const riskPromise = this.riskRepository.findAllAvailable(companyId, {
-      where: { name: { in: Object.keys(mapData.risk) } },
-      select: { id: true, name: true, esocialCode: true, type: true },
-    });
+    const homoGroupsPromise = homoGroupsKeys.length
+      ? this.prisma.homogeneousGroup.findMany({
+          where: { companyId, type: null, status: 'ACTIVE' },
+          select: { name: true, id: true, hierarchyOnHomogeneous: { select: { hierarchyId: true, id: true } } },
+        })
+      : undefined;
 
-    const [epis, homoGroups, hierarchies, risk] = await Promise.all([
-      episKeys ? episPromise : [],
-      homoGroupsKeys ? homoGroupsPromise : [],
-      hierarchyKeys ? hierarchiesPromise : [],
-      riskKeys ? riskPromise : [],
-    ]);
+    const hierarchiesPromise = hierarchyKeys.length
+      ? this.prisma.hierarchy.findMany({
+          where: { companyId, status: 'ACTIVE' },
+          select: { id: true, name: true, parentId: true, type: true, workspaces: { select: { id: true } } },
+        })
+      : undefined;
 
-    const homoGroupsMap: Record<string, IHomoDataReturn> = {}; //! should be by workspace
+    const riskPromise = riskKeys.length
+      ? this.riskRepository.findAllAvailable(companyId, {
+          where: { name: { in: riskKeys } },
+          select: { id: true, name: true, esocialCode: true, type: true },
+        })
+      : undefined;
+
+    const employeePromise =
+      employeeKeys.length && !body.createEmployee
+        ? this.employeeRepository.findNude({
+            where: { companyId, ...(employeeKeys.length < 300 && { cpf: { in: employeeKeys } }) },
+            select: { id: true, cpf: true },
+          })
+        : undefined;
+
+    const [epis, homoGroups, hierarchies, risk, employees] = await Promise.all([episPromise, homoGroupsPromise, hierarchiesPromise, riskPromise, employeePromise]);
+
+    const homoGroupsMap: Record<string, IHomoDataReturn> = {};
     const hierarchyMap: Record<string, IHierarchyDataReturn> = {};
+    const hierarOnHomoMap: Record<string, IHierarOnHomoDataReturn> = {};
     const riskMap: Record<string, RiskFactorsEntity> = {};
     const workspaceMap: Record<string, IWorkDataReturn> = {};
     const episMap: Record<string, IEpiReturn> = {};
+    const employeesMap: Record<string, IEmployeeReturn> = {};
 
     const hierarchyPathMap: Record<string, IHierarchyDataReturn> = {};
 
@@ -358,8 +525,20 @@ class FileFactoryProduct implements IFileFactoryProduct {
       episMap[epi.ca] = epi;
     });
 
+    employees?.forEach((employee) => {
+      employeesMap[employee.cpf] = employee;
+    });
+
     homoGroups?.forEach((homo) => {
       homoGroupsMap[homo.name] = homo;
+
+      homo.hierarchyOnHomogeneous.forEach((hh) => {
+        hierarOnHomoMap[`${homo.id}${hh.hierarchyId}`] = {
+          hierarchyId: hh.hierarchyId,
+          homogeneousGroupId: homo.id,
+          id: hh.id,
+        };
+      });
     });
 
     risk?.forEach((risk) => {
@@ -405,112 +584,287 @@ class FileFactoryProduct implements IFileFactoryProduct {
       });
     });
 
-    return { homoGroupsMap, hierarchyPathMap, hierarchyMap, riskMap, workspaceMap, episMap, company };
+    return { homoGroupsMap, hierarchyPathMap, hierarchyMap, hierarOnHomoMap, riskMap, workspaceMap, episMap, company, employeesMap };
   }
 
-  private async getMapDataWithId(
-    company: {
-      id: string;
-      workspace: {
-        id: string;
-        name: string;
-        abbreviation: string;
-      }[];
-    },
-    mapData: IMapData,
-  ) {
+  // get the database existent data, create a map using getDatabaseMaps and compare with xml map data
+  private async getMapDataWithId(company: ICompanyData, mapData: IMapData, body: IBodyFileCompanyStruct) {
     const companyId = company.id;
-    const { homoGroupsMap, riskMap, workspaceMap, hierarchyPathMap, episMap } = await this.getDatabaseMaps(company, mapData);
+    const { homoGroupsMap, riskMap, workspaceMap, hierarchyPathMap, episMap, hierarOnHomoMap, employeesMap } = await this.getDatabaseMaps(company, mapData, body);
 
     Object.entries(mapData.epis).map(([ca]) => {
       const epiId = episMap[ca]?.id;
-      if (!epiId) throw new BadRequestException(`Epi de ca: ${ca} não encontrado`);
+      if (!epiId) return this.throwError(`Epi de ca: ${ca} não encontrado`, body);
 
       mapData.epis[ca].id = epiId;
     });
 
-    Object.entries(mapData.workspace).map(([workspaceName, workspaceValue]) => {
+    const promisesWorkspaces = Object.entries(mapData.workspace).map(async ([workspaceName, workspaceValue]) => {
       const workspaceId = workspaceMap[workspaceName]?.id;
-      if (!workspaceId) throw new BadRequestException(`Estabelecimento ${workspaceName} não encontrado`);
+      if (!workspaceId) return this.throwError(`Estabelecimento ${workspaceName} não encontrado`);
 
       mapData.workspace[workspaceName].id = workspaceId;
 
-      Object.keys(workspaceValue.homogeneousGroup).map((homoName) => {
-        const homogeneousGroup = homoGroupsMap[homoName]?.id;
-        if (!homogeneousGroup) throw new BadRequestException(`Grupo homogênio ${homoName} não encontrado`);
+      const promisesHomogroups = Object.keys(workspaceValue.homogeneousGroup).map((homoName) => {
+        const homogeneousGroupId = homoGroupsMap[homoName]?.id;
+        if (!homogeneousGroupId && !body.createHomo) {
+          return this.throwError(`Grupo homogênio ${homoName} não encontrado`);
+        }
 
-        mapData.workspace[workspaceName].homogeneousGroup[homoName].id = homogeneousGroup;
+        return async () => {
+          if (!homogeneousGroupId && body.createHomo) {
+            const homogroupImportData = workspaceValue.homogeneousGroup[homoName];
+            const homogroup = await this.createHomogroup(
+              {
+                companyId,
+                name: homoName,
+                description: homogroupImportData.description || '',
+                workspaceIds: [workspaceId],
+              },
+              company,
+            );
+            mapData.workspace[workspaceName].homogeneousGroup[homoName].id = homogroup.id;
+          } else {
+            mapData.workspace[workspaceName].homogeneousGroup[homoName].id = homogeneousGroupId;
+          }
+        };
       });
 
-      Object.keys(workspaceValue.hierarchies).map((hierarchyPath) => {
-        const fullPath = workspaceId + '--' + hierarchyPath;
+      const hierarchies = Object.values(workspaceValue.hierarchies);
+      const hierarchiesDir = hierarchies.filter((h) => h.type == HierarchyEnum.DIRECTORY);
+      const hierarchiesMan = hierarchies.filter((h) => h.type == HierarchyEnum.MANAGEMENT);
+      const hierarchiesSec = hierarchies.filter((h) => h.type == HierarchyEnum.SECTOR);
+      const hierarchiesSubSec = hierarchies.filter((h) => h.type == HierarchyEnum.SUB_SECTOR);
+      const hierarchiesOff = hierarchies.filter((h) => h.type == HierarchyEnum.OFFICE);
+      const hierarchiesSubOff = hierarchies.filter((h) => h.type == HierarchyEnum.SUB_OFFICE);
 
-        const hierarchyFullPath = hierarchyPathMap[fullPath];
-        if (!hierarchyFullPath)
-          throw new BadRequestException(
+      const promisesHierarchies = sortArray(Object.values(workspaceValue.hierarchies), {
+        by: ['type'],
+        order: ['type'],
+        customOrders: {
+          type: [HierarchyEnum.DIRECTORY, HierarchyEnum.MANAGEMENT, HierarchyEnum.SECTOR, HierarchyEnum.SUB_SECTOR, HierarchyEnum.OFFICE, HierarchyEnum.SUB_OFFICE],
+        },
+      }).map(({ value: hierarchyPath }) => {
+        const fullPath = workspaceId + '--' + hierarchyPath;
+        const hierarchyFullPathId = hierarchyPathMap[fullPath]?.id;
+
+        if (!hierarchyFullPathId && !body.createHierarchy) {
+          return this.throwError(
             `Departamento ${hierarchyPath
               .split('--')
               .filter((v) => v != emptyHierarchy)
               .join(' --> ')} não encontrado`,
           );
+        }
 
-        mapData.workspace[workspaceName].hierarchies[hierarchyPath].id = hierarchyFullPath.id;
+        return async () => {
+          const hierarchyImportData = workspaceValue.hierarchies[hierarchyPath];
+          let hierarchyId = hierarchyFullPathId;
+
+          if (!hierarchyId && body.createHierarchy) {
+            const hierarchy = await this.createHierarchy(
+              {
+                companyId,
+                name: hierarchyImportData.name,
+                description: hierarchyImportData.description || '',
+                type: hierarchyImportData.type,
+                realDescription: hierarchyImportData.realDescription,
+                workspaceIds: [workspaceId],
+                parentId: (mapData.workspace[workspaceName].hierarchies[hierarchyImportData.parentPath]?.id as string) || null,
+              },
+              company,
+            );
+
+            hierarchyId = hierarchy.id;
+          }
+
+          mapData.workspace[workspaceName].hierarchies[hierarchyPath].id = hierarchyId;
+        };
       });
+
+      const promisesEmployees = Object.keys(workspaceValue.employees).map((cpf) => {
+        const employeeId = employeesMap[cpf]?.id;
+        if (!employeeId && !body.createEmployee) {
+          return this.throwError(`Empregado de CPF ${formatCPF(cpf)} não encontrado`);
+        }
+
+        return async () => {
+          let employee: EmployeeEntity;
+          const employeeImportData = workspaceValue.employees[cpf];
+
+          if (!employeeId && body.createEmployee) {
+            employee = await this.upsertEmlpoyee(employeeImportData, cpf, companyId);
+
+            mapData.workspace[workspaceName].employees[cpf].id = employee.id;
+          } else {
+            mapData.workspace[workspaceName].employees[cpf].id = employeeId;
+          }
+
+          const hierarchyHistory = sortArray(Object.values(employeeImportData.employeesHistory), {
+            by: ['startDate', 'motive'],
+            order: ['asc', 'motive'],
+            customOrders: {
+              motive: [EmployeeHierarchyMotiveTypeEnum.ADM, EmployeeHierarchyMotiveTypeEnum.DEM],
+            },
+          });
+
+          await asyncEach(hierarchyHistory, async (history) => {
+            const subOfficeId = mapData.workspace[workspaceName].hierarchies[history.subOfficePath]?.id as string;
+            const hierarchyId = mapData.workspace[workspaceName].hierarchies[history.officePath]?.id as string;
+            await this.upsertEmployeeHierarchyHistoryService.execute(
+              {
+                companyId,
+                employeeId: mapData.workspace[workspaceName].employees[cpf].id as number,
+                startDate: history.startDate,
+                motive: history.motive,
+                ...(subOfficeId && { subOfficeId }),
+                ...(hierarchyId && { hierarchyId }),
+              },
+              body.user,
+              employee,
+            );
+          });
+        };
+      });
+
+      if (this.errors.length == 0) {
+        await asyncBatch([...promisesHomogroups, ...promisesHierarchies, ...promisesEmployees], 50, async (promise) => {
+          if (typeof promise === 'function') {
+            await promise();
+          }
+        });
+
+        if (body.createHierOnHomo) {
+          const hierarchyOnHomogeneous = mapData.workspace[workspaceName].hierarchyOnHomogeneous;
+
+          await asyncBatch(Object.values(hierarchyOnHomogeneous), 50, async (hh) => {
+            console.log(1, hh); //!
+            console.log(2, mapData.workspace[workspaceName].hierarchies); //!
+            const hierarchyId = mapData.workspace[workspaceName].hierarchies[hh.hierarchyPath]?.id as string;
+            const homogeneousGroupId = mapData.workspace[workspaceName].homogeneousGroup[hh.ghoName]?.id as string;
+
+            const hierarOnHomoId = hierarOnHomoMap[homogeneousGroupId + hierarchyId]?.id;
+            if (!hierarOnHomoId) {
+              await this.createHomoHierarchy(homogeneousGroupId, hierarchyId);
+            }
+          });
+        }
+      }
+
+      return;
     });
 
-    const promises = Object.entries(mapData.risk)
+    await Promise.all(promisesWorkspaces);
+
+    const promisesRisks = Object.entries(mapData.risk)
       .map(([riskName, riskValue]) => {
         const risk = riskMap[riskName];
-        if (!risk) throw new BadRequestException(`Risco ${riskName} não encontrado`);
+        if (!risk) return this.throwError(`Risco ${riskName} não encontrado`);
 
         mapData.risk[riskName].id = risk.id;
         mapData.risk[riskName].data = risk;
 
-        const generateSourcePromises = Object.keys(riskValue.generateSource).map(async (generateSourceName) => {
-          const generateSource = await this.createGenerateSourceService.execute(
-            { riskId: risk.id, name: generateSourceName, companyId },
-            { targetCompanyId: companyId } as any,
-            {
+        const generateSourcePromises = Object.keys(riskValue.generateSource).map((generateSourceName) => {
+          return async () => {
+            const generateSource = await this.createGenerateSourceService.execute(
+              { riskId: risk.id, name: generateSourceName, companyId },
+              { targetCompanyId: companyId } as any,
+              {
+                returnIfExist: true,
+              },
+            );
+
+            mapData.risk[riskName].generateSource[generateSourceName].id = generateSource.id;
+          };
+        });
+
+        const admsPromises = Object.keys(riskValue.adms).map((admName) => {
+          return async () => {
+            const adm = await this.createRecMedService.execute({ medType: 'ADM', riskId: risk.id, medName: admName, companyId }, { targetCompanyId: companyId } as any, {
               returnIfExist: true,
-            },
-          );
+            });
 
-          mapData.risk[riskName].generateSource[generateSourceName].id = generateSource.id;
+            mapData.risk[riskName].adms[admName].id = adm.id;
+          };
         });
 
-        const admsPromises = Object.keys(riskValue.adms).map(async (admName) => {
-          const adm = await this.createRecMedService.execute({ medType: 'ADM', riskId: risk.id, medName: admName, companyId }, { targetCompanyId: companyId } as any, {
-            returnIfExist: true,
-          });
+        const engsPromises = Object.keys(riskValue.engs).map((engName) => {
+          return async () => {
+            const eng = await this.createRecMedService.execute({ medType: 'ENG', riskId: risk.id, medName: engName, companyId }, { targetCompanyId: companyId } as any, {
+              returnIfExist: true,
+            });
 
-          mapData.risk[riskName].adms[admName].id = adm.id;
+            mapData.risk[riskName].engs[engName].id = eng.id;
+          };
         });
 
-        const engsPromises = Object.keys(riskValue.engs).map(async (engName) => {
-          const eng = await this.createRecMedService.execute({ medType: 'ENG', riskId: risk.id, medName: engName, companyId }, { targetCompanyId: companyId } as any, {
-            returnIfExist: true,
-          });
+        const recsPromises = Object.keys(riskValue.recs).map((recName) => {
+          return async () => {
+            const rec = await this.createRecMedService.execute({ riskId: risk.id, recName, companyId }, { targetCompanyId: companyId } as any, {
+              returnIfExist: true,
+            });
 
-          mapData.risk[riskName].engs[engName].id = eng.id;
-        });
-
-        const recsPromises = Object.keys(riskValue.recs).map(async (recName) => {
-          const rec = await this.createRecMedService.execute({ riskId: risk.id, recName, companyId }, { targetCompanyId: companyId } as any, {
-            returnIfExist: true,
-          });
-
-          mapData.risk[riskName].recs[recName].id = rec.id;
+            mapData.risk[riskName].recs[recName].id = rec.id;
+          };
         });
 
         return [...generateSourcePromises, ...admsPromises, ...engsPromises, ...recsPromises];
       })
       .flat(1);
 
-    await asyncBatch(promises, 50, async (promise) => {
-      await promise;
+    if (this.errors.length == 0) {
+      await asyncBatch(promisesRisks, 50, async (promise) => {
+        if (promise) await promise();
+      });
+    }
+    return mapData;
+  }
+
+  private async createHomogroup(data: CreateHomoGroupDto, company: ICompanyData) {
+    const homo = await this.homoGroupRepository.upsertForImport({
+      name: data.name,
+      companyId: company.id,
+      workspaceIds: data.workspaceIds,
+      description: data.description,
     });
 
-    return mapData;
+    return homo;
+  }
+
+  private async createHierarchy(data: CreateHierarchyDto, company: ICompanyData) {
+    console.log(data); //!
+    const hierarchies = await this.hierarchyRepository.upsert(
+      {
+        companyId: company.id,
+        ...data,
+      },
+      company.id,
+    );
+
+    return hierarchies;
+  }
+
+  private async createHomoHierarchy(homogeneousGroupId: string, hierarchyId: string) {
+    return await this.homoGroupRepository.createNewHierarchyOnHomogeneousIfNeeded({
+      homogeneousGroupId,
+      hierarchyId,
+    });
+  }
+
+  private async upsertEmlpoyee(employeeImportData: IWorkspaceData['employees']['0'], cpf: string, companyId: string) {
+    return await this.employeeRepository.upsertImport({
+      companyId,
+      cpf,
+      ...(employeeImportData.name && { name: employeeImportData.name }),
+      ...(employeeImportData.email && { email: employeeImportData.email }),
+      ...(employeeImportData.phone && { phone: employeeImportData.phone }),
+      ...(employeeImportData.birth && { birthday: employeeImportData.birth }),
+      ...(employeeImportData.cbo && { cbo: employeeImportData.cbo }),
+      ...(employeeImportData.esocialCode && { esocialCode: employeeImportData.esocialCode }),
+      ...(employeeImportData.lastExam && { lastExam: employeeImportData.lastExam }),
+      ...(employeeImportData.sex && { sex: employeeImportData.sex }),
+      ...(employeeImportData.socialName && { socialName: employeeImportData.socialName }),
+    });
   }
 
   public async getColumns() {
