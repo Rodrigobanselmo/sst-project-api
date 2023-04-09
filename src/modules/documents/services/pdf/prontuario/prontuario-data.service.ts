@@ -24,6 +24,7 @@ export class PdfProntuarioDataService {
       select: {
         name: true,
         cpf: true,
+        socialName: true,
         birthday: true,
         sex: true,
         company: {

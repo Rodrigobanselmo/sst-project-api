@@ -29,6 +29,7 @@ export interface IReportExcellCell {
   content: string | number | Date;
   notes?: string[];
   borders?: Partial<ExcelJS.Borders>;
+  font?: Partial<ExcelJS.Font>;
   align?: {
     horizontal?: 'left' | 'center' | 'right' | 'fill' | 'justify' | 'centerContinuous' | 'distributed';
     vertical?: 'top' | 'middle' | 'bottom' | 'distributed' | 'justify';

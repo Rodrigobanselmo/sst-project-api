@@ -1,3 +1,4 @@
+import { DownaldRiskModelFactory } from './factories/report/products/DownaldRiskModelFactory';
 import { DayJSProvider } from '../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { Module } from '@nestjs/common';
 import { ExcelProvider } from '../../shared/providers/ExcelProvider/implementations/ExcelProvider';
@@ -41,9 +42,11 @@ import { HierarchyExcelProvider } from './providers/HierarchyExcelProvider';
 import { FileHelperProvider } from './providers/FileHelperProvider';
 import { ReportRiskStructureFactory } from './factories/report/products/ReportRiskStructureFactory';
 import { RiskStructureReportService } from './services/reports/risk-structure-report/risk-structure-report.service';
+import { DownaldEmployeeModelFactory } from './factories/report/products/DownaldEmployeeModelFactory';
+import { ModelsUploadsController } from './controller/models/models.controller';
 
 @Module({
-  controllers: [FilesChecklistController, ReportsController, FilesCompanyController, FilesCnaeController, FilesController, FilesCidController],
+  controllers: [FilesChecklistController, ModelsUploadsController, ReportsController, FilesCompanyController, FilesCnaeController, FilesController, FilesCidController],
   imports: [SSTModule, CompanyModule],
   providers: [
     DayJSProvider,
@@ -80,6 +83,8 @@ import { RiskStructureReportService } from './services/reports/risk-structure-re
     FileHelperProvider,
     ReportRiskStructureFactory,
     RiskStructureReportService,
+    DownaldRiskModelFactory,
+    DownaldEmployeeModelFactory,
   ],
 })
 export class FilesModule {}

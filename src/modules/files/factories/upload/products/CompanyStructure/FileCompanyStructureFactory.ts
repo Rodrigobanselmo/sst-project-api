@@ -32,6 +32,7 @@ import { CompanyStructColumnMap, CompanyStructHeaderEnum, emptyHierarchy } from 
 import {
   IBodyFileCompanyStruct,
   ICompanyData,
+  IDataReturnHierarchy,
   IEmployeeReturn,
   IEpiReturn,
   IHierarchyDataReturn,
@@ -630,57 +631,53 @@ class FileFactoryProduct implements IFileFactoryProduct {
         };
       });
 
-      const hierarchies = Object.values(workspaceValue.hierarchies);
-      const hierarchiesDir = hierarchies.filter((h) => h.type == HierarchyEnum.DIRECTORY);
-      const hierarchiesMan = hierarchies.filter((h) => h.type == HierarchyEnum.MANAGEMENT);
-      const hierarchiesSec = hierarchies.filter((h) => h.type == HierarchyEnum.SECTOR);
-      const hierarchiesSubSec = hierarchies.filter((h) => h.type == HierarchyEnum.SUB_SECTOR);
-      const hierarchiesOff = hierarchies.filter((h) => h.type == HierarchyEnum.OFFICE);
-      const hierarchiesSubOff = hierarchies.filter((h) => h.type == HierarchyEnum.SUB_OFFICE);
+      const handleHierarchy = (hierarchiesMan: IDataReturnHierarchy[]) => {
+        return hierarchiesMan.map(({ value: hierarchyPath }) => {
+          const fullPath = workspaceId + '--' + hierarchyPath;
+          const hierarchyFullPathId = hierarchyPathMap[fullPath]?.id;
 
-      const promisesHierarchies = sortArray(Object.values(workspaceValue.hierarchies), {
-        by: ['type'],
-        order: ['type'],
-        customOrders: {
-          type: [HierarchyEnum.DIRECTORY, HierarchyEnum.MANAGEMENT, HierarchyEnum.SECTOR, HierarchyEnum.SUB_SECTOR, HierarchyEnum.OFFICE, HierarchyEnum.SUB_OFFICE],
-        },
-      }).map(({ value: hierarchyPath }) => {
-        const fullPath = workspaceId + '--' + hierarchyPath;
-        const hierarchyFullPathId = hierarchyPathMap[fullPath]?.id;
-
-        if (!hierarchyFullPathId && !body.createHierarchy) {
-          return this.throwError(
-            `Departamento ${hierarchyPath
-              .split('--')
-              .filter((v) => v != emptyHierarchy)
-              .join(' --> ')} não encontrado`,
-          );
-        }
-
-        return async () => {
-          const hierarchyImportData = workspaceValue.hierarchies[hierarchyPath];
-          let hierarchyId = hierarchyFullPathId;
-
-          if (!hierarchyId && body.createHierarchy) {
-            const hierarchy = await this.createHierarchy(
-              {
-                companyId,
-                name: hierarchyImportData.name,
-                description: hierarchyImportData.description || '',
-                type: hierarchyImportData.type,
-                realDescription: hierarchyImportData.realDescription,
-                workspaceIds: [workspaceId],
-                parentId: (mapData.workspace[workspaceName].hierarchies[hierarchyImportData.parentPath]?.id as string) || null,
-              },
-              company,
+          if (!hierarchyFullPathId && !body.createHierarchy) {
+            return this.throwError(
+              `Departamento ${hierarchyPath
+                .split('--')
+                .filter((v) => v != emptyHierarchy)
+                .join(' --> ')} não encontrado`,
             );
-
-            hierarchyId = hierarchy.id;
           }
 
-          mapData.workspace[workspaceName].hierarchies[hierarchyPath].id = hierarchyId;
-        };
-      });
+          return async () => {
+            const hierarchyImportData = workspaceValue.hierarchies[hierarchyPath];
+            let hierarchyId = hierarchyFullPathId;
+
+            if (!hierarchyId && body.createHierarchy) {
+              const hierarchy = await this.createHierarchy(
+                {
+                  companyId,
+                  name: hierarchyImportData.name,
+                  description: hierarchyImportData.description || '',
+                  type: hierarchyImportData.type,
+                  realDescription: hierarchyImportData.realDescription,
+                  workspaceIds: [workspaceId],
+                  parentId: (mapData.workspace[workspaceName].hierarchies[hierarchyImportData.parentPath]?.id as string) || null,
+                },
+                company,
+              );
+
+              hierarchyId = hierarchy.id;
+            }
+
+            mapData.workspace[workspaceName].hierarchies[hierarchyPath].id = hierarchyId;
+          };
+        });
+      };
+
+      const hierarchies = Object.values(workspaceValue.hierarchies);
+      const promiseHierarchiesDir = handleHierarchy(hierarchies.filter((h) => h.type == HierarchyEnum.DIRECTORY));
+      const promiseHierarchiesMan = handleHierarchy(hierarchies.filter((h) => h.type == HierarchyEnum.MANAGEMENT));
+      const promiseHierarchiesSec = handleHierarchy(hierarchies.filter((h) => h.type == HierarchyEnum.SECTOR));
+      const promiseHierarchiesSubSec = handleHierarchy(hierarchies.filter((h) => h.type == HierarchyEnum.SUB_SECTOR));
+      const promiseHierarchiesOff = handleHierarchy(hierarchies.filter((h) => h.type == HierarchyEnum.OFFICE));
+      const promiseHierarchiesSubOff = handleHierarchy(hierarchies.filter((h) => h.type == HierarchyEnum.SUB_OFFICE));
 
       const promisesEmployees = Object.keys(workspaceValue.employees).map((cpf) => {
         const employeeId = employeesMap[cpf]?.id;
@@ -704,14 +701,15 @@ class FileFactoryProduct implements IFileFactoryProduct {
             by: ['startDate', 'motive'],
             order: ['asc', 'motive'],
             customOrders: {
-              motive: [EmployeeHierarchyMotiveTypeEnum.ADM, EmployeeHierarchyMotiveTypeEnum.DEM],
+              motive: [EmployeeHierarchyMotiveTypeEnum.DEM, EmployeeHierarchyMotiveTypeEnum.ADM],
             },
           });
 
           await asyncEach(hierarchyHistory, async (history) => {
             const subOfficeId = mapData.workspace[workspaceName].hierarchies[history.subOfficePath]?.id as string;
             const hierarchyId = mapData.workspace[workspaceName].hierarchies[history.officePath]?.id as string;
-            await this.upsertEmployeeHierarchyHistoryService.execute(
+
+            const historyData = await this.upsertEmployeeHierarchyHistoryService.execute(
               {
                 companyId,
                 employeeId: mapData.workspace[workspaceName].employees[cpf].id as number,
@@ -723,12 +721,26 @@ class FileFactoryProduct implements IFileFactoryProduct {
               body.user,
               employee,
             );
+
+            if (!employee.hierarchyHistory) employee.hierarchyHistory = [];
+            if (historyData) employee.hierarchyHistory.push(historyData);
           });
         };
       });
 
       if (this.errors.length == 0) {
-        await asyncBatch([...promisesHomogroups, ...promisesHierarchies, ...promisesEmployees], 50, async (promise) => {
+        await asyncEach(
+          [promiseHierarchiesDir, promiseHierarchiesMan, promiseHierarchiesSec, promiseHierarchiesSubSec, promiseHierarchiesOff, promiseHierarchiesSubOff],
+          async (promises) => {
+            await asyncBatch(promises, 50, async (promise) => {
+              if (typeof promise === 'function') {
+                await promise();
+              }
+            });
+          },
+        );
+
+        await asyncBatch([...promisesHomogroups, ...promisesEmployees], 50, async (promise) => {
           if (typeof promise === 'function') {
             await promise();
           }

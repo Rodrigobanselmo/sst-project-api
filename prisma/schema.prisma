@@ -670,10 +670,10 @@ model Employee {
   hierarchyId          String?
   admissionDate        DateTime?
   birthday             DateTime?
-  cidId                String?
   email                String?
   esocialCode          String?
   isComorbidity        Boolean?                   @default(false)
+  isPCD                Boolean?                   @default(false)
   nickname             String?
   phone                String?
   sex                  SexTypeEnum?
@@ -684,9 +684,10 @@ model Employee {
   expiredDateExam      DateTime?
   newExamAdded         DateTime?
   cbo                  String?
+  rg                   String?
   absenteeisms         Absenteeism[]
   cat                  Cat[]
-  cid                  Cid?                       @relation(fields: [cidId], references: [cid], onDelete: Restrict)
+  cids                 Cid[]
   company              Company                    @relation(fields: [companyId], references: [id])
   hierarchy            Hierarchy?                 @relation(fields: [hierarchyId], references: [id], onDelete: Restrict)
   shift                CompanyShift?              @relation(fields: [shiftId], references: [id], onDelete: Restrict)
@@ -1140,7 +1141,7 @@ model HomogeneousGroup {
   workspaces             Workspace[]
   protocolsData          ProtocolToRisk[]
 
-  @@unique([name, companyId])
+  @@unique([name, companyId]) //if remove this will need to change company struct xml import for non unique name
   @@index([name])
   @@index([deletedAt])
   @@index([companyId])

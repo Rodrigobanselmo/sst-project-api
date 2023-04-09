@@ -21,14 +21,17 @@ export class CreateEmployeeHierarchyHistoryService {
     private readonly checkEmployeeExamService: CheckEmployeeExamService,
   ) {}
 
-  async execute(dataDto: CreateEmployeeHierarchyHistoryDto, user: UserPayloadDto) {
-    const found = await this.employeeRepository.findById(dataDto.employeeId, user.targetCompanyId);
+  async execute(dataDto: CreateEmployeeHierarchyHistoryDto, user: UserPayloadDto, employee?: EmployeeEntity) {
+    if (!employee) {
+      employee = await this.employeeRepository.findById(dataDto.employeeId, user.targetCompanyId, { select: { id: true } });
 
-    if (!found?.id) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_NOT_FOUND);
+      if (!employee?.id) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_NOT_FOUND);
+    }
 
     const { hierarchyId, beforeHistory } = await this.check({
       dataDto,
-      foundEmployee: found,
+      foundEmployee: employee,
+      histories: employee.hierarchyHistory,
     });
 
     if (dataDto.motive === EmployeeHierarchyMotiveTypeEnum.DEM) dataDto.hierarchyId = beforeHistory.hierarchyId;
@@ -37,11 +40,11 @@ export class CreateEmployeeHierarchyHistoryService {
       {
         ...dataDto,
       },
-      found.id,
+      employee.id,
       hierarchyId,
     );
 
-    this.employeePPPHistoryRepository.updateManyNude({
+    const pppPromise = this.employeePPPHistoryRepository.updateManyNude({
       data: { sendEvent: true },
       where: {
         employee: {
@@ -51,37 +54,37 @@ export class CreateEmployeeHierarchyHistoryService {
       },
     });
 
-    this.checkEmployeeExamService.execute({
-      employeeId: found.id,
+    const checkExamPromise = this.checkEmployeeExamService.execute({
+      employeeId: employee.id,
     });
+
+    await Promise.all([pppPromise, checkExamPromise]);
 
     return history;
   }
 
-  async check({ dataDto, foundEmployee }: { dataDto: Partial<CreateEmployeeHierarchyHistoryDto & { id?: number }>; foundEmployee: EmployeeEntity }) {
+  async check({
+    dataDto,
+    foundEmployee,
+    histories,
+  }: {
+    dataDto: Partial<CreateEmployeeHierarchyHistoryDto & { id?: number }>;
+    foundEmployee: Pick<EmployeeEntity, 'id'>;
+    histories?: EmployeeHierarchyHistoryEntity[];
+  }) {
     if (!dataDto.startDate) throw new BadRequestException('missing start date');
-    // CHECK ACTUAL
-    // {
-    //   const isActualOk =
-    //     historyRules[dataDto.motive].canHaveHierarchy === !!found.hierarchyId;
 
-    //   if (!isActualOk) {
-    //     if (found.hierarchyId)
-    //       throw new BadRequestException(
-    //         ErrorMessageEnum.EMPLOYEE_FORBIDDEN_ADM_TWICE,
-    //       );
-    //     if (!found.hierarchyId)
-    //       throw new BadRequestException(
-    //         ErrorMessageEnum.EMPLOYEE_NOT_IN_HIERARCHY,
-    //       );
-    //   }
-    // }
-
-    // CHECK AFTER
     let afterMotive: EmployeeHierarchyMotiveTypeEnum | null;
     {
-      const afterHistory = (
-        await this.employeeHierarchyHistoryRepository.findNude({
+      let afterHistories = histories?.filter((h) => {
+        const cond2 = dataDto.id ? h.id !== dataDto.id : true;
+        const cond1 = h.startDate >= dataDto.startDate;
+
+        return cond1 && cond2;
+      });
+
+      if (!afterHistories) {
+        afterHistories = await this.employeeHierarchyHistoryRepository.findNude({
           where: {
             employeeId: foundEmployee.id,
             startDate: { gte: dataDto.startDate },
@@ -89,10 +92,10 @@ export class CreateEmployeeHierarchyHistoryService {
           },
           orderBy: { startDate: 'asc' },
           take: 3,
-        })
-      )
-        .sort((a, b) => sortData(a.created_at, b.created_at))
-        .sort((a, b) => sortData(a.startDate, b.startDate))[0];
+        });
+      }
+
+      const afterHistory = afterHistories.sort((a, b) => sortData(a.created_at, b.created_at)).sort((a, b) => sortData(a.startDate, b.startDate))[0];
 
       afterMotive = afterHistory?.motive || null;
       const isAfterOk = historyRules[dataDto.motive].after.includes(afterMotive);
@@ -102,10 +105,18 @@ export class CreateEmployeeHierarchyHistoryService {
 
     // CHECK BEFORE
     let beforeMotive: EmployeeHierarchyMotiveTypeEnum | null;
+    let beforeHistories: EmployeeHierarchyHistoryEntity[];
     let beforeHistory: EmployeeHierarchyHistoryEntity;
     {
-      beforeHistory = (
-        await this.employeeHierarchyHistoryRepository.findNude({
+      beforeHistories = histories?.filter((h) => {
+        const cond2 = dataDto.id ? h.id !== dataDto.id : true;
+        const cond1 = h.startDate <= dataDto.startDate;
+
+        return cond1 && cond2;
+      });
+
+      if (!beforeHistories) {
+        beforeHistories = await this.employeeHierarchyHistoryRepository.findNude({
           where: {
             employeeId: foundEmployee.id,
             startDate: { lte: dataDto.startDate },
@@ -113,12 +124,15 @@ export class CreateEmployeeHierarchyHistoryService {
           },
           orderBy: { startDate: 'desc' },
           take: 3,
-        })
-      )
-        .sort((a, b) => sortData(b.created_at, a.created_at))
-        .sort((a, b) => sortData(b.startDate, a.startDate))[0];
+        });
+      }
+
+      beforeHistory = beforeHistories.sort((a, b) => sortData(b.created_at, a.created_at)).sort((a, b) => sortData(b.startDate, a.startDate))[0];
 
       beforeMotive = beforeHistory?.motive || null;
+      if (beforeMotive && beforeMotive != EmployeeHierarchyMotiveTypeEnum.DEM && dataDto.motive == EmployeeHierarchyMotiveTypeEnum.ADM)
+        dataDto.motive = EmployeeHierarchyMotiveTypeEnum.TRANS_PROM;
+
       const isBeforeOk = historyRules[dataDto.motive].before.includes(beforeMotive);
 
       if (!isBeforeOk) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_BLOCK_HISTORY);

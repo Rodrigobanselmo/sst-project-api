@@ -403,7 +403,8 @@ class ExcelProvider implements IExcelProvider {
       if (cellStyles.align) cell.alignment = { ...cellStyles.align };
       if (cellStyles.borders) cell.border = { ...cellStyles.borders };
       if (cellStyles.fill) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: cellStyles.fill.replace('#', '') } };
-      if (cellStyles.color) cell.font = { color: { argb: cellStyles.color.replace('#', '') } };
+      if (cellStyles.font) cell.font = cellStyles.font;
+      if (cellStyles.color) cell.font = { color: { argb: cellStyles.color.replace('#', '') }, ...cell?.font };
       if (cellStyles.mergeRight) {
         const currentRowIdx = worksheet.rowCount;
         const startColumnIdx = cellStyles.mergeRight == 'all' ? 1 : colNumber;

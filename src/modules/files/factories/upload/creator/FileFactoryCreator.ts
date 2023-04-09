@@ -1,8 +1,9 @@
 import { PrismaService } from './../../../../../prisma/prisma.service';
 import { IExcelReadData } from './../../../../../shared/providers/ExcelProvider/models/IExcelProvider.types';
 import { ExcelProvider } from '../../../../../shared/providers/ExcelProvider/implementations/ExcelProvider';
-import { IColumnRuleMap, IFileFactoryProduct, ISheetData, ISheetExtractedData } from '../types/IFileFactory.types';
+import { IColumnRule, IColumnRuleMap, IFileFactoryProduct, ISheetData, ISheetExtractedData } from '../types/IFileFactory.types';
 import { BadRequestException } from '@nestjs/common';
+import { IReportCell } from '../../report/types/IReportFactory.types';
 
 export abstract class FileFactoryAbstractionCreator<T, R extends keyof any> {
   public abstract factoryMethod(): IFileFactoryProduct<T, R>;
@@ -61,10 +62,22 @@ export abstract class FileFactoryAbstractionCreator<T, R extends keyof any> {
     return { headerStartIndex, columnHandlerOrder };
   }
 
+  private checkIfOneExists(excelRow: (string | number)[], arrayCheck: string[], columnHandlerOrder: (IColumnRule & Partial<IReportCell>)[]) {
+    const foundData = arrayCheck.find((schemaCell) => {
+      const columnIndex = columnHandlerOrder.findIndex((columnOrder) => schemaCell == columnOrder.field);
+      const cell = excelRow[columnIndex];
+
+      if (cell) return true;
+    });
+
+    return !!foundData;
+  }
+
   public validationTransform(sheet: ISheetData) {
     const { columnHandlerOrder, headerStartIndex } = this.getHeaderInfo(sheet);
 
     const databaseRows = [] as ISheetExtractedData<R>;
+    const errors = [] as string[];
 
     sheet.rows.slice(headerStartIndex + 1).forEach((excelRow, indexRow) => {
       if (!excelRow.length) return;
@@ -73,33 +86,30 @@ export abstract class FileFactoryAbstractionCreator<T, R extends keyof any> {
       const rowIndex = indexRow + 1 + (headerStartIndex + 1);
 
       columnHandlerOrder.forEach((columnHandler, indexCell) => {
-        const errorMessageMissing = `Esta faltando um campo obrigatório na linha "${rowIndex}", coluna "${this.excelProvider.getColumnByIndex(indexCell)}" da planilha ${
-          sheet.sheetName
-        }"`;
+        const errorMessageMissing = `Esta faltando um campo obrigatório na linha "${rowIndex}", coluna "${this.excelProvider.getColumnByIndex(indexCell)}" (${
+          columnHandler.field
+        }) da planilha ${sheet.sheetName}"`;
 
-        const errorMessageInvalid = `Dado inválido na linha "${rowIndex}", coluna "${this.excelProvider.getColumnByIndex(indexCell)}" da planilha ${sheet.sheetName}"`;
+        const errorMessageInvalid = `Dado inválido na linha "${rowIndex}", coluna "${this.excelProvider.getColumnByIndex(indexCell)}" da planilha ${
+          sheet.sheetName
+        }" \nDado: ${excelRow[indexCell]} `;
 
         const excelCell = excelRow[indexCell];
         const isEmptyCell = excelCell === null || excelCell === undefined;
         const isEmptyRequired = isEmptyCell && columnHandler.required;
 
-        if (isEmptyRequired) throw new BadRequestException(errorMessageMissing);
+        if (isEmptyRequired) return errors.push(errorMessageMissing);
         if (isEmptyCell) {
-          if (columnHandler.requiredIf) {
-            const isRequiredIf = columnHandler.requiredIf.find((schemaCell) => {
-              const isRequiredIf_ColumnHandler = columnHandlerOrder.findIndex((columnOrder) => schemaCell == columnOrder.field);
-              const isRequiredIf_ExcelCell = excelRow[isRequiredIf_ColumnHandler];
-
-              if (isRequiredIf_ExcelCell) return true;
-            });
-            if (isRequiredIf) throw new BadRequestException(errorMessageMissing);
+          if (columnHandler.requiredIfOneExist) {
+            const isRequiredIf = this.checkIfOneExists(excelRow, columnHandler.requiredIfOneExist, columnHandlerOrder);
+            if (isRequiredIf) return errors.push(errorMessageMissing);
           }
 
           return;
         }
 
         let checkedData = columnHandler.checkHandler(excelCell);
-        if (checkedData === false) throw new BadRequestException(errorMessageInvalid);
+        if (checkedData === false) return errors.push(errorMessageInvalid);
         if (checkedData === 'false') checkedData = false;
         if (checkedData === 'true') checkedData = true;
 
@@ -116,6 +126,8 @@ export abstract class FileFactoryAbstractionCreator<T, R extends keyof any> {
 
       databaseRows.push(databaseRow);
     });
+
+    if (errors.length) throw new BadRequestException(errors);
 
     return databaseRows;
   }

@@ -8,3 +8,12 @@ export const hierarchyList = [
   HierarchyEnum.OFFICE,
   HierarchyEnum.SUB_OFFICE,
 ];
+
+export const hierarchyListReversed = [
+  HierarchyEnum.DIRECTORY,
+  HierarchyEnum.MANAGEMENT,
+  HierarchyEnum.SECTOR,
+  HierarchyEnum.SUB_SECTOR,
+  HierarchyEnum.OFFICE,
+  HierarchyEnum.SUB_OFFICE,
+].reverse();

@@ -15,7 +15,7 @@ import { Permissions } from '../../../../shared/decorators/permissions.decorator
 import { PermissionEnum, RoleEnum } from '../../../../shared/constants/enum/authorization';
 import { Roles } from '../../../../shared/decorators/roles.decorator';
 import { UploadCompanyStructureService } from '../../services/company/upload-structure/upload-structure.service';
-import { UploadRiskStructureReportDto } from '../../dto/risk-structure-report.dto';
+import { UploadCompanyStructureReportDto } from '../../dto/risk-structure-report.dto';
 @Controller('files/company')
 export class FilesCompanyController {
   constructor(
@@ -168,7 +168,8 @@ export class FilesCompanyController {
   })
   @Post('company-structure/upload/:companyId')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadCompanyStruct(@UploadedFile() file: Express.Multer.File, @User() userPayloadDto: UserPayloadDto, @Body() body: UploadRiskStructureReportDto) {
+  async uploadCompanyStruct(@UploadedFile() file: Express.Multer.File, @User() userPayloadDto: UserPayloadDto, @Body() body: UploadCompanyStructureReportDto) {
+    console.log(body);
     return await this.uploadCompanyStructureService.execute(file, userPayloadDto, body);
   }
 }

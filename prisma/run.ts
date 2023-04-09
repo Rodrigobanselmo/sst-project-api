@@ -1,3 +1,4 @@
+import { asyncEach } from './../src/shared/utils/asyncEach';
 import { removeDuplicitiesRisks } from './run/remove-duplicities-risks';
 import { AmazonStorageProvider } from './../src/shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
 import { CharacterizationRepository } from './../src/modules/company/repositories/implementations/CharacterizationRepository';
@@ -29,6 +30,8 @@ import { removeDuplicatesRisks } from './run/removeDuplicatesRisks';
 import { setHomoWork } from './run/set-homo-work';
 import { emptyDocTables } from './run/empty-doc-tables';
 import { createEpi } from './run/create-epi';
+import { asyncBatch } from 'src/shared/utils/asyncBatch';
+import { simulateAwait } from 'src/shared/utils/simulateAwait';
 
 const prisma = new PrismaClient({
   // log: ['query'],
@@ -82,11 +85,23 @@ async function main() {
     // }),
 
     // await deleteWithNameCompany('Deletar', prisma);
-    await deleteCompany('a661bbe2-ef70-4343-b175-925c9ff9c298', prisma);
+    // await deleteCompany('a661bbe2-ef70-4343-b175-925c9ff9c298', prisma);
 
     // await removeDuplicatesRisks(prisma);
     // await setHomoWork(prisma);
     // await fixHierarchyHomo(prisma);
+
+    const promisses = Array.from({ length: 100 }, (_, index) => {
+      return async () => {
+        console.log(index);
+        await simulateAwait(1000);
+        return index;
+      };
+    });
+
+    await asyncBatch(promisses, 5, async (promise) => {
+      await promise();
+    });
 
     console.info('end');
   } catch (err) {

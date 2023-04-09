@@ -15,7 +15,7 @@ import { FindEvents2220Dto } from './../../../esocial/dto/event.dto';
 export class EmployeeRepository {
   constructor(private prisma: PrismaService) {}
 
-  async create({ hierarchyId, companyId, shiftId, cidId, ...createCompanyDto }: CreateEmployeeDto): Promise<EmployeeEntity> {
+  async create({ hierarchyId, companyId, shiftId, ...createCompanyDto }: CreateEmployeeDto): Promise<EmployeeEntity> {
     try {
       const employee = await this.prisma.employee.create({
         data: {
@@ -31,11 +31,11 @@ export class EmployeeRepository {
                 connect: { id: shiftId },
               }
             : undefined,
-          cid: cidId
-            ? {
-                connect: { cid: cidId },
-              }
-            : undefined,
+          // cid: cidId
+          //   ? {
+          //       connect: { cid: cidId },
+          //     }
+          //   : undefined,
         },
       });
       return new EmployeeEntity(employee);
@@ -45,7 +45,7 @@ export class EmployeeRepository {
     }
   }
 
-  async update({ hierarchyId, companyId, shiftId, cidId, id, ...createCompanyDto }: UpdateEmployeeDto, removeSubOffices?: boolean): Promise<EmployeeEntity> {
+  async update({ hierarchyId, companyId, shiftId, id, ...createCompanyDto }: UpdateEmployeeDto, removeSubOffices?: boolean): Promise<EmployeeEntity> {
     const employee = await this.prisma.employee.update({
       data: {
         ...createCompanyDto,
@@ -60,17 +60,57 @@ export class EmployeeRepository {
               connect: { id: shiftId },
             }
           : undefined,
-        cid: cidId
-          ? {
-              connect: { cid: cidId },
-            }
-          : undefined,
+        // cid: cidId
+        //   ? {
+        //       connect: { cid: cidId },
+        //     }
+        //   : undefined,
         ...('lastExam' in createCompanyDto &&
           !createCompanyDto.lastExam && {
             lastExam: null,
           }),
       },
       where: { id_companyId: { companyId, id } },
+    });
+
+    return new EmployeeEntity(employee);
+  }
+
+  async upsertImport({ cpf, birthday, companyId, cbo, name, email, esocialCode, lastExam, socialName, sex, phone }: UpdateEmployeeDto): Promise<EmployeeEntity> {
+    const employee = await this.prisma.employee.upsert({
+      create: {
+        cpf,
+        birthday,
+        companyId,
+        cbo,
+        name,
+        email,
+        esocialCode,
+        lastExam,
+        socialName,
+        sex,
+        phone,
+      },
+      update: {
+        cpf,
+        birthday,
+        companyId,
+        cbo,
+        name,
+        email,
+        esocialCode,
+        lastExam,
+        socialName,
+        sex,
+        phone,
+      },
+      where: {
+        cpf_companyId: { companyId, cpf },
+      },
+      select: {
+        id: true,
+        hierarchyHistory: true,
+      },
     });
 
     return new EmployeeEntity(employee);
@@ -91,7 +131,7 @@ export class EmployeeRepository {
   ): Promise<EmployeeEntity[]> {
     const employeeHistory = await this.prisma.employeeHierarchyHistory.findMany({ where: { hierarchy: { companyId } }, include: { employee: true } });
     const data = await this.prisma.$transaction(
-      upsertEmployeeMany.map(({ companyId: _, id, hierarchyId, shiftId, cidId, cbo, admissionDate, ...upsertEmployeeDto }) =>
+      upsertEmployeeMany.map(({ companyId: _, id, hierarchyId, shiftId, cbo, admissionDate, ...upsertEmployeeDto }) =>
         this.prisma.employee.upsert({
           create: {
             ...upsertEmployeeDto,
@@ -106,11 +146,11 @@ export class EmployeeRepository {
                   connect: { id: shiftId },
                 }
               : undefined,
-            cid: cidId
-              ? {
-                  connect: { cid: cidId },
-                }
-              : undefined,
+            // cid: cidId
+            //   ? {
+            //       connect: { cid: cidId },
+            //     }
+            //   : undefined,
             status: 'ACTIVE',
             hierarchyHistory: hierarchyId
               ? {
@@ -135,11 +175,11 @@ export class EmployeeRepository {
                   connect: { id: shiftId },
                 }
               : undefined,
-            cid: cidId
-              ? {
-                  connect: { cid: cidId },
-                }
-              : undefined,
+            // cid: cidId
+            //   ? {
+            //       connect: { cid: cidId },
+            //     }
+            //   : undefined,
             status: 'ACTIVE',
             ...(cbo && { cbo: onlyNumbers(cbo) }),
             hierarchyHistory: hierarchyId

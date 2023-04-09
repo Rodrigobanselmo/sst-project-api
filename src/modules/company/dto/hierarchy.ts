@@ -17,7 +17,7 @@ export class CreateHierarchyDto {
   @IsEnum(StatusEnum, {
     message: `status must be one of: ${StatusEnum.ACTIVE} or ${StatusEnum.INACTIVE}`,
   })
-  status: StatusEnum;
+  status?: StatusEnum;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsString()
@@ -31,7 +31,7 @@ export class CreateHierarchyDto {
 
   @IsString()
   @IsOptional()
-  ghoName: string;
+  ghoName?: string;
 
   @IsString({ each: true })
   @IsOptional()
@@ -57,7 +57,7 @@ export class CreateHierarchyDto {
 
   @IsString()
   @IsOptional()
-  parentId?: string;
+  parentId?: string | null;
 
   @ValidateNested({ each: true })
   @IsOptional()

@@ -7,6 +7,7 @@ import { EmployeeHierarchyHistoryEntity } from './employee-hierarchy-history.ent
 import { HierarchyEntity } from './hierarchy.entity';
 
 import { WorkspaceEntity } from './workspace.entity';
+import { CidEntity } from './cid.entity';
 
 export class EmployeeEntity implements Employee {
   @ApiProperty({ description: 'The id of the Employee' })
@@ -62,7 +63,6 @@ export class EmployeeEntity implements Employee {
   isComorbidity: boolean;
   skippedDismissalExam: boolean;
   sex: SexTypeEnum;
-  cidId: string;
   shiftId: number;
   normalized: string;
   birthday: Date;
@@ -71,8 +71,11 @@ export class EmployeeEntity implements Employee {
   expiredDateExam: Date;
   newExamAdded: Date;
   cbo: string;
+  rg: string;
+  isPCD: boolean;
   // sendEvent: boolean;
   company?: CompanyEntity;
+  cids?: CidEntity[];
   examsHistory?: EmployeeExamsHistoryEntity[];
   hierarchyHistory?: EmployeeHierarchyHistoryEntity[];
   pppHistory?: EmployeePPPHistoryEntity[];

@@ -350,7 +350,7 @@ export class HierarchyRepository {
     const isSubOffice = upsertHierarchy?.type == HierarchyEnum.SUB_OFFICE;
 
     try {
-      if (workspaceIds.length)
+      if (workspaceIds.length && !!id)
         this.prisma.homogeneousGroup.update({
           data: {
             workspaces: workspaceIds.length

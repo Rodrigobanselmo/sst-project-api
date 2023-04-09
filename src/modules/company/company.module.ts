@@ -114,6 +114,7 @@ import { CreateEmployeeHierarchyHistoryService } from './services/employee/0-his
 import { DeleteEmployeeHierarchyHistoryService } from './services/employee/0-history/hierarchy/delete/delete.service';
 import { FindEmployeeHierarchyHistoryService } from './services/employee/0-history/hierarchy/find/find.service';
 import { UpdateEmployeeHierarchyHistoryService } from './services/employee/0-history/hierarchy/update/update.service';
+import { UpsertEmployeeHierarchyHistoryService } from './services/employee/0-history/hierarchy/upsert/upsert.service';
 import { CreateEmployeeService } from './services/employee/create-employee/create-employee.service';
 import { DeleteSubOfficeEmployeeService } from './services/employee/delete-sub-office-employee/delete-sub-office-employee.service';
 import { FindAllAvailableEmployeesService } from './services/employee/find-all-available-employees/find-all-available-employees.service';
@@ -311,6 +312,7 @@ import { UpdateScheduleBlocksService } from './services/scheduleBlock/update-sch
     FindAlertsByTimeService,
     AlertReportCron,
     UpdateApplyServiceCompanyService,
+    UpsertEmployeeHierarchyHistoryService,
   ],
   exports: [
     CompanyRepository,
@@ -328,6 +330,8 @@ import { UpdateScheduleBlocksService } from './services/scheduleBlock/update-sch
     CatRepository,
     DeleteHomoGroupService,
     ScheduleBlockRepository,
+    UpsertEmployeeHierarchyHistoryService,
+    CreateEmployeeService,
   ],
 })
 export class CompanyModule {}

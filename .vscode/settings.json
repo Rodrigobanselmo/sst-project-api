@@ -26,5 +26,9 @@
     "Trab",
     "utiliz",
     "Vinculo"
-  ]
+  ],
+  "workbench.colorCustomizations": {
+    "titleBar.activeBackground": "#201910",
+    "activityBar.background": "#201910",
+}
 }

@@ -15,11 +15,29 @@ export class UpdateHierarchyService {
       throw new BadRequestException(ErrorCompanyEnum.UPDATE_HIERARCHY_WITH_PARENT);
     }
 
+    if (!hierarchy.parentId) {
+      const foundHierarchy = await this.hierarchyRepository.findFirstNude({
+        select: { id: true },
+        where: {
+          name: hierarchy.name,
+          id: { not: hierarchy.id },
+          type: hierarchy.type,
+          parent: null,
+          companyId: user.targetCompanyId,
+          ...(hierarchy.workspaceIds.length > 0 && { workspaces: { some: { id: { in: hierarchy.workspaceIds } } } }),
+        },
+      });
+
+      if (foundHierarchy?.id) {
+        throw new BadRequestException('Hierarquia com esse nome já existe');
+      }
+    }
+
     const hierarchies = await this.hierarchyRepository.update(hierarchy, user.targetCompanyId);
 
     if (hierarchy.employeesIds) {
       const employeeFound = await this.employeeRepository.findNude({
-        include: { hierarchy: true },
+        select: { id: true, hierarchyId: true },
         where: { id: { in: hierarchy.employeesIds } },
       });
 

@@ -36,7 +36,7 @@ export class DeleteEmployeeHierarchyHistoryService {
 
     await this.employeeHierarchyHistoryRepository.delete(id, employeeId, hierarchyId);
 
-    this.employeePPPHistoryRepository.updateManyNude({
+    const pppPromise = this.employeePPPHistoryRepository.updateManyNude({
       data: { sendEvent: true },
       where: {
         employee: {
@@ -46,25 +46,28 @@ export class DeleteEmployeeHierarchyHistoryService {
       },
     });
 
-    this.checkEmployeeExamService.execute({
+    const checkExamPromise = this.checkEmployeeExamService.execute({
       employeeId,
     });
+    await Promise.all([pppPromise, checkExamPromise]);
 
     return history;
   }
 
-  async check({ foundEmployee, id }: { foundEmployee: EmployeeEntity; id: number }) {
+  async check({ foundEmployee, id, history }: { foundEmployee: EmployeeEntity; id: number; history?: EmployeeHierarchyHistoryEntity[] }) {
     // CHECK AFTER
     let afterHistory: EmployeeHierarchyHistoryEntity;
     let beforeHistory: EmployeeHierarchyHistoryEntity;
     {
       const allHistory = (
-        await this.employeeHierarchyHistoryRepository.findNude({
-          where: {
-            employeeId: foundEmployee.id,
-          },
-          orderBy: { startDate: 'asc' },
-        })
+        history
+          ? history
+          : await this.employeeHierarchyHistoryRepository.findNude({
+              where: {
+                employeeId: foundEmployee.id,
+              },
+              orderBy: { startDate: 'asc' },
+            })
       )
         .sort((a, b) => sortData(a.created_at, b.created_at))
         .sort((a, b) => sortData(a.startDate, b.startDate));

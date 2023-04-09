@@ -59,16 +59,15 @@ export class UpdateHomoGroupService {
 
     const homo = await this.homoGroupRepository.update({ ...homoGroup, companyId: userPayloadDto.targetCompanyId });
 
-    if ('startDate' in homoGroup || 'endDate' in homoGroup || !!homoGroup.workspaceIds?.length)
-      this.employeePPPHistoryRepository.updateManyNude({
-        data: { sendEvent: true },
-        where: {
-          employee: {
-            companyId: userPayloadDto.targetCompanyId,
-            hierarchyHistory: { some: { hierarchy: { hierarchyOnHomogeneous: { some: { homogeneousGroupId: homo.id } } } } },
-          },
+    this.employeePPPHistoryRepository.updateManyNude({
+      data: { sendEvent: true },
+      where: {
+        employee: {
+          companyId: userPayloadDto.targetCompanyId,
+          hierarchyHistory: { some: { hierarchy: { hierarchyOnHomogeneous: { some: { homogeneousGroupId: homo.id } } } } },
         },
-      });
+      },
+    });
 
     return homo;
   }

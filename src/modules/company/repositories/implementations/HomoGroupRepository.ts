@@ -45,6 +45,64 @@ export class HomoGroupRepository {
   }
 
   async update({ workspaceIds, companyId, id, hierarchies, endDate = null, startDate = null, ...updateHomoGroup }: UpdateHomoGroupDto): Promise<HomoGroupEntity> {
+    await this.updateHierarchyOnHomogeneousFromGHO({ id, hierarchies, endDate, startDate });
+
+    const data = await this.prisma.homogeneousGroup.update({
+      where: { id },
+      include: { hierarchyOnHomogeneous: { include: { hierarchy: true } } },
+      data: {
+        ...(workspaceIds?.length && { workspaces: { connect: workspaceIds.map((id) => ({ id_companyId: { id, companyId } })) } }),
+        ...updateHomoGroup,
+      },
+    });
+
+    const homoGroup = { ...data } as HomoGroupEntity;
+
+    if (data.hierarchyOnHomogeneous)
+      homoGroup.hierarchies = data.hierarchyOnHomogeneous.map((homo) => ({
+        ...homo.hierarchy,
+      }));
+
+    return this.getHomoGroupData(homoGroup);
+  }
+
+  async upsertForImport({ name, workspaceIds, companyId, description = '' }: CreateHomoGroupDto): Promise<HomoGroupEntity> {
+    const data = await this.prisma.homogeneousGroup.upsert({
+      where: { name_companyId: { name, companyId } },
+      create: {
+        company: { connect: { id: companyId } },
+        name,
+        description,
+        workspaces: workspaceIds?.length
+          ? {
+              connect: workspaceIds.map((id) => ({
+                id_companyId: { companyId, id },
+              })),
+            }
+          : undefined,
+      },
+      update: {
+        name,
+        description,
+        workspaces: workspaceIds?.length
+          ? {
+              connect: workspaceIds.map((id) => ({
+                id_companyId: { companyId, id },
+              })),
+            }
+          : undefined,
+      },
+    });
+
+    return data;
+  }
+
+  async updateHierarchyOnHomogeneousFromGHO({
+    id,
+    hierarchies,
+    endDate = null,
+    startDate = null,
+  }: Pick<UpdateHomoGroupDto, 'id' | 'hierarchies' | 'endDate' | 'startDate'>) {
     if (hierarchies) {
       const hierarchyOnHomogeneous = {};
       const foundHomogeneousGroups = await this.prisma.hierarchyOnHomogeneous.findMany({
@@ -135,24 +193,65 @@ export class HomoGroupRepository {
         ),
       );
     }
+  }
 
-    const data = await this.prisma.homogeneousGroup.update({
-      where: { id },
-      include: { hierarchyOnHomogeneous: { include: { hierarchy: true } } },
-      data: {
-        ...(workspaceIds?.length && { workspaces: { connect: workspaceIds.map((id) => ({ id_companyId: { id, companyId } })) } }),
-        ...updateHomoGroup,
+  async createNewHierarchyOnHomogeneousIfNeeded({
+    homogeneousGroupId,
+    hierarchyId,
+    hierarchyOnHomogeneousId,
+  }: {
+    hierarchyId: string;
+    homogeneousGroupId: string;
+    hierarchyOnHomogeneousId?: number;
+  }) {
+    if (!hierarchyOnHomogeneousId) {
+      hierarchyOnHomogeneousId = (
+        await this.prisma.hierarchyOnHomogeneous.findFirst({
+          where: {
+            homogeneousGroupId,
+            hierarchyId,
+            OR: [
+              {
+                endDate: null,
+              },
+              { endDate: { gte: new Date() } },
+            ],
+          },
+          select: {
+            id: true,
+          },
+        })
+      )?.id;
+    }
+
+    if (hierarchyOnHomogeneousId) return;
+
+    const foundPPP = await this.prisma.employeePPPHistory.findFirst({
+      select: { id: true, doneDate: true, created_at: true },
+      orderBy: { doneDate: 'desc' },
+      where: {
+        employee: {
+          hierarchyHistory: { some: { hierarchy: { id: hierarchyId } } },
+        },
+        events: {
+          some: {
+            status: { in: ['DONE', 'TRANSMITTED'] },
+          },
+        },
       },
     });
 
-    const homoGroup = { ...data } as HomoGroupEntity;
+    const endDate = null;
+    const startDate = foundPPP ? new Date() : null;
 
-    if (data.hierarchyOnHomogeneous)
-      homoGroup.hierarchies = data.hierarchyOnHomogeneous.map((homo) => ({
-        ...homo.hierarchy,
-      }));
-
-    return this.getHomoGroupData(homoGroup);
+    return await this.prisma.hierarchyOnHomogeneous.create({
+      data: {
+        hierarchyId,
+        homogeneousGroupId,
+        startDate,
+        endDate,
+      },
+    });
   }
 
   async updateHierarchyHomo({ ids, endDate = null, startDate = null }: UpdateHierarchyHomoGroupDto) {

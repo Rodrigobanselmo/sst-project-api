@@ -22,78 +22,87 @@ export class CreateEmployeeDto {
   @MaxLength(100)
   name: string;
 
+  @IsOptional()
+  @IsString()
+  rg?: string;
+
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsString()
   @IsOptional()
   @IsEnum(StatusEnum, {
     message: `status must be one of: ${StatusEnum.ACTIVE} or ${StatusEnum.INACTIVE}`,
   })
-  status: StatusEnum;
+  status?: StatusEnum;
 
   @IsString()
   companyId: string;
 
   @IsString()
   @IsOptional()
-  hierarchyId: string;
+  hierarchyId?: string;
 
   @IsString()
   @IsOptional()
-  cbo: string;
+  cbo?: string;
 
   @IsString()
   @IsOptional()
-  esocialCode: string;
+  esocialCode?: string;
 
   @IsString()
   @IsOptional()
-  socialName: string;
+  socialName?: string;
 
   @IsString()
   @IsOptional()
-  nickname: string;
+  nickname?: string;
 
   @IsString()
   @IsOptional()
-  phone: string;
+  phone?: string;
 
   @IsString()
   @IsOptional()
-  email: string;
+  email?: string;
 
   @IsBoolean()
   @ToBoolean()
   @IsOptional()
-  isComorbidity: boolean;
+  isComorbidity?: boolean;
+
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  isPCD?: boolean;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsString()
   @IsEnum(SexTypeEnum, {
     message: `Sexo inválido`,
   })
-  sex: SexTypeEnum;
+  sex?: SexTypeEnum;
 
-  // @IsString({ each: true })
-  @IsString()
-  @IsOptional()
-  cidId: string;
-  // cidId: string[];
+  // // @IsString({ each: true })
+  // @IsString()
+  // @IsOptional()
+  // cidId?: string;
+  // // cidId: string[];
 
   @IsInt()
   @IsOptional()
-  shiftId: number;
+  shiftId?: number;
 
   @IsOptional()
   @Transform(DateFormat, { toClassOnly: true })
   @IsDate({ message: 'Data de aniversário inválida' })
   @Type(() => Date)
-  birthday: Date;
+  birthday?: Date;
 
   @IsOptional()
   @Transform(DateFormat, { toClassOnly: true })
   @IsDate({ message: 'Data exame anterior ao contrato' })
   @Type(() => Date)
-  lastExam: Date;
+  lastExam?: Date;
 }
 
 export class UpdateEmployeeDto extends PartialType(CreateEmployeeDto) {

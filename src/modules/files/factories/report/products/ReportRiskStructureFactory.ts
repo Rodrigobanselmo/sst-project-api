@@ -18,8 +18,8 @@ import {
   IReportSanitizeData,
   ReportFillColorEnum,
 } from '../types/IReportFactory.types';
-import { CompanyStructColumnList } from '../../upload/products/CompanyStructure/constants/company-struct.constants';
 import { IColumnRule } from '../../upload/types/IFileFactory.types';
+import { CompanyStructColumnList } from '../../upload/products/CompanyStructure/constants/headersList/CompanyStructColumnList';
 
 @Injectable()
 export class ReportRiskStructureFactory extends ReportFactoryAbstractionCreator<any> {

@@ -62,6 +62,7 @@ export class PdfAsoDataService {
             cpf: true,
             birthday: true,
             companyId: true,
+            socialName: true,
             sex: true,
             company: {
               select: {

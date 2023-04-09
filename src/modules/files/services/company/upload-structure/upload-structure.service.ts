@@ -1,4 +1,4 @@
-import { UploadRiskStructureReportDto } from './../../../dto/risk-structure-report.dto';
+import { UploadCompanyStructureReportDto } from './../../../dto/risk-structure-report.dto';
 import { FileCompanyStructureFactory } from '../../../factories/upload/products/CompanyStructure/FileCompanyStructureFactory';
 import { EmployeeRepository } from '../../../../company/repositories/implementations/EmployeeRepository';
 import { BadRequestException, Injectable } from '@nestjs/common';
@@ -24,43 +24,13 @@ import { hierarchyList } from '../../../../../shared/constants/lists/hierarchy.l
 
 @Injectable()
 export class UploadCompanyStructureService {
-  constructor(
-    private readonly excelProvider: ExcelProvider,
-    private readonly fileCompanyStructureFactory: FileCompanyStructureFactory,
-    private readonly employeeRepository: EmployeeRepository,
-    private readonly workspaceRepository: WorkspaceRepository,
-    private readonly databaseTableRepository: DatabaseTableRepository,
-    private readonly uploadExcelProvider: UploadExcelProvider,
-    private readonly hierarchyRepository: HierarchyRepository,
-    private readonly companyRepository: CompanyRepository,
-  ) {}
+  constructor(private readonly fileCompanyStructureFactory: FileCompanyStructureFactory) {}
 
-  async execute(file: Express.Multer.File, userPayloadDto: UserPayloadDto, body: UploadRiskStructureReportDto) {
+  async execute(file: Express.Multer.File, userPayloadDto: UserPayloadDto, body: UploadCompanyStructureReportDto) {
     if (!file) throw new BadRequestException(`file is not available`);
     const buffer = file.buffer;
 
-    const x = await this.fileCompanyStructureFactory.execute(buffer, { companyId: userPayloadDto.targetCompanyId, ...body });
-
-    return x;
-    const hierarchyExcel = new HierarchyExcelProvider();
-
-    const Workbook = workbooksConstant[WorkbooksEnum.EMPLOYEES];
-
-    const system = userPayloadDto.isSystem;
-    const companyId = userPayloadDto.targetCompanyId;
-
-    return;
+    const data = await this.fileCompanyStructureFactory.execute(buffer, { companyId: userPayloadDto.targetCompanyId, user: userPayloadDto, ...body });
+    return data;
   }
 }
-
-const read = async (readFileData: IExcelReadData[], excelProvider: ExcelProvider, sheet: ICompanySheet, databaseTable: DatabaseTableEntity) => {
-  const table = readFileData.find((data) => data.name === sheet.name);
-
-  if (!table) throw new BadRequestException('The table you trying to insert has a different sheet name');
-
-  const database = await excelProvider.transformToTableData(table, sheet.columns);
-
-  if (databaseTable?.version && database.version !== databaseTable.version) throw new BadRequestException(ErrorMessageEnum.FILE_WRONG_TABLE_HEAD);
-
-  return database.rows;
-};

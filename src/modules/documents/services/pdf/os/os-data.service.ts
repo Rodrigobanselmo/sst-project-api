@@ -45,6 +45,7 @@ export class PdfOsDataService {
         hierarchy: { select: { workspaces: { select: { name: true } } } },
         cpf: true,
         esocialCode: true,
+        socialName: true,
         // birthday: true,
         // sex: true,
         company: {

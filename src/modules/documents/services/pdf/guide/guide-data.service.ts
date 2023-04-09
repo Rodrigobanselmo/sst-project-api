@@ -29,6 +29,7 @@ export class PdfGuideDataService {
         email: true,
         companyId: true,
         hierarchy: { select: { name: true } },
+        socialName: true,
         company: {
           select: {
             id: true,

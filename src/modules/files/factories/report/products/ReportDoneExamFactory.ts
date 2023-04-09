@@ -114,7 +114,7 @@ class ReportFactoryProduct implements IReportFactoryProduct<FindEmployeeExamHist
     const titleData = this.getTitle(headerData, query);
     const infoData = this.getEndInformation(employeesExamsData, !!clinicsIds);
 
-    const returnData: IReportFactoryProductFindData = { headerRow: headerData, titleRows: titleData, endRows: infoData, sanitizeData };
+    const returnData: IReportFactoryProductFindData = { titleRows: titleData, headerRow: headerData, sanitizeData, endRows: infoData };
 
     return returnData;
   }

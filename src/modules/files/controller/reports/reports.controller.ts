@@ -14,7 +14,7 @@ import { DoneExamReportService } from '../../services/reports/done-exam-report/d
 import { ExpiredExamReportService } from '../../services/reports/expired-exam-report/expired-exam-report.service';
 import { RiskStructureReportService } from '../../services/reports/risk-structure-report/risk-structure-report.service';
 
-const getResponse = (res: Response, data: any) => {
+export const getResponse = (res: Response, data: any) => {
   if ('workbook' in data) {
     res.attachment(data.filename);
     data.workbook.xlsx.write(res).then(function () {

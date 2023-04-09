@@ -3,7 +3,7 @@ import { IExcelReadData } from './../../../../../shared/providers/ExcelProvider/
 
 export type IColumnRule = {
   required?: boolean;
-  requiredIf?: string[];
+  requiredIfOneExist?: string[];
   isArray?: boolean;
   field: string;
   checkHandler?: (...args: any[]) => any;

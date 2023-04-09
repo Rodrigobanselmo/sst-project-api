@@ -529,6 +529,7 @@ export class RiskRepository implements IRiskRepository {
             representAll: true,
           },
         ],
+        ...options.where,
       },
       // include: {
       //   recMed: { where: { deleted_at: null, AND: [...tenant] } },

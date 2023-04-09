@@ -29,6 +29,7 @@ export interface IReportCell {
   mergeRight?: number | 'all';
   width?: number;
   borders?: Partial<ExcelJS.Borders>;
+  font?: Partial<ExcelJS.Font>;
   align?: {
     horizontal?: 'left' | 'center' | 'right' | 'fill' | 'justify' | 'centerContinuous' | 'distributed';
     vertical?: 'top' | 'middle' | 'bottom' | 'distributed' | 'justify';
@@ -49,7 +50,7 @@ export type IReportSanitizeData = Record<string, IReportCell>;
 export type IReportGenerateType<T> = {
   downloadType: ReportDownloadTypeEnum;
   companyId: string;
-  body: T;
+  body?: T;
 };
 
 export enum ReportFillColorEnum {
