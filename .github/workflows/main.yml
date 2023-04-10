@@ -28,7 +28,7 @@ jobs:
 
       - uses: appleboy/scp-action@master
         with:
-          host: 54.83.83.89
+          host: 18.219.123.103
           username: ${{ secrets.SSH_USER }}
           port: ${{ secrets.SSH_PORT }}
           key: ${{ secrets.SSH_KEY }} 
@@ -38,7 +38,7 @@ jobs:
       - name: Update API
         uses: appleboy/ssh-action@master
         with:
-          host: 54.83.83.89
+          host: 18.219.123.103
           username: ${{ secrets.SSH_USER }}
           port: ${{ secrets.SSH_PORT }}
           key: ${{ secrets.SSH_KEY }} 
