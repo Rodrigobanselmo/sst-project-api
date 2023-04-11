@@ -150,14 +150,10 @@ class FileFactoryProduct implements IFileFactoryProduct {
     });
 
     const mapData = this.getMapData(sheetData, company);
-    console.log(JSON.stringify(mapData, null, 2)); //!
 
     const mapDataWithId = await this.getMapDataWithId(company, mapData, body);
-    console.log(JSON.stringify(mapDataWithId, null, 2)); //!
 
     if (this.errors.length) throw new BadRequestException(this.errors);
-
-    return { mapData, mapDataWithId };
 
     const isRisk = !!Object.keys(mapData.risk).length;
     if (!isRisk) if (!company.riskFactorGroupData[0].id) throw new BadRequestException(`Sistema de gestão não cadatsrado`);
@@ -750,8 +746,6 @@ class FileFactoryProduct implements IFileFactoryProduct {
           const hierarchyOnHomogeneous = mapData.workspace[workspaceName].hierarchyOnHomogeneous;
 
           await asyncBatch(Object.values(hierarchyOnHomogeneous), 50, async (hh) => {
-            console.log(1, hh); //!
-            console.log(2, mapData.workspace[workspaceName].hierarchies); //!
             const hierarchyId = mapData.workspace[workspaceName].hierarchies[hh.hierarchyPath]?.id as string;
             const homogeneousGroupId = mapData.workspace[workspaceName].homogeneousGroup[hh.ghoName]?.id as string;
 
@@ -844,7 +838,6 @@ class FileFactoryProduct implements IFileFactoryProduct {
   }
 
   private async createHierarchy(data: CreateHierarchyDto, company: ICompanyData) {
-    console.log(data); //!
     const hierarchies = await this.hierarchyRepository.upsert(
       {
         companyId: company.id,

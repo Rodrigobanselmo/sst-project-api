@@ -169,7 +169,6 @@ export class FilesCompanyController {
   @Post('company-structure/upload/:companyId')
   @UseInterceptors(FileInterceptor('file'))
   async uploadCompanyStruct(@UploadedFile() file: Express.Multer.File, @User() userPayloadDto: UserPayloadDto, @Body() body: UploadCompanyStructureReportDto) {
-    console.log(body);
     return await this.uploadCompanyStructureService.execute(file, userPayloadDto, body);
   }
 }

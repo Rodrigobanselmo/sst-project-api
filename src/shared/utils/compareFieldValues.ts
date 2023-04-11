@@ -26,7 +26,7 @@ export const compareFieldValues = (
         if (skip) return null;
       }
 
-      const equal = obj1 == obj2;
+      const equal = String(obj1) == String(obj2);
 
       return equal;
     })

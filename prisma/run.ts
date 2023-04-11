@@ -91,17 +91,7 @@ async function main() {
     // await setHomoWork(prisma);
     // await fixHierarchyHomo(prisma);
 
-    const promisses = Array.from({ length: 100 }, (_, index) => {
-      return async () => {
-        console.log(index);
-        await simulateAwait(1000);
-        return index;
-      };
-    });
-
-    await asyncBatch(promisses, 5, async (promise) => {
-      await promise();
-    });
+    await prisma.examToClinic.updateMany({ data: { isDismissal: true } });
 
     console.info('end');
   } catch (err) {

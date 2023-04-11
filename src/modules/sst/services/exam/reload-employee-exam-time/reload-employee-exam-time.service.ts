@@ -139,6 +139,7 @@ export class ReloadEmployeeExamTimeService {
       }
 
       if (missingExam) {
+        employee.expiredDateExam = null;
         allWithMissingExam.push(employee);
       }
     });

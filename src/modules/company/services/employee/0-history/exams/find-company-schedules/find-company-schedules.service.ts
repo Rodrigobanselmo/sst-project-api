@@ -77,7 +77,7 @@ export class FindCompanyScheduleEmployeeExamHistoryService {
           // ],
           // employee: { companyId },
         },
-        orderBy: [{ status: 'asc' }, { doneDate: 'desc' }],
+        orderBy: [{ status: 'asc' }, { doneDate: 'desc' }, { exam: { isAttendance: 'desc' } }],
         distinct: ['doneDate', 'employeeId'],
       },
     );

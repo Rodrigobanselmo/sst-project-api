@@ -1,3 +1,4 @@
+import { CheckEmployeeExamService } from './../../../../sst/services/exam/check-employee-exam/check-employee-exam.service';
 import { UploadCompanyStructureReportDto } from './../../../dto/risk-structure-report.dto';
 import { FileCompanyStructureFactory } from '../../../factories/upload/products/CompanyStructure/FileCompanyStructureFactory';
 import { EmployeeRepository } from '../../../../company/repositories/implementations/EmployeeRepository';
@@ -24,13 +25,18 @@ import { hierarchyList } from '../../../../../shared/constants/lists/hierarchy.l
 
 @Injectable()
 export class UploadCompanyStructureService {
-  constructor(private readonly fileCompanyStructureFactory: FileCompanyStructureFactory) {}
+  constructor(private readonly fileCompanyStructureFactory: FileCompanyStructureFactory, private readonly checkEmployeeExamService: CheckEmployeeExamService) {}
 
   async execute(file: Express.Multer.File, userPayloadDto: UserPayloadDto, body: UploadCompanyStructureReportDto) {
     if (!file) throw new BadRequestException(`file is not available`);
     const buffer = file.buffer;
 
     const data = await this.fileCompanyStructureFactory.execute(buffer, { companyId: userPayloadDto.targetCompanyId, user: userPayloadDto, ...body });
+
+    this.checkEmployeeExamService.execute({
+      companyId: userPayloadDto.targetCompanyId,
+    });
+
     return data;
   }
 }

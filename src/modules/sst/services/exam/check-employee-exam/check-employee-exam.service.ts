@@ -1,3 +1,4 @@
+import { EmployeeEntity } from './../../../../company/entities/employee.entity';
 import { standardDate } from './../../../../company/services/report/update-all-companies/update-all-companies.service';
 import { Injectable } from '@nestjs/common';
 
@@ -25,10 +26,15 @@ export class CheckEmployeeExamService {
     const companyId = body.companyId;
     const riskId = riskAllId == body.riskId ? undefined : body.riskId;
 
-    const employeesWithExpiredDatePromise = this.employeeRepository.findNude({
+    const employeesValidDatePromise = this.employeeRepository.findNude({
       where: {
-        expiredDateExam: { gte: new Date() },
-        examsHistory: { some: { examId: { gt: 0 } } },
+        OR: [
+          {
+            expiredDateExam: { gte: new Date() },
+            examsHistory: { some: { examId: { gt: 0 } } },
+          },
+          { newExamAdded: { not: null } },
+        ],
         ...(hierarchyId && { hierarchyId }),
         ...(employeeId && { id: employeeId }),
         ...(homogeneousGroupId && { hierarchy: { hierarchyOnHomogeneous: { some: { homogeneousGroupId: homogeneousGroupId } } } }),
@@ -39,9 +45,12 @@ export class CheckEmployeeExamService {
       select: { id: true, companyId: true, hierarchyId: true, newExamAdded: true },
     });
 
-    const employeesWithoutExpiredDatePromise = this.employeeRepository.findNude({
+    const employeesWithExpiredDatePromise = this.employeeRepository.findNude({
       where: {
         OR: [
+          {
+            expiredDateExam: { lte: new Date() },
+          },
           {
             expiredDateExam: null,
           },
@@ -59,17 +68,12 @@ export class CheckEmployeeExamService {
       select: { id: true, companyId: true, hierarchyId: true, newExamAdded: true },
     });
 
-    const [employeesWithExpiredDate, employeesWithoutExpiredDate] = await Promise.all([employeesWithExpiredDatePromise, employeesWithoutExpiredDatePromise]);
+    const [employeesWithValidDate, employeesWithExpiredDate] = await Promise.all([employeesValidDatePromise, employeesWithExpiredDatePromise]);
 
-    const companiesWithExpiredDateIds = employeesWithExpiredDate.map((employee) => employee.companyId);
-    const companiesWithoutExpiredDateIds = employeesWithoutExpiredDate.map((employee) => employee.companyId);
+    const allEmployee = [...employeesWithValidDate, ...employeesWithExpiredDate];
+    const companiesIds = allEmployee.map((employee) => employee.companyId);
 
-    await this.reloadExamExpired(
-      [...new Set(companiesWithoutExpiredDateIds)],
-      employeesWithoutExpiredDate.map((employee) => employee.id),
-    );
-
-    await asyncBatch(employeesWithExpiredDate, 10, async (employee) => {
+    await asyncBatch(employeesWithValidDate, 10, async (employee) => {
       const exams = await this.findExamByHierarchyService.execute(
         { targetCompanyId: employee.companyId },
         { employeeId: employee.id, hierarchyId: employee.hierarchyId },
@@ -107,16 +111,16 @@ export class CheckEmployeeExamService {
       }
     });
 
-    await this.reloadExamExpired(
-      [...new Set(companiesWithExpiredDateIds)],
-      employeesWithExpiredDate.map((employee) => employee.id),
-    );
+    await this.reloadExamExpired([...new Set(companiesIds)], allEmployee);
   }
 
-  async reloadExamExpired(companiesIdsWithoutDuplicates: string[], employeeIds: number[]) {
+  async reloadExamExpired(companiesIdsWithoutDuplicates: string[], employees: EmployeeEntity[]) {
+    if (!companiesIdsWithoutDuplicates.length) return;
+    if (!employees.length) return;
+
     await asyncBatch(companiesIdsWithoutDuplicates, 1, async (companyId) => {
       await this.reloadEmployeeExamTimeService.reloadEmployeeExamTime(companyId, {
-        employeeIds,
+        employeeIds: [...new Set(employees.filter((e) => e.companyId == companyId).map((employee) => employee.id))],
       });
     });
   }
