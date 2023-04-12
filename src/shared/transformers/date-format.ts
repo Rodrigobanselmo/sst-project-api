@@ -15,7 +15,10 @@ export const DateFormat = (data: TransformFnParams, options: { onlyDate?: boolea
       const year = splitStr[2];
 
       if (day && month && year) {
-        const date = new Date(Number(year), Number(month) - 1, Number(day));
+        const date = dayjs(`${year}-${Number(month)}-${day}`)
+          .tz('America/Sao_Paulo', true)
+          .toDate();
+
         return date;
       }
     }

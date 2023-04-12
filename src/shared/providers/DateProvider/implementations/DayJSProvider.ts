@@ -8,7 +8,6 @@ import { IDateProvider, ManipulateType } from '../models/IDateProvider.types';
 dayjs.locale('pt-br');
 dayjs.extend(customParseFormat);
 dayjs.extend(utc);
-dayjs.extend(utc);
 dayjs.extend(timezone);
 class DayJSProvider implements IDateProvider {
   dayjs = dayjs;
