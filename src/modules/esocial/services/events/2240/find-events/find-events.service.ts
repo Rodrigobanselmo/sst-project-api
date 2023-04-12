@@ -44,6 +44,7 @@ export class FindEvents2240ESocialService {
     const { company } = await this.getCompany(companyId);
     const startDate = company.esocialStart;
     const esocialSend = company.esocialSend;
+
     if (!startDate || esocialSend === null)
       return {
         data: [],
@@ -54,6 +55,7 @@ export class FindEvents2240ESocialService {
       };
 
     const employees2240 = await this.findEmployee2240(company, startDate);
+    console.log(employees2240);
 
     const eventsStruct = this.eSocialEventProvider.convertToEvent2240Struct({ company, esocialStartDate: startDate, employees: employees2240 });
 
@@ -284,6 +286,7 @@ export class FindEvents2240ESocialService {
     esocialStartDate: Date,
   ) {
     const employeesData = [] as IEmployee2240Data[];
+    console.log(company.employees);
     //! company.employees.forEach((employee) => {
     company.employees.forEach((employee) => {
       // const timeline = {};
@@ -484,8 +487,8 @@ export class FindEvents2240ESocialService {
         employees: {
           where: {
             companyId,
-            // OR: [{ pppHistory: { every: { status: { in: ['DONE', 'TRANSMITTED'] } } } }, { pppHistory: { some: { sendEvent: true } } }],
-            OR: [{ pppHistory: { some: { sendEvent: true } } }],
+            OR: [{ pppHistory: { every: { status: { in: ['DONE', 'TRANSMITTED'] } } } }, { pppHistory: { some: { sendEvent: true } } }],
+            // OR: [{ pppHistory: { some: { sendEvent: true } } }],
           },
           select: {
             id: true,
