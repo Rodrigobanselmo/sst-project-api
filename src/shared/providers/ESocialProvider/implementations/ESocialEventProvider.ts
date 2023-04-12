@@ -1124,7 +1124,7 @@ class ESocialEventProvider {
       }),
       eSocial: {
         ['_attributes']: {
-          xmlns: 'http://www.esocial.gov.br/schema/evt/evtCAT/v_S_01_00_00',
+          xmlns: 'http://www.esocial.gov.br/schema/evt/evtCAT/v_S_01_01_00',
         },
         evtCAT: {
           ['_attributes']: {
@@ -1224,7 +1224,7 @@ class ESocialEventProvider {
       }),
       eSocial: {
         ['_attributes']: {
-          xmlns: 'http://www.esocial.gov.br/schema/evt/evtMonit/v_S_01_00_00',
+          xmlns: 'http://www.esocial.gov.br/schema/evt/evtMonit/v_S_01_01_00',
         },
         evtMonit: {
           ['_attributes']: {
@@ -1288,7 +1288,7 @@ class ESocialEventProvider {
       }),
       eSocial: {
         ['_attributes']: {
-          xmlns: 'http://www.esocial.gov.br/schema/evt/evtExpRisco/v_S_01_00_00',
+          xmlns: 'http://www.esocial.gov.br/schema/evt/evtExpRisco/v_S_01_01_00',
         },
         evtExpRisco: {
           ['_attributes']: {
@@ -1380,7 +1380,7 @@ class ESocialEventProvider {
       }),
       eSocial: {
         ['_attributes']: {
-          xmlns: 'http://www.esocial.gov.br/schema/evt/evtExclusao/v_S_01_00_00',
+          xmlns: 'http://www.esocial.gov.br/schema/evt/evtExclusao/v_S_01_01_00',
         },
         evtExclusao: {
           ['_attributes']: {

@@ -24,7 +24,7 @@ const xml = `<eSocial xmlns="http://www.esocial.gov.br/schema/lote/eventos/envio
     </ideTransmissor>
     <eventos>
       <evento Id="ID1171475300001602022110815093100002">
-        <eSocial xmlns="http://www.esocial.gov.br/schema/evt/evtMonit/v_S_01_00_00">
+        <eSocial xmlns="http://www.esocial.gov.br/schema/evt/evtMonit/v_S_01_01_00">
           <evtMonit Id="ID1171475300001602022110815093100002">
             <ideEvento>
               <indRetif>1</indRetif>
