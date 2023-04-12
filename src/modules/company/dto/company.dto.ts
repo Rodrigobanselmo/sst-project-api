@@ -12,7 +12,6 @@ import { ActivityDto } from './activity.dto';
 import { AddressDto } from './address.dto';
 import { LicenseDto } from './license.dto';
 import { WorkspaceDto } from './workspace.dto';
-import { StringNormalizeTransform } from '../../../shared/transformers/string-normalize.transform';
 import { ToBoolean } from '../../../shared/decorators/boolean.decorator';
 import { UserCompanyEditDto } from './update-user-company.dto';
 import { UpdateEmployeeDto } from './employee.dto';
@@ -459,7 +458,6 @@ export class UpdateApplyServiceCompanyDto {
 }
 
 export class FindCompaniesDto extends PaginationQueryDto {
-  // @Transform(StringNormalizeTransform, { toClassOnly: true })
   @IsString()
   @IsOptional()
   search?: string;

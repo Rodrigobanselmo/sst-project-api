@@ -1,3 +1,4 @@
+import { CompanyRepository } from './../../../../company/repositories/implementations/CompanyRepository';
 import { Injectable } from '@nestjs/common';
 
 import { ExcelProvider } from '../../../../../shared/providers/ExcelProvider/implementations/ExcelProvider';
@@ -12,8 +13,13 @@ import { DayJSProvider } from '../../../../../shared/providers/DateProvider/impl
 
 @Injectable()
 export class ReportExpiredExamFactory extends ReportFactoryAbstractionCreator<FindEmployeeDto> {
-  constructor(private readonly employeeRepository: EmployeeRepository, private readonly excelProv: ExcelProvider, private readonly dayjsProvider: DayJSProvider) {
-    super(excelProv);
+  constructor(
+    private readonly companyRepository: CompanyRepository,
+    private readonly excelProv: ExcelProvider,
+    private readonly employeeRepository: EmployeeRepository,
+    private readonly dayjsProvider: DayJSProvider,
+  ) {
+    super(excelProv, companyRepository);
   }
 
   public factoryMethod(): IReportFactoryProduct<FindEmployeeDto> {

@@ -14,7 +14,7 @@ import { FindCompaniesDto } from '../../../../company/dto/company.dto';
 @Injectable()
 export class ReportClinicFactory extends ReportFactoryAbstractionCreator<FindCompaniesDto> {
   constructor(private readonly companyRepository: CompanyRepository, private readonly excelProv: ExcelProvider) {
-    super(excelProv);
+    super(excelProv, companyRepository);
   }
 
   public factoryMethod(): IReportFactoryProduct<FindCompaniesDto> {

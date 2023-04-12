@@ -1,3 +1,4 @@
+import { CompanyEntity } from './../../../../company/entities/company.entity';
 import { ReportDownloadTypeEnum } from '../../../../../modules/files/dto/base-report.dto';
 import ExcelJS from 'exceljs';
 
@@ -5,7 +6,7 @@ export type IReportHeader = IReportHeaderCell[];
 
 export interface IReportFactoryProduct<T> {
   getSheetName(): string;
-  getFilename(): string;
+  getFilename(company: CompanyEntity): string;
   findTableData(companyId: string, query: T): Promise<IReportFactoryProductFindData>;
   sanitizeData(...data: any): IReportSanitizeData[];
   getHeader(...data: any): IReportHeader;

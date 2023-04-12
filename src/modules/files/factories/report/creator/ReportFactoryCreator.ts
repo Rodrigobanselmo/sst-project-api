@@ -2,13 +2,17 @@ import { ReportDownloadTypeEnum } from '../../../../..//modules/files/dto/base-r
 import { Workbook } from 'exceljs';
 import { ExcelProvider } from '../../../../../shared/providers/ExcelProvider/implementations/ExcelProvider';
 import { IReportCell, IReportFactoryProduct, IReportFactoryProductFindData, IReportGenerateType, IReportRows, ReportFillColorEnum } from '../types/IReportFactory.types';
+import { CompanyRepository } from '../../../../../modules/company/repositories/implementations/CompanyRepository';
 
 export abstract class ReportFactoryAbstractionCreator<T> {
-  public abstract factoryMethod(): IReportFactoryProduct<T>;
+  private readonly companyRepo: CompanyRepository;
   private readonly excelProvider: ExcelProvider;
 
-  constructor(excelProvider) {
+  public abstract factoryMethod(): IReportFactoryProduct<T>;
+
+  constructor(excelProvider, companyRepo) {
     this.excelProvider = excelProvider;
+    this.companyRepo = companyRepo;
   }
 
   public create() {
@@ -30,8 +34,9 @@ export abstract class ReportFactoryAbstractionCreator<T> {
 
     const tableData = await product.findTableData(companyId, query);
     const rows = this.organizeRows(tableData);
+    const company = await this.companyRepo.findFirstNude({ where: { id: companyId }, select: { id: true, name: true, fantasy: true } });
 
-    return { rows, filename: product.getFilename(), sheetName: product.getSheetName() };
+    return { rows, filename: product.getFilename(company), sheetName: product.getSheetName() };
   }
 
   public organizeRows(findArgs: IReportFactoryProductFindData): IReportRows {

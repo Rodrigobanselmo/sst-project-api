@@ -5,16 +5,21 @@ export const checkIsValidDate = (value: any) => {
     return ExcelDateToJSDate(value);
   }
 
-  const transformToString = String(value);
+  const transformToString = String(value).trim();
 
   if (!transformToString) {
     return false;
   }
 
   const slice = transformToString.replace(/'/, '').split('/');
+
   if (slice.length == 3) {
-    const date = slice[1] + '/' + slice[2] + '/' + slice[2];
-    return new Date(date);
+    const dateString = slice[1] + '/' + slice[0] + '/' + slice[2];
+    const date = new Date(dateString);
+
+    if (date instanceof Date && !isNaN(date.getTime())) {
+      return date;
+    }
   }
 
   return false;

@@ -24,7 +24,7 @@ import { CompanyStructColumnList } from '../../upload/products/CompanyStructure/
 @Injectable()
 export class ReportRiskStructureFactory extends ReportFactoryAbstractionCreator<any> {
   constructor(private readonly companyRepository: CompanyRepository, private readonly excelProv: ExcelProvider) {
-    super(excelProv);
+    super(excelProv, companyRepository);
   }
 
   public factoryMethod(): IReportFactoryProduct<any> {

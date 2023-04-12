@@ -3,7 +3,7 @@ import { v4 } from 'uuid';
 import { downloadImageFile, getExtensionFromUrl } from './downloadImageFile';
 
 export const downloadPathImage = async (url: string) => {
-  if (process.env.NODE_ENV === 'development') return 'images/mock/placeholder-image.png';
+  // if (process.env.NODE_ENV === 'development') return 'images/mock/placeholder-image.png';
 
   return await downloadImageFile(url, `tmp/${v4()}.${getExtensionFromUrl(url)}`);
 };

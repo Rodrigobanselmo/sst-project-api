@@ -24,7 +24,7 @@ import { concatSideBySideTables } from '../helpers/concatSideBySideTables';
 @Injectable()
 export class DownaldRiskModelFactory extends ReportFactoryAbstractionCreator<any> {
   constructor(private readonly companyRepository: CompanyRepository, private readonly excelProv: ExcelProvider) {
-    super(excelProv);
+    super(excelProv, companyRepository);
   }
 
   public factoryMethod(): IReportFactoryProduct<any> {
@@ -53,9 +53,8 @@ class DownloadFactoryProduct implements IReportFactoryProduct<any> {
     return rows;
   }
 
-  public getFilename(): string {
-    const date = new Date();
-    const filename = `Modelo Estrutura Ocupacional ${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
+  public getFilename(company: CompanyEntity): string {
+    const filename = `Estrutura Ocupacional (${company.fantasy || company.name})`;
     return filename;
   }
 

@@ -32,9 +32,10 @@ import { emptyDocTables } from './run/empty-doc-tables';
 import { createEpi } from './run/create-epi';
 import { asyncBatch } from 'src/shared/utils/asyncBatch';
 import { simulateAwait } from 'src/shared/utils/simulateAwait';
+import { hash } from 'bcrypt';
 
 const prisma = new PrismaClient({
-  // log: ['query'],
+  log: ['query'],
 });
 
 async function main() {
@@ -91,7 +92,17 @@ async function main() {
     // await setHomoWork(prisma);
     // await fixHierarchyHomo(prisma);
 
-    await prisma.examToClinic.updateMany({ data: { isDismissal: true } });
+    // await prisma.examToClinic.updateMany({ data: { isDismissal: true } });
+    // await prisma.company.updateMany({ data: { numAsos: 3 } });
+    const passwordHash = await hash('qweqweqwe', 10);
+    await prisma.user.update({
+      data: { password: passwordHash },
+      where: { email: 'leandro.penin@grupoevicon.com.br' },
+    });
+
+    // await prisma.employeeHierarchyHistory.deleteMany({
+    //   where: { startDate: null, employee: { companyId: '79b887c7-396f-4116-afc5-59ec00e4537f' } },
+    // });
 
     console.info('end');
   } catch (err) {

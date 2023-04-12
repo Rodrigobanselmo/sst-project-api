@@ -14,7 +14,7 @@ import { IReportCell, IReportFactoryProduct, IReportFactoryProductFindData, IRep
 @Injectable()
 export class DownaldEmployeeModelFactory extends ReportFactoryAbstractionCreator<any> {
   constructor(private readonly companyRepository: CompanyRepository, private readonly excelProv: ExcelProvider) {
-    super(excelProv);
+    super(excelProv, companyRepository);
   }
 
   public factoryMethod(): IReportFactoryProduct<any> {
@@ -24,6 +24,7 @@ export class DownaldEmployeeModelFactory extends ReportFactoryAbstractionCreator
 
 class DownloadFactoryProduct implements IReportFactoryProduct<any> {
   constructor(private readonly companyRepository: CompanyRepository) {}
+  public company: CompanyEntity;
 
   public async findTableData(companyId: string) {
     const company = await getCompany(companyId, this.companyRepository);
@@ -43,8 +44,8 @@ class DownloadFactoryProduct implements IReportFactoryProduct<any> {
     return rows;
   }
 
-  public getFilename(): string {
-    const filename = `Planilha de Importação Funcionários (Modelo)`;
+  public getFilename(company: CompanyEntity): string {
+    const filename = `Planilha de Importação Funcionários (${company.fantasy || company.name})`;
     return filename;
   }
 

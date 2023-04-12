@@ -29,6 +29,7 @@ export abstract class DocumentFactoryAbstractionCreator<T, R> {
       const { url, buffer, fileName } = await this.save(product, documentSections, { body });
 
       await product.save({ body, attachments, url, data });
+      this.unlinkFiles(product.unlinkPaths);
 
       return { buffer, fileName };
     } catch (error) {

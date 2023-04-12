@@ -684,7 +684,6 @@ class FileFactoryProduct implements IFileFactoryProduct {
         return async () => {
           let employee: EmployeeEntity;
           const employeeImportData = workspaceValue.employees[cpf];
-
           if (!employeeId && body.createEmployee) {
             employee = await this.upsertEmlpoyee(employeeImportData, cpf, companyId);
 

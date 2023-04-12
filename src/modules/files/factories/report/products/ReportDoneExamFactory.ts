@@ -25,7 +25,7 @@ export class ReportDoneExamFactory extends ReportFactoryAbstractionCreator<FindE
     private readonly excelProv: ExcelProvider,
     private readonly dayjsProvider: DayJSProvider,
   ) {
-    super(excelProv);
+    super(excelProv, companyRepository);
   }
 
   public factoryMethod(): IReportFactoryProduct<FindEmployeeExamHistoryDto> {
