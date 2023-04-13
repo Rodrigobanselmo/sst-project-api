@@ -183,7 +183,6 @@ export class CompanyController {
   @Patch()
   update(@Body() updateCompanyDto: UpdateCompanyDto) {
     delete updateCompanyDto.status;
-    console.log(updateCompanyDto.address);
     return this.updateCompanyService.execute(updateCompanyDto);
   }
 
@@ -195,7 +194,6 @@ export class CompanyController {
   })
   @Patch('all')
   updateFull(@Body() updateCompanyDto: UpdateCompanyDto) {
-    console.log(updateCompanyDto.address);
     return this.updateCompanyService.execute(updateCompanyDto);
   }
 

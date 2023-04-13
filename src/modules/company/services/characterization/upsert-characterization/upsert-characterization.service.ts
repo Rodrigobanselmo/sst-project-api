@@ -104,7 +104,7 @@ export class UpsertCharacterizationService {
     const urls = await Promise.all(
       files.map(async (file) => {
         const fileType = file.originalname.split('.')[file.originalname.split('.').length - 1];
-        const path = companyId + '/characterization/' + v4() + '.' + fileType;
+        const path = 'characterization/' + v4() + '.' + fileType;
 
         const { url } = await this.amazonStorageProvider.upload({
           file: file.buffer,

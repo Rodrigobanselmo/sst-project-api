@@ -85,7 +85,7 @@ export class CreateDocumentService {
 
   private async upload(companyId: string, file: Express.Multer.File, dto: CreateDocumentDto) {
     const fileType = file.originalname.split('.')[file.originalname.split('.').length - 1];
-    const path = companyId + '/documents/' + `${dto?.name || ''}-${v4()}` + '.' + fileType;
+    const path = 'documents/' + `${dto?.name || ''}-${v4()}` + '.' + fileType;
 
     const { url } = await this.amazonStorageProvider.upload({
       file: file.buffer,

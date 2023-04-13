@@ -25,7 +25,7 @@ export class AddCompanyPhotoService {
 
   private async upload(companyId: string, file: Express.Multer.File) {
     const fileType = file.originalname.split('.')[file.originalname.split('.').length - 1];
-    const path = companyId + '/company/' + v4() + '.' + fileType;
+    const path = 'company/' + v4() + '.' + fileType;
 
     const { url } = await this.amazonStorageProvider.upload({
       file: file.buffer,

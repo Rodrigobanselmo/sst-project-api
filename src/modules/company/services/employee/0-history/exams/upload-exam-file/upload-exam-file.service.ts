@@ -76,7 +76,7 @@ export class UploadExamFileService {
       );
 
       const fileType = file.originalname.split('.')[file.originalname.split('.').length - 1];
-      const path = companyId + '/exams/' + `${v4()}` + '.' + fileType;
+      const path = 'exams/' + `${companyId + '--' + v4()}` + '.' + fileType;
 
       const { url } = await this.amazonStorageProvider.upload({
         file: file.buffer,

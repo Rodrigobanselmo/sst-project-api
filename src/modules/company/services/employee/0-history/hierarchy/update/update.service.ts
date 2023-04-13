@@ -25,7 +25,6 @@ export class UpdateEmployeeHierarchyHistoryService {
   ) {}
 
   async execute(dataDto: UpdateEmployeeHierarchyHistoryDto, user: UserPayloadDto, history?: EmployeeHierarchyHistoryEntity, employee?: EmployeeEntity) {
-    console.log(dataDto);
     if (!history) {
       history = await this.employeeHierarchyHistoryRepository.findFirstNude({
         where: { id: dataDto.id, employeeId: dataDto.employeeId, employee: { companyId: user.targetCompanyId } },
