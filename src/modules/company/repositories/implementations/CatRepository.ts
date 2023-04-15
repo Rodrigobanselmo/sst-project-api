@@ -124,10 +124,10 @@ export class CatRepository {
     return cats.map((cat) => new CatEntity(cat));
   }
 
-  async findEvent2210(options: Prisma.CatFindManyArgs = {}) {
+  async findEvent2210(companyId: string, options: Prisma.CatFindManyArgs = {}) {
     return this.findNude({
       ...options,
-      where: { sendEvent: true, events: { none: { action: 'EXCLUDE', status: { in: ['DONE', 'TRANSMITTED'] } } }, ...options?.where },
+      where: { employee: { companyId }, sendEvent: true, events: { none: { action: 'EXCLUDE', status: { in: ['DONE', 'TRANSMITTED'] } } }, ...options?.where },
       include: {
         events: { select: { status: true, id: true, receipt: true, action: true } },
         doc: { include: { professional: { select: { cpf: true, name: true, id: true } } } },

@@ -48,7 +48,7 @@ export class UpdateDocumentService {
     }
 
     const fileType = file.originalname.split('.')[file.originalname.split('.').length - 1];
-    const path = companyId + '/documents/' + `${documentFound?.name || ''}-${v4()}` + '.' + fileType;
+    const path = 'documents/' + `${documentFound?.name || ''}-${v4()}` + '.' + fileType;
 
     const { url } = await this.amazonStorageProvider.upload({
       file: file.buffer,

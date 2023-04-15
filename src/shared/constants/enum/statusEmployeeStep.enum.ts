@@ -1,0 +1,7 @@
+export enum StatusEmployeeStepEnum {
+  IN_DEMISSION = 'IN_DEMISSION',
+  DEMISSION = 'DEMISSION',
+  IN_ADMISSION = 'IN_ADMISSION',
+  ADMISSION = 'ADMISSION',
+  IN_TRANS = 'IN_TRANS',
+}

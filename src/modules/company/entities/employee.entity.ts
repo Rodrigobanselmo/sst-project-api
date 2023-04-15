@@ -1,3 +1,6 @@
+import { StatusEmployeeStepEnum } from './../../../shared/constants/enum/statusEmployeeStep.enum';
+import { getEmployeeRowStatus } from './../../../shared/utils/getExpiredExamStatus.utils';
+import { StatusExamEnum } from 'src/shared/constants/enum/statusExam.enum';
 import { ApiProperty } from '@nestjs/swagger';
 import { Company, Employee, Hierarchy, SexTypeEnum, StatusEnum } from '@prisma/client';
 import { EmployeePPPHistoryEntity } from './employee-ppp-history.entity';
@@ -73,6 +76,8 @@ export class EmployeeEntity implements Employee {
   cbo: string;
   rg: string;
   isPCD: boolean;
+  statusExam?: StatusExamEnum;
+  statusStep?: StatusEmployeeStepEnum;
   // sendEvent: boolean;
   company?: CompanyEntity;
   cids?: CidEntity[];
@@ -124,12 +129,35 @@ export class EmployeeEntity implements Employee {
       this.examsHistory = this.examsHistory.map((examsHistory) => new EmployeeExamsHistoryEntity(examsHistory));
       this.scheduleExam = this.examsHistory.find((p) => p?.status == 'PROCESSING');
       this.lastDoneExam = this.examsHistory.find((p) => p?.status == 'DONE');
+      this.statusExam = getEmployeeRowStatus(this as EmployeeEntity);
     }
 
     if (this.hierarchyHistory) {
       this.hierarchyHistory = this.hierarchyHistory.map((hierarchyHistory) => new EmployeeHierarchyHistoryEntity(hierarchyHistory));
       const admissionDate = this.hierarchyHistory.find((h) => h?.motive == 'ADM')?.startDate;
       if (admissionDate) this.admissionDate = admissionDate;
+    }
+
+    if (this.statusExam && this.hierarchyHistory) {
+      if (this.hierarchyId) {
+        this.statusStep = StatusEmployeeStepEnum.ADMISSION;
+
+        if ((!this.lastExam && !this.lastDoneExam) || this.lastDoneExam?.examType == 'DEMI') this.statusStep = StatusEmployeeStepEnum.IN_ADMISSION;
+        if (this.hierarchyHistory?.[0]?.motive == 'ADM' && this.lastDoneExam?.examType == 'DEMI') this.statusStep = StatusEmployeeStepEnum.IN_ADMISSION;
+      } else if (!this.hierarchyId) {
+        if (this.hierarchyHistory?.[0]?.motive == 'DEM') {
+          if (this.lastDoneExam?.examType == 'DEMI') this.statusStep = StatusEmployeeStepEnum.DEMISSION;
+          else this.statusStep = StatusEmployeeStepEnum.IN_DEMISSION;
+        }
+
+        if (this.hierarchyHistory?.[0]?.motive == 'ADM' && [StatusExamEnum.EXPIRED, StatusExamEnum.PENDING, StatusExamEnum.PROCESSING].includes(this.statusExam)) {
+          if ((!this.lastExam && !this.lastDoneExam) || this.lastDoneExam?.examType == 'DEMI') this.statusStep = StatusEmployeeStepEnum.IN_ADMISSION;
+        }
+
+        if (this.hierarchyHistory?.[0]?.motive == undefined) {
+          this.statusStep = StatusEmployeeStepEnum.IN_ADMISSION;
+        }
+      }
     }
   }
 }

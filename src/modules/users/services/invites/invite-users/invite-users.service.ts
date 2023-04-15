@@ -102,7 +102,7 @@ export class InviteUsersService {
       expires_date,
     );
 
-    await inviteNewUser(this.mailProvider, invite);
+    if (invite.email) await inviteNewUser(this.mailProvider, invite);
 
     return invite;
   }

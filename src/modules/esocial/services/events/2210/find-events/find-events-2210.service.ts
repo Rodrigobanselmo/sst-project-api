@@ -34,7 +34,7 @@ export class FindEvents2210ESocialService {
         },
       };
 
-    const cats = await this.catRepository.findEvent2210();
+    const cats = await this.catRepository.findEvent2210(companyId);
     const eventsStruct = this.eSocialEventProvider.convertToEvent2210Struct(company, cats);
 
     const eventsXml = eventsStruct.map((data) => {

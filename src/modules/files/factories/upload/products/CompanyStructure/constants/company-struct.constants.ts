@@ -1,3 +1,4 @@
+import { normalizeToUpperString } from './../../../../../../../shared/utils/normalizeString';
 import { SexTypeEnumTranslateBrToUs, SexTypeEnumTranslatedNotes } from './../../../../../../../shared/utils/translate/sexType.translate';
 import { checkIsValidCpf } from './../../../../../../../shared/utils/validators/checkIsValidCpf';
 import { ReportColorEnum, ReportFillColorEnum } from './../../../../report/types/IReportFactory.types';
@@ -182,23 +183,28 @@ export const CompanyStructColumnMap: IColumnRuleMap<CompanyStructHeaderEnum> = {
   [CompanyStructHeaderEnum.DIRECTORY]: {
     field: CompanyStructHeaderEnum.DIRECTORY,
     checkHandler: checkIsString,
+    transform: (v) => normalizeToUpperString(v),
   },
   [CompanyStructHeaderEnum.MANAGEMENT]: {
     field: CompanyStructHeaderEnum.MANAGEMENT,
     checkHandler: checkIsString,
+    transform: (v) => normalizeToUpperString(v),
   },
   [CompanyStructHeaderEnum.SECTOR]: {
     field: CompanyStructHeaderEnum.SECTOR,
     checkHandler: checkIsString,
+    transform: (v) => normalizeToUpperString(v),
     requiredIfOneExist: [CompanyStructHeaderEnum.EMPLOYEE_ADMISSION, CompanyStructHeaderEnum.OFFICE],
   },
   [CompanyStructHeaderEnum.SUB_SECTOR]: {
     field: CompanyStructHeaderEnum.SUB_SECTOR,
     checkHandler: checkIsString,
+    transform: (v) => normalizeToUpperString(v),
   },
   [CompanyStructHeaderEnum.OFFICE]: {
     field: CompanyStructHeaderEnum.OFFICE,
     checkHandler: checkIsString,
+    transform: (v) => normalizeToUpperString(v),
     requiredIfOneExist: [
       CompanyStructHeaderEnum.EMPLOYEE_ADMISSION,
       CompanyStructHeaderEnum.SUB_OFFICE,
@@ -210,6 +216,7 @@ export const CompanyStructColumnMap: IColumnRuleMap<CompanyStructHeaderEnum> = {
   [CompanyStructHeaderEnum.SUB_OFFICE]: {
     field: CompanyStructHeaderEnum.SUB_OFFICE,
     checkHandler: checkIsString,
+    transform: (v) => normalizeToUpperString(v),
   },
   [CompanyStructHeaderEnum.OFFICE_DESCRIPTION]: {
     field: CompanyStructHeaderEnum.OFFICE_DESCRIPTION,

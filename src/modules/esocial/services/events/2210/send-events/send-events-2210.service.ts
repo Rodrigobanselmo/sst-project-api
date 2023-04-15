@@ -44,7 +44,7 @@ export class SendEvents2210ESocialService {
 
     if (!startDate || esocialSend == null) throw new BadRequestException('Data de início do eSocial ou tipo de envio não informado para essa empresa');
 
-    const cats = await this.catRepository.findEvent2210();
+    const cats = await this.catRepository.findEvent2210(companyId);
 
     const eventsStruct = this.eSocialEventProvider.convertToEvent2210Struct(company, cats, { ideEvento: body });
 

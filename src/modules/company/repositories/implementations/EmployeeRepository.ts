@@ -257,6 +257,14 @@ export class EmployeeRepository {
       lastExam: true,
       status: true,
       hierarchy: { select: { id: true, name: true, companyId: true } },
+      hierarchyHistory: {
+        select: {
+          motive: true,
+          startDate: true,
+        },
+        orderBy: { startDate: 'desc' },
+        take: 1,
+      },
       ...options?.select,
     };
 
