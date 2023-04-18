@@ -7,6 +7,7 @@ import { UserPayloadDto } from '../../../../../../../shared/dto/user-payload.dto
 import { EmployeeRepository } from '../../../../../repositories/implementations/EmployeeRepository';
 import { UpdateEmployeeExamHistoryDto } from './../../../../../dto/employee-exam-history';
 import { EmployeeExamsHistoryRepository } from './../../../../../repositories/implementations/EmployeeExamsHistoryRepository';
+import { StatusEnum } from '@prisma/client';
 
 @Injectable()
 export class UpdateEmployeeExamHistoryService {
@@ -27,13 +28,9 @@ export class UpdateEmployeeExamHistoryService {
       },
     });
 
-    //tenant
-    if (!found?.id) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_NOT_FOUND);
+    if (dataDto.status === 'EXPIRED') dataDto.status = found.status;
 
-    // const ignoreFields = [];
-    // if (dataDto.status != 'CANCELED') {
-    //   ignoreFields.push('status');
-    // }
+    if (!found?.id) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_NOT_FOUND);
 
     const isEqual = compareFieldValues(found, dataDto, {
       fields: checkExamFields,
@@ -42,11 +39,15 @@ export class UpdateEmployeeExamHistoryService {
     const history = await this.employeeExamHistoryRepository.update({
       ...dataDto,
       ...(!isEqual && { sendEvent: true }),
+      ...(dataDto.status != found.status && {
+        userDoneId: user.userId,
+      }),
     });
 
     this.checkEmployeeExamService.execute({
       employeeId: dataDto.employeeId,
     });
+
     return history;
   }
 }

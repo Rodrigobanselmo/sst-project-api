@@ -17,6 +17,8 @@ export class FindCompanyScheduleEmployeeExamHistoryService {
     //   StatusEnum.INACTIVE,
     // ];
 
+    // if (!query.notInStatus) query.notInStatus = [StatusEnum.CANCELED];
+
     const employeesExams = await this.employeeExamHistoryRepository.find(
       {
         ...query,
@@ -33,6 +35,13 @@ export class FindCompanyScheduleEmployeeExamHistoryService {
           employeeId: true,
           hierarchyId: true,
           subOfficeId: true,
+          conclusion: true,
+          evaluationType: true,
+          fileUrl: true,
+          userDone: { select: { id: true, name: true, email: true } },
+          userSchedule: { select: { id: true, name: true, email: true } },
+          time: true,
+          clinic: { select: { id: true, fantasy: true, address: true } },
           exam: { select: { id: true, name: true, isAttendance: true, isAvaliation: true } },
           status: true,
           employee: {
@@ -43,6 +52,7 @@ export class FindCompanyScheduleEmployeeExamHistoryService {
               companyId: true,
               birthday: true,
               phone: true,
+              email: true,
               sex: true,
               company: {
                 select: {
@@ -60,7 +70,7 @@ export class FindCompanyScheduleEmployeeExamHistoryService {
           AND: [
             {
               status: {
-                notIn: [StatusEnum.PENDING, StatusEnum.CANCELED],
+                notIn: [StatusEnum.PENDING],
               },
             },
           ],
@@ -77,8 +87,9 @@ export class FindCompanyScheduleEmployeeExamHistoryService {
           // ],
           // employee: { companyId },
         },
-        orderBy: [{ status: 'asc' }, { doneDate: 'desc' }, { exam: { isAttendance: 'desc' } }],
-        distinct: ['doneDate', 'employeeId'],
+        orderBy: [{ doneDate: 'desc' }, { time: 'desc' }, { exam: { isAttendance: 'desc' } }],
+        // orderBy: [{ status: 'asc' }, { doneDate: 'desc' }, { exam: { isAttendance: 'desc' } }],
+        distinct: ['doneDate', 'time', 'employeeId', 'status'],
       },
     );
 

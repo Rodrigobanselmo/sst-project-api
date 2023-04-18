@@ -61,13 +61,18 @@ export class UpdateManyScheduleExamHistoryService {
     data = data.map((exam) => {
       const foundExam = found.examsHistory.find((e) => e.id === exam.id);
 
+      if (exam.status === 'EXPIRED') exam.status = foundExam.status;
+
       const isEqual = compareFieldValues(foundExam, exam, {
         fields: checkExamFields,
       });
 
       return {
-        ...(isEqual && { sendEvent: true }),
+        ...(!isEqual && { sendEvent: true }),
         ...exam,
+        ...(exam.status != foundExam.status && {
+          userDoneId: user.userId,
+        }),
       };
     });
 

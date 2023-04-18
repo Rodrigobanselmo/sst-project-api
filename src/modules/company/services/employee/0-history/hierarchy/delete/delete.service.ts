@@ -24,7 +24,7 @@ export class DeleteEmployeeHierarchyHistoryService {
   async execute(id: number, employeeId: number, user: UserPayloadDto) {
     const history = await this.employeeHierarchyHistoryRepository.findFirstNude({
       where: { id, employeeId },
-      select: { id: true, employeeId: true, startDate: true, employee: { select: { id: true } } },
+      select: { id: true, employeeId: true, startDate: true, employee: { select: { id: true, cpf: true } } },
     });
 
     const found = history.employee;
@@ -85,7 +85,7 @@ export class DeleteEmployeeHierarchyHistoryService {
       const isAfterOk = historyRules[String(afterMotive)]?.before?.includes(beforeMotive);
       const isBeforeOk = historyRules[String(beforeMotive)]?.after?.includes(afterMotive);
 
-      if (!isAfterOk || !isBeforeOk) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_BLOCK_HISTORY);
+      if (!isAfterOk || !isBeforeOk) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_BLOCK_HISTORY + (foundEmployee?.cpf ? ` ${foundEmployee.cpf}` : ''));
     }
 
     const getActualEmployeeHierarchy = () => {

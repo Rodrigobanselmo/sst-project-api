@@ -160,6 +160,10 @@ export class UpdateEmployeeExamHistoryDto extends PartialType(CreateEmployeeExam
   @IsOptional()
   doctorId?: number;
 
+  @IsInt()
+  @IsOptional()
+  userDoneId?: number;
+
   @IsString()
   @IsOptional()
   time?: string;
@@ -231,46 +235,16 @@ export class UpdateFileExamDto {
   ids: number[];
 }
 
-export class FindEmployeeExamHistoryDto extends PaginationQueryDto {
-  @IsString()
-  @IsOptional()
-  search?: string;
-
-  @IsString()
-  companyId?: string;
-
-  @IsInt()
-  @IsOptional()
-  examId?: number;
-
-  @IsInt()
-  @IsOptional()
-  employeeId?: number;
-
-  @IsBoolean()
-  @ToBoolean()
-  @IsOptional()
-  allCompanies?: boolean;
-
-  @IsBoolean()
-  @ToBoolean()
-  @IsOptional()
-  allExams?: boolean;
-
-  @IsBoolean()
-  @ToBoolean()
-  @IsOptional()
-  orderByCreation?: boolean;
-
-  @IsBoolean()
-  @ToBoolean()
-  @IsOptional()
-  includeClinic?: boolean;
-
+export class QueryFiltersEmployeeExamHistory extends PaginationQueryDto {
   @Transform(QueryArray, { toClassOnly: true })
   @IsString({ each: true })
   @IsOptional()
   status?: string[];
+
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsString({ each: true })
+  @IsOptional()
+  notInStatus?: string[];
 
   @Transform(QueryArray, { toClassOnly: true })
   @IsString({ each: true })
@@ -314,6 +288,48 @@ export class FindEmployeeExamHistoryDto extends PaginationQueryDto {
     each: true,
   })
   notInEvaluationType?: ExamHistoryEvaluationEnum[];
+
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsString({ each: true })
+  @IsOptional()
+  notInAvaliationType?: string[];
+}
+
+export class FindEmployeeExamHistoryDto extends QueryFiltersEmployeeExamHistory {
+  @IsString()
+  @IsOptional()
+  search?: string;
+
+  @IsString()
+  companyId?: string;
+
+  @IsInt()
+  @IsOptional()
+  examId?: number;
+
+  @IsInt()
+  @IsOptional()
+  employeeId?: number;
+
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  allCompanies?: boolean;
+
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  allExams?: boolean;
+
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  orderByCreation?: boolean;
+
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  includeClinic?: boolean;
 }
 
 export class FindClinicEmployeeExamHistoryDto {
@@ -329,6 +345,21 @@ export class FindClinicEmployeeExamHistoryDto {
   @IsOptional()
   examIsAvaliation?: boolean;
 
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  getClinic?: boolean;
+
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  getUser?: boolean;
+
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  getHierarchy?: boolean;
+
   @ValidateIf((o) => !o.employeeId)
   @Transform(DateFormat, { toClassOnly: true })
   @IsDate({ message: 'Data inválida' })
@@ -342,7 +373,7 @@ export class FindClinicEmployeeExamHistoryDto {
   notAfterDate: Date;
 }
 
-export class FindCompanyEmployeeExamHistoryDto extends PaginationQueryDto {
+export class FindCompanyEmployeeExamHistoryDto extends QueryFiltersEmployeeExamHistory {
   @IsString()
   @IsOptional()
   search?: string;

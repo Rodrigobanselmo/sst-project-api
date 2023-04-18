@@ -82,6 +82,14 @@ export class ExamToClinicRepository {
     return data.map((exam) => new ExamToClinicEntity(exam));
   }
 
+  async findFirstNude(options: Prisma.ExamToClinicFindManyArgs = {}) {
+    const examClinic = await this.prisma.examToClinic.findFirst({
+      ...options,
+    });
+
+    return new ExamToClinicEntity(examClinic);
+  }
+
   async find(query: Partial<FindExamToClinicDto>, pagination: PaginationQueryDto, options: Prisma.ExamToClinicFindManyArgs = {}) {
     const whereInit = {
       AND: [],
@@ -122,5 +130,13 @@ export class ExamToClinicRepository {
       data: response[1].map((exam) => new ExamToClinicEntity(exam as any)),
       count: response[0],
     };
+  }
+
+  async delete(id: number) {
+    const examToClinic = await this.prisma.examToClinic.delete({
+      where: { id },
+    });
+
+    return new ExamToClinicEntity(examToClinic);
   }
 }

@@ -23,7 +23,7 @@ export class CreateEmployeeHierarchyHistoryService {
 
   async execute(dataDto: CreateEmployeeHierarchyHistoryDto, user: UserPayloadDto, employee?: EmployeeEntity) {
     if (!employee) {
-      employee = await this.employeeRepository.findById(dataDto.employeeId, user.targetCompanyId, { select: { id: true } });
+      employee = await this.employeeRepository.findById(dataDto.employeeId, user.targetCompanyId, { select: { id: true, cpf: true } });
 
       if (!employee?.id) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_NOT_FOUND);
     }
@@ -69,7 +69,7 @@ export class CreateEmployeeHierarchyHistoryService {
     histories,
   }: {
     dataDto: Partial<CreateEmployeeHierarchyHistoryDto & { id?: number }>;
-    foundEmployee: Pick<EmployeeEntity, 'id'>;
+    foundEmployee: Pick<EmployeeEntity, 'id' | 'cpf'>;
     histories?: EmployeeHierarchyHistoryEntity[];
   }) {
     if (!dataDto.startDate) throw new BadRequestException('missing start date');
@@ -100,7 +100,7 @@ export class CreateEmployeeHierarchyHistoryService {
       afterMotive = afterHistory?.motive || null;
       const isAfterOk = historyRules[dataDto.motive].after.includes(afterMotive);
 
-      if (!isAfterOk) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_BLOCK_HISTORY);
+      if (!isAfterOk) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_BLOCK_HISTORY + (foundEmployee?.cpf ? ` ${foundEmployee.cpf}` : ''));
     }
 
     // CHECK BEFORE
@@ -135,7 +135,7 @@ export class CreateEmployeeHierarchyHistoryService {
 
       const isBeforeOk = historyRules[dataDto.motive].before.includes(beforeMotive);
 
-      if (!isBeforeOk) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_BLOCK_HISTORY);
+      if (!isBeforeOk) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_BLOCK_HISTORY + (foundEmployee?.cpf ? ` ${foundEmployee.cpf}` : ''));
     }
 
     const getActualEmployeeHierarchy = () => {

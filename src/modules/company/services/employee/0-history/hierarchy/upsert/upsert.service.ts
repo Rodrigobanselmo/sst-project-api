@@ -21,7 +21,7 @@ export class UpsertEmployeeHierarchyHistoryService {
   async execute(dataDto: CreateEmployeeHierarchyHistoryDto & { companyId: string }, user: UserPayloadDto, employee?: EmployeeEntity) {
     if (!employee) {
       employee = await this.employeeRepository.findById(dataDto.employeeId, dataDto.companyId, {
-        select: { id: true, hierarchyHistory: true },
+        select: { id: true, hierarchyHistory: true, cpf: true },
       });
     }
 

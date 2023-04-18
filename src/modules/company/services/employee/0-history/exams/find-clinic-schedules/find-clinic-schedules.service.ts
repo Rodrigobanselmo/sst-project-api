@@ -21,6 +21,7 @@ export class FindClinicScheduleEmployeeExamHistoryService {
         cpf: true,
         birthday: true,
         phone: true,
+        email: true,
         sex: true,
         company: {
           select: {
@@ -45,6 +46,17 @@ export class FindClinicScheduleEmployeeExamHistoryService {
             time: true,
             evaluationType: true,
             status: true,
+            ...(query.getClinic && {
+              clinic: { select: { id: true, name: true, fantasy: true, address: true } },
+            }),
+            ...(query.getUser && {
+              userDone: { select: { id: true, name: true, email: true } },
+              userSchedule: { select: { id: true, name: true, email: true } },
+            }),
+            ...(query.getHierarchy && {
+              hierarchy: { select: { name: true, id: true, type: true } },
+              subOffice: { select: { name: true, id: true, type: true } },
+            }),
           },
           where: {
             status: { in: status },

@@ -97,6 +97,7 @@ import { FindRiskByIdService } from './services/risk/find-one/find-one.service';
 import { FindRecMedService } from './services/rec-med/find-rec-med/find-rec-med.service';
 import { FindGenerateSourceService } from './services/generate-source/find-generate-source/find-generate-source.service';
 import { ReloadEmployeeExamTimeService } from './services/exam/reload-employee-exam-time/reload-employee-exam-time.service';
+import { DeleteExamToClinicService } from './services/examToClinic/delete-exam-to-clinic/find-exam-to-clinic.service';
 
 @Module({
   controllers: [
@@ -198,6 +199,7 @@ import { ReloadEmployeeExamTimeService } from './services/exam/reload-employee-e
     FindRecMedService,
     FindGenerateSourceService,
     ReloadEmployeeExamTimeService,
+    DeleteExamToClinicService,
   ],
   exports: [
     RiskRepository,

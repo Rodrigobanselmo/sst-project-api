@@ -1,10 +1,10 @@
 import { onlyNumbers } from '@brazilian-utils/brazilian-utils';
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { ExamHistoryEvaluationEnum, Prisma, StatusEnum } from '@prisma/client';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
-import { DayJSProvider } from '../../../../shared/providers/DateProvider/implementations/DayJSProvider';
+import { DayJSProvider, dayjs } from '../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { prismaFilter } from '../../../../shared/utils/filters/prisma.filters';
 import { CreateEmployeeExamHistoryDto, FindEmployeeExamHistoryDto, UpdateEmployeeExamHistoryDto, UpdateManyScheduleExamDto } from '../../dto/employee-exam-history';
 import { EmployeeExamsHistoryEntity } from '../../entities/employee-exam-history.entity';
@@ -146,6 +146,7 @@ export class EmployeeExamsHistoryRepository {
       skip: [
         'search',
         'companyId',
+        'notInAvaliationType',
         'allCompanies',
         'userCompany',
         'companiesIds',
@@ -155,6 +156,7 @@ export class EmployeeExamsHistoryRepository {
         'clinicsIds',
         'notInEvaluationType',
         'notInExamType',
+        'notInStatus',
       ],
     });
 
@@ -205,13 +207,68 @@ export class EmployeeExamsHistoryRepository {
 
     if ('notInEvaluationType' in query) {
       (where.AND as any).push({
-        evaluationType: { notIn: query.notInEvaluationType },
+        OR: [
+          {
+            evaluationType: { notIn: query.notInEvaluationType },
+          },
+          ...(query.notInEvaluationType?.includes(ExamHistoryEvaluationEnum.NONE) ? [] : [{ evaluationType: { equals: null } }]),
+        ],
+      } as typeof whereOptions);
+    }
+
+    if ('notInStatus' in query) {
+      const notInStatus = query.notInStatus;
+      const isExpired = !query.notInStatus?.includes(StatusEnum.EXPIRED);
+      const iSchedule = !query.notInStatus?.includes(StatusEnum.PROCESSING);
+
+      if (!isExpired) notInStatus.push(StatusEnum.PROCESSING);
+
+      (where.AND as any).push({
+        OR: [
+          {
+            status: { notIn: notInStatus },
+          },
+          ...(iSchedule ? [{ status: StatusEnum.PROCESSING, doneDate: { gte: dayjs().tz('America/Sao_Paulo', true).toDate() } }] : []),
+          ...(isExpired ? [{ status: StatusEnum.PROCESSING, doneDate: { lte: dayjs().tz('America/Sao_Paulo', true).toDate() } }] : []),
+        ],
       } as typeof whereOptions);
     }
 
     if ('notInExamType' in query) {
       (where.AND as any).push({
         examType: { notIn: query.notInExamType },
+      } as typeof whereOptions);
+    }
+
+    if ('notInAvaliationType' in query) {
+      const isAttendance = !query.notInAvaliationType?.includes('isAttendance');
+      const isComplementary = !query.notInAvaliationType?.includes('isComplementary');
+      const isAvaliation = !query.notInAvaliationType?.includes('isAvaliation');
+
+      (where.AND as any).push({
+        OR: [
+          ...(isAttendance
+            ? [
+                {
+                  exam: { isAttendance: true, isAvaliation: false },
+                },
+              ]
+            : []),
+          ...(isComplementary
+            ? [
+                {
+                  exam: { isAttendance: false, isAvaliation: false },
+                },
+              ]
+            : []),
+          ...(isAvaliation
+            ? [
+                {
+                  exam: { isAvaliation: true },
+                },
+              ]
+            : []),
+        ],
       } as typeof whereOptions);
     }
 

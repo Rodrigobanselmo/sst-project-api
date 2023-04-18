@@ -121,6 +121,14 @@ export class ExamRepository {
     };
   }
 
+  async findFirstNude(options: Prisma.ExamFindManyArgs = {}) {
+    const examClinic = await this.prisma.exam.findFirst({
+      ...options,
+    });
+
+    return new ExamEntity(examClinic);
+  }
+
   async findAll(): Promise<ExamEntity[]> {
     const exams = await this.prisma.exam.findMany();
 

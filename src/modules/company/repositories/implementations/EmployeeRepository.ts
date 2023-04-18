@@ -110,6 +110,7 @@ export class EmployeeRepository {
       select: {
         id: true,
         hierarchyHistory: true,
+        cpf: true,
       },
     });
 

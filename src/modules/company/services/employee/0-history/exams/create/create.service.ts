@@ -26,7 +26,7 @@ export class CreateEmployeeExamHistoryService {
 
     if (!found?.id) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_NOT_FOUND);
 
-    await this.checkOtherSchedulesAndCancel(dataDto, found);
+    await this.checkOtherSchedulesAndCancel(dataDto, found, user);
     await this.changeHierarchy(dataDto, user);
 
     const history = await this.employeeExamHistoryRepository.create({
@@ -57,7 +57,7 @@ export class CreateEmployeeExamHistoryService {
     };
   }
 
-  async checkOtherSchedulesAndCancel(dataDto: CreateEmployeeExamHistoryDto, employee: EmployeeEntity) {
+  async checkOtherSchedulesAndCancel(dataDto: CreateEmployeeExamHistoryDto, employee: EmployeeEntity, user: UserPayloadDto) {
     const examsIds = dataDto.examsData.map((x) => x.examId);
 
     if (dataDto.examId) examsIds.push(dataDto.examId);
@@ -73,7 +73,7 @@ export class CreateEmployeeExamHistoryService {
     const cancelIds = oldSchedules.map((e) => e.id);
 
     await this.employeeExamHistoryRepository.updateByIds({
-      data: { status: StatusEnum.CANCELED },
+      data: { status: StatusEnum.CANCELED, userDoneId: user.userId },
       where: { id: { in: cancelIds } },
     });
   }

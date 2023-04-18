@@ -54,7 +54,15 @@ export class PdfAsoDataService {
       orderBy: { doneDate: 'desc' },
       select: {
         id: true,
-        clinic: { select: { id: true, fantasy: true } },
+        clinic: {
+          select: {
+            id: true,
+            contacts: { select: { phone: true, id: true, isPrincipal: true, email: true }, take: 1, orderBy: { isPrincipal: 'desc' } },
+            fantasy: true,
+            address: true,
+            doctorResponsible: { include: { professional: { select: { name: true, id: true } } } },
+          },
+        },
         examType: true,
         employee: {
           select: {
@@ -90,6 +98,7 @@ export class PdfAsoDataService {
                         cnpj: true,
                         logoUrl: true,
                         fantasy: true,
+                        address: true,
                         contacts: { select: { phone: true, id: true, isPrincipal: true, email: true }, take: 1, orderBy: { isPrincipal: 'desc' } },
                       },
                     },
