@@ -166,8 +166,8 @@ export const paragraphNewNormal = (text: string, { children, color, ...options }
           });
 
           const textRuns: (TextRun | ExternalHyperlink)[] = [];
-          arrayRange.forEach((key, index) => {
-            const nextKey = arrayRange[index + 1];
+          arrayRange.forEach((key, indexRange) => {
+            const nextKey = arrayRange[indexRange + 1];
             const filter = [...entityRange, ...inlineStyleRange].filter((s) => s.offset <= Number(key) && s.length + s.offset >= Number(nextKey));
             if (nextKey) {
               const offset = Number(key);
@@ -192,13 +192,13 @@ export const paragraphNewNormal = (text: string, { children, color, ...options }
                 const textValue = text.substring(offset, offsetEnd);
                 const paragraphNormal = getParagraphNormal(textValue);
 
-                paragraphNormal.forEach(({ isLink, text, ...item }) => {
+                paragraphNormal.forEach(({ isLink, text, ...item }, indexParagraph) => {
                   if (!isLink) {
                     const textRun = new TextRun({
                       text,
                       size: options?.size ? options?.size * 2 : undefined,
                       ...(color && { color: color }),
-                      ...(isBreak && index == 0 && { break: true }),
+                      ...(isBreak && indexRange == 0 && indexParagraph == 0 && { break: true }),
                       ...styles,
                       ...item,
                     });
