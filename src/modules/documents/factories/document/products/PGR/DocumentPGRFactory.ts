@@ -37,6 +37,7 @@ import { hierarchyConverter } from '../../../../docx/converter/hierarchy.convert
 import { IGetDocument, ISaveDocument } from '../../types/IDocumentFactory.types';
 import { IDocumentPGRBody } from './types/pgr.types';
 import { DocumentModelRepository } from '../../../../repositories/implementations/DocumentModelRepository';
+import { simpleCompanyId } from 'src/shared/constants/ids';
 
 @Injectable()
 export class DocumentPGRFactory extends DocumentFactoryAbstractionCreator<IDocumentPGRBody, any> {
@@ -95,6 +96,7 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
     const homogeneousGroupPromise = this.homoGroupRepository.findDocumentData(companyId, { workspaceId });
     const versionsPromise = this.riskDocumentRepository.findDocumentData(riskGroupId, companyId, DocumentTypeEnum.PGR);
     const modelDataPromise = this.documentModelData(company.documentData[0].modelId, companyId);
+    // const simpleCompanyPromise = this.companyRepository.findFirstNude({ where: { id: simpleCompanyId }, include: { address: true, covers: true } });
 
     const [workspace, riskGroupData, hierarchies, homogeneousGroupsFound, versions, modelData] = await Promise.all([
       workspacePromise,
@@ -338,7 +340,7 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
     if (logo) this.unlinkPaths.push(logo);
     if (consultantLogo) this.unlinkPaths.push(consultantLogo);
 
-    return { logo, consultantLogo };
+    return { logo, consultantLogo: consultantLogo || 'images/logo/logo-simple.png' };
   }
 
   private getHierarchyData(homogeneousGroups: HomoGroupEntity[], hierarchies: HierarchyEntity[], characterizations: CharacterizationEntity[]) {
