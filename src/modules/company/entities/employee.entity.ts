@@ -99,17 +99,17 @@ export class EmployeeEntity implements Employee {
 
     if (!options.skipNewExamAdded && this.newExamAdded) {
       //? toda vez que um novo exame é adicionado a um funcionario ou cargo e o funcionario possui um exame expirado, ele salva a data de hoje como newExamAdded
-      if (!this.expiredDateExam) this.expiredDateExam = this.newExamAdded;
-      if (this.expiredDateExam > this.newExamAdded) this.expiredDateExam = this.newExamAdded;
 
       if (this.examsHistory) {
         this.examsHistory = this.examsHistory.map((e) => {
           if ((e?.exam?.isAttendance || e.evaluationType == 'APTO') && e.doneDate <= this.newExamAdded) {
-            if (!e.expiredDate) e.expiredDate = this.newExamAdded;
             if (e.expiredDate > this.newExamAdded) e.expiredDate = this.newExamAdded;
+            this.expiredDateExam = this.newExamAdded;
           }
           return e;
         });
+      } else {
+        if (this.expiredDateExam > this.newExamAdded) this.expiredDateExam = this.newExamAdded;
       }
     }
 

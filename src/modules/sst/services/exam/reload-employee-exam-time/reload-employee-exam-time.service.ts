@@ -95,9 +95,8 @@ export class ReloadEmployeeExamTimeService {
           if (isDismissalLastExam && isDone) {
             employee.expiredDateExam = null;
           }
+          return;
         }
-
-        return;
       }
 
       if (hasExam) {
@@ -123,6 +122,7 @@ export class ReloadEmployeeExamTimeService {
           {
             if (employee.newExamAdded && doneExamFound) {
               const doneDateExam = doneExamFound.doneDate;
+
               if (this.dayjs.format(doneDateExam, 'YYYY-MM-DD') <= this.dayjs.format(employee.newExamAdded, 'YYYY-MM-DD')) {
                 doneExamFound.expiredDate = employee.newExamAdded;
               }

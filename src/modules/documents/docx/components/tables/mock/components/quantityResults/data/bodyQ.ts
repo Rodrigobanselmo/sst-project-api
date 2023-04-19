@@ -7,7 +7,7 @@ export const rowBodyQui: [string, string, string, string][] = [
     'Muito Alto\n(Inaceitável)',
   ],
   ['50% LEO ≤ MVUE < LEO', '0,5 ≤ IJ < 1', 'Anual', 'Alto\n(Temporariamente Aceitável)'],
-  ['25% LEO ≤ MVUE < 50% LEO', '0,25 ≤ IJ < 0,5', '2 em 2 anos', 'Interromper as atividades'],
-  ['10% LEO ≤ MVUE < 25% LEO', '0,1 ≤ IJ 0,25', '2 em 2 anos', 'Moderado\n(Aceitável)'],
+  ['25% LEO ≤ MVUE < 50% LEO', '0,25 ≤ IJ < 0,5', '2 em 2 anos', 'Moderado\n(Aceitável)'],
+  ['10% LEO ≤ MVUE < 25% LEO', '0,1 ≤ IJ 0,25', '2 em 2 anos', 'Muito Baixo\n(Aceitável)'],
   ['MVUE < 10% LEO', 'IJ < 0,10', '2 em 2 anos', 'Muito Baixo\n(Aceitável)'],
 ];

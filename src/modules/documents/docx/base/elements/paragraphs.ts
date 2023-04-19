@@ -133,15 +133,21 @@ export const getParagraphNormal = (text: string) =>
     })
     .reduce((acc, curr) => [...acc, ...curr], []);
 
-export const paragraphNewNormal = (text: string, { children, color, ...options } = {} as ParagraphProps) =>
-  new Paragraph({
+export const paragraphNewNormal = (text: string, { children, color, ...options } = {} as ParagraphProps) => {
+  let hasBreakLine = false;
+  const alignment = options?.align || AlignmentType.JUSTIFIED;
+
+  return new Paragraph({
     children: [
       ...(children || []),
       ...text
         .split('\n')
         .map((text, index) => {
+          const isBreak = index != 0;
           const entityRange = options.entityRangeBlock?.[index] || [];
           const inlineStyleRange = options.inlineStyleRangeBlock?.[index] || [];
+
+          if (isBreak) hasBreakLine = isBreak;
 
           const ranges = { 0: null, [text.length]: null };
 
@@ -191,7 +197,8 @@ export const paragraphNewNormal = (text: string, { children, color, ...options }
                     const textRun = new TextRun({
                       text,
                       size: options?.size ? options?.size * 2 : undefined,
-                      ...(color ? { color: color } : {}),
+                      ...(color && { color: color }),
+                      ...(isBreak && index == 0 && { break: true }),
                       ...styles,
                       ...item,
                     });
@@ -247,9 +254,10 @@ export const paragraphNewNormal = (text: string, { children, color, ...options }
         .flat(1),
     ],
     spacing: { line: 350 },
-    alignment: options?.align || AlignmentType.JUSTIFIED,
+    alignment: hasBreakLine && alignment == AlignmentType.JUSTIFIED ? AlignmentType.START : alignment,
     ...options,
   });
+};
 
 export const pageBreak = () =>
   new Paragraph({

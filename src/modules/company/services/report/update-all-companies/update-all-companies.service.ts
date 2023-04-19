@@ -563,7 +563,7 @@ export class UpdateAllCompaniesService {
           {
             if (employee.newExamAdded && doneExamFound) {
               const doneDateExam = doneExamFound.doneDate;
-              if (doneDateExam > employee.newExamAdded) {
+              if (doneDateExam <= employee.newExamAdded) {
                 doneExamFound.expiredDate = employee.newExamAdded;
               }
             }
