@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { DocumentSectionTypeEnum } from 'src/modules/documents/docx/builders/pgr/types/section.types';
+import { DocumentSectionTypeEnum } from '../../../../../modules/documents/docx/builders/pgr/types/section.types';
 
 import { DocumentModelRepository } from '../../../repositories/implementations/DocumentModelRepository';
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';

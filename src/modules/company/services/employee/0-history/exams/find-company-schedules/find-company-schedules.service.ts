@@ -50,6 +50,7 @@ export class FindCompanyScheduleEmployeeExamHistoryService {
               id: true,
               cpf: true,
               companyId: true,
+              hierarchyId: true,
               birthday: true,
               phone: true,
               email: true,

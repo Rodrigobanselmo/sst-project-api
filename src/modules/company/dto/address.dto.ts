@@ -7,7 +7,7 @@ import { CepFormatTransform } from '../../../shared/transformers/cep-format.tran
 import { NumberFormat } from '../../../shared/transformers/number-format';
 import { StringCapitalizeTransform } from '../../../shared/transformers/string-capitalize';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
-import { StringNormalizeTransform } from '../../../shared/transformers/string-normalize.transform';
+import { StringNormalizeUpperTransform } from '../../../shared/transformers/string-normalize.transform';
 
 export class AddressDto {
   // @Matches(/[1-9][0-9]*/, {
@@ -38,12 +38,12 @@ export class AddressDto {
   neighborhood: string;
 
   @IsOptional()
-  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @Transform(StringNormalizeUpperTransform, { toClassOnly: true })
   @IsString()
   city: string;
 
   @IsOptional()
-  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @Transform(StringNormalizeUpperTransform, { toClassOnly: true })
   @IsEnum(UfStateEnum, {
     message: `UF inválido`,
     each: true,

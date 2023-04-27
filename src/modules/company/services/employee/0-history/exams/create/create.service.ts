@@ -1,7 +1,7 @@
 import { CheckEmployeeExamService } from './../../../../../../sst/services/exam/check-employee-exam/check-employee-exam.service';
 import { NotificationRepository } from './../../../../../../notifications/repositories/implementations/NotificationRepository';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { StatusEnum } from '@prisma/client';
+import { ExamHistoryTypeEnum, StatusEnum } from '@prisma/client';
 import { EmployeeEntity } from '../../../../../../../modules/company/entities/employee.entity';
 import { ErrorMessageEnum } from '../../../../../../../shared/constants/enum/errorMessage';
 
@@ -27,7 +27,7 @@ export class CreateEmployeeExamHistoryService {
     if (!found?.id) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_NOT_FOUND);
 
     await this.checkOtherSchedulesAndCancel(dataDto, found, user);
-    await this.changeHierarchy(dataDto, user);
+    await this.changeHierarchy(dataDto, found, user);
 
     const history = await this.employeeExamHistoryRepository.create({
       ...dataDto,
@@ -63,6 +63,8 @@ export class CreateEmployeeExamHistoryService {
     if (dataDto.examId) examsIds.push(dataDto.examId);
 
     const oldSchedules = await this.employeeExamHistoryRepository.findNude({
+      select: { id: true, examType: true },
+      orderBy: { created_at: 'desc' },
       where: {
         status: { in: ['PROCESSING', 'PENDING'] },
         employeeId: employee.id,
@@ -70,7 +72,43 @@ export class CreateEmployeeExamHistoryService {
       },
     });
 
-    const cancelIds = oldSchedules.map((e) => e.id);
+    const skipCancel = [];
+
+    const cancelIds = oldSchedules
+      .filter((oldExam) => {
+        const isAdm = dataDto.examType == 'ADMI';
+        const isDem = dataDto.examType == 'DEMI';
+        const isRet = dataDto.examType == 'RETU';
+        const isEva = dataDto.examType == 'EVAL';
+
+        const isAdmOld = oldExam.examType == 'ADMI';
+        const isDemOld = oldExam.examType == 'DEMI';
+        const isRetOld = oldExam.examType == 'RETU';
+        const isEvaOld = oldExam.examType == 'EVAL';
+
+        if (isAdm && isDemOld && !skipCancel.includes(ExamHistoryTypeEnum.DEMI)) {
+          skipCancel.push(ExamHistoryTypeEnum.DEMI);
+          return false;
+        }
+
+        if (isDem && isAdmOld && !skipCancel.includes(ExamHistoryTypeEnum.ADMI)) {
+          skipCancel.push(ExamHistoryTypeEnum.ADMI);
+          return false;
+        }
+
+        if ((isRet || isEva) && !skipCancel.includes(oldExam.examType)) {
+          skipCancel.push(oldExam.examType);
+          return false;
+        }
+
+        if ((isRetOld || isEvaOld) && !skipCancel.includes(oldExam.examType)) {
+          skipCancel.push(oldExam.examType);
+          return false;
+        }
+
+        return true;
+      })
+      .map((e) => e.id);
 
     await this.employeeExamHistoryRepository.updateByIds({
       data: { status: StatusEnum.CANCELED, userDoneId: user.userId },
@@ -78,28 +116,31 @@ export class CreateEmployeeExamHistoryService {
     });
   }
 
-  async changeHierarchy(dataDto: CreateEmployeeExamHistoryDto, user: UserPayloadDto) {
-    if (dataDto.changeHierarchyAnyway && dataDto.changeHierarchyDate && dataDto.hierarchyId)
-      await this.createEmployeeHierarchyHistoryService.execute(
-        {
-          employeeId: dataDto.employeeId,
-          hierarchyId: dataDto.hierarchyId,
-          motive: dataDto.examType === 'ADMI' ? 'ADM' : 'TRANS_PROM',
-          startDate: dataDto.changeHierarchyDate,
-          subOfficeId: dataDto.subOfficeId,
-        },
-        user,
-      );
+  async changeHierarchy(dataDto: CreateEmployeeExamHistoryDto, employee: EmployeeEntity, user: UserPayloadDto) {
+    if (dataDto.changeHierarchyAnyway && dataDto.changeHierarchyDate && dataDto.hierarchyId) {
+      if (employee.hierarchyId !== dataDto.hierarchyId)
+        await this.createEmployeeHierarchyHistoryService.execute(
+          {
+            employeeId: dataDto.employeeId,
+            hierarchyId: dataDto.hierarchyId,
+            motive: dataDto.examType === 'ADMI' ? 'ADM' : 'TRANS_PROM',
+            startDate: dataDto.changeHierarchyDate,
+            subOfficeId: dataDto.subOfficeId,
+          },
+          user,
+        );
+    }
 
     if (dataDto.examType === 'DEMI' && dataDto.changeHierarchyDate && !dataDto.hierarchyId)
-      await this.createEmployeeHierarchyHistoryService.execute(
-        {
-          employeeId: dataDto.employeeId,
-          hierarchyId: null,
-          motive: 'DEM',
-          startDate: dataDto.changeHierarchyDate,
-        },
-        user,
-      );
+      if (employee.hierarchyId)
+        await this.createEmployeeHierarchyHistoryService.execute(
+          {
+            employeeId: dataDto.employeeId,
+            hierarchyId: null,
+            motive: 'DEM',
+            startDate: dataDto.changeHierarchyDate,
+          },
+          user,
+        );
   }
 }

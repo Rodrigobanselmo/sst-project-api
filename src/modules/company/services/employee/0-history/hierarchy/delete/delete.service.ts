@@ -49,6 +49,7 @@ export class DeleteEmployeeHierarchyHistoryService {
     const checkExamPromise = this.checkEmployeeExamService.execute({
       employeeId,
     });
+
     await Promise.all([pppPromise, checkExamPromise]);
 
     return history;

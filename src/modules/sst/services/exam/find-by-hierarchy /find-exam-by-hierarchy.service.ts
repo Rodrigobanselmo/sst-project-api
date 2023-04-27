@@ -1,7 +1,8 @@
+import { EmployeeHierarchyHistoryRepository } from './../../../../company/repositories/implementations/EmployeeHierarchyHistoryRepository';
 import { getRiskDoc } from './../../../../../shared/utils/getRiskDoc';
 import { HierarchyEntity } from './../../../../company/entities/hierarchy.entity';
 import { Injectable } from '@nestjs/common';
-import { HomoTypeEnum, Prisma, SexTypeEnum, StatusEnum } from '@prisma/client';
+import { ExamHistoryTypeEnum, HomoTypeEnum, Prisma, SexTypeEnum, StatusEnum } from '@prisma/client';
 
 import { originRiskMap } from '../../../../../shared/constants/maps/origin-risk';
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
@@ -13,7 +14,7 @@ import { EmployeeEntity } from '../../../../company/entities/employee.entity';
 import { EmployeeRepository } from '../../../../company/repositories/implementations/EmployeeRepository';
 import { HierarchyRepository } from '../../../../company/repositories/implementations/HierarchyRepository';
 import { FindExamHierarchyDto } from '../../../dto/exam.dto';
-import { IExamOriginData, IExamEmployeeCheck } from '../../../entities/exam.entity';
+import { IExamOriginData, IExamEmployeeCheck, IExamOrigins } from '../../../entities/exam.entity';
 import { ExamRepository } from '../../../repositories/implementations/ExamRepository';
 import { RiskDataRepository } from '../../../repositories/implementations/RiskDataRepository';
 
@@ -28,11 +29,12 @@ export class FindExamByHierarchyService {
     private readonly employeeRepository: EmployeeRepository,
     private readonly examRepository: ExamRepository,
     private readonly riskDataRepository: RiskDataRepository,
+    private readonly employeeHierarchyHistoryRepository: EmployeeHierarchyHistoryRepository,
     private readonly hierarchyRepository: HierarchyRepository,
     private readonly dayjs: DayJSProvider,
   ) {}
 
-  async execute(user: Pick<UserPayloadDto, 'targetCompanyId'>, query: FindExamHierarchyDto) {
+  async execute(user: Pick<UserPayloadDto, 'targetCompanyId'>, query: FindExamHierarchyDto, options?: { employee?: EmployeeEntity }) {
     let hierarchyId = query.hierarchyId;
     const companyId = user.targetCompanyId;
     let employee: EmployeeEntity;
@@ -41,50 +43,55 @@ export class FindExamByHierarchyService {
     const date = new Date();
 
     const examType = {
-      ...('isPeriodic' in query && {
-        isPeriodic: query?.isPeriodic,
-      }),
+      ...('isPeriodic' in query && { isPeriodic: query?.isPeriodic }),
       ...('isChange' in query && { isChange: query?.isChange }),
-      ...('isAdmission' in query && {
-        isAdmission: query?.isAdmission,
-      }),
+      ...('isAdmission' in query && { isAdmission: query?.isAdmission }),
       ...('isReturn' in query && { isReturn: query?.isReturn }),
-      // ...('isDismissal' in query && {
-      //   isDismissal: query?.isDismissal,
-      // }),
     };
 
     if (query.employeeId) {
-      employee = await this.employeeRepository.findById(query.employeeId, companyId, {
-        include: {
-          subOffices: { select: { id: true } },
-          ...(query?.isDismissal &&
-            !hierarchyId && {
-              hierarchyHistory: {
-                where: { motive: { not: 'DEM' } },
-                select: { hierarchyId: true, motive: true, startDate: true, subHierarchies: { select: { id: true } } },
-                take: 1,
-              },
-            }),
-          examsHistory: {
-            orderBy: { doneDate: 'desc' },
-            where: {
-              AND: [
-                { expiredDate: { gte: new Date() } },
-                {
-                  status: query.isPendingExams ? { in: ['PENDING', 'PROCESSING'] } : 'DONE',
+      employee =
+        options?.employee && !query?.isDismissal && !query.isPendingExams
+          ? options.employee
+          : await this.employeeRepository.findFirstNude({
+              where: { id: query.employeeId, companyId },
+              include: {
+                hierarchyHistory: {
+                  select: {
+                    motive: true,
+                    startDate: true,
+                  },
+                  orderBy: { startDate: 'desc' },
+                  take: 1,
                 },
-              ],
-            },
-          },
-        },
-      });
+                subOffices: { select: { id: true } },
+                ...(query?.isDismissal &&
+                  !hierarchyId && {
+                    hierarchyHistory: {
+                      where: { motive: { not: 'DEM' } },
+                      select: { hierarchyId: true, motive: true, startDate: true, subHierarchies: { select: { id: true } } },
+                      take: 1,
+                    },
+                  }),
+                examsHistory: {
+                  orderBy: { doneDate: 'desc' },
+                  distinct: ['examId', 'status'],
+                  where: {
+                    status: query.isPendingExams ? { in: ['PENDING', 'PROCESSING'] } : 'DONE',
+                  },
+                },
+              },
+            });
 
       if (query?.isDismissal && !hierarchyId && employee.hierarchyHistory && employee.hierarchyHistory?.length > 0) {
         if (employee.hierarchyHistory[0]) {
           hierarchyId = employee.hierarchyHistory[0].hierarchyId;
           employee.subOffices = employee.hierarchyHistory[0].subHierarchies;
         }
+      }
+
+      if (employee && employee.hierarchyId && !hierarchyId) {
+        hierarchyId = employee.hierarchyId;
       }
 
       if (employee && !query.isOffice) {
@@ -94,6 +101,7 @@ export class FindExamByHierarchyService {
 
     const hierarchy = hierarchyId ? await this.hierarchyRepository.findByIdWithParent(hierarchyId, companyId) : undefined;
     hierarchies.push(...[hierarchy, ...(hierarchy?.parents || [])].filter((h) => h));
+    if (query.subOfficesIds) hierarchies.push(...query.subOfficesIds.map((id) => ({ id })));
 
     const hierarchyIds = hierarchies.map(({ id }) => id);
 
@@ -249,6 +257,7 @@ export class FindExamByHierarchyService {
 
       return { ...rd, prioritization };
     });
+
     const exams: Record<string, IExamOriginData[]> = {};
 
     riskDataOrigin.forEach((rd) => {
@@ -266,10 +275,8 @@ export class FindExamByHierarchyService {
           ...this.checkExpiredDate(examData, employee),
         });
       });
-      // exams
     });
 
-    // const examRepresentAll = hierarchyIds.length > 0 ? await this.onGetAllExams(companyId, { examsTypes: examType, onlyAttendance: query.onlyAttendance }) : { data: [] };
     const examRepresentAll = await this.onGetAllExams(companyId, { examsTypes: examType, onlyAttendance: query.onlyAttendance });
 
     examRepresentAll.data.map((exam) => {
@@ -292,74 +299,31 @@ export class FindExamByHierarchyService {
       });
     });
 
-    const lastClinicExam = {
-      expiredDate: new Date(),
-      closeToExpired: true,
-    };
+    const examsDataReturn = Object.entries(exams)
+      .map(([examId, examData]) => {
+        const origins = examData.sort((a, b) => sortNumber(a, b, 'validityInMonths')).sort((a, b) => sortNumber(a, b, 'prioritization')) as IExamOriginData[];
 
-    const examsDataReturn = (
-      Object.entries(exams)
-        .map(([examId, examData]) => {
-          const origins = examData.sort((a, b) => sortNumber(a, b, 'validityInMonths')).sort((a, b) => sortNumber(a, b, 'prioritization')) as IExamOriginData[];
+        const isAttendance = examData[0]?.exam?.isAttendance;
 
-          const isAttendance = examData[0]?.exam?.isAttendance;
-
-          if (isAttendance) {
-            const origin = origins.find((a) => !a.skipEmployee);
-            if (origin) {
-              lastClinicExam.expiredDate = origin.expiredDate;
-              lastClinicExam.closeToExpired = origin.closeToExpired;
-            }
-          }
-
-          return {
-            exam: {
-              id: examId,
-              name: examData[0]?.exam?.name,
-              isAttendance,
-            },
-            origins,
-          };
-        })
-        .sort((a, b) => sortString(a.exam, b.exam, 'name'))
-        .sort((a, b) => sortNumber(b.exam.isAttendance ? 1 : 0, a.exam.isAttendance ? 1 : 0)) as any
-    ).map((data) => {
-      data.origins = data.origins.map((origin) => {
-        if (origin.status == StatusEnum.ACTIVE) {
-          origin.status = StatusEnum.DONE;
-          origin.closeToExpired = lastClinicExam.closeToExpired;
-          origin.expiredDate = lastClinicExam.expiredDate;
-        }
-        return origin;
-      });
-
-      return data;
-    });
+        return {
+          exam: {
+            id: examId,
+            name: examData[0]?.exam?.name,
+            isAttendance,
+          },
+          origins,
+        };
+      })
+      .sort((a, b) => sortString(a.exam, b.exam, 'name'))
+      .sort((a, b) => sortNumber(b.exam.isAttendance ? 1 : 0, a.exam.isAttendance ? 1 : 0)) as any;
 
     return {
-      data: examsDataReturn as {
-        exam: {
-          id: string;
-          name: string;
-          isAttendance: boolean;
-        };
-        origins: IExamOriginData[];
-      }[],
-      // employee,
+      data: examsDataReturn as IExamOrigins[],
     };
   }
 
   checkIfSkipEmployee(examRisk: IExamEmployeeCheck, employee: EmployeeEntity) {
     if (!employee) return null;
-
-    // if (employee.lastExam) {
-    // const lastExamValid = this.dayjs
-    //   .dayjs(employee.lastExam)
-    //   .add(getValidityInMonths(employee, examRisk), 'month')
-    //   .isAfter(this.dayjs.dayjs());
-
-    // if (lastExamValid) return true;
-    // }
 
     const age = this.dayjs.dayjs().diff(employee.birthday, 'years');
     const isOutOfAgeRange = (examRisk.fromAge && examRisk.fromAge > age) || (examRisk.toAge && examRisk.toAge < age);
@@ -372,18 +336,6 @@ export class FindExamByHierarchyService {
 
     if (isNotIncludeMale) return true;
     if (isNotIncludeFemale) return true;
-
-    // const isExamValid = employee.examsHistory.some(
-    //   (exam) =>
-    //     exam.examId === examRisk.examId &&
-    //     this.dayjs.compareTime(
-    //       this.dayjs.dateNow(),
-    //       exam.expiredDate,
-    //       'days',
-    //     ) >= examRisk.considerBetweenDays,
-    // );
-
-    // if (isExamValid) return true;
 
     return false;
   }
@@ -399,7 +351,10 @@ export class FindExamByHierarchyService {
       foundExamHistory.status = StatusEnum.ACTIVE;
     }
 
-    if (!foundExamHistory?.expiredDate) return {};
+    if (!foundExamHistory?.expiredDate)
+      return {
+        expiredDate: null,
+      };
 
     const closeValidated = examRisk.considerBetweenDays || (examRisk.exam.isAttendance ? clinicExamCloseToExpire : null);
 
@@ -409,40 +364,88 @@ export class FindExamByHierarchyService {
       closeToExpired,
       expiredDate: foundExamHistory.expiredDate,
       status: foundExamHistory.status,
+      doneDate: foundExamHistory.doneDate,
     };
   }
 
-  checkCloseToExpiredDate(
-    examsDataReturn: {
-      exam: {
-        id: string;
-        name: string;
-        isAttendance: boolean;
-      };
-      origins: IExamOriginData[];
-    }[],
-  ) {
-    const foundExam = examsDataReturn.find((exam) => exam?.exam?.isAttendance);
-    if (!foundExam) return examsDataReturn;
+  filterOriginsByEmployee(examsData: IExamOrigins[], employee: EmployeeEntity, hierarchyIds: string[]): IExamOrigins[] {
+    return examsData.map(({ exam, origins, ...rest }) => {
+      const newOrigins = [];
 
-    const clinicValidityInMonths = foundExam.origins.find((exam) => !exam.skipEmployee)?.validityInMonths;
+      origins?.forEach((origin) => {
+        const isPartOfHomo = origin?.homogeneousGroup ? origin.homogeneousGroup?.hierarchies?.find((hierarchy) => hierarchyIds.includes(hierarchy?.id)) : true;
+        if (!isPartOfHomo) return;
 
-    return examsDataReturn.map((examsData) => {
-      examsData.origins = examsData.origins.map((origin) => {
-        // const closeToExpired =
-        //   considerBetweenDays !== null &&
-        //   this.dayjs.compareTime(
-        //     this.dayjs.dateNow(),
-        //     origin.expiredDate,
-        //     'days',
-        //   ) >= considerBetweenDays;
+        const skip = this.checkIfSkipEmployee(origin, employee);
+        if (skip) return false;
 
-        // if (closeToExpired) origin.closeToExpired = closeToExpired;
+        const originExpireDate = this.checkExpiredDate(origin, employee);
+        newOrigins.push({ ...origin, ...originExpireDate });
 
-        return origin;
+        return true;
       });
 
-      return examsData;
+      return {
+        exam,
+        origins: newOrigins,
+        ...rest,
+      };
+    });
+  }
+
+  filterOrigins(examsData: IExamOrigins[], examType?: ExamHistoryTypeEnum) {
+    return examsData.map(({ exam, origins }) => {
+      const isDismissal = examType === ExamHistoryTypeEnum.DEMI;
+      const isReturn = examType === ExamHistoryTypeEnum.RETU;
+      const isChange = examType === ExamHistoryTypeEnum.CHAN;
+      const isPeriodic = examType === ExamHistoryTypeEnum.PERI;
+      const isAdmission = examType === ExamHistoryTypeEnum.ADMI;
+      const isOffice = examType === ExamHistoryTypeEnum.ADMI;
+
+      origins = origins?.filter((origin) => {
+        if (origin.skipEmployee) return false;
+
+        if (isReturn) if (!origin.isReturn) return false;
+        if (isDismissal) if (!origin.isDismissal) return false;
+        if (isChange) if (!origin.isChange) return false;
+        if (isPeriodic || isOffice) if (!origin.isPeriodic) return false;
+        if (isAdmission) if (!origin.isAdmission) return false;
+
+        return true;
+      });
+
+      return {
+        exam,
+        origins,
+      };
+    });
+  }
+
+  getAllOrigins(examsData: IExamOrigins[], examType?: ExamHistoryTypeEnum) {
+    return examsData.map(({ exam, origins }) => {
+      const isDismissal = examType === ExamHistoryTypeEnum.DEMI;
+      const isReturn = examType === ExamHistoryTypeEnum.RETU;
+      const isChange = examType === ExamHistoryTypeEnum.CHAN;
+      const isPeriodic = examType === ExamHistoryTypeEnum.PERI;
+      const isAdmission = examType === ExamHistoryTypeEnum.ADMI;
+      const isOffice = examType === ExamHistoryTypeEnum.ADMI;
+
+      const origin = origins?.find((origin) => {
+        if (origin.skipEmployee) return false;
+
+        if (isReturn) if (!origin.isReturn) return false;
+        if (isDismissal) if (!origin.isDismissal) return false;
+        if (isChange) if (!origin.isChange) return false;
+        if (isPeriodic || isOffice) if (!origin.isPeriodic) return false;
+        if (isAdmission) if (!origin.isAdmission) return false;
+
+        return true;
+      });
+
+      return {
+        exam,
+        origin,
+      };
     });
   }
 
@@ -475,127 +478,61 @@ export class FindExamByHierarchyService {
 
     return examRepresentAll;
   }
-}
 
-// const Exam = await this.examRepository.findNude({
-//   include: {
-//     examToRisk: {
-//       include: {
-//         risk: {
-//           select: {
-//             name: true,
-//             id: true,
-//             representAll: true,
-//             riskFactorData: {
-//               // include: {
-//               //   homogeneousGroup: { include: { characterization: true } },
-//               // },
-//               where: {
-//                 companyId,
-//                 homogeneousGroup: {
-//                   hierarchyOnHomogeneous: {
-//                     some: {
-//                       hierarchyId: { in: hierarchyIds },
-//                     },
-//                   },
-//                 },
-//               },
-//             },
-//           },
-//         },
-//       },
-//       where: { companyId },
-//     },
-//     examToRiskData: {
-//       include: {
-//         risk: {
-//           include: {
-//             riskFactor: {
-//               select: { name: true, id: true },
-//             },
-//           },
-//         },
-//       },
-//     },
-//   },
-//   where: {
-//     AND: [
-//       {
-//         //tenant
-//         OR: [
-//           { system: true },
-//           { companyId },
-//           {
-//             company: {
-//               applyingServiceContracts: {
-//                 some: { receivingServiceCompanyId: companyId },
-//               },
-//             },
-//           },
-//           {
-//             company: {
-//               receivingServiceContracts: {
-//                 some: { applyingServiceCompanyId: companyId },
-//               },
-//             },
-//           },
-//         ],
-//       },
-//       {
-//         // rules
-//         OR: [
-//           {
-//             examToRisk: {
-//               some: {
-//                 companyId: companyId,
-//                 risk: {
-//                   riskFactorData: {
-//                     some: {
-//                       examsToRiskFactorData: {
-//                         some: {
-//                           risk: {
-//                             companyId: companyId,
-//                             homogeneousGroup: {
-//                               hierarchyOnHomogeneous: {
-//                                 some: {
-//                                   hierarchyId: { in: hierarchyIds },
-//                                 },
-//                               },
-//                             },
-//                           },
-//                         },
-//                       },
-//                     },
-//                   },
-//                 },
-//               },
-//             },
-//           },
-//           {
-//             examToRisk: {
-//               some: {
-//                 companyId: companyId,
-//                 risk: { representAll: true },
-//               },
-//             },
-//           },
-//           {
-//             examToRiskData: {
-//               some: {
-//                 risk: {
-//                   companyId: companyId,
-//                   examsToRiskFactorData: { some: { examId: { gt: 0 } } },
-//                   homogeneousGroup: {
-//                     hierarchyOnHomogeneous: {
-//                       some: { hierarchyId: { in: hierarchyIds } },
-//                     },
-//                   },
-//                 },
-//               },
-//             },
-//           },
-//         ],
-//       },
-//     ],
-//   },
-// });
+  async onGetExamsIdsByHierarchy({
+    hierarchyId,
+    examType,
+    doneDate,
+    employeeId,
+    companyId,
+  }: {
+    employeeId: number;
+    companyId: string;
+    hierarchyId?: string;
+    doneDate?: Date;
+    examType: ExamHistoryTypeEnum;
+  }) {
+    const originsData = [];
+    const subOfficesIds = [];
+
+    if (doneDate) {
+      const hierarchiesHistory = await this.employeeHierarchyHistoryRepository.findNude({
+        where: {
+          ...(hierarchyId && { hierarchyId }),
+          ...(!hierarchyId && {
+            startDate: { lte: doneDate },
+            motive: { not: 'DEM' },
+          }),
+          employeeId: employeeId,
+        },
+        orderBy: { startDate: 'desc' },
+        take: 1,
+        select: { hierarchyId: true, subHierarchies: { select: { id: true } } },
+      });
+
+      if (hierarchiesHistory.length) {
+        hierarchyId = hierarchiesHistory[0]?.hierarchyId;
+        subOfficesIds.push(...hierarchiesHistory[0]?.subHierarchies?.map((sub) => sub.id));
+      }
+    }
+
+    console.log(99, subOfficesIds);
+
+    if (hierarchyId) {
+      const isDismissal = examType === ExamHistoryTypeEnum.DEMI;
+      const isOffice = examType === ExamHistoryTypeEnum.OFFI;
+
+      const exams = await this.execute(
+        { targetCompanyId: companyId },
+        { subOfficesIds, employeeId: employeeId, hierarchyId, ...(isDismissal && { isDismissal: isDismissal }), ...(isOffice && { isOffice: isOffice }) },
+      );
+
+      if (exams.data) {
+        const origins = this.getAllOrigins(exams.data, examType);
+        originsData.push(...origins);
+      }
+    }
+
+    return originsData;
+  }
+}

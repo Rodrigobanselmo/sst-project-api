@@ -1,6 +1,6 @@
 import { StatusEmployeeStepEnum } from './../../../shared/constants/enum/statusEmployeeStep.enum';
 import { getEmployeeRowStatus } from './../../../shared/utils/getExpiredExamStatus.utils';
-import { StatusExamEnum } from 'src/shared/constants/enum/statusExam.enum';
+import { StatusExamEnum } from './../../../shared/constants/enum/statusExam.enum';
 import { ApiProperty } from '@nestjs/swagger';
 import { Company, Employee, Hierarchy, SexTypeEnum, StatusEnum } from '@prisma/client';
 import { EmployeePPPHistoryEntity } from './employee-ppp-history.entity';
@@ -11,6 +11,8 @@ import { HierarchyEntity } from './hierarchy.entity';
 
 import { WorkspaceEntity } from './workspace.entity';
 import { CidEntity } from './cid.entity';
+import dayjs from 'dayjs';
+import { dismissalDate } from './../../../shared/constants/ids';
 
 export class EmployeeEntity implements Employee {
   @ApiProperty({ description: 'The id of the Employee' })
@@ -97,20 +99,23 @@ export class EmployeeEntity implements Employee {
   ) {
     Object.assign(this, partial);
 
+    this.newExamAdded = null;
     if (!options.skipNewExamAdded && this.newExamAdded) {
       //? toda vez que um novo exame é adicionado a um funcionario ou cargo e o funcionario possui um exame expirado, ele salva a data de hoje como newExamAdded
 
-      if (this.examsHistory) {
-        this.examsHistory = this.examsHistory.map((e) => {
-          if ((e?.exam?.isAttendance || e.evaluationType == 'APTO') && e.doneDate <= this.newExamAdded) {
-            if (e.expiredDate > this.newExamAdded) e.expiredDate = this.newExamAdded;
-            this.expiredDateExam = this.newExamAdded;
-          }
-          return e;
-        });
-      } else {
-        if (this.expiredDateExam > this.newExamAdded) this.expiredDateExam = this.newExamAdded;
-      }
+      // if (this.examsHistory) {
+      //   this.examsHistory = this.examsHistory.map((e) => {
+      //     if ((e?.exam?.isAttendance || e.evaluationType == 'APTO') && e.doneDate <= this.newExamAdded) {
+      //       if (e.expiredDate > this.newExamAdded) e.expiredDate = this.newExamAdded;
+      //       this.expiredDateExam = this.newExamAdded;
+      //     }
+      //     return e;
+      //   });
+      // } else {
+      //   if (this.expiredDateExam > this.newExamAdded) this.expiredDateExam = this.newExamAdded;
+      // }
+
+      if (this.expiredDateExam > this.newExamAdded) this.expiredDateExam = this.newExamAdded;
     }
 
     if (this.hierarchy) {
@@ -139,19 +144,40 @@ export class EmployeeEntity implements Employee {
     }
 
     if (this.statusExam && this.hierarchyHistory) {
+      const actualHierarchy = this.hierarchyHistory?.[0];
+      const isActualHierarchyAdm = actualHierarchy?.motive == 'ADM';
+      const isActualHierarchyOfficeChange = ['TRANS', 'ALOC', 'PROM', 'TRANS_PROM'].includes(actualHierarchy?.motive);
+
+      const isLastDoneExamDem = this.lastDoneExam && this.lastDoneExam?.examType == 'DEMI';
+      const isLastDoneExamAdm = this.lastDoneExam && this.lastDoneExam?.examType == 'ADMI';
+      const isLastDoneExamOffice = this.lastDoneExam && this.lastDoneExam?.examType == 'OFFI';
+      const isMissingLastDoneExam = !this.lastExam && !this.lastDoneExam;
+      const isExpiredExam = this.expiredDateExam && this.expiredDateExam < new Date();
+
       if (this.hierarchyId) {
         this.statusStep = StatusEmployeeStepEnum.ADMISSION;
+        const isLastExamActualHierarchyId = this.lastDoneExam?.hierarchyId && this.lastDoneExam.hierarchyId == this.hierarchyId;
+        const isLastExamBeforeHierarchyStartDate = this.lastDoneExam?.doneDate < actualHierarchy?.startDate;
 
-        if ((!this.lastExam && !this.lastDoneExam) || this.lastDoneExam?.examType == 'DEMI') this.statusStep = StatusEmployeeStepEnum.IN_ADMISSION;
-        if (this.hierarchyHistory?.[0]?.motive == 'ADM' && this.lastDoneExam?.examType == 'DEMI') this.statusStep = StatusEmployeeStepEnum.IN_ADMISSION;
+        if (isActualHierarchyAdm && (!isLastExamActualHierarchyId || !isLastDoneExamAdm) && isLastExamBeforeHierarchyStartDate)
+          this.statusStep = StatusEmployeeStepEnum.IN_ADMISSION;
+
+        if (isActualHierarchyAdm && (!isLastExamActualHierarchyId || !isLastDoneExamAdm) && isLastExamBeforeHierarchyStartDate)
+          this.statusStep = StatusEmployeeStepEnum.IN_ADMISSION;
+
+        if (isExpiredExam && isActualHierarchyOfficeChange && (!isLastExamActualHierarchyId || !isLastDoneExamOffice) && isLastExamBeforeHierarchyStartDate)
+          this.statusStep = StatusEmployeeStepEnum.IN_TRANS;
+
+        if (isMissingLastDoneExam || isLastDoneExamDem) this.statusStep = StatusEmployeeStepEnum.IN_ADMISSION;
       } else if (!this.hierarchyId) {
         if (this.hierarchyHistory?.[0]?.motive == 'DEM') {
-          if (this.lastDoneExam?.examType == 'DEMI') this.statusStep = StatusEmployeeStepEnum.DEMISSION;
+          if (isLastDoneExamDem) this.statusStep = StatusEmployeeStepEnum.DEMISSION;
+          else if (dayjs(dismissalDate).isSame(this.expiredDateExam)) this.statusStep = StatusEmployeeStepEnum.DEMISSION;
           else this.statusStep = StatusEmployeeStepEnum.IN_DEMISSION;
         }
 
-        if (this.hierarchyHistory?.[0]?.motive == 'ADM' && [StatusExamEnum.EXPIRED, StatusExamEnum.PENDING, StatusExamEnum.PROCESSING].includes(this.statusExam)) {
-          if ((!this.lastExam && !this.lastDoneExam) || this.lastDoneExam?.examType == 'DEMI') this.statusStep = StatusEmployeeStepEnum.IN_ADMISSION;
+        if (isActualHierarchyAdm && [StatusExamEnum.EXPIRED, StatusExamEnum.PENDING, StatusExamEnum.PROCESSING].includes(this.statusExam)) {
+          if (isMissingLastDoneExam || isLastDoneExamDem) this.statusStep = StatusEmployeeStepEnum.IN_ADMISSION;
         }
 
         if (this.hierarchyHistory?.[0]?.motive == undefined) {

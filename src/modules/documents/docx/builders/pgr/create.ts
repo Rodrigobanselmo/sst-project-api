@@ -89,6 +89,14 @@ export class DocumentBuildPGR {
   }
 
   private getVariables(): IDocVariables {
+    let docVariables = this.docSections.variables as any;
+
+    console.log(this.docSections.variables);
+    if (Array.isArray(docVariables)) {
+      docVariables = docVariables.reduce((acc, item) => ({ ...acc, [item.type]: item }), {} as any);
+    }
+    console.log(docVariables);
+
     return {
       [VariablesPGREnum.VERSION]: this.version,
       [VariablesPGREnum.DOC_VALIDITY]: this.versions[0].validity,
@@ -96,7 +104,7 @@ export class DocumentBuildPGR {
       [VariablesPGREnum.DOCUMENT_COORDINATOR]: this.document?.coordinatorBy || '',
       ...companyVariables(this.company, this.workspace, this.workspace.address),
       ...booleanVariables(this.company, this.workspace, this.hierarchy, this.document),
-      ...this.docSections.variables,
+      ...docVariables,
     };
   }
 

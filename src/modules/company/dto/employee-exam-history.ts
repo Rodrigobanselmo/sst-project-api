@@ -336,6 +336,34 @@ export class FindClinicEmployeeExamHistoryDto {
   @IsString()
   companyId?: string;
 
+  @IsString()
+  @IsOptional()
+  employeeCompanyId?: string;
+
+  @IsOptional()
+  @IsString()
+  hierarchyId?: string;
+
+  @IsOptional()
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsString()
+  @IsEnum(ExamHistoryTypeEnum, {
+    message: `tipo de exame inválido`,
+  })
+  examType?: ExamHistoryTypeEnum;
+
+  @IsOptional()
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsString()
+  @IsEnum(StatusEnum, {
+    message: `tipo de status inválido`,
+  })
+  status?: StatusEnum;
+
+  @IsOptional()
+  @IsInt()
+  id?: number;
+
   @IsOptional()
   @IsInt()
   employeeId?: number;

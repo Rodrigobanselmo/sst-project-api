@@ -5,6 +5,7 @@ import { EmployeeHierarchyHistoryEntity } from './employee-hierarchy-history.ent
 import { EmployeeEntity } from './employee.entity';
 import { HierarchyOnHomogeneousEntity, HomoGroupEntity } from './homoGroup.entity';
 import { WorkspaceEntity } from './workspace.entity';
+import { EmployeeExamsHistoryEntity } from './employee-exam-history.entity';
 
 export class HierarchyEntity implements Hierarchy {
   @ApiProperty({ description: 'The id of the Hierarchy' })
@@ -65,6 +66,8 @@ export class HierarchyEntity implements Hierarchy {
 
   subHierarchyHistory?: EmployeeHierarchyHistoryEntity[];
   hierarchyHistory?: EmployeeHierarchyHistoryEntity[];
+  employeeExamsHistory?: EmployeeExamsHistoryEntity[];
+  employeeExamsHistorySubOffice?: EmployeeExamsHistoryEntity[];
 
   constructor(partial: Partial<HierarchyEntity>) {
     Object.assign(this, partial);

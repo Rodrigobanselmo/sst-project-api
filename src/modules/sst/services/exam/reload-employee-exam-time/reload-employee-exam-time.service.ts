@@ -18,58 +18,14 @@ export class ReloadEmployeeExamTimeService {
   ) {}
 
   async reloadEmployeeExamTime(companyId: string, options?: { employeeIds?: number[] }) {
-    const date = this.dayjs.dayjs(this.standardDate).toDate();
+    const datewww = this.dayjs.dayjs(this.standardDate).toDate();
 
-    const allEmployees = (
-      await this.employeeRepository.findNude(
-        {
-          where: {
-            companyId,
-            status: { not: 'CANCELED' },
-            OR: [
-              {
-                skippedDismissalExam: false,
-              },
-              {
-                skippedDismissalExam: null,
-              },
-            ],
-            ...(options.employeeIds && { id: { in: options.employeeIds } }),
-          },
-          select: {
-            id: true,
-            lastExam: true,
-            expiredDateExam: true,
-            hierarchyId: true,
-            newExamAdded: true,
-            subOffices: { select: { id: true } },
-            hierarchyHistory: {
-              take: 1,
-              select: { startDate: true },
-              orderBy: { startDate: 'desc' },
-              where: {
-                motive: 'DEM',
-              },
-            },
-            examsHistory: {
-              select: {
-                doneDate: true,
-                expiredDate: true,
-                status: true,
-                evaluationType: true,
-                validityInMonths: true,
-              },
-              where: {
-                exam: { isAttendance: true },
-                status: { in: ['DONE', 'PROCESSING', 'PENDING'] },
-              },
-              orderBy: { doneDate: 'desc' },
-            },
-          },
-        },
-        { skipNewExamAdded: true },
-      )
-    ).map((e) => ({ ...e, expiredDateExamOld: e.expiredDateExam }));
+    const allEmployees = (await this.employeeRepository.findReloadEmployeeExamTime({ companyId, employeeIds: options.employeeIds }, {}, { skipNewExamAdded: true })).map(
+      (e) => ({
+        ...e,
+        expiredDateExamOld: e.expiredDateExam,
+      }),
+    );
 
     const allWithMissingExam = [] as EmployeeEntity[];
 
@@ -121,11 +77,11 @@ export class ReloadEmployeeExamTimeService {
           // >> logic newExamAdded
           {
             if (employee.newExamAdded && doneExamFound) {
-              const doneDateExam = doneExamFound.doneDate;
+              // const doneDateExam = doneExamFound.doneDate;
 
-              if (this.dayjs.format(doneDateExam, 'YYYY-MM-DD') <= this.dayjs.format(employee.newExamAdded, 'YYYY-MM-DD')) {
-                doneExamFound.expiredDate = employee.newExamAdded;
-              }
+              // if (this.dayjs.format(doneDateExam, 'YYYY-MM-DD') <= this.dayjs.format(employee.newExamAdded, 'YYYY-MM-DD')) {
+              doneExamFound.expiredDate = employee.newExamAdded;
+              // }
             }
           }
 
@@ -144,39 +100,38 @@ export class ReloadEmployeeExamTimeService {
       }
     });
 
-    const exams =
-      allWithMissingExam.length != 0
-        ? await this.findExamByHierarchyService.execute(
-            { targetCompanyId: companyId },
-            {
-              onlyAttendance: true,
-            },
-          )
-        : undefined;
+    //TODO qualquer coisa pode ver e mockar isso aqui
+    const exams = allWithMissingExam.length != 0 ? await this.findExamByHierarchyService.execute({ targetCompanyId: companyId }, {}) : undefined;
 
     const getExpired = allWithMissingExam.map((employee) => {
       const ids = [...employee.subOffices.map(({ id }) => id), employee.hierarchyId];
 
       let expiredDate: Date;
-      if (exams)
-        exams.data.find(({ exam, origins }) => {
-          if (!exam.isAttendance) return false;
+      if (exams) {
+        const examsIds = exams.data.map(({ exam }) => exam.id);
+        const examsUniqueIds = [...new Set(examsIds)];
 
-          origins.find((origin) => {
-            const isPartOfHomo = origin?.homogeneousGroup
-              ? origin.homogeneousGroup?.hierarchyOnHomogeneous?.find((homoHier) => ids.includes(homoHier?.hierarchy?.id))
-              : true;
-            if (!isPartOfHomo) return;
+        examsUniqueIds.map((examId) => {
+          exams.data.find(({ exam, origins }) => {
+            if (examId != exam.id) return false;
 
-            const skip = this.findExamByHierarchyService.checkIfSkipEmployee(origin, employee);
-            if (skip) return;
+            origins.find((origin) => {
+              const isPartOfHomo = origin?.homogeneousGroup ? origin.homogeneousGroup?.hierarchies?.find((hier) => ids.includes(hier?.id)) : true;
+              if (!isPartOfHomo) return;
 
-            const expired = this.findExamByHierarchyService.checkExpiredDate(origin, employee);
-            if (!expired.expiredDate) return;
-            expiredDate = expired.expiredDate;
-            return true;
+              const skip = this.findExamByHierarchyService.checkIfSkipEmployee(origin, employee);
+              if (skip) return;
+
+              const expired = this.findExamByHierarchyService.checkExpiredDate(origin, employee);
+              if (!expired.expiredDate) return;
+
+              if (!expiredDate || expiredDate > expired.expiredDate) expiredDate = expired.expiredDate;
+
+              return true;
+            });
           });
         });
+      }
 
       const expired = expiredDate ? { expiredDate } : {};
 
@@ -199,10 +154,10 @@ export class ReloadEmployeeExamTimeService {
           where: { id: e.id },
           data: { expiredDateExam: e.expiredDateExam, skippedDismissalExam: null },
         });
-      if (e.expiredDateExam === null && e.expiredDateExamOld != date)
+      if (e.expiredDateExam === null && e.expiredDateExamOld != datewww)
         await this.employeeRepository.updateNude({
           where: { id: e.id },
-          data: { expiredDateExam: date, skippedDismissalExam: null },
+          data: { expiredDateExam: datewww, skippedDismissalExam: null },
         });
     });
 

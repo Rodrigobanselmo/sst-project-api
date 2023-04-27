@@ -69,6 +69,7 @@ export class UpdateExamDto extends PartialType(CreateExamDto) {}
 
 export class CheckEmployeeExamDto {
   homogeneousGroupId?: string;
+  homogeneousGroupIds?: string[];
 
   hierarchyId?: string;
 
@@ -76,6 +77,7 @@ export class CheckEmployeeExamDto {
 
   companyId?: string;
   riskId?: string;
+  riskIds?: string[];
 }
 
 export class UpsertExamDto extends CreateExamDto {
@@ -118,6 +120,11 @@ export class FindExamDto extends PaginationQueryDto {
 }
 
 export class FindExamHierarchyDto {
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsOptional()
+  @IsString({ each: true })
+  subOfficesIds?: string[];
+
   @IsString()
   @IsOptional()
   hierarchyId?: string;

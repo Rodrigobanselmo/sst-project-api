@@ -45,7 +45,8 @@ export class UpsertRiskDataService {
       });
     const riskData = await this.riskDataRepository.upsert(upsertRiskDataDto);
 
-    if (upsertRiskDataDto.exams) this.checkEmployeeExamService.execute({ homogeneousGroupId: upsertRiskDataDto.homogeneousGroupId });
+    if (upsertRiskDataDto.exams)
+      this.checkEmployeeExamService.execute({ homogeneousGroupId: upsertRiskDataDto.homogeneousGroupId, companyId: upsertRiskDataDto.companyId });
 
     this.employeePPPHistoryRepository.updateManyNude({
       data: { sendEvent: true },

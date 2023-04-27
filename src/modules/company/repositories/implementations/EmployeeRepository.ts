@@ -15,7 +15,14 @@ import { FindEvents2220Dto } from './../../../esocial/dto/event.dto';
 export class EmployeeRepository {
   constructor(private prisma: PrismaService) {}
 
-  async create({ hierarchyId, companyId, shiftId, ...createCompanyDto }: CreateEmployeeDto): Promise<EmployeeEntity> {
+  async create({
+    hierarchyId,
+    companyId,
+    shiftId,
+    ...createCompanyDto
+  }: CreateEmployeeDto & {
+    hierarchyId?: string;
+  }): Promise<EmployeeEntity> {
     try {
       const employee = await this.prisma.employee.create({
         data: {
@@ -45,7 +52,18 @@ export class EmployeeRepository {
     }
   }
 
-  async update({ hierarchyId, companyId, shiftId, id, ...createCompanyDto }: UpdateEmployeeDto, removeSubOffices?: boolean): Promise<EmployeeEntity> {
+  async update(
+    {
+      hierarchyId,
+      companyId,
+      shiftId,
+      id,
+      ...createCompanyDto
+    }: UpdateEmployeeDto & {
+      hierarchyId?: string;
+    },
+    removeSubOffices?: boolean,
+  ): Promise<EmployeeEntity> {
     const employee = await this.prisma.employee.update({
       data: {
         ...createCompanyDto,
@@ -126,6 +144,7 @@ export class EmployeeRepository {
   async upsertMany(
     upsertEmployeeMany: (CreateEmployeeDto & {
       id: number;
+      hierarchyId?: string;
       admissionDate?: Date;
     })[],
     companyId: string,
@@ -219,7 +238,6 @@ export class EmployeeRepository {
       where: { id_companyId: { companyId, id } },
       ...(!options.select && {
         include: {
-          ...include,
           company: {
             select: {
               fantasy: true,
@@ -231,6 +249,35 @@ export class EmployeeRepository {
             },
           },
           hierarchy: { select: { id: true, name: true } },
+          subOffices: { select: { id: true, name: true } },
+          hierarchyHistory: {
+            select: {
+              motive: true,
+              startDate: true,
+            },
+            orderBy: { startDate: 'desc' },
+            take: 1,
+          },
+          examsHistory: {
+            select: {
+              status: true,
+              id: true,
+              doneDate: true,
+              evaluationType: true,
+              hierarchyId: true,
+              subOfficeId: true,
+              examType: true,
+              expiredDate: true,
+            },
+            where: {
+              exam: { isAttendance: true },
+              status: { in: ['PENDING', 'PROCESSING', 'DONE'] },
+            },
+            distinct: ['status'],
+            take: 3,
+            orderBy: { doneDate: 'desc' },
+          },
+          ...include,
         },
       }),
     });
@@ -320,7 +367,7 @@ export class EmployeeRepository {
         },
         distinct: ['status'],
         take: 3,
-        orderBy: { created_at: 'desc' },
+        orderBy: { doneDate: 'desc' },
       };
     }
 
@@ -601,6 +648,65 @@ export class EmployeeRepository {
     });
 
     return employees.map((employee) => new EmployeeEntity(employee, partial));
+  }
+
+  async findReloadEmployeeExamTime(
+    data: { employeeIds: number[]; companyId: string },
+    options: Prisma.EmployeeFindManyArgs = {},
+    partial?: { skipNewExamAdded?: boolean },
+  ) {
+    const employees = await this.prisma.employee.findMany({
+      ...options,
+      where: {
+        companyId: data.companyId,
+        status: { not: 'CANCELED' },
+        OR: [
+          {
+            skippedDismissalExam: false,
+          },
+          {
+            skippedDismissalExam: null,
+          },
+        ],
+        ...(data.employeeIds && { id: { in: data.employeeIds } }),
+        ...options.where,
+      },
+      select: {
+        id: true,
+        lastExam: true,
+        expiredDateExam: true,
+        hierarchyId: true,
+        newExamAdded: true,
+        birthday: true,
+        sex: true,
+        subOffices: { select: { id: true } },
+        hierarchyHistory: {
+          take: 1,
+          select: { startDate: true },
+          orderBy: { startDate: 'desc' },
+          where: {
+            motive: 'DEM',
+          },
+        },
+        examsHistory: {
+          select: {
+            doneDate: true,
+            expiredDate: true,
+            status: true,
+            evaluationType: true,
+            validityInMonths: true,
+          },
+          where: {
+            exam: { isAttendance: true },
+            status: { in: ['DONE', 'PROCESSING', 'PENDING'] },
+          },
+          orderBy: { doneDate: 'desc' },
+        },
+        ...options.select,
+      },
+    });
+
+    return employees.map((employee) => new EmployeeEntity(employee as any, partial));
   }
 
   async countNude(options: Prisma.EmployeeCountArgs = {}) {

@@ -704,6 +704,8 @@ model Employee {
   @@index([esocialCode])
   @@index([name])
   @@index([email])
+  @@index([companyId])
+  @@index([expiredDateExam])
 }
 
 model EmployeeHierarchyHistory {
@@ -1088,7 +1090,7 @@ model Hierarchy {
   refName                       String?
   deletedAt                     DateTime?
   employees                     Employee[]
-  employeeExamsHistory          EmployeeExamsHistory[]
+  employeeExamsHistory          EmployeeExamsHistory[] //poder ao adimitir um funcionario, escolher adicionar a este cargo 
   employeeExamsHistorySubOffice EmployeeExamsHistory[]     @relation("subOffice_employee_exam")
   hierarchyHistory              EmployeeHierarchyHistory[]
   company                       Company                    @relation(fields: [companyId], references: [id])
@@ -1274,9 +1276,9 @@ model ProtocolToRisk {
   companyId             String
   minRiskDegree         Int?               @default(1)
   minRiskDegreeQuantity Int?               @default(1)
-  company               Company            @relation(fields: [companyId], references: [id])
-  protocol              Protocol?          @relation(fields: [protocolId], references: [id])
-  risk                  RiskFactors?       @relation(fields: [riskId], references: [id])
+  company               Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  protocol              Protocol?          @relation(fields: [protocolId], references: [id], onDelete: Cascade)
+  risk                  RiskFactors?       @relation(fields: [riskId], references: [id], onDelete: Cascade)
   hierarchies           Hierarchy[]
   homoGroups            HomogeneousGroup[]
 
@@ -1381,7 +1383,7 @@ model RiskFactorsDocInfo {
   isPPP       Boolean     @default(true)
   created_at  DateTime    @default(now())
   company     Company     @relation(fields: [companyId], references: [id])
-  hierarchy   Hierarchy?  @relation(fields: [hierarchyId], references: [id], onDelete: Restrict)
+  hierarchy   Hierarchy?  @relation(fields: [hierarchyId], references: [id], onDelete: Cascade)
   risk        RiskFactors @relation(fields: [riskId], references: [id])
 
   @@unique([companyId, riskId, hierarchyId])

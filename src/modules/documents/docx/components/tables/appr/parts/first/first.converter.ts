@@ -6,7 +6,7 @@ import { RiskFactorGroupDataEntity } from '../../../../../../../sst/entities/ris
 import { HierarchyMapData, IHomoGroupMap } from '../../../../../converter/hierarchy.converter';
 import { bodyTableProps, borderNoneStyle } from '../../elements/body';
 import { FirstRiskInventoryColumnEnum, firstRiskInventoryHeader } from './first.constant';
-import { DocumentDataEntity } from 'src/modules/sst/entities/documentData.entity';
+import { DocumentDataEntity } from '../../../../../../../../modules/sst/entities/documentData.entity';
 
 export const documentConverter = (
   riskFactorGroupData: RiskFactorGroupDataEntity & DocumentDataEntity & DocumentDataPGRDto,

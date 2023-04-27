@@ -1,7 +1,7 @@
 import { TransformFnParams } from 'class-transformer';
 import { normalizeToUpperString } from '../utils/normalizeString';
 
-export const StringNormalizeTransform = (data: TransformFnParams) => {
+export const StringNormalizeUpperTransform = (data: TransformFnParams) => {
   const str = data.obj[data.key];
 
   if (str != '' && !str) return null;

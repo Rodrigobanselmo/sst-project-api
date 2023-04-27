@@ -522,10 +522,17 @@ export class HierarchyRepository {
     });
   }
 
-  async findAllHierarchyByCompanyAndId(id: string, companyId: string) {
+  async deleteByIds(ids: string[]): Promise<void> {
+    await this.prisma.hierarchy.deleteMany({
+      where: { id: { in: ids } },
+    });
+  }
+
+  async findAllHierarchyByCompanyAndId(id: string, companyId: string, options: Prisma.HierarchyFindFirstArgs = {}) {
     const hierarchy = await this.prisma.hierarchy.findFirst({
-      where: { companyId, id },
-      include: { workspaces: { select: { id: true } } },
+      where: { companyId, id, ...options.where },
+      ...options,
+      ...(!options.select && { include: { workspaces: { select: { id: true } } } }),
     });
 
     return new HierarchyEntity(hierarchy as any);

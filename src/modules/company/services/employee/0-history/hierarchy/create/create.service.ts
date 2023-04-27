@@ -11,6 +11,7 @@ import { UserPayloadDto } from '../../../../../../../shared/dto/user-payload.dto
 import { CreateEmployeeHierarchyHistoryDto } from '../../../../../dto/employee-hierarchy-history';
 import { EmployeeHierarchyHistoryRepository } from '../../../../../repositories/implementations/EmployeeHierarchyHistoryRepository';
 import { EmployeeRepository } from '../../../../../repositories/implementations/EmployeeRepository';
+import { formatCPF } from '@brazilian-utils/brazilian-utils';
 
 @Injectable()
 export class CreateEmployeeHierarchyHistoryService {
@@ -83,7 +84,10 @@ export class CreateEmployeeHierarchyHistoryService {
         return cond1 && cond2;
       });
 
-      if (!afterHistories) {
+      const hasSubOffice = dataDto.subOfficeId;
+      const missingSuboffices = hasSubOffice && afterHistories?.[0] && !('subHierarchies' in afterHistories?.[0]);
+
+      if (!afterHistories || missingSuboffices) {
         afterHistories = await this.employeeHierarchyHistoryRepository.findNude({
           where: {
             employeeId: foundEmployee.id,
@@ -92,15 +96,23 @@ export class CreateEmployeeHierarchyHistoryService {
           },
           orderBy: { startDate: 'asc' },
           take: 3,
+          include: {
+            subHierarchies: { select: { id: true } },
+          },
         });
       }
 
       const afterHistory = afterHistories.sort((a, b) => sortData(a.created_at, b.created_at)).sort((a, b) => sortData(a.startDate, b.startDate))[0];
 
       afterMotive = afterHistory?.motive || null;
-      const isAfterOk = historyRules[dataDto.motive].after.includes(afterMotive);
 
-      if (!isAfterOk) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_BLOCK_HISTORY + (foundEmployee?.cpf ? ` ${foundEmployee.cpf}` : ''));
+      const isAfterOk = historyRules[dataDto.motive].after.includes(afterMotive);
+      const isSameOffice = afterHistory?.hierarchyId == dataDto.hierarchyId;
+      const isSameOfficeAndSub = isSameOffice && afterHistory?.subHierarchies?.every(({ id }) => dataDto.subOfficeId == id);
+
+      if (!isAfterOk) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_BLOCK_HISTORY + (foundEmployee?.cpf ? ` CPF: ${formatCPF(foundEmployee.cpf)}` : ''));
+      if (isSameOfficeAndSub)
+        throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_BLOCK_HISTORY_SAME_OFFICE + (foundEmployee?.cpf ? ` CPF: ${formatCPF(foundEmployee.cpf)}` : ''));
     }
 
     // CHECK BEFORE
@@ -115,7 +127,10 @@ export class CreateEmployeeHierarchyHistoryService {
         return cond1 && cond2;
       });
 
-      if (!beforeHistories) {
+      const hasSubOffice = dataDto.subOfficeId;
+      const missingSuboffices = hasSubOffice && beforeHistories?.[0] && !('subHierarchies' in beforeHistories[0]);
+
+      if (!beforeHistories || missingSuboffices) {
         beforeHistories = await this.employeeHierarchyHistoryRepository.findNude({
           where: {
             employeeId: foundEmployee.id,
@@ -124,6 +139,9 @@ export class CreateEmployeeHierarchyHistoryService {
           },
           orderBy: { startDate: 'desc' },
           take: 3,
+          include: {
+            subHierarchies: { select: { id: true } },
+          },
         });
       }
 
@@ -134,8 +152,12 @@ export class CreateEmployeeHierarchyHistoryService {
         dataDto.motive = EmployeeHierarchyMotiveTypeEnum.TRANS_PROM;
 
       const isBeforeOk = historyRules[dataDto.motive].before.includes(beforeMotive);
+      const isSameOffice = beforeHistory?.hierarchyId == dataDto.hierarchyId;
+      const isSameOfficeAndSub = isSameOffice && beforeHistory?.subHierarchies?.every(({ id }) => dataDto.subOfficeId == id);
 
-      if (!isBeforeOk) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_BLOCK_HISTORY + (foundEmployee?.cpf ? ` ${foundEmployee.cpf}` : ''));
+      if (!isBeforeOk) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_BLOCK_HISTORY + (foundEmployee?.cpf ? ` CPF: ${formatCPF(foundEmployee.cpf)}` : ''));
+      if (isSameOfficeAndSub)
+        throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_BLOCK_HISTORY_SAME_OFFICE + (foundEmployee?.cpf ? ` CPF: ${formatCPF(foundEmployee.cpf)}` : ''));
     }
 
     const getActualEmployeeHierarchy = () => {

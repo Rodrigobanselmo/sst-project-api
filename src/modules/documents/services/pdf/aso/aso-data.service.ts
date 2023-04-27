@@ -16,7 +16,7 @@ import { FindExamByHierarchyService } from '../../../../sst/services/exam/find-b
 import { FindAllRiskDataByEmployeeService } from '../../../../sst/services/risk-data/find-by-employee/find-by-employee.service';
 import { IPdfAsoData } from './types/IAsoData.type';
 import { checkRiskDataDoc } from '../../../../../shared/utils/getRiskDoc';
-import { removeDuplicate } from 'src/shared/utils/removeDuplicate';
+import { removeDuplicate } from '../../../../../shared/utils/removeDuplicate';
 
 export const checkExamType = (exam: ExamRiskDataEntity | ExamRiskEntity, examType: ExamHistoryTypeEnum) => {
   const isAdmission = examType == ExamHistoryTypeEnum.ADMI;
@@ -48,6 +48,35 @@ export class PdfAsoDataService {
 
   async execute(employeeId: number, userPayloadDto: UserPayloadDto, asoId?: number): Promise<IPdfAsoData> {
     const companyId = userPayloadDto.targetCompanyId;
+
+    const examsIds = [];
+
+    const asoExam = await this.employeeExamsHistoryRepository.findFirstNude({
+      where: { ...(asoId && { id: asoId }), employeeId, exam: { isAttendance: true }, OR: [{ clinicId: companyId }, { employee: { companyId } }] },
+      orderBy: { doneDate: 'desc' },
+      select: {
+        id: true,
+        hierarchyId: true,
+        doneDate: true,
+        examType: true,
+        employeeId: true,
+        employee: { select: { companyId: true } },
+      },
+    });
+
+    if (asoExam.examType && asoExam?.employee?.companyId) {
+      const originsData = await this.findExamByHierarchyService.onGetExamsIdsByHierarchy({
+        companyId: asoExam.employee.companyId,
+        employeeId: asoExam.employeeId,
+        hierarchyId: asoExam.hierarchyId,
+        examType: asoExam.examType,
+        doneDate: asoExam.doneDate,
+      });
+
+      if (originsData) {
+        examsIds.push(...originsData.map((origin) => Number(origin.exam.id)));
+      }
+    }
 
     const clinicExam = await this.employeeExamsHistoryRepository.findFirstNude({
       where: { ...(asoId && { id: asoId }), employeeId, exam: { isAttendance: true }, OR: [{ clinicId: companyId }, { employee: { companyId } }] },
@@ -115,7 +144,7 @@ export class PdfAsoDataService {
             },
             examsHistory: {
               distinct: ['examId'],
-              where: { status: { in: ['PROCESSING', 'DONE'] }, exam: { isAttendance: false } },
+              where: { status: { in: ['PROCESSING', 'DONE'] }, exam: { isAttendance: false }, examId: { in: examsIds } },
               select: { exam: { select: { name: true } }, doneDate: true, changeHierarchyDate: true, examId: true },
               orderBy: { doneDate: 'desc' },
             },

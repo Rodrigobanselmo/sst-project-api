@@ -1,4 +1,4 @@
-import { StringNormalizeTransform } from './../../../shared/transformers/string-normalize.transform';
+import { StringNormalizeUpperTransform } from './../../../shared/transformers/string-normalize.transform';
 import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
 import { PartialType } from '@nestjs/swagger';
 import { HierarchyEnum, StatusEnum } from '@prisma/client';
@@ -9,7 +9,7 @@ import { StringCapitalizeParagraphTransform } from '../../../shared/transformers
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 
 export class CreateHierarchyDto {
-  @Transform(StringNormalizeTransform, { toClassOnly: true })
+  @Transform(StringNormalizeUpperTransform, { toClassOnly: true })
   @IsString()
   name: string;
 
@@ -78,7 +78,7 @@ export class UpsertHierarchyDto {
   @IsString()
   id?: string;
 
-  @Transform(StringNormalizeTransform, { toClassOnly: true })
+  @Transform(StringNormalizeUpperTransform, { toClassOnly: true })
   @IsOptional()
   @IsString()
   @MaxLength(100)
@@ -160,7 +160,7 @@ export class CreateSubHierarchyDto {
   @IsString()
   id: string;
 
-  @Transform(StringNormalizeTransform, { toClassOnly: true })
+  @Transform(StringNormalizeUpperTransform, { toClassOnly: true })
   @IsString()
   name: string;
 

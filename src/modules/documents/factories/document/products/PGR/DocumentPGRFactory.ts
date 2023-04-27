@@ -37,7 +37,6 @@ import { hierarchyConverter } from '../../../../docx/converter/hierarchy.convert
 import { IGetDocument, ISaveDocument } from '../../types/IDocumentFactory.types';
 import { IDocumentPGRBody } from './types/pgr.types';
 import { DocumentModelRepository } from '../../../../repositories/implementations/DocumentModelRepository';
-import { simpleCompanyId } from 'src/shared/constants/ids';
 
 @Injectable()
 export class DocumentPGRFactory extends DocumentFactoryAbstractionCreator<IDocumentPGRBody, any> {
@@ -252,7 +251,7 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
     const data = options.data;
     const version = options.version;
     const attachments = options.attachments;
-
+    console.log(data.modelData);
     const sections: ISectionOptions[] = new DocumentBuildPGR({
       version,
       document: { ...data.riskGroupData, ...data.documentData, ...(data.documentData.json && ((data.documentData as any).json as DocumentDataPGRDto)) },

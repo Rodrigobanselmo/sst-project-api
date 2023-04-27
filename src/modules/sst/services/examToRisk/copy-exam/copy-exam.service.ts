@@ -32,11 +32,9 @@ export class CopyExamRiskService {
       companyId: user.targetCompanyId,
     });
 
-    copyData.map((data) => {
-      this.checkEmployeeExamService.execute({
-        companyId: user.targetCompanyId,
-        riskId: data.riskId,
-      });
+    this.checkEmployeeExamService.execute({
+      companyId: user.targetCompanyId,
+      riskIds: copyData.map((data) => data.riskId),
     });
 
     return ExamFactor;

@@ -2,6 +2,11 @@ import { IDocumentModelData } from './../../../types/document-mode.types';
 import { IDocumentPGRSectionGroups, IDocVariables } from './../../../docx/builders/pgr/types/section.types';
 
 export const parseModelData = (modelData: IDocumentModelData): IDocumentPGRSectionGroups => {
+  let docVariables = modelData?.variables as any;
+  if (Array.isArray(docVariables)) {
+    docVariables = docVariables.reduce((acc, item) => ({ ...acc, [item.type]: item.label }), {} as IDocVariables);
+  }
+
   const sectionGroup: IDocumentPGRSectionGroups = {
     sections: modelData?.sections?.map(({ children: sectionChildren, ...section }) => {
       return {
@@ -13,7 +18,7 @@ export const parseModelData = (modelData: IDocumentModelData): IDocumentPGRSecti
         }),
       };
     }),
-    variables: Object.entries(modelData?.variables || {}).reduce((acc, [key, value]) => ({ ...acc, [key]: value.value }), {} as IDocVariables),
+    variables: docVariables,
   };
 
   return sectionGroup;

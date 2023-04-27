@@ -13,6 +13,7 @@ export interface IExamOriginData extends Partial<ExamRiskDataEntity> {
   skipEmployee?: boolean;
   closeToExpired?: boolean;
   expiredDate?: Date | null;
+  doneDate?: Date | null;
   homogeneousGroup?: HomoGroupEntity;
   risk?: { name: string; id: string };
 }
@@ -22,6 +23,15 @@ export interface IExamEmployeeCheck {
   isFemale?: boolean;
   fromAge?: number;
   toAge?: number;
+}
+
+export interface IExamOrigins {
+  exam: {
+    id: string;
+    name: string;
+    isAttendance: boolean;
+  };
+  origins: IExamOriginData[];
 }
 
 export class ExamEntity implements Exam {

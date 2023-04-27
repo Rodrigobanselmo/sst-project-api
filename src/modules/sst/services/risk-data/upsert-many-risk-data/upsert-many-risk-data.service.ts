@@ -65,9 +65,7 @@ export class UpsertManyRiskDataService {
     if (upsertRiskDataDto.riskId) risksDataMany.push(await this.riskDataRepository.upsertMany(upsertRiskDataDto));
 
     if (upsertRiskDataDto.exams)
-      upsertRiskDataDto.homogeneousGroupIds.forEach((id) => {
-        this.checkEmployeeExamService.execute({ homogeneousGroupId: id });
-      });
+      this.checkEmployeeExamService.execute({ homogeneousGroupIds: upsertRiskDataDto.homogeneousGroupIds, companyId: upsertRiskDataDto.companyId });
 
     this.employeePPPHistoryRepository.updateManyNude({
       data: { sendEvent: true },
