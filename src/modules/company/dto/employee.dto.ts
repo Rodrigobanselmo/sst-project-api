@@ -155,6 +155,21 @@ export class FindEmployeeDto extends PaginationQueryDto {
   @IsOptional()
   all?: boolean;
 
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  getAllHierarchyIds?: boolean;
+
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  getAllExams?: boolean;
+
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  getAllExamsWithSchedule?: boolean;
+
   @IsOptional()
   @IsDate({ message: 'Data inválida' })
   @Type(() => Date)
@@ -165,6 +180,26 @@ export class FindEmployeeDto extends PaginationQueryDto {
   @IsOptional()
   expiredExam?: boolean;
 
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  noPagination?: boolean;
+
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  getEsocialCode?: boolean;
+
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  getSector?: boolean;
+
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  getGroup?: boolean;
+
   @IsOptional()
   @IsDate({ message: 'Data inválida' })
   @Type(() => Date)
@@ -174,6 +209,11 @@ export class FindEmployeeDto extends PaginationQueryDto {
   @IsString({ each: true })
   @IsOptional()
   companiesIds?: string[];
+
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsString({ each: true })
+  @IsOptional()
+  workspacesIds?: string[];
 
   @Transform(QueryArray, { toClassOnly: true })
   @IsString({ each: true })

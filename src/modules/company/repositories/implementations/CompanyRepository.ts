@@ -1,3 +1,4 @@
+import { riskAllId } from './../../../../shared/constants/ids';
 import { prismaFilter } from './../../../../shared/utils/filters/prisma.filters';
 import { PaginationQueryDto } from './../../../../shared/dto/pagination.dto';
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -528,7 +529,7 @@ export class CompanyRepository implements ICompanyRepository {
       ],
     });
 
-    if ('search' in query) {
+    if ('search' in query && query.search) {
       const cnpj = onlyNumbers(query.search);
       (where.AND as any).push({
         OR: [
@@ -696,7 +697,7 @@ export class CompanyRepository implements ICompanyRepository {
       ],
     });
 
-    if ('search' in query) {
+    if ('search' in query && query.search) {
       const cnpj = onlyNumbers(query.search);
       (where.AND as any).push({
         OR: [
@@ -839,7 +840,7 @@ export class CompanyRepository implements ICompanyRepository {
     });
 
     const riskCountPromise = this.prisma.riskFactors.count({
-      where: { riskFactorData: { some: { companyId: id } } },
+      where: { riskFactorData: { some: { companyId: id, riskId: { not: riskAllId } } } },
     });
 
     const examsCountPromise = this.prisma.exam.count({

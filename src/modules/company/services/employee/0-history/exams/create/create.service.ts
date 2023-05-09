@@ -34,9 +34,11 @@ export class CreateEmployeeExamHistoryService {
       ...this.getUser(dataDto, user),
     });
 
-    this.checkEmployeeExamService.execute({
-      employeeId: dataDto.employeeId,
-    });
+    if (([StatusEnum.DONE, StatusEnum.CANCELED] as StatusEnum[]).includes(dataDto.status)) {
+      this.checkEmployeeExamService.execute({
+        employeeId: dataDto.employeeId,
+      });
+    }
 
     return history;
   }

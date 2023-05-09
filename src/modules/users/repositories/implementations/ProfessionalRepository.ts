@@ -185,7 +185,7 @@ export class ProfessionalRepository {
       ],
     } as typeof options.where;
 
-    if ('search' in query) {
+    if ('search' in query && query.search) {
       (where.AND as any).push({
         OR: [
           { name: { contains: query.search, mode: 'insensitive' } },
@@ -305,7 +305,7 @@ export class ProfessionalRepository {
       ],
     } as typeof options.where;
 
-    if ('search' in query) {
+    if ('search' in query && query.search) {
       (where.AND as any).push({
         OR: [
           { name: { contains: query.search, mode: 'insensitive' } },

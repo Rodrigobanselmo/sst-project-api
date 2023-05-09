@@ -48,6 +48,7 @@ export class EmployeeExamsHistoryEntity implements EmployeeExamsHistory {
   userSchedule?: UserEntity;
   userDoneId: number;
   userDone?: UserEntity;
+  scheduleMedicalVisitId: number;
 
   clinicObs: string;
   scheduleType: ClinicScheduleTypeEnum;

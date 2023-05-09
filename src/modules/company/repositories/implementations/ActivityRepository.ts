@@ -48,7 +48,7 @@ export class ActivityRepository {
       skip: ['search'],
     });
 
-    if ('search' in query) {
+    if ('search' in query && query.search) {
       (where.AND as any).push({
         OR: [{ name: { contains: query.search, mode: 'insensitive' } }, { code: { contains: query.search } }],
       } as typeof options.where);

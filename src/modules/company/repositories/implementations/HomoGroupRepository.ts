@@ -304,7 +304,7 @@ export class HomoGroupRepository {
       skip: ['search', 'type'],
     });
 
-    if ('search' in query) {
+    if ('search' in query && query.search) {
       (where.AND as any).push({
         name: { contains: query.search, mode: 'insensitive' },
       } as typeof options.where);

@@ -5,6 +5,7 @@
     "Aval",
     "Avaliation",
     "Condicao",
+    "Conected",
     "Consultar",
     "efic",
     "Empregador",
@@ -29,6 +30,6 @@
   ],
   "workbench.colorCustomizations": {
     "titleBar.activeBackground": "#201910",
-    "activityBar.background": "#201910",
-}
+    "activityBar.background": "#201910"
+  }
 }

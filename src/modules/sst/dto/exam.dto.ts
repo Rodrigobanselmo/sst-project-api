@@ -156,6 +156,11 @@ export class FindExamHierarchyDto {
   @IsBoolean()
   @ToBoolean()
   @IsOptional()
+  getAllExamToRiskWithoutHierarchy?: boolean;
+
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
   isPeriodic?: boolean;
   @IsBoolean()
   @ToBoolean()

@@ -68,10 +68,12 @@ export enum ReportFillColorEnum {
   TITLE = '#a1a1a1',
   TITLE_LIGHT = '#d3d3d3',
   END = '#faffae',
+
+  EXPIRED = '#F44336',
+  CLOSE_TO_EXPIRED = '#d9d10b',
 }
 
 export enum ReportColorEnum {
-  BLUE = '#1ea5ff',
   YELLOW = '#d9d10b',
   RED = '#F44336',
   GREEN = '#3cbe7d',

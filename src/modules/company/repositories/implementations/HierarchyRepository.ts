@@ -781,7 +781,7 @@ export class HierarchyRepository {
       skip: ['search', 'homogeneousGroupId'],
     });
 
-    if ('search' in query) {
+    if ('search' in query && query.search) {
       (where.AND as any).push({
         OR: [{ name: { contains: query.search, mode: 'insensitive' } }],
       } as typeof options.where);
@@ -817,6 +817,14 @@ export class HierarchyRepository {
       data: response[1].map((hierarchy) => new HierarchyEntity(hierarchy)),
       count: response[0],
     };
+  }
+
+  async findNude(options: Prisma.HierarchyFindManyArgs = {}) {
+    const hierarchies = await this.prisma.hierarchy.findMany({
+      ...options,
+    });
+
+    return hierarchies.map((hierarchy) => new HierarchyEntity(hierarchy));
   }
 
   async findFirstNude(options: Prisma.HierarchyFindFirstArgs = {}) {

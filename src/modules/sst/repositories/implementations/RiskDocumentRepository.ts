@@ -69,7 +69,7 @@ export class RiskDocumentRepository {
       skip: ['search', 'type'],
     });
 
-    if ('search' in query) {
+    if ('search' in query && query.search) {
       (where.AND as any).push({
         OR: [{ name: { contains: query.search, mode: 'insensitive' } }, { version: { contains: query.search, mode: 'insensitive' } }],
       } as typeof options.where);

@@ -1,3 +1,7 @@
+import { ProtocolEntity } from './../../sst/entities/protocol.entity';
+import { ExamEntity } from './../../sst/entities/exam.entity';
+import { RecMedEntity } from './../../sst/entities/recMed.entity';
+import { UserEntity } from './../../users/entities/user.entity';
 import { RiskDocumentEntity } from './../../sst/entities/riskDocument.entity';
 import { DocumentDataEntity } from './../../sst/entities/documentData.entity';
 import { ApiProperty } from '@nestjs/swagger';
@@ -30,6 +34,11 @@ import { WorkspaceEntity } from './workspace.entity';
 import { Company, CompanyPaymentTypeEnum, CompanyTypesEnum } from '.prisma/client';
 import { ScheduleBlockEntity } from './schedule-block.entity';
 import { AlertEntity } from './alert.entity';
+import { DocumentModelEntity } from '../../../modules/documents/entities/document-model.entity';
+import { UserCompanyEntity } from '../../../modules/users/entities/userCompany.entity';
+import { RiskFactorDataEntity } from '../../../modules/sst/entities/riskData.entity';
+import { EmployeeExamsHistoryEntity } from './employee-exam-history.entity';
+import { DocumentEntity } from './document.entity';
 
 export class CompanyEntity implements Company {
   @ApiProperty({ description: 'The id of the Company' })
@@ -116,8 +125,8 @@ export class CompanyEntity implements Company {
   blockResignationExam: boolean;
   doctorResponsibleId: number;
   tecResponsibleId: number;
-  contacts: ContactEntity[];
-  covers: DocumentCoverEntity[];
+  contacts?: ContactEntity[];
+  covers?: DocumentCoverEntity[];
   isClinic: boolean;
 
   employeeCount?: number;
@@ -143,9 +152,9 @@ export class CompanyEntity implements Company {
   paymentDay: number;
   isTaxNote: boolean;
   observationBank: string;
-  companiesToClinicAvailable: CompanyClinicsEntity;
+  companiesToClinicAvailable: CompanyClinicsEntity[];
   clinicsAvailable?: CompanyClinicsEntity;
-  clinicExams: ExamToClinicEntity[];
+  clinicExams?: ExamToClinicEntity[];
   report: CompanyReportEntity;
   riskDegree?: number;
   isGroup: boolean;
@@ -157,6 +166,8 @@ export class CompanyEntity implements Company {
   cert?: CompanyCertEntity;
   riskFactors?: RiskFactorsEntity[];
   hierarchy?: HierarchyEntity[];
+  recMed?: RecMedEntity[];
+  exams?: ExamEntity[];
   homogeneousGroup?: HomoGroupEntity[];
   os?: CompanyOSEntity;
 
@@ -171,6 +182,13 @@ export class CompanyEntity implements Company {
   scheduleBlocks?: ScheduleBlockEntity[];
   alerts?: AlertEntity[];
   documentData?: DocumentDataEntity[];
+  documentModels?: DocumentModelEntity[];
+  users?: UserCompanyEntity[];
+  riskFactorDocument?: RiskDocumentEntity[];
+  riskFactorData?: RiskFactorDataEntity[];
+  protocol?: ProtocolEntity[];
+  examClinicHistory?: EmployeeExamsHistoryEntity[];
+  documents?: DocumentEntity[];
 
   isDocuments: boolean;
   esocial: boolean;

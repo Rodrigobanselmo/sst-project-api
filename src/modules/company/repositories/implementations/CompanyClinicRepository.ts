@@ -35,7 +35,7 @@ export class CompanyClinicRepository {
       skip: ['search'],
     });
 
-    if ('search' in query) {
+    if ('search' in query && query.search) {
       delete query.search;
     }
 

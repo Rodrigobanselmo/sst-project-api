@@ -1,5 +1,5 @@
 import { EmployeeHierarchyHistoryRepository } from './../../../../company/repositories/implementations/EmployeeHierarchyHistoryRepository';
-import { getRiskDoc } from './../../../../../shared/utils/getRiskDoc';
+import { getRiskDoc, getRiskDocV2 } from './../../../../../shared/utils/getRiskDoc';
 import { HierarchyEntity } from './../../../../company/entities/hierarchy.entity';
 import { Injectable } from '@nestjs/common';
 import { ExamHistoryTypeEnum, HomoTypeEnum, Prisma, SexTypeEnum, StatusEnum } from '@prisma/client';
@@ -36,8 +36,9 @@ export class FindExamByHierarchyService {
 
   async execute(user: Pick<UserPayloadDto, 'targetCompanyId'>, query: FindExamHierarchyDto, options?: { employee?: EmployeeEntity }) {
     let hierarchyId = query.hierarchyId;
-    const companyId = user.targetCompanyId;
     let employee: EmployeeEntity;
+    const companyId = user.targetCompanyId;
+    const isGetExamToRisk = query.getAllExamToRiskWithoutHierarchy;
 
     const hierarchies: Partial<HierarchyEntity>[] = [];
     const date = new Date();
@@ -105,24 +106,27 @@ export class FindExamByHierarchyService {
 
     const hierarchyIds = hierarchies.map(({ id }) => id);
 
-    const riskData = (
-      await this.riskDataRepository.findNude({
-        select: {
-          examsToRiskFactorData: {
-            include: {
-              exam: { select: { name: true, id: true, isAttendance: true } },
-            },
-            where: { ...examType },
+    const hierarchyGtZero = hierarchyIds.length > 0;
+    const getRiskFactor = isGetExamToRisk || hierarchyGtZero;
+
+    let riskData = await this.riskDataRepository.findNude({
+      select: {
+        examsToRiskFactorData: {
+          include: {
+            exam: { select: { name: true, id: true, isAttendance: true } },
           },
-          riskFactor: {
-            select: {
-              name: true,
-              severity: true,
-              type: true,
-              representAll: true,
-              id: true,
-              isAso: true,
-              isPCMSO: true,
+          where: { ...examType },
+        },
+        riskFactor: {
+          select: {
+            name: true,
+            severity: true,
+            type: true,
+            representAll: true,
+            id: true,
+            isAso: true,
+            isPCMSO: true,
+            ...(getRiskFactor && {
               docInfo: {
                 where: {
                   OR: [
@@ -149,84 +153,94 @@ export class FindExamByHierarchyService {
                   ...examType,
                 },
               },
-            },
+            }),
           },
-          homogeneousGroup: {
-            include: {
-              hierarchyOnHomogeneous: {
-                select: {
-                  hierarchy: { select: { id: true, type: true, name: true } },
-                },
-                ...(hierarchyId && {
-                  where: {
-                    homogeneousGroup: { type: 'HIERARCHY' },
-                    ...(date && { AND: [{ OR: [{ startDate: { lte: date } }, { startDate: null }] }, { OR: [{ endDate: { gt: date } }, { endDate: null }] }] }),
-                  },
-                }),
-              },
-              characterization: { select: { name: true, type: true } },
-              environment: { select: { name: true, type: true } },
-            },
-          },
-          id: true,
-          probability: true,
-          probabilityAfter: true,
-          companyId: true,
-          hierarchyId: true,
-          homogeneousGroupId: true,
-          riskId: true,
-          dataRecs: true,
-          level: true,
-          json: true,
-          standardExams: true,
-          riskFactorGroupDataId: true,
         },
-        where: {
-          ...(date && { AND: [{ OR: [{ startDate: { lte: date } }, { startDate: null }] }, { OR: [{ endDate: { gt: date } }, { endDate: null }] }] }),
-          companyId,
-          ...(hierarchyIds.length > 0 && {
-            homogeneousGroup: {
-              hierarchyOnHomogeneous: {
-                some: {
+        homogeneousGroup: {
+          include: {
+            hierarchyOnHomogeneous: {
+              select: {
+                hierarchy: { select: { id: true, type: true, name: true } },
+              },
+              ...(hierarchyId && {
+                where: {
+                  homogeneousGroup: { type: 'HIERARCHY' },
                   ...(date && { AND: [{ OR: [{ startDate: { lte: date } }, { startDate: null }] }, { OR: [{ endDate: { gt: date } }, { endDate: null }] }] }),
-                  hierarchyId: { in: hierarchyIds },
                 },
+              }),
+            },
+            characterization: { select: { name: true, type: true } },
+            environment: { select: { name: true, type: true } },
+          },
+        },
+        id: true,
+        probability: true,
+        probabilityAfter: true,
+        companyId: true,
+        hierarchyId: true,
+        homogeneousGroupId: true,
+        riskId: true,
+        dataRecs: true,
+        level: true,
+        json: true,
+        standardExams: true,
+        riskFactorGroupDataId: true,
+      },
+      where: {
+        ...(date && { AND: [{ OR: [{ startDate: { lte: date } }, { startDate: null }] }, { OR: [{ endDate: { gt: date } }, { endDate: null }] }] }),
+        companyId,
+        ...(hierarchyGtZero && {
+          homogeneousGroup: {
+            hierarchyOnHomogeneous: {
+              some: {
+                ...(date && { AND: [{ OR: [{ startDate: { lte: date } }, { startDate: null }] }, { OR: [{ endDate: { gt: date } }, { endDate: null }] }] }),
+                hierarchyId: { in: hierarchyIds },
               },
             },
-          }),
-          // here we check if has standard exam and is check OR if exam is directly add to risk
-          OR: [
-            {
-              examsToRiskFactorData: {
-                some: {
-                  examId: { gt: 0 },
-                  ...(query.onlyAttendance && { exam: { isAttendance: true } }),
-                },
+          },
+        }),
+        // here we check if has standard exam and is check OR if exam is directly add to risk
+        OR: [
+          {
+            examsToRiskFactorData: {
+              some: {
+                examId: { gt: 0 },
+                ...(query.onlyAttendance && { exam: { isAttendance: true } }),
               },
             },
-            ...(hierarchyIds.length > 0
-              ? [
-                  {
-                    riskFactor: {
-                      examToRisk: {
-                        some: {
-                          examId: { gt: 0 },
-                          ...(query.onlyAttendance && {
-                            exam: { isAttendance: true },
-                          }),
-                        },
+          },
+          ...(getRiskFactor
+            ? [
+                {
+                  riskFactor: {
+                    examToRisk: {
+                      some: {
+                        examId: { gt: 0 },
+                        ...(query.onlyAttendance && {
+                          exam: { isAttendance: true },
+                        }),
                       },
                     },
-                    standardExams: true,
                   },
-                ]
-              : []),
-          ],
-        },
-      })
-    ).filter((riskData) => {
-      return getRiskDoc(riskData.riskFactor, { companyId, hierarchyId })?.isAso;
+                  standardExams: true,
+                },
+              ]
+            : []),
+        ],
+      },
     });
+
+    if (hierarchyId) {
+      riskData = riskData.filter((riskData) => {
+        return getRiskDoc(riskData.riskFactor, { companyId, hierarchyId })?.isAso;
+      });
+    }
+
+    if (isGetExamToRisk && !hierarchyId) {
+      riskData = riskData.filter((riskData) => {
+        return getRiskDocV2(riskData.riskFactor, { companyId, getIfAnyIsTrue: true, docType: 'isAso' })?.isAso;
+      });
+    }
 
     const riskDataOrigin = riskData.map((rd) => {
       let prioritization: number;
@@ -261,7 +275,7 @@ export class FindExamByHierarchyService {
     const exams: Record<string, IExamOriginData[]> = {};
 
     riskDataOrigin.forEach((rd) => {
-      [...rd.examsToRiskFactorData, ...rd.riskFactor.examToRisk].forEach((examData) => {
+      [...rd.examsToRiskFactorData, ...(rd?.riskFactor?.examToRisk || [])].forEach((examData) => {
         const isStandard = !('isStandard' in examData) || (examData as any)?.isStandard;
 
         if (!exams[examData.examId]) exams[examData.examId] = [];
@@ -270,8 +284,8 @@ export class FindExamByHierarchyService {
           origin: isStandard ? `Padrão (${rd.origin && rd.origin})` : rd.origin,
           prioritization: (isStandard ? 100 : rd.prioritization) || 3,
           homogeneousGroup: rd.homogeneousGroup,
-          skipEmployee: this.checkIfSkipEmployee(examData, employee),
           risk: rd.riskFactor,
+          skipEmployee: this.checkIfSkipEmployee(examData, employee),
           ...this.checkExpiredDate(examData, employee),
         });
       });
@@ -373,6 +387,11 @@ export class FindExamByHierarchyService {
       const newOrigins = [];
 
       origins?.forEach((origin) => {
+        if (origin.risk?.docInfo) {
+          const availableRisk = getRiskDocV2(origin.risk, { companyId: employee.companyId, hierarchyId: employee.hierarchyId })?.isAso;
+          if (!availableRisk) return;
+        }
+
         const isPartOfHomo = origin?.homogeneousGroup ? origin.homogeneousGroup?.hierarchies?.find((hierarchy) => hierarchyIds.includes(hierarchy?.id)) : true;
         if (!isPartOfHomo) return;
 

@@ -52,7 +52,7 @@ export class AbsenteeismRepository {
         employee: { select: { name: true, cpf: true, id: true, companyId: true, company: { select: { id: true, name: true, initials: true, fantasy: true } } } },
       };
 
-    if ('search' in query) {
+    if ('search' in query && query.search) {
       (where.AND as any).push({
         OR: [{ employee: { name: { contains: query.search, mode: 'insensitive' } } }],
       } as typeof options.where);

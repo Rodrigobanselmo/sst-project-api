@@ -48,6 +48,14 @@ export class EmployeeComplementaryExamHistoryDto {
   scheduleType: ClinicScheduleTypeEnum;
 }
 export class CreateEmployeeExamHistoryDto {
+  @IsOptional()
+  @IsInt()
+  id?: number;
+
+  @IsOptional()
+  @IsInt()
+  scheduleMedicalVisitId?: number;
+
   @ValidateIf((o) => !!o.examId && o.status == StatusEnum.DONE)
   @IsInt()
   examId: number;

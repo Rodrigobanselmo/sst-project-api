@@ -76,4 +76,5 @@ export enum PermissionEnum {
   ALERT = '19',
   DOCUMENT_MODEL = '20',
   CLINIC_COMPANY_LINK = '21',
+  SCHEDULE_MEDICAL_VISIT = '22',
 }

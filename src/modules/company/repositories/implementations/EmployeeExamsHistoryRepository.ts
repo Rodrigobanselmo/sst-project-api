@@ -14,40 +14,51 @@ import clone from 'clone';
 export class EmployeeExamsHistoryRepository {
   constructor(private prisma: PrismaService, private dayjs: DayJSProvider) {}
 
-  async create({
+  createManyData = ({
     examsData = [],
     hierarchyId,
     ...createData
   }: CreateEmployeeExamHistoryDto & {
     userDoneId?: number;
     userScheduleId?: number;
-  }) {
-    const data = await this.prisma.employeeExamsHistory.createMany({
-      data: [
-        ...[
-          createData.examId && {
-            ...createData,
-            hierarchyId,
-            // isASO: true,
-            expiredDate: this.dayjs
-              .dayjs(createData.doneDate)
-              .add(createData.validityInMonths || 0, 'months')
-              .toDate(),
-          },
-        ].filter((i) => i),
-        ...examsData.map((exam) => ({
+  }) => {
+    const data: Prisma.EmployeeExamsHistoryCreateManyInput[] = [
+      ...[
+        createData.examId && {
+          ...createData,
           hierarchyId,
-          employeeId: createData.employeeId,
-          userDoneId: createData.userDoneId,
-          userScheduleId: createData.userScheduleId,
-          examType: createData.examType || undefined,
+          // isASO: true,
           expiredDate: this.dayjs
-            .dayjs(exam.doneDate)
-            .add(exam.validityInMonths || 0, 'months')
+            .dayjs(createData.doneDate)
+            .add(createData.validityInMonths || 0, 'months')
             .toDate(),
-          ...exam,
-        })),
-      ],
+        },
+      ].filter((i) => i),
+      ...examsData.map((exam) => ({
+        hierarchyId,
+        employeeId: createData.employeeId,
+        userDoneId: createData.userDoneId,
+        userScheduleId: createData.userScheduleId,
+        examType: createData.examType || undefined,
+        expiredDate: this.dayjs
+          .dayjs(exam.doneDate)
+          .add(exam.validityInMonths || 0, 'months')
+          .toDate(),
+        ...exam,
+      })),
+    ];
+
+    return data;
+  };
+
+  async create(
+    createData: CreateEmployeeExamHistoryDto & {
+      userDoneId?: number;
+      userScheduleId?: number;
+    },
+  ) {
+    const data = await this.prisma.employeeExamsHistory.createMany({
+      data: this.createManyData(createData),
     });
 
     return data;
@@ -160,7 +171,7 @@ export class EmployeeExamsHistoryRepository {
       ],
     });
 
-    if ('search' in query) {
+    if ('search' in query && query.search) {
       const OR = [];
       const CPF = onlyNumbers(query.search);
       const isCPF = CPF.length == 11;

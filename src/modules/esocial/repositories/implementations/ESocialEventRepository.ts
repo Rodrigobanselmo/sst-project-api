@@ -73,7 +73,7 @@ export class ESocialEventRepository {
       skip: ['search', 'companyId'],
     });
 
-    if ('search' in query) {
+    if ('search' in query && query.search) {
       (where.AND as any).push({
         OR: [
           {

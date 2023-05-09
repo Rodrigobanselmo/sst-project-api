@@ -147,7 +147,7 @@ export class GenerateSourceRepository implements IGenerateSourceRepository {
       } as typeof options.where);
     }
 
-    if ('search' in query) {
+    if ('search' in query && query.search) {
       const OR = [] as any[];
 
       OR.push({ name: { contains: query.search, mode: 'insensitive' } });

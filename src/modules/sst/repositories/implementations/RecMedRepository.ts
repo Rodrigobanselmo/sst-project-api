@@ -113,7 +113,7 @@ export class RecMedRepository implements IRecMedRepository {
       } as typeof options.where);
     }
 
-    if ('search' in query) {
+    if ('search' in query && query.search) {
       const OR = [] as any[];
 
       !query.onlyMed && OR.push({ recName: { contains: query.search, mode: 'insensitive' } });

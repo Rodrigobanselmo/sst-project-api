@@ -70,7 +70,7 @@ export class DocumentModelRepository {
         created_at: true,
       };
 
-    if ('search' in query) {
+    if ('search' in query && query.search) {
       (where.AND as any).push({
         OR: [{ name: { contains: query.search, mode: 'insensitive' } }, { description: { contains: query.search, mode: 'insensitive' } }],
       } as typeof options.where);

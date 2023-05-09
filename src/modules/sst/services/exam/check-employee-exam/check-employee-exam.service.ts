@@ -12,7 +12,7 @@ import { ReloadEmployeeExamTimeService } from '../reload-employee-exam-time/relo
 import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { dismissalDate, riskAllId } from '../../../../../shared/constants/ids';
 import { isShouldDemissionBlock } from '../../../../../shared/utils/demissionalBlockCalc';
-import { ExamHistoryTypeEnum } from '@prisma/client';
+import { ExamHistoryTypeEnum, ExamTypeEnum } from '@prisma/client';
 import { StatusEmployeeStepEnum } from '../../../../../shared/constants/enum/statusEmployeeStep.enum';
 
 @Injectable()
@@ -138,7 +138,7 @@ export class CheckEmployeeExamService {
 
     const exams = await this.findExamByHierarchyService.execute(
       { targetCompanyId: companyIdFound },
-      { ...(onlyOne && { employeeId: allEmployee[0].id, hierarchyId: allEmployee[0].hierarchyId }) },
+      { ...(onlyOne ? { employeeId: allEmployee[0].id, hierarchyId: allEmployee[0].hierarchyId } : { getAllExamToRiskWithoutHierarchy: true }) },
       { ...(onlyOne && { employee: allEmployee[0] }) },
     );
 
@@ -171,67 +171,74 @@ export class CheckEmployeeExamService {
   }
 
   async handleMissingHierarchy(employee: EmployeeEntity, examData: IExamOrigins[]) {
-    if (!employee.hierarchyId) {
-      const dismissalStart = employee.hierarchyHistory.find((h) => h.motive == 'DEM')?.startDate;
-      const dismissal = employee.status == 'INACTIVE';
-      let expiredDateExam: Date | null;
+    const { dismissalStart, isDismissal } = this.getIsDismissal(employee);
+    if (isDismissal) {
+      let expiredDateExam = dismissalStart;
 
-      if (dismissal && dismissalStart) {
-        expiredDateExam = dismissalStart;
+      const allClinicExams = employee.examsHistory.filter((examHis) => examHis.status == 'DONE');
+      const isDismissalLastExam = allClinicExams?.[0]?.examType == 'DEMI';
 
-        const allClinicExams = employee.examsHistory.filter((examHis) => examHis.status == 'DONE');
-        const isDismissalLastExam = allClinicExams?.[0]?.examType == 'DEMI';
+      if (isDismissalLastExam) {
+        expiredDateExam = this.dayjs.dayjs(dismissalDate).toDate();
+      } else {
+        const { isExpiredExam } = this.checkExpiredExam(employee, examData, { isDismissal: true });
+        const lastDoneClinicExam = employee.examsHistory.find((examHist) => examHist.status == 'DONE' && examHist.exam.isAttendance);
 
-        if (isDismissalLastExam) {
-          expiredDateExam = this.dayjs.dayjs(dismissalDate).toDate();
-        } else {
-          const { isExpiredExam } = this.checkExpiredExam(employee, examData, { isDismissal: true });
-          const lastDoneClinicExam = employee.examsHistory.find((examHist) => examHist.status == 'DONE' && examHist.exam.isAttendance);
+        if (!isExpiredExam && lastDoneClinicExam.doneDate) {
+          const company = await this.companyRepository.findFirstNude({
+            where: { id: employee.companyId },
+            select: {
+              primary_activity: true,
+              blockResignationExam: true,
+            },
+          });
 
-          if (!isExpiredExam && lastDoneClinicExam.doneDate) {
-            const company = await this.companyRepository.findFirstNude({
-              where: { id: employee.companyId },
-              select: {
-                primary_activity: true,
-                blockResignationExam: true,
-              },
+          if (company.blockResignationExam) {
+            const isBlock = isShouldDemissionBlock(company, {
+              doneDate: lastDoneClinicExam.doneDate,
+              dismissalDate: dismissalStart,
             });
 
-            if (company.blockResignationExam) {
-              const isBlock = isShouldDemissionBlock(company, {
-                doneDate: lastDoneClinicExam.doneDate,
-                dismissalDate: dismissalStart,
-              });
-
-              if (isBlock) {
-                expiredDateExam = this.dayjs.dayjs(dismissalDate).toDate();
-              }
+            if (isBlock) {
+              expiredDateExam = this.dayjs.dayjs(dismissalDate).toDate();
             }
           }
         }
-
-        return { expiredDateExam };
       }
+
+      return { expiredDateExam };
     }
 
     return { expiredDateExam: undefined };
+  }
+
+  getIsDismissal(employee: EmployeeEntity) {
+    if (!employee.hierarchyId) {
+      const dismissalStart = employee.hierarchyHistory.find((h) => h.motive == 'DEM')?.startDate;
+      const dismissal = employee.status == 'INACTIVE';
+
+      return { isDismissal: !!(dismissal && dismissalStart), dismissalStart };
+    }
+
+    return { isDismissal: false, dismissalStart: undefined };
   }
 
   checkExpiredExam(employee: EmployeeEntity, examsData: IExamOrigins[], options?: { onlyOne?: boolean; isDismissal?: boolean }) {
     let expiredComplementaryDate: Date;
     let expiredClinicDate: Date;
     let isExpiredExam = false;
+    let employeeExamType: ExamHistoryTypeEnum = options?.isDismissal ? ExamHistoryTypeEnum.DEMI : ExamHistoryTypeEnum.PERI;
 
     let hasComplementary = false;
 
-    const hierarchyIds = [...employee.subOffices.map(({ id }) => id)];
+    const hierarchyIds = [...employee?.subOffices?.map(({ id }) => id)];
 
     if (employee.hierarchyId) {
       hierarchyIds.push(employee.hierarchyId);
 
-      const hierarchy = employee?.hierarchy?.parents?.map((parent) => parent.id);
-      if (hierarchy) {
-        hierarchyIds.push(...hierarchy);
+      const hierarchyParentIds = employee?.hierarchy?.parents?.map((parent) => parent.id);
+      if (hierarchyParentIds) {
+        hierarchyIds.push(...hierarchyParentIds);
       }
     }
 
@@ -243,55 +250,62 @@ export class CheckEmployeeExamService {
       examFilteredOrigins = this.findExamByHierarchyService.filterOriginsByEmployee(examsData, employee, hierarchyIds);
     }
 
-    console.log(JSON.stringify(examFilteredOrigins, null, 2));
-
     const { examType: typeOfExam, examPossibleType } = this.getExamType(employee, examFilteredOrigins);
 
-    examFilteredOrigins.forEach(({ exam, origins }) => {
-      const isClinic = exam.isAttendance;
+    const originsExams = examFilteredOrigins
+      .map(({ exam, origins }) => {
+        const isClinic = exam.isAttendance;
 
-      origins?.find((origin) => {
-        let expiredOrigin = origin?.expiredDate;
+        return origins?.find((origin) => {
+          let expiredOrigin = origin?.expiredDate;
 
-        const examType = options?.isDismissal ? 'isDismissal' : typeOfExam;
+          const examType = options?.isDismissal ? 'isDismissal' : typeOfExam;
 
-        if (!origin?.[examType as any]) return false; // examType can not be isOffice, nao aceita esse valor somente isPer.., isAdm..
+          if (!origin?.[examType as any]) return false; // examType can not be isOffice, nao aceita esse valor somente isPer.., isAdm..
 
-        // if is in_admission will add expired date as admission date
-        if (['isAdmission'].includes(examType)) {
-          const actualHierarchyHistory = employee.hierarchyHistory[0];
-          const startDate = actualHierarchyHistory?.startDate;
+          // if is in_admission will add expired date as admission date
+          if (['isAdmission'].includes(examType)) {
+            const actualHierarchyHistory = employee.hierarchyHistory[0];
+            const startDate = actualHierarchyHistory?.startDate;
 
-          if (startDate) expiredOrigin = startDate;
-        }
+            if (startDate) {
+              employeeExamType = ExamHistoryTypeEnum.ADMI;
+              expiredOrigin = startDate;
+            }
+          }
 
-        if (!isClinic && ['isOffice'].includes(examPossibleType)) {
-          const actualHierarchyHistory = employee.hierarchyHistory[0];
-          const startDate = actualHierarchyHistory?.startDate;
+          if (!isClinic && ['isOffice'].includes(examPossibleType)) {
+            const actualHierarchyHistory = employee.hierarchyHistory[0];
+            const startDate = actualHierarchyHistory?.startDate;
 
-          const beforeHierarchyHistory = employee.hierarchyHistory[1];
-          const beforeStartDate = beforeHierarchyHistory?.startDate;
+            const beforeHierarchyHistory = employee.hierarchyHistory[1];
+            const beforeStartDate = beforeHierarchyHistory?.startDate;
 
-          const newExamInHierarchy = !expiredOrigin || (beforeStartDate && beforeStartDate > origin.doneDate);
+            const newExamInHierarchy = !expiredOrigin || (beforeStartDate && beforeStartDate > origin.doneDate);
 
-          if (newExamInHierarchy && startDate) expiredOrigin = startDate;
-        }
+            if (newExamInHierarchy && startDate) {
+              employeeExamType = ExamHistoryTypeEnum.OFFI;
+              expiredOrigin = startDate;
+            }
+          }
 
-        const isExpiredNull = expiredOrigin === null;
-        const replaceExpiredDateComp = isExpiredNull || expiredComplementaryDate === undefined || (expiredComplementaryDate && expiredComplementaryDate > expiredOrigin);
-        const replaceExpiredDateClinic = isExpiredNull || expiredClinicDate === undefined || (expiredClinicDate && expiredClinicDate > expiredOrigin);
+          const isExpiredNull = expiredOrigin === null;
+          const replaceExpiredDateComp =
+            isExpiredNull || expiredComplementaryDate === undefined || (expiredComplementaryDate && expiredComplementaryDate > expiredOrigin);
+          const replaceExpiredDateClinic = isExpiredNull || expiredClinicDate === undefined || (expiredClinicDate && expiredClinicDate > expiredOrigin);
 
-        if (!isClinic && replaceExpiredDateComp) expiredComplementaryDate = expiredOrigin;
-        if (isClinic && replaceExpiredDateClinic) expiredClinicDate = expiredOrigin;
+          if (!isClinic && replaceExpiredDateComp) expiredComplementaryDate = expiredOrigin;
+          if (isClinic && replaceExpiredDateClinic) expiredClinicDate = expiredOrigin;
 
-        const isExpired = !expiredOrigin || (expiredOrigin && expiredOrigin <= new Date());
+          const isExpired = !expiredOrigin || (expiredOrigin && expiredOrigin <= new Date());
 
-        if (isExpired) isExpiredExam = true;
-        if (!isClinic) hasComplementary = true;
+          if (isExpired) isExpiredExam = true;
+          if (!isClinic) hasComplementary = true;
 
-        return true;
-      });
-    });
+          return true;
+        });
+      })
+      .filter((origin) => origin);
 
     let expiredDate: Date | null = null;
 
@@ -315,7 +329,7 @@ export class CheckEmployeeExamService {
       expiredDate = expiredClinicDate;
     }
 
-    return { isExpiredExam, expiredDateExam: expiredDate };
+    return { isExpiredExam, expiredDateExam: expiredDate, originsExams, employeeExamType };
   }
 
   getExamType(employee: EmployeeEntity, examFilteredOrigins: IExamOrigins[]) {

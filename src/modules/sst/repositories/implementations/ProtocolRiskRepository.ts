@@ -68,7 +68,7 @@ export class ProtocolToRiskRepository {
       skip: ['search'],
     });
 
-    if ('search' in query) {
+    if ('search' in query && query.search) {
       (where.AND as any).push({
         OR: [{ protocol: { name: { contains: query.search, mode: 'insensitive' } } }, { risk: { name: { contains: query.search, mode: 'insensitive' } } }],
       } as typeof options.where);

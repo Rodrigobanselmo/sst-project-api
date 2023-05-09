@@ -1,3 +1,4 @@
+import { ExamEntity } from './../../../sst/entities/exam.entity';
 import { onlyNumbers } from '@brazilian-utils/brazilian-utils';
 import { ConflictException, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
@@ -324,6 +325,10 @@ export class EmployeeRepository {
           cnpj: true,
           initials: true,
           ...(typeof options.select.company != 'boolean' && options.select.company?.select && options.select.company.select),
+          ...(query?.getGroup && {
+            unit: true,
+            group: { select: { name: true } },
+          }),
         },
       };
 
@@ -346,37 +351,30 @@ export class EmployeeRepository {
       delete query.companyId;
     }
 
-    if ('expiredExam' in query) {
-      options.orderBy = [{ expiredDateExam: { sort: 'asc', nulls: 'first' } }, { company: { group: { name: 'asc' } } }, { company: { name: 'asc' } }, { name: 'asc' }];
-      options.select.expiredDateExam = true;
-      options.select.newExamAdded = true;
-      options.select.examsHistory = {
-        select: {
-          status: true,
-          id: true,
-          doneDate: true,
-          evaluationType: true,
-          hierarchyId: true,
-          subOfficeId: true,
-          examType: true,
-          expiredDate: true,
-        },
-        where: {
-          exam: { isAttendance: true },
-          status: { in: ['PENDING', 'PROCESSING', 'DONE'] },
-        },
-        distinct: ['status'],
-        take: 3,
-        orderBy: { doneDate: 'desc' },
-      };
-    }
-
     const { where } = prismaFilter(whereInit, {
       query,
-      skip: ['search', 'hierarchySubOfficeId', 'lteExpiredDateExam', 'all', 'expiredExam', 'companiesIds', 'uf', 'cities', 'companiesGroupIds'],
+      skip: [
+        'search',
+        'hierarchySubOfficeId',
+        'lteExpiredDateExam',
+        'all',
+        'expiredExam',
+        'companiesIds',
+        'uf',
+        'cities',
+        'companiesGroupIds',
+        `getAllExams`,
+        'workspacesIds',
+        'getAllHierarchyIds',
+        'noPagination',
+        'getAllExamsWithSchedule',
+        'getSector',
+        'getEsocialCode',
+        'getGroup',
+      ],
     });
 
-    if ('search' in query) {
+    if ('search' in query && query.search) {
       const OR = [];
       const CPF = onlyNumbers(query.search);
       const isCPF = CPF.length == 11;
@@ -412,6 +410,18 @@ export class EmployeeRepository {
       } as typeof options.where);
     }
 
+    if ('workspacesIds' in query) {
+      (where.AND as any).push({
+        company: {
+          workspace: {
+            some: {
+              id: { in: query.workspacesIds },
+            },
+          },
+        },
+      } as typeof options.where);
+    }
+
     if ('companiesGroupIds' in query) {
       (where.AND as any).push({
         company: {
@@ -438,9 +448,134 @@ export class EmployeeRepository {
 
     if ('lteExpiredDateExam' in query) {
       (where.AND as any).push({
-        expiredDateExam: {
-          lte: query.lteExpiredDateExam,
+        OR: [
+          {
+            expiredDateExam: {
+              lte: query.lteExpiredDateExam,
+            },
+          },
+          { expiredDateExam: null },
+        ],
+      } as typeof options.where);
+    }
+
+    if ('getAllHierarchyIds' in query) {
+      options.select.subOffices = { select: { id: true } };
+      options.select.hierarchy = {
+        select: {
+          id: true,
+          parent: {
+            select: {
+              id: true,
+              parent: {
+                select: {
+                  id: true,
+                  parent: {
+                    select: {
+                      id: true,
+                      parent: { select: { id: true } },
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
+      };
+    }
+
+    if ('expiredExam' in query) {
+      options.orderBy = [{ expiredDateExam: { sort: 'asc', nulls: 'first' } }, { company: { group: { name: 'asc' } } }, { company: { name: 'asc' } }, { name: 'asc' }];
+      options.select.expiredDateExam = true;
+      options.select.newExamAdded = true;
+      options.select.examsHistory = {
+        select: {
+          status: true,
+          id: true,
+          doneDate: true,
+          evaluationType: true,
+          hierarchyId: true,
+          subOfficeId: true,
+          examType: true,
+          expiredDate: true,
+        },
+        where: {
+          exam: { isAttendance: true },
+          status: { in: ['PENDING', 'PROCESSING', 'DONE'] },
+        },
+        distinct: ['status'],
+        take: 3,
+        orderBy: { doneDate: 'desc' },
+      };
+    }
+
+    if ('getSector' in query) {
+      options.select.hierarchy = { select: { name: true, parent: { select: { name: true, type: true, parent: { select: { name: true, type: true } } } } } };
+    }
+
+    if ('getEsocialCode' in query) {
+      options.select.esocialCode = true;
+    }
+
+    if ('getAllExams' in query) {
+      options.orderBy = [{ expiredDateExam: { sort: 'asc', nulls: 'first' } }, { company: { group: { name: 'asc' } } }, { company: { name: 'asc' } }, { name: 'asc' }];
+      options.select.hierarchyId = true;
+      options.select.lastExam = true;
+      options.select.status = true;
+      options.select.expiredDateExam = true;
+      options.select.birthday = true;
+      options.select.sex = true;
+      options.select.subOffices = { select: { id: true } };
+      options.select.hierarchyHistory = {
+        take: 2,
+        select: { startDate: true, motive: true, hierarchyId: true },
+        orderBy: { startDate: 'desc' },
+      };
+      options.select.examsHistory = {
+        select: {
+          doneDate: true,
+          expiredDate: true,
+          status: true,
+          examType: true,
+          evaluationType: true,
+          hierarchyId: true,
+          validityInMonths: true,
+          examId: true,
+          exam: {
+            select: { isAttendance: true },
+          },
+        },
+        orderBy: { doneDate: 'desc' },
+        distinct: ['examId', 'status'],
+        where: {
+          exam: { isAvaliation: false },
+          ...(!query.getAllExamsWithSchedule && {
+            status: { in: ['DONE'] },
+          }),
+          ...(query.getAllExamsWithSchedule && {
+            OR: [
+              {
+                status: { in: ['DONE'] },
+              },
+              {
+                status: { in: ['PROCESSING'] },
+                doneDate: { gte: new Date() },
+              },
+            ],
+          }),
+        },
+      };
+
+      (where.AND as any).push({
+        status: { not: 'CANCELED' },
+        OR: [
+          {
+            skippedDismissalExam: false,
+          },
+          {
+            skippedDismissalExam: null,
+          },
+        ],
       } as typeof options.where);
     }
 
@@ -449,8 +584,10 @@ export class EmployeeRepository {
         where,
       }),
       this.prisma.employee.findMany({
-        take: pagination.take || 20,
-        skip: pagination.skip || 0,
+        ...(!query.noPagination && {
+          take: pagination.take || 20,
+          skip: pagination.skip || 0,
+        }),
         ...options,
         where,
       }),
@@ -459,6 +596,7 @@ export class EmployeeRepository {
     return {
       data: response[1].map((employee) => new EmployeeEntity(employee)),
       count: response[0],
+      exams: [] as ExamEntity[],
     };
   }
 
@@ -597,7 +735,7 @@ export class EmployeeRepository {
       skip: ['search', 'companiesIds', 'startDate', 'all'],
     });
 
-    if ('search' in query) {
+    if ('search' in query && query.search) {
       const OR = [];
       const CPF = onlyNumbers(query.search);
       const isCPF = CPF.length == 11;

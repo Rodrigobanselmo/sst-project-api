@@ -122,7 +122,7 @@ class ReportFactoryProduct implements IReportFactoryProduct<FindCompaniesDto> {
   }
 
   public getTitle(header: IReportHeader): IReportCell[][] {
-    const row: IReportCell[] = [{ content: 'Relação de clínicas credenciadas', mergeRight: header.length }];
+    const row: IReportCell[] = [{ content: 'Relação de clínicas credenciadas', mergeRight: header.length - 1 }];
     const rows = [row];
 
     return rows;

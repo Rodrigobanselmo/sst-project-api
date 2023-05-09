@@ -2,7 +2,7 @@ import { StatusEmployeeStepEnum } from './../../../shared/constants/enum/statusE
 import { getEmployeeRowStatus } from './../../../shared/utils/getExpiredExamStatus.utils';
 import { StatusExamEnum } from './../../../shared/constants/enum/statusExam.enum';
 import { ApiProperty } from '@nestjs/swagger';
-import { Company, Employee, Hierarchy, SexTypeEnum, StatusEnum } from '@prisma/client';
+import { Company, Employee, ExamHistoryTypeEnum, Hierarchy, SexTypeEnum, StatusEnum } from '@prisma/client';
 import { EmployeePPPHistoryEntity } from './employee-ppp-history.entity';
 import { CompanyEntity } from './company.entity';
 import { EmployeeExamsHistoryEntity } from './employee-exam-history.entity';
@@ -89,6 +89,20 @@ export class EmployeeEntity implements Employee {
   sectorHierarchy?: HierarchyEntity;
   scheduleExam?: EmployeeExamsHistoryEntity;
   lastDoneExam?: EmployeeExamsHistoryEntity;
+  examType?: ExamHistoryTypeEnum;
+  infoExams?: Record<
+    number,
+    {
+      expiredDate?: Date;
+      closeToExpired?: boolean;
+      examId: number;
+      isAttendance: boolean;
+      status?: StatusExamEnum;
+      validity?: number;
+      validityDateString?: string;
+      isScheduled?: boolean;
+    }
+  >;
 
   constructor(
     partial: Partial<Omit<EmployeeEntity, 'company'>> & {
@@ -134,7 +148,7 @@ export class EmployeeEntity implements Employee {
       this.examsHistory = this.examsHistory.map((examsHistory) => new EmployeeExamsHistoryEntity(examsHistory));
       this.scheduleExam = this.examsHistory.find((p) => p?.status == 'PROCESSING');
       this.lastDoneExam = this.examsHistory.find((p) => p?.status == 'DONE');
-      this.statusExam = getEmployeeRowStatus(this as EmployeeEntity);
+      this.statusExam = getEmployeeRowStatus(this.examsHistory[0], this.expiredDateExam);
     }
 
     if (this.hierarchyHistory) {

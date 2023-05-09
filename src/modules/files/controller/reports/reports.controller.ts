@@ -13,6 +13,7 @@ import { ClinicReportService } from '../../services/reports/clinic-report/clinic
 import { DoneExamReportService } from '../../services/reports/done-exam-report/done-exam-report.service';
 import { ExpiredExamReportService } from '../../services/reports/expired-exam-report/expired-exam-report.service';
 import { RiskStructureReportService } from '../../services/reports/risk-structure-report/risk-structure-report.service';
+import { ExamComplementaryReportService } from '../../services/reports/exam-complementary-report/exam-complementary-report.service';
 
 export const getResponse = (res: Response, data: any) => {
   if ('workbook' in data) {
@@ -32,6 +33,7 @@ export class ReportsController {
     private readonly expiredExamReportService: ExpiredExamReportService,
     private readonly doneExamReportService: DoneExamReportService,
     private readonly riskStructureReportService: RiskStructureReportService,
+    private readonly examComplementaryReportService: ExamComplementaryReportService,
   ) {}
 
   @Permissions({ code: PermissionEnum.CLINIC, crud: true, isMember: true })
@@ -45,6 +47,13 @@ export class ReportsController {
   @Post('/expired-exam/:companyId')
   async expiredExam(@Body() body: DownloadExpiredExamReportDto, @User() userPayloadDto: UserPayloadDto, @Res() res: Response) {
     const data = await this.expiredExamReportService.execute(body, userPayloadDto);
+    getResponse(res, data);
+  }
+
+  @Permissions({ code: PermissionEnum.CLINIC_SCHEDULE, crud: true, isMember: true })
+  @Post('/complementary-exam/:companyId')
+  async complementaryExam(@Body() body: DownloadExpiredExamReportDto, @User() userPayloadDto: UserPayloadDto, @Res() res: Response) {
+    const data = await this.examComplementaryReportService.execute(body, userPayloadDto);
     getResponse(res, data);
   }
 

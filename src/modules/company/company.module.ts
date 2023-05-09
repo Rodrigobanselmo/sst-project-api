@@ -151,6 +151,14 @@ import { DeleteScheduleBlocksService } from './services/scheduleBlock/delete-sch
 import { FindOneScheduleBlocksService } from './services/scheduleBlock/find-one-schedule-block/find-one-schedule-block.service';
 import { FindScheduleBlocksService } from './services/scheduleBlock/find-schedule-block/find-schedule-block.service';
 import { UpdateScheduleBlocksService } from './services/scheduleBlock/update-schedule-block/update-schedule-block.service';
+import { DeleteCompanyService } from './services/company/delete-company/delete-company.service';
+import { ScheduleMedicalVisitRepository } from './repositories/implementations/ScheduleMedicalVisitRepository';
+import { FindScheduleMedicalVisitsService } from './services/scheduleMedicalVisit/find-schedule-medical-visit/find-schedule-medical-visit.service';
+import { CreateScheduleMedicalVisitsService } from './services/scheduleMedicalVisit/create-schedule-medical-visit/create-schedule-medical-visit.service';
+import { UpdateScheduleMedicalVisitsService } from './services/scheduleMedicalVisit/update-schedule-medical-visit/update-schedule-medical-visit.service';
+import { DeleteScheduleMedicalVisitsService } from './services/scheduleMedicalVisit/delete-schedule-medical-visit/delete-schedule-medical-visit.service';
+import { ScheduleMedicalVisitController } from './controller/scheduleMedicalVisit/scheduleMedicalVisit.controller';
+import { FindOneScheduleMedicalVisitsService } from './services/scheduleMedicalVisit/find-one-schedule-medical-visit/find-one-schedule-medical-visit.service';
 
 @Module({
   imports: [
@@ -178,6 +186,7 @@ import { UpdateScheduleBlocksService } from './services/scheduleBlock/update-sch
     CompanyOSController,
     ScheduleBlockController,
     AlertController,
+    ScheduleMedicalVisitController,
   ],
   providers: [
     CreateCompanyService,
@@ -313,6 +322,13 @@ import { UpdateScheduleBlocksService } from './services/scheduleBlock/update-sch
     AlertReportCron,
     UpdateApplyServiceCompanyService,
     UpsertEmployeeHierarchyHistoryService,
+    DeleteCompanyService,
+    ScheduleMedicalVisitRepository,
+    FindScheduleMedicalVisitsService,
+    CreateScheduleMedicalVisitsService,
+    UpdateScheduleMedicalVisitsService,
+    DeleteScheduleMedicalVisitsService,
+    FindOneScheduleMedicalVisitsService,
   ],
   exports: [
     CompanyRepository,
@@ -332,6 +348,7 @@ import { UpdateScheduleBlocksService } from './services/scheduleBlock/update-sch
     ScheduleBlockRepository,
     UpsertEmployeeHierarchyHistoryService,
     CreateEmployeeService,
+    FindAllAvailableEmployeesService,
   ],
 })
 export class CompanyModule {}

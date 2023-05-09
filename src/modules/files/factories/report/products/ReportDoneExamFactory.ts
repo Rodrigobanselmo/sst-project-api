@@ -190,8 +190,8 @@ class ReportFactoryProduct implements IReportFactoryProduct<FindEmployeeExamHist
     const startDate = query.startDate ? this.dayjsProvider.format(query.startDate) : '__/__/____';
     const endDate = query.endDate ? this.dayjsProvider.format(query.endDate) : '__/__/____';
 
-    const row: IReportCell[] = [{ content: 'Exames Realizados', mergeRight: header.length }];
-    const row2: IReportCell[] = [{ content: `Périodo: ${startDate} à ${endDate}`, mergeRight: header.length }];
+    const row: IReportCell[] = [{ content: 'Exames Realizados', mergeRight: header.length - 1 }];
+    const row2: IReportCell[] = [{ content: `Périodo: ${startDate} à ${endDate}`, mergeRight: header.length - 1 }];
     const rows = [row, row2];
 
     return rows;

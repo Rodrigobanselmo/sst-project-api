@@ -5,6 +5,8 @@ import { HomoGroupEntity } from '../../company/entities/homoGroup.entity';
 import { ExamRiskEntity } from './examRisk.entity';
 import { ExamRiskDataEntity } from './examRiskData.entity';
 import { ExamToClinicEntity } from './examToClinic';
+import { RiskDocInfoEntity } from './riskDocInfo.entity';
+import { RiskFactorsEntity } from './risk.entity';
 
 export interface IExamOriginData extends Partial<ExamRiskDataEntity> {
   origin?: string;
@@ -15,7 +17,7 @@ export interface IExamOriginData extends Partial<ExamRiskDataEntity> {
   expiredDate?: Date | null;
   doneDate?: Date | null;
   homogeneousGroup?: HomoGroupEntity;
-  risk?: { name: string; id: string };
+  risk?: RiskFactorsEntity;
 }
 
 export interface IExamEmployeeCheck {

@@ -44,6 +44,8 @@ import { ReportRiskStructureFactory } from './factories/report/products/ReportRi
 import { RiskStructureReportService } from './services/reports/risk-structure-report/risk-structure-report.service';
 import { DownaldEmployeeModelFactory } from './factories/report/products/DownaldEmployeeModelFactory';
 import { ModelsUploadsController } from './controller/models/models.controller';
+import { ReportExpiredComplementaryExamFactory } from './factories/report/products/ReportExpiredComplementaryExamFactory';
+import { ExamComplementaryReportService } from './services/reports/exam-complementary-report/exam-complementary-report.service';
 
 @Module({
   controllers: [FilesChecklistController, ModelsUploadsController, ReportsController, FilesCompanyController, FilesCnaeController, FilesController, FilesCidController],
@@ -85,6 +87,8 @@ import { ModelsUploadsController } from './controller/models/models.controller';
     RiskStructureReportService,
     DownaldRiskModelFactory,
     DownaldEmployeeModelFactory,
+    ReportExpiredComplementaryExamFactory,
+    ExamComplementaryReportService,
   ],
 })
 export class FilesModule {}

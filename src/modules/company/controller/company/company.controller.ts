@@ -1,5 +1,5 @@
 import { Public } from './../../../../shared/decorators/public.decorator';
-import { BadRequestException, Body, Controller, Get, Param, Patch, Post, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -28,6 +28,7 @@ import { UpdateAllCompaniesService } from '../../services/report/update-all-comp
 import { FindCompanyDashDto } from '../../dto/dashboard.dto';
 import { DashboardCompanyService } from '../../services/report/dashboard-company/dashboard-company.service';
 import { UpdateApplyServiceCompanyService } from '../../services/company/update-apply-service-company/update-apply-service-company.service';
+import { DeleteCompanyService } from '../../services/company/delete-company/delete-company.service';
 
 @ApiTags('company')
 @Controller('company')
@@ -49,6 +50,7 @@ export class CompanyController {
     private readonly dashboardCompanyService: DashboardCompanyService,
     private readonly updateAllCompaniesService: UpdateAllCompaniesService,
     private readonly updateApplyServiceCompanyService: UpdateApplyServiceCompanyService,
+    private readonly deleteCompanyService: DeleteCompanyService,
   ) {}
 
   @Roles(RoleEnum.COMPANY, RoleEnum.CONTRACTS, RoleEnum.CLINICS, RoleEnum.USER, RoleEnum.DOCTOR)
@@ -217,6 +219,28 @@ export class CompanyController {
   @Post('/:companyId/set-clinics')
   setClinics(@Body() setCompanyClinicDto: SetCompanyClinicDto, @User() userPayloadDto: UserPayloadDto) {
     return this.setCompanyClinicsService.execute(setCompanyClinicDto, userPayloadDto);
+  }
+
+  @Permissions({
+    code: PermissionEnum.COMPANY,
+    crud: true,
+    isMember: true,
+    isContract: true,
+  })
+  @Delete('/:companyId')
+  delete(@User() userPayloadDto: UserPayloadDto) {
+    return this.deleteCompanyService.execute(userPayloadDto);
+  }
+
+  @Permissions({
+    code: PermissionEnum.CLINIC,
+    crud: true,
+    isMember: true,
+    isContract: true,
+  })
+  @Delete('/:companyId/clinic')
+  deleteClinic(@User() userPayloadDto: UserPayloadDto) {
+    return this.deleteCompanyService.execute(userPayloadDto, { clinic: true });
   }
 
   @Public()

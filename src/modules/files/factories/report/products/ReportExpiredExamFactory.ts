@@ -118,7 +118,7 @@ class ReportFactoryProduct implements IReportFactoryProduct<FindEmployeeDto> {
   }
 
   public getTitle(header: IReportHeader): IReportCell[][] {
-    const row: IReportCell[] = [{ content: 'Exames Vencidos', mergeRight: header.length }];
+    const row: IReportCell[] = [{ content: 'Exames Vencidos', mergeRight: header.length - 1 }];
     const rows = [row];
 
     return rows;

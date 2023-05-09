@@ -351,6 +351,9 @@ model Company {
   scheduleBlocks             ScheduleBlock[]                  @relation(name: "schedule_block_m2m_companies")
   alerts                     Alert[]
   documentModels             DocumentModel[]
+  scheduleMedicalVisits      ScheduleMedicalVisit[]
+  clinicMedicalVisits        ScheduleMedicalVisit[]           @relation(name: "medical_visit_clinic")
+  labMedicalVisits           ScheduleMedicalVisit[]           @relation(name: "medical_visit_lab")
 
   @@index([name])
   @@index([isClinic])
@@ -457,7 +460,7 @@ model CompanyReport {
   esocialPendent  Int       @default(0)
   esocialReject   Int       @default(0)
   esocialProgress Int       @default(0)
-  company         Company   @relation(fields: [companyId], references: [id])
+  company         Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([companyId])
 }
@@ -511,7 +514,7 @@ model CompanyShift {
   companyId   String
   created_at  DateTime   @default(now())
   updated_at  DateTime   @updatedAt
-  company     Company    @relation(fields: [companyId], references: [id])
+  company     Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
   employees   Employee[]
 
   @@unique([id, companyId])
@@ -725,46 +728,48 @@ model EmployeeHierarchyHistory {
 }
 
 model EmployeeExamsHistory {
-  id                    Int                        @id @default(autoincrement())
-  created_at            DateTime                   @default(now())
-  updated_at            DateTime                   @updatedAt
-  doneDate              DateTime?
-  validityInMonths      Int?
-  time                  String?
-  examId                Int
-  employeeId            Int
-  clinicId              String?
-  conclusion            ExamHistoryConclusionEnum?
-  doctorId              Int?
-  evaluationType        ExamHistoryEvaluationEnum?
-  examType              ExamHistoryTypeEnum?
-  obs                   String?
-  status                StatusEnum                 @default(DONE)
-  userDoneId            Int?
-  userScheduleId        Int?
-  expiredDate           DateTime?
-  changeHierarchyAnyway Boolean                    @default(false)
-  changeHierarchyDate   DateTime?
-  clinicObs             String?
-  hierarchyId           String?
-  scheduleType          ClinicScheduleTypeEnum?
-  fileUrl               String?
-  subOfficeId           String?
-  deletedAt             DateTime?
-  sendEvent             Boolean                    @default(true)
-  asoExamId             Int?
-  isSequential          Boolean?
-  events                EmployeeESocialEvent[]
-  asoExam               EmployeeExamsHistory?      @relation("aso_exam_relation", fields: [asoExamId], references: [id], onDelete: Restrict)
-  complementaryExams    EmployeeExamsHistory[]     @relation("aso_exam_relation")
-  clinic                Company?                   @relation(fields: [clinicId], references: [id], onDelete: Restrict)
-  doctor                ProfessionalCouncil?       @relation(fields: [doctorId], references: [id], onDelete: Restrict)
-  employee              Employee                   @relation(fields: [employeeId], references: [id])
-  exam                  Exam                       @relation(fields: [examId], references: [id])
-  hierarchy             Hierarchy?                 @relation(fields: [hierarchyId], references: [id], onDelete: Restrict)
-  subOffice             Hierarchy?                 @relation("subOffice_employee_exam", fields: [subOfficeId], references: [id], onDelete: Restrict)
-  userDone              User?                      @relation("user_done", fields: [userDoneId], references: [id], onDelete: Restrict)
-  userSchedule          User?                      @relation("user_schedule", fields: [userScheduleId], references: [id], onDelete: Restrict)
+  id                     Int                        @id @default(autoincrement())
+  created_at             DateTime                   @default(now())
+  updated_at             DateTime                   @updatedAt
+  doneDate               DateTime?
+  validityInMonths       Int?
+  time                   String?
+  examId                 Int
+  employeeId             Int
+  clinicId               String?
+  conclusion             ExamHistoryConclusionEnum?
+  doctorId               Int?
+  evaluationType         ExamHistoryEvaluationEnum?
+  examType               ExamHistoryTypeEnum?
+  obs                    String?
+  status                 StatusEnum                 @default(DONE)
+  userDoneId             Int?
+  userScheduleId         Int?
+  scheduleMedicalVisitId Int?
+  expiredDate            DateTime?
+  changeHierarchyAnyway  Boolean                    @default(false)
+  changeHierarchyDate    DateTime?
+  clinicObs              String?
+  hierarchyId            String?
+  scheduleType           ClinicScheduleTypeEnum?
+  fileUrl                String?
+  subOfficeId            String?
+  deletedAt              DateTime?
+  sendEvent              Boolean                    @default(true)
+  asoExamId              Int?
+  isSequential           Boolean?
+  events                 EmployeeESocialEvent[]
+  asoExam                EmployeeExamsHistory?      @relation("aso_exam_relation", fields: [asoExamId], references: [id], onDelete: Restrict)
+  complementaryExams     EmployeeExamsHistory[]     @relation("aso_exam_relation")
+  clinic                 Company?                   @relation(fields: [clinicId], references: [id], onDelete: Restrict)
+  doctor                 ProfessionalCouncil?       @relation(fields: [doctorId], references: [id], onDelete: Restrict)
+  employee               Employee                   @relation(fields: [employeeId], references: [id])
+  exam                   Exam                       @relation(fields: [examId], references: [id])
+  scheduleMedicalVisit   ScheduleMedicalVisit?      @relation(fields: [scheduleMedicalVisitId], references: [id])
+  hierarchy              Hierarchy?                 @relation(fields: [hierarchyId], references: [id], onDelete: Restrict)
+  subOffice              Hierarchy?                 @relation("subOffice_employee_exam", fields: [subOfficeId], references: [id], onDelete: Restrict)
+  userDone               User?                      @relation("user_done", fields: [userDoneId], references: [id], onDelete: Restrict)
+  userSchedule           User?                      @relation("user_schedule", fields: [userScheduleId], references: [id], onDelete: Restrict)
 
   @@index([status])
   @@index([deletedAt])
@@ -989,7 +994,7 @@ model ExamToClinic {
   isDismissal     Boolean                 @default(true)
   isPeriodic      Boolean                 @default(true)
   isReturn        Boolean                 @default(true)
-  company         Company                 @relation(fields: [companyId], references: [id])
+  company         Company                 @relation(fields: [companyId], references: [id], onDelete: Cascade)
   exam            Exam                    @relation(fields: [examId], references: [id])
 
   @@unique([examId, companyId, startDate, groupId])
@@ -1028,7 +1033,7 @@ model Alert {
   type       AlertsTypeEnum
   companyId  String
   system     Boolean        @default(false)
-  company    Company        @relation(fields: [companyId], references: [id])
+  company    Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
   groups     AccessGroups[]
   users      User[]
   emails     String[]
@@ -1236,6 +1241,7 @@ model ProfessionalCouncil {
   professional              Professional                     @relation(fields: [professionalId], references: [id], onDelete: Cascade)
   professionalsResponsibles ProfessionalCouncilResponsible[]
   professionalDataSignature DocumentDataToProfessional[]
+  scheduleMedicalVisits     ScheduleMedicalVisit[]
 
   @@unique([councilType, councilUF, councilId, professionalId])
 }
@@ -1550,7 +1556,7 @@ model ScheduleBlock {
   allCompanies Boolean   @default(false)
 
   companyId        String
-  company          Company   @relation(fields: [companyId], references: [id])
+  company          Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   applyOnCompanies Company[] @relation(name: "schedule_block_m2m_companies")
 
   @@unique([id, companyId])
@@ -1559,6 +1565,32 @@ model ScheduleBlock {
   @@index(startDate)
   @@index(endDate)
   @@index(name)
+}
+
+model ScheduleMedicalVisit {
+  id             Int        @id @default(autoincrement())
+  updated_at     DateTime   @updatedAt
+  created_at     DateTime   @default(now())
+  status         StatusEnum @default(ACTIVE)
+  doneClinicDate DateTime?
+  doneLabDate    DateTime?
+  companyId      String
+  userId         Int
+  clinicId       String?
+  labId          String?
+  docId          Int?
+
+  company Company              @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user    User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clinic  Company?             @relation(name: "medical_visit_clinic", fields: [clinicId], references: [id], onDelete: Cascade)
+  lab     Company?             @relation(name: "medical_visit_lab", fields: [labId], references: [id], onDelete: Cascade)
+  doc     ProfessionalCouncil? @relation(fields: [docId], references: [id], onDelete: Restrict)
+
+  exams EmployeeExamsHistory[]
+
+  @@unique([id, companyId])
+  @@index([companyId])
+  @@index(status)
 }
 
 model User {
@@ -1582,6 +1614,7 @@ model User {
   notification        Notification[]         @relation("NotificationToUser")
   notificationConfirm Notification[]         @relation("user_notification_confirm")
   alerts              Alert[]
+  medicalVisits       ScheduleMedicalVisit[]
 
   @@unique([id, name])
   @@index([email])

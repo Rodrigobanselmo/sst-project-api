@@ -239,7 +239,7 @@ export class RiskRepository implements IRiskRepository {
       skip: ['search', 'companyId'],
     });
 
-    if ('search' in query) {
+    if ('search' in query && query.search) {
       const OR = [];
       OR.push({ name: { contains: query.search, mode: 'insensitive' } });
 
