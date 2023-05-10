@@ -1,3 +1,4 @@
+import { CheckEmployeeExamService } from './../../../../sst/services/exam/check-employee-exam/check-employee-exam.service';
 import { EmployeeExamsHistoryRepository } from './../../../repositories/implementations/EmployeeExamsHistoryRepository';
 import { ScheduleMedicalVisitRepository } from './../../../repositories/implementations/ScheduleMedicalVisitRepository';
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
@@ -6,6 +7,7 @@ import { UpdateScheduleMedicalVisitDto } from '../../../../..//modules/company/d
 import { CreateEmployeeExamHistoryService } from '../../employee/0-history/exams/create/create.service';
 import { UpdateEmployeeExamHistoryService } from '../../employee/0-history/exams/update/update.service';
 import { asyncBatch } from 'src/shared/utils/asyncBatch';
+import { StatusEnum } from '@prisma/client';
 
 @Injectable()
 export class UpdateScheduleMedicalVisitsService {
@@ -14,6 +16,7 @@ export class UpdateScheduleMedicalVisitsService {
     private readonly updateEmployeeExamHistoryService: UpdateEmployeeExamHistoryService,
     private readonly scheduleMedicalVisitRepository: ScheduleMedicalVisitRepository,
     private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository,
+    private readonly checkEmployeeExamService: CheckEmployeeExamService,
   ) {}
 
   async execute(body: UpdateScheduleMedicalVisitDto, user: UserPayloadDto) {
@@ -29,6 +32,11 @@ export class UpdateScheduleMedicalVisitsService {
       ...body,
       companyId: user.targetCompanyId,
     });
+
+    if (([StatusEnum.DONE, StatusEnum.CANCELED] as StatusEnum[]).includes(body.status))
+      await this.checkEmployeeExamService.execute({
+        companyId: user.targetCompanyId,
+      });
 
     return visit;
   }

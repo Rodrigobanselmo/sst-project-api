@@ -182,7 +182,9 @@ export class EmployeeEntity implements Employee {
         if (isExpiredExam && isActualHierarchyOfficeChange && (!isLastExamActualHierarchyId || !isLastDoneExamOffice) && isLastExamBeforeHierarchyStartDate)
           this.statusStep = StatusEmployeeStepEnum.IN_TRANS;
 
-        if (isMissingLastDoneExam || isLastDoneExamDem) this.statusStep = StatusEmployeeStepEnum.IN_ADMISSION;
+        const isOldHistory = actualHierarchy?.startDate && Math.abs(dayjs(actualHierarchy?.startDate).diff(dayjs(), 'month')) >= 2;
+
+        if (!isOldHistory && (isMissingLastDoneExam || isLastDoneExamDem)) this.statusStep = StatusEmployeeStepEnum.IN_ADMISSION;
       } else if (!this.hierarchyId) {
         if (this.hierarchyHistory?.[0]?.motive == 'DEM') {
           if (isLastDoneExamDem) this.statusStep = StatusEmployeeStepEnum.DEMISSION;

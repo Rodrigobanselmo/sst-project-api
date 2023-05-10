@@ -101,6 +101,7 @@ export class PdfAsoDataService {
             companyId: true,
             socialName: true,
             sex: true,
+            rg: true,
             company: {
               select: {
                 name: true,

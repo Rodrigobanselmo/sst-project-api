@@ -41,6 +41,7 @@ export class PdfOsDataService {
       select: {
         id: true,
         companyId: true,
+        rg: true,
         name: true,
         hierarchy: { select: { workspaces: { select: { name: true } } } },
         cpf: true,

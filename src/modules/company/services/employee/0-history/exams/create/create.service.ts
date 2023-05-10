@@ -60,7 +60,7 @@ export class CreateEmployeeExamHistoryService {
   }
 
   async checkOtherSchedulesAndCancel(dataDto: CreateEmployeeExamHistoryDto, employee: EmployeeEntity, user: UserPayloadDto) {
-    const examsIds = dataDto.examsData.map((x) => x.examId);
+    const examsIds = dataDto?.examsData?.map((x) => x.examId) || [];
 
     if (dataDto.examId) examsIds.push(dataDto.examId);
 

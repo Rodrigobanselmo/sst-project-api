@@ -299,6 +299,7 @@ export class EmployeeRepository {
     options.select = {
       id: true,
       cpf: true,
+      rg: true,
       email: true,
       hierarchyId: true,
       name: true,
@@ -817,6 +818,7 @@ export class EmployeeRepository {
         newExamAdded: true,
         birthday: true,
         sex: true,
+        rg: true,
         subOffices: { select: { id: true } },
         hierarchyHistory: {
           take: 1,

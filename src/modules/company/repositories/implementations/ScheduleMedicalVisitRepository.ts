@@ -47,9 +47,28 @@ export class ScheduleMedicalVisitRepository {
         status: data.status,
         doneClinicDate: data.doneClinicDate,
         doneLabDate: data.doneLabDate,
-        exams: { updateMany: { where: {}, data: {} } },
       },
       where: { id },
+    });
+
+    await this.prisma.employeeExamsHistory.updateMany({
+      data: {
+        clinicId: data.clinicId,
+        doctorId: data.docId,
+        status: data.status,
+        doneDate: data.doneClinicDate,
+      },
+      where: { scheduleMedicalVisitId: id, exam: { isAttendance: true } },
+    });
+
+    await this.prisma.employeeExamsHistory.updateMany({
+      data: {
+        clinicId: data.labId,
+        doctorId: data.docId,
+        status: data.status,
+        doneDate: data.doneLabDate,
+      },
+      where: { scheduleMedicalVisitId: id, exam: { isAttendance: false } },
     });
 
     return new ScheduleMedicalVisitEntity(visit);

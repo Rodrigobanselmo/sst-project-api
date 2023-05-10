@@ -27,6 +27,7 @@ export class PdfGuideDataService {
         cpf: true,
         name: true,
         email: true,
+        rg: true,
         companyId: true,
         hierarchy: { select: { name: true } },
         socialName: true,
