@@ -349,6 +349,7 @@ import { FindOneScheduleMedicalVisitsService } from './services/scheduleMedicalV
     UpsertEmployeeHierarchyHistoryService,
     CreateEmployeeService,
     FindAllAvailableEmployeesService,
+    ScheduleMedicalVisitRepository
   ],
 })
-export class CompanyModule {}
+export class CompanyModule { }

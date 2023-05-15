@@ -44,7 +44,7 @@ export class PdfAsoDataService {
     private readonly findAllRiskDataByEmployeeService: FindAllRiskDataByEmployeeService,
     private readonly findExamByHierarchyService: FindExamByHierarchyService,
     private readonly protocolToRiskRepository: ProtocolToRiskRepository,
-  ) {}
+  ) { }
 
   async execute(employeeId: number, userPayloadDto: UserPayloadDto, asoId?: number): Promise<IPdfAsoData> {
     const companyId = userPayloadDto.targetCompanyId;
@@ -83,6 +83,7 @@ export class PdfAsoDataService {
       orderBy: { doneDate: 'desc' },
       select: {
         id: true,
+        doneDate: true,
         clinic: {
           select: {
             id: true,

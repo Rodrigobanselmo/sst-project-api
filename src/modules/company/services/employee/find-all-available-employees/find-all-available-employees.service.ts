@@ -1,3 +1,4 @@
+import { HierarchyEntity } from './../../../entities/hierarchy.entity';
 import { getEmployeeRowExpiredDate, getEmployeeRowStatus } from './../../../../../shared/utils/getExpiredExamStatus.utils';
 import { ExamEntity } from './../../../../sst/entities/exam.entity';
 import { HierarchyRepository } from './../../../repositories/implementations/HierarchyRepository';
@@ -8,7 +9,7 @@ import { EmployeeRepository } from '../../../../../modules/company/repositories/
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { FindExamByHierarchyService } from './../../../../sst/services/exam/find-by-hierarchy /find-exam-by-hierarchy.service';
 import { CheckEmployeeExamService } from './../../../../sst/services/exam/check-employee-exam/check-employee-exam.service';
-import { getHierarchyParents } from '../../../../../shared/utils/getParents';
+import { getHierarchyParents, getHierarchyParentsFromMap } from '../../../../../shared/utils/getParents';
 import { StatusEnum } from '@prisma/client';
 
 @Injectable()
@@ -18,7 +19,7 @@ export class FindAllAvailableEmployeesService {
     private readonly findExamByHierarchyService: FindExamByHierarchyService,
     private readonly checkEmployeeExamService: CheckEmployeeExamService,
     private readonly hierarchyRepository: HierarchyRepository,
-  ) {}
+  ) { }
 
   async execute({ skip, take, ...query }: FindEmployeeDto, user: UserPayloadDto) {
     const employeesData = await this.employeeRepository.find({ ...query, companyId: user.targetCompanyId }, { skip, take });
@@ -70,13 +71,25 @@ export class FindAllAvailableEmployeesService {
       select: { id: true, parentId: true },
     });
 
+    const hierarchyMap = hierarchies.reduce((acc, hierarchy) => {
+      acc[hierarchy.id] = hierarchy;
+      return acc;
+    }, {} as Record<number, HierarchyEntity>);
+
+
     employees.map((employee) => {
       const examsHistoryOnlyDone = employee.examsHistory?.filter((historyExam) => historyExam.status === 'DONE');
 
-      const { isDismissal } = this.checkEmployeeExamService.getIsDismissal({ ...employee, examsHistory: examsHistoryOnlyDone });
-      const { parents, actualHierarchy } = getHierarchyParents(hierarchies, employee.hierarchyId);
+      const hierarchyIdToCheckExams = query.getHierarchyIdFromScheduledExam ? (employee.scheduleExam?.subOfficeId || employee.scheduleExam?.hierarchyId) : null
 
-      if (!employee.hierarchy) employee.hierarchy = actualHierarchy;
+      const { isDismissal } = this.checkEmployeeExamService.getIsDismissal({ ...employee, examsHistory: examsHistoryOnlyDone });
+      const { parents, actualHierarchy } = getHierarchyParentsFromMap(hierarchyMap, hierarchyIdToCheckExams || employee.hierarchyId);
+
+      if (!employee.hierarchy) {
+        if (!query.getHierarchyIdFromScheduledExam) employee.hierarchy = actualHierarchy;
+        if (query.getHierarchyIdFromScheduledExam) employee.hierarchy = hierarchyMap[employee.hierarchyId || employee.scheduleExam?.hierarchyId];
+      }
+
       if (actualHierarchy) employee.hierarchy.parents = parents;
 
       const { originsExams, employeeExamType } = this.checkEmployeeExamService.checkExpiredExam({ ...employee, examsHistory: examsHistoryOnlyDone }, exams.data, {

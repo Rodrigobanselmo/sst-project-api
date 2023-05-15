@@ -12,7 +12,7 @@ import { onGetRisks } from '../../../../../shared/utils/onGetRisks';
 
 @Injectable()
 export class PdfProntuarioDataService {
-  constructor(private readonly employeeRepository: EmployeeRepository, private readonly findAllRiskDataByEmployeeService: FindAllRiskDataByEmployeeService) {}
+  constructor(private readonly employeeRepository: EmployeeRepository, private readonly findAllRiskDataByEmployeeService: FindAllRiskDataByEmployeeService) { }
   async execute(employeeId: number, userPayloadDto: UserPayloadDto, options?: { isAvaliation?: boolean }): Promise<IPdfProntuarioData> {
     const companyId = userPayloadDto.targetCompanyId;
 
@@ -115,7 +115,7 @@ export class PdfProntuarioDataService {
     };
   }
 
-  async getQuestions(employee: EmployeeEntity, companyId: string) {
+  getQuestions(employee: EmployeeEntity, companyId: string) {
     const questions: IProntuarioQuestion[] = [
       { name: 'Estado de saúde atual?', textAnswer: '' },
       { name: 'Fuma?', textAnswer: 'Frequência:', objectiveAnswer: ['Sim', 'Não'] },
@@ -139,7 +139,7 @@ export class PdfProntuarioDataService {
     return questions;
   }
 
-  async getExamination(employee: EmployeeEntity, companyId: string) {
+  getExamination(employee: EmployeeEntity, companyId: string) {
     const examination = (
       [
         { name: 'Aparelho Cardíaco normal?', textAnswer: '', objectiveAnswer: ['Sim', 'Não'] },

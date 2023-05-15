@@ -15,7 +15,7 @@ export const isShouldDemissionBlock = (
     validityInMonths?: number;
   },
 ) => {
-  if (!company?.blockResignationExam) return false;
+  if (!company?.blockResignationExam || !doneDateProp) return false;
 
   const doneDate = doneDateProp ? dayjs(doneDateProp) : dayjs(expiredDate).add(-(validityInMonths || 0), 'months');
   const riskDegreeDays = getRiskDegreeBlockDays(company);

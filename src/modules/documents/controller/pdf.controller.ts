@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
 
 import { User } from '../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../shared/dto/user-payload.dto';
@@ -10,6 +10,9 @@ import { PdfProntuarioDataService } from '../services/pdf/prontuario/prontuario-
 import { PdfAsoDataService } from '../services/pdf/aso/aso-data.service';
 import { PdfOsDataService } from '../services/pdf/os/os-data.service';
 import { PdfEvaluationDataService } from '../services/pdf/evaluation/evaluation-data.service';
+import { KitPdfDto } from '../dto/kit-dto';
+import { PdfVisitReportDataService } from '../services/pdf/visitReport/visit-report-data.service';
+import { VisitReportPdfDto } from '../dto/visit-report-dto';
 @Controller('documents/pdf')
 export class DocumentsPdfController {
   constructor(
@@ -19,7 +22,8 @@ export class DocumentsPdfController {
     private readonly pdfProntuarioDataService: PdfProntuarioDataService,
     private readonly pdfEvaluationDataService: PdfEvaluationDataService,
     private readonly pdfOsDataService: PdfOsDataService,
-  ) {}
+    private readonly pdfVisitReportDataService: PdfVisitReportDataService,
+  ) { }
 
   @Permissions(
     {
@@ -53,6 +57,7 @@ export class DocumentsPdfController {
   @Get('aso/:employeeId/:companyId/:asoId?')
   async aso(@User() userPayloadDto: UserPayloadDto, @Param('employeeId', ParseIntPipe) employeeId: number, @Param('asoId') asoId: number) {
     return this.pdfAsoDataService.execute(employeeId, userPayloadDto, asoId ? Number(asoId) : asoId);
+    // return this.pdfAsoDataService.execute(employeeId, userPayloadDto, { asoId: asoId ? Number(asoId) : asoId });
   }
 
   @Permissions(
@@ -101,9 +106,26 @@ export class DocumentsPdfController {
       isContract: true,
     },
   )
-  @Get('kit/:employeeId/:companyId/:asoId?')
-  async kit(@User() userPayloadDto: UserPayloadDto, @Param('employeeId', ParseIntPipe) employeeId: number, @Param('asoId') asoId: number) {
-    return this.pdfKitDataService.execute(employeeId, userPayloadDto, asoId ? Number(asoId) : asoId);
+  @Get('kit/:companyId')
+  async kit(@User() userPayloadDto: UserPayloadDto, @Query() query: KitPdfDto) {
+    return this.pdfKitDataService.execute(userPayloadDto, query);
+  }
+
+  @Permissions(
+    {
+      code: PermissionEnum.EMPLOYEE_HISTORY,
+      isMember: true,
+      isContract: true,
+    },
+    {
+      code: PermissionEnum.COMPANY_SCHEDULE,
+      isMember: true,
+      isContract: true,
+    },
+  )
+  @Get('visit-report/:companyId')
+  async visitReport(@User() userPayloadDto: UserPayloadDto, @Query() query: VisitReportPdfDto) {
+    return this.pdfVisitReportDataService.execute(userPayloadDto, query);
   }
 
   @Permissions({

@@ -28,6 +28,7 @@ const methodToCrud = (method: IMethods) => {
 
 const isParentCompany = async (prisma: PrismaService, requestCompanyId: string, companyId: string): Promise<boolean> => {
   const parentRelation = await prisma.contract.findUnique({
+    select: { status: true },
     where: {
       applyingServiceCompanyId_receivingServiceCompanyId: {
         applyingServiceCompanyId: requestCompanyId,
@@ -36,7 +37,7 @@ const isParentCompany = async (prisma: PrismaService, requestCompanyId: string, 
     },
   });
 
-  if (!parentRelation) throw new ForbiddenException('Sem permissões para acesso (1)');
+  if (!parentRelation?.status) throw new ForbiddenException('Sem permissões para acesso (1)');
   if (parentRelation.status !== 'ACTIVE') throw new ForbiddenException('Sem permissões para acesso (2)');
 
   return true;
@@ -62,7 +63,7 @@ const checkPermissions = (user: UserPayloadDto, options: IPermissionOptions, CRU
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {
-  constructor(private reflector: Reflector, private prisma: PrismaService) {}
+  constructor(private reflector: Reflector, private prisma: PrismaService) { }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const requiredPermissionsOptions = this.reflector.getAllAndOverride<IPermissionOptions[]>(PERMISSIONS_KEY, [context.getHandler(), context.getClass()]);

@@ -14,7 +14,7 @@ import { FindEvents2220Dto } from './../../../esocial/dto/event.dto';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 @Injectable()
 export class EmployeeRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async create({
     hierarchyId,
@@ -31,13 +31,13 @@ export class EmployeeRepository {
           company: { connect: { id: companyId } },
           hierarchy: hierarchyId
             ? {
-                connect: { id: hierarchyId },
-              }
+              connect: { id: hierarchyId },
+            }
             : undefined,
           shift: shiftId
             ? {
-                connect: { id: shiftId },
-              }
+              connect: { id: shiftId },
+            }
             : undefined,
           // cid: cidId
           //   ? {
@@ -71,13 +71,13 @@ export class EmployeeRepository {
         hierarchy: !hierarchyId
           ? undefined
           : {
-              connect: { id: hierarchyId },
-            },
+            connect: { id: hierarchyId },
+          },
         subOffices: removeSubOffices ? { set: [] } : undefined,
         shift: shiftId
           ? {
-              connect: { id: shiftId },
-            }
+            connect: { id: shiftId },
+          }
           : undefined,
         // cid: cidId
         //   ? {
@@ -86,8 +86,8 @@ export class EmployeeRepository {
         //   : undefined,
         ...('lastExam' in createCompanyDto &&
           !createCompanyDto.lastExam && {
-            lastExam: null,
-          }),
+          lastExam: null,
+        }),
       },
       where: { id_companyId: { companyId, id } },
     });
@@ -159,13 +159,13 @@ export class EmployeeRepository {
             company: { connect: { id: companyId } },
             hierarchy: hierarchyId
               ? {
-                  connect: { id: hierarchyId },
-                }
+                connect: { id: hierarchyId },
+              }
               : undefined,
             shift: shiftId
               ? {
-                  connect: { id: shiftId },
-                }
+                connect: { id: shiftId },
+              }
               : undefined,
             // cid: cidId
             //   ? {
@@ -175,12 +175,12 @@ export class EmployeeRepository {
             status: 'ACTIVE',
             hierarchyHistory: hierarchyId
               ? {
-                  create: {
-                    motive: 'ADM',
-                    startDate: admissionDate,
-                    hierarchyId: hierarchyId,
-                  },
-                }
+                create: {
+                  motive: 'ADM',
+                  startDate: admissionDate,
+                  hierarchyId: hierarchyId,
+                },
+              }
               : undefined,
             ...(cbo && { cbo: onlyNumbers(cbo) }),
           },
@@ -189,12 +189,12 @@ export class EmployeeRepository {
             hierarchy: !hierarchyId
               ? undefined
               : {
-                  connect: { id: hierarchyId },
-                },
+                connect: { id: hierarchyId },
+              },
             shift: shiftId
               ? {
-                  connect: { id: shiftId },
-                }
+                connect: { id: shiftId },
+              }
               : undefined,
             // cid: cidId
             //   ? {
@@ -205,22 +205,22 @@ export class EmployeeRepository {
             ...(cbo && { cbo: onlyNumbers(cbo) }),
             hierarchyHistory: hierarchyId
               ? {
-                  upsert: {
-                    where: {
-                      id: employeeHistory.find(({ employee }) => employee.cpf === upsertEmployeeDto.cpf)?.id || -1,
-                    },
-                    create: {
-                      motive: 'ADM',
-                      startDate: admissionDate,
-                      hierarchyId: hierarchyId,
-                    },
-                    update: {
-                      motive: 'ADM',
-                      startDate: admissionDate,
-                      hierarchyId: hierarchyId,
-                    },
+                upsert: {
+                  where: {
+                    id: employeeHistory.find(({ employee }) => employee.cpf === upsertEmployeeDto.cpf)?.id || -1,
                   },
-                }
+                  create: {
+                    motive: 'ADM',
+                    startDate: admissionDate,
+                    hierarchyId: hierarchyId,
+                  },
+                  update: {
+                    motive: 'ADM',
+                    startDate: admissionDate,
+                    hierarchyId: hierarchyId,
+                  },
+                },
+              }
               : undefined,
           },
           where: { cpf_companyId: { companyId, cpf: upsertEmployeeDto.cpf } },
@@ -313,6 +313,13 @@ export class EmployeeRepository {
           startDate: true,
         },
         orderBy: { startDate: 'desc' },
+        ...(query.dateFrom && {
+          where: {
+            startDate: {
+              lte: query.dateFrom
+            }
+          }
+        }),
         take: 1,
       },
       ...options?.select,
@@ -372,6 +379,12 @@ export class EmployeeRepository {
         'getSector',
         'getEsocialCode',
         'getGroup',
+        'dateFrom',
+        'dateFromExams',
+        'getHierarchyIdFromScheduledExam',
+        'scheduleMedicalVisitId',
+        'getSocialName',
+        'getExamName',
       ],
     });
 
@@ -407,6 +420,14 @@ export class EmployeeRepository {
       (where.AND as any).push({
         company: {
           id: { in: query.companiesIds },
+        },
+      } as typeof options.where);
+    }
+
+    if ('scheduleMedicalVisitId' in query) {
+      (where.AND as any).push({
+        examsHistory: {
+          some: { scheduleMedicalVisitId: query.scheduleMedicalVisitId }
         },
       } as typeof options.where);
     }
@@ -518,6 +539,10 @@ export class EmployeeRepository {
       options.select.esocialCode = true;
     }
 
+    if ('getSocialName' in query) {
+      options.select.socialName = true;
+    }
+
     if ('getAllExams' in query) {
       options.orderBy = [{ expiredDateExam: { sort: 'asc', nulls: 'first' } }, { company: { group: { name: 'asc' } } }, { company: { name: 'asc' } }, { name: 'asc' }];
       options.select.hierarchyId = true;
@@ -531,6 +556,13 @@ export class EmployeeRepository {
         take: 2,
         select: { startDate: true, motive: true, hierarchyId: true },
         orderBy: { startDate: 'desc' },
+        ...(query.dateFrom && {
+          where: {
+            startDate: {
+              lte: query.dateFrom
+            }
+          }
+        }),
       };
       options.select.examsHistory = {
         select: {
@@ -540,6 +572,7 @@ export class EmployeeRepository {
           examType: true,
           evaluationType: true,
           hierarchyId: true,
+          ...(query.getHierarchyIdFromScheduledExam && { subOfficeId: true }),
           validityInMonths: true,
           examId: true,
           exam: {
@@ -550,17 +583,15 @@ export class EmployeeRepository {
         distinct: ['examId', 'status'],
         where: {
           exam: { isAvaliation: false },
-          ...(!query.getAllExamsWithSchedule && {
-            status: { in: ['DONE'] },
-          }),
+          ...(query.dateFromExams && { doneDate: { lte: query.dateFromExams, } }),
+          ...(!query.getAllExamsWithSchedule && { status: { in: ['DONE'] }, }),
           ...(query.getAllExamsWithSchedule && {
             OR: [
-              {
-                status: { in: ['DONE'] },
-              },
+              { status: { in: ['DONE'] }, },
               {
                 status: { in: ['PROCESSING'] },
                 doneDate: { gte: new Date() },
+                ...(query.dateFromExams && { doneDate: { lte: query.dateFromExams, } }),
               },
             ],
           }),
@@ -578,6 +609,19 @@ export class EmployeeRepository {
           },
         ],
       } as typeof options.where);
+    }
+
+    if ('getExamName' in query) {
+      if (typeof options.select?.examsHistory != 'boolean' && options.select.examsHistory.select) {
+        if (typeof options.select.examsHistory.select?.exam != 'boolean') {
+          if (!options.select.examsHistory.select?.exam)
+            options.select.examsHistory.select.exam = {}
+          if (!options.select.examsHistory.select.exam?.select)
+            options.select.examsHistory.select.exam.select = {}
+
+          options.select.examsHistory.select.exam.select.name = true;
+        }
+      }
     }
 
     const response = await this.prisma.$transaction([

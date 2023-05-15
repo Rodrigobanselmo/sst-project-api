@@ -134,6 +134,10 @@ export class FindEmployeeDto extends PaginationQueryDto {
   @IsOptional()
   name?: string;
 
+  @IsInt()
+  @IsOptional()
+  scheduleMedicalVisitId?: number;
+
   @IsString()
   @IsOptional()
   cpf?: string;
@@ -170,10 +174,35 @@ export class FindEmployeeDto extends PaginationQueryDto {
   @IsOptional()
   getAllExamsWithSchedule?: boolean;
 
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  getHierarchyIdFromScheduledExam?: boolean;
+
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  getExamName?: boolean;
+
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  getSocialName?: boolean;
+
   @IsOptional()
   @IsDate({ message: 'Data inválida' })
   @Type(() => Date)
-  lteExpiredDateExam: Date;
+  lteExpiredDateExam?: Date;
+
+  @IsOptional()
+  @IsDate({ message: 'Data inválida' })
+  @Type(() => Date)
+  dateFrom: Date;
+
+  @IsOptional()
+  @IsDate({ message: 'Data inválida' })
+  @Type(() => Date)
+  dateFromExams: Date;
 
   @IsBoolean()
   @ToBoolean()
@@ -203,7 +232,7 @@ export class FindEmployeeDto extends PaginationQueryDto {
   @IsOptional()
   @IsDate({ message: 'Data inválida' })
   @Type(() => Date)
-  expiredDateExam: Date;
+  expiredDateExam?: Date;
 
   @Transform(QueryArray, { toClassOnly: true })
   @IsString({ each: true })
@@ -237,7 +266,7 @@ export class FindEmployeeDto extends PaginationQueryDto {
     message: `status must be one of: ${StatusEnum.ACTIVE} or ${StatusEnum.INACTIVE}`,
     each: true,
   })
-  status: StatusEnum[];
+  status?: StatusEnum[];
 }
 
 export class FindOneEmployeeDto {

@@ -34,6 +34,7 @@ import { FindOneDocumentModelService } from './services/document/document-models
 import { DocumentModelController } from './controller/document-model.controller';
 import { DocumentPGRPreviewFactory } from './factories/document/products/PGR/DocumentPGRPreviewFactory';
 import { DownloadPreviewModel } from './services/document/document-models/download-preview-model.service';
+import { PdfVisitReportDataService } from './services/pdf/visitReport/visit-report-data.service';
 
 @Module({
   controllers: [DocumentModelController, DocumentsPgrController, DocumentsPdfController, DocumentsBaseController],
@@ -66,6 +67,7 @@ import { DownloadPreviewModel } from './services/document/document-models/downlo
     DocumentPGRPreviewFactory,
     FakeStorageProvider,
     DownloadPreviewModel,
+    PdfVisitReportDataService
   ],
 })
-export class DocumentsModule {}
+export class DocumentsModule { }

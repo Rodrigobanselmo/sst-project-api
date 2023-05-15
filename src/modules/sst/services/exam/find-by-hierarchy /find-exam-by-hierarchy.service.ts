@@ -1,3 +1,4 @@
+import { isShouldDemissionBlock } from './../../../../../shared/utils/demissionalBlockCalc';
 import { EmployeeHierarchyHistoryRepository } from './../../../../company/repositories/implementations/EmployeeHierarchyHistoryRepository';
 import { getRiskDoc, getRiskDocV2 } from './../../../../../shared/utils/getRiskDoc';
 import { HierarchyEntity } from './../../../../company/entities/hierarchy.entity';
@@ -17,6 +18,7 @@ import { FindExamHierarchyDto } from '../../../dto/exam.dto';
 import { IExamOriginData, IExamEmployeeCheck, IExamOrigins } from '../../../entities/exam.entity';
 import { ExamRepository } from '../../../repositories/implementations/ExamRepository';
 import { RiskDataRepository } from '../../../repositories/implementations/RiskDataRepository';
+import { CompanyEntity } from './../../../../..//modules/company/entities/company.entity';
 
 export const clinicExamCloseToExpire = 45;
 
@@ -32,7 +34,7 @@ export class FindExamByHierarchyService {
     private readonly employeeHierarchyHistoryRepository: EmployeeHierarchyHistoryRepository,
     private readonly hierarchyRepository: HierarchyRepository,
     private readonly dayjs: DayJSProvider,
-  ) {}
+  ) { }
 
   async execute(user: Pick<UserPayloadDto, 'targetCompanyId'>, query: FindExamHierarchyDto, options?: { employee?: EmployeeEntity }) {
     let hierarchyId = query.hierarchyId;
@@ -55,34 +57,34 @@ export class FindExamByHierarchyService {
         options?.employee && !query?.isDismissal && !query.isPendingExams
           ? options.employee
           : await this.employeeRepository.findFirstNude({
-              where: { id: query.employeeId, companyId },
-              include: {
+            where: { id: query.employeeId, companyId },
+            include: {
+              hierarchyHistory: {
+                select: {
+                  motive: true,
+                  startDate: true,
+                },
+                orderBy: { startDate: 'desc' },
+                take: 1,
+              },
+              subOffices: { select: { id: true } },
+              ...(query?.isDismissal &&
+                !hierarchyId && {
                 hierarchyHistory: {
-                  select: {
-                    motive: true,
-                    startDate: true,
-                  },
-                  orderBy: { startDate: 'desc' },
+                  where: { motive: { not: 'DEM' } },
+                  select: { hierarchyId: true, motive: true, startDate: true, subHierarchies: { select: { id: true } } },
                   take: 1,
                 },
-                subOffices: { select: { id: true } },
-                ...(query?.isDismissal &&
-                  !hierarchyId && {
-                    hierarchyHistory: {
-                      where: { motive: { not: 'DEM' } },
-                      select: { hierarchyId: true, motive: true, startDate: true, subHierarchies: { select: { id: true } } },
-                      take: 1,
-                    },
-                  }),
-                examsHistory: {
-                  orderBy: { doneDate: 'desc' },
-                  distinct: ['examId', 'status'],
-                  where: {
-                    status: query.isPendingExams ? { in: ['PENDING', 'PROCESSING'] } : 'DONE',
-                  },
+              }),
+              examsHistory: {
+                orderBy: { doneDate: 'desc' },
+                distinct: ['examId', 'status'],
+                where: {
+                  status: query.isPendingExams ? { in: ['PENDING', 'PROCESSING'] } : 'DONE',
                 },
               },
-            });
+            },
+          });
 
       if (query?.isDismissal && !hierarchyId && employee.hierarchyHistory && employee.hierarchyHistory?.length > 0) {
         if (employee.hierarchyHistory[0]) {
@@ -211,20 +213,20 @@ export class FindExamByHierarchyService {
           },
           ...(getRiskFactor
             ? [
-                {
-                  riskFactor: {
-                    examToRisk: {
-                      some: {
-                        examId: { gt: 0 },
-                        ...(query.onlyAttendance && {
-                          exam: { isAttendance: true },
-                        }),
-                      },
+              {
+                riskFactor: {
+                  examToRisk: {
+                    some: {
+                      examId: { gt: 0 },
+                      ...(query.onlyAttendance && {
+                        exam: { isAttendance: true },
+                      }),
                     },
                   },
-                  standardExams: true,
                 },
-              ]
+                standardExams: true,
+              },
+            ]
             : []),
         ],
       },
@@ -354,7 +356,7 @@ export class FindExamByHierarchyService {
     return false;
   }
 
-  checkExpiredDate(examRisk: IExamOriginData, employee: EmployeeEntity) {
+  checkExpiredDate(examRisk: IExamOriginData, employee: EmployeeEntity, company?: CompanyEntity) {
     if (!employee) return null;
 
     const foundExamHistory = employee?.examsHistory?.find((exam) => exam.examId === examRisk.examId) || ({} as EmployeeExamsHistoryEntity);
@@ -371,7 +373,6 @@ export class FindExamByHierarchyService {
       };
 
     const closeValidated = examRisk.considerBetweenDays || (examRisk.exam.isAttendance ? clinicExamCloseToExpire : null);
-
     const closeToExpired = closeValidated !== null && this.dayjs.compareTime(this.dayjs.dateNow(), foundExamHistory.expiredDate, 'days') <= closeValidated;
 
     return {
@@ -534,8 +535,6 @@ export class FindExamByHierarchyService {
         subOfficesIds.push(...hierarchiesHistory[0]?.subHierarchies?.map((sub) => sub.id));
       }
     }
-
-    console.log(99, subOfficesIds);
 
     if (hierarchyId) {
       const isDismissal = examType === ExamHistoryTypeEnum.DEMI;

@@ -12,3 +12,16 @@ export function getHierarchyParents(hierarchies: HierarchyEntity[], id: Hierarch
   }
   return { parents, actualHierarchy };
 }
+
+export function getHierarchyParentsFromMap(hierarchies: Record<number, HierarchyEntity>, id: HierarchyEntity['id']) {
+  const parents: HierarchyEntity[] = [];
+
+  let hierarchy = id ? hierarchies[id] : null;
+  const actualHierarchy = hierarchy;
+
+  while (hierarchy) {
+    hierarchy = hierarchies[hierarchy?.parentId];
+    if (hierarchy) parents.push(hierarchy);
+  }
+  return { parents, actualHierarchy };
+}
