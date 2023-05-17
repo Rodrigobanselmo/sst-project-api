@@ -82,11 +82,9 @@ export class CreateEmployeeDto {
   })
   sex?: SexTypeEnum;
 
-  // // @IsString({ each: true })
-  // @IsString()
-  // @IsOptional()
-  // cidId?: string;
-  // // cidId: string[];
+  @IsOptional()
+  @IsString({ each: true })
+  cidIds: string[];
 
   @IsInt()
   @IsOptional()
@@ -267,6 +265,13 @@ export class FindEmployeeDto extends PaginationQueryDto {
     each: true,
   })
   status?: StatusEnum[];
+}
+
+export class ReportComplementaryExamDto extends FindEmployeeDto {
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  examsInHorizontal?: boolean;
 }
 
 export class FindOneEmployeeDto {

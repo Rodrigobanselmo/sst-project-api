@@ -94,6 +94,8 @@ export class EmployeeEntity implements Employee {
     number,
     {
       expiredDate?: Date;
+      lastDoneExamDate?: Date;
+      lastScheduleExamDate?: Date;
       closeToExpired?: boolean;
       examId: number;
       isAttendance: boolean;

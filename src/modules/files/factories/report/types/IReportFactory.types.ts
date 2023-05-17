@@ -1,5 +1,5 @@
-import { CompanyEntity } from './../../../../company/entities/company.entity';
-import { ReportDownloadTypeEnum } from '../../../../../modules/files/dto/base-report.dto';
+import { CompanyEntity } from '../../../../company/entities/company.entity';
+import { ReportDownloadTypeEnum } from '../../../dto/base-report.dto';
 import ExcelJS from 'exceljs';
 
 export type IReportHeader = IReportHeaderCell[];
@@ -21,7 +21,7 @@ export interface IReportFactoryProductFindData {
   headerRow: IReportHeader;
 }
 
-export interface IReportFactoryCreatorConstructor {}
+export interface IReportFactoryCreatorConstructor { }
 
 export interface IReportCell {
   fill?: ReportFillColorEnum;
@@ -74,8 +74,13 @@ export enum ReportFillColorEnum {
 }
 
 export enum ReportColorEnum {
+  LIGHT_GREY = '#d3d3d3',
+  BLUE = '#1ea5ff',
   YELLOW = '#d9d10b',
   RED = '#F44336',
   GREEN = '#3cbe7d',
   WHITE = '#ffffff',
+
+  EXPIRED = '#F44336',
+  CLOSE_TO_EXPIRED = '#d9d10b',
 }

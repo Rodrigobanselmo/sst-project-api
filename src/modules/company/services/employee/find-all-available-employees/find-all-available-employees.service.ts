@@ -106,6 +106,7 @@ export class FindAllAvailableEmployeesService {
         const status = getEmployeeRowStatus(examHistoryData, originExam?.expiredDate);
 
         const isScheduled = examHistoryData?.status == StatusEnum.PROCESSING;
+        const examHistoryDataDone = !isScheduled ? examHistoryData : examsHistory.find((hExam) => hExam.status === 'DONE');
 
         const validityDateString = getEmployeeRowExpiredDate(isScheduled ? examHistoryData.doneDate : originExam?.expiredDate);
 
@@ -117,8 +118,12 @@ export class FindAllAvailableEmployeesService {
           isAttendance: originExam.exam.isAttendance,
           validity: employee.isComorbidity ? originExam.lowValidityInMonths : originExam.validityInMonths,
           isScheduled,
+          lastDoneExamDate: examHistoryDataDone?.doneDate,
           validityDateString,
           status,
+          ...(isScheduled && {
+            lastScheduleExamDate: examHistoryData?.doneDate,
+          }),
         };
       });
     });

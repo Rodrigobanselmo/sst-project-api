@@ -19,7 +19,7 @@ export class EmployeeRepository {
   async create({
     hierarchyId,
     companyId,
-    shiftId,
+    shiftId, cidIds,
     ...createCompanyDto
   }: CreateEmployeeDto & {
     hierarchyId?: string;
@@ -29,21 +29,9 @@ export class EmployeeRepository {
         data: {
           ...createCompanyDto,
           company: { connect: { id: companyId } },
-          hierarchy: hierarchyId
-            ? {
-              connect: { id: hierarchyId },
-            }
-            : undefined,
-          shift: shiftId
-            ? {
-              connect: { id: shiftId },
-            }
-            : undefined,
-          // cid: cidId
-          //   ? {
-          //       connect: { cid: cidId },
-          //     }
-          //   : undefined,
+          cids: { connect: cidIds.map((cidId) => ({ cid: cidId })) },
+          hierarchy: hierarchyId ? { connect: { id: hierarchyId }, } : undefined,
+          shift: shiftId ? { connect: { id: shiftId }, } : undefined,
         },
       });
       return new EmployeeEntity(employee);
@@ -58,6 +46,7 @@ export class EmployeeRepository {
       hierarchyId,
       companyId,
       shiftId,
+      cidIds,
       id,
       ...createCompanyDto
     }: UpdateEmployeeDto & {
@@ -68,22 +57,10 @@ export class EmployeeRepository {
     const employee = await this.prisma.employee.update({
       data: {
         ...createCompanyDto,
-        hierarchy: !hierarchyId
-          ? undefined
-          : {
-            connect: { id: hierarchyId },
-          },
+        hierarchy: hierarchyId ? { connect: { id: hierarchyId }, } : undefined,
         subOffices: removeSubOffices ? { set: [] } : undefined,
-        shift: shiftId
-          ? {
-            connect: { id: shiftId },
-          }
-          : undefined,
-        // cid: cidId
-        //   ? {
-        //       connect: { cid: cidId },
-        //     }
-        //   : undefined,
+        cids: cidIds ? { set: cidIds.map((cidId) => ({ cid: cidId })) } : undefined,
+        shift: shiftId ? { connect: { id: shiftId }, } : undefined,
         ...('lastExam' in createCompanyDto &&
           !createCompanyDto.lastExam && {
           lastExam: null,
@@ -278,6 +255,7 @@ export class EmployeeRepository {
             take: 3,
             orderBy: { doneDate: 'desc' },
           },
+          cids: { select: { cid: true, description: true } },
           ...include,
         },
       }),

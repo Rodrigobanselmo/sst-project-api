@@ -98,6 +98,7 @@ export class PdfAsoDataService {
           select: {
             name: true,
             cpf: true,
+            isPCD: true,
             birthday: true,
             companyId: true,
             socialName: true,

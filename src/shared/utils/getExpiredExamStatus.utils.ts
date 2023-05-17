@@ -7,7 +7,7 @@ import { StatusExamEnum } from '../constants/enum/statusExam.enum';
 export const getEmployeeRowStatus = (exam?: EmployeeExamsHistoryEntity, expiredDateExam?: Date): StatusExamEnum | null => {
   const diff = -dayjs().diff(expiredDateExam, 'day');
 
-  if (!exam) return StatusExamEnum.EXPIRED;
+  // if (!exam) return StatusExamEnum.EXPIRED;
 
   if (exam?.status == StatusEnum.PROCESSING || exam?.status == StatusEnum.PENDING) {
     if (dayjs().isBefore(exam.doneDate) || dayjs().diff(exam.doneDate, 'day') == 0) {
