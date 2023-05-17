@@ -49,7 +49,7 @@ export class PdfAsoDataService {
   async execute(employeeId: number, userPayloadDto: UserPayloadDto, asoId?: number): Promise<IPdfAsoData> {
     const companyId = userPayloadDto.targetCompanyId;
 
-    const examsIds = [];
+    const examsNeeded: ExamEntity[] = [];
 
     const asoExam = await this.employeeExamsHistoryRepository.findFirstNude({
       where: { ...(asoId && { id: asoId }), employeeId, exam: { isAttendance: true }, OR: [{ clinicId: companyId }, { employee: { companyId } }] },
@@ -74,9 +74,12 @@ export class PdfAsoDataService {
       });
 
       if (originsData) {
-        examsIds.push(...originsData.map((origin) => Number(origin.exam.id)));
+        examsNeeded.push(...originsData.map((origin) => (origin.exam as ExamEntity)));
       }
     }
+
+    const examsIds = examsNeeded.map(({ id }) => Number(id));
+
 
     const clinicExam = await this.employeeExamsHistoryRepository.findFirstNude({
       where: { ...(asoId && { id: asoId }), employeeId, exam: { isAttendance: true }, OR: [{ clinicId: companyId }, { employee: { companyId } }] },
@@ -164,7 +167,6 @@ export class PdfAsoDataService {
 
     if (!clinicExam?.id) throw new ForbiddenException(ErrorMessageEnum.FORBIDDEN_ACCESS);
 
-    const examType = clinicExam.examType;
     const admissionDate = clinicExam?.employee?.hierarchyHistory?.[0]?.startDate || clinicExam?.changeHierarchyDate;
 
     const {
@@ -194,11 +196,9 @@ export class PdfAsoDataService {
     const doctorResponsible = actualCompany.doctorResponsible;
     const numAsos = actualCompany.numAsos;
 
-    const examsRepresentAll = await this.findExamByHierarchyService.onGetAllExams(employee.companyId);
-    const exams = this.onGetAllExamsData(employee, asoRisk, examsRepresentAll?.data, examType);
-    const doneExams = exams.map((examData) => {
-      const history = examsHistory.find((examHistory) => examHistory.examId == examData.examId);
-      return { exam: examData.exam, doneDate: history?.doneDate };
+    const doneExams = examsNeeded.map((exam) => {
+      const history = examsHistory.find((examHistory) => examHistory.examId == exam.id);
+      return { exam: exam, doneDate: history?.doneDate };
     });
 
     protocols.push(...asoRisk.map((r) => r.riskData.map((rd) => rd.protocolsToRisk)).flat(2));

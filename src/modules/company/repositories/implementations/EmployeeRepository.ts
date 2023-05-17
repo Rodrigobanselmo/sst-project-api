@@ -19,7 +19,8 @@ export class EmployeeRepository {
   async create({
     hierarchyId,
     companyId,
-    shiftId, cidIds,
+    shiftId,
+    cidIds,
     ...createCompanyDto
   }: CreateEmployeeDto & {
     hierarchyId?: string;

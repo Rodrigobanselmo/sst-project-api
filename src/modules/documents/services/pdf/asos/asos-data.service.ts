@@ -57,8 +57,6 @@ export class PdfAsoDataService {
   async execute(employeeId: number, userPayloadDto: UserPayloadDto, options?: { asoId?: number, scheduleMedicalVisitId?: number }) {
     const companyId = userPayloadDto.targetCompanyId;
 
-    const examsIds = [];
-
     const asoId = options.asoId;
     const scheduleMedicalVisitId = options.scheduleMedicalVisitId;
 

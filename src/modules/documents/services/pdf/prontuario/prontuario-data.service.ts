@@ -10,6 +10,7 @@ import { EmployeeRepository } from '../../../../company/repositories/implementat
 import { IPdfProntuarioData, IProntuarioQuestion } from './types/IProntuarioData.type';
 import { onGetRisks } from '../../../../../shared/utils/onGetRisks';
 
+//TODO: add doneExams on prontuario para aparecer no Prontuario
 @Injectable()
 export class PdfProntuarioDataService {
   constructor(private readonly employeeRepository: EmployeeRepository, private readonly findAllRiskDataByEmployeeService: FindAllRiskDataByEmployeeService) { }

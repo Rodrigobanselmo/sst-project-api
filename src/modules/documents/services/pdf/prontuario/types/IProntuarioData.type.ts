@@ -1,3 +1,4 @@
+import { ExamEntity } from './../../../../../sst/entities/exam.entity';
 import { RiskFactorDataEntity } from './../../../../../sst/entities/riskData.entity';
 import { HierarchyEntity } from './../../../../../company/entities/hierarchy.entity';
 import { EmployeeExamsHistoryEntity } from './../../../../../company/entities/employee-exam-history.entity';
@@ -25,6 +26,10 @@ export interface IPdfProntuarioData {
   doctorResponsible: Partial<ProfessionalEntity>;
   clinicExam: EmployeeExamsHistoryEntity;
   sector: HierarchyEntity;
+  doneExams?: {
+    exam: ExamEntity;
+    doneDate: Date;
+  }[];
   risks: {
     riskData: RiskFactorDataEntity;
     riskFactor: RiskFactorsEntity;

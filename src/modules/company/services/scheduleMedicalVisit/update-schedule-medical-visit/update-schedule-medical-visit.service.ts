@@ -6,7 +6,7 @@ import { Injectable } from '@nestjs/common';
 import { UpdateScheduleMedicalVisitDto } from '../../../../..//modules/company/dto/scheduleMedicalVisit.dto';
 import { CreateEmployeeExamHistoryService } from '../../employee/0-history/exams/create/create.service';
 import { UpdateEmployeeExamHistoryService } from '../../employee/0-history/exams/update/update.service';
-import { asyncBatch } from 'src/shared/utils/asyncBatch';
+import { asyncBatch } from '../../../../../shared/utils/asyncBatch';
 import { StatusEnum } from '@prisma/client';
 
 @Injectable()

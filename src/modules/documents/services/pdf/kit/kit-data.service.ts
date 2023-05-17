@@ -5,7 +5,7 @@ import { Injectable } from '@nestjs/common';
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { PdfAsoDataService } from '../aso/aso-data.service';
 import { PdfProntuarioDataService } from '../prontuario/prontuario-data.service';
-import { asyncBatch } from 'src/shared/utils/asyncBatch';
+import { asyncBatch } from '../../../../../shared/utils/asyncBatch';
 import sortArray from 'sort-array';
 
 @Injectable()
