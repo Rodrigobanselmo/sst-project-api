@@ -38,6 +38,10 @@ export class ScheduleMedicalVisitRepository {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async update({ id, companyId, ...data }: UpdateScheduleMedicalVisitDto) {
+    const visitOld = await this.prisma.scheduleMedicalVisit.findFirst({
+      where: { id },
+    });
+
     const visit = await this.prisma.scheduleMedicalVisit.update({
       data: {
         companyId,
@@ -51,11 +55,17 @@ export class ScheduleMedicalVisitRepository {
       where: { id },
     });
 
+    if (visitOld.status !== data.status) {
+      await this.prisma.employeeExamsHistory.updateMany({
+        data: { status: data.status, },
+        where: { status: visitOld.status, scheduleMedicalVisitId: id, },
+      });
+    }
+
     await this.prisma.employeeExamsHistory.updateMany({
       data: {
         clinicId: data.clinicId,
         doctorId: data.docId,
-        status: data.status,
         doneDate: data.doneClinicDate,
       },
       where: { scheduleMedicalVisitId: id, exam: { isAttendance: true } },
@@ -65,10 +75,9 @@ export class ScheduleMedicalVisitRepository {
       data: {
         clinicId: data.labId,
         doctorId: data.docId,
-        status: data.status,
         doneDate: data.doneLabDate,
       },
-      where: { scheduleMedicalVisitId: id, exam: { isAttendance: false } },
+      where: { status: visitOld.status, scheduleMedicalVisitId: id, exam: { isAttendance: false } },
     });
 
     return new ScheduleMedicalVisitEntity(visit);
