@@ -11,7 +11,7 @@ import { EmployeeExamsHistoryRepository } from './EmployeeExamsHistoryRepository
 
 @Injectable()
 export class ScheduleMedicalVisitRepository {
-  constructor(private prisma: PrismaService, private employeeExamsHistoryRepository: EmployeeExamsHistoryRepository) {}
+  constructor(private prisma: PrismaService, private employeeExamsHistoryRepository: EmployeeExamsHistoryRepository) { }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async create({ companyId, ...data }: CreateScheduleMedicalVisitDto & { userId: number }) {
@@ -113,14 +113,14 @@ export class ScheduleMedicalVisitRepository {
           },
           ...(!query.onlyCompany
             ? [
-                {
-                  company: {
-                    receivingServiceContracts: {
-                      some: { applyingServiceCompanyId: query.companyId },
-                    },
+              {
+                company: {
+                  receivingServiceContracts: {
+                    some: { applyingServiceCompanyId: query.companyId },
                   },
                 },
-              ]
+              },
+            ]
             : []),
         ],
       } as typeof options.where);
@@ -202,7 +202,7 @@ export class ScheduleMedicalVisitRepository {
         doc: { include: { professional: true } },
         user: true,
         company: true,
-        exams: { select: { id: true, examId: true, employeeId: true, examType: true, scheduleMedicalVisitId: true } },
+        exams: { where: { status: { notIn: ['CANCELED', 'EXPIRED'] } }, select: { id: true, examId: true, employeeId: true, examType: true, scheduleMedicalVisitId: true } },
         // exams: {select:{employeeId:true,examType:true,examId:true,}}
       },
       ...options,

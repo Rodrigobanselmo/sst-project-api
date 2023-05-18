@@ -39,7 +39,7 @@ export class PdfKitDataService {
         where: { id: options.scheduleMedicalVisitId, companyId },
         select: {
           exams: {
-            where: { exam: { isAttendance: true } },
+            where: { exam: { isAttendance: true }, status: { notIn: ['CANCELED', 'EXPIRED'] } },
             select: { id: true, employeeId: true }
           }
         }

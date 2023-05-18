@@ -251,8 +251,6 @@ class ReportFactoryProduct implements IReportFactoryProduct<FindEmployeeDto> {
         const expiredText = (`vencidos: ${totalByExam[exam.id].expired};`)
         const scheduleText = (`agendados: ${totalByExam[exam.id].processing};`)
 
-        console.log(nameExam.length)
-
         const row: IReportCell[] = [
           { content: `${nameExam}`, },
           { content: `${doneText}`, },
