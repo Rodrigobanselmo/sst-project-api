@@ -12,7 +12,7 @@ export enum SexTypeEnumNotes {
 
 export const SexTypeEnumTranslatedList = [SexTypeEnumTranslated.M, SexTypeEnumTranslated.F];
 
-export const SexTypeEnumTranslatedNotes = Object.entries(SexTypeEnumTranslated).map(([key, value]) => `${value} : ${SexTypeEnumNotes[key]}`);
+export const SexTypeEnumTranslatedNotes = Object.entries(SexTypeEnumTranslated).map(([key, value]) => `${value} ou ${SexTypeEnumNotes[key]}`);
 
 export const SexTypeEnumTranslateBrToUs = (portugueseValue: string) => {
   let keyValue = '';

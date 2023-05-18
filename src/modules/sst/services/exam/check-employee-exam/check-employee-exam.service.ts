@@ -23,7 +23,7 @@ export class CheckEmployeeExamService {
     private readonly companyRepository: CompanyRepository,
     private readonly reloadEmployeeExamTimeService: ReloadEmployeeExamTimeService,
     private readonly dayjs: DayJSProvider,
-  ) {}
+  ) { }
 
   async execute(body: CheckEmployeeExamDto) {
     const homogeneousGroupId = body.homogeneousGroupId;
@@ -182,9 +182,9 @@ export class CheckEmployeeExamService {
         expiredDateExam = this.dayjs.dayjs(dismissalDate).toDate();
       } else {
         const { isExpiredExam } = this.checkExpiredExam(employee, examData, { isDismissal: true });
-        const lastDoneClinicExam = employee.examsHistory.find((examHist) => examHist.status == 'DONE' && examHist.exam.isAttendance);
+        const lastDoneClinicExam = employee.examsHistory?.find((examHist) => examHist.status == 'DONE' && examHist.exam.isAttendance);
 
-        if (!isExpiredExam && lastDoneClinicExam.doneDate) {
+        if (!isExpiredExam && lastDoneClinicExam?.doneDate) {
           const company = await this.companyRepository.findFirstNude({
             where: { id: employee.companyId },
             select: {

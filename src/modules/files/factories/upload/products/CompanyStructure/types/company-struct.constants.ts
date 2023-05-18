@@ -39,6 +39,7 @@ export type IDataReturnEmployee = IDataReturn & {
   phone?: string;
   cbo?: string;
   isPcd?: boolean;
+  cids?: Record<string, string>;
   esocialCode?: string;
   lastExam?: Date;
   employeesHistory: Record<string, IDataReturnEmployeeHistory>;
@@ -96,6 +97,7 @@ export interface IMapData {
   workspace: Record<string, IWorkspaceData>;
   risk: Record<string, IRiskAllData>;
   epis: Record<string, IDataReturn>;
+  cids: Record<string, string>;
 }
 export interface ICompanyData {
   id: string;

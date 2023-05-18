@@ -156,7 +156,7 @@ class FileFactoryProduct implements IFileFactoryProduct {
     if (this.errors.length) throw new BadRequestException(this.errors);
 
     const isRisk = !!Object.keys(mapData.risk).length;
-    if (!isRisk) if (!company.riskFactorGroupData[0].id) throw new BadRequestException(`Sistema de gestão não cadatsrado`);
+    if (!isRisk) if (!company.riskFactorGroupData?.[0]?.id) throw new BadRequestException(`Sistema de gestão não cadatsrado`);
 
     return await asyncBatch(sheetData, 20, async (row) => {
       const touchRisk = !!row[CompanyStructHeaderEnum.RISK];
@@ -174,18 +174,18 @@ class FileFactoryProduct implements IFileFactoryProduct {
         const recs = row[CompanyStructHeaderEnum.REC]?.map((recName: string) => riskMap.recs[recName].id);
         const epis = row[CompanyStructHeaderEnum.EPI_CA]?.map(
           (ca: string) =>
-            ({
-              epiId: episMap[ca].id,
-              efficientlyCheck: row[CompanyStructHeaderEnum.EPI_EFFICIENTLY],
-              epcCheck: row[CompanyStructHeaderEnum.EPI_EPC],
-              longPeriodsCheck: row[CompanyStructHeaderEnum.EPI_LONG_PERIODS],
-              maintenanceCheck: row[CompanyStructHeaderEnum.EPI_MAINTENANCE],
-              sanitationCheck: row[CompanyStructHeaderEnum.EPI_SANITATION],
-              tradeSignCheck: row[CompanyStructHeaderEnum.EPI_TRADE_SIGN],
-              trainingCheck: row[CompanyStructHeaderEnum.EPI_TRAINING],
-              unstoppedCheck: row[CompanyStructHeaderEnum.EPI_UNSTOPPED],
-              validationCheck: row[CompanyStructHeaderEnum.EPI_VALIDATION],
-            } as EpiRoRiskDataDto),
+          ({
+            epiId: episMap[ca].id,
+            efficientlyCheck: row[CompanyStructHeaderEnum.EPI_EFFICIENTLY],
+            epcCheck: row[CompanyStructHeaderEnum.EPI_EPC],
+            longPeriodsCheck: row[CompanyStructHeaderEnum.EPI_LONG_PERIODS],
+            maintenanceCheck: row[CompanyStructHeaderEnum.EPI_MAINTENANCE],
+            sanitationCheck: row[CompanyStructHeaderEnum.EPI_SANITATION],
+            tradeSignCheck: row[CompanyStructHeaderEnum.EPI_TRADE_SIGN],
+            trainingCheck: row[CompanyStructHeaderEnum.EPI_TRAINING],
+            unstoppedCheck: row[CompanyStructHeaderEnum.EPI_UNSTOPPED],
+            validationCheck: row[CompanyStructHeaderEnum.EPI_VALIDATION],
+          } as EpiRoRiskDataDto),
         );
 
         const homogeneousGroupId = workspaceMap.homogeneousGroup[row[CompanyStructHeaderEnum.GHO]]?.id as string;
@@ -270,6 +270,7 @@ class FileFactoryProduct implements IFileFactoryProduct {
       workspace: {},
       risk: {},
       epis: {},
+      cids: {},
     };
 
     const subOfficeIndex = hierarchyList.findIndex((i) => i == HierarchyEnum.SUB_OFFICE);
@@ -362,7 +363,18 @@ class FileFactoryProduct implements IFileFactoryProduct {
             sex: row[CompanyStructHeaderEnum.EMPLOYEE_SEX],
             socialName: row[CompanyStructHeaderEnum.EMPLOYEE_SOCIAL_NAME],
             employeesHistory: {},
+            cids: {},
           };
+
+        const isCid = !!row[CompanyStructHeaderEnum.EMPLOYEE_CIDS];
+
+        if (isCid) {
+          row[CompanyStructHeaderEnum.EMPLOYEE_CIDS].map((value: string) => {
+            mapData.cids[value] = value
+            mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]].employees[row[CompanyStructHeaderEnum.EMPLOYEE_CPF]].cids[value] = value
+          });
+        }
+
 
         if (isEmployeeHistory) {
           const adm = EmployeeHierarchyMotiveTypeEnum.ADM;
@@ -475,38 +487,47 @@ class FileFactoryProduct implements IFileFactoryProduct {
     const employeeKeys = Object.keys(workspaces.map((w) => (mapData.workspace[w.name] || mapData.workspace[w.abbreviation])?.employees).flat(1));
     const riskKeys = Object.keys(mapData.risk);
 
+    const cidsKeys = Object.keys(mapData.cids);
+    // const cidsKeys = Object.values(workspaces.map((w) => (mapData.workspace[w.name] || mapData.workspace[w.abbreviation])?.employees)).map(
+    //   (employeeMap) => {
+    //     return Object.values(employeeMap).map((employee) => Object.keys(employee.cids));
+    //   }
+    // ).flat(2)
+
+    const cidsPromise = cidsKeys.length ? this.prisma.cid.findMany({ where: { cid: { in: cidsKeys } }, select: { cid: true } }) : undefined;
+
     const episPromise = episKeys.length ? this.prisma.epi.findMany({ where: { ca: { in: episKeys } }, select: { id: true, ca: true } }) : undefined;
 
     const homoGroupsPromise = homoGroupsKeys.length
       ? this.prisma.homogeneousGroup.findMany({
-          where: { companyId, type: null, status: 'ACTIVE' },
-          select: { name: true, id: true, hierarchyOnHomogeneous: { select: { hierarchyId: true, id: true } } },
-        })
+        where: { companyId, type: null, status: 'ACTIVE' },
+        select: { name: true, id: true, hierarchyOnHomogeneous: { select: { hierarchyId: true, id: true } } },
+      })
       : undefined;
 
     const hierarchiesPromise = hierarchyKeys.length
       ? this.prisma.hierarchy.findMany({
-          where: { companyId, status: 'ACTIVE' },
-          select: { id: true, name: true, parentId: true, type: true, workspaces: { select: { id: true } } },
-        })
+        where: { companyId, status: 'ACTIVE' },
+        select: { id: true, name: true, parentId: true, type: true, workspaces: { select: { id: true } } },
+      })
       : undefined;
 
     const riskPromise = riskKeys.length
       ? this.riskRepository.findAllAvailable(companyId, {
-          where: { name: { in: riskKeys } },
-          select: { id: true, name: true, esocialCode: true, type: true },
-        })
+        where: { name: { in: riskKeys } },
+        select: { id: true, name: true, esocialCode: true, type: true },
+      })
       : undefined;
 
     const employeePromise =
       employeeKeys.length && !body.createEmployee
         ? this.employeeRepository.findNude({
-            where: { companyId, ...(employeeKeys.length < 300 && { cpf: { in: employeeKeys } }) },
-            select: { id: true, cpf: true },
-          })
+          where: { companyId, ...(employeeKeys.length < 300 && { cpf: { in: employeeKeys } }) },
+          select: { id: true, cpf: true },
+        })
         : undefined;
 
-    const [epis, homoGroups, hierarchies, risk, employees] = await Promise.all([episPromise, homoGroupsPromise, hierarchiesPromise, riskPromise, employeePromise]);
+    const [epis, homoGroups, hierarchies, risk, employees, cids] = await Promise.all([episPromise, homoGroupsPromise, hierarchiesPromise, riskPromise, employeePromise, cidsPromise]);
 
     const homoGroupsMap: Record<string, IHomoDataReturn> = {};
     const hierarchyMap: Record<string, IHierarchyDataReturn> = {};
@@ -515,8 +536,13 @@ class FileFactoryProduct implements IFileFactoryProduct {
     const workspaceMap: Record<string, IWorkDataReturn> = {};
     const episMap: Record<string, IEpiReturn> = {};
     const employeesMap: Record<string, IEmployeeReturn> = {};
+    const cidsMap: Record<string, string> = {};
 
     const hierarchyPathMap: Record<string, IHierarchyDataReturn> = {};
+
+    cids?.forEach((cid) => {
+      cidsMap[cid.cid] = cid.cid;
+    });
 
     epis?.forEach((epi) => {
       episMap[epi.ca] = epi;
@@ -581,13 +607,18 @@ class FileFactoryProduct implements IFileFactoryProduct {
       });
     });
 
-    return { homoGroupsMap, hierarchyPathMap, hierarchyMap, hierarOnHomoMap, riskMap, workspaceMap, episMap, company, employeesMap };
+    return { homoGroupsMap, hierarchyPathMap, hierarchyMap, hierarOnHomoMap, riskMap, workspaceMap, episMap, company, employeesMap, cidsMap };
   }
 
   // get the database existent data, create a map using getDatabaseMaps and compare with xml map data
   private async getMapDataWithId(company: ICompanyData, mapData: IMapData, body: IBodyFileCompanyStruct) {
     const companyId = company.id;
-    const { homoGroupsMap, riskMap, workspaceMap, hierarchyPathMap, episMap, hierarOnHomoMap, employeesMap } = await this.getDatabaseMaps(company, mapData, body);
+    const { homoGroupsMap, riskMap, workspaceMap, hierarchyPathMap, episMap, hierarOnHomoMap, employeesMap, cidsMap } = await this.getDatabaseMaps(company, mapData, body);
+
+    Object.entries(mapData.cids).map(([cid]) => {
+      const cidId = cidsMap[cid];
+      if (!cidId) return this.throwError(`CID: ${cid} não encontrado`, body);
+    });
 
     Object.entries(mapData.epis).map(([ca]) => {
       const epiId = episMap[ca]?.id;
@@ -860,6 +891,7 @@ class FileFactoryProduct implements IFileFactoryProduct {
       companyId,
       cpf,
       ...(employeeImportData.name && { name: employeeImportData.name }),
+      ...(employeeImportData.rg && { rg: employeeImportData.rg }),
       ...(employeeImportData.email && { email: employeeImportData.email }),
       ...(employeeImportData.phone && { phone: employeeImportData.phone }),
       ...(employeeImportData.birth && { birthday: employeeImportData.birth }),
@@ -868,6 +900,8 @@ class FileFactoryProduct implements IFileFactoryProduct {
       ...(employeeImportData.lastExam && { lastExam: employeeImportData.lastExam }),
       ...(employeeImportData.sex && { sex: employeeImportData.sex }),
       ...(employeeImportData.socialName && { socialName: employeeImportData.socialName }),
+      ...(typeof employeeImportData.isPcd == 'boolean' && { isPcd: employeeImportData.isPcd }),
+      ...(employeeImportData.cids && { cidIds: Object.values(employeeImportData.cids) }),
     });
   }
 

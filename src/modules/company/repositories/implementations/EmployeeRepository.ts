@@ -73,33 +73,18 @@ export class EmployeeRepository {
     return new EmployeeEntity(employee);
   }
 
-  async upsertImport({ cpf, birthday, companyId, cbo, name, email, esocialCode, lastExam, socialName, sex, phone }: UpdateEmployeeDto): Promise<EmployeeEntity> {
+  async upsertImport({ cpf, birthday, companyId, cbo, name, email, esocialCode, lastExam, socialName, sex, phone, isPCD, cidIds, rg, }: UpdateEmployeeDto): Promise<EmployeeEntity> {
     const employee = await this.prisma.employee.upsert({
       create: {
-        cpf,
-        birthday,
-        companyId,
-        cbo,
-        name,
-        email,
-        esocialCode,
-        lastExam,
-        socialName,
-        sex,
-        phone,
+        cpf, birthday, companyId, cbo, name, email, esocialCode, lastExam, socialName, sex, phone, isPCD, rg,
+        cids: cidIds?.length ? { connect: cidIds.map((cidId) => ({ cid: cidId })) } : undefined,
+        ...(cidIds.length && { isPCD: true }),
       },
       update: {
-        cpf,
-        birthday,
-        companyId,
-        cbo,
-        name,
-        email,
-        esocialCode,
-        lastExam,
-        socialName,
-        sex,
-        phone,
+        cpf, birthday, companyId, cbo, name, email, esocialCode, lastExam, socialName, sex, phone, isPCD, rg,
+        cids: cidIds ? { set: (cidIds || []).map((cidId) => ({ cid: cidId })) } : undefined,
+        ...(cidIds.length && { isPCD: true }),
+        ...(!cidIds.length && { isPCD: false })
       },
       where: {
         cpf_companyId: { companyId, cpf },

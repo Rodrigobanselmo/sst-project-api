@@ -30,6 +30,7 @@ export enum CompanyStructHeaderEnum {
   EMPLOYEE_SOCIAL_NAME = 'Nome social do empregado',
   EMPLOYEE_RG = 'RG',
   EMPLOYEE_IS_PCD = 'Funcionário PCD',
+  EMPLOYEE_CIDS = 'CID',
 
   DIRECTORY = 'Diretoria',
   MANAGEMENT = 'Gerência',
@@ -122,6 +123,7 @@ export const CompanyStructColumnMap: IColumnRuleMap<CompanyStructHeaderEnum> = {
       CompanyStructHeaderEnum.EMPLOYEE_RG,
       CompanyStructHeaderEnum.EMPLOYEE_SOCIAL_NAME,
       CompanyStructHeaderEnum.EMPLOYEE_IS_PCD,
+      CompanyStructHeaderEnum.EMPLOYEE_CIDS,
     ],
   },
   [CompanyStructHeaderEnum.EMPLOYEE_NAME]: {
@@ -177,9 +179,13 @@ export const CompanyStructColumnMap: IColumnRuleMap<CompanyStructHeaderEnum> = {
     field: CompanyStructHeaderEnum.EMPLOYEE_IS_PCD,
     checkHandler: checkIsBoolean,
     notes: ['S: Sim', 'N: Não'],
-    transform: (v) => Boolean(v),
+    transform: (v) => typeof v == 'string' ? Boolean(v) : undefined,
   },
-
+  [CompanyStructHeaderEnum.EMPLOYEE_CIDS]: {
+    field: CompanyStructHeaderEnum.EMPLOYEE_CIDS,
+    checkHandler: checkIsString,
+    isArray: true,
+  },
   [CompanyStructHeaderEnum.DIRECTORY]: {
     field: CompanyStructHeaderEnum.DIRECTORY,
     checkHandler: checkIsString,

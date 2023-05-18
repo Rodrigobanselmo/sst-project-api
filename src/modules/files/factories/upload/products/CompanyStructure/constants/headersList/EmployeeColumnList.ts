@@ -15,6 +15,7 @@ export const EmployeeColumnList: (opt: { workspaceLength: number }) => ISheetHea
         CompanyStructColumnMap[CompanyStructHeaderEnum.EMPLOYEE_EMAIL],
         CompanyStructColumnMap[CompanyStructHeaderEnum.EMPLOYEE_PHONE],
         CompanyStructColumnMap[CompanyStructHeaderEnum.EMPLOYEE_IS_PCD],
+        CompanyStructColumnMap[CompanyStructHeaderEnum.EMPLOYEE_CIDS],
         CompanyStructColumnMap[CompanyStructHeaderEnum.EMPLOYEE_ADMISSION],
         CompanyStructColumnMap[CompanyStructHeaderEnum.EMPLOYEE_DEMISSION],
         CompanyStructColumnMap[CompanyStructHeaderEnum.ESOCIAL_CODE],
