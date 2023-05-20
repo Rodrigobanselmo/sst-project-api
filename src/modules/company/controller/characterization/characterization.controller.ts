@@ -30,7 +30,7 @@ export class CharacterizationController {
     private readonly findByIdCharacterizationService: FindByIdCharacterizationService,
     private readonly updateCharacterizationPhotoService: UpdateCharacterizationPhotoService,
     private readonly copyCharacterizationService: CopyCharacterizationService,
-  ) {}
+  ) { }
 
   @Permissions({
     code: PermissionEnum.CHARACTERIZATION,
@@ -97,9 +97,15 @@ export class CharacterizationController {
     isMember: true,
     crud: 'cu',
   })
+  @UseInterceptors(FileInterceptor('file'))
   @Patch('/photo/:id')
-  async update(@Body() updatePhotoCharacterizationDto: UpdatePhotoCharacterizationDto, @Param('id') id: string) {
-    return this.updateCharacterizationPhotoService.execute(id, updatePhotoCharacterizationDto);
+  async update(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() updatePhotoCharacterizationDto: UpdatePhotoCharacterizationDto,
+    @User() userPayloadDto: UserPayloadDto,
+    @Param('id') id: string
+  ) {
+    return this.updateCharacterizationPhotoService.execute(id, file, updatePhotoCharacterizationDto, userPayloadDto);
   }
 
   @Permissions({
@@ -109,7 +115,6 @@ export class CharacterizationController {
     crud: 'cu',
   })
   @Delete('/photo/:id')
-  @UseInterceptors(FileInterceptor('file'))
   deletePhoto(@Param('id') id: string) {
     return this.deleteCharacterizationPhotoService.execute(id);
   }

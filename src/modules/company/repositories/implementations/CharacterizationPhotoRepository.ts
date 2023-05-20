@@ -15,7 +15,7 @@ export interface ICharacterizationPhoto extends Partial<AddPhotoCharacterization
 
 @Injectable()
 export class CharacterizationPhotoRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async createMany(characterizationPhoto: ICharacterizationPhoto[]) {
     const characterizations = await this.prisma.companyCharacterizationPhoto.createMany({
@@ -27,7 +27,7 @@ export class CharacterizationPhotoRepository {
     return characterizations;
   }
 
-  async update({ id, ...characterizationPhotoDto }: UpdatePhotoCharacterizationDto): Promise<CharacterizationPhotoEntity> {
+  async update({ id, ...characterizationPhotoDto }: Partial<ICharacterizationPhoto>): Promise<CharacterizationPhotoEntity> {
     const characterization = await this.prisma.companyCharacterizationPhoto.update({
       where: { id: id || 'no-id' },
       data: {

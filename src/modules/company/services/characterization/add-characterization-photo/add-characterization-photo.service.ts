@@ -15,7 +15,7 @@ export class AddCharacterizationPhotoService {
     private readonly characterizationRepository: CharacterizationRepository,
     private readonly characterizationPhotoRepository: CharacterizationPhotoRepository,
     private readonly amazonStorageProvider: AmazonStorageProvider,
-  ) {}
+  ) { }
 
   async execute(addPhotoCharacterizationDto: AddPhotoCharacterizationDto, userPayloadDto: UserPayloadDto, file: Express.Multer.File) {
     const companyId = userPayloadDto.targetCompanyId;
@@ -36,9 +36,9 @@ export class AddCharacterizationPhotoService {
     return characterizationData;
   }
 
-  private async upload(companyId: string, file: Express.Multer.File) {
+  public async upload(companyId: string, file: Express.Multer.File, opt?: { id?: string }) {
     const fileType = file.originalname.split('.')[file.originalname.split('.').length - 1];
-    const path = 'characterization/' + v4() + '.' + fileType;
+    const path = 'characterization/' + (opt?.id || v4()) + '.' + fileType;
 
     const { url } = await this.amazonStorageProvider.upload({
       file: file.buffer,
