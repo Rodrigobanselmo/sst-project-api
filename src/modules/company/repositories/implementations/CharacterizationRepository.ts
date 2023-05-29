@@ -33,7 +33,7 @@ export const getCharacterizationType = (type: CharacterizationTypeEnum) => {
 };
 @Injectable()
 export class CharacterizationRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async upsert(
     { id, companyId, workspaceId, hierarchyIds, type, profileParentId, startDate = null, endDate = null, ...characterizationDto }: ICompanyCharacterization,
@@ -67,6 +67,7 @@ export class CharacterizationRepository {
         },
       }),
     });
+
     if (hierarchyIds) {
       if (!workspaceId) throw new BadRequestException('Faltou identificar o estabelecimento para cadastrar os cargos');
 
@@ -98,6 +99,8 @@ export class CharacterizationRepository {
           }
         });
 
+      console.log('hierarchyOnHomogeneous', hierarchyOnHomogeneous);
+      console.log('hierarchyIds', hierarchyIds);
       await Promise.all(
         hierarchyIds.map(
           async (hierarchyId) =>

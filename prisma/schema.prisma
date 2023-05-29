@@ -1289,7 +1289,7 @@ model ProtocolToRisk {
   homoGroups            HomogeneousGroup[]
 
   @@unique([id, companyId])
-  @@unique([riskId, protocolId])
+  @@unique([riskId, protocolId, companyId])
 }
 
 model RecMed {

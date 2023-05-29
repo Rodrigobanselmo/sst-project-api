@@ -19,7 +19,7 @@ export class UpsertCharacterizationService {
     private readonly amazonStorageProvider: AmazonStorageProvider,
     private readonly deleteHierarchyHomoGroupService: DeleteHierarchyHomoGroupService,
     private readonly updateHomoGroupService: UpdateHomoGroupService,
-  ) {}
+  ) { }
 
   async execute(
     { photos, ...upsertCharacterizationDto }: UpsertCharacterizationDto,

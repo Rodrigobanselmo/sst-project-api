@@ -9,12 +9,12 @@ import { RecMedRepository } from '../../../../../modules/sst/repositories/implem
 
 @Injectable()
 export class FindRecMedService {
-  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache, private readonly recMedRepository: RecMedRepository) {}
+  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache, private readonly recMedRepository: RecMedRepository) { }
 
   async execute({ skip, take, riskType, ...query }: FindRecMedDto, user: UserPayloadDto) {
     const RecMed = await this.recMedRepository.find({ companyId: user.targetCompanyId, ...query }, { skip, take });
 
-    const extCacheString = JSON.stringify({ onlyRec: query.onlyRec, onlyMed: query.onlyMed, riskType });
+    const extCacheString = JSON.stringify({ onlyRec: query.onlyRec, onlyMed: query.onlyMed, riskType, recType: query.recType, medType: query.medType });
     const cacheKey = CacheEnum.REC_MED_REPRESENT_ALL + extCacheString;
 
     let RecMedAll: {
@@ -30,6 +30,9 @@ export class FindRecMedService {
           risk: { representAll: true, ...(riskType && { type: riskType }) },
           id: { notIn: RecMed.data.map((i) => i.id) },
           deleted_at: null,
+
+          ...(query.recType && { recType: { in: query.recType } }),
+          ...(query.medType && { medType: { in: query.medType }, }),
         },
         distinct: ['medName', 'recName'],
       });

@@ -70,7 +70,7 @@ export class CharacterizationController {
     if ('activities' in body) body.activities = body.activities.filter((item) => item !== '');
     if ('paragraphs' in body) body.paragraphs = body.paragraphs.filter((item) => item !== '');
     if ('hierarchyIds' in body) body.hierarchyIds = body.hierarchyIds.filter((item) => item !== '');
-    if ('photos' in body) body.hierarchyIds = body.photos.filter((item) => item !== '');
+    if ('photos' in body) body.photos = body.photos.filter((item) => item !== '');
 
     return this.upsertCharacterizationService.execute(body, workspaceId, userPayloadDto, files);
   }

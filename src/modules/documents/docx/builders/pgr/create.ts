@@ -91,11 +91,9 @@ export class DocumentBuildPGR {
   private getVariables(): IDocVariables {
     let docVariables = this.docSections.variables as any;
 
-    console.log(this.docSections.variables);
     if (Array.isArray(docVariables)) {
       docVariables = docVariables.reduce((acc, item) => ({ ...acc, [item.type]: item }), {} as any);
     }
-    console.log(docVariables);
 
     return {
       [VariablesPGREnum.VERSION]: this.version,

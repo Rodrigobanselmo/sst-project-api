@@ -113,7 +113,10 @@ export class CompanyEntity implements Company {
   responsibleName: string;
   phone: string;
   operationTime: string;
+
   activityStartDate: Date;
+  activity_start_date: string;
+
   receivingServiceContracts?: ContractEntity[];
   applyingServiceContracts?: ContractEntity[];
   responsibleNit: string;
@@ -201,7 +204,6 @@ export class CompanyEntity implements Company {
   vision: string;
   values: string;
 
-  activity_start_date: string;
   cadastral_situation_date: string;
   legal_nature_code: string;
   size: string;

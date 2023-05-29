@@ -103,7 +103,7 @@ export class AddPhotoCharacterizationDto {
 
   @Transform(StringCapitalizeTransform, { toClassOnly: true })
   @IsString()
-  @MaxLength(250, {
+  @MaxLength(500, {
     message: 'A imagem deve ter uma descrição com até 250 caracteres',
   })
   name: string;
@@ -121,7 +121,9 @@ export class UpdatePhotoCharacterizationDto {
   @Transform(StringCapitalizeTransform, { toClassOnly: true })
   @IsOptional()
   @IsString()
-  @MaxLength(100)
+  @MaxLength(500, {
+    message: 'A imagem deve ter uma descrição com até 250 caracteres',
+  })
   name: string;
 }
 

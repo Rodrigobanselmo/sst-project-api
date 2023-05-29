@@ -251,7 +251,7 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
     const data = options.data;
     const version = options.version;
     const attachments = options.attachments;
-    console.log(data.modelData);
+
     const sections: ISectionOptions[] = new DocumentBuildPGR({
       version,
       document: { ...data.riskGroupData, ...data.documentData, ...(data.documentData.json && ((data.documentData as any).json as DocumentDataPGRDto)) },
