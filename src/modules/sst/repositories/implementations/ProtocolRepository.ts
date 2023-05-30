@@ -9,7 +9,7 @@ import { ProtocolEntity } from '../../entities/protocol.entity';
 
 @Injectable()
 export class ProtocolRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async create(createCompanyDto: CreateProtocolDto) {
     const protocol = await this.prisma.protocol.create({
@@ -33,7 +33,7 @@ export class ProtocolRepository {
       .map((protocolId) => {
         return riskIds.map((riskId) =>
           this.prisma.protocolToRisk.upsert({
-            where: { riskId_protocolId: { protocolId, riskId } },
+            where: { riskId_protocolId_companyId: { protocolId, riskId, companyId } },
             create: {
               protocolId,
               riskId,
