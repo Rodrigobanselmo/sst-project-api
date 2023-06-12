@@ -22,6 +22,7 @@ import { UpdateUserService } from '../../services/users/update-user/update-user.
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 import { PermissionEnum, RoleEnum } from '../../../../shared/constants/enum/authorization';
 import { Roles } from '../../../../shared/decorators/roles.decorator';
+import { v4 } from 'uuid';
 
 @ApiTags('users')
 @Controller('users')
@@ -36,7 +37,7 @@ export class UsersController {
     private readonly findByIdService: FindByIdService,
     private readonly sessionService: SessionService,
     private readonly updatePermissionsRolesService: UpdatePermissionsRolesService,
-  ) {}
+  ) { }
 
   @Get('me')
   async findMe(@User() userPayloadDto: UserPayloadDto) {
@@ -45,10 +46,14 @@ export class UsersController {
 
   @Permissions({
     code: PermissionEnum.USER,
+    isMember: true,
+    isContract: true,
+    crud: true,
   })
-  @Get(':id')
-  findId(@Param('id', ParseIntPipe) id: number) {
-    return classToClass(this.findByIdService.execute(+id));
+  @Get('/company/:companyId/:id')
+  findId(@Param('id', ParseIntPipe) id: number, @User() user: UserPayloadDto) {
+    console.log()
+    return classToClass(this.findByIdService.execute(+id, user.targetCompanyId));
   }
 
   @Permissions({
@@ -72,6 +77,8 @@ export class UsersController {
   @Public()
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
+    if (!createUserDto.password) createUserDto.password = v4()
+
     await this.createUserService.execute(createUserDto);
 
     return this.sessionService.execute(createUserDto);
@@ -80,6 +87,17 @@ export class UsersController {
   @Patch()
   update(@Body() updateUserDto: UpdateUserDto, @User() { userId }: UserPayloadDto) {
     return classToClass(this.updateUserService.execute(+userId, updateUserDto));
+  }
+
+  @Permissions({
+    code: PermissionEnum.USER,
+    isMember: true,
+    isContract: true,
+    crud: true,
+  })
+  @Patch('/company/:companyId/:id')
+  async updateAll(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto, @User() user: UserPayloadDto) {
+    return classToClass(this.updateUserService.execute(id, { ...updateUserDto, skipPassCheck: true, companyId: user.targetCompanyId }));
   }
 
   @Permissions({

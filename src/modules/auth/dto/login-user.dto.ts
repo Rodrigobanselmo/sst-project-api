@@ -16,5 +16,9 @@ export class LoginUserDto {
 
 export class LoginGoogleUserDto {
   @IsString()
-  readonly token?: string;
+  @IsEmail()
+  readonly email?: string;
+
+  @IsString()
+  readonly googleToken?: string;
 }

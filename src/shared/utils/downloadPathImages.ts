@@ -2,6 +2,11 @@ import { v4 } from 'uuid';
 
 import { downloadImageFile, getExtensionFromUrl } from './downloadImageFile';
 
+export const getPathImage = (url: string) => {
+  if (!url) return null;
+  return `tmp/${v4()}.${getExtensionFromUrl(url)}`;
+};
+
 export const downloadPathImage = async (url: string) => {
   // if (process.env.NODE_ENV === 'development') return 'images/mock/placeholder-image.png';
 

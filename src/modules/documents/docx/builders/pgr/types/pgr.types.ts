@@ -1,3 +1,4 @@
+import { IImagesMap } from './../../../../factories/document/types/IDocumentFactory.types';
 import { DocumentDataPGRDto } from './../../../../../sst/dto/document-data-pgr.dto';
 import { DocumentDataEntity } from '../../../../../../modules/sst/entities/documentData.entity';
 import { CompanyEntity } from '../../../../../company/entities/company.entity';
@@ -26,4 +27,6 @@ export interface ICreatePGR {
   attachments: AttachmentEntity[];
   hierarchyTree: IHierarchyMap;
   docSections?: IDocumentPGRSectionGroups;
+  imagesMap?: IImagesMap;
+  hierarchyHighLevelsData: Map<string, HierarchyMapData>;
 }

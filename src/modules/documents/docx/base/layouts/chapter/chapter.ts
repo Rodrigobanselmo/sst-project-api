@@ -1,6 +1,6 @@
-import { setNiceProportion } from './../../../../../../shared/utils/setNiceProportion';
+import { setNiceProportion } from '../../../helpers/setNiceProportion';
 import { AlignmentType, Footer, Header, HeightRule, ImageRun, ISectionOptions, Paragraph, Table, TableCell, TableRow, TextRun, VerticalAlign, WidthType } from 'docx';
-import fs from 'fs';
+import { readFileSync } from 'fs';
 import sizeOf from 'image-size';
 import { borderNoneStyle, sectionCoverProperties } from '../../config/styles';
 
@@ -36,7 +36,7 @@ const table = (rows: TableRow[]) =>
   });
 
 const imageCover = (imgPath: string, verticalAlign: VerticalAlign) => {
-  const { height: imgHeight, width: imgWidth } = sizeOf(fs.readFileSync(imgPath));
+  const { height: imgHeight, width: imgWidth } = sizeOf(readFileSync(imgPath));
 
   const maxWidth = 630;
   const maxHeight = 200;
@@ -49,7 +49,7 @@ const imageCover = (imgPath: string, verticalAlign: VerticalAlign) => {
       new Paragraph({
         children: [
           new ImageRun({
-            data: fs.readFileSync(imgPath),
+            data: readFileSync(imgPath),
             transformation: {
               width,
               height,

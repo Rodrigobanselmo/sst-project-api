@@ -1,7 +1,7 @@
-import { setNiceProportion } from './../../../../../../shared/utils/setNiceProportion';
+import { setNiceProportion } from '../../../helpers/setNiceProportion';
 import sizeOf from 'image-size';
 import { AlignmentType, ImageRun, ISectionOptions, Paragraph, TextRun } from 'docx';
-import fs from 'fs';
+import { readFileSync } from 'fs';
 
 import { sectionCoverProperties } from '../../config/styles';
 
@@ -35,7 +35,7 @@ const textShow = (version: string) =>
   });
 
 const imageCover = (imgPath: string) => {
-  const { height: imgHeight, width: imgWidth } = sizeOf(fs.readFileSync(imgPath));
+  const { height: imgHeight, width: imgWidth } = sizeOf(readFileSync(imgPath));
 
   const maxWidth = 630;
   const maxHeight = 354;
@@ -45,7 +45,7 @@ const imageCover = (imgPath: string) => {
   return new Paragraph({
     children: [
       new ImageRun({
-        data: fs.readFileSync(imgPath),
+        data: readFileSync(imgPath),
         transformation: {
           width,
           height,

@@ -6,9 +6,21 @@ export class CreateUserDto {
   readonly email: string;
 
   @IsString()
-  @MinLength(8)
-  @MaxLength(20)
+  @IsOptional()
+  @MaxLength(30)
   password: string;
+
+  @IsString()
+  @IsOptional()
+  readonly googleToken: string;
+
+  @IsString()
+  @IsOptional()
+  readonly photoUrl: string;
+
+  @IsString()
+  @IsOptional()
+  readonly name: string;
 
   @IsString()
   @IsOptional()

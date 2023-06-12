@@ -15,9 +15,9 @@ class SendGridProvider implements IMailProvider {
     this.client = sgMail;
   }
 
-  async sendMail({ path, subject, to, variables, attachments, source = EmailsEnum.VALIDATION }: ISendMailData): Promise<any> {
+  async sendMail({ path, subject, to, variables, attachments, source = EmailsEnum.VALIDATION, sendDelevelop }: ISendMailData): Promise<any> {
     try {
-      if (process.env.NODE_ENV === 'development') return;
+      if (!sendDelevelop && process.env.NODE_ENV === 'development') return;
       if (!to) return;
 
       const templateFileContent = fs.readFileSync(path).toString('utf-8');
@@ -34,9 +34,10 @@ class SendGridProvider implements IMailProvider {
         subject: subject,
         html: templateHTML,
         attachments,
+        replyTo: source.replace(':id', random),
       });
     } catch (error) {
-      console.error(error);
+      console.error(JSON.stringify(error, null, 2));
       throw new UnprocessableEntityException(ErrorMessageEnum.EMAIL_NOT_SEND);
     }
   }

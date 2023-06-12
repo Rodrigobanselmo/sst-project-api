@@ -1,3 +1,5 @@
+import { ICreatePGR } from './../../../docx/builders/pgr/types/pgr.types';
+import { DocumentBuildPGR } from './../../../docx/builders/pgr/create';
 import { IDocumentModelData } from './../../../types/document-mode.types';
 import { RiskDocumentEntity } from './../../../../sst/entities/riskDocument.entity';
 import { AttachmentEntity } from './../../../../sst/entities/attachment.entity';
@@ -13,12 +15,15 @@ export interface IGetDocumentFileName {
 }
 
 export interface IDocumentAttachment {
+  buildData: ICreatePGR;
   section: ISectionOptions[];
   link: string;
   type: string;
   id: string;
   name: string;
 }
+
+export type IImagesMap = Record<string, { path: string }>
 
 export interface IGetDocument<T, R> {
   version: string;
@@ -34,14 +39,18 @@ export interface ISaveDocument<T, R> {
   body: T;
 }
 
+export interface IUnlinkPaths { path: string, url: string }
+
 export interface IDocumentFactoryProduct<T = any, R = any> {
-  unlinkPaths: string[];
+  localCreation?: boolean;
+  unlinkPaths: IUnlinkPaths[];
   downloadPathImage(url: string): Promise<string>;
   getData(body: T): R;
-  getAttachments(data: R, body: T): Promise<IDocumentAttachment[]>;
+  getAttachments(data: IGetDocument<T, R>): Promise<IDocumentAttachment[]>;
   getFileName(body: T, type?: string, ...args: any[]): string;
   getVersionName(data: R, body: T): string;
-  getDocument(options: IGetDocument<T, R>): Promise<ISectionOptions[]>;
+  getDocumentBuild(options: IGetDocument<T, R>): Promise<ICreatePGR>;
+  getDocumentSections(options: IGetDocument<T, R>): Promise<ISectionOptions[]>;
   save(options: ISaveDocument<T, R>): Promise<RiskDocumentEntity>;
   error(options: Pick<ISaveDocument<T, R>, 'body'>): Promise<void>;
   documentModelData(id: number, companyId: string): Promise<IDocumentModelData>;

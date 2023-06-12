@@ -1,8 +1,8 @@
-import { setNiceProportion } from './../../../../../../shared/utils/setNiceProportion';
 import { AlignmentType, BorderStyle, Footer, ImageRun, ITableBordersOptions, Paragraph, Table, TableCell, TableRow, TextRun, VerticalAlign, WidthType } from 'docx';
-import { palette } from '../../../../../../shared/constants/palette';
 import sizeOf from 'image-size';
-import fs from 'fs';
+import { readFileSync } from 'fs';
+import { setNiceProportion } from '../../../helpers/setNiceProportion';
+import { palette } from '../../../helpers/palette';
 
 interface IFooterProps {
   footerText: string;
@@ -94,7 +94,7 @@ const secondCell = (consultantLogoPath: string) => {
     });
 
   const getProportion = () => {
-    const { height: imgHeight, width: imgWidth } = sizeOf(fs.readFileSync(consultantLogoPath));
+    const { height: imgHeight, width: imgWidth } = sizeOf(readFileSync(consultantLogoPath));
 
     const maxWidth = 250;
     const maxHeight = 30;
@@ -105,7 +105,7 @@ const secondCell = (consultantLogoPath: string) => {
 
   const image = consultantLogoPath
     ? new ImageRun({
-        data: fs.readFileSync(consultantLogoPath),
+        data: readFileSync(consultantLogoPath),
         transformation: getProportion(),
       })
     : undefined;

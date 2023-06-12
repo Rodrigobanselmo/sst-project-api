@@ -11,7 +11,7 @@ import dayjs from 'dayjs';
 
 @Injectable()
 export class NotificationRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async create({
     companiesIds,
@@ -82,7 +82,7 @@ export class NotificationRepository {
 
     const { where } = prismaFilter(whereInit, {
       query,
-      skip: ['usersIds', 'userId', 'companiesIds', 'isUnread'],
+      skip: ['usersIds', 'userId', 'companiesIds', 'isUnread', 'isCompany', 'isConsulting', 'isClinic'],
     });
 
     if ('usersIds' in query) {
@@ -103,21 +103,37 @@ export class NotificationRepository {
       } as typeof options.where);
     }
 
+    if ('isConsulting' in query || 'isClinic' in query || 'isCompany' in query) {
+      const OrData: Partial<Prisma.NotificationWhereInput>[] = [];
+      if (query.isConsulting) OrData.push({ isConsulting: query.isConsulting });
+      if (query.isClinic) OrData.push({ isClinic: query.isClinic });
+      if (query.isCompany) OrData.push({ isCompany: query.isCompany });
+
+      if (OrData.length)
+        (where.AND as any).push({
+          OR: OrData
+        } as typeof options.where);
+    }
+
     const response = await this.prisma.$transaction([
       this.prisma.notification.count({
         where,
       }),
       this.prisma.notification.count({
         where: {
-          ...where,
-          OR: [
-            {
-              created_at: { gte: dayjs().add(-7, 'day').toDate() },
-            },
-            {
-              confirmations: { some: { id: query.userId } },
-            },
-          ],
+          AND: [{
+            ...where,
+          }, {
+            OR: [
+              {
+                created_at: { lte: dayjs().add(-14, 'day').toDate() },
+              },
+              {
+                confirmations: { some: { id: query.userId } },
+              },
+            ],
+
+          }]
         },
       }),
       this.prisma.notification.findMany({
@@ -129,10 +145,14 @@ export class NotificationRepository {
       }),
     ]);
 
+    const allCount = response[0]
+    const ignoredCount = response[1]
+    const data = response[2]
+
     return {
-      data: response[2].map((exam) => new NotificationEntity(exam)),
-      countUnread: response[0] > response[1] ? response[0] - response[1] : 0,
-      count: response[0],
+      data: data.map((exam) => new NotificationEntity(exam)),
+      countUnread: allCount > ignoredCount ? allCount - ignoredCount : 0,
+      count: allCount,
     };
   }
 

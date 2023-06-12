@@ -9,6 +9,7 @@ import { LoginUserDto } from '../../../dto/login-user.dto';
 import { PayloadTokenDto } from '../../../dto/payload-token.dto';
 import { RefreshTokensRepository } from '../../../repositories/implementations/RefreshTokensRepository';
 import { ErrorMessageEnum } from '../../../../../shared/constants/enum/errorMessage';
+import { FirebaseProvider } from '../../../../../shared/providers/FirebaseProvider/FirebaseProvider';
 
 @Injectable()
 export class SessionService {
@@ -17,7 +18,8 @@ export class SessionService {
     private readonly refreshTokensRepository: RefreshTokensRepository,
     private readonly hashProvider: HashProvider,
     private readonly jwtTokenProvider: JwtTokenProvider,
-  ) {}
+    private readonly firebaseProvider: FirebaseProvider
+  ) { }
 
   async execute({ email, password, userEntity }: LoginUserDto & { userEntity?: UserEntity }) {
     const user = userEntity ? userEntity : await this.validateUser(email, password);

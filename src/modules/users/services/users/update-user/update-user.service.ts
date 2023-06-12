@@ -16,39 +16,41 @@ export class UpdateUserService {
     private readonly dateProvider: DayJSProvider,
     private readonly findByTokenService: FindByTokenService,
     private readonly inviteUsersRepository: InviteUsersRepository,
-  ) {}
+  ) { }
 
-  async execute(id: number, { password, oldPassword, token, ...restUpdateUserDto }: UpdateUserDto) {
+  async execute(id: number, { password, oldPassword, token, skipPassCheck, companyId, ...restUpdateUserDto }: UpdateUserDto & { skipPassCheck?: boolean, companyId?: string }) {
     if (!id) throw new BadRequestException(`Bad Request`);
 
     const updateUserDto: UpdateUserDto = { ...restUpdateUserDto };
 
-    const userData = await this.userRepository.findById(id);
-    if (!userData) throw new BadRequestException(`user #${id} not found`);
+    const userData = await this.userRepository.findById(id, companyId);
+    if (!userData) throw new BadRequestException(`usuário #${id} not found`);
 
     if (restUpdateUserDto.googleExternalId) {
       const user = await this.userRepository.findByGoogleExternalId(restUpdateUserDto.googleExternalId);
       if (user && user.id !== id) {
         await this.userRepository.update(user.id, {
           googleExternalId: null,
+          googleUser: null,
         });
       }
     }
 
     if (password) {
-      if (!oldPassword) throw new BadRequestException(`Old password missing`);
+      if (!skipPassCheck) {
+        if (!oldPassword) throw new BadRequestException(`Senha atual não informada`);
+        const passwordMatch = await this.hashProvider.compare(oldPassword, userData.password);
 
-      const passwordMatch = await this.hashProvider.compare(oldPassword, userData.password);
-
-      if (!passwordMatch) {
-        throw new BadRequestException('password incorrect');
+        if (!passwordMatch) {
+          throw new BadRequestException('Senha atual não confere');
+        }
       }
 
       const passHash = await this.hashProvider.createHash(password);
       updateUserDto.password = passHash;
     }
 
-    const { companies, invite, companyId } = await getCompanyPermissionByToken(token, this.findByTokenService, this.dateProvider);
+    const { companies, invite, companyId: userCompanyId } = await getCompanyPermissionByToken(token, this.findByTokenService, this.dateProvider);
 
     const user = await this.userRepository.update(
       id,
@@ -56,25 +58,26 @@ export class UpdateUserService {
         ...updateUserDto,
         ...(invite &&
           invite?.professional && {
-            ...(invite?.professional.councils && {
-              councils: invite.professional.councils.map(({ councilId, councilType, councilUF, id }) => ({
-                councilId,
-                councilType,
-                councilUF,
-                id,
-              })),
-            }),
-            ...(invite?.professional.phone && {
-              phone: invite.professional.phone,
-            }),
-            ...(invite?.professional.type && {
-              type: invite.professional.type,
-            }),
+          ...(invite?.professional.councils && {
+            councils: invite.professional.councils.map(({ councilId, councilType, councilUF, id }) => ({
+              councilId,
+              councilType,
+              councilUF,
+              id,
+            })),
           }),
+          ...(invite?.professional.phone && {
+            phone: invite.professional.phone,
+          }),
+          ...(invite?.professional.type && {
+            type: invite.professional.type,
+          }),
+        }),
       },
       companies,
     );
-    if (invite && invite.email && companyId) await this.inviteUsersRepository.deleteByCompanyIdAndEmail(companyId, invite.email);
+    if (invite && invite.email && userCompanyId) await this.inviteUsersRepository.deleteByCompanyIdAndEmail(userCompanyId, invite.email);
+    if (invite?.id) await this.inviteUsersRepository.deleteById(userCompanyId, invite.id);
 
     return user;
   }

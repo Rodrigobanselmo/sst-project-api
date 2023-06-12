@@ -36,12 +36,16 @@ export class UserEntity implements User {
   formation: string[];
   certifications: string[];
   cpf: string;
+  companyId?: string;
   phone: string;
   googleExternalId: string;
   facebookExternalId: string;
   councilType: string;
   councilUF: string;
   councilId: string;
+  photoUrl: string;
+  googleUser: string;
+  facebookUser: string;
   type: ProfessionalTypeEnum;
   professional?: ProfessionalEntity;
   councils?: ProfessionalCouncilEntity[];
@@ -60,7 +64,7 @@ export class UserEntity implements User {
       if (this.professional?.councils) this.councils = this.professional.councils;
 
       if (this.professional?.formation) this.formation = this.professional.formation;
-      if (!this.professional?.certifications) this.certifications = this.professional.certifications;
+      if (this.professional?.certifications) this.certifications = this.professional.certifications;
       if (!this?.type) this.type = this.professional.type;
       if (!this?.cpf) this.cpf = this.professional.cpf;
       if (!this?.phone) this.phone = this.professional.phone;

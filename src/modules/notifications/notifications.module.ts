@@ -1,5 +1,5 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { SendGridProvider } from '../../shared/providers/MailProvider/implementations/SendGrid/SendGridProvider';
+import { NodeMailProvider } from '../../shared/providers/MailProvider/implementations/NodeMail/NodeMailProvider';
 
 import { SSTModule } from '../sst/sst.module';
 import { CompanyModule } from '../company/company.module';
@@ -17,7 +17,7 @@ import { UpdateUserNotificationService } from './services/update-user-notificati
   exports: [NotificationRepository],
   providers: [
     SendEmailService,
-    SendGridProvider,
+    NodeMailProvider,
     NotificationRepository,
     CreateNotificationService,
     ListNotificationService,
@@ -25,4 +25,4 @@ import { UpdateUserNotificationService } from './services/update-user-notificati
     UpdateUserNotificationService,
   ],
 })
-export class NotificationModule {}
+export class NotificationModule { }

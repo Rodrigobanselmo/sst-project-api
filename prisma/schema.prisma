@@ -354,6 +354,7 @@ model Company {
   scheduleMedicalVisits      ScheduleMedicalVisit[]
   clinicMedicalVisits        ScheduleMedicalVisit[]           @relation(name: "medical_visit_clinic")
   labMedicalVisits           ScheduleMedicalVisit[]           @relation(name: "medical_visit_lab")
+  ImageGallery               ImageGallery[]
 
   @@index([name])
   @@index([isClinic])
@@ -1154,6 +1155,19 @@ model HomogeneousGroup {
   @@index([companyId])
 }
 
+model ImageGallery {
+  id         Int              @id @default(autoincrement())
+  types      ImagesTypeEnum[]
+  companyId  String
+  name       String
+  company    Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  url        String
+  created_at DateTime         @default(now())
+  updated_at DateTime         @updatedAt
+
+  @@unique([companyId, id])
+}
+
 model InviteUsers {
   id           String        @id @default(uuid())
   expires_date DateTime
@@ -1602,9 +1616,12 @@ model User {
   updated_at          DateTime               @updatedAt
   deleted_at          DateTime?
   cpf                 String?
+  phone               String?
+  photoUrl            String?
   facebookExternalId  String?
   googleExternalId    String?
-  phone               String?
+  googleUser          String?
+  facebookUser        String?
   esocialTransmission EmployeeESocialBatch[]
   examDone            EmployeeExamsHistory[] @relation("user_done")
   examSchedules       EmployeeExamsHistory[] @relation("user_schedule")
@@ -1915,4 +1932,17 @@ enum ProfessionalRespTypeEnum {
 enum AlertsTypeEnum {
   CLINIC_NEXT_DAY_SCHEDULE
   COMPANY_EXPIRED_EXAM
+}
+
+enum ImagesTypeEnum {
+  PGR
+  PCMSO
+  OTHERS
+  DOCS
+  CHAR
+  ENV
+  WORK
+  EQUI
+  ACTIV
+  COMPANY
 }

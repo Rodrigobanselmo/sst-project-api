@@ -9,7 +9,7 @@ import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/com
 import { resolve } from 'path';
 
 import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
-import { SendGridProvider } from '../../../../../shared/providers/MailProvider/implementations/SendGrid/SendGridProvider';
+import { NodeMailProvider } from '../../../../../shared/providers/MailProvider/implementations/NodeMail/NodeMailProvider';
 import { InviteUserDto } from '../../../dto/invite-user.dto';
 import { InviteUsersEntity } from '../../../entities/invite-users.entity';
 import { InviteUsersRepository } from '../../../repositories/implementations/InviteUsersRepository';
@@ -25,8 +25,8 @@ export class InviteUsersService {
     private readonly authGroupRepository: AuthGroupRepository,
     private readonly dateProvider: DayJSProvider,
     private readonly companyRepository: CompanyRepository,
-    private readonly mailProvider: SendGridProvider,
-  ) {}
+    private readonly mailProvider: NodeMailProvider,
+  ) { }
 
   async execute(inviteUserDto: InviteUserDto, userPayloadDto: UserPayloadDto) {
     const userRoles = userPayloadDto.roles || [];
@@ -108,7 +108,7 @@ export class InviteUsersService {
   }
 }
 
-export const inviteNewUser = async (mailProvider: SendGridProvider, invite: InviteUsersEntity) => {
+export const inviteNewUser = async (mailProvider: NodeMailProvider, invite: InviteUsersEntity) => {
   const templatePath = resolve(__dirname, '..', '..', '..', '..', '..', '..', 'templates', 'email', 'inviteUser.hbs');
 
   if (!invite.email) {

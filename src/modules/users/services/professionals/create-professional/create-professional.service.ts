@@ -7,15 +7,15 @@ import { CreateProfessionalDto } from './../../../dto/professional.dto';
 import { ProfessionalRepository } from './../../../repositories/implementations/ProfessionalRepository';
 import { ProfessionalTypeEnum } from '@prisma/client';
 import { inviteNewUser } from '../../invites/invite-users/invite-users.service';
-import { SendGridProvider } from '../../../../../shared/providers/MailProvider/implementations/SendGrid/SendGridProvider';
+import { NodeMailProvider } from '../../../../../shared/providers/MailProvider/implementations/NodeMail/NodeMailProvider';
 
 @Injectable()
 export class CreateProfessionalService {
   constructor(
     private readonly professionalRepository: ProfessionalRepository,
     private readonly userRepository: UsersRepository,
-    private readonly mailProvider: SendGridProvider,
-  ) {}
+    private readonly mailProvider: NodeMailProvider,
+  ) { }
 
   async execute({ ...createDataDto }: CreateProfessionalDto, user: UserPayloadDto) {
     const professionalFound = await this.professionalRepository.findFirstNude({

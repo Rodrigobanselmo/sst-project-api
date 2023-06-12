@@ -9,6 +9,7 @@ export enum DocumentSectionChildrenTypeEnum {
   H5 = 'H5',
   H6 = 'H6',
   PARAGRAPH = 'PARAGRAPH',
+  IMAGE = 'IMAGE',
   BREAK = 'BREAK',
   BULLET = 'BULLET',
   BULLET_SPACE = 'BULLET_SPACE',
@@ -121,6 +122,13 @@ export type IParagraph = Omit<IParagraphOptions, 'text'> & {
   align?: AlignmentType;
   inlineStyleRangeBlock?: IInlineStyleRange[][];
   entityRangeBlock?: IEntityRange[][];
+} & IBaseDocumentModel;
+
+export type IImage = {
+  type: DocumentSectionChildrenTypeEnum.IMAGE;
+  url: string | null;
+  width: number;
+  align?: AlignmentType;
 } & IBaseDocumentModel;
 
 export type ILegend = Omit<IParagraphOptions, 'text'> & {
@@ -379,6 +387,7 @@ export type ISectionChildrenType =
   | IH5
   | IH6
   | IParagraph
+  | IImage
   | IBreak
   | ITitle
   | IBullet

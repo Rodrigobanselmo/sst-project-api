@@ -101,6 +101,7 @@
     "@types/multer": "^1.4.7",
     "@types/node": "^16.0.0",
     "@types/node-telegram-bot-api": "^0.57.3",
+    "@types/nodemailer": "^6.4.8",
     "@types/passport-jwt": "^3.0.6",
     "@types/sort-array": "^4.1.0",
     "@types/supertest": "^2.0.11",

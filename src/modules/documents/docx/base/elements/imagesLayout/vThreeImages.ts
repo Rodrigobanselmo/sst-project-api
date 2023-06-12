@@ -1,5 +1,5 @@
 import { ImageRun, Paragraph, Table, TableCell, TableRow, VerticalAlign, WidthType } from 'docx';
-import fs from 'fs';
+import {readFileSync} from 'fs';
 
 import { borderNoneStyle } from '../../config/styles';
 import { paragraphFigure } from '../paragraphs';
@@ -34,7 +34,7 @@ export const VThreeImages = (images: [string, string, string], texts: [string, s
                 new Paragraph({
                   children: [
                     new ImageRun({
-                      data: fs.readFileSync(images[0]),
+                      data: readFileSync(images[0]),
                       transformation: {
                         width: width,
                         height: width * (16 / 9),
@@ -56,7 +56,7 @@ export const VThreeImages = (images: [string, string, string], texts: [string, s
                   children: images[1]
                     ? [
                         new ImageRun({
-                          data: fs.readFileSync(images[1]),
+                          data: readFileSync(images[1]),
                           transformation: {
                             width: width,
                             height: width * (16 / 9),
@@ -80,7 +80,7 @@ export const VThreeImages = (images: [string, string, string], texts: [string, s
                   children: images[2]
                     ? [
                         new ImageRun({
-                          data: fs.readFileSync(images[2]),
+                          data: readFileSync(images[2]),
                           transformation: {
                             width: width,
                             height: width * (16 / 9),

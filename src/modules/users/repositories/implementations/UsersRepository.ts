@@ -1,7 +1,7 @@
 import { ProfessionalEntity } from './../../entities/professional.entity';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
-import { ProfessionalTypeEnum } from '@prisma/client';
+import { Prisma, ProfessionalTypeEnum } from '@prisma/client';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { CreateUserDto } from '../../dto/create-user.dto';
@@ -14,20 +14,20 @@ import { UserCompanyEntity } from '../../entities/userCompany.entity';
 @Injectable()
 export class UsersRepository implements IUsersRepository {
   private count = 0;
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
-  async create(createUserDto: Omit<CreateUserDto, 'token'>, userCompanyDto: UserCompanyDto[], professional?: ProfessionalEntity) {
+  async create(createUserDto: Omit<CreateUserDto, 'token' | 'googleToken'>, userCompanyDto: UserCompanyDto[], professional?: ProfessionalEntity) {
     const hasCouncil = professional && professional?.councils && professional.councils.length > 0;
 
     const councils = hasCouncil
       ? professional.councils
       : [
-          {
-            councilId: '',
-            councilUF: '',
-            councilType: '',
-          } as any,
-        ];
+        {
+          councilId: '',
+          councilUF: '',
+          councilType: '',
+        } as any,
+      ];
 
     const user = await this.prisma.user.create({
       data: {
@@ -35,7 +35,7 @@ export class UsersRepository implements IUsersRepository {
         professional: {
           create: {
             type: ProfessionalTypeEnum.USER,
-            name: '',
+            name: createUserDto.name || '',
             email: createUserDto.email,
             ...(professional && {
               phone: professional?.phone,
@@ -64,17 +64,18 @@ export class UsersRepository implements IUsersRepository {
 
   async update(
     id: number,
-    { oldPassword, certifications, councilId, councilUF, councilType, cpf, phone, formation, type, name, councils, ...updateUserDto }: UpdateUserDto,
+    { oldPassword, certifications, councilId, councilUF, councilType, cpf, phone, formation, type, name, councils, ...updateUserDto }: UpdateUserDto & { googleUser?: string, facebookUser?: string },
     userCompanyDto: UserCompanyDto[] = [],
   ) {
+
     const professional = {
-      certifications,
+      certifications: Array.isArray(certifications) ? certifications.filter((c) => c) : certifications,
+      formation: Array.isArray(formation) ? formation.filter((c) => c) : formation,
       councilId,
       councilUF,
       councilType,
       cpf,
       phone,
-      formation,
       type,
       name,
     };
@@ -147,7 +148,7 @@ export class UsersRepository implements IUsersRepository {
                 id: c.id,
               },
             });
-          } catch (err) {}
+          } catch (err) { }
         }),
       );
 
@@ -218,6 +219,14 @@ export class UsersRepository implements IUsersRepository {
     );
   }
 
+  async findFirstNude(options: Prisma.UserFindFirstArgs = {}) {
+    const professional = await this.prisma.user.findFirst({
+      ...options,
+    });
+
+    return new UserEntity(professional);
+  }
+
   async findByEmail(email: string) {
     const user = await this.prisma.user.findUnique({
       where: { email },
@@ -234,17 +243,22 @@ export class UsersRepository implements IUsersRepository {
     });
   }
 
-  async findById(id: number) {
-    const user = await this.prisma.user.findUnique({
-      where: { id },
+  async findById(id: number, companyId?: string) {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        id,
+        ...(companyId && { companies: { some: { status: 'ACTIVE', companyId } } })
+      },
       include: {
         companies: { include: { group: { select: { permissions: true, roles: true } } } },
         professional: { include: { councils: true } },
       },
     });
     if (!user) return;
+
     return new UserEntity({
       ...(user as any),
+      companyId,
       professional: new ProfessionalEntity(user?.professional),
       companies: user.companies.map((c) => new UserCompanyEntity(c)),
     });

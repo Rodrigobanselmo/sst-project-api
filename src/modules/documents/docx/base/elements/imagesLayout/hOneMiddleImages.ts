@@ -1,5 +1,5 @@
 import { ImageRun, Paragraph, Table, TableCell, TableRow, WidthType } from 'docx';
-import fs from 'fs';
+import { readFileSync } from 'fs';
 
 import { borderNoneStyle } from '../../config/styles';
 import { paragraphFigure } from '../paragraphs';
@@ -27,7 +27,7 @@ export const HOneMiddleImages = (image: string, text: string) => {
                 new Paragraph({
                   children: [
                     new ImageRun({
-                      data: fs.readFileSync(image),
+                      data: readFileSync(image),
                       transformation: {
                         width: fullWidth / 2 - 5,
                         height: 404 / 2,

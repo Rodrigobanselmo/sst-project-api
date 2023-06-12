@@ -1,5 +1,7 @@
+import { ServerlessLambdaProvider } from './../../../../../../shared/providers/ServerlessFunctionsProvider/implementations/ServerlessLambda/ServerlessLambdaProvider';
+import { DocumentSectionChildrenTypeEnum, IImage } from './../../../../docx/builders/pgr/types/elements.types';
 import { parseModelData } from './../../helpers/parseModelData';
-import { IDocumentPGRSectionGroups, IDocVariables } from './../../../../docx/builders/pgr/types/section.types';
+import { DocumentSectionTypeEnum, IDocumentPGRSectionGroups, IDocVariables } from './../../../../docx/builders/pgr/types/section.types';
 import { IDocumentModelData } from './../../../../types/document-mode.types';
 import { DocumentDataPGRDto } from '../../../../../sst/dto/document-data-pgr.dto';
 import { BadRequestException, Injectable } from '@nestjs/common';
@@ -12,10 +14,10 @@ import { actionPlanTableSection } from '../../../../docx/components/tables/actio
 import { APPRByGroupTableSection } from '../../../../docx/components/tables/apprByGroup/appr-group.section';
 import { dayjs } from '../../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { DocumentFactoryAbstractionCreator } from '../../creator/DocumentFactoryCreator';
-import { IDocumentFactoryProduct as IDocumentFactoryProduct } from '../../types/IDocumentFactory.types';
+import { IDocumentFactoryProduct as IDocumentFactoryProduct, IImagesMap, IUnlinkPaths } from '../../types/IDocumentFactory.types';
 import { PromiseInfer } from '../../../../../../shared/interfaces/promise-infer.types';
 import { AmazonStorageProvider } from '../../../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
-import { downloadPathImage, downloadPathImages } from '../../../../../../shared/utils/downloadPathImages';
+import { downloadPathImage, downloadPathImages, getPathImage } from '../../../../../../shared/utils/downloadPathImages';
 import { getConsultantCompany } from '../../../../../../shared/utils/getConsultantCompany';
 import { getDocxFileName } from '../../../../../../shared/utils/getFileName';
 import { getRiskDoc } from '../../../../../../shared/utils/getRiskDoc';
@@ -37,6 +39,7 @@ import { hierarchyConverter } from '../../../../docx/converter/hierarchy.convert
 import { IGetDocument, ISaveDocument } from '../../types/IDocumentFactory.types';
 import { IDocumentPGRBody } from './types/pgr.types';
 import { DocumentModelRepository } from '../../../../repositories/implementations/DocumentModelRepository';
+import { removeDuplicate } from '../../../../../../shared/utils/removeDuplicate';
 
 @Injectable()
 export class DocumentPGRFactory extends DocumentFactoryAbstractionCreator<IDocumentPGRBody, any> {
@@ -49,8 +52,9 @@ export class DocumentPGRFactory extends DocumentFactoryAbstractionCreator<IDocum
     private readonly hierarchyRepository: HierarchyRepository,
     private readonly documentModelRepository: DocumentModelRepository,
     private readonly storageProvider: AmazonStorageProvider,
+    private readonly lambdaProvider: ServerlessLambdaProvider,
   ) {
-    super(storageProvider);
+    super(storageProvider, lambdaProvider);
   }
 
   public factoryMethod(): IDocumentFactoryProduct {
@@ -67,7 +71,9 @@ export class DocumentPGRFactory extends DocumentFactoryAbstractionCreator<IDocum
 }
 
 export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
-  public unlinkPaths = [];
+  public unlinkPaths: IUnlinkPaths[] = [];
+  public localCreation = false;
+
   private company: CompanyEntity;
 
   constructor(
@@ -131,8 +137,20 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
     const documentData = company?.documentData?.[0];
 
     this.company = company;
+    const model = parseModelData(modelData)
 
-    const { characterizations } = await this.downloadPhotos(homogeneousGroups);
+    // const { characterizations } = await this.downloadPhotos(homogeneousGroups);
+    const images = removeDuplicate(model.sections.map(
+      section => section.data.map(
+        sectionData => 'children' in sectionData && sectionData.children.map(
+          child => child.type == DocumentSectionChildrenTypeEnum.IMAGE ? child : null
+        )
+      )
+    ).flat(2).filter(i => i), { removeById: 'url' })
+
+
+    const { imagesMap } = await this.downloadImages(images);
+    const { characterizations } = await this.downloadCharPhotos(homogeneousGroups);
     const { hierarchyData, hierarchyHighLevelsData, homoGroupTree, hierarchyTree } = this.getHierarchyData(homogeneousGroups, hierarchies, characterizations);
 
     riskGroupData.data = riskGroupData.data.filter((riskData) => {
@@ -184,61 +202,68 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
       logo,
       characterizations,
       cover,
-      modelData: parseModelData(modelData),
+      imagesMap,
+      modelData: model
     };
   }
 
-  public async getAttachments(data: PromiseInfer<ReturnType<DocumentPGRFactoryProduct['getData']>>) {
-    // APRs
-    const aprSection: ISectionOptions[] = [
-      ...APPRTableSection(
-        { ...data.riskGroupData, ...data.documentData, ...(data.documentData.json && ((data.documentData as any).json as DocumentDataPGRDto)) },
-        data.hierarchyData,
-        data.homoGroupTree,
-      ),
-    ];
+  public async getAttachments(options: IGetDocument<IDocumentPGRBody, PromiseInfer<ReturnType<DocumentPGRFactoryProduct['getData']>>>) {
+    const documentBaseBuild = await this.getDocumentBuild(options);
 
-    // APRs Groups
-    const aprGroupSection: ISectionOptions[] = [
-      ...APPRByGroupTableSection(
-        { ...data.riskGroupData, ...data.documentData, ...(data.documentData.json && ((data.documentData as any).json as DocumentDataPGRDto)) },
-        data.hierarchyHighLevelsData,
-        data.hierarchyTree,
-        data.homoGroupTree,
-      ),
-    ];
 
-    // ACTION PLAN
-    const actionPlanSections: ISectionOptions[] = [
-      actionPlanTableSection(
-        { ...data.riskGroupData, ...data.documentData, ...(data.documentData.json && ((data.documentData as any).json as DocumentDataPGRDto)) },
-        data.hierarchyTree,
-      ),
-    ];
+    const documentAprBuild: typeof documentBaseBuild = {
+      ...documentBaseBuild,
+      attachments: [],
+      docSections: {
+        sections: [{ data: [{ type: DocumentSectionTypeEnum.APR }] }],
+        variables: {}
+      }
+    } as typeof documentBaseBuild
 
-    const docId = data.docId;
-    const companyId = data.company.id;
+    const documentAprGroupBuild: typeof documentBaseBuild = {
+      ...documentBaseBuild,
+      attachments: [],
+      docSections: {
+        sections: [{ data: [{ type: DocumentSectionTypeEnum.APR_GROUP }] }],
+        variables: {}
+      }
+    } as typeof documentBaseBuild
+
+    const documentActionPlanBuild: typeof documentBaseBuild = {
+      ...documentBaseBuild,
+      attachments: [],
+      docSections: {
+        sections: [{ data: [{ type: DocumentSectionTypeEnum.ACTION_PLAN }] }],
+        variables: {}
+      }
+    }
+
+    const docId = options.data.docId;
+    const companyId = options.data.company.id;
     const id1 = v4();
     const id2 = v4();
     const id3 = v4();
 
     return [
       {
-        section: aprSection,
+        buildData: documentAprBuild,
+        section: new DocumentBuildPGR(documentAprBuild).build(),
         type: 'PGR-APR',
         id: id1,
         name: 'Inventário de Risco por Função (APR)',
         link: `${process.env.APP_HOST}/download/pgr/anexos?ref1=${docId}&ref2=${id1}&ref3=${companyId}`,
       },
       {
-        section: aprGroupSection,
+        buildData: documentAprGroupBuild,
+        section: new DocumentBuildPGR(documentAprGroupBuild).build(),
         type: 'PGR-APR-GSE',
         id: id2,
         name: 'Inventário de Risco por GSE (APR)',
         link: `${process.env.APP_HOST}/download/pgr/anexos?ref1=${docId}&ref2=${id2}&ref3=${companyId}`,
       },
       {
-        section: actionPlanSections,
+        buildData: documentActionPlanBuild,
+        section: new DocumentBuildPGR(documentActionPlanBuild).build(),
         type: 'PGR-PLANO_DE_ACAO',
         id: id3,
         name: 'Plano de Ação Detalhado',
@@ -247,12 +272,13 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
     ];
   }
 
-  public async getDocument(options: IGetDocument<IDocumentPGRBody, PromiseInfer<ReturnType<DocumentPGRFactoryProduct['getData']>>>) {
+  public async getDocumentBuild(options: IGetDocument<IDocumentPGRBody, PromiseInfer<ReturnType<DocumentPGRFactoryProduct['getData']>>>) {
     const data = options.data;
     const version = options.version;
     const attachments = options.attachments;
+    const imagesMap = options.data?.imagesMap;
 
-    const sections: ISectionOptions[] = new DocumentBuildPGR({
+    return {
       version,
       document: { ...data.riskGroupData, ...data.documentData, ...(data.documentData.json && ((data.documentData as any).json as DocumentDataPGRDto)) },
       attachments: attachments.map((attachment) => {
@@ -273,7 +299,13 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
       hierarchyTree: data.hierarchyTree,
       cover: data.cover,
       docSections: data.modelData,
-    }).build();
+      imagesMap,
+      hierarchyHighLevelsData: data.hierarchyHighLevelsData,
+    };
+  }
+
+  public async getDocumentSections(options: IGetDocument<IDocumentPGRBody, PromiseInfer<ReturnType<DocumentPGRFactoryProduct['getData']>>>) {
+    const sections: ISectionOptions[] = new DocumentBuildPGR(await this.getDocumentBuild(options)).build();
 
     return sections;
   }
@@ -323,21 +355,21 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
     return `${dayjs(data.versions[0].created_at).format('MM_DD_YYYY')} - REV. ${version.version}`;
   };
 
-  public getFileName = (info: IDocumentPGRBody, type: string) => {
+  public getFileName = (info: IDocumentPGRBody, type = 'PGR') => {
     return getDocxFileName({
       name: info.name,
       companyName: this.company.initials || this.company?.fantasy || this.company.name,
       version: info.version,
-      typeName: type || 'PGR',
+      typeName: type,
       date: dayjs(new Date()).format('MMMM-YYYY'),
     });
   };
 
   public async downloadLogos(company: CompanyEntity, consultant: CompanyEntity) {
-    const [logo, consultantLogo] = await downloadPathImages([company?.logoUrl, consultant?.logoUrl]);
+    const [logo, consultantLogo] = await this.downloadPathLogoImage(company?.logoUrl, consultant?.logoUrl);
 
-    if (logo) this.unlinkPaths.push(logo);
-    if (consultantLogo) this.unlinkPaths.push(consultantLogo);
+    if (logo) this.unlinkPaths.push({ path: logo, url: company?.logoUrl });
+    if (consultantLogo) this.unlinkPaths.push({ path: consultantLogo, url: consultant?.logoUrl });
 
     return { logo, consultantLogo: consultantLogo || 'images/logo/logo-simple.png' };
   }
@@ -385,8 +417,8 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
     return { hierarchyData, hierarchyHighLevelsData, homoGroupTree, hierarchyTree };
   }
 
-  private async downloadPhotos(homoGroups: HomoGroupEntity[]) {
-    const photosPath: string[] = [];
+  private async downloadCharPhotos(homoGroups: HomoGroupEntity[]) {
+    const photosPath: IUnlinkPaths[] = [];
     const characterizations: CharacterizationEntity[] = [];
 
     const promises = homoGroups
@@ -401,8 +433,10 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
                 if (!photo.photoUrl) return;
 
                 try {
+
                   const path = await this.downloadPathImage(photo.photoUrl);
-                  if (path) photosPath.push(path);
+
+                  if (path) photosPath.push({ path, url: photo.photoUrl });
                   return { ...photo, photoUrl: path };
                 } catch (error) {
                   return { ...photo, photoUrl: null };
@@ -422,7 +456,52 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
     return { characterizations };
   }
 
+  private async downloadImages(images: IImage[]) {
+    const photosPath: IUnlinkPaths[] = [];
+    const imagesMap: IImagesMap = {};
+
+    const promises = images
+      .map(async (image) => {
+        if (!image.url) return;
+
+        try {
+          const path = await this.downloadInlinePathImage(image.url);
+          if (path) photosPath.push({ path, url: image.url });
+
+          imagesMap[image.url] = { path: path || null }
+        } catch (error) {
+          imagesMap[image.url] = { path: null }
+        }
+      });
+
+    await asyncBatch(promises, 50, async (promise) => await promise);
+
+    this.unlinkPaths.push(...photosPath);
+
+    return { imagesMap };
+  }
+
+  public async downloadPathLogoImage(logoUrl: string, consultLogoUrl: string) {
+    if (!this.localCreation) {
+      const logo = getPathImage(logoUrl);
+      const consultantLogo = getPathImage(consultLogoUrl);
+
+      return [logo, consultantLogo]
+    }
+
+    const [logo, consultantLogo] = await downloadPathImages([logoUrl, consultLogoUrl]);
+    return [logo, consultantLogo]
+  }
+
   public async downloadPathImage(url: string) {
+    if (!this.localCreation) return getPathImage(url);
+
+    return downloadPathImage(url);
+  }
+
+  public async downloadInlinePathImage(url: string) {
+    if (!this.localCreation) return getPathImage(url);
+
     return downloadPathImage(url);
   }
 

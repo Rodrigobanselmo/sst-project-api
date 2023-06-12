@@ -10,7 +10,7 @@ import { chapterSection } from '../../../base/layouts/chapter/chapter';
 import { coverSections } from '../../../base/layouts/cover/cover';
 import { headerAndFooter } from '../../../base/layouts/headerAndFooter/headerAndFooter';
 import { summarySections } from '../../../base/layouts/summary/summary';
-import { HierarchyMapData, IHomoGroupMap } from '../../../converter/hierarchy.converter';
+import { HierarchyMapData, IHierarchyMap, IHomoGroupMap } from '../../../converter/hierarchy.converter';
 import { convertToDocxHelper } from '../functions/convertToDocx';
 import { replaceAllVariables } from '../functions/replaceAllVariables';
 import { ISectionChildrenType } from '../types/elements.types';
@@ -18,6 +18,9 @@ import { IAllDocumentSectionType, IChapter, ICover, IDocVariables, ISection, Doc
 import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
 import { IMapElementDocumentType } from './elementTypeMap';
 import { allCharacterizationSections } from '../../../components/iterables/all-characterization/all-characterization.sections';
+import { APPRTableSection } from '../../../components/tables/appr/appr.section';
+import { actionPlanTableSection } from '../../../components/tables/actionPlan/actionPlan.section';
+import { APPRByGroupTableSection } from '../../../components/tables/apprByGroup/appr-group.section';
 
 type IMapSectionDocumentType = Record<string, (arg: IAllDocumentSectionType) => ISectionOptions | ISectionOptions[]>;
 
@@ -34,6 +37,8 @@ type IDocumentClassType = {
   characterizations: CharacterizationEntity[];
   environments: CharacterizationEntity[];
   company: CompanyEntity;
+  hierarchyTree: IHierarchyMap;
+  hierarchyHighLevelsData: Map<string, HierarchyMapData>;
 };
 
 export class SectionsMapClass {
@@ -48,6 +53,8 @@ export class SectionsMapClass {
   private environments: CharacterizationEntity[];
   private characterizations: CharacterizationEntity[];
   private hierarchy: Map<string, HierarchyMapData>;
+  private hierarchyHighLevelsData: Map<string, HierarchyMapData>;
+  private hierarchyTree: IHierarchyMap;
   private company: CompanyEntity;
 
   constructor({
@@ -63,6 +70,8 @@ export class SectionsMapClass {
     environments,
     characterizations,
     consultantLogoImagePath,
+    hierarchyTree,
+    hierarchyHighLevelsData,
   }: IDocumentClassType) {
     this.variables = variables;
     this.version = version;
@@ -76,11 +85,13 @@ export class SectionsMapClass {
     this.characterizations = characterizations;
     this.company = company;
     this.cover = cover;
+    this.hierarchyTree = hierarchyTree;
+    this.hierarchyHighLevelsData = hierarchyHighLevelsData;
   }
 
   public map: IMapSectionDocumentType = {
     [DocumentSectionTypeEnum.TOC]: () => summarySections(),
-    [DocumentSectionTypeEnum.COVER]: ({}: ICover) =>
+    [DocumentSectionTypeEnum.COVER]: ({ }: ICover) =>
       coverSections({
         imgPath: this.logoPath,
         version: this.version,
@@ -115,8 +126,12 @@ export class SectionsMapClass {
           ...sectionLandscapeProperties,
         }),
       ),
-    // [PGRSectionTypeEnum.APR]: () =>
-    //   APPRTableSection(this.document, this.hierarchy, this.homogeneousGroup),
+    [DocumentSectionTypeEnum.APR]: () =>
+      APPRTableSection(this.document, this.hierarchy, this.homogeneousGroup),
+    [DocumentSectionTypeEnum.APR_GROUP]: () =>
+      APPRByGroupTableSection(this.document, this.hierarchyHighLevelsData, this.hierarchyTree, this.homogeneousGroup),
+    [DocumentSectionTypeEnum.ACTION_PLAN]: () =>
+      actionPlanTableSection(this.document, this.hierarchyTree),
   };
 
   getFooterHeader = (footerText: string) => {

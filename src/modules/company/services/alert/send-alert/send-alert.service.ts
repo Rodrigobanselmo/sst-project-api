@@ -14,7 +14,7 @@ import { AlertRepository } from '../../../repositories/implementations/AlertRepo
 import { FindOneAlertService } from '../find-alert/find-alert.service';
 import { AlertsTypeEnum } from '@prisma/client';
 import { resolve } from 'path';
-import { SendGridProvider } from './../../../../../shared/providers/MailProvider/implementations/SendGrid/SendGridProvider';
+import { NodeMailProvider } from './../../../../../shared/providers/MailProvider/implementations/NodeMail/NodeMailProvider';
 import { FindAlertsByTimeService } from '../find-alerts-by-time/find-alerts-by-time.service';
 import { UpsertAlertService } from '../upsert-alert/upsert-alert.service';
 
@@ -23,12 +23,12 @@ export class SendAlertService {
   constructor(
     private readonly alertRepository: AlertRepository,
     private readonly upsertAlertService: UpsertAlertService,
-    private readonly mailProvider: SendGridProvider,
+    private readonly mailProvider: NodeMailProvider,
     private readonly dayjsProvider: DayJSProvider,
     private readonly employeeRepository: EmployeeRepository,
     private readonly findOneAlertService: FindOneAlertService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
-  ) {}
+  ) { }
 
   async execute({ type }: AlertSendDto, companyId: string) {
     const cacheKey = CacheEnum.ALERT_NOTIFICATION.replace(':type', type).replace(':companyId', companyId);

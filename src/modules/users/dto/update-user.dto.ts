@@ -37,6 +37,10 @@ export class UpdateUserDto {
 
   @IsString()
   @IsOptional()
+  googleUser?: string;
+
+  @IsString()
+  @IsOptional()
   phone?: string;
 
   @IsString({ each: true })

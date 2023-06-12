@@ -1,9 +1,7 @@
 import { AlignmentType, ExternalHyperlink, IParagraphOptions, IRunOptions, PageBreak, Paragraph, SequentialIdentifier, TextRun, UnderlineType } from 'docx';
-import { rgbStringToHex, rgbToHex } from '../../../../../shared/utils/rgbToHex';
-import { isOdd } from '../../../../../shared/utils/isOdd';
+import { rgbStringToHex } from '../../helpers/rgbToHex';
+import { isOdd } from '../../helpers/isOdd';
 import { IEntityRange, IInlineStyleRange, InlineStyleTypeEnum } from '../../builders/pgr/types/elements.types';
-import { onlyNumbers } from '@brazilian-utils/brazilian-utils';
-import sortArray from 'sort-array';
 
 interface ParagraphProps extends IParagraphOptions {
   break?: boolean;

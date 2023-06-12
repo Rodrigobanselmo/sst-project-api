@@ -3,7 +3,7 @@ import { TelegramModule } from 'nestjs-telegram';
 
 import { DayJSProvider } from '../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { ExcelProvider } from '../../shared/providers/ExcelProvider/implementations/ExcelProvider';
-import { SendGridProvider } from '../../shared/providers/MailProvider/implementations/SendGrid/SendGridProvider';
+import { NodeMailProvider } from '../../shared/providers/MailProvider/implementations/NodeMail/NodeMailProvider';
 import { AmazonStorageProvider } from '../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
 import { EsocialModule } from '../esocial/esocial.module';
 import { NotificationModule } from '../notifications/notifications.module';
@@ -159,6 +159,12 @@ import { UpdateScheduleMedicalVisitsService } from './services/scheduleMedicalVi
 import { DeleteScheduleMedicalVisitsService } from './services/scheduleMedicalVisit/delete-schedule-medical-visit/delete-schedule-medical-visit.service';
 import { ScheduleMedicalVisitController } from './controller/scheduleMedicalVisit/scheduleMedicalVisit.controller';
 import { FindOneScheduleMedicalVisitsService } from './services/scheduleMedicalVisit/find-one-schedule-medical-visit/find-one-schedule-medical-visit.service';
+import { UpdateImageGalleryService } from './services/imageGallery/update-image-gallery/update-image-gallery.service';
+import { CreateImageGalleyService } from './services/imageGallery/create-image-gallery/create-image-gallery.service';
+import { FindImageGalleryService } from './services/imageGallery/find-image-gallery/find-image-gallery.service';
+import { DeleteImageGalleryService } from './services/imageGallery/delete-image-gallery/delete-image-gallery.service';
+import { ImageGalleryRepository } from './repositories/implementations/ImageGalleryRepository';
+import { ImageGalleryController } from './controller/imageGallery/imageGallery.controller';
 
 @Module({
   imports: [
@@ -187,6 +193,7 @@ import { FindOneScheduleMedicalVisitsService } from './services/scheduleMedicalV
     ScheduleBlockController,
     AlertController,
     ScheduleMedicalVisitController,
+    ImageGalleryController,
   ],
   providers: [
     CreateCompanyService,
@@ -316,7 +323,7 @@ import { FindOneScheduleMedicalVisitsService } from './services/scheduleMedicalV
     UpsertAlertService,
     FindOneAlertService,
     DeleteAlertService,
-    SendGridProvider,
+    NodeMailProvider,
     SendAlertService,
     FindAlertsByTimeService,
     AlertReportCron,
@@ -329,6 +336,11 @@ import { FindOneScheduleMedicalVisitsService } from './services/scheduleMedicalV
     UpdateScheduleMedicalVisitsService,
     DeleteScheduleMedicalVisitsService,
     FindOneScheduleMedicalVisitsService,
+    UpdateImageGalleryService,
+    CreateImageGalleyService,
+    DeleteImageGalleryService,
+    FindImageGalleryService,
+    ImageGalleryRepository
   ],
   exports: [
     CompanyRepository,

@@ -4,7 +4,7 @@ import { UsersRepository } from '../../../repositories/implementations/UsersRepo
 
 @Injectable()
 export class FindMeService {
-  constructor(private readonly userRepository: UsersRepository) {}
+  constructor(private readonly userRepository: UsersRepository) { }
   async execute(id: number, companyId?: string) {
     const user = await this.userRepository.findById(id);
     if (!user?.id) throw new BadRequestException(ErrorInvitesEnum.USER_NOT_FOUND);
@@ -19,9 +19,9 @@ export class FindMeService {
           roles,
           ...(group &&
             group?.roles && {
-              permissions: group.permissions,
-              roles: group.roles,
-            }),
+            permissions: group.permissions,
+            roles: group.roles,
+          }),
         };
       })
       .filter((i) => i);

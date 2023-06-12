@@ -4,11 +4,11 @@ import { FileStorage, IStorageProvider } from '../../models/StorageProvider.type
 
 export class FakeStorageProvider implements IStorageProvider {
   async upload(): Promise<FileStorage.Upload.Result> {
-    return { url: ' ' };
+    return { url: ' ', key: ' ' };
   }
 
   async uploadLarge(): Promise<FileStorage.Upload.Result> {
-    return { url: ' ' };
+    return { url: ' ', key: ' ' };
   }
 
   download(): FileStorage.Download.Result {

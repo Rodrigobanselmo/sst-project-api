@@ -70,6 +70,13 @@ export const documentElementTypeMap: IDocumentElementTypeMap = {
     accept: ['OTHER'],
     order: primaryOrder,
   },
+  [DocumentSectionChildrenTypeEnum.IMAGE]: {
+    label: 'Imagem',
+    type: DocumentSectionChildrenTypeEnum.IMAGE,
+    url: null,
+    width: 100,
+    accept: ['OTHER'],
+  },
   [DocumentSectionChildrenTypeEnum.BREAK]: {
     label: 'Quebra de Página',
     type: DocumentSectionChildrenTypeEnum.BREAK,

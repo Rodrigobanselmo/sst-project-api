@@ -1,3 +1,4 @@
+import { ServerlessLambdaProvider } from './../../shared/providers/ServerlessFunctionsProvider/implementations/ServerlessLambda/ServerlessLambdaProvider';
 import { FakeStorageProvider } from './../../shared/providers/StorageProvider/implementations/AmazonStorage/FakeStorageProvider';
 import { PdfGuideDataService } from './services/pdf/guide/guide-data.service';
 import { Module } from '@nestjs/common';
@@ -67,7 +68,8 @@ import { PdfVisitReportDataService } from './services/pdf/visitReport/visit-repo
     DocumentPGRPreviewFactory,
     FakeStorageProvider,
     DownloadPreviewModel,
-    PdfVisitReportDataService
+    PdfVisitReportDataService,
+    ServerlessLambdaProvider
   ],
 })
 export class DocumentsModule { }

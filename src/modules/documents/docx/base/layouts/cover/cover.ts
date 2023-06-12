@@ -10,10 +10,10 @@ import {
   VerticalPositionAlign,
   VerticalPositionRelativeFrom,
 } from 'docx';
-import fs from 'fs';
+import { readFileSync } from 'fs';
 import sizeOf from 'image-size';
 
-import { setNiceProportion } from '../../../../../../shared/utils/setNiceProportion';
+import { setNiceProportion } from '../../../helpers/setNiceProportion';
 import { convertToEmu, convertToParagraph, convertToParagraphBox, pageHeight, pageWidth, sectionCoverProperties } from '../../config/styles';
 
 interface ITextProps {
@@ -116,7 +116,7 @@ const imageCover = (props: IHeaderProps) => {
   return new Paragraph({
     children: [
       new ImageRun({
-        data: fs.readFileSync(props.coverProps.backgroundImagePath),
+        data: readFileSync(props.coverProps.backgroundImagePath),
         transformation: {
           width: pageWidth,
           height: pageHeight,
@@ -140,7 +140,7 @@ const imageCover = (props: IHeaderProps) => {
 };
 
 const imageLogo = (props: IHeaderProps) => {
-  const { height: imgHeight, width: imgWidth } = sizeOf(fs.readFileSync(props.imgPath));
+  const { height: imgHeight, width: imgWidth } = sizeOf(readFileSync(props.imgPath));
 
   const logoProps = props?.coverProps?.logoProps;
 
@@ -149,7 +149,7 @@ const imageLogo = (props: IHeaderProps) => {
   return new Paragraph({
     children: [
       new ImageRun({
-        data: fs.readFileSync(props.imgPath),
+        data: readFileSync(props.imgPath),
         transformation: {
           width,
           height,

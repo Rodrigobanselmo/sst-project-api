@@ -3,7 +3,7 @@ import { forwardRef, Module } from '@nestjs/common';
 import { DayJSProvider } from '../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { FirebaseProvider } from '../../shared/providers/FirebaseProvider/FirebaseProvider';
 import { HashProvider } from '../../shared/providers/HashProvider/implementations/HashProvider';
-import { SendGridProvider } from '../../shared/providers/MailProvider/implementations/SendGrid/SendGridProvider';
+import { NodeMailProvider } from '../../shared/providers/MailProvider/implementations/NodeMail/NodeMailProvider';
 import { AuthModule } from '../auth/auth.module';
 import { RefreshTokensRepository } from '../auth/repositories/implementations/RefreshTokensRepository';
 import { CompanyModule } from '../company/company.module';
@@ -50,7 +50,7 @@ import { UpdateUserService } from './services/users/update-user/update-user.serv
   providers: [
     HashProvider,
     DayJSProvider,
-    SendGridProvider,
+    NodeMailProvider,
     UsersRepository,
     CreateUserService,
     UpdateUserService,
@@ -87,4 +87,4 @@ import { UpdateUserService } from './services/users/update-user/update-user.serv
   ],
   exports: [UsersRepository, ProfessionalRepository],
 })
-export class UsersModule {}
+export class UsersModule { }

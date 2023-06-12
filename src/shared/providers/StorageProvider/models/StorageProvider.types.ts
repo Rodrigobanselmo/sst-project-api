@@ -15,6 +15,7 @@ export namespace FileStorage {
 
     export type Result = {
       url: string;
+      key: string;
     };
   }
 

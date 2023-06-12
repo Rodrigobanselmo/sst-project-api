@@ -1,3 +1,4 @@
+import { IImagesMap } from './../../../../factories/document/types/IDocumentFactory.types';
 import { DocumentDataEntity } from './../../../../../sst/entities/documentData.entity';
 import { DocumentDataPGRDto } from './../../../../../sst/dto/document-data-pgr.dto';
 import { WorkspaceEntity } from './../../../../../company/entities/workspace.entity';
@@ -38,7 +39,7 @@ import { riskCharacterizationTableSection } from '../../../components/tables/ris
 import { versionControlTable } from '../../../components/tables/versionControl/versionControl.table';
 import { HierarchyMapData, IHierarchyMap, IHomoGroupMap } from '../../../converter/hierarchy.converter';
 import { convertToDocxHelper } from '../functions/convertToDocx';
-import { IBreak, IBullet, IH1, IH2, IH3, IH4, IH5, IH6, IParagraph, ISectionChildrenType, ITitle, DocumentSectionChildrenTypeEnum } from '../types/elements.types';
+import { IBreak, IBullet, IH1, IH2, IH3, IH4, IH5, IH6, IParagraph, ISectionChildrenType, ITitle, DocumentSectionChildrenTypeEnum, IImage } from '../types/elements.types';
 import { IDocVariables } from '../types/section.types';
 import { AttachmentEntity } from '../../../../../sst/entities/attachment.entity';
 import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
@@ -47,6 +48,7 @@ import { ProfessionalEntity } from './../../../../../users/entities/professional
 import { UserEntity } from './../../../../../users/entities/user.entity';
 import { paragraphFigure, paragraphTable } from './../../../base/elements/paragraphs';
 import { considerationsQuantityTable } from '../../../components/tables/mock/components/considerationsQuantity/table.component';
+import { imageDoc } from '../../../components/images/image';
 
 export type IMapElementDocumentType = Record<string, (arg: ISectionChildrenType) => (Paragraph | Table)[]>;
 
@@ -62,6 +64,7 @@ type IDocumentClassType = {
   attachments: AttachmentEntity[];
   workspace: WorkspaceEntity;
   hierarchyTree: IHierarchyMap;
+  imagesMap?: IImagesMap;
 };
 
 export class ElementsMapClass {
@@ -76,6 +79,7 @@ export class ElementsMapClass {
   private homogeneousGroup: IHomoGroupMap;
   private hierarchy: Map<string, HierarchyMapData>;
   private hierarchyTree: IHierarchyMap;
+  private imagesMap?: IImagesMap;
 
   constructor({
     variables,
@@ -89,6 +93,7 @@ export class ElementsMapClass {
     attachments,
     hierarchyTree,
     workspace,
+    imagesMap,
   }: IDocumentClassType) {
     this.variables = variables;
     this.versions = versions;
@@ -101,6 +106,7 @@ export class ElementsMapClass {
     this.attachments = attachments;
     this.hierarchyTree = hierarchyTree;
     this.workspace = workspace;
+    this.imagesMap = imagesMap;
   }
 
   public map: IMapElementDocumentType = {
@@ -110,9 +116,10 @@ export class ElementsMapClass {
     [DocumentSectionChildrenTypeEnum.H4]: ({ text }: IH4) => [h4(text)],
     [DocumentSectionChildrenTypeEnum.H5]: ({ text }: IH5) => [h5(text)],
     [DocumentSectionChildrenTypeEnum.H6]: ({ text }: IH6) => [h6(text)],
-    [DocumentSectionChildrenTypeEnum.BREAK]: ({}: IBreak) => [pageBreak()],
+    [DocumentSectionChildrenTypeEnum.BREAK]: ({ }: IBreak) => [pageBreak()],
     [DocumentSectionChildrenTypeEnum.TITLE]: ({ text }: ITitle) => [title(text)],
     [DocumentSectionChildrenTypeEnum.PARAGRAPH]: ({ text, ...rest }: IParagraph) => [paragraphNewNormal(text, rest)],
+    [DocumentSectionChildrenTypeEnum.IMAGE]: (data: IImage) => imageDoc(data, this.imagesMap),
     [DocumentSectionChildrenTypeEnum.LEGEND]: ({ text, ...rest }: IParagraph) => [paragraphTableLegend(text, rest)],
     [DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE]: ({ text, ...rest }: IParagraph) => [paragraphTable(text, rest)],
     [DocumentSectionChildrenTypeEnum.PARAGRAPH_FIGURE]: ({ text, ...rest }: IParagraph) => [paragraphFigure(text, rest)],

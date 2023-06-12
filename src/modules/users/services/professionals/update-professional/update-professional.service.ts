@@ -5,11 +5,11 @@ import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { UpdateProfessionalDto } from '../../../dto/professional.dto';
 import { ProfessionalRepository } from '../../../repositories/implementations/ProfessionalRepository';
 import { inviteNewUser } from '../../invites/invite-users/invite-users.service';
-import { SendGridProvider } from './../../../../../shared/providers/MailProvider/implementations/SendGrid/SendGridProvider';
+import { NodeMailProvider } from './../../../../../shared/providers/MailProvider/implementations/NodeMail/NodeMailProvider';
 
 @Injectable()
 export class UpdateProfessionalService {
-  constructor(private readonly mailProvider: SendGridProvider, private readonly professionalRepository: ProfessionalRepository) {}
+  constructor(private readonly mailProvider: NodeMailProvider, private readonly professionalRepository: ProfessionalRepository) { }
 
   async execute({ ...updateDataDto }: UpdateProfessionalDto, user: UserPayloadDto) {
     await this.checkIfCanUpdateProfessional(updateDataDto.id, user);

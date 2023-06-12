@@ -15,7 +15,7 @@ export class AmazonStorageProvider implements IStorageProvider {
   async upload({ file, fileName, isPublic }: FileStorage.Upload.Params): Promise<FileStorage.Upload.Result> {
     // if (process.env.APP_HOST.includes('localhost')) return { url: 'edwq' };
 
-    const { Location: url } = await this.s3
+    const { Location: url, Key: key } = await this.s3
       .upload({
         Bucket: this.bucket,
         Key: process.env.APP_HOST.includes('localhost') ? `${'test'}/${fileName}` : fileName,
@@ -24,11 +24,11 @@ export class AmazonStorageProvider implements IStorageProvider {
         ACL: isPublic ? 'public-read' : undefined,
       })
       .promise();
-    return { url };
+    return { url, key };
   }
 
   async uploadLarge({ file, fileName, isPublic }: FileStorage.Upload.Params): Promise<FileStorage.Upload.Result> {
-    const { Location: url } = await this.s3
+    const { Location: url, Key: key } = await this.s3
       .upload({
         Bucket: this.bucket,
         Key: fileName,
@@ -37,7 +37,8 @@ export class AmazonStorageProvider implements IStorageProvider {
         ACL: isPublic ? 'public-read' : undefined,
       })
       .promise();
-    return { url };
+
+    return { url, key };
   }
 
   download({ fileKey }: FileStorage.Download.Params): FileStorage.Download.Result {

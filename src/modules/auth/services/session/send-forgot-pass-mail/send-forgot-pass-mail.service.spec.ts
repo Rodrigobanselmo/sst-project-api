@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SendGridProvider } from '../../../../../shared/providers/MailProvider/implementations/SendGrid/SendGridProvider';
 import { UsersRepository } from '../../../../users/repositories/implementations/UsersRepository';
 import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { RefreshTokensRepository } from '../../../repositories/implementations/RefreshTokensRepository';
 import { SendForgotPassMailService } from './send-forgot-pass-mail.service';
+import { NodeMailProvider } from '../../../../..//shared/providers/MailProvider/implementations/NodeMail/NodeMailProvider';
 
 describe('SendForgotPassMailService', () => {
   let service: SendForgotPassMailService;
@@ -19,10 +19,10 @@ describe('SendForgotPassMailService', () => {
           } as Partial<RefreshTokensRepository>,
         },
         {
-          provide: SendGridProvider,
+          provide: NodeMailProvider,
           useValue: {
             sendMail: jest.fn().mockReturnValue(undefined),
-          } as Partial<SendGridProvider>,
+          } as Partial<NodeMailProvider>,
         },
         {
           provide: DayJSProvider,

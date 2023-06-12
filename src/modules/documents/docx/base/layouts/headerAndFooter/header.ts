@@ -1,4 +1,3 @@
-import { setNiceProportion } from './../../../../../../shared/utils/setNiceProportion';
 import sizeOf from 'image-size';
 import {
   AlignmentType,
@@ -15,7 +14,8 @@ import {
   VerticalAlign,
   WidthType,
 } from 'docx';
-import fs from 'fs';
+import { readFileSync } from 'fs';
+import { setNiceProportion } from '../../../helpers/setNiceProportion';
 
 interface IHeaderProps {
   path: string;
@@ -39,7 +39,7 @@ const table = (rows: TableRow[]) =>
 
 const firstCell = (path?: string) => {
   const getProportion = () => {
-    const { height: imgHeight, width: imgWidth } = sizeOf(fs.readFileSync(path));
+    const { height: imgHeight, width: imgWidth } = sizeOf(readFileSync(path));
 
     const maxWidth = 100;
     const maxHeight = 25;
@@ -50,7 +50,7 @@ const firstCell = (path?: string) => {
 
   const image = path
     ? new ImageRun({
-        data: fs.readFileSync(path),
+        data: readFileSync(path),
         transformation: getProportion(),
       })
     : undefined;

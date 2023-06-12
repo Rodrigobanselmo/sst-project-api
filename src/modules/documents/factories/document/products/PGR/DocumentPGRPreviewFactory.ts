@@ -1,3 +1,4 @@
+import { ServerlessLambdaProvider } from './../../../../../../shared/providers/ServerlessFunctionsProvider/implementations/ServerlessLambda/ServerlessLambdaProvider';
 import { IDocumentModelData } from './../../../../types/document-mode.types';
 import { Injectable } from '@nestjs/common';
 
@@ -26,8 +27,9 @@ export class DocumentPGRPreviewFactory extends DocumentFactoryAbstractionCreator
     private readonly hierarchyRepository: HierarchyRepository,
     private readonly documentModelRepository: DocumentModelRepository,
     private readonly storageProvider: FakeStorageProvider,
+    private readonly lambdaProvider: ServerlessLambdaProvider,
   ) {
-    super(storageProvider);
+    super(storageProvider, lambdaProvider);
   }
 
   public factoryMethod(body: IDocumentPGRBody & { data: IDocumentModelData }): IDocumentFactoryProduct {
@@ -47,7 +49,7 @@ export class DocumentPGRPreviewFactory extends DocumentFactoryAbstractionCreator
   }
 
   async upload() {
-    return ' ';
+    return { url: ' ', key: ' ' };
   }
 
   async unlinkFiles() {
@@ -57,6 +59,7 @@ export class DocumentPGRPreviewFactory extends DocumentFactoryAbstractionCreator
 
 export class DocumentPreviewPGRFactoryProduct extends DocumentPGRFactoryProduct {
   public data: IDocumentModelData = { sections: [], variables: {} };
+  public localCreation = true;
 
   public async save() {
     return new RiskDocumentEntity({});

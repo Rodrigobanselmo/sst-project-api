@@ -7,6 +7,8 @@ export enum DocumentSectionTypeEnum {
   COVER = 'COVER',
   SECTION = 'SECTION',
   APR = 'APR',
+  APR_GROUP = 'APR_GROUP',
+  ACTION_PLAN = 'ACTION_PLAN',
   ITERABLE_ENVIRONMENTS = 'ITERABLE_ENVIRONMENTS',
   ITERABLE_CHARACTERIZATION = 'ITERABLE_CHARACTERIZATION',
 }
@@ -56,7 +58,17 @@ export type IAprTable = {
   properties?: ISectionPropertiesOptions;
 } & IBase;
 
-export type IAllDocumentSectionType = IChapter | ISection | ICover | ISectionEnv | ISectionChar | ITOC | IAprTable;
+export type IAprGroupTable = {
+  type: DocumentSectionTypeEnum.APR_GROUP;
+  properties?: ISectionPropertiesOptions;
+} & IBase;
+
+export type IActionPlanTable = {
+  type: DocumentSectionTypeEnum.ACTION_PLAN;
+  properties?: ISectionPropertiesOptions;
+} & IBase;
+
+export type IAllDocumentSectionType = IChapter | ISection | ICover | ISectionEnv | ISectionChar | ITOC | IAprTable | IAprGroupTable | IActionPlanTable;
 
 export type IDocumentPGRSectionGroup = {
   data: IAllDocumentSectionType[];

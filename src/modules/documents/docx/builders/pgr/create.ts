@@ -1,3 +1,4 @@
+import { IImagesMap } from './../../../factories/document/types/IDocumentFactory.types';
 import { DocumentDataPGRDto } from './../../../../sst/dto/document-data-pgr.dto';
 import { DocumentDataEntity } from './../../../../sst/entities/documentData.entity';
 import { DocumentCoverEntity } from './../../../../company/entities/document-cover.entity';
@@ -19,6 +20,7 @@ import { IAllDocumentSectionType, IDocumentPGRSectionGroups, IDocVariables } fro
 import { HierarchyMapData, IHierarchyMap, IHomoGroupMap } from '../../converter/hierarchy.converter';
 import { booleanVariables } from './functions/getVariables/boolean.variables';
 
+
 export class DocumentBuildPGR {
   private version: string;
   private logoImagePath: string;
@@ -36,6 +38,8 @@ export class DocumentBuildPGR {
   private characterizations: CharacterizationEntity[];
   private attachments: AttachmentEntity[];
   private hierarchyTree: IHierarchyMap;
+  private imagesMap?: IImagesMap;
+  private hierarchyHighLevelsData: Map<string, HierarchyMapData>;
 
   constructor({
     version,
@@ -53,6 +57,8 @@ export class DocumentBuildPGR {
     hierarchyTree,
     cover,
     docSections,
+    imagesMap,
+    hierarchyHighLevelsData,
   }: ICreatePGR) {
     this.version = version;
     this.logoImagePath = logo;
@@ -70,6 +76,8 @@ export class DocumentBuildPGR {
     this.attachments = attachments;
     this.hierarchyTree = hierarchyTree;
     this.variables = this.getVariables();
+    this.imagesMap = imagesMap;
+    this.hierarchyHighLevelsData = hierarchyHighLevelsData;
   }
 
   public build() {
@@ -121,6 +129,7 @@ export class DocumentBuildPGR {
       attachments: this.attachments,
       hierarchyTree: this.hierarchyTree,
       workspace: this.workspace,
+      imagesMap: this.imagesMap,
     }).map;
 
     const sectionsMap = new SectionsMapClass({
@@ -136,6 +145,8 @@ export class DocumentBuildPGR {
       characterizations: this.characterizations ?? [],
       company: this.company,
       cover: this.cover,
+      hierarchyTree: this.hierarchyTree,
+      hierarchyHighLevelsData: this.hierarchyHighLevelsData,
     }).map;
 
     data.forEach((child) => {

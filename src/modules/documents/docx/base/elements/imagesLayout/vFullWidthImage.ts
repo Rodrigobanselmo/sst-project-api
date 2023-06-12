@@ -1,5 +1,5 @@
 import { ImageRun, IParagraphOptions, Paragraph } from 'docx';
-import fs from 'fs';
+import { readFileSync } from 'fs';
 
 import { paragraphFigure } from '../paragraphs';
 
@@ -10,7 +10,7 @@ export const VFullWidthImage = (image: string, text: string, options?: IParagrap
     new Paragraph({
       children: [
         new ImageRun({
-          data: fs.readFileSync(image),
+          data: readFileSync(image),
           transformation: {
             width: fullWidth * (9 / 16),
             height: fullWidth,

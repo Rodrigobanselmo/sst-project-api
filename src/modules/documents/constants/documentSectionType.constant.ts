@@ -50,13 +50,6 @@ export const documentSectionTypeMap: IDocumentSectionTypeMap = {
     accept: [DocumentTypeEnum.OTHER],
     order: primaryOrder,
   },
-  [DocumentSectionTypeEnum.APR]: {
-    label: '',
-    type: DocumentSectionTypeEnum.APR,
-    active: false,
-    accept: [DocumentTypeEnum.PGR],
-    order: fourthOrder,
-  },
   [DocumentSectionTypeEnum.ITERABLE_ENVIRONMENTS]: {
     label: 'Ambientes',
     type: DocumentSectionTypeEnum.ITERABLE_ENVIRONMENTS,
@@ -66,6 +59,24 @@ export const documentSectionTypeMap: IDocumentSectionTypeMap = {
   [DocumentSectionTypeEnum.ITERABLE_CHARACTERIZATION]: {
     label: 'Postos de Trabalho / Atividades / Equipamentos',
     type: DocumentSectionTypeEnum.ITERABLE_CHARACTERIZATION,
+    accept: [DocumentTypeEnum.PGR],
+    order: fourthOrder,
+  },
+  [DocumentSectionTypeEnum.APR]: {
+    label: 'APR',
+    type: DocumentSectionTypeEnum.APR,
+    accept: [DocumentTypeEnum.PGR],
+    order: fourthOrder,
+  },
+  [DocumentSectionTypeEnum.APR_GROUP]: {
+    label: 'APR por Grupo homogênio',
+    type: DocumentSectionTypeEnum.APR_GROUP,
+    accept: [DocumentTypeEnum.PGR],
+    order: fourthOrder,
+  },
+  [DocumentSectionTypeEnum.ACTION_PLAN]: {
+    label: 'Plano de Ação',
+    type: DocumentSectionTypeEnum.ACTION_PLAN,
     accept: [DocumentTypeEnum.PGR],
     order: fourthOrder,
   },

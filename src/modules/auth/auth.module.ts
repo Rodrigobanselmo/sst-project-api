@@ -1,11 +1,10 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { CacheModule, forwardRef, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 
 import { DayJSProvider } from '../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { FirebaseProvider } from '../../shared/providers/FirebaseProvider/FirebaseProvider';
 import { HashProvider } from '../../shared/providers/HashProvider/implementations/HashProvider';
-import { SendGridProvider } from '../../shared/providers/MailProvider/implementations/SendGrid/SendGridProvider';
 import { JwtTokenProvider } from '../../shared/providers/TokenProvider/implementations/JwtTokenProvider';
 import { UsersModule } from '../users/users.module';
 import { AuthController } from './controller/session/auth.controller';
@@ -21,9 +20,11 @@ import { AuthGroupRepository } from './repositories/implementations/AuthGroupRep
 import { FindAvailableAccessGroupsService } from './services/group/find-available-access-group/upsert-access-group.service';
 import { UpsertAccessGroupsService } from './services/group/upsert-access-group/upsert-access-group.service';
 import { AuthGroupController } from './controller/group/group.controller';
+import { NodeMailProvider } from '../../shared/providers/MailProvider/implementations/NodeMail/NodeMailProvider';
 
 @Module({
   imports: [
+    CacheModule.register(),
     PassportModule,
     forwardRef(() => UsersModule),
     JwtModule.register({
@@ -44,7 +45,7 @@ import { AuthGroupController } from './controller/group/group.controller';
     JwtTokenProvider,
     JwtStrategy,
     SendForgotPassMailService,
-    SendGridProvider,
+    NodeMailProvider,
     VerifyGoogleLoginService,
     FirebaseProvider,
     AuthGroupRepository,
@@ -53,4 +54,4 @@ import { AuthGroupController } from './controller/group/group.controller';
   ],
   exports: [SessionService, AuthGroupRepository],
 })
-export class AuthModule {}
+export class AuthModule { }
