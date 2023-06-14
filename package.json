@@ -34,6 +34,7 @@
     "posttest:e2e": "docker-compose stop test_db && docker-compose rm -f test_db"
   },
   "dependencies": {
+    "@aws-sdk/client-cloudwatch-logs": "^3.350.0",
     "@brazilian-utils/brazilian-utils": "^1.0.0-rc.12",
     "@nestjs/axios": "^0.0.7",
     "@nestjs/common": "^8.0.0",
@@ -43,7 +44,7 @@
     "@nestjs/platform-express": "^8.0.0",
     "@nestjs/schedule": "^2.1.0",
     "@nestjs/swagger": "^5.1.4",
-    "@prisma/client": "^4.8.1",
+    "@prisma/client": "4.8.1",
     "@sendgrid/mail": "^7.7.0",
     "@types/xml-crypto": "^1.4.2",
     "aws-sdk": "^2.1140.0",
@@ -63,6 +64,7 @@
     "image-size": "^1.0.1",
     "jszip": "^3.10.1",
     "mime-types": "^2.1.35",
+    "nest-winston": "^1.9.2",
     "nestjs-soap": "^3.0.0",
     "nestjs-telegram": "^1.2.0",
     "node-telegram-bot-api": "^0.59.0",
@@ -81,6 +83,8 @@
     "sqs-consumer": "^5.7.0",
     "swagger-ui-express": "^4.1.6",
     "uuid": "^8.3.2",
+    "winston": "^3.9.0",
+    "winston-cloudwatch": "^6.1.1",
     "xml-crypto": "^3.0.1",
     "xml-formatter": "^2.6.1",
     "xml-js": "^1.6.11",

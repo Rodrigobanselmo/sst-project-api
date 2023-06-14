@@ -1,4 +1,4 @@
-import { setNiceProportion } from '../../../helpers/setNiceProportion';
+import { setNiceProportion } from './../../../../../../shared/utils/setNiceProportion';
 import sizeOf from 'image-size';
 import { AlignmentType, ImageRun, ISectionOptions, Paragraph, TextRun } from 'docx';
 import { readFileSync } from 'fs';

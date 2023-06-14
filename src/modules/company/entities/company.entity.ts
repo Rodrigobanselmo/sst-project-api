@@ -1,14 +1,17 @@
-import { ProtocolEntity } from './../../sst/entities/protocol.entity';
-import { ExamEntity } from './../../sst/entities/exam.entity';
-import { RecMedEntity } from './../../sst/entities/recMed.entity';
-import { UserEntity } from './../../users/entities/user.entity';
-import { RiskDocumentEntity } from './../../sst/entities/riskDocument.entity';
-import { DocumentDataEntity } from './../../sst/entities/documentData.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { ProfessionalCouncil, StatusEnum } from '@prisma/client';
+import { DocumentDataEntity } from './../../sst/entities/documentData.entity';
+import { ExamEntity } from './../../sst/entities/exam.entity';
+import { ProtocolEntity } from './../../sst/entities/protocol.entity';
+import { RecMedEntity } from './../../sst/entities/recMed.entity';
+import { RiskDocumentEntity } from './../../sst/entities/riskDocument.entity';
 
+import { Company, CompanyPaymentTypeEnum, CompanyTypesEnum } from '.prisma/client';
+import { DocumentModelEntity } from '../../../modules/documents/entities/document-model.entity';
 import { CompanyCertEntity } from '../../../modules/esocial/entities/companyCert.entity';
 import { EmployeeESocialBatchEntity } from '../../../modules/esocial/entities/employeeEsocialBatch.entity';
+import { RiskFactorDataEntity } from '../../../modules/sst/entities/riskData.entity';
+import { UserCompanyEntity } from '../../../modules/users/entities/userCompany.entity';
 import { CompanyStepEnum } from '../../../shared/constants/enum/stepCompany.enum';
 import { ExamToClinicEntity } from '../../sst/entities/examToClinic';
 import { RiskFactorGroupDataEntity } from '../../sst/entities/riskGroupData.entity';
@@ -18,27 +21,23 @@ import { ProfessionalResponsibleEntity } from './../../users/entities/profession
 import { ProfessionalEntity } from './../../users/entities/professional.entity';
 import { ActivityEntity } from './activity.entity';
 import { AddressCompanyEntity } from './address-company.entity';
+import { AlertEntity } from './alert.entity';
 import { CharacterizationEntity } from './characterization.entity';
 import { CompanyClinicsEntity } from './company-clinics.entity';
 import { CompanyGroupEntity } from './company-group.entity';
 import { ContactEntity } from './contact.entity';
 import { ContractEntity } from './contract.entity';
 import { DocumentCoverEntity } from './document-cover.entity';
+import { DocumentEntity } from './document.entity';
+import { EmployeeExamsHistoryEntity } from './employee-exam-history.entity';
 import { EmployeeEntity } from './employee.entity';
 import { HierarchyEntity } from './hierarchy.entity';
 import { HomoGroupEntity } from './homoGroup.entity';
 import { LicenseEntity } from './license.entity';
 import { CompanyOSEntity } from './os.entity';
 import { CompanyReportEntity } from './report.entity';
-import { WorkspaceEntity } from './workspace.entity';
-import { Company, CompanyPaymentTypeEnum, CompanyTypesEnum } from '.prisma/client';
 import { ScheduleBlockEntity } from './schedule-block.entity';
-import { AlertEntity } from './alert.entity';
-import { DocumentModelEntity } from '../../../modules/documents/entities/document-model.entity';
-import { UserCompanyEntity } from '../../../modules/users/entities/userCompany.entity';
-import { RiskFactorDataEntity } from '../../../modules/sst/entities/riskData.entity';
-import { EmployeeExamsHistoryEntity } from './employee-exam-history.entity';
-import { DocumentEntity } from './document.entity';
+import { WorkspaceEntity } from './workspace.entity';
 
 export class CompanyEntity implements Company {
   @ApiProperty({ description: 'The id of the Company' })

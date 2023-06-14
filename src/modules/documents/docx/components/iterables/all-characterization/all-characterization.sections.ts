@@ -9,8 +9,8 @@ import { IHierarchyData, IHomoGroupMap } from '../../../converter/hierarchy.conv
 import { hierarchyHomoOrgTable } from '../../tables/hierarchyHomoOrg/hierarchyHomoOrg.table';
 import { CharacterizationEntity } from '../../../../../company/entities/characterization.entity';
 import { environmentsConverter, IEnvironmentConvertResponse } from './all-characterization.converter';
-import { getCharacterizationType } from '../../../../../../modules/company/repositories/implementations/CharacterizationRepository';
 import { sortNumber } from '../../../../../../shared/utils/sorts/number.sort';
+import { getCharacterizationType } from '../../../../../../shared/utils/getCharacterizationType';
 
 const getData = (
   hierarchiesTreeOrg: IHierarchyData,

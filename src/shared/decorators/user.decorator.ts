@@ -7,6 +7,9 @@ export const User = createParamDecorator((data: unknown, ctx: ExecutionContext) 
 
   const companyId = getCompanyId(request);
   const authInformation = isMaster(request.user, companyId);
+  const user = { ...request.user, ...authInformation }
 
-  return { ...request.user, ...authInformation };
+  request.user = user;
+
+  return user;
 });

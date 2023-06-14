@@ -1,5 +1,5 @@
 import { HomoGroupEntity } from './../../../entities/homoGroup.entity';
-import { isEnvironment } from './../../../repositories/implementations/CharacterizationRepository';
+import { isEnvironment } from 'src/shared/utils/isEnvironment';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { HierarchyEnum, HomogeneousGroup, HomoTypeEnum } from '@prisma/client';
 import { v4 } from 'uuid';
@@ -21,7 +21,7 @@ export class CopyCompanyService {
     private readonly hierarchyRepository: HierarchyRepository,
     private readonly homoGroupRepository: HomoGroupRepository,
     private readonly riskGroupDataRepository: RiskGroupDataRepository,
-  ) {}
+  ) { }
   async execute(companyCopyFromId: string, riskGroupFromId: string, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;
 
@@ -201,26 +201,26 @@ export class CopyCompanyService {
                     generateSources:
                       riskFactorFromData.generateSources && riskFactorFromData.generateSources.length
                         ? {
-                            connect: riskFactorFromData.generateSources.map(({ id }) => ({
-                              id,
-                            })),
-                          }
+                          connect: riskFactorFromData.generateSources.map(({ id }) => ({
+                            id,
+                          })),
+                        }
                         : undefined,
                     recs:
                       riskFactorFromData.recs && riskFactorFromData.recs.length
                         ? {
-                            connect: riskFactorFromData.recs.map(({ id }) => ({
-                              id,
-                            })),
-                          }
+                          connect: riskFactorFromData.recs.map(({ id }) => ({
+                            id,
+                          })),
+                        }
                         : undefined,
                     adms:
                       riskFactorFromData.adms && riskFactorFromData.adms.length
                         ? {
-                            connect: riskFactorFromData.adms.map(({ id }) => ({
-                              id,
-                            })),
-                          }
+                          connect: riskFactorFromData.adms.map(({ id }) => ({
+                            id,
+                          })),
+                        }
                         : undefined,
                   },
                 });

@@ -1,4 +1,4 @@
-import { Alert, AlertsTypeEnum, Company, AccessGroups, User } from '@prisma/client';
+import { AccessGroups, Alert, AlertsTypeEnum, Company, User } from '@prisma/client';
 import { AlertDto } from '../dto/alert.dto';
 
 import { AccessGroupsEntity } from './../../auth/entities/access-groups.entity';

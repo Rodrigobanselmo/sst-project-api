@@ -1,13 +1,13 @@
-import { QueryArray } from './../../../shared/transformers/query-array';
-import { KeysOfEnum } from './../../../shared/utils/keysOfEnum.utils';
-import { StringUppercaseTransform } from './../../../shared/transformers/string-uppercase.transform';
+import { IsDate, IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
 import { DateFormat } from './../../../shared/transformers/date-format';
-import { IsDate, IsEnum, IsInt, IsOptional, IsString, ValidateIf, ValidateNested } from 'class-validator';
+import { QueryArray } from './../../../shared/transformers/query-array';
+import { StringUppercaseTransform } from './../../../shared/transformers/string-uppercase.transform';
+import { KeysOfEnum } from './../../../shared/utils/keysOfEnum.utils';
 
+import { PartialType } from '@nestjs/swagger';
+import { DocumentTypeEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
-import { DocumentTypeEnum, StatusEnum } from '@prisma/client';
-import { PartialType } from '@nestjs/swagger';
 
 export class CreateDocumentDto {
   @IsOptional()

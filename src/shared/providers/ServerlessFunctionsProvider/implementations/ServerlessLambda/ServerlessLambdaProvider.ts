@@ -21,8 +21,7 @@ export class ServerlessLambdaProvider {
     try {
       const response = await this.lambda.invoke({
         FunctionName: 'sst-project-lambda-dev-createDocument',
-        Payload: JSON.stringify(data.body),
-
+        Payload: JSON.stringify(data),
       }).promise();
 
       const payload = JSON.parse(response.Payload?.toString('utf-8')) as ICreateDocumentFuncReturn;

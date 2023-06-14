@@ -9,12 +9,12 @@ import { HierarchyEntity } from '../../entities/hierarchy.entity';
 import { HomoGroupEntity } from '../../entities/homoGroup.entity';
 import { prismaFilter } from './../../../../shared/utils/filters/prisma.filters';
 import { sortData } from './../../../../shared/utils/sorts/data.sort';
-import { isEnvironment } from './CharacterizationRepository';
+import { isEnvironment } from '../../../../shared/utils/isEnvironment';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 @Injectable()
 export class HomoGroupRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async create({ workspaceIds, hierarchies, endDate = null, startDate = null, ...createHomoGroupDto }: CreateHomoGroupDto, companyId: string): Promise<HomoGroupEntity> {
     const data = await this.prisma.homogeneousGroup.create({
@@ -75,10 +75,10 @@ export class HomoGroupRepository {
         description,
         workspaces: workspaceIds?.length
           ? {
-              connect: workspaceIds.map((id) => ({
-                id_companyId: { companyId, id },
-              })),
-            }
+            connect: workspaceIds.map((id) => ({
+              id_companyId: { companyId, id },
+            })),
+          }
           : undefined,
       },
       update: {
@@ -86,10 +86,10 @@ export class HomoGroupRepository {
         description,
         workspaces: workspaceIds?.length
           ? {
-              connect: workspaceIds.map((id) => ({
-                id_companyId: { companyId, id },
-              })),
-            }
+            connect: workspaceIds.map((id) => ({
+              id_companyId: { companyId, id },
+            })),
+          }
           : undefined,
       },
     });

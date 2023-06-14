@@ -25,7 +25,7 @@ import { CharacterizationEntity } from '../../../../../company/entities/characte
 import { CompanyEntity } from '../../../../../company/entities/company.entity';
 import { HierarchyEntity } from '../../../../../company/entities/hierarchy.entity';
 import { HomoGroupEntity } from '../../../../../company/entities/homoGroup.entity';
-import { isEnvironment } from '../../../../../company/repositories/implementations/CharacterizationRepository';
+import { isEnvironment } from 'src/shared/utils/isEnvironment';
 import { CompanyRepository } from '../../../../../company/repositories/implementations/CompanyRepository';
 import { HierarchyRepository } from '../../../../../company/repositories/implementations/HierarchyRepository';
 import { HomoGroupRepository } from '../../../../../company/repositories/implementations/HomoGroupRepository';
@@ -72,7 +72,7 @@ export class DocumentPGRFactory extends DocumentFactoryAbstractionCreator<IDocum
 
 export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
   public unlinkPaths: IUnlinkPaths[] = [];
-  public localCreation = false;
+  public localCreation = true;
 
   private company: CompanyEntity;
 

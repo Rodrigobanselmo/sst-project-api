@@ -26,28 +26,29 @@ export abstract class DocumentFactoryAbstractionCreator<T, R> {
 
   public async execute(body: T) {
     const product = this.create(body);
+    const isLocal = process.env.APP_HOST.includes('localhost');
 
     try {
-      console.log(1)
+      if (isLocal) console.log(1, 'start')
       const data = await product.getData(body);
       const version = product.getVersionName(data, body);
       const attachmentsData = await product.getAttachments({ data, attachments: [], body, version });
       const attachments = await this.saveAttachments(attachmentsData, product, body);
-      console.log(2)
+      if (isLocal) console.log(2, 'attachments')
 
       const { url, buffer, fileName } = await this.save(product, {
         body,
         getBuild: async () => product.getDocumentBuild({ data, attachments, body, version }),
         getSections: async () => product.getDocumentSections({ data, attachments, body, version })
       });
-      console.log(3)
+      if (isLocal) console.log(3, url)
 
       await product.save({ body, attachments, url, data });
 
       if (product.localCreation) {
         this.unlinkFiles(product.unlinkPaths);
       }
-      console.log(4)
+      if (isLocal) console.log(4, 'unlinked')
 
       return { buffer, fileName };
     } catch (error) {
@@ -108,9 +109,22 @@ export abstract class DocumentFactoryAbstractionCreator<T, R> {
       photos: product.unlinkPaths
     }
 
+    // const buffer = Buffer.from(JSON.stringify(body));
+    // const { key: s3BodyKey } = await this.upload(buffer, v4() + '.txt');
+
+    // console.log(s3BodyKey)
+
     const { url } = await this.serverlessLambdaProvider.createDocument({
-      body
+      body,
+      // body: {
+      //   isDev,
+      //   s3BodyKey
+      // }
     });
+
+    // const { url } = await this.serverlessLambdaProvider.createDocument({
+    //   body
+    // });
 
     return { url, buffer: null, fileName };
 

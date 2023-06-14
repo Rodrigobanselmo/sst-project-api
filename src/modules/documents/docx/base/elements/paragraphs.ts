@@ -1,7 +1,7 @@
 import { AlignmentType, ExternalHyperlink, IParagraphOptions, IRunOptions, PageBreak, Paragraph, SequentialIdentifier, TextRun, UnderlineType } from 'docx';
-import { rgbStringToHex } from '../../helpers/rgbToHex';
-import { isOdd } from '../../helpers/isOdd';
 import { IEntityRange, IInlineStyleRange, InlineStyleTypeEnum } from '../../builders/pgr/types/elements.types';
+import { isOdd } from '../../../../../shared/utils/isOdd';
+import { rgbStringToHex } from '../../../../../shared/utils/rgbToHex';
 
 interface ParagraphProps extends IParagraphOptions {
   break?: boolean;
@@ -312,22 +312,22 @@ export const paragraphTableLegend = (text: string, options = {} as ParagraphProp
 export const paragraphFigure = (text: string, options = {} as ParagraphProps & { spacingAfter?: number }) =>
   text
     ? paragraphNewNormal(text, {
-        ...options,
-        children: [
-          new TextRun({
-            text: 'Figura ',
-            size: 16,
-          }),
-          new TextRun({
-            size: 16,
-            children: [new SequentialIdentifier('Figure')],
-          }),
-          new TextRun({
-            text: ': ',
-            size: 16,
-          }),
-        ],
-        size: 8,
-        spacing: { after: options?.spacingAfter ?? 70 },
-      })
+      ...options,
+      children: [
+        new TextRun({
+          text: 'Figura ',
+          size: 16,
+        }),
+        new TextRun({
+          size: 16,
+          children: [new SequentialIdentifier('Figure')],
+        }),
+        new TextRun({
+          text: ': ',
+          size: 16,
+        }),
+      ],
+      size: 8,
+      spacing: { after: options?.spacingAfter ?? 70 },
+    })
     : undefined;

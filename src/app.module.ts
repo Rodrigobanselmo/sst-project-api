@@ -14,7 +14,8 @@ import { PrismaModule } from './prisma/prisma.module';
 import { JwtAuthGuard } from './shared/guards/jwt-auth.guard';
 import { PermissionsGuard } from './shared/guards/permissions.guard';
 import { RolesGuard } from './shared/guards/roles.guard';
-import { LoggerMiddleware } from './shared/middlewares/logger.middleware';
+import { LoggerMiddleware } from './shared/middlewares/logger.local.middleware';
+import { HttpLoggerMiddleware } from './shared/middlewares/logger.middleware';
 
 @Module({
   imports: [PrismaModule, UsersModule, AuthModule, CompanyModule, SSTModule, FilesModule, DocumentsModule, EsocialModule, NotificationModule, ScheduleModule.forRoot()],
@@ -36,5 +37,6 @@ import { LoggerMiddleware } from './shared/middlewares/logger.middleware';
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(LoggerMiddleware).forRoutes({ path: '*', method: RequestMethod.ALL });
+    consumer.apply(HttpLoggerMiddleware).forRoutes({ path: '*', method: RequestMethod.ALL });
   }
 }

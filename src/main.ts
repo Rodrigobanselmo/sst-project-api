@@ -6,6 +6,16 @@ import { AppModule } from './app.module';
 import { InternalServerExceptionFilter } from './shared/filters/internal-server-exception.filter';
 import { PrismaDbExceptionFilter } from './shared/filters/prisma-db-exception.filter';
 import { urlencoded, json } from 'express';
+import { LoggingInterceptor } from './shared/interceptors/logger.interceptor';
+import { LoggerExceptionFilter } from './shared/filters/logger-exception.filter';
+
+// import {
+//   utilities as nestWinstonModuleUtilities,
+//   WinstonModule,
+// } from 'nest-winston';
+// import * as winston from 'winston';
+// import CloudWatchTransport from 'winston-cloudwatch';
+
 // import chalk from 'chalk';
 
 // export function logger(req, res, next) {
@@ -37,9 +47,37 @@ import { urlencoded, json } from 'express';
 async function bootstrap() {
   console.info('STARTED');
 
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: false,
+    // logger: WinstonModule.createLogger({
+    //   format: winston.format.uncolorize(), //Uncolorize logs as weird character encoding appears when logs are colorized in cloudwatch.
+    //   transports: [
+    //     new winston.transports.Console({
+    //       format: winston.format.combine(
+    //         winston.format.timestamp(),
+    //         winston.format.ms(),
+    //         nestWinstonModuleUtilities.format.nestLike()
+    //       ),
+    //     }),
+    //     new CloudWatchTransport({
+    //       level: 'verbose',
+    //       name: "Cloudwatch Logs",
+    //       logGroupName: process.env.CLOUDWATCH_GROUP_NAME,
+    //       logStreamName: process.env.CLOUDWATCH_STREAM_NAME,
+    //       awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    //       awsSecretKey: process.env.AWS_SECRET_ACCESS_KEY,
+    //       awsRegion: process.env.CLOUDWATCH_AWS_REGION,
+    //       messageFormatter: function (item) {
+    //         return (
+    //           item.level + item.message
+    //         );
+    //       },
+    //     }),
+    //   ],
+    // }),
+  });
 
-  // app.use(logger);
+  // app.useGlobalInterceptors(new LoggingInterceptor());
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -55,8 +93,9 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api', app, document);
 
-  if (process.env.NODE_ENV === 'production') app.useGlobalFilters(new InternalServerExceptionFilter());
-
+  // app.useGlobalFilters(new LoggerExceptionFilter())
+  // if (process.env.NODE_ENV === 'production') app.useGlobalFilters(new InternalServerExceptionFilter());
+  // else 
   app.useGlobalFilters(new PrismaDbExceptionFilter());
 
   app.enableCors({

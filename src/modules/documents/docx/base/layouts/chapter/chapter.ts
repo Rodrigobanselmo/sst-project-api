@@ -1,4 +1,4 @@
-import { setNiceProportion } from '../../../helpers/setNiceProportion';
+import { setNiceProportion } from './../../../../../../shared/utils/setNiceProportion';
 import { AlignmentType, Footer, Header, HeightRule, ImageRun, ISectionOptions, Paragraph, Table, TableCell, TableRow, TextRun, VerticalAlign, WidthType } from 'docx';
 import { readFileSync } from 'fs';
 import sizeOf from 'image-size';
@@ -71,11 +71,11 @@ export const createChapterPage = ({ version, chapter, imagePath }: IChapterProps
     }),
     ...(imagePath
       ? [
-          new TableRow({
-            children: [imageCover(imagePath, VerticalAlign.CENTER)],
-            height: { value: 3000, rule: HeightRule.EXACT },
-          }),
-        ]
+        new TableRow({
+          children: [imageCover(imagePath, VerticalAlign.CENTER)],
+          height: { value: 3000, rule: HeightRule.EXACT },
+        }),
+      ]
       : []),
     new TableRow({
       children: [text(chapter, VerticalAlign.CENTER)],

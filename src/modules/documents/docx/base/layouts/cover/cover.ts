@@ -12,8 +12,8 @@ import {
 } from 'docx';
 import { readFileSync } from 'fs';
 import sizeOf from 'image-size';
+import { setNiceProportion } from '../../../../../../shared/utils/setNiceProportion';
 
-import { setNiceProportion } from '../../../helpers/setNiceProportion';
 import { convertToEmu, convertToParagraph, convertToParagraphBox, pageHeight, pageWidth, sectionCoverProperties } from '../../config/styles';
 
 interface ITextProps {

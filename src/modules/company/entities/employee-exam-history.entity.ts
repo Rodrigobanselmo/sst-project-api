@@ -1,24 +1,23 @@
-import { EmployeeESocialEventEntity } from './../../esocial/entities/employeeEsocialEvent.entity';
-import { ProfessionalCouncilEntity } from './../../users/entities/council.entity';
 import {
+  ClinicScheduleTypeEnum,
   EmployeeExamsHistory,
-  ExamHistoryEvaluationEnum,
+  Exam,
   ExamHistoryConclusionEnum,
+  ExamHistoryEvaluationEnum,
   ExamHistoryTypeEnum,
+  Hierarchy,
   StatusEnum,
   User,
-  Exam,
-  ClinicScheduleTypeEnum,
-  Hierarchy,
 } from '@prisma/client';
+import { ProfessionalEntity } from '../../../modules/users/entities/professional.entity';
 import { UserEntity } from '../../../modules/users/entities/user.entity';
 import { ExamEntity } from '../../sst/entities/exam.entity';
-import { ProfessionalEntity } from '../../../modules/users/entities/professional.entity';
+import { EmployeeESocialEventEntity } from './../../esocial/entities/employeeEsocialEvent.entity';
 import { CompanyEntity } from './company.entity';
 
+import dayjs from 'dayjs';
 import { EmployeeEntity } from './employee.entity';
 import { HierarchyEntity } from './hierarchy.entity';
-import dayjs from 'dayjs';
 
 export class EmployeeExamsHistoryEntity implements EmployeeExamsHistory {
   id: number;

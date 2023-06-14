@@ -1,6 +1,6 @@
 import { IParagraphOptions, Paragraph } from 'docx';
 
-import { paragraphNewNormal, paragraphNormal } from './paragraphs';
+import { paragraphNewNormal } from './paragraphs';
 
 export const bulletsNormal = (text: string, level: 0 | 1 | 2 | 3 | 4 | 5 | 6 = 0, options?: IParagraphOptions) => {
   return paragraphNewNormal(text, {

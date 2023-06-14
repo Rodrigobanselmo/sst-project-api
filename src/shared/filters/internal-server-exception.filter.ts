@@ -1,7 +1,10 @@
 import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
+import { AmazonLoggerProvider } from '../providers/LoggerProvider/implementations/AmazonStorage/AmazonLoggerProvider';
 
 @Catch()
 export class InternalServerExceptionFilter implements ExceptionFilter {
+  private logger = new AmazonLoggerProvider();
+
   catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
@@ -15,8 +18,27 @@ export class InternalServerExceptionFilter implements ExceptionFilter {
     const message = exception ? exception?.message : 'Internal server error';
 
     if (status === HttpStatus.INTERNAL_SERVER_ERROR) {
-      console.error('o something to warn me');
+      console.log('do something to warn me');
     }
+
+    // const { method, originalUrl, ip } = req;
+    // const body = req.body;
+    // const headers = req.headers;
+    // const user = req.user;
+
+    // this.logger.logRequest({
+    //   method,
+    //   originalUrl,
+    //   ip,
+    //   body: body,
+    //   headers: headers,
+    //   status,
+    //   error: {
+    //     message,
+    //     error,
+    //   }
+    //   user: user
+    // });
 
     response.status(status).json({
       statusCode: status,

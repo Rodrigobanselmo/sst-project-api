@@ -1,5 +1,5 @@
+import { Absenteeism, AbsenteeismMotive, DateUnitEnum, EsocialTable18Mot, StatusEnum } from '@prisma/client';
 import { ProfessionalEntity } from './../../users/entities/professional.entity';
-import { Absenteeism, AbsenteeismMotive, DateUnitEnum, EsocialTable18Mot, ProfessionalCouncil, SexTypeEnum, StatusEnum } from '@prisma/client';
 import { CidEntity } from './cid.entity';
 import { EmployeeEntity } from './employee.entity';
 

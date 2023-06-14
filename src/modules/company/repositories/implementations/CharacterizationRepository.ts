@@ -2,35 +2,20 @@ import { sortData } from './../../../../shared/utils/sorts/data.sort';
 import { RiskFactorsEntity } from '../../../sst/entities/risk.entity';
 import { RiskFactorDataEntity } from '../../../sst/entities/riskData.entity';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { CharacterizationTypeEnum, HomoTypeEnum, Prisma } from '@prisma/client';
+import { CharacterizationTypeEnum, Prisma } from '@prisma/client';
 import { v4 } from 'uuid';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { UpsertCharacterizationDto } from '../../dto/characterization.dto';
 import { CharacterizationEntity } from '../../entities/characterization.entity';
 import { HierarchyEntity } from '../../entities/hierarchy.entity';
+import { getCharacterizationType } from '../../../../shared/utils/getCharacterizationType';
 
 interface ICompanyCharacterization extends Omit<UpsertCharacterizationDto, 'photos'> {
   companyId: string;
   workspaceId: string;
 }
 
-export const isEnvironment = (type: CharacterizationTypeEnum) => {
-  return (
-    [
-      CharacterizationTypeEnum.ADMINISTRATIVE,
-      CharacterizationTypeEnum.OPERATION,
-      CharacterizationTypeEnum.SUPPORT,
-      CharacterizationTypeEnum.GENERAL,
-    ] as CharacterizationTypeEnum[]
-  ).includes(type);
-};
-
-export const getCharacterizationType = (type: CharacterizationTypeEnum) => {
-  if (isEnvironment(type)) return HomoTypeEnum.ENVIRONMENT;
-
-  return type as HomoTypeEnum;
-};
 @Injectable()
 export class CharacterizationRepository {
   constructor(private prisma: PrismaService) { }

@@ -1,4 +1,4 @@
-import { AlignmentType, ISectionOptions, Paragraph, StyleLevel, TableOfContents, TextRun } from 'docx';
+import { AlignmentType, ISectionOptions, Paragraph, TableOfContents, TextRun } from 'docx';
 
 import { sectionCoverProperties } from '../../config/styles';
 

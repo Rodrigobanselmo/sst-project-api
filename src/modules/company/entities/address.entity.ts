@@ -2,7 +2,6 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { Address } from '.prisma/client';
 import { WorkspaceEntity } from './workspace.entity';
-import { UfStateEnum } from '@prisma/client';
 
 export class AddressEntity implements Address {
   @ApiProperty({ description: 'address id.' })

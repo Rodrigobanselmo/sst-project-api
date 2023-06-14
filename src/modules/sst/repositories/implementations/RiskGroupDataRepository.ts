@@ -1,4 +1,4 @@
-import { isEnvironment } from '../../../company/repositories/implementations/CharacterizationRepository';
+import { isEnvironment } from 'src/shared/utils/isEnvironment';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
@@ -11,7 +11,7 @@ import { m2mGetDeletedIds } from './../../../../shared/utils/m2mFilterIds';
 
 @Injectable()
 export class RiskGroupDataRepository {
-  constructor(readonly prisma: PrismaService) {}
+  constructor(readonly prisma: PrismaService) { }
   async upsert({ companyId, id, ...createDto }: UpsertRiskGroupDataDto): Promise<RiskFactorGroupDataEntity> {
     const riskFactorGroupDataEntity = await this.prisma.riskFactorGroupData.upsert({
       create: {

@@ -1,12 +1,10 @@
-import { StringRemoveAccentTransform } from './../../../shared/transformers/string-remove-accent.transform';
 import { UfStateEnum } from '@prisma/client';
 import { Transform } from 'class-transformer';
-import { IsEnum, IsOptional, IsString, Length, Matches } from 'class-validator';
+import { IsEnum, IsOptional, IsString, Length } from 'class-validator';
 
 import { CepFormatTransform } from '../../../shared/transformers/cep-format.transform';
 import { NumberFormat } from '../../../shared/transformers/number-format';
 import { StringCapitalizeTransform } from '../../../shared/transformers/string-capitalize';
-import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { StringNormalizeUpperTransform } from '../../../shared/transformers/string-normalize.transform';
 
 export class AddressDto {

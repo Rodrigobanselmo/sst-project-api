@@ -1,4 +1,3 @@
-import { EmployeeESocialEventEntity } from './../../esocial/entities/employeeEsocialEvent.entity';
 import {
   Cat,
   Cities,
@@ -7,11 +6,11 @@ import {
   EsocialTable17Injury,
   EsocialTable20Lograd,
   EsocialTable6Country,
-  Professional,
   StatusEnum,
-  Uf,
+  Uf
 } from '@prisma/client';
 import { ProfessionalEntity } from '../../users/entities/professional.entity';
+import { EmployeeESocialEventEntity } from './../../esocial/entities/employeeEsocialEvent.entity';
 import { CidEntity } from './cid.entity';
 import { EmployeeEntity } from './employee.entity';
 

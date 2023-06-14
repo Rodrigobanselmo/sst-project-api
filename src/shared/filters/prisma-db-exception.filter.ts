@@ -6,6 +6,7 @@ import { ErrorMessageEnum } from '../constants/enum/errorMessage';
 @Catch(PrismaClientKnownRequestError)
 export class PrismaDbExceptionFilter implements ExceptionFilter {
   catch(exception: any, host: ArgumentsHost) {
+
     const context = host.switchToHttp();
     const response = context.getResponse<Response>();
     const request = context.getRequest<Request>();
@@ -14,8 +15,6 @@ export class PrismaDbExceptionFilter implements ExceptionFilter {
     let error = new HttpException(ErrorMessageEnum.PRISMA_ERROR, 500);
 
     const { cause, target, field_name } = meta;
-
-    console.error(exception);
 
     switch (code) {
       case 'P2002':
@@ -38,8 +37,8 @@ export class PrismaDbExceptionFilter implements ExceptionFilter {
     const status = error.getStatus();
 
     if (status === HttpStatus.INTERNAL_SERVER_ERROR) {
-      console.error(`error`, exception);
-      console.error('Do something to warn me');
+      console.log(`error`, exception);
+      console.log('Do something to warn me');
     }
 
     response.status(status).json({

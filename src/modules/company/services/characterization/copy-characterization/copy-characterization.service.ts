@@ -1,6 +1,6 @@
 import { CopyCharacterizationDto } from './../../../dto/characterization.dto';
 import { HomoGroupEntity } from '../../../entities/homoGroup.entity';
-import { isEnvironment } from '../../../repositories/implementations/CharacterizationRepository';
+import { isEnvironment } from 'src/shared/utils/isEnvironment';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { HierarchyEnum, HomogeneousGroup, HomoTypeEnum } from '@prisma/client';
 import { v4 } from 'uuid';
@@ -16,7 +16,7 @@ import { HomoGroupRepository } from '../../../repositories/implementations/HomoG
 
 @Injectable()
 export class CopyCharacterizationService {
-  constructor(private readonly prisma: PrismaService, private readonly homoGroupRepository: HomoGroupRepository) {}
+  constructor(private readonly prisma: PrismaService, private readonly homoGroupRepository: HomoGroupRepository) { }
   async execute({ companyCopyFromId, workspaceId, characterizationIds }: CopyCharacterizationDto, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;
     const sameCompany = companyId === companyCopyFromId;
@@ -36,10 +36,10 @@ export class CopyCharacterizationService {
         id: companyCopyFromId,
         ...(!isMaster &&
           !sameCompany && {
-            receivingServiceContracts: {
-              some: { applyingServiceCompanyId: user.companyId },
-            },
-          }),
+          receivingServiceContracts: {
+            some: { applyingServiceCompanyId: user.companyId },
+          },
+        }),
       },
     });
 
@@ -128,26 +128,26 @@ export class CopyCharacterizationService {
                     generateSources:
                       riskFactorFromData.generateSources && riskFactorFromData.generateSources.length
                         ? {
-                            connect: riskFactorFromData.generateSources.map(({ id }) => ({
-                              id,
-                            })),
-                          }
+                          connect: riskFactorFromData.generateSources.map(({ id }) => ({
+                            id,
+                          })),
+                        }
                         : undefined,
                     recs:
                       riskFactorFromData.recs && riskFactorFromData.recs.length
                         ? {
-                            connect: riskFactorFromData.recs.map(({ id }) => ({
-                              id,
-                            })),
-                          }
+                          connect: riskFactorFromData.recs.map(({ id }) => ({
+                            id,
+                          })),
+                        }
                         : undefined,
                     adms:
                       riskFactorFromData.adms && riskFactorFromData.adms.length
                         ? {
-                            connect: riskFactorFromData.adms.map(({ id }) => ({
-                              id,
-                            })),
-                          }
+                          connect: riskFactorFromData.adms.map(({ id }) => ({
+                            id,
+                          })),
+                        }
                         : undefined,
                   },
                 });
