@@ -4,6 +4,8 @@ import { NextFunction, Request, Response } from 'express';
 import { AmazonLoggerProvider } from '../providers/LoggerProvider/implementations/AmazonStorage/AmazonLoggerProvider';
 import { HashProvider } from '../providers/HashProvider/implementations/HashProvider';
 import { hashSensitiveData } from '../utils/hashSensitiveData';
+// import geoip from 'geoip-lite';
+
 @Injectable()
 export class HttpLoggerMiddleware implements NestMiddleware {
   private logger = new AmazonLoggerProvider();
@@ -13,6 +15,12 @@ export class HttpLoggerMiddleware implements NestMiddleware {
     const rawResponse = res.write;
     const rawResponseEnd = res.end;
     const chunkBuffers = [];
+
+    const ip2 = req.headers['x-forwarded-for'];
+    const ip3 = req.socket.remoteAddress;
+    const ip4 = req.connection.remoteAddress;
+    // const userAgent = (req as any).useragent.source;
+    // const location = geoip.lookup(ip);
 
     res.write = (...chunks) => {
       const resArgs = [];
@@ -45,18 +53,23 @@ export class HttpLoggerMiddleware implements NestMiddleware {
       const { statusCode } = res;
       const user = req.user as any;
 
-      this.logger.logRequest({
-        status: statusCode,
-        method,
-        userId: user?.userId,
-        originalUrl,
-        userCompanyId: user?.companyId,
-        targetCompanyId: user?.targetCompanyId,
-        ip,
-        headers: JSON.stringify(headers),
-        requestBody: JSON.stringify(hashSensitiveData(bodyReq, this.hashProvider)),
-        responseBody: isResponseFile ? 'binary file' : (body),
-      });
+      if (statusCode != 304) {
+        this.logger.logRequest({
+          status: statusCode,
+          method,
+          userId: user?.userId,
+          originalUrl,
+          userCompanyId: user?.companyId,
+          targetCompanyId: user?.targetCompanyId,
+          ip,
+          ip2,
+          ip3,
+          ip4,
+          headers: JSON.stringify(headers),
+          requestBody: JSON.stringify(hashSensitiveData(bodyReq)),
+          responseBody: isResponseFile ? 'binary file' : (body),
+        });
+      }
 
       rawResponseEnd.apply(res, resArgs);
     };
