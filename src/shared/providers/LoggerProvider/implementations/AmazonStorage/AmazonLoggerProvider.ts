@@ -1,12 +1,16 @@
 import { PutLogEventsCommand, CloudWatchLogsClient } from "@aws-sdk/client-cloudwatch-logs";
 
 import { ILoggerProvider } from '../../models/LoggerProvider.types';
+import { HashProvider } from "../../../../providers/HashProvider/implementations/HashProvider";
+import { IHashProvider } from "../../../../providers/HashProvider/models/IHashProvider.types";
 
 export class AmazonLoggerProvider implements ILoggerProvider {
   private readonly cloudwatchClient: CloudWatchLogsClient;
+  private readonly hashProvider: HashProvider;
 
   constructor() {
     this.cloudwatchClient = new CloudWatchLogsClient({ region: process.env.CLOUDWATCH_AWS_REGION });
+    this.hashProvider = new HashProvider();
   }
 
   async logRequest(data: any) {

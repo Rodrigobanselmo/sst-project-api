@@ -2,9 +2,12 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
 import { AmazonLoggerProvider } from '../providers/LoggerProvider/implementations/AmazonStorage/AmazonLoggerProvider';
+import { HashProvider } from '../providers/HashProvider/implementations/HashProvider';
+import { hashSensitiveData } from '../utils/hashSensitiveData';
 @Injectable()
 export class HttpLoggerMiddleware implements NestMiddleware {
   private logger = new AmazonLoggerProvider();
+  private hashProvider = new HashProvider();
 
   use(req: Request, res: Response, next: NextFunction) {
     const rawResponse = res.write;
@@ -51,7 +54,7 @@ export class HttpLoggerMiddleware implements NestMiddleware {
         targetCompanyId: user?.targetCompanyId,
         ip,
         headers: JSON.stringify(headers),
-        requestBody: JSON.stringify(bodyReq),
+        requestBody: JSON.stringify(hashSensitiveData(bodyReq, this.hashProvider)),
         responseBody: isResponseFile ? 'binary file' : (body),
       });
 
