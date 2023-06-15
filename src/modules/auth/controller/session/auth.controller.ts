@@ -20,7 +20,7 @@ export class AuthController {
     private readonly sendForgotPassMailService: SendForgotPassMailService,
     private readonly deleteAllExpiredRefreshTokensService: DeleteAllExpiredService,
     private readonly verifyGoogleLoginService: VerifyGoogleLoginService,
-  ) {}
+  ) { }
 
   @Public()
   @HttpCode(HttpStatus.OK)
@@ -40,6 +40,7 @@ export class AuthController {
   @Public()
   @Post('refresh')
   refresh(@Body() { refresh_token, companyId }: RefreshTokenDto) {
+
     return this.refreshTokenService.execute(refresh_token, companyId);
   }
 

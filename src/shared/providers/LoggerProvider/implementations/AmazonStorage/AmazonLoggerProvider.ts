@@ -10,10 +10,30 @@ export class AmazonLoggerProvider implements ILoggerProvider {
   }
 
   async logRequest(data: any) {
+    this.log({
+      logGroupName: process.env.CLOUDWATCH_GROUP_NAME,
+      logStreamName: process.env.CLOUDWATCH_LOG_NAME || 'api-errors',
+      data,
+    })
+  }
+
+  async logError(data: any) {
+    this.log({
+      logGroupName: process.env.CLOUDWATCH_GROUP_NAME,
+      logStreamName: process.env.CLOUDWATCH_ERROR_LOG_NAME || 'api-errors',
+      data,
+    })
+  }
+
+  private async log({ logGroupName, logStreamName, data }: { logGroupName: string, logStreamName: string, data: any }) {
+    if (process.env.NODE_ENV === 'development') {
+      return;
+    }
+
     try {
       const command = new PutLogEventsCommand({
-        logGroupName: process.env.CLOUDWATCH_GROUP_NAME,
-        logStreamName: process.env.CLOUDWATCH_LOG_NAME,
+        logGroupName,
+        logStreamName,
         logEvents: [{
           message: JSON.stringify({
             ...data,
@@ -23,7 +43,20 @@ export class AmazonLoggerProvider implements ILoggerProvider {
       });
       await this.cloudwatchClient.send(command);
     } catch (error) {
-      console.error("Error sending log events:", error);
+      console.error("Error sending error log events:", error);
+
+      const command = new PutLogEventsCommand({
+        logGroupName,
+        logStreamName,
+        logEvents: [{
+          message: JSON.stringify(error),
+          timestamp: new Date().getTime(),
+        }],
+      });
+
+      await this.cloudwatchClient.send(command);
     }
   }
+
+
 }

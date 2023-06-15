@@ -9,12 +9,12 @@ import { urlencoded, json } from 'express';
 import { LoggingInterceptor } from './shared/interceptors/logger.interceptor';
 import { LoggerExceptionFilter } from './shared/filters/logger-exception.filter';
 
-// import {
-//   utilities as nestWinstonModuleUtilities,
-//   WinstonModule,
-// } from 'nest-winston';
-// import * as winston from 'winston';
-// import CloudWatchTransport from 'winston-cloudwatch';
+import {
+  utilities as nestWinstonModuleUtilities,
+  WinstonModule,
+} from 'nest-winston';
+import * as winston from 'winston';
+import CloudWatchTransport from 'winston-cloudwatch';
 
 // import chalk from 'chalk';
 
@@ -60,10 +60,10 @@ async function bootstrap() {
     //       ),
     //     }),
     //     new CloudWatchTransport({
-    //       level: 'verbose',
+    //       level: 'error',
     //       name: "Cloudwatch Logs",
     //       logGroupName: process.env.CLOUDWATCH_GROUP_NAME,
-    //       logStreamName: process.env.CLOUDWATCH_STREAM_NAME,
+    //       logStreamName: process.env.CLOUDWATCH_LOG_NAME,
     //       awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID,
     //       awsSecretKey: process.env.AWS_SECRET_ACCESS_KEY,
     //       awsRegion: process.env.CLOUDWATCH_AWS_REGION,
@@ -94,8 +94,9 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   // app.useGlobalFilters(new LoggerExceptionFilter())
-  // if (process.env.NODE_ENV === 'production') app.useGlobalFilters(new InternalServerExceptionFilter());
+  // if (process.env.NODE_ENV === 'production') 
   // else 
+  app.useGlobalFilters(new InternalServerExceptionFilter());
   app.useGlobalFilters(new PrismaDbExceptionFilter());
 
   app.enableCors({

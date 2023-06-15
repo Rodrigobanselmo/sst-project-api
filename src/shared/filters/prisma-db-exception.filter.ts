@@ -2,14 +2,16 @@ import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, BadRe
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { Response } from 'express';
 import { ErrorMessageEnum } from '../constants/enum/errorMessage';
+import { AmazonLoggerProvider } from '../providers/LoggerProvider/implementations/AmazonStorage/AmazonLoggerProvider';
 
 @Catch(PrismaClientKnownRequestError)
 export class PrismaDbExceptionFilter implements ExceptionFilter {
-  catch(exception: any, host: ArgumentsHost) {
+  private logger = new AmazonLoggerProvider();
 
+  catch(exception: any, host: ArgumentsHost) {
     const context = host.switchToHttp();
     const response = context.getResponse<Response>();
-    const request = context.getRequest<Request>();
+    const request = context.getRequest();
 
     const { code, meta } = exception;
     let error = new HttpException(ErrorMessageEnum.PRISMA_ERROR, 500);
@@ -36,9 +38,25 @@ export class PrismaDbExceptionFilter implements ExceptionFilter {
     }
     const status = error.getStatus();
 
-    if (status === HttpStatus.INTERNAL_SERVER_ERROR) {
-      console.log(`error`, exception);
-      console.log('Do something to warn me');
+    if (status >= 500) {
+      const { method, originalUrl, ip } = request;
+      const body = request.body;
+      const headers = request.headers;
+      const user = request.user;
+
+      const errorLog = {
+        method,
+        originalUrl,
+        ip,
+        body: body,
+        headers: headers,
+        status,
+        error: exception.stack,
+        user: user
+      }
+
+      console.error(exception)
+      this.logger.logError(errorLog);
     }
 
     response.status(status).json({

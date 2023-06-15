@@ -1,10 +1,11 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { classToClass } from 'class-transformer';
 
 import { UsersRepository } from '../../../../users/repositories/implementations/UsersRepository';
 import { JwtTokenProvider } from '../../../../../shared/providers/TokenProvider/implementations/JwtTokenProvider';
 import { PayloadTokenDto } from '../../../dto/payload-token.dto';
 import { RefreshTokensRepository } from '../../../repositories/implementations/RefreshTokensRepository';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 
 @Injectable()
 export class RefreshTokenService {
@@ -12,7 +13,7 @@ export class RefreshTokenService {
     private readonly usersRepository: UsersRepository,
     private readonly refreshTokensRepository: RefreshTokensRepository,
     private readonly jwtTokenProvider: JwtTokenProvider,
-  ) {}
+  ) { }
 
   async execute(refresh_token: string, companyId?: string) {
     const sub = this.jwtTokenProvider.verifyIsValidToken(refresh_token, 'refresh');

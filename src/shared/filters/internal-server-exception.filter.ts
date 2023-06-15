@@ -15,30 +15,30 @@ export class InternalServerExceptionFilter implements ExceptionFilter {
 
     const exceptionResponse = typeof resp === 'string' ? { error: 'Internal server error' } : resp;
 
-    const message = exception ? exception?.message : 'Internal server error';
+    let message = exception ? exception?.message : 'Internal server error';
 
-    if (status === HttpStatus.INTERNAL_SERVER_ERROR) {
-      console.log('do something to warn me');
+    if (status >= 500) {
+      message = 'Algo de errado acontenceu, informe o suporte para mais detalhes';
+
+      const { method, originalUrl, ip } = request;
+      const body = request.body;
+      const headers = request.headers;
+      const user = request.user;
+
+      const errorLog = {
+        method,
+        originalUrl,
+        ip,
+        body: body,
+        headers: headers,
+        status,
+        error: exception.stack,
+        user: user
+      }
+
+      this.logger.logError(errorLog);
+      console.error(exception)
     }
-
-    // const { method, originalUrl, ip } = req;
-    // const body = req.body;
-    // const headers = req.headers;
-    // const user = req.user;
-
-    // this.logger.logRequest({
-    //   method,
-    //   originalUrl,
-    //   ip,
-    //   body: body,
-    //   headers: headers,
-    //   status,
-    //   error: {
-    //     message,
-    //     error,
-    //   }
-    //   user: user
-    // });
 
     response.status(status).json({
       statusCode: status,
