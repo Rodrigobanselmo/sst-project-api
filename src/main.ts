@@ -6,7 +6,6 @@ import { AppModule } from './app.module';
 import { InternalServerExceptionFilter } from './shared/filters/internal-server-exception.filter';
 import { PrismaDbExceptionFilter } from './shared/filters/prisma-db-exception.filter';
 import { urlencoded, json } from 'express';
-import useragent from 'express-useragent';
 import { LoggingInterceptor } from './shared/interceptors/logger.interceptor';
 import { LoggerExceptionFilter } from './shared/filters/logger-exception.filter';
 
