@@ -6,6 +6,7 @@ import { AppModule } from './app.module';
 import { InternalServerExceptionFilter } from './shared/filters/internal-server-exception.filter';
 import { PrismaDbExceptionFilter } from './shared/filters/prisma-db-exception.filter';
 import { urlencoded, json } from 'express';
+import useragent from 'express-useragent';
 import { LoggingInterceptor } from './shared/interceptors/logger.interceptor';
 import { LoggerExceptionFilter } from './shared/filters/logger-exception.filter';
 
@@ -15,6 +16,7 @@ import {
 } from 'nest-winston';
 import * as winston from 'winston';
 import CloudWatchTransport from 'winston-cloudwatch';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 // import chalk from 'chalk';
 
@@ -47,7 +49,7 @@ import CloudWatchTransport from 'winston-cloudwatch';
 async function bootstrap() {
   console.info('STARTED');
 
-  const app = await NestFactory.create(AppModule, {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: false,
     // logger: WinstonModule.createLogger({
     //   format: winston.format.uncolorize(), //Uncolorize logs as weird character encoding appears when logs are colorized in cloudwatch.
@@ -77,8 +79,10 @@ async function bootstrap() {
     // }),
   });
 
-  // app.useGlobalInterceptors(new LoggingInterceptor());
+  app.set('trust proxy', true)
 
+
+  // app.useGlobalInterceptors(new LoggingInterceptor());
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
