@@ -355,6 +355,7 @@ model Company {
   clinicMedicalVisits        ScheduleMedicalVisit[]           @relation(name: "medical_visit_clinic")
   labMedicalVisits           ScheduleMedicalVisit[]           @relation(name: "medical_visit_lab")
   ImageGallery               ImageGallery[]
+  UserHistory                UserHistory[]
 
   @@index([name])
   @@index([isClinic])
@@ -1627,6 +1628,7 @@ model User {
   examSchedules       EmployeeExamsHistory[] @relation("user_schedule")
   professional        Professional?
   refresh_token       RefreshToken[]
+  sessionHistory      UserHistory[]
   companies           UserCompany[]
   notification        Notification[]         @relation("NotificationToUser")
   notificationConfirm Notification[]         @relation("user_notification_confirm")
@@ -1652,6 +1654,21 @@ model UserCompany {
 
   @@id([companyId, userId])
   @@index([companyId])
+}
+
+model UserHistory {
+  id         Int      @id @default(autoincrement())
+  ip         String?
+  city       String?
+  region     String?
+  country    String?
+  userAgent  String?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companyId  String?
+  company    Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
 }
 
 model Uf {

@@ -1,4 +1,5 @@
-import { Body, Controller, Delete, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { UserAgent } from './../../../../shared/decorators/userAgent.decorator';
+import { Body, Controller, Delete, HttpCode, HttpStatus, Ip, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { Public } from '../../../../shared/decorators/public.decorator';
@@ -25,16 +26,16 @@ export class AuthController {
   @Public()
   @HttpCode(HttpStatus.OK)
   @Post('session')
-  async session(@Body() loginUserDto: LoginUserDto) {
-    return this.sessionService.execute(loginUserDto);
+  async session(@Body() loginUserDto: LoginUserDto, @Ip() ip: string, @UserAgent() userAgent: string) {
+    return this.sessionService.execute(loginUserDto, ip, userAgent);
   }
 
   @Public()
   @Post('session/google')
-  async google(@Body() loginUserDto: LoginGoogleUserDto) {
+  async google(@Body() loginUserDto: LoginGoogleUserDto, @Ip() ip: string, @UserAgent() userAgent: string) {
     const user = await this.verifyGoogleLoginService.execute(loginUserDto);
 
-    return this.sessionService.execute({ email: user.email, userEntity: user });
+    return this.sessionService.execute({ email: user.email, userEntity: user }, ip, userAgent);
   }
 
   @Public()

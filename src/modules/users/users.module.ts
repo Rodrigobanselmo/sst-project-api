@@ -43,6 +43,8 @@ import { FindMeService } from './services/users/find-me/find-me.service';
 import { ResetPasswordService } from './services/users/reset-password/reset-password.service';
 import { UpdatePermissionsRolesService } from './services/users/update-permissions-roles/update-permissions-roles.service';
 import { UpdateUserService } from './services/users/update-user/update-user.service';
+import { UserHistoryRepository } from './repositories/implementations/UserHistoryRepository';
+import { FindUserHistorysService } from './services/user-history/find-user-history/find-user-history.service';
 
 @Module({
   controllers: [UsersController, InvitesController, ProfessionalsController, ProfessionalResponsibleController, CouncilController],
@@ -84,7 +86,9 @@ import { UpdateUserService } from './services/users/update-user/update-user.serv
     UpdateCouncilService,
     DeleteCouncilService,
     CreateCouncilService,
+    UserHistoryRepository,
+    FindUserHistorysService
   ],
-  exports: [UsersRepository, ProfessionalRepository],
+  exports: [UsersRepository, UserHistoryRepository, ProfessionalRepository],
 })
 export class UsersModule { }

@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
+import { UserAgent } from './../../../../shared/decorators/userAgent.decorator';
+import { Body, Controller, Get, Ip, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { classToClass } from 'class-transformer';
 import { SessionService } from '../../../auth/services/session/session/session.service';
@@ -23,6 +24,8 @@ import { Permissions } from '../../../../shared/decorators/permissions.decorator
 import { PermissionEnum, RoleEnum } from '../../../../shared/constants/enum/authorization';
 import { Roles } from '../../../../shared/decorators/roles.decorator';
 import { v4 } from 'uuid';
+import { FindUserHistoryDto } from '../../dto/user-history.dto';
+import { FindUserHistorysService } from '../../services/user-history/find-user-history/find-user-history.service';
 
 @ApiTags('users')
 @Controller('users')
@@ -37,6 +40,7 @@ export class UsersController {
     private readonly findByIdService: FindByIdService,
     private readonly sessionService: SessionService,
     private readonly updatePermissionsRolesService: UpdatePermissionsRolesService,
+    private readonly findUserHistorysService: FindUserHistorysService,
   ) { }
 
   @Get('me')
@@ -74,14 +78,32 @@ export class UsersController {
     return classToClass(this.findAllByCompanyService.execute(user));
   }
 
+
+  @Permissions({
+    code: PermissionEnum.USER,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
+  @Get('/history/:companyId')
+  @Get()
+  find(@User() userPayloadDto: UserPayloadDto, @Query() query: FindUserHistoryDto) {
+    return this.findUserHistorysService.execute({ ...query, companyId: userPayloadDto.targetCompanyId }, userPayloadDto);
+  }
+
+  @Get('me/history')
+  async findMeHistory(@User() userPayloadDto: UserPayloadDto, @Query() query: FindUserHistoryDto) {
+    return this.findUserHistorysService.execute({ ...query, companyId: userPayloadDto.targetCompanyId, userId: userPayloadDto.userId }, userPayloadDto);
+  }
+
   @Public()
   @Post()
-  async create(@Body() createUserDto: CreateUserDto) {
+  async create(@Body() createUserDto: CreateUserDto, @Ip() ip: string, @UserAgent() userAgent: string) {
     if (!createUserDto.password) createUserDto.password = v4()
 
     await this.createUserService.execute(createUserDto);
 
-    return this.sessionService.execute(createUserDto);
+    return this.sessionService.execute(createUserDto, ip, userAgent);
   }
 
   @Patch()

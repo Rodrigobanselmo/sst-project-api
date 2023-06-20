@@ -20,6 +20,10 @@ export class UserPayloadDto extends UserCompanyDto {
   @IsEmail()
   readonly email: string;
 
+  @IsString()
+  @IsOptional()
+  readonly ip?: string;
+
   @IsBoolean()
   @ToBoolean()
   isMaster: boolean;

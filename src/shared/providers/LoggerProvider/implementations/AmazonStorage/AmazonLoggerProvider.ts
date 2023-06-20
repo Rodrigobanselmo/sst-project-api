@@ -13,12 +13,15 @@ export class AmazonLoggerProvider implements ILoggerProvider {
     this.hashProvider = new HashProvider();
   }
 
-  async logRequest(data: any) {
-    this.log({
-      logGroupName: process.env.CLOUDWATCH_GROUP_NAME,
-      logStreamName: process.env.CLOUDWATCH_LOG_NAME || 'api-errors',
-      data,
-    })
+  async logRequest({ is404NoUSer, ...data }: any) {
+    if (is404NoUSer)
+      this.log404(data);
+    else
+      this.log({
+        logGroupName: process.env.CLOUDWATCH_GROUP_NAME,
+        logStreamName: process.env.CLOUDWATCH_LOG_NAME,
+        data,
+      })
   }
 
   async logError(data: any) {
@@ -29,7 +32,15 @@ export class AmazonLoggerProvider implements ILoggerProvider {
     })
   }
 
-  private async log({ logGroupName, logStreamName, data }: { logGroupName: string, logStreamName: string, data: any }) {
+  async log404(data: any) {
+    this.log({
+      logGroupName: process.env.CLOUDWATCH_GROUP_NAME_404 || '30-days-retention',
+      logStreamName: process.env.CLOUDWATCH_ERROR_LOG_NAME || 'api-request-404',
+      data,
+    })
+  }
+
+  async log({ logGroupName, logStreamName, data }: { logGroupName: string, logStreamName: string, data: any }) {
     if (process.env.NODE_ENV === 'development') {
       return;
     }

@@ -4,7 +4,8 @@ import { NextFunction, Request, Response } from 'express';
 import { AmazonLoggerProvider } from '../providers/LoggerProvider/implementations/AmazonStorage/AmazonLoggerProvider';
 import { HashProvider } from '../providers/HashProvider/implementations/HashProvider';
 import { hashSensitiveData } from '../utils/hashSensitiveData';
-// import geoip from 'geoip-lite';
+import { getIp } from '../utils/getIp';
+import { getUserAgentString } from '../utils/getUserAgent';
 
 @Injectable()
 export class HttpLoggerMiddleware implements NestMiddleware {
@@ -12,15 +13,13 @@ export class HttpLoggerMiddleware implements NestMiddleware {
   private hashProvider = new HashProvider();
 
   use(req: Request, res: Response, next: NextFunction) {
+    if (process.env.APP_HOST === 'localhost') {
+      return next();
+    }
+
     const rawResponse = res.write;
     const rawResponseEnd = res.end;
     const chunkBuffers = [];
-
-    const ip2 = req.headers['x-forwarded-for'];
-    const ip3 = req.socket.remoteAddress;
-    const ip4 = req.connection.remoteAddress;
-    // const userAgent = (req as any).useragent.source;
-    // const location = geoip.lookup(ip);
 
     res.write = (...chunks) => {
       const resArgs = [];
@@ -49,22 +48,22 @@ export class HttpLoggerMiddleware implements NestMiddleware {
       const isResponseFile = !!res.get('Content-Disposition');
       const body = Buffer.concat(chunkBuffers).toString('utf8');
 
-      const { method, originalUrl, ip, headers, body: bodyReq } = req;
+      const { method, originalUrl, headers, body: bodyReq } = req;
       const { statusCode } = res;
       const user = req.user as any;
 
       if (statusCode != 304) {
+        const is404NoUSer = statusCode == 404 && !user?.userId;
+
         this.logger.logRequest({
+          is404NoUSer,
           status: statusCode,
           method,
           userId: user?.userId,
           originalUrl,
           userCompanyId: user?.companyId,
           targetCompanyId: user?.targetCompanyId,
-          ip,
-          ip2,
-          ip3,
-          ip4,
+          ip: getIp(req),
           headers: JSON.stringify(headers),
           requestBody: JSON.stringify(hashSensitiveData(bodyReq)),
           responseBody: isResponseFile ? 'binary file' : (body),

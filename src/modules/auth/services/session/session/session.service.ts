@@ -10,6 +10,8 @@ import { PayloadTokenDto } from '../../../dto/payload-token.dto';
 import { RefreshTokensRepository } from '../../../repositories/implementations/RefreshTokensRepository';
 import { ErrorMessageEnum } from '../../../../../shared/constants/enum/errorMessage';
 import { FirebaseProvider } from '../../../../../shared/providers/FirebaseProvider/FirebaseProvider';
+import { UserHistoryRepository } from '../../../../../modules/users/repositories/implementations/UserHistoryRepository';
+import geoip from 'geoip-lite';
 
 @Injectable()
 export class SessionService {
@@ -18,10 +20,11 @@ export class SessionService {
     private readonly refreshTokensRepository: RefreshTokensRepository,
     private readonly hashProvider: HashProvider,
     private readonly jwtTokenProvider: JwtTokenProvider,
+    private readonly userHistoryRepository: UserHistoryRepository,
     private readonly firebaseProvider: FirebaseProvider
   ) { }
 
-  async execute({ email, password, userEntity }: LoginUserDto & { userEntity?: UserEntity }) {
+  async execute({ email, password, userEntity }: LoginUserDto & { userEntity?: UserEntity }, ip: string, userAgent: string) {
     const user = userEntity ? userEntity : await this.validateUser(email, password);
 
     const companies = user.companies
@@ -44,12 +47,26 @@ export class SessionService {
       ...company,
     };
 
+
     const token = this.jwtTokenProvider.generateToken(payload);
 
     const [refresh_token, refreshTokenExpiresDate] = this.jwtTokenProvider.generateRefreshToken(user.id);
 
     const newRefreshToken = await this.refreshTokensRepository.create(refresh_token, user.id, refreshTokenExpiresDate);
 
+    const location = geoip.lookup(process.env.LOCAL_IP || ip);
+
+    this.userHistoryRepository.create({
+      userId: user.id,
+      companyId: company.companyId,
+      ip: ip,
+      userAgent,
+      city: location.city,
+      country: location.country,
+      region: location.region,
+
+
+    })
     return {
       token,
       refresh_token: newRefreshToken.refresh_token,
