@@ -1,4 +1,4 @@
-import { PermissionCompanyEnum } from './../src/shared/constants/enum/permissionsCompany';
+// import { PermissionCompanyEnum } from './../src/shared/constants/enum/permissionsCompany';
 import { asyncEach } from './../src/shared/utils/asyncEach';
 import { removeDuplicitiesRisks } from './run/remove-duplicities-risks';
 import { AmazonStorageProvider } from './../src/shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
