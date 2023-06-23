@@ -16,9 +16,15 @@ import { PermissionsGuard } from './shared/guards/permissions.guard';
 import { RolesGuard } from './shared/guards/roles.guard';
 import { LoggerMiddleware } from './shared/middlewares/logger.local.middleware';
 import { HttpLoggerMiddleware } from './shared/middlewares/logger.middleware';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
-  imports: [PrismaModule, UsersModule, AuthModule, CompanyModule, SSTModule, FilesModule, DocumentsModule, EsocialModule, NotificationModule, ScheduleModule.forRoot()],
+  imports: [
+    ThrottlerModule.forRoot({
+      ttl: 60,
+      limit: 10,
+    }),
+    PrismaModule, UsersModule, AuthModule, CompanyModule, SSTModule, FilesModule, DocumentsModule, EsocialModule, NotificationModule, ScheduleModule.forRoot()],
   providers: [
     {
       provide: APP_GUARD,

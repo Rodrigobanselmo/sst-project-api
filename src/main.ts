@@ -1,6 +1,7 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+// import helmet from 'helmet';
 
 import { AppModule } from './app.module';
 import { InternalServerExceptionFilter } from './shared/filters/internal-server-exception.filter';
@@ -16,34 +17,6 @@ import {
 import * as winston from 'winston';
 import CloudWatchTransport from 'winston-cloudwatch';
 import { NestExpressApplication } from '@nestjs/platform-express';
-
-// import chalk from 'chalk';
-
-// export function logger(req, res, next) {
-//   if (process.env.NODE_ENV !== 'development') {
-//     next();
-//     return;
-//   }
-//   if (req.method === 'OPTIONS') {
-//     next();
-//     return;
-//   }
-
-//   const shortPath = (req?.url as string)
-//     .split('?')[0]
-//     .split('/')
-//     .map((path) => (path.split('-').length == 5 ? path.split('-')[0] : path))
-//     .join('/');
-
-//   const queryParams = ((req?.url as string).split('?')[1] || '')
-//     .split('&')
-//     .map((path) => (path.split('-').length == 5 ? path.split('-')[0] : path))
-//     .join('&');
-
-//   console.info((req.method === 'GET' ? chalk.cyan : chalk.red)(`[${req.method}]: `) + chalk.blue(`${shortPath}`) + chalk.gray(`?${queryParams}`));
-
-//   next();
-// }
 
 async function bootstrap() {
   console.info('STARTED');
@@ -96,9 +69,6 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api', app, document);
 
-  // app.useGlobalFilters(new LoggerExceptionFilter())
-  // if (process.env.NODE_ENV === 'production') 
-  // else 
   app.useGlobalFilters(new InternalServerExceptionFilter());
   app.useGlobalFilters(new PrismaDbExceptionFilter());
 
@@ -107,6 +77,7 @@ async function bootstrap() {
     origin: '*',
   });
 
+  // app.use(helmet());
   app.use(json({ limit: '50mb' }));
   app.use(urlencoded({ extended: true, limit: '50mb' }));
   await app.listen(process.env.PORT);
