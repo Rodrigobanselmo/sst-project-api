@@ -20,6 +20,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
   console.info('STARTED');
+  const isDev = process.env.NODE_ENV === 'development';
 
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: false,
@@ -74,7 +75,11 @@ async function bootstrap() {
 
   app.enableCors({
     exposedHeaders: ['Content-Disposition'],
-    origin: '*',
+    origin: ['https://simplesst.com'],
+    // origin: ['https://simplesst.com', 'http://201.75.187.24'],
+    ...(isDev && {
+      origin: '*',
+    })
   });
 
   // app.use(helmet());

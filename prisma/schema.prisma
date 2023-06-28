@@ -289,11 +289,7 @@ model Company {
   esocialLastTransmission         DateTime?
   esocialSend                     Boolean?
 
-  isDocuments Boolean? @default(true)
-  esocial     Boolean? @default(true)
-  schedule    Boolean? @default(true)
-  cat         Boolean? @default(true)
-  absenteeism Boolean? @default(true)
+  permissions String[]
 
   accessGroups               AccessGroups[]
   address                    AddressCompany?

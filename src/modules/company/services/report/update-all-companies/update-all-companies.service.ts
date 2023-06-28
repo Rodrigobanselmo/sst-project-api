@@ -39,7 +39,7 @@ export class UpdateAllCompaniesService {
     private readonly eSocialEventProvider: ESocialEventProvider,
     private readonly companyReportRepository: CompanyReportRepository,
     private readonly updateESocialReportService: UpdateESocialReportService,
-  ) {}
+  ) { }
 
   async execute(user?: UserPayloadDto) {
     const companyId = user?.targetCompanyId;
@@ -48,10 +48,8 @@ export class UpdateAllCompaniesService {
     const allCompanies = await this.companyRepository.findNude({
       select: {
         id: true,
-        // report: { select: { id: true } },
         esocialStart: true,
         cnpj: true,
-        // esocialEvents:{select:{}}.
         doctorResponsible: {
           include: { professional: { select: { name: true } } },
         },
@@ -99,23 +97,13 @@ export class UpdateAllCompaniesService {
     console.info('start cron(2): update employees');
     const employeeExams = (await asyncEach(allCompanies, (v) => this.addReport(v))).map(
       ({ company, examTime, esocialEvents }): UpsertCompanyReportDto & { company: CompanyEntity } => {
-        const expired = (examTime?.allWithExamExpired?.length || 0) + (examTime?.allWithMissingExam?.length || 0);
 
         return {
           company: company,
           companyId: company.id,
           lastDailyReport: this.dayjs.dateNow(),
           dailyReport: {
-            exam: {
-              ...(examTime && {
-                all: examTime?.all?.length || 0,
-                expired,
-                good: (examTime?.all?.length || 0) - expired,
-                schedule: examTime?.allWithExamSchedule?.length || 0,
-                expired30: examTime?.closeToExpire30?.length || 0,
-                expired90: examTime?.closeToExpire90?.length || 0,
-              }),
-            },
+            exam: examTime,
             esocial: {
               ...esocialEvents,
             },
@@ -173,16 +161,7 @@ export class UpdateAllCompaniesService {
     return employeeExamsData;
   }
 
-  // async updateExam(company: CompanyEntity) {
-  //   //! optimization here => query only once employees and then apply filters
-  //   const examTime = await this.addEmployeeExamTime(company);
-  //   const esocialEvents = await this.addCompanyEsocial(company);
-
-  //   return { examTime, esocialEvents, company };
-  // }
-
   async addReport(company: CompanyEntity) {
-    //! optimization here => query only once employees and then apply filters
     const examTime = await this.addEmployeeExamTime(company);
     const esocialEvents = await this.addCompanyEsocial(company);
 
@@ -192,233 +171,56 @@ export class UpdateAllCompaniesService {
   async addEmployeeExamTime(company: CompanyEntity, options?: { employeeIds?: number[] }) {
     const companyId = company.id;
     const date = this.dayjs.dayjs(this.standardDate).toDate();
+    const date45 = this.dayjs.dayjs(this.standardDate).add(45, 'day').toDate();
+    const date90 = this.dayjs.dayjs(this.standardDate).add(45, 'day').toDate();
+
     try {
-      const allEmployees = (
-        await this.employeeRepository.findNude({
-          where: {
-            companyId,
-            status: { not: 'CANCELED' },
-            skippedDismissalExam: { not: true },
-            ...(options.employeeIds && { id: { in: options.employeeIds } }),
-          },
-          select: {
-            id: true,
-            lastExam: true,
-            expiredDateExam: true,
-            hierarchyId: true,
-            newExamAdded: true,
-            subOffices: { select: { id: true } },
-            examsHistory: {
-              select: {
-                doneDate: true,
-                expiredDate: true,
-                status: true,
-                evaluationType: true,
-                validityInMonths: true,
-              },
-              where: {
-                exam: { isAttendance: true },
-                status: { in: ['DONE', 'PROCESSING', 'PENDING'] },
-              },
-              orderBy: { doneDate: 'desc' },
-            },
-          },
-        })
-      ).map((e) => ({ ...e, expiredDateExamOld: e.expiredDateExam }));
-
-      const allWithExam = [] as EmployeeEntity[];
-      const allWithExamExpired = [] as EmployeeEntity[];
-      const allWithExamSchedule = [] as EmployeeEntity[];
-
-      const allWithMissingExam = [] as EmployeeEntity[];
-
-      allEmployees.forEach((employee) => {
-        const hasExam = employee?.examsHistory?.length > 0;
-        const missingExam = employee?.examsHistory?.length == 0;
-
-        if (!employee.hierarchyId) {
-          const dismissal = employee.status == 'INACTIVE';
-
-          if (dismissal) {
-            const demExamIndex = employee.examsHistory.findIndex((exam) => {
-              if (exam.examType == 'DEMI') return true;
-              return false;
-            });
-
-            const isSchedule = ['PROCESSING', 'PENDING'].includes(employee.examsHistory[demExamIndex]?.status);
-            const isDone = employee.examsHistory[demExamIndex]?.status == 'DONE';
-            const isDismissalLastExam = demExamIndex != -1 && employee.examsHistory.length - 1 == demExamIndex;
-
-            if (isDismissalLastExam) {
-              if (isDone) {
-                employee.expiredDateExam = null;
-              }
-
-              if (isSchedule) {
-                allWithExamSchedule.push(employee);
-              }
-            } else {
-              allWithExamExpired.push(employee);
-            }
-
-            allWithExam.push(employee);
-          }
-
-          return;
-        }
-
-        if (hasExam) {
-          let doneExamFound: EmployeeExamsHistoryEntity;
-          let scheduleExamFound: EmployeeExamsHistoryEntity;
-
-          //--> add expired Date
-          {
-            const doneExamFound = employee.examsHistory.find((exam) => {
-              const isDone = exam.status === 'DONE';
-              if (isDone) return true;
-              return false;
-            });
-
-            const scheduleExamFound = employee.examsHistory.find((exam) => {
-              const isSchedule = ['PROCESSING', 'PENDING'].includes(exam.status);
-              if (!isSchedule) return false;
-
-              const isDoneDateValid = this.dayjs.dayjs(exam.doneDate).isAfter(this.dayjs.dateNow());
-              if (!isDoneDateValid) return false;
-
-              return true;
-            });
-
-            // logic newExamAdded
-            {
-              if (employee.newExamAdded && doneExamFound) {
-                const doneDateExam = doneExamFound.doneDate;
-                if (this.dayjs.format(doneDateExam, 'YYYY-MM-DD') <= this.dayjs.format(employee.newExamAdded, 'YYYY-MM-DD')) {
-                  doneExamFound.expiredDate = employee.newExamAdded;
-                }
-              }
-            }
-
-            if (doneExamFound) employee.expiredDateExam = doneExamFound.expiredDate;
-            if (!doneExamFound && scheduleExamFound && employee.lastExam) {
-              const expiredDate = this.dayjs.dayjs(employee.lastExam).add(scheduleExamFound.validityInMonths, 'month').toDate();
-              employee.expiredDateExam = expiredDate;
-            }
-          }
-
-          // allWithExam
-          {
-            allWithExam.push(employee);
-          }
-
-          // allWithExamExpired
-          {
-            if (doneExamFound) {
-              const isExpired = this.dayjs.dayjs(doneExamFound.expiredDate).isBefore(this.dayjs.dateNow());
-
-              if (isExpired) allWithExamExpired.push(employee);
-            } else {
-              if (!doneExamFound && scheduleExamFound && employee.lastExam) {
-                const isExpired = this.dayjs.dayjs(employee.expiredDateExam).isBefore(this.dayjs.dateNow());
-
-                if (isExpired) allWithExamExpired.push(employee);
-              } else {
-                allWithExamExpired.push(employee);
-              }
-            }
-          }
-
-          // allWithExamSchedule
-          {
-            if (scheduleExamFound) allWithExamSchedule.push(employee);
-          }
-        }
-
-        // missingExam
-        if (missingExam) {
-          allWithMissingExam.push(employee);
+      const goodPromise = this.employeeRepository.countNude({
+        where: {
+          expiredDateExam: { gt: date90 },
         }
       });
 
-      const exams = await this.findExamByHierarchyService.execute(
-        { targetCompanyId: companyId },
-        {
-          onlyAttendance: true,
-        },
-      );
-
-      const getExpired = allWithMissingExam.map((employee) => {
-        const ids = [...employee.subOffices.map(({ id }) => id), employee.hierarchyId];
-
-        let expiredDate: Date;
-        exams.data.find(({ exam, origins }) => {
-          if (!exam.isAttendance) return false;
-
-          origins.find((origin) => {
-            const isPartOfHomo = origin?.homogeneousGroup
-              ? origin.homogeneousGroup?.hierarchyOnHomogeneous?.find((homoHier) => ids.includes(homoHier?.hierarchy?.id))
-              : true;
-            if (!isPartOfHomo) return;
-
-            const skip = this.findExamByHierarchyService.checkIfSkipEmployee(origin, employee);
-            if (skip) return;
-
-            const expired = this.findExamByHierarchyService.checkExpiredDate(origin, employee);
-            if (!expired.expiredDate) return;
-            expiredDate = expired.expiredDate;
-            return true;
-          });
-        });
-
-        const expired = expiredDate ? { expiredDate } : {};
-
-        if (expiredDate) employee.expiredDateExam = expiredDate;
-        return { ...employee, ...expired };
+      const expiredPromise = this.employeeRepository.countNude({
+        where: {
+          expiredDateExam: { lte: date },
+        }
       });
 
-      const missingExamExpired = getExpired.filter((e) => {
-        if (!e.expiredDate) return true;
-
-        const lastExamValid = this.dayjs.dayjs(e.expiredDate).isAfter(this.dayjs.dayjs());
-
-        if (!lastExamValid) return true;
-        return false;
+      const expired45Promise = this.employeeRepository.countNude({
+        where: {
+          expiredDateExam: { lte: date45, gt: date },
+        }
       });
 
-      await asyncBatch(allEmployees, 100, async (e) => {
-        if (e.expiredDateExam && e.expiredDateExam != e.expiredDateExamOld)
-          await this.employeeRepository.updateNude({
-            where: { id: e.id },
-            data: { expiredDateExam: e.expiredDateExam },
-          });
-        if (e.expiredDateExam === null && e.expiredDateExamOld != date)
-          await this.employeeRepository.updateNude({
-            where: { id: e.id },
-            data: { expiredDateExam: date },
-          });
+      const expired90Promise = this.employeeRepository.countNude({
+        where: {
+          expiredDateExam: { lte: date90, gt: date45 },
+        }
       });
 
-      const _30_DaysFromNow = this.dayjs.addDay(this.dayjs.dateNow(), 30);
-      return {
-        company,
-        all: allEmployees,
-        allWithExam,
-        allWithExamExpired,
-        allWithExamSchedule,
-        allWithMissingExam,
-        missingExamExpired,
-        closeToExpire30: allEmployees.filter((e) => {
-          if (!e.expiredDateExam) return;
+      const schedulePromise = this.employeeRepository.countNude({
+        where: { examsHistory: { some: { doneDate: { gt: date } } } }
+      });
 
-          return this.dayjs.dayjs(_30_DaysFromNow).isAfter(e.expiredDateExam) && this.dayjs.dayjs().isBefore(e.expiredDateExam);
-        }),
-        closeToExpire90: allEmployees.filter((e) => {
-          if (!e.expiredDateExam) return;
-          const _90_DaysFromNow = this.dayjs.addDay(this.dayjs.dateNow(), 90);
+      const [good, expired, expired45, expired90, schedule] = await Promise.all([
+        goodPromise,
+        expiredPromise,
+        expired45Promise,
+        expired90Promise,
+        schedulePromise,
+      ]);
 
-          return this.dayjs.dayjs(_90_DaysFromNow).isAfter(e.expiredDateExam) && this.dayjs.dayjs(_30_DaysFromNow).isBefore(e.expiredDateExam);
-        }),
-      };
+      const examTime = {
+        all: good + expired + expired90 + expired45,
+        expired: expired,
+        good: good,
+        schedule: schedule,
+        expiredClose1: expired45,
+        expiredClose2: expired90,
+      }
+
+      return examTime;
     } catch (e) {
       this.errorCompanies.push(companyId);
       this.error = e;
@@ -587,11 +389,11 @@ export class UpdateAllCompaniesService {
     const exams =
       allWithMissingExam.length != 0
         ? await this.findExamByHierarchyService.execute(
-            { targetCompanyId: companyId },
-            {
-              onlyAttendance: true,
-            },
-          )
+          { targetCompanyId: companyId },
+          {
+            onlyAttendance: true,
+          },
+        )
         : undefined;
 
     const getExpired = allWithMissingExam.map((employee) => {

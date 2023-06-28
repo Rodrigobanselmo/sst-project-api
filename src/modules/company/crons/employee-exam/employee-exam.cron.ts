@@ -5,7 +5,7 @@ import { UpdateAllCompaniesService } from '../../services/report/update-all-comp
 
 @Injectable()
 export class UpdateCompaniesReportCron {
-  constructor(private readonly updateAllCompaniesService: UpdateAllCompaniesService) {}
+  constructor(private readonly updateAllCompaniesService: UpdateAllCompaniesService) { }
 
   @Cron(CronExpression.EVERY_DAY_AT_2AM) //11pm on brazil
   // @Cron(CronExpression.EVERY_5_SECONDS)

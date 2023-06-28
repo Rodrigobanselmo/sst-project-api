@@ -1,3 +1,4 @@
+import { PermissionCompanyEnum } from './../../../shared/constants/enum/permissionsCompany';
 import { QueryArray } from '../../../shared/transformers/query-array';
 import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
 import { CompanyPaymentTypeEnum, CompanyTypesEnum, StatusEnum } from '@prisma/client';
@@ -201,29 +202,9 @@ export class CreateCompanyDto {
   esocialSend?: boolean;
 
   @IsOptional()
-  @IsBoolean()
-  @ToBoolean()
-  isDocuments?: boolean;
-
-  @IsOptional()
-  @IsBoolean()
-  @ToBoolean()
-  esocial?: boolean;
-
-  @IsOptional()
-  @IsBoolean()
-  @ToBoolean()
-  schedule?: boolean;
-
-  @IsOptional()
-  @IsBoolean()
-  @ToBoolean()
-  cat?: boolean;
-
-  @IsOptional()
-  @IsBoolean()
-  @ToBoolean()
-  absenteeism?: boolean;
+  @IsString({ each: true })
+  @IsEnum(PermissionCompanyEnum, { each: true, message: `valor inválido para permissões` })
+  permissions?: PermissionCompanyEnum[];
 }
 
 export class UpdateCompanyDto {
@@ -286,29 +267,9 @@ export class UpdateCompanyDto {
   isConsulting?: boolean;
 
   @IsOptional()
-  @IsBoolean()
-  @ToBoolean()
-  isDocuments?: boolean;
-
-  @IsOptional()
-  @IsBoolean()
-  @ToBoolean()
-  esocial?: boolean;
-
-  @IsOptional()
-  @IsBoolean()
-  @ToBoolean()
-  schedule?: boolean;
-
-  @IsOptional()
-  @IsBoolean()
-  @ToBoolean()
-  cat?: boolean;
-
-  @IsOptional()
-  @IsBoolean()
-  @ToBoolean()
-  absenteeism?: boolean;
+  @IsString({ each: true })
+  @IsEnum(PermissionCompanyEnum, { each: true, message: `valor inválido para permissões ` })
+  permissions?: PermissionCompanyEnum[];
 
   @IsOptional()
   @ValidateNested({ each: true })

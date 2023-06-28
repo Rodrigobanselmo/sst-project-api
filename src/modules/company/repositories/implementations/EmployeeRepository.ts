@@ -10,6 +10,7 @@ import { CreateEmployeeDto, FindEmployeeDto, UpdateEmployeeDto } from '../../dto
 import { EmployeeEntity } from '../../entities/employee.entity';
 import { prismaFilter } from './../../../../shared/utils/filters/prisma.filters';
 import { FindEvents2220Dto } from './../../../esocial/dto/event.dto';
+import { PermissionCompanyEnum } from 'src/shared/constants/enum/permissionsCompany';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 @Injectable()
@@ -296,6 +297,7 @@ export class EmployeeRepository {
           name: true,
           cnpj: true,
           initials: true,
+          permissions: true,
           ...(typeof options.select.company != 'boolean' && options.select.company?.select && options.select.company.select),
           ...(query?.getGroup && {
             unit: true,
@@ -349,6 +351,7 @@ export class EmployeeRepository {
         'scheduleMedicalVisitId',
         'getSocialName',
         'getExamName',
+        'isSchedule',
       ],
     });
 
@@ -428,6 +431,14 @@ export class EmployeeRepository {
       (where.AND as any).push({
         company: {
           address: { state: { in: query.uf } },
+        },
+      } as typeof options.where);
+    }
+
+    if ('isSchedule' in query && !query?.search && !!query?.all) {
+      (where.AND as any).push({
+        company: {
+          permissions: { has: PermissionCompanyEnum.schedule },
         },
       } as typeof options.where);
     }

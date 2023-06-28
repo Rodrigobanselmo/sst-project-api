@@ -192,11 +192,7 @@ export class CompanyEntity implements Company {
   examClinicHistory?: EmployeeExamsHistoryEntity[];
   documents?: DocumentEntity[];
 
-  isDocuments: boolean;
-  esocial: boolean;
-  schedule: boolean;
-  cat: boolean;
-  absenteeism: boolean;
+  permissions: string[];
 
   //! remove >>>
   mission: string;
