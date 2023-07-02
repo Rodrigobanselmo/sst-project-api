@@ -101,14 +101,14 @@ async function main() {
     //   where: { email: 'leandro.penin@grupoevicon.com.br' },
     // });
 
-    await prisma.company.updateMany({
-      where: { isConsulting: false },
-      data: { permissions: { set: [PermissionCompanyEnum.document] } },
-    });
-    await prisma.company.updateMany({
-      where: { isConsulting: true },
-      data: { permissions: { set: [PermissionCompanyEnum.document, PermissionCompanyEnum.schedule, PermissionCompanyEnum.absenteeism, PermissionCompanyEnum.esocial, PermissionCompanyEnum.cat] } },
-    });
+    // await prisma.company.updateMany({
+    //   where: { isConsulting: false },
+    //   data: { permissions: { set: [PermissionCompanyEnum.document] } },
+    // });
+    // await prisma.company.updateMany({
+    //   where: { isConsulting: true },
+    //   data: { permissions: { set: [PermissionCompanyEnum.document, PermissionCompanyEnum.schedule, PermissionCompanyEnum.absenteeism, PermissionCompanyEnum.esocial, PermissionCompanyEnum.cat] } },
+    // });
 
     console.info('end');
   } catch (err) {
