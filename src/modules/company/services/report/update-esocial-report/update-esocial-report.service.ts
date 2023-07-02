@@ -1,3 +1,4 @@
+import { getEmployeeFind2240Where } from './../../../../esocial/services/events/2240/find-events/find-events.service';
 import { CatRepository } from './../../../repositories/implementations/CatRepository';
 import { Injectable } from '@nestjs/common';
 
@@ -16,7 +17,7 @@ export class UpdateESocialReportService {
     private readonly eSocialEventProvider: ESocialEventProvider,
     private readonly companyReportRepository: CompanyReportRepository,
     private readonly catRepository: CatRepository,
-  ) {}
+  ) { }
 
   async execute({ companyId }: { companyId: string }) {
     const company = await this.companyRepository.findFirstNude({
@@ -65,14 +66,13 @@ export class UpdateESocialReportService {
 
     const employees2240 = await this.employeeRepository.countNude({
       where: {
-        companyId,
-        OR: [{ pppHistory: { none: { status: { in: ['DONE', 'TRANSMITTED'] } } } }, { pppHistory: { some: { sendEvent: true } } }],
+        ...getEmployeeFind2240Where(companyId)
       },
     });
 
     esocial.S2240.pending = employees2240;
 
-    const employees2210 = await this.catRepository.countEvent2210();
+    const employees2210 = await this.catRepository.countEvent2210({ companyId });
 
     esocial.S2210.pending = employees2210;
 

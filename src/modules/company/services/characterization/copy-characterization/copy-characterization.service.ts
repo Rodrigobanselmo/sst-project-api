@@ -1,6 +1,6 @@
 import { CopyCharacterizationDto } from './../../../dto/characterization.dto';
 import { HomoGroupEntity } from '../../../entities/homoGroup.entity';
-import { isEnvironment } from 'src/shared/utils/isEnvironment';
+import { isEnvironment } from '../../../../..//shared/utils/isEnvironment';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { HierarchyEnum, HomogeneousGroup, HomoTypeEnum } from '@prisma/client';
 import { v4 } from 'uuid';

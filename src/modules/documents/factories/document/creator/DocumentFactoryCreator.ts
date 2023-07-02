@@ -1,13 +1,12 @@
 import { ICreatePGR } from './../../../docx/builders/pgr/types/pgr.types';
 import { ISectionOptions, Packer } from 'docx';
-import fs from 'fs';
+import { writeFileSync, unlinkSync } from 'fs';
 
 import { IDocumentAttachment, IDocumentFactoryProduct as IDocumentFactoryProduct, IUnlinkPaths } from '../types/IDocumentFactory.types';
 import { IStorageProvider } from './../../../../../shared/providers/StorageProvider/models/StorageProvider.types';
 import { AttachmentEntity } from './../../../../sst/entities/attachment.entity';
 import { baseDocuemntOptions, createBaseDocument } from './../../../docx/base/config/document';
 import { ServerlessLambdaProvider } from '../../../../../shared/providers/ServerlessFunctionsProvider/implementations/ServerlessLambda/ServerlessLambdaProvider';
-import { v4 } from 'uuid';
 
 export abstract class DocumentFactoryAbstractionCreator<T, R> {
   public abstract factoryMethod(body: T): IDocumentFactoryProduct<T, R>;
@@ -90,6 +89,11 @@ export abstract class DocumentFactoryAbstractionCreator<T, R> {
       return { url: save.url, buffer: save.buffer, fileName: save.fileName };
     } else {
       const buildData = await getBuild();
+
+      // save buildData in file as text
+      writeFileSync('tmp/buildData.txt', JSON.stringify(buildData));
+      throw new Error('Not implemented yet');
+
       const save = await this.saveWithLambda(product, buildData, { body, type });
 
       return { url: save.url, buffer: save.buffer, fileName: save.fileName };
@@ -156,7 +160,7 @@ export abstract class DocumentFactoryAbstractionCreator<T, R> {
       .filter((i) => !!i?.path && typeof i.path == 'string')
       .forEach((path) => {
         try {
-          fs.unlinkSync(path.path);
+          unlinkSync(path.path);
         } catch (e) { }
       });
   }

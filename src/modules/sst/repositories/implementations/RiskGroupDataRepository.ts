@@ -1,4 +1,4 @@
-import { isEnvironment } from 'src/shared/utils/isEnvironment';
+import { isEnvironment } from '../../../../shared/utils/isEnvironment';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
@@ -149,7 +149,7 @@ export class RiskGroupDataRepository {
     //   },
     // );
 
-    return new RiskFactorGroupDataEntity(riskFactorGroupDataEntity);
+    return new RiskFactorGroupDataEntity(riskFactorGroupDataEntity as any);
   }
 
   async findDocumentData(id: string, companyId: string, options?: { workspaceId?: string }) {
@@ -195,6 +195,6 @@ export class RiskGroupDataRepository {
       },
     });
 
-    return new RiskFactorGroupDataEntity(riskFactorGroupData);
+    return new RiskFactorGroupDataEntity(riskFactorGroupData as any);
   }
 }

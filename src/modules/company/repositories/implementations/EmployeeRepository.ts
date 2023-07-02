@@ -10,7 +10,7 @@ import { CreateEmployeeDto, FindEmployeeDto, UpdateEmployeeDto } from '../../dto
 import { EmployeeEntity } from '../../entities/employee.entity';
 import { prismaFilter } from './../../../../shared/utils/filters/prisma.filters';
 import { FindEvents2220Dto } from './../../../esocial/dto/event.dto';
-import { PermissionCompanyEnum } from 'src/shared/constants/enum/permissionsCompany';
+import { PermissionCompanyEnum } from './../../../../shared/constants/enum/permissionsCompany';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 @Injectable()

@@ -21,15 +21,10 @@ export interface DailyCompanyReportDto {
     expired90?: number;
   };
   esocial: {
-    processing?: number;
-    pending?: number;
-    done?: number;
-    transmitted?: number;
-    rejected?: number;
     ['S2240']?: IESocialPropsDto;
     ['S2220']?: IESocialPropsDto;
     ['S2210']?: IESocialPropsDto;
-  };
+  } & IESocialPropsDto;
 }
 
 export class UpsertCompanyReportDto {

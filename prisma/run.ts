@@ -1,4 +1,4 @@
-// import { PermissionCompanyEnum } from './../src/shared/constants/enum/permissionsCompany';
+import { PermissionCompanyEnum } from './../src/shared/constants/enum/permissionsCompany';
 import { asyncEach } from './../src/shared/utils/asyncEach';
 import { removeDuplicitiesRisks } from './run/remove-duplicities-risks';
 import { AmazonStorageProvider } from './../src/shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
@@ -101,14 +101,14 @@ async function main() {
     //   where: { email: 'leandro.penin@grupoevicon.com.br' },
     // });
 
-    // await prisma.company.updateMany({
-    //   where: { isConsulting: false },
-    //   data: { permissions: { set: [PermissionCompanyEnum.document] } },
-    // });
-    // await prisma.company.updateMany({
-    //   where: { isConsulting: true },
-    //   data: { permissions: { set: [PermissionCompanyEnum.document, PermissionCompanyEnum.schedule, PermissionCompanyEnum.absenteeism, PermissionCompanyEnum.esocial, PermissionCompanyEnum.cat] } },
-    // });
+    await prisma.company.updateMany({
+      where: { isConsulting: false },
+      data: { permissions: { set: [PermissionCompanyEnum.document] } },
+    });
+    await prisma.company.updateMany({
+      where: { isConsulting: true },
+      data: { permissions: { set: [PermissionCompanyEnum.document, PermissionCompanyEnum.schedule, PermissionCompanyEnum.absenteeism, PermissionCompanyEnum.esocial, PermissionCompanyEnum.cat] } },
+    });
 
     console.info('end');
   } catch (err) {

@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { HierarchyEnum, HomogeneousGroup } from '@prisma/client';
+import { HierarchyEnum, HomogeneousGroup, Prisma } from '@prisma/client';
 import clone from 'clone';
 import sortArray from 'sort-array';
 
@@ -25,6 +25,13 @@ import { RiskRepository } from './../../../../../sst/repositories/implementation
 import { ProfessionalEntity } from './../../../../../users/entities/professional.entity';
 import { IBreakPointPPP, IEmployee2240Data, IPriorRiskData } from './../../../../interfaces/event-2240';
 
+
+export const getEmployeeFind2240Where = (companyId: string): Prisma.EmployeeWhereInput => ({
+  companyId,
+  OR: [{ pppHistory: { none: { id: { gt: 0 } } } }, { pppHistory: { some: { sendEvent: true } } }],
+  hierarchyHistory: { some: { id: { gt: 0 } } }
+})
+
 @Injectable()
 export class FindEvents2240ESocialService {
   private end = true;
@@ -37,7 +44,7 @@ export class FindEvents2240ESocialService {
     private readonly riskRepository: RiskRepository,
     private readonly dayjsProvider: DayJSProvider,
     private readonly prisma: PrismaService,
-  ) {}
+  ) { }
 
   async execute({ skip, take, ...query }: FindEvents2240Dto, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;
@@ -360,7 +367,7 @@ export class FindEvents2240ESocialService {
         .filter((i) => i)
         .reduce((acc, curr) => {
           return { ...acc, ...curr };
-        });
+        }, {});
 
       Object.entries(timeline).forEach(([key, value]) => {
         timeline[key].risks = this.onGetRisks(value.riskData);
@@ -377,8 +384,8 @@ export class FindEvents2240ESocialService {
       employeesData.push({
         ...employee,
         actualPPPHistory,
-        hierarchy: { id: hierarchy.id, name: hierarchy.name },
-        sectorHierarchy: { id: sectorHierarchy.id, name: sectorHierarchy.name } as any,
+        hierarchy: { id: hierarchy?.id, name: hierarchy?.name },
+        sectorHierarchy: { id: sectorHierarchy?.id, name: sectorHierarchy?.name } as any,
       });
     });
     return employeesData;
@@ -484,9 +491,7 @@ export class FindEvents2240ESocialService {
         //*Employees
         employees: {
           where: {
-            companyId,
-            OR: [{ pppHistory: { none: { id: { gt: 0 } } } }, { pppHistory: { some: { sendEvent: true } } }],
-            // OR: [{ pppHistory: { some: { sendEvent: true } } }],
+            ...getEmployeeFind2240Where(companyId)
           },
           select: {
             id: true,

@@ -10,7 +10,7 @@ import { prismaFilter } from '../../../../shared/utils/filters/prisma.filters';
 
 @Injectable()
 export class CatRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async create({ companyId, ...createCompanyDto }: CreateCatDto) {
@@ -75,14 +75,14 @@ export class CatRepository {
             },
             ...(!query.onlyCompany
               ? [
-                  {
-                    company: {
-                      receivingServiceContracts: {
-                        some: { applyingServiceCompanyId: query.companyId },
-                      },
+                {
+                  company: {
+                    receivingServiceContracts: {
+                      some: { applyingServiceCompanyId: query.companyId },
                     },
                   },
-                ]
+                },
+              ]
               : []),
           ],
         },
@@ -124,10 +124,15 @@ export class CatRepository {
     return cats.map((cat) => new CatEntity(cat));
   }
 
+
+  getFindEvent2210Where(companyId: string, options?: Prisma.CatWhereInput): Prisma.CatWhereInput {
+    return { employee: { companyId }, sendEvent: true, events: { none: { action: 'EXCLUDE', status: { in: ['DONE', 'TRANSMITTED'] } } }, ...options }
+  }
+
   async findEvent2210(companyId: string, options: Prisma.CatFindManyArgs = {}) {
     return this.findNude({
       ...options,
-      where: { employee: { companyId }, sendEvent: true, events: { none: { action: 'EXCLUDE', status: { in: ['DONE', 'TRANSMITTED'] } } }, ...options?.where },
+      where: { ...this.getFindEvent2210Where(companyId, options?.where) },
       include: {
         events: { select: { status: true, id: true, receipt: true, action: true } },
         doc: { include: { professional: { select: { cpf: true, name: true, id: true } } } },
@@ -160,9 +165,9 @@ export class CatRepository {
     });
   }
 
-  async countEvent2210(options: Prisma.CatCountArgs = {}) {
+  async countEvent2210({ companyId, ...options }: Prisma.CatCountArgs & { companyId: string }) {
     const count = await this.prisma.cat.count({
-      where: { sendEvent: true, events: { none: { action: 'EXCLUDE', status: { in: ['DONE', 'TRANSMITTED'] } } }, ...options?.where },
+      where: { ...this.getFindEvent2210Where(companyId, options?.where) },
     });
 
     return count;

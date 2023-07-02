@@ -1,5 +1,5 @@
 import { m2mGetDeletedIds } from './../../../../shared/utils/m2mFilterIds';
-import { isEnvironment } from 'src/shared/utils/isEnvironment';
+import { isEnvironment } from '../../../../shared/utils/isEnvironment';
 import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
@@ -227,6 +227,24 @@ export class RiskDataRepository {
         engsToRiskFactorData: { include: { recMed: true } },
         examsToRiskFactorData: { include: { exam: true } },
         generateSources: true,
+        riskFactor: {
+          select: {
+            examToRisk: {
+              select: { id: true, exam: { select: { name: true } }, },
+              where: {
+                endDate: null,
+                companyId,
+                OR: [
+                  { isAdmission: true },
+                  { isPeriodic: true },
+                  { isReturn: true },
+                  { isChange: true },
+                  { isDismissal: true },
+                ]
+              }
+            }
+          }
+        }
       },
     })) as RiskFactorDataEntity[];
 

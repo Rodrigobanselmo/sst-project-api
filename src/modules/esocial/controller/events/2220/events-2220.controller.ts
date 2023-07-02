@@ -6,29 +6,31 @@ import { User } from '../../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from './../../../../../shared/dto/user-payload.dto';
 import { Event2220Dto, FindEvents2220Dto } from './../../../dto/event.dto';
 import { SendEvents2220ESocialService } from './../../../services/events/2220/send-events/send-events.service';
+import { Permissions } from '../../../../../shared/decorators/permissions.decorator';
+import { PermissionEnum } from '../../../../../shared/constants/enum/authorization';
 
 @ApiTags('events-2220')
 @Controller('esocial/events/2220')
 export class ESocialEvent2220Controller {
-  constructor(private readonly sendEvents2220ESocialService: SendEvents2220ESocialService, private readonly findEvents2220ESocialService: FindEvents2220ESocialService) {}
+  constructor(private readonly sendEvents2220ESocialService: SendEvents2220ESocialService, private readonly findEvents2220ESocialService: FindEvents2220ESocialService) { }
 
-  // @Permissions({
-  //   code: PermissionEnum.ESOCIAL,
-  //   isContract: true,
-  //   isMember: true,
-  //   crud: true,
-  // })
+  @Permissions({
+    code: PermissionEnum.ESOCIAL,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
   @Get(':companyId?')
   find(@Query() query: FindEvents2220Dto, @User() userPayloadDto: UserPayloadDto) {
     return this.findEvents2220ESocialService.execute(query, userPayloadDto);
   }
 
-  // @Permissions({
-  //   code: PermissionEnum.ESOCIAL,
-  //   isContract: true,
-  //   isMember: true,
-  //   crud: true,
-  // })
+  @Permissions({
+    code: PermissionEnum.ESOCIAL,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
   @Post()
   async sendBatch(@Res() res, @Body() body: Event2220Dto, @User() userPayloadDto: UserPayloadDto) {
     // return this.sendEvents2220ESocialService.execute(body, userPayloadDto);

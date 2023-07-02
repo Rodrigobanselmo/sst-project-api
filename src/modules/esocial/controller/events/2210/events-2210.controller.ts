@@ -8,29 +8,31 @@ import { Event2210Dto, Event2220Dto, FindEvents2210Dto, FindEvents2220Dto } from
 import { SendEvents2220ESocialService } from '../../../services/events/2220/send-events/send-events.service';
 import { FindEvents2210ESocialService } from '../../../../../modules/esocial/services/events/2210/find-events/find-events-2210.service';
 import { SendEvents2210ESocialService } from '../../../../../modules/esocial/services/events/2210/send-events/send-events-2210.service';
+import { Permissions } from '../../../../../shared/decorators/permissions.decorator';
+import { PermissionEnum } from '../../../../../shared/constants/enum/authorization';
 
 @ApiTags('events-2210')
 @Controller('esocial/events/2210')
 export class ESocialEvent2210Controller {
-  constructor(private readonly sendEvents2210ESocialService: SendEvents2210ESocialService, private readonly findEvents2210ESocialService: FindEvents2210ESocialService) {}
+  constructor(private readonly sendEvents2210ESocialService: SendEvents2210ESocialService, private readonly findEvents2210ESocialService: FindEvents2210ESocialService) { }
 
-  // @Permissions({
-  //   code: PermissionEnum.ESOCIAL,
-  //   isContract: true,
-  //   isMember: true,
-  //   crud: true,
-  // })
+  @Permissions({
+    code: PermissionEnum.ESOCIAL,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
   @Get(':companyId?')
   find(@Query() query: FindEvents2210Dto, @User() userPayloadDto: UserPayloadDto) {
     return this.findEvents2210ESocialService.execute(query, userPayloadDto);
   }
 
-  // @Permissions({
-  //   code: PermissionEnum.ESOCIAL,
-  //   isContract: true,
-  //   isMember: true,
-  //   crud: true,
-  // })
+  @Permissions({
+    code: PermissionEnum.ESOCIAL,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
   @Post()
   async sendBatch(@Res() res, @Body() body: Event2210Dto, @User() userPayloadDto: UserPayloadDto) {
     const { fileStream, fileName } = await this.sendEvents2210ESocialService.execute(body, userPayloadDto);

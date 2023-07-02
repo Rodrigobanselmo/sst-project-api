@@ -1,3 +1,4 @@
+import { PermissionCompanyEnum } from './../../../../../shared/constants/enum/permissionsCompany';
 import { EmployeeExamsHistoryEntity } from './../../../entities/employee-exam-history.entity';
 import { UpsertCompanyReportDto } from './../../../dto/company-report.dto';
 import { EmployeeEntity } from '../../../../../modules/company/entities/employee.entity';
@@ -44,11 +45,12 @@ export class UpdateAllCompaniesService {
   async execute(user?: UserPayloadDto) {
     const companyId = user?.targetCompanyId;
 
-    console.info('start cron(1): update all');
+    console.info('start cron(1): All companies');
     const allCompanies = await this.companyRepository.findNude({
       select: {
         id: true,
         esocialStart: true,
+        permissions: true,
         cnpj: true,
         doctorResponsible: {
           include: { professional: { select: { name: true } } },
@@ -94,7 +96,6 @@ export class UpdateAllCompaniesService {
       },
     });
 
-    console.info('start cron(2): update employees');
     const employeeExams = (await asyncEach(allCompanies, (v) => this.addReport(v))).map(
       ({ company, examTime, esocialEvents }): UpsertCompanyReportDto & { company: CompanyEntity } => {
 
@@ -104,9 +105,7 @@ export class UpdateAllCompaniesService {
           lastDailyReport: this.dayjs.dateNow(),
           dailyReport: {
             exam: examTime,
-            esocial: {
-              ...esocialEvents,
-            },
+            esocial: esocialEvents
           },
         };
       },
@@ -169,38 +168,59 @@ export class UpdateAllCompaniesService {
   }
 
   async addEmployeeExamTime(company: CompanyEntity, options?: { employeeIds?: number[] }) {
+    const isSchedule = company.permissions.includes(PermissionCompanyEnum.schedule)
+
+    if (!isSchedule) return {
+      all: 0,
+      expired: 0,
+      good: 0,
+      schedule: 0,
+      expiredClose1: 0,
+      expiredClose2: 0,
+    }
+
     const companyId = company.id;
-    const date = this.dayjs.dayjs(this.standardDate).toDate();
-    const date45 = this.dayjs.dayjs(this.standardDate).add(45, 'day').toDate();
-    const date90 = this.dayjs.dayjs(this.standardDate).add(45, 'day').toDate();
+    const date = this.dayjs.dayjs().hour(0).minute(0).second(0).millisecond(0).toDate();
+    const date45 = this.dayjs.dayjs().hour(0).minute(0).second(0).millisecond(0).add(45, 'day').toDate();
+    const date90 = this.dayjs.dayjs().hour(0).minute(0).second(0).millisecond(0).add(90, 'day').toDate();
 
     try {
       const goodPromise = this.employeeRepository.countNude({
         where: {
+          companyId,
           expiredDateExam: { gt: date90 },
         }
       });
 
       const expiredPromise = this.employeeRepository.countNude({
         where: {
-          expiredDateExam: { lte: date },
+          companyId,
+          OR: [
+            { expiredDateExam: { lte: date } },
+            { expiredDateExam: null }
+          ],
         }
       });
 
       const expired45Promise = this.employeeRepository.countNude({
         where: {
+          companyId,
           expiredDateExam: { lte: date45, gt: date },
         }
       });
 
       const expired90Promise = this.employeeRepository.countNude({
         where: {
+          companyId,
           expiredDateExam: { lte: date90, gt: date45 },
         }
       });
 
       const schedulePromise = this.employeeRepository.countNude({
-        where: { examsHistory: { some: { doneDate: { gt: date } } } }
+        where: {
+          companyId,
+          examsHistory: { some: { doneDate: { gte: date }, status: 'PROCESSING' } }
+        }
       });
 
       const [good, expired, expired45, expired90, schedule] = await Promise.all([
@@ -229,7 +249,35 @@ export class UpdateAllCompaniesService {
 
   async addCompanyEsocial(company: CompanyEntity) {
     const companyId = company.id;
-    if (!company.esocialStart) return {};
+    const isEsocial = company.permissions.includes(PermissionCompanyEnum.esocial)
+
+    const emptyEsocial = {
+      ['S2240']: {
+        processing: 0,
+        pending: 0,
+        done: 0,
+        transmitted: 0,
+        rejected: 0,
+      },
+      ['S2220']: {
+        processing: 0,
+        pending: 0,
+        done: 0,
+        transmitted: 0,
+        rejected: 0,
+      },
+      ['S2210']: {
+        processing: 0,
+        pending: 0,
+        done: 0,
+        transmitted: 0,
+        rejected: 0,
+      },
+
+    }
+
+    if (!isEsocial) return emptyEsocial;
+    if (!company.esocialStart) return emptyEsocial;
 
     try {
       const esocial = await this.updateESocialReportService.addCompanyEsocial(company);
