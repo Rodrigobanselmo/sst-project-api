@@ -72,7 +72,7 @@ export class DocumentPGRFactory extends DocumentFactoryAbstractionCreator<IDocum
 
 export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
   public unlinkPaths: IUnlinkPaths[] = [];
-  public localCreation = false;
+  public localCreation = true;
 
   private company: CompanyEntity;
 
