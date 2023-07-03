@@ -75,7 +75,7 @@ async function bootstrap() {
 
   app.enableCors({
     exposedHeaders: ['Content-Disposition'],
-    origin: ['https://simplesst.com'],
+    origin: ['https://simplesst.com', 'https://www.simplesst.com/'],
     // origin: ['https://simplesst.com', 'http://201.75.187.24'],
     ...(isDev && {
       origin: '*',

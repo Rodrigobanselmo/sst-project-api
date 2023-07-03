@@ -39,7 +39,7 @@ class ESocialGenerateId {
 
 @Injectable()
 class ESocialMethodsProvider implements IESocialEventProvider {
-  constructor(private readonly companyRepository: CompanyRepository, private readonly dayJSProvider?: DayJSProvider) {}
+  constructor(private readonly companyRepository: CompanyRepository, private readonly dayJSProvider?: DayJSProvider) { }
 
   public signEvent({ cert: { certificate, key }, xml }: ISignEvent) {
     const sig = new SignedXml();
@@ -162,7 +162,7 @@ class ESocialMethodsProvider implements IESocialEventProvider {
       },
     });
 
-    const cert = company?.cert || company?.group?.cert || company?.receivingServiceContracts?.[0].applyingServiceCompany?.cert;
+    const cert = company?.cert || company?.group?.cert || company?.receivingServiceContracts?.[0]?.applyingServiceCompany?.cert;
 
     if (options?.cert && !cert) throw new BadRequestException('Certificado digital não cadastrado');
 

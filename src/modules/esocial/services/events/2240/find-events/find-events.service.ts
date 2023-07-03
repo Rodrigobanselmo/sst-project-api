@@ -529,7 +529,7 @@ export class FindEvents2240ESocialService {
       },
     });
 
-    const cert = company?.cert || company?.group?.cert || company?.receivingServiceContracts?.[0].applyingServiceCompany?.cert;
+    const cert = company?.cert || company?.group?.cert || company?.receivingServiceContracts?.[0]?.applyingServiceCompany?.cert;
 
     if (options?.cert && !cert) throw new BadRequestException('Certificado digital não cadastrado');
 
