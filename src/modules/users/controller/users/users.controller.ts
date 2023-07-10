@@ -56,7 +56,6 @@ export class UsersController {
   })
   @Get('/company/:companyId/:id')
   findId(@Param('id', ParseIntPipe) id: number, @User() user: UserPayloadDto) {
-    console.log()
     return classToClass(this.findByIdService.execute(+id, user.targetCompanyId));
   }
 

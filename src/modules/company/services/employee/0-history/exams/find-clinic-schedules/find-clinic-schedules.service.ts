@@ -15,11 +15,11 @@ export class FindClinicScheduleEmployeeExamHistoryService {
     private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository,
     private readonly employeeRepository: EmployeeRepository,
     private readonly findExamByHierarchyService: FindExamByHierarchyService,
-  ) {}
+  ) { }
 
   async execute(query: FindClinicEmployeeExamHistoryDto, user: UserPayloadDto) {
     const clinicCompanyId = user.targetCompanyId;
-    const status: StatusEnum[] = query.status == StatusEnum.CANCELED ? [StatusEnum.CANCELED] : [StatusEnum.DONE, StatusEnum.PROCESSING, StatusEnum.INACTIVE];
+    const status: StatusEnum[] = query.status == StatusEnum.CANCELED ? [StatusEnum.CANCELED] : [StatusEnum.DONE, StatusEnum.PROCESSING, StatusEnum.EXPIRED, StatusEnum.INACTIVE];
     const examsIds = [];
 
     if (query.examType && query.employeeCompanyId) {
@@ -87,23 +87,23 @@ export class FindClinicScheduleEmployeeExamHistoryService {
             ...(query.date && { doneDate: query.date }),
             ...(query.id
               ? {
-                  OR: [
-                    {
-                      id: query.id,
-                    },
-                    {
-                      examId: { in: examsIds },
-                      ...(query.notAfterDate && { doneDate: { lte: query.notAfterDate } }),
-                    },
-                    {
-                      ...(query.notAfterDate && { doneDate: query.notAfterDate }),
-                      exam: { isAttendance: false },
-                    },
-                  ],
-                }
+                OR: [
+                  {
+                    id: query.id,
+                  },
+                  {
+                    examId: { in: examsIds },
+                    ...(query.notAfterDate && { doneDate: { lte: query.notAfterDate } }),
+                  },
+                  {
+                    ...(query.notAfterDate && { doneDate: query.notAfterDate }),
+                    exam: { isAttendance: false },
+                  },
+                ],
+              }
               : {
-                  ...(query.notAfterDate && { doneDate: { lte: query.notAfterDate } }),
-                }),
+                ...(query.notAfterDate && { doneDate: { lte: query.notAfterDate } }),
+              }),
           },
           orderBy: { doneDate: 'desc' },
           distinct: ['examId'],

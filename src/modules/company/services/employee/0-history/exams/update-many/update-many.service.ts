@@ -24,7 +24,7 @@ export class UpdateManyScheduleExamHistoryService {
     private readonly dayJSProvider: DayJSProvider,
     private readonly notificationRepository: NotificationRepository,
     private readonly checkEmployeeExamService: CheckEmployeeExamService,
-  ) {}
+  ) { }
 
   async execute({ data, isClinic, ...dataDto }: UpdateManyScheduleExamDto, user: UserPayloadDto) {
     const employeeId = data.every((dt) => data?.[0]?.employeeId === dt?.employeeId) ? data[0]?.employeeId : 0;
@@ -60,8 +60,7 @@ export class UpdateManyScheduleExamHistoryService {
 
     data = data.map((exam) => {
       const foundExam = found.examsHistory.find((e) => e.id === exam.id);
-
-      if (exam.status === 'EXPIRED') exam.status = foundExam.status;
+      if (exam.status === 'EXPIRED') exam.status = foundExam.statusOriginal;
 
       const isEqual = compareFieldValues(foundExam, exam, {
         fields: checkExamFields,
@@ -70,7 +69,7 @@ export class UpdateManyScheduleExamHistoryService {
       return {
         ...(!isEqual && { sendEvent: true }),
         ...exam,
-        ...(exam.status != foundExam.status && {
+        ...(exam.status != foundExam.statusOriginal && {
           userDoneId: user.userId,
         }),
       };

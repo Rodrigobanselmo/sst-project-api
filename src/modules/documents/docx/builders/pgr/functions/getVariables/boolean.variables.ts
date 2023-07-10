@@ -7,6 +7,7 @@ import { HierarchyMapData } from './../../../../converter/hierarchy.converter';
 import { CompanyEntity } from '../../../../../../company/entities/company.entity';
 import { VariablesPGREnum } from '../../enums/variables.enum';
 import { CharacterizationTypeEnum, RiskFactorsEnum } from '@prisma/client';
+import { filterRisk } from './../../../../../../../shared/utils/filterRisk';
 
 export const booleanVariables = (
   company: CompanyEntity,
@@ -14,6 +15,8 @@ export const booleanVariables = (
   hierarchy: Map<string, HierarchyMapData>,
   document: RiskFactorGroupDataEntity & DocumentDataEntity & DocumentDataPGRDto,
 ) => {
+  const riskData = (document.data || []).filter(v => filterRisk(v))
+
   return {
     [VariablesPGREnum.IS_Q5]: document.isQ5 ? 'true' : '',
     [VariablesPGREnum.HAS_RISK_FIS]: (document.data || []).find((riskData) => riskData.riskFactor.type == RiskFactorsEnum.FIS) ? 'true' : '',
@@ -52,10 +55,10 @@ export const booleanVariables = (
     )
       ? 'true'
       : '',
-    [VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_RISK]: (document.data || []).find((riskData) => riskData.homogeneousGroup.environment) ? 'true' : '',
-    [VariablesPGREnum.COMPANY_HAS_CHARACTERIZATION_RISK]: (document.data || []).find((riskData) => riskData.homogeneousGroup.characterization) ? 'true' : '',
-    [VariablesPGREnum.COMPANY_HAS_HIERARCHY_RISK]: (document.data || []).find((riskData) => riskData.homogeneousGroup.type === 'HIERARCHY') ? 'true' : '',
-    [VariablesPGREnum.COMPANY_HAS_GSE_RISK]: (document.data || []).find((riskData) => !riskData.homogeneousGroup.type) ? 'true' : '',
+    [VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_RISK]: riskData.find((riskData) => riskData.homogeneousGroup.environment) ? 'true' : '',
+    [VariablesPGREnum.COMPANY_HAS_CHARACTERIZATION_RISK]: riskData.find((riskData) => riskData.homogeneousGroup.characterization) ? 'true' : '',
+    [VariablesPGREnum.COMPANY_HAS_HIERARCHY_RISK]: riskData.find((riskData) => riskData.homogeneousGroup.type === 'HIERARCHY') ? 'true' : '',
+    [VariablesPGREnum.COMPANY_HAS_GSE_RISK]: riskData.find((riskData) => !riskData.homogeneousGroup.type) ? 'true' : '',
     [VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_GENERAL]: company.environments.find((env) => env.type === CharacterizationTypeEnum.GENERAL) ? 'true' : '',
     [VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_ADM]: company.environments.find((env) => env.type === CharacterizationTypeEnum.ADMINISTRATIVE) ? 'true' : '',
     [VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_OP]: company.environments.find((env) => env.type === CharacterizationTypeEnum.OPERATION) ? 'true' : '',

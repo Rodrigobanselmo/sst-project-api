@@ -11,6 +11,7 @@ import { IHierarchyData, IHierarchyMap } from '../../../converter/hierarchy.conv
 import { hierarchyMap } from '../appr/parts/first/first.constant';
 import { bodyTableProps } from './elements/body';
 import { headerTableProps } from './elements/header';
+import { filterRisk } from '../../../../../..//shared/utils/filterRisk';
 
 export interface IHierarchyRiskOptions {
   hierarchyType?: HierarchyEnum;
@@ -42,6 +43,7 @@ export const hierarchyRisksConverter = (
   const allRiskRecord = {} as Record<string, IRiskDataMap>;
 
   const HomoPositionMap = new Map<string, IHomoPositionData>();
+  const riskGroupData = riskGroup.data?.filter((riskData) => filterRisk(riskData));
 
   (function getAllHierarchyByType() {
     hierarchyData.forEach((hierarchiesData) => {
@@ -63,7 +65,7 @@ export const hierarchyRisksConverter = (
   })();
 
   (function getAllRiskFactors() {
-    riskGroup.data.forEach((riskData) => {
+    riskGroupData?.forEach((riskData) => {
       riskData.homogeneousGroupId;
 
       const hasRisk = allRiskRecord[riskData.riskId] || {

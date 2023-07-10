@@ -84,8 +84,6 @@ export class CharacterizationRepository {
           }
         });
 
-      console.log('hierarchyOnHomogeneous', hierarchyOnHomogeneous);
-      console.log('hierarchyIds', hierarchyIds);
       await Promise.all(
         hierarchyIds.map(
           async (hierarchyId) =>

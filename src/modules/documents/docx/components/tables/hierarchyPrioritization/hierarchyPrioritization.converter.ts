@@ -13,6 +13,7 @@ import { hierarchyMap } from '../appr/parts/first/first.constant';
 import { bodyTableProps } from './elements/body';
 import { headerTableProps } from './elements/header';
 import { borderStyleGlobal } from '../../../base/config/styles';
+import { filterRisk } from '../../../../../../shared/utils/filterRisk';
 
 export interface IHierarchyPrioritizationOptions {
   isByGroup?: boolean;
@@ -54,10 +55,11 @@ export const hierarchyPrioritizationConverter = (
   hierarchyTree: IHierarchyMap,
   { hierarchyType = HierarchyEnum.SECTOR, isByGroup = false, homoType }: IHierarchyPrioritizationOptions,
 ) => {
+  const riskGroupData = riskGroup.data.filter((riskData) => filterRisk(riskData))
+
   const warnLevelStart = 4;
   const allRiskRecord = {} as Record<string, IRiskDataMap>;
   const allHierarchyRecord = {} as Record<string, IHierarchyDataType>;
-
   const HomoPositionMap = new Map<string, IHomoPositionData>();
 
   function getAllHierarchyByType() {
@@ -82,7 +84,7 @@ export const hierarchyPrioritizationConverter = (
   }
 
   function getAllHomoGroups() {
-    riskGroup.data.forEach((riskData) => {
+    riskGroupData.forEach((riskData) => {
       if (!homoType && riskData.homogeneousGroup.type) return;
 
       if (homoType && !Array.isArray(homoType) && riskData.homogeneousGroup.type !== homoType) return;
@@ -120,7 +122,7 @@ export const hierarchyPrioritizationConverter = (
   !isByGroup ? getAllHierarchyByType() : getAllHomoGroups();
 
   (function getAllRiskFactors() {
-    riskGroup.data.forEach((riskData) => {
+    riskGroupData.forEach((riskData) => {
       const hasRisk = allRiskRecord[riskData.riskId] || {
         homogeneousGroupIds: [],
       };

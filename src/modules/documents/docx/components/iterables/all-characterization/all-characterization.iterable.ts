@@ -5,6 +5,7 @@ import { ISectionChildrenType, DocumentSectionChildrenTypeEnum } from '../../../
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
 import { CharacterizationEntity } from '../../../../../company/entities/characterization.entity';
 import { environmentsConverter } from './all-characterization.converter';
+import { filterRisk } from '../../../../../../shared/utils/filterRisk';
 
 export const environmentIterable = (
   environments: CharacterizationEntity[],
@@ -92,7 +93,7 @@ export const environmentIterable = (
         //   });
       }
 
-      risks.forEach((risk, index) => {
+      risks.filter(risk => filterRisk(risk)).forEach((risk, index) => {
         if (index === 0)
           riskFactors.push({
             type: DocumentSectionChildrenTypeEnum.PARAGRAPH,

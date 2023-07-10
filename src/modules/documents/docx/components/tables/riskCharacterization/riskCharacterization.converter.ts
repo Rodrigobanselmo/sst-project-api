@@ -1,3 +1,4 @@
+import { filterRisk } from '../../../../../../shared/utils/filterRisk';
 import { RiskOrderEnum } from '../../../../../../shared/constants/enum/risk.enums';
 import { palette } from '../../../../../../shared/constants/palette';
 import { sortNumber } from '../../../../../../shared/utils/sorts/number.sort';
@@ -10,8 +11,9 @@ import { RiskCharacterizationColumnEnum } from './riskCharacterization.constant'
 
 export const riskCharacterizationConverter = (riskGroup: RiskFactorGroupDataEntity) => {
   const riskMap: Record<string, bodyTableProps[]> = {};
+  const riskGroupData = riskGroup.data.filter((riskData) => filterRisk(riskData));
 
-  riskGroup.data.forEach((riskData) => {
+  riskGroupData.forEach((riskData) => {
     const cells: bodyTableProps[] = [];
 
     if (riskMap[riskData.riskId]) return;

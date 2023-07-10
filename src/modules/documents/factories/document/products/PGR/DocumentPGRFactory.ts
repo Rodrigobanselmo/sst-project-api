@@ -40,6 +40,7 @@ import { IGetDocument, ISaveDocument } from '../../types/IDocumentFactory.types'
 import { IDocumentPGRBody } from './types/pgr.types';
 import { DocumentModelRepository } from '../../../../repositories/implementations/DocumentModelRepository';
 import { removeDuplicate } from '../../../../../../shared/utils/removeDuplicate';
+import { writeFileSync } from 'fs';
 
 @Injectable()
 export class DocumentPGRFactory extends DocumentFactoryAbstractionCreator<IDocumentPGRBody, any> {
@@ -114,12 +115,13 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
 
     riskGroupData.data = riskGroupData.data.map((riskData) => {
       const homo = homogeneousGroupsFound.find((homo) => homo.id == riskData.homogeneousGroupId);
+      const isEnv = isEnvironment(homo.characterization?.type)
+
       return {
         homogeneousGroup: {
           ...homo,
-          ...(homo.characterization && !isEnvironment(homo.characterization.type) && { characterization: { ...homo.characterization, homogeneousGroup: homo } }),
-          ...(homo.characterization &&
-            isEnvironment(homo.characterization.type) && { characterization: null, environment: { ...homo.characterization, homogeneousGroup: homo } }),
+          ...(homo.characterization && !isEnv && { characterization: { ...homo.characterization, homogeneousGroup: homo } }),
+          ...(homo.characterization && isEnv && { environment: { ...homo.characterization, homogeneousGroup: homo } }),
         },
         ...riskData,
       };
@@ -127,7 +129,11 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
 
     const homogeneousGroups = homogeneousGroupsFound
       .map((h) => ({ riskFactorData: riskGroupData.data.filter((riskData) => riskData.homogeneousGroupId == h.id) as any, ...h }))
-      .map((h) => ({ ...h, ...(h.characterization && { characterization: { ...h.characterization, homogeneousGroup: h } }) }));
+      .map((h) => ({
+        ...h,
+        ...(h.characterization && { characterization: { ...h.characterization, homogeneousGroup: h } }),
+        ...(h.characterization && isEnvironment(h.characterization.type) && { environment: { ...h.characterization, homogeneousGroup: h } }),
+      }));
 
     const characterization = homogeneousGroups.filter((i) => i.characterization);
     company.characterization = characterization as any;
@@ -278,6 +284,31 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
     const attachments = options.attachments;
     const imagesMap = options.data?.imagesMap;
 
+    writeFileSync('tmp/buildData.txt', JSON.stringify({
+      version,
+      document: { ...data.riskGroupData, ...data.documentData, ...(data.documentData.json && ((data.documentData as any).json as DocumentDataPGRDto)) },
+      attachments: attachments.map((attachment) => {
+        return {
+          ...attachment,
+          url: attachment.link,
+        };
+      }),
+      logo: data.logo,
+      consultantLogo: data.consultantLogo,
+      company: data.company,
+      workspace: data.workspace,
+      versions: data.versions,
+      environments: data.characterizations,
+      hierarchy: data.hierarchyData,
+      homogeneousGroup: data.homoGroupTree,
+      characterizations: data.characterizations,
+      hierarchyTree: data.hierarchyTree,
+      cover: data.cover,
+      docSections: data.modelData,
+      imagesMap,
+      hierarchyHighLevelsData: data.hierarchyHighLevelsData,
+    }));
+
     return {
       version,
       document: { ...data.riskGroupData, ...data.documentData, ...(data.documentData.json && ((data.documentData as any).json as DocumentDataPGRDto)) },
@@ -378,10 +409,12 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
     const homoMap: Record<string, HomoGroupEntity> = {};
 
     homogeneousGroups.forEach((homogeneousGroup) => {
+      const isEnv = isEnvironment(homogeneousGroup?.characterization?.type)
+
       const homo = {
         ...homogeneousGroup,
-        characterization: homogeneousGroup?.characterization && !isEnvironment(homogeneousGroup.characterization.type) ? homogeneousGroup.characterization : undefined,
-        environment: homogeneousGroup?.characterization && isEnvironment(homogeneousGroup.characterization.type) ? homogeneousGroup.characterization : undefined,
+        characterization: homogeneousGroup?.characterization && !isEnv ? homogeneousGroup.characterization : undefined,
+        environment: homogeneousGroup?.characterization && isEnv ? homogeneousGroup.characterization : undefined,
       };
       homoMap[homogeneousGroup.id] = homo;
     });
@@ -406,7 +439,7 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
             characterization:
               homo.homogeneousGroup?.characterization && !isEnvironment(homo.homogeneousGroup.characterization.type) ? homo.homogeneousGroup.characterization : undefined,
             environment:
-              homo.homogeneousGroup?.characterization && isEnvironment(homo.homogeneousGroup.characterization.type) ? homo.homogeneousGroup.characterization : undefined,
+              homo.homogeneousGroup?.environment && isEnvironment(homo.homogeneousGroup.environment.type) ? homo.homogeneousGroup.environment : undefined,
           }));
 
         return new HierarchyEntity(hierarchyCopy);

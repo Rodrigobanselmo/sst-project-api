@@ -34,6 +34,7 @@ export class EmployeeExamsHistoryEntity implements EmployeeExamsHistory {
   evaluationType: ExamHistoryEvaluationEnum;
   conclusion: ExamHistoryConclusionEnum;
   status: StatusEnum;
+  statusOriginal: StatusEnum;
 
   doctorId: number;
   doctor: ProfessionalEntity;
@@ -96,8 +97,10 @@ export class EmployeeExamsHistoryEntity implements EmployeeExamsHistory {
     //   this.doctor = { ...this.doctor, ...this.doctor.professional };
     // }
 
-    if ([StatusEnum.PENDING, StatusEnum.PROCESSING].includes(this.status as any) && dayjs(this.doneDate).isBefore(dayjs().add(-1, 'day')))
+    if ([StatusEnum.PENDING, StatusEnum.PROCESSING].includes(this.status as any) && dayjs(this.doneDate).isBefore(dayjs().add(-1, 'day'))) {
+      this.statusOriginal = this.status;
       this.status = StatusEnum.EXPIRED;
+    }
 
     if (this.hierarchy) this.hierarchy = new HierarchyEntity(this.hierarchy);
   }

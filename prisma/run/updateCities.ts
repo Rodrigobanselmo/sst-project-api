@@ -11,6 +11,4 @@ export const changeRecMed = async (prisma: PrismaClient) => {
   const c23 = await prisma.addressCompany.findMany({ distinct: ['city'], select: { city: true } });
   const c22 = await prisma.address.findMany({ distinct: ['city'], select: { city: true } });
 
-  console.log(c23);
-  console.log(c22);
 };

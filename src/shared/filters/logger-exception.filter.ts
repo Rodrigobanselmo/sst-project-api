@@ -16,7 +16,6 @@ export class LoggerExceptionFilter extends BaseExceptionFilter {
 
     // const { method, originalUrl, body, headers } = request;
 
-    console.log(1232131);
 
     super.catch(exception, host);
   }

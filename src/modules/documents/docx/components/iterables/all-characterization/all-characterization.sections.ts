@@ -1,6 +1,5 @@
 import { CharacterizationTypeEnum } from '@prisma/client';
 import { AlignmentType, BorderStyle, Paragraph, Table } from 'docx';
-import { sortString } from '../../../../../../shared/utils/sorts/string.sort';
 
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
 import { ISectionChildrenType, DocumentSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
@@ -11,6 +10,7 @@ import { CharacterizationEntity } from '../../../../../company/entities/characte
 import { environmentsConverter, IEnvironmentConvertResponse } from './all-characterization.converter';
 import { sortNumber } from '../../../../../../shared/utils/sorts/number.sort';
 import { getCharacterizationType } from '../../../../../../shared/utils/getCharacterizationType';
+import { filterRisk } from '../../../../../../shared/utils/filterRisk';
 
 const getData = (
   hierarchiesTreeOrg: IHierarchyData,
@@ -66,7 +66,7 @@ const getData = (
     });
   }
 
-  risks.forEach((risk, index) => {
+  risks.filter(risk => filterRisk(risk)).forEach((risk, index) => {
     if (index === 0)
       riskFactors.push({
         type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
