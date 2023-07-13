@@ -1,7 +1,7 @@
 import { prismaFilter } from '../../../../shared/utils/filters/prisma.filters';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, StatusEnum } from '@prisma/client';
 import { removeDuplicate } from '../../../../shared/utils/removeDuplicate';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
@@ -13,7 +13,7 @@ import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
 
 @Injectable()
 export class RiskRepository implements IRiskRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async create({ recMed, generateSource, ...createRiskDto }: CreateRiskDto, system: boolean): Promise<RiskFactorsEntity> {
     const risk = await this.prisma.riskFactors.create({
@@ -24,10 +24,10 @@ export class RiskRepository implements IRiskRepository {
           createMany: {
             data: recMed
               ? recMed.map(({ ...rm }) => ({
-                  system,
-                  companyId: createRiskDto.companyId,
-                  ...rm,
-                }))
+                system,
+                companyId: createRiskDto.companyId,
+                ...rm,
+              }))
               : [],
             skipDuplicates: true,
           },
@@ -36,10 +36,10 @@ export class RiskRepository implements IRiskRepository {
           createMany: {
             data: generateSource
               ? generateSource.map(({ ...gs }) => ({
-                  system,
-                  companyId: createRiskDto.companyId,
-                  ...gs,
-                }))
+                system,
+                companyId: createRiskDto.companyId,
+                ...gs,
+              }))
               : [],
             skipDuplicates: true,
           },
@@ -72,23 +72,23 @@ export class RiskRepository implements IRiskRepository {
           upsert: !recMed
             ? []
             : recMed.map(({ id, ...rm }) => {
-                return {
-                  create: { system, companyId, ...rm },
-                  update: { system, ...rm },
-                  where: { id: id || 'no-id' },
-                };
-              }),
+              return {
+                create: { system, companyId, ...rm },
+                update: { system, ...rm },
+                where: { id: id || 'no-id' },
+              };
+            }),
         },
         generateSource: {
           upsert: !generateSource
             ? []
             : generateSource.map(({ id, ...gs }) => {
-                return {
-                  create: { system, companyId, ...gs },
-                  update: { system, ...gs },
-                  where: { id: id || 'no-id' },
-                };
-              }),
+              return {
+                create: { system, companyId, ...gs },
+                update: { system, ...gs },
+                where: { id: id || 'no-id' },
+              };
+            }),
         },
         ...createRiskDto,
       },
@@ -110,9 +110,9 @@ export class RiskRepository implements IRiskRepository {
             data: !recMed
               ? []
               : recMed.map(({ id, ...rm }) => ({
-                  system,
-                  ...rm,
-                })),
+                system,
+                ...rm,
+              })),
             skipDuplicates: true,
           },
         },
@@ -121,9 +121,9 @@ export class RiskRepository implements IRiskRepository {
             data: !generateSource
               ? []
               : generateSource.map(({ id, ...gs }) => ({
-                  system,
-                  ...gs,
-                })),
+                system,
+                ...gs,
+              })),
             skipDuplicates: true,
           },
         },
@@ -135,23 +135,23 @@ export class RiskRepository implements IRiskRepository {
           upsert: !recMed
             ? []
             : recMed.map(({ id, ...rm }) => {
-                return {
-                  create: { system, ...rm },
-                  update: { system, ...rm },
-                  where: { id: id || 'no-id' },
-                };
-              }),
+              return {
+                create: { system, ...rm },
+                update: { system, ...rm },
+                where: { id: id || 'no-id' },
+              };
+            }),
         },
         generateSource: {
           upsert: !generateSource
             ? []
             : generateSource.map(({ id, companyId, recMeds: _, ...gs }) => {
-                return {
-                  create: { system, companyId, ...gs },
-                  update: { system, ...gs },
-                  where: { id: id || 'no-id' },
-                };
-              }),
+              return {
+                create: { system, companyId, ...gs },
+                update: { system, ...gs },
+                where: { id: id || 'no-id' },
+              };
+            }),
         },
       },
       where: { id_companyId: { companyId, id: id || 'no-id' } },
@@ -175,9 +175,9 @@ export class RiskRepository implements IRiskRepository {
                 data: !recMed
                   ? []
                   : recMed.map(({ id, ...rm }) => ({
-                      system,
-                      ...rm,
-                    })),
+                    system,
+                    ...rm,
+                  })),
                 skipDuplicates: true,
               },
             },
@@ -186,9 +186,9 @@ export class RiskRepository implements IRiskRepository {
                 data: !generateSource
                   ? []
                   : generateSource.map(({ id, ...rm }) => ({
-                      system,
-                      ...rm,
-                    })),
+                    system,
+                    ...rm,
+                  })),
                 skipDuplicates: true,
               },
             },
@@ -201,23 +201,23 @@ export class RiskRepository implements IRiskRepository {
               upsert: !recMed
                 ? []
                 : recMed.map(({ id, ...rm }) => {
-                    return {
-                      create: { system, ...rm },
-                      update: { system, ...rm },
-                      where: { id: id || 'no-id' },
-                    };
-                  }),
+                  return {
+                    create: { system, ...rm },
+                    update: { system, ...rm },
+                    where: { id: id || 'no-id' },
+                  };
+                }),
             },
             generateSource: {
               upsert: !generateSource
                 ? []
                 : generateSource.map(({ id, recMeds: _, ...gs }) => {
-                    return {
-                      create: { system, ...gs },
-                      update: { system, ...gs },
-                      where: { id: id || 'no-id' },
-                    };
-                  }),
+                  return {
+                    create: { system, ...gs },
+                    update: { system, ...gs },
+                    where: { id: id || 'no-id' },
+                  };
+                }),
             },
           },
           where: { id_companyId: { companyId, id: id || 'no-id' } },
@@ -390,7 +390,7 @@ export class RiskRepository implements IRiskRepository {
                   {
                     company: {
                       applyingServiceContracts: {
-                        some: { receivingServiceCompanyId: companyId },
+                        some: { receivingServiceCompanyId: companyId, status: 'ACTIVE' },
                       },
                     },
                   },
@@ -477,7 +477,7 @@ export class RiskRepository implements IRiskRepository {
           {
             company: {
               applyingServiceContracts: {
-                some: { receivingServiceCompanyId: userCompanyId },
+                some: { receivingServiceCompanyId: userCompanyId, status: StatusEnum.ACTIVE, },
               },
             },
           },

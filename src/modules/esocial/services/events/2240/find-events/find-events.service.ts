@@ -146,7 +146,7 @@ export class FindEvents2240ESocialService {
                   {
                     company: {
                       applyingServiceContracts: {
-                        some: { receivingServiceCompanyId: companyId },
+                        some: { receivingServiceCompanyId: companyId, status: 'ACTIVE' },
                       },
                     },
                   },

@@ -2,6 +2,7 @@ import { ExamToRisk, RiskFactors } from '@prisma/client';
 
 import { ExamEntity } from './exam.entity';
 import { RiskFactorsEntity } from './risk.entity';
+import { CompanyEntity } from 'src/modules/company/entities/company.entity';
 
 export class ExamRiskEntity implements ExamToRisk {
   id: number;
@@ -27,6 +28,7 @@ export class ExamRiskEntity implements ExamToRisk {
   minRiskDegreeQuantity: number;
   minRiskDegree: number;
   isOld: boolean; // not used
+  company?: CompanyEntity;
 
   constructor(partial: Partial<ExamRiskEntity>) {
     Object.assign(this, partial);

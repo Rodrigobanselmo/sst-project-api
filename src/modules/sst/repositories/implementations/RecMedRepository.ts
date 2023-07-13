@@ -10,7 +10,7 @@ import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class RecMedRepository implements IRecMedRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async create(createRecMedDto: CreateRecMedDto, system: boolean): Promise<RecMedEntity> {
     const redMed = await this.prisma.recMed.create({
@@ -76,10 +76,10 @@ export class RecMedRepository implements IRecMedRepository {
           },
           ...(query?.representAll
             ? [
-                {
-                  risk: { representAll: true },
-                },
-              ]
+              {
+                risk: { representAll: true },
+              },
+            ]
             : []),
         ],
       } as typeof options.where);
@@ -104,7 +104,7 @@ export class RecMedRepository implements IRecMedRepository {
           {
             company: {
               applyingServiceContracts: {
-                some: { receivingServiceCompanyId: query.companyId },
+                some: { receivingServiceCompanyId: query.companyId, status: 'ACTIVE' },
               },
             },
           },

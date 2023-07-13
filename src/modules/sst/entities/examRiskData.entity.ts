@@ -5,6 +5,7 @@ import { RiskFactorDataEntity } from './riskData.entity';
 export class ExamRiskDataEntity implements ExamToRiskData {
   examId: number;
   riskFactorDataId: string;
+  companyId: string;
   isMale: boolean;
   isFemale: boolean;
   isPeriodic: boolean;

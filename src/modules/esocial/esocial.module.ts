@@ -35,6 +35,7 @@ import { FindESocialBatchService } from './services/events/all/find-batch/find-b
 import { FindESocialEventService } from './services/events/all/find-events/find-events.service';
 import { SendBatchESocialService } from './services/events/all/send-batch/send-batch.service';
 import { FindAllTable27Service } from './services/tables/find-all-27.service';
+import { checkInternetConnectivity } from '../../shared/utils/isOnline';
 
 @Module({
   controllers: [TablesController, ESocialEventController, ESocialEvent2210Controller, ESocialEvent2220Controller, ESocialEvent2240Controller],
@@ -43,6 +44,13 @@ import { FindAllTable27Service } from './services/tables/find-all-27.service';
     SoapModule.forRootAsync({
       clientName: SoapClientEnum.PRODUCTION_RESTRICT,
       useFactory: async (): Promise<SoapModuleOptions> => {
+        const online = await checkInternetConnectivity();
+
+        if (!online) {
+          console.log('Skipping SOAP connection. Working in offline mode.');
+          return null; // Skip SOAP connection if offline
+        }
+
         const httpsAgent = new https.Agent({
           rejectUnauthorized: false,
           pfx: fs.readFileSync('cert/cert.pfx'),
@@ -63,6 +71,13 @@ import { FindAllTable27Service } from './services/tables/find-all-27.service';
     SoapModule.forRootAsync({
       clientName: SoapClientEnum.PRODUCTION,
       useFactory: async (): Promise<SoapModuleOptions> => {
+        const online = await checkInternetConnectivity();
+
+        if (!online) {
+          console.log('Skipping SOAP connection. Working in offline mode.');
+          return null; // Skip SOAP connection if offline
+        }
+
         const httpsAgent = new https.Agent({
           rejectUnauthorized: false,
           pfx: fs.readFileSync('cert/cert.pfx'),
@@ -83,6 +98,13 @@ import { FindAllTable27Service } from './services/tables/find-all-27.service';
     SoapModule.forRootAsync({
       clientName: SoapClientEnum.CONSULT_PRODUCTION_RESTRICT,
       useFactory: async (): Promise<SoapModuleOptions> => {
+        const online = await checkInternetConnectivity();
+
+        if (!online) {
+          console.log('Skipping SOAP connection. Working in offline mode.');
+          return null; // Skip SOAP connection if offline
+        }
+
         const httpsAgent = new https.Agent({
           rejectUnauthorized: false,
           pfx: fs.readFileSync('cert/cert.pfx'),
@@ -103,6 +125,13 @@ import { FindAllTable27Service } from './services/tables/find-all-27.service';
     SoapModule.forRootAsync({
       clientName: SoapClientEnum.CONSULT_PRODUCTION,
       useFactory: async (): Promise<SoapModuleOptions> => {
+        const online = await checkInternetConnectivity();
+
+        if (!online) {
+          console.log('Skipping SOAP connection. Working in offline mode.');
+          return null; // Skip SOAP connection if offline
+        }
+
         const httpsAgent = new https.Agent({
           rejectUnauthorized: false,
           pfx: fs.readFileSync('cert/cert.pfx'),
@@ -149,4 +178,4 @@ import { FindAllTable27Service } from './services/tables/find-all-27.service';
     FetchOneESocialBatchEventsService,
   ],
 })
-export class EsocialModule {}
+export class EsocialModule { }

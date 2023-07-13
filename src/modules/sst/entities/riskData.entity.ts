@@ -150,7 +150,7 @@ export class RiskFactorDataEntity implements RiskFactorData {
   }
 
   private getBaseExams() {
-    if (this.riskFactor && this.riskFactor?.examToRisk && this.standardExams) {
+    if (this.riskFactor && this.riskFactor?.examToRisk && this.standardExams != false) {
       this.riskFactor?.examToRisk.forEach((examData) => {
         if (examData?.minRiskDegreeQuantity && this.isQuantity && this.level < examData?.minRiskDegreeQuantity) return;
 
@@ -172,6 +172,7 @@ export class RiskFactorDataEntity implements RiskFactorData {
           considerBetweenDays: examData.considerBetweenDays,
           riskFactorDataId: this.id,
           toAge: examData.toAge,
+          companyId: examData.companyId,
           validityInMonths: examData.validityInMonths,
           isStandard: true,
           exam: examData?.exam,

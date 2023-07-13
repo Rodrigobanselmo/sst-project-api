@@ -65,7 +65,7 @@ export class CreateExamDto {
   // riskIds: string[];
 }
 
-export class UpdateExamDto extends PartialType(CreateExamDto) {}
+export class UpdateExamDto extends PartialType(CreateExamDto) { }
 
 export class CheckEmployeeExamDto {
   homogeneousGroupId?: string;
@@ -132,6 +132,11 @@ export class FindExamHierarchyDto {
   @IsInt()
   @IsOptional()
   employeeId?: number;
+
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  skipAllExams?: boolean;
 
   @IsBoolean()
   @ToBoolean()

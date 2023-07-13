@@ -6,7 +6,7 @@ import { FindRiskDto } from '../../../dto/risk.dto';
 
 @Injectable()
 export class FindRiskService {
-  constructor(private readonly riskRepository: RiskRepository) {}
+  constructor(private readonly riskRepository: RiskRepository) { }
 
   async execute({ skip, take, ...query }: FindRiskDto, user: UserPayloadDto) {
     const Exam = await this.riskRepository.find(
@@ -41,7 +41,7 @@ export class FindRiskService {
                 {
                   company: {
                     applyingServiceContracts: {
-                      some: { receivingServiceCompanyId: user.targetCompanyId },
+                      some: { receivingServiceCompanyId: user.targetCompanyId, status: 'ACTIVE' },
                     },
                   },
                 },

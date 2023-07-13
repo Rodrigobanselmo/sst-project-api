@@ -352,6 +352,7 @@ model Company {
   labMedicalVisits           ScheduleMedicalVisit[]           @relation(name: "medical_visit_lab")
   ImageGallery               ImageGallery[]
   UserHistory                UserHistory[]
+  ExamToRiskSkipCompany      ExamToRiskSkipCompany[]
 
   @@index([name])
   @@index([isClinic])
@@ -999,31 +1000,42 @@ model ExamToClinic {
 }
 
 model ExamToRisk {
-  id                    Int          @id @default(autoincrement())
+  id                    Int                     @id @default(autoincrement())
   examId                Int?
   riskId                String?
   companyId             String
   endDate               DateTime?
   fromAge               Int?
-  isAdmission           Boolean      @default(false)
-  isChange              Boolean      @default(false)
-  isDismissal           Boolean      @default(false)
-  isFemale              Boolean      @default(false)
-  isMale                Boolean      @default(false)
-  isPeriodic            Boolean      @default(false)
-  isReturn              Boolean      @default(false)
-  startDate             DateTime     @default(now())
+  isAdmission           Boolean                 @default(false)
+  isChange              Boolean                 @default(false)
+  isDismissal           Boolean                 @default(false)
+  isFemale              Boolean                 @default(false)
+  isMale                Boolean                 @default(false)
+  isPeriodic            Boolean                 @default(false)
+  isReturn              Boolean                 @default(false)
+  startDate             DateTime                @default(now())
   toAge                 Int?
   validityInMonths      Int?
   lowValidityInMonths   Int?
-  minRiskDegree         Int?         @default(1)
-  minRiskDegreeQuantity Int?         @default(1)
+  minRiskDegree         Int?                    @default(1)
+  minRiskDegreeQuantity Int?                    @default(1)
   considerBetweenDays   Int?
-  company               Company      @relation(fields: [companyId], references: [id])
-  exam                  Exam?        @relation(fields: [examId], references: [id])
-  risk                  RiskFactors? @relation(fields: [riskId], references: [id])
+  company               Company                 @relation(fields: [companyId], references: [id])
+  exam                  Exam?                   @relation(fields: [examId], references: [id])
+  risk                  RiskFactors?            @relation(fields: [riskId], references: [id])
+  skipCompanies         ExamToRiskSkipCompany[]
 
   @@unique([id, companyId])
+}
+
+model ExamToRiskSkipCompany {
+  id           Int        @id @default(autoincrement())
+  companyId    String
+  examToRiskId Int
+  ExamToRisk   ExamToRisk @relation(fields: [examToRiskId], references: [id], onDelete: Cascade)
+  company      Company    @relation(fields: [companyId], references: [id])
+
+  @@unique([examToRiskId, companyId])
 }
 
 model Alert {

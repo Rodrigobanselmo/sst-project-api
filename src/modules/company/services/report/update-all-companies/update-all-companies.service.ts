@@ -65,6 +65,7 @@ export class UpdateAllCompaniesService {
           },
         },
         applyingServiceContracts: {
+          where: { status: 'ACTIVE', },
           select: { receivingServiceCompanyId: true },
         },
       },

@@ -137,7 +137,7 @@ export class CompanyRepository implements ICompanyRepository {
       doctorResponsibleId,
       tecResponsibleId,
       ...updateCompanyDto
-    }: UpdateCompanyDto,
+    }: UpdateCompanyDto & { deleted_at?: Date },
     options?: IPrismaOptions<{
       primary_activity?: boolean;
       secondary_activity?: boolean;
@@ -466,6 +466,7 @@ export class CompanyRepository implements ICompanyRepository {
 
     const whereInit = {
       AND: [
+        { deleted_at: null },
         ...(companyId
           ? [
             {
@@ -671,7 +672,7 @@ export class CompanyRepository implements ICompanyRepository {
   }
 
   async findAll(query: FindCompaniesDto, pagination: PaginationQueryDto, options: Partial<Prisma.CompanyFindManyArgs> = {}) {
-    const whereInit = { AND: [] } as typeof options.where;
+    const whereInit = { AND: [{ deleted_at: null }] } as typeof options.where;
 
     if (query.findAll) {
       delete query.isGroup;
@@ -958,6 +959,23 @@ export class CompanyRepository implements ICompanyRepository {
   async findNude(options: Prisma.CompanyFindManyArgs = {}) {
     const data = await this.prisma.company.findMany({
       ...options,
+      where: { deleted_at: null, ...options.where },
+    });
+
+    return data.map((data) => new CompanyEntity(data));
+  }
+
+  async findConsultant(companyId: string, options: Prisma.CompanyFindManyArgs = {}) {
+    const data = await this.prisma.company.findMany({
+      ...options,
+      where: {
+        applyingServiceContracts: {
+          some: {
+            status: 'ACTIVE',
+            receivingServiceCompanyId: companyId,
+          }
+        }, ...options.where
+      },
     });
 
     return data.map((data) => new CompanyEntity(data));

@@ -11,7 +11,7 @@ let i = 0;
 
 @Injectable()
 export class ExamRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async create({ ...createExamDto }: CreateExamDto & { system: boolean }): Promise<ExamEntity> {
     const redMed = await this.prisma.exam.create({
@@ -71,7 +71,7 @@ export class ExamRepository {
           {
             company: {
               applyingServiceContracts: {
-                some: { receivingServiceCompanyId: query.companyId },
+                some: { receivingServiceCompanyId: query.companyId, status: 'ACTIVE' },
               },
             },
           },

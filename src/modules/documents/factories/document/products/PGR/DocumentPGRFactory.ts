@@ -284,30 +284,30 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
     const attachments = options.attachments;
     const imagesMap = options.data?.imagesMap;
 
-    writeFileSync('tmp/buildData.txt', JSON.stringify({
-      version,
-      document: { ...data.riskGroupData, ...data.documentData, ...(data.documentData.json && ((data.documentData as any).json as DocumentDataPGRDto)) },
-      attachments: attachments.map((attachment) => {
-        return {
-          ...attachment,
-          url: attachment.link,
-        };
-      }),
-      logo: data.logo,
-      consultantLogo: data.consultantLogo,
-      company: data.company,
-      workspace: data.workspace,
-      versions: data.versions,
-      environments: data.characterizations,
-      hierarchy: data.hierarchyData,
-      homogeneousGroup: data.homoGroupTree,
-      characterizations: data.characterizations,
-      hierarchyTree: data.hierarchyTree,
-      cover: data.cover,
-      docSections: data.modelData,
-      imagesMap,
-      hierarchyHighLevelsData: data.hierarchyHighLevelsData,
-    }));
+    // writeFileSync('tmp/buildData.txt', JSON.stringify({
+    //   version,
+    //   document: { ...data.riskGroupData, ...data.documentData, ...(data.documentData.json && ((data.documentData as any).json as DocumentDataPGRDto)) },
+    //   attachments: attachments.map((attachment) => {
+    //     return {
+    //       ...attachment,
+    //       url: attachment.link,
+    //     };
+    //   }),
+    //   logo: data.logo,
+    //   consultantLogo: data.consultantLogo,
+    //   company: data.company,
+    //   workspace: data.workspace,
+    //   versions: data.versions,
+    //   environments: data.characterizations,
+    //   hierarchy: data.hierarchyData,
+    //   homogeneousGroup: data.homoGroupTree,
+    //   characterizations: data.characterizations,
+    //   hierarchyTree: data.hierarchyTree,
+    //   cover: data.cover,
+    //   docSections: data.modelData,
+    //   imagesMap,
+    //   hierarchyHighLevelsData: data.hierarchyHighLevelsData,
+    // }));
 
     return {
       version,

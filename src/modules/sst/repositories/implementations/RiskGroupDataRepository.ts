@@ -98,7 +98,7 @@ export class RiskGroupDataRepository {
                       {
                         company: {
                           applyingServiceContracts: {
-                            some: { receivingServiceCompanyId: companyId },
+                            some: { receivingServiceCompanyId: companyId, status: 'ACTIVE' },
                           },
                         },
                       },
@@ -180,7 +180,7 @@ export class RiskGroupDataRepository {
                       {
                         company: {
                           applyingServiceContracts: {
-                            some: { receivingServiceCompanyId: companyId },
+                            some: { receivingServiceCompanyId: companyId, status: 'ACTIVE' },
                           },
                         },
                       },

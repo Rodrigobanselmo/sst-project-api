@@ -10,7 +10,7 @@ import { DocumentModelEntity } from './../../entities/document-model.entity';
 
 @Injectable()
 export class DocumentModelRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async create({ data, ...props }: CreateDocumentModelDto & { data: IDocumentModelData; system?: boolean }) {
     const buffer = Buffer.from(JSON.stringify(data), 'utf8');
@@ -46,7 +46,7 @@ export class DocumentModelRepository {
               companyId: query.companyId,
             },
             {
-              company: { applyingServiceContracts: { some: { receivingServiceCompanyId: query.companyId } } },
+              company: { applyingServiceContracts: { some: { receivingServiceCompanyId: query.companyId, status: 'ACTIVE' } } },
             },
             ...(query.all ? [{ company: { receivingServiceContracts: { some: { applyingServiceCompanyId: query.companyId } } } }] : []),
           ],

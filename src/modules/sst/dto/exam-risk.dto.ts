@@ -99,6 +99,14 @@ export class UpdateExamRiskDto extends PartialType(CreateExamsRiskDto) {
   @IsInt()
   @IsOptional()
   id?: number;
+
+  @IsOptional()
+  @IsString()
+  realCompanyId?: string;
+
+  @IsOptional()
+  @IsString()
+  addSkipCompanyId?: string;
 }
 
 export class CopyExamsRiskDto {
@@ -126,5 +134,9 @@ export class FindExamRiskDto extends PaginationQueryDto {
 
   @IsString()
   @IsOptional()
-  companyId?: string;
+  companyId?: string | string[];
+
+  @IsString()
+  @IsOptional()
+  targetCompanyId?: string;
 }

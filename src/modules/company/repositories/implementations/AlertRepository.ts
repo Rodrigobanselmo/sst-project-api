@@ -7,7 +7,7 @@ import { AlertEntity } from '../../entities/alert.entity';
 
 @Injectable()
 export class AlertRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async upsert({
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -81,6 +81,7 @@ export class AlertRepository {
               isClinic: false,
               applyingServiceContracts: {
                 some: {
+                  status: 'ACTIVE',
                   receivingServiceCompanyId: companyId,
                 },
               },

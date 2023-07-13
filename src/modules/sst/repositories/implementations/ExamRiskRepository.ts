@@ -10,7 +10,7 @@ import { ExamRiskEntity } from '../../entities/examRisk.entity';
 
 @Injectable()
 export class ExamRiskRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async create({ ...createExamsRiskDto }: CreateExamsRiskDto): Promise<ExamRiskEntity> {
     const redMed = await this.prisma.examToRisk.create({
@@ -22,10 +22,17 @@ export class ExamRiskRepository {
     return new ExamRiskEntity(redMed);
   }
 
-  async update({ id, companyId, ...createExamsRiskDto }: UpdateExamRiskDto): Promise<ExamRiskEntity> {
+  async update({ id, companyId, addSkipCompanyId, ...createExamsRiskDto }: UpdateExamRiskDto): Promise<ExamRiskEntity> {
     const Exam = await this.prisma.examToRisk.update({
       data: {
         ...createExamsRiskDto,
+        ...(addSkipCompanyId && {
+          skipCompanies: {
+            create: {
+              companyId: addSkipCompanyId,
+            }
+          }
+        })
       },
       where: { id_companyId: { companyId, id: id || 0 } },
     });
@@ -35,14 +42,14 @@ export class ExamRiskRepository {
 
   async find(query: Partial<FindExamRiskDto>, pagination: PaginationQueryDto, options: Prisma.ExamToRiskFindManyArgs = {}) {
     const whereInit = {
-      AND: [],
+      AND: [{ skipCompanies: { none: { companyId: query.targetCompanyId } } }],
     } as typeof options.where;
 
     const include = { ...options?.include };
 
     const { where } = prismaFilter(whereInit, {
       query,
-      skip: ['search'],
+      skip: ['search', 'targetCompanyId'],
     });
 
     if ('search' in query && query.search) {
@@ -60,7 +67,7 @@ export class ExamRiskRepository {
         include: Object.keys(include).length > 0 ? include : undefined,
         take: pagination.take || 20,
         skip: pagination.skip || 0,
-        orderBy: { risk: { name: 'asc' } },
+        orderBy: [{ risk: { representAll: 'desc' } }, { risk: { name: 'asc' } }, { exam: { name: 'asc' } }],
       }),
     ]);
 

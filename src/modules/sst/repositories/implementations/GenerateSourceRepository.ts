@@ -10,7 +10,7 @@ import { IGenerateSourceRepository } from '../IGenerateSourceRepository.types';
 
 @Injectable()
 export class GenerateSourceRepository implements IGenerateSourceRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async create({ recMeds, ...createGenerateSourceDto }: CreateGenerateSourceDto, system: boolean): Promise<GenerateSourceEntity> {
     const hasRecMed = recMeds ? recMeds.filter(({ recName, medName }) => recName || medName).length > 0 : false;
@@ -21,16 +21,16 @@ export class GenerateSourceRepository implements IGenerateSourceRepository {
         system,
         recMeds: hasRecMed
           ? {
-              createMany: {
-                data: recMeds.map(({ ...rm }) => ({
-                  system,
-                  ...rm,
-                  riskId: createGenerateSourceDto.riskId,
-                  companyId: createGenerateSourceDto.companyId,
-                })),
-                skipDuplicates: true,
-              },
-            }
+            createMany: {
+              data: recMeds.map(({ ...rm }) => ({
+                system,
+                ...rm,
+                riskId: createGenerateSourceDto.riskId,
+                companyId: createGenerateSourceDto.companyId,
+              })),
+              skipDuplicates: true,
+            },
+          }
           : undefined,
       },
       include: { recMeds: true },
@@ -51,14 +51,14 @@ export class GenerateSourceRepository implements IGenerateSourceRepository {
           upsert: !recMeds
             ? []
             : recMeds
-                .filter(({ recName, medName }) => recName || medName)
-                .map(({ id, ...rm }) => {
-                  return {
-                    create: { system, companyId, ...rm, riskId },
-                    update: { system, ...rm, riskId },
-                    where: { id: id || 'no-id' },
-                  };
-                }),
+              .filter(({ recName, medName }) => recName || medName)
+              .map(({ id, ...rm }) => {
+                return {
+                  create: { system, companyId, ...rm, riskId },
+                  update: { system, ...rm, riskId },
+                  where: { id: id || 'no-id' },
+                };
+              }),
         },
       },
       where: { id_companyId: { companyId, id: id || 'no-id' } },
@@ -138,7 +138,7 @@ export class GenerateSourceRepository implements IGenerateSourceRepository {
           {
             company: {
               applyingServiceContracts: {
-                some: { receivingServiceCompanyId: query.companyId },
+                some: { receivingServiceCompanyId: query.companyId, status: 'ACTIVE' },
               },
             },
           },
