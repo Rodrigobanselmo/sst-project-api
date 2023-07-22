@@ -6,16 +6,18 @@ import { IPayloadToken, ITokenProvider } from '../models/ITokenProvider.types';
 
 @Injectable()
 export class JwtTokenProvider implements ITokenProvider {
-  constructor(private readonly jwtService: JwtService, private readonly dateProvider: DayJSProvider) {}
+  constructor(private readonly jwtService: JwtService, private readonly dateProvider: DayJSProvider) { }
 
   public generateToken(payload: IPayloadToken): string {
     const token = this.jwtService.sign(payload);
     return token;
   }
 
-  public generateRefreshToken(userId: number): [string, Date] {
+  public generateRefreshToken(userId: number, options?: { isApp?: boolean }): [string, Date] {
     const secret_refresh_token = process.env.REFRESH_TOKEN_SECRET;
-    const expires_in_refresh_token = process.env.REFRESH_TOKEN_EXPIRES;
+    let expires_in_refresh_token = process.env.REFRESH_TOKEN_EXPIRES;
+
+    if (options.isApp) expires_in_refresh_token = '300h'
 
     const dateNow = this.dateProvider.dateNow();
     const lastChar = expires_in_refresh_token.slice(-1);

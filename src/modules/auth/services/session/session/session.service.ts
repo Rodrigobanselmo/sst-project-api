@@ -24,7 +24,7 @@ export class SessionService {
     private readonly firebaseProvider: FirebaseProvider
   ) { }
 
-  async execute({ email, password, userEntity }: LoginUserDto & { userEntity?: UserEntity }, ip: string, userAgent: string) {
+  async execute({ email, password, userEntity, isApp }: LoginUserDto & { userEntity?: UserEntity }, ip: string, userAgent: string) {
     const user = userEntity ? userEntity : await this.validateUser(email, password);
 
     const companies = user.companies
@@ -50,7 +50,7 @@ export class SessionService {
 
     const token = this.jwtTokenProvider.generateToken(payload);
 
-    const [refresh_token, refreshTokenExpiresDate] = this.jwtTokenProvider.generateRefreshToken(user.id);
+    const [refresh_token, refreshTokenExpiresDate] = this.jwtTokenProvider.generateRefreshToken(user.id, { isApp });
 
     const newRefreshToken = await this.refreshTokensRepository.create(refresh_token, user.id, refreshTokenExpiresDate);
 

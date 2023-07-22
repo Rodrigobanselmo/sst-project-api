@@ -2702,11 +2702,6 @@
     "@webassemblyjs/ast" "1.11.1"
     "@xtuc/long" "4.2.2"
 
-"@xmldom/xmldom@^0.7.0":
-  version "0.7.6"
-  resolved "https://registry.yarnpkg.com/@xmldom/xmldom/-/xmldom-0.7.6.tgz#6f55073fa73e65776bd85826958b98c8cd1457b5"
-  integrity sha512-HHXP9hskkFQHy8QxxUXkS7946FFIhYVfGqsk0WLwllmexN9x/+R4UBLvurHEuyXRfVEObVR8APuQehykLviwSQ==
-
 "@xmldom/xmldom@^0.8.3":
   version "0.8.3"
   resolved "https://registry.yarnpkg.com/@xmldom/xmldom/-/xmldom-0.8.3.tgz#beaf980612532aa9a3004aff7e428943aeaa0711"
@@ -2716,6 +2711,11 @@
   version "0.8.6"
   resolved "https://registry.yarnpkg.com/@xmldom/xmldom/-/xmldom-0.8.6.tgz#8a1524eb5bd5e965c1e3735476f0262469f71440"
   integrity sha512-uRjjusqpoqfmRkTaNuLJ2VohVr67Q5YwDATW3VU7PfzTj6IRaihGrYI7zckGZjxQPBIp63nfvJbM+Yu5ICh0Bg==
+
+"@xmldom/xmldom@^0.8.8":
+  version "0.8.9"
+  resolved "https://registry.yarnpkg.com/@xmldom/xmldom/-/xmldom-0.8.9.tgz#b6ef7457e826be8049667ae673eda7876eb049be"
+  integrity sha512-4VSbbcMoxc4KLjb1gs96SRmi7w4h1SF+fCoiK0XaQX62buCc1G5d0DC5bJ9xJBNPDSVCmIrcl8BiYxzjrqaaJA==
 
 "@xtuc/ieee754@^1.2.0":
   version "1.2.0"
@@ -4096,10 +4096,10 @@ dev-null@^0.1.1:
   resolved "https://registry.yarnpkg.com/dev-null/-/dev-null-0.1.1.tgz#5a205ce3c2b2ef77b6238d6ba179eb74c6a0e818"
   integrity sha512-nMNZG0zfMgmdv8S5O0TM5cpwNbGKRGPCxVsr0SmA3NZZy9CYBbuNLL0PD3Acx9e5LIUgwONXtM9kM6RlawPxEQ==
 
-dezalgo@1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/dezalgo/-/dezalgo-1.0.3.tgz#7f742de066fc748bc8db820569dddce49bf0d456"
-  integrity sha512-K7i4zNfT2kgQz3GylDw40ot9GAE47sFZ9EXHFSPP6zONLgH6kWXE0KWJchkbQJLBkRazq4APwZ4OwiFFlT95OQ==
+dezalgo@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/dezalgo/-/dezalgo-1.0.4.tgz#751235260469084c132157dfa857f386d4c33d81"
+  integrity sha512-rXSP0bf+5n0Qonsb+SVVfNfIsimO4HEtmnIpPHY8Q1UCzKlQrDMfdobr8nJOOsRgWCyMRqeSBQzmWUMq7zvVig==
   dependencies:
     asap "^2.0.0"
     wrappy "1"
@@ -5008,15 +5008,14 @@ formidable@^1.2.2:
   resolved "https://registry.npmjs.org/formidable/-/formidable-1.2.2.tgz"
   integrity sha512-V8gLm+41I/8kguQ4/o1D3RIHRmhYFG4pnNyonvua+40rqcEmT4+V71yaZ3B457xbbgCsCfjSPi65u/W6vK1U5Q==
 
-formidable@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/formidable/-/formidable-2.0.1.tgz#4310bc7965d185536f9565184dee74fbb75557ff"
-  integrity sha512-rjTMNbp2BpfQShhFbR3Ruk3qk2y9jKpvMW78nJgx8QKtxjDVrwbZG+wvDOmVbifHyOUOQJXxqEy6r0faRrPzTQ==
+formidable@^3.2.4:
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/formidable/-/formidable-3.5.0.tgz#3605a9325130d05c550d57be8e81d1757baa12d6"
+  integrity sha512-WwsMWvPmY+Kv37C3+KP3A+2Ym1aZoac4nz4ZEe5z0UPBoCg0O/wHay3eeYkZr4KJIbCzpSUeno+STMhde+KCfw==
   dependencies:
-    dezalgo "1.0.3"
-    hexoid "1.0.0"
-    once "1.4.0"
-    qs "6.9.3"
+    dezalgo "^1.0.4"
+    hexoid "^1.0.0"
+    once "^1.4.0"
 
 forwarded@0.2.0:
   version "0.2.0"
@@ -5384,7 +5383,7 @@ has@^1.0.3:
   dependencies:
     function-bind "^1.1.1"
 
-hexoid@1.0.0:
+hexoid@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/hexoid/-/hexoid-1.0.0.tgz#ad10c6573fb907de23d9ec63a711267d9dc9bc18"
   integrity sha512-QFLV0taWQOZtvIRIAdBChesmogZrtuXvVWsFHZTk2SU+anspqZ2vMnoLg7IE1+Uk16N19APic1BuF8bC8c2m5g==
@@ -7152,12 +7151,12 @@ nest-winston@^1.9.2:
   dependencies:
     fast-safe-stringify "^2.1.1"
 
-nestjs-soap@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/nestjs-soap/-/nestjs-soap-3.0.0.tgz#c2ba13c7db3e001b99e910c8b90e0321d625a187"
-  integrity sha512-XJwtFjCBLPbEgSCizaJnrMRDYs1a5Z4/B3Ieike9KZxr5ZLTCP43cLO2EJwopx7QDotIkJN7zG8il8TTvsVBAQ==
+nestjs-soap@^3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/nestjs-soap/-/nestjs-soap-3.0.2.tgz#de245fe57bd191da8f07db735ffd94487cd46b12"
+  integrity sha512-aeoh9BnISVV3agy74Ni9OlbCmelatllUt8sHgZ5/MwsKYYXNEY71+BKBmz1Dn2XMYprmgyW3U+pMgGfb5Lfl6w==
   dependencies:
-    soap "^0.45.0"
+    soap "^1.0.0"
 
 nestjs-telegram@^1.2.0:
   version "1.2.0"
@@ -7356,7 +7355,7 @@ on-finished@^2.3.0, on-finished@~2.3.0:
   dependencies:
     ee-first "1.1.1"
 
-once@1.4.0, once@^1.3.0, once@^1.3.1, once@^1.4.0:
+once@^1.3.0, once@^1.3.1, once@^1.4.0:
   version "1.4.0"
   resolved "https://registry.npmjs.org/once/-/once-1.4.0.tgz"
   integrity sha1-WDsap3WWHUsROsF9nFC6753Xa9E=
@@ -7916,11 +7915,6 @@ qs@6.7.0:
   resolved "https://registry.npmjs.org/qs/-/qs-6.7.0.tgz"
   integrity sha512-VCdBRNFTX1fyE7Nb6FYoURo/SPe62QCaAyzJvUjwRaIsc+NePBEniHlvxFmmX56+HZphIGtV0XeCirBtpDrTyQ==
 
-qs@6.9.3:
-  version "6.9.3"
-  resolved "https://registry.yarnpkg.com/qs/-/qs-6.9.3.tgz#bfadcd296c2d549f1dffa560619132c977f5008e"
-  integrity sha512-EbZYNarm6138UKKq46tdx08Yo/q9ZhFoAXAI1meAFd2GtbRDhbZY2WQSICskT0c5q99aFzLG1D4nvTk9tqfXIw==
-
 qs@^6.9.4:
   version "6.10.1"
   resolved "https://registry.npmjs.org/qs/-/qs-6.10.1.tgz"
@@ -8439,21 +8433,21 @@ soap-x509-http@^1.0.2:
     request "^2.79.0"
     ws.js "~2.0.0"
 
-soap@^0.45.0:
-  version "0.45.0"
-  resolved "https://registry.yarnpkg.com/soap/-/soap-0.45.0.tgz#6772e25da4b407bdba63b60fa615d94fd87cb988"
-  integrity sha512-t2wgZaWQCL8htPxpHzwW1Sw/Qy22Ls6my1X9ajMMXcmNYLlO4ogk10T0A+J8p4/6xHUQthfe2J3Ys1e9/sqS5w==
+soap@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/soap/-/soap-1.0.0.tgz#3273d8cb7bcbe99a69ad9a35fc6b087a9dc3a316"
+  integrity sha512-GB5GuKjWFtAPP0IaM4tKUvdF4dFlaz4iujLPg0DsCy9qAAgm5/g+SI+P9e6igWWwXZ74CC5Uo0VEEz8lte0CJA==
   dependencies:
     axios-ntlm "^1.2.0"
     debug "^4.3.2"
-    formidable "^2.0.1"
+    formidable "^3.2.4"
     get-stream "^6.0.1"
     lodash "^4.17.21"
     sax ">=0.6"
     strip-bom "^3.0.0"
     uuid "^8.3.2"
     whatwg-mimetype "3.0.0"
-    xml-crypto "^2.1.3"
+    xml-crypto "^3.0.0"
 
 socks-proxy-agent@5, socks-proxy-agent@^5.0.0:
   version "5.0.1"
@@ -9610,12 +9604,12 @@ xml-crypto@>=0.0.4:
     "@xmldom/xmldom" "^0.8.3"
     xpath "0.0.32"
 
-xml-crypto@^2.1.3:
-  version "2.1.4"
-  resolved "https://registry.yarnpkg.com/xml-crypto/-/xml-crypto-2.1.4.tgz#85b3c62fa0debc4956ee72cb2dfee65651e865b5"
-  integrity sha512-ModFeGOy67L/XXHcuepnYGF7DASEDw7fhvy+qIs1ORoH55G1IIr+fN0kaMtttwvmNFFMskD9AHro8wx352/mUg==
+xml-crypto@^3.0.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/xml-crypto/-/xml-crypto-3.2.0.tgz#a9debab572c8e895cff5fb351a8d8be3f6e1962e"
+  integrity sha512-qVurBUOQrmvlgmZqIVBqmb06TD2a/PpEUfFPgD7BuBfjmoH4zgkqaWSIJrnymlCvM2GGt9x+XtJFA+ttoAufqg==
   dependencies:
-    "@xmldom/xmldom" "^0.7.0"
+    "@xmldom/xmldom" "^0.8.8"
     xpath "0.0.32"
 
 xml-crypto@^3.0.1:

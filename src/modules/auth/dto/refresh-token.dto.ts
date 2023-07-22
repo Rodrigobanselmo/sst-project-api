@@ -1,4 +1,5 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
+import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
 export class RefreshTokenDto {
   @IsString()
@@ -7,4 +8,9 @@ export class RefreshTokenDto {
   @IsOptional()
   @IsString()
   readonly companyId?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  @ToBoolean()
+  isApp?: boolean;
 }

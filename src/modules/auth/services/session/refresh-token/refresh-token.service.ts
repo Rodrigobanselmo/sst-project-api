@@ -15,7 +15,7 @@ export class RefreshTokenService {
     private readonly jwtTokenProvider: JwtTokenProvider,
   ) { }
 
-  async execute(refresh_token: string, companyId?: string) {
+  async execute(refresh_token: string, companyId?: string, options?: { isApp?: boolean }) {
     const sub = this.jwtTokenProvider.verifyIsValidToken(refresh_token, 'refresh');
 
     if (sub === 'expired') {
@@ -58,7 +58,7 @@ export class RefreshTokenService {
     };
 
     const token = this.jwtTokenProvider.generateToken(payloadToken);
-    const [new_refresh_token, refreshTokenExpiresDate] = this.jwtTokenProvider.generateRefreshToken(user.id);
+    const [new_refresh_token, refreshTokenExpiresDate] = this.jwtTokenProvider.generateRefreshToken(user.id, { isApp: options?.isApp });
 
     const refreshToken = await this.refreshTokensRepository.create(new_refresh_token, user.id, refreshTokenExpiresDate);
 

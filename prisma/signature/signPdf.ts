@@ -1,6 +1,6 @@
 import { getPfxData } from './../../src/shared/utils/getPfxData';
 
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync, createWriteStream } from 'fs';
 import {
     PDFArray,
     PDFDocument,
@@ -71,7 +71,7 @@ export const signPdf = async () => {
 
     // const fileInputPath = fileOutputPath_before || 'prisma/signature/aso.pdf';
     const fileInputPath = 'prisma/signature/aso.pdf';
-    const fileOutputPath = `tmp/a1-${v4()}.pdf`;
+    const fileOutputPath = `tmp/a1-${(new Date()).getTime()}.pdf`;
     const certPath = `cert/cert_alex.pfx`;
     const passphrase = '230296';
 
@@ -84,11 +84,32 @@ export const signPdf = async () => {
         throw new BadRequestException(`Command execution failed with error: ${error.message}`);
     }
 
-    const SIGNATURE_LENGTH = 100000;
     const pdfBuffer = readFileSync(fileOutputPath);
     const p12Buffer = readFileSync(certPath);
+    const SIGNATURE_LENGTH = p12Buffer.length * 2;
 
     const date = new Date();
+
+
+    //! simple
+    // const pdfBufferToSign = plainAddPlaceholder({
+    //     pdfBuffer,
+    //     reason: 'Signed Certificate.',
+    //     contactInfo: 'sign@example.com',
+    //     name: 'Example',
+    //     location: 'Jakarta',
+    //     signatureLength: p12Buffer.length,
+    // });
+
+    // const signer = new SignPdf()
+    // const signedPdf = signer.sign(pdfBufferToSign, p12Buffer, { passphrase: passphrase });
+    // const bufferPdf = Buffer.from(signedPdf)
+
+    // const pathSignedPdf2 = 'signed.pdf'
+    // createWriteStream(pathSignedPdf2).write(bufferPdf);
+
+    // return
+
 
     const formattedTime = date.toLocaleString('pt-BR', {
         timeZone: 'America/Sao_Paulo',

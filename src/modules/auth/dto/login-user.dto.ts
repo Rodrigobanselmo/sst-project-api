@@ -1,4 +1,5 @@
-import { IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsBoolean, IsEmail, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
 export class LoginUserDto {
   @IsString()
@@ -12,6 +13,11 @@ export class LoginUserDto {
   //   message: 'password too weak',
   // })
   readonly password?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  @ToBoolean()
+  isApp?: boolean;
 }
 
 export class LoginGoogleUserDto {

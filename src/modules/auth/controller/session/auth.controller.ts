@@ -40,9 +40,9 @@ export class AuthController {
 
   @Public()
   @Post('refresh')
-  refresh(@Body() { refresh_token, companyId }: RefreshTokenDto) {
+  refresh(@Body() { refresh_token, companyId, isApp }: RefreshTokenDto) {
 
-    return this.refreshTokenService.execute(refresh_token, companyId);
+    return this.refreshTokenService.execute(refresh_token, companyId, { isApp });
   }
 
   @Public()
