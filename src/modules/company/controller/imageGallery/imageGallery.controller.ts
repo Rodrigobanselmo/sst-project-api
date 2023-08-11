@@ -82,7 +82,7 @@ export class ImageGalleryController {
         } as Express.Multer.File
 
         console.log('adding image ' + fileName)
-        await this.createImageGalleyService.execute(body, user, sss);
+        await this.createImageGalleyService.execute({ companyId: user.targetCompanyId, name: fileName, types: ['PGR'] }, user, sss);
         console.log('added image ' + fileName)
       }
     });
