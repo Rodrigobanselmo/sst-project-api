@@ -1,9 +1,11 @@
+import { prismaFilter } from './../../../../shared/utils/filters/prisma.filters';
+import { PaginationQueryDto } from './../../../../shared/dto/pagination.dto';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
-import { WorkspaceDto } from '../../dto/workspace.dto';
+import { FindWorkspaceDto, WorkspaceDto } from '../../dto/workspace.dto';
 import { WorkspaceEntity } from '../../entities/workspace.entity';
 
 interface IWorkspaceCompany extends WorkspaceDto {
@@ -12,7 +14,7 @@ interface IWorkspaceCompany extends WorkspaceDto {
 
 @Injectable()
 export class WorkspaceRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async create({ address, companyId, ...workspaceDto }: IWorkspaceCompany): Promise<WorkspaceEntity> {
     const workspace = await this.prisma.workspace.create({
@@ -21,8 +23,8 @@ export class WorkspaceRepository {
         companyId: companyId,
         address: address
           ? {
-              create: { ...address },
-            }
+            create: { ...address },
+          }
           : undefined,
       },
       include: {
@@ -56,5 +58,59 @@ export class WorkspaceRepository {
     });
 
     return [...workspaces.map((workspace) => new WorkspaceEntity(workspace))];
+  }
+
+  async find(query: Partial<FindWorkspaceDto>, pagination: PaginationQueryDto, options: Prisma.WorkspaceFindManyArgs = {}) {
+    const whereInit = {
+      AND: [
+        // {
+        //   OR: [
+        //     { companyId: query.companyId },
+        //     {
+        //       company: {
+        //         group: { companies: { some: { companyId: query.companyId } } },
+        //       },
+        //     },
+        //   ],
+        // },
+      ],
+    } as typeof options.where;
+
+    const { where } = prismaFilter(whereInit, {
+      query,
+      skip: ['search', 'companiesIds'],
+    });
+
+    if ('search' in query && query.search) {
+      (where.AND as any).push({
+        OR: [{ name: { contains: query.search, mode: 'insensitive' } }],
+      } as typeof options.where);
+      delete query.search;
+    }
+
+    if ('companiesIds' in query) {
+      (where.AND as any).push({
+        companyId: { in: query.companiesIds },
+      } as typeof options.where);
+      delete query.companiesIds;
+    }
+
+    const response = await this.prisma.$transaction([
+      this.prisma.workspace.count({
+        where,
+      }),
+      this.prisma.workspace.findMany({
+        ...options,
+        where,
+        take: pagination.take || 20,
+        skip: pagination.skip || 0,
+        orderBy: { name: 'asc' },
+      }),
+    ]);
+
+    return {
+      data: response[1].map((contact) => new WorkspaceEntity(contact)),
+      count: response[0],
+    };
   }
 }

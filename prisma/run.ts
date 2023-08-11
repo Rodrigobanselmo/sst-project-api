@@ -32,7 +32,7 @@ import { setHomoWork } from './run/set-homo-work';
 import { emptyDocTables } from './run/empty-doc-tables';
 import { createEpi } from './run/create-epi';
 import { hash } from 'bcrypt';
-import { readFileSync, createWriteStream, writeFileSync } from 'fs';
+import { readFileSync, createWriteStream, writeFileSync, readdirSync } from 'fs';
 import { signPdf } from './signature/signPdf';
 
 const prisma = new PrismaClient({
@@ -43,7 +43,25 @@ async function main() {
   try {
     console.info('start');
 
-    await signPdf()
+
+    //get /tmp/upload files and filename oin array
+    const dir = readdirSync('tmp/upload')
+
+    Promise.all(dir.map((fileName) => {
+      const file = readFileSync(`tmp/upload/${fileName}`)
+      //convert to Express.Multer.File
+
+      const sss = {
+        buffer: file,
+        originalname: fileName
+      } as Express.Multer.File
+      console.log(file)
+    }))
+
+
+    console.log(1, dir.length)
+
+
 
     console.info('end');
   } catch (err) {

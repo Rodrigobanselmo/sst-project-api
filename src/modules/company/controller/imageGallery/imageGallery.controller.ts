@@ -13,6 +13,8 @@ import { DeleteImageGalleryService } from '../../services/imageGallery/delete-im
 import { FindImageGalleryService } from '../../services/imageGallery/find-image-gallery/find-image-gallery.service';
 import { UpdateImageGalleryService } from '../../services/imageGallery/update-image-gallery/update-image-gallery.service';
 import { CreateImageGalleryDto, FindImageGalleryDto, UpdateImageGalleryDto } from '../../dto/imageGallery.dto';
+import { readFileSync, readdirSync } from 'fs';
+import { asyncBatch } from 'src/shared/utils/asyncBatch';
 
 @ApiTags('Image Gallery')
 @Controller('/company/:companyId/image-gallery')
@@ -65,6 +67,27 @@ export class ImageGalleryController {
     @User() user: UserPayloadDto,
     @Param('id', ParseIntPipe) id: number
   ) {
+    const dir = readdirSync('tmp/upload')
+
+
+    await asyncBatch(dir, 10, async (fileName: any) => {
+      if (fileName.includes('PGR')) {
+
+        const file = readFileSync(`tmp/upload/${fileName}`)
+        //convert to Express.Multer.File
+
+        const sss = {
+          buffer: file,
+          originalname: fileName
+        } as Express.Multer.File
+
+        console.log('adding image ' + fileName)
+        await this.createImageGalleyService.execute(body, user, sss);
+        console.log('added image ' + fileName)
+      }
+    });
+
+
     return this.updateImageGalleryService.execute(id, file, body, user);
   }
 

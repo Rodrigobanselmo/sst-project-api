@@ -165,6 +165,8 @@ import { FindImageGalleryService } from './services/imageGallery/find-image-gall
 import { DeleteImageGalleryService } from './services/imageGallery/delete-image-gallery/delete-image-gallery.service';
 import { ImageGalleryRepository } from './repositories/implementations/ImageGalleryRepository';
 import { ImageGalleryController } from './controller/imageGallery/imageGallery.controller';
+import { FindWorkspaceService } from './services/workspace/find-workspace/find-workspace.service';
+import { WorkspaceController } from './controller/workspace/workspace.controller';
 
 @Module({
   imports: [
@@ -194,6 +196,7 @@ import { ImageGalleryController } from './controller/imageGallery/imageGallery.c
     AlertController,
     ScheduleMedicalVisitController,
     ImageGalleryController,
+    WorkspaceController
   ],
   providers: [
     CreateCompanyService,
@@ -340,7 +343,8 @@ import { ImageGalleryController } from './controller/imageGallery/imageGallery.c
     CreateImageGalleyService,
     DeleteImageGalleryService,
     FindImageGalleryService,
-    ImageGalleryRepository
+    ImageGalleryRepository,
+    FindWorkspaceService
   ],
   exports: [
     CompanyRepository,

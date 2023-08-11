@@ -60,8 +60,7 @@ export class FindContactDto extends PaginationQueryDto {
   search?: string;
 
   @IsString()
-  @IsOptional()
-  companyId?: string;
+  companyId: string;
 
   @Transform(QueryArray, { toClassOnly: true })
   @IsString({ each: true })

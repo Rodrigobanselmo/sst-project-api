@@ -1,3 +1,5 @@
+import { QueryArray } from './../../../shared/transformers/query-array';
+import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
 import { CnpjFormatTransform } from './../../../shared/transformers/cnpj-format.transform';
 import { Prisma, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
@@ -54,4 +56,19 @@ export class WorkspaceDto {
   @IsDefined()
   @Type(() => AddressDto)
   readonly address: AddressDto;
+}
+
+export class FindWorkspaceDto extends PaginationQueryDto {
+  @IsString()
+  @IsOptional()
+  search?: string;
+
+  @IsString()
+  @IsOptional()
+  companyId?: string;
+
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsString({ each: true })
+  @IsOptional()
+  companiesIds?: string[];
 }
