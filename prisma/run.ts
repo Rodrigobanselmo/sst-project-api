@@ -43,26 +43,6 @@ async function main() {
   try {
     console.info('start');
 
-
-    //get /tmp/upload files and filename oin array
-    const dir = readdirSync('tmp/upload')
-
-    Promise.all(dir.map((fileName) => {
-      const file = readFileSync(`tmp/upload/${fileName}`)
-      //convert to Express.Multer.File
-
-      const sss = {
-        buffer: file,
-        originalname: fileName
-      } as Express.Multer.File
-      console.log(file)
-    }))
-
-
-    console.log(1, dir.length)
-
-
-
     console.info('end');
   } catch (err) {
     console.error(err);
