@@ -41,6 +41,7 @@ export class UpdateImageGalleryDto {
   @IsOptional()
   @IsString()
   companyId: string;
+
 }
 
 

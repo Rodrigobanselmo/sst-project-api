@@ -1,3 +1,4 @@
+import { normalizeString } from './../../../../shared/utils/normalizeString';
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 
@@ -12,7 +13,9 @@ import { prismaFilter } from './../../../../shared/utils/filters/prisma.filters'
 export class ImageGalleryRepository {
   constructor(private prisma: PrismaService) { }
 
-  async create(data: CreateImageGalleryDto & { url: string }) {
+  async create(data: CreateImageGalleryDto & { url: string; search?: string }) {
+    if (data.name) data.search = normalizeString(data.name);
+
     const result = await this.prisma.imageGallery.create({
       data: {
         ...data,
@@ -22,7 +25,9 @@ export class ImageGalleryRepository {
     return new ImageGalleryEntity(result);
   }
 
-  async update({ id, companyId, ...createCompanyDto }: UpdateImageGalleryDto & { url: string }) {
+  async update({ id, companyId, ...createCompanyDto }: UpdateImageGalleryDto & { url: string; search?: string }) {
+    if (createCompanyDto.name) createCompanyDto.search = normalizeString(createCompanyDto.name).toLocaleLowerCase();
+
     const result = await this.prisma.imageGallery.update({
       data: createCompanyDto,
       where: { companyId_id: { companyId, id } },
@@ -43,7 +48,7 @@ export class ImageGalleryRepository {
 
     if ('search' in query && query.search) {
       (where.AND as any).push({
-        OR: [{ name: { contains: query.search, mode: 'insensitive' } }],
+        OR: [{ search: { contains: normalizeString(query.search).toLocaleLowerCase(), mode: 'insensitive' } }],
       } as typeof options.where);
       delete query.search;
     }

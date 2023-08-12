@@ -1169,6 +1169,7 @@ model ImageGallery {
   types      ImagesTypeEnum[]
   companyId  String
   name       String
+  search     String?
   company    Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
   url        String
   created_at DateTime         @default(now())

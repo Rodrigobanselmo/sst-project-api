@@ -8,6 +8,7 @@ export class ImageGalleryEntity implements ImageGallery {
   url: string;
   companyId: string;
   name: string;
+  search: string;
   company: CompanyEntity;
   created_at: Date;
   updated_at: Date;

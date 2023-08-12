@@ -1,3 +1,4 @@
+import { normalizeString } from './../src/shared/utils/normalizeString';
 import { PermissionCompanyEnum } from './../src/shared/constants/enum/permissionsCompany';
 import { asyncEach } from './../src/shared/utils/asyncEach';
 import { removeDuplicitiesRisks } from './run/remove-duplicities-risks';
@@ -34,6 +35,7 @@ import { createEpi } from './run/create-epi';
 import { hash } from 'bcrypt';
 import { readFileSync, createWriteStream, writeFileSync, readdirSync } from 'fs';
 import { signPdf } from './signature/signPdf';
+import { asyncBatch } from './../src/shared/utils/asyncBatch';
 
 const prisma = new PrismaClient({
   log: ['query'],
@@ -42,6 +44,18 @@ const prisma = new PrismaClient({
 async function main() {
   try {
     console.info('start');
+
+    const allImages = await prisma.imageGallery.findMany();
+    console.log(1)
+    await asyncBatch(allImages, 50, async (data: typeof allImages[0]) => {
+      console.log(2)
+      await prisma.imageGallery.update({
+        where: {
+          id: data.id
+        },
+        data: { search: normalizeString(data.name).toLocaleLowerCase() }
+      })
+    });
 
     console.info('end');
   } catch (err) {
