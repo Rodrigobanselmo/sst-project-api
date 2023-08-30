@@ -167,6 +167,10 @@ import { ImageGalleryRepository } from './repositories/implementations/ImageGall
 import { ImageGalleryController } from './controller/imageGallery/imageGallery.controller';
 import { FindWorkspaceService } from './services/workspace/find-workspace/find-workspace.service';
 import { WorkspaceController } from './controller/workspace/workspace.controller';
+import { SyncRepository } from './repositories/implementations/SyncRepository';
+import { SyncMainService } from './services/sync/sync-main/sync-main.service';
+import { SyncController } from './controller/sync/sync.controller';
+import { SyncHierarchyService } from './services/sync/sync-hierarchy/sync-hierarchy.service';
 
 @Module({
   imports: [
@@ -196,7 +200,8 @@ import { WorkspaceController } from './controller/workspace/workspace.controller
     AlertController,
     ScheduleMedicalVisitController,
     ImageGalleryController,
-    WorkspaceController
+    WorkspaceController,
+    SyncController
   ],
   providers: [
     CreateCompanyService,
@@ -344,7 +349,10 @@ import { WorkspaceController } from './controller/workspace/workspace.controller
     DeleteImageGalleryService,
     FindImageGalleryService,
     ImageGalleryRepository,
-    FindWorkspaceService
+    FindWorkspaceService,
+    SyncRepository,
+    SyncMainService,
+    SyncHierarchyService,
   ],
   exports: [
     CompanyRepository,

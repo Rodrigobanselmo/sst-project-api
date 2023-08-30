@@ -63,6 +63,7 @@ export class HierarchyEntity implements Hierarchy {
   workspaceId?: string;
   employeesCount?: number;
   deletedAt: Date;
+  updated_at: Date;
 
   subHierarchyHistory?: EmployeeHierarchyHistoryEntity[];
   hierarchyHistory?: EmployeeHierarchyHistoryEntity[];

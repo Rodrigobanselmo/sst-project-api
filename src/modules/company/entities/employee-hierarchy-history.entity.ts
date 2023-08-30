@@ -29,7 +29,6 @@ export class EmployeeHierarchyHistoryEntity implements EmployeeHierarchyHistory 
   }
 }
 
-// eslint-disable-next-line prettier/prettier
 const base = [
   EmployeeHierarchyMotiveTypeEnum.ALOC,
   EmployeeHierarchyMotiveTypeEnum.PROM,

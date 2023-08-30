@@ -16,7 +16,7 @@ export class FilesChecklistController {
     private readonly uploadEpiDataService: UploadEpiDataService,
     private readonly uploadRiskService: UploadChecklistDataService,
     private readonly downloadRiskService: DownloadRiskDataService,
-  ) {}
+  ) { }
 
   @Roles(RoleEnum.DATABASE)
   @Permissions({
@@ -59,7 +59,7 @@ export class FilesChecklistController {
     isMember: true,
   })
   @Post('epi/upload/:companyId?')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 10_000_000_000 } }))
   async uploadEpiFile(@UploadedFile() file: Express.Multer.File, @User() userPayloadDto: UserPayloadDto, @Res() res) {
     const { workbook, filename } = await this.uploadEpiDataService.execute(file, userPayloadDto);
 

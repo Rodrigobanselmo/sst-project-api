@@ -25,6 +25,11 @@ export class WorkspaceEntity implements Workspace {
   })
   updated_at: Date;
 
+  @ApiProperty({
+    description: 'The last time that the Workspace data was updated',
+  })
+  deleted_at: Date | null;
+
   @ApiProperty({ description: 'The company id related to the Workspace' })
   companyId: string;
 

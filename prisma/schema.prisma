@@ -1081,8 +1081,9 @@ model GenerateSource {
   name           String
   companyId      String
   system         Boolean          @default(false)
-  created_at     DateTime         @default(now())
   status         StatusEnum       @default(ACTIVE)
+  created_at     DateTime         @default(now())
+  updated_at     DateTime         @default(now())
   deleted_at     DateTime?
   company        Company          @relation(fields: [companyId], references: [id])
   risk           RiskFactors      @relation(fields: [riskId], references: [id], onDelete: Cascade)
@@ -1094,7 +1095,6 @@ model GenerateSource {
 
 model Hierarchy {
   id                            String                     @id @default(uuid())
-  created_at                    DateTime                   @default(now())
   status                        StatusEnum                 @default(ACTIVE)
   type                          HierarchyEnum
   description                   String                     @default("")
@@ -1103,6 +1103,8 @@ model Hierarchy {
   companyId                     String
   parentId                      String?
   refName                       String?
+  created_at                    DateTime                   @default(now())
+  updated_at                    DateTime                   @default(now())
   deletedAt                     DateTime?
   employees                     Employee[]
   employeeExamsHistory          EmployeeExamsHistory[] //poder ao adimitir um funcionario, escolher adicionar a este cargo 
@@ -1327,6 +1329,7 @@ model RecMed {
   medType              MeasuresTypeEnum?
   status               StatusEnum             @default(ACTIVE)
   created_at           DateTime               @default(now())
+  updated_at           DateTime               @default(now())
   deleted_at           DateTime?
   recType              RecTypeEnum?
   company              Company                @relation(fields: [companyId], references: [id])
@@ -1374,8 +1377,9 @@ model RiskFactors {
   carnogenicityLinach   String?
   status                StatusEnum              @default(ACTIVE)
   type                  RiskFactorsEnum
-  created_at            DateTime                @default(now())
   representAll          Boolean                 @default(false)
+  created_at            DateTime                @default(now())
+  updated_at            DateTime                @default(now())
   deleted_at            DateTime?
   isEmergency           Boolean                 @default(false)
   json                  Json?
@@ -1695,6 +1699,7 @@ model Workspace {
   description        String?
   created_at         DateTime                  @default(now())
   updated_at         DateTime                  @updatedAt
+  deleted_at         DateTime?
   companyId          String
   status             StatusEnum                @default(ACTIVE)
   cnpj               String?

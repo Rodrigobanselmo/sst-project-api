@@ -48,6 +48,8 @@ export class RiskFactorsEntity implements RiskFactors {
   @ApiProperty({ description: 'The creation date of the risk' })
   created_at: Date;
 
+  updated_at: Date;
+
   @ApiProperty({ description: 'The appendix date of the risk' })
   appendix: string;
 

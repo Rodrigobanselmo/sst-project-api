@@ -2,18 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
-import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
 
-import { prismaFilter } from '../../../../shared/utils/filters/prisma.filters';
-import { CidDto, FindCidDto } from '../../dto/cid.dto';
-import { CidEntity } from '../../entities/cid.entity';
 import { EmployeePPPHistoryEntity } from '../../entities/employee-ppp-history.entity';
 
 const i = 0;
 
 @Injectable()
 export class EmployeePPPHistoryRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async createManyNude(createData: Prisma.EmployeePPPHistoryCreateArgs['data'][], options?: Partial<Prisma.EmployeePPPHistoryCreateArgs>) {
     const data = await this.prisma.$transaction(

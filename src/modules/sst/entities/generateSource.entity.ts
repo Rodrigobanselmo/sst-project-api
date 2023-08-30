@@ -35,6 +35,7 @@ export class GenerateSourceEntity implements GenerateSource {
 
   @ApiProperty({ description: 'The creation date of the risk' })
   created_at: Date;
+  updated_at: Date;
 
   @ApiProperty({ description: 'The deleted date of data' })
   deleted_at: Date | null;

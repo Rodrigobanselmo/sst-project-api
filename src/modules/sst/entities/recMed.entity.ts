@@ -45,6 +45,7 @@ export class RecMedEntity implements RecMed {
 
   @ApiProperty({ description: 'The creation date of the risk' })
   created_at: Date;
+  updated_at: Date;
 
   @ApiProperty({ description: 'The generate source id related' })
   generateSourceId: string;

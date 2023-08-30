@@ -10,6 +10,7 @@ import { CreateRiskDto, FindRiskDto, UpdateRiskDto, UpsertRiskDto } from '../../
 import { RiskFactorsEntity } from '../../entities/risk.entity';
 import { IRiskRepository } from '../IRiskRepository.types';
 import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
+import { databaseFindChanges } from '../../../../shared/utils/databaseFindChanges';
 
 @Injectable()
 export class RiskRepository implements IRiskRepository {
@@ -539,6 +540,32 @@ export class RiskRepository implements IRiskRepository {
     });
 
     return risks.map((risk) => new RiskFactorsEntity(risk as any));
+  }
+
+  async findSyncChanges({ lastPulledVersion, companyId, userId }: { lastPulledVersion: Date; companyId: string; userId: number }) {
+    const options: Prisma.RiskFactorsFindManyArgs = {};
+    options.select = {
+      name: true,
+      severity: true,
+      type: true,
+      cas: true,
+      representAll: true,
+      id: true,
+      status: true,
+    }
+    options.where = {
+      AND: [{ OR: [{ companyId }, { system: true }] }],
+    }
+
+    const changes = await databaseFindChanges({
+      entity: RiskFactorsEntity,
+      findManyFn: this.prisma.riskFactors.findMany,
+      lastPulledVersion,
+      options,
+      userId
+    })
+
+    return changes
   }
 
   async DeleteByIdSoft(id: string): Promise<RiskFactorsEntity> {
