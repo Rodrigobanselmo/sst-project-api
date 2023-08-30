@@ -144,6 +144,7 @@ export class SectionsMapClass {
   };
 
   private convertToDocx(data: ISectionChildrenType[], variables = {} as IDocVariables) {
+    if (!data) return [];
     return data
       .map((child) => {
         const childData = convertToDocxHelper(child, {
