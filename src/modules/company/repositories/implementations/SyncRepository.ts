@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, Company, Workspace } from '@prisma/client';
+import { Prisma, Company, Workspace, Employee } from '@prisma/client';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { databaseFindChanges } from '../../../../shared/utils/databaseFindChanges';
@@ -8,6 +8,7 @@ import { RiskFactorsEntity } from '../../../sst/entities/risk.entity';
 import { HierarchyEntity } from '../../entities/hierarchy.entity';
 import { CompanyEntity } from '../../entities/company.entity';
 import { company } from 'faker';
+import { EmployeeEntity } from '../../entities/employee.entity';
 
 @Injectable()
 export class SyncRepository {
@@ -47,11 +48,18 @@ export class SyncRepository {
         userId
       })
 
-      const [companyChanges, workspaceChanges, hierarchyChanges] = await Promise.all([companyChangesPromise, workspaceChangesPromise, hierarchyChangesPromise])
+      const employeesChangesPromise = this.findEmployeeSyncChanges({
+        companyIds: companyIds,
+        lastPulledVersion: companyStartIds ? undefined : lastPulledVersion,
+        userId
+      })
+
+      const [companyChanges, workspaceChanges, hierarchyChanges, employeesChanges] = await Promise.all([companyChangesPromise, workspaceChangesPromise, hierarchyChangesPromise, employeesChangesPromise])
 
       changes.Company = companyChanges
       changes.Workspace = workspaceChanges
       changes.Hierarchy = hierarchyChanges
+      changes.Employee = employeesChanges
       changes.MMWorkspaceHierarchy = {
         created: ([...hierarchyChanges.created, ...hierarchyChanges.updated] as HierarchyEntity[]).map((data) => {
           return data.workspaces.map((workspace) => ({ id: workspace.id + data.id, hierarchyId: data.id, workspaceId: workspace.id, created_at: new Date(), updated_at: new Date() }))
@@ -316,7 +324,7 @@ export class SyncRepository {
     }
 
     const hierarchyChanges = await databaseFindChanges({
-      entity: RiskFactorsEntity,
+      entity: HierarchyEntity,
       findManyFn: this.prisma.hierarchy.findMany,
       lastPulledVersion,
       options,
@@ -325,6 +333,38 @@ export class SyncRepository {
     })
 
     return hierarchyChanges
+  }
+
+  async findEmployeeSyncChanges({ lastPulledVersion, companyIds, userId }: { lastPulledVersion: Date; workspaceId?: string; companyIds: string[]; userId: number }) {
+    const options: Prisma.EmployeeFindManyArgs = {};
+    options.select = {
+      name: true,
+      id: true,
+      status: true,
+      cpf: true,
+      rg: true,
+      socialName: true,
+      companyId: true,
+      created_at: true,
+      updated_at: true,
+      deleted_at: true,
+    }
+
+    options.where = {
+      AND: [{
+        companyId: { in: companyIds },
+      }],
+    }
+
+    const employeeChanges = await databaseFindChanges({
+      entity: EmployeeEntity,
+      findManyFn: this.prisma.employee.findMany,
+      lastPulledVersion,
+      options,
+      userId,
+    })
+
+    return employeeChanges
   }
 
 }

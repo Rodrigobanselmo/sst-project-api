@@ -37,11 +37,12 @@ export class EmployeeEntity implements Employee {
 
   @ApiProperty({ description: 'The creation date of the Employee' })
   created_at: Date;
-
+  
   @ApiProperty({
     description: 'The last time that the Employee data was updated',
   })
   updated_at: Date;
+  deleted_at: Date;
 
   @ApiProperty({ description: 'The hierarchy id of the Employee' })
   hierarchyId: string;

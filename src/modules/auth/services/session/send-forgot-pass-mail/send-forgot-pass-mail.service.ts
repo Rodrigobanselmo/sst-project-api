@@ -23,7 +23,7 @@ export class SendForgotPassMailService {
     if (cacheBlockEmailSend) throw new BadRequestException('Espere 45 segundos para solicitar um novo email de recuperação de senha')
 
 
-    this.cacheManager.set(email, true, { ttl: process.env.NODE_ENV === 'development' ? 1 : 45 })
+    this.cacheManager.set(email, true, process.env.NODE_ENV === 'development' ? 1 : 45)
 
     const user = await this.usersRepository.findFirstNude({ where: { email }, select: { id: true, name: true } });
     if (!user?.id) throw new BadRequestException('Usuário com esse email não existe');

@@ -89,7 +89,7 @@
     "sqs-consumer": "^5.7.0",
     "swagger-ui-express": "^4.1.6",
     "ua-parser-js": "^1.0.35",
-    "uuid": "^8.3.2",
+    "uuid": "^9.0.0",
     "winston": "^3.9.0",
     "winston-cloudwatch": "^6.1.1",
     "xml-crypto": "^3.0.1",
