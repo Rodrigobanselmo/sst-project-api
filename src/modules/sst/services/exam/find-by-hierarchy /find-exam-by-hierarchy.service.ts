@@ -1,10 +1,9 @@
-import { CompanyRepository } from './../../../../company/repositories/implementations/CompanyRepository';
-import { isShouldDemissionBlock } from './../../../../../shared/utils/demissionalBlockCalc';
-import { EmployeeHierarchyHistoryRepository } from './../../../../company/repositories/implementations/EmployeeHierarchyHistoryRepository';
-import { getRiskDoc, getRiskDocV2 } from './../../../../../shared/utils/getRiskDoc';
-import { HierarchyEntity } from './../../../../company/entities/hierarchy.entity';
 import { Injectable } from '@nestjs/common';
 import { ExamHistoryTypeEnum, HomoTypeEnum, Prisma, SexTypeEnum, StatusEnum } from '@prisma/client';
+import { getRiskDoc, getRiskDocV2 } from './../../../../../shared/utils/getRiskDoc';
+import { HierarchyEntity } from './../../../../company/entities/hierarchy.entity';
+import { CompanyRepository } from './../../../../company/repositories/implementations/CompanyRepository';
+import { EmployeeHierarchyHistoryRepository } from './../../../../company/repositories/implementations/EmployeeHierarchyHistoryRepository';
 
 import { originRiskMap } from '../../../../../shared/constants/maps/origin-risk';
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
@@ -16,7 +15,7 @@ import { EmployeeEntity } from '../../../../company/entities/employee.entity';
 import { EmployeeRepository } from '../../../../company/repositories/implementations/EmployeeRepository';
 import { HierarchyRepository } from '../../../../company/repositories/implementations/HierarchyRepository';
 import { FindExamHierarchyDto } from '../../../dto/exam.dto';
-import { IExamOriginData, IExamEmployeeCheck, IExamOrigins } from '../../../entities/exam.entity';
+import { IExamEmployeeCheck, IExamOriginData, IExamOrigins } from '../../../entities/exam.entity';
 import { ExamRepository } from '../../../repositories/implementations/ExamRepository';
 import { RiskDataRepository } from '../../../repositories/implementations/RiskDataRepository';
 import { CompanyEntity } from './../../../../..//modules/company/entities/company.entity';
@@ -572,6 +571,35 @@ export function filterOriginsByHierarchy(examsData: IExamOrigins[], companyId: s
       }
 
       const isPartOfHomo = origin?.homogeneousGroup ? origin.homogeneousGroup?.hierarchies?.find((hierarchy) => hierarchyId === (hierarchy?.id)) : true;
+      if (!isPartOfHomo) return;
+
+      newOrigins.push(origin);
+
+      return true;
+    });
+
+    return {
+      exam,
+      origins: newOrigins,
+      ...rest,
+    };
+  });
+}
+
+export function filterOriginsByHomoGroupId(examsData: IExamOrigins[], companyId: string, homoGroup: { id: string, type: HomoTypeEnum }): IExamOrigins[] {
+  if (homoGroup.type == 'HIERARCHY') return filterOriginsByHierarchy(examsData, companyId, homoGroup.id);
+
+  return examsData.map(({ exam, origins, ...rest }) => {
+    const newOrigins = [];
+
+    origins?.forEach((origin) => {
+      if (origin.risk?.docInfo) {
+        const availableRisk = getRiskDocV2(origin.risk, { companyId })?.isAso;
+        if (!availableRisk) return;
+      }
+
+
+      const isPartOfHomo = origin?.homogeneousGroup ? origin.homogeneousGroup.id == homoGroup.id : true;
       if (!isPartOfHomo) return;
 
       newOrigins.push(origin);

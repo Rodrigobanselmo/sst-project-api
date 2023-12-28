@@ -1,12 +1,12 @@
+import { palette } from '../../../../../../../../shared/constants/palette';
 import { getIsTodosRisk } from '../../../../../../../../shared/utils/getIsTodosRisk';
 import { sortString } from '../../../../../../../../shared/utils/sorts/string.sort';
-import { IHierarchyMap, IHomoGroupMap, IRiskMap } from '../../../../../converter/hierarchy.converter';
 import { IExamOriginData, IExamOrigins } from '../../../../../../../sst/entities/exam.entity';
+import { filterOriginsByHomoGroupId } from '../../../../../../../sst/services/exam/find-by-hierarchy /find-exam-by-hierarchy.service';
+import { IHierarchyMap, IHomoGroupMap } from '../../../../../converter/hierarchy.converter';
+import { getHomoGroupName } from '../../../apprByGroup/appr-group.section';
 import { bodyTableProps } from '../../elements/body';
 import { ExamByGroupColumnEnum } from '../../examsByRisk.constant';
-import { filterOriginsByHierarchy } from '../../../../../../../sst/services/exam/find-by-hierarchy /find-exam-by-hierarchy.service';
-import { getHomoGroupName } from '../../../apprByGroup/appr-group.section';
-import { palette } from '../../../../../../../../shared/constants/palette';
 
 export const examsByGroupConverter = (homoMap: IHomoGroupMap, exams: IExamOrigins[], hierarchyTree: IHierarchyMap) => {
   const rows: bodyTableProps[][] = [];
@@ -81,16 +81,14 @@ const examsByGroupGetData = (homoMap: IHomoGroupMap, exams: IExamOrigins[]) => {
   Object.values(homoMap).forEach((gse) => {
     if (!gseExamsMap[gse.id]) gseExamsMap[gse.id] = {}
 
-    gse.hierarchies.forEach((hierarchy) => {
-      const origins = filterOriginsByHierarchy(exams, gse.companyId, hierarchy.id)
+    const origins = filterOriginsByHomoGroupId(exams, gse.companyId, gse)
 
-      origins.forEach((originInfo) => {
-        if (!gseExamsMap[gse.id][originInfo.exam.id]) gseExamsMap[gse.id][originInfo.exam.id] = []
+    origins.forEach((originInfo) => {
+      if (!gseExamsMap[gse.id][originInfo.exam.id]) gseExamsMap[gse.id][originInfo.exam.id] = []
 
-        originInfo.origins.forEach((origin) => {
-          gseExamsMap[gse.id][originInfo.exam.id].push({ name: originInfo.exam.name, origin })
-        });
-      })
+      originInfo.origins.forEach((origin) => {
+        gseExamsMap[gse.id][originInfo.exam.id].push({ name: originInfo.exam.name, origin })
+      });
     })
   })
 
