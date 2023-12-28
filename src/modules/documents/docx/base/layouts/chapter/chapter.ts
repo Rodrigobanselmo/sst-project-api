@@ -7,6 +7,7 @@ import { borderNoneStyle, sectionCoverProperties } from '../../config/styles';
 interface IChapterProps {
   version: string;
   chapter: string;
+  title: string;
   imagePath: string;
 }
 
@@ -63,10 +64,10 @@ const imageCover = (imgPath: string, verticalAlign: VerticalAlign) => {
   });
 };
 
-export const createChapterPage = ({ version, chapter, imagePath }: IChapterProps) => {
+export const createChapterPage = ({ version, chapter, imagePath, title }: IChapterProps) => {
   return table([
     new TableRow({
-      children: [text('PROGRAMA DE GERENCIAMENTO DE RISCOS – PGR', VerticalAlign.TOP)],
+      children: [text(title, VerticalAlign.TOP)],
       height: { value: 1500, rule: HeightRule.EXACT },
     }),
     ...(imagePath
@@ -88,9 +89,9 @@ export const createChapterPage = ({ version, chapter, imagePath }: IChapterProps
   ]);
 };
 
-export const chapterSection = ({ version, chapter, imagePath }: IChapterProps): ISectionOptions => {
+export const chapterSection = ({ version, chapter, imagePath, title }: IChapterProps): ISectionOptions => {
   return {
-    children: [createChapterPage({ version, chapter, imagePath })],
+    children: [createChapterPage({ version, chapter, imagePath, title })],
     properties: sectionCoverProperties,
     footers: {
       default: new Footer({

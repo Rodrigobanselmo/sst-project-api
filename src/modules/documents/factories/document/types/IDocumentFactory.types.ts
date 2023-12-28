@@ -43,6 +43,7 @@ export interface IUnlinkPaths { path: string, url: string }
 
 export interface IDocumentFactoryProduct<T = any, R = any> {
   localCreation?: boolean;
+  type: string;
   unlinkPaths: IUnlinkPaths[];
   downloadPathImage(url: string): Promise<string>;
   getData(body: T): R;

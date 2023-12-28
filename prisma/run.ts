@@ -44,6 +44,73 @@ const prisma = new PrismaClient({
 async function main() {
   try {
     console.info('start');
+    const allEmployeesPromise = await prisma.employee.findMany({
+      where: {
+        status: { not: 'CANCELED' },
+      },
+
+      take: 1,
+      select: {
+        id: true,
+        companyId: true,
+        hierarchyId: true,
+        lastExam: true,
+        status: true,
+        hierarchy: {
+          select: {
+            id: true,
+            parent: {
+              select: {
+                id: true,
+                parent: {
+                  select: {
+                    id: true,
+                    parent: {
+                      select: {
+                        id: true,
+                        parent: { select: { id: true } },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+
+        expiredDateExam: true,
+        hierarchyHistory: {
+          take: 2,
+          select: { startDate: true, motive: true, hierarchyId: true },
+          orderBy: { startDate: 'desc' },
+        },
+
+        birthday: true,
+        sex: true,
+        subOffices: { select: { id: true } },
+        examsHistory: {
+          select: {
+            doneDate: true,
+            expiredDate: true,
+            status: true,
+            examType: true,
+            evaluationType: true,
+            hierarchyId: true,
+            validityInMonths: true,
+            examId: true,
+            exam: {
+              select: { isAttendance: true },
+            },
+          },
+          orderBy: { doneDate: 'desc' },
+          distinct: ['examId', 'status'],
+          where: {
+            exam: { isAvaliation: false },
+            status: { in: ['DONE'] },
+          },
+        },
+      },
+    });
 
     console.info('end');
   } catch (err) {

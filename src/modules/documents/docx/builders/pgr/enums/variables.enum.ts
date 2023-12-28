@@ -77,7 +77,8 @@ export enum VariablesPGREnum {
   IS_SE = 'IS_SE',
   IS_TO = 'IS_TO',
 
-  //*PGR string --------------------->
+  //*string --------------------->
+  DOCUMENT_TITLE = 'TITULO_DO_DOCUMENTO',
   CHAPTER_1 = 'NOME_DO_CAPITULO_1',
   CHAPTER_2 = 'NOME_DO_CAPITULO_2',
   CHAPTER_3 = 'NOME_DO_CAPITULO_3',

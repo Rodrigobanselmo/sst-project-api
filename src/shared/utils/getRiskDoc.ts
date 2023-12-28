@@ -30,18 +30,24 @@ export const getRiskDocV2 = (risk: RiskFactorsEntity, { companyId, hierarchyId, 
   let data: RiskDocInfoEntity, first: RiskDocInfoEntity, second: RiskDocInfoEntity;
 
   risk?.docInfo?.some((i) => {
-    if (getIfAnyIsTrue && docType && i.hierarchyId && i[docType]) {
-      data = i;
-      return true;
-    }
-    if (hierarchyId && i.hierarchyId && i.hierarchyId == hierarchyId) {
+    const isFromDocTypeAndInAnyHierarchy = getIfAnyIsTrue && docType && i.hierarchyId && i[docType];
+    if (isFromDocTypeAndInAnyHierarchy) {
       data = i;
       return true;
     }
 
-    if (companyId && !i.hierarchyId && i.companyId === companyId) {
+    const isFromHierarchyId = hierarchyId && i.hierarchyId && i.hierarchyId == hierarchyId;
+    if (isFromHierarchyId) {
+      data = i;
+      return true;
+    }
+
+    const isFromCompanyAndMissingHierarchy = companyId && !i.hierarchyId && i.companyId === companyId;
+    const isSystemStandard = !i.hierarchyId
+    
+    if (isFromCompanyAndMissingHierarchy) {
       first = i;
-    } else if (!i.hierarchyId) {
+    } else if (isSystemStandard) {
       second = i;
     }
 

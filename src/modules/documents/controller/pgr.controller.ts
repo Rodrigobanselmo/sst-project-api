@@ -7,10 +7,15 @@ import { UserPayloadDto } from '../../../shared/dto/user-payload.dto';
 import { UploadDocumentDto, UploadPgrActionPlanDto } from '../dto/document.dto';
 import { PgrActionPlanUploadTableService } from '../services/document/action-plan/upload-action-plan-table.service';
 import { PgrUploadService } from '../services/document/document/upload-pgr-doc.service';
+import { PcmsoUploadService } from '../services/document/document/upload-pcmso-doc.service';
 
 @Controller('documents/pgr')
 export class DocumentsPgrController {
-  constructor(private readonly pgrActionPlanUploadTableService: PgrActionPlanUploadTableService, private readonly pgrUploadDocService: PgrUploadService) {}
+  constructor(
+    private readonly pgrActionPlanUploadTableService: PgrActionPlanUploadTableService,
+    private readonly pgrUploadDocService: PgrUploadService,
+    private readonly pcmsoUploadService: PcmsoUploadService
+  ) { }
 
   @Permissions(
     {
@@ -41,7 +46,7 @@ export class DocumentsPgrController {
   })
   @Post()
   async uploadPGRDoc(@Res() res, @User() userPayloadDto: UserPayloadDto, @Body() upsertPgrDto: UploadDocumentDto) {
-    const { buffer: file, fileName } = await this.pgrUploadDocService.execute({
+    const { buffer: file, fileName } = await this.pcmsoUploadService.execute({
       ...upsertPgrDto,
       companyId: userPayloadDto.targetCompanyId,
     });

@@ -160,6 +160,7 @@ export class FindExamByHierarchyService {
                 },
                 where: {
                   companyId,
+                  deletedAt: null,
                   exam: { isAttendance: false },
                   ...examType,
                 },
@@ -227,6 +228,7 @@ export class FindExamByHierarchyService {
                 riskFactor: {
                   examToRisk: {
                     some: {
+                      deletedAt: null,
                       examId: { gt: 0 },
                       ...(query.onlyAttendance && {
                         exam: { isAttendance: true },
@@ -243,6 +245,7 @@ export class FindExamByHierarchyService {
     });
 
     if (hierarchyId) {
+      console.log(JSON.stringify(riskData))
       riskData = riskData.filter((riskData) => {
         return getRiskDoc(riskData.riskFactor, { companyId, hierarchyId })?.isAso;
       });
@@ -410,6 +413,8 @@ export class FindExamByHierarchyService {
     });
   }
 
+
+
   filterOrigins(examsData: IExamOrigins[], examType?: ExamHistoryTypeEnum) {
     return examsData.map(({ exam, origins }) => {
       const isDismissal = examType === ExamHistoryTypeEnum.DEMI;
@@ -472,6 +477,7 @@ export class FindExamByHierarchyService {
       select: {
         examToRisk: {
           where: {
+            deletedAt: null,
             companyId: { in: companyIds },
             risk: { representAll: true },
             ...options?.examsTypes,
@@ -484,6 +490,7 @@ export class FindExamByHierarchyService {
       where: {
         examToRisk: {
           some: {
+            deletedAt: null,
             companyId: { in: companyIds },
             risk: { representAll: true },
           },
@@ -552,4 +559,30 @@ export class FindExamByHierarchyService {
 
     return originsData;
   }
+}
+
+export function filterOriginsByHierarchy(examsData: IExamOrigins[], companyId: string, hierarchyId: string): IExamOrigins[] {
+  return examsData.map(({ exam, origins, ...rest }) => {
+    const newOrigins = [];
+
+    origins?.forEach((origin) => {
+      if (origin.risk?.docInfo) {
+        const availableRisk = getRiskDocV2(origin.risk, { companyId, hierarchyId: hierarchyId })?.isAso;
+        if (!availableRisk) return;
+      }
+
+      const isPartOfHomo = origin?.homogeneousGroup ? origin.homogeneousGroup?.hierarchies?.find((hierarchy) => hierarchyId === (hierarchy?.id)) : true;
+      if (!isPartOfHomo) return;
+
+      newOrigins.push(origin);
+
+      return true;
+    });
+
+    return {
+      exam,
+      origins: newOrigins,
+      ...rest,
+    };
+  });
 }

@@ -88,11 +88,6 @@ export class CreateExamsRiskDto {
   @Type(() => Date)
   startDate: Date;
 
-  @IsOptional()
-  @Transform(DateFormat, { toClassOnly: true })
-  @IsDate({ message: 'Data de fim inválida' })
-  @Type(() => Date)
-  endDate: Date;
 }
 
 export class UpdateExamRiskDto extends PartialType(CreateExamsRiskDto) {

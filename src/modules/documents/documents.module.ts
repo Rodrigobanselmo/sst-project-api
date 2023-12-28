@@ -36,6 +36,7 @@ import { DocumentModelController } from './controller/document-model.controller'
 import { DocumentPGRPreviewFactory } from './factories/document/products/PGR/DocumentPGRPreviewFactory';
 import { DownloadPreviewModel } from './services/document/document-models/download-preview-model.service';
 import { PdfVisitReportDataService } from './services/pdf/visitReport/visit-report-data.service';
+import { DocumentPCMSOFactory } from './factories/document/products/PGR/DocumentPCMSOFactory';
 
 @Module({
   controllers: [DocumentModelController, DocumentsPgrController, DocumentsPdfController, DocumentsBaseController],
@@ -59,6 +60,7 @@ import { PdfVisitReportDataService } from './services/pdf/visitReport/visit-repo
     PdfOsDataService,
     PdfEvaluationDataService,
     DocumentPGRFactory,
+    DocumentPCMSOFactory,
     GetDocVariablesService,
     DocumentModelRepository,
     UpdateDocumentModelService,

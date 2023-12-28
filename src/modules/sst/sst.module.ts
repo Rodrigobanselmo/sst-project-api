@@ -98,6 +98,7 @@ import { FindRecMedService } from './services/rec-med/find-rec-med/find-rec-med.
 import { FindGenerateSourceService } from './services/generate-source/find-generate-source/find-generate-source.service';
 import { ReloadEmployeeExamTimeService } from './services/exam/reload-employee-exam-time/reload-employee-exam-time.service';
 import { DeleteExamToClinicService } from './services/examToClinic/delete-exam-to-clinic/find-exam-to-clinic.service';
+import { DeleteSoftExamRiskService } from './services/examToRisk/delete-soft-exam-risk/delete-soft-exam-risk.service';
 
 @Module({
   controllers: [
@@ -200,6 +201,7 @@ import { DeleteExamToClinicService } from './services/examToClinic/delete-exam-t
     FindGenerateSourceService,
     ReloadEmployeeExamTimeService,
     DeleteExamToClinicService,
+    DeleteSoftExamRiskService,
   ],
   exports: [
     RiskRepository,
@@ -223,4 +225,4 @@ import { DeleteExamToClinicService } from './services/examToClinic/delete-exam-t
   ],
   imports: [forwardRef(() => CompanyModule), CacheModule.register()],
 })
-export class SSTModule {}
+export class SSTModule { }

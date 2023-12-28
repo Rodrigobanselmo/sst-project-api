@@ -57,26 +57,13 @@ function executeCommand(command) {
     });
 }
 
-
 export const signPdf = async () => {
-    // const fileInputPath_before = 'prisma/signature/aso.pdf';
-    // const fileOutputPath_before = `tmp/small-${v4()}.pdf`;
-    // const command_compress = `gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/ebook -dNOPAUSE -dQUIET -dBATCH -sOutputFile=${fileOutputPath_before} ${fileInputPath_before}`;
-
-    // try {
-    //     await executeCommand(command_compress);
-    // } catch (error) {
-    //     throw new BadRequestException(`Command execution failed with error: ${error.message}`);
-    // }
-
-    // const fileInputPath = fileOutputPath_before || 'prisma/signature/aso.pdf';
     const fileInputPath = 'prisma/signature/aso.pdf';
     const fileOutputPath = `tmp/a1-${(new Date()).getTime()}.pdf`;
     const certPath = `cert/cert_alex.pfx`;
     const passphrase = '230296';
 
     const command = `gs -dPDFA -dBATCH -dNOPAUSE -sColorConversionStrategy=UseDeviceIndependentColor -sDEVICE=pdfwrite -dPDFACompatibilityPolicy=2 -sOutputFile=${fileOutputPath} ${fileInputPath}`;
-    // const command = `gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/ebook -dNOPAUSE -dQUIET -dBATCH -sOutputFile=${fileOutputPath} -dPDFA -dPDFACompatibilityPolicy=1 ${fileInputPath}`;
 
     try {
         await executeCommand(command);
@@ -89,26 +76,6 @@ export const signPdf = async () => {
     const SIGNATURE_LENGTH = p12Buffer.length * 2;
 
     const date = new Date();
-
-
-    //! simple
-    // const pdfBufferToSign = plainAddPlaceholder({
-    //     pdfBuffer,
-    //     reason: 'Signed Certificate.',
-    //     contactInfo: 'sign@example.com',
-    //     name: 'Example',
-    //     location: 'Jakarta',
-    //     signatureLength: p12Buffer.length,
-    // });
-
-    // const signer = new SignPdf()
-    // const signedPdf = signer.sign(pdfBufferToSign, p12Buffer, { passphrase: passphrase });
-    // const bufferPdf = Buffer.from(signedPdf)
-
-    // const pathSignedPdf2 = 'signed.pdf'
-    // createWriteStream(pathSignedPdf2).write(bufferPdf);
-
-    // return
 
 
     const formattedTime = date.toLocaleString('pt-BR', {

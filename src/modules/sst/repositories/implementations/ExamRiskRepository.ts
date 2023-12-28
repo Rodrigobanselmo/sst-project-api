@@ -42,7 +42,7 @@ export class ExamRiskRepository {
 
   async find(query: Partial<FindExamRiskDto>, pagination: PaginationQueryDto, options: Prisma.ExamToRiskFindManyArgs = {}) {
     const whereInit = {
-      AND: [{ skipCompanies: { none: { companyId: query.targetCompanyId } } }],
+      AND: [{ skipCompanies: { none: { companyId: query.targetCompanyId } }, deletedAt: null }],
     } as typeof options.where;
 
     const include = { ...options?.include };
@@ -79,7 +79,7 @@ export class ExamRiskRepository {
 
   async createMany({ companyId, data }: UpsertManyExamsRiskDto) {
     await this.prisma.examToRisk.createMany({
-      data: data.map(({ id, endDate, startDate, ...examRisk }) => ({
+      data: data.map(({ id, startDate, ...examRisk }) => ({
         ...examRisk,
         companyId,
       })),
@@ -117,5 +117,15 @@ export class ExamRiskRepository {
     const exams = await this.prisma.examToRisk.findMany(options);
 
     return exams.map((exam) => new ExamRiskEntity(exam));
+  }
+
+  async deleteSoft(id: number, companyId: string): Promise<ExamRiskEntity> {
+    const riskFactors = await this.prisma.examToRisk.update({
+      where: { id_companyId: { companyId, id } },
+      data: { deletedAt: new Date() },
+      select: { id: true, riskId: true },
+    });
+
+    return new ExamRiskEntity(riskFactors);
   }
 }

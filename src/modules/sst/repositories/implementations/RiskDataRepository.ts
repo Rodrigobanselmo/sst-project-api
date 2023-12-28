@@ -232,7 +232,7 @@ export class RiskDataRepository {
             examToRisk: {
               select: { id: true, exam: { select: { name: true } }, },
               where: {
-                endDate: null,
+                deletedAt: null,
                 companyId,
                 OR: [
                   { isAdmission: true },
@@ -479,7 +479,7 @@ export class RiskDataRepository {
         });
       }
 
-      riskData.examsToRiskFactorData = await this.setExams(exams.map((exam) => ({ ...exam, riskFactorDataId: riskData.id })));
+      riskData.examsToRiskFactorData = await this.setExams(exams.filter(i => i.examId).map((exam) => ({ ...exam, riskFactorDataId: riskData.id })));
     }
 
     return riskData;
@@ -566,7 +566,7 @@ export class RiskDataRepository {
 
     if (epis)
       riskData.epiToRiskFactorData = await this.setEpis(
-        epis.map((epi) => ({
+        epis.filter(i => i.epiId).map((epi) => ({
           ...epi,
           riskFactorDataId: riskData.id,
         })),
@@ -574,7 +574,7 @@ export class RiskDataRepository {
 
     if (engs)
       riskData.engsToRiskFactorData = await this.setEngs(
-        engs.map((eng) => ({
+        engs.filter(i => i.recMedId).map((eng) => ({
           ...eng,
           riskFactorDataId: riskData.id,
         })),
@@ -582,7 +582,7 @@ export class RiskDataRepository {
 
     if (exams)
       riskData.examsToRiskFactorData = await this.setExams(
-        exams.map((exam) => ({
+        exams.filter(i => i.examId).map((exam) => ({
           ...exam,
           riskFactorDataId: riskData.id,
         })),

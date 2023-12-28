@@ -98,6 +98,10 @@ export class UpsertCharacterizationDto {
 }
 
 export class AddPhotoCharacterizationDto {
+  @IsOptional()
+  @IsString()
+  id?: string;
+
   @IsString()
   companyCharacterizationId: string;
 

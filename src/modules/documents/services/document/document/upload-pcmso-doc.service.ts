@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 
 import { UploadDocumentDto } from '../../../dto/document.dto';
-import { DocumentPGRFactory } from '../../../factories/document/products/PGR/DocumentPGRFactory';
+import { DocumentPCMSOFactory } from '../../../factories/document/products/PGR/DocumentPCMSOFactory';
 
 @Injectable()
 export class PcmsoUploadService {
-  constructor(private readonly documentPGRFactory: DocumentPGRFactory) {}
+  constructor(private readonly documentPCMSOFactory: DocumentPCMSOFactory) { }
   async execute(body: UploadDocumentDto) {
-    return await this.documentPGRFactory.execute(body as any);
+    return await this.documentPCMSOFactory.execute(body as any);
   }
 }

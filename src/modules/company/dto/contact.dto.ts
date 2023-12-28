@@ -59,6 +59,7 @@ export class FindContactDto extends PaginationQueryDto {
   @IsOptional()
   search?: string;
 
+  @IsOptional()
   @IsString()
   companyId: string;
 

@@ -65,6 +65,9 @@ export enum DocumentSectionChildrenTypeEnum {
   MATRIX_TABLES = 'MATRIX_TABLES',
   APR_TABLE = 'APR_TABLE',
   PLAN_TABLE = 'PLAN_TABLE',
+
+  TABLE_PCMSO_GHO = 'TABLE_PCMSO_GHO',
+
 }
 
 export enum InlineStyleTypeEnum {
@@ -379,6 +382,10 @@ export type IIterableArc = {
   type: DocumentSectionChildrenTypeEnum.ITERABLE_QUALITY_ACI;
 } & IBaseDocumentModel;
 
+export type ITablePcmsoGho = {
+  type: DocumentSectionChildrenTypeEnum.TABLE_PCMSO_GHO;
+} & IBaseDocumentModel;
+
 export type ISectionChildrenType =
   | IH1
   | IH2
@@ -439,4 +446,5 @@ export type ISectionChildrenType =
   | IAttachments
   | IProfessionalSignature
   | IConsiderationsQuantityTable
+  | ITablePcmsoGho
   | IProfessional;

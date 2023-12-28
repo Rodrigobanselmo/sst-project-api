@@ -143,6 +143,73 @@ export const documentElementTypeMap: IDocumentElementTypeMap = {
     order: fourthOrder,
   },
 
+  //*MANY string --------------------->
+  [DocumentSectionChildrenTypeEnum.TABLE_PRIORITIZATION_HIERARCHY]: {
+    label: 'Tabela de Priorização por Cargo',
+    type: DocumentSectionChildrenTypeEnum.TABLE_PRIORITIZATION_HIERARCHY,
+    accept: ['PGR', 'PCSMO'],
+  },
+  [DocumentSectionChildrenTypeEnum.TABLE_PRIORITIZATION]: {
+    label: 'Tabela de Priorização por GSE',
+    type: DocumentSectionChildrenTypeEnum.TABLE_PRIORITIZATION,
+    accept: ['PGR', 'PCSMO'],
+  },
+  [DocumentSectionChildrenTypeEnum.TABLE_GSE]: {
+    label: 'Tabela de Grupos Similares de Exposição',
+    type: DocumentSectionChildrenTypeEnum.TABLE_GSE,
+    accept: ['PGR', 'PCSMO'],
+  },
+  [DocumentSectionChildrenTypeEnum.COMPLEMENTARY_DOCS]: {
+    label: 'Lista de Documentos Complementares',
+    type: DocumentSectionChildrenTypeEnum.COMPLEMENTARY_DOCS,
+    accept: ['PGR', 'PCSMO'],
+  },
+  [DocumentSectionChildrenTypeEnum.HIERARCHY_RISK_TABLE]: {
+    label: 'Tabela Relação Cargos vs Riscos',
+    type: DocumentSectionChildrenTypeEnum.HIERARCHY_RISK_TABLE,
+    accept: ['PGR', 'PCSMO'],
+  },
+  [DocumentSectionChildrenTypeEnum.RISK_TABLE]: {
+    label: 'Tabela de Riscos e Perigos',
+    type: DocumentSectionChildrenTypeEnum.RISK_TABLE,
+    accept: ['PGR', 'PCSMO'],
+  },
+  [DocumentSectionChildrenTypeEnum.COMPLEMENTARY_SYSTEMS]: {
+    label: 'Lista de Sistemas de Gestão Implementados',
+    type: DocumentSectionChildrenTypeEnum.COMPLEMENTARY_SYSTEMS,
+    accept: ['PGR', 'PCSMO'],
+  },
+  [DocumentSectionChildrenTypeEnum.HEALTH_EFFECT_TABLES]: {
+    label: 'Tabela de Potenciais Efeitos Adversos à Saúde',
+    type: DocumentSectionChildrenTypeEnum.HEALTH_EFFECT_TABLES,
+    accept: ['PGR', 'PCSMO'],
+  },
+  [DocumentSectionChildrenTypeEnum.EXPOSITION_DEGREE_TABLES]: {
+    label: 'Tabela de Grau de exposição a Saúde',
+    type: DocumentSectionChildrenTypeEnum.EXPOSITION_DEGREE_TABLES,
+    accept: ['PGR', 'PCSMO'],
+  },
+  [DocumentSectionChildrenTypeEnum.HIERARCHY_ORG_TABLE]: {
+    label: 'Tabela de Organograma',
+    type: DocumentSectionChildrenTypeEnum.HIERARCHY_ORG_TABLE,
+    accept: ['PGR', 'PCSMO'],
+  },
+  [DocumentSectionChildrenTypeEnum.QUANTITY_RESULTS_TABLES]: {
+    label: 'Tabela de Avaliação Quantitativa do Risco Ocupacional',
+    type: DocumentSectionChildrenTypeEnum.QUANTITY_RESULTS_TABLES,
+    accept: ['PGR', 'PCSMO'],
+  },
+  [DocumentSectionChildrenTypeEnum.QUANTITY_CONSIDERATION_TABLES]: {
+    label: 'Tabela de Considerações da Avaliação Quantitativa do Risco Ocupacional',
+    type: DocumentSectionChildrenTypeEnum.QUANTITY_CONSIDERATION_TABLES,
+    accept: ['PGR', 'PCSMO'],
+  },
+  [DocumentSectionChildrenTypeEnum.MATRIX_TABLES]: {
+    label: 'Tabela Matriz de Riscos Ocupacionais',
+    type: DocumentSectionChildrenTypeEnum.MATRIX_TABLES,
+    accept: ['PGR', 'PCSMO'],
+  },
+
   //*PGR string --------------------->
   [DocumentSectionChildrenTypeEnum.ITERABLE_ENVIRONMENTS_ADM]: {
     label: 'Tabelas dos Ambientes Administrativos',
@@ -189,11 +256,6 @@ export const documentElementTypeMap: IDocumentElementTypeMap = {
     type: DocumentSectionChildrenTypeEnum.ITERABLE_EMERGENCY_RISKS,
     accept: ['PGR'],
   },
-  [DocumentSectionChildrenTypeEnum.TABLE_GSE]: {
-    label: 'Tabela de Grupos Similares de Exposição',
-    type: DocumentSectionChildrenTypeEnum.TABLE_GSE,
-    accept: ['PGR'],
-  },
   [DocumentSectionChildrenTypeEnum.TABLE_HIERARCHY_ENV]: {
     label: 'Tabela de Cargos por Ambiente',
     type: DocumentSectionChildrenTypeEnum.TABLE_HIERARCHY_ENV,
@@ -202,11 +264,6 @@ export const documentElementTypeMap: IDocumentElementTypeMap = {
   [DocumentSectionChildrenTypeEnum.TABLE_HIERARCHY_CHAR]: {
     label: 'Tabela de Cargos por Posto / Atividade / Equipamento',
     type: DocumentSectionChildrenTypeEnum.TABLE_HIERARCHY_CHAR,
-    accept: ['PGR'],
-  },
-  [DocumentSectionChildrenTypeEnum.TABLE_PRIORITIZATION]: {
-    label: 'Tabela de Priorização por GSE',
-    type: DocumentSectionChildrenTypeEnum.TABLE_PRIORITIZATION,
     accept: ['PGR'],
   },
   [DocumentSectionChildrenTypeEnum.TABLE_PRIORITIZATION_ENV]: {
@@ -219,12 +276,6 @@ export const documentElementTypeMap: IDocumentElementTypeMap = {
     type: DocumentSectionChildrenTypeEnum.TABLE_PRIORITIZATION_CHAR,
     accept: ['PGR'],
   },
-  [DocumentSectionChildrenTypeEnum.TABLE_PRIORITIZATION_HIERARCHY]: {
-    label: 'Tabela de Priorização por Cargo',
-    type: DocumentSectionChildrenTypeEnum.TABLE_PRIORITIZATION_HIERARCHY,
-    accept: ['PGR'],
-  },
-
   [DocumentSectionChildrenTypeEnum.ITERABLE_QUALITY_FIS]: {
     label: 'Lista dos Riscos Físicos',
     type: DocumentSectionChildrenTypeEnum.ITERABLE_QUALITY_FIS,
@@ -281,65 +332,14 @@ export const documentElementTypeMap: IDocumentElementTypeMap = {
     type: DocumentSectionChildrenTypeEnum.TABLE_QUANTITY_RAD,
     accept: ['PGR'],
   },
-
-  [DocumentSectionChildrenTypeEnum.HIERARCHY_RISK_TABLE]: {
-    label: 'Tabela Relação Cargos vs Riscos',
-    type: DocumentSectionChildrenTypeEnum.HIERARCHY_RISK_TABLE,
-    accept: ['PGR'],
-  },
-  [DocumentSectionChildrenTypeEnum.RISK_TABLE]: {
-    label: 'Tabela de Riscos e Perigos',
-    type: DocumentSectionChildrenTypeEnum.RISK_TABLE,
-    accept: ['PGR'],
-  },
   [DocumentSectionChildrenTypeEnum.MEASURE_IMAGE]: {
-    label: 'Imagem da Hierarquia das Medidas de Controle', //!
+    label: 'Imagem: Hierarquia das Medidas de Controle', //!
     type: DocumentSectionChildrenTypeEnum.MEASURE_IMAGE,
     accept: ['PGR'],
   },
   [DocumentSectionChildrenTypeEnum.RS_IMAGE]: {
     label: 'Formulario de Acidente de Trabalho (RS)',
     type: DocumentSectionChildrenTypeEnum.RS_IMAGE,
-    accept: ['PGR'],
-  },
-  [DocumentSectionChildrenTypeEnum.COMPLEMENTARY_DOCS]: {
-    label: 'Lista de Documentos Complementares',
-    type: DocumentSectionChildrenTypeEnum.COMPLEMENTARY_DOCS,
-    accept: ['PGR'],
-  },
-  [DocumentSectionChildrenTypeEnum.COMPLEMENTARY_SYSTEMS]: {
-    label: 'Lista de Sistemas de Gestão Implementados',
-    type: DocumentSectionChildrenTypeEnum.COMPLEMENTARY_SYSTEMS,
-    accept: ['PGR'],
-  },
-  [DocumentSectionChildrenTypeEnum.HEALTH_EFFECT_TABLES]: {
-    label: 'Tabela de Potenciais Efeitos Adversos à Saúde',
-    type: DocumentSectionChildrenTypeEnum.HEALTH_EFFECT_TABLES,
-    accept: ['PGR'],
-  },
-  [DocumentSectionChildrenTypeEnum.EXPOSITION_DEGREE_TABLES]: {
-    label: 'Tabela de Grau de exposição a Saúde',
-    type: DocumentSectionChildrenTypeEnum.EXPOSITION_DEGREE_TABLES,
-    accept: ['PGR'],
-  },
-  [DocumentSectionChildrenTypeEnum.HIERARCHY_ORG_TABLE]: {
-    label: 'Tabela de Organograma',
-    type: DocumentSectionChildrenTypeEnum.HIERARCHY_ORG_TABLE,
-    accept: ['PGR'],
-  },
-  [DocumentSectionChildrenTypeEnum.QUANTITY_RESULTS_TABLES]: {
-    label: 'Tabela de Avaliação Quantitativa do Risco Ocupacional',
-    type: DocumentSectionChildrenTypeEnum.QUANTITY_RESULTS_TABLES,
-    accept: ['PGR'],
-  },
-  [DocumentSectionChildrenTypeEnum.QUANTITY_CONSIDERATION_TABLES]: {
-    label: 'Tabela de Considerações da Avaliação Quantitativa do Risco Ocupacional',
-    type: DocumentSectionChildrenTypeEnum.QUANTITY_CONSIDERATION_TABLES,
-    accept: ['PGR'],
-  },
-  [DocumentSectionChildrenTypeEnum.MATRIX_TABLES]: {
-    label: 'Tabela Matriz de Riscos Ocupacionais',
-    type: DocumentSectionChildrenTypeEnum.MATRIX_TABLES,
     accept: ['PGR'],
   },
   [DocumentSectionChildrenTypeEnum.APR_TABLE]: {
@@ -352,5 +352,10 @@ export const documentElementTypeMap: IDocumentElementTypeMap = {
     label: 'Tabela Plano de Ação',
     type: DocumentSectionChildrenTypeEnum.PLAN_TABLE,
     accept: ['PGR'],
+  },
+  [DocumentSectionChildrenTypeEnum.TABLE_PCMSO_GHO]: {
+    label: 'Tabela Exames vs Riscos',
+    type: DocumentSectionChildrenTypeEnum.TABLE_PCMSO_GHO,
+    accept: ['PCSMO'],
   },
 };

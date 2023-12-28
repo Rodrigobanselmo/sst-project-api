@@ -43,12 +43,21 @@ export class ImageGalleryRepository {
 
     const { where } = prismaFilter(whereInit, {
       query,
-      skip: ['search'],
+      skip: ['search', 'types'],
     });
 
     if ('search' in query && query.search) {
       (where.AND as any).push({
         OR: [{ search: { contains: normalizeString(query.search).toLocaleLowerCase(), mode: 'insensitive' } }],
+      } as typeof options.where);
+      delete query.search;
+    }
+
+    if ('types' in query && query.types) {
+      (where.AND as any).push({
+        types: {
+          hasSome: query.types,
+        }
       } as typeof options.where);
       delete query.search;
     }

@@ -23,7 +23,7 @@ async function bootstrap() {
   const isDev = process.env.NODE_ENV === 'development';
 
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    logger: false,
+    // logger: false,
     // logger: WinstonModule.createLogger({
     //   format: winston.format.uncolorize(), //Uncolorize logs as weird character encoding appears when logs are colorized in cloudwatch.
     //   transports: [

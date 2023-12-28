@@ -425,10 +425,10 @@ export class HomoGroupRepository {
     return homogeneousGroup;
   }
 
-  async findDocumentData(companyId: string, options?: { workspaceId?: string }) {
+  async findDocumentData(companyId: string, options?: { workspaceId?: string; includePhotos?: boolean }) {
     const homogeneousGroups = await this.prisma.homogeneousGroup.findMany({
       where: { companyId, ...(options.workspaceId && { workspaces: { some: { id: options.workspaceId } } }) },
-      include: { characterization: { include: { photos: true, profiles: true } } },
+      include: { characterization: { include: { photos: !!options?.includePhotos, profiles: true } } },
     });
 
     return homogeneousGroups.map((homo) => new HomoGroupEntity(homo));

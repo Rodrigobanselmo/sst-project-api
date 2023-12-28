@@ -43,40 +43,7 @@ export const APPRByGroupTableSection = (
   const everyHomoNotFound = [] as string[];
 
   const setHomoGroup = (homo: HomoGroupEntity) => {
-    let nameOrigin: string;
-    let desc: string;
-    let descRh: string;
-    let typeOrigin: string;
-    // let environments: string;
-
-    if (homo.environment) {
-      typeOrigin = 'GSE Desenvolvido (Ambiente)';
-      desc = homo.environment.description;
-      nameOrigin = `${homo.environment.name} (${originRiskMap[homo.environment.type].name})`;
-    }
-
-    if (homo.characterization) {
-      typeOrigin = `GSE Desenvolvido (${originRiskMap[homo.characterization.type].name})`;
-      desc = homo.characterization.description;
-      nameOrigin = `${homo.characterization.name} `;
-    }
-
-    if (homo.type == HomoTypeEnum.HIERARCHY) {
-      const hierarchy = hierarchyTree[homo.id] || hierarchyTree[homo.name];
-
-      if (hierarchy) {
-        typeOrigin = `GSE Desenvolvido (${originRiskMap[hierarchy.type].name})`;
-        nameOrigin = `${hierarchy.name}`;
-        desc = hierarchy.realDescription;
-        descRh = hierarchy.description;
-      }
-    }
-
-    if (!homo.type) {
-      typeOrigin = 'GSE';
-      desc = homo.description;
-      nameOrigin = homo.name;
-    }
+    const { desc, descRh, nameOrigin, typeOrigin } = getHomoGroupName(homo, hierarchyTree)
 
     hierarchyDataHomoGroup.set(homo.id, {
       hierarchies: homoGroupTree[homo.id].hierarchies,
@@ -176,4 +143,47 @@ export const APPRByGroupTableSection = (
   });
 
   return sectionsTables.map((table) => setSection(table));
+};
+
+export const getHomoGroupName = (homo: HomoGroupEntity, hierarchyTree: IHierarchyMap) => {
+  let nameOrigin: string;
+  let desc: string;
+  let descRh: string;
+  let typeOrigin: string;
+
+  if (homo.environment) {
+    typeOrigin = 'GSE Desenvolvido (Ambiente)';
+    desc = homo.environment.description;
+    nameOrigin = `${homo.environment.name} (${originRiskMap[homo.environment.type].name})`;
+  }
+
+  if (homo.characterization) {
+    typeOrigin = `GSE Desenvolvido (${originRiskMap[homo.characterization.type].name})`;
+    desc = homo.characterization.description;
+    nameOrigin = `${homo.characterization.name} `;
+  }
+
+  if (homo.type == HomoTypeEnum.HIERARCHY) {
+    const hierarchy = hierarchyTree[homo.id] || hierarchyTree[homo.name];
+
+    if (hierarchy) {
+      typeOrigin = `GSE Desenvolvido (${originRiskMap[hierarchy.type].name})`;
+      nameOrigin = `${hierarchy.name}`;
+      desc = hierarchy.realDescription;
+      descRh = hierarchy.description;
+    }
+  }
+
+  if (!homo.type) {
+    typeOrigin = 'GSE';
+    desc = homo.description;
+    nameOrigin = homo.name;
+  }
+
+  return {
+    nameOrigin,
+    desc,
+    descRh,
+    typeOrigin
+  }
 };

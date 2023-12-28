@@ -1,3 +1,4 @@
+import { IExamOrigins } from './../../../../sst/entities/exam.entity';
 import { IImagesMap } from './../../../factories/document/types/IDocumentFactory.types';
 import { DocumentDataPGRDto } from './../../../../sst/dto/document-data-pgr.dto';
 import { DocumentDataEntity } from './../../../../sst/entities/documentData.entity';
@@ -17,7 +18,7 @@ import { SectionsMapClass } from './maps/sectionTypeMap';
 import { docPGRSections } from './mock';
 import { ICreatePGR } from './types/pgr.types';
 import { IAllDocumentSectionType, IDocumentPGRSectionGroups, IDocVariables } from './types/section.types';
-import { HierarchyMapData, IHierarchyMap, IHomoGroupMap } from '../../converter/hierarchy.converter';
+import { HierarchyMapData, IHierarchyMap, IHomoGroupMap, IRiskMap } from '../../converter/hierarchy.converter';
 import { booleanVariables } from './functions/getVariables/boolean.variables';
 
 
@@ -40,6 +41,8 @@ export class DocumentBuildPGR {
   private hierarchyTree: IHierarchyMap;
   private imagesMap?: IImagesMap;
   private hierarchyHighLevelsData: Map<string, HierarchyMapData>;
+  private exams?: IExamOrigins[];
+  private risksMap?: IRiskMap
 
   constructor({
     version,
@@ -59,6 +62,8 @@ export class DocumentBuildPGR {
     docSections,
     imagesMap,
     hierarchyHighLevelsData,
+    exams,
+    risksMap
   }: ICreatePGR) {
     this.version = version;
     this.logoImagePath = logo;
@@ -78,6 +83,8 @@ export class DocumentBuildPGR {
     this.variables = this.getVariables();
     this.imagesMap = imagesMap;
     this.hierarchyHighLevelsData = hierarchyHighLevelsData;
+    this.exams = exams;
+    this.risksMap = risksMap;
   }
 
   public build() {
@@ -108,6 +115,7 @@ export class DocumentBuildPGR {
       [VariablesPGREnum.DOC_VALIDITY]: this.versions[0].validity,
       [VariablesPGREnum.COMPANY_HAS_SST_CERTIFICATION]: this.document?.complementarySystems?.length > 0 ? 'true' : '',
       [VariablesPGREnum.DOCUMENT_COORDINATOR]: this.document?.coordinatorBy || '',
+      [VariablesPGREnum.DOCUMENT_TITLE]: 'Criar variavel local "TITULO_DO_DOCUMENTO"',
       ...companyVariables(this.company, this.workspace, this.workspace.address),
       ...booleanVariables(this.company, this.workspace, this.hierarchy, this.document),
       ...docVariables,
@@ -130,6 +138,8 @@ export class DocumentBuildPGR {
       hierarchyTree: this.hierarchyTree,
       workspace: this.workspace,
       imagesMap: this.imagesMap,
+      exams: this.exams,
+      risksMap: this.risksMap
     }).map;
 
     const sectionsMap = new SectionsMapClass({

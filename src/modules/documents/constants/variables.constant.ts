@@ -360,6 +360,11 @@ export const variableMap: IVariableMap = {
   },
 
   //*PGR string --------------------->
+  [VariablesPGREnum.DOCUMENT_TITLE]: {
+    type: VariablesPGREnum.DOCUMENT_TITLE,
+    label: 'Título do documento',
+    accept: [],
+  },
   [VariablesPGREnum.CHAPTER_1]: {
     type: VariablesPGREnum.CHAPTER_1,
     label: '',

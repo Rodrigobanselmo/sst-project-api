@@ -1,5 +1,5 @@
 import sizeOf from 'image-size';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Readable } from 'stream';
 import { v4 } from 'uuid';
 
@@ -8,6 +8,7 @@ import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { AmazonStorageProvider } from '../../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
 import { AddPhotoCharacterizationDto } from '../../../dto/characterization.dto';
 import { CharacterizationRepository } from '../../../repositories/implementations/CharacterizationRepository';
+import { ErrorCompanyEnum } from 'src/shared/constants/enum/errorMessage';
 
 @Injectable()
 export class AddCharacterizationPhotoService {
@@ -20,6 +21,15 @@ export class AddCharacterizationPhotoService {
   async execute(addPhotoCharacterizationDto: AddPhotoCharacterizationDto, userPayloadDto: UserPayloadDto, file: Express.Multer.File) {
     const companyId = userPayloadDto.targetCompanyId;
     const [photoUrl, isVertical] = await this.upload(companyId, file);
+
+    if (addPhotoCharacterizationDto.id) {
+      const foundPhoto = await this.characterizationPhotoRepository.findById(addPhotoCharacterizationDto.id);
+
+      if (foundPhoto?.id) {
+        throw new BadRequestException(ErrorCompanyEnum.CHAR_PHOTO_ALREADY_EXISTS);
+      }
+    }
+
 
     await this.characterizationPhotoRepository.createMany([
       {

@@ -74,8 +74,9 @@ export class DocumentPGRFactory extends DocumentFactoryAbstractionCreator<IDocum
 export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
   public unlinkPaths: IUnlinkPaths[] = [];
   public localCreation = true;
+  public type = 'PGR';
 
-  private company: CompanyEntity;
+  protected company: CompanyEntity;
 
   constructor(
     protected readonly riskGroupDataRepository: RiskGroupDataRepository,
@@ -90,6 +91,10 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
   }
 
   public async getData({ companyId, workspaceId, ...body }: IDocumentPGRBody) {
+    return await this.getPrgData({ companyId, workspaceId, includeCharPhotos: true, ...body });
+  }
+
+  protected async getPrgData({ companyId, workspaceId, includeCharPhotos = true, ...body }: IDocumentPGRBody & { includeCharPhotos?: boolean }) {
     const company = await this.companyRepository.findDocumentData(companyId, { workspaceId, type: 'PGR' });
     const riskGroupId = company.riskFactorGroupData?.[0]?.id;
 
@@ -99,7 +104,7 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
     const workspacePromise = this.workspaceRepository.findById(workspaceId);
     const riskGroupDataPromise = this.riskGroupDataRepository.findDocumentData(riskGroupId, companyId, { workspaceId }); // add homo
     const hierarchyPromise = this.hierarchyRepository.findDocumentData(companyId, { workspaceId }); // add homo
-    const homogeneousGroupPromise = this.homoGroupRepository.findDocumentData(companyId, { workspaceId });
+    const homogeneousGroupPromise = this.homoGroupRepository.findDocumentData(companyId, { workspaceId, includePhotos: includeCharPhotos });
     const versionsPromise = this.riskDocumentRepository.findDocumentData(riskGroupId, companyId, DocumentTypeEnum.PGR);
     const modelDataPromise = this.documentModelData(company.documentData[0].modelId, companyId);
     // const simpleCompanyPromise = this.companyRepository.findFirstNude({ where: { id: simpleCompanyId }, include: { address: true, covers: true } });
@@ -113,9 +118,13 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
       modelDataPromise,
     ]);
 
+    const riskMap: Record<string, { name: string }> = {}
+
     riskGroupData.data = riskGroupData.data.map((riskData) => {
       const homo = homogeneousGroupsFound.find((homo) => homo.id == riskData.homogeneousGroupId);
       const isEnv = isEnvironment(homo.characterization?.type)
+
+      if (!riskMap[riskData.riskId]) riskMap[riskData.riskId] = { name: riskData.riskFactor.name }
 
       return {
         homogeneousGroup: {
@@ -209,7 +218,8 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
       characterizations,
       cover,
       imagesMap,
-      modelData: model
+      modelData: model,
+      riskMap
     };
   }
 
@@ -279,6 +289,10 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
   }
 
   public async getDocumentBuild(options: IGetDocument<IDocumentPGRBody, PromiseInfer<ReturnType<DocumentPGRFactoryProduct['getData']>>>) {
+    return await this.getDocumentPgrBuild(options)
+  }
+
+  protected async getDocumentPgrBuild(options: IGetDocument<IDocumentPGRBody, PromiseInfer<ReturnType<DocumentPGRFactoryProduct['getData']>>>) {
     const data = options.data;
     const version = options.version;
     const attachments = options.attachments;

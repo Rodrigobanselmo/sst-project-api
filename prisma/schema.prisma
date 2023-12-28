@@ -1005,7 +1005,7 @@ model ExamToRisk {
   examId                Int?
   riskId                String?
   companyId             String
-  endDate               DateTime?
+  deletedAt             DateTime?
   fromAge               Int?
   isAdmission           Boolean                 @default(false)
   isChange              Boolean                 @default(false)

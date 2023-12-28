@@ -48,7 +48,7 @@ const title = (props: IHeaderProps) =>
   new Paragraph({
     children: [
       new TextRun({
-        text: props.title || 'PROGRAMA DE GERENCIAMENTO DE RISCOS – PGR',
+        text: props.title || 'Criar variavel local "TITULO_DO_DOCUMENTO"',
         size: (props?.coverProps?.titleProps?.size || 0) * 2 || 96,
         bold: props?.coverProps?.titleProps?.bold ?? true,
         ...(props?.coverProps?.titleProps?.color && {

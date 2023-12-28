@@ -8,6 +8,7 @@ interface IFooterProps {
   footerText: string;
   consultantLogoPath: string;
   version: string;
+  title: string;
 }
 const borderStyle: ITableBordersOptions = {
   top: {
@@ -29,13 +30,13 @@ const table = (rows: TableRow[]) =>
     borders: borderStyle,
   });
 
-const firstCell = (footerText: string, version: string) =>
+const firstCell = (title: string, footerText: string, version: string) =>
   new TableCell({
     children: [
       new Paragraph({
         children: [
           new TextRun({
-            text: 'PROGRAMA DE GERENCIAMENTO DE RISCOS – PGR',
+            text: title,
             size: 12,
             color: palette.text.main.string,
           }),
@@ -123,15 +124,15 @@ const secondCell = (consultantLogoPath: string) => {
   });
 };
 
-const row = (footerText: string, version: string, consultantLogoPath: string) =>
+const row = (title: string, footerText: string, version: string, consultantLogoPath: string) =>
   new TableRow({
-    children: [firstCell(footerText, version), secondCell(consultantLogoPath)],
+    children: [firstCell(title, footerText, version), secondCell(consultantLogoPath)],
   });
 
-export const createFooter = ({ footerText, version, consultantLogoPath }: IFooterProps) => {
+export const createFooter = ({ title, footerText, version, consultantLogoPath }: IFooterProps) => {
   const footer = {
     default: new Footer({
-      children: [table([row(footerText, version, consultantLogoPath)])],
+      children: [table([row(title, footerText, version, consultantLogoPath)])],
     }),
     first: new Footer({
       children: [],

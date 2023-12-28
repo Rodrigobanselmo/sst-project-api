@@ -38,7 +38,8 @@ export abstract class DocumentFactoryAbstractionCreator<T, R> {
       const { url, buffer, fileName } = await this.save(product, {
         body,
         getBuild: async () => product.getDocumentBuild({ data, attachments, body, version }),
-        getSections: async () => product.getDocumentSections({ data, attachments, body, version })
+        getSections: async () => product.getDocumentSections({ data, attachments, body, version }),
+        type: product.type
       });
       if (isLocal) console.log(3, url)
 

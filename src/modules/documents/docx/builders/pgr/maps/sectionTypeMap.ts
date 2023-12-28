@@ -1,3 +1,4 @@
+import { IExamOrigins } from './../../../../../sst/entities/exam.entity';
 import { DocumentDataEntity } from './../../../../../sst/entities/documentData.entity';
 import { DocumentDataPGRDto } from './../../../../../sst/dto/document-data-pgr.dto';
 import { DocumentCoverEntity } from './../../../../../company/entities/document-cover.entity';
@@ -21,6 +22,7 @@ import { allCharacterizationSections } from '../../../components/iterables/all-c
 import { APPRTableSection } from '../../../components/tables/appr/appr.section';
 import { actionPlanTableSection } from '../../../components/tables/actionPlan/actionPlan.section';
 import { APPRByGroupTableSection } from '../../../components/tables/apprByGroup/appr-group.section';
+import { VariablesPGREnum } from '../enums/variables.enum';
 
 type IMapSectionDocumentType = Record<string, (arg: IAllDocumentSectionType) => ISectionOptions | ISectionOptions[]>;
 
@@ -39,6 +41,7 @@ type IDocumentClassType = {
   company: CompanyEntity;
   hierarchyTree: IHierarchyMap;
   hierarchyHighLevelsData: Map<string, HierarchyMapData>;
+  exams?: IExamOrigins[];
 };
 
 export class SectionsMapClass {
@@ -56,6 +59,7 @@ export class SectionsMapClass {
   private hierarchyHighLevelsData: Map<string, HierarchyMapData>;
   private hierarchyTree: IHierarchyMap;
   private company: CompanyEntity;
+  private exams?: IExamOrigins[];
 
   constructor({
     variables,
@@ -72,6 +76,7 @@ export class SectionsMapClass {
     consultantLogoImagePath,
     hierarchyTree,
     hierarchyHighLevelsData,
+    exams,
   }: IDocumentClassType) {
     this.variables = variables;
     this.version = version;
@@ -87,6 +92,7 @@ export class SectionsMapClass {
     this.cover = cover;
     this.hierarchyTree = hierarchyTree;
     this.hierarchyHighLevelsData = hierarchyHighLevelsData;
+    this.exams = exams;
   }
 
   public map: IMapSectionDocumentType = {
@@ -95,6 +101,7 @@ export class SectionsMapClass {
       coverSections({
         imgPath: this.logoPath,
         version: this.version,
+        title: replaceAllVariables(`??${VariablesPGREnum.DOCUMENT_TITLE}??`, this.variables),
         companyName: `${this.company.name} ${this.company.initials ? `(${this.company.initials})` : ''}`,
         ...(this.cover && (this.cover.json as any)),
       }),
@@ -103,10 +110,11 @@ export class SectionsMapClass {
         version: this.version,
         chapter: replaceAllVariables(text, this.variables),
         imagePath: this.logoPath,
+        title: replaceAllVariables(`??${VariablesPGREnum.DOCUMENT_TITLE}??`, this.variables),
       }),
-    [DocumentSectionTypeEnum.SECTION]: ({ children, footerText, ...rest }: ISection) => ({
+    [DocumentSectionTypeEnum.SECTION]: ({ title, children, footerText, ...rest }: ISection) => ({
       children: this.convertToDocx(children),
-      ...this.getFooterHeader(footerText),
+      ...this.getFooterHeader(footerText, title),
       ...rest,
       ...sectionLandscapeProperties,
     }),
@@ -134,8 +142,9 @@ export class SectionsMapClass {
       actionPlanTableSection(this.document, this.hierarchyTree),
   };
 
-  getFooterHeader = (footerText: string) => {
+  getFooterHeader = (footerText: string, title?: string) => {
     return headerAndFooter({
+      title: title || replaceAllVariables(`??${VariablesPGREnum.DOCUMENT_TITLE}??`, this.variables),
       footerText: replaceAllVariables(footerText, this.variables),
       logoPath: this.logoPath,
       consultantLogoPath: this.consultantLogoPath,

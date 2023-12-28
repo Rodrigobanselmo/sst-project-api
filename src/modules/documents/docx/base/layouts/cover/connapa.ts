@@ -15,7 +15,7 @@ const title = () =>
   new Paragraph({
     children: [
       new TextRun({
-        text: 'PROGRAMA DE GERENCIAMENTO DE RISCOS – PGR',
+        text: '??TITULO_DO_DOCUMENTO??',
         size: 96,
         bold: true,
       }),

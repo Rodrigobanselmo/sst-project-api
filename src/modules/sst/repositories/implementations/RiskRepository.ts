@@ -403,7 +403,7 @@ export class RiskRepository implements IRiskRepository {
         },
         examToRisk: {
           include: { exam: { select: { name: true, id: true } } },
-          where: { companyId },
+          where: { companyId, deletedAt: null },
         },
         riskFactorData: {
           where: {

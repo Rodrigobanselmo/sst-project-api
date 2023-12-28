@@ -42,6 +42,7 @@ export type ISection = {
   type: DocumentSectionTypeEnum.SECTION;
   children: ISectionChildrenType[];
   footerText?: string;
+  title?: string;
   properties?: ISectionPropertiesOptions;
 } & IBase;
 

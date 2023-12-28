@@ -34,6 +34,7 @@ export type IHierarchyMap = Record<
 >;
 
 export type IHomoGroupMap = Record<string, HomoGroupEntity>;
+export type IRiskMap = Record<string, { name: string }>;
 
 const setMapHierarchies = (hierarchyData: HierarchyEntity[]) => {
   const hierarchyTree = {} as IHierarchyMap;

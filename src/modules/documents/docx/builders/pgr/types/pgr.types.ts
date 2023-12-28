@@ -1,3 +1,4 @@
+import { IExamOrigins } from './../../../../../sst/entities/exam.entity';
 import { IImagesMap } from './../../../../factories/document/types/IDocumentFactory.types';
 import { DocumentDataPGRDto } from './../../../../../sst/dto/document-data-pgr.dto';
 import { DocumentDataEntity } from '../../../../../../modules/sst/entities/documentData.entity';
@@ -6,7 +7,7 @@ import { WorkspaceEntity } from '../../../../../company/entities/workspace.entit
 import { AttachmentEntity } from '../../../../../sst/entities/attachment.entity';
 import { RiskDocumentEntity } from '../../../../../sst/entities/riskDocument.entity';
 import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
-import { HierarchyMapData, IHierarchyMap, IHomoGroupMap } from '../../../converter/hierarchy.converter';
+import { HierarchyMapData, IHierarchyMap, IHomoGroupMap, IRiskMap } from '../../../converter/hierarchy.converter';
 import { CharacterizationEntity } from './../../../../../company/entities/characterization.entity';
 import { DocumentCoverEntity } from './../../../../../company/entities/document-cover.entity';
 import { IDocumentPGRSectionGroups } from './section.types';
@@ -29,4 +30,6 @@ export interface ICreatePGR {
   docSections?: IDocumentPGRSectionGroups;
   imagesMap?: IImagesMap;
   hierarchyHighLevelsData: Map<string, HierarchyMapData>;
+  exams?: IExamOrigins[];
+  risksMap?: IRiskMap
 }

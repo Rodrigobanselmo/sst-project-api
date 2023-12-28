@@ -7,14 +7,16 @@ export interface IHeaderFooterProps {
   footerText: string;
   logoPath: string;
   consultantLogoPath: string;
+  title: string;
 }
 
-export const headerAndFooter = ({ version, footerText, logoPath, consultantLogoPath }: IHeaderFooterProps) => {
+export const headerAndFooter = ({ title, version, footerText, logoPath, consultantLogoPath }: IHeaderFooterProps) => {
   return {
     footers: createFooter({
       footerText,
       version,
       consultantLogoPath,
+      title,
     }),
     headers: createHeader({
       path: logoPath,

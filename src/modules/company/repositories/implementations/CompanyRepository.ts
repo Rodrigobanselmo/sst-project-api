@@ -846,7 +846,7 @@ export class CompanyRepository implements ICompanyRepository {
     });
 
     const examsCountPromise = this.prisma.exam.count({
-      where: { OR: [{ examToRiskData: { some: { risk: { companyId: id } } } }, { examToRisk: { some: { companyId: id } } }] },
+      where: { OR: [{ examToRiskData: { some: { risk: { companyId: id } } } }, { examToRisk: { some: { companyId: id, deletedAt: null } } }] },
     });
 
     const characterizationCountPromise = this.prisma.companyCharacterization.count({

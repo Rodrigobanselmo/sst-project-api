@@ -24,7 +24,7 @@ export class ExamRiskEntity implements ExamToRisk {
   risk?: RiskFactorsEntity;
   exam?: ExamEntity;
   startDate: Date;
-  endDate: Date;
+  deletedAt: Date;
   minRiskDegreeQuantity: number;
   minRiskDegree: number;
   isOld: boolean; // not used

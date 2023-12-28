@@ -17,7 +17,7 @@ export class UpdateExamRiskService {
 
   async execute(id: number, { realCompanyId, ...updateExamDto }: UpdateExamRiskDto, user: UserPayloadDto) {
     const found = await this.examRiskRepository.findFirstNude({
-      where: { id, companyId: user.targetCompanyId },
+      where: { id, companyId: user.targetCompanyId, deletedAt: null },
       select: {
         id: true, riskId: true, company: {
           select: {
@@ -42,10 +42,9 @@ export class UpdateExamRiskService {
         addSkipCompanyId: realCompanyId
       });
 
-      return this.createExamRiskService.execute({
+      const examRisk = await this.createExamRiskService.execute({
         companyId: realCompanyId,
         considerBetweenDays: updateExamDto.considerBetweenDays,
-        endDate: updateExamDto.endDate,
         examId: updateExamDto.examId,
         fromAge: updateExamDto.fromAge,
         riskId: updateExamDto.riskId,
@@ -63,6 +62,14 @@ export class UpdateExamRiskService {
         validityInMonths: updateExamDto.validityInMonths,
         isMale: updateExamDto.isMale,
       }, { ...user, targetCompanyId: realCompanyId })
+
+      this.checkEmployeeExam({
+        companyIds: [realCompanyId],
+        foundRiskId: found.riskId,
+        riskId: updateExamDto.riskId
+      })
+
+      return examRisk;
     }
 
     const exam = await this.examRiskRepository.update({
@@ -83,7 +90,6 @@ export class UpdateExamRiskService {
 
   private async checkEmployeeExam({ companyIds, riskId, foundRiskId }: { companyIds: string[], riskId: string, foundRiskId: string }) {
     await asyncEach(companyIds, async (companyId) => {
-      console.log(1)
       await this.checkEmployeeExamService.execute({
         companyId,
         riskId,

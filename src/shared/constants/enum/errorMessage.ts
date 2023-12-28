@@ -49,6 +49,7 @@ export enum ErrorCompanyEnum {
   FORBIDEN_INACTIVATION = 'Para inativar é necessario informar "Data Fim" para todos os cargos',
   ENVIRONMENT_NOT_FOUND = 'O Ambiente requisitado não foi encontrado nesta empresa',
   CHARACTERIZATION_NOT_FOUND = 'A Atividade requisitada não foi encontrado nesta empresa',
+  CHAR_PHOTO_ALREADY_EXISTS = 'Foto já cadastrada',
   HOMOGENEOUS_SAME_NAME = 'Já existe um grupo homogêneo com o mesmo nome',
   WORKSPACE_NOT_FOUND = 'O Estabelecimento (área de trabalho) informada não foi encontrada, verifique a sigla utilizada',
   CPF_CONFLICT = 'CPF já cadastrado',
