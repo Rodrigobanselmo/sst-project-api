@@ -602,7 +602,7 @@ model DocumentData {
   name          String?
   created_at    DateTime         @default(now())
   companyId     String
-  workspaceId   String           @unique
+  workspaceId   String
   validityStart DateTime?
   validityEnd   DateTime?
   status        StatusEnum       @default(PROGRESS)
@@ -1714,7 +1714,7 @@ model Workspace {
   company            Company                   @relation(fields: [companyId], references: [id])
   hierarchy          Hierarchy[]               @relation("HierarchyToWorkspace")
   homogeneousGroup   HomogeneousGroup[]
-  documentData       DocumentData?
+  documentData       DocumentData[]
 
   @@unique([abbreviation, companyId])
   @@unique([id, companyId])

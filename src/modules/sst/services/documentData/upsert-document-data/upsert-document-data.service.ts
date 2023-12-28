@@ -6,10 +6,10 @@ import { DocumentDataRepository } from '../../../repositories/implementations/Do
 
 @Injectable()
 export class UpsertDocumentDataService {
-  constructor(private readonly documentDataRepository: DocumentDataRepository) {}
+  constructor(private readonly documentDataRepository: DocumentDataRepository) { }
 
   async execute(dto: UpsertDocumentDataDto & { json?: any }, user: UserPayloadDto) {
-    const riskData = await this.documentDataRepository.upsert({ ...dto, type: 'PGR', companyId: user.targetCompanyId });
+    const riskData = await this.documentDataRepository.upsert({ ...dto, companyId: user.targetCompanyId });
     return riskData;
   }
 }
