@@ -64,14 +64,13 @@ export class DocumentPCMSOFactoryProduct extends DocumentPGRFactoryProduct {
     protected readonly documentModelRepository: DocumentModelRepository,
     protected readonly findExamByHierarchyService: FindExamByHierarchyService,
   ) {
-    super(riskGroupDataRepository, riskDocumentRepository, workspaceRepository, companyRepository, homoGroupRepository, hierarchyRepository, documentModelRepository);
+    super(riskGroupDataRepository, riskDocumentRepository, workspaceRepository, companyRepository, homoGroupRepository, hierarchyRepository, documentModelRepository, findExamByHierarchyService);
   }
 
   public async getData({ companyId, workspaceId, ...body }: IDocumentPGRBody) {
     const allData = await this.getPrgData({ companyId, workspaceId, ...body })
-    const exams = await this.findExamByHierarchyService.execute({ targetCompanyId: companyId }, { getAllExamToRiskWithoutHierarchy: true });
 
-    return { ...allData, exams }
+    return { ...allData }
   }
 
   public async getAttachments(options: IGetDocument<IDocumentPGRBody, PromiseInfer<ReturnType<DocumentPCMSOFactoryProduct['getData']>>>) {
@@ -100,38 +99,50 @@ export class DocumentPCMSOFactoryProduct extends DocumentPGRFactoryProduct {
       }
     } as typeof documentBaseBuild
 
-    const documentAprGroupBuild: typeof documentBaseBuild = {
+    const documentRiskExamHierarchyBuild: typeof documentBaseBuild = {
       ...documentBaseBuild,
       attachments: [],
       docSections: {
-        sections: [{ data: [{ type: DocumentSectionTypeEnum.APR_GROUP }] }],
+        sections: [{
+          data: [{
+            title: 'PCMSO',
+            type: DocumentSectionTypeEnum.SECTION, children: [
+              {
+                type: DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE,
+                text: "Relação de exames por hierarquia",
+              },
+              {
+                type: DocumentSectionChildrenTypeEnum.TABLE_PCMSO_HIERARCHY,
+              },
+            ]
+          }]
+        }],
         variables: {}
       }
     } as typeof documentBaseBuild
 
-    const documentActionPlanBuild: typeof documentBaseBuild = {
-      ...documentBaseBuild,
-      attachments: [],
-      docSections: {
-        sections: [{ data: [{ type: DocumentSectionTypeEnum.ACTION_PLAN }] }],
-        variables: {}
-      }
-    }
 
     const docId = options.data.docId;
     const companyId = options.data.company.id;
     const id1 = v4();
     const id2 = v4();
-    const id3 = v4();
 
     return [
       {
         buildData: documentRiskExamGroupBuild,
         section: new DocumentBuildPGR(documentRiskExamGroupBuild).build(),
-        type: 'PGR-APR',
+        type: 'PCMSO-EXAMES',
         id: id1,
-        name: 'Inventário de Risco por Função (APR)',
+        name: 'Relação de exames por GSE',
         link: `${process.env.APP_HOST}/download/pgr/anexos?ref1=${docId}&ref2=${id1}&ref3=${companyId}`,
+      },
+      {
+        buildData: documentRiskExamHierarchyBuild,
+        section: new DocumentBuildPGR(documentRiskExamHierarchyBuild).build(),
+        type: 'PCMSO-EXAMES-HIERARQUIA',
+        id: id2,
+        name: 'Relação de exames por hierarquia',
+        link: `${process.env.APP_HOST}/download/pgr/anexos?ref1=${docId}&ref2=${id2}&ref3=${companyId}`,
       },
       // {
       //   buildData: documentAprGroupBuild,
@@ -154,7 +165,7 @@ export class DocumentPCMSOFactoryProduct extends DocumentPGRFactoryProduct {
 
   public async getDocumentBuild(options: IGetDocument<IDocumentPGRBody, PromiseInfer<ReturnType<DocumentPCMSOFactoryProduct['getData']>>>) {
     const docData = await this.getDocumentPgrBuild(options)
-    return { ...docData, exams: options.data.exams.data }
+    return { ...docData }
   }
 
 }

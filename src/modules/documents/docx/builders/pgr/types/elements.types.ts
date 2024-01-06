@@ -67,6 +67,7 @@ export enum DocumentSectionChildrenTypeEnum {
   PLAN_TABLE = 'PLAN_TABLE',
 
   TABLE_PCMSO_GHO = 'TABLE_PCMSO_GHO',
+  TABLE_PCMSO_HIERARCHY = 'TABLE_PCMSO_HIERARCHY',
 
 }
 
@@ -386,6 +387,10 @@ export type ITablePcmsoGho = {
   type: DocumentSectionChildrenTypeEnum.TABLE_PCMSO_GHO;
 } & IBaseDocumentModel;
 
+export type ITablePcmsoHierarchy = {
+  type: DocumentSectionChildrenTypeEnum.TABLE_PCMSO_HIERARCHY;
+} & IBaseDocumentModel;
+
 export type ISectionChildrenType =
   | IH1
   | IH2
@@ -447,4 +452,5 @@ export type ISectionChildrenType =
   | IProfessionalSignature
   | IConsiderationsQuantityTable
   | ITablePcmsoGho
+  | ITablePcmsoHierarchy
   | IProfessional;

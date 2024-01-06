@@ -36,6 +36,8 @@ export interface IExamOrigins {
   origins: IExamOriginData[];
 }
 
+export type IRiskExamMap = Record<string, { riskName: string; exams: Record<string, { name: string; id: string }> }>
+
 export class ExamEntity implements Exam {
   @ApiProperty({ description: 'The id of the Company' })
   id: number;
@@ -122,5 +124,23 @@ export class ExamEntity implements Exam {
     //     }
     //   });
     // }
+  }
+
+  static getRiskExams(exams: IExamOrigins[]) {
+    const riskExamMap: IRiskExamMap = {};
+
+    if (!exams) return riskExamMap;
+
+    exams.forEach((exam) => {
+      exam.origins.forEach((origin) => {
+        if (!riskExamMap[origin.risk?.id]) {
+          riskExamMap[origin.risk?.id] = { riskName: origin.risk?.name, exams: {} };
+        }
+
+        riskExamMap[origin.risk?.id].exams[exam.exam.id] = { name: exam.exam.name, id: exam.exam.id };
+      });
+    });
+
+    return riskExamMap
   }
 }

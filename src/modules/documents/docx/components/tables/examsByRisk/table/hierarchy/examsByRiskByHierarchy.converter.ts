@@ -1,29 +1,36 @@
-import { CompanyEntity } from './../../../../../../../company/entities/company.entity';
+import { palette } from '../../../../../../../../shared/constants/palette';
 import { getIsTodosRisk } from '../../../../../../../../shared/utils/getIsTodosRisk';
 import { sortString } from '../../../../../../../../shared/utils/sorts/string.sort';
-import { HierarchyMapData, IHierarchyData, IHierarchyMap, IHomoGroupMap, IRiskMap } from '../../../../../converter/hierarchy.converter';
 import { IExamOriginData, IExamOrigins } from '../../../../../../../sst/entities/exam.entity';
-import { bodyTableProps } from '../../elements/body';
-import { ExamByGroupColumnEnum } from '../../examsByRisk.constant';
 import { filterOriginsByHierarchy } from '../../../../../../../sst/services/exam/find-by-hierarchy /find-exam-by-hierarchy.service';
-import { getHomoGroupName } from '../../../apprByGroup/appr-group.section';
-import { palette } from '../../../../../../../../shared/constants/palette';
+import { IHierarchyData, IHierarchyMap } from '../../../../../converter/hierarchy.converter';
+import { HierarchyPlanMap } from '../../../hierarchyHomoOrg/hierarchyHomoOrg.constant';
+import { bodyTableProps } from '../../elements/body';
+import { getIsAll, getX, removeExamsDuplicated } from '../exam-utils';
+import { ExamByHierarchyColumnEnum } from './examsByRiskByHierarchy.constant';
 
 export const examsByHierarchyConverter = (hierarchyData: IHierarchyData, exams: IExamOrigins[], companyId: string, hierarchyTree: IHierarchyMap) => {
   const rows: bodyTableProps[][] = [];
+  const hierarchyType: Record<string, string> = {}
+  const hierarchyTypeArray: bodyTableProps[] = []
+
+  Array.from(hierarchyData.entries()).forEach(([, hierarchy]) => {
+    hierarchy.org.forEach((org) => {
+      if (!hierarchyType[org.typeEnum]) {
+        hierarchyType[org.typeEnum] = org.typeEnum
+        hierarchyTypeArray[HierarchyPlanMap[org.typeEnum].position] = { text: '', size: 3, fontSize: 8 };
+      }
+    })
+  })
+
 
 
   const hierarchyExamsMap = examsByGroupGetData(hierarchyData, exams, companyId)
 
-  const getIsAll = (riskId: string, riskName?: string) => {
-    const isAll = getIsTodosRisk({ riskId }) || !riskName
-    return isAll
-  }
-
   Array.from(hierarchyData.entries())
     .sort((a, b) => sortString(a, b, 'name'))
     .forEach(([id, hierarchy]) => {
-      let lastRiskId = '';
+      //* [if want to have rowSpan] let lastRiskId = '';
 
       const examArray = Object.values(hierarchyExamsMap[id]).flat();
       examArray.sort((a, b) => sortString(
@@ -33,30 +40,42 @@ export const examsByHierarchyConverter = (hierarchyData: IHierarchyData, exams: 
         const cells: bodyTableProps[] = [];
         const riskId = examOrigin.origin?.risk?.id;
 
-        if (examIndex == 0) {
-          const rowSpan = examArray.length;
-          cells[ExamByGroupColumnEnum.GSE] = { text: hierarchyTree[id]?.name || '', size: 4, rowSpan };
-        }
+        //* [if want to have rowSpan] if (examIndex == 0) {
+        //* [if want to have rowSpan] const rowSpan = examArray.length;
+        const rowSpan = undefined
+
+
+        //* [if want]cells[ExamByHierarchyColumnEnum.HIERARCHY] = { text: hierarchyTree[id]?.name || '', size: 4, rowSpan };
+        //* [if want to have rowSpan] }
 
         const isAll = getIsAll(riskId, examOrigin.origin?.risk?.name)
-        const refId = (isAll ? 'all' : riskId)
+        //* [if want to have rowSpan] const refId = (isAll ? 'all' : riskId)
 
-        if (lastRiskId != refId) {
-          lastRiskId = refId || '';
-          const text = isAll ? 'não vinculado a risco específico' : examOrigin.origin?.risk?.name || '';
+        //* [if want to have rowSpan] if (lastRiskId != refId) {
+        //* [if want to have rowSpan] lastRiskId = refId || '';
+        const text = isAll ? 'não vinculado a risco específico' : examOrigin.origin?.risk?.name || '';
 
-          const sameRiskExams = examArray.filter((exam) => isAll ? getIsAll(exam.origin?.risk?.id, exam.origin?.risk?.name) : exam.origin?.risk?.id === riskId);
-          const rowSpan = sameRiskExams.length
-          cells[ExamByGroupColumnEnum.RISKS] = { text, size: 5, rowSpan, ...(isAll && { color: palette.text.simple.string }) };
-        }
+        //* [if want to have rowSpan] const sameRiskExams = examArray.filter((exam) => isAll ? getIsAll(exam.origin?.risk?.id, exam.origin?.risk?.name) : exam.origin?.risk?.id === riskId);
+        //* [if want to have rowSpan] const rowSpan = sameRiskExams.length
+        //* [if want to have rowSpan] const rowSpan = undefined
+        cells[ExamByHierarchyColumnEnum.RISKS] = { text, size: 5, rowSpan, ...(isAll && { color: palette.text.simple.string }), fontSize: 10 };
+        //* [if want to have rowSpan] }
 
 
-        cells[ExamByGroupColumnEnum.EXAMS] = { text: examOrigin.name, size: 5 };
-        cells[ExamByGroupColumnEnum.PERIODICIDADE] = { text: examOrigin.origin.isPeriodic ? String(examOrigin.origin.validityInMonths || '-') : '', size: 1 };
-        cells[ExamByGroupColumnEnum.PRE_ADMISSION] = { ...getX(examOrigin.origin.isAdmission), size: 1 };
-        cells[ExamByGroupColumnEnum.RETURN_TO_WORK] = { ...getX(examOrigin.origin.isReturn), size: 1 };
-        cells[ExamByGroupColumnEnum.CHANGE_RISK] = { ...getX(examOrigin.origin.isChange), size: 1 };
-        cells[ExamByGroupColumnEnum.DEMISSIONAL] = { ...getX(examOrigin.origin.isDismissal), size: 1 };
+        cells[ExamByHierarchyColumnEnum.EXAMS] = { text: examOrigin.name, size: 5, fontSize: 10 };
+        cells[ExamByHierarchyColumnEnum.PERIODICIDADE] = { text: examOrigin.origin.isPeriodic ? String(examOrigin.origin.validityInMonths || '-') : '', size: 1 };
+        cells[ExamByHierarchyColumnEnum.PRE_ADMISSION] = { ...getX(examOrigin.origin.isAdmission), size: 1 };
+        cells[ExamByHierarchyColumnEnum.RETURN_TO_WORK] = { ...getX(examOrigin.origin.isReturn), size: 1 };
+        cells[ExamByHierarchyColumnEnum.CHANGE_RISK] = { ...getX(examOrigin.origin.isChange), size: 1 };
+        cells[ExamByHierarchyColumnEnum.DEMISSIONAL] = { ...getX(examOrigin.origin.isDismissal), size: 1 };
+
+
+
+        cells.unshift(...hierarchyTypeArray)
+
+        hierarchy.org.forEach((org) => {
+          cells[HierarchyPlanMap[org.typeEnum].position].text = org?.name || ''
+        })
 
         rows.push(cells);
       })
@@ -64,14 +83,6 @@ export const examsByHierarchyConverter = (hierarchyData: IHierarchyData, exams: 
 
   return rows;
 };
-const getX = (isSelected: boolean) => {
-  return {
-    text: isSelected ? 'X' : '',
-    size: 1,
-    fontSize: 15
-  }
-}
-
 
 const examsByGroupGetData = (hierarchyData: IHierarchyData, exams: IExamOrigins[], companyId: string) => {
   const hierarchyExamsMap: Record<string, Record<string, { name: string; origin?: IExamOriginData }[]>> = {}
@@ -92,7 +103,7 @@ const examsByGroupGetData = (hierarchyData: IHierarchyData, exams: IExamOrigins[
     })
   })
 
-  return hierarchyExamsMap;
+  return removeExamsDuplicated(hierarchyExamsMap);
 };
 
 

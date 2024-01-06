@@ -1,4 +1,4 @@
-import { IExamOrigins } from './../../../../sst/entities/exam.entity';
+import { ExamEntity, IExamOrigins, IRiskExamMap } from './../../../../sst/entities/exam.entity';
 import { IImagesMap } from './../../../factories/document/types/IDocumentFactory.types';
 import { DocumentDataPGRDto } from './../../../../sst/dto/document-data-pgr.dto';
 import { DocumentDataEntity } from './../../../../sst/entities/documentData.entity';
@@ -42,6 +42,7 @@ export class DocumentBuildPGR {
   private imagesMap?: IImagesMap;
   private hierarchyHighLevelsData: Map<string, HierarchyMapData>;
   private exams?: IExamOrigins[];
+  private riskExamMap?: IRiskExamMap;
   private risksMap?: IRiskMap
 
   constructor({
@@ -85,6 +86,8 @@ export class DocumentBuildPGR {
     this.hierarchyHighLevelsData = hierarchyHighLevelsData;
     this.exams = exams;
     this.risksMap = risksMap;
+
+    if (exams) this.riskExamMap = ExamEntity.getRiskExams(exams);
   }
 
   public build() {
@@ -139,7 +142,8 @@ export class DocumentBuildPGR {
       workspace: this.workspace,
       imagesMap: this.imagesMap,
       exams: this.exams,
-      risksMap: this.risksMap
+      risksMap: this.risksMap,
+      riskExamMap: this.riskExamMap,
     }).map;
 
     const sectionsMap = new SectionsMapClass({

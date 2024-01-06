@@ -1,5 +1,5 @@
 import { TextDirection } from 'docx';
-import { headerTableProps } from './elements/header';
+import { headerTableProps } from '../../elements/header';
 
 export enum ExamByGroupColumnEnum {
   GSE,

@@ -1,4 +1,4 @@
-import { IExamOrigins } from './../../../../../sst/entities/exam.entity';
+import { IExamOrigins, IRiskExamMap } from './../../../../../sst/entities/exam.entity';
 import { IImagesMap } from './../../../../factories/document/types/IDocumentFactory.types';
 import { DocumentDataEntity } from './../../../../../sst/entities/documentData.entity';
 import { DocumentDataPGRDto } from './../../../../../sst/dto/document-data-pgr.dto';
@@ -51,7 +51,7 @@ import { paragraphFigure, paragraphTable } from './../../../base/elements/paragr
 import { considerationsQuantityTable } from '../../../components/tables/mock/components/considerationsQuantity/table.component';
 import { imageDoc } from '../../../components/images/image';
 import { examsByRiskByGroupTable } from '../../../components/tables/examsByRisk/table/homoGroup/examsByRiskByGroup.table';
-import { examsByRiskByHierarchyTable } from '../../../components/tables/examsByRisk/table/hierarchy/examsByRiskByHierarchy..table';
+import { examsByRiskByHierarchyTable } from '../../../components/tables/examsByRisk/table/hierarchy/examsByRiskByHierarchy.table';
 
 export type IMapElementDocumentType = Record<string, (arg: ISectionChildrenType) => (Paragraph | Table)[]>;
 
@@ -69,7 +69,8 @@ type IDocumentClassType = {
   hierarchyTree: IHierarchyMap;
   imagesMap?: IImagesMap;
   exams?: IExamOrigins[];
-  risksMap?: IRiskMap
+  risksMap?: IRiskMap;
+  riskExamMap?: IRiskExamMap;
 };
 
 export class ElementsMapClass {
@@ -87,6 +88,7 @@ export class ElementsMapClass {
   private imagesMap?: IImagesMap;
   private exams?: IExamOrigins[];
   private risksMap?: IRiskMap
+  private riskExamMap?: IRiskExamMap;
 
   constructor({
     variables,
@@ -102,7 +104,8 @@ export class ElementsMapClass {
     workspace,
     imagesMap,
     exams,
-    risksMap
+    risksMap,
+    riskExamMap,
   }: IDocumentClassType) {
     this.variables = variables;
     this.versions = versions;
@@ -118,6 +121,7 @@ export class ElementsMapClass {
     this.imagesMap = imagesMap;
     this.exams = exams;
     this.risksMap = risksMap;
+    this.riskExamMap = riskExamMap;
   }
 
   public map: IMapElementDocumentType = {
@@ -265,7 +269,7 @@ export class ElementsMapClass {
         showHomogeneous: false,
         showHomogeneousDescription: false,
       })['children'],
-    [DocumentSectionChildrenTypeEnum.RISK_TABLE]: () => riskCharacterizationTableSection(this.document)['children'],
+    [DocumentSectionChildrenTypeEnum.RISK_TABLE]: () => riskCharacterizationTableSection(this.document, this.riskExamMap)['children'],
     [DocumentSectionChildrenTypeEnum.HIERARCHY_RISK_TABLE]: () =>
       hierarchyRisksTableAllSections(this.document, this.hierarchy, this.hierarchyTree, (x, v) => this.convertToDocx(x, v)),
     [DocumentSectionChildrenTypeEnum.PLAN_TABLE]: () => actionPlanTableSection(this.document, this.hierarchyTree)['children'],
@@ -276,7 +280,7 @@ export class ElementsMapClass {
     //       return [...acc, ...curr];
     //     }, []),
     [DocumentSectionChildrenTypeEnum.TABLE_PCMSO_GHO]: () => [examsByRiskByGroupTable(this.homogeneousGroup, this.exams, this.hierarchyTree)],
-    // [DocumentSectionChildrenTypeEnum.TABLE_PCMSO_GHO]: () => [examsByRiskByHierarchyTable(this.hierarchy, this.exams, this.workspace.companyId, this.hierarchyTree)],
+    [DocumentSectionChildrenTypeEnum.TABLE_PCMSO_HIERARCHY]: () => [examsByRiskByHierarchyTable(this.hierarchy, this.exams, this.workspace.companyId, this.hierarchyTree)],
   };
 
   private convertToDocx(data: ISectionChildrenType[], variables = {} as IDocVariables) {

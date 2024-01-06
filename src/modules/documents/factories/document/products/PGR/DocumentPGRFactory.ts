@@ -1,31 +1,28 @@
-import { ServerlessLambdaProvider } from './../../../../../../shared/providers/ServerlessFunctionsProvider/implementations/ServerlessLambda/ServerlessLambdaProvider';
-import { DocumentSectionChildrenTypeEnum, IImage } from './../../../../docx/builders/pgr/types/elements.types';
-import { parseModelData } from './../../helpers/parseModelData';
-import { DocumentSectionTypeEnum, IDocumentPGRSectionGroups, IDocVariables } from './../../../../docx/builders/pgr/types/section.types';
-import { IDocumentModelData } from './../../../../types/document-mode.types';
-import { DocumentDataPGRDto } from '../../../../../sst/dto/document-data-pgr.dto';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { DocumentTypeEnum, HomoTypeEnum, StatusEnum } from '@prisma/client';
 import { ISectionOptions } from 'docx';
-import { asyncBatch } from '../../../../../../shared/utils/asyncBatch';
 import { v4 } from 'uuid';
+import { asyncBatch } from '../../../../../../shared/utils/asyncBatch';
+import { DocumentDataPGRDto } from '../../../../../sst/dto/document-data-pgr.dto';
+import { ServerlessLambdaProvider } from './../../../../../../shared/providers/ServerlessFunctionsProvider/implementations/ServerlessLambda/ServerlessLambdaProvider';
+import { FindExamByHierarchyService } from './../../../../../sst/services/exam/find-by-hierarchy /find-exam-by-hierarchy.service';
+import { DocumentSectionChildrenTypeEnum, IImage } from './../../../../docx/builders/pgr/types/elements.types';
+import { DocumentSectionTypeEnum } from './../../../../docx/builders/pgr/types/section.types';
+import { parseModelData } from './../../helpers/parseModelData';
 
-import { actionPlanTableSection } from '../../../../docx/components/tables/actionPlan/actionPlan.section';
-import { APPRByGroupTableSection } from '../../../../docx/components/tables/apprByGroup/appr-group.section';
-import { dayjs } from '../../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
-import { DocumentFactoryAbstractionCreator } from '../../creator/DocumentFactoryCreator';
-import { IDocumentFactoryProduct as IDocumentFactoryProduct, IImagesMap, IUnlinkPaths } from '../../types/IDocumentFactory.types';
 import { PromiseInfer } from '../../../../../../shared/interfaces/promise-infer.types';
+import { dayjs } from '../../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { AmazonStorageProvider } from '../../../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
 import { downloadPathImage, downloadPathImages, getPathImage } from '../../../../../../shared/utils/downloadPathImages';
 import { getConsultantCompany } from '../../../../../../shared/utils/getConsultantCompany';
 import { getDocxFileName } from '../../../../../../shared/utils/getFileName';
 import { getRiskDoc } from '../../../../../../shared/utils/getRiskDoc';
+import { isEnvironment } from '../../../../../../shared/utils/isEnvironment';
+import { removeDuplicate } from '../../../../../../shared/utils/removeDuplicate';
 import { CharacterizationEntity } from '../../../../../company/entities/characterization.entity';
 import { CompanyEntity } from '../../../../../company/entities/company.entity';
 import { HierarchyEntity } from '../../../../../company/entities/hierarchy.entity';
 import { HomoGroupEntity } from '../../../../../company/entities/homoGroup.entity';
-import { isEnvironment } from '../../../../../../shared/utils/isEnvironment';
 import { CompanyRepository } from '../../../../../company/repositories/implementations/CompanyRepository';
 import { HierarchyRepository } from '../../../../../company/repositories/implementations/HierarchyRepository';
 import { HomoGroupRepository } from '../../../../../company/repositories/implementations/HomoGroupRepository';
@@ -34,13 +31,11 @@ import { RiskDocumentEntity } from '../../../../../sst/entities/riskDocument.ent
 import { RiskDocumentRepository } from '../../../../../sst/repositories/implementations/RiskDocumentRepository';
 import { RiskGroupDataRepository } from '../../../../../sst/repositories/implementations/RiskGroupDataRepository';
 import { DocumentBuildPGR } from '../../../../docx/builders/pgr/create';
-import { APPRTableSection } from '../../../../docx/components/tables/appr/appr.section';
 import { hierarchyConverter } from '../../../../docx/converter/hierarchy.converter';
-import { IGetDocument, ISaveDocument } from '../../types/IDocumentFactory.types';
-import { IDocumentPGRBody } from './types/pgr.types';
 import { DocumentModelRepository } from '../../../../repositories/implementations/DocumentModelRepository';
-import { removeDuplicate } from '../../../../../../shared/utils/removeDuplicate';
-import { writeFileSync } from 'fs';
+import { DocumentFactoryAbstractionCreator } from '../../creator/DocumentFactoryCreator';
+import { IDocumentFactoryProduct, IGetDocument, IImagesMap, ISaveDocument, IUnlinkPaths } from '../../types/IDocumentFactory.types';
+import { IDocumentPGRBody } from './types/pgr.types';
 
 @Injectable()
 export class DocumentPGRFactory extends DocumentFactoryAbstractionCreator<IDocumentPGRBody, any> {
@@ -52,6 +47,7 @@ export class DocumentPGRFactory extends DocumentFactoryAbstractionCreator<IDocum
     private readonly homoGroupRepository: HomoGroupRepository,
     private readonly hierarchyRepository: HierarchyRepository,
     private readonly documentModelRepository: DocumentModelRepository,
+    protected readonly findExamByHierarchyService: FindExamByHierarchyService,
     private readonly storageProvider: AmazonStorageProvider,
     private readonly lambdaProvider: ServerlessLambdaProvider,
   ) {
@@ -67,6 +63,7 @@ export class DocumentPGRFactory extends DocumentFactoryAbstractionCreator<IDocum
       this.homoGroupRepository,
       this.hierarchyRepository,
       this.documentModelRepository,
+      this.findExamByHierarchyService,
     );
   }
 }
@@ -86,6 +83,7 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
     protected readonly homoGroupRepository: HomoGroupRepository,
     protected readonly hierarchyRepository: HierarchyRepository,
     protected readonly documentModelRepository: DocumentModelRepository,
+    protected readonly findExamByHierarchyService: FindExamByHierarchyService,
   ) {
     //
   }
@@ -199,6 +197,8 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
     const docId = body.id || v4();
     const cover = company?.covers?.[0] || consultant?.covers?.[0];
 
+    const exams = await this.findExamByHierarchyService.execute({ targetCompanyId: companyId }, { getAllExamToRiskWithoutHierarchy: true });
+
     return {
       company,
       workspace,
@@ -219,7 +219,8 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
       cover,
       imagesMap,
       modelData: model,
-      riskMap
+      riskMap,
+      exams
     };
   }
 
@@ -346,6 +347,7 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
       docSections: data.modelData,
       imagesMap,
       hierarchyHighLevelsData: data.hierarchyHighLevelsData,
+      exams: data.exams.data,
     };
   }
 

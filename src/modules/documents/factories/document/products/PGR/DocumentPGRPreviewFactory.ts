@@ -1,3 +1,4 @@
+import { FindExamByHierarchyService } from './../../../../../sst/services/exam/find-by-hierarchy /find-exam-by-hierarchy.service';
 import { ServerlessLambdaProvider } from './../../../../../../shared/providers/ServerlessFunctionsProvider/implementations/ServerlessLambda/ServerlessLambdaProvider';
 import { IDocumentModelData } from './../../../../types/document-mode.types';
 import { Injectable } from '@nestjs/common';
@@ -26,6 +27,7 @@ export class DocumentPGRPreviewFactory extends DocumentFactoryAbstractionCreator
     private readonly homoGroupRepository: HomoGroupRepository,
     private readonly hierarchyRepository: HierarchyRepository,
     private readonly documentModelRepository: DocumentModelRepository,
+    private readonly findExamByHierarchyService: FindExamByHierarchyService,
     private readonly storageProvider: FakeStorageProvider,
     private readonly lambdaProvider: ServerlessLambdaProvider,
   ) {
@@ -41,6 +43,7 @@ export class DocumentPGRPreviewFactory extends DocumentFactoryAbstractionCreator
       this.homoGroupRepository,
       this.hierarchyRepository,
       this.documentModelRepository,
+      this.findExamByHierarchyService
     );
 
     DocumentPreview.data = body.data;

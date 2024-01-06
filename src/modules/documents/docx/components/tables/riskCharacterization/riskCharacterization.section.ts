@@ -1,3 +1,4 @@
+import { IRiskExamMap } from './../../../../../sst/entities/exam.entity';
 import { PageOrientation, Table, WidthType } from 'docx';
 import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
 import { riskCharacterizationHeader } from './riskCharacterization.constant';
@@ -6,8 +7,8 @@ import { TableBodyElements } from './elements/body';
 import { TableHeaderElements } from './elements/header';
 import { riskCharacterizationConverter } from './riskCharacterization.converter';
 
-export const riskCharacterizationTableSection = (riskFactorGroupData: RiskFactorGroupDataEntity) => {
-  const riskCharacterizationData = riskCharacterizationConverter(riskFactorGroupData);
+export const riskCharacterizationTableSection = (riskFactorGroupData: RiskFactorGroupDataEntity, riskExamMap: IRiskExamMap) => {
+  const riskCharacterizationData = riskCharacterizationConverter(riskFactorGroupData, riskExamMap);
 
   const tableHeaderElements = new TableHeaderElements();
   const tableBodyElements = new TableBodyElements();

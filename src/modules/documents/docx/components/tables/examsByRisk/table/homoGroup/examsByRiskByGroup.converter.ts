@@ -6,18 +6,14 @@ import { filterOriginsByHomoGroupId } from '../../../../../../../sst/services/ex
 import { IHierarchyMap, IHomoGroupMap } from '../../../../../converter/hierarchy.converter';
 import { getHomoGroupName } from '../../../apprByGroup/appr-group.section';
 import { bodyTableProps } from '../../elements/body';
-import { ExamByGroupColumnEnum } from '../../examsByRisk.constant';
+import { getIsAll, getX } from '../exam-utils';
+import { ExamByGroupColumnEnum } from './examsByGroupRisk.constant';
 
 export const examsByGroupConverter = (homoMap: IHomoGroupMap, exams: IExamOrigins[], hierarchyTree: IHierarchyMap) => {
   const rows: bodyTableProps[][] = [];
 
 
   const gseExamsMap = examsByGroupGetData(homoMap, exams)
-
-  const getIsAll = (riskId: string, riskName?: string) => {
-    const isAll = getIsTodosRisk({ riskId }) || !riskName
-    return isAll
-  }
 
   Object.values(homoMap)
     .sort((a, b) => sortString(a, b, 'name'))
@@ -65,13 +61,6 @@ export const examsByGroupConverter = (homoMap: IHomoGroupMap, exams: IExamOrigin
 
   return rows;
 };
-const getX = (isSelected: boolean) => {
-  return {
-    text: isSelected ? 'X' : '',
-    size: 1,
-    fontSize: 15
-  }
-}
 
 
 const examsByGroupGetData = (homoMap: IHomoGroupMap, exams: IExamOrigins[]) => {
@@ -94,5 +83,8 @@ const examsByGroupGetData = (homoMap: IHomoGroupMap, exams: IExamOrigins[]) => {
 
   return gseExamsMap;
 };
+
+
+
 
 

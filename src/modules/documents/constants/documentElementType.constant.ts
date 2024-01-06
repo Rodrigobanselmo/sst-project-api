@@ -354,8 +354,13 @@ export const documentElementTypeMap: IDocumentElementTypeMap = {
     accept: ['PGR'],
   },
   [DocumentSectionChildrenTypeEnum.TABLE_PCMSO_GHO]: {
-    label: 'Tabela Exames vs Riscos',
+    label: 'Tabela Exames vs Riscos por grupo',
     type: DocumentSectionChildrenTypeEnum.TABLE_PCMSO_GHO,
+    accept: ['PCSMO'],
+  },
+  [DocumentSectionChildrenTypeEnum.TABLE_PCMSO_HIERARCHY]: {
+    label: 'Tabela Exames vs Riscos pro hierarquia',
+    type: DocumentSectionChildrenTypeEnum.TABLE_PCMSO_HIERARCHY,
     accept: ['PCSMO'],
   },
 };

@@ -1,11 +1,11 @@
 import { HeightRule, Table, WidthType } from 'docx';
 import { IExamOrigins } from '../../../../../../../sst/entities/exam.entity';
-import { examsByGroupHeader } from '../../examsByRisk.constant';
 
-import { IHierarchyMap, IHomoGroupMap, IRiskMap } from '../../../../../converter/hierarchy.converter';
+import { IHierarchyMap, IHomoGroupMap } from '../../../../../converter/hierarchy.converter';
 import { TableBodyElements } from '../../elements/body';
 import { TableHeaderElements } from '../../elements/header';
 import { examsByGroupConverter } from './examsByRiskByGroup.converter';
+import { examsByGroupHeader } from './examsByGroupRisk.constant';
 
 export const examsByRiskByGroupTable = (homoMap: IHomoGroupMap, exams: IExamOrigins[], hierarchyTree: IHierarchyMap) => {
   const data = examsByGroupConverter(homoMap, exams, hierarchyTree);

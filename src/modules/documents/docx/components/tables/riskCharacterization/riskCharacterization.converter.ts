@@ -1,3 +1,4 @@
+import { IRiskExamMap } from './../../../../../sst/entities/exam.entity';
 import { filterRisk } from '../../../../../../shared/utils/filterRisk';
 import { RiskOrderEnum } from '../../../../../../shared/constants/enum/risk.enums';
 import { palette } from '../../../../../../shared/constants/palette';
@@ -9,7 +10,7 @@ import { borderStyleGlobal } from '../../../base/config/styles';
 import { bodyTableProps } from './elements/body';
 import { RiskCharacterizationColumnEnum } from './riskCharacterization.constant';
 
-export const riskCharacterizationConverter = (riskGroup: RiskFactorGroupDataEntity) => {
+export const riskCharacterizationConverter = (riskGroup: RiskFactorGroupDataEntity, riskExamMap: IRiskExamMap) => {
   const riskMap: Record<string, bodyTableProps[]> = {};
   const riskGroupData = riskGroup.data.filter((riskData) => filterRisk(riskData));
 
@@ -82,7 +83,7 @@ export const riskCharacterizationConverter = (riskGroup: RiskFactorGroupDataEnti
       borders: borderStyleGlobal(palette.common.white.string),
     };
     cells[RiskCharacterizationColumnEnum.BEI] = {
-      text: risk.exame || '--',
+      text: Object.values(riskExamMap?.[riskData.riskId]?.exams || {})?.map(e => e?.name)?.join('\n') || '--',
       size: 2,
       borders: borderStyleGlobal(palette.common.white.string),
     };
