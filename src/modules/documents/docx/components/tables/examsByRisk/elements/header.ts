@@ -22,7 +22,7 @@ export class TableHeaderElements {
   headerCell({ text, size = 10, ...rest }: headerTableProps) {
     return new TableCell({
       children: [
-        ...text.split('\n').map(
+        ...(text || '').split('\n').map(
           (value) =>
             new Paragraph({
               children: [

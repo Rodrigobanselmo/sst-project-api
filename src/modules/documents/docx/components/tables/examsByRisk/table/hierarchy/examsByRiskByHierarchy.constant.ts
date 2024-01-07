@@ -51,8 +51,7 @@ export const NewExamsByHierarchyHeader = (hierarchyData: IHierarchyData): header
       }
     })
   })
-
-  header.unshift(...hierarchyTypeArray)
+  header.unshift(...hierarchyTypeArray.filter(Boolean));
 
   return header;
 };

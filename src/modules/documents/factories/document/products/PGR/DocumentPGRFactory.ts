@@ -92,8 +92,8 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
     return await this.getPrgData({ companyId, workspaceId, includeCharPhotos: true, ...body });
   }
 
-  protected async getPrgData({ companyId, workspaceId, includeCharPhotos = true, ...body }: IDocumentPGRBody & { includeCharPhotos?: boolean }) {
-    const company = await this.companyRepository.findDocumentData(companyId, { workspaceId, type: 'PGR' });
+  protected async getPrgData({ companyId, workspaceId, includeCharPhotos = true, type = 'PGR', ...body }: IDocumentPGRBody & { includeCharPhotos?: boolean }) {
+    const company = await this.companyRepository.findDocumentData(companyId, { workspaceId, type });
     const riskGroupId = company.riskFactorGroupData?.[0]?.id;
 
     if (company.documentData?.length == 0) throw new BadRequestException('Nenhum documento PGR cadastrado');
@@ -115,6 +115,9 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
       versionsPromise,
       modelDataPromise,
     ]);
+
+    console.log(modelData)
+    console.log(company.documentData)
 
     const riskMap: Record<string, { name: string }> = {}
 

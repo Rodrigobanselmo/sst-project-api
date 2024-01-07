@@ -244,7 +244,6 @@ export class FindExamByHierarchyService {
     });
 
     if (hierarchyId) {
-      console.log(JSON.stringify(riskData))
       riskData = riskData.filter((riskData) => {
         return getRiskDoc(riskData.riskFactor, { companyId, hierarchyId })?.isAso;
       });

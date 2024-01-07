@@ -10,12 +10,7 @@ export const complementaryDocsIterable = (
   convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[],
 ) => {
   if (!complementaryDocs?.length)
-    return convertToDocx([
-      {
-        type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
-        text: `Não há documentos complementares na elaboração do PGR.`,
-      },
-    ]);
+    return []
 
   const complementaryDocsVarArray = ComplementaryDocsConverter(complementaryDocs);
 

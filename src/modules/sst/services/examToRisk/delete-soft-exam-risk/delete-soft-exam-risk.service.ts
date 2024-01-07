@@ -17,7 +17,6 @@ export class DeleteSoftExamRiskService {
 
     if (!found?.id) throw new BadRequestException('Não encontrado');
 
-    console.log('found', id, found.companyId, user.targetCompanyId)
     if (found.companyId != user.targetCompanyId) {
       await this.examRiskRepository.update({
         id,

@@ -49,10 +49,32 @@ export class DocumentPCMSOFactory extends DocumentFactoryAbstractionCreator<IDoc
       this.findExamByHierarchyService
     );
   }
+
+  // async upload() {
+  //   return { url: ' ', key: ' ' };
+  // }
+
+  // async unlinkFiles() {
+  //   //
+  // }
 }
 
 export class DocumentPCMSOFactoryProduct extends DocumentPGRFactoryProduct {
   public type = 'PCMSO';
+
+
+  // public async error() {
+  //   return;
+  // }
+
+  // public async downloadLogos() {
+  //   return { logo: 'images/logo/logo-main.png', consultantLogo: 'images/logo/logo-simple.png' };
+  // }
+
+  // public async downloadPathImage() {
+  //   return 'images/mock/placeholder-image.png';
+  // }
+
 
   constructor(
     protected readonly riskGroupDataRepository: RiskGroupDataRepository,
@@ -68,7 +90,7 @@ export class DocumentPCMSOFactoryProduct extends DocumentPGRFactoryProduct {
   }
 
   public async getData({ companyId, workspaceId, ...body }: IDocumentPGRBody) {
-    const allData = await this.getPrgData({ companyId, workspaceId, ...body })
+    const allData = await this.getPrgData({ companyId, workspaceId, type: 'PCSMO', ...body })
 
     return { ...allData }
   }

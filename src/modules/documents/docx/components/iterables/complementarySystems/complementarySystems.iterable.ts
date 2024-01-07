@@ -9,6 +9,8 @@ export const complementarySystemsIterable = (
   complementarySystems: string[],
   convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[],
 ) => {
+  if (!complementarySystems?.length) return [];
+
   if (!complementarySystems?.length)
     return convertToDocx([
       {

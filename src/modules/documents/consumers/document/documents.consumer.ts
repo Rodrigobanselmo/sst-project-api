@@ -26,6 +26,7 @@ export class PgrConsumer implements OnModuleInit {
 
       this.app.on('error', this.handleSQSError);
       this.app.on('processing_error', this.handleSQSProcessingError);
+      this.app.on('message_received', () => console.log('Message received'));
       this.app.start();
     } else {
       console.log('Skipping SQS connection. Working in offline mode.');
