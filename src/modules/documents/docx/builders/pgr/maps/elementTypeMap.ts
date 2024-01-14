@@ -280,7 +280,23 @@ export class ElementsMapClass {
     //       return [...acc, ...curr];
     //     }, []),
     [DocumentSectionChildrenTypeEnum.TABLE_PCMSO_GHO]: () => [examsByRiskByGroupTable(this.homogeneousGroup, this.exams, this.hierarchyTree)],
-    [DocumentSectionChildrenTypeEnum.TABLE_PCMSO_HIERARCHY]: () => [examsByRiskByHierarchyTable(this.hierarchy, this.exams, this.workspace.companyId, this.hierarchyTree)],
+    [DocumentSectionChildrenTypeEnum.TABLE_PCMSO_HIERARCHY]: () => [examsByRiskByHierarchyTable({
+      companyId: this.workspace.companyId,
+      exams: this.exams,
+      hierarchyData: this.hierarchy,
+      concatExamsAndRisks: false,
+      homoGroupTree: this.homogeneousGroup,
+      withGroup: true,
+      mergeCells: false,
+    })],
+    [DocumentSectionChildrenTypeEnum.TABLE_PCMSO_HIERARCHY_CONCAT]: () => [examsByRiskByHierarchyTable({
+      companyId: this.workspace.companyId,
+      exams: this.exams,
+      hierarchyData: this.hierarchy,
+      concatExamsAndRisks: true,
+      homoGroupTree: this.homogeneousGroup,
+      mergeCells: true,
+    })],
   };
 
   private convertToDocx(data: ISectionChildrenType[], variables = {} as IDocVariables) {

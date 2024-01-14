@@ -143,11 +143,34 @@ export class DocumentPCMSOFactoryProduct extends DocumentPGRFactoryProduct {
       }
     } as typeof documentBaseBuild
 
+    const documentRiskExamHierarchyConcatBuild: typeof documentBaseBuild = {
+      ...documentBaseBuild,
+      attachments: [],
+      docSections: {
+        sections: [{
+          data: [{
+            title: 'PCMSO',
+            type: DocumentSectionTypeEnum.SECTION, children: [
+              {
+                type: DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE,
+                text: "Relação de exames por hierarquia",
+              },
+              {
+                type: DocumentSectionChildrenTypeEnum.TABLE_PCMSO_HIERARCHY_CONCAT,
+              },
+            ]
+          }]
+        }],
+        variables: {}
+      }
+    } as typeof documentBaseBuild
+
 
     const docId = options.data.docId;
     const companyId = options.data.company.id;
     const id1 = v4();
     const id2 = v4();
+    const id3 = v4();
 
     return [
       {
@@ -165,6 +188,14 @@ export class DocumentPCMSOFactoryProduct extends DocumentPGRFactoryProduct {
         id: id2,
         name: 'Relação de exames por hierarquia',
         link: `${process.env.APP_HOST}/download/pgr/anexos?ref1=${docId}&ref2=${id2}&ref3=${companyId}`,
+      },
+      {
+        buildData: documentRiskExamHierarchyBuild,
+        section: new DocumentBuildPGR(documentRiskExamHierarchyConcatBuild).build(),
+        type: 'PCMSO-EXAMES-HIERARQUIA-MESCLADA',
+        id: id3,
+        name: 'Relação de exames por hierarquia mesclada',
+        link: `${process.env.APP_HOST}/download/pgr/anexos?ref1=${docId}&ref2=${id3}&ref3=${companyId}`,
       },
       // {
       //   buildData: documentAprGroupBuild,

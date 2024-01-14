@@ -13,7 +13,7 @@ export enum ExamByHierarchyColumnEnum {
   DEMISSIONAL,
 }
 
-export const NewExamsByHierarchyHeader = (hierarchyData: IHierarchyData): headerTableProps[] => {
+export const NewExamsByHierarchyHeader = (hierarchyData: IHierarchyData, options: { withGroup?: boolean }): headerTableProps[] => {
   const header: headerTableProps[] = [];
 
   header[ExamByHierarchyColumnEnum.RISKS] = { text: 'Riscos', size: 5 };
@@ -51,6 +51,9 @@ export const NewExamsByHierarchyHeader = (hierarchyData: IHierarchyData): header
       }
     })
   })
+
+  if (options.withGroup) hierarchyTypeArray.push({ text: 'GSE', size: 3 })
+
   header.unshift(...hierarchyTypeArray.filter(Boolean));
 
   return header;

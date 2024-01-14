@@ -145,7 +145,7 @@ export const APPRByGroupTableSection = (
   return sectionsTables.map((table) => setSection(table));
 };
 
-export const getHomoGroupName = (homo: HomoGroupEntity, hierarchyTree: IHierarchyMap) => {
+export const getHomoGroupName = (homo: HomoGroupEntity, hierarchyTree?: IHierarchyMap) => {
   let nameOrigin: string;
   let desc: string;
   let descRh: string;
@@ -163,7 +163,7 @@ export const getHomoGroupName = (homo: HomoGroupEntity, hierarchyTree: IHierarch
     nameOrigin = `${homo.characterization.name} `;
   }
 
-  if (homo.type == HomoTypeEnum.HIERARCHY) {
+  if (hierarchyTree && homo.type == HomoTypeEnum.HIERARCHY) {
     const hierarchy = hierarchyTree[homo.id] || hierarchyTree[homo.name];
 
     if (hierarchy) {
@@ -184,6 +184,6 @@ export const getHomoGroupName = (homo: HomoGroupEntity, hierarchyTree: IHierarch
     nameOrigin,
     desc,
     descRh,
-    typeOrigin
+    typeOrigin,
   }
 };

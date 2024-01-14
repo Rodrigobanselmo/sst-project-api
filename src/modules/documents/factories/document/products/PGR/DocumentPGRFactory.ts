@@ -116,9 +116,6 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
       modelDataPromise,
     ]);
 
-    console.log(modelData)
-    console.log(company.documentData)
-
     const riskMap: Record<string, { name: string }> = {}
 
     riskGroupData.data = riskGroupData.data.map((riskData) => {

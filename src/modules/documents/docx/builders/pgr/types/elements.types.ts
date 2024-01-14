@@ -68,6 +68,7 @@ export enum DocumentSectionChildrenTypeEnum {
 
   TABLE_PCMSO_GHO = 'TABLE_PCMSO_GHO',
   TABLE_PCMSO_HIERARCHY = 'TABLE_PCMSO_HIERARCHY',
+  TABLE_PCMSO_HIERARCHY_CONCAT = 'TABLE_PCMSO_HIERARCHY_CONCAT',
 
 }
 
@@ -391,6 +392,10 @@ export type ITablePcmsoHierarchy = {
   type: DocumentSectionChildrenTypeEnum.TABLE_PCMSO_HIERARCHY;
 } & IBaseDocumentModel;
 
+export type ITablePcmsoHierarchyConcat = {
+  type: DocumentSectionChildrenTypeEnum.TABLE_PCMSO_HIERARCHY_CONCAT;
+} & IBaseDocumentModel;
+
 export type ISectionChildrenType =
   | IH1
   | IH2
@@ -453,4 +458,5 @@ export type ISectionChildrenType =
   | IConsiderationsQuantityTable
   | ITablePcmsoGho
   | ITablePcmsoHierarchy
+  | ITablePcmsoHierarchyConcat
   | IProfessional;

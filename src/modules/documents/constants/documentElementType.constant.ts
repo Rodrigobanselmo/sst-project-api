@@ -363,4 +363,9 @@ export const documentElementTypeMap: IDocumentElementTypeMap = {
     type: DocumentSectionChildrenTypeEnum.TABLE_PCMSO_HIERARCHY,
     accept: ['PCSMO'],
   },
+  [DocumentSectionChildrenTypeEnum.TABLE_PCMSO_HIERARCHY_CONCAT]: {
+    label: 'Tabela Exames vs Riscos pro hierarquia mesclada',
+    type: DocumentSectionChildrenTypeEnum.TABLE_PCMSO_HIERARCHY_CONCAT,
+    accept: ['PCSMO'],
+  },
 };

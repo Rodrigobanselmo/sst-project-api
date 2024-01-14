@@ -1,10 +1,14 @@
 import { AlignmentType, BorderStyle, ITableBordersOptions, ITableCellOptions, Paragraph, TableCell, TableRow, TextRun, VerticalAlign, WidthType } from 'docx';
 import { palette } from '../../../../../../../shared/constants/palette';
 
-export interface bodyTableProps extends Partial<ITableCellOptions> {
+type NotReadOnly<T> = {
+  -readonly [K in keyof T]: T[K];
+};
+export interface bodyTableProps extends NotReadOnly<Partial<ITableCellOptions>> {
   text: string;
   size?: number;
   fontSize?: number;
+  rowSpan?: number;
   color?: string;
 }
 
