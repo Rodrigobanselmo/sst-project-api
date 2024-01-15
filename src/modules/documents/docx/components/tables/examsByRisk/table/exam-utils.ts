@@ -20,8 +20,11 @@ export const removeExamsDuplicated = (hierarchyExamsMap: Record<string, Record<s
 
   Object.values(hierarchyExamsUniqueMap).forEach((hierarchy) => {
     Object.values(hierarchy).forEach((exams) => {
-      exams.forEach((exam, index) => {
-        const examIndex = exams.findIndex((e) => {
+      const examsClone = clone(exams)
+      let count = 0
+
+      examsClone.forEach((exam, index) => {
+        const examIndex = examsClone.findIndex((e) => {
           return e.origin?.isMale === exam.origin?.isMale &&
             e.origin?.isFemale === exam.origin?.isFemale &&
             e.origin?.isPeriodic === exam.origin?.isPeriodic &&
@@ -36,7 +39,8 @@ export const removeExamsDuplicated = (hierarchyExamsMap: Record<string, Record<s
         })
 
         if (examIndex !== index) {
-          exams.splice(index, 1)
+          exams.splice(index - count, 1)
+          count++
         }
       })
     })

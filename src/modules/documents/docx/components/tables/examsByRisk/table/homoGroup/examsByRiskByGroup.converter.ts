@@ -70,7 +70,7 @@ const examsByGroupGetData = (homoMap: IHomoGroupMap, exams: IExamOrigins[]) => {
   Object.values(homoMap).forEach((gse) => {
     if (!gseExamsMap[gse.id]) gseExamsMap[gse.id] = {}
 
-    const origins = filterOriginsByHomoGroupId(exams, gse.companyId, gse)
+    const origins = filterOriginsByHomoGroupId(exams, gse.companyId, gse, { docType: 'isPCMSO' })
 
     origins.forEach((originInfo) => {
       if (!gseExamsMap[gse.id][originInfo.exam.id]) gseExamsMap[gse.id][originInfo.exam.id] = []

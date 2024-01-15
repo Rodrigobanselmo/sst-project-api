@@ -559,13 +559,13 @@ export class FindExamByHierarchyService {
   }
 }
 
-export function filterOriginsByHierarchy(examsData: IExamOrigins[], companyId: string, hierarchyId: string): IExamOrigins[] {
+export function filterOriginsByHierarchy(examsData: IExamOrigins[], companyId: string, hierarchyId: string, options?: { docType?: 'isAso' | 'isPCMSO' }): IExamOrigins[] {
   return examsData.map(({ exam, origins, ...rest }) => {
     const newOrigins = [];
 
     origins?.forEach((origin) => {
       if (origin.risk?.docInfo) {
-        const availableRisk = getRiskDocV2(origin.risk, { companyId, hierarchyId: hierarchyId })?.isAso;
+        const availableRisk = getRiskDocV2(origin.risk, { companyId, hierarchyId: hierarchyId })?.[options?.docType || 'isAso'];
         if (!availableRisk) return;
       }
 
@@ -585,7 +585,7 @@ export function filterOriginsByHierarchy(examsData: IExamOrigins[], companyId: s
   });
 }
 
-export function filterOriginsByHomoGroupId(examsData: IExamOrigins[], companyId: string, homoGroup: { id: string, type: HomoTypeEnum }): IExamOrigins[] {
+export function filterOriginsByHomoGroupId(examsData: IExamOrigins[], companyId: string, homoGroup: { id: string, type: HomoTypeEnum }, options?: { docType?: 'isAso' | 'isPCMSO' }): IExamOrigins[] {
   if (homoGroup.type == 'HIERARCHY') return filterOriginsByHierarchy(examsData, companyId, homoGroup.id);
 
   return examsData.map(({ exam, origins, ...rest }) => {
@@ -593,7 +593,7 @@ export function filterOriginsByHomoGroupId(examsData: IExamOrigins[], companyId:
 
     origins?.forEach((origin) => {
       if (origin.risk?.docInfo) {
-        const availableRisk = getRiskDocV2(origin.risk, { companyId })?.isAso;
+        const availableRisk = getRiskDocV2(origin.risk, { companyId })?.[options?.docType || 'isAso'];
         if (!availableRisk) return;
       }
 

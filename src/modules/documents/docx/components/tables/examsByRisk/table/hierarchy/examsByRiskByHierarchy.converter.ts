@@ -276,7 +276,7 @@ const examsByGroupGetData = (hierarchyData: IHierarchyData, exams: IExamOrigins[
     if (!hierarchyExamsMap[id]) hierarchyExamsMap[id] = {}
 
     hierarchy.org.map((org) => ({ id: org.id })).forEach((hierarchy) => {
-      const origins = filterOriginsByHierarchy(exams, companyId, hierarchy.id)
+      const origins = filterOriginsByHierarchy(exams, companyId, hierarchy.id, { docType: 'isPCMSO' })
 
       origins.forEach((originInfo) => {
         if (!hierarchyExamsMap[id][originInfo.exam.id]) hierarchyExamsMap[id][originInfo.exam.id] = []
