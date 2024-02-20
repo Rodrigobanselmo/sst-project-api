@@ -433,6 +433,7 @@ export class HierarchyRepository {
     id?: string;
     historyIds?: number[];
   }): Promise<HierarchyEntity> {
+
     try {
       if (workspaceIds.length)
         this.prisma.homogeneousGroup.update({
@@ -461,14 +462,14 @@ export class HierarchyRepository {
           })),
         },
         ...(employeesIds &&
-          employeesIds.length && {
+          !!employeesIds.length && {
           subOfficeEmployees: {
             connect: employeesIds.map((id) => ({
               id_companyId: { companyId, id },
             })),
           },
           ...(historyIds &&
-            historyIds.length && {
+            !!historyIds.length && {
             subHierarchyHistory: {
               connect: historyIds.map((id) => ({
                 id,
@@ -483,13 +484,16 @@ export class HierarchyRepository {
       update: {
         ...upsertHierarchy,
         name: name.split('//')[0],
-        employeeExamsHistorySubOffice: {
-          connect: historyIds.map((id) => ({
-            id,
-          })),
-        },
+        ...(historyIds &&
+          !!historyIds.length && {
+          subHierarchyHistory: {
+            connect: historyIds.map((id) => ({
+              id,
+            })),
+          },
+        }),
         subOfficeEmployees:
-          employeesIds && employeesIds.length
+          employeesIds && !!employeesIds.length
             ? {
               connect: employeesIds.map((id) => ({
                 id_companyId: { companyId, id },
@@ -510,10 +514,10 @@ export class HierarchyRepository {
           },
       },
       where: { id: id || 'none' },
-      include: { workspaces: true },
+      include: { workspaces: true, subOfficeEmployees: { select: { id: true } } },
     });
 
-    return new HierarchyEntity(data);
+    return new HierarchyEntity(data as any);
   }
 
   async deleteById(id: string): Promise<void> {

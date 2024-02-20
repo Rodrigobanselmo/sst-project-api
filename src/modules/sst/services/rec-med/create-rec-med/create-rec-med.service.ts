@@ -8,9 +8,9 @@ import { Cache } from 'cache-manager';
 
 @Injectable()
 export class CreateRecMedService {
-  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache, private readonly recMedRepository: RecMedRepository) {}
+  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache, private readonly recMedRepository: RecMedRepository) { }
 
-  async execute(createRecMedDto: CreateRecMedDto, userPayloadDto: UserPayloadDto, options?: { returnIfExist?: boolean }) {
+  async execute(createRecMedDto: CreateRecMedDto, userPayloadDto: UserPayloadDto, options?: { returnIfExist?: boolean; skipIfExist?: boolean }) {
     const user = isMaster(userPayloadDto, createRecMedDto.companyId);
 
     const system = user.isSystem && user.companyId === createRecMedDto.companyId;
@@ -19,7 +19,7 @@ export class CreateRecMedService {
       const foundRecFactor = await this.recMedRepository.find(
         {
           companyId: createRecMedDto.companyId,
-          search: createRecMedDto.recName,
+          name: createRecMedDto.recName,
           // ...(createRecMedDto.recType && { recType: [createRecMedDto.recType] }),
           riskIds: [createRecMedDto.riskId],
           onlyRec: true,
@@ -29,6 +29,7 @@ export class CreateRecMedService {
       );
 
       if (foundRecFactor.count > 0) {
+        if (options.skipIfExist) return;
         if (options?.returnIfExist) return foundRecFactor.data[0];
         throw new BadRequestException('Recomendação já exite');
       }
@@ -38,7 +39,7 @@ export class CreateRecMedService {
       const foundMedFactor = await this.recMedRepository.find(
         {
           companyId: createRecMedDto.companyId,
-          search: createRecMedDto.medName,
+          name: createRecMedDto.medName,
           medType: [createRecMedDto.medType],
           riskIds: [createRecMedDto.riskId],
           onlyMed: true,
@@ -46,8 +47,10 @@ export class CreateRecMedService {
         },
         { take: 1, skip: 0 },
       );
+      console.log(foundMedFactor, 'foundMedFactor')
 
       if (foundMedFactor.count > 0) {
+        if (options.skipIfExist) return;
         if (options?.returnIfExist) return foundMedFactor.data[0];
         throw new BadRequestException('Medida de controle já exite');
       }

@@ -36,7 +36,7 @@ export async function databaseFindChanges({ userId, lastPulledVersion = new Date
     return {
         created: createdData.map((data) => {
             const entityData = new entity(data)
-            return { ...entityData, user_id: String(userId) }
+            return { ...entityData, user_id: String(userId), apiId: data.id }
         }),
         updated: updatedData.map((data) => {
             const entityData = new entity(data)

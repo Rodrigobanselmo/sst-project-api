@@ -171,6 +171,8 @@ import { SyncRepository } from './repositories/implementations/SyncRepository';
 import { SyncMainService } from './services/sync/sync-main/sync-main.service';
 import { SyncController } from './controller/sync/sync.controller';
 import { SyncHierarchyService } from './services/sync/sync-hierarchy/sync-hierarchy.service';
+import { AddCharacterizationFileService } from './services/characterization/add-characterization-file/add-characterization-file.service';
+import { CharacterizationFileRepository } from './repositories/implementations/CharacterizationFileRepository';
 
 @Module({
   imports: [
@@ -353,6 +355,8 @@ import { SyncHierarchyService } from './services/sync/sync-hierarchy/sync-hierar
     SyncRepository,
     SyncMainService,
     SyncHierarchyService,
+    AddCharacterizationFileService,
+    CharacterizationFileRepository
   ],
   exports: [
     CompanyRepository,

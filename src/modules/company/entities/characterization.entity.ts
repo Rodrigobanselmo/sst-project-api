@@ -6,6 +6,7 @@ import { CharacterizationPhotoEntity } from './characterization-photo.entity';
 import { HierarchyEntity } from './hierarchy.entity';
 import { HomoGroupEntity } from './homoGroup.entity';
 import { WorkspaceEntity } from './workspace.entity';
+import { CharacterizationFileEntity } from './characterization-file.entity';
 
 export class CharacterizationEntity implements CompanyCharacterization {
   @ApiProperty({ description: 'The id of the workstation' })
@@ -31,6 +32,8 @@ export class CharacterizationEntity implements CompanyCharacterization {
 
   @ApiProperty({ description: 'The photos related to the workstation' })
   photos?: CharacterizationPhotoEntity[];
+
+  files?: CharacterizationFileEntity[];
 
   hierarchies?: HierarchyEntity[];
   riskData?: RiskFactorDataEntity[];

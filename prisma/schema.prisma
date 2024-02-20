@@ -431,6 +431,7 @@ model CompanyCharacterization {
   profiles           CompanyCharacterization[]      @relation("profiles")
   workspace          Workspace                      @relation(fields: [workspaceId], references: [id])
   photos             CompanyCharacterizationPhoto[]
+  files              CompanyCharacterizationFile[]
 
   @@unique([workspaceId, companyId, id])
 }
@@ -446,6 +447,16 @@ model CompanyCharacterizationPhoto {
   companyCharacterizationId String
   order                     Int?
   companyEnvironment        CompanyCharacterization @relation(fields: [companyCharacterizationId], references: [id])
+}
+
+model CompanyCharacterizationFile {
+  id                        String                  @id @default(uuid())
+  url                       String
+  created_at                DateTime                @default(now())
+  deleted_at                DateTime?
+  updated_at                DateTime                @updatedAt
+  companyCharacterizationId String
+  Characterization          CompanyCharacterization @relation(fields: [companyCharacterizationId], references: [id])
 }
 
 model CompanyReport {

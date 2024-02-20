@@ -2,13 +2,18 @@ import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
 import { QueryArray } from './../../../shared/transformers/query-array';
 import { RiskFactorsEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
-import { IsEnum, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsBoolean, IsEnum, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
 import { RiskCreateRecMedDto, RiskUpdateRecMedDto } from './rec-med.dto';
+import { ToBoolean } from '../../../shared/decorators/boolean.decorator';
 
 export class CreateGenerateSourceDto {
+  @IsString()
+  @IsOptional()
+  id?: string;
+
   @IsString()
   riskId: string;
 
@@ -31,6 +36,17 @@ export class CreateGenerateSourceDto {
   @IsOptional()
   @Type(() => RiskCreateRecMedDto)
   recMeds?: RiskCreateRecMedDto[];
+
+
+  @IsOptional()
+  @IsBoolean()
+  @ToBoolean()
+  returnIfExist?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @ToBoolean()
+  skipIfExist?: boolean
 }
 
 export class UpsertGenerateSourceDto extends CreateGenerateSourceDto {
@@ -90,6 +106,10 @@ export class FindGenerateSourceDto extends PaginationQueryDto {
   @IsString()
   @IsOptional()
   companyId?: string;
+
+  @IsString()
+  @IsOptional()
+  name?: string;
 
   @IsString()
   @IsOptional()

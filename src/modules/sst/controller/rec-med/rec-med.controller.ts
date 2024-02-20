@@ -16,7 +16,7 @@ export class RecMedController {
     private readonly updateRecMedService: UpdateRecMedService,
     private readonly deleteSoftRecMedService: DeleteSoftRecMedService,
     private readonly findRecMedService: FindRecMedService,
-  ) {}
+  ) { }
 
   @Permissions({
     code: PermissionEnum.REC_MED,
@@ -24,8 +24,8 @@ export class RecMedController {
     isMember: true,
   })
   @Post()
-  create(@User() userPayloadDto: UserPayloadDto, @Body() createRecMedDto: CreateRecMedDto) {
-    return this.createRecMedService.execute(createRecMedDto, userPayloadDto);
+  create(@User() userPayloadDto: UserPayloadDto, @Body() { returnIfExist, skipIfExist, ...createRecMedDto }: CreateRecMedDto) {
+    return this.createRecMedService.execute(createRecMedDto, userPayloadDto, { returnIfExist, skipIfExist });
   }
 
   @Permissions({

@@ -341,6 +341,7 @@ export class SyncRepository {
       name: true,
       id: true,
       status: true,
+      hierarchyId: true,
       cpf: true,
       rg: true,
       socialName: true,

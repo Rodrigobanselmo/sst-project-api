@@ -12,6 +12,10 @@ import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
 
 export class CreateRecMedDto {
   @IsString()
+  @IsOptional()
+  id?: string;
+
+  @IsString()
   riskId: string;
 
   @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
@@ -50,6 +54,16 @@ export class CreateRecMedDto {
 
   @IsString()
   companyId: string;
+
+  @IsOptional()
+  @IsBoolean()
+  @ToBoolean()
+  returnIfExist?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @ToBoolean()
+  skipIfExist?: boolean
 }
 
 export class UpsertRecMedDto extends CreateRecMedDto {
@@ -159,6 +173,10 @@ export class FindRecMedDto extends PaginationQueryDto {
   @IsString()
   @IsOptional()
   search?: string;
+
+  @IsString()
+  @IsOptional()
+  name?: string;
 
   @IsString()
   @IsOptional()

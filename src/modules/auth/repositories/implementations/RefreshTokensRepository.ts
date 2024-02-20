@@ -6,7 +6,7 @@ import { IRefreshTokensRepository } from '../IRefreshTokensRepository.types';
 
 @Injectable()
 export class RefreshTokensRepository implements IRefreshTokensRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async create(refresh_token: string, userId: number, expires_date: Date) {
     const refreshToken = await this.prisma.refreshToken.create({
@@ -48,7 +48,7 @@ export class RefreshTokensRepository implements IRefreshTokensRepository {
   }
 
   async deleteById(id: string) {
-    await this.prisma.refreshToken.delete({ where: { id } });
+    await this.prisma.refreshToken.deleteMany({ where: { id } });
   }
 
   async deleteAllOldTokens(date: Date) {

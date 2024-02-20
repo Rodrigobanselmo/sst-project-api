@@ -13,7 +13,6 @@ export class DocumentDataRepository {
   constructor(private prisma: PrismaService) { }
 
   async upsert({ id, companyId, json, professionals, workspaceId, type, ...createDto }: UpsertDocumentDataDto & { json?: any }): Promise<DocumentDataEntity> {
-    console.log(type)
     const documentData = await this.prisma.documentData.upsert({
       create: {
         ...createDto,

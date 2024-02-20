@@ -184,7 +184,13 @@ export class CreateSubHierarchyDto {
   employeesIds?: number[];
 
   @IsString()
+  @IsOptional()
   parentId?: string;
+
+
+  @IsString()
+  @IsOptional()
+  organizeByOffice?: boolean;
 }
 
 export class FindHierarchyDto extends PaginationQueryDto {

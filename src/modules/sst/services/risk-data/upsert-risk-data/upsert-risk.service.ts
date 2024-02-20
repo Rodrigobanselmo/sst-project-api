@@ -7,16 +7,18 @@ import { UpsertRiskDataDto } from '../../../dto/risk-data.dto';
 import { RiskDataRepository } from '../../../repositories/implementations/RiskDataRepository';
 import { CheckEmployeeExamService } from '../../exam/check-employee-exam/check-employee-exam.service';
 import { EmployeePPPHistoryRepository } from './../../../../company/repositories/implementations/EmployeePPPHistoryRepository';
+import { RiskGroupDataRepository } from './../../../../../modules/sst/repositories/implementations/RiskGroupDataRepository';
 
 @Injectable()
 export class UpsertRiskDataService {
   constructor(
     private readonly riskDataRepository: RiskDataRepository,
+    private readonly riskGroupDataRepository: RiskGroupDataRepository,
     private readonly homoGroupRepository: HomoGroupRepository,
     private readonly hierarchyRepository: HierarchyRepository,
     private readonly employeePPPHistoryRepository: EmployeePPPHistoryRepository,
     private readonly checkEmployeeExamService: CheckEmployeeExamService,
-  ) {}
+  ) { }
 
   async execute(upsertRiskDataDto: UpsertRiskDataDto) {
     const keepEmpty = upsertRiskDataDto.keepEmpty;
@@ -33,6 +35,7 @@ export class UpsertRiskDataService {
     if ('endDate' in upsertRiskDataDto) {
       if (!upsertRiskDataDto.endDate) upsertRiskDataDto.endDate = null;
     }
+
     const isTypeHierarchy = type && type == HomoTypeEnum.HIERARCHY;
     if (isTypeHierarchy)
       await hierarchyCreateHomo({
@@ -43,6 +46,12 @@ export class UpsertRiskDataService {
         type,
         workspaceId,
       });
+
+    if (!upsertRiskDataDto.riskFactorGroupDataId) {
+      const riskGroupData = await this.riskGroupDataRepository.findAllByCompany(upsertRiskDataDto.companyId);
+      upsertRiskDataDto.riskFactorGroupDataId = riskGroupData[0]?.id;
+    }
+
     const riskData = await this.riskDataRepository.upsert(upsertRiskDataDto);
 
     if (upsertRiskDataDto.exams)

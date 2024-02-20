@@ -1,11 +1,12 @@
 import { CharacterizationTypeEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
-import { IsDate, IsEnum, IsInt, IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsBoolean, IsDate, IsEnum, IsInt, IsOptional, IsString, MaxLength } from 'class-validator';
 
 import { StringCapitalizeTransform } from '../../../shared/transformers/string-capitalize';
 import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
+import { ToBoolean } from '../../../shared/decorators/boolean.decorator';
 
 export class UpsertCharacterizationDto {
   @IsOptional()
@@ -95,6 +96,11 @@ export class UpsertCharacterizationDto {
     message: `Status inválido`,
   })
   status?: StatusEnum;
+
+  @IsOptional()
+  @IsBoolean()
+  @ToBoolean()
+  createWithId?: boolean;
 }
 
 export class AddPhotoCharacterizationDto {
@@ -112,6 +118,16 @@ export class AddPhotoCharacterizationDto {
   })
   name: string;
 }
+
+export class AddFileCharacterizationDto {
+  @IsOptional()
+  @IsString()
+  id?: string;
+
+  @IsString()
+  companyCharacterizationId: string;
+}
+
 
 export class UpdatePhotoCharacterizationDto {
   @IsOptional()

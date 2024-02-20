@@ -59,6 +59,7 @@ export class UpsertRiskDataDto {
   homogeneousGroupId: string;
 
   @IsString()
+  @IsOptional()
   riskFactorGroupDataId: string;
 
   @IsString({ each: true })

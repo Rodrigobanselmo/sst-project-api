@@ -22,7 +22,7 @@ export class UpsertCharacterizationService {
   ) { }
 
   async execute(
-    { photos, ...upsertCharacterizationDto }: UpsertCharacterizationDto,
+    { photos, createWithId, ...upsertCharacterizationDto }: UpsertCharacterizationDto,
     workspaceId: string,
     userPayloadDto: UserPayloadDto,
     files: Array<Express.Multer.File>,
@@ -58,24 +58,25 @@ export class UpsertCharacterizationService {
         },
       });
 
-      if (!foundHomoGroup?.id) throw new BadRequestException(ErrorCompanyEnum.CHAR_NOT_FOUND);
+      if (!foundHomoGroup?.id && !createWithId) throw new BadRequestException(ErrorCompanyEnum.CHAR_NOT_FOUND);
+      else if (!!foundHomoGroup?.id) {
+        const forbidenInactivating = inactivating && foundHomoGroup.homogeneousGroup?.hierarchyOnHomogeneous[0]?.id;
+        if (forbidenInactivating) {
+          throw new BadRequestException(ErrorCompanyEnum.FORBIDEN_INACTIVATION);
+        }
 
-      const forbidenInactivating = inactivating && foundHomoGroup.homogeneousGroup?.hierarchyOnHomogeneous[0]?.id;
-      if (forbidenInactivating) {
-        throw new BadRequestException(ErrorCompanyEnum.FORBIDEN_INACTIVATION);
+        await this.deleteHierarchyHomoGroupService.checkDeletion(foundHomoGroup.homogeneousGroup, userPayloadDto, {
+          updateCheck: true,
+          onlyEndPresentOk: true,
+          data: { endDate: upsertCharacterizationDto.endDate, startDate: upsertCharacterizationDto.startDate },
+        });
+
+        await this.updateHomoGroupService.checkDeletion(foundHomoGroup.homogeneousGroup, userPayloadDto, {
+          endDate: upsertCharacterizationDto.endDate,
+          startDate: upsertCharacterizationDto.startDate,
+          ids: upsertCharacterizationDto.hierarchyIds,
+        });
       }
-
-      await this.deleteHierarchyHomoGroupService.checkDeletion(foundHomoGroup.homogeneousGroup, userPayloadDto, {
-        updateCheck: true,
-        onlyEndPresentOk: true,
-        data: { endDate: upsertCharacterizationDto.endDate, startDate: upsertCharacterizationDto.startDate },
-      });
-
-      await this.updateHomoGroupService.checkDeletion(foundHomoGroup.homogeneousGroup, userPayloadDto, {
-        endDate: upsertCharacterizationDto.endDate,
-        startDate: upsertCharacterizationDto.startDate,
-        ids: upsertCharacterizationDto.hierarchyIds,
-      });
     }
 
     const characterization = await this.characterizationRepository.upsert({
