@@ -1,25 +1,19 @@
-import { clothesList } from './../../../../../shared/constants/maps/ibtu-clothes.map';
-import { PaginationQueryDto } from '../../../../../shared/dto/pagination.dto';
-import { formatCEP } from '@brazilian-utils/brazilian-utils';
 import { Injectable } from '@nestjs/common';
+import { clothesList } from './../../../../../shared/constants/maps/ibtu-clothes.map';
 
-import { clinicScheduleMap, companyPaymentScheduleMap } from '../../../../../shared/constants/maps/enumTraslate.map';
 import { ExcelProvider } from '../../../../../shared/providers/ExcelProvider/implementations/ExcelProvider';
-import { formatPhoneNumber } from '../../../../../shared/utils/formats';
-import { CompanyEntity } from '../../../../company/entities/company.entity';
 import { CompanyRepository } from '../../../../company/repositories/implementations/CompanyRepository';
+import { CompanyStructColumnList } from '../../upload/products/CompanyStructure/constants/headersList/CompanyStructColumnList';
+import { IColumnRule } from '../../upload/types/IFileFactory.types';
 import { ReportFactoryAbstractionCreator } from '../creator/ReportFactoryCreator';
 import {
   IReportCell,
   IReportFactoryProduct,
   IReportFactoryProductFindData,
   IReportHeader,
-  IReportHeaderCell,
   IReportSanitizeData,
-  ReportFillColorEnum,
+  ReportFillColorEnum
 } from '../types/IReportFactory.types';
-import { IColumnRule } from '../../upload/types/IFileFactory.types';
-import { CompanyStructColumnList } from '../../upload/products/CompanyStructure/constants/headersList/CompanyStructColumnList';
 
 @Injectable()
 export class ReportRiskStructureFactory extends ReportFactoryAbstractionCreator<any> {
@@ -33,7 +27,7 @@ export class ReportRiskStructureFactory extends ReportFactoryAbstractionCreator<
 }
 
 class ReportFactoryProduct implements IReportFactoryProduct<any> {
-  constructor(private readonly companyRepository: CompanyRepository) {}
+  constructor(private readonly companyRepository: CompanyRepository) { }
 
   public async findTableData() {
     const sanitizeData = this.sanitizeData();

@@ -22,14 +22,14 @@ export class DownaldEmployeeModelFactory extends ReportFactoryAbstractionCreator
   }
 }
 
-class DownloadFactoryProduct implements IReportFactoryProduct<any> {
-  constructor(private readonly companyRepository: CompanyRepository) {}
+export class DownloadFactoryProduct implements IReportFactoryProduct<any> {
+  constructor(private readonly companyRepository: CompanyRepository) { }
   public company: CompanyEntity;
 
   public async findTableData(companyId: string) {
     const company = await getCompany(companyId, this.companyRepository);
 
-    const sanitizeData = this.sanitizeData();
+    const sanitizeData = this.sanitizeData({});
     const headerData = this.getHeader(company);
     const titleData = this.getTitle(headerData, company);
     const infoData = [];
@@ -39,7 +39,7 @@ class DownloadFactoryProduct implements IReportFactoryProduct<any> {
     return returnData;
   }
 
-  public sanitizeData(): IReportSanitizeData[] {
+  public sanitizeData({ }: any): IReportSanitizeData[] {
     const rows: IReportSanitizeData[] = [];
     return rows;
   }

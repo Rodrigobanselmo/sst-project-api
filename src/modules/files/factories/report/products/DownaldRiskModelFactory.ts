@@ -1,14 +1,16 @@
-import { CompanyEntity } from './../../../../company/entities/company.entity';
 import { Injectable } from '@nestjs/common';
 import { clothesList } from '../../../../../shared/constants/maps/ibtu-clothes.map';
+import { CompanyEntity } from './../../../../company/entities/company.entity';
 
 import { ExcelProvider } from '../../../../../shared/providers/ExcelProvider/implementations/ExcelProvider';
 import { CompanyRepository } from '../../../../company/repositories/implementations/CompanyRepository';
 import { CompanyStructColumnList } from '../../upload/products/CompanyStructure/constants/headersList/CompanyStructColumnList';
+import { allBorders, getBoxBorders } from '../constants/theme';
 import { ReportFactoryAbstractionCreator } from '../creator/ReportFactoryCreator';
 import { convertHeaderUpload } from '../helpers/convertHeaderUpload';
 import { convertTitleUpload } from '../helpers/convertTitleUpload';
 import { getCompany, getCompanyInfo } from '../helpers/getCompanyInfo';
+import { getWorkspaceInfoTable } from '../helpers/getWorkspaceInfoTable';
 import {
   IReportCell,
   IReportFactoryProduct,
@@ -17,9 +19,6 @@ import {
   IReportSanitizeData,
   ReportFillColorEnum,
 } from '../types/IReportFactory.types';
-import { getWorkspaceInfoTable } from '../helpers/getWorkspaceInfoTable';
-import { allBorders, getBoxBorders } from '../constants/theme';
-import { concatSideBySideTables } from '../helpers/concatSideBySideTables';
 
 @Injectable()
 export class DownaldRiskModelFactory extends ReportFactoryAbstractionCreator<any> {
@@ -33,7 +32,7 @@ export class DownaldRiskModelFactory extends ReportFactoryAbstractionCreator<any
 }
 
 class DownloadFactoryProduct implements IReportFactoryProduct<any> {
-  constructor(private readonly companyRepository: CompanyRepository) {}
+  constructor(private readonly companyRepository: CompanyRepository) { }
 
   public async findTableData(companyId: string) {
     const company = await getCompany(companyId, this.companyRepository);

@@ -107,11 +107,13 @@ export const CompanyStructColumnMap: IColumnRuleMap<CompanyStructHeaderEnum> = {
     field: CompanyStructHeaderEnum.WORKSPACE,
     checkHandler: checkIsString,
     width: 80,
+    database: 'workspace',
   },
 
   [CompanyStructHeaderEnum.EMPLOYEE_CPF]: {
     field: CompanyStructHeaderEnum.EMPLOYEE_CPF,
     checkHandler: checkIsValidCpf,
+    database: 'cpf',
     requiredIfOneExist: [
       CompanyStructHeaderEnum.EMPLOYEE_NAME,
       CompanyStructHeaderEnum.EMPLOYEE_ADMISSION,
@@ -129,83 +131,100 @@ export const CompanyStructColumnMap: IColumnRuleMap<CompanyStructHeaderEnum> = {
   [CompanyStructHeaderEnum.EMPLOYEE_NAME]: {
     field: CompanyStructHeaderEnum.EMPLOYEE_NAME,
     checkHandler: checkIsString,
+    database: 'name',
     requiredIfOneExist: [CompanyStructHeaderEnum.EMPLOYEE_CPF],
     width: 50,
   },
   [CompanyStructHeaderEnum.EMPLOYEE_ADMISSION]: {
     field: CompanyStructHeaderEnum.EMPLOYEE_ADMISSION,
     checkHandler: checkIsValidDate,
+    database: 'admissionDate',
   },
   [CompanyStructHeaderEnum.EMPLOYEE_DEMISSION]: {
     field: CompanyStructHeaderEnum.EMPLOYEE_DEMISSION,
     checkHandler: checkIsValidDate,
+    database: 'demissionDate',
   },
   [CompanyStructHeaderEnum.EMPLOYEE_BIRTH]: {
     field: CompanyStructHeaderEnum.EMPLOYEE_BIRTH,
     checkHandler: checkIsValidDate,
+    database: 'birthday',
   },
   [CompanyStructHeaderEnum.EMPLOYEE_SEX]: {
     field: CompanyStructHeaderEnum.EMPLOYEE_SEX,
     checkHandler: (value: any) => checkIsEnum(SexTypeEnumTranslateBrToUs(value), SexTypeEnum),
     notes: SexTypeEnumTranslatedNotes,
+    database: 'sex',
   },
   [CompanyStructHeaderEnum.ESOCIAL_CODE]: {
     field: CompanyStructHeaderEnum.ESOCIAL_CODE,
     checkHandler: checkIsString,
+    database: 'esocialCode',
   },
   [CompanyStructHeaderEnum.LAST_EXAM]: {
     field: CompanyStructHeaderEnum.LAST_EXAM,
     checkHandler: checkIsValidDate,
+    database: 'lastExam',
   },
   [CompanyStructHeaderEnum.EMPLOYEE_PHONE]: {
     field: CompanyStructHeaderEnum.EMPLOYEE_PHONE,
     checkHandler: checkIsString,
+    database: 'phone',
   },
   [CompanyStructHeaderEnum.EMPLOYEE_EMAIL]: {
     field: CompanyStructHeaderEnum.EMPLOYEE_EMAIL,
     checkHandler: checkIsString,
     width: 40,
+    database: 'email',
   },
   [CompanyStructHeaderEnum.EMPLOYEE_SOCIAL_NAME]: {
     field: CompanyStructHeaderEnum.EMPLOYEE_SOCIAL_NAME,
     checkHandler: checkIsString,
     width: 50,
+    database: 'socialName',
   },
   [CompanyStructHeaderEnum.EMPLOYEE_RG]: {
     field: CompanyStructHeaderEnum.EMPLOYEE_RG,
     checkHandler: checkIsString,
+    database: 'rg',
   },
   [CompanyStructHeaderEnum.EMPLOYEE_IS_PCD]: {
     field: CompanyStructHeaderEnum.EMPLOYEE_IS_PCD,
     checkHandler: checkIsBoolean,
     notes: ['S: Sim', 'N: Não'],
     transform: (v) => typeof v == 'string' ? Boolean(v) : undefined,
+    database: 'isPCD',
   },
   [CompanyStructHeaderEnum.EMPLOYEE_CIDS]: {
     field: CompanyStructHeaderEnum.EMPLOYEE_CIDS,
     checkHandler: checkIsString,
     isArray: true,
+    database: 'cids',
   },
   [CompanyStructHeaderEnum.DIRECTORY]: {
     field: CompanyStructHeaderEnum.DIRECTORY,
     checkHandler: checkIsString,
     transform: (v) => normalizeToUpperString(v),
+    database: 'directory',
   },
   [CompanyStructHeaderEnum.MANAGEMENT]: {
     field: CompanyStructHeaderEnum.MANAGEMENT,
     checkHandler: checkIsString,
     transform: (v) => normalizeToUpperString(v),
+    database: 'management',
   },
   [CompanyStructHeaderEnum.SECTOR]: {
     field: CompanyStructHeaderEnum.SECTOR,
     checkHandler: checkIsString,
     transform: (v) => normalizeToUpperString(v),
     requiredIfOneExist: [CompanyStructHeaderEnum.EMPLOYEE_ADMISSION, CompanyStructHeaderEnum.OFFICE],
+    database: 'sector',
   },
   [CompanyStructHeaderEnum.SUB_SECTOR]: {
     field: CompanyStructHeaderEnum.SUB_SECTOR,
     checkHandler: checkIsString,
     transform: (v) => normalizeToUpperString(v),
+    database: 'subSector',
   },
   [CompanyStructHeaderEnum.OFFICE]: {
     field: CompanyStructHeaderEnum.OFFICE,
@@ -218,25 +237,30 @@ export const CompanyStructColumnMap: IColumnRuleMap<CompanyStructHeaderEnum> = {
       CompanyStructHeaderEnum.OFFICE_REAL_DESCRIPTION,
       CompanyStructHeaderEnum.CBO,
     ],
+    database: 'office',
   },
   [CompanyStructHeaderEnum.SUB_OFFICE]: {
     field: CompanyStructHeaderEnum.SUB_OFFICE,
     checkHandler: checkIsString,
     transform: (v) => normalizeToUpperString(v),
+    database: 'subOffice',
   },
   [CompanyStructHeaderEnum.OFFICE_DESCRIPTION]: {
     field: CompanyStructHeaderEnum.OFFICE_DESCRIPTION,
     checkHandler: checkIsString,
     width: 80,
+    database: 'officeDescription',
   },
   [CompanyStructHeaderEnum.OFFICE_REAL_DESCRIPTION]: {
     field: CompanyStructHeaderEnum.OFFICE_REAL_DESCRIPTION,
     checkHandler: checkIsString,
     width: 80,
+    database: 'officeRealDescription',
   },
   [CompanyStructHeaderEnum.CBO]: {
     field: CompanyStructHeaderEnum.CBO,
     checkHandler: checkIsString,
+    database: 'cbo',
   },
 
   [CompanyStructHeaderEnum.GHO]: {
@@ -244,12 +268,14 @@ export const CompanyStructColumnMap: IColumnRuleMap<CompanyStructHeaderEnum> = {
     checkHandler: checkIsString,
     // fill: ReportFillColorEnum.HEADER_YELLOW,
     width: 30,
+    database: 'gho',
   },
   [CompanyStructHeaderEnum.GHO_DESCRIPTION]: {
     field: CompanyStructHeaderEnum.GHO_DESCRIPTION,
     checkHandler: checkIsString,
     width: 80,
     requiredIfOneExist: [CompanyStructHeaderEnum.GHO],
+    database: 'ghoDescription',
   },
 
   // [CompanyStructHeaderEnum.AMB_GENERAL]: {

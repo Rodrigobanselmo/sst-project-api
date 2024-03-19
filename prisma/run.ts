@@ -44,19 +44,23 @@ const prisma = new PrismaClient({
 async function main() {
   try {
     console.info('start');
-    const allEmployeesPromise = await prisma.employee.findMany({
-      where: {
-        status: { not: 'CANCELED' },
-      },
 
-      take: 1,
+    // const companyIds = ['6a90957b-ea2a-4dba-b88e-ee128562718a', '87544c8e-8827-4429-a3d6-ec62f486fc5b']
+
+    // await prisma.employeePPPHistory.deleteMany({ where: { employee: { companyId: { in: companyIds } } } })
+    // await prisma.employeeExamsHistory.deleteMany({ where: { employee: { companyId: { in: companyIds } } } })
+    // await prisma.employeeHierarchyHistory.deleteMany({ where: { employee: { companyId: { in: companyIds } } } })
+    // await prisma.employeeESocialEvent.deleteMany({ where: { companyId: { in: companyIds } } })
+    // await prisma.employeeESocialBatch.deleteMany({ where: { companyId: { in: companyIds } } })
+    // await prisma.employee.deleteMany({ where: { companyId: { in: companyIds } } })
+
+    // await prisma.hierarchyOnHomogeneous.deleteMany({ where: { hierarchy: { companyId: { in: companyIds } } } })
+    // await prisma.hierarchy.deleteMany({ where: { companyId: { in: companyIds } } })
+
+    await prisma.employee.findMany({
+      take: 10000,
       select: {
-        id: true,
-        companyId: true,
-        hierarchyId: true,
-        lastExam: true,
-        status: true,
-        hierarchy: {
+        id: true, hierarchy: {
           select: {
             id: true,
             parent: {
@@ -76,41 +80,10 @@ async function main() {
               },
             },
           },
-        },
+        }
+      }
+    })
 
-        expiredDateExam: true,
-        hierarchyHistory: {
-          take: 2,
-          select: { startDate: true, motive: true, hierarchyId: true },
-          orderBy: { startDate: 'desc' },
-        },
-
-        birthday: true,
-        sex: true,
-        subOffices: { select: { id: true } },
-        examsHistory: {
-          select: {
-            doneDate: true,
-            expiredDate: true,
-            status: true,
-            examType: true,
-            evaluationType: true,
-            hierarchyId: true,
-            validityInMonths: true,
-            examId: true,
-            exam: {
-              select: { isAttendance: true },
-            },
-          },
-          orderBy: { doneDate: 'desc' },
-          distinct: ['examId', 'status'],
-          where: {
-            exam: { isAvaliation: false },
-            status: { in: ['DONE'] },
-          },
-        },
-      },
-    });
 
     console.info('end');
   } catch (err) {

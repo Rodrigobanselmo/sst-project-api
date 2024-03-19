@@ -352,6 +352,8 @@ export class EmployeeRepository {
         'getSocialName',
         'getExamName',
         'isSchedule',
+        'getAllHierarchyNames',
+        'getHierarchyDescription',
       ],
     });
 
@@ -481,6 +483,31 @@ export class EmployeeRepository {
       };
     }
 
+    if ('getAllHierarchyNames' in query) {
+      options.select.subOffices = { select: { name: true } };
+      options.select.hierarchy = {
+        select: {
+          name: true,
+          parent: {
+            select: {
+              name: true,
+              parent: {
+                select: {
+                  name: true,
+                  parent: {
+                    select: {
+                      name: true,
+                      parent: { select: { name: true } },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      };
+    }
+
     if ('expiredExam' in query) {
       options.orderBy = [{ expiredDateExam: { sort: 'asc', nulls: 'first' } }, { company: { group: { name: 'asc' } } }, { company: { name: 'asc' } }, { name: 'asc' }];
       options.select.expiredDateExam = true;
@@ -596,6 +623,13 @@ export class EmployeeRepository {
 
           options.select.examsHistory.select.exam.select.name = true;
         }
+      }
+    }
+
+    if ('getHierarchyDescription' in query) {
+      if (typeof options.select?.hierarchy != 'boolean' && options.select.hierarchy.select) {
+        options.select.hierarchy.select.description = true;
+        options.select.hierarchy.select.realDescription = true;
       }
     }
 

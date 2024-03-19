@@ -14,6 +14,8 @@ import { DoneExamReportService } from '../../services/reports/done-exam-report/d
 import { ExpiredExamReportService } from '../../services/reports/expired-exam-report/expired-exam-report.service';
 import { RiskStructureReportService } from '../../services/reports/risk-structure-report/risk-structure-report.service';
 import { ExamComplementaryReportService } from '../../services/reports/exam-complementary-report/exam-complementary-report.service';
+import { DownloadEmployeeReportDto } from '../../dto/employee-report.dto';
+import { EmployeeReportService } from '../../services/reports/employee-report/employee-report.service';
 
 export const getResponse = (res: Response, data: any) => {
   if ('workbook' in data) {
@@ -33,8 +35,9 @@ export class ReportsController {
     private readonly expiredExamReportService: ExpiredExamReportService,
     private readonly doneExamReportService: DoneExamReportService,
     private readonly riskStructureReportService: RiskStructureReportService,
+    private readonly employeeReportService: EmployeeReportService,
     private readonly examComplementaryReportService: ExamComplementaryReportService,
-  ) {}
+  ) { }
 
   @Permissions({ code: PermissionEnum.CLINIC, crud: true, isMember: true })
   @Post('/clinic/:companyId')
@@ -68,6 +71,13 @@ export class ReportsController {
   @Post('/risk-structure/:companyId')
   async riskStructure(@Body() body: DownloadRiskStructureReportDto, @User() userPayloadDto: UserPayloadDto, @Res() res: Response) {
     const data = await this.riskStructureReportService.execute(body, userPayloadDto);
+    getResponse(res, data);
+  }
+
+  @Permissions({ code: PermissionEnum.RISK_DATA, crud: true, isMember: true })
+  @Post('/employee/:companyId')
+  async employees(@Body() body: DownloadEmployeeReportDto, @User() userPayloadDto: UserPayloadDto, @Res() res: Response) {
+    const data = await this.employeeReportService.execute(body, userPayloadDto);
     getResponse(res, data);
   }
 }

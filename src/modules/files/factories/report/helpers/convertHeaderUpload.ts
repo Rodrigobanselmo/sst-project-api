@@ -11,7 +11,7 @@ export function convertHeaderUpload(sheetHeaderList: ISheetHeaderList): IReportH
           return column.map((column) => {
             return {
               content: column.field,
-              database: column.field,
+              database: column.database || column.field,
               fill: fillColors[_index % fillColors.length],
               borders: { ...allBorders, ...(column.required && requiredBorders) },
               ...column,
@@ -21,7 +21,7 @@ export function convertHeaderUpload(sheetHeaderList: ISheetHeaderList): IReportH
 
         return {
           content: column.field,
-          database: column.field,
+          database: column.database,
           fill: fillColors[index % fillColors.length],
           borders: { ...allBorders, ...(column.required && requiredBorders) },
           ...column,

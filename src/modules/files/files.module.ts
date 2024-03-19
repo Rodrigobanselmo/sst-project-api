@@ -46,6 +46,9 @@ import { DownaldEmployeeModelFactory } from './factories/report/products/Downald
 import { ModelsUploadsController } from './controller/models/models.controller';
 import { ReportExpiredComplementaryExamFactory } from './factories/report/products/ReportExpiredComplementaryExamFactory';
 import { ExamComplementaryReportService } from './services/reports/exam-complementary-report/exam-complementary-report.service';
+import { EmployeeReportService } from './services/reports/employee-report/employee-report.service';
+import { EmployeeRepository } from '../company/repositories/implementations/EmployeeRepository';
+import { ReportEmployeeModelFactory } from './factories/report/products/ReportEmployeeFactory';
 
 @Module({
   controllers: [FilesChecklistController, ModelsUploadsController, ReportsController, FilesCompanyController, FilesCnaeController, FilesController, FilesCidController],
@@ -89,6 +92,9 @@ import { ExamComplementaryReportService } from './services/reports/exam-compleme
     DownaldEmployeeModelFactory,
     ReportExpiredComplementaryExamFactory,
     ExamComplementaryReportService,
+    EmployeeReportService,
+    EmployeeRepository,
+    ReportEmployeeModelFactory,
   ],
 })
-export class FilesModule {}
+export class FilesModule { }

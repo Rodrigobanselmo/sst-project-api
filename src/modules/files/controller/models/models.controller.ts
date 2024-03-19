@@ -13,7 +13,7 @@ import { getResponse } from '../reports/reports.controller';
 
 @Controller('files/models')
 export class ModelsUploadsController {
-  constructor(private readonly downaldRiskModelFactory: DownaldRiskModelFactory, private readonly downaldEmpoyeeModelFactory: DownaldEmployeeModelFactory) {}
+  constructor(private readonly downaldRiskModelFactory: DownaldRiskModelFactory, private readonly downaldEmpoyeeModelFactory: DownaldEmployeeModelFactory) { }
 
   @Post('/employee/:companyId')
   async employeeModel(@User() userPayloadDto: UserPayloadDto, @Res() res: Response) {

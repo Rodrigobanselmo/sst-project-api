@@ -23,7 +23,7 @@ export class ReportClinicFactory extends ReportFactoryAbstractionCreator<FindCom
 }
 
 class ReportFactoryProduct implements IReportFactoryProduct<FindCompaniesDto> {
-  constructor(private readonly companyRepository: CompanyRepository) {}
+  constructor(private readonly companyRepository: CompanyRepository) { }
 
   public async findTableData(companyId: string, { skip, take, ...query }: FindCompaniesDto) {
     query.isClinic = true;
@@ -109,7 +109,7 @@ class ReportFactoryProduct implements IReportFactoryProduct<FindCompaniesDto> {
       { database: 'street', content: 'Endereço', width: 120 },
       { database: 'cep', content: 'CEP', width: 20 },
       { database: 'city', content: 'Cidade', width: 40 },
-      { database: 'UF', content: 'state', width: 10 },
+      { database: 'state', content: 'UF', width: 10 },
       { database: 'phone1', content: 'Telefone 1', width: 15 },
       { database: 'phone2', content: 'Telefone 2', width: 15 },
       { database: 'email', content: 'Email', width: 60 },

@@ -37,7 +37,7 @@ export class EmployeeEntity implements Employee {
 
   @ApiProperty({ description: 'The creation date of the Employee' })
   created_at: Date;
-  
+
   @ApiProperty({
     description: 'The last time that the Employee data was updated',
   })
@@ -54,12 +54,12 @@ export class EmployeeEntity implements Employee {
   hierarchy?: Partial<HierarchyEntity>;
 
   subOffices?: Partial<HierarchyEntity>[];
-  directory?: string;
-  management?: string;
-  sector?: string;
-  sub_sector?: string;
-  office?: string;
-  sub_office?: string;
+  directory?: Partial<HierarchyEntity>;
+  management?: Partial<HierarchyEntity>;
+  sector?: Partial<HierarchyEntity>;
+  sub_sector?: Partial<HierarchyEntity>;
+  office?: Partial<HierarchyEntity>;
+  sub_office?: Partial<HierarchyEntity>;
 
   esocialCode: string;
   socialName: string;
@@ -73,6 +73,7 @@ export class EmployeeEntity implements Employee {
   normalized: string;
   birthday: Date;
   admissionDate: Date;
+  demissionDate?: Date;
   lastExam: Date;
   expiredDateExam: Date;
   newExamAdded: Date;
@@ -137,6 +138,8 @@ export class EmployeeEntity implements Employee {
 
     if (this.hierarchy) {
       this.hierarchy = new HierarchyEntity(this.hierarchy);
+
+      this.directory = this.hierarchy?.parents?.find((p) => p?.type == 'DIRECTORY');
     }
 
     if (this.hierarchy?.parents) {
@@ -157,7 +160,9 @@ export class EmployeeEntity implements Employee {
     if (this.hierarchyHistory) {
       this.hierarchyHistory = this.hierarchyHistory.map((hierarchyHistory) => new EmployeeHierarchyHistoryEntity(hierarchyHistory));
       const admissionDate = this.hierarchyHistory.find((h) => h?.motive == 'ADM')?.startDate;
+      const demissionDate = this.hierarchyHistory.find((h) => h?.motive == 'DEM')?.startDate;
       if (admissionDate) this.admissionDate = admissionDate;
+      if (demissionDate && admissionDate && admissionDate < demissionDate) this.demissionDate = demissionDate;
     }
 
     if (this.statusExam && this.hierarchyHistory) {

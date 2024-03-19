@@ -1,33 +1,33 @@
-import { asyncEach } from './../../../../../../shared/utils/asyncEach';
-import { EmployeeEntity } from './../../../../../company/entities/employee.entity';
-import { UpsertEmployeeHierarchyHistoryService } from './../../../../../company/services/employee/0-history/hierarchy/upsert/upsert.service';
-import { EmployeeRepository } from './../../../../../company/repositories/implementations/EmployeeRepository';
-import { CreateHierarchyDto } from './../../../../../company/dto/hierarchy';
-import { CreateHomoGroupDto } from './../../../../../company/dto/homoGroup';
-import { HierarchyRepository } from './../../../../../company/repositories/implementations/HierarchyRepository';
-import { HomoGroupRepository } from './../../../../../company/repositories/implementations/HomoGroupRepository';
-import { HierarchyEntity } from './../../../../../company/entities/hierarchy.entity';
-import { RiskRepository } from './../../../../../sst/repositories/implementations/RiskRepository';
-import { HierarchyExcelProvider } from './../../../../providers/HierarchyExcelProvider';
-import { CreateGenerateSourceService } from './../../../../../sst/services/generate-source/create-generate-source/create-generate-source.service';
-import { CreateRecMedService } from './../../../../../sst/services/rec-med/create-rec-med/create-rec-med.service';
-import { QuantityTypeEnum } from './../../../../../company/interfaces/risk-data-json.types';
-import { isRiskQuantity } from './../../../../../../shared/utils/isRiskQuantity';
-import { RiskFactorsEntity } from './../../../../../sst/entities/risk.entity';
-import { FindAllAvailableRiskService } from './../../../../../sst/services/risk/find-all-available-risk/find-all-available-risk.service';
-import { CompanyEntity } from './../../../../../company/entities/company.entity';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { asyncBatch } from '../../../../../../shared/utils/asyncBatch';
-import { UpsertRiskDataService } from './../../../../../sst/services/risk-data/upsert-risk-data/upsert-risk.service';
 import { PrismaService } from './../../../../../../prisma/prisma.service';
 import { IExcelReadData } from './../../../../../../shared/providers/ExcelProvider/models/IExcelProvider.types';
-import { checkIsNumber } from './../../../../../../shared/utils/validators/checkIdNumber';
-import { checkIsString } from './../../../../../../shared/utils/validators/checkIsString';
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { asyncEach } from './../../../../../../shared/utils/asyncEach';
+import { isRiskQuantity } from './../../../../../../shared/utils/isRiskQuantity';
+import { CreateHierarchyDto } from './../../../../../company/dto/hierarchy';
+import { CreateHomoGroupDto } from './../../../../../company/dto/homoGroup';
+import { EmployeeEntity } from './../../../../../company/entities/employee.entity';
+import { QuantityTypeEnum } from './../../../../../company/interfaces/risk-data-json.types';
+import { EmployeeRepository } from './../../../../../company/repositories/implementations/EmployeeRepository';
+import { HierarchyRepository } from './../../../../../company/repositories/implementations/HierarchyRepository';
+import { HomoGroupRepository } from './../../../../../company/repositories/implementations/HomoGroupRepository';
+import { UpsertEmployeeHierarchyHistoryService } from './../../../../../company/services/employee/0-history/hierarchy/upsert/upsert.service';
+import { RiskFactorsEntity } from './../../../../../sst/entities/risk.entity';
+import { RiskRepository } from './../../../../../sst/repositories/implementations/RiskRepository';
+import { CreateGenerateSourceService } from './../../../../../sst/services/generate-source/create-generate-source/create-generate-source.service';
+import { CreateRecMedService } from './../../../../../sst/services/rec-med/create-rec-med/create-rec-med.service';
+import { UpsertRiskDataService } from './../../../../../sst/services/risk-data/upsert-risk-data/upsert-risk.service';
 
+import { formatCPF } from '@brazilian-utils/brazilian-utils';
+import { EmployeeHierarchyMotiveTypeEnum, HierarchyEnum } from '@prisma/client';
+import clone from 'clone';
+import dayjs from 'dayjs';
+import sortArray from 'sort-array';
+import { EpiRoRiskDataDto } from '../../../../../../modules/sst/dto/epi-risk-data.dto';
+import { hierarchyList, hierarchyListReversed } from '../../../../../../shared/constants/lists/hierarchy.list';
 import { ExcelProvider } from '../../../../../../shared/providers/ExcelProvider/implementations/ExcelProvider';
-import { FindCompaniesDto } from '../../../../../company/dto/company.dto';
 import { FileFactoryAbstractionCreator } from '../../creator/FileFactoryCreator';
-import { IColumnRuleMap, IFileFactoryProduct, ISheetData, ISheetExtractedData } from '../../types/IFileFactory.types';
+import { IFileFactoryProduct, ISheetData, ISheetExtractedData } from '../../types/IFileFactory.types';
 import { CompanyStructColumnMap, CompanyStructHeaderEnum, emptyHierarchy } from './constants/company-struct.constants';
 import {
   IBodyFileCompanyStruct,
@@ -35,22 +35,13 @@ import {
   IDataReturnHierarchy,
   IEmployeeReturn,
   IEpiReturn,
-  IHierarchyDataReturn,
   IHierarOnHomoDataReturn,
+  IHierarchyDataReturn,
   IHomoDataReturn,
   IMapData,
   IWorkDataReturn,
   IWorkspaceData,
 } from './types/company-struct.constants';
-import { HierarchyEnum, Workspace, HomogeneousGroup, EmployeeHierarchyMotiveTypeEnum } from '@prisma/client';
-import { FileHelperProvider } from '../../../../providers/FileHelperProvider';
-import { hierarchyList, hierarchyListReversed } from '../../../../../../shared/constants/lists/hierarchy.list';
-import { EpiRoRiskDataDto } from '../../../../../../modules/sst/dto/epi-risk-data.dto';
-import { formatCPF } from '@brazilian-utils/brazilian-utils';
-import { CreateEmployeeService } from '../../../../../../modules/company/services/employee/create-employee/create-employee.service';
-import sortArray from 'sort-array';
-import clone from 'clone';
-import dayjs from 'dayjs';
 
 @Injectable()
 export class FileCompanyStructureFactory extends FileFactoryAbstractionCreator<IBodyFileCompanyStruct, CompanyStructHeaderEnum> {
@@ -118,22 +109,8 @@ class FileFactoryProduct implements IFileFactoryProduct {
     return sheets;
   }
 
-  public getHierarchyPath(data: Record<string, string>) {
-    const hierarchyArray = hierarchyList.map((key) => (data[CompanyStructHeaderEnum[key]] as string) || emptyHierarchy);
-
-    return hierarchyArray;
-  }
-
-  public getHierarchyData(hierarchyArray: string[]) {
-    const reverseHierarchyArray = hierarchyArray.reverse();
-    const lastHierarchyNameIndex = reverseHierarchyArray.findIndex((i) => i != emptyHierarchy);
-    const type = hierarchyListReversed[lastHierarchyNameIndex];
-    const name = reverseHierarchyArray[lastHierarchyNameIndex];
-
-    reverseHierarchyArray[lastHierarchyNameIndex] = emptyHierarchy;
-    const parentHierarchyPath = reverseHierarchyArray.reverse();
-
-    return { parentHierarchyPath, type, name };
+  public async getColumns() {
+    return CompanyStructColumnMap;
   }
 
   public async saveData(sheetsData: ISheetExtractedData<CompanyStructHeaderEnum>[], body: IBodyFileCompanyStruct) {
@@ -210,6 +187,24 @@ class FileFactoryProduct implements IFileFactoryProduct {
         });
       }
     });
+  }
+
+  private getHierarchyPath(data: Record<string, string>) {
+    const hierarchyArray = hierarchyList.map((key) => (data[CompanyStructHeaderEnum[key]] as string) || emptyHierarchy);
+
+    return hierarchyArray;
+  }
+
+  private getHierarchyData(hierarchyArray: string[]) {
+    const reverseHierarchyArray = hierarchyArray.reverse();
+    const lastHierarchyNameIndex = reverseHierarchyArray.findIndex((i) => i != emptyHierarchy);
+    const type = hierarchyListReversed[lastHierarchyNameIndex];
+    const name = reverseHierarchyArray[lastHierarchyNameIndex];
+
+    reverseHierarchyArray[lastHierarchyNameIndex] = emptyHierarchy;
+    const parentHierarchyPath = reverseHierarchyArray.reverse();
+
+    return { parentHierarchyPath, type, name };
   }
 
   private getRiskDataJson(risk: RiskFactorsEntity, data: Record<Partial<CompanyStructHeaderEnum>, any>) {
@@ -903,9 +898,5 @@ class FileFactoryProduct implements IFileFactoryProduct {
       ...(typeof employeeImportData.isPcd == 'boolean' && { isPcd: employeeImportData.isPcd }),
       ...(employeeImportData.cids && { cidIds: Object.values(employeeImportData.cids) }),
     });
-  }
-
-  public async getColumns() {
-    return CompanyStructColumnMap;
   }
 }

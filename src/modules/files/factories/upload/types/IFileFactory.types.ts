@@ -1,4 +1,4 @@
-import { IReportCell, ReportFillColorEnum } from '../../report/types/IReportFactory.types';
+import { IReportCell, IReportHeaderCell, ReportFillColorEnum } from '../../report/types/IReportFactory.types';
 import { IExcelReadData } from './../../../../../shared/providers/ExcelProvider/models/IExcelProvider.types';
 
 export type IColumnRule = {
@@ -6,6 +6,7 @@ export type IColumnRule = {
   requiredIfOneExist?: string[];
   isArray?: boolean;
   field: string;
+  database?: string;
   checkHandler?: (...args: any[]) => any;
   transform?: (...args: any[]) => any;
   notes?: string[];

@@ -165,6 +165,16 @@ export class FindEmployeeDto extends PaginationQueryDto {
   @IsBoolean()
   @ToBoolean()
   @IsOptional()
+  getAllHierarchyNames?: boolean;
+
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  getHierarchyDescription?: boolean;
+
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
   isSchedule?: boolean;
 
   @IsBoolean()

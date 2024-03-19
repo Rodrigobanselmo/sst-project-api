@@ -38,15 +38,15 @@ class ReportFactoryProduct implements IReportFactoryProduct<FindEmployeeExamHist
     private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository,
     private readonly examToClinicRepository: ExamToClinicRepository,
     private readonly dayjsProvider: DayJSProvider,
-  ) {}
+  ) { }
 
   public async findTableData(companyId: string, { skip, take, ...query }: FindEmployeeExamHistoryDto) {
     const clinicsIds = query.clinicsIds;
     const examToClinic = clinicsIds
       ? await this.examToClinicRepository.findNude({
-          select: { companyId: true, examId: true, price: true },
-          where: { companyId: { in: clinicsIds }, endDate: null },
-        })
+        select: { companyId: true, examId: true, price: true },
+        where: { companyId: { in: clinicsIds }, endDate: null },
+      })
       : [];
 
     const examToClinicMap = examToClinic.reduce((acc, { examId, companyId, ...curr }) => {
@@ -103,10 +103,10 @@ class ReportFactoryProduct implements IReportFactoryProduct<FindEmployeeExamHist
 
     const employeesExamsData = clinicsIds
       ? employeesExams.data.map((employeesExam) => {
-          const price = examToClinicMap[`${employeesExam.clinicId}${employeesExam.examId}`]?.price;
-          employeesExam.price = price / 100 || 0;
-          return employeesExam;
-        })
+        const price = examToClinicMap[`${employeesExam.clinicId}${employeesExam.examId}`]?.price;
+        employeesExam.price = price / 100 || 0;
+        return employeesExam;
+      })
       : employeesExams.data;
 
     const sanitizeData = this.sanitizeData(employeesExamsData, !!clinicsIds);
@@ -202,7 +202,6 @@ class ReportFactoryProduct implements IReportFactoryProduct<FindEmployeeExamHist
 
     const row: IReportCell[] = [
       {
-        // eslint-disable-next-line prettier/prettier
         content: `Total de exames realizados: (${employeeExams.length})             ${price}`,
         mergeRight: 'all',
       },
