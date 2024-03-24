@@ -42,6 +42,7 @@ class ReportFactoryProduct extends DownloadFactoryProduct {
     const { data } = await this.employeeRepository.find({
       getEsocialCode: true,
       getHierarchyDescription: true,
+      companyId,
       getAllHierarchyNames: true, //! trocar se for buscar de varias empresa já que busca por id de todos as hierarchies, performace ruim do prisma
     }, { take: 50000 })
 
@@ -58,7 +59,6 @@ class ReportFactoryProduct extends DownloadFactoryProduct {
 
   public sanitizeData({ employees }: { employees: EmployeeEntity[] }): IReportSanitizeData[] {
     const rows: IReportSanitizeData[] = [];
-
 
     employees.forEach((employee) => {
       const row: IReportSanitizeData = {

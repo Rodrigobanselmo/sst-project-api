@@ -137,9 +137,19 @@ export class EmployeeEntity implements Employee {
     }
 
     if (this.hierarchy) {
+
       this.hierarchy = new HierarchyEntity(this.hierarchy);
 
-      this.directory = this.hierarchy?.parents?.find((p) => p?.type == 'DIRECTORY');
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { parent, parents, ...h } = this.hierarchy
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const allHierarchies = [h, ...(this.hierarchy?.parents?.map(({ parent, parents, ...h }) => h) || [])] as HierarchyEntity[];
+
+      this.directory = allHierarchies.find((p) => p?.type == 'DIRECTORY');
+      this.management = allHierarchies.find((p) => p?.type == 'MANAGEMENT');
+      this.sector = allHierarchies.find((p) => p?.type == 'SECTOR');
+      this.sub_sector = allHierarchies.find((p) => p?.type == 'SUB_SECTOR');
+      this.office = allHierarchies.find((p) => p?.type == 'OFFICE');
     }
 
     if (this.hierarchy?.parents) {

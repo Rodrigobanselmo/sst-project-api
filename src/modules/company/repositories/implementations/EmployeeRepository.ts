@@ -488,16 +488,25 @@ export class EmployeeRepository {
       options.select.hierarchy = {
         select: {
           name: true,
+          type: true,
           parent: {
             select: {
               name: true,
+              type: true,
               parent: {
                 select: {
                   name: true,
+                  type: true,
                   parent: {
                     select: {
                       name: true,
-                      parent: { select: { name: true } },
+                      type: true,
+                      parent: {
+                        select: {
+                          type: true,
+                          name: true
+                        }
+                      },
                     },
                   },
                 },
