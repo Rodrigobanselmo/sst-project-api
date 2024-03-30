@@ -30,6 +30,6 @@ export class FindMeService {
 
     delete user.password;
 
-    return { ...user, ...company };
+    return { ...user, companies, ...company };
   }
 }
