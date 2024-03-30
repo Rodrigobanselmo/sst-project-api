@@ -123,7 +123,7 @@ export class CharacterizationRepository {
         profileParentId: profileParentId || undefined,
         ...characterizationDto,
       },
-      include: { profiles: true },
+      include: { profiles: true, files: true },
     })) as CharacterizationEntity;
 
     characterization.profiles = await Promise.all(
@@ -217,7 +217,7 @@ export class CharacterizationRepository {
   ) {
     const characterization = (await this.prisma.companyCharacterization.findUnique({
       where: { id },
-      include: { photos: true, profiles: true, ...options.include },
+      include: { photos: true, profiles: true, files: true, ...options.include },
     })) as CharacterizationEntity;
 
     if (characterization) {

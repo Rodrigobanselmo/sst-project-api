@@ -31,7 +31,7 @@ export class AmazonStorageProvider implements IStorageProvider {
     const { Location: url, Key: key } = await this.s3
       .upload({
         Bucket: this.bucket,
-        Key: fileName,
+        Key: process.env.APP_HOST.includes('localhost') ? `${'test'}/${fileName}` : fileName,
         Body: file,
         ContentType: this.contentType(fileName),
         ACL: isPublic ? 'public-read' : undefined,
