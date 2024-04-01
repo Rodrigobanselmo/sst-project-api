@@ -456,7 +456,7 @@ model CompanyCharacterizationFile {
   deleted_at                DateTime?
   updated_at                DateTime                @updatedAt
   companyCharacterizationId String
-  Characterization          CompanyCharacterization @relation(fields: [companyCharacterizationId], references: [id])
+  Characterization          CompanyCharacterization @relation(fields: [companyCharacterizationId], references: [id], onDelete: Cascade)
 }
 
 model CompanyReport {
