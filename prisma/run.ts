@@ -36,6 +36,7 @@ import { hash } from 'bcrypt';
 import { readFileSync, createWriteStream, writeFileSync, readdirSync } from 'fs';
 import { signPdf } from './signature/signPdf';
 import { asyncBatch } from './../src/shared/utils/asyncBatch';
+import { realizaCover } from './run/realiza-cover';
 
 const prisma = new PrismaClient({
   log: ['query'],
@@ -57,32 +58,7 @@ async function main() {
     // await prisma.hierarchyOnHomogeneous.deleteMany({ where: { hierarchy: { companyId: { in: companyIds } } } })
     // await prisma.hierarchy.deleteMany({ where: { companyId: { in: companyIds } } })
 
-    await prisma.employee.findMany({
-      take: 10000,
-      select: {
-        id: true, hierarchy: {
-          select: {
-            id: true,
-            parent: {
-              select: {
-                id: true,
-                parent: {
-                  select: {
-                    id: true,
-                    parent: {
-                      select: {
-                        id: true,
-                        parent: { select: { id: true } },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        }
-      }
-    })
+    await realizaCover(prisma)
 
 
     console.info('end');
