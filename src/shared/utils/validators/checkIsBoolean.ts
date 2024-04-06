@@ -13,6 +13,7 @@ export const checkIsBoolean = (value: any) => {
     if (transformToString == 'FALSO') return 'false';
     if (['sim', 's', 'verdadeito', 'v', 'x'].includes(strLower)) return 'true';
     if (['nao', 'não', 'n', 'falso', 'f'].includes(strLower)) return 'false';
+    if ([''].includes(strLower.trim())) return 'true';
 
     if (transformToString.length > 0) return false;
   }
