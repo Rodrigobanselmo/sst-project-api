@@ -48,6 +48,8 @@ async function main() {
 
     // const companyIds = ['6a90957b-ea2a-4dba-b88e-ee128562718a', '87544c8e-8827-4429-a3d6-ec62f486fc5b']
 
+    const charId = "1e19f768-2fd0-47aa-b1bd-e5a9328ec0ee"
+
     // await prisma.employeePPPHistory.deleteMany({ where: { employee: { companyId: { in: companyIds } } } })
     // await prisma.employeeExamsHistory.deleteMany({ where: { employee: { companyId: { in: companyIds } } } })
     // await prisma.employeeHierarchyHistory.deleteMany({ where: { employee: { companyId: { in: companyIds } } } })
@@ -55,10 +57,15 @@ async function main() {
     // await prisma.employeeESocialBatch.deleteMany({ where: { companyId: { in: companyIds } } })
     // await prisma.employee.deleteMany({ where: { companyId: { in: companyIds } } })
 
-    // await prisma.hierarchyOnHomogeneous.deleteMany({ where: { hierarchy: { companyId: { in: companyIds } } } })
+    await prisma.companyCharacterizationFile.deleteMany({ where: { companyCharacterizationId: charId } })
+    // await prisma.companyCharacterizationPhoto.deleteMany({ where: { companyCharacterizationId: charId } })
+    // await prisma.companyCharacterization.delete({ where: { id: charId } })
     // await prisma.hierarchy.deleteMany({ where: { companyId: { in: companyIds } } })
 
-    await realizaCover(prisma)
+
+
+
+    // await realizaCover(prisma)
 
 
     console.info('end');
