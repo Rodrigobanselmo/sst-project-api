@@ -5,6 +5,7 @@ export interface bodyTableProps extends Partial<ITableCellOptions> {
   text?: string;
   size?: number;
   employee?: string;
+  isSubOffice?: boolean;
   description?: string;
 }
 

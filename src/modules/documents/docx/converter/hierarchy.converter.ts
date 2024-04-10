@@ -22,6 +22,7 @@ export interface HierarchyMapData {
   descRh: string;
   descReal: string;
   employeesLength: number;
+  subEmployeesLength: number;
 }
 
 export type IHierarchyData = Map<string, HierarchyMapData>;
@@ -170,6 +171,7 @@ export const hierarchyConverter = (hierarchies: HierarchyEntity[], environments 
         descRh: hierarchy.description,
         descReal: hierarchy.realDescription,
         employeesLength: hierarchy?.employees?.length || 0,
+        subEmployeesLength: hierarchy?.subOfficeEmployees?.length || 0,
         allHomogeneousGroupIds: removeDuplicate(allHomogeneousGroupIds, {
           simpleCompare: true,
         }),
@@ -181,6 +183,7 @@ export const hierarchyConverter = (hierarchies: HierarchyEntity[], environments 
       descRh: hierarchy.description,
       descReal: hierarchy.realDescription,
       employeesLength: hierarchy?.employees?.length || 0,
+      subEmployeesLength: hierarchy?.subOfficeEmployees?.length || 0,
       allHomogeneousGroupIds: removeDuplicate(allHomogeneousGroupIds, {
         simpleCompare: true,
       }),

@@ -27,6 +27,7 @@ export const palette = {
     simple: hexToColors('#014DA2'),
     main: hexToColors('#000000'),
     attention: hexToColors('#ff0000'),
+    warn: hexToColors('#d96c2f'),
   },
   matrix: {
     0: hexToColors('#ffffff'),

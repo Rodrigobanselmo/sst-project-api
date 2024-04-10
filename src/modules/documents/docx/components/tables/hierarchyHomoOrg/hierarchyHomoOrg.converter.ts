@@ -23,6 +23,7 @@ type IHierarchyDataRecord<T> = {
   name: string;
   type: string;
   numEmployees: string;
+  isSubOffice?: boolean;
   description: string;
 };
 export type IHierarchyPlan<T> = Record<string, IHierarchyDataRecord<T>>;
@@ -70,6 +71,7 @@ export const hierarchyPlanConverter = (
             homogeneousGroupIds: [],
             homogeneousGroup: '',
             employeesLength: hierarchiesData.employeesLength,
+            subEmployeesLength: hierarchiesData?.subEmployeesLength,
             description: hierarchiesData.descRh,
           };
         }
@@ -78,6 +80,7 @@ export const hierarchyPlanConverter = (
           ...hierarchyData,
           ...(showHomogeneous ? {} : { homogeneousGroupIds: [highParent.id] }),
           employeesLength: hierarchiesData.employeesLength,
+          subEmployeesLength: hierarchiesData?.subEmployeesLength,
           description: hierarchiesData.descRh,
         };
       });
@@ -90,7 +93,7 @@ export const hierarchyPlanConverter = (
             const hierarchyId = org[index].id;
             const hierarchyName = org[index]?.name;
             const hierarchyType = org[index].typeEnum;
-            const hierarchyEmployees = org[index]?.employeesLength || 0;
+            const hierarchyEmployees = org[index]?.employeesLength || org[index]?.subEmployeesLength || 0;
             const hierarchyDesc = org[index]?.description || 0;
             if (hierarchyId !== hierarchyEmptyId) hierarchyColumns[hierarchyType as any] = 0;
 
@@ -100,6 +103,7 @@ export const hierarchyPlanConverter = (
                 data: {},
                 name: hierarchyName,
                 numEmployees: String(hierarchyEmployees),
+                isSubOffice: !!org[index]?.subEmployeesLength,
                 description: hierarchyDesc || '',
               };
 
@@ -198,6 +202,7 @@ export const hierarchyPlanConverter = (
             rows[rowsPosition][hierarchyColumnTypePosition] = {
               text: hierarchyData.name,
               employee: hierarchyData.numEmployees,
+              isSubOffice: hierarchyData.isSubOffice,
               description: hierarchyData.description,
               borders: borderStyleGlobal(palette.common.white.string),
             };
@@ -239,6 +244,7 @@ export const hierarchyPlanConverter = (
 
   bodyData.forEach((row) => {
     const employees = row[row.length - 1].employee;
+    // const isSubOffice = row[row.length - 1].isSubOffice;
     const description = row[row.length - 1].description;
 
     if (showDescription && hasAtLeastOneDescription)
@@ -248,6 +254,7 @@ export const hierarchyPlanConverter = (
       };
     row[row.length] = {
       text: employees,
+      // ...(isSubOffice ? { shading: { fill: palette.table.rowDark.string } } : {}),
       borders: borderStyleGlobal(palette.common.white.string),
     };
   });
