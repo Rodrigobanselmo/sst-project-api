@@ -93,27 +93,107 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
   }
 
   protected async getPrgData({ companyId, workspaceId, includeCharPhotos = true, type = 'PGR', ...body }: IDocumentPGRBody & { includeCharPhotos?: boolean }) {
+    const {
+      company,
+      riskGroupId,
+      workspace,
+      riskGroupData,
+      hierarchies,
+      homogeneousGroups,
+      hierarchyData,
+      hierarchyHighLevelsData,
+      homoGroupTree,
+      hierarchyTree,
+      characterizations,
+      riskMap,
+      exams
+    } = await this.getPrgRiskData({ companyId, workspaceId, includeCharPhotos, type, ...body });
+
+    if (company.documentData?.length == 0) throw new BadRequestException('Nenhum documento PGR cadastrado');
+
+    const versionsPromise = this.riskDocumentRepository.findDocumentData(riskGroupId, companyId, DocumentTypeEnum.PGR);
+    const modelDataPromise = this.documentModelData(company.documentData[0].modelId, companyId);
+
+    const [versions, modelData] = await Promise.all([
+      versionsPromise,
+      modelDataPromise,
+    ]);
+
+    const consultant = getConsultantCompany(company);
+    const documentData = company?.documentData?.[0];
+
+    this.company = company;
+    const model = parseModelData(modelData)
+
+    // const { characterizations } = await this.downloadPhotos(homogeneousGroups);
+    const images = removeDuplicate(model.sections.map(
+      section => section.data.map(
+        sectionData => 'children' in sectionData && sectionData.children.map(
+          child => child.type == DocumentSectionChildrenTypeEnum.IMAGE ? child : null
+        )
+      )
+    ).flat(2).filter(i => i), { removeById: 'url' })
+
+
+    const { imagesMap } = await this.downloadImages(images);
+
+    const version = new RiskDocumentEntity({
+      version: body.version,
+      description: body.description,
+      validity: documentData.validity,
+      approvedBy: documentData.approvedBy,
+      revisionBy: documentData.revisionBy,
+      created_at: new Date(),
+    });
+
+    const { consultantLogo, logo } = await this.downloadLogos(company, consultant);
+
+    versions.unshift(version);
+
+    const docId = body.id || v4();
+    const cover = company?.covers?.[0] || consultant?.covers?.[0];
+
+    return {
+      company,
+      workspace,
+      riskGroupData,
+      documentData,
+      hierarchies,
+      homogeneousGroups,
+      consultant,
+      hierarchyData,
+      hierarchyHighLevelsData,
+      homoGroupTree,
+      hierarchyTree,
+      versions,
+      docId,
+      consultantLogo,
+      logo,
+      characterizations,
+      cover,
+      imagesMap,
+      modelData: model,
+      riskMap,
+      exams
+    };
+  }
+
+  public async getPrgRiskData({ companyId, workspaceId, includeCharPhotos = true, type = 'PGR' }: Pick<IDocumentPGRBody, 'companyId' | 'workspaceId' | 'type'> & { includeCharPhotos?: boolean }) {
     const company = await this.companyRepository.findDocumentData(companyId, { workspaceId, type });
     const riskGroupId = company.riskFactorGroupData?.[0]?.id;
 
-    if (company.documentData?.length == 0) throw new BadRequestException('Nenhum documento PGR cadastrado');
     if (!riskGroupId) throw new BadRequestException('Nenhum sistema de gestão cadastrado');
 
     const workspacePromise = this.workspaceRepository.findById(workspaceId);
     const riskGroupDataPromise = this.riskGroupDataRepository.findDocumentData(riskGroupId, companyId, { workspaceId }); // add homo
     const hierarchyPromise = this.hierarchyRepository.findDocumentData(companyId, { workspaceId }); // add homo
     const homogeneousGroupPromise = this.homoGroupRepository.findDocumentData(companyId, { workspaceId, includePhotos: includeCharPhotos });
-    const versionsPromise = this.riskDocumentRepository.findDocumentData(riskGroupId, companyId, DocumentTypeEnum.PGR);
-    const modelDataPromise = this.documentModelData(company.documentData[0].modelId, companyId);
-    // const simpleCompanyPromise = this.companyRepository.findFirstNude({ where: { id: simpleCompanyId }, include: { address: true, covers: true } });
 
-    const [workspace, riskGroupData, hierarchies, homogeneousGroupsFound, versions, modelData] = await Promise.all([
+    const [workspace, riskGroupData, hierarchies, homogeneousGroupsFound] = await Promise.all([
       workspacePromise,
       riskGroupDataPromise,
       hierarchyPromise,
       homogeneousGroupPromise,
-      versionsPromise,
-      modelDataPromise,
     ]);
 
     const riskMap: Record<string, { name: string }> = {}
@@ -146,23 +226,6 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
     company.characterization = characterization as any;
     company.environments = characterization as any;
 
-    const consultant = getConsultantCompany(company);
-    const documentData = company?.documentData?.[0];
-
-    this.company = company;
-    const model = parseModelData(modelData)
-
-    // const { characterizations } = await this.downloadPhotos(homogeneousGroups);
-    const images = removeDuplicate(model.sections.map(
-      section => section.data.map(
-        sectionData => 'children' in sectionData && sectionData.children.map(
-          child => child.type == DocumentSectionChildrenTypeEnum.IMAGE ? child : null
-        )
-      )
-    ).flat(2).filter(i => i), { removeById: 'url' })
-
-
-    const { imagesMap } = await this.downloadImages(images);
     const { characterizations } = await this.downloadCharPhotos(homogeneousGroups);
     const { hierarchyData, hierarchyHighLevelsData, homoGroupTree, hierarchyTree } = this.getHierarchyData(homogeneousGroups, hierarchies, characterizations);
 
@@ -181,46 +244,22 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
       return false;
     });
 
-    const version = new RiskDocumentEntity({
-      version: body.version,
-      description: body.description,
-      validity: documentData.validity,
-      approvedBy: documentData.approvedBy,
-      revisionBy: documentData.revisionBy,
-      created_at: new Date(),
-    });
-
-    const { consultantLogo, logo } = await this.downloadLogos(company, consultant);
-
-    versions.unshift(version);
-
-    const docId = body.id || v4();
-    const cover = company?.covers?.[0] || consultant?.covers?.[0];
-
     const exams = await this.findExamByHierarchyService.execute({ targetCompanyId: companyId }, { getAllExamToRiskWithoutHierarchy: true });
 
     return {
       company,
       workspace,
       riskGroupData,
-      documentData,
       hierarchies,
       homogeneousGroups,
-      consultant,
       hierarchyData,
       hierarchyHighLevelsData,
       homoGroupTree,
       hierarchyTree,
-      versions,
-      docId,
-      consultantLogo,
-      logo,
       characterizations,
-      cover,
-      imagesMap,
-      modelData: model,
       riskMap,
-      exams
+      exams,
+      riskGroupId
     };
   }
 

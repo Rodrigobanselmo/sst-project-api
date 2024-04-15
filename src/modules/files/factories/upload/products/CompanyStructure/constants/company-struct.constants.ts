@@ -75,6 +75,14 @@ export enum CompanyStructHeaderEnum {
   IS_ACCLIMATIZED = 'Trabalhador aclimatizado?',
   CLOTHES_TYPE = 'Tipo Vestimento (IBUTG)',
 
+  // DOSE_FB = 'Dose Corpo Inteiro',
+  // DOSE_FB_PUBLIC = 'Dose Corpo Inteiro Público',
+  // DOSE_EYE = 'Dose Olho',
+  // DOSE_EYE_PUBLIC = 'Dose Olho Público',
+  // DOSE_SKIN = 'Dose Pele',
+  // DOSE_SKIN_PUBLIC = 'Dose Pele Público',
+  // DOSE_HEAD = 'Dose Cabeça',
+
   EPI_CA = 'CA (EPI)',
   EPI_EFFICIENTLY = '(EPI) Eficaz?',
   EPI_EPC = '(EPI)  Foi tentada a implementação de medidas de proteção coletiva, de caráter administrativo ou de organização, ...?',
@@ -335,30 +343,36 @@ export const CompanyStructColumnMap: IColumnRuleMap<CompanyStructHeaderEnum> = {
     checkHandler: checkIsString,
     width: 70,
     notes: ['Nome do Risco cadastrado no sistema'],
+    database: 'risk',
   },
   [CompanyStructHeaderEnum.PROB]: {
     field: CompanyStructHeaderEnum.PROB,
     checkHandler: (value) => value && checkIsNumber(value),
+    database: 'probability',
   },
   [CompanyStructHeaderEnum.GENERATE_SOURCE]: {
     field: CompanyStructHeaderEnum.GENERATE_SOURCE,
     checkHandler: checkIsString,
     isArray: true,
     width: 50,
+    database: 'generateSources',
   },
 
   //* Ruido
   [CompanyStructHeaderEnum.DBA_NR15_Q5]: {
     field: CompanyStructHeaderEnum.DBA_NR15_Q5,
     checkHandler: checkIsNumber,
+    database: 'nr15q5',
   },
   [CompanyStructHeaderEnum.DBA_LTCAT_Q5]: {
     field: CompanyStructHeaderEnum.DBA_LTCAT_Q5,
     checkHandler: checkIsNumber,
+    database: 'ltcatq5',
   },
   [CompanyStructHeaderEnum.DBA_LTCAT_Q3]: {
     field: CompanyStructHeaderEnum.DBA_LTCAT_Q3,
     checkHandler: checkIsNumber,
+    database: 'ltcatq3',
   },
 
   //* HEAT
@@ -366,58 +380,106 @@ export const CompanyStructColumnMap: IColumnRuleMap<CompanyStructHeaderEnum> = {
     field: CompanyStructHeaderEnum.IBTUG,
     checkHandler: checkIsNumber,
     requiredIfOneExist: [CompanyStructHeaderEnum.MW, CompanyStructHeaderEnum.IS_ACCLIMATIZED, CompanyStructHeaderEnum.CLOTHES_TYPE],
+    database: 'ibtug',
   },
   [CompanyStructHeaderEnum.MW]: {
     field: CompanyStructHeaderEnum.MW,
     checkHandler: checkIsNumber,
     requiredIfOneExist: [CompanyStructHeaderEnum.IBTUG],
+    database: 'mw',
   },
   [CompanyStructHeaderEnum.IS_ACCLIMATIZED]: {
     field: CompanyStructHeaderEnum.IS_ACCLIMATIZED,
     checkHandler: checkIsBoolean,
     transform: (v) => Boolean(v),
     requiredIfOneExist: [CompanyStructHeaderEnum.IBTUG],
+    database: 'isAcclimatized',
   },
   [CompanyStructHeaderEnum.CLOTHES_TYPE]: {
     field: CompanyStructHeaderEnum.CLOTHES_TYPE,
     checkHandler: (value: any) => checkIsEnum(value, ClothesIBTUG),
     requiredIfOneExist: [CompanyStructHeaderEnum.IBTUG],
     notes: ['Utilizar valores: 0, 0.5, 2, 3, 4, 10, 12'],
+    database: 'clothesType',
   },
 
   //* Vibration
   [CompanyStructHeaderEnum.AREN]: {
     field: CompanyStructHeaderEnum.AREN,
     checkHandler: checkIsNumber,
+    database: 'aren',
   },
   [CompanyStructHeaderEnum.VDVR]: {
     field: CompanyStructHeaderEnum.VDVR,
     checkHandler: checkIsNumber,
+    database: 'vdvr',
   },
+
+  //* RADIATION
+  // [CompanyStructHeaderEnum.DOSE_FB]: {
+  //   field: CompanyStructHeaderEnum.DOSE_FB,
+  //   checkHandler: checkIsNumber,
+  //   database: 'doseFB',
+  // },
+  // [CompanyStructHeaderEnum.DOSE_FB_PUBLIC]: {
+  //   field: CompanyStructHeaderEnum.DOSE_FB_PUBLIC,
+  //   checkHandler: checkIsNumber,
+  //   database: 'doseFBPublic',
+  // },
+  // [CompanyStructHeaderEnum.DOSE_EYE]: {
+  //   field: CompanyStructHeaderEnum.DOSE_EYE,
+  //   checkHandler: checkIsNumber,
+  //   database: 'doseEye',
+  // },
+  // [CompanyStructHeaderEnum.DOSE_EYE_PUBLIC]: {
+  //   field: CompanyStructHeaderEnum.DOSE_EYE_PUBLIC,
+  //   checkHandler: checkIsNumber,
+  //   database: 'doseEyePublic',
+  // },
+  // [CompanyStructHeaderEnum.DOSE_SKIN]: {
+  //   field: CompanyStructHeaderEnum.DOSE_SKIN,
+  //   checkHandler: checkIsNumber,
+  //   database: 'doseSkin',
+  // },
+  // [CompanyStructHeaderEnum.DOSE_SKIN_PUBLIC]: {
+  //   field: CompanyStructHeaderEnum.DOSE_SKIN_PUBLIC,
+  //   checkHandler: checkIsNumber,
+  //   database: 'doseSkinPublic',
+  // },
+  // [CompanyStructHeaderEnum.DOSE_HEAD]: {
+  //   field: CompanyStructHeaderEnum.DOSE_HEAD,
+  //   checkHandler: checkIsNumber,
+  //   database: 'doseHead',
+  // },
 
   //* Chemicals
   [CompanyStructHeaderEnum.NR15LT]: {
     field: CompanyStructHeaderEnum.NR15LT,
     checkHandler: checkIsNumber,
     notes: ['utilizar "T" para indicar TETO'],
+    database: 'nr15ltValue'
   },
   [CompanyStructHeaderEnum.TWA_ACGH]: {
     field: CompanyStructHeaderEnum.TWA_ACGH,
     checkHandler: checkIsNumber,
+    database: 'twaValue'
   },
   [CompanyStructHeaderEnum.STEL]: {
     field: CompanyStructHeaderEnum.STEL,
     checkHandler: checkIsNumber,
     notes: ['utilizar "C" para indicar "CEILLING"'],
+    database: 'stelValue'
   },
   [CompanyStructHeaderEnum.VMP]: {
     field: CompanyStructHeaderEnum.VMP,
     checkHandler: checkIsNumber,
+    database: 'vmpValue'
   },
   [CompanyStructHeaderEnum.UNIT]: {
     field: CompanyStructHeaderEnum.UNIT,
     checkHandler: checkIsString,
     width: 30,
+    database: 'unit'
   },
 
   [CompanyStructHeaderEnum.EPI_CA]: {
@@ -435,60 +497,70 @@ export const CompanyStructColumnMap: IColumnRuleMap<CompanyStructHeaderEnum> = {
       CompanyStructHeaderEnum.EPI_UNSTOPPED,
       CompanyStructHeaderEnum.EPI_TRAINING,
     ],
+    database: 'epiCa',
   },
   [CompanyStructHeaderEnum.EPI_EFFICIENTLY]: {
     field: CompanyStructHeaderEnum.EPI_EFFICIENTLY,
     checkHandler: checkIsBoolean,
     transform: (v) => Boolean(v),
     notes: ['S: Sim', 'N: Não'],
+    database: 'epiEfficiently',
   },
   [CompanyStructHeaderEnum.EPI_EPC]: {
     field: CompanyStructHeaderEnum.EPI_EPC,
     checkHandler: checkIsBoolean,
     transform: (v) => Boolean(v),
     notes: ['S: Sim', 'N: Não'],
+    database: 'epiEpc',
   },
   [CompanyStructHeaderEnum.EPI_LONG_PERIODS]: {
     field: CompanyStructHeaderEnum.EPI_LONG_PERIODS,
     checkHandler: checkIsBoolean,
     transform: (v) => Boolean(v),
     notes: ['S: Sim', 'N: Não'],
+    database: 'epiLongPeriods',
   },
   [CompanyStructHeaderEnum.EPI_VALIDATION]: {
     field: CompanyStructHeaderEnum.EPI_VALIDATION,
     checkHandler: checkIsBoolean,
     transform: (v) => Boolean(v),
     notes: ['S: Sim', 'N: Não'],
+    database: 'epiValidation',
   },
   [CompanyStructHeaderEnum.EPI_TRADE_SIGN]: {
     field: CompanyStructHeaderEnum.EPI_TRADE_SIGN,
     checkHandler: checkIsBoolean,
     transform: (v) => Boolean(v),
     notes: ['S: Sim', 'N: Não'],
+    database: 'epiTradeSign',
   },
   [CompanyStructHeaderEnum.EPI_SANITATION]: {
     field: CompanyStructHeaderEnum.EPI_SANITATION,
     checkHandler: checkIsBoolean,
     transform: (v) => Boolean(v),
     notes: ['S: Sim', 'N: Não'],
+    database: 'epiSanitation',
   },
   [CompanyStructHeaderEnum.EPI_MAINTENANCE]: {
     field: CompanyStructHeaderEnum.EPI_MAINTENANCE,
     checkHandler: checkIsBoolean,
     transform: (v) => Boolean(v),
     notes: ['S: Sim', 'N: Não'],
+    database: 'epiMaintenance',
   },
   [CompanyStructHeaderEnum.EPI_UNSTOPPED]: {
     field: CompanyStructHeaderEnum.EPI_UNSTOPPED,
     checkHandler: checkIsBoolean,
     transform: (v) => Boolean(v),
     notes: ['S: Sim', 'N: Não'],
+    database: 'epiUnstopped',
   },
   [CompanyStructHeaderEnum.EPI_TRAINING]: {
     field: CompanyStructHeaderEnum.EPI_TRAINING,
     checkHandler: checkIsBoolean,
     transform: (v) => Boolean(v),
     notes: ['S: Sim', 'N: Não'],
+    database: 'epiTraining',
   },
   [CompanyStructHeaderEnum.EPC]: {
     field: CompanyStructHeaderEnum.EPC,
@@ -496,35 +568,42 @@ export const CompanyStructColumnMap: IColumnRuleMap<CompanyStructHeaderEnum> = {
     requiredIfOneExist: [CompanyStructHeaderEnum.EPC_EFFICIENTLY],
     isArray: true,
     width: 50,
+    database: 'epc',
   },
   [CompanyStructHeaderEnum.EPC_EFFICIENTLY]: {
     field: CompanyStructHeaderEnum.EPC_EFFICIENTLY,
     checkHandler: checkIsBoolean,
     transform: (v) => Boolean(v),
     notes: ['S: Sim', 'N: Não'],
+    database: 'epcEfficiently',
   },
   [CompanyStructHeaderEnum.EPC_OTHERS]: {
     field: CompanyStructHeaderEnum.EPC_OTHERS,
     checkHandler: checkIsString,
     isArray: true,
     width: 50,
+    database: 'adm',
   },
   [CompanyStructHeaderEnum.REC]: {
     field: CompanyStructHeaderEnum.REC,
     checkHandler: checkIsString,
     isArray: true,
     width: 50,
+    database: 'rec',
   },
   [CompanyStructHeaderEnum.PROB_REC]: {
     field: CompanyStructHeaderEnum.PROB_REC,
     checkHandler: (value) => value && checkIsNumber(value),
+    database: 'probabilityAfter',
   },
   [CompanyStructHeaderEnum.START_DATE]: {
     field: CompanyStructHeaderEnum.START_DATE,
     checkHandler: checkIsValidDate,
+    database: 'startDate',
   },
   [CompanyStructHeaderEnum.END_DATE]: {
     field: CompanyStructHeaderEnum.END_DATE,
     checkHandler: checkIsValidDate,
+    database: 'endDate',
   },
 };

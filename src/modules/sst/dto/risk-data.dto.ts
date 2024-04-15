@@ -37,6 +37,10 @@ export class UpsertRiskDataDto {
 
   @IsOptional()
   @IsNumber()
+  exposure?: number;
+
+  @IsOptional()
+  @IsNumber()
   probabilityAfter?: number;
 
   @IsOptional()
@@ -131,6 +135,10 @@ export class UpsertManyRiskDataDto {
   @IsString({ each: true })
   @IsOptional()
   workspaceIds?: string;
+
+  @IsOptional()
+  @IsNumber()
+  exposure?: number;
 
   @IsOptional()
   @IsNumber()

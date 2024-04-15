@@ -21,7 +21,7 @@ export class CopyHomoGroupService {
     private readonly riskDataRepository: RiskDataRepository,
     private readonly hierarchyRepository: HierarchyRepository,
     private readonly upsertManyRiskDataService: UpsertManyRiskDataService,
-  ) {}
+  ) { }
 
   async execute(
     { actualGroupId, riskGroupId, copyFromHomoGroupId, riskGroupIdFrom, companyIdFrom, hierarchyId, ...rest }: CopyHomogeneousGroupDto,
@@ -74,6 +74,7 @@ export class CopyHomoGroupService {
         recs: !(riskData?.recs?.length > 0) ? undefined : riskData.recs.map(({ id }) => id),
         generateSources: !(riskData?.generateSources?.length > 0) ? undefined : riskData.generateSources.map(({ id }) => id),
         probability: riskData.probability || undefined,
+        exposure: riskData.exposure || undefined,
         probabilityAfter: riskData.probabilityAfter || undefined,
         json: riskData.json || undefined,
         ...rest,

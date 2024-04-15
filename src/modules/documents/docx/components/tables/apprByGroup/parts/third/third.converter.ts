@@ -14,6 +14,7 @@ import { whiteBorder, whiteColumnBorder } from '../../elements/header';
 import { ThirdRiskInventoryColumnEnum } from './third.constant';
 import { originRiskMap } from '../../../../../../../../shared/constants/maps/origin-risk';
 import { sortString } from '../../../../../../../../shared/utils/sorts/string.sort';
+import { isRiskValidForHierarchyData } from '../../../appr/parts/third/third.converter';
 
 export const dataConverter = (
   riskGroup: RiskFactorGroupDataEntity & DocumentDataEntity & DocumentDataPGRDto,
@@ -27,7 +28,8 @@ export const dataConverter = (
     .sort((a, b) => sortString(a.riskFactor.name, b.riskFactor.name))
     .sort((a, b) => sortNumber(riskMap[a.riskFactor.type]?.order, riskMap[b.riskFactor.type]?.order))
     .forEach((riskData) => {
-      if (!hierarchyData.allHomogeneousGroupIds.includes(riskData.homogeneousGroupId)) return;
+      if (!isRiskValidForHierarchyData({ hierarchyData, riskData, isByGroup: true })) return;
+
 
       const cells: bodyTableProps[] = [];
 

@@ -12,6 +12,19 @@ import { whiteBorder, whiteColumnBorder } from '../../elements/header';
 import { ThirdRiskInventoryColumnEnum } from './third.constant';
 import { originRiskMap } from '../../../../../../../../shared/constants/maps/origin-risk';
 import { sortString } from '../../../../../../../../shared/utils/sorts/string.sort';
+import { RiskFactorDataEntity } from 'src/modules/sst/entities/riskData.entity';
+
+
+export function isRiskValidForHierarchyData({ hierarchyData, riskData, isByGroup }: { hierarchyData: HierarchyMapData; riskData: Partial<RiskFactorDataEntity>; isByGroup: boolean }) {
+  if (!hierarchyData.allHomogeneousGroupIds.includes(riskData.homogeneousGroupId)) return false;
+
+  if (!isByGroup) {
+    const foundHierarchy = riskData.riskFactor.docInfo.find((doc) => !!hierarchyData.org.find((hierarchy) => hierarchy.id === doc.hierarchyId));
+    if (foundHierarchy && foundHierarchy.isPGR === false) return false;
+  }
+
+  return true
+}
 
 export const dataConverter = (riskGroup: RiskFactorGroupDataEntity, hierarchyData: HierarchyMapData, isByGroup: boolean) => {
   const riskFactorsMap = new Map<RiskFactorsEnum, bodyTableProps[][]>();
@@ -21,12 +34,7 @@ export const dataConverter = (riskGroup: RiskFactorGroupDataEntity, hierarchyDat
     .sort((a, b) => sortString(a.riskFactor.name, b.riskFactor.name))
     .sort((a, b) => sortNumber(riskMap[a.riskFactor.type]?.order, riskMap[b.riskFactor.type]?.order))
     .forEach((riskData) => {
-      if (!hierarchyData.allHomogeneousGroupIds.includes(riskData.homogeneousGroupId)) return;
-
-      if (!isByGroup) {
-        const foundHierarchy = riskData.riskFactor.docInfo.find((doc) => !!hierarchyData.org.find((hierarchy) => hierarchy.id === doc.hierarchyId));
-        if (foundHierarchy && foundHierarchy.isPGR === false) return;
-      }
+      if (!isRiskValidForHierarchyData({ hierarchyData, riskData, isByGroup })) return;
 
       const cells: bodyTableProps[] = [];
 

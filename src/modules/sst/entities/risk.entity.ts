@@ -1,3 +1,4 @@
+import { QuantityTypeEnum } from './../../company/interfaces/risk-data-json.types';
 import { ApiProperty } from '@nestjs/swagger';
 
 import { Prisma, RiskFactors, RiskFactorsEnum } from '.prisma/client';
@@ -9,6 +10,7 @@ import { RiskFactorDataEntity } from './riskData.entity';
 import { RiskDocInfoEntity } from './riskDocInfo.entity';
 import { EsocialTable24Entity } from '../../../modules/esocial/entities/esocialTable24.entity';
 import { ProtocolToRiskEntity } from './protocol.entity';
+import { isRiskQuantity } from '../../../shared/utils/isRiskQuantity';
 
 export class RiskFactorsEntity implements RiskFactors {
   @ApiProperty({ description: 'The id of the Company' })
@@ -67,6 +69,7 @@ export class RiskFactorsEntity implements RiskFactors {
   @ApiProperty({ description: 'The deleted date of data' })
   deleted_at: Date | null;
 
+  task: string | null;
   risk: string;
   symptoms: string;
 
@@ -122,5 +125,52 @@ export class RiskFactorsEntity implements RiskFactors {
     if (LT <= 100) return 1.5 * LT;
     if (LT <= 1000) return 1.25 * LT;
     return 1.1 * LT;
+  }
+
+  public getRiskType() {
+    return isRiskQuantity(this);
+  }
+
+  public getAnexo() {
+    const apendixNumber = Number(this.appendix);
+    // 9 = Anexo 9 FRIO
+    // 11 = Anexo 11 QUIMICO NR 15
+    // 12 = Anexo 12 POEIRAS  
+    // 13 = Anexo 13 QUIMICO Atividades
+    if (apendixNumber && !Number.isNaN(apendixNumber)) return apendixNumber
+
+    const type = this.getRiskType();
+
+    // 1 = Anexo 1
+    if (type == QuantityTypeEnum.NOISE) return 1
+
+    //! 2 = Anexo 2 Ruido Impacto
+
+    // 3 = Anexo 3
+    if (type == QuantityTypeEnum.HEAT) return 3
+
+    // 5 = Anexo 5
+    if (type == QuantityTypeEnum.RADIATION) return 5
+
+    //! 6 = Anexo 6
+    //! 7 = Anexo 7
+
+    // 8 = Anexo 8
+    if (type == QuantityTypeEnum.VL || type == QuantityTypeEnum.VFB) return 8
+
+    // 10 = Anexo 10
+
+    // 14 = Anexo 14
+    //! 15 = NR 16 Anexo 1 - Explosivos (Periculosidade)
+    //! 16 = NR 16 Anexo 2 - Inflamáveis (Periculosidade)
+    //! 17 = NR 16 Anexo 3 - Vigilante (Periculosidade)
+    //! 18 = NR 16 Anexo 4 - Eletricidade (Periculosidade)
+    //! 19 = NR 16 Anexo 5 - Motoboy (Periculosidade)
+    //! 20 =  Portaria nº 518/2003 - Radiações Ionizantes (Periculosidade)
+    // A = Riscos de Acidentes
+    // E = Riscos Ergonomicos
+    // N = Riscos não relacionados
+
+
   }
 }

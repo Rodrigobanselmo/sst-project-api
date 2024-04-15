@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { HierarchyEnum } from '@prisma/client';
 
 import { bodyTableProps } from '../../elements/body';

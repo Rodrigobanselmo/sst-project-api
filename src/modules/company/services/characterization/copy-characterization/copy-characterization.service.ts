@@ -122,6 +122,7 @@ export class CopyCharacterizationService {
                     riskFactorGroupDataId: actualCompany.riskFactorGroupData[0].id,
                     probabilityAfter: riskFactorFromData.probabilityAfter,
                     probability: riskFactorFromData.probability,
+                    exposure: riskFactorFromData.exposure,
                     json: riskFactorFromData.json || undefined,
                     // probabilityAfterCalc: {create:{chancesOfHappening:riskFactorFromData.probabilityAfter}}, //! missing this
                     companyId,

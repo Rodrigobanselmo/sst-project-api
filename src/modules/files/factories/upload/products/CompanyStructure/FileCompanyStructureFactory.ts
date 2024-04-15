@@ -45,6 +45,8 @@ import {
 
 @Injectable()
 export class FileCompanyStructureFactory extends FileFactoryAbstractionCreator<IBodyFileCompanyStruct, CompanyStructHeaderEnum> {
+  static splitter = '; ';
+
   constructor(
     private readonly excelProv: ExcelProvider,
     private readonly prisma: PrismaService,
@@ -76,7 +78,7 @@ export class FileCompanyStructureFactory extends FileFactoryAbstractionCreator<I
 }
 
 class FileFactoryProduct implements IFileFactoryProduct {
-  public splitter = '; ';
+  public splitter = FileCompanyStructureFactory.splitter;
   public errors: string[] = [];
   private throwError(message: string, options?: { stopFirstError?: boolean }) {
     if (options?.stopFirstError) throw new BadRequestException(message);

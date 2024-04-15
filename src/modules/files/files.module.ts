@@ -49,10 +49,12 @@ import { ExamComplementaryReportService } from './services/reports/exam-compleme
 import { EmployeeReportService } from './services/reports/employee-report/employee-report.service';
 import { EmployeeRepository } from '../company/repositories/implementations/EmployeeRepository';
 import { ReportEmployeeModelFactory } from './factories/report/products/ReportEmployeeFactory';
+import { DocumentsModule } from '../documents/documents.module';
+import { ReportRiskStructureRsDataFactory } from './factories/report/products/ReportRiskStructureRsData/ReportRiskStructureFactory.rsdata';
 
 @Module({
   controllers: [FilesChecklistController, ModelsUploadsController, ReportsController, FilesCompanyController, FilesCnaeController, FilesController, FilesCidController],
-  imports: [SSTModule, CompanyModule],
+  imports: [SSTModule, CompanyModule, DocumentsModule],
   providers: [
     DayJSProvider,
     DownloadExcelProvider,
@@ -87,6 +89,7 @@ import { ReportEmployeeModelFactory } from './factories/report/products/ReportEm
     HierarchyExcelProvider,
     FileHelperProvider,
     ReportRiskStructureFactory,
+    ReportRiskStructureRsDataFactory,
     RiskStructureReportService,
     DownaldRiskModelFactory,
     DownaldEmployeeModelFactory,

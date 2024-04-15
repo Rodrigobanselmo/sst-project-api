@@ -3,12 +3,13 @@ import { Workbook } from 'exceljs';
 import { ExcelProvider } from '../../../../../shared/providers/ExcelProvider/implementations/ExcelProvider';
 import { IReportCell, IReportFactoryProduct, IReportFactoryProductFindData, IReportGenerateType, IReportRows, ReportFillColorEnum } from '../types/IReportFactory.types';
 import { CompanyRepository } from '../../../../../modules/company/repositories/implementations/CompanyRepository';
+import { asyncEach } from 'src/shared/utils/asyncEach';
 
 export abstract class ReportFactoryAbstractionCreator<T> {
   private readonly companyRepo: CompanyRepository;
   private readonly excelProvider: ExcelProvider;
 
-  public abstract factoryMethod(): IReportFactoryProduct<T>;
+  public abstract factoryMethod(): IReportFactoryProduct<T> | IReportFactoryProduct<T>[];
 
   constructor(excelProvider, companyRepo) {
     this.excelProvider = excelProvider;
@@ -22,21 +23,27 @@ export abstract class ReportFactoryAbstractionCreator<T> {
   }
 
   public async excelCompile(companyId: string, query: T): Promise<{ workbook: Workbook; filename: string }> {
-    const { rows, filename: fileName, sheetName } = await this.getRows(companyId, query);
+    const sheets = await this.getRows(companyId, query);
 
-    const { workbook, filename } = await this.excelProvider.createReportTable([{ rows, name: sheetName }], fileName);
+    const { workbook, filename } = await this.excelProvider.createReportTable(sheets.map(({ rows, sheetName }) => ({ rows, name: sheetName })), sheets[0].filename);
 
     return { workbook, filename };
   }
 
   public async getRows(companyId: string, query: T) {
-    const product = this.create();
+    let products = this.create();
+    products = Array.isArray(products) ? products : [products];
 
-    const tableData = await product.findTableData(companyId, query);
-    const rows = this.organizeRows(tableData);
-    const company = await this.companyRepo.findFirstNude({ where: { id: companyId }, select: { id: true, name: true, fantasy: true } });
+    const data = await asyncEach(products, async (product, index) => {
+      const tableData = await product.findTableData(companyId, query);
+      const rows = this.organizeRows(tableData);
+      const company = await this.companyRepo.findFirstNude({ where: { id: companyId }, select: { id: true, name: true, fantasy: true } });
 
-    return { rows, filename: product.getFilename(company), sheetName: product.getSheetName() };
+      return { rows, filename: product.getFilename(company), sheetName: product.getSheetName() + ` ${index}` };
+    });
+
+
+    return data
   }
 
   public organizeRows(findArgs: IReportFactoryProductFindData): IReportRows {

@@ -25,6 +25,7 @@ import { EpiRiskDataEntity } from './epiRiskData.entity';
 import { EngsRiskDataEntity } from './engsRiskData.entity';
 import { ExamRiskDataEntity } from './examRiskData.entity';
 import { ExamEntity } from './exam.entity';
+import { isRiskQuantity } from 'src/shared/utils/isRiskQuantity';
 
 export class RiskFactorDataEntity implements RiskFactorData {
   @ApiProperty({ description: 'The id of the Company' })
@@ -90,6 +91,7 @@ export class RiskFactorDataEntity implements RiskFactorData {
   @ApiProperty({ description: 'The array with exam data' })
   exams?: ExamEntity[];
 
+  exposure: number | null;
   dataRecs?: RiskDataRecEntity[];
   level: number;
   json: Prisma.JsonValue;

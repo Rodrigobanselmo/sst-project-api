@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { bodyTableProps, borderNoneStyle } from '../../elements/body';
 
 export enum SecondRiskInventoryColumnEnum {

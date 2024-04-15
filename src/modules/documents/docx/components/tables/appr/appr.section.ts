@@ -58,12 +58,12 @@ export const APPRTableSection = (
         map.set(homoGroupID, true);
 
         if (!description && !homoGroup.type) hierarchy.descReal = homoGroup?.description;
-        if (!homoGroup.type && isByGroup) hierarchy.descReal = homoGroup?.description || hierarchy.descReal || hierarchy.descRh;
+        // if (!homoGroup.type && isByGroup) hierarchy.descReal = homoGroup?.description || hierarchy.descReal || hierarchy.descRh;
 
-        if (isByGroup) createTable();
+        // if (isByGroup) createTable();
       });
 
-      if (isByGroup) return;
+      // if (isByGroup) return;
 
       createTable();
     });

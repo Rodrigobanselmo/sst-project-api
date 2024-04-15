@@ -13,7 +13,7 @@ export async function getCompany(companyId: string, companyRepository: CompanyRe
       cnpj: true,
       address: true,
       fantasy: true,
-      workspace: { select: { abbreviation: true, name: true } },
+      workspace: { select: { id: true, abbreviation: true, name: true } },
       receivingServiceContracts: {
         select: { applyingServiceCompany: { select: { name: true, cnpj: true, address: true, contacts: { where: { isPrincipal: true } } } } },
       },

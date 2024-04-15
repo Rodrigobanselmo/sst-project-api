@@ -1370,6 +1370,7 @@ model RiskFactors {
   companyId             String
   severity              Int                     @default(0)
   system                Boolean                 @default(false)
+  task                  String?
   appendix              String?
   risk                  String?
   propagation           String[]
@@ -1491,6 +1492,7 @@ model RiskFactorData {
   id                    String                 @id @default(uuid())
   probability           Int?
   probabilityAfter      Int?
+  exposure              Int?
   companyId             String
   riskId                String
   homogeneousGroupId    String?

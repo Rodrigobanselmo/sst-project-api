@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { bodyTableProps, borderNoneStyle } from '../../elements/body';
 import { borderRightStyle, whiteColumnBorder } from '../../elements/header';
 
