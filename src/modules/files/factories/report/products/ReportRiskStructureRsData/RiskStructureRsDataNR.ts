@@ -1,3 +1,5 @@
+import { IRiskDataActivities, QuantityTypeEnum } from './../../../../../company/interfaces/risk-data-json.types';
+import { AppendixEnumMap, Nr16AppendixEnumMap } from './../../../../../../shared/constants/enum/appendix';
 import { DocumentPGRFactoryProduct } from '../../../../../documents/factories/document/products/PGR/DocumentPGRFactory';
 import { IHierarchyMap } from './../../../../../documents/docx/converter/hierarchy.converter';
 
@@ -24,6 +26,7 @@ import { CompanyStructRSDataNRHeaderEnum as NR } from '../../../upload/products/
 import { formatCNPJ, onlyNumbers } from '@brazilian-utils/brazilian-utils';
 import { BadRequestException } from '@nestjs/common';
 import { DownloadRiskStructureReportDto } from 'src/modules/files/dto/risk-structure-report.dto';
+
 
 export function setPriorizationRiskData(riskData: Partial<RiskFactorDataEntity>, hierarchyTree: IHierarchyMap) {
   const isHierarchy = riskData.homogeneousGroup.type == HomoTypeEnum.HIERARCHY
@@ -84,6 +87,28 @@ export class RiskStructureRsDataNR extends ReportRiskStructureProduct {
   // constructor(private readonly _documentPGRFactory: DocumentPGRFactory, private readonly _companyRepository: CompanyRepository) {
   //   super(_documentPGRFactory, _companyRepository)
   // }
+  addRow(anexo: string | number, accpet: (string | number)[], object: IReportSanitizeData) {
+    if (accpet.includes(anexo)) {
+      return object
+    }
+
+    return {}
+  }
+
+  private mapRadRiskAnexo7(risk: string) {
+    const riskName = risk.toLocaleLowerCase()
+    if (riskName.includes('ultrassom')) return 1
+    if (riskName.includes('campos magnéticos estáticos')) return 2
+    if (riskName.includes('campos magnéticos de sub-radiofrequência')) return 3
+    if (riskName.includes('sub-radiofrequência')) return 4
+    if (riskName.includes('radiação de radiofrequência')) return 5
+    if (riskName.includes('micro-ondas')) return 6
+    if (riskName.includes('radiação visível')) return 7
+    if (riskName.includes('radiação ultravioleta, exceto')) return 8
+    if (riskName.includes('radiação ultravioleta na faixa')) return 9
+    if (riskName.includes('laser')) return 10
+    return ''
+  }
 
   public sanitizeData(data: PromiseInfer<ReturnType<DocumentPGRFactoryProduct['getPrgRiskData']>>, params: DownloadRiskStructureReportDto): IReportSanitizeData[] {
     const rows: IReportSanitizeData[] = []
@@ -91,12 +116,19 @@ export class RiskStructureRsDataNR extends ReportRiskStructureProduct {
 
     Array.from(data.hierarchyData.values()).map((hierarchy) => {
       return this.getRiskDataByHierarchy({ hierarchy, riskData: getConcatRisksData(data) }).sort((a, b) => sortString(a.riskFactor.name, b.riskFactor.name)).map((riskData) => {
-        const isQuimical = riskData.riskFactor.type === 'QUI';
+        if (riskData.riskFactor.representAll) return
+
         const method = riskData.riskFactor.method
         const exposure = riskData.exposure
-        const startDate = riskData.startDate || params.startDate
+        const appendix = AppendixEnumMap[riskData.riskFactor.getAnexo()]?.rsData
+        const nr16appendix = Nr16AppendixEnumMap[riskData.riskFactor.getNr16Anexo()]?.rsData
 
-        if (!exposure) {
+        const startDate = riskData.startDate || params.startDate
+        const roLevel = riskData.level
+        const eficientEpi = riskData.epiToRiskFactorData.some(epi => epi.efficientlyCheck)
+        const riskType = riskData.riskFactor.getRiskType();
+
+        if (typeof exposure != 'number') {
           errors.push(`Exposição não informada para o risco ${riskData.riskFactor.name}`)
         }
         if (!startDate) {
@@ -105,52 +137,142 @@ export class RiskStructureRsDataNR extends ReportRiskStructureProduct {
         if (!method) {
           errors.push(`Técnica não informada para o risco ${riskData.riskFactor.name}`)
         }
+        if (!nr16appendix || !appendix) {
+          errors.push(`Anexo não informada para o risco ${riskData.riskFactor.name}`)
+        }
+        if (!roLevel) {
+          errors.push(`Probabilidade ou Severidade não informada para o risco ${riskData.riskFactor.name}`)
+        }
 
-        const sanitazeRow: IReportSanitizeData = {
-          [NR.TIPO]: { content: 1 },
-          [NR.CNPJ]: { content: formatCNPJ(onlyNumbers(data.company.cnpj)) },
-          [NR.INICIO]: { content: riskData.startDate },
-          [NR.FIM]: { content: riskData.endDate },
-          [NR.TECNICA]: { content: method },
-          [NR.EXPOSICAO]: { content: exposure || '' },
-          risk: { content: riskData.riskFactor.name },
-          probability: { content: riskData.probability },
-          probabilityAfter: { content: riskData.probabilityAfter },
-          generateSources: { content: this.joinArray(riskData.generateSources.map(gs => gs.name)) },
-          ...(isQuimical && {
-            unit: isQuimical ? { content: Object(riskData?.json)?.unit || riskData.riskFactor.unit } : undefined,
-          }),
-          rec: { content: this.joinArray(riskData.recs.map(rec => rec.recName)) },
-          epc: { content: this.joinArray(riskData.engs.map(eng => eng.medName)) },
-          ...(riskData.engsToRiskFactorData.some(eng => eng.efficientlyCheck) && {
-            epcEfficiently: { content: 'Sim' },
-          }),
-          adm: { content: this.joinArray(riskData.adms.map(adm => adm.medName)) },
-          epiCa: { content: this.joinArray(riskData.epis.map(epi => epi.ca)) },
-          //hierarchy
-          ...hierarchy.org.reduce((acc, org) => {
-            return {
-              ...acc,
-              [hierarchyMap[org.typeEnum].databaseRsData]: { content: org.name },
-            };
-          }, {}),
-          //epi
-          ...(riskData.epiToRiskFactorData.some(epi => epi.efficientlyCheck) && {
-            ...['epiEfficiently', 'epiEpc', 'epiLongPeriods', 'epiValidation', 'epiTradeSign', 'epiSanitation', 'epiMaintenance', 'epiUnstopped', 'epiTraining'].reduce((acc, epi) => ({
-              ...acc,
-              [epi]: { content: 'Sim' }
-            }), {})
-          }),
-          //risk json info
-          ...Object.keys(Object(riskData.json)).reduce((acc, key) => ({
-            ...acc,
-            ...(key != 'unit' && {
-              [key]: { content: this.normalizeContent(riskData.json[key]) },
-            })
-          }), {}),
-        };
+        const engs = riskData.engs.map(gs => gs.medName).join('; ')
+        const adms = riskData.adms.map(gs => gs.medName).join('; ')
+        const meds = [engs, adms].flat().join('; ')
+        const activitiesJson = (riskData.activities as IRiskDataActivities)
 
-        rows.push(sanitazeRow);
+        const rowsData: { value: string | number; activity: [string, string] }[] = []
+
+        if (appendix == 13) {
+          if (!activitiesJson.activities?.length) {
+            errors.push(`Manipulação não informada para o risco ${riskData.riskFactor.name}`)
+          }
+
+          activitiesJson.activities.forEach(manipulation => {
+            if (manipulation.description) rowsData.push({ value: appendix, activity: [manipulation.description, ''] })
+          })
+        } else if (!!appendix) {
+          rowsData.push({ value: appendix, activity: ['', ''] })
+        }
+
+        activitiesJson?.activities?.forEach(activity => {
+          if (activity.description) rowsData.push({ value: nr16appendix, activity: [activity.description, activity.subActivity] })
+        })
+
+        if (!rowsData?.length) {
+          errors.push(`Atividade ou areá de risco não informada para o risco ${riskData.riskFactor.name}`)
+        }
+
+        rowsData.forEach(row => {
+          const sanitazeRow: IReportSanitizeData = {
+            [NR.TIPO]: { content: 1 },
+            [NR.CNPJ]: { content: formatCNPJ(onlyNumbers(data.company.cnpj)) },
+            [NR.INICIO]: { content: riskData.startDate },
+            [NR.FIM]: { content: riskData.endDate },
+            [NR.ANEXO]: { content: row.value },
+            [NR.TECNICA]: { content: method },
+            [NR.EXPOSICAO]: { content: exposure },
+            [NR.CONSTAR_EM]: { content: 0 },
+            [NR.CONSIDERAR_PCMSO]: { content: roLevel > 3 ? 1 : 0 },
+            [NR.NAO_CONSIDERAR_COMPLEMENTARES]: { content: 1 },
+            [NR.CA]: { content: riskData.epis.map(epi => epi.ca).join('/') },
+            [NR.FONTE_GERADORA]: { content: riskData.generateSources.map(gs => gs.name).join('; ') },
+            [NR.MEDIDAS_CONTROLE]: { content: meds },
+            [NR.RECOMENDACOES]: { content: riskData.recs.map(gs => gs.recName).join('; ') },
+            [NR.MEIO_PROP]: { content: riskData.riskFactor.propagation.join(', ') },
+            [NR.COMPROMETIMENTO]: { content: riskData.riskFactor.risk },
+            [NR.POSSIVEIS_DANOS]: { content: riskData.riskFactor.symptoms },
+            [NR.OBSERVACOES]: { content: riskData.riskFactor.coments },
+            ...this.addRow(row.value, [11, 13, 14], {
+              [NR.VIAS_ABS]: { content: riskData.riskFactor.symptoms },
+            }),
+            ...this.addRow(row.value, [1], {
+              [NR.MEDIÇAO_INSS]: { content: (riskData.json as any)?.nr15q5 },
+              [NR.MEDIÇAO_PORTARIA]: { content: (riskData.json as any)?.ltcatq5 }, //! not sure
+            }),
+            ...this.addRow(row.value, [2], {
+              [NR.MEDIÇAO_INSS]: { content: riskData?.intensity || '' },
+              [NR.TIPO_LEITURA]: { content: 0 }, //! missing
+            }),
+            ...this.addRow(row.value, [3], {
+              [NR.RESULTADO]: { content: (riskData.json as any)?.ibtug || '' },
+              [NR.TIPO_ATIVIDADE]: { content: '' }, //! missing
+              [NR.KCAL]: { content: '' }, //! missing
+              [NR.REGIME]: { content: '' }, //! missing
+              [NR.LOCAL]: { content: '' }, //! missing
+              [NR.LIMITE_IBUTG]: { content: riskData?.ibtugLEO || '' },
+            }),
+            ...this.addRow(row.value, [5], {
+              [NR.INTENSIDADE_RAD]: { content: riskData?.intensity || '' },
+            }),
+            ...this.addRow(row.value, [8], {
+              [NR.TIPO_VIBRACAO]: { content: riskType === QuantityTypeEnum.VFB ? 3 : 0 },
+              [NR.CORPO]: { content: '' }, //! missing
+              [NR.INTENSIDADE_AREN]: { content: (riskData.json as any).aren || '' },
+              [NR.INTENSIDADE_VDVR]: { content: (riskData.json as any).vdvr || '' },
+            }),
+            ...this.addRow(row.value, [9], {
+              [NR.LIMITE_FRIO]: { content: '' }, //! missing
+              [NR.INTENSIDADE_FRIO]: { content: '' }, //! missing
+            }),
+            ...this.addRow(row.value, [11], {
+              [NR.AGENTE_QUI]: { content: riskData.riskFactor.name },
+              [NR.INTENSIDADE_QUI]: { content: (riskData.json as any).nr15ltValue || (riskData.json as any).stelValue || '' },
+              [NR.UNIDADE]: { content: (riskData.json as any).unit || '' },
+            }),
+            ...this.addRow(row.value, [12], {
+              [NR.AGENTE_POEIRA]: { content: riskData.riskFactor.name },
+              [NR.INTENSIDADE_POEIRA]: { content: (riskData.json as any).nr15ltValue || (riskData.json as any).stelValue || '' },
+              [NR.UNIDADE_POEIRA]: { content: (riskData.json as any).unit || '' },
+            }),
+            ...this.addRow(row.value, [13], {
+              [NR.AGENTE_POEIRA]: { content: riskData.riskFactor.name },
+              [NR.MANIPULAÇAO_ANEXO_13]: { content: row.activity[0] || '' },
+            }),
+            ...this.addRow(row.value, [7], {
+              [NR.AGENTE_RESTO]: { content: this.mapRadRiskAnexo7(riskData.riskFactor.name) },
+            }),
+            ...this.addRow(row.value, [15, 16, 17, 19], {
+              [NR.AGENTE_RESTO]: { content: row.activity[0] },
+            }),
+            ...this.addRow(row.value, [14, 'A', 'E'], {
+              [NR.AGENTE_RESTO]: { content: riskData.riskFactor.name },
+            }),
+            ...this.addRow(row.value, [18, 20], {
+              [NR.FATOR_ELET_RAD]: { content: row.activity[0] },
+              [NR.TAREFA_ELET_RAD]: { content: row.activity[1] },
+            }),
+            ...this.addRow(row.value, ['N'], {
+              [NR.AGENTE_EQUIVALENTE]: { content: riskData.riskFactor.name },
+            }),
+
+
+
+            //hierarchy
+            ...hierarchy.org.reduce((acc, org) => {
+              return {
+                ...acc,
+                [hierarchyMap[org.typeEnum].databaseRsData]: { content: org.name },
+              };
+            }, {}),
+            //epi
+            ...[NR.EPI_EFICAZ, NR.EPI_REGISTRO, NR.EPI_TREINAMENTO, NR.EPI_1, NR.EPI_2, NR.EPI_3, NR.EPI_4, NR.EPI_5, NR.EPI_6, NR.EPI_7].reduce((acc, epi) => ({
+              ...acc,
+              [epi]: { content: eficientEpi ? 1 : 0 }
+            }), {}),
+          };
+
+          rows.push(sanitazeRow);
+        });
+
       })
     }).flat();
 

@@ -23,7 +23,7 @@ export enum CompanyStructRSDataNRHeaderEnum {
   TECNICA = '*Técnica ',
   EXPOSICAO = '*Exposição',
   MEDIÇAO_PORTARIA = 'Medição (critério Portaria MTE 3214/78)',
-  MEDIÇAO = 'Medição (conf. critério INSS)',
+  MEDIÇAO_INSS = 'Medição (conf. critério INSS)',
   INTENSIDADE_RUIDO = 'Intensidade',
   TIPO_LEITURA = 'Tipo de leitura',
   RESULTADO = 'Resultado IBUTG',

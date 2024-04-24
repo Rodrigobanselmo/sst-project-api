@@ -1370,8 +1370,8 @@ model RiskFactors {
   companyId             String
   severity              Int                     @default(0)
   system                Boolean                 @default(false)
-  task                  String?
   appendix              String?
+  nr16appendix          String?
   risk                  String?
   propagation           String[]
   exame                 String?
@@ -1404,6 +1404,7 @@ model RiskFactors {
   isPPP                 Boolean                 @default(true)
   esocialCode           String?
   coments               String?
+  activities            Json?
   examToRisk            ExamToRisk[]
   generateSource        GenerateSource[]
   protocolToRisk        ProtocolToRisk[]
@@ -1499,6 +1500,7 @@ model RiskFactorData {
   hierarchyId           String?
   riskFactorGroupDataId String
   json                  Json?
+  activities            Json?
   level                 Int?
   standardExams         Boolean                @default(true)
   deletedAt             DateTime?

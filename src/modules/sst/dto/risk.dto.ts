@@ -154,6 +154,19 @@ export class CreateRiskDto {
   @IsString()
   @IsOptional()
   coments?: string;
+
+  @IsString()
+  @IsOptional()
+  appendix?: string;
+
+  @IsString()
+  @IsOptional()
+  nr16appendix?: string;
+
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @Type(() => ActivityDto)
+  activities?: ActivityDto[];
 }
 
 export class UpsertRiskDto extends CreateRiskDto {
@@ -188,6 +201,15 @@ export class UpdateRiskDto {
   @IsString()
   @IsOptional()
   name?: string;
+
+
+  @IsString()
+  @IsOptional()
+  appendix?: string;
+
+  @IsString()
+  @IsOptional()
+  nr16appendix?: string;
 
   @IsNumber()
   @IsOptional()
@@ -322,6 +344,11 @@ export class UpdateRiskDto {
   @IsString()
   @IsOptional()
   coments?: string;
+
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @Type(() => ActivityDto)
+  activities?: ActivityDto[];
 }
 
 export class FindRiskDto extends PaginationQueryDto {
@@ -337,4 +364,34 @@ export class FindRiskDto extends PaginationQueryDto {
   @ToBoolean()
   @IsOptional()
   representAll: boolean;
+}
+
+export class ActivityDto {
+  // @IsString()
+  // id: string;
+
+  @IsString()
+  description: string;
+
+  // @Transform(StringUppercaseTransform, { toClassOnly: true })
+  // @IsString()
+  // @IsEnum(StatusEnum, { message: `type must be one of: ${KeysOfEnum(StatusEnum)}`, })
+  // status: StatusEnum;
+
+  @ValidateNested({ each: true })
+  @Type(() => SubActivityDto)
+  subActivities: SubActivityDto[];
+}
+
+export class SubActivityDto {
+  // @IsString()
+  // id: string;
+
+  @IsString()
+  description: string;
+
+  // @Transform(StringUppercaseTransform, { toClassOnly: true })
+  // @IsString()
+  // @IsEnum(StatusEnum, { message: `type must be one of: ${KeysOfEnum(StatusEnum)}`, })
+  // status: StatusEnum;
 }

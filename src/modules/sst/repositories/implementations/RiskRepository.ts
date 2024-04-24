@@ -16,10 +16,11 @@ import { databaseFindChanges } from '../../../../shared/utils/databaseFindChange
 export class RiskRepository implements IRiskRepository {
   constructor(private prisma: PrismaService) { }
 
-  async create({ recMed, generateSource, ...createRiskDto }: CreateRiskDto, system: boolean): Promise<RiskFactorsEntity> {
+  async create({ recMed, generateSource, activities, ...createRiskDto }: CreateRiskDto, system: boolean): Promise<RiskFactorsEntity> {
     const risk = await this.prisma.riskFactors.create({
       data: {
         ...createRiskDto,
+        activities: activities as any,
         system,
         recMed: {
           createMany: {
@@ -57,6 +58,7 @@ export class RiskRepository implements IRiskRepository {
       recMed,
       generateSource,
       id,
+      activities,
       ...createRiskDto
     }: UpdateRiskDto & {
       isAso?: boolean;
@@ -69,6 +71,7 @@ export class RiskRepository implements IRiskRepository {
   ): Promise<RiskFactorsEntity> {
     const risk = await this.prisma.riskFactors.update({
       data: {
+        activities: activities as any,
         recMed: {
           upsert: !recMed
             ? []
@@ -100,10 +103,11 @@ export class RiskRepository implements IRiskRepository {
     return new RiskFactorsEntity(risk);
   }
 
-  async upsert({ companyId: _, id, recMed, generateSource, ...upsertRiskDto }: UpsertRiskDto, system: boolean, companyId: string): Promise<RiskFactorsEntity> {
+  async upsert({ companyId: _, activities, id, recMed, generateSource, ...upsertRiskDto }: UpsertRiskDto, system: boolean, companyId: string): Promise<RiskFactorsEntity> {
     const risk = await this.prisma.riskFactors.upsert({
       create: {
         ...upsertRiskDto,
+        activities: activities as any,
         system,
         companyId,
         recMed: {
@@ -164,10 +168,11 @@ export class RiskRepository implements IRiskRepository {
 
   async upsertMany(upsertRiskDtoMany: UpsertRiskDto[], system: boolean, companyId: string): Promise<RiskFactorsEntity[]> {
     const data = await Promise.all(
-      upsertRiskDtoMany.map(async ({ companyId: _, id, esocialCode, recMed, generateSource, ...upsertRiskDto }) => {
+      upsertRiskDtoMany.map(async ({ companyId: _, activities, id, esocialCode, recMed, generateSource, ...upsertRiskDto }) => {
         return await this.prisma.riskFactors.upsert({
           create: {
             ...upsertRiskDto,
+            activities: activities as any,
             esocialCode: esocialCode || null,
             system,
             companyId,
@@ -508,6 +513,7 @@ export class RiskRepository implements IRiskRepository {
         nr15lt: true,
         stel: true,
         tlv: true,
+        activities: true,
         twa: true,
         unit: true,
         // _count: { select: { riskFactorData: true } },

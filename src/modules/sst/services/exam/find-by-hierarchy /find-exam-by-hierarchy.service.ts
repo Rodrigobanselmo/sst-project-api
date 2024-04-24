@@ -193,6 +193,7 @@ export class FindExamByHierarchyService {
         riskId: true,
         dataRecs: true,
         level: true,
+        activities: true,
         json: true,
         standardExams: true,
         riskFactorGroupDataId: true,

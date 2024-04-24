@@ -34,7 +34,7 @@ export const CompanyStructRSDataNRColumnList: ISheetHeaderList = [
   {
     group: [
       CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.MEDIÇAO_PORTARIA],
-      CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.MEDIÇAO],
+      CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.MEDIÇAO_INSS],
 
     ],
     name: 'Anexo 1 - Limites de Tolerância para Ruído Contínuo ou Intermitente	'

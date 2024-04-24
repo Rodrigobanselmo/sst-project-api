@@ -1,3 +1,4 @@
+import { AppendixEnum, Nr16AppendixEnum } from './../../../shared/constants/enum/appendix';
 import { QuantityTypeEnum } from './../../company/interfaces/risk-data-json.types';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -11,6 +12,13 @@ import { RiskDocInfoEntity } from './riskDocInfo.entity';
 import { EsocialTable24Entity } from '../../../modules/esocial/entities/esocialTable24.entity';
 import { ProtocolToRiskEntity } from './protocol.entity';
 import { isRiskQuantity } from '../../../shared/utils/isRiskQuantity';
+
+export type RiskFactorActivitie = {
+  description: string;
+  subActivities: {
+    description: string;
+  }[]
+}
 
 export class RiskFactorsEntity implements RiskFactors {
   @ApiProperty({ description: 'The id of the Company' })
@@ -92,10 +100,14 @@ export class RiskFactorsEntity implements RiskFactors {
   coments: string;
   carnogenicityACGIH: string;
   carnogenicityLinach: string;
+  nr16appendix: string | null;
+  activities: RiskFactorActivitie[] | null;
+
   examToRisk: ExamRiskEntity[];
   riskFactorData: RiskFactorDataEntity[];
   docInfo?: RiskDocInfoEntity[];
   protocolToRisk?: ProtocolToRiskEntity[];
+
 
   isAso: boolean;
   isPGR: boolean;
@@ -105,7 +117,7 @@ export class RiskFactorsEntity implements RiskFactors {
   esocialCode: string;
   esocial?: EsocialTable24Entity;
 
-  constructor(partial: Partial<RiskFactorsEntity>) {
+  constructor(partial: Partial<Omit<RiskFactorsEntity, 'activities'>>) {
     Object.assign(this, partial);
     this.vmp = String(this.getVMP(this?.nr15lt || ''));
 
@@ -131,20 +143,33 @@ export class RiskFactorsEntity implements RiskFactors {
     return isRiskQuantity(this);
   }
 
-  public getAnexo() {
+  public getAnexo(): AppendixEnum {
     const apendixNumber = Number(this.appendix);
-    // 9 = Anexo 9 FRIO
+    // 6 = Anexo 6 Pressão Hiperbarica !!!!(ATIVIDADES)
+    // 7 = Anexo 7 RAD Não Ionizantes
+    // 9 = Anexo 9 FRIO 
+    // 10 = Anexo 10 Umidade
     // 11 = Anexo 11 QUIMICO NR 15
     // 12 = Anexo 12 POEIRAS  
-    // 13 = Anexo 13 QUIMICO Atividades
+    // 13 = Anexo 13 QUIMICO !!!!(ATIVIDADES)
     if (apendixNumber && !Number.isNaN(apendixNumber)) return apendixNumber
 
+    // A = Riscos de Acidentes
+    if (this.type === 'ACI') return AppendixEnum.ACI
+    // E = Riscos Ergonomicos
+    if (this.type === 'ERG') return AppendixEnum.ERG
+    // N = Riscos não relacionados
+    if (this.type === 'OUTROS') return AppendixEnum.OUTROS
+
     const type = this.getRiskType();
+    const isNoise = type == QuantityTypeEnum.NOISE
+    const isNoisImpact = isNoise && this.name.toLocaleLowerCase().includes('impacto');
 
     // 1 = Anexo 1
-    if (type == QuantityTypeEnum.NOISE) return 1
+    if (isNoise && !isNoisImpact) return 1
 
-    //! 2 = Anexo 2 Ruido Impacto
+    // 2 = Anexo 2 Ruido Impacto
+    if (isNoise) return 2
 
     // 3 = Anexo 3
     if (type == QuantityTypeEnum.HEAT) return 3
@@ -152,25 +177,23 @@ export class RiskFactorsEntity implements RiskFactors {
     // 5 = Anexo 5
     if (type == QuantityTypeEnum.RADIATION) return 5
 
-    //! 6 = Anexo 6
-    //! 7 = Anexo 7
-
     // 8 = Anexo 8
     if (type == QuantityTypeEnum.VL || type == QuantityTypeEnum.VFB) return 8
 
-    // 10 = Anexo 10
-
     // 14 = Anexo 14
-    //! 15 = NR 16 Anexo 1 - Explosivos (Periculosidade)
-    //! 16 = NR 16 Anexo 2 - Inflamáveis (Periculosidade)
-    //! 17 = NR 16 Anexo 3 - Vigilante (Periculosidade)
-    //! 18 = NR 16 Anexo 4 - Eletricidade (Periculosidade)
-    //! 19 = NR 16 Anexo 5 - Motoboy (Periculosidade)
-    //! 20 =  Portaria nº 518/2003 - Radiações Ionizantes (Periculosidade)
-    // A = Riscos de Acidentes
-    // E = Riscos Ergonomicos
-    // N = Riscos não relacionados
+    if (this.type === 'BIO') return 14
 
+  }
+
+  public getNr16Anexo(): Nr16AppendixEnum {
+    const apendixNumber = Number(this.nr16appendix);
+    // 16 = NR 16 Anexo 2 - Inflamáveis (Periculosidade) !!!!(ATIVIDADES)
+    // 17 = NR 16 Anexo 3 - Vigilante (Periculosidade) !!!!(ATIVIDADES)
+    // 18 = NR 16 Anexo 4 - Eletricidade (Periculosidade) !!!!(ATIVIDADES)
+    // 19 = NR 16 Anexo 5 - Motoboy (Periculosidade) !!!!(ATIVIDADES)
+    if (apendixNumber && !Number.isNaN(apendixNumber)) return apendixNumber
+
+    if (this.nr16appendix == 'Portaria nº 518/2003') return Nr16AppendixEnum.IONIZING_RAD_PERICULOSITY
 
   }
 }

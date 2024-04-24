@@ -5,7 +5,7 @@ import { EpiRepository } from '../../../repositories/implementations/EpiReposito
 
 @Injectable()
 export class FindByCAEpiService {
-  constructor(private readonly epiRepository: EpiRepository) {}
+  constructor(private readonly epiRepository: EpiRepository) { }
 
   async execute(ca: string) {
     const EpiFactor = await this.epiRepository.findByCA(ca);

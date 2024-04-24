@@ -100,6 +100,9 @@ export class UpsertRiskDataDto {
   json?: Prisma.JsonValue;
 
   @IsOptional()
+  activities?: Prisma.JsonValue;
+
+  @IsOptional()
   @Transform(DateFormat, { toClassOnly: true })
   @IsDate({ message: 'Data de início inválida' })
   @Type(() => Date)

@@ -91,10 +91,15 @@ export class RiskFactorDataEntity implements RiskFactorData {
   @ApiProperty({ description: 'The array with exam data' })
   exams?: ExamEntity[];
 
+  // 0 - Habitual/Permanente
+  // 1 - Ocasional
+  // 2 - Habitual/Intermitente
+
   exposure: number | null;
   dataRecs?: RiskDataRecEntity[];
   level: number;
   json: Prisma.JsonValue;
+  activities: Prisma.JsonValue | null;
   isQuantity?: boolean;
   ibtugLEO?: number;
   ibtug?: number;
@@ -138,12 +143,14 @@ export class RiskFactorDataEntity implements RiskFactorData {
     if (this.json && typeof this.json === 'object') {
       const json = this.json as unknown as IRiskDataJson;
 
-      if (json.type === QuantityTypeEnum.QUI) this.quiProb(json);
-      if (json.type === QuantityTypeEnum.NOISE) this.noiseProb(json);
-      if (json.type === QuantityTypeEnum.VFB) this.vibProb(json);
-      if (json.type === QuantityTypeEnum.VL) this.vibLProb(json);
-      if (json.type === QuantityTypeEnum.RADIATION) this.radProb(json);
-      if (json.type === QuantityTypeEnum.HEAT) this.heatProb(json);
+      if ('type' in json) {
+        if (json.type === QuantityTypeEnum.QUI) this.quiProb(json);
+        if (json.type === QuantityTypeEnum.NOISE) this.noiseProb(json);
+        if (json.type === QuantityTypeEnum.VFB) this.vibProb(json);
+        if (json.type === QuantityTypeEnum.VL) this.vibLProb(json);
+        if (json.type === QuantityTypeEnum.RADIATION) this.radProb(json);
+        if (json.type === QuantityTypeEnum.HEAT) this.heatProb(json);
+      }
     }
 
     this.getProtocols();

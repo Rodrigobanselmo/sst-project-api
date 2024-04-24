@@ -2,10 +2,16 @@ export enum QuantityTypeEnum {
   RADIATION = 'RADIATION',
   QUI = 'QUI',
   NOISE = 'NOISE',
+  NOISE_I = 'NOISE_I',
   HEAT = 'HEAT',
   VL = 'VL',
   VFB = 'VFB',
 }
+
+export type IRiskDataActivities = {
+  activities: { description?: string; subActivity?: string }[];
+  realActivity?: string;
+};
 
 export interface IRiskDataJsonQui {
   stel?: string;
@@ -17,6 +23,7 @@ export interface IRiskDataJsonQui {
   nr15ltValue?: string;
   vmpValue?: string;
   unit?: string;
+  manipulation?: string;
 
   isNr15Teto: boolean;
   isStelTeto: boolean;
@@ -71,4 +78,4 @@ export interface IRiskDataJsonVibration {
   type: QuantityTypeEnum.VFB | QuantityTypeEnum.VL;
 }
 
-export type IRiskDataJson = IRiskDataJsonNoise | IRiskDataJsonQui | IRiskDataJsonRadiation | IRiskDataJsonHeat | IRiskDataJsonVibration;
+export type IRiskDataJson = IRiskDataJsonNoise | IRiskDataJsonQui | IRiskDataJsonRadiation | IRiskDataJsonHeat | IRiskDataJsonVibration 

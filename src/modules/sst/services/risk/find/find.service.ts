@@ -20,6 +20,9 @@ export class FindRiskService {
           type: true,
           severity: true,
           unit: true,
+          appendix: true,
+          nr16appendix: true,
+          activities: true,
 
           symptoms: true,
           risk: true,
