@@ -1,4 +1,4 @@
-export async function databaseFindChanges({ userId, lastPulledVersion = new Date(0), options, entity, findManyFn, deletedAtKey = 'deleted_at' }: { deletedAtKey?: string, lastPulledVersion?: Date; options: any; entity: any; findManyFn: any; userId: number }) {
+export async function databaseFindChanges({ userId, sanitaze, lastPulledVersion = new Date(0), options, entity, findManyFn, deletedAtKey = 'deleted_at' }: { deletedAtKey?: string, sanitaze?: (any: any) => any, lastPulledVersion?: Date; options: any; entity: any; findManyFn: any; userId: number }) {
 
     const createdPromise = findManyFn({
         ...options,
@@ -36,11 +36,17 @@ export async function databaseFindChanges({ userId, lastPulledVersion = new Date
     return {
         created: createdData.map((data) => {
             const entityData = new entity(data)
-            return { ...entityData, user_id: String(userId), apiId: data.id }
+            const returnData = { ...entityData, user_id: String(userId), apiId: data.id }
+
+            if (sanitaze) return sanitaze(returnData)
+            return returnData
         }),
         updated: updatedData.map((data) => {
             const entityData = new entity(data)
-            return { ...entityData, user_id: String(userId) }
+            const returnData = { ...entityData, user_id: String(userId) }
+
+            if (sanitaze) return sanitaze(returnData)
+            return returnData
         }),
         deleted: deleteData.map((data) => {
             return data.id

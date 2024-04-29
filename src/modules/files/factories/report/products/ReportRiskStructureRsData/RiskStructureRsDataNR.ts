@@ -1,16 +1,19 @@
-import { IRiskDataActivities, QuantityTypeEnum } from './../../../../../company/interfaces/risk-data-json.types';
-import { AppendixEnumMap, Nr16AppendixEnumMap } from './../../../../../../shared/constants/enum/appendix';
 import { DocumentPGRFactoryProduct } from '../../../../../documents/factories/document/products/PGR/DocumentPGRFactory';
+import { AppendixEnumMap, Nr16AppendixEnumMap } from './../../../../../../shared/constants/enum/appendix';
+import { IRiskDataActivities, QuantityTypeEnum } from './../../../../../company/interfaces/risk-data-json.types';
 import { IHierarchyMap } from './../../../../../documents/docx/converter/hierarchy.converter';
 
-import { HomoTypeEnum } from '@prisma/client';
+import { formatCNPJ, onlyNumbers } from '@brazilian-utils/brazilian-utils';
+import { ExposureTypeEnum, HomoTypeEnum } from '@prisma/client';
 import { CompanyEntity } from 'src/modules/company/entities/company.entity';
+import { DownloadRiskStructureReportDto } from 'src/modules/files/dto/risk-structure-report.dto';
 import { RiskFactorDataEntity } from 'src/modules/sst/entities/riskData.entity';
 import { originRiskMap } from 'src/shared/constants/maps/origin-risk';
 import { isNaEpi, isNaRecMed } from 'src/shared/utils/isNa';
 import { removeDuplicate } from 'src/shared/utils/removeDuplicate';
 import { sortString } from 'src/shared/utils/sorts/string.sort';
 import { PromiseInfer } from '../../../../../../shared/interfaces/promise-infer.types';
+import { CompanyStructRSDataNRHeaderEnum as NR } from '../../../upload/products/CompanyStructure/constants/company-struct-rsdata-nr.constants';
 import { CompanyStructRSDataNRColumnList } from '../../../upload/products/CompanyStructure/constants/headersList/CompanyStructRSDataNRColumnList';
 import { hierarchyMap } from '../../../upload/products/CompanyStructure/maps/hierarchyMap';
 import { convertHeaderUpload } from '../../helpers/convertHeaderUpload';
@@ -22,11 +25,13 @@ import {
   IReportSanitizeData
 } from '../../types/IReportFactory.types';
 import { ReportRiskStructureProduct } from '../ReportRiskStructureFactory';
-import { CompanyStructRSDataNRHeaderEnum as NR } from '../../../upload/products/CompanyStructure/constants/company-struct-rsdata-nr.constants';
-import { formatCNPJ, onlyNumbers } from '@brazilian-utils/brazilian-utils';
-import { BadRequestException } from '@nestjs/common';
-import { DownloadRiskStructureReportDto } from 'src/modules/files/dto/risk-structure-report.dto';
 
+
+export const ExposureEnumMap: Record<ExposureTypeEnum, number> = {
+  [ExposureTypeEnum.HP]: 0,
+  [ExposureTypeEnum.O]: 1,
+  [ExposureTypeEnum.HI]: 2,
+}
 
 export function setPriorizationRiskData(riskData: Partial<RiskFactorDataEntity>, hierarchyTree: IHierarchyMap) {
   const isHierarchy = riskData.homogeneousGroup.type == HomoTypeEnum.HIERARCHY
@@ -119,7 +124,7 @@ export class RiskStructureRsDataNR extends ReportRiskStructureProduct {
         if (riskData.riskFactor.representAll) return
 
         const method = riskData.riskFactor.method
-        const exposure = riskData.exposure
+        const exposure = ExposureEnumMap[riskData.exposure]
         const appendix = AppendixEnumMap[riskData.riskFactor.getAnexo()]?.rsData
         const nr16appendix = Nr16AppendixEnumMap[riskData.riskFactor.getNr16Anexo()]?.rsData
 

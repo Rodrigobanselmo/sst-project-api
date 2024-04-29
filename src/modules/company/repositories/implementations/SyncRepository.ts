@@ -184,6 +184,7 @@ export class SyncRepository {
       representAll: true,
       id: true,
       status: true,
+      activities: true,
       created_at: true,
       updated_at: true,
       deleted_at: true,
@@ -202,6 +203,7 @@ export class SyncRepository {
 
     const riskChanges = await databaseFindChanges({
       entity: RiskFactorsEntity,
+      sanitaze: (data: RiskFactorsEntity) => ({ ...data, activities: JSON.stringify(data.activities) }),
       findManyFn: this.prisma.riskFactors.findMany,
       lastPulledVersion,
       options,

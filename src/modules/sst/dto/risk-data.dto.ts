@@ -1,6 +1,6 @@
 import { DateFormat } from './../../../shared/transformers/date-format';
 import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
-import { HomoTypeEnum, Prisma } from '@prisma/client';
+import { ExposureTypeEnum, HomoTypeEnum, Prisma } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import { IsBoolean, IsDate, IsEnum, IsNumber, IsOptional, IsString, ValidateIf, ValidateNested } from 'class-validator';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
@@ -35,9 +35,11 @@ export class UpsertRiskDataDto {
   @IsNumber()
   probability?: number;
 
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsOptional()
-  @IsNumber()
-  exposure?: number;
+  @IsString()
+  @IsEnum(ExposureTypeEnum, { message: `type must be one of: ${KeysOfEnum(ExposureTypeEnum)}` })
+  exposure?: ExposureTypeEnum;
 
   @IsOptional()
   @IsNumber()
@@ -139,9 +141,11 @@ export class UpsertManyRiskDataDto {
   @IsOptional()
   workspaceIds?: string;
 
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsOptional()
-  @IsNumber()
-  exposure?: number;
+  @IsString()
+  @IsEnum(ExposureTypeEnum, { message: `type must be one of: ${KeysOfEnum(ExposureTypeEnum)}` })
+  exposure?: ExposureTypeEnum;
 
   @IsOptional()
   @IsNumber()
