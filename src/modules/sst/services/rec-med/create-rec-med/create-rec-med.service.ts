@@ -47,7 +47,6 @@ export class CreateRecMedService {
         },
         { take: 1, skip: 0 },
       );
-      console.log(foundMedFactor, 'foundMedFactor')
 
       if (foundMedFactor.count > 0) {
         if (options.skipIfExist) return;

@@ -161,7 +161,7 @@ export class CreateRiskDto {
 
   @IsString()
   @IsOptional()
-  nr16appendix?: string;
+  otherAppendix?: string;
 
   @ValidateNested({ each: true })
   @IsOptional()
@@ -209,7 +209,7 @@ export class UpdateRiskDto {
 
   @IsString()
   @IsOptional()
-  nr16appendix?: string;
+  otherAppendix?: string;
 
   @IsNumber()
   @IsOptional()

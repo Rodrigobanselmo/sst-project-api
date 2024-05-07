@@ -17,12 +17,13 @@ export enum AppendixEnum {
   OUTROS = 'N',
 }
 
-export enum Nr16AppendixEnum {
-  NR_16_APPENDIX_1 = 1,
-  NR_16_APPENDIX_2 = 2,
-  NR_16_APPENDIX_3 = 3,
-  NR_16_APPENDIX_4 = 4,
-  NR_16_APPENDIX_5 = 5,
+export enum OtherAppendixEnum {
+  ACGH = 'ACGH',
+  NR_16_APPENDIX_1 = 'NR 16 Anexo 1',
+  NR_16_APPENDIX_2 = 'NR 16 Anexo 2',
+  NR_16_APPENDIX_3 = 'NR 16 Anexo 3',
+  NR_16_APPENDIX_4 = 'NR 16 Anexo 4',
+  NR_16_APPENDIX_5 = 'NR 16 Anexo 5',
   IONIZING_RAD_PERICULOSITY = 'Portaria nº 518/2003',
 }
 
@@ -45,11 +46,12 @@ export const AppendixEnumMap: Record<AppendixEnum, { name: string; rsData: strin
   [AppendixEnum.OUTROS]: { name: 'Riscos não relacionados', rsData: 'N' },
 }
 
-export const Nr16AppendixEnumMap: Record<Nr16AppendixEnum, { name: string; rsData: string | number }> = {
-  [Nr16AppendixEnum.NR_16_APPENDIX_1]: { name: 'NR 16 Anexo 1', rsData: 15 },
-  [Nr16AppendixEnum.NR_16_APPENDIX_2]: { name: 'NR 16 Anexo 2', rsData: 16 },
-  [Nr16AppendixEnum.NR_16_APPENDIX_3]: { name: 'NR 16 Anexo 3', rsData: 17 },
-  [Nr16AppendixEnum.NR_16_APPENDIX_4]: { name: 'NR 16 Anexo 4', rsData: 18 },
-  [Nr16AppendixEnum.NR_16_APPENDIX_5]: { name: 'NR 16 Anexo 5', rsData: 19 },
-  [Nr16AppendixEnum.IONIZING_RAD_PERICULOSITY]: { name: "Portaria nº 518/2003", rsData: 20 },
+export const OtherAppendixEnumMap: Record<OtherAppendixEnum, { name: string; rsData: string | number }> = {
+  [OtherAppendixEnum.ACGH]: { name: 'ACGH', rsData: 'ACGH' },
+  [OtherAppendixEnum.NR_16_APPENDIX_1]: { name: 'NR 16 Anexo 1', rsData: 15 },
+  [OtherAppendixEnum.NR_16_APPENDIX_2]: { name: 'NR 16 Anexo 2', rsData: 16 },
+  [OtherAppendixEnum.NR_16_APPENDIX_3]: { name: 'NR 16 Anexo 3', rsData: 17 },
+  [OtherAppendixEnum.NR_16_APPENDIX_4]: { name: 'NR 16 Anexo 4', rsData: 18 },
+  [OtherAppendixEnum.NR_16_APPENDIX_5]: { name: 'NR 16 Anexo 5', rsData: 19 },
+  [OtherAppendixEnum.IONIZING_RAD_PERICULOSITY]: { name: "Portaria nº 518/2003", rsData: 20 },
 }

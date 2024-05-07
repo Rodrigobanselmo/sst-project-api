@@ -31,7 +31,7 @@ export abstract class FileFactoryAbstractionCreator<T, R extends keyof any> {
     const sheets = await product.getSheets(readFileData);
 
     const sheetsRows = sheets.map((sheet) => {
-      const sheetRows = this.validationTransform(sheet);
+      const sheetRows = this.validationTransform(sheet, product);
 
       return sheetRows;
     });
@@ -73,7 +73,7 @@ export abstract class FileFactoryAbstractionCreator<T, R extends keyof any> {
     return !!foundData;
   }
 
-  public validationTransform(sheet: ISheetData) {
+  public validationTransform(sheet: ISheetData, product: IFileFactoryProduct<T, R>) {
     const { columnHandlerOrder, headerStartIndex } = this.getHeaderInfo(sheet);
 
     const databaseRows = [] as ISheetExtractedData<R>;
@@ -82,34 +82,34 @@ export abstract class FileFactoryAbstractionCreator<T, R extends keyof any> {
     sheet.rows.slice(headerStartIndex + 1).forEach((excelRow, indexRow) => {
       if (!excelRow.length) return;
 
+
       const databaseRow = {} as Record<R, any>;
       const rowIndex = indexRow + 1 + (headerStartIndex + 1);
+      const rowErrors = [] as string[];
 
       columnHandlerOrder.forEach((columnHandler, indexCell) => {
-        const errorMessageMissing = `Esta faltando um campo obrigatório na linha "${rowIndex}", coluna "${this.excelProvider.getColumnByIndex(indexCell)}" (${
-          columnHandler.field
-        }) da planilha ${sheet.sheetName}"`;
+        const errorMessageMissing = `Esta faltando um campo obrigatório na linha "${rowIndex}", coluna "${this.excelProvider.getColumnByIndex(indexCell)}" (${columnHandler.field
+          }) da planilha ${sheet.sheetName}"`;
 
-        const errorMessageInvalid = `Dado inválido na linha "${rowIndex}", coluna "${this.excelProvider.getColumnByIndex(indexCell)}" da planilha ${
-          sheet.sheetName
-        }" \nDado: ${excelRow[indexCell]} `;
+        const errorMessageInvalid = `Dado inválido na linha "${rowIndex}", coluna "${this.excelProvider.getColumnByIndex(indexCell)}" da planilha ${sheet.sheetName
+          }" \nDado: ${excelRow[indexCell]} `;
 
         const excelCell = excelRow[indexCell];
-        const isEmptyCell = excelCell === null || excelCell === undefined;
+        const isEmptyCell = excelCell === null || excelCell === undefined || excelCell === '';
         const isEmptyRequired = isEmptyCell && columnHandler.required;
 
-        if (isEmptyRequired) return errors.push(errorMessageMissing);
+        if (isEmptyRequired) return rowErrors.push(errorMessageMissing);
         if (isEmptyCell) {
           if (columnHandler.requiredIfOneExist) {
             const isRequiredIf = this.checkIfOneExists(excelRow, columnHandler.requiredIfOneExist, columnHandlerOrder);
-            if (isRequiredIf) return errors.push(errorMessageMissing);
+            if (isRequiredIf) return rowErrors.push(errorMessageMissing);
           }
 
           return;
         }
 
         let checkedData = columnHandler.checkHandler(excelCell);
-        if (checkedData === false) return errors.push(errorMessageInvalid);
+        if (checkedData === false) return rowErrors.push(errorMessageInvalid);
         if (checkedData === 'false') checkedData = false;
         if (checkedData === 'true') checkedData = true;
 
@@ -124,6 +124,8 @@ export abstract class FileFactoryAbstractionCreator<T, R extends keyof any> {
         }
       });
 
+      if (product.skipRow && product.skipRow(databaseRow)) return;
+      errors.push(...rowErrors);
       databaseRows.push(databaseRow);
     });
 

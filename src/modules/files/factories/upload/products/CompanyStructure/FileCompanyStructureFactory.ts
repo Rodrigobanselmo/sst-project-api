@@ -42,28 +42,30 @@ import {
   IWorkDataReturn,
   IWorkspaceData,
 } from './types/company-struct.constants';
+import { CompanyStructRsDataEmployeeColumnMap } from './constants/company-struct-rsdata-employee.constants';
 
 @Injectable()
 export class FileCompanyStructureFactory extends FileFactoryAbstractionCreator<IBodyFileCompanyStruct, CompanyStructHeaderEnum> {
   static splitter = '; ';
+  public product = FileCompanyStructureProduct
 
   constructor(
-    private readonly excelProv: ExcelProvider,
-    private readonly prisma: PrismaService,
-    private readonly upsertRiskDataService: UpsertRiskDataService,
-    private readonly riskRepository: RiskRepository,
-    private readonly createRecMedService: CreateRecMedService,
-    private readonly createGenerateSourceService: CreateGenerateSourceService,
-    private readonly homoGroupRepository: HomoGroupRepository,
-    private readonly hierarchyRepository: HierarchyRepository,
-    private readonly employeeRepository: EmployeeRepository,
-    private readonly upsertEmployeeHierarchyHistoryService: UpsertEmployeeHierarchyHistoryService,
+    readonly excelProv: ExcelProvider,
+    readonly prisma: PrismaService,
+    readonly upsertRiskDataService: UpsertRiskDataService,
+    readonly riskRepository: RiskRepository,
+    readonly createRecMedService: CreateRecMedService,
+    readonly createGenerateSourceService: CreateGenerateSourceService,
+    readonly homoGroupRepository: HomoGroupRepository,
+    readonly hierarchyRepository: HierarchyRepository,
+    readonly employeeRepository: EmployeeRepository,
+    readonly upsertEmployeeHierarchyHistoryService: UpsertEmployeeHierarchyHistoryService,
   ) {
     super(excelProv, prisma);
   }
 
   public factoryMethod(): IFileFactoryProduct {
-    return new FileFactoryProduct(
+    return new this.product(
       this.prisma,
       this.upsertRiskDataService,
       this.riskRepository,
@@ -77,9 +79,17 @@ export class FileCompanyStructureFactory extends FileFactoryAbstractionCreator<I
   }
 }
 
-class FileFactoryProduct implements IFileFactoryProduct {
+export class FileCompanyStructureProduct implements IFileFactoryProduct {
   public splitter = FileCompanyStructureFactory.splitter;
   public errors: string[] = [];
+
+  public skipRow = (databaseRow: Record<CompanyStructHeaderEnum, any>) => {
+    if (typeof databaseRow[CompanyStructHeaderEnum.EMPLOYEE_NAME] !== 'string') return false;
+
+    //RS DATA skip last row
+    return databaseRow[CompanyStructHeaderEnum.EMPLOYEE_NAME].includes('Total:');
+  };
+
   private throwError(message: string, options?: { stopFirstError?: boolean }) {
     if (options?.stopFirstError) throw new BadRequestException(message);
     if (!this.errors.includes(message)) this.errors.push(message);
@@ -112,7 +122,7 @@ class FileFactoryProduct implements IFileFactoryProduct {
   }
 
   public async getColumns() {
-    return CompanyStructColumnMap;
+    return { ...CompanyStructColumnMap, ...CompanyStructRsDataEmployeeColumnMap };
   }
 
   public async saveData(sheetsData: ISheetExtractedData<CompanyStructHeaderEnum>[], body: IBodyFileCompanyStruct) {
@@ -338,8 +348,8 @@ class FileFactoryProduct implements IFileFactoryProduct {
         };
       }
 
-      if (!isHierarchy && !isHomogeneousGroup) throw new BadRequestException(`Informe ao menos um Setor, Cargo ou Grupo homogênio (Obrigatório)`);
-      if (!isHierarchy && isEmployeeHistory) throw new BadRequestException(`Informe ao menos um Setor e Cargo (Obrigatório)`);
+      // if (!isHierarchy && !isHomogeneousGroup) throw new BadRequestException(`Informe ao menos um Setor, Cargo ou Grupo homogênio (Obrigatório)`);
+      if (!isHierarchy && isEmployeeHistory) throw new BadRequestException(`Quando informado data de admissão, informe ao menos um Setor e Cargo (Obrigatório)`);
 
       if (isEmployee) {
         const isOffice = hierarchyArray?.[officeIndex] != emptyHierarchy;

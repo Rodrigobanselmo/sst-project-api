@@ -1,13 +1,13 @@
-import { normalizeToUpperString } from './../../../../../../../shared/utils/normalizeString';
-import { SexTypeEnumTranslateBrToUs, SexTypeEnumTranslatedNotes } from './../../../../../../../shared/utils/translate/sexType.translate';
-import { checkIsValidCpf } from './../../../../../../../shared/utils/validators/checkIsValidCpf';
-import { ReportColorEnum, ReportFillColorEnum } from './../../../../report/types/IReportFactory.types';
-import { ClothesIBTUG, clothesList } from './../../../../../../../shared/constants/maps/ibtu-clothes.map';
-import { checkIsValidDate } from './../../../../../../../shared/utils/validators/checkIsValidDate';
+import { normalizeToUpperString } from '../../../../../../../shared/utils/normalizeString';
+import { SexTypeEnumTranslateBrToUs, SexTypeEnumTranslatedNotes } from '../../../../../../../shared/utils/translate/sexType.translate';
+import { checkIsValidCpf } from '../../../../../../../shared/utils/validators/checkIsValidCpf';
+import { ReportColorEnum, ReportFillColorEnum } from '../../../../report/types/IReportFactory.types';
+import { ClothesIBTUG, clothesList } from '../../../../../../../shared/constants/maps/ibtu-clothes.map';
+import { checkIsValidDate } from '../../../../../../../shared/utils/validators/checkIsValidDate';
 import { checkIsBoolean } from '../../../../../../../shared/utils/validators/checkIsBoolean';
-import { checkIsNumber } from './../../../../../../../shared/utils/validators/checkIdNumber';
+import { checkIsNumber } from '../../../../../../../shared/utils/validators/checkIdNumber';
 import { IColumnRuleMap, ISheetRuleMap } from '../../../types/IFileFactory.types';
-import { checkIsString } from './../../../../../../../shared/utils/validators/checkIsString';
+import { checkIsString } from '../../../../../../../shared/utils/validators/checkIsString';
 import { checkIsEnum } from '../../../../../../../shared/utils/validators/checkIsEnum';
 import { SexTypeEnum } from '@prisma/client';
 

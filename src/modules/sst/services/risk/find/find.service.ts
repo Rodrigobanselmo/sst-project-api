@@ -21,8 +21,9 @@ export class FindRiskService {
           severity: true,
           unit: true,
           appendix: true,
-          nr16appendix: true,
+          otherAppendix: true,
           activities: true,
+          esocialCode: true,
 
           symptoms: true,
           risk: true,

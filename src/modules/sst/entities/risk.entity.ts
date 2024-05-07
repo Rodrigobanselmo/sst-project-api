@@ -1,9 +1,9 @@
-import { AppendixEnum, Nr16AppendixEnum } from './../../../shared/constants/enum/appendix';
+import { AppendixEnum, OtherAppendixEnum } from './../../../shared/constants/enum/appendix';
 import { QuantityTypeEnum } from './../../company/interfaces/risk-data-json.types';
 import { ApiProperty } from '@nestjs/swagger';
 
 import { Prisma, RiskFactors, RiskFactorsEnum } from '.prisma/client';
-import { StatusEnum } from '@prisma/client';
+import { GrauInsalubridade, StatusEnum } from '@prisma/client';
 import { RecMedEntity } from './recMed.entity';
 import { GenerateSourceEntity } from './generateSource.entity';
 import { ExamRiskEntity } from './examRisk.entity';
@@ -100,8 +100,10 @@ export class RiskFactorsEntity implements RiskFactors {
   coments: string;
   carnogenicityACGIH: string;
   carnogenicityLinach: string;
-  nr16appendix: string | null;
+  otherAppendix: string | null;
   activities: RiskFactorActivitie[] | null;
+  grauInsalubridade: GrauInsalubridade | null;
+  synonymous: string[];
 
   examToRisk: ExamRiskEntity[];
   riskFactorData: RiskFactorDataEntity[];
@@ -182,18 +184,5 @@ export class RiskFactorsEntity implements RiskFactors {
 
     // 14 = Anexo 14
     if (this.type === 'BIO') return 14
-
-  }
-
-  public getNr16Anexo(): Nr16AppendixEnum {
-    const apendixNumber = Number(this.nr16appendix);
-    // 16 = NR 16 Anexo 2 - Inflamáveis (Periculosidade) !!!!(ATIVIDADES)
-    // 17 = NR 16 Anexo 3 - Vigilante (Periculosidade) !!!!(ATIVIDADES)
-    // 18 = NR 16 Anexo 4 - Eletricidade (Periculosidade) !!!!(ATIVIDADES)
-    // 19 = NR 16 Anexo 5 - Motoboy (Periculosidade) !!!!(ATIVIDADES)
-    if (apendixNumber && !Number.isNaN(apendixNumber)) return apendixNumber
-
-    if (this.nr16appendix == 'Portaria nº 518/2003') return Nr16AppendixEnum.IONIZING_RAD_PERICULOSITY
-
   }
 }

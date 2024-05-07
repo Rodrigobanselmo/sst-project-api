@@ -10,7 +10,7 @@ export function convertHeaderUpload(sheetHeaderList: ISheetHeaderList): IReportH
         if (Array.isArray(column)) {
           return column.map((column) => {
             return {
-              content: column.field,
+              content: column.field.split(' ****')[0],
               database: column.database || column.field,
               fill: fillColors[_index % fillColors.length],
               borders: { ...allBorders, ...(column.required && requiredBorders) },
@@ -20,7 +20,7 @@ export function convertHeaderUpload(sheetHeaderList: ISheetHeaderList): IReportH
         }
 
         return {
-          content: column.field,
+          content: column.field.split(' ****')[0],
           database: column.database,
           fill: fillColors[index % fillColors.length],
           borders: { ...allBorders, ...(column.required && requiredBorders) },

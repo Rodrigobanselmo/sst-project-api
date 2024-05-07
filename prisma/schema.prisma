@@ -1034,7 +1034,7 @@ model ExamToRisk {
   considerBetweenDays   Int?
   company               Company                 @relation(fields: [companyId], references: [id])
   exam                  Exam?                   @relation(fields: [examId], references: [id])
-  risk                  RiskFactors?            @relation(fields: [riskId], references: [id])
+  risk                  RiskFactors?            @relation(fields: [riskId], references: [id], onDelete: Cascade)
   skipCompanies         ExamToRiskSkipCompany[]
 
   @@unique([id, companyId])
@@ -1371,7 +1371,9 @@ model RiskFactors {
   severity              Int                     @default(0)
   system                Boolean                 @default(false)
   appendix              String?
-  nr16appendix          String?
+  grauInsalubridade     GrauInsalubridade?
+  synonymous            String[]
+  otherAppendix         String?
   risk                  String?
   propagation           String[]
   exame                 String?
@@ -1432,7 +1434,7 @@ model RiskFactorsDocInfo {
   created_at  DateTime    @default(now())
   company     Company     @relation(fields: [companyId], references: [id])
   hierarchy   Hierarchy?  @relation(fields: [hierarchyId], references: [id], onDelete: Cascade)
-  risk        RiskFactors @relation(fields: [riskId], references: [id])
+  risk        RiskFactors @relation(fields: [riskId], references: [id], onDelete: Cascade)
 
   @@unique([companyId, riskId, hierarchyId])
   @@index([companyId])
@@ -1546,7 +1548,7 @@ model RiskFactorProbability {
   riskFactorGroupDataId String?
   riskFactorDataAfter   RiskFactorData? @relation("RiskFactorProbabilityAfter", fields: [riskFactorDataAfterId, riskId, riskFactorGroupDataId], references: [id, riskId, riskFactorGroupDataId])
   riskFactorData        RiskFactorData? @relation("RiskFactorProbabilityBefore", fields: [riskFactorDataId, riskId, riskFactorGroupDataId], references: [id, riskId, riskFactorGroupDataId])
-  riskFactor            RiskFactors     @relation(fields: [riskId], references: [id])
+  riskFactor            RiskFactors     @relation(fields: [riskId], references: [id], onDelete: Cascade)
 
   @@unique([riskFactorDataId, riskId, riskFactorGroupDataId])
   @@unique([riskFactorDataAfterId, riskId, riskFactorGroupDataId])
@@ -1935,6 +1937,12 @@ enum RiskRecTextTypeEnum {
   TECHNIQUE
   LOGISTICS
   OTHER
+}
+
+enum GrauInsalubridade {
+  MIN
+  MAX
+  MED
 }
 
 enum UfStateEnum {

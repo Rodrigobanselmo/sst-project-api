@@ -1,5 +1,5 @@
 import { DocumentPGRFactoryProduct } from '../../../../../documents/factories/document/products/PGR/DocumentPGRFactory';
-import { AppendixEnumMap, Nr16AppendixEnumMap } from './../../../../../../shared/constants/enum/appendix';
+import { AppendixEnumMap, OtherAppendixEnum, OtherAppendixEnumMap } from './../../../../../../shared/constants/enum/appendix';
 import { IRiskDataActivities, QuantityTypeEnum } from './../../../../../company/interfaces/risk-data-json.types';
 import { IHierarchyMap } from './../../../../../documents/docx/converter/hierarchy.converter';
 
@@ -25,6 +25,7 @@ import {
   IReportSanitizeData
 } from '../../types/IReportFactory.types';
 import { ReportRiskStructureProduct } from '../ReportRiskStructureFactory';
+import { BadRequestException } from '@nestjs/common';
 
 
 export const ExposureEnumMap: Record<ExposureTypeEnum, number> = {
@@ -55,9 +56,6 @@ export function getConcatRisksData(data: PromiseInfer<ReturnType<DocumentPGRFact
 
   data.riskGroupData?.data?.forEach((riskData) => {
     setPriorizationRiskData(riskData, data.hierarchyTree)
-
-    console.log(riskData.riskFactor.name, riskData.prioritization)
-
 
     const riskId = riskData.riskId
     if (!map[riskId]) {
@@ -119,19 +117,21 @@ export class RiskStructureRsDataNR extends ReportRiskStructureProduct {
     const rows: IReportSanitizeData[] = []
     const errors: string[] = []
 
-    Array.from(data.hierarchyData.values()).map((hierarchy) => {
+    Array.from(data.hierarchyData.values()).forEach((hierarchy) => {
       return this.getRiskDataByHierarchy({ hierarchy, riskData: getConcatRisksData(data) }).sort((a, b) => sortString(a.riskFactor.name, b.riskFactor.name)).map((riskData) => {
         if (riskData.riskFactor.representAll) return
-
+        if (riskData.riskFactor.otherAppendix === OtherAppendixEnum.ACGH) return
         const method = riskData.riskFactor.method
         const exposure = ExposureEnumMap[riskData.exposure]
         const appendix = AppendixEnumMap[riskData.riskFactor.getAnexo()]?.rsData
-        const nr16appendix = Nr16AppendixEnumMap[riskData.riskFactor.getNr16Anexo()]?.rsData
+        const otherappendix = OtherAppendixEnumMap[riskData.riskFactor.otherAppendix]?.rsData
+
 
         const startDate = riskData.startDate || params.startDate
-        const roLevel = riskData.level
+        const roLevel = riskData.level || 5
         const eficientEpi = riskData.epiToRiskFactorData.some(epi => epi.efficientlyCheck)
         const riskType = riskData.riskFactor.getRiskType();
+        const considerPcmso = roLevel > 3 || riskData.riskFactor.appendix != '1'
 
         if (typeof exposure != 'number') {
           errors.push(`Exposição não informada para o risco ${riskData.riskFactor.name}`)
@@ -142,17 +142,19 @@ export class RiskStructureRsDataNR extends ReportRiskStructureProduct {
         if (!method) {
           errors.push(`Técnica não informada para o risco ${riskData.riskFactor.name}`)
         }
-        if (!nr16appendix || !appendix) {
+        if (!otherappendix && !appendix) {
           errors.push(`Anexo não informada para o risco ${riskData.riskFactor.name}`)
         }
-        if (!roLevel) {
-          errors.push(`Probabilidade ou Severidade não informada para o risco ${riskData.riskFactor.name}`)
-        }
+        // if (!roLevel) {
+        //   errors.push(`Probabilidade ou Severidade não informada para o risco ${riskData.riskFactor.name}`)
+        // }
 
-        const engs = riskData.engs.map(gs => gs.medName).join('; ')
-        const adms = riskData.adms.map(gs => gs.medName).join('; ')
-        const meds = [engs, adms].flat().join('; ')
         const activitiesJson = (riskData.activities as IRiskDataActivities)
+        const engs = riskData.engs.map(gs => gs.medName).filter(Boolean).join('; ')
+        const adms = riskData.adms.map(gs => gs.medName).filter(Boolean).join('; ')
+        const recs = riskData.recs.map(gs => gs.recName).filter(Boolean).join('; ')
+        const meds = [engs, adms].filter(Boolean).join('; ')
+        const gs = riskData.generateSources.map(gs => gs.name).filter(Boolean).join('; ')
 
         const rowsData: { value: string | number; activity: [string, string] }[] = []
 
@@ -168,30 +170,34 @@ export class RiskStructureRsDataNR extends ReportRiskStructureProduct {
           rowsData.push({ value: appendix, activity: ['', ''] })
         }
 
-        activitiesJson?.activities?.forEach(activity => {
-          if (activity.description) rowsData.push({ value: nr16appendix, activity: [activity.description, activity.subActivity] })
-        })
+        if (otherappendix) {
+          activitiesJson?.activities?.forEach(activity => {
+            if (activity.description) rowsData.push({ value: otherappendix, activity: [activity.description, activity.subActivity] })
+          })
+        }
 
         if (!rowsData?.length) {
           errors.push(`Atividade ou areá de risco não informada para o risco ${riskData.riskFactor.name}`)
         }
 
+        const json = (riskData.json as any) || {}
+
         rowsData.forEach(row => {
           const sanitazeRow: IReportSanitizeData = {
             [NR.TIPO]: { content: 1 },
             [NR.CNPJ]: { content: formatCNPJ(onlyNumbers(data.company.cnpj)) },
-            [NR.INICIO]: { content: riskData.startDate },
+            [NR.INICIO]: { content: startDate },
             [NR.FIM]: { content: riskData.endDate },
             [NR.ANEXO]: { content: row.value },
             [NR.TECNICA]: { content: method },
             [NR.EXPOSICAO]: { content: exposure },
             [NR.CONSTAR_EM]: { content: 0 },
-            [NR.CONSIDERAR_PCMSO]: { content: roLevel > 3 ? 1 : 0 },
+            [NR.CONSIDERAR_PCMSO]: { content: considerPcmso ? 1 : 0 },
             [NR.NAO_CONSIDERAR_COMPLEMENTARES]: { content: 1 },
             [NR.CA]: { content: riskData.epis.map(epi => epi.ca).join('/') },
-            [NR.FONTE_GERADORA]: { content: riskData.generateSources.map(gs => gs.name).join('; ') },
+            [NR.FONTE_GERADORA]: { content: gs },
             [NR.MEDIDAS_CONTROLE]: { content: meds },
-            [NR.RECOMENDACOES]: { content: riskData.recs.map(gs => gs.recName).join('; ') },
+            [NR.RECOMENDACOES]: { content: recs },
             [NR.MEIO_PROP]: { content: riskData.riskFactor.propagation.join(', ') },
             [NR.COMPROMETIMENTO]: { content: riskData.riskFactor.risk },
             [NR.POSSIVEIS_DANOS]: { content: riskData.riskFactor.symptoms },
@@ -200,15 +206,15 @@ export class RiskStructureRsDataNR extends ReportRiskStructureProduct {
               [NR.VIAS_ABS]: { content: riskData.riskFactor.symptoms },
             }),
             ...this.addRow(row.value, [1], {
-              [NR.MEDIÇAO_INSS]: { content: (riskData.json as any)?.nr15q5 },
-              [NR.MEDIÇAO_PORTARIA]: { content: (riskData.json as any)?.ltcatq5 }, //! not sure
+              [NR.MEDIÇAO_INSS]: { content: json?.nr15q5 },
+              [NR.MEDIÇAO_PORTARIA]: { content: json?.ltcatq5 },
             }),
             ...this.addRow(row.value, [2], {
               [NR.MEDIÇAO_INSS]: { content: riskData?.intensity || '' },
               [NR.TIPO_LEITURA]: { content: 0 }, //! missing
             }),
             ...this.addRow(row.value, [3], {
-              [NR.RESULTADO]: { content: (riskData.json as any)?.ibtug || '' },
+              [NR.RESULTADO]: { content: json?.ibtug || '' },
               [NR.TIPO_ATIVIDADE]: { content: '' }, //! missing
               [NR.KCAL]: { content: '' }, //! missing
               [NR.REGIME]: { content: '' }, //! missing
@@ -221,8 +227,8 @@ export class RiskStructureRsDataNR extends ReportRiskStructureProduct {
             ...this.addRow(row.value, [8], {
               [NR.TIPO_VIBRACAO]: { content: riskType === QuantityTypeEnum.VFB ? 3 : 0 },
               [NR.CORPO]: { content: '' }, //! missing
-              [NR.INTENSIDADE_AREN]: { content: (riskData.json as any).aren || '' },
-              [NR.INTENSIDADE_VDVR]: { content: (riskData.json as any).vdvr || '' },
+              [NR.INTENSIDADE_AREN]: { content: json.aren || '' },
+              [NR.INTENSIDADE_VDVR]: { content: json.vdvr || '' },
             }),
             ...this.addRow(row.value, [9], {
               [NR.LIMITE_FRIO]: { content: '' }, //! missing
@@ -230,16 +236,16 @@ export class RiskStructureRsDataNR extends ReportRiskStructureProduct {
             }),
             ...this.addRow(row.value, [11], {
               [NR.AGENTE_QUI]: { content: riskData.riskFactor.name },
-              [NR.INTENSIDADE_QUI]: { content: (riskData.json as any).nr15ltValue || (riskData.json as any).stelValue || '' },
-              [NR.UNIDADE]: { content: (riskData.json as any).unit || '' },
+              [NR.INTENSIDADE_QUI]: { content: json.nr15ltValue || json.stelValue || '' },
+              [NR.UNIDADE]: { content: json.unit || '' },
             }),
             ...this.addRow(row.value, [12], {
               [NR.AGENTE_POEIRA]: { content: riskData.riskFactor.name },
-              [NR.INTENSIDADE_POEIRA]: { content: (riskData.json as any).nr15ltValue || (riskData.json as any).stelValue || '' },
-              [NR.UNIDADE_POEIRA]: { content: (riskData.json as any).unit || '' },
+              [NR.INTENSIDADE_POEIRA]: { content: json.nr15ltValue || json.stelValue || '' },
+              [NR.UNIDADE_POEIRA]: { content: json.unit || '' },
             }),
             ...this.addRow(row.value, [13], {
-              [NR.AGENTE_POEIRA]: { content: riskData.riskFactor.name },
+              [NR.AGENTE_QUI_ANEXO_13]: { content: riskData.riskFactor.name },
               [NR.MANIPULAÇAO_ANEXO_13]: { content: row.activity[0] || '' },
             }),
             ...this.addRow(row.value, [7], {
@@ -252,7 +258,7 @@ export class RiskStructureRsDataNR extends ReportRiskStructureProduct {
               [NR.AGENTE_RESTO]: { content: riskData.riskFactor.name },
             }),
             ...this.addRow(row.value, [18, 20], {
-              [NR.FATOR_ELET_RAD]: { content: row.activity[0] },
+              [NR.AGENTE_RESTO]: { content: row.activity[0] },
               [NR.TAREFA_ELET_RAD]: { content: row.activity[1] },
             }),
             ...this.addRow(row.value, ['N'], {
@@ -279,7 +285,11 @@ export class RiskStructureRsDataNR extends ReportRiskStructureProduct {
         });
 
       })
-    }).flat();
+    })
+
+    if (errors.length) {
+      throw new BadRequestException(errors)
+    }
 
     return rows;
   }

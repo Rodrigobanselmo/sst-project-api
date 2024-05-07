@@ -59,7 +59,7 @@
     "dayjs": "^1.10.7",
     "deep-equal": "^2.1.0",
     "docx": "^7.3.0",
-    "exceljs": "^4.3.0",
+    "exceljs": "^4.4.0",
     "firebase": "^9.9.0",
     "fluent-ffmpeg": "^2.1.2",
     "geoip-lite": "^1.4.7",

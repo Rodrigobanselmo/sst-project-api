@@ -27,6 +27,7 @@ export type ISheetHeaderList = ({
 
 export interface IFileFactoryProduct<T = any, R extends keyof any = any> {
   splitter?: string;
+  skipRow?: (databaseRow: Record<R, any>) => boolean;
   // getSheetName(): string;
   // getFilename(): string;
   // findTableData(companyId: string, query: T): Promise<IFileFactoryProductFindData>;

@@ -51,7 +51,7 @@ export const CompanyStructRSDataACGHColumnList: ISheetHeaderList = [
     group: [
       CompanyStructRSDataACGHColumnMap[CompanyStructRSDataACGHHeaderEnum.EPI],
       CompanyStructRSDataACGHColumnMap[CompanyStructRSDataACGHHeaderEnum.CA],
-      CompanyStructRSDataACGHColumnMap[CompanyStructRSDataACGHHeaderEnum.EPI_EFICAZ],
+      CompanyStructRSDataACGHColumnMap[CompanyStructRSDataACGHHeaderEnum.EPI_EFETIVO],
       CompanyStructRSDataACGHColumnMap[CompanyStructRSDataACGHHeaderEnum.TREINAMENTO],
       CompanyStructRSDataACGHColumnMap[CompanyStructRSDataACGHHeaderEnum.REGISTRO],
       CompanyStructRSDataACGHColumnMap[CompanyStructRSDataACGHHeaderEnum.EPI_ALL],

@@ -51,6 +51,7 @@ import { EmployeeRepository } from '../company/repositories/implementations/Empl
 import { ReportEmployeeModelFactory } from './factories/report/products/ReportEmployeeFactory';
 import { DocumentsModule } from '../documents/documents.module';
 import { ReportRiskStructureRsDataFactory } from './factories/report/products/ReportRiskStructureRsData/ReportRiskStructureFactory.rsdata';
+import { FileRsDataEmployeeFactory } from './factories/upload/products/CompanyStructure/FileRsDataEmployeeFactory';
 
 @Module({
   controllers: [FilesChecklistController, ModelsUploadsController, ReportsController, FilesCompanyController, FilesCnaeController, FilesController, FilesCidController],
@@ -85,6 +86,7 @@ import { ReportRiskStructureRsDataFactory } from './factories/report/products/Re
     ReportExpiredExamFactory,
     ReportDoneExamFactory,
     FileCompanyStructureFactory,
+    FileRsDataEmployeeFactory,
     UploadCompanyStructureService,
     HierarchyExcelProvider,
     FileHelperProvider,

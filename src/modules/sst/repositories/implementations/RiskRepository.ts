@@ -577,7 +577,7 @@ export class RiskRepository implements IRiskRepository {
   async DeleteByIdSoft(id: string): Promise<RiskFactorsEntity> {
     const riskFactors = await this.prisma.riskFactors.update({
       where: { id },
-      data: { deleted_at: new Date() },
+      data: { deleted_at: new Date(), status: 'INACTIVE' },
     });
 
     return new RiskFactorsEntity(riskFactors);
@@ -586,7 +586,7 @@ export class RiskRepository implements IRiskRepository {
   async DeleteByCompanyAndIdSoft(id: string, companyId: string): Promise<RiskFactorsEntity> {
     const riskFactors = await this.prisma.riskFactors.update({
       where: { id_companyId: { id, companyId } },
-      data: { deleted_at: new Date() },
+      data: { deleted_at: new Date(), status: 'INACTIVE' },
     });
 
     return new RiskFactorsEntity(riskFactors);

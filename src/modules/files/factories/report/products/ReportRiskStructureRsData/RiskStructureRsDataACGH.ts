@@ -11,63 +11,98 @@ import {
   IReportSanitizeData
 } from '../../types/IReportFactory.types';
 import { ReportRiskStructureProduct } from '../ReportRiskStructureFactory';
-import { getConcatRisksData } from './RiskStructureRsDataNR';
+import { ExposureEnumMap, getConcatRisksData } from './RiskStructureRsDataNR';
 import { convertTitleUpload } from '../../helpers/convertTitleUpload';
+import { CompanyStructRSDataACGHHeaderEnum as NR } from '../../../upload/products/CompanyStructure/constants/company-struct-rsdata-acgh.constants';
+import { formatCNPJ, onlyNumbers } from '@brazilian-utils/brazilian-utils';
+import { IRiskDataJsonQui } from 'src/modules/company/interfaces/risk-data-json.types';
+import { BadRequestException } from '@nestjs/common';
+import { OtherAppendixEnum } from 'src/shared/constants/enum/appendix';
+import { DownloadRiskStructureReportDto } from 'src/modules/files/dto/risk-structure-report.dto';
 
 export class RiskStructureRsDataACGH extends ReportRiskStructureProduct {
-  public sanitizeData(data: PromiseInfer<ReturnType<DocumentPGRFactoryProduct['getPrgRiskData']>>): IReportSanitizeData[] {
+  public sanitizeData(data: PromiseInfer<ReturnType<DocumentPGRFactoryProduct['getPrgRiskData']>>, params: DownloadRiskStructureReportDto): IReportSanitizeData[] {
     const rows: IReportSanitizeData[] = []
+    const errors: string[] = []
 
-    Array.from(data.hierarchyData.values()).map((hierarchy) => {
+    Array.from(data.hierarchyData.values()).forEach((hierarchy) => {
       return this.getRiskDataByHierarchy({ hierarchy, riskData: getConcatRisksData(data) }).sort((a, b) => sortString(a.riskFactor.name, b.riskFactor.name)).map((riskData) => {
-        const isQuimical = riskData.riskFactor.type === 'QUI';
+        if (riskData.riskFactor.representAll) return
+        if (riskData.riskFactor.otherAppendix !== OtherAppendixEnum.ACGH) return
+        const method = riskData.riskFactor.method
+        const exposure = ExposureEnumMap[riskData.exposure]
+
+        const startDate = riskData.startDate || params.startDate
+        const eficientEpi = riskData.epiToRiskFactorData.some(epi => epi.efficientlyCheck)
+
+        if (typeof exposure != 'number') {
+          errors.push(`Exposição não informada para o risco ${riskData.riskFactor.name}`)
+        }
+        if (!startDate) {
+          errors.push(`Início de exposição não informada para o risco ${riskData.riskFactor.name}`)
+        }
+        if (!method) {
+          errors.push(`Técnica não informada para o risco ${riskData.riskFactor.name}`)
+        }
+
+        const engs = riskData.engs.map(gs => gs.medName).filter(Boolean).join('; ')
+        const adms = riskData.adms.map(gs => gs.medName).filter(Boolean).join('; ')
+        const recs = riskData.recs.map(gs => gs.recName).filter(Boolean).join('; ')
+        const meds = [engs, adms].filter(Boolean).join('; ')
+        const gs = riskData.generateSources.map(gs => gs.name).filter(Boolean).join('; ')
+
+        const json = (riskData.json || {}) as unknown as IRiskDataJsonQui
 
         const sanitazeRow: IReportSanitizeData = {
-          startDate: { content: riskData.startDate },
-          endDate: { content: riskData.endDate },
-          workspace: { content: data.workspace.name },
-          officeDescription: { content: hierarchy.descRh },
-          officeRealDescription: { content: hierarchy.descReal },
-          risk: { content: riskData.riskFactor.name },
-          probability: { content: riskData.probability },
-          probabilityAfter: { content: riskData.probabilityAfter },
-          generateSources: { content: this.joinArray(riskData.generateSources.map(gs => gs.name)) },
-          ...(isQuimical && {
-            unit: isQuimical ? { content: Object(riskData?.json)?.unit || riskData.riskFactor.unit } : undefined,
-          }),
-          rec: { content: this.joinArray(riskData.recs.map(rec => rec.recName)) },
-          epc: { content: this.joinArray(riskData.engs.map(eng => eng.medName)) },
-          ...(riskData.engsToRiskFactorData.some(eng => eng.efficientlyCheck) && {
-            epcEfficiently: { content: 'Sim' },
-          }),
-          adm: { content: this.joinArray(riskData.adms.map(adm => adm.medName)) },
-          epiCa: { content: this.joinArray(riskData.epis.map(epi => epi.ca)) },
-          //epi
-          ...(riskData.epiToRiskFactorData.some(epi => epi.efficientlyCheck) && {
-            ...['epiEfficiently', 'epiEpc', 'epiLongPeriods', 'epiValidation', 'epiTradeSign', 'epiSanitation', 'epiMaintenance', 'epiUnstopped', 'epiTraining'].reduce((acc, epi) => ({
-              ...acc,
-              [epi]: { content: 'Sim' }
-            }), {})
-          }),
+          [NR.TIPO]: { content: 1 },
+          [NR.CNPJ]: { content: formatCNPJ(onlyNumbers(data.company.cnpj)) },
+          [NR.INICIO]: { content: startDate },
+          [NR.FIM]: { content: riskData.endDate },
+          [NR.TECNICA]: { content: method },
+          [NR.EXPOSICAO]: { content: exposure },
+
+          [NR.AGENTE]: { content: riskData.riskFactor.name },
+          [NR.TWA]: { content: json.twa || '' },
+          [NR.STEL]: { content: json.stel || '' },
+
+          [NR.CONSIDERAR_PCMSO]: { content: 1 },
+          [NR.NAO_CONSIDERAR_COMPLEMENTARES]: { content: 1 },
+          [NR.CA]: { content: riskData.epis.map(epi => epi.ca).join('/') },
+          [NR.FONTE_GERADORA]: { content: gs },
+          [NR.MEDIDAS_CONTROLE]: { content: meds },
+          [NR.RECOMENDACOES]: { content: recs },
+          [NR.MEIO_PROP]: { content: riskData.riskFactor.propagation.join(', ') },
+          [NR.COMPROMETIMENTO]: { content: riskData.riskFactor.risk },
+          [NR.POSSIVEIS_DANOS]: { content: riskData.riskFactor.symptoms },
+
           //hierarchy
           ...hierarchy.org.reduce((acc, org) => {
             return {
               ...acc,
-              [hierarchyMap[org.typeEnum].database]: { content: org.name },
+              [hierarchyMap[org.typeEnum].databaseRsData]: { content: org.name },
             };
           }, {}),
-          //risk json info
-          ...Object.keys(Object(riskData.json)).reduce((acc, key) => ({
+          //epi
+          ...[NR.EPI, NR.EPI_EFETIVO, NR.TREINAMENTO, NR.REGISTRO, NR.EPI_ALL].reduce((acc, epi) => ({
             ...acc,
-            ...(key != 'unit' && {
-              [key]: { content: this.normalizeContent(riskData.json[key]) },
-            })
+            [epi]: { content: eficientEpi ? 1 : 0 }
           }), {}),
         };
 
         rows.push(sanitazeRow);
+        console.log(hierarchy.org.reduce((acc, org) => {
+          return {
+            ...acc,
+            [hierarchyMap[org.typeEnum].databaseRsData]: { content: org.name },
+          };
+        }, {}))
       })
-    }).flat();
+    })
+
+
+    if (errors.length) {
+      throw new BadRequestException(errors)
+    }
 
     return rows;
   }

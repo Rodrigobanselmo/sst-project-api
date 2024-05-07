@@ -37,6 +37,7 @@ import { readFileSync, createWriteStream, writeFileSync, readdirSync } from 'fs'
 import { signPdf } from './signature/signPdf';
 import { asyncBatch } from './../src/shared/utils/asyncBatch';
 import { realizaCover } from './run/realiza-cover';
+import { removeRisk } from './run/remove-risks-000deletar';
 
 const prisma = new PrismaClient({
   log: ['query'],
@@ -48,7 +49,7 @@ async function main() {
 
     // const companyIds = ['6a90957b-ea2a-4dba-b88e-ee128562718a', '87544c8e-8827-4429-a3d6-ec62f486fc5b']
 
-    const charId = "1e19f768-2fd0-47aa-b1bd-e5a9328ec0ee"
+    // const charId = "1e19f768-2fd0-47aa-b1bd-e5a9328ec0ee"
 
     // await prisma.employeePPPHistory.deleteMany({ where: { employee: { companyId: { in: companyIds } } } })
     // await prisma.employeeExamsHistory.deleteMany({ where: { employee: { companyId: { in: companyIds } } } })
@@ -57,7 +58,7 @@ async function main() {
     // await prisma.employeeESocialBatch.deleteMany({ where: { companyId: { in: companyIds } } })
     // await prisma.employee.deleteMany({ where: { companyId: { in: companyIds } } })
 
-    await prisma.companyCharacterizationFile.deleteMany({ where: { companyCharacterizationId: charId } })
+    // await prisma.companyCharacterizationFile.deleteMany({ where: { companyCharacterizationId: charId } })
     // await prisma.companyCharacterizationPhoto.deleteMany({ where: { companyCharacterizationId: charId } })
     // await prisma.companyCharacterization.delete({ where: { id: charId } })
     // await prisma.hierarchy.deleteMany({ where: { companyId: { in: companyIds } } })
@@ -66,6 +67,7 @@ async function main() {
 
 
     // await realizaCover(prisma)
+    await removeRisk(prisma)
 
 
     console.info('end');

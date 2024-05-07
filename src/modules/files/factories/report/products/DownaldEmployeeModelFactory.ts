@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CompanyEntity } from './../../../../company/entities/company.entity';
-import { EmployeeColumnList } from './../../upload/products/CompanyStructure/constants/headersList/EmployeeColumnList';
+import { EmployeeColumnList } from '../../upload/products/CompanyStructure/constants/headersList/EmployeeColumnList';
 
 import { ExcelProvider } from '../../../../../shared/providers/ExcelProvider/implementations/ExcelProvider';
 import { CompanyRepository } from '../../../../company/repositories/implementations/CompanyRepository';
