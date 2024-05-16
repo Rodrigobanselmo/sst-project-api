@@ -248,6 +248,7 @@ export class RiskRepository implements IRiskRepository {
     if ('search' in query && query.search) {
       const OR = [];
       OR.push({ name: { contains: query.search, mode: 'insensitive' } });
+      OR.push({ cas: { contains: query.search, mode: 'insensitive' } });
 
       (where.AND as any).push({ OR } as typeof options.where);
       delete query.search;
