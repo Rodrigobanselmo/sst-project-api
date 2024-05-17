@@ -11,6 +11,7 @@ import { RiskFactorsEntity } from '../../entities/risk.entity';
 import { IRiskRepository } from '../IRiskRepository.types';
 import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
 import { databaseFindChanges } from '../../../../shared/utils/databaseFindChanges';
+import { normalizeString } from '../../../../shared/utils/normalizeString';
 
 @Injectable()
 export class RiskRepository implements IRiskRepository {
@@ -247,7 +248,7 @@ export class RiskRepository implements IRiskRepository {
 
     if ('search' in query && query.search) {
       const OR = [];
-      OR.push({ search: { contains: query.search, mode: 'insensitive' } });
+      OR.push({ search: { contains: normalizeString(query.search), mode: 'insensitive' } });
       OR.push({ cas: { contains: query.search, mode: 'insensitive' } });
 
       (where.AND as any).push({ OR } as typeof options.where);
