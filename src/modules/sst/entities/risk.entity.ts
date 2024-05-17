@@ -27,6 +27,9 @@ export class RiskFactorsEntity implements RiskFactors {
   @ApiProperty({ description: 'The name of the risk' })
   name: string;
 
+  search: string;
+
+
   @ApiProperty({ description: 'The severity of the rik' })
   severity: number;
 

@@ -1373,6 +1373,7 @@ model RiskFactors {
   appendix              String?
   grauInsalubridade     GrauInsalubridade?
   synonymous            String[]
+  search                String?
   otherAppendix         String?
   risk                  String?
   propagation           String[]
