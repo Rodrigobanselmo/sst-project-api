@@ -44,6 +44,8 @@ jobs:
           key: ${{ secrets.SSH_KEY }} 
           script: |
             cd ~/app/sst-project-api
+            nvm -v
+            nvm use 20
             npm -v
             yarn -v
             node -v
