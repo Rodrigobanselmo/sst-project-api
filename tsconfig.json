@@ -14,9 +14,7 @@
     "incremental": true,
     "skipLibCheck": true,
     "noErrorTruncation": true,
-    "lib": [
-      "ES2021"
-    ],
+    "lib": ["ES2021"],
     "strictNullChecks": false,
     "noImplicitAny": false,
     "strictBindCallApply": false,

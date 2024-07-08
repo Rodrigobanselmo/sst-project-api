@@ -9,12 +9,19 @@ import {
   TextRun,
   VerticalPositionAlign,
   VerticalPositionRelativeFrom,
-} from 'docx';
-import { readFileSync } from 'fs';
-import sizeOf from 'image-size';
-import { setNiceProportion } from '../../../../../../shared/utils/setNiceProportion';
+} from "docx";
+import { readFileSync } from "fs";
+import sizeOf from "image-size";
+import { setNiceProportion } from "../../../../../../shared/utils/setNiceProportion";
 
-import { convertToEmu, convertToParagraph, convertToParagraphBox, pageHeight, pageWidth, sectionCoverProperties } from '../../config/styles';
+import {
+  convertToEmu,
+  convertToParagraph,
+  convertToParagraphBox,
+  pageHeight,
+  pageWidth,
+  sectionCoverProperties,
+} from "../../config/styles";
 
 interface ITextProps {
   x?: number;
@@ -59,6 +66,7 @@ const title = (props: IHeaderProps) =>
     spacing: { after: 400, before: 0 },
     ...(props?.coverProps?.titleProps && {
       frame: {
+        type: "absolute",
         position: {
           x: convertToParagraph(props?.coverProps?.titleProps?.x || 0),
           y: convertToParagraph(props?.coverProps?.titleProps?.y || 0),
@@ -82,7 +90,7 @@ const textShow = (text?: string, props?: ITextProps) =>
   new Paragraph({
     children: [
       new TextRun({
-        text: text || '',
+        text: text || "",
         size: (props?.size || 0) * 2 || 40,
         bold: props?.bold ?? false,
         ...(props?.color && {
@@ -93,6 +101,7 @@ const textShow = (text?: string, props?: ITextProps) =>
     spacing: { after: 100, before: 0 },
     ...(props && {
       frame: {
+        type: "absolute",
         position: {
           x: convertToParagraph(props.x || 0),
           y: convertToParagraph(props.y || 0),
@@ -140,11 +149,18 @@ const imageCover = (props: IHeaderProps) => {
 };
 
 const imageLogo = (props: IHeaderProps) => {
-  const { height: imgHeight, width: imgWidth } = sizeOf(readFileSync(props.imgPath));
+  const { height: imgHeight, width: imgWidth } = sizeOf(
+    readFileSync(props.imgPath),
+  );
 
   const logoProps = props?.coverProps?.logoProps;
 
-  const { height, width } = setNiceProportion(logoProps?.maxLogoWidth || 630, logoProps?.maxLogoHeight || 354, imgWidth, imgHeight);
+  const { height, width } = setNiceProportion(
+    logoProps?.maxLogoWidth || 630,
+    logoProps?.maxLogoHeight || 354,
+    imgWidth,
+    imgHeight,
+  );
 
   return new Paragraph({
     children: [
@@ -158,10 +174,13 @@ const imageLogo = (props: IHeaderProps) => {
           floating: {
             zIndex: 1,
             horizontalPosition: {
-              offset: convertToEmu(logoProps.x, 'w'),
+              offset: convertToEmu(logoProps.x, "w"),
             },
             verticalPosition: {
-              offset: convertToEmu(logoProps.y + ((logoProps?.maxLogoHeight ?? 0) - height) / 2, 'h'),
+              offset: convertToEmu(
+                logoProps.y + ((logoProps?.maxLogoHeight ?? 0) - height) / 2,
+                "h",
+              ),
             },
             behindDocument: true,
           },
@@ -175,15 +194,18 @@ const imageLogo = (props: IHeaderProps) => {
 export const createCover = (props: IHeaderProps): Paragraph[] => {
   const coverSection = [] as Paragraph[];
 
-  if (props?.coverProps?.backgroundImagePath) coverSection.push(imageCover(props));
+  if (props?.coverProps?.backgroundImagePath)
+    coverSection.push(imageCover(props));
 
   coverSection.push(title(props));
   coverSection.push(textShow(props.version, props?.coverProps?.versionProps));
-  coverSection.push(textShow(''));
+  coverSection.push(textShow(""));
   if (props.imgPath) coverSection.push(imageLogo(props));
-  coverSection.push(textShow(''));
-  coverSection.push(textShow(''));
-  coverSection.push(textShow(props.companyName, props?.coverProps?.companyProps));
+  coverSection.push(textShow(""));
+  coverSection.push(textShow(""));
+  coverSection.push(
+    textShow(props.companyName, props?.coverProps?.companyProps),
+  );
 
   return coverSection;
 };

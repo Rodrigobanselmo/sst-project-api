@@ -1,18 +1,18 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { FindCAEpiService } from './find-ca-epi.service';
+import { Test, TestingModule } from "@nestjs/testing";
+import { FindByCAEpiService } from "./find-ca-epi.service";
 
-describe.skip('FindCAEpiService', () => {
-  let service: FindCAEpiService;
+describe.skip("FindCAEpiService", () => {
+  let service: FindByCAEpiService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [FindCAEpiService],
+      providers: [FindByCAEpiService],
     }).compile();
 
-    service = module.get<FindCAEpiService>(FindCAEpiService);
+    service = module.get<FindByCAEpiService>(FindByCAEpiService);
   });
 
-  it('should be defined', () => {
+  it("should be defined", () => {
     expect(service).toBeDefined();
   });
 });

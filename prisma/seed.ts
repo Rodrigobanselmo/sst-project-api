@@ -1,10 +1,10 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
-import { seedCompany } from './seed/company';
-import { seedEmployees } from './seed/employees';
-import { seedEpis } from './seed/epis';
-import { seedRisks } from './seed/risks';
-import { seedUsers } from './seed/user';
+import { seedCompany } from "./seed/company";
+import { seedEmployees } from "./seed/employees";
+import { seedEpis } from "./seed/epis";
+import { seedRisks } from "./seed/risks";
+import { seedUsers } from "./seed/user";
 
 const prisma = new PrismaClient();
 
@@ -21,7 +21,8 @@ async function main() {
 }
 
 main()
-  .catch(() => {
+  .catch((error) => {
+    console.log(error);
     process.exit(1);
   })
   .finally(async () => {

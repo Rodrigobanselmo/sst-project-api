@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, Company, Workspace, Employee } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { databaseFindChanges } from '../../../../shared/utils/databaseFindChanges';
@@ -7,7 +7,6 @@ import { RecMedEntity } from '../../../sst/entities/recMed.entity';
 import { RiskFactorsEntity } from '../../../sst/entities/risk.entity';
 import { HierarchyEntity } from '../../entities/hierarchy.entity';
 import { CompanyEntity } from '../../entities/company.entity';
-import { company } from 'faker';
 import { EmployeeEntity } from '../../entities/employee.entity';
 
 @Injectable()

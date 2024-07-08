@@ -1,18 +1,26 @@
-import { Body, Controller, Delete, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
-import { classToClass } from 'class-transformer';
+import {
+  Body,
+  Controller,
+  Delete,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+} from "@nestjs/common";
+import { ApiTags } from "@nestjs/swagger";
+import { instanceToInstance } from "class-transformer";
 
-import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
-import { Permissions } from '../../../../shared/decorators/permissions.decorator';
-import { User } from '../../../../shared/decorators/user.decorator';
-import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
-import { CreateCouncilDto, UpdateCouncilDto } from '../../dto/council.dto';
-import { CreateCouncilService } from '../../services/professionals/create-council/create-council.service';
-import { DeleteCouncilService } from '../../services/professionals/delete-council/delete-council.service';
-import { UpdateCouncilService } from '../../services/professionals/update-council/update-council.service';
+import { PermissionEnum } from "../../../../shared/constants/enum/authorization";
+import { Permissions } from "../../../../shared/decorators/permissions.decorator";
+import { User } from "../../../../shared/decorators/user.decorator";
+import { UserPayloadDto } from "../../../../shared/dto/user-payload.dto";
+import { CreateCouncilDto, UpdateCouncilDto } from "../../dto/council.dto";
+import { CreateCouncilService } from "../../services/professionals/create-council/create-council.service";
+import { DeleteCouncilService } from "../../services/professionals/delete-council/delete-council.service";
+import { UpdateCouncilService } from "../../services/professionals/update-council/update-council.service";
 
-@ApiTags('councils')
-@Controller('/:companyId/councils')
+@ApiTags("councils")
+@Controller("/:companyId/councils")
 export class CouncilController {
   constructor(
     private readonly createCouncilService: CreateCouncilService,
@@ -53,8 +61,12 @@ export class CouncilController {
       crud: true,
     },
   )
-  @Patch('/:id')
-  async update(@Body() body: UpdateCouncilDto, @User() user: UserPayloadDto, @Param('id', ParseIntPipe) id: number) {
+  @Patch("/:id")
+  async update(
+    @Body() body: UpdateCouncilDto,
+    @User() user: UserPayloadDto,
+    @Param("id", ParseIntPipe) id: number,
+  ) {
     return this.updateCouncilService.execute({ id, ...body }, user);
   }
 
@@ -70,8 +82,13 @@ export class CouncilController {
       crud: true,
     },
   )
-  @Delete('/:professionalId/:id')
-  delete(@Param('id', ParseIntPipe) id: number, @Param('professionalId', ParseIntPipe) professionalId: number) {
-    return classToClass(this.deleteCouncilService.execute(id, professionalId));
+  @Delete("/:professionalId/:id")
+  delete(
+    @Param("id", ParseIntPipe) id: number,
+    @Param("professionalId", ParseIntPipe) professionalId: number,
+  ) {
+    return instanceToInstance(
+      this.deleteCouncilService.execute(id, professionalId),
+    );
   }
 }

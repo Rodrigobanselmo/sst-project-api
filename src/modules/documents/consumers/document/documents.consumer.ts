@@ -1,18 +1,25 @@
-import { Injectable, InternalServerErrorException, OnModuleInit } from '@nestjs/common';
-import { DocumentTypeEnum } from '@prisma/client';
-import * as AWS from 'aws-sdk';
-import { Consumer } from 'sqs-consumer';
+import {
+  Injectable,
+  InternalServerErrorException,
+  OnModuleInit,
+} from "@nestjs/common";
+import { DocumentTypeEnum } from "@prisma/client";
+import { Consumer } from "sqs-consumer";
+import { SQSClient } from "@aws-sdk/client-sqs";
 
-import { MessageSQS } from '../../../../shared/interfaces/message-sqs';
-import { UploadDocumentDto } from '../../dto/document.dto';
-import { PcmsoUploadService } from '../../services/document/document/upload-pcmso-doc.service';
-import { PgrUploadService } from '../../services/document/document/upload-pgr-doc.service';
-import { checkInternetConnectivity } from '../../../../shared/utils/isOnline';
+import { MessageSQS } from "../../../../shared/interfaces/message-sqs";
+import { UploadDocumentDto } from "../../dto/document.dto";
+import { PcmsoUploadService } from "../../services/document/document/upload-pcmso-doc.service";
+import { PgrUploadService } from "../../services/document/document/upload-pgr-doc.service";
+import { checkInternetConnectivity } from "../../../../shared/utils/isOnline";
 
 @Injectable()
 export class PgrConsumer implements OnModuleInit {
   private app: Consumer;
-  constructor(private readonly pgrUploadDocService: PgrUploadService, private readonly pcmsoUploadService: PcmsoUploadService) { }
+  constructor(
+    private readonly pgrUploadDocService: PgrUploadService,
+    private readonly pcmsoUploadService: PcmsoUploadService,
+  ) {}
 
   async onModuleInit() {
     const online = await checkInternetConnectivity();
@@ -21,15 +28,15 @@ export class PgrConsumer implements OnModuleInit {
       this.app = Consumer.create({
         queueUrl: process.env.AWS_SQS_PGR_URL,
         handleMessage: (message) => this.consume(message as any),
-        sqs: new AWS.SQS({ region: process.env.AWS_SQS_PGR_REGION }),
+        sqs: new SQSClient({ region: process.env.AWS_SQS_PGR_REGION }),
       });
 
-      this.app.on('error', this.handleSQSError);
-      this.app.on('processing_error', this.handleSQSProcessingError);
-      this.app.on('message_received', () => console.log('Message received'));
+      this.app.on("error", this.handleSQSError);
+      this.app.on("processing_error", this.handleSQSProcessingError);
+      this.app.on("message_received", () => console.log("Message received"));
       this.app.start();
     } else {
-      console.log('Skipping SQS connection. Working in offline mode.');
+      console.log("Skipping SQS connection. Working in offline mode.");
     }
   }
 
@@ -54,10 +61,10 @@ export class PgrConsumer implements OnModuleInit {
   }
 
   private handleSQSError = (error: Error) => {
-    console.error('SQS Error:', error.message);
+    console.error("SQS Error:", error.message);
   };
 
   private handleSQSProcessingError = (error: Error) => {
-    console.error('SQS Processing Error:', error.message);
+    console.error("SQS Processing Error:", error.message);
   };
 }

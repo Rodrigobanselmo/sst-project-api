@@ -1,11 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { DeleteAllExpiredService } from '../../services/session/delete-all-expired/delete-all-expired.service';
-import { RefreshTokenService } from '../../services/session/refresh-token/refresh-token.service';
-import { SendForgotPassMailService } from '../../services/session/send-forgot-pass-mail/send-forgot-pass-mail.service';
-import { SessionService } from '../../services/session/session/session.service';
-import { AuthController } from './auth.controller';
+import { Test, TestingModule } from "@nestjs/testing";
+import { DeleteAllExpiredService } from "../../services/session/delete-all-expired/delete-all-expired.service";
+import { RefreshTokenService } from "../../services/session/refresh-token/refresh-token.service";
+import { SendForgotPassMailService } from "../../services/session/send-forgot-pass-mail/send-forgot-pass-mail.service";
+import { SessionService } from "../../services/session/session/session.service";
+import { AuthController } from "./auth.controller";
 
-describe('AuthController', () => {
+describe("AuthController", () => {
   let controller: AuthController;
 
   beforeEach(async () => {
@@ -42,19 +42,21 @@ describe('AuthController', () => {
     controller = module.get<AuthController>(AuthController);
   });
 
-  it('should be defined', () => {
+  it("should be defined", () => {
     expect(controller).toBeDefined();
   });
 
-  it('should authenticate user session', async () => {
-    expect(await controller.session({} as any)).toEqual({});
+  it("should authenticate user session", async () => {
+    expect(await controller.session({} as any, {} as any, {} as any)).toEqual(
+      {}
+    );
   });
 
-  it('should refresh user token', async () => {
+  it("should refresh user token", async () => {
     expect(await controller.refresh({} as any)).toEqual({});
   });
 
-  it('should delete all expired tokens', async () => {
+  it("should delete all expired tokens", async () => {
     expect(await controller.deleteAll()).toEqual({});
   });
 });

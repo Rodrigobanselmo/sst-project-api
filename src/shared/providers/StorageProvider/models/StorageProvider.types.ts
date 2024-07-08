@@ -1,4 +1,4 @@
-import internal from 'stream';
+import internal from "stream";
 
 interface IStorageProvider {
   upload(params: FileStorage.Upload.Params): Promise<FileStorage.Upload.Result>;

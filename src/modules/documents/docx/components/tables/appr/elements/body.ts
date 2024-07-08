@@ -1,5 +1,16 @@
-import { AlignmentType, BorderStyle, ISpacingProperties, ITableCellOptions, Paragraph, TableCell, TableRow, TextRun, VerticalAlign, WidthType } from 'docx';
-import { palette } from '../../../../../../../shared/constants/palette';
+import {
+  AlignmentType,
+  BorderStyle,
+  ISpacingProperties,
+  ITableCellOptions,
+  Paragraph,
+  TableCell,
+  TableRow,
+  TextRun,
+  VerticalAlign,
+  WidthType,
+} from "docx";
+import { palette } from "../../../../../../../shared/constants/palette";
 
 export interface bodyTableProps extends Partial<ITableCellOptions> {
   text: string;
@@ -9,7 +20,7 @@ export interface bodyTableProps extends Partial<ITableCellOptions> {
   bold?: boolean;
   size?: number;
   spacing?: ISpacingProperties;
-  alignment?: AlignmentType;
+  alignment?: (typeof AlignmentType)[keyof typeof AlignmentType];
 }
 
 export const borderNoneStyle = {
@@ -26,11 +37,20 @@ export class TableBodyElements {
     });
   }
 
-  tableCell({ text = '', title, size = 10, bold, spacing = { line: 200 }, alignment = AlignmentType.LEFT, color, ...rest }: bodyTableProps) {
-    const tex = text || '';
+  tableCell({
+    text = "",
+    title,
+    size = 10,
+    bold,
+    spacing = { line: 200 },
+    alignment = AlignmentType.LEFT,
+    color,
+    ...rest
+  }: bodyTableProps) {
+    const tex = text || "";
     return new TableCell({
       children: [
-        ...tex.split('\n').map((value) => {
+        ...tex.split("\n").map((value) => {
           const children = [
             new TextRun({
               text: value,
@@ -43,7 +63,7 @@ export class TableBodyElements {
           if (title)
             children.push(
               new TextRun({
-                text: title + ' ',
+                text: title + " ",
                 size: 12,
                 color: color || palette.text.main.string,
                 bold: true,

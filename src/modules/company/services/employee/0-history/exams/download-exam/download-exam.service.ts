@@ -1,28 +1,35 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from "@nestjs/common";
 
-import { ErrorMessageEnum } from '../../../../../../../shared/constants/enum/errorMessage';
-import { UserPayloadDto } from '../../../../../../../shared/dto/user-payload.dto';
-import { AmazonStorageProvider } from '../../../../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
-import { EmployeeExamsHistoryRepository } from './../../../../../repositories/implementations/EmployeeExamsHistoryRepository';
+import { ErrorMessageEnum } from "../../../../../../../shared/constants/enum/errorMessage";
+import { UserPayloadDto } from "../../../../../../../shared/dto/user-payload.dto";
+import { AmazonStorageProvider } from "../../../../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider";
+import { EmployeeExamsHistoryRepository } from "./../../../../../repositories/implementations/EmployeeExamsHistoryRepository";
 
 @Injectable()
 export class DownloadExamService {
-  constructor(private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository, private readonly amazonStorageProvider: AmazonStorageProvider) {}
+  constructor(
+    private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository,
+    private readonly amazonStorageProvider: AmazonStorageProvider,
+  ) {}
 
   async execute(id: number, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;
-    const documentFound = await this.employeeExamHistoryRepository.findFirstNude({
-      where: {
-        id,
-        employee: { companyId },
-      },
-      select: { id: true, fileUrl: true },
-    });
+    const documentFound =
+      await this.employeeExamHistoryRepository.findFirstNude({
+        where: {
+          id,
+          employee: { companyId },
+        },
+        select: { id: true, fileUrl: true },
+      });
 
-    if (!documentFound?.id) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_HISTORY_NOT_FOUND);
+    if (!documentFound?.id)
+      throw new BadRequestException(
+        ErrorMessageEnum.EMPLOYEE_HISTORY_NOT_FOUND,
+      );
 
-    const fileKey = documentFound.fileUrl.split('.com/').pop();
-    const { file: fileStream } = this.amazonStorageProvider.download({
+    const fileKey = documentFound.fileUrl.split(".com/").pop();
+    const { file: fileStream } = await this.amazonStorageProvider.download({
       fileKey,
     });
 

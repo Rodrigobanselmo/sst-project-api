@@ -1,26 +1,32 @@
-import { m2mGetDeletedIds } from './../../../../shared/utils/m2mFilterIds';
-import { isEnvironment } from '../../../../shared/utils/isEnvironment';
-import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
+import { m2mGetDeletedIds } from "./../../../../shared/utils/m2mFilterIds";
+import { isEnvironment } from "../../../../shared/utils/isEnvironment";
+import { PaginationQueryDto } from "../../../../shared/dto/pagination.dto";
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Injectable } from '@nestjs/common';
-import { removeDuplicate } from '../../../../shared/utils/removeDuplicate';
+import { Injectable } from "@nestjs/common";
+import { removeDuplicate } from "../../../../shared/utils/removeDuplicate";
 
-import { PrismaService } from '../../../../prisma/prisma.service';
-import { FindRiskDataDto, UpsertManyRiskDataDto, UpsertRiskDataDto } from '../../dto/risk-data.dto';
-import { RiskFactorDataEntity } from '../../entities/riskData.entity';
-import { Prisma, PrismaPromise } from '@prisma/client';
-import { getMatrizRisk } from '../../../../shared/utils/matriz';
-import { EpiRiskDataEntity } from '../../entities/epiRiskData.entity';
-import { EpiRoRiskDataDto } from '../../dto/epi-risk-data.dto';
-import { EngsRiskDataDto } from '../../dto/engs-risk-data.dto';
-import { EngsRiskDataEntity } from '../../entities/engsRiskData.entity';
-import { ExamsRiskDataDto } from '../../dto/exams-risk-data.dto';
-import { ExamRiskDataEntity } from '../../entities/examRiskData.entity';
+import { PrismaService } from "../../../../prisma/prisma.service";
+import {
+  FindRiskDataDto,
+  UpsertManyRiskDataDto,
+  UpsertRiskDataDto,
+} from "../../dto/risk-data.dto";
+import { RiskFactorDataEntity } from "../../entities/riskData.entity";
+import { Prisma, PrismaPromise } from "@prisma/client";
+import { getMatrizRisk } from "../../../../shared/utils/matriz";
+import { EpiRiskDataEntity } from "../../entities/epiRiskData.entity";
+import { EpiRoRiskDataDto } from "../../dto/epi-risk-data.dto";
+import { EngsRiskDataDto } from "../../dto/engs-risk-data.dto";
+import { EngsRiskDataEntity } from "../../entities/engsRiskData.entity";
+import { ExamsRiskDataDto } from "../../dto/exams-risk-data.dto";
+import { ExamRiskDataEntity } from "../../entities/examRiskData.entity";
 
 @Injectable()
 export class RiskDataRepository {
-  constructor(private prisma: PrismaService) { }
-  async upsert(upsertRiskDataDto: Omit<UpsertRiskDataDto, 'keepEmpty' | 'type'>): Promise<RiskFactorDataEntity> {
+  constructor(private prisma: PrismaService) {}
+  async upsert(
+    upsertRiskDataDto: Omit<UpsertRiskDataDto, "keepEmpty" | "type">
+  ): Promise<RiskFactorDataEntity> {
     const level = await this.addLevel(upsertRiskDataDto);
     if (level) upsertRiskDataDto.level = level;
 
@@ -29,7 +35,9 @@ export class RiskDataRepository {
     return new RiskFactorDataEntity(riskFactorData);
   }
 
-  async upsertConnectMany(upsertManyRiskDataDto: UpsertManyRiskDataDto): Promise<RiskFactorDataEntity[]> {
+  async upsertConnectMany(
+    upsertManyRiskDataDto: UpsertManyRiskDataDto
+  ): Promise<RiskFactorDataEntity[]> {
     const homogeneousGroupIds = upsertManyRiskDataDto.homogeneousGroupIds;
     if (homogeneousGroupIds) {
       delete upsertManyRiskDataDto.homogeneousGroupIds;
@@ -44,16 +52,20 @@ export class RiskDataRepository {
           this.upsertConnectPrisma({
             homogeneousGroupId,
             ...upsertManyRiskDataDto,
-          } as unknown as UpsertRiskDataDto),
-        ),
+          } as unknown as UpsertRiskDataDto)
+        )
       );
 
-      return data.map((riskFactorData) => new RiskFactorDataEntity(riskFactorData));
+      return data.map(
+        (riskFactorData) => new RiskFactorDataEntity(riskFactorData)
+      );
     }
     return [];
   }
 
-  async upsertMany(upsertManyRiskDataDto: UpsertManyRiskDataDto): Promise<RiskFactorDataEntity[]> {
+  async upsertMany(
+    upsertManyRiskDataDto: UpsertManyRiskDataDto
+  ): Promise<RiskFactorDataEntity[]> {
     const homogeneousGroupIds = upsertManyRiskDataDto.homogeneousGroupIds;
     if (homogeneousGroupIds) {
       delete upsertManyRiskDataDto.homogeneousGroupIds;
@@ -68,11 +80,13 @@ export class RiskDataRepository {
           this.upsertPrisma({
             homogeneousGroupId,
             ...upsertManyRiskDataDto,
-          } as unknown as UpsertRiskDataDto),
-        ),
+          } as unknown as UpsertRiskDataDto)
+        )
       );
 
-      return data.map((riskFactorData) => new RiskFactorDataEntity(riskFactorData));
+      return data.map(
+        (riskFactorData) => new RiskFactorDataEntity(riskFactorData)
+      );
     }
     return [];
   }
@@ -99,15 +113,20 @@ export class RiskDataRepository {
     return riskFactorData.map((data) => {
       const riskData = { ...data } as unknown as RiskFactorDataEntity;
       if (data.homogeneousGroup && data.homogeneousGroup.hierarchyOnHomogeneous)
-        riskData.homogeneousGroup.hierarchies = data.homogeneousGroup.hierarchyOnHomogeneous.map((homo) => ({
-          ...homo.hierarchy,
-        }));
+        riskData.homogeneousGroup.hierarchies =
+          data.homogeneousGroup.hierarchyOnHomogeneous.map((homo) => ({
+            ...homo.hierarchy,
+          }));
 
       return new RiskFactorDataEntity(riskData);
     });
   }
 
-  async findAllByGroupAndRisk(riskFactorGroupDataId: string, riskId: string, companyId: string) {
+  async findAllByGroupAndRisk(
+    riskFactorGroupDataId: string,
+    riskId: string,
+    companyId: string
+  ) {
     const riskFactorData = (await this.prisma.riskFactorData.findMany({
       where: { riskFactorGroupDataId, companyId, riskId },
       include: {
@@ -123,13 +142,19 @@ export class RiskDataRepository {
     return riskFactorData.map((data) => new RiskFactorDataEntity(data));
   }
 
-  async findAllActionPlan(riskFactorGroupDataId: string, workspaceId: string, companyId: string, query: Partial<FindRiskDataDto>, pagination: PaginationQueryDto) {
+  async findAllActionPlan(
+    riskFactorGroupDataId: string,
+    workspaceId: string,
+    companyId: string,
+    query: Partial<FindRiskDataDto>,
+    pagination: PaginationQueryDto
+  ) {
     const where = {
       AND: [
         {
           riskFactorGroupDataId,
           companyId,
-          recs: { some: { recName: { contains: '' } } },
+          recs: { some: { recName: { contains: "" } } },
           homogeneousGroup: {
             hierarchyOnHomogeneous: {
               some: {
@@ -147,7 +172,7 @@ export class RiskDataRepository {
           },
         },
       ],
-    } as Prisma.RiskFactorDataFindManyArgs['where'];
+    } as Prisma.RiskFactorDataFindManyArgs["where"];
 
     // if ('search' in query && query.search) {
     //   (where.AND as any).push({
@@ -172,7 +197,7 @@ export class RiskDataRepository {
       }),
       this.prisma.riskFactorData.findMany({
         where,
-        orderBy: { level: 'desc' },
+        orderBy: { level: "desc" },
         take: pagination.take || 20,
         skip: pagination.skip || 0,
         include: {
@@ -193,7 +218,10 @@ export class RiskDataRepository {
 
     const riskData = await Promise.all(
       (response[1] as unknown as RiskFactorDataEntity[]).map(async (data) => {
-        if (data.homogeneousGroup && data.homogeneousGroup.type === 'HIERARCHY') {
+        if (
+          data.homogeneousGroup &&
+          data.homogeneousGroup.type === "HIERARCHY"
+        ) {
           const hierarchy = await this.prisma.hierarchy.findUnique({
             where: { id: data.homogeneousGroup.id },
           });
@@ -201,14 +229,18 @@ export class RiskDataRepository {
           data.homogeneousGroup.hierarchy = hierarchy;
         }
 
-        if (data.homogeneousGroup.characterization && isEnvironment(data.homogeneousGroup.characterization.type)) {
-          data.homogeneousGroup.environment = data.homogeneousGroup.characterization;
+        if (
+          data.homogeneousGroup.characterization &&
+          isEnvironment(data.homogeneousGroup.characterization.type)
+        ) {
+          data.homogeneousGroup.environment =
+            data.homogeneousGroup.characterization;
 
           data.homogeneousGroup.characterization = null;
         }
 
         return new RiskFactorDataEntity(data);
-      }),
+      })
     );
 
     return {
@@ -217,7 +249,11 @@ export class RiskDataRepository {
     };
   }
 
-  async findAllByHomogeneousGroupId(companyId: string, riskFactorGroupDataId: string, homogeneousGroupId: string) {
+  async findAllByHomogeneousGroupId(
+    companyId: string,
+    riskFactorGroupDataId: string,
+    homogeneousGroupId: string
+  ) {
     const riskFactorData = (await this.prisma.riskFactorData.findMany({
       where: { riskFactorGroupDataId, companyId, homogeneousGroupId },
       include: {
@@ -230,7 +266,7 @@ export class RiskDataRepository {
         riskFactor: {
           select: {
             examToRisk: {
-              select: { id: true, exam: { select: { name: true } }, },
+              select: { id: true, exam: { select: { name: true } } },
               where: {
                 deletedAt: null,
                 companyId,
@@ -240,11 +276,11 @@ export class RiskDataRepository {
                   { isReturn: true },
                   { isChange: true },
                   { isDismissal: true },
-                ]
-              }
-            }
-          }
-        }
+                ],
+              },
+            },
+          },
+        },
       },
     })) as RiskFactorDataEntity[];
 
@@ -255,12 +291,11 @@ export class RiskDataRepository {
     companyId: string,
     // riskFactorGroupDataId: string,
     hierarchyId: string,
-    options: Prisma.RiskFactorDataFindManyArgs = {},
+    options: Prisma.RiskFactorDataFindManyArgs = {}
   ) {
     const riskFactorData = (await this.prisma.riskFactorData.findMany({
       ...options,
       where: {
-        // riskFactorGroupDataId,
         companyId,
         homogeneousGroup: { hierarchyOnHomogeneous: { some: { hierarchyId } } },
         ...options?.where,
@@ -303,7 +338,7 @@ export class RiskDataRepository {
         },
         ...options.include,
       },
-    })) as RiskFactorDataEntity[];
+    })) as unknown as RiskFactorDataEntity[];
 
     return riskFactorData.map((data) => new RiskFactorDataEntity(data));
   }
@@ -340,17 +375,35 @@ export class RiskDataRepository {
     return riskFactorData;
   }
 
-  async deleteByHomoAndRisk(homogeneousGroupIds: string[], riskIds: string[], groupId: string) {
+  async deleteByHomoAndRisk(
+    homogeneousGroupIds: string[],
+    riskIds: string[],
+    groupId: string
+  ) {
     const riskFactorData = await this.prisma.riskFactorData.deleteMany({
       where: {
-        AND: [{ homogeneousGroupId: { in: homogeneousGroupIds } }, { riskId: { in: riskIds } }, { riskFactorGroupDataId: groupId }],
+        AND: [
+          { homogeneousGroupId: { in: homogeneousGroupIds } },
+          { riskId: { in: riskIds } },
+          { riskFactorGroupDataId: groupId },
+        ],
       },
     });
 
     return riskFactorData;
   }
 
-  private async upsertPrisma({ recs, adms, engs, epis, exams, generateSources, companyId, id, ...createDto }: Omit<UpsertRiskDataDto, 'keepEmpty'>) {
+  private async upsertPrisma({
+    recs,
+    adms,
+    engs,
+    epis,
+    exams,
+    generateSources,
+    companyId,
+    id,
+    ...createDto
+  }: Omit<UpsertRiskDataDto, "keepEmpty">) {
     const isCreation = !id;
     if (isCreation) {
       const foundRiskData = await this.prisma.riskFactorData.findMany({
@@ -359,11 +412,13 @@ export class RiskDataRepository {
           riskId: createDto.riskId,
           homogeneousGroupId: createDto.homogeneousGroupId,
         },
-        orderBy: { endDate: 'desc' },
+        orderBy: { endDate: "desc" },
       });
 
       if (foundRiskData.length !== 0) {
-        const findEndDateNull = foundRiskData.find((riskData) => riskData.endDate == null);
+        const findEndDateNull = foundRiskData.find(
+          (riskData) => riskData.endDate == null
+        );
         if (findEndDateNull) id = findEndDateNull.id;
       }
     }
@@ -374,24 +429,24 @@ export class RiskDataRepository {
         companyId,
         generateSources: generateSources
           ? {
-            connect: generateSources.map((id) => ({
-              id,
-            })),
-          }
+              connect: generateSources.map((id) => ({
+                id,
+              })),
+            }
           : undefined,
         recs: recs
           ? {
-            connect: recs.map((id) => ({
-              id,
-            })),
-          }
+              connect: recs.map((id) => ({
+                id,
+              })),
+            }
           : undefined,
         adms: adms
           ? {
-            connect: adms.map((id) => ({
-              id,
-            })),
-          }
+              connect: adms.map((id) => ({
+                id,
+              })),
+            }
           : undefined,
       },
       update: {
@@ -399,28 +454,28 @@ export class RiskDataRepository {
         companyId,
         recs: recs
           ? {
-            set: recs.map((id) => ({
-              id,
-            })),
-          }
+              set: recs.map((id) => ({
+                id,
+              })),
+            }
           : undefined,
         adms: adms
           ? {
-            set: adms.map((id) => ({
-              id,
-            })),
-          }
+              set: adms.map((id) => ({
+                id,
+              })),
+            }
           : undefined,
         generateSources: generateSources
           ? {
-            set: generateSources.map((id) => ({
-              id,
-            })),
-          }
+              set: generateSources.map((id) => ({
+                id,
+              })),
+            }
           : undefined,
       },
       where: {
-        id: id || 'no-id',
+        id: id || "no-id",
       },
       include: {
         adms: true,
@@ -438,13 +493,15 @@ export class RiskDataRepository {
           where: {
             riskFactorDataId: riskData.id,
             epiId: {
-              in: m2mGetDeletedIds(riskData.epiToRiskFactorData, epis, 'epiId'),
+              in: m2mGetDeletedIds(riskData.epiToRiskFactorData, epis, "epiId"),
             },
           },
         });
       }
 
-      riskData.epiToRiskFactorData = await this.setEpis(epis.map((epi) => ({ ...epi, riskFactorDataId: riskData.id })));
+      riskData.epiToRiskFactorData = await this.setEpis(
+        epis.map((epi) => ({ ...epi, riskFactorDataId: riskData.id }))
+      );
     }
 
     if (engs) {
@@ -453,7 +510,11 @@ export class RiskDataRepository {
           where: {
             riskFactorDataId: riskData.id,
             recMedId: {
-              in: m2mGetDeletedIds(riskData.engsToRiskFactorData, engs, 'recMedId'),
+              in: m2mGetDeletedIds(
+                riskData.engsToRiskFactorData,
+                engs,
+                "recMedId"
+              ),
             },
           },
         });
@@ -463,7 +524,7 @@ export class RiskDataRepository {
         engs.map((eng) => ({
           ...eng,
           riskFactorDataId: riskData.id,
-        })),
+        }))
       );
     }
 
@@ -473,30 +534,50 @@ export class RiskDataRepository {
           where: {
             riskFactorDataId: riskData.id,
             examId: {
-              in: m2mGetDeletedIds(riskData.examsToRiskFactorData, exams, 'examId'),
+              in: m2mGetDeletedIds(
+                riskData.examsToRiskFactorData,
+                exams,
+                "examId"
+              ),
             },
           },
         });
       }
 
-      riskData.examsToRiskFactorData = await this.setExams(exams.filter(i => i.examId).map((exam) => ({ ...exam, riskFactorDataId: riskData.id })));
+      riskData.examsToRiskFactorData = await this.setExams(
+        exams
+          .filter((i) => i.examId)
+          .map((exam) => ({ ...exam, riskFactorDataId: riskData.id }))
+      );
     }
 
     return riskData;
   }
 
-  private async upsertConnectPrisma({ recs, adms, engs, epis, exams, generateSources, companyId, id, ...createDto }: Omit<UpsertRiskDataDto, 'keepEmpty'>) {
+  private async upsertConnectPrisma({
+    recs,
+    adms,
+    engs,
+    epis,
+    exams,
+    generateSources,
+    companyId,
+    id,
+    ...createDto
+  }: Omit<UpsertRiskDataDto, "keepEmpty">) {
     const foundRiskData = await this.prisma.riskFactorData.findMany({
       where: {
         riskFactorGroupDataId: createDto.riskFactorGroupDataId,
         riskId: createDto.riskId,
         homogeneousGroupId: createDto.homogeneousGroupId,
       },
-      orderBy: { endDate: 'desc' },
+      orderBy: { endDate: "desc" },
     });
 
     if (foundRiskData.length !== 0) {
-      const findEndDateNull = foundRiskData.find((riskData) => riskData.endDate == null);
+      const findEndDateNull = foundRiskData.find(
+        (riskData) => riskData.endDate == null
+      );
       if (findEndDateNull) id = findEndDateNull.id;
     }
 
@@ -506,24 +587,24 @@ export class RiskDataRepository {
         companyId,
         generateSources: generateSources
           ? {
-            connect: generateSources.map((id) => ({
-              id,
-            })),
-          }
+              connect: generateSources.map((id) => ({
+                id,
+              })),
+            }
           : undefined,
         recs: recs
           ? {
-            connect: recs.map((id) => ({
-              id,
-            })),
-          }
+              connect: recs.map((id) => ({
+                id,
+              })),
+            }
           : undefined,
         adms: adms
           ? {
-            connect: adms.map((id) => ({
-              id,
-            })),
-          }
+              connect: adms.map((id) => ({
+                id,
+              })),
+            }
           : undefined,
       },
       update: {
@@ -531,28 +612,28 @@ export class RiskDataRepository {
         companyId,
         recs: recs
           ? {
-            connect: recs.map((id) => ({
-              id,
-            })),
-          }
+              connect: recs.map((id) => ({
+                id,
+              })),
+            }
           : undefined,
         adms: adms
           ? {
-            connect: adms.map((id) => ({
-              id,
-            })),
-          }
+              connect: adms.map((id) => ({
+                id,
+              })),
+            }
           : undefined,
         generateSources: generateSources
           ? {
-            connect: generateSources.map((id) => ({
-              id,
-            })),
-          }
+              connect: generateSources.map((id) => ({
+                id,
+              })),
+            }
           : undefined,
       },
       where: {
-        id: id || 'no-id',
+        id: id || "no-id",
       },
       include: {
         adms: true,
@@ -566,26 +647,32 @@ export class RiskDataRepository {
 
     if (epis)
       riskData.epiToRiskFactorData = await this.setEpis(
-        epis.filter(i => i.epiId).map((epi) => ({
-          ...epi,
-          riskFactorDataId: riskData.id,
-        })),
+        epis
+          .filter((i) => i.epiId)
+          .map((epi) => ({
+            ...epi,
+            riskFactorDataId: riskData.id,
+          }))
       );
 
     if (engs)
       riskData.engsToRiskFactorData = await this.setEngs(
-        engs.filter(i => i.recMedId).map((eng) => ({
-          ...eng,
-          riskFactorDataId: riskData.id,
-        })),
+        engs
+          .filter((i) => i.recMedId)
+          .map((eng) => ({
+            ...eng,
+            riskFactorDataId: riskData.id,
+          }))
       );
 
     if (exams)
       riskData.examsToRiskFactorData = await this.setExams(
-        exams.filter(i => i.examId).map((exam) => ({
-          ...exam,
-          riskFactorDataId: riskData.id,
-        })),
+        exams
+          .filter((i) => i.examId)
+          .map((exam) => ({
+            ...exam,
+            riskFactorDataId: riskData.id,
+          }))
       );
 
     return riskData;
@@ -602,8 +689,8 @@ export class RiskDataRepository {
             riskFactorDataId_epiId: { riskFactorDataId, epiId },
           },
           include: { epi: true },
-        }),
-      ),
+        })
+      )
     );
 
     return data as EpiRiskDataEntity[];
@@ -620,8 +707,8 @@ export class RiskDataRepository {
             examId_riskFactorDataId: { riskFactorDataId, examId },
           },
           include: { exam: true },
-        }),
-      ),
+        })
+      )
     );
 
     return data as ExamRiskDataEntity[];
@@ -638,14 +725,22 @@ export class RiskDataRepository {
             riskFactorDataId_recMedId: { riskFactorDataId, recMedId },
           },
           include: { recMed: true },
-        }),
-      ),
+        })
+      )
     );
 
     return data as EngsRiskDataEntity[];
   }
 
-  private async addLevel({ riskId, probability, json }: { riskId?: string; json?: any; probability?: number }) {
+  private async addLevel({
+    riskId,
+    probability,
+    json,
+  }: {
+    riskId?: string;
+    json?: any;
+    probability?: number;
+  }) {
     let level = 0;
     let realProbability = probability;
 
