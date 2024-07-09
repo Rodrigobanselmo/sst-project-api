@@ -63,7 +63,7 @@ export class CreateRecMedDto {
   @IsOptional()
   @IsBoolean()
   @ToBoolean()
-  skipIfExist?: boolean
+  skipIfExist?: boolean;
 }
 
 export class UpsertRecMedDto extends CreateRecMedDto {

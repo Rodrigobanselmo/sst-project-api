@@ -58,7 +58,11 @@ export class RiskDocumentRepository {
     return riskDocumentEntity.map((data) => new RiskDocumentEntity(data));
   }
 
-  async find(query: Partial<FindDocVersionDto & { companyId: string }>, pagination: PaginationQueryDto, options: Prisma.RiskFactorDocumentFindManyArgs = {}) {
+  async find(
+    query: Partial<FindDocVersionDto & { companyId: string }>,
+    pagination: PaginationQueryDto,
+    options: Prisma.RiskFactorDocumentFindManyArgs = {},
+  ) {
     const whereInit = {
       AND: [],
       ...options.where,
@@ -71,7 +75,10 @@ export class RiskDocumentRepository {
 
     if ('search' in query && query.search) {
       (where.AND as any).push({
-        OR: [{ name: { contains: query.search, mode: 'insensitive' } }, { version: { contains: query.search, mode: 'insensitive' } }],
+        OR: [
+          { name: { contains: query.search, mode: 'insensitive' } },
+          { version: { contains: query.search, mode: 'insensitive' } },
+        ],
       } as typeof options.where);
     }
 

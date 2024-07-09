@@ -1,6 +1,6 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable } from '@nestjs/common';
 
-import { ESocialEventProvider } from "../../../../../../shared/providers/ESocialProvider/implementations/ESocialEventProvider";
+import { ESocialEventProvider } from '../../../../../../shared/providers/ESocialProvider/implementations/ESocialEventProvider';
 
 @Injectable()
 export class FetchOneESocialBatchEventsService {

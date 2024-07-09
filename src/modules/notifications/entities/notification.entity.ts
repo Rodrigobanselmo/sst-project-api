@@ -1,4 +1,3 @@
-
 import { Notification, Prisma } from '.prisma/client';
 
 export class NotificationEntity implements Notification {

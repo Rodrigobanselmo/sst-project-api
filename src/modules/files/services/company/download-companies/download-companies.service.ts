@@ -21,7 +21,8 @@ export class DownloadCompaniesService {
     const companyId = userPayloadDto.companyId;
 
     return this.downloadExcelProvider.newTableData({
-      findAll: (sheet) => findAllCompanies(this.excelProvider, this.companyRepository, sheet, companyId, userPayloadDto.isMaster),
+      findAll: (sheet) =>
+        findAllCompanies(this.excelProvider, this.companyRepository, sheet, companyId, userPayloadDto.isMaster),
       Workbook,
       companyId,
     });

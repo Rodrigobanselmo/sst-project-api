@@ -93,27 +93,29 @@ export const environmentIterable = (
         //   });
       }
 
-      risks.filter(risk => filterRisk(risk)).forEach((risk, index) => {
-        if (index === 0)
+      risks
+        .filter((risk) => filterRisk(risk))
+        .forEach((risk, index) => {
+          if (index === 0)
+            riskFactors.push({
+              type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
+              text: '**Fatores de risco:**',
+            });
+
           riskFactors.push({
-            type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
-            text: '**Fatores de risco:**',
+            type: DocumentSectionChildrenTypeEnum.BULLET,
+            level: 0,
+            text: `${risk.name} (${risk.type})`,
+            alignment: AlignmentType.START,
           });
 
-        riskFactors.push({
-          type: DocumentSectionChildrenTypeEnum.BULLET,
-          level: 0,
-          text: `${risk.name} (${risk.type})`,
-          alignment: AlignmentType.START,
+          if (index === risks.length - 1)
+            riskFactors.push({
+              type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
+              text: '',
+              removeWithSomeEmptyVars: [VariablesPGREnum.ENVIRONMENT_DESCRIPTION],
+            });
         });
-
-        if (index === risks.length - 1)
-          riskFactors.push({
-            type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
-            text: '',
-            removeWithSomeEmptyVars: [VariablesPGREnum.ENVIRONMENT_DESCRIPTION],
-          });
-      });
 
       cons.forEach((consideration, index) => {
         if (index === 0)

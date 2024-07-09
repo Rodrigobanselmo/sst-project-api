@@ -39,7 +39,9 @@ export const hierarchyHomoOrgTable = (
     width: { size: 100, type: WidthType.PERCENTAGE },
     rows: [
       tableHeaderElements.headerRow(headerData.map(tableHeaderElements.headerCell)),
-      ...bodyData.filter((data) => data).map((data) => tableBodyElements.tableRow(data.map(tableBodyElements.tableCell))),
+      ...bodyData
+        .filter((data) => data)
+        .map((data) => tableBodyElements.tableRow(data.map(tableBodyElements.tableCell))),
     ],
   });
 

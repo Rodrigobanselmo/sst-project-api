@@ -8,7 +8,10 @@ import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 
 @Injectable()
 export class UpdateHierarchyService {
-  constructor(private readonly hierarchyRepository: HierarchyRepository, private readonly employeeRepository: EmployeeRepository) {}
+  constructor(
+    private readonly hierarchyRepository: HierarchyRepository,
+    private readonly employeeRepository: EmployeeRepository,
+  ) {}
 
   async execute(hierarchy: UpdateHierarchyDto, user: UserPayloadDto) {
     if (hierarchy.parentId && hierarchy.type === HierarchyEnum.DIRECTORY) {
@@ -41,7 +44,9 @@ export class UpdateHierarchyService {
         where: { id: { in: hierarchy.employeesIds } },
       });
 
-      const employeesIdsToDisconnect = employeeFound.filter((employee) => employee.hierarchyId !== hierarchy.id).map((employee) => employee.id);
+      const employeesIdsToDisconnect = employeeFound
+        .filter((employee) => employee.hierarchyId !== hierarchy.id)
+        .map((employee) => employee.id);
 
       await this.employeeRepository.disconnectSubOffices(employeesIdsToDisconnect, user.targetCompanyId);
     }

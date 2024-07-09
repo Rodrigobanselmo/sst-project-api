@@ -5,7 +5,11 @@ import { palette } from '../../../../../../../shared/constants/palette';
 import { getMatrizRisk } from '../../../../../../../shared/utils/matriz';
 import { sortData } from '../../../../../../../shared/utils/sorts/data.sort';
 import { RiskFactorGroupDataEntity } from '../../../../../../sst/entities/riskGroupData.entity';
-import { IRiskDataJson, IRiskDataJsonRadiation, QuantityTypeEnum } from '../../../../../../company/interfaces/risk-data-json.types';
+import {
+  IRiskDataJson,
+  IRiskDataJsonRadiation,
+  QuantityTypeEnum,
+} from '../../../../../../company/interfaces/risk-data-json.types';
 import { borderStyleGlobal } from '../../../../base/config/styles';
 import { IHierarchyMap } from '../../../../converter/hierarchy.converter';
 import { bodyTableProps } from './elements/body';

@@ -8,7 +8,10 @@ import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 
 @Injectable()
 export class UpsertManyHierarchyService {
-  constructor(private readonly hierarchyRepository: HierarchyRepository, private readonly employeeRepository: EmployeeRepository) {}
+  constructor(
+    private readonly hierarchyRepository: HierarchyRepository,
+    private readonly employeeRepository: EmployeeRepository,
+  ) {}
 
   async execute(hierarchies: UpdateHierarchyDto[], user: UserPayloadDto) {
     await Promise.all(
@@ -16,7 +19,10 @@ export class UpsertManyHierarchyService {
         if (hierarchy.parentId && ([HierarchyEnum.DIRECTORY] as HierarchyEnum[]).includes(hierarchy.type)) {
           throw new BadRequestException(ErrorCompanyEnum.UPDATE_HIERARCHY_WITH_PARENT);
         }
-        if (!hierarchy.parentId && ([HierarchyEnum.SUB_SECTOR, HierarchyEnum.SUB_OFFICE] as HierarchyEnum[]).includes(hierarchy.type)) {
+        if (
+          !hierarchy.parentId &&
+          ([HierarchyEnum.SUB_SECTOR, HierarchyEnum.SUB_OFFICE] as HierarchyEnum[]).includes(hierarchy.type)
+        ) {
           throw new BadRequestException(ErrorCompanyEnum.UPSERT_HIERARCHY_WITH_PARENT);
         }
 

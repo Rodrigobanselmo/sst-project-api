@@ -1,18 +1,18 @@
 import ffmpeg from 'fluent-ffmpeg';
 
 export function convert3gpToMp3(inputPath: string, outputPath: string): Promise<string> {
-    return new Promise((resolve, reject) => {
-        ffmpeg(inputPath)
-            .toFormat('mp3')
-            .on('error', (err: Error) => {
-                console.error(`An error occurred: ${err.message}`);
-                reject(err);
-            })
-            .on('end', () => {
-                resolve(outputPath);
-            })
-            .save(outputPath);
-    });
+  return new Promise((resolve, reject) => {
+    ffmpeg(inputPath)
+      .toFormat('mp3')
+      .on('error', (err: Error) => {
+        console.error(`An error occurred: ${err.message}`);
+        reject(err);
+      })
+      .on('end', () => {
+        resolve(outputPath);
+      })
+      .save(outputPath);
+  });
 }
 
 // Example usage

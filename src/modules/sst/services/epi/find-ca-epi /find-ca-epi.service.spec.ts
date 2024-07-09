@@ -1,7 +1,7 @@
-import { Test, TestingModule } from "@nestjs/testing";
-import { FindByCAEpiService } from "./find-ca-epi.service";
+import { Test, TestingModule } from '@nestjs/testing';
+import { FindByCAEpiService } from './find-ca-epi.service';
 
-describe.skip("FindCAEpiService", () => {
+describe.skip('FindCAEpiService', () => {
   let service: FindByCAEpiService;
 
   beforeEach(async () => {
@@ -12,7 +12,7 @@ describe.skip("FindCAEpiService", () => {
     service = module.get<FindByCAEpiService>(FindByCAEpiService);
   });
 
-  it("should be defined", () => {
+  it('should be defined', () => {
     expect(service).toBeDefined();
   });
 });

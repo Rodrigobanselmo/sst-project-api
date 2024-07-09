@@ -5,13 +5,20 @@ import { PrismaService } from '../../../../prisma/prisma.service';
 import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
 
 import { prismaFilter } from '../../../../shared/utils/filters/prisma.filters';
-import { CreateScheduleMedicalVisitDto, FindScheduleMedicalVisitDto, UpdateScheduleMedicalVisitDto } from '../../dto/scheduleMedicalVisit.dto';
+import {
+  CreateScheduleMedicalVisitDto,
+  FindScheduleMedicalVisitDto,
+  UpdateScheduleMedicalVisitDto,
+} from '../../dto/scheduleMedicalVisit.dto';
 import { ScheduleMedicalVisitEntity } from '../../entities/schedule-medical-visit.entity';
 import { EmployeeExamsHistoryRepository } from './EmployeeExamsHistoryRepository';
 
 @Injectable()
 export class ScheduleMedicalVisitRepository {
-  constructor(private prisma: PrismaService, private employeeExamsHistoryRepository: EmployeeExamsHistoryRepository) { }
+  constructor(
+    private prisma: PrismaService,
+    private employeeExamsHistoryRepository: EmployeeExamsHistoryRepository,
+  ) {}
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async create({ companyId, ...data }: CreateScheduleMedicalVisitDto & { userId: number }) {
@@ -27,7 +34,11 @@ export class ScheduleMedicalVisitRepository {
         doneLabDate: data.doneLabDate,
         exams: {
           createMany: {
-            data: data.exams.map((exam) => this.employeeExamsHistoryRepository.createManyData({ ...exam, userScheduleId: data.userId })).flat(1),
+            data: data.exams
+              .map((exam) =>
+                this.employeeExamsHistoryRepository.createManyData({ ...exam, userScheduleId: data.userId }),
+              )
+              .flat(1),
           },
         },
       },
@@ -57,8 +68,8 @@ export class ScheduleMedicalVisitRepository {
 
     if (visitOld.status !== data.status) {
       await this.prisma.employeeExamsHistory.updateMany({
-        data: { status: data.status, },
-        where: { status: visitOld.status, scheduleMedicalVisitId: id, },
+        data: { status: data.status },
+        where: { status: visitOld.status, scheduleMedicalVisitId: id },
       });
     }
 
@@ -83,7 +94,11 @@ export class ScheduleMedicalVisitRepository {
     return new ScheduleMedicalVisitEntity(visit);
   }
 
-  async find(query: Partial<FindScheduleMedicalVisitDto>, pagination: PaginationQueryDto, options: Prisma.ScheduleMedicalVisitFindManyArgs = {}) {
+  async find(
+    query: Partial<FindScheduleMedicalVisitDto>,
+    pagination: PaginationQueryDto,
+    options: Prisma.ScheduleMedicalVisitFindManyArgs = {},
+  ) {
     const whereInit = {
       AND: [],
     } as typeof options.where;
@@ -109,7 +124,10 @@ export class ScheduleMedicalVisitRepository {
 
     if ('search' in query && query.search) {
       (where.AND as any).push({
-        OR: [{ company: { name: { contains: query.search, mode: 'insensitive' } } }, { company: { fantasy: { contains: query.search, mode: 'insensitive' } } }],
+        OR: [
+          { company: { name: { contains: query.search, mode: 'insensitive' } } },
+          { company: { fantasy: { contains: query.search, mode: 'insensitive' } } },
+        ],
       } as typeof options.where);
       delete query.search;
     }
@@ -122,14 +140,14 @@ export class ScheduleMedicalVisitRepository {
           },
           ...(!query.onlyCompany
             ? [
-              {
-                company: {
-                  receivingServiceContracts: {
-                    some: { applyingServiceCompanyId: query.companyId },
+                {
+                  company: {
+                    receivingServiceContracts: {
+                      some: { applyingServiceCompanyId: query.companyId },
+                    },
                   },
                 },
-              },
-            ]
+              ]
             : []),
         ],
       } as typeof options.where);
@@ -202,7 +220,10 @@ export class ScheduleMedicalVisitRepository {
     return count;
   }
 
-  async findById({ companyId, id }: { companyId: string; id: number }, options: Prisma.ScheduleMedicalVisitFindFirstArgs = {}) {
+  async findById(
+    { companyId, id }: { companyId: string; id: number },
+    options: Prisma.ScheduleMedicalVisitFindFirstArgs = {},
+  ) {
     const visit = await this.prisma.scheduleMedicalVisit.findFirst({
       where: { id, companyId },
       include: {
@@ -211,7 +232,10 @@ export class ScheduleMedicalVisitRepository {
         doc: { include: { professional: true } },
         user: true,
         company: true,
-        exams: { where: { status: { notIn: ['CANCELED', 'EXPIRED'] } }, select: { id: true, examId: true, employeeId: true, examType: true, scheduleMedicalVisitId: true } },
+        exams: {
+          where: { status: { notIn: ['CANCELED', 'EXPIRED'] } },
+          select: { id: true, examId: true, employeeId: true, examType: true, scheduleMedicalVisitId: true },
+        },
         // exams: {select:{employeeId:true,examType:true,examId:true,}}
       },
       ...options,

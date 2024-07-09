@@ -49,7 +49,11 @@ export class PdfGuideDataService {
                     cnpj: true,
                     logoUrl: true,
                     fantasy: true,
-                    contacts: { select: { phone: true, id: true, isPrincipal: true, email: true }, take: 1, orderBy: { isPrincipal: 'desc' } },
+                    contacts: {
+                      select: { phone: true, id: true, isPrincipal: true, email: true },
+                      take: 1,
+                      orderBy: { isPrincipal: 'desc' },
+                    },
                   },
                 },
               },
@@ -173,7 +177,9 @@ export class PdfGuideDataService {
       exams: examInstructions,
       consultantCompany: consultantCompany?.id ? consultantCompany : actualCompany,
       company: actualCompany,
-      clinicComplementaryExams: Object.values(clinicComplementaryExamBlocks).sort((a, b) => sortData(a.doneDate, b.doneDate)),
+      clinicComplementaryExams: Object.values(clinicComplementaryExamBlocks).sort((a, b) =>
+        sortData(a.doneDate, b.doneDate),
+      ),
       clinicExam: clinicExamBlock,
       user: { email: userPayloadDto.email, id: v4() },
     };

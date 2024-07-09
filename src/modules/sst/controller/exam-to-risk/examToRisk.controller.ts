@@ -19,7 +19,7 @@ export class ExamRiskController {
     private readonly updateExamService: UpdateExamRiskService,
     private readonly copyExamRiskService: CopyExamRiskService,
     private readonly deleteSoftExamRiskService: DeleteSoftExamRiskService,
-  ) { }
+  ) {}
 
   @Permissions({
     code: PermissionEnum.EXAM_RISK,
@@ -50,7 +50,11 @@ export class ExamRiskController {
     isContract: true,
   })
   @Patch('/:id/:companyId')
-  async update(@Param('id', ParseIntPipe) id: number, @User() userPayloadDto: UserPayloadDto, @Body() updateRiskDto: UpdateExamRiskDto) {
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @User() userPayloadDto: UserPayloadDto,
+    @Body() updateRiskDto: UpdateExamRiskDto,
+  ) {
     return this.updateExamService.execute(id, updateRiskDto, userPayloadDto);
   }
 

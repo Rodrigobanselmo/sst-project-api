@@ -128,7 +128,6 @@ export class AddFileCharacterizationDto {
   companyCharacterizationId: string;
 }
 
-
 export class UpdatePhotoCharacterizationDto {
   @IsOptional()
   @IsString()

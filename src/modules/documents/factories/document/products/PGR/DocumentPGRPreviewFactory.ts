@@ -18,7 +18,10 @@ import { IDocumentPGRBody } from './types/pgr.types';
 import { DocumentModelRepository } from '../../../../repositories/implementations/DocumentModelRepository';
 
 @Injectable()
-export class DocumentPGRPreviewFactory extends DocumentFactoryAbstractionCreator<IDocumentPGRBody & { data: IDocumentModelData }, any> {
+export class DocumentPGRPreviewFactory extends DocumentFactoryAbstractionCreator<
+  IDocumentPGRBody & { data: IDocumentModelData },
+  any
+> {
   constructor(
     private readonly riskGroupDataRepository: RiskGroupDataRepository,
     private readonly riskDocumentRepository: RiskDocumentRepository,
@@ -43,7 +46,7 @@ export class DocumentPGRPreviewFactory extends DocumentFactoryAbstractionCreator
       this.homoGroupRepository,
       this.hierarchyRepository,
       this.documentModelRepository,
-      this.findExamByHierarchyService
+      this.findExamByHierarchyService,
     );
 
     DocumentPreview.data = body.data;

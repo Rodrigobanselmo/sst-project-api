@@ -1,38 +1,24 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Injectable } from "@nestjs/common";
-import { Prisma } from "@prisma/client";
-import { v4 } from "uuid";
+import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+import { v4 } from 'uuid';
 
-import { PrismaService } from "../../../../prisma/prisma.service";
-import { PaginationQueryDto } from "../../../../shared/dto/pagination.dto";
-import {
-  FindCompanyGroupDto,
-  UpsertCompanyGroupDto,
-} from "../../dto/company-group.dto";
-import { CompanyGroupEntity } from "../../entities/company-group.entity";
+import { PrismaService } from '../../../../prisma/prisma.service';
+import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
+import { FindCompanyGroupDto, UpsertCompanyGroupDto } from '../../dto/company-group.dto';
+import { CompanyGroupEntity } from '../../entities/company-group.entity';
 
 @Injectable()
 export class CompanyGroupRepository {
   constructor(private prisma: PrismaService) {}
 
-  async upsert({
-    id,
-    companyId,
-    companiesIds,
-    doctorResponsibleId,
-    tecResponsibleId,
-    ...data
-  }: UpsertCompanyGroupDto) {
+  async upsert({ id, companyId, companiesIds, doctorResponsibleId, tecResponsibleId, ...data }: UpsertCompanyGroupDto) {
     const uuid = v4();
     const group = await this.prisma.companyGroup.upsert({
       update: {
         ...data,
-        doctorResponsible: doctorResponsibleId
-          ? { connect: { id: doctorResponsibleId } }
-          : undefined,
-        tecResponsible: tecResponsibleId
-          ? { connect: { id: tecResponsibleId } }
-          : undefined,
+        doctorResponsible: doctorResponsibleId ? { connect: { id: doctorResponsibleId } } : undefined,
+        tecResponsible: tecResponsibleId ? { connect: { id: tecResponsibleId } } : undefined,
         companies: companiesIds
           ? {
               set: companiesIds.map((companyId) => ({
@@ -112,11 +98,7 @@ export class CompanyGroupRepository {
     return new CompanyGroupEntity(group as any);
   }
 
-  async findById(
-    id: number,
-    companyId: string,
-    options: Prisma.CompanyGroupFindFirstArgs = {}
-  ) {
+  async findById(id: number, companyId: string, options: Prisma.CompanyGroupFindFirstArgs = {}) {
     const group = await this.prisma.companyGroup.findFirst({
       where: { companyId, id },
       include: {
@@ -164,7 +146,7 @@ export class CompanyGroupRepository {
     companyId: string,
     query: Partial<FindCompanyGroupDto>,
     pagination: PaginationQueryDto,
-    options: Prisma.CompanyGroupFindManyArgs = {}
+    options: Prisma.CompanyGroupFindManyArgs = {},
   ) {
     const where = {
       AND: [{ companyId }],
@@ -217,12 +199,12 @@ export class CompanyGroupRepository {
       ...options.select,
     };
 
-    if ("search" in query && query.search) {
+    if ('search' in query && query.search) {
       (where.AND as any).push({
         OR: query.search.map((s) => ({
           name: {
             contains: s,
-            mode: "insensitive",
+            mode: 'insensitive',
           },
         })),
       } as typeof options.where);
@@ -234,7 +216,7 @@ export class CompanyGroupRepository {
         (where.AND as any).push({
           [key]: {
             contains: value,
-            mode: "insensitive",
+            mode: 'insensitive',
           },
         } as typeof options.where);
     });
@@ -248,7 +230,7 @@ export class CompanyGroupRepository {
         where,
         take: pagination.take || 20,
         skip: pagination.skip || 0,
-        orderBy: { name: "asc" },
+        orderBy: { name: 'asc' },
       }),
     ]);
 

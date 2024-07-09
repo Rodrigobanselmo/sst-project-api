@@ -7,7 +7,10 @@ export class FindAllActionPlanService {
   constructor(private readonly riskDataRepository: RiskDataRepository) {}
 
   async execute(groupId: string, workspaceId: string, companyId: string, { skip, take, ...query }: FindRiskDataDto) {
-    const riskData = await this.riskDataRepository.findAllActionPlan(groupId, workspaceId, companyId, query, { skip, take });
+    const riskData = await this.riskDataRepository.findAllActionPlan(groupId, workspaceId, companyId, query, {
+      skip,
+      take,
+    });
 
     return riskData;
   }

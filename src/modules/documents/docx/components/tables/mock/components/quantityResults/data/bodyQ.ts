@@ -1,5 +1,10 @@
 export const rowBodyQui: [string, string, string, string][] = [
-  ['Qualquer resultado > IPVS', 'NA', 'Interromper as atividades imediatamente, situação de risco grave e iminente.', 'Interromper as atividades'],
+  [
+    'Qualquer resultado > IPVS',
+    'NA',
+    'Interromper as atividades imediatamente, situação de risco grave e iminente.',
+    'Interromper as atividades',
+  ],
   [
     'MVUE ≥ LEO',
     'IJ ≥ 1',

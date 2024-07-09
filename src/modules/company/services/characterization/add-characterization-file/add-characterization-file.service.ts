@@ -2,7 +2,6 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { readFile, writeFile, unlink } from 'fs/promises';
 import { v4 } from 'uuid';
 
-
 import { ErrorCompanyEnum } from '../../../../../shared/constants/enum/errorMessage';
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { AmazonStorageProvider } from '../../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
@@ -17,9 +16,13 @@ export class AddCharacterizationFileService {
     private readonly characterizationRepository: CharacterizationRepository,
     private readonly characterizationFileRepository: CharacterizationFileRepository,
     private readonly amazonStorageProvider: AmazonStorageProvider,
-  ) { }
+  ) {}
 
-  async execute(addFileCharacterizationDto: AddFileCharacterizationDto, userPayloadDto: UserPayloadDto, file: Express.Multer.File) {
+  async execute(
+    addFileCharacterizationDto: AddFileCharacterizationDto,
+    userPayloadDto: UserPayloadDto,
+    file: Express.Multer.File,
+  ) {
     const fileUrl = await this.upload(file);
 
     if (addFileCharacterizationDto.id) {
@@ -30,22 +33,20 @@ export class AddCharacterizationFileService {
       }
     }
 
+    await this.characterizationFileRepository.upsert({
+      ...addFileCharacterizationDto,
+      url: fileUrl,
+      companyCharacterizationId: addFileCharacterizationDto.companyCharacterizationId,
+    });
 
-    await this.characterizationFileRepository.upsert(
-      {
-        ...addFileCharacterizationDto,
-        url: fileUrl,
-        companyCharacterizationId: addFileCharacterizationDto.companyCharacterizationId,
-      },
+    const characterizationData = await this.characterizationRepository.findById(
+      addFileCharacterizationDto.companyCharacterizationId,
     );
-
-    const characterizationData = await this.characterizationRepository.findById(addFileCharacterizationDto.companyCharacterizationId);
 
     return characterizationData;
   }
 
   public async upload(file: Express.Multer.File, opt?: { id?: string }) {
-
     const fileBuffer = await this.convertFileBuffer(file);
 
     const fileType = file.originalname.split('.')[file.originalname.split('.').length - 1];
@@ -57,15 +58,15 @@ export class AddCharacterizationFileService {
       fileName: path,
     });
 
-    return url
+    return url;
   }
 
   private async convertFileBuffer(file: Express.Multer.File) {
-    if (!file?.originalname) return file.buffer
-    if (file.originalname.split('.').pop() !== '3gp') return file.buffer
+    if (!file?.originalname) return file.buffer;
+    if (file.originalname.split('.').pop() !== '3gp') return file.buffer;
 
-    const outputPath = 'tmp/' + (v4()) + '.mp3';
-    const inputPath = 'tmp/' + (v4()) + '.3gp';
+    const outputPath = 'tmp/' + v4() + '.mp3';
+    const inputPath = 'tmp/' + v4() + '.3gp';
 
     file.originalname = file.originalname.replace('.3gp', '.mp3');
 
@@ -76,16 +77,24 @@ export class AddCharacterizationFileService {
     }
 
     try {
-      await convert3gpToMp3(inputPath, outputPath)
+      await convert3gpToMp3(inputPath, outputPath);
       const fileBuffer = await readFile(outputPath);
 
-      try { await unlink(inputPath) } catch (err) { }
-      try { await unlink(outputPath) } catch (err) { }
+      try {
+        await unlink(inputPath);
+      } catch (err) {}
+      try {
+        await unlink(outputPath);
+      } catch (err) {}
 
-      return fileBuffer
+      return fileBuffer;
     } catch (err) {
-      try { await unlink(inputPath) } catch (err) { }
-      try { await unlink(outputPath) } catch (err) { }
+      try {
+        await unlink(inputPath);
+      } catch (err) {}
+      try {
+        await unlink(outputPath);
+      } catch (err) {}
 
       throw new Error(`Erro ao converter arquivo mp3: ${JSON.stringify(err)}`);
     }

@@ -21,21 +21,36 @@ export class CopyHomoGroupService {
     private readonly riskDataRepository: RiskDataRepository,
     private readonly hierarchyRepository: HierarchyRepository,
     private readonly upsertManyRiskDataService: UpsertManyRiskDataService,
-  ) { }
+  ) {}
 
   async execute(
-    { actualGroupId, riskGroupId, copyFromHomoGroupId, riskGroupIdFrom, companyIdFrom, hierarchyId, ...rest }: CopyHomogeneousGroupDto,
+    {
+      actualGroupId,
+      riskGroupId,
+      copyFromHomoGroupId,
+      riskGroupIdFrom,
+      companyIdFrom,
+      hierarchyId,
+      ...rest
+    }: CopyHomogeneousGroupDto,
     userPayloadDto: UserPayloadDto,
   ) {
     const companyId = userPayloadDto.targetCompanyId;
 
     const getRiskData = async () => {
       if (actualGroupId) {
-        const foundCopyFromHomoGroup = await this.homoGroupRepository.findHomoGroupByCompanyAndId(copyFromHomoGroupId, companyIdFrom);
+        const foundCopyFromHomoGroup = await this.homoGroupRepository.findHomoGroupByCompanyAndId(
+          copyFromHomoGroupId,
+          companyIdFrom,
+        );
 
         if (!foundCopyFromHomoGroup?.id) throw new BadRequestException(ErrorCompanyEnum.GHO_NOT_FOUND);
 
-        return this.riskDataRepository.findAllByHomogeneousGroupId(companyIdFrom, riskGroupIdFrom, foundCopyFromHomoGroup.id);
+        return this.riskDataRepository.findAllByHomogeneousGroupId(
+          companyIdFrom,
+          riskGroupIdFrom,
+          foundCopyFromHomoGroup.id,
+        );
       }
 
       if (hierarchyId) {
@@ -69,10 +84,16 @@ export class CopyHomoGroupService {
         hierarchyIds: [],
         riskIds: [],
         adms: !(riskData?.adms?.length > 0) ? undefined : riskData.adms.map(({ id }) => id),
-        engs: !(riskData?.engsToRiskFactorData?.length > 0) ? undefined : riskData.engsToRiskFactorData.map(({ recMed, ...rest }) => rest),
-        epis: !(riskData?.epiToRiskFactorData?.length > 0) ? undefined : riskData.epiToRiskFactorData.map(({ epi, ...rest }) => rest),
+        engs: !(riskData?.engsToRiskFactorData?.length > 0)
+          ? undefined
+          : riskData.engsToRiskFactorData.map(({ recMed, ...rest }) => rest),
+        epis: !(riskData?.epiToRiskFactorData?.length > 0)
+          ? undefined
+          : riskData.epiToRiskFactorData.map(({ epi, ...rest }) => rest),
         recs: !(riskData?.recs?.length > 0) ? undefined : riskData.recs.map(({ id }) => id),
-        generateSources: !(riskData?.generateSources?.length > 0) ? undefined : riskData.generateSources.map(({ id }) => id),
+        generateSources: !(riskData?.generateSources?.length > 0)
+          ? undefined
+          : riskData.generateSources.map(({ id }) => id),
         probability: riskData.probability || undefined,
         exposure: riskData.exposure || undefined,
         probabilityAfter: riskData.probabilityAfter || undefined,
@@ -96,7 +117,9 @@ export class CopyHomoGroupService {
       where: {
         employee: {
           companyId: userPayloadDto.targetCompanyId,
-          hierarchyHistory: { some: { hierarchy: { hierarchyOnHomogeneous: { some: { homogeneousGroupId: foundHomoGroup.id } } } } },
+          hierarchyHistory: {
+            some: { hierarchy: { hierarchyOnHomogeneous: { some: { homogeneousGroupId: foundHomoGroup.id } } } },
+          },
         },
       },
     });

@@ -1,16 +1,16 @@
-import { Injectable } from "@nestjs/common";
-import { Prisma } from "@prisma/client";
+import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 
-import { PrismaService } from "../../../../prisma/prisma.service";
-import { PaginationQueryDto } from "../../../../shared/dto/pagination.dto";
-import { prismaFilter } from "../../../../shared/utils/filters/prisma.filters";
+import { PrismaService } from '../../../../prisma/prisma.service';
+import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
+import { prismaFilter } from '../../../../shared/utils/filters/prisma.filters';
 import {
   CreateEmployeeHierarchyHistoryDto,
   FindEmployeeHierarchyHistoryDto,
   UpdateEmployeeHierarchyHistoryDto,
-} from "../../dto/employee-hierarchy-history";
-import { EmployeeHierarchyHistoryEntity } from "../../entities/employee-hierarchy-history.entity";
-import { transformStringToObject } from "./../../../../shared/utils/transformStringToObject";
+} from '../../dto/employee-hierarchy-history';
+import { EmployeeHierarchyHistoryEntity } from '../../entities/employee-hierarchy-history.entity';
+import { transformStringToObject } from './../../../../shared/utils/transformStringToObject';
 
 @Injectable()
 export class EmployeeHierarchyHistoryRepository {
@@ -19,9 +19,9 @@ export class EmployeeHierarchyHistoryRepository {
   async create(
     { subOfficeId, ...createData }: CreateEmployeeHierarchyHistoryDto,
     employeeId: number,
-    hierarchyId?: string | null
+    hierarchyId?: string | null,
   ) {
-    const status = createData.motive === "DEM" ? "INACTIVE" : "ACTIVE";
+    const status = createData.motive === 'DEM' ? 'INACTIVE' : 'ACTIVE';
 
     const response = await this.prisma.$transaction([
       this.prisma.employeeHierarchyHistory.create({
@@ -41,7 +41,7 @@ export class EmployeeHierarchyHistoryRepository {
                 ...(subOfficeId && {
                   subOffices: { connect: { id: subOfficeId } },
                 }),
-                ...(createData.motive !== "DEM" &&
+                ...(createData.motive !== 'DEM' &&
                   !subOfficeId && {
                     subOffices: { set: [] },
                   }),
@@ -57,9 +57,9 @@ export class EmployeeHierarchyHistoryRepository {
   async update(
     { id, subOfficeId, ...updateData }: UpdateEmployeeHierarchyHistoryDto,
     employeeId: number,
-    hierarchyId?: string | null
+    hierarchyId?: string | null,
   ) {
-    const status = updateData.motive === "DEM" ? "INACTIVE" : "ACTIVE";
+    const status = updateData.motive === 'DEM' ? 'INACTIVE' : 'ACTIVE';
 
     const response = await this.prisma.$transaction([
       this.prisma.employeeHierarchyHistory.update({
@@ -83,7 +83,7 @@ export class EmployeeHierarchyHistoryRepository {
                 ...(subOfficeId && {
                   subOffices: { connect: { id: subOfficeId } },
                 }),
-                ...(updateData.motive === "DEM" &&
+                ...(updateData.motive === 'DEM' &&
                   !subOfficeId && {
                     subOffices: { set: [] },
                   }),
@@ -99,7 +99,7 @@ export class EmployeeHierarchyHistoryRepository {
   async find(
     query: Partial<FindEmployeeHierarchyHistoryDto>,
     pagination: PaginationQueryDto,
-    options: Prisma.EmployeeHierarchyHistoryFindManyArgs = {}
+    options: Prisma.EmployeeHierarchyHistoryFindManyArgs = {},
   ) {
     const whereInit = {
       AND: [
@@ -111,14 +111,14 @@ export class EmployeeHierarchyHistoryRepository {
 
     const { where } = prismaFilter(whereInit, {
       query,
-      skip: ["companyId"],
+      skip: ['companyId'],
     });
 
     const optionsFind = transformStringToObject(
       Array.from({ length: 5 })
-        .map(() => "include.parent")
-        .join("."),
-      true
+        .map(() => 'include.parent')
+        .join('.'),
+      true,
     );
 
     const response = await this.prisma.$transaction([
@@ -139,14 +139,12 @@ export class EmployeeHierarchyHistoryRepository {
             },
           },
         },
-        orderBy: { startDate: "desc" },
+        orderBy: { startDate: 'desc' },
       }),
     ]);
 
     return {
-      data: response[1].map(
-        (data) => new EmployeeHierarchyHistoryEntity(data as any)
-      ),
+      data: response[1].map((data) => new EmployeeHierarchyHistoryEntity(data as any)),
       count: response[0],
     };
   }
@@ -159,9 +157,7 @@ export class EmployeeHierarchyHistoryRepository {
     return data.map((data) => new EmployeeHierarchyHistoryEntity(data));
   }
 
-  async findFirstNude(
-    options: Prisma.EmployeeHierarchyHistoryFindFirstArgs = {}
-  ) {
+  async findFirstNude(options: Prisma.EmployeeHierarchyHistoryFindFirstArgs = {}) {
     const data = await this.prisma.employeeHierarchyHistory.findFirst({
       ...options,
     });
@@ -175,8 +171,7 @@ export class EmployeeHierarchyHistoryRepository {
         where: { id },
       }),
       this.prisma.employee.update({
-        data:
-          hierarchyId !== undefined ? { hierarchyId, status: "ACTIVE" } : {},
+        data: hierarchyId !== undefined ? { hierarchyId, status: 'ACTIVE' } : {},
         where: { id: employeeId },
       }),
     ]);

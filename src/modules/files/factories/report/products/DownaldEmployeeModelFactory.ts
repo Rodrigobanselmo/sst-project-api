@@ -9,11 +9,20 @@ import { convertHeaderUpload } from '../helpers/convertHeaderUpload';
 import { convertTitleUpload } from '../helpers/convertTitleUpload';
 import { getCompany, getCompanyInfo } from '../helpers/getCompanyInfo';
 import { getWorkspaceInfoTable } from '../helpers/getWorkspaceInfoTable';
-import { IReportCell, IReportFactoryProduct, IReportFactoryProductFindData, IReportHeader, IReportSanitizeData } from '../types/IReportFactory.types';
+import {
+  IReportCell,
+  IReportFactoryProduct,
+  IReportFactoryProductFindData,
+  IReportHeader,
+  IReportSanitizeData,
+} from '../types/IReportFactory.types';
 
 @Injectable()
 export class DownaldEmployeeModelFactory extends ReportFactoryAbstractionCreator<any> {
-  constructor(private readonly companyRepository: CompanyRepository, private readonly excelProv: ExcelProvider) {
+  constructor(
+    private readonly companyRepository: CompanyRepository,
+    private readonly excelProv: ExcelProvider,
+  ) {
     super(excelProv, companyRepository);
   }
 
@@ -23,7 +32,7 @@ export class DownaldEmployeeModelFactory extends ReportFactoryAbstractionCreator
 }
 
 export class DownloadFactoryProduct implements IReportFactoryProduct<any> {
-  constructor(private readonly companyRepository: CompanyRepository) { }
+  constructor(private readonly companyRepository: CompanyRepository) {}
   public company: CompanyEntity;
 
   public async findTableData(companyId: string) {
@@ -34,12 +43,17 @@ export class DownloadFactoryProduct implements IReportFactoryProduct<any> {
     const titleData = this.getTitle(headerData, company);
     const infoData = [];
 
-    const returnData: IReportFactoryProductFindData = { headerRow: headerData, titleRows: titleData, endRows: infoData, sanitizeData };
+    const returnData: IReportFactoryProductFindData = {
+      headerRow: headerData,
+      titleRows: titleData,
+      endRows: infoData,
+      sanitizeData,
+    };
 
     return returnData;
   }
 
-  public sanitizeData({ }: any): IReportSanitizeData[] {
+  public sanitizeData({}: any): IReportSanitizeData[] {
     const rows: IReportSanitizeData[] = [];
     return rows;
   }
@@ -56,13 +70,21 @@ export class DownloadFactoryProduct implements IReportFactoryProduct<any> {
   }
 
   public getHeader(company: CompanyEntity): IReportHeader {
-    const header: IReportHeader = convertHeaderUpload(EmployeeColumnList({ workspaceLength: company.workspace.length }));
+    const header: IReportHeader = convertHeaderUpload(
+      EmployeeColumnList({ workspaceLength: company.workspace.length }),
+    );
     return header;
   }
 
   public getTitle(_: IReportHeader, company: CompanyEntity): IReportCell[][] {
     const { main, sub } = getCompanyInfo(company);
-    const row: IReportCell[] = [{ content: 'Tabela de Funcionários', mergeRight: 'all', font: { size: 11, bold: true, color: { theme: 1 }, name: 'Calibri' } }];
+    const row: IReportCell[] = [
+      {
+        content: 'Tabela de Funcionários',
+        mergeRight: 'all',
+        font: { size: 11, bold: true, color: { theme: 1 }, name: 'Calibri' },
+      },
+    ];
     const emptyRow: IReportCell[] = [{ content: '', fill: undefined }];
     const headerTitle = convertTitleUpload(EmployeeColumnList({ workspaceLength: company.workspace.length }));
 

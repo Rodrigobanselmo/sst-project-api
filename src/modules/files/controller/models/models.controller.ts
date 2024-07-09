@@ -13,17 +13,26 @@ import { getResponse } from '../reports/reports.controller';
 
 @Controller('files/models')
 export class ModelsUploadsController {
-  constructor(private readonly downaldRiskModelFactory: DownaldRiskModelFactory, private readonly downaldEmpoyeeModelFactory: DownaldEmployeeModelFactory) { }
+  constructor(
+    private readonly downaldRiskModelFactory: DownaldRiskModelFactory,
+    private readonly downaldEmpoyeeModelFactory: DownaldEmployeeModelFactory,
+  ) {}
 
   @Post('/employee/:companyId')
   async employeeModel(@User() userPayloadDto: UserPayloadDto, @Res() res: Response) {
-    const data = await this.downaldEmpoyeeModelFactory.execute({ downloadType: ReportDownloadTypeEnum.XML, companyId: userPayloadDto.targetCompanyId });
+    const data = await this.downaldEmpoyeeModelFactory.execute({
+      downloadType: ReportDownloadTypeEnum.XML,
+      companyId: userPayloadDto.targetCompanyId,
+    });
     getResponse(res, data);
   }
 
   @Post('/risk/:companyId')
   async riskStructure(@User() userPayloadDto: UserPayloadDto, @Res() res: Response) {
-    const data = await this.downaldRiskModelFactory.execute({ downloadType: ReportDownloadTypeEnum.XML, companyId: userPayloadDto.targetCompanyId });
+    const data = await this.downaldRiskModelFactory.execute({
+      downloadType: ReportDownloadTypeEnum.XML,
+      companyId: userPayloadDto.targetCompanyId,
+    });
     getResponse(res, data);
   }
 }

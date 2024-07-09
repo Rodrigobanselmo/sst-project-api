@@ -26,7 +26,7 @@ export class InviteUsersService {
     private readonly dateProvider: DayJSProvider,
     private readonly companyRepository: CompanyRepository,
     private readonly mailProvider: NodeMailProvider,
-  ) { }
+  ) {}
 
   async execute(inviteUserDto: InviteUserDto, userPayloadDto: UserPayloadDto) {
     const userRoles = userPayloadDto.roles || [];
@@ -58,17 +58,23 @@ export class InviteUsersService {
         userPermissions.some(
           (userPermission) =>
             userPermission.split('-')[0] === addPermission.split('-')[0] &&
-            Array.from(addPermission.split('-')[1] || '').every((crud) => (userPermission.split('-')[1] || '').includes(crud)),
+            Array.from(addPermission.split('-')[1] || '').every((crud) =>
+              (userPermission.split('-')[1] || '').includes(crud),
+            ),
         ),
       );
 
-      if (!hasAllRoles || !hasAllPermissions) throw new ForbiddenException(ErrorInvitesEnum.FORBIDDEN_INSUFFICIENT_PERMISSIONS);
+      if (!hasAllRoles || !hasAllPermissions)
+        throw new ForbiddenException(ErrorInvitesEnum.FORBIDDEN_INSUFFICIENT_PERMISSIONS);
     }
 
     if (userToAdd) {
       let userAlreadyAdded = userToAdd.companies.some((company) => company.companyId === inviteUserDto.companyId);
 
-      if (isConsulting) userAlreadyAdded = userToAdd.companies.some((company) => inviteUserDto.companiesIds.includes(company.companyId));
+      if (isConsulting)
+        userAlreadyAdded = userToAdd.companies.some((company) =>
+          inviteUserDto.companiesIds.includes(company.companyId),
+        );
 
       if (userAlreadyAdded) throw new BadRequestException(ErrorInvitesEnum.USER_ALREADY_EXIST);
     }
@@ -87,7 +93,11 @@ export class InviteUsersService {
       );
 
     if (userRoles.includes(RoleEnum.MASTER))
-      companies = await this.companyRepository.findAll({ companiesIds: inviteUserDto?.companiesIds || [] }, { skip: 0, take: 100 }, { select: { id: true } });
+      companies = await this.companyRepository.findAll(
+        { companiesIds: inviteUserDto?.companiesIds || [] },
+        { skip: 0, take: 100 },
+        { select: { id: true } },
+      );
 
     const expires_date = this.dateProvider.addDay(new Date(), 7);
 

@@ -5,7 +5,11 @@ import { IsBoolean, IsEnum, IsNumber, IsOptional, IsString, ValidateNested } fro
 import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
-import { RiskCreateGenerateSourceDto, RiskUpdateGenerateSourceDto, UpsertGenerateSourceDto } from './generate-source.dto';
+import {
+  RiskCreateGenerateSourceDto,
+  RiskUpdateGenerateSourceDto,
+  UpsertGenerateSourceDto,
+} from './generate-source.dto';
 import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
 import { RiskCreateRecMedDto, RiskUpdateRecMedDto, UpsertRecMedDto } from './rec-med.dto';
@@ -201,7 +205,6 @@ export class UpdateRiskDto {
   @IsString()
   @IsOptional()
   name?: string;
-
 
   @IsString()
   @IsOptional()

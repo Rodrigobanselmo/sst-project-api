@@ -5,5 +5,6 @@ export const getConsultantCompany = (company: CompanyEntity): CompanyEntity => {
     return;
   }
 
-  return company.receivingServiceContracts.find((consult) => !consult?.applyingServiceCompany?.isGroup)?.applyingServiceCompany;
+  return company.receivingServiceContracts.find((consult) => !consult?.applyingServiceCompany?.isGroup)
+    ?.applyingServiceCompany;
 };

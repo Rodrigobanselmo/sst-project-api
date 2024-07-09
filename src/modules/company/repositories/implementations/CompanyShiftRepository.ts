@@ -29,7 +29,11 @@ export class CompanyShiftRepository {
     return new CompanyShiftEntity(data);
   }
 
-  async find(query: Partial<FindCompanyShiftDto>, pagination: PaginationQueryDto, options: Prisma.CompanyShiftFindManyArgs = {}) {
+  async find(
+    query: Partial<FindCompanyShiftDto>,
+    pagination: PaginationQueryDto,
+    options: Prisma.CompanyShiftFindManyArgs = {},
+  ) {
     const whereInit = {
       AND: [],
     } as typeof options.where;

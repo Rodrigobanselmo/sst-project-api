@@ -11,7 +11,10 @@ import { removeDuplicate } from '../../../../../../../shared/utils/removeDuplica
 
 @Injectable()
 export class UploadExamFileService {
-  constructor(private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository, private readonly amazonStorageProvider: AmazonStorageProvider) {}
+  constructor(
+    private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository,
+    private readonly amazonStorageProvider: AmazonStorageProvider,
+  ) {}
 
   async execute({ ids }: UpdateFileExamDto, user: UserPayloadDto, file: Express.Multer.File) {
     const companyId = user.targetCompanyId;

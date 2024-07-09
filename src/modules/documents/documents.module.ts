@@ -71,7 +71,8 @@ import { DocumentPCMSOFactory } from './factories/document/products/PGR/Document
     FakeStorageProvider,
     DownloadPreviewModel,
     PdfVisitReportDataService,
-    ServerlessLambdaProvider
-  ], exports: [DocumentPGRFactory],
+    ServerlessLambdaProvider,
+  ],
+  exports: [DocumentPGRFactory],
 })
-export class DocumentsModule { }
+export class DocumentsModule {}

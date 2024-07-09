@@ -29,7 +29,11 @@ export class ContactRepository {
     return new ContactEntity(contact);
   }
 
-  async findAllByCompany(query: Partial<FindContactDto>, pagination: PaginationQueryDto, options: Prisma.ContactFindManyArgs = {}) {
+  async findAllByCompany(
+    query: Partial<FindContactDto>,
+    pagination: PaginationQueryDto,
+    options: Prisma.ContactFindManyArgs = {},
+  ) {
     const whereInit = {
       AND: [
         // {

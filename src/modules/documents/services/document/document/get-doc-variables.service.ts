@@ -40,7 +40,11 @@ export class GetDocVariablesService {
         const elements = this.filterMap(documentElementTypeMap, type);
         const sections = this.filterMap(documentSectionTypeMap, type);
 
-        return { variables: { ...acc.variables, ...variables }, sections: { ...acc.sections, ...sections }, elements: { ...acc.elements, ...elements } };
+        return {
+          variables: { ...acc.variables, ...variables },
+          sections: { ...acc.sections, ...sections },
+          elements: { ...acc.elements, ...elements },
+        };
       },
       { variables: {}, elements: {}, sections: {} },
     );

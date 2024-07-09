@@ -13,14 +13,17 @@ export const getCredential = (row: ProfessionalEntity) => {
   return '';
 };
 
-export const ProfessionalsConverter = (professionalEntity: ProfessionalEntity[], workspace: WorkspaceEntity): IDocVariables[] => {
+export const ProfessionalsConverter = (
+  professionalEntity: ProfessionalEntity[],
+  workspace: WorkspaceEntity,
+): IDocVariables[] => {
   return professionalEntity
     .filter((professional) =>
       'professionalDocumentDataSignature' in professional
         ? professional.professionalDocumentDataSignature.isElaborator
         : 'professionalDocumentDataSignature' in professional
-        ? professional.professionalDocumentDataSignature.isElaborator
-        : false,
+          ? professional.professionalDocumentDataSignature.isElaborator
+          : false,
     )
     .map((professional) => {
       // const council =professional

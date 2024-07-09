@@ -1,7 +1,13 @@
 import { PrismaService } from './../../../../../prisma/prisma.service';
 import { IExcelReadData } from './../../../../../shared/providers/ExcelProvider/models/IExcelProvider.types';
 import { ExcelProvider } from '../../../../../shared/providers/ExcelProvider/implementations/ExcelProvider';
-import { IColumnRule, IColumnRuleMap, IFileFactoryProduct, ISheetData, ISheetExtractedData } from '../types/IFileFactory.types';
+import {
+  IColumnRule,
+  IColumnRuleMap,
+  IFileFactoryProduct,
+  ISheetData,
+  ISheetExtractedData,
+} from '../types/IFileFactory.types';
 import { BadRequestException } from '@nestjs/common';
 import { IReportCell } from '../../report/types/IReportFactory.types';
 
@@ -45,8 +51,11 @@ export abstract class FileFactoryAbstractionCreator<T, R extends keyof any> {
   }
 
   public getHeaderInfo(sheet: ISheetData) {
-    const headerStartIndex = sheet.rows.findIndex((row) => row[0] && row[1] && sheet.columnsMap[row[0]] && sheet.columnsMap[row[1]]);
-    if (headerStartIndex == -1) throw new BadRequestException(`Não foi encontrado a cabeçario da tabela na planilha "${sheet.sheetName}"`);
+    const headerStartIndex = sheet.rows.findIndex(
+      (row) => row[0] && row[1] && sheet.columnsMap[row[0]] && sheet.columnsMap[row[1]],
+    );
+    if (headerStartIndex == -1)
+      throw new BadRequestException(`Não foi encontrado a cabeçario da tabela na planilha "${sheet.sheetName}"`);
 
     const columnHandlerOrder = sheet.rows[headerStartIndex].map((cell, columnsIndex) => {
       const columnType = sheet.columnsMap[cell];
@@ -62,7 +71,11 @@ export abstract class FileFactoryAbstractionCreator<T, R extends keyof any> {
     return { headerStartIndex, columnHandlerOrder };
   }
 
-  private checkIfOneExists(excelRow: (string | number)[], arrayCheck: string[], columnHandlerOrder: (IColumnRule & Partial<IReportCell>)[]) {
+  private checkIfOneExists(
+    excelRow: (string | number)[],
+    arrayCheck: string[],
+    columnHandlerOrder: (IColumnRule & Partial<IReportCell>)[],
+  ) {
     const foundData = arrayCheck.find((schemaCell) => {
       const columnIndex = columnHandlerOrder.findIndex((columnOrder) => schemaCell == columnOrder.field);
       const cell = excelRow[columnIndex];
@@ -82,17 +95,18 @@ export abstract class FileFactoryAbstractionCreator<T, R extends keyof any> {
     sheet.rows.slice(headerStartIndex + 1).forEach((excelRow, indexRow) => {
       if (!excelRow.length) return;
 
-
       const databaseRow = {} as Record<R, any>;
       const rowIndex = indexRow + 1 + (headerStartIndex + 1);
       const rowErrors = [] as string[];
 
       columnHandlerOrder.forEach((columnHandler, indexCell) => {
-        const errorMessageMissing = `Esta faltando um campo obrigatório na linha "${rowIndex}", coluna "${this.excelProvider.getColumnByIndex(indexCell)}" (${columnHandler.field
-          }) da planilha ${sheet.sheetName}"`;
+        const errorMessageMissing = `Esta faltando um campo obrigatório na linha "${rowIndex}", coluna "${this.excelProvider.getColumnByIndex(indexCell)}" (${
+          columnHandler.field
+        }) da planilha ${sheet.sheetName}"`;
 
-        const errorMessageInvalid = `Dado inválido na linha "${rowIndex}", coluna "${this.excelProvider.getColumnByIndex(indexCell)}" da planilha ${sheet.sheetName
-          }" \nDado: ${excelRow[indexCell]} `;
+        const errorMessageInvalid = `Dado inválido na linha "${rowIndex}", coluna "${this.excelProvider.getColumnByIndex(indexCell)}" da planilha ${
+          sheet.sheetName
+        }" \nDado: ${excelRow[indexCell]} `;
 
         const excelCell = excelRow[indexCell];
         const isEmptyCell = excelCell === null || excelCell === undefined || excelCell === '';

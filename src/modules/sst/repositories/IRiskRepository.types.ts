@@ -9,8 +9,15 @@ interface IRiskRepository {
 
   upsertMany(upsertRiskDtoMany: UpsertRiskDto[], system: boolean, companyId: string): Promise<RiskFactorsEntity[]>;
 
-  findById(id: string, companyId: string, options?: IPrismaOptions<{ company?: boolean; recMed?: boolean }>): Promise<RiskFactorsEntity>;
+  findById(
+    id: string,
+    companyId: string,
+    options?: IPrismaOptions<{ company?: boolean; recMed?: boolean }>,
+  ): Promise<RiskFactorsEntity>;
 
-  findAllByCompanyId(companyId: string, options?: IPrismaOptions<{ company?: boolean; recMed?: boolean }>): Promise<RiskFactorsEntity[]>;
+  findAllByCompanyId(
+    companyId: string,
+    options?: IPrismaOptions<{ company?: boolean; recMed?: boolean }>,
+  ): Promise<RiskFactorsEntity[]>;
 }
 export { IRiskRepository };

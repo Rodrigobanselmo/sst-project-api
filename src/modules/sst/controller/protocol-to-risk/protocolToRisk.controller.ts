@@ -4,7 +4,12 @@ import { PermissionEnum } from '../../../../shared/constants/enum/authorization'
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
-import { CopyProtocolToRiskDto, CreateProtocolToRiskDto, FindProtocolToRiskDto, UpdateProtocolToRiskDto } from '../../dto/protocol-to-risk.dto';
+import {
+  CopyProtocolToRiskDto,
+  CreateProtocolToRiskDto,
+  FindProtocolToRiskDto,
+  UpdateProtocolToRiskDto,
+} from '../../dto/protocol-to-risk.dto';
 import { CopyProtocolToRiskService } from '../../services/protocolToRisk/copy-protocol/copy-protocol.service';
 import { CreateProtocolToRiskService } from '../../services/protocolToRisk/create-protocol/create-protocol.service';
 import { FindProtocolToRiskService } from '../../services/protocolToRisk/find-protocol/find-protocol.service';
@@ -48,7 +53,11 @@ export class ProtocolToRiskController {
     isContract: true,
   })
   @Patch('/:id/:companyId')
-  async update(@Param('id', ParseIntPipe) id: number, @User() userPayloadDto: UserPayloadDto, @Body() updateRiskDto: UpdateProtocolToRiskDto) {
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @User() userPayloadDto: UserPayloadDto,
+    @Body() updateRiskDto: UpdateProtocolToRiskDto,
+  ) {
     return this.updateProtocolToService.execute(id, updateRiskDto, userPayloadDto);
   }
 

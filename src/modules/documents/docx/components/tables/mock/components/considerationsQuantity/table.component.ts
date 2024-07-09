@@ -1,5 +1,8 @@
 import { IDocVariables } from './../../../../../builders/pgr/types/section.types';
-import { ISectionChildrenType, DocumentSectionChildrenTypeEnum } from './../../../../../builders/pgr/types/elements.types';
+import {
+  ISectionChildrenType,
+  DocumentSectionChildrenTypeEnum,
+} from './../../../../../builders/pgr/types/elements.types';
 import { HeightRule, Paragraph, Table, WidthType } from 'docx';
 
 import { TableBodyElements } from '../../elements/body';
@@ -8,7 +11,9 @@ import { NewBody } from './body.converter';
 import { NewHeader } from './header.converter';
 
 // Table 2
-export const considerationsQuantityTable = (convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[]) => {
+export const considerationsQuantityTable = (
+  convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[],
+) => {
   const tableHeaderElements = new TableHeaderElements();
   const tableBodyElements = new TableBodyElements();
 

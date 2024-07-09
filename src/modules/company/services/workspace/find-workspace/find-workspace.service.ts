@@ -5,7 +5,7 @@ import { WorkspaceRepository } from './../../../repositories/implementations/Wor
 
 @Injectable()
 export class FindWorkspaceService {
-  constructor(private readonly workspaceRepository: WorkspaceRepository) { }
+  constructor(private readonly workspaceRepository: WorkspaceRepository) {}
 
   async execute({ skip, take, ...query }: FindWorkspaceDto, user: UserPayloadDto) {
     const access = await this.workspaceRepository.find({ companyId: user.targetCompanyId, ...query }, { skip, take });

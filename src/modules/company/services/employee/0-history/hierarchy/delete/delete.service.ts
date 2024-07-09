@@ -1,7 +1,10 @@
 import { RoleEnum } from './../../../../../../../shared/constants/enum/authorization';
 import { CheckEmployeeExamService } from './../../../../../../sst/services/exam/check-employee-exam/check-employee-exam.service';
 import { EmployeePPPHistoryRepository } from './../../../../../repositories/implementations/EmployeePPPHistoryRepository';
-import { EmployeeHierarchyHistoryEntity, historyRules } from './../../../../../entities/employee-hierarchy-history.entity';
+import {
+  EmployeeHierarchyHistoryEntity,
+  historyRules,
+} from './../../../../../entities/employee-hierarchy-history.entity';
 import { sortData } from './../../../../../../../shared/utils/sorts/data.sort';
 import { EmployeeEntity } from './../../../../../entities/employee.entity';
 import { BadRequestException, Injectable } from '@nestjs/common';
@@ -55,7 +58,15 @@ export class DeleteEmployeeHierarchyHistoryService {
     return history;
   }
 
-  async check({ foundEmployee, id, history }: { foundEmployee: EmployeeEntity; id: number; history?: EmployeeHierarchyHistoryEntity[] }) {
+  async check({
+    foundEmployee,
+    id,
+    history,
+  }: {
+    foundEmployee: EmployeeEntity;
+    id: number;
+    history?: EmployeeHierarchyHistoryEntity[];
+  }) {
     // CHECK AFTER
     let afterHistory: EmployeeHierarchyHistoryEntity;
     let beforeHistory: EmployeeHierarchyHistoryEntity;
@@ -86,7 +97,10 @@ export class DeleteEmployeeHierarchyHistoryService {
       const isAfterOk = historyRules[String(afterMotive)]?.before?.includes(beforeMotive);
       const isBeforeOk = historyRules[String(beforeMotive)]?.after?.includes(afterMotive);
 
-      if (!isAfterOk || !isBeforeOk) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_BLOCK_HISTORY + (foundEmployee?.cpf ? ` ${foundEmployee.cpf}` : ''));
+      if (!isAfterOk || !isBeforeOk)
+        throw new BadRequestException(
+          ErrorMessageEnum.EMPLOYEE_BLOCK_HISTORY + (foundEmployee?.cpf ? ` ${foundEmployee.cpf}` : ''),
+        );
     }
 
     const getActualEmployeeHierarchy = () => {

@@ -8,14 +8,10 @@ import {
   SequentialIdentifier,
   TextRun,
   UnderlineType,
-} from "docx";
-import {
-  IEntityRange,
-  IInlineStyleRange,
-  InlineStyleTypeEnum,
-} from "../../builders/pgr/types/elements.types";
-import { isOdd } from "../../../../../shared/utils/isOdd";
-import { rgbStringToHex } from "../../../../../shared/utils/rgbToHex";
+} from 'docx';
+import { IEntityRange, IInlineStyleRange, InlineStyleTypeEnum } from '../../builders/pgr/types/elements.types';
+import { isOdd } from '../../../../../shared/utils/isOdd';
+import { rgbStringToHex } from '../../../../../shared/utils/rgbToHex';
 
 interface ParagraphProps extends IParagraphOptions {
   break?: boolean;
@@ -32,9 +28,7 @@ interface ParagraphProps extends IParagraphOptions {
 
 type Writeable<T> = { -readonly [P in keyof T]: T[P] };
 
-const getStyle = (
-  range: IInlineStyleRange,
-): Writeable<Partial<IRunOptions>> => {
+const getStyle = (range: IInlineStyleRange): Writeable<Partial<IRunOptions>> => {
   const style: Writeable<Partial<IRunOptions>> = {};
   switch (range.style) {
     case InlineStyleTypeEnum.BOLD:
@@ -70,26 +64,23 @@ const getStyle = (
   return style;
 };
 
-export const paragraphNormal = (
-  text: string,
-  { children, color, ...options } = {} as ParagraphProps,
-) =>
+export const paragraphNormal = (text: string, { children, color, ...options } = {} as ParagraphProps) =>
   new Paragraph({
     children: [
       ...(children || []),
       ...text
-        .split("**")
+        .split('**')
         .map((text, index) => {
           const isBold = isOdd(index);
           return text
-            .split("^^")
+            .split('^^')
             .map((text, index) => {
               const isSuper = isOdd(index);
               return text
-                .split("\n")
+                .split('\n')
                 .map((text, index) => {
                   const isBreak = index != 0;
-                  return text.split("<link>").map((text, index) => {
+                  return text.split('<link>').map((text, index) => {
                     const isLink = isOdd(index);
                     if (!isLink)
                       return new TextRun({
@@ -122,18 +113,18 @@ export const paragraphNormal = (
 
 export const getParagraphNormal = (text: string) =>
   text
-    .split("**")
+    .split('**')
     .map((text, index) => {
       const isBold = isOdd(index);
       return text
-        .split("^^")
+        .split('^^')
         .map((text, index) => {
           const isSuper = isOdd(index);
           return text
-            .split("\n")
+            .split('\n')
             .map((text, index) => {
               const isBreak = index != 0;
-              return text.split("<link>").map((text, index) => {
+              return text.split('<link>').map((text, index) => {
                 const isLink = isOdd(index);
                 return {
                   isLink: isLink,
@@ -150,10 +141,7 @@ export const getParagraphNormal = (text: string) =>
     })
     .reduce((acc, curr) => [...acc, ...curr], []);
 
-export const paragraphNewNormal = (
-  text: string,
-  { children, color, ...options } = {} as ParagraphProps,
-) => {
+export const paragraphNewNormal = (text: string, { children, color, ...options } = {} as ParagraphProps) => {
   let hasBreakLine = false;
   const alignment = options?.align || AlignmentType.JUSTIFIED;
 
@@ -161,7 +149,7 @@ export const paragraphNewNormal = (
     children: [
       ...(children || []),
       ...text
-        .split("\n")
+        .split('\n')
         .map((text, index) => {
           const isBreak = index != 0;
           const entityRange = options.entityRangeBlock?.[index] || [];
@@ -189,25 +177,22 @@ export const paragraphNewNormal = (
           arrayRange.forEach((key, indexRange) => {
             const nextKey = arrayRange[indexRange + 1];
             const filter = [...entityRange, ...inlineStyleRange].filter(
-              (s) =>
-                s.offset <= Number(key) &&
-                s.length + s.offset >= Number(nextKey),
+              (s) => s.offset <= Number(key) && s.length + s.offset >= Number(nextKey),
             );
             if (nextKey) {
               const offset = Number(key);
               const offsetEnd = Number(nextKey);
 
-              let link = "";
+              let link = '';
               const styles: Partial<IRunOptions> = {};
 
               filter.forEach((inline) => {
-                if ("data" in inline) {
-                  if (inline.data?.type === "LINK")
-                    link = inline.data?.data?.url;
+                if ('data' in inline) {
+                  if (inline.data?.type === 'LINK') link = inline.data?.data?.url;
                   return;
                 }
 
-                if ("style" in inline) {
+                if ('style' in inline) {
                   const style = getStyle(inline);
                   Object.assign(styles, style);
                 }
@@ -217,43 +202,39 @@ export const paragraphNewNormal = (
                 const textValue = text.substring(offset, offsetEnd);
                 const paragraphNormal = getParagraphNormal(textValue);
 
-                paragraphNormal.forEach(
-                  ({ isLink, text, ...item }, indexParagraph) => {
-                    if (!isLink) {
-                      const textRun = new TextRun({
-                        text,
-                        size: options?.size ? options?.size * 2 : undefined,
-                        ...(color && { color: color }),
-                        ...(isBreak &&
-                          indexRange == 0 &&
-                          indexParagraph == 0 && { break: true }),
-                        ...styles,
-                        ...item,
-                      });
+                paragraphNormal.forEach(({ isLink, text, ...item }, indexParagraph) => {
+                  if (!isLink) {
+                    const textRun = new TextRun({
+                      text,
+                      size: options?.size ? options?.size * 2 : undefined,
+                      ...(color && { color: color }),
+                      ...(isBreak && indexRange == 0 && indexParagraph == 0 && { break: true }),
+                      ...styles,
+                      ...item,
+                    });
 
-                      textRuns.push(textRun);
-                    }
+                    textRuns.push(textRun);
+                  }
 
-                    if (isLink) {
-                      const [link, textLink] = text.split("|");
-                      const textRun = new ExternalHyperlink({
-                        children: [
-                          new TextRun({
-                            text: textLink,
-                            size: options?.size ? options?.size * 2 : undefined,
-                            ...(color ? { color: color } : {}),
-                            ...styles,
-                            ...item,
-                            style: "Hyperlink",
-                          }),
-                        ],
-                        link: link,
-                      });
+                  if (isLink) {
+                    const [link, textLink] = text.split('|');
+                    const textRun = new ExternalHyperlink({
+                      children: [
+                        new TextRun({
+                          text: textLink,
+                          size: options?.size ? options?.size * 2 : undefined,
+                          ...(color ? { color: color } : {}),
+                          ...styles,
+                          ...item,
+                          style: 'Hyperlink',
+                        }),
+                      ],
+                      link: link,
+                    });
 
-                      textRuns.push(textRun);
-                    }
-                  },
-                );
+                    textRuns.push(textRun);
+                  }
+                });
 
                 return;
               }
@@ -266,7 +247,7 @@ export const paragraphNewNormal = (
                       size: options?.size ? options?.size * 2 : undefined,
                       ...(color ? { color: color } : {}),
                       ...styles,
-                      style: "Hyperlink",
+                      style: 'Hyperlink',
                     }),
                   ],
                   link: link,
@@ -283,10 +264,7 @@ export const paragraphNewNormal = (
         .flat(1),
     ],
     spacing: { line: 350 },
-    alignment:
-      hasBreakLine && alignment == AlignmentType.JUSTIFIED
-        ? AlignmentType.START
-        : alignment,
+    alignment: hasBreakLine && alignment == AlignmentType.JUSTIFIED ? AlignmentType.START : alignment,
     ...options,
   });
 };
@@ -297,7 +275,7 @@ export const pageBreak = () =>
   });
 
 export const textLink = (text: string, options = {} as ParagraphProps) => {
-  const link = text.split("|");
+  const link = text.split('|');
 
   return new ExternalHyperlink({
     children: [
@@ -307,7 +285,7 @@ export const textLink = (text: string, options = {} as ParagraphProps) => {
         superScript: options?.isSuper ? options?.isSuper : undefined,
         break: options?.isBreak ? 1 : undefined,
         size: options?.size ? options?.size * 2 : undefined,
-        style: "Hyperlink",
+        style: 'Hyperlink',
       }),
     ],
     link: link[0],
@@ -319,15 +297,15 @@ export const paragraphTable = (text: string, options = {} as ParagraphProps) =>
     ...options,
     children: [
       new TextRun({
-        text: "Tabela ",
+        text: 'Tabela ',
         size: 16,
       }),
       new TextRun({
         size: 16,
-        children: [new SequentialIdentifier("Table")],
+        children: [new SequentialIdentifier('Table')],
       }),
       new TextRun({
-        text: ": ",
+        text: ': ',
         size: 16,
       }),
     ],
@@ -335,10 +313,7 @@ export const paragraphTable = (text: string, options = {} as ParagraphProps) =>
     spacing: { after: 70 },
   });
 
-export const paragraphTableLegend = (
-  text: string,
-  options = {} as ParagraphProps,
-) =>
+export const paragraphTableLegend = (text: string, options = {} as ParagraphProps) =>
   paragraphNewNormal(text, {
     spacing: { after: 300 },
     size: 8,
@@ -346,24 +321,21 @@ export const paragraphTableLegend = (
     ...options,
   });
 
-export const paragraphFigure = (
-  text: string,
-  options = {} as ParagraphProps & { spacingAfter?: number },
-) =>
+export const paragraphFigure = (text: string, options = {} as ParagraphProps & { spacingAfter?: number }) =>
   text
     ? paragraphNewNormal(text, {
         ...options,
         children: [
           new TextRun({
-            text: "Figura ",
+            text: 'Figura ',
             size: 16,
           }),
           new TextRun({
             size: 16,
-            children: [new SequentialIdentifier("Figure")],
+            children: [new SequentialIdentifier('Figure')],
           }),
           new TextRun({
-            text: ": ",
+            text: ': ',
             size: 16,
           }),
         ],

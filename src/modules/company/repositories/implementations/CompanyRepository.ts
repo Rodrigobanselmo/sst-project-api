@@ -20,7 +20,7 @@ interface ICreateCompany extends CreateCompanyDto {
 
 @Injectable()
 export class CompanyRepository implements ICompanyRepository {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async create({
     workspace = [],
@@ -58,53 +58,53 @@ export class CompanyRepository implements ICompanyRepository {
           Object.keys(license).length === 0
             ? undefined
             : {
-              connectOrCreate: {
-                create: { ...license, companyId: companyUUId },
-                where: { companyId: companyId || 'company not found' },
+                connectOrCreate: {
+                  create: { ...license, companyId: companyUUId },
+                  where: { companyId: companyId || 'company not found' },
+                },
               },
-            },
         receivingServiceContracts: isReceivingService
           ? {
-            create: { applyingServiceCompanyId: companyId },
-          }
+              create: { applyingServiceCompanyId: companyId },
+            }
           : undefined,
         address: address
           ? {
-            create: { ...address },
-          }
+              create: { ...address },
+            }
           : undefined,
         workspace: workspace
           ? {
-            create: [
-              ...workspace.map(({ id, address, ...work }) => ({
-                ...work,
-                address: { create: address },
-              })),
-            ],
-          }
+              create: [
+                ...workspace.map(({ id, address, ...work }) => ({
+                  ...work,
+                  address: { create: address },
+                })),
+              ],
+            }
           : undefined,
 
         // TODO: should be connect only
         primary_activity: primary_activity
           ? {
-            connectOrCreate: [
-              ...primary_activity.map((activity) => ({
-                create: activity,
-                where: { code: activity.code },
-              })),
-            ],
-          }
+              connectOrCreate: [
+                ...primary_activity.map((activity) => ({
+                  create: activity,
+                  where: { code: activity.code },
+                })),
+              ],
+            }
           : undefined,
         // TODO: should be connect only
         secondary_activity: secondary_activity
           ? {
-            connectOrCreate: [
-              ...secondary_activity.map((activity) => ({
-                create: activity,
-                where: { code: activity.code },
-              })),
-            ],
-          }
+              connectOrCreate: [
+                ...secondary_activity.map((activity) => ({
+                  create: activity,
+                  where: { code: activity.code },
+                })),
+              ],
+            }
           : undefined,
         contacts: {
           create: [{ email, phone, name: 'Contato principal', isPrincipal: true }],
@@ -148,7 +148,6 @@ export class CompanyRepository implements ICompanyRepository {
     }>,
     prismaRef?: boolean,
   ) {
-
     const include = options?.include || {};
     if (primary_activity.length)
       await this.prisma.company.update({
@@ -185,20 +184,20 @@ export class CompanyRepository implements ICompanyRepository {
                   ...rest,
                   hierarchy: hierarchyId //! edit employee
                     ? {
-                      connect: {
-                        id_companyId: { companyId, id: hierarchyId },
-                      },
-                    }
+                        connect: {
+                          id_companyId: { companyId, id: hierarchyId },
+                        },
+                      }
                     : undefined,
                 },
                 update: {
                   ...rest,
                   hierarchy: hierarchyId
                     ? {
-                      connect: {
-                        id_companyId: { companyId, id: hierarchyId },
-                      },
-                    }
+                        connect: {
+                          id_companyId: { companyId, id: hierarchyId },
+                        },
+                      }
                     : undefined,
                 },
                 where: { cpf_companyId: { cpf: rest.cpf, companyId } },
@@ -296,86 +295,96 @@ export class CompanyRepository implements ICompanyRepository {
     const include = options?.include || {};
 
     const data = await this.prisma.$transaction(
-      updateCompanyDto.map(({ secondary_activity = [], primary_activity = [], employees = [], workspace = [], address, id, users, ...upsertRiskDto }) =>
-        this.prisma.company.upsert({
-          where: { id: id || 'no-id' },
-          create: {
-            name: '',
-            cnpj: '',
-            fantasy: '',
-            ...upsertRiskDto,
-            workspace: {
-              create: [
-                ...workspace.map(({ id, address, ...work }) => ({
-                  ...work,
-                  address: { create: address },
-                })),
-              ],
-            },
-            primary_activity: {
-              connect: [
-                ...primary_activity.map((activity) => ({
-                  code: activity.code,
-                })),
-              ],
-            },
-            secondary_activity: {
-              connect: [
-                ...secondary_activity.map((activity) => ({
-                  code: activity.code,
-                })),
-              ],
-            },
-          },
-          update: {
-            ...upsertRiskDto,
-            workspace: {
-              upsert: [
-                ...workspace.map(({ id, address, ...work }) => ({
-                  create: {
+      updateCompanyDto.map(
+        ({
+          secondary_activity = [],
+          primary_activity = [],
+          employees = [],
+          workspace = [],
+          address,
+          id,
+          users,
+          ...upsertRiskDto
+        }) =>
+          this.prisma.company.upsert({
+            where: { id: id || 'no-id' },
+            create: {
+              name: '',
+              cnpj: '',
+              fantasy: '',
+              ...upsertRiskDto,
+              workspace: {
+                create: [
+                  ...workspace.map(({ id, address, ...work }) => ({
                     ...work,
                     address: { create: address },
-                  },
-                  update: {
-                    ...work,
-                    address: { update: address },
-                  },
-                  where: {
-                    id_companyId: {
-                      companyId: upsertRiskDto.companyId,
-                      id: id || 'no-id',
+                  })),
+                ],
+              },
+              primary_activity: {
+                connect: [
+                  ...primary_activity.map((activity) => ({
+                    code: activity.code,
+                  })),
+                ],
+              },
+              secondary_activity: {
+                connect: [
+                  ...secondary_activity.map((activity) => ({
+                    code: activity.code,
+                  })),
+                ],
+              },
+            },
+            update: {
+              ...upsertRiskDto,
+              workspace: {
+                upsert: [
+                  ...workspace.map(({ id, address, ...work }) => ({
+                    create: {
+                      ...work,
+                      address: { create: address },
                     },
-                  },
-                })),
-              ],
+                    update: {
+                      ...work,
+                      address: { update: address },
+                    },
+                    where: {
+                      id_companyId: {
+                        companyId: upsertRiskDto.companyId,
+                        id: id || 'no-id',
+                      },
+                    },
+                  })),
+                ],
+              },
+              primary_activity: {
+                connect: [
+                  ...primary_activity.map((activity) => ({
+                    code: activity.code,
+                  })),
+                ],
+              },
+              secondary_activity: {
+                connect: [
+                  ...secondary_activity.map((activity) => ({
+                    code: activity.code,
+                  })),
+                ],
+              },
             },
-            primary_activity: {
-              connect: [
-                ...primary_activity.map((activity) => ({
-                  code: activity.code,
-                })),
-              ],
+            include: {
+              workspace: include.workspace ? { include: { address: true } } : false,
+              primary_activity: !!include.primary_activity,
+              secondary_activity: !!include.secondary_activity,
+              license: !!include.license,
+              users: !!include.users,
+              group: true,
+              doctorResponsible: { include: { professional: true } },
+              tecResponsible: { include: { professional: true } },
+              employees: !!include.employees ? true : false,
             },
-            secondary_activity: {
-              connect: [
-                ...secondary_activity.map((activity) => ({
-                  code: activity.code,
-                })),
-              ],
-            },
-          },
-          include: {
-            workspace: include.workspace ? { include: { address: true } } : false,
-            primary_activity: !!include.primary_activity,
-            secondary_activity: !!include.secondary_activity,
-            license: !!include.license,
-            users: !!include.users,
-            group: true,
-            doctorResponsible: { include: { professional: true } },
-            tecResponsible: { include: { professional: true } },
-            employees: !!include.employees ? true : false,
-          },
-        }),
+          }),
       ),
     );
 
@@ -427,7 +436,11 @@ export class CompanyRepository implements ICompanyRepository {
     return new CompanyEntity(company);
   }
 
-  async findAllCompanyData(id: string, workspaceId: string, options?: Partial<Prisma.CompanyFindUniqueArgs>): Promise<CompanyEntity> {
+  async findAllCompanyData(
+    id: string,
+    workspaceId: string,
+    options?: Partial<Prisma.CompanyFindUniqueArgs>,
+  ): Promise<CompanyEntity> {
     const company = (await this.prisma.company.findUnique({
       where: { id },
       ...options,
@@ -469,19 +482,19 @@ export class CompanyRepository implements ICompanyRepository {
         { deleted_at: null },
         ...(companyId
           ? [
-            {
-              OR: [
-                { id: companyId },
-                {
-                  receivingServiceContracts: {
-                    some: { applyingServiceCompanyId: companyId },
+              {
+                OR: [
+                  { id: companyId },
+                  {
+                    receivingServiceContracts: {
+                      some: { applyingServiceCompanyId: companyId },
+                    },
                   },
-                },
-                ...(query.isClinic ? [{ companiesToClinicAvailable: { some: { companyId } } }] : []),
-              ],
-              ...options?.where,
-            },
-          ]
+                  ...(query.isClinic ? [{ companiesToClinicAvailable: { some: { companyId } } }] : []),
+                ],
+                ...options?.where,
+              },
+            ]
           : []),
       ],
     } as typeof options.where;
@@ -572,7 +585,9 @@ export class CompanyRepository implements ICompanyRepository {
               companiesToClinicAvailable: { some: { companyId: { in: query.companiesIds } } },
             },
             {
-              companiesToClinicAvailable: { some: { company: { companyGroup: { companies: { some: { id: { in: query.companiesIds } } } } } } },
+              companiesToClinicAvailable: {
+                some: { company: { companyGroup: { companies: { some: { id: { in: query.companiesIds } } } } } },
+              },
             },
           ],
         } as typeof options.where);
@@ -615,7 +630,9 @@ export class CompanyRepository implements ICompanyRepository {
             companiesToClinicAvailable: { some: { companyId: query.companyToClinicsId } },
           },
           {
-            companiesToClinicAvailable: { some: { company: { companyGroup: { companies: { some: { id: query.companyToClinicsId } } } } } },
+            companiesToClinicAvailable: {
+              some: { company: { companyGroup: { companies: { some: { id: query.companyToClinicsId } } } } },
+            },
           },
         ],
       } as typeof options.where);
@@ -671,7 +688,11 @@ export class CompanyRepository implements ICompanyRepository {
     };
   }
 
-  async findAll(query: FindCompaniesDto, pagination: PaginationQueryDto, options: Partial<Prisma.CompanyFindManyArgs> = {}) {
+  async findAll(
+    query: FindCompaniesDto,
+    pagination: PaginationQueryDto,
+    options: Partial<Prisma.CompanyFindManyArgs> = {},
+  ) {
     const whereInit = { AND: [{ deleted_at: null }] } as typeof options.where;
 
     if (query.findAll) {
@@ -846,7 +867,12 @@ export class CompanyRepository implements ICompanyRepository {
     });
 
     const examsCountPromise = this.prisma.exam.count({
-      where: { OR: [{ examToRiskData: { some: { risk: { companyId: id } } } }, { examToRisk: { some: { companyId: id, deletedAt: null } } }] },
+      where: {
+        OR: [
+          { examToRiskData: { some: { risk: { companyId: id } } } },
+          { examToRisk: { some: { companyId: id, deletedAt: null } } },
+        ],
+      },
     });
 
     const characterizationCountPromise = this.prisma.companyCharacterization.count({
@@ -861,7 +887,12 @@ export class CompanyRepository implements ICompanyRepository {
     });
 
     const employeeAwayCountPromise = this.prisma.employee.count({
-      where: { companyId: id, hierarchyId: { not: null }, status: 'ACTIVE', absenteeisms: { some: { endDate: { lt: new Date() } } } },
+      where: {
+        companyId: id,
+        hierarchyId: { not: null },
+        status: 'ACTIVE',
+        absenteeisms: { some: { endDate: { lt: new Date() } } },
+      },
     });
 
     const employeeInactiveCountPromise = this.prisma.employee.count({
@@ -973,8 +1004,9 @@ export class CompanyRepository implements ICompanyRepository {
           some: {
             status: 'ACTIVE',
             receivingServiceCompanyId: companyId,
-          }
-        }, ...options.where
+          },
+        },
+        ...options.where,
       },
     });
 
@@ -998,15 +1030,15 @@ export class CompanyRepository implements ICompanyRepository {
       include: {
         ...(workspaceId &&
           type && {
-          documentData: {
-            where: { workspaceId, type },
-            include: {
-              professionalsSignatures: {
-                include: { professional: { include: { professional: true } } },
+            documentData: {
+              where: { workspaceId, type },
+              include: {
+                professionalsSignatures: {
+                  include: { professional: { include: { professional: true } } },
+                },
               },
             },
-          },
-        }),
+          }),
         primary_activity: true,
         address: true,
         covers: true,

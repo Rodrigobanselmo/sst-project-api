@@ -6,12 +6,17 @@ import { PrismaService } from '../../../../prisma/prisma.service';
 
 import { Prisma } from '@prisma/client';
 import { NotificationEntity } from '../../entities/notification.entity';
-import { CreateNotificationDto, FindNotificationDto, UpdateNotificationDto, UpdateUserNotificationDto } from '../../dto/nofication.dto';
+import {
+  CreateNotificationDto,
+  FindNotificationDto,
+  UpdateNotificationDto,
+  UpdateUserNotificationDto,
+} from '../../dto/nofication.dto';
 import dayjs from 'dayjs';
 
 @Injectable()
 export class NotificationRepository {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async create({
     companiesIds,
@@ -34,7 +39,13 @@ export class NotificationRepository {
     return new NotificationEntity(notification);
   }
 
-  async update({ id, companiesIds, usersIds, json, ...createNotificationDto }: UpdateNotificationDto): Promise<NotificationEntity> {
+  async update({
+    id,
+    companiesIds,
+    usersIds,
+    json,
+    ...createNotificationDto
+  }: UpdateNotificationDto): Promise<NotificationEntity> {
     const notification = await this.prisma.notification.update({
       data: {
         ...createNotificationDto,
@@ -74,7 +85,11 @@ export class NotificationRepository {
     return data.map((exam) => new NotificationEntity(exam));
   }
 
-  async find(query: Partial<FindNotificationDto> & { userId: number }, pagination: PaginationQueryDto, options: Prisma.NotificationFindManyArgs = {}) {
+  async find(
+    query: Partial<FindNotificationDto> & { userId: number },
+    pagination: PaginationQueryDto,
+    options: Prisma.NotificationFindManyArgs = {},
+  ) {
     const whereInit = {
       AND: [],
       ...options.where,
@@ -111,7 +126,7 @@ export class NotificationRepository {
 
       if (OrData.length)
         (where.AND as any).push({
-          OR: OrData
+          OR: OrData,
         } as typeof options.where);
     }
 
@@ -121,19 +136,21 @@ export class NotificationRepository {
       }),
       this.prisma.notification.count({
         where: {
-          AND: [{
-            ...where,
-          }, {
-            OR: [
-              {
-                created_at: { lte: dayjs().add(-14, 'day').toDate() },
-              },
-              {
-                confirmations: { some: { id: query.userId } },
-              },
-            ],
-
-          }]
+          AND: [
+            {
+              ...where,
+            },
+            {
+              OR: [
+                {
+                  created_at: { lte: dayjs().add(-14, 'day').toDate() },
+                },
+                {
+                  confirmations: { some: { id: query.userId } },
+                },
+              ],
+            },
+          ],
         },
       }),
       this.prisma.notification.findMany({
@@ -145,9 +162,9 @@ export class NotificationRepository {
       }),
     ]);
 
-    const allCount = response[0]
-    const ignoredCount = response[1]
-    const data = response[2]
+    const allCount = response[0];
+    const ignoredCount = response[1];
+    const data = response[2];
 
     return {
       data: data.map((exam) => new NotificationEntity(exam)),

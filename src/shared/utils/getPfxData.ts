@@ -1,8 +1,8 @@
-import { BadRequestException, InternalServerErrorException } from "@nestjs/common";
-import { unlinkSync, writeFileSync } from "fs";
+import { BadRequestException, InternalServerErrorException } from '@nestjs/common';
+import { unlinkSync, writeFileSync } from 'fs';
 import PfxToPem from 'pfx-to-pem';
-import { v4 } from "uuid";
-import { DayJSProvider } from "../providers/DateProvider/implementations/DayJSProvider";
+import { v4 } from 'uuid';
+import { DayJSProvider } from '../providers/DateProvider/implementations/DayJSProvider';
 
 interface CertificateAttributes {
   publicModulus: string;
@@ -58,13 +58,17 @@ export const getPfxData = async ({ buffer, password }: { buffer: Buffer; passwor
     throw new InternalServerErrorException('Não foi possivel converter o certificado');
   }
 
-  const dayjs = new DayJSProvider()
+  const dayjs = new DayJSProvider();
   const notAfter = dayjs.dayjs(pem?.attributes?.notAfter);
   const notBefore = dayjs.dayjs(pem?.attributes?.notBefore);
 
-  if (notAfter.toDate() < new Date()) throw new BadRequestException(`Certificado digital da empresa vencido (${notAfter.format('DD/MM/YYYY')})`);
+  if (notAfter.toDate() < new Date())
+    throw new BadRequestException(`Certificado digital da empresa vencido (${notAfter.format('DD/MM/YYYY')})`);
 
-  if (notBefore.toDate() > new Date()) throw new BadRequestException(`Certificado digital da empresa válido a partir de ${notBefore.format('DD/MM/YYYY')}`);
+  if (notBefore.toDate() > new Date())
+    throw new BadRequestException(
+      `Certificado digital da empresa válido a partir de ${notBefore.format('DD/MM/YYYY')}`,
+    );
 
   return {
     pem,

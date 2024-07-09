@@ -1,4 +1,3 @@
-
 import { UserHistory } from '.prisma/client';
 import { UserEntity } from './user.entity';
 import { getUserAgentString } from '../../../shared/utils/getUserAgent';

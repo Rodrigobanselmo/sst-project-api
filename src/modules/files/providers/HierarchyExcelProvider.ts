@@ -152,12 +152,16 @@ export class HierarchyExcelProvider {
         };
 
       if (newHierarchy[allHierarchy.id].workspaceIds && hierarchy.workspaceId) {
-        newHierarchy[allHierarchy.id].workspaceIds = removeDuplicate([...newHierarchy[allHierarchy.id].workspaceIds, ...hierarchy.workspaceId], {
-          simpleCompare: true,
-        });
+        newHierarchy[allHierarchy.id].workspaceIds = removeDuplicate(
+          [...newHierarchy[allHierarchy.id].workspaceIds, ...hierarchy.workspaceId],
+          {
+            simpleCompare: true,
+          },
+        );
       }
       if (parentId) newHierarchy[allHierarchy.id].parentId = parentId;
-      if (hierarchy.ghoName && !newHierarchy[allHierarchy.id]?.ghoNames?.includes(hierarchy.ghoName)) newHierarchy[allHierarchy.id].ghoNames.push(hierarchy.ghoName);
+      if (hierarchy.ghoName && !newHierarchy[allHierarchy.id]?.ghoNames?.includes(hierarchy.ghoName))
+        newHierarchy[allHierarchy.id].ghoNames.push(hierarchy.ghoName);
 
       if (newHierarchy[hierarchy.id].children)
         newHierarchy[hierarchy.id].children.forEach((childId) => {
@@ -201,11 +205,14 @@ export class HierarchyExcelProvider {
             newHierarchy[newHierarchy[hierarchy.id].parentId] &&
             newHierarchy[newHierarchy[hierarchy.id].parentId].connectedToOldId
           ) {
-            newHierarchy[hierarchy.id].connectedToOldId = newHierarchy[newHierarchy[hierarchy.id].parentId].connectedToOldId;
+            newHierarchy[hierarchy.id].connectedToOldId =
+              newHierarchy[newHierarchy[hierarchy.id].parentId].connectedToOldId;
           }
 
           //if has other equal hierarchy
-          const equalHierarchy = Object.values(newHierarchy).find((i) => !i.fromOld && i.id !== hierarchy.id && isEqualHierarchy(i, hierarchy, true));
+          const equalHierarchy = Object.values(newHierarchy).find(
+            (i) => !i.fromOld && i.id !== hierarchy.id && isEqualHierarchy(i, hierarchy, true),
+          );
 
           if (equalHierarchy && newHierarchy[hierarchy.id]) {
             replaceAndEditIfEqual(equalHierarchy, hierarchy);

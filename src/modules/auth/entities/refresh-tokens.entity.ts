@@ -1,4 +1,4 @@
-import { RefreshToken } from ".prisma/client";
+import { RefreshToken } from '.prisma/client';
 
 export class RefreshTokenEntity implements RefreshToken {
   id: string;

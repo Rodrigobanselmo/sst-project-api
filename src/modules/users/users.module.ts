@@ -47,7 +47,13 @@ import { UserHistoryRepository } from './repositories/implementations/UserHistor
 import { FindUserHistorysService } from './services/user-history/find-user-history/find-user-history.service';
 
 @Module({
-  controllers: [UsersController, InvitesController, ProfessionalsController, ProfessionalResponsibleController, CouncilController],
+  controllers: [
+    UsersController,
+    InvitesController,
+    ProfessionalsController,
+    ProfessionalResponsibleController,
+    CouncilController,
+  ],
   imports: [forwardRef(() => AuthModule), CompanyModule],
   providers: [
     HashProvider,
@@ -87,8 +93,8 @@ import { FindUserHistorysService } from './services/user-history/find-user-histo
     DeleteCouncilService,
     CreateCouncilService,
     UserHistoryRepository,
-    FindUserHistorysService
+    FindUserHistorysService,
   ],
   exports: [UsersRepository, UserHistoryRepository, ProfessionalRepository],
 })
-export class UsersModule { }
+export class UsersModule {}

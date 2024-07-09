@@ -1,4 +1,3 @@
-
 import { CompanyEntity } from './company.entity';
 import { License } from '.prisma/client';
 import { StatusEnum } from '@prisma/client';

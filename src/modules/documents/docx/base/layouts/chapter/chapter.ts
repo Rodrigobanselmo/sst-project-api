@@ -1,4 +1,4 @@
-import { setNiceProportion } from "./../../../../../../shared/utils/setNiceProportion";
+import { setNiceProportion } from './../../../../../../shared/utils/setNiceProportion';
 import {
   AlignmentType,
   Footer,
@@ -13,10 +13,10 @@ import {
   TextRun,
   VerticalAlign,
   WidthType,
-} from "docx";
-import { readFileSync } from "fs";
-import sizeOf from "image-size";
-import { borderNoneStyle, sectionCoverProperties } from "../../config/styles";
+} from 'docx';
+import { readFileSync } from 'fs';
+import sizeOf from 'image-size';
+import { borderNoneStyle, sectionCoverProperties } from '../../config/styles';
 
 interface IChapterProps {
   version: string;
@@ -25,10 +25,7 @@ interface IChapterProps {
   imagePath: string;
 }
 
-const text = (
-  text: string,
-  verticalAlign: (typeof VerticalAlign)[keyof typeof VerticalAlign],
-) =>
+const text = (text: string, verticalAlign: (typeof VerticalAlign)[keyof typeof VerticalAlign]) =>
   new TableCell({
     width: { size: 100, type: WidthType.PERCENTAGE },
     children: [
@@ -53,21 +50,13 @@ const table = (rows: TableRow[]) =>
     borders: borderNoneStyle,
   });
 
-const imageCover = (
-  imgPath: string,
-  verticalAlign: (typeof VerticalAlign)[keyof typeof VerticalAlign],
-) => {
+const imageCover = (imgPath: string, verticalAlign: (typeof VerticalAlign)[keyof typeof VerticalAlign]) => {
   const { height: imgHeight, width: imgWidth } = sizeOf(readFileSync(imgPath));
 
   const maxWidth = 630;
   const maxHeight = 200;
 
-  const { height, width } = setNiceProportion(
-    maxWidth,
-    maxHeight,
-    imgWidth,
-    imgHeight,
-  );
+  const { height, width } = setNiceProportion(maxWidth, maxHeight, imgWidth, imgHeight);
 
   return new TableCell({
     width: { size: 100, type: WidthType.PERCENTAGE },
@@ -89,12 +78,7 @@ const imageCover = (
   });
 };
 
-export const createChapterPage = ({
-  version,
-  chapter,
-  imagePath,
-  title,
-}: IChapterProps) => {
+export const createChapterPage = ({ version, chapter, imagePath, title }: IChapterProps) => {
   return table([
     new TableRow({
       children: [text(title, VerticalAlign.TOP)],
@@ -119,12 +103,7 @@ export const createChapterPage = ({
   ]);
 };
 
-export const chapterSection = ({
-  version,
-  chapter,
-  imagePath,
-  title,
-}: IChapterProps): ISectionOptions => {
+export const chapterSection = ({ version, chapter, imagePath, title }: IChapterProps): ISectionOptions => {
   return {
     children: [createChapterPage({ version, chapter, imagePath, title })],
     properties: sectionCoverProperties,

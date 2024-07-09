@@ -1,4 +1,3 @@
-
 import { ChecklistData, Prisma } from '.prisma/client';
 
 export class ChecklistDataEntity implements ChecklistData {

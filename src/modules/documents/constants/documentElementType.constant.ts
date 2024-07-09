@@ -3,7 +3,14 @@ import { DocumentSectionChildrenTypeEnum, ISectionChildrenType } from '../docx/b
 
 type IDocumentElementTypeMap = Record<
   DocumentSectionChildrenTypeEnum,
-  ISectionChildrenType & { label: string; accept: DocumentTypeEnum[]; active?: boolean; isParagraph?: boolean; isBullet?: boolean; order?: number }
+  ISectionChildrenType & {
+    label: string;
+    accept: DocumentTypeEnum[];
+    active?: boolean;
+    isParagraph?: boolean;
+    isBullet?: boolean;
+    order?: number;
+  }
 >;
 
 const primaryOrder = 1;

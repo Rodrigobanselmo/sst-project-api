@@ -9,7 +9,7 @@ import { ProtocolEntity } from '../../entities/protocol.entity';
 
 @Injectable()
 export class ProtocolRepository {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async create(createCompanyDto: CreateProtocolDto) {
     const protocol = await this.prisma.protocol.create({
@@ -57,7 +57,11 @@ export class ProtocolRepository {
     return data.map((dt) => 'id' in dt && new ProtocolEntity(dt));
   }
 
-  async find(query: Partial<FindProtocolDto>, pagination: PaginationQueryDto, options: Prisma.ProtocolFindManyArgs = {}) {
+  async find(
+    query: Partial<FindProtocolDto>,
+    pagination: PaginationQueryDto,
+    options: Prisma.ProtocolFindManyArgs = {},
+  ) {
     const whereInit = {
       AND: [
         // {

@@ -29,7 +29,11 @@ export class DocumentRepository {
     return new DocumentEntity(document);
   }
 
-  async find(query: Partial<FindDocumentDto>, pagination: PaginationQueryDto, options: Prisma.DocumentFindManyArgs = {}) {
+  async find(
+    query: Partial<FindDocumentDto>,
+    pagination: PaginationQueryDto,
+    options: Prisma.DocumentFindManyArgs = {},
+  ) {
     const whereInit = {
       AND: [],
       ...options.where,

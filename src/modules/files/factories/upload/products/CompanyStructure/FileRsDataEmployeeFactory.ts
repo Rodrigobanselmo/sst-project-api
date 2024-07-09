@@ -6,7 +6,7 @@ import { CompanyStructColumnMap } from './constants/company-struct.constants';
 
 @Injectable()
 export class FileRsDataEmployeeFactory extends FileCompanyStructureFactory {
-  public product = FileFactoryProduct
+  public product = FileFactoryProduct;
 }
 
 class FileFactoryProduct extends FileCompanyStructureProduct {

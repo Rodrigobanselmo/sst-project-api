@@ -10,7 +10,7 @@ import { CreateUserHistoryDto, FindUserHistoryDto, UpdateUserHistoryDto } from '
 
 @Injectable()
 export class UserHistoryRepository {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async create(createCompanyDto: CreateUserHistoryDto) {
     const userHistory = await this.prisma.userHistory.create({
@@ -29,7 +29,11 @@ export class UserHistoryRepository {
     return new UserHistoryEntity(userHistory);
   }
 
-  async findAllByCompany(query: Partial<FindUserHistoryDto>, pagination: PaginationQueryDto, options: Prisma.UserHistoryFindManyArgs = {}) {
+  async findAllByCompany(
+    query: Partial<FindUserHistoryDto>,
+    pagination: PaginationQueryDto,
+    options: Prisma.UserHistoryFindManyArgs = {},
+  ) {
     const whereInit = {
       AND: [
         // { companyId: query.companyId },
@@ -52,7 +56,6 @@ export class UserHistoryRepository {
       }),
     };
 
-
     const { where } = prismaFilter(whereInit, {
       query,
       skip: ['search'],
@@ -64,8 +67,8 @@ export class UserHistoryRepository {
           OR: [
             { user: { email: { contains: query.search, mode: 'insensitive' } } },
             { user: { name: { contains: query.search, mode: 'insensitive' } } },
-          ]
-        })
+          ],
+        }),
       } as typeof options.where);
       delete query.search;
     }

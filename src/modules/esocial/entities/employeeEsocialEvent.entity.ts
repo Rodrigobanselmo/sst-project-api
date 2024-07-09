@@ -1,4 +1,10 @@
-import { EmployeeESocialEvent, EmployeeESocialEventActionEnum, EmployeeESocialEventTypeEnum, Prisma, StatusEnum } from '@prisma/client';
+import {
+  EmployeeESocialEvent,
+  EmployeeESocialEventActionEnum,
+  EmployeeESocialEventTypeEnum,
+  Prisma,
+  StatusEnum,
+} from '@prisma/client';
 
 import { CatEntity } from './../../company/entities/cat.entity';
 import { CompanyEntity } from './../../company/entities/company.entity';

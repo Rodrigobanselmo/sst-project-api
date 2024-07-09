@@ -1,13 +1,7 @@
-import { KeysOfEnum } from "./../../../shared/utils/keysOfEnum.utils";
-import {
-  IsBoolean,
-  IsEnum,
-  IsOptional,
-  IsString,
-  ValidateNested,
-} from "class-validator";
-import { AlignmentType, PageOrientation } from "docx";
-import { IBaseDocumentModel } from "../docx/builders/pgr/types/elements.types";
+import { KeysOfEnum } from './../../../shared/utils/keysOfEnum.utils';
+import { IsBoolean, IsEnum, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { AlignmentType, PageOrientation } from 'docx';
+import { IBaseDocumentModel } from '../docx/builders/pgr/types/elements.types';
 
 class DocVariables {
   @IsString()

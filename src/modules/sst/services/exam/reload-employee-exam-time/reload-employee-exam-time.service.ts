@@ -20,12 +20,16 @@ export class ReloadEmployeeExamTimeService {
   async reloadEmployeeExamTime(companyId: string, options?: { employeeIds?: number[] }) {
     const datewww = this.dayjs.dayjs(this.standardDate).toDate();
 
-    const allEmployees = (await this.employeeRepository.findReloadEmployeeExamTime({ companyId, employeeIds: options.employeeIds }, {}, { skipNewExamAdded: true })).map(
-      (e) => ({
-        ...e,
-        expiredDateExamOld: e.expiredDateExam,
-      }),
-    );
+    const allEmployees = (
+      await this.employeeRepository.findReloadEmployeeExamTime(
+        { companyId, employeeIds: options.employeeIds },
+        {},
+        { skipNewExamAdded: true },
+      )
+    ).map((e) => ({
+      ...e,
+      expiredDateExamOld: e.expiredDateExam,
+    }));
 
     const allWithMissingExam = [] as EmployeeEntity[];
 
@@ -87,7 +91,10 @@ export class ReloadEmployeeExamTimeService {
 
           if (doneExamFound) employee.expiredDateExam = doneExamFound.expiredDate;
           if (!doneExamFound && scheduleExamFound && employee.lastExam) {
-            const expiredDate = this.dayjs.dayjs(employee.lastExam).add(scheduleExamFound.validityInMonths, 'month').toDate();
+            const expiredDate = this.dayjs
+              .dayjs(employee.lastExam)
+              .add(scheduleExamFound.validityInMonths, 'month')
+              .toDate();
             employee.expiredDateExam = expiredDate;
           }
         }
@@ -101,7 +108,10 @@ export class ReloadEmployeeExamTimeService {
     });
 
     //TODO qualquer coisa pode ver e mockar isso aqui
-    const exams = allWithMissingExam.length != 0 ? await this.findExamByHierarchyService.execute({ targetCompanyId: companyId }, {}) : undefined;
+    const exams =
+      allWithMissingExam.length != 0
+        ? await this.findExamByHierarchyService.execute({ targetCompanyId: companyId }, {})
+        : undefined;
 
     const getExpired = allWithMissingExam.map((employee) => {
       const ids = [...employee.subOffices.map(({ id }) => id), employee.hierarchyId];
@@ -116,7 +126,9 @@ export class ReloadEmployeeExamTimeService {
             if (examId != exam.id) return false;
 
             origins.find((origin) => {
-              const isPartOfHomo = origin?.homogeneousGroup ? origin.homogeneousGroup?.hierarchies?.find((hier) => ids.includes(hier?.id)) : true;
+              const isPartOfHomo = origin?.homogeneousGroup
+                ? origin.homogeneousGroup?.hierarchies?.find((hier) => ids.includes(hier?.id))
+                : true;
               if (!isPartOfHomo) return;
 
               const skip = this.findExamByHierarchyService.checkIfSkipEmployee(origin, employee);

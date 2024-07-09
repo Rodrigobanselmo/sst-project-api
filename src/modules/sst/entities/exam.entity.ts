@@ -34,7 +34,7 @@ export interface IExamOrigins {
   origins: IExamOriginData[];
 }
 
-export type IRiskExamMap = Record<string, { riskName: string; exams: Record<string, { name: string; id: string }> }>
+export type IRiskExamMap = Record<string, { riskName: string; exams: Record<string, { name: string; id: string }> }>;
 
 export class ExamEntity implements Exam {
   id: number;
@@ -138,6 +138,6 @@ export class ExamEntity implements Exam {
       });
     });
 
-    return riskExamMap
+    return riskExamMap;
   }
 }

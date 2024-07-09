@@ -7,7 +7,10 @@ import { UpdateProfessionalService } from '../update-professional/update-profess
 
 @Injectable()
 export class CreateCouncilService {
-  constructor(private readonly professionalRepository: ProfessionalRepository, private readonly updateProfessionalService: UpdateProfessionalService) {}
+  constructor(
+    private readonly professionalRepository: ProfessionalRepository,
+    private readonly updateProfessionalService: UpdateProfessionalService,
+  ) {}
 
   async execute(createDataDto: CreateCouncilDto, user: UserPayloadDto) {
     await this.updateProfessionalService.checkIfCanUpdateProfessional(createDataDto.professionalId, user);

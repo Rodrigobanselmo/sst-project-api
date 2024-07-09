@@ -5,14 +5,17 @@ import { IDocVariables } from '../../../builders/pgr/types/section.types';
 import { ProfessionalEntity } from '../../../../../users/entities/professional.entity';
 import { getCredential } from '../professionals/professionals.converter';
 
-export const SignaturesConverter = (signatureEntity: (ProfessionalEntity | UserEntity)[], workspace: WorkspaceEntity): IDocVariables[] => {
+export const SignaturesConverter = (
+  signatureEntity: (ProfessionalEntity | UserEntity)[],
+  workspace: WorkspaceEntity,
+): IDocVariables[] => {
   return signatureEntity
     .filter((professional) =>
       'professionalDocumentDataSignature' in professional
         ? professional.professionalDocumentDataSignature.isSigner
         : 'professionalDocumentDataSignature' in professional
-        ? professional.professionalDocumentDataSignature.isSigner
-        : false,
+          ? professional.professionalDocumentDataSignature.isSigner
+          : false,
     )
     .map((signature) => {
       // const council =

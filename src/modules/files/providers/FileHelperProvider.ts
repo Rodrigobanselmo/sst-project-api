@@ -6,12 +6,16 @@ export class FileHelperProvider {
   constructor(private readonly prisma: PrismaService) {}
 
   public async checkWorkspace(companyId: string, workspaces?: string[]) {
-    const workspace = await this.prisma.workspace.findMany({ where: { companyId }, select: { id: true, abbreviation: true, name: true } });
+    const workspace = await this.prisma.workspace.findMany({
+      where: { companyId },
+      select: { id: true, abbreviation: true, name: true },
+    });
 
     if (workspaces) {
       const workspaceCheck = workspaces?.map((workspaceToCheck) => {
         const found = workspace.find((w) => w.abbreviation == workspaceToCheck || w.name == workspaceToCheck);
-        if (!found) throw new BadRequestException(`Estabelecimento "${workspaceToCheck}" não encontrado para essa empresa`);
+        if (!found)
+          throw new BadRequestException(`Estabelecimento "${workspaceToCheck}" não encontrado para essa empresa`);
 
         return found;
       });

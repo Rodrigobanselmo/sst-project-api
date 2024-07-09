@@ -58,7 +58,15 @@ const imageCover = (imgPath: string) => {
 
 export const createCover = ({ version, imgPath, companyName }: IHeaderProps): Paragraph[] => {
   if (!imgPath) return [title()];
-  return [title(), textShow(version), textShow(''), imageCover(imgPath), textShow(''), textShow(''), textShow(companyName)];
+  return [
+    title(),
+    textShow(version),
+    textShow(''),
+    imageCover(imgPath),
+    textShow(''),
+    textShow(''),
+    textShow(companyName),
+  ];
 };
 
 export const coverSections = ({ version, imgPath, companyName }: IHeaderProps): ISectionOptions => {

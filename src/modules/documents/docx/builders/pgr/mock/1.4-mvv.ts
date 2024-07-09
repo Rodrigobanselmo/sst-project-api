@@ -7,7 +7,11 @@ export const mvvSection: IDocumentPGRSectionGroup = {
     {
       type: DocumentSectionTypeEnum.SECTION,
       footerText: `??${VariablesPGREnum.CHAPTER_1}??`,
-      removeWithSomeEmptyVars: [VariablesPGREnum.COMPANY_MISSION, VariablesPGREnum.COMPANY_VISION, VariablesPGREnum.COMPANY_VALUES],
+      removeWithSomeEmptyVars: [
+        VariablesPGREnum.COMPANY_MISSION,
+        VariablesPGREnum.COMPANY_VISION,
+        VariablesPGREnum.COMPANY_VALUES,
+      ],
       children: [
         {
           type: DocumentSectionChildrenTypeEnum.H1,

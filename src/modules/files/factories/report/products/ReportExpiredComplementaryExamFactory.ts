@@ -45,9 +45,12 @@ class ReportFactoryProduct implements IReportFactoryProduct<FindEmployeeDto> {
     private readonly employeeRepository: EmployeeRepository,
     private readonly dayjsProvider: DayJSProvider,
     private readonly findAllAvailableEmployeesService: FindAllAvailableEmployeesService,
-  ) { }
+  ) {}
 
-  public async findTableData(companyId: string, { skip, take, examsInHorizontal, ...query }: ReportComplementaryExamDto) {
+  public async findTableData(
+    companyId: string,
+    { skip, take, examsInHorizontal, ...query }: ReportComplementaryExamDto,
+  ) {
     query.getAllExams = true;
     query.getAllExamsWithSchedule = true;
     query.noPagination = true;
@@ -58,7 +61,10 @@ class ReportFactoryProduct implements IReportFactoryProduct<FindEmployeeDto> {
     query.all = true;
     // query.status = ['ACTIVE'];
 
-    const employees = await this.findAllAvailableEmployeesService.execute(query, { companyId, targetCompanyId: companyId } as any);
+    const employees = await this.findAllAvailableEmployeesService.execute(query, {
+      companyId,
+      targetCompanyId: companyId,
+    } as any);
 
     const sortedExams = sortArray(employees.exams, { by: ['isAttendance', 'name'], order: ['desc', 'asc'] });
 
@@ -67,14 +73,24 @@ class ReportFactoryProduct implements IReportFactoryProduct<FindEmployeeDto> {
     const titleData = this.getTitle(headerData);
     const infoData = this.getEndInformation(employees.data, sortedExams);
 
-    const returnData: IReportFactoryProductFindData = { headerRow: headerData, titleRows: titleData, endRows: infoData, sanitizeData };
+    const returnData: IReportFactoryProductFindData = {
+      headerRow: headerData,
+      titleRows: titleData,
+      endRows: infoData,
+      sanitizeData,
+    };
 
     return returnData;
   }
 
-  public sanitizeData(employees: EmployeeEntity[], sortedExams: ExamEntity[], { examsInHorizontal }: { examsInHorizontal?: boolean }): IReportSanitizeData[] {
-    const rows: (IReportSanitizeData | IReportSanitizeData[])[] = employees.map<IReportSanitizeData | IReportSanitizeData[]>((employee) => {
-
+  public sanitizeData(
+    employees: EmployeeEntity[],
+    sortedExams: ExamEntity[],
+    { examsInHorizontal }: { examsInHorizontal?: boolean },
+  ): IReportSanitizeData[] {
+    const rows: (IReportSanitizeData | IReportSanitizeData[])[] = employees.map<
+      IReportSanitizeData | IReportSanitizeData[]
+    >((employee) => {
       if (examsInHorizontal) {
         const sanitazeRow: IReportSanitizeData = {
           group: { content: employee.company?.group?.name },
@@ -88,10 +104,20 @@ class ReportFactoryProduct implements IReportFactoryProduct<FindEmployeeDto> {
           sector: { content: employee.sectorHierarchy?.name || '' },
           hierarchy: { content: employee?.hierarchy?.name || '' },
           lastExam: {
-            content: employee.lastExam || employee.lastDoneExam?.doneDate ? this.dayjsProvider.format(employee.lastDoneExam?.doneDate || employee.lastExam) : '',
+            content:
+              employee.lastExam || employee.lastDoneExam?.doneDate
+                ? this.dayjsProvider.format(employee.lastDoneExam?.doneDate || employee.lastExam)
+                : '',
           },
-          expiredDateExam: { content: employee.expiredDateExam && employee.expiredDateExam.getFullYear() > 1901 ? employee.expiredDateExam : '' },
-          scheduleDate: { content: employee?.scheduleExam?.doneDate ? this.dayjsProvider.format(employee?.scheduleExam?.doneDate) : '' },
+          expiredDateExam: {
+            content:
+              employee.expiredDateExam && employee.expiredDateExam.getFullYear() > 1901 ? employee.expiredDateExam : '',
+          },
+          scheduleDate: {
+            content: employee?.scheduleExam?.doneDate
+              ? this.dayjsProvider.format(employee?.scheduleExam?.doneDate)
+              : '',
+          },
           ...sortedExams.reduce((acc, exam) => {
             const examFound = employee.infoExams?.[exam.id];
             if (!examFound) return acc;
@@ -116,39 +142,41 @@ class ReportFactoryProduct implements IReportFactoryProduct<FindEmployeeDto> {
       }
 
       let pass = false;
-      const sanitazeRows = sortedExams.map((exam) => {
-        const examFound = employee.infoExams?.[exam.id];
-        if (!examFound) return;
+      const sanitazeRows = sortedExams
+        .map((exam) => {
+          const examFound = employee.infoExams?.[exam.id];
+          if (!examFound) return;
 
-        const color = !pass ? undefined : ReportColorEnum.LIGHT_GREY
+          const color = !pass ? undefined : ReportColorEnum.LIGHT_GREY;
 
-        const sanitazeRow: IReportSanitizeData = {
-          group: { content: employee.company?.group?.name, color },
-          company: { content: getCompanyName(employee.company), color },
-          unit: { content: employee.company.unit, color },
-          rg: { content: employee.rg, color },
-          cpf: { content: employee.cpf, color },
-          esocialCode: { content: employee.esocialCode, color },
-          name: { content: employee.name, color },
-          birthday: { content: employee.birthday ? this.dayjsProvider.format(employee.birthday) : '', color },
-          sector: { content: employee.sectorHierarchy?.name || '', color },
-          hierarchy: { content: employee?.hierarchy?.name || '', color },
+          const sanitazeRow: IReportSanitizeData = {
+            group: { content: employee.company?.group?.name, color },
+            company: { content: getCompanyName(employee.company), color },
+            unit: { content: employee.company.unit, color },
+            rg: { content: employee.rg, color },
+            cpf: { content: employee.cpf, color },
+            esocialCode: { content: employee.esocialCode, color },
+            name: { content: employee.name, color },
+            birthday: { content: employee.birthday ? this.dayjsProvider.format(employee.birthday) : '', color },
+            sector: { content: employee.sectorHierarchy?.name || '', color },
+            hierarchy: { content: employee?.hierarchy?.name || '', color },
 
-          lastExam: { content: examFound.lastDoneExamDate },
-          expiredDateExam: { content: examFound.expiredDate },
-          scheduleDate: { content: examFound.lastScheduleExamDate },
-        };
+            lastExam: { content: examFound.lastDoneExamDate },
+            expiredDateExam: { content: examFound.expiredDate },
+            scheduleDate: { content: examFound.lastScheduleExamDate },
+          };
 
-        sanitazeRow.exam = { content: exam.name || '' };
+          sanitazeRow.exam = { content: exam.name || '' };
 
-        if (examFound.status == StatusExamEnum.EXPIRED) sanitazeRow.expiredDateExam.color = ReportColorEnum.EXPIRED;
-        if ([StatusExamEnum.CLOSE_1, StatusExamEnum.CLOSE_2, StatusExamEnum.CLOSE_3].includes(examFound.status)) sanitazeRow.expiredDateExam.color = ReportColorEnum.CLOSE_TO_EXPIRED;
-        if (examFound.status == StatusExamEnum.DONE) sanitazeRow.expiredDateExam.color = ReportColorEnum.GREEN;
+          if (examFound.status == StatusExamEnum.EXPIRED) sanitazeRow.expiredDateExam.color = ReportColorEnum.EXPIRED;
+          if ([StatusExamEnum.CLOSE_1, StatusExamEnum.CLOSE_2, StatusExamEnum.CLOSE_3].includes(examFound.status))
+            sanitazeRow.expiredDateExam.color = ReportColorEnum.CLOSE_TO_EXPIRED;
+          if (examFound.status == StatusExamEnum.DONE) sanitazeRow.expiredDateExam.color = ReportColorEnum.GREEN;
 
-
-        pass = true;
-        return sanitazeRow;
-      }).filter(i => i)
+          pass = true;
+          return sanitazeRow;
+        })
+        .filter((i) => i);
 
       return sanitazeRows;
     });
@@ -194,8 +222,8 @@ class ReportFactoryProduct implements IReportFactoryProduct<FindEmployeeDto> {
             content: exam.name,
             width: 50,
           };
-        })
-      )
+        }),
+      );
     }
 
     return header;
@@ -219,44 +247,41 @@ class ReportFactoryProduct implements IReportFactoryProduct<FindEmployeeDto> {
         closeToExpired: 0,
         expired: 0,
         name: exam.name,
-        clinic: exam.isAttendance
+        clinic: exam.isAttendance,
       };
-    })
+    });
 
     employees.forEach((employee) => {
-
       Object.entries(employee.infoExams).forEach(([examId, info]) => {
         if (!info) return;
 
         totalByExam[examId].total++;
         if (info.status == StatusExamEnum.EXPIRED) totalByExam[examId].expired++;
-        if ([StatusExamEnum.CLOSE_1, StatusExamEnum.CLOSE_2, StatusExamEnum.CLOSE_3].includes(info.status)) totalByExam[examId].closeToExpired++;
+        if ([StatusExamEnum.CLOSE_1, StatusExamEnum.CLOSE_2, StatusExamEnum.CLOSE_3].includes(info.status))
+          totalByExam[examId].closeToExpired++;
         if (info.status == StatusExamEnum.DONE) totalByExam[examId].done++;
         if (info.status == StatusExamEnum.PROCESSING) totalByExam[examId].processing++;
         if (info.status == StatusExamEnum.PENDING) totalByExam[examId].processing++;
-      })
-
-
+      });
     });
-
 
     const row: IReportCell[] = [{ content: `Exames`, mergeRight: 'all' }];
     const rows = [row];
 
     sortedExams.forEach((exam) => {
       if (totalByExam[exam.id]) {
-        const nameExam = (`${totalByExam[exam.id].name}`)
-        const doneText = (`em dia: ${totalByExam[exam.id].done};`)
-        const closeText = (`a vencer: ${totalByExam[exam.id].closeToExpired};`)
-        const expiredText = (`vencidos: ${totalByExam[exam.id].expired};`)
-        const scheduleText = (`agendados: ${totalByExam[exam.id].processing};`)
+        const nameExam = `${totalByExam[exam.id].name}`;
+        const doneText = `em dia: ${totalByExam[exam.id].done};`;
+        const closeText = `a vencer: ${totalByExam[exam.id].closeToExpired};`;
+        const expiredText = `vencidos: ${totalByExam[exam.id].expired};`;
+        const scheduleText = `agendados: ${totalByExam[exam.id].processing};`;
 
         const row: IReportCell[] = [
-          { content: `${nameExam}`, },
-          { content: `${doneText}`, },
-          { content: `${closeText}`, },
-          { content: `${scheduleText}`, },
-          { content: `${expiredText}`, },
+          { content: `${nameExam}` },
+          { content: `${doneText}` },
+          { content: `${closeText}` },
+          { content: `${scheduleText}` },
+          { content: `${expiredText}` },
           { content: `total: ${totalByExam[exam.id].total}`, mergeRight: 10 },
         ];
 

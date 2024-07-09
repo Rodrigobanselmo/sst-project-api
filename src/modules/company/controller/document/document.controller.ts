@@ -1,4 +1,17 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+  Res,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
@@ -73,7 +86,11 @@ export class DocumentController {
   })
   @Post()
   @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 1000000000 } }))
-  create(@UploadedFile() file: Express.Multer.File, @Body() createDto: CreateDocumentDto, @User() userPayloadDto: UserPayloadDto) {
+  create(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() createDto: CreateDocumentDto,
+    @User() userPayloadDto: UserPayloadDto,
+  ) {
     return this.createDocumentService.execute(createDto, userPayloadDto, file);
   }
 
@@ -85,7 +102,12 @@ export class DocumentController {
   })
   @Patch('/:id')
   @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 1000000000 } }))
-  update(@UploadedFile() file: Express.Multer.File, @Body() update: UpdateDocumentDto, @User() userPayloadDto: UserPayloadDto, @Param('id', ParseIntPipe) id: number) {
+  update(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() update: UpdateDocumentDto,
+    @User() userPayloadDto: UserPayloadDto,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
     return this.updateDocumentService.execute({ ...update, id }, userPayloadDto, file);
   }
 

@@ -1,4 +1,7 @@
-import { FindExamByHierarchyService, filterOriginsByHierarchy } from './../../../../../sst/services/exam/find-by-hierarchy /find-exam-by-hierarchy.service';
+import {
+  FindExamByHierarchyService,
+  filterOriginsByHierarchy,
+} from './../../../../../sst/services/exam/find-by-hierarchy /find-exam-by-hierarchy.service';
 import { Injectable } from '@nestjs/common';
 import { v4 } from 'uuid';
 import { ServerlessLambdaProvider } from '../../../../../../shared/providers/ServerlessFunctionsProvider/implementations/ServerlessLambda/ServerlessLambdaProvider';
@@ -46,7 +49,7 @@ export class DocumentPCMSOFactory extends DocumentFactoryAbstractionCreator<IDoc
       this.homoGroupRepository,
       this.hierarchyRepository,
       this.documentModelRepository,
-      this.findExamByHierarchyService
+      this.findExamByHierarchyService,
     );
   }
 
@@ -62,7 +65,6 @@ export class DocumentPCMSOFactory extends DocumentFactoryAbstractionCreator<IDoc
 export class DocumentPCMSOFactoryProduct extends DocumentPGRFactoryProduct {
   public type = 'PCMSO';
 
-
   // public async error() {
   //   return;
   // }
@@ -75,7 +77,6 @@ export class DocumentPCMSOFactoryProduct extends DocumentPGRFactoryProduct {
   //   return 'images/mock/placeholder-image.png';
   // }
 
-
   constructor(
     protected readonly riskGroupDataRepository: RiskGroupDataRepository,
     protected readonly riskDocumentRepository: RiskDocumentRepository,
@@ -86,85 +87,109 @@ export class DocumentPCMSOFactoryProduct extends DocumentPGRFactoryProduct {
     protected readonly documentModelRepository: DocumentModelRepository,
     protected readonly findExamByHierarchyService: FindExamByHierarchyService,
   ) {
-    super(riskGroupDataRepository, riskDocumentRepository, workspaceRepository, companyRepository, homoGroupRepository, hierarchyRepository, documentModelRepository, findExamByHierarchyService);
+    super(
+      riskGroupDataRepository,
+      riskDocumentRepository,
+      workspaceRepository,
+      companyRepository,
+      homoGroupRepository,
+      hierarchyRepository,
+      documentModelRepository,
+      findExamByHierarchyService,
+    );
   }
 
   public async getData({ companyId, workspaceId, ...body }: IDocumentPGRBody) {
-    const allData = await this.getPrgData({ companyId, workspaceId, type: 'PCSMO', ...body })
+    const allData = await this.getPrgData({ companyId, workspaceId, type: 'PCSMO', ...body });
 
-    return { ...allData }
+    return { ...allData };
   }
 
-  public async getAttachments(options: IGetDocument<IDocumentPGRBody, PromiseInfer<ReturnType<DocumentPCMSOFactoryProduct['getData']>>>) {
+  public async getAttachments(
+    options: IGetDocument<IDocumentPGRBody, PromiseInfer<ReturnType<DocumentPCMSOFactoryProduct['getData']>>>,
+  ) {
     const documentBaseBuild = await this.getDocumentBuild(options);
-
 
     const documentRiskExamGroupBuild: typeof documentBaseBuild = {
       ...documentBaseBuild,
       attachments: [],
       docSections: {
-        sections: [{
-          data: [{
-            title: 'PCMSO',
-            type: DocumentSectionTypeEnum.SECTION, children: [
+        sections: [
+          {
+            data: [
               {
-                type: DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE,
-                text: "Relação de exames por GSE",
+                title: 'PCMSO',
+                type: DocumentSectionTypeEnum.SECTION,
+                children: [
+                  {
+                    type: DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE,
+                    text: 'Relação de exames por GSE',
+                  },
+                  {
+                    type: DocumentSectionChildrenTypeEnum.TABLE_PCMSO_GHO,
+                  },
+                ],
               },
-              {
-                type: DocumentSectionChildrenTypeEnum.TABLE_PCMSO_GHO,
-              },
-            ]
-          }]
-        }],
-        variables: {}
-      }
-    } as typeof documentBaseBuild
+            ],
+          },
+        ],
+        variables: {},
+      },
+    } as typeof documentBaseBuild;
 
     const documentRiskExamHierarchyBuild: typeof documentBaseBuild = {
       ...documentBaseBuild,
       attachments: [],
       docSections: {
-        sections: [{
-          data: [{
-            title: 'PCMSO',
-            type: DocumentSectionTypeEnum.SECTION, children: [
+        sections: [
+          {
+            data: [
               {
-                type: DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE,
-                text: "Relação de exames por hierarquia",
+                title: 'PCMSO',
+                type: DocumentSectionTypeEnum.SECTION,
+                children: [
+                  {
+                    type: DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE,
+                    text: 'Relação de exames por hierarquia',
+                  },
+                  {
+                    type: DocumentSectionChildrenTypeEnum.TABLE_PCMSO_HIERARCHY,
+                  },
+                ],
               },
-              {
-                type: DocumentSectionChildrenTypeEnum.TABLE_PCMSO_HIERARCHY,
-              },
-            ]
-          }]
-        }],
-        variables: {}
-      }
-    } as typeof documentBaseBuild
+            ],
+          },
+        ],
+        variables: {},
+      },
+    } as typeof documentBaseBuild;
 
     const documentRiskExamHierarchyConcatBuild: typeof documentBaseBuild = {
       ...documentBaseBuild,
       attachments: [],
       docSections: {
-        sections: [{
-          data: [{
-            title: 'PCMSO',
-            type: DocumentSectionTypeEnum.SECTION, children: [
+        sections: [
+          {
+            data: [
               {
-                type: DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE,
-                text: "Relação de exames por hierarquia",
+                title: 'PCMSO',
+                type: DocumentSectionTypeEnum.SECTION,
+                children: [
+                  {
+                    type: DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE,
+                    text: 'Relação de exames por hierarquia',
+                  },
+                  {
+                    type: DocumentSectionChildrenTypeEnum.TABLE_PCMSO_HIERARCHY_CONCAT,
+                  },
+                ],
               },
-              {
-                type: DocumentSectionChildrenTypeEnum.TABLE_PCMSO_HIERARCHY_CONCAT,
-              },
-            ]
-          }]
-        }],
-        variables: {}
-      }
-    } as typeof documentBaseBuild
-
+            ],
+          },
+        ],
+        variables: {},
+      },
+    } as typeof documentBaseBuild;
 
     const docId = options.data.docId;
     const companyId = options.data.company.id;
@@ -216,9 +241,10 @@ export class DocumentPCMSOFactoryProduct extends DocumentPGRFactoryProduct {
     ];
   }
 
-  public async getDocumentBuild(options: IGetDocument<IDocumentPGRBody, PromiseInfer<ReturnType<DocumentPCMSOFactoryProduct['getData']>>>) {
-    const docData = await this.getDocumentPgrBuild(options)
-    return { ...docData }
+  public async getDocumentBuild(
+    options: IGetDocument<IDocumentPGRBody, PromiseInfer<ReturnType<DocumentPCMSOFactoryProduct['getData']>>>,
+  ) {
+    const docData = await this.getDocumentPgrBuild(options);
+    return { ...docData };
   }
-
 }

@@ -13,8 +13,15 @@ import { onGetRisks } from '../../../../../shared/utils/onGetRisks';
 //TODO: add doneExams on prontuario para aparecer no Prontuario
 @Injectable()
 export class PdfProntuarioDataService {
-  constructor(private readonly employeeRepository: EmployeeRepository, private readonly findAllRiskDataByEmployeeService: FindAllRiskDataByEmployeeService) { }
-  async execute(employeeId: number, userPayloadDto: UserPayloadDto, options?: { isAvaliation?: boolean }): Promise<IPdfProntuarioData> {
+  constructor(
+    private readonly employeeRepository: EmployeeRepository,
+    private readonly findAllRiskDataByEmployeeService: FindAllRiskDataByEmployeeService,
+  ) {}
+  async execute(
+    employeeId: number,
+    userPayloadDto: UserPayloadDto,
+    options?: { isAvaliation?: boolean },
+  ): Promise<IPdfProntuarioData> {
     const companyId = userPayloadDto.targetCompanyId;
 
     const employeeData = await this.employeeRepository.findFirstNude({
@@ -35,13 +42,26 @@ export class PdfProntuarioDataService {
             initials: true,
             logoUrl: true,
             cnpj: true,
-            doctorResponsible: { select: { councilId: true, councilType: true, councilUF: true, professional: { select: { name: true } } } },
+            doctorResponsible: {
+              select: { councilId: true, councilType: true, councilUF: true, professional: { select: { name: true } } },
+            },
             group: {
               select: {
-                doctorResponsible: { select: { councilId: true, councilType: true, councilUF: true, professional: { select: { name: true } } } },
+                doctorResponsible: {
+                  select: {
+                    councilId: true,
+                    councilType: true,
+                    councilUF: true,
+                    professional: { select: { name: true } },
+                  },
+                },
               },
             },
-            contacts: { select: { phone: true, id: true, isPrincipal: true, email: true }, take: 1, orderBy: { isPrincipal: 'desc' } },
+            contacts: {
+              select: { phone: true, id: true, isPrincipal: true, email: true },
+              take: 1,
+              orderBy: { isPrincipal: 'desc' },
+            },
             receivingServiceContracts: {
               select: {
                 applyingServiceCompany: {
@@ -52,7 +72,11 @@ export class PdfProntuarioDataService {
                     cnpj: true,
                     logoUrl: true,
                     fantasy: true,
-                    contacts: { select: { phone: true, id: true, isPrincipal: true, email: true }, take: 1, orderBy: { isPrincipal: 'desc' } },
+                    contacts: {
+                      select: { phone: true, id: true, isPrincipal: true, email: true },
+                      take: 1,
+                      orderBy: { isPrincipal: 'desc' },
+                    },
                   },
                 },
               },
@@ -67,7 +91,10 @@ export class PdfProntuarioDataService {
           },
         },
         examsHistory: {
-          where: { status: { in: ['PROCESSING', 'DONE'] }, exam: { isAttendance: true, ...(options?.isAvaliation && { isAvaliation: true, isAttendance: false }) } },
+          where: {
+            status: { in: ['PROCESSING', 'DONE'] },
+            exam: { isAttendance: true, ...(options?.isAvaliation && { isAvaliation: true, isAttendance: false }) },
+          },
           select: { doneDate: true, changeHierarchyDate: true, examId: true, examType: true },
           orderBy: { doneDate: 'desc' },
           take: 1,
@@ -81,12 +108,19 @@ export class PdfProntuarioDataService {
       },
     });
 
-    const admissionDate = employeeData?.hierarchyHistory?.[0]?.startDate || employeeData?.examsHistory[0]?.changeHierarchyDate || employeeData?.examsHistory[0]?.doneDate;
-    const { risk: riskData, employee: employeeRisk } = await this.findAllRiskDataByEmployeeService.getRiskData(employeeId, undefined, {
-      fromExam: true,
-      hierarchyData: true,
-      filterDate: true,
-    });
+    const admissionDate =
+      employeeData?.hierarchyHistory?.[0]?.startDate ||
+      employeeData?.examsHistory[0]?.changeHierarchyDate ||
+      employeeData?.examsHistory[0]?.doneDate;
+    const { risk: riskData, employee: employeeRisk } = await this.findAllRiskDataByEmployeeService.getRiskData(
+      employeeId,
+      undefined,
+      {
+        fromExam: true,
+        hierarchyData: true,
+        filterDate: true,
+      },
+    );
 
     const questions = await this.getQuestions(employeeData, companyId);
     const examination = await this.getExamination(employeeData, companyId);

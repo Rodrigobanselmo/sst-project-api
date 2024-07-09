@@ -42,11 +42,11 @@ export class DownloadRiskStructureReportDto {
 
   @IsOptional()
   @IsString()
-  workspaceId: string
+  workspaceId: string;
 
   @IsOptional()
   @IsString()
-  externalSystem: string
+  externalSystem: string;
 
   @IsDate({ message: 'Data de início inválida' })
   @Type(() => Date)

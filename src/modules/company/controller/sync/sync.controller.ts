@@ -13,7 +13,7 @@ export class SyncController {
   constructor(
     private readonly syncService: SyncMainService,
     private readonly syncHierarchyService: SyncHierarchyService,
-  ) { }
+  ) {}
 
   @Permissions({
     code: PermissionEnum.COMPANY,
@@ -36,5 +36,4 @@ export class SyncController {
   syncHierarchy(@Query() query: SyncDto, @User() userPayloadDto: UserPayloadDto) {
     return this.syncHierarchyService.execute(query, userPayloadDto);
   }
-
 }

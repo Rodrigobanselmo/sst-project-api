@@ -26,13 +26,21 @@ export const findAllEmployees = async (
     include: {
       employees: {
         orderBy: { name: 'asc' },
-        include: { hierarchyHistory: { where: { motive: 'ADM' }, select: { startDate: true, motive: true }, take: 1, orderBy: { startDate: 'desc' } } },
+        include: {
+          hierarchyHistory: {
+            where: { motive: 'ADM' },
+            select: { startDate: true, motive: true },
+            take: 1,
+            orderBy: { startDate: 'desc' },
+          },
+        },
       },
       workspace: true,
     },
   });
 
-  if (company.workspace?.length === 1) riskSheet.columns = riskSheet.columns.filter((column) => column.databaseName !== 'abbreviation');
+  if (company.workspace?.length === 1)
+    riskSheet.columns = riskSheet.columns.filter((column) => column.databaseName !== 'abbreviation');
 
   const hierarchies = await hierarchyRepository.findAllHierarchyByCompany(companyId, {
     include: {
@@ -107,7 +115,9 @@ export const findAllEmployees = async (
   company.employees = company.employees.map((employee) => {
     const hierarchyWorkspace = hierarchies.find((hierarchy) => hierarchy.id === employee.hierarchyId)?.workspaceIds;
 
-    const workspace = workspaces.find((workspace) => hierarchyWorkspace && hierarchyWorkspace.find((id) => id == workspace.id));
+    const workspace = workspaces.find(
+      (workspace) => hierarchyWorkspace && hierarchyWorkspace.find((id) => id == workspace.id),
+    );
 
     return {
       ...employee,

@@ -1,4 +1,4 @@
-import { textLink } from "../../../../base/elements/paragraphs";
+import { textLink } from '../../../../base/elements/paragraphs';
 import {
   AlignmentType,
   ITableCellOptions,
@@ -9,10 +9,10 @@ import {
   TextRun,
   VerticalAlign,
   WidthType,
-} from "docx";
-import { isOdd } from "../../../../../../../shared/utils/isOdd";
-import { borderStyleGlobal } from "../../../../base/config/styles";
-import { palette } from "../../../../../../../shared/constants/palette";
+} from 'docx';
+import { isOdd } from '../../../../../../../shared/utils/isOdd';
+import { borderStyleGlobal } from '../../../../base/config/styles';
+import { palette } from '../../../../../../../shared/constants/palette';
 
 export interface bodyTableProps extends Partial<ITableCellOptions> {
   text: string;
@@ -35,19 +35,19 @@ export class TableBodyElements {
   tableCell({ text, size = 10, alignment, ...rest }: bodyTableProps) {
     return new TableCell({
       children: [
-        ...text.split("\n").map(
+        ...text.split('\n').map(
           (text) =>
             new Paragraph({
               children: [
                 ...text
-                  .split("**")
+                  .split('**')
                   .map((text, index) => {
                     const isBold = isOdd(index);
                     return text
-                      .split("\n")
+                      .split('\n')
                       .map((text, index) => {
                         const isBreak = index != 0;
-                        return text.split("<link>").map((text) => {
+                        return text.split('<link>').map((text) => {
                           const isLink = isOdd(index);
                           if (!isLink)
                             return new TextRun({

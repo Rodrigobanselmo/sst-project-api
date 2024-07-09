@@ -1,10 +1,10 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 
-import { UsersRepository } from "../../../../users/repositories/implementations/UsersRepository";
-import { JwtTokenProvider } from "../../../../../shared/providers/TokenProvider/implementations/JwtTokenProvider";
-import { PayloadTokenDto } from "../../../dto/payload-token.dto";
-import { RefreshTokensRepository } from "../../../repositories/implementations/RefreshTokensRepository";
-import { instanceToInstance } from "class-transformer";
+import { UsersRepository } from '../../../../users/repositories/implementations/UsersRepository';
+import { JwtTokenProvider } from '../../../../../shared/providers/TokenProvider/implementations/JwtTokenProvider';
+import { PayloadTokenDto } from '../../../dto/payload-token.dto';
+import { RefreshTokensRepository } from '../../../repositories/implementations/RefreshTokensRepository';
+import { instanceToInstance } from 'class-transformer';
 
 @Injectable()
 export class RefreshTokenService {
@@ -14,42 +14,31 @@ export class RefreshTokenService {
     private readonly jwtTokenProvider: JwtTokenProvider,
   ) {}
 
-  async execute(
-    refresh_token: string,
-    companyId?: string,
-    options?: { isApp?: boolean },
-  ) {
-    const sub = this.jwtTokenProvider.verifyIsValidToken(
-      refresh_token,
-      "refresh",
-    );
+  async execute(refresh_token: string, companyId?: string, options?: { isApp?: boolean }) {
+    const sub = this.jwtTokenProvider.verifyIsValidToken(refresh_token, 'refresh');
 
-    if (sub === "expired") {
+    if (sub === 'expired') {
       await this.refreshTokensRepository.deleteByRefreshToken(refresh_token);
-      throw new UnauthorizedException("jwt expired");
+      throw new UnauthorizedException('jwt expired');
     }
 
-    if (sub === "invalid") {
-      throw new UnauthorizedException("invalid jwt");
+    if (sub === 'invalid') {
+      throw new UnauthorizedException('invalid jwt');
     }
 
     const userId = Number(sub);
 
-    const userRefreshToken =
-      await this.refreshTokensRepository.findByUserIdAndRefreshToken(
-        userId,
-        refresh_token,
-      );
+    const userRefreshToken = await this.refreshTokensRepository.findByUserIdAndRefreshToken(userId, refresh_token);
 
     if (!userRefreshToken) {
-      throw new UnauthorizedException("Refresh Token does not exists!");
+      throw new UnauthorizedException('Refresh Token does not exists!');
     }
 
     const user = await this.usersRepository.findById(userId);
 
     const companies = user.companies
       .map(({ companyId, permissions, roles, status }) => {
-        if (status.toUpperCase() !== "ACTIVE") return null;
+        if (status.toUpperCase() !== 'ACTIVE') return null;
 
         return {
           companyId,
@@ -71,16 +60,11 @@ export class RefreshTokenService {
     };
 
     const token = this.jwtTokenProvider.generateToken(payloadToken);
-    const [new_refresh_token, refreshTokenExpiresDate] =
-      this.jwtTokenProvider.generateRefreshToken(user.id, {
-        isApp: options?.isApp,
-      });
+    const [new_refresh_token, refreshTokenExpiresDate] = this.jwtTokenProvider.generateRefreshToken(user.id, {
+      isApp: options?.isApp,
+    });
 
-    const refreshToken = await this.refreshTokensRepository.create(
-      new_refresh_token,
-      user.id,
-      refreshTokenExpiresDate,
-    );
+    const refreshToken = await this.refreshTokensRepository.create(new_refresh_token, user.id, refreshTokenExpiresDate);
 
     await this.refreshTokensRepository.deleteById(userRefreshToken.id);
 

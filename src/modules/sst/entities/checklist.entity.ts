@@ -1,4 +1,3 @@
-
 import { Checklist, StatusEnum } from '.prisma/client';
 import { ChecklistDataEntity } from './checklistData.entity';
 import { Transform } from 'class-transformer';

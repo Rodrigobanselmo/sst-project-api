@@ -1,10 +1,10 @@
-import { Injectable } from "@nestjs/common";
-import { StatusEnum } from "@prisma/client";
+import { Injectable } from '@nestjs/common';
+import { StatusEnum } from '@prisma/client';
 
-import { UserPayloadDto } from "../../../../../shared/dto/user-payload.dto";
-import { RiskDocumentRepository } from "../../../../sst/repositories/implementations/RiskDocumentRepository";
-import { UploadDocumentDto } from "../../../dto/document.dto";
-import { SendMessageCommand, SQSClient } from "@aws-sdk/client-sqs";
+import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
+import { RiskDocumentRepository } from '../../../../sst/repositories/implementations/RiskDocumentRepository';
+import { UploadDocumentDto } from '../../../dto/document.dto';
+import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs';
 
 @Injectable()
 export class AddQueueDocumentService {
@@ -15,10 +15,7 @@ export class AddQueueDocumentService {
     this.sqs = new SQSClient({ region: process.env.AWS_SQS_PGR_REGION });
     this.queueUrl = process.env.AWS_SQS_PGR_URL;
   }
-  async execute(
-    upsertPgrDto: UploadDocumentDto,
-    userPayloadDto: UserPayloadDto,
-  ) {
+  async execute(upsertPgrDto: UploadDocumentDto, userPayloadDto: UserPayloadDto) {
     const companyId = userPayloadDto.targetCompanyId;
 
     const riskDoc = await this.riskDocumentRepository.upsert({
@@ -40,7 +37,7 @@ export class AddQueueDocumentService {
     const command = new SendMessageCommand({
       QueueUrl: this.queueUrl,
       MessageBody: JSON.stringify(payload),
-      MessageGroupId: "DOCUMENT",
+      MessageGroupId: 'DOCUMENT',
       MessageDeduplicationId: riskDoc.id,
     });
 

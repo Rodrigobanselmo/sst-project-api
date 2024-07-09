@@ -8,12 +8,21 @@ import { formatPhoneNumber } from '../../../../../shared/utils/formats';
 import { CompanyEntity } from '../../../../company/entities/company.entity';
 import { CompanyRepository } from '../../../../company/repositories/implementations/CompanyRepository';
 import { ReportFactoryAbstractionCreator } from '../creator/ReportFactoryCreator';
-import { IReportCell, IReportFactoryProduct, IReportFactoryProductFindData, IReportHeader, IReportSanitizeData } from '../types/IReportFactory.types';
+import {
+  IReportCell,
+  IReportFactoryProduct,
+  IReportFactoryProductFindData,
+  IReportHeader,
+  IReportSanitizeData,
+} from '../types/IReportFactory.types';
 import { FindCompaniesDto } from '../../../../company/dto/company.dto';
 
 @Injectable()
 export class ReportClinicFactory extends ReportFactoryAbstractionCreator<FindCompaniesDto> {
-  constructor(private readonly companyRepository: CompanyRepository, private readonly excelProv: ExcelProvider) {
+  constructor(
+    private readonly companyRepository: CompanyRepository,
+    private readonly excelProv: ExcelProvider,
+  ) {
     super(excelProv, companyRepository);
   }
 
@@ -23,7 +32,7 @@ export class ReportClinicFactory extends ReportFactoryAbstractionCreator<FindCom
 }
 
 class ReportFactoryProduct implements IReportFactoryProduct<FindCompaniesDto> {
-  constructor(private readonly companyRepository: CompanyRepository) { }
+  constructor(private readonly companyRepository: CompanyRepository) {}
 
   public async findTableData(companyId: string, { skip, take, ...query }: FindCompaniesDto) {
     query.isClinic = true;
@@ -55,7 +64,12 @@ class ReportFactoryProduct implements IReportFactoryProduct<FindCompaniesDto> {
     const titleData = this.getTitle(headerData);
     const infoData = this.getEndInformation(clinics.data.length);
 
-    const returnData: IReportFactoryProductFindData = { headerRow: headerData, titleRows: titleData, endRows: infoData, sanitizeData };
+    const returnData: IReportFactoryProductFindData = {
+      headerRow: headerData,
+      titleRows: titleData,
+      endRows: infoData,
+      sanitizeData,
+    };
 
     return returnData;
   }

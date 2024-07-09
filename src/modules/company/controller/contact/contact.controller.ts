@@ -18,7 +18,7 @@ export class ContactController {
     private readonly createContactsService: CreateContactsService,
     private readonly findAvailableContactsService: FindContactsService,
     private readonly deleteContactsService: DeleteContactsService,
-  ) { }
+  ) {}
 
   @Permissions({
     code: PermissionEnum.COMPANY,
@@ -28,7 +28,10 @@ export class ContactController {
   })
   @Get()
   find(@User() userPayloadDto: UserPayloadDto, @Query() query: FindContactDto) {
-    return this.findAvailableContactsService.execute({ ...query, companyId: userPayloadDto.targetCompanyId }, userPayloadDto);
+    return this.findAvailableContactsService.execute(
+      { ...query, companyId: userPayloadDto.targetCompanyId },
+      userPayloadDto,
+    );
   }
 
   @Permissions({
@@ -49,7 +52,11 @@ export class ContactController {
     crud: true,
   })
   @Patch('/:id')
-  update(@Body() upsertAccessGroupDto: UpdateContactDto, @User() userPayloadDto: UserPayloadDto, @Param('id', ParseIntPipe) id: number) {
+  update(
+    @Body() upsertAccessGroupDto: UpdateContactDto,
+    @User() userPayloadDto: UserPayloadDto,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
     return this.updateContactsService.execute({ ...upsertAccessGroupDto, id }, userPayloadDto);
   }
 

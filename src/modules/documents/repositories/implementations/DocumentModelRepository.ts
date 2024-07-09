@@ -10,7 +10,7 @@ import { DocumentModelEntity } from './../../entities/document-model.entity';
 
 @Injectable()
 export class DocumentModelRepository {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async create({ data, ...props }: CreateDocumentModelDto & { data: IDocumentModelData; system?: boolean }) {
     const buffer = Buffer.from(JSON.stringify(data), 'utf8');
@@ -36,7 +36,11 @@ export class DocumentModelRepository {
     return new DocumentModelEntity(document);
   }
 
-  async find(query: Partial<FindDocumentModelDto>, pagination: PaginationQueryDto, options: Prisma.DocumentModelFindManyArgs = {}) {
+  async find(
+    query: Partial<FindDocumentModelDto>,
+    pagination: PaginationQueryDto,
+    options: Prisma.DocumentModelFindManyArgs = {},
+  ) {
     const whereInit = {
       AND: [
         {
@@ -46,9 +50,13 @@ export class DocumentModelRepository {
               companyId: query.companyId,
             },
             {
-              company: { applyingServiceContracts: { some: { receivingServiceCompanyId: query.companyId, status: 'ACTIVE' } } },
+              company: {
+                applyingServiceContracts: { some: { receivingServiceCompanyId: query.companyId, status: 'ACTIVE' } },
+              },
             },
-            ...(query.all ? [{ company: { receivingServiceContracts: { some: { applyingServiceCompanyId: query.companyId } } } }] : []),
+            ...(query.all
+              ? [{ company: { receivingServiceContracts: { some: { applyingServiceCompanyId: query.companyId } } } }]
+              : []),
           ],
         },
       ],
@@ -72,7 +80,10 @@ export class DocumentModelRepository {
 
     if ('search' in query && query.search) {
       (where.AND as any).push({
-        OR: [{ name: { contains: query.search, mode: 'insensitive' } }, { description: { contains: query.search, mode: 'insensitive' } }],
+        OR: [
+          { name: { contains: query.search, mode: 'insensitive' } },
+          { description: { contains: query.search, mode: 'insensitive' } },
+        ],
       } as typeof options.where);
       delete query.search;
     }

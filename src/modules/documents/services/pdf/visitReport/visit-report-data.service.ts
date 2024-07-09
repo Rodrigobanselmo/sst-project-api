@@ -15,8 +15,8 @@ export class PdfVisitReportDataService {
   constructor(
     private readonly scheduleMedicalVisitRepository: ScheduleMedicalVisitRepository,
     private readonly pdfProntuarioDataService: PdfProntuarioDataService,
-    private readonly pdfAsoDataService: PdfAsoDataService
-  ) { }
+    private readonly pdfAsoDataService: PdfAsoDataService,
+  ) {}
   async execute(userPayloadDto: UserPayloadDto, options?: VisitReportPdfDto) {
     const companyId = userPayloadDto.targetCompanyId;
 
@@ -31,7 +31,11 @@ export class PdfVisitReportDataService {
             logoUrl: true,
             cnpj: true,
             address: true,
-            contacts: { select: { phone: true, id: true, isPrincipal: true, email: true }, take: 1, orderBy: { isPrincipal: 'desc' } },
+            contacts: {
+              select: { phone: true, id: true, isPrincipal: true, email: true },
+              take: 1,
+              orderBy: { isPrincipal: 'desc' },
+            },
             receivingServiceContracts: {
               select: {
                 applyingServiceCompany: {
@@ -43,7 +47,11 @@ export class PdfVisitReportDataService {
                     logoUrl: true,
                     fantasy: true,
                     address: true,
-                    contacts: { select: { phone: true, id: true, isPrincipal: true, email: true }, take: 1, orderBy: { isPrincipal: 'desc' } },
+                    contacts: {
+                      select: { phone: true, id: true, isPrincipal: true, email: true },
+                      take: 1,
+                      orderBy: { isPrincipal: 'desc' },
+                    },
                   },
                 },
               },
@@ -54,13 +62,13 @@ export class PdfVisitReportDataService {
                   license: { status: 'ACTIVE' },
                 },
               },
-            }
-          }
+            },
+          },
         },
         exams: {
           where: {
             exam: { isAttendance: true },
-            status: { in: ['PROCESSING', 'DONE'] }
+            status: { in: ['PROCESSING', 'DONE'] },
           },
           select: {
             exam: { select: { name: true } },
@@ -74,24 +82,26 @@ export class PdfVisitReportDataService {
                 birthday: true,
                 socialName: true,
                 rg: true,
-              }
-            }
-          }
-        }
-      }
-    })
+              },
+            },
+          },
+        },
+      },
+    });
 
     const actualCompany = scheduleMedicalVisit?.company;
     const consultantCompany = scheduleMedicalVisit?.company?.receivingServiceContracts?.[0]?.applyingServiceCompany;
-    const empoyees = scheduleMedicalVisit?.exams?.map(exam => exam.employee);
-    const doneDate = scheduleMedicalVisit.doneClinicDate
+    const empoyees = scheduleMedicalVisit?.exams?.map((exam) => exam.employee);
+    const doneDate = scheduleMedicalVisit.doneClinicDate;
 
-    const sumExamsTypes = scheduleMedicalVisit?.exams.reduce((acc, exam) => {
-      acc[exam.examType] = acc[exam.examType] ? acc[exam.examType] + 1 : 1
+    const sumExamsTypes = scheduleMedicalVisit?.exams.reduce(
+      (acc, exam) => {
+        acc[exam.examType] = acc[exam.examType] ? acc[exam.examType] + 1 : 1;
 
-      return acc
-    }, {} as Record<ExamHistoryTypeEnum, number>)
-
+        return acc;
+      },
+      {} as Record<ExamHistoryTypeEnum, number>,
+    );
 
     delete actualCompany?.receivingServiceContracts;
 
@@ -102,7 +112,6 @@ export class PdfVisitReportDataService {
       doneDate,
       sumExamsTypes,
       totalSumExamsTypes: Object.values(sumExamsTypes).reduce((acc, curr) => acc + curr, 0),
-    }
-
+    };
   }
 }

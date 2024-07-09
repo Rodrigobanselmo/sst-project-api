@@ -10,7 +10,10 @@ export class CreateRiskService {
   async execute(createRiskDto: CreateRiskDto, user: UserPayloadDto) {
     const system = user.isSystem;
 
-    const found = await this.riskRepository.findNude({ where: { name: createRiskDto.name, companyId: user.targetCompanyId }, select: { id: true } });
+    const found = await this.riskRepository.findNude({
+      where: { name: createRiskDto.name, companyId: user.targetCompanyId },
+      select: { id: true },
+    });
     if (found.length > 0) throw new BadRequestException('Risco com esse nome já existente');
     const riskFactor = await this.riskRepository.create(createRiskDto, system);
 

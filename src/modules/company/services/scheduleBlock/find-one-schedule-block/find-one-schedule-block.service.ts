@@ -17,7 +17,8 @@ export class FindOneScheduleBlocksService {
     });
 
     if (!schedule?.id) throw new BadRequestException(ErrorMessageEnum.SCHEDULE_BLOCK_NOT_FOUND);
-    if (schedule?.companyId != user.companyId && schedule?.companyId != user.targetCompanyId) throw new BadRequestException(ErrorMessageEnum.SCHEDULE_BLOCK_ACCESS);
+    if (schedule?.companyId != user.companyId && schedule?.companyId != user.targetCompanyId)
+      throw new BadRequestException(ErrorMessageEnum.SCHEDULE_BLOCK_ACCESS);
 
     return schedule;
   }

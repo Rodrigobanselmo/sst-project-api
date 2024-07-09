@@ -8,7 +8,7 @@ export interface IResposeLambdaBody {
 
 export interface IResposeLambda<T> {
   statusCode: number;
-  body: IResposeLambdaBody & T
+  body: IResposeLambdaBody & T;
 }
 
 export interface ICreateDocumentProps {
@@ -19,13 +19,13 @@ export interface ICreateDocumentProps {
     fileName?: string;
     s3BodyKey?: string;
     isPublic?: boolean;
-  }
+  };
 }
 
 export type ICreateDocumentReturn = {
   url: string;
-}
+};
 
 export type ICreateDocumentFuncReturn = IResposeLambda<{
   url: string;
-}>
+}>;

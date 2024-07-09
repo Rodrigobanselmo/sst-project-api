@@ -1,5 +1,5 @@
 import { ImageRun, Paragraph, Table, TableCell, TableRow, VerticalAlign, WidthType } from 'docx';
-import {readFileSync} from 'fs';
+import { readFileSync } from 'fs';
 
 import { borderNoneStyle } from '../../config/styles';
 import { paragraphFigure } from '../paragraphs';

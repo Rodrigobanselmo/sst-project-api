@@ -1,6 +1,6 @@
-import { ArgumentsHost, Catch } from "@nestjs/common";
-import { AmazonLoggerProvider } from "../providers/LoggerProvider/implementations/AmazonStorage/AmazonLoggerProvider";
-import { BaseExceptionFilter } from "@nestjs/core";
+import { ArgumentsHost, Catch } from '@nestjs/common';
+import { AmazonLoggerProvider } from '../providers/LoggerProvider/implementations/AmazonStorage/AmazonLoggerProvider';
+import { BaseExceptionFilter } from '@nestjs/core';
 
 @Catch()
 export class LoggerExceptionFilter extends BaseExceptionFilter {

@@ -8,7 +8,13 @@ import { checkIsNumber } from '../../../../../../../shared/utils/validators/chec
 import { IColumnRuleMap, ISheetRuleMap } from '../../../types/IFileFactory.types';
 import { checkIsString } from '../../../../../../../shared/utils/validators/checkIsString';
 import { checkIsEnum } from '../../../../../../../shared/utils/validators/checkIsEnum';
-import { CharacterizationTypeEnum, EmployeeHierarchyMotiveTypeEnum, HierarchyEnum, RiskFactors, SexTypeEnum } from '@prisma/client';
+import {
+  CharacterizationTypeEnum,
+  EmployeeHierarchyMotiveTypeEnum,
+  HierarchyEnum,
+  RiskFactors,
+  SexTypeEnum,
+} from '@prisma/client';
 import { CompanyStructHeaderEnum } from '../constants/company-struct.constants';
 
 type IDataReturn = { id?: string | number; value: string };

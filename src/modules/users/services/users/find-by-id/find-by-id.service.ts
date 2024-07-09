@@ -4,7 +4,7 @@ import { UsersRepository } from '../../../repositories/implementations/UsersRepo
 
 @Injectable()
 export class FindByIdService {
-  constructor(private readonly userRepository: UsersRepository) { }
+  constructor(private readonly userRepository: UsersRepository) {}
   async execute(id: number, companyId: string) {
     const user = await this.userRepository.findById(id, companyId);
     if (!user?.id) throw new BadRequestException(ErrorInvitesEnum.USER_NOT_FOUND);

@@ -7,7 +7,10 @@ import { DayJSProvider } from '../../../../../shared/providers/DateProvider/impl
 
 @Injectable()
 export class UpsertExamToClinicService {
-  constructor(private readonly examToClinicRepository: ExamToClinicRepository, private readonly dayjs: DayJSProvider) {}
+  constructor(
+    private readonly examToClinicRepository: ExamToClinicRepository,
+    private readonly dayjs: DayJSProvider,
+  ) {}
 
   async execute(createExamDto: UpsertExamToClinicDto, user: UserPayloadDto) {
     const [clinicExamActual, clinicExamOld] = await this.examToClinicRepository.findNude({

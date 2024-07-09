@@ -124,7 +124,7 @@ export class CreateAbsenteeismDto {
   status?: StatusEnum;
 }
 
-export class UpdateAbsenteeismDto extends CreateAbsenteeismDto{
+export class UpdateAbsenteeismDto extends CreateAbsenteeismDto {
   @IsInt()
   id: number;
 }

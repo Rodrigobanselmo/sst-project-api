@@ -61,7 +61,11 @@ export class ScheduleBlockController {
     crud: true,
   })
   @Patch('/:companyId/:id')
-  update(@Body() upsertAccessGroupDto: UpdateScheduleBlockDto, @User() userPayloadDto: UserPayloadDto, @Param('id', ParseIntPipe) id: number) {
+  update(
+    @Body() upsertAccessGroupDto: UpdateScheduleBlockDto,
+    @User() userPayloadDto: UserPayloadDto,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
     return this.updateScheduleBlocksService.execute({ ...upsertAccessGroupDto, id }, userPayloadDto);
   }
 

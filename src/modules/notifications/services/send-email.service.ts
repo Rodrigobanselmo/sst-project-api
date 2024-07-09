@@ -8,7 +8,10 @@ import { NodeMailProvider } from '../../../shared/providers/MailProvider/impleme
 
 @Injectable()
 export class SendEmailService {
-  constructor(private readonly mailProvider: NodeMailProvider, private readonly prisma: PrismaService) { }
+  constructor(
+    private readonly mailProvider: NodeMailProvider,
+    private readonly prisma: PrismaService,
+  ) {}
 
   async execute(user: UserPayloadDto, dto: EmailDto, files?: Array<Express.Multer.File>) {
     if (dto.template === EmailsTemplatesEnum.REFERRAL_GUIDE) {

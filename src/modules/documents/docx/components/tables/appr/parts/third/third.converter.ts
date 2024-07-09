@@ -14,19 +14,32 @@ import { originRiskMap } from '../../../../../../../../shared/constants/maps/ori
 import { sortString } from '../../../../../../../../shared/utils/sorts/string.sort';
 import { RiskFactorDataEntity } from 'src/modules/sst/entities/riskData.entity';
 
-
-export function isRiskValidForHierarchyData({ hierarchyData, riskData, isByGroup }: { hierarchyData: HierarchyMapData; riskData: Partial<RiskFactorDataEntity>; isByGroup: boolean }) {
+export function isRiskValidForHierarchyData({
+  hierarchyData,
+  riskData,
+  isByGroup,
+}: {
+  hierarchyData: HierarchyMapData;
+  riskData: Partial<RiskFactorDataEntity>;
+  isByGroup: boolean;
+}) {
   if (!hierarchyData.allHomogeneousGroupIds.includes(riskData.homogeneousGroupId)) return false;
 
   if (!isByGroup) {
-    const foundHierarchy = riskData.riskFactor.docInfo.find((doc) => !!hierarchyData.org.find((hierarchy) => hierarchy.id === doc.hierarchyId));
+    const foundHierarchy = riskData.riskFactor.docInfo.find(
+      (doc) => !!hierarchyData.org.find((hierarchy) => hierarchy.id === doc.hierarchyId),
+    );
     if (foundHierarchy && foundHierarchy.isPGR === false) return false;
   }
 
-  return true
+  return true;
 }
 
-export const dataConverter = (riskGroup: RiskFactorGroupDataEntity, hierarchyData: HierarchyMapData, isByGroup: boolean) => {
+export const dataConverter = (
+  riskGroup: RiskFactorGroupDataEntity,
+  hierarchyData: HierarchyMapData,
+  isByGroup: boolean,
+) => {
   const riskFactorsMap = new Map<RiskFactorsEnum, bodyTableProps[][]>();
   const riskInventoryData: bodyTableProps[][] = [];
 

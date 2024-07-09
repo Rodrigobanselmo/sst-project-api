@@ -11,7 +11,11 @@ import { EmployeeESocialEventEntity } from '../../entities/employeeEsocialEvent.
 @Injectable()
 export class ESocialEventRepository {
   constructor(private prisma: PrismaService) {}
-  async find(query: Partial<FindESocialEventDto>, pagination: PaginationQueryDto, options: Prisma.EmployeeESocialEventFindManyArgs = {}) {
+  async find(
+    query: Partial<FindESocialEventDto>,
+    pagination: PaginationQueryDto,
+    options: Prisma.EmployeeESocialEventFindManyArgs = {},
+  ) {
     const companyId = query.companyId;
     const whereInit = {
       AND: [

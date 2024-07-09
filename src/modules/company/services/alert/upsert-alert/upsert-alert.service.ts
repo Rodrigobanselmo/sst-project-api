@@ -18,7 +18,10 @@ export class UpsertAlertService {
   ) {}
 
   async execute({ removeEmails, ...body }: AlertDto, user: UserPayloadDto) {
-    const findAlert = await this.alertRepository.findFirstNude({ where: { companyId: user.targetCompanyId, type: body.type }, select: { emails: true } });
+    const findAlert = await this.alertRepository.findFirstNude({
+      where: { companyId: user.targetCompanyId, type: body.type },
+      select: { emails: true },
+    });
     const system = user.isSystem;
 
     if (body?.emails) {
@@ -27,7 +30,9 @@ export class UpsertAlertService {
       });
     }
 
-    const emails = [...(findAlert?.emails || []), ...(body?.emails || [])].filter((email) => (removeEmails ? !removeEmails?.includes(email) : true));
+    const emails = [...(findAlert?.emails || []), ...(body?.emails || [])].filter((email) =>
+      removeEmails ? !removeEmails?.includes(email) : true,
+    );
     const nextAlert = this.getNextDate(body.configJson);
 
     const alert = await this.alertRepository.upsert({

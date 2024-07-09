@@ -17,10 +17,10 @@ export class UpdateScheduleMedicalVisitsService {
     private readonly scheduleMedicalVisitRepository: ScheduleMedicalVisitRepository,
     private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository,
     private readonly checkEmployeeExamService: CheckEmployeeExamService,
-  ) { }
+  ) {}
 
   async execute(body: UpdateScheduleMedicalVisitDto, user: UserPayloadDto) {
-    const handleExamHistoryCreation = async (exam: typeof body.exams[0]) => {
+    const handleExamHistoryCreation = async (exam: (typeof body.exams)[0]) => {
       if (exam.id) return await this.updateEmployeeExamHistoryService.execute({ id: exam.id, ...exam }, user);
 
       return await this.createEmployeeExamHistoryService.execute({ ...exam, scheduleMedicalVisitId: body.id }, user);

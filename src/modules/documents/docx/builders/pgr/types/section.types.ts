@@ -69,7 +69,16 @@ export type IActionPlanTable = {
   properties?: ISectionPropertiesOptions;
 } & IBase;
 
-export type IAllDocumentSectionType = IChapter | ISection | ICover | ISectionEnv | ISectionChar | ITOC | IAprTable | IAprGroupTable | IActionPlanTable;
+export type IAllDocumentSectionType =
+  | IChapter
+  | ISection
+  | ICover
+  | ISectionEnv
+  | ISectionChar
+  | ITOC
+  | IAprTable
+  | IAprGroupTable
+  | IActionPlanTable;
 
 export type IDocumentPGRSectionGroup = {
   data: IAllDocumentSectionType[];

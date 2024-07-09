@@ -1,4 +1,3 @@
-
 import { Address } from '.prisma/client';
 import { WorkspaceEntity } from './workspace.entity';
 

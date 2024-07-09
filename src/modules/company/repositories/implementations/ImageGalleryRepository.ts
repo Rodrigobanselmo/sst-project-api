@@ -11,7 +11,7 @@ import { prismaFilter } from './../../../../shared/utils/filters/prisma.filters'
 
 @Injectable()
 export class ImageGalleryRepository {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async create(data: CreateImageGalleryDto & { url: string; search?: string }) {
     if (data.name) data.search = normalizeString(data.name);
@@ -36,7 +36,11 @@ export class ImageGalleryRepository {
     return new ImageGalleryEntity(result);
   }
 
-  async findAllByCompany(query: Partial<FindImageGalleryDto>, pagination: PaginationQueryDto, options: Prisma.ImageGalleryFindManyArgs = {}) {
+  async findAllByCompany(
+    query: Partial<FindImageGalleryDto>,
+    pagination: PaginationQueryDto,
+    options: Prisma.ImageGalleryFindManyArgs = {},
+  ) {
     const whereInit = {
       AND: [],
     } as typeof options.where;
@@ -57,7 +61,7 @@ export class ImageGalleryRepository {
       (where.AND as any).push({
         types: {
           hasSome: query.types,
-        }
+        },
       } as typeof options.where);
       delete query.search;
     }

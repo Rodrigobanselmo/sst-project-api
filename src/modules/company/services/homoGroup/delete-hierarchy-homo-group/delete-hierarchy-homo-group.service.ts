@@ -38,7 +38,8 @@ export class DeleteHierarchyHomoGroupService {
     });
 
     if (!foundHomoGroup?.id) throw new BadRequestException(ErrorCompanyEnum.GHO_NOT_FOUND);
-    if (foundHomoGroup?.hierarchyOnHomogeneous.length !== homoGroup.ids.length) throw new BadRequestException(ErrorCompanyEnum.GHO_NOT_FOUND);
+    if (foundHomoGroup?.hierarchyOnHomogeneous.length !== homoGroup.ids.length)
+      throw new BadRequestException(ErrorCompanyEnum.GHO_NOT_FOUND);
 
     await this.checkDeletion(foundHomoGroup, userPayloadDto, { deleteCheck: true });
 
@@ -67,7 +68,12 @@ export class DeleteHierarchyHomoGroupService {
   async checkDeletion(
     homoGroup: HomoGroupEntity,
     userPayloadDto: UserPayloadDto,
-    check?: { onlyEndPresentOk?: boolean; deleteCheck?: boolean; updateCheck?: boolean; data?: Pick<UpdateHierarchyHomoGroupDto, 'endDate' | 'startDate'> },
+    check?: {
+      onlyEndPresentOk?: boolean;
+      deleteCheck?: boolean;
+      updateCheck?: boolean;
+      data?: Pick<UpdateHierarchyHomoGroupDto, 'endDate' | 'startDate'>;
+    },
   ) {
     if (userPayloadDto.roles.includes(RoleEnum.ESOCIAL_EDIT)) return;
     if (!homoGroup?.hierarchyOnHomogeneous?.length) return;
@@ -76,7 +82,13 @@ export class DeleteHierarchyHomoGroupService {
       orderBy: { doneDate: 'desc' },
       where: {
         employee: {
-          hierarchyHistory: { some: { hierarchy: { hierarchyOnHomogeneous: { some: { id: { in: homoGroup.hierarchyOnHomogeneous.map((hh) => hh.id) } } } } } },
+          hierarchyHistory: {
+            some: {
+              hierarchy: {
+                hierarchyOnHomogeneous: { some: { id: { in: homoGroup.hierarchyOnHomogeneous.map((hh) => hh.id) } } },
+              },
+            },
+          },
         },
         events: {
           some: {
@@ -89,7 +101,11 @@ export class DeleteHierarchyHomoGroupService {
     const pppId = foundPPP?.id;
 
     if (check.deleteCheck) {
-      const isStartDateBefore = pppId && homoGroup.hierarchyOnHomogeneous.some((hh) => foundPPP.created_at && (!hh.startDate || hh.startDate < foundPPP.doneDate));
+      const isStartDateBefore =
+        pppId &&
+        homoGroup.hierarchyOnHomogeneous.some(
+          (hh) => foundPPP.created_at && (!hh.startDate || hh.startDate < foundPPP.doneDate),
+        );
 
       if (isStartDateBefore) throw new BadRequestException(ErrorMessageEnum.ESOCIAL_FORBIDDEN_HIER_DELETION);
     }
@@ -103,7 +119,8 @@ export class DeleteHierarchyHomoGroupService {
           const isSameStartDate = this.dayjsPropvider.format(hh.startDate) == this.dayjsPropvider.format(startDate);
           const isActualStartDateBeforePPP = !hh.startDate || hh.startDate < foundPPP.doneDate;
 
-          const isEndDateWithStartDate = check.onlyEndPresentOk && !isSameStartDate && !startDate && hh.startDate && endDate;
+          const isEndDateWithStartDate =
+            check.onlyEndPresentOk && !isSameStartDate && !startDate && hh.startDate && endDate;
 
           const isStartDateOK = isEndDateWithStartDate || !(isActualStartDateBeforePPP && !isSameStartDate);
 

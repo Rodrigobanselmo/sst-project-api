@@ -54,7 +54,15 @@ import { ReportRiskStructureRsDataFactory } from './factories/report/products/Re
 import { FileRsDataEmployeeFactory } from './factories/upload/products/CompanyStructure/FileRsDataEmployeeFactory';
 
 @Module({
-  controllers: [FilesChecklistController, ModelsUploadsController, ReportsController, FilesCompanyController, FilesCnaeController, FilesController, FilesCidController],
+  controllers: [
+    FilesChecklistController,
+    ModelsUploadsController,
+    ReportsController,
+    FilesCompanyController,
+    FilesCnaeController,
+    FilesController,
+    FilesCidController,
+  ],
   imports: [SSTModule, CompanyModule, DocumentsModule],
   providers: [
     DayJSProvider,
@@ -102,4 +110,4 @@ import { FileRsDataEmployeeFactory } from './factories/upload/products/CompanySt
     ReportEmployeeModelFactory,
   ],
 })
-export class FilesModule { }
+export class FilesModule {}

@@ -18,7 +18,11 @@ export class UpsertEmployeeHierarchyHistoryService {
     private readonly createEmployeeHierarchyHistoryService: CreateEmployeeHierarchyHistoryService,
   ) {}
 
-  async execute(dataDto: CreateEmployeeHierarchyHistoryDto & { companyId: string }, user: UserPayloadDto, employee?: EmployeeEntity) {
+  async execute(
+    dataDto: CreateEmployeeHierarchyHistoryDto & { companyId: string },
+    user: UserPayloadDto,
+    employee?: EmployeeEntity,
+  ) {
     if (!employee) {
       employee = await this.employeeRepository.findById(dataDto.employeeId, dataDto.companyId, {
         select: { id: true, hierarchyHistory: true, cpf: true },
@@ -29,7 +33,9 @@ export class UpsertEmployeeHierarchyHistoryService {
       const sameDate = this.dayJSProvider.format(dataDto.startDate) === this.dayJSProvider.format(history.startDate);
       if (!sameDate) return false;
 
-      const sameMotive = (EmployeeHierarchyMotiveTypeEnum.DEM == dataDto.motive) == (history.motive == EmployeeHierarchyMotiveTypeEnum.DEM);
+      const sameMotive =
+        (EmployeeHierarchyMotiveTypeEnum.DEM == dataDto.motive) ==
+        (history.motive == EmployeeHierarchyMotiveTypeEnum.DEM);
       return sameMotive;
     });
 

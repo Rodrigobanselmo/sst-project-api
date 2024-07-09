@@ -5,12 +5,17 @@ import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
 import { PrismaService } from '../../../../prisma/prisma.service';
 
 import { Prisma } from '@prisma/client';
-import { CreateExamsRiskDto, FindExamRiskDto, UpdateExamRiskDto, UpsertManyExamsRiskDto } from '../../dto/exam-risk.dto';
+import {
+  CreateExamsRiskDto,
+  FindExamRiskDto,
+  UpdateExamRiskDto,
+  UpsertManyExamsRiskDto,
+} from '../../dto/exam-risk.dto';
 import { ExamRiskEntity } from '../../entities/examRisk.entity';
 
 @Injectable()
 export class ExamRiskRepository {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async create({ ...createExamsRiskDto }: CreateExamsRiskDto): Promise<ExamRiskEntity> {
     const redMed = await this.prisma.examToRisk.create({
@@ -30,9 +35,9 @@ export class ExamRiskRepository {
           skipCompanies: {
             create: {
               companyId: addSkipCompanyId,
-            }
-          }
-        })
+            },
+          },
+        }),
       },
       where: { id_companyId: { companyId, id: id || 0 } },
     });
@@ -40,7 +45,11 @@ export class ExamRiskRepository {
     return new ExamRiskEntity(Exam);
   }
 
-  async find(query: Partial<FindExamRiskDto>, pagination: PaginationQueryDto, options: Prisma.ExamToRiskFindManyArgs = {}) {
+  async find(
+    query: Partial<FindExamRiskDto>,
+    pagination: PaginationQueryDto,
+    options: Prisma.ExamToRiskFindManyArgs = {},
+  ) {
     const whereInit = {
       AND: [{ skipCompanies: { none: { companyId: query.targetCompanyId } }, deletedAt: null }],
     } as typeof options.where;
@@ -54,7 +63,10 @@ export class ExamRiskRepository {
 
     if ('search' in query && query.search) {
       (where.AND as any).push({
-        OR: [{ exam: { name: { contains: query.search, mode: 'insensitive' } } }, { risk: { name: { contains: query.search, mode: 'insensitive' } } }],
+        OR: [
+          { exam: { name: { contains: query.search, mode: 'insensitive' } } },
+          { risk: { name: { contains: query.search, mode: 'insensitive' } } },
+        ],
       } as typeof options.where);
     }
 

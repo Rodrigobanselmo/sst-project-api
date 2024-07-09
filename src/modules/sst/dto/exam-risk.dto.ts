@@ -87,7 +87,6 @@ export class CreateExamsRiskDto {
   @IsDate({ message: 'Data de início inválida' })
   @Type(() => Date)
   startDate: Date;
-
 }
 
 export class UpdateExamRiskDto extends PartialType(CreateExamsRiskDto) {

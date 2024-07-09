@@ -1,25 +1,22 @@
-import { ValidationPipe } from "@nestjs/common";
-import { NestFactory } from "@nestjs/core";
+import { ValidationPipe } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
 // import helmet from 'helmet';
 
-import { AppModule } from "./app.module";
-import { InternalServerExceptionFilter } from "./shared/filters/internal-server-exception.filter";
-import { PrismaDbExceptionFilter } from "./shared/filters/prisma-db-exception.filter";
-import { urlencoded, json } from "express";
-import { LoggingInterceptor } from "./shared/interceptors/logger.interceptor";
-import { LoggerExceptionFilter } from "./shared/filters/logger-exception.filter";
+import { AppModule } from './app.module';
+import { InternalServerExceptionFilter } from './shared/filters/internal-server-exception.filter';
+import { PrismaDbExceptionFilter } from './shared/filters/prisma-db-exception.filter';
+import { urlencoded, json } from 'express';
+import { LoggingInterceptor } from './shared/interceptors/logger.interceptor';
+import { LoggerExceptionFilter } from './shared/filters/logger-exception.filter';
 
-import {
-  utilities as nestWinstonModuleUtilities,
-  WinstonModule,
-} from "nest-winston";
-import * as winston from "winston";
-import CloudWatchTransport from "winston-cloudwatch";
-import { NestExpressApplication } from "@nestjs/platform-express";
+import { utilities as nestWinstonModuleUtilities, WinstonModule } from 'nest-winston';
+import * as winston from 'winston';
+import CloudWatchTransport from 'winston-cloudwatch';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  console.info("STARTED");
-  const isDev = process.env.NODE_ENV === "development";
+  console.info('STARTED');
+  const isDev = process.env.NODE_ENV === 'development';
 
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     // logger: false,
@@ -51,7 +48,7 @@ async function bootstrap() {
     // }),
   });
 
-  app.set("trust proxy", true);
+  app.set('trust proxy', true);
 
   // app.useGlobalInterceptors(new LoggingInterceptor());
   app.useGlobalPipes(
@@ -68,22 +65,22 @@ async function bootstrap() {
   app.useGlobalFilters(new PrismaDbExceptionFilter());
 
   app.enableCors({
-    exposedHeaders: ["Content-Disposition"],
+    exposedHeaders: ['Content-Disposition'],
     origin: [
-      "https://simplesst.com.br",
-      "https://www.simplesst.com.br",
-      "https://simplesst.com",
-      "https://www.simplesst.com",
+      'https://simplesst.com.br',
+      'https://www.simplesst.com.br',
+      'https://simplesst.com',
+      'https://www.simplesst.com',
     ],
     // origin: ['https://simplesst.com', 'http://201.75.187.24'],
     ...(isDev && {
-      origin: "*",
+      origin: '*',
     }),
   });
 
   // app.use(helmet());
-  app.use(json({ limit: "50mb" }));
-  app.use(urlencoded({ extended: true, limit: "50mb" }));
+  app.use(json({ limit: '50mb' }));
+  app.use(urlencoded({ extended: true, limit: '50mb' }));
   await app.listen(process.env.PORT);
 }
 bootstrap();

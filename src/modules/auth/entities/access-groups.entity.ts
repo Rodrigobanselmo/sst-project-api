@@ -1,9 +1,9 @@
-import { AlertEntity } from "./../../company/entities/alert.entity";
-import { InviteUsersEntity } from "./../../users/entities/invite-users.entity";
-import { CompanyEntity } from "./../../company/entities/company.entity";
+import { AlertEntity } from './../../company/entities/alert.entity';
+import { InviteUsersEntity } from './../../users/entities/invite-users.entity';
+import { CompanyEntity } from './../../company/entities/company.entity';
 
-import { AccessGroups } from ".prisma/client";
-import { UserCompanyEntity } from "./../../../modules/users/entities/userCompany.entity";
+import { AccessGroups } from '.prisma/client';
+import { UserCompanyEntity } from './../../../modules/users/entities/userCompany.entity';
 
 export class AccessGroupsEntity implements AccessGroups {
   id: number;
@@ -29,9 +29,7 @@ export class AccessGroupsEntity implements AccessGroups {
     }
 
     if (this.invites) {
-      this.invites = this.invites.map(
-        (invite) => new InviteUsersEntity(invite),
-      );
+      this.invites = this.invites.map((invite) => new InviteUsersEntity(invite));
     }
 
     if (this.users) {

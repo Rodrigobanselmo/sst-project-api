@@ -35,7 +35,12 @@ export class AuthGroupRepository {
     return new AccessGroupsEntity(accessGroup);
   }
 
-  async findAvailable(companyId: string, query: Partial<FindAccessGroupDto>, pagination: PaginationQueryDto, options: Prisma.AccessGroupsFindManyArgs = {}) {
+  async findAvailable(
+    companyId: string,
+    query: Partial<FindAccessGroupDto>,
+    pagination: PaginationQueryDto,
+    options: Prisma.AccessGroupsFindManyArgs = {},
+  ) {
     const where = {
       AND: [{ OR: [{ companyId }, { system: true }] }],
     } as typeof options.where;

@@ -30,7 +30,6 @@ export const dataConverter = (
     .forEach((riskData) => {
       if (!isRiskValidForHierarchyData({ hierarchyData, riskData, isByGroup: true })) return;
 
-
       const cells: bodyTableProps[] = [];
 
       const base = {

@@ -44,8 +44,8 @@ export const environmentsConverter = (environments: CharacterizationEntity[]): I
       const profileName = environment.profileParentId
         ? environment.name
         : environment.profileName
-        ? `${environment.profileName} (${environment.name})`
-        : environment.name;
+          ? `${environment.profileName} (${environment.name})`
+          : environment.name;
 
       const variables = {
         [VariablesPGREnum.ENVIRONMENT_NAME]: environment.name || '',
@@ -115,7 +115,9 @@ export const getLayouts = (vPhotos: CharacterizationPhotoEntity[], hPhotos: Char
 
     if (length >= 2) {
       const removeLegend = isAllLegendEqual && (length - 2 !== 0 || hLength !== 0);
-      layouts.push(VTwoImages([vPhotos[0].photoUrl, vPhotos[1].photoUrl], [vPhotos[0].name, vPhotos[1].name], removeLegend));
+      layouts.push(
+        VTwoImages([vPhotos[0].photoUrl, vPhotos[1].photoUrl], [vPhotos[0].name, vPhotos[1].name], removeLegend),
+      );
 
       const restOfPhotos = vPhotos.slice(2);
       return vLayout(restOfPhotos, restOfPhotos.length);
@@ -138,7 +140,9 @@ export const getLayouts = (vPhotos: CharacterizationPhotoEntity[], hPhotos: Char
       }
 
       if (hLength > 0) {
-        layouts.push(VHImages([vPhotos[0].photoUrl, hPhotos[0].photoUrl], [vPhotos[0].name, hPhotos[0].name], removeLegend));
+        layouts.push(
+          VHImages([vPhotos[0].photoUrl, hPhotos[0].photoUrl], [vPhotos[0].name, hPhotos[0].name], removeLegend),
+        );
 
         const restOfPhotos = hPhotos.slice(1);
         return hLayout(restOfPhotos, [], restOfPhotos.length);
@@ -150,7 +154,9 @@ export const getLayouts = (vPhotos: CharacterizationPhotoEntity[], hPhotos: Char
 
     if (hLength >= 2) {
       const removeLegend = isAllLegendEqual && hLength - 2 !== 0;
-      layouts.push(HTwoImages([hPhotos[0].photoUrl, hPhotos[1].photoUrl], [hPhotos[0].name, hPhotos[1].name], removeLegend));
+      layouts.push(
+        HTwoImages([hPhotos[0].photoUrl, hPhotos[1].photoUrl], [hPhotos[0].name, hPhotos[1].name], removeLegend),
+      );
 
       const restOfPhotos = hPhotos.slice(2);
       return hLayout(restOfPhotos, [], restOfPhotos.length);

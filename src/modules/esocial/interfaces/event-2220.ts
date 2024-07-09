@@ -49,7 +49,22 @@ export const mapInverseResAso: Record<EnumTpExameOcup, ExamHistoryTypeEnum | nul
 
 export const requiredOrdExams = ['0281'];
 // eslint-disable-next-line prettier/prettier
-export const requiredObsProc = ['0583', '0998', '0999', '1128', '1230', '1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999', '9999'];
+export const requiredObsProc = [
+  '0583',
+  '0998',
+  '0999',
+  '1128',
+  '1230',
+  '1992',
+  '1993',
+  '1994',
+  '1995',
+  '1996',
+  '1997',
+  '1998',
+  '1999',
+  '9999',
+];
 
 export interface IEvent2220Props extends IEventProps {
   id: string;

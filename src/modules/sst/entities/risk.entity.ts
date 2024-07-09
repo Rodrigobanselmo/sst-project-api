@@ -16,8 +16,8 @@ export type RiskFactorActivitie = {
   description: string;
   subActivities: {
     description: string;
-  }[]
-}
+  }[];
+};
 
 export class RiskFactorsEntity implements RiskFactors {
   id: string;
@@ -70,7 +70,6 @@ export class RiskFactorsEntity implements RiskFactors {
   docInfo?: RiskDocInfoEntity[];
   protocolToRisk?: ProtocolToRiskEntity[];
 
-
   isAso: boolean;
   isPGR: boolean;
   isPCMSO: boolean;
@@ -109,40 +108,40 @@ export class RiskFactorsEntity implements RiskFactors {
     const apendixNumber = Number(this.appendix);
     // 6 = Anexo 6 Pressão Hiperbarica !!!!(ATIVIDADES)
     // 7 = Anexo 7 RAD Não Ionizantes
-    // 9 = Anexo 9 FRIO 
+    // 9 = Anexo 9 FRIO
     // 10 = Anexo 10 Umidade
     // 11 = Anexo 11 QUIMICO NR 15
-    // 12 = Anexo 12 POEIRAS  
+    // 12 = Anexo 12 POEIRAS
     // 13 = Anexo 13 QUIMICO !!!!(ATIVIDADES)
-    if (apendixNumber && !Number.isNaN(apendixNumber)) return apendixNumber
+    if (apendixNumber && !Number.isNaN(apendixNumber)) return apendixNumber;
 
     // A = Riscos de Acidentes
-    if (this.type === 'ACI') return AppendixEnum.ACI
+    if (this.type === 'ACI') return AppendixEnum.ACI;
     // E = Riscos Ergonomicos
-    if (this.type === 'ERG') return AppendixEnum.ERG
+    if (this.type === 'ERG') return AppendixEnum.ERG;
     // N = Riscos não relacionados
-    if (this.type === 'OUTROS') return AppendixEnum.OUTROS
+    if (this.type === 'OUTROS') return AppendixEnum.OUTROS;
 
     const type = this.getRiskType();
-    const isNoise = type == QuantityTypeEnum.NOISE
+    const isNoise = type == QuantityTypeEnum.NOISE;
     const isNoisImpact = isNoise && this.name.toLocaleLowerCase().includes('impacto');
 
     // 1 = Anexo 1
-    if (isNoise && !isNoisImpact) return 1
+    if (isNoise && !isNoisImpact) return 1;
 
     // 2 = Anexo 2 Ruido Impacto
-    if (isNoise) return 2
+    if (isNoise) return 2;
 
     // 3 = Anexo 3
-    if (type == QuantityTypeEnum.HEAT) return 3
+    if (type == QuantityTypeEnum.HEAT) return 3;
 
     // 5 = Anexo 5
-    if (type == QuantityTypeEnum.RADIATION) return 5
+    if (type == QuantityTypeEnum.RADIATION) return 5;
 
     // 8 = Anexo 8
-    if (type == QuantityTypeEnum.VL || type == QuantityTypeEnum.VFB) return 8
+    if (type == QuantityTypeEnum.VL || type == QuantityTypeEnum.VFB) return 8;
 
     // 14 = Anexo 14
-    if (this.type === 'BIO') return 14
+    if (this.type === 'BIO') return 14;
   }
 }

@@ -9,7 +9,10 @@ import { CompanyRepository } from '../../../repositories/implementations/Company
 
 @Injectable()
 export class AddCompanyPhotoService {
-  constructor(private readonly companyRepository: CompanyRepository, private readonly amazonStorageProvider: AmazonStorageProvider) {}
+  constructor(
+    private readonly companyRepository: CompanyRepository,
+    private readonly amazonStorageProvider: AmazonStorageProvider,
+  ) {}
 
   async execute(userPayloadDto: UserPayloadDto, file: Express.Multer.File) {
     const companyId = userPayloadDto.targetCompanyId;

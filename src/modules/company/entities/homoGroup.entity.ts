@@ -42,15 +42,18 @@ export class HomoGroupEntity implements HomogeneousGroup {
 
     if (this.hierarchyOnHomogeneous && !this.hierarchies) {
       this.hierarchies = Object.values(
-        this.hierarchyOnHomogeneous.reduce((acc, curr) => {
-          if (!curr.hierarchy) return acc;
-          if (!acc[curr.hierarchyId]) acc[curr.hierarchyId] = new HierarchyEntity(curr.hierarchy);
-          if (!acc[curr.hierarchyId].hierarchyOnHomogeneous) acc[curr.hierarchyId].hierarchyOnHomogeneous = [];
+        this.hierarchyOnHomogeneous.reduce(
+          (acc, curr) => {
+            if (!curr.hierarchy) return acc;
+            if (!acc[curr.hierarchyId]) acc[curr.hierarchyId] = new HierarchyEntity(curr.hierarchy);
+            if (!acc[curr.hierarchyId].hierarchyOnHomogeneous) acc[curr.hierarchyId].hierarchyOnHomogeneous = [];
 
-          delete curr.hierarchy;
-          acc[curr.hierarchyId].hierarchyOnHomogeneous.push(curr);
-          return acc;
-        }, {} as Record<string, HierarchyEntity>),
+            delete curr.hierarchy;
+            acc[curr.hierarchyId].hierarchyOnHomogeneous.push(curr);
+            return acc;
+          },
+          {} as Record<string, HierarchyEntity>,
+        ),
       );
     }
   }

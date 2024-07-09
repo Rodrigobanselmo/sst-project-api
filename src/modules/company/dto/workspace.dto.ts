@@ -3,7 +3,17 @@ import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
 import { CnpjFormatTransform } from './../../../shared/transformers/cnpj-format.transform';
 import { Prisma, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
-import { IsBoolean, IsDefined, IsEnum, IsOptional, IsString, Length, MaxLength, ValidateIf, ValidateNested } from 'class-validator';
+import {
+  IsBoolean,
+  IsDefined,
+  IsEnum,
+  IsOptional,
+  IsString,
+  Length,
+  MaxLength,
+  ValidateIf,
+  ValidateNested,
+} from 'class-validator';
 import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
 import { StringCapitalizeTransform } from '../../../shared/transformers/string-capitalize';

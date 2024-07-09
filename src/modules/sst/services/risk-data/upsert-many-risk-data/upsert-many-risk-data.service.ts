@@ -22,7 +22,9 @@ export class UpsertManyRiskDataService {
   async execute(upsertRiskDataDto: UpsertManyRiskDataDto) {
     (await Promise.all(
       upsertRiskDataDto.homogeneousGroupIds.map(async (homogeneousGroupId, index) => {
-        const workspaceId = upsertRiskDataDto.workspaceIds ? upsertRiskDataDto.workspaceIds[index] : upsertRiskDataDto.workspaceId;
+        const workspaceId = upsertRiskDataDto.workspaceIds
+          ? upsertRiskDataDto.workspaceIds[index]
+          : upsertRiskDataDto.workspaceId;
 
         const type = upsertRiskDataDto.type;
 
@@ -65,14 +67,23 @@ export class UpsertManyRiskDataService {
     if (upsertRiskDataDto.riskId) risksDataMany.push(await this.riskDataRepository.upsertMany(upsertRiskDataDto));
 
     if (upsertRiskDataDto.exams)
-      this.checkEmployeeExamService.execute({ homogeneousGroupIds: upsertRiskDataDto.homogeneousGroupIds, companyId: upsertRiskDataDto.companyId });
+      this.checkEmployeeExamService.execute({
+        homogeneousGroupIds: upsertRiskDataDto.homogeneousGroupIds,
+        companyId: upsertRiskDataDto.companyId,
+      });
 
     this.employeePPPHistoryRepository.updateManyNude({
       data: { sendEvent: true },
       where: {
         employee: {
           companyId: upsertRiskDataDto.companyId,
-          hierarchyHistory: { some: { hierarchy: { hierarchyOnHomogeneous: { some: { homogeneousGroupId: { in: upsertRiskDataDto.homogeneousGroupIds } } } } } },
+          hierarchyHistory: {
+            some: {
+              hierarchy: {
+                hierarchyOnHomogeneous: { some: { homogeneousGroupId: { in: upsertRiskDataDto.homogeneousGroupIds } } },
+              },
+            },
+          },
         },
       },
     });

@@ -7,7 +7,13 @@ import { EmployeeExamsHistoryEntity } from '../../../../../modules/company/entit
 import { ExcelProvider } from '../../../../../shared/providers/ExcelProvider/implementations/ExcelProvider';
 import { getCompanyName } from '../../../../../shared/utils/companyName';
 import { ReportFactoryAbstractionCreator } from '../creator/ReportFactoryCreator';
-import { IReportCell, IReportFactoryProduct, IReportFactoryProductFindData, IReportHeader, IReportSanitizeData } from '../types/IReportFactory.types';
+import {
+  IReportCell,
+  IReportFactoryProduct,
+  IReportFactoryProductFindData,
+  IReportHeader,
+  IReportSanitizeData,
+} from '../types/IReportFactory.types';
 import { employeeExamConclusionTypeMap } from './../../../../../shared/constants/maps/exam-history-conclusion.map';
 import { employeeExamEvaluationTypeMap } from './../../../../../shared/constants/maps/exam-history-evaluation.map';
 import { employeeExamTypeMap } from './../../../../../shared/constants/maps/exam-history-type.map';
@@ -29,7 +35,11 @@ export class ReportDoneExamFactory extends ReportFactoryAbstractionCreator<FindE
   }
 
   public factoryMethod(): IReportFactoryProduct<FindEmployeeExamHistoryDto> {
-    return new ReportFactoryProduct(this.employeeExamHistoryRepository, this.examToClinicRepository, this.dayjsProvider);
+    return new ReportFactoryProduct(
+      this.employeeExamHistoryRepository,
+      this.examToClinicRepository,
+      this.dayjsProvider,
+    );
   }
 }
 
@@ -38,20 +48,23 @@ class ReportFactoryProduct implements IReportFactoryProduct<FindEmployeeExamHist
     private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository,
     private readonly examToClinicRepository: ExamToClinicRepository,
     private readonly dayjsProvider: DayJSProvider,
-  ) { }
+  ) {}
 
   public async findTableData(companyId: string, { skip, take, ...query }: FindEmployeeExamHistoryDto) {
     const clinicsIds = query.clinicsIds;
     const examToClinic = clinicsIds
       ? await this.examToClinicRepository.findNude({
-        select: { companyId: true, examId: true, price: true },
-        where: { companyId: { in: clinicsIds }, endDate: null },
-      })
+          select: { companyId: true, examId: true, price: true },
+          where: { companyId: { in: clinicsIds }, endDate: null },
+        })
       : [];
 
-    const examToClinicMap = examToClinic.reduce((acc, { examId, companyId, ...curr }) => {
-      return { ...acc, [`${companyId}${examId}`]: curr };
-    }, {} as Record<string, { price: number }>);
+    const examToClinicMap = examToClinic.reduce(
+      (acc, { examId, companyId, ...curr }) => {
+        return { ...acc, [`${companyId}${examId}`]: curr };
+      },
+      {} as Record<string, { price: number }>,
+    );
 
     const employeesExams = await this.employeeExamHistoryRepository.find(
       {
@@ -103,10 +116,10 @@ class ReportFactoryProduct implements IReportFactoryProduct<FindEmployeeExamHist
 
     const employeesExamsData = clinicsIds
       ? employeesExams.data.map((employeesExam) => {
-        const price = examToClinicMap[`${employeesExam.clinicId}${employeesExam.examId}`]?.price;
-        employeesExam.price = price / 100 || 0;
-        return employeesExam;
-      })
+          const price = examToClinicMap[`${employeesExam.clinicId}${employeesExam.examId}`]?.price;
+          employeesExam.price = price / 100 || 0;
+          return employeesExam;
+        })
       : employeesExams.data;
 
     const sanitizeData = this.sanitizeData(employeesExamsData, !!clinicsIds);
@@ -114,7 +127,12 @@ class ReportFactoryProduct implements IReportFactoryProduct<FindEmployeeExamHist
     const titleData = this.getTitle(headerData, query);
     const infoData = this.getEndInformation(employeesExamsData, !!clinicsIds);
 
-    const returnData: IReportFactoryProductFindData = { titleRows: titleData, headerRow: headerData, sanitizeData, endRows: infoData };
+    const returnData: IReportFactoryProductFindData = {
+      titleRows: titleData,
+      headerRow: headerData,
+      sanitizeData,
+      endRows: infoData,
+    };
 
     return returnData;
   }
@@ -198,7 +216,9 @@ class ReportFactoryProduct implements IReportFactoryProduct<FindEmployeeExamHist
   }
 
   public getEndInformation(employeeExams: EmployeeExamsHistoryEntity[], isWithPrice: boolean): IReportCell[][] {
-    const price = isWithPrice ? `Custo: ${formatCurrency(employeeExams.reduce((acc, curr) => acc + (curr.price || 0), 0))}` : '';
+    const price = isWithPrice
+      ? `Custo: ${formatCurrency(employeeExams.reduce((acc, curr) => acc + (curr.price || 0), 0))}`
+      : '';
 
     const row: IReportCell[] = [
       {

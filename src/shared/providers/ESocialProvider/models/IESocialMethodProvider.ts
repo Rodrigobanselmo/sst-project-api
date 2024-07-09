@@ -1,5 +1,9 @@
 import { CatEntity } from './../../../../modules/company/entities/cat.entity';
-import { IBreakPointPPP, IEmployee2240Data, IEvent2240Props } from './../../../../modules/esocial/interfaces/event-2240';
+import {
+  IBreakPointPPP,
+  IEmployee2240Data,
+  IEvent2240Props,
+} from './../../../../modules/esocial/interfaces/event-2240';
 import { IEsocialSendBatchResponse } from './../../../../modules/esocial/interfaces/esocial';
 import { UserPayloadDto } from './../../../dto/user-payload.dto';
 import { BaseEventDto } from './../../../../modules/esocial/dto/event.dto';

@@ -1,11 +1,11 @@
-import { CacheEnum } from "./../../../../../shared/constants/enum/cache";
-import { BadRequestException, Inject, Injectable } from "@nestjs/common";
-import { CreateRecMedDto } from "../../../dto/rec-med.dto";
-import { RecMedRepository } from "../../../repositories/implementations/RecMedRepository";
-import { UserPayloadDto } from "../../../../../shared/dto/user-payload.dto";
-import { isMaster } from "../../../../../shared/utils/isMater";
-import { Cache } from "cache-manager";
-import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { CacheEnum } from './../../../../../shared/constants/enum/cache';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { CreateRecMedDto } from '../../../dto/rec-med.dto';
+import { RecMedRepository } from '../../../repositories/implementations/RecMedRepository';
+import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
+import { isMaster } from '../../../../../shared/utils/isMater';
+import { Cache } from 'cache-manager';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()
 export class CreateRecMedService {
@@ -21,8 +21,7 @@ export class CreateRecMedService {
   ) {
     const user = isMaster(userPayloadDto, createRecMedDto.companyId);
 
-    const system =
-      user.isSystem && user.companyId === createRecMedDto.companyId;
+    const system = user.isSystem && user.companyId === createRecMedDto.companyId;
 
     if (createRecMedDto.recName) {
       const foundRecFactor = await this.recMedRepository.find(
@@ -40,7 +39,7 @@ export class CreateRecMedService {
       if (foundRecFactor.count > 0) {
         if (options.skipIfExist) return;
         if (options?.returnIfExist) return foundRecFactor.data[0];
-        throw new BadRequestException("Recomendação já exite");
+        throw new BadRequestException('Recomendação já exite');
       }
     }
 
@@ -60,14 +59,11 @@ export class CreateRecMedService {
       if (foundMedFactor.count > 0) {
         if (options.skipIfExist) return;
         if (options?.returnIfExist) return foundMedFactor.data[0];
-        throw new BadRequestException("Medida de controle já exite");
+        throw new BadRequestException('Medida de controle já exite');
       }
     }
 
-    const RecMedFactor = await this.recMedRepository.create(
-      createRecMedDto,
-      system || false,
-    );
+    const RecMedFactor = await this.recMedRepository.create(createRecMedDto, system || false);
     const cacheKey = CacheEnum.REC_MED_REPRESENT_ALL;
 
     // const keys = await this.cacheManager.store.reset(cacheKey);

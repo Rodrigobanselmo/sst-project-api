@@ -71,7 +71,10 @@ export class ProfessionalRepository {
     });
   }
 
-  async update({ id, inviteId, councils, ...data }: Omit<UpdateProfessionalDto, 'sendEmail' | 'userId'>, options: Partial<Prisma.ProfessionalUpdateArgs> = {}) {
+  async update(
+    { id, inviteId, councils, ...data }: Omit<UpdateProfessionalDto, 'sendEmail' | 'userId'>,
+    options: Partial<Prisma.ProfessionalUpdateArgs> = {},
+  ) {
     const professional = await this.prisma.professional.update({
       ...options,
       data: { ...data },
@@ -134,7 +137,11 @@ export class ProfessionalRepository {
     } as any);
   }
 
-  async findByCompanyId(query: Partial<FindProfessionalsDto>, pagination: PaginationQueryDto, options: Prisma.ProfessionalFindManyArgs = {}) {
+  async findByCompanyId(
+    query: Partial<FindProfessionalsDto>,
+    pagination: PaginationQueryDto,
+    options: Prisma.ProfessionalFindManyArgs = {},
+  ) {
     const companyId = query.companyId;
     const userCompanyId = query.userCompanyId;
     delete query.companyId;
@@ -250,7 +257,11 @@ export class ProfessionalRepository {
     };
   }
 
-  async findCouncilByCompanyId(query: Partial<FindProfessionalsDto>, pagination: PaginationQueryDto, options: Prisma.ProfessionalFindManyArgs = {}) {
+  async findCouncilByCompanyId(
+    query: Partial<FindProfessionalsDto>,
+    pagination: PaginationQueryDto,
+    options: Prisma.ProfessionalFindManyArgs = {},
+  ) {
     const companyId = query.companyId;
     const userCompanyId = query.userCompanyId;
     const byCouncil = query.byCouncil;

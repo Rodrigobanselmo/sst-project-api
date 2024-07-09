@@ -1,9 +1,9 @@
-import { Injectable, NestMiddleware } from "@nestjs/common";
-import { NextFunction, Request, Response } from "express";
-import { AmazonLoggerProvider } from "../providers/LoggerProvider/implementations/AmazonStorage/AmazonLoggerProvider";
-import { HashProvider } from "../providers/HashProvider/implementations/HashProvider";
-import { hashSensitiveData } from "../utils/hashSensitiveData";
-import { getIp } from "../utils/getIp";
+import { Injectable, NestMiddleware } from '@nestjs/common';
+import { NextFunction, Request, Response } from 'express';
+import { AmazonLoggerProvider } from '../providers/LoggerProvider/implementations/AmazonStorage/AmazonLoggerProvider';
+import { HashProvider } from '../providers/HashProvider/implementations/HashProvider';
+import { hashSensitiveData } from '../utils/hashSensitiveData';
+import { getIp } from '../utils/getIp';
 
 @Injectable()
 export class HttpLoggerMiddleware implements NestMiddleware {
@@ -11,7 +11,7 @@ export class HttpLoggerMiddleware implements NestMiddleware {
   private hashProvider = new HashProvider();
 
   use(req: Request, res: Response, next: NextFunction) {
-    if (process.env.APP_HOST === "localhost") {
+    if (process.env.APP_HOST === 'localhost') {
       return next();
     }
 
@@ -24,7 +24,7 @@ export class HttpLoggerMiddleware implements NestMiddleware {
       for (let i = 0; i < chunks.length; i++) {
         resArgs[i] = chunks[i];
         if (!resArgs[i]) {
-          res.once("drain", res.write);
+          res.once('drain', res.write);
           i--;
         }
       }
@@ -43,8 +43,8 @@ export class HttpLoggerMiddleware implements NestMiddleware {
         chunkBuffers.push(Buffer.from(resArgs[0]));
       }
 
-      const isResponseFile = !!res.get("Content-Disposition");
-      const body = Buffer.concat(chunkBuffers).toString("utf8");
+      const isResponseFile = !!res.get('Content-Disposition');
+      const body = Buffer.concat(chunkBuffers).toString('utf8');
 
       const { method, originalUrl, headers, body: bodyReq } = req;
       const { statusCode } = res;
@@ -64,7 +64,7 @@ export class HttpLoggerMiddleware implements NestMiddleware {
           ip: getIp(req),
           headers: JSON.stringify(headers),
           requestBody: JSON.stringify(hashSensitiveData(bodyReq)),
-          responseBody: isResponseFile ? "binary file" : body,
+          responseBody: isResponseFile ? 'binary file' : body,
         });
       }
 

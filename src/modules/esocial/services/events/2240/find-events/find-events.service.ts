@@ -25,12 +25,11 @@ import { RiskRepository } from './../../../../../sst/repositories/implementation
 import { ProfessionalEntity } from './../../../../../users/entities/professional.entity';
 import { IBreakPointPPP, IEmployee2240Data, IPriorRiskData } from './../../../../interfaces/event-2240';
 
-
 export const getEmployeeFind2240Where = (companyId: string): Prisma.EmployeeWhereInput => ({
   companyId,
   OR: [{ pppHistory: { none: { id: { gt: 0 } } } }, { pppHistory: { some: { sendEvent: true } } }],
-  hierarchyHistory: { some: { id: { gt: 0 } } }
-})
+  hierarchyHistory: { some: { id: { gt: 0 } } },
+});
 
 @Injectable()
 export class FindEvents2240ESocialService {
@@ -44,7 +43,7 @@ export class FindEvents2240ESocialService {
     private readonly riskRepository: RiskRepository,
     private readonly dayjsProvider: DayJSProvider,
     private readonly prisma: PrismaService,
-  ) { }
+  ) {}
 
   async execute({ skip, take, ...query }: FindEvents2240Dto, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;
@@ -63,12 +62,19 @@ export class FindEvents2240ESocialService {
 
     const employees2240 = await this.findEmployee2240(company, startDate);
 
-    const eventsStruct = this.eSocialEventProvider.convertToEvent2240Struct({ company, esocialStartDate: startDate, employees: employees2240 });
+    const eventsStruct = this.eSocialEventProvider.convertToEvent2240Struct({
+      company,
+      esocialStartDate: startDate,
+      employees: employees2240,
+    });
 
     // update when is same as before
     {
       const updateIsSame = eventsStruct.filter((e) => e.isSame && e.receipt).map((e) => e.ppp.id);
-      await this.prisma.employeePPPHistory.updateMany({ where: { id: { in: updateIsSame } }, data: { sendEvent: false } });
+      await this.prisma.employeePPPHistory.updateMany({
+        where: { id: { in: updateIsSame } },
+        data: { sendEvent: false },
+      });
       const updateIsExcludeNotExist = eventsStruct.filter((e) => e.isExclude && !e.receipt).map((e) => e.ppp.id);
       await this.prisma.employeePPPHistory.deleteMany({ where: { id: { in: updateIsExcludeNotExist } } });
     }
@@ -295,30 +301,29 @@ export class FindEvents2240ESocialService {
 
     company.employees.forEach((employee) => {
       // const timeline = {};
-      const allHistory = employee.hierarchyHistory.reduce<(EmployeeHierarchyHistoryEntity & { ambProfessional?: Partial<ProfessionalEntity> })[]>(
-        (acc, history, index, array) => {
-          const startDate = this.onGetDate(history.startDate > esocialStartDate ? history.startDate : esocialStartDate);
-          const endDate = this.onGetDate(array[index + 1]?.startDate);
+      const allHistory = employee.hierarchyHistory.reduce<
+        (EmployeeHierarchyHistoryEntity & { ambProfessional?: Partial<ProfessionalEntity> })[]
+      >((acc, history, index, array) => {
+        const startDate = this.onGetDate(history.startDate > esocialStartDate ? history.startDate : esocialStartDate);
+        const endDate = this.onGetDate(array[index + 1]?.startDate);
 
-          const responsibles = company.professionalsResponsibles;
-          const newAcc: Record<number, typeof acc[0]> = {};
-          newAcc[startDate.getTime()] = history;
+        const responsibles = company.professionalsResponsibles;
+        const newAcc: Record<number, (typeof acc)[0]> = {};
+        newAcc[startDate.getTime()] = history;
 
-          responsibles.forEach((professional) => {
-            const profStartDate = this.onGetDate(professional.startDate);
-            const newHistory = { ...history, ambProfessional: professional.professional };
-            if (profStartDate <= startDate) {
-              return (newAcc[startDate.getTime()] = newHistory);
-            }
+        responsibles.forEach((professional) => {
+          const profStartDate = this.onGetDate(professional.startDate);
+          const newHistory = { ...history, ambProfessional: professional.professional };
+          if (profStartDate <= startDate) {
+            return (newAcc[startDate.getTime()] = newHistory);
+          }
 
-            const isBetween = this.isDateBetween(profStartDate, startDate, endDate);
-            if (isBetween) newAcc[profStartDate.getTime()] = { ...newHistory, startDate: profStartDate };
-          });
+          const isBetween = this.isDateBetween(profStartDate, startDate, endDate);
+          if (isBetween) newAcc[profStartDate.getTime()] = { ...newHistory, startDate: profStartDate };
+        });
 
-          return [...acc, ...Object.values(newAcc)];
-        },
-        [],
-      );
+        return [...acc, ...Object.values(newAcc)];
+      }, []);
 
       const hierarchyHistory = sortArray(allHistory, { by: ['startDate'], order: 'asc' });
 
@@ -347,7 +352,11 @@ export class FindEvents2240ESocialService {
             const hhStartDate = this.onGetDate(hh.startDate);
             const hhEndDate = this.onGetDate(hh.endDate);
 
-            const { timeline, breakPoint } = this.cutTimeline(homoRiskDataTree[hh.homogeneousGroupId] || [], [endDate, hhEndDate], [startDate, hhStartDate]);
+            const { timeline, breakPoint } = this.cutTimeline(
+              homoRiskDataTree[hh.homogeneousGroupId] || [],
+              [endDate, hhEndDate],
+              [startDate, hhStartDate],
+            );
 
             Object.assign(pppSnapshot, breakPoint);
 
@@ -358,7 +367,11 @@ export class FindEvents2240ESocialService {
 
           Object.keys(pppSnapshot).forEach((key) => {
             pppSnapshot[key].responsible = history.ambProfessional;
-            pppSnapshot[key].environments = hierarchy.workspaces.map((w) => ({ cnpj: w.cnpj || company.cnpj, sectorName: sector.name, isOwner: w.isOwner }));
+            pppSnapshot[key].environments = hierarchy.workspaces.map((w) => ({
+              cnpj: w.cnpj || company.cnpj,
+              sectorName: sector.name,
+              isOwner: w.isOwner,
+            }));
             pppSnapshot[key].desc = hierarchy.description;
           });
 
@@ -378,7 +391,8 @@ export class FindEvents2240ESocialService {
 
       const hierarchy = hierarchyTree[hierarchyHistory?.[0]?.hierarchyId];
       let sectorHierarchy = hierarchyTree[hierarchy?.parentId];
-      if (sectorHierarchy && sectorHierarchy?.parentId && sectorHierarchy.type != 'SECTOR') sectorHierarchy = hierarchyTree[sectorHierarchy?.parentId];
+      if (sectorHierarchy && sectorHierarchy?.parentId && sectorHierarchy.type != 'SECTOR')
+        sectorHierarchy = hierarchyTree[sectorHierarchy?.parentId];
       delete employee.hierarchyHistory;
 
       employeesData.push({
@@ -491,7 +505,7 @@ export class FindEvents2240ESocialService {
         //*Employees
         employees: {
           where: {
-            ...getEmployeeFind2240Where(companyId)
+            ...getEmployeeFind2240Where(companyId),
           },
           select: {
             id: true,
@@ -529,7 +543,8 @@ export class FindEvents2240ESocialService {
       },
     });
 
-    const cert = company?.cert || company?.group?.cert || company?.receivingServiceContracts?.[0]?.applyingServiceCompany?.cert;
+    const cert =
+      company?.cert || company?.group?.cert || company?.receivingServiceContracts?.[0]?.applyingServiceCompany?.cert;
 
     if (options?.cert && !cert) throw new BadRequestException('Certificado digital não cadastrado');
 
@@ -619,7 +634,8 @@ export class FindEvents2240ESocialService {
 
     if (minEndDate != 9999999999999 && maxEndDate && maxEndDate.getTime() != minEndDate)
       breakPoint[this.onGetStringDate(minEndDate)] = { riskData: [], date: this.onGetDate(minEndDate) };
-    if (maxStartDate) breakPoint[this.onGetStringDate(maxStartDate)] = { riskData: [], date: this.onGetDate(maxStartDate) };
+    if (maxStartDate)
+      breakPoint[this.onGetStringDate(maxStartDate)] = { riskData: [], date: this.onGetDate(maxStartDate) };
 
     const timeline =
       riskData?.reduce<RiskFactorDataEntity[]>((acc, rd) => {
@@ -635,10 +651,15 @@ export class FindEvents2240ESocialService {
         const rdClone = clone(rd);
 
         if (setEndDate || !rd.endDate) rdClone.endDate = this.onGetDate(minEndDate);
-        else breakPoint[this.onGetStringDate(rdClone.endDate)] = { riskData: [], date: this.onGetDate(rdClone.endDate) };
+        else
+          breakPoint[this.onGetStringDate(rdClone.endDate)] = { riskData: [], date: this.onGetDate(rdClone.endDate) };
 
         if (setStartDateOnly || !rd.startDate) rdClone.startDate = this.onGetDate(maxStartDate);
-        else breakPoint[this.onGetStringDate(rdClone.startDate)] = { riskData: [], date: this.onGetDate(rdClone.startDate) };
+        else
+          breakPoint[this.onGetStringDate(rdClone.startDate)] = {
+            riskData: [],
+            date: this.onGetDate(rdClone.startDate),
+          };
 
         return [...acc, rdClone];
       }, [] as RiskFactorDataEntity[]) || [];

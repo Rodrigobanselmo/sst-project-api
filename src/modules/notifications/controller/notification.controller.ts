@@ -1,4 +1,15 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+  UploadedFiles,
+  UseInterceptors,
+} from '@nestjs/common';
 import { User } from '../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from './../../../shared/dto/user-payload.dto';
 
@@ -21,7 +32,7 @@ export class NotificationController {
     private readonly createNotificationService: CreateNotificationService,
     private readonly listCompanyNotificationService: ListCompanyNotificationService,
     private readonly updateUserNotificationService: UpdateUserNotificationService,
-  ) { }
+  ) {}
 
   @Roles(RoleEnum.NOTIFICATION)
   @Post()
@@ -36,7 +47,11 @@ export class NotificationController {
   }
 
   @Patch(':id/user')
-  updateUser(@User() user: UserPayloadDto, @Body() dto: UpdateUserNotificationDto, @Param('id', ParseIntPipe) id: number) {
+  updateUser(
+    @User() user: UserPayloadDto,
+    @Body() dto: UpdateUserNotificationDto,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
     return this.updateUserNotificationService.execute(user, { ...dto, id });
   }
 
@@ -117,7 +132,6 @@ export class NotificationController {
 
   //   await page.goto('http://localhost:3333/notification/returnfile');
 
-
   //   return { ok: true };
   //   //?------------------------- teste
 
@@ -143,7 +157,6 @@ export class NotificationController {
   //   }
 
   //   return { ok: true };
-
 
   //   //- - -- - -- - - -- - -
   //   {
@@ -175,8 +188,6 @@ export class NotificationController {
 
   //     await page.waitForNavigation({ waitUntil: 'networkidle0' });
   //   }
-
-
 
   //   await browser.close();
 

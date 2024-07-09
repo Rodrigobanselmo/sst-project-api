@@ -1,12 +1,12 @@
-import { RecMedEntity } from "./../../../entities/recMed.entity";
-import { CacheEnum } from "./../../../../../shared/constants/enum/cache";
-import { FindRecMedDto } from "./../../../dto/rec-med.dto";
-import { UserPayloadDto } from "../../../../../shared/dto/user-payload.dto";
-import { Inject, Injectable } from "@nestjs/common";
-import { Cache } from "cache-manager";
+import { RecMedEntity } from './../../../entities/recMed.entity';
+import { CacheEnum } from './../../../../../shared/constants/enum/cache';
+import { FindRecMedDto } from './../../../dto/rec-med.dto';
+import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
+import { Inject, Injectable } from '@nestjs/common';
+import { Cache } from 'cache-manager';
 
-import { RecMedRepository } from "../../../../../modules/sst/repositories/implementations/RecMedRepository";
-import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { RecMedRepository } from '../../../../../modules/sst/repositories/implementations/RecMedRepository';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()
 export class FindRecMedService {
@@ -15,14 +15,8 @@ export class FindRecMedService {
     private readonly recMedRepository: RecMedRepository,
   ) {}
 
-  async execute(
-    { skip, take, riskType, ...query }: FindRecMedDto,
-    user: UserPayloadDto,
-  ) {
-    const RecMed = await this.recMedRepository.find(
-      { companyId: user.targetCompanyId, ...query },
-      { skip, take },
-    );
+  async execute({ skip, take, riskType, ...query }: FindRecMedDto, user: UserPayloadDto) {
+    const RecMed = await this.recMedRepository.find({ companyId: user.targetCompanyId, ...query }, { skip, take });
 
     const extCacheString = JSON.stringify({
       onlyRec: query.onlyRec,
@@ -42,10 +36,10 @@ export class FindRecMedService {
       RecMedAll = await this.recMedRepository.findNude({
         where: {
           ...(query.onlyRec && {
-            AND: [{ recName: { not: null } }, { recName: { not: "" } }],
+            AND: [{ recName: { not: null } }, { recName: { not: '' } }],
           }),
           ...(query.onlyMed && {
-            AND: [{ medName: { not: null } }, { medName: { not: "" } }],
+            AND: [{ medName: { not: null } }, { medName: { not: '' } }],
           }),
           risk: { representAll: true, ...(riskType && { type: riskType }) },
           id: { notIn: RecMed.data.map((i) => i.id) },
@@ -54,7 +48,7 @@ export class FindRecMedService {
           ...(query.recType && { recType: { in: query.recType } }),
           ...(query.medType && { medType: { in: query.medType } }),
         },
-        distinct: ["medName", "recName"],
+        distinct: ['medName', 'recName'],
       });
 
       RecMedAll.data = RecMedAll.data.map((x) => ({ ...x, isAll: true }));

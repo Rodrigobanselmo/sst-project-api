@@ -1,17 +1,17 @@
-import { UserEntity } from "../../../../users/entities/user.entity";
-import { BadRequestException, Injectable } from "@nestjs/common";
-import { instanceToInstance } from "class-transformer";
+import { UserEntity } from '../../../../users/entities/user.entity';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { instanceToInstance } from 'class-transformer';
 
-import { UsersRepository } from "../../../../users/repositories/implementations/UsersRepository";
-import { HashProvider } from "../../../../../shared/providers/HashProvider/implementations/HashProvider";
-import { JwtTokenProvider } from "../../../../../shared/providers/TokenProvider/implementations/JwtTokenProvider";
-import { LoginUserDto } from "../../../dto/login-user.dto";
-import { PayloadTokenDto } from "../../../dto/payload-token.dto";
-import { RefreshTokensRepository } from "../../../repositories/implementations/RefreshTokensRepository";
-import { ErrorMessageEnum } from "../../../../../shared/constants/enum/errorMessage";
-import { FirebaseProvider } from "../../../../../shared/providers/FirebaseProvider/FirebaseProvider";
-import { UserHistoryRepository } from "../../../../../modules/users/repositories/implementations/UserHistoryRepository";
-import geoip from "geoip-lite";
+import { UsersRepository } from '../../../../users/repositories/implementations/UsersRepository';
+import { HashProvider } from '../../../../../shared/providers/HashProvider/implementations/HashProvider';
+import { JwtTokenProvider } from '../../../../../shared/providers/TokenProvider/implementations/JwtTokenProvider';
+import { LoginUserDto } from '../../../dto/login-user.dto';
+import { PayloadTokenDto } from '../../../dto/payload-token.dto';
+import { RefreshTokensRepository } from '../../../repositories/implementations/RefreshTokensRepository';
+import { ErrorMessageEnum } from '../../../../../shared/constants/enum/errorMessage';
+import { FirebaseProvider } from '../../../../../shared/providers/FirebaseProvider/FirebaseProvider';
+import { UserHistoryRepository } from '../../../../../modules/users/repositories/implementations/UserHistoryRepository';
+import geoip from 'geoip-lite';
 
 @Injectable()
 export class SessionService {
@@ -25,22 +25,15 @@ export class SessionService {
   ) {}
 
   async execute(
-    {
-      email,
-      password,
-      userEntity,
-      isApp,
-    }: LoginUserDto & { userEntity?: UserEntity },
+    { email, password, userEntity, isApp }: LoginUserDto & { userEntity?: UserEntity },
     ip: string,
     userAgent: string,
   ) {
-    const user = userEntity
-      ? userEntity
-      : await this.validateUser(email, password);
+    const user = userEntity ? userEntity : await this.validateUser(email, password);
 
     const companies = user.companies
       .map(({ companyId, permissions, roles, status }) => {
-        if (status.toUpperCase() !== "ACTIVE") return null;
+        if (status.toUpperCase() !== 'ACTIVE') return null;
 
         return {
           companyId,
@@ -60,14 +53,9 @@ export class SessionService {
 
     const token = this.jwtTokenProvider.generateToken(payload);
 
-    const [refresh_token, refreshTokenExpiresDate] =
-      this.jwtTokenProvider.generateRefreshToken(user.id, { isApp });
+    const [refresh_token, refreshTokenExpiresDate] = this.jwtTokenProvider.generateRefreshToken(user.id, { isApp });
 
-    const newRefreshToken = await this.refreshTokensRepository.create(
-      refresh_token,
-      user.id,
-      refreshTokenExpiresDate,
-    );
+    const newRefreshToken = await this.refreshTokensRepository.create(refresh_token, user.id, refreshTokenExpiresDate);
 
     const location = geoip.lookup(process.env.LOCAL_IP || ip);
 
@@ -95,10 +83,7 @@ export class SessionService {
       throw new BadRequestException(ErrorMessageEnum.WRONG_EMAIL_PASS);
     }
 
-    const passwordMatch = await this.hashProvider.compare(
-      password,
-      user.password,
-    );
+    const passwordMatch = await this.hashProvider.compare(password, user.password);
 
     if (!passwordMatch) {
       throw new BadRequestException(ErrorMessageEnum.WRONG_EMAIL_PASS);

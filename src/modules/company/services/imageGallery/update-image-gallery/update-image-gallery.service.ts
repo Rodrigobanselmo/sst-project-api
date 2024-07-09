@@ -12,7 +12,7 @@ export class UpdateImageGalleryService {
     private readonly imageGalleryRepository: ImageGalleryRepository,
     private readonly createImageGalleyService: CreateImageGalleyService,
     private readonly amazonStorageProvider: AmazonStorageProvider,
-  ) { }
+  ) {}
 
   async execute(id: number, file: Express.Multer.File, body: UpdateImageGalleryDto, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;
@@ -31,7 +31,6 @@ export class UpdateImageGalleryService {
       url,
       id,
     });
-
 
     return result;
   }

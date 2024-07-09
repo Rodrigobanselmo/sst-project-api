@@ -8,7 +8,10 @@ export class FindProfessionalResponsibleService {
   constructor(private readonly professionalResponsibleRepository: ProfessionalResponsibleRepository) {}
 
   async execute({ skip, take, ...query }: FindProfessionalResponsibleDto, user: UserPayloadDto) {
-    const access = await this.professionalResponsibleRepository.find({ companyId: user.targetCompanyId, ...query }, { skip, take });
+    const access = await this.professionalResponsibleRepository.find(
+      { companyId: user.targetCompanyId, ...query },
+      { skip, take },
+    );
 
     return access;
   }

@@ -12,8 +12,12 @@ export const StringNormalizeUpperTransform = (data: TransformFnParams) => {
 
   if (typeof str === 'string') {
     if (str.includes('??HIERARCHY_NAME??')) {
-      const array = str.split('??HIERARCHY_NAME??').map(data => (data.includes('(') ? '(' : '') + normalizeToUpperString(data) + (data.includes(')') ? ')' : ''))
-      array.splice(1, 0, '??HIERARCHY_NAME??')
+      const array = str
+        .split('??HIERARCHY_NAME??')
+        .map(
+          (data) => (data.includes('(') ? '(' : '') + normalizeToUpperString(data) + (data.includes(')') ? ')' : ''),
+        );
+      array.splice(1, 0, '??HIERARCHY_NAME??');
 
       return array.filter(Boolean).join(' ');
     }

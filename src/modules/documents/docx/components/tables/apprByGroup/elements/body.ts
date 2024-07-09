@@ -9,8 +9,8 @@ import {
   TextRun,
   VerticalAlign,
   WidthType,
-} from "docx";
-import { palette } from "../../../../../../../shared/constants/palette";
+} from 'docx';
+import { palette } from '../../../../../../../shared/constants/palette';
 
 export interface bodyTableProps extends Partial<ITableCellOptions> {
   text: string;
@@ -38,7 +38,7 @@ export class TableBodyElements {
   }
 
   tableCell({
-    text = "",
+    text = '',
     title,
     size = 10,
     bold,
@@ -47,10 +47,10 @@ export class TableBodyElements {
     color,
     ...rest
   }: bodyTableProps) {
-    const tex = text || "";
+    const tex = text || '';
     return new TableCell({
       children: [
-        ...tex.split("\n").map((value) => {
+        ...tex.split('\n').map((value) => {
           const children = [
             new TextRun({
               text: value,
@@ -63,7 +63,7 @@ export class TableBodyElements {
           if (title)
             children.push(
               new TextRun({
-                text: title + " ",
+                text: title + ' ',
                 size: 12,
                 color: color || palette.text.main.string,
                 bold: true,

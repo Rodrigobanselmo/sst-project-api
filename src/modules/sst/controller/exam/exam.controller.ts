@@ -71,7 +71,11 @@ export class ExamController {
     isContract: true,
   })
   @Patch('/:id/:companyId')
-  async update(@Param('id', ParseIntPipe) id: number, @User() userPayloadDto: UserPayloadDto, @Body() updateRiskDto: UpdateExamDto) {
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @User() userPayloadDto: UserPayloadDto,
+    @Body() updateRiskDto: UpdateExamDto,
+  ) {
     return this.updateExamService.execute(id, updateRiskDto, userPayloadDto);
   }
 

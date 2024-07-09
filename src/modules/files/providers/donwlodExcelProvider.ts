@@ -7,7 +7,10 @@ import { DatabaseTableRepository } from '../repositories/implementations/Databas
 
 @Injectable()
 export class DownloadExcelProvider {
-  constructor(private readonly databaseTableRepository: DatabaseTableRepository, private readonly excelProvider: ExcelProvider) {}
+  constructor(
+    private readonly databaseTableRepository: DatabaseTableRepository,
+    private readonly excelProvider: ExcelProvider,
+  ) {}
 
   async newTableData({ findAll, Workbook, companyId }) {
     // get risk table with actual version

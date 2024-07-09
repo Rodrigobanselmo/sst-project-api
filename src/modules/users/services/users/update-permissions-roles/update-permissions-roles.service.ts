@@ -42,7 +42,9 @@ export class UpdatePermissionsRolesService {
         userPermissions.some((userPermission) => {
           return (
             userPermission.split('-')[0] === addPermission.split('-')[0] &&
-            Array.from(addPermission.split('-')[1] || '').every((crud) => (userPermission.split('-')[1] || '').includes(crud))
+            Array.from(addPermission.split('-')[1] || '').every((crud) =>
+              (userPermission.split('-')[1] || '').includes(crud),
+            )
           );
         }),
       );
@@ -68,7 +70,10 @@ export class UpdatePermissionsRolesService {
     });
 
     if (companies && companies && companies.length > 0) {
-      await this.usersCompanyRepository.deleteAllFromConsultant(updateUserCompanyDto.userId, updateUserCompanyDto.companyId);
+      await this.usersCompanyRepository.deleteAllFromConsultant(
+        updateUserCompanyDto.userId,
+        updateUserCompanyDto.companyId,
+      );
 
       await this.usersCompanyRepository.upsertMany({
         ...updateUserCompanyDto,

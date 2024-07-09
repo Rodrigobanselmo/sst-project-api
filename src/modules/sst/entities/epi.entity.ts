@@ -1,4 +1,3 @@
-
 import { Epi } from '.prisma/client';
 import { StatusEnum } from '@prisma/client';
 import { EpiRiskDataEntity } from './epiRiskData.entity';

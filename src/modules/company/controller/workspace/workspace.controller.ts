@@ -10,9 +10,7 @@ import { FindWorkspaceDto } from '../../dto/workspace.dto';
 
 @Controller('workspace')
 export class WorkspaceController {
-  constructor(
-    private readonly findWorkspaceService: FindWorkspaceService,
-  ) { }
+  constructor(private readonly findWorkspaceService: FindWorkspaceService) {}
 
   @Permissions({
     code: PermissionEnum.COMPANY,
@@ -24,5 +22,4 @@ export class WorkspaceController {
   find(@User() userPayloadDto: UserPayloadDto, @Query() query: FindWorkspaceDto) {
     return this.findWorkspaceService.execute(query, userPayloadDto);
   }
-
 }

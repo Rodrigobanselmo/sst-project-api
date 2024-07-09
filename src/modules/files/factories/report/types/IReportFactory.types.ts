@@ -21,7 +21,7 @@ export interface IReportFactoryProductFindData {
   headerRow: IReportHeader;
 }
 
-export interface IReportFactoryCreatorConstructor { }
+export interface IReportFactoryCreatorConstructor {}
 
 export interface IReportCell {
   fill?: ReportFillColorEnum;

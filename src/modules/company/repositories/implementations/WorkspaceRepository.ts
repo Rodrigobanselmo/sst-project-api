@@ -14,7 +14,7 @@ interface IWorkspaceCompany extends WorkspaceDto {
 
 @Injectable()
 export class WorkspaceRepository {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async create({ address, companyId, ...workspaceDto }: IWorkspaceCompany): Promise<WorkspaceEntity> {
     const workspace = await this.prisma.workspace.create({
@@ -23,8 +23,8 @@ export class WorkspaceRepository {
         companyId: companyId,
         address: address
           ? {
-            create: { ...address },
-          }
+              create: { ...address },
+            }
           : undefined,
       },
       include: {
@@ -60,7 +60,11 @@ export class WorkspaceRepository {
     return [...workspaces.map((workspace) => new WorkspaceEntity(workspace))];
   }
 
-  async find(query: Partial<FindWorkspaceDto>, pagination: PaginationQueryDto, options: Prisma.WorkspaceFindManyArgs = {}) {
+  async find(
+    query: Partial<FindWorkspaceDto>,
+    pagination: PaginationQueryDto,
+    options: Prisma.WorkspaceFindManyArgs = {},
+  ) {
     const whereInit = {
       AND: [
         // {

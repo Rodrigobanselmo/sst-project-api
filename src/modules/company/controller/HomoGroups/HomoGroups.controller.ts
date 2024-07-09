@@ -4,7 +4,13 @@ import { PermissionEnum } from '../../../../shared/constants/enum/authorization'
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
-import { CopyHomogeneousGroupDto, CreateHomoGroupDto, FindHomogeneousGroupDto, UpdateHierarchyHomoGroupDto, UpdateHomoGroupDto } from '../../dto/homoGroup';
+import {
+  CopyHomogeneousGroupDto,
+  CreateHomoGroupDto,
+  FindHomogeneousGroupDto,
+  UpdateHierarchyHomoGroupDto,
+  UpdateHomoGroupDto,
+} from '../../dto/homoGroup';
 import { CopyHomoGroupService } from '../../services/homoGroup/copy-homo-group/copy-homo-group.service';
 import { CreateHomoGroupService } from '../../services/homoGroup/create-homo-group/create-homo-group.service';
 import { DeleteHierarchyHomoGroupService } from '../../services/homoGroup/delete-hierarchy-homo-group/delete-hierarchy-homo-group.service';
@@ -66,7 +72,10 @@ export class HomoGroupsController {
     crud: true,
   })
   @Post('/hierarchy-homo/:companyId')
-  updateHierarchyHomo(@Body() updateHomoGroupsDto: UpdateHierarchyHomoGroupDto, @User() userPayloadDto: UserPayloadDto) {
+  updateHierarchyHomo(
+    @Body() updateHomoGroupsDto: UpdateHierarchyHomoGroupDto,
+    @User() userPayloadDto: UserPayloadDto,
+  ) {
     return this.updateHierarchyHomoGroupService.execute({ ...updateHomoGroupsDto }, userPayloadDto);
   }
 
@@ -77,7 +86,10 @@ export class HomoGroupsController {
     crud: 'd',
   })
   @Post('/hierarchy-homo-delete/:companyId')
-  deleteHierarchyHomo(@Body() updateHomoGroupsDto: UpdateHierarchyHomoGroupDto, @User() userPayloadDto: UserPayloadDto) {
+  deleteHierarchyHomo(
+    @Body() updateHomoGroupsDto: UpdateHierarchyHomoGroupDto,
+    @User() userPayloadDto: UserPayloadDto,
+  ) {
     return this.deleteHierarchyHomoGroupService.execute({ ...updateHomoGroupsDto }, userPayloadDto);
   }
 
@@ -99,7 +111,11 @@ export class HomoGroupsController {
     crud: true,
   })
   @Patch('/:id/:companyId?')
-  update(@Body() updateHomoGroupsDto: UpdateHomoGroupDto, @Param('id') id: string, @User() userPayloadDto: UserPayloadDto) {
+  update(
+    @Body() updateHomoGroupsDto: UpdateHomoGroupDto,
+    @Param('id') id: string,
+    @User() userPayloadDto: UserPayloadDto,
+  ) {
     return this.updateHomoGroupsService.execute({ id, ...updateHomoGroupsDto }, userPayloadDto);
   }
 

@@ -15,7 +15,7 @@ export class CreateProfessionalService {
     private readonly professionalRepository: ProfessionalRepository,
     private readonly userRepository: UsersRepository,
     private readonly mailProvider: NodeMailProvider,
-  ) { }
+  ) {}
 
   async execute({ ...createDataDto }: CreateProfessionalDto, user: UserPayloadDto) {
     const professionalFound = await this.professionalRepository.findFirstNude({
@@ -40,7 +40,9 @@ export class CreateProfessionalService {
     const permissions: string[] = [];
     const roles: string[] = [];
 
-    if (([ProfessionalTypeEnum.DOCTOR, ProfessionalTypeEnum.NURSE] as ProfessionalTypeEnum[]).includes(createDataDto.type)) {
+    if (
+      ([ProfessionalTypeEnum.DOCTOR, ProfessionalTypeEnum.NURSE] as ProfessionalTypeEnum[]).includes(createDataDto.type)
+    ) {
       roles.push(RoleEnum.DOCTOR);
     }
 

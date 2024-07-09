@@ -11,67 +11,107 @@ import { EmployeeEntity } from '../../entities/employee.entity';
 
 @Injectable()
 export class SyncRepository {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
-  async findSyncChanges({ lastPulledVersion, companyStartIds, companyId, userId, companyIds }: { companyStartIds?: string[], lastPulledVersion?: Date; companyId: string; userId: number; companyIds?: string[] }) {
-    const riskChangeszPromise = await this.findRiskSyncChanges({ lastPulledVersion, companyId, userId })
-    const recMedChangeszPromise = await this.findRecMedSyncChanges({ lastPulledVersion, companyId, userId })
-    const generateSourceChangeszPromise = await this.findGenerateSourceSyncChanges({ lastPulledVersion, companyId, userId })
+  async findSyncChanges({
+    lastPulledVersion,
+    companyStartIds,
+    companyId,
+    userId,
+    companyIds,
+  }: {
+    companyStartIds?: string[];
+    lastPulledVersion?: Date;
+    companyId: string;
+    userId: number;
+    companyIds?: string[];
+  }) {
+    const riskChangeszPromise = await this.findRiskSyncChanges({ lastPulledVersion, companyId, userId });
+    const recMedChangeszPromise = await this.findRecMedSyncChanges({ lastPulledVersion, companyId, userId });
+    const generateSourceChangeszPromise = await this.findGenerateSourceSyncChanges({
+      lastPulledVersion,
+      companyId,
+      userId,
+    });
 
-    const [riskChanges, recMedChanges, generateSourceChanges] = await Promise.all([riskChangeszPromise, recMedChangeszPromise, generateSourceChangeszPromise])
+    const [riskChanges, recMedChanges, generateSourceChanges] = await Promise.all([
+      riskChangeszPromise,
+      recMedChangeszPromise,
+      generateSourceChangeszPromise,
+    ]);
 
     const changes: any = {
       Risk: riskChanges,
       RecMed: recMedChanges,
       GenerateSource: generateSourceChanges,
-    }
+    };
 
     if (companyIds || companyStartIds) {
-      if (companyStartIds)
-        companyIds = companyStartIds
+      if (companyStartIds) companyIds = companyStartIds;
 
       const companyChangesPromise = this.findCompanySyncChanges({
         companyIds: companyIds,
         lastPulledVersion: companyStartIds ? undefined : lastPulledVersion,
-        userId
-      })
+        userId,
+      });
       const workspaceChangesPromise = this.findWorkspaceSyncChanges({
         companyIds: companyIds,
         lastPulledVersion: companyStartIds ? undefined : lastPulledVersion,
-        userId
-      })
+        userId,
+      });
 
       const hierarchyChangesPromise = this.findHierarchySyncChanges({
         companyIds: companyIds,
         lastPulledVersion: companyStartIds ? undefined : lastPulledVersion,
-        userId
-      })
+        userId,
+      });
 
       const employeesChangesPromise = this.findEmployeeSyncChanges({
         companyIds: companyIds,
         lastPulledVersion: companyStartIds ? undefined : lastPulledVersion,
-        userId
-      })
+        userId,
+      });
 
-      const [companyChanges, workspaceChanges, hierarchyChanges, employeesChanges] = await Promise.all([companyChangesPromise, workspaceChangesPromise, hierarchyChangesPromise, employeesChangesPromise])
+      const [companyChanges, workspaceChanges, hierarchyChanges, employeesChanges] = await Promise.all([
+        companyChangesPromise,
+        workspaceChangesPromise,
+        hierarchyChangesPromise,
+        employeesChangesPromise,
+      ]);
 
-      changes.Company = companyChanges
-      changes.Workspace = workspaceChanges
-      changes.Hierarchy = hierarchyChanges
-      changes.Employee = employeesChanges
+      changes.Company = companyChanges;
+      changes.Workspace = workspaceChanges;
+      changes.Hierarchy = hierarchyChanges;
+      changes.Employee = employeesChanges;
       changes.MMWorkspaceHierarchy = {
-        created: ([...hierarchyChanges.created, ...hierarchyChanges.updated] as HierarchyEntity[]).map((data) => {
-          return data.workspaces.map((workspace) => ({ id: workspace.id + data.id, hierarchyId: data.id, workspaceId: workspace.id, created_at: new Date(), updated_at: new Date() }))
-        }).flat(1),
+        created: ([...hierarchyChanges.created, ...hierarchyChanges.updated] as HierarchyEntity[])
+          .map((data) => {
+            return data.workspaces.map((workspace) => ({
+              id: workspace.id + data.id,
+              hierarchyId: data.id,
+              workspaceId: workspace.id,
+              created_at: new Date(),
+              updated_at: new Date(),
+            }));
+          })
+          .flat(1),
         updated: [],
         deleted: [],
-      }
+      };
     }
 
-    return changes
+    return changes;
   }
 
-  async findRecMedSyncChanges({ lastPulledVersion, companyId, userId }: { lastPulledVersion: Date; companyId: string; userId: number }) {
+  async findRecMedSyncChanges({
+    lastPulledVersion,
+    companyId,
+    userId,
+  }: {
+    lastPulledVersion: Date;
+    companyId: string;
+    userId: number;
+  }) {
     const options: Prisma.RecMedFindManyArgs = {};
     options.select = {
       recName: true,
@@ -84,31 +124,42 @@ export class SyncRepository {
       created_at: true,
       updated_at: true,
       deleted_at: true,
-    }
+    };
 
     options.where = {
-      AND: [{
-        OR: [
-          { companyId },
-          { system: true },
-          {
-            company: { applyingServiceContracts: { some: { receivingServiceCompanyId: companyId } }, },
-          }]
-      }],
-    }
+      AND: [
+        {
+          OR: [
+            { companyId },
+            { system: true },
+            {
+              company: { applyingServiceContracts: { some: { receivingServiceCompanyId: companyId } } },
+            },
+          ],
+        },
+      ],
+    };
 
     const recMed = await databaseFindChanges({
       entity: RecMedEntity,
       findManyFn: this.prisma.recMed.findMany,
       lastPulledVersion,
       options,
-      userId
-    })
+      userId,
+    });
 
-    return recMed
+    return recMed;
   }
 
-  async findCompanySyncChanges({ lastPulledVersion, companyIds, userId }: { lastPulledVersion: Date; companyIds: string[]; userId: number }) {
+  async findCompanySyncChanges({
+    lastPulledVersion,
+    companyIds,
+    userId,
+  }: {
+    lastPulledVersion: Date;
+    companyIds: string[];
+    userId: number;
+  }) {
     const options: Prisma.CompanyFindManyArgs = {};
     options.select = {
       cnpj: true,
@@ -122,26 +173,32 @@ export class SyncRepository {
       created_at: true,
       updated_at: true,
       deleted_at: true,
-    }
+    };
 
     options.where = {
-      AND: [
-        { id: { in: companyIds } },
-      ],
-    }
+      AND: [{ id: { in: companyIds } }],
+    };
 
     const company = await databaseFindChanges({
       entity: CompanyEntity,
       findManyFn: this.prisma.company.findMany,
       lastPulledVersion,
       options,
-      userId
-    })
+      userId,
+    });
 
-    return company
+    return company;
   }
 
-  async findWorkspaceSyncChanges({ lastPulledVersion, companyIds, userId }: { lastPulledVersion: Date; companyIds: string[]; userId: number }) {
+  async findWorkspaceSyncChanges({
+    lastPulledVersion,
+    companyIds,
+    userId,
+  }: {
+    lastPulledVersion: Date;
+    companyIds: string[];
+    userId: number;
+  }) {
     const options: Prisma.WorkspaceFindManyArgs = {};
     options.select = {
       cnpj: true,
@@ -154,26 +211,32 @@ export class SyncRepository {
       created_at: true,
       updated_at: true,
       deleted_at: true,
-    }
+    };
 
     options.where = {
-      AND: [
-        { companyId: { in: companyIds } },
-      ],
-    }
+      AND: [{ companyId: { in: companyIds } }],
+    };
 
     const company = await databaseFindChanges({
       entity: CompanyEntity,
       findManyFn: this.prisma.workspace.findMany,
       lastPulledVersion,
       options,
-      userId
-    })
+      userId,
+    });
 
-    return company
+    return company;
   }
 
-  async findRiskSyncChanges({ lastPulledVersion, companyId, userId }: { lastPulledVersion?: Date; companyId: string; userId: number }) {
+  async findRiskSyncChanges({
+    lastPulledVersion,
+    companyId,
+    userId,
+  }: {
+    lastPulledVersion?: Date;
+    companyId: string;
+    userId: number;
+  }) {
     const options: Prisma.RiskFactorsFindManyArgs = {};
     options.select = {
       name: true,
@@ -187,32 +250,46 @@ export class SyncRepository {
       created_at: true,
       updated_at: true,
       deleted_at: true,
-    }
+    };
 
     options.where = {
-      AND: [{
-        OR: [
-          { companyId },
-          { system: true },
-          {
-            company: { applyingServiceContracts: { some: { receivingServiceCompanyId: companyId } }, },
-          }]
-      }],
-    }
+      AND: [
+        {
+          OR: [
+            { companyId },
+            { system: true },
+            {
+              company: { applyingServiceContracts: { some: { receivingServiceCompanyId: companyId } } },
+            },
+          ],
+        },
+      ],
+    };
 
     const riskChanges = await databaseFindChanges({
       entity: RiskFactorsEntity,
-      sanitaze: (data: RiskFactorsEntity) => ({ ...data, activities: !!data.activities?.length ? JSON.stringify(data.activities) : undefined }),
+      sanitaze: (data: RiskFactorsEntity) => ({
+        ...data,
+        activities: !!data.activities?.length ? JSON.stringify(data.activities) : undefined,
+      }),
       findManyFn: this.prisma.riskFactors.findMany,
       lastPulledVersion,
       options,
-      userId
-    })
+      userId,
+    });
 
-    return riskChanges
+    return riskChanges;
   }
 
-  async findGenerateSourceSyncChanges({ lastPulledVersion, companyId, userId }: { lastPulledVersion: Date; companyId: string; userId: number }) {
+  async findGenerateSourceSyncChanges({
+    lastPulledVersion,
+    companyId,
+    userId,
+  }: {
+    lastPulledVersion: Date;
+    companyId: string;
+    userId: number;
+  }) {
     const options: Prisma.GenerateSourceFindManyArgs = {};
     options.select = {
       name: true,
@@ -222,31 +299,34 @@ export class SyncRepository {
       created_at: true,
       updated_at: true,
       deleted_at: true,
-    }
+    };
 
     options.where = {
-      AND: [{
-        OR: [
-          { companyId },
-          { system: true },
-          {
-            company: { applyingServiceContracts: { some: { receivingServiceCompanyId: companyId } }, },
-          }]
-      }],
-    }
+      AND: [
+        {
+          OR: [
+            { companyId },
+            { system: true },
+            {
+              company: { applyingServiceContracts: { some: { receivingServiceCompanyId: companyId } } },
+            },
+          ],
+        },
+      ],
+    };
 
     const generateSourceChanges = await databaseFindChanges({
       entity: RiskFactorsEntity,
       findManyFn: this.prisma.generateSource.findMany,
       lastPulledVersion,
       options,
-      userId
-    })
+      userId,
+    });
 
-    return generateSourceChanges
+    return generateSourceChanges;
   }
 
-  async findHierarchiesSync({ companyId, workspaceId }: { workspaceId?: string; companyId?: string; }) {
+  async findHierarchiesSync({ companyId, workspaceId }: { workspaceId?: string; companyId?: string }) {
     const options: Prisma.HierarchyFindManyArgs = {};
     options.select = {
       name: true,
@@ -264,34 +344,46 @@ export class SyncRepository {
         select: { id: true },
         ...(workspaceId && {
           where: {
-            id: workspaceId
+            id: workspaceId,
           },
-        })
+        }),
       },
-    }
+    };
 
     options.where = {
-      AND: [{
-        ...(companyId && { companyId }),
-        ...(workspaceId && {
-          workspaces: { some: { id: workspaceId } }
-        })
-      }],
-    }
+      AND: [
+        {
+          ...(companyId && { companyId }),
+          ...(workspaceId && {
+            workspaces: { some: { id: workspaceId } },
+          }),
+        },
+      ],
+    };
 
     const hierarchies = await this.prisma.hierarchy.findMany({
-      ...options
-    })
+      ...options,
+    });
 
     return hierarchies.map((hierarchy) => {
       return {
         ...hierarchy,
-        workspaceIds: (hierarchy as any)?.workspaces?.map((workspace) => workspace.id)
-      }
-    })
+        workspaceIds: (hierarchy as any)?.workspaces?.map((workspace) => workspace.id),
+      };
+    });
   }
 
-  async findHierarchySyncChanges({ lastPulledVersion, companyIds, workspaceId, userId }: { lastPulledVersion: Date; workspaceId?: string; companyIds: string[]; userId: number }) {
+  async findHierarchySyncChanges({
+    lastPulledVersion,
+    companyIds,
+    workspaceId,
+    userId,
+  }: {
+    lastPulledVersion: Date;
+    workspaceId?: string;
+    companyIds: string[];
+    userId: number;
+  }) {
     const options: Prisma.HierarchyFindManyArgs = {};
     options.select = {
       name: true,
@@ -309,20 +401,22 @@ export class SyncRepository {
         select: { id: true },
         ...(workspaceId && {
           where: {
-            id: workspaceId
+            id: workspaceId,
           },
-        })
+        }),
       },
-    }
+    };
 
     options.where = {
-      AND: [{
-        companyId: { in: companyIds },
-        ...(workspaceId && {
-          workspaces: { some: { id: workspaceId } }
-        })
-      }],
-    }
+      AND: [
+        {
+          companyId: { in: companyIds },
+          ...(workspaceId && {
+            workspaces: { some: { id: workspaceId } },
+          }),
+        },
+      ],
+    };
 
     const hierarchyChanges = await databaseFindChanges({
       entity: HierarchyEntity,
@@ -330,13 +424,22 @@ export class SyncRepository {
       lastPulledVersion,
       options,
       userId,
-      deletedAtKey: 'deletedAt'
-    })
+      deletedAtKey: 'deletedAt',
+    });
 
-    return hierarchyChanges
+    return hierarchyChanges;
   }
 
-  async findEmployeeSyncChanges({ lastPulledVersion, companyIds, userId }: { lastPulledVersion: Date; workspaceId?: string; companyIds: string[]; userId: number }) {
+  async findEmployeeSyncChanges({
+    lastPulledVersion,
+    companyIds,
+    userId,
+  }: {
+    lastPulledVersion: Date;
+    workspaceId?: string;
+    companyIds: string[];
+    userId: number;
+  }) {
     const options: Prisma.EmployeeFindManyArgs = {};
     options.select = {
       name: true,
@@ -350,13 +453,15 @@ export class SyncRepository {
       created_at: true,
       updated_at: true,
       deleted_at: true,
-    }
+    };
 
     options.where = {
-      AND: [{
-        companyId: { in: companyIds },
-      }],
-    }
+      AND: [
+        {
+          companyId: { in: companyIds },
+        },
+      ],
+    };
 
     const employeeChanges = await databaseFindChanges({
       entity: EmployeeEntity,
@@ -364,9 +469,8 @@ export class SyncRepository {
       lastPulledVersion,
       options,
       userId,
-    })
+    });
 
-    return employeeChanges
+    return employeeChanges;
   }
-
 }

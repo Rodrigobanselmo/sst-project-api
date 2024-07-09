@@ -1,5 +1,5 @@
 import { ImageRun, Paragraph, Table, TableCell, TableRow, VerticalAlign, WidthType } from 'docx';
-import {readFileSync} from 'fs';
+import { readFileSync } from 'fs';
 
 import { borderNoneStyle } from '../../config/styles';
 import { paragraphFigure } from '../paragraphs';
@@ -7,7 +7,11 @@ import { paragraphFigure } from '../paragraphs';
 const fullWidth = 718;
 const width = fullWidth / 3 - 10;
 
-export const VThreeImages = (images: [string, string, string], texts: [string, string, string], removeLegend?: boolean) => {
+export const VThreeImages = (
+  images: [string, string, string],
+  texts: [string, string, string],
+  removeLegend?: boolean,
+) => {
   if (texts[0] == texts[1]) {
     if (texts[1] == texts[2]) {
       texts[2] = '';

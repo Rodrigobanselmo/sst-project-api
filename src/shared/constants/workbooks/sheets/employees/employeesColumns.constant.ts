@@ -5,7 +5,11 @@ import { checkIsValidDate } from '../../../../../shared/utils/validators/checkIs
 import { ITableSchema } from '../../../../providers/ExcelProvider/models/IExcelProvider.types';
 import { checkIsEnum } from '../../../../utils/validators/checkIsEnum';
 import { checkIsString } from '../../../../utils/validators/checkIsString';
-import { SexTypeEnumTranslateBrToUs, SexTypeEnumTranslatedList, SexTypeEnumTranslatedNotes } from './../../../../utils/translate/sexType.translate';
+import {
+  SexTypeEnumTranslateBrToUs,
+  SexTypeEnumTranslatedList,
+  SexTypeEnumTranslatedNotes,
+} from './../../../../utils/translate/sexType.translate';
 import { checkIsValidCpf } from './../../../../utils/validators/checkIsValidCpf';
 
 export const employeesColumnsConstant = [
@@ -84,7 +88,8 @@ export const employeesColumnsConstant = [
     isArray: false,
     required: false,
     checkHandler: checkIsString,
-    notes: 'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
+    notes:
+      'No caso de haver importação de dados de outra empresa, usar "//" para indicar nome de referecia (ex.: "Analista SR//Analista")',
   },
   {
     databaseName: 'office',

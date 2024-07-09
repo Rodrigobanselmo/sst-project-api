@@ -17,7 +17,7 @@ export class GenerateSourceController {
     private readonly updateGenerateSourceService: UpdateGenerateSourceService,
     private readonly findGenerateSourceService: FindGenerateSourceService,
     private readonly deleteSoftGenerateSourceService: DeleteSoftGenerateSourceService,
-  ) { }
+  ) {}
 
   @Permissions({
     code: PermissionEnum.GS,
@@ -25,8 +25,14 @@ export class GenerateSourceController {
     isMember: true,
   })
   @Post()
-  create(@User() userPayloadDto: UserPayloadDto, @Body() { returnIfExist, skipIfExist, ...createGenerateSourceDto }: CreateGenerateSourceDto) {
-    return this.createGenerateSourceService.execute(createGenerateSourceDto, userPayloadDto, { returnIfExist, skipIfExist });
+  create(
+    @User() userPayloadDto: UserPayloadDto,
+    @Body() { returnIfExist, skipIfExist, ...createGenerateSourceDto }: CreateGenerateSourceDto,
+  ) {
+    return this.createGenerateSourceService.execute(createGenerateSourceDto, userPayloadDto, {
+      returnIfExist,
+      skipIfExist,
+    });
   }
 
   @Permissions({
@@ -46,7 +52,11 @@ export class GenerateSourceController {
     isMember: true,
   })
   @Patch('/:generateSourceId')
-  async update(@Param('generateSourceId') generateSourceId: string, @User() userPayloadDto: UserPayloadDto, @Body() updateRiskDto: UpdateGenerateSourceDto) {
+  async update(
+    @Param('generateSourceId') generateSourceId: string,
+    @User() userPayloadDto: UserPayloadDto,
+    @Body() updateRiskDto: UpdateGenerateSourceDto,
+  ) {
     return this.updateGenerateSourceService.execute(generateSourceId, updateRiskDto, userPayloadDto);
   }
 

@@ -23,7 +23,7 @@ export class DocumentsPdfController {
     private readonly pdfEvaluationDataService: PdfEvaluationDataService,
     private readonly pdfOsDataService: PdfOsDataService,
     private readonly pdfVisitReportDataService: PdfVisitReportDataService,
-  ) { }
+  ) {}
 
   @Permissions(
     {
@@ -55,7 +55,11 @@ export class DocumentsPdfController {
     },
   )
   @Get('aso/:employeeId/:companyId/:asoId?')
-  async aso(@User() userPayloadDto: UserPayloadDto, @Param('employeeId', ParseIntPipe) employeeId: number, @Param('asoId') asoId: number) {
+  async aso(
+    @User() userPayloadDto: UserPayloadDto,
+    @Param('employeeId', ParseIntPipe) employeeId: number,
+    @Param('asoId') asoId: number,
+  ) {
     return this.pdfAsoDataService.execute(employeeId, userPayloadDto, asoId ? Number(asoId) : asoId);
     // return this.pdfAsoDataService.execute(employeeId, userPayloadDto, { asoId: asoId ? Number(asoId) : asoId });
   }

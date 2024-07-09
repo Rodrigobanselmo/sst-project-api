@@ -3,7 +3,9 @@ import { IReportCell, ReportFillColorEnum } from '../types/IReportFactory.types'
 import { allBorders, getBoxBorders } from '../constants/theme';
 
 export function getWorkspaceInfoTable(company: CompanyEntity) {
-  const rowTitle: IReportCell[] = [{ content: 'Estabelecimentos', mergeRight: 1, fill: ReportFillColorEnum.HEADER_YELLOW, borders: allBorders }];
+  const rowTitle: IReportCell[] = [
+    { content: 'Estabelecimentos', mergeRight: 1, fill: ReportFillColorEnum.HEADER_YELLOW, borders: allBorders },
+  ];
   const headerTitle: IReportCell[] = [
     { content: 'Nome Estabelecmento', fill: ReportFillColorEnum.HEADER, borders: allBorders },
     { content: 'Sigla', fill: ReportFillColorEnum.HEADER, borders: allBorders },

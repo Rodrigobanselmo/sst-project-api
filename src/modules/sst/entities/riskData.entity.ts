@@ -13,7 +13,12 @@ import {
   IRiskDataJsonVibration,
   QuantityTypeEnum,
 } from '../../company/interfaces/risk-data-json.types';
-import { heatTableLEOConstant, heatTableLIIConstant, heatTableNAConstant, heatTableTETOConstant } from '../../documents/constants/heatTable.constant';
+import {
+  heatTableLEOConstant,
+  heatTableLIIConstant,
+  heatTableNAConstant,
+  heatTableTETOConstant,
+} from '../../documents/constants/heatTable.constant';
 import { EpiEntity } from './epi.entity';
 import { GenerateSourceEntity } from './generateSource.entity';
 import { RecMedEntity } from './recMed.entity';
@@ -115,7 +120,12 @@ export class RiskFactorDataEntity implements RiskFactorData {
       this.riskFactor?.examToRisk.forEach((examData) => {
         if (examData?.minRiskDegreeQuantity && this.isQuantity && this.level < examData?.minRiskDegreeQuantity) return;
 
-        if (examData?.minRiskDegree && (!this.isQuantity || !examData?.minRiskDegreeQuantity) && this.level < examData?.minRiskDegree) return;
+        if (
+          examData?.minRiskDegree &&
+          (!this.isQuantity || !examData?.minRiskDegreeQuantity) &&
+          this.level < examData?.minRiskDegree
+        )
+          return;
 
         if (!this.examsToRiskFactorData) this.examsToRiskFactorData = [];
 
@@ -145,9 +155,21 @@ export class RiskFactorDataEntity implements RiskFactorData {
   private getProtocols() {
     if (this.riskFactor && this.riskFactor?.protocolToRisk) {
       this.riskFactor?.protocolToRisk.forEach((protocolRisk) => {
-        if (this.level && protocolRisk?.minRiskDegreeQuantity && this.isQuantity && this.level < protocolRisk?.minRiskDegreeQuantity) return;
+        if (
+          this.level &&
+          protocolRisk?.minRiskDegreeQuantity &&
+          this.isQuantity &&
+          this.level < protocolRisk?.minRiskDegreeQuantity
+        )
+          return;
 
-        if (this.level && protocolRisk?.minRiskDegree && (!this.isQuantity || !protocolRisk?.minRiskDegreeQuantity) && this.level < protocolRisk?.minRiskDegree) return;
+        if (
+          this.level &&
+          protocolRisk?.minRiskDegree &&
+          (!this.isQuantity || !protocolRisk?.minRiskDegreeQuantity) &&
+          this.level < protocolRisk?.minRiskDegree
+        )
+          return;
 
         if (!this.protocolsToRisk) this.protocolsToRisk = [];
 
@@ -159,7 +181,9 @@ export class RiskFactorDataEntity implements RiskFactorData {
   private setRecMedExamData(partial: Partial<RiskFactorDataEntity>) {
     if (!this.epis) this.epis = [];
     if (partial.epiToRiskFactorData) {
-      this.epiToRiskFactorData = partial.epiToRiskFactorData.map((epiToRiskFactorData) => new EpiRiskDataEntity(epiToRiskFactorData));
+      this.epiToRiskFactorData = partial.epiToRiskFactorData.map(
+        (epiToRiskFactorData) => new EpiRiskDataEntity(epiToRiskFactorData),
+      );
 
       this.epis = this.epiToRiskFactorData.map(
         ({ epi, ...epiToRiskFactorData }) =>
@@ -172,7 +196,9 @@ export class RiskFactorDataEntity implements RiskFactorData {
 
     if (!this.engs) this.engs = [];
     if (partial.engsToRiskFactorData) {
-      this.engsToRiskFactorData = partial.engsToRiskFactorData.map((engsToRiskFactorData) => new EngsRiskDataEntity(engsToRiskFactorData));
+      this.engsToRiskFactorData = partial.engsToRiskFactorData.map(
+        (engsToRiskFactorData) => new EngsRiskDataEntity(engsToRiskFactorData),
+      );
 
       this.engs = this.engsToRiskFactorData.map(
         ({ recMed, ...engsToRiskFactorData }) =>
@@ -185,7 +211,9 @@ export class RiskFactorDataEntity implements RiskFactorData {
 
     if (!this.exams) this.exams = [];
     if (partial.examsToRiskFactorData) {
-      this.examsToRiskFactorData = partial.examsToRiskFactorData.map((examsToRiskFactorData) => new ExamRiskDataEntity(examsToRiskFactorData));
+      this.examsToRiskFactorData = partial.examsToRiskFactorData.map(
+        (examsToRiskFactorData) => new ExamRiskDataEntity(examsToRiskFactorData),
+      );
 
       this.exams = this.examsToRiskFactorData.map(
         ({ exam, ...examsToRiskFactorData }) =>
@@ -209,7 +237,8 @@ export class RiskFactorDataEntity implements RiskFactorData {
 
   private getOrigin() {
     if (this.homogeneousGroup) {
-      if (this.homogeneousGroup.environment) this.origin = `${this.homogeneousGroup.environment.name}\n(${originRiskMap[this.homogeneousGroup.environment.type].name})`;
+      if (this.homogeneousGroup.environment)
+        this.origin = `${this.homogeneousGroup.environment.name}\n(${originRiskMap[this.homogeneousGroup.environment.type].name})`;
 
       if (this.homogeneousGroup.hierarchy && this.homogeneousGroup.hierarchy.name)
         this.origin = `${this.homogeneousGroup.hierarchy.name}\n(${originRiskMap[this.homogeneousGroup.hierarchy.type].name})`;
@@ -347,7 +376,14 @@ export class RiskFactorDataEntity implements RiskFactorData {
         const ibtugNA = this.mapCheck(mw, 100, 602, heatTableNAConstant);
 
         if (!isAcclimatized) {
-          const ibtugNAList = [ibtugNA.ibtug - 2, ibtugNA.ibtug - 1.5, ibtugNA.ibtug - 1, ibtugNA.ibtug - 0.5, ibtugNA.ibtug, 10000];
+          const ibtugNAList = [
+            ibtugNA.ibtug - 2,
+            ibtugNA.ibtug - 1.5,
+            ibtugNA.ibtug - 1,
+            ibtugNA.ibtug - 0.5,
+            ibtugNA.ibtug,
+            10000,
+          ];
 
           return this.valuesCheck(String(ibtug), ibtugNAList, 5);
         }

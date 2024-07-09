@@ -6,7 +6,10 @@ import { DatabaseTableRepository } from '../repositories/implementations/Databas
 
 @Injectable()
 export class UploadExcelProvider {
-  constructor(private readonly databaseTableRepository: DatabaseTableRepository, private readonly excelProvider: ExcelProvider) {}
+  constructor(
+    private readonly databaseTableRepository: DatabaseTableRepository,
+    private readonly excelProvider: ExcelProvider,
+  ) {}
 
   async getAllData({ buffer, Workbook, read, DatabaseTable }) {
     const readFileData = await this.excelProvider.read(buffer);

@@ -17,7 +17,15 @@ const getData = (
   homoGroupTree: IHomoGroupMap,
   titleSection: string,
   convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[],
-  { variables, id, risks, considerations: cons, activities: ac, type, paragraphs }: Partial<IEnvironmentConvertResponse>,
+  {
+    variables,
+    id,
+    risks,
+    considerations: cons,
+    activities: ac,
+    type,
+    paragraphs,
+  }: Partial<IEnvironmentConvertResponse>,
 ) => {
   const parameters: ISectionChildrenType[] = [];
   const riskFactors: ISectionChildrenType[] = [];
@@ -66,21 +74,23 @@ const getData = (
     });
   }
 
-  risks.filter(risk => filterRisk(risk)).forEach((risk, index) => {
-    if (index === 0)
-      riskFactors.push({
-        type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
-        text: '**Fatores de risco:**',
-        spacing: { after: 100 },
-      });
+  risks
+    .filter((risk) => filterRisk(risk))
+    .forEach((risk, index) => {
+      if (index === 0)
+        riskFactors.push({
+          type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
+          text: '**Fatores de risco:**',
+          spacing: { after: 100 },
+        });
 
-    riskFactors.push({
-      type: DocumentSectionChildrenTypeEnum.BULLET,
-      level: 0,
-      text: `${risk.name} (${risk.type})`,
-      alignment: AlignmentType.START,
+      riskFactors.push({
+        type: DocumentSectionChildrenTypeEnum.BULLET,
+        level: 0,
+        text: `${risk.name} (${risk.type})`,
+        alignment: AlignmentType.START,
+      });
     });
-  });
 
   paragraphs.forEach((paragraph) => {
     paragraphSection.push({
@@ -261,65 +271,81 @@ export const allCharacterizationSections = (
 
     environmentData
       .sort((a, b) => sortNumber(b.profileParentId ? 1 : 0, a.profileParentId ? 1 : 0))
-      .forEach(({ variables, elements, id, risks, considerations: cons, breakPage, activities: ac, profileParentId, profiles, type, paragraphs }) => {
-        const title = [
-          {
-            type: DocumentSectionChildrenTypeEnum.H3,
-            text: `${desc}: ??${VariablesPGREnum.ENVIRONMENT_NAME}??`,
-          },
-        ] as ISectionChildrenType[];
-
-        const otherSections = getData(hierarchiesTreeOrg, homoGroupTree, titleSection, convertToDocx, {
+      .forEach(
+        ({
           variables,
+          elements,
           id,
           risks,
           considerations: cons,
+          breakPage,
           activities: ac,
+          profileParentId,
+          profiles,
           type,
           paragraphs,
-        });
+        }) => {
+          const title = [
+            {
+              type: DocumentSectionChildrenTypeEnum.H3,
+              text: `${desc}: ??${VariablesPGREnum.ENVIRONMENT_NAME}??`,
+            },
+          ] as ISectionChildrenType[];
 
-        if (profileParentId) {
-          otherSections.unshift(
-            ...convertToDocx(
-              [
+          const otherSections = getData(hierarchiesTreeOrg, homoGroupTree, titleSection, convertToDocx, {
+            variables,
+            id,
+            risks,
+            considerations: cons,
+            activities: ac,
+            type,
+            paragraphs,
+          });
+
+          if (profileParentId) {
+            otherSections.unshift(
+              ...convertToDocx(
+                [
+                  {
+                    type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
+                    text: ``,
+                  },
+                ],
+                variables,
+              ),
+            );
+
+            sectionProfiles[id] = otherSections;
+            return;
+          }
+
+          const section = [
+            ...convertToDocx([...title], variables),
+            ...elements,
+            ...otherSections,
+            ...profiles
+              .map((profile) => sectionProfiles[profile.id])
+              .reduce((acc, curr) => (curr ? [...acc, ...curr] : acc), []),
+          ];
+
+          if (firstPass) {
+            section.unshift(
+              ...convertToDocx([
                 {
-                  type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
-                  text: ``,
+                  type: DocumentSectionChildrenTypeEnum.H2,
+                  text: titleSection,
                 },
-              ],
-              variables,
-            ),
-          );
+              ]),
+            );
+            firstPass = false;
+          }
 
-          sectionProfiles[id] = otherSections;
-          return;
-        }
-
-        const section = [
-          ...convertToDocx([...title], variables),
-          ...elements,
-          ...otherSections,
-          ...profiles.map((profile) => sectionProfiles[profile.id]).reduce((acc, curr) => (curr ? [...acc, ...curr] : acc), []),
-        ];
-
-        if (firstPass) {
-          section.unshift(
-            ...convertToDocx([
-              {
-                type: DocumentSectionChildrenTypeEnum.H2,
-                text: titleSection,
-              },
-            ]),
-          );
-          firstPass = false;
-        }
-
-        if (breakPage || sections.length === 0) sections.push(section);
-        else {
-          sections[sections.length - 1] = [...(sections[sections.length - 1] || []), ...section];
-        }
-      });
+          if (breakPage || sections.length === 0) sections.push(section);
+          else {
+            sections[sections.length - 1] = [...(sections[sections.length - 1] || []), ...section];
+          }
+        },
+      );
   });
 
   return sections.map((section) => ({

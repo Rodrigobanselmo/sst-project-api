@@ -8,7 +8,10 @@ import { AlertEntity } from './../../../entities/alert.entity';
 
 @Injectable()
 export class FindOneAlertService {
-  constructor(private readonly alertRepository: AlertRepository, private readonly companyRepository: CompanyRepository) {}
+  constructor(
+    private readonly alertRepository: AlertRepository,
+    private readonly companyRepository: CompanyRepository,
+  ) {}
 
   async execute(companyId: string, options?: Prisma.AlertFindManyArgs) {
     const alerts = await this.alertRepository.findOne(companyId, options);

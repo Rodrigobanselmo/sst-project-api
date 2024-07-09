@@ -1,4 +1,17 @@
-import { AlignmentType, BorderStyle, Footer, ImageRun, ITableBordersOptions, Paragraph, Table, TableCell, TableRow, TextRun, VerticalAlign, WidthType } from 'docx';
+import {
+  AlignmentType,
+  BorderStyle,
+  Footer,
+  ImageRun,
+  ITableBordersOptions,
+  Paragraph,
+  Table,
+  TableCell,
+  TableRow,
+  TextRun,
+  VerticalAlign,
+  WidthType,
+} from 'docx';
 import sizeOf from 'image-size';
 import { readFileSync } from 'fs';
 import { palette } from '../../../../../../shared/constants/palette';
@@ -106,9 +119,9 @@ const secondCell = (consultantLogoPath: string) => {
 
   const image = consultantLogoPath
     ? new ImageRun({
-      data: readFileSync(consultantLogoPath),
-      transformation: getProportion(),
-    })
+        data: readFileSync(consultantLogoPath),
+        transformation: getProportion(),
+      })
     : undefined;
 
   return new TableCell({

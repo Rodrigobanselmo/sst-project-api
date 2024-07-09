@@ -12,7 +12,10 @@ import { PermissionEnum } from '../../../../../shared/constants/enum/authorizati
 
 @Controller('esocial/events/2210')
 export class ESocialEvent2210Controller {
-  constructor(private readonly sendEvents2210ESocialService: SendEvents2210ESocialService, private readonly findEvents2210ESocialService: FindEvents2210ESocialService) { }
+  constructor(
+    private readonly sendEvents2210ESocialService: SendEvents2210ESocialService,
+    private readonly findEvents2210ESocialService: FindEvents2210ESocialService,
+  ) {}
 
   @Permissions({
     code: PermissionEnum.ESOCIAL,

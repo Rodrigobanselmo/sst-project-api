@@ -16,9 +16,19 @@ export class UpdateUserService {
     private readonly dateProvider: DayJSProvider,
     private readonly findByTokenService: FindByTokenService,
     private readonly inviteUsersRepository: InviteUsersRepository,
-  ) { }
+  ) {}
 
-  async execute(id: number, { password, oldPassword, token, skipPassCheck, companyId, ...restUpdateUserDto }: UpdateUserDto & { skipPassCheck?: boolean, companyId?: string }) {
+  async execute(
+    id: number,
+    {
+      password,
+      oldPassword,
+      token,
+      skipPassCheck,
+      companyId,
+      ...restUpdateUserDto
+    }: UpdateUserDto & { skipPassCheck?: boolean; companyId?: string },
+  ) {
     if (!id) throw new BadRequestException(`Bad Request`);
 
     const updateUserDto: UpdateUserDto = { ...restUpdateUserDto };
@@ -50,7 +60,11 @@ export class UpdateUserService {
       updateUserDto.password = passHash;
     }
 
-    const { companies, invite, companyId: userCompanyId } = await getCompanyPermissionByToken(token, this.findByTokenService, this.dateProvider);
+    const {
+      companies,
+      invite,
+      companyId: userCompanyId,
+    } = await getCompanyPermissionByToken(token, this.findByTokenService, this.dateProvider);
 
     const user = await this.userRepository.update(
       id,
@@ -58,25 +72,26 @@ export class UpdateUserService {
         ...updateUserDto,
         ...(invite &&
           invite?.professional && {
-          ...(invite?.professional.councils && {
-            councils: invite.professional.councils.map(({ councilId, councilType, councilUF, id }) => ({
-              councilId,
-              councilType,
-              councilUF,
-              id,
-            })),
+            ...(invite?.professional.councils && {
+              councils: invite.professional.councils.map(({ councilId, councilType, councilUF, id }) => ({
+                councilId,
+                councilType,
+                councilUF,
+                id,
+              })),
+            }),
+            ...(invite?.professional.phone && {
+              phone: invite.professional.phone,
+            }),
+            ...(invite?.professional.type && {
+              type: invite.professional.type,
+            }),
           }),
-          ...(invite?.professional.phone && {
-            phone: invite.professional.phone,
-          }),
-          ...(invite?.professional.type && {
-            type: invite.professional.type,
-          }),
-        }),
       },
       companies,
     );
-    if (invite && invite.email && userCompanyId) await this.inviteUsersRepository.deleteByCompanyIdAndEmail(userCompanyId, invite.email);
+    if (invite && invite.email && userCompanyId)
+      await this.inviteUsersRepository.deleteByCompanyIdAndEmail(userCompanyId, invite.email);
     if (invite?.id) await this.inviteUsersRepository.deleteById(userCompanyId, invite.id);
 
     return user;

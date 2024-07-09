@@ -9,8 +9,7 @@ export const complementaryDocsIterable = (
   complementaryDocs: string[],
   convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[],
 ) => {
-  if (!complementaryDocs?.length)
-    return []
+  if (!complementaryDocs?.length) return [];
 
   const complementaryDocsVarArray = ComplementaryDocsConverter(complementaryDocs);
 

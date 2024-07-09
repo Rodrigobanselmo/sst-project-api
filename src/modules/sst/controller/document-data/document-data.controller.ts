@@ -12,7 +12,10 @@ import { UpsertDocumentDataPCMSODto } from '../../dto/document-data-pcmso.dto';
 
 @Controller('document-data/:companyId')
 export class DocumentDataController {
-  constructor(private readonly upsertDocumentDataService: UpsertDocumentDataService, private readonly findByIdService: FindByIdDocumentDataService) { }
+  constructor(
+    private readonly upsertDocumentDataService: UpsertDocumentDataService,
+    private readonly findByIdService: FindByIdDocumentDataService,
+  ) {}
 
   @Permissions({
     code: PermissionEnum.COMPANY,

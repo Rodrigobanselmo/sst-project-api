@@ -23,7 +23,7 @@ export interface IDocumentAttachment {
   name: string;
 }
 
-export type IImagesMap = Record<string, { path: string }>
+export type IImagesMap = Record<string, { path: string }>;
 
 export interface IGetDocument<T, R> {
   version: string;
@@ -39,7 +39,10 @@ export interface ISaveDocument<T, R> {
   body: T;
 }
 
-export interface IUnlinkPaths { path: string, url: string }
+export interface IUnlinkPaths {
+  path: string;
+  url: string;
+}
 
 export interface IDocumentFactoryProduct<T = any, R = any> {
   localCreation?: boolean;

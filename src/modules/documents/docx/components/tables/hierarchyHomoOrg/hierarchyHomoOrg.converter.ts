@@ -118,7 +118,10 @@ export const hierarchyPlanConverter = (
     });
   })();
 
-  const mockedColumns = [HierarchyPlanMap[HierarchyPlanColumnEnum.GSE], HierarchyPlanMap[HierarchyPlanColumnEnum.DESCRIPTION]].map<headerTableProps>(({ ...column }) => {
+  const mockedColumns = [
+    HierarchyPlanMap[HierarchyPlanColumnEnum.GSE],
+    HierarchyPlanMap[HierarchyPlanColumnEnum.DESCRIPTION],
+  ].map<headerTableProps>(({ ...column }) => {
     delete column.position;
     return column;
   });
@@ -153,7 +156,9 @@ export const hierarchyPlanConverter = (
     const generateRow = (): bodyTableProps[] => Array.from({ length: columnsLength }).map(() => ({}));
 
     Object.entries(allHierarchyPlan)
-      .sort(([a, c], [b, d]) => (showHomogeneous ? sortString(homoGroupTree[a], homoGroupTree[b], 'name') : sortString(c[0], d[0], 'name')))
+      .sort(([a, c], [b, d]) =>
+        showHomogeneous ? sortString(homoGroupTree[a], homoGroupTree[b], 'name') : sortString(c[0], d[0], 'name'),
+      )
       .forEach(([homogeneousGroupId, firstHierarchyPlan]) => {
         const homo = homoGroupTree[homogeneousGroupId];
         let name = homo ? homo.name : '';
@@ -170,7 +175,8 @@ export const hierarchyPlanConverter = (
             name = `${homo.environment.name}\n(${originRiskMap[homo.environment.type].name})`;
           }
 
-          if (homo.characterization) name = `${homo.characterization.name}\n(${originRiskMap[homo.characterization.type].name})`;
+          if (homo.characterization)
+            name = `${homo.characterization.name}\n(${originRiskMap[homo.characterization.type].name})`;
         }
 
         const row = generateRow();
@@ -277,4 +283,3 @@ export const hierarchyPlanConverter = (
     headerData,
   };
 };
-

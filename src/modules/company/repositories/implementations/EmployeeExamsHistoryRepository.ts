@@ -6,13 +6,21 @@ import { PrismaService } from '../../../../prisma/prisma.service';
 import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
 import { DayJSProvider, dayjs } from '../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { prismaFilter } from '../../../../shared/utils/filters/prisma.filters';
-import { CreateEmployeeExamHistoryDto, FindEmployeeExamHistoryDto, UpdateEmployeeExamHistoryDto, UpdateManyScheduleExamDto } from '../../dto/employee-exam-history';
+import {
+  CreateEmployeeExamHistoryDto,
+  FindEmployeeExamHistoryDto,
+  UpdateEmployeeExamHistoryDto,
+  UpdateManyScheduleExamDto,
+} from '../../dto/employee-exam-history';
 import { EmployeeExamsHistoryEntity } from '../../entities/employee-exam-history.entity';
 import clone from 'clone';
 
 @Injectable()
 export class EmployeeExamsHistoryRepository {
-  constructor(private prisma: PrismaService, private dayjs: DayJSProvider) {}
+  constructor(
+    private prisma: PrismaService,
+    private dayjs: DayJSProvider,
+  ) {}
 
   createManyData = ({
     examsData = [],
@@ -64,7 +72,12 @@ export class EmployeeExamsHistoryRepository {
     return data;
   }
 
-  async update({ id, examsData, hierarchyId, ...updateData }: UpdateEmployeeExamHistoryDto & { fileUrl?: string; sendEvent?: boolean }) {
+  async update({
+    id,
+    examsData,
+    hierarchyId,
+    ...updateData
+  }: UpdateEmployeeExamHistoryDto & { fileUrl?: string; sendEvent?: boolean }) {
     const data = await this.prisma.employeeExamsHistory.update({
       data: {
         ...updateData,
@@ -222,7 +235,9 @@ export class EmployeeExamsHistoryRepository {
           {
             evaluationType: { notIn: query.notInEvaluationType },
           },
-          ...(query.notInEvaluationType?.includes(ExamHistoryEvaluationEnum.NONE) ? [] : [{ evaluationType: { equals: null } }]),
+          ...(query.notInEvaluationType?.includes(ExamHistoryEvaluationEnum.NONE)
+            ? []
+            : [{ evaluationType: { equals: null } }]),
         ],
       } as typeof whereOptions);
     }
@@ -239,8 +254,12 @@ export class EmployeeExamsHistoryRepository {
           {
             status: { notIn: notInStatus },
           },
-          ...(iSchedule ? [{ status: StatusEnum.PROCESSING, doneDate: { gte: dayjs().tz('America/Sao_Paulo', true).toDate() } }] : []),
-          ...(isExpired ? [{ status: StatusEnum.PROCESSING, doneDate: { lte: dayjs().tz('America/Sao_Paulo', true).toDate() } }] : []),
+          ...(iSchedule
+            ? [{ status: StatusEnum.PROCESSING, doneDate: { gte: dayjs().tz('America/Sao_Paulo', true).toDate() } }]
+            : []),
+          ...(isExpired
+            ? [{ status: StatusEnum.PROCESSING, doneDate: { lte: dayjs().tz('America/Sao_Paulo', true).toDate() } }]
+            : []),
         ],
       } as typeof whereOptions);
     }

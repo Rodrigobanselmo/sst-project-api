@@ -6,7 +6,7 @@ import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 
 @Injectable()
 export class SyncMainService {
-  constructor(private readonly syncRepository: SyncRepository) { }
+  constructor(private readonly syncRepository: SyncRepository) {}
 
   async execute(data: SyncDto, user: UserPayloadDto) {
     const changes = await this.syncRepository.findSyncChanges({
@@ -15,11 +15,11 @@ export class SyncMainService {
       userId: user.userId,
       companyIds: data.companyIds,
       companyStartIds: data.companyStartIds,
-    })
+    });
 
     return {
       latestVersion: new Date().getTime(),
-      changes
-    }
+      changes,
+    };
   }
 }

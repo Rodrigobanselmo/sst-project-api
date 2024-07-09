@@ -1,15 +1,10 @@
-import { Injectable } from "@nestjs/common";
-import { PaginationQueryDto } from "../../../../shared/dto/pagination.dto";
+import { Injectable } from '@nestjs/common';
+import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
 
-import { PrismaService } from "../../../../prisma/prisma.service";
-import {
-  CreateEpiDto,
-  FindEpiDto,
-  UpdateEpiDto,
-  UpsertEpiDto,
-} from "../../dto/epi.dto";
-import { EpiEntity } from "../../entities/epi.entity";
-import { Prisma } from "@prisma/client";
+import { PrismaService } from '../../../../prisma/prisma.service';
+import { CreateEpiDto, FindEpiDto, UpdateEpiDto, UpsertEpiDto } from '../../dto/epi.dto';
+import { EpiEntity } from '../../entities/epi.entity';
+import { Prisma } from '@prisma/client';
 
 let i = 0;
 
@@ -27,10 +22,7 @@ export class EpiRepository {
     return new EpiEntity(redMed);
   }
 
-  async update({
-    id,
-    ...createEpiDto
-  }: UpdateEpiDto & { id: number }): Promise<EpiEntity> {
+  async update({ id, ...createEpiDto }: UpdateEpiDto & { id: number }): Promise<EpiEntity> {
     const Epi = await this.prisma.epi.update({
       data: {
         ...createEpiDto,
@@ -43,7 +35,7 @@ export class EpiRepository {
 
   async upsertMany(upsertDtoMany: UpsertEpiDto[]): Promise<EpiEntity[]> {
     i++;
-    console.info("batch" + i);
+    console.info('batch' + i);
     const data = await this.prisma.$transaction(
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       upsertDtoMany.map(({ id: _, ca, ...upsertRiskDto }) =>
@@ -53,9 +45,9 @@ export class EpiRepository {
             ...upsertRiskDto,
           },
           update: { ...upsertRiskDto },
-          where: { ca_status: { status: "ACTIVE", ca } },
-        })
-      )
+          where: { ca_status: { status: 'ACTIVE', ca } },
+        }),
+      ),
     );
 
     return data.map((epi) => new EpiEntity(epi));
@@ -63,7 +55,7 @@ export class EpiRepository {
 
   async findByCA(ca: string): Promise<EpiEntity> {
     const epi = await this.prisma.epi.findUnique({
-      where: { ca_status: { ca, status: "ACTIVE" } },
+      where: { ca_status: { ca, status: 'ACTIVE' } },
     });
 
     return new EpiEntity(epi);
@@ -71,14 +63,14 @@ export class EpiRepository {
 
   async find(query: Partial<FindEpiDto>, pagination: PaginationQueryDto) {
     const where = {
-      AND: [{ ca: { notIn: ["0", "1", "2", query?.ca || "0"] } }],
+      AND: [{ ca: { notIn: ['0', '1', '2', query?.ca || '0'] } }],
     };
 
     Object.entries(query).forEach(([key, value]) => {
       if (value)
         where[key] = {
           contains: value,
-          mode: "insensitive",
+          mode: 'insensitive',
         };
     });
 
@@ -97,9 +89,7 @@ export class EpiRepository {
     const epis = await this.prisma.epi.findMany({
       where: {
         ca: {
-          in: Array.isArray(query?.ca)
-            ? (query?.ca as unknown as string[])
-            : [query?.ca] || ["0", "1", "2"],
+          in: Array.isArray(query?.ca) ? (query?.ca as unknown as string[]) : [query?.ca] || ['0', '1', '2'],
         },
       },
     });

@@ -1,23 +1,23 @@
-import { BadRequestException, Inject, Injectable } from "@nestjs/common";
-import { EmployeeESocialEventTypeEnum, StatusEnum } from "@prisma/client";
-import { Cache } from "cache-manager";
-import { Readable } from "stream";
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { EmployeeESocialEventTypeEnum, StatusEnum } from '@prisma/client';
+import { Cache } from 'cache-manager';
+import { Readable } from 'stream';
 
-import { EmployeePPPHistoryRepository } from "../../../../../../modules/company/repositories/implementations/EmployeePPPHistoryRepository";
-import { CacheEnum } from "../../../../../../shared/constants/enum/cache";
-import { UserPayloadDto } from "../../../../../../shared/dto/user-payload.dto";
-import { ICacheEventBatchType } from "../../../../../../shared/interfaces/cache.types";
-import { ESocialEventProvider } from "../../../../../../shared/providers/ESocialProvider/implementations/ESocialEventProvider";
-import { ESocialMethodsProvider } from "../../../../../../shared/providers/ESocialProvider/implementations/ESocialMethodsProvider";
+import { EmployeePPPHistoryRepository } from '../../../../../../modules/company/repositories/implementations/EmployeePPPHistoryRepository';
+import { CacheEnum } from '../../../../../../shared/constants/enum/cache';
+import { UserPayloadDto } from '../../../../../../shared/dto/user-payload.dto';
+import { ICacheEventBatchType } from '../../../../../../shared/interfaces/cache.types';
+import { ESocialEventProvider } from '../../../../../../shared/providers/ESocialProvider/implementations/ESocialEventProvider';
+import { ESocialMethodsProvider } from '../../../../../../shared/providers/ESocialProvider/implementations/ESocialMethodsProvider';
 import {
   IESocial2240,
   IESocial3000,
-} from "../../../../../../shared/providers/ESocialProvider/models/IESocialMethodProvider";
-import { UpdateESocialReportService } from "../../../../../company/services/report/update-esocial-report/update-esocial-report.service";
-import { Event2240Dto } from "../../../../dto/event.dto";
-import { IEsocialSendBatchResponse } from "../../../../interfaces/esocial";
-import { FindEvents2240ESocialService } from "../find-events/find-events.service";
-import { CACHE_MANAGER } from "@nestjs/cache-manager";
+} from '../../../../../../shared/providers/ESocialProvider/models/IESocialMethodProvider';
+import { UpdateESocialReportService } from '../../../../../company/services/report/update-esocial-report/update-esocial-report.service';
+import { Event2240Dto } from '../../../../dto/event.dto';
+import { IEsocialSendBatchResponse } from '../../../../interfaces/esocial';
+import { FindEvents2240ESocialService } from '../find-events/find-events.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()
 export class SendEvents2240ESocialService {
@@ -32,25 +32,18 @@ export class SendEvents2240ESocialService {
 
   async execute(body: Event2240Dto, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;
-    const { company, cert } =
-      await this.findEvents2240ESocialService.getCompany(companyId, {
-        report: true,
-        cert: true,
-      });
+    const { company, cert } = await this.findEvents2240ESocialService.getCompany(companyId, {
+      report: true,
+      cert: true,
+    });
 
     const startDate = company.esocialStart;
     const esocialSend = company.esocialSend;
 
     if (!startDate || esocialSend == null)
-      throw new BadRequestException(
-        "Data de início do eSocial ou tipo de envio não informado para essa empresa",
-      );
+      throw new BadRequestException('Data de início do eSocial ou tipo de envio não informado para essa empresa');
 
-    const employees2240 =
-      await this.findEvents2240ESocialService.findEmployee2240(
-        company,
-        startDate,
-      );
+    const employees2240 = await this.findEvents2240ESocialService.findEmployee2240(company, startDate);
 
     const eventsStruct = this.eSocialEventProvider.convertToEvent2240Struct({
       company,
@@ -107,7 +100,7 @@ export class SendEvents2240ESocialService {
               xml: xmlResult,
               cert,
             })
-          : "";
+          : '';
 
         return { signedXml, xml: xmlResult, ...data };
       })
@@ -146,7 +139,7 @@ export class SendEvents2240ESocialService {
           {
             events: eventsXml,
             response: {
-              status: { cdResposta: "201" },
+              status: { cdResposta: '201' },
             } as IEsocialSendBatchResponse,
           },
         ];
@@ -166,14 +159,13 @@ export class SendEvents2240ESocialService {
 
     await this.updateESocialReportService.execute({ companyId });
 
-    if (esocialSend) return { fileStream: null, fileName: "" };
+    if (esocialSend) return { fileStream: null, fileName: '' };
 
-    const { zipFile, fileName } =
-      await this.eSocialMethodsProvider.createZipFolder({
-        company,
-        eventsXml,
-        type: "2240",
-      });
+    const { zipFile, fileName } = await this.eSocialMethodsProvider.createZipFolder({
+      company,
+      eventsXml,
+      type: '2240',
+    });
 
     return { fileStream: Readable.from(zipFile) as any, fileName };
   }

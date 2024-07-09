@@ -1,17 +1,14 @@
-import { Body, Controller, Get, Post, Query } from "@nestjs/common";
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 
-import {
-  FindAccessGroupDto,
-  UpsertAccessGroupDto,
-} from "../../dto/access-group.dto";
-import { FindAvailableAccessGroupsService } from "../../services/group/find-available-access-group/upsert-access-group.service";
-import { UpsertAccessGroupsService } from "../../services/group/upsert-access-group/upsert-access-group.service";
-import { User } from "./../../../../shared/decorators/user.decorator";
-import { UserPayloadDto } from "./../../../../shared/dto/user-payload.dto";
-import { Permissions } from "../../../../shared/decorators/permissions.decorator";
-import { PermissionEnum } from "../../../../shared/constants/enum/authorization";
+import { FindAccessGroupDto, UpsertAccessGroupDto } from '../../dto/access-group.dto';
+import { FindAvailableAccessGroupsService } from '../../services/group/find-available-access-group/upsert-access-group.service';
+import { UpsertAccessGroupsService } from '../../services/group/upsert-access-group/upsert-access-group.service';
+import { User } from './../../../../shared/decorators/user.decorator';
+import { UserPayloadDto } from './../../../../shared/dto/user-payload.dto';
+import { Permissions } from '../../../../shared/decorators/permissions.decorator';
+import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
 
-@Controller("auth/group/:companyId")
+@Controller('auth/group/:companyId')
 export class AuthGroupController {
   constructor(
     private readonly findAvailableAccessGroupsService: FindAvailableAccessGroupsService,
@@ -31,26 +28,17 @@ export class AuthGroupController {
     },
   )
   @Get()
-  find(
-    @User() userPayloadDto: UserPayloadDto,
-    @Query() query: FindAccessGroupDto,
-  ) {
+  find(@User() userPayloadDto: UserPayloadDto, @Query() query: FindAccessGroupDto) {
     return this.findAvailableAccessGroupsService.execute(query, userPayloadDto);
   }
 
   @Permissions({
     code: PermissionEnum.ACCESS_GROUP,
-    crud: "cu",
+    crud: 'cu',
     isMember: true,
   })
   @Post()
-  upsert(
-    @Body() upsertAccessGroupDto: UpsertAccessGroupDto,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
-    return this.upsertAccessGroupsService.execute(
-      upsertAccessGroupDto,
-      userPayloadDto,
-    );
+  upsert(@Body() upsertAccessGroupDto: UpsertAccessGroupDto, @User() userPayloadDto: UserPayloadDto) {
+    return this.upsertAccessGroupsService.execute(upsertAccessGroupDto, userPayloadDto);
   }
 }

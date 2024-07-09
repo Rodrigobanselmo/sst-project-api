@@ -8,13 +8,20 @@ import { originRiskMap } from './../../../../../../../shared/constants/maps/orig
 import { getMatrizRisk } from './../../../../../../../shared/utils/matriz';
 import { RiskFactorGroupDataEntity } from '../../../../../../sst/entities/riskGroupData.entity';
 import { borderStyleGlobal } from './../../../../base/config/styles';
-import { IRiskDataJson, IRiskDataJsonNoise, QuantityTypeEnum } from './../../../../../../company/interfaces/risk-data-json.types';
+import {
+  IRiskDataJson,
+  IRiskDataJsonNoise,
+  QuantityTypeEnum,
+} from './../../../../../../company/interfaces/risk-data-json.types';
 import { IHierarchyMap } from './../../../../converter/hierarchy.converter';
 import { bodyTableProps } from './elements/body';
 import { QuantityNoiseColumnEnum } from './quantityNoise.constant';
 import sortArray from 'sort-array';
 
-export const quantityNoiseConverter = (riskGroupData: RiskFactorGroupDataEntity & DocumentDataEntity & DocumentDataPGRDto, hierarchyTree: IHierarchyMap) => {
+export const quantityNoiseConverter = (
+  riskGroupData: RiskFactorGroupDataEntity & DocumentDataEntity & DocumentDataPGRDto,
+  hierarchyTree: IHierarchyMap,
+) => {
   const rows: bodyTableProps[][] = [];
 
   riskGroupData.data
@@ -52,7 +59,9 @@ export const quantityNoiseConverter = (riskGroupData: RiskFactorGroupDataEntity 
         if (hierarchy) origin = `${hierarchy.name}\n(${originRiskMap[hierarchy.type].name})`;
       }
 
-      const value = riskGroupData.isQ5 ? String(Math.max(Number(json?.ltcatq5 || 0), Number(json?.nr15q5 || 0))) : json.ltcatq3;
+      const value = riskGroupData.isQ5
+        ? String(Math.max(Number(json?.ltcatq5 || 0), Number(json?.nr15q5 || 0)))
+        : json.ltcatq3;
 
       const ro = getMatrizRisk(riskData.riskFactor.severity, riskData.probability);
 

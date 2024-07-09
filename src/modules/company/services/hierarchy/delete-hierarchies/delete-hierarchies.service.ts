@@ -99,8 +99,13 @@ export class DeleteHierarchyService {
     return Array.isArray(arr) && arr.length === 0;
   }
 
-  checkEmptyArraysAndChildren(obj: HierarchyEntity, emptyResult: HierarchyEntity[] = [], nonEmptyResult: HierarchyEntity[] = []) {
-    const { employeeExamsHistory, employeeExamsHistorySubOffice, hierarchyHistory, subHierarchyHistory, children } = obj;
+  checkEmptyArraysAndChildren(
+    obj: HierarchyEntity,
+    emptyResult: HierarchyEntity[] = [],
+    nonEmptyResult: HierarchyEntity[] = [],
+  ) {
+    const { employeeExamsHistory, employeeExamsHistorySubOffice, hierarchyHistory, subHierarchyHistory, children } =
+      obj;
 
     const allArraysEmpty =
       this.isEmptyArray(employeeExamsHistory) &&

@@ -24,7 +24,7 @@ export class UpdateManyScheduleExamHistoryService {
     private readonly dayJSProvider: DayJSProvider,
     private readonly notificationRepository: NotificationRepository,
     private readonly checkEmployeeExamService: CheckEmployeeExamService,
-  ) { }
+  ) {}
 
   async execute({ data, isClinic, ...dataDto }: UpdateManyScheduleExamDto, user: UserPayloadDto) {
     const employeeId = data.every((dt) => data?.[0]?.employeeId === dt?.employeeId) ? data[0]?.employeeId : 0;

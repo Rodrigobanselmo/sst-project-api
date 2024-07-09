@@ -70,7 +70,11 @@ export class ProtocolController {
     crud: true,
   })
   @Patch('/:id/:companyId')
-  update(@Body() upsertAccessGroupDto: UpdateProtocolDto, @User() userPayloadDto: UserPayloadDto, @Param('id', ParseIntPipe) id: number) {
+  update(
+    @Body() upsertAccessGroupDto: UpdateProtocolDto,
+    @User() userPayloadDto: UserPayloadDto,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
     return this.updateProtocolsService.execute({ ...upsertAccessGroupDto, id }, userPayloadDto);
   }
 

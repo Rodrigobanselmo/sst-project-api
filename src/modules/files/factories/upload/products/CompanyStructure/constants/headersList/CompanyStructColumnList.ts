@@ -71,7 +71,10 @@ export const CompanyStructColumnList: ISheetHeaderList = [
     name: 'Medidas de Controle (EPI)',
   },
   {
-    group: [CompanyStructColumnMap[CompanyStructHeaderEnum.EPC], CompanyStructColumnMap[CompanyStructHeaderEnum.EPC_EFFICIENTLY]],
+    group: [
+      CompanyStructColumnMap[CompanyStructHeaderEnum.EPC],
+      CompanyStructColumnMap[CompanyStructHeaderEnum.EPC_EFFICIENTLY],
+    ],
     name: 'Medidas de Controle de Engenharia (EPC)',
   },
   {
@@ -79,11 +82,17 @@ export const CompanyStructColumnList: ISheetHeaderList = [
     name: 'Medidas de Controle Admnistrativa',
   },
   {
-    group: [CompanyStructColumnMap[CompanyStructHeaderEnum.REC], CompanyStructColumnMap[CompanyStructHeaderEnum.PROB_REC]],
+    group: [
+      CompanyStructColumnMap[CompanyStructHeaderEnum.REC],
+      CompanyStructColumnMap[CompanyStructHeaderEnum.PROB_REC],
+    ],
     name: 'Recomendações',
   },
   {
-    group: [CompanyStructColumnMap[CompanyStructHeaderEnum.START_DATE], CompanyStructColumnMap[CompanyStructHeaderEnum.END_DATE]],
+    group: [
+      CompanyStructColumnMap[CompanyStructHeaderEnum.START_DATE],
+      CompanyStructColumnMap[CompanyStructHeaderEnum.END_DATE],
+    ],
     name: 'Periódo de Exposição ao Risco',
     fillColors: [ReportFillColorEnum.HEADER_RED],
   },

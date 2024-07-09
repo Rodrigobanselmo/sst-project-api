@@ -14,20 +14,24 @@ import { UserCompanyEntity } from '../../entities/userCompany.entity';
 @Injectable()
 export class UsersRepository implements IUsersRepository {
   private count = 0;
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
-  async create(createUserDto: Omit<CreateUserDto, 'token' | 'googleToken'>, userCompanyDto: UserCompanyDto[], professional?: ProfessionalEntity) {
+  async create(
+    createUserDto: Omit<CreateUserDto, 'token' | 'googleToken'>,
+    userCompanyDto: UserCompanyDto[],
+    professional?: ProfessionalEntity,
+  ) {
     const hasCouncil = professional && professional?.councils && professional.councils.length > 0;
 
     const councils = hasCouncil
       ? professional.councils
       : [
-        {
-          councilId: '',
-          councilUF: '',
-          councilType: '',
-        } as any,
-      ];
+          {
+            councilId: '',
+            councilUF: '',
+            councilType: '',
+          } as any,
+        ];
 
     const user = await this.prisma.user.create({
       data: {
@@ -64,10 +68,22 @@ export class UsersRepository implements IUsersRepository {
 
   async update(
     id: number,
-    { oldPassword, certifications, councilId, councilUF, councilType, cpf, phone, formation, type, name, councils, ...updateUserDto }: UpdateUserDto & { googleUser?: string, facebookUser?: string },
+    {
+      oldPassword,
+      certifications,
+      councilId,
+      councilUF,
+      councilType,
+      cpf,
+      phone,
+      formation,
+      type,
+      name,
+      councils,
+      ...updateUserDto
+    }: UpdateUserDto & { googleUser?: string; facebookUser?: string },
     userCompanyDto: UserCompanyDto[] = [],
   ) {
-
     const professional = {
       certifications: Array.isArray(certifications) ? certifications.filter((c) => c) : certifications,
       formation: Array.isArray(formation) ? formation.filter((c) => c) : formation,
@@ -148,7 +164,7 @@ export class UsersRepository implements IUsersRepository {
                 id: c.id,
               },
             });
-          } catch (err) { }
+          } catch (err) {}
         }),
       );
 
@@ -247,7 +263,7 @@ export class UsersRepository implements IUsersRepository {
     const user = await this.prisma.user.findFirst({
       where: {
         id,
-        ...(companyId && { companies: { some: { status: 'ACTIVE', companyId } } })
+        ...(companyId && { companies: { some: { status: 'ACTIVE', companyId } } }),
       },
       include: {
         companies: { include: { group: { select: { permissions: true, roles: true } } } },

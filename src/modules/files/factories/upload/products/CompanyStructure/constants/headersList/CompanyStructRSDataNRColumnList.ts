@@ -19,7 +19,8 @@ export const CompanyStructRSDataNRColumnList: ISheetHeaderList = [
       CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.CARGO_D],
       CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.CODIGO_PT],
       CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.POSICAO],
-    ], name: 'Identifição'
+    ],
+    name: 'Identifição',
   },
   {
     group: [
@@ -28,24 +29,22 @@ export const CompanyStructRSDataNRColumnList: ISheetHeaderList = [
       CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.ANEXO],
       CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.TECNICA],
       CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.EXPOSICAO],
-
-    ], name: 'Identificação do RISCO'
+    ],
+    name: 'Identificação do RISCO',
   },
   {
     group: [
       CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.MEDIÇAO_PORTARIA],
       CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.MEDIÇAO_INSS],
-
     ],
-    name: 'Anexo 1 - Limites de Tolerância para Ruído Contínuo ou Intermitente	'
+    name: 'Anexo 1 - Limites de Tolerância para Ruído Contínuo ou Intermitente	',
   },
   {
     group: [
       CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.INTENSIDADE_RUIDO],
       CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.TIPO_LEITURA],
-
     ],
-    name: 'Anexo 2 - Limites de Tolerância para Ruídos de Impacto	'
+    name: 'Anexo 2 - Limites de Tolerância para Ruídos de Impacto	',
   },
   {
     group: [
@@ -56,13 +55,11 @@ export const CompanyStructRSDataNRColumnList: ISheetHeaderList = [
       CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.LOCAL],
       CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.LIMITE_IBUTG],
     ],
-    name: 'Anexo 3 - Limites de Tolerância para Exposição ao Calor'
+    name: 'Anexo 3 - Limites de Tolerância para Exposição ao Calor',
   },
   {
-    group: [
-      CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.INTENSIDADE_RAD],
-    ],
-    name: 'Anexo 5 - Rad. Ionizantes'
+    group: [CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.INTENSIDADE_RAD]],
+    name: 'Anexo 5 - Rad. Ionizantes',
   },
   {
     group: [
@@ -71,65 +68,56 @@ export const CompanyStructRSDataNRColumnList: ISheetHeaderList = [
       CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.INTENSIDADE_AREN],
       CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.INTENSIDADE_VDVR],
     ],
-    name: 'Anexo 8 -  Vibrações			'
+    name: 'Anexo 8 -  Vibrações			',
   },
   {
     group: [
       CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.LIMITE_FRIO],
       CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.INTENSIDADE_FRIO],
-
     ],
-    name: 'Anexo 9  - Frio	'
+    name: 'Anexo 9  - Frio	',
   },
   {
     group: [
       CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.AGENTE_QUI],
       CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.INTENSIDADE_QUI],
       CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.UNIDADE_MEDIDA],
-
     ],
-    name: 'Anexo 11 - Agentes Químicos Cuja Insalubridade é Caracterizada por Limite de Tolerância  e Inspeção no Local de Trabalho	'
+    name: 'Anexo 11 - Agentes Químicos Cuja Insalubridade é Caracterizada por Limite de Tolerância  e Inspeção no Local de Trabalho	',
   },
   {
     group: [
       CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.AGENTE_POEIRA],
       CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.INTENSIDADE_POEIRA],
       CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.UNIDADE_POEIRA],
-
     ],
-    name: 'Anexo 12 - Limites de Tolerância para Poeiras Minerais		'
+    name: 'Anexo 12 - Limites de Tolerância para Poeiras Minerais		',
   },
   {
     group: [
       CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.AGENTE_QUI_ANEXO_13],
       CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.MANIPULAÇAO_ANEXO_13],
-
     ],
-    name: 'Anexo 13 - Agentes Químicos	'
+    name: 'Anexo 13 - Agentes Químicos	',
   },
   {
-    group: [
-      CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.AGENTE_RESTO],
-
-    ],
-    name: 'Anexo 7 / Anexo 14 / Nr16 Anexo 1 / Nr16 Anexo2 / Nr16 Anexo 3 / Nr16 Anexo 5/ Acidentes/ Ergonômicos'
+    group: [CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.AGENTE_RESTO]],
+    name: 'Anexo 7 / Anexo 14 / Nr16 Anexo 1 / Nr16 Anexo2 / Nr16 Anexo 3 / Nr16 Anexo 5/ Acidentes/ Ergonômicos',
   },
   {
     group: [
       CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.FATOR_ELET_RAD],
       CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.TAREFA_ELET_RAD],
-
     ],
-    name: 'Eletricidade / Radiações Ionizantes	'
+    name: 'Eletricidade / Radiações Ionizantes	',
   },
   {
     group: [
       CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.CONSTAR_EM],
       CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.CONSIDERAR_PCMSO],
       CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.NAO_CONSIDERAR_COMPLEMENTARES],
-
     ],
-    name: 'Geral		'
+    name: 'Geral		',
   },
   {
     group: [
@@ -145,15 +133,12 @@ export const CompanyStructRSDataNRColumnList: ISheetHeaderList = [
       CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.EPI_5],
       CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.EPI_6],
       CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.EPI_7],
-
     ],
-    name: 'EPI											'
+    name: 'EPI											',
   },
   {
-    group: [
-      CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.AGENTE_EQUIVALENTE],
-    ],
-    name: 'Anexo IV'
+    group: [CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.AGENTE_EQUIVALENTE]],
+    name: 'Anexo IV',
   },
   {
     group: [
@@ -165,25 +150,18 @@ export const CompanyStructRSDataNRColumnList: ISheetHeaderList = [
       CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.VIAS_ABS],
       CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.RECOMENDACOES],
     ],
-    name: 'Considerações						'
+    name: 'Considerações						',
   },
   {
-    group: [
-      CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.OBSERVACOES],
-    ],
-    name: 'Complementares'
+    group: [CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.OBSERVACOES]],
+    name: 'Complementares',
   },
   {
-    group: [
-      CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.ETAPA],
-    ],
-    name: ''
+    group: [CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.ETAPA]],
+    name: '',
   },
   {
-    group: [
-      CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.CODIGO],
-    ],
-    name: 'Integração'
+    group: [CompanyStructRSDataNRColumnMap[CompanyStructRSDataNRHeaderEnum.CODIGO]],
+    name: 'Integração',
   },
-
 ];

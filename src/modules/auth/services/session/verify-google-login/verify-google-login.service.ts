@@ -7,7 +7,10 @@ import { LoginGoogleUserDto } from '../../../dto/login-user.dto';
 
 @Injectable()
 export class VerifyGoogleLoginService {
-  constructor(private readonly usersRepository: UsersRepository, private readonly firebaseProvider: FirebaseProvider) { }
+  constructor(
+    private readonly usersRepository: UsersRepository,
+    private readonly firebaseProvider: FirebaseProvider,
+  ) {}
 
   async execute({ googleToken }: LoginGoogleUserDto) {
     try {
@@ -21,7 +24,7 @@ export class VerifyGoogleLoginService {
           await this.usersRepository.update(user.id, {
             googleExternalId: result.user.uid,
             ...(!user.photoUrl && { photoUrl: result.user.photoURL }),
-            ...(!result.user.email && { googleUser: result.user.email })
+            ...(!result.user.email && { googleUser: result.user.email }),
           });
         }
       }

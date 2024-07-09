@@ -87,7 +87,11 @@ export class ESocialBatchRepository {
     return data.map((data) => new EmployeeESocialBatchEntity(data));
   }
 
-  async find(query: Partial<FindESocialBatchDto>, pagination: PaginationQueryDto, options: Prisma.EmployeeESocialBatchFindManyArgs = {}) {
+  async find(
+    query: Partial<FindESocialBatchDto>,
+    pagination: PaginationQueryDto,
+    options: Prisma.EmployeeESocialBatchFindManyArgs = {},
+  ) {
     const companyId = query.companyId;
     const whereInit = {
       AND: [

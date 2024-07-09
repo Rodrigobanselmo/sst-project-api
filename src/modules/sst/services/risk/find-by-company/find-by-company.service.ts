@@ -6,7 +6,7 @@ import { FindRiskDto } from '../../../dto/risk.dto';
 
 @Injectable()
 export class FindRisksByCompanyService {
-  constructor(private readonly riskRepository: RiskRepository) { }
+  constructor(private readonly riskRepository: RiskRepository) {}
 
   async execute({ skip, take, ...query }: FindRiskDto, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;
@@ -62,7 +62,7 @@ export class FindRisksByCompanyService {
           },
           examToRisk: {
             include: { exam: { select: { name: true, id: true } } },
-            where: { companyId, deletedAt: null, },
+            where: { companyId, deletedAt: null },
           },
           riskFactorData: {
             where: {

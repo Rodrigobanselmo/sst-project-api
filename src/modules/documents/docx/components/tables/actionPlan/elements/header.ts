@@ -1,5 +1,15 @@
 import { borderStyleGlobal } from './../../../../base/config/styles';
-import { AlignmentType, HeightRule, Paragraph, TableCell, TableRow, TextDirection, TextRun, VerticalAlign, WidthType } from 'docx';
+import {
+  AlignmentType,
+  HeightRule,
+  Paragraph,
+  TableCell,
+  TableRow,
+  TextDirection,
+  TextRun,
+  VerticalAlign,
+  WidthType,
+} from 'docx';
 import { palette } from '../../../../../../../shared/constants/palette';
 
 export interface headerTableProps {

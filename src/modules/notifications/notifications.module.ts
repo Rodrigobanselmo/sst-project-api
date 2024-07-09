@@ -25,4 +25,4 @@ import { UpdateUserNotificationService } from './services/update-user-notificati
     UpdateUserNotificationService,
   ],
 })
-export class NotificationModule { }
+export class NotificationModule {}

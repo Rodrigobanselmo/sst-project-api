@@ -37,7 +37,12 @@ const addRules = (worksheet: ExcelJS.Worksheet) => {
   row.getCell(3).border = sheetStylesConstant.border.addMore;
 };
 
-const addHeader = async (worksheet: ExcelJS.Worksheet, columns: ITableSchema[], prisma?: PrismaService, companyId?: string) => {
+const addHeader = async (
+  worksheet: ExcelJS.Worksheet,
+  columns: ITableSchema[],
+  prisma?: PrismaService,
+  companyId?: string,
+) => {
   const rows = columns.map((row) => row.excelName);
   const columnsWidth = columns.map((row) => ({
     width: row.excelName.length > 20 ? row.excelName.length : 18,
@@ -130,10 +135,114 @@ const addEmptyRow = (worksheet: ExcelJS.Worksheet) => {
 
 @Injectable()
 class ExcelProvider implements IExcelProvider {
-  excelColumns = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "AA", "AB", "AC", "AD", "AE", "AF", "AG", "AH", "AI", "AJ", "AK", "AL", "AM", "AN", "AO", "AP", "AQ", "AR", "AS", "AT", "AU", "AV", "AW", "AX", "AY", "AZ", "BA", "BB", "BC", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BK", "BL", "BM", "BN", "BO", "BP", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BX", "BY", "BZ", "CA", "CB", "CC", "CD", "CE", "CF", "CG", "CH", "CI", "CJ", "CK", "CL", "CM", "CN", "CO", "CP", "CQ", "CR", "CS", "CT", "CU", "CV", "CW", "CX", "CY", "CZ"];
+  excelColumns = [
+    'A',
+    'B',
+    'C',
+    'D',
+    'E',
+    'F',
+    'G',
+    'H',
+    'I',
+    'J',
+    'K',
+    'L',
+    'M',
+    'N',
+    'O',
+    'P',
+    'Q',
+    'R',
+    'S',
+    'T',
+    'U',
+    'V',
+    'W',
+    'X',
+    'Y',
+    'Z',
+    'AA',
+    'AB',
+    'AC',
+    'AD',
+    'AE',
+    'AF',
+    'AG',
+    'AH',
+    'AI',
+    'AJ',
+    'AK',
+    'AL',
+    'AM',
+    'AN',
+    'AO',
+    'AP',
+    'AQ',
+    'AR',
+    'AS',
+    'AT',
+    'AU',
+    'AV',
+    'AW',
+    'AX',
+    'AY',
+    'AZ',
+    'BA',
+    'BB',
+    'BC',
+    'BD',
+    'BE',
+    'BF',
+    'BG',
+    'BH',
+    'BI',
+    'BJ',
+    'BK',
+    'BL',
+    'BM',
+    'BN',
+    'BO',
+    'BP',
+    'BQ',
+    'BR',
+    'BS',
+    'BT',
+    'BU',
+    'BV',
+    'BW',
+    'BX',
+    'BY',
+    'BZ',
+    'CA',
+    'CB',
+    'CC',
+    'CD',
+    'CE',
+    'CF',
+    'CG',
+    'CH',
+    'CI',
+    'CJ',
+    'CK',
+    'CL',
+    'CM',
+    'CN',
+    'CO',
+    'CP',
+    'CQ',
+    'CR',
+    'CS',
+    'CT',
+    'CU',
+    'CV',
+    'CW',
+    'CX',
+    'CY',
+    'CZ',
+  ];
 
-
-  constructor(private readonly prisma?: PrismaService) { }
+  constructor(private readonly prisma?: PrismaService) {}
 
   async create(workbookExcel: IWorkbookExcel, companyId?: string) {
     const workbook = new ExcelJS.Workbook();
@@ -219,7 +328,10 @@ class ExcelProvider implements IExcelProvider {
             if (typeof value === 'object') {
               if (indexRow !== 0) rows[indexRow][0] = '-';
 
-              rows[indexRow][indexCell] = getObjectValueFromString(cellSchema.databaseName.split('.').slice(1).join('.'), value);
+              rows[indexRow][indexCell] = getObjectValueFromString(
+                cellSchema.databaseName.split('.').slice(1).join('.'),
+                value,
+              );
             } else {
               rows[indexRow][indexCell] = value;
             }
@@ -238,7 +350,11 @@ class ExcelProvider implements IExcelProvider {
     return rowsData;
   }
 
-  async transformToTableData(excelReadData: IExcelReadData, tableSchema: ITableSchema[], options?: { isArrayWithMissingFirstData?: boolean }) {
+  async transformToTableData(
+    excelReadData: IExcelReadData,
+    tableSchema: ITableSchema[],
+    options?: { isArrayWithMissingFirstData?: boolean },
+  ) {
     const transformStep = {
       startMap: false,
       row: 0,
@@ -253,7 +369,8 @@ class ExcelProvider implements IExcelProvider {
 
       const isNextArrayData =
         excelReadData.data[indexRow + 1] &&
-        (excelReadData.data[indexRow + 1][0] === '-' || (options && options.isArrayWithMissingFirstData && excelReadData.data[indexRow + 1].some((row) => row)));
+        (excelReadData.data[indexRow + 1][0] === '-' ||
+          (options && options.isArrayWithMissingFirstData && excelReadData.data[indexRow + 1].some((row) => row)));
 
       const saveIndexes = {
         hasSaved: false,
@@ -268,7 +385,9 @@ class ExcelProvider implements IExcelProvider {
           const actualCell = ` spreadsheet ${excelReadData.name}, linha ${indexRow + 1} e coluna ${indexCell + 1}`;
 
           const excelCell = excelRow[indexCell];
-          const isEmptyCell = !tableSchemaCell.isBoolean && (excelCell === null || excelCell === undefined || (excelCell === '-' && indexCell == 0));
+          const isEmptyCell =
+            !tableSchemaCell.isBoolean &&
+            (excelCell === null || excelCell === undefined || (excelCell === '-' && indexCell == 0));
 
           const isMissingField = isEmptyCell && !isArrayData && tableSchemaCell.required;
 
@@ -278,17 +397,24 @@ class ExcelProvider implements IExcelProvider {
             tableSchemaCell.required &&
             tableSchemaCell.isArray &&
             !tableSchema.every((tCell, idxCell) => {
-              return tCell.databaseName.split('.')[0] !== tableSchemaCell.databaseName.split('.')[0] || excelRow[idxCell] === null || excelRow[idxCell] === undefined;
+              return (
+                tCell.databaseName.split('.')[0] !== tableSchemaCell.databaseName.split('.')[0] ||
+                excelRow[idxCell] === null ||
+                excelRow[idxCell] === undefined
+              );
             });
 
-          if (isMissingField || isMissingArrayField) throw new BadRequestException(`Esta faltando um campo obrigatório na ${actualCell}`);
+          if (isMissingField || isMissingArrayField)
+            throw new BadRequestException(`Esta faltando um campo obrigatório na ${actualCell}`);
 
-          if (isArrayData && !tableSchemaCell.isArray && !isEmptyCell) throw new BadRequestException(`This is not an array property on ${actualCell}`);
+          if (isArrayData && !tableSchemaCell.isArray && !isEmptyCell)
+            throw new BadRequestException(`This is not an array property on ${actualCell}`);
 
           if (isEmptyCell) return;
 
           let checkedData = tableSchemaCell.checkHandler(excelCell);
-          if (checkedData === false && excelCell != '-') throw new BadRequestException(`Dado inválido na ${actualCell}`);
+          if (checkedData === false && excelCell != '-')
+            throw new BadRequestException(`Dado inválido na ${actualCell}`);
 
           if (checkedData === 'false') checkedData = false;
 
@@ -355,7 +481,8 @@ class ExcelProvider implements IExcelProvider {
       if (isTableHeader) transformStep.startMap = true;
     });
 
-    if (databaseRows.length === 0 && !transformStep.startMap) throw new BadRequestException(ErrorMessageEnum.FILE_WRONG_TABLE_HEAD);
+    if (databaseRows.length === 0 && !transformStep.startMap)
+      throw new BadRequestException(ErrorMessageEnum.FILE_WRONG_TABLE_HEAD);
 
     return {
       rows: databaseRows,
@@ -399,13 +526,15 @@ class ExcelProvider implements IExcelProvider {
 
       if (cellStyles.align) cell.alignment = { ...cellStyles.align };
       if (cellStyles.borders) cell.border = { ...cellStyles.borders };
-      if (cellStyles.fill) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: cellStyles.fill.replace('#', '') } };
+      if (cellStyles.fill)
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: cellStyles.fill.replace('#', '') } };
       if (cellStyles.font) cell.font = cellStyles.font;
       if (cellStyles.color) cell.font = { color: { argb: cellStyles.color.replace('#', '') }, ...cell?.font };
       if (cellStyles.mergeRight) {
         const currentRowIdx = worksheet.rowCount;
         const startColumnIdx = cellStyles.mergeRight == 'all' ? 1 : colNumber;
-        const endColumnIdx = cellStyles.mergeRight == 'all' ? worksheet.columnCount : startColumnIdx + cellStyles.mergeRight;
+        const endColumnIdx =
+          cellStyles.mergeRight == 'all' ? worksheet.columnCount : startColumnIdx + cellStyles.mergeRight;
         worksheet.mergeCells(currentRowIdx, startColumnIdx, currentRowIdx, endColumnIdx);
       }
 
