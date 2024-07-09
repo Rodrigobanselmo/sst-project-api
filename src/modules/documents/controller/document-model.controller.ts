@@ -1,5 +1,4 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query, Res } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
 import { Readable } from 'stream';
 
 import { PermissionEnum } from '../../../shared/constants/enum/authorization';
@@ -16,7 +15,6 @@ import { Response } from 'express';
 import { DocumentTypeEnum } from '@prisma/client';
 import { DownloadPreviewModel } from '../services/document/document-models/download-preview-model.service';
 
-@ApiTags('document-model')
 @Controller('document-model')
 export class DocumentModelController {
   constructor(

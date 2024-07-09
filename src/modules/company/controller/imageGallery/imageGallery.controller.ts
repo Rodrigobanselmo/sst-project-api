@@ -1,6 +1,5 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UploadedFile, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import { ApiTags } from '@nestjs/swagger';
 import { pngFileFilter } from '../../../../shared/utils/filters/png.filters';
 
 import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
@@ -16,7 +15,6 @@ import { CreateImageGalleryDto, FindImageGalleryDto, UpdateImageGalleryDto } fro
 import { readFileSync, readdirSync } from 'fs';
 import { asyncBatch } from 'src/shared/utils/asyncBatch';
 
-@ApiTags('Image Gallery')
 @Controller('/company/:companyId/image-gallery')
 export class ImageGalleryController {
   constructor(

@@ -7,7 +7,6 @@ import {
   Patch,
   Post,
 } from "@nestjs/common";
-import { ApiTags } from "@nestjs/swagger";
 import { instanceToInstance } from "class-transformer";
 
 import { PermissionEnum } from "../../../../shared/constants/enum/authorization";
@@ -19,7 +18,6 @@ import { CreateCouncilService } from "../../services/professionals/create-counci
 import { DeleteCouncilService } from "../../services/professionals/delete-council/delete-council.service";
 import { UpdateCouncilService } from "../../services/professionals/update-council/update-council.service";
 
-@ApiTags("councils")
 @Controller("/:companyId/councils")
 export class CouncilController {
   constructor(

@@ -8,7 +8,6 @@ import {
   Post,
   Query,
 } from "@nestjs/common";
-import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { instanceToInstance } from "class-transformer";
 
 import { PermissionEnum } from "../../../../shared/constants/enum/authorization";
@@ -26,7 +25,6 @@ import { FindAllByEmailService } from "../../services/invites/find-by-email/find
 import { FindByTokenService } from "../../services/invites/find-by-token/find-by-token.service";
 import { InviteUsersService } from "../../services/invites/invite-users/invite-users.service";
 
-@ApiTags("invites")
 @Controller("invites")
 export class InvitesController {
   constructor(
@@ -106,7 +104,6 @@ export class InvitesController {
   }
 
   @Delete("expired")
-  @ApiBearerAuth()
   deleteAll() {
     return this.deleteExpiredInvitesService.execute();
   }

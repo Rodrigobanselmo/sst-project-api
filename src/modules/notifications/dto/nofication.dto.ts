@@ -1,6 +1,5 @@
 import { MessageEnum } from './../../../shared/constants/enum/message.enum';
 import { PartialType } from '@nestjs/swagger';
-import { Prisma } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import { IsBoolean, IsDefined, IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
 import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';

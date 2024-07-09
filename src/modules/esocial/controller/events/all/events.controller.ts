@@ -4,7 +4,6 @@ import { FindESocialEventService } from './../../../services/events/all/find-eve
 import { FindESocialEventDto } from './../../../dto/esocial-event.dto';
 import { Body, Controller, Get, Param, Post, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags } from '@nestjs/swagger';
 
 import { Public } from '../../../../../shared/decorators/public.decorator';
 import { User } from '../../../../../shared/decorators/user.decorator';
@@ -16,7 +15,6 @@ import { SendBatchESocialService } from '../../../services/events/all/send-batch
 import { FindESocialBatchService } from '../../../../../modules/esocial/services/events/all/find-batch/find-batch.service';
 import { FetchOneESocialBatchEventsService } from '../../../../../modules/esocial/services/events/all/fetch-one-batch-event/fetch-one-batch-event.service';
 
-@ApiTags('events')
 @Controller('esocial/events/all')
 export class ESocialEventController {
   constructor(

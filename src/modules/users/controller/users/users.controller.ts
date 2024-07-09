@@ -10,7 +10,6 @@ import {
   Post,
   Query,
 } from "@nestjs/common";
-import { ApiTags } from "@nestjs/swagger";
 import { instanceToInstance } from "class-transformer";
 import { SessionService } from "../../../auth/services/session/session/session.service";
 
@@ -36,7 +35,6 @@ import { v4 } from "uuid";
 import { FindUserHistoryDto } from "../../dto/user-history.dto";
 import { FindUserHistorysService } from "../../services/user-history/find-user-history/find-user-history.service";
 
-@ApiTags("users")
 @Controller("users")
 export class UsersController {
   constructor(

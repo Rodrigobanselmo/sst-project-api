@@ -1,11 +1,9 @@
-import { ApiProperty } from '@nestjs/swagger';
 import { Exam, ExamTypeEnum, StatusEnum } from '@prisma/client';
 
 import { HomoGroupEntity } from '../../company/entities/homoGroup.entity';
 import { ExamRiskEntity } from './examRisk.entity';
 import { ExamRiskDataEntity } from './examRiskData.entity';
 import { ExamToClinicEntity } from './examToClinic';
-import { RiskDocInfoEntity } from './riskDocInfo.entity';
 import { RiskFactorsEntity } from './risk.entity';
 
 export interface IExamOriginData extends Partial<ExamRiskDataEntity> {
@@ -39,7 +37,6 @@ export interface IExamOrigins {
 export type IRiskExamMap = Record<string, { riskName: string; exams: Record<string, { name: string; id: string }> }>
 
 export class ExamEntity implements Exam {
-  @ApiProperty({ description: 'The id of the Company' })
   id: number;
   name: string;
   instruction: string;

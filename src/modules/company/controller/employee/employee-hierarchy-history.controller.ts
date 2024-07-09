@@ -1,5 +1,4 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
 
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
@@ -13,7 +12,6 @@ import { Permissions } from '../../../../shared/decorators/permissions.decorator
 import { PermissionEnum, RoleEnum } from '../../../../shared/constants/enum/authorization';
 import { Roles } from '../../../../shared/decorators/roles.decorator';
 
-@ApiTags('employee-history-hierarchy')
 @Controller('employee-history/hierarchy')
 export class EmployeeHierarchyHistoryController {
   constructor(

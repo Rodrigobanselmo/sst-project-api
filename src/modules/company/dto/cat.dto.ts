@@ -1,4 +1,3 @@
-import { PartialType } from '@nestjs/swagger';
 import { StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import { IsBoolean, IsDate, IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
@@ -189,7 +188,7 @@ export class CreateCatDto {
   status: StatusEnum;
 }
 
-export class UpdateCatDto extends PartialType(CreateCatDto) {
+export class UpdateCatDto extends CreateCatDto {
   @IsInt()
   id: number;
 }

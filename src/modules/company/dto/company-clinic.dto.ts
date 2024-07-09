@@ -1,4 +1,3 @@
-import { PartialType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import { ArrayNotEmpty, IsArray, IsDefined, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
 
@@ -24,7 +23,7 @@ export class TestRoute123CompanyDto {
   x: CreateCompanyClinicDto[];
 }
 
-export class UpdateCompanyClinicDto extends PartialType(CreateCompanyClinicDto) {}
+export class UpdateCompanyClinicDto extends CreateCompanyClinicDto {}
 
 export class SetCompanyClinicDto {
   @ValidateNested({ each: true })

@@ -1,6 +1,5 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags } from '@nestjs/swagger';
 
 import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
@@ -14,7 +13,6 @@ import { FindByIdDocumentService } from '../../services/document/find-by-id-docu
 import { FindDocumentService } from '../../services/document/find-document/find-document.service';
 import { UpdateDocumentService } from '../../services/document/update-document/update-document.service';
 
-@ApiTags('document')
 @Controller('company/:companyId/document')
 export class DocumentController {
   constructor(

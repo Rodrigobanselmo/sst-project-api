@@ -1,5 +1,4 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
 
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
@@ -13,7 +12,6 @@ import { DeleteScheduleMedicalVisitsService } from '../../services/scheduleMedic
 import { CreateScheduleMedicalVisitDto, FindScheduleMedicalVisitDto, UpdateScheduleMedicalVisitDto } from '../../dto/scheduleMedicalVisit.dto';
 import { FindOneScheduleMedicalVisitsService } from '../../services/scheduleMedicalVisit/find-one-schedule-medical-visit/find-one-schedule-medical-visit.service';
 
-@ApiTags('Schedule Medical Visit')
 @Controller('company/:companyId/schedule-medical-visit')
 export class ScheduleMedicalVisitController {
   constructor(

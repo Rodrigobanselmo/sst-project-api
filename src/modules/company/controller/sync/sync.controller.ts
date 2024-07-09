@@ -1,5 +1,4 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
 
 import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
@@ -9,7 +8,6 @@ import { SyncDto } from '../../dto/sync.dto';
 import { SyncMainService } from '../../services/sync/sync-main/sync-main.service';
 import { SyncHierarchyService } from '../../services/sync/sync-hierarchy/sync-hierarchy.service';
 
-@ApiTags('sync')
 @Controller('sync')
 export class SyncController {
   constructor(

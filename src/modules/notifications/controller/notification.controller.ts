@@ -1,5 +1,4 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query, UploadedFiles, UseInterceptors } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
 import { User } from '../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from './../../../shared/dto/user-payload.dto';
 
@@ -14,7 +13,6 @@ import { ListNotificationService } from '../services/list-notification.service';
 import { SendEmailService } from '../services/send-email.service';
 import { UpdateUserNotificationService } from '../services/update-user-notification.service';
 
-@ApiTags('notification')
 @Controller('notification')
 export class NotificationController {
   constructor(

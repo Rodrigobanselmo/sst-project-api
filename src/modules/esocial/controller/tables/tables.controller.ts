@@ -1,6 +1,5 @@
 import { PrismaService } from './../../../../prisma/prisma.service';
 import { Controller, Get, Query } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
 
 import { FindAllTable27Service } from '../../services/tables/find-all-27.service';
 import { FindCitiesDto } from '../../dto/cities.dto';
@@ -9,7 +8,6 @@ import { FindEsocialTable24Dto } from '../../dto/event.dto';
 import { onlyNumbers } from '@brazilian-utils/brazilian-utils';
 import { normalizeString } from '../../../../shared/utils/normalizeString';
 
-@ApiTags('tables')
 @Controller('esocial')
 export class TablesController {
   constructor(private readonly findAllTable27Service: FindAllTable27Service, private readonly prisma: PrismaService) {}

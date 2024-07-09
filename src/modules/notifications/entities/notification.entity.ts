@@ -1,9 +1,7 @@
-import { ApiProperty } from '@nestjs/swagger';
 
 import { Notification, Prisma } from '.prisma/client';
 
 export class NotificationEntity implements Notification {
-  @ApiProperty({ description: 'The id of the AccessGroups' })
   id: number;
   created_at: Date;
   json: Prisma.JsonValue;

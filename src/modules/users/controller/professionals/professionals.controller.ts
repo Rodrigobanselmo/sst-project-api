@@ -8,7 +8,6 @@ import {
   Post,
   Query,
 } from "@nestjs/common";
-import { ApiTags } from "@nestjs/swagger";
 import { instanceToInstance } from "class-transformer";
 
 import { PermissionEnum } from "../../../../shared/constants/enum/authorization";
@@ -25,7 +24,6 @@ import { FindAllProfessionalsByCompanyService } from "../../services/professiona
 import { FindFirstProfessionalService } from "../../services/professionals/find-first/find-first.service";
 import { UpdateProfessionalService } from "../../services/professionals/update-professional/update-professional.service";
 
-@ApiTags("professionals")
 @Controller("professionals")
 export class ProfessionalsController {
   constructor(

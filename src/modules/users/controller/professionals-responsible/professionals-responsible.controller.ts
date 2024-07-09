@@ -1,5 +1,4 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
 
 import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
@@ -11,7 +10,6 @@ import { DeleteProfessionalResponsibleService } from '../../services/professiona
 import { FindProfessionalResponsibleService } from '../../services/professionals-responsibles/find-professionals-responsibles/find-professionals-responsibles.service';
 import { UpdateProfessionalResponsibleService } from '../../services/professionals-responsibles/update-professionals-responsibles/update-professionals-responsibles.service';
 
-@ApiTags('professionals-responsible')
 @Controller('company/:companyId/professionals-responsible')
 export class ProfessionalResponsibleController {
   constructor(

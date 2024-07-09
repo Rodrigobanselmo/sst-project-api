@@ -3,7 +3,6 @@ import { ErrorCompanyEnum } from './../../../shared/constants/enum/errorMessage'
 import { CpfFormatTransform } from './../../../shared/transformers/cpf-format.transform';
 import { StringUppercaseTransform } from './../../../shared/transformers/string-uppercase.transform';
 import { DateFormat } from './../../../shared/transformers/date-format';
-import { PartialType } from '@nestjs/swagger';
 import { IsBoolean, IsDate, IsDefined, IsEnum, IsInt, IsOptional, IsString, Length, MaxLength, ValidateIf, ValidateNested } from 'class-validator';
 import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
@@ -11,6 +10,7 @@ import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
 import { Transform, Type } from 'class-transformer';
 import { ClinicScheduleTypeEnum, ExamHistoryConclusionEnum, ExamHistoryEvaluationEnum, ExamHistoryTypeEnum, SexTypeEnum, StatusEnum } from '@prisma/client';
 import { QueryArray } from './../../../shared/transformers/query-array';
+import { PartialType } from '@nestjs/swagger';
 
 export class EmployeeComplementaryExamHistoryDto {
   @IsInt()

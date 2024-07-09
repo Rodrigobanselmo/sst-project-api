@@ -1,7 +1,6 @@
 import { StatusEmployeeStepEnum } from './../../../shared/constants/enum/statusEmployeeStep.enum';
 import { getEmployeeRowStatus } from './../../../shared/utils/getExpiredExamStatus.utils';
 import { StatusExamEnum } from './../../../shared/constants/enum/statusExam.enum';
-import { ApiProperty } from '@nestjs/swagger';
 import { Company, Employee, ExamHistoryTypeEnum, Hierarchy, SexTypeEnum, StatusEnum } from '@prisma/client';
 import { EmployeePPPHistoryEntity } from './employee-ppp-history.entity';
 import { CompanyEntity } from './company.entity';
@@ -15,42 +14,16 @@ import dayjs from 'dayjs';
 import { dismissalDate } from './../../../shared/constants/ids';
 
 export class EmployeeEntity implements Employee {
-  @ApiProperty({ description: 'The id of the Employee' })
   id: number;
-
-  @ApiProperty({ description: 'The name of the Employee' })
   name: string;
-
-  @ApiProperty({ description: 'The cpf name of the Employee' })
   cpf: string;
-
-  @ApiProperty({
-    description: 'The current status of the Employee',
-    examples: ['ACTIVE', 'INACTIVE'],
-  })
   status: StatusEnum;
-
-  @ApiProperty({
-    description: 'The company id of the employee',
-  })
   companyId: string;
-
-  @ApiProperty({ description: 'The creation date of the Employee' })
   created_at: Date;
-
-  @ApiProperty({
-    description: 'The last time that the Employee data was updated',
-  })
   updated_at: Date;
   deleted_at: Date;
-
-  @ApiProperty({ description: 'The hierarchy id of the Employee' })
   hierarchyId: string;
-
-  @ApiProperty({ description: 'The workspaces related to the Employee' })
   workspaces?: WorkspaceEntity[];
-
-  @ApiProperty({ description: 'The hierarchy of the Employee' })
   hierarchy?: Partial<HierarchyEntity>;
 
   subOffices?: Partial<HierarchyEntity>[];

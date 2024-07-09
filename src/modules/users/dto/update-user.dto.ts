@@ -1,6 +1,5 @@
 import { QueryArray } from './../../../shared/transformers/query-array';
 import { StringUppercaseTransform } from './../../../shared/transformers/string-uppercase.transform';
-import { ApiProperty } from '@nestjs/swagger';
 import { ProfessionalTypeEnum, UfStateEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import { IsEnum, IsOptional, IsString, MaxLength, MinLength, ValidateIf, ValidateNested } from 'class-validator';
@@ -9,7 +8,6 @@ import { StringCapitalizeTransform } from '../../../shared/transformers/string-c
 import { CouncilDto } from './council.dto';
 
 export class UpdateUserDto {
-  @ApiProperty({ description: 'user older password' })
   @IsOptional()
   @IsString()
   oldPassword?: string;

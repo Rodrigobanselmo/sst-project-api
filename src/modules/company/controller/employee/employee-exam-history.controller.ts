@@ -1,6 +1,5 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags } from '@nestjs/swagger';
 import { Public } from '../../../../shared/decorators/public.decorator';
 
 import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
@@ -31,7 +30,6 @@ import { UpdateManyScheduleExamHistoryService } from '../../services/employee/0-
 import { UpdateEmployeeExamHistoryService } from '../../services/employee/0-history/exams/update/update.service';
 import { UploadExamFileService } from '../../services/employee/0-history/exams/upload-exam-file/upload-exam-file.service';
 
-@ApiTags('employee-history-exam')
 @Controller('employee-history/exam')
 export class EmployeeExamHistoryController {
   constructor(

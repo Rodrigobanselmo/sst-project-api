@@ -1,9 +1,7 @@
-import { ApiProperty } from '@nestjs/swagger';
 import { ScheduleBlock, ScheduleBlockTypeEnum, StatusEnum } from '@prisma/client';
 import { CompanyEntity } from './company.entity';
 
 export class ScheduleBlockEntity implements ScheduleBlock {
-  @ApiProperty({ description: 'The id of the Company' })
   id: number;
   name: string;
   description: string;
