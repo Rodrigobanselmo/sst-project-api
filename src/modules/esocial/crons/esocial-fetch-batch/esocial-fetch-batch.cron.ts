@@ -13,9 +13,9 @@ export class EsocialFetchBatchCron {
   constructor(
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly fetchESocialBatchEventsService: FetchESocialBatchEventsService,
-  ) {}
+  ) { }
 
-  @Cron(CronExpression.EVERY_5_SECONDS)
+  @Cron(CronExpression.EVERY_10_HOURS)
   async handleCron() {
     const shouldSkip: ICacheEventBatchType | null = await this.cacheManager.get(CacheEnum.ESOCIAL_FETCH_EVENT);
 
