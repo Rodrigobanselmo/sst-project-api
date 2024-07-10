@@ -192,7 +192,7 @@ export const baseDocuemntOptions: Omit<IPropertiesOptions, 'sections'> = {
       // },
     ],
   },
-}
+};
 
 export const createBaseDocument = (sections: ISectionOptions[], options = baseDocuemntOptions) => {
   const doc = new Document({

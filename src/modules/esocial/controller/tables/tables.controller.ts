@@ -1,6 +1,5 @@
 import { PrismaService } from './../../../../prisma/prisma.service';
 import { Controller, Get, Query } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
 
 import { FindAllTable27Service } from '../../services/tables/find-all-27.service';
 import { FindCitiesDto } from '../../dto/cities.dto';
@@ -9,10 +8,12 @@ import { FindEsocialTable24Dto } from '../../dto/event.dto';
 import { onlyNumbers } from '@brazilian-utils/brazilian-utils';
 import { normalizeString } from '../../../../shared/utils/normalizeString';
 
-@ApiTags('tables')
 @Controller('esocial')
 export class TablesController {
-  constructor(private readonly findAllTable27Service: FindAllTable27Service, private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly findAllTable27Service: FindAllTable27Service,
+    private readonly prisma: PrismaService,
+  ) {}
 
   @Get('cities')
   async findC(@Query() query: FindCitiesDto) {
@@ -49,7 +50,13 @@ export class TablesController {
       ...(search && { city: { contains: normalizeString(search).toLowerCase(), mode: 'insensitive' } }),
     };
 
-    const add = await this.prisma.addressCompany.groupBy({ by: ['city', 'state'], orderBy: { city: 'asc' }, skip: skip || 0, take: take || 20, where });
+    const add = await this.prisma.addressCompany.groupBy({
+      by: ['city', 'state'],
+      orderBy: { city: 'asc' },
+      skip: skip || 0,
+      take: take || 20,
+      where,
+    });
 
     return {
       data: add.map((c) => ({ name: c.city, ufCode: c.state })),
@@ -65,7 +72,12 @@ export class TablesController {
 
     const data = await this.prisma.cbo.findMany({
       where: {
-        ...(search && { OR: [...(code ? [{ code: { contains: code, mode: 'insensitive' } }] : ([] as any)), { desc: { contains: search, mode: 'insensitive' } }] }),
+        ...(search && {
+          OR: [
+            ...(code ? [{ code: { contains: code, mode: 'insensitive' } }] : ([] as any)),
+            { desc: { contains: search, mode: 'insensitive' } },
+          ],
+        }),
       },
       skip: skip || 0,
       take: take || 20,
@@ -81,7 +93,12 @@ export class TablesController {
     const { skip, take, search } = query;
     const data = await this.prisma.cid.findMany({
       where: {
-        ...(search && { OR: [{ cid: { contains: search, mode: 'insensitive' } }, { description: { contains: search, mode: 'insensitive' } }] }),
+        ...(search && {
+          OR: [
+            { cid: { contains: search, mode: 'insensitive' } },
+            { description: { contains: search, mode: 'insensitive' } },
+          ],
+        }),
       },
       skip: skip || 0,
       take: take || 20,
@@ -94,7 +111,10 @@ export class TablesController {
 
   @Get('absenteeism-motives')
   async findM() {
-    const data = await this.prisma.absenteeismMotive.findMany({ select: { id: true, desc: true }, orderBy: { desc: 'asc' } });
+    const data = await this.prisma.absenteeismMotive.findMany({
+      select: { id: true, desc: true },
+      orderBy: { desc: 'asc' },
+    });
     return { data };
   }
 
@@ -116,31 +136,47 @@ export class TablesController {
 
   @Get('table-13')
   async find13() {
-    const data = await this.prisma.esocialTable13BodyPart.findMany({ select: { code: true, desc: true }, orderBy: { desc: 'asc' } });
+    const data = await this.prisma.esocialTable13BodyPart.findMany({
+      select: { code: true, desc: true },
+      orderBy: { desc: 'asc' },
+    });
     return { data };
   }
 
   @Get('table-14-15')
   async find1415() {
-    const data = await this.prisma.esocialTable14And15Acid.findMany({ select: { code: true, desc: true, case: true }, orderBy: { desc: 'asc' } });
+    const data = await this.prisma.esocialTable14And15Acid.findMany({
+      select: { code: true, desc: true, case: true },
+      orderBy: { desc: 'asc' },
+    });
     return { data };
   }
 
   @Get('table-15')
   async find15() {
-    const data = await this.prisma.esocialTable14And15Acid.findMany({ select: { code: true, desc: true, case: true }, where: { table: 15 }, orderBy: { desc: 'asc' } });
+    const data = await this.prisma.esocialTable14And15Acid.findMany({
+      select: { code: true, desc: true, case: true },
+      where: { table: 15 },
+      orderBy: { desc: 'asc' },
+    });
     return { data };
   }
 
   @Get('table-17')
   async find17() {
-    const data = await this.prisma.esocialTable17Injury.findMany({ select: { code: true, desc: true }, orderBy: { desc: 'asc' } });
+    const data = await this.prisma.esocialTable17Injury.findMany({
+      select: { code: true, desc: true },
+      orderBy: { desc: 'asc' },
+    });
     return { data };
   }
 
   @Get('table-18')
   async find18() {
-    const data = await this.prisma.esocialTable18Mot.findMany({ select: { code: true, description: true, id: true }, orderBy: { description: 'asc' } });
+    const data = await this.prisma.esocialTable18Mot.findMany({
+      select: { code: true, description: true, id: true },
+      orderBy: { description: 'asc' },
+    });
     return { data };
   }
 

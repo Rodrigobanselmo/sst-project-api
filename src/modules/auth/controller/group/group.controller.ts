@@ -1,5 +1,4 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
 
 import { FindAccessGroupDto, UpsertAccessGroupDto } from '../../dto/access-group.dto';
 import { FindAvailableAccessGroupsService } from '../../services/group/find-available-access-group/upsert-access-group.service';
@@ -9,7 +8,6 @@ import { UserPayloadDto } from './../../../../shared/dto/user-payload.dto';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
 
-@ApiTags('access-group')
 @Controller('auth/group/:companyId')
 export class AuthGroupController {
   constructor(

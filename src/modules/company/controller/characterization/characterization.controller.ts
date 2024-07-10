@@ -1,11 +1,27 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UploadedFile, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UploadedFile,
+  UploadedFiles,
+  UseInterceptors,
+} from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import { ApiTags } from '@nestjs/swagger';
 import { pngFileFilter } from '../../../../shared/utils/filters/png.filters';
 
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
-import { UpsertCharacterizationDto, AddPhotoCharacterizationDto, UpdatePhotoCharacterizationDto, CopyCharacterizationDto, AddFileCharacterizationDto } from '../../dto/characterization.dto';
+import {
+  UpsertCharacterizationDto,
+  AddPhotoCharacterizationDto,
+  UpdatePhotoCharacterizationDto,
+  CopyCharacterizationDto,
+  AddFileCharacterizationDto,
+} from '../../dto/characterization.dto';
 import { DeleteCharacterizationService } from '../../services/characterization/delete-characterization/delete-characterization.service';
 import { FindAllCharacterizationService } from '../../services/characterization/find-all-characterization/find-all-characterization.service';
 import { UpsertCharacterizationService } from '../../services/characterization/upsert-characterization/upsert-characterization.service';
@@ -19,7 +35,6 @@ import { Roles } from '../../../../shared/decorators/roles.decorator';
 import { CopyCharacterizationService } from '../../services/characterization/copy-characterization/copy-characterization.service';
 import { AddCharacterizationFileService } from '../../services/characterization/add-characterization-file/add-characterization-file.service';
 
-@ApiTags('characterizations')
 @Controller('/company/:companyId/workspace/:workspaceId/characterizations')
 export class CharacterizationController {
   constructor(
@@ -32,7 +47,7 @@ export class CharacterizationController {
     private readonly findByIdCharacterizationService: FindByIdCharacterizationService,
     private readonly updateCharacterizationPhotoService: UpdateCharacterizationPhotoService,
     private readonly copyCharacterizationService: CopyCharacterizationService,
-  ) { }
+  ) {}
 
   @Permissions({
     code: PermissionEnum.CHARACTERIZATION,
@@ -104,7 +119,7 @@ export class CharacterizationController {
     @UploadedFile() file: Express.Multer.File,
     @Body() updatePhotoCharacterizationDto: UpdatePhotoCharacterizationDto,
     @User() userPayloadDto: UserPayloadDto,
-    @Param('id') id: string
+    @Param('id') id: string,
   ) {
     return this.updateCharacterizationPhotoService.execute(id, file, updatePhotoCharacterizationDto, userPayloadDto);
   }
@@ -154,10 +169,11 @@ export class CharacterizationController {
     crud: 'cu',
   })
   @Post('/copy')
-  async copy(@Body() copyCharacterizationDto: CopyCharacterizationDto, @Param('workspaceId') workspaceId: string, @User() userPayloadDto: UserPayloadDto) {
+  async copy(
+    @Body() copyCharacterizationDto: CopyCharacterizationDto,
+    @Param('workspaceId') workspaceId: string,
+    @User() userPayloadDto: UserPayloadDto,
+  ) {
     return this.copyCharacterizationService.execute({ ...copyCharacterizationDto, workspaceId }, userPayloadDto);
   }
-
-
-
 }

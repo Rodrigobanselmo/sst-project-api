@@ -56,7 +56,7 @@ describe('SessionService', () => {
   });
 
   it('should return token, refresh token and user', async () => {
-    const session = await service.execute({} as any);
+    const session = await service.execute({} as any, {} as any, {} as any);
 
     expect(session).toEqual(
       expect.objectContaining({
@@ -68,7 +68,7 @@ describe('SessionService', () => {
   });
 
   it('should not return password', async () => {
-    const session = await service.execute({} as any);
+    const session = await service.execute({} as any, {} as any, {} as any);
     expect(session.user.password).toBeUndefined();
   });
 
@@ -76,7 +76,7 @@ describe('SessionService', () => {
     jest.spyOn(usersRepository, 'findByEmail').mockImplementation(() => false as any);
 
     try {
-      await service.execute({} as any);
+      await service.execute({} as any, {} as any, {} as any);
       throw new Error('error');
     } catch (err) {
       expect(err).toEqual(new BadRequestException(ErrorMessageEnum.WRONG_EMAIL_PASS));
@@ -87,7 +87,7 @@ describe('SessionService', () => {
     jest.spyOn(hashProvider, 'compare').mockImplementation(() => false as any);
 
     try {
-      await service.execute({} as any);
+      await service.execute({} as any, {} as any, {} as any);
       throw new Error('error');
     } catch (err) {
       expect(err).toEqual(new BadRequestException(ErrorMessageEnum.WRONG_EMAIL_PASS));

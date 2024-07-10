@@ -8,7 +8,10 @@ import { IEvaluationQuestion, IPdfEvaluationData } from './types/IEvaluationData
 
 @Injectable()
 export class PdfEvaluationDataService {
-  constructor(private readonly pdfProntuarioDataService: PdfProntuarioDataService, private readonly findAllRiskDataByEmployeeService: FindAllRiskDataByEmployeeService) {}
+  constructor(
+    private readonly pdfProntuarioDataService: PdfProntuarioDataService,
+    private readonly findAllRiskDataByEmployeeService: FindAllRiskDataByEmployeeService,
+  ) {}
   async execute(employeeId: number, userPayloadDto: UserPayloadDto): Promise<IPdfEvaluationData> {
     const prontuario = await this.pdfProntuarioDataService.execute(employeeId, userPayloadDto, { isAvaliation: true });
     const questions = await this.getQuestions();

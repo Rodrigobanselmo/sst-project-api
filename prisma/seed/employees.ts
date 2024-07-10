@@ -1,47 +1,51 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
-export const seedEmployees = async (prisma: PrismaClient, companyId: string, workId: string) => {
+export const seedEmployees = async (
+  prisma: PrismaClient,
+  companyId: string,
+  workId: string
+) => {
   await prisma.hierarchy.createMany({
     data: [
       {
-        name: 'Presidência',
-        type: 'DIRECTORY',
-        id: 'a',
+        name: "Presidência",
+        type: "DIRECTORY",
+        id: "a",
         companyId: companyId,
       },
       {
-        name: 'Gerente',
-        type: 'MANAGEMENT',
-        id: 'b',
-        parentId: 'a',
+        name: "Gerente",
+        type: "MANAGEMENT",
+        id: "b",
+        parentId: "a",
         companyId: companyId,
       },
       {
-        name: 'Tecnologia',
-        type: 'SECTOR',
-        id: 'c',
-        parentId: 'b',
+        name: "Tecnologia",
+        type: "SECTOR",
+        id: "c",
+        parentId: "b",
         companyId: companyId,
       },
       {
-        name: 'Médicina ocupacional',
-        type: 'SECTOR',
-        id: 'f',
-        parentId: 'b',
+        name: "Médicina ocupacional",
+        type: "SECTOR",
+        id: "f",
+        parentId: "b",
         companyId: companyId,
       },
       {
-        name: 'Engenheiro de Segurança',
-        type: 'OFFICE',
-        id: 'd',
-        parentId: 'f',
+        name: "Engenheiro de Segurança",
+        type: "OFFICE",
+        id: "d",
+        parentId: "f",
         companyId: companyId,
       },
       {
-        name: 'Engenheiro de Software',
-        type: 'OFFICE',
-        id: 'e',
-        parentId: 'c',
+        name: "Engenheiro de Software",
+        type: "OFFICE",
+        id: "e",
+        parentId: "c",
         companyId: companyId,
       },
     ],
@@ -55,28 +59,12 @@ export const seedEmployees = async (prisma: PrismaClient, companyId: string, wor
         employees: {
           create: [
             {
-              cpf: '1234567894',
-              name: 'Alex Abreu Marins',
-              workspaces: {
-                connect: {
-                  id_companyId: { companyId: companyId, id: workId },
-                },
-              },
-              hierarchy: {
-                connect: { id: 'f' },
-              },
+              cpf: "1234567894",
+              name: "Alex Abreu Marins",
             },
             {
-              cpf: '1234567892',
-              name: 'Rodrigo Barbosa Anselmo',
-              workspaces: {
-                connect: {
-                  id_companyId: { companyId: companyId, id: workId },
-                },
-              },
-              hierarchy: {
-                connect: { id: 'e' },
-              },
+              cpf: "1234567892",
+              name: "Rodrigo Barbosa Anselmo",
             },
           ],
         },

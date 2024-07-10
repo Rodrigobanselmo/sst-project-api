@@ -1,16 +1,13 @@
 import { AlertEntity } from './../../company/entities/alert.entity';
 import { InviteUsersEntity } from './../../users/entities/invite-users.entity';
 import { CompanyEntity } from './../../company/entities/company.entity';
-import { ApiProperty } from '@nestjs/swagger';
 
 import { AccessGroups } from '.prisma/client';
 import { UserCompanyEntity } from './../../../modules/users/entities/userCompany.entity';
 
 export class AccessGroupsEntity implements AccessGroups {
-  @ApiProperty({ description: 'The id of the AccessGroups' })
   id: number;
 
-  @ApiProperty({ description: 'The Refresh Token creation date' })
   created_at: Date;
   roles: string[];
   permissions: string[];

@@ -1,6 +1,5 @@
 import { Body, Controller, Delete, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
-import { classToClass } from 'class-transformer';
+import { instanceToInstance } from 'class-transformer';
 
 import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
@@ -11,7 +10,6 @@ import { CreateCouncilService } from '../../services/professionals/create-counci
 import { DeleteCouncilService } from '../../services/professionals/delete-council/delete-council.service';
 import { UpdateCouncilService } from '../../services/professionals/update-council/update-council.service';
 
-@ApiTags('councils')
 @Controller('/:companyId/councils')
 export class CouncilController {
   constructor(
@@ -72,6 +70,6 @@ export class CouncilController {
   )
   @Delete('/:professionalId/:id')
   delete(@Param('id', ParseIntPipe) id: number, @Param('professionalId', ParseIntPipe) professionalId: number) {
-    return classToClass(this.deleteCouncilService.execute(id, professionalId));
+    return instanceToInstance(this.deleteCouncilService.execute(id, professionalId));
   }
 }

@@ -7,12 +7,20 @@ import { UpdateProfessionalService } from '../update-professional/update-profess
 
 @Injectable()
 export class UpdateCouncilService {
-  constructor(private readonly professionalRepository: ProfessionalRepository, private readonly updateProfessionalService: UpdateProfessionalService) {}
+  constructor(
+    private readonly professionalRepository: ProfessionalRepository,
+    private readonly updateProfessionalService: UpdateProfessionalService,
+  ) {}
 
   async execute(body: UpdateCouncilDto, user: UserPayloadDto) {
     await this.updateProfessionalService.checkIfCanUpdateProfessional(body.professionalId, user, [body.id]);
 
-    if (!((body.councilId && body.councilType && body.councilUF) || (body.councilId == '' && body.councilType == '' && body.councilUF == ''))) {
+    if (
+      !(
+        (body.councilId && body.councilType && body.councilUF) ||
+        (body.councilId == '' && body.councilType == '' && body.councilUF == '')
+      )
+    ) {
       throw new BadRequestException('Dados inválidos para cadastro');
     }
 

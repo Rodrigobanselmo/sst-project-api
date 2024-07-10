@@ -5,7 +5,10 @@ import { EmployeeRepository } from '../../../../../modules/company/repositories/
 
 @Injectable()
 export class UpdateEmployeeService {
-  constructor(private readonly checkEmployeeExamService: CheckEmployeeExamService, private readonly employeeRepository: EmployeeRepository) {}
+  constructor(
+    private readonly checkEmployeeExamService: CheckEmployeeExamService,
+    private readonly employeeRepository: EmployeeRepository,
+  ) {}
 
   async execute(updateEmployeeDto: UpdateEmployeeDto) {
     // let removeSubOffices = false;

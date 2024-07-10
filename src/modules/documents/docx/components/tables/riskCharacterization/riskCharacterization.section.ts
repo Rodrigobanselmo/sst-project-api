@@ -7,7 +7,10 @@ import { TableBodyElements } from './elements/body';
 import { TableHeaderElements } from './elements/header';
 import { riskCharacterizationConverter } from './riskCharacterization.converter';
 
-export const riskCharacterizationTableSection = (riskFactorGroupData: RiskFactorGroupDataEntity, riskExamMap: IRiskExamMap) => {
+export const riskCharacterizationTableSection = (
+  riskFactorGroupData: RiskFactorGroupDataEntity,
+  riskExamMap: IRiskExamMap,
+) => {
   const riskCharacterizationData = riskCharacterizationConverter(riskFactorGroupData, riskExamMap);
 
   const tableHeaderElements = new TableHeaderElements();

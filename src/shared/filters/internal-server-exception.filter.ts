@@ -33,11 +33,11 @@ export class InternalServerExceptionFilter implements ExceptionFilter {
         headers: headers,
         status,
         error: exception.stack,
-        user: user
-      }
+        user: user,
+      };
 
       this.logger.logError(errorLog);
-      console.error(exception)
+      console.error(exception);
     }
 
     response.status(status).json({

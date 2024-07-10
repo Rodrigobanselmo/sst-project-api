@@ -17,7 +17,6 @@ export enum CompanyStructRsDataEmployeeHeaderEnum {
   SECTOR = 'Setor',
   OFFICE = 'Cargo',
   STATUS = 'Status',
-
 }
 
 export const CompanyStructRsDataEmployeeSheetMap: ISheetRuleMap = {};
@@ -65,7 +64,10 @@ export const CompanyStructRsDataEmployeeColumnMap: IColumnRuleMap<CompanyStructR
     field: CompanyStructHeaderEnum.SECTOR,
     checkHandler: checkIsString,
     transform: (v) => normalizeToUpperString(v),
-    requiredIfOneExist: [CompanyStructRsDataEmployeeHeaderEnum.EMPLOYEE_ADMISSION, CompanyStructRsDataEmployeeHeaderEnum.OFFICE],
+    requiredIfOneExist: [
+      CompanyStructRsDataEmployeeHeaderEnum.EMPLOYEE_ADMISSION,
+      CompanyStructRsDataEmployeeHeaderEnum.OFFICE,
+    ],
     database: 'sector',
   },
   [CompanyStructRsDataEmployeeHeaderEnum.OFFICE]: {

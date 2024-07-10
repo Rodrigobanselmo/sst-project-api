@@ -83,7 +83,10 @@ export const riskCharacterizationConverter = (riskGroup: RiskFactorGroupDataEnti
       borders: borderStyleGlobal(palette.common.white.string),
     };
     cells[RiskCharacterizationColumnEnum.BEI] = {
-      text: Object.values(riskExamMap?.[riskData.riskId]?.exams || {})?.map(e => e?.name)?.join('\n') || '--',
+      text:
+        Object.values(riskExamMap?.[riskData.riskId]?.exams || {})
+          ?.map((e) => e?.name)
+          ?.join('\n') || '--',
       size: 2,
       borders: borderStyleGlobal(palette.common.white.string),
     };

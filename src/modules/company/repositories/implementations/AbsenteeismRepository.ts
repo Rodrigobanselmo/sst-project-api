@@ -29,7 +29,11 @@ export class AbsenteeismRepository {
     return new AbsenteeismEntity(absenteeism);
   }
 
-  async find(query: Partial<FindAbsenteeismDto>, pagination: PaginationQueryDto, options: Prisma.AbsenteeismFindManyArgs = {}) {
+  async find(
+    query: Partial<FindAbsenteeismDto>,
+    pagination: PaginationQueryDto,
+    options: Prisma.AbsenteeismFindManyArgs = {},
+  ) {
     const whereInit = {
       AND: [],
     } as typeof options.where;
@@ -49,7 +53,15 @@ export class AbsenteeismRepository {
         startDate: true,
         endDate: true,
         timeUnit: true,
-        employee: { select: { name: true, cpf: true, id: true, companyId: true, company: { select: { id: true, name: true, initials: true, fantasy: true } } } },
+        employee: {
+          select: {
+            name: true,
+            cpf: true,
+            id: true,
+            companyId: true,
+            company: { select: { id: true, name: true, initials: true, fantasy: true } },
+          },
+        },
       };
 
     if ('search' in query && query.search) {
@@ -124,7 +136,12 @@ export class AbsenteeismRepository {
   async findById({ companyId, id }: { companyId: string; id: number }, options: Prisma.AbsenteeismFindFirstArgs = {}) {
     const absenteeism = await this.prisma.absenteeism.findFirst({
       where: { id, employee: { companyId } },
-      include: { esocial18: true, motive: true, doc: { include: { professional: { select: { name: true, id: true } } } }, cid: true },
+      include: {
+        esocial18: true,
+        motive: true,
+        doc: { include: { professional: { select: { name: true, id: true } } } },
+        cid: true,
+      },
       ...options,
     });
 

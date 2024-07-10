@@ -55,7 +55,7 @@ export const hierarchyPrioritizationConverter = (
   hierarchyTree: IHierarchyMap,
   { hierarchyType = HierarchyEnum.SECTOR, isByGroup = false, homoType }: IHierarchyPrioritizationOptions,
 ) => {
-  const riskGroupData = riskGroup.data.filter((riskData) => filterRisk(riskData))
+  const riskGroupData = riskGroup.data.filter((riskData) => filterRisk(riskData));
 
   const warnLevelStart = 4;
   const allRiskRecord = {} as Record<string, IRiskDataMap>;
@@ -74,7 +74,10 @@ export const hierarchyPrioritizationConverter = (
         };
 
         allHierarchyRecord[hierarchy.id] = {
-          homogeneousGroupIds: removeDuplicate([...hierarchyMap.homogeneousGroupIds, ...hierarchiesData.allHomogeneousGroupIds], { simpleCompare: true }),
+          homogeneousGroupIds: removeDuplicate(
+            [...hierarchyMap.homogeneousGroupIds, ...hierarchiesData.allHomogeneousGroupIds],
+            { simpleCompare: true },
+          ),
           name: hierarchy.name,
         };
       }
@@ -175,7 +178,8 @@ export const hierarchyPrioritizationConverter = (
 
           const isQuantity = !isHomoString && 'isQuantity' in homogeneousGroup && !!homogeneousGroup.isQuantity;
           const isDataRisk = !isHomoString && 'riskDegree' in homogeneousGroup && homogeneousGroup.riskDegree;
-          const isDataRiskLevel = !isHomoString && 'riskDegreeLevel' in homogeneousGroup && homogeneousGroup.riskDegreeLevel;
+          const isDataRiskLevel =
+            !isHomoString && 'riskDegreeLevel' in homogeneousGroup && homogeneousGroup.riskDegreeLevel;
 
           HomoPositionMap.set(homogeneousGroupId, {
             data: [

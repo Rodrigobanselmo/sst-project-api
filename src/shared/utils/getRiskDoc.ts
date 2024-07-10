@@ -2,7 +2,12 @@ import { RiskDocInfoEntity } from './../../modules/sst/entities/riskDocInfo.enti
 import { RiskFactorDataEntity } from '../../modules/sst/entities/riskData.entity';
 import { RiskFactorsEntity } from '../../modules/sst/entities/risk.entity';
 
-type IOptions = { companyId?: string; hierarchyId?: string; getIfAnyIsTrue?: boolean; docType?: keyof RiskDocInfoEntity };
+type IOptions = {
+  companyId?: string;
+  hierarchyId?: string;
+  getIfAnyIsTrue?: boolean;
+  docType?: keyof RiskDocInfoEntity;
+};
 
 export const getRiskDoc = (risk: RiskFactorsEntity, { companyId, hierarchyId, getIfAnyIsTrue, docType }: IOptions) => {
   if (getIfAnyIsTrue && docType) {
@@ -26,7 +31,10 @@ export const getRiskDoc = (risk: RiskFactorsEntity, { companyId, hierarchyId, ge
   return risk;
 };
 
-export const getRiskDocV2 = (risk: RiskFactorsEntity, { companyId, hierarchyId, getIfAnyIsTrue, docType }: IOptions) => {
+export const getRiskDocV2 = (
+  risk: RiskFactorsEntity,
+  { companyId, hierarchyId, getIfAnyIsTrue, docType }: IOptions,
+) => {
   let data: RiskDocInfoEntity, first: RiskDocInfoEntity, second: RiskDocInfoEntity;
 
   risk?.docInfo?.some((i) => {
@@ -43,8 +51,8 @@ export const getRiskDocV2 = (risk: RiskFactorsEntity, { companyId, hierarchyId, 
     }
 
     const isFromCompanyAndMissingHierarchy = companyId && !i.hierarchyId && i.companyId === companyId;
-    const isSystemStandard = !i.hierarchyId
-    
+    const isSystemStandard = !i.hierarchyId;
+
     if (isFromCompanyAndMissingHierarchy) {
       first = i;
     } else if (isSystemStandard) {
@@ -57,7 +65,10 @@ export const getRiskDocV2 = (risk: RiskFactorsEntity, { companyId, hierarchyId, 
   return data || first || second || risk;
 };
 
-export const checkRiskDataDoc = (riskData: RiskFactorDataEntity[], { companyId, docType }: { companyId: string; docType: keyof RiskDocInfoEntity }) => {
+export const checkRiskDataDoc = (
+  riskData: RiskFactorDataEntity[],
+  { companyId, docType }: { companyId: string; docType: keyof RiskDocInfoEntity },
+) => {
   return riskData.filter((riskData) => {
     const foundHierarchyDoc = riskData.riskFactor.docInfo.find((doc) => doc.hierarchyId == riskData.homogeneousGroupId);
 

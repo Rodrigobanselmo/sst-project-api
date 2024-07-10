@@ -11,7 +11,12 @@ import { FindAllByHierarchyService } from '../../services/risk-data/find-by-hier
 import { FindAllByHomogeneousGroupService } from '../../services/risk-data/find-by-homogeneous-group/find-by-homogeneous-group.service';
 import { UpsertManyRiskDataService } from '../../services/risk-data/upsert-many-risk-data/upsert-many-risk-data.service';
 import { UpsertRiskDataService } from '../../services/risk-data/upsert-risk-data/upsert-risk.service';
-import { DeleteManyRiskDataDto, FindRiskDataDto, UpsertManyRiskDataDto, UpsertRiskDataDto } from '../../dto/risk-data.dto';
+import {
+  DeleteManyRiskDataDto,
+  FindRiskDataDto,
+  UpsertManyRiskDataDto,
+  UpsertRiskDataDto,
+} from '../../dto/risk-data.dto';
 
 @Controller('risk-data')
 export class RiskDataController {
@@ -76,7 +81,11 @@ export class RiskDataController {
     isMember: true,
   })
   @Get('/:companyId/:groupId/homogeneous/:homogeneousGroupId')
-  findAllAvailableByHomogenousGroup(@User() userPayloadDto: UserPayloadDto, @Param('groupId') groupId: string, @Param('homogeneousGroupId') homogeneousGroupId: string) {
+  findAllAvailableByHomogenousGroup(
+    @User() userPayloadDto: UserPayloadDto,
+    @Param('groupId') groupId: string,
+    @Param('homogeneousGroupId') homogeneousGroupId: string,
+  ) {
     const companyId = userPayloadDto.targetCompanyId;
 
     return this.findAllByHomogeneousGroupService.execute(homogeneousGroupId, groupId, companyId);
@@ -100,7 +109,11 @@ export class RiskDataController {
     isMember: true,
   })
   @Get('/:companyId/:riskGroupId/:riskId')
-  findAllAvailable(@User() userPayloadDto: UserPayloadDto, @Param('riskId') riskId: string, @Param('riskGroupId') groupId: string) {
+  findAllAvailable(
+    @User() userPayloadDto: UserPayloadDto,
+    @Param('riskId') riskId: string,
+    @Param('riskGroupId') groupId: string,
+  ) {
     const companyId = userPayloadDto.targetCompanyId;
 
     return this.findAllByGroupAndRiskService.execute(riskId, groupId, companyId);

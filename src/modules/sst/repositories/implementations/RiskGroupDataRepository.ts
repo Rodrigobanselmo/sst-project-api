@@ -11,7 +11,7 @@ import { m2mGetDeletedIds } from './../../../../shared/utils/m2mFilterIds';
 
 @Injectable()
 export class RiskGroupDataRepository {
-  constructor(readonly prisma: PrismaService) { }
+  constructor(readonly prisma: PrismaService) {}
   async upsert({ companyId, id, ...createDto }: UpsertRiskGroupDataDto): Promise<RiskFactorGroupDataEntity> {
     const riskFactorGroupDataEntity = await this.prisma.riskFactorGroupData.upsert({
       create: {
@@ -122,8 +122,10 @@ export class RiskGroupDataRepository {
 
     riskFactorGroupDataEntity.data.map((data, index) => {
       if (data.homogeneousGroup.characterization && isEnvironment(data.homogeneousGroup.characterization.type)) {
-        (riskFactorGroupDataEntity.data[index].homogeneousGroup as any).environment = data.homogeneousGroup.characterization as any;
-        riskFactorGroupDataEntity.data[index].homogeneousGroup.characterization = data.homogeneousGroup.characterization = null;
+        (riskFactorGroupDataEntity.data[index].homogeneousGroup as any).environment = data.homogeneousGroup
+          .characterization as any;
+        riskFactorGroupDataEntity.data[index].homogeneousGroup.characterization =
+          data.homogeneousGroup.characterization = null;
       }
     });
 

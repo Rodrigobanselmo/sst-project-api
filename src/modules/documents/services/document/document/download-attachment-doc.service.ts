@@ -7,7 +7,10 @@ import { ErrorDocumentEnum } from '../../../../../shared/constants/enum/errorMes
 
 @Injectable()
 export class DownloadAttachmentsService {
-  constructor(private readonly amazonStorageProvider: AmazonStorageProvider, private readonly riskDocumentRepository: RiskDocumentRepository) {}
+  constructor(
+    private readonly amazonStorageProvider: AmazonStorageProvider,
+    private readonly riskDocumentRepository: RiskDocumentRepository,
+  ) {}
   async execute(userPayloadDto: UserPayloadDto, docId: string, attachmentId: string) {
     const companyId = userPayloadDto.targetCompanyId;
 
@@ -19,7 +22,7 @@ export class DownloadAttachmentsService {
 
     const fileKey = attachment.url.split('.com/').pop();
 
-    const { file: fileStream } = this.amazonStorageProvider.download({
+    const { file: fileStream } = await this.amazonStorageProvider.download({
       fileKey,
     });
 

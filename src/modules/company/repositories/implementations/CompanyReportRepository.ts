@@ -9,7 +9,10 @@ import { CompanyReportEntity } from '../../entities/report.entity';
 export class CompanyReportRepository {
   constructor(private prisma: PrismaService) {}
 
-  async upsert({ companyId, dailyReport, lastDailyReport }: UpsertCompanyReportDto, options: Partial<Prisma.CompanyReportUpsertArgs> = {}) {
+  async upsert(
+    { companyId, dailyReport, lastDailyReport }: UpsertCompanyReportDto,
+    options: Partial<Prisma.CompanyReportUpsertArgs> = {},
+  ) {
     const report = await this.prisma.companyReport.upsert({
       where: { companyId },
       create: { lastDailyReport, dailyReport: dailyReport as any, companyId },
@@ -71,7 +74,11 @@ export class CompanyReportRepository {
     return new CompanyReportEntity(report);
   }
 
-  async updateESocialReport(companyId: string, dailyReport: Partial<DailyCompanyReportDto>, options: Partial<Prisma.CompanyReportUpdateArgs> = {}) {
+  async updateESocialReport(
+    companyId: string,
+    dailyReport: Partial<DailyCompanyReportDto>,
+    options: Partial<Prisma.CompanyReportUpdateArgs> = {},
+  ) {
     let report = await this.prisma.companyReport.findFirst({
       where: { companyId },
     });
@@ -113,11 +120,26 @@ export class CompanyReportRepository {
     };
 
     const esocial = {
-      processing: (newDailyReport.esocial.S2210.processing || 0) + (newDailyReport.esocial.S2220.processing || 0) + (newDailyReport.esocial.S2240.processing || 0),
-      pending: (newDailyReport.esocial.S2210.pending || 0) + (newDailyReport.esocial.S2220.pending || 0) + (newDailyReport.esocial.S2240.pending || 0),
-      done: (newDailyReport.esocial.S2210.done || 0) + (newDailyReport.esocial.S2220.done || 0) + (newDailyReport.esocial.S2240.done || 0),
-      transmitted: (newDailyReport.esocial.S2210.transmitted || 0) + (newDailyReport.esocial.S2220.transmitted || 0) + (newDailyReport.esocial.S2240.transmitted || 0),
-      rejected: (newDailyReport.esocial.S2210.rejected || 0) + (newDailyReport.esocial.S2220.rejected || 0) + (newDailyReport.esocial.S2240.rejected || 0),
+      processing:
+        (newDailyReport.esocial.S2210.processing || 0) +
+        (newDailyReport.esocial.S2220.processing || 0) +
+        (newDailyReport.esocial.S2240.processing || 0),
+      pending:
+        (newDailyReport.esocial.S2210.pending || 0) +
+        (newDailyReport.esocial.S2220.pending || 0) +
+        (newDailyReport.esocial.S2240.pending || 0),
+      done:
+        (newDailyReport.esocial.S2210.done || 0) +
+        (newDailyReport.esocial.S2220.done || 0) +
+        (newDailyReport.esocial.S2240.done || 0),
+      transmitted:
+        (newDailyReport.esocial.S2210.transmitted || 0) +
+        (newDailyReport.esocial.S2220.transmitted || 0) +
+        (newDailyReport.esocial.S2240.transmitted || 0),
+      rejected:
+        (newDailyReport.esocial.S2210.rejected || 0) +
+        (newDailyReport.esocial.S2220.rejected || 0) +
+        (newDailyReport.esocial.S2240.rejected || 0),
     };
 
     newDailyReport.esocial = {
@@ -176,11 +198,14 @@ export class CompanyReportRepository {
 
     const processingCat = group.find((g) => g.status === 'PROCESSING' && g.type === 'CAT_2210')?._count || 0;
 
-    const rejectedRisk = group.find((g) => (g.status === 'INVALID' || g.status === 'ERROR') && g.type === 'RISK_2240')?._count || 0;
+    const rejectedRisk =
+      group.find((g) => (g.status === 'INVALID' || g.status === 'ERROR') && g.type === 'RISK_2240')?._count || 0;
 
-    const rejectedExam = group.find((g) => (g.status === 'INVALID' || g.status === 'ERROR') && g.type === 'EXAM_2220')?._count || 0;
+    const rejectedExam =
+      group.find((g) => (g.status === 'INVALID' || g.status === 'ERROR') && g.type === 'EXAM_2220')?._count || 0;
 
-    const rejectedCat = group.find((g) => (g.status === 'INVALID' || g.status === 'ERROR') && g.type === 'CAT_2210')?._count || 0;
+    const rejectedCat =
+      group.find((g) => (g.status === 'INVALID' || g.status === 'ERROR') && g.type === 'CAT_2210')?._count || 0;
 
     esocial.S2240.done = doneRisk;
     esocial.S2240.rejected = rejectedRisk;

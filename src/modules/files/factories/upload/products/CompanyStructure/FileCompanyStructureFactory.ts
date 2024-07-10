@@ -45,9 +45,12 @@ import {
 import { CompanyStructRsDataEmployeeColumnMap } from './constants/company-struct-rsdata-employee.constants';
 
 @Injectable()
-export class FileCompanyStructureFactory extends FileFactoryAbstractionCreator<IBodyFileCompanyStruct, CompanyStructHeaderEnum> {
+export class FileCompanyStructureFactory extends FileFactoryAbstractionCreator<
+  IBodyFileCompanyStruct,
+  CompanyStructHeaderEnum
+> {
   static splitter = '; ';
-  public product = FileCompanyStructureProduct
+  public product = FileCompanyStructureProduct;
 
   constructor(
     readonly excelProv: ExcelProvider,
@@ -145,7 +148,8 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
     if (this.errors.length) throw new BadRequestException(this.errors);
 
     const isRisk = !!Object.keys(mapData.risk).length;
-    if (!isRisk) if (!company.riskFactorGroupData?.[0]?.id) throw new BadRequestException(`Sistema de gestão não cadatsrado`);
+    if (!isRisk)
+      if (!company.riskFactorGroupData?.[0]?.id) throw new BadRequestException(`Sistema de gestão não cadatsrado`);
 
     return await asyncBatch(sheetData, 20, async (row) => {
       const touchRisk = !!row[CompanyStructHeaderEnum.RISK];
@@ -158,23 +162,27 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
       if (touchRisk) {
         const json = this.getRiskDataJson(mapDataWithId.risk[row[CompanyStructHeaderEnum.RISK]].data, row);
         const adms = row[CompanyStructHeaderEnum.EPC_OTHERS]?.map((admName: string) => riskMap.adms[admName].id);
-        const engs = row[CompanyStructHeaderEnum.EPC]?.map((engName: string) => ({ recMedId: riskMap.engs[engName].id }));
-        const generateSources = row[CompanyStructHeaderEnum.GENERATE_SOURCE]?.map((gs: string) => riskMap.generateSource[gs].id);
+        const engs = row[CompanyStructHeaderEnum.EPC]?.map((engName: string) => ({
+          recMedId: riskMap.engs[engName].id,
+        }));
+        const generateSources = row[CompanyStructHeaderEnum.GENERATE_SOURCE]?.map(
+          (gs: string) => riskMap.generateSource[gs].id,
+        );
         const recs = row[CompanyStructHeaderEnum.REC]?.map((recName: string) => riskMap.recs[recName].id);
         const epis = row[CompanyStructHeaderEnum.EPI_CA]?.map(
           (ca: string) =>
-          ({
-            epiId: episMap[ca].id,
-            efficientlyCheck: row[CompanyStructHeaderEnum.EPI_EFFICIENTLY],
-            epcCheck: row[CompanyStructHeaderEnum.EPI_EPC],
-            longPeriodsCheck: row[CompanyStructHeaderEnum.EPI_LONG_PERIODS],
-            maintenanceCheck: row[CompanyStructHeaderEnum.EPI_MAINTENANCE],
-            sanitationCheck: row[CompanyStructHeaderEnum.EPI_SANITATION],
-            tradeSignCheck: row[CompanyStructHeaderEnum.EPI_TRADE_SIGN],
-            trainingCheck: row[CompanyStructHeaderEnum.EPI_TRAINING],
-            unstoppedCheck: row[CompanyStructHeaderEnum.EPI_UNSTOPPED],
-            validationCheck: row[CompanyStructHeaderEnum.EPI_VALIDATION],
-          } as EpiRoRiskDataDto),
+            ({
+              epiId: episMap[ca].id,
+              efficientlyCheck: row[CompanyStructHeaderEnum.EPI_EFFICIENTLY],
+              epcCheck: row[CompanyStructHeaderEnum.EPI_EPC],
+              longPeriodsCheck: row[CompanyStructHeaderEnum.EPI_LONG_PERIODS],
+              maintenanceCheck: row[CompanyStructHeaderEnum.EPI_MAINTENANCE],
+              sanitationCheck: row[CompanyStructHeaderEnum.EPI_SANITATION],
+              tradeSignCheck: row[CompanyStructHeaderEnum.EPI_TRADE_SIGN],
+              trainingCheck: row[CompanyStructHeaderEnum.EPI_TRAINING],
+              unstoppedCheck: row[CompanyStructHeaderEnum.EPI_UNSTOPPED],
+              validationCheck: row[CompanyStructHeaderEnum.EPI_VALIDATION],
+            }) as EpiRoRiskDataDto,
         );
 
         const homogeneousGroupId = workspaceMap.homogeneousGroup[row[CompanyStructHeaderEnum.GHO]]?.id as string;
@@ -284,8 +292,10 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
     const officeIndex = hierarchyList.findIndex((i) => i == HierarchyEnum.OFFICE);
 
     sheetData.forEach((row) => {
-      if (!row[CompanyStructHeaderEnum.WORKSPACE]) row[CompanyStructHeaderEnum.WORKSPACE] = company?.workspace?.[0]?.name;
-      if (!row[CompanyStructHeaderEnum.WORKSPACE]) throw new BadRequestException('Cadastre ou informe um estabelecimento antes de importar os dado');
+      if (!row[CompanyStructHeaderEnum.WORKSPACE])
+        row[CompanyStructHeaderEnum.WORKSPACE] = company?.workspace?.[0]?.name;
+      if (!row[CompanyStructHeaderEnum.WORKSPACE])
+        throw new BadRequestException('Cadastre ou informe um estabelecimento antes de importar os dado');
 
       if (!mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]])
         mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]] = {
@@ -316,7 +326,9 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
         hierarchyArray.forEach((hierarchyName, index) => {
           if (hierarchyName == emptyHierarchy) return;
 
-          const hierarchyNewArray = hierarchyArray.slice(0, index + 1).concat(hierarchyArray.slice(index + 1).map(() => emptyHierarchy));
+          const hierarchyNewArray = hierarchyArray
+            .slice(0, index + 1)
+            .concat(hierarchyArray.slice(index + 1).map(() => emptyHierarchy));
           const hierarchyPath = hierarchyNewArray.join('--');
 
           if (mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]].hierarchies[hierarchyPath]) return;
@@ -349,14 +361,23 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
       }
 
       // if (!isHierarchy && !isHomogeneousGroup) throw new BadRequestException(`Informe ao menos um Setor, Cargo ou Grupo homogênio (Obrigatório)`);
-      if (!isHierarchy && isEmployeeHistory) throw new BadRequestException(`Quando informado data de admissão, informe ao menos um Setor e Cargo (Obrigatório)`);
+      if (!isHierarchy && isEmployeeHistory)
+        throw new BadRequestException(
+          `Quando informado data de admissão, informe ao menos um Setor e Cargo (Obrigatório)`,
+        );
 
       if (isEmployee) {
         const isOffice = hierarchyArray?.[officeIndex] != emptyHierarchy;
         const isSubOffice = hierarchyArray?.[subOfficeIndex] != emptyHierarchy;
 
-        if (!mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]].employees[row[CompanyStructHeaderEnum.EMPLOYEE_CPF]])
-          mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]].employees[row[CompanyStructHeaderEnum.EMPLOYEE_CPF]] = {
+        if (
+          !mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]].employees[
+            row[CompanyStructHeaderEnum.EMPLOYEE_CPF]
+          ]
+        )
+          mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]].employees[
+            row[CompanyStructHeaderEnum.EMPLOYEE_CPF]
+          ] = {
             value: row[CompanyStructHeaderEnum.EMPLOYEE_CPF],
             name: row[CompanyStructHeaderEnum.EMPLOYEE_NAME],
             birth: row[CompanyStructHeaderEnum.EMPLOYEE_BIRTH],
@@ -377,11 +398,12 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
 
         if (isCid) {
           row[CompanyStructHeaderEnum.EMPLOYEE_CIDS].map((value: string) => {
-            mapData.cids[value] = value
-            mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]].employees[row[CompanyStructHeaderEnum.EMPLOYEE_CPF]].cids[value] = value
+            mapData.cids[value] = value;
+            mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]].employees[
+              row[CompanyStructHeaderEnum.EMPLOYEE_CPF]
+            ].cids[value] = value;
           });
         }
-
 
         if (isEmployeeHistory) {
           const adm = EmployeeHierarchyMotiveTypeEnum.ADM;
@@ -392,7 +414,9 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
 
           if (admDate && isOffice) {
             const value = adm + dayjs(admDate).format('YYYY-MM-DD');
-            mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]].employees[row[CompanyStructHeaderEnum.EMPLOYEE_CPF]].employeesHistory[value] = {
+            mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]].employees[
+              row[CompanyStructHeaderEnum.EMPLOYEE_CPF]
+            ].employeesHistory[value] = {
               value: value,
               motive: adm,
               startDate: row[CompanyStructHeaderEnum.EMPLOYEE_ADMISSION],
@@ -411,7 +435,9 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
 
           if (demDate) {
             const value = dem + dayjs(demDate).format('YYYY-MM-DD');
-            mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]].employees[row[CompanyStructHeaderEnum.EMPLOYEE_CPF]].employeesHistory[value] = {
+            mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]].employees[
+              row[CompanyStructHeaderEnum.EMPLOYEE_CPF]
+            ].employeesHistory[value] = {
               value: value,
               motive: dem,
               startDate: row[CompanyStructHeaderEnum.EMPLOYEE_DEMISSION],
@@ -489,9 +515,15 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
     const companyId = company.id;
 
     const episKeys = Object.keys(mapData.epis);
-    const homoGroupsKeys = Object.keys(workspaces.map((w) => (mapData.workspace[w.name] || mapData.workspace[w.abbreviation])?.homogeneousGroup).flat(1));
-    const hierarchyKeys = Object.keys(workspaces.map((w) => (mapData.workspace[w.name] || mapData.workspace[w.abbreviation])?.hierarchies).flat(1));
-    const employeeKeys = Object.keys(workspaces.map((w) => (mapData.workspace[w.name] || mapData.workspace[w.abbreviation])?.employees).flat(1));
+    const homoGroupsKeys = Object.keys(
+      workspaces.map((w) => (mapData.workspace[w.name] || mapData.workspace[w.abbreviation])?.homogeneousGroup).flat(1),
+    );
+    const hierarchyKeys = Object.keys(
+      workspaces.map((w) => (mapData.workspace[w.name] || mapData.workspace[w.abbreviation])?.hierarchies).flat(1),
+    );
+    const employeeKeys = Object.keys(
+      workspaces.map((w) => (mapData.workspace[w.name] || mapData.workspace[w.abbreviation])?.employees).flat(1),
+    );
     const riskKeys = Object.keys(mapData.risk);
 
     const cidsKeys = Object.keys(mapData.cids);
@@ -501,40 +533,51 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
     //   }
     // ).flat(2)
 
-    const cidsPromise = cidsKeys.length ? this.prisma.cid.findMany({ where: { cid: { in: cidsKeys } }, select: { cid: true } }) : undefined;
+    const cidsPromise = cidsKeys.length
+      ? this.prisma.cid.findMany({ where: { cid: { in: cidsKeys } }, select: { cid: true } })
+      : undefined;
 
-    const episPromise = episKeys.length ? this.prisma.epi.findMany({ where: { ca: { in: episKeys } }, select: { id: true, ca: true } }) : undefined;
+    const episPromise = episKeys.length
+      ? this.prisma.epi.findMany({ where: { ca: { in: episKeys } }, select: { id: true, ca: true } })
+      : undefined;
 
     const homoGroupsPromise = homoGroupsKeys.length
       ? this.prisma.homogeneousGroup.findMany({
-        where: { companyId, type: null, status: 'ACTIVE' },
-        select: { name: true, id: true, hierarchyOnHomogeneous: { select: { hierarchyId: true, id: true } } },
-      })
+          where: { companyId, type: null, status: 'ACTIVE' },
+          select: { name: true, id: true, hierarchyOnHomogeneous: { select: { hierarchyId: true, id: true } } },
+        })
       : undefined;
 
     const hierarchiesPromise = hierarchyKeys.length
       ? this.prisma.hierarchy.findMany({
-        where: { companyId, status: 'ACTIVE' },
-        select: { id: true, name: true, parentId: true, type: true, workspaces: { select: { id: true } } },
-      })
+          where: { companyId, status: 'ACTIVE' },
+          select: { id: true, name: true, parentId: true, type: true, workspaces: { select: { id: true } } },
+        })
       : undefined;
 
     const riskPromise = riskKeys.length
       ? this.riskRepository.findAllAvailable(companyId, {
-        where: { name: { in: riskKeys } },
-        select: { id: true, name: true, esocialCode: true, type: true },
-      })
+          where: { name: { in: riskKeys } },
+          select: { id: true, name: true, esocialCode: true, type: true },
+        })
       : undefined;
 
     const employeePromise =
       employeeKeys.length && !body.createEmployee
         ? this.employeeRepository.findNude({
-          where: { companyId, ...(employeeKeys.length < 300 && { cpf: { in: employeeKeys } }) },
-          select: { id: true, cpf: true },
-        })
+            where: { companyId, ...(employeeKeys.length < 300 && { cpf: { in: employeeKeys } }) },
+            select: { id: true, cpf: true },
+          })
         : undefined;
 
-    const [epis, homoGroups, hierarchies, risk, employees, cids] = await Promise.all([episPromise, homoGroupsPromise, hierarchiesPromise, riskPromise, employeePromise, cidsPromise]);
+    const [epis, homoGroups, hierarchies, risk, employees, cids] = await Promise.all([
+      episPromise,
+      homoGroupsPromise,
+      hierarchiesPromise,
+      riskPromise,
+      employeePromise,
+      cidsPromise,
+    ]);
 
     const homoGroupsMap: Record<string, IHomoDataReturn> = {};
     const hierarchyMap: Record<string, IHierarchyDataReturn> = {};
@@ -606,7 +649,15 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
       hierarchies.forEach((hier) => {
         if (hier.type != type) return;
         hier.workspaces.map(({ id }) => {
-          const array = [id, emptyHierarchy, emptyHierarchy, emptyHierarchy, emptyHierarchy, emptyHierarchy, emptyHierarchy];
+          const array = [
+            id,
+            emptyHierarchy,
+            emptyHierarchy,
+            emptyHierarchy,
+            emptyHierarchy,
+            emptyHierarchy,
+            emptyHierarchy,
+          ];
           const path = setHierarchyArray(hier, array);
 
           hierarchyPathMap[path.join('--')] = hier;
@@ -614,13 +665,25 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
       });
     });
 
-    return { homoGroupsMap, hierarchyPathMap, hierarchyMap, hierarOnHomoMap, riskMap, workspaceMap, episMap, company, employeesMap, cidsMap };
+    return {
+      homoGroupsMap,
+      hierarchyPathMap,
+      hierarchyMap,
+      hierarOnHomoMap,
+      riskMap,
+      workspaceMap,
+      episMap,
+      company,
+      employeesMap,
+      cidsMap,
+    };
   }
 
   // get the database existent data, create a map using getDatabaseMaps and compare with xml map data
   private async getMapDataWithId(company: ICompanyData, mapData: IMapData, body: IBodyFileCompanyStruct) {
     const companyId = company.id;
-    const { homoGroupsMap, riskMap, workspaceMap, hierarchyPathMap, episMap, hierarOnHomoMap, employeesMap, cidsMap } = await this.getDatabaseMaps(company, mapData, body);
+    const { homoGroupsMap, riskMap, workspaceMap, hierarchyPathMap, episMap, hierarOnHomoMap, employeesMap, cidsMap } =
+      await this.getDatabaseMaps(company, mapData, body);
 
     Object.entries(mapData.cids).map(([cid]) => {
       const cidId = cidsMap[cid];
@@ -692,7 +755,9 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
                   type: hierarchyImportData.type,
                   realDescription: hierarchyImportData.realDescription,
                   workspaceIds: [workspaceId],
-                  parentId: (mapData.workspace[workspaceName].hierarchies[hierarchyImportData.parentPath]?.id as string) || null,
+                  parentId:
+                    (mapData.workspace[workspaceName].hierarchies[hierarchyImportData.parentPath]?.id as string) ||
+                    null,
                 },
                 company,
               );
@@ -763,7 +828,14 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
 
       if (this.errors.length == 0) {
         await asyncEach(
-          [promiseHierarchiesDir, promiseHierarchiesMan, promiseHierarchiesSec, promiseHierarchiesSubSec, promiseHierarchiesOff, promiseHierarchiesSubOff],
+          [
+            promiseHierarchiesDir,
+            promiseHierarchiesMan,
+            promiseHierarchiesSec,
+            promiseHierarchiesSubSec,
+            promiseHierarchiesOff,
+            promiseHierarchiesSubOff,
+          ],
           async (promises) => {
             await asyncBatch(promises, 50, async (promise) => {
               if (typeof promise === 'function') {
@@ -823,9 +895,13 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
 
         const admsPromises = Object.keys(riskValue.adms).map((admName) => {
           return async () => {
-            const adm = await this.createRecMedService.execute({ medType: 'ADM', riskId: risk.id, medName: admName, companyId }, { targetCompanyId: companyId } as any, {
-              returnIfExist: true,
-            });
+            const adm = await this.createRecMedService.execute(
+              { medType: 'ADM', riskId: risk.id, medName: admName, companyId },
+              { targetCompanyId: companyId } as any,
+              {
+                returnIfExist: true,
+              },
+            );
 
             mapData.risk[riskName].adms[admName].id = adm.id;
           };
@@ -833,9 +909,13 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
 
         const engsPromises = Object.keys(riskValue.engs).map((engName) => {
           return async () => {
-            const eng = await this.createRecMedService.execute({ medType: 'ENG', riskId: risk.id, medName: engName, companyId }, { targetCompanyId: companyId } as any, {
-              returnIfExist: true,
-            });
+            const eng = await this.createRecMedService.execute(
+              { medType: 'ENG', riskId: risk.id, medName: engName, companyId },
+              { targetCompanyId: companyId } as any,
+              {
+                returnIfExist: true,
+              },
+            );
 
             mapData.risk[riskName].engs[engName].id = eng.id;
           };
@@ -843,9 +923,13 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
 
         const recsPromises = Object.keys(riskValue.recs).map((recName) => {
           return async () => {
-            const rec = await this.createRecMedService.execute({ riskId: risk.id, recName, companyId }, { targetCompanyId: companyId } as any, {
-              returnIfExist: true,
-            });
+            const rec = await this.createRecMedService.execute(
+              { riskId: risk.id, recName, companyId },
+              { targetCompanyId: companyId } as any,
+              {
+                returnIfExist: true,
+              },
+            );
 
             mapData.risk[riskName].recs[recName].id = rec.id;
           };

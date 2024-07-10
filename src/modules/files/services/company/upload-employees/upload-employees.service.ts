@@ -51,7 +51,10 @@ export class UploadEmployeesService {
       include: { workspace: true },
     });
 
-    if (company.workspace?.length === 1) Workbook.sheets[0].columns = Workbook.sheets[0].columns.filter((column) => column.databaseName !== 'abbreviation');
+    if (company.workspace?.length === 1)
+      Workbook.sheets[0].columns = Workbook.sheets[0].columns.filter(
+        (column) => column.databaseName !== 'abbreviation',
+      );
 
     // get risk table with actual version
     const DatabaseTable = await this.databaseTableRepository.findByNameAndCompany(Workbook.name, companyId);
@@ -70,7 +73,11 @@ export class UploadEmployeesService {
       const workspace =
         company.workspace?.length === 1
           ? workspaces
-          : workspaces.filter((work) => employee?.abbreviation && (employee?.abbreviation == work.abbreviation || employee?.abbreviation == work.name));
+          : workspaces.filter(
+              (work) =>
+                employee?.abbreviation &&
+                (employee?.abbreviation == work.abbreviation || employee?.abbreviation == work.name),
+            );
 
       if (workspace.length === 0) throw new BadRequestException(ErrorCompanyEnum.WORKSPACE_NOT_FOUND);
 
@@ -130,7 +137,9 @@ export class UploadEmployeesService {
           if (key != 'OFFICE') return;
           if (hierarchyName) {
             const children = Object.values(hierarchyTree);
-            const actualHierarchy = children.find((h) => h?.name && h?.type && h.name === hierarchyName && h.type === key);
+            const actualHierarchy = children.find(
+              (h) => h?.name && h?.type && h.name === hierarchyName && h.type === key,
+            );
 
             if (actualHierarchy) {
               newEmployee.hierarchyId = actualHierarchy.id;
@@ -162,7 +171,15 @@ export class UploadEmployeesService {
     });
 
     return await this.uploadExcelProvider.newTableData({
-      findAll: (sheet) => findAllEmployees(this.excelProvider, this.companyRepository, this.workspaceRepository, this.hierarchyRepository, sheet, companyId),
+      findAll: (sheet) =>
+        findAllEmployees(
+          this.excelProvider,
+          this.companyRepository,
+          this.workspaceRepository,
+          this.hierarchyRepository,
+          sheet,
+          companyId,
+        ),
       Workbook,
       system,
       companyId,
@@ -171,7 +188,12 @@ export class UploadEmployeesService {
   }
 }
 
-const read = async (readFileData: IExcelReadData[], excelProvider: ExcelProvider, sheet: ICompanySheet, databaseTable: DatabaseTableEntity) => {
+const read = async (
+  readFileData: IExcelReadData[],
+  excelProvider: ExcelProvider,
+  sheet: ICompanySheet,
+  databaseTable: DatabaseTableEntity,
+) => {
   const table = readFileData.find((data) => data.name === sheet.name);
 
   if (!table) throw new BadRequestException('The table you trying to insert has a different sheet name');

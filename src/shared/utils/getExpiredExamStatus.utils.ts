@@ -4,7 +4,10 @@ import dayjs from 'dayjs';
 import { EmployeeEntity } from './../../modules/company/entities/employee.entity';
 import { StatusExamEnum } from '../constants/enum/statusExam.enum';
 
-export const getEmployeeRowStatus = (exam?: EmployeeExamsHistoryEntity, expiredDateExam?: Date): StatusExamEnum | null => {
+export const getEmployeeRowStatus = (
+  exam?: EmployeeExamsHistoryEntity,
+  expiredDateExam?: Date,
+): StatusExamEnum | null => {
   const diff = -dayjs().diff(expiredDateExam, 'day');
 
   // if (!exam) return StatusExamEnum.EXPIRED;

@@ -1,6 +1,6 @@
 import { CatRepository } from './../../../../../company/repositories/implementations/CatRepository';
 import { PrismaService } from './../../../../../../prisma/prisma.service';
-import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 
 import { ESocialEventRepository } from '../../../../../../modules/esocial/repositories/implementations/ESocialEventRepository';
@@ -15,6 +15,7 @@ import { ICacheEventBatchType } from './../../../../../../shared/interfaces/cach
 import { asyncEach } from './../../../../../../shared/utils/asyncEach';
 import { UpdateESocialReportService } from './../../../../../company/services/report/update-esocial-report/update-esocial-report.service';
 import { EmployeePPPHistoryRepository } from '../../../../../../modules/company/repositories/implementations/EmployeePPPHistoryRepository';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()
 export class FetchESocialBatchEventsService {
@@ -93,7 +94,12 @@ export class FetchESocialBatchEventsService {
 
                     const found = await this.eSocialEventRepository.findFirstNude({
                       where: { eventId: id },
-                      select: { id: true, examHistoryId: true, pppId: true, catId: true },
+                      select: {
+                        id: true,
+                        examHistoryId: true,
+                        pppId: true,
+                        catId: true,
+                      },
                     });
 
                     if (!found?.id) throw new Error(`Event not found ID:${id}`);
@@ -109,7 +115,13 @@ export class FetchESocialBatchEventsService {
                         }),
                         ...(rejectedEvent &&
                           found.pppId && {
-                            ppp: { update: { sendEvent: true, status: 'INVALID', json: '' } },
+                            ppp: {
+                              update: {
+                                sendEvent: true,
+                                status: 'INVALID',
+                                json: '',
+                              },
+                            },
                           }),
                         ...(!rejectedEvent &&
                           found.pppId && {

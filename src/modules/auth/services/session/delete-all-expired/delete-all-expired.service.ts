@@ -5,7 +5,10 @@ import { DayJSProvider } from '../../../../../shared/providers/DateProvider/impl
 
 @Injectable()
 export class DeleteAllExpiredService {
-  constructor(private readonly refreshTokensRepository: RefreshTokensRepository, private readonly dateProvider: DayJSProvider) {}
+  constructor(
+    private readonly refreshTokensRepository: RefreshTokensRepository,
+    private readonly dateProvider: DayJSProvider,
+  ) {}
 
   async execute() {
     const currentDate = this.dateProvider.dateNow();

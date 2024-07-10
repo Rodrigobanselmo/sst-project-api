@@ -15,7 +15,11 @@ export async function getCompany(companyId: string, companyRepository: CompanyRe
       fantasy: true,
       workspace: { select: { id: true, abbreviation: true, name: true } },
       receivingServiceContracts: {
-        select: { applyingServiceCompany: { select: { name: true, cnpj: true, address: true, contacts: { where: { isPrincipal: true } } } } },
+        select: {
+          applyingServiceCompany: {
+            select: { name: true, cnpj: true, address: true, contacts: { where: { isPrincipal: true } } },
+          },
+        },
       },
     },
   });
@@ -40,8 +44,22 @@ export function getCompanyInfo(company: CompanyEntity) {
         font: { size: 14, bold: true, color: { theme: 1 }, name: 'Calibri' },
       },
     ],
-    [{ content: address, mergeRight: 20, fill: ReportFillColorEnum.HEADER_GREEN, font: { size: 14, bold: true, color: { theme: 1 }, name: 'Calibri' } }],
-    [{ content: addressCity, mergeRight: 20, fill: ReportFillColorEnum.HEADER_GREEN, font: { size: 14, bold: true, color: { theme: 1 }, name: 'Calibri' } }],
+    [
+      {
+        content: address,
+        mergeRight: 20,
+        fill: ReportFillColorEnum.HEADER_GREEN,
+        font: { size: 14, bold: true, color: { theme: 1 }, name: 'Calibri' },
+      },
+    ],
+    [
+      {
+        content: addressCity,
+        mergeRight: 20,
+        fill: ReportFillColorEnum.HEADER_GREEN,
+        font: { size: 14, bold: true, color: { theme: 1 }, name: 'Calibri' },
+      },
+    ],
   ];
 
   if (contact) rows.push([{ content: contact, mergeRight: 20, fill: ReportFillColorEnum.HEADER_GREEN }]);
@@ -49,7 +67,13 @@ export function getCompanyInfo(company: CompanyEntity) {
   const subRows: IReportCell[][] = [];
 
   if (consultant)
-    subRows.push([{ content: `${company.name} (${company.cnpj})`, mergeRight: 'all', font: { size: 11, bold: true, color: { theme: 1 }, name: 'Calibri' } }]);
+    subRows.push([
+      {
+        content: `${company.name} (${company.cnpj})`,
+        mergeRight: 'all',
+        font: { size: 11, bold: true, color: { theme: 1 }, name: 'Calibri' },
+      },
+    ]);
 
   return { main: rows, sub: subRows };
 }

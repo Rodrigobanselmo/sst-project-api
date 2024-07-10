@@ -5,7 +5,10 @@ import { ISectionChildrenType, DocumentSectionChildrenTypeEnum } from '../../../
 import { IDocVariables } from '../../../builders/pgr/types/section.types';
 import { BulletTextConverter } from './bullets.converter';
 
-export const bulletTextIterable = (bulletText: string[], convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[]) => {
+export const bulletTextIterable = (
+  bulletText: string[],
+  convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[],
+) => {
   const bulletTextVarArray = BulletTextConverter(bulletText);
 
   const iterableSections = bulletTextVarArray

@@ -10,7 +10,12 @@ export const requiredBorders: Partial<Borders> = {
   bottom: { style: 'thin', color: { argb: 'ff0000' } },
 };
 
-export const getBoxBorders = (rowIndex: number, columnIndex: number, rowLastIndex: number, columnLastIndex: number): Partial<Borders> => {
+export const getBoxBorders = (
+  rowIndex: number,
+  columnIndex: number,
+  rowLastIndex: number,
+  columnLastIndex: number,
+): Partial<Borders> => {
   const bottoms: Partial<Borders> = {};
 
   if (rowIndex === 0) {

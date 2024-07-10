@@ -1,4 +1,14 @@
-import { AlignmentType, ExternalHyperlink, IParagraphOptions, IRunOptions, PageBreak, Paragraph, SequentialIdentifier, TextRun, UnderlineType } from 'docx';
+import {
+  AlignmentType,
+  ExternalHyperlink,
+  IParagraphOptions,
+  IRunOptions,
+  PageBreak,
+  Paragraph,
+  SequentialIdentifier,
+  TextRun,
+  UnderlineType,
+} from 'docx';
 import { IEntityRange, IInlineStyleRange, InlineStyleTypeEnum } from '../../builders/pgr/types/elements.types';
 import { isOdd } from '../../../../../shared/utils/isOdd';
 import { rgbStringToHex } from '../../../../../shared/utils/rgbToHex';
@@ -7,7 +17,7 @@ interface ParagraphProps extends IParagraphOptions {
   break?: boolean;
   sequentialIdentifier?: SequentialIdentifier;
   size?: number;
-  align?: AlignmentType;
+  align?: (typeof AlignmentType)[keyof typeof AlignmentType];
   isBold?: boolean;
   isSuper?: boolean;
   isBreak?: boolean;
@@ -166,7 +176,9 @@ export const paragraphNewNormal = (text: string, { children, color, ...options }
           const textRuns: (TextRun | ExternalHyperlink)[] = [];
           arrayRange.forEach((key, indexRange) => {
             const nextKey = arrayRange[indexRange + 1];
-            const filter = [...entityRange, ...inlineStyleRange].filter((s) => s.offset <= Number(key) && s.length + s.offset >= Number(nextKey));
+            const filter = [...entityRange, ...inlineStyleRange].filter(
+              (s) => s.offset <= Number(key) && s.length + s.offset >= Number(nextKey),
+            );
             if (nextKey) {
               const offset = Number(key);
               const offsetEnd = Number(nextKey);
@@ -312,22 +324,22 @@ export const paragraphTableLegend = (text: string, options = {} as ParagraphProp
 export const paragraphFigure = (text: string, options = {} as ParagraphProps & { spacingAfter?: number }) =>
   text
     ? paragraphNewNormal(text, {
-      ...options,
-      children: [
-        new TextRun({
-          text: 'Figura ',
-          size: 16,
-        }),
-        new TextRun({
-          size: 16,
-          children: [new SequentialIdentifier('Figure')],
-        }),
-        new TextRun({
-          text: ': ',
-          size: 16,
-        }),
-      ],
-      size: 8,
-      spacing: { after: options?.spacingAfter ?? 70 },
-    })
+        ...options,
+        children: [
+          new TextRun({
+            text: 'Figura ',
+            size: 16,
+          }),
+          new TextRun({
+            size: 16,
+            children: [new SequentialIdentifier('Figure')],
+          }),
+          new TextRun({
+            text: ': ',
+            size: 16,
+          }),
+        ],
+        size: 8,
+        spacing: { after: options?.spacingAfter ?? 70 },
+      })
     : undefined;

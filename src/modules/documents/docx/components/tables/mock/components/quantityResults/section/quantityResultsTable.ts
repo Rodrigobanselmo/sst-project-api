@@ -1,6 +1,9 @@
 import { Paragraph, Table } from 'docx';
 
-import { ISectionChildrenType, DocumentSectionChildrenTypeEnum } from '../../../../../../builders/pgr/types/elements.types';
+import {
+  ISectionChildrenType,
+  DocumentSectionChildrenTypeEnum,
+} from '../../../../../../builders/pgr/types/elements.types';
 import { IDocVariables } from '../../../../../../builders/pgr/types/section.types';
 import { annualDoseTable } from '../../annualDose/table.component';
 import { quantityResultsFBVTable } from '../tables/quantityResultsFBVTable';
@@ -10,7 +13,9 @@ import { quantityResultsQTable } from '../tables/quantityResultsQTable';
 import { quantityResultsR2Table } from '../tables/quantityResultsR2Table';
 import { quantityResultsRTable } from '../tables/quantityResultsRTable';
 
-export const quantityResultsTable = (convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[]) => {
+export const quantityResultsTable = (
+  convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[],
+) => {
   const table1 = convertToDocx([
     {
       type: DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE,

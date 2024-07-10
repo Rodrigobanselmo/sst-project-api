@@ -1,5 +1,4 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
 
 import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
@@ -9,12 +8,9 @@ import { FindContactDto } from '../../dto/contact.dto';
 import { FindWorkspaceService } from '../../services/workspace/find-workspace/find-workspace.service';
 import { FindWorkspaceDto } from '../../dto/workspace.dto';
 
-@ApiTags('workspace')
 @Controller('workspace')
 export class WorkspaceController {
-  constructor(
-    private readonly findWorkspaceService: FindWorkspaceService,
-  ) { }
+  constructor(private readonly findWorkspaceService: FindWorkspaceService) {}
 
   @Permissions({
     code: PermissionEnum.COMPANY,
@@ -26,5 +22,4 @@ export class WorkspaceController {
   find(@User() userPayloadDto: UserPayloadDto, @Query() query: FindWorkspaceDto) {
     return this.findWorkspaceService.execute(query, userPayloadDto);
   }
-
 }

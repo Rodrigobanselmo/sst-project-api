@@ -8,7 +8,10 @@ import { ExamToClinicRepository } from '../../../repositories/implementations/Ex
 
 @Injectable()
 export class UpsertExamToClinicService {
-  constructor(private readonly examToClinicRepository: ExamToClinicRepository, private readonly dayjs: DayJSProvider) {}
+  constructor(
+    private readonly examToClinicRepository: ExamToClinicRepository,
+    private readonly dayjs: DayJSProvider,
+  ) {}
 
   async execute(createExamDto: UpsertExamToClinicDto, user: UserPayloadDto) {
     const [clinicExamActual, clinicExamOld] = await this.examToClinicRepository.findNude({
@@ -39,7 +42,11 @@ export class UpsertExamToClinicService {
     }
 
     // if company already have an exam in the same date or future date, update it
-    if (clinicExamActual && clinicExamActual.startDate >= this.dayjs.dateNow() && createExamDto.startDate >= this.dayjs.dateNow()) {
+    if (
+      clinicExamActual &&
+      clinicExamActual.startDate >= this.dayjs.dateNow() &&
+      createExamDto.startDate >= this.dayjs.dateNow()
+    ) {
       const newExam = await this.examToClinicRepository.update({
         ...createExamDto,
         companyId: user.targetCompanyId,

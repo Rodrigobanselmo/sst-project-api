@@ -1,5 +1,4 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
 
 import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
@@ -12,7 +11,6 @@ import { FindAlertsByTimeService } from '../../services/alert/find-alerts-by-tim
 import { SendAlertService } from '../../services/alert/send-alert/send-alert.service';
 import { UpsertAlertService } from '../../services/alert/upsert-alert/upsert-alert.service';
 
-@ApiTags('alert')
 @Controller('alert/:companyId')
 export class AlertController {
   constructor(

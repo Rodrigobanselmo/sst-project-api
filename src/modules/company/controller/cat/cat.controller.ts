@@ -1,5 +1,4 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
 
 import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
@@ -12,7 +11,6 @@ import { DeleteCatsService } from '../../services/cat/delete-cat/delete-cat.serv
 import { FindCatsService } from '../../services/cat/find-cat/find-cat.service';
 import { UpdateCatsService } from '../../services/cat/update-cat/update-cat.service';
 
-@ApiTags('cat')
 @Controller('cat')
 export class CatController {
   constructor(
@@ -63,7 +61,11 @@ export class CatController {
     crud: true,
   })
   @Patch('/:companyId/:id')
-  update(@Body() upsertAccessGroupDto: UpdateCatDto, @User() userPayloadDto: UserPayloadDto, @Param('id', ParseIntPipe) id: number) {
+  update(
+    @Body() upsertAccessGroupDto: UpdateCatDto,
+    @User() userPayloadDto: UserPayloadDto,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
     return this.updateCatsService.execute({ ...upsertAccessGroupDto, id }, userPayloadDto);
   }
 

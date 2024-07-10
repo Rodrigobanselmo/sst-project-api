@@ -7,7 +7,6 @@ import { formatCnae, formatPhoneNumber } from '../../../../../../../shared/utils
 
 export const companyVariables = (company: CompanyEntity, workspace: WorkspaceEntity, address: AddressEntity) => {
   const consultant = company.receivingServiceContracts[0]?.applyingServiceCompany;
-  const workspaceOwner = workspace.isOwner ? workspace.companyJson : undefined;
 
   return {
     [VariablesPGREnum.CONSULTANT_NAME]: consultant ? `${consultant.name} ` : `${company.name}`,
@@ -17,7 +16,8 @@ export const companyVariables = (company: CompanyEntity, workspace: WorkspaceEnt
     [VariablesPGREnum.COMPANY_CNAE]: company?.primary_activity
       ? `${formatCnae(company?.primary_activity[0]?.code || '')} – ${company?.primary_activity[0]?.name || ''}`
       : '',
-    [VariablesPGREnum.COMPANY_RISK_DEGREE]: company?.primary_activity && company?.primary_activity[0] ? String(company?.primary_activity[0].riskDegree) : '',
+    [VariablesPGREnum.COMPANY_RISK_DEGREE]:
+      company?.primary_activity && company?.primary_activity[0] ? String(company?.primary_activity[0].riskDegree) : '',
     [VariablesPGREnum.COMPANY_INITIAL]: `(${company?.initials})` || '',
     [VariablesPGREnum.COMPANY_CNPJ]: formatCNPJ(company?.cnpj) || '',
     [VariablesPGREnum.COMPANY_EMAIL]: company?.email || '',
@@ -57,7 +57,6 @@ export const companyVariables = (company: CompanyEntity, workspace: WorkspaceEnt
     [VariablesPGREnum.IS_PI]: address?.state == 'PI' ? 'true' : '',
     [VariablesPGREnum.IS_RJ]: address?.state == 'RJ' ? 'true' : '',
     [VariablesPGREnum.IS_RN]: address?.state == 'RN' ? 'true' : '',
-    [VariablesPGREnum.IS_RS]: address?.state == 'RS' ? 'true' : '',
     [VariablesPGREnum.IS_RO]: address?.state == 'RO' ? 'true' : '',
     [VariablesPGREnum.IS_RR]: address?.state == 'RR' ? 'true' : '',
     [VariablesPGREnum.IS_SC]: address?.state == 'SC' ? 'true' : '',

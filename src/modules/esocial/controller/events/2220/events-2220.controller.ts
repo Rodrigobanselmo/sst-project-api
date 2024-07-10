@@ -1,5 +1,4 @@
 import { Body, Controller, Get, Post, Query, Res } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
 
 import { FindEvents2220ESocialService } from '../../../../../modules/esocial/services/events/2220/find-events/find-events.service';
 import { User } from '../../../../../shared/decorators/user.decorator';
@@ -9,10 +8,12 @@ import { SendEvents2220ESocialService } from './../../../services/events/2220/se
 import { Permissions } from '../../../../../shared/decorators/permissions.decorator';
 import { PermissionEnum } from '../../../../../shared/constants/enum/authorization';
 
-@ApiTags('events-2220')
 @Controller('esocial/events/2220')
 export class ESocialEvent2220Controller {
-  constructor(private readonly sendEvents2220ESocialService: SendEvents2220ESocialService, private readonly findEvents2220ESocialService: FindEvents2220ESocialService) { }
+  constructor(
+    private readonly sendEvents2220ESocialService: SendEvents2220ESocialService,
+    private readonly findEvents2220ESocialService: FindEvents2220ESocialService,
+  ) {}
 
   @Permissions({
     code: PermissionEnum.ESOCIAL,

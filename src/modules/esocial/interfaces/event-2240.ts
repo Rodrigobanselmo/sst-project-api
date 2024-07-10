@@ -88,7 +88,26 @@ export const mapInverseTpExameOcup: Record<EnumResAso, ExamHistoryEvaluationEnum
 export const requiredLimTol = ['02.01.014', '01.18.001']; // Calor e Silica
 
 export const requiredTpAval = ['09.01.001'];
-export const requiredDescAg = ['01.01.001', '01.02.001', '01.03.001', '01.04.001', '01.05.001', '01.06.001', '01.07.001', '01.08.001', '01.09.001', '01.10.001', '01.12.001', '01.13.001', '01.14.001', '01.15.001', '01.16.001', '01.17.001', '01.18.001', '05.01.001']
+export const requiredDescAg = [
+  '01.01.001',
+  '01.02.001',
+  '01.03.001',
+  '01.04.001',
+  '01.05.001',
+  '01.06.001',
+  '01.07.001',
+  '01.08.001',
+  '01.09.001',
+  '01.10.001',
+  '01.12.001',
+  '01.13.001',
+  '01.14.001',
+  '01.15.001',
+  '01.16.001',
+  '01.17.001',
+  '01.18.001',
+  '05.01.001',
+];
 
 export interface IEvent2240Props extends IEventProps {
   id: string;
@@ -110,7 +129,7 @@ export interface IEvent2240Props extends IEventProps {
         tpAval?: TpAvalEnum;
         intConc?: number;
         limTol?: number;
-        unMed?: typeof UnMedEnum[keyof typeof UnMedEnum];
+        unMed?: (typeof UnMedEnum)[keyof typeof UnMedEnum];
         tecMedicao?: string;
         epcEpi?: {
           utilizEPC: utileEpiEpcEnum;
@@ -157,4 +176,7 @@ export interface IBreakPointPPP {
   date: Date;
 }
 
-export type IEmployee2240Data = EmployeeEntity & { actualPPPHistory?: IBreakPointPPP[]; sectorHierarchy?: Partial<HierarchyEntity> };
+export type IEmployee2240Data = EmployeeEntity & {
+  actualPPPHistory?: IBreakPointPPP[];
+  sectorHierarchy?: Partial<HierarchyEntity>;
+};

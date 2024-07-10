@@ -57,7 +57,10 @@ export const hierarchyRisksConverter = (
         };
 
         allHierarchyRecord[hierarchy.id] = {
-          homogeneousGroupIds: removeDuplicate([...hierarchyMap.homogeneousGroupIds, ...hierarchiesData.allHomogeneousGroupIds], { simpleCompare: true }),
+          homogeneousGroupIds: removeDuplicate(
+            [...hierarchyMap.homogeneousGroupIds, ...hierarchiesData.allHomogeneousGroupIds],
+            { simpleCompare: true },
+          ),
           name: hierarchy.name,
         };
       }

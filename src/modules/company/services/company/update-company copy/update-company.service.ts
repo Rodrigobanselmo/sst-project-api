@@ -6,7 +6,10 @@ import { CompanyRepository } from '../../../repositories/implementations/Company
 
 @Injectable()
 export class UpdateCompanyService {
-  constructor(private readonly companyRepository: CompanyRepository, private readonly workspaceRepository: WorkspaceRepository) {}
+  constructor(
+    private readonly companyRepository: CompanyRepository,
+    private readonly workspaceRepository: WorkspaceRepository,
+  ) {}
 
   async execute(updateCompanyDto: UpdateCompanyDto) {
     const newWorkspaces = [] as WorkspaceDto[];

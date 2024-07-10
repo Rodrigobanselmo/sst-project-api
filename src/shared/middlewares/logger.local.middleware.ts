@@ -28,7 +28,6 @@ export class LoggerMiddleware implements NestMiddleware {
       const oldSend = res.send;
 
       res.send = (body) => {
-
         if (new Date() > timeToWait) {
           console.info(chalk.white(`- `));
           console.info(chalk.white(`- `));
@@ -42,8 +41,14 @@ export class LoggerMiddleware implements NestMiddleware {
           console.info(chalk.white(`- `));
           timeToWait = new Date(new Date().getTime() + 10000);
         }
-        console.info((req.method === 'GET' ? chalk.cyan : chalk.red)(`[${req.method}]: `) + chalk.blue(`${shortPath}`) + chalk.gray(`?${queryParams}`));
-        console.info(chalk.gray(`Response status: `) + chalk[res.statusCode < 400 ? 'greenBright' : 'redBright'](res.statusCode));
+        console.info(
+          (req.method === 'GET' ? chalk.cyan : chalk.red)(`[${req.method}]: `) +
+            chalk.blue(`${shortPath}`) +
+            chalk.gray(`?${queryParams}`),
+        );
+        console.info(
+          chalk.gray(`Response status: `) + chalk[res.statusCode < 400 ? 'greenBright' : 'redBright'](res.statusCode),
+        );
         if (req.method !== 'GET') console.info(chalk.gray(`body: `) + chalk.yellow(JSON.stringify(req.body, null, 2)));
         if (body && body?.slice) console.info(chalk.gray(`Response body: `) + chalk.gray(body.slice(0, 500)));
 

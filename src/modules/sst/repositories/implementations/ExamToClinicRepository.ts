@@ -39,7 +39,13 @@ export class ExamToClinicRepository {
     return new ExamToClinicEntity(ExamToClinic);
   }
 
-  async upsert({ examId, companyId, startDate, groupId, ...createExamToClinicDto }: UpsertExamToClinicDto): Promise<ExamToClinicEntity> {
+  async upsert({
+    examId,
+    companyId,
+    startDate,
+    groupId,
+    ...createExamToClinicDto
+  }: UpsertExamToClinicDto): Promise<ExamToClinicEntity> {
     const GROUP_ID = groupId || v4();
     const examEntity = await this.prisma.examToClinic.upsert({
       create: {
@@ -90,7 +96,11 @@ export class ExamToClinicRepository {
     return new ExamToClinicEntity(examClinic);
   }
 
-  async find(query: Partial<FindExamToClinicDto>, pagination: PaginationQueryDto, options: Prisma.ExamToClinicFindManyArgs = {}) {
+  async find(
+    query: Partial<FindExamToClinicDto>,
+    pagination: PaginationQueryDto,
+    options: Prisma.ExamToClinicFindManyArgs = {},
+  ) {
     const whereInit = {
       AND: [],
     } as typeof options.where;

@@ -1,8 +1,8 @@
-import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, BadRequestException } from '@nestjs/common';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, BadRequestException } from '@nestjs/common';
 import { Response } from 'express';
 import { ErrorMessageEnum } from '../constants/enum/errorMessage';
 import { AmazonLoggerProvider } from '../providers/LoggerProvider/implementations/AmazonStorage/AmazonLoggerProvider';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Catch(PrismaClientKnownRequestError)
 export class PrismaDbExceptionFilter implements ExceptionFilter {
@@ -20,7 +20,10 @@ export class PrismaDbExceptionFilter implements ExceptionFilter {
 
     switch (code) {
       case 'P2002':
-        if (target) error = new BadRequestException(`Dado que está tentando criar já existe: ${target.join(', ')} está em conflito`);
+        if (target)
+          error = new BadRequestException(
+            `Dado que está tentando criar já existe: ${target.join(', ')} está em conflito`,
+          );
         break;
 
       case 'P2003':
@@ -52,10 +55,10 @@ export class PrismaDbExceptionFilter implements ExceptionFilter {
         headers: headers,
         status,
         error: exception.stack,
-        user: user
-      }
+        user: user,
+      };
 
-      console.error(exception)
+      console.error(exception);
       this.logger.logError(errorLog);
     }
 

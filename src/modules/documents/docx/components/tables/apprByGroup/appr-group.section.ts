@@ -43,7 +43,7 @@ export const APPRByGroupTableSection = (
   const everyHomoNotFound = [] as string[];
 
   const setHomoGroup = (homo: HomoGroupEntity) => {
-    const { desc, descRh, nameOrigin, typeOrigin } = getHomoGroupName(homo, hierarchyTree)
+    const { desc, descRh, nameOrigin, typeOrigin } = getHomoGroupName(homo, hierarchyTree);
 
     hierarchyDataHomoGroup.set(homo.id, {
       hierarchies: homoGroupTree[homo.id].hierarchies,
@@ -78,9 +78,12 @@ export const APPRByGroupTableSection = (
       everyHomoFound.push(homo.id);
 
       homoGroupTree[homo.id].hierarchies.forEach((hierarchy, i, hierarchies) => {
-        const allHomogeneousGroupIds = (hierarchyData.get(hierarchy.id) || { allHomogeneousGroupIds: [] })?.allHomogeneousGroupIds;
+        const allHomogeneousGroupIds = (hierarchyData.get(hierarchy.id) || { allHomogeneousGroupIds: [] })
+          ?.allHomogeneousGroupIds;
 
-        removeDuplicate([...allHomogeneousGroupIds.map((id) => ({ id })), ...hierarchy.homogeneousGroups], { removeById: 'id' }).forEach((homoGroup) => {
+        removeDuplicate([...allHomogeneousGroupIds.map((id) => ({ id })), ...hierarchy.homogeneousGroups], {
+          removeById: 'id',
+        }).forEach((homoGroup) => {
           const isOnEvery = hierarchies.every((hierarchyEvery) => {
             const everyAllHomogeneousGroupIds = (
               hierarchyData.get(hierarchyEvery.id) || {
@@ -88,7 +91,9 @@ export const APPRByGroupTableSection = (
               }
             )?.allHomogeneousGroupIds;
 
-            return [...everyAllHomogeneousGroupIds.map((id) => ({ id })), ...hierarchyEvery.homogeneousGroups].find((h) => h.id === homoGroup.id);
+            return [...everyAllHomogeneousGroupIds.map((id) => ({ id })), ...hierarchyEvery.homogeneousGroups].find(
+              (h) => h.id === homoGroup.id,
+            );
           });
 
           const mapDataHomo = hierarchyDataHomoGroup.get(homo.id);
@@ -185,5 +190,5 @@ export const getHomoGroupName = (homo: HomoGroupEntity, hierarchyTree?: IHierarc
     desc,
     descRh,
     typeOrigin,
-  }
+  };
 };

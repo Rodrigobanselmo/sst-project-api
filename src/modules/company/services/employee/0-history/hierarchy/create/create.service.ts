@@ -2,7 +2,10 @@ import { CheckEmployeeExamService } from './../../../../../../sst/services/exam/
 import { EmployeePPPHistoryRepository } from './../../../../../repositories/implementations/EmployeePPPHistoryRepository';
 import { EmployeeEntity } from './../../../../../entities/employee.entity';
 import { sortData } from './../../../../../../../shared/utils/sorts/data.sort';
-import { EmployeeHierarchyHistoryEntity, historyRules } from './../../../../../entities/employee-hierarchy-history.entity';
+import {
+  EmployeeHierarchyHistoryEntity,
+  historyRules,
+} from './../../../../../entities/employee-hierarchy-history.entity';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { EmployeeHierarchyMotiveTypeEnum } from '@prisma/client';
 import { ErrorMessageEnum } from './../../../../../../../shared/constants/enum/errorMessage';
@@ -24,7 +27,9 @@ export class CreateEmployeeHierarchyHistoryService {
 
   async execute(dataDto: CreateEmployeeHierarchyHistoryDto, user: UserPayloadDto, employee?: EmployeeEntity) {
     if (!employee) {
-      employee = await this.employeeRepository.findById(dataDto.employeeId, user.targetCompanyId, { select: { id: true, cpf: true } });
+      employee = await this.employeeRepository.findById(dataDto.employeeId, user.targetCompanyId, {
+        select: { id: true, cpf: true },
+      });
 
       if (!employee?.id) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_NOT_FOUND);
     }
@@ -102,17 +107,26 @@ export class CreateEmployeeHierarchyHistoryService {
         });
       }
 
-      const afterHistory = afterHistories.sort((a, b) => sortData(a.created_at, b.created_at)).sort((a, b) => sortData(a.startDate, b.startDate))[0];
+      const afterHistory = afterHistories
+        .sort((a, b) => sortData(a.created_at, b.created_at))
+        .sort((a, b) => sortData(a.startDate, b.startDate))[0];
 
       afterMotive = afterHistory?.motive || null;
 
       const isAfterOk = historyRules[dataDto.motive].after.includes(afterMotive);
       const isSameOffice = afterHistory?.hierarchyId == dataDto.hierarchyId;
-      const isSameOfficeAndSub = isSameOffice && afterHistory?.subHierarchies?.every(({ id }) => dataDto.subOfficeId == id);
+      const isSameOfficeAndSub =
+        isSameOffice && afterHistory?.subHierarchies?.every(({ id }) => dataDto.subOfficeId == id);
 
-      if (!isAfterOk) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_BLOCK_HISTORY + (foundEmployee?.cpf ? ` CPF: ${formatCPF(foundEmployee.cpf)}` : ''));
+      if (!isAfterOk)
+        throw new BadRequestException(
+          ErrorMessageEnum.EMPLOYEE_BLOCK_HISTORY + (foundEmployee?.cpf ? ` CPF: ${formatCPF(foundEmployee.cpf)}` : ''),
+        );
       if (isSameOfficeAndSub)
-        throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_BLOCK_HISTORY_SAME_OFFICE + (foundEmployee?.cpf ? ` CPF: ${formatCPF(foundEmployee.cpf)}` : ''));
+        throw new BadRequestException(
+          ErrorMessageEnum.EMPLOYEE_BLOCK_HISTORY_SAME_OFFICE +
+            (foundEmployee?.cpf ? ` CPF: ${formatCPF(foundEmployee.cpf)}` : ''),
+        );
     }
 
     // CHECK BEFORE
@@ -145,19 +159,32 @@ export class CreateEmployeeHierarchyHistoryService {
         });
       }
 
-      beforeHistory = beforeHistories.sort((a, b) => sortData(b.created_at, a.created_at)).sort((a, b) => sortData(b.startDate, a.startDate))[0];
+      beforeHistory = beforeHistories
+        .sort((a, b) => sortData(b.created_at, a.created_at))
+        .sort((a, b) => sortData(b.startDate, a.startDate))[0];
 
       beforeMotive = beforeHistory?.motive || null;
-      if (beforeMotive && beforeMotive != EmployeeHierarchyMotiveTypeEnum.DEM && dataDto.motive == EmployeeHierarchyMotiveTypeEnum.ADM)
+      if (
+        beforeMotive &&
+        beforeMotive != EmployeeHierarchyMotiveTypeEnum.DEM &&
+        dataDto.motive == EmployeeHierarchyMotiveTypeEnum.ADM
+      )
         dataDto.motive = EmployeeHierarchyMotiveTypeEnum.TRANS_PROM;
 
       const isBeforeOk = historyRules[dataDto.motive].before.includes(beforeMotive);
       const isSameOffice = beforeHistory?.hierarchyId == dataDto.hierarchyId;
-      const isSameOfficeAndSub = isSameOffice && beforeHistory?.subHierarchies?.every(({ id }) => dataDto.subOfficeId == id);
+      const isSameOfficeAndSub =
+        isSameOffice && beforeHistory?.subHierarchies?.every(({ id }) => dataDto.subOfficeId == id);
 
-      if (!isBeforeOk) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_BLOCK_HISTORY + (foundEmployee?.cpf ? ` CPF: ${formatCPF(foundEmployee.cpf)}` : ''));
+      if (!isBeforeOk)
+        throw new BadRequestException(
+          ErrorMessageEnum.EMPLOYEE_BLOCK_HISTORY + (foundEmployee?.cpf ? ` CPF: ${formatCPF(foundEmployee.cpf)}` : ''),
+        );
       if (isSameOfficeAndSub)
-        throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_BLOCK_HISTORY_SAME_OFFICE + (foundEmployee?.cpf ? ` CPF: ${formatCPF(foundEmployee.cpf)}` : ''));
+        throw new BadRequestException(
+          ErrorMessageEnum.EMPLOYEE_BLOCK_HISTORY_SAME_OFFICE +
+            (foundEmployee?.cpf ? ` CPF: ${formatCPF(foundEmployee.cpf)}` : ''),
+        );
     }
 
     const getActualEmployeeHierarchy = () => {

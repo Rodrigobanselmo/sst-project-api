@@ -10,12 +10,12 @@ import { QueryArray } from '../../../shared/transformers/query-array';
 export class CreateImageGalleryDto {
   @Transform(StringCapitalizeTransform, { toClassOnly: true })
   @IsString()
-  @MaxLength(500, { message: 'A imagem deve ter uma descrição com até 250 caracteres', })
+  @MaxLength(500, { message: 'A imagem deve ter uma descrição com até 250 caracteres' })
   name: string;
 
   @IsOptional()
-  @IsString({ each: true, })
-  @IsEnum(ImagesTypeEnum, { each: true, message: `Valores aceitos: ${KeysOfEnum(ImagesTypeEnum)}`, })
+  @IsString({ each: true })
+  @IsEnum(ImagesTypeEnum, { each: true, message: `Valores aceitos: ${KeysOfEnum(ImagesTypeEnum)}` })
   types?: ImagesTypeEnum[];
 
   @IsOptional()
@@ -30,20 +30,18 @@ export class UpdateImageGalleryDto {
 
   @IsOptional()
   @IsString()
-  @MaxLength(500, { message: 'A imagem deve ter uma descrição com até 250 caracteres', })
+  @MaxLength(500, { message: 'A imagem deve ter uma descrição com até 250 caracteres' })
   name: string;
 
   @IsOptional()
-  @IsString({ each: true, })
-  @IsEnum(ImagesTypeEnum, { each: true, message: `Valores aceitos: ${KeysOfEnum(ImagesTypeEnum)}`, })
+  @IsString({ each: true })
+  @IsEnum(ImagesTypeEnum, { each: true, message: `Valores aceitos: ${KeysOfEnum(ImagesTypeEnum)}` })
   types?: ImagesTypeEnum[];
 
   @IsOptional()
   @IsString()
   companyId: string;
-
 }
-
 
 export class FindImageGalleryDto extends PaginationQueryDto {
   @IsString()

@@ -7,7 +7,7 @@ import {
   EsocialTable20Lograd,
   EsocialTable6Country,
   StatusEnum,
-  Uf
+  Uf,
 } from '@prisma/client';
 import { ProfessionalEntity } from '../../users/entities/professional.entity';
 import { EmployeeESocialEventEntity } from './../../esocial/entities/employeeEsocialEvent.entity';

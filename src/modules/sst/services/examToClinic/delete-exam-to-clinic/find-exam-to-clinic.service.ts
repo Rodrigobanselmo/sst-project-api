@@ -6,7 +6,10 @@ import { ExamToClinicRepository } from '../../../repositories/implementations/Ex
 
 @Injectable()
 export class DeleteExamToClinicService {
-  constructor(private readonly examToClinicRepository: ExamToClinicRepository, private readonly examRepository: ExamRepository) {}
+  constructor(
+    private readonly examToClinicRepository: ExamToClinicRepository,
+    private readonly examRepository: ExamRepository,
+  ) {}
 
   async execute(id: number, user: UserPayloadDto) {
     const examToClinic = await this.examToClinicRepository.findFirstNude({
@@ -47,7 +50,8 @@ export class DeleteExamToClinicService {
       },
     });
 
-    if (exam?.id) throw new BadRequestException('Você não pode excluir um exame que já foi realizado por um funcionário');
+    if (exam?.id)
+      throw new BadRequestException('Você não pode excluir um exame que já foi realizado por um funcionário');
 
     const deletedExamClinic = await this.examToClinicRepository.delete(id);
 

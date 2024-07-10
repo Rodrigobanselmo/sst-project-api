@@ -11,7 +11,10 @@ import { normalizeString } from '../../../../shared/utils/normalizeString';
 
 @Injectable()
 export class ScheduleBlockRepository {
-  constructor(private prisma: PrismaService, private dayjsProvider: DayJSProvider) {}
+  constructor(
+    private prisma: PrismaService,
+    private dayjsProvider: DayJSProvider,
+  ) {}
 
   async create({ companyId, name, startDate, endDate, companiesIds, yearRecurrence, ...data }: CreateScheduleBlockDto) {
     const scheduleBlock = await this.prisma.scheduleBlock.create({
@@ -33,7 +36,16 @@ export class ScheduleBlockRepository {
     return new ScheduleBlockEntity(scheduleBlock);
   }
 
-  async update({ id, name, yearRecurrence, startDate, endDate, companiesIds, companyId, ...data }: UpdateScheduleBlockDto) {
+  async update({
+    id,
+    name,
+    yearRecurrence,
+    startDate,
+    endDate,
+    companiesIds,
+    companyId,
+    ...data
+  }: UpdateScheduleBlockDto) {
     const scheduleBlock = await this.prisma.scheduleBlock.update({
       data: {
         ...data,
@@ -54,7 +66,11 @@ export class ScheduleBlockRepository {
     return new ScheduleBlockEntity(scheduleBlock);
   }
 
-  async find(query: Partial<FindScheduleBlockDto>, pagination: PaginationQueryDto, options: Prisma.ScheduleBlockFindManyArgs = {}) {
+  async find(
+    query: Partial<FindScheduleBlockDto>,
+    pagination: PaginationQueryDto,
+    options: Prisma.ScheduleBlockFindManyArgs = {},
+  ) {
     const whereInit = {
       AND: [],
     } as typeof options.where;
@@ -146,11 +162,17 @@ export class ScheduleBlockRepository {
     return count;
   }
 
-  async findById({ companyId, id }: { companyId: string; id: number }, options: Prisma.ScheduleBlockFindFirstArgs = {}) {
+  async findById(
+    { companyId, id }: { companyId: string; id: number },
+    options: Prisma.ScheduleBlockFindFirstArgs = {},
+  ) {
     const scheduleBlock = await this.prisma.scheduleBlock.findFirst({
       where: { id, companyId },
       include: {
-        applyOnCompanies: { where: { status: 'ACTIVE' }, select: { cnpj: true, fantasy: true, name: true, initials: true, id: true } },
+        applyOnCompanies: {
+          where: { status: 'ACTIVE' },
+          select: { cnpj: true, fantasy: true, name: true, initials: true, id: true },
+        },
       },
       ...options,
     });

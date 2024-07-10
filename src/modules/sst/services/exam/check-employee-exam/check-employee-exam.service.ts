@@ -23,7 +23,7 @@ export class CheckEmployeeExamService {
     private readonly companyRepository: CompanyRepository,
     private readonly reloadEmployeeExamTimeService: ReloadEmployeeExamTimeService,
     private readonly dayjs: DayJSProvider,
-  ) { }
+  ) {}
 
   async execute(body: CheckEmployeeExamDto) {
     const homogeneousGroupId = body.homogeneousGroupId;
@@ -49,14 +49,30 @@ export class CheckEmployeeExamService {
         ],
         ...(hierarchyId && { hierarchyId }),
         ...(employeeId && { id: employeeId }),
-        ...(homogeneousGroupId && { hierarchy: { hierarchyOnHomogeneous: { some: { homogeneousGroupId: homogeneousGroupId } } } }),
-        ...(homogeneousGroupIds && { hierarchy: { hierarchyOnHomogeneous: { some: { homogeneousGroupId: { in: homogeneousGroupIds } } } } }),
+        ...(homogeneousGroupId && {
+          hierarchy: { hierarchyOnHomogeneous: { some: { homogeneousGroupId: homogeneousGroupId } } },
+        }),
+        ...(homogeneousGroupIds && {
+          hierarchy: { hierarchyOnHomogeneous: { some: { homogeneousGroupId: { in: homogeneousGroupIds } } } },
+        }),
         ...(companyId && { companyId }),
         ...(companyId &&
-          riskId && { companyId, hierarchy: { hierarchyOnHomogeneous: { some: { homogeneousGroup: { riskFactorData: { some: { riskId: riskId } } } } } } }),
+          riskId && {
+            companyId,
+            hierarchy: {
+              hierarchyOnHomogeneous: { some: { homogeneousGroup: { riskFactorData: { some: { riskId: riskId } } } } },
+            },
+          }),
         ...(companyId &&
           !skipRiskIds &&
-          riskIds && { companyId, hierarchy: { hierarchyOnHomogeneous: { some: { homogeneousGroup: { riskFactorData: { some: { riskId: { in: riskIds } } } } } } } }),
+          riskIds && {
+            companyId,
+            hierarchy: {
+              hierarchyOnHomogeneous: {
+                some: { homogeneousGroup: { riskFactorData: { some: { riskId: { in: riskIds } } } } },
+              },
+            },
+          }),
       },
       select: {
         id: true,
@@ -138,7 +154,11 @@ export class CheckEmployeeExamService {
 
     const exams = await this.findExamByHierarchyService.execute(
       { targetCompanyId: companyIdFound },
-      { ...(onlyOne ? { employeeId: allEmployee[0].id, hierarchyId: allEmployee[0].hierarchyId } : { getAllExamToRiskWithoutHierarchy: true }) },
+      {
+        ...(onlyOne
+          ? { employeeId: allEmployee[0].id, hierarchyId: allEmployee[0].hierarchyId }
+          : { getAllExamToRiskWithoutHierarchy: true }),
+      },
       { ...(onlyOne && { employee: allEmployee[0] }) },
     );
 
@@ -155,7 +175,8 @@ export class CheckEmployeeExamService {
       }
 
       const isBothNull = expiredDate == null && employee.expiredDateExam == null;
-      const isSameDate = expiredDate && employee.expiredDateExam && expiredDate.getTime() == employee.expiredDateExam.getTime();
+      const isSameDate =
+        expiredDate && employee.expiredDateExam && expiredDate.getTime() == employee.expiredDateExam.getTime();
       const isEqual = isSameDate || isBothNull;
 
       if (!isEqual) {
@@ -182,7 +203,9 @@ export class CheckEmployeeExamService {
         expiredDateExam = this.dayjs.dayjs(dismissalDate).toDate();
       } else {
         const { isExpiredExam } = this.checkExpiredExam(employee, examData, { isDismissal: true });
-        const lastDoneClinicExam = employee.examsHistory?.find((examHist) => examHist.status == 'DONE' && examHist.exam.isAttendance);
+        const lastDoneClinicExam = employee.examsHistory?.find(
+          (examHist) => examHist.status == 'DONE' && examHist.exam.isAttendance,
+        );
 
         if (!isExpiredExam && lastDoneClinicExam?.doneDate) {
           const company = await this.companyRepository.findFirstNude({
@@ -223,11 +246,17 @@ export class CheckEmployeeExamService {
     return { isDismissal: false, dismissalStart: undefined };
   }
 
-  checkExpiredExam(employee: EmployeeEntity, examsData: IExamOrigins[], options?: { onlyOne?: boolean; isDismissal?: boolean }) {
+  checkExpiredExam(
+    employee: EmployeeEntity,
+    examsData: IExamOrigins[],
+    options?: { onlyOne?: boolean; isDismissal?: boolean },
+  ) {
     let expiredComplementaryDate: Date;
     let expiredClinicDate: Date;
     let isExpiredExam = false;
-    let employeeExamType: ExamHistoryTypeEnum = options?.isDismissal ? ExamHistoryTypeEnum.DEMI : ExamHistoryTypeEnum.PERI;
+    let employeeExamType: ExamHistoryTypeEnum = options?.isDismissal
+      ? ExamHistoryTypeEnum.DEMI
+      : ExamHistoryTypeEnum.PERI;
 
     let hasComplementary = false;
 
@@ -291,8 +320,13 @@ export class CheckEmployeeExamService {
 
           const isExpiredNull = expiredOrigin === null;
           const replaceExpiredDateComp =
-            isExpiredNull || expiredComplementaryDate === undefined || (expiredComplementaryDate && expiredComplementaryDate > expiredOrigin);
-          const replaceExpiredDateClinic = isExpiredNull || expiredClinicDate === undefined || (expiredClinicDate && expiredClinicDate > expiredOrigin);
+            isExpiredNull ||
+            expiredComplementaryDate === undefined ||
+            (expiredComplementaryDate && expiredComplementaryDate > expiredOrigin);
+          const replaceExpiredDateClinic =
+            isExpiredNull ||
+            expiredClinicDate === undefined ||
+            (expiredClinicDate && expiredClinicDate > expiredOrigin);
 
           if (!isClinic && replaceExpiredDateComp) expiredComplementaryDate = expiredOrigin;
           if (isClinic && replaceExpiredDateClinic) expiredClinicDate = expiredOrigin;
@@ -313,7 +347,8 @@ export class CheckEmployeeExamService {
       const isComplementaryBeforeClinic = expiredComplementaryDate < expiredClinicDate;
 
       if (isComplementaryBeforeClinic) {
-        const isComplementaryCloseToClinic = Math.abs(this.dayjs.compareTime(expiredClinicDate, expiredComplementaryDate, 'days')) <= 75;
+        const isComplementaryCloseToClinic =
+          Math.abs(this.dayjs.compareTime(expiredClinicDate, expiredComplementaryDate, 'days')) <= 75;
 
         if (isComplementaryCloseToClinic) {
           expiredDate = expiredClinicDate;
@@ -341,10 +376,14 @@ export class CheckEmployeeExamService {
 
     const isBeforeHierarchyDem = beforeHierarchyHistory?.motive == 'DEM';
 
-    const lastDoneClinicExam = employee.examsHistory.find((examHist) => examHist.status == 'DONE' && examHist.exam.isAttendance);
+    const lastDoneClinicExam = employee.examsHistory.find(
+      (examHist) => examHist.status == 'DONE' && examHist.exam.isAttendance,
+    );
 
-    const isLastExamBeforeActualHierarchyStartDate = lastDoneClinicExam?.doneDate && lastDoneClinicExam.doneDate < actualHierarchyHistory?.startDate;
-    const isLastExamNotActualHierarchy = lastDoneClinicExam?.hierarchyId && lastDoneClinicExam.hierarchyId != actualHierarchyHistory?.hierarchyId;
+    const isLastExamBeforeActualHierarchyStartDate =
+      lastDoneClinicExam?.doneDate && lastDoneClinicExam.doneDate < actualHierarchyHistory?.startDate;
+    const isLastExamNotActualHierarchy =
+      lastDoneClinicExam?.hierarchyId && lastDoneClinicExam.hierarchyId != actualHierarchyHistory?.hierarchyId;
 
     if (isLastExamBeforeActualHierarchyStartDate && (isLastExamNotActualHierarchy || !lastDoneClinicExam.hierarchyId)) {
       if (beforeHierarchyHistory && !isBeforeHierarchyDem) {

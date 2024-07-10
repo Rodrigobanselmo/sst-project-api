@@ -20,7 +20,9 @@ export class AlertEntity implements Alert {
   systemGroups?: AccessGroupsEntity[];
   company?: CompanyEntity;
 
-  constructor(partial: Partial<Alert> & { users?: Partial<User>[]; groups?: Partial<AccessGroups>[]; company?: Partial<Company> }) {
+  constructor(
+    partial: Partial<Alert> & { users?: Partial<User>[]; groups?: Partial<AccessGroups>[]; company?: Partial<Company> },
+  ) {
     Object.assign(this, partial);
 
     if (this.company) {

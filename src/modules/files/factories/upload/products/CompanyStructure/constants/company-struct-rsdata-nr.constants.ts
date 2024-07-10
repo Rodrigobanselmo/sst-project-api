@@ -1,6 +1,5 @@
 import { IColumnRuleMap } from '../../../types/IFileFactory.types';
 
-
 export enum CompanyStructRSDataNRHeaderEnum {
   TIPO = 'Tipo ****TIPO',
   UNIDADE = 'Unidade Marítima ****UNIDADE',
@@ -79,11 +78,14 @@ export enum CompanyStructRSDataNRHeaderEnum {
 }
 
 export const CompanyStructRSDataNRColumnMap: IColumnRuleMap<any> = {
-  ...Object.values(CompanyStructRSDataNRHeaderEnum).reduce((acc, key) => ({
-    ...acc,
-    [key]: {
-      field: key,
-      database: key,
-    },
-  }), {}),
+  ...Object.values(CompanyStructRSDataNRHeaderEnum).reduce(
+    (acc, key) => ({
+      ...acc,
+      [key]: {
+        field: key,
+        database: key,
+      },
+    }),
+    {},
+  ),
 };

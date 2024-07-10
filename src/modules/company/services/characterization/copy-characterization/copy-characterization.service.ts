@@ -16,8 +16,14 @@ import { HomoGroupRepository } from '../../../repositories/implementations/HomoG
 
 @Injectable()
 export class CopyCharacterizationService {
-  constructor(private readonly prisma: PrismaService, private readonly homoGroupRepository: HomoGroupRepository) { }
-  async execute({ companyCopyFromId, workspaceId, characterizationIds }: CopyCharacterizationDto, user: UserPayloadDto) {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly homoGroupRepository: HomoGroupRepository,
+  ) {}
+  async execute(
+    { companyCopyFromId, workspaceId, characterizationIds }: CopyCharacterizationDto,
+    user: UserPayloadDto,
+  ) {
     const companyId = user.targetCompanyId;
     const sameCompany = companyId === companyCopyFromId;
     const isMaster = user.isMaster;
@@ -36,10 +42,10 @@ export class CopyCharacterizationService {
         id: companyCopyFromId,
         ...(!isMaster &&
           !sameCompany && {
-          receivingServiceContracts: {
-            some: { applyingServiceCompanyId: user.companyId },
-          },
-        }),
+            receivingServiceContracts: {
+              some: { applyingServiceCompanyId: user.companyId },
+            },
+          }),
       },
     });
 
@@ -94,7 +100,8 @@ export class CopyCharacterizationService {
           if (!profileParentId && group?.characterization?.profileParentId) return; //log('skip profile');
           if (profileParentId && !group?.characterization?.profileParentId) return; //log('skip not profile');
 
-          if (group.characterization && isEnvironment(group.characterization.type)) group.environment = group.characterization;
+          if (group.characterization && isEnvironment(group.characterization.type))
+            group.environment = group.characterization;
 
           let newHomoGroup: HomogeneousGroup;
           const newHomoGroupId = v4();
@@ -107,7 +114,9 @@ export class CopyCharacterizationService {
                 name: _newHomoGroupId,
                 companyId: companyId,
                 type: group.type,
-                ...(workspaceId && { workspaces: { connect: [workspaceId].map((id) => ({ id_companyId: { id, companyId } })) } }),
+                ...(workspaceId && {
+                  workspaces: { connect: [workspaceId].map((id) => ({ id_companyId: { id, companyId } })) },
+                }),
               },
             });
           };
@@ -129,26 +138,26 @@ export class CopyCharacterizationService {
                     generateSources:
                       riskFactorFromData.generateSources && riskFactorFromData.generateSources.length
                         ? {
-                          connect: riskFactorFromData.generateSources.map(({ id }) => ({
-                            id,
-                          })),
-                        }
+                            connect: riskFactorFromData.generateSources.map(({ id }) => ({
+                              id,
+                            })),
+                          }
                         : undefined,
                     recs:
                       riskFactorFromData.recs && riskFactorFromData.recs.length
                         ? {
-                          connect: riskFactorFromData.recs.map(({ id }) => ({
-                            id,
-                          })),
-                        }
+                            connect: riskFactorFromData.recs.map(({ id }) => ({
+                              id,
+                            })),
+                          }
                         : undefined,
                     adms:
                       riskFactorFromData.adms && riskFactorFromData.adms.length
                         ? {
-                          connect: riskFactorFromData.adms.map(({ id }) => ({
-                            id,
-                          })),
-                        }
+                            connect: riskFactorFromData.adms.map(({ id }) => ({
+                              id,
+                            })),
+                          }
                         : undefined,
                   },
                 });
@@ -230,60 +239,65 @@ export class CopyCharacterizationService {
   async getCommonHierarchy(targetHierarchies: HierarchyEntity[], fromHierarchies: HierarchyEntity[]) {
     const equalHierarchy: Record<string, HierarchyEntity[]> = {};
     const equalWorkspace: Record<string, WorkspaceEntity> = {};
-    [HierarchyEnum.DIRECTORY, HierarchyEnum.MANAGEMENT, HierarchyEnum.SECTOR, HierarchyEnum.SUB_SECTOR, HierarchyEnum.OFFICE, HierarchyEnum.SUB_OFFICE].forEach(
-      (hierarchyType) => {
-        targetHierarchies.forEach((targetHierarchy) => {
-          if (targetHierarchy.type !== hierarchyType) return;
+    [
+      HierarchyEnum.DIRECTORY,
+      HierarchyEnum.MANAGEMENT,
+      HierarchyEnum.SECTOR,
+      HierarchyEnum.SUB_SECTOR,
+      HierarchyEnum.OFFICE,
+      HierarchyEnum.SUB_OFFICE,
+    ].forEach((hierarchyType) => {
+      targetHierarchies.forEach((targetHierarchy) => {
+        if (targetHierarchy.type !== hierarchyType) return;
 
-          fromHierarchies.find((hierarchyFrom) => {
-            const same = hierarchyFrom.id === targetHierarchy.refName;
-            if (same) {
-              equalWorkspace[hierarchyFrom.workspaces[0].id] = targetHierarchy.workspaces[0];
+        fromHierarchies.find((hierarchyFrom) => {
+          const same = hierarchyFrom.id === targetHierarchy.refName;
+          if (same) {
+            equalWorkspace[hierarchyFrom.workspaces[0].id] = targetHierarchy.workspaces[0];
 
-              const old = equalHierarchy[hierarchyFrom.id + '//' + hierarchyFrom.workspaces[0].id] || [];
+            const old = equalHierarchy[hierarchyFrom.id + '//' + hierarchyFrom.workspaces[0].id] || [];
 
-              equalHierarchy[hierarchyFrom.id + '//' + hierarchyFrom.workspaces[0].id] = [targetHierarchy, ...old];
-            }
-          });
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          // targetHierarchy.workspaces.forEach((workspace) => {
-          // fromHierarchies.find((hierarchyFrom) => {
-          // if (hierarchyFrom.type !== hierarchyType) return;
-
-          //* check if same hierarchy
-          // const sameWorkspaceFrom = hierarchyFrom.workspaces.find(
-          //   (workspaceFrom) => {
-          //     const isTheSame =
-          //       workspaceFrom.name.toLowerCase() ===
-          //       workspace.name.toLowerCase();
-          //     if (isTheSame) equalWorkspace[workspaceFrom.id] = workspace;
-
-          //     return isTheSame;
-          //   },
-          // );
-
-          // const sameName =
-          //   hierarchyFrom.name.toLowerCase() ===
-          //   targetHierarchy.name.toLowerCase();
-
-          // const sameParent = targetHierarchy.parentId
-          //   ? equalHierarchy[
-          //       hierarchyFrom.parentId + '//' + sameWorkspaceFrom.id
-          //     ] &&
-          //     equalHierarchy[
-          //       hierarchyFrom.parentId + '//' + sameWorkspaceFrom.id
-          //     ].id === targetHierarchy.parentId
-          //   : true;
-
-          // if (sameWorkspaceFrom && sameName && sameParent) {
-          //   equalHierarchy[hierarchyFrom.id + '//' + sameWorkspaceFrom.id] =
-          //     targetHierarchy;
-          // }
-          // });
-          // });
+            equalHierarchy[hierarchyFrom.id + '//' + hierarchyFrom.workspaces[0].id] = [targetHierarchy, ...old];
+          }
         });
-      },
-    );
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        // targetHierarchy.workspaces.forEach((workspace) => {
+        // fromHierarchies.find((hierarchyFrom) => {
+        // if (hierarchyFrom.type !== hierarchyType) return;
+
+        //* check if same hierarchy
+        // const sameWorkspaceFrom = hierarchyFrom.workspaces.find(
+        //   (workspaceFrom) => {
+        //     const isTheSame =
+        //       workspaceFrom.name.toLowerCase() ===
+        //       workspace.name.toLowerCase();
+        //     if (isTheSame) equalWorkspace[workspaceFrom.id] = workspace;
+
+        //     return isTheSame;
+        //   },
+        // );
+
+        // const sameName =
+        //   hierarchyFrom.name.toLowerCase() ===
+        //   targetHierarchy.name.toLowerCase();
+
+        // const sameParent = targetHierarchy.parentId
+        //   ? equalHierarchy[
+        //       hierarchyFrom.parentId + '//' + sameWorkspaceFrom.id
+        //     ] &&
+        //     equalHierarchy[
+        //       hierarchyFrom.parentId + '//' + sameWorkspaceFrom.id
+        //     ].id === targetHierarchy.parentId
+        //   : true;
+
+        // if (sameWorkspaceFrom && sameName && sameParent) {
+        //   equalHierarchy[hierarchyFrom.id + '//' + sameWorkspaceFrom.id] =
+        //     targetHierarchy;
+        // }
+        // });
+        // });
+      });
+    });
 
     return { equalHierarchy, equalWorkspace };
   }

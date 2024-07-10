@@ -9,7 +9,10 @@ import { NodeMailProvider } from './../../../../../shared/providers/MailProvider
 
 @Injectable()
 export class UpdateProfessionalService {
-  constructor(private readonly mailProvider: NodeMailProvider, private readonly professionalRepository: ProfessionalRepository) { }
+  constructor(
+    private readonly mailProvider: NodeMailProvider,
+    private readonly professionalRepository: ProfessionalRepository,
+  ) {}
 
   async execute({ ...updateDataDto }: UpdateProfessionalDto, user: UserPayloadDto) {
     await this.checkIfCanUpdateProfessional(updateDataDto.id, user);

@@ -38,7 +38,11 @@ export class FilesCompanyController {
   })
   @Post('/upload/unique')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadCompanyFile(@UploadedFile() file: Express.Multer.File, @User() userPayloadDto: UserPayloadDto, @Res() res) {
+  async uploadCompanyFile(
+    @UploadedFile() file: Express.Multer.File,
+    @User() userPayloadDto: UserPayloadDto,
+    @Res() res,
+  ) {
     const { workbook, filename } = await this.uploadUniqueCompanyService.execute(file, userPayloadDto);
 
     res.attachment(filename);
@@ -54,7 +58,11 @@ export class FilesCompanyController {
   })
   @Post('employees/upload/:companyId?')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadEmployeesFile(@UploadedFile() file: Express.Multer.File, @User() userPayloadDto: UserPayloadDto, @Res() res) {
+  async uploadEmployeesFile(
+    @UploadedFile() file: Express.Multer.File,
+    @User() userPayloadDto: UserPayloadDto,
+    @Res() res,
+  ) {
     const { workbook, filename } = await this.uploadEmployeesService.execute(file, userPayloadDto);
 
     res.attachment(filename);
@@ -168,7 +176,11 @@ export class FilesCompanyController {
   })
   @Post('company-structure/upload/:companyId')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadCompanyStruct(@UploadedFile() file: Express.Multer.File, @User() userPayloadDto: UserPayloadDto, @Body() body: UploadCompanyStructureReportDto) {
+  async uploadCompanyStruct(
+    @UploadedFile() file: Express.Multer.File,
+    @User() userPayloadDto: UserPayloadDto,
+    @Body() body: UploadCompanyStructureReportDto,
+  ) {
     return await this.uploadCompanyStructureService.execute(file, userPayloadDto, body);
   }
 }

@@ -47,7 +47,7 @@ describe('AuthController', () => {
   });
 
   it('should authenticate user session', async () => {
-    expect(await controller.session({} as any)).toEqual({});
+    expect(await controller.session({} as any, {} as any, {} as any)).toEqual({});
   });
 
   it('should refresh user token', async () => {

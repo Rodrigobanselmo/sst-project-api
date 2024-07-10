@@ -35,7 +35,11 @@ export class UpsertRiskDocInfoService {
           data: { sendEvent: true },
           where: {
             employee: {
-              hierarchy: { hierarchyOnHomogeneous: { some: { homogeneousGroup: { riskFactorData: { some: { riskId: upsertRiskDataDto.riskId } } } } } },
+              hierarchy: {
+                hierarchyOnHomogeneous: {
+                  some: { homogeneousGroup: { riskFactorData: { some: { riskId: upsertRiskDataDto.riskId } } } },
+                },
+              },
             },
           },
         });
@@ -64,7 +68,11 @@ export class UpsertRiskDocInfoService {
         where: {
           employee: {
             companyId: user.targetCompanyId,
-            hierarchy: { hierarchyOnHomogeneous: { some: { homogeneousGroup: { riskFactorData: { some: { riskId: upsertRiskDataDto.riskId } } } } } },
+            hierarchy: {
+              hierarchyOnHomogeneous: {
+                some: { homogeneousGroup: { riskFactorData: { some: { riskId: upsertRiskDataDto.riskId } } } },
+              },
+            },
           },
         },
       });

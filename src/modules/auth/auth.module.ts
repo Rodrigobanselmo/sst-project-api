@@ -1,4 +1,4 @@
-import { CacheModule, forwardRef, Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 
@@ -21,6 +21,7 @@ import { FindAvailableAccessGroupsService } from './services/group/find-availabl
 import { UpsertAccessGroupsService } from './services/group/upsert-access-group/upsert-access-group.service';
 import { AuthGroupController } from './controller/group/group.controller';
 import { NodeMailProvider } from '../../shared/providers/MailProvider/implementations/NodeMail/NodeMailProvider';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
@@ -54,4 +55,4 @@ import { NodeMailProvider } from '../../shared/providers/MailProvider/implementa
   ],
   exports: [SessionService, AuthGroupRepository],
 })
-export class AuthModule { }
+export class AuthModule {}

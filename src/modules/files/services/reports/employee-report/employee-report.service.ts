@@ -6,7 +6,7 @@ import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 
 @Injectable()
 export class EmployeeReportService {
-  constructor(private readonly reportEmployeeFactory: ReportEmployeeModelFactory) { }
+  constructor(private readonly reportEmployeeFactory: ReportEmployeeModelFactory) {}
 
   async execute(body: DownloadEmployeeReportDto, userPayloadDto: UserPayloadDto) {
     const downloadType = body.downloadType;

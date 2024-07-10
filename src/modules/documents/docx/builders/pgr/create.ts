@@ -21,7 +21,6 @@ import { IAllDocumentSectionType, IDocumentPGRSectionGroups, IDocVariables } fro
 import { HierarchyMapData, IHierarchyMap, IHomoGroupMap, IRiskMap } from '../../converter/hierarchy.converter';
 import { booleanVariables } from './functions/getVariables/boolean.variables';
 
-
 export class DocumentBuildPGR {
   private version: string;
   private logoImagePath: string;
@@ -43,7 +42,7 @@ export class DocumentBuildPGR {
   private hierarchyHighLevelsData: Map<string, HierarchyMapData>;
   private exams?: IExamOrigins[];
   private riskExamMap?: IRiskExamMap;
-  private risksMap?: IRiskMap
+  private risksMap?: IRiskMap;
 
   constructor({
     version,
@@ -64,7 +63,7 @@ export class DocumentBuildPGR {
     imagesMap,
     hierarchyHighLevelsData,
     exams,
-    risksMap
+    risksMap,
   }: ICreatePGR) {
     this.version = version;
     this.logoImagePath = logo;

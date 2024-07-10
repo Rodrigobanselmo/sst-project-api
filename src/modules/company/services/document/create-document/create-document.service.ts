@@ -10,7 +10,10 @@ import dayjs from 'dayjs';
 
 @Injectable()
 export class CreateDocumentService {
-  constructor(private readonly documentRepository: DocumentRepository, private readonly amazonStorageProvider: AmazonStorageProvider) {}
+  constructor(
+    private readonly documentRepository: DocumentRepository,
+    private readonly amazonStorageProvider: AmazonStorageProvider,
+  ) {}
 
   async execute({ parentDocumentId, ...dto }: CreateDocumentDto, user: UserPayloadDto, file: Express.Multer.File) {
     const companyId = user.targetCompanyId;

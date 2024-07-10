@@ -1,6 +1,5 @@
 import { AppendixEnum, OtherAppendixEnum } from './../../../shared/constants/enum/appendix';
 import { QuantityTypeEnum } from './../../company/interfaces/risk-data-json.types';
-import { ApiProperty } from '@nestjs/swagger';
 
 import { Prisma, RiskFactors, RiskFactorsEnum } from '.prisma/client';
 import { GrauInsalubridade, StatusEnum } from '@prisma/client';
@@ -17,67 +16,25 @@ export type RiskFactorActivitie = {
   description: string;
   subActivities: {
     description: string;
-  }[]
-}
+  }[];
+};
 
 export class RiskFactorsEntity implements RiskFactors {
-  @ApiProperty({ description: 'The id of the Company' })
   id: string;
-
-  @ApiProperty({ description: 'The name of the risk' })
   name: string;
-
   search: string;
-
-
-  @ApiProperty({ description: 'The severity of the rik' })
   severity: number;
-
-  @ApiProperty({
-    description: 'The current type of the risk',
-    examples: ['BIO', 'QUI', 'FIS'],
-  })
   type: RiskFactorsEnum;
-
-  @ApiProperty({ description: 'The company id related to the risk' })
   companyId: string;
-
-  @ApiProperty({
-    description: 'If risk was created from one of simple professionals',
-  })
   system: boolean;
-
-  @ApiProperty({
-    description: 'If represent all risks',
-  })
   representAll: boolean;
-
-  @ApiProperty({
-    description: 'The current status of the risk',
-    examples: ['ACTIVE', 'PENDING', 'CANCELED'],
-  })
   status: StatusEnum;
-
-  @ApiProperty({ description: 'The creation date of the risk' })
   created_at: Date;
-
   updated_at: Date;
-
-  @ApiProperty({ description: 'The appendix date of the risk' })
   appendix: string;
-
-  @ApiProperty({ description: 'The propagation array of the risk' })
   propagation: string[];
-
-  @ApiProperty({
-    description: 'The array with recommendations and measure controls data',
-  })
   recMed?: RecMedEntity[];
-
-  @ApiProperty({ description: 'The array with generate source data' })
   generateSource?: GenerateSourceEntity[];
-
-  @ApiProperty({ description: 'The deleted date of data' })
   deleted_at: Date | null;
 
   task: string | null;
@@ -112,7 +69,6 @@ export class RiskFactorsEntity implements RiskFactors {
   riskFactorData: RiskFactorDataEntity[];
   docInfo?: RiskDocInfoEntity[];
   protocolToRisk?: ProtocolToRiskEntity[];
-
 
   isAso: boolean;
   isPGR: boolean;
@@ -152,40 +108,40 @@ export class RiskFactorsEntity implements RiskFactors {
     const apendixNumber = Number(this.appendix);
     // 6 = Anexo 6 Pressão Hiperbarica !!!!(ATIVIDADES)
     // 7 = Anexo 7 RAD Não Ionizantes
-    // 9 = Anexo 9 FRIO 
+    // 9 = Anexo 9 FRIO
     // 10 = Anexo 10 Umidade
     // 11 = Anexo 11 QUIMICO NR 15
-    // 12 = Anexo 12 POEIRAS  
+    // 12 = Anexo 12 POEIRAS
     // 13 = Anexo 13 QUIMICO !!!!(ATIVIDADES)
-    if (apendixNumber && !Number.isNaN(apendixNumber)) return apendixNumber
+    if (apendixNumber && !Number.isNaN(apendixNumber)) return apendixNumber;
 
     // A = Riscos de Acidentes
-    if (this.type === 'ACI') return AppendixEnum.ACI
+    if (this.type === 'ACI') return AppendixEnum.ACI;
     // E = Riscos Ergonomicos
-    if (this.type === 'ERG') return AppendixEnum.ERG
+    if (this.type === 'ERG') return AppendixEnum.ERG;
     // N = Riscos não relacionados
-    if (this.type === 'OUTROS') return AppendixEnum.OUTROS
+    if (this.type === 'OUTROS') return AppendixEnum.OUTROS;
 
     const type = this.getRiskType();
-    const isNoise = type == QuantityTypeEnum.NOISE
+    const isNoise = type == QuantityTypeEnum.NOISE;
     const isNoisImpact = isNoise && this.name.toLocaleLowerCase().includes('impacto');
 
     // 1 = Anexo 1
-    if (isNoise && !isNoisImpact) return 1
+    if (isNoise && !isNoisImpact) return 1;
 
     // 2 = Anexo 2 Ruido Impacto
-    if (isNoise) return 2
+    if (isNoise) return 2;
 
     // 3 = Anexo 3
-    if (type == QuantityTypeEnum.HEAT) return 3
+    if (type == QuantityTypeEnum.HEAT) return 3;
 
     // 5 = Anexo 5
-    if (type == QuantityTypeEnum.RADIATION) return 5
+    if (type == QuantityTypeEnum.RADIATION) return 5;
 
     // 8 = Anexo 8
-    if (type == QuantityTypeEnum.VL || type == QuantityTypeEnum.VFB) return 8
+    if (type == QuantityTypeEnum.VL || type == QuantityTypeEnum.VFB) return 8;
 
     // 14 = Anexo 14
-    if (this.type === 'BIO') return 14
+    if (this.type === 'BIO') return 14;
   }
 }

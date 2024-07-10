@@ -15,7 +15,10 @@ import { originRiskMap } from './../../../../../../shared/constants/maps/origin-
 import { ActionPlanColumnEnum } from './actionPlan.constant';
 import { bodyTableProps } from './elements/body';
 
-export const actionPlanConverter = (riskGroup: RiskFactorGroupDataEntity & DocumentDataEntity & DocumentDataPGRDto, hierarchyTree: IHierarchyMap) => {
+export const actionPlanConverter = (
+  riskGroup: RiskFactorGroupDataEntity & DocumentDataEntity & DocumentDataPGRDto,
+  hierarchyTree: IHierarchyMap,
+) => {
   const homogeneousGroupsMap = new Map<string, bodyTableProps[][]>();
   const actionPlanData: bodyTableProps[][] = [];
 

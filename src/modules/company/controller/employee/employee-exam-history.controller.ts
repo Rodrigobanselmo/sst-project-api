@@ -1,6 +1,18 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+  Res,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags } from '@nestjs/swagger';
 import { Public } from '../../../../shared/decorators/public.decorator';
 
 import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
@@ -31,7 +43,6 @@ import { UpdateManyScheduleExamHistoryService } from '../../services/employee/0-
 import { UpdateEmployeeExamHistoryService } from '../../services/employee/0-history/exams/update/update.service';
 import { UploadExamFileService } from '../../services/employee/0-history/exams/upload-exam-file/upload-exam-file.service';
 
-@ApiTags('employee-history-exam')
 @Controller('employee-history/exam')
 export class EmployeeExamHistoryController {
   constructor(
@@ -221,7 +232,11 @@ export class EmployeeExamHistoryController {
     crud: true,
   })
   @Patch('/:id/:companyId?')
-  update(@Body() upsertAccessGroupDto: UpdateEmployeeExamHistoryDto, @User() userPayloadDto: UserPayloadDto, @Param('id', ParseIntPipe) id: number) {
+  update(
+    @Body() upsertAccessGroupDto: UpdateEmployeeExamHistoryDto,
+    @User() userPayloadDto: UserPayloadDto,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
     return this.updateEmployeeExamHistoryService.execute({ ...upsertAccessGroupDto, id }, userPayloadDto);
   }
 
@@ -232,7 +247,11 @@ export class EmployeeExamHistoryController {
     crud: true,
   })
   @Delete('/:employeeId/:id/:companyId?')
-  delete(@User() userPayloadDto: UserPayloadDto, @Param('id', ParseIntPipe) id: number, @Param('employeeId', ParseIntPipe) employeeId: number) {
+  delete(
+    @User() userPayloadDto: UserPayloadDto,
+    @Param('id', ParseIntPipe) id: number,
+    @Param('employeeId', ParseIntPipe) employeeId: number,
+  ) {
     return this.deleteEmployeeExamHistoryService.execute(id, employeeId, userPayloadDto);
   }
 
@@ -263,7 +282,11 @@ export class EmployeeExamHistoryController {
   })
   @Post('upload/:companyId')
   @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 100000000 } }))
-  upload(@UploadedFile() file: Express.Multer.File, @Body() createDto: UpdateFileExamDto, @User() userPayloadDto: UserPayloadDto) {
+  upload(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() createDto: UpdateFileExamDto,
+    @User() userPayloadDto: UserPayloadDto,
+  ) {
     createDto.ids = createDto.ids.map((id) => Number(id));
     return this.uploadExamFileService.execute(createDto, userPayloadDto, file);
   }

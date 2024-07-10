@@ -1,12 +1,17 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query, Res } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
 import { Readable } from 'stream';
 
 import { PermissionEnum } from '../../../shared/constants/enum/authorization';
 import { Permissions } from '../../../shared/decorators/permissions.decorator';
 import { User } from '../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../shared/dto/user-payload.dto';
-import { CreateDocumentModelDto, DownloadPreviewModelData, FindDocumentModelDto, IGetDocumentModelData, UpdateDocumentModelDto } from '../dto/document-model.dto';
+import {
+  CreateDocumentModelDto,
+  DownloadPreviewModelData,
+  FindDocumentModelDto,
+  IGetDocumentModelData,
+  UpdateDocumentModelDto,
+} from '../dto/document-model.dto';
 import { CreateDocumentModelService } from '../services/document/document-models/create-document-model.service';
 import { FindDocumentModelService } from '../services/document/document-models/find-document-model.service';
 import { FindOneDocumentModelService } from '../services/document/document-models/find-one-document-model.service';
@@ -16,7 +21,6 @@ import { Response } from 'express';
 import { DocumentTypeEnum } from '@prisma/client';
 import { DownloadPreviewModel } from '../services/document/document-models/download-preview-model.service';
 
-@ApiTags('document-model')
 @Controller('document-model')
 export class DocumentModelController {
   constructor(
@@ -34,7 +38,11 @@ export class DocumentModelController {
     isContract: true,
   })
   @Post('/:companyId/preview')
-  async downloadPreview(@Res() res: Response, @User() userPayloadDto: UserPayloadDto, @Body() body: DownloadPreviewModelData) {
+  async downloadPreview(
+    @Res() res: Response,
+    @User() userPayloadDto: UserPayloadDto,
+    @Body() body: DownloadPreviewModelData,
+  ) {
     const { buffer: file, fileName } = await this.downloadPreviewModel.execute(body, userPayloadDto);
 
     res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
@@ -42,7 +50,12 @@ export class DocumentModelController {
   }
 
   @Get('/:companyId/:id/data')
-  async findDocumentModelData(@Res() response: Response, @User() user: UserPayloadDto, @Param('id', ParseIntPipe) id: number, @Query() query: IGetDocumentModelData) {
+  async findDocumentModelData(
+    @Res() response: Response,
+    @User() user: UserPayloadDto,
+    @Param('id', ParseIntPipe) id: number,
+    @Query() query: IGetDocumentModelData,
+  ) {
     const json = await this.getDocVariablesService.execute(id, { ...query, companyId: user.targetCompanyId });
     const jsonStream = new Readable({
       read() {
@@ -109,7 +122,11 @@ export class DocumentModelController {
     crud: true,
   })
   @Patch('/:companyId/:id')
-  async update(@Body() upsertAccessGroupDto: UpdateDocumentModelDto, @User() userPayloadDto: UserPayloadDto, @Param('id', ParseIntPipe) id: number) {
+  async update(
+    @Body() upsertAccessGroupDto: UpdateDocumentModelDto,
+    @User() userPayloadDto: UserPayloadDto,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
     const data = await this.updateDocumentModelService.execute({ ...upsertAccessGroupDto, id }, userPayloadDto);
     return data;
   }

@@ -7,7 +7,10 @@ import { CheckEmployeeExamService } from '../../exam/check-employee-exam/check-e
 
 @Injectable()
 export class CreateExamRiskService {
-  constructor(private readonly examRiskRepository: ExamRiskRepository, private readonly checkEmployeeExamService: CheckEmployeeExamService) {}
+  constructor(
+    private readonly examRiskRepository: ExamRiskRepository,
+    private readonly checkEmployeeExamService: CheckEmployeeExamService,
+  ) {}
 
   async execute(createExamDto: CreateExamsRiskDto, user: UserPayloadDto) {
     const ExamFactor = await this.examRiskRepository.create({

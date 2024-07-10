@@ -71,14 +71,26 @@ export class UploadCidDataService {
   }
 }
 
-const readCids = async (readFileData: IExcelReadData[], excelProvider: ExcelProvider, cidSheet: ICidSheet, databaseTable: DatabaseTableEntity) => {
+const readCids = async (
+  readFileData: IExcelReadData[],
+  excelProvider: ExcelProvider,
+  cidSheet: ICidSheet,
+  databaseTable: DatabaseTableEntity,
+) => {
   const cidsTable = readFileData.find((data) => data.name === cidSheet.name);
 
-  if (!cidsTable) throw new BadRequestException(ErrorFilesEnum.WRONG_TABLE_SHEET.replace('??FOUND??', readFileData.join(', ')).replace('??EXPECTED??', cidSheet.name));
+  if (!cidsTable)
+    throw new BadRequestException(
+      ErrorFilesEnum.WRONG_TABLE_SHEET.replace('??FOUND??', readFileData.join(', ')).replace(
+        '??EXPECTED??',
+        cidSheet.name,
+      ),
+    );
 
   const cidDatabase = await excelProvider.transformToTableData(cidsTable, cidSheet.columns);
 
-  if (databaseTable?.version && cidDatabase.version !== databaseTable.version) throw new BadRequestException(ErrorFilesEnum.WRONG_TABLE_VERSION);
+  if (databaseTable?.version && cidDatabase.version !== databaseTable.version)
+    throw new BadRequestException(ErrorFilesEnum.WRONG_TABLE_VERSION);
 
   return cidDatabase.rows;
 };

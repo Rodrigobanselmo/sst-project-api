@@ -4,7 +4,6 @@ import { QueryArray } from './../../../shared/transformers/query-array';
 import { StringUppercaseTransform } from './../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from './../../../shared/utils/keysOfEnum.utils';
 
-import { PartialType } from '@nestjs/swagger';
 import { DocumentTypeEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
@@ -68,7 +67,7 @@ export class CreateDocumentDto {
   // oldDocuments?: UpdateDocumentDto[];
 }
 
-export class UpdateDocumentDto extends PartialType(CreateDocumentDto) {
+export class UpdateDocumentDto extends CreateDocumentDto {
   @IsInt()
   @IsOptional()
   id?: number;

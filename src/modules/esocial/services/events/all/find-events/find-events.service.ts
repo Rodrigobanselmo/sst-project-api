@@ -8,7 +8,10 @@ export class FindESocialEventService {
   constructor(private readonly eSocialEventRepository: ESocialEventRepository) {}
 
   async execute({ skip, take, ...query }: FindESocialEventDto, user: UserPayloadDto) {
-    const employees = await this.eSocialEventRepository.find({ ...query, companyId: user.targetCompanyId }, { skip, take });
+    const employees = await this.eSocialEventRepository.find(
+      { ...query, companyId: user.targetCompanyId },
+      { skip, take },
+    );
 
     return employees;
   }

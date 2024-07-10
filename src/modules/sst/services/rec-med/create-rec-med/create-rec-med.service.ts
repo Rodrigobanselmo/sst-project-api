@@ -1,16 +1,24 @@
 import { CacheEnum } from './../../../../../shared/constants/enum/cache';
-import { BadRequestException, CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { CreateRecMedDto } from '../../../dto/rec-med.dto';
 import { RecMedRepository } from '../../../repositories/implementations/RecMedRepository';
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { isMaster } from '../../../../../shared/utils/isMater';
 import { Cache } from 'cache-manager';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()
 export class CreateRecMedService {
-  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache, private readonly recMedRepository: RecMedRepository) { }
+  constructor(
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private readonly recMedRepository: RecMedRepository,
+  ) {}
 
-  async execute(createRecMedDto: CreateRecMedDto, userPayloadDto: UserPayloadDto, options?: { returnIfExist?: boolean; skipIfExist?: boolean }) {
+  async execute(
+    createRecMedDto: CreateRecMedDto,
+    userPayloadDto: UserPayloadDto,
+    options?: { returnIfExist?: boolean; skipIfExist?: boolean },
+  ) {
     const user = isMaster(userPayloadDto, createRecMedDto.companyId);
 
     const system = user.isSystem && user.companyId === createRecMedDto.companyId;

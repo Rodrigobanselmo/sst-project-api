@@ -10,7 +10,10 @@ import { Roles } from '../../../../shared/decorators/roles.decorator';
 
 @Controller('files/cid')
 export class FilesCidController {
-  constructor(private readonly downloadCidService: DownloadCidService, private readonly uploadCidService: UploadCidDataService) {}
+  constructor(
+    private readonly downloadCidService: DownloadCidService,
+    private readonly uploadCidService: UploadCidDataService,
+  ) {}
 
   @Roles(RoleEnum.MASTER)
   @Post('/upload')

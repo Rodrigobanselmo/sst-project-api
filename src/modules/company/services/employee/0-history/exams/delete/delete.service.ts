@@ -7,7 +7,10 @@ import { EmployeeExamsHistoryRepository } from './../../../../../repositories/im
 
 @Injectable()
 export class DeleteEmployeeExamHistoryService {
-  constructor(private readonly amazonStorageProvider: AmazonStorageProvider, private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository) {}
+  constructor(
+    private readonly amazonStorageProvider: AmazonStorageProvider,
+    private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository,
+  ) {}
 
   async execute(id: number, employeeId: number, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;

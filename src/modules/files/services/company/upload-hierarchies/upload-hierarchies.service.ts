@@ -59,7 +59,9 @@ export class UploadHierarchiesService {
     const ghoNameDescriptionMap = {} as Record<string, string>;
 
     hierarchiesExcelData = hierarchiesExcelData.map((hierarchy) => {
-      const workspace = workspaces.filter((work) => hierarchy.abbreviation && hierarchy.abbreviation.includes(work.abbreviation));
+      const workspace = workspaces.filter(
+        (work) => hierarchy.abbreviation && hierarchy.abbreviation.includes(work.abbreviation),
+      );
 
       if (!workspace) throw new BadRequestException(ErrorCompanyEnum.WORKSPACE_NOT_FOUND);
 
@@ -143,14 +145,20 @@ export class UploadHierarchiesService {
   }
 }
 
-const read = async (readFileData: IExcelReadData[], excelProvider: ExcelProvider, sheet: ICompanySheet, databaseTable: DatabaseTableEntity) => {
+const read = async (
+  readFileData: IExcelReadData[],
+  excelProvider: ExcelProvider,
+  sheet: ICompanySheet,
+  databaseTable: DatabaseTableEntity,
+) => {
   const table = readFileData.find((data) => data.name === sheet.name);
 
   if (!table) throw new BadRequestException('The table you trying to insert has a different sheet name');
 
   const database = await excelProvider.transformToTableData(table, sheet.columns);
 
-  if (databaseTable?.version && database.version !== databaseTable.version) throw new BadRequestException(ErrorMessageEnum.FILE_WRONG_TABLE_HEAD);
+  if (databaseTable?.version && database.version !== databaseTable.version)
+    throw new BadRequestException(ErrorMessageEnum.FILE_WRONG_TABLE_HEAD);
 
   return database.rows;
 };

@@ -1,5 +1,4 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
 
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
@@ -10,10 +9,13 @@ import { UpdateScheduleMedicalVisitsService } from '../../services/scheduleMedic
 import { CreateScheduleMedicalVisitsService } from '../../services/scheduleMedicalVisit/create-schedule-medical-visit/create-schedule-medical-visit.service';
 import { FindScheduleMedicalVisitsService } from '../../services/scheduleMedicalVisit/find-schedule-medical-visit/find-schedule-medical-visit.service';
 import { DeleteScheduleMedicalVisitsService } from '../../services/scheduleMedicalVisit/delete-schedule-medical-visit/delete-schedule-medical-visit.service';
-import { CreateScheduleMedicalVisitDto, FindScheduleMedicalVisitDto, UpdateScheduleMedicalVisitDto } from '../../dto/scheduleMedicalVisit.dto';
+import {
+  CreateScheduleMedicalVisitDto,
+  FindScheduleMedicalVisitDto,
+  UpdateScheduleMedicalVisitDto,
+} from '../../dto/scheduleMedicalVisit.dto';
 import { FindOneScheduleMedicalVisitsService } from '../../services/scheduleMedicalVisit/find-one-schedule-medical-visit/find-one-schedule-medical-visit.service';
 
-@ApiTags('Schedule Medical Visit')
 @Controller('company/:companyId/schedule-medical-visit')
 export class ScheduleMedicalVisitController {
   constructor(
@@ -64,7 +66,11 @@ export class ScheduleMedicalVisitController {
     crud: true,
   })
   @Patch('/:id')
-  update(@Body() upsertAccessGroupDto: UpdateScheduleMedicalVisitDto, @User() userPayloadDto: UserPayloadDto, @Param('id', ParseIntPipe) id: number) {
+  update(
+    @Body() upsertAccessGroupDto: UpdateScheduleMedicalVisitDto,
+    @User() userPayloadDto: UserPayloadDto,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
     return this.updateScheduleMedicalVisitsService.execute({ ...upsertAccessGroupDto, id }, userPayloadDto);
   }
 

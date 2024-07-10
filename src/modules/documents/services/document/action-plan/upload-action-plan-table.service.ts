@@ -27,9 +27,16 @@ export class PgrActionPlanUploadTableService {
     const companyId = userPayloadDto.targetCompanyId;
     const workspaceId = upsertPgrDto.workspaceId;
 
-    const riskGroupData = await this.riskGroupDataRepository.findAllDataById(upsertPgrDto.riskGroupId, workspaceId, companyId);
+    const riskGroupData = await this.riskGroupDataRepository.findAllDataById(
+      upsertPgrDto.riskGroupId,
+      workspaceId,
+      companyId,
+    );
 
-    const version = (await this.riskDocumentRepository.findByRiskGroupAndCompany(upsertPgrDto.riskGroupId, companyId)).sort((a, b) => sortData(b, a, 'created_at')) || [];
+    const version =
+      (await this.riskDocumentRepository.findByRiskGroupAndCompany(upsertPgrDto.riskGroupId, companyId)).sort((a, b) =>
+        sortData(b, a, 'created_at'),
+      ) || [];
 
     const hierarchyHierarchy = await this.hierarchyRepository.findAllDataHierarchyByCompany(companyId, workspaceId);
 
@@ -46,7 +53,9 @@ export class PgrActionPlanUploadTableService {
 
     const fileName = getDocxFileName({
       name: version[0] ? version[0]?.name || '' : '',
-      companyName: (riskGroupData.company?.fantasy || riskGroupData.company.name) + (riskGroupData.company.initials ? '-' + riskGroupData.company.initials : ''),
+      companyName:
+        (riskGroupData.company?.fantasy || riskGroupData.company.name) +
+        (riskGroupData.company.initials ? '-' + riskGroupData.company.initials : ''),
       typeName: 'PGR-PLANO_DE_ACAO',
       version: version[0] ? version[0]?.version || '0.0.0' : '0.0.0',
       date: dayjs((riskGroupData as any).validityEnd || new Date()).format('MMMM-YYYY'),

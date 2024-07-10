@@ -39,7 +39,11 @@ export class EmployeeController {
     crud: 'u',
   })
   @Post('/:employeeId/sub-office/:subOfficeId/:companyId')
-  deleteSubOffice(@Param('employeeId') employeeId: number, @Param('companyId') companyId: string, @Param('subOfficeId') subOfficeId: string) {
+  deleteSubOffice(
+    @Param('employeeId') employeeId: number,
+    @Param('companyId') companyId: string,
+    @Param('subOfficeId') subOfficeId: string,
+  ) {
     return this.deleteSubOfficeEmployeeService.execute({
       id: employeeId,
       subOfficeId,
@@ -74,7 +78,11 @@ export class EmployeeController {
     isMember: true,
   })
   @Get('/id/:employeeId/:companyId?')
-  findOne(@User() userPayloadDto: UserPayloadDto, @Query() query: FindOneEmployeeDto, @Param('employeeId') employeeId: number) {
+  findOne(
+    @User() userPayloadDto: UserPayloadDto,
+    @Query() query: FindOneEmployeeDto,
+    @Param('employeeId') employeeId: number,
+  ) {
     return this.findEmployeeService.execute(employeeId, query, userPayloadDto);
   }
 }

@@ -14,8 +14,8 @@ export class DocumentsPgrController {
   constructor(
     private readonly pgrActionPlanUploadTableService: PgrActionPlanUploadTableService,
     private readonly pgrUploadDocService: PgrUploadService,
-    private readonly pcmsoUploadService: PcmsoUploadService
-  ) { }
+    private readonly pcmsoUploadService: PcmsoUploadService,
+  ) {}
 
   @Permissions(
     {
@@ -31,7 +31,11 @@ export class DocumentsPgrController {
     },
   )
   @Post('action-plan')
-  async uploadPGRActionPlanDoc(@Res() res, @User() userPayloadDto: UserPayloadDto, @Body() upsertPgrDto: UploadPgrActionPlanDto) {
+  async uploadPGRActionPlanDoc(
+    @Res() res,
+    @User() userPayloadDto: UserPayloadDto,
+    @Body() upsertPgrDto: UploadPgrActionPlanDto,
+  ) {
     const { buffer: file, fileName } = await this.pgrActionPlanUploadTableService.execute(upsertPgrDto, userPayloadDto);
 
     res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);

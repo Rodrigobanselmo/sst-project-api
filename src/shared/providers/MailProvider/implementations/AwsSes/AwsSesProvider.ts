@@ -1,14 +1,14 @@
-import { SES } from 'aws-sdk';
 import fs from 'fs';
 import handlebars from 'handlebars';
 import { EmailsEnum } from '../../../../../shared/constants/enum/emails';
 import { IMailProvider, ISendMailData } from '../../models/IMailProvider';
+import { SendEmailCommand, SESClient } from '@aws-sdk/client-ses';
 
 class AwsSesProvider implements IMailProvider {
-  private client: SES;
+  private client: SESClient;
 
   constructor() {
-    this.client = new SES({ region: process.env.AWS_SES_REGION });
+    this.client = new SESClient({ region: process.env.AWS_SES_REGION });
   }
 
   async sendMail({ path, subject, to, variables, source = EmailsEnum.VALIDATION }: ISendMailData): Promise<any> {
@@ -24,22 +24,22 @@ class AwsSesProvider implements IMailProvider {
 
     if (!(typeof to === 'string')) return;
 
-    const message = await this.client
-      .sendEmail({
-        Source: source.replace(':id', random),
-        Destination: {
-          ToAddresses: [to],
-        },
-        Message: {
-          Subject: { Data: subject },
-          Body: {
-            Html: {
-              Data: templateHTML,
-            },
+    const command = new SendEmailCommand({
+      Source: source.replace(':id', random),
+      Destination: {
+        ToAddresses: [to],
+      },
+      Message: {
+        Subject: { Data: subject },
+        Body: {
+          Html: {
+            Data: templateHTML,
           },
         },
-      })
-      .promise();
+      },
+    });
+
+    const message = await this.client.send(command);
 
     console.info('Message sent: %s', message.MessageId);
   }

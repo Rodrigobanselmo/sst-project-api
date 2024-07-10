@@ -8,7 +8,11 @@ import { DayJSProvider } from '../../../../../shared/providers/DateProvider/impl
 
 @Injectable()
 export class UpdateCatsService {
-  constructor(private readonly catRepository: CatRepository, private readonly employeeRepository: EmployeeRepository, private readonly dayjs: DayJSProvider) {}
+  constructor(
+    private readonly catRepository: CatRepository,
+    private readonly employeeRepository: EmployeeRepository,
+    private readonly dayjs: DayJSProvider,
+  ) {}
 
   async execute(UpsertCatsDto: UpdateCatDto, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;

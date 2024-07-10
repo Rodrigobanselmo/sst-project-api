@@ -1,5 +1,8 @@
 import { ISheetHeaderList } from '../../../../types/IFileFactory.types';
-import { CompanyStructRSDataACGHColumnMap, CompanyStructRSDataACGHHeaderEnum } from '../company-struct-rsdata-acgh.constants';
+import {
+  CompanyStructRSDataACGHColumnMap,
+  CompanyStructRSDataACGHHeaderEnum,
+} from '../company-struct-rsdata-acgh.constants';
 
 export const CompanyStructRSDataACGHColumnList: ISheetHeaderList = [
   {
@@ -19,7 +22,8 @@ export const CompanyStructRSDataACGHColumnList: ISheetHeaderList = [
       CompanyStructRSDataACGHColumnMap[CompanyStructRSDataACGHHeaderEnum.CARGO_D],
       CompanyStructRSDataACGHColumnMap[CompanyStructRSDataACGHHeaderEnum.CODIGO_PT],
       CompanyStructRSDataACGHColumnMap[CompanyStructRSDataACGHHeaderEnum.POSICAO],
-    ], name: 'Identifição'
+    ],
+    name: 'Identifição',
   },
   {
     group: [
@@ -27,25 +31,23 @@ export const CompanyStructRSDataACGHColumnList: ISheetHeaderList = [
       CompanyStructRSDataACGHColumnMap[CompanyStructRSDataACGHHeaderEnum.FIM],
       CompanyStructRSDataACGHColumnMap[CompanyStructRSDataACGHHeaderEnum.TECNICA],
       CompanyStructRSDataACGHColumnMap[CompanyStructRSDataACGHHeaderEnum.EXPOSICAO],
-
-    ], name: 'Identificação do RISCO'
+    ],
+    name: 'Identificação do RISCO',
   },
   {
     group: [
       CompanyStructRSDataACGHColumnMap[CompanyStructRSDataACGHHeaderEnum.AGENTE],
       CompanyStructRSDataACGHColumnMap[CompanyStructRSDataACGHHeaderEnum.TWA],
       CompanyStructRSDataACGHColumnMap[CompanyStructRSDataACGHHeaderEnum.STEL],
-
     ],
-    name: 'ACGH'
+    name: 'ACGH',
   },
   {
     group: [
       CompanyStructRSDataACGHColumnMap[CompanyStructRSDataACGHHeaderEnum.CONSIDERAR_PCMSO],
       CompanyStructRSDataACGHColumnMap[CompanyStructRSDataACGHHeaderEnum.NAO_CONSIDERAR_COMPLEMENTARES],
-
     ],
-    name: 'Geral		'
+    name: 'Geral		',
   },
   {
     group: [
@@ -55,9 +57,8 @@ export const CompanyStructRSDataACGHColumnList: ISheetHeaderList = [
       CompanyStructRSDataACGHColumnMap[CompanyStructRSDataACGHHeaderEnum.TREINAMENTO],
       CompanyStructRSDataACGHColumnMap[CompanyStructRSDataACGHHeaderEnum.REGISTRO],
       CompanyStructRSDataACGHColumnMap[CompanyStructRSDataACGHHeaderEnum.EPI_ALL],
-
     ],
-    name: 'EPI											'
+    name: 'EPI											',
   },
   {
     group: [
@@ -68,19 +69,17 @@ export const CompanyStructRSDataACGHColumnList: ISheetHeaderList = [
       CompanyStructRSDataACGHColumnMap[CompanyStructRSDataACGHHeaderEnum.MEDIDAS_CONTROLE],
       CompanyStructRSDataACGHColumnMap[CompanyStructRSDataACGHHeaderEnum.RECOMENDACOES],
     ],
-    name: 'Considerações						'
+    name: 'Considerações						',
   },
   {
     group: [
       CompanyStructRSDataACGHColumnMap[CompanyStructRSDataACGHHeaderEnum.OBSERVACOES],
       CompanyStructRSDataACGHColumnMap[CompanyStructRSDataACGHHeaderEnum.ETAPA],
     ],
-    name: 'Complementares'
+    name: 'Complementares',
   },
   {
-    group: [
-      CompanyStructRSDataACGHColumnMap[CompanyStructRSDataACGHHeaderEnum.CODIGO],
-    ],
-    name: 'Integração'
+    group: [CompanyStructRSDataACGHColumnMap[CompanyStructRSDataACGHHeaderEnum.CODIGO]],
+    name: 'Integração',
   },
 ];

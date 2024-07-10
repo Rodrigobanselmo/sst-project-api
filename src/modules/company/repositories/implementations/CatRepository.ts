@@ -10,7 +10,7 @@ import { prismaFilter } from '../../../../shared/utils/filters/prisma.filters';
 
 @Injectable()
 export class CatRepository {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async create({ companyId, ...createCompanyDto }: CreateCatDto) {
@@ -49,7 +49,15 @@ export class CatRepository {
         hrAcid: true,
         houveAfast: true,
         dtAcid: true,
-        employee: { select: { name: true, cpf: true, id: true, companyId: true, company: { select: { id: true, name: true, initials: true, fantasy: true } } } },
+        employee: {
+          select: {
+            name: true,
+            cpf: true,
+            id: true,
+            companyId: true,
+            company: { select: { id: true, name: true, initials: true, fantasy: true } },
+          },
+        },
       };
 
     if ('search' in query && query.search) {
@@ -75,14 +83,14 @@ export class CatRepository {
             },
             ...(!query.onlyCompany
               ? [
-                {
-                  company: {
-                    receivingServiceContracts: {
-                      some: { applyingServiceCompanyId: query.companyId },
+                  {
+                    company: {
+                      receivingServiceContracts: {
+                        some: { applyingServiceCompanyId: query.companyId },
+                      },
                     },
                   },
-                },
-              ]
+                ]
               : []),
           ],
         },
@@ -124,9 +132,13 @@ export class CatRepository {
     return cats.map((cat) => new CatEntity(cat));
   }
 
-
   getFindEvent2210Where(companyId: string, options?: Prisma.CatWhereInput): Prisma.CatWhereInput {
-    return { employee: { companyId }, sendEvent: true, events: { none: { action: 'EXCLUDE', status: { in: ['DONE', 'TRANSMITTED'] } } }, ...options }
+    return {
+      employee: { companyId },
+      sendEvent: true,
+      events: { none: { action: 'EXCLUDE', status: { in: ['DONE', 'TRANSMITTED'] } } },
+      ...options,
+    };
   }
 
   async findEvent2210(companyId: string, options: Prisma.CatFindManyArgs = {}) {
@@ -148,7 +160,14 @@ export class CatRepository {
                 id: true,
                 name: true,
                 type: true,
-                parent: { select: { id: true, name: true, type: true, parent: { select: { id: true, name: true, type: true } } } },
+                parent: {
+                  select: {
+                    id: true,
+                    name: true,
+                    type: true,
+                    parent: { select: { id: true, name: true, type: true } },
+                  },
+                },
               },
             },
           },
@@ -157,7 +176,10 @@ export class CatRepository {
           select: {
             dtAcid: true,
             hrAcid: true,
-            events: { where: { receipt: { not: null }, status: { in: ['DONE', 'TRANSMITTED'] } }, select: { receipt: true, id: true, action: true } },
+            events: {
+              where: { receipt: { not: null }, status: { in: ['DONE', 'TRANSMITTED'] } },
+              select: { receipt: true, id: true, action: true },
+            },
           },
         },
         ...options?.include,
@@ -202,7 +224,11 @@ export class CatRepository {
             events: { where: { status: 'DONE' }, select: { id: true, receipt: true }, orderBy: { created_at: 'desc' } },
           },
         },
-        events: { where: { status: 'DONE' }, select: { status: true, id: true, receipt: true, eventId: true }, orderBy: { created_at: 'desc' } },
+        events: {
+          where: { status: 'DONE' },
+          select: { status: true, id: true, receipt: true, eventId: true },
+          orderBy: { created_at: 'desc' },
+        },
       },
       ...options,
     });

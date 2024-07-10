@@ -15,9 +15,12 @@ import { normalizeString } from '../../../../shared/utils/normalizeString';
 
 @Injectable()
 export class RiskRepository implements IRiskRepository {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
-  async create({ recMed, generateSource, activities, ...createRiskDto }: CreateRiskDto, system: boolean): Promise<RiskFactorsEntity> {
+  async create(
+    { recMed, generateSource, activities, ...createRiskDto }: CreateRiskDto,
+    system: boolean,
+  ): Promise<RiskFactorsEntity> {
     const risk = await this.prisma.riskFactors.create({
       data: {
         ...createRiskDto,
@@ -27,10 +30,10 @@ export class RiskRepository implements IRiskRepository {
           createMany: {
             data: recMed
               ? recMed.map(({ ...rm }) => ({
-                system,
-                companyId: createRiskDto.companyId,
-                ...rm,
-              }))
+                  system,
+                  companyId: createRiskDto.companyId,
+                  ...rm,
+                }))
               : [],
             skipDuplicates: true,
           },
@@ -39,10 +42,10 @@ export class RiskRepository implements IRiskRepository {
           createMany: {
             data: generateSource
               ? generateSource.map(({ ...gs }) => ({
-                system,
-                companyId: createRiskDto.companyId,
-                ...gs,
-              }))
+                  system,
+                  companyId: createRiskDto.companyId,
+                  ...gs,
+                }))
               : [],
             skipDuplicates: true,
           },
@@ -77,23 +80,23 @@ export class RiskRepository implements IRiskRepository {
           upsert: !recMed
             ? []
             : recMed.map(({ id, ...rm }) => {
-              return {
-                create: { system, companyId, ...rm },
-                update: { system, ...rm },
-                where: { id: id || 'no-id' },
-              };
-            }),
+                return {
+                  create: { system, companyId, ...rm },
+                  update: { system, ...rm },
+                  where: { id: id || 'no-id' },
+                };
+              }),
         },
         generateSource: {
           upsert: !generateSource
             ? []
             : generateSource.map(({ id, ...gs }) => {
-              return {
-                create: { system, companyId, ...gs },
-                update: { system, ...gs },
-                where: { id: id || 'no-id' },
-              };
-            }),
+                return {
+                  create: { system, companyId, ...gs },
+                  update: { system, ...gs },
+                  where: { id: id || 'no-id' },
+                };
+              }),
         },
         ...createRiskDto,
       },
@@ -104,7 +107,11 @@ export class RiskRepository implements IRiskRepository {
     return new RiskFactorsEntity(risk);
   }
 
-  async upsert({ companyId: _, activities, id, recMed, generateSource, ...upsertRiskDto }: UpsertRiskDto, system: boolean, companyId: string): Promise<RiskFactorsEntity> {
+  async upsert(
+    { companyId: _, activities, id, recMed, generateSource, ...upsertRiskDto }: UpsertRiskDto,
+    system: boolean,
+    companyId: string,
+  ): Promise<RiskFactorsEntity> {
     const risk = await this.prisma.riskFactors.upsert({
       create: {
         ...upsertRiskDto,
@@ -116,9 +123,9 @@ export class RiskRepository implements IRiskRepository {
             data: !recMed
               ? []
               : recMed.map(({ id, ...rm }) => ({
-                system,
-                ...rm,
-              })),
+                  system,
+                  ...rm,
+                })),
             skipDuplicates: true,
           },
         },
@@ -127,9 +134,9 @@ export class RiskRepository implements IRiskRepository {
             data: !generateSource
               ? []
               : generateSource.map(({ id, ...gs }) => ({
-                system,
-                ...gs,
-              })),
+                  system,
+                  ...gs,
+                })),
             skipDuplicates: true,
           },
         },
@@ -141,23 +148,23 @@ export class RiskRepository implements IRiskRepository {
           upsert: !recMed
             ? []
             : recMed.map(({ id, ...rm }) => {
-              return {
-                create: { system, ...rm },
-                update: { system, ...rm },
-                where: { id: id || 'no-id' },
-              };
-            }),
+                return {
+                  create: { system, ...rm },
+                  update: { system, ...rm },
+                  where: { id: id || 'no-id' },
+                };
+              }),
         },
         generateSource: {
           upsert: !generateSource
             ? []
             : generateSource.map(({ id, companyId, recMeds: _, ...gs }) => {
-              return {
-                create: { system, companyId, ...gs },
-                update: { system, ...gs },
-                where: { id: id || 'no-id' },
-              };
-            }),
+                return {
+                  create: { system, companyId, ...gs },
+                  update: { system, ...gs },
+                  where: { id: id || 'no-id' },
+                };
+              }),
         },
       },
       where: { id_companyId: { companyId, id: id || 'no-id' } },
@@ -167,76 +174,86 @@ export class RiskRepository implements IRiskRepository {
     return new RiskFactorsEntity(risk);
   }
 
-  async upsertMany(upsertRiskDtoMany: UpsertRiskDto[], system: boolean, companyId: string): Promise<RiskFactorsEntity[]> {
+  async upsertMany(
+    upsertRiskDtoMany: UpsertRiskDto[],
+    system: boolean,
+    companyId: string,
+  ): Promise<RiskFactorsEntity[]> {
     const data = await Promise.all(
-      upsertRiskDtoMany.map(async ({ companyId: _, activities, id, esocialCode, recMed, generateSource, ...upsertRiskDto }) => {
-        return await this.prisma.riskFactors.upsert({
-          create: {
-            ...upsertRiskDto,
-            activities: activities as any,
-            esocialCode: esocialCode || null,
-            system,
-            companyId,
-            recMed: {
-              createMany: {
-                data: !recMed
-                  ? []
-                  : recMed.map(({ id, ...rm }) => ({
-                    system,
-                    ...rm,
-                  })),
-                skipDuplicates: true,
+      upsertRiskDtoMany.map(
+        async ({ companyId: _, activities, id, esocialCode, recMed, generateSource, ...upsertRiskDto }) => {
+          return await this.prisma.riskFactors.upsert({
+            create: {
+              ...upsertRiskDto,
+              activities: activities as any,
+              esocialCode: esocialCode || null,
+              system,
+              companyId,
+              recMed: {
+                createMany: {
+                  data: !recMed
+                    ? []
+                    : recMed.map(({ id, ...rm }) => ({
+                        system,
+                        ...rm,
+                      })),
+                  skipDuplicates: true,
+                },
+              },
+              generateSource: {
+                createMany: {
+                  data: !generateSource
+                    ? []
+                    : generateSource.map(({ id, ...rm }) => ({
+                        system,
+                        ...rm,
+                      })),
+                  skipDuplicates: true,
+                },
               },
             },
-            generateSource: {
-              createMany: {
-                data: !generateSource
+            update: {
+              ...upsertRiskDto,
+              esocialCode: esocialCode || null,
+              system,
+              recMed: {
+                upsert: !recMed
                   ? []
-                  : generateSource.map(({ id, ...rm }) => ({
-                    system,
-                    ...rm,
-                  })),
-                skipDuplicates: true,
+                  : recMed.map(({ id, ...rm }) => {
+                      return {
+                        create: { system, ...rm },
+                        update: { system, ...rm },
+                        where: { id: id || 'no-id' },
+                      };
+                    }),
+              },
+              generateSource: {
+                upsert: !generateSource
+                  ? []
+                  : generateSource.map(({ id, recMeds: _, ...gs }) => {
+                      return {
+                        create: { system, ...gs },
+                        update: { system, ...gs },
+                        where: { id: id || 'no-id' },
+                      };
+                    }),
               },
             },
-          },
-          update: {
-            ...upsertRiskDto,
-            esocialCode: esocialCode || null,
-            system,
-            recMed: {
-              upsert: !recMed
-                ? []
-                : recMed.map(({ id, ...rm }) => {
-                  return {
-                    create: { system, ...rm },
-                    update: { system, ...rm },
-                    where: { id: id || 'no-id' },
-                  };
-                }),
-            },
-            generateSource: {
-              upsert: !generateSource
-                ? []
-                : generateSource.map(({ id, recMeds: _, ...gs }) => {
-                  return {
-                    create: { system, ...gs },
-                    update: { system, ...gs },
-                    where: { id: id || 'no-id' },
-                  };
-                }),
-            },
-          },
-          where: { id_companyId: { companyId, id: id || 'no-id' } },
-          include: { recMed: true, generateSource: true },
-        });
-      }),
+            where: { id_companyId: { companyId, id: id || 'no-id' } },
+            include: { recMed: true, generateSource: true },
+          });
+        },
+      ),
     );
 
     return data.map((risk) => new RiskFactorsEntity(risk));
   }
 
-  async find(query: Partial<FindRiskDto>, pagination: PaginationQueryDto, options: Prisma.RiskFactorsFindManyArgs = {}) {
+  async find(
+    query: Partial<FindRiskDto>,
+    pagination: PaginationQueryDto,
+    options: Prisma.RiskFactorsFindManyArgs = {},
+  ) {
     const whereInit = {
       AND: [{ OR: [{ companyId: query.companyId }, { system: true }] }],
     } as typeof options.where;
@@ -297,7 +314,11 @@ export class RiskRepository implements IRiskRepository {
     return new RiskFactorsEntity(risk);
   }
 
-  async findOneById(id: string, companyId: string, options?: Prisma.RiskFactorsFindUniqueArgs): Promise<RiskFactorsEntity> {
+  async findOneById(
+    id: string,
+    companyId: string,
+    options?: Prisma.RiskFactorsFindUniqueArgs,
+  ): Promise<RiskFactorsEntity> {
     const risk = await this.prisma.riskFactors.findUnique({
       where: { id_companyId: { id, companyId } },
       include: {
@@ -345,7 +366,13 @@ export class RiskRepository implements IRiskRepository {
   async findRiskDataByHierarchies(
     hierarchyIds: string[],
     companyId: string,
-    options: Prisma.RiskFactorsFindManyArgs & { date?: Date; selectEpi?: boolean; selectAdm?: boolean; selectEpc?: boolean; selectFont?: boolean } = {},
+    options: Prisma.RiskFactorsFindManyArgs & {
+      date?: Date;
+      selectEpi?: boolean;
+      selectAdm?: boolean;
+      selectEpc?: boolean;
+      selectFont?: boolean;
+    } = {},
   ) {
     const { date, selectEpi, selectAdm, selectEpc, selectFont, ...rest } = options;
 
@@ -355,13 +382,23 @@ export class RiskRepository implements IRiskRepository {
         representAll: false, // remove standard risk
         riskFactorData: {
           some: {
-            ...(date && { AND: [{ OR: [{ startDate: { lte: date } }, { startDate: null }] }, { OR: [{ endDate: { gt: date } }, { endDate: null }] }] }),
+            ...(date && {
+              AND: [
+                { OR: [{ startDate: { lte: date } }, { startDate: null }] },
+                { OR: [{ endDate: { gt: date } }, { endDate: null }] },
+              ],
+            }),
             companyId,
             homogeneousGroup: {
               hierarchyOnHomogeneous: {
                 some: {
                   hierarchyId: { in: hierarchyIds },
-                  ...(date && { AND: [{ OR: [{ startDate: { lte: date } }, { startDate: null }] }, { OR: [{ endDate: { gt: date } }, { endDate: null }] }] }),
+                  ...(date && {
+                    AND: [
+                      { OR: [{ startDate: { lte: date } }, { startDate: null }] },
+                      { OR: [{ endDate: { gt: date } }, { endDate: null }] },
+                    ],
+                  }),
                 },
               },
             },
@@ -387,7 +424,12 @@ export class RiskRepository implements IRiskRepository {
               status: 'ACTIVE',
             },
           },
-          select: { minRiskDegree: true, minRiskDegreeQuantity: true, id: true, protocol: { select: { name: true, id: true } } },
+          select: {
+            minRiskDegree: true,
+            minRiskDegreeQuantity: true,
+            id: true,
+            protocol: { select: { name: true, id: true } },
+          },
         },
         docInfo: {
           where: {
@@ -414,13 +456,23 @@ export class RiskRepository implements IRiskRepository {
         },
         riskFactorData: {
           where: {
-            ...(date && { AND: [{ OR: [{ startDate: { lte: date } }, { startDate: null }] }, { OR: [{ endDate: { gt: date } }, { endDate: null }] }] }),
+            ...(date && {
+              AND: [
+                { OR: [{ startDate: { lte: date } }, { startDate: null }] },
+                { OR: [{ endDate: { gt: date } }, { endDate: null }] },
+              ],
+            }),
             companyId,
             homogeneousGroup: {
               hierarchyOnHomogeneous: {
                 some: {
                   hierarchyId: { in: hierarchyIds },
-                  ...(date && { AND: [{ OR: [{ startDate: { lte: date } }, { startDate: null }] }, { OR: [{ endDate: { gt: date } }, { endDate: null }] }] }),
+                  ...(date && {
+                    AND: [
+                      { OR: [{ startDate: { lte: date } }, { startDate: null }] },
+                      { OR: [{ endDate: { gt: date } }, { endDate: null }] },
+                    ],
+                  }),
                 },
               },
             },
@@ -476,7 +528,10 @@ export class RiskRepository implements IRiskRepository {
     };
   }
 
-  async findAllAvailable(userCompanyId: string, options: Prisma.RiskFactorsFindManyArgs = {}): Promise<RiskFactorsEntity[]> {
+  async findAllAvailable(
+    userCompanyId: string,
+    options: Prisma.RiskFactorsFindManyArgs = {},
+  ): Promise<RiskFactorsEntity[]> {
     // const tenant: Prisma.RiskFactorsFindManyArgs['where']['AND'] = [
     const tenant = [
       {
@@ -485,7 +540,7 @@ export class RiskRepository implements IRiskRepository {
           {
             company: {
               applyingServiceContracts: {
-                some: { receivingServiceCompanyId: userCompanyId, status: StatusEnum.ACTIVE, },
+                some: { receivingServiceCompanyId: userCompanyId, status: StatusEnum.ACTIVE },
               },
             },
           },
@@ -550,7 +605,15 @@ export class RiskRepository implements IRiskRepository {
     return risks.map((risk) => new RiskFactorsEntity(risk as any));
   }
 
-  async findSyncChanges({ lastPulledVersion, companyId, userId }: { lastPulledVersion: Date; companyId: string; userId: number }) {
+  async findSyncChanges({
+    lastPulledVersion,
+    companyId,
+    userId,
+  }: {
+    lastPulledVersion: Date;
+    companyId: string;
+    userId: number;
+  }) {
     const options: Prisma.RiskFactorsFindManyArgs = {};
     options.select = {
       name: true,
@@ -560,20 +623,20 @@ export class RiskRepository implements IRiskRepository {
       representAll: true,
       id: true,
       status: true,
-    }
+    };
     options.where = {
       AND: [{ OR: [{ companyId }, { system: true }] }],
-    }
+    };
 
     const changes = await databaseFindChanges({
       entity: RiskFactorsEntity,
       findManyFn: this.prisma.riskFactors.findMany,
       lastPulledVersion,
       options,
-      userId
-    })
+      userId,
+    });
 
-    return changes
+    return changes;
   }
 
   async DeleteByIdSoft(id: string): Promise<RiskFactorsEntity> {

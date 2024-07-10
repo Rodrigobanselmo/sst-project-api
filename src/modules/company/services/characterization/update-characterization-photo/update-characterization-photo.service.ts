@@ -14,9 +14,14 @@ export class UpdateCharacterizationPhotoService {
     private readonly characterizationPhotoRepository: CharacterizationPhotoRepository,
     private readonly addCharacterizationPhotoService: AddCharacterizationPhotoService,
     private readonly amazonStorageProvider: AmazonStorageProvider,
-  ) { }
+  ) {}
 
-  async execute(id: string, file: Express.Multer.File, updatePhotoCharacterizationDto: UpdatePhotoCharacterizationDto, user: UserPayloadDto) {
+  async execute(
+    id: string,
+    file: Express.Multer.File,
+    updatePhotoCharacterizationDto: UpdatePhotoCharacterizationDto,
+    user: UserPayloadDto,
+  ) {
     let photoUrl: string;
     let isVertical: boolean;
 
@@ -25,7 +30,11 @@ export class UpdateCharacterizationPhotoService {
       const splitUrl = photo.photoUrl.split('/');
       const fileName = splitUrl[splitUrl.length - 1] as string;
 
-      [photoUrl, isVertical] = await this.addCharacterizationPhotoService.upload(photo.companyCharacterizationId, file, { id: fileName.split('.')[0] });
+      [photoUrl, isVertical] = await this.addCharacterizationPhotoService.upload(
+        photo.companyCharacterizationId,
+        file,
+        { id: fileName.split('.')[0] },
+      );
     }
 
     const characterizationPhoto = await this.characterizationPhotoRepository.update({
@@ -35,7 +44,9 @@ export class UpdateCharacterizationPhotoService {
       id,
     });
 
-    const characterizationData = await this.characterizationRepository.findById(characterizationPhoto.companyCharacterizationId);
+    const characterizationData = await this.characterizationRepository.findById(
+      characterizationPhoto.companyCharacterizationId,
+    );
 
     return characterizationData;
   }

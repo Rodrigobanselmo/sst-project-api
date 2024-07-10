@@ -15,7 +15,14 @@ import { HierarchyMapData, IHierarchyMap, IHomoGroupMap } from '../../../convert
 import { convertToDocxHelper } from '../functions/convertToDocx';
 import { replaceAllVariables } from '../functions/replaceAllVariables';
 import { ISectionChildrenType } from '../types/elements.types';
-import { IAllDocumentSectionType, IChapter, ICover, IDocVariables, ISection, DocumentSectionTypeEnum } from '../types/section.types';
+import {
+  IAllDocumentSectionType,
+  IChapter,
+  ICover,
+  IDocVariables,
+  ISection,
+  DocumentSectionTypeEnum,
+} from '../types/section.types';
 import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
 import { IMapElementDocumentType } from './elementTypeMap';
 import { allCharacterizationSections } from '../../../components/iterables/all-characterization/all-characterization.sections';
@@ -97,7 +104,7 @@ export class SectionsMapClass {
 
   public map: IMapSectionDocumentType = {
     [DocumentSectionTypeEnum.TOC]: () => summarySections(),
-    [DocumentSectionTypeEnum.COVER]: ({ }: ICover) =>
+    [DocumentSectionTypeEnum.COVER]: ({}: ICover) =>
       coverSections({
         imgPath: this.logoPath,
         version: this.version,
@@ -119,27 +126,25 @@ export class SectionsMapClass {
       ...sectionLandscapeProperties,
     }),
     [DocumentSectionTypeEnum.ITERABLE_ENVIRONMENTS]: (): ISectionOptions[] =>
-      allCharacterizationSections(this.environments, this.hierarchy, this.homogeneousGroup, 'env', (x, v) => this.convertToDocx(x, v)).map(
-        ({ footerText, children }) => ({
-          children,
-          ...this.getFooterHeader(footerText),
-          ...sectionLandscapeProperties,
-        }),
-      ),
+      allCharacterizationSections(this.environments, this.hierarchy, this.homogeneousGroup, 'env', (x, v) =>
+        this.convertToDocx(x, v),
+      ).map(({ footerText, children }) => ({
+        children,
+        ...this.getFooterHeader(footerText),
+        ...sectionLandscapeProperties,
+      })),
     [DocumentSectionTypeEnum.ITERABLE_CHARACTERIZATION]: (): ISectionOptions[] =>
-      allCharacterizationSections(this.characterizations, this.hierarchy, this.homogeneousGroup, 'char', (x, v) => this.convertToDocx(x, v)).map(
-        ({ footerText, children }) => ({
-          children,
-          ...this.getFooterHeader(footerText),
-          ...sectionLandscapeProperties,
-        }),
-      ),
-    [DocumentSectionTypeEnum.APR]: () =>
-      APPRTableSection(this.document, this.hierarchy, this.homogeneousGroup),
+      allCharacterizationSections(this.characterizations, this.hierarchy, this.homogeneousGroup, 'char', (x, v) =>
+        this.convertToDocx(x, v),
+      ).map(({ footerText, children }) => ({
+        children,
+        ...this.getFooterHeader(footerText),
+        ...sectionLandscapeProperties,
+      })),
+    [DocumentSectionTypeEnum.APR]: () => APPRTableSection(this.document, this.hierarchy, this.homogeneousGroup),
     [DocumentSectionTypeEnum.APR_GROUP]: () =>
       APPRByGroupTableSection(this.document, this.hierarchyHighLevelsData, this.hierarchyTree, this.homogeneousGroup),
-    [DocumentSectionTypeEnum.ACTION_PLAN]: () =>
-      actionPlanTableSection(this.document, this.hierarchyTree),
+    [DocumentSectionTypeEnum.ACTION_PLAN]: () => actionPlanTableSection(this.document, this.hierarchyTree),
   };
 
   getFooterHeader = (footerText: string, title?: string) => {

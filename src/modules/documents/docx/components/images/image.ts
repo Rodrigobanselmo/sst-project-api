@@ -8,7 +8,7 @@ import { IImage } from '../../builders/pgr/types/elements.types';
 
 export const imageDoc = (data: IImage, imagesMap?: IImagesMap) => {
   const path = imagesMap?.[data.url]?.path || 'images/hierarchy-risk-pgr.png';
-  const file = fs.readFileSync(path)
+  const file = fs.readFileSync(path);
   const pageWidth = 717.6;
   const pageHeight = 975.2;
 

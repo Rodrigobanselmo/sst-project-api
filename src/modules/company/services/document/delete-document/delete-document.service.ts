@@ -7,7 +7,10 @@ import { DocumentRepository } from '../../../repositories/implementations/Docume
 
 @Injectable()
 export class DeleteDocumentService {
-  constructor(private readonly documentRepository: DocumentRepository, private readonly amazonStorageProvider: AmazonStorageProvider) {}
+  constructor(
+    private readonly documentRepository: DocumentRepository,
+    private readonly amazonStorageProvider: AmazonStorageProvider,
+  ) {}
 
   async execute(id: number, user: UserPayloadDto) {
     const documentFound = await this.documentRepository.findFirstNude({

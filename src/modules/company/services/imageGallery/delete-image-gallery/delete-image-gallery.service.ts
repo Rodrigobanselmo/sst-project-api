@@ -8,7 +8,7 @@ export class DeleteImageGalleryService {
   constructor(
     private readonly imageGalleryRepository: ImageGalleryRepository,
     private readonly amazonStorageProvider: AmazonStorageProvider,
-  ) { }
+  ) {}
 
   async execute(id: number, companyId: string) {
     const image = await this.imageGalleryRepository.findFirstNude({ where: { id, companyId } });
@@ -24,7 +24,6 @@ export class DeleteImageGalleryService {
     });
 
     const deletedPhoto = await this.imageGalleryRepository.delete(id, companyId);
-
 
     return deletedPhoto;
   }

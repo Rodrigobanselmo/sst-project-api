@@ -1,5 +1,4 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
 
 import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
@@ -11,7 +10,6 @@ import { DeleteCompanyOSService } from '../../services/os/delete-os/delete-os.se
 import { FindOneCompanyOSService } from '../../services/os/find-os/find-os.service';
 import { UpsertCompanyOSService } from '../../services/os/upsert-os/upsert-os.service';
 
-@ApiTags('os')
 @Controller('os/:companyId')
 export class CompanyOSController {
   constructor(

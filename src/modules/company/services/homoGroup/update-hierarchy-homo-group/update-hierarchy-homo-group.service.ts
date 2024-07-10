@@ -36,9 +36,13 @@ export class UpdateHierarchyHomoGroupService {
     });
 
     if (!foundHomoGroup?.id) throw new BadRequestException(ErrorCompanyEnum.GHO_NOT_FOUND);
-    if (foundHomoGroup?.hierarchyOnHomogeneous.length !== homoGroup.ids.length) throw new BadRequestException(ErrorCompanyEnum.GHO_NOT_FOUND);
+    if (foundHomoGroup?.hierarchyOnHomogeneous.length !== homoGroup.ids.length)
+      throw new BadRequestException(ErrorCompanyEnum.GHO_NOT_FOUND);
 
-    await this.deleteHierarchyHomoGroupService.checkDeletion(foundHomoGroup, userPayloadDto, { updateCheck: true, data: homoGroup });
+    await this.deleteHierarchyHomoGroupService.checkDeletion(foundHomoGroup, userPayloadDto, {
+      updateCheck: true,
+      data: homoGroup,
+    });
 
     const data = await this.homoGroupRepository.updateHierarchyHomo(homoGroup);
 

@@ -22,7 +22,10 @@ import {
 
 @Injectable()
 export class DownaldRiskModelFactory extends ReportFactoryAbstractionCreator<any> {
-  constructor(private readonly companyRepository: CompanyRepository, private readonly excelProv: ExcelProvider) {
+  constructor(
+    private readonly companyRepository: CompanyRepository,
+    private readonly excelProv: ExcelProvider,
+  ) {
     super(excelProv, companyRepository);
   }
 
@@ -32,7 +35,7 @@ export class DownaldRiskModelFactory extends ReportFactoryAbstractionCreator<any
 }
 
 class DownloadFactoryProduct implements IReportFactoryProduct<any> {
-  constructor(private readonly companyRepository: CompanyRepository) { }
+  constructor(private readonly companyRepository: CompanyRepository) {}
 
   public async findTableData(companyId: string) {
     const company = await getCompany(companyId, this.companyRepository);
@@ -42,7 +45,12 @@ class DownloadFactoryProduct implements IReportFactoryProduct<any> {
     const titleData = this.getTitle(headerData, company);
     const infoData = [];
 
-    const returnData: IReportFactoryProductFindData = { headerRow: headerData, titleRows: titleData, endRows: infoData, sanitizeData };
+    const returnData: IReportFactoryProductFindData = {
+      headerRow: headerData,
+      titleRows: titleData,
+      endRows: infoData,
+      sanitizeData,
+    };
 
     return returnData;
   }
@@ -70,7 +78,13 @@ class DownloadFactoryProduct implements IReportFactoryProduct<any> {
 
   public getTitle(_: IReportHeader, company: CompanyEntity): IReportCell[][] {
     const { main, sub } = getCompanyInfo(company);
-    const row: IReportCell[] = [{ content: 'Estrutura Ocupacional', mergeRight: 'all', font: { size: 11, bold: true, color: { theme: 1 }, name: 'Calibri' } }];
+    const row: IReportCell[] = [
+      {
+        content: 'Estrutura Ocupacional',
+        mergeRight: 'all',
+        font: { size: 11, bold: true, color: { theme: 1 }, name: 'Calibri' },
+      },
+    ];
     const emptyRow: IReportCell[] = [{ content: '', fill: undefined }];
     const headerTitle = convertTitleUpload(CompanyStructColumnList);
 
@@ -83,7 +97,14 @@ class DownloadFactoryProduct implements IReportFactoryProduct<any> {
   }
 
   public getClothesTable(): IReportCell[][] {
-    const rowTitle: IReportCell[] = [{ content: 'Tipos de Vestimentas [IBUTG]', mergeRight: 1, fill: ReportFillColorEnum.HEADER_RED, borders: allBorders }];
+    const rowTitle: IReportCell[] = [
+      {
+        content: 'Tipos de Vestimentas [IBUTG]',
+        mergeRight: 1,
+        fill: ReportFillColorEnum.HEADER_RED,
+        borders: allBorders,
+      },
+    ];
     const emptyRow: IReportCell[] = [{ content: '', fill: undefined }];
     const headerTitle: IReportCell[] = [
       { content: 'Vestimenta', fill: ReportFillColorEnum.HEADER, borders: allBorders },

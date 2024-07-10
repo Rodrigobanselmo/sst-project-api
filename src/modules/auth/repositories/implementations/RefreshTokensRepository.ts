@@ -6,7 +6,7 @@ import { IRefreshTokensRepository } from '../IRefreshTokensRepository.types';
 
 @Injectable()
 export class RefreshTokensRepository implements IRefreshTokensRepository {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(refresh_token: string, userId: number, expires_date: Date) {
     const refreshToken = await this.prisma.refreshToken.create({

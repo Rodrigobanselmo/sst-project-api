@@ -16,19 +16,17 @@ export class CreateImageGalleyService {
   constructor(
     private readonly imageGalleryRepository: ImageGalleryRepository,
     private readonly amazonStorageProvider: AmazonStorageProvider,
-  ) { }
+  ) {}
 
   async execute(body: CreateImageGalleryDto, userPayloadDto: UserPayloadDto, file: Express.Multer.File) {
     const companyId = userPayloadDto.targetCompanyId;
     const url = await this.upload(companyId, file);
 
-    const result = await this.imageGalleryRepository.create(
-      {
-        ...body,
-        companyId,
-        url,
-      },
-    );
+    const result = await this.imageGalleryRepository.create({
+      ...body,
+      companyId,
+      url,
+    });
 
     return result;
   }
@@ -43,6 +41,6 @@ export class CreateImageGalleyService {
       fileName: path,
     });
 
-    return url
+    return url;
   }
 }

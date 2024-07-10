@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException, OnModuleInit } from '@nestjs/common';
 import { DocumentTypeEnum } from '@prisma/client';
-import * as AWS from 'aws-sdk';
 import { Consumer } from 'sqs-consumer';
+import { SQSClient } from '@aws-sdk/client-sqs';
 
 import { MessageSQS } from '../../../../shared/interfaces/message-sqs';
 import { UploadDocumentDto } from '../../dto/document.dto';
@@ -12,7 +12,10 @@ import { checkInternetConnectivity } from '../../../../shared/utils/isOnline';
 @Injectable()
 export class PgrConsumer implements OnModuleInit {
   private app: Consumer;
-  constructor(private readonly pgrUploadDocService: PgrUploadService, private readonly pcmsoUploadService: PcmsoUploadService) { }
+  constructor(
+    private readonly pgrUploadDocService: PgrUploadService,
+    private readonly pcmsoUploadService: PcmsoUploadService,
+  ) {}
 
   async onModuleInit() {
     const online = await checkInternetConnectivity();
@@ -21,7 +24,7 @@ export class PgrConsumer implements OnModuleInit {
       this.app = Consumer.create({
         queueUrl: process.env.AWS_SQS_PGR_URL,
         handleMessage: (message) => this.consume(message as any),
-        sqs: new AWS.SQS({ region: process.env.AWS_SQS_PGR_REGION }),
+        sqs: new SQSClient({ region: process.env.AWS_SQS_PGR_REGION }),
       });
 
       this.app.on('error', this.handleSQSError);

@@ -25,7 +25,11 @@ export class CompanyClinicRepository {
     ]);
   }
 
-  async findAllByCompany(query: Partial<FindCompanyClinicDto>, pagination: PaginationQueryDto, options: Prisma.CompanyClinicsFindManyArgs = {}) {
+  async findAllByCompany(
+    query: Partial<FindCompanyClinicDto>,
+    pagination: PaginationQueryDto,
+    options: Prisma.CompanyClinicsFindManyArgs = {},
+  ) {
     const whereInit = {
       AND: [],
     } as typeof options.where;

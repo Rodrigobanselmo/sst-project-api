@@ -1,5 +1,4 @@
 import { ProfessionalEntity } from './../../users/entities/professional.entity';
-import { ApiProperty } from '@nestjs/swagger';
 
 import { CompanyGroup } from '.prisma/client';
 import { ProfessionalCouncil } from '@prisma/client';
@@ -8,7 +7,6 @@ import { CompanyCertEntity } from '../../../modules/esocial/entities/companyCert
 import { CompanyOSEntity } from './os.entity';
 
 export class CompanyGroupEntity implements CompanyGroup {
-  @ApiProperty({ description: 'The id of the CompanyGroups' })
   id: number;
   name: string;
   description: string;

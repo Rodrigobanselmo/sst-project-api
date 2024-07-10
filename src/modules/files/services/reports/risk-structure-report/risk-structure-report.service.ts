@@ -9,8 +9,8 @@ import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 export class RiskStructureReportService {
   constructor(
     private readonly reportRiskStructureFactory: ReportRiskStructureFactory,
-    private readonly reportRiskStructureRsDataFactory: ReportRiskStructureRsDataFactory
-  ) { }
+    private readonly reportRiskStructureRsDataFactory: ReportRiskStructureRsDataFactory,
+  ) {}
 
   async execute(body: DownloadRiskStructureReportDto, userPayloadDto: UserPayloadDto) {
     const downloadType = body.downloadType;

@@ -71,14 +71,26 @@ export class UploadCnaeDataService {
   }
 }
 
-const readCnaes = async (readFileData: IExcelReadData[], excelProvider: ExcelProvider, cnaeSheet: ICnaeSheet, databaseTable: DatabaseTableEntity) => {
+const readCnaes = async (
+  readFileData: IExcelReadData[],
+  excelProvider: ExcelProvider,
+  cnaeSheet: ICnaeSheet,
+  databaseTable: DatabaseTableEntity,
+) => {
   const cnaesTable = readFileData.find((data) => data.name === cnaeSheet.name);
 
-  if (!cnaesTable) throw new BadRequestException(ErrorFilesEnum.WRONG_TABLE_SHEET.replace('??FOUND??', readFileData.join(', ')).replace('??EXPECTED??', cnaeSheet.name));
+  if (!cnaesTable)
+    throw new BadRequestException(
+      ErrorFilesEnum.WRONG_TABLE_SHEET.replace('??FOUND??', readFileData.join(', ')).replace(
+        '??EXPECTED??',
+        cnaeSheet.name,
+      ),
+    );
 
   const cnaeDatabase = await excelProvider.transformToTableData(cnaesTable, cnaeSheet.columns);
 
-  if (databaseTable?.version && cnaeDatabase.version !== databaseTable.version) throw new BadRequestException(ErrorFilesEnum.WRONG_TABLE_VERSION);
+  if (databaseTable?.version && cnaeDatabase.version !== databaseTable.version)
+    throw new BadRequestException(ErrorFilesEnum.WRONG_TABLE_VERSION);
 
   return cnaeDatabase.rows;
 };

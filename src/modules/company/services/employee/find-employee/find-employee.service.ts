@@ -20,7 +20,9 @@ export class FindEmployeeService {
 
     const employee = await this.employeeRepository.findById(id, user.targetCompanyId, {
       ...(isAbs60 && {
-        include: { absenteeisms: { select: { id: true, startDate: true, endDate: true, motive: true, esocial18: true } } },
+        include: {
+          absenteeisms: { select: { id: true, startDate: true, endDate: true, motive: true, esocial18: true } },
+        },
       }),
     });
 

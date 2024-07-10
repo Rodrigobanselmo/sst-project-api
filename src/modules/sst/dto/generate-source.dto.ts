@@ -37,7 +37,6 @@ export class CreateGenerateSourceDto {
   @Type(() => RiskCreateRecMedDto)
   recMeds?: RiskCreateRecMedDto[];
 
-
   @IsOptional()
   @IsBoolean()
   @ToBoolean()
@@ -46,7 +45,7 @@ export class CreateGenerateSourceDto {
   @IsOptional()
   @IsBoolean()
   @ToBoolean()
-  skipIfExist?: boolean
+  skipIfExist?: boolean;
 }
 
 export class UpsertGenerateSourceDto extends CreateGenerateSourceDto {

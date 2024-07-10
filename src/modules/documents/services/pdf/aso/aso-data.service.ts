@@ -44,7 +44,7 @@ export class PdfAsoDataService {
     private readonly findAllRiskDataByEmployeeService: FindAllRiskDataByEmployeeService,
     private readonly findExamByHierarchyService: FindExamByHierarchyService,
     private readonly protocolToRiskRepository: ProtocolToRiskRepository,
-  ) { }
+  ) {}
 
   async execute(employeeId: number, userPayloadDto: UserPayloadDto, asoId?: number): Promise<IPdfAsoData> {
     const companyId = userPayloadDto.targetCompanyId;
@@ -52,7 +52,12 @@ export class PdfAsoDataService {
     const examsNeeded: ExamEntity[] = [];
 
     const asoExam = await this.employeeExamsHistoryRepository.findFirstNude({
-      where: { ...(asoId && { id: asoId }), employeeId, exam: { isAttendance: true }, OR: [{ clinicId: companyId }, { employee: { companyId } }] },
+      where: {
+        ...(asoId && { id: asoId }),
+        employeeId,
+        exam: { isAttendance: true },
+        OR: [{ clinicId: companyId }, { employee: { companyId } }],
+      },
       orderBy: { doneDate: 'desc' },
       select: {
         id: true,
@@ -74,15 +79,19 @@ export class PdfAsoDataService {
       });
 
       if (originsData) {
-        examsNeeded.push(...originsData.map((origin) => (origin.exam as ExamEntity)));
+        examsNeeded.push(...originsData.map((origin) => origin.exam as ExamEntity));
       }
     }
 
     const examsIds = examsNeeded.map(({ id }) => Number(id));
 
-
     const clinicExam = await this.employeeExamsHistoryRepository.findFirstNude({
-      where: { ...(asoId && { id: asoId }), employeeId, exam: { isAttendance: true }, OR: [{ clinicId: companyId }, { employee: { companyId } }] },
+      where: {
+        ...(asoId && { id: asoId }),
+        employeeId,
+        exam: { isAttendance: true },
+        OR: [{ clinicId: companyId }, { employee: { companyId } }],
+      },
       orderBy: { doneDate: 'desc' },
       select: {
         id: true,
@@ -90,7 +99,11 @@ export class PdfAsoDataService {
         clinic: {
           select: {
             id: true,
-            contacts: { select: { phone: true, id: true, isPrincipal: true, email: true }, take: 1, orderBy: { isPrincipal: 'desc' } },
+            contacts: {
+              select: { phone: true, id: true, isPrincipal: true, email: true },
+              take: 1,
+              orderBy: { isPrincipal: 'desc' },
+            },
             fantasy: true,
             address: true,
             doctorResponsible: { include: { professional: { select: { name: true, id: true } } } },
@@ -114,15 +127,33 @@ export class PdfAsoDataService {
                 logoUrl: true,
                 cnpj: true,
                 address: true,
-                doctorResponsible: { select: { councilId: true, councilType: true, councilUF: true, professional: { select: { name: true } } } },
+                doctorResponsible: {
+                  select: {
+                    councilId: true,
+                    councilType: true,
+                    councilUF: true,
+                    professional: { select: { name: true } },
+                  },
+                },
                 numAsos: true,
                 group: {
                   select: {
                     numAsos: true,
-                    doctorResponsible: { select: { councilId: true, councilType: true, councilUF: true, professional: { select: { name: true } } } },
+                    doctorResponsible: {
+                      select: {
+                        councilId: true,
+                        councilType: true,
+                        councilUF: true,
+                        professional: { select: { name: true } },
+                      },
+                    },
                   },
                 },
-                contacts: { select: { phone: true, id: true, isPrincipal: true, email: true }, take: 1, orderBy: { isPrincipal: 'desc' } },
+                contacts: {
+                  select: { phone: true, id: true, isPrincipal: true, email: true },
+                  take: 1,
+                  orderBy: { isPrincipal: 'desc' },
+                },
                 receivingServiceContracts: {
                   select: {
                     applyingServiceCompany: {
@@ -134,7 +165,11 @@ export class PdfAsoDataService {
                         logoUrl: true,
                         fantasy: true,
                         address: true,
-                        contacts: { select: { phone: true, id: true, isPrincipal: true, email: true }, take: 1, orderBy: { isPrincipal: 'desc' } },
+                        contacts: {
+                          select: { phone: true, id: true, isPrincipal: true, email: true },
+                          take: 1,
+                          orderBy: { isPrincipal: 'desc' },
+                        },
                       },
                     },
                   },
@@ -150,7 +185,11 @@ export class PdfAsoDataService {
             },
             examsHistory: {
               distinct: ['examId'],
-              where: { status: { in: ['PROCESSING', 'DONE'] }, exam: { isAttendance: false }, examId: { in: examsIds } },
+              where: {
+                status: { in: ['PROCESSING', 'DONE'] },
+                exam: { isAttendance: false },
+                examId: { in: examsIds },
+              },
               select: { exam: { select: { name: true } }, doneDate: true, changeHierarchyDate: true, examId: true },
               orderBy: { doneDate: 'desc' },
             },
@@ -220,7 +259,12 @@ export class PdfAsoDataService {
     };
   }
 
-  onGetAllExamsData(employee: EmployeeEntity, asoRisk: IPriorRiskData[], examRepresentAll: ExamEntity[], examType: ExamHistoryTypeEnum) {
+  onGetAllExamsData(
+    employee: EmployeeEntity,
+    asoRisk: IPriorRiskData[],
+    examRepresentAll: ExamEntity[],
+    examType: ExamHistoryTypeEnum,
+  ) {
     const exams: (ExamRiskEntity | ExamRiskDataEntity)[] = [];
 
     asoRisk?.forEach((data) => {
@@ -243,7 +287,9 @@ export class PdfAsoDataService {
 
     return exams.filter(
       (item, index, self) =>
-        checkExamType(item, examType) && !this.findExamByHierarchyService.checkIfSkipEmployee(item, employee) && index === self.findIndex((t) => t.examId == item.examId),
+        checkExamType(item, examType) &&
+        !this.findExamByHierarchyService.checkIfSkipEmployee(item, employee) &&
+        index === self.findIndex((t) => t.examId == item.examId),
     );
   }
 

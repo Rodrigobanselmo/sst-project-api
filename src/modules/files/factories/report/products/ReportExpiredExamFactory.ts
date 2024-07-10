@@ -3,7 +3,13 @@ import { Injectable } from '@nestjs/common';
 
 import { ExcelProvider } from '../../../../../shared/providers/ExcelProvider/implementations/ExcelProvider';
 import { ReportFactoryAbstractionCreator } from '../creator/ReportFactoryCreator';
-import { IReportCell, IReportFactoryProduct, IReportFactoryProductFindData, IReportHeader, IReportSanitizeData } from '../types/IReportFactory.types';
+import {
+  IReportCell,
+  IReportFactoryProduct,
+  IReportFactoryProductFindData,
+  IReportHeader,
+  IReportSanitizeData,
+} from '../types/IReportFactory.types';
 import { getCompanyName } from './../../../../../shared/utils/companyName';
 import { FindEmployeeDto } from './../../../../company/dto/employee.dto';
 import { EmployeeEntity } from './../../../../company/entities/employee.entity';
@@ -28,7 +34,10 @@ export class ReportExpiredExamFactory extends ReportFactoryAbstractionCreator<Fi
 }
 
 class ReportFactoryProduct implements IReportFactoryProduct<FindEmployeeDto> {
-  constructor(private readonly employeeRepository: EmployeeRepository, private readonly dayjsProvider: DayJSProvider) {}
+  constructor(
+    private readonly employeeRepository: EmployeeRepository,
+    private readonly dayjsProvider: DayJSProvider,
+  ) {}
 
   public async findTableData(companyId: string, { skip, take, ...query }: FindEmployeeDto) {
     query.expiredExam = true;
@@ -45,7 +54,12 @@ class ReportFactoryProduct implements IReportFactoryProduct<FindEmployeeDto> {
           birthday: true,
           lastExam: true,
           esocialCode: true,
-          hierarchy: { select: { name: true, parent: { select: { name: true, type: true, parent: { select: { name: true, type: true } } } } } },
+          hierarchy: {
+            select: {
+              name: true,
+              parent: { select: { name: true, type: true, parent: { select: { name: true, type: true } } } },
+            },
+          },
           company: { select: { unit: true, group: { select: { name: true } } } },
         },
       },
@@ -56,7 +70,12 @@ class ReportFactoryProduct implements IReportFactoryProduct<FindEmployeeDto> {
     const titleData = this.getTitle(headerData);
     const infoData = this.getEndInformation(employees.data.length);
 
-    const returnData: IReportFactoryProductFindData = { headerRow: headerData, titleRows: titleData, endRows: infoData, sanitizeData };
+    const returnData: IReportFactoryProductFindData = {
+      headerRow: headerData,
+      titleRows: titleData,
+      endRows: infoData,
+      sanitizeData,
+    };
 
     return returnData;
   }
@@ -74,10 +93,18 @@ class ReportFactoryProduct implements IReportFactoryProduct<FindEmployeeDto> {
         sector: { content: employee.sectorHierarchy?.name || '' },
         hierarchy: { content: employee?.hierarchy?.name || '' },
         lastExam: {
-          content: employee.lastExam || employee.lastDoneExam?.doneDate ? this.dayjsProvider.format(employee.lastDoneExam?.doneDate || employee.lastExam) : '',
+          content:
+            employee.lastExam || employee.lastDoneExam?.doneDate
+              ? this.dayjsProvider.format(employee.lastDoneExam?.doneDate || employee.lastExam)
+              : '',
         },
-        expiredDateExam: { content: employee.expiredDateExam && employee.expiredDateExam.getFullYear() > 1901 ? employee.expiredDateExam : '' },
-        scheduleDate: { content: employee?.scheduleExam?.doneDate ? this.dayjsProvider.format(employee?.scheduleExam?.doneDate) : '' },
+        expiredDateExam: {
+          content:
+            employee.expiredDateExam && employee.expiredDateExam.getFullYear() > 1901 ? employee.expiredDateExam : '',
+        },
+        scheduleDate: {
+          content: employee?.scheduleExam?.doneDate ? this.dayjsProvider.format(employee?.scheduleExam?.doneDate) : '',
+        },
       };
 
       return sanitazeRow;

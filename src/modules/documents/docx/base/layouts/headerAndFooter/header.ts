@@ -50,9 +50,9 @@ const firstCell = (path?: string) => {
 
   const image = path
     ? new ImageRun({
-      data: readFileSync(path),
-      transformation: getProportion(),
-    })
+        data: readFileSync(path),
+        transformation: getProportion(),
+      })
     : undefined;
 
   return new TableCell({

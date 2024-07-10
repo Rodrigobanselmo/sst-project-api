@@ -9,7 +9,10 @@ import { v4 } from 'uuid';
 
 @Injectable()
 export class UpdateDocumentService {
-  constructor(private readonly documentRepository: DocumentRepository, private readonly amazonStorageProvider: AmazonStorageProvider) {}
+  constructor(
+    private readonly documentRepository: DocumentRepository,
+    private readonly amazonStorageProvider: AmazonStorageProvider,
+  ) {}
 
   async execute(updateDto: UpdateDocumentDto, user: UserPayloadDto, file: Express.Multer.File) {
     const companyId = user.targetCompanyId;

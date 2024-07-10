@@ -69,7 +69,6 @@ export enum DocumentSectionChildrenTypeEnum {
   TABLE_PCMSO_GHO = 'TABLE_PCMSO_GHO',
   TABLE_PCMSO_HIERARCHY = 'TABLE_PCMSO_HIERARCHY',
   TABLE_PCMSO_HIERARCHY_CONCAT = 'TABLE_PCMSO_HIERARCHY_CONCAT',
-
 }
 
 export enum InlineStyleTypeEnum {
@@ -110,7 +109,7 @@ export interface IEntityRange {
 }
 
 export const optionsBulletLevel: Array<0 | 1 | 2 | 3 | 4 | 5 | 6> = [0, 1, 2, 3, 4, 5, 6];
-type OptionsLevel = typeof optionsBulletLevel[number];
+type OptionsLevel = (typeof optionsBulletLevel)[number];
 
 export type IBullet = Omit<IParagraphOptions, 'text'> & {
   type: DocumentSectionChildrenTypeEnum.BULLET;
@@ -124,7 +123,7 @@ export type IParagraph = Omit<IParagraphOptions, 'text'> & {
   text: string;
   size?: number;
   color?: string;
-  align?: AlignmentType;
+  align?: (typeof AlignmentType)[keyof typeof AlignmentType];
   inlineStyleRangeBlock?: IInlineStyleRange[][];
   entityRangeBlock?: IEntityRange[][];
 } & IBaseDocumentModel;
@@ -133,7 +132,7 @@ export type IImage = {
   type: DocumentSectionChildrenTypeEnum.IMAGE;
   url: string | null;
   width: number;
-  align?: AlignmentType;
+  align?: (typeof AlignmentType)[keyof typeof AlignmentType];
 } & IBaseDocumentModel;
 
 export type ILegend = Omit<IParagraphOptions, 'text'> & {
@@ -141,7 +140,7 @@ export type ILegend = Omit<IParagraphOptions, 'text'> & {
   text: string;
   color?: string;
   size?: number;
-  align?: AlignmentType;
+  align?: (typeof AlignmentType)[keyof typeof AlignmentType];
   inlineStyleRangeBlock?: IInlineStyleRange[][];
   entityRangeBlock?: IEntityRange[][];
 } & IBaseDocumentModel;

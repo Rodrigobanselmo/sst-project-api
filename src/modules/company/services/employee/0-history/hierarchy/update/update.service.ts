@@ -24,7 +24,12 @@ export class UpdateEmployeeHierarchyHistoryService {
     private readonly deleteEmployeeHierarchyHistoryService: DeleteEmployeeHierarchyHistoryService,
   ) {}
 
-  async execute(dataDto: UpdateEmployeeHierarchyHistoryDto, user: UserPayloadDto, history?: EmployeeHierarchyHistoryEntity, employee?: EmployeeEntity) {
+  async execute(
+    dataDto: UpdateEmployeeHierarchyHistoryDto,
+    user: UserPayloadDto,
+    history?: EmployeeHierarchyHistoryEntity,
+    employee?: EmployeeEntity,
+  ) {
     if (!history) {
       history = await this.employeeHierarchyHistoryRepository.findFirstNude({
         where: { id: dataDto.id, employeeId: dataDto.employeeId, employee: { companyId: user.targetCompanyId } },

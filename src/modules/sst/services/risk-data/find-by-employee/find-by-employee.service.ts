@@ -137,7 +137,11 @@ export class FindAllRiskDataByEmployeeService {
       employee.subOffices = hierarchyHistory?.subHierarchies;
     }
 
-    if (examHistory && examHistory?.hierarchy && (examHistory.doneDate > hierarchyHistory?.startDate || !hierarchyHistory?.startDate)) {
+    if (
+      examHistory &&
+      examHistory?.hierarchy &&
+      (examHistory.doneDate > hierarchyHistory?.startDate || !hierarchyHistory?.startDate)
+    ) {
       date = examHistory.doneDate;
       employee.hierarchy = examHistory?.hierarchy;
       if (examHistory?.subOfficeId) employee.subOffices = [{ id: examHistory?.subOfficeId }];

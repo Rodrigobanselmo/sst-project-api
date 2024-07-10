@@ -31,5 +31,5 @@ export interface ICreatePGR {
   imagesMap?: IImagesMap;
   hierarchyHighLevelsData: Map<string, HierarchyMapData>;
   exams?: IExamOrigins[];
-  risksMap?: IRiskMap
+  risksMap?: IRiskMap;
 }

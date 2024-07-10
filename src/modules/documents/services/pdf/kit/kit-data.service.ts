@@ -13,8 +13,8 @@ export class PdfKitDataService {
   constructor(
     private readonly scheduleMedicalVisitRepository: ScheduleMedicalVisitRepository,
     private readonly pdfProntuarioDataService: PdfProntuarioDataService,
-    private readonly pdfAsoDataService: PdfAsoDataService
-  ) { }
+    private readonly pdfAsoDataService: PdfAsoDataService,
+  ) {}
   async execute(userPayloadDto: UserPayloadDto, options?: KitPdfDto) {
     const companyId = userPayloadDto.targetCompanyId;
     const kits = [];
@@ -31,8 +31,8 @@ export class PdfKitDataService {
           examination,
           questions,
         },
-      })
-    }
+      });
+    };
 
     if (options.scheduleMedicalVisitId) {
       const scheduleMedicalVisit = await this.scheduleMedicalVisitRepository.findFirstNude({
@@ -40,19 +40,18 @@ export class PdfKitDataService {
         select: {
           exams: {
             where: { exam: { isAttendance: true }, status: { notIn: ['CANCELED', 'EXPIRED'] } },
-            select: { id: true, employeeId: true }
-          }
-        }
-      })
+            select: { id: true, employeeId: true },
+          },
+        },
+      });
 
       await asyncBatch(scheduleMedicalVisit.exams, 20, async (exam) => {
-        await getAso(exam.employeeId, exam.id)
-      })
+        await getAso(exam.employeeId, exam.id);
+      });
     } else {
-      await getAso(options.employeeId, options?.asoId)
+      await getAso(options.employeeId, options?.asoId);
     }
 
-    return sortArray(kits, { by: 'sort' })
-
+    return sortArray(kits, { by: 'sort' });
   }
 }

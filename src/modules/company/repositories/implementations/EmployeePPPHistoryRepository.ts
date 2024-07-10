@@ -9,9 +9,12 @@ const i = 0;
 
 @Injectable()
 export class EmployeePPPHistoryRepository {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
-  async createManyNude(createData: Prisma.EmployeePPPHistoryCreateArgs['data'][], options?: Partial<Prisma.EmployeePPPHistoryCreateArgs>) {
+  async createManyNude(
+    createData: Prisma.EmployeePPPHistoryCreateArgs['data'][],
+    options?: Partial<Prisma.EmployeePPPHistoryCreateArgs>,
+  ) {
     const data = await this.prisma.$transaction(
       createData.map((data) =>
         this.prisma.employeePPPHistory.create({
@@ -24,7 +27,10 @@ export class EmployeePPPHistoryRepository {
     return data.map((data) => new EmployeePPPHistoryEntity(data));
   }
 
-  async upsertManyNude(createData: Pick<Prisma.EmployeePPPHistoryUpsertArgs, 'create' | 'update' | 'where'>[], options?: Partial<Prisma.EmployeePPPHistoryUpsertArgs>) {
+  async upsertManyNude(
+    createData: Pick<Prisma.EmployeePPPHistoryUpsertArgs, 'create' | 'update' | 'where'>[],
+    options?: Partial<Prisma.EmployeePPPHistoryUpsertArgs>,
+  ) {
     const data = await this.prisma.$transaction(
       createData.map((data) =>
         this.prisma.employeePPPHistory.upsert({

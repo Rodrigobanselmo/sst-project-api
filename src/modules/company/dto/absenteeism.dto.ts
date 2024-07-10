@@ -2,7 +2,6 @@ import { DateFormat } from './../../../shared/transformers/date-format';
 import { QueryArray } from '../../../shared/transformers/query-array';
 import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
-import { PartialType } from '@nestjs/swagger';
 import { IsBoolean, IsDate, IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { DateUnitEnum, StatusEnum } from '@prisma/client';
@@ -125,7 +124,7 @@ export class CreateAbsenteeismDto {
   status?: StatusEnum;
 }
 
-export class UpdateAbsenteeismDto extends PartialType(CreateAbsenteeismDto) {
+export class UpdateAbsenteeismDto extends CreateAbsenteeismDto {
   @IsInt()
   id: number;
 }

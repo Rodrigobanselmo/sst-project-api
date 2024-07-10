@@ -1,13 +1,30 @@
 import { Public } from './../../../../shared/decorators/public.decorator';
-import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags } from '@nestjs/swagger';
 
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import { FindActivityDto } from '../../dto/activity.dto';
 import { SetCompanyClinicDto, TestRoute123CompanyDto } from '../../dto/company-clinic.dto';
-import { CreateCompanyDto, FindCompaniesDto, UpdateApplyServiceCompanyDto, UpdateCompanyDto } from '../../dto/company.dto';
+import {
+  CreateCompanyDto,
+  FindCompaniesDto,
+  UpdateApplyServiceCompanyDto,
+  UpdateCompanyDto,
+} from '../../dto/company.dto';
 import { AddCompanyPhotoService } from '../../services/company/add-company-photo/add-company-photo.service';
 import { CopyCompanyService } from '../../services/company/copy-company/copy-company.service';
 import { CreateCompanyService } from '../../services/company/create-company/create-company.service';
@@ -30,7 +47,6 @@ import { DashboardCompanyService } from '../../services/report/dashboard-company
 import { UpdateApplyServiceCompanyService } from '../../services/company/update-apply-service-company/update-apply-service-company.service';
 import { DeleteCompanyService } from '../../services/company/delete-company/delete-company.service';
 
-@ApiTags('company')
 @Controller('company')
 export class CompanyController {
   constructor(
@@ -206,7 +222,11 @@ export class CompanyController {
     crud: true,
   })
   @Post('/copy/:copyFromCompanyId/:riskGroupId/:companyId')
-  copy(@Param('copyFromCompanyId') copyFromCompanyId: string, @Param('riskGroupId') riskGroupId: string, @User() userPayloadDto: UserPayloadDto) {
+  copy(
+    @Param('copyFromCompanyId') copyFromCompanyId: string,
+    @Param('riskGroupId') riskGroupId: string,
+    @User() userPayloadDto: UserPayloadDto,
+  ) {
     return this.copyCompanyService.execute(copyFromCompanyId, riskGroupId, userPayloadDto);
   }
 

@@ -86,7 +86,11 @@ const setMapHierarchies = (hierarchyData: HierarchyEntity[]) => {
   return { hierarchyTree, homoGroupTree };
 };
 
-export const hierarchyConverter = (hierarchies: HierarchyEntity[], environments = [] as CharacterizationEntity[], { workspaceId }: { workspaceId?: string } = {}) => {
+export const hierarchyConverter = (
+  hierarchies: HierarchyEntity[],
+  environments = [] as CharacterizationEntity[],
+  { workspaceId }: { workspaceId?: string } = {},
+) => {
   const { hierarchyTree, homoGroupTree } = setMapHierarchies(hierarchies);
   const hierarchyData = new Map<string, HierarchyMapData>();
   const hierarchyHighLevelsData = new Map<string, HierarchyMapData>();
@@ -162,7 +166,9 @@ export const hierarchyConverter = (hierarchies: HierarchyEntity[], environments 
 
     const isOffice = ([HierarchyEnum.OFFICE, HierarchyEnum.SUB_OFFICE] as HierarchyEnum[]).includes(hierarchy.type);
 
-    const workspace = workspaceId ? hierarchy.workspaces.find((workspace) => workspace.id === workspaceId) || hierarchy.workspaces[0] : hierarchy.workspaces[0];
+    const workspace = workspaceId
+      ? hierarchy.workspaces.find((workspace) => workspace.id === workspaceId) || hierarchy.workspaces[0]
+      : hierarchy.workspaces[0];
 
     if (isOffice)
       hierarchyData.set(hierarchy.id, {

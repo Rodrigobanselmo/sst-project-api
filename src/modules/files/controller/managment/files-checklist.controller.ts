@@ -16,7 +16,7 @@ export class FilesChecklistController {
     private readonly uploadEpiDataService: UploadEpiDataService,
     private readonly uploadRiskService: UploadChecklistDataService,
     private readonly downloadRiskService: DownloadRiskDataService,
-  ) { }
+  ) {}
 
   @Roles(RoleEnum.DATABASE)
   @Permissions({

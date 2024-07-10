@@ -31,7 +31,10 @@ export class InviteUsersRepository implements IInviteUsersRepository {
     return new InviteUsersEntity(invite);
   }
 
-  async findById(id: string, options?: Partial<Prisma.InviteUsersFindUniqueArgs>): Promise<InviteUsersEntity | undefined> {
+  async findById(
+    id: string,
+    options?: Partial<Prisma.InviteUsersFindUniqueArgs>,
+  ): Promise<InviteUsersEntity | undefined> {
     const invite = await this.prisma.inviteUsers.findUnique({
       where: { id },
       ...options,
@@ -68,7 +71,11 @@ export class InviteUsersRepository implements IInviteUsersRepository {
     );
   }
 
-  async find(query: Partial<FindInvitesDto>, pagination: PaginationQueryDto, options: Prisma.InviteUsersFindManyArgs = {}) {
+  async find(
+    query: Partial<FindInvitesDto>,
+    pagination: PaginationQueryDto,
+    options: Prisma.InviteUsersFindManyArgs = {},
+  ) {
     const whereInit = {
       AND: [],
     } as typeof options.where;
@@ -106,7 +113,13 @@ export class InviteUsersRepository implements IInviteUsersRepository {
     ]);
 
     return {
-      data: response[1].map((p) => new InviteUsersEntity({ ...p, ...(p.professional && { professional: new ProfessionalEntity(p.professional) }) })),
+      data: response[1].map(
+        (p) =>
+          new InviteUsersEntity({
+            ...p,
+            ...(p.professional && { professional: new ProfessionalEntity(p.professional) }),
+          }),
+      ),
       count: response[0],
     };
   }

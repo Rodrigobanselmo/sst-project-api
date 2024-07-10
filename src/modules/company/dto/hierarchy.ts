@@ -187,7 +187,6 @@ export class CreateSubHierarchyDto {
   @IsOptional()
   parentId?: string;
 
-
   @IsString()
   @IsOptional()
   organizeByOffice?: boolean;

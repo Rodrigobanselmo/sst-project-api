@@ -103,8 +103,16 @@ export class SendBatchESocialService {
   ) {}
 
   async execute() {
-    const { company, cert } = await this.eSocialMethodsProvider.getCompany('d1309cad-19d4-4102-9bf9-231f91095c20', { cert: true, report: true });
-    const xml = '<library>' + '<book Id="ID1034952680000002022100418283200001">' + '<name>Harry Potter</name>' + '</book>' + '</library>';
+    const { company, cert } = await this.eSocialMethodsProvider.getCompany('d1309cad-19d4-4102-9bf9-231f91095c20', {
+      cert: true,
+      report: true,
+    });
+    const xml =
+      '<library>' +
+      '<book Id="ID1034952680000002022100418283200001">' +
+      '<name>Harry Potter</name>' +
+      '</book>' +
+      '</library>';
 
     const s = await this.eSocialMethodsProvider.signEvent({
       xml,

@@ -1,5 +1,4 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
 
 import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
@@ -12,7 +11,6 @@ import { FindAbsenteeismsService } from '../../services/absenteeism/find-absente
 import { FindOneAbsenteeismsService } from '../../services/absenteeism/find-one-absenteeism/find-one-absenteeism.service';
 import { UpdateAbsenteeismsService } from '../../services/absenteeism/update-absenteeism/update-absenteeism.service';
 
-@ApiTags('absenteeism')
 @Controller('absenteeism')
 export class AbsenteeismController {
   constructor(
@@ -63,7 +61,11 @@ export class AbsenteeismController {
     crud: true,
   })
   @Patch('/:companyId/:id')
-  update(@Body() upsertAccessGroupDto: UpdateAbsenteeismDto, @User() userPayloadDto: UserPayloadDto, @Param('id', ParseIntPipe) id: number) {
+  update(
+    @Body() upsertAccessGroupDto: UpdateAbsenteeismDto,
+    @User() userPayloadDto: UserPayloadDto,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
     return this.updateAbsenteeismsService.execute({ ...upsertAccessGroupDto, id }, userPayloadDto);
   }
 

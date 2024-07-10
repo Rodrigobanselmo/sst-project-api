@@ -1,6 +1,10 @@
 import { HeadingLevel, IParagraphOptions, Paragraph } from 'docx';
 
-const baseHeading = (text: string, heading: HeadingLevel, options?: IParagraphOptions) =>
+const baseHeading = (
+  text: string,
+  heading: (typeof HeadingLevel)[keyof typeof HeadingLevel],
+  options?: IParagraphOptions,
+) =>
   new Paragraph({
     text: text,
     heading,

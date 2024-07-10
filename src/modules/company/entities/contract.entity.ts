@@ -1,10 +1,8 @@
-import { ApiProperty } from '@nestjs/swagger';
 import { Contract, StatusEnum } from '@prisma/client';
 
 import { CompanyEntity } from './company.entity';
 
 export class ContractEntity implements Contract {
-  @ApiProperty({ description: 'The id of the Company' })
   id: string;
 
   applyingServiceCompanyId: string;

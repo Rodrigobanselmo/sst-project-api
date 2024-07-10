@@ -40,7 +40,7 @@ export class UpdateAllCompaniesService {
     private readonly eSocialEventProvider: ESocialEventProvider,
     private readonly companyReportRepository: CompanyReportRepository,
     private readonly updateESocialReportService: UpdateESocialReportService,
-  ) { }
+  ) {}
 
   async execute(user?: UserPayloadDto) {
     const companyId = user?.targetCompanyId;
@@ -65,7 +65,7 @@ export class UpdateAllCompaniesService {
           },
         },
         applyingServiceContracts: {
-          where: { status: 'ACTIVE', },
+          where: { status: 'ACTIVE' },
           select: { receivingServiceCompanyId: true },
         },
       },
@@ -99,14 +99,13 @@ export class UpdateAllCompaniesService {
 
     const employeeExams = (await asyncEach(allCompanies, (v) => this.addReport(v))).map(
       ({ company, examTime, esocialEvents }): UpsertCompanyReportDto & { company: CompanyEntity } => {
-
         return {
           company: company,
           companyId: company.id,
           lastDailyReport: this.dayjs.dateNow(),
           dailyReport: {
             exam: examTime,
-            esocial: esocialEvents
+            esocial: esocialEvents,
           },
         };
       },
@@ -169,16 +168,17 @@ export class UpdateAllCompaniesService {
   }
 
   async addEmployeeExamTime(company: CompanyEntity, options?: { employeeIds?: number[] }) {
-    const isSchedule = company.permissions.includes(PermissionCompanyEnum.schedule)
+    const isSchedule = company.permissions.includes(PermissionCompanyEnum.schedule);
 
-    if (!isSchedule) return {
-      all: 0,
-      expired: 0,
-      good: 0,
-      schedule: 0,
-      expiredClose1: 0,
-      expiredClose2: 0,
-    }
+    if (!isSchedule)
+      return {
+        all: 0,
+        expired: 0,
+        good: 0,
+        schedule: 0,
+        expiredClose1: 0,
+        expiredClose2: 0,
+      };
 
     const companyId = company.id;
     const date = this.dayjs.dayjs().hour(0).minute(0).second(0).millisecond(0).toDate();
@@ -190,38 +190,35 @@ export class UpdateAllCompaniesService {
         where: {
           companyId,
           expiredDateExam: { gt: date90 },
-        }
+        },
       });
 
       const expiredPromise = this.employeeRepository.countNude({
         where: {
           companyId,
-          OR: [
-            { expiredDateExam: { lte: date } },
-            { expiredDateExam: null }
-          ],
-        }
+          OR: [{ expiredDateExam: { lte: date } }, { expiredDateExam: null }],
+        },
       });
 
       const expired45Promise = this.employeeRepository.countNude({
         where: {
           companyId,
           expiredDateExam: { lte: date45, gt: date },
-        }
+        },
       });
 
       const expired90Promise = this.employeeRepository.countNude({
         where: {
           companyId,
           expiredDateExam: { lte: date90, gt: date45 },
-        }
+        },
       });
 
       const schedulePromise = this.employeeRepository.countNude({
         where: {
           companyId,
-          examsHistory: { some: { doneDate: { gte: date }, status: 'PROCESSING' } }
-        }
+          examsHistory: { some: { doneDate: { gte: date }, status: 'PROCESSING' } },
+        },
       });
 
       const [good, expired, expired45, expired90, schedule] = await Promise.all([
@@ -239,7 +236,7 @@ export class UpdateAllCompaniesService {
         schedule: schedule,
         expiredClose1: expired45,
         expiredClose2: expired90,
-      }
+      };
 
       return examTime;
     } catch (e) {
@@ -250,7 +247,7 @@ export class UpdateAllCompaniesService {
 
   async addCompanyEsocial(company: CompanyEntity) {
     const companyId = company.id;
-    const isEsocial = company.permissions.includes(PermissionCompanyEnum.esocial)
+    const isEsocial = company.permissions.includes(PermissionCompanyEnum.esocial);
 
     const emptyEsocial = {
       ['S2240']: {
@@ -274,8 +271,7 @@ export class UpdateAllCompaniesService {
         transmitted: 0,
         rejected: 0,
       },
-
-    }
+    };
 
     if (!isEsocial) return emptyEsocial;
     if (!company.esocialStart) return emptyEsocial;
@@ -423,7 +419,10 @@ export class UpdateAllCompaniesService {
 
           if (doneExamFound) employee.expiredDateExam = doneExamFound.expiredDate;
           if (!doneExamFound && scheduleExamFound && employee.lastExam) {
-            const expiredDate = this.dayjs.dayjs(employee.lastExam).add(scheduleExamFound.validityInMonths, 'month').toDate();
+            const expiredDate = this.dayjs
+              .dayjs(employee.lastExam)
+              .add(scheduleExamFound.validityInMonths, 'month')
+              .toDate();
             employee.expiredDateExam = expiredDate;
           }
         }
@@ -438,11 +437,11 @@ export class UpdateAllCompaniesService {
     const exams =
       allWithMissingExam.length != 0
         ? await this.findExamByHierarchyService.execute(
-          { targetCompanyId: companyId },
-          {
-            onlyAttendance: true,
-          },
-        )
+            { targetCompanyId: companyId },
+            {
+              onlyAttendance: true,
+            },
+          )
         : undefined;
 
     const getExpired = allWithMissingExam.map((employee) => {
@@ -455,7 +454,9 @@ export class UpdateAllCompaniesService {
 
           origins.find((origin) => {
             const isPartOfHomo = origin?.homogeneousGroup
-              ? origin.homogeneousGroup?.hierarchyOnHomogeneous?.find((homoHier) => ids.includes(homoHier?.hierarchy?.id))
+              ? origin.homogeneousGroup?.hierarchyOnHomogeneous?.find((homoHier) =>
+                  ids.includes(homoHier?.hierarchy?.id),
+                )
               : true;
             if (!isPartOfHomo) return;
 

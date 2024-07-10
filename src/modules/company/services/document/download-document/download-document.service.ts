@@ -7,7 +7,10 @@ import { DocumentRepository } from '../../../repositories/implementations/Docume
 
 @Injectable()
 export class DownloadDocumentService {
-  constructor(private readonly documentRepository: DocumentRepository, private readonly amazonStorageProvider: AmazonStorageProvider) {}
+  constructor(
+    private readonly documentRepository: DocumentRepository,
+    private readonly amazonStorageProvider: AmazonStorageProvider,
+  ) {}
 
   async execute(id: number, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;
@@ -22,7 +25,7 @@ export class DownloadDocumentService {
     if (!documentFound?.id) throw new BadRequestException(ErrorMessageEnum.DOCUMENT_NOT_FOUND);
 
     const fileKey = documentFound.fileUrl.split('.com/').pop();
-    const { file: fileStream } = this.amazonStorageProvider.download({
+    const { file: fileStream } = await this.amazonStorageProvider.download({
       fileKey,
     });
 

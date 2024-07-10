@@ -25,7 +25,15 @@ export class DownloadUniqueCompanyService {
     const companyId = userPayloadDto.companyId;
 
     return this.downloadExcelProvider.newTableData({
-      findAll: (sheet) => findAllEmployees(this.excelProvider, this.companyRepository, this.workspaceRepository, this.hierarchyRepository, sheet, companyId),
+      findAll: (sheet) =>
+        findAllEmployees(
+          this.excelProvider,
+          this.companyRepository,
+          this.workspaceRepository,
+          this.hierarchyRepository,
+          sheet,
+          companyId,
+        ),
       Workbook,
       companyId,
     });

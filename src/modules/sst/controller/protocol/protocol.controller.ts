@@ -1,5 +1,4 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
 
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
@@ -13,7 +12,6 @@ import { PermissionEnum, RoleEnum } from '../../../../shared/constants/enum/auth
 import { Roles } from '../../../../shared/decorators/roles.decorator';
 import { UpdateRiskProtocolsService } from '../../services/protocol/update-risk-protocol/update-risk-protocol.service';
 
-@ApiTags('protocol')
 @Controller('protocol')
 export class ProtocolController {
   constructor(
@@ -72,7 +70,11 @@ export class ProtocolController {
     crud: true,
   })
   @Patch('/:id/:companyId')
-  update(@Body() upsertAccessGroupDto: UpdateProtocolDto, @User() userPayloadDto: UserPayloadDto, @Param('id', ParseIntPipe) id: number) {
+  update(
+    @Body() upsertAccessGroupDto: UpdateProtocolDto,
+    @User() userPayloadDto: UserPayloadDto,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
     return this.updateProtocolsService.execute({ ...upsertAccessGroupDto, id }, userPayloadDto);
   }
 

@@ -22,13 +22,16 @@ export const signaturesIterable = (
   const iterableSections = signaturesVariablesArray.map((variables) => {
     const credentials = [] as string[];
 
-    if (variables[VariablesPGREnum.PROFESSIONAL_NAME]) credentials.push(`**??${VariablesPGREnum.PROFESSIONAL_NAME}??**`);
+    if (variables[VariablesPGREnum.PROFESSIONAL_NAME])
+      credentials.push(`**??${VariablesPGREnum.PROFESSIONAL_NAME}??**`);
 
-    if (variables[VariablesPGREnum.PROFESSIONAL_FORMATION]) credentials.push(`??${VariablesPGREnum.PROFESSIONAL_FORMATION}??`);
+    if (variables[VariablesPGREnum.PROFESSIONAL_FORMATION])
+      credentials.push(`??${VariablesPGREnum.PROFESSIONAL_FORMATION}??`);
 
     if (variables[VariablesPGREnum.PROFESSIONAL_CREA]) credentials.push(`??${VariablesPGREnum.PROFESSIONAL_CREA}??`);
 
-    if (variables[VariablesPGREnum.PROFESSIONAL_CPF]) credentials.push(`CPF: ${variables[VariablesPGREnum.PROFESSIONAL_CPF]}`);
+    if (variables[VariablesPGREnum.PROFESSIONAL_CPF])
+      credentials.push(`CPF: ${variables[VariablesPGREnum.PROFESSIONAL_CPF]}`);
 
     // if (variables[VariablesPGREnum.PROFESSIONAL_CERTIFICATIONS]) text = `${text}${variables[VariablesPGREnum.PROFESSIONAL_CERTIFICATIONS]}`
     return convertToDocx(
@@ -100,7 +103,10 @@ export const signaturesIterable = (
 
   const table = new Table({
     width: { size: 100, type: WidthType.PERCENTAGE },
-    rows: [tableBodyElements.tableRow([marginParagraph]), ...iterableSectionsChunks.map((dataChuck) => tableBodyElements.tableRow([...getRows(dataChuck)]))],
+    rows: [
+      tableBodyElements.tableRow([marginParagraph]),
+      ...iterableSectionsChunks.map((dataChuck) => tableBodyElements.tableRow([...getRows(dataChuck)])),
+    ],
   });
 
   return [table];

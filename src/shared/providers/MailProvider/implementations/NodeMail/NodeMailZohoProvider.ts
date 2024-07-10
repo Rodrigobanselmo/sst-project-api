@@ -9,7 +9,15 @@ import { EmailsEnum } from '../../../../constants/enum/emails';
 import { IMailProvider, ISendMailData } from '../../models/IMailProvider';
 
 class NodeMailProvider implements IMailProvider {
-  async sendMail({ path, subject, to, variables, attachments, source = EmailsEnum.VALIDATION, sendDelevelop }: ISendMailData): Promise<any> {
+  async sendMail({
+    path,
+    subject,
+    to,
+    variables,
+    attachments,
+    source = EmailsEnum.VALIDATION,
+    sendDelevelop,
+  }: ISendMailData): Promise<any> {
     try {
       if (!sendDelevelop && process.env.NODE_ENV === 'development') return;
       if (!to) return;
@@ -23,7 +31,7 @@ class NodeMailProvider implements IMailProvider {
       const email = source.match(/<([^>]+)>/)[1];
 
       const transporter = nodemailer.createTransport({
-        host: "smtp.zoho.com",
+        host: 'smtp.zoho.com',
         secure: true,
         port: 465,
         auth: {
@@ -31,7 +39,6 @@ class NodeMailProvider implements IMailProvider {
           pass: process.env.ZOHO_PASS,
         },
       });
-
 
       await transporter.sendMail({
         to: to as string,
@@ -42,11 +49,10 @@ class NodeMailProvider implements IMailProvider {
           attachments: attachments?.map((attachment) => ({
             content: attachment.content,
             filename: attachment.filename,
-            contentType: attachment.type
-          }))
-        })
+            contentType: attachment.type,
+          })),
+        }),
       });
-
     } catch (error) {
       console.error(JSON.stringify(error, null, 2));
       throw new UnprocessableEntityException(ErrorMessageEnum.EMAIL_NOT_SEND);

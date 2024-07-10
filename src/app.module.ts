@@ -1,4 +1,4 @@
-import { CacheModule, MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 
@@ -20,11 +20,23 @@ import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
-    ThrottlerModule.forRoot({
-      ttl: 60,
-      limit: 10,
-    }),
-    PrismaModule, UsersModule, AuthModule, CompanyModule, SSTModule, FilesModule, DocumentsModule, EsocialModule, NotificationModule, ScheduleModule.forRoot()],
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60,
+        limit: 10,
+      },
+    ]),
+    PrismaModule,
+    UsersModule,
+    AuthModule,
+    CompanyModule,
+    SSTModule,
+    FilesModule,
+    DocumentsModule,
+    EsocialModule,
+    NotificationModule,
+    ScheduleModule.forRoot(),
+  ],
   providers: [
     {
       provide: APP_GUARD,

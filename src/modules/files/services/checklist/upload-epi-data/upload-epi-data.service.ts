@@ -70,16 +70,25 @@ export class UploadEpiDataService {
   }
 }
 
-const readEpis = async (readFileData: IExcelReadData[], excelProvider: ExcelProvider, epiSheet: IEpiSheet, databaseTable: DatabaseTableEntity) => {
+const readEpis = async (
+  readFileData: IExcelReadData[],
+  excelProvider: ExcelProvider,
+  epiSheet: IEpiSheet,
+  databaseTable: DatabaseTableEntity,
+) => {
   const episTable = readFileData.find((data) => data.name === epiSheet.name);
 
   if (!episTable)
-    throw new BadRequestException(`The table you trying to insert has a different sheet name: ${readFileData.join(', ')} than the expected: ${epiSheet.name}`);
+    throw new BadRequestException(
+      `The table you trying to insert has a different sheet name: ${readFileData.join(', ')} than the expected: ${epiSheet.name}`,
+    );
 
   const epiDatabase = await excelProvider.transformToTableData(episTable, epiSheet.columns);
 
   if (databaseTable?.version && epiDatabase.version !== databaseTable.version)
-    throw new BadRequestException('The table you trying to insert has a different version, make sure you have the newest table version');
+    throw new BadRequestException(
+      'The table you trying to insert has a different version, make sure you have the newest table version',
+    );
 
   return epiDatabase.rows;
 };

@@ -19,24 +19,28 @@ export class UpdateHomoGroupService {
 
   async execute(homoGroup: UpdateHomoGroupDto, userPayloadDto: UserPayloadDto) {
     const inactivating = homoGroup.status == 'INACTIVE';
-    const foundHomoGroup = await this.homoGroupRepository.findHomoGroupByCompanyAndId(homoGroup.id, userPayloadDto.targetCompanyId, {
-      select: {
-        id: true,
-        created_at: true,
-        ...(inactivating && { hierarchyOnHomogeneous: { where: { endDate: null }, take: 1, select: { id: true } } }),
-        ...(!!homoGroup?.hierarchies?.length && {
-          hierarchyOnHomogeneous: {
-            select: { id: true, startDate: true, endDate: true, hierarchyId: true },
-            where: {
-              endDate: null,
-              hierarchy: {
-                id: { in: homoGroup.hierarchies.map((h) => h.id) },
+    const foundHomoGroup = await this.homoGroupRepository.findHomoGroupByCompanyAndId(
+      homoGroup.id,
+      userPayloadDto.targetCompanyId,
+      {
+        select: {
+          id: true,
+          created_at: true,
+          ...(inactivating && { hierarchyOnHomogeneous: { where: { endDate: null }, take: 1, select: { id: true } } }),
+          ...(!!homoGroup?.hierarchies?.length && {
+            hierarchyOnHomogeneous: {
+              select: { id: true, startDate: true, endDate: true, hierarchyId: true },
+              where: {
+                endDate: null,
+                hierarchy: {
+                  id: { in: homoGroup.hierarchies.map((h) => h.id) },
+                },
               },
             },
-          },
-        }),
+          }),
+        },
       },
-    });
+    );
 
     if (!foundHomoGroup?.id) throw new BadRequestException(ErrorCompanyEnum.GHO_NOT_FOUND);
 
@@ -64,7 +68,9 @@ export class UpdateHomoGroupService {
       where: {
         employee: {
           companyId: userPayloadDto.targetCompanyId,
-          hierarchyHistory: { some: { hierarchy: { hierarchyOnHomogeneous: { some: { homogeneousGroupId: homo.id } } } } },
+          hierarchyHistory: {
+            some: { hierarchy: { hierarchyOnHomogeneous: { some: { homogeneousGroupId: homo.id } } } },
+          },
         },
       },
     });
@@ -72,8 +78,13 @@ export class UpdateHomoGroupService {
     return homo;
   }
 
-  async checkDeletion(homoGroup: HomoGroupEntity, userPayloadDto: UserPayloadDto, data: { ids: string[]; endDate?: Date; startDate?: Date }) {
-    const newHierarchyIds = data?.ids?.filter((id) => !homoGroup.hierarchyOnHomogeneous?.find((hh) => hh?.hierarchyId == id)) || [];
+  async checkDeletion(
+    homoGroup: HomoGroupEntity,
+    userPayloadDto: UserPayloadDto,
+    data: { ids: string[]; endDate?: Date; startDate?: Date },
+  ) {
+    const newHierarchyIds =
+      data?.ids?.filter((id) => !homoGroup.hierarchyOnHomogeneous?.find((hh) => hh?.hierarchyId == id)) || [];
 
     if (newHierarchyIds.length == 0) return;
 

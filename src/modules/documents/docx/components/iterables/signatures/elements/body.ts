@@ -1,4 +1,16 @@
-import { AlignmentType, BorderStyle, HeightRule, ITableBordersOptions, ITableCellOptions, Paragraph, TableCell, TableRow, TextRun, VerticalAlign, WidthType } from 'docx';
+import {
+  AlignmentType,
+  BorderStyle,
+  HeightRule,
+  ITableBordersOptions,
+  ITableCellOptions,
+  Paragraph,
+  TableCell,
+  TableRow,
+  TextRun,
+  VerticalAlign,
+  WidthType,
+} from 'docx';
 
 import { palette } from '../../../../../../../shared/constants/palette';
 import { borderNoneStyle } from './../../../../base/config/styles';

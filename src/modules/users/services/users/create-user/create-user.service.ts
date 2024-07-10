@@ -21,7 +21,7 @@ export class CreateUserService {
     private readonly dateProvider: DayJSProvider,
     private readonly hashProvider: HashProvider,
     private readonly inviteUsersRepository: InviteUsersRepository,
-  ) { }
+  ) {}
 
   async execute({ token, password, googleToken, ...restCreateUserDto }: CreateUserDto) {
     const passHash = await this.hashProvider.createHash(password);
@@ -29,35 +29,42 @@ export class CreateUserService {
 
     const userAlreadyExist = await this.userRepository.findFirstNude({
       where: {
-        OR: [
-          { email: restCreateUserDto.email },
-          { googleExternalId: result?.user?.uid || 'not-found' }]
-      }
+        OR: [{ email: restCreateUserDto.email }, { googleExternalId: result?.user?.uid || 'not-found' }],
+      },
     });
 
     if (userAlreadyExist?.id) throw new BadRequestException(ErrorAuthEnum.USER_ALREADY_EXIST);
 
-    const { companies, companyId, invite } = await getCompanyPermissionByToken(token, this.findByTokenService, this.dateProvider);
+    const { companies, companyId, invite } = await getCompanyPermissionByToken(
+      token,
+      this.findByTokenService,
+      this.dateProvider,
+    );
 
     const userData = {
       ...restCreateUserDto,
       password: passHash,
       googleExternalId: result?.user?.uid,
-      ...(!restCreateUserDto.email && result?.user?.email && { googleUser: result.user.email })
+      ...(!restCreateUserDto.email && result?.user?.email && { googleUser: result.user.email }),
     };
     const professional = invite?.professional;
 
     const user = await this.userRepository.create(userData, companies, professional);
 
     if (invite) await this.inviteUsersRepository.deleteById(companyId, invite.id);
-    if (invite && invite.email && companyId) await this.inviteUsersRepository.deleteByCompanyIdAndEmail(companyId, invite.email);
+    if (invite && invite.email && companyId)
+      await this.inviteUsersRepository.deleteByCompanyIdAndEmail(companyId, invite.email);
 
     delete user.password;
     return user;
   }
 }
 
-export const getCompanyPermissionByToken = async (token: string, findByTokenService: FindByTokenService, dateProvider: DayJSProvider) => {
+export const getCompanyPermissionByToken = async (
+  token: string,
+  findByTokenService: FindByTokenService,
+  dateProvider: DayJSProvider,
+) => {
   if (!token) return { companies: [] };
 
   const invite = await findByTokenService.execute(token);

@@ -1,7 +1,10 @@
 import { DocumentTypeEnum } from '@prisma/client';
 import { VariablesPGREnum } from '../docx/builders/pgr/enums/variables.enum';
 
-type IVariableMap = Record<VariablesPGREnum, { type: VariablesPGREnum; accept: DocumentTypeEnum[]; label: string; active?: boolean; isBoolean?: boolean }>;
+type IVariableMap = Record<
+  VariablesPGREnum,
+  { type: VariablesPGREnum; accept: DocumentTypeEnum[]; label: string; active?: boolean; isBoolean?: boolean }
+>;
 
 export const variableMap: IVariableMap = {
   //*main string

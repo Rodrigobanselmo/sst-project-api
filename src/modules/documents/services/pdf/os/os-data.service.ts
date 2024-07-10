@@ -17,7 +17,10 @@ import { IPdfOSData } from './types/IOSData.type';
 
 @Injectable()
 export class PdfOsDataService {
-  constructor(private readonly employeeRepository: EmployeeRepository, private readonly findAllRiskDataByEmployeeService: FindAllRiskDataByEmployeeService) {}
+  constructor(
+    private readonly employeeRepository: EmployeeRepository,
+    private readonly findAllRiskDataByEmployeeService: FindAllRiskDataByEmployeeService,
+  ) {}
 
   async execute(employeeId: number, userPayloadDto: UserPayloadDto): Promise<IPdfOSData> {
     const companyId = userPayloadDto.targetCompanyId;
@@ -91,16 +94,20 @@ export class PdfOsDataService {
 
     if (!employeeFound?.id) throw new ForbiddenException(ErrorMessageEnum.FORBIDDEN_ACCESS);
 
-    const { risk: riskData, employee: employeeRisk } = await this.findAllRiskDataByEmployeeService.getRiskData(employeeId, undefined, {
-      fromExam: true,
-      hierarchyData: true,
-      filterDate: true,
-      selectAdm: true,
-      selectEpi: true,
-      selectEpc: true,
-      selectFont: true,
-      desc: true,
-    });
+    const { risk: riskData, employee: employeeRisk } = await this.findAllRiskDataByEmployeeService.getRiskData(
+      employeeId,
+      undefined,
+      {
+        fromExam: true,
+        hierarchyData: true,
+        filterDate: true,
+        selectAdm: true,
+        selectEpi: true,
+        selectEpc: true,
+        selectFont: true,
+        desc: true,
+      },
+    );
 
     const employee = { ...employeeRisk, ...employeeFound };
     const osRiskData = checkRiskDataDoc(riskData, { docType: 'isPGR', companyId: employee.companyId });

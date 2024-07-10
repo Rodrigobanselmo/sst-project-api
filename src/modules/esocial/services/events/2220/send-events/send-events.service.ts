@@ -1,24 +1,23 @@
 import { sortData } from './../../../../../../shared/utils/sorts/data.sort';
-import { BadRequestException, CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { EmployeeESocialEventTypeEnum } from '@prisma/client';
 import { Cache } from 'cache-manager';
 import { Readable } from 'stream';
 
-import { CompanyReportRepository } from '../../../../../../modules/company/repositories/implementations/CompanyReportRepository';
 import { UserPayloadDto } from '../../../../../../shared/dto/user-payload.dto';
-import { DayJSProvider } from '../../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { ESocialEventProvider } from '../../../../../../shared/providers/ESocialProvider/implementations/ESocialEventProvider';
 import { ESocialMethodsProvider } from '../../../../../../shared/providers/ESocialProvider/implementations/ESocialMethodsProvider';
-import { CompanyRepository } from '../../../../../company/repositories/implementations/CompanyRepository';
-import { EmployeeExamsHistoryRepository } from '../../../../../company/repositories/implementations/EmployeeExamsHistoryRepository';
 import { EmployeeRepository } from '../../../../../company/repositories/implementations/EmployeeRepository';
 import { CacheEnum } from './../../../../../../shared/constants/enum/cache';
 import { ICacheEventBatchType } from './../../../../../../shared/interfaces/cache.types';
-import { IESocial2220, IESocial3000 } from './../../../../../../shared/providers/ESocialProvider/models/IESocialMethodProvider';
+import {
+  IESocial2220,
+  IESocial3000,
+} from './../../../../../../shared/providers/ESocialProvider/models/IESocialMethodProvider';
 import { UpdateESocialReportService } from './../../../../../company/services/report/update-esocial-report/update-esocial-report.service';
 import { Event2220Dto } from './../../../../dto/event.dto';
 import { IEsocialSendBatchResponse } from './../../../../interfaces/esocial';
-import { ESocialBatchRepository } from './../../../../repositories/implementations/ESocialBatchRepository';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()
 export class SendEvents2220ESocialService {
@@ -26,23 +25,23 @@ export class SendEvents2220ESocialService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly eSocialEventProvider: ESocialEventProvider,
     private readonly eSocialMethodsProvider: ESocialMethodsProvider,
-    private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository,
     private readonly employeeRepository: EmployeeRepository,
-    private readonly companyRepository: CompanyRepository,
-    private readonly companyReportRepository: CompanyReportRepository,
     private readonly updateESocialReportService: UpdateESocialReportService,
-    private readonly eSocialBatchRepository: ESocialBatchRepository,
-    private readonly dayJSProvider: DayJSProvider,
   ) {}
 
   async execute(body: Event2220Dto, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;
-    const { company, cert } = await this.eSocialMethodsProvider.getCompany(companyId, { cert: true, report: true, doctor: true });
+    const { company, cert } = await this.eSocialMethodsProvider.getCompany(companyId, {
+      cert: true,
+      report: true,
+      doctor: true,
+    });
 
     const startDate = company.esocialStart;
     const esocialSend = company.esocialSend;
 
-    if (!startDate || esocialSend == null) throw new BadRequestException('Data de início do eSocial ou tipo de envio não informado para essa empresa');
+    if (!startDate || esocialSend == null)
+      throw new BadRequestException('Data de início do eSocial ou tipo de envio não informado para essa empresa');
 
     const { data: employees } = await this.employeeRepository.findEvent2220(
       {

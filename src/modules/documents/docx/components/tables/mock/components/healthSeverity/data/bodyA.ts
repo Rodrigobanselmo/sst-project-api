@@ -2,7 +2,9 @@ export const rowBodyAci: [string, string[]][] = [
   ['01\nDESPREZÍVEL', ['– Nenhuma lesão ou efeito à saúde.']],
   [
     '02\nPEQUENO',
-    ['Pode prejudicar a integridade física e/ou a saúde, provocando lesão que implique em incapacidade temporária por prazo igual ou inferior a 15 (quinze) dias.'],
+    [
+      'Pode prejudicar a integridade física e/ou a saúde, provocando lesão que implique em incapacidade temporária por prazo igual ou inferior a 15 (quinze) dias.',
+    ],
   ],
   [
     '03\nMODERADO',

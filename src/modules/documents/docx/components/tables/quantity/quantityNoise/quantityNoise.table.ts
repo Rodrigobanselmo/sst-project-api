@@ -9,7 +9,10 @@ import { TableHeaderElements } from './elements/header';
 import { NewQuantityNoiseHeader } from './quantityNoise.constant';
 import { quantityNoiseConverter } from './quantityNoise.converter';
 
-export const quantityNoiseTable = (riskGroupData: RiskFactorGroupDataEntity & DocumentDataEntity & DocumentDataPGRDto, hierarchyTree: IHierarchyMap) => {
+export const quantityNoiseTable = (
+  riskGroupData: RiskFactorGroupDataEntity & DocumentDataEntity & DocumentDataPGRDto,
+  hierarchyTree: IHierarchyMap,
+) => {
   const quantityNoiseData = quantityNoiseConverter(riskGroupData, hierarchyTree);
   const tableHeaderElements = new TableHeaderElements();
   const tableBodyElements = new TableBodyElements();

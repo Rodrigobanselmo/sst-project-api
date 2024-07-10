@@ -42,7 +42,11 @@ export class RiskController {
     isMember: true,
   })
   @Patch('/:riskId')
-  async update(@Param('riskId') riskId: string, @User() userPayloadDto: UserPayloadDto, @Body() updateRiskDto: UpdateRiskDto) {
+  async update(
+    @Param('riskId') riskId: string,
+    @User() userPayloadDto: UserPayloadDto,
+    @Body() updateRiskDto: UpdateRiskDto,
+  ) {
     return this.updateRiskService.execute(riskId, updateRiskDto, userPayloadDto);
   }
 

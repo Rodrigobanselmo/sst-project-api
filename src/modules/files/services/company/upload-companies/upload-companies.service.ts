@@ -44,7 +44,8 @@ export class UploadCompaniesService {
     await this.companyRepository.upsertMany(allCompanies);
 
     return await this.uploadExcelProvider.newTableData({
-      findAll: (sheet) => findAllCompanies(this.excelProvider, this.companyRepository, sheet, companyId, userPayloadDto.isMaster),
+      findAll: (sheet) =>
+        findAllCompanies(this.excelProvider, this.companyRepository, sheet, companyId, userPayloadDto.isMaster),
       Workbook,
       system,
       companyId,
@@ -53,7 +54,12 @@ export class UploadCompaniesService {
   }
 }
 
-const read = async (readFileData: IExcelReadData[], excelProvider: ExcelProvider, sheet: ICompanySheet, databaseTable: DatabaseTableEntity) => {
+const read = async (
+  readFileData: IExcelReadData[],
+  excelProvider: ExcelProvider,
+  sheet: ICompanySheet,
+  databaseTable: DatabaseTableEntity,
+) => {
   const table = readFileData.find((data) => data.name === sheet.name);
 
   if (!table) throw new BadRequestException('The table you trying to insert has a different sheet name');
@@ -61,7 +67,9 @@ const read = async (readFileData: IExcelReadData[], excelProvider: ExcelProvider
   const database = await excelProvider.transformToTableData(table, sheet.columns);
 
   if (databaseTable?.version && database.version !== databaseTable.version)
-    throw new BadRequestException('The table you trying to insert has a different version, make sure you have the newest table version');
+    throw new BadRequestException(
+      'The table you trying to insert has a different version, make sure you have the newest table version',
+    );
 
   return database.rows;
 };

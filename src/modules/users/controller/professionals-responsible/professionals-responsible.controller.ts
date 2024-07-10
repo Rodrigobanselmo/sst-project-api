@@ -1,17 +1,19 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
 
 import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
-import { CreateProfessionalResponsibleDto, FindProfessionalResponsibleDto, UpdateProfessionalResponsibleDto } from '../../dto/professional-responsible.dto';
+import {
+  CreateProfessionalResponsibleDto,
+  FindProfessionalResponsibleDto,
+  UpdateProfessionalResponsibleDto,
+} from '../../dto/professional-responsible.dto';
 import { CreateProfessionalResponsibleService } from '../../services/professionals-responsibles/create-professionals-responsibles/create-professional-responsiblea.service';
 import { DeleteProfessionalResponsibleService } from '../../services/professionals-responsibles/delete-professionals-responsibles/delete-professionals-responsibles.service';
 import { FindProfessionalResponsibleService } from '../../services/professionals-responsibles/find-professionals-responsibles/find-professionals-responsibles.service';
 import { UpdateProfessionalResponsibleService } from '../../services/professionals-responsibles/update-professionals-responsibles/update-professionals-responsibles.service';
 
-@ApiTags('professionals-responsible')
 @Controller('company/:companyId/professionals-responsible')
 export class ProfessionalResponsibleController {
   constructor(
@@ -50,7 +52,11 @@ export class ProfessionalResponsibleController {
     crud: true,
   })
   @Patch('/:id')
-  update(@Body() upsertAccessGroupDto: UpdateProfessionalResponsibleDto, @User() userPayloadDto: UserPayloadDto, @Param('id', ParseIntPipe) id: number) {
+  update(
+    @Body() upsertAccessGroupDto: UpdateProfessionalResponsibleDto,
+    @User() userPayloadDto: UserPayloadDto,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
     return this.updateProfessionalResponsibleService.execute({ ...upsertAccessGroupDto, id }, userPayloadDto);
   }
 

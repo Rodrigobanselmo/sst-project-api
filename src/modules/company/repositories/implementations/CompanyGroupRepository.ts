@@ -142,7 +142,12 @@ export class CompanyGroupRepository {
     return new CompanyGroupEntity(group as any);
   }
 
-  async findAvailable(companyId: string, query: Partial<FindCompanyGroupDto>, pagination: PaginationQueryDto, options: Prisma.CompanyGroupFindManyArgs = {}) {
+  async findAvailable(
+    companyId: string,
+    query: Partial<FindCompanyGroupDto>,
+    pagination: PaginationQueryDto,
+    options: Prisma.CompanyGroupFindManyArgs = {},
+  ) {
     const where = {
       AND: [{ companyId }],
     } as typeof options.where;
@@ -196,7 +201,12 @@ export class CompanyGroupRepository {
 
     if ('search' in query && query.search) {
       (where.AND as any).push({
-        OR: [{ name: { contains: query.search, mode: 'insensitive' } }],
+        OR: query.search.map((s) => ({
+          name: {
+            contains: s,
+            mode: 'insensitive',
+          },
+        })),
       } as typeof options.where);
       delete query.search;
     }

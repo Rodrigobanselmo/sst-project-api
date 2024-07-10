@@ -15,7 +15,7 @@ import { PermissionCompanyEnum } from './../../../../shared/constants/enum/permi
 /* eslint-disable @typescript-eslint/no-unused-vars */
 @Injectable()
 export class EmployeeRepository {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async create({
     hierarchyId,
@@ -32,8 +32,8 @@ export class EmployeeRepository {
           ...createCompanyDto,
           company: { connect: { id: companyId } },
           cids: { connect: cidIds.map((cidId) => ({ cid: cidId })) },
-          hierarchy: hierarchyId ? { connect: { id: hierarchyId }, } : undefined,
-          shift: shiftId ? { connect: { id: shiftId }, } : undefined,
+          hierarchy: hierarchyId ? { connect: { id: hierarchyId } } : undefined,
+          shift: shiftId ? { connect: { id: shiftId } } : undefined,
         },
       });
       return new EmployeeEntity(employee);
@@ -59,14 +59,14 @@ export class EmployeeRepository {
     const employee = await this.prisma.employee.update({
       data: {
         ...createCompanyDto,
-        hierarchy: hierarchyId ? { connect: { id: hierarchyId }, } : undefined,
+        hierarchy: hierarchyId ? { connect: { id: hierarchyId } } : undefined,
         subOffices: removeSubOffices ? { set: [] } : undefined,
         cids: cidIds ? { set: cidIds.map((cidId) => ({ cid: cidId })) } : undefined,
-        shift: shiftId ? { connect: { id: shiftId }, } : undefined,
+        shift: shiftId ? { connect: { id: shiftId } } : undefined,
         ...('lastExam' in createCompanyDto &&
           !createCompanyDto.lastExam && {
-          lastExam: null,
-        }),
+            lastExam: null,
+          }),
       },
       where: { id_companyId: { companyId, id } },
     });
@@ -74,18 +74,57 @@ export class EmployeeRepository {
     return new EmployeeEntity(employee);
   }
 
-  async upsertImport({ cpf, birthday, companyId, cbo, name, email, esocialCode, lastExam, socialName, sex, phone, isPCD, cidIds, rg, }: UpdateEmployeeDto): Promise<EmployeeEntity> {
+  async upsertImport({
+    cpf,
+    birthday,
+    companyId,
+    cbo,
+    name,
+    email,
+    esocialCode,
+    lastExam,
+    socialName,
+    sex,
+    phone,
+    isPCD,
+    cidIds,
+    rg,
+  }: UpdateEmployeeDto): Promise<EmployeeEntity> {
     const employee = await this.prisma.employee.upsert({
       create: {
-        cpf, birthday, companyId, cbo, name, email, esocialCode, lastExam, socialName, sex, phone, isPCD, rg,
+        cpf,
+        birthday,
+        companyId,
+        cbo,
+        name,
+        email,
+        esocialCode,
+        lastExam,
+        socialName,
+        sex,
+        phone,
+        isPCD,
+        rg,
         cids: cidIds?.length ? { connect: cidIds.map((cidId) => ({ cid: cidId })) } : undefined,
         ...(cidIds.length && { isPCD: true }),
       },
       update: {
-        cpf, birthday, companyId, cbo, name, email, esocialCode, lastExam, socialName, sex, phone, isPCD, rg,
+        cpf,
+        birthday,
+        companyId,
+        cbo,
+        name,
+        email,
+        esocialCode,
+        lastExam,
+        socialName,
+        sex,
+        phone,
+        isPCD,
+        rg,
         cids: cidIds ? { set: (cidIds || []).map((cidId) => ({ cid: cidId })) } : undefined,
         ...(cidIds.length && { isPCD: true }),
-        ...(!cidIds.length && { isPCD: false })
+        ...(!cidIds.length && { isPCD: false }),
       },
       where: {
         cpf_companyId: { companyId, cpf },
@@ -114,7 +153,10 @@ export class EmployeeRepository {
     })[],
     companyId: string,
   ): Promise<EmployeeEntity[]> {
-    const employeeHistory = await this.prisma.employeeHierarchyHistory.findMany({ where: { hierarchy: { companyId } }, include: { employee: true } });
+    const employeeHistory = await this.prisma.employeeHierarchyHistory.findMany({
+      where: { hierarchy: { companyId } },
+      include: { employee: true },
+    });
     const data = await this.prisma.$transaction(
       upsertEmployeeMany.map(({ companyId: _, id, hierarchyId, shiftId, cbo, admissionDate, ...upsertEmployeeDto }) =>
         this.prisma.employee.upsert({
@@ -123,13 +165,13 @@ export class EmployeeRepository {
             company: { connect: { id: companyId } },
             hierarchy: hierarchyId
               ? {
-                connect: { id: hierarchyId },
-              }
+                  connect: { id: hierarchyId },
+                }
               : undefined,
             shift: shiftId
               ? {
-                connect: { id: shiftId },
-              }
+                  connect: { id: shiftId },
+                }
               : undefined,
             // cid: cidId
             //   ? {
@@ -139,12 +181,12 @@ export class EmployeeRepository {
             status: 'ACTIVE',
             hierarchyHistory: hierarchyId
               ? {
-                create: {
-                  motive: 'ADM',
-                  startDate: admissionDate,
-                  hierarchyId: hierarchyId,
-                },
-              }
+                  create: {
+                    motive: 'ADM',
+                    startDate: admissionDate,
+                    hierarchyId: hierarchyId,
+                  },
+                }
               : undefined,
             ...(cbo && { cbo: onlyNumbers(cbo) }),
           },
@@ -153,12 +195,12 @@ export class EmployeeRepository {
             hierarchy: !hierarchyId
               ? undefined
               : {
-                connect: { id: hierarchyId },
-              },
+                  connect: { id: hierarchyId },
+                },
             shift: shiftId
               ? {
-                connect: { id: shiftId },
-              }
+                  connect: { id: shiftId },
+                }
               : undefined,
             // cid: cidId
             //   ? {
@@ -169,22 +211,22 @@ export class EmployeeRepository {
             ...(cbo && { cbo: onlyNumbers(cbo) }),
             hierarchyHistory: hierarchyId
               ? {
-                upsert: {
-                  where: {
-                    id: employeeHistory.find(({ employee }) => employee.cpf === upsertEmployeeDto.cpf)?.id || -1,
+                  upsert: {
+                    where: {
+                      id: employeeHistory.find(({ employee }) => employee.cpf === upsertEmployeeDto.cpf)?.id || -1,
+                    },
+                    create: {
+                      motive: 'ADM',
+                      startDate: admissionDate,
+                      hierarchyId: hierarchyId,
+                    },
+                    update: {
+                      motive: 'ADM',
+                      startDate: admissionDate,
+                      hierarchyId: hierarchyId,
+                    },
                   },
-                  create: {
-                    motive: 'ADM',
-                    startDate: admissionDate,
-                    hierarchyId: hierarchyId,
-                  },
-                  update: {
-                    motive: 'ADM',
-                    startDate: admissionDate,
-                    hierarchyId: hierarchyId,
-                  },
-                },
-              }
+                }
               : undefined,
           },
           where: { cpf_companyId: { companyId, cpf: upsertEmployeeDto.cpf } },
@@ -195,7 +237,11 @@ export class EmployeeRepository {
     return data.map((employee) => new EmployeeEntity(employee));
   }
 
-  async findById(id: number, companyId: string, options: Partial<Prisma.EmployeeFindUniqueArgs> = {}): Promise<EmployeeEntity> {
+  async findById(
+    id: number,
+    companyId: string,
+    options: Partial<Prisma.EmployeeFindUniqueArgs> = {},
+  ): Promise<EmployeeEntity> {
     const include = options?.include || {};
 
     const employee = await this.prisma.employee.findUnique({
@@ -251,7 +297,11 @@ export class EmployeeRepository {
     return new EmployeeEntity(employee as any);
   }
 
-  async find(query: Partial<FindEmployeeDto>, pagination: PaginationQueryDto, options: Prisma.EmployeeFindManyArgs = {}) {
+  async find(
+    query: Partial<FindEmployeeDto>,
+    pagination: PaginationQueryDto,
+    options: Prisma.EmployeeFindManyArgs = {},
+  ) {
     const whereInit = {
       AND: [],
       ...options.where,
@@ -281,9 +331,9 @@ export class EmployeeRepository {
         ...(query.dateFrom && {
           where: {
             startDate: {
-              lte: query.dateFrom
-            }
-          }
+              lte: query.dateFrom,
+            },
+          },
         }),
         take: 1,
       },
@@ -298,7 +348,9 @@ export class EmployeeRepository {
           cnpj: true,
           initials: true,
           permissions: true,
-          ...(typeof options.select.company != 'boolean' && options.select.company?.select && options.select.company.select),
+          ...(typeof options.select.company != 'boolean' &&
+            options.select.company?.select &&
+            options.select.company.select),
           ...(query?.getGroup && {
             unit: true,
             group: { select: { name: true } },
@@ -396,7 +448,7 @@ export class EmployeeRepository {
     if ('scheduleMedicalVisitId' in query) {
       (where.AND as any).push({
         examsHistory: {
-          some: { scheduleMedicalVisitId: query.scheduleMedicalVisitId }
+          some: { scheduleMedicalVisitId: query.scheduleMedicalVisitId },
         },
       } as typeof options.where);
     }
@@ -504,8 +556,8 @@ export class EmployeeRepository {
                       parent: {
                         select: {
                           type: true,
-                          name: true
-                        }
+                          name: true,
+                        },
                       },
                     },
                   },
@@ -518,7 +570,12 @@ export class EmployeeRepository {
     }
 
     if ('expiredExam' in query) {
-      options.orderBy = [{ expiredDateExam: { sort: 'asc', nulls: 'first' } }, { company: { group: { name: 'asc' } } }, { company: { name: 'asc' } }, { name: 'asc' }];
+      options.orderBy = [
+        { expiredDateExam: { sort: 'asc', nulls: 'first' } },
+        { company: { group: { name: 'asc' } } },
+        { company: { name: 'asc' } },
+        { name: 'asc' },
+      ];
       options.select.expiredDateExam = true;
       options.select.newExamAdded = true;
       options.select.examsHistory = {
@@ -543,7 +600,12 @@ export class EmployeeRepository {
     }
 
     if ('getSector' in query) {
-      options.select.hierarchy = { select: { name: true, parent: { select: { name: true, type: true, parent: { select: { name: true, type: true } } } } } };
+      options.select.hierarchy = {
+        select: {
+          name: true,
+          parent: { select: { name: true, type: true, parent: { select: { name: true, type: true } } } },
+        },
+      };
     }
 
     if ('getEsocialCode' in query) {
@@ -555,7 +617,12 @@ export class EmployeeRepository {
     }
 
     if ('getAllExams' in query) {
-      options.orderBy = [{ expiredDateExam: { sort: 'asc', nulls: 'first' } }, { company: { group: { name: 'asc' } } }, { company: { name: 'asc' } }, { name: 'asc' }];
+      options.orderBy = [
+        { expiredDateExam: { sort: 'asc', nulls: 'first' } },
+        { company: { group: { name: 'asc' } } },
+        { company: { name: 'asc' } },
+        { name: 'asc' },
+      ];
       options.select.hierarchyId = true;
       options.select.lastExam = true;
       options.select.status = true;
@@ -570,9 +637,9 @@ export class EmployeeRepository {
         ...(query.dateFrom && {
           where: {
             startDate: {
-              lte: query.dateFrom
-            }
-          }
+              lte: query.dateFrom,
+            },
+          },
         }),
       };
       options.select.examsHistory = {
@@ -594,15 +661,15 @@ export class EmployeeRepository {
         distinct: ['examId', 'status'],
         where: {
           exam: { isAvaliation: false },
-          ...(query.dateFromExams && { doneDate: { lte: query.dateFromExams, } }),
-          ...(!query.getAllExamsWithSchedule && { status: { in: ['DONE'] }, }),
+          ...(query.dateFromExams && { doneDate: { lte: query.dateFromExams } }),
+          ...(!query.getAllExamsWithSchedule && { status: { in: ['DONE'] } }),
           ...(query.getAllExamsWithSchedule && {
             OR: [
-              { status: { in: ['DONE'] }, },
+              { status: { in: ['DONE'] } },
               {
                 status: { in: ['PROCESSING'] },
                 doneDate: { gte: new Date() },
-                ...(query.dateFromExams && { doneDate: { lte: query.dateFromExams, } }),
+                ...(query.dateFromExams && { doneDate: { lte: query.dateFromExams } }),
               },
             ],
           }),
@@ -625,10 +692,8 @@ export class EmployeeRepository {
     if ('getExamName' in query) {
       if (typeof options.select?.examsHistory != 'boolean' && options.select.examsHistory.select) {
         if (typeof options.select.examsHistory.select?.exam != 'boolean') {
-          if (!options.select.examsHistory.select?.exam)
-            options.select.examsHistory.select.exam = {}
-          if (!options.select.examsHistory.select.exam?.select)
-            options.select.examsHistory.select.exam.select = {}
+          if (!options.select.examsHistory.select?.exam) options.select.examsHistory.select.exam = {};
+          if (!options.select.examsHistory.select.exam?.select) options.select.examsHistory.select.exam.select = {};
 
           options.select.examsHistory.select.exam.select.name = true;
         }
@@ -663,7 +728,11 @@ export class EmployeeRepository {
     };
   }
 
-  async findEvent2220(query: FindEvents2220Dto & { startDate: Date }, pagination: PaginationQueryDto, options: Prisma.EmployeeFindManyArgs = {}) {
+  async findEvent2220(
+    query: FindEvents2220Dto & { startDate: Date },
+    pagination: PaginationQueryDto,
+    options: Prisma.EmployeeFindManyArgs = {},
+  ) {
     const companyId = query.companyId;
 
     const whereInit = {

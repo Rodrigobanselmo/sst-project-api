@@ -17,7 +17,7 @@ export class UpdateESocialReportService {
     private readonly eSocialEventProvider: ESocialEventProvider,
     private readonly companyReportRepository: CompanyReportRepository,
     private readonly catRepository: CatRepository,
-  ) { }
+  ) {}
 
   async execute({ companyId }: { companyId: string }) {
     const company = await this.companyRepository.findFirstNude({
@@ -66,7 +66,7 @@ export class UpdateESocialReportService {
 
     const employees2240 = await this.employeeRepository.countNude({
       where: {
-        ...getEmployeeFind2240Where(companyId)
+        ...getEmployeeFind2240Where(companyId),
       },
     });
 

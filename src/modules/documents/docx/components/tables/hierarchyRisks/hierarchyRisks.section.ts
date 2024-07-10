@@ -18,7 +18,12 @@ export const hierarchyRisksTableSections = (
     hierarchyType: HierarchyEnum.SECTOR,
   },
 ) => {
-  const { bodyData, headerData } = hierarchyRisksConverter(riskFactorGroupData, hierarchiesEntity, hierarchyTree, options);
+  const { bodyData, headerData } = hierarchyRisksConverter(
+    riskFactorGroupData,
+    hierarchiesEntity,
+    hierarchyTree,
+    options,
+  );
 
   const noData = headerData.length == 1 || bodyData.length == 0;
 

@@ -14,7 +14,14 @@ import { readFileSync } from 'fs';
 import sizeOf from 'image-size';
 import { setNiceProportion } from '../../../../../../shared/utils/setNiceProportion';
 
-import { convertToEmu, convertToParagraph, convertToParagraphBox, pageHeight, pageWidth, sectionCoverProperties } from '../../config/styles';
+import {
+  convertToEmu,
+  convertToParagraph,
+  convertToParagraphBox,
+  pageHeight,
+  pageWidth,
+  sectionCoverProperties,
+} from '../../config/styles';
 
 interface ITextProps {
   x?: number;
@@ -59,6 +66,7 @@ const title = (props: IHeaderProps) =>
     spacing: { after: 400, before: 0 },
     ...(props?.coverProps?.titleProps && {
       frame: {
+        type: 'absolute',
         position: {
           x: convertToParagraph(props?.coverProps?.titleProps?.x || 0),
           y: convertToParagraph(props?.coverProps?.titleProps?.y || 0),
@@ -93,6 +101,7 @@ const textShow = (text?: string, props?: ITextProps) =>
     spacing: { after: 100, before: 0 },
     ...(props && {
       frame: {
+        type: 'absolute',
         position: {
           x: convertToParagraph(props.x || 0),
           y: convertToParagraph(props.y || 0),
@@ -144,7 +153,12 @@ const imageLogo = (props: IHeaderProps) => {
 
   const logoProps = props?.coverProps?.logoProps;
 
-  const { height, width } = setNiceProportion(logoProps?.maxLogoWidth || 630, logoProps?.maxLogoHeight || 354, imgWidth, imgHeight);
+  const { height, width } = setNiceProportion(
+    logoProps?.maxLogoWidth || 630,
+    logoProps?.maxLogoHeight || 354,
+    imgWidth,
+    imgHeight,
+  );
 
   return new Paragraph({
     children: [

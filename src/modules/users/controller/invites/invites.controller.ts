@@ -1,6 +1,5 @@
 import { Body, Controller, Delete, ForbiddenException, Get, Param, Post, Query } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { classToClass } from 'class-transformer';
+import { instanceToInstance } from 'class-transformer';
 
 import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
 import { ErrorInvitesEnum } from '../../../../shared/constants/enum/errorMessage';
@@ -17,7 +16,6 @@ import { FindAllByEmailService } from '../../services/invites/find-by-email/find
 import { FindByTokenService } from '../../services/invites/find-by-token/find-by-token.service';
 import { InviteUsersService } from '../../services/invites/invite-users/invite-users.service';
 
-@ApiTags('invites')
 @Controller('invites')
 export class InvitesController {
   constructor(
@@ -37,23 +35,23 @@ export class InvitesController {
   })
   @Get('/:companyId?')
   async findAllByCompany(@User() user: UserPayloadDto) {
-    return classToClass(this.findAllByCompanyIdService.execute(user.targetCompanyId));
+    return instanceToInstance(this.findAllByCompanyIdService.execute(user.targetCompanyId));
   }
 
   @Get('/me/:email')
   async findAllByEmail(@Param('email', ValidateEmailPipe) email: string, @User() user: UserPayloadDto) {
     if (user.email !== email) throw new ForbiddenException(ErrorInvitesEnum.FORBIDDEN_ACCESS_USER_INVITE_LIST);
-    return classToClass(this.findAllByEmailService.execute(email));
+    return instanceToInstance(this.findAllByEmailService.execute(email));
   }
 
   @Get('/token/:tokenId')
   async findByToken(@Param('tokenId') tokenId: string) {
-    return classToClass(this.findByTokenService.execute(tokenId));
+    return instanceToInstance(this.findByTokenService.execute(tokenId));
   }
 
   @Get()
   async find(@User() user: UserPayloadDto, @Query() query: FindInvitesDto) {
-    return classToClass(this.findAvailableService.execute(query, user));
+    return instanceToInstance(this.findAvailableService.execute(query, user));
   }
 
   @Permissions({
@@ -64,7 +62,7 @@ export class InvitesController {
   })
   @Post()
   async invite(@Body() inviteUserDto: InviteUserDto, @User() user: UserPayloadDto) {
-    return classToClass(this.inviteUsersService.execute(inviteUserDto, user));
+    return instanceToInstance(this.inviteUsersService.execute(inviteUserDto, user));
   }
 
   @Permissions({
@@ -84,7 +82,6 @@ export class InvitesController {
   }
 
   @Delete('expired')
-  @ApiBearerAuth()
   deleteAll() {
     return this.deleteExpiredInvitesService.execute();
   }

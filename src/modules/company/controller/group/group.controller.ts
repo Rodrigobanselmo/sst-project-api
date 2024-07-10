@@ -1,5 +1,4 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
 import { FindCompanyGroupDto, UpsertCompanyGroupDto } from '../../dto/company-group.dto';
 import { FindAvailableCompanyGroupsService } from '../../services/group/find-company-groups-group/find-company-groups-group.service';
 import { UpsertCompanyGroupsService } from '../../services/group/upsert-company-group/upsert-company-group.service';
@@ -9,7 +8,6 @@ import { UserPayloadDto } from './../../../../shared/dto/user-payload.dto';
 import { PermissionEnum, RoleEnum } from '../../../../shared/constants/enum/authorization';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 import { Roles } from '../../../../shared/decorators/roles.decorator';
-@ApiTags('company-group')
 @Controller('company/:companyId/group')
 export class CompanyGroupController {
   constructor(

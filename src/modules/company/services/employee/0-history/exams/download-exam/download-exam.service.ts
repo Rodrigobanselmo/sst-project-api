@@ -7,7 +7,10 @@ import { EmployeeExamsHistoryRepository } from './../../../../../repositories/im
 
 @Injectable()
 export class DownloadExamService {
-  constructor(private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository, private readonly amazonStorageProvider: AmazonStorageProvider) {}
+  constructor(
+    private readonly employeeExamHistoryRepository: EmployeeExamsHistoryRepository,
+    private readonly amazonStorageProvider: AmazonStorageProvider,
+  ) {}
 
   async execute(id: number, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;
@@ -22,7 +25,7 @@ export class DownloadExamService {
     if (!documentFound?.id) throw new BadRequestException(ErrorMessageEnum.EMPLOYEE_HISTORY_NOT_FOUND);
 
     const fileKey = documentFound.fileUrl.split('.com/').pop();
-    const { file: fileStream } = this.amazonStorageProvider.download({
+    const { file: fileStream } = await this.amazonStorageProvider.download({
       fileKey,
     });
 

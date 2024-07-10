@@ -8,9 +8,13 @@ import { CompanyClinicRepository } from './../../../repositories/implementations
 
 @Injectable()
 export class SetCompanyClinicsService {
-  constructor(private readonly companyRepository: CompanyRepository, private readonly companyClinicRepository: CompanyClinicRepository) {}
+  constructor(
+    private readonly companyRepository: CompanyRepository,
+    private readonly companyClinicRepository: CompanyClinicRepository,
+  ) {}
   async execute(setCompanyClinicDto: SetCompanyClinicDto, user: UserPayloadDto) {
-    if (!setCompanyClinicDto.ids.every((c) => c.companyId === user.targetCompanyId)) throw new ForbiddenException(ErrorMessageEnum.FORBIDDEN_ACCESS);
+    if (!setCompanyClinicDto.ids.every((c) => c.companyId === user.targetCompanyId))
+      throw new ForbiddenException(ErrorMessageEnum.FORBIDDEN_ACCESS);
 
     await this.companyClinicRepository.set(setCompanyClinicDto, user.targetCompanyId);
 

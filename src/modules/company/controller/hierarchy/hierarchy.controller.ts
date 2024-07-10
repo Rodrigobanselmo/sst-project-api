@@ -4,7 +4,13 @@ import { PermissionEnum } from '../../../../shared/constants/enum/authorization'
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
-import { CreateHierarchyDto, CreateSubHierarchyDto, UpdateHierarchyDto, UpdateSimpleManyHierarchyDto, UpsertManyHierarchyDto } from '../../dto/hierarchy';
+import {
+  CreateHierarchyDto,
+  CreateSubHierarchyDto,
+  UpdateHierarchyDto,
+  UpdateSimpleManyHierarchyDto,
+  UpsertManyHierarchyDto,
+} from '../../dto/hierarchy';
 import { CreateHierarchyService } from '../../services/hierarchy/create-hierarchies/create-hierarchies.service';
 import { CreateSubHierarchyService } from '../../services/hierarchy/create-sub-hierarchies/create-sub-hierarchies.service';
 import { DeleteHierarchyService } from '../../services/hierarchy/delete-hierarchies/delete-hierarchies.service';
@@ -79,7 +85,11 @@ export class HierarchyController {
     crud: true,
   })
   @Patch('/:id/:companyId?')
-  update(@Body() updateHierarchyDto: UpdateHierarchyDto, @Param('id') id: string, @User() userPayloadDto: UserPayloadDto) {
+  update(
+    @Body() updateHierarchyDto: UpdateHierarchyDto,
+    @Param('id') id: string,
+    @User() userPayloadDto: UserPayloadDto,
+  ) {
     return this.updateHierarchyService.execute({ id, ...updateHierarchyDto }, userPayloadDto);
   }
 
@@ -101,7 +111,10 @@ export class HierarchyController {
     crud: 'u',
   })
   @Post('/simple-update-many/:companyId?')
-  updateSimpleMany(@Body() upsertManyHierarchyDto: UpdateSimpleManyHierarchyDto, @User() userPayloadDto: UserPayloadDto) {
+  updateSimpleMany(
+    @Body() upsertManyHierarchyDto: UpdateSimpleManyHierarchyDto,
+    @User() userPayloadDto: UserPayloadDto,
+  ) {
     return this.updateSimpleManyHierarchyService.execute(upsertManyHierarchyDto.data, userPayloadDto);
   }
 

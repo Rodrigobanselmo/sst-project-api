@@ -10,7 +10,7 @@ export interface ICharacterizationFile extends Partial<AddFileCharacterizationDt
 
 @Injectable()
 export class CharacterizationFileRepository {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async update({ id, ...fileDTO }: Partial<ICharacterizationFile>): Promise<CharacterizationFileEntity> {
     const characterization = await this.prisma.companyCharacterizationFile.update({
@@ -23,7 +23,11 @@ export class CharacterizationFileRepository {
     return new CharacterizationFileEntity(characterization);
   }
 
-  async upsert({ id, companyCharacterizationId: characterizationId, ...fileDTO }: ICharacterizationFile): Promise<CharacterizationFileEntity> {
+  async upsert({
+    id,
+    companyCharacterizationId: characterizationId,
+    ...fileDTO
+  }: ICharacterizationFile): Promise<CharacterizationFileEntity> {
     const characterization = await this.prisma.companyCharacterizationFile.upsert({
       where: { id: id || 'no-id' },
       create: {

@@ -1,6 +1,5 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
-import { classToClass } from 'class-transformer';
+import { instanceToInstance } from 'class-transformer';
 
 import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
@@ -12,7 +11,6 @@ import { FindAllProfessionalsByCompanyService } from '../../services/professiona
 import { FindFirstProfessionalService } from '../../services/professionals/find-first/find-first.service';
 import { UpdateProfessionalService } from '../../services/professionals/update-professional/update-professional.service';
 
-@ApiTags('professionals')
 @Controller('professionals')
 export class ProfessionalsController {
   constructor(
@@ -36,7 +34,7 @@ export class ProfessionalsController {
   )
   @Get('/company/:companyId?')
   findAllByCompany(@User() userPayloadDto: UserPayloadDto, @Query() query: FindProfessionalsDto) {
-    return classToClass(this.findAllByCompanyService.execute(query, userPayloadDto));
+    return instanceToInstance(this.findAllByCompanyService.execute(query, userPayloadDto));
   }
 
   @Permissions(
@@ -49,7 +47,7 @@ export class ProfessionalsController {
   )
   @Get('/find')
   findFirst(@Query() query: FindProfessionalsDto) {
-    return classToClass(this.findFirstProfessionalService.execute(query));
+    return instanceToInstance(this.findFirstProfessionalService.execute(query));
   }
 
   @Permissions(
@@ -86,7 +84,11 @@ export class ProfessionalsController {
     },
   )
   @Patch('/:id')
-  async update(@Body() updateProfessionalDto: UpdateProfessionalDto, @User() user: UserPayloadDto, @Param('id', ParseIntPipe) id: number) {
+  async update(
+    @Body() updateProfessionalDto: UpdateProfessionalDto,
+    @User() user: UserPayloadDto,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
     return this.updateProfessionalService.execute({ id, ...updateProfessionalDto }, user);
   }
 }

@@ -3,7 +3,14 @@ import { CompanyStructColumnMap, CompanyStructHeaderEnum } from '../company-stru
 
 export const EmployeeColumnList: (opt: { workspaceLength: number }) => ISheetHeaderList = ({ workspaceLength }) => {
   return [
-    ...(workspaceLength > 1 ? [{ group: [{ ...CompanyStructColumnMap[CompanyStructHeaderEnum.WORKSPACE], required: true }], name: 'Identifição Estabelecimento' }] : []),
+    ...(workspaceLength > 1
+      ? [
+          {
+            group: [{ ...CompanyStructColumnMap[CompanyStructHeaderEnum.WORKSPACE], required: true }],
+            name: 'Identifição Estabelecimento',
+          },
+        ]
+      : []),
     {
       group: [
         { ...CompanyStructColumnMap[CompanyStructHeaderEnum.EMPLOYEE_CPF], required: true },
@@ -38,7 +45,10 @@ export const EmployeeColumnList: (opt: { workspaceLength: number }) => ISheetHea
       name: 'Identificação do Cargo',
     },
     {
-      group: [CompanyStructColumnMap[CompanyStructHeaderEnum.GHO], CompanyStructColumnMap[CompanyStructHeaderEnum.GHO_DESCRIPTION]],
+      group: [
+        CompanyStructColumnMap[CompanyStructHeaderEnum.GHO],
+        CompanyStructColumnMap[CompanyStructHeaderEnum.GHO_DESCRIPTION],
+      ],
       name: 'Grupo Similar de Exposição ao cargo',
     },
   ];

@@ -1,6 +1,6 @@
 import { UserEntity } from '../../../../users/entities/user.entity';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { classToClass } from 'class-transformer';
+import { instanceToInstance } from 'class-transformer';
 
 import { UsersRepository } from '../../../../users/repositories/implementations/UsersRepository';
 import { HashProvider } from '../../../../../shared/providers/HashProvider/implementations/HashProvider';
@@ -21,10 +21,14 @@ export class SessionService {
     private readonly hashProvider: HashProvider,
     private readonly jwtTokenProvider: JwtTokenProvider,
     private readonly userHistoryRepository: UserHistoryRepository,
-    private readonly firebaseProvider: FirebaseProvider
-  ) { }
+    private readonly firebaseProvider: FirebaseProvider,
+  ) {}
 
-  async execute({ email, password, userEntity, isApp }: LoginUserDto & { userEntity?: UserEntity }, ip: string, userAgent: string) {
+  async execute(
+    { email, password, userEntity, isApp }: LoginUserDto & { userEntity?: UserEntity },
+    ip: string,
+    userAgent: string,
+  ) {
     const user = userEntity ? userEntity : await this.validateUser(email, password);
 
     const companies = user.companies
@@ -39,14 +43,13 @@ export class SessionService {
       })
       .filter((i) => i);
 
-    const company = companies[0] || ({} as typeof companies[0]);
+    const company = companies[0] || ({} as (typeof companies)[0]);
 
     const payload: PayloadTokenDto = {
       email,
       sub: user.id,
       ...company,
     };
-
 
     const token = this.jwtTokenProvider.generateToken(payload);
 
@@ -64,13 +67,11 @@ export class SessionService {
       city: location.city,
       country: location.country,
       region: location.region,
-
-
-    })
+    });
     return {
       token,
       refresh_token: newRefreshToken.refresh_token,
-      user: classToClass(user),
+      user: instanceToInstance(user),
       ...company,
     };
   }

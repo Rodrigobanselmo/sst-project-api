@@ -16,32 +16,40 @@ export class DeleteHomoGroupService {
   }
 
   async checkDeletion(id: string, userPayloadDto: UserPayloadDto) {
-    const foundHomoGroup = await this.homoGroupRepository.findHomoGroupByCompanyAndId(id, userPayloadDto.targetCompanyId, {
-      select: {
-        id: true,
-        created_at: true,
+    const foundHomoGroup = await this.homoGroupRepository.findHomoGroupByCompanyAndId(
+      id,
+      userPayloadDto.targetCompanyId,
+      {
+        select: {
+          id: true,
+          created_at: true,
+        },
       },
-    });
+    );
 
     if (!foundHomoGroup?.id) throw new BadRequestException(ErrorCompanyEnum.CHAR_NOT_FOUND);
 
-    const foundHomoGroupEvent = await this.homoGroupRepository.findHomoGroupByCompanyAndId(id, userPayloadDto.targetCompanyId, {
-      select: {
-        id: true,
-        created_at: true,
-        hierarchyOnHomogeneous: {
-          select: { id: true },
-          take: 1,
-          where: {
-            hierarchy: {
-              hierarchyHistory: {
-                some: {
-                  employee: {
-                    esocialEvents: {
-                      some: {
-                        created_at: { gte: foundHomoGroup.created_at },
-                        status: { in: ['DONE', 'TRANSMITTED'] },
-                        type: 'RISK_2240',
+    const foundHomoGroupEvent = await this.homoGroupRepository.findHomoGroupByCompanyAndId(
+      id,
+      userPayloadDto.targetCompanyId,
+      {
+        select: {
+          id: true,
+          created_at: true,
+          hierarchyOnHomogeneous: {
+            select: { id: true },
+            take: 1,
+            where: {
+              hierarchy: {
+                hierarchyHistory: {
+                  some: {
+                    employee: {
+                      esocialEvents: {
+                        some: {
+                          created_at: { gte: foundHomoGroup.created_at },
+                          status: { in: ['DONE', 'TRANSMITTED'] },
+                          type: 'RISK_2240',
+                        },
                       },
                     },
                   },
@@ -51,8 +59,9 @@ export class DeleteHomoGroupService {
           },
         },
       },
-    });
+    );
 
-    if (foundHomoGroupEvent.hierarchyOnHomogeneous?.[0]?.id) throw new BadRequestException(ErrorMessageEnum.ESOCIAL_FORBIDDEN_DELETION);
+    if (foundHomoGroupEvent.hierarchyOnHomogeneous?.[0]?.id)
+      throw new BadRequestException(ErrorMessageEnum.ESOCIAL_FORBIDDEN_DELETION);
   }
 }

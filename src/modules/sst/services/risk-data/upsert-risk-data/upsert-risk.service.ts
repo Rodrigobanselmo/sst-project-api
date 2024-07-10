@@ -18,7 +18,7 @@ export class UpsertRiskDataService {
     private readonly hierarchyRepository: HierarchyRepository,
     private readonly employeePPPHistoryRepository: EmployeePPPHistoryRepository,
     private readonly checkEmployeeExamService: CheckEmployeeExamService,
-  ) { }
+  ) {}
 
   async execute(upsertRiskDataDto: UpsertRiskDataDto) {
     const keepEmpty = upsertRiskDataDto.keepEmpty;
@@ -55,14 +55,23 @@ export class UpsertRiskDataService {
     const riskData = await this.riskDataRepository.upsert(upsertRiskDataDto);
 
     if (upsertRiskDataDto.exams)
-      this.checkEmployeeExamService.execute({ homogeneousGroupId: upsertRiskDataDto.homogeneousGroupId, companyId: upsertRiskDataDto.companyId });
+      this.checkEmployeeExamService.execute({
+        homogeneousGroupId: upsertRiskDataDto.homogeneousGroupId,
+        companyId: upsertRiskDataDto.companyId,
+      });
 
     this.employeePPPHistoryRepository.updateManyNude({
       data: { sendEvent: true },
       where: {
         employee: {
           companyId: upsertRiskDataDto.companyId,
-          hierarchyHistory: { some: { hierarchy: { hierarchyOnHomogeneous: { some: { homogeneousGroupId: upsertRiskDataDto.homogeneousGroupId } } } } },
+          hierarchyHistory: {
+            some: {
+              hierarchy: {
+                hierarchyOnHomogeneous: { some: { homogeneousGroupId: upsertRiskDataDto.homogeneousGroupId } },
+              },
+            },
+          },
         },
       },
     });

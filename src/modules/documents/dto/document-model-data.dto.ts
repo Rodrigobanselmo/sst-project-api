@@ -21,7 +21,7 @@ class DocModelPageOrientation {
   @IsEnum(PageOrientation, {
     message: `orientatação deve ser ${KeysOfEnum(PageOrientation)}`,
   })
-  orientation?: PageOrientation;
+  orientation?: (typeof PageOrientation)[keyof typeof PageOrientation];
 }
 
 class DocModelPageMargin {
@@ -93,7 +93,7 @@ class DocumentModelElement extends Base {
   @IsEnum(AlignmentType, {
     message: `orientatação deve ser ${KeysOfEnum(AlignmentType)}`,
   })
-  align?: AlignmentType;
+  align?: (typeof AlignmentType)[keyof typeof AlignmentType];
 }
 
 class DocumentModelSection extends Base {

@@ -44,7 +44,7 @@ export const AppendixEnumMap: Record<AppendixEnum, { name: string; rsData: strin
   [AppendixEnum.ACI]: { name: 'Riscos de Acidentes', rsData: 'A' },
   [AppendixEnum.ERG]: { name: 'Riscos Ergonomicos', rsData: 'E' },
   [AppendixEnum.OUTROS]: { name: 'Riscos não relacionados', rsData: 'N' },
-}
+};
 
 export const OtherAppendixEnumMap: Record<OtherAppendixEnum, { name: string; rsData: string | number }> = {
   [OtherAppendixEnum.ACGH]: { name: 'ACGH', rsData: 'ACGH' },
@@ -53,5 +53,5 @@ export const OtherAppendixEnumMap: Record<OtherAppendixEnum, { name: string; rsD
   [OtherAppendixEnum.NR_16_APPENDIX_3]: { name: 'NR 16 Anexo 3', rsData: 17 },
   [OtherAppendixEnum.NR_16_APPENDIX_4]: { name: 'NR 16 Anexo 4', rsData: 18 },
   [OtherAppendixEnum.NR_16_APPENDIX_5]: { name: 'NR 16 Anexo 5', rsData: 19 },
-  [OtherAppendixEnum.IONIZING_RAD_PERICULOSITY]: { name: "Portaria nº 518/2003", rsData: 20 },
-}
+  [OtherAppendixEnum.IONIZING_RAD_PERICULOSITY]: { name: 'Portaria nº 518/2003', rsData: 20 },
+};

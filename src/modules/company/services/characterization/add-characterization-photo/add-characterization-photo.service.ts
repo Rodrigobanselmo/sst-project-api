@@ -16,9 +16,13 @@ export class AddCharacterizationPhotoService {
     private readonly characterizationRepository: CharacterizationRepository,
     private readonly characterizationPhotoRepository: CharacterizationPhotoRepository,
     private readonly amazonStorageProvider: AmazonStorageProvider,
-  ) { }
+  ) {}
 
-  async execute(addPhotoCharacterizationDto: AddPhotoCharacterizationDto, userPayloadDto: UserPayloadDto, file: Express.Multer.File) {
+  async execute(
+    addPhotoCharacterizationDto: AddPhotoCharacterizationDto,
+    userPayloadDto: UserPayloadDto,
+    file: Express.Multer.File,
+  ) {
     const companyId = userPayloadDto.targetCompanyId;
     const [photoUrl, isVertical] = await this.upload(companyId, file);
 
@@ -30,7 +34,6 @@ export class AddCharacterizationPhotoService {
       }
     }
 
-
     await this.characterizationPhotoRepository.createMany([
       {
         ...addPhotoCharacterizationDto,
@@ -41,7 +44,9 @@ export class AddCharacterizationPhotoService {
       },
     ]);
 
-    const characterizationData = await this.characterizationRepository.findById(addPhotoCharacterizationDto.companyCharacterizationId);
+    const characterizationData = await this.characterizationRepository.findById(
+      addPhotoCharacterizationDto.companyCharacterizationId,
+    );
 
     return characterizationData;
   }

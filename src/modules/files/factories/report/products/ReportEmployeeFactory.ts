@@ -8,7 +8,12 @@ import { ExcelProvider } from '../../../../../shared/providers/ExcelProvider/imp
 import { CompanyRepository } from '../../../../company/repositories/implementations/CompanyRepository';
 import { ReportFactoryAbstractionCreator } from '../creator/ReportFactoryCreator';
 import { getCompany } from '../helpers/getCompanyInfo';
-import { IReportCell, IReportFactoryProduct, IReportFactoryProductFindData, IReportSanitizeData } from '../types/IReportFactory.types';
+import {
+  IReportCell,
+  IReportFactoryProduct,
+  IReportFactoryProductFindData,
+  IReportSanitizeData,
+} from '../types/IReportFactory.types';
 import { DownloadFactoryProduct } from './DownaldEmployeeModelFactory';
 
 @Injectable()
@@ -39,20 +44,27 @@ class ReportFactoryProduct extends DownloadFactoryProduct {
   public async findTableData(companyId: string) {
     const company = await getCompany(companyId, this._companyRepository);
 
-    const { data } = await this.employeeRepository.find({
-      getEsocialCode: true,
-      getHierarchyDescription: true,
-      companyId,
-      getAllHierarchyNames: true, //! trocar se for buscar de varias empresa já que busca por id de todos as hierarchies, performace ruim do prisma
-    }, { take: 50000 })
-
+    const { data } = await this.employeeRepository.find(
+      {
+        getEsocialCode: true,
+        getHierarchyDescription: true,
+        companyId,
+        getAllHierarchyNames: true, //! trocar se for buscar de varias empresa já que busca por id de todos as hierarchies, performace ruim do prisma
+      },
+      { take: 50000 },
+    );
 
     const sanitizeData = this.sanitizeData({ employees: data });
     const headerData = this.getHeader(company);
     const titleData = this.getTitle(headerData, company);
     const infoData = [];
 
-    const returnData: IReportFactoryProductFindData = { headerRow: headerData, titleRows: titleData, endRows: infoData, sanitizeData };
+    const returnData: IReportFactoryProductFindData = {
+      headerRow: headerData,
+      titleRows: titleData,
+      endRows: infoData,
+      sanitizeData,
+    };
 
     return returnData;
   }
@@ -89,8 +101,7 @@ class ReportFactoryProduct extends DownloadFactoryProduct {
       };
 
       rows.push(row);
-    }
-    );
+    });
 
     return rows;
   }

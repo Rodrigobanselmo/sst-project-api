@@ -1,4 +1,4 @@
-import { CacheModule, forwardRef, Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TelegramModule } from 'nestjs-telegram';
 
 import { DayJSProvider } from '../../shared/providers/DateProvider/implementations/DayJSProvider';
@@ -173,6 +173,7 @@ import { SyncController } from './controller/sync/sync.controller';
 import { SyncHierarchyService } from './services/sync/sync-hierarchy/sync-hierarchy.service';
 import { AddCharacterizationFileService } from './services/characterization/add-characterization-file/add-characterization-file.service';
 import { CharacterizationFileRepository } from './repositories/implementations/CharacterizationFileRepository';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
@@ -203,7 +204,7 @@ import { CharacterizationFileRepository } from './repositories/implementations/C
     ScheduleMedicalVisitController,
     ImageGalleryController,
     WorkspaceController,
-    SyncController
+    SyncController,
   ],
   providers: [
     CreateCompanyService,
@@ -356,7 +357,7 @@ import { CharacterizationFileRepository } from './repositories/implementations/C
     SyncMainService,
     SyncHierarchyService,
     AddCharacterizationFileService,
-    CharacterizationFileRepository
+    CharacterizationFileRepository,
   ],
   exports: [
     CompanyRepository,
@@ -377,7 +378,7 @@ import { CharacterizationFileRepository } from './repositories/implementations/C
     UpsertEmployeeHierarchyHistoryService,
     CreateEmployeeService,
     FindAllAvailableEmployeesService,
-    ScheduleMedicalVisitRepository
+    ScheduleMedicalVisitRepository,
   ],
 })
-export class CompanyModule { }
+export class CompanyModule {}

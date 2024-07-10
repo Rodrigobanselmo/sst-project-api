@@ -4,7 +4,11 @@ import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
 import { prismaFilter } from '../../../../shared/utils/filters/prisma.filters';
-import { CreateProfessionalResponsibleDto, FindProfessionalResponsibleDto, UpdateProfessionalResponsibleDto } from '../../dto/professional-responsible.dto';
+import {
+  CreateProfessionalResponsibleDto,
+  FindProfessionalResponsibleDto,
+  UpdateProfessionalResponsibleDto,
+} from '../../dto/professional-responsible.dto';
 import { ProfessionalResponsibleEntity } from '../../entities/professional-responsible.entity';
 
 @Injectable()
@@ -28,7 +32,11 @@ export class ProfessionalResponsibleRepository {
     return new ProfessionalResponsibleEntity(professionalResponsible);
   }
 
-  async find(query: Partial<FindProfessionalResponsibleDto>, pagination: PaginationQueryDto, options: Prisma.ProfessionalCouncilResponsibleFindManyArgs = {}) {
+  async find(
+    query: Partial<FindProfessionalResponsibleDto>,
+    pagination: PaginationQueryDto,
+    options: Prisma.ProfessionalCouncilResponsibleFindManyArgs = {},
+  ) {
     const whereInit = {
       AND: [],
     } as typeof options.where;
@@ -37,7 +45,14 @@ export class ProfessionalResponsibleRepository {
       id: true,
       startDate: true,
       type: true,
-      professional: { select: { councilId: true, councilUF: true, councilType: true, professional: { select: { name: true, id: true } } } },
+      professional: {
+        select: {
+          councilId: true,
+          councilUF: true,
+          councilType: true,
+          professional: { select: { name: true, id: true } },
+        },
+      },
       ...options.select,
     };
 
@@ -77,7 +92,9 @@ export class ProfessionalResponsibleRepository {
       ...options,
     });
 
-    return professionalResponsible.map((professionalResponsible) => new ProfessionalResponsibleEntity(professionalResponsible));
+    return professionalResponsible.map(
+      (professionalResponsible) => new ProfessionalResponsibleEntity(professionalResponsible),
+    );
   }
 
   async findFirstNude(options: Prisma.ProfessionalCouncilResponsibleFindFirstArgs = {}) {

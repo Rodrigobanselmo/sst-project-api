@@ -10,7 +10,10 @@ import { Roles } from '../../../../shared/decorators/roles.decorator';
 
 @Controller('files/cnae')
 export class FilesCnaeController {
-  constructor(private readonly downloadCnaeService: DownloadCnaeService, private readonly uploadCnaeService: UploadCnaeDataService) {}
+  constructor(
+    private readonly downloadCnaeService: DownloadCnaeService,
+    private readonly uploadCnaeService: UploadCnaeDataService,
+  ) {}
 
   @Roles(RoleEnum.MASTER)
   @Post('/upload')

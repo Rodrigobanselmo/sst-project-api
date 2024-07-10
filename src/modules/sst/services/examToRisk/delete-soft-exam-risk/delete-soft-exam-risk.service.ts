@@ -6,7 +6,10 @@ import { CheckEmployeeExamService } from '../../exam/check-employee-exam/check-e
 
 @Injectable()
 export class DeleteSoftExamRiskService {
-  constructor(private readonly examRiskRepository: ExamRiskRepository, private readonly checkEmployeeExamService: CheckEmployeeExamService) { }
+  constructor(
+    private readonly examRiskRepository: ExamRiskRepository,
+    private readonly checkEmployeeExamService: CheckEmployeeExamService,
+  ) {}
 
   async execute(id: number, user: UserPayloadDto) {
     const found = await this.examRiskRepository.findFirstNude({
@@ -14,14 +17,13 @@ export class DeleteSoftExamRiskService {
       select: { id: true, companyId: true },
     });
 
-
     if (!found?.id) throw new BadRequestException('Não encontrado');
 
     if (found.companyId != user.targetCompanyId) {
       await this.examRiskRepository.update({
         id,
         companyId: found.companyId,
-        addSkipCompanyId: user.targetCompanyId
+        addSkipCompanyId: user.targetCompanyId,
       });
 
       this.checkEmployeeExamService.execute({
@@ -29,7 +31,7 @@ export class DeleteSoftExamRiskService {
         riskId: found.riskId,
       });
 
-      return found
+      return found;
     }
 
     const examRisk = await this.examRiskRepository.deleteSoft(id, user.targetCompanyId);

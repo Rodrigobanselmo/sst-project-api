@@ -1,4 +1,3 @@
-import { ApiProperty } from '@nestjs/swagger';
 import { ProfessionalCouncil, StatusEnum } from '@prisma/client';
 import { DocumentDataEntity } from './../../sst/entities/documentData.entity';
 import { ExamEntity } from './../../sst/entities/exam.entity';
@@ -40,65 +39,22 @@ import { ScheduleBlockEntity } from './schedule-block.entity';
 import { WorkspaceEntity } from './workspace.entity';
 
 export class CompanyEntity implements Company {
-  @ApiProperty({ description: 'The id of the Company' })
   id: string;
-
-  @ApiProperty({ description: 'The CNPJ of the Company' })
   cnpj: string;
-
-  @ApiProperty({ description: 'The name of the Company' })
   name: string;
-
-  @ApiProperty({ description: 'The fantasy name of the Company' })
   fantasy: string;
-
-  @ApiProperty({
-    description: 'The current status of the Company',
-    examples: ['ACTIVE', 'PENDING', 'CANCELED'],
-  })
   status: StatusEnum;
-
-  @ApiProperty({
-    description: 'The type of the Company',
-    examples: ['matriz', 'filial'],
-  })
   type: CompanyTypesEnum;
-
-  @ApiProperty({
-    description: 'If true, the company can administrate other companies',
-  })
   isConsulting: boolean;
-
-  @ApiProperty({ description: 'The creation date of the Company' })
   created_at: Date;
-
-  @ApiProperty({
-    description: 'The last time that the Company data was updated',
-  })
   updated_at: Date;
-
-  @ApiProperty({ description: 'The license id of the Company' })
   licenseId: number;
-
-  @ApiProperty({ description: 'The group id of the Company' })
   groupId: number;
-
-  @ApiProperty({ description: 'The parent company id of the Company' })
   parentCompanyId: string;
-
-  @ApiProperty({ description: 'The creation date of the Company' })
   license?: LicenseEntity;
-
-  @ApiProperty({ description: 'The address of the Company' })
   address?: AddressCompanyEntity;
-
-  @ApiProperty({ description: 'The workspace related to the company' })
   workspace?: WorkspaceEntity[];
-
-  @ApiProperty({ description: 'The employees related to the company' })
   employees?: EmployeeEntity[];
-
-  @ApiProperty({ description: 'The deleted date of data' })
   deleted_at: Date | null;
 
   primary_activity?: ActivityEntity[];

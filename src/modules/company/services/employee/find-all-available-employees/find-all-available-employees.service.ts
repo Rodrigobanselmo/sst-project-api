@@ -1,5 +1,8 @@
 import { HierarchyEntity } from './../../../entities/hierarchy.entity';
-import { getEmployeeRowExpiredDate, getEmployeeRowStatus } from './../../../../../shared/utils/getExpiredExamStatus.utils';
+import {
+  getEmployeeRowExpiredDate,
+  getEmployeeRowStatus,
+} from './../../../../../shared/utils/getExpiredExamStatus.utils';
 import { ExamEntity } from './../../../../sst/entities/exam.entity';
 import { HierarchyRepository } from './../../../repositories/implementations/HierarchyRepository';
 import { EmployeeEntity } from './../../../entities/employee.entity';
@@ -19,23 +22,29 @@ export class FindAllAvailableEmployeesService {
     private readonly findExamByHierarchyService: FindExamByHierarchyService,
     private readonly checkEmployeeExamService: CheckEmployeeExamService,
     private readonly hierarchyRepository: HierarchyRepository,
-  ) { }
+  ) {}
 
   async execute({ skip, take, ...query }: FindEmployeeDto, user: UserPayloadDto) {
-    const employeesData = await this.employeeRepository.find({ ...query, companyId: user.targetCompanyId }, { skip, take });
+    const employeesData = await this.employeeRepository.find(
+      { ...query, companyId: user.targetCompanyId },
+      { skip, take },
+    );
 
     if (employeesData.data?.length && query?.getAllExams) {
       const allEmployees: EmployeeEntity[] = [];
       const allExams: ExamEntity[] = [];
 
-      const groupedByCompany = employeesData.data.reduce((acc, employee) => {
-        if (acc[employee.companyId]) {
-          acc[employee.companyId].push(employee);
-        } else {
-          acc[employee.companyId] = [employee];
-        }
-        return acc;
-      }, {} as Record<number, EmployeeEntity[]>);
+      const groupedByCompany = employeesData.data.reduce(
+        (acc, employee) => {
+          if (acc[employee.companyId]) {
+            acc[employee.companyId].push(employee);
+          } else {
+            acc[employee.companyId] = [employee];
+          }
+          return acc;
+        },
+        {} as Record<number, EmployeeEntity[]>,
+      );
 
       const uniqueCompanyIds = Object.keys(groupedByCompany);
 
@@ -56,7 +65,10 @@ export class FindAllAvailableEmployeesService {
 
   async getAllExams(employees: EmployeeEntity[], query: FindEmployeeDto, companyId: string) {
     const allExamsMap: Record<number, ExamEntity> = {};
-    const exams = await this.findExamByHierarchyService.execute({ targetCompanyId: companyId }, { getAllExamToRiskWithoutHierarchy: true });
+    const exams = await this.findExamByHierarchyService.execute(
+      { targetCompanyId: companyId },
+      { getAllExamToRiskWithoutHierarchy: true },
+    );
     const hierarchies = await this.hierarchyRepository.findNude({
       where: {
         companyId: companyId,
@@ -71,30 +83,45 @@ export class FindAllAvailableEmployeesService {
       select: { id: true, parentId: true },
     });
 
-    const hierarchyMap = hierarchies.reduce((acc, hierarchy) => {
-      acc[hierarchy.id] = hierarchy;
-      return acc;
-    }, {} as Record<number, HierarchyEntity>);
-
+    const hierarchyMap = hierarchies.reduce(
+      (acc, hierarchy) => {
+        acc[hierarchy.id] = hierarchy;
+        return acc;
+      },
+      {} as Record<number, HierarchyEntity>,
+    );
 
     employees.map((employee) => {
       const examsHistoryOnlyDone = employee.examsHistory?.filter((historyExam) => historyExam.status === 'DONE');
 
-      const hierarchyIdToCheckExams = query.getHierarchyIdFromScheduledExam ? (employee.scheduleExam?.subOfficeId || employee.scheduleExam?.hierarchyId) : null
+      const hierarchyIdToCheckExams = query.getHierarchyIdFromScheduledExam
+        ? employee.scheduleExam?.subOfficeId || employee.scheduleExam?.hierarchyId
+        : null;
 
-      const { isDismissal } = this.checkEmployeeExamService.getIsDismissal({ ...employee, examsHistory: examsHistoryOnlyDone });
-      const { parents, actualHierarchy } = getHierarchyParentsFromMap(hierarchyMap, hierarchyIdToCheckExams || employee.hierarchyId);
+      const { isDismissal } = this.checkEmployeeExamService.getIsDismissal({
+        ...employee,
+        examsHistory: examsHistoryOnlyDone,
+      });
+      const { parents, actualHierarchy } = getHierarchyParentsFromMap(
+        hierarchyMap,
+        hierarchyIdToCheckExams || employee.hierarchyId,
+      );
 
       if (!employee.hierarchy) {
         if (!query.getHierarchyIdFromScheduledExam) employee.hierarchy = actualHierarchy;
-        if (query.getHierarchyIdFromScheduledExam) employee.hierarchy = hierarchyMap[employee.hierarchyId || employee.scheduleExam?.hierarchyId];
+        if (query.getHierarchyIdFromScheduledExam)
+          employee.hierarchy = hierarchyMap[employee.hierarchyId || employee.scheduleExam?.hierarchyId];
       }
 
       if (actualHierarchy) employee.hierarchy.parents = parents;
 
-      const { originsExams, employeeExamType } = this.checkEmployeeExamService.checkExpiredExam({ ...employee, examsHistory: examsHistoryOnlyDone }, exams.data, {
-        isDismissal,
-      });
+      const { originsExams, employeeExamType } = this.checkEmployeeExamService.checkExpiredExam(
+        { ...employee, examsHistory: examsHistoryOnlyDone },
+        exams.data,
+        {
+          isDismissal,
+        },
+      );
 
       employee.infoExams = {};
       employee.examType = employeeExamType;
@@ -106,9 +133,13 @@ export class FindAllAvailableEmployeesService {
         const status = getEmployeeRowStatus(examHistoryData, originExam?.expiredDate);
 
         const isScheduled = examHistoryData?.status == StatusEnum.PROCESSING;
-        const examHistoryDataDone = !isScheduled ? examHistoryData : examsHistory.find((hExam) => hExam.status === 'DONE');
+        const examHistoryDataDone = !isScheduled
+          ? examHistoryData
+          : examsHistory.find((hExam) => hExam.status === 'DONE');
 
-        const validityDateString = getEmployeeRowExpiredDate(isScheduled ? examHistoryData.doneDate : originExam?.expiredDate);
+        const validityDateString = getEmployeeRowExpiredDate(
+          isScheduled ? examHistoryData.doneDate : originExam?.expiredDate,
+        );
 
         if (originExam.exam && !allExamsMap[originExam.examId]) allExamsMap[originExam.examId] = originExam.exam;
         employee.infoExams[originExam.examId] = {

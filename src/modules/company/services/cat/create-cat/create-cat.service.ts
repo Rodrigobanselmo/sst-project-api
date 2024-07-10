@@ -9,7 +9,11 @@ import { CatRepository } from '../../../repositories/implementations/CatReposito
 
 @Injectable()
 export class CreateCatsService {
-  constructor(private readonly employeeRepository: EmployeeRepository, private readonly catRepository: CatRepository, private readonly dayjs: DayJSProvider) {}
+  constructor(
+    private readonly employeeRepository: EmployeeRepository,
+    private readonly catRepository: CatRepository,
+    private readonly dayjs: DayJSProvider,
+  ) {}
 
   async execute(UpsertCatsDto: CreateCatDto, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;

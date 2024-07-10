@@ -2273,7 +2273,8 @@ export class ESocial27TableRepository {
       },
       {
         code: '0562',
-        'name ': 'Ergoespirometria ou teste cardiopulmonar de exercício completo (espirometria forçada, consumo de O2, produção de CO2 e derivados, ECG, oximetria)',
+        'name ':
+          'Ergoespirometria ou teste cardiopulmonar de exercício completo (espirometria forçada, consumo de O2, produção de CO2 e derivados, ECG, oximetria)',
       },
       {
         code: '0563',

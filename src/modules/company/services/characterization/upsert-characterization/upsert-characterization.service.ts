@@ -19,7 +19,7 @@ export class UpsertCharacterizationService {
     private readonly amazonStorageProvider: AmazonStorageProvider,
     private readonly deleteHierarchyHomoGroupService: DeleteHierarchyHomoGroupService,
     private readonly updateHomoGroupService: UpdateHomoGroupService,
-  ) { }
+  ) {}
 
   async execute(
     { photos, createWithId, ...upsertCharacterizationDto }: UpsertCharacterizationDto,
@@ -39,7 +39,11 @@ export class UpsertCharacterizationService {
         select: {
           id: true,
           created_at: true,
-          ...(inactivating && { homogeneousGroup: { select: { hierarchyOnHomogeneous: { where: { endDate: null }, take: 1, select: { id: true } } } } }),
+          ...(inactivating && {
+            homogeneousGroup: {
+              select: { hierarchyOnHomogeneous: { where: { endDate: null }, take: 1, select: { id: true } } },
+            },
+          }),
           ...(!!upsertCharacterizationDto?.hierarchyIds?.length && {
             homogeneousGroup: {
               select: {

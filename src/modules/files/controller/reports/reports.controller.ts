@@ -37,46 +37,70 @@ export class ReportsController {
     private readonly riskStructureReportService: RiskStructureReportService,
     private readonly employeeReportService: EmployeeReportService,
     private readonly examComplementaryReportService: ExamComplementaryReportService,
-  ) { }
+  ) {}
 
   @Permissions({ code: PermissionEnum.CLINIC, crud: true, isMember: true })
   @Post('/clinic/:companyId')
-  async clinicReport(@Body() body: DownloudClinicReportDto, @User() userPayloadDto: UserPayloadDto, @Res() res: Response) {
+  async clinicReport(
+    @Body() body: DownloudClinicReportDto,
+    @User() userPayloadDto: UserPayloadDto,
+    @Res() res: Response,
+  ) {
     const data = await this.clinicReportService.execute(body, userPayloadDto);
     getResponse(res, data);
   }
 
   @Permissions({ code: PermissionEnum.CLINIC_SCHEDULE, crud: true, isMember: true })
   @Post('/expired-exam/:companyId')
-  async expiredExam(@Body() body: DownloadExpiredExamReportDto, @User() userPayloadDto: UserPayloadDto, @Res() res: Response) {
+  async expiredExam(
+    @Body() body: DownloadExpiredExamReportDto,
+    @User() userPayloadDto: UserPayloadDto,
+    @Res() res: Response,
+  ) {
     const data = await this.expiredExamReportService.execute(body, userPayloadDto);
     getResponse(res, data);
   }
 
   @Permissions({ code: PermissionEnum.CLINIC_SCHEDULE, crud: true, isMember: true })
   @Post('/complementary-exam/:companyId')
-  async complementaryExam(@Body() body: DownloadExpiredExamReportDto, @User() userPayloadDto: UserPayloadDto, @Res() res: Response) {
+  async complementaryExam(
+    @Body() body: DownloadExpiredExamReportDto,
+    @User() userPayloadDto: UserPayloadDto,
+    @Res() res: Response,
+  ) {
     const data = await this.examComplementaryReportService.execute(body, userPayloadDto);
     getResponse(res, data);
   }
 
   @Permissions({ code: PermissionEnum.CLINIC_SCHEDULE, crud: true, isMember: true })
   @Post('/done-exam/:companyId')
-  async doneExam(@Body() body: DownloudDoneExamReportDto, @User() userPayloadDto: UserPayloadDto, @Res() res: Response) {
+  async doneExam(
+    @Body() body: DownloudDoneExamReportDto,
+    @User() userPayloadDto: UserPayloadDto,
+    @Res() res: Response,
+  ) {
     const data = await this.doneExamReportService.execute(body, userPayloadDto);
     getResponse(res, data);
   }
 
   @Permissions({ code: PermissionEnum.RISK_DATA, crud: true, isMember: true })
   @Post('/risk-structure/:companyId')
-  async riskStructure(@Body() body: DownloadRiskStructureReportDto, @User() userPayloadDto: UserPayloadDto, @Res() res: Response) {
+  async riskStructure(
+    @Body() body: DownloadRiskStructureReportDto,
+    @User() userPayloadDto: UserPayloadDto,
+    @Res() res: Response,
+  ) {
     const data = await this.riskStructureReportService.execute(body, userPayloadDto);
     getResponse(res, data);
   }
 
   @Permissions({ code: PermissionEnum.RISK_DATA, crud: true, isMember: true })
   @Post('/employee/:companyId')
-  async employees(@Body() body: DownloadEmployeeReportDto, @User() userPayloadDto: UserPayloadDto, @Res() res: Response) {
+  async employees(
+    @Body() body: DownloadEmployeeReportDto,
+    @User() userPayloadDto: UserPayloadDto,
+    @Res() res: Response,
+  ) {
     const data = await this.employeeReportService.execute(body, userPayloadDto);
     getResponse(res, data);
   }

@@ -4,14 +4,24 @@ import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
 import { prismaFilter } from '../../../../shared/utils/filters/prisma.filters';
-import { CreateProtocolToRiskDto, FindProtocolToRiskDto, UpdateProtocolToRiskDto, UpsertManyProtocolToRiskDto } from '../../dto/protocol-to-risk.dto';
+import {
+  CreateProtocolToRiskDto,
+  FindProtocolToRiskDto,
+  UpdateProtocolToRiskDto,
+  UpsertManyProtocolToRiskDto,
+} from '../../dto/protocol-to-risk.dto';
 import { ProtocolToRiskEntity } from '../../entities/protocol.entity';
 
 @Injectable()
 export class ProtocolToRiskRepository {
   constructor(private prisma: PrismaService) {}
 
-  async create({ hierarchyIds, homoGroupsIds, riskId, ...createProtocolToRiskDto }: CreateProtocolToRiskDto): Promise<ProtocolToRiskEntity> {
+  async create({
+    hierarchyIds,
+    homoGroupsIds,
+    riskId,
+    ...createProtocolToRiskDto
+  }: CreateProtocolToRiskDto): Promise<ProtocolToRiskEntity> {
     const redMed = await this.prisma.protocolToRisk.create({
       data: {
         ...createProtocolToRiskDto,
@@ -34,7 +44,14 @@ export class ProtocolToRiskRepository {
     return new ProtocolToRiskEntity(redMed);
   }
 
-  async update({ id, companyId, riskId, hierarchyIds, homoGroupsIds, ...createProtocolToRiskDto }: UpdateProtocolToRiskDto): Promise<ProtocolToRiskEntity> {
+  async update({
+    id,
+    companyId,
+    riskId,
+    hierarchyIds,
+    homoGroupsIds,
+    ...createProtocolToRiskDto
+  }: UpdateProtocolToRiskDto): Promise<ProtocolToRiskEntity> {
     const Exam = await this.prisma.protocolToRisk.update({
       data: {
         ...createProtocolToRiskDto,
@@ -56,7 +73,11 @@ export class ProtocolToRiskRepository {
     return new ProtocolToRiskEntity(Exam);
   }
 
-  async find(query: Partial<FindProtocolToRiskDto>, pagination: PaginationQueryDto, options: Prisma.ProtocolToRiskFindManyArgs = {}) {
+  async find(
+    query: Partial<FindProtocolToRiskDto>,
+    pagination: PaginationQueryDto,
+    options: Prisma.ProtocolToRiskFindManyArgs = {},
+  ) {
     const whereInit = {
       AND: [],
     } as typeof options.where;
@@ -70,7 +91,10 @@ export class ProtocolToRiskRepository {
 
     if ('search' in query && query.search) {
       (where.AND as any).push({
-        OR: [{ protocol: { name: { contains: query.search, mode: 'insensitive' } } }, { risk: { name: { contains: query.search, mode: 'insensitive' } } }],
+        OR: [
+          { protocol: { name: { contains: query.search, mode: 'insensitive' } } },
+          { risk: { name: { contains: query.search, mode: 'insensitive' } } },
+        ],
       } as typeof options.where);
     }
 
@@ -161,7 +185,10 @@ export class ProtocolToRiskRepository {
     return exams.map((exam) => new ProtocolToRiskEntity(exam));
   }
 
-  async findByHierarchies(hierarchiesIds: string[], options: Prisma.ProtocolToRiskFindManyArgs & { date?: Date } = {}): Promise<ProtocolToRiskEntity[]> {
+  async findByHierarchies(
+    hierarchiesIds: string[],
+    options: Prisma.ProtocolToRiskFindManyArgs & { date?: Date } = {},
+  ): Promise<ProtocolToRiskEntity[]> {
     const { date, ...optionsRest } = options;
 
     const exams = await this.prisma.protocolToRisk.findMany({
@@ -174,7 +201,12 @@ export class ProtocolToRiskRepository {
                 hierarchyOnHomogeneous: {
                   some: {
                     hierarchyId: { in: hierarchiesIds },
-                    ...(date && { AND: [{ OR: [{ startDate: { lte: date } }, { startDate: null }] }, { OR: [{ endDate: { gt: date } }, { endDate: null }] }] }),
+                    ...(date && {
+                      AND: [
+                        { OR: [{ startDate: { lte: date } }, { startDate: null }] },
+                        { OR: [{ endDate: { gt: date } }, { endDate: null }] },
+                      ],
+                    }),
                   },
                 },
               },

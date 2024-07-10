@@ -1,4 +1,15 @@
-import { AlignmentType, BorderStyle, ISpacingProperties, ITableCellOptions, Paragraph, TableCell, TableRow, TextRun, VerticalAlign, WidthType } from 'docx';
+import {
+  AlignmentType,
+  BorderStyle,
+  ISpacingProperties,
+  ITableCellOptions,
+  Paragraph,
+  TableCell,
+  TableRow,
+  TextRun,
+  VerticalAlign,
+  WidthType,
+} from 'docx';
 import { palette } from '../../../../../../../shared/constants/palette';
 
 export interface bodyTableProps extends Partial<ITableCellOptions> {
@@ -9,7 +20,7 @@ export interface bodyTableProps extends Partial<ITableCellOptions> {
   bold?: boolean;
   size?: number;
   spacing?: ISpacingProperties;
-  alignment?: AlignmentType;
+  alignment?: (typeof AlignmentType)[keyof typeof AlignmentType];
 }
 
 export const borderNoneStyle = {
@@ -26,7 +37,16 @@ export class TableBodyElements {
     });
   }
 
-  tableCell({ text = '', title, size = 10, bold, spacing = { line: 200 }, alignment = AlignmentType.LEFT, color, ...rest }: bodyTableProps) {
+  tableCell({
+    text = '',
+    title,
+    size = 10,
+    bold,
+    spacing = { line: 200 },
+    alignment = AlignmentType.LEFT,
+    color,
+    ...rest
+  }: bodyTableProps) {
     const tex = text || '';
     return new TableCell({
       children: [

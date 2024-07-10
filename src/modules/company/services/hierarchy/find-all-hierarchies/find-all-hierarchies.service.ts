@@ -7,7 +7,9 @@ export class FindAllHierarchyService {
   constructor(private readonly hierarchyRepository: HierarchyRepository) {}
 
   async execute(user: UserPayloadDto) {
-    const hierarchies = await this.hierarchyRepository.findAllHierarchyByCompany(user.targetCompanyId, { include: { workspaces: true } });
+    const hierarchies = await this.hierarchyRepository.findAllHierarchyByCompany(user.targetCompanyId, {
+      include: { workspaces: true },
+    });
 
     return hierarchies;
   }

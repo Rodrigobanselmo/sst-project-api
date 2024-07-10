@@ -1,4 +1,9 @@
-export const m2mGetDeletedIds = (dbArray: any[], sendArray: any[], compareFieldSend: string, compareFieldDb?: string) => {
+export const m2mGetDeletedIds = (
+  dbArray: any[],
+  sendArray: any[],
+  compareFieldSend: string,
+  compareFieldDb?: string,
+) => {
   return dbArray
     .filter(
       (dbData) =>

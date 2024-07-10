@@ -10,9 +10,17 @@ import { ProfessionalDocumentDataEntity } from '../../entities/usersRiskGroup';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 @Injectable()
 export class DocumentDataRepository {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
-  async upsert({ id, companyId, json, professionals, workspaceId, type, ...createDto }: UpsertDocumentDataDto & { json?: any }): Promise<DocumentDataEntity> {
+  async upsert({
+    id,
+    companyId,
+    json,
+    professionals,
+    workspaceId,
+    type,
+    ...createDto
+  }: UpsertDocumentDataDto & { json?: any }): Promise<DocumentDataEntity> {
     const documentData = await this.prisma.documentData.upsert({
       create: {
         ...createDto,
@@ -57,7 +65,12 @@ export class DocumentDataRepository {
     return new DocumentDataEntity(documentData);
   }
 
-  async findOne(companyId: string, workspaceId: string, type: DocumentTypeEnum, options?: Partial<Prisma.DocumentDataFindUniqueArgs>) {
+  async findOne(
+    companyId: string,
+    workspaceId: string,
+    type: DocumentTypeEnum,
+    options?: Partial<Prisma.DocumentDataFindUniqueArgs>,
+  ) {
     const data = await this.prisma.documentData.findUnique({
       where: { type_workspaceId_companyId: { type, companyId, workspaceId } },
       include: {

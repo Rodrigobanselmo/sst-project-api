@@ -1,5 +1,8 @@
 import { normalizeToUpperString } from '../../../../../../../shared/utils/normalizeString';
-import { SexTypeEnumTranslateBrToUs, SexTypeEnumTranslatedNotes } from '../../../../../../../shared/utils/translate/sexType.translate';
+import {
+  SexTypeEnumTranslateBrToUs,
+  SexTypeEnumTranslatedNotes,
+} from '../../../../../../../shared/utils/translate/sexType.translate';
 import { checkIsValidCpf } from '../../../../../../../shared/utils/validators/checkIsValidCpf';
 import { ReportColorEnum, ReportFillColorEnum } from '../../../../report/types/IReportFactory.types';
 import { ClothesIBTUG, clothesList } from '../../../../../../../shared/constants/maps/ibtu-clothes.map';
@@ -200,7 +203,7 @@ export const CompanyStructColumnMap: IColumnRuleMap<CompanyStructHeaderEnum> = {
     field: CompanyStructHeaderEnum.EMPLOYEE_IS_PCD,
     checkHandler: checkIsBoolean,
     notes: ['S: Sim', 'N: Não'],
-    transform: (v) => typeof v == 'string' ? Boolean(v) : undefined,
+    transform: (v) => (typeof v == 'string' ? Boolean(v) : undefined),
     database: 'isPCD',
   },
   [CompanyStructHeaderEnum.EMPLOYEE_CIDS]: {
@@ -379,7 +382,11 @@ export const CompanyStructColumnMap: IColumnRuleMap<CompanyStructHeaderEnum> = {
   [CompanyStructHeaderEnum.IBTUG]: {
     field: CompanyStructHeaderEnum.IBTUG,
     checkHandler: checkIsNumber,
-    requiredIfOneExist: [CompanyStructHeaderEnum.MW, CompanyStructHeaderEnum.IS_ACCLIMATIZED, CompanyStructHeaderEnum.CLOTHES_TYPE],
+    requiredIfOneExist: [
+      CompanyStructHeaderEnum.MW,
+      CompanyStructHeaderEnum.IS_ACCLIMATIZED,
+      CompanyStructHeaderEnum.CLOTHES_TYPE,
+    ],
     database: 'ibtug',
   },
   [CompanyStructHeaderEnum.MW]: {
@@ -457,29 +464,29 @@ export const CompanyStructColumnMap: IColumnRuleMap<CompanyStructHeaderEnum> = {
     field: CompanyStructHeaderEnum.NR15LT,
     checkHandler: checkIsNumber,
     notes: ['utilizar "T" para indicar TETO'],
-    database: 'nr15ltValue'
+    database: 'nr15ltValue',
   },
   [CompanyStructHeaderEnum.TWA_ACGH]: {
     field: CompanyStructHeaderEnum.TWA_ACGH,
     checkHandler: checkIsNumber,
-    database: 'twaValue'
+    database: 'twaValue',
   },
   [CompanyStructHeaderEnum.STEL]: {
     field: CompanyStructHeaderEnum.STEL,
     checkHandler: checkIsNumber,
     notes: ['utilizar "C" para indicar "CEILLING"'],
-    database: 'stelValue'
+    database: 'stelValue',
   },
   [CompanyStructHeaderEnum.VMP]: {
     field: CompanyStructHeaderEnum.VMP,
     checkHandler: checkIsNumber,
-    database: 'vmpValue'
+    database: 'vmpValue',
   },
   [CompanyStructHeaderEnum.UNIT]: {
     field: CompanyStructHeaderEnum.UNIT,
     checkHandler: checkIsString,
     width: 30,
-    database: 'unit'
+    database: 'unit',
   },
 
   [CompanyStructHeaderEnum.EPI_CA]: {

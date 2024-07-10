@@ -23,7 +23,11 @@ export class CreateDocumentModelService {
     );
 
     if (found.data[0]?.id)
-      throw new BadRequestException('Modelo de documento com esse nome já existe' + found.data[0].status === StatusEnum.INACTIVE ? ' inativado' : '');
+      throw new BadRequestException(
+        'Modelo de documento com esse nome já existe' + found.data[0].status === StatusEnum.INACTIVE
+          ? ' inativado'
+          : '',
+      );
 
     let baseModel: IDocumentModelData = {
       variables: {},
@@ -43,7 +47,8 @@ export class CreateDocumentModelService {
         { select: { data: true } },
       );
 
-      if (copyDataModel.data[0] && copyDataModel.data[0].dataJson && !copyDataModel.data[0].errorParse) baseModel = copyDataModel.data[0].dataJson;
+      if (copyDataModel.data[0] && copyDataModel.data[0].dataJson && !copyDataModel.data[0].errorParse)
+        baseModel = copyDataModel.data[0].dataJson;
     }
 
     const model = await this.documentModelRepository.create({

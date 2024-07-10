@@ -1,7 +1,6 @@
 import { UserAgent } from './../../../../shared/decorators/userAgent.decorator';
 import { Body, Controller, Get, Ip, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
-import { classToClass } from 'class-transformer';
+import { instanceToInstance } from 'class-transformer';
 import { SessionService } from '../../../auth/services/session/session/session.service';
 
 import { Public } from '../../../../shared/decorators/public.decorator';
@@ -21,13 +20,11 @@ import { ResetPasswordService } from '../../services/users/reset-password/reset-
 import { UpdatePermissionsRolesService } from '../../services/users/update-permissions-roles/update-permissions-roles.service';
 import { UpdateUserService } from '../../services/users/update-user/update-user.service';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
-import { PermissionEnum, RoleEnum } from '../../../../shared/constants/enum/authorization';
-import { Roles } from '../../../../shared/decorators/roles.decorator';
+import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
 import { v4 } from 'uuid';
 import { FindUserHistoryDto } from '../../dto/user-history.dto';
 import { FindUserHistorysService } from '../../services/user-history/find-user-history/find-user-history.service';
 
-@ApiTags('users')
 @Controller('users')
 export class UsersController {
   constructor(
@@ -41,11 +38,11 @@ export class UsersController {
     private readonly sessionService: SessionService,
     private readonly updatePermissionsRolesService: UpdatePermissionsRolesService,
     private readonly findUserHistorysService: FindUserHistorysService,
-  ) { }
+  ) {}
 
   @Get('me')
   async findMe(@User() userPayloadDto: UserPayloadDto) {
-    return classToClass(this.findMeService.execute(userPayloadDto.userId, userPayloadDto.companyId));
+    return instanceToInstance(this.findMeService.execute(userPayloadDto.userId, userPayloadDto.companyId));
   }
 
   @Permissions({
@@ -56,7 +53,7 @@ export class UsersController {
   })
   @Get('/company/:companyId/:id')
   findId(@Param('id', ParseIntPipe) id: number, @User() user: UserPayloadDto) {
-    return classToClass(this.findByIdService.execute(+id, user.targetCompanyId));
+    return instanceToInstance(this.findByIdService.execute(+id, user.targetCompanyId));
   }
 
   @Permissions({
@@ -64,7 +61,7 @@ export class UsersController {
   })
   @Get()
   findEmail(@Query('email', ValidateEmailPipe) email: string) {
-    return classToClass(this.findByEmailService.execute(email));
+    return instanceToInstance(this.findByEmailService.execute(email));
   }
 
   @Permissions({
@@ -74,9 +71,8 @@ export class UsersController {
   })
   @Get('/company/:companyId?')
   findAllByCompany(@User() user: UserPayloadDto) {
-    return classToClass(this.findAllByCompanyService.execute(user));
+    return instanceToInstance(this.findAllByCompanyService.execute(user));
   }
-
 
   @Permissions({
     code: PermissionEnum.USER,
@@ -87,18 +83,28 @@ export class UsersController {
   @Get('/history/:companyId')
   @Get()
   find(@User() userPayloadDto: UserPayloadDto, @Query() query: FindUserHistoryDto) {
-    return this.findUserHistorysService.execute({ ...query, companyId: userPayloadDto.targetCompanyId }, userPayloadDto);
+    return this.findUserHistorysService.execute(
+      { ...query, companyId: userPayloadDto.targetCompanyId },
+      userPayloadDto,
+    );
   }
 
   @Get('me/history')
   async findMeHistory(@User() userPayloadDto: UserPayloadDto, @Query() query: FindUserHistoryDto) {
-    return this.findUserHistorysService.execute({ ...query, companyId: userPayloadDto.targetCompanyId, userId: userPayloadDto.userId }, userPayloadDto);
+    return this.findUserHistorysService.execute(
+      {
+        ...query,
+        companyId: userPayloadDto.targetCompanyId,
+        userId: userPayloadDto.userId,
+      },
+      userPayloadDto,
+    );
   }
 
   @Public()
   @Post()
   async create(@Body() createUserDto: CreateUserDto, @Ip() ip: string, @UserAgent() userAgent: string) {
-    if (!createUserDto.password) createUserDto.password = v4()
+    if (!createUserDto.password) createUserDto.password = v4();
 
     await this.createUserService.execute(createUserDto);
 
@@ -107,7 +113,7 @@ export class UsersController {
 
   @Patch()
   update(@Body() updateUserDto: UpdateUserDto, @User() { userId }: UserPayloadDto) {
-    return classToClass(this.updateUserService.execute(+userId, updateUserDto));
+    return instanceToInstance(this.updateUserService.execute(+userId, updateUserDto));
   }
 
   @Permissions({
@@ -117,8 +123,18 @@ export class UsersController {
     crud: true,
   })
   @Patch('/company/:companyId/:id')
-  async updateAll(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto, @User() user: UserPayloadDto) {
-    return classToClass(this.updateUserService.execute(id, { ...updateUserDto, skipPassCheck: true, companyId: user.targetCompanyId }));
+  async updateAll(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateUserDto: UpdateUserDto,
+    @User() user: UserPayloadDto,
+  ) {
+    return instanceToInstance(
+      this.updateUserService.execute(id, {
+        ...updateUserDto,
+        skipPassCheck: true,
+        companyId: user.targetCompanyId,
+      }),
+    );
   }
 
   @Permissions({
@@ -129,12 +145,12 @@ export class UsersController {
   })
   @Patch('/company')
   async updatePermissionsRoles(@Body() updateUserCompanyDto: UpdateUserCompanyDto, @User() user: UserPayloadDto) {
-    return classToClass(this.updatePermissionsRolesService.execute(updateUserCompanyDto, user));
+    return instanceToInstance(this.updatePermissionsRolesService.execute(updateUserCompanyDto, user));
   }
 
   @Public()
   @Patch('reset-password')
   async reset(@Body() resetPasswordDto: ResetPasswordDto) {
-    return classToClass(this.resetPasswordService.execute(resetPasswordDto));
+    return instanceToInstance(this.resetPasswordService.execute(resetPasswordDto));
   }
 }

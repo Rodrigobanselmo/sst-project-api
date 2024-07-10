@@ -1,6 +1,5 @@
 import { UserAgent } from './../../../../shared/decorators/userAgent.decorator';
 import { Body, Controller, Delete, HttpCode, HttpStatus, Ip, Post } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { Public } from '../../../../shared/decorators/public.decorator';
 import { ForgotPasswordDto } from '../../dto/forgot-password';
@@ -12,7 +11,6 @@ import { SendForgotPassMailService } from '../../services/session/send-forgot-pa
 import { SessionService } from '../../services/session/session/session.service';
 import { VerifyGoogleLoginService } from '../../services/session/verify-google-login/verify-google-login.service';
 
-@ApiTags('Authentication')
 @Controller()
 export class AuthController {
   constructor(
@@ -21,7 +19,7 @@ export class AuthController {
     private readonly sendForgotPassMailService: SendForgotPassMailService,
     private readonly deleteAllExpiredRefreshTokensService: DeleteAllExpiredService,
     private readonly verifyGoogleLoginService: VerifyGoogleLoginService,
-  ) { }
+  ) {}
 
   @Public()
   @HttpCode(HttpStatus.OK)
@@ -41,8 +39,9 @@ export class AuthController {
   @Public()
   @Post('refresh')
   refresh(@Body() { refresh_token, companyId, isApp }: RefreshTokenDto) {
-
-    return this.refreshTokenService.execute(refresh_token, companyId, { isApp });
+    return this.refreshTokenService.execute(refresh_token, companyId, {
+      isApp,
+    });
   }
 
   @Public()
@@ -52,7 +51,6 @@ export class AuthController {
   }
 
   @Delete('auth/expired-refresh-tokens')
-  @ApiBearerAuth()
   deleteAll() {
     return this.deleteAllExpiredRefreshTokensService.execute();
   }

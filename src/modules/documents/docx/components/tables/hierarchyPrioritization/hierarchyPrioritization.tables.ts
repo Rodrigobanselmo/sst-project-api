@@ -17,7 +17,12 @@ export const hierarchyPrioritizationTables = (
     isByGroup: false,
   },
 ) => {
-  const { bodyData, headerData } = hierarchyPrioritizationConverter(riskFactorGroupData, hierarchiesEntity, hierarchyTree, options);
+  const { bodyData, headerData } = hierarchyPrioritizationConverter(
+    riskFactorGroupData,
+    hierarchiesEntity,
+    hierarchyTree,
+    options,
+  );
 
   const tableHeaderElements = new TableHeaderElements();
   const tableBodyElements = new TableBodyElements();

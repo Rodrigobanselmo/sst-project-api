@@ -7,12 +7,13 @@ import { CharacterizationRepository } from '../../../repositories/implementation
 
 @Injectable()
 export class FindImageGalleryService {
-  constructor(
-    private readonly imageGalleryRepository: ImageGalleryRepository,
-  ) { }
+  constructor(private readonly imageGalleryRepository: ImageGalleryRepository) {}
 
   async execute({ skip, take, ...query }: FindImageGalleryDto, user: UserPayloadDto) {
-    const result = await this.imageGalleryRepository.findAllByCompany({ companyId: user.targetCompanyId, ...query }, { skip, take });
+    const result = await this.imageGalleryRepository.findAllByCompany(
+      { companyId: user.targetCompanyId, ...query },
+      { skip, take },
+    );
 
     return result;
   }

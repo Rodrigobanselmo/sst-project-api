@@ -35,8 +35,17 @@ export class DocumentsBaseController {
     },
   )
   @Get('/:docId/attachment/:attachmentId/:companyId?')
-  async downloadAttachment(@Res() res, @User() userPayloadDto: UserPayloadDto, @Param('docId') docId: string, @Param('attachmentId') attachmentId: string) {
-    const { fileKey, fileStream } = await this.pgrDownloadAttachmentsService.execute(userPayloadDto, docId, attachmentId);
+  async downloadAttachment(
+    @Res() res,
+    @User() userPayloadDto: UserPayloadDto,
+    @Param('docId') docId: string,
+    @Param('attachmentId') attachmentId: string,
+  ) {
+    const { fileKey, fileStream } = await this.pgrDownloadAttachmentsService.execute(
+      userPayloadDto,
+      docId,
+      attachmentId,
+    );
 
     res.setHeader('Content-Disposition', `attachment; filename=${fileKey.split('/')[fileKey.split('/').length - 1]}`);
     fileStream.on('error', function (e) {

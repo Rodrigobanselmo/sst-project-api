@@ -6,7 +6,10 @@ import { CompanyOSRepository } from './../../../repositories/implementations/Com
 
 @Injectable()
 export class FindOneCompanyOSService {
-  constructor(private readonly companyOSRepository: CompanyOSRepository, private readonly companyRepository: CompanyRepository) { }
+  constructor(
+    private readonly companyOSRepository: CompanyOSRepository,
+    private readonly companyRepository: CompanyRepository,
+  ) {}
 
   async execute(user: UserPayloadDto) {
     const company = await this.companyRepository.findFirstNude({

@@ -19,7 +19,9 @@ export class CopyProtocolToRiskService {
     });
 
     const copyData = FromProtocolFactor.map((protocol) => {
-      const found = ActualProtocolFactor.find((aProtocol) => aProtocol.protocolId === protocol.protocolId && aProtocol.riskId === protocol.riskId);
+      const found = ActualProtocolFactor.find(
+        (aProtocol) => aProtocol.protocolId === protocol.protocolId && aProtocol.riskId === protocol.riskId,
+      );
 
       if (found) return null;
 

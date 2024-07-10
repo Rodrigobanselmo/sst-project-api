@@ -1,5 +1,5 @@
 import { UpsertDocumentDataService } from './services/documentData/upsert-document-data/upsert-document-data.service';
-import { Module, forwardRef, CacheModule } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { DayJSProvider } from '../../shared/providers/DateProvider/implementations/DayJSProvider';
 
 import { CompanyModule } from '../company/company.module';
@@ -99,6 +99,7 @@ import { FindGenerateSourceService } from './services/generate-source/find-gener
 import { ReloadEmployeeExamTimeService } from './services/exam/reload-employee-exam-time/reload-employee-exam-time.service';
 import { DeleteExamToClinicService } from './services/examToClinic/delete-exam-to-clinic/find-exam-to-clinic.service';
 import { DeleteSoftExamRiskService } from './services/examToRisk/delete-soft-exam-risk/delete-soft-exam-risk.service';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   controllers: [
@@ -225,4 +226,4 @@ import { DeleteSoftExamRiskService } from './services/examToRisk/delete-soft-exa
   ],
   imports: [forwardRef(() => CompanyModule), CacheModule.register()],
 })
-export class SSTModule { }
+export class SSTModule {}

@@ -9,7 +9,15 @@ import { EmailsEnum } from '../../../../constants/enum/emails';
 import { IMailProvider, ISendMailData } from '../../models/IMailProvider';
 
 class NodeMailProvider implements IMailProvider {
-  async sendMail({ path, subject, to, variables, attachments, source = EmailsEnum.VALIDATION, sendDelevelop }: ISendMailData): Promise<any> {
+  async sendMail({
+    path,
+    subject,
+    to,
+    variables,
+    attachments,
+    source = EmailsEnum.VALIDATION,
+    sendDelevelop,
+  }: ISendMailData): Promise<any> {
     try {
       if (!sendDelevelop && process.env.NODE_ENV === 'development') return;
       if (!to) return;
@@ -21,7 +29,7 @@ class NodeMailProvider implements IMailProvider {
       const templateHTML = templateParse(variables);
 
       // const email = 'Simplesst <manager.simplesst@gmail.com>'
-      const email = 'manager.simplesst@gmail.com      '
+      const email = 'manager.simplesst@gmail.com      ';
 
       const transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -40,11 +48,10 @@ class NodeMailProvider implements IMailProvider {
           attachments: attachments?.map((attachment) => ({
             content: attachment.content,
             filename: attachment.filename,
-            contentType: attachment.type
-          }))
-        })
+            contentType: attachment.type,
+          })),
+        }),
       });
-
     } catch (error) {
       console.error(JSON.stringify(error, null, 2));
       throw new UnprocessableEntityException(ErrorMessageEnum.EMAIL_NOT_SEND);

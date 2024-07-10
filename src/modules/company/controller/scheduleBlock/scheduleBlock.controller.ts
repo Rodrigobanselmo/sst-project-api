@@ -1,5 +1,4 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
 
 import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
@@ -12,7 +11,6 @@ import { FindOneScheduleBlocksService } from '../../services/scheduleBlock/find-
 import { FindScheduleBlocksService } from '../../services/scheduleBlock/find-schedule-block/find-schedule-block.service';
 import { UpdateScheduleBlocksService } from '../../services/scheduleBlock/update-schedule-block/update-schedule-block.service';
 
-@ApiTags('schedule-block')
 @Controller('schedule-block')
 export class ScheduleBlockController {
   constructor(
@@ -63,7 +61,11 @@ export class ScheduleBlockController {
     crud: true,
   })
   @Patch('/:companyId/:id')
-  update(@Body() upsertAccessGroupDto: UpdateScheduleBlockDto, @User() userPayloadDto: UserPayloadDto, @Param('id', ParseIntPipe) id: number) {
+  update(
+    @Body() upsertAccessGroupDto: UpdateScheduleBlockDto,
+    @User() userPayloadDto: UserPayloadDto,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
     return this.updateScheduleBlocksService.execute({ ...upsertAccessGroupDto, id }, userPayloadDto);
   }
 

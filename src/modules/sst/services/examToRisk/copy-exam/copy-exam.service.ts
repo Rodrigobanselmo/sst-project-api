@@ -7,7 +7,10 @@ import { CheckEmployeeExamService } from '../../exam/check-employee-exam/check-e
 
 @Injectable()
 export class CopyExamRiskService {
-  constructor(private readonly examRiskRepository: ExamRiskRepository, private readonly checkEmployeeExamService: CheckEmployeeExamService) { }
+  constructor(
+    private readonly examRiskRepository: ExamRiskRepository,
+    private readonly checkEmployeeExamService: CheckEmployeeExamService,
+  ) {}
 
   async execute(copyExamsRiskDto: CopyExamsRiskDto, user: UserPayloadDto) {
     const FromExamFactor = await this.examRiskRepository.findNude({

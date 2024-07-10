@@ -82,18 +82,19 @@ export class EpiRepository {
         where,
         take: pagination.take || 20,
         skip: pagination.skip || 0,
-        // orderBy: { ca: 'asc' },
       }),
     ]);
 
     const standardEpis = [];
-    // if (Object.keys(where).length === 0) {
     const epis = await this.prisma.epi.findMany({
-      where: { ca: { in: query?.ca || ['0', '1', '2'] } },
+      where: {
+        ca: {
+          in: Array.isArray(query?.ca) ? (query?.ca as unknown as string[]) : [query?.ca] || ['0', '1', '2'],
+        },
+      },
     });
 
     standardEpis.push(...epis);
-    // }
 
     const count = response[0];
 

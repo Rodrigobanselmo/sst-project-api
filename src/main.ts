@@ -1,6 +1,5 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 // import helmet from 'helmet';
 
 import { AppModule } from './app.module';
@@ -10,10 +9,7 @@ import { urlencoded, json } from 'express';
 import { LoggingInterceptor } from './shared/interceptors/logger.interceptor';
 import { LoggerExceptionFilter } from './shared/filters/logger-exception.filter';
 
-import {
-  utilities as nestWinstonModuleUtilities,
-  WinstonModule,
-} from 'nest-winston';
+import { utilities as nestWinstonModuleUtilities, WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
 import CloudWatchTransport from 'winston-cloudwatch';
 import { NestExpressApplication } from '@nestjs/platform-express';
@@ -52,8 +48,7 @@ async function bootstrap() {
     // }),
   });
 
-  app.set('trust proxy', true)
-
+  app.set('trust proxy', true);
 
   // app.useGlobalInterceptors(new LoggingInterceptor());
   app.useGlobalPipes(
@@ -65,21 +60,22 @@ async function bootstrap() {
       },
     }),
   );
-  const options = new DocumentBuilder().setTitle('SST API').setDescription('SST Rest API Documentation').setVersion('1.0').addTag('Software').addBearerAuth().build();
-
-  const document = SwaggerModule.createDocument(app, options);
-  SwaggerModule.setup('api', app, document);
 
   app.useGlobalFilters(new InternalServerExceptionFilter());
   app.useGlobalFilters(new PrismaDbExceptionFilter());
 
   app.enableCors({
     exposedHeaders: ['Content-Disposition'],
-    origin: ['https://simplesst.com.br', 'https://www.simplesst.com.br', 'https://simplesst.com', 'https://www.simplesst.com'],
+    origin: [
+      'https://simplesst.com.br',
+      'https://www.simplesst.com.br',
+      'https://simplesst.com',
+      'https://www.simplesst.com',
+    ],
     // origin: ['https://simplesst.com', 'http://201.75.187.24'],
     ...(isDev && {
       origin: '*',
-    })
+    }),
   });
 
   // app.use(helmet());

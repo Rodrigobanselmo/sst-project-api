@@ -1,4 +1,3 @@
-import { PartialType } from '@nestjs/swagger';
 import { IsInt, IsOptional, IsString } from 'class-validator';
 
 import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
@@ -16,7 +15,7 @@ export class CreateCompanyShiftDto {
   companyId: string;
 }
 
-export class UpdateCompanyShiftDto extends PartialType(CreateCompanyShiftDto) {
+export class UpdateCompanyShiftDto extends CreateCompanyShiftDto {
   @IsInt()
   @IsOptional()
   id: number;

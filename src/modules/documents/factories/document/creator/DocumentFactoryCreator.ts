@@ -2,7 +2,11 @@ import { ICreatePGR } from './../../../docx/builders/pgr/types/pgr.types';
 import { ISectionOptions, Packer } from 'docx';
 import { writeFileSync, unlinkSync } from 'fs';
 
-import { IDocumentAttachment, IDocumentFactoryProduct as IDocumentFactoryProduct, IUnlinkPaths } from '../types/IDocumentFactory.types';
+import {
+  IDocumentAttachment,
+  IDocumentFactoryProduct as IDocumentFactoryProduct,
+  IUnlinkPaths,
+} from '../types/IDocumentFactory.types';
 import { IStorageProvider } from './../../../../../shared/providers/StorageProvider/models/StorageProvider.types';
 import { AttachmentEntity } from './../../../../sst/entities/attachment.entity';
 import { baseDocuemntOptions, createBaseDocument } from './../../../docx/base/config/document';
@@ -14,9 +18,7 @@ export abstract class DocumentFactoryAbstractionCreator<T, R> {
   constructor(
     private readonly amazonStorageProvider: IStorageProvider,
     private readonly serverlessLambdaProvider: ServerlessLambdaProvider,
-  ) {
-
-  }
+  ) {}
 
   public create(body: T) {
     const product = this.factoryMethod(body);
@@ -28,27 +30,27 @@ export abstract class DocumentFactoryAbstractionCreator<T, R> {
     const isLocal = process.env.APP_HOST.includes('localhost');
 
     try {
-      if (isLocal) console.log(1, 'start')
+      if (isLocal) console.log(1, 'start');
       const data = await product.getData(body);
       const version = product.getVersionName(data, body);
       const attachmentsData = await product.getAttachments({ data, attachments: [], body, version });
       const attachments = await this.saveAttachments(attachmentsData, product, body);
-      if (isLocal) console.log(2, 'attachments')
+      if (isLocal) console.log(2, 'attachments');
 
       const { url, buffer, fileName } = await this.save(product, {
         body,
         getBuild: async () => product.getDocumentBuild({ data, attachments, body, version }),
         getSections: async () => product.getDocumentSections({ data, attachments, body, version }),
-        type: product.type
+        type: product.type,
       });
-      if (isLocal) console.log(3, url)
+      if (isLocal) console.log(3, url);
 
       await product.save({ body, attachments, url, data });
 
       if (product.localCreation) {
         this.unlinkFiles(product.unlinkPaths);
       }
-      if (isLocal) console.log(4, 'unlinked')
+      if (isLocal) console.log(4, 'unlinked');
 
       return { buffer, fileName };
     } catch (error) {
@@ -82,7 +84,15 @@ export abstract class DocumentFactoryAbstractionCreator<T, R> {
     return attachmentsEntity;
   }
 
-  private async save(product: IDocumentFactoryProduct<T>, { body, type, getBuild, getSections, }: { body: T; type?: string; getBuild: () => Promise<ICreatePGR>; getSections: () => Promise<ISectionOptions[]> }) {
+  private async save(
+    product: IDocumentFactoryProduct<T>,
+    {
+      body,
+      type,
+      getBuild,
+      getSections,
+    }: { body: T; type?: string; getBuild: () => Promise<ICreatePGR>; getSections: () => Promise<ISectionOptions[]> },
+  ) {
     if (product.localCreation) {
       const documentSections = await getSections();
       const save = await this.saveWithSections(product, documentSections, { body, type });
@@ -101,7 +111,11 @@ export abstract class DocumentFactoryAbstractionCreator<T, R> {
     }
   }
 
-  private async saveWithLambda(product: IDocumentFactoryProduct<T>, buildData: ICreatePGR, options: { type?: string; body: T }) {
+  private async saveWithLambda(
+    product: IDocumentFactoryProduct<T>,
+    buildData: ICreatePGR,
+    options: { type?: string; body: T },
+  ) {
     const fileName = product.getFileName(options.body, options.type);
 
     const isDev = process.env.APP_HOST.includes('localhost');
@@ -111,8 +125,8 @@ export abstract class DocumentFactoryAbstractionCreator<T, R> {
       fileName,
       buildData,
       docOptions: baseDocuemntOptions,
-      photos: product.unlinkPaths
-    }
+      photos: product.unlinkPaths,
+    };
 
     // const buffer = Buffer.from(JSON.stringify(body));
     // const { key: s3BodyKey } = await this.upload(buffer, v4() + '.txt');
@@ -132,10 +146,13 @@ export abstract class DocumentFactoryAbstractionCreator<T, R> {
     // });
 
     return { url, buffer: null, fileName };
-
   }
 
-  private async saveWithSections(product: IDocumentFactoryProduct<T>, sections: ISectionOptions[], options: { type?: string; body: T; localCreation?: boolean }) {
+  private async saveWithSections(
+    product: IDocumentFactoryProduct<T>,
+    sections: ISectionOptions[],
+    options: { type?: string; body: T; localCreation?: boolean },
+  ) {
     const fileName = product.getFileName(options.body, options.type);
     const Doc = createBaseDocument(sections);
 
@@ -162,7 +179,7 @@ export abstract class DocumentFactoryAbstractionCreator<T, R> {
       .forEach((path) => {
         try {
           unlinkSync(path.path);
-        } catch (e) { }
+        } catch (e) {}
       });
   }
 }

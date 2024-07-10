@@ -18,10 +18,20 @@ interface ICompanyCharacterization extends Omit<UpsertCharacterizationDto, 'phot
 
 @Injectable()
 export class CharacterizationRepository {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async upsert(
-    { id, companyId, workspaceId, hierarchyIds, type, profileParentId, startDate = null, endDate = null, ...characterizationDto }: ICompanyCharacterization,
+    {
+      id,
+      companyId,
+      workspaceId,
+      hierarchyIds,
+      type,
+      profileParentId,
+      startDate = null,
+      endDate = null,
+      ...characterizationDto
+    }: ICompanyCharacterization,
     isProfile?: boolean,
   ): Promise<CharacterizationEntity> {
     const newId = id || v4();
@@ -58,7 +68,12 @@ export class CharacterizationRepository {
 
       const hierarchyOnHomogeneous = {};
       homogeneousGroup.hierarchyOnHomogeneous
-        .sort((a, b) => sortData(b?.endDate || new Date('3000-01-01T00:00:00.00Z'), a?.endDate || new Date('3000-01-01T00:00:00.00Z')))
+        .sort((a, b) =>
+          sortData(
+            b?.endDate || new Date('3000-01-01T00:00:00.00Z'),
+            a?.endDate || new Date('3000-01-01T00:00:00.00Z'),
+          ),
+        )
         .forEach((hg) => {
           if (hierarchyOnHomogeneous[hg.hierarchyId]) return;
 
@@ -97,8 +112,13 @@ export class CharacterizationRepository {
               },
               update: {
                 startDate:
-                  hierarchyOnHomogeneous[hierarchyId] && 'startDate' in hierarchyOnHomogeneous[hierarchyId] ? hierarchyOnHomogeneous[hierarchyId].startDate : startDate,
-                endDate: hierarchyOnHomogeneous[hierarchyId] && 'endDate' in hierarchyOnHomogeneous[hierarchyId] ? hierarchyOnHomogeneous[hierarchyId].endDate : endDate,
+                  hierarchyOnHomogeneous[hierarchyId] && 'startDate' in hierarchyOnHomogeneous[hierarchyId]
+                    ? hierarchyOnHomogeneous[hierarchyId].startDate
+                    : startDate,
+                endDate:
+                  hierarchyOnHomogeneous[hierarchyId] && 'endDate' in hierarchyOnHomogeneous[hierarchyId]
+                    ? hierarchyOnHomogeneous[hierarchyId].endDate
+                    : endDate,
               },
             }),
         ),
@@ -153,7 +173,11 @@ export class CharacterizationRepository {
         workspaceId,
         companyId,
         type: {
-          in: [CharacterizationTypeEnum.ACTIVITIES, CharacterizationTypeEnum.EQUIPMENT, CharacterizationTypeEnum.WORKSTATION],
+          in: [
+            CharacterizationTypeEnum.ACTIVITIES,
+            CharacterizationTypeEnum.EQUIPMENT,
+            CharacterizationTypeEnum.WORKSTATION,
+          ],
         },
       },
       ...options,

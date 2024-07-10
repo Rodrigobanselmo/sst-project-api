@@ -16,7 +16,8 @@ export class FindByIdCharacterizationService {
       },
     });
 
-    if (characterization.companyId != userPayloadDto.targetCompanyId) throw new BadRequestException(ErrorCompanyEnum.CHARACTERIZATION_NOT_FOUND);
+    if (characterization.companyId != userPayloadDto.targetCompanyId)
+      throw new BadRequestException(ErrorCompanyEnum.CHARACTERIZATION_NOT_FOUND);
 
     return characterization;
   }
