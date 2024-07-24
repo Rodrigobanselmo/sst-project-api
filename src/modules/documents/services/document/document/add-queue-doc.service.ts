@@ -13,7 +13,7 @@ export class AddQueueDocumentService {
 
   constructor(private readonly riskDocumentRepository: RiskDocumentRepository) {
     this.sqs = new SQSClient({ region: process.env.AWS_SQS_PGR_REGION });
-    this.queueUrl = process.env.AWS_SQS_PGR_URL;
+    this.queueUrl = process.env.AWS_SQS_TRIGGER_PGR_URL;
   }
   async execute(upsertPgrDto: UploadDocumentDto, userPayloadDto: UserPayloadDto) {
     const companyId = userPayloadDto.targetCompanyId;
