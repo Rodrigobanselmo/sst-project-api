@@ -8,22 +8,32 @@ import { UploadDocumentDto } from '../../dto/document.dto';
 import { PcmsoUploadService } from '../../services/document/document/upload-pcmso-doc.service';
 import { PgrUploadService } from '../../services/document/document/upload-pgr-doc.service';
 import { checkInternetConnectivity } from '../../../../shared/utils/isOnline';
+import { EC2Client, StopInstancesCommand } from '@aws-sdk/client-ec2';
 
 @Injectable()
 export class PgrConsumer implements OnModuleInit {
   private app: Consumer;
+  private isDocumentInstance: boolean;
+  private ec2: EC2Client;
+
   constructor(
     private readonly pgrUploadDocService: PgrUploadService,
     private readonly pcmsoUploadService: PcmsoUploadService,
-  ) {}
+  ) {
+    this.isDocumentInstance = process.env.DOCUMENT_INSTANCE === 'true';
+    this.ec2 = new EC2Client({ region: process.env.AWS_EC2_REGION });
+  }
 
   async onModuleInit() {
+    if (!this.isDocumentInstance) return;
+
     const online = await checkInternetConnectivity();
 
     if (online) {
       this.app = Consumer.create({
         queueUrl: process.env.AWS_SQS_PGR_URL,
         handleMessage: (message) => this.consume(message as any),
+        batchSize: 5,
         sqs: new SQSClient({ region: process.env.AWS_SQS_PGR_REGION }),
       });
 
@@ -53,7 +63,14 @@ export class PgrConsumer implements OnModuleInit {
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException();
+    } finally {
+      await this.stopInstance();
     }
+  }
+
+  private async stopInstance() {
+    const command = new StopInstancesCommand({ InstanceIds: [process.env.PGR_INSTANCE_ID] });
+    await this.ec2.send(command);
   }
 
   private handleSQSError = (error: Error) => {

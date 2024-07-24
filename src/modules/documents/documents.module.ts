@@ -37,11 +37,13 @@ import { DocumentPGRPreviewFactory } from './factories/document/products/PGR/Doc
 import { DownloadPreviewModel } from './services/document/document-models/download-preview-model.service';
 import { PdfVisitReportDataService } from './services/pdf/visitReport/visit-report-data.service';
 import { DocumentPCMSOFactory } from './factories/document/products/PGR/DocumentPCMSOFactory';
+import { TriggerPgrConsumer } from './consumers/document/trigger-documents.consumer';
 
 @Module({
   controllers: [DocumentModelController, DocumentsPgrController, DocumentsPdfController, DocumentsBaseController],
   imports: [SSTModule, CompanyModule, UsersModule],
   providers: [
+    TriggerPgrConsumer,
     ExcelProvider,
     DownloadDocumentService,
     PgrUploadService,
