@@ -47,7 +47,7 @@ export class CharacterizationController {
     private readonly findByIdCharacterizationService: FindByIdCharacterizationService,
     private readonly updateCharacterizationPhotoService: UpdateCharacterizationPhotoService,
     private readonly copyCharacterizationService: CopyCharacterizationService,
-  ) {}
+  ) { }
 
   @Permissions({
     code: PermissionEnum.CHARACTERIZATION,
@@ -131,12 +131,13 @@ export class CharacterizationController {
     crud: 'cu',
   })
   @Post('/files')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file', { limits: { fieldSize: 20 * 1024 * 1024 } }))
   async uploadFiles(
     @UploadedFile() file: Express.Multer.File,
     @Body() addFileCharacterizationDto: AddFileCharacterizationDto,
     @User() userPayloadDto: UserPayloadDto,
   ) {
+
     return this.addCharacterizationFileService.execute(addFileCharacterizationDto, userPayloadDto, file);
   }
 
