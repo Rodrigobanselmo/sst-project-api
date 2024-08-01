@@ -13,7 +13,7 @@ export class FindGenerateSourceService {
   constructor(
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly generateSourceRepository: GenerateSourceRepository,
-  ) {}
+  ) { }
 
   async execute({ skip, take, riskType, ...query }: FindGenerateSourceDto, user: UserPayloadDto) {
     const GenerateSource = await this.generateSourceRepository.find(
@@ -31,6 +31,7 @@ export class FindGenerateSourceService {
     if (!GenerateSourceAll) {
       GenerateSourceAll = await this.generateSourceRepository.findNude({
         where: {
+          deleted_at: null,
           risk: { representAll: true, ...(riskType && { type: riskType }) },
         },
         distinct: ['name'],

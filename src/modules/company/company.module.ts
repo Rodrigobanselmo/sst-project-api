@@ -174,6 +174,7 @@ import { SyncHierarchyService } from './services/sync/sync-hierarchy/sync-hierar
 import { AddCharacterizationFileService } from './services/characterization/add-characterization-file/add-characterization-file.service';
 import { CharacterizationFileRepository } from './repositories/implementations/CharacterizationFileRepository';
 import { CacheModule } from '@nestjs/cache-manager';
+import { SyncCharacterizationService } from './services/sync/sync-characterization/sync-characterization.service';
 
 @Module({
   imports: [
@@ -358,6 +359,7 @@ import { CacheModule } from '@nestjs/cache-manager';
     SyncHierarchyService,
     AddCharacterizationFileService,
     CharacterizationFileRepository,
+    SyncCharacterizationService,
   ],
   exports: [
     CompanyRepository,
@@ -381,4 +383,4 @@ import { CacheModule } from '@nestjs/cache-manager';
     ScheduleMedicalVisitRepository,
   ],
 })
-export class CompanyModule {}
+export class CompanyModule { }

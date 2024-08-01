@@ -43,8 +43,8 @@ export class LoggerMiddleware implements NestMiddleware {
         }
         console.info(
           (req.method === 'GET' ? chalk.cyan : chalk.red)(`[${req.method}]: `) +
-            chalk.blue(`${shortPath}`) +
-            chalk.gray(`?${queryParams}`),
+          chalk.blue(`${shortPath}`) +
+          chalk.gray(`?${queryParams}`),
         );
         console.info(
           chalk.gray(`Response status: `) + chalk[res.statusCode < 400 ? 'greenBright' : 'redBright'](res.statusCode),

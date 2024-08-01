@@ -77,6 +77,8 @@ export class RiskFactorDataEntity implements RiskFactorData {
   endDate: Date;
   startDate: Date;
   deletedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
   protocolsToRisk: ProtocolToRiskEntity[];
 
   constructor(partial: Partial<RiskFactorDataEntity>) {

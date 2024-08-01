@@ -178,4 +178,4 @@ import { CacheModule } from '@nestjs/cache-manager';
     FetchOneESocialBatchEventsService,
   ],
 })
-export class EsocialModule {}
+export class EsocialModule { }

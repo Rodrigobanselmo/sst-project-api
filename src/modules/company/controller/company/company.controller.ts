@@ -67,7 +67,7 @@ export class CompanyController {
     private readonly updateAllCompaniesService: UpdateAllCompaniesService,
     private readonly updateApplyServiceCompanyService: UpdateApplyServiceCompanyService,
     private readonly deleteCompanyService: DeleteCompanyService,
-  ) {}
+  ) { }
 
   @Roles(RoleEnum.COMPANY, RoleEnum.CONTRACTS, RoleEnum.CLINICS, RoleEnum.USER, RoleEnum.DOCTOR)
   @Permissions({ isContract: true, isMember: true })

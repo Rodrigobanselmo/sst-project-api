@@ -15,7 +15,7 @@ export class PgrConsumer implements OnModuleInit {
   constructor(
     private readonly pgrUploadDocService: PgrUploadService,
     private readonly pcmsoUploadService: PcmsoUploadService,
-  ) {}
+  ) { }
 
   async onModuleInit() {
     const online = await checkInternetConnectivity();

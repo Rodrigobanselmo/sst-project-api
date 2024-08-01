@@ -11,7 +11,7 @@ import { EmployeeEntity } from '../../entities/employee.entity';
 
 @Injectable()
 export class SyncRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async findSyncChanges({
     lastPulledVersion,
@@ -473,4 +473,100 @@ export class SyncRepository {
 
     return employeeChanges;
   }
+
+
+  async findCharacterizationChanges({
+    workspaceId,
+    companyId,
+    lastSync
+  }: {
+    workspaceId: string;
+    companyId: string;
+    lastSync?: Date
+  }) {
+
+    const characterizations = await this.prisma.companyCharacterization.findMany({
+      where: {
+        companyId,
+        workspaceId,
+        OR: [{
+          updated_at: { gte: lastSync },
+        }, {
+          homogeneousGroup: {
+            riskFactorData: {
+              some: {
+                updatedAt: { gte: lastSync },
+              }
+            }
+          }
+        }]
+      },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        type: true,
+        profileParentId: true,
+        profileName: true,
+        noiseValue: true,
+        temperature: true,
+        luminosity: true,
+        moisturePercentage: true,
+        files: true,
+        status: true,
+        created_at: true,
+        updated_at: true,
+        deleted_at: true,
+        homogeneousGroup: {
+          select: {
+            hierarchyOnHomogeneous: {
+              select: {
+                hierarchyId: true
+              }
+            },
+            riskFactorData: {
+              where: {
+                endDate: null,
+                deletedAt: null
+              },
+              select: {
+                createdAt: true,
+                updatedAt: true,
+                id: true,
+                probability: true,
+                probabilityAfter: true,
+                exposure: true,
+                activities: true,
+                riskId: true,
+                recs: { select: { id: true, } },
+                adms: { select: { id: true, } },
+                generateSources: { select: { id: true, } },
+                epiToRiskFactorData: {
+                  include: { epi: { select: { ca: true, equipment: true, } } }
+                },
+                engsToRiskFactorData: {
+                  select: {
+                    recMedId: true,
+                    efficientlyCheck: true,
+                  }
+                },
+              }
+            }
+          }
+        },
+        photos: {
+          select: {
+            name: true,
+            photoUrl: true,
+            created_at: true,
+            updated_at: true,
+            deleted_at: true
+          }
+        }
+      }
+    })
+
+    return characterizations;
+  }
 }
+

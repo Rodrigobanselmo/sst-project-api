@@ -17,6 +17,10 @@ export class UpsertRiskDataDto {
 
   @IsString()
   @IsOptional()
+  createId?: string;
+
+  @IsString()
+  @IsOptional()
   level?: number;
 
   @IsString()

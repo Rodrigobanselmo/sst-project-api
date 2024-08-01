@@ -44,15 +44,17 @@ export class AmazonLoggerProvider implements ILoggerProvider {
       return;
     }
 
+    const message = JSON.stringify({ ...data });
+    const maxSize = 262144; // 256 KB
+    const truncatedMessage = this.truncateMessageToSize(message, maxSize);
+
     try {
       const command = new PutLogEventsCommand({
         logGroupName,
         logStreamName,
         logEvents: [
           {
-            message: JSON.stringify({
-              ...data,
-            }),
+            message: truncatedMessage,
             timestamp: new Date().getTime(),
           },
         ],
@@ -61,12 +63,15 @@ export class AmazonLoggerProvider implements ILoggerProvider {
     } catch (error) {
       console.error('Error sending error log events:', error);
 
+      const message = JSON.stringify(error);
+      const truncatedMessage = this.truncateMessageToSize(message);
+
       const command = new PutLogEventsCommand({
         logGroupName,
         logStreamName,
         logEvents: [
           {
-            message: JSON.stringify(error),
+            message: truncatedMessage,
             timestamp: new Date().getTime(),
           },
         ],
@@ -74,5 +79,17 @@ export class AmazonLoggerProvider implements ILoggerProvider {
 
       await this.cloudwatchClient.send(command);
     }
+  }
+
+  private truncateMessageToSize(message: string, maxSize = 250000): string {
+    // Calculate the max message size considering other fields
+    const overhead = 1024; // Approximate overhead for additional JSON fields and metadata
+    const maxMessageSize = maxSize - overhead;
+
+    if (message.length > maxMessageSize) {
+      return message.substring(0, maxMessageSize);
+    }
+
+    return message;
   }
 }

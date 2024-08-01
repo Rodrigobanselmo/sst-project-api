@@ -188,6 +188,7 @@ export class RiskStructureRsDataNR extends ReportRiskStructureProduct {
               if (manipulation.description)
                 rowsData.push({ value: appendix, activity: [manipulation.description, ''] });
             });
+
           } else if (!!appendix) {
             rowsData.push({ value: appendix, activity: ['', ''] });
           }

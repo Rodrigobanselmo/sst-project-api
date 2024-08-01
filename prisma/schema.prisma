@@ -1509,6 +1509,8 @@ model RiskFactorData {
   deletedAt             DateTime?
   endDate               DateTime?
   startDate             DateTime?
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @default(now()) @updatedAt
   examsToRiskFactorData ExamToRiskData[]
   company               Company                @relation(fields: [companyId], references: [id])
   hierarchy             Hierarchy?             @relation(fields: [hierarchyId], references: [id], onDelete: Cascade)

@@ -19,7 +19,7 @@ import { ExamRiskDataEntity } from '../../entities/examRiskData.entity';
 
 @Injectable()
 export class RiskDataRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
   async upsert(upsertRiskDataDto: Omit<UpsertRiskDataDto, 'keepEmpty' | 'type'>): Promise<RiskFactorDataEntity> {
     const level = await this.addLevel(upsertRiskDataDto);
     if (level) upsertRiskDataDto.level = level;
@@ -367,6 +367,7 @@ export class RiskDataRepository {
     exams,
     generateSources,
     companyId,
+    createId,
     id,
     ...createDto
   }: Omit<UpsertRiskDataDto, 'keepEmpty'>) {
@@ -390,27 +391,28 @@ export class RiskDataRepository {
     const riskData = (await this.prisma.riskFactorData.upsert({
       create: {
         ...createDto,
+        id: createId,
         companyId,
         generateSources: generateSources
           ? {
-              connect: generateSources.map((id) => ({
-                id,
-              })),
-            }
+            connect: generateSources.map((id) => ({
+              id,
+            })),
+          }
           : undefined,
         recs: recs
           ? {
-              connect: recs.map((id) => ({
-                id,
-              })),
-            }
+            connect: recs.map((id) => ({
+              id,
+            })),
+          }
           : undefined,
         adms: adms
           ? {
-              connect: adms.map((id) => ({
-                id,
-              })),
-            }
+            connect: adms.map((id) => ({
+              id,
+            })),
+          }
           : undefined,
       },
       update: {
@@ -418,24 +420,24 @@ export class RiskDataRepository {
         companyId,
         recs: recs
           ? {
-              set: recs.map((id) => ({
-                id,
-              })),
-            }
+            set: recs.map((id) => ({
+              id,
+            })),
+          }
           : undefined,
         adms: adms
           ? {
-              set: adms.map((id) => ({
-                id,
-              })),
-            }
+            set: adms.map((id) => ({
+              id,
+            })),
+          }
           : undefined,
         generateSources: generateSources
           ? {
-              set: generateSources.map((id) => ({
-                id,
-              })),
-            }
+            set: generateSources.map((id) => ({
+              id,
+            })),
+          }
           : undefined,
       },
       where: {
@@ -537,24 +539,24 @@ export class RiskDataRepository {
         companyId,
         generateSources: generateSources
           ? {
-              connect: generateSources.map((id) => ({
-                id,
-              })),
-            }
+            connect: generateSources.map((id) => ({
+              id,
+            })),
+          }
           : undefined,
         recs: recs
           ? {
-              connect: recs.map((id) => ({
-                id,
-              })),
-            }
+            connect: recs.map((id) => ({
+              id,
+            })),
+          }
           : undefined,
         adms: adms
           ? {
-              connect: adms.map((id) => ({
-                id,
-              })),
-            }
+            connect: adms.map((id) => ({
+              id,
+            })),
+          }
           : undefined,
       },
       update: {
@@ -562,24 +564,24 @@ export class RiskDataRepository {
         companyId,
         recs: recs
           ? {
-              connect: recs.map((id) => ({
-                id,
-              })),
-            }
+            connect: recs.map((id) => ({
+              id,
+            })),
+          }
           : undefined,
         adms: adms
           ? {
-              connect: adms.map((id) => ({
-                id,
-              })),
-            }
+            connect: adms.map((id) => ({
+              id,
+            })),
+          }
           : undefined,
         generateSources: generateSources
           ? {
-              connect: generateSources.map((id) => ({
-                id,
-              })),
-            }
+            connect: generateSources.map((id) => ({
+              id,
+            })),
+          }
           : undefined,
       },
       where: {
