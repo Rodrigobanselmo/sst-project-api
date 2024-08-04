@@ -1,7 +1,21 @@
 {
   "compilerOptions": {
+    "skipLibCheck": false,
+    "strictNullChecks": false,
     "module": "commonjs",
+    "noImplicitAny": false,
     "declaration": true,
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "paths": {
+      "@/*": [
+        "src/*",
+        "test/*"
+      ],
+      "@v2": [
+        "src/@v2/*"
+      ]
+    },
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
@@ -12,14 +26,16 @@
     "esModuleInterop": true,
     "baseUrl": "./",
     "incremental": true,
-    "skipLibCheck": true,
     "noErrorTruncation": true,
-    "lib": ["ES2021"],
-    "strictNullChecks": false,
-    "noImplicitAny": false,
+    "lib": [
+      "ES2021"
+    ],
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "resolveJsonModule": true,
     "noFallthroughCasesInSwitch": false
-  }
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.d.ts"
+  ]
 }
