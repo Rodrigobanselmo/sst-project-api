@@ -489,17 +489,19 @@ export class SyncRepository {
       where: {
         companyId,
         workspaceId,
-        OR: [{
-          updated_at: { gte: lastSync },
-        }, {
-          homogeneousGroup: {
-            riskFactorData: {
-              some: {
-                updatedAt: { gte: lastSync },
+        ...(lastSync && {
+          OR: [{
+            updated_at: { gte: lastSync },
+          }, {
+            homogeneousGroup: {
+              riskFactorData: {
+                some: {
+                  updatedAt: { gte: lastSync },
+                }
               }
             }
-          }
-        }]
+          }]
+        })
       },
       select: {
         id: true,
