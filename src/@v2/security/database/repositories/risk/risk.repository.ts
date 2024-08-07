@@ -29,7 +29,7 @@ export class RiskRepository {
       ...RiskRepository.selectOptions()
     })
 
-    return risk ? RiskModel.toEntity({ ...risk, ...this.aggregations }) : null
+    return risk ? RiskModel.toAggregate({ ...risk, ...this.aggregations }) : null
   }
 
 

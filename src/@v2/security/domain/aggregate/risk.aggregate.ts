@@ -1,30 +1,24 @@
-import { RiskEntity, IRiskEntity } from "../entities/risk.entity"
+import { Aggregate } from "../../../shared/domain/entities/aggregate"
 import { RecomendationEntity } from "../entities/recomendation.entity"
+import { RiskEntity } from "../entities/risk.entity"
 
-export type IRiskAggregateRelations = {
+
+export type IRiskAggregate = {
+  entity: RiskEntity
   recomendations: (riskId: string) => Promise<RecomendationEntity[]>
 }
 
-export type IRiskAggregate = IRiskEntity & IRiskAggregateRelations
-
-
 export class RiskAggregate {
   risk: RiskEntity;
-
-  #recomendations?: RecomendationEntity[]
-  #getRecomendations: (riskId: string) => Promise<RecomendationEntity[]>
+  #recomendations: (riskId: string) => Promise<RecomendationEntity[]>
+  #aggregate: Aggregate = new Aggregate();
 
   constructor(params: IRiskAggregate) {
-    this.risk = new RiskEntity(params);
-    this.#getRecomendations = params.recomendations
+    this.risk = params.entity;
+    this.#recomendations = params.recomendations
   }
 
   async recomendations() {
-    if (!this.#recomendations) this.#recomendations = await this.#getRecomendations(this.risk.id)
-    return this.#recomendations
+    return this.#aggregate.get<RecomendationEntity[]>(() => this.#recomendations(this.risk.id))
   }
 }
-
-
-
-
