@@ -7,7 +7,7 @@ import { SharedTokens } from '../constants/tokens';
 import { ContextKey } from '../adapters/context/types/enum/context-key.enum';
 
 @Injectable()
-export class JwtAuthGuard extends AuthGuard('jwt') {
+export class JwtAuthGuard extends AuthGuard('jwt-v2') {
   constructor(
     @Inject(SharedTokens.Context)
     private readonly context: LocalContext, private reflector: Reflector) {

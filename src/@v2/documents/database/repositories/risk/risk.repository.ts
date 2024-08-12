@@ -1,0 +1,36 @@
+import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service'
+import { Injectable } from '@nestjs/common'
+import { Prisma } from '@prisma/client'
+import { RiskModel } from '../../models/risk.model'
+import { IRiskRepository } from './risk.types'
+import { RecomendationRepository } from '../recomendation/recomendation.repository'
+
+
+@Injectable()
+export class RiskRepository {
+  private aggregations = {
+    recomendations: (riskId: string) => this.recomendationRepository.find({ riskId })
+  }
+
+  constructor(
+    private readonly prisma: PrismaServiceV2,
+    private readonly recomendationRepository: RecomendationRepository
+  ) { }
+
+  static selectOptions() {
+    const include = {} satisfies Prisma.RiskFactorsFindFirstArgs['include']
+
+    return { include }
+  }
+
+  async findById(params: IRiskRepository.FindByIdParams): IRiskRepository.FindByIdReturn {
+    const risk = await this.prisma.riskFactors.findUnique({
+      where: { id_companyId: { id: params.id, companyId: params.companyId } },
+      ...RiskRepository.selectOptions()
+    })
+
+    return risk ? RiskModel.toAggregate({ ...risk, ...this.aggregations }) : null
+  }
+
+
+}

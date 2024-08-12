@@ -17,6 +17,7 @@ import { RolesGuard } from './shared/guards/roles.guard';
 import { LoggerMiddleware } from './shared/middlewares/logger.local.middleware';
 import { HttpLoggerMiddleware } from './shared/middlewares/logger.middleware';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { DocumentModule } from './@v2/documents/document.module';
 
 @Module({
   imports: [
@@ -36,6 +37,8 @@ import { ThrottlerModule } from '@nestjs/throttler';
     EsocialModule,
     NotificationModule,
     ScheduleModule.forRoot(),
+    //V2
+    DocumentModule,
   ],
   providers: [
     {

@@ -6,6 +6,9 @@ import { ContextKey } from 'src/@v2/shared/adapters/context/types/enum/context-k
 import { SharedTokens } from 'src/@v2/shared/constants/tokens';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 
+/**
+ * @deprecated - Use useFetch from v2
+ */
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
   constructor(
