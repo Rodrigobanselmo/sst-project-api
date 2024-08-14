@@ -34,6 +34,9 @@ import { PermissionEnum, RoleEnum } from '../../../../shared/constants/enum/auth
 import { Roles } from '../../../../shared/decorators/roles.decorator';
 import { CopyCharacterizationService } from '../../services/characterization/copy-characterization/copy-characterization.service';
 import { AddCharacterizationFileService } from '../../services/characterization/add-characterization-file/add-characterization-file.service';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { CreateSubHierarchyService } from '../../services/hierarchy/create-sub-hierarchies/create-sub-hierarchies.service';
+import { Public } from 'src/shared/decorators/public.decorator';
 
 @Controller('/company/:companyId/workspace/:workspaceId/characterizations')
 export class CharacterizationController {
@@ -47,7 +50,8 @@ export class CharacterizationController {
     private readonly findByIdCharacterizationService: FindByIdCharacterizationService,
     private readonly updateCharacterizationPhotoService: UpdateCharacterizationPhotoService,
     private readonly copyCharacterizationService: CopyCharacterizationService,
-  ) { }
+  ) {
+  }
 
   @Permissions({
     code: PermissionEnum.CHARACTERIZATION,

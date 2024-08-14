@@ -1,5 +1,5 @@
 import { RecMed } from '@prisma/client';
-import { RecomendationEntity } from '../../domain/entities/recomendation.entity';
+import { RecomendationEntity } from '../../domain/entities/attachment.entity';
 
 type IRecomendationModel = RecMed
 

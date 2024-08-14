@@ -1,5 +1,5 @@
 import { Aggregate } from "../../../shared/domain/entities/aggregate"
-import { RecomendationEntity } from "../entities/recomendation.entity"
+import { RecomendationEntity } from "../entities/attachment.entity"
 import { RiskEntity } from "../entities/risk.entity"
 
 

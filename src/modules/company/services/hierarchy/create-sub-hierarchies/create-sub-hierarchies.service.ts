@@ -13,7 +13,7 @@ export class CreateSubHierarchyService {
   constructor(
     private readonly hierarchyRepository: HierarchyRepository,
     private readonly employeeRepository: EmployeeRepository,
-  ) {}
+  ) { }
 
   async execute(hierarchy: CreateSubHierarchyDto, user: UserPayloadDto) {
     const employees = await this.employeeRepository.findNude({
@@ -54,7 +54,7 @@ export class CreateSubHierarchyService {
 
     const offices = Object.values(officesMap);
 
-    const hierarchySub = Promise.all(
+    const hierarchySub = await Promise.all(
       offices.map(async (officeEmployees) => {
         const office = officeEmployees[0].hierarchy;
         const workspaceIds = office.workspaces.map((workspace) => workspace.id);

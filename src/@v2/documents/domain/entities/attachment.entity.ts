@@ -1,16 +1,16 @@
 
-export type IRecomendationEntity = {
+export type IAttachmentEntity = {
   id: string;
   name: string;
   riskId: string;
 }
 
-export class RecomendationEntity {
+export class AttachmentEntity {
   id: string;
   name: string;
   riskId: string;
 
-  constructor(partial: IRecomendationEntity) {
+  constructor(partial: IAttachmentEntity) {
     this.id = partial.id;
     this.name = partial.name;
     this.riskId = partial.riskId;

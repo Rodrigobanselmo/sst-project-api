@@ -26,7 +26,6 @@ export class UpsertCharacterizationDto {
   })
   type?: CharacterizationTypeEnum;
 
-  @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
   @IsString()
   @IsOptional()
   description?: string;

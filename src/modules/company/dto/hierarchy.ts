@@ -158,7 +158,7 @@ export class UpdateSimpleManyHierarchyDto {
 export class CreateSubHierarchyDto {
   @IsOptional()
   @IsString()
-  id: string;
+  id?: string;
 
   @Transform(StringNormalizeUpperTransform, { toClassOnly: true })
   @IsString()
@@ -166,7 +166,7 @@ export class CreateSubHierarchyDto {
 
   @IsOptional()
   @IsString()
-  realDescription: string;
+  realDescription?: string;
 
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsString()
@@ -174,7 +174,7 @@ export class CreateSubHierarchyDto {
   @IsEnum(StatusEnum, {
     message: `status must be one of: ${StatusEnum.ACTIVE} or ${StatusEnum.INACTIVE}`,
   })
-  status: StatusEnum;
+  status?: StatusEnum;
 
   @IsString()
   companyId: string;
