@@ -85,6 +85,9 @@ export class UpsertCharacterizationDto {
   startDate?: Date;
 
   @IsOptional()
+  done_at?: Date | '';
+
+  @IsOptional()
   @IsDate()
   @Type(() => Date)
   endDate?: Date;

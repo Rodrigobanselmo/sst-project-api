@@ -38,6 +38,7 @@ export class CharacterizationEntity implements CompanyCharacterization {
   profileParent?: CharacterizationEntity;
   profiles?: CharacterizationEntity[];
   status: StatusEnum;
+  done_at: Date | null;
 
   constructor(partial: Partial<CharacterizationEntity>) {
     Object.assign(this, partial);

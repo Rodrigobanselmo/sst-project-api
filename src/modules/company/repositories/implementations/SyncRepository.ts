@@ -512,6 +512,7 @@ export class SyncRepository {
         profileName: true,
         noiseValue: true,
         temperature: true,
+        done_at: true,
         luminosity: true,
         moisturePercentage: true,
         files: true,

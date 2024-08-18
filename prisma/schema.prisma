@@ -411,6 +411,7 @@ model CompanyCharacterization {
   created_at         DateTime                       @default(now())
   deleted_at         DateTime?
   updated_at         DateTime                       @updatedAt
+  done_at            DateTime?
   type               CharacterizationTypeEnum
   workspaceId        String
   companyId          String

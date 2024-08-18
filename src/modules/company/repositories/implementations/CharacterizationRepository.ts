@@ -18,7 +18,7 @@ interface ICompanyCharacterization extends Omit<UpsertCharacterizationDto, 'phot
 
 @Injectable()
 export class CharacterizationRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async upsert(
     {
@@ -30,6 +30,7 @@ export class CharacterizationRepository {
       profileParentId,
       startDate = null,
       endDate = null,
+      done_at,
       ...characterizationDto
     }: ICompanyCharacterization,
     isProfile?: boolean,
@@ -131,6 +132,7 @@ export class CharacterizationRepository {
       },
       create: {
         ...characterizationDto,
+        done_at: done_at === '' ? null : done_at ? new Date(done_at) : undefined,
         profileParentId: profileParentId || undefined,
         id: newId,
         companyId,
@@ -140,6 +142,7 @@ export class CharacterizationRepository {
       },
       update: {
         type,
+        done_at: done_at === '' ? null : done_at ? new Date(done_at) : undefined,
         profileParentId: profileParentId || undefined,
         ...characterizationDto,
       },
