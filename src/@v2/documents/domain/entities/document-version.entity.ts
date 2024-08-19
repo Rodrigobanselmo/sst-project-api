@@ -1,32 +1,28 @@
 import { AttachmentEntity } from "./attachment.entity";
-import { CompanyEntity } from "./company.entity";
-import { WorkspaceEntity } from "./workspace.entity";
 
 export type IDocumentVersionEntity = {
   id: string;
-  name: string;
+  name: string | null;
   description: string;
   version: string;
   attachments: AttachmentEntity[];
-  fileUrl?: string;
-
-  workspace: WorkspaceEntity;
-  company: CompanyEntity;
+  fileUrl: string | null;
 }
 
 export class DocumentVersionEntity {
   id: string;
-  name: string;
-  fileUrl?: string;
-
-  workspace: WorkspaceEntity;
-  company: CompanyEntity;
+  name: string | null;
+  description: string;
+  version: string;
+  attachments: AttachmentEntity[];
+  fileUrl: string | null;
 
   constructor(partial: IDocumentVersionEntity) {
     this.id = partial.id;
     this.name = partial.name;
-    this.workspace = partial.workspace;
-    this.company = partial.company;
+    this.description = partial.description;
+    this.version = partial.version;
+    this.attachments = partial.attachments;
     this.fileUrl = partial.fileUrl;
   }
 }

@@ -8,9 +8,9 @@ import { RecomendationRepository } from '../recomendation/recomendation.reposito
 
 @Injectable()
 export class RiskRepository {
-  private aggregations = {
-    recomendations: (riskId: string) => this.recomendationRepository.find({ riskId })
-  }
+  private aggregations = (riskId: string) => ({
+    recomendations: () => this.recomendationRepository.find({ riskId })
+  })
 
   constructor(
     private readonly prisma: PrismaServiceV2,
@@ -29,7 +29,7 @@ export class RiskRepository {
       ...RiskRepository.selectOptions()
     })
 
-    return risk ? RiskModel.toAggregate({ ...risk, ...this.aggregations }) : null
+    return risk ? RiskModel.toAggregate({ ...risk, ...this.aggregations(risk.id) }) : null
   }
 
 

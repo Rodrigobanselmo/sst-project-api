@@ -2,23 +2,23 @@ import { DocumentTypeEnum } from "../enums/document-type.enum"
 import { IDocumentModelData } from "../types/document-mode-data.type"
 
 export type IDocumentModelEntity = {
-  id: string
+  id: number
   name: string
   system: boolean
-  description?: string
+  description: string | null
   type: DocumentTypeEnum
 
   data: Buffer
 }
 
 export class DocumentModelEntity {
-  id: string
+  id: number
   name: string
   system: boolean
-  description?: string
+  description: string | null
   type: DocumentTypeEnum
 
-  data?: IDocumentModelData | null
+  data: IDocumentModelData | null = null
 
   constructor(params: IDocumentModelEntity) {
     this.id = params.id;

@@ -1,15 +1,15 @@
-import { ProfessionalEntity } from "./professional.entity";
+import { ProfessionalCouncilEntity } from "./professional-council.entity";
 
 export type IProfessionalSignatureEntity = {
   isSigner: boolean;
   isElaborator: boolean;
-  professional: ProfessionalEntity;
+  professional: ProfessionalCouncilEntity;
 }
 
 export class ProfessionalSignatureEntity {
   isSigner: boolean;
   isElaborator: boolean;
-  professional: ProfessionalEntity;
+  professional: ProfessionalCouncilEntity;
 
   constructor(params: IProfessionalSignatureEntity) {
     this.isSigner = params.isSigner;

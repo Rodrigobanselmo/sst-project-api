@@ -2,17 +2,17 @@ import { RiskFactors } from '@prisma/client';
 import { IRiskAggregate, RiskAggregate } from '../../domain/aggregate/risk.aggregate';
 import { RiskEntity } from '../../domain/entities/risk.entity';
 
-type IRiskModelEntity = RiskFactors
-type IRiskModelAggregate = IRiskModelEntity & Omit<IRiskAggregate, 'entity'>
+type IRiskEntityModel = RiskFactors
+type IRiskAggregateModel = IRiskEntityModel & Omit<IRiskAggregate, 'entity'>
 
 export class RiskModel {
-  static toEntity(data: IRiskModelEntity): RiskEntity {
+  static toEntity(data: IRiskEntityModel): RiskEntity {
     return new RiskEntity(data)
   }
 
-  static toAggregate(data: IRiskModelAggregate): RiskAggregate {
+  static toAggregate(data: IRiskAggregateModel): RiskAggregate {
     return new RiskAggregate({
-      ...data,
+      recomendations: () => Promise.resolve([]),
       entity: RiskModel.toEntity(data),
     })
   }

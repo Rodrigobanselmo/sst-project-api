@@ -5,12 +5,12 @@ import { RiskEntity } from "../entities/risk.entity"
 
 export type IRiskAggregate = {
   entity: RiskEntity
-  recomendations: (riskId: string) => Promise<RecomendationEntity[]>
+  recomendations: () => Promise<RecomendationEntity[]>
 }
 
 export class RiskAggregate {
   risk: RiskEntity;
-  #recomendations: (riskId: string) => Promise<RecomendationEntity[]>
+  #recomendations: () => Promise<RecomendationEntity[]>
   #aggregate: Aggregate = new Aggregate();
 
   constructor(params: IRiskAggregate) {
@@ -19,6 +19,6 @@ export class RiskAggregate {
   }
 
   async recomendations() {
-    return this.#aggregate.get<RecomendationEntity[]>(() => this.#recomendations(this.risk.id))
+    return this.#aggregate.get<RecomendationEntity[]>(() => this.#recomendations())
   }
 }
