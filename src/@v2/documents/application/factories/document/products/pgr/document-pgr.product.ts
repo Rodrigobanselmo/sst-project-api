@@ -5,6 +5,9 @@ import { IDocumentFactoryProduct } from '../../types/document-factory.types';
 import { IDocumentPGRParams } from './document-pgr.types';
 import { dateUtils } from '@/@v2/shared/utils/helpers/date-utils';
 import { DocumentTypeEnum } from '@/@v2/documents/domain/enums/document-type.enum';
+import { DocumentBuildPGR } from '@/@v2/documents/application/libs/docx/builders/pgr/create';
+import { PromiseInfer } from '@/@v2/shared/interfaces/promise-infer.types';
+import { DocumentAggregate } from '@/@v2/documents/domain/aggregate/document.aggregate';
 
 @Injectable()
 export class DocumentPGRFactory implements IDocumentFactoryProduct<IDocumentPGRParams> {
@@ -224,7 +227,7 @@ export class DocumentPGRFactory implements IDocumentFactoryProduct<IDocumentPGRP
   }
 
   public async getAttachments(
-    options: IGetDocument<IDocumentPGRBody, PromiseInfer<ReturnType<DocumentPGRFactoryProduct['getData']>>>,
+    data: IGetDocument<IDocumentPGRBody, PromiseInfer<ReturnType<DocumentPGRFactoryProduct['getData']>>>,
   ) {
     const documentBaseBuild = await this.getDocumentBuild(options);
 
@@ -290,80 +293,8 @@ export class DocumentPGRFactory implements IDocumentFactoryProduct<IDocumentPGRP
     ];
   }
 
-  public async getDocumentBuild(
-    options: IGetDocument<IDocumentPGRBody, PromiseInfer<ReturnType<DocumentPGRFactoryProduct['getData']>>>,
-  ) {
-    return await this.getDocumentPgrBuild(options);
-  }
-
-  protected async getDocumentPgrBuild(
-    options: IGetDocument<IDocumentPGRBody, PromiseInfer<ReturnType<DocumentPGRFactoryProduct['getData']>>>,
-  ) {
-    const data = options.data;
-    const version = options.version;
-    const attachments = options.attachments;
-    const imagesMap = options.data?.imagesMap;
-
-    // writeFileSync('tmp/buildData.txt', JSON.stringify({
-    //   version,
-    //   document: { ...data.riskGroupData, ...data.documentData, ...(data.documentData.json && ((data.documentData as any).json as DocumentDataPGRDto)) },
-    //   attachments: attachments.map((attachment) => {
-    //     return {
-    //       ...attachment,
-    //       url: attachment.link,
-    //     };
-    //   }),
-    //   logo: data.logo,
-    //   consultantLogo: data.consultantLogo,
-    //   company: data.company,
-    //   workspace: data.workspace,
-    //   versions: data.versions,
-    //   environments: data.characterizations,
-    //   hierarchy: data.hierarchyData,
-    //   homogeneousGroup: data.homoGroupTree,
-    //   characterizations: data.characterizations,
-    //   hierarchyTree: data.hierarchyTree,
-    //   cover: data.cover,
-    //   docSections: data.modelData,
-    //   imagesMap,
-    //   hierarchyHighLevelsData: data.hierarchyHighLevelsData,
-    // }));
-
-    return {
-      version,
-      document: {
-        ...data.riskGroupData,
-        ...data.documentData,
-        ...(data.documentData.json && ((data.documentData as any).json as DocumentDataPGRDto)),
-      },
-      attachments: attachments.map((attachment) => {
-        return {
-          ...attachment,
-          url: attachment.link,
-        };
-      }),
-      logo: data.logo,
-      consultantLogo: data.consultantLogo,
-      company: data.company,
-      workspace: data.workspace,
-      versions: data.versions,
-      environments: data.characterizations,
-      hierarchy: data.hierarchyData,
-      homogeneousGroup: data.homoGroupTree,
-      characterizations: data.characterizations,
-      hierarchyTree: data.hierarchyTree,
-      cover: data.cover,
-      docSections: data.modelData,
-      imagesMap,
-      hierarchyHighLevelsData: data.hierarchyHighLevelsData,
-      exams: data.exams.data,
-    };
-  }
-
-  public async getSections(
-    options: IGetDocument<IDocumentPGRBody, PromiseInfer<ReturnType<DocumentPGRFactoryProduct['getData']>>>,
-  ) {
-    const sections: ISectionOptions[] = new DocumentBuildPGR(await this.getDocumentBuild(options)).build();
+  public async getSections(data: DocumentAggregate) {
+    const sections: ISectionOptions[] = new DocumentBuildPGR({ data }).build();
 
     return sections;
   }

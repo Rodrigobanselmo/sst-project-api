@@ -8,6 +8,7 @@ import { isDevelopment } from '@/@v2/shared/utils/helpers/is-development';
 import { createBaseDocument } from '../../libs/docx/base/config/document';
 import { IDocumentCreation } from './document-creation.interface';
 import { BUCKET_FOLDERS } from '@/@v2/shared/constants/buckets';
+import { AttachmentEntity } from '@/@v2/documents/domain/entities/attachment.entity';
 
 export abstract class DocumentCreationService {
   constructor(
@@ -58,7 +59,6 @@ export abstract class DocumentCreationService {
           id: attachment.id,
           name: attachment.name,
           url,
-          link: attachment.link,
         });
       }),
     );
