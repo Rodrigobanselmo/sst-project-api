@@ -30,54 +30,12 @@ export const booleanVariables = (document: IDocumentBuildPGR) => {
     [VariablesPGREnum.HAS_RISK_ERG]: document.homogeneousGroups.find((group) => group.risksData.find((riskData) => riskData.risk.type === RiskTypeEnum.ERG)) ? 'true' : '',
     [VariablesPGREnum.HAS_RISK_ACI]: document.homogeneousGroups.find((group) => group.risksData.find((riskData) => riskData.risk.type === RiskTypeEnum.ACI)) ? 'true' : '',
     [VariablesPGREnum.HAS_QUANTITY]: document.homogeneousGroups.find((group) => group.risksData.find((riskData) => riskData.isQuantity)) ? 'true' : '',
-    [VariablesPGREnum.HAS_QUANTITY_NOISE]: (document.data || []).find(
-      (riskData) =>
-        riskData.json &&
-        riskData.isQuantity &&
-        (riskData.json as unknown as IRiskDataJson).type === QuantityTypeEnum.NOISE,
-    )
-      ? 'true'
-      : '',
-    [VariablesPGREnum.HAS_QUANTITY_QUI]: (document.data || []).find(
-      (riskData) =>
-        riskData.json &&
-        riskData.isQuantity &&
-        (riskData.json as unknown as IRiskDataJson).type === QuantityTypeEnum.QUI,
-    )
-      ? 'true'
-      : '',
-    [VariablesPGREnum.HAS_QUANTITY_VFB]: (document.data || []).find(
-      (riskData) =>
-        riskData.json &&
-        riskData.isQuantity &&
-        (riskData.json as unknown as IRiskDataJson).type === QuantityTypeEnum.VFB,
-    )
-      ? 'true'
-      : '',
-    [VariablesPGREnum.HAS_QUANTITY_VL]: (document.data || []).find(
-      (riskData) =>
-        riskData.json &&
-        riskData.isQuantity &&
-        (riskData.json as unknown as IRiskDataJson).type === QuantityTypeEnum.VL,
-    )
-      ? 'true'
-      : '',
-    [VariablesPGREnum.HAS_QUANTITY_RAD]: (document.data || []).find(
-      (riskData) =>
-        riskData.json &&
-        riskData.isQuantity &&
-        (riskData.json as unknown as IRiskDataJson).type === QuantityTypeEnum.RADIATION,
-    )
-      ? 'true'
-      : '',
-    [VariablesPGREnum.HAS_QUANTITY_HEAT]: (document.data || []).find(
-      (riskData) =>
-        riskData.json &&
-        riskData.isQuantity &&
-        (riskData.json as unknown as IRiskDataJson).type === QuantityTypeEnum.HEAT,
-    )
-      ? 'true'
-      : '',
+    [VariablesPGREnum.HAS_QUANTITY_NOISE]: document.homogeneousGroups.find((group) => group.risksData.find((riskData) => riskData.isQuantity && riskData.quantityNoise)) ? 'true' : '',
+    [VariablesPGREnum.HAS_QUANTITY_QUI]: document.homogeneousGroups.find((group) => group.risksData.find((riskData) => riskData.isQuantity && riskData.quantityQui)) ? 'true' : '',
+    [VariablesPGREnum.HAS_QUANTITY_VFB]: document.homogeneousGroups.find((group) => group.risksData.find((riskData) => riskData.isQuantity && riskData.quantityVibrationFB)) ? 'true' : '',
+    [VariablesPGREnum.HAS_QUANTITY_VL]: document.homogeneousGroups.find((group) => group.risksData.find((riskData) => riskData.isQuantity && riskData.quantityVibrationL)) ? 'true' : '',
+    [VariablesPGREnum.HAS_QUANTITY_RAD]: document.homogeneousGroups.find((group) => group.risksData.find((riskData) => riskData.isQuantity && riskData.quantityRadiation)) ? 'true' : '',
+    [VariablesPGREnum.HAS_QUANTITY_HEAT]: document.homogeneousGroups.find((group) => group.risksData.find((riskData) => riskData.isQuantity && riskData.quantityHeat)) ? 'true' : '',
     [VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_RISK]: riskData.find((riskData) => riskData.homogeneousGroup.environment)
       ? 'true'
       : '',
