@@ -1,9 +1,9 @@
 import { ProfessionalCouncilEntity } from './../../../../../users/entities/council.entity';
 import { WorkspaceEntity } from './../../../../../company/entities/workspace.entity';
-import { CompanyEntity } from './../../../../../company/entities/company.entity';
+import { CompanyModel } from './../../../../../company/entities/company.entity';
 import { UserEntity } from './../../../../../users/entities/user.entity';
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
-import { IDocVariables } from '../../../builders/pgr/types/section.types';
+import { IDocVariables } from '../../../../../../domain/types/section.types';
 import { ProfessionalEntity } from '../../../../../users/entities/professional.entity';
 
 export const getCredential = (row: ProfessionalEntity) => {

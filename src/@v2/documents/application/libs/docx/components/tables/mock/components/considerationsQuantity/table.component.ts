@@ -1,8 +1,8 @@
-import { IDocVariables } from './../../../../../builders/pgr/types/section.types';
+import { IDocVariables } from '../../../../../../../../domain/types/section.types';
 import {
   ISectionChildrenType,
-  DocumentSectionChildrenTypeEnum,
-} from './../../../../../builders/pgr/types/elements.types';
+} from '../../../../../../../../domain/types/elements.types';
+import { DocumentSectionChildrenTypeEnum } from '@/@v2/documents/domain/types/DocumentSectionChildrenTypeEnum';
 import { HeightRule, Paragraph, Table, WidthType } from 'docx';
 
 import { TableBodyElements } from '../../elements/body';

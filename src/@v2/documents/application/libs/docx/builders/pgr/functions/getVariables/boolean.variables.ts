@@ -4,47 +4,32 @@ import { IRiskDataJson, QuantityTypeEnum } from './../../../../../../company/int
 import { WorkspaceEntity } from './../../../../../../company/entities/workspace.entity';
 import { RiskFactorGroupDataEntity } from '../../../../../../sst/entities/riskGroupData.entity';
 import { HierarchyMapData } from './../../../../converter/hierarchy.converter';
-import { CompanyEntity } from '../../../../../../company/entities/company.entity';
+import { CompanyModel } from '../../../../../../company/entities/company.entity';
 import { VariablesPGREnum } from '../../enums/variables.enum';
 import { CharacterizationTypeEnum, RiskFactorsEnum } from '@prisma/client';
 import { filterRisk } from './../../../../../../../shared/utils/filterRisk';
+import { DocumentVersionModel } from '@/@v2/documents/domain/models/document-version.model';
+import { HierarchyModel } from '@/@v2/documents/domain/models/hierarchy.model';
+import { HomogeneousGroupModel } from '@/@v2/documents/domain/models/homogeneous-group.model';
+import { RiskTypeEnum } from '@/@v2/shared/domain/enum/security/risk-type.enum';
 
-export const booleanVariables = (
-  company: CompanyEntity,
-  workspace: WorkspaceEntity,
-  hierarchy: Map<string, HierarchyMapData>,
-  document: RiskFactorGroupDataEntity & DocumentDataEntity & DocumentDataPGRDto,
-) => {
+interface IDocumentBuildPGR {
+  documentVersion: DocumentVersionModel
+  hierarchies: HierarchyModel[]
+  homogeneousGroups: HomogeneousGroupModel[]
+}
+
+export const booleanVariables = (document: IDocumentBuildPGR) => {
   const riskData = (document.data || []).filter((v) => filterRisk(v));
 
   return {
-    [VariablesPGREnum.IS_Q5]: document.isQ5 ? 'true' : '',
-    [VariablesPGREnum.HAS_RISK_FIS]: (document.data || []).find(
-      (riskData) => riskData.riskFactor.type == RiskFactorsEnum.FIS,
-    )
-      ? 'true'
-      : '',
-    [VariablesPGREnum.HAS_RISK_QUI]: (document.data || []).find(
-      (riskData) => riskData.riskFactor.type == RiskFactorsEnum.QUI,
-    )
-      ? 'true'
-      : '',
-    [VariablesPGREnum.HAS_RISK_BIO]: (document.data || []).find(
-      (riskData) => riskData.riskFactor.type == RiskFactorsEnum.BIO,
-    )
-      ? 'true'
-      : '',
-    [VariablesPGREnum.HAS_RISK_ERG]: (document.data || []).find(
-      (riskData) => riskData.riskFactor.type == RiskFactorsEnum.ERG,
-    )
-      ? 'true'
-      : '',
-    [VariablesPGREnum.HAS_RISK_ACI]: (document.data || []).find(
-      (riskData) => riskData.riskFactor.type == RiskFactorsEnum.ACI,
-    )
-      ? 'true'
-      : '',
-    [VariablesPGREnum.HAS_QUANTITY]: (document.data || []).find((riskData) => riskData.isQuantity) ? 'true' : '',
+    [VariablesPGREnum.IS_Q5]: document.documentVersion.documentBase.data.isQ5 ? 'true' : '',
+    [VariablesPGREnum.HAS_RISK_FIS]: document.homogeneousGroups.find((group) => group.risksData.find((riskData) => riskData.risk.type === RiskTypeEnum.FIS)) ? 'true' : '',
+    [VariablesPGREnum.HAS_RISK_QUI]: document.homogeneousGroups.find((group) => group.risksData.find((riskData) => riskData.risk.type === RiskTypeEnum.QUI)) ? 'true' : '',
+    [VariablesPGREnum.HAS_RISK_BIO]: document.homogeneousGroups.find((group) => group.risksData.find((riskData) => riskData.risk.type === RiskTypeEnum.BIO)) ? 'true' : '',
+    [VariablesPGREnum.HAS_RISK_ERG]: document.homogeneousGroups.find((group) => group.risksData.find((riskData) => riskData.risk.type === RiskTypeEnum.ERG)) ? 'true' : '',
+    [VariablesPGREnum.HAS_RISK_ACI]: document.homogeneousGroups.find((group) => group.risksData.find((riskData) => riskData.risk.type === RiskTypeEnum.ACI)) ? 'true' : '',
+    [VariablesPGREnum.HAS_QUANTITY]: document.homogeneousGroups.find((group) => group.risksData.find((riskData) => riskData.isQuantity)) ? 'true' : '',
     [VariablesPGREnum.HAS_QUANTITY_NOISE]: (document.data || []).find(
       (riskData) =>
         riskData.json &&

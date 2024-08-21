@@ -1,5 +1,5 @@
 import { DocumentTypeEnum } from "../enums/document-type.enum"
-import { IDocumentModelData } from "../types/document-mode-data.type"
+import { IDocumentModelData } from "../types/document-mode-data.types"
 
 export type IDocumentModelEntity = {
   id: number
@@ -17,8 +17,7 @@ export class DocumentModelEntity {
   system: boolean
   description: string | null
   type: DocumentTypeEnum
-
-  data: IDocumentModelData | null = null
+  data: IDocumentModelData | null
 
   constructor(params: IDocumentModelEntity) {
     this.id = params.id;
@@ -26,14 +25,19 @@ export class DocumentModelEntity {
     this.system = params.system
     this.description = params.description
     this.type = params.type
+    this.data = DocumentModelEntity.convertData(params.data);
+  }
 
-    if (params.data) {
+  static convertData(data: Buffer) {
+    if (data) {
       try {
-        this.data = JSON.parse(params.data.toString('utf8'));
+        return JSON.parse(data.toString('utf8')) as IDocumentModelData;
       } catch (e) {
         //! captureException(error)
-        this.data = null;
+        return null;
       }
     }
+
+    return null;
   }
 }

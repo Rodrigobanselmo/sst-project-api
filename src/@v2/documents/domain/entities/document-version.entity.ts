@@ -7,6 +7,7 @@ export type IDocumentVersionEntity = {
   version: string;
   attachments: AttachmentEntity[];
   fileUrl: string | null;
+  createdAt: Date;
 }
 
 export class DocumentVersionEntity {
@@ -16,13 +17,15 @@ export class DocumentVersionEntity {
   version: string;
   attachments: AttachmentEntity[];
   fileUrl: string | null;
+  createdAt: Date;
 
-  constructor(partial: IDocumentVersionEntity) {
-    this.id = partial.id;
-    this.name = partial.name;
-    this.description = partial.description;
-    this.version = partial.version;
-    this.attachments = partial.attachments;
-    this.fileUrl = partial.fileUrl;
+  constructor(params: IDocumentVersionEntity) {
+    this.id = params.id;
+    this.name = params.name;
+    this.description = params.description;
+    this.version = params.version;
+    this.attachments = params.attachments;
+    this.fileUrl = params.fileUrl;
+    this.createdAt = params.createdAt
   }
 }

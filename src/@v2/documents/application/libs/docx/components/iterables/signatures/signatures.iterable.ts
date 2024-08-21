@@ -4,8 +4,9 @@ import { arrayChunks } from '../../../../../../shared/utils/arrayChunks';
 
 import { ProfessionalEntity } from '../../../../../users/entities/professional.entity';
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
-import { ISectionChildrenType, DocumentSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
-import { IDocVariables } from '../../../builders/pgr/types/section.types';
+import { ISectionChildrenType } from '../../../../../../domain/types/elements.types';
+import { DocumentSectionChildrenTypeEnum } from '@/@v2/documents/domain/types/DocumentSectionChildrenTypeEnum';
+import { IDocVariables } from '../../../../../../domain/types/section.types';
 import { UserEntity } from './../../../../../users/entities/user.entity';
 import { TableBodyElements } from './elements/body';
 import { SignaturesConverter } from './signatures.converter';

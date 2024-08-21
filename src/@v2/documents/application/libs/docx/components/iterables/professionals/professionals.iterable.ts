@@ -1,12 +1,13 @@
 import { WorkspaceEntity } from './../../../../../company/entities/workspace.entity';
-import { CompanyEntity } from './../../../../../company/entities/company.entity';
+import { CompanyModel } from './../../../../../company/entities/company.entity';
 import { UserEntity } from './../../../../../users/entities/user.entity';
 import { ProfessionalEntity } from '../../../../../users/entities/professional.entity';
 
-import { ISectionChildrenType, DocumentSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
+import { ISectionChildrenType } from '../../../../../../domain/types/elements.types';
+import { DocumentSectionChildrenTypeEnum } from '@/@v2/documents/domain/types/DocumentSectionChildrenTypeEnum';
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
 import { ProfessionalsConverter } from './professionals.converter';
-import { IDocVariables } from '../../../builders/pgr/types/section.types';
+import { IDocVariables } from '../../../../../../domain/types/section.types';
 import { AlignmentType, Paragraph, Table } from 'docx';
 
 export const professionalsIterable = (

@@ -1,11 +1,11 @@
 import { WorkspaceEntity } from '../../../../../../company/entities/workspace.entity';
 import { AddressEntity } from '../../../../../../company/entities/address.entity';
-import { CompanyEntity } from '../../../../../../company/entities/company.entity';
+import { CompanyModel } from '../../../../../../company/entities/company.entity';
 import { VariablesPGREnum } from '../../enums/variables.enum';
 import { formatCNPJ } from '@brazilian-utils/brazilian-utils';
 import { formatCnae, formatPhoneNumber } from '../../../../../../../shared/utils/formats';
 
-export const companyVariables = (company: CompanyEntity, workspace: WorkspaceEntity, address: AddressEntity) => {
+export const companyVariables = (company: CompanyModel, workspace: WorkspaceEntity, address: AddressEntity) => {
   const consultant = company.receivingServiceContracts[0]?.applyingServiceCompany;
 
   return {

@@ -1,13 +1,14 @@
 import { Paragraph, Table } from 'docx';
 
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
-import { ISectionChildrenType, DocumentSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
-import { IDocVariables } from '../../../builders/pgr/types/section.types';
-import { AttachmentEntity } from '../../../../../sst/entities/attachment.entity';
+import { ISectionChildrenType } from '../../../../../../domain/types/elements.types';
+import { DocumentSectionChildrenTypeEnum } from '@/@v2/documents/domain/types/DocumentSectionChildrenTypeEnum';
+import { IDocVariables } from '../../../../../../domain/types/section.types';
+import { AttachmentModel } from '../../../../../sst/entities/attachment.entity';
 import { attachmentsConverter } from './attachments.converter';
 
 export const attachmentsIterable = (
-  attachments: AttachmentEntity[],
+  attachments: AttachmentModel[],
   convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[],
 ) => {
   const attachmentsVarArray = attachmentsConverter(attachments);

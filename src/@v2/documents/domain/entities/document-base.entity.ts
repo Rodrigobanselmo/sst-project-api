@@ -1,7 +1,7 @@
+import { DocumentModelEntity } from "@/modules/documents/entities/document-model.entity";
 import { DocumentTypeEnum } from "../enums/document-type.enum";
 import { DocumentBaseDataVO } from "../values-object/document-base-data.vo";
 import { CompanyEntity } from "./company.entity";
-import { DocumentModelEntity } from "./document-model.entity";
 import { ProfessionalSignatureEntity } from "./professional-signature.entity";
 import { WorkspaceEntity } from "./workspace.entity";
 
@@ -17,7 +17,7 @@ export type IDocumentBaseEntity = {
   coordinatorBy: string | null;
 
   data: DocumentBaseDataVO;
-  model: DocumentModelEntity;
+  entity: DocumentModelEntity;
   workspace: WorkspaceEntity;
   company: CompanyEntity;
   professionalSignatures: ProfessionalSignatureEntity[];
@@ -35,7 +35,7 @@ export class DocumentBaseEntity {
   coordinatorBy: string | null;
 
   data: DocumentBaseDataVO;
-  model: DocumentModelEntity;
+  entity: DocumentModelEntity;
   workspace: WorkspaceEntity;
   company: CompanyEntity;
   professionalSignatures: ProfessionalSignatureEntity[];
@@ -52,7 +52,7 @@ export class DocumentBaseEntity {
     this.coordinatorBy = partial.coordinatorBy;
 
     this.data = partial.data;
-    this.model = partial.model;
+    this.entity = partial.entity;
     this.workspace = partial.workspace;
     this.company = partial.company;
     this.professionalSignatures = partial.professionalSignatures;

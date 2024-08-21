@@ -2,7 +2,7 @@ import { IExamOrigins } from './../../../../../sst/entities/exam.entity';
 import { DocumentDataEntity } from './../../../../../sst/entities/documentData.entity';
 import { DocumentDataPGRDto } from './../../../../../sst/dto/document-data-pgr.dto';
 import { DocumentCoverEntity } from './../../../../../company/entities/document-cover.entity';
-import { CompanyEntity } from './../../../../../company/entities/company.entity';
+import { CompanyModel } from './../../../../../company/entities/company.entity';
 import { CharacterizationEntity } from './../../../../../company/entities/characterization.entity';
 import { ISectionOptions } from 'docx';
 
@@ -14,15 +14,15 @@ import { summarySections } from '../../../base/layouts/summary/summary';
 import { HierarchyMapData, IHierarchyMap, IHomoGroupMap } from '../../../converter/hierarchy.converter';
 import { convertToDocxHelper } from '../functions/convertToDocx';
 import { replaceAllVariables } from '../functions/replaceAllVariables';
-import { ISectionChildrenType } from '../types/elements.types';
+import { ISectionChildrenType } from '../../../../../../domain/types/elements.types';
 import {
   IAllDocumentSectionType,
   IChapter,
   ICover,
   IDocVariables,
   ISection,
-  DocumentSectionTypeEnum,
-} from '../types/section.types';
+} from '../../../../../../domain/types/section.types';
+import { DocumentSectionTypeEnum } from '@/@v2/documents/domain/enums/document-section-type.enum';
 import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
 import { IMapElementDocumentType } from './elementTypeMap';
 import { allCharacterizationSections } from '../../../components/iterables/all-characterization/all-characterization.sections';
@@ -45,7 +45,7 @@ type IDocumentClassType = {
   hierarchy: Map<string, HierarchyMapData>;
   characterizations: CharacterizationEntity[];
   environments: CharacterizationEntity[];
-  company: CompanyEntity;
+  company: CompanyModel;
   hierarchyTree: IHierarchyMap;
   hierarchyHighLevelsData: Map<string, HierarchyMapData>;
   exams?: IExamOrigins[];
@@ -65,7 +65,7 @@ export class SectionsMapClass {
   private hierarchy: Map<string, HierarchyMapData>;
   private hierarchyHighLevelsData: Map<string, HierarchyMapData>;
   private hierarchyTree: IHierarchyMap;
-  private company: CompanyEntity;
+  private company: CompanyModel;
   private exams?: IExamOrigins[];
 
   constructor({
@@ -104,7 +104,7 @@ export class SectionsMapClass {
 
   public map: IMapSectionDocumentType = {
     [DocumentSectionTypeEnum.TOC]: () => summarySections(),
-    [DocumentSectionTypeEnum.COVER]: ({}: ICover) =>
+    [DocumentSectionTypeEnum.COVER]: ({ }: ICover) =>
       coverSections({
         imgPath: this.logoPath,
         version: this.version,

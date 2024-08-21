@@ -1,5 +1,5 @@
-import { ISectionChildrenType } from '../types/elements.types';
-import { IDocVariables } from '../types/section.types';
+import { ISectionChildrenType } from '../../../../../../domain/types/elements.types';
+import { IDocVariables } from '../../../../../../domain/types/section.types';
 import { replaceAllVariables } from './replaceAllVariables';
 
 export const convertToDocxHelper = (data: ISectionChildrenType, variables: IDocVariables) => {

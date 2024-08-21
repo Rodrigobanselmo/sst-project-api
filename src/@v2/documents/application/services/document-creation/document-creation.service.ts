@@ -8,7 +8,7 @@ import { isDevelopment } from '@/@v2/shared/utils/helpers/is-development';
 import { createBaseDocument } from '../../libs/docx/base/config/document';
 import { IDocumentCreation } from './document-creation.interface';
 import { BUCKET_FOLDERS } from '@/@v2/shared/constants/buckets';
-import { AttachmentEntity } from '@/@v2/documents/domain/entities/attachment.entity';
+import { AttachmentModel } from '@/@v2/documents/domain/models/attachment.model';
 
 export abstract class DocumentCreationService {
   constructor(
@@ -55,7 +55,7 @@ export abstract class DocumentCreationService {
         const { buffer } = await this.generate({ sections: attachment.section });
         const { url } = await this.upload(buffer, product.getFileName(body, attachment.type));
 
-        return new AttachmentEntity({
+        return new AttachmentModel({
           id: attachment.id,
           name: attachment.name,
           url,

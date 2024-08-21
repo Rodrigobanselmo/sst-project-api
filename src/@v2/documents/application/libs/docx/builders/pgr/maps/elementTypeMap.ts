@@ -3,7 +3,7 @@ import { IImagesMap } from './../../../../factories/document/types/IDocumentFact
 import { DocumentDataEntity } from './../../../../../sst/entities/documentData.entity';
 import { DocumentDataPGRDto } from './../../../../../sst/dto/document-data-pgr.dto';
 import { WorkspaceEntity } from './../../../../../company/entities/workspace.entity';
-import { CompanyEntity } from './../../../../../company/entities/company.entity';
+import { CompanyModel } from './../../../../../company/entities/company.entity';
 import { HomoTypeEnum, RiskFactorsEnum } from '@prisma/client';
 import { Paragraph, Table } from 'docx';
 
@@ -63,11 +63,11 @@ import {
   IParagraph,
   ISectionChildrenType,
   ITitle,
-  DocumentSectionChildrenTypeEnum,
   IImage,
-} from '../types/elements.types';
-import { IDocVariables } from '../types/section.types';
-import { AttachmentEntity } from '../../../../../sst/entities/attachment.entity';
+} from '../../../../../../domain/types/elements.types';
+import { DocumentSectionChildrenTypeEnum } from '@/@v2/documents/domain/types/DocumentSectionChildrenTypeEnum';
+import { IDocVariables } from '../../../../../../domain/types/section.types';
+import { AttachmentModel } from '../../../../../sst/entities/attachment.entity';
 import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
 import { CharacterizationEntity } from './../../../../../company/entities/characterization.entity';
 import { ProfessionalEntity } from './../../../../../users/entities/professional.entity';
@@ -89,7 +89,7 @@ type IDocumentClassType = {
   homogeneousGroup: IHomoGroupMap;
   hierarchy: Map<string, HierarchyMapData>;
   characterizations: CharacterizationEntity[];
-  attachments: AttachmentEntity[];
+  attachments: AttachmentModel[];
   workspace: WorkspaceEntity;
   hierarchyTree: IHierarchyMap;
   imagesMap?: IImagesMap;
@@ -106,7 +106,7 @@ export class ElementsMapClass {
   private environments: CharacterizationEntity[];
   private characterizations: CharacterizationEntity[];
   private document: RiskFactorGroupDataEntity & DocumentDataEntity & DocumentDataPGRDto;
-  private attachments: AttachmentEntity[];
+  private attachments: AttachmentModel[];
   private homogeneousGroup: IHomoGroupMap;
   private hierarchy: IHierarchyData;
   private hierarchyTree: IHierarchyMap;
@@ -156,7 +156,7 @@ export class ElementsMapClass {
     [DocumentSectionChildrenTypeEnum.H4]: ({ text }: IH4) => [h4(text)],
     [DocumentSectionChildrenTypeEnum.H5]: ({ text }: IH5) => [h5(text)],
     [DocumentSectionChildrenTypeEnum.H6]: ({ text }: IH6) => [h6(text)],
-    [DocumentSectionChildrenTypeEnum.BREAK]: ({}: IBreak) => [pageBreak()],
+    [DocumentSectionChildrenTypeEnum.BREAK]: ({ }: IBreak) => [pageBreak()],
     [DocumentSectionChildrenTypeEnum.TITLE]: ({ text }: ITitle) => [title(text)],
     [DocumentSectionChildrenTypeEnum.PARAGRAPH]: ({ text, ...rest }: IParagraph) => [paragraphNewNormal(text, rest)],
     [DocumentSectionChildrenTypeEnum.IMAGE]: (data: IImage) => imageDoc(data, this.imagesMap),

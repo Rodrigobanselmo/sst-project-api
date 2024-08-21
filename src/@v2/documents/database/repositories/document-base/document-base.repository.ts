@@ -1,8 +1,8 @@
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service'
 import { Injectable } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
-import { DocumentBaseModel } from '../../models/document-base.model'
 import { IDocumentBaseRepository } from './document-base.types'
+import { DocumentBaseMapper } from '../../models/document-base.mapper'
 
 
 @Injectable()
@@ -15,7 +15,15 @@ export class DocumentBaseRepository {
     const include = {
       model: true,
       workspace: true,
-      company: true,
+      company: {
+        include: {
+          receivingServiceContracts: {
+            select: {
+              applyingServiceCompany: true
+            }
+          }
+        }
+      },
       professionalsSignatures: {
         include: {
           professional: {
@@ -32,17 +40,11 @@ export class DocumentBaseRepository {
 
   async findById(params: IDocumentBaseRepository.FindByIdParams) {
     const documentbase = await this.prisma.documentData.findUnique({
-      where: { id_companyId: { id: params.id, companyId: params.companyId } },
+      where: { id: params.id },
       ...DocumentBaseRepository.selectOptions()
     })
 
-    return documentbase ? DocumentBaseModel.toEntity({
-      ...documentbase,
-      workspace: documentbase.workspace,
-      company: documentbase.company,
-      model: documentbase.model,
-      professionalsSignatures: documentbase.professionalsSignatures
-    }) : null
+    return documentbase ? documentbase : null
   }
 
 

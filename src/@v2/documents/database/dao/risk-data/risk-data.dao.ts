@@ -2,7 +2,7 @@ import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service'
 import { Injectable } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
 import { IRiskDataDAO } from './risk-data.types'
-import { RiskDataModel } from '../../models/risk-data.model'
+import { RiskDataMapper } from '../../models/risk-data.mapper'
 
 
 @Injectable()
@@ -29,7 +29,7 @@ export class RiskDataDAO {
       ...RiskDataDAO.selectOptions()
     })
 
-    return RiskDataModel.toEntities(RiskDatas)
+    return RiskDataMapper.toModels(RiskDatas)
   }
 
 

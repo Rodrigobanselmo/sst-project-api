@@ -3,8 +3,9 @@ import { Paragraph, Table, WidthType } from 'docx';
 import { palette } from '../../../../../../shared/constants/palette';
 
 import { borderStyleGlobal } from '../../../base/config/styles';
-import { ISectionChildrenType, DocumentSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
-import { IDocVariables } from '../../../builders/pgr/types/section.types';
+import { ISectionChildrenType } from '../../../../../../domain/types/elements.types';
+import { DocumentSectionChildrenTypeEnum } from '@/@v2/documents/domain/types/DocumentSectionChildrenTypeEnum';
+import { IDocVariables } from '../../../../../../domain/types/section.types';
 import { IHierarchyData, IHierarchyMap } from '../../../converter/hierarchy.converter';
 import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
 import { bodyTableProps, TableBodyElements } from './elements/body';

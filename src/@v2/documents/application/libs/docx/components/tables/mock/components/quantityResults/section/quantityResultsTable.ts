@@ -2,9 +2,9 @@ import { Paragraph, Table } from 'docx';
 
 import {
   ISectionChildrenType,
-  DocumentSectionChildrenTypeEnum,
-} from '../../../../../../builders/pgr/types/elements.types';
-import { IDocVariables } from '../../../../../../builders/pgr/types/section.types';
+} from '../../../../../../../../../domain/types/elements.types';
+import { DocumentSectionChildrenTypeEnum } from '@/@v2/documents/domain/types/DocumentSectionChildrenTypeEnum';
+import { IDocVariables } from '../../../../../../../../../domain/types/section.types';
 import { annualDoseTable } from '../../annualDose/table.component';
 import { quantityResultsFBVTable } from '../tables/quantityResultsFBVTable';
 import { quantityResultsHTable } from '../tables/quantityResultsHTable';

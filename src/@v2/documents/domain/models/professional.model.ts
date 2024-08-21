@@ -1,5 +1,5 @@
 
-export type IProfessionalVO = {
+export type IProfessionalModel = {
   name: string
   email: string;
   cpf: string;
@@ -7,14 +7,14 @@ export type IProfessionalVO = {
   formation: string[];
 }
 
-export class ProfessionalVO {
+export class ProfessionalModel {
   name: string
   email: string;
   cpf: string;
   certifications: string[];
   formation: string[];
 
-  constructor(params: IProfessionalVO) {
+  constructor(params: IProfessionalModel) {
     this.name = params.name
     this.email = params.email;
     this.cpf = params.cpf;

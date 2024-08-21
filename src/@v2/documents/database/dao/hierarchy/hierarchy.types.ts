@@ -1,4 +1,4 @@
 
 export namespace IHierarchyDAO {
-  export type FindByIdParams = { id: string; wokspaceId: string }
+  export type FindByIdParams = { workspaceId: string }
 }

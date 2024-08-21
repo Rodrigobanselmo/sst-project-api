@@ -1,5 +1,5 @@
 import { VariablesPGREnum } from '../enums/variables.enum';
-import { IDocumentPGRSectionGroups } from '../types/section.types';
+import { IDocumentSectionGroups } from '@/@v2/documents/application/libs/docx/builders/pgr/types/IDocumentPGRSectionGroups';
 // import { testSection } from './0.0-test';
 import { initSection } from './1.0-init';
 import { definitionsSection } from './1.1-definitions';
@@ -39,7 +39,7 @@ import { endSection } from './2.9-end';
 // import { attachmentsSection } from './3.0-anexos';
 import { attachmentsLinkSection } from './3.01-anexos-link';
 
-export const docPGRSections: IDocumentPGRSectionGroups = {
+export const docPGRSections: IDocumentSectionGroups = {
   sections: [
     // // // // testSection,
     initSection,

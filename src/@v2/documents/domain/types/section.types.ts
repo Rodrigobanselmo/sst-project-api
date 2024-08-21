@@ -1,17 +1,6 @@
 import { ISectionPropertiesOptions } from 'docx';
 import { ISectionChildrenType } from './elements.types';
-
-export enum DocumentSectionTypeEnum {
-  CHAPTER = 'CHAPTER',
-  TOC = 'TOC',
-  COVER = 'COVER',
-  SECTION = 'SECTION',
-  APR = 'APR',
-  APR_GROUP = 'APR_GROUP',
-  ACTION_PLAN = 'ACTION_PLAN',
-  ITERABLE_ENVIRONMENTS = 'ITERABLE_ENVIRONMENTS',
-  ITERABLE_CHARACTERIZATION = 'ITERABLE_CHARACTERIZATION',
-}
+import { DocumentSectionTypeEnum } from '../enums/document-section-type.enum';
 
 interface IBase {
   removeWithSomeEmptyVars?: string[];
@@ -80,13 +69,4 @@ export type IAllDocumentSectionType =
   | IAprGroupTable
   | IActionPlanTable;
 
-export type IDocumentPGRSectionGroup = {
-  data: IAllDocumentSectionType[];
-};
 
-export type IDocVariables = Record<string, string>;
-
-export type IDocumentPGRSectionGroups = {
-  variables: IDocVariables;
-  sections: IDocumentPGRSectionGroup[];
-};

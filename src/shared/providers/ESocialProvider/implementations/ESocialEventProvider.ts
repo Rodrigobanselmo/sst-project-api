@@ -110,7 +110,7 @@ class ESocialEventProvider {
     private readonly eSocialBatchRepository: ESocialBatchRepository,
     private readonly dayJSProvider: DayJSProvider,
     private readonly eSocialMethodsProvider: ESocialMethodsProvider,
-  ) {}
+  ) { }
 
   errorsEvent2210(event: IEvent2210Props) {
     const cat = event.cat;
@@ -939,6 +939,7 @@ class ESocialEventProvider {
 
         snapshot.risks.forEach((risk) => {
           if (risk.riskFactor?.esocialCode == '02.01.003') {
+            // AQUI TOMAR CUIDADO SE FOR USAR O MODULO V2 POIS O arenValue E vdvrValue ESTÃO COM LOGICA UM POUCO DIFERETE
             if (risk.riskData?.arenValue) {
               const copyRisk = clone(risk);
               copyRisk.riskFactor.esocialCode = '02.01.003';
@@ -1476,10 +1477,10 @@ class ESocialEventProvider {
           }),
           ...(!options?.isExclude &&
             event.ideEvento.nrRecibo && {
-              nrRecibo: {
-                ['_text']: event.ideEvento.nrRecibo,
-              },
-            }),
+            nrRecibo: {
+              ['_text']: event.ideEvento.nrRecibo,
+            },
+          }),
           tpAmb: {
             ['_text']: event.ideEvento.tpAmb || this.tpAmb,
           },
@@ -1673,9 +1674,9 @@ class ESocialEventProvider {
         const xmlResult = this.generateXmlEvent3000(event);
         const signedXml: string = esocialSend
           ? this.eSocialMethodsProvider.signEvent({
-              xml: xmlResult,
-              cert: cert,
-            })
+            xml: xmlResult,
+            cert: cert,
+          })
           : '';
 
         return { signedXml, xml: xmlResult, ...data };
@@ -1684,17 +1685,17 @@ class ESocialEventProvider {
 
     const sendEventResponse = esocialSend
       ? await this.sendEventToESocial(eventsExcludeXml, {
-          company: company,
-          environment: props.body?.tpAmb,
-        })
+        company: company,
+        environment: props.body?.tpAmb,
+      })
       : [
-          {
-            events: eventsExcludeXml,
-            response: {
-              status: { cdResposta: '201' },
-            } as IEsocialSendBatchResponse,
-          },
-        ];
+        {
+          events: eventsExcludeXml,
+          response: {
+            status: { cdResposta: '201' },
+          } as IEsocialSendBatchResponse,
+        },
+      ];
 
     await this.saveDatabaseBatchEvent({
       esocialSend,
@@ -1727,40 +1728,40 @@ class ESocialEventProvider {
 
         const events: CreateESocialEvent[] = isOk
           ? respEvents.map(({ ...event }) => {
-              if ('examIds' in event) {
-                examsIds.push(...event.examIds);
-              }
+            if ('examIds' in event) {
+              examsIds.push(...event.examIds);
+            }
 
-              let action: EmployeeESocialEventActionEnum = EmployeeESocialEventActionEnum.SEND;
+            let action: EmployeeESocialEventActionEnum = EmployeeESocialEventActionEnum.SEND;
 
-              if (event.xml.includes('infoExclusao')) {
-                action = EmployeeESocialEventActionEnum.EXCLUDE;
-              }
+            if (event.xml.includes('infoExclusao')) {
+              action = EmployeeESocialEventActionEnum.EXCLUDE;
+            }
 
-              if (event.xml.includes('<indRetif>2</indRetif>')) {
-                action = EmployeeESocialEventActionEnum.MODIFY;
-              }
+            if (event.xml.includes('<indRetif>2</indRetif>')) {
+              action = EmployeeESocialEventActionEnum.MODIFY;
+            }
 
-              if ('json' in event) {
-                if (action != EmployeeESocialEventActionEnum.EXCLUDE) pppJson.push({ json: event.json, event });
-              }
+            if ('json' in event) {
+              if (action != EmployeeESocialEventActionEnum.EXCLUDE) pppJson.push({ json: event.json, event });
+            }
 
-              return {
-                employeeId: event.employee.id,
-                eventXml: event.xml,
-                eventId: event.idFull || event.id,
-                action,
-                ...('eventDate' in event && {
-                  eventsDate: event?.eventDate,
-                }),
-                ...('aso' in event && {
-                  examHistoryId: event?.aso?.id,
-                }),
-                ...('ppp' in event && {
-                  pppId: event?.ppp?.id,
-                }),
-              };
-            })
+            return {
+              employeeId: event.employee.id,
+              eventXml: event.xml,
+              eventId: event.idFull || event.id,
+              action,
+              ...('eventDate' in event && {
+                eventsDate: event?.eventDate,
+              }),
+              ...('aso' in event && {
+                examHistoryId: event?.aso?.id,
+              }),
+              ...('ppp' in event && {
+                pppId: event?.ppp?.id,
+              }),
+            };
+          })
           : [];
 
         await this.eSocialBatchRepository.create({

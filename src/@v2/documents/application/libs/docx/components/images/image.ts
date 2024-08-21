@@ -4,7 +4,7 @@ import { IImagesMap } from './../../../factories/document/types/IDocumentFactory
 import { ImageRun, Paragraph } from 'docx';
 import sizeOf from 'image-size';
 import fs from 'fs';
-import { IImage } from '../../builders/pgr/types/elements.types';
+import { IImage } from '../../../../../domain/types/elements.types';
 
 export const imageDoc = (data: IImage, imagesMap?: IImagesMap) => {
   const path = imagesMap?.[data.url]?.path || 'images/hierarchy-risk-pgr.png';

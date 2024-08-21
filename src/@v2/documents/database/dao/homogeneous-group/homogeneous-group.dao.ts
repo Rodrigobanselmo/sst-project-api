@@ -2,7 +2,7 @@ import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service'
 import { Injectable } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
 import { IHomogeneousGroupDAO } from './homogeneous-group.types'
-import { HomogeneousGroupModel } from '../../models/homogeneous-group.model'
+import { HomogeneousGroupMapper } from '../../models/homogeneous-group.mapper'
 import { RiskDataDAO } from '../risk-data/risk-data.dao'
 
 
@@ -22,11 +22,11 @@ export class HomogeneousGroupDAO {
 
   async findMany(params: IHomogeneousGroupDAO.FindByIdParams) {
     const homogeneousGroups = await this.prisma.homogeneousGroup.findMany({
-      where: { workspaces: { some: { id: params.wokspaceId } } },
+      where: { workspaces: { some: { id: params.workspaceId } } },
       ...HomogeneousGroupDAO.selectOptions()
     })
 
-    return HomogeneousGroupModel.toEntities(homogeneousGroups)
+    return HomogeneousGroupMapper.toModels(homogeneousGroups)
   }
 
 

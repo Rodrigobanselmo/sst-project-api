@@ -5,7 +5,7 @@ export interface IGetDocumentFileName {
   name: string;
   typeName: string;
   version: string;
-  company: CompanyEntity;
+  company: CompanyModel;
   textType?: string;
 }
 
@@ -22,14 +22,14 @@ export type IImagesMap = Record<string, { path: string }>;
 
 export interface IGetDocument<T, R> {
   version: string;
-  attachments: AttachmentEntity[];
+  attachments: AttachmentModel[];
   data: R;
   body: T;
 }
 
 export interface ISaveDocument<T, R> {
   url: string;
-  attachments: AttachmentEntity[];
+  attachments: AttachmentModel[];
   data: R;
   body: T;
 }

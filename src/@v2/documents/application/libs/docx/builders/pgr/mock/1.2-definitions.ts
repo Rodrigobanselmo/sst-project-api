@@ -1,7 +1,8 @@
 import { AlignmentType } from 'docx';
 import { VariablesPGREnum } from '../enums/variables.enum';
-import { DocumentSectionChildrenTypeEnum } from '../types/elements.types';
-import { IDocumentPGRSectionGroup, DocumentSectionTypeEnum } from '../types/section.types';
+import { DocumentSectionChildrenTypeEnum } from '@/@v2/documents/domain/types/DocumentSectionChildrenTypeEnum';
+import { IDocumentPGRSectionGroup } from '../../../../../../domain/types/section.types';
+import { DocumentSectionTypeEnum } from '@/@v2/documents/domain/enums/document-section-type.enum';
 
 export const definitions2Section: IDocumentPGRSectionGroup = {
   data: [

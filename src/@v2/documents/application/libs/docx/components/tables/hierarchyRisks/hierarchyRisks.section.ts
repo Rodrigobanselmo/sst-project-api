@@ -3,8 +3,9 @@ import { PageOrientation, Paragraph, Table, WidthType } from 'docx';
 import { arrayChunks } from '../../../../../../shared/utils/arrayChunks';
 
 import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
-import { ISectionChildrenType, DocumentSectionChildrenTypeEnum } from '../../../builders/pgr/types/elements.types';
-import { IDocVariables } from '../../../builders/pgr/types/section.types';
+import { ISectionChildrenType } from '../../../../../../domain/types/elements.types';
+import { DocumentSectionChildrenTypeEnum } from '@/@v2/documents/domain/types/DocumentSectionChildrenTypeEnum';
+import { IDocVariables } from '../../../../../../domain/types/section.types';
 import { IHierarchyData, IHierarchyMap } from '../../../converter/hierarchy.converter';
 import { TableBodyElements } from './elements/body';
 import { TableHeaderElements } from './elements/header';

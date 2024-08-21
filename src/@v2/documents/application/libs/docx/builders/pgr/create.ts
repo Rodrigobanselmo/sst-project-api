@@ -3,13 +3,13 @@ import { IImagesMap } from './../../../factories/document/types/IDocumentFactory
 import { DocumentDataPGRDto } from './../../../../sst/dto/document-data-pgr.dto';
 import { DocumentDataEntity } from './../../../../sst/entities/documentData.entity';
 import { DocumentCoverEntity } from './../../../../company/entities/document-cover.entity';
-import { AttachmentEntity } from '../../../../sst/entities/attachment.entity';
+import { AttachmentModel } from '../../../../sst/entities/attachment.entity';
 import { CharacterizationEntity } from './../../../../company/entities/characterization.entity';
 import { RiskFactorGroupDataEntity } from '../../../../sst/entities/riskGroupData.entity';
 import { ISectionOptions } from 'docx';
 import { RiskDocumentEntity } from '../../../../sst/entities/riskDocument.entity';
 
-import { CompanyEntity } from '../../../../company/entities/company.entity';
+import { CompanyModel } from '../../../../company/entities/company.entity';
 import { WorkspaceEntity } from '../../../../company/entities/workspace.entity';
 import { VariablesPGREnum } from './enums/variables.enum';
 import { companyVariables } from './functions/getVariables/company.variables';
@@ -17,80 +17,30 @@ import { ElementsMapClass } from './maps/elementTypeMap';
 import { SectionsMapClass } from './maps/sectionTypeMap';
 import { docPGRSections } from './mock';
 import { ICreatePGR } from './types/pgr.types';
-import { IAllDocumentSectionType, IDocumentPGRSectionGroups, IDocVariables } from './types/section.types';
+import { IAllDocumentSectionType, } from '../../../../../domain/types/section.types';
+import { IDocumentSectionGroups, IDocVariables } from '@/@v2/documents/application/libs/docx/builders/pgr/types/IDocumentPGRSectionGroups';
 import { HierarchyMapData, IHierarchyMap, IHomoGroupMap, IRiskMap } from '../../converter/hierarchy.converter';
 import { booleanVariables } from './functions/getVariables/boolean.variables';
+import { DocumentPGRModel } from '@/@v2/documents/domain/models/document-pgr.model';
+
+interface IDocumentBuildPGR {
+  data: DocumentPGRModel
+  version: string
+}
 
 export class DocumentBuildPGR {
-  private version: string;
-  private logoImagePath: string;
-  private consultantLogoImagePath: string;
-  private cover: DocumentCoverEntity;
-  private company: CompanyEntity;
-  private workspace: WorkspaceEntity;
-  private docSections: IDocumentPGRSectionGroups;
-  private versions: RiskDocumentEntity[];
+  private data: DocumentPGRModel;
   private variables: IDocVariables;
-  private environments: CharacterizationEntity[];
-  private document: RiskFactorGroupDataEntity & DocumentDataEntity & DocumentDataPGRDto;
-  private homogeneousGroup: IHomoGroupMap;
-  private hierarchy: Map<string, HierarchyMapData>;
-  private characterizations: CharacterizationEntity[];
-  private attachments: AttachmentEntity[];
-  private hierarchyTree: IHierarchyMap;
-  private imagesMap?: IImagesMap;
-  private hierarchyHighLevelsData: Map<string, HierarchyMapData>;
-  private exams?: IExamOrigins[];
-  private riskExamMap?: IRiskExamMap;
-  private risksMap?: IRiskMap;
+  private version: string;
 
-  constructor({
-    version,
-    logo,
-    consultantLogo,
-    company,
-    workspace,
-    versions,
-    environments,
-    document,
-    homogeneousGroup,
-    hierarchy,
-    characterizations,
-    attachments,
-    hierarchyTree,
-    cover,
-    docSections,
-    imagesMap,
-    hierarchyHighLevelsData,
-    exams,
-    risksMap,
-  }: ICreatePGR) {
+  constructor({ data, version }: IDocumentBuildPGR) {
+    this.data = data;
     this.version = version;
-    this.logoImagePath = logo;
-    this.cover = cover;
-    this.consultantLogoImagePath = consultantLogo;
-    this.company = company;
-    this.workspace = workspace;
-    this.docSections = docSections || docPGRSections;
-    this.versions = versions;
-    this.environments = environments;
-    this.document = document;
-    this.homogeneousGroup = homogeneousGroup;
-    this.hierarchy = hierarchy;
-    this.characterizations = characterizations;
-    this.attachments = attachments;
-    this.hierarchyTree = hierarchyTree;
     this.variables = this.getVariables();
-    this.imagesMap = imagesMap;
-    this.hierarchyHighLevelsData = hierarchyHighLevelsData;
-    this.exams = exams;
-    this.risksMap = risksMap;
-
-    if (exams) this.riskExamMap = ExamEntity.getRiskExams(exams);
   }
 
   public build() {
-    const sections: ISectionOptions[] = this.docSections.sections
+    const sections: ISectionOptions[] = this.data.model.sections
       .map((docSection) => {
         return this.convertToSections(docSection.data);
       })
@@ -106,20 +56,16 @@ export class DocumentBuildPGR {
   }
 
   private getVariables(): IDocVariables {
-    let docVariables = this.docSections.variables as any;
-
-    if (Array.isArray(docVariables)) {
-      docVariables = docVariables.reduce((acc, item) => ({ ...acc, [item.type]: item }), {} as any);
-    }
+    const docVariables = this.data.model.variables;
 
     return {
       [VariablesPGREnum.VERSION]: this.version,
-      [VariablesPGREnum.DOC_VALIDITY]: this.versions[0].validity,
-      [VariablesPGREnum.COMPANY_HAS_SST_CERTIFICATION]: this.document?.complementarySystems?.length > 0 ? 'true' : '',
-      [VariablesPGREnum.DOCUMENT_COORDINATOR]: this.document?.coordinatorBy || '',
+      [VariablesPGREnum.DOC_VALIDITY]: this.data.documentBase.validUntil,
+      [VariablesPGREnum.COMPANY_HAS_SST_CERTIFICATION]: this.data?.documentBase.data.complementarySystems.length > 0 ? 'true' : '',
+      [VariablesPGREnum.DOCUMENT_COORDINATOR]: this.data.documentBase.coordinatorBy || '',
       [VariablesPGREnum.DOCUMENT_TITLE]: 'Criar variavel local "TITULO_DO_DOCUMENTO"',
-      ...companyVariables(this.company, this.workspace, this.workspace.address),
-      ...booleanVariables(this.company, this.workspace, this.hierarchy, this.document),
+      ...companyVariables(this.data.documentBase.company, this.data.documentBase.workspace),
+      ...booleanVariables(this.data),
       ...docVariables,
     };
   }
@@ -130,10 +76,10 @@ export class DocumentBuildPGR {
     const elementsMap = new ElementsMapClass({
       versions: this.versions,
       variables: this.variables,
-      professionals: [...(this.document?.professionals || [])],
+      professionals: [...(this.data?.professionals || [])],
       environments: this.environments ?? [],
       characterizations: this.characterizations ?? [],
-      document: this.document,
+      document: this.data,
       homogeneousGroup: this.homogeneousGroup,
       hierarchy: this.hierarchy,
       attachments: this.attachments,
@@ -151,7 +97,7 @@ export class DocumentBuildPGR {
       consultantLogoImagePath: this.consultantLogoImagePath,
       version: this.version,
       elementsMap,
-      document: this.document,
+      document: this.data,
       homogeneousGroup: this.homogeneousGroup,
       hierarchy: this.hierarchy,
       environments: this.environments ?? [],
