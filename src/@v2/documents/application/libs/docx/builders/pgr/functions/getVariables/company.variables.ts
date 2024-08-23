@@ -1,41 +1,35 @@
-import { WorkspaceEntity } from '../../../../../../company/entities/workspace.entity';
-import { AddressEntity } from '../../../../../../company/entities/address.entity';
-import { CompanyModel } from '../../../../../../company/entities/company.entity';
+import { WorkspaceModel } from '@/@v2/documents/domain/models/workspace.model';
 import { VariablesPGREnum } from '../../enums/variables.enum';
-import { formatCNPJ } from '@brazilian-utils/brazilian-utils';
-import { formatCnae, formatPhoneNumber } from '../../../../../../../shared/utils/formats';
+import { CompanyModel } from '@/@v2/documents/domain/models/company.model';
+import { formatCnpj } from '@/@v2/shared/utils/helpers/formats-cnpj';
+import { formatPhoneNumber } from '@/@v2/shared/utils/helpers/formats-phone';
 
-export const companyVariables = (company: CompanyModel, workspace: WorkspaceEntity, address: AddressEntity) => {
-  const consultant = company.receivingServiceContracts[0]?.applyingServiceCompany;
+export const companyVariables = (company: CompanyModel, workspace: WorkspaceModel) => {
+  const address = workspace?.address || company?.address;
 
   return {
-    [VariablesPGREnum.CONSULTANT_NAME]: consultant ? `${consultant.name} ` : `${company.name}`,
-    [VariablesPGREnum.COMPANY_SIGNER_CITY]: consultant
-      ? `${consultant.address.city} – ${consultant.address.state}`
-      : `${company.address.city} – ${company.address.state}`,
-    [VariablesPGREnum.COMPANY_CNAE]: company?.primary_activity
-      ? `${formatCnae(company?.primary_activity[0]?.code || '')} – ${company?.primary_activity[0]?.name || ''}`
-      : '',
-    [VariablesPGREnum.COMPANY_RISK_DEGREE]:
-      company?.primary_activity && company?.primary_activity[0] ? String(company?.primary_activity[0].riskDegree) : '',
-    [VariablesPGREnum.COMPANY_INITIAL]: `(${company?.initials})` || '',
-    [VariablesPGREnum.COMPANY_CNPJ]: formatCNPJ(company?.cnpj) || '',
-    [VariablesPGREnum.COMPANY_EMAIL]: company?.email || '',
-    [VariablesPGREnum.COMPANY_NAME]: company?.name || '',
-    [VariablesPGREnum.COMPANY_TELEPHONE]: formatPhoneNumber(company?.phone) || '',
-    [VariablesPGREnum.COMPANY_SHORT_NAME]: company?.shortName || company?.name || '',
-    [VariablesPGREnum.COMPANY_WORK_TIME]: company?.operationTime || '',
+    [VariablesPGREnum.CONSULTANT_NAME]: company.consultant?.name || company.name,
+    [VariablesPGREnum.COMPANY_SIGNER_CITY]: (company.consultant ? company.consultant.address?.formattedCity : company.address?.formattedCity) || '',
+    [VariablesPGREnum.COMPANY_CNAE]: company.primaryActivity,
+    [VariablesPGREnum.COMPANY_RISK_DEGREE]: company.primaryActivityRiskDegree,
+    [VariablesPGREnum.COMPANY_INITIAL]: company.initials ? `(${company.initials})` : '',
+    [VariablesPGREnum.COMPANY_CNPJ]: formatCnpj(company?.cnpj) || '',
+    [VariablesPGREnum.COMPANY_EMAIL]: company.email || '',
+    [VariablesPGREnum.COMPANY_NAME]: company.name || '',
+    [VariablesPGREnum.COMPANY_TELEPHONE]: formatPhoneNumber(company.phone) || '',
+    [VariablesPGREnum.COMPANY_SHORT_NAME]: company.shortName || company.name || '',
+    [VariablesPGREnum.COMPANY_WORK_TIME]: company.operationTime || '',
     [VariablesPGREnum.COMPANY_NUMBER]: address?.number || '',
     [VariablesPGREnum.COMPANY_CEP]: address?.cep || '',
     [VariablesPGREnum.COMPANY_STATE]: address?.state || '',
     [VariablesPGREnum.COMPANY_STREET]: address?.street || '',
     [VariablesPGREnum.COMPANY_CITY]: address?.city || '',
     [VariablesPGREnum.COMPANY_NEIGHBOR]: address?.neighborhood || '',
-    [VariablesPGREnum.COMPANY_MISSION]: company?.mission || '',
-    [VariablesPGREnum.COMPANY_VISION]: company?.vision || '',
-    [VariablesPGREnum.COMPANY_VALUES]: company?.values || '',
+    [VariablesPGREnum.COMPANY_MISSION]: company.mission || '',
+    [VariablesPGREnum.COMPANY_VISION]: company.vision || '',
+    [VariablesPGREnum.COMPANY_VALUES]: company.values || '',
     [VariablesPGREnum.COMPANY_RESPONSIBLE]: company?.responsibleName || '',
-    [VariablesPGREnum.WORKSPACE_CNPJ]: formatCNPJ(workspace?.cnpj) || formatCNPJ(company?.cnpj) || '',
+    [VariablesPGREnum.WORKSPACE_CNPJ]: formatCnpj(workspace?.cnpj) || formatCnpj(company?.cnpj) || '',
     [VariablesPGREnum.IS_RS]: address?.state === 'RS' ? 'true' : '',
     [VariablesPGREnum.IS_AC]: address?.state == 'AC' ? 'true' : '',
     [VariablesPGREnum.IS_AL]: address?.state == 'AL' ? 'true' : '',

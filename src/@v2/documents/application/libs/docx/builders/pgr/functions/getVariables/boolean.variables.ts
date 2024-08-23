@@ -1,17 +1,9 @@
-import { DocumentDataPGRDto } from './../../../../../../sst/dto/document-data-pgr.dto';
-import { DocumentDataEntity } from './../../../../../../sst/entities/documentData.entity';
-import { IRiskDataJson, QuantityTypeEnum } from './../../../../../../company/interfaces/risk-data-json.types';
-import { WorkspaceEntity } from './../../../../../../company/entities/workspace.entity';
-import { RiskFactorGroupDataEntity } from '../../../../../../sst/entities/riskGroupData.entity';
-import { HierarchyMapData } from './../../../../converter/hierarchy.converter';
-import { CompanyModel } from '../../../../../../company/entities/company.entity';
-import { VariablesPGREnum } from '../../enums/variables.enum';
-import { CharacterizationTypeEnum, RiskFactorsEnum } from '@prisma/client';
-import { filterRisk } from './../../../../../../../shared/utils/filterRisk';
+import { getHomogeneuosVariablesDomain } from '@/@v2/documents/domain/functions/get-homogeneous-variables.func';
+import { getRiskDataVariablesDomain } from '@/@v2/documents/domain/functions/get-risk-data-variables.func';
 import { DocumentVersionModel } from '@/@v2/documents/domain/models/document-version.model';
 import { HierarchyModel } from '@/@v2/documents/domain/models/hierarchy.model';
 import { HomogeneousGroupModel } from '@/@v2/documents/domain/models/homogeneous-group.model';
-import { RiskTypeEnum } from '@/@v2/shared/domain/enum/security/risk-type.enum';
+import { VariablesPGREnum } from '../../enums/variables.enum';
 
 interface IDocumentBuildPGR {
   documentVersion: DocumentVersionModel
@@ -20,102 +12,41 @@ interface IDocumentBuildPGR {
 }
 
 export const booleanVariables = (document: IDocumentBuildPGR) => {
-  const riskData = (document.data || []).filter((v) => filterRisk(v));
+  const risksData = document.homogeneousGroups.flatMap((group) => group.risksData);
+  const risksDataVariables = getRiskDataVariablesDomain(risksData);
+  const homogeneousGroupsVariables = getHomogeneuosVariablesDomain(document.homogeneousGroups);
 
   return {
     [VariablesPGREnum.IS_Q5]: document.documentVersion.documentBase.data.isQ5 ? 'true' : '',
-    [VariablesPGREnum.HAS_RISK_FIS]: document.homogeneousGroups.find((group) => group.risksData.find((riskData) => riskData.risk.type === RiskTypeEnum.FIS)) ? 'true' : '',
-    [VariablesPGREnum.HAS_RISK_QUI]: document.homogeneousGroups.find((group) => group.risksData.find((riskData) => riskData.risk.type === RiskTypeEnum.QUI)) ? 'true' : '',
-    [VariablesPGREnum.HAS_RISK_BIO]: document.homogeneousGroups.find((group) => group.risksData.find((riskData) => riskData.risk.type === RiskTypeEnum.BIO)) ? 'true' : '',
-    [VariablesPGREnum.HAS_RISK_ERG]: document.homogeneousGroups.find((group) => group.risksData.find((riskData) => riskData.risk.type === RiskTypeEnum.ERG)) ? 'true' : '',
-    [VariablesPGREnum.HAS_RISK_ACI]: document.homogeneousGroups.find((group) => group.risksData.find((riskData) => riskData.risk.type === RiskTypeEnum.ACI)) ? 'true' : '',
-    [VariablesPGREnum.HAS_QUANTITY]: document.homogeneousGroups.find((group) => group.risksData.find((riskData) => riskData.isQuantity)) ? 'true' : '',
-    [VariablesPGREnum.HAS_QUANTITY_NOISE]: document.homogeneousGroups.find((group) => group.risksData.find((riskData) => riskData.isQuantity && riskData.quantityNoise)) ? 'true' : '',
-    [VariablesPGREnum.HAS_QUANTITY_QUI]: document.homogeneousGroups.find((group) => group.risksData.find((riskData) => riskData.isQuantity && riskData.quantityQui)) ? 'true' : '',
-    [VariablesPGREnum.HAS_QUANTITY_VFB]: document.homogeneousGroups.find((group) => group.risksData.find((riskData) => riskData.isQuantity && riskData.quantityVibrationFB)) ? 'true' : '',
-    [VariablesPGREnum.HAS_QUANTITY_VL]: document.homogeneousGroups.find((group) => group.risksData.find((riskData) => riskData.isQuantity && riskData.quantityVibrationL)) ? 'true' : '',
-    [VariablesPGREnum.HAS_QUANTITY_RAD]: document.homogeneousGroups.find((group) => group.risksData.find((riskData) => riskData.isQuantity && riskData.quantityRadiation)) ? 'true' : '',
-    [VariablesPGREnum.HAS_QUANTITY_HEAT]: document.homogeneousGroups.find((group) => group.risksData.find((riskData) => riskData.isQuantity && riskData.quantityHeat)) ? 'true' : '',
-    [VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_RISK]: riskData.find((riskData) => riskData.homogeneousGroup.environment)
-      ? 'true'
-      : '',
-    [VariablesPGREnum.COMPANY_HAS_CHARACTERIZATION_RISK]: riskData.find(
-      (riskData) => riskData.homogeneousGroup.characterization,
-    )
-      ? 'true'
-      : '',
-    [VariablesPGREnum.COMPANY_HAS_HIERARCHY_RISK]: riskData.find(
-      (riskData) => riskData.homogeneousGroup.type === 'HIERARCHY',
-    )
-      ? 'true'
-      : '',
-    [VariablesPGREnum.COMPANY_HAS_GSE_RISK]: riskData.find((riskData) => !riskData.homogeneousGroup.type) ? 'true' : '',
-    [VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_GENERAL]: company.environments.find(
-      (env) => env.type === CharacterizationTypeEnum.GENERAL,
-    )
-      ? 'true'
-      : '',
-    [VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_ADM]: company.environments.find(
-      (env) => env.type === CharacterizationTypeEnum.ADMINISTRATIVE,
-    )
-      ? 'true'
-      : '',
-    [VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_OP]: company.environments.find(
-      (env) => env.type === CharacterizationTypeEnum.OPERATION,
-    )
-      ? 'true'
-      : '',
-    [VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_SUP]: company.environments.find(
-      (env) => env.type === CharacterizationTypeEnum.SUPPORT,
-    )
-      ? 'true'
-      : '',
-    [VariablesPGREnum.COMPANY_HAS_CHARACTERIZATION_ACT]: company.characterization.find(
-      (env) => env.type === CharacterizationTypeEnum.ACTIVITIES,
-    )
-      ? 'true'
-      : '',
-    [VariablesPGREnum.COMPANY_HAS_CHARACTERIZATION_EQUIP]: company.characterization.find(
-      (env) => env.type === CharacterizationTypeEnum.EQUIPMENT,
-    )
-      ? 'true'
-      : '',
-    [VariablesPGREnum.COMPANY_HAS_CHARACTERIZATION_WORK]: company.characterization.find(
-      (env) => env.type === CharacterizationTypeEnum.WORKSTATION,
-    )
-      ? 'true'
-      : '',
-    [VariablesPGREnum.HAS_HEAT]: (document?.data || []).find(
-      (riskData) =>
-        (riskData.riskId === 'fda7e05a-0f90-4720-8429-c44a56109411' ||
-          riskData.riskFactor.name === 'Temperaturas anormais (calor)') &&
-        riskData.riskFactor.type === RiskFactorsEnum.FIS,
-    )
-      ? 'true'
-      : '',
-    [VariablesPGREnum.HAS_VFB]: (document?.data || []).find(
-      (riskData) =>
-        (riskData.riskId === 'd6c59841-9e2e-4a59-b069-86c28ae05507' ||
-          riskData.riskFactor.name === 'Vibrações de Corpo Inteiro') &&
-        riskData.riskFactor.type === RiskFactorsEnum.FIS,
-    )
-      ? 'true'
-      : '',
-    [VariablesPGREnum.HAS_VL]: (document?.data || []).find(
-      (riskData) =>
-        (riskData.riskId === '0fc5e0d1-b455-4b77-a583-9a6170ecc2a9' ||
-          riskData.riskFactor.name === 'Vibrações Localizadas (Mão-Braço)') &&
-        riskData.riskFactor.type === RiskFactorsEnum.FIS,
-    )
-      ? 'true'
-      : '',
-    [VariablesPGREnum.HAS_EMERGENCY]: (document?.data || []).some(
-      (riskData) => riskData.riskFactor && riskData.riskFactor.isEmergency,
-    )
-      ? 'true'
-      : '',
-    [VariablesPGREnum.IS_WORKSPACE_OWNER]: workspace.isOwner ? 'true' : '',
-    [VariablesPGREnum.IS_NOT_WORKSPACE_OWNER]: !workspace.isOwner ? 'true' : '',
-    [VariablesPGREnum.HAS_EMERGENCY_PLAN]: document.hasEmergencyPlan ? 'true' : '',
+    [VariablesPGREnum.HAS_RISK_FIS]: risksDataVariables.hasFis ? 'true' : '',
+    [VariablesPGREnum.HAS_RISK_QUI]: risksDataVariables.hasQui ? 'true' : '',
+    [VariablesPGREnum.HAS_RISK_BIO]: risksDataVariables.hasBio ? 'true' : '',
+    [VariablesPGREnum.HAS_RISK_ERG]: risksDataVariables.hasErg ? 'true' : '',
+    [VariablesPGREnum.HAS_RISK_ACI]: risksDataVariables.hasAci ? 'true' : '',
+    [VariablesPGREnum.HAS_QUANTITY]: risksDataVariables.hasQuantity ? 'true' : '',
+    [VariablesPGREnum.HAS_QUANTITY_NOISE]: risksDataVariables.hasQuantityNoise ? 'true' : '',
+    [VariablesPGREnum.HAS_QUANTITY_QUI]: risksDataVariables.hasQuantityQui ? 'true' : '',
+    [VariablesPGREnum.HAS_QUANTITY_VFB]: risksDataVariables.hasQuantityVibrationFB ? 'true' : '',
+    [VariablesPGREnum.HAS_QUANTITY_VL]: risksDataVariables.hasQuantityVibrationL ? 'true' : '',
+    [VariablesPGREnum.HAS_QUANTITY_RAD]: risksDataVariables.hasQuantityRadiation ? 'true' : '',
+    [VariablesPGREnum.HAS_QUANTITY_HEAT]: risksDataVariables.hasQuantityHeat ? 'true' : '',
+    [VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_RISK]: homogeneousGroupsVariables.hasEnviromentRisk ? 'true' : '',
+    [VariablesPGREnum.COMPANY_HAS_CHARACTERIZATION_RISK]: homogeneousGroupsVariables.hasCharacterizationRisk ? 'true' : '',
+    [VariablesPGREnum.COMPANY_HAS_HIERARCHY_RISK]: homogeneousGroupsVariables.hasCharacterizationRisk ? 'true' : '',
+    [VariablesPGREnum.COMPANY_HAS_GSE_RISK]: homogeneousGroupsVariables.hasGHORisk ? 'true' : '',
+    [VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_GENERAL]: homogeneousGroupsVariables.hasEnviromentGeneral ? 'true' : '',
+    [VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_ADM]: homogeneousGroupsVariables.hasEnviromentAdministrative ? 'true' : '',
+    [VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_OP]: homogeneousGroupsVariables.hasEnviromentOperation ? 'true' : '',
+    [VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_SUP]: homogeneousGroupsVariables.hasEnviromentSupport ? 'true' : '',
+    [VariablesPGREnum.COMPANY_HAS_CHARACTERIZATION_ACT]: homogeneousGroupsVariables.hasCharacterizationActivity ? 'true' : '',
+    [VariablesPGREnum.COMPANY_HAS_CHARACTERIZATION_EQUIP]: homogeneousGroupsVariables.hasCharacterizationEquipment ? 'true' : '',
+    [VariablesPGREnum.COMPANY_HAS_CHARACTERIZATION_WORK]: homogeneousGroupsVariables.hasCharacterizationWorkstation ? 'true' : '',
+    [VariablesPGREnum.HAS_HEAT]: risksDataVariables.hasHeat ? 'true' : '',
+    [VariablesPGREnum.HAS_VFB]: risksDataVariables.hasVibrationFB ? 'true' : '',
+    [VariablesPGREnum.HAS_VL]: risksDataVariables.hasVibrationL ? 'true' : '',
+    [VariablesPGREnum.HAS_EMERGENCY]: risksDataVariables.isEmergency ? 'true' : '',
+    [VariablesPGREnum.IS_WORKSPACE_OWNER]: document.documentVersion.documentBase.workspace.isOwner ? 'true' : '',
+    [VariablesPGREnum.IS_NOT_WORKSPACE_OWNER]: !document.documentVersion.documentBase.workspace.isOwner ? 'true' : '',
+    [VariablesPGREnum.HAS_EMERGENCY_PLAN]: document.documentVersion.documentBase.data.hasEmergencyPlan ? 'true' : '',
   };
 };

@@ -9,6 +9,7 @@ import { createBaseDocument } from '../../libs/docx/base/config/document';
 import { IDocumentCreation } from './document-creation.interface';
 import { BUCKET_FOLDERS } from '@/@v2/shared/constants/buckets';
 import { AttachmentModel } from '@/@v2/documents/domain/models/attachment.model';
+import { AttachmentEntity } from '@/@v2/documents/domain/entities/attachment.entity';
 
 export abstract class DocumentCreationService {
   constructor(
@@ -23,11 +24,11 @@ export abstract class DocumentCreationService {
       if (isLocal) console.log(1, 'start');
       const data = await product.getData(body);
       const version = product.getVersionName(data, body);
-      const attachmentsData = await product.getAttachments({ data, attachments: [], body, version });
+      const attachmentsData = await product.getAttachments({ data, body, version });
       const attachments = await this.saveAttachments<T>(attachmentsData, product, body);
       if (isLocal) console.log(2, 'attachments');
 
-      const sections = await product.getSections({ data, attachments, body, version })
+      const sections = await product.getSections({ data, attachments: AttachmentModel.fromEntities(attachments), body, version })
       const fileName = product.getFileName(body);
 
       const { buffer } = await this.generate({ sections });
@@ -55,7 +56,7 @@ export abstract class DocumentCreationService {
         const { buffer } = await this.generate({ sections: attachment.section });
         const { url } = await this.upload(buffer, product.getFileName(body, attachment.type));
 
-        return new AttachmentModel({
+        return new AttachmentEntity({
           id: attachment.id,
           name: attachment.name,
           url,

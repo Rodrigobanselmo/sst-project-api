@@ -1,41 +1,31 @@
-import { ExamEntity, IExamOrigins, IRiskExamMap } from './../../../../sst/entities/exam.entity';
-import { IImagesMap } from './../../../factories/document/types/IDocumentFactory.types';
-import { DocumentDataPGRDto } from './../../../../sst/dto/document-data-pgr.dto';
-import { DocumentDataEntity } from './../../../../sst/entities/documentData.entity';
-import { DocumentCoverEntity } from './../../../../company/entities/document-cover.entity';
-import { AttachmentModel } from '../../../../sst/entities/attachment.entity';
-import { CharacterizationEntity } from './../../../../company/entities/characterization.entity';
-import { RiskFactorGroupDataEntity } from '../../../../sst/entities/riskGroupData.entity';
 import { ISectionOptions } from 'docx';
-import { RiskDocumentEntity } from '../../../../sst/entities/riskDocument.entity';
 
-import { CompanyModel } from '../../../../company/entities/company.entity';
-import { WorkspaceEntity } from '../../../../company/entities/workspace.entity';
+import { IDocVariables } from '@/@v2/documents/application/libs/docx/builders/pgr/types/IDocumentPGRSectionGroups';
+import { DocumentPGRModel } from '@/@v2/documents/domain/models/document-pgr.model';
+import { IAllDocumentSectionType, } from '../../../../../domain/types/section.types';
 import { VariablesPGREnum } from './enums/variables.enum';
+import { booleanVariables } from './functions/getVariables/boolean.variables';
 import { companyVariables } from './functions/getVariables/company.variables';
 import { ElementsMapClass } from './maps/elementTypeMap';
 import { SectionsMapClass } from './maps/sectionTypeMap';
-import { docPGRSections } from './mock';
-import { ICreatePGR } from './types/pgr.types';
-import { IAllDocumentSectionType, } from '../../../../../domain/types/section.types';
-import { IDocumentSectionGroups, IDocVariables } from '@/@v2/documents/application/libs/docx/builders/pgr/types/IDocumentPGRSectionGroups';
-import { HierarchyMapData, IHierarchyMap, IHomoGroupMap, IRiskMap } from '../../converter/hierarchy.converter';
-import { booleanVariables } from './functions/getVariables/boolean.variables';
-import { DocumentPGRModel } from '@/@v2/documents/domain/models/document-pgr.model';
+import { AttachmentModel } from '@/@v2/documents/domain/models/attachment.model';
 
 interface IDocumentBuildPGR {
   data: DocumentPGRModel
+  attachments: AttachmentModel[];
   version: string
 }
 
 export class DocumentBuildPGR {
   private data: DocumentPGRModel;
   private variables: IDocVariables;
+  private attachments: AttachmentModel[];
   private version: string;
 
-  constructor({ data, version }: IDocumentBuildPGR) {
+  constructor({ data, version, attachments }: IDocumentBuildPGR) {
     this.data = data;
     this.version = version;
+    this.attachments = attachments;
     this.variables = this.getVariables();
   }
 
@@ -74,21 +64,10 @@ export class DocumentBuildPGR {
     const sections: ISectionOptions[] = [];
 
     const elementsMap = new ElementsMapClass({
-      versions: this.versions,
+      data: this.data,
       variables: this.variables,
-      professionals: [...(this.data?.professionals || [])],
-      environments: this.environments ?? [],
-      characterizations: this.characterizations ?? [],
-      document: this.data,
-      homogeneousGroup: this.homogeneousGroup,
-      hierarchy: this.hierarchy,
       attachments: this.attachments,
-      hierarchyTree: this.hierarchyTree,
-      workspace: this.workspace,
       imagesMap: this.imagesMap,
-      exams: this.exams,
-      risksMap: this.risksMap,
-      riskExamMap: this.riskExamMap,
     }).map;
 
     const sectionsMap = new SectionsMapClass({
@@ -110,28 +89,28 @@ export class DocumentBuildPGR {
 
     data.forEach((child) => {
       if ('removeWithSomeEmptyVars' in child) {
-        const isEmpty = child.removeWithSomeEmptyVars.some((variable) => !this.variables[variable]);
+        const isEmpty = child.removeWithSomeEmptyVars?.some((variable) => !this.variables[variable]);
         if (isEmpty) {
           return null;
         }
       }
 
       if ('removeWithAllEmptyVars' in child) {
-        const isEmpty = child.removeWithAllEmptyVars.every((variable) => !this.variables[variable]);
+        const isEmpty = child.removeWithAllEmptyVars?.every((variable) => !this.variables[variable]);
         if (isEmpty) {
           return null;
         }
       }
 
       if ('removeWithAllValidVars' in child) {
-        const isNotEmpty = child.removeWithAllValidVars.every((variable) => this.variables[variable]);
+        const isNotEmpty = child.removeWithAllValidVars?.every((variable) => this.variables[variable]);
         if (isNotEmpty) {
           return null;
         }
       }
 
       if ('addWithAllVars' in child) {
-        const isNotEmpty = child.addWithAllVars.every((variable) => this.variables[variable]);
+        const isNotEmpty = child.addWithAllVars?.every((variable) => this.variables[variable]);
         if (!isNotEmpty) {
           return null;
         }

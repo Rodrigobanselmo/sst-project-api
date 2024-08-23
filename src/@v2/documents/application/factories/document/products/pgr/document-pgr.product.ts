@@ -149,7 +149,7 @@ export class DocumentPGRFactory implements IDocumentFactoryProduct<IDocumentPGRP
     return `${dateUtils(data.documentVersion.createdAt).format('MM_DD_YYYY')} - REV. ${data.documentVersion.version}`;
   };
 
-  public getFileName = (info: IDocumentPGRBody, type = 'PGR') => {
+  public getFileName = (data: DocumentPGRModel, type = 'PGR') => {
     return getDocxFileName({
       name: info.name,
       companyName: this.company.initials || this.company?.fantasy || this.company.name,
