@@ -31,6 +31,10 @@ export class HierarchyOrganogramModel {
     this.organogramMap = organogramMap
   }
 
+  get organogramMapArray() {
+    return Object.values(this.organogramMap)
+  }
+
   #getOrganogramMap(params: IHierarchyOrganogramModel) {
     const organogramAllMap: OrganogramMapType = {};
     const organogramMap: OrganogramMapType = {};
@@ -59,7 +63,7 @@ export class HierarchyOrganogramModel {
 
       organogramArray[hierarchyInfo.index] = organogramTypeFactory(hierarchy);
 
-      const isOffice = ([HierarchyTypeEnum.OFFICE, HierarchyTypeEnum.SUB_OFFICE] as HierarchyTypeEnum[]).includes(item.hierarchy.type);
+      const isOffice = ([HierarchyTypeEnum.OFFICE, HierarchyTypeEnum.SUB_OFFICE] as HierarchyTypeEnum[]).includes(hierarchy.type);
 
       const organogram = organogramArray.filter((hierarchyInfo) => hierarchyInfo)
       const allHomogeneousGroups = organogram.reduce((acc, hierarchy) => [...acc, ...hierarchy.homogeneousGroups], [] as HomogeneousGroupModel[])

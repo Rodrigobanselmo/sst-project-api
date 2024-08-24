@@ -1,14 +1,10 @@
-import { originRiskMap } from './../../../../../../shared/constants/maps/origin-risk';
-import { HomoTypeEnum } from '@prisma/client';
-import { hierarchyList } from '../../../../../../shared/constants/lists/hierarchy.list';
-import { palette } from '../../../../../../shared/constants/palette';
-import { sortNumber } from '../../../../../../shared/utils/sorts/number.sort';
-import { sortString } from '../../../../../../shared/utils/sorts/string.sort';
+
 import { IHierarchyData, IHomoGroupMap } from '../../../converter/hierarchy.converter';
 import { bodyTableProps, emptyCellName } from './elements/body';
 import { headerTableProps } from './elements/header';
 import { HierarchyPlanColumnEnum, HierarchyPlanMap } from './hierarchyHomoOrg.constant';
 import { borderStyleGlobal } from '../../../base/config/styles';
+import { HierarchyOrganogramModel } from '@/@v2/documents/domain/models/hierarchy-organogram.model';
 
 export type ConverterProps = {
   showHomogeneous?: boolean;
@@ -39,8 +35,7 @@ export type IHierarchyPlan<T> = Record<string, IHierarchyDataRecord<T>>;
 const hierarchyEmptyId = '0';
 
 export const hierarchyPlanConverter = (
-  hierarchyData: IHierarchyData,
-  homoGroupTree: IHomoGroupMap,
+  data: HierarchyOrganogramModel,
   { showDescription, showHomogeneous, showHomogeneousDescription, type, groupIdFilter }: ConverterProps = {
     showHomogeneous: false,
     showHomogeneousDescription: false,
@@ -54,15 +49,15 @@ export const hierarchyPlanConverter = (
   const hierarchyColumns = {} as Record<string, number>;
 
   (function mapAllHierarchyPlan() {
-    hierarchyData.forEach((hierarchiesData) => {
-      const highParent = hierarchiesData.org[0];
+    data.organogramMapArray.forEach((data) => {
+      const highParent = data.organogram[0];
 
       const org = [...hierarchyList, 'EMPLOYEE'].map((orgType) => {
-        const hierarchyData = hierarchiesData.org.find((org) => org.typeEnum === orgType);
+        const organogramData = data.organogram.find((org) => org.hierarchy.type === orgType);
 
-        if (hierarchiesData.descRh) hasAtLeastOneDescription = true;
+        if (data.hierarchy.description) hasAtLeastOneDescription = true;
 
-        if (!hierarchyData) {
+        if (!organogramData) {
           return {
             type: orgType,
             typeEnum: orgType,
@@ -70,23 +65,23 @@ export const hierarchyPlanConverter = (
             id: hierarchyEmptyId,
             homogeneousGroupIds: [],
             homogeneousGroup: '',
-            employeesLength: hierarchiesData.employeesLength,
-            subEmployeesLength: hierarchiesData?.subEmployeesLength,
-            description: hierarchiesData.descRh,
+            employeesLength: data.hierarchy.employees.length,
+            subEmployeesLength: data.hierarchy.subOfficeEmployees.length,
+            description: data.hierarchy.description,
           };
         }
 
         return {
-          ...hierarchyData,
-          ...(showHomogeneous ? {} : { homogeneousGroupIds: [highParent.id] }),
-          employeesLength: hierarchiesData.employeesLength,
-          subEmployeesLength: hierarchiesData?.subEmployeesLength,
-          description: hierarchiesData.descRh,
+          ...organogramData,
+          ...(showHomogeneous ? {} : { homogeneousGroupIds: [highParent.hierarchy.id] }),
+          employeesLength: data.hierarchy.employees.length,
+          subEmployeesLength: data.hierarchy.subOfficeEmployees.length,
+          description: data.hierarchy.description,
         };
       });
 
-      hierarchiesData.org.forEach((hierarchyData) => {
-        (showHomogeneous ? hierarchyData.homogeneousGroupIds : [highParent.id]).forEach((homogeneousGroupId) => {
+      data.organogram.forEach((organogramData) => {
+        (showHomogeneous ? organogramData.homogeneousGroups.map(h => h.id) : [highParent.hierarchy.id]).forEach((homogeneousGroupId) => {
           if (!allHierarchyPlan[homogeneousGroupId]) allHierarchyPlan[homogeneousGroupId] = {};
 
           const loop = (allHierarchyPlanLoop: IHierarchyPlan<any>, index: number) => {
