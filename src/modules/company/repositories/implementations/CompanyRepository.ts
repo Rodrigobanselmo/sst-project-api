@@ -20,7 +20,7 @@ interface ICreateCompany extends CreateCompanyDto {
 
 @Injectable()
 export class CompanyRepository implements ICompanyRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async create({
     workspace = [],
@@ -58,53 +58,53 @@ export class CompanyRepository implements ICompanyRepository {
           Object.keys(license).length === 0
             ? undefined
             : {
-                connectOrCreate: {
-                  create: { ...license, companyId: companyUUId },
-                  where: { companyId: companyId || 'company not found' },
-                },
+              connectOrCreate: {
+                create: { ...license, companyId: companyUUId },
+                where: { companyId: companyId || 'company not found' },
               },
+            },
         receivingServiceContracts: isReceivingService
           ? {
-              create: { applyingServiceCompanyId: companyId },
-            }
+            create: { applyingServiceCompanyId: companyId },
+          }
           : undefined,
         address: address
           ? {
-              create: { ...address },
-            }
+            create: { ...address },
+          }
           : undefined,
         workspace: workspace
           ? {
-              create: [
-                ...workspace.map(({ id, address, ...work }) => ({
-                  ...work,
-                  address: { create: address },
-                })),
-              ],
-            }
+            create: [
+              ...workspace.map(({ id, address, ...work }) => ({
+                ...work,
+                address: { create: address },
+              })),
+            ],
+          }
           : undefined,
 
         // TODO: should be connect only
         primary_activity: primary_activity
           ? {
-              connectOrCreate: [
-                ...primary_activity.map((activity) => ({
-                  create: activity,
-                  where: { code: activity.code },
-                })),
-              ],
-            }
+            connectOrCreate: [
+              ...primary_activity.map((activity) => ({
+                create: activity,
+                where: { code: activity.code },
+              })),
+            ],
+          }
           : undefined,
         // TODO: should be connect only
         secondary_activity: secondary_activity
           ? {
-              connectOrCreate: [
-                ...secondary_activity.map((activity) => ({
-                  create: activity,
-                  where: { code: activity.code },
-                })),
-              ],
-            }
+            connectOrCreate: [
+              ...secondary_activity.map((activity) => ({
+                create: activity,
+                where: { code: activity.code },
+              })),
+            ],
+          }
           : undefined,
         contacts: {
           create: [{ email, phone, name: 'Contato principal', isPrincipal: true }],
@@ -184,20 +184,20 @@ export class CompanyRepository implements ICompanyRepository {
                   ...rest,
                   hierarchy: hierarchyId //! edit employee
                     ? {
-                        connect: {
-                          id_companyId: { companyId, id: hierarchyId },
-                        },
-                      }
+                      connect: {
+                        id_companyId: { companyId, id: hierarchyId },
+                      },
+                    }
                     : undefined,
                 },
                 update: {
                   ...rest,
                   hierarchy: hierarchyId
                     ? {
-                        connect: {
-                          id_companyId: { companyId, id: hierarchyId },
-                        },
-                      }
+                      connect: {
+                        id_companyId: { companyId, id: hierarchyId },
+                      },
+                    }
                     : undefined,
                 },
                 where: { cpf_companyId: { cpf: rest.cpf, companyId } },
@@ -482,19 +482,19 @@ export class CompanyRepository implements ICompanyRepository {
         { deleted_at: null },
         ...(companyId
           ? [
-              {
-                OR: [
-                  { id: companyId },
-                  {
-                    receivingServiceContracts: {
-                      some: { applyingServiceCompanyId: companyId },
-                    },
+            {
+              OR: [
+                { id: companyId },
+                {
+                  receivingServiceContracts: {
+                    some: { applyingServiceCompanyId: companyId },
                   },
-                  ...(query.isClinic ? [{ companiesToClinicAvailable: { some: { companyId } } }] : []),
-                ],
-                ...options?.where,
-              },
-            ]
+                },
+                ...(query.isClinic ? [{ companiesToClinicAvailable: { some: { companyId } } }] : []),
+              ],
+              ...options?.where,
+            },
+          ]
           : []),
       ],
     } as typeof options.where;
@@ -1021,7 +1021,7 @@ export class CompanyRepository implements ICompanyRepository {
     return new CompanyEntity(data);
   }
 
-  async findDocumentData(companyId: string, options?: { workspaceId?: string; type?: DocumentTypeEnum }) {
+  async findDocumentData(companyId: string, options?: { workspaceId?: string; type?: DocumentTypeEnum; ghoIds?: string[] }) {
     const workspaceId = options?.workspaceId;
     const type = options?.type;
 
@@ -1030,15 +1030,15 @@ export class CompanyRepository implements ICompanyRepository {
       include: {
         ...(workspaceId &&
           type && {
-            documentData: {
-              where: { workspaceId, type },
-              include: {
-                professionalsSignatures: {
-                  include: { professional: { include: { professional: true } } },
-                },
+          documentData: {
+            where: { workspaceId, type },
+            include: {
+              professionalsSignatures: {
+                include: { professional: { include: { professional: true } } },
               },
             },
-          }),
+          },
+        }),
         primary_activity: true,
         address: true,
         covers: true,
@@ -1059,7 +1059,26 @@ export class CompanyRepository implements ICompanyRepository {
       company.employeeCount = await this.prisma.employee.count({
         where: {
           companyId,
-          hierarchy: { workspaces: { some: { id: workspaceId } } },
+          hierarchy: {
+            workspaces: { some: { id: workspaceId } },
+            ...(options?.ghoIds && {
+              OR: [{
+                hierarchyOnHomogeneous: { some: { homogeneousGroupId: { in: options.ghoIds } } },
+              }, {
+                id: { in: options.ghoIds },
+              }, {
+                parent: { id: { in: options.ghoIds } },
+              }, {
+                children: { some: { id: { in: options.ghoIds } } },
+              }, {
+                children: { some: { children: { some: { id: { in: options.ghoIds } } } } },
+              }, {
+                children: { some: { children: { some: { children: { some: { id: { in: options.ghoIds } } } } } } },
+              }, {
+                children: { some: { children: { some: { children: { some: { children: { some: { id: { in: options.ghoIds } } } } } } } } },
+              }]
+            })
+          },
         },
       });
     }

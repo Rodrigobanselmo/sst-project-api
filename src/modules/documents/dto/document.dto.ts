@@ -13,6 +13,10 @@ export class UpsertDocumentDto {
   @IsString()
   documentDataId: string;
 
+  @IsOptional()
+  @IsString({ each: true })
+  ghoIds?: string[];
+
   @IsString()
   name: string;
 

@@ -11,7 +11,7 @@ import { m2mGetDeletedIds } from './../../../../shared/utils/m2mFilterIds';
 
 @Injectable()
 export class RiskGroupDataRepository {
-  constructor(readonly prisma: PrismaService) {}
+  constructor(readonly prisma: PrismaService) { }
   async upsert({ companyId, id, ...createDto }: UpsertRiskGroupDataDto): Promise<RiskFactorGroupDataEntity> {
     const riskFactorGroupDataEntity = await this.prisma.riskFactorGroupData.upsert({
       create: {
@@ -154,7 +154,7 @@ export class RiskGroupDataRepository {
     return new RiskFactorGroupDataEntity(riskFactorGroupDataEntity as any);
   }
 
-  async findDocumentData(id: string, companyId: string, options?: { workspaceId?: string }) {
+  async findDocumentData(id: string, companyId: string, options?: { workspaceId?: string; ghoIds?: string[] }) {
     const riskFactorGroupData = await this.prisma.riskFactorGroupData.findUnique({
       where: { id_companyId: { id, companyId } },
       include: {
@@ -164,6 +164,31 @@ export class RiskGroupDataRepository {
               status: 'ACTIVE',
               ...(options.workspaceId && {
                 workspaces: { some: { id: options.workspaceId } },
+                ...(options?.ghoIds && {
+                  OR: [{
+                    id: { in: options.ghoIds },
+                  }, {
+                    hierarchyOnHomogeneous: {
+                      some: {
+                        hierarchy: {
+                          OR: [{
+                            id: { in: options.ghoIds },
+                          }, {
+                            parent: { id: { in: options.ghoIds } },
+                          }, {
+                            children: { some: { id: { in: options.ghoIds } } },
+                          }, {
+                            children: { some: { children: { some: { id: { in: options.ghoIds } } } } },
+                          }, {
+                            children: { some: { children: { some: { children: { some: { id: { in: options.ghoIds } } } } } } },
+                          }, {
+                            children: { some: { children: { some: { children: { some: { children: { some: { id: { in: options.ghoIds } } } } } } } } },
+                          }]
+                        },
+                      },
+                    },
+                  }]
+                })
               }),
             },
           },
