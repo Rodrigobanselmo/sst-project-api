@@ -11,7 +11,7 @@ import {
 } from 'docx';
 import { borderStyleGlobal } from '../../../../base/config/styles';
 
-import { palette } from '../../../../../../../shared/constants/palette';
+import { palette } from '../../../../constants/palette';
 
 export interface headerTableProps extends Partial<ITableCellOptions> {
   text: string;

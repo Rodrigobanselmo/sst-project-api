@@ -1,13 +1,12 @@
 import { Table, WidthType } from 'docx';
 
-import { RiskFactorGroupDataEntity } from '../../../../../../sst/entities/riskGroupData.entity';
-import { IHierarchyMap } from '../../../../converter/hierarchy.converter';
+import { IDocumentRiskGroupDataConverter, IHierarchyMap } from '../../../../converter/hierarchy.converter';
 import { TableBodyElements } from './elements/body';
 import { TableHeaderElements } from './elements/header';
 import { NewQuantityVFBHeader } from './quantityVFB.constant';
 import { quantityVFBConverter } from './quantityVFB.converter';
 
-export const quantityVFBTable = (riskGroupData: RiskFactorGroupDataEntity, hierarchyTree: IHierarchyMap) => {
+export const quantityVFBTable = (riskGroupData: IDocumentRiskGroupDataConverter, hierarchyTree: IHierarchyMap) => {
   const quantityVFBData = quantityVFBConverter(riskGroupData, hierarchyTree);
   const tableHeaderElements = new TableHeaderElements();
   const tableBodyElements = new TableBodyElements();

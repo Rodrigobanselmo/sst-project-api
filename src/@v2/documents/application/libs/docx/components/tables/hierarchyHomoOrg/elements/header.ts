@@ -1,16 +1,14 @@
 import {
   AlignmentType,
-  HeightRule,
   ITableCellOptions,
   Paragraph,
   TableCell,
   TableRow,
-  TextDirection,
   TextRun,
   VerticalAlign,
-  WidthType,
+  WidthType
 } from 'docx';
-import { palette } from '../../../../../../../shared/constants/palette';
+import { palette } from '../../../../constants/palette';
 
 export interface headerTableProps extends Partial<ITableCellOptions> {
   text: string;

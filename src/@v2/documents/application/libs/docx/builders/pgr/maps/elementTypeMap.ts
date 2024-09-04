@@ -12,6 +12,35 @@ import { IDocVariables } from '../types/IDocumentPGRSectionGroups';
 import { hierarchyHomoOrgSection } from '../../../components/tables/hierarchyHomoOrg/hierarchyHomoOrg.section';
 import { DocumentPGRModel } from '@/@v2/documents/domain/models/document-pgr.model';
 import { AttachmentModel } from '@/@v2/documents/domain/models/attachment.model';
+import { IImagesMap } from '@/@v2/documents/application/factories/document/types/document-factory.types';
+import { convertToDocxHelper } from '../functions/convertToDocx';
+import { HierarchyModel } from '@/@v2/documents/domain/models/hierarchy.model';
+import { hierarchyConverter, IHierarchyDataConverter } from '../../../converter/hierarchy.converter';
+import { ICharacterizationModel } from '@/@v2/documents/domain/models/characterization.model';
+import { signaturesIterable } from '../../../components/iterables/signatures/signatures.iterable';
+import { hierarchyPrioritizationPage } from '../../../components/tables/hierarchyPrioritization/hierarchyPrioritization.page';
+import { quantityNoiseTable } from '../../../components/tables/quantity/quantityNoise/quantityNoise.table';
+import { quantityHeatTable } from '../../../components/tables/quantity/quantityHeat/quantityHeat.table';
+import { quantityVFBTable } from '../../../components/tables/quantity/quantityVFB/quantityVFB.table';
+import { quantityVLTable } from '../../../components/tables/quantity/quantityVL/quantityVL.table';
+import { quantityRadTable } from '../../../components/tables/quantity/quantityRad/quantityRad.table';
+import { quantityQuiTable } from '../../../components/tables/quantity/quantityQui/quantityQui.table';
+import { bulletTextIterable } from '../../../components/iterables/bullets/bullets.iterable';
+import { removeDuplicate } from '@/@v2/shared/utils/helpers/remove-duplicate';
+import { professionalsIterable } from '../../../components/iterables/professionals/professionals.iterable';
+import { complementaryDocsIterable } from '../../../components/iterables/complementaryDocs/complementaryDocs.iterable';
+import { complementarySystemsIterable } from '../../../components/iterables/complementarySystems/complementarySystems.iterable';
+import { recommendationsIterable } from '../../../components/iterables/recommendations/recommendations.iterable';
+import { emergencyIterable } from '../../../components/iterables/emergency/emergency.iterable';
+import { attachmentsIterable } from '../../../components/iterables/attachments/attachments.iterable';
+import { healthEffectTable } from '../../../components/tables/mock/components/healthSeverity/section/healthEffectTable';
+import { expositionDegreeTable } from '../../../components/tables/mock/components/expositionDegree/section/expositionDegreeTable';
+import { matrizTable } from '../../../components/tables/mock/components/matriz/table.component';
+import { measureHierarchyImage } from '../../../components/images/measureHierarch';
+import { rsDocumentImage } from '../../../components/images/rsDocument';
+import { quantityResultsTable } from '../../../components/tables/mock/components/quantityResults/section/quantityResultsTable';
+import { considerationsQuantityTable } from '../../../components/tables/mock/components/considerationsQuantity/table.component';
+import { riskCharacterizationTableSection } from '../../../components/tables/riskCharacterization/riskCharacterization.section';
 
 export type IMapElementDocumentType = Record<string, (arg: any) => (Paragraph | Table)[]>;
 
@@ -60,7 +89,8 @@ export class ElementsMapClass {
     },
     [DocumentChildrenTypeEnum.BULLET]: ({ level = 0, text, ...rest }: IBullet) => [bulletsNormal(text, level, rest)],
     [DocumentChildrenTypeEnum.BULLET_SPACE]: ({ text }: IBullet) => [bulletsSpace(text)],
-    [DocumentChildrenTypeEnum.TABLE_VERSION_CONTROL]: () => [versionControlTable(this.versions)],
+    // [DocumentChildrenTypeEnum.TABLE_VERSION_CONTROL]: () => [versionControlTable(this.versions)],
+    [DocumentChildrenTypeEnum.TABLE_VERSION_CONTROL]: () => [],
     [DocumentChildrenTypeEnum.TABLE_GSE]: () =>
       hierarchyHomoOrgSection(this.hierarchy, this.homogeneousGroup, {
         showDescription: false,
@@ -79,10 +109,10 @@ export class ElementsMapClass {
         showHomogeneous: true,
         type: [HomoTypeEnum.ACTIVITIES, HomoTypeEnum.EQUIPMENT, HomoTypeEnum.WORKSTATION],
       })['children'],
-    [DocumentChildrenTypeEnum.PROFESSIONALS_SIGNATURES]: () => signaturesIterable(this.professionals, this.workspace, (x, v) => this.convertToDocx(x, v)),
+    [DocumentChildrenTypeEnum.PROFESSIONALS_SIGNATURES]: () => signaturesIterable(this.data.documentBase.professionalSignatures, this.data.documentBase.workspace, (x, v) => this.convertToDocx(x, v)),
     [DocumentChildrenTypeEnum.TABLE_PRIORITIZATION]: () =>
       hierarchyPrioritizationPage(
-        this.document,
+        this.riskGroupData,
         this.hierarchy,
         this.hierarchyTree,
         {
@@ -92,7 +122,7 @@ export class ElementsMapClass {
       ),
     [DocumentChildrenTypeEnum.TABLE_PRIORITIZATION_HIERARCHY]: () =>
       hierarchyPrioritizationPage(
-        this.document,
+        this.riskGroupData,
         this.hierarchy,
         this.hierarchyTree,
         {
@@ -103,7 +133,7 @@ export class ElementsMapClass {
       ),
     [DocumentChildrenTypeEnum.TABLE_PRIORITIZATION_ENV]: () =>
       hierarchyPrioritizationPage(
-        this.document,
+        this.riskGroupData,
         this.hierarchy,
         this.hierarchyTree,
         {
@@ -114,7 +144,7 @@ export class ElementsMapClass {
       ),
     [DocumentChildrenTypeEnum.TABLE_PRIORITIZATION_CHAR]: () =>
       hierarchyPrioritizationPage(
-        this.document,
+        this.riskGroupData,
         this.hierarchy,
         this.hierarchyTree,
         {
@@ -123,67 +153,62 @@ export class ElementsMapClass {
         },
         (x, v) => this.convertToDocx(x, v),
       ),
-    [DocumentChildrenTypeEnum.TABLE_QUANTITY_NOISE]: () => [quantityNoiseTable(this.document, this.hierarchyTree)],
-    [DocumentChildrenTypeEnum.TABLE_QUANTITY_HEAT]: () => [quantityHeatTable(this.document, this.hierarchyTree)],
-    [DocumentChildrenTypeEnum.TABLE_QUANTITY_VFB]: () => [quantityVFBTable(this.document, this.hierarchyTree)],
-    [DocumentChildrenTypeEnum.TABLE_QUANTITY_VL]: () => [quantityVLTable(this.document, this.hierarchyTree)],
-    [DocumentChildrenTypeEnum.TABLE_QUANTITY_RAD]: () => [quantityRadTable(this.document, this.hierarchyTree)],
-    [DocumentChildrenTypeEnum.TABLE_QUANTITY_QUI]: () => [quantityQuiTable(this.document, this.hierarchyTree)],
+    [DocumentChildrenTypeEnum.TABLE_QUANTITY_NOISE]: () => [quantityNoiseTable(this.documentRiskData, this.hierarchyTree)],
+    [DocumentChildrenTypeEnum.TABLE_QUANTITY_HEAT]: () => [quantityHeatTable(this.documentRiskData, this.hierarchyTree)],
+    [DocumentChildrenTypeEnum.TABLE_QUANTITY_VFB]: () => [quantityVFBTable(this.documentRiskData, this.hierarchyTree)],
+    [DocumentChildrenTypeEnum.TABLE_QUANTITY_VL]: () => [quantityVLTable(this.documentRiskData, this.hierarchyTree)],
+    [DocumentChildrenTypeEnum.TABLE_QUANTITY_RAD]: () => [quantityRadTable(this.documentRiskData, this.hierarchyTree)],
+    [DocumentChildrenTypeEnum.TABLE_QUANTITY_QUI]: () => [quantityQuiTable(this.documentRiskData, this.hierarchyTree)],
     [DocumentChildrenTypeEnum.ITERABLE_QUALITY_FIS]: () =>
       bulletTextIterable(
         removeDuplicate(
-          (this.document?.data || [])
-            .map((riskData) => !!(riskData.riskFactor.type === RiskTypeEnum.FIS) && riskData.riskFactor.name)
-            .filter((x) => x),
-          { simpleCompare: true },
+          (this.riskGroupData || [])
+            .map(({ riskData }) => !!(riskData.risk.type === RiskTypeEnum.FIS) && riskData.risk.name)
+            .filter((x) => x) as unknown as string[],
         ),
         (x, v) => this.convertToDocx(x, v),
       ),
     [DocumentChildrenTypeEnum.ITERABLE_QUALITY_QUI]: () =>
       bulletTextIterable(
         removeDuplicate(
-          (this.document?.data || [])
-            .map((riskData) => !!(riskData.riskFactor.type === RiskTypeEnum.QUI) && riskData.riskFactor.name)
-            .filter((x) => x),
-          { simpleCompare: true },
+          (this.riskGroupData || [])
+            .map(({ riskData }) => !!(riskData.risk.type === RiskTypeEnum.QUI) && riskData.risk.name)
+            .filter((x) => x) as unknown as string[],
         ),
         (x, v) => this.convertToDocx(x, v),
       ),
     [DocumentChildrenTypeEnum.ITERABLE_QUALITY_BIO]: () =>
       bulletTextIterable(
         removeDuplicate(
-          (this.document?.data || [])
-            .map((riskData) => !!(riskData.riskFactor.type === RiskTypeEnum.BIO) && riskData.riskFactor.name)
-            .filter((x) => x),
-          { simpleCompare: true },
+          (this.riskGroupData || [])
+            .map(({ riskData }) => !!(riskData.risk.type === RiskTypeEnum.BIO) && riskData.risk.name)
+            .filter((x) => x) as unknown as string[],
         ),
         (x, v) => this.convertToDocx(x, v),
       ),
     [DocumentChildrenTypeEnum.ITERABLE_QUALITY_ERG]: () =>
       bulletTextIterable(
         removeDuplicate(
-          (this.document?.data || [])
-            .map((riskData) => !!(riskData.riskFactor.type === RiskTypeEnum.ERG) && riskData.riskFactor.name)
-            .filter((x) => x),
-          { simpleCompare: true },
+          (this.riskGroupData || [])
+            .map(({ riskData }) => !!(riskData.risk.type === RiskTypeEnum.ERG) && riskData.risk.name)
+            .filter((x) => x) as unknown as string[],
         ),
         (x, v) => this.convertToDocx(x, v),
       ),
     [DocumentChildrenTypeEnum.ITERABLE_QUALITY_ACI]: () =>
       bulletTextIterable(
         removeDuplicate(
-          (this.document?.data || [])
-            .map((riskData) => !!(riskData.riskFactor.type === RiskTypeEnum.ACI) && riskData.riskFactor.name)
-            .filter((x) => x),
-          { simpleCompare: true },
+          (this.riskGroupData || [])
+            .map(({ riskData }) => !!(riskData.risk.type === RiskTypeEnum.ACI) && riskData.risk.name)
+            .filter((x) => x) as unknown as string[],
         ),
         (x, v) => this.convertToDocx(x, v),
       ),
-    [DocumentChildrenTypeEnum.PROFESSIONAL]: () => professionalsIterable(this.professionals, this.workspace, (x, v) => this.convertToDocx(x, v)),
-    [DocumentChildrenTypeEnum.COMPLEMENTARY_DOCS]: () => complementaryDocsIterable(this.document.complementaryDocs || [], (x, v) => this.convertToDocx(x, v)),
-    [DocumentChildrenTypeEnum.COMPLEMENTARY_SYSTEMS]: () => complementarySystemsIterable(this.document.complementarySystems || [], (x, v) => this.convertToDocx(x, v)),
-    [DocumentChildrenTypeEnum.ITERABLE_RECOMMENDATIONS]: () => recommendationsIterable(this.document?.data || [], (x, v) => this.convertToDocx(x, v)),
-    [DocumentChildrenTypeEnum.ITERABLE_EMERGENCY_RISKS]: () => emergencyIterable(this.document?.data || [], (x, v) => this.convertToDocx(x, v)),
+    [DocumentChildrenTypeEnum.PROFESSIONAL]: () => professionalsIterable(this.data.documentBase.professionalSignatures, (x, v) => this.convertToDocx(x, v)),
+    [DocumentChildrenTypeEnum.COMPLEMENTARY_DOCS]: () => complementaryDocsIterable(this.data.documentBase.data.complementaryDocs || [], (x, v) => this.convertToDocx(x, v)),
+    [DocumentChildrenTypeEnum.COMPLEMENTARY_SYSTEMS]: () => complementarySystemsIterable(this.data.documentBase.data.complementarySystems || [], (x, v) => this.convertToDocx(x, v)),
+    [DocumentChildrenTypeEnum.ITERABLE_RECOMMENDATIONS]: () => recommendationsIterable(this.riskGroupData, (x, v) => this.convertToDocx(x, v)),
+    [DocumentChildrenTypeEnum.ITERABLE_EMERGENCY_RISKS]: () => emergencyIterable(this.riskGroupData, (x, v) => this.convertToDocx(x, v)),
     [DocumentChildrenTypeEnum.ATTACHMENTS]: () => attachmentsIterable(this.attachments || [], (x, v) => this.convertToDocx(x, v)),
     [DocumentChildrenTypeEnum.HEALTH_EFFECT_TABLES]: () => healthEffectTable((x, v) => this.convertToDocx(x, v)),
     [DocumentChildrenTypeEnum.EXPOSITION_DEGREE_TABLES]: () => expositionDegreeTable((x, v) => this.convertToDocx(x, v)),
@@ -221,5 +246,62 @@ export class ElementsMapClass {
 
 
     return components;
+  }
+
+
+  private get hierarchyData() {
+    const homoMap = this.data.homogeneousGroupsMap;
+
+    const hierarchiesData = this.data.hierarchies
+      .map((hierarchy) => ({
+        ...hierarchy,
+        ...(hierarchy.groups?.length && {
+          hierarchyOnHomogeneous: hierarchy.groups.map((hh) => {
+            const homogeneousGroup = homoMap[hh.homogeneousGroupId];
+
+            return { ...hh, homogeneousGroup };
+          }),
+        }),
+      }))
+      .map((hierarchy) => {
+        const hierarchyCopy = { ...hierarchy } as unknown as IHierarchyDataConverter;
+        hierarchyCopy.homogeneousGroups = hierarchy.hierarchyOnHomogeneous?.map((homo) => homo.homogeneousGroup) || [];
+
+        return hierarchyCopy;
+      });
+
+    const { hierarchyData, hierarchyHighLevelsData, homoGroupTree, hierarchyTree, riskGroupData } = hierarchyConverter(
+      hierarchiesData,
+      this.data.homogeneousGroups,
+      this.data.documentBase.workspace,
+      this.data.documentBase.company,
+      'isPGR'
+    );
+
+    return {
+      hierarchyData,
+      hierarchyHighLevelsData,
+      homoGroupTree,
+      hierarchyTree,
+      riskGroupData
+    }
+  }
+  private get hierarchy() {
+    return this.hierarchyData.hierarchyData
+  }
+  private get homogeneousGroup() {
+    return this.hierarchyData.homoGroupTree
+  }
+  private get hierarchyTree() {
+    return this.hierarchyData.hierarchyTree
+  }
+  private get riskGroupData() {
+    return this.hierarchyData.riskGroupData
+  }
+  private get documentRiskData() {
+    return {
+      riskGroupData: this.hierarchyData.riskGroupData,
+      documentVersion: this.data.documentVersion
+    }
   }
 }

@@ -1,19 +1,20 @@
-import { sortNumber } from './../../../../../../shared/utils/sorts/number.sort';
-import { riskMap } from './../../../../constants/risks.constant';
-import { originRiskMap } from './../../../../../../shared/constants/maps/origin-risk';
 import { HierarchyEnum, HomoTypeEnum, RiskFactorsEnum } from '@prisma/client';
 
-import { palette } from '../../../../../../shared/constants/palette';
-import { removeDuplicate } from '../../../../../../shared/utils/removeDuplicate';
-import { sortString } from '../../../../../../shared/utils/sorts/string.sort';
-import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
-import { getMatrizRisk } from '../../../../../../shared/utils/matriz';
-import { IHierarchyData, IHierarchyMap } from '../../../converter/hierarchy.converter';
+import { IHierarchyData, IHierarchyMap, IRiskGroupDataConverter } from '../../../converter/hierarchy.converter';
 import { hierarchyMap } from '../appr/parts/first/first.constant';
 import { bodyTableProps } from './elements/body';
 import { headerTableProps } from './elements/header';
 import { borderStyleGlobal } from '../../../base/config/styles';
-import { filterRisk } from '../../../../../../shared/utils/filterRisk';
+import { removeDuplicate } from '@/@v2/shared/utils/helpers/remove-duplicate';
+import { originRiskMap } from '@/shared/constants/maps/origin-risk';
+import { riskMap } from '@/modules/documents/constants/risks.constant';
+import { sortString } from '@/@v2/shared/utils/sorts/string.sort';
+import { sortNumber } from '@/@v2/shared/utils/sorts/number.sort';
+import { getMatrizRisk } from '@/@v2/shared/domain/functions/security/get-matrix-risk.func';
+import { matrixRiskMap } from '../../../constants/matriz-risk-map';
+import { palette } from '../../../constants/palette';
+import { RiskDataModel } from '@/@v2/documents/domain/models/risk-data.model';
+import { checkValidExistentRisk } from '@/@v2/shared/domain/functions/security/check-valid-existent-risk.func';
 
 export interface IHierarchyPrioritizationOptions {
   isByGroup?: boolean;
@@ -50,12 +51,12 @@ interface IRiskDataMap {
 }
 
 export const hierarchyPrioritizationConverter = (
-  riskGroup: RiskFactorGroupDataEntity,
+  riskGroup: IRiskGroupDataConverter[],
   hierarchyData: IHierarchyData,
   hierarchyTree: IHierarchyMap,
   { hierarchyType = HierarchyEnum.SECTOR, isByGroup = false, homoType }: IHierarchyPrioritizationOptions,
 ) => {
-  const riskGroupData = riskGroup.data.filter((riskData) => filterRisk(riskData));
+  const riskGroupData = riskGroup.filter(({ riskData }) => checkValidExistentRisk(riskData.risk));
 
   const warnLevelStart = 4;
   const allRiskRecord = {} as Record<string, IRiskDataMap>;
@@ -76,7 +77,6 @@ export const hierarchyPrioritizationConverter = (
         allHierarchyRecord[hierarchy.id] = {
           homogeneousGroupIds: removeDuplicate(
             [...hierarchyMap.homogeneousGroupIds, ...hierarchiesData.allHomogeneousGroupIds],
-            { simpleCompare: true },
           ),
           name: hierarchy.name,
         };
@@ -88,24 +88,25 @@ export const hierarchyPrioritizationConverter = (
 
   function getAllHomoGroups() {
     riskGroupData.forEach((riskData) => {
-      if (!homoType && riskData.homogeneousGroup.type) return;
+      if (!homoType && riskData.homogeneousGroup.gho.type) return;
 
-      if (homoType && !Array.isArray(homoType) && riskData.homogeneousGroup.type !== homoType) return;
+      if (homoType && !Array.isArray(homoType) && riskData.homogeneousGroup.gho.type !== homoType) return;
 
-      if (homoType && Array.isArray(homoType) && !homoType.includes(riskData.homogeneousGroup.type)) return;
+      if (homoType && Array.isArray(homoType) && !homoType.includes(riskData.homogeneousGroup.gho.type)) return;
 
-      const homoId = riskData.homogeneousGroup.id;
-      let name = riskData.homogeneousGroup.name;
+      const homoId = riskData.homogeneousGroup.gho.id;
+      let name = riskData.homogeneousGroup.gho.name;
 
-      if (riskData.homogeneousGroup.environment) {
-        name = `${riskData.homogeneousGroup.environment?.name}\n(${originRiskMap[riskData.homogeneousGroup.environment.type].name})`;
+      if (riskData.homogeneousGroup.gho.isEnviroment && riskData.homogeneousGroup.gho.characterization) {
+        name = `${riskData.homogeneousGroup.gho.characterization?.name}\n(${originRiskMap[riskData.homogeneousGroup.gho.characterization.type].name})`;
       }
 
-      if (riskData.homogeneousGroup.characterization)
-        name = `${riskData.homogeneousGroup.characterization.name}\n(${originRiskMap[riskData.homogeneousGroup.characterization.type].name})`;
+      if (riskData.homogeneousGroup.gho.isCharacterization && riskData.homogeneousGroup.gho.characterization) {
+        name = `${riskData.homogeneousGroup.gho.characterization.name}\n(${originRiskMap[riskData.homogeneousGroup.gho.characterization.type].name})`;
+      }
 
       //nivel hierarquido da estrtura organizacional
-      if (riskData.homogeneousGroup.type == HomoTypeEnum.HIERARCHY) {
+      if (riskData.homogeneousGroup.gho.type == HomoTypeEnum.HIERARCHY) {
         const hierarchy = hierarchyTree[homoId];
 
         if (hierarchy) name = `${hierarchy.name}\n(${originRiskMap[hierarchy.type].name})`;
@@ -125,25 +126,25 @@ export const hierarchyPrioritizationConverter = (
   !isByGroup ? getAllHierarchyByType() : getAllHomoGroups();
 
   (function getAllRiskFactors() {
-    riskGroupData.forEach((riskData) => {
-      const hasRisk = allRiskRecord[riskData.riskId] || {
+    riskGroupData.forEach(({ riskData, homogeneousGroup }) => {
+      const hasRisk = allRiskRecord[riskData.risk.id] || {
         homogeneousGroupIds: [],
       };
       const dataRisk = {} as IRiskDataMap['homogeneousGroupIds'][0];
 
-      const severity = riskData.riskFactor.severity;
+      const severity = riskData.risk.severity;
       const probability = riskData.probability;
 
-      const riskDegree = getMatrizRisk(severity, probability);
+      const riskDegree = matrixRiskMap[getMatrizRisk(severity, probability)];
       dataRisk.riskDegree = riskDegree.short;
       dataRisk.riskDegreeLevel = riskDegree.level;
       dataRisk.isQuantity = riskData.isQuantity;
-      dataRisk.id = riskData.homogeneousGroupId;
+      dataRisk.id = homogeneousGroup.gho.id;
 
-      allRiskRecord[riskData.riskId] = {
+      allRiskRecord[riskData.risk.id] = {
         ...hasRisk,
-        name: `(${riskData.riskFactor?.type}) ${riskData.riskFactor.name}`,
-        type: riskData.riskFactor?.type,
+        name: `(${riskData.risk?.type}) ${riskData.risk.name}`,
+        type: riskData.risk?.type,
         homogeneousGroupIds: [...hasRisk.homogeneousGroupIds, dataRisk],
       };
     });

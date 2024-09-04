@@ -9,6 +9,7 @@ import { DocumentBuildPGR } from '@/@v2/documents/application/libs/docx/builders
 import { PromiseInfer } from '@/@v2/shared/interfaces/promise-infer.types';
 import { DocumentPGRModel } from '@/@v2/documents/domain/models/document-pgr.model';
 import { DocumentDAO } from '@/@v2/documents/database/dao/document/document.dao';
+import { DocumentSectionTypeEnum } from '@/@v2/documents/domain/enums/document-section-type.enum';
 
 @Injectable({ scope: Scope.REQUEST })
 export class DocumentPGRFactory implements IDocumentFactoryProduct<IDocumentPGRParams> {

@@ -1,9 +1,9 @@
 import { HierarchyTypeEnum } from "@/@v2/shared/domain/enum/company/hierarchy-type.enum";
-import { hierarchyMap } from "../../application/libs/docx/components/tables/appr/parts/first/first.constant";
-import { DocumentVersionModel } from "./document-version.model";
-import { HierarchyModel } from "./hierarchy.model";
-import { HomogeneousGroupModel } from "./homogeneous-group.model";
-import { WorkspaceModel } from "./workspace.model";
+import { hierarchyMap } from "../../../application/libs/docx/components/tables/appr/parts/first/first.constant";
+import { DocumentVersionModel } from "../document-version.model";
+import { HierarchyModel } from "../hierarchy.model";
+import { HomogeneousGroupModel } from "../homogeneous-group.model";
+import { WorkspaceModel } from "../workspace.model";
 
 export type IHierarchyOrganogramModel = {
   documentVersion: DocumentVersionModel

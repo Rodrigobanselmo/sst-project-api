@@ -17,5 +17,3 @@ export const rsDocumentImage = () => {
 
   return [images];
 };
-
-//quantityResultsFBVTable

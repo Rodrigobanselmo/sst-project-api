@@ -1,8 +1,8 @@
 import { RecTypeEnum } from '@prisma/client';
 
-import { RiskFactorDataEntity } from '../../../../../sst/entities/riskData.entity';
+import { IRiskGroupDataConverter } from '../../../converter/hierarchy.converter';
 
-export const recommendationsConverter = (riskData: Partial<RiskFactorDataEntity>[]) => {
+export const recommendationsConverter = (riskData: IRiskGroupDataConverter[]) => {
   const remove = ['Não aplicável', 'Não verificada', 'Não implementada'];
 
   const eng = {
@@ -23,20 +23,20 @@ export const recommendationsConverter = (riskData: Partial<RiskFactorDataEntity>
   const others = { data: [] as string[], title: 'Outras Recomendações' };
 
   riskData.forEach((data) => {
-    (data?.recs || []).forEach((rec) => {
-      if (remove.includes(rec.recName)) return;
+    (data?.riskData.recommendations || []).forEach((rec) => {
+      if (remove.includes(rec.name)) return;
 
-      if (rec.recType === RecTypeEnum.ENG) {
-        if (!eng.data.find((r) => r == rec.recName)) eng.data.push(rec.recName);
+      if (rec.type === RecTypeEnum.ENG) {
+        if (!eng.data.find((r) => r == rec.name)) eng.data.push(rec.name);
       }
-      if (rec.recType === RecTypeEnum.ADM) {
-        if (!adm.data.find((r) => r == rec.recName)) adm.data.push(rec.recName);
+      if (rec.type === RecTypeEnum.ADM) {
+        if (!adm.data.find((r) => r == rec.name)) adm.data.push(rec.name);
       }
-      if (rec.recType === RecTypeEnum.EPI) {
-        if (!epi.data.find((r) => r == rec.recName)) epi.data.push(rec.recName);
+      if (rec.type === RecTypeEnum.EPI) {
+        if (!epi.data.find((r) => r == rec.name)) epi.data.push(rec.name);
       }
-      if (!rec.recType) {
-        if (!others.data.find((r) => r == rec.recName)) others.data.push(rec.recName);
+      if (!rec.type) {
+        if (!others.data.find((r) => r == rec.name)) others.data.push(rec.name);
       }
     });
   });

@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
 import { IRiskDataDAO } from './risk-data.types'
 import { RiskDataMapper } from '../../models/risk-data.mapper'
+import { RiskDAO } from '../risk/risk.dao'
 
 
 @Injectable()
@@ -11,9 +12,36 @@ export class RiskDataDAO {
     private readonly prisma: PrismaServiceV2,
   ) { }
 
-  static selectOptions() {
+  static selectOptions({ companyId }: { companyId: string }) {
     const include = {
-      riskFactor: true
+      riskFactor: RiskDAO.selectOptions({ companyId }),
+      recs: {
+        select: {
+          recName: true,
+          recType: true,
+        }
+      },
+      adms: {
+        select: {
+          medName: true
+        }
+      },
+      generateSources: {
+        select: {
+          name: true
+        }
+      },
+      engsToRiskFactorData: {
+        include: {
+          recMed: true
+        }
+      },
+      epiToRiskFactorData: {
+        include: {
+          epi: true
+        }
+      },
+      examsToRiskFactorData: true,
     } satisfies Prisma.RiskFactorDataFindFirstArgs['include']
 
     return { include }
@@ -26,7 +54,7 @@ export class RiskDataDAO {
           workspaces: { some: { id: params.wokspaceId } }
         }
       },
-      ...RiskDataDAO.selectOptions()
+      ...RiskDataDAO.selectOptions({ companyId: params.companyId })
     })
 
     return RiskDataMapper.toModels(RiskDatas)

@@ -2,8 +2,8 @@ import { AlignmentType, Paragraph, Table } from 'docx';
 
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
 import { ISectionChildrenType } from '../../../../../../domain/types/elements.types';
-import { DocumentSectionChildrenTypeEnum } from '@/@v2/documents/domain/types/DocumentSectionChildrenTypeEnum';
-import { IDocVariables } from '../../../../../../domain/types/section.types';
+import { DocumentChildrenTypeEnum as DocumentSectionChildrenTypeEnum } from '@/@v2/documents/domain/enums/document-children-type.enum';
+import { IDocVariables } from '../../../builders/pgr/types/IDocumentPGRSectionGroups';
 import { CharacterizationEntity } from '../../../../../company/entities/characterization.entity';
 import { environmentsConverter } from './all-characterization.converter';
 import { filterRisk } from '../../../../../../shared/utils/filterRisk';

@@ -12,7 +12,7 @@ import {
   WidthType,
 } from 'docx';
 
-import { palette } from '../../../../../../../shared/constants/palette';
+import { palette } from '../../../../constants/palette';
 import { borderNoneStyle } from './../../../../base/config/styles';
 
 export interface bodyTableProps extends Partial<ITableCellOptions> {

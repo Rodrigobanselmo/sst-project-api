@@ -1,6 +1,6 @@
 import { sectionLandscapeProperties } from '../../../base/config/styles';
 import { VariablesPGREnum } from '../enums/variables.enum';
-import { DocumentSectionChildrenTypeEnum } from '@/@v2/documents/domain/types/DocumentSectionChildrenTypeEnum';
+import { DocumentChildrenTypeEnum as DocumentSectionChildrenTypeEnum } from '@/@v2/documents/domain/enums/document-children-type.enum';
 import { IDocumentPGRSectionGroup } from '../../../../../../domain/types/section.types';
 import { DocumentSectionTypeEnum } from '@/@v2/documents/domain/enums/document-section-type.enum';
 

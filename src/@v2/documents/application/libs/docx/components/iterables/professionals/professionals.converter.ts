@@ -1,46 +1,29 @@
-import { ProfessionalCouncilEntity } from './../../../../../users/entities/council.entity';
-import { WorkspaceEntity } from './../../../../../company/entities/workspace.entity';
-import { CompanyModel } from './../../../../../company/entities/company.entity';
-import { UserEntity } from './../../../../../users/entities/user.entity';
-import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
-import { IDocVariables } from '../../../../../../domain/types/section.types';
-import { ProfessionalEntity } from '../../../../../users/entities/professional.entity';
 
-export const getCredential = (row: ProfessionalEntity) => {
-  if (row && 'councilId' in row) {
-    return `${row?.councilType ? row.councilType + ': ' : ''}${row.councilId}${row?.councilUF ? ' - ' + row.councilUF : ''}`;
+import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
+import { IDocVariables } from '../../../builders/pgr/types/IDocumentPGRSectionGroups';
+import { ProfessionalSignatureModel } from '@/@v2/documents/domain/models/professional-signature.model';
+
+export const getCredential = (row: ProfessionalSignatureModel) => {
+  if (row.professionalCouncil.councilId) {
+    return `${row.professionalCouncil?.councilType ? row.professionalCouncil.councilType + ': ' : ''}${row.professionalCouncil.councilId}${row.professionalCouncil?.councilUF ? ' - ' + row.professionalCouncil.councilUF : ''}`;
   }
   return '';
 };
 
 export const ProfessionalsConverter = (
-  professionalEntity: ProfessionalEntity[],
-  workspace: WorkspaceEntity,
+  professionalEntity: ProfessionalSignatureModel[],
 ): IDocVariables[] => {
   return professionalEntity
-    .filter((professional) =>
-      'professionalDocumentDataSignature' in professional
-        ? professional.professionalDocumentDataSignature.isElaborator
-        : 'professionalDocumentDataSignature' in professional
-          ? professional.professionalDocumentDataSignature.isElaborator
-          : false,
-    )
+    .filter((professional) => professional.isElaborator)
     .map((professional) => {
-      // const council =professional
-      //   professional?.councils?.find(
-      //     (c) =>
-      //       c.councilType === 'CREA' &&
-      //       c.councilUF === workspace?.address?.state,
-      //   ) || professional?.councils?.[0];
-
-      const crea = getCredential(professional as ProfessionalEntity);
+      const crea = getCredential(professional);
 
       return {
-        [VariablesPGREnum.PROFESSIONAL_CERTIFICATIONS]: professional.certifications.join(' -- ') || '',
+        [VariablesPGREnum.PROFESSIONAL_CERTIFICATIONS]: professional.professionalCouncil.professional.certifications.join(' -- ') || '',
         [VariablesPGREnum.PROFESSIONAL_CREA]: crea || '',
-        [VariablesPGREnum.PROFESSIONAL_FORMATION]: professional.formation.join('/') || '',
-        [VariablesPGREnum.PROFESSIONAL_NAME]: professional.name || '',
-        [VariablesPGREnum.PROFESSIONAL_CPF]: professional.cpf || '',
+        [VariablesPGREnum.PROFESSIONAL_FORMATION]: professional.professionalCouncil.professional.formation.join('/') || '',
+        [VariablesPGREnum.PROFESSIONAL_NAME]: professional.professionalCouncil.professional.name || '',
+        [VariablesPGREnum.PROFESSIONAL_CPF]: professional.professionalCouncil.professional.cpf || '',
       };
     });
 };

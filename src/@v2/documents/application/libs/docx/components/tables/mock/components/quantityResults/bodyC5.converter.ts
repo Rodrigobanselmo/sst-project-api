@@ -1,5 +1,5 @@
 import { AlignmentType } from 'docx';
-import { palette } from '../../../../../../../../shared/constants/palette';
+import { palette } from '../../../../../constants/palette';
 import { bodyTableProps } from '../../elements/body';
 import { borderStyleGlobal } from '../../../../../base/config/styles';
 

@@ -55,7 +55,7 @@ export class DocumentBuildPGR {
       [VariablesPGREnum.DOCUMENT_COORDINATOR]: this.data.documentBase.coordinatorBy || '',
       [VariablesPGREnum.DOCUMENT_TITLE]: 'Criar variavel local "TITULO_DO_DOCUMENTO"',
       ...companyVariables(this.data.documentBase.company, this.data.documentBase.workspace),
-      ...booleanVariables(this.data),
+      ...booleanVariables({ ...this.data, documentType: 'isPGR' }),
       ...docVariables,
     };
   }

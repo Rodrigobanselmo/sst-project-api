@@ -156,7 +156,7 @@ export class ElementsMapClass {
     [DocumentSectionChildrenTypeEnum.H4]: ({ text }: IH4) => [h4(text)],
     [DocumentSectionChildrenTypeEnum.H5]: ({ text }: IH5) => [h5(text)],
     [DocumentSectionChildrenTypeEnum.H6]: ({ text }: IH6) => [h6(text)],
-    [DocumentSectionChildrenTypeEnum.BREAK]: ({}: IBreak) => [pageBreak()],
+    [DocumentSectionChildrenTypeEnum.BREAK]: ({ }: IBreak) => [pageBreak()],
     [DocumentSectionChildrenTypeEnum.TITLE]: ({ text }: ITitle) => [title(text)],
     [DocumentSectionChildrenTypeEnum.PARAGRAPH]: ({ text, ...rest }: IParagraph) => [paragraphNewNormal(text, rest)],
     [DocumentSectionChildrenTypeEnum.IMAGE]: (data: IImage) => imageDoc(data, this.imagesMap),

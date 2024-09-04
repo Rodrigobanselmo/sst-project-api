@@ -2,7 +2,7 @@ import { riskMap } from './../../../../constants/risks.constant';
 import { HierarchyEnum, RiskFactorsEnum } from '@prisma/client';
 
 import { palette } from '../../../../../../shared/constants/palette';
-import { removeDuplicate } from '../../../../../../shared/utils/removeDuplicate';
+import { removeDuplicate } from '@/@v2/shared/utils/helpers/remove-duplicate';
 import { sortString } from '../../../../../../shared/utils/sorts/string.sort';
 import { sortNumber } from '../../../../../../shared/utils/sorts/number.sort';
 import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';

@@ -1,4 +1,4 @@
-import { palette } from '../../../../../../../../shared/constants/palette';
+import { palette } from '../../../../../constants/palette';
 import { getIsTodosRisk } from '../../../../../../../../shared/utils/getIsTodosRisk';
 import { sortString } from '../../../../../../../../shared/utils/sorts/string.sort';
 import { IExamOriginData, IExamOrigins } from '../../../../../../../sst/entities/exam.entity';

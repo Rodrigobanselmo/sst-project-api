@@ -3,12 +3,12 @@ import { Paragraph, Table } from 'docx';
 import {
   ISectionChildrenType,
 } from '../../../../../../../../../domain/types/elements.types';
-import { DocumentSectionChildrenTypeEnum } from '@/@v2/documents/domain/types/DocumentSectionChildrenTypeEnum';
-import { IDocVariables } from '../../../../../../../../../domain/types/section.types';
+import { DocumentChildrenTypeEnum as DocumentSectionChildrenTypeEnum } from '@/@v2/documents/domain/enums/document-children-type.enum';
 import { expositionDegreeATable } from '../tables/expositionDegreeATable';
 import { expositionDegreeBTable } from '../tables/expositionDegreeBTable';
 import { expositionDegreeETable } from '../tables/expositionDegreeETable';
 import { expositionDegreeFQTable } from '../tables/expositionDegreeFQTable';
+import { IDocVariables } from '@/@v2/documents/application/libs/docx/builders/pgr/types/IDocumentPGRSectionGroups';
 
 export const expositionDegreeTable = (
   convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[],

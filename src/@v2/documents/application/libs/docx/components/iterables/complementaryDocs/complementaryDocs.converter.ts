@@ -1,5 +1,5 @@
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
-import { IDocVariables } from '../../../../../../domain/types/section.types';
+import { IDocVariables } from '../../../builders/pgr/types/IDocumentPGRSectionGroups';
 
 export const ComplementaryDocsConverter = (complementaryDocs: string[]): IDocVariables[] => {
   return complementaryDocs.map((doc) => ({

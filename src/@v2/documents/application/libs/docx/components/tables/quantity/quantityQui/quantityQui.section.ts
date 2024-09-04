@@ -1,10 +1,9 @@
 import { PageOrientation } from 'docx';
 
-import { RiskFactorGroupDataEntity } from '../../../../../../sst/entities/riskGroupData.entity';
-import { IHierarchyMap } from '../../../../converter/hierarchy.converter';
+import { IDocumentRiskGroupDataConverter, IHierarchyMap } from '../../../../converter/hierarchy.converter';
 import { quantityQuiTable } from './quantityQui.table';
 
-export const quantityQuiTableSection = (riskGroupData: RiskFactorGroupDataEntity, hierarchyTree: IHierarchyMap) => {
+export const quantityQuiTableSection = (riskGroupData: IDocumentRiskGroupDataConverter, hierarchyTree: IHierarchyMap) => {
   const table = quantityQuiTable(riskGroupData, hierarchyTree);
 
   const section = {

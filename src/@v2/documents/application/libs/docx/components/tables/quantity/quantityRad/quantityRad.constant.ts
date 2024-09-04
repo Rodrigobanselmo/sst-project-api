@@ -1,5 +1,5 @@
 import { borderStyleGlobal } from '../../../../base/config/styles';
-import { palette } from '../../../../../../../shared/constants/palette';
+import { palette } from '../../../../constants/palette';
 import { headerTableProps } from './elements/header';
 
 export enum QuantityRadColumnEnum {

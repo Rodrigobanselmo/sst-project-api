@@ -1,12 +1,11 @@
-import { DocumentDataEntity } from './../../../../../sst/entities/documentData.entity';
-import { DocumentDataPGRDto } from './../../../../../sst/dto/document-data-pgr.dto';
-import { HierarchyEnum, HomogeneousGroup } from '@prisma/client';
+import { HierarchyEnum } from '@prisma/client';
 import { ISectionOptions, PageOrientation } from 'docx';
 import { sortString } from '../../../../../../shared/utils/sorts/string.sort';
 import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
-import { HierarchyEntity } from '../../../../../company/entities/hierarchy.entity';
+import { DocumentDataPGRDto } from './../../../../../sst/dto/document-data-pgr.dto';
+import { DocumentDataEntity } from './../../../../../sst/entities/documentData.entity';
 
-import { hierarchyConverter, IHierarchyData, IHomoGroupMap } from '../../../converter/hierarchy.converter';
+import { IHierarchyData, IHomoGroupMap } from '../../../converter/hierarchy.converter';
 import { firstRiskInventoryTableSection } from './parts/first/first.table';
 import { secondRiskInventoryTableSection } from './parts/second/second.table';
 import { thirdRiskInventoryTableSection } from './parts/third/third.table';

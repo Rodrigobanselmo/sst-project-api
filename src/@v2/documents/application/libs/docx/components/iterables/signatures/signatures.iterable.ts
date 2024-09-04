@@ -1,19 +1,18 @@
-import { WorkspaceEntity } from './../../../../../company/entities/workspace.entity';
 import { AlignmentType, Paragraph, Table, WidthType } from 'docx';
-import { arrayChunks } from '../../../../../../shared/utils/arrayChunks';
 
-import { ProfessionalEntity } from '../../../../../users/entities/professional.entity';
-import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
+import { ProfessionalSignatureModel } from '@/@v2/documents/domain/models/professional-signature.model';
+import { WorkspaceModel } from '@/@v2/documents/domain/models/workspace.model';
 import { ISectionChildrenType } from '../../../../../../domain/types/elements.types';
-import { DocumentSectionChildrenTypeEnum } from '@/@v2/documents/domain/types/DocumentSectionChildrenTypeEnum';
-import { IDocVariables } from '../../../../../../domain/types/section.types';
-import { UserEntity } from './../../../../../users/entities/user.entity';
+import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
 import { TableBodyElements } from './elements/body';
 import { SignaturesConverter } from './signatures.converter';
+import { IDocVariables } from '../../../builders/pgr/types/IDocumentPGRSectionGroups';
+import { DocumentChildrenTypeEnum } from '@/@v2/documents/domain/enums/document-children-type.enum';
+import { arrayChunks } from '@/@v2/shared/utils/helpers/array-chunks';
 
 export const signaturesIterable = (
-  signatureEntity: (ProfessionalEntity | UserEntity)[],
-  workspace: WorkspaceEntity,
+  signatureEntity: ProfessionalSignatureModel[],
+  workspace: WorkspaceModel,
   convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[],
 ) => {
   if (!signatureEntity?.length) return [];
@@ -38,7 +37,7 @@ export const signaturesIterable = (
     return convertToDocx(
       [
         ...credentials.map<ISectionChildrenType>((credential) => ({
-          type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
+          type: DocumentChildrenTypeEnum.PARAGRAPH,
           text: credential,
           align: AlignmentType.CENTER,
           spacing: { after: 0, before: 0 },
@@ -100,6 +99,8 @@ export const signaturesIterable = (
         marginParagraph,
       ];
     }
+
+    return []
   };
 
   const table = new Table({

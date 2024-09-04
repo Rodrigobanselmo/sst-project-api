@@ -1,6 +1,6 @@
 import clone from 'clone';
 import { VerticalAlign } from 'docx';
-import { palette } from '../../../../../../../../shared/constants/palette';
+import { palette } from '../../../../../constants/palette';
 import { removeDuplicate } from '../../../../../../../../shared/utils/removeDuplicate';
 import { sortNumber } from '../../../../../../../../shared/utils/sorts/number.sort';
 import { IExamOriginData, IExamOrigins } from '../../../../../../../sst/entities/exam.entity';
@@ -140,15 +140,15 @@ export const examsByHierarchyConverter = ({
       .sort((b, a) =>
         sortNumber(
           (a.origin.isAdmission ? 1 : 0) +
-            (a.origin.isPeriodic ? 4 : 0) +
-            (a.origin.isDismissal ? 7 : 0) +
-            (a.origin.isChange ? 10 : 0) +
-            (a.origin.isReturn ? 50 : 0),
+          (a.origin.isPeriodic ? 4 : 0) +
+          (a.origin.isDismissal ? 7 : 0) +
+          (a.origin.isChange ? 10 : 0) +
+          (a.origin.isReturn ? 50 : 0),
           (b.origin.isAdmission ? 1 : 0) +
-            (b.origin.isPeriodic ? 4 : 0) +
-            (b.origin.isDismissal ? 7 : 0) +
-            (b.origin.isChange ? 10 : 0) +
-            (b.origin.isReturn ? 50 : 0),
+          (b.origin.isPeriodic ? 4 : 0) +
+          (b.origin.isDismissal ? 7 : 0) +
+          (b.origin.isChange ? 10 : 0) +
+          (b.origin.isReturn ? 50 : 0),
         ),
       )
       .sort((a, b) => sortNumber(a.origin.validityInMonths || 0, b.origin.validityInMonths || 0));
@@ -171,8 +171,8 @@ export const examsByHierarchyConverter = ({
         const text = isAll
           ? 'não vinculado a risco específico'
           : removeDuplicate(risks.map((risk) => (getIsAll(risk?.id, risk?.name) ? '' : risk?.name)).filter(Boolean), {
-              simpleCompare: true,
-            }).join('\n');
+            simpleCompare: true,
+          }).join('\n');
 
         cells[ExamByHierarchyColumnEnum.RISKS] = {
           text,

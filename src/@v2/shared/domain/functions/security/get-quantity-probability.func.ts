@@ -6,6 +6,7 @@ import { RiskDataQuantityVibrationFBVO } from "../../values-object/security/risk
 import { RiskDataQuantityVibrationLVO } from "../../values-object/security/risk-data-quantity-vibration-l.vo"
 
 interface IValuesCheckParams {
+  probability: number | null
   quantityNoise: RiskDataQuantityNoiseVO | null
   quantityHeat: RiskDataQuantityHeatVO | null
   quantityRadiation: RiskDataQuantityRadiationVO | null
@@ -14,7 +15,7 @@ interface IValuesCheckParams {
   quantityVibrationL: RiskDataQuantityVibrationLVO | null
 }
 
-export function getQuantityProbability({ quantityHeat, quantityNoise, quantityQui, quantityRadiation, quantityVibrationFB, quantityVibrationL }: IValuesCheckParams) {
+export function getQuantityProbability({ probability, quantityHeat, quantityNoise, quantityQui, quantityRadiation, quantityVibrationFB, quantityVibrationL }: IValuesCheckParams) {
   return Math.max(
     quantityNoise?.probability || 0,
     quantityHeat?.probability || 0,
@@ -22,5 +23,5 @@ export function getQuantityProbability({ quantityHeat, quantityNoise, quantityQu
     quantityQui?.probability || 0,
     quantityVibrationFB?.probability || 0,
     quantityVibrationL?.probability || 0
-  )
+  ) || probability || 0
 }

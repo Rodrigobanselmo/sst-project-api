@@ -23,7 +23,7 @@ export abstract class DocumentCreationService {
     try {
       if (isLocal) console.log(1, 'start');
       const data = await product.getData(body);
-      const version = product.getVersionName(data, body);
+      const version = product.getVersionName(data, body); //! remove version
       const attachmentsData = await product.getAttachments({ data, body, version });
       const attachments = await this.saveAttachments<T>(attachmentsData, product, body);
       if (isLocal) console.log(2, 'attachments');

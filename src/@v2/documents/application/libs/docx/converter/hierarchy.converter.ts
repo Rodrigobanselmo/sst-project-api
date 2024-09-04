@@ -1,16 +1,34 @@
-import { EmployeeEntity } from './../../../company/entities/employee.entity';
-import { HierarchyEnum, HomoTypeEnum } from '@prisma/client';
+import { EmployeeModel } from "@/@v2/documents/domain/models/employee.model";
+import { HierarchyGroupModel } from "@/@v2/documents/domain/models/hierarchy-groups.model";
+import { IHierarchyModel } from "@/@v2/documents/domain/models/hierarchy.model";
+import { HomogeneousGroupModel } from "@/@v2/documents/domain/models/homogeneous-group.model";
+import { WorkspaceModel } from "@/@v2/documents/domain/models/workspace.model";
+import { HierarchyTypeEnum } from "@/@v2/shared/domain/enum/company/hierarchy-type.enum";
+import { removeDuplicate } from "@/shared/utils/removeDuplicate";
+import { HierarchyEnum } from "@prisma/client";
+import { hierarchyMap } from "../components/tables/appr/parts/first/first.constant";
+import { RiskDataModel } from "@/@v2/documents/domain/models/risk-data.model";
+import { DocumentVersionModel } from "@/@v2/documents/domain/models/document-version.model";
+import { CompanyModel } from "@/@v2/documents/domain/models/company.model";
+import { IDocumentsRequirementKeys } from "@/@v2/shared/domain/types/document/document-types.type";
 
-import { HomoGroupEntity } from '../../../../modules/company/entities/homoGroup.entity';
-import { removeDuplicate } from '../../../../shared/utils/removeDuplicate';
-import { HierarchyEntity } from '../../../company/entities/hierarchy.entity';
-import { hierarchyMap } from '../components/tables/appr/parts/first/first.constant';
-import { CharacterizationEntity } from './../../../company/entities/characterization.entity';
+
+export type IHierarchyDataConverter = IHierarchyModel & {
+  homogeneousGroups: HomogeneousGroupModel[];
+  hierarchyOnHomogeneous: HierarchyGroupModel & {
+    homogeneousGroup: HomogeneousGroupModel
+  }
+}
+export type IGHODataConverter = { gho: HomogeneousGroupModel; employeeCount: number; hierarchies: IHierarchyDataConverter[] }
+
+export type IRiskGroupDataConverter = { riskData: RiskDataModel; homogeneousGroup: IGHODataConverter }
+export type IDocumentRiskGroupDataConverter = { riskGroupData: IRiskGroupDataConverter[]; documentVersion: DocumentVersionModel }
+
 
 export interface HierarchyMapData {
   org: {
     type: string;
-    typeEnum: HierarchyEnum;
+    typeEnum: HierarchyTypeEnum;
     name: string;
     id: string;
     homogeneousGroupIds: string[];
@@ -29,15 +47,15 @@ export type IHierarchyData = Map<string, HierarchyMapData>;
 
 export type IHierarchyMap = Record<
   string,
-  HierarchyEntity & {
+  IHierarchyDataConverter & {
     children: string[];
   }
 >;
 
-export type IHomoGroupMap = Record<string, HomoGroupEntity>;
+export type IHomoGroupMap = Record<string, IGHODataConverter>;
 export type IRiskMap = Record<string, { name: string }>;
 
-const setMapHierarchies = (hierarchyData: HierarchyEntity[]) => {
+const setMapHierarchies = (hierarchyData: IHierarchyDataConverter[]) => {
   const hierarchyTree = {} as IHierarchyMap;
   const homoGroupTree = {} as IHomoGroupMap;
 
@@ -62,23 +80,27 @@ const setMapHierarchies = (hierarchyData: HierarchyEntity[]) => {
     hierarchy.homogeneousGroups.forEach((homogeneousGroup) => {
       if (!homoGroupTree[homogeneousGroup.id])
         homoGroupTree[homogeneousGroup.id] = {
+          employeeCount: 0,
           hierarchies: [],
         } as any;
 
       homoGroupTree[homogeneousGroup.id] = {
-        ...homogeneousGroup,
+        gho: homogeneousGroup,
+        employeeCount: 0,
         hierarchies: [...homoGroupTree[homogeneousGroup.id].hierarchies, hierarchy],
       };
     });
   });
 
   Object.values(homoGroupTree).forEach((homoGroup) => {
-    const employees: EmployeeEntity[] = [];
-    homoGroupTree[homoGroup.id].hierarchies.forEach((h) => {
+    const employees: EmployeeModel[] = [];
+    homoGroupTree[homoGroup.gho.id].hierarchies.forEach((h) => {
       employees.push(...h.employees);
     });
 
-    homoGroupTree[homoGroup.id].employeeCount = removeDuplicate(employees, {
+    homoGroup.gho.isCharacterization
+
+    homoGroupTree[homoGroup.gho.id].employeeCount = removeDuplicate(employees, {
       removeById: 'id',
     }).length;
   });
@@ -87,9 +109,11 @@ const setMapHierarchies = (hierarchyData: HierarchyEntity[]) => {
 };
 
 export const hierarchyConverter = (
-  hierarchies: HierarchyEntity[],
-  environments = [] as CharacterizationEntity[],
-  { workspaceId }: { workspaceId?: string } = {},
+  hierarchies: IHierarchyDataConverter[],
+  homoGroup = [] as HomogeneousGroupModel[],
+  workspace: WorkspaceModel,
+  company: CompanyModel,
+  documentType: IDocumentsRequirementKeys,
 ) => {
   const { hierarchyTree, homoGroupTree } = setMapHierarchies(hierarchies);
   const hierarchyData = new Map<string, HierarchyMapData>();
@@ -98,7 +122,7 @@ export const hierarchyConverter = (
   hierarchies.forEach((hierarchy) => {
     const hierarchyArrayData: HierarchyMapData['org'] = [];
     const hierarchyInfo = hierarchyMap[hierarchy.type];
-    const allHomogeneousGroupIds = [];
+    const allHomogeneousGroupIds = [] as string[];
 
     const loop = (parentId: string) => {
       if (!parentId) return;
@@ -117,15 +141,15 @@ export const hierarchyConverter = (
         environments:
           parent?.homogeneousGroups
             ?.map((group) => {
-              if (group.type != HomoTypeEnum.ENVIRONMENT) return;
-              return (environments.find((e) => e.id === group.id) || {})?.name || '';
+              if (!group.isEnviroment) return;
+              return (homoGroup.find((e) => e.id === group.id) || {})?.name || '';
             })
             .filter((e) => e)
             .join(', ') || '',
         homogeneousGroup:
           parent?.homogeneousGroups
             ?.map((group) => {
-              if (group.type) return false;
+              if (!group.isGHO) return false;
               return group.name;
             })
             .filter((e) => e)
@@ -146,15 +170,15 @@ export const hierarchyConverter = (
       environments:
         hierarchy?.homogeneousGroups
           ?.map((group) => {
-            if (group.type != HomoTypeEnum.ENVIRONMENT) return;
-            return (environments.find((e) => e.id === group.id) || {})?.name || '';
+            if (!group.isEnviroment) return;
+            return (homoGroup.find((e) => e.id === group.id) || {})?.name || '';
           })
           .filter((e) => e)
           .join(', ') || '',
       homogeneousGroup:
         hierarchy?.homogeneousGroups
           ?.map((group) => {
-            if (group.type) return false;
+            if (!group.isGHO) return false;
             return group.name;
           })
           .filter((e) => e)
@@ -165,10 +189,6 @@ export const hierarchyConverter = (
     loop(hierarchy.parentId);
 
     const isOffice = ([HierarchyEnum.OFFICE, HierarchyEnum.SUB_OFFICE] as HierarchyEnum[]).includes(hierarchy.type);
-
-    const workspace = workspaceId
-      ? hierarchy.workspaces.find((workspace) => workspace.id === workspaceId) || hierarchy.workspaces[0]
-      : hierarchy.workspaces[0];
 
     if (isOffice)
       hierarchyData.set(hierarchy.id, {
@@ -196,10 +216,23 @@ export const hierarchyConverter = (
     });
   });
 
+  const riskGroupData: IRiskGroupDataConverter[] = [];
+
+  homoGroup.forEach((gho) => {
+    gho.risksData({ companyId: company.id, documentType }).forEach((riskData) => {
+      riskGroupData.push({
+        homogeneousGroup: homoGroupTree[gho.id],
+        riskData,
+      })
+    })
+  })
+
+
   return {
     hierarchyData,
     hierarchyHighLevelsData,
     homoGroupTree,
     hierarchyTree,
+    riskGroupData
   };
 };

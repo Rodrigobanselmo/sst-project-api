@@ -2,9 +2,9 @@ import { Paragraph, Table } from 'docx';
 
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
 import { ISectionChildrenType } from '../../../../../../domain/types/elements.types';
-import { DocumentSectionChildrenTypeEnum } from '@/@v2/documents/domain/types/DocumentSectionChildrenTypeEnum';
-import { IDocVariables } from '../../../../../../domain/types/section.types';
+import { IDocVariables } from '../../../builders/pgr/types/IDocumentPGRSectionGroups';
 import { complementarySystemsConverter } from './complementarySystems.converter';
+import { DocumentChildrenTypeEnum as DocumentSectionChildrenTypeEnum } from '@/@v2/documents/domain/enums/document-children-type.enum';
 
 export const complementarySystemsIterable = (
   complementarySystems: string[],

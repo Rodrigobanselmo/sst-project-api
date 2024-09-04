@@ -1,9 +1,7 @@
-import { Footer, Header, PageOrientation, Table, WidthType } from 'docx';
+import { Footer, Header, PageOrientation } from 'docx';
 
 import { IHierarchyData, IHomoGroupMap } from '../../../converter/hierarchy.converter';
-import { TableBodyElements } from './elements/body';
-import { TableHeaderElements } from './elements/header';
-import { ConverterProps, hierarchyPlanConverter } from './hierarchyHomoOrg.converter';
+import { ConverterProps } from './hierarchyHomoOrg.converter';
 import { hierarchyHomoOrgTable } from './hierarchyHomoOrg.table';
 
 export const hierarchyHomoOrgSection = (

@@ -1,86 +1,80 @@
 import { HomoTypeEnum } from '@prisma/client';
 
-import { originRiskMap } from '../../../../../../../shared/constants/maps/origin-risk';
-import { palette } from '../../../../../../../shared/constants/palette';
-import { getMatrizRisk } from '../../../../../../../shared/utils/matriz';
-import { sortData } from '../../../../../../../shared/utils/sorts/data.sort';
-import { RiskFactorGroupDataEntity } from '../../../../../../sst/entities/riskGroupData.entity';
-import {
-  IRiskDataJson,
-  IRiskDataJsonRadiation,
-  QuantityTypeEnum,
-} from '../../../../../../company/interfaces/risk-data-json.types';
+import { originRiskMap } from '../../../../constants/origin-risk';
+import { palette } from '../../../../constants/palette';
+
 import { borderStyleGlobal } from '../../../../base/config/styles';
-import { IHierarchyMap } from '../../../../converter/hierarchy.converter';
+import { IDocumentRiskGroupDataConverter, IHierarchyMap } from '../../../../converter/hierarchy.converter';
 import { bodyTableProps } from './elements/body';
 import { QuantityRadColumnEnum } from './quantityRad.constant';
 import sortArray from 'sort-array';
+import { sortData } from '@/@v2/shared/utils/sorts/data.sort';
+import { matrixRiskMap } from '../../../../constants/matriz-risk-map';
+import { getMatrizRisk } from '@/@v2/shared/domain/functions/security/get-matrix-risk.func';
 
-export const quantityRadConverter = (riskGroupData: RiskFactorGroupDataEntity, hierarchyTree: IHierarchyMap) => {
+export const quantityRadConverter = ({ riskGroupData }: IDocumentRiskGroupDataConverter, hierarchyTree: IHierarchyMap) => {
   const rows: bodyTableProps[][] = [];
 
-  riskGroupData.data
-    .filter((row) => {
-      if (!row.json || !row.isQuantity) return false;
-      const json = row.json as unknown as IRiskDataJson;
+  riskGroupData
+    .filter(({ riskData }) => {
+      if (!riskData.isQuantity) return false;
 
-      if (json.type !== QuantityTypeEnum.RADIATION) return false;
-      return Object.entries(json).some(([key, value]) => {
+      if (!riskData.quantityRadiation) return false;
+      return Object.entries(riskData.quantityRadiation).some(([key, value]) => {
         return key.includes('dose') && value;
       });
     })
-    .sort((a, b) => sortData(a.homogeneousGroup, b.homogeneousGroup, 'name'))
+    .sort((a, b) => sortData(a.homogeneousGroup.gho, b.homogeneousGroup.gho, 'name'))
     .map((riskData) => {
-      let origin: string;
+      let origin: string = '';
+      if (riskData.homogeneousGroup.gho.isEnviroment && riskData.homogeneousGroup.gho.characterization)
+        origin = `${riskData.homogeneousGroup.gho.characterization.name}\n(${originRiskMap[riskData.homogeneousGroup.gho.characterization.type].name})`;
 
-      if (riskData.homogeneousGroup.environment)
-        origin = `${riskData.homogeneousGroup.environment.name}\n(${originRiskMap[riskData.homogeneousGroup.environment.type].name})`;
+      if (riskData.homogeneousGroup.gho.isCharacterization && riskData.homogeneousGroup.gho.characterization)
+        origin = `${riskData.homogeneousGroup.gho.characterization.name}\n(${originRiskMap[riskData.homogeneousGroup.gho.characterization.type].name})`;
 
-      if (riskData.homogeneousGroup.characterization)
-        origin = `${riskData.homogeneousGroup.characterization.name}\n(${originRiskMap[riskData.homogeneousGroup.characterization.type].name})`;
+      if (!riskData.homogeneousGroup.gho.type) origin = `${riskData.homogeneousGroup.gho.name}\n(GSE)`;
 
-      if (!riskData.homogeneousGroup.type) origin = `${riskData.homogeneousGroup.name}\n(GSE)`;
-
-      if (riskData.homogeneousGroup.type == HomoTypeEnum.HIERARCHY) {
-        const hierarchy = hierarchyTree[riskData.homogeneousGroup.id];
+      if (riskData.homogeneousGroup.gho.isHierarchy) {
+        const hierarchy = hierarchyTree[riskData.homogeneousGroup.gho.id];
 
         if (hierarchy) origin = `${hierarchy.name}\n(${originRiskMap[hierarchy.type].name})`;
       }
 
-      const json = riskData.json as unknown as IRiskDataJsonRadiation;
+      const json = riskData.riskData.quantityRadiation;
       const array = [
         {
           bodyPart: 'Corpo Inteiro',
-          employee: json.doseFB,
-          prob: json.doseFBProb,
-          public: json.doseFBPublic,
-          publicProb: json.doseFBPublicProb,
+          employee: json?.doseFB,
+          prob: json?.doseFBProb,
+          public: json?.doseFBPublic,
+          publicProb: json?.doseFBPublicProb,
         },
         {
           bodyPart: 'Cristalino',
-          employee: json.doseEye,
-          prob: json.doseEyeProb,
-          public: json.doseEyePublic,
-          publicProb: json.doseEyePublicProb,
+          employee: json?.doseEye,
+          prob: json?.doseEyeProb,
+          public: json?.doseEyePublic,
+          publicProb: json?.doseEyePublicProb,
         },
         {
           bodyPart: 'Pele',
-          employee: json.doseSkin,
-          prob: json.doseSkinProb,
-          public: json.doseSkinPublic,
-          publicProb: json.doseSkinPublicProb,
+          employee: json?.doseSkin,
+          prob: json?.doseSkinProb,
+          public: json?.doseSkinPublic,
+          publicProb: json?.doseSkinPublicProb,
         },
         {
           bodyPart: 'Mãos e pés',
-          employee: json.doseHand,
-          prob: json.doseHandProb,
+          employee: json?.doseHand,
+          prob: json?.doseHandProb,
         },
       ];
       array.forEach((value) => {
         const cells: bodyTableProps[] = [];
         if (typeof value?.prob === 'number' || typeof value?.publicProb === 'number') {
-          const prob = getMatrizRisk(riskData.riskFactor.severity, value.prob);
-          const publicProb = getMatrizRisk(riskData.riskFactor.severity, value.publicProb);
+          const prob = matrixRiskMap[getMatrizRisk(riskData.riskData.risk.severity, value.prob)];
+          const publicProb = matrixRiskMap[getMatrizRisk(riskData.riskData.risk.severity, value.publicProb)];
 
           cells[QuantityRadColumnEnum.ORIGIN] = {
             text: origin || '',

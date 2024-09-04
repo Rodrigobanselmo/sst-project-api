@@ -1,69 +1,63 @@
-import { DocumentDataPGRDto } from './../../../../../../sst/dto/document-data-pgr.dto';
-import { DocumentDataEntity } from './../../../../../../sst/entities/documentData.entity';
-import { HomoTypeEnum } from '@prisma/client';
-
-import { palette } from '../../../../../../../shared/constants/palette';
-import { sortData } from '../../../../../../../shared/utils/sorts/data.sort';
-import { originRiskMap } from './../../../../../../../shared/constants/maps/origin-risk';
-import { getMatrizRisk } from './../../../../../../../shared/utils/matriz';
-import { RiskFactorGroupDataEntity } from '../../../../../../sst/entities/riskGroupData.entity';
-import { borderStyleGlobal } from './../../../../base/config/styles';
-import {
-  IRiskDataJson,
-  IRiskDataJsonNoise,
-  QuantityTypeEnum,
-} from './../../../../../../company/interfaces/risk-data-json.types';
-import { IHierarchyMap } from './../../../../converter/hierarchy.converter';
-import { bodyTableProps } from './elements/body';
-import { QuantityNoiseColumnEnum } from './quantityNoise.constant';
 import sortArray from 'sort-array';
 
+import { palette } from '../../../../constants/palette';
+import { borderStyleGlobal } from './../../../../base/config/styles';
+
+import { DocumentVersionModel } from '@/@v2/documents/domain/models/document-version.model';
+import { getMatrizRisk } from '@/@v2/shared/domain/functions/security/get-matrix-risk.func';
+import { sortData } from '@/@v2/shared/utils/sorts/data.sort';
+import { matrixRiskMap } from '@/modules/documents/constants/matrizRisk.constant';
+import { originRiskMap } from '../../../../constants/origin-risk';
+import { IHierarchyMap, IRiskGroupDataConverter } from './../../../../converter/hierarchy.converter';
+import { bodyTableProps } from './elements/body';
+import { QuantityNoiseColumnEnum } from './quantityNoise.constant';
+
 export const quantityNoiseConverter = (
-  riskGroupData: RiskFactorGroupDataEntity & DocumentDataEntity & DocumentDataPGRDto,
+  riskGroupData: IRiskGroupDataConverter[],
+  documentVersion: DocumentVersionModel,
   hierarchyTree: IHierarchyMap,
 ) => {
   const rows: bodyTableProps[][] = [];
 
-  riskGroupData.data
-    .filter((row) => {
-      if (!row.json || !row.isQuantity) return false;
-      const json = row.json as unknown as IRiskDataJson;
+  riskGroupData
+    .filter(({ riskData }) => {
+      if (!riskData.isQuantity) return false;
 
-      if (json.type !== QuantityTypeEnum.NOISE) return false;
-      if (!riskGroupData.isQ5) {
-        return !!json.ltcatq3;
+      if (!riskData.quantityNoise) return false;
+      if (!documentVersion.documentBase.data.isQ5) {
+        return !!riskData.quantityNoise.ltcatq3;
       }
 
-      if (riskGroupData.isQ5) {
-        return !!json.ltcatq5 || !!json.nr15q5;
+      if (documentVersion.documentBase.data.isQ5) {
+        return !!riskData.quantityNoise.ltcatq5 || !!riskData.quantityNoise.nr15q5;
       }
     })
-    .sort((a, b) => sortData(a.homogeneousGroup, b.homogeneousGroup, 'name'))
+    .sort((a, b) => sortData(a.homogeneousGroup.gho, b.homogeneousGroup.gho, 'name'))
     .map((riskData) => {
       const cells: bodyTableProps[] = [];
 
-      const json = riskData.json as unknown as IRiskDataJsonNoise;
+      const json = riskData.riskData
 
-      let origin: string;
-      if (riskData.homogeneousGroup.environment)
-        origin = `${riskData.homogeneousGroup.environment.name}\n(${originRiskMap[riskData.homogeneousGroup.environment.type].name})`;
+      let origin: string = '';
+      if (riskData.homogeneousGroup.gho.isEnviroment && riskData.homogeneousGroup.gho.characterization)
+        origin = `${riskData.homogeneousGroup.gho.characterization.name}\n(${originRiskMap[riskData.homogeneousGroup.gho.characterization.type].name})`;
 
-      if (riskData.homogeneousGroup.characterization)
-        origin = `${riskData.homogeneousGroup.characterization.name}\n(${originRiskMap[riskData.homogeneousGroup.characterization.type].name})`;
+      if (riskData.homogeneousGroup.gho.isCharacterization && riskData.homogeneousGroup.gho.characterization)
+        origin = `${riskData.homogeneousGroup.gho.characterization.name}\n(${originRiskMap[riskData.homogeneousGroup.gho.characterization.type].name})`;
 
-      if (!riskData.homogeneousGroup.type) origin = `${riskData.homogeneousGroup.name}\n(GSE)`;
+      if (!riskData.homogeneousGroup.gho.type) origin = `${riskData.homogeneousGroup.gho.name}\n(GSE)`;
 
-      if (riskData.homogeneousGroup.type == HomoTypeEnum.HIERARCHY) {
-        const hierarchy = hierarchyTree[riskData.homogeneousGroup.id];
+      if (riskData.homogeneousGroup.gho.isHierarchy) {
+        const hierarchy = hierarchyTree[riskData.homogeneousGroup.gho.id];
 
         if (hierarchy) origin = `${hierarchy.name}\n(${originRiskMap[hierarchy.type].name})`;
       }
 
-      const value = riskGroupData.isQ5
-        ? String(Math.max(Number(json?.ltcatq5 || 0), Number(json?.nr15q5 || 0)))
-        : json.ltcatq3;
+      const value = documentVersion.documentBase.data.isQ5
+        ? String(Math.max(Number(json.quantityNoise?.ltcatq5 || 0), Number(json.quantityNoise?.nr15q5 || 0)))
+        : json.quantityNoise?.ltcatq3;
 
-      const ro = getMatrizRisk(riskData.riskFactor.severity, riskData.probability);
+      const ro = matrixRiskMap[getMatrizRisk(riskData.riskData.risk.severity, riskData.riskData.probability)];
 
       cells[QuantityNoiseColumnEnum.ORIGIN] = {
         text: origin || '',

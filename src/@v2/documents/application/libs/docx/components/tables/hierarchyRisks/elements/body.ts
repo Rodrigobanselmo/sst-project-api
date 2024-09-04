@@ -8,7 +8,7 @@ import {
   VerticalAlign,
   WidthType,
 } from 'docx';
-import { palette } from '../../../../../../../shared/constants/palette';
+import { palette } from '../../../../constants/palette';
 
 export interface bodyTableProps extends Partial<ITableCellOptions> {
   text?: string;

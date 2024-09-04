@@ -1,27 +1,24 @@
-import { WorkspaceEntity } from './../../../../../company/entities/workspace.entity';
-import { CompanyModel } from './../../../../../company/entities/company.entity';
-import { UserEntity } from './../../../../../users/entities/user.entity';
-import { ProfessionalEntity } from '../../../../../users/entities/professional.entity';
 
-import { ISectionChildrenType } from '../../../../../../domain/types/elements.types';
-import { DocumentSectionChildrenTypeEnum } from '@/@v2/documents/domain/types/DocumentSectionChildrenTypeEnum';
-import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
-import { ProfessionalsConverter } from './professionals.converter';
-import { IDocVariables } from '../../../../../../domain/types/section.types';
+
+import { DocumentChildrenTypeEnum } from '@/@v2/documents/domain/enums/document-children-type.enum';
+import { ProfessionalSignatureModel } from '@/@v2/documents/domain/models/professional-signature.model';
 import { AlignmentType, Paragraph, Table } from 'docx';
+import { ISectionChildrenType } from '../../../../../../domain/types/elements.types';
+import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
+import { IDocVariables } from '../../../builders/pgr/types/IDocumentPGRSectionGroups';
+import { ProfessionalsConverter } from './professionals.converter';
 
 export const professionalsIterable = (
-  professionalEntity: ProfessionalEntity[],
-  workspace: WorkspaceEntity,
+  professionalEntity: ProfessionalSignatureModel[],
   convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[],
 ) => {
   if (!professionalEntity?.length) return [];
 
-  const professionalsVariablesArray = ProfessionalsConverter(professionalEntity, workspace);
+  const professionalsVariablesArray = ProfessionalsConverter(professionalEntity);
 
   const baseSection: ISectionChildrenType[] = [
     {
-      type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
+      type: DocumentChildrenTypeEnum.PARAGRAPH,
       text: '**Profissionais:**',
     },
   ];
@@ -42,11 +39,11 @@ export const professionalsIterable = (
       return convertToDocx(
         [
           {
-            type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
+            type: DocumentChildrenTypeEnum.PARAGRAPH,
             text: `**??${VariablesPGREnum.PROFESSIONAL_NAME}??**`,
           },
           {
-            type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
+            type: DocumentChildrenTypeEnum.PARAGRAPH,
             text,
             align: AlignmentType.START,
           },

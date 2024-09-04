@@ -1,4 +1,4 @@
-import { Footer, Header, PageOrientation, Table, WidthType } from 'docx';
+import { Table, WidthType } from 'docx';
 
 import { IHierarchyData, IHomoGroupMap } from '../../../converter/hierarchy.converter';
 import { TableBodyElements } from './elements/body';

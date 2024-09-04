@@ -10,7 +10,7 @@ import {
   VerticalAlign,
   WidthType,
 } from 'docx';
-import { palette } from '../../../../../../../shared/constants/palette';
+import { palette } from '../../../../constants/palette';
 
 type NotReadOnly<T> = {
   -readonly [K in keyof T]: T[K];

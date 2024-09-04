@@ -1,10 +1,15 @@
+import { HomoTypeEnum } from '@prisma/client';
 
 import { IHierarchyData, IHomoGroupMap } from '../../../converter/hierarchy.converter';
 import { bodyTableProps, emptyCellName } from './elements/body';
 import { headerTableProps } from './elements/header';
 import { HierarchyPlanColumnEnum, HierarchyPlanMap } from './hierarchyHomoOrg.constant';
 import { borderStyleGlobal } from '../../../base/config/styles';
-import { HierarchyOrganogramModel } from '@/@v2/documents/domain/models/hierarchy-organogram.model';
+import { hierarchyList } from '@/@v2/documents/domain/constants/hierarchy-type-order.constant';
+import { sortNumber } from '@/@v2/shared/utils/sorts/number.sort';
+import { sortString } from '@/@v2/shared/utils/sorts/string.sort';
+import { originRiskMap } from '../../../constants/origin-risk';
+import { palette } from '../../../constants/palette';
 
 export type ConverterProps = {
   showHomogeneous?: boolean;
@@ -35,7 +40,8 @@ export type IHierarchyPlan<T> = Record<string, IHierarchyDataRecord<T>>;
 const hierarchyEmptyId = '0';
 
 export const hierarchyPlanConverter = (
-  data: HierarchyOrganogramModel,
+  hierarchyData: IHierarchyData,
+  homoGroupTree: IHomoGroupMap,
   { showDescription, showHomogeneous, showHomogeneousDescription, type, groupIdFilter }: ConverterProps = {
     showHomogeneous: false,
     showHomogeneousDescription: false,
@@ -49,15 +55,15 @@ export const hierarchyPlanConverter = (
   const hierarchyColumns = {} as Record<string, number>;
 
   (function mapAllHierarchyPlan() {
-    data.organogramMapArray.forEach((data) => {
-      const highParent = data.organogram[0];
+    hierarchyData.forEach((hierarchiesData) => {
+      const highParent = hierarchiesData.org[0];
 
       const org = [...hierarchyList, 'EMPLOYEE'].map((orgType) => {
-        const organogramData = data.organogram.find((org) => org.hierarchy.type === orgType);
+        const hierarchyData = hierarchiesData.org.find((org) => org.typeEnum === orgType);
 
-        if (data.hierarchy.description) hasAtLeastOneDescription = true;
+        if (hierarchiesData.descRh) hasAtLeastOneDescription = true;
 
-        if (!organogramData) {
+        if (!hierarchyData) {
           return {
             type: orgType,
             typeEnum: orgType,
@@ -65,23 +71,23 @@ export const hierarchyPlanConverter = (
             id: hierarchyEmptyId,
             homogeneousGroupIds: [],
             homogeneousGroup: '',
-            employeesLength: data.hierarchy.employees.length,
-            subEmployeesLength: data.hierarchy.subOfficeEmployees.length,
-            description: data.hierarchy.description,
+            employeesLength: hierarchiesData.employeesLength,
+            subEmployeesLength: hierarchiesData?.subEmployeesLength,
+            description: hierarchiesData.descRh,
           };
         }
 
         return {
-          ...organogramData,
-          ...(showHomogeneous ? {} : { homogeneousGroupIds: [highParent.hierarchy.id] }),
-          employeesLength: data.hierarchy.employees.length,
-          subEmployeesLength: data.hierarchy.subOfficeEmployees.length,
-          description: data.hierarchy.description,
+          ...hierarchyData,
+          ...(showHomogeneous ? {} : { homogeneousGroupIds: [highParent.id] }),
+          employeesLength: hierarchiesData.employeesLength,
+          subEmployeesLength: hierarchiesData?.subEmployeesLength,
+          description: hierarchiesData.descRh,
         };
       });
 
-      data.organogram.forEach((organogramData) => {
-        (showHomogeneous ? organogramData.homogeneousGroups.map(h => h.id) : [highParent.hierarchy.id]).forEach((homogeneousGroupId) => {
+      hierarchiesData.org.forEach((hierarchyData) => {
+        (showHomogeneous ? hierarchyData.homogeneousGroupIds : [highParent.id]).forEach((homogeneousGroupId) => {
           if (!allHierarchyPlan[homogeneousGroupId]) allHierarchyPlan[homogeneousGroupId] = {};
 
           const loop = (allHierarchyPlanLoop: IHierarchyPlan<any>, index: number) => {
@@ -156,22 +162,22 @@ export const hierarchyPlanConverter = (
       )
       .forEach(([homogeneousGroupId, firstHierarchyPlan]) => {
         const homo = homoGroupTree[homogeneousGroupId];
-        let name = homo ? homo.name : '';
+        let name = homo ? homo.gho.name : '';
 
         if (showHomogeneous) {
           if (!homo) return;
-          if (!type && homo && homo.type) return;
-          if (type && !Array.isArray(type) && homo.type !== type) return;
-          if (type && Array.isArray(type) && !type.includes(homo.type)) return;
+          if (!type && homo && homo.gho.type) return;
+          if (type && !Array.isArray(type) && homo.gho.type !== type) return;
+          if (type && Array.isArray(type) && !type.includes(homo.gho.type)) return;
 
-          if (groupIdFilter && homo.id != groupIdFilter) return;
+          if (groupIdFilter && homo.gho.id != groupIdFilter) return;
 
-          if (homo.environment) {
-            name = `${homo.environment.name}\n(${originRiskMap[homo.environment.type].name})`;
+          if (homo.gho.isEnviroment && homo.gho.characterization) {
+            name = `${homo.gho.characterization.name}\n(${originRiskMap[homo.gho.characterization.type].name})`;
           }
 
-          if (homo.characterization)
-            name = `${homo.characterization.name}\n(${originRiskMap[homo.characterization.type].name})`;
+          if (homo.gho.isCharacterization && homo.gho.characterization)
+            name = `${homo.gho.characterization.name}\n(${originRiskMap[homo.gho.characterization.type].name})`;
         }
 
         const row = generateRow();
@@ -183,7 +189,7 @@ export const hierarchyPlanConverter = (
           };
           if (showHomogeneousDescription)
             row[1] = {
-              text: homo.description || ' ',
+              text: homo.gho.description || ' ',
               borders: borderStyleGlobal(palette.common.white.string),
             };
         }

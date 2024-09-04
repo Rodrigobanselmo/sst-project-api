@@ -1,7 +1,7 @@
 import { TextDirection } from 'docx';
-import { palette } from '../../../../../../shared/constants/palette';
 import { borderStyleGlobal } from '../../../base/config/styles';
 import { headerTableProps } from './elements/header';
+import { palette } from '../../../constants/palette';
 
 export enum RiskCharacterizationColumnEnum {
   AGENT,

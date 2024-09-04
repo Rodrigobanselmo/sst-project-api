@@ -29,7 +29,7 @@ export class FetchESocialBatchEventsService {
     private readonly eSocialEventRepository: ESocialEventRepository,
     private readonly updateESocialReportService: UpdateESocialReportService,
     private prisma: PrismaService,
-  ) {}
+  ) { }
 
   async execute() {
     let isInProgress = false;
@@ -115,18 +115,18 @@ export class FetchESocialBatchEventsService {
                         }),
                         ...(rejectedEvent &&
                           found.pppId && {
-                            ppp: {
-                              update: {
-                                sendEvent: true,
-                                status: 'INVALID',
-                                json: '',
-                              },
+                          ppp: {
+                            update: {
+                              sendEvent: true,
+                              status: 'INVALID',
+                              json: '',
                             },
-                          }),
+                          },
+                        }),
                         ...(!rejectedEvent &&
                           found.pppId && {
-                            ppp: { update: { status: 'DONE' } },
-                          }),
+                          ppp: { update: { status: 'DONE' } },
+                        }),
                         ...(found.catId && {
                           cat: { update: { sendEvent: rejectedEvent } },
                         }),

@@ -1,15 +1,22 @@
 import { HomoTypeEnum } from "@/@v2/shared/domain/enum/security/homo-type.enum";
-import { RiskDataModel } from "./risk-data.model";
-import { ICharacterizationModel } from "./characterization.model";
 import { getCharacterizationType } from "@/@v2/shared/domain/functions/security/get-characterization-type.func";
 import { getIsHomogeneousGroupGHO } from "@/@v2/shared/domain/functions/security/get-is-homogeneous-group-gho.func";
 import { getIsHomogeneousGroupHierarchy } from "@/@v2/shared/domain/functions/security/get-is-homogeneous-group-hierarchy.func";
+import { getRiskDocumentsRequirements } from "@/@v2/shared/domain/values-object/delete/get-risk-document-requirements.func copy";
+import { ICharacterizationModel } from "./characterization.model";
+import { HierarchyGroupModel } from "./hierarchy-groups.model";
+import { RiskDataModel } from "./risk-data.model";
+import { IDocumentsRequirementKeys } from "@/@v2/shared/domain/types/document/document-types.type";
 
 export type IHomogeneousGroupModel = {
   id: string
   name: string
+  description: string
   type: HomoTypeEnum;
+  companyId: string
+  documentType: IDocumentsRequirementKeys
 
+  hierarchies: HierarchyGroupModel[]
   characterization: ICharacterizationModel | null
   risksData: RiskDataModel[]
 }
@@ -17,17 +24,27 @@ export type IHomogeneousGroupModel = {
 export class HomogeneousGroupModel {
   id: string
   name: string
+  description: string
   type: HomoTypeEnum;
 
+  hierarchies: HierarchyGroupModel[]
   characterization: ICharacterizationModel | null
   risksData: RiskDataModel[]
 
   constructor(params: IHomogeneousGroupModel) {
     this.id = params.id
     this.name = params.name
+    this.description = params.description
     this.type = params.type;
-    this.risksData = params.risksData
+
+    this.hierarchies = params.hierarchies
     this.characterization = params.characterization
+
+    this.risksData = this.filterRisksData({
+      companyId: params.companyId,
+      documentType: params.documentType,
+      risksData: params.risksData
+    })
   }
 
   get isEnviroment() {
@@ -46,6 +63,13 @@ export class HomogeneousGroupModel {
 
   get isGHO() {
     return getIsHomogeneousGroupGHO(this)
+  }
+
+  private filterRisksData({ companyId, documentType, risksData }: { companyId: string, documentType: IDocumentsRequirementKeys; risksData: RiskDataModel[] }) {
+    return risksData.filter(riskData => {
+      const requirement = getRiskDocumentsRequirements({ companyId, requirements: riskData.risk.documentsRequirements })
+      return requirement.checkIfExistAny({ documentType })
+    })
   }
 
 }

@@ -3,12 +3,12 @@ import { Paragraph, Table } from 'docx';
 import {
   ISectionChildrenType,
 } from '../../../../../../../../../domain/types/elements.types';
-import { DocumentSectionChildrenTypeEnum } from '@/@v2/documents/domain/types/DocumentSectionChildrenTypeEnum';
-import { IDocVariables } from '../../../../../../../../../domain/types/section.types';
+import { DocumentChildrenTypeEnum as DocumentSectionChildrenTypeEnum } from '@/@v2/documents/domain/enums/document-children-type.enum';
 import { healthSeverityAciTable } from '../tables/healthSeverityATable';
 import { healthSeverityBioTable } from '../tables/healthSeverityBTable';
 import { healthSeverityErgTable } from '../tables/healthSeverityETable';
 import { healthSeverityFisQuiTable } from '../tables/healthSeverityFQTable';
+import { IDocVariables } from '@/@v2/documents/application/libs/docx/builders/pgr/types/IDocumentPGRSectionGroups';
 
 export const healthEffectTable = (
   convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[],

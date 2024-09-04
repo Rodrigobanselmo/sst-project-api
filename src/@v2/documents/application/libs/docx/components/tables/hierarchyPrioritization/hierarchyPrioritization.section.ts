@@ -1,13 +1,12 @@
 import { HierarchyEnum } from '@prisma/client';
 import { PageOrientation } from 'docx';
 
-import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
-import { IHierarchyData, IHierarchyMap } from '../../../converter/hierarchy.converter';
+import { IHierarchyData, IHierarchyMap, IRiskGroupDataConverter } from '../../../converter/hierarchy.converter';
 import { IHierarchyPrioritizationOptions } from './hierarchyPrioritization.converter';
 import { hierarchyPrioritizationTables } from './hierarchyPrioritization.tables';
 
 export const hierarchyPrioritizationTableSections = (
-  riskFactorGroupData: RiskFactorGroupDataEntity,
+  riskFactorGroupData: IRiskGroupDataConverter[],
   hierarchiesEntity: IHierarchyData,
   hierarchyTree: IHierarchyMap,
   options: IHierarchyPrioritizationOptions = {

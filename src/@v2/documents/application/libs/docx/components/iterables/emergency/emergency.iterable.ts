@@ -1,21 +1,19 @@
 import { Paragraph, Table } from 'docx';
 
+import { DocumentChildrenTypeEnum as DocumentSectionChildrenTypeEnum } from '@/@v2/documents/domain/enums/document-children-type.enum';
 import { ISectionChildrenType } from '../../../../../../domain/types/elements.types';
-import { DocumentSectionChildrenTypeEnum } from '@/@v2/documents/domain/types/DocumentSectionChildrenTypeEnum';
-import { IDocVariables } from '../../../../../../domain/types/section.types';
-import { RiskFactorDataEntity } from '../../../../../sst/entities/riskData.entity';
+import { IDocVariables } from '../../../builders/pgr/types/IDocumentPGRSectionGroups';
+import { IRiskGroupDataConverter } from '../../../converter/hierarchy.converter';
 import { emergencyConverter } from './emergency.converter';
-import { removeDuplicate } from '../../../../../../shared/utils/removeDuplicate';
+import { removeDuplicate } from '@/@v2/shared/utils/helpers/remove-duplicate';
 
 export const emergencyIterable = (
-  riskData: Partial<RiskFactorDataEntity>[],
+  riskData: IRiskGroupDataConverter[],
   convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[],
 ) => {
   const emergencyVarArray = emergencyConverter(riskData);
 
-  const iterableSections = removeDuplicate(emergencyVarArray, {
-    simpleCompare: true,
-  })
+  const iterableSections = removeDuplicate(emergencyVarArray)
     .map((risk) => {
       if (!risk) return;
 
@@ -29,8 +27,9 @@ export const emergencyIterable = (
     })
     .filter((i) => i)
     .reduce((acc, curr) => {
-      return [...acc, ...curr];
+      return [...(acc || []), ...(curr || [])];
     }, []);
 
-  return iterableSections;
+  if (iterableSections) return iterableSections;
+  return []
 };

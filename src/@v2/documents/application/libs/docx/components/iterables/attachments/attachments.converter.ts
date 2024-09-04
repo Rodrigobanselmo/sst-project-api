@@ -1,6 +1,6 @@
+import { AttachmentModel } from '@/@v2/documents/domain/models/attachment.model';
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
-import { IDocVariables } from '../../../../../../domain/types/section.types';
-import { AttachmentModel } from '../../../../../sst/entities/attachment.entity';
+import { IDocVariables } from '../../../builders/pgr/types/IDocumentPGRSectionGroups';
 
 export const attachmentsConverter = (attachments: AttachmentModel[]): IDocVariables[] => {
   const attachmentsData: IDocVariables[] = [];

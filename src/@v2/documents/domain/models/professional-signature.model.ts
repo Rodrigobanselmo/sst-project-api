@@ -9,11 +9,11 @@ export type IProfessionalSignatureModel = {
 export class ProfessionalSignatureModel {
   isSigner: boolean;
   isElaborator: boolean;
-  professional: ProfessionalCouncilModel;
+  professionalCouncil: ProfessionalCouncilModel;
 
   constructor(params: IProfessionalSignatureModel) {
     this.isSigner = params.isSigner;
     this.isElaborator = params.isElaborator;
-    this.professional = params.professional;
+    this.professionalCouncil = params.professional;
   }
 }

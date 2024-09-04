@@ -4,17 +4,26 @@ import { DocumentVersionModel } from '@/@v2/documents/domain/models/document-ver
 import { HierarchyModel } from '@/@v2/documents/domain/models/hierarchy.model';
 import { HomogeneousGroupModel } from '@/@v2/documents/domain/models/homogeneous-group.model';
 import { VariablesPGREnum } from '../../enums/variables.enum';
+import { IDocumentsRequirementKeys } from '@/@v2/shared/domain/types/document/document-types.type';
 
-interface IDocumentBuildPGR {
+interface IBooleanVariables {
   documentVersion: DocumentVersionModel
   hierarchies: HierarchyModel[]
   homogeneousGroups: HomogeneousGroupModel[]
+  documentType: IDocumentsRequirementKeys
 }
 
-export const booleanVariables = (document: IDocumentBuildPGR) => {
-  const risksData = document.homogeneousGroups.flatMap((group) => group.risksData);
+export const booleanVariables = (document: IBooleanVariables) => {
+  const risksData = document.homogeneousGroups.flatMap((group) => group.risksData({
+    companyId: document.documentVersion.documentBase.company.id,
+    documentType: document.documentType,
+  }));
   const risksDataVariables = getRiskDataVariablesDomain(risksData);
-  const homogeneousGroupsVariables = getHomogeneuosVariablesDomain(document.homogeneousGroups);
+  const homogeneousGroupsVariables = getHomogeneuosVariablesDomain({
+    homogeneousGroups: document.homogeneousGroups,
+    companyId: document.documentVersion.documentBase.company.id,
+    documentType: document.documentType,
+  });
 
   return {
     [VariablesPGREnum.IS_Q5]: document.documentVersion.documentBase.data.isQ5 ? 'true' : '',

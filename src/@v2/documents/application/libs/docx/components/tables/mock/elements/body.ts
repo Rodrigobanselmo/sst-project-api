@@ -12,7 +12,7 @@ import {
 } from 'docx';
 import { isOdd } from '../../../../../../../shared/utils/isOdd';
 import { borderStyleGlobal } from '../../../../base/config/styles';
-import { palette } from '../../../../../../../shared/constants/palette';
+import { palette } from '../../../../constants/palette';
 
 export interface bodyTableProps extends Partial<ITableCellOptions> {
   text: string;

@@ -4,7 +4,7 @@ import { AlignmentType } from 'docx';
 import { RiskFactorGroupDataEntity } from '../../../../../../../sst/entities/riskGroupData.entity';
 import { riskMap } from '../../../../../../constants/risks.constant';
 import { getMatrizRisk } from '../../../../../../../../shared/utils/matriz';
-import { palette } from '../../../../../../../../shared/constants/palette';
+import { palette } from '../../../../../constants/palette';
 import { HierarchyMapData } from '../../../../../converter/hierarchy.converter';
 
 import { bodyTableProps, borderNoneStyle } from '../../elements/body';

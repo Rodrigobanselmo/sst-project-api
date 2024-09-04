@@ -1,13 +1,13 @@
 import { Paragraph, Table } from 'docx';
 
+import { DocumentChildrenTypeEnum as DocumentSectionChildrenTypeEnum } from '@/@v2/documents/domain/enums/document-children-type.enum';
 import { ISectionChildrenType } from '../../../../../../domain/types/elements.types';
-import { DocumentSectionChildrenTypeEnum } from '@/@v2/documents/domain/types/DocumentSectionChildrenTypeEnum';
-import { IDocVariables } from '../../../../../../domain/types/section.types';
-import { RiskFactorDataEntity } from '../../../../../sst/entities/riskData.entity';
+import { IDocVariables } from '../../../builders/pgr/types/IDocumentPGRSectionGroups';
+import { IRiskGroupDataConverter } from '../../../converter/hierarchy.converter';
 import { recommendationsConverter } from './recommendations.converter';
 
 export const recommendationsIterable = (
-  riskData: Partial<RiskFactorDataEntity>[],
+  riskData: IRiskGroupDataConverter[],
   convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[],
 ) => {
   const recommendationsVarArray = recommendationsConverter(riskData);
@@ -32,8 +32,9 @@ export const recommendationsIterable = (
     })
     .filter((i) => i)
     .reduce((acc, curr) => {
-      return [...acc, ...curr];
-    }, []);
+      return [...(acc || []), ...(curr || [])];
+    }, [] as (Paragraph | Table)[]);
 
-  return iterableSections;
+  if (iterableSections) return iterableSections;
+  return []
 };

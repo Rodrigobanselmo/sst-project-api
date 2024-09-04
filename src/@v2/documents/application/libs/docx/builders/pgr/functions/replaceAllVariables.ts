@@ -1,4 +1,4 @@
-import { IDocVariables } from '../../../../../../domain/types/section.types';
+import { IDocVariables } from '../../../builders/pgr/types/IDocumentPGRSectionGroups';
 import { isOdd } from '../../../../../../shared/utils/isOdd';
 
 export const replaceAllVariables = (text: string, variables: IDocVariables) => {

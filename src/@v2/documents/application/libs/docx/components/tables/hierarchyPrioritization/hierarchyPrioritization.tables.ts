@@ -1,15 +1,14 @@
 import { HierarchyEnum } from '@prisma/client';
-import { PageOrientation, Table, WidthType } from 'docx';
+import { Table, WidthType } from 'docx';
 
-import { arrayChunks } from '../../../../../../shared/utils/arrayChunks';
-import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
-import { IHierarchyData, IHierarchyMap } from '../../../converter/hierarchy.converter';
+import { IHierarchyData, IHierarchyMap, IRiskGroupDataConverter } from '../../../converter/hierarchy.converter';
 import { TableBodyElements } from './elements/body';
 import { TableHeaderElements } from './elements/header';
 import { hierarchyPrioritizationConverter, IHierarchyPrioritizationOptions } from './hierarchyPrioritization.converter';
+import { arrayChunks } from '@/@v2/shared/utils/helpers/array-chunks';
 
 export const hierarchyPrioritizationTables = (
-  riskFactorGroupData: RiskFactorGroupDataEntity,
+  riskFactorGroupData: IRiskGroupDataConverter[],
   hierarchiesEntity: IHierarchyData,
   hierarchyTree: IHierarchyMap,
   options: IHierarchyPrioritizationOptions = {

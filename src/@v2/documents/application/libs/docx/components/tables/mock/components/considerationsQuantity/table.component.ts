@@ -1,14 +1,14 @@
-import { IDocVariables } from '../../../../../../../../domain/types/section.types';
 import {
   ISectionChildrenType,
 } from '../../../../../../../../domain/types/elements.types';
-import { DocumentSectionChildrenTypeEnum } from '@/@v2/documents/domain/types/DocumentSectionChildrenTypeEnum';
+import { DocumentChildrenTypeEnum as DocumentSectionChildrenTypeEnum } from '@/@v2/documents/domain/enums/document-children-type.enum';
 import { HeightRule, Paragraph, Table, WidthType } from 'docx';
 
 import { TableBodyElements } from '../../elements/body';
 import { TableHeaderElements } from '../../elements/header';
 import { NewBody } from './body.converter';
 import { NewHeader } from './header.converter';
+import { IDocVariables } from '../../../../../builders/pgr/types/IDocumentPGRSectionGroups';
 
 // Table 2
 export const considerationsQuantityTable = (

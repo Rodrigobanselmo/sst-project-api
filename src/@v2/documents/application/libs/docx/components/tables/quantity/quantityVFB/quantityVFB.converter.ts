@@ -1,60 +1,51 @@
-import { HomoTypeEnum } from '@prisma/client';
 
-import { originRiskMap } from '../../../../../../../shared/constants/maps/origin-risk';
-import { palette } from '../../../../../../../shared/constants/palette';
-import { getMatrizRisk } from '../../../../../../../shared/utils/matriz';
-import { sortData } from '../../../../../../../shared/utils/sorts/data.sort';
-import { RiskFactorGroupDataEntity } from '../../../../../../sst/entities/riskGroupData.entity';
-import {
-  IRiskDataJson,
-  IRiskDataJsonVibration,
-  QuantityTypeEnum,
-} from '../../../../../../company/interfaces/risk-data-json.types';
+import { getMatrizRisk } from '@/@v2/shared/domain/functions/security/get-matrix-risk.func';
+import { sortData } from '@/@v2/shared/utils/sorts/data.sort';
+import sortArray from 'sort-array';
 import { borderStyleGlobal } from '../../../../base/config/styles';
-import { IHierarchyMap } from '../../../../converter/hierarchy.converter';
+import { matrixRiskMap } from '../../../../constants/matriz-risk-map';
+import { originRiskMap } from '../../../../constants/origin-risk';
+import { palette } from '../../../../constants/palette';
+import { IDocumentRiskGroupDataConverter, IHierarchyMap } from '../../../../converter/hierarchy.converter';
 import { bodyTableProps } from './elements/body';
 import { QuantityVFBColumnEnum } from './quantityVFB.constant';
-import sortArray from 'sort-array';
 
-export const quantityVFBConverter = (riskGroupData: RiskFactorGroupDataEntity, hierarchyTree: IHierarchyMap) => {
+export const quantityVFBConverter = ({ riskGroupData }: IDocumentRiskGroupDataConverter, hierarchyTree: IHierarchyMap) => {
   const rows: bodyTableProps[][] = [];
 
-  riskGroupData.data
-    .filter((row) => {
-      if (!row.json || !row.isQuantity) return false;
-      const json = row.json as unknown as IRiskDataJson;
+  riskGroupData
+    .filter(({ riskData }) => {
+      if (!riskData.isQuantity) return false;
 
-      if (json.type !== QuantityTypeEnum.VFB) return false;
-      return !!json.aren || !!json.vdvr;
+      if (!riskData.quantityVibrationFB) return false;
+      return !!riskData.quantityVibrationFB?.aren || !!riskData.quantityVibrationFB?.vdvr;
     })
-    .sort((a, b) => sortData(a.homogeneousGroup, b.homogeneousGroup, 'name'))
+    .sort((a, b) => sortData(a.homogeneousGroup.gho, b.homogeneousGroup.gho, 'name'))
     .map((riskData) => {
       const cells: bodyTableProps[] = [];
 
-      let origin: string;
+      let origin: string = '';
+      if (riskData.homogeneousGroup.gho.isEnviroment && riskData.homogeneousGroup.gho.characterization)
+        origin = `${riskData.homogeneousGroup.gho.characterization.name}\n(${originRiskMap[riskData.homogeneousGroup.gho.characterization.type].name})`;
 
-      if (riskData.homogeneousGroup.environment)
-        origin = `${riskData.homogeneousGroup.environment.name}\n(${originRiskMap[riskData.homogeneousGroup.environment.type].name})`;
+      if (riskData.homogeneousGroup.gho.isCharacterization && riskData.homogeneousGroup.gho.characterization)
+        origin = `${riskData.homogeneousGroup.gho.characterization.name}\n(${originRiskMap[riskData.homogeneousGroup.gho.characterization.type].name})`;
 
-      if (riskData.homogeneousGroup.characterization)
-        origin = `${riskData.homogeneousGroup.characterization.name}\n(${originRiskMap[riskData.homogeneousGroup.characterization.type].name})`;
+      if (!riskData.homogeneousGroup.gho.type) origin = `${riskData.homogeneousGroup.gho.name}\n(GSE)`;
 
-      if (!riskData.homogeneousGroup.type) origin = `${riskData.homogeneousGroup.name}\n(GSE)`;
-
-      if (riskData.homogeneousGroup.type == HomoTypeEnum.HIERARCHY) {
-        const hierarchy = hierarchyTree[riskData.homogeneousGroup.id];
+      if (riskData.homogeneousGroup.gho.isHierarchy) {
+        const hierarchy = hierarchyTree[riskData.homogeneousGroup.gho.id];
 
         if (hierarchy) origin = `${hierarchy.name}\n(${originRiskMap[hierarchy.type].name})`;
       }
 
-      const json = riskData.json as unknown as IRiskDataJsonVibration;
+      const json = riskData.riskData.quantityVibrationFB
 
-      const aren = json.aren;
-      const vdvr = json.vdvr;
+      const aren = json?.aren;
+      const vdvr = json?.vdvr;
 
-      const roAren = getMatrizRisk(riskData.riskFactor.severity, riskData.probAren);
-
-      const roVdvr = getMatrizRisk(riskData.riskFactor.severity, riskData.probVdvr);
+      const roAren = matrixRiskMap[getMatrizRisk(riskData.riskData.risk.severity, json?.arenProb)];
+      const roVdvr = matrixRiskMap[getMatrizRisk(riskData.riskData.risk.severity, json?.vdvrProb)];
 
       cells[QuantityVFBColumnEnum.ORIGIN] = {
         text: origin || '',

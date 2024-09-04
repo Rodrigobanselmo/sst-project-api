@@ -11,7 +11,7 @@ import {
   WidthType,
 } from 'docx';
 
-import { palette } from '../../../../../../../shared/constants/palette';
+import { palette } from '../../../../constants/palette';
 import { borderStyle } from './body';
 
 export interface headerTableProps extends Partial<ITableCellOptions> {

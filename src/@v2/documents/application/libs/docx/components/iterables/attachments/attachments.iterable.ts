@@ -2,10 +2,10 @@ import { Paragraph, Table } from 'docx';
 
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
 import { ISectionChildrenType } from '../../../../../../domain/types/elements.types';
-import { DocumentSectionChildrenTypeEnum } from '@/@v2/documents/domain/types/DocumentSectionChildrenTypeEnum';
-import { IDocVariables } from '../../../../../../domain/types/section.types';
-import { AttachmentModel } from '../../../../../sst/entities/attachment.entity';
+import { DocumentChildrenTypeEnum as DocumentSectionChildrenTypeEnum } from '@/@v2/documents/domain/enums/document-children-type.enum';
+import { IDocVariables } from '../../../builders/pgr/types/IDocumentPGRSectionGroups';
 import { attachmentsConverter } from './attachments.converter';
+import { AttachmentModel } from '@/@v2/documents/domain/models/attachment.model';
 
 export const attachmentsIterable = (
   attachments: AttachmentModel[],
