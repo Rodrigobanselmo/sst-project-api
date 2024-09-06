@@ -219,7 +219,7 @@ export const hierarchyConverter = (
   const riskGroupData: IRiskGroupDataConverter[] = [];
 
   homoGroup.forEach((gho) => {
-    gho.risksData({ companyId: company.id, documentType }).forEach((riskData) => {
+    gho.risksData.forEach((riskData) => {
       riskGroupData.push({
         homogeneousGroup: homoGroupTree[gho.id],
         riskData,

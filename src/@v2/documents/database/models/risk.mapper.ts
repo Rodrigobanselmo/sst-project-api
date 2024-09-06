@@ -28,7 +28,7 @@ export class RiskMapper {
       type: data.type as RiskTypeEnum,
       unit: data.unit,
 
-      requirements: { document: documentRequirement },
+      requirement: { document: documentRequirement },
       documentsRequirements: data.docInfo.map(doc => new RiskDocumentsRequirementVO(doc))
     })
   }

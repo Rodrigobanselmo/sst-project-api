@@ -52,6 +52,7 @@ export type IImage = {
   type: DocumentChildrenTypeEnum.IMAGE;
   url: string | null;
   width: number;
+  path?: string | null;
   align?: (typeof AlignmentType)[keyof typeof AlignmentType];
 } & IBaseDocumentModel;
 

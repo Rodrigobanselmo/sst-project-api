@@ -1,13 +1,6 @@
-import { IDocumentsRequirementKeys } from "@/@v2/shared/domain/types/document/document-types.type";
 import { HomogeneousGroupModel } from "../models/homogeneous-group.model";
 
-type IGetHomogeneuosVariablesDomain = {
-    homogeneousGroups: HomogeneousGroupModel[]
-    companyId: string;
-    documentType: IDocumentsRequirementKeys
-}
-
-export function getHomogeneuosVariablesDomain({ companyId, documentType, homogeneousGroups }: IGetHomogeneuosVariablesDomain) {
+export function getHomogeneuosVariablesDomain(homogeneousGroups: HomogeneousGroupModel[]) {
 
     const variables = {
         hasEnviromentRisk: false,
@@ -24,7 +17,7 @@ export function getHomogeneuosVariablesDomain({ companyId, documentType, homogen
     }
 
     homogeneousGroups.forEach((homogeneousGroup) => {
-        const hasRisk = homogeneousGroup.risksData({ companyId, documentType }).length
+        const hasRisk = homogeneousGroup.risksData.length
 
         if (hasRisk && homogeneousGroup.isEnviroment) variables.hasEnviromentRisk = true
         if (hasRisk && homogeneousGroup.isCharacterization) variables.hasCharacterizationRisk = true

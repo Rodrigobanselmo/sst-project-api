@@ -15,10 +15,12 @@ export class RiskDataDAO {
   static selectOptions({ companyId }: { companyId: string }) {
     const include = {
       riskFactor: RiskDAO.selectOptions({ companyId }),
+      dataRecs: true,
       recs: {
         select: {
           recName: true,
           recType: true,
+          id: true
         }
       },
       adms: {

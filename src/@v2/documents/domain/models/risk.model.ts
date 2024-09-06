@@ -9,8 +9,20 @@ export type IRiskModel = {
   isEmergency: boolean
   isRepresentAll: boolean
   unit: string | null
+  cas: string | null
+  propagation: string[] | null
+  nr15lt: string | null
+  twa: string | null
+  stel: string | null
+  ipvs: string | null
+  pe: string | null
+  pv: string | null
+  carnogenicityACGIH: string | null
+  carnogenicityLinach: string | null
+  symptoms: string | null
+  healthRisk: string | null
 
-  requirements: { document: RiskDocumentsRequirementVO }
+  requirement: { document: RiskDocumentsRequirementVO }
   documentsRequirements: RiskDocumentsRequirementVO[]
 }
 
@@ -22,6 +34,18 @@ export class RiskModel {
   isEmergency: boolean
   isRepresentAll: boolean
   unit: string | null
+  cas: string | null
+  propagation: string[] | null
+  nr15lt: string | null
+  twa: string | null
+  stel: string | null
+  ipvs: string | null
+  pe: string | null
+  pv: string | null
+  carnogenicityACGIH: string | null
+  carnogenicityLinach: string | null
+  symptoms: string | null
+  healthRisk: string | null
 
   #requirements: { document: RiskDocumentsRequirementVO }
   #documentsRequirements: RiskDocumentsRequirementVO[]
@@ -34,8 +58,21 @@ export class RiskModel {
     this.isEmergency = params.isEmergency
     this.isRepresentAll = params.isRepresentAll
     this.unit = params.unit
+    this.cas = params.cas
+    this.propagation = params.propagation
+    this.nr15lt = params.nr15lt
+    this.twa = params.twa
+    this.stel = params.stel
+    this.ipvs = params.ipvs
+    this.pe = params.pe
+    this.pv = params.pv
+    this.carnogenicityACGIH = params.carnogenicityACGIH
+    this.carnogenicityLinach = params.carnogenicityLinach
+    this.symptoms = params.symptoms
+    this.healthRisk = params.healthRisk
 
-    this.#requirements = params.requirements
+
+    this.#requirements = params.requirement
     this.#documentsRequirements = params.documentsRequirements
   }
 

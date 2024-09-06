@@ -1,12 +1,11 @@
-import { ExamRequirementsVO } from "@/@v2/shared/domain/values-object/medicine/exam-requirements.vo";
-import { RiskModel } from "./risk.model";
+import { ExamRequirementVO } from "@/@v2/shared/domain/values-object/medicine/exam-requirement.vo";
 
 export type IExamModel = {
   id: number;
   name: string;
   examRisks: {
-    risk: RiskModel;
-    requirements: ExamRequirementsVO
+    riskId: string;
+    requirement: ExamRequirementVO
   }[];
 }
 
@@ -14,8 +13,8 @@ export class ExamModel {
   id: number;
   name: string;
   examRisks: {
-    risk: RiskModel;
-    requirements: ExamRequirementsVO
+    riskId: string;
+    requirement: ExamRequirementVO
   }[];
 
   constructor(params: IExamModel) {

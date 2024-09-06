@@ -1,12 +1,9 @@
+import { ExamRequirementVO } from '@/@v2/shared/domain/values-object/medicine/exam-requirement.vo';
 import { Exam, ExamToRisk } from '@prisma/client';
 import { ExamModel, IExamModel } from '../../domain/models/exam.model';
-import { ExamRequirementsVO } from '@/@v2/shared/domain/values-object/medicine/exam-requirements.vo';
-import { IRiskMapper, RiskMapper } from './risk.mapper';
 
 export type IExamMapper = Exam & {
-  examToRisk: (ExamToRisk & {
-    risk: IRiskMapper | null
-  })[]
+  examToRisk: (ExamToRisk)[]
 }
 
 export class ExamMapper {
@@ -14,9 +11,11 @@ export class ExamMapper {
 
     const examRisks = [] as IExamModel['examRisks']
     data.examToRisk.forEach(etr => {
-      if (etr.risk) examRisks.push({
-        requirements: new ExamRequirementsVO(etr),
-        risk: RiskMapper.toModel(etr.risk),
+      if (!etr.riskId) return
+
+      examRisks.push({
+        requirement: new ExamRequirementVO(etr),
+        riskId: etr.riskId,
       })
     })
 

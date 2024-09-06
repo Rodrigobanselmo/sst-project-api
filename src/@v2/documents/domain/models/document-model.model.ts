@@ -21,21 +21,21 @@ export class DocumentModelModel {
     this.variables = data.variables
   }
 
-  get images() {
-    const imagesMap: Record<string, IImage> = {}
+  get imagesUrls() {
+    const imagesPath = new Set<string>()
 
     this.#data?.sections.forEach((section) => {
       if (!section.children) return
       Object.values(section.children).forEach((data) => {
         data.forEach((child) => {
           if (child.type === 'IMAGE' && child.url) {
-            imagesMap[child.url] = child
+            imagesPath.add(child.url)
           }
         })
       })
     }, [])
 
-    return Object.values(imagesMap)
+    return Array.from(imagesPath)
   }
 
   private data(): IDocumentSectionGroups {

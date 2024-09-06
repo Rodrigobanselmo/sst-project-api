@@ -41,6 +41,8 @@ import { rsDocumentImage } from '../../../components/images/rsDocument';
 import { quantityResultsTable } from '../../../components/tables/mock/components/quantityResults/section/quantityResultsTable';
 import { considerationsQuantityTable } from '../../../components/tables/mock/components/considerationsQuantity/table.component';
 import { riskCharacterizationTableSection } from '../../../components/tables/riskCharacterization/riskCharacterization.section';
+import { hierarchyRisksTableAllSections } from '../../../components/tables/hierarchyRisks/hierarchyRisks.section';
+import { actionPlanTableSection } from '../../../components/tables/actionPlan/actionPlan.section';
 
 export type IMapElementDocumentType = Record<string, (arg: any) => (Paragraph | Table)[]>;
 
@@ -89,7 +91,8 @@ export class ElementsMapClass {
     },
     [DocumentChildrenTypeEnum.BULLET]: ({ level = 0, text, ...rest }: IBullet) => [bulletsNormal(text, level, rest)],
     [DocumentChildrenTypeEnum.BULLET_SPACE]: ({ text }: IBullet) => [bulletsSpace(text)],
-    // [DocumentChildrenTypeEnum.TABLE_VERSION_CONTROL]: () => [versionControlTable(this.versions)],
+    //!
+    //! [DocumentChildrenTypeEnum.TABLE_VERSION_CONTROL]: () => [versionControlTable(this.versions)],
     [DocumentChildrenTypeEnum.TABLE_VERSION_CONTROL]: () => [],
     [DocumentChildrenTypeEnum.TABLE_GSE]: () =>
       hierarchyHomoOrgSection(this.hierarchy, this.homogeneousGroup, {
@@ -223,12 +226,12 @@ export class ElementsMapClass {
         showHomogeneous: false,
         showHomogeneousDescription: false,
       })['children'],
-    [DocumentChildrenTypeEnum.RISK_TABLE]: () => riskCharacterizationTableSection(this.document, this.riskExamMap)['children'],
+    [DocumentChildrenTypeEnum.RISK_TABLE]: () => riskCharacterizationTableSection(this.data.risksData, this.data.getRiskDataExams)['children'],
     [DocumentChildrenTypeEnum.HIERARCHY_RISK_TABLE]: () =>
-      hierarchyRisksTableAllSections(this.document, this.hierarchy, this.hierarchyTree, (x, v) =>
+      hierarchyRisksTableAllSections(this.riskGroupData, this.hierarchy, this.hierarchyTree, (x, v) =>
         this.convertToDocx(x, v),
       ),
-    [DocumentChildrenTypeEnum.PLAN_TABLE]: () => actionPlanTableSection(this.document, this.hierarchyTree)['children'],
+    [DocumentChildrenTypeEnum.PLAN_TABLE]: () => actionPlanTableSection(this.riskGroupData, this.data.documentVersion, this.hierarchyTree)['children'],
   };
 
   private convertToDocx(data: ISectionChildrenType[], variables = {} as IDocVariables) {
@@ -257,7 +260,7 @@ export class ElementsMapClass {
         ...hierarchy,
         ...(hierarchy.groups?.length && {
           hierarchyOnHomogeneous: hierarchy.groups.map((hh) => {
-            const homogeneousGroup = homoMap[hh.homogeneousGroupId];
+            const homogeneousGroup = homoMap[hh.homogeneousGroupId]!;
 
             return { ...hh, homogeneousGroup };
           }),

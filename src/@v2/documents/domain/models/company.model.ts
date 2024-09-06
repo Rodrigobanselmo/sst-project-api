@@ -19,6 +19,7 @@ export type ICompanyModel = {
   primaryActivityCode: string | null
   primaryActivityName: string | null
   primaryActivityRiskDegree: number | null
+  logoUrl: string | null
 
   consultant: ConsultantModel | null
   address: AddressModel | null
@@ -41,6 +42,8 @@ export class CompanyModel {
   primaryActivityCode: string
   primaryActivityName: string
   primaryActivityRiskDegree: string
+  logoUrl: string | null
+  logoPath: string | null
 
   consultant: ConsultantModel | null
   address: AddressModel | null
@@ -62,6 +65,8 @@ export class CompanyModel {
     this.primaryActivityCode = params.primaryActivityCode || ''
     this.primaryActivityName = params.primaryActivityName || ''
     this.primaryActivityRiskDegree = String(params.primaryActivityRiskDegree || '')
+    this.logoUrl = params.logoUrl
+    this.logoPath = null
 
     this.consultant = params.consultant;
     this.address = params.address

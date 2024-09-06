@@ -5,10 +5,10 @@ export type IDocumentBaseDataVO = {
   visitDate?: Date
   complementaryDocs?: string[]
   complementarySystems?: string[]
-  months_period_level_2?: number
-  months_period_level_3?: number
-  months_period_level_4?: number
-  months_period_level_5?: number
+  monthsPeriodLevel_2?: number
+  monthsPeriodLevel_3?: number
+  monthsPeriodLevel_4?: number
+  monthsPeriodLevel_5?: number
 }
 
 export class DocumentBaseDataVO {
@@ -18,10 +18,10 @@ export class DocumentBaseDataVO {
   visitDate?: Date
   complementaryDocs: string[]
   complementarySystems: string[]
-  months_period_level_2: number
-  months_period_level_3: number
-  months_period_level_4: number
-  months_period_level_5: number
+  monthsPeriodLevel_2: number
+  monthsPeriodLevel_3: number
+  monthsPeriodLevel_4: number
+  monthsPeriodLevel_5: number
 
 
   constructor(params: IDocumentBaseDataVO) {
@@ -31,9 +31,24 @@ export class DocumentBaseDataVO {
     this.visitDate = params.visitDate
     this.complementaryDocs = params.complementaryDocs || []
     this.complementarySystems = params.complementarySystems || []
-    this.months_period_level_2 = params.months_period_level_2 || 24
-    this.months_period_level_3 = params.months_period_level_3 || 12
-    this.months_period_level_4 = params.months_period_level_4 || 6
-    this.months_period_level_5 = params.months_period_level_5 || 3
+    this.monthsPeriodLevel_2 = params.monthsPeriodLevel_2 || 24
+    this.monthsPeriodLevel_3 = params.monthsPeriodLevel_3 || 12
+    this.monthsPeriodLevel_4 = params.monthsPeriodLevel_4 || 6
+    this.monthsPeriodLevel_5 = params.monthsPeriodLevel_5 || 3
+  }
+
+  getMonthsPeriodLevel(level: number): number | null {
+    switch (level) {
+      case 2:
+        return this.monthsPeriodLevel_2
+      case 3:
+        return this.monthsPeriodLevel_3
+      case 4:
+        return this.monthsPeriodLevel_4
+      case 5:
+        return this.monthsPeriodLevel_5
+      default:
+        return null
+    }
   }
 }

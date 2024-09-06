@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, Scope } from '@nestjs/common';
 import { ISectionOptions } from 'docx';
 import { v4 } from 'uuid';
-import { IDocumentFactoryProduct, IUnlinkPaths } from '../../types/document-factory.types';
+import { IDocumentFactoryProduct, IImagesMap, IUnlinkPaths } from '../../types/document-factory.types';
 import { IDocumentPGRParams } from './document-pgr.types';
 import { dateUtils } from '@/@v2/shared/utils/helpers/date-utils';
 import { DocumentTypeEnum } from '@/@v2/documents/domain/enums/document-type.enum';
@@ -10,13 +10,20 @@ import { PromiseInfer } from '@/@v2/shared/interfaces/promise-infer.types';
 import { DocumentPGRModel } from '@/@v2/documents/domain/models/document-pgr.model';
 import { DocumentDAO } from '@/@v2/documents/database/dao/document/document.dao';
 import { DocumentSectionTypeEnum } from '@/@v2/documents/domain/enums/document-section-type.enum';
+import { CompanyModel } from '@/@v2/documents/domain/models/company.model';
+import { ConsultantModel } from '@/@v2/documents/domain/models/consultant.model';
+import { DonwloadImageService } from '@/@v2/documents/application/services/donwload-image/donwload-image.service';
+import { CharacterizationPhotoModel } from '@/@v2/documents/domain/models/characterization-photos.model';
 
 @Injectable({ scope: Scope.REQUEST })
 export class DocumentPGRFactory implements IDocumentFactoryProduct<IDocumentPGRParams> {
   public unlinkPaths: IUnlinkPaths[] = [];
   public type = 'PGR';
 
-  constructor(protected readonly documentDAO: DocumentDAO) { }
+  constructor(
+    protected readonly documentDAO: DocumentDAO,
+    protected readonly donwloadImageService: DonwloadImageService
+  ) { }
 
   public async getData({ documentVersionId }: IDocumentPGRParams) {
     const document = await this.documentDAO.findDocumentPGR({ documentVersionId });
@@ -160,13 +167,44 @@ export class DocumentPGRFactory implements IDocumentFactoryProduct<IDocumentPGRP
     });
   };
 
-  public async downloadLogos(company: CompanyModel, consultant: CompanyModel) {
-    const [logo, consultantLogo] = await this.downloadPathLogoImage(company?.logoUrl, consultant?.logoUrl);
+  private async downloadImages(document: DocumentPGRModel) {
+    const imagesMap: IImagesMap = {};
 
-    if (logo) this.unlinkPaths.push({ path: logo, url: company?.logoUrl });
-    if (consultantLogo) this.unlinkPaths.push({ path: consultantLogo, url: consultant?.logoUrl });
+    const imagesUrls = document.model.imagesUrls;
+    const company = document.documentBase.company;
+    const consultant = document.documentBase.company.consultant;
 
-    return { logo, consultantLogo: consultantLogo || 'images/logo/logo-simple.png' };
+    const companyLogoPath = await this.donwloadImageService.donwload({ imageUrl: company.logoUrl })
+    const consultantLogoPath = await this.donwloadImageService.donwload({ imageUrl: consultant?.logoUrl })
+
+    if (companyLogoPath) this.unlinkPaths.push({ path: companyLogoPath });
+    if (consultantLogoPath) this.unlinkPaths.push({ path: consultantLogoPath });
+
+    await this.donwloadImageService.donwloadBatch({
+      images: imagesUrls,
+      getUrl: (url) => url,
+      callbackFn: async (path, url) => {
+        if (path) {
+          this.unlinkPaths.push({ path });
+          imagesMap[url] = { path };
+        }
+      },
+    })
+
+    const photos = document.homogeneousGroups.map((group) => group.characterization?.photos).flat().filter(Boolean) as (CharacterizationPhotoModel)[];
+
+    await this.donwloadImageService.donwloadBatch({
+      images: document.homogeneousGroups,
+      getUrl: (homogeneousGroup) => homogeneousGroup.characterization.,
+      callbackFn: async (path, url) => {
+        if (path) {
+          this.unlinkPaths.push({ path });
+          imagesMap[url] = { path };
+        }
+      },
+    })
+
+    return { companyLogoUrl, consultantLogoUrl };
   }
 
   public async downloadPathLogoImage(logoUrl: string, consultLogoUrl: string) {

@@ -13,10 +13,14 @@ import { GenerateSourceModel } from "./generate-source.model"
 import { RecommendationModel } from "./recommendation.model"
 import { RiskModel } from "./risk.model"
 import { ExamRiskModel } from "./exam-risk.model"
+import { RecommendationDataModel } from "./recommendation-data.model"
+import { IRiskLevelValues } from "@/@v2/shared/domain/types/security/risk-level-values.type"
+import { IRiskProbabilityValues } from "@/@v2/shared/domain/types/security/risk-probability-values.type"
 
 export type IRiskDataModel = {
-  probability: number | null;
-  probabilityAfter: number | null;
+  probability: IRiskProbabilityValues | null;
+  probabilityAfter: IRiskProbabilityValues | null;
+  level: IRiskLevelValues | null;
 
   risk: RiskModel
   recommendations: RecommendationModel[]
@@ -25,6 +29,7 @@ export type IRiskDataModel = {
   generateSources: GenerateSourceModel[]
   epis: EPIModel[]
   exams: ExamRiskModel[]
+  recommendationsData: RecommendationDataModel[]
 
   quantityNoise: RiskDataQuantityNoiseVO | null
   quantityHeat: RiskDataQuantityHeatVO | null
@@ -37,6 +42,7 @@ export type IRiskDataModel = {
 export class RiskDataModel {
   #probability: number;
   probabilityAfter: number;
+  level: IRiskLevelValues;
 
   risk: RiskModel
   recommendations: RecommendationModel[]
@@ -45,6 +51,7 @@ export class RiskDataModel {
   generateSources: GenerateSourceModel[]
   epis: EPIModel[]
   exams: ExamRiskModel[]
+  recommendationsData: RecommendationDataModel[]
 
   quantityNoise: RiskDataQuantityNoiseVO | null
   quantityHeat: RiskDataQuantityHeatVO | null
@@ -56,6 +63,7 @@ export class RiskDataModel {
   constructor(params: IRiskDataModel) {
     this.#probability = params.probability || 0
     this.probabilityAfter = params.probabilityAfter || 0
+    this.level = params.level || 1
 
     this.risk = params.risk
     this.recommendations = params.recommendations
@@ -64,6 +72,7 @@ export class RiskDataModel {
     this.generateSources = params.generateSources
     this.epis = params.epis
     this.exams = params.exams
+    this.recommendationsData = params.recommendationsData
 
     this.quantityNoise = params.quantityNoise
     this.quantityHeat = params.quantityHeat
@@ -77,7 +86,7 @@ export class RiskDataModel {
     return getIsQuantity(this)
   }
 
-  get probability() {
+  get probability(): IRiskProbabilityValues {
     return getQuantityProbability({ ...this, probability: this.#probability })
   }
 }

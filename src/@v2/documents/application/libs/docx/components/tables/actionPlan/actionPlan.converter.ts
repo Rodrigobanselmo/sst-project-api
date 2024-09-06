@@ -1,66 +1,67 @@
-import { DocumentDataPGRDto } from './../../../../../sst/dto/document-data-pgr.dto';
-import { DocumentDataEntity } from './../../../../../sst/entities/documentData.entity';
-import { sortString } from './../../../../../../shared/utils/sorts/string.sort';
-import { sortNumber } from './../../../../../../shared/utils/sorts/number.sort';
-import { HomoTypeEnum } from '@prisma/client';
-import clone from 'clone';
 
-import { palette } from '../../../../../../shared/constants/palette';
-import { dayjs } from '../../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
-import { getMatrizRisk } from '../../../../../../shared/utils/matriz';
-import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
+
+
+import { DocumentVersionModel } from '@/@v2/documents/domain/models/document-version.model';
+import { getMatrizRisk } from '@/@v2/shared/domain/functions/security/get-matrix-risk.func';
+import { sortNumber } from '@/@v2/shared/utils/sorts/number.sort';
+import { sortString } from '@/@v2/shared/utils/sorts/string.sort';
+import dayjs from 'dayjs';
 import { borderStyleGlobal } from '../../../base/config/styles';
-import { IHierarchyMap } from '../../../converter/hierarchy.converter';
-import { originRiskMap } from './../../../../../../shared/constants/maps/origin-risk';
+import { matrixRiskMap } from '../../../constants/matriz-risk-map';
+import { originRiskMap } from '../../../constants/origin-risk';
+import { palette } from '../../../constants/palette';
+import { IHierarchyMap, IRiskGroupDataConverter } from '../../../converter/hierarchy.converter';
 import { ActionPlanColumnEnum } from './actionPlan.constant';
 import { bodyTableProps } from './elements/body';
 
 export const actionPlanConverter = (
-  riskGroup: RiskFactorGroupDataEntity & DocumentDataEntity & DocumentDataPGRDto,
+  riskGroup: IRiskGroupDataConverter[],
+  documentVersion: DocumentVersionModel,
   hierarchyTree: IHierarchyMap,
 ) => {
   const homogeneousGroupsMap = new Map<string, bodyTableProps[][]>();
   const actionPlanData: bodyTableProps[][] = [];
 
-  riskGroup.data
-    .sort((a, b) => sortString(a.riskFactor.name, b.riskFactor.name))
-    .sort((a, b) => sortNumber(b.level, a.level))
+  riskGroup
+    .sort((a, b) => sortString(a.riskData.risk.name, b.riskData.risk.name))
+    .sort((a, b) => sortNumber(b.riskData.level, a.riskData.level))
     .map((riskData) => {
-      let origin: string;
+      let origin: string = '';
 
-      if (riskData.homogeneousGroup.environment)
-        origin = `${riskData.homogeneousGroup.environment.name}\n(${originRiskMap[riskData.homogeneousGroup.environment.type].name})`;
+      if (riskData.homogeneousGroup.gho.isEnviroment && riskData.homogeneousGroup.gho.characterization)
+        origin = `${riskData.homogeneousGroup.gho.characterization.name}\n(${originRiskMap[riskData.homogeneousGroup.gho.characterization.type].name})`;
 
-      if (riskData.homogeneousGroup.characterization)
-        origin = `${riskData.homogeneousGroup.characterization.name}\n(${originRiskMap[riskData.homogeneousGroup.characterization.type].name})`;
+      if (riskData.homogeneousGroup.gho.isCharacterization && riskData.homogeneousGroup.gho.characterization)
+        origin = `${riskData.homogeneousGroup.gho.characterization.name}\n(${originRiskMap[riskData.homogeneousGroup.gho.characterization.type].name})`;
 
-      if (!riskData.homogeneousGroup.type) origin = `${riskData.homogeneousGroup.name}\n(GSE)`;
+      if (!riskData.homogeneousGroup.gho.type) origin = `${riskData.homogeneousGroup.gho.name}\n(GSE)`;
 
-      if (riskData.homogeneousGroup.type == HomoTypeEnum.HIERARCHY) {
-        const hierarchy = hierarchyTree[riskData.homogeneousGroup.id];
+      if (riskData.homogeneousGroup.gho.isHierarchy) {
+        const hierarchy = hierarchyTree[riskData.homogeneousGroup.gho.id];
 
         if (hierarchy) origin = `${hierarchy.name}\n(${originRiskMap[hierarchy.type].name})`;
       }
+
       return { ...riskData, origin };
     })
     .sort((a, b) => sortString(a.origin, b.origin))
     .forEach(({ origin, ...riskData }) => {
-      const dataRecs = riskData.dataRecs;
-      riskData.recs.forEach((rec) => {
+      const dataRecs = riskData.riskData.recommendationsData;
+      riskData.riskData.recommendations.forEach((rec) => {
         const cells: bodyTableProps[] = [];
 
-        const dataRecFound = dataRecs?.find((dataRec) => dataRec.recMedId == rec.id);
+        const dataRecFound = dataRecs?.find((dataRec) => dataRec.recommendationId == rec.id);
         const responsibleName = dataRecFound?.responsibleName || '';
-        const level = riskData.level || 0;
+        const level = riskData.riskData.level;
 
         const getDue = () => {
-          const months = riskGroup[`months_period_level_${level}`];
+          const months = documentVersion.documentBase.data.getMonthsPeriodLevel(level);
 
           if (dataRecFound && dataRecFound.endDate) {
             return dayjs(dataRecFound.endDate);
           }
 
-          if (months) return dayjs(riskGroup?.validityStart).add(months + 1, 'months');
+          if (months) return dayjs(documentVersion.documentBase.validityStart).add(months + 1, 'months');
 
           return false;
         };
@@ -79,37 +80,37 @@ export const actionPlanConverter = (
           borders: borderStyleGlobal(palette.common.white.string),
         };
         cells[ActionPlanColumnEnum.RISK] = {
-          text: riskData.riskFactor.name,
+          text: riskData.riskData.risk.name,
           size: 10,
           borders: borderStyleGlobal(palette.common.white.string),
         };
         cells[ActionPlanColumnEnum.SOURCE] = {
-          text: riskData.generateSources.map((gs) => gs.name).join('\n'),
+          text: riskData.riskData.generateSources.map((gs) => gs.name).join('\n'),
           size: 10,
           borders: borderStyleGlobal(palette.common.white.string),
         };
         cells[ActionPlanColumnEnum.SEVERITY] = {
-          text: String(riskData.riskFactor.severity),
+          text: String(riskData.riskData.risk.severity),
           size: 1,
           borders: borderStyleGlobal(palette.common.white.string),
         };
         cells[ActionPlanColumnEnum.PROBABILITY] = {
-          text: String(riskData.probability || '-'),
+          text: String(riskData.riskData.probability || '-'),
           size: 1,
           borders: borderStyleGlobal(palette.common.white.string),
         };
         cells[ActionPlanColumnEnum.RO] = {
-          text: getMatrizRisk(riskData.riskFactor.severity, riskData.probability).label,
+          text: matrixRiskMap[getMatrizRisk(riskData.riskData.risk.severity, riskData.riskData.probability)].label,
           size: 5,
           borders: borderStyleGlobal(palette.common.white.string),
         };
         cells[ActionPlanColumnEnum.INTERVENTION] = {
-          text: getMatrizRisk(riskData.riskFactor.severity, riskData.probability).intervention,
+          text: matrixRiskMap[getMatrizRisk(riskData.riskData.risk.severity, riskData.riskData.probability)].intervention,
           size: 5,
           borders: borderStyleGlobal(palette.common.white.string),
         };
         cells[ActionPlanColumnEnum.RECOMMENDATION] = {
-          text: rec.recName,
+          text: rec.name,
           size: 10,
           borders: borderStyleGlobal(palette.common.white.string),
         };
@@ -124,8 +125,8 @@ export const actionPlanConverter = (
           borders: borderStyleGlobal(palette.common.white.string),
         };
 
-        const rows = homogeneousGroupsMap.get(riskData.homogeneousGroupId) || [];
-        homogeneousGroupsMap.set(riskData.homogeneousGroupId, [...rows, cells]);
+        const rows = homogeneousGroupsMap.get(riskData.homogeneousGroup.gho.id) || [];
+        homogeneousGroupsMap.set(riskData.homogeneousGroup.gho.id, [...rows, cells]);
       });
     });
 

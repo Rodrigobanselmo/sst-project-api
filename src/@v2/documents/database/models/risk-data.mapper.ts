@@ -1,13 +1,13 @@
 import { QuantityTypeEnum } from '@/@v2/shared/domain/enum/security/quantity-type.enum';
 import { RecommendationTypeEnum } from '@/@v2/shared/domain/enum/security/recommendation-type.enum';
-import { ExamRequirementsVO } from '@/@v2/shared/domain/values-object/medicine/exam-requirements.vo';
+import { ExamRequirementVO } from '@/@v2/shared/domain/values-object/medicine/exam-requirement.vo';
 import { RiskDataQuantityHeatVO } from '@/@v2/shared/domain/values-object/security/risk-data-quantity-heat.vo';
 import { RiskDataQuantityNoiseVO } from '@/@v2/shared/domain/values-object/security/risk-data-quantity-noise.vo';
 import { RiskDataQuantityQuiVO } from '@/@v2/shared/domain/values-object/security/risk-data-quantity-qui.vo';
 import { RiskDataQuantityRadiationVO } from '@/@v2/shared/domain/values-object/security/risk-data-quantity-radiation.vo';
 import { RiskDataQuantityVibrationFBVO } from '@/@v2/shared/domain/values-object/security/risk-data-quantity-vibration-fb.vo';
 import { RiskDataQuantityVibrationLVO } from '@/@v2/shared/domain/values-object/security/risk-data-quantity-vibration-l.vo';
-import { Epi, EpiToRiskFactorData, ExamToRiskData, RecTypeEnum as PrismaRecTypeEnum, RecMed, RiskFactorData, RiskFactors, RiskFactorsDocInfo } from '@prisma/client';
+import { Epi, EpiToRiskFactorData, ExamToRiskData, RecTypeEnum as PrismaRecTypeEnum, RecMed, RiskFactorData, RiskFactorDataRec, RiskFactors, RiskFactorsDocInfo } from '@prisma/client';
 import { AdministrativeMeasureModel } from '../../domain/models/administrative-measure.model';
 import { EgineeringMeasureModel } from '../../domain/models/engineering-measure.model';
 import { EPIModel } from '../../domain/models/epis.model';
@@ -16,11 +16,14 @@ import { GenerateSourceModel } from '../../domain/models/generate-source.model';
 import { RecommendationModel } from '../../domain/models/recommendation.model';
 import { IRiskDataModel, RiskDataModel } from '../../domain/models/risk-data.model';
 import { IRiskMapper, RiskMapper } from './risk.mapper';
+import { RecommendationDataModel } from '../../domain/models/recommendation-data.model';
+import { IRiskProbabilityValues } from '@/@v2/shared/domain/types/security/risk-probability-values.type';
+import { IRiskLevelValues } from '@/@v2/shared/domain/types/security/risk-level-values.type';
 
 export type IRiskDataMapper = RiskFactorData & {
   riskFactor: IRiskMapper
   adms: { medName: string | null }[]
-  recs: { recName: string | null; recType: PrismaRecTypeEnum | null }[]
+  recs: { id: string; recName: string | null; recType: PrismaRecTypeEnum | null }[]
   generateSources: { name: string | null }[]
   engsToRiskFactorData: {
     recMed: RecMed
@@ -30,16 +33,19 @@ export type IRiskDataMapper = RiskFactorData & {
     epi: Epi
   })[]
   examsToRiskFactorData: ExamToRiskData[]
+  dataRecs: RiskFactorDataRec[]
 }
 
 export class RiskDataMapper {
   static toModel(data: IRiskDataMapper): RiskDataModel {
     return new RiskDataModel({
       ...this.quantityParse(data),
-      probability: data.probability,
-      probabilityAfter: data.probabilityAfter,
+      level: data.level as IRiskLevelValues,
+      probability: data.probability as IRiskProbabilityValues,
+      probabilityAfter: data.probabilityAfter as IRiskProbabilityValues,
       administrativeMeasures: data.adms.map(adm => new AdministrativeMeasureModel({ name: adm.medName || '' })),
       recommendations: data.recs.map(rec => new RecommendationModel({
+        id: rec.id,
         name: rec.recName || '',
         type: rec.recType as RecommendationTypeEnum,
       })),
@@ -53,9 +59,14 @@ export class RiskDataMapper {
       })),
       exams: data.examsToRiskFactorData.map(exam => new ExamRiskModel({
         examId: exam.examId,
-        requirements: new ExamRequirementsVO(exam)
+        requirement: new ExamRequirementVO(exam)
       })),
       risk: RiskMapper.toModel(data.riskFactor),
+      recommendationsData: data.dataRecs.map(recData => new RecommendationDataModel({
+        recommendationId: recData.recMedId,
+        responsibleName: recData.responsibleName,
+        endDate: recData.endDate,
+      }))
     })
   }
 

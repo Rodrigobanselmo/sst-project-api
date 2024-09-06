@@ -1,18 +1,17 @@
 import { HierarchyEnum } from '@prisma/client';
 import { PageOrientation, Paragraph, Table, WidthType } from 'docx';
-import { arrayChunks } from '../../../../../../shared/utils/arrayChunks';
 
-import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
 import { ISectionChildrenType } from '../../../../../../domain/types/elements.types';
 import { DocumentChildrenTypeEnum as DocumentSectionChildrenTypeEnum } from '@/@v2/documents/domain/enums/document-children-type.enum';
 import { IDocVariables } from '../../../builders/pgr/types/IDocumentPGRSectionGroups';
-import { IHierarchyData, IHierarchyMap } from '../../../converter/hierarchy.converter';
+import { IHierarchyData, IHierarchyMap, IRiskGroupDataConverter } from '../../../converter/hierarchy.converter';
 import { TableBodyElements } from './elements/body';
 import { TableHeaderElements } from './elements/header';
 import { hierarchyRisksConverter, IHierarchyRiskOptions } from './hierarchyRisks.converter';
+import { arrayChunks } from '@/@v2/shared/utils/helpers/array-chunks';
 
 export const hierarchyRisksTableSections = (
-  riskFactorGroupData: RiskFactorGroupDataEntity,
+  riskFactorGroupData: IRiskGroupDataConverter[],
   hierarchiesEntity: IHierarchyData,
   hierarchyTree: IHierarchyMap,
   options: IHierarchyRiskOptions = {
@@ -69,7 +68,7 @@ export const hierarchyRisksTableSections = (
 };
 
 export const hierarchyRisksTableAllSections = (
-  riskFactorGroupData: RiskFactorGroupDataEntity,
+  riskFactorGroupData: IRiskGroupDataConverter[],
   hierarchiesEntity: IHierarchyData,
   hierarchyTree: IHierarchyMap,
   convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[],

@@ -1,17 +1,16 @@
-import { riskMap } from './../../../../constants/risks.constant';
 import { HierarchyEnum, RiskFactorsEnum } from '@prisma/client';
 
-import { palette } from '../../../../../../shared/constants/palette';
-import { removeDuplicate } from '@/@v2/shared/utils/helpers/remove-duplicate';
-import { sortString } from '../../../../../../shared/utils/sorts/string.sort';
-import { sortNumber } from '../../../../../../shared/utils/sorts/number.sort';
-import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
 import { borderStyleGlobal } from '../../../base/config/styles';
-import { IHierarchyData, IHierarchyMap } from '../../../converter/hierarchy.converter';
+import { IHierarchyData, IHierarchyMap, IRiskGroupDataConverter } from '../../../converter/hierarchy.converter';
 import { hierarchyMap } from '../appr/parts/first/first.constant';
 import { bodyTableProps } from './elements/body';
 import { headerTableProps } from './elements/header';
-import { filterRisk } from '../../../../../..//shared/utils/filterRisk';
+import { removeDuplicate } from '@/@v2/shared/utils/helpers/remove-duplicate';
+import { sortString } from '@/@v2/shared/utils/sorts/string.sort';
+import { sortNumber } from '@/@v2/shared/utils/sorts/number.sort';
+import { riskMap } from '../../../constants/risks-map';
+import { palette } from '../../../constants/palette';
+import { checkValidExistentRisk } from '@/@v2/shared/domain/functions/security/check-valid-existent-risk.func';
 
 export interface IHierarchyRiskOptions {
   hierarchyType?: HierarchyEnum;
@@ -34,7 +33,7 @@ interface IRiskDataMap {
 }
 
 export const hierarchyRisksConverter = (
-  riskGroup: RiskFactorGroupDataEntity,
+  riskGroup: IRiskGroupDataConverter[],
   hierarchyData: IHierarchyData,
   hierarchyTree: IHierarchyMap,
   { hierarchyType = HierarchyEnum.SECTOR }: IHierarchyRiskOptions,
@@ -43,7 +42,8 @@ export const hierarchyRisksConverter = (
   const allRiskRecord = {} as Record<string, IRiskDataMap>;
 
   const HomoPositionMap = new Map<string, IHomoPositionData>();
-  const riskGroupData = riskGroup.data?.filter((riskData) => filterRisk(riskData));
+  // const riskGroupData = riskGroup.data?.filter((riskData) => checkIfExis(riskData));
+  const riskGroupData = riskGroup.filter(({ riskData }) => checkValidExistentRisk(riskData.risk));
 
   (function getAllHierarchyByType() {
     hierarchyData.forEach((hierarchiesData) => {
@@ -59,7 +59,6 @@ export const hierarchyRisksConverter = (
         allHierarchyRecord[hierarchy.id] = {
           homogeneousGroupIds: removeDuplicate(
             [...hierarchyMap.homogeneousGroupIds, ...hierarchiesData.allHomogeneousGroupIds],
-            { simpleCompare: true },
           ),
           name: hierarchy.name,
         };
@@ -68,17 +67,15 @@ export const hierarchyRisksConverter = (
   })();
 
   (function getAllRiskFactors() {
-    riskGroupData?.forEach((riskData) => {
-      riskData.homogeneousGroupId;
-
-      const hasRisk = allRiskRecord[riskData.riskId] || {
+    riskGroupData?.forEach(({ riskData, homogeneousGroup }) => {
+      const hasRisk = allRiskRecord[riskData.risk.id] || {
         homogeneousGroupIds: [],
       };
 
-      allRiskRecord[riskData.riskId] = {
-        name: `(${riskData.riskFactor?.type}) ${riskData.riskFactor.name}`,
-        type: riskData.riskFactor?.type,
-        homogeneousGroupIds: [...hasRisk.homogeneousGroupIds, riskData.homogeneousGroupId],
+      allRiskRecord[riskData.risk.id] = {
+        name: `(${riskData.risk.type}) ${riskData.risk.name}`,
+        type: riskData.risk.type,
+        homogeneousGroupIds: [...hasRisk.homogeneousGroupIds, homogeneousGroup.gho.id],
       };
     });
   })();

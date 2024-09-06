@@ -3,7 +3,7 @@ import { DocumentDataPGRDto } from './../../../../../sst/dto/document-data-pgr.d
 import { HierarchyEntity } from './../../../../../company/entities/hierarchy.entity';
 import { HomoTypeEnum } from '@prisma/client';
 import { ISectionOptions, PageOrientation } from 'docx';
-import { removeDuplicate } from '@/@v2/shared/utils/helpers/remove-duplicate';
+import { removeDuplicate } from '../../../../../../shared/utils/removeDuplicate';
 
 import { originRiskMap } from '../../../../../../shared/constants/maps/origin-risk';
 import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';

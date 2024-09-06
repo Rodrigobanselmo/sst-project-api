@@ -1,5 +1,5 @@
 import { IDocumentsRequirementKeys } from "../../types/document/document-types.type";
-import { RiskDocumentsRequirementVO } from "../document/risk-documents-requirement.vo";
+import { RiskDocumentsRequirementVO } from "../../values-object/document/risk-documents-requirement.vo";
 
 namespace GetRiskDocumentsRequirements {
   export type Params = { requirements: RiskDocumentsRequirementVO[]; companyId: string; };

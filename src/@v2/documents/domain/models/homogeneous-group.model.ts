@@ -2,7 +2,7 @@ import { HomoTypeEnum } from "@/@v2/shared/domain/enum/security/homo-type.enum";
 import { getCharacterizationType } from "@/@v2/shared/domain/functions/security/get-characterization-type.func";
 import { getIsHomogeneousGroupGHO } from "@/@v2/shared/domain/functions/security/get-is-homogeneous-group-gho.func";
 import { getIsHomogeneousGroupHierarchy } from "@/@v2/shared/domain/functions/security/get-is-homogeneous-group-hierarchy.func";
-import { getRiskDocumentsRequirements } from "@/@v2/shared/domain/values-object/delete/get-risk-document-requirements.func copy";
+import { getRiskDocumentsRequirements } from "@/@v2/shared/domain/functions/document/get-risk-document-requirements.func";
 import { ICharacterizationModel } from "./characterization.model";
 import { HierarchyGroupModel } from "./hierarchy-groups.model";
 import { RiskDataModel } from "./risk-data.model";
@@ -67,9 +67,8 @@ export class HomogeneousGroupModel {
 
   private filterRisksData({ companyId, documentType, risksData }: { companyId: string, documentType: IDocumentsRequirementKeys; risksData: RiskDataModel[] }) {
     return risksData.filter(riskData => {
-      const requirement = getRiskDocumentsRequirements({ companyId, requirements: riskData.risk.documentsRequirements })
-      return requirement.checkIfExistAny({ documentType })
+      const { checkIfExistAny } = getRiskDocumentsRequirements({ companyId, requirements: riskData.risk.documentsRequirements })
+      return checkIfExistAny({ documentType })
     })
   }
-
 }

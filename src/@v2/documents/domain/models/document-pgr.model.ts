@@ -2,6 +2,8 @@ import { DocumentVersionModel } from "./document-version.model";
 import { ExamModel } from "./exam.model";
 import { HierarchyModel } from "./hierarchy.model";
 import { HomogeneousGroupModel } from './homogeneous-group.model';
+import { RiskDataExamModel } from "./risk-data-exam.model";
+import { RiskDataModel } from "./risk-data.model";
 
 export type IDocumentPGRModel = {
   documentVersion: DocumentVersionModel
@@ -16,8 +18,10 @@ export class DocumentPGRModel {
   homogeneousGroups: HomogeneousGroupModel[]
   exams: ExamModel[]
 
-  homogeneousGroupsMap: Record<string, HomogeneousGroupModel>
-  hierarchiesMap: Record<string, HierarchyModel>
+  homogeneousGroupsMap: Record<string, HomogeneousGroupModel | null>
+  hierarchiesMap: Record<string, HierarchyModel | null>
+  examsMap: Record<string, ExamModel | null> = {}
+  risksDataExamsMap: Record<string, RiskDataExamModel[] | null> = {}
 
   constructor(params: IDocumentPGRModel) {
     this.documentVersion = params.documentVersion;
@@ -27,6 +31,7 @@ export class DocumentPGRModel {
 
     this.homogeneousGroupsMap = this.getHomogeneousGroupsMap()
     this.hierarchiesMap = this.getHierarchiesMap()
+    this.setExamsMap()
   }
 
   get documentBase() {
@@ -37,8 +42,29 @@ export class DocumentPGRModel {
     return this.documentVersion.documentBase.model
   }
 
+  get risksData() {
+    return this.homogeneousGroups.reduce((acc, group) => [...acc, ...group.risksData], [] as RiskDataModel[])
+  }
+
   getHierarchyGroups(hierarchy: HierarchyModel) {
     return hierarchy.groups.map((group) => this.homogeneousGroupsMap[group.homogeneousGroupId])
+  }
+
+  getRiskDataExams(riskData: RiskDataModel) {
+    const exams = [] as RiskDataExamModel[]
+
+    riskData.exams.forEach((exam) => {
+      const examModel = this.examsMap[exam.examId]
+      if (examModel) exams.push(new RiskDataExamModel({
+        exam: examModel,
+        requirement: exam.requirement
+      }))
+    })
+
+    const riskDataExams = this.risksDataExamsMap[riskData.risk.id]
+    if (riskDataExams) exams.push(...riskDataExams)
+
+    return exams
   }
 
   private getHomogeneousGroupsMap() {
@@ -47,5 +73,20 @@ export class DocumentPGRModel {
 
   private getHierarchiesMap() {
     return this.hierarchies.reduce((acc, group) => ({ ...acc, [group.id]: group }), {})
+  }
+
+  private setExamsMap() {
+    this.exams.forEach((exam) => {
+      this.examsMap[exam.id] = exam
+
+      exam.examRisks.forEach((examRisk) => {
+        const riskId = examRisk.riskId
+        if (!this.risksDataExamsMap[riskId]) this.risksDataExamsMap[riskId] = []
+        this.risksDataExamsMap[riskId].push(new RiskDataExamModel({
+          exam,
+          requirement: examRisk.requirement
+        }))
+      })
+    })
   }
 }

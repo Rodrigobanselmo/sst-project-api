@@ -1,5 +1,5 @@
 
-export type IExamRequirementsVO = {
+export type IExamRequirementVO = {
   fromAge: number | null;
   toAge: number | null;
   isAdmission: boolean;
@@ -14,7 +14,7 @@ export type IExamRequirementsVO = {
   considerBetweenDays: number | null;
 }
 
-export class ExamRequirementsVO {
+export class ExamRequirementVO {
   fromAge: number | null;
   toAge: number | null;
   isAdmission: boolean;
@@ -28,7 +28,7 @@ export class ExamRequirementsVO {
   lowValidityInMonths: number | null;
   considerBetweenDays: number | null;
 
-  constructor(params: IExamRequirementsVO) {
+  constructor(params: IExamRequirementVO) {
     this.fromAge = params.fromAge;
     this.toAge = params.toAge;
     this.isAdmission = params.isAdmission;

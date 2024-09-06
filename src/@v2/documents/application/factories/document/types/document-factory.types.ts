@@ -45,7 +45,6 @@ export interface ISaveDocument<T, R> {
 
 export interface IUnlinkPaths {
   path: string;
-  url: string;
 }
 
 export interface IDocumentFactoryProduct<T = any, R = any> {
