@@ -1,5 +1,5 @@
 import { ISectionChildrenType } from '@/@v2/documents/domain/types/elements.types';
-import { IDocVariables } from '../types/IDocumentPGRSectionGroups';
+import { IDocVariables } from '../types/documet-section-groups.types';
 import { replaceAllVariables } from './replaceAllVariables';
 
 export const convertToDocxHelper = (data: ISectionChildrenType, variables: IDocVariables) => {

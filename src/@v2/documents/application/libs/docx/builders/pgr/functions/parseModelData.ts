@@ -1,5 +1,5 @@
 import { IDocumentModelData } from "@/@v2/documents/domain/types/document-mode-data.types";
-import { IDocumentSectionGroup, IDocumentSectionGroups, IDocVariables } from "../types/IDocumentPGRSectionGroups";
+import { IDocumentSectionGroup, IDocumentSectionGroups, IDocVariables } from "../types/documet-section-groups.types";
 import { ISectionChildrenType } from "@/@v2/documents/domain/types/elements.types";
 
 export const parseModelData = (model: IDocumentModelData): IDocumentSectionGroups => {

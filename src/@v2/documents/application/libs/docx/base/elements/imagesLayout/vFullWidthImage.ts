@@ -20,5 +20,5 @@ export const VFullWidthImage = (image: string, text: string, options?: IParagrap
       ...options,
     }),
     paragraphFigure(text, { spacingAfter: 200 }),
-  ].filter((i) => i);
+  ].filter((i) => i) as Paragraph[];
 };

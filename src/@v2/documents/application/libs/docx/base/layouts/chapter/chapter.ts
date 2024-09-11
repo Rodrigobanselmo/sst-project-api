@@ -1,4 +1,3 @@
-import { setNiceProportion } from './../../../../../../shared/utils/setNiceProportion';
 import {
   AlignmentType,
   Footer,
@@ -17,12 +16,13 @@ import {
 import { readFileSync } from 'fs';
 import sizeOf from 'image-size';
 import { borderNoneStyle, sectionCoverProperties } from '../../config/styles';
+import { setNiceProportion } from '../../../helpers/set-nice-proportion';
 
 interface IChapterProps {
   version: string;
   chapter: string;
   title: string;
-  imagePath: string;
+  imagePath?: string | null;
 }
 
 const text = (text: string, verticalAlign: (typeof VerticalAlign)[keyof typeof VerticalAlign]) =>
@@ -56,7 +56,7 @@ const imageCover = (imgPath: string, verticalAlign: (typeof VerticalAlign)[keyof
   const maxWidth = 630;
   const maxHeight = 200;
 
-  const { height, width } = setNiceProportion(maxWidth, maxHeight, imgWidth, imgHeight);
+  const { height, width } = setNiceProportion(maxWidth, maxHeight, imgWidth || 0, imgHeight || 0);
 
   return new TableCell({
     width: { size: 100, type: WidthType.PERCENTAGE },
@@ -86,11 +86,11 @@ export const createChapterPage = ({ version, chapter, imagePath, title }: IChapt
     }),
     ...(imagePath
       ? [
-          new TableRow({
-            children: [imageCover(imagePath, VerticalAlign.CENTER)],
-            height: { value: 3000, rule: HeightRule.EXACT },
-          }),
-        ]
+        new TableRow({
+          children: [imageCover(imagePath, VerticalAlign.CENTER)],
+          height: { value: 3000, rule: HeightRule.EXACT },
+        }),
+      ]
       : []),
     new TableRow({
       children: [text(chapter, VerticalAlign.CENTER)],

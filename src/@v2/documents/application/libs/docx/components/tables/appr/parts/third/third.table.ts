@@ -1,6 +1,5 @@
 import { Table, WidthType } from 'docx';
-import { RiskFactorGroupDataEntity } from '../../../../../../../sst/entities/riskGroupData.entity';
-import { HierarchyMapData } from '../../../../../converter/hierarchy.converter';
+import { HierarchyMapData, IDocumentRiskGroupDataConverter } from '../../../../../converter/hierarchy.converter';
 
 import { TableBodyElements } from '../../elements/body';
 import { TableHeaderElements } from '../../elements/header';
@@ -8,7 +7,7 @@ import { thirdRiskInventoryColumnsHeader, thirdRiskInventoryHeader } from './thi
 import { dataConverter } from './third.converter';
 
 export const thirdRiskInventoryTableSection = (
-  riskFactorGroupData: RiskFactorGroupDataEntity,
+  riskFactorGroupData: IDocumentRiskGroupDataConverter,
   hierarchyData: HierarchyMapData,
   isByGroup: boolean,
 ) => {

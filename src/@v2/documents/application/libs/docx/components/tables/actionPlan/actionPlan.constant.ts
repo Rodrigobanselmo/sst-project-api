@@ -1,5 +1,5 @@
-import { palette } from '../../../../../../shared/constants/palette';
 import { borderStyleGlobal } from '../../../base/config/styles';
+import { palette } from '../../../constants/palette';
 import { headerTableProps } from './elements/header';
 
 export enum ActionPlanColumnEnum {

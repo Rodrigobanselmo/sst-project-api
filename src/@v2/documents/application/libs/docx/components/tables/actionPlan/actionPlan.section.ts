@@ -1,18 +1,16 @@
-import { PageOrientation, Table, WidthType } from 'docx';
+import { ISectionOptions, PageOrientation, Table, WidthType } from 'docx';
 
-import { IHierarchyMap, IRiskGroupDataConverter } from '../../../converter/hierarchy.converter';
+import { IDocumentRiskGroupDataConverter, IHierarchyMap } from '../../../converter/hierarchy.converter';
 import { actionPlanHeader, actionPlanTitle } from './actionPlan.constant';
 import { actionPlanConverter } from './actionPlan.converter';
 import { TableBodyElements } from './elements/body';
 import { TableHeaderElements } from './elements/header';
-import { DocumentVersionModel } from '@/@v2/documents/domain/models/document-version.model';
 
 export const actionPlanTableSection = (
-  riskFactorGroupData: IRiskGroupDataConverter[],
-  documentVersion: DocumentVersionModel,
+  document: IDocumentRiskGroupDataConverter,
   hierarchyTree: IHierarchyMap,
 ) => {
-  const actionPlanData = actionPlanConverter(riskFactorGroupData, documentVersion, hierarchyTree);
+  const actionPlanData = actionPlanConverter(document.riskGroupData, document.documentVersion, hierarchyTree);
 
   const tableHeaderElements = new TableHeaderElements();
   const tableBodyElements = new TableBodyElements();
@@ -34,7 +32,7 @@ export const actionPlanTableSection = (
         size: { orientation: PageOrientation.LANDSCAPE },
       },
     },
-  };
+  } satisfies ISectionOptions;
 
   return section;
 };

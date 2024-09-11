@@ -10,8 +10,7 @@ export abstract class DonwloadImageService {
     private readonly storage: IStorageAdapter,
   ) { }
 
-  public async donwloadBatch<T, S>({ images, callbackFn, getUrl }: IDonwloadImage.ParamsBatch<T, S>) {
-
+  async donwloadBatch<T, S>({ images, callbackFn, getUrl }: IDonwloadImage.DownloadBatchParams<T, S>) {
     return await asyncBatch(images, 50, async (image) => {
       const url = getUrl(image);
       const path = await this.donwload({ imageUrl: url });
@@ -20,7 +19,7 @@ export abstract class DonwloadImageService {
     });
   }
 
-  public async donwload({ imageUrl }: IDonwloadImage.Params): Promise<string | null> {
+  async donwload({ imageUrl }: IDonwloadImage.DownloadParams): Promise<string | null> {
     if (!imageUrl) return null;
 
     return 'images/mock/placeholder-image.png'

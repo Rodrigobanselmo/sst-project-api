@@ -5,7 +5,7 @@ import { createHeader } from './header';
 export interface IHeaderFooterProps {
   version: string;
   footerText: string;
-  logoPath: string;
+  logoPath: string | null;
   consultantLogoPath: string;
   title: string;
 }
@@ -19,7 +19,7 @@ export const headerAndFooter = ({ title, version, footerText, logoPath, consulta
       title,
     }),
     headers: createHeader({
-      path: logoPath,
+      path: logoPath!,
     }),
     properties: sectionProperties,
   };

@@ -1,32 +1,34 @@
-import { sortNumber } from './../../../../../../../../shared/utils/sorts/number.sort';
-import { HomoTypeEnum, RiskFactorsEnum } from '@prisma/client';
+import { HomoTypeEnum, RiskFactorsEnum, HomogeneousGroup } from '@prisma/client';
 import { AlignmentType } from 'docx';
-import { RiskFactorGroupDataEntity } from '../../../../../../../sst/entities/riskGroupData.entity';
-import { riskMap } from '../../../../../../constants/risks.constant';
-import { getMatrizRisk } from '../../../../../../../../shared/utils/matriz';
 import { palette } from '../../../../../constants/palette';
-import { HierarchyMapData } from '../../../../../converter/hierarchy.converter';
+import { HierarchyMapData, IDocumentRiskGroupDataConverter, IGHODataConverter } from '../../../../../converter/hierarchy.converter';
 
+import { RiskDataModel } from '@/@v2/documents/domain/models/risk-data.model';
 import { bodyTableProps, borderNoneStyle } from '../../elements/body';
 import { whiteBorder, whiteColumnBorder } from '../../elements/header';
 import { ThirdRiskInventoryColumnEnum } from './third.constant';
-import { originRiskMap } from '../../../../../../../../shared/constants/maps/origin-risk';
-import { sortString } from '../../../../../../../../shared/utils/sorts/string.sort';
-import { RiskFactorDataEntity } from 'src/modules/sst/entities/riskData.entity';
+import { sortString } from '@/@v2/shared/utils/sorts/string.sort';
+import { sortNumber } from '@/@v2/shared/utils/sorts/number.sort';
+import { riskMap } from '../../../../../constants/risks-map';
+import { getMatrizRisk } from '@/@v2/shared/domain/functions/security/get-matrix-risk.func';
+import { matrixRiskMap } from '../../../../../constants/matriz-risk-map';
+import { originRiskMap } from '../../../../../constants/origin-risk';
 
 export function isRiskValidForHierarchyData({
   hierarchyData,
   riskData,
   isByGroup,
+  homogeneousGroup
 }: {
   hierarchyData: HierarchyMapData;
-  riskData: Partial<RiskFactorDataEntity>;
+  homogeneousGroup: IGHODataConverter;
+  riskData: RiskDataModel
   isByGroup: boolean;
 }) {
-  if (!hierarchyData.allHomogeneousGroupIds.includes(riskData.homogeneousGroupId)) return false;
+  if (!hierarchyData.allHomogeneousGroupIds.includes(homogeneousGroup.gho.id)) return false;
 
   if (!isByGroup) {
-    const foundHierarchy = riskData.riskFactor.docInfo.find(
+    const foundHierarchy = riskData.risk.documentsRequirements.find(
       (doc) => !!hierarchyData.org.find((hierarchy) => hierarchy.id === doc.hierarchyId),
     );
     if (foundHierarchy && foundHierarchy.isPGR === false) return false;
@@ -36,18 +38,18 @@ export function isRiskValidForHierarchyData({
 }
 
 export const dataConverter = (
-  riskGroup: RiskFactorGroupDataEntity,
+  riskGroup: IDocumentRiskGroupDataConverter,
   hierarchyData: HierarchyMapData,
   isByGroup: boolean,
 ) => {
   const riskFactorsMap = new Map<RiskFactorsEnum, bodyTableProps[][]>();
   const riskInventoryData: bodyTableProps[][] = [];
 
-  riskGroup.data
-    .sort((a, b) => sortString(a.riskFactor.name, b.riskFactor.name))
-    .sort((a, b) => sortNumber(riskMap[a.riskFactor.type]?.order, riskMap[b.riskFactor.type]?.order))
-    .forEach((riskData) => {
-      if (!isRiskValidForHierarchyData({ hierarchyData, riskData, isByGroup })) return;
+  riskGroup.riskGroupData
+    .sort((a, b) => sortString(a.riskData.risk.name, b.riskData.risk.name))
+    .sort((a, b) => sortNumber(riskMap[a.riskData.risk.type]?.order, riskMap[b.riskData.risk.type]?.order))
+    .forEach(({ riskData, homogeneousGroup }) => {
+      if (!isRiskValidForHierarchyData({ hierarchyData, homogeneousGroup, riskData, isByGroup })) return;
 
       const cells: bodyTableProps[] = [];
 
@@ -63,27 +65,28 @@ export const dataConverter = (
       const attention = { color: palette.text.attention.string, bold: true };
       const fill = { shading: { fill: palette.table.header.string } };
 
-      const riskOccupational = getMatrizRisk(riskData.riskFactor.severity, riskData.probability);
-      const riskOccupationalAfter = getMatrizRisk(riskData.riskFactor.severity, riskData.probability);
+      const riskOccupational = matrixRiskMap[getMatrizRisk(riskData.risk.severity, riskData.probability)];
+      const riskOccupationalAfter = matrixRiskMap[getMatrizRisk(riskData.risk.severity, riskData.probability)];
 
-      let origin: string;
+      let origin: string = '';
 
-      if (riskData.homogeneousGroup.environment)
-        origin = `${riskData.homogeneousGroup.environment.name}\n(${originRiskMap[riskData.homogeneousGroup.environment.type].name})`;
+      if (homogeneousGroup.gho.isEnviroment && homogeneousGroup.gho.characterization)
+        origin = `${homogeneousGroup.gho.characterization.name}\n(${originRiskMap[homogeneousGroup.gho.characterization.type].name})`;
 
-      if (riskData.homogeneousGroup.characterization)
-        origin = `${riskData.homogeneousGroup.characterization.name}\n(${originRiskMap[riskData.homogeneousGroup.characterization.type].name})`;
+      if (homogeneousGroup.gho.isCharacterization && homogeneousGroup.gho.characterization)
+        origin = `${homogeneousGroup.gho.characterization.name}\n(${originRiskMap[homogeneousGroup.gho.characterization.type].name})`;
 
-      if (!riskData.homogeneousGroup.type) origin = `${riskData.homogeneousGroup.name}\n(GSE)`;
+      if (!homogeneousGroup.gho.type) origin = `${homogeneousGroup.gho.name}\n(GSE)`;
 
-      if (riskData.homogeneousGroup.type == HomoTypeEnum.HIERARCHY) {
-        const hierarchy = hierarchyData.org.find((hierarchy) => hierarchy.id == riskData.homogeneousGroup.id);
+      if (homogeneousGroup.gho.isHierarchy) {
+        const hierarchy = hierarchyData.org.find((hierarchy) => hierarchy.id == homogeneousGroup.gho.id);
 
         if (hierarchy) origin = `${hierarchy.name}\n(${originRiskMap[hierarchy.typeEnum].name})`;
       }
 
+
       cells[ThirdRiskInventoryColumnEnum.TYPE] = {
-        text: riskMap[riskData.riskFactor.type]?.label || '',
+        text: riskMap[riskData.risk.type]?.label || '',
         bold: true,
         size: 4,
         ...base,
@@ -99,13 +102,13 @@ export const dataConverter = (
       };
 
       cells[ThirdRiskInventoryColumnEnum.RISK_FACTOR] = {
-        text: riskData.riskFactor.name,
+        text: riskData.risk.name,
         size: 10,
         ...base,
       };
 
       cells[ThirdRiskInventoryColumnEnum.RISK] = {
-        text: riskData.riskFactor.risk,
+        text: riskData.risk.healthRisk || '',
         size: 7,
         ...base,
       };
@@ -124,19 +127,19 @@ export const dataConverter = (
       };
 
       cells[ThirdRiskInventoryColumnEnum.ENG] = {
-        text: riskData.engs.map((eng) => eng.medName).join('\n'),
+        text: riskData.egineeringMeasures.map((eng) => eng.name).join('\n'),
         size: 7,
         ...base,
       };
 
       cells[ThirdRiskInventoryColumnEnum.ADM] = {
-        text: riskData.adms.map((adm) => adm.medName).join('\n'),
+        text: riskData.administrativeMeasures.map((adm) => adm.name).join('\n'),
         size: 7,
         ...base,
       };
 
       cells[ThirdRiskInventoryColumnEnum.SEVERITY] = {
-        text: String(riskData.riskFactor.severity),
+        text: String(riskData.risk.severity),
         size: 1,
         ...base,
         ...fill,
@@ -163,13 +166,13 @@ export const dataConverter = (
       };
 
       cells[ThirdRiskInventoryColumnEnum.RECOMMENDATIONS] = {
-        text: riskData.recs.map((rec) => rec.recName).join('\n'),
+        text: riskData.recommendations.map((rec) => rec.name).join('\n'),
         size: 7,
         ...base,
       };
 
       cells[ThirdRiskInventoryColumnEnum.SEVERITY_AFTER] = {
-        text: String(riskData.riskFactor.severity),
+        text: String(riskData.risk.severity),
         size: 1,
         ...base,
         ...fill,
@@ -191,8 +194,8 @@ export const dataConverter = (
         ...fill,
       };
 
-      const rows = riskFactorsMap.get(riskData.riskFactor.type) || [];
-      riskFactorsMap.set(riskData.riskFactor.type, [...rows, cells]);
+      const rows = riskFactorsMap.get(riskData.risk.type) || [];
+      riskFactorsMap.set(riskData.risk.type, [...rows, cells]);
     });
 
   riskFactorsMap.forEach((rows) => {

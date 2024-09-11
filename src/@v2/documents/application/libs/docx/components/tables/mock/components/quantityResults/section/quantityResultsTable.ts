@@ -4,7 +4,7 @@ import {
   ISectionChildrenType,
 } from '../../../../../../../../../domain/types/elements.types';
 import { DocumentChildrenTypeEnum as DocumentSectionChildrenTypeEnum } from '@/@v2/documents/domain/enums/document-children-type.enum';
-import { IDocVariables } from '@/@v2/documents/application/libs/docx/builders/pgr/types/IDocumentPGRSectionGroups';
+import { IDocVariables } from '@/@v2/documents/application/libs/docx/builders/pgr/types/documet-section-groups.types';
 import { annualDoseTable } from '../../annualDose/table.component';
 import { quantityResultsFBVTable } from '../tables/quantityResultsFBVTable';
 import { quantityResultsHTable } from '../tables/quantityResultsHTable';

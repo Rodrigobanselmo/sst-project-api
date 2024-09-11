@@ -4,7 +4,7 @@ import { Paragraph, Table, WidthType } from 'docx';
 import { DocumentChildrenTypeEnum } from '@/@v2/documents/domain/enums/document-children-type.enum';
 import { ISectionChildrenType } from '../../../../../../domain/types/elements.types';
 import { borderStyleGlobal } from '../../../base/config/styles';
-import { IDocVariables } from '../../../builders/pgr/types/IDocumentPGRSectionGroups';
+import { IDocVariables } from '../../../builders/pgr/types/documet-section-groups.types';
 import { palette } from '../../../constants/palette';
 import { IHierarchyData, IHierarchyMap, IRiskGroupDataConverter } from '../../../converter/hierarchy.converter';
 import { bodyTableProps, TableBodyElements } from './elements/body';

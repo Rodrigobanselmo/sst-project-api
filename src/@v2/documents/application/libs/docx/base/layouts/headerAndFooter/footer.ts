@@ -14,8 +14,8 @@ import {
 } from 'docx';
 import sizeOf from 'image-size';
 import { readFileSync } from 'fs';
-import { palette } from '../../../../../../shared/constants/palette';
-import { setNiceProportion } from '../../../../../../shared/utils/setNiceProportion';
+import { palette } from '../../../constants/palette';
+import { setNiceProportion } from '../../../helpers/set-nice-proportion';
 
 interface IFooterProps {
   footerText: string;
@@ -113,22 +113,22 @@ const secondCell = (consultantLogoPath: string) => {
     const maxWidth = 250;
     const maxHeight = 30;
 
-    const { height, width } = setNiceProportion(maxWidth, maxHeight, imgWidth, imgHeight);
+    const { height, width } = setNiceProportion(maxWidth, maxHeight, imgWidth || 0, imgHeight || 0);
     return { height, width };
   };
 
   const image = consultantLogoPath
     ? new ImageRun({
-        data: readFileSync(consultantLogoPath),
-        transformation: getProportion(),
-      })
+      data: readFileSync(consultantLogoPath),
+      transformation: getProportion(),
+    })
     : undefined;
 
   return new TableCell({
     verticalAlign: VerticalAlign.CENTER,
     children: [
       new Paragraph({
-        children: [image],
+        children: image ? [image] : [],
         alignment: AlignmentType.END,
         spacing: { after: 0, before: 100 },
       }),

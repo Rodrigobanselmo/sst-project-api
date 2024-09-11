@@ -2,7 +2,7 @@ import { DocumentModelEntity } from "../entities/document-model.entity"
 import { IDocumentModelData } from "../types/document-mode-data.types"
 import { IImage } from "../types/elements.types"
 import { parseModelData } from "../../application/libs/docx/builders/pgr/functions/parseModelData"
-import { IDocumentSectionGroup, IDocumentSectionGroups } from "../../application/libs/docx/builders/pgr/types/IDocumentPGRSectionGroups"
+import { IDocumentSectionGroup, IDocumentSectionGroups } from "../../application/libs/docx/builders/pgr/types/documet-section-groups.types"
 
 export type IDocumentModelModel = {
   data: Buffer
@@ -21,22 +21,23 @@ export class DocumentModelModel {
     this.variables = data.variables
   }
 
-  get imagesUrls() {
-    const imagesPath = new Set<string>()
+  get images() {
+    const imagesMap: Record<string, IImage> = {}
 
     this.#data?.sections.forEach((section) => {
       if (!section.children) return
       Object.values(section.children).forEach((data) => {
         data.forEach((child) => {
           if (child.type === 'IMAGE' && child.url) {
-            imagesPath.add(child.url)
+            imagesMap[child.url] = child
           }
         })
       })
     }, [])
 
-    return Array.from(imagesPath)
+    return Object.values(imagesMap)
   }
+
 
   private data(): IDocumentSectionGroups {
     const modelData = this.#data

@@ -3,7 +3,7 @@ import { PageOrientation, Paragraph, Table, WidthType } from 'docx';
 
 import { ISectionChildrenType } from '../../../../../../domain/types/elements.types';
 import { DocumentChildrenTypeEnum as DocumentSectionChildrenTypeEnum } from '@/@v2/documents/domain/enums/document-children-type.enum';
-import { IDocVariables } from '../../../builders/pgr/types/IDocumentPGRSectionGroups';
+import { IDocVariables } from '../../../builders/pgr/types/documet-section-groups.types';
 import { IHierarchyData, IHierarchyMap, IRiskGroupDataConverter } from '../../../converter/hierarchy.converter';
 import { TableBodyElements } from './elements/body';
 import { TableHeaderElements } from './elements/header';

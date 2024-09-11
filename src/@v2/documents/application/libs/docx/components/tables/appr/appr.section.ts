@@ -1,14 +1,11 @@
 import { HierarchyEnum } from '@prisma/client';
-import { ISectionOptions, PageOrientation } from 'docx';
-import { sortString } from '../../../../../../shared/utils/sorts/string.sort';
-import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
-import { DocumentDataPGRDto } from './../../../../../sst/dto/document-data-pgr.dto';
-import { DocumentDataEntity } from './../../../../../sst/entities/documentData.entity';
+import { ISectionOptions, PageOrientation, Paragraph, Table } from 'docx';
 
-import { IHierarchyData, IHomoGroupMap } from '../../../converter/hierarchy.converter';
+import { IDocumentRiskGroupDataConverter, IHierarchyData, IHomoGroupMap } from '../../../converter/hierarchy.converter';
 import { firstRiskInventoryTableSection } from './parts/first/first.table';
 import { secondRiskInventoryTableSection } from './parts/second/second.table';
 import { thirdRiskInventoryTableSection } from './parts/third/third.table';
+import { sortString } from '@/@v2/shared/utils/sorts/string.sort';
 
 export interface IAPPRTableOptions {
   isByGroup?: boolean;
@@ -16,12 +13,12 @@ export interface IAPPRTableOptions {
 }
 
 export const APPRTableSection = (
-  riskFactorGroupData: RiskFactorGroupDataEntity & DocumentDataEntity & DocumentDataPGRDto,
+  riskFactorGroupData: IDocumentRiskGroupDataConverter,
   hierarchyData: IHierarchyData,
   homoGroupTree: IHomoGroupMap,
   // options: IAPPRTableOptions = {},
 ): ISectionOptions[] => {
-  const sectionsTables = [];
+  const sectionsTables = [] as (Table | Paragraph)[][];
   const isByGroup = false;
 
   const map = new Map<string, boolean>();
@@ -42,7 +39,7 @@ export const APPRTableSection = (
       const homoGroupsIds = hierarchy.org.reduce((acc, hierarchy) => {
         if (hierarchy.homogeneousGroupIds) return [...acc, ...hierarchy.homogeneousGroupIds];
         return acc;
-      }, []);
+      }, [] as string[]);
 
       homoGroupsIds.forEach((homoGroupID) => {
         if (map.get(homoGroupID)) {
@@ -56,7 +53,7 @@ export const APPRTableSection = (
 
         map.set(homoGroupID, true);
 
-        if (!description && !homoGroup.type) hierarchy.descReal = homoGroup?.description;
+        if (!description && !homoGroup.gho.type) hierarchy.descReal = homoGroup?.gho.description;
         // if (!homoGroup.type && isByGroup) hierarchy.descReal = homoGroup?.description || hierarchy.descReal || hierarchy.descRh;
 
         // if (isByGroup) createTable();

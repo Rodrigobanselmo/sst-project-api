@@ -1,7 +1,7 @@
 import { WorkspaceEntity } from './../../../../../company/entities/workspace.entity';
 import { UserEntity } from './../../../../../users/entities/user.entity';
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
-import { IDocVariables } from '../../../builders/pgr/types/IDocumentPGRSectionGroups';
+import { IDocVariables } from '../../../builders/pgr/types/documet-section-groups.types';
 import { ProfessionalEntity } from '../../../../../users/entities/professional.entity';
 import { getCredential } from '../professionals/professionals.converter';
 

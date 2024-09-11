@@ -6,7 +6,7 @@ import { ISectionChildrenType } from '../../../../../../domain/types/elements.ty
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
 import { TableBodyElements } from './elements/body';
 import { SignaturesConverter } from './signatures.converter';
-import { IDocVariables } from '../../../builders/pgr/types/IDocumentPGRSectionGroups';
+import { IDocVariables } from '../../../builders/pgr/types/documet-section-groups.types';
 import { DocumentChildrenTypeEnum } from '@/@v2/documents/domain/enums/document-children-type.enum';
 import { arrayChunks } from '@/@v2/shared/utils/helpers/array-chunks';
 

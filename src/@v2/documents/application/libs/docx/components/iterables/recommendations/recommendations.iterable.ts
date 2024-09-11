@@ -2,7 +2,7 @@ import { Paragraph, Table } from 'docx';
 
 import { DocumentChildrenTypeEnum as DocumentSectionChildrenTypeEnum } from '@/@v2/documents/domain/enums/document-children-type.enum';
 import { ISectionChildrenType } from '../../../../../../domain/types/elements.types';
-import { IDocVariables } from '../../../builders/pgr/types/IDocumentPGRSectionGroups';
+import { IDocVariables } from '../../../builders/pgr/types/documet-section-groups.types';
 import { IRiskGroupDataConverter } from '../../../converter/hierarchy.converter';
 import { recommendationsConverter } from './recommendations.converter';
 

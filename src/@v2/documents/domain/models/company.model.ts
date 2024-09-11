@@ -1,10 +1,12 @@
 import { formatCnae } from "@/@v2/shared/utils/helpers/formats-cnae";
 import { AddressModel } from "./address.model";
 import { ConsultantModel } from "./consultant.model";
+import { CompanyDocumentsCoverVO } from "@/@v2/shared/domain/values-object/company/company-document-cover.vo";
 
 export type ICompanyModel = {
   id: string
   name: string
+  fantasyName: string
   cnpj: string;
   employeeCount: number
   initials: string | null
@@ -21,6 +23,7 @@ export type ICompanyModel = {
   primaryActivityRiskDegree: number | null
   logoUrl: string | null
 
+  cover: CompanyDocumentsCoverVO | null
   consultant: ConsultantModel | null
   address: AddressModel | null
 }
@@ -28,6 +31,7 @@ export type ICompanyModel = {
 export class CompanyModel {
   id: string
   name: string
+  fantasyName: string
   cnpj: string;
   employeeCount: number
   initials: string
@@ -45,12 +49,14 @@ export class CompanyModel {
   logoUrl: string | null
   logoPath: string | null
 
+  cover: CompanyDocumentsCoverVO | null
   consultant: ConsultantModel | null
   address: AddressModel | null
 
   constructor(params: ICompanyModel) {
     this.id = params.id
     this.name = params.name
+    this.fantasyName = params.fantasyName
     this.cnpj = params.cnpj
     this.employeeCount = params.employeeCount
     this.initials = params.initials || ''
@@ -68,6 +74,7 @@ export class CompanyModel {
     this.logoUrl = params.logoUrl
     this.logoPath = null
 
+    this.cover = params.cover;
     this.consultant = params.consultant;
     this.address = params.address
   }
@@ -76,5 +83,13 @@ export class CompanyModel {
     if (!this.primaryActivityCode) return '';
 
     return `${formatCnae(this.primaryActivityCode)} - ${this.primaryActivityName || ''}`
+  }
+
+  get indentificationName() {
+    return this.initials || this.shortName || this.fantasyName || this.name;
+  }
+
+  get consultantLogoPath() {
+    return this.consultant?.logoPath || 'images/logo/logo-simple.png';
   }
 }

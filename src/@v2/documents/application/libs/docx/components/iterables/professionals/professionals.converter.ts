@@ -1,6 +1,6 @@
 
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
-import { IDocVariables } from '../../../builders/pgr/types/IDocumentPGRSectionGroups';
+import { IDocVariables } from '../../../builders/pgr/types/documet-section-groups.types';
 import { ProfessionalSignatureModel } from '@/@v2/documents/domain/models/professional-signature.model';
 
 export const getCredential = (row: ProfessionalSignatureModel) => {

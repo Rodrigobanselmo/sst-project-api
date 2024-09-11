@@ -1,6 +1,6 @@
 import { ISectionOptions } from 'docx';
 
-import { IDocVariables } from '@/@v2/documents/application/libs/docx/builders/pgr/types/IDocumentPGRSectionGroups';
+import { IDocVariables } from '@/@v2/documents/application/libs/docx/builders/pgr/types/documet-section-groups.types';
 import { DocumentPGRModel } from '@/@v2/documents/domain/models/document-pgr.model';
 import { IAllDocumentSectionType, } from '../../../../../domain/types/section.types';
 import { VariablesPGREnum } from './enums/variables.enum';
@@ -67,24 +67,13 @@ export class DocumentBuildPGR {
       data: this.data,
       variables: this.variables,
       attachments: this.attachments,
-      imagesMap: this.imagesMap,
     }).map;
 
     const sectionsMap = new SectionsMapClass({
+      data: this.data,
       variables: this.variables,
-      logoImagePath: this.logoImagePath,
-      consultantLogoImagePath: this.consultantLogoImagePath,
-      version: this.version,
       elementsMap,
-      document: this.data,
-      homogeneousGroup: this.homogeneousGroup,
-      hierarchy: this.hierarchy,
-      environments: this.environments ?? [],
-      characterizations: this.characterizations ?? [],
-      company: this.company,
-      cover: this.cover,
-      hierarchyTree: this.hierarchyTree,
-      hierarchyHighLevelsData: this.hierarchyHighLevelsData,
+      version: this.version,
     }).map;
 
     data.forEach((child) => {

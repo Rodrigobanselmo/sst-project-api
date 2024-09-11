@@ -1,17 +1,29 @@
-import { CharacterizationTypeEnum } from '@prisma/client';
+import { HomoTypeEnum } from '@prisma/client';
 import { AlignmentType, BorderStyle, Paragraph, Table } from 'docx';
 
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
 import { ISectionChildrenType } from '../../../../../../domain/types/elements.types';
 import { DocumentChildrenTypeEnum as DocumentSectionChildrenTypeEnum } from '@/@v2/documents/domain/enums/document-children-type.enum';
-import { IDocVariables } from '../../../builders/pgr/types/IDocumentPGRSectionGroups';
+import { IDocVariables } from '../../../builders/pgr/types/documet-section-groups.types';
 import { IHierarchyData, IHomoGroupMap } from '../../../converter/hierarchy.converter';
 import { hierarchyHomoOrgTable } from '../../tables/hierarchyHomoOrg/hierarchyHomoOrg.table';
-import { CharacterizationEntity } from '../../../../../company/entities/characterization.entity';
-import { environmentsConverter, IEnvironmentConvertResponse } from './all-characterization.converter';
-import { sortNumber } from '../../../../../../shared/utils/sorts/number.sort';
-import { getCharacterizationType } from '../../../../../../shared/utils/getCharacterizationType';
-import { filterRisk } from '../../../../../../shared/utils/filterRisk';
+import { environmentsConverter } from './all-characterization.converter';
+import { HomogeneousGroupModel } from '@/@v2/documents/domain/models/homogeneous-group.model';
+import { checkValidExistentRisk } from '@/@v2/shared/domain/functions/security/check-valid-existent-risk.func';
+import { getCharacterizationType } from '@/@v2/shared/domain/functions/security/get-characterization-type.func';
+import { sortNumber } from '@/@v2/shared/utils/sorts/number.sort';
+import { RiskModel } from '@/@v2/documents/domain/models/risk.model';
+import { CharacterizationTypeEnum } from '@/@v2/shared/domain/enum/security/characterization-type.enum';
+
+export interface IEnvironmentConvertResponse {
+  variables: IDocVariables;
+  risks: RiskModel[];
+  considerations: string[];
+  activities: string[];
+  paragraphs: string[];
+  type: CharacterizationTypeEnum;
+  id: string;
+}
 
 const getData = (
   hierarchiesTreeOrg: IHierarchyData,
@@ -26,7 +38,7 @@ const getData = (
     activities: ac,
     type,
     paragraphs,
-  }: Partial<IEnvironmentConvertResponse>,
+  }: IEnvironmentConvertResponse,
 ) => {
   const parameters: ISectionChildrenType[] = [];
   const riskFactors: ISectionChildrenType[] = [];
@@ -76,7 +88,7 @@ const getData = (
   }
 
   risks
-    .filter((risk) => filterRisk(risk))
+    .filter((risk) => checkValidExistentRisk(risk))
     .forEach((risk, index) => {
       if (index === 0)
         riskFactors.push({
@@ -93,13 +105,13 @@ const getData = (
       });
     });
 
-  paragraphs.forEach((paragraph) => {
+  paragraphs?.forEach((paragraph) => {
     paragraphSection.push({
       ...getSentenceType(paragraph),
     });
   });
 
-  cons.forEach((consideration, index) => {
+  cons?.forEach((consideration, index) => {
     if (index === 0)
       considerations.push({
         type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
@@ -112,7 +124,7 @@ const getData = (
     });
   });
 
-  ac.forEach((activity, index) => {
+  ac?.forEach((activity, index) => {
     if (index === 0)
       activities.push({
         type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
@@ -144,7 +156,7 @@ const getData = (
   const { table: officesTable, missingBody } = hierarchyHomoOrgTable(hierarchiesTreeOrg, homoGroupTree, {
     showDescription: false,
     showHomogeneous: true,
-    type: getCharacterizationType(type),
+    type: getCharacterizationType(type).isEnviroment ? HomoTypeEnum.ENVIRONMENT : type as HomoTypeEnum,
     groupIdFilter: id,
   });
 
@@ -253,7 +265,7 @@ const characterizationTypes = [
 ];
 
 export const allCharacterizationSections = (
-  environmentsData: CharacterizationEntity[],
+  homogeneousGroup: HomogeneousGroupModel[],
   hierarchiesTreeOrg: IHierarchyData,
   homoGroupTree: IHomoGroupMap,
   type = 'char' as 'env' | 'char',
@@ -263,7 +275,15 @@ export const allCharacterizationSections = (
   const sectionProfiles: Record<string, (Paragraph | Table)[]> = {};
 
   (type === 'char' ? characterizationTypes : environmentTypes).forEach(({ type, title: titleSection, desc }) => {
-    const environments = environmentsData.filter((e) => e.type === type || !!e.profileParentId);
+    const environments = homogeneousGroup.filter((e) => {
+      if (!e.characterization) return false;
+
+      const sameType = e.characterization.type === type;
+      const isProfile = !!e.characterization.profileParentId;
+
+      return sameType || isProfile;
+
+    });
 
     if (!environments?.length) return;
 
@@ -294,13 +314,13 @@ export const allCharacterizationSections = (
           ] as ISectionChildrenType[];
 
           const otherSections = getData(hierarchiesTreeOrg, homoGroupTree, titleSection, convertToDocx, {
-            variables,
-            id,
-            risks,
+            variables: variables,
+            id: id,
+            risks: risks,
             considerations: cons,
             activities: ac,
-            type,
-            paragraphs,
+            type: type as any,
+            paragraphs: paragraphs,
           });
 
           if (profileParentId) {
@@ -324,7 +344,7 @@ export const allCharacterizationSections = (
             ...convertToDocx([...title], variables),
             ...elements,
             ...otherSections,
-            ...profiles
+            ...(profiles || [])
               .map((profile) => sectionProfiles[profile.id])
               .reduce((acc, curr) => (curr ? [...acc, ...curr] : acc), []),
           ];

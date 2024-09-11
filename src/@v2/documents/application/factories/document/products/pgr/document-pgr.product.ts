@@ -1,19 +1,17 @@
+import { DocumentBuildPGR } from '@/@v2/documents/application/libs/docx/builders/pgr/create';
+import { getDocumentFileName } from '@/@v2/documents/application/libs/docx/helpers/get-document-file-name';
+import { DonwloadImageService } from '@/@v2/documents/application/services/donwload-image/donwload-image.service';
+import { DocumentDAO } from '@/@v2/documents/database/dao/document/document.dao';
+import { DocumentSectionTypeEnum } from '@/@v2/documents/domain/enums/document-section-type.enum';
+import { CharacterizationPhotoModel } from '@/@v2/documents/domain/models/characterization-photos.model';
+import { DocumentPGRModel } from '@/@v2/documents/domain/models/document-pgr.model';
+import { PromiseInfer } from '@/@v2/shared/interfaces/promise-infer.types';
+import { dateUtils } from '@/@v2/shared/utils/helpers/date-utils';
 import { BadRequestException, Injectable, Scope } from '@nestjs/common';
 import { ISectionOptions } from 'docx';
 import { v4 } from 'uuid';
-import { IDocumentFactoryProduct, IImagesMap, IUnlinkPaths } from '../../types/document-factory.types';
+import { IDocumentFactoryProduct, IUnlinkPaths } from '../../types/document-factory.types';
 import { IDocumentPGRParams } from './document-pgr.types';
-import { dateUtils } from '@/@v2/shared/utils/helpers/date-utils';
-import { DocumentTypeEnum } from '@/@v2/documents/domain/enums/document-type.enum';
-import { DocumentBuildPGR } from '@/@v2/documents/application/libs/docx/builders/pgr/create';
-import { PromiseInfer } from '@/@v2/shared/interfaces/promise-infer.types';
-import { DocumentPGRModel } from '@/@v2/documents/domain/models/document-pgr.model';
-import { DocumentDAO } from '@/@v2/documents/database/dao/document/document.dao';
-import { DocumentSectionTypeEnum } from '@/@v2/documents/domain/enums/document-section-type.enum';
-import { CompanyModel } from '@/@v2/documents/domain/models/company.model';
-import { ConsultantModel } from '@/@v2/documents/domain/models/consultant.model';
-import { DonwloadImageService } from '@/@v2/documents/application/services/donwload-image/donwload-image.service';
-import { CharacterizationPhotoModel } from '@/@v2/documents/domain/models/characterization-photos.model';
 
 @Injectable({ scope: Scope.REQUEST })
 export class DocumentPGRFactory implements IDocumentFactoryProduct<IDocumentPGRParams> {
@@ -29,9 +27,7 @@ export class DocumentPGRFactory implements IDocumentFactoryProduct<IDocumentPGRP
     const document = await this.documentDAO.findDocumentPGR({ documentVersionId });
     if (!document) throw new BadRequestException('Nenhum documento PGR cadastrado');
 
-    // const { imagesMap } = await this.downloadImages(images);
-    // const { consultantLogo, logo } = await this.downloadLogos(company, consultant);
-    // const { characterizations } = await this.downloadCharPhotos(homogeneousGroups);
+    await this.downloadImages(document);
 
     return document
   }
@@ -158,65 +154,53 @@ export class DocumentPGRFactory implements IDocumentFactoryProduct<IDocumentPGRP
   };
 
   public getFileName = (data: DocumentPGRModel, type = 'PGR') => {
-    return getDocxFileName({
-      name: info.name,
-      companyName: this.company.initials || this.company?.fantasy || this.company.name,
-      version: info.version,
+    return getDocumentFileName({
+      name: data.documentVersion.name || '',
+      companyName: data.documentBase.company.indentificationName,
+      version: data.documentVersion.version,
       typeName: type,
       date: dateUtils().format('MMMM-YYYY'),
     });
   };
 
   private async downloadImages(document: DocumentPGRModel) {
-    const imagesMap: IImagesMap = {};
-
-    const imagesUrls = document.model.imagesUrls;
+    const images = document.model.images;
     const company = document.documentBase.company;
     const consultant = document.documentBase.company.consultant;
 
     const companyLogoPath = await this.donwloadImageService.donwload({ imageUrl: company.logoUrl })
     const consultantLogoPath = await this.donwloadImageService.donwload({ imageUrl: consultant?.logoUrl })
 
-    if (companyLogoPath) this.unlinkPaths.push({ path: companyLogoPath });
-    if (consultantLogoPath) this.unlinkPaths.push({ path: consultantLogoPath });
+    if (companyLogoPath) {
+      this.unlinkPaths.push({ path: companyLogoPath })
+      company.logoPath = companyLogoPath;
+    };
+    if (consultantLogoPath && consultant) {
+      this.unlinkPaths.push({ path: consultantLogoPath })
+      consultant.logoPath = consultantLogoPath
+    };
 
     await this.donwloadImageService.donwloadBatch({
-      images: imagesUrls,
-      getUrl: (url) => url,
-      callbackFn: async (path, url) => {
+      images: images,
+      getUrl: (image) => image.url,
+      callbackFn: async (path, image) => {
         if (path) {
           this.unlinkPaths.push({ path });
-          imagesMap[url] = { path };
+          image.path = path;
         }
       },
     })
 
-    const photos = document.homogeneousGroups.map((group) => group.characterization?.photos).flat().filter(Boolean) as (CharacterizationPhotoModel)[];
-
+    const photos = document.homogeneousGroups.map((group) => group.characterization?.photos).flat().filter(Boolean) as CharacterizationPhotoModel[];
     await this.donwloadImageService.donwloadBatch({
-      images: document.homogeneousGroups,
-      getUrl: (homogeneousGroup) => homogeneousGroup.characterization.,
-      callbackFn: async (path, url) => {
+      images: photos,
+      getUrl: (photo) => photo.url,
+      callbackFn: async (path, photo) => {
         if (path) {
           this.unlinkPaths.push({ path });
-          imagesMap[url] = { path };
+          photo.path = path;
         }
       },
     })
-
-    return { companyLogoUrl, consultantLogoUrl };
-  }
-
-  public async downloadPathLogoImage(logoUrl: string, consultLogoUrl: string) {
-    const [logo, consultantLogo] = await downloadPathImages([logoUrl, consultLogoUrl]);
-    return [logo, consultantLogo];
-  }
-
-  public async downloadPathImage(url: string) {
-    return downloadPathImage(url);
-  }
-
-  public async downloadInlinePathImage(url: string) {
-    return downloadPathImage(url);
   }
 }

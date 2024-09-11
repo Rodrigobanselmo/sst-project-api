@@ -8,7 +8,7 @@ import { expositionDegreeATable } from '../tables/expositionDegreeATable';
 import { expositionDegreeBTable } from '../tables/expositionDegreeBTable';
 import { expositionDegreeETable } from '../tables/expositionDegreeETable';
 import { expositionDegreeFQTable } from '../tables/expositionDegreeFQTable';
-import { IDocVariables } from '@/@v2/documents/application/libs/docx/builders/pgr/types/IDocumentPGRSectionGroups';
+import { IDocVariables } from '@/@v2/documents/application/libs/docx/builders/pgr/types/documet-section-groups.types';
 
 export const expositionDegreeTable = (
   convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[],

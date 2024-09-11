@@ -5,7 +5,7 @@ import { ProfessionalSignatureModel } from '@/@v2/documents/domain/models/profes
 import { AlignmentType, Paragraph, Table } from 'docx';
 import { ISectionChildrenType } from '../../../../../../domain/types/elements.types';
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
-import { IDocVariables } from '../../../builders/pgr/types/IDocumentPGRSectionGroups';
+import { IDocVariables } from '../../../builders/pgr/types/documet-section-groups.types';
 import { ProfessionalsConverter } from './professionals.converter';
 
 export const professionalsIterable = (

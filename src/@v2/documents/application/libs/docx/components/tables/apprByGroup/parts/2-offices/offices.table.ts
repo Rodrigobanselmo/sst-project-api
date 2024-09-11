@@ -1,14 +1,13 @@
-import { HierarchyEntity } from './../../../../../../../company/entities/hierarchy.entity';
 import { Table, WidthType } from 'docx';
 
-import { HierarchyMapData } from '../../../../../converter/hierarchy.converter';
+import { HierarchyMapData, IHierarchyDataConverter } from '../../../../../converter/hierarchy.converter';
 import { TableBodyElements } from '../../elements/body';
 import { TableHeaderElements } from '../../elements/header';
 import { secondRiskInventoryHeader } from './offices.constant';
 import { dataConverter } from './offices.converter';
 
 export const officeRiskInventoryTableSection = (
-  hierarchyData: HierarchyMapData & { hierarchies: HierarchyEntity[] },
+  hierarchyData: HierarchyMapData & { hierarchies: IHierarchyDataConverter[] },
 ) => {
   const data = dataConverter(hierarchyData);
 

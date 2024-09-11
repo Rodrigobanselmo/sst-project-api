@@ -8,7 +8,7 @@ import { healthSeverityAciTable } from '../tables/healthSeverityATable';
 import { healthSeverityBioTable } from '../tables/healthSeverityBTable';
 import { healthSeverityErgTable } from '../tables/healthSeverityETable';
 import { healthSeverityFisQuiTable } from '../tables/healthSeverityFQTable';
-import { IDocVariables } from '@/@v2/documents/application/libs/docx/builders/pgr/types/IDocumentPGRSectionGroups';
+import { IDocVariables } from '@/@v2/documents/application/libs/docx/builders/pgr/types/documet-section-groups.types';
 
 export const healthEffectTable = (
   convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[],

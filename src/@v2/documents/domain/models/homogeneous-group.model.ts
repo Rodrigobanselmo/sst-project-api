@@ -1,12 +1,12 @@
 import { HomoTypeEnum } from "@/@v2/shared/domain/enum/security/homo-type.enum";
+import { getRiskDocumentsRequirements } from "@/@v2/shared/domain/functions/document/get-risk-document-requirements.func";
 import { getCharacterizationType } from "@/@v2/shared/domain/functions/security/get-characterization-type.func";
 import { getIsHomogeneousGroupGHO } from "@/@v2/shared/domain/functions/security/get-is-homogeneous-group-gho.func";
 import { getIsHomogeneousGroupHierarchy } from "@/@v2/shared/domain/functions/security/get-is-homogeneous-group-hierarchy.func";
-import { getRiskDocumentsRequirements } from "@/@v2/shared/domain/functions/document/get-risk-document-requirements.func";
-import { ICharacterizationModel } from "./characterization.model";
+import { IDocumentsRequirementKeys } from "@/@v2/shared/domain/types/document/document-types.type";
+import { CharacterizationModel } from "./characterization.model";
 import { HierarchyGroupModel } from "./hierarchy-groups.model";
 import { RiskDataModel } from "./risk-data.model";
-import { IDocumentsRequirementKeys } from "@/@v2/shared/domain/types/document/document-types.type";
 
 export type IHomogeneousGroupModel = {
   id: string
@@ -17,7 +17,7 @@ export type IHomogeneousGroupModel = {
   documentType: IDocumentsRequirementKeys
 
   hierarchies: HierarchyGroupModel[]
-  characterization: ICharacterizationModel | null
+  characterization: CharacterizationModel | null
   risksData: RiskDataModel[]
 }
 
@@ -28,7 +28,7 @@ export class HomogeneousGroupModel {
   type: HomoTypeEnum;
 
   hierarchies: HierarchyGroupModel[]
-  characterization: ICharacterizationModel | null
+  characterization: CharacterizationModel | null
   risksData: RiskDataModel[]
 
   constructor(params: IHomogeneousGroupModel) {

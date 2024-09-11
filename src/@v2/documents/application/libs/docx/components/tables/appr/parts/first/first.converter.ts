@@ -1,22 +1,19 @@
-import { DocumentDataPGRDto } from './../../../../../../../sst/dto/document-data-pgr.dto';
 import dayjs from 'dayjs';
 import { AlignmentType } from 'docx';
-import { RiskFactorGroupDataEntity } from '../../../../../../../sst/entities/riskGroupData.entity';
 
-import { HierarchyMapData, IHomoGroupMap } from '../../../../../converter/hierarchy.converter';
+import { HierarchyMapData, IDocumentRiskGroupDataConverter, IHomoGroupMap } from '../../../../../converter/hierarchy.converter';
 import { bodyTableProps, borderNoneStyle } from '../../elements/body';
 import { FirstRiskInventoryColumnEnum, firstRiskInventoryHeader } from './first.constant';
-import { DocumentDataEntity } from '../../../../../../../../modules/sst/entities/documentData.entity';
 
 export const documentConverter = (
-  riskFactorGroupData: RiskFactorGroupDataEntity & DocumentDataEntity & DocumentDataPGRDto,
+  riskFactorGroupData: IDocumentRiskGroupDataConverter,
   homoGroupTree: IHomoGroupMap,
   hierarchy: HierarchyMapData,
   isByGroup: boolean,
 ) => {
   const rows: bodyTableProps[][] = [];
-  const homogeneousGroups = [];
-  const environments = [];
+  const homogeneousGroups = [] as string[];
+  const environments = [] as string[];
 
   rows.push(
     firstRiskInventoryHeader.map((data) => ({
@@ -26,13 +23,13 @@ export const documentConverter = (
     })),
   );
 
-  const docData = [];
+  const docData = [] as string[];
 
-  docData[FirstRiskInventoryColumnEnum.SOURCE] = riskFactorGroupData.source || '';
-  docData[FirstRiskInventoryColumnEnum.REVIEW] = riskFactorGroupData.revisionBy || '';
-  docData[FirstRiskInventoryColumnEnum.ELABORATION_BY] = riskFactorGroupData.elaboratedBy || '';
-  docData[FirstRiskInventoryColumnEnum.APPROVE_BY] = riskFactorGroupData.approvedBy || '';
-  docData[FirstRiskInventoryColumnEnum.DATA] = dayjs(riskFactorGroupData.visitDate).format('DD/MM/YYYY') || '';
+  docData[FirstRiskInventoryColumnEnum.SOURCE] = riskFactorGroupData.documentVersion.documentBase.data.source || '';
+  docData[FirstRiskInventoryColumnEnum.REVIEW] = riskFactorGroupData.documentVersion.documentBase.revisionBy || '';
+  docData[FirstRiskInventoryColumnEnum.ELABORATION_BY] = riskFactorGroupData.documentVersion.documentBase.elaboratedBy || '';
+  docData[FirstRiskInventoryColumnEnum.APPROVE_BY] = riskFactorGroupData.documentVersion.documentBase.approvedBy || '';
+  docData[FirstRiskInventoryColumnEnum.DATA] = dayjs(riskFactorGroupData.documentVersion.documentBase.data.visitDate).format('DD/MM/YYYY') || '';
   docData[FirstRiskInventoryColumnEnum.UNIT] = hierarchy.workspace || '';
 
   rows.push(

@@ -1,6 +1,8 @@
-import { sortNumber } from '../../../../../../shared/utils/sorts/number.sort';
 import { Paragraph, Table } from 'docx';
 
+import { HomogeneousGroupModel } from '@/@v2/documents/domain/models/homogeneous-group.model';
+import { RiskModel } from '@/@v2/documents/domain/models/risk.model';
+import { sortNumber } from '@/@v2/shared/utils/sorts/number.sort';
 import { HFullWidthImage } from '../../../base/elements/imagesLayout/hFullWidthImage';
 import { HTwoImages } from '../../../base/elements/imagesLayout/hTwoImages';
 import { ImageDivider } from '../../../base/elements/imagesLayout/imageDivider';
@@ -9,31 +11,31 @@ import { VHImages } from '../../../base/elements/imagesLayout/vHImages';
 import { VThreeImages } from '../../../base/elements/imagesLayout/vThreeImages';
 import { VTwoImages } from '../../../base/elements/imagesLayout/vTwoImages';
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
-import { IDocVariables } from '../../../builders/pgr/types/IDocumentPGRSectionGroups';
-import { RiskFactorsEntity } from '../../../../../sst/entities/risk.entity';
-import { CharacterizationPhotoEntity } from '../../../../../company/entities/characterization-photo.entity';
-import { CharacterizationEntity } from '../../../../../company/entities/characterization.entity';
-import { CharacterizationTypeEnum } from '@prisma/client';
+import { IDocVariables } from '../../../builders/pgr/types/documet-section-groups.types';
+import { CharacterizationPhotoModel } from '@/@v2/documents/domain/models/characterization-photos.model';
+import { CharacterizationTypeEnum } from '@/@v2/shared/domain/enum/security/characterization-type.enum';
 
 export interface IEnvironmentConvertResponse {
   variables: IDocVariables;
   elements: ReturnType<typeof getLayouts>;
-  risks: RiskFactorsEntity[];
+  risks: RiskModel[];
   considerations: string[];
   activities: string[];
   paragraphs: string[];
   breakPage: boolean;
   type: CharacterizationTypeEnum;
   id: string;
-  profileParentId?: string;
+  profileParentId: string | null;
   profileName?: string;
-  profiles?: CharacterizationEntity[];
+  profiles?: HomogeneousGroupModel[];
 }
 
-export const environmentsConverter = (environments: CharacterizationEntity[]): IEnvironmentConvertResponse[] => {
-  return environments
+export const environmentsConverter = (homogeneousGroups: (HomogeneousGroupModel)[]): IEnvironmentConvertResponse[] => {
+  return homogeneousGroups
     .sort((a, b) => sortNumber(a, b, 'order'))
-    .map((environment) => {
+    .map((homogeneousGroup) => {
+      const environment = homogeneousGroup.characterization!;
+
       const imagesVertical = environment.photos.filter((image) => image.isVertical);
 
       const imagesHorizontal = environment.photos.filter((image) => !image.isVertical);
@@ -57,14 +59,14 @@ export const environmentsConverter = (environments: CharacterizationEntity[]): I
         [VariablesPGREnum.ENVIRONMENT_MOISTURE]: environment.moisturePercentage || '',
       };
 
-      const risks = environment.homogeneousGroup.riskFactorData.map((risk) => risk.riskFactor);
+      const risks = homogeneousGroup.risksData.map((risk) => risk.risk);
 
       const considerations = environment.considerations;
       const activities = environment.activities;
       const type = environment.type;
       const id = environment.id;
       const profileParentId = environment.profileParentId;
-      const profiles = environment.profiles;
+      const profiles = homogeneousGroups.filter((group) => group.characterization?.profileParentId === environment.id);
       const paragraphs = environment.paragraphs;
 
       return {
@@ -84,7 +86,7 @@ export const environmentsConverter = (environments: CharacterizationEntity[]): I
     });
 };
 
-export const getLayouts = (vPhotos: CharacterizationPhotoEntity[], hPhotos: CharacterizationPhotoEntity[]) => {
+export const getLayouts = (vPhotos: CharacterizationPhotoModel[], hPhotos: CharacterizationPhotoModel[]) => {
   const vLength = vPhotos.length;
   const hLength = hPhotos.length;
 
@@ -92,7 +94,7 @@ export const getLayouts = (vPhotos: CharacterizationPhotoEntity[], hPhotos: Char
 
   const layouts: (Table[] | Paragraph[])[] = [];
 
-  const vLayout = (vPhotos: CharacterizationPhotoEntity[], length: number, keepVTree = false) => {
+  const vLayout = (vPhotos: CharacterizationPhotoModel[], length: number, keepVTree = false) => {
     const hasDivider = layouts.length > 0;
 
     if (hasDivider) layouts.push([ImageDivider()]);
@@ -103,7 +105,7 @@ export const getLayouts = (vPhotos: CharacterizationPhotoEntity[], hPhotos: Char
 
       layouts.push(
         VThreeImages(
-          [vPhotos[0].photoUrl, vPhotos[1] ? vPhotos[1].photoUrl : '', vPhotos[2] ? vPhotos[2].photoUrl : ''],
+          [vPhotos[0].path!, vPhotos[1] ? vPhotos[1].path! : '', vPhotos[2] ? vPhotos[2].path! : ''],
           [vPhotos[0].name, vPhotos[1] ? vPhotos[1].name : '', vPhotos[2] ? vPhotos[2].name : ''],
           removeLegend,
         ),
@@ -116,7 +118,7 @@ export const getLayouts = (vPhotos: CharacterizationPhotoEntity[], hPhotos: Char
     if (length >= 2) {
       const removeLegend = isAllLegendEqual && (length - 2 !== 0 || hLength !== 0);
       layouts.push(
-        VTwoImages([vPhotos[0].photoUrl, vPhotos[1].photoUrl], [vPhotos[0].name, vPhotos[1].name], removeLegend),
+        VTwoImages([vPhotos[0].path!, vPhotos[1].path!], [vPhotos[0].name, vPhotos[1].name], removeLegend),
       );
 
       const restOfPhotos = vPhotos.slice(2);
@@ -126,7 +128,7 @@ export const getLayouts = (vPhotos: CharacterizationPhotoEntity[], hPhotos: Char
     return vPhotos;
   };
 
-  const hLayout = (hPhotos: CharacterizationPhotoEntity[], vPhotos: CharacterizationPhotoEntity[], hLength: number) => {
+  const hLayout = (hPhotos: CharacterizationPhotoModel[], vPhotos: CharacterizationPhotoModel[], hLength: number) => {
     const hasDivider = layouts.length > 0;
 
     if (hasDivider) layouts.push([ImageDivider()]);
@@ -135,13 +137,13 @@ export const getLayouts = (vPhotos: CharacterizationPhotoEntity[], hPhotos: Char
       const removeLegend = isAllLegendEqual && hLength > 1;
 
       if (hLength == 0) {
-        layouts.push(VFullWidthImage(vPhotos[0].photoUrl, vPhotos[0].name));
+        layouts.push(VFullWidthImage(vPhotos[0].path!, vPhotos[0].name));
         return;
       }
 
       if (hLength > 0) {
         layouts.push(
-          VHImages([vPhotos[0].photoUrl, hPhotos[0].photoUrl], [vPhotos[0].name, hPhotos[0].name], removeLegend),
+          VHImages([vPhotos[0].path!, hPhotos[0].path!], [vPhotos[0].name, hPhotos[0].name], removeLegend),
         );
 
         const restOfPhotos = hPhotos.slice(1);
@@ -155,14 +157,14 @@ export const getLayouts = (vPhotos: CharacterizationPhotoEntity[], hPhotos: Char
     if (hLength >= 2) {
       const removeLegend = isAllLegendEqual && hLength - 2 !== 0;
       layouts.push(
-        HTwoImages([hPhotos[0].photoUrl, hPhotos[1].photoUrl], [hPhotos[0].name, hPhotos[1].name], removeLegend),
+        HTwoImages([hPhotos[0].path!, hPhotos[1].path!], [hPhotos[0].name, hPhotos[1].name], removeLegend),
       );
 
       const restOfPhotos = hPhotos.slice(2);
       return hLayout(restOfPhotos, [], restOfPhotos.length);
     }
 
-    if (hPhotos[0]) layouts.push(HFullWidthImage(hPhotos[0].photoUrl, hPhotos[0].name));
+    if (hPhotos[0]) layouts.push(HFullWidthImage(hPhotos[0].path!, hPhotos[0].name));
   };
 
   const restOfVPhotos = vLayout(vPhotos, vLength);

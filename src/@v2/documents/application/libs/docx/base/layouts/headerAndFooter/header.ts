@@ -15,7 +15,7 @@ import {
   WidthType,
 } from 'docx';
 import { readFileSync } from 'fs';
-import { setNiceProportion } from '../../../../../../shared/utils/setNiceProportion';
+import { setNiceProportion } from '../../../helpers/set-nice-proportion';
 
 interface IHeaderProps {
   path: string;
@@ -39,27 +39,27 @@ const table = (rows: TableRow[]) =>
 
 const firstCell = (path?: string) => {
   const getProportion = () => {
-    const { height: imgHeight, width: imgWidth } = sizeOf(readFileSync(path));
+    const { height: imgHeight, width: imgWidth } = sizeOf(readFileSync(path!));
 
     const maxWidth = 100;
     const maxHeight = 25;
 
-    const { height, width } = setNiceProportion(maxWidth, maxHeight, imgWidth, imgHeight);
+    const { height, width } = setNiceProportion(maxWidth, maxHeight, imgWidth || 0, imgHeight || 0);
     return { height, width };
   };
 
   const image = path
     ? new ImageRun({
-        data: readFileSync(path),
-        transformation: getProportion(),
-      })
+      data: readFileSync(path),
+      transformation: getProportion(),
+    })
     : undefined;
 
   return new TableCell({
     verticalAlign: VerticalAlign.CENTER,
     children: [
       new Paragraph({
-        children: [image],
+        children: image ? [image] : [],
       }),
     ],
   });

@@ -12,7 +12,6 @@ import {
 } from 'docx';
 import { readFileSync } from 'fs';
 import sizeOf from 'image-size';
-import { setNiceProportion } from '../../../../../../shared/utils/setNiceProportion';
 
 import {
   convertToEmu,
@@ -22,6 +21,8 @@ import {
   pageWidth,
   sectionCoverProperties,
 } from '../../config/styles';
+import { setNiceProportion } from '../../../helpers/set-nice-proportion';
+import { CompanyDocumentsCoverVO } from '@/@v2/shared/domain/values-object/company/company-document-cover.vo';
 
 interface ITextProps {
   x?: number;
@@ -34,21 +35,10 @@ interface ITextProps {
 }
 interface IHeaderProps {
   version: string;
-  imgPath: string;
+  imgPath?: string | null;
   companyName: string;
   title?: string;
-  coverProps?: {
-    logoProps?: {
-      maxLogoHeight?: number;
-      maxLogoWidth?: number;
-      x?: number;
-      y?: number;
-    };
-    titleProps?: ITextProps;
-    versionProps?: ITextProps;
-    companyProps?: ITextProps;
-    backgroundImagePath?: string;
-  };
+  coverProps?: CompanyDocumentsCoverVO | null;
 }
 
 const title = (props: IHeaderProps) =>
@@ -81,7 +71,7 @@ const title = (props: IHeaderProps) =>
           x: HorizontalPositionAlign.LEFT,
           y: VerticalPositionAlign.TOP,
         },
-      },
+      } as any,
       spacing: { after: 0, before: 0 },
     }),
   });
@@ -116,7 +106,7 @@ const textShow = (text?: string, props?: ITextProps) =>
           x: HorizontalPositionAlign.LEFT,
           y: VerticalPositionAlign.TOP,
         },
-      },
+      } as any,
       spacing: { after: 0, before: 0 },
     }),
   });
@@ -125,7 +115,7 @@ const imageCover = (props: IHeaderProps) => {
   return new Paragraph({
     children: [
       new ImageRun({
-        data: readFileSync(props.coverProps.backgroundImagePath),
+        data: readFileSync(props.coverProps!.backgroundImagePath!),
         transformation: {
           width: pageWidth,
           height: pageHeight,
@@ -149,21 +139,21 @@ const imageCover = (props: IHeaderProps) => {
 };
 
 const imageLogo = (props: IHeaderProps) => {
-  const { height: imgHeight, width: imgWidth } = sizeOf(readFileSync(props.imgPath));
+  const { height: imgHeight, width: imgWidth } = sizeOf(readFileSync(props.imgPath!));
 
   const logoProps = props?.coverProps?.logoProps;
 
   const { height, width } = setNiceProportion(
     logoProps?.maxLogoWidth || 630,
     logoProps?.maxLogoHeight || 354,
-    imgWidth,
-    imgHeight,
+    imgWidth || 0,
+    imgHeight || 0,
   );
 
   return new Paragraph({
     children: [
       new ImageRun({
-        data: readFileSync(props.imgPath),
+        data: readFileSync(props.imgPath!),
         transformation: {
           width,
           height,
@@ -172,10 +162,10 @@ const imageLogo = (props: IHeaderProps) => {
           floating: {
             zIndex: 1,
             horizontalPosition: {
-              offset: convertToEmu(logoProps.x, 'w'),
+              offset: convertToEmu(logoProps.x || 0, 'w'),
             },
             verticalPosition: {
-              offset: convertToEmu(logoProps.y + ((logoProps?.maxLogoHeight ?? 0) - height) / 2, 'h'),
+              offset: convertToEmu((logoProps.y || 0) + ((logoProps?.maxLogoHeight ?? 0) - height) / 2, 'h'),
             },
             behindDocument: true,
           },

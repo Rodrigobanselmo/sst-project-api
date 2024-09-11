@@ -1,5 +1,5 @@
-import { IDocVariables } from '../../../builders/pgr/types/IDocumentPGRSectionGroups';
-import { isOdd } from '../../../../../../shared/utils/isOdd';
+import { isOdd } from '@/@v2/shared/utils/helpers/is-odd';
+import { IDocVariables } from '../types/documet-section-groups.types';
 
 export const replaceAllVariables = (text: string, variables: IDocVariables) => {
   if (text) {

@@ -1,16 +1,13 @@
-import { DocumentDataEntity } from './../../../../../../../sst/entities/documentData.entity';
-import { DocumentDataPGRDto } from './../../../../../../../sst/dto/document-data-pgr.dto';
 import { Table, WidthType } from 'docx';
-import { RiskFactorGroupDataEntity } from '../../../../../../../sst/entities/riskGroupData.entity';
 import { firstRiskInventoryHeader } from './first.constant';
 
-import { HierarchyMapData, IHomoGroupMap } from '../../../../../converter/hierarchy.converter';
+import { HierarchyMapData, IDocumentRiskGroupDataConverter, IHomoGroupMap } from '../../../../../converter/hierarchy.converter';
 import { TableBodyElements } from '../../elements/body';
 import { borderBottomStyle, TableHeaderElements } from '../../elements/header';
 import { documentConverter } from './first.converter';
 
 export const firstRiskInventoryTableSection = (
-  riskFactorGroupData: RiskFactorGroupDataEntity & DocumentDataEntity & DocumentDataPGRDto,
+  riskFactorGroupData: IDocumentRiskGroupDataConverter,
   homoGroupTree: IHomoGroupMap,
   hierarchyData: HierarchyMapData,
   isByGroup: boolean,

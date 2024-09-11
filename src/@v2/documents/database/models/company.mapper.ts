@@ -14,7 +14,7 @@ export class CompanyMapper {
       id: data.id,
       name: data.name,
       cnpj: data.cnpj || '00000000000000',
-      consultant: data.receivingServiceContracts.find((consult) => !consult?.applyingServiceCompany?.isGroup)?.applyingServiceCompany,
+      consultant: data.receivingServiceContracts.find((consult) => !consult?.applyingServiceCompany?.isGroup)?.applyingServiceCompany || null,
     })
   }
 }

@@ -3,13 +3,13 @@ import { AlignmentType, Paragraph, Table } from 'docx';
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
 import { ISectionChildrenType } from '../../../../../../domain/types/elements.types';
 import { DocumentChildrenTypeEnum as DocumentSectionChildrenTypeEnum } from '@/@v2/documents/domain/enums/document-children-type.enum';
-import { IDocVariables } from '../../../builders/pgr/types/IDocumentPGRSectionGroups';
-import { CharacterizationEntity } from '../../../../../company/entities/characterization.entity';
+import { IDocVariables } from '../../../builders/pgr/types/documet-section-groups.types';
 import { environmentsConverter } from './all-characterization.converter';
-import { filterRisk } from '../../../../../../shared/utils/filterRisk';
+import { HomogeneousGroupModel } from '@/@v2/documents/domain/models/homogeneous-group.model';
+import { checkValidExistentRisk } from '@/@v2/shared/domain/functions/security/check-valid-existent-risk.func';
 
 export const environmentIterable = (
-  environments: CharacterizationEntity[],
+  environments: HomogeneousGroupModel[],
   convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[],
 ) => {
   if (!environments?.length) return [];
@@ -95,7 +95,7 @@ export const environmentIterable = (
       }
 
       risks
-        .filter((risk) => filterRisk(risk))
+        .filter((risk) => checkValidExistentRisk(risk))
         .forEach((risk, index) => {
           if (index === 0)
             riskFactors.push({

@@ -23,5 +23,5 @@ export const HFullWidthImage = (image: string, text: string, options?: IParagrap
     paragraphFigure(text, {
       spacingAfter: 200,
     }),
-  ].filter((i) => i);
+  ].filter((i) => i) as Paragraph[];
 };
