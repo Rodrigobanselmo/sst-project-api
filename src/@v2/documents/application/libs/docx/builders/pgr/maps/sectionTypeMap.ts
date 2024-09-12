@@ -19,6 +19,7 @@ import { convertToDocxHelper } from '../functions/convertToDocx';
 import { replaceAllVariables } from '../functions/replaceAllVariables';
 import { IDocVariables } from '../types/documet-section-groups.types';
 import { IMapElementDocumentType } from './elementTypeMap';
+import { CoverTypeEnum } from '@/@v2/shared/domain/enum/company/cover-type.enum';
 
 type IMapSectionDocumentType = Record<string, (arg: any) => ISectionOptions | ISectionOptions[]>;
 
@@ -50,7 +51,7 @@ export class SectionsMapClass {
       version: this.version,
       title: replaceAllVariables(`??${VariablesPGREnum.DOCUMENT_TITLE}??`, this.variables),
       companyName: `${this.data.documentBase.company.name} ${this.data.documentBase.company.initials ? `(${this.data.documentBase.company.initials})` : ''}`,
-      coverProps: this.data.documentBase.company.cover,
+      coverProps: this.data.documentBase.company.cover(CoverTypeEnum.PGR),
     }),
     [DocumentSectionTypeEnum.CHAPTER]: ({ text }: IChapter) =>
       chapterSection({

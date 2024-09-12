@@ -27,7 +27,18 @@ export class RiskMapper {
       severity: data.severity,
       type: data.type as RiskTypeEnum,
       unit: data.unit,
-
+      carnogenicityACGIH: data.carnogenicityACGIH,
+      carnogenicityLinach: data.carnogenicityLinach,
+      cas: data.cas,
+      healthRisk: data.risk,
+      ipvs: data.ipvs,
+      nr15lt: data.nr15lt,
+      pe: data.pe,
+      propagation: data.propagation,
+      pv: data.pv,
+      stel: data.stel,
+      symptoms: data.symptoms,
+      twa: data.twa,
       requirement: { document: documentRequirement },
       documentsRequirements: data.docInfo.map(doc => new RiskDocumentsRequirementVO(doc))
     })

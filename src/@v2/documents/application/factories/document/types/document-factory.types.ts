@@ -11,13 +11,11 @@ export interface IDocumentAttachment {
 }
 
 export interface IGetAttachments<T, R> {
-  version: string;
   data: R;
   body: T;
 }
 
 export interface IGetDocument<T, R> {
-  version: string;
   attachments: AttachmentModel[];
   data: R;
   body: T;
@@ -30,6 +28,10 @@ export interface ISaveDocument<T, R> {
   body: T;
 }
 
+export interface ISaveErrorDocument<T, R> {
+  body: T;
+}
+
 export interface IUnlinkPaths {
   path: string;
 }
@@ -37,12 +39,10 @@ export interface IUnlinkPaths {
 export interface IDocumentFactoryProduct<T = any, R = any> {
   type: string;
   unlinkPaths: IUnlinkPaths[];
-  downloadPathImage(url: string): Promise<string>;
-  getData(body: T): R;
+  getData(body: T): Promise<R>;
   getAttachments(data: IGetAttachments<T, R>): Promise<IDocumentAttachment[]>;
   getFileName(body: R, type?: string, ...args: any[]): string;
-  getVersionName(data: R, body: T): string;
   getSections(options: IGetDocument<T, R>): Promise<ISectionOptions[]>;
   save(options: ISaveDocument<T, R>): Promise<RiskDocumentEntity>;
-  error(options: Pick<ISaveDocument<T, R>, 'body'>): Promise<void>;
+  error(options: ISaveErrorDocument<T, R>): Promise<void>;
 }

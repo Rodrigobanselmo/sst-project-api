@@ -12,7 +12,15 @@ export class HierarchyDAO {
   ) { }
 
   static selectOptions() {
-    const include = {} satisfies Prisma.HierarchyFindFirstArgs['include']
+    const include = {
+      employees: {
+        select: { id: true }
+      },
+      subOfficeEmployees: {
+        select: { id: true }
+      },
+      hierarchyOnHomogeneous: true
+    } satisfies Prisma.HierarchyFindFirstArgs['include']
 
     return { include }
   }

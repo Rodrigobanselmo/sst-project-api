@@ -1,7 +1,7 @@
 import { DocumentData, DocumentModel } from '@prisma/client';
 import { DocumentTypeEnum } from '../../domain/enums/document-type.enum';
 import { DocumentBaseModel } from '../../domain/models/document-base.model';
-import { DocumentModelModel } from '../../domain/models/document-model.model';
+import { DocumentModelModel, IDocumentModelModel } from '../../domain/models/document-model.model';
 import { CompanyMapper, ICompanyMapper } from './company.mapper';
 import { DocumentBaseDataMapper } from './document-base-data.mapper';
 import { IProfessionalSignatureMapper, ProfessionalSignatureMapper } from './professional-signature.mapper';

@@ -43,7 +43,11 @@ export class DocumentPGRModel {
   }
 
   get risksData() {
-    return this.homogeneousGroups.reduce((acc, group) => [...acc, ...group.risksData], [] as RiskDataModel[])
+    return this.homogeneousGroups.reduce((acc, group) => [...acc, ...group.risksData({ documentType: 'isPGR' })], [] as RiskDataModel[])
+  }
+
+  get numOfEmployee() {
+    return this.hierarchies.reduce((acc, hierarchy) => acc + hierarchy.employees.length, 0)
   }
 
   getHierarchyGroups(hierarchy: HierarchyModel) {

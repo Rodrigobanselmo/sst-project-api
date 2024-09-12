@@ -9,14 +9,26 @@ export class DocumentBaseDAO {
   static selectOptions() {
     const include = {
       model: true,
-      workspace: true,
+      workspace: {
+        include: {
+          address: true
+        }
+      },
       company: {
         include: {
+          address: true,
+          primary_activity: true,
+          covers: true,
           receivingServiceContracts: {
             select: {
-              applyingServiceCompany: true
+              applyingServiceCompany: {
+                include: {
+                  covers: true,
+                  address: true
+                }
+              }
             }
-          }
+          },
         }
       },
       professionalsSignatures: {
@@ -27,7 +39,7 @@ export class DocumentBaseDAO {
             }
           }
         }
-      }
+      },
     } satisfies Prisma.DocumentDataFindFirstArgs['include']
 
     return { include }

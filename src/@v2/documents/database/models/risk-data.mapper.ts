@@ -56,6 +56,7 @@ export class RiskDataMapper {
       })),
       epis: data.epiToRiskFactorData.map(epi => new EPIModel({
         ca: epi.epi.ca,
+        equipment: epi.epi.equipment,
       })),
       exams: data.examsToRiskFactorData.map(exam => new ExamRiskModel({
         examId: exam.examId,

@@ -14,7 +14,6 @@ export type IHomogeneousGroupModel = {
   description: string
   type: HomoTypeEnum;
   companyId: string
-  documentType: IDocumentsRequirementKeys
 
   hierarchies: HierarchyGroupModel[]
   characterization: CharacterizationModel | null
@@ -26,25 +25,23 @@ export class HomogeneousGroupModel {
   name: string
   description: string
   type: HomoTypeEnum;
+  companyId: string
 
   hierarchies: HierarchyGroupModel[]
   characterization: CharacterizationModel | null
-  risksData: RiskDataModel[]
+  #risksData: RiskDataModel[]
 
   constructor(params: IHomogeneousGroupModel) {
     this.id = params.id
     this.name = params.name
     this.description = params.description
     this.type = params.type;
+    this.companyId = params.companyId
 
     this.hierarchies = params.hierarchies
     this.characterization = params.characterization
 
-    this.risksData = this.filterRisksData({
-      companyId: params.companyId,
-      documentType: params.documentType,
-      risksData: params.risksData
-    })
+    this.#risksData = params.risksData
   }
 
   get isEnviroment() {
@@ -65,9 +62,9 @@ export class HomogeneousGroupModel {
     return getIsHomogeneousGroupGHO(this)
   }
 
-  private filterRisksData({ companyId, documentType, risksData }: { companyId: string, documentType: IDocumentsRequirementKeys; risksData: RiskDataModel[] }) {
-    return risksData.filter(riskData => {
-      const { checkIfExistAny } = getRiskDocumentsRequirements({ companyId, requirements: riskData.risk.documentsRequirements })
+  risksData({ documentType }: { documentType: IDocumentsRequirementKeys; }) {
+    return this.#risksData.filter(riskData => {
+      const { checkIfExistAny } = getRiskDocumentsRequirements({ companyId: this.companyId, requirements: riskData.risk.documentsRequirements })
       return checkIfExistAny({ documentType })
     })
   }

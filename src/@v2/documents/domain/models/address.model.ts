@@ -1,6 +1,6 @@
 export type IAddressModel = {
-  number: string;
   cep: string;
+  number: string | null;
   street: string | null;
   complement: string | null;
   neighborhood: string | null;
@@ -9,8 +9,8 @@ export type IAddressModel = {
 }
 
 export class AddressModel {
-  number: string;
   cep: string;
+  number: string | null;
   street: string | null;
   complement: string | null;
   neighborhood: string | null;

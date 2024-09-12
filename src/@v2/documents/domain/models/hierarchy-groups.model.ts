@@ -1,15 +1,15 @@
 export type IHierarchyGroupModel = {
   homogeneousGroupId: string;
   hierarchyId: string;
-  endDate: Date;
-  startDate: Date;
+  endDate: Date | null;
+  startDate: Date | null;
 }
 
 export class HierarchyGroupModel {
   homogeneousGroupId: string;
   hierarchyId: string;
-  endDate: Date;
-  startDate: Date;
+  endDate: Date | null;
+  startDate: Date | null;
 
 
   constructor(params: IHierarchyGroupModel) {

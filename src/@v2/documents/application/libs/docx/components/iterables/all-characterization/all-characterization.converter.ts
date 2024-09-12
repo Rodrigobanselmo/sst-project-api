@@ -59,7 +59,7 @@ export const environmentsConverter = (homogeneousGroups: (HomogeneousGroupModel)
         [VariablesPGREnum.ENVIRONMENT_MOISTURE]: environment.moisturePercentage || '',
       };
 
-      const risks = homogeneousGroup.risksData.map((risk) => risk.risk);
+      const risks = homogeneousGroup.risksData({ documentType: 'isPGR' }).map((risk) => risk.risk);
 
       const considerations = environment.considerations;
       const activities = environment.activities;

@@ -12,9 +12,15 @@ export class HomogeneousGroupDAO {
     private readonly prisma: PrismaServiceV2,
   ) { }
 
-  static selectOptions() {
+  static selectOptions({ companyId }: { companyId: string }) {
     const include = {
-      riskFactorData: RiskDataDAO.selectOptions(),
+      riskFactorData: RiskDataDAO.selectOptions({ companyId }),
+      hierarchyOnHomogeneous: true,
+      characterization: {
+        include: {
+          photos: true,
+        }
+      },
     } satisfies Prisma.HomogeneousGroupFindFirstArgs['include']
 
     return { include }
@@ -23,7 +29,7 @@ export class HomogeneousGroupDAO {
   async findMany(params: IHomogeneousGroupDAO.FindByIdParams) {
     const homogeneousGroups = await this.prisma.homogeneousGroup.findMany({
       where: { workspaces: { some: { id: params.workspaceId } } },
-      ...HomogeneousGroupDAO.selectOptions()
+      ...HomogeneousGroupDAO.selectOptions(params)
     })
 
     return HomogeneousGroupMapper.toModels(homogeneousGroups)

@@ -3,7 +3,7 @@ import { AddressModel } from "./address.model"
 export type IWorkspaceModel = {
   id: string
   name: string
-  cnpj: string
+  cnpj: string | null
   isOwner: boolean
   address: AddressModel | null
 }
@@ -11,7 +11,7 @@ export type IWorkspaceModel = {
 export class WorkspaceModel {
   id: string
   name: string
-  cnpj: string
+  cnpj: string | null
   isOwner: boolean
   address: AddressModel | null
 

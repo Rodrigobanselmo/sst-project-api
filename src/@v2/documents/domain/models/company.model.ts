@@ -1,14 +1,14 @@
+import { CoverTypeEnum } from "@/@v2/shared/domain/enum/company/cover-type.enum";
 import { formatCnae } from "@/@v2/shared/utils/helpers/formats-cnae";
 import { AddressModel } from "./address.model";
 import { ConsultantModel } from "./consultant.model";
-import { CompanyDocumentsCoverVO } from "@/@v2/shared/domain/values-object/company/company-document-cover.vo";
+import { CoverModel } from "./cover.model";
 
 export type ICompanyModel = {
   id: string
   name: string
-  fantasyName: string
+  fantasyName: string | null
   cnpj: string;
-  employeeCount: number
   initials: string | null
   email: string | null
   phone: string | null
@@ -23,7 +23,7 @@ export type ICompanyModel = {
   primaryActivityRiskDegree: number | null
   logoUrl: string | null
 
-  cover: CompanyDocumentsCoverVO | null
+  covers: CoverModel[]
   consultant: ConsultantModel | null
   address: AddressModel | null
 }
@@ -33,7 +33,6 @@ export class CompanyModel {
   name: string
   fantasyName: string
   cnpj: string;
-  employeeCount: number
   initials: string
   email: string
   phone: string
@@ -49,16 +48,15 @@ export class CompanyModel {
   logoUrl: string | null
   logoPath: string | null
 
-  cover: CompanyDocumentsCoverVO | null
+  private covers: CoverModel[]
   consultant: ConsultantModel | null
   address: AddressModel | null
 
   constructor(params: ICompanyModel) {
     this.id = params.id
     this.name = params.name
-    this.fantasyName = params.fantasyName
+    this.fantasyName = params.fantasyName || ''
     this.cnpj = params.cnpj
-    this.employeeCount = params.employeeCount
     this.initials = params.initials || ''
     this.email = params.email || ''
     this.phone = params.phone || ''
@@ -74,7 +72,7 @@ export class CompanyModel {
     this.logoUrl = params.logoUrl
     this.logoPath = null
 
-    this.cover = params.cover;
+    this.covers = params.covers;
     this.consultant = params.consultant;
     this.address = params.address
   }
@@ -91,5 +89,10 @@ export class CompanyModel {
 
   get consultantLogoPath() {
     return this.consultant?.logoPath || 'images/logo/logo-simple.png';
+  }
+
+  cover(type: CoverTypeEnum) {
+    const convers = [...this.covers, ...(this.consultant?.covers || [])];
+    return convers.find(cover => cover.types.includes(type))?.data || null;
   }
 }

@@ -20,7 +20,6 @@ export class DocumentVersionMapper {
       documentBase: DocumentBaseMapper.toModel(data.documentData),
       attachments: data.attachments.map((attachment, index) => {
         return new AttachmentModel({
-          id: attachment.id,
           name: attachment.name || `Anexo ${index}`,
           url: attachment.url,
         })

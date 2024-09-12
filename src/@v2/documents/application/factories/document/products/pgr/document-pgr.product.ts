@@ -10,11 +10,12 @@ import { dateUtils } from '@/@v2/shared/utils/helpers/date-utils';
 import { BadRequestException, Injectable, Scope } from '@nestjs/common';
 import { ISectionOptions } from 'docx';
 import { v4 } from 'uuid';
-import { IDocumentFactoryProduct, IUnlinkPaths } from '../../types/document-factory.types';
+import { IDocumentFactoryProduct, IGetAttachments, IGetDocument, ISaveDocument, ISaveErrorDocument, IUnlinkPaths } from '../../types/document-factory.types';
 import { IDocumentPGRParams } from './document-pgr.types';
+import { getDocumentVersion } from '@/@v2/documents/application/libs/docx/helpers/get-document-version';
 
 @Injectable({ scope: Scope.REQUEST })
-export class DocumentPGRFactory implements IDocumentFactoryProduct<IDocumentPGRParams> {
+export class DocumentPGRFactory implements IDocumentFactoryProduct<IDocumentPGRParams, DocumentPGRModel> {
   public unlinkPaths: IUnlinkPaths[] = [];
   public type = 'PGR';
 
@@ -32,63 +33,56 @@ export class DocumentPGRFactory implements IDocumentFactoryProduct<IDocumentPGRP
     return document
   }
 
-  public async getAttachments(data: DocumentPGRModel) {
-    const documentBaseBuild = await this.getDocumentBuild(options);
+  public async getAttachments({ data }: IGetAttachments<IDocumentPGRParams, DocumentPGRModel>) {
+    const version = this.getVersionName(data);
 
-    const documentAprBuild: typeof documentBaseBuild = {
-      ...documentBaseBuild,
-
+    const documentAPRSection = new DocumentBuildPGR({
+      data: data,
+      version: version,
       attachments: [],
-      docSections: {
-        sections: [{ data: [{ type: DocumentSectionTypeEnum.APR }] }],
-        variables: {},
-      },
-    } as typeof documentBaseBuild;
+      variables: {},
+      sections: [{ data: [{ type: DocumentSectionTypeEnum.ACTION_PLAN }] }],
+    }).build();
 
-    const documentAprGroupBuild: typeof documentBaseBuild = {
-      ...documentBaseBuild,
+    const documentAPRGroupSection = new DocumentBuildPGR({
+      data: data,
+      version: version,
       attachments: [],
-      docSections: {
-        sections: [{ data: [{ type: DocumentSectionTypeEnum.APR_GROUP }] }],
-        variables: {},
-      },
-    } as typeof documentBaseBuild;
+      variables: {},
+      sections: [{ data: [{ type: DocumentSectionTypeEnum.APR_GROUP }] }],
+    }).build();
 
-    const documentActionPlanBuild: typeof documentBaseBuild = {
-      ...documentBaseBuild,
+    const documentActionPlanSection = new DocumentBuildPGR({
+      data: data,
+      version: version,
       attachments: [],
-      docSections: {
-        sections: [{ data: [{ type: DocumentSectionTypeEnum.ACTION_PLAN }] }],
-        variables: {},
-      },
-    };
+      variables: {},
+      sections: [{ data: [{ type: DocumentSectionTypeEnum.ACTION_PLAN }] }],
+    }).build();
 
-    const docId = options.data.docId;
-    const companyId = options.data.company.id;
+    const docId = data.documentVersion.id;
+    const companyId = data.documentBase.company.id;
     const id1 = v4();
     const id2 = v4();
     const id3 = v4();
 
     return [
       {
-        buildData: documentAprBuild,
-        section: new DocumentBuildPGR(documentAprBuild).build(),
+        section: documentAPRSection,
         type: 'PGR-APR',
         id: id1,
         name: 'Inventário de Risco por Função (APR)',
         link: `${process.env.APP_HOST}/download/pgr/anexos?ref1=${docId}&ref2=${id1}&ref3=${companyId}`,
       },
       {
-        buildData: documentAprGroupBuild,
-        section: new DocumentBuildPGR(documentAprGroupBuild).build(),
+        section: documentAPRGroupSection,
         type: 'PGR-APR-GSE',
         id: id2,
         name: 'Inventário de Risco por GSE (APR)',
         link: `${process.env.APP_HOST}/download/pgr/anexos?ref1=${docId}&ref2=${id2}&ref3=${companyId}`,
       },
       {
-        buildData: documentActionPlanBuild,
-        section: new DocumentBuildPGR(documentActionPlanBuild).build(),
+        section: documentActionPlanSection,
         type: 'PGR-PLANO_DE_ACAO',
         id: id3,
         name: 'Plano de Ação Detalhado',
@@ -97,61 +91,36 @@ export class DocumentPGRFactory implements IDocumentFactoryProduct<IDocumentPGRP
     ];
   }
 
-  public async getSections(data: DocumentPGRModel) {
-    const sections: ISectionOptions[] = new DocumentBuildPGR({ data }).build();
+  public async getSections({ data, attachments }: IGetDocument<IDocumentPGRParams, DocumentPGRModel>) {
+    const version = this.getVersionName(data);
+
+    const sections: ISectionOptions[] = new DocumentBuildPGR({
+      data: data,
+      version: version,
+      attachments,
+      sections: data.model.sections,
+      variables: data.model.variables,
+    }).build();
 
     return sections;
   }
 
-  public async save(
-    options: ISaveDocument<IDocumentPGRBody, PromiseInfer<ReturnType<DocumentPGRFactoryProduct['getData']>>>,
-  ) {
-    const data = options.data;
-    const body = options.body;
-    const url = options.url;
-    const attachments = options.attachments;
-
+  public async save({ attachments, body, data, url }: ISaveDocument<IDocumentPGRParams, DocumentPGRModel>) {
     return await this.riskDocumentRepository.upsert({
       id: data.docId,
-      companyId: data.company.id,
-      fileUrl: url,
       status: StatusEnum.DONE,
+      fileUrl: url,
       attachments: attachments,
-      name: body.name,
-      version: body.version,
-      documentDataId: body.documentDataId,
-      description: body.description,
-      workspaceId: body.workspaceId,
-      workspaceName: data.workspace.name,
     });
   }
 
-  public async error(
-    options: Pick<
-      ISaveDocument<IDocumentPGRBody, PromiseInfer<ReturnType<DocumentPGRFactoryProduct['getData']>>>,
-      'body'
-    >,
-  ) {
-    const body = options.body;
-
-    if (body.id)
+  public async error({ body }: ISaveErrorDocument<IDocumentPGRParams, DocumentPGRModel>,) {
+    if (body.documentVersionId)
       await this.riskDocumentRepository.upsert({
         id: body.id,
-        companyId: body.companyId,
-        name: body.name,
-        version: body.version,
-        documentDataId: body.documentDataId,
-        description: body.description,
-        workspaceId: body.workspaceId,
-        workspaceName: body.workspaceName,
         status: StatusEnum.ERROR,
       });
   }
-
-  public getVersionName = (data: DocumentPGRModel) => {
-    if (!data.documentVersion) return `${dateUtils().format('MM_DD_YYYY')}`;
-    return `${dateUtils(data.documentVersion.createdAt).format('MM_DD_YYYY')} - REV. ${data.documentVersion.version}`;
-  };
 
   public getFileName = (data: DocumentPGRModel, type = 'PGR') => {
     return getDocumentFileName({
@@ -161,6 +130,11 @@ export class DocumentPGRFactory implements IDocumentFactoryProduct<IDocumentPGRP
       typeName: type,
       date: dateUtils().format('MMMM-YYYY'),
     });
+  };
+
+
+  private getVersionName = (data: DocumentPGRModel) => {
+    return getDocumentVersion(data.documentVersion)
   };
 
   private async downloadImages(document: DocumentPGRModel) {

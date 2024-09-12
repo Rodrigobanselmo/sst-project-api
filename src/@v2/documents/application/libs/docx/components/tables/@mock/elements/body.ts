@@ -10,9 +10,9 @@ import {
   VerticalAlign,
   WidthType,
 } from 'docx';
-import { isOdd } from '../../../../../../../shared/utils/isOdd';
 import { borderStyleGlobal } from '../../../../base/config/styles';
 import { palette } from '../../../../constants/palette';
+import { isOdd } from '@/@v2/shared/utils/helpers/is-odd';
 
 export interface bodyTableProps extends Partial<ITableCellOptions> {
   text: string;
@@ -31,7 +31,6 @@ export class TableBodyElements {
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   tableCell({ text, size = 10, alignment, ...rest }: bodyTableProps) {
     return new TableCell({
       children: [
@@ -57,12 +56,12 @@ export class TableBodyElements {
                               size: rest?.textSize ? rest?.textSize * 2 : 12,
                               color: rest?.color ? rest?.color : undefined,
                             });
-                          if (isLink)
-                            return textLink(text, {
-                              isBold,
-                              isBreak,
-                              size: rest?.textSize ? rest?.textSize * 2 : 12,
-                            });
+
+                          return textLink(text, {
+                            isBold,
+                            isBreak,
+                            size: rest?.textSize ? rest?.textSize * 2 : 12,
+                          });
                         });
                       })
                       .reduce((acc, curr) => [...acc, ...curr], []);

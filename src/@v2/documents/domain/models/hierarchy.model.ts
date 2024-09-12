@@ -5,7 +5,7 @@ import { EmployeeModel } from "./employee.model"
 export type IHierarchyModel = {
   id: string
   name: string
-  parentId: string
+  parentId: string | null
   description: string
   type: HierarchyTypeEnum
   realDescription: string
@@ -17,7 +17,7 @@ export type IHierarchyModel = {
 export class HierarchyModel {
   id: string
   name: string
-  parentId: string
+  parentId: string | null
   description: string
   type: HierarchyTypeEnum
   realDescription: string

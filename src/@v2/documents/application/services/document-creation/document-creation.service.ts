@@ -1,5 +1,5 @@
 import { ISectionOptions, Packer } from 'docx';
-import { writeFileSync, unlinkSync } from 'fs';
+import { unlinkSync } from 'fs';
 import { IDocumentAttachment, IDocumentFactoryProduct, IUnlinkPaths } from '../../factories/document/types/document-factory.types';
 import { SharedTokens } from '@/@v2/shared/constants/tokens';
 import { Inject } from '@nestjs/common';
@@ -23,12 +23,11 @@ export abstract class DocumentCreationService {
     try {
       if (isLocal) console.log(1, 'start');
       const data = await product.getData(body);
-      const version = product.getVersionName(data, body); //! remove version
-      const attachmentsData = await product.getAttachments({ data, body, version });
+      const attachmentsData = await product.getAttachments({ data, body });
       const attachments = await this.saveAttachments<T>(attachmentsData, product, body);
       if (isLocal) console.log(2, 'attachments');
 
-      const sections = await product.getSections({ data, attachments: AttachmentModel.fromEntities(attachments), body, version })
+      const sections = await product.getSections({ data, attachments: AttachmentModel.fromEntities(attachments), body })
       const fileName = product.getFileName(body);
 
       const { buffer } = await this.generate({ sections });

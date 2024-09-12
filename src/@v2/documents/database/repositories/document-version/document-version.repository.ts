@@ -1,7 +1,6 @@
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service'
 import { Injectable } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
-import { DocumentBaseRepository } from '../document-base/document-base.repository'
 import { IDocumentVersionRepository } from './document-version.types'
 
 
@@ -12,12 +11,12 @@ export class DocumentVersionRepository {
   ) { }
 
   static selectOptions() {
-    const include = { attachments: true, documentData: DocumentBaseRepository.selectOptions() } satisfies Prisma.RiskFactorDocumentFindFirstArgs['include']
+    const include = { attachments: true } satisfies Prisma.RiskFactorDocumentFindFirstArgs['include']
 
     return { include }
   }
 
-  async findById(params: IDocumentVersionRepository.FindByIdParams) {
+  async readById(params: IDocumentVersionRepository.ReadByIdParams) {
     const documentversion = await this.prisma.riskFactorDocument.findUnique({
       where: { id: params.id },
       ...DocumentVersionRepository.selectOptions()

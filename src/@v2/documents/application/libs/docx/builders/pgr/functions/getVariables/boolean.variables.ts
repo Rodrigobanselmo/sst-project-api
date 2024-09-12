@@ -12,7 +12,7 @@ interface IBooleanVariables {
 }
 
 export const booleanVariables = (document: IBooleanVariables) => {
-  const risksData = document.homogeneousGroups.flatMap((group) => group.risksData);
+  const risksData = document.homogeneousGroups.flatMap((group) => group.risksData({ documentType: 'isPGR' }));
   const risksDataVariables = getRiskDataVariablesDomain(risksData);
   const homogeneousGroupsVariables = getHomogeneuosVariablesDomain(document.homogeneousGroups);
 

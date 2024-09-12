@@ -1,6 +1,6 @@
 import { ISectionOptions } from 'docx';
 
-import { IDocVariables } from '@/@v2/documents/application/libs/docx/builders/pgr/types/documet-section-groups.types';
+import { IDocumentSectionGroup, IDocVariables } from '@/@v2/documents/application/libs/docx/builders/pgr/types/documet-section-groups.types';
 import { DocumentPGRModel } from '@/@v2/documents/domain/models/document-pgr.model';
 import { IAllDocumentSectionType, } from '../../../../../domain/types/section.types';
 import { VariablesPGREnum } from './enums/variables.enum';
@@ -13,7 +13,9 @@ import { AttachmentModel } from '@/@v2/documents/domain/models/attachment.model'
 interface IDocumentBuildPGR {
   data: DocumentPGRModel
   attachments: AttachmentModel[];
+  variables: Record<string, string>;
   version: string
+  sections: IDocumentSectionGroup[];
 }
 
 export class DocumentBuildPGR {
@@ -21,16 +23,19 @@ export class DocumentBuildPGR {
   private variables: IDocVariables;
   private attachments: AttachmentModel[];
   private version: string;
+  private sections: IDocumentSectionGroup[];
 
-  constructor({ data, version, attachments }: IDocumentBuildPGR) {
+  constructor({ data, version, attachments, sections, variables }: IDocumentBuildPGR) {
     this.data = data;
     this.version = version;
     this.attachments = attachments;
-    this.variables = this.getVariables();
+    this.sections = sections;
+    this.variables = this.getVariables(variables);
+
   }
 
   public build() {
-    const sections: ISectionOptions[] = this.data.model.sections
+    const sections: ISectionOptions[] = this.sections
       .map((docSection) => {
         return this.convertToSections(docSection.data);
       })
@@ -45,9 +50,7 @@ export class DocumentBuildPGR {
     return sections;
   }
 
-  private getVariables(): IDocVariables {
-    const docVariables = this.data.model.variables;
-
+  private getVariables(variables: IDocumentBuildPGR['variables']): IDocVariables {
     return {
       [VariablesPGREnum.VERSION]: this.version,
       [VariablesPGREnum.DOC_VALIDITY]: this.data.documentBase.validUntil,
@@ -56,7 +59,7 @@ export class DocumentBuildPGR {
       [VariablesPGREnum.DOCUMENT_TITLE]: 'Criar variavel local "TITULO_DO_DOCUMENTO"',
       ...companyVariables(this.data.documentBase.company, this.data.documentBase.workspace),
       ...booleanVariables(this.data),
-      ...docVariables,
+      ...variables,
     };
   }
 

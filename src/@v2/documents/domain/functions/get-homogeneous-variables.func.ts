@@ -17,7 +17,7 @@ export function getHomogeneuosVariablesDomain(homogeneousGroups: HomogeneousGrou
     }
 
     homogeneousGroups.forEach((homogeneousGroup) => {
-        const hasRisk = homogeneousGroup.risksData.length
+        const hasRisk = homogeneousGroup.risksData({ documentType: 'isPGR' }).length
 
         if (hasRisk && homogeneousGroup.isEnviroment) variables.hasEnviromentRisk = true
         if (hasRisk && homogeneousGroup.isCharacterization) variables.hasCharacterizationRisk = true

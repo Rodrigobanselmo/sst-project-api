@@ -124,7 +124,7 @@ export const hierarchyConverter = (
     const hierarchyInfo = hierarchyMap[hierarchy.type];
     const allHomogeneousGroupIds = [] as string[];
 
-    const loop = (parentId: string) => {
+    const loop = (parentId: string | null) => {
       if (!parentId) return;
       const parent = hierarchyTree[parentId];
       const parentInfo = hierarchyMap[parent.type];
@@ -219,7 +219,7 @@ export const hierarchyConverter = (
   const riskGroupData: IRiskGroupDataConverter[] = [];
 
   homoGroup.forEach((gho) => {
-    gho.risksData.forEach((riskData) => {
+    gho.risksData({ documentType: 'isPGR' }).forEach((riskData) => {
       riskGroupData.push({
         homogeneousGroup: homoGroupTree[gho.id],
         riskData,

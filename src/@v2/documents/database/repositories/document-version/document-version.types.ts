@@ -1,4 +1,5 @@
 
 export namespace IDocumentVersionRepository {
-  export type FindByIdParams = { id: string; }
+  export type ReadByIdParams = { id: string; }
+  export type EditByIdParams = { id: string; }
 }

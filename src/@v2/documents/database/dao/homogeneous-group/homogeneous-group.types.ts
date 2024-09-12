@@ -1,4 +1,4 @@
 
 export namespace IHomogeneousGroupDAO {
-  export type FindByIdParams = { workspaceId: string }
+  export type FindByIdParams = { workspaceId: string; companyId: string }
 }
