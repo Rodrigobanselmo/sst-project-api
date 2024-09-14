@@ -4,7 +4,13 @@ import { CompanyModel } from '@/@v2/documents/domain/models/company.model';
 import { formatCnpj } from '@/@v2/shared/utils/helpers/formats-cnpj';
 import { formatPhoneNumber } from '@/@v2/shared/utils/helpers/formats-phone';
 
-export const companyVariables = (company: CompanyModel, workspace: WorkspaceModel) => {
+interface ICompanyVariables {
+  company: CompanyModel
+  workspace: WorkspaceModel
+  employeeCount: number
+}
+
+export const companyVariables = ({ employeeCount, company, workspace }: ICompanyVariables) => {
   const address = workspace?.address || company?.address;
 
   return {
@@ -29,7 +35,7 @@ export const companyVariables = (company: CompanyModel, workspace: WorkspaceMode
     [VariablesPGREnum.COMPANY_VISION]: company.vision || '',
     [VariablesPGREnum.COMPANY_VALUES]: company.values || '',
     [VariablesPGREnum.COMPANY_RESPONSIBLE]: company?.responsibleName || '',
-    [VariablesPGREnum.WORKSPACE_CNPJ]: formatCnpj(workspace?.cnpj) || formatCnpj(company?.cnpj) || '',
+    [VariablesPGREnum.WORKSPACE_CNPJ]: formatCnpj(workspace?.cnpj || company?.cnpj || ''),
     [VariablesPGREnum.IS_RS]: address?.state === 'RS' ? 'true' : '',
     [VariablesPGREnum.IS_AC]: address?.state == 'AC' ? 'true' : '',
     [VariablesPGREnum.IS_AL]: address?.state == 'AL' ? 'true' : '',
@@ -57,6 +63,6 @@ export const companyVariables = (company: CompanyModel, workspace: WorkspaceMode
     [VariablesPGREnum.IS_SP]: address?.state == 'SP' ? 'true' : '',
     [VariablesPGREnum.IS_SE]: address?.state == 'SE' ? 'true' : '',
     [VariablesPGREnum.IS_TO]: address?.state == 'TO' ? 'true' : '',
-    [VariablesPGREnum.COMPANY_EMPLOYEES_TOTAL]: String(company?.employeeCount) || '',
+    [VariablesPGREnum.COMPANY_EMPLOYEES_TOTAL]: String(employeeCount) || '',
   };
 };

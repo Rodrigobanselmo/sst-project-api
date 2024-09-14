@@ -1,9 +1,9 @@
 import { DocumentModelEntity } from "@/modules/documents/entities/document-model.entity";
-import { DocumentTypeEnum } from "../enums/document-type.enum";
-import { DocumentBaseDataVO } from "../values-object/document-base-data.vo";
 import { CompanyEntity } from "./company.entity";
 import { ProfessionalSignatureEntity } from "./professional-signature.entity";
 import { WorkspaceEntity } from "./workspace.entity";
+import { DocumentBaseDataVO } from "@/@v2/documents/domain/values-object/document-base-data.vo";
+import { DocumentTypeEnum } from "@/@v2/shared/domain/enum/documents/document-type.enum";
 
 export type IDocumentBaseEntity = {
   id: string;

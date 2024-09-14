@@ -1,9 +1,9 @@
-import { setNiceProportion } from './../../../../../../shared/utils/setNiceProportion';
 import sizeOf from 'image-size';
 import { AlignmentType, ImageRun, ISectionOptions, Paragraph, TextRun } from 'docx';
 import { readFileSync } from 'fs';
 
 import { sectionCoverProperties } from '../../config/styles';
+import { setNiceProportion } from '../../../helpers/set-nice-proportion';
 
 interface IHeaderProps {
   version: string;
@@ -40,7 +40,7 @@ const imageCover = (imgPath: string) => {
   const maxWidth = 630;
   const maxHeight = 354;
 
-  const { height, width } = setNiceProportion(maxWidth, maxHeight, imgWidth, imgHeight);
+  const { height, width } = setNiceProportion(maxWidth, maxHeight, imgWidth || 0, imgHeight || 0);
 
   return new Paragraph({
     children: [

@@ -73,7 +73,7 @@ export const VHImages = (images: [string, string], texts: [string, string], remo
         new TableRow({
           children: [
             new TableCell({
-              children: [paragraphFigure(texts[0])].filter((i) => i),
+              children: [paragraphFigure(texts[0])].filter((i) => i) as Paragraph[],
               width: { size: 45, type: WidthType.PERCENTAGE },
             }),
             new TableCell({
@@ -81,7 +81,7 @@ export const VHImages = (images: [string, string], texts: [string, string], remo
               width: { size: 10, type: WidthType.PERCENTAGE },
             }),
             new TableCell({
-              children: [paragraphFigure(texts[1])].filter((i) => i),
+              children: [paragraphFigure(texts[1])].filter((i) => i) as Paragraph[],
               width: { size: 45, type: WidthType.PERCENTAGE },
             }),
           ],

@@ -7,7 +7,7 @@ import { FirstRiskInventoryColumnEnum, firstRiskInventoryHeader } from './first.
 
 export const documentConverter = (
   riskFactorGroupData: IDocumentRiskGroupDataConverter,
-  homoGroupTree: IHomoGroupMap,
+  _homoGroupTree: IHomoGroupMap,
   hierarchy: HierarchyMapData,
   isByGroup: boolean,
 ) => {

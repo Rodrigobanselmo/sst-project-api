@@ -1,9 +1,10 @@
 import { IStorageAdapter } from '@/@v2/shared/adapters/storage/storage.interface';
 import { SharedTokens } from '@/@v2/shared/constants/tokens';
 import { asyncBatch } from '@/shared/utils/asyncBatch';
-import { Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { IDonwloadImage } from './donwload-image.interface';
 
+@Injectable()
 export abstract class DonwloadImageService {
   constructor(
     @Inject(SharedTokens.Storage)

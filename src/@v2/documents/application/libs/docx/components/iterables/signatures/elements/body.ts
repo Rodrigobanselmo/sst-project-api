@@ -1,5 +1,4 @@
 import {
-  AlignmentType,
   BorderStyle,
   HeightRule,
   ITableBordersOptions,
@@ -7,9 +6,8 @@ import {
   Paragraph,
   TableCell,
   TableRow,
-  TextRun,
   VerticalAlign,
-  WidthType,
+  WidthType
 } from 'docx';
 
 import { palette } from '../../../../constants/palette';

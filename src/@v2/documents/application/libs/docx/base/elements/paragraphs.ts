@@ -11,8 +11,8 @@ import {
 } from 'docx';
 import { IEntityRange, IInlineStyleRange } from '../../../../../domain/types/elements.types';
 import { InlineStyleTypeEnum } from '@/@v2/documents/domain/enums/inline-style-type.enum';
-import { isOdd } from '../../../../../shared/utils/isOdd';
-import { rgbStringToHex } from '../../../../../shared/utils/rgbToHex';
+import { rgbToHex } from '../../helpers/rgb-to-regex';
+import { isOdd } from '@/@v2/shared/utils/helpers/is-odd';
 
 interface ParagraphProps extends IParagraphOptions {
   break?: boolean;
@@ -52,11 +52,11 @@ const getStyle = (range: IInlineStyleRange): Writeable<Partial<IRunOptions>> => 
       break;
     }
     case InlineStyleTypeEnum.COLOR: {
-      style.color = rgbStringToHex(range.value);
+      if (range.value) style.color = rgbToHex(range.value);
       break;
     }
     case InlineStyleTypeEnum.BG_COLOR: {
-      style.shading = { fill: rgbStringToHex(range.value) };
+      if (range.value) style.shading = { fill: rgbToHex(range.value) };
       break;
     }
     default:
@@ -92,13 +92,13 @@ export const paragraphNormal = (text: string, { children, color, ...options } = 
                         size: options?.size ? options?.size * 2 : undefined,
                         ...(color ? { color: color } : {}),
                       });
-                    if (isLink)
-                      return textLink(text, {
-                        isBold,
-                        isBreak,
-                        isSuper,
-                        size: options?.size,
-                      });
+
+                    return textLink(text, {
+                      isBold,
+                      isBreak,
+                      isSuper,
+                      size: options?.size,
+                    });
                   });
                 })
                 .reduce((acc, curr) => [...acc, ...curr], []);
@@ -209,7 +209,7 @@ export const paragraphNewNormal = (text: string, { children, color, ...options }
                       text,
                       size: options?.size ? options?.size * 2 : undefined,
                       ...(color && { color: color }),
-                      ...(isBreak && indexRange == 0 && indexParagraph == 0 && { break: true }),
+                      ...(isBreak && indexRange == 0 && indexParagraph == 0 && { break: 1 }),
                       ...styles,
                       ...item,
                     });

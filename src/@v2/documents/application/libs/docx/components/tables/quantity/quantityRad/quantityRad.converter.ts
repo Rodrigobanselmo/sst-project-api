@@ -1,16 +1,15 @@
-import { HomoTypeEnum } from '@prisma/client';
 
 import { originRiskMap } from '../../../../constants/origin-risk';
 import { palette } from '../../../../constants/palette';
 
+import { getMatrizRisk } from '@/@v2/shared/domain/functions/security/get-matrix-risk.func';
+import { sortData } from '@/@v2/shared/utils/sorts/data.sort';
+import sortArray from 'sort-array';
 import { borderStyleGlobal } from '../../../../base/config/styles';
+import { matrixRiskMap } from '../../../../constants/matriz-risk-map';
 import { IDocumentRiskGroupDataConverter, IHierarchyMap } from '../../../../converter/hierarchy.converter';
 import { bodyTableProps } from './elements/body';
 import { QuantityRadColumnEnum } from './quantityRad.constant';
-import sortArray from 'sort-array';
-import { sortData } from '@/@v2/shared/utils/sorts/data.sort';
-import { matrixRiskMap } from '../../../../constants/matriz-risk-map';
-import { getMatrizRisk } from '@/@v2/shared/domain/functions/security/get-matrix-risk.func';
 
 export const quantityRadConverter = ({ riskGroupData }: IDocumentRiskGroupDataConverter, hierarchyTree: IHierarchyMap) => {
   const rows: bodyTableProps[][] = [];

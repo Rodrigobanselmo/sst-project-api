@@ -67,7 +67,7 @@ export const HTwoImages = (images: [string, string], texts: [string, string], re
         new TableRow({
           children: [
             new TableCell({
-              children: [paragraphFigure(texts[0])].filter((i) => i),
+              children: [paragraphFigure(texts[0])].filter((i) => i) as Paragraph[],
               width: { size: 45, type: WidthType.PERCENTAGE },
             }),
             new TableCell({
@@ -75,7 +75,7 @@ export const HTwoImages = (images: [string, string], texts: [string, string], re
               width: { size: 10, type: WidthType.PERCENTAGE },
             }),
             new TableCell({
-              children: [paragraphFigure(texts[1])].filter((i) => i),
+              children: [paragraphFigure(texts[1])].filter((i) => i) as Paragraph[],
               width: { size: 45, type: WidthType.PERCENTAGE },
             }),
           ],

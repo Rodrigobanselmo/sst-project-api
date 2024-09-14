@@ -5,9 +5,9 @@ import { IDocVariables } from '../../../builders/pgr/types/documet-section-group
 export const attachmentsConverter = (attachments: AttachmentModel[]): IDocVariables[] => {
   const attachmentsData: IDocVariables[] = [];
   attachments.forEach((attachment) => {
-    if (attachment?.url)
+    if (attachment?.link)
       attachmentsData.push({
-        [VariablesPGREnum.ATTACHMENT_LINK]: attachment.url,
+        [VariablesPGREnum.ATTACHMENT_LINK]: attachment.link,
         [VariablesPGREnum.ATTACHMENT_NAME]: attachment.name,
       });
   });

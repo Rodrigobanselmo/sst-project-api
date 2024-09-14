@@ -9,11 +9,13 @@ export class RiskUseCase {
   ) { }
 
   async read(params: IRiskUseCase.Params) {
-    const risk = await this.riskRepository.findById({
-      id: params.riskId,
-      companyId: '1'
-    })
+    params
+    this.riskRepository
+    // const risk = await this.riskRepository.findById({
+    //   id: params.riskId,
+    //   companyId: '1'
+    // })
 
-    risk?.hasMedialRecomendation()
+    // risk?.hasMedialRecomendation()
   }
 }

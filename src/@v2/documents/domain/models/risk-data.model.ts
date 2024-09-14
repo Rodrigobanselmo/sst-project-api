@@ -40,7 +40,7 @@ export type IRiskDataModel = {
 }
 
 export class RiskDataModel {
-  #probability: number;
+  #probability: IRiskProbabilityValues;
   probabilityAfter: number;
   level: IRiskLevelValues;
 
@@ -87,6 +87,6 @@ export class RiskDataModel {
   }
 
   get probability(): IRiskProbabilityValues {
-    return getQuantityProbability({ ...this, probability: this.#probability })
+    return getQuantityProbability({ ...this }) || this.#probability
   }
 }

@@ -31,7 +31,9 @@
     "incremental": true,
     "noErrorTruncation": true,
     "lib": [
-      "ES2021"
+      "ES2021",
+      "dom",
+      "esnext"
     ],
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,

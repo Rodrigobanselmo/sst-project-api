@@ -20,15 +20,15 @@ import { emergencyIterable } from '../../../components/iterables/emergency/emerg
 import { professionalsIterable } from '../../../components/iterables/professionals/professionals.iterable';
 import { recommendationsIterable } from '../../../components/iterables/recommendations/recommendations.iterable';
 import { signaturesIterable } from '../../../components/iterables/signatures/signatures.iterable';
-import { actionPlanTableSection } from '../../../components/tables/actionPlan/actionPlan.section';
-import { hierarchyHomoOrgSection } from '../../../components/tables/hierarchyHomoOrg/hierarchyHomoOrg.section';
-import { hierarchyPrioritizationPage } from '../../../components/tables/hierarchyPrioritization/hierarchyPrioritization.page';
-import { hierarchyRisksTableAllSections } from '../../../components/tables/hierarchyRisks/hierarchyRisks.section';
 import { considerationsQuantityTable } from '../../../components/tables/@mock/components/considerationsQuantity/table.component';
 import { expositionDegreeTable } from '../../../components/tables/@mock/components/expositionDegree/section/expositionDegreeTable';
 import { healthEffectTable } from '../../../components/tables/@mock/components/healthSeverity/section/healthEffectTable';
 import { matrizTable } from '../../../components/tables/@mock/components/matriz/table.component';
 import { quantityResultsTable } from '../../../components/tables/@mock/components/quantityResults/section/quantityResultsTable';
+import { actionPlanTableSection } from '../../../components/tables/actionPlan/actionPlan.section';
+import { hierarchyHomoOrgSection } from '../../../components/tables/hierarchyHomoOrg/hierarchyHomoOrg.section';
+import { hierarchyPrioritizationPage } from '../../../components/tables/hierarchyPrioritization/hierarchyPrioritization.page';
+import { hierarchyRisksTableAllSections } from '../../../components/tables/hierarchyRisks/hierarchyRisks.section';
 import { quantityHeatTable } from '../../../components/tables/quantity/quantityHeat/quantityHeat.table';
 import { quantityNoiseTable } from '../../../components/tables/quantity/quantityNoise/quantityNoise.table';
 import { quantityQuiTable } from '../../../components/tables/quantity/quantityQui/quantityQui.table';
@@ -104,7 +104,7 @@ export class ElementsMapClass {
         showHomogeneous: true,
         type: [HomoTypeEnum.ACTIVITIES, HomoTypeEnum.EQUIPMENT, HomoTypeEnum.WORKSTATION],
       })['children'],
-    [DocumentChildrenTypeEnum.PROFESSIONALS_SIGNATURES]: () => signaturesIterable(this.data.documentBase.professionalSignatures, this.data.documentBase.workspace, (x, v) => this.convertToDocx(x, v)),
+    [DocumentChildrenTypeEnum.PROFESSIONALS_SIGNATURES]: () => signaturesIterable(this.data.documentBase.professionalSignatures, (x, v) => this.convertToDocx(x, v)),
     [DocumentChildrenTypeEnum.TABLE_PRIORITIZATION]: () =>
       hierarchyPrioritizationPage(
         this.oldRiskGroupData,

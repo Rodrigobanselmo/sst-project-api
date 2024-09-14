@@ -8654,6 +8654,11 @@ nest-winston@^1.10.0:
   dependencies:
     fast-safe-stringify "^2.1.1"
 
+nestjs-cls@^4.4.1:
+  version "4.4.1"
+  resolved "https://registry.yarnpkg.com/nestjs-cls/-/nestjs-cls-4.4.1.tgz#ce0affa15e8565cfee74336746c058feaaeb2d9d"
+  integrity sha512-4yhldwm/cJ02lQ8ZAdM8KQ7gMfjAc1z3fo5QAQgXNyN4N6X5So9BCwv+BTLRugDCkELUo3qtzQHnKhGYL/ftPg==
+
 nestjs-soap@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/nestjs-soap/-/nestjs-soap-3.0.2.tgz#de245fe57bd191da8f07db735ffd94487cd46b12"

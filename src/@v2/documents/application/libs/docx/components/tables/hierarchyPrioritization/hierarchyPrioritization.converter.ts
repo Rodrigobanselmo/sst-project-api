@@ -1,20 +1,19 @@
 import { HierarchyEnum, HomoTypeEnum, RiskFactorsEnum } from '@prisma/client';
 
+import { checkValidExistentRisk } from '@/@v2/shared/domain/functions/security/check-valid-existent-risk.func';
+import { getMatrizRisk } from '@/@v2/shared/domain/functions/security/get-matrix-risk.func';
+import { removeDuplicate } from '@/@v2/shared/utils/helpers/remove-duplicate';
+import { sortNumber } from '@/@v2/shared/utils/sorts/number.sort';
+import { sortString } from '@/@v2/shared/utils/sorts/string.sort';
+import { riskMap } from '@/modules/documents/constants/risks.constant';
+import { originRiskMap } from '@/shared/constants/maps/origin-risk';
+import { borderStyleGlobal } from '../../../base/config/styles';
+import { matrixRiskMap } from '../../../constants/matriz-risk-map';
+import { palette } from '../../../constants/palette';
 import { IHierarchyData, IHierarchyMap, IRiskGroupDataConverter } from '../../../converter/hierarchy.converter';
 import { hierarchyMap } from '../appr/parts/first/first.constant';
 import { bodyTableProps } from './elements/body';
 import { headerTableProps } from './elements/header';
-import { borderStyleGlobal } from '../../../base/config/styles';
-import { removeDuplicate } from '@/@v2/shared/utils/helpers/remove-duplicate';
-import { originRiskMap } from '@/shared/constants/maps/origin-risk';
-import { riskMap } from '@/modules/documents/constants/risks.constant';
-import { sortString } from '@/@v2/shared/utils/sorts/string.sort';
-import { sortNumber } from '@/@v2/shared/utils/sorts/number.sort';
-import { getMatrizRisk } from '@/@v2/shared/domain/functions/security/get-matrix-risk.func';
-import { matrixRiskMap } from '../../../constants/matriz-risk-map';
-import { palette } from '../../../constants/palette';
-import { RiskDataModel } from '@/@v2/documents/domain/models/risk-data.model';
-import { checkValidExistentRisk } from '@/@v2/shared/domain/functions/security/check-valid-existent-risk.func';
 
 export interface IHierarchyPrioritizationOptions {
   isByGroup?: boolean;

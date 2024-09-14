@@ -1,10 +1,9 @@
 import { HomoTypeEnum } from '@/@v2/shared/domain/enum/security/homo-type.enum';
-import { HomogeneousGroup, HierarchyOnHomogeneous } from '@prisma/client';
+import { HierarchyOnHomogeneous, HomogeneousGroup } from '@prisma/client';
+import { HierarchyGroupModel } from '../../domain/models/hierarchy-groups.model';
 import { HomogeneousGroupModel } from '../../domain/models/homogeneous-group.model';
 import { CharacterizationMapper, ICharacterizationMapper } from './characterization.mapper';
 import { IRiskDataMapper, RiskDataMapper } from './risk-data.mapper';
-import { HierarchyGroupModel } from '../../domain/models/hierarchy-groups.model';
-import { IDocumentsRequirementKeys } from '@/@v2/shared/domain/types/document/document-types.type';
 
 export type IHomogeneousGroupMapper = HomogeneousGroup & {
   riskFactorData: IRiskDataMapper[]

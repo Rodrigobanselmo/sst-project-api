@@ -4,7 +4,7 @@ import { IStorageAdapter } from './storage.interface';
 import { Readable } from 'stream';
 import { isDevelopment } from '@/@v2/shared/utils/helpers/is-development';
 import { config } from '@/@v2/shared/constants/config';
-import MimeClass from '@/@v2/shared/utils/helpers/mime';
+import { toContentType } from '@/@v2/shared/utils/helpers/mime';
 
 export class S3StorageAdapter implements IStorageAdapter {
   private readonly bucket: string;
@@ -63,8 +63,7 @@ export class S3StorageAdapter implements IStorageAdapter {
     const extension = filename.split('.').pop();
     if (!extension) throw new Error('Invalid file name');
 
-    const mime = new MimeClass();
-    const contentType = mime.toContentType(extension);
+    const contentType = toContentType(extension);
     if (!contentType) throw new Error('Unsupported file type');
 
     return contentType;
@@ -77,7 +76,7 @@ export class S3StorageAdapter implements IStorageAdapter {
   private toReadable(stream: ReadableStream): Readable {
     const reader = stream.getReader();
     return new Readable({
-      async read(size) {
+      async read() {
         const { done, value } = await reader.read();
         if (done) {
           this.push(null);

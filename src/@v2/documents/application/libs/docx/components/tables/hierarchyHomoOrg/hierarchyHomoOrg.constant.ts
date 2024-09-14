@@ -1,6 +1,6 @@
 import { HierarchyEnum } from '@prisma/client';
-import { palette } from '../../../../../../shared/constants/palette';
 import { borderStyleGlobal } from '../../../base/config/styles';
+import { palette } from '../../../constants/palette';
 
 export enum HierarchyPlanColumnEnum {
   GSE = 'GSE',

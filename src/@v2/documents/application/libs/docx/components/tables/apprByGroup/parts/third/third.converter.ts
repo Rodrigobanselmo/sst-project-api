@@ -1,18 +1,18 @@
-import { HomoTypeEnum, RiskFactorsEnum } from '@prisma/client';
+import { RiskFactorsEnum } from '@prisma/client';
 import { AlignmentType } from 'docx';
 import { palette } from '../../../../../constants/palette';
 import { HierarchyMapData, IDocumentRiskGroupDataConverter, IHierarchyMap } from '../../../../../converter/hierarchy.converter';
 
+import { getMatrizRisk } from '@/@v2/shared/domain/functions/security/get-matrix-risk.func';
+import { sortNumber } from '@/@v2/shared/utils/sorts/number.sort';
+import { sortString } from '@/@v2/shared/utils/sorts/string.sort';
+import { matrixRiskMap } from '../../../../../constants/matriz-risk-map';
+import { originRiskMap } from '../../../../../constants/origin-risk';
+import { riskMap } from '../../../../../constants/risks-map';
+import { isRiskValidForHierarchyData } from '../../../appr/parts/third/third.converter';
 import { bodyTableProps, borderNoneStyle } from '../../elements/body';
 import { whiteBorder, whiteColumnBorder } from '../../elements/header';
 import { ThirdRiskInventoryColumnEnum } from './third.constant';
-import { isRiskValidForHierarchyData } from '../../../appr/parts/third/third.converter';
-import { sortString } from '@/@v2/shared/utils/sorts/string.sort';
-import { sortNumber } from '@/@v2/shared/utils/sorts/number.sort';
-import { riskMap } from '../../../../../constants/risks-map';
-import { getMatrizRisk } from '@/@v2/shared/domain/functions/security/get-matrix-risk.func';
-import { matrixRiskMap } from '../../../../../constants/matriz-risk-map';
-import { originRiskMap } from '../../../../../constants/origin-risk';
 
 export const dataConverter = (
   riskGroup: IDocumentRiskGroupDataConverter,

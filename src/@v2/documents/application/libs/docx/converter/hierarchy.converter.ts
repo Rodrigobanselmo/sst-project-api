@@ -112,8 +112,8 @@ export const hierarchyConverter = (
   hierarchies: IHierarchyDataConverter[],
   homoGroup = [] as HomogeneousGroupModel[],
   workspace: WorkspaceModel,
-  company: CompanyModel,
-  documentType: IDocumentsRequirementKeys,
+  _company: CompanyModel,
+  _documentType: IDocumentsRequirementKeys,
 ) => {
   const { hierarchyTree, homoGroupTree } = setMapHierarchies(hierarchies);
   const hierarchyData = new Map<string, HierarchyMapData>();

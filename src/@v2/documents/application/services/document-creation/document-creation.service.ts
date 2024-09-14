@@ -1,16 +1,16 @@
+import { AttachmentEntity } from '@/@v2/documents/domain/entities/attachment.entity';
+import { IStorageAdapter } from '@/@v2/shared/adapters/storage/storage.interface';
+import { BUCKET_FOLDERS } from '@/@v2/shared/constants/buckets';
+import { SharedTokens } from '@/@v2/shared/constants/tokens';
+import { isDevelopment } from '@/@v2/shared/utils/helpers/is-development';
+import { Inject, Injectable } from '@nestjs/common';
 import { ISectionOptions, Packer } from 'docx';
 import { unlinkSync } from 'fs';
 import { IDocumentAttachment, IDocumentFactoryProduct, IUnlinkPaths } from '../../factories/document/types/document-factory.types';
-import { SharedTokens } from '@/@v2/shared/constants/tokens';
-import { Inject } from '@nestjs/common';
-import { IStorageAdapter } from '@/@v2/shared/adapters/storage/storage.interface';
-import { isDevelopment } from '@/@v2/shared/utils/helpers/is-development';
 import { createBaseDocument } from '../../libs/docx/base/config/document';
 import { IDocumentCreation } from './document-creation.interface';
-import { BUCKET_FOLDERS } from '@/@v2/shared/constants/buckets';
-import { AttachmentModel } from '@/@v2/documents/domain/models/attachment.model';
-import { AttachmentEntity } from '@/@v2/documents/domain/entities/attachment.entity';
 
+@Injectable()
 export abstract class DocumentCreationService {
   constructor(
     @Inject(SharedTokens.Storage)
@@ -27,7 +27,7 @@ export abstract class DocumentCreationService {
       const attachments = await this.saveAttachments<T>(attachmentsData, product, body);
       if (isLocal) console.log(2, 'attachments');
 
-      const sections = await product.getSections({ data, attachments: AttachmentModel.fromEntities(attachments), body })
+      const sections = await product.getSections({ data, attachments: attachmentsData.map(attachment => attachment.model), body })
       const fileName = product.getFileName(body);
 
       const { buffer } = await this.generate({ sections });
@@ -53,11 +53,11 @@ export abstract class DocumentCreationService {
     const attachmentsEntity = await Promise.all(
       attachments.map(async (attachment) => {
         const { buffer } = await this.generate({ sections: attachment.section });
-        const { url } = await this.upload(buffer, product.getFileName(body, attachment.type));
+        const { url } = await this.upload(buffer, product.getFileName(body, attachment.model.type));
 
         return new AttachmentEntity({
           id: attachment.id,
-          name: attachment.name,
+          name: attachment.model.name,
           url,
         });
       }),

@@ -59,14 +59,14 @@ export const VThreeImages = (
                 new Paragraph({
                   children: images[1]
                     ? [
-                        new ImageRun({
-                          data: readFileSync(images[1]),
-                          transformation: {
-                            width: width,
-                            height: width * (16 / 9),
-                          },
-                        }),
-                      ]
+                      new ImageRun({
+                        data: readFileSync(images[1]),
+                        transformation: {
+                          width: width,
+                          height: width * (16 / 9),
+                        },
+                      }),
+                    ]
                     : [],
                   spacing: { after: 32 },
                 }),
@@ -83,14 +83,14 @@ export const VThreeImages = (
                 new Paragraph({
                   children: images[2]
                     ? [
-                        new ImageRun({
-                          data: readFileSync(images[2]),
-                          transformation: {
-                            width: width,
-                            height: width * (16 / 9),
-                          },
-                        }),
-                      ]
+                      new ImageRun({
+                        data: readFileSync(images[2]),
+                        transformation: {
+                          width: width,
+                          height: width * (16 / 9),
+                        },
+                      }),
+                    ]
                     : [],
                   spacing: { after: 32 },
                 }),
@@ -106,13 +106,13 @@ export const VThreeImages = (
         new TableRow({
           children: [
             new TableCell({
-              children: [paragraphFigure(texts[0])].filter((i) => i),
+              children: [paragraphFigure(texts[0])].filter((i) => i) as Paragraph[],
             }),
             new TableCell({
-              children: [paragraphFigure(texts[1])].filter((i) => i),
+              children: [paragraphFigure(texts[1])].filter((i) => i) as Paragraph[],
             }),
             new TableCell({
-              children: [paragraphFigure(texts[2])].filter((i) => i),
+              children: [paragraphFigure(texts[2])].filter((i) => i) as Paragraph[],
             }),
           ],
         }),

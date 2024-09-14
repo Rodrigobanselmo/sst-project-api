@@ -1,16 +1,16 @@
 import { HierarchyEnum, RiskFactorsEnum } from '@prisma/client';
 
+import { checkValidExistentRisk } from '@/@v2/shared/domain/functions/security/check-valid-existent-risk.func';
+import { removeDuplicate } from '@/@v2/shared/utils/helpers/remove-duplicate';
+import { sortNumber } from '@/@v2/shared/utils/sorts/number.sort';
+import { sortString } from '@/@v2/shared/utils/sorts/string.sort';
 import { borderStyleGlobal } from '../../../base/config/styles';
+import { palette } from '../../../constants/palette';
+import { riskMap } from '../../../constants/risks-map';
 import { IHierarchyData, IHierarchyMap, IRiskGroupDataConverter } from '../../../converter/hierarchy.converter';
 import { hierarchyMap } from '../appr/parts/first/first.constant';
 import { bodyTableProps } from './elements/body';
 import { headerTableProps } from './elements/header';
-import { removeDuplicate } from '@/@v2/shared/utils/helpers/remove-duplicate';
-import { sortString } from '@/@v2/shared/utils/sorts/string.sort';
-import { sortNumber } from '@/@v2/shared/utils/sorts/number.sort';
-import { riskMap } from '../../../constants/risks-map';
-import { palette } from '../../../constants/palette';
-import { checkValidExistentRisk } from '@/@v2/shared/domain/functions/security/check-valid-existent-risk.func';
 
 export interface IHierarchyRiskOptions {
   hierarchyType?: HierarchyEnum;
@@ -35,7 +35,7 @@ interface IRiskDataMap {
 export const hierarchyRisksConverter = (
   riskGroup: IRiskGroupDataConverter[],
   hierarchyData: IHierarchyData,
-  hierarchyTree: IHierarchyMap,
+  _hierarchyTree: IHierarchyMap,
   { hierarchyType = HierarchyEnum.SECTOR }: IHierarchyRiskOptions,
 ) => {
   const allHierarchyRecord = {} as Record<string, IHierarchyDataType>;

@@ -62,7 +62,7 @@ export const HOneMiddleImages = (image: string, text: string) => {
               width: { size: 5, type: WidthType.PERCENTAGE },
             }),
             new TableCell({
-              children: [paragraphFigure(text)].filter((i) => i),
+              children: [paragraphFigure(text)].filter((i) => i) as Paragraph[],
               width: { size: 90, type: WidthType.PERCENTAGE },
             }),
             new TableCell({

@@ -1,18 +1,18 @@
-import { HomoTypeEnum, RiskFactorsEnum, HomogeneousGroup } from '@prisma/client';
+import { RiskFactorsEnum } from '@prisma/client';
 import { AlignmentType } from 'docx';
 import { palette } from '../../../../../constants/palette';
 import { HierarchyMapData, IDocumentRiskGroupDataConverter, IGHODataConverter } from '../../../../../converter/hierarchy.converter';
 
 import { RiskDataModel } from '@/@v2/documents/domain/models/risk-data.model';
+import { getMatrizRisk } from '@/@v2/shared/domain/functions/security/get-matrix-risk.func';
+import { sortNumber } from '@/@v2/shared/utils/sorts/number.sort';
+import { sortString } from '@/@v2/shared/utils/sorts/string.sort';
+import { matrixRiskMap } from '../../../../../constants/matriz-risk-map';
+import { originRiskMap } from '../../../../../constants/origin-risk';
+import { riskMap } from '../../../../../constants/risks-map';
 import { bodyTableProps, borderNoneStyle } from '../../elements/body';
 import { whiteBorder, whiteColumnBorder } from '../../elements/header';
 import { ThirdRiskInventoryColumnEnum } from './third.constant';
-import { sortString } from '@/@v2/shared/utils/sorts/string.sort';
-import { sortNumber } from '@/@v2/shared/utils/sorts/number.sort';
-import { riskMap } from '../../../../../constants/risks-map';
-import { getMatrizRisk } from '@/@v2/shared/domain/functions/security/get-matrix-risk.func';
-import { matrixRiskMap } from '../../../../../constants/matriz-risk-map';
-import { originRiskMap } from '../../../../../constants/origin-risk';
 
 export function isRiskValidForHierarchyData({
   hierarchyData,

@@ -1,13 +1,13 @@
 import { AttachmentEntity } from "@/@v2/documents/domain/entities/attachment.entity";
+import { DocumentVersionEntity } from "@/@v2/documents/domain/entities/document-version.entity";
 import { AttachmentModel } from "@/@v2/documents/domain/models/attachment.model";
 import { ISectionOptions } from 'docx';
 
 
 export interface IDocumentAttachment {
-  section: ISectionOptions[];
-  type: string;
   id: string;
-  name: string;
+  section: ISectionOptions[];
+  model: AttachmentModel;
 }
 
 export interface IGetAttachments<T, R> {
@@ -28,7 +28,7 @@ export interface ISaveDocument<T, R> {
   body: T;
 }
 
-export interface ISaveErrorDocument<T, R> {
+export interface ISaveErrorDocument<T> {
   body: T;
 }
 
@@ -43,6 +43,6 @@ export interface IDocumentFactoryProduct<T = any, R = any> {
   getAttachments(data: IGetAttachments<T, R>): Promise<IDocumentAttachment[]>;
   getFileName(body: R, type?: string, ...args: any[]): string;
   getSections(options: IGetDocument<T, R>): Promise<ISectionOptions[]>;
-  save(options: ISaveDocument<T, R>): Promise<RiskDocumentEntity>;
-  error(options: ISaveErrorDocument<T, R>): Promise<void>;
+  save(options: ISaveDocument<T, R>): Promise<DocumentVersionEntity>;
+  error(options: ISaveErrorDocument<T>): Promise<void>;
 }

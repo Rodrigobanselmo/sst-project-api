@@ -57,7 +57,11 @@ export class DocumentBuildPGR {
       [VariablesPGREnum.COMPANY_HAS_SST_CERTIFICATION]: this.data?.documentBase.data.complementarySystems.length > 0 ? 'true' : '',
       [VariablesPGREnum.DOCUMENT_COORDINATOR]: this.data.documentBase.coordinatorBy || '',
       [VariablesPGREnum.DOCUMENT_TITLE]: 'Criar variavel local "TITULO_DO_DOCUMENTO"',
-      ...companyVariables(this.data.documentBase.company, this.data.documentBase.workspace),
+      ...companyVariables({
+        employeeCount: this.data.numOfEmployee,
+        company: this.data.documentBase.company,
+        workspace: this.data.documentBase.workspace
+      }),
       ...booleanVariables(this.data),
       ...variables,
     };

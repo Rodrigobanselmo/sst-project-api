@@ -1,9 +1,8 @@
 import { ImageRun, Paragraph } from 'docx';
-import sizeOf from 'image-size';
 import fs from 'fs';
+import sizeOf from 'image-size';
 import { IImage } from '../../../../../domain/types/elements.types';
 import { setNiceProportion } from '../../helpers/set-nice-proportion';
-import { IImagesMap } from '@/@v2/documents/application/factories/document/types/document-factory.types';
 
 export const imageDoc = (data: IImage) => {
   const path = data.path || 'images/hierarchy-risk-pgr.png';
@@ -13,7 +12,7 @@ export const imageDoc = (data: IImage) => {
 
   const imageWidth = (pageWidth * (data.width || 100)) / 100;
 
-  const { height: imgHeight, width: imgWidth } = sizeOf(file);
+  const { height: imgHeight, width: imgWidth } = sizeOf(file as any);
   const { height, width } = setNiceProportion(imageWidth, pageHeight / 2, imgWidth || 0, imgHeight || 0);
 
   const images = new Paragraph({

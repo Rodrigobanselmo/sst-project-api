@@ -1,18 +1,21 @@
 import { DocumentBuildPGR } from '@/@v2/documents/application/libs/docx/builders/pgr/create';
 import { getDocumentFileName } from '@/@v2/documents/application/libs/docx/helpers/get-document-file-name';
+import { getDocumentVersion } from '@/@v2/documents/application/libs/docx/helpers/get-document-version';
 import { DonwloadImageService } from '@/@v2/documents/application/services/donwload-image/donwload-image.service';
 import { DocumentDAO } from '@/@v2/documents/database/dao/document/document.dao';
+import { DocumentVersionRepository } from '@/@v2/documents/database/repositories/document-version/document-version.repository';
+import { DocumentVersionEntity } from '@/@v2/documents/domain/entities/document-version.entity';
 import { DocumentSectionTypeEnum } from '@/@v2/documents/domain/enums/document-section-type.enum';
+import { AttachmentModel } from '@/@v2/documents/domain/models/attachment.model';
 import { CharacterizationPhotoModel } from '@/@v2/documents/domain/models/characterization-photos.model';
 import { DocumentPGRModel } from '@/@v2/documents/domain/models/document-pgr.model';
-import { PromiseInfer } from '@/@v2/shared/interfaces/promise-infer.types';
+import { DocumentVersionStatus } from '@/@v2/shared/domain/enum/documents/document-version-status';
 import { dateUtils } from '@/@v2/shared/utils/helpers/date-utils';
 import { BadRequestException, Injectable, Scope } from '@nestjs/common';
 import { ISectionOptions } from 'docx';
 import { v4 } from 'uuid';
 import { IDocumentFactoryProduct, IGetAttachments, IGetDocument, ISaveDocument, ISaveErrorDocument, IUnlinkPaths } from '../../types/document-factory.types';
 import { IDocumentPGRParams } from './document-pgr.types';
-import { getDocumentVersion } from '@/@v2/documents/application/libs/docx/helpers/get-document-version';
 
 @Injectable({ scope: Scope.REQUEST })
 export class DocumentPGRFactory implements IDocumentFactoryProduct<IDocumentPGRParams, DocumentPGRModel> {
@@ -21,6 +24,7 @@ export class DocumentPGRFactory implements IDocumentFactoryProduct<IDocumentPGRP
 
   constructor(
     protected readonly documentDAO: DocumentDAO,
+    protected readonly documentVersionRepository: DocumentVersionRepository,
     protected readonly donwloadImageService: DonwloadImageService
   ) { }
 
@@ -60,7 +64,7 @@ export class DocumentPGRFactory implements IDocumentFactoryProduct<IDocumentPGRP
       sections: [{ data: [{ type: DocumentSectionTypeEnum.ACTION_PLAN }] }],
     }).build();
 
-    const docId = data.documentVersion.id;
+    const docVersionId = data.documentVersion.id;
     const companyId = data.documentBase.company.id;
     const id1 = v4();
     const id2 = v4();
@@ -68,25 +72,31 @@ export class DocumentPGRFactory implements IDocumentFactoryProduct<IDocumentPGRP
 
     return [
       {
-        section: documentAPRSection,
-        type: 'PGR-APR',
         id: id1,
-        name: 'Inventário de Risco por Função (APR)',
-        link: `${process.env.APP_HOST}/download/pgr/anexos?ref1=${docId}&ref2=${id1}&ref3=${companyId}`,
+        section: documentAPRSection,
+        model: new AttachmentModel({
+          name: 'Inventário de Risco por Função (APR)',
+          link: `${process.env.APP_HOST}/download/pgr/anexos?ref1=${docVersionId}&ref2=${id1}&ref3=${companyId}`,
+          type: 'PGR-APR',
+        }),
       },
       {
-        section: documentAPRGroupSection,
-        type: 'PGR-APR-GSE',
         id: id2,
-        name: 'Inventário de Risco por GSE (APR)',
-        link: `${process.env.APP_HOST}/download/pgr/anexos?ref1=${docId}&ref2=${id2}&ref3=${companyId}`,
+        section: documentAPRGroupSection,
+        model: new AttachmentModel({
+          type: 'PGR-APR-GSE',
+          name: 'Inventário de Risco por GSE (APR)',
+          link: `${process.env.APP_HOST}/download/pgr/anexos?ref1=${docVersionId}&ref2=${id2}&ref3=${companyId}`,
+        }),
       },
       {
-        section: documentActionPlanSection,
-        type: 'PGR-PLANO_DE_ACAO',
         id: id3,
-        name: 'Plano de Ação Detalhado',
-        link: `${process.env.APP_HOST}/download/pgr/anexos?ref1=${docId}&ref2=${id3}&ref3=${companyId}`,
+        section: documentActionPlanSection,
+        model: new AttachmentModel({
+          type: 'PGR-PLANO_DE_ACAO',
+          name: 'Plano de Ação Detalhado',
+          link: `${process.env.APP_HOST}/download/pgr/anexos?ref1=${docVersionId}&ref2=${id3}&ref3=${companyId}`,
+        }),
       },
     ];
   }
@@ -105,21 +115,27 @@ export class DocumentPGRFactory implements IDocumentFactoryProduct<IDocumentPGRP
     return sections;
   }
 
-  public async save({ attachments, body, data, url }: ISaveDocument<IDocumentPGRParams, DocumentPGRModel>) {
-    return await this.riskDocumentRepository.upsert({
-      id: data.docId,
-      status: StatusEnum.DONE,
+  public async save({ attachments, body, url }: ISaveDocument<IDocumentPGRParams, DocumentPGRModel>) {
+    const documentVersion = new DocumentVersionEntity({
+      id: body.documentVersionId,
+      status: DocumentVersionStatus.ERROR,
+      attachments,
       fileUrl: url,
-      attachments: attachments,
-    });
+    })
+
+    const document = await this.documentVersionRepository.update(documentVersion);
+    return document
   }
 
-  public async error({ body }: ISaveErrorDocument<IDocumentPGRParams, DocumentPGRModel>,) {
-    if (body.documentVersionId)
-      await this.riskDocumentRepository.upsert({
-        id: body.id,
-        status: StatusEnum.ERROR,
-      });
+  public async error({ body }: ISaveErrorDocument<IDocumentPGRParams>,) {
+    const documentVersion = new DocumentVersionEntity({
+      id: body.documentVersionId,
+      status: DocumentVersionStatus.ERROR,
+      attachments: [],
+      fileUrl: null,
+    })
+
+    await this.documentVersionRepository.update(documentVersion);
   }
 
   public getFileName = (data: DocumentPGRModel, type = 'PGR') => {

@@ -1,14 +1,14 @@
 import { HomoTypeEnum } from '@prisma/client';
 import { ISectionOptions, PageOrientation, Paragraph, Table } from 'docx';
 
+import { removeDuplicate } from '@/@v2/shared/utils/helpers/remove-duplicate';
+import { sortString } from '@/@v2/shared/utils/sorts/string.sort';
+import { originRiskMap } from '../../../constants/origin-risk';
 import { HierarchyMapData, IDocumentRiskGroupDataConverter, IGHODataConverter, IHierarchyData, IHierarchyDataConverter, IHierarchyMap, IHomoGroupMap } from '../../../converter/hierarchy.converter';
 import { officeRiskInventoryTableSection } from './parts/2-offices/offices.table';
 import { firstRiskInventoryTableSection } from './parts/first/first.table';
 import { secondRiskInventoryTableSection } from './parts/second/second.table';
 import { thirdRiskInventoryTableSection } from './parts/third/third.table';
-import { sortString } from '@/@v2/shared/utils/sorts/string.sort';
-import { removeDuplicate } from '@/@v2/shared/utils/helpers/remove-duplicate';
-import { originRiskMap } from '../../../constants/origin-risk';
 
 export interface IAPPRTableOptions {
   isByGroup?: boolean;
@@ -72,11 +72,11 @@ export const APPRByGroupTableSection = (
       if (!foundHomo) setHomoGroup(homo);
       everyHomoFound.push(homo.gho.id);
 
-      homoGroupTree[homo.gho.id].hierarchies.forEach((hierarchy, i, hierarchies) => {
+      homoGroupTree[homo.gho.id].hierarchies.forEach((hierarchy, _i, hierarchies) => {
         const allHomogeneousGroupIds = (hierarchyData.get(hierarchy.id) || { allHomogeneousGroupIds: [] })
           ?.allHomogeneousGroupIds;
 
-        removeDuplicate([...allHomogeneousGroupIds.map((id) => ({ id })), ...hierarchy.homogeneousGroups], {
+        removeDuplicate([...allHomogeneousGroupIds.map((id: string) => ({ id })), ...hierarchy.homogeneousGroups], {
           removeById: 'id',
         }).forEach((homoGroup) => {
           const isOnEvery = hierarchies.every((hierarchyEvery) => {

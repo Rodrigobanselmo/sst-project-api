@@ -1,23 +1,21 @@
 import { AlignmentType, Paragraph, Table, WidthType } from 'docx';
 
+import { DocumentChildrenTypeEnum } from '@/@v2/documents/domain/enums/document-children-type.enum';
 import { ProfessionalSignatureModel } from '@/@v2/documents/domain/models/professional-signature.model';
-import { WorkspaceModel } from '@/@v2/documents/domain/models/workspace.model';
+import { arrayChunks } from '@/@v2/shared/utils/helpers/array-chunks';
 import { ISectionChildrenType } from '../../../../../../domain/types/elements.types';
 import { VariablesPGREnum } from '../../../builders/pgr/enums/variables.enum';
+import { IDocVariables } from '../../../builders/pgr/types/documet-section-groups.types';
 import { TableBodyElements } from './elements/body';
 import { SignaturesConverter } from './signatures.converter';
-import { IDocVariables } from '../../../builders/pgr/types/documet-section-groups.types';
-import { DocumentChildrenTypeEnum } from '@/@v2/documents/domain/enums/document-children-type.enum';
-import { arrayChunks } from '@/@v2/shared/utils/helpers/array-chunks';
 
 export const signaturesIterable = (
   signatureEntity: ProfessionalSignatureModel[],
-  workspace: WorkspaceModel,
   convertToDocx: (data: ISectionChildrenType[], variables?: IDocVariables) => (Paragraph | Table)[],
 ) => {
   if (!signatureEntity?.length) return [];
 
-  const signaturesVariablesArray = SignaturesConverter(signatureEntity, workspace);
+  const signaturesVariablesArray = SignaturesConverter(signatureEntity);
 
   const iterableSections = signaturesVariablesArray.map((variables) => {
     const credentials = [] as string[];

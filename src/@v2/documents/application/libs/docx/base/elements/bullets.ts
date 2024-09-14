@@ -55,6 +55,8 @@ export const bulletsMoreLevels = (bullets: string[][] | string[], options?: IPar
           }),
         ] as Paragraph[];
       }
+
+      return []
     })
     .reduce((acc, array) => {
       return [...acc, ...array];

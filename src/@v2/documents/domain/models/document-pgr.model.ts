@@ -1,3 +1,4 @@
+import { getNumOfEmployees } from "../functions/get-num-of-employees.func";
 import { DocumentVersionModel } from "./document-version.model";
 import { ExamModel } from "./exam.model";
 import { HierarchyModel } from "./hierarchy.model";
@@ -47,11 +48,11 @@ export class DocumentPGRModel {
   }
 
   get numOfEmployee() {
-    return this.hierarchies.reduce((acc, hierarchy) => acc + hierarchy.employees.length, 0)
+    return getNumOfEmployees(this.hierarchies)
   }
 
   getHierarchyGroups(hierarchy: HierarchyModel) {
-    return hierarchy.groups.map((group) => this.homogeneousGroupsMap[group.homogeneousGroupId])
+    return hierarchy.groups.map((group) => this.homogeneousGroupsMap[group.homogeneousGroupId]).filter(Boolean) as HomogeneousGroupModel[]
   }
 
   getRiskDataExams(riskData: RiskDataModel) {

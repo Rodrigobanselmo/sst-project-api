@@ -1,5 +1,6 @@
+import { DocumentVersionEntity } from "@/@v2/documents/domain/entities/document-version.entity";
 
 export namespace IDocumentVersionRepository {
-  export type ReadByIdParams = { id: string; }
-  export type EditByIdParams = { id: string; }
+  export type FindParams = { id: string; }
+  export type EditParams = DocumentVersionEntity;
 }

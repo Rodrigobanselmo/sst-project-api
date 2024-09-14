@@ -1,8 +1,8 @@
-import { DocumentModelEntity } from "../entities/document-model.entity"
-import { IDocumentModelData } from "../types/document-mode-data.types"
-import { IImage } from "../types/elements.types"
 import { parseModelData } from "../../application/libs/docx/builders/pgr/functions/parseModelData"
 import { IDocumentSectionGroup, IDocumentSectionGroups } from "../../application/libs/docx/builders/pgr/types/documet-section-groups.types"
+import { convertModelDataBuffer } from "../functions/conver-model-data-buffer"
+import { IDocumentModelData } from "../types/document-mode-data.types"
+import { IImage } from "../types/elements.types"
 
 export type IDocumentModelModel = {
   data: Buffer
@@ -14,7 +14,7 @@ export class DocumentModelModel {
   variables: Record<string, string> = {}
 
   constructor(params: IDocumentModelModel) {
-    this.#data = DocumentModelEntity.convertData(params.data);
+    this.#data = convertModelDataBuffer(params.data);
 
     const data = this.data()
     this.sections = data.sections
