@@ -26,6 +26,7 @@ export function dataConverter({ data }: IDocumentClassType) {
       return hierarchyCopy;
     });
 
+
   const { hierarchyData, hierarchyHighLevelsData, homoGroupTree, hierarchyTree, riskGroupData } = hierarchyConverter(
     hierarchiesData,
     data.homogeneousGroups,

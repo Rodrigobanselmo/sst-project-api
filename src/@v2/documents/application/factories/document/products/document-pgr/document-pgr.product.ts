@@ -15,20 +15,19 @@ import { BadRequestException, Injectable, Scope } from '@nestjs/common';
 import { ISectionOptions } from 'docx';
 import { v4 } from 'uuid';
 import { IDocumentFactoryProduct, IGetAttachments, IGetDocument, ISaveDocument, ISaveErrorDocument, IUnlinkPaths } from '../../types/document-factory.types';
-import { IDocumentPGRParams } from './document-pgr.types';
+import { IProductDocumentPGR } from './document-pgr.types';
 
-@Injectable({ scope: Scope.REQUEST })
-export class DocumentPGRFactory implements IDocumentFactoryProduct<IDocumentPGRParams, DocumentPGRModel> {
+export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocumentPGR, DocumentPGRModel> {
   public unlinkPaths: IUnlinkPaths[] = [];
   public type = 'PGR';
 
   constructor(
-    protected readonly documentDAO: DocumentDAO,
-    protected readonly documentVersionRepository: DocumentVersionRepository,
-    protected readonly donwloadImageService: DonwloadImageService
+    private readonly documentDAO: DocumentDAO,
+    private readonly documentVersionRepository: DocumentVersionRepository,
+    private readonly donwloadImageService: DonwloadImageService
   ) { }
 
-  public async getData({ documentVersionId }: IDocumentPGRParams) {
+  public async getData({ documentVersionId }: IProductDocumentPGR) {
     const document = await this.documentDAO.findDocumentPGR({ documentVersionId });
     if (!document) throw new BadRequestException('Nenhum documento PGR cadastrado');
 
@@ -37,7 +36,7 @@ export class DocumentPGRFactory implements IDocumentFactoryProduct<IDocumentPGRP
     return document
   }
 
-  public async getAttachments({ data }: IGetAttachments<IDocumentPGRParams, DocumentPGRModel>) {
+  public async getAttachments({ data }: IGetAttachments<IProductDocumentPGR, DocumentPGRModel>) {
     const version = this.getVersionName(data);
 
     const documentAPRSection = new DocumentBuildPGR({
@@ -101,7 +100,7 @@ export class DocumentPGRFactory implements IDocumentFactoryProduct<IDocumentPGRP
     ];
   }
 
-  public async getSections({ data, attachments }: IGetDocument<IDocumentPGRParams, DocumentPGRModel>) {
+  public async getSections({ data, attachments }: IGetDocument<IProductDocumentPGR, DocumentPGRModel>) {
     const version = this.getVersionName(data);
 
     const sections: ISectionOptions[] = new DocumentBuildPGR({
@@ -115,10 +114,10 @@ export class DocumentPGRFactory implements IDocumentFactoryProduct<IDocumentPGRP
     return sections;
   }
 
-  public async save({ attachments, body, url }: ISaveDocument<IDocumentPGRParams, DocumentPGRModel>) {
+  public async save({ attachments, body, url }: ISaveDocument<IProductDocumentPGR, DocumentPGRModel>) {
     const documentVersion = new DocumentVersionEntity({
       id: body.documentVersionId,
-      status: DocumentVersionStatus.ERROR,
+      status: DocumentVersionStatus.DONE,
       attachments,
       fileUrl: url,
     })
@@ -127,7 +126,7 @@ export class DocumentPGRFactory implements IDocumentFactoryProduct<IDocumentPGRP
     return document
   }
 
-  public async error({ body }: ISaveErrorDocument<IDocumentPGRParams>,) {
+  public async error({ body }: ISaveErrorDocument<IProductDocumentPGR>,) {
     const documentVersion = new DocumentVersionEntity({
       id: body.documentVersionId,
       status: DocumentVersionStatus.ERROR,

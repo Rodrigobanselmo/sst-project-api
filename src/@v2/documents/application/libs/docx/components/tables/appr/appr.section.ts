@@ -47,8 +47,10 @@ export const APPRTableSection = (
         }
 
         const homoGroup = homoGroupTree[homoGroupID] || {
-          description: '',
-          type: null,
+          gho: {
+            description: '',
+            type: null,
+          }
         };
 
         map.set(homoGroupID, true);

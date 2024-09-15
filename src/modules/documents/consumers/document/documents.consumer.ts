@@ -57,10 +57,12 @@ export class PgrConsumer implements OnModuleInit {
   }
 
   private handleSQSError = (error: Error) => {
+    console.log(1)
     console.error('SQS Error:', error.message);
   };
 
   private handleSQSProcessingError = (error: Error) => {
+    console.log(1)
     console.error('SQS Processing Error:', error.message);
   };
 }

@@ -11,24 +11,24 @@ import { createBaseDocument } from '../../libs/docx/base/config/document';
 import { IDocumentCreation } from './document-creation.interface';
 
 @Injectable()
-export abstract class DocumentCreationService {
+export class DocumentCreationService {
   constructor(
     @Inject(SharedTokens.Storage)
     private readonly storage: IStorageAdapter,
   ) { }
 
-  public async execute<T>({ product, body }: IDocumentCreation.Params<T>) {
+  public async execute<T, R>({ product, body }: IDocumentCreation.Params<T, R>) {
     const isLocal = isDevelopment();
 
     try {
       if (isLocal) console.log(1, 'start');
       const data = await product.getData(body);
       const attachmentsData = await product.getAttachments({ data, body });
-      const attachments = await this.saveAttachments<T>(attachmentsData, product, body);
+      const attachments = await this.saveAttachments<T, R>(attachmentsData, product, data);
       if (isLocal) console.log(2, 'attachments');
 
       const sections = await product.getSections({ data, attachments: attachmentsData.map(attachment => attachment.model), body })
-      const fileName = product.getFileName(body);
+      const fileName = product.getFileName(data);
 
       const { buffer } = await this.generate({ sections });
       const { url } = await this.upload(buffer, fileName);
@@ -49,11 +49,11 @@ export abstract class DocumentCreationService {
     }
   }
 
-  private async saveAttachments<T>(attachments: IDocumentAttachment[], product: IDocumentFactoryProduct<T>, body: T) {
+  private async saveAttachments<T, R>(attachments: IDocumentAttachment[], product: IDocumentFactoryProduct<T>, data: R) {
     const attachmentsEntity = await Promise.all(
       attachments.map(async (attachment) => {
         const { buffer } = await this.generate({ sections: attachment.section });
-        const { url } = await this.upload(buffer, product.getFileName(body, attachment.model.type));
+        const { url } = await this.upload(buffer, product.getFileName(data, attachment.model.type));
 
         return new AttachmentEntity({
           id: attachment.id,
@@ -85,12 +85,12 @@ export abstract class DocumentCreationService {
   }
 
   public async unlinkFiles(paths: IUnlinkPaths[]) {
-    paths
-      .filter((i) => !!i?.path && typeof i.path == 'string')
-      .forEach((path) => {
-        try {
-          unlinkSync(path.path);
-        } catch (e) { }
-      });
+    // paths
+    //   .filter((i) => !!i?.path && typeof i.path == 'string')
+    //   .forEach((path) => {
+    //     try {
+    //       unlinkSync(path.path);
+    //     } catch (e) { }
+    //   });
   }
 }

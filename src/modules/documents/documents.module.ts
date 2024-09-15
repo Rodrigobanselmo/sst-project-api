@@ -37,10 +37,11 @@ import { DocumentPGRPreviewFactory } from './factories/document/products/PGR/Doc
 import { DownloadPreviewModel } from './services/document/document-models/download-preview-model.service';
 import { PdfVisitReportDataService } from './services/pdf/visitReport/visit-report-data.service';
 import { DocumentPCMSOFactory } from './factories/document/products/PGR/DocumentPCMSOFactory';
+import { DocumentModule } from '@/@v2/documents/document.module';
 
 @Module({
   controllers: [DocumentModelController, DocumentsPgrController, DocumentsPdfController, DocumentsBaseController],
-  imports: [SSTModule, CompanyModule, UsersModule],
+  imports: [DocumentModule, SSTModule, CompanyModule, UsersModule],
   providers: [
     ExcelProvider,
     DownloadDocumentService,
@@ -75,4 +76,4 @@ import { DocumentPCMSOFactory } from './factories/document/products/PGR/Document
   ],
   exports: [DocumentPGRFactory],
 })
-export class DocumentsModule {}
+export class DocumentsModule { }

@@ -5,7 +5,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { IDonwloadImage } from './donwload-image.interface';
 
 @Injectable()
-export abstract class DonwloadImageService {
+export class DonwloadImageService {
   constructor(
     @Inject(SharedTokens.Storage)
     private readonly storage: IStorageAdapter,

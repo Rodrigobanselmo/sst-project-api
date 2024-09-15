@@ -25,7 +25,7 @@ export class HierarchyMapper {
       })),
       parentId: data.parentId,
       realDescription: data.realDescription,
-      subOfficeEmployees: data.employees.map(employee => new EmployeeModel({
+      subOfficeEmployees: data.subOfficeEmployees.map(employee => new EmployeeModel({
         id: employee.id,
       })),
       employees: data.employees.map(employee => new EmployeeModel({

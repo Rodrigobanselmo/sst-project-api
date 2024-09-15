@@ -18,6 +18,7 @@ import { LoggerMiddleware } from './shared/middlewares/logger.local.middleware';
 import { HttpLoggerMiddleware } from './shared/middlewares/logger.middleware';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { DocumentModule } from './@v2/documents/document.module';
+import { SharedModule } from './@v2/shared/shared.module';
 
 @Module({
   imports: [
@@ -39,6 +40,8 @@ import { DocumentModule } from './@v2/documents/document.module';
     ScheduleModule.forRoot(),
     //V2
     DocumentModule,
+    SharedModule,
+
   ],
   providers: [
     {

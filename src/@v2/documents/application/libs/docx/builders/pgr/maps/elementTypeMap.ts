@@ -218,7 +218,7 @@ export class ElementsMapClass {
         showHomogeneous: false,
         showHomogeneousDescription: false,
       })['children'],
-    [DocumentChildrenTypeEnum.RISK_TABLE]: () => riskCharacterizationTableSection(this.data.risksData, this.data.getRiskDataExams)['children'],
+    [DocumentChildrenTypeEnum.RISK_TABLE]: () => riskCharacterizationTableSection(this.data.risksData, this.data.getRiskDataExams.bind(this.data))['children'],
     [DocumentChildrenTypeEnum.HIERARCHY_RISK_TABLE]: () =>
       hierarchyRisksTableAllSections(this.oldRiskGroupData, this.OldHierarchy, this.oldHierarchyTree, (x, v) =>
         this.convertToDocx(x, v),

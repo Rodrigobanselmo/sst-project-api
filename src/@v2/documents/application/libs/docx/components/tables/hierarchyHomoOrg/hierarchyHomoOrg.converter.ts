@@ -10,6 +10,7 @@ import { sortNumber } from '@/@v2/shared/utils/sorts/number.sort';
 import { sortString } from '@/@v2/shared/utils/sorts/string.sort';
 import { originRiskMap } from '../../../constants/origin-risk';
 import { palette } from '../../../constants/palette';
+import { writeFile } from 'fs';
 
 export type ConverterProps = {
   showHomogeneous?: boolean;
@@ -155,6 +156,14 @@ export const hierarchyPlanConverter = (
     const rows: bodyTableProps[][] = [];
 
     const generateRow = (): bodyTableProps[] => Array.from({ length: columnsLength }).map(() => ({}));
+
+    writeFile('allHierarchyPlan2.json', JSON.stringify(allHierarchyPlan, null, 2), (err) => {
+      if (err) {
+        console.error('An error occurred while writing JSON Object to File.', err);
+      } else {
+        console.log('JSON file has been saved.');
+      }
+    });
 
     Object.entries(allHierarchyPlan)
       .sort(([a, c], [b, d]) =>

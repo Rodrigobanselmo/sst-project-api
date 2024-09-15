@@ -41,7 +41,7 @@ export interface IDocumentFactoryProduct<T = any, R = any> {
   unlinkPaths: IUnlinkPaths[];
   getData(body: T): Promise<R>;
   getAttachments(data: IGetAttachments<T, R>): Promise<IDocumentAttachment[]>;
-  getFileName(body: R, type?: string, ...args: any[]): string;
+  getFileName(data: R, type?: string, ...args: any[]): string;
   getSections(options: IGetDocument<T, R>): Promise<ISectionOptions[]>;
   save(options: ISaveDocument<T, R>): Promise<DocumentVersionEntity>;
   error(options: ISaveErrorDocument<T>): Promise<void>;

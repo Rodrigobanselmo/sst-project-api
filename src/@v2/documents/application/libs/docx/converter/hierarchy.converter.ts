@@ -227,7 +227,6 @@ export const hierarchyConverter = (
     })
   })
 
-
   return {
     hierarchyData,
     hierarchyHighLevelsData,

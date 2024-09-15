@@ -51,7 +51,7 @@ export class RiskDataQuantityQuiVO {
   }
 
   get probability() {
-    return this.nr15ltProb | this.stelProb | this.twaProb | this.vmpProb;
+    return this.nr15ltProb || this.stelProb || this.twaProb || this.vmpProb;
   }
 
   get isNr15Teto() {
