@@ -2,7 +2,7 @@ import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service'
 import { Injectable } from '@nestjs/common'
 import { Prisma, StatusEnum } from '@prisma/client'
 import { IDocumentVersionRepository } from './document-version.types'
-import { DocumentVersionMapper } from '../../models/document-version.mapper'
+import { DocumentVersionMapper } from '../../mappers/document-version.mapper'
 
 
 @Injectable()

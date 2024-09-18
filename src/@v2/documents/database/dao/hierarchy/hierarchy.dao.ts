@@ -1,7 +1,7 @@
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service'
 import { Injectable } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
-import { HierarchyMapper } from '../../models/hierarchy.mapper'
+import { HierarchyMapper } from '../../mappers/hierarchy.mapper'
 import { IHierarchyDAO } from './hierarchy.types'
 
 

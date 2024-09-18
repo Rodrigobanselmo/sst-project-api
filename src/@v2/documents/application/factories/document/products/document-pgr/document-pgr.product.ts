@@ -11,7 +11,7 @@ import { CharacterizationPhotoModel } from '@/@v2/documents/domain/models/charac
 import { DocumentPGRModel } from '@/@v2/documents/domain/models/document-pgr.model';
 import { DocumentVersionStatus } from '@/@v2/shared/domain/enum/documents/document-version-status';
 import { dateUtils } from '@/@v2/shared/utils/helpers/date-utils';
-import { BadRequestException, Injectable, Scope } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 import { ISectionOptions } from 'docx';
 import { v4 } from 'uuid';
 import { IDocumentFactoryProduct, IGetAttachments, IGetDocument, ISaveDocument, ISaveErrorDocument, IUnlinkPaths } from '../../types/document-factory.types';

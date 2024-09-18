@@ -2,7 +2,7 @@ import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service'
 import { Injectable } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
 import { IRiskDataDAO } from './risk-data.types'
-import { RiskDataMapper } from '../../models/risk-data.mapper'
+import { RiskDataMapper } from '../../mappers/risk-data.mapper'
 import { RiskDAO } from '../risk/risk.dao'
 
 

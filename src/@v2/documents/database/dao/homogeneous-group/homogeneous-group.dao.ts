@@ -2,7 +2,7 @@ import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service'
 import { Injectable } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
 import { IHomogeneousGroupDAO } from './homogeneous-group.types'
-import { HomogeneousGroupMapper } from '../../models/homogeneous-group.mapper'
+import { HomogeneousGroupMapper } from '../../mappers/homogeneous-group.mapper'
 import { RiskDataDAO } from '../risk-data/risk-data.dao'
 
 

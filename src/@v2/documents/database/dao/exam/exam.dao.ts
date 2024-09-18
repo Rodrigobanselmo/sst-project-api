@@ -2,7 +2,7 @@ import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service'
 import { CompanyQueries } from '@/@v2/shared/utils/database/company.queries'
 import { Injectable } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
-import { ExamMapper } from '../../models/exam.mapper'
+import { ExamMapper } from '../../mappers/exam.mapper'
 import { IExamDAO } from './exam.types'
 
 

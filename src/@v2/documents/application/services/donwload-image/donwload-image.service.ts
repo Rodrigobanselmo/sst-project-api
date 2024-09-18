@@ -5,7 +5,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { promises as fs } from 'fs';
 import { IDonwloadImage } from './donwload-image.interface';
 import { v4 } from 'uuid';
-import { donwloadFile } from '@/@v2/shared/utils/helpers/downalod-file';
+import { donwloadPublicFile } from '@/@v2/shared/utils/helpers/downalod-public-file';
 
 @Injectable()
 export class DonwloadImageService {
@@ -29,11 +29,14 @@ export class DonwloadImageService {
     const isOldBucket = !imageUrl.includes('https://simplesst.s3.sa-east-1');
 
     if (isOldBucket) {
-      return donwloadFile({ url: imageUrl });
+      return donwloadPublicFile({ url: imageUrl });
     }
 
     const fileBuffer = await this.storage.download({ fileUrl: imageUrl });
-    const extension = imageUrl.split('/').at(-1).split('.')[1]
+
+    const extension = imageUrl.split('/').at(-1)?.split('.')[1]
+    if (!extension) return null;
+
     const path = `tmp/${v4()}.${extension}`;
 
     await fs.writeFile(path, fileBuffer, {});

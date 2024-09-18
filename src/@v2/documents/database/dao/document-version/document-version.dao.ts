@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
 import { IDocumentVersionRepository } from './document-version.types'
 import { DocumentBaseDAO } from '../document-base/document-base.dao'
-import { DocumentVersionMapper } from '../../models/document-version.mapper'
+import { DocumentVersionMapper } from '../../mappers/document-version.mapper'
 
 
 @Injectable()
