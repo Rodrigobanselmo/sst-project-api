@@ -6,11 +6,13 @@ import axios from 'axios';
 type IDownloadFile = { url: string, filePath?: string }
 
 const getFilePath = (url: string) => {
-    const extension = url.split('/').at(-1).split('.')[1];
+    const extension = url.split('/').at(-1)?.split('.')[1];
+    if (!extension) return `tmp/${v4()}`;
+
     return `tmp/${v4()}.${extension}`;
 };
 
-export const donwloadFile = async ({ url, filePath }: IDownloadFile): Promise<string | null> => {
+export const donwloadPublicFile = async ({ url, filePath }: IDownloadFile): Promise<string | null> => {
     const path = filePath || getFilePath(url);
 
     return axios({
