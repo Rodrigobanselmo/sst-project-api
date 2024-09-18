@@ -106,14 +106,6 @@ export class RiskStructureRsDataACGH extends ReportRiskStructureProduct {
           };
 
           rows.push(sanitazeRow);
-          console.log(
-            hierarchy.org.reduce((acc, org) => {
-              return {
-                ...acc,
-                [hierarchyMap[org.typeEnum].databaseRsData]: { content: org.name },
-              };
-            }, {}),
-          );
         });
     });
 

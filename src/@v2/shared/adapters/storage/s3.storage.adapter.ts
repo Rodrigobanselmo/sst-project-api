@@ -1,10 +1,10 @@
 import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
-import { IStorageAdapter } from './storage.interface';
-import { Readable } from 'stream';
-import { isDevelopment } from '@/@v2/shared/utils/helpers/is-development';
 import { config } from '@/@v2/shared/constants/config';
+import { isDevelopment } from '@/@v2/shared/utils/helpers/is-development';
 import { toContentType } from '@/@v2/shared/utils/helpers/mime';
+import { Readable } from 'stream';
+import { IStorageAdapter } from './storage.interface';
 
 export class S3StorageAdapter implements IStorageAdapter {
   private readonly bucket: string;
@@ -42,9 +42,7 @@ export class S3StorageAdapter implements IStorageAdapter {
     const fileStream = await this.s3.send(command);
     if (!fileStream.Body) throw new Error('File not found');
 
-    return {
-      file: Readable.from(this.toReadable(fileStream.Body.transformToWebStream())),
-    };
+    return Readable.from(this.toReadable(fileStream.Body.transformToWebStream()))
   }
 
   async delete({ fileUrl }: IStorageAdapter.Delete.Params): Promise<IStorageAdapter.Delete.Result> {

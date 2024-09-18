@@ -85,12 +85,12 @@ export class DocumentCreationService {
   }
 
   public async unlinkFiles(paths: IUnlinkPaths[]) {
-    // paths
-    //   .filter((i) => !!i?.path && typeof i.path == 'string')
-    //   .forEach((path) => {
-    //     try {
-    //       unlinkSync(path.path);
-    //     } catch (e) { }
-    //   });
+    paths
+      .filter((i) => !!i?.path && typeof i.path == 'string')
+      .forEach((path) => {
+        try {
+          unlinkSync(path.path);
+        } catch (e) { }
+      });
   }
 }

@@ -44,7 +44,7 @@ export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocum
       version: version,
       attachments: [],
       variables: {},
-      sections: [{ data: [{ type: DocumentSectionTypeEnum.ACTION_PLAN }] }],
+      sections: [{ data: [{ type: DocumentSectionTypeEnum.APR }] }],
     }).build();
 
     const documentAPRGroupSection = new DocumentBuildPGR({

@@ -25,9 +25,7 @@ export namespace IStorageAdapter {
       fileUrl: string;
     };
 
-    export type Result = {
-      file: internal.Readable;
-    };
+    export type Result = internal.Readable;
   }
 
   export namespace Delete {
