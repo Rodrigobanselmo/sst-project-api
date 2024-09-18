@@ -1,21 +1,20 @@
-/* eslint-disable prettier/prettier */
-import { RiskDocumentEntity } from '../../../../../sst/entities/riskDocument.entity';
-import { dayjs } from '../../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
-import { sortData } from '../../../../../../shared/utils/sorts/data.sort';
+import { VersionModel } from '@/@v2/documents/domain/models/version.model';
+import { sortData } from '@/@v2/shared/utils/sorts/data.sort';
+import dayjs from 'dayjs';
 import { bodyTableProps } from './elements/body';
 import { VersionControlColumnEnum } from './versionControl.constant';
 
-export const versionControlConverter = (documentsVersions: RiskDocumentEntity[]) => {
+export const versionControlConverter = (documentsVersions: VersionModel[]) => {
   const rows: bodyTableProps[][] = [];
 
   documentsVersions
-    .sort((a, b) => sortData(a, b, 'created_at'))
+    .sort((a, b) => sortData(a, b, 'createdAt'))
     .map((version, index) => {
       const cells: bodyTableProps[] = [];
 
       cells[VersionControlColumnEnum.INDEX] = { text: String(index + 1) };
       cells[VersionControlColumnEnum.DATE] = {
-        text: dayjs(version.created_at).format('DD/MM/YYYY') || '',
+        text: dayjs(version.createdAt).format('DD/MM/YYYY') || '',
       };
       cells[VersionControlColumnEnum.DESCRIPTION] = {
         text: version.description || '',

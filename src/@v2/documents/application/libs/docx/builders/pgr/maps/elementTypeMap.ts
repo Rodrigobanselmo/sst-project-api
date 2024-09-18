@@ -39,6 +39,7 @@ import { riskCharacterizationTableSection } from '../../../components/tables/ris
 import { dataConverter } from '../../../converter/data.converter';
 import { convertToDocxHelper } from '../functions/convertToDocx';
 import { IDocVariables } from '../types/documet-section-groups.types';
+import { versionControlTable } from '../../../components/tables/versionControl/versionControl.table';
 
 export type IMapElementDocumentType = Record<string, (arg: any) => (Paragraph | Table)[]>;
 
@@ -83,9 +84,7 @@ export class ElementsMapClass {
     },
     [DocumentChildrenTypeEnum.BULLET]: ({ level = 0, text, ...rest }: IBullet) => [bulletsNormal(text, level, rest)],
     [DocumentChildrenTypeEnum.BULLET_SPACE]: ({ text }: IBullet) => [bulletsSpace(text)],
-    //!
-    //! [DocumentChildrenTypeEnum.TABLE_VERSION_CONTROL]: () => [versionControlTable(this.versions)],
-    [DocumentChildrenTypeEnum.TABLE_VERSION_CONTROL]: () => [],
+    [DocumentChildrenTypeEnum.TABLE_VERSION_CONTROL]: () => [versionControlTable(this.data.documentBase.versions)],
     [DocumentChildrenTypeEnum.TABLE_GSE]: () =>
       hierarchyHomoOrgSection(this.OldHierarchy, this.OldHomogeneousGroup, {
         showDescription: false,

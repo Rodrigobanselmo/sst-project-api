@@ -31,6 +31,7 @@ export class DocumentBaseDAO {
           },
         }
       },
+      docs: true,
       professionalsSignatures: {
         include: {
           professional: {

@@ -5,6 +5,7 @@ import { CompanyModel } from "./company.model";
 import { DocumentModelModel } from "./document-model.model";
 import { ProfessionalSignatureModel } from "./professional-signature.model";
 import { WorkspaceModel } from "./workspace.model";
+import { VersionModel } from "./version.model";
 
 export type IDocumentBaseModel = {
   id: string;
@@ -21,6 +22,7 @@ export type IDocumentBaseModel = {
   model: DocumentModelModel;
   workspace: WorkspaceModel;
   company: CompanyModel;
+  versions: VersionModel[];
   professionalSignatures: ProfessionalSignatureModel[];
 }
 
@@ -39,6 +41,7 @@ export class DocumentBaseModel {
   model: DocumentModelModel;
   workspace: WorkspaceModel;
   company: CompanyModel;
+  _versions: VersionModel[];
   professionalSignatures: ProfessionalSignatureModel[];
 
   constructor(partial: IDocumentBaseModel) {
@@ -56,6 +59,7 @@ export class DocumentBaseModel {
     this.model = partial.model;
     this.workspace = partial.workspace;
     this.company = partial.company;
+    this._versions = partial.versions;
     this.professionalSignatures = partial.professionalSignatures;
   }
 
@@ -66,5 +70,9 @@ export class DocumentBaseModel {
     }
 
     return '';
+  }
+
+  get versions() {
+    return this._versions.filter(version => version.version.includes('.0.0'));
   }
 }
