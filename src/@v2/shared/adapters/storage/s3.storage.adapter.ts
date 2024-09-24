@@ -2,7 +2,7 @@ import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } fro
 
 import { config } from '@/@v2/shared/constants/config';
 import { isDevelopment } from '@/@v2/shared/utils/helpers/is-development';
-import { toContentType } from '@/@v2/shared/utils/helpers/mime';
+import { getContentType } from '@/@v2/shared/utils/helpers/get-content-type';
 import { Readable } from 'stream';
 import { IStorageAdapter } from './storage.interface';
 
@@ -61,7 +61,7 @@ export class S3StorageAdapter implements IStorageAdapter {
     const extension = filename.split('.').pop();
     if (!extension) throw new Error('Invalid file name');
 
-    const contentType = toContentType(extension);
+    const contentType = getContentType(extension);
     if (!contentType) throw new Error('Unsupported file type');
 
     return contentType;

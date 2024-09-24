@@ -18,7 +18,7 @@ export class DocumentVersionDAO {
     return { include }
   }
 
-  async findById(params: IDocumentVersionRepository.FindByIdParams) {
+  async find(params: IDocumentVersionRepository.FindByIdParams) {
     const documentversion = await this.prisma.riskFactorDocument.findUnique({
       where: { id: params.id },
       ...DocumentVersionDAO.selectOptions()

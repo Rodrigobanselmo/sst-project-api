@@ -1,7 +1,7 @@
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service'
 import { Injectable } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
-import { RecomendationModel } from '../../models/recomendation.model'
+import { RecomendationMapper } from '../../mappers/entities/recomendation.mapper'
 import { IRiskRepository } from './recomendation.types'
 
 
@@ -23,7 +23,7 @@ export class RecomendationRepository {
       ...RecomendationRepository.selectOptions()
     })
 
-    return risk ? RecomendationModel.toEntity(risk) : null
+    return risk ? RecomendationMapper.toEntity(risk) : null
   }
 
   async find(params: IRiskRepository.FindParams): IRiskRepository.FindParamsReturn {
@@ -38,6 +38,6 @@ export class RecomendationRepository {
       ...RecomendationRepository.selectOptions()
     })
 
-    return RecomendationModel.toEntities(risk)
+    return RecomendationMapper.toEntities(risk)
   }
 }

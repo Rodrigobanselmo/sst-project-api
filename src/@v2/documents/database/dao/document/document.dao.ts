@@ -17,7 +17,7 @@ export class DocumentDAO {
   ) { }
 
   async findDocumentPGR(params: IDocumentDAO.FindByIdParams) {
-    const document = await this.documentVersionDAO.findById({ id: params.documentVersionId })
+    const document = await this.documentVersionDAO.find({ id: params.documentVersionId })
 
     const workspaceId = document?.documentBase?.workspace.id
     if (!workspaceId) return null

@@ -1,7 +1,7 @@
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service'
 import { Injectable } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
-import { RiskModel } from '../../models/risk.model'
+import { RiskMapper } from '../../mappers/entities/risk.mapper'
 import { IRiskRepository } from './risk.types'
 import { RecomendationRepository } from '../recomendation/recomendation.repository'
 
@@ -29,7 +29,7 @@ export class RiskRepository {
       ...RiskRepository.selectOptions()
     })
 
-    return risk ? RiskModel.toAggregate({ ...risk, ...this.aggregations(risk.id) }) : null
+    return risk ? RiskMapper.toAggregate({ ...risk, ...this.aggregations(risk.id) }) : null
   }
 
 

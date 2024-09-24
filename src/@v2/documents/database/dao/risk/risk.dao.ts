@@ -1,4 +1,4 @@
-import { CompanyQueries } from '@/@v2/shared/utils/database/company.queries'
+import { CompanyQueries } from '@/@v2/shared/utils/database/company-query-prisma'
 import { Injectable } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
 
