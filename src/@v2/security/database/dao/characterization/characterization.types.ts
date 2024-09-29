@@ -10,6 +10,7 @@ export enum CharacterizationOrderByEnum {
   ORDER = 'ORDER',
   PHOTOS = 'PHOTOS',
   RISKS = 'RISKS',
+  HIERARCHY = 'HIERARCHY',
   PROFILES = 'PROFILES',
 }
 

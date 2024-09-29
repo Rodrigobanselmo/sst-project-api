@@ -8,7 +8,7 @@ class OrderBy {
   field: CharacterizationOrderByEnum;
 
   @IsEnum(OrderByDirectionEnum)
-  direction: OrderByDirectionEnum;
+  order: OrderByDirectionEnum;
 }
 
 export class BrowseCharacterizationQuery {

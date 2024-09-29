@@ -5,7 +5,7 @@ import { Injectable } from '@nestjs/common';
 import { CharacterizationBrowseResultModelMapper, ICharacterizationBrowseResultModelMapper } from '../../mappers/mappers/characterization-browse-result.mapper';
 import { CharacterizationOrderByEnum, ICharacterizationDAO } from './characterization.types';
 import { gerWhereRawPrisma } from '@/@v2/shared/utils/database/get-where-raw-prisma';
-import { Prisma, StatusEnum } from '@prisma/client';
+import { CharacterizationTypeEnum, Prisma, StatusEnum } from '@prisma/client';
 import { CharacterizationBrowseModelMapper } from '../../mappers/mappers/characterization-browse.mapper';
 import { ICharacterizationBrowseFilterModelMapper } from '../../mappers/mappers/characterization-browse-filter.mapper';
 
@@ -40,7 +40,7 @@ export class CharacterizationDAO {
           FILTER (WHERE profile.id IS NOT NULL), '[]'
         ) AS profiles,
         COALESCE(
-          JSON_AGG(DISTINCT JSONB_BUILD_OBJECT('id', h.id, 'name', h.name)) 
+          JSON_AGG(DISTINCT JSONB_BUILD_OBJECT('id', h.id, 'name', h.name, 'type', h.type)) 
           FILTER (WHERE h.name IS NOT NULL), '[]'
         ) AS hierarchies,
         COALESCE(
@@ -119,19 +119,22 @@ export class CharacterizationDAO {
   private browseOrderBy(orderBy?: ICharacterizationDAO.BrowseParams['orderBy']) {
     if (!orderBy) return []
 
+    const desiredOrder = [CharacterizationTypeEnum.GENERAL, CharacterizationTypeEnum.ADMINISTRATIVE, CharacterizationTypeEnum.OPERATION, CharacterizationTypeEnum.SUPPORT, CharacterizationTypeEnum.WORKSTATION, CharacterizationTypeEnum.ACTIVITIES, CharacterizationTypeEnum.EQUIPMENT]
+
     const map: Record<CharacterizationOrderByEnum, string> = {
       [CharacterizationOrderByEnum.NAME]: 'cc.name',
-      [CharacterizationOrderByEnum.TYPE]: 'cc.type',
+      [CharacterizationOrderByEnum.TYPE]: `CASE cc.type ${desiredOrder.map((type, index) => `WHEN '${type}' THEN ${index}`).join(' ')} ELSE ${desiredOrder.length} END`,
       [CharacterizationOrderByEnum.CREATED_AT]: 'cc.created_at',
       [CharacterizationOrderByEnum.UPDATED_AT]: 'cc.updated_at',
       [CharacterizationOrderByEnum.DONE_AT]: 'cc.done_at',
       [CharacterizationOrderByEnum.ORDER]: 'cc.order',
       [CharacterizationOrderByEnum.PHOTOS]: 'total_photos',
       [CharacterizationOrderByEnum.RISKS]: 'total_risks',
+      [CharacterizationOrderByEnum.HIERARCHY]: 'total_hierarchies',
       [CharacterizationOrderByEnum.PROFILES]: 'total_profiles',
     }
 
-    const orderByRaw = orderBy.map<IOrderByRawPrisma>(({ field, direction }) => ({ column: map[field], direction }))
+    const orderByRaw = orderBy.map<IOrderByRawPrisma>(({ field, order }) => ({ column: map[field], order }))
 
     return orderByRaw
   }

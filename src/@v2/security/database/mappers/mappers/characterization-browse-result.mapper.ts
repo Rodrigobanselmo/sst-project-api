@@ -1,6 +1,7 @@
-import { CharacterizationTypeEnum as PrismaCharacterizationTypeEnum, RecMed } from '@prisma/client';
+import { HierarchyEnum, CharacterizationTypeEnum as PrismaCharacterizationTypeEnum, RecMed } from '@prisma/client';
 import { CharacterizationBrowseResultModel } from '@/@v2/security/domain/models/characterization-browse-result.model';
 import { CharacterizationTypeEnum } from '@/@v2/shared/domain/enum/security/characterization-type.enum';
+import { HierarchyTypeEnum } from '@/@v2/shared/domain/enum/company/hierarchy-type.enum';
 
 export type ICharacterizationBrowseResultModelMapper = {
   id: string;
@@ -18,6 +19,7 @@ export type ICharacterizationBrowseResultModelMapper = {
   hierarchies: {
     id: string;
     name: string;
+    type: HierarchyEnum;
   }[];
   riskfactors: {
     id: string;
@@ -43,9 +45,15 @@ export class CharacterizationBrowseResultModelMapper {
         id: profile.id,
         name: profile.name,
       })),
-
-      hierarchies: prisma.hierarchies,
-      riskfactors: prisma.riskfactors,
+      hierarchies: prisma.hierarchies.map((hierarchy) => ({
+        id: hierarchy.id,
+        name: hierarchy.name,
+        type: HierarchyTypeEnum[hierarchy.type]
+      })),
+      risks: prisma.riskfactors.map((riskfactor) => ({
+        id: riskfactor.id,
+        name: riskfactor.name,
+      })),
       photos: prisma.photos.map((photo) => ({
         id: photo.id,
         url: photo.url,

@@ -5,5 +5,5 @@ export enum OrderByDirectionEnum {
 
 export type IOrderBy<T = string> = {
     field: T;
-    direction: OrderByDirectionEnum
+    order: OrderByDirectionEnum
 }[]
