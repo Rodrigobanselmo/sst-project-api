@@ -1,3 +1,4 @@
+import { DownloudCharacterizationReportDto } from './../../../dto/characterization-report.dto';
 import { PaginationQueryDto } from '../../../../../shared/dto/pagination.dto';
 import { formatCEP } from '@brazilian-utils/brazilian-utils';
 import { Injectable } from '@nestjs/common';
@@ -15,17 +16,16 @@ import {
   IReportHeader,
   IReportSanitizeData,
 } from '../types/IReportFactory.types';
-import { CharacterizationRepository } from '@/modules/files/repositories/implementations/CharacterizationRepository';
-import { DownloudCharacterizationReportDto } from '@/modules/files/dto/characterization-report.dto';
-import { CompanyCharacterization } from '@prisma/client';
+import { CompanyCharacterization, CompanyCharacterizationPhoto } from '@prisma/client';
 import { CharacterizationTypeMap } from '../constants/characterization-type-map';
 import dayjs from 'dayjs';
+import { ReportCharacterizationRepository } from '../../../repositories/implementations/CharacterizationRepository';
 
 @Injectable()
 export class ReportCharacterizationFactory extends ReportFactoryAbstractionCreator<DownloudCharacterizationReportDto> {
   constructor(
     private readonly companyRepository: CompanyRepository,
-    private readonly characterizationRepository: CharacterizationRepository,
+    private readonly characterizationRepository: ReportCharacterizationRepository,
     private readonly excelProv: ExcelProvider,
   ) {
     super(excelProv, companyRepository);
@@ -37,7 +37,7 @@ export class ReportCharacterizationFactory extends ReportFactoryAbstractionCreat
 }
 
 class ReportFactoryProduct implements IReportFactoryProduct<DownloudCharacterizationReportDto> {
-  constructor(private readonly characterizationRepository: CharacterizationRepository) { }
+  constructor(private readonly characterizationRepository: ReportCharacterizationRepository) { }
 
   public async findTableData(companyId: string, query: DownloudCharacterizationReportDto) {
     const char = await this.characterizationRepository.list(
@@ -60,7 +60,7 @@ class ReportFactoryProduct implements IReportFactoryProduct<DownloudCharacteriza
     return returnData;
   }
 
-  public sanitizeData(clinics: CompanyCharacterization[]): IReportSanitizeData[] {
+  public sanitizeData(clinics: (CompanyCharacterization & { photos: CompanyCharacterizationPhoto[] })[]): IReportSanitizeData[] {
     const rows: IReportSanitizeData[] = clinics.map<IReportSanitizeData>((row) => {
       const type = CharacterizationTypeMap[row.type].rowLabel || '';
 
@@ -68,6 +68,7 @@ class ReportFactoryProduct implements IReportFactoryProduct<DownloudCharacteriza
         name: { content: row.name },
         done: { content: row.done_at ? `Finalizado em ${dayjs(row.done_at).format('DD/MM/YYYY')}` : '' },
         type: { content: type },
+        photos: { content: row.photos.length },
       };
 
       return sanitazeRow;
@@ -93,6 +94,7 @@ class ReportFactoryProduct implements IReportFactoryProduct<DownloudCharacteriza
       { database: 'name', content: 'Nome', width: 120 },
       { database: 'type', content: 'Tipo', width: 100 },
       { database: 'done', content: 'Finalizado', width: 100 },
+      { database: 'photos', content: 'Quantidade de Fotos', width: 50 },
     ];
 
     return header;

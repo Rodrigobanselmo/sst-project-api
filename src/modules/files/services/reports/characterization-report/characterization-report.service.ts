@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 
-import { DownloudCharacterizationReportDto } from '@/modules/files/dto/characterization-report.dto';
-import { ReportCharacterizationFactory } from '@/modules/files/factories/report/products/ReportCharacterizationFactory';
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
+import { DownloudCharacterizationReportDto } from '../../../dto/characterization-report.dto';
+import { ReportCharacterizationFactory } from '../../../factories/report/products/ReportCharacterizationFactory';
 
 @Injectable()
 export class CharacterizationReportService {

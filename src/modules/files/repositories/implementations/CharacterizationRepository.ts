@@ -7,14 +7,14 @@ import { IDatabaseTableRepository } from '../IDatabaseTableRepository.types';
 import { DatabaseTableEntity } from '../../entities/databaseTable.entity';
 
 @Injectable()
-export class CharacterizationRepository {
+export class ReportCharacterizationRepository {
   constructor(private prisma: PrismaService) { }
 
   async list(companyId: string, workspaceId: string) {
     const database = await this.prisma.companyCharacterization.findMany({
       where: { companyId, workspaceId },
       include: {
-        company: true,
+        photos: true,
       }
     })
 

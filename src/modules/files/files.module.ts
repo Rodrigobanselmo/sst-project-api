@@ -52,7 +52,7 @@ import { ReportEmployeeModelFactory } from './factories/report/products/ReportEm
 import { DocumentsModule } from '../documents/documents.module';
 import { ReportRiskStructureRsDataFactory } from './factories/report/products/ReportRiskStructureRsData/ReportRiskStructureFactory.rsdata';
 import { FileRsDataEmployeeFactory } from './factories/upload/products/CompanyStructure/FileRsDataEmployeeFactory';
-import { CharacterizationRepository } from './repositories/implementations/CharacterizationRepository';
+import { ReportCharacterizationRepository } from './repositories/implementations/CharacterizationRepository';
 import { ReportCharacterizationFactory } from './factories/report/products/ReportCharacterizationFactory';
 import { CharacterizationReportService } from './services/reports/characterization-report/characterization-report.service';
 
@@ -69,7 +69,7 @@ import { CharacterizationReportService } from './services/reports/characterizati
   imports: [SSTModule, CompanyModule, DocumentsModule],
   providers: [
     DayJSProvider,
-    CharacterizationRepository,
+    ReportCharacterizationRepository,
     DownloadExcelProvider,
     UploadExcelProvider,
     UploadChecklistDataService,
