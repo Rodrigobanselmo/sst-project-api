@@ -1,13 +1,13 @@
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
-import { getPagination } from '@/@v2/shared/utils/database/get-pagination';
 import { getOrderByRawPrisma, IOrderByRawPrisma } from '@/@v2/shared/utils/database/get-order-by-raw-prisma';
-import { Injectable } from '@nestjs/common';
-import { CharacterizationBrowseResultModelMapper, ICharacterizationBrowseResultModelMapper } from '../../mappers/mappers/characterization-browse-result.mapper';
-import { CharacterizationOrderByEnum, ICharacterizationDAO } from './characterization.types';
+import { getPagination } from '@/@v2/shared/utils/database/get-pagination';
 import { gerWhereRawPrisma } from '@/@v2/shared/utils/database/get-where-raw-prisma';
+import { Injectable } from '@nestjs/common';
 import { CharacterizationTypeEnum, Prisma, StatusEnum } from '@prisma/client';
-import { CharacterizationBrowseModelMapper } from '../../mappers/mappers/characterization-browse.mapper';
-import { ICharacterizationBrowseFilterModelMapper } from '../../mappers/mappers/characterization-browse-filter.mapper';
+import { ICharacterizationBrowseFilterModelMapper } from '../../mappers/models/characterization-browse-filter.mapper';
+import { ICharacterizationBrowseResultModelMapper } from '../../mappers/models/characterization-browse-result.mapper';
+import { CharacterizationBrowseModelMapper } from '../../mappers/models/characterization-browse.mapper';
+import { CharacterizationOrderByEnum, ICharacterizationDAO } from './characterization.types';
 
 
 @Injectable()

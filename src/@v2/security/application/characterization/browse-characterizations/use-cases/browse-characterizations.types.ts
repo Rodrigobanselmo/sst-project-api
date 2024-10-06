@@ -1,5 +1,5 @@
 import { CharacterizationOrderByEnum } from "@/@v2/security/database/dao/characterization/characterization.types"
-import { IOrderBy, OrderByDirectionEnum } from "@/@v2/shared/types/order-by.types"
+import { IOrderBy } from "@/@v2/shared/types/order-by.types"
 import { IPagination } from "@/@v2/shared/types/pagination.types"
 
 export namespace IBrowseCharacterizationUseCase {

@@ -1,7 +1,7 @@
-import { HierarchyEnum, CharacterizationTypeEnum as PrismaCharacterizationTypeEnum, RecMed } from '@prisma/client';
 import { CharacterizationBrowseResultModel } from '@/@v2/security/domain/models/characterization-browse-result.model';
-import { CharacterizationTypeEnum } from '@/@v2/shared/domain/enum/security/characterization-type.enum';
 import { HierarchyTypeEnum } from '@/@v2/shared/domain/enum/company/hierarchy-type.enum';
+import { CharacterizationTypeEnum } from '@/@v2/shared/domain/enum/security/characterization-type.enum';
+import { HierarchyEnum, CharacterizationTypeEnum as PrismaCharacterizationTypeEnum } from '@prisma/client';
 
 export type ICharacterizationBrowseResultModelMapper = {
   id: string;

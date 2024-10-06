@@ -1,4 +1,3 @@
-import { CharacterizationTypeEnum } from "@/@v2/shared/domain/enum/security/characterization-type.enum";
 import { IOrderBy } from "@/@v2/shared/types/order-by.types";
 
 export enum CharacterizationOrderByEnum {

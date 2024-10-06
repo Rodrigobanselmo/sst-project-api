@@ -353,6 +353,7 @@ model Company {
   ImageGallery               ImageGallery[]
   UserHistory                UserHistory[]
   ExamToRiskSkipCompany      ExamToRiskSkipCompany[]
+  Status                     Status[]
 
   @@index([name])
   @@index([isClinic])
@@ -405,12 +406,12 @@ model CompanyGroup {
 }
 
 model CompanyCharacterization {
-  id                 String                         @id @default(uuid())
+  id                 String                   @id @default(uuid())
   name               String
   description        String?
-  created_at         DateTime                       @default(now())
+  created_at         DateTime                 @default(now())
   deleted_at         DateTime?
-  updated_at         DateTime                       @updatedAt
+  updated_at         DateTime                 @updatedAt
   done_at            DateTime?
   type               CharacterizationTypeEnum
   workspaceId        String
@@ -425,14 +426,17 @@ model CompanyCharacterization {
   profileName        String?
   profileParentId    String?
   paragraphs         String[]
-  status             StatusEnum                     @default(ACTIVE)
-  company            Company                        @relation(fields: [companyId], references: [id])
-  homogeneousGroup   HomogeneousGroup               @relation(fields: [id], references: [id], onDelete: Cascade)
-  profileParent      CompanyCharacterization?       @relation("profiles", fields: [profileParentId], references: [id], onDelete: Cascade)
-  profiles           CompanyCharacterization[]      @relation("profiles")
-  workspace          Workspace                      @relation(fields: [workspaceId], references: [id])
-  photos             CompanyCharacterizationPhoto[]
-  files              CompanyCharacterizationFile[]
+  stageId            Int?
+
+  stage            Status?                        @relation(fields: [stageId], references: [id])
+  status           StatusEnum                     @default(ACTIVE)
+  company          Company                        @relation(fields: [companyId], references: [id])
+  homogeneousGroup HomogeneousGroup               @relation(fields: [id], references: [id], onDelete: Cascade)
+  profileParent    CompanyCharacterization?       @relation("profiles", fields: [profileParentId], references: [id], onDelete: Cascade)
+  profiles         CompanyCharacterization[]      @relation("profiles")
+  workspace        Workspace                      @relation(fields: [workspaceId], references: [id])
+  photos           CompanyCharacterizationPhoto[]
+  files            CompanyCharacterizationFile[]
 
   @@unique([workspaceId, companyId, id])
   @@index(companyId)
@@ -1646,6 +1650,24 @@ model ScheduleMedicalVisit {
   @@index(status)
 }
 
+model Status {
+  id    Int            @id @default(autoincrement())
+  name  String
+  type  StatusTypeEnum
+  color String?
+
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  CompanyCharacterization CompanyCharacterization[]
+
+  @@index(type)
+}
+
 model User {
   id                  Int                    @id @default(autoincrement())
   email               String                 @unique
@@ -1910,6 +1932,10 @@ enum StatusEnum {
   DONE
   MODIFIED
   TRANSMITTED
+}
+
+enum StatusTypeEnum {
+  CHARACTERIZATION
 }
 
 enum RecTypeEnum {

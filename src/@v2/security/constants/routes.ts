@@ -1,4 +1,10 @@
 export const SecurityRoutes = {
-  BROWSE_CHARACTERIZATION: 'v2/companies/:companyId/workspaces/:workspaceId/characterizations',
+  CHARACTERIZATION: {
+    BROWSE: 'v2/companies/:companyId/workspaces/:workspaceId/characterizations',
+  },
+  STATUS: {
+    ADD: 'v2/companies/:companyId/status',
+    EDIT: 'v2/companies/:companyId/status',
+  }
 } as const
 

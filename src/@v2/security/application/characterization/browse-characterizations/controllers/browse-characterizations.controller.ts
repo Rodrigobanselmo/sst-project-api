@@ -7,23 +7,21 @@ import { Permissions } from '@/shared/decorators/permissions.decorator'
 import { BrowseCharacterizationUseCase } from '../use-cases/browse-characterizations.usecase'
 import { BrowseCharacterizationPath } from './browse-characterizations.path'
 import { BrowseCharacterizationQuery } from './browse-characterizations.query'
-import { Public } from '@/shared/decorators/public.decorator'
 
-@Controller(SecurityRoutes.BROWSE_CHARACTERIZATION)
-// @UseGuards(JwtAuthGuard)
+@Controller(SecurityRoutes.CHARACTERIZATION.BROWSE)
+@UseGuards(JwtAuthGuard)
 export class BrowseCharacterizationController {
   constructor(
     private readonly browseCharacterizationUseCase: BrowseCharacterizationUseCase
   ) { }
 
   @Get()
-  @Public()
-  // @Permissions({
-  //   code: PermissionEnum.CHARACTERIZATION,
-  //   isContract: true,
-  //   isMember: true,
-  //   crud: true,
-  // })
+  @Permissions({
+    code: PermissionEnum.CHARACTERIZATION,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
   async browse(@Param() path: BrowseCharacterizationPath, @Query() query: BrowseCharacterizationQuery) {
     return this.browseCharacterizationUseCase.execute({
       companyId: path.companyId,
