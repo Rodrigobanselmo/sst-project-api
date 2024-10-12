@@ -197,18 +197,20 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
     workspaceId,
     includeCharPhotos = true,
     type = 'PGR',
-  }: Pick<IDocumentPGRBody, 'companyId' | 'workspaceId' | 'type'> & { includeCharPhotos?: boolean }) {
-    const company = await this.companyRepository.findDocumentData(companyId, { workspaceId, type });
+    ghoIds,
+  }: Pick<IDocumentPGRBody, 'companyId' | 'workspaceId' | 'type' | 'ghoIds'> & { includeCharPhotos?: boolean }) {
+    const company = await this.companyRepository.findDocumentData(companyId, { workspaceId, type, ghoIds });
     const riskGroupId = company.riskFactorGroupData?.[0]?.id;
 
     if (!riskGroupId) throw new BadRequestException('Nenhum sistema de gestão cadastrado');
 
     const workspacePromise = this.workspaceRepository.findById(workspaceId);
-    const riskGroupDataPromise = this.riskGroupDataRepository.findDocumentData(riskGroupId, companyId, { workspaceId }); // add homo
-    const hierarchyPromise = this.hierarchyRepository.findDocumentData(companyId, { workspaceId }); // add homo
+    const riskGroupDataPromise = this.riskGroupDataRepository.findDocumentData(riskGroupId, companyId, { workspaceId, ghoIds }); // add homo
+    const hierarchyPromise = this.hierarchyRepository.findDocumentData(companyId, { workspaceId, ghoIds }); // add homo
     const homogeneousGroupPromise = this.homoGroupRepository.findDocumentData(companyId, {
       workspaceId,
       includePhotos: includeCharPhotos,
+      ghoIds
     });
 
     const [workspace, riskGroupData, hierarchies, homogeneousGroupsFound] = await Promise.all([

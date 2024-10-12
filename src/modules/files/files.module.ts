@@ -52,6 +52,9 @@ import { ReportEmployeeModelFactory } from './factories/report/products/ReportEm
 import { DocumentsModule } from '../documents/documents.module';
 import { ReportRiskStructureRsDataFactory } from './factories/report/products/ReportRiskStructureRsData/ReportRiskStructureFactory.rsdata';
 import { FileRsDataEmployeeFactory } from './factories/upload/products/CompanyStructure/FileRsDataEmployeeFactory';
+import { ReportCharacterizationRepository } from './repositories/implementations/CharacterizationRepository';
+import { ReportCharacterizationFactory } from './factories/report/products/ReportCharacterizationFactory';
+import { CharacterizationReportService } from './services/reports/characterization-report/characterization-report.service';
 
 @Module({
   controllers: [
@@ -66,6 +69,7 @@ import { FileRsDataEmployeeFactory } from './factories/upload/products/CompanySt
   imports: [SSTModule, CompanyModule, DocumentsModule],
   providers: [
     DayJSProvider,
+    ReportCharacterizationRepository,
     DownloadExcelProvider,
     UploadExcelProvider,
     UploadChecklistDataService,
@@ -107,7 +111,9 @@ import { FileRsDataEmployeeFactory } from './factories/upload/products/CompanySt
     ExamComplementaryReportService,
     EmployeeReportService,
     EmployeeRepository,
+    ReportCharacterizationFactory,
     ReportEmployeeModelFactory,
+    CharacterizationReportService,
   ],
 })
-export class FilesModule {}
+export class FilesModule { }

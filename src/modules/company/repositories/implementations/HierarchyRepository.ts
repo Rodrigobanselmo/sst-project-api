@@ -16,7 +16,7 @@ import { isEnvironment } from '../../../../shared/utils/isEnvironment';
 
 @Injectable()
 export class HierarchyRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async upsertMany(
     upsertHierarchyMany: (CreateHierarchyDto & {
@@ -27,12 +27,12 @@ export class HierarchyRepository {
     ghoNames?:
       | Record<string, string>
       | Record<
-          string,
-          {
-            description: string;
-            workIds: string[];
-          }
-        >,
+        string,
+        {
+          description: string;
+          workIds: string[];
+        }
+      >,
   ): Promise<HierarchyEntity[]> {
     let homogeneousGroup = [];
 
@@ -47,95 +47,95 @@ export class HierarchyRepository {
     if (upsertHierarchyMany && upsertHierarchyMany.length > 0)
       homogeneousGroup = ghoNames
         ? await this.prisma.$transaction(
-            Object.entries(ghoNames).map(([ghoName, description]) => {
-              if (typeof description != 'string') {
-                return this.prisma.homogeneousGroup.upsert({
-                  create: {
-                    company: { connect: { id: companyId } },
-                    name: ghoName,
-                    description: description.description || '',
-                    workspaces: description.workIds.length
-                      ? {
-                          connect: description.workIds.map((id) => ({
-                            id_companyId: { companyId, id },
-                          })),
-                        }
-                      : undefined,
-                  },
-                  update: {
-                    name: ghoName,
-                    workspaces: description.workIds.length
-                      ? {
-                          connect: workIds.map((id) => ({
-                            id_companyId: { companyId, id },
-                          })),
-                        }
-                      : undefined,
-                    ...(description.description ? { description: description.description } : {}),
-                  },
-                  where: { name_companyId: { companyId, name: ghoName } },
-                });
-              }
-
+          Object.entries(ghoNames).map(([ghoName, description]) => {
+            if (typeof description != 'string') {
               return this.prisma.homogeneousGroup.upsert({
                 create: {
                   company: { connect: { id: companyId } },
                   name: ghoName,
-                  description: description || '',
-                  workspaces: workIds.length
+                  description: description.description || '',
+                  workspaces: description.workIds.length
                     ? {
-                        connect: workIds.map((id) => ({
-                          id_companyId: { companyId, id },
-                        })),
-                      }
+                      connect: description.workIds.map((id) => ({
+                        id_companyId: { companyId, id },
+                      })),
+                    }
                     : undefined,
                 },
                 update: {
                   name: ghoName,
-                  workspaces: workIds.length
+                  workspaces: description.workIds.length
                     ? {
-                        connect: workIds.map((id) => ({
-                          id_companyId: { companyId, id },
-                        })),
-                      }
+                      connect: workIds.map((id) => ({
+                        id_companyId: { companyId, id },
+                      })),
+                    }
                     : undefined,
-                  ...(description ? { description: description } : {}),
+                  ...(description.description ? { description: description.description } : {}),
+                },
+                where: { name_companyId: { companyId, name: ghoName } },
+              });
+            }
+
+            return this.prisma.homogeneousGroup.upsert({
+              create: {
+                company: { connect: { id: companyId } },
+                name: ghoName,
+                description: description || '',
+                workspaces: workIds.length
+                  ? {
+                    connect: workIds.map((id) => ({
+                      id_companyId: { companyId, id },
+                    })),
+                  }
+                  : undefined,
+              },
+              update: {
+                name: ghoName,
+                workspaces: workIds.length
+                  ? {
+                    connect: workIds.map((id) => ({
+                      id_companyId: { companyId, id },
+                    })),
+                  }
+                  : undefined,
+                ...(description ? { description: description } : {}),
+              },
+              where: { name_companyId: { companyId, name: ghoName } },
+            });
+          }),
+        )
+        : await this.prisma.$transaction(
+          upsertHierarchyMany
+            .filter(({ ghoName }) => ghoName)
+            .map(({ ghoName, workspaceIds }) => {
+              return this.prisma.homogeneousGroup.upsert({
+                create: {
+                  company: { connect: { id: companyId } },
+                  name: ghoName,
+                  description: '',
+                  workspaces: workspaceIds.length
+                    ? {
+                      connect: workspaceIds.map((id) => ({
+                        id_companyId: { companyId, id },
+                      })),
+                    }
+                    : undefined,
+                },
+                update: {
+                  name: ghoName,
+                  workspaces: workspaceIds.length
+                    ? {
+                      connect: workspaceIds.map((id) => ({
+                        id_companyId: { companyId, id },
+                      })),
+                    }
+                    : undefined,
                 },
                 where: { name_companyId: { companyId, name: ghoName } },
               });
             }),
-          )
-        : await this.prisma.$transaction(
-            upsertHierarchyMany
-              .filter(({ ghoName }) => ghoName)
-              .map(({ ghoName, workspaceIds }) => {
-                return this.prisma.homogeneousGroup.upsert({
-                  create: {
-                    company: { connect: { id: companyId } },
-                    name: ghoName,
-                    description: '',
-                    workspaces: workspaceIds.length
-                      ? {
-                          connect: workspaceIds.map((id) => ({
-                            id_companyId: { companyId, id },
-                          })),
-                        }
-                      : undefined,
-                  },
-                  update: {
-                    name: ghoName,
-                    workspaces: workspaceIds.length
-                      ? {
-                          connect: workspaceIds.map((id) => ({
-                            id_companyId: { companyId, id },
-                          })),
-                        }
-                      : undefined,
-                  },
-                  where: { name_companyId: { companyId, name: ghoName } },
-                });
-              }),
-          );
+        );
 
     const HierarchyOnHomoGroup: {
       hierarchyId: string;
@@ -210,22 +210,22 @@ export class HierarchyRepository {
               [isSubOffice ? 'subOfficeEmployees' : 'employees']:
                 employeesIds && employeesIds.length
                   ? {
-                      connect: employeesIds.map((id) => ({
-                        id_companyId: { companyId, id },
-                      })),
-                    }
-                  : undefined,
-              workspaces: workspaceIds
-                ? {
-                    connect: workspaceIds.map((id) => ({
+                    connect: employeesIds.map((id) => ({
                       id_companyId: { companyId, id },
                     })),
                   }
+                  : undefined,
+              workspaces: workspaceIds
+                ? {
+                  connect: workspaceIds.map((id) => ({
+                    id_companyId: { companyId, id },
+                  })),
+                }
                 : undefined,
               parent: parentId
                 ? {
-                    connect: { id: parentId },
-                  }
+                  connect: { id: parentId },
+                }
                 : undefined,
             },
             update: {
@@ -234,25 +234,25 @@ export class HierarchyRepository {
               workspaces: !(workspaceIds && workspaceIds.length > 0)
                 ? undefined
                 : {
-                    set: workspaceIds.map((id) => ({
-                      id_companyId: { companyId, id },
-                    })),
-                  },
+                  set: workspaceIds.map((id) => ({
+                    id_companyId: { companyId, id },
+                  })),
+                },
               [isSubOffice ? 'subOfficeEmployees' : 'employees']:
                 employeesIds && employeesIds.length
                   ? {
-                      connect: employeesIds.map((id) => ({
-                        id_companyId: { companyId, id },
-                      })),
-                    }
+                    connect: employeesIds.map((id) => ({
+                      id_companyId: { companyId, id },
+                    })),
+                  }
                   : undefined,
               parent: !parentId
                 ? parentId === null
                   ? { disconnect: true }
                   : undefined
                 : {
-                    connect: { id: parentId },
-                  },
+                  connect: { id: parentId },
+                },
             },
             where: { id: id || 'none' },
             // ...(parentId && { where: { parentId_name: { parentId, name: name.split('//')[0] } } }),
@@ -320,15 +320,15 @@ export class HierarchyRepository {
           data: {
             workspaces: workspaceIds.length
               ? {
-                  set: workspaceIds.map((id) => ({
-                    id_companyId: { companyId, id },
-                  })),
-                }
+                set: workspaceIds.map((id) => ({
+                  id_companyId: { companyId, id },
+                })),
+              }
               : undefined,
           },
           where: { id },
         });
-    } catch (error) {}
+    } catch (error) { }
 
     const data = await this.prisma.hierarchy.update({
       where: { id },
@@ -338,25 +338,25 @@ export class HierarchyRepository {
         workspaces: !workspaceIds
           ? undefined
           : {
-              set: workspaceIds.map((id) => ({
-                id_companyId: { companyId, id },
-              })),
-            },
+            set: workspaceIds.map((id) => ({
+              id_companyId: { companyId, id },
+            })),
+          },
         [isSubOffice ? 'subOfficeEmployees' : 'employees']:
           employeesIds && employeesIds.length
             ? {
-                connect: employeesIds.map((id) => ({
-                  id_companyId: { companyId, id },
-                })),
-              }
+              connect: employeesIds.map((id) => ({
+                id_companyId: { companyId, id },
+              })),
+            }
             : undefined,
         parent: !parentId
           ? undefined
           : {
-              connect: {
-                id: parentId,
-              },
+            connect: {
+              id: parentId,
             },
+          },
       },
     });
 
@@ -384,15 +384,15 @@ export class HierarchyRepository {
           data: {
             workspaces: workspaceIds.length
               ? {
-                  set: workspaceIds.map((id) => ({
-                    id_companyId: { companyId, id },
-                  })),
-                }
+                set: workspaceIds.map((id) => ({
+                  id_companyId: { companyId, id },
+                })),
+              }
               : undefined,
           },
           where: { id },
         });
-    } catch (error) {}
+    } catch (error) { }
 
     const data = await this.prisma.hierarchy.upsert({
       create: {
@@ -408,15 +408,15 @@ export class HierarchyRepository {
         [isSubOffice ? 'subOfficeEmployees' : 'employees']:
           employeesIds && employeesIds.length
             ? {
-                connect: employeesIds.map((id) => ({
-                  id_companyId: { companyId, id },
-                })),
-              }
+              connect: employeesIds.map((id) => ({
+                id_companyId: { companyId, id },
+              })),
+            }
             : undefined,
         parent: parentId
           ? {
-              connect: { id: parentId },
-            }
+            connect: { id: parentId },
+          }
           : undefined,
       },
       update: {
@@ -425,23 +425,23 @@ export class HierarchyRepository {
         [isSubOffice ? 'subOfficeEmployees' : 'employees']:
           employeesIds && employeesIds.length
             ? {
-                set: employeesIds.map((id) => ({
-                  id_companyId: { companyId, id },
-                })),
-              }
+              set: employeesIds.map((id) => ({
+                id_companyId: { companyId, id },
+              })),
+            }
             : undefined,
         workspaces: !workspaceIds
           ? undefined
           : {
-              set: workspaceIds.map((id) => ({
-                id_companyId: { companyId, id },
-              })),
-            },
+            set: workspaceIds.map((id) => ({
+              id_companyId: { companyId, id },
+            })),
+          },
         parent: !parentId
           ? undefined
           : {
-              connect: { id: parentId },
-            },
+            connect: { id: parentId },
+          },
       },
       where: { id: id || 'none' },
     });
@@ -468,15 +468,15 @@ export class HierarchyRepository {
           data: {
             workspaces: workspaceIds.length
               ? {
-                  set: workspaceIds.map((id) => ({
-                    id_companyId: { companyId, id },
-                  })),
-                }
+                set: workspaceIds.map((id) => ({
+                  id_companyId: { companyId, id },
+                })),
+              }
               : undefined,
           },
           where: { id },
         });
-    } catch (error) {}
+    } catch (error) { }
 
     const data = await this.prisma.hierarchy.upsert({
       create: {
@@ -491,20 +491,20 @@ export class HierarchyRepository {
         },
         ...(employeesIds &&
           !!employeesIds.length && {
-            subOfficeEmployees: {
-              connect: employeesIds.map((id) => ({
-                id_companyId: { companyId, id },
+          subOfficeEmployees: {
+            connect: employeesIds.map((id) => ({
+              id_companyId: { companyId, id },
+            })),
+          },
+          ...(historyIds &&
+            !!historyIds.length && {
+            subHierarchyHistory: {
+              connect: historyIds.map((id) => ({
+                id,
               })),
             },
-            ...(historyIds &&
-              !!historyIds.length && {
-                subHierarchyHistory: {
-                  connect: historyIds.map((id) => ({
-                    id,
-                  })),
-                },
-              }),
           }),
+        }),
         parent: {
           connect: { id: parentId },
         },
@@ -514,32 +514,32 @@ export class HierarchyRepository {
         name: name.split('//')[0],
         ...(historyIds &&
           !!historyIds.length && {
-            subHierarchyHistory: {
-              connect: historyIds.map((id) => ({
-                id,
-              })),
-            },
-          }),
+          subHierarchyHistory: {
+            connect: historyIds.map((id) => ({
+              id,
+            })),
+          },
+        }),
         subOfficeEmployees:
           employeesIds && !!employeesIds.length
             ? {
-                connect: employeesIds.map((id) => ({
-                  id_companyId: { companyId, id },
-                })),
-              }
+              connect: employeesIds.map((id) => ({
+                id_companyId: { companyId, id },
+              })),
+            }
             : undefined,
         workspaces: !workspaceIds
           ? undefined
           : {
-              set: workspaceIds.map((id) => ({
-                id_companyId: { companyId, id },
-              })),
-            },
+            set: workspaceIds.map((id) => ({
+              id_companyId: { companyId, id },
+            })),
+          },
         parent: !parentId
           ? undefined
           : {
-              connect: { id: parentId },
-            },
+            connect: { id: parentId },
+          },
       },
       where: { id: id || 'none' },
       include: { workspaces: true, subOfficeEmployees: { select: { id: true } } },
@@ -883,10 +883,139 @@ export class HierarchyRepository {
     companyId: string,
     options: {
       workspaceId?: string;
+      ghoIds?: string[];
     } = {},
   ) {
     const hierarchies = await this.prisma.hierarchy.findMany({
-      where: { companyId, ...(options.workspaceId && { workspaces: { some: { id: options.workspaceId } } }) },
+      where: {
+        companyId,
+        ...(options.workspaceId && { workspaces: { some: { id: options.workspaceId } } }),
+        ...(options?.ghoIds && {
+
+          OR: [{
+            OR: [{
+              hierarchyOnHomogeneous: { some: { homogeneousGroupId: { in: options.ghoIds } } },
+            }, {
+              id: { in: options.ghoIds },
+            }],
+          }, {
+            OR: [{
+              parent: {
+                hierarchyOnHomogeneous: { some: { homogeneousGroupId: { in: options.ghoIds } } },
+              }
+            }, {
+              parent: {
+                id: { in: options.ghoIds },
+              }
+            }],
+          }, {
+            OR: [{
+              children: {
+                some: {
+                  hierarchyOnHomogeneous: { some: { homogeneousGroupId: { in: options.ghoIds } } },
+                }
+              }
+            }, {
+              children: {
+                some: {
+                  id: { in: options.ghoIds },
+                }
+              }
+            }],
+          }, {
+            OR: [{
+              children: {
+                some: {
+                  children: {
+                    some: {
+                      hierarchyOnHomogeneous: { some: { homogeneousGroupId: { in: options.ghoIds } } },
+                    }
+                  }
+                }
+              }
+            }, {
+              children: {
+                some: {
+                  children: {
+                    some: {
+                      id: { in: options.ghoIds },
+                    }
+                  }
+                }
+              }
+            }],
+          }, {
+            OR: [{
+              children: {
+                some: {
+                  children: {
+                    some: {
+                      children: {
+                        some: {
+                          hierarchyOnHomogeneous: { some: { homogeneousGroupId: { in: options.ghoIds } } },
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }, {
+              children: {
+                some: {
+                  children: {
+                    some: {
+                      children: {
+                        some: {
+                          id: { in: options.ghoIds },
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }],
+          }, {
+            OR: [{
+              children: {
+                some: {
+                  children: {
+                    some: {
+                      children: {
+                        some: {
+                          children: {
+                            some: {
+                              hierarchyOnHomogeneous: { some: { homogeneousGroupId: { in: options.ghoIds } } },
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }, {
+              children: {
+                some: {
+                  children: {
+                    some: {
+                      children: {
+                        some: {
+                          children: {
+                            some: {
+                              id: { in: options.ghoIds },
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }],
+          }
+          ]
+        })
+      },
       include: {
         hierarchyOnHomogeneous: {
           where: { endDate: null },
