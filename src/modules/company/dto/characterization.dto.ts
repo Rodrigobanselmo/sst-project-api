@@ -7,11 +7,17 @@ import { StringCapitalizeParagraphTransform } from '../../../shared/transformers
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
 import { ToBoolean } from '../../../shared/decorators/boolean.decorator';
+import { NumberTransform } from '@/shared/transformers/number.transform';
 
 export class UpsertCharacterizationDto {
   @IsOptional()
   @IsString()
   id?: string;
+
+  @IsOptional()
+  @Transform(NumberTransform, { toClassOnly: true })
+  @IsInt()
+  stageId?: any
 
   @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
   @IsString()
@@ -34,9 +40,10 @@ export class UpsertCharacterizationDto {
   @IsOptional()
   photos?: string[];
 
-  @IsInt()
   @IsOptional()
-  order?: number;
+  @Transform(NumberTransform, { toClassOnly: true })
+  @IsInt()
+  order?: any
 
   @IsOptional()
   @IsString({ each: true })

@@ -1,4 +1,4 @@
-import { CharacterizationBrowseModel } from '@/@v2/security/domain/models/characterization-browse.model';
+import { CharacterizationBrowseModel } from '@/@v2/security/domain/models/characterization/characterization-browse.model';
 import { IPaginationModelMapper, PaginationModelMapper } from '@/@v2/shared/utils/database/pagination-mapper';
 import { CharacterizationBrowseFilterModelMapper, ICharacterizationBrowseFilterModelMapper } from './characterization-browse-filter.mapper';
 import { CharacterizationBrowseResultModelMapper, ICharacterizationBrowseResultModelMapper } from './characterization-browse-result.mapper';

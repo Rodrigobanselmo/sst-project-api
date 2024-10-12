@@ -1,8 +1,9 @@
 import { IsOptional, IsString } from 'class-validator';
 
 export class EditStatusPayload {
+  @IsOptional()
   @IsString()
-  name: string;
+  name?: string;
 
   @IsString()
   @IsOptional()

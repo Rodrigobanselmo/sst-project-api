@@ -1,4 +1,4 @@
-import { CharacterizationBrowseResultModel } from '@/@v2/security/domain/models/characterization-browse-result.model';
+import { CharacterizationBrowseResultModel } from '@/@v2/security/domain/models/characterization/characterization-browse-result.model';
 import { HierarchyTypeEnum } from '@/@v2/shared/domain/enum/company/hierarchy-type.enum';
 import { CharacterizationTypeEnum } from '@/@v2/shared/domain/enum/security/characterization-type.enum';
 import { HierarchyEnum, CharacterizationTypeEnum as PrismaCharacterizationTypeEnum } from '@prisma/client';
@@ -29,6 +29,10 @@ export type ICharacterizationBrowseResultModelMapper = {
     id: string;
     url: string;
   }[];
+  stage: {
+    name: string | null;
+    color: string | null;
+  }
 }
 
 export class CharacterizationBrowseResultModelMapper {
@@ -39,8 +43,8 @@ export class CharacterizationBrowseResultModelMapper {
       updatedAt: prisma.updated_at,
       name: prisma.name,
       type: CharacterizationTypeEnum[prisma.type],
-      doneAt: prisma.done_at,
-      order: prisma.order,
+      doneAt: prisma.done_at || undefined,
+      order: prisma.order || undefined,
       profiles: prisma.profiles.map((profile) => ({
         id: profile.id,
         name: profile.name,
@@ -58,6 +62,10 @@ export class CharacterizationBrowseResultModelMapper {
         id: photo.id,
         url: photo.url,
       })),
+      stage: prisma.stage.name ? {
+        name: prisma.stage.name,
+        color: prisma.stage.color || undefined,
+      } : undefined
     })
   }
 

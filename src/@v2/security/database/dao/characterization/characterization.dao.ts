@@ -4,9 +4,9 @@ import { getPagination } from '@/@v2/shared/utils/database/get-pagination';
 import { gerWhereRawPrisma } from '@/@v2/shared/utils/database/get-where-raw-prisma';
 import { Injectable } from '@nestjs/common';
 import { CharacterizationTypeEnum, Prisma, StatusEnum } from '@prisma/client';
-import { ICharacterizationBrowseFilterModelMapper } from '../../mappers/models/characterization-browse-filter.mapper';
-import { ICharacterizationBrowseResultModelMapper } from '../../mappers/models/characterization-browse-result.mapper';
-import { CharacterizationBrowseModelMapper } from '../../mappers/models/characterization-browse.mapper';
+import { ICharacterizationBrowseFilterModelMapper } from '../../mappers/models/characterization/characterization-browse-filter.mapper';
+import { ICharacterizationBrowseResultModelMapper } from '../../mappers/models/characterization/characterization-browse-result.mapper';
+import { CharacterizationBrowseModelMapper } from '../../mappers/models/characterization/characterization-browse.mapper';
 import { CharacterizationOrderByEnum, ICharacterizationDAO } from './characterization.types';
 
 
@@ -50,7 +50,8 @@ export class CharacterizationDAO {
         COALESCE(
           JSON_AGG(DISTINCT JSONB_BUILD_OBJECT('id', ph.id, 'url', ph."photoUrl")) 
           FILTER (WHERE ph.id IS NOT NULL), '[]'
-        ) AS photos
+        ) AS photos,
+        JSONB_BUILD_OBJECT('name', st.name, 'color', st.color) AS stage
       FROM 
         "CompanyCharacterization" cc
       LEFT JOIN 
@@ -67,9 +68,11 @@ export class CharacterizationDAO {
         "CompanyCharacterization" profile ON cc.id = profile."profileParentId"
       LEFT JOIN 
         "CompanyCharacterizationPhoto" ph ON cc.id = ph."companyCharacterizationId"
+      LEFT JOIN 
+        "Status" st ON st.id = cc."stageId"
       ${gerWhereRawPrisma(whereParams)}
       GROUP BY 
-        cc.created_at, cc.updated_at, cc.id, cc.name, cc.type, cc.done_at, cc.order
+        cc.created_at, cc.updated_at, cc.id, cc.name, cc.type, cc.done_at, cc.order, st.name, st.color
       ${getOrderByRawPrisma(orderByParams)}
       LIMIT ${pagination.limit}
       OFFSET ${pagination.offSet};
@@ -81,13 +84,12 @@ export class CharacterizationDAO {
     `;
 
     const distinctFiltersPromise = this.prisma.$queryRaw<ICharacterizationBrowseFilterModelMapper[]>`
-      WITH distinct_types AS (
-          SELECT DISTINCT type
-          FROM "CompanyCharacterization" cc 
-          ${gerWhereRawPrisma(whereParams)}
-      )
       SELECT 
-          (SELECT array_agg(type) FROM distinct_types) AS filter_types;
+        array_agg(DISTINCT cc.type) AS filter_types,
+        json_agg(DISTINCT s) AS stages
+      FROM "CompanyCharacterization" cc
+      LEFT JOIN "Status" s ON cc."stageId" = s.id
+      ${gerWhereRawPrisma(whereParams)};
     `;
 
     const [characterizations, totalCharacterizations, distinctFilters] = await Promise.all([characterizationsPromise, totalCharacterizationsPromise, distinctFiltersPromise])
@@ -127,6 +129,7 @@ export class CharacterizationDAO {
       [CharacterizationOrderByEnum.CREATED_AT]: 'cc.created_at',
       [CharacterizationOrderByEnum.UPDATED_AT]: 'cc.updated_at',
       [CharacterizationOrderByEnum.DONE_AT]: 'cc.done_at',
+      [CharacterizationOrderByEnum.STAGE]: 'st.name',
       [CharacterizationOrderByEnum.ORDER]: 'cc.order',
       [CharacterizationOrderByEnum.PHOTOS]: 'total_photos',
       [CharacterizationOrderByEnum.RISKS]: 'total_risks',

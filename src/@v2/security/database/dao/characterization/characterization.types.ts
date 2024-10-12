@@ -6,6 +6,7 @@ export enum CharacterizationOrderByEnum {
   TYPE = 'TYPE',
   UPDATED_AT = 'UPDATED_AT',
   DONE_AT = 'DONE_AT',
+  STAGE = 'STAGE',
   ORDER = 'ORDER',
   PHOTOS = 'PHOTOS',
   RISKS = 'RISKS',

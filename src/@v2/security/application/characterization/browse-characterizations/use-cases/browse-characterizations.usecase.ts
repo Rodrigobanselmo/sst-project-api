@@ -9,7 +9,7 @@ export class BrowseCharacterizationUseCase {
   ) { }
 
   async execute(params: IBrowseCharacterizationUseCase.Params) {
-    return await this.characterizationDAO.browse({
+    const data = await this.characterizationDAO.browse({
       page: params.pagination.page,
       limit: params.pagination.limit,
       orderBy: params.orderBy,
@@ -19,6 +19,8 @@ export class BrowseCharacterizationUseCase {
         search: params.search
       }
     })
+
+    return data
 
   }
 }

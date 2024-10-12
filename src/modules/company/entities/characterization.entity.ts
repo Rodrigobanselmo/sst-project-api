@@ -10,6 +10,7 @@ import { CharacterizationFileEntity } from './characterization-file.entity';
 export class CharacterizationEntity implements CompanyCharacterization {
   id: string;
   name: string;
+  stageId: number;
   description: string | null;
   created_at: Date;
   type: CharacterizationTypeEnum;

@@ -31,6 +31,7 @@ export class CharacterizationRepository {
       startDate = null,
       endDate = null,
       done_at,
+      stageId,
       ...characterizationDto
     }: ICompanyCharacterization,
     isProfile?: boolean,
@@ -137,6 +138,7 @@ export class CharacterizationRepository {
         id: newId,
         companyId,
         workspaceId,
+        stageId,
         type: type,
         name: characterizationDto.name,
       },
@@ -144,6 +146,7 @@ export class CharacterizationRepository {
         type,
         done_at: done_at === '' ? null : done_at ? new Date(done_at) : undefined,
         profileParentId: profileParentId || undefined,
+        stageId,
         ...characterizationDto,
       },
       include: { profiles: true, files: true },
@@ -156,6 +159,7 @@ export class CharacterizationRepository {
             id: profile.id,
             companyId,
             workspaceId,
+            stageId,
             type,
             profileParentId: profile.profileParentId,
             ...(!!characterizationDto && {
