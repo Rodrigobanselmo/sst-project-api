@@ -16,7 +16,7 @@ import {
   IReportHeader,
   IReportSanitizeData,
 } from '../types/IReportFactory.types';
-import { CompanyCharacterization, CompanyCharacterizationPhoto } from '@prisma/client';
+import { CompanyCharacterization, CompanyCharacterizationPhoto, Status } from '@prisma/client';
 import { CharacterizationTypeMap } from '../constants/characterization-type-map';
 import dayjs from 'dayjs';
 import { ReportCharacterizationRepository } from '../../../repositories/implementations/CharacterizationRepository';
@@ -60,7 +60,7 @@ class ReportFactoryProduct implements IReportFactoryProduct<DownloudCharacteriza
     return returnData;
   }
 
-  public sanitizeData(clinics: (CompanyCharacterization & { photos: CompanyCharacterizationPhoto[] })[]): IReportSanitizeData[] {
+  public sanitizeData(clinics: (CompanyCharacterization & { photos: CompanyCharacterizationPhoto[]; stage?: Status })[]): IReportSanitizeData[] {
     const rows: IReportSanitizeData[] = clinics.map<IReportSanitizeData>((row) => {
       const type = CharacterizationTypeMap[row.type].rowLabel || '';
 
@@ -68,6 +68,7 @@ class ReportFactoryProduct implements IReportFactoryProduct<DownloudCharacteriza
         name: { content: row.name },
         done: { content: row.done_at ? `Finalizado em ${dayjs(row.done_at).format('DD/MM/YYYY')}` : '' },
         type: { content: type },
+        stage: { content: row.stage?.name || '' },
         photos: { content: row.photos.length },
       };
 
@@ -93,6 +94,7 @@ class ReportFactoryProduct implements IReportFactoryProduct<DownloudCharacteriza
     const header = [
       { database: 'name', content: 'Nome', width: 120 },
       { database: 'type', content: 'Tipo', width: 100 },
+      { database: 'stage', content: 'Status', width: 100 },
       { database: 'done', content: 'Finalizado', width: 100 },
       { database: 'photos', content: 'Quantidade de Fotos', width: 50 },
     ];

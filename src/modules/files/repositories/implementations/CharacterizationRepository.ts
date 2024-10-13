@@ -14,6 +14,7 @@ export class ReportCharacterizationRepository {
     const database = await this.prisma.companyCharacterization.findMany({
       where: { companyId, workspaceId },
       include: {
+        stage: true,
         photos: true,
       }
     })
