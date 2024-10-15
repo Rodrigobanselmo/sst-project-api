@@ -19,8 +19,11 @@ export class CharacterizationDAO {
   async browse({ limit, page, orderBy, filters }: ICharacterizationDAO.BrowseParams) {
     const pagination = getPagination(page, limit)
 
-    const whereParams = this.browseWhere(filters)
+    const browseWhereParams = this.browseWhere(filters)
+    const filterWhereParams = this.filterWhere(filters)
     const orderByParams = this.browseOrderBy(orderBy)
+
+    const whereParams = [...browseWhereParams, ...filterWhereParams]
 
     const characterizationsPromise = this.prisma.$queryRaw<ICharacterizationBrowseResultModelMapper[]>`
       SELECT 
@@ -89,7 +92,7 @@ export class CharacterizationDAO {
         json_agg(DISTINCT s) AS stages
       FROM "CompanyCharacterization" cc
       LEFT JOIN "Status" s ON cc."stageId" = s.id
-      ${gerWhereRawPrisma(whereParams)};
+      ${gerWhereRawPrisma(browseWhereParams)};
     `;
 
     const [characterizations, totalCharacterizations, distinctFilters] = await Promise.all([characterizationsPromise, totalCharacterizationsPromise, distinctFiltersPromise])
@@ -109,10 +112,28 @@ export class CharacterizationDAO {
       Prisma.sql`cc."profileParentId" IS NULL`,
     ]
 
+    return where
+  }
+
+  private filterWhere(filters: ICharacterizationDAO.BrowseParams['filters']) {
+    const where: Prisma.Sql[] = []
 
     if (filters.search) {
       const search = `%${filters.search}%`
       where.push(Prisma.sql`unaccent(lower(cc.name)) ILIKE unaccent(lower(${search}))`)
+    }
+
+    if (filters.stageIds?.length) {
+      const includeNull = filters.stageIds.includes(0)
+
+      if (includeNull) {
+        if (filters.stageIds.length === 1) where.push(Prisma.sql`cc."stageId" IS NULL`)
+        else where.push(Prisma.sql`cc."stageId" IN (${Prisma.join(filters.stageIds.filter(Boolean))}) OR cc."stageId" IS NULL`)
+      }
+
+      if (!includeNull) {
+        where.push(Prisma.sql`cc."stageId" IN (${Prisma.join(filters.stageIds)})`)
+      }
     }
 
     return where

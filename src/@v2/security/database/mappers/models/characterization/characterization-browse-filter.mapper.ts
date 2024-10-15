@@ -12,7 +12,11 @@ export class CharacterizationBrowseFilterModelMapper {
     return new CharacterizationBrowseFilterModel({
       types: prisma.filter_types?.map((type) => CharacterizationTypeEnum[type]) || [],
       stages: prisma.stages.map((stage) => {
-        if (!stage) return null
+        if (!stage) return {
+          id: 0,
+          name: 'Sem Status',
+          color: undefined,
+        }
 
         return {
           id: stage.id,

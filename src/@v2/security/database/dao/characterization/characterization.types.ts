@@ -23,6 +23,7 @@ export namespace ICharacterizationDAO {
       companyId: string;
       workspaceId: string;
       search?: string;
+      stageIds?: number[];
     };
   }
 }

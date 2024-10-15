@@ -16,7 +16,8 @@ export class BrowseCharacterizationUseCase {
       filters: {
         companyId: params.companyId,
         workspaceId: params.workspaceId,
-        search: params.search
+        search: params.search,
+        stageIds: params.stageIds
       }
     })
 

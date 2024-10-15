@@ -28,8 +28,12 @@ export class BrowseCharacterizationQuery {
   @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => OrderBy)
-  @IsOptional()
   orderBy?: OrderBy[];
+
+  @IsArray()
+  @IsOptional()
+  @Type(() => Number)
+  stageIds?: number[];
 }
 
 

@@ -9,6 +9,10 @@ export function gerWhereRawPrisma(where: Prisma.Sql[], options?: IWhereRawPrisma
 
     const isOR = options?.type == 'OR'
 
+    where = where.map((w) => {
+        return Prisma.sql`(${w})`
+    })
+
     const raw = isOR
         ? Prisma.join(where, ' OR ')
         : Prisma.join(where, ' AND ')

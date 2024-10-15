@@ -9,5 +9,6 @@ export namespace IBrowseCharacterizationUseCase {
     search?: string
     orderBy?: IOrderBy<CharacterizationOrderByEnum>
     pagination: IPagination
+    stageIds?: number[]
   }
 }

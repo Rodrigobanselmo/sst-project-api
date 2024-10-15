@@ -28,6 +28,7 @@ export class BrowseCharacterizationController {
       workspaceId: path.workspaceId,
       orderBy: query.orderBy,
       search: query.search,
+      stageIds: query.stageIds,
       pagination: {
         page: query.page,
         limit: query.limit
