@@ -23,12 +23,7 @@ import { SecurityModule } from './@v2/security/security.module';
 
 @Module({
   imports: [
-    ThrottlerModule.forRoot([
-      {
-        ttl: 60,
-        limit: 10,
-      },
-    ]),
+    ThrottlerModule.forRoot([{ ttl: 60, limit: 10, }]),
     PrismaModule,
     UsersModule,
     AuthModule,
