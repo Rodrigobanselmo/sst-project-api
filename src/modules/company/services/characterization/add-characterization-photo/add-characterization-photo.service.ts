@@ -9,6 +9,7 @@ import { AmazonStorageProvider } from '../../../../../shared/providers/StoragePr
 import { AddPhotoCharacterizationDto } from '../../../dto/characterization.dto';
 import { CharacterizationRepository } from '../../../repositories/implementations/CharacterizationRepository';
 import { ErrorCompanyEnum } from 'src/shared/constants/enum/errorMessage';
+import dayjs from 'dayjs';
 
 @Injectable()
 export class AddCharacterizationPhotoService {
@@ -16,7 +17,7 @@ export class AddCharacterizationPhotoService {
     private readonly characterizationRepository: CharacterizationRepository,
     private readonly characterizationPhotoRepository: CharacterizationPhotoRepository,
     private readonly amazonStorageProvider: AmazonStorageProvider,
-  ) {}
+  ) { }
 
   async execute(
     addPhotoCharacterizationDto: AddPhotoCharacterizationDto,
@@ -55,13 +56,17 @@ export class AddCharacterizationPhotoService {
     const fileType = file.originalname.split('.')[file.originalname.split('.').length - 1];
     const path = 'characterization/' + (opt?.id || v4()) + '.' + fileType;
 
+    console.log('AMW S3', 'before', new Date().getSeconds())
     const { url } = await this.amazonStorageProvider.upload({
       file: file.buffer,
       isPublic: true,
       fileName: path,
     });
+    console.log('AMW S3', 'after', new Date().getSeconds())
 
     const dimensions = sizeOf(file.buffer);
+    console.log('AMW S3', 'after sizeOf', new Date().getSeconds())
+
     const isVertical = dimensions.width < dimensions.height;
 
     return [url, isVertical] as [string, boolean];
