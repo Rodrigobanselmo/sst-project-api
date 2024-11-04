@@ -26,6 +26,11 @@ export class ActionPlanDAO {
     const whereParams = [...browseWhereParams, ...filterWhereParams]
 
     const actionplansPromise = this.prisma.$queryRaw<IActionPlanBrowseResultModelMapper[]>`
+      WITH "FilteredHierarchyOnHomogeneous" AS (
+        SELECT hh."hierarchyId", hh."homogeneousGroupId" 
+        FROM "HierarchyOnHomogeneous" AS hh
+        WHERE "endDate" IS NULL
+      )
       SELECT 
         rec."id" AS rec_id,
         rfd."id" AS rfd_id,
@@ -49,9 +54,10 @@ export class ActionPlanDAO {
         hg."name" AS hg_name,
         cc."name" AS cc_name,
         cc."type" AS cc_type,
+        hierarchy_count.total_hierarchies AS total_hierarchies,
         COALESCE(
-          JSON_AGG(DISTINCT JSONB_BUILD_OBJECT('name', h."name", 'type', h.type)) 
-          FILTER (WHERE h."name" IS NOT NULL), '[]'
+          JSON_AGG(DISTINCT JSONB_BUILD_OBJECT('name', limited_hierarchies."name", 'type', limited_hierarchies.type)) 
+          FILTER (WHERE limited_hierarchies."name" IS NOT NULL), '[]'
         ) AS hierarchies,
         COALESCE(
           JSON_AGG(DISTINCT JSONB_BUILD_OBJECT('name', gs."name")) 
@@ -69,23 +75,61 @@ export class ActionPlanDAO {
         "_GenerateSourceToRiskFactorData" gs_to_rfd ON gs_to_rfd."B" = rfd."id"
       LEFT JOIN
         "GenerateSource" gs ON gs."id" = gs_to_rfd."A"
-      LEFT JOIN
+      LEFT JOIN 
         "RiskFactorDataRec" rfd_rec ON rfd_rec."riskFactorDataId" = rfd."id"
       LEFT JOIN
         "HomogeneousGroup" hg ON hg."id" = rfd."homogeneousGroupId"
       LEFT JOIN
-        "HierarchyOnHomogeneous" hh ON hh."homogeneousGroupId" = hg."id" AND hh."endDate" IS NULL
+        "FilteredHierarchyOnHomogeneous" hh ON hh."homogeneousGroupId" = hg."id"
       LEFT JOIN 
-        "Hierarchy" h ON hh."hierarchyId" = h.id
+        "Hierarchy" h ON h."id" = hh."hierarchyId"
+      LEFT JOIN 
+        "Hierarchy" h_parent_1 ON h_parent_1."id" = h."parentId"
+      LEFT JOIN 
+        "Hierarchy" h_parent_2 ON h_parent_2."id" = h_parent_1."parentId"
+      LEFT JOIN 
+        "Hierarchy" h_parent_3 ON h_parent_3."id" = h_parent_2."parentId"
+      LEFT JOIN 
+        "Hierarchy" h_parent_4 ON h_parent_4."id" = h_parent_3."parentId"
+      LEFT JOIN 
+        "Hierarchy" h_parent_5 ON h_parent_5."id" = h_parent_4."parentId"
+      LEFT JOIN 
+        "Hierarchy" h_children_1 ON h_children_1."parentId" = h."id"
+      LEFT JOIN
+        "Hierarchy" h_children_2 ON h_children_2."parentId" = h_children_1."id"
+      LEFT JOIN
+        "Hierarchy" h_children_3 ON h_children_3."parentId" = h_children_2."id"
+      LEFT JOIN
+        "Hierarchy" h_children_4 ON h_children_4."parentId" = h_children_3."id"
+      LEFT JOIN
+        "Hierarchy" h_children_5 ON h_children_5."parentId" = h_children_4."id"
       LEFT JOIN
         "CompanyCharacterization" cc ON cc."id" = hg."id"
       LEFT JOIN
         "Workspace" w ON w."companyId" = rfd."companyId"
       LEFT JOIN
         "DocumentData" dd ON dd."workspaceId" = w."id"
-      -- ${gerWhereRawPrisma(whereParams)}
+      LEFT JOIN LATERAL (
+        SELECT COUNT(*)::INTEGER AS total_hierarchies
+        FROM "FilteredHierarchyOnHomogeneous" hh
+        WHERE hh."homogeneousGroupId" = hg."id"
+      ) AS hierarchy_count ON true
+      -- LEFT JOIN LATERAL (
+      --   SELECT h."name", h."type"
+      --   FROM "FilteredHierarchyOnHomogeneous" hh
+      --   JOIN "Hierarchy" h ON hh."hierarchyId" = h.id
+      --   WHERE hh."homogeneousGroupId" = hg."id"
+      --   LIMIT 5
+      -- ) AS limited_hierarchies ON true
+      LEFT JOIN LATERAL (
+        SELECT lateral_h."name", lateral_h."type"
+        FROM "Hierarchy" lateral_h
+        WHERE lateral_h."id" IN (h."id", h_parent_1."id", h_parent_2."id", h_parent_3."id", h_parent_4."id", h_children_1."id", h_children_2."id", h_children_3."id", h_children_4."id", h_children_5."id")
+        LIMIT 10
+      ) AS limited_hierarchies ON true
+      ${gerWhereRawPrisma(whereParams)}
       GROUP BY 
-        rec."id",
+      rec."id",
         rfd."id",
         rfd."createdAt",
         rfd."level",
@@ -106,30 +150,28 @@ export class ActionPlanDAO {
         hg."type",
         hg."name",
         cc."name",
-        cc."type"
+        cc."type",
+        hierarchy_count.total_hierarchies
       -- ${getOrderByRawPrisma(orderByParams)}
       LIMIT ${pagination.limit}
       OFFSET ${pagination.offSet};
     `;
 
-    const totalActionPlansPromise = null
     // const totalActionPlansPromise = this.prisma.$queryRaw<{ total: number }[]>`
-    //   SELECT COUNT(*) AS total 
-    //   FROM "RiskFactorData" rfd
-    //   JOIN "_recs" rec_to_rfd ON rec_to_rfd."B" = rfd."id"
+    //   SELECT COUNT(*) AS total FROM "CompanyCharacterization" cc
     //   ${gerWhereRawPrisma(whereParams)};
     // `;
 
-    const distinctFiltersPromise = this.prisma.$queryRaw<IActionPlanBrowseFilterModelMapper[]>`
-      SELECT 
-        array_agg(DISTINCT cc.type) AS filter_types,
-        json_agg(DISTINCT s) AS stages
-      FROM "CompanyCharacterization" cc
-      LEFT JOIN "Status" s ON cc."stageId" = s.id
-      ${gerWhereRawPrisma(browseWhereParams)};
-    `;
+    // const distinctFiltersPromise = this.prisma.$queryRaw<IActionPlanBrowseFilterModelMapper[]>`
+    //   SELECT 
+    //     array_agg(DISTINCT cc.type) AS filter_types,
+    //     json_agg(DISTINCT s) AS stages
+    //   FROM "CompanyCharacterization" cc
+    //   LEFT JOIN "Status" s ON cc."stageId" = s.id
+    //   ${gerWhereRawPrisma(browseWhereParams)};
+    // `;
 
-    const [actionplans, totalActionPlans, distinctFilters] = await Promise.all([actionplansPromise, totalActionPlansPromise, distinctFiltersPromise])
+    const [actionplans, totalActionPlans, distinctFilters] = await Promise.all([actionplansPromise, null, null])
 
     return actionplans
 
@@ -155,21 +197,21 @@ export class ActionPlanDAO {
 
     if (filters.search) {
       const search = `%${filters.search}%`
-      where.push(Prisma.sql`unaccent(lower(cc.name)) ILIKE unaccent(lower(${search}))`)
+      where.push(Prisma.sql`unaccent(lower(hg.name)) ILIKE unaccent(lower(${search}))`)
     }
 
-    if (filters.stageIds?.length) {
-      const includeNull = filters.stageIds.includes(0)
+    // if (filters.stageIds?.length) {
+    //   const includeNull = filters.stageIds.includes(0)
 
-      if (includeNull) {
-        if (filters.stageIds.length === 1) where.push(Prisma.sql`cc."stageId" IS NULL`)
-        else where.push(Prisma.sql`cc."stageId" IN (${Prisma.join(filters.stageIds.filter(Boolean))}) OR cc."stageId" IS NULL`)
-      }
+    //   if (includeNull) {
+    //     if (filters.stageIds.length === 1) where.push(Prisma.sql`cc."stageId" IS NULL`)
+    //     else where.push(Prisma.sql`cc."stageId" IN (${Prisma.join(filters.stageIds.filter(Boolean))}) OR cc."stageId" IS NULL`)
+    //   }
 
-      if (!includeNull) {
-        where.push(Prisma.sql`cc."stageId" IN (${Prisma.join(filters.stageIds)})`)
-      }
-    }
+    //   if (!includeNull) {
+    //     where.push(Prisma.sql`cc."stageId" IN (${Prisma.join(filters.stageIds)})`)
+    //   }
+    // }
 
     return where
   }

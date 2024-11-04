@@ -1151,6 +1151,7 @@ model Hierarchy {
 
   @@unique([id, companyId])
   @@unique([parentId, name])
+  @@index([parentId])
   @@index([deletedAt])
   @@index([companyId])
 }
