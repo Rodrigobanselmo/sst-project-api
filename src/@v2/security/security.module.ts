@@ -13,12 +13,17 @@ import { EditStatusUseCase } from './application/status/edit-status/use-cases/ed
 import { CharacterizationDAO } from './database/dao/characterization/characterization.dao';
 import { StatusDAO } from './database/dao/status/status.dao';
 import { StatusRepository } from './database/repositories/status/status.repository';
-
+import { RiskDataDAO } from './database/dao/risk-data/risk-data.dao';
+import { ActionPlanDAO } from './database/dao/action-plan/action-plan.dao';
+import { BrowseActionPlanController } from './application/action-plan/browse-action-plan/controllers/browse-action-plan.controller';
+import { BrowseActionPlanUseCase } from './application/action-plan/browse-action-plan/use-cases/browse-action-plan.usecase';
 
 @Module({
   imports: [SharedModule],
   controllers: [
     BrowseCharacterizationController,
+
+    BrowseActionPlanController,
 
     AddStatusController,
     EditStatusController,
@@ -29,10 +34,13 @@ import { StatusRepository } from './database/repositories/status/status.reposito
     // Database
     StatusRepository,
     CharacterizationDAO,
+    RiskDataDAO,
+    ActionPlanDAO,
     StatusDAO,
 
     // Use Cases
     BrowseCharacterizationUseCase,
+    BrowseActionPlanUseCase,
 
     AddStatusUseCase,
     BrowseStatusUseCase,

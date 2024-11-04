@@ -13,6 +13,10 @@ export class RiskDataRecEntity implements RiskFactorDataRec {
   comments?: RiskDataRecCommentsEntity[];
   updated_at: Date;
   created_at: Date;
+  startDate: Date;
+  doneDate: Date;
+  canceledDate: Date;
+  workspaceId: string;
 
   constructor(partial: Partial<RiskDataRecEntity>) {
     Object.assign(this, partial);

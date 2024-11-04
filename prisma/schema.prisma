@@ -633,6 +633,11 @@ model DocumentData {
   revisionBy    String?
   approvedBy    String?
 
+  months_period_level_2 Int @default(24)
+  months_period_level_3 Int @default(12)
+  months_period_level_4 Int @default(6)
+  months_period_level_5 Int @default(3)
+
   json Json?
 
   company                 Company                      @relation(fields: [companyId], references: [id])
@@ -640,6 +645,9 @@ model DocumentData {
   docs                    RiskFactorDocument[]
   professionalsSignatures DocumentDataToProfessional[]
   workspace               Workspace                    @relation(fields: [workspaceId], references: [id])
+
+  coordinator   User? @relation(fields: [coordinatorId], references: [id])
+  coordinatorId Int?
 
   @@unique([id, companyId])
   @@unique([type, workspaceId, companyId])
@@ -1467,10 +1475,10 @@ model RiskFactorDocument {
   documentData   DocumentData  @relation(fields: [documentDataId, companyId], references: [id, companyId])
   workspace      Workspace     @relation(fields: [workspaceId, companyId], references: [id, companyId], onDelete: Cascade)
 
-  approvedBy   String?
-  elaboratedBy String?
-  revisionBy   String?
-  validity     String?
+  approvedBy   String? //*not used
+  elaboratedBy String? //*not used
+  revisionBy   String? //*not used
+  validity     String? //*not used
 
   @@unique([id, companyId])
 }
@@ -1567,20 +1575,25 @@ model RiskFactorProbability {
 
 model RiskFactorDataRec {
   id               String                      @id @default(uuid())
-  responsibleName  String?
+  responsibleName  String? //*not used
   endDate          DateTime?
   status           StatusEnum                  @default(PENDING)
+  startDate        DateTime?
+  doneDate         DateTime?
+  canceledDate     DateTime?
   recMedId         String
   riskFactorDataId String
   companyId        String
+  workspaceId      String
   created_at       DateTime                    @default(now())
   updated_at       DateTime                    @updatedAt
   company          Company                     @relation(fields: [companyId], references: [id])
+  workspace        Workspace                   @relation(fields: [workspaceId], references: [id])
   recMed           RecMed                      @relation(fields: [recMedId], references: [id])
   riskFactorData   RiskFactorData              @relation(fields: [riskFactorDataId], references: [id])
   comments         RiskFactorDataRecComments[]
 
-  @@unique([riskFactorDataId, recMedId, companyId])
+  @@unique([riskFactorDataId, recMedId, workspaceId])
 }
 
 model RiskFactorDataRecComments {
@@ -1592,6 +1605,16 @@ model RiskFactorDataRecComments {
   updated_at          DateTime            @updatedAt
   textType            RiskRecTextTypeEnum
   riskFactorDataRec   RiskFactorDataRec   @relation(fields: [riskFactorDataRecId], references: [id])
+
+  isApproved      Boolean?
+  approvedAt      DateTime?
+  approvedComment String?
+
+  approvedBy   User? @relation("rec_comment_answer", fields: [approvedById], references: [id])
+  approvedById Int?
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
 }
 
 model ScheduleBlock {
@@ -1695,6 +1718,10 @@ model User {
   alerts              Alert[]
   medicalVisits       ScheduleMedicalVisit[]
 
+  coordinator       DocumentData[]
+  recComments       RiskFactorDataRecComments[]
+  recCommentsAnswer RiskFactorDataRecComments[] @relation("rec_comment_answer")
+
   @@unique([id, name])
   @@index([email])
 }
@@ -1761,6 +1788,7 @@ model Workspace {
   hierarchy          Hierarchy[]               @relation("HierarchyToWorkspace")
   homogeneousGroup   HomogeneousGroup[]
   documentData       DocumentData[]
+  RiskFactorDataRec  RiskFactorDataRec[]
 
   @@unique([abbreviation, companyId])
   @@unique([id, companyId])
@@ -1932,10 +1960,13 @@ enum StatusEnum {
   DONE
   MODIFIED
   TRANSMITTED
+  WATTING_APPROVAL
+  REJECTED
 }
 
 enum StatusTypeEnum {
   CHARACTERIZATION
+  ACTION_PLAN
 }
 
 enum RecTypeEnum {
