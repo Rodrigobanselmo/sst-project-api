@@ -25,11 +25,75 @@ export class ActionPlanDAO {
 
     const whereParams = [...browseWhereParams, ...filterWhereParams]
 
+    // ${gerWhereRawPrisma(browseWhereParams)}
+
     const actionplansPromise = this.prisma.$queryRaw<IActionPlanBrowseResultModelMapper[]>`
       WITH "FilteredHierarchyOnHomogeneous" AS (
         SELECT hh."hierarchyId", hh."homogeneousGroupId" 
         FROM "HierarchyOnHomogeneous" AS hh
         WHERE "endDate" IS NULL
+      ),
+      "FilteredRiskFactorData" AS (
+        SELECT 
+          rfd."id" as "id",
+          rfd."createdAt" as "createdAt",
+          rfd."level" as "level",
+          rfd."riskId" as "riskId",
+          rfd."companyId" as "companyId",
+          rfd."endDate" as "endDate",
+          rfd."deletedAt" as "deletedAt",
+          hg."id" as "hg_id",
+          hg."type" as "hg_type",
+          hg."name" as "hg_name",
+          COALESCE(
+            JSON_AGG(DISTINCT JSONB_BUILD_OBJECT('name', limited_hierarchies."name", 'type', limited_hierarchies.type)) 
+            FILTER (WHERE limited_hierarchies."name" IS NOT NULL), '[]'
+          )::TEXT AS hierarchies
+        FROM 
+          "RiskFactorData" rfd
+        LEFT JOIN
+          "HomogeneousGroup" hg ON hg."id" = rfd."homogeneousGroupId"
+        LEFT JOIN
+          "FilteredHierarchyOnHomogeneous" hh ON hh."homogeneousGroupId" = hg."id"
+        LEFT JOIN 
+          "Hierarchy" h ON h."id" = hh."hierarchyId"
+        LEFT JOIN 
+          "Hierarchy" h_parent_1 ON h_parent_1."id" = h."parentId"
+        LEFT JOIN 
+          "Hierarchy" h_parent_2 ON h_parent_2."id" = h_parent_1."parentId"
+        LEFT JOIN 
+          "Hierarchy" h_parent_3 ON h_parent_3."id" = h_parent_2."parentId"
+        LEFT JOIN 
+          "Hierarchy" h_parent_4 ON h_parent_4."id" = h_parent_3."parentId"
+        LEFT JOIN 
+          "Hierarchy" h_parent_5 ON h_parent_5."id" = h_parent_4."parentId"
+        LEFT JOIN 
+          "Hierarchy" h_children_1 ON h_children_1."parentId" = h."id"
+        LEFT JOIN
+          "Hierarchy" h_children_2 ON h_children_2."parentId" = h_children_1."id"
+        LEFT JOIN
+          "Hierarchy" h_children_3 ON h_children_3."parentId" = h_children_2."id"
+        LEFT JOIN
+          "Hierarchy" h_children_4 ON h_children_4."parentId" = h_children_3."id"
+        LEFT JOIN
+          "Hierarchy" h_children_5 ON h_children_5."parentId" = h_children_4."id"
+        LEFT JOIN LATERAL (
+          SELECT lateral_h."name", lateral_h."type"
+          FROM "Hierarchy" lateral_h
+          WHERE lateral_h."id" IN (h."id", h_parent_1."id", h_parent_2."id", h_parent_3."id", h_parent_4."id", h_children_1."id", h_children_2."id", h_children_3."id", h_children_4."id", h_children_5."id")
+        ) AS limited_hierarchies ON true
+        ${gerWhereRawPrisma(browseWhereParams)}
+        GROUP BY 
+          rfd."id",
+          rfd."createdAt",
+          rfd."level",
+          rfd."riskId",
+          rfd."companyId",
+          rfd."endDate",
+          rfd."deletedAt",
+          hg."id",
+          hg."type",
+          hg."name"
       )
       SELECT 
         rec."id" AS rec_id,
@@ -50,21 +114,17 @@ export class ActionPlanDAO {
         dd."months_period_level_5",
         risk."name" AS risk_name,
         risk."type" AS risk_type,
-        hg."type" AS hg_type,
-        hg."name" AS hg_name,
+        rfd."hg_type" AS hg_type,
+        rfd."hg_name" AS hg_name,
         cc."name" AS cc_name,
         cc."type" AS cc_type,
-        hierarchy_count.total_hierarchies AS total_hierarchies,
-        COALESCE(
-          JSON_AGG(DISTINCT JSONB_BUILD_OBJECT('name', limited_hierarchies."name", 'type', limited_hierarchies.type)) 
-          FILTER (WHERE limited_hierarchies."name" IS NOT NULL), '[]'
-        ) AS hierarchies,
+        rfd."hierarchies"::JSONB AS hierarchies,
         COALESCE(
           JSON_AGG(DISTINCT JSONB_BUILD_OBJECT('name', gs."name")) 
           FILTER (WHERE gs."name" IS NOT NULL), '[]'
         ) AS generateSources
       FROM 
-        "RiskFactorData" rfd
+        "FilteredRiskFactorData" rfd
       JOIN 
         "_recs" rec_to_rfd ON rec_to_rfd."B" = rfd."id"
       LEFT JOIN
@@ -78,62 +138,19 @@ export class ActionPlanDAO {
       LEFT JOIN 
         "RiskFactorDataRec" rfd_rec ON rfd_rec."riskFactorDataId" = rfd."id"
       LEFT JOIN
-        "HomogeneousGroup" hg ON hg."id" = rfd."homogeneousGroupId"
-      LEFT JOIN
-        "FilteredHierarchyOnHomogeneous" hh ON hh."homogeneousGroupId" = hg."id"
-      LEFT JOIN 
-        "Hierarchy" h ON h."id" = hh."hierarchyId"
-      LEFT JOIN 
-        "Hierarchy" h_parent_1 ON h_parent_1."id" = h."parentId"
-      LEFT JOIN 
-        "Hierarchy" h_parent_2 ON h_parent_2."id" = h_parent_1."parentId"
-      LEFT JOIN 
-        "Hierarchy" h_parent_3 ON h_parent_3."id" = h_parent_2."parentId"
-      LEFT JOIN 
-        "Hierarchy" h_parent_4 ON h_parent_4."id" = h_parent_3."parentId"
-      LEFT JOIN 
-        "Hierarchy" h_parent_5 ON h_parent_5."id" = h_parent_4."parentId"
-      LEFT JOIN 
-        "Hierarchy" h_children_1 ON h_children_1."parentId" = h."id"
-      LEFT JOIN
-        "Hierarchy" h_children_2 ON h_children_2."parentId" = h_children_1."id"
-      LEFT JOIN
-        "Hierarchy" h_children_3 ON h_children_3."parentId" = h_children_2."id"
-      LEFT JOIN
-        "Hierarchy" h_children_4 ON h_children_4."parentId" = h_children_3."id"
-      LEFT JOIN
-        "Hierarchy" h_children_5 ON h_children_5."parentId" = h_children_4."id"
-      LEFT JOIN
-        "CompanyCharacterization" cc ON cc."id" = hg."id"
+        "CompanyCharacterization" cc ON cc."id" = rfd."hg_id"
       LEFT JOIN
         "Workspace" w ON w."companyId" = rfd."companyId"
       LEFT JOIN
         "DocumentData" dd ON dd."workspaceId" = w."id"
-      LEFT JOIN LATERAL (
-        SELECT COUNT(*)::INTEGER AS total_hierarchies
-        FROM "FilteredHierarchyOnHomogeneous" hh
-        WHERE hh."homogeneousGroupId" = hg."id"
-      ) AS hierarchy_count ON true
-      -- LEFT JOIN LATERAL (
-      --   SELECT h."name", h."type"
-      --   FROM "FilteredHierarchyOnHomogeneous" hh
-      --   JOIN "Hierarchy" h ON hh."hierarchyId" = h.id
-      --   WHERE hh."homogeneousGroupId" = hg."id"
-      --   LIMIT 5
-      -- ) AS limited_hierarchies ON true
-      LEFT JOIN LATERAL (
-        SELECT lateral_h."name", lateral_h."type"
-        FROM "Hierarchy" lateral_h
-        WHERE lateral_h."id" IN (h."id", h_parent_1."id", h_parent_2."id", h_parent_3."id", h_parent_4."id", h_children_1."id", h_children_2."id", h_children_3."id", h_children_4."id", h_children_5."id")
-        LIMIT 10
-      ) AS limited_hierarchies ON true
-      ${gerWhereRawPrisma(whereParams)}
+      ${gerWhereRawPrisma(filterWhereParams)}
       GROUP BY 
-      rec."id",
+        rec."id",
+        rec."recName",
         rfd."id",
         rfd."createdAt",
         rfd."level",
-        rec."recName",
+        rfd."hierarchies",
         rfd_rec."updated_at",
         rfd_rec."startDate",
         rfd_rec."doneDate",
@@ -147,12 +164,10 @@ export class ActionPlanDAO {
         dd."months_period_level_5",
         risk."name",
         risk."type",
-        hg."type",
-        hg."name",
+        rfd."hg_type",
+        rfd."hg_name",
         cc."name",
-        cc."type",
-        hierarchy_count.total_hierarchies
-      -- ${getOrderByRawPrisma(orderByParams)}
+        cc."type"
       LIMIT ${pagination.limit}
       OFFSET ${pagination.offSet};
     `;
@@ -197,7 +212,7 @@ export class ActionPlanDAO {
 
     if (filters.search) {
       const search = `%${filters.search}%`
-      where.push(Prisma.sql`unaccent(lower(hg.name)) ILIKE unaccent(lower(${search}))`)
+      where.push(Prisma.sql`unaccent(lower(rfd.hg_name)) ILIKE unaccent(lower(${search}))`)
     }
 
     // if (filters.stageIds?.length) {
