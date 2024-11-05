@@ -59,8 +59,64 @@ export class ActionPlanDAO {
         cc."type" AS cc_type,
         (array_agg(CASE WHEN hg."type" = 'HIERARCHY' THEN h."name" WHEN cc."name" IS NOT NULL THEN cc."name" ELSE hg."name" END))[1] AS origin,
         COALESCE(
-          JSON_AGG(DISTINCT JSONB_BUILD_OBJECT('name', hierarchies."name", 'type', hierarchies.type)) 
-          FILTER (WHERE hierarchies."name" IS NOT NULL), '[]'
+          (
+            COALESCE(
+              JSONB_AGG(DISTINCT JSONB_BUILD_OBJECT('name', h."name", 'type', h.type)) 
+              FILTER (WHERE h."name" IS NOT NULL), 
+              '[]'::jsonb
+            ) || 
+            COALESCE(
+              JSONB_AGG(DISTINCT JSONB_BUILD_OBJECT('name', h_parent_1."name", 'type', h_parent_1.type)) 
+              FILTER (WHERE h_parent_1."name" IS NOT NULL), 
+              '[]'::jsonb
+            ) || 
+            COALESCE(
+              JSONB_AGG(DISTINCT JSONB_BUILD_OBJECT('name', h_parent_2."name", 'type', h_parent_2.type)) 
+              FILTER (WHERE h_parent_2."name" IS NOT NULL), 
+              '[]'::jsonb
+            ) || 
+            COALESCE(
+              JSONB_AGG(DISTINCT JSONB_BUILD_OBJECT('name', h_parent_3."name", 'type', h_parent_3.type)) 
+              FILTER (WHERE h_parent_3."name" IS NOT NULL), 
+              '[]'::jsonb
+            ) || 
+            COALESCE(
+              JSONB_AGG(DISTINCT JSONB_BUILD_OBJECT('name', h_parent_4."name", 'type', h_parent_4.type)) 
+              FILTER (WHERE h_parent_4."name" IS NOT NULL), 
+              '[]'::jsonb
+            ) || 
+            COALESCE(
+              JSONB_AGG(DISTINCT JSONB_BUILD_OBJECT('name', h_parent_5."name", 'type', h_parent_5.type)) 
+              FILTER (WHERE h_parent_5."name" IS NOT NULL), 
+              '[]'::jsonb
+            ) || 
+            COALESCE(
+              JSONB_AGG(DISTINCT JSONB_BUILD_OBJECT('name', h_children_1."name", 'type', h_children_1.type)) 
+              FILTER (WHERE h_children_1."name" IS NOT NULL), 
+              '[]'::jsonb
+            ) || 
+            COALESCE(
+              JSONB_AGG(DISTINCT JSONB_BUILD_OBJECT('name', h_children_2."name", 'type', h_children_2.type)) 
+              FILTER (WHERE h_children_2."name" IS NOT NULL), 
+              '[]'::jsonb
+            ) || 
+            COALESCE(
+              JSONB_AGG(DISTINCT JSONB_BUILD_OBJECT('name', h_children_3."name", 'type', h_children_3.type)) 
+              FILTER (WHERE h_children_3."name" IS NOT NULL), 
+              '[]'::jsonb
+            ) || 
+            COALESCE(
+              JSONB_AGG(DISTINCT JSONB_BUILD_OBJECT('name', h_children_4."name", 'type', h_children_4.type)) 
+              FILTER (WHERE h_children_4."name" IS NOT NULL), 
+              '[]'::jsonb
+            ) || 
+            COALESCE(
+              JSONB_AGG(DISTINCT JSONB_BUILD_OBJECT('name', h_children_5."name", 'type', h_children_5.type)) 
+              FILTER (WHERE h_children_5."name" IS NOT NULL), 
+              '[]'::jsonb
+            )
+          ),
+          '[]'::jsonb
         ) AS hierarchies,
         COALESCE(
           JSON_AGG(DISTINCT JSONB_BUILD_OBJECT('name', gs."name")) 
@@ -112,12 +168,6 @@ export class ActionPlanDAO {
         "Workspace" w ON w."companyId" = rfd."companyId"
       LEFT JOIN
         "DocumentData" dd ON dd."workspaceId" = w."id"
-      LEFT JOIN LATERAL (
-        SELECT h_all."name", h_all."type"
-        FROM "Hierarchy" h_all
-        WHERE h_all."id" IN (h."id", h_parent_1."id", h_parent_2."id", h_parent_3."id", h_parent_4."id", h_children_1."id", h_children_2."id", h_children_3."id", h_children_4."id", h_children_5."id")
-        LIMIT 10
-      ) AS hierarchies ON true
       ${gerWhereRawPrisma(whereParams)}
       GROUP BY 
       rec."id",
