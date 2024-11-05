@@ -8,6 +8,7 @@ import { IActionPlanDAO, ActionPlanOrderByEnum } from './action-plan.types';
 import { IActionPlanBrowseResultModelMapper } from '../../mappers/models/action-plan/action-plan-browse-result.mapper';
 import { IActionPlanBrowseFilterModelMapper } from '../../mappers/models/action-plan/action-plan-browse-filter.mapper';
 import { ActionPlanBrowseModelMapper } from '../../mappers/models/action-plan/action-plan-browse.mapper';
+import { OriginTypeEnum } from '@/@v2/security/domain/enums/origin-type.enum';
 
 
 @Injectable()
@@ -25,106 +26,48 @@ export class ActionPlanDAO {
 
     const whereParams = [...browseWhereParams, ...filterWhereParams]
 
-    // ${gerWhereRawPrisma(browseWhereParams)}
-
     const actionplansPromise = this.prisma.$queryRaw<IActionPlanBrowseResultModelMapper[]>`
       WITH "FilteredHierarchyOnHomogeneous" AS (
         SELECT hh."hierarchyId", hh."homogeneousGroupId" 
         FROM "HierarchyOnHomogeneous" AS hh
         WHERE "endDate" IS NULL
-      ),
-      "FilteredRiskFactorData" AS (
-        SELECT 
-          rfd."id" as "id",
-          rfd."createdAt" as "createdAt",
-          rfd."level" as "level",
-          rfd."riskId" as "riskId",
-          rfd."companyId" as "companyId",
-          rfd."endDate" as "endDate",
-          rfd."deletedAt" as "deletedAt",
-          hg."id" as "hg_id",
-          hg."type" as "hg_type",
-          hg."name" as "hg_name",
-          COALESCE(
-            JSON_AGG(DISTINCT JSONB_BUILD_OBJECT('name', limited_hierarchies."name", 'type', limited_hierarchies.type)) 
-            FILTER (WHERE limited_hierarchies."name" IS NOT NULL), '[]'
-          )::TEXT AS hierarchies
-        FROM 
-          "RiskFactorData" rfd
-        LEFT JOIN
-          "HomogeneousGroup" hg ON hg."id" = rfd."homogeneousGroupId"
-        LEFT JOIN
-          "FilteredHierarchyOnHomogeneous" hh ON hh."homogeneousGroupId" = hg."id"
-        LEFT JOIN 
-          "Hierarchy" h ON h."id" = hh."hierarchyId"
-        LEFT JOIN 
-          "Hierarchy" h_parent_1 ON h_parent_1."id" = h."parentId"
-        LEFT JOIN 
-          "Hierarchy" h_parent_2 ON h_parent_2."id" = h_parent_1."parentId"
-        LEFT JOIN 
-          "Hierarchy" h_parent_3 ON h_parent_3."id" = h_parent_2."parentId"
-        LEFT JOIN 
-          "Hierarchy" h_parent_4 ON h_parent_4."id" = h_parent_3."parentId"
-        LEFT JOIN 
-          "Hierarchy" h_parent_5 ON h_parent_5."id" = h_parent_4."parentId"
-        LEFT JOIN 
-          "Hierarchy" h_children_1 ON h_children_1."parentId" = h."id"
-        LEFT JOIN
-          "Hierarchy" h_children_2 ON h_children_2."parentId" = h_children_1."id"
-        LEFT JOIN
-          "Hierarchy" h_children_3 ON h_children_3."parentId" = h_children_2."id"
-        LEFT JOIN
-          "Hierarchy" h_children_4 ON h_children_4."parentId" = h_children_3."id"
-        LEFT JOIN
-          "Hierarchy" h_children_5 ON h_children_5."parentId" = h_children_4."id"
-        LEFT JOIN LATERAL (
-          SELECT lateral_h."name", lateral_h."type"
-          FROM "Hierarchy" lateral_h
-          WHERE lateral_h."id" IN (h."id", h_parent_1."id", h_parent_2."id", h_parent_3."id", h_parent_4."id", h_children_1."id", h_children_2."id", h_children_3."id", h_children_4."id", h_children_5."id")
-        ) AS limited_hierarchies ON true
-        ${gerWhereRawPrisma(browseWhereParams)}
-        GROUP BY 
-          rfd."id",
-          rfd."createdAt",
-          rfd."level",
-          rfd."riskId",
-          rfd."companyId",
-          rfd."endDate",
-          rfd."deletedAt",
-          hg."id",
-          hg."type",
-          hg."name"
       )
       SELECT 
         rec."id" AS rec_id,
+        rec."recName" AS rec_name,
         rfd."id" AS rfd_id,
         rfd."createdAt" AS rfd_created_at, 
         rfd."level" AS rfd_level,
-        rec."recName" AS rec_name,
         rfd_rec."updated_at" AS rfd_rec_updated_at,
         rfd_rec."startDate" AS rfd_rec_start_date,
         rfd_rec."doneDate" AS rfd_rec_done_date,
         rfd_rec."canceledDate" AS rfd_rec_canceled_date,
-        rfd_rec."endDate" AS rfd_rec_endDate,
+        rfd_rec."endDate" AS rfd_rec_end_date,
         rfd_rec."status" AS rfd_rec_status,
         w."id" AS w_id,
-        dd."months_period_level_2",
-        dd."months_period_level_3",
-        dd."months_period_level_4",
-        dd."months_period_level_5",
+        dd."validityStart" as validity_start,
+        dd."validityEnd" as validity_end,
+        dd."months_period_level_2" as months_period_level_2,
+        dd."months_period_level_3" as months_period_level_3,
+        dd."months_period_level_4" as months_period_level_4,
+        dd."months_period_level_5" as months_period_level_5,
         risk."name" AS risk_name,
         risk."type" AS risk_type,
-        rfd."hg_type" AS hg_type,
-        rfd."hg_name" AS hg_name,
+        hg."type" AS hg_type,
+        hg."name" AS hg_name,
         cc."name" AS cc_name,
         cc."type" AS cc_type,
-        rfd."hierarchies"::JSONB AS hierarchies,
+        (array_agg(CASE WHEN hg."type" = 'HIERARCHY' THEN h."name" WHEN cc."name" IS NOT NULL THEN cc."name" ELSE hg."name" END))[1] AS origin,
+        COALESCE(
+          JSON_AGG(DISTINCT JSONB_BUILD_OBJECT('name', hierarchies."name", 'type', hierarchies.type)) 
+          FILTER (WHERE hierarchies."name" IS NOT NULL), '[]'
+        ) AS hierarchies,
         COALESCE(
           JSON_AGG(DISTINCT JSONB_BUILD_OBJECT('name', gs."name")) 
           FILTER (WHERE gs."name" IS NOT NULL), '[]'
         ) AS generateSources
       FROM 
-        "FilteredRiskFactorData" rfd
+        "RiskFactorData" rfd
       JOIN 
         "_recs" rec_to_rfd ON rec_to_rfd."B" = rfd."id"
       LEFT JOIN
@@ -138,19 +81,50 @@ export class ActionPlanDAO {
       LEFT JOIN 
         "RiskFactorDataRec" rfd_rec ON rfd_rec."riskFactorDataId" = rfd."id"
       LEFT JOIN
-        "CompanyCharacterization" cc ON cc."id" = rfd."hg_id"
+        "HomogeneousGroup" hg ON hg."id" = rfd."homogeneousGroupId"
+      LEFT JOIN
+        "FilteredHierarchyOnHomogeneous" hh ON hh."homogeneousGroupId" = hg."id"
+      LEFT JOIN 
+        "Hierarchy" h ON h."id" = hh."hierarchyId"
+      LEFT JOIN 
+        "Hierarchy" h_parent_1 ON h_parent_1."id" = h."parentId"
+      LEFT JOIN 
+        "Hierarchy" h_parent_2 ON h_parent_2."id" = h_parent_1."parentId"
+      LEFT JOIN 
+        "Hierarchy" h_parent_3 ON h_parent_3."id" = h_parent_2."parentId"
+      LEFT JOIN 
+        "Hierarchy" h_parent_4 ON h_parent_4."id" = h_parent_3."parentId"
+      LEFT JOIN 
+        "Hierarchy" h_parent_5 ON h_parent_5."id" = h_parent_4."parentId"
+      LEFT JOIN 
+        "Hierarchy" h_children_1 ON h_children_1."parentId" = h."id"
+      LEFT JOIN
+        "Hierarchy" h_children_2 ON h_children_2."parentId" = h_children_1."id"
+      LEFT JOIN
+        "Hierarchy" h_children_3 ON h_children_3."parentId" = h_children_2."id"
+      LEFT JOIN
+        "Hierarchy" h_children_4 ON h_children_4."parentId" = h_children_3."id"
+      LEFT JOIN
+        "Hierarchy" h_children_5 ON h_children_5."parentId" = h_children_4."id"
+      LEFT JOIN
+        "CompanyCharacterization" cc ON cc."id" = hg."id"
       LEFT JOIN
         "Workspace" w ON w."companyId" = rfd."companyId"
       LEFT JOIN
         "DocumentData" dd ON dd."workspaceId" = w."id"
-      ${gerWhereRawPrisma(filterWhereParams)}
+      LEFT JOIN LATERAL (
+        SELECT h_all."name", h_all."type"
+        FROM "Hierarchy" h_all
+        WHERE h_all."id" IN (h."id", h_parent_1."id", h_parent_2."id", h_parent_3."id", h_parent_4."id", h_children_1."id", h_children_2."id", h_children_3."id", h_children_4."id", h_children_5."id")
+        LIMIT 10
+      ) AS hierarchies ON true
+      ${gerWhereRawPrisma(whereParams)}
       GROUP BY 
-        rec."id",
-        rec."recName",
+      rec."id",
         rfd."id",
         rfd."createdAt",
         rfd."level",
-        rfd."hierarchies",
+        rec."recName",
         rfd_rec."updated_at",
         rfd_rec."startDate",
         rfd_rec."doneDate",
@@ -158,17 +132,20 @@ export class ActionPlanDAO {
         rfd_rec."endDate",
         rfd_rec."status",
         w."id",
+        dd."validityStart", 
+        dd."validityEnd",
         dd."months_period_level_2",
         dd."months_period_level_3",
         dd."months_period_level_4",
         dd."months_period_level_5",
         risk."name",
         risk."type",
-        rfd."hg_type",
-        rfd."hg_name",
+        hg."type",
+        hg."name",
         cc."name",
         cc."type"
-      LIMIT ${pagination.limit}
+      ${getOrderByRawPrisma(orderByParams)}
+      LIMIT ${1000}
       OFFSET ${pagination.offSet};
     `;
 
@@ -212,7 +189,7 @@ export class ActionPlanDAO {
 
     if (filters.search) {
       const search = `%${filters.search}%`
-      where.push(Prisma.sql`unaccent(lower(rfd.hg_name)) ILIKE unaccent(lower(${search}))`)
+      where.push(Prisma.sql`unaccent(lower(hg.name)) ILIKE unaccent(lower(${search}))`)
     }
 
     // if (filters.stageIds?.length) {
@@ -232,23 +209,37 @@ export class ActionPlanDAO {
   }
 
   private browseOrderBy(orderBy?: IActionPlanDAO.BrowseParams['orderBy']) {
+
     if (!orderBy) return []
 
-    const desiredOrder = [CharacterizationTypeEnum.GENERAL, CharacterizationTypeEnum.ADMINISTRATIVE, CharacterizationTypeEnum.OPERATION, CharacterizationTypeEnum.SUPPORT, CharacterizationTypeEnum.WORKSTATION, CharacterizationTypeEnum.ACTIVITIES, CharacterizationTypeEnum.EQUIPMENT]
+    //missing / hierarchy type / origin type / generateSource
 
     const map: Record<ActionPlanOrderByEnum, string> = {
-      [ActionPlanOrderByEnum.NAME]: 'cc.name',
-      [ActionPlanOrderByEnum.TYPE]: `CASE cc.type ${desiredOrder.map((type, index) => `WHEN '${type}' THEN ${index}`).join(' ')} ELSE ${desiredOrder.length} END`,
-      [ActionPlanOrderByEnum.CREATED_AT]: 'cc.created_at',
-      [ActionPlanOrderByEnum.UPDATED_AT]: 'cc.updated_at',
-      [ActionPlanOrderByEnum.DONE_AT]: 'cc.done_at',
-      [ActionPlanOrderByEnum.STAGE]: 'st.name',
-      [ActionPlanOrderByEnum.ORDER]: 'cc.order',
-      [ActionPlanOrderByEnum.PHOTOS]: 'total_photos',
-      [ActionPlanOrderByEnum.RISKS]: 'total_risks',
-      [ActionPlanOrderByEnum.HIERARCHY]: 'total_hierarchies',
-      [ActionPlanOrderByEnum.PROFILES]: 'total_profiles',
+      [ActionPlanOrderByEnum.UPDATED_AT]: 'rfd_rec_updated_at',
+      [ActionPlanOrderByEnum.CREATED_AT]: 'rfd_created_at',
+      [ActionPlanOrderByEnum.ORIGIN]: 'origin',
+      [ActionPlanOrderByEnum.ORIGIN_TYPE]: 'hg_type',
+      [ActionPlanOrderByEnum.CANCEL_DATE]: 'rfd_rec_canceled_date',
+      [ActionPlanOrderByEnum.DONE_DATE]: 'rfd_rec_done_date',
+      [ActionPlanOrderByEnum.START_DATE]: 'rfd_rec_start_date',
+      [ActionPlanOrderByEnum.LEVEL]: 'rfd_level',
+      [ActionPlanOrderByEnum.RISK]: 'risk_name',
+      [ActionPlanOrderByEnum.RECOMMENDATION]: 'rec_name',
+      [ActionPlanOrderByEnum.STATUS]: 'rfd_rec_status',
+
+      [ActionPlanOrderByEnum.VALID_DATE]: `
+        CASE 
+          WHEN rfd_rec."endDate" IS NOT NULL THEN rfd_rec."endDate" 
+          WHEN dd."validityStart" IS NULL THEN NULL::timestamp 
+          WHEN rfd."level" = 2 AND dd.months_period_level_2 IS NOT NULL THEN dd."validityStart" + dd.months_period_level_2 * INTERVAL '1 month' 
+          WHEN rfd."level" = 3 AND dd.months_period_level_3 IS NOT NULL THEN dd."validityStart" + dd.months_period_level_3 * INTERVAL '1 month' 
+          WHEN rfd."level" = 4 AND dd.months_period_level_4 IS NOT NULL THEN dd."validityStart" + dd.months_period_level_4 * INTERVAL '1 month' 
+          WHEN rfd."level" = 5 AND dd.months_period_level_5 IS NOT NULL THEN dd."validityStart" + dd.months_period_level_5 * INTERVAL '1 month' 
+          ELSE NULL::timestamp 
+        END`,
     }
+
+
 
     const orderByRaw = orderBy.map<IOrderByRawPrisma>(({ field, order }) => ({ column: map[field], order }))
 
