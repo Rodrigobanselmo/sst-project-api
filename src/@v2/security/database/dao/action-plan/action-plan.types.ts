@@ -24,13 +24,13 @@ export namespace IActionPlanDAO {
     filters: {
       companyId: string;
       search?: string;
-      status?: ActionPlanStatusEnum;
+      status?: ActionPlanStatusEnum[];
       workspaceIds?: string[];
       hierarchyIds?: string[];
       recommendationIds?: string[];
       generateSourceIds?: string[];
       riskIds?: string[];
-      level?: number[];
+      ocupationalRisks?: number[];
       isStarted?: boolean;
       isDone?: boolean;
       isCanceled?: boolean;

@@ -20,7 +20,7 @@ export type IActionPlanBrowseResultModelMapper = {
   rfd_rec_done_date: Date | null;
   rfd_rec_canceled_date: Date | null;
   rfd_rec_end_date: Date | null;
-  rfd_rec_status: ActionPlanStatusEnum;
+  rfd_rec_status: ActionPlanStatusEnum | null;
   w_id: string;
   validity_start: Date | null;
   validity_end: Date | null;
@@ -29,6 +29,7 @@ export type IActionPlanBrowseResultModelMapper = {
   months_period_level_4: number;
   months_period_level_5: number;
   risk_name: string;
+  risk_id: string;
   risk_type: RiskFactorsEnum;
   hg_name: string;
   hg_type: PrismaHomoTypeEnum | null;
@@ -36,13 +37,13 @@ export type IActionPlanBrowseResultModelMapper = {
   cc_type: PrismaCharacterizationTypeEnum | null;
   h_type: PrismaHierarchyEnum | null;
   h_name: string | null;
-  origin: string;
   hierarchies: {
     id: string;
     name: string;
     type: PrismaHierarchyEnum;
   }[];
   generatesources: {
+    id: string;
     name: string;
   }[];
 }
@@ -53,11 +54,10 @@ export class ActionPlanBrowseResultModelMapper {
       canceledDate: prisma.rfd_rec_canceled_date,
       createdAt: prisma.rfd_created_at,
       doneDate: prisma.rfd_rec_done_date,
-      ocupationalRiskLevel: prisma.rfd_level as IRiskLevelValues,
+      ocupationalRisk: prisma.rfd_level as IRiskLevelValues,
       startDate: prisma.rfd_rec_start_date,
-      status: ActionPlanStatusEnum[prisma.rfd_rec_status],
+      status: prisma.rfd_rec_status ? ActionPlanStatusEnum[prisma.rfd_rec_status] : ActionPlanStatusEnum.PENDING,
       updatedAt: prisma.rfd_rec_updated_at,
-      validDate: prisma.rfd_rec_end_date,
       uuid: {
         recommendationId: prisma.rec_id,
         riskDataId: prisma.rfd_id
@@ -74,7 +74,16 @@ export class ActionPlanBrowseResultModelMapper {
           type: HierarchyTypeEnum[prisma.h_type]
         } : null
       },
+      endDate: prisma.rfd_rec_end_date,
+      validityStart: prisma.validity_start,
+      periods: {
+        monthsLevel_2: prisma.months_period_level_2,
+        monthsLevel_3: prisma.months_period_level_3,
+        monthsLevel_4: prisma.months_period_level_4,
+        monthsLevel_5: prisma.months_period_level_5
+      },
       risk: {
+        id: prisma.risk_id,
         name: prisma.risk_name,
         type: RiskTypeEnum[prisma.risk_type]
       },
@@ -84,6 +93,7 @@ export class ActionPlanBrowseResultModelMapper {
       },
       generateSource: prisma.generatesources.map((generateSource) => ({
         name: generateSource.name,
+        id: generateSource.id
       })),
       hierarchies: prisma.hierarchies.map((hierarchy) => ({
         id: hierarchy.id,
