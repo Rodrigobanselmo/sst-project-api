@@ -17,7 +17,6 @@ export class BrowseActionPlanUseCase {
         companyId: params.companyId,
         workspaceIds: params.workspaceIds,
         search: params.search,
-        stageIds: params.stageIds
       }
     })
 

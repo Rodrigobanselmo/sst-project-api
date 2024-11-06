@@ -1,3 +1,4 @@
+import { ActionPlanStatusEnum } from "@/@v2/security/domain/enums/action-plan-status.enum";
 import { IOrderBy } from "@/@v2/shared/types/order-by.types";
 
 export enum ActionPlanOrderByEnum {
@@ -22,9 +23,18 @@ export namespace IActionPlanDAO {
     page?: number;
     filters: {
       companyId: string;
-      workspaceIds?: string[];
       search?: string;
-      stageIds?: number[];
+      status?: ActionPlanStatusEnum;
+      workspaceIds?: string[];
+      hierarchyIds?: string[];
+      recommendationIds?: string[];
+      generateSourceIds?: string[];
+      riskIds?: string[];
+      level?: number[];
+      isStarted?: boolean;
+      isDone?: boolean;
+      isCanceled?: boolean;
+      isExpired?: boolean;
     };
   }
 }

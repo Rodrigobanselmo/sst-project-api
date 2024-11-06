@@ -2,8 +2,8 @@ import { IsInt, IsString } from 'class-validator';
 
 export class DeleteStatusPath {
   @IsString()
-  companyId: string;
+  companyId!: string;
 
   @IsInt()
-  id: number;
+  id!: number;
 }

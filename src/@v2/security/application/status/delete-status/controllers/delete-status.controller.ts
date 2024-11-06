@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Param, Patch, UseGuards } from '@nestjs/common'
+import { Controller, Delete, Param, UseGuards } from '@nestjs/common'
 
 import { SecurityRoutes } from '@/@v2/security/constants/routes'
 import { JwtAuthGuard } from '@/@v2/shared/guards/jwt-auth.guard'

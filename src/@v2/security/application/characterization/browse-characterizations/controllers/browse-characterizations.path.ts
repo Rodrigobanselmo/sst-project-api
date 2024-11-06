@@ -2,8 +2,8 @@ import { IsString } from 'class-validator';
 
 export class BrowseCharacterizationPath {
   @IsString()
-  companyId: string;
+  companyId!: string;
 
   @IsString()
-  workspaceId: string;
+  workspaceId!: string;
 }

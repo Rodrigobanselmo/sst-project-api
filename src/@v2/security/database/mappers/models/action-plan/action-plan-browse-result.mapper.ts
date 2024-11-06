@@ -1,71 +1,95 @@
+import { ActionPlanStatusEnum } from '@/@v2/security/domain/enums/action-plan-status.enum';
 import { ActionPlanBrowseResultModel } from '@/@v2/security/domain/models/action-plan/action-plan-browse-result.model';
 import { HierarchyTypeEnum } from '@/@v2/shared/domain/enum/company/hierarchy-type.enum';
 import { CharacterizationTypeEnum } from '@/@v2/shared/domain/enum/security/characterization-type.enum';
-import { HierarchyEnum, CharacterizationTypeEnum as PrismaCharacterizationTypeEnum } from '@prisma/client';
+import { HomoTypeEnum } from '@/@v2/shared/domain/enum/security/homo-type.enum';
+import { RecommendationTypeEnum } from '@/@v2/shared/domain/enum/security/recommendation-type.enum';
+import { RiskTypeEnum } from '@/@v2/shared/domain/enum/security/risk-type.enum';
+import { IRiskLevelValues } from '@/@v2/shared/domain/types/security/risk-level-values.type';
+import { RiskFactorsEnum, HomoTypeEnum as PrismaHomoTypeEnum, HierarchyEnum as PrismaHierarchyEnum, CharacterizationTypeEnum as PrismaCharacterizationTypeEnum, RecTypeEnum as PrismaRecTypeEnum } from '@prisma/client';
 
 export type IActionPlanBrowseResultModelMapper = {
-  id: string;
-  created_at: Date;
-  updated_at: Date;
-  name: string;
-  type: PrismaCharacterizationTypeEnum;
-  done_at: string | null;
-  order: number | null;
-  filter_types: string[];
-  profiles: {
-    id: string;
-    name: string;
-  }[];
+  rec_id: string;
+  rec_name: string;
+  rec_type: PrismaRecTypeEnum
+  rfd_id: string;
+  rfd_created_at: Date;
+  rfd_level: number | null;
+  rfd_rec_updated_at: Date | null;
+  rfd_rec_start_date: Date | null;
+  rfd_rec_done_date: Date | null;
+  rfd_rec_canceled_date: Date | null;
+  rfd_rec_end_date: Date | null;
+  rfd_rec_status: ActionPlanStatusEnum;
+  w_id: string;
+  validity_start: Date | null;
+  validity_end: Date | null;
+  months_period_level_2: number;
+  months_period_level_3: number;
+  months_period_level_4: number;
+  months_period_level_5: number;
+  risk_name: string;
+  risk_type: RiskFactorsEnum;
+  hg_name: string;
+  hg_type: PrismaHomoTypeEnum | null;
+  cc_name: string | null;
+  cc_type: PrismaCharacterizationTypeEnum | null;
+  h_type: PrismaHierarchyEnum | null;
+  h_name: string | null;
+  origin: string;
   hierarchies: {
     id: string;
     name: string;
-    type: HierarchyEnum;
+    type: PrismaHierarchyEnum;
   }[];
-  riskfactors: {
-    id: string;
+  generatesources: {
     name: string;
   }[];
-  photos: {
-    id: string;
-    url: string;
-  }[];
-  stage: {
-    name: string | null;
-    color: string | null;
-  }
 }
 
 export class ActionPlanBrowseResultModelMapper {
   static toModel(prisma: IActionPlanBrowseResultModelMapper): ActionPlanBrowseResultModel {
     return new ActionPlanBrowseResultModel({
-      id: prisma.id,
-      createdAt: prisma.created_at,
-      updatedAt: prisma.updated_at,
-      name: prisma.name,
-      type: CharacterizationTypeEnum[prisma.type],
-      doneAt: prisma.done_at || undefined,
-      order: prisma.order || undefined,
-      profiles: prisma.profiles.map((profile) => ({
-        id: profile.id,
-        name: profile.name,
+      canceledDate: prisma.rfd_rec_canceled_date,
+      createdAt: prisma.rfd_created_at,
+      doneDate: prisma.rfd_rec_done_date,
+      ocupationalRiskLevel: prisma.rfd_level as IRiskLevelValues,
+      startDate: prisma.rfd_rec_start_date,
+      status: ActionPlanStatusEnum[prisma.rfd_rec_status],
+      updatedAt: prisma.rfd_rec_updated_at,
+      validDate: prisma.rfd_rec_end_date,
+      uuid: {
+        recommendationId: prisma.rec_id,
+        riskDataId: prisma.rfd_id
+      },
+      homogeneousGroup: {
+        name: prisma.hg_name,
+        type: prisma.hg_type ? HomoTypeEnum[prisma.hg_type] : null,
+        characterization: prisma.cc_name && prisma.cc_type ? {
+          name: prisma.cc_name,
+          type: CharacterizationTypeEnum[prisma.cc_type]
+        } : null,
+        hierarchy: prisma.h_name && prisma.h_type ? {
+          name: prisma.h_name,
+          type: HierarchyTypeEnum[prisma.h_type]
+        } : null
+      },
+      risk: {
+        name: prisma.risk_name,
+        type: RiskTypeEnum[prisma.risk_type]
+      },
+      recommendation: {
+        name: prisma.rec_name,
+        type: RecommendationTypeEnum[prisma.rec_type]
+      },
+      generateSource: prisma.generatesources.map((generateSource) => ({
+        name: generateSource.name,
       })),
       hierarchies: prisma.hierarchies.map((hierarchy) => ({
         id: hierarchy.id,
         name: hierarchy.name,
         type: HierarchyTypeEnum[hierarchy.type]
       })),
-      risks: prisma.riskfactors.map((riskfactor) => ({
-        id: riskfactor.id,
-        name: riskfactor.name,
-      })),
-      photos: prisma.photos.map((photo) => ({
-        id: photo.id,
-        url: photo.url,
-      })),
-      stage: prisma.stage.name ? {
-        name: prisma.stage.name,
-        color: prisma.stage.color || undefined,
-      } : undefined
     })
   }
 

@@ -1,5 +1,4 @@
-import { CharacterizationTypeEnum } from "@/@v2/shared/domain/enum/security/characterization-type.enum";
-import { OriginTypeEnum } from "../../enums/origin-type.enum";
+import { OriginTypeEnum } from "../../../../shared/domain/enum/security/origin-type.enum";
 
 export type IActionPlanBrowseFilterModel = {
     generateSources: ({ id: number; name: string; })[]

@@ -5,10 +5,10 @@ import { IsArray, IsEnum, IsInt, IsOptional, IsString, ValidateNested } from 'cl
 
 class OrderBy {
   @IsEnum(CharacterizationOrderByEnum)
-  field: CharacterizationOrderByEnum;
+  field!: CharacterizationOrderByEnum;
 
   @IsEnum(OrderByDirectionEnum)
-  order: OrderByDirectionEnum;
+  order!: OrderByDirectionEnum;
 }
 
 export class BrowseCharacterizationQuery {

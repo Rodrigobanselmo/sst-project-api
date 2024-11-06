@@ -5,10 +5,10 @@ import { IsArray, IsEnum, IsInt, IsOptional, IsString, ValidateNested } from 'cl
 
 class OrderBy {
   @IsEnum(ActionPlanOrderByEnum)
-  field: ActionPlanOrderByEnum;
+  field!: ActionPlanOrderByEnum;
 
   @IsEnum(OrderByDirectionEnum)
-  order: OrderByDirectionEnum;
+  order!: OrderByDirectionEnum;
 }
 
 export class BrowseActionPlanQuery {

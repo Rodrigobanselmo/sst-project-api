@@ -3,12 +3,10 @@ import { getOrderByRawPrisma, IOrderByRawPrisma } from '@/@v2/shared/utils/datab
 import { getPagination } from '@/@v2/shared/utils/database/get-pagination';
 import { gerWhereRawPrisma } from '@/@v2/shared/utils/database/get-where-raw-prisma';
 import { Injectable } from '@nestjs/common';
-import { CharacterizationTypeEnum, Prisma, StatusEnum } from '@prisma/client';
-import { IActionPlanDAO, ActionPlanOrderByEnum } from './action-plan.types';
+import { Prisma } from '@prisma/client';
 import { IActionPlanBrowseResultModelMapper } from '../../mappers/models/action-plan/action-plan-browse-result.mapper';
-import { IActionPlanBrowseFilterModelMapper } from '../../mappers/models/action-plan/action-plan-browse-filter.mapper';
 import { ActionPlanBrowseModelMapper } from '../../mappers/models/action-plan/action-plan-browse.mapper';
-import { OriginTypeEnum } from '@/@v2/security/domain/enums/origin-type.enum';
+import { ActionPlanOrderByEnum, IActionPlanDAO } from './action-plan.types';
 
 
 @Injectable()
@@ -27,14 +25,10 @@ export class ActionPlanDAO {
     const whereParams = [...browseWhereParams, ...filterWhereParams]
 
     const actionplansPromise = this.prisma.$queryRaw<IActionPlanBrowseResultModelMapper[]>`
-      WITH "FilteredHierarchyOnHomogeneous" AS (
-        SELECT hh."hierarchyId", hh."homogeneousGroupId" 
-        FROM "HierarchyOnHomogeneous" AS hh
-        WHERE "endDate" IS NULL
-      )
       SELECT 
         rec."id" AS rec_id,
         rec."recName" AS rec_name,
+        rec."recType" AS rec_type,
         rfd."id" AS rfd_id,
         rfd."createdAt" AS rfd_created_at, 
         rfd."level" AS rfd_level,
@@ -57,6 +51,8 @@ export class ActionPlanDAO {
         hg."name" AS hg_name,
         cc."name" AS cc_name,
         cc."type" AS cc_type,
+        (array_agg(h."type"))[1] AS h_type,
+        (array_agg(h."name"))[1] AS h_name,
         (array_agg(CASE WHEN hg."type" = 'HIERARCHY' THEN h."name" WHEN cc."name" IS NOT NULL THEN cc."name" ELSE hg."name" END))[1] AS origin,
         COALESCE(
           JSON_AGG(DISTINCT JSONB_BUILD_OBJECT('name', hierarchies."name", 'type', hierarchies.type)) 
@@ -83,7 +79,7 @@ export class ActionPlanDAO {
       LEFT JOIN
         "HomogeneousGroup" hg ON hg."id" = rfd."homogeneousGroupId"
       LEFT JOIN
-        "FilteredHierarchyOnHomogeneous" hh ON hh."homogeneousGroupId" = hg."id"
+        "HierarchyOnHomogeneous" hh ON hh."homogeneousGroupId" = hg."id" AND hh."endDate" IS NULL
       LEFT JOIN 
         "Hierarchy" h ON h."id" = hh."hierarchyId"
       LEFT JOIN 
@@ -116,11 +112,10 @@ export class ActionPlanDAO {
         SELECT h_all."name", h_all."type"
         FROM "Hierarchy" h_all
         WHERE h_all."id" IN (h."id", h_parent_1."id", h_parent_2."id", h_parent_3."id", h_parent_4."id", h_children_1."id", h_children_2."id", h_children_3."id", h_children_4."id", h_children_5."id")
-        LIMIT 10
       ) AS hierarchies ON true
       ${gerWhereRawPrisma(whereParams)}
       GROUP BY 
-      rec."id",
+        rec."id",
         rfd."id",
         rfd."createdAt",
         rfd."level",
@@ -167,11 +162,11 @@ export class ActionPlanDAO {
 
     return actionplans
 
-    return ActionPlanBrowseModelMapper.toModel({
-      results: actionplans,
-      pagination: { limit: pagination.limit, page: pagination.page, total: Number(totalActionPlans[0].total) },
-      filters: distinctFilters[0],
-    })
+    // return ActionPlanBrowseModelMapper.toModel({
+    //   results: actionplans,
+    //   pagination: { limit: pagination.limit, page: pagination.page, total: Number(totalActionPlans[0].total) },
+    //   filters: distinctFilters[0],
+    // })
   }
 
   private browseWhere(filters: IActionPlanDAO.BrowseParams['filters']) {
@@ -179,6 +174,7 @@ export class ActionPlanDAO {
       Prisma.sql`rfd."companyId" = ${filters.companyId}`,
       Prisma.sql`rfd."endDate" IS NULL`,
       Prisma.sql`rfd."deletedAt" IS NULL`,
+      Prisma.sql`w."id" IS NOT NULL`,
     ]
 
     return where

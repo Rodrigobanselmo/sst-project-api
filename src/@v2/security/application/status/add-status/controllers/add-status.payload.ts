@@ -3,7 +3,7 @@ import { IsEnum, IsOptional, IsString } from 'class-validator';
 
 export class AddStatusPayload {
   @IsString()
-  name: string;
+  name!: string;
 
   @IsString()
   @IsOptional()
@@ -11,7 +11,7 @@ export class AddStatusPayload {
 
   @IsString()
   @IsEnum(StatusTypeEnum)
-  type: StatusTypeEnum;
+  type!: StatusTypeEnum;
 }
 
 
