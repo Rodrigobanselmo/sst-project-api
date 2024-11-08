@@ -1,4 +1,4 @@
-import { CharacterizationDAO } from './../src/@v2/security/database/dao/characterization/characterization.dao';
+import { CharacterizationDAO } from '../src/@v2/security/database/dao/characterization/characterization.dao';
 import { OrderByDirectionEnum } from '../src/@v2/shared/types/order-by.types';
 import { PrismaClient } from '@prisma/client';
 import { ActionPlanDAO } from '../src/@v2/security/database/dao/action-plan/action-plan.dao';
@@ -31,6 +31,7 @@ const data = await new ActionPlanDAO(prisma).browse({
         // recommendationIds: ["52e056d1-40ab-4749-9a8f-07ceac162d31"],
         // riskIds: ["7406d7ed-d93a-466d-81ae-c4f052f6d525"],
         // status: ['PENDING'],
+        // responisbleIds: [1],
     },
     orderBy: [{
         field: ActionPlanOrderByEnum.ORIGIN,
@@ -40,7 +41,9 @@ const data = await new ActionPlanDAO(prisma).browse({
 
 // console.log(data[0])
 // console.log(data.map(d => d.uuid.recommendationId))
-console.log(data.length)
+console.log(JSON.stringify(data.results[0], null, 2))
+console.log(JSON.stringify(data.pagination, null, 2))
+console.log(JSON.stringify(data.filters, null, 2))
 console.timeEnd('prisma')
 
 // const data = await new CharacterizationDAO(prisma).browse({

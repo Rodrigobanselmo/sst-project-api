@@ -1594,6 +1594,9 @@ model RiskFactorDataRec {
   riskFactorData   RiskFactorData              @relation(fields: [riskFactorDataId], references: [id])
   comments         RiskFactorDataRecComments[]
 
+  responsible   User? @relation(fields: [responsibleId], references: [id])
+  responsibleId Int?
+
   @@unique([riskFactorDataId, recMedId, workspaceId])
 }
 
@@ -1722,6 +1725,7 @@ model User {
   coordinator       DocumentData[]
   recComments       RiskFactorDataRecComments[]
   recCommentsAnswer RiskFactorDataRecComments[] @relation("rec_comment_answer")
+  RiskFactorDataRec RiskFactorDataRec[]
 
   @@unique([id, name])
   @@index([email])

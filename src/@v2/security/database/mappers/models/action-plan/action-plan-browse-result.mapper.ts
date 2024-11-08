@@ -37,6 +37,8 @@ export type IActionPlanBrowseResultModelMapper = {
   cc_type: PrismaCharacterizationTypeEnum | null;
   h_type: PrismaHierarchyEnum | null;
   h_name: string | null;
+  resp_id: string | null;
+  resp_name: string | null;
   hierarchies: {
     id: string;
     name: string;
@@ -62,6 +64,10 @@ export class ActionPlanBrowseResultModelMapper {
         recommendationId: prisma.rec_id,
         riskDataId: prisma.rfd_id
       },
+      responsible: prisma.resp_id && prisma.resp_name ? {
+        id: prisma.resp_id,
+        name: prisma.resp_name
+      } : null,
       homogeneousGroup: {
         name: prisma.hg_name,
         type: prisma.hg_type ? HomoTypeEnum[prisma.hg_type] : null,
@@ -91,7 +97,7 @@ export class ActionPlanBrowseResultModelMapper {
         name: prisma.rec_name,
         type: RecommendationTypeEnum[prisma.rec_type]
       },
-      generateSource: prisma.generatesources.map((generateSource) => ({
+      generateSources: prisma.generatesources.map((generateSource) => ({
         name: generateSource.name,
         id: generateSource.id
       })),

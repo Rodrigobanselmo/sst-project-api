@@ -17,6 +17,7 @@ export class RiskDataRecEntity implements RiskFactorDataRec {
   doneDate: Date;
   canceledDate: Date;
   workspaceId: string;
+  responsibleId: number;
 
   constructor(partial: Partial<RiskDataRecEntity>) {
     Object.assign(this, partial);

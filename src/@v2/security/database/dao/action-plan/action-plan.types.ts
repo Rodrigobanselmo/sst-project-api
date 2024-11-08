@@ -14,6 +14,7 @@ export enum ActionPlanOrderByEnum {
   DONE_DATE = 'DONE_DATE',
   CANCEL_DATE = 'CANCEL_DATE',
   VALID_DATE = 'VALID_DATE',
+  RESPONSIBLE = 'RESPONSIBLE',
 }
 
 export namespace IActionPlanDAO {
@@ -25,6 +26,7 @@ export namespace IActionPlanDAO {
       companyId: string;
       search?: string;
       status?: ActionPlanStatusEnum[];
+      responisbleIds?: number[];
       workspaceIds?: string[];
       hierarchyIds?: string[];
       recommendationIds?: string[];

@@ -1,29 +1,17 @@
+import { ActionPlanStatusEnum } from '@/@v2/security/domain/enums/action-plan-status.enum';
 import { ActionPlanBrowseFilterModel } from '@/@v2/security/domain/models/action-plan/action-plan-browse-filter.model';
-import { CharacterizationTypeEnum as PrismaCharacterizationTypeEnum, Status as PrismaStatus } from '@prisma/client';
+import { CharacterizationTypeEnum as PrismaCharacterizationTypeEnum, StatusEnum as PrismaStatusEnum } from '@prisma/client';
 
 export type IActionPlanBrowseFilterModelMapper = {
-  filter_types: PrismaCharacterizationTypeEnum[] | null;
-  stages: (PrismaStatus | null)[] | null;
+  filter_status: PrismaStatusEnum[] | null
+  workspaces: { id: string; name: string }[] | null
 }
 
 export class ActionPlanBrowseFilterModelMapper {
   static toModel(prisma: IActionPlanBrowseFilterModelMapper): ActionPlanBrowseFilterModel {
-    return {} as any
-    // return new ActionPlanBrowseFilterModel({
-    //   types: prisma.filter_types?.map((type) => CharacterizationTypeEnum[type]) || [],
-    //   stages: prisma.stages?.map((stage) => {
-    //     if (!stage) return {
-    //       id: 0,
-    //       name: 'Sem Status',
-    //       color: undefined,
-    //     }
-
-    //     return {
-    //       id: stage.id,
-    //       name: stage.name,
-    //       color: stage.color || undefined,
-    //     }
-    //   }) || [],
-    // })
+    return new ActionPlanBrowseFilterModel({
+      status: prisma.filter_status?.map(status => ActionPlanStatusEnum[status]) || [],
+      workspaces: prisma.workspaces || [],
+    })
   }
 }

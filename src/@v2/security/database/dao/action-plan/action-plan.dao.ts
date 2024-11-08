@@ -1,14 +1,14 @@
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
+import { gerHavingRawPrisma } from '@/@v2/shared/utils/database/get-having-raw-prisma';
 import { getOrderByRawPrisma, IOrderByRawPrisma } from '@/@v2/shared/utils/database/get-order-by-raw-prisma';
 import { getPagination } from '@/@v2/shared/utils/database/get-pagination';
 import { gerWhereRawPrisma } from '@/@v2/shared/utils/database/get-where-raw-prisma';
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { ActionPlanBrowseResultModelMapper, IActionPlanBrowseResultModelMapper } from '../../mappers/models/action-plan/action-plan-browse-result.mapper';
+import { IActionPlanBrowseFilterModelMapper } from '../../mappers/models/action-plan/action-plan-browse-filter.mapper';
+import { IActionPlanBrowseResultModelMapper } from '../../mappers/models/action-plan/action-plan-browse-result.mapper';
 import { ActionPlanBrowseModelMapper } from '../../mappers/models/action-plan/action-plan-browse.mapper';
 import { ActionPlanOrderByEnum, IActionPlanDAO } from './action-plan.types';
-import { gerHavingRawPrisma } from '@/@v2/shared/utils/database/get-having-raw-prisma';
-import { ActionPlanStatusEnum } from '@/@v2/security/domain/enums/action-plan-status.enum';
 
 
 @Injectable()
@@ -55,6 +55,8 @@ export class ActionPlanDAO {
         hg."name" AS hg_name,
         cc."name" AS cc_name,
         cc."type" AS cc_type,
+        u_resp."id" AS resp_id,
+        u_resp."name" AS resp_name,
         (array_agg(h."type"))[1] AS h_type,
         (array_agg(h."name"))[1] AS h_name,
         (array_agg(
@@ -98,6 +100,8 @@ export class ActionPlanDAO {
         "GenerateSource" gs ON gs."id" = gs_to_rfd."A"
       LEFT JOIN 
         "RiskFactorDataRec" rfd_rec ON rfd_rec."riskFactorDataId" = rfd."id" AND rfd_rec."recMedId" = rec."id"
+      LEFT JOIN 
+        "User" u_resp ON u_resp."id" = rfd_rec."responsibleId"
       LEFT JOIN
         "HomogeneousGroup" hg ON hg."id" = rfd."homogeneousGroupId"
       LEFT JOIN
@@ -161,15 +165,20 @@ export class ActionPlanDAO {
         hg."type",
         hg."name",
         cc."name",
-        cc."type"
+        cc."type",
+        u_resp."id",
+        u_resp."name"
       ${gerHavingRawPrisma(filterHaving)}
       ${getOrderByRawPrisma(orderByParams)}
-      LIMIT ${10000}
+      LIMIT ${pagination.limit}
       OFFSET ${pagination.offSet};
     `;
 
-    const totalActionPlansPromise = this.prisma.$queryRaw<{ total: number }[]>`
-      SELECT COUNT(DISTINCT (rfd."id", rec."id")) AS total
+    const totalActionPlansPromise = this.prisma.$queryRaw<[{ total: number } & IActionPlanBrowseFilterModelMapper]>`
+      SELECT 
+        COUNT(DISTINCT (rfd."id", rec."id"))::integer AS total,
+        array_agg(DISTINCT CASE WHEN rfd_rec."status" is NULL THEN 'PENDING' ELSE rfd_rec."status"::TEXT END) AS filter_status,
+        json_agg(DISTINCT JSONB_BUILD_OBJECT('id', w.id, 'name', w.name)) AS workspaces
       FROM 
         "RiskFactorData" rfd
       JOIN 
@@ -187,6 +196,9 @@ export class ActionPlanDAO {
       ` : Prisma.sql``}
       LEFT JOIN 
         "RiskFactorDataRec" rfd_rec ON rfd_rec."riskFactorDataId" = rfd."id" AND rfd_rec."recMedId" = rec."id"
+      ${filters.responisbleIds?.length ? Prisma.sql`
+        LEFT JOIN  "User" u_resp ON u_resp."id" = rfd_rec."responsibleId"
+      ` : Prisma.sql``}
       LEFT JOIN
         "HomogeneousGroup" hg ON hg."id" = rfd."homogeneousGroupId"
       ${(filters.search || filters.hierarchyIds?.length) ? Prisma.sql`
@@ -224,25 +236,13 @@ export class ActionPlanDAO {
       ${gerWhereRawPrisma(whereTotalParams)}
     `;
 
-    // const distinctFiltersPromise = this.prisma.$queryRaw<IActionPlanBrowseFilterModelMapper[]>`
-    //   SELECT 
-    //     array_agg(DISTINCT cc.type) AS filter_types,
-    //     json_agg(DISTINCT s) AS stages
-    //   FROM "CompanyCharacterization" cc
-    //   LEFT JOIN "Status" s ON cc."stageId" = s.id
-    //   ${gerWhereRawPrisma(browseWhereParams)};
-    // `;
+    const [actionplans, totalActionPlans] = await Promise.all([actionplansPromise, totalActionPlansPromise])
 
-    const [actionplans, totalActionPlans, distinctFilters] = await Promise.all([actionplansPromise, totalActionPlansPromise, null])
-
-    console.log(totalActionPlans)
-    return ActionPlanBrowseResultModelMapper.toModels(actionplans)
-
-    // return ActionPlanBrowseModelMapper.toModel({
-    //   results: actionplans,
-    //   pagination: { limit: pagination.limit, page: pagination.page, total: Number(totalActionPlans[0].total) },
-    //   filters: distinctFilters[0],
-    // })
+    return ActionPlanBrowseModelMapper.toModel({
+      results: actionplans,
+      pagination: { limit: pagination.limit, page: pagination.page, total: Number(totalActionPlans[0].total) },
+      filters: totalActionPlans[0],
+    })
   }
 
   private browseWhere(filters: IActionPlanDAO.BrowseParams['filters']) {
@@ -279,6 +279,10 @@ export class ActionPlanDAO {
 
     if (filters.generateSourceIds?.length) {
       where.push(Prisma.sql`gs."id" IN (${Prisma.join(filters.generateSourceIds)})`)
+    }
+
+    if (filters.responisbleIds?.length) {
+      where.push(Prisma.sql`u_resp."id" IN (${Prisma.join(filters.responisbleIds)})`)
     }
 
     if (filters.recommendationIds?.length) {
@@ -380,12 +384,18 @@ export class ActionPlanDAO {
       [ActionPlanOrderByEnum.CANCEL_DATE]: 'rfd_rec_canceled_date',
       [ActionPlanOrderByEnum.DONE_DATE]: 'rfd_rec_done_date',
       [ActionPlanOrderByEnum.START_DATE]: 'rfd_rec_start_date',
-      [ActionPlanOrderByEnum.LEVEL]: 'rfd_level',
       [ActionPlanOrderByEnum.RISK]: 'risk_name',
       [ActionPlanOrderByEnum.RECOMMENDATION]: 'rec_name',
+      [ActionPlanOrderByEnum.RESPONSIBLE]: 'resp_name',
       [ActionPlanOrderByEnum.STATUS]: 'rfd_rec_status',
       [ActionPlanOrderByEnum.ORIGIN]: 'origin',
       [ActionPlanOrderByEnum.VALID_DATE]: `valid_date`,
+      [ActionPlanOrderByEnum.LEVEL]: `
+        CASE
+          WHEN rfd."level" IS NULL THEN 0
+          ELSE rfd."level"
+        END
+      `,
     }
 
 

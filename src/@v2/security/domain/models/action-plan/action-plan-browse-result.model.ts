@@ -18,10 +18,11 @@ export type IActionPlanBrowseResultModel = {
     canceledDate: Date | null;
     ocupationalRisk: IRiskLevelValues | null;
     recommendation: { name: string; type: RecommendationTypeEnum }
-    generateSource: { id: string; name: string; }[]
+    generateSources: { id: string; name: string; }[]
     status: ActionPlanStatusEnum;
     hierarchies: { name: string; type: HierarchyTypeEnum; }[];
     risk: { id: string; name: string; type: RiskTypeEnum }
+    responsible: { id: string; name: string; } | null
     homogeneousGroup: {
         name: string;
         type: HomoTypeEnum | null;
@@ -48,11 +49,12 @@ export class ActionPlanBrowseResultModel {
     validDate: Date | null;
     ocupationalRisk: IRiskLevelValues | null;
     recommendation: { name: string; type: RecommendationTypeEnum }
-    generateSource: { id: string; name: string; }[]
+    generateSources: { id: string; name: string; }[]
     risk: { id: string; name: string; type: RiskTypeEnum }
     origin: { name: string; type: OriginTypeEnum }
     status: ActionPlanStatusEnum;
     hierarchies: { name: string; type: HierarchyTypeEnum; }[];
+    responsible: { id: string; name: string; } | null
 
     constructor(params: IActionPlanBrowseResultModel) {
         this.uuid = {
@@ -66,7 +68,7 @@ export class ActionPlanBrowseResultModel {
         this.canceledDate = params.canceledDate;
         this.ocupationalRisk = params.ocupationalRisk;
         this.status = params.status;
-        this.generateSource = params.generateSource.map(source => ({
+        this.generateSources = params.generateSources.map(source => ({
             id: source.id,
             name: source.name,
         }));
@@ -79,6 +81,11 @@ export class ActionPlanBrowseResultModel {
             name: params.risk.name,
             type: params.risk.type
         };
+        this.responsible = params.responsible ? {
+            id: params.responsible.id,
+            name: params.responsible.name,
+        } : null
+
         this.hierarchies = params.hierarchies.map(hierarchy => ({
             name: hierarchy.name,
             type: hierarchy.type

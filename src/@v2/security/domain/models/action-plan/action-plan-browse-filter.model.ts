@@ -1,29 +1,34 @@
-import { OriginTypeEnum } from "../../../../shared/domain/enum/security/origin-type.enum";
+import { ActionPlanStatusEnum } from "../../enums/action-plan-status.enum";
 
 export type IActionPlanBrowseFilterModel = {
-    generateSources: ({ id: number; name: string; })[]
-    risks: ({ id: number; name: string; })[]
-    recommendations: ({ id: number; name: string; })[]
-    responsibles: ({ id: number; name: string; })[]
-    status: ({ id: number; name: string; })[]
+    status: ActionPlanStatusEnum[]
     workspaces: { id: string; name: string; }[];
-    type: OriginTypeEnum[]
+
+    // generateSources: ({ id: number; name: string; })[]
+    // risks: ({ id: number; name: string; })[]
+    // recommendations: ({ id: number; name: string; })[]
+    // responsibles: ({ id: number; name: string; })[]
 }
 
 export class ActionPlanBrowseFilterModel {
-    generateSources: ({ id: number; name: string; })[]
-    risks: ({ id: number; name: string; })[]
-    recommendations: ({ id: number; name: string; })[]
-    responsibles: ({ id: number; name: string; })[]
-    status: ({ id: number; name: string; })[]
-    type: OriginTypeEnum[]
+    status: ActionPlanStatusEnum[]
+    workspaces: { id: string; name: string; }[];
+
+    // generateSources: ({ id: number; name: string; })[]
+    // risks: ({ id: number; name: string; })[]
+    // recommendations: ({ id: number; name: string; })[]
+    // responsibles: ({ id: number; name: string; })[]
 
     constructor(params: IActionPlanBrowseFilterModel) {
-        this.generateSources = params.generateSources;
-        this.risks = params.risks;
-        this.recommendations = params.recommendations;
-        this.responsibles = params.responsibles
         this.status = params.status;
-        this.type = params.type;
+        this.workspaces = params.workspaces.map(workspace => ({
+            id: workspace.id,
+            name: workspace.name
+        }));
+
+        // this.generateSources = params.generateSources;
+        // this.risks = params.risks;
+        // this.recommendations = params.recommendations;
+        // this.responsibles = params.responsibles
     }
 }
