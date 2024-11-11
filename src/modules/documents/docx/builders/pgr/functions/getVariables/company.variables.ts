@@ -9,8 +9,8 @@ export const companyVariables = (company: CompanyEntity, workspace: WorkspaceEnt
   const consultant = company.receivingServiceContracts[0]?.applyingServiceCompany;
 
   return {
-    [VariablesPGREnum.CONSULTANT_NAME]: consultant ? `${consultant.name} ` : `${company.name}`,
-    [VariablesPGREnum.COMPANY_SIGNER_CITY]: consultant
+    [VariablesPGREnum.CONSULTANT_NAME]: consultant?.name ? `${consultant.name} ` : `${company.name}`,
+    [VariablesPGREnum.COMPANY_SIGNER_CITY]: consultant?.address
       ? `${consultant.address.city} – ${consultant.address.state}`
       : `${company.address.city} – ${company.address.state}`,
     [VariablesPGREnum.COMPANY_CNAE]: company?.primary_activity
