@@ -33,6 +33,7 @@ export class BrowseCharacterizationQuery {
   @IsArray()
   @IsOptional()
   @Type(() => Number)
+  @IsInt({ each: true })
   stageIds?: number[];
 }
 

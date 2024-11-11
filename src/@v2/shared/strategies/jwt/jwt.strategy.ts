@@ -18,7 +18,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt-v2') {
   async validate({ sub: userId, permissions }: JWTType): Promise<UserContext> {
     const userContext = new UserContext({
       user: {
-        id: userId,
+        id: Number(userId),
         permissions,
       },
     })
