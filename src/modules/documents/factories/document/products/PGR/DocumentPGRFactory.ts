@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { DocumentTypeEnum, HomoTypeEnum, StatusEnum } from '@prisma/client';
+import { CoverTypeEnum, DocumentTypeEnum, HomoTypeEnum, StatusEnum } from '@prisma/client';
 import { ISectionOptions } from 'docx';
 import { v4 } from 'uuid';
 import { asyncBatch } from '../../../../../../shared/utils/asyncBatch';
@@ -42,6 +42,7 @@ import {
   IUnlinkPaths,
 } from '../../types/IDocumentFactory.types';
 import { IDocumentPGRBody } from './types/pgr.types';
+import { DocumentCoverEntity } from '@/modules/company/entities/document-cover.entity';
 
 @Injectable()
 export class DocumentPGRFactory extends DocumentFactoryAbstractionCreator<IDocumentPGRBody, any> {
@@ -165,9 +166,14 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
     versions.unshift(version);
 
     const docId = body.id || v4();
-    const cover = company?.covers?.[0] || consultant?.covers?.[0] || {
+    const cover = company?.covers?.[0] || consultant?.covers?.[0] || new DocumentCoverEntity({
+      name: 'Capa PGR',
+      companyId,
+      description: 'Capa padrão do PGR',
+      id: 1,
+      acceptType: [CoverTypeEnum.PGR, CoverTypeEnum.PCSMO],
       json: { "coverProps": { "logoProps": { "x": 200, "y": 58, "maxLogoWidth": 212, "maxLogoHeight": 141 }, "titleProps": { "x": 103, "y": 310, "boxX": 464, "boxY": 0, "size": 28, "color": "FFFFFF" }, "companyProps": { "x": 103, "y": 510, "boxX": 464, "boxY": 0, "size": 14, "color": "FFFFFF" }, "versionProps": { "x": 103, "y": 480, "boxX": 464, "boxY": 0, "size": 14, "color": "FFFFFF" }, "backgroundImagePath": "images/cover/simple.png" } }
-    };
+    });
 
     return {
       company,
