@@ -165,7 +165,9 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
     versions.unshift(version);
 
     const docId = body.id || v4();
-    const cover = company?.covers?.[0] || consultant?.covers?.[0];
+    const cover = company?.covers?.[0] || consultant?.covers?.[0] || {
+      json: { "coverProps": { "logoProps": { "x": 200, "y": 58, "maxLogoWidth": 212, "maxLogoHeight": 141 }, "titleProps": { "x": 103, "y": 310, "boxX": 464, "boxY": 0, "size": 28, "color": "FFFFFF" }, "companyProps": { "x": 103, "y": 510, "boxX": 464, "boxY": 0, "size": 14, "color": "FFFFFF" }, "versionProps": { "x": 103, "y": 480, "boxX": 464, "boxY": 0, "size": 14, "color": "FFFFFF" }, "backgroundImagePath": "images/cover/simple.png" } }
+    };
 
     return {
       company,
