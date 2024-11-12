@@ -1,9 +1,8 @@
 import { StatusEnum } from '@prisma/client';
 import { ActionPlanEntity } from '../../../domain/entities/action-plan.entity';
 import { ActionPlanStatusEnum } from '../../../domain/enums/action-plan-status.enum';
-import { CommentMapper, ICommentEntityMapper } from './comment.mapper';
 
-type IActionPlanEntityMapper = {
+export type IActionPlanEntityMapper = {
   companyId: string
   recMedId: string
   riskFactorDataId: string
@@ -14,7 +13,6 @@ type IActionPlanEntityMapper = {
   canceledDate?: Date | null
   responsibleId?: number | null
   endDate: Date | null
-  comments: ICommentEntityMapper[]
 }
 
 export class ActionPlanMapper {
@@ -30,7 +28,6 @@ export class ActionPlanMapper {
       canceledDate: data.canceledDate,
       responsibleId: data.responsibleId,
       validDate: data.endDate,
-      comments: CommentMapper.toArrayEntity(data.comments)
     })
   }
 }

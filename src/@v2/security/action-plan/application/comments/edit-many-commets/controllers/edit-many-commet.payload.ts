@@ -5,17 +5,16 @@ import { IsArray, IsBoolean, IsEnum, IsInt, IsOptional, IsString, ValidateNested
 
 export class EditManyCommentPayload {
   @IsArray()
-  @Type(() => Number)
-  @IsInt({ each: true })
-  ids?: number[];
+  @Type(() => String)
+  @IsString({ each: true })
+  ids: string[];
 
   @IsBoolean()
-  @IsOptional()
-  isApproved?: boolean;
+  @Type(() => Boolean)
+  isApproved: boolean;
 
   @IsString()
   @IsOptional()
   approvedComment?: string | null;
 }
-
 

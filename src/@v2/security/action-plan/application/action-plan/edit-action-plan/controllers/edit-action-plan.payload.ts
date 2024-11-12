@@ -1,7 +1,7 @@
 import { ActionPlanStatusEnum } from '@/@v2/security/action-plan/domain/enums/action-plan-status.enum';
 import { CommentTextTypeEnum } from '@/@v2/security/action-plan/domain/enums/comment-text-type.enum';
 import { Type } from 'class-transformer';
-import { IsDate, IsEnum, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsDate, IsEnum, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 
 class Comment {
@@ -24,7 +24,7 @@ export class EditActionPlanPayload {
   @IsString()
   workspaceId!: string;
 
-  @IsString()
+  @IsInt()
   @IsOptional()
   responsibleId?: number | null;
 

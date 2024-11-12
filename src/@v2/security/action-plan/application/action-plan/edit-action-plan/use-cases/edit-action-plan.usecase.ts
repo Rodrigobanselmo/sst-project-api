@@ -1,4 +1,4 @@
-import { ActionPlanRepository } from '@/@v2/security/action-plan/database/repositories/action-plan/action-plan.repository'
+import { ActionPlanAggregateRepository } from '@/@v2/security/action-plan/database/repositories/action-plan/action-plan-aggregate.repository'
 import { EditActionPlanService } from '@/@v2/security/action-plan/services/edit-action-plan/edit-action-plan.service'
 import { LocalContext, UserContext } from '@/@v2/shared/adapters/context'
 import { ContextKey } from '@/@v2/shared/adapters/context/types/enum/context-key.enum'
@@ -12,7 +12,7 @@ export class EditActionPlanUseCase {
     @Inject(SharedTokens.Context)
     private readonly context: LocalContext,
     private readonly editActionPlanService: EditActionPlanService,
-    private readonly actionPlanRepository: ActionPlanRepository,
+    private readonly actionPlanRepository: ActionPlanAggregateRepository,
   ) { }
 
   async execute(params: IEditActionPlanUseCase.Params) {

@@ -1,25 +1,25 @@
-import { ActionPlanRepository } from '@/@v2/security/action-plan/database/repositories/action-plan/action-plan.repository'
+import { ActionPlanAggregateRepository } from '@/@v2/security/action-plan/database/repositories/action-plan/action-plan-aggregate.repository'
 import { Injectable } from '@nestjs/common'
 import { IEditActionPlanService } from './edit-action-plan.service.types'
 
 @Injectable()
 export class EditActionPlanService {
   constructor(
-    private readonly actionPlanRepository: ActionPlanRepository
+    private readonly actionPlanAggregateRepository: ActionPlanAggregateRepository
   ) { }
 
   async update(params: IEditActionPlanService.Params) {
-    const actionPlan = await this.actionPlanRepository.findById({
+    const aggregare = await this.actionPlanAggregateRepository.findById({
       companyId: params.companyId,
       recommendationId: params.recommendationId,
       riskDataId: params.riskDataId,
       workspaceId: params.workspaceId
     })
 
-    actionPlan.responsibleId = params.responsibleId
+    aggregare.actionPlan.responsibleId = params.responsibleId
 
     if (params.validDate !== undefined) {
-      actionPlan.setValidDate({
+      aggregare.setValidDate({
         validDate: params.validDate,
         comment: {
           text: params.comment.text,
@@ -30,7 +30,7 @@ export class EditActionPlanService {
     }
 
     if (params.status) {
-      actionPlan.setStatus({
+      aggregare.setStatus({
         status: params.status,
         comment: {
           text: params.comment.text,
@@ -40,6 +40,6 @@ export class EditActionPlanService {
       })
     }
 
-    return actionPlan
+    return aggregare
   }
 }

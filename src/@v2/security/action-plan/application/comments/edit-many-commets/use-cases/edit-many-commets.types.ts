@@ -1,8 +1,8 @@
 
 export namespace IEditCommentUseCase {
   export type Params = {
+    ids?: string[];
     companyId: string
-    ids?: number[];
     isApproved?: boolean;
     approvedComment?: string | null;
   }

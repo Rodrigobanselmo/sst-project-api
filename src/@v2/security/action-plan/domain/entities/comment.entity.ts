@@ -1,12 +1,6 @@
 import { CommentTextTypeEnum } from "../enums/comment-text-type.enum";
 import { CommentTypeEnum } from "../enums/comment-type.enum";
 
-type IUpdateApprovement = {
-  isApproved: boolean;
-  approvedById: number;
-  approvedComment: string | null;
-}
-
 export type ICommentEntity = {
   id?: string;
   text: string
@@ -60,12 +54,5 @@ export class CommentEntity {
 
   get approvedById() {
     return this._approvedById;
-  }
-
-  approve({ approvedById, isApproved, approvedComment }: IUpdateApprovement) {
-    this._isApproved = isApproved;
-    this._approvedAt = new Date();
-    this._approvedComment = approvedComment;
-    this._approvedById = approvedById;
   }
 }

@@ -9,6 +9,7 @@ import { IActionPlanBrowseFilterModelMapper } from '../../mappers/models/action-
 import { IActionPlanBrowseResultModelMapper } from '../../mappers/models/action-plan/action-plan-browse-result.mapper';
 import { ActionPlanBrowseModelMapper } from '../../mappers/models/action-plan/action-plan-browse.mapper';
 import { ActionPlanOrderByEnum, IActionPlanDAO } from './action-plan.types';
+import { ActionPlanStatusEnum } from '../../../domain/enums/action-plan-status.enum';
 
 
 @Injectable()
@@ -375,7 +376,7 @@ export class ActionPlanDAO {
 
     if (!orderBy) return []
 
-    //missing / hierarchy type / origin type / generateSource
+    const desiredOrder = [ActionPlanStatusEnum.REJECTED, ActionPlanStatusEnum.PROGRESS, ActionPlanStatusEnum.PENDING, ActionPlanStatusEnum.DONE, ActionPlanStatusEnum.CANCELED]
 
     const map: Record<ActionPlanOrderByEnum, string> = {
       [ActionPlanOrderByEnum.UPDATED_AT]: 'rfd_rec_updated_at',
@@ -387,7 +388,7 @@ export class ActionPlanDAO {
       [ActionPlanOrderByEnum.RISK]: 'risk_name',
       [ActionPlanOrderByEnum.RECOMMENDATION]: 'rec_name',
       [ActionPlanOrderByEnum.RESPONSIBLE]: 'resp_name',
-      [ActionPlanOrderByEnum.STATUS]: 'rfd_rec_status',
+      [ActionPlanOrderByEnum.STATUS]: `CASE rfd_rec_status ${desiredOrder.map((type, index) => `WHEN '${type}' THEN ${index}`).join(' ')} ELSE ${desiredOrder.length} END`,
       [ActionPlanOrderByEnum.ORIGIN]: 'origin',
       [ActionPlanOrderByEnum.VALID_DATE]: `valid_date`,
       [ActionPlanOrderByEnum.LEVEL]: `

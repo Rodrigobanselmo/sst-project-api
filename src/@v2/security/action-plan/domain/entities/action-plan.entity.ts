@@ -1,29 +1,6 @@
-import { DomainError } from "@/@v2/shared/domain/error/domain-error.error";
-import { ActionPlanStatusEnum } from "../enums/action-plan-status.enum";
-import { CommentTextTypeEnum } from "../enums/comment-text-type.enum";
-import { CommentTypeEnum } from "../enums/comment-type.enum";
-import { errorCommentRequired, errorCommentTextRequired } from "../errors/diagnose.errors";
-import { CommentEntity } from "./comment.entity";
-import { DomainResponse } from "@/@v2/shared/domain/types/shared/domain-response";
 import { updateField } from "@/@v2/shared/domain/helpers/update-field.helper";
-
-type ISetStatus = {
-  comment?: {
-    text?: string
-    textType?: CommentTextTypeEnum
-    commentedById: number;
-  }
-  status: ActionPlanStatusEnum
-}
-
-type ISetValidDate = {
-  comment: {
-    text?: string
-    textType?: CommentTextTypeEnum
-    commentedById: number;
-  }
-  validDate: Date | null
-}
+import { ActionPlanStatusEnum } from "../enums/action-plan-status.enum";
+import { CommentEntity } from "./comment.entity";
 
 export type IActionPlanEntity = {
   companyId: string
@@ -37,8 +14,6 @@ export type IActionPlanEntity = {
   canceledDate?: Date | null
   responsibleId?: number | null
   validDate: Date | null
-
-  comments: CommentEntity[]
 }
 
 export class ActionPlanEntity {
@@ -47,14 +22,12 @@ export class ActionPlanEntity {
   readonly riskDataId: string
   readonly workspaceId: string
 
-  protected _responsibleId: number | null
-  protected _status: ActionPlanStatusEnum;
-  protected _startDate: Date | null
-  protected _doneDate: Date | null
-  protected _canceledDate: Date | null
-  protected _validDate: Date | null
-
-  comments: CommentEntity[]
+  _responsibleId: number | null
+  _status: ActionPlanStatusEnum;
+  _startDate: Date | null
+  _doneDate: Date | null
+  _canceledDate: Date | null
+  _validDate: Date | null
 
   constructor(params: IActionPlanEntity) {
     this.companyId = params.companyId;
@@ -68,8 +41,6 @@ export class ActionPlanEntity {
     this._doneDate = params.doneDate;
     this._canceledDate = params.canceledDate;
     this._validDate = params.validDate;
-
-    this.comments = params.comments;
   }
 
   get responsibleId() {
@@ -100,59 +71,4 @@ export class ActionPlanEntity {
     return this._validDate;
   }
 
-  setValidDate({ validDate, comment }: ISetValidDate): DomainResponse {
-    if (!comment.text || !comment.textType) return [, errorCommentTextRequired];
-
-    this.comments.push(new CommentEntity({
-      text: comment.text,
-      textType: comment.textType,
-      commentedById: comment.commentedById,
-      type: CommentTypeEnum.POSTPONED,
-    }));
-
-    this._validDate = validDate;
-
-    return [, null];
-  }
-
-  setStatus({ status, comment }: ISetStatus): DomainResponse {
-    if (status === ActionPlanStatusEnum.DONE) {
-      if (!comment) return [, errorCommentRequired];
-
-      this._doneDate = new Date();
-      this.comments.push(new CommentEntity({
-        text: comment.text || null,
-        textType: comment.textType || null,
-        commentedById: comment.commentedById,
-        type: CommentTypeEnum.DONE,
-      }));
-    }
-
-    else if (status === ActionPlanStatusEnum.PROGRESS) {
-      this._startDate = new Date();
-    }
-
-    else if (status === ActionPlanStatusEnum.PENDING) {
-      this._startDate = null;
-      this._doneDate = null;
-      this._canceledDate = null;
-    }
-
-    else if (status === ActionPlanStatusEnum.CANCELED) {
-      if (!comment) return [, errorCommentRequired];
-      if (!comment.text || !comment.textType) return [, errorCommentTextRequired];
-
-      this._canceledDate = new Date();
-      this.comments.push(new CommentEntity({
-        text: comment.text,
-        textType: comment.textType,
-        commentedById: comment.commentedById,
-        type: CommentTypeEnum.CANCELED,
-      }));
-
-    }
-
-    this._status = status;
-    return [, null];
-  }
 }

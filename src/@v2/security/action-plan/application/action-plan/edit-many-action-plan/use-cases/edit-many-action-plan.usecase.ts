@@ -1,4 +1,4 @@
-import { ActionPlanRepository } from '@/@v2/security/action-plan/database/repositories/action-plan/action-plan.repository'
+import { ActionPlanAggregateRepository } from '@/@v2/security/action-plan/database/repositories/action-plan/action-plan-aggregate.repository'
 import { Inject, Injectable } from '@nestjs/common'
 import { LocalContext, UserContext } from '@/@v2/shared/adapters/context'
 import { SharedTokens } from '@/@v2/shared/constants/tokens'
@@ -13,7 +13,7 @@ export class EditManyActionPlanUseCase {
     @Inject(SharedTokens.Context)
     private readonly context: LocalContext,
     private readonly editActionPlanService: EditActionPlanService,
-    private readonly actionPlanRepository: ActionPlanRepository
+    private readonly actionPlanRepository: ActionPlanAggregateRepository
   ) { }
 
   async execute(params: IEditManyActionPlanUseCase.Params) {

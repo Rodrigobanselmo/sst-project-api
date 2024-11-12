@@ -4,15 +4,15 @@ import { SecurityRoutes } from '@/@v2/security/action-plan/constants/routes'
 import { JwtAuthGuard } from '@/@v2/shared/guards/jwt-auth.guard'
 import { PermissionEnum } from '@/shared/constants/enum/authorization'
 import { Permissions } from '@/shared/decorators/permissions.decorator'
-import { EditCommentUseCase } from '../use-cases/edit-commet.usecase'
-import { EditCommentPath } from './edit-commet.path'
+import { EditManyCommentsUseCase } from '../use-cases/edit-many-commets.usecase'
+import { EditCommentPath } from './edit-many-commet.path'
 import { EditManyCommentPayload } from './edit-many-commet.payload'
 
 @Controller(SecurityRoutes.COMMENT.EDIT_MANY)
 @UseGuards(JwtAuthGuard)
-export class EditCommentController {
+export class EditManyCommentController {
   constructor(
-    private readonly editCommentUseCase: EditCommentUseCase
+    private readonly editManyCommentsUseCase: EditManyCommentsUseCase
   ) { }
 
   @Get()
@@ -23,7 +23,7 @@ export class EditCommentController {
     crud: true,
   })
   async edit(@Param() path: EditCommentPath, @Body() body: EditManyCommentPayload) {
-    return this.editCommentUseCase.execute({
+    return this.editManyCommentsUseCase.execute({
       companyId: path.companyId,
       ...body
     })
