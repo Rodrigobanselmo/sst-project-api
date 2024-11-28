@@ -10,7 +10,7 @@ import { getValidDateActionPlan } from "@/@v2/shared/domain/functions/security/g
 import { OriginTypeEnum } from "@/@v2/shared/domain/enum/security/origin-type.enum";
 
 export type IActionPlanBrowseResultModel = {
-    uuid: { riskDataId: string; recommendationId: string; };
+    uuid: { riskDataId: string; recommendationId: string; workspaceId: string };
     createdAt: Date;
     updatedAt: Date | null;
     startDate: Date | null;
@@ -40,7 +40,7 @@ export type IActionPlanBrowseResultModel = {
 }
 
 export class ActionPlanBrowseResultModel {
-    uuid: { riskDataId: string; recommendationId: string; };
+    uuid: { riskDataId: string; recommendationId: string; workspaceId: string };
     createdAt: Date;
     updatedAt: Date | null;
     startDate: Date | null;
@@ -59,7 +59,8 @@ export class ActionPlanBrowseResultModel {
     constructor(params: IActionPlanBrowseResultModel) {
         this.uuid = {
             recommendationId: params.uuid.recommendationId,
-            riskDataId: params.uuid.riskDataId
+            riskDataId: params.uuid.riskDataId,
+            workspaceId: params.uuid.workspaceId
         };
         this.createdAt = params.createdAt;
         this.updatedAt = params.updatedAt;

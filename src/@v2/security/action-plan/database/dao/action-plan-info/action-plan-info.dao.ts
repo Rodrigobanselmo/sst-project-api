@@ -1,7 +1,7 @@
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { DocumentTypeEnum } from '@prisma/client';
-import { ActionPlanInfoModelMapper } from '../../mappers/models/action-plan-info/action-plan-info-find.mapper';
+import { ActionPlanInfoModelMapper } from '../../mappers/models/action-plan-info/action-plan-info.model';
 import { IActionPlanInfoDAO } from './action-plan-info.types';
 
 

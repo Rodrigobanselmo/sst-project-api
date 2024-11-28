@@ -1,4 +1,4 @@
-import { RiskFactorDataRecComments, RiskRecTextTypeEnum, RiskRecTypeEnum } from '@prisma/client';
+import { $Enums, RiskFactorDataRecComments, RiskRecTextTypeEnum, RiskRecTypeEnum } from '@prisma/client';
 
 export class RiskDataRecCommentsEntity implements RiskFactorDataRecComments {
   id: string;
@@ -13,6 +13,8 @@ export class RiskDataRecCommentsEntity implements RiskFactorDataRecComments {
   approvedAt: Date;
   approvedComment: string;
   approvedById: number;
+  previous_status: $Enums.StatusEnum;
+  previous_valid_date: Date;
 
   constructor(partial: Partial<RiskDataRecCommentsEntity>) {
     Object.assign(this, partial);

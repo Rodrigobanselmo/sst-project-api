@@ -3,7 +3,7 @@ import { EditActionPlanService } from '@/@v2/security/action-plan/services/edit-
 import { LocalContext, UserContext } from '@/@v2/shared/adapters/context'
 import { ContextKey } from '@/@v2/shared/adapters/context/types/enum/context-key.enum'
 import { SharedTokens } from '@/@v2/shared/constants/tokens'
-import { Inject, Injectable } from '@nestjs/common'
+import { BadRequestException, Inject, Injectable } from '@nestjs/common'
 import { IEditActionPlanUseCase } from './edit-action-plan.types'
 
 @Injectable()
@@ -22,6 +22,8 @@ export class EditActionPlanUseCase {
       comment: params.comment,
       ...params,
     })
+
+    if (!actionPlan) throw new BadRequestException('Plano de ação não encontrado')
 
     await this.actionPlanRepository.update(actionPlan)
   }

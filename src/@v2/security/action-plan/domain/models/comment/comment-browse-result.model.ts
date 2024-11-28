@@ -1,3 +1,4 @@
+import { ActionPlanStatusEnum } from "../../enums/action-plan-status.enum";
 import { CommentTextTypeEnum } from "../../enums/comment-text-type.enum";
 import { CommentTypeEnum } from "../../enums/comment-type.enum";
 
@@ -13,6 +14,10 @@ export type ICommentBrowseResultModel = {
     approvedAt: Date | null;
     approvedComment: string | null;
 
+    changes: {
+        status: ActionPlanStatusEnum | undefined;
+        validDate: Date | undefined;
+    }
     approvedBy: { id: number; name: string; email: string } | null;
     createdBy: { id: number; name: string; email: string; } | null
 }
@@ -29,6 +34,11 @@ export class CommentBrowseResultModel {
     approvedAt: Date | null;
     approvedComment: string | null;
 
+    changes: {
+        status: ActionPlanStatusEnum | undefined;
+        validDate: Date | undefined;
+    }
+
     approvedBy: { id: number; name: string; email: string } | null;
     createdBy: { id: number; name: string; email: string; } | null
 
@@ -44,6 +54,7 @@ export class CommentBrowseResultModel {
         this.approvedAt = params.approvedAt;
         this.approvedComment = params.approvedComment;
 
+        this.changes = params.changes;
         this.approvedBy = params.approvedBy;
         this.createdBy = params.createdBy;
     }

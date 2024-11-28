@@ -3,20 +3,31 @@ import { Prisma } from '@prisma/client'
 import { IActionPlanAggregateRepository } from './action-plan-aggregate.types'
 import { asyncBatch } from '@/@v2/shared/utils/helpers/asyncBatch'
 import { ActionPlanAggregateMapper } from '../../mappers/aggregations/action-plan.mapper'
+import { Injectable } from '@nestjs/common'
 
-
+@Injectable()
 export class ActionPlanAggregateRepository implements IActionPlanAggregateRepository {
   constructor(private readonly prisma: PrismaServiceV2) { }
 
-  static selectOptions({ workspaceId }: { workspaceId: string }) {
-    const include = {
-      comments: true,
+  static selectOptions(params: IActionPlanAggregateRepository.SelectOptionsParams) {
+    const select = {
+      dataRecs: {
+        where: {
+          companyId: params.companyId,
+          recMedId: params.recommendationId,
+          riskFactorDataId: params.riskDataId,
+          workspaceId: params.workspaceId,
+        },
+        include: {
+          comments: true,
+        }
+      },
       company: {
         select: {
           documentData: {
             where: {
               type: 'PGR',
-              workspaceId,
+              workspaceId: params.workspaceId,
             },
             select: {
               coordinator: true
@@ -24,27 +35,30 @@ export class ActionPlanAggregateRepository implements IActionPlanAggregateReposi
           }
         }
       }
-    } satisfies Prisma.RiskFactorDataRecFindFirstArgs['include']
+    } satisfies Prisma.RiskFactorDataFindFirstArgs['select']
 
-    return { include }
+    return { select }
   }
 
   async findById(params: IActionPlanAggregateRepository.FindByIdParams): IActionPlanAggregateRepository.FindByIdReturn {
-    const actionPlan = await this.prisma.riskFactorDataRec.findFirst({
+    const actionPlan = await this.prisma.riskFactorData.findFirst({
       where: {
-        recMedId: params.recommendationId,
-        riskFactorDataId: params.riskDataId,
-        workspaceId: params.workspaceId,
-        companyId: params.companyId
+        id: params.riskDataId,
+        companyId: params.companyId,
+        recs: {
+          some: {
+            id: params.recommendationId
+          }
+        },
       },
-      ...ActionPlanAggregateRepository.selectOptions({ workspaceId: params.workspaceId })
+      ...ActionPlanAggregateRepository.selectOptions(params)
     })
 
-    return actionPlan ? ActionPlanAggregateMapper.toAggregate(actionPlan) : null
+    return actionPlan ? ActionPlanAggregateMapper.toAggregate({ ...actionPlan, ...params }) : null
   }
 
   async update(params: IActionPlanAggregateRepository.UpdateParams): IActionPlanAggregateRepository.UpdateReturn {
-    const actionPlan = await this.prisma.riskFactorDataRec.upsert({
+    await this.prisma.riskFactorDataRec.upsert({
       where: {
         companyId: params.actionPlan.companyId,
         riskFactorDataId_recMedId_workspaceId: {
@@ -93,10 +107,7 @@ export class ActionPlanAggregateRepository implements IActionPlanAggregateReposi
           }
         }
       },
-      ...ActionPlanAggregateRepository.selectOptions({ workspaceId: params.actionPlan.workspaceId })
     })
-
-    return actionPlan ? ActionPlanAggregateMapper.toAggregate(actionPlan) : null
   }
 
   async updateMany(params: IActionPlanAggregateRepository.UpdateManyParams): IActionPlanAggregateRepository.UpdateManyReturn {

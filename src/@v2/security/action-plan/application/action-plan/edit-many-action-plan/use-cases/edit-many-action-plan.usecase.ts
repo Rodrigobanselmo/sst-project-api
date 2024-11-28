@@ -1,5 +1,5 @@
 import { ActionPlanAggregateRepository } from '@/@v2/security/action-plan/database/repositories/action-plan/action-plan-aggregate.repository'
-import { Inject, Injectable } from '@nestjs/common'
+import { BadRequestException, Inject, Injectable } from '@nestjs/common'
 import { LocalContext, UserContext } from '@/@v2/shared/adapters/context'
 import { SharedTokens } from '@/@v2/shared/constants/tokens'
 import { ContextKey } from '@/@v2/shared/adapters/context/types/enum/context-key.enum'
@@ -23,7 +23,7 @@ export class EditManyActionPlanUseCase {
       items: params.ids,
       batchSize: 10,
       callback: async ({ riskDataId, recommendationId, workspaceId }) => {
-        return this.editActionPlanService.update({
+        const actionPlan = await this.editActionPlanService.update({
           companyId: params.companyId,
           userId: loggedUser.id,
           recommendationId,
@@ -34,6 +34,9 @@ export class EditManyActionPlanUseCase {
           status: params.status,
           comment: params.comment
         })
+
+        if (!actionPlan) throw new BadRequestException('Plano de ação não encontrado')
+        return actionPlan
       }
     })
 

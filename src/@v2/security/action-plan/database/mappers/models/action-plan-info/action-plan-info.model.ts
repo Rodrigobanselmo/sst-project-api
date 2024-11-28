@@ -12,19 +12,20 @@ export type IActionPlanInfoModelMapper = {
     name: string | null
     email: string
   } | null
-}
+} | null
+
 export class ActionPlanInfoModelMapper {
   static toModel(prisma: IActionPlanInfoModelMapper): ActionPlanInfoModel {
     return new ActionPlanInfoModel({
-      validityStart: prisma.validityStart,
-      validityEnd: prisma.validityEnd,
+      validityStart: prisma?.validityStart || null,
+      validityEnd: prisma?.validityEnd || null,
       periods: {
-        monthsLevel_2: prisma.months_period_level_2,
-        monthsLevel_3: prisma.months_period_level_3,
-        monthsLevel_4: prisma.months_period_level_4,
-        monthsLevel_5: prisma.months_period_level_5
+        monthsLevel_2: prisma?.months_period_level_2 || 24,
+        monthsLevel_3: prisma?.months_period_level_3 || 12,
+        monthsLevel_4: prisma?.months_period_level_4 || 6,
+        monthsLevel_5: prisma?.months_period_level_5 || 3
       },
-      coordinator: prisma.coordinator ? {
+      coordinator: prisma?.coordinator ? {
         id: prisma.coordinator.id,
         name: prisma.coordinator.name,
         email: prisma.coordinator.email

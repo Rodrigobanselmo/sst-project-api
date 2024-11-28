@@ -1,6 +1,8 @@
+import { ActionPlanStatusEnum } from "@/@v2/security/action-plan/domain/enums/action-plan-status.enum";
 import { CommentTextTypeEnum } from "@/@v2/security/action-plan/domain/enums/comment-text-type.enum";
 import { CommentTypeEnum } from "@/@v2/security/action-plan/domain/enums/comment-type.enum";
-import { CommentBrowseResultModel } from "@/@v2/security/action-plan/domain/models/comment/comment-browse-result.model"
+import { CommentBrowseResultModel } from "@/@v2/security/action-plan/domain/models/comment/comment-browse-result.model";
+import { StatusEnum } from "@prisma/client";
 
 export type ICommentBrowseResultModelMapper = {
   comment_id: string
@@ -18,6 +20,8 @@ export type ICommentBrowseResultModelMapper = {
   approved_name: string | null;
   approved_email: string | null;
   approved_id: number | null;
+  rfs_rec_status: StatusEnum | null;
+  rfs_rec_valid_date: Date | null;
 }
 
 export class CommentBrowseResultModelMapper {
@@ -37,6 +41,10 @@ export class CommentBrowseResultModelMapper {
         email: prisma.creator_email,
         id: prisma.creator_id,
       } : null,
+      changes: {
+        status: prisma.rfs_rec_status ? ActionPlanStatusEnum[prisma.rfs_rec_status] : undefined,
+        validDate: prisma.rfs_rec_valid_date || undefined,
+      },
       approvedBy: prisma.approved_name && prisma.approved_email && prisma.approved_id ? {
         name: prisma.approved_name,
         email: prisma.approved_email,

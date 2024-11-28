@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, UseGuards } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common'
 
 import { SecurityRoutes } from '@/@v2/security/action-plan/constants/routes'
 import { JwtAuthGuard } from '@/@v2/shared/guards/jwt-auth.guard'
@@ -15,7 +15,7 @@ export class EditActionPlanInfoController {
     private readonly editActionPlanInfoUseCase: EditActionPlanInfoUseCase
   ) { }
 
-  @Get()
+  @Post()
   @Permissions({
     code: PermissionEnum.ACTION_PLAN,
     isContract: true,

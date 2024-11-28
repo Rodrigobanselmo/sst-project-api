@@ -55,6 +55,7 @@ export class BrowseCommentsQuery {
 
   @IsOptional()
   @IsBoolean()
+  @Type(() => Boolean)
   isApproved?: boolean | null;
 }
 

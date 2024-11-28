@@ -16,6 +16,8 @@ export class EditActionPlanService {
       workspaceId: params.workspaceId
     })
 
+    if (!aggregare) return null
+
     aggregare.actionPlan.responsibleId = params.responsibleId
 
     if (params.validDate !== undefined) {
@@ -33,8 +35,8 @@ export class EditActionPlanService {
       aggregare.setStatus({
         status: params.status,
         comment: {
-          text: params.comment.text,
-          textType: params.comment.textType,
+          text: params.comment?.text,
+          textType: params.comment?.textType,
           commentedById: params.userId
         }
       })

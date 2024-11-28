@@ -27,7 +27,8 @@ export class EditActionPlanInfoUseCase {
       monthsLevel_5: params.monthsLevel_5,
     })
 
-    aggregare.coordinator = coordinator
+    if (coordinator) aggregare.coordinator = coordinator
+    if (params.coordinatorId == null) aggregare.coordinator = null
 
     await this.actionPlanInfoAggregateRepository.update(aggregare)
   }

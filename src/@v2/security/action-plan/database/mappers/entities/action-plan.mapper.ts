@@ -12,7 +12,7 @@ export type IActionPlanEntityMapper = {
   doneDate?: Date | null
   canceledDate?: Date | null
   responsibleId?: number | null
-  endDate: Date | null
+  endDate?: Date | null
 }
 
 export class ActionPlanMapper {

@@ -15,8 +15,16 @@ export class BrowseActionPlanUseCase {
       orderBy: params.orderBy,
       filters: {
         companyId: params.companyId,
+        ocupationalRisks: params.ocupationalRisks,
+        responisbleIds: params.responisbleIds,
+        status: params.status,
         workspaceIds: params.workspaceIds,
         search: params.search,
+        generateSourceIds: params.generateSourceIds,
+        hierarchyIds: params.hierarchyIds,
+        recommendationIds: params.recommendationIds,
+        riskIds: params.riskIds,
+        isExpired: params.isExpired
       }
     })
 

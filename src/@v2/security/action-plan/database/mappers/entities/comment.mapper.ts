@@ -2,6 +2,7 @@ import { RiskFactorDataRecComments } from '@prisma/client';
 import { CommentEntity } from '../../../domain/entities/comment.entity';
 import { CommentTextTypeEnum } from '../../../domain/enums/comment-text-type.enum';
 import { CommentTypeEnum } from '../../../domain/enums/comment-type.enum';
+import { ActionPlanStatusEnum } from '../../../domain/enums/action-plan-status.enum';
 
 export type ICommentEntityMapper = RiskFactorDataRecComments
 
@@ -20,7 +21,9 @@ export class CommentMapper {
       approvedAt: data.approvedAt,
       approvedById: data.approvedById,
       approvedComment: data.approvedComment,
-      isApproved: data.isApproved
+      isApproved: data.isApproved,
+      previousStatus: data.previous_status ? ActionPlanStatusEnum[data.previous_status] : null,
+      previousValidDate: data.previous_valid_date,
     })
   }
 }

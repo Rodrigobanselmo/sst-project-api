@@ -3,8 +3,9 @@ import { Prisma } from '@prisma/client'
 import { ActionPlanInfoAggregateMapper } from '../../mappers/aggregations/action-plan-info.mapper'
 import { ICoordinatorRepository } from './coordinator.types'
 import { CoordinatorMapper } from '../../mappers/entities/coordinator.mapper'
+import { Injectable } from '@nestjs/common'
 
-
+@Injectable()
 export class CoordinatorRepository implements ICoordinatorRepository {
   constructor(private readonly prisma: PrismaServiceV2) { }
 

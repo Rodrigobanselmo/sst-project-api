@@ -28,7 +28,14 @@ export class BrowseActionPlanController {
       workspaceIds: query.workspaceIds,
       orderBy: query.orderBy,
       search: query.search,
-      stageIds: query.stageIds,
+      status: query.status,
+      responisbleIds: query.responisbleIds,
+      ocupationalRisks: query.ocupationalRisks,
+      generateSourceIds: query.generateSourceIds,
+      hierarchyIds: query.hierarchyIds,
+      recommendationIds: query.recommendationIds,
+      riskIds: query.riskIds,
+      isExpired: query.isExpired,
       pagination: {
         page: query.page,
         limit: query.limit

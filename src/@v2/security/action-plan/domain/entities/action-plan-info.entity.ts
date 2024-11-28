@@ -70,9 +70,9 @@ export class ActionPlanInfoEntity {
   update(params: IUpdateActionPlanInfoEntity) {
     this._validityStart = updateField(this._validityStart, params.validityStart);
     this._validityEnd = updateField(this._validityEnd, params.validityEnd);
-    this._monthsLevel_2 = updateField(this._monthsLevel_2, params.monthsLevel_2);
-    this._monthsLevel_3 = updateField(this._monthsLevel_3, params.monthsLevel_3);
-    this._monthsLevel_4 = updateField(this._monthsLevel_4, params.monthsLevel_4);
-    this._monthsLevel_5 = updateField(this._monthsLevel_5, params.monthsLevel_5);
+    this._monthsLevel_2 = params.monthsLevel_2 || this._monthsLevel_2
+    this._monthsLevel_3 = params.monthsLevel_3 || this._monthsLevel_3
+    this._monthsLevel_4 = params.monthsLevel_4 || this._monthsLevel_4
+    this._monthsLevel_5 = params.monthsLevel_5 || this._monthsLevel_5
   }
 }

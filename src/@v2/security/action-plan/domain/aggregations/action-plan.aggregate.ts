@@ -52,6 +52,8 @@ export class ActionPlanAggregate {
       textType: comment.textType,
       commentedById: comment.commentedById,
       type: CommentTypeEnum.POSTPONED,
+      previousStatus: null,
+      previousValidDate: this.actionPlan.validDate,
       ...(isCoordinator && {
         isApproved: true,
         approvedAt: new Date(),
@@ -77,6 +79,8 @@ export class ActionPlanAggregate {
         textType: comment.textType || null,
         commentedById: comment.commentedById,
         type: CommentTypeEnum.DONE,
+        previousStatus: this.actionPlan.status,
+        previousValidDate: null,
         ...(isCoordinator && {
           isApproved: true,
           approvedAt: new Date(),
@@ -104,6 +108,8 @@ export class ActionPlanAggregate {
         text: comment.text,
         textType: comment.textType,
         commentedById: comment.commentedById,
+        previousStatus: this.actionPlan.status,
+        previousValidDate: null,
         type: CommentTypeEnum.CANCELED,
         ...(isCoordinator && {
           isApproved: true,

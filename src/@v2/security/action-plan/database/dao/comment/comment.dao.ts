@@ -36,6 +36,8 @@ export class CommentDAO {
         comment."textType" AS comment_text_type,
         comment."created_at" AS comment_created_at,
         comment."updated_at" AS comment_updated_at,
+        rfs_rec."status" AS rfs_rec_status,
+        rfs_rec."endDate" AS rfs_rec_valid_date,
         creator_user."name" AS creator_name,
         creator_user."email" AS creator_email,
         creator_user."id" AS creator_id,
@@ -113,7 +115,7 @@ export class CommentDAO {
       where.push(Prisma.sql`comment."textType"::text IN (${Prisma.join(filters.textType)})`)
     }
 
-    if ('isApproved' in filters) {
+    if (typeof filters.isApproved === 'boolean') {
       where.push(Prisma.sql`comment."isApproved" = ${filters.isApproved}`)
     }
 

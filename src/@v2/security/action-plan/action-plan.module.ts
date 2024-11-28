@@ -10,25 +10,34 @@ import { EditManyActionPlanController } from './application/action-plan/edit-man
 import { CommentAggregateRepository } from './database/repositories/comment/comment-aggregate.repository';
 import { EditCommentService } from './services/edit-comment/edit-comment.service';
 import { EditActionPlanUseCase } from './application/action-plan/edit-action-plan/use-cases/edit-action-plan.usecase';
-import { EditManyCommentController } from './application/comments/edit-many-commets/controllers/edit-many-commet.controller';
-import { EditManyCommentsUseCase } from './application/comments/edit-many-commets/use-cases/edit-many-commets.usecase';
+import { EditManyCommentController } from './application/comment/edit-many-commets/controllers/edit-many-commet.controller';
+import { EditManyCommentsUseCase } from './application/comment/edit-many-commets/use-cases/edit-many-commets.usecase';
 import { ActionPlanInfoDAO } from './database/dao/action-plan-info/action-plan-info.dao';
-import { FindActionPlanInfoUseCase } from './application/action-plan-info/browse-action-plan-info/use-cases/find-action-plan-info.usecase';
-import { FindActionPlanInfoController } from './application/action-plan-info/browse-action-plan-info/controllers/browse-action-plan-info.controller';
-import { ActionPlanInfoAggregateRepository } from './database/repositories/action-plan-info/action-plan-aggregate.repository';
+import { ReadActionPlanInfoUseCase } from './application/action-plan-info/read-action-plan-info/use-cases/find-action-plan-info.usecase';
+import { FindActionPlanInfoController } from './application/action-plan-info/read-action-plan-info/controllers/read-action-plan-info.controller';
+import { ActionPlanInfoAggregateRepository } from '@/@v2/security/action-plan/database/repositories/action-plan-info/action-plan-aggregate.repository'
 import { CoordinatorRepository } from './database/repositories/coordinator/coordinator.repository';
 import { EditActionPlanInfoUseCase } from './application/action-plan-info/edit-action-plan-info/use-cases/edit-action-plan-info.usecase';
 import { EditActionPlanInfoController } from './application/action-plan-info/edit-action-plan-info/controllers/edit-action-plan-info.controller';
 import { CommentDAO } from './database/dao/comment/comment.dao';
+import { UserDAO } from './database/dao/user/user.dao';
+import { BrowseResponsiblesUseCase } from './application/user/browse-responsible/use-cases/browse-responsibles.usecase';
+import { BrowseResponsiblesController } from './application/user/browse-responsible/controllers/browse-responsible.controller';
+import { BrowseCoordinatorsUseCase } from './application/user/browse-coordinators/use-cases/browse-coordinators.usecase';
+import { BrowseCoordinatorsController } from './application/user/browse-coordinators/controllers/browse-coordinators.controller';
+import { EditActionPlanController } from './application/action-plan/edit-action-plan/controllers/edit-action-plan.controller';
 
 @Module({
   imports: [SharedModule],
   controllers: [
     BrowseActionPlanController,
+    EditActionPlanController,
     EditManyActionPlanController,
     FindActionPlanInfoController,
     EditManyCommentController,
-    EditActionPlanInfoController
+    EditActionPlanInfoController,
+    BrowseResponsiblesController,
+    BrowseCoordinatorsController,
   ],
   providers: [
     // Database
@@ -39,14 +48,17 @@ import { CommentDAO } from './database/dao/comment/comment.dao';
     ActionPlanInfoAggregateRepository,
     CoordinatorRepository,
     CommentDAO,
+    UserDAO,
 
     // Use Cases
     BrowseActionPlanUseCase,
     EditManyActionPlanUseCase,
     EditActionPlanUseCase,
     EditManyCommentsUseCase,
-    FindActionPlanInfoUseCase,
+    ReadActionPlanInfoUseCase,
     EditActionPlanInfoUseCase,
+    BrowseResponsiblesUseCase,
+    BrowseCoordinatorsUseCase,
 
     // Services
     EditActionPlanService,

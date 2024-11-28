@@ -7,11 +7,12 @@ export interface IActionPlanAggregateRepository {
 }
 
 export namespace IActionPlanAggregateRepository {
+  export type SelectOptionsParams = { companyId: string; workspaceId: string; riskDataId: string; recommendationId: string; }
   export type FindByIdParams = { companyId: string; workspaceId: string; riskDataId: string; recommendationId: string; }
   export type FindByIdReturn = Promise<ActionPlanAggregate | null>
 
   export type UpdateParams = ActionPlanAggregate
-  export type UpdateReturn = Promise<ActionPlanAggregate | null>
+  export type UpdateReturn = Promise<void>
 
   export type UpdateManyParams = ActionPlanAggregate[]
   export type UpdateManyReturn = Promise<void>

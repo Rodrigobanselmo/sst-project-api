@@ -22,6 +22,7 @@ export type IActionPlanBrowseResultModelMapper = {
   rfd_rec_end_date: Date | null;
   rfd_rec_status: ActionPlanStatusEnum | null;
   w_id: string;
+  w_name: string;
   validity_start: Date | null;
   validity_end: Date | null;
   months_period_level_2: number;
@@ -62,7 +63,8 @@ export class ActionPlanBrowseResultModelMapper {
       updatedAt: prisma.rfd_rec_updated_at,
       uuid: {
         recommendationId: prisma.rec_id,
-        riskDataId: prisma.rfd_id
+        riskDataId: prisma.rfd_id,
+        workspaceId: prisma.w_id
       },
       responsible: prisma.resp_id && prisma.resp_name ? {
         id: prisma.resp_id,

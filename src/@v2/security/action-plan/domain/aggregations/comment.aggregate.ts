@@ -1,6 +1,7 @@
 import { ActionPlanEntity } from "../entities/action-plan.entity";
 import { CommentEntity } from "../entities/comment.entity";
 import { ActionPlanStatusEnum } from "../enums/action-plan-status.enum";
+import { CommentTypeEnum } from "../enums/comment-type.enum";
 
 type IUpdateApprovement = {
   isApproved: boolean;
@@ -22,14 +23,33 @@ export class CommentAggregate {
     this.comment = params.comment;
   }
 
-
   approve({ approvedById, isApproved, approvedComment }: IUpdateApprovement) {
+    if (this.comment._isApproved === isApproved) return;
+
+    const isPosponed = this.comment.type === CommentTypeEnum.POSTPONED;
     if (!isApproved) {
-      this.actionPlan._status = ActionPlanStatusEnum.REJECTED;
-      this.actionPlan._doneDate = null;
-      this.actionPlan._canceledDate = null;
       this.comment._approvedAt = null;
+      this.actionPlan._status = ActionPlanStatusEnum.REJECTED;
+      this.comment._previousStatus = this.actionPlan._status;
+
+      if (isPosponed) {
+        const requestedValidDate = this.actionPlan._validDate;
+
+        this.actionPlan._validDate = this.comment._previousValidDate;
+        this.comment._previousValidDate = requestedValidDate;
+      }
     } else {
+      const previousRejected = this.comment.isApproved === false
+      if (previousRejected) {
+        this.actionPlan._status = this.comment._previousStatus;
+        if (isPosponed) {
+          const oldValidDate = this.actionPlan._validDate;
+
+          this.actionPlan._validDate = this.comment._previousValidDate;
+          this.comment._previousValidDate = oldValidDate
+        }
+      }
+
       this.comment._approvedAt = new Date();
     }
 

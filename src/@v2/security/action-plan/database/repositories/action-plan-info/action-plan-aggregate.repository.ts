@@ -1,11 +1,15 @@
-import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service'
+import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
 import { Prisma } from '@prisma/client'
 import { ActionPlanInfoAggregateMapper } from '../../mappers/aggregations/action-plan-info.mapper'
 import { IActionPlanInfoAggregateRepository } from './action-plan-aggregate.types'
+import { Injectable } from '@nestjs/common';
 
-
+@Injectable()
 export class ActionPlanInfoAggregateRepository implements IActionPlanInfoAggregateRepository {
-  constructor(private readonly prisma: PrismaServiceV2) { }
+  constructor(
+    private readonly prisma: PrismaServiceV2,
+  ) { }
+
 
   static selectOptions() {
     const include = {

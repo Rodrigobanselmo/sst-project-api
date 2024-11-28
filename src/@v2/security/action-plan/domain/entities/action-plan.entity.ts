@@ -17,8 +17,8 @@ export type IActionPlanEntity = {
 }
 
 export class ActionPlanEntity {
-  readonly companyId: string
-  readonly recommendationId: string
+  companyId: string
+  recommendationId: string
   readonly riskDataId: string
   readonly workspaceId: string
 
@@ -48,7 +48,7 @@ export class ActionPlanEntity {
   }
 
   set responsibleId(responsibleId: number | null | undefined) {
-    this._responsibleId = updateField(responsibleId, this._responsibleId);
+    this._responsibleId = updateField(this._responsibleId, responsibleId);
   }
 
   get startDate() {

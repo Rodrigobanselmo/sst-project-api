@@ -1,3 +1,4 @@
+import { ActionPlanStatusEnum } from "../enums/action-plan-status.enum";
 import { CommentTextTypeEnum } from "../enums/comment-text-type.enum";
 import { CommentTypeEnum } from "../enums/comment-type.enum";
 
@@ -7,6 +8,9 @@ export type ICommentEntity = {
   textType: CommentTextTypeEnum
   type: CommentTypeEnum;
   commentedById: number;
+
+  previousStatus: ActionPlanStatusEnum | null;
+  previousValidDate: Date | null;
 
   isApproved?: boolean | null;
   approvedAt?: Date | null;
@@ -21,6 +25,9 @@ export class CommentEntity {
   type: CommentTypeEnum;
   commentedById: number;
 
+  _previousStatus: ActionPlanStatusEnum | null;
+  _previousValidDate: Date | null;
+
   _isApproved: boolean | null;
   _approvedAt: Date | null;
   _approvedComment: string | null;
@@ -32,6 +39,9 @@ export class CommentEntity {
     this.textType = params.textType;
     this.type = params.type;
     this.commentedById = params.commentedById;
+
+    this._previousStatus = params.previousStatus || null;
+    this._previousValidDate = params.previousValidDate || null;
 
     this._isApproved = params.isApproved || null;
     this._approvedAt = params.approvedAt || null;
@@ -54,5 +64,13 @@ export class CommentEntity {
 
   get approvedById() {
     return this._approvedById;
+  }
+
+  get previousStatus() {
+    return this._previousStatus;
+  }
+
+  get previousValidDate() {
+    return this._previousValidDate;
   }
 }

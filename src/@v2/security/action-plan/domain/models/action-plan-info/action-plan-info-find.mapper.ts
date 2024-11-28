@@ -11,7 +11,7 @@ export type IActionPlanInfoModel = {
     id: number
     name: string | null
     email: string
-  }
+  } | null
 }
 
 export class ActionPlanInfoModel {

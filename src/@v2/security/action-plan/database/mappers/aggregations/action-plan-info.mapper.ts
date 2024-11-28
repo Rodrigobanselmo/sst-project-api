@@ -3,14 +3,14 @@ import { ActionPlanInfoMapper, IActionPlanInfoMapper } from '../entities/action-
 import { CoordinatorMapper, ICoordinatorMapper } from '../entities/coordinator.mapper';
 
 type IActionPlanInfoAggregateMapper = IActionPlanInfoMapper & {
-  coordinator: ICoordinatorMapper
+  coordinator: ICoordinatorMapper | null
 }
 
 export class ActionPlanInfoAggregateMapper {
   static toAggregate(data: IActionPlanInfoAggregateMapper): ActionPlanInfoAggregate {
     return new ActionPlanInfoAggregate({
       actionPlanInfo: ActionPlanInfoMapper.toEntity(data),
-      coordinator: CoordinatorMapper.toEntity(data.coordinator)
+      coordinator: data.coordinator ? CoordinatorMapper.toEntity(data.coordinator) : null
     })
   }
 }

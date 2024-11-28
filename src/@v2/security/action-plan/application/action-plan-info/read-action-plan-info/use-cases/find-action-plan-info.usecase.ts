@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common'
 import { IFindActionPlanInfoUseCase } from './find-action-plan-info.types'
 
 @Injectable()
-export class FindActionPlanInfoUseCase {
+export class ReadActionPlanInfoUseCase {
   constructor(
     private readonly actionPlanInfoDAO: ActionPlanInfoDAO
   ) { }

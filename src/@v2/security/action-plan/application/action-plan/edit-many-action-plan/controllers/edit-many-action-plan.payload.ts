@@ -1,15 +1,17 @@
 import { ActionPlanStatusEnum } from '@/@v2/security/action-plan/domain/enums/action-plan-status.enum';
 import { CommentTextTypeEnum } from '@/@v2/security/action-plan/domain/enums/comment-text-type.enum';
 import { Type } from 'class-transformer';
-import { IsArray, IsEnum, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsDate, IsEnum, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 
 class Comment {
   @IsString()
-  text!: string;
+  @IsOptional()
+  text?: string;
 
   @IsEnum(CommentTextTypeEnum)
-  textType!: CommentTextTypeEnum;
+  @IsOptional()
+  textType?: CommentTextTypeEnum;
 }
 
 class Identifier {
@@ -29,11 +31,11 @@ export class EditActionPlanPayload {
   @Type(() => Identifier)
   ids: Identifier[];
 
-  @IsString()
   @IsInt()
+  @IsOptional()
   responsibleId?: number | null;
 
-  @IsString()
+  @IsDate()
   @IsOptional()
   validDate?: Date | null;
 

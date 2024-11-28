@@ -13,8 +13,8 @@ export namespace IEditManyActionPlanUseCase {
     validDate?: Date | null;
     status?: ActionPlanStatusEnum;
     comment?: {
-      text: string
-      textType: CommentTextTypeEnum
+      text?: string
+      textType?: CommentTextTypeEnum
     }
   }
 }

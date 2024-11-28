@@ -10,6 +10,7 @@ import { IActionPlanBrowseResultModelMapper } from '../../mappers/models/action-
 import { ActionPlanBrowseModelMapper } from '../../mappers/models/action-plan/action-plan-browse.mapper';
 import { ActionPlanOrderByEnum, IActionPlanDAO } from './action-plan.types';
 import { ActionPlanStatusEnum } from '../../../domain/enums/action-plan-status.enum';
+import { OrderByDirectionEnum } from '@/@v2/shared/types/order-by.types';
 
 
 @Injectable()
@@ -36,6 +37,7 @@ export class ActionPlanDAO {
         rfd."id" AS rfd_id,
         rfd."createdAt" AS rfd_created_at, 
         rfd."level" AS rfd_level,
+        rfd_rec."id" AS rfd_rec_id,
         rfd_rec."updated_at" AS rfd_rec_updated_at,
         rfd_rec."startDate" AS rfd_rec_start_date,
         rfd_rec."doneDate" AS rfd_rec_done_date,
@@ -43,6 +45,7 @@ export class ActionPlanDAO {
         rfd_rec."endDate" AS rfd_rec_end_date,
         rfd_rec."status" AS rfd_rec_status,
         w."id" AS w_id,
+        w."name" AS w_name,
         dd."validityStart" as validity_start,
         dd."validityEnd" as validity_end,
         dd."months_period_level_2" as months_period_level_2,
@@ -53,7 +56,9 @@ export class ActionPlanDAO {
         risk."name" AS risk_name,
         risk."type" AS risk_type,
         hg."type" AS hg_type,
+        hg."id" AS hg_id,
         hg."name" AS hg_name,
+        cc."id" AS cc_id,
         cc."name" AS cc_name,
         cc."type" AS cc_type,
         u_resp."id" AS resp_id,
@@ -105,6 +110,10 @@ export class ActionPlanDAO {
         "User" u_resp ON u_resp."id" = rfd_rec."responsibleId"
       LEFT JOIN
         "HomogeneousGroup" hg ON hg."id" = rfd."homogeneousGroupId"
+      ${filters.workspaceIds?.length ? Prisma.sql`
+        LEFT JOIN
+            "_HomogeneousGroupToWorkspace" hg_to_w ON hg_to_w."A" = hg."id"
+      ` : Prisma.sql``}
       LEFT JOIN
         "HierarchyOnHomogeneous" hh ON hh."homogeneousGroupId" = hg."id" AND hh."endDate" IS NULL
       LEFT JOIN 
@@ -147,6 +156,7 @@ export class ActionPlanDAO {
         rfd."createdAt",
         rfd."level",
         rec."recName",
+        rfd_rec."id",
         rfd_rec."updated_at",
         rfd_rec."startDate",
         rfd_rec."doneDate",
@@ -154,6 +164,7 @@ export class ActionPlanDAO {
         rfd_rec."endDate",
         rfd_rec."status",
         w."id",
+        w."name",
         dd."validityStart", 
         dd."validityEnd",
         dd."months_period_level_2",
@@ -163,8 +174,10 @@ export class ActionPlanDAO {
         risk."id",
         risk."name",
         risk."type",
+        hg."id",
         hg."type",
         hg."name",
+        cc."id",
         cc."name",
         cc."type",
         u_resp."id",
@@ -174,6 +187,8 @@ export class ActionPlanDAO {
       LIMIT ${pagination.limit}
       OFFSET ${pagination.offSet};
     `;
+
+    console.log({ pagination })
 
     const totalActionPlansPromise = this.prisma.$queryRaw<[{ total: number } & IActionPlanBrowseFilterModelMapper]>`
       SELECT 
@@ -202,6 +217,10 @@ export class ActionPlanDAO {
       ` : Prisma.sql``}
       LEFT JOIN
         "HomogeneousGroup" hg ON hg."id" = rfd."homogeneousGroupId"
+      ${filters.workspaceIds?.length ? Prisma.sql`
+        LEFT JOIN
+            "_HomogeneousGroupToWorkspace" hg_to_w ON hg_to_w."A" = hg."id"
+      ` : Prisma.sql``}
       ${(filters.search || filters.hierarchyIds?.length) ? Prisma.sql`
         LEFT JOIN
           "HierarchyOnHomogeneous" hh ON hh."homogeneousGroupId" = hg."id" AND hh."endDate" IS NULL
@@ -276,6 +295,7 @@ export class ActionPlanDAO {
 
     if (filters.workspaceIds?.length) {
       where.push(Prisma.sql`w."id" IN (${Prisma.join(filters.workspaceIds)})`)
+      where.push(Prisma.sql`hg_to_w."B" IN (${Prisma.join(filters.workspaceIds)})`)
     }
 
     if (filters.generateSourceIds?.length) {
@@ -283,7 +303,16 @@ export class ActionPlanDAO {
     }
 
     if (filters.responisbleIds?.length) {
-      where.push(Prisma.sql`u_resp."id" IN (${Prisma.join(filters.responisbleIds)})`)
+      const includeNull = filters.responisbleIds.includes(0)
+
+      if (includeNull) {
+        if (filters.responisbleIds.length === 1) where.push(Prisma.sql`u_resp."id" IS NULL`)
+        else where.push(Prisma.sql`u_resp."id" IN (${Prisma.join(filters.responisbleIds.filter(Boolean))}) OR u_resp."id" IS NULL`)
+      }
+
+      if (!includeNull) {
+        where.push(Prisma.sql`u_resp."id" IN (${Prisma.join(filters.responisbleIds)})`)
+      }
     }
 
     if (filters.recommendationIds?.length) {
@@ -311,19 +340,19 @@ export class ActionPlanDAO {
       `)
     }
 
-    if ('isCanceled' in filters) {
+    if (typeof filters.isCanceled === 'boolean') {
       where.push(Prisma.sql`rfd_rec."canceledDate" ${filters.isCanceled ? Prisma.sql`IS NOT` : Prisma.sql`IS`} NULL`)
     }
 
-    if ('isDone' in filters) {
+    if (typeof filters.isDone === 'boolean') {
       where.push(Prisma.sql`rfd_rec."doneDate" ${filters.isDone ? Prisma.sql`IS NOT` : Prisma.sql`IS`} NULL`)
     }
 
-    if ('isStarted' in filters) {
+    if (typeof filters.isStarted === 'boolean') {
       where.push(Prisma.sql`rfd_rec."startDate" ${filters.isStarted ? Prisma.sql`IS NOT` : Prisma.sql`IS`} NULL`)
     }
 
-    if ('isExpired' in filters) {
+    if (typeof filters.isExpired === 'boolean') {
       having.push(Prisma.sql` 
         CASE 
           WHEN rfd_rec."endDate" IS NOT NULL THEN rfd_rec."endDate" 
@@ -373,9 +402,6 @@ export class ActionPlanDAO {
   }
 
   private browseOrderBy(orderBy?: IActionPlanDAO.BrowseParams['orderBy']) {
-
-    if (!orderBy) return []
-
     const desiredOrder = [ActionPlanStatusEnum.REJECTED, ActionPlanStatusEnum.PROGRESS, ActionPlanStatusEnum.PENDING, ActionPlanStatusEnum.DONE, ActionPlanStatusEnum.CANCELED]
 
     const map: Record<ActionPlanOrderByEnum, string> = {
@@ -388,7 +414,12 @@ export class ActionPlanDAO {
       [ActionPlanOrderByEnum.RISK]: 'risk_name',
       [ActionPlanOrderByEnum.RECOMMENDATION]: 'rec_name',
       [ActionPlanOrderByEnum.RESPONSIBLE]: 'resp_name',
-      [ActionPlanOrderByEnum.STATUS]: `CASE rfd_rec_status ${desiredOrder.map((type, index) => `WHEN '${type}' THEN ${index}`).join(' ')} ELSE ${desiredOrder.length} END`,
+      [ActionPlanOrderByEnum.STATUS]: `
+        CASE rfd_rec.status 
+          ${desiredOrder.map((type, index) => `WHEN '${type}' THEN ${index}`).join(' ')} 
+          ELSE ${desiredOrder.findIndex(type => type === ActionPlanStatusEnum.PENDING)} 
+        END
+      `,
       [ActionPlanOrderByEnum.ORIGIN]: 'origin',
       [ActionPlanOrderByEnum.VALID_DATE]: `valid_date`,
       [ActionPlanOrderByEnum.LEVEL]: `
@@ -402,6 +433,12 @@ export class ActionPlanDAO {
 
 
     const orderByRaw = orderBy.map<IOrderByRawPrisma>(({ field, order }) => ({ column: map[field], order }))
+    orderByRaw.push({ column: 'rec_id', order: OrderByDirectionEnum.ASC })
+    orderByRaw.push({ column: 'rfd_rec_id', order: OrderByDirectionEnum.ASC })
+    orderByRaw.push({ column: 'rfd_id', order: OrderByDirectionEnum.ASC })
+    orderByRaw.push({ column: 'w_id', order: OrderByDirectionEnum.ASC })
+    orderByRaw.push({ column: 'hg_id', order: OrderByDirectionEnum.ASC })
+    orderByRaw.push({ column: 'cc_id', order: OrderByDirectionEnum.ASC })
 
     return orderByRaw
   }

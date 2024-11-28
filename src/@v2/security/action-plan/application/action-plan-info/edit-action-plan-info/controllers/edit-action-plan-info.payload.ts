@@ -1,4 +1,5 @@
-import { IsDate, IsInt, IsOptional } from 'class-validator';
+import { IsNotNull } from '@/@v2/shared/decorators/validators/is-not-null.decorator';
+import { IsDate, IsInt, isNotEmpty, IsNotIn, IsOptional } from 'class-validator';
 
 export class EditActionPlanInfoPayload {
   @IsInt()

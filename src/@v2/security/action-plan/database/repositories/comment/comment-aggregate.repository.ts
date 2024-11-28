@@ -3,8 +3,9 @@ import { asyncBatch } from '@/@v2/shared/utils/helpers/asyncBatch'
 import { Prisma } from '@prisma/client'
 import { CommentAggregateMapper } from '../../mappers/aggregations/comment.mapper'
 import { ICommentAggregateRepository } from './comment-aggregate.types'
+import { Injectable } from '@nestjs/common'
 
-
+@Injectable()
 export class CommentAggregateRepository implements ICommentAggregateRepository {
   constructor(private readonly prisma: PrismaServiceV2) { }
 
