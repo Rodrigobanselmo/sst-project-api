@@ -1,6 +1,6 @@
 import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common'
 
-import { SecurityRoutes } from '@/@v2/security/action-plan/constants/routes'
+import { ActionPlanRoutes } from '@/@v2/security/action-plan/constants/routes'
 import { JwtAuthGuard } from '@/@v2/shared/guards/jwt-auth.guard'
 import { PermissionEnum } from '@/shared/constants/enum/authorization'
 import { Permissions } from '@/shared/decorators/permissions.decorator'
@@ -8,7 +8,7 @@ import { BrowseActionPlanUseCase } from '../use-cases/browse-action-plan.usecase
 import { BrowseActionPlanPath } from './browse-action-plan.path'
 import { BrowseActionPlanQuery } from './browse-action-plan.query'
 
-@Controller(SecurityRoutes.ACTION_PLAN.BROWSE)
+@Controller(ActionPlanRoutes.ACTION_PLAN.BROWSE)
 @UseGuards(JwtAuthGuard)
 export class BrowseActionPlanController {
   constructor(
@@ -35,7 +35,7 @@ export class BrowseActionPlanController {
       hierarchyIds: query.hierarchyIds,
       recommendationIds: query.recommendationIds,
       riskIds: query.riskIds,
-      isExpired: query.isExpired,
+      isExpired: query.isExpired || undefined,
       pagination: {
         page: query.page,
         limit: query.limit

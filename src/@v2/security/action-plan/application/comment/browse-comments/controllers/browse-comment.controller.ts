@@ -1,6 +1,6 @@
 import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common'
 
-import { SecurityRoutes } from '@/@v2/security/action-plan/constants/routes'
+import { ActionPlanRoutes } from '@/@v2/security/action-plan/constants/routes'
 import { JwtAuthGuard } from '@/@v2/shared/guards/jwt-auth.guard'
 import { PermissionEnum } from '@/shared/constants/enum/authorization'
 import { Permissions } from '@/shared/decorators/permissions.decorator'
@@ -8,7 +8,7 @@ import { BrowseCommentsUseCase } from '../use-cases/browse-comments.usecase'
 import { BrowseCommentsPath } from './browse-comment.path'
 import { BrowseCommentsQuery } from './browse-comment.query'
 
-@Controller(SecurityRoutes.COMMENT.BROWSE)
+@Controller(ActionPlanRoutes.COMMENT.BROWSE)
 @UseGuards(JwtAuthGuard)
 export class BrowseCommentsController {
   constructor(

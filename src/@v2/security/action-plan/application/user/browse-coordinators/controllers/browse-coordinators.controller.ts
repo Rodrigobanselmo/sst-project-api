@@ -1,6 +1,6 @@
 import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common'
 
-import { SecurityRoutes } from '@/@v2/security/action-plan/constants/routes'
+import { ActionPlanRoutes } from '@/@v2/security/action-plan/constants/routes'
 import { JwtAuthGuard } from '@/@v2/shared/guards/jwt-auth.guard'
 import { PermissionEnum } from '@/shared/constants/enum/authorization'
 import { Permissions } from '@/shared/decorators/permissions.decorator'
@@ -8,7 +8,7 @@ import { BrowseCoordinatorPath } from './browse-coordinators.path'
 import { BrowseCoordinatorQuery } from './browse-coordinators.query'
 import { BrowseCoordinatorsUseCase } from '../use-cases/browse-coordinators.usecase'
 
-@Controller(SecurityRoutes.COORDINATOR.BROWSE)
+@Controller(ActionPlanRoutes.COORDINATOR.BROWSE)
 @UseGuards(JwtAuthGuard)
 export class BrowseCoordinatorsController {
   constructor(

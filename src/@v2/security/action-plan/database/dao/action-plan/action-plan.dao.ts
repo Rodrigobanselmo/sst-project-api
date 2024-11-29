@@ -401,7 +401,7 @@ export class ActionPlanDAO {
     return { filterWhere: where, filterHaving: having }
   }
 
-  private browseOrderBy(orderBy?: IActionPlanDAO.BrowseParams['orderBy']) {
+  private browseOrderBy(orderBy: IActionPlanDAO.BrowseParams['orderBy'] = []) {
     const desiredOrder = [ActionPlanStatusEnum.REJECTED, ActionPlanStatusEnum.PROGRESS, ActionPlanStatusEnum.PENDING, ActionPlanStatusEnum.DONE, ActionPlanStatusEnum.CANCELED]
 
     const map: Record<ActionPlanOrderByEnum, string> = {

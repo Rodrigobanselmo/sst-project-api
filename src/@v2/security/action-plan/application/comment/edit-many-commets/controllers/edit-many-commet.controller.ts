@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Query, UseGuards } from '@nestjs/common'
 
-import { SecurityRoutes } from '@/@v2/security/action-plan/constants/routes'
+import { ActionPlanRoutes } from '@/@v2/security/action-plan/constants/routes'
 import { JwtAuthGuard } from '@/@v2/shared/guards/jwt-auth.guard'
 import { PermissionEnum } from '@/shared/constants/enum/authorization'
 import { Permissions } from '@/shared/decorators/permissions.decorator'
@@ -8,7 +8,7 @@ import { EditManyCommentsUseCase } from '../use-cases/edit-many-commets.usecase'
 import { EditCommentPath } from './edit-many-commet.path'
 import { EditManyCommentPayload } from './edit-many-commet.payload'
 
-@Controller(SecurityRoutes.COMMENT.EDIT_MANY)
+@Controller(ActionPlanRoutes.COMMENT.EDIT_MANY)
 @UseGuards(JwtAuthGuard)
 export class EditManyCommentController {
   constructor(

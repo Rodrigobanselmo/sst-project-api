@@ -1,4 +1,4 @@
-export const SecurityRoutes = {
+export const ActionPlanRoutes = {
   ACTION_PLAN_INFO: {
     EDIT: 'v2/companies/:companyId/workspaces/:workspaceId/action-plan-info',
     GET: 'v2/companies/:companyId/workspaces/:workspaceId/action-plan-info',
@@ -17,6 +17,9 @@ export const SecurityRoutes = {
   },
   COORDINATOR: {
     BROWSE: 'v2/companies/:companyId/action-plans/condinators',
+  },
+  HIERARCHY: {
+    BROWSE: 'v2/companies/:companyId/action-plans/hierarchies',
   }
 } as const
 

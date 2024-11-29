@@ -26,6 +26,9 @@ import { BrowseResponsiblesController } from './application/user/browse-responsi
 import { BrowseCoordinatorsUseCase } from './application/user/browse-coordinators/use-cases/browse-coordinators.usecase';
 import { BrowseCoordinatorsController } from './application/user/browse-coordinators/controllers/browse-coordinators.controller';
 import { EditActionPlanController } from './application/action-plan/edit-action-plan/controllers/edit-action-plan.controller';
+import { HierarchyDAO } from './database/dao/hierarchy/hierarchy.dao';
+import { BrowseHierarchiesUseCase } from './application/hierarchy/browse-hierarchies/use-cases/browse-hierarchies.usecase';
+import { BrowseHierarchiesController } from './application/hierarchy/browse-hierarchies/controllers/browse-hierarchies.controller';
 
 @Module({
   imports: [SharedModule],
@@ -38,6 +41,7 @@ import { EditActionPlanController } from './application/action-plan/edit-action-
     EditActionPlanInfoController,
     BrowseResponsiblesController,
     BrowseCoordinatorsController,
+    BrowseHierarchiesController,
   ],
   providers: [
     // Database
@@ -49,6 +53,7 @@ import { EditActionPlanController } from './application/action-plan/edit-action-
     CoordinatorRepository,
     CommentDAO,
     UserDAO,
+    HierarchyDAO,
 
     // Use Cases
     BrowseActionPlanUseCase,
@@ -59,6 +64,7 @@ import { EditActionPlanController } from './application/action-plan/edit-action-
     EditActionPlanInfoUseCase,
     BrowseResponsiblesUseCase,
     BrowseCoordinatorsUseCase,
+    BrowseHierarchiesUseCase,
 
     // Services
     EditActionPlanService,

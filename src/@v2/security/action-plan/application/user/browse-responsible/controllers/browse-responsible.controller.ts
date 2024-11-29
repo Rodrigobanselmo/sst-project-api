@@ -1,6 +1,6 @@
 import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common'
 
-import { SecurityRoutes } from '@/@v2/security/action-plan/constants/routes'
+import { ActionPlanRoutes } from '@/@v2/security/action-plan/constants/routes'
 import { JwtAuthGuard } from '@/@v2/shared/guards/jwt-auth.guard'
 import { PermissionEnum } from '@/shared/constants/enum/authorization'
 import { Permissions } from '@/shared/decorators/permissions.decorator'
@@ -8,7 +8,7 @@ import { BrowseResponsiblePath } from './browse-responsible.path'
 import { BrowseResponsibleQuery } from './browse-responsible.query'
 import { BrowseResponsiblesUseCase } from '../use-cases/browse-responsibles.usecase'
 
-@Controller(SecurityRoutes.RESPONSIBLE.BROWSE)
+@Controller(ActionPlanRoutes.RESPONSIBLE.BROWSE)
 @UseGuards(JwtAuthGuard)
 export class BrowseResponsiblesController {
   constructor(
