@@ -1,3 +1,4 @@
+import { HierarchyBrowseShortQuerie } from './../src/@v2/security/action-plan/database/dao/hierarchy/queries/browse-short-hierarchy.dao';
 // import { CharacterizationDAO } from '../src/@v2/security/database/dao/characterization/characterization.dao';
 // import { ActionPlanDAO } from '../src/@v2/security/database/dao/action-plan/action-plan.dao';
 // import { ActionPlanOrderByEnum } from '../src/@v2/security/database/dao/action-plan/action-plan.types';
@@ -12,20 +13,15 @@ const prisma = new PrismaClient({});
 
 
 {
-    const data = await new CommentDAO(prisma).browse({
+    const data = await new HierarchyBrowseShortQuerie(prisma).browseShort({
+        limit: 100,
         filters: {
+            search: 'Jr II',
             companyId: 'd1309cad-19d4-4102-9bf9-231f91095c20',
-            search: 'Tostadeira Vertical e Condimentação',
+            // search: 'Tostadeira Vertical e Condimentação',
             workspaceIds: ['f588207b-ac7b-4b63-9d85-cd5753f9b288'],
-            creatorsIds: [1],
-            type: [CommentTypeEnum.CANCELED],
-            textType: [CommentTextTypeEnum.LOGISTICS],
-            isApproved: null,
+            // type: [],
         },
-        orderBy: [{
-            field: CommentOrderByEnum.UPDATED_AT,
-            order: OrderByDirectionEnum.ASC
-        }]
     })
 
     console.log(data)

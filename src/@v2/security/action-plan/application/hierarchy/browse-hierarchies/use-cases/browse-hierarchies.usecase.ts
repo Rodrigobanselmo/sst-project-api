@@ -1,6 +1,7 @@
+import { HierarchyDAO } from '@/@v2/security/action-plan/database/dao/hierarchy/hierarchy.dao'
+import { HierarchyTypeEnum } from '@/@v2/shared/domain/enum/company/hierarchy-type.enum'
 import { Injectable } from '@nestjs/common'
 import { IBrowseHierarchiesUseCase } from './browse-hierarchies.types'
-import { HierarchyDAO } from '@/@v2/security/action-plan/database/dao/hierarchy/hierarchy.dao'
 
 @Injectable()
 export class BrowseHierarchiesUseCase {
@@ -9,18 +10,17 @@ export class BrowseHierarchiesUseCase {
   ) { }
 
   async execute(params: IBrowseHierarchiesUseCase.Params) {
-    const data = await this.hierarchyDAO.browse({
+    const data = await this.hierarchyDAO.browseShort({
       page: params.pagination.page,
       limit: params.pagination.limit,
-      orderBy: params.orderBy,
       filters: {
         companyId: params.companyId,
         search: params.search,
-        workspaceIds: params.workspaceIds
+        workspaceIds: params.workspaceIds,
+        // type: [HierarchyTypeEnum.OFFICE]
       }
     })
 
     return data
-
   }
 }

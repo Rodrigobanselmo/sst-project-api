@@ -1,4 +1,5 @@
 import { HierarchyTypeEnum } from "@/@v2/shared/domain/enum/company/hierarchy-type.enum";
+import { ActionPlanStatusEnum } from "../../enums/action-plan-status.enum";
 
 type IHierarchyParent = {
     id: string;

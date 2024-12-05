@@ -30,6 +30,10 @@ export class ActionPlanDAO {
     const whereTotalParams = [...whereParams, ...filterHaving]
 
     const actionplansPromise = this.prisma.$queryRaw<IActionPlanBrowseResultModelMapper[]>`
+      WITH "DocumentDataUnique" AS (
+        SELECT DISTINCT ON ("workspaceId") *
+        FROM "DocumentData" dd
+      )
       SELECT 
         rec."id" AS rec_id,
         rec."recName" AS rec_name,
@@ -143,7 +147,7 @@ export class ActionPlanDAO {
       LEFT JOIN
         "Workspace" w ON w."companyId" = rfd."companyId"
       LEFT JOIN
-        "DocumentData" dd ON dd."workspaceId" = w."id"
+        "DocumentDataUnique" dd ON dd."workspaceId" = w."id"
       LEFT JOIN LATERAL (
         SELECT h_all."name", h_all."type"
         FROM "Hierarchy" h_all
@@ -187,8 +191,6 @@ export class ActionPlanDAO {
       LIMIT ${pagination.limit}
       OFFSET ${pagination.offSet};
     `;
-
-    console.log({ pagination })
 
     const totalActionPlansPromise = this.prisma.$queryRaw<[{ total: number } & IActionPlanBrowseFilterModelMapper]>`
       SELECT 
