@@ -40,11 +40,6 @@ export type IActionPlanBrowseResultModelMapper = {
   h_name: string | null;
   resp_id: string | null;
   resp_name: string | null;
-  hierarchies: {
-    id: string;
-    name: string;
-    type: PrismaHierarchyEnum;
-  }[];
   generatesources: {
     id: string;
     name: string;
@@ -102,11 +97,6 @@ export class ActionPlanBrowseResultModelMapper {
       generateSources: prisma.generatesources.map((generateSource) => ({
         name: generateSource.name,
         id: generateSource.id
-      })),
-      hierarchies: prisma.hierarchies.map((hierarchy) => ({
-        id: hierarchy.id,
-        name: hierarchy.name,
-        type: HierarchyTypeEnum[hierarchy.type]
       })),
     })
   }

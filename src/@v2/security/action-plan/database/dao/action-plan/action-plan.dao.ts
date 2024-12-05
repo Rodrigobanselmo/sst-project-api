@@ -89,10 +89,6 @@ export class ActionPlanDAO {
           END
         ))[1] AS valid_date,
         COALESCE(
-          JSON_AGG(DISTINCT JSONB_BUILD_OBJECT('name', hierarchies."name", 'type', hierarchies.type)) 
-          FILTER (WHERE hierarchies."name" IS NOT NULL), '[]'
-        ) AS hierarchies,
-        COALESCE(
           JSON_AGG(DISTINCT JSONB_BUILD_OBJECT('name', gs."name", 'id', gs."id")) 
           FILTER (WHERE gs."name" IS NOT NULL), '[]'
         ) AS generateSources
@@ -122,37 +118,34 @@ export class ActionPlanDAO {
         "HierarchyOnHomogeneous" hh ON hh."homogeneousGroupId" = hg."id" AND hh."endDate" IS NULL
       LEFT JOIN 
         "Hierarchy" h ON h."id" = hh."hierarchyId"
-      LEFT JOIN 
-        "Hierarchy" h_parent_1 ON h_parent_1."id" = h."parentId"
-      LEFT JOIN 
-        "Hierarchy" h_parent_2 ON h_parent_2."id" = h_parent_1."parentId"
-      LEFT JOIN 
-        "Hierarchy" h_parent_3 ON h_parent_3."id" = h_parent_2."parentId"
-      LEFT JOIN 
-        "Hierarchy" h_parent_4 ON h_parent_4."id" = h_parent_3."parentId"
-      LEFT JOIN 
-        "Hierarchy" h_parent_5 ON h_parent_5."id" = h_parent_4."parentId"
-      LEFT JOIN 
-        "Hierarchy" h_children_1 ON h_children_1."parentId" = h."id"
-      LEFT JOIN
-        "Hierarchy" h_children_2 ON h_children_2."parentId" = h_children_1."id"
-      LEFT JOIN
-        "Hierarchy" h_children_3 ON h_children_3."parentId" = h_children_2."id"
-      LEFT JOIN
-        "Hierarchy" h_children_4 ON h_children_4."parentId" = h_children_3."id"
-      LEFT JOIN
-        "Hierarchy" h_children_5 ON h_children_5."parentId" = h_children_4."id"
+      ${(filters.hierarchyIds?.length) ? Prisma.sql`
+        LEFT JOIN 
+          "Hierarchy" h_parent_1 ON h_parent_1."id" = h."parentId"
+        LEFT JOIN 
+          "Hierarchy" h_parent_2 ON h_parent_2."id" = h_parent_1."parentId"
+        LEFT JOIN 
+          "Hierarchy" h_parent_3 ON h_parent_3."id" = h_parent_2."parentId"
+        LEFT JOIN 
+          "Hierarchy" h_parent_4 ON h_parent_4."id" = h_parent_3."parentId"
+        LEFT JOIN 
+          "Hierarchy" h_parent_5 ON h_parent_5."id" = h_parent_4."parentId"
+        LEFT JOIN 
+          "Hierarchy" h_children_1 ON h_children_1."parentId" = h."id"
+        LEFT JOIN
+          "Hierarchy" h_children_2 ON h_children_2."parentId" = h_children_1."id"
+        LEFT JOIN
+          "Hierarchy" h_children_3 ON h_children_3."parentId" = h_children_2."id"
+        LEFT JOIN
+          "Hierarchy" h_children_4 ON h_children_4."parentId" = h_children_3."id"
+        LEFT JOIN
+          "Hierarchy" h_children_5 ON h_children_5."parentId" = h_children_4."id"
+      ` : Prisma.sql``}
       LEFT JOIN
         "CompanyCharacterization" cc ON cc."id" = hg."id"
       LEFT JOIN
         "Workspace" w ON w."companyId" = rfd."companyId"
       LEFT JOIN
         "DocumentDataUnique" dd ON dd."workspaceId" = w."id"
-      LEFT JOIN LATERAL (
-        SELECT h_all."name", h_all."type"
-        FROM "Hierarchy" h_all
-        WHERE h_all."id" IN (h."id", h_parent_1."id", h_parent_2."id", h_parent_3."id", h_parent_4."id", h_children_1."id", h_children_2."id", h_children_3."id", h_children_4."id", h_children_5."id")
-      ) AS hierarchies ON true
       ${gerWhereRawPrisma(whereParams)}
       GROUP BY 
         rec."id",
@@ -223,11 +216,11 @@ export class ActionPlanDAO {
         LEFT JOIN
             "_HomogeneousGroupToWorkspace" hg_to_w ON hg_to_w."A" = hg."id"
       ` : Prisma.sql``}
-      ${(filters.search || filters.hierarchyIds?.length) ? Prisma.sql`
-        LEFT JOIN
-          "HierarchyOnHomogeneous" hh ON hh."homogeneousGroupId" = hg."id" AND hh."endDate" IS NULL
-        LEFT JOIN 
-          "Hierarchy" h ON h."id" = hh."hierarchyId"
+      LEFT JOIN
+        "HierarchyOnHomogeneous" hh ON hh."homogeneousGroupId" = hg."id" AND hh."endDate" IS NULL
+      LEFT JOIN 
+        "Hierarchy" h ON h."id" = hh."hierarchyId"
+      ${(filters.hierarchyIds?.length) ? Prisma.sql`
         LEFT JOIN 
           "Hierarchy" h_parent_1 ON h_parent_1."id" = h."parentId"
         LEFT JOIN 
@@ -385,20 +378,6 @@ export class ActionPlanDAO {
           h_children_5."id" IN (${Prisma.join(filters.hierarchyIds)})
         `)
     }
-
-
-    // if (filters.stageIds?.length) {
-    //   const includeNull = filters.stageIds.includes(0)
-
-    //   if (includeNull) {
-    //     if (filters.stageIds.length === 1) where.push(Prisma.sql`cc."stageId" IS NULL`)
-    //     else where.push(Prisma.sql`cc."stageId" IN (${Prisma.join(filters.stageIds.filter(Boolean))}) OR cc."stageId" IS NULL`)
-    //   }
-
-    //   if (!includeNull) {
-    //     where.push(Prisma.sql`cc."stageId" IN (${Prisma.join(filters.stageIds)})`)
-    //   }
-    // }
 
     return { filterWhere: where, filterHaving: having }
   }

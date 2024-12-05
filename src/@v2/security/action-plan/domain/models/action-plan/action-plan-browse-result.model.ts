@@ -20,7 +20,6 @@ export type IActionPlanBrowseResultModel = {
     recommendation: { name: string; type: RecommendationTypeEnum }
     generateSources: { id: string; name: string; }[]
     status: ActionPlanStatusEnum;
-    hierarchies: { name: string; type: HierarchyTypeEnum; }[];
     risk: { id: string; name: string; type: RiskTypeEnum }
     responsible: { id: string; name: string; } | null
     homogeneousGroup: {
@@ -86,11 +85,6 @@ export class ActionPlanBrowseResultModel {
             id: params.responsible.id,
             name: params.responsible.name,
         } : null
-
-        this.hierarchies = params.hierarchies.map(hierarchy => ({
-            name: hierarchy.name,
-            type: hierarchy.type
-        }))
 
         this.validDate = getValidDateActionPlan({ ...params, level: params.ocupationalRisk });
         this.origin = getOriginHomogeneousGroup(params.homogeneousGroup)
