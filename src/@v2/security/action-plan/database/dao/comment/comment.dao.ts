@@ -36,6 +36,8 @@ export class CommentDAO {
         comment."textType" AS comment_text_type,
         comment."created_at" AS comment_created_at,
         comment."updated_at" AS comment_updated_at,
+        commeny."previous_status" AS previous_status,
+        commeny."previous_valid_date" AS previous_valid_date,
         rfs_rec."status" AS rfs_rec_status,
         rfs_rec."endDate" AS rfs_rec_valid_date,
         creator_user."name" AS creator_name,

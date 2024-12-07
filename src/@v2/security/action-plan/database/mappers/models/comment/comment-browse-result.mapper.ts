@@ -14,6 +14,8 @@ export type ICommentBrowseResultModelMapper = {
   comment_text_type: string | null;
   comment_created_at: Date
   comment_updated_at: Date | null;
+  previous_status: ActionPlanStatusEnum | null;
+  previous_valid_date: Date | null;
   creator_name: string | null;
   creator_email: string | null;
   creator_id: number | null;
@@ -43,7 +45,9 @@ export class CommentBrowseResultModelMapper {
       } : null,
       changes: {
         status: prisma.rfs_rec_status ? ActionPlanStatusEnum[prisma.rfs_rec_status] : undefined,
-        validDate: prisma.rfs_rec_valid_date || undefined,
+        validDate: prisma.previous_valid_date || undefined,
+        previousStatus: prisma.previous_status ? ActionPlanStatusEnum[prisma.previous_status] : undefined,
+        previousValidDate: prisma.rfs_rec_valid_date || undefined,
       },
       approvedBy: prisma.approved_name && prisma.approved_email && prisma.approved_id ? {
         name: prisma.approved_name,

@@ -16,7 +16,9 @@ export type ICommentBrowseResultModel = {
 
     changes: {
         status: ActionPlanStatusEnum | undefined;
+        previousStatus: ActionPlanStatusEnum | undefined;
         validDate: Date | undefined;
+        previousValidDate: Date | undefined;
     }
     approvedBy: { id: number; name: string; email: string } | null;
     createdBy: { id: number; name: string; email: string; } | null
@@ -36,7 +38,9 @@ export class CommentBrowseResultModel {
 
     changes: {
         status: ActionPlanStatusEnum | undefined;
+        previousStatus: ActionPlanStatusEnum | undefined;
         validDate: Date | undefined;
+        previousValidDate: Date | undefined;
     }
 
     approvedBy: { id: number; name: string; email: string } | null;
