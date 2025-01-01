@@ -1610,7 +1610,9 @@ model RiskFactorDataRecComments {
   textType            RiskRecTextTypeEnum?
   riskFactorDataRec   RiskFactorDataRec    @relation(fields: [riskFactorDataRecId], references: [id])
   previous_status     StatusEnum?
+  current_status      StatusEnum?
   previous_valid_date DateTime?
+  current_valid_date  DateTime?
 
   isApproved      Boolean?
   approvedAt      DateTime?

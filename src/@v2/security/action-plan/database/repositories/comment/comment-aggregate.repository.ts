@@ -1,20 +1,42 @@
-import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service'
-import { asyncBatch } from '@/@v2/shared/utils/helpers/asyncBatch'
-import { Prisma } from '@prisma/client'
-import { CommentAggregateMapper } from '../../mappers/aggregations/comment.mapper'
-import { ICommentAggregateRepository } from './comment-aggregate.types'
-import { Injectable } from '@nestjs/common'
+import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
+import { asyncBatch } from '@/@v2/shared/utils/helpers/asyncBatch';
+import { Prisma } from '@prisma/client';
+import { CommentAggregateMapper } from '../../mappers/aggregations/comment.mapper';
+import { ICommentAggregateRepository } from './comment-aggregate.types';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class CommentAggregateRepository implements ICommentAggregateRepository {
-  constructor(private readonly prisma: PrismaServiceV2) { }
+  constructor(private readonly prisma: PrismaServiceV2) {}
 
   static selectOptions() {
     const include = {
-      riskFactorDataRec: true
-    } satisfies Prisma.RiskFactorDataRecCommentsFindFirstArgs['include']
+      riskFactorDataRec: {
+        include: {
+          riskFactorData: {
+            select: { level: true },
+          },
+          workspace: {
+            select: {
+              documentData: {
+                where: {
+                  type: 'PGR',
+                },
+                select: {
+                  months_period_level_2: true,
+                  months_period_level_3: true,
+                  months_period_level_4: true,
+                  months_period_level_5: true,
+                  validityStart: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    } satisfies Prisma.RiskFactorDataRecCommentsFindFirstArgs['include'];
 
-    return { include }
+    return { include };
   }
 
   async findById(params: ICommentAggregateRepository.FindByIdParams): ICommentAggregateRepository.FindByIdReturn {
@@ -23,12 +45,14 @@ export class CommentAggregateRepository implements ICommentAggregateRepository {
         id: params.id,
         riskFactorDataRec: {
           companyId: params.companyId,
-        }
+        },
       },
-      ...CommentAggregateRepository.selectOptions()
-    })
+      ...CommentAggregateRepository.selectOptions(),
+    });
 
-    return comment ? CommentAggregateMapper.toAggregate(comment) : null
+    comment.riskFactorDataRec.workspace.documentData[0].validityStart;
+
+    return comment ? CommentAggregateMapper.toAggregate(comment) : null;
   }
 
   async update(params: ICommentAggregateRepository.UpdateParams): ICommentAggregateRepository.UpdateReturn {
@@ -38,7 +62,7 @@ export class CommentAggregateRepository implements ICommentAggregateRepository {
           id: params.comment.id,
           riskFactorDataRec: {
             companyId: params.actionPlan.companyId,
-          }
+          },
         },
         data: {
           approvedAt: params.comment.approvedAt,
@@ -46,26 +70,26 @@ export class CommentAggregateRepository implements ICommentAggregateRepository {
           approvedComment: params.comment.approvedComment,
           isApproved: params.comment.isApproved,
         },
-        ...CommentAggregateRepository.selectOptions()
+        ...CommentAggregateRepository.selectOptions(),
       }),
       this.prisma.riskFactorDataRec.update({
         where: {
           riskFactorDataId_recMedId_workspaceId: {
             riskFactorDataId: params.actionPlan.riskDataId,
             recMedId: params.actionPlan.recommendationId,
-            workspaceId: params.actionPlan.workspaceId
-          }
+            workspaceId: params.actionPlan.workspaceId,
+          },
         },
         data: {
           status: params.actionPlan.status,
           doneDate: params.actionPlan.doneDate,
           canceledDate: params.actionPlan.canceledDate,
+          endDate: params.actionPlan.validDate,
         },
       }),
+    ]);
 
-    ])
-
-    return comment ? CommentAggregateMapper.toAggregate(comment) : null
+    return comment ? CommentAggregateMapper.toAggregate(comment) : null;
   }
 
   async updateMany(params: ICommentAggregateRepository.UpdateManyParams): ICommentAggregateRepository.UpdateManyReturn {
@@ -74,6 +98,7 @@ export class CommentAggregateRepository implements ICommentAggregateRepository {
         items: params,
         batchSize: 10,
         callback: async (params) => {
+          console.log(params);
           await Promise.all([
             tx.riskFactorDataRecComments.update({
               select: { id: true },
@@ -81,7 +106,7 @@ export class CommentAggregateRepository implements ICommentAggregateRepository {
                 id: params.comment.id,
                 riskFactorDataRec: {
                   companyId: params.actionPlan.companyId,
-                }
+                },
               },
               data: {
                 approvedAt: params.comment.approvedAt,
@@ -96,17 +121,19 @@ export class CommentAggregateRepository implements ICommentAggregateRepository {
                 riskFactorDataId_recMedId_workspaceId: {
                   riskFactorDataId: params.actionPlan.riskDataId,
                   recMedId: params.actionPlan.recommendationId,
-                  workspaceId: params.actionPlan.workspaceId
-                }
+                  workspaceId: params.actionPlan.workspaceId,
+                },
               },
               data: {
+                endDate: params.actionPlan.validDate,
                 status: params.actionPlan.status,
                 doneDate: params.actionPlan.doneDate,
                 canceledDate: params.actionPlan.canceledDate,
               },
-            })])
-        }
-      })
-    })
+            }),
+          ]);
+        },
+      });
+    });
   }
 }

@@ -15,6 +15,8 @@ export class RiskDataRecCommentsEntity implements RiskFactorDataRecComments {
   approvedById: number;
   previous_status: $Enums.StatusEnum;
   previous_valid_date: Date;
+  current_status: $Enums.StatusEnum;
+  current_valid_date: Date;
 
   constructor(partial: Partial<RiskDataRecCommentsEntity>) {
     Object.assign(this, partial);

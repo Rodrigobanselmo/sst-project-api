@@ -11,18 +11,16 @@ import { IUserDAO, UserOrderByEnum } from './user.types';
 
 @Injectable()
 export class UserDAO {
-  constructor(
-    private readonly prisma: PrismaServiceV2,
-  ) { }
+  constructor(private readonly prisma: PrismaServiceV2) {}
 
   async browse({ limit, page, orderBy, filters }: IUserDAO.BrowseParams) {
-    const pagination = getPagination(page, limit)
+    const pagination = getPagination(page, limit);
 
-    const browseWhereParams = this.browseWhere(filters)
-    const browseFilterParams = this.filterWhere(filters)
-    const orderByParams = this.browseOrderBy(orderBy)
+    const browseWhereParams = this.browseWhere(filters);
+    const browseFilterParams = this.filterWhere(filters);
+    const orderByParams = this.browseOrderBy(orderBy);
 
-    const whereParams = [...browseWhereParams, ...browseFilterParams]
+    const whereParams = [...browseWhereParams, ...browseFilterParams];
 
     const usersPromise = this.prisma.$queryRaw<IResponsibleBrowseResultModelMapper[]>`
       SELECT 
@@ -35,7 +33,6 @@ export class UserDAO {
         "UserCompany" up 
           ON up."userId" = u."id" 
           AND up."status" <> 'INACTIVE'
-          AND up."companyId" = ${filters.companyId}
       ${gerWhereRawPrisma(whereParams)}
       ${getOrderByRawPrisma(orderByParams)}
       LIMIT ${pagination.limit}
@@ -51,48 +48,45 @@ export class UserDAO {
         "UserCompany" up 
           ON up."userId" = u."id" 
           AND up."status" <> 'INACTIVE'
-          AND up."companyId" = ${filters.companyId}
       ${gerWhereRawPrisma(whereParams)}
     `;
 
-    const [users, totalUsers] = await Promise.all([usersPromise, totalUsersPromise])
+    const [users, totalUsers] = await Promise.all([usersPromise, totalUsersPromise]);
 
     return ResponsibleBrowseModelMapper.toModel({
       results: users,
       pagination: { limit: pagination.limit, page: pagination.page, total: Number(totalUsers[0].total) },
       filters: totalUsers[0],
-    })
+    });
   }
 
   private browseWhere(filters: IUserDAO.BrowseParams['filters']) {
-    const where = [
-      Prisma.sql`up."companyId" = ${filters.companyId}`,
-    ]
+    const where = [Prisma.sql`up."companyId" = ${filters.companyId}`];
 
-    return where
+    return where;
   }
 
   private filterWhere(filters: IUserDAO.BrowseParams['filters']) {
-    const where: Prisma.Sql[] = []
+    const where: Prisma.Sql[] = [];
 
     if (filters.search) {
-      const search = `%${filters.search}%`
+      const search = `%${filters.search}%`;
       where.push(Prisma.sql`
         unaccent(lower(u."name")) ILIKE unaccent(lower(${search}))
-      `)
+      `);
     }
 
-    return where
+    return where;
   }
 
   private browseOrderBy(orderBy?: IUserDAO.BrowseParams['orderBy']) {
-    if (!orderBy) return []
+    if (!orderBy) return [];
 
     const map: Record<UserOrderByEnum, string> = {
       [UserOrderByEnum.NAME]: 'u."name"',
-    }
+    };
 
-    const orderByRaw = orderBy.map<IOrderByRawPrisma>(({ field, order }) => ({ column: map[field], order }))
-    return orderByRaw
+    const orderByRaw = orderBy.map<IOrderByRawPrisma>(({ field, order }) => ({ column: map[field], order }));
+    return orderByRaw;
   }
 }

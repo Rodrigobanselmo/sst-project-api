@@ -1,3 +1,5 @@
+import { BrowseCommentsUseCase } from './application/comment/browse-comments/use-cases/browse-comments.usecase';
+import { BrowseCommentsController } from './application/comment/browse-comments/controllers/browse-comment.controller';
 import { Module } from '@nestjs/common';
 import { ActionPlanDAO } from './database/dao/action-plan/action-plan.dao';
 import { BrowseActionPlanController } from './application/action-plan/browse-action-plan/controllers/browse-action-plan.controller';
@@ -15,7 +17,7 @@ import { EditManyCommentsUseCase } from './application/comment/edit-many-commets
 import { ActionPlanInfoDAO } from './database/dao/action-plan-info/action-plan-info.dao';
 import { ReadActionPlanInfoUseCase } from './application/action-plan-info/read-action-plan-info/use-cases/find-action-plan-info.usecase';
 import { FindActionPlanInfoController } from './application/action-plan-info/read-action-plan-info/controllers/read-action-plan-info.controller';
-import { ActionPlanInfoAggregateRepository } from '@/@v2/security/action-plan/database/repositories/action-plan-info/action-plan-aggregate.repository'
+import { ActionPlanInfoAggregateRepository } from '@/@v2/security/action-plan/database/repositories/action-plan-info/action-plan-aggregate.repository';
 import { CoordinatorRepository } from './database/repositories/coordinator/coordinator.repository';
 import { EditActionPlanInfoUseCase } from './application/action-plan-info/edit-action-plan-info/use-cases/edit-action-plan-info.usecase';
 import { EditActionPlanInfoController } from './application/action-plan-info/edit-action-plan-info/controllers/edit-action-plan-info.controller';
@@ -29,6 +31,8 @@ import { EditActionPlanController } from './application/action-plan/edit-action-
 import { HierarchyDAO } from './database/dao/hierarchy/hierarchy.dao';
 import { BrowseHierarchiesUseCase } from './application/hierarchy/browse-hierarchies/use-cases/browse-hierarchies.usecase';
 import { BrowseHierarchiesController } from './application/hierarchy/browse-hierarchies/controllers/browse-hierarchies.controller';
+import { BrowseCommentCreatorsController } from './application/user/browse-comment-creators/controllers/browse-comment-creators.controller';
+import { BrowseCommentCreatorsUseCase } from './application/user/browse-comment-creators/use-cases/browse-comment-creators.usecase';
 
 @Module({
   imports: [SharedModule],
@@ -42,6 +46,8 @@ import { BrowseHierarchiesController } from './application/hierarchy/browse-hier
     BrowseResponsiblesController,
     BrowseCoordinatorsController,
     BrowseHierarchiesController,
+    BrowseCommentsController,
+    BrowseCommentCreatorsController,
   ],
   providers: [
     // Database
@@ -65,11 +71,13 @@ import { BrowseHierarchiesController } from './application/hierarchy/browse-hier
     BrowseResponsiblesUseCase,
     BrowseCoordinatorsUseCase,
     BrowseHierarchiesUseCase,
+    BrowseCommentsUseCase,
+    BrowseCommentCreatorsUseCase,
 
     // Services
     EditActionPlanService,
-    EditCommentService
+    EditCommentService,
   ],
-  exports: []
+  exports: [],
 })
-export class ActionPlanModule { }
+export class ActionPlanModule {}

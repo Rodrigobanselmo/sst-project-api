@@ -1,33 +1,32 @@
-import { updateField } from "@/@v2/shared/domain/helpers/update-field.helper";
-import { ActionPlanStatusEnum } from "../enums/action-plan-status.enum";
-import { CommentEntity } from "./comment.entity";
+import { updateField } from '@/@v2/shared/domain/helpers/update-field.helper';
+import { ActionPlanStatusEnum } from '../enums/action-plan-status.enum';
 
 export type IActionPlanEntity = {
-  companyId: string
-  recommendationId: string
-  riskDataId: string
-  workspaceId: string
+  companyId: string;
+  recommendationId: string;
+  riskDataId: string;
+  workspaceId: string;
 
   status: ActionPlanStatusEnum;
-  startDate: Date | null
-  doneDate: Date | null
-  canceledDate?: Date | null
-  responsibleId?: number | null
-  validDate: Date | null
-}
+  startDate: Date | null;
+  doneDate: Date | null;
+  canceledDate?: Date | null;
+  responsibleId?: number | null;
+  validDate: Date | null;
+};
 
 export class ActionPlanEntity {
-  companyId: string
-  recommendationId: string
-  readonly riskDataId: string
-  readonly workspaceId: string
+  companyId: string;
+  recommendationId: string;
+  readonly riskDataId: string;
+  readonly workspaceId: string;
 
-  _responsibleId: number | null
+  _responsibleId: number | null;
   _status: ActionPlanStatusEnum;
-  _startDate: Date | null
-  _doneDate: Date | null
-  _canceledDate: Date | null
-  _validDate: Date | null
+  _startDate: Date | null;
+  _doneDate: Date | null;
+  _canceledDate: Date | null;
+  _validDate: Date | null;
 
   constructor(params: IActionPlanEntity) {
     this.companyId = params.companyId;
@@ -70,5 +69,4 @@ export class ActionPlanEntity {
   get validDate() {
     return this._validDate;
   }
-
 }

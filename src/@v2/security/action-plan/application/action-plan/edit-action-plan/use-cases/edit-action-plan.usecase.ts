@@ -23,6 +23,8 @@ export class EditActionPlanUseCase {
       ...params,
     })
 
+    console.log(actionPlan)
+
     if (!actionPlan) throw new BadRequestException('Plano de ação não encontrado')
 
     await this.actionPlanRepository.update(actionPlan)

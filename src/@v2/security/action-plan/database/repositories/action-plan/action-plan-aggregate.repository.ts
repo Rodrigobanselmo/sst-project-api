@@ -1,16 +1,17 @@
-import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service'
-import { Prisma } from '@prisma/client'
-import { IActionPlanAggregateRepository } from './action-plan-aggregate.types'
-import { asyncBatch } from '@/@v2/shared/utils/helpers/asyncBatch'
-import { ActionPlanAggregateMapper } from '../../mappers/aggregations/action-plan.mapper'
-import { Injectable } from '@nestjs/common'
+import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
+import { Prisma } from '@prisma/client';
+import { IActionPlanAggregateRepository } from './action-plan-aggregate.types';
+import { asyncBatch } from '@/@v2/shared/utils/helpers/asyncBatch';
+import { ActionPlanAggregateMapper } from '../../mappers/aggregations/action-plan.mapper';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class ActionPlanAggregateRepository implements IActionPlanAggregateRepository {
-  constructor(private readonly prisma: PrismaServiceV2) { }
+  constructor(private readonly prisma: PrismaServiceV2) {}
 
   static selectOptions(params: IActionPlanAggregateRepository.SelectOptionsParams) {
     const select = {
+      level: true,
       dataRecs: {
         where: {
           companyId: params.companyId,
@@ -20,7 +21,7 @@ export class ActionPlanAggregateRepository implements IActionPlanAggregateReposi
         },
         include: {
           comments: true,
-        }
+        },
       },
       company: {
         select: {
@@ -30,14 +31,19 @@ export class ActionPlanAggregateRepository implements IActionPlanAggregateReposi
               workspaceId: params.workspaceId,
             },
             select: {
-              coordinator: true
-            }
-          }
-        }
-      }
-    } satisfies Prisma.RiskFactorDataFindFirstArgs['select']
+              months_period_level_2: true,
+              months_period_level_3: true,
+              months_period_level_4: true,
+              months_period_level_5: true,
+              validityStart: true,
+              coordinator: true,
+            },
+          },
+        },
+      },
+    } satisfies Prisma.RiskFactorDataFindFirstArgs['select'];
 
-    return { select }
+    return { select };
   }
 
   async findById(params: IActionPlanAggregateRepository.FindByIdParams): IActionPlanAggregateRepository.FindByIdReturn {
@@ -47,14 +53,14 @@ export class ActionPlanAggregateRepository implements IActionPlanAggregateReposi
         companyId: params.companyId,
         recs: {
           some: {
-            id: params.recommendationId
-          }
+            id: params.recommendationId,
+          },
         },
       },
-      ...ActionPlanAggregateRepository.selectOptions(params)
-    })
+      ...ActionPlanAggregateRepository.selectOptions(params),
+    });
 
-    return actionPlan ? ActionPlanAggregateMapper.toAggregate({ ...actionPlan, ...params }) : null
+    return actionPlan ? ActionPlanAggregateMapper.toAggregate({ ...actionPlan, ...params }) : null;
   }
 
   async update(params: IActionPlanAggregateRepository.UpdateParams): IActionPlanAggregateRepository.UpdateReturn {
@@ -64,8 +70,8 @@ export class ActionPlanAggregateRepository implements IActionPlanAggregateReposi
         riskFactorDataId_recMedId_workspaceId: {
           riskFactorDataId: params.actionPlan.riskDataId,
           recMedId: params.actionPlan.recommendationId,
-          workspaceId: params.actionPlan.workspaceId
-        }
+          workspaceId: params.actionPlan.workspaceId,
+        },
       },
       create: {
         companyId: params.actionPlan.companyId,
@@ -80,14 +86,24 @@ export class ActionPlanAggregateRepository implements IActionPlanAggregateReposi
         canceledDate: params.actionPlan.canceledDate,
         comments: {
           createMany: {
-            data: params.comments.filter(comment => !comment.id).map(comment => ({
-              text: comment.text,
-              userId: comment.commentedById,
-              textType: comment.textType,
-              type: comment.type
-            }))
-          }
-        }
+            data: params.comments
+              .filter((comment) => !comment.id)
+              .map((comment) => ({
+                text: comment.text,
+                userId: comment.commentedById,
+                textType: comment.textType,
+                previous_status: comment.previousStatus,
+                previous_valid_date: comment.previousValidDate,
+                approvedAt: comment.approvedAt,
+                approvedById: comment.approvedById,
+                approvedComment: comment.approvedComment,
+                isApproved: comment.isApproved,
+                current_status: comment.currentStatus,
+                current_valid_date: comment.currentValidDate,
+                type: comment.type,
+              })),
+          },
+        },
       },
       update: {
         responsibleId: params.actionPlan.responsibleId,
@@ -98,19 +114,31 @@ export class ActionPlanAggregateRepository implements IActionPlanAggregateReposi
         canceledDate: params.actionPlan.canceledDate,
         comments: {
           createMany: {
-            data: params.comments.filter(comment => !comment.id).map(comment => ({
-              text: comment.text,
-              userId: comment.commentedById,
-              textType: comment.textType,
-              type: comment.type
-            }))
-          }
-        }
+            data: params.comments
+              .filter((comment) => !comment.id)
+              .map((comment) => ({
+                text: comment.text,
+                userId: comment.commentedById,
+                textType: comment.textType,
+                previous_status: comment.previousStatus,
+                previous_valid_date: comment.previousValidDate,
+                approvedAt: comment.approvedAt,
+                approvedById: comment.approvedById,
+                approvedComment: comment.approvedComment,
+                isApproved: comment.isApproved,
+                current_status: comment.currentStatus,
+                current_valid_date: comment.currentValidDate,
+                type: comment.type,
+              })),
+          },
+        },
       },
-    })
+    });
   }
 
-  async updateMany(params: IActionPlanAggregateRepository.UpdateManyParams): IActionPlanAggregateRepository.UpdateManyReturn {
+  async updateMany(
+    params: IActionPlanAggregateRepository.UpdateManyParams,
+  ): IActionPlanAggregateRepository.UpdateManyReturn {
     await this.prisma.$transaction(async (tx) => {
       await asyncBatch({
         items: params,
@@ -122,8 +150,8 @@ export class ActionPlanAggregateRepository implements IActionPlanAggregateReposi
               riskFactorDataId_recMedId_workspaceId: {
                 riskFactorDataId: params.actionPlan.riskDataId,
                 recMedId: params.actionPlan.recommendationId,
-                workspaceId: params.actionPlan.workspaceId
-              }
+                workspaceId: params.actionPlan.workspaceId,
+              },
             },
             create: {
               companyId: params.actionPlan.companyId,
@@ -138,14 +166,24 @@ export class ActionPlanAggregateRepository implements IActionPlanAggregateReposi
               canceledDate: params.actionPlan.canceledDate,
               comments: {
                 createMany: {
-                  data: params.comments.filter(comment => !comment.id).map(comment => ({
-                    text: comment.text,
-                    userId: comment.commentedById,
-                    textType: comment.textType,
-                    type: comment.type
-                  }))
-                }
-              }
+                  data: params.comments
+                    .filter((comment) => !comment.id)
+                    .map((comment) => ({
+                      text: comment.text,
+                      userId: comment.commentedById,
+                      textType: comment.textType,
+                      previous_status: comment.previousStatus,
+                      previous_valid_date: comment.previousValidDate,
+                      approvedAt: comment.approvedAt,
+                      approvedById: comment.approvedById,
+                      approvedComment: comment.approvedComment,
+                      isApproved: comment.isApproved,
+                      current_status: comment.currentStatus,
+                      current_valid_date: comment.currentValidDate,
+                      type: comment.type,
+                    })),
+                },
+              },
             },
             update: {
               responsibleId: params.actionPlan.responsibleId,
@@ -156,19 +194,29 @@ export class ActionPlanAggregateRepository implements IActionPlanAggregateReposi
               canceledDate: params.actionPlan.canceledDate,
               comments: {
                 createMany: {
-                  data: params.comments.filter(comment => !comment.id).map(comment => ({
-                    text: comment.text,
-                    userId: comment.commentedById,
-                    textType: comment.textType,
-                    type: comment.type
-                  }))
-                }
-              }
+                  data: params.comments
+                    .filter((comment) => !comment.id)
+                    .map((comment) => ({
+                      text: comment.text,
+                      userId: comment.commentedById,
+                      textType: comment.textType,
+                      previous_status: comment.previousStatus,
+                      previous_valid_date: comment.previousValidDate,
+                      approvedAt: comment.approvedAt,
+                      approvedById: comment.approvedById,
+                      approvedComment: comment.approvedComment,
+                      isApproved: comment.isApproved,
+                      current_status: comment.currentStatus,
+                      current_valid_date: comment.currentValidDate,
+                      type: comment.type,
+                    })),
+                },
+              },
             },
-            select: { id: true }
-          })
-        }
-      })
-    })
+            select: { id: true },
+          });
+        },
+      });
+    });
   }
 }

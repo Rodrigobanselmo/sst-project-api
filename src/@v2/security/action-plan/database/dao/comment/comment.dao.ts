@@ -9,21 +9,18 @@ import { ICommentBrowseResultModelMapper } from '../../mappers/models/comment/co
 import { CommentBrowseModelMapper } from '../../mappers/models/comment/comment-browse.mapper';
 import { CommentOrderByEnum, ICommentDAO } from './comment.types';
 
-
 @Injectable()
 export class CommentDAO {
-  constructor(
-    private readonly prisma: PrismaServiceV2,
-  ) { }
+  constructor(private readonly prisma: PrismaServiceV2) {}
 
   async browse({ limit, page, orderBy, filters }: ICommentDAO.BrowseParams) {
-    const pagination = getPagination(page, limit)
+    const pagination = getPagination(page, limit);
 
-    const browseWhereParams = this.browseWhere(filters)
-    const browseFilterParams = this.filterWhere(filters)
-    const orderByParams = this.browseOrderBy(orderBy)
+    const browseWhereParams = this.browseWhere(filters);
+    const browseFilterParams = this.filterWhere(filters);
+    const orderByParams = this.browseOrderBy(orderBy);
 
-    const whereParams = [...browseWhereParams, ...browseFilterParams]
+    const whereParams = [...browseWhereParams, ...browseFilterParams];
 
     const commentsPromise = this.prisma.$queryRaw<ICommentBrowseResultModelMapper[]>`
       SELECT 
@@ -36,10 +33,19 @@ export class CommentDAO {
         comment."textType" AS comment_text_type,
         comment."created_at" AS comment_created_at,
         comment."updated_at" AS comment_updated_at,
-        commeny."previous_status" AS previous_status,
-        commeny."previous_valid_date" AS previous_valid_date,
-        rfs_rec."status" AS rfs_rec_status,
-        rfs_rec."endDate" AS rfs_rec_valid_date,
+        comment."previous_status" AS previous_status,
+        comment."previous_valid_date" AS previous_valid_date,
+        comment."current_status" AS current_status,
+        comment."current_valid_date" AS current_valid_date,
+        rec."recName" AS rec_name,
+        hg."type" AS hg_type,
+        hg."id" AS hg_id,
+        hg."name" AS hg_name,
+        cc."id" AS cc_id,
+        cc."name" AS cc_name,
+        cc."type" AS cc_type,
+        (array_agg(h."type"))[1] AS h_type,
+        (array_agg(h."name"))[1] AS h_name,
         creator_user."name" AS creator_name,
         creator_user."email" AS creator_email,
         creator_user."id" AS creator_id,
@@ -54,7 +60,46 @@ export class CommentDAO {
         "User" approved_user ON approved_user."id" = comment."approvedById"
       LEFT JOIN
         "RiskFactorDataRec" rfs_rec ON rfs_rec."id" = comment."riskFactorDataRecId"
+      LEFT JOIN
+        "RecMed" rec ON rec."id" = rfs_rec."recMedId"
+      LEFT JOIN
+        "RiskFactorData" rfd ON rfd."id" = rfs_rec."riskFactorDataId"
+      LEFT JOIN
+        "HomogeneousGroup" hg ON hg."id" = rfd."homogeneousGroupId"
+      LEFT JOIN
+        "HierarchyOnHomogeneous" hh ON hh."homogeneousGroupId" = hg."id" AND hh."endDate" IS NULL
+      LEFT JOIN 
+        "Hierarchy" h ON h."id" = hh."hierarchyId"
+      LEFT JOIN
+        "CompanyCharacterization" cc ON cc."id" = hg."id"
       ${gerWhereRawPrisma(whereParams)}
+      GROUP BY 
+        comment."id",
+        comment."isApproved",
+        comment."approvedAt",
+        comment."approvedComment",
+        comment."text",
+        comment."type",
+        comment."textType",
+        comment."created_at",
+        comment."updated_at",
+        comment."previous_status",
+        comment."previous_valid_date",
+        comment."current_status",
+        comment."current_valid_date",
+        rec."recName",
+        hg."type",
+        hg."id",
+        hg."name",
+        cc."id",
+        cc."name",
+        cc."type",
+        creator_user."name",
+        creator_user."email",
+        creator_user."id",
+        approved_user."name",
+        approved_user."email",
+        approved_user."id"
       ${getOrderByRawPrisma(orderByParams)}
       LIMIT ${pagination.limit}
       OFFSET ${pagination.offSet};
@@ -74,62 +119,64 @@ export class CommentDAO {
       ${gerWhereRawPrisma(whereParams)}
     `;
 
-    const [comments, totalComments] = await Promise.all([commentsPromise, totalCommentsPromise])
+    const [comments, totalComments] = await Promise.all([commentsPromise, totalCommentsPromise]);
 
     return CommentBrowseModelMapper.toModel({
       results: comments,
       pagination: { limit: pagination.limit, page: pagination.page, total: Number(totalComments[0].total) },
       filters: totalComments[0],
-    })
+    });
   }
 
   private browseWhere(filters: ICommentDAO.BrowseParams['filters']) {
-    const where = [
-      Prisma.sql`rfs_rec."companyId" = ${filters.companyId}`,
-    ]
+    const where = [Prisma.sql`rfs_rec."companyId" = ${filters.companyId}`];
 
-    return where
+    return where;
   }
 
   private filterWhere(filters: ICommentDAO.BrowseParams['filters']) {
-    const where: Prisma.Sql[] = []
+    const where: Prisma.Sql[] = [];
 
     if (filters.search) {
-      const search = `%${filters.search}%`
+      const search = `%${filters.search}%`;
       where.push(Prisma.sql`
         unaccent(lower(comment."text")) ILIKE unaccent(lower(${search}))
-      `)
+      `);
     }
 
     if (filters.workspaceIds?.length) {
-      where.push(Prisma.sql`rfs_rec."workspaceId" IN (${Prisma.join(filters.workspaceIds)})`)
+      where.push(Prisma.sql`rfs_rec."workspaceId" IN (${Prisma.join(filters.workspaceIds)})`);
     }
 
     if (filters.creatorsIds?.length) {
-      where.push(Prisma.sql`creator_user."id" IN (${Prisma.join(filters.creatorsIds)})`)
+      where.push(Prisma.sql`creator_user."id" IN (${Prisma.join(filters.creatorsIds)})`);
     }
 
     if (filters.type?.length) {
-      where.push(Prisma.sql`comment."type"::text IN (${Prisma.join(filters.type)})`)
+      where.push(Prisma.sql`comment."type"::text IN (${Prisma.join(filters.type)})`);
     }
 
     if (filters.textType?.length) {
-      where.push(Prisma.sql`comment."textType"::text IN (${Prisma.join(filters.textType)})`)
+      where.push(Prisma.sql`comment."textType"::text IN (${Prisma.join(filters.textType)})`);
     }
 
     if (typeof filters.isApproved === 'boolean') {
-      where.push(Prisma.sql`comment."isApproved" = ${filters.isApproved}`)
+      where.push(Prisma.sql`comment."isApproved" = ${filters.isApproved}`);
     }
 
-    return where
+    return where;
   }
 
   private browseOrderBy(orderBy?: ICommentDAO.BrowseParams['orderBy']) {
+    if (!orderBy) return [];
 
-    if (!orderBy) return []
-
-    const desiredTypeOrder = [RiskRecTypeEnum.DONE, RiskRecTypeEnum.POSTPONED, RiskRecTypeEnum.CANCELED]
-    const desiredTextTypeOrder = [RiskRecTextTypeEnum.MONEY, RiskRecTextTypeEnum.LOGISTICS, RiskRecTextTypeEnum.TECHNIQUE, RiskRecTextTypeEnum.OTHER]
+    const desiredTypeOrder = [RiskRecTypeEnum.POSTPONED, RiskRecTypeEnum.DONE, RiskRecTypeEnum.CANCELED];
+    const desiredTextTypeOrder = [
+      RiskRecTextTypeEnum.MONEY,
+      RiskRecTextTypeEnum.LOGISTICS,
+      RiskRecTextTypeEnum.TECHNIQUE,
+      RiskRecTextTypeEnum.OTHER,
+    ];
 
     const map: Record<CommentOrderByEnum, string> = {
       [CommentOrderByEnum.UPDATED_AT]: 'comment."updated_at"',
@@ -145,12 +192,10 @@ export class CommentDAO {
           ELSE 2
         END
       `,
-    }
+    };
 
+    const orderByRaw = orderBy.map<IOrderByRawPrisma>(({ field, order }) => ({ column: map[field], order }));
 
-
-    const orderByRaw = orderBy.map<IOrderByRawPrisma>(({ field, order }) => ({ column: map[field], order }))
-
-    return orderByRaw
+    return orderByRaw;
   }
 }

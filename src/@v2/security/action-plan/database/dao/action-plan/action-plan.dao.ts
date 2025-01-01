@@ -33,6 +33,7 @@ export class ActionPlanDAO {
       WITH "DocumentDataUnique" AS (
         SELECT DISTINCT ON ("workspaceId") *
         FROM "DocumentData" dd
+        WHERE dd."type" = 'PGR'
       )
       SELECT 
         rec."id" AS rec_id,

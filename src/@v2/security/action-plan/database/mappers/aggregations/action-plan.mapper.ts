@@ -3,38 +3,54 @@ import { ActionPlanAggregate } from '../../../domain/aggregations/action-plan.ag
 import { ActionPlanMapper, IActionPlanEntityMapper } from '../entities/action-plan.mapper';
 import { CommentMapper, ICommentEntityMapper } from '../entities/comment.mapper';
 import { CoordinatorMapper, ICoordinatorMapper } from '../entities/coordinator.mapper';
+import { dateUtils } from '@/@v2/shared/utils/helpers/date-utils';
 
 type IActionPlanAggregateMapper = {
+  level: number | null;
   companyId: string;
   workspaceId: string;
   riskDataId: string;
   recommendationId: string;
   company: {
     documentData: {
-      coordinator: ICoordinatorMapper
-    }[]
-  }
-  dataRecs: ((IActionPlanEntityMapper & {
-    comments: ICommentEntityMapper[]
-  }) | null)[]
-}
+      months_period_level_2: number;
+      months_period_level_3: number;
+      months_period_level_4: number;
+      months_period_level_5: number;
+      validityStart: Date | null;
+      coordinator: ICoordinatorMapper;
+    }[];
+  };
+  dataRecs: (
+    | (IActionPlanEntityMapper & {
+        comments: ICommentEntityMapper[];
+      })
+    | null
+  )[];
+};
 
 export class ActionPlanAggregateMapper {
   static toAggregate(data: IActionPlanAggregateMapper): ActionPlanAggregate {
-    const coordenator = data.company.documentData?.[0]?.coordinator
-    const dataRec = data.dataRecs[0] || {
-      companyId: data.companyId,
-      recMedId: data.recommendationId,
-      riskFactorDataId: data.riskDataId,
-      workspaceId: data.workspaceId,
-      status: StatusEnum.PENDING,
-      comments: []
-    } satisfies IActionPlanAggregateMapper['dataRecs'][0]
+    const documentData = data.company.documentData?.[0];
+    const coordenator = documentData?.coordinator;
+    const dataRec =
+      data.dataRecs[0] ||
+      ({
+        companyId: data.companyId,
+        recMedId: data.recommendationId,
+        riskFactorDataId: data.riskDataId,
+        workspaceId: data.workspaceId,
+        status: StatusEnum.PENDING,
+        comments: [],
+      } satisfies IActionPlanAggregateMapper['dataRecs'][0]);
 
     return new ActionPlanAggregate({
-      actionPlan: ActionPlanMapper.toEntity(dataRec),
+      actionPlan: ActionPlanMapper.toEntity(dataRec, {
+        documentData,
+        level: data.level,
+      }),
       comments: CommentMapper.toArrayEntity(dataRec.comments),
-      coordinator: coordenator ? CoordinatorMapper.toEntity(coordenator) : null
-    })
+      coordinator: coordenator ? CoordinatorMapper.toEntity(coordenator) : null,
+    });
   }
 }
