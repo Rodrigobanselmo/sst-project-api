@@ -19,7 +19,7 @@ import { isEnvironment } from '../../../../shared/utils/isEnvironment';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 @Injectable()
 export class HomoGroupRepository {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async create(
     { workspaceIds, hierarchies, endDate = null, startDate = null, ...createHomoGroupDto }: CreateHomoGroupDto,
@@ -100,10 +100,10 @@ export class HomoGroupRepository {
         description,
         workspaces: workspaceIds?.length
           ? {
-            connect: workspaceIds.map((id) => ({
-              id_companyId: { companyId, id },
-            })),
-          }
+              connect: workspaceIds.map((id) => ({
+                id_companyId: { companyId, id },
+              })),
+            }
           : undefined,
       },
       update: {
@@ -111,10 +111,10 @@ export class HomoGroupRepository {
         description,
         workspaces: workspaceIds?.length
           ? {
-            connect: workspaceIds.map((id) => ({
-              id_companyId: { companyId, id },
-            })),
-          }
+              connect: workspaceIds.map((id) => ({
+                id_companyId: { companyId, id },
+              })),
+            }
           : undefined,
       },
     });
@@ -464,36 +464,57 @@ export class HomoGroupRepository {
     return homogeneousGroup;
   }
 
-  async findDocumentData(companyId: string, options?: { workspaceId?: string; includePhotos?: boolean; ghoIds?: string[] }) {
+  async findDocumentData(
+    companyId: string,
+    options?: { workspaceId?: string; includePhotos?: boolean; ghoIds?: string[] },
+  ) {
     const homogeneousGroups = await this.prisma.homogeneousGroup.findMany({
       where: {
         companyId,
         ...(options.workspaceId && { workspaces: { some: { id: options.workspaceId } } }),
         ...(options?.ghoIds && {
-          OR: [{
-            id: { in: options.ghoIds },
-          }, {
-            hierarchyOnHomogeneous: {
-              some: {
-                hierarchy: {
-                  OR: [{
-                    id: { in: options.ghoIds },
-                  }, {
-                    parent: { id: { in: options.ghoIds } },
-                  }, {
-                    children: { some: { id: { in: options.ghoIds } } },
-                  }, {
-                    children: { some: { children: { some: { id: { in: options.ghoIds } } } } },
-                  }, {
-                    children: { some: { children: { some: { children: { some: { id: { in: options.ghoIds } } } } } } },
-                  }, {
-                    children: { some: { children: { some: { children: { some: { children: { some: { id: { in: options.ghoIds } } } } } } } } },
-                  }]
+          OR: [
+            {
+              id: { in: options.ghoIds },
+            },
+            {
+              hierarchyOnHomogeneous: {
+                some: {
+                  hierarchy: {
+                    OR: [
+                      {
+                        id: { in: options.ghoIds },
+                      },
+                      {
+                        parent: { id: { in: options.ghoIds } },
+                      },
+                      {
+                        children: { some: { id: { in: options.ghoIds } } },
+                      },
+                      {
+                        children: { some: { children: { some: { id: { in: options.ghoIds } } } } },
+                      },
+                      {
+                        children: {
+                          some: { children: { some: { children: { some: { id: { in: options.ghoIds } } } } } },
+                        },
+                      },
+                      {
+                        children: {
+                          some: {
+                            children: {
+                              some: { children: { some: { children: { some: { id: { in: options.ghoIds } } } } } },
+                            },
+                          },
+                        },
+                      },
+                    ],
+                  },
                 },
               },
             },
-          }]
-        })
+          ],
+        }),
       },
       include: { characterization: { include: { photos: !!options?.includePhotos, profiles: true } } },
     });

@@ -9,21 +9,18 @@ import { ICharacterizationBrowseResultModelMapper } from '../../mappers/models/c
 import { CharacterizationBrowseModelMapper } from '../../mappers/models/characterization/characterization-browse.mapper';
 import { CharacterizationOrderByEnum, ICharacterizationDAO } from './characterization.types';
 
-
 @Injectable()
 export class CharacterizationDAO {
-  constructor(
-    private readonly prisma: PrismaServiceV2,
-  ) { }
+  constructor(private readonly prisma: PrismaServiceV2) {}
 
   async browse({ limit, page, orderBy, filters }: ICharacterizationDAO.BrowseParams) {
-    const pagination = getPagination(page, limit)
+    const pagination = getPagination(page, limit);
 
-    const browseWhereParams = this.browseWhere(filters)
-    const filterWhereParams = this.filterWhere(filters)
-    const orderByParams = this.browseOrderBy(orderBy)
+    const browseWhereParams = this.browseWhere(filters);
+    const filterWhereParams = this.filterWhere(filters);
+    const orderByParams = this.browseOrderBy(orderBy);
 
-    const whereParams = [...browseWhereParams, ...filterWhereParams]
+    const whereParams = [...browseWhereParams, ...filterWhereParams];
 
     const characterizationsPromise = this.prisma.$queryRaw<ICharacterizationBrowseResultModelMapper[]>`
       SELECT 
@@ -34,6 +31,7 @@ export class CharacterizationDAO {
         cc.type,
         cc.done_at, 
         cc.order, 
+        cc.status,
         COUNT(DISTINCT rfd.id) AS total_risks,
         COUNT(DISTINCT profile.id) AS total_profiles,
         COUNT(DISTINCT h.id) AS total_hierarchies,
@@ -75,7 +73,7 @@ export class CharacterizationDAO {
         "Status" st ON st.id = cc."stageId"
       ${gerWhereRawPrisma(whereParams)}
       GROUP BY 
-        cc.created_at, cc.updated_at, cc.id, cc.name, cc.type, cc.done_at, cc.order, st.name, st.color
+        cc.created_at, cc.updated_at, cc.id, cc.name, cc.type, cc.done_at, cc.order, cc.status, st.name, st.color
       ${getOrderByRawPrisma(orderByParams)}
       LIMIT ${pagination.limit}
       OFFSET ${pagination.offSet};
@@ -95,54 +93,68 @@ export class CharacterizationDAO {
       ${gerWhereRawPrisma(browseWhereParams)};
     `;
 
-    const [characterizations, totalCharacterizations, distinctFilters] = await Promise.all([characterizationsPromise, totalCharacterizationsPromise, distinctFiltersPromise])
+    const [characterizations, totalCharacterizations, distinctFilters] = await Promise.all([
+      characterizationsPromise,
+      totalCharacterizationsPromise,
+      distinctFiltersPromise,
+    ]);
 
     return CharacterizationBrowseModelMapper.toModel({
       results: characterizations,
       pagination: { limit: pagination.limit, page: pagination.page, total: Number(totalCharacterizations[0].total) },
       filters: distinctFilters[0],
-    })
+    });
   }
 
   private browseWhere(filters: ICharacterizationDAO.BrowseParams['filters']) {
     const where = [
       Prisma.sql`cc."companyId" = ${filters.companyId}`,
       Prisma.sql`cc."workspaceId" = ${filters.workspaceId}`,
-      Prisma.sql`cc."status"::text = ${StatusEnum.ACTIVE}`,
       Prisma.sql`cc."profileParentId" IS NULL`,
-    ]
+    ];
 
-    return where
+    return where;
   }
 
   private filterWhere(filters: ICharacterizationDAO.BrowseParams['filters']) {
-    const where: Prisma.Sql[] = []
+    const where: Prisma.Sql[] = [];
 
     if (filters.search) {
-      const search = `%${filters.search}%`
-      where.push(Prisma.sql`unaccent(lower(cc.name)) ILIKE unaccent(lower(${search}))`)
+      const search = `%${filters.search}%`;
+      where.push(Prisma.sql`unaccent(lower(cc.name)) ILIKE unaccent(lower(${search}))`);
     }
 
     if (filters.stageIds?.length) {
-      const includeNull = filters.stageIds.includes(0)
+      const includeNull = filters.stageIds.includes(0);
 
       if (includeNull) {
-        if (filters.stageIds.length === 1) where.push(Prisma.sql`cc."stageId" IS NULL`)
-        else where.push(Prisma.sql`cc."stageId" IN (${Prisma.join(filters.stageIds.filter(Boolean))}) OR cc."stageId" IS NULL`)
+        if (filters.stageIds.length === 1) where.push(Prisma.sql`cc."stageId" IS NULL`);
+        else
+          where.push(
+            Prisma.sql`cc."stageId" IN (${Prisma.join(filters.stageIds.filter(Boolean))}) OR cc."stageId" IS NULL`,
+          );
       }
 
       if (!includeNull) {
-        where.push(Prisma.sql`cc."stageId" IN (${Prisma.join(filters.stageIds)})`)
+        where.push(Prisma.sql`cc."stageId" IN (${Prisma.join(filters.stageIds)})`);
       }
     }
 
-    return where
+    return where;
   }
 
   private browseOrderBy(orderBy?: ICharacterizationDAO.BrowseParams['orderBy']) {
-    if (!orderBy) return []
+    if (!orderBy) return [];
 
-    const desiredOrder = [CharacterizationTypeEnum.GENERAL, CharacterizationTypeEnum.ADMINISTRATIVE, CharacterizationTypeEnum.OPERATION, CharacterizationTypeEnum.SUPPORT, CharacterizationTypeEnum.WORKSTATION, CharacterizationTypeEnum.ACTIVITIES, CharacterizationTypeEnum.EQUIPMENT]
+    const desiredOrder = [
+      CharacterizationTypeEnum.GENERAL,
+      CharacterizationTypeEnum.ADMINISTRATIVE,
+      CharacterizationTypeEnum.OPERATION,
+      CharacterizationTypeEnum.SUPPORT,
+      CharacterizationTypeEnum.WORKSTATION,
+      CharacterizationTypeEnum.ACTIVITIES,
+      CharacterizationTypeEnum.EQUIPMENT,
+    ];
 
     const map: Record<CharacterizationOrderByEnum, string> = {
       [CharacterizationOrderByEnum.NAME]: 'cc.name',
@@ -156,10 +168,10 @@ export class CharacterizationDAO {
       [CharacterizationOrderByEnum.RISKS]: 'total_risks',
       [CharacterizationOrderByEnum.HIERARCHY]: 'total_hierarchies',
       [CharacterizationOrderByEnum.PROFILES]: 'total_profiles',
-    }
+    };
 
-    const orderByRaw = orderBy.map<IOrderByRawPrisma>(({ field, order }) => ({ column: map[field], order }))
+    const orderByRaw = orderBy.map<IOrderByRawPrisma>(({ field, order }) => ({ column: map[field], order }));
 
-    return orderByRaw
+    return orderByRaw;
   }
 }
