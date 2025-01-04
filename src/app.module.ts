@@ -20,6 +20,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { DocumentModule } from './@v2/documents/document.module';
 import { SharedModule } from './@v2/shared/shared.module';
 import { SecurityModule } from './@v2/security/security.module';
+import { EnterpriseModule } from './@v2/enterprise/enterprise.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { SecurityModule } from './@v2/security/security.module';
     DocumentModule,
     SecurityModule,
     SharedModule,
+    EnterpriseModule,
 
   ],
   providers: [

@@ -13,6 +13,9 @@ class DateUtils extends Date {
     return dayjs(this).format(template)
   }
 
+  addMonths(months: number) {
+    return dayjs(this).add(months, 'month').toDate()
+  }
 }
 
 export const dateUtils = (date?: Date) => {

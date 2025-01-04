@@ -99,7 +99,7 @@ export class InviteUsersService {
         { select: { id: true } },
       );
 
-    const expires_date = this.dateProvider.addDay(new Date(), 7);
+    const expires_date = this.dateProvider.addDay(new Date(), 365);
 
     await this.inviteUsersRepository.deleteByCompanyIdAndEmail(inviteUserDto.companyId, inviteUserDto.email);
 

@@ -1,5 +1,5 @@
 type UserData = {
-  id: string;
+  id: number;
   permissions: string[];
 }
 

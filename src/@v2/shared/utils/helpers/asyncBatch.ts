@@ -1,14 +1,21 @@
-import { arrayChunks } from './array-chunks';
-import { asyncEach } from './asyncEach';
+import { arrayChunks } from './array-chunks'
+import { asyncEach } from './asyncEach'
 
-export async function asyncBatch<T, S>(
-  array: T[],
-  perChunk: number,
-  callbackFn: (value: T, index?: number) => Promise<S>,
-) {
-  const data = await asyncEach(arrayChunks(array, perChunk), async (chunk, index) =>
-    Promise.all(chunk.map(async (dt) => callbackFn(dt, index))),
-  );
+type AsyncBatchProps<T, S> = {
+  items: T[]
+  batchSize: number
+  callback: (value: T, batchIndex?: number, chunkIndex?: number) => Promise<S>
+}
 
-  return data.reduce((acc, curr) => [...acc, ...curr], []);
+export async function asyncBatch<T, S>({
+  items,
+  callback,
+  batchSize,
+}: AsyncBatchProps<T, S>) {
+  const data = await asyncEach(
+    arrayChunks(items, batchSize),
+    async (chunk, batchIndex) => Promise.all(chunk.map(async (dt, chunkIndex) => callback(dt, batchIndex, chunkIndex)))
+  )
+
+  return data.reduce((acc, curr) => [...(acc || []), ...(curr || [])], [])
 }

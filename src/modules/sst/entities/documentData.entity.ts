@@ -33,6 +33,12 @@ export class DocumentDataEntity implements DocumentData {
   professionalsSignatures?: ProfessionalDocumentDataEntity[];
   model: DocumentModelEntity;
 
+  months_period_level_2: number;
+  months_period_level_3: number;
+  months_period_level_4: number;
+  months_period_level_5: number;
+  coordinatorId: number;
+
   constructor(partial: Partial<DocumentDataEntity>) {
     Object.assign(this, partial);
 
