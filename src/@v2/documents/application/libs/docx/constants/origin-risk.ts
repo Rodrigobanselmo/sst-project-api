@@ -30,12 +30,12 @@ export const originRiskMap: Record<string, { name: string; type: string; priorit
     type: 'Mão de Obra',
   },
   [HierarchyEnum.DIRECTORY]: {
-    name: 'Diretoria',
+    name: 'Superintendência',
     type: 'Nível Hierarquico',
     prioritization: 7,
   },
   [HierarchyEnum.MANAGEMENT]: {
-    name: 'Gerência',
+    name: 'Diretoria',
     type: 'Nível Hierarquico',
     prioritization: 6,
   },

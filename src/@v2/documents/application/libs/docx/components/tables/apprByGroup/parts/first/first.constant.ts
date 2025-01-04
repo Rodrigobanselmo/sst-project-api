@@ -41,8 +41,8 @@ export const firstRiskInventoryHeader = RewRiskInventoryHeader();
 
 //! have two of these
 export const hierarchyMap: Record<string, { text: string; index: number }> = {
-  [HierarchyEnum.DIRECTORY]: { text: 'DIRETORIA:', index: 0 },
-  [HierarchyEnum.MANAGEMENT]: { text: 'Gerência:', index: 1 },
+  [HierarchyEnum.DIRECTORY]: { text: 'Superintendência:', index: 0 },
+  [HierarchyEnum.MANAGEMENT]: { text: 'Diretoria:', index: 1 },
   [HierarchyEnum.SECTOR]: { text: 'Setor:', index: 2 },
   [HierarchyEnum.SUB_SECTOR]: {
     text: 'Subsetor (Posto de Trabalho):',

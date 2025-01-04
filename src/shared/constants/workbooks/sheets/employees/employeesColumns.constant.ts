@@ -60,7 +60,7 @@ export const employeesColumnsConstant = [
   },
   {
     databaseName: 'directory',
-    excelName: 'Diretoria',
+    excelName: 'Superintendência',
     isArray: false,
     required: false,
     checkHandler: checkIsString,
@@ -68,7 +68,7 @@ export const employeesColumnsConstant = [
   },
   {
     databaseName: 'management',
-    excelName: 'Gerência',
+    excelName: 'Diretoria',
     isArray: false,
     required: false,
     checkHandler: checkIsString,

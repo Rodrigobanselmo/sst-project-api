@@ -19,13 +19,13 @@ export const HierarchyPlanMap: Record<string, { text: string; size: number; posi
     borders: borderStyleGlobal(palette.common.white.string),
   },
   [HierarchyEnum.DIRECTORY]: {
-    text: 'DIRETORIA',
+    text: 'SUPERINTENDÊNCIA',
     size: 3,
     position: 0,
     borders: borderStyleGlobal(palette.common.white.string),
   },
   [HierarchyEnum.MANAGEMENT]: {
-    text: 'GERÊNCIA',
+    text: 'DIRETORIA',
     size: 3,
     position: 1,
     borders: borderStyleGlobal(palette.common.white.string),

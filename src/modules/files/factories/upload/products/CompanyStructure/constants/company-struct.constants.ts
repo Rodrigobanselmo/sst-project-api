@@ -35,8 +35,8 @@ export enum CompanyStructHeaderEnum {
   EMPLOYEE_IS_PCD = 'Funcionário PCD',
   EMPLOYEE_CIDS = 'CID',
 
-  DIRECTORY = 'Diretoria',
-  MANAGEMENT = 'Gerência',
+  DIRECTORY = 'Superintendência',
+  MANAGEMENT = 'Diretoria',
   SECTOR = 'Setor',
   SUB_SECTOR = 'Sub Setor',
   OFFICE = 'Cargo',

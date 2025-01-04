@@ -23,7 +23,7 @@ export const quantitySection: IDocumentPGRSectionGroup = {
         },
         {
           type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
-          text: 'Maiores detalhes das campanhas de monitoramento e dos resultados de avaliações quantitativas de outros agentes, que não os apresentados abaixo, podem ser obtidos através da Gerência de Segurança e Sustentabilidade.',
+          text: 'Maiores detalhes das campanhas de monitoramento e dos resultados de avaliações quantitativas de outros agentes, que não os apresentados abaixo, podem ser obtidos através da Diretoria de Segurança e Sustentabilidade.',
         },
       ],
     },
