@@ -1,13 +1,12 @@
-import { CompanyEntity } from './../../../../company/entities/company.entity';
-import { AccessGroupsEntity } from './../../../../auth/entities/access-groups.entity';
-import { RoleEnum } from './../../../../../shared/constants/enum/authorization';
-import { CompanyRepository } from './../../../../company/repositories/implementations/CompanyRepository';
-import { UsersCompanyRepository } from './../../../repositories/implementations/UsersCompanyRepository';
-import { UserPayloadDto } from './../../../../../shared/dto/user-payload.dto';
-import { AuthGroupRepository } from './../../../../auth/repositories/implementations/AuthGroupRepository';
 import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
 import { resolve } from 'path';
+import { RoleEnum } from './../../../../../shared/constants/enum/authorization';
+import { UserPayloadDto } from './../../../../../shared/dto/user-payload.dto';
+import { AuthGroupRepository } from './../../../../auth/repositories/implementations/AuthGroupRepository';
+import { CompanyEntity } from './../../../../company/entities/company.entity';
+import { CompanyRepository } from './../../../../company/repositories/implementations/CompanyRepository';
 
+import { v4 } from 'uuid';
 import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
 import { NodeMailProvider } from '../../../../../shared/providers/MailProvider/implementations/NodeMail/NodeMailProvider';
 import { InviteUserDto } from '../../../dto/invite-user.dto';
@@ -15,7 +14,7 @@ import { InviteUsersEntity } from '../../../entities/invite-users.entity';
 import { InviteUsersRepository } from '../../../repositories/implementations/InviteUsersRepository';
 import { UsersRepository } from '../../../repositories/implementations/UsersRepository';
 import { ErrorInvitesEnum } from './../../../../../shared/constants/enum/errorMessage';
-import { v4 } from 'uuid';
+import { inviteUserTemplatePath } from '@/templates/email';
 
 @Injectable()
 export class InviteUsersService {
@@ -119,7 +118,7 @@ export class InviteUsersService {
 }
 
 export const inviteNewUser = async (mailProvider: NodeMailProvider, invite: InviteUsersEntity) => {
-  const templatePath = resolve(__dirname, '..', '..', '..', '..', '..', '..', 'templates', 'email', 'inviteUser.hbs');
+  const templatePath = inviteUserTemplatePath;
 
   if (!invite.email) {
     throw new BadRequestException('Email não informado ou inválido');

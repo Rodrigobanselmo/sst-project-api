@@ -5,6 +5,7 @@ import fs from 'fs';
 import handlebars from 'handlebars';
 import nodemailer from 'nodemailer';
 import { EmailsEnum } from '../../../../constants/enum/emails';
+import { readFile } from 'fs/promises';
 
 import { IMailProvider, ISendMailData } from '../../models/IMailProvider';
 
@@ -22,7 +23,7 @@ class NodeMailProvider implements IMailProvider {
       if (!sendDelevelop && process.env.NODE_ENV === 'development') return;
       if (!to) return;
 
-      const templateFileContent = fs.readFileSync(path).toString('utf-8');
+      const templateFileContent = await readFile(path, 'utf-8');
 
       const templateParse = handlebars.compile(templateFileContent);
 
