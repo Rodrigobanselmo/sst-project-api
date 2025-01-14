@@ -4,20 +4,27 @@ import { BrowseCharacterizationUseCase } from './application/characterization/br
 import { CharacterizationDAO } from './database/dao/characterization/characterization.dao';
 import { RiskDataDAO } from './database/dao/risk-data/risk-data.dao';
 import { SharedModule } from '@/@v2/shared/shared.module';
+import { CharacterizationRepository } from './database/repositories/characterization/characterization.repository';
+import { EditCharacterizationService } from './services/edit-characterization/edit-characterization.service';
+import { EditManyCharacterizationController } from './application/characterization/edit-many-characterization/controllers/edit-many-characterization.controller';
+import { EditManyCharacterizationUseCase } from './application/characterization/edit-many-characterization/use-cases/edit-many-characterization.usecase';
 
 @Module({
   imports: [SharedModule],
-  controllers: [
-    BrowseCharacterizationController,
-  ],
+  controllers: [BrowseCharacterizationController, EditManyCharacterizationController],
   providers: [
     // Database
     CharacterizationDAO,
+    CharacterizationRepository,
     RiskDataDAO,
 
     // Use Cases
     BrowseCharacterizationUseCase,
+    EditManyCharacterizationUseCase,
+
+    //Services
+    EditCharacterizationService,
   ],
-  exports: []
+  exports: [],
 })
-export class CharacterizationModule { }
+export class CharacterizationModule {}
