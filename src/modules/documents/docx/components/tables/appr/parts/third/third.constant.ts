@@ -83,7 +83,7 @@ const ThirdRiskInventoryColumnsHeader = (): bodyTableProps[] => {
     margins: { top: 100, bottom: 100 },
   };
   header[ThirdRiskInventoryColumnEnum.SOURCE] = {
-    text: 'Fonte Geradora ou Condição de Risco',
+    text: 'Fonte Geradora ou Circunstância de Risco',
     borders: { ...borderNoneStyle, right: whiteColumnBorder },
     size: 10,
     margins: { top: 100, bottom: 100 },
