@@ -166,14 +166,25 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
     versions.unshift(version);
 
     const docId = body.id || v4();
-    const cover = company?.covers?.[0] || consultant?.covers?.[0] || new DocumentCoverEntity({
-      name: 'Capa PGR',
-      companyId,
-      description: 'Capa padrão do PGR',
-      id: 1,
-      acceptType: [CoverTypeEnum.PGR, CoverTypeEnum.PCSMO],
-      json: { "coverProps": { "logoProps": { "x": 200, "y": 58, "maxLogoWidth": 212, "maxLogoHeight": 141 }, "titleProps": { "x": 103, "y": 310, "boxX": 464, "boxY": 0, "size": 28, "color": "FFFFFF" }, "companyProps": { "x": 103, "y": 510, "boxX": 464, "boxY": 0, "size": 14, "color": "FFFFFF" }, "versionProps": { "x": 103, "y": 480, "boxX": 464, "boxY": 0, "size": 14, "color": "FFFFFF" }, "backgroundImagePath": "images/cover/simple.png" } }
-    });
+    const cover =
+      company?.covers?.[0] ||
+      consultant?.covers?.[0] ||
+      new DocumentCoverEntity({
+        name: 'Capa PGR',
+        companyId,
+        description: 'Capa padrão do PGR',
+        id: 1,
+        acceptType: [CoverTypeEnum.PGR, CoverTypeEnum.PCSMO],
+        json: {
+          coverProps: {
+            logoProps: { x: 200, y: 58, maxLogoWidth: 212, maxLogoHeight: 141 },
+            titleProps: { x: 103, y: 310, boxX: 464, boxY: 0, size: 28, color: 'FFFFFF' },
+            companyProps: { x: 103, y: 510, boxX: 464, boxY: 0, size: 14, color: 'FFFFFF' },
+            versionProps: { x: 103, y: 480, boxX: 464, boxY: 0, size: 14, color: 'FFFFFF' },
+            backgroundImagePath: 'images/cover/simple.png',
+          },
+        },
+      });
 
     return {
       company,
@@ -213,12 +224,15 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
     if (!riskGroupId) throw new BadRequestException('Nenhum sistema de gestão cadastrado');
 
     const workspacePromise = this.workspaceRepository.findById(workspaceId);
-    const riskGroupDataPromise = this.riskGroupDataRepository.findDocumentData(riskGroupId, companyId, { workspaceId, ghoIds }); // add homo
+    const riskGroupDataPromise = this.riskGroupDataRepository.findDocumentData(riskGroupId, companyId, {
+      workspaceId,
+      ghoIds,
+    }); // add homo
     const hierarchyPromise = this.hierarchyRepository.findDocumentData(companyId, { workspaceId, ghoIds }); // add homo
     const homogeneousGroupPromise = this.homoGroupRepository.findDocumentData(companyId, {
       workspaceId,
       includePhotos: includeCharPhotos,
-      ghoIds
+      ghoIds,
     });
 
     const [workspace, riskGroupData, hierarchies, homogeneousGroupsFound] = await Promise.all([
@@ -313,6 +327,9 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
     options: IGetDocument<IDocumentPGRBody, PromiseInfer<ReturnType<DocumentPGRFactoryProduct['getData']>>>,
   ) {
     const documentBaseBuild = await this.getDocumentBuild(options);
+
+    // add on file text from(JSON.stringify(documentBaseBuild));
+    // writeFileSync('tmp/buildData.txt', JSON.stringify(documentBaseBuild));
 
     const documentAprBuild: typeof documentBaseBuild = {
       ...documentBaseBuild,

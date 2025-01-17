@@ -472,7 +472,7 @@ export class HomoGroupRepository {
       where: {
         companyId,
         ...(options.workspaceId && { workspaces: { some: { id: options.workspaceId } } }),
-        ...(options?.ghoIds && {
+        ...(options?.ghoIds.length && {
           OR: [
             {
               id: { in: options.ghoIds },
