@@ -3,19 +3,23 @@ import { VariablesPGREnum } from '../../enums/variables.enum';
 import { CompanyModel } from '@/@v2/documents/domain/models/company.model';
 import { formatCnpj } from '@/@v2/shared/utils/helpers/formats-cnpj';
 import { formatPhoneNumber } from '@/@v2/shared/utils/helpers/formats-phone';
+import { dateUtils } from '@/@v2/shared/utils/helpers/date-utils';
 
 interface ICompanyVariables {
-  company: CompanyModel
-  workspace: WorkspaceModel
-  employeeCount: number
+  company: CompanyModel;
+  workspace: WorkspaceModel;
+  employeeCount: number;
 }
 
 export const companyVariables = ({ employeeCount, company, workspace }: ICompanyVariables) => {
   const address = workspace?.address || company?.address;
 
   return {
+    [VariablesPGREnum.CURRENT_DATE_LONG]: dateUtils().format('D [de] MMMM [de] YYYY hhmm').toLocaleLowerCase(),
+    [VariablesPGREnum.CURRENT_DATE_SHORT]: dateUtils().format('DD/MM/YYYY').toLocaleLowerCase(),
     [VariablesPGREnum.CONSULTANT_NAME]: company.consultant?.name || company.name,
-    [VariablesPGREnum.COMPANY_SIGNER_CITY]: (company.consultant ? company.consultant.address?.formattedCity : company.address?.formattedCity) || '',
+    [VariablesPGREnum.COMPANY_SIGNER_CITY]:
+      (company.consultant ? company.consultant.address?.formattedCity : company.address?.formattedCity) || '',
     [VariablesPGREnum.COMPANY_CNAE]: company.primaryActivity,
     [VariablesPGREnum.COMPANY_RISK_DEGREE]: company.primaryActivityRiskDegree,
     [VariablesPGREnum.COMPANY_INITIAL]: company.initials ? `(${company.initials})` : '',

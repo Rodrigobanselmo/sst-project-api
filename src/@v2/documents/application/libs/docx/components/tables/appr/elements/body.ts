@@ -53,7 +53,7 @@ export class TableBodyElements {
         ...tex.split('\n').map((value) => {
           const children = [
             new TextRun({
-              text: value,
+              text: value.replaceAll('**', ''),
               size: 12,
               color: color || palette.text.main.string,
               bold: !!bold,

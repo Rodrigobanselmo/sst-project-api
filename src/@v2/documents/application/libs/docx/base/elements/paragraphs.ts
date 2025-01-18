@@ -65,53 +65,6 @@ const getStyle = (range: IInlineStyleRange): Writeable<Partial<IRunOptions>> => 
   return style;
 };
 
-export const paragraphNormal = (text: string, { children, color, ...options } = {} as ParagraphProps) =>
-  new Paragraph({
-    children: [
-      ...(children || []),
-      ...text
-        .split('**')
-        .map((text, index) => {
-          const isBold = isOdd(index);
-          return text
-            .split('^^')
-            .map((text, index) => {
-              const isSuper = isOdd(index);
-              return text
-                .split('\n')
-                .map((text, index) => {
-                  const isBreak = index != 0;
-                  return text.split('<link>').map((text, index) => {
-                    const isLink = isOdd(index);
-                    if (!isLink)
-                      return new TextRun({
-                        text: text,
-                        bold: isBold,
-                        superScript: isSuper,
-                        break: isBreak ? 1 : 0,
-                        size: options?.size ? options?.size * 2 : undefined,
-                        ...(color ? { color: color } : {}),
-                      });
-
-                    return textLink(text, {
-                      isBold,
-                      isBreak,
-                      isSuper,
-                      size: options?.size,
-                    });
-                  });
-                })
-                .reduce((acc, curr) => [...acc, ...curr], []);
-            })
-            .reduce((acc, curr) => [...acc, ...curr], []);
-        })
-        .reduce((acc, curr) => [...acc, ...curr], []),
-    ],
-    spacing: { line: 350 },
-    alignment: options?.align || AlignmentType.JUSTIFIED,
-    ...options,
-  });
-
 export const getParagraphNormal = (text: string) =>
   text
     .split('**')
@@ -325,22 +278,22 @@ export const paragraphTableLegend = (text: string, options = {} as ParagraphProp
 export const paragraphFigure = (text: string, options = {} as ParagraphProps & { spacingAfter?: number }) =>
   text
     ? paragraphNewNormal(text, {
-      ...options,
-      children: [
-        new TextRun({
-          text: 'Figura ',
-          size: 16,
-        }),
-        new TextRun({
-          size: 16,
-          children: [new SequentialIdentifier('Figure')],
-        }),
-        new TextRun({
-          text: ': ',
-          size: 16,
-        }),
-      ],
-      size: 8,
-      spacing: { after: options?.spacingAfter ?? 70 },
-    })
+        ...options,
+        children: [
+          new TextRun({
+            text: 'Figura ',
+            size: 16,
+          }),
+          new TextRun({
+            size: 16,
+            children: [new SequentialIdentifier('Figure')],
+          }),
+          new TextRun({
+            text: ': ',
+            size: 16,
+          }),
+        ],
+        size: 8,
+        spacing: { after: options?.spacingAfter ?? 70 },
+      })
     : undefined;

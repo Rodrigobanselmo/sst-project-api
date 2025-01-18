@@ -9,7 +9,15 @@ import { RiskDataQuantityQuiVO } from '@/@v2/shared/domain/values-object/securit
 import { RiskDataQuantityRadiationVO } from '@/@v2/shared/domain/values-object/security/risk-data-quantity-radiation.vo';
 import { RiskDataQuantityVibrationFBVO } from '@/@v2/shared/domain/values-object/security/risk-data-quantity-vibration-fb.vo';
 import { RiskDataQuantityVibrationLVO } from '@/@v2/shared/domain/values-object/security/risk-data-quantity-vibration-l.vo';
-import { Epi, EpiToRiskFactorData, ExamToRiskData, RecTypeEnum as PrismaRecTypeEnum, RecMed, RiskFactorData, RiskFactorDataRec } from '@prisma/client';
+import {
+  Epi,
+  EpiToRiskFactorData,
+  ExamToRiskData,
+  RecTypeEnum as PrismaRecTypeEnum,
+  RecMed,
+  RiskFactorData,
+  RiskFactorDataRec,
+} from '@prisma/client';
 import { AdministrativeMeasureModel } from '../../domain/models/administrative-measure.model';
 import { EgineeringMeasureModel } from '../../domain/models/engineering-measure.model';
 import { EPIModel } from '../../domain/models/epis.model';
@@ -21,20 +29,20 @@ import { IRiskDataModel, RiskDataModel } from '../../domain/models/risk-data.mod
 import { IRiskMapper, RiskMapper } from './risk.mapper';
 
 export type IRiskDataMapper = RiskFactorData & {
-  riskFactor: IRiskMapper
-  adms: { medName: string | null }[]
-  recs: { id: string; recName: string | null; recType: PrismaRecTypeEnum | null }[]
-  generateSources: { name: string | null }[]
+  riskFactor: IRiskMapper;
+  adms: { medName: string | null }[];
+  recs: { id: string; recName: string | null; recType: PrismaRecTypeEnum | null }[];
+  generateSources: { name: string | null }[];
   engsToRiskFactorData: {
-    recMed: RecMed
-    efficientlyCheck: boolean
-  }[]
+    recMed: RecMed;
+    efficientlyCheck: boolean;
+  }[];
   epiToRiskFactorData: (EpiToRiskFactorData & {
-    epi: Epi
-  })[]
-  examsToRiskFactorData: ExamToRiskData[]
-  dataRecs: RiskFactorDataRec[]
-}
+    epi: Epi;
+  })[];
+  examsToRiskFactorData: ExamToRiskData[];
+  dataRecs: RiskFactorDataRec[];
+};
 
 export class RiskDataMapper {
   static toModel(data: IRiskDataMapper): RiskDataModel {
@@ -43,60 +51,84 @@ export class RiskDataMapper {
       level: data.level as IRiskLevelValues,
       probability: data.probability as IRiskProbabilityValues,
       probabilityAfter: data.probabilityAfter as IRiskProbabilityValues,
-      administrativeMeasures: data.adms.map(adm => new AdministrativeMeasureModel({ name: adm.medName || '' })),
-      recommendations: data.recs.map(rec => new RecommendationModel({
-        id: rec.id,
-        name: rec.recName || '',
-        type: rec.recType as RecommendationTypeEnum,
-      })),
-      generateSources: data.generateSources.map(gs => new GenerateSourceModel({ name: gs.name || '' })),
-      egineeringMeasures: data.engsToRiskFactorData.map(eng => new EgineeringMeasureModel({
-        name: eng.recMed.medName || '',
-        efficientlyCheck: eng.efficientlyCheck,
-      })),
-      epis: data.epiToRiskFactorData.map(epi => new EPIModel({
-        ca: epi.epi.ca,
-        equipment: epi.epi.equipment,
-      })),
-      exams: data.examsToRiskFactorData.map(exam => new ExamRiskModel({
-        examId: exam.examId,
-        requirement: new ExamRequirementVO(exam)
-      })),
+      administrativeMeasures: data.adms.map((adm) => new AdministrativeMeasureModel({ name: adm.medName || '' })),
+      recommendations: data.recs.map(
+        (rec) =>
+          new RecommendationModel({
+            id: rec.id,
+            name: rec.recName || '',
+            type: rec.recType as RecommendationTypeEnum,
+          }),
+      ),
+      generateSources: data.generateSources.map((gs) => new GenerateSourceModel({ name: gs.name || '' })),
+      egineeringMeasures: data.engsToRiskFactorData.map(
+        (eng) =>
+          new EgineeringMeasureModel({
+            name: eng.recMed.medName || '',
+            efficientlyCheck: eng.efficientlyCheck,
+          }),
+      ),
+      epis: data.epiToRiskFactorData.map(
+        (epi) =>
+          new EPIModel({
+            ca: epi.epi.ca,
+            equipment: epi.epi.equipment,
+          }),
+      ),
+      exams: data.examsToRiskFactorData.map(
+        (exam) =>
+          new ExamRiskModel({
+            examId: exam.examId,
+            requirement: new ExamRequirementVO(exam),
+          }),
+      ),
       risk: RiskMapper.toModel(data.riskFactor),
-      recommendationsData: data.dataRecs.map(recData => new RecommendationDataModel({
-        recommendationId: recData.recMedId,
-        responsibleName: recData.responsibleName,
-        endDate: recData.endDate,
-      }))
-    })
+      recommendationsData: data.dataRecs.map(
+        (recData) =>
+          new RecommendationDataModel({
+            recommendationId: recData.recMedId,
+            responsibleName: recData.responsibleName,
+            endDate: recData.endDate,
+          }),
+      ),
+    });
   }
 
   static toModels(data: IRiskDataMapper[]): RiskDataModel[] {
-    return data.map(RiskData => this.toModel(RiskData))
+    return data.map((RiskData) => this.toModel(RiskData));
   }
 
   private static quantityParse(data: IRiskDataMapper) {
-    const quantityObject: Pick<IRiskDataModel, 'quantityQui' | 'quantityHeat' | 'quantityRadiation' | 'quantityVibrationFB' | 'quantityNoise' | 'quantityVibrationL'> = {
+    const quantityObject: Pick<
+      IRiskDataModel,
+      | 'quantityQui'
+      | 'quantityHeat'
+      | 'quantityRadiation'
+      | 'quantityVibrationFB'
+      | 'quantityNoise'
+      | 'quantityVibrationL'
+    > = {
       quantityQui: null,
       quantityNoise: null,
       quantityVibrationFB: null,
       quantityVibrationL: null,
       quantityRadiation: null,
       quantityHeat: null,
-    }
+    };
 
-    const json = data.json as any
-    if (!json) return quantityObject
-    if (typeof json !== 'object') return quantityObject
+    const json = data.json as any;
+    if (!json) return quantityObject;
+    if (typeof json !== 'object') return quantityObject;
 
-    if (json.type === QuantityTypeEnum.QUI) quantityObject.quantityQui = new RiskDataQuantityQuiVO(json)
-    if (json.type === QuantityTypeEnum.NOISE) quantityObject.quantityNoise = new RiskDataQuantityNoiseVO(json)
-    if (json.type === QuantityTypeEnum.VFB) quantityObject.quantityVibrationFB = new RiskDataQuantityVibrationFBVO(json)
-    if (json.type === QuantityTypeEnum.VL) quantityObject.quantityVibrationL = new RiskDataQuantityVibrationLVO(json)
-    if (json.type === QuantityTypeEnum.RADIATION) quantityObject.quantityRadiation = new RiskDataQuantityRadiationVO(json)
-    if (json.type === QuantityTypeEnum.HEAT) quantityObject.quantityHeat = new RiskDataQuantityHeatVO(json)
+    if (json.type === QuantityTypeEnum.QUI) quantityObject.quantityQui = new RiskDataQuantityQuiVO(json);
+    if (json.type === QuantityTypeEnum.NOISE) quantityObject.quantityNoise = new RiskDataQuantityNoiseVO(json);
+    if (json.type === QuantityTypeEnum.VFB)
+      quantityObject.quantityVibrationFB = new RiskDataQuantityVibrationFBVO(json);
+    if (json.type === QuantityTypeEnum.VL) quantityObject.quantityVibrationL = new RiskDataQuantityVibrationLVO(json);
+    if (json.type === QuantityTypeEnum.RADIATION)
+      quantityObject.quantityRadiation = new RiskDataQuantityRadiationVO(json);
+    if (json.type === QuantityTypeEnum.HEAT) quantityObject.quantityHeat = new RiskDataQuantityHeatVO(json);
 
-    return quantityObject
+    return quantityObject;
   }
 }
-

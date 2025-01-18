@@ -9,6 +9,7 @@ export class PgrUploadService {
   async execute(body: UploadDocumentDto) {
     return await this.creatorDocumentPGR.execute({
       documentVersionId: body.id,
+      homogeneousGroupsIds: body.ghoIds,
     });
   }
 }

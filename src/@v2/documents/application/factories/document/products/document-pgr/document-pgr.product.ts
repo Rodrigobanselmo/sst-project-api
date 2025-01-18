@@ -14,7 +14,14 @@ import { dateUtils } from '@/@v2/shared/utils/helpers/date-utils';
 import { BadRequestException } from '@nestjs/common';
 import { ISectionOptions } from 'docx';
 import { v4 } from 'uuid';
-import { IDocumentFactoryProduct, IGetAttachments, IGetDocument, ISaveDocument, ISaveErrorDocument, IUnlinkPaths } from '../../types/document-factory.types';
+import {
+  IDocumentFactoryProduct,
+  IGetAttachments,
+  IGetDocument,
+  ISaveDocument,
+  ISaveErrorDocument,
+  IUnlinkPaths,
+} from '../../types/document-factory.types';
 import { IProductDocumentPGR } from './document-pgr.types';
 
 export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocumentPGR, DocumentPGRModel> {
@@ -24,16 +31,16 @@ export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocum
   constructor(
     private readonly documentDAO: DocumentDAO,
     private readonly documentVersionRepository: DocumentVersionRepository,
-    private readonly donwloadImageService: DonwloadImageService
-  ) { }
+    private readonly donwloadImageService: DonwloadImageService,
+  ) {}
 
-  public async getData({ documentVersionId }: IProductDocumentPGR) {
-    const document = await this.documentDAO.findDocumentPGR({ documentVersionId });
+  public async getData({ documentVersionId, homogeneousGroupsIds }: IProductDocumentPGR) {
+    const document = await this.documentDAO.findDocumentPGR({ documentVersionId, homogeneousGroupsIds });
     if (!document) throw new BadRequestException('Nenhum documento PGR cadastrado');
 
     await this.downloadImages(document);
 
-    return document
+    return document;
   }
 
   public async getAttachments({ data }: IGetAttachments<IProductDocumentPGR, DocumentPGRModel>) {
@@ -120,19 +127,19 @@ export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocum
       status: DocumentVersionStatus.DONE,
       attachments,
       fileUrl: url,
-    })
+    });
 
     const document = await this.documentVersionRepository.update(documentVersion);
-    return document
+    return document;
   }
 
-  public async error({ body }: ISaveErrorDocument<IProductDocumentPGR>,) {
+  public async error({ body }: ISaveErrorDocument<IProductDocumentPGR>) {
     const documentVersion = new DocumentVersionEntity({
       id: body.documentVersionId,
       status: DocumentVersionStatus.ERROR,
       attachments: [],
       fileUrl: null,
-    })
+    });
 
     await this.documentVersionRepository.update(documentVersion);
   }
@@ -147,9 +154,8 @@ export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocum
     });
   };
 
-
   private getVersionName = (data: DocumentPGRModel) => {
-    return getDocumentVersion(data.documentVersion)
+    return getDocumentVersion(data.documentVersion);
   };
 
   private async downloadImages(document: DocumentPGRModel) {
@@ -157,17 +163,17 @@ export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocum
     const company = document.documentBase.company;
     const consultant = document.documentBase.company.consultant;
 
-    const companyLogoPath = await this.donwloadImageService.donwload({ imageUrl: company.logoUrl })
-    const consultantLogoPath = await this.donwloadImageService.donwload({ imageUrl: consultant?.logoUrl })
+    const companyLogoPath = await this.donwloadImageService.donwload({ imageUrl: company.logoUrl });
+    const consultantLogoPath = await this.donwloadImageService.donwload({ imageUrl: consultant?.logoUrl });
 
     if (companyLogoPath) {
-      this.unlinkPaths.push({ path: companyLogoPath })
+      this.unlinkPaths.push({ path: companyLogoPath });
       company.logoPath = companyLogoPath;
-    };
+    }
     if (consultantLogoPath && consultant) {
-      this.unlinkPaths.push({ path: consultantLogoPath })
-      consultant.logoPath = consultantLogoPath
-    };
+      this.unlinkPaths.push({ path: consultantLogoPath });
+      consultant.logoPath = consultantLogoPath;
+    }
 
     await this.donwloadImageService.donwloadBatch({
       images: images,
@@ -178,9 +184,12 @@ export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocum
           image.path = path;
         }
       },
-    })
+    });
 
-    const photos = document.homogeneousGroups.map((group) => group.characterization?.photos).flat().filter(Boolean) as CharacterizationPhotoModel[];
+    const photos = document.homogeneousGroups
+      .map((group) => group.characterization?.photos)
+      .flat()
+      .filter(Boolean) as CharacterizationPhotoModel[];
     await this.donwloadImageService.donwloadBatch({
       images: photos,
       getUrl: (photo) => photo.url,
@@ -190,6 +199,6 @@ export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocum
           photo.path = path;
         }
       },
-    })
+    });
   }
 }

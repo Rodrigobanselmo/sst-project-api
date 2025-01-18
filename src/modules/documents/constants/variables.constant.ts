@@ -8,6 +8,16 @@ type IVariableMap = Record<
 
 export const variableMap: IVariableMap = {
   //*main string
+  [VariablesPGREnum.CURRENT_DATE_LONG]: {
+    type: VariablesPGREnum.CURRENT_DATE_LONG,
+    label: 'DATA ATUAL POR EXTENSO',
+    accept: [DocumentTypeEnum.OTHER],
+  },
+  [VariablesPGREnum.CURRENT_DATE_SHORT]: {
+    type: VariablesPGREnum.CURRENT_DATE_SHORT,
+    label: 'DATA ATUAL DD/MM/YYYY',
+    accept: [DocumentTypeEnum.OTHER],
+  },
   [VariablesPGREnum.COMPANY_CEP]: {
     type: VariablesPGREnum.COMPANY_CEP,
     label: 'CEP (EMPRESA ATUAL)',
