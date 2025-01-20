@@ -1,7 +1,11 @@
 import { RiskFactorsEnum } from '@prisma/client';
 import { AlignmentType } from 'docx';
 import { palette } from '../../../../../constants/palette';
-import { HierarchyMapData, IDocumentRiskGroupDataConverter, IGHODataConverter } from '../../../../../converter/hierarchy.converter';
+import {
+  HierarchyMapData,
+  IDocumentRiskGroupDataConverter,
+  IGHODataConverter,
+} from '../../../../../converter/hierarchy.converter';
 
 import { RiskDataModel } from '@/@v2/documents/domain/models/risk-data.model';
 import { getMatrizRisk } from '@/@v2/shared/domain/functions/security/get-matrix-risk.func';
@@ -18,11 +22,11 @@ export function isRiskValidForHierarchyData({
   hierarchyData,
   riskData,
   isByGroup,
-  homogeneousGroup
+  homogeneousGroup,
 }: {
   hierarchyData: HierarchyMapData;
   homogeneousGroup: IGHODataConverter;
-  riskData: RiskDataModel
+  riskData: RiskDataModel;
   isByGroup: boolean;
 }) {
   if (!hierarchyData.allHomogeneousGroupIds.includes(homogeneousGroup.gho.id)) return false;
@@ -66,7 +70,7 @@ export const dataConverter = (
       const fill = { shading: { fill: palette.table.header.string } };
 
       const riskOccupational = matrixRiskMap[getMatrizRisk(riskData.risk.severity, riskData.probability)];
-      const riskOccupationalAfter = matrixRiskMap[getMatrizRisk(riskData.risk.severity, riskData.probability)];
+      const riskOccupationalAfter = matrixRiskMap[getMatrizRisk(riskData.risk.severity, riskData.probabilityAfter)];
 
       let origin: string = '';
 
@@ -83,7 +87,6 @@ export const dataConverter = (
 
         if (hierarchy) origin = `${hierarchy.name}\n(${originRiskMap[hierarchy.typeEnum].name})`;
       }
-
 
       cells[ThirdRiskInventoryColumnEnum.TYPE] = {
         text: riskMap[riskData.risk.type]?.label || '',

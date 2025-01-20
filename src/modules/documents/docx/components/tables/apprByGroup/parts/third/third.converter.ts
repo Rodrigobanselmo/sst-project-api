@@ -45,7 +45,7 @@ export const dataConverter = (
       const fill = { shading: { fill: palette.table.header.string } };
 
       const riskOccupational = getMatrizRisk(riskData.riskFactor.severity, riskData.probability);
-      const riskOccupationalAfter = getMatrizRisk(riskData.riskFactor.severity, riskData.probability);
+      const riskOccupationalAfter = getMatrizRisk(riskData.riskFactor.severity, riskData.probabilityAfter);
 
       let origin: string;
 

@@ -1,7 +1,11 @@
 import { RiskFactorsEnum } from '@prisma/client';
 import { AlignmentType } from 'docx';
 import { palette } from '../../../../../constants/palette';
-import { HierarchyMapData, IDocumentRiskGroupDataConverter, IHierarchyMap } from '../../../../../converter/hierarchy.converter';
+import {
+  HierarchyMapData,
+  IDocumentRiskGroupDataConverter,
+  IHierarchyMap,
+} from '../../../../../converter/hierarchy.converter';
 
 import { getMatrizRisk } from '@/@v2/shared/domain/functions/security/get-matrix-risk.func';
 import { sortNumber } from '@/@v2/shared/utils/sorts/number.sort';
@@ -26,12 +30,15 @@ export const dataConverter = (
     .sort((a, b) => sortString(a.riskData.risk.name, b.riskData.risk.name))
     .sort((a, b) => sortNumber(riskMap[a.riskData.risk.type]?.order, riskMap[b.riskData.risk.type]?.order))
     .forEach((riskData) => {
-      if (!isRiskValidForHierarchyData({
-        hierarchyData,
-        riskData: riskData.riskData,
-        isByGroup: true,
-        homogeneousGroup: riskData.homogeneousGroup,
-      })) return;
+      if (
+        !isRiskValidForHierarchyData({
+          hierarchyData,
+          riskData: riskData.riskData,
+          isByGroup: true,
+          homogeneousGroup: riskData.homogeneousGroup,
+        })
+      )
+        return;
 
       const cells: bodyTableProps[] = [];
 
@@ -47,8 +54,10 @@ export const dataConverter = (
       const attention = { color: palette.text.attention.string, bold: true };
       const fill = { shading: { fill: palette.table.header.string } };
 
-      const riskOccupational = matrixRiskMap[getMatrizRisk(riskData.riskData.risk.severity, riskData.riskData.probability)];
-      const riskOccupationalAfter = matrixRiskMap[getMatrizRisk(riskData.riskData.risk.severity, riskData.riskData.probability)];
+      const riskOccupational =
+        matrixRiskMap[getMatrizRisk(riskData.riskData.risk.severity, riskData.riskData.probability)];
+      const riskOccupationalAfter =
+        matrixRiskMap[getMatrizRisk(riskData.riskData.risk.severity, riskData.riskData.probabilityAfter)];
 
       let origin: string = '';
 
