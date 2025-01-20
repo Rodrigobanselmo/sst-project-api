@@ -65,7 +65,7 @@ export class TableBodyElements {
       children: [
         ...text.split('\n').map((value) =>
           paragraphNewNormal(value, {
-            size: 12,
+            size: 6,
             color: palette.text.main.string,
             alignment: AlignmentType.CENTER,
             spacing: {

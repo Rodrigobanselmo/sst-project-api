@@ -1,18 +1,17 @@
-import { Injectable } from '@nestjs/common'
-import { Prisma } from '@prisma/client'
-
+import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class DocumentBaseDAO {
-  constructor() { }
+  constructor() {}
 
   static selectOptions() {
     const include = {
       model: true,
       workspace: {
         include: {
-          address: true
-        }
+          address: true,
+        },
       },
       company: {
         include: {
@@ -24,25 +23,28 @@ export class DocumentBaseDAO {
               applyingServiceCompany: {
                 include: {
                   covers: true,
-                  address: true
-                }
-              }
-            }
+                  address: true,
+                },
+              },
+            },
           },
-        }
+        },
       },
-      docs: true,
+      docs: {
+        distinct: 'version',
+        orderBy: { created_at: 'desc' },
+      },
       professionalsSignatures: {
         include: {
           professional: {
             include: {
-              professional: true
-            }
-          }
-        }
+              professional: true,
+            },
+          },
+        },
       },
-    } satisfies Prisma.DocumentDataFindFirstArgs['include']
+    } satisfies Prisma.DocumentDataFindFirstArgs['include'];
 
-    return { include }
+    return { include };
   }
 }
