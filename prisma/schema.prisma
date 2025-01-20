@@ -715,6 +715,8 @@ model Employee {
   newExamAdded         DateTime?
   cbo                  String?
   rg                   String?
+  user_id              Int?
+  user                 User?                      @relation(fields: [user_id], references: [id], onDelete: Restrict)
   absenteeisms         Absenteeism[]
   cat                  Cat[]
   cids                 Cid[]
@@ -1255,7 +1257,7 @@ model Notification {
 }
 
 model Professional {
-  name           String
+  name           String?
   formation      String[]
   certifications String[]
   created_at     DateTime              @default(now())
@@ -1703,7 +1705,7 @@ model User {
   id                  Int                    @id @default(autoincrement())
   email               String                 @unique
   name                String?
-  password            String
+  password            String?
   created_at          DateTime               @default(now())
   updated_at          DateTime               @updatedAt
   deleted_at          DateTime?
@@ -1730,6 +1732,7 @@ model User {
   recComments       RiskFactorDataRecComments[]
   recCommentsAnswer RiskFactorDataRecComments[] @relation("rec_comment_answer")
   RiskFactorDataRec RiskFactorDataRec[]
+  Employee          Employee[]
 
   @@unique([id, name])
   @@index([email])
