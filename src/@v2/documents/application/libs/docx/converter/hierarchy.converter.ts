@@ -60,7 +60,7 @@ export type IHierarchyMap = Record<
 export type IHomoGroupMap = Record<string, IGHODataConverter>;
 export type IRiskMap = Record<string, { name: string }>;
 
-const setMapHierarchies = (hierarchyData: IHierarchyDataConverter[]) => {
+const setMapHierarchies = (hierarchyData: IHierarchyDataConverter[], homoGroupData = [] as HomogeneousGroupModel[]) => {
   const hierarchyTree = {} as IHierarchyMap;
   const homoGroupTree = {} as IHomoGroupMap;
 
@@ -85,6 +85,7 @@ const setMapHierarchies = (hierarchyData: IHierarchyDataConverter[]) => {
     hierarchy.homogeneousGroups.forEach((homogeneousGroup) => {
       if (!homoGroupTree[homogeneousGroup.id])
         homoGroupTree[homogeneousGroup.id] = {
+          gho: {},
           employeeCount: 0,
           hierarchies: [],
         } as any;
@@ -97,13 +98,20 @@ const setMapHierarchies = (hierarchyData: IHierarchyDataConverter[]) => {
     });
   });
 
+  homoGroupData.forEach((gho) => {
+    if (!homoGroupTree[gho.id])
+      homoGroupTree[gho.id] = {
+        gho: gho,
+        employeeCount: 0,
+        hierarchies: [],
+      } as any;
+  });
+
   Object.values(homoGroupTree).forEach((homoGroup) => {
     const employees: EmployeeModel[] = [];
     homoGroupTree[homoGroup.gho.id].hierarchies.forEach((h) => {
       employees.push(...h.employees);
     });
-
-    homoGroup.gho.isCharacterization;
 
     homoGroupTree[homoGroup.gho.id].employeeCount = removeDuplicate(employees, {
       removeById: 'id',
@@ -120,7 +128,8 @@ export const hierarchyConverter = (
   _company: CompanyModel,
   _documentType: IDocumentsRequirementKeys,
 ) => {
-  const { hierarchyTree, homoGroupTree } = setMapHierarchies(hierarchies);
+  const { hierarchyTree, homoGroupTree } = setMapHierarchies(hierarchies, homoGroup);
+
   const hierarchyData = new Map<string, HierarchyMapData>();
   const hierarchyHighLevelsData = new Map<string, HierarchyMapData>();
 
@@ -147,7 +156,7 @@ export const hierarchyConverter = (
           parent?.homogeneousGroups
             ?.map((group) => {
               if (!group.isEnviroment) return;
-              return (homoGroup.find((e) => e.id === group.id) || {})?.characterization.name || '';
+              return (homoGroup.find((e) => e.id === group.id) || {})?.characterization?.name || '';
             })
             .filter((e) => e)
             .join(', ') || '',
@@ -176,7 +185,7 @@ export const hierarchyConverter = (
         hierarchy?.homogeneousGroups
           ?.map((group) => {
             if (!group.isEnviroment) return;
-            return (homoGroup.find((e) => e.id === group.id) || {})?.characterization.name || '';
+            return (homoGroup.find((e) => e.id === group.id) || {})?.characterization?.name || '';
           })
           .filter((e) => e)
           .join(', ') || '',

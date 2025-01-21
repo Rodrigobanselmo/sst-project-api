@@ -6,9 +6,9 @@ import { HomogeneousGroupModel } from '@/@v2/documents/domain/models/homogeneous
 import { VariablesPGREnum } from '../../enums/variables.enum';
 
 interface IBooleanVariables {
-  documentVersion: DocumentVersionModel
-  hierarchies: HierarchyModel[]
-  homogeneousGroups: HomogeneousGroupModel[]
+  documentVersion: DocumentVersionModel;
+  hierarchies: HierarchyModel[];
+  homogeneousGroups: HomogeneousGroupModel[];
 }
 
 export const booleanVariables = (document: IBooleanVariables) => {
@@ -32,7 +32,7 @@ export const booleanVariables = (document: IBooleanVariables) => {
     [VariablesPGREnum.HAS_QUANTITY_HEAT]: risksDataVariables.hasQuantityHeat ? 'true' : '',
     [VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_RISK]: homogeneousGroupsVariables.hasEnviromentRisk ? 'true' : '',
     [VariablesPGREnum.COMPANY_HAS_CHARACTERIZATION_RISK]: homogeneousGroupsVariables.hasCharacterizationRisk ? 'true' : '',
-    [VariablesPGREnum.COMPANY_HAS_HIERARCHY_RISK]: homogeneousGroupsVariables.hasCharacterizationRisk ? 'true' : '',
+    [VariablesPGREnum.COMPANY_HAS_HIERARCHY_RISK]: homogeneousGroupsVariables.hasHierarchyRisk ? 'true' : '',
     [VariablesPGREnum.COMPANY_HAS_GSE_RISK]: homogeneousGroupsVariables.hasGHORisk ? 'true' : '',
     [VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_GENERAL]: homogeneousGroupsVariables.hasEnviromentGeneral ? 'true' : '',
     [VariablesPGREnum.COMPANY_HAS_ENVIRONMENT_ADM]: homogeneousGroupsVariables.hasEnviromentAdministrative ? 'true' : '',

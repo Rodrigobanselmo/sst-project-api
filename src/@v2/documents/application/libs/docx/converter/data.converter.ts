@@ -21,8 +21,7 @@ export function dataConverter({ data }: IDocumentClassType) {
     }))
     .map((hierarchy) => {
       const hierarchyCopy = { ...hierarchy } as unknown as IHierarchyDataConverter;
-      hierarchyCopy.homogeneousGroups =
-        hierarchy.hierarchyOnHomogeneous?.map((homo) => homo.homogeneousGroup).filter(Boolean) || [];
+      hierarchyCopy.homogeneousGroups = hierarchy.hierarchyOnHomogeneous?.map((homo) => homo.homogeneousGroup).filter(Boolean) || [];
 
       return hierarchyCopy;
     });

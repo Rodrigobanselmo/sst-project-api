@@ -2,13 +2,16 @@ import { CharacterizationTypeEnum } from '@/@v2/shared/domain/enum/security/char
 import { CompanyCharacterization, CompanyCharacterizationPhoto } from '@prisma/client';
 import { CharacterizationPhotoModel } from '../../domain/models/characterization-photos.model';
 import { CharacterizationModel } from '../../domain/models/characterization.model';
+import { isDevelopmentGetter } from '@/@v2/shared/utils/helpers/is-development';
 
 export type ICharacterizationMapper = CompanyCharacterization & {
-  photos: CompanyCharacterizationPhoto[]
-}
+  photos: CompanyCharacterizationPhoto[];
+};
 
 export class CharacterizationMapper {
   static toModel(data: ICharacterizationMapper): CharacterizationModel {
+    const isDevelopment = isDevelopmentGetter();
+
     return new CharacterizationModel({
       id: data.id,
       name: data.name,
@@ -24,11 +27,16 @@ export class CharacterizationMapper {
       paragraphs: data.paragraphs,
       considerations: data.considerations,
 
-      photos: data.photos.map(photo => new CharacterizationPhotoModel({
-        isVertical: photo.isVertical,
-        name: photo.name,
-        url: photo.photoUrl,
-      }))
-    })
+      photos: !isDevelopment
+        ? data.photos.map(
+            (photo) =>
+              new CharacterizationPhotoModel({
+                isVertical: photo.isVertical,
+                name: photo.name,
+                url: photo.photoUrl,
+              }),
+          )
+        : [],
+    });
   }
 }

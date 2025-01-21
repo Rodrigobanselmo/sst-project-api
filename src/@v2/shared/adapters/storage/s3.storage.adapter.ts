@@ -1,7 +1,7 @@
 import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
 import { config } from '@/@v2/shared/constants/config';
-import { isDevelopment } from '@/@v2/shared/utils/helpers/is-development';
+import { isDevelopmentGetter } from '@/@v2/shared/utils/helpers/is-development';
 import { getContentType } from '@/@v2/shared/utils/helpers/get-content-type';
 import { Readable } from 'stream';
 import { IStorageAdapter } from './storage.interface';
@@ -16,7 +16,7 @@ export class S3StorageAdapter implements IStorageAdapter {
   }
 
   async upload({ file, fileName, isPublic }: IStorageAdapter.Upload.Params): Promise<IStorageAdapter.Upload.Result> {
-    const key = isDevelopment() ? `${'test'}/${fileName}` : fileName;
+    const key = isDevelopmentGetter() ? `${'test'}/${fileName}` : fileName;
 
     const command = new PutObjectCommand({
       Bucket: this.bucket,
@@ -42,12 +42,12 @@ export class S3StorageAdapter implements IStorageAdapter {
     const fileStream = await this.s3.send(command);
     if (!fileStream.Body) throw new Error('File not found');
 
-    return Readable.from(this.toReadable(fileStream.Body.transformToWebStream()))
+    return Readable.from(this.toReadable(fileStream.Body.transformToWebStream()));
   }
 
   async delete({ fileUrl }: IStorageAdapter.Delete.Params): Promise<IStorageAdapter.Delete.Result> {
     const fileKey = fileUrl.split('.com/').at(-1);
-    if (isDevelopment() && !fileKey?.includes('test')) return;
+    if (isDevelopmentGetter() && !fileKey?.includes('test')) return;
 
     const command = new DeleteObjectCommand({
       Bucket: this.bucket,

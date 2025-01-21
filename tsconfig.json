@@ -12,13 +12,8 @@
     "allowJs": true,
     "resolveJsonModule": true,
     "paths": {
-      "@/*": [
-        "src/*",
-        "test/*"
-      ],
-      "@v2": [
-        "src/@v2/*"
-      ]
+      "@/*": ["src/*", "test/*"],
+      "@v2": ["src/@v2/*"]
     },
     "removeComments": true,
     "emitDecoratorMetadata": true,
@@ -31,17 +26,10 @@
     "baseUrl": "./",
     "incremental": true,
     "noErrorTruncation": true,
-    "lib": [
-      "ES2021",
-      "dom",
-      "esnext"
-    ],
+    "lib": ["ES2021", "dom", "esnext"],
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.d.ts"
-  ]
+  "include": ["src/**/*.ts", "src/**/*.d.ts"]
 }

@@ -14,14 +14,7 @@ import { dateUtils } from '@/@v2/shared/utils/helpers/date-utils';
 import { BadRequestException } from '@nestjs/common';
 import { ISectionOptions } from 'docx';
 import { v4 } from 'uuid';
-import {
-  IDocumentFactoryProduct,
-  IGetAttachments,
-  IGetDocument,
-  ISaveDocument,
-  ISaveErrorDocument,
-  IUnlinkPaths,
-} from '../../types/document-factory.types';
+import { IDocumentFactoryProduct, IGetAttachments, IGetDocument, ISaveDocument, ISaveErrorDocument, IUnlinkPaths } from '../../types/document-factory.types';
 import { IProductDocumentPGR } from './document-pgr.types';
 
 export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocumentPGR, DocumentPGRModel> {

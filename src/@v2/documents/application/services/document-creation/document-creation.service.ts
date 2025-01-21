@@ -2,7 +2,7 @@ import { AttachmentEntity } from '@/@v2/documents/domain/entities/attachment.ent
 import { IStorageAdapter } from '@/@v2/shared/adapters/storage/storage.interface';
 import { BUCKET_FOLDERS } from '@/@v2/shared/constants/buckets';
 import { SharedTokens } from '@/@v2/shared/constants/tokens';
-import { isDevelopment } from '@/@v2/shared/utils/helpers/is-development';
+import { isDevelopmentGetter } from '@/@v2/shared/utils/helpers/is-development';
 import { Inject, Injectable } from '@nestjs/common';
 import { ISectionOptions, Packer } from 'docx';
 import { unlinkSync } from 'fs';
@@ -15,10 +15,10 @@ export class DocumentCreationService {
   constructor(
     @Inject(SharedTokens.Storage)
     private readonly storage: IStorageAdapter,
-  ) { }
+  ) {}
 
   public async execute<T, R>({ product, body }: IDocumentCreation.Params<T, R>) {
-    const isLocal = isDevelopment();
+    const isLocal = isDevelopmentGetter();
 
     try {
       if (isLocal) console.log(1, 'start');
@@ -27,7 +27,7 @@ export class DocumentCreationService {
       const attachments = await this.saveAttachments<T, R>(attachmentsData, product, data);
       if (isLocal) console.log(2, 'attachments');
 
-      const sections = await product.getSections({ data, attachments: attachmentsData.map(attachment => attachment.model), body })
+      const sections = await product.getSections({ data, attachments: attachmentsData.map((attachment) => attachment.model), body });
       const fileName = product.getFileName(data);
 
       const { buffer } = await this.generate({ sections });
@@ -66,7 +66,7 @@ export class DocumentCreationService {
     return attachmentsEntity;
   }
 
-  private async generate({ sections }: { sections: ISectionOptions[]; }) {
+  private async generate({ sections }: { sections: ISectionOptions[] }) {
     const Doc = createBaseDocument(sections);
 
     const b64string = await Packer.toBase64String(Doc);
@@ -90,7 +90,7 @@ export class DocumentCreationService {
       .forEach((path) => {
         try {
           unlinkSync(path.path);
-        } catch (e) { }
+        } catch (e) {}
       });
   }
 }
