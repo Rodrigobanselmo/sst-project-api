@@ -27,7 +27,7 @@ export class HomogeneousGroupDAO {
     const homogeneousGroups = await this.prisma.homogeneousGroup.findMany({
       where: {
         workspaces: { some: { id: params.workspaceId } },
-        ...(params?.homogeneousGroupsIds.length
+        ...(params?.homogeneousGroupsIds?.length
           ? {
               OR: [
                 {

@@ -36,7 +36,6 @@ export class SectionsMapClass {
   private variables: IDocVariables;
   private elementsMap: IMapElementDocumentType;
 
-
   constructor({ version, variables, data, elementsMap }: IDocumentClassType) {
     this.data = data;
     this.version = version;
@@ -46,13 +45,14 @@ export class SectionsMapClass {
 
   public map: IMapSectionDocumentType = {
     [DocumentSectionTypeEnum.TOC]: () => summarySections(),
-    [DocumentSectionTypeEnum.COVER]: ({ }: ICover) => coverSections({
-      imgPath: this.data.documentBase.company.logoPath,
-      version: this.version,
-      title: replaceAllVariables(`??${VariablesPGREnum.DOCUMENT_TITLE}??`, this.variables),
-      companyName: `${this.data.documentBase.company.name} ${this.data.documentBase.company.initials ? `(${this.data.documentBase.company.initials})` : ''}`,
-      coverProps: this.data.documentBase.company.cover(CoverTypeEnum.PGR),
-    }),
+    [DocumentSectionTypeEnum.COVER]: ({}: ICover) =>
+      coverSections({
+        imgPath: this.data.documentBase.company.logoPath,
+        version: this.version,
+        title: replaceAllVariables(`??${VariablesPGREnum.DOCUMENT_TITLE}??`, this.variables),
+        companyName: `${this.data.documentBase.company.name} ${this.data.documentBase.company.initials ? `(${this.data.documentBase.company.initials})` : ''}`,
+        coverProps: this.data.documentBase.company.cover(CoverTypeEnum.PGR),
+      }),
     [DocumentSectionTypeEnum.CHAPTER]: ({ text }: IChapter) =>
       chapterSection({
         version: this.version,
@@ -67,24 +67,40 @@ export class SectionsMapClass {
       ...sectionLandscapeProperties,
     }),
     [DocumentSectionTypeEnum.ITERABLE_ENVIRONMENTS]: (): ISectionOptions[] =>
-      allCharacterizationSections(this.data.homogeneousGroups, this.oldData.hierarchyData, this.oldData.homoGroupTree, 'env', (x, v) =>
-        this.convertToDocx(x, v),
+      allCharacterizationSections(
+        this.data.homogeneousGroups,
+        this.oldData.hierarchyData,
+        this.oldData.homoGroupTree,
+        'env',
+        (x, v) => this.convertToDocx(x, v),
       ).map(({ footerText, children }) => ({
         children,
         ...this.getFooterHeader(footerText),
         ...sectionLandscapeProperties,
       })),
     [DocumentSectionTypeEnum.ITERABLE_CHARACTERIZATION]: (): ISectionOptions[] =>
-      allCharacterizationSections(this.data.homogeneousGroups, this.oldData.hierarchyData, this.oldData.homoGroupTree, 'char', (x, v) =>
-        this.convertToDocx(x, v),
+      allCharacterizationSections(
+        this.data.homogeneousGroups,
+        this.oldData.hierarchyData,
+        this.oldData.homoGroupTree,
+        'char',
+        (x, v) => this.convertToDocx(x, v),
       ).map(({ footerText, children }) => ({
         children,
         ...this.getFooterHeader(footerText),
         ...sectionLandscapeProperties,
       })),
-    [DocumentSectionTypeEnum.APR]: () => APPRTableSection(this.oldData.documentRiskData, this.oldData.hierarchyData, this.oldData.homoGroupTree),
-    [DocumentSectionTypeEnum.APR_GROUP]: () => APPRByGroupTableSection(this.oldData.documentRiskData, this.oldData.hierarchyHighLevelsData, this.oldData.hierarchyTree, this.oldData.homoGroupTree),
-    [DocumentSectionTypeEnum.ACTION_PLAN]: () => actionPlanTableSection(this.oldData.documentRiskData, this.oldData.hierarchyTree),
+    [DocumentSectionTypeEnum.APR]: () =>
+      APPRTableSection(this.oldData.documentRiskData, this.oldData.hierarchyData, this.oldData.homoGroupTree),
+    [DocumentSectionTypeEnum.APR_GROUP]: () =>
+      APPRByGroupTableSection(
+        this.oldData.documentRiskData,
+        this.oldData.hierarchyHighLevelsData,
+        this.oldData.hierarchyTree,
+        this.oldData.homoGroupTree,
+      ),
+    [DocumentSectionTypeEnum.ACTION_PLAN]: () =>
+      actionPlanTableSection(this.oldData.documentRiskData, this.oldData.hierarchyTree),
   };
 
   getFooterHeader = (footerText: string, title?: string) => {
@@ -115,7 +131,7 @@ export class SectionsMapClass {
   }
 
   private get oldData() {
-    const data = dataConverter({ data: this.data })
-    return data
+    const data = dataConverter({ data: this.data });
+    return data;
   }
 }

@@ -1,7 +1,7 @@
 import { WorkspaceOrderByEnum } from '@/@v2/enterprise/company/database/dao/workspace/workspace.types';
 import { OrderByDirectionEnum } from '@/@v2/shared/types/order-by.types';
 import { Type } from 'class-transformer';
-import { IsArray, IsEnum, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsEnum, IsOptional, ValidateNested } from 'class-validator';
 
 class OrderBy {
   @IsEnum(WorkspaceOrderByEnum)
@@ -18,5 +18,3 @@ export class BrowseWorkspaceQuery {
   @Type(() => OrderBy)
   orderBy?: OrderBy[];
 }
-
-

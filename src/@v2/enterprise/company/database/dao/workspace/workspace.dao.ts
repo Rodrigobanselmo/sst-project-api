@@ -7,19 +7,16 @@ import { IWorkspaceBrowseResultModelMapper } from '../../mappers/models/workspac
 import { WorkspaceBrowseModelMapper } from '../../mappers/models/workspace/workspace-all-browse.mapper';
 import { IWorkspaceDAO, WorkspaceOrderByEnum } from './workspace.types';
 
-
 @Injectable()
 export class WorkspaceDAO {
-  constructor(
-    private readonly prisma: PrismaServiceV2,
-  ) { }
+  constructor(private readonly prisma: PrismaServiceV2) {}
 
   async browseAll({ orderBy, filters }: IWorkspaceDAO.BrowseParams) {
-    const browseWhereParams = this.browseWhere(filters)
-    const filterWhereParams = this.filterWhere(filters)
-    const orderByParams = this.browseOrderBy(orderBy)
+    const browseWhereParams = this.browseWhere(filters);
+    const filterWhereParams = this.filterWhere(filters);
+    const orderByParams = this.browseOrderBy(orderBy);
 
-    const whereParams = [...browseWhereParams, ...filterWhereParams]
+    const whereParams = [...browseWhereParams, ...filterWhereParams];
 
     const workspacesPromise = this.prisma.$queryRaw<IWorkspaceBrowseResultModelMapper[]>`
       SELECT 
@@ -34,41 +31,38 @@ export class WorkspaceDAO {
       ${getOrderByRawPrisma(orderByParams)};
     `;
 
-
-    const [workspaces] = await Promise.all([workspacesPromise])
+    const [workspaces] = await Promise.all([workspacesPromise]);
 
     return WorkspaceBrowseModelMapper.toModel({
       results: workspaces,
-      filters: {}
-    })
+      filters: {},
+    });
   }
 
   private browseWhere(filters: IWorkspaceDAO.BrowseParams['filters']) {
-    const where = [
-      Prisma.sql`w."companyId" = ${filters.companyId}`,
-      Prisma.sql`w."status"::text = ${StatusEnum.ACTIVE}`
-    ]
+    const where = [Prisma.sql`w."companyId" = ${filters.companyId}`, Prisma.sql`w."status"::text = ${StatusEnum.ACTIVE}`];
 
-    return where
+    return where;
   }
 
   private filterWhere(filters: IWorkspaceDAO.BrowseParams['filters']) {
-    const where: Prisma.Sql[] = []
+    const where: Prisma.Sql[] = [];
+    filters;
 
-    return where
+    return where;
   }
 
   private browseOrderBy(orderBy?: IWorkspaceDAO.BrowseParams['orderBy']) {
-    if (!orderBy) return []
+    if (!orderBy) return [];
 
     const map: Record<WorkspaceOrderByEnum, string> = {
       [WorkspaceOrderByEnum.NAME]: 'w.name',
       [WorkspaceOrderByEnum.CREATED_AT]: 'w.created_at',
       [WorkspaceOrderByEnum.UPDATED_AT]: 'w.updated_at',
-    }
+    };
 
-    const orderByRaw = orderBy.map<IOrderByRawPrisma>(({ field, order }) => ({ column: map[field], order }))
+    const orderByRaw = orderBy.map<IOrderByRawPrisma>(({ field, order }) => ({ column: map[field], order }));
 
-    return orderByRaw
+    return orderByRaw;
   }
 }

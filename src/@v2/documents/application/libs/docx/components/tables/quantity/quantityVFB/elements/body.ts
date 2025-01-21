@@ -3,15 +3,13 @@ import {
   BorderStyle,
   ITableBordersOptions,
   ITableCellOptions,
-  Paragraph,
   TableCell,
   TableRow,
-  TextRun,
   VerticalAlign,
   WidthType,
 } from 'docx';
-import { palette } from '../../../../../constants/palette';
 import { paragraphNewNormal } from '../../../../../base/elements/paragraphs';
+import { palette } from '../../../../../constants/palette';
 
 export interface bodyTableProps extends Partial<ITableCellOptions> {
   text: string;
