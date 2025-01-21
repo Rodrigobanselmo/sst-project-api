@@ -21,18 +21,18 @@ export function dataConverter({ data }: IDocumentClassType) {
     }))
     .map((hierarchy) => {
       const hierarchyCopy = { ...hierarchy } as unknown as IHierarchyDataConverter;
-      hierarchyCopy.homogeneousGroups = hierarchy.hierarchyOnHomogeneous?.map((homo) => homo.homogeneousGroup) || [];
+      hierarchyCopy.homogeneousGroups =
+        hierarchy.hierarchyOnHomogeneous?.map((homo) => homo.homogeneousGroup).filter(Boolean) || [];
 
       return hierarchyCopy;
     });
-
 
   const { hierarchyData, hierarchyHighLevelsData, homoGroupTree, hierarchyTree, riskGroupData } = hierarchyConverter(
     hierarchiesData,
     data.homogeneousGroups,
     data.documentBase.workspace,
     data.documentBase.company,
-    'isPGR'
+    'isPGR',
   );
 
   return {
@@ -43,7 +43,7 @@ export function dataConverter({ data }: IDocumentClassType) {
     riskGroupData,
     documentRiskData: {
       riskGroupData,
-      documentVersion: data.documentVersion
-    }
-  }
+      documentVersion: data.documentVersion,
+    },
+  };
 }
