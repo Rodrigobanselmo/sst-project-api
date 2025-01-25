@@ -14,7 +14,7 @@ import { InviteUsersEntity } from '../../../entities/invite-users.entity';
 import { InviteUsersRepository } from '../../../repositories/implementations/InviteUsersRepository';
 import { UsersRepository } from '../../../repositories/implementations/UsersRepository';
 import { ErrorInvitesEnum } from './../../../../../shared/constants/enum/errorMessage';
-import { inviteUserTemplatePath } from '@/templates/email';
+import { EmailPathEnum } from '@/templates/email';
 
 @Injectable()
 export class InviteUsersService {
@@ -118,7 +118,7 @@ export class InviteUsersService {
 }
 
 export const inviteNewUser = async (mailProvider: NodeMailProvider, invite: InviteUsersEntity) => {
-  const templatePath = inviteUserTemplatePath;
+  const templatePath = EmailPathEnum.INVITE_USER;
 
   if (!invite.email) {
     throw new BadRequestException('Email não informado ou inválido');

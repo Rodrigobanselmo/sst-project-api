@@ -35,8 +35,8 @@ export class ActionPlanMapper {
       riskDataId: data.riskFactorDataId,
       workspaceId: data.workspaceId,
       status: ActionPlanStatusEnum[data.status],
-      startDate: data.startDate,
-      doneDate: data.doneDate,
+      startDate: data.startDate || null,
+      doneDate: data.doneDate || null,
       canceledDate: data.canceledDate,
       responsibleId: data.responsibleId,
       validDate: calculateActionPlanValidDate({
@@ -46,7 +46,7 @@ export class ActionPlanMapper {
         monthsPeriodLevel_4: info.documentData.months_period_level_4,
         monthsPeriodLevel_5: info.documentData.months_period_level_5,
         validityStart: info.documentData.validityStart,
-        validDate: data.endDate,
+        validDate: data.endDate || null,
       }),
     });
   }

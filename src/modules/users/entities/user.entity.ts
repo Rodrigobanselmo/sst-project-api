@@ -30,6 +30,7 @@ export class UserEntity implements User {
   photoUrl: string;
   googleUser: string;
   facebookUser: string;
+  token: string | null;
   type: ProfessionalTypeEnum;
   professional?: ProfessionalEntity;
   councils?: ProfessionalCouncilEntity[];
