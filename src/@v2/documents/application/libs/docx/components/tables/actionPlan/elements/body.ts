@@ -1,6 +1,6 @@
-import { AlignmentType, Paragraph, TableCell, TableRow, TextRun, VerticalAlign, WidthType } from 'docx';
-import { palette } from '../../../../constants/palette';
+import { AlignmentType, TableCell, TableRow, VerticalAlign, WidthType } from 'docx';
 import { paragraphNewNormal } from '../../../../base/elements/paragraphs';
+import { palette } from '../../../../constants/palette';
 
 export interface bodyTableProps {
   text: string;

@@ -34,11 +34,11 @@ export class ActionPlanEntity {
     this.riskDataId = params.riskDataId;
     this.workspaceId = params.workspaceId;
 
-    this._responsibleId = params.responsibleId;
+    this._responsibleId = params.responsibleId || null;
     this._status = params.status;
     this._startDate = params.startDate;
     this._doneDate = params.doneDate;
-    this._canceledDate = params.canceledDate;
+    this._canceledDate = params.canceledDate || null;
     this._validDate = params.validDate;
   }
 

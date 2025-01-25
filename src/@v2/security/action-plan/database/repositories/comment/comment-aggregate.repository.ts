@@ -1,5 +1,5 @@
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
-import { asyncBatch } from '@/@v2/shared/utils/helpers/asyncBatch';
+import { asyncBatch } from '@/@v2/shared/utils/helpers/async-batch';
 import { Prisma } from '@prisma/client';
 import { CommentAggregateMapper } from '../../mappers/aggregations/comment.mapper';
 import { ICommentAggregateRepository } from './comment-aggregate.types';

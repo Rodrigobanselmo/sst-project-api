@@ -1,23 +1,35 @@
-import dayjs from 'dayjs'
+import dayjs from 'dayjs';
+
+type UnitTypeShort = 'd' | 'M' | 'y' | 'h' | 'm' | 's' | 'ms' | 'w';
+
+type UnitTypeLong = 'millisecond' | 'second' | 'minute' | 'hour' | 'day' | 'month' | 'year' | 'week';
+
+type UnitTypeLongPlural = 'milliseconds' | 'seconds' | 'minutes' | 'hours' | 'days' | 'months' | 'years' | 'weeks';
+
+export type ManipulateType = UnitTypeLong | UnitTypeLongPlural | UnitTypeShort;
 
 class DateUtils extends Date {
   constructor(date: Date | string | number = new Date()) {
-    super(date)
+    super(date);
   }
 
   static builder(date = new Date()) {
-    return new DateUtils(date)
+    return new DateUtils(date);
   }
 
   format(template: string) {
-    return dayjs(this).format(template)
+    return dayjs(this).format(template);
   }
 
   addMonths(months: number) {
-    return dayjs(this).add(months, 'month').toDate()
+    return dayjs(this).add(months, 'month').toDate();
+  }
+
+  addTime(value: number, type: ManipulateType): Date {
+    return dayjs(this).add(value, type).toDate();
   }
 }
 
 export const dateUtils = (date?: Date) => {
-  return DateUtils.builder(date)
-}
+  return DateUtils.builder(date);
+};

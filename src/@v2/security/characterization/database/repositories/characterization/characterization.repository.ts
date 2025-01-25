@@ -1,7 +1,7 @@
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
 import { Prisma } from '@prisma/client';
 import { ICharacterizationRepository } from './characterization.types';
-import { asyncBatch } from '@/@v2/shared/utils/helpers/asyncBatch';
+import { asyncBatch } from '@/@v2/shared/utils/helpers/async-batch';
 import { Injectable } from '@nestjs/common';
 import { CharacterizationMapper } from '../../mappers/entities/characterization.mapper';
 

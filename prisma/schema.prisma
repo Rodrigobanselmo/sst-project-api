@@ -1703,7 +1703,7 @@ model Status {
 
 model User {
   id                  Int                    @id @default(autoincrement())
-  email               String                 @unique
+  email               String?                @unique
   name                String?
   password            String?
   created_at          DateTime               @default(now())
@@ -1716,6 +1716,7 @@ model User {
   googleExternalId    String?
   googleUser          String?
   facebookUser        String?
+  token               String?                @default(uuid())
   esocialTransmission EmployeeESocialBatch[]
   examDone            EmployeeExamsHistory[] @relation("user_done")
   examSchedules       EmployeeExamsHistory[] @relation("user_schedule")

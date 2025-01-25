@@ -1,7 +1,7 @@
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
 import { Prisma } from '@prisma/client';
 import { IActionPlanAggregateRepository } from './action-plan-aggregate.types';
-import { asyncBatch } from '@/@v2/shared/utils/helpers/asyncBatch';
+import { asyncBatch } from '@/@v2/shared/utils/helpers/async-batch';
 import { ActionPlanAggregateMapper } from '../../mappers/aggregations/action-plan.mapper';
 import { Injectable } from '@nestjs/common';
 
