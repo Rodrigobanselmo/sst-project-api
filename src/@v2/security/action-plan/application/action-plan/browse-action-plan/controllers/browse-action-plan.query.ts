@@ -3,7 +3,7 @@ import { ActionPlanStatusEnum } from '@/@v2/security/action-plan/domain/enums/ac
 import { IRiskLevelValues } from '@/@v2/shared/domain/types/security/risk-level-values.type';
 import { OrderByDirectionEnum } from '@/@v2/shared/types/order-by.types';
 import { Type } from 'class-transformer';
-import { IsArray, IsBoolean, IsEnum, IsIn, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsBoolean, IsEnum, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 class OrderBy {
   @IsEnum(ActionPlanOrderByEnum)
@@ -84,5 +84,3 @@ export class BrowseActionPlanQuery {
   @Type(() => Boolean)
   isExpired?: boolean | null;
 }
-
-

@@ -26,18 +26,17 @@ export class CommentAggregate {
   approve({ approvedById, isApproved, approvedComment }: IUpdateApprovement) {
     if (this.comment.isApproved === isApproved) return;
 
-    const isPosponed = this.comment.type === CommentTypeEnum.POSTPONED;
+    const isPostponed = this.comment.type === CommentTypeEnum.POSTPONED;
     if (!isApproved) {
       this.comment._approvedAt = null;
       this.actionPlan._status = ActionPlanStatusEnum.REJECTED;
-      if (isPosponed) this.actionPlan._validDate = this.comment._previousValidDate;
+      if (isPostponed) this.actionPlan._validDate = this.comment._previousValidDate;
     } else {
-      const isPreviousRejected =
-        this.comment.isApproved === false && this.actionPlan._status === ActionPlanStatusEnum.REJECTED;
+      const isPreviousRejected = this.comment.isApproved === false && this.actionPlan._status === ActionPlanStatusEnum.REJECTED;
 
       if (isPreviousRejected) {
-        this.actionPlan._status = this.comment._currentStatus;
-        if (isPosponed) this.actionPlan._validDate = this.comment._currentValidDate;
+        this.actionPlan._status = this.comment._currentStatus || ActionPlanStatusEnum.PENDING;
+        if (isPostponed) this.actionPlan._validDate = this.comment._currentValidDate;
       }
 
       this.comment._approvedAt = new Date();

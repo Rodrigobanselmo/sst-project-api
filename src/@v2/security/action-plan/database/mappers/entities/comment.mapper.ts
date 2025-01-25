@@ -14,10 +14,10 @@ export class CommentMapper {
   static toEntity(data: ICommentEntityMapper): CommentEntity {
     return new CommentEntity({
       id: data.id,
-      text: data.text,
+      text: data.text || '',
       type: CommentTypeEnum[data.type],
       commentedById: data.userId,
-      textType: CommentTextTypeEnum[data.textType],
+      textType: data.textType ? CommentTextTypeEnum[data.textType] : CommentTextTypeEnum.OTHER,
       approvedAt: data.approvedAt,
       approvedById: data.approvedById,
       approvedComment: data.approvedComment,

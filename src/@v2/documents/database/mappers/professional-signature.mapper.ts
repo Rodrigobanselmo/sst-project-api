@@ -3,15 +3,14 @@ import { ProfessionalCouncilModel } from '../../domain/models/professional-counc
 import { ProfessionalSignatureModel } from '../../domain/models/professional-signature.model';
 import { ProfessionalModel } from '../../domain/models/professional.model';
 
-export type IProfessionalSignatureMapper = (DocumentDataToProfessional & {
+export type IProfessionalSignatureMapper = DocumentDataToProfessional & {
   professional: ProfessionalCouncil & {
-    professional: Professional
-  }
-})
+    professional: Professional;
+  };
+};
 
 export class ProfessionalSignatureMapper {
   static toModel(data: IProfessionalSignatureMapper): ProfessionalSignatureModel {
-
     return new ProfessionalSignatureModel({
       isElaborator: data.isElaborator,
       isSigner: data.isSigner,
@@ -25,13 +24,13 @@ export class ProfessionalSignatureMapper {
           cpf: data.professional.professional.cpf || '00000000000',
           email: data.professional.professional.email || 'e-mail não informado',
           formation: data.professional.professional.formation,
-          name: data.professional.professional.name,
+          name: data.professional.professional.name || 'Nome não informado',
         }),
       }),
-    })
+    });
   }
 
   static toModels(data: IProfessionalSignatureMapper[]): ProfessionalSignatureModel[] {
-    return data.map(professionalSignature => this.toModel(professionalSignature))
+    return data.map((professionalSignature) => this.toModel(professionalSignature));
   }
 }

@@ -20,12 +20,12 @@ export class EditManyCommentsUseCase {
     const loggedUser = this.context.get<UserContext>(ContextKey.USER);
 
     const comments = await asyncBatch({
-      items: params.ids,
+      items: params.ids || [],
       batchSize: 10,
       callback: async (id) => {
         return this.editCommentService.update({
           id,
-          isApproved: params.isApproved,
+          isApproved: params.isApproved || false,
           approvedComment: params.approvedComment,
           companyId: params.companyId,
           userId: loggedUser.id,

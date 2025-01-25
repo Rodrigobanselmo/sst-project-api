@@ -1,5 +1,7 @@
 export type IUserBrowseFilterModel = {};
 
 export class UserBrowseFilterModel {
-  constructor(params: IUserBrowseFilterModel) {}
+  constructor(params: IUserBrowseFilterModel) {
+    params;
+  }
 }

@@ -6,11 +6,7 @@ import { HierarchyTypeEnum } from '@/@v2/shared/domain/enum/company/hierarchy-ty
 import { CharacterizationTypeEnum } from '@/@v2/shared/domain/enum/security/characterization-type.enum';
 import { HomoTypeEnum } from '@/@v2/shared/domain/enum/security/homo-type.enum';
 import { getOriginHomogeneousGroup } from '@/@v2/shared/domain/functions/security/get-origin-homogeneous-group.func';
-import {
-  CharacterizationTypeEnum as PrismaCharacterizationTypeEnum,
-  HierarchyEnum as PrismaHierarchyEnum,
-  HomoTypeEnum as PrismaHomoTypeEnum,
-} from '@prisma/client';
+import { CharacterizationTypeEnum as PrismaCharacterizationTypeEnum, HierarchyEnum as PrismaHierarchyEnum, HomoTypeEnum as PrismaHomoTypeEnum } from '@prisma/client';
 
 export type ICommentBrowseResultModelMapper = {
   comment_id: string;
@@ -47,12 +43,12 @@ export class CommentBrowseResultModelMapper {
       name: prisma.hg_name,
       type: prisma.hg_type ? HomoTypeEnum[prisma.hg_type] : null,
       characterization: {
-        name: prisma.cc_name,
-        type: prisma.cc_type ? CharacterizationTypeEnum[prisma.cc_type] : null,
+        name: prisma.cc_name || '',
+        type: prisma.cc_type ? CharacterizationTypeEnum[prisma.cc_type] : CharacterizationTypeEnum.GENERAL,
       },
       hierarchy: {
-        name: prisma.h_name,
-        type: prisma.h_type ? HierarchyTypeEnum[prisma.h_type] : null,
+        name: prisma.h_name || '',
+        type: prisma.h_type ? HierarchyTypeEnum[prisma.h_type] : HierarchyTypeEnum.OFFICE,
       },
     });
 

@@ -3,7 +3,6 @@ import { ActionPlanAggregate } from '../../../domain/aggregations/action-plan.ag
 import { ActionPlanMapper, IActionPlanEntityMapper } from '../entities/action-plan.mapper';
 import { CommentMapper, ICommentEntityMapper } from '../entities/comment.mapper';
 import { CoordinatorMapper, ICoordinatorMapper } from '../entities/coordinator.mapper';
-import { dateUtils } from '@/@v2/shared/utils/helpers/date-utils';
 
 type IActionPlanAggregateMapper = {
   level: number | null;

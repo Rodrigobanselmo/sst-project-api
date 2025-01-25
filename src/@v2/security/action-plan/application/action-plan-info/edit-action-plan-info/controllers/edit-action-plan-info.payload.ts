@@ -1,5 +1,4 @@
-import { IsNotNull } from '@/@v2/shared/decorators/validators/is-not-null.decorator';
-import { IsDate, IsInt, isNotEmpty, IsNotIn, IsOptional } from 'class-validator';
+import { IsDate, IsInt, IsOptional } from 'class-validator';
 
 export class EditActionPlanInfoPayload {
   @IsInt()
@@ -8,11 +7,11 @@ export class EditActionPlanInfoPayload {
 
   @IsDate()
   @IsOptional()
-  validityStart?: Date
+  validityStart?: Date;
 
   @IsDate()
   @IsOptional()
-  validityEnd?: Date
+  validityEnd?: Date;
 
   @IsInt()
   @IsOptional()
@@ -30,5 +29,3 @@ export class EditActionPlanInfoPayload {
   @IsOptional()
   monthsLevel_5?: number;
 }
-
-

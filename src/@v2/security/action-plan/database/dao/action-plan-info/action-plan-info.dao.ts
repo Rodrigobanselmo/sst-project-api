@@ -4,12 +4,9 @@ import { DocumentTypeEnum } from '@prisma/client';
 import { ActionPlanInfoModelMapper } from '../../mappers/models/action-plan-info/action-plan-info.model';
 import { IActionPlanInfoDAO } from './action-plan-info.types';
 
-
 @Injectable()
 export class ActionPlanInfoDAO {
-  constructor(
-    private readonly prisma: PrismaServiceV2,
-  ) { }
+  constructor(private readonly prisma: PrismaServiceV2) {}
 
   async find({ companyId, workspaceId }: IActionPlanInfoDAO.FindParams) {
     const data = await this.prisma.documentData.findFirst({
@@ -20,9 +17,9 @@ export class ActionPlanInfoDAO {
       },
       include: {
         coordinator: true,
-      }
-    })
+      },
+    });
 
-    return ActionPlanInfoModelMapper.toModel(data)
+    return data ? ActionPlanInfoModelMapper.toModel(data) : null;
   }
 }

@@ -1,12 +1,9 @@
-import { CommentBrowseFilterModel } from "@/@v2/security/action-plan/domain/models/comment/comment-browse-filter.model"
+import { CommentBrowseFilterModel } from '@/@v2/security/action-plan/domain/models/comment/comment-browse-filter.model';
 
-export type ICommentBrowseFilterModelMapper = {
-}
+export type ICommentBrowseFilterModelMapper = {};
 
 export class CommentBrowseFilterModelMapper {
-  static toModel(prisma: ICommentBrowseFilterModelMapper): CommentBrowseFilterModel {
-    return new CommentBrowseFilterModel({
-
-    })
+  static toModel(): CommentBrowseFilterModel {
+    return new CommentBrowseFilterModel({});
   }
 }
