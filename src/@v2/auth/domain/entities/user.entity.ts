@@ -45,4 +45,8 @@ export class UserEntity {
 
     return isValid;
   }
+
+  get hasAccess() {
+    return this.googleExternalId || this.password;
+  }
 }

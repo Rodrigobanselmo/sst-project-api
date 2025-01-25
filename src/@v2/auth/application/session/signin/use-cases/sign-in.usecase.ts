@@ -19,7 +19,8 @@ export class SignInUseCase {
 
   async execute(params: ISigninUseCase.Params) {
     const user = await this.userRepository.findByToken(params);
-    if (!user) throw new BadRequestException('Somente usuários conviddados podem se cadastrar');
+    if (!user) throw new BadRequestException('Somente usuários convidados podem se cadastrar');
+    if (user.hasAccess) throw new BadRequestException('Usuário já cadastrado');
 
     const googleCredentials = await this.getGoogleCredentials(params);
     if (googleCredentials) {
@@ -43,6 +44,7 @@ export class SignInUseCase {
     if (!isValidEmail) throw new BadRequestException('Email inválido');
 
     //update user
+    if (!user.hasAccess) throw new BadRequestException('Credênciais inválidas');
     const updatedUser = await this.userRepository.update(user);
     if (!updatedUser) throw new BadRequestException('Erro ao atualizar usuário');
 
