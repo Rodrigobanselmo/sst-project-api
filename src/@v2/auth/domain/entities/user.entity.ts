@@ -14,7 +14,7 @@ export type IUserEntity = {
 
 export class UserEntity {
   id: number;
-  #email: string | null;
+  private _email: string | null;
   name: string | null;
   password: string | null;
   googleExternalId: string | null;
@@ -26,7 +26,7 @@ export class UserEntity {
   constructor(params: IUserEntity) {
     this.id = params.id || -1;
     this.name = params.name || null;
-    this.#email = params.email || null;
+    this._email = params.email || null;
     this.password = params.password || null;
     this.googleExternalId = params.googleExternalId || null;
     this.cpf = params.cpf || null;
@@ -36,12 +36,12 @@ export class UserEntity {
   }
 
   get email() {
-    return this.#email;
+    return this._email;
   }
 
   setEmail(email: string) {
     const isValid = isValidEmail(email);
-    this.#email = isValid ? email : this.#email;
+    this._email = isValid ? email : this._email;
 
     return isValid;
   }

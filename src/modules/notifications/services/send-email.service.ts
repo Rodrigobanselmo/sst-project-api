@@ -20,7 +20,7 @@ export class SendEmailService {
   }
 
   async sendReferralGuide(user: UserPayloadDto, dto: EmailDto, files?: Array<Express.Multer.File>) {
-    const templatePath = resolve(__dirname, '..', '..', '..', '..', 'templates', 'email', 'referralGuide.hbs');
+    const templatePath = resolve(__dirname, '..', '..', '..', '..', 'templates', '@v1', 'email', 'referralGuide.hbs');
 
     await this.mailProvider.sendMail({
       path: templatePath,

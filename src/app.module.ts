@@ -2,7 +2,7 @@ import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/c
 import { APP_GUARD } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 
-import { AuthModule } from './modules/auth/auth.module';
+import { AuthModule as AuthOldModule } from './modules/auth/auth.module';
 import { SSTModule } from './modules/sst/sst.module';
 import { CompanyModule } from './modules/company/company.module';
 import { DocumentsModule } from './modules/documents/documents.module';
@@ -21,13 +21,14 @@ import { DocumentModule } from './@v2/documents/document.module';
 import { SharedModule } from './@v2/shared/shared.module';
 import { SecurityModule } from './@v2/security/security.module';
 import { EnterpriseModule } from './@v2/enterprise/enterprise.module';
+import { AuthModule } from './@v2/auth/auth.module';
 
 @Module({
   imports: [
-    ThrottlerModule.forRoot([{ ttl: 60, limit: 10, }]),
+    ThrottlerModule.forRoot([{ ttl: 60, limit: 10 }]),
     PrismaModule,
     UsersModule,
-    AuthModule,
+    AuthOldModule,
     CompanyModule,
     SSTModule,
     FilesModule,
@@ -40,7 +41,7 @@ import { EnterpriseModule } from './@v2/enterprise/enterprise.module';
     SecurityModule,
     SharedModule,
     EnterpriseModule,
-
+    AuthModule,
   ],
   providers: [
     {

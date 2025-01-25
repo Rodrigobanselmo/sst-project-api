@@ -3,12 +3,13 @@ import { readFile } from 'fs/promises';
 import handlebars from 'handlebars';
 import nodemailer from 'nodemailer';
 import { MailAdapter } from './mail.interface';
-import { EmailType } from './templates';
+import { EmailType } from '../../../../templates/@v2/email';
+import { isDevelopmentGetter } from '../../utils/helpers/is-development';
 
 export class NodeMailerAdapter implements MailAdapter {
   async sendMail({ to, type, variables, attachments }: MailAdapter.SendMailData): Promise<any> {
     try {
-      if (process.env.NODE_ENV === 'development') return;
+      if (isDevelopmentGetter()) return;
       if (!to) return;
 
       const { path, subject } = EmailType[type];
@@ -31,6 +32,7 @@ export class NodeMailerAdapter implements MailAdapter {
 
       await transporter.sendMail({
         to: to as string,
+        from: 'Simplesst <noreply@simplesst.com.br>',
         subject: subject,
         html: templateHTML,
         ...(attachments?.length && {

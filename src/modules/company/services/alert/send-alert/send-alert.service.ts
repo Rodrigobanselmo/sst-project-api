@@ -33,8 +33,7 @@ export class SendAlertService {
     const cacheKey = CacheEnum.ALERT_NOTIFICATION.replace(':type', type).replace(':companyId', companyId);
     const shouldSkip: ICacheAlertType | null = await this.cacheManager.get(cacheKey);
 
-    if (shouldSkip)
-      throw new BadRequestException('Este alerta já foi enviado hoje, espere um dia caso queira enviar novamente');
+    if (shouldSkip) throw new BadRequestException('Este alerta já foi enviado hoje, espere um dia caso queira enviar novamente');
 
     const findAlerts = await this.findOneAlertService.execute(companyId, {
       where: { type },
@@ -86,8 +85,7 @@ export class SendAlertService {
     if (alert.emails) emails.push(...alert.emails);
     if (alert.users) emails.push(...alert.users.map((user) => user.email));
     if (alert.groups) emails.push(...alert.groups.map((group) => group.users.map((userGroup) => userGroup.user.email)));
-    if (alert.systemGroups)
-      emails.push(...alert.systemGroups.map((group) => group.users.map((userGroup) => userGroup.user.email)));
+    if (alert.systemGroups) emails.push(...alert.systemGroups.map((group) => group.users.map((userGroup) => userGroup.user.email)));
 
     const uniqueEmails = [...new Set(emails.flat(1))];
 
@@ -131,29 +129,12 @@ export class SendAlertService {
 
     if (totalExams == 0) return null;
 
-    const employees = await this.employeeRepository.find(
-      { expiredExam: true, companyId: companyId },
-      { take: totalExams > 20 ? 20 : totalExams },
-    );
+    const employees = await this.employeeRepository.find({ expiredExam: true, companyId: companyId }, { take: totalExams > 20 ? 20 : totalExams });
 
-    const employeesData = employees.data.filter(
-      (employee) => !employee.expiredDateExam || employee.expiredDateExam < closeDate,
-    );
+    const employeesData = employees.data.filter((employee) => !employee.expiredDateExam || employee.expiredDateExam < closeDate);
 
     const subject = 'Ralatórios - Exames Vencidos';
-    const path = resolve(
-      __dirname,
-      '..',
-      '..',
-      '..',
-      '..',
-      '..',
-      '..',
-      'templates',
-      'email',
-      'alerts',
-      'expiredExamAlert.hbs',
-    );
+    const path = resolve(__dirname, '..', '..', '..', '..', '..', '..', 'templates', '@v1', 'email', 'alerts', 'expiredExamAlert.hbs');
     const variables = {
       scheduleLink: `${process.env.APP_HOST}/dashboard/empresas/${companyId}/agenda`,
       expiredCount,

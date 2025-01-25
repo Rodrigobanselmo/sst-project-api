@@ -115,10 +115,7 @@ export class EmployeeEntity implements Employee {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { parent, parents, ...h } = this.hierarchy;
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const allHierarchies = [
-        h,
-        ...(this.hierarchy?.parents?.map(({ parent, parents, ...h }) => h) || []),
-      ] as HierarchyEntity[];
+      const allHierarchies = [h, ...(this.hierarchy?.parents?.map(({ parent, parents, ...h }) => h) || [])] as HierarchyEntity[];
 
       this.directory = allHierarchies.find((p) => p?.type == 'DIRECTORY');
       this.management = allHierarchies.find((p) => p?.type == 'MANAGEMENT');
@@ -143,9 +140,7 @@ export class EmployeeEntity implements Employee {
     }
 
     if (this.hierarchyHistory) {
-      this.hierarchyHistory = this.hierarchyHistory.map(
-        (hierarchyHistory) => new EmployeeHierarchyHistoryEntity(hierarchyHistory),
-      );
+      this.hierarchyHistory = this.hierarchyHistory.map((hierarchyHistory) => new EmployeeHierarchyHistoryEntity(hierarchyHistory));
       const admissionDate = this.hierarchyHistory.find((h) => h?.motive == 'ADM')?.startDate;
       const demissionDate = this.hierarchyHistory.find((h) => h?.motive == 'DEM')?.startDate;
       if (admissionDate) this.admissionDate = admissionDate;
@@ -165,49 +160,27 @@ export class EmployeeEntity implements Employee {
 
       if (this.hierarchyId) {
         this.statusStep = StatusEmployeeStepEnum.ADMISSION;
-        const isLastExamActualHierarchyId =
-          this.lastDoneExam?.hierarchyId && this.lastDoneExam.hierarchyId == this.hierarchyId;
+        const isLastExamActualHierarchyId = this.lastDoneExam?.hierarchyId && this.lastDoneExam.hierarchyId == this.hierarchyId;
         const isLastExamBeforeHierarchyStartDate = this.lastDoneExam?.doneDate < actualHierarchy?.startDate;
 
-        if (
-          isActualHierarchyAdm &&
-          (!isLastExamActualHierarchyId || !isLastDoneExamAdm) &&
-          isLastExamBeforeHierarchyStartDate
-        )
-          this.statusStep = StatusEmployeeStepEnum.IN_ADMISSION;
+        if (isActualHierarchyAdm && (!isLastExamActualHierarchyId || !isLastDoneExamAdm) && isLastExamBeforeHierarchyStartDate) this.statusStep = StatusEmployeeStepEnum.IN_ADMISSION;
 
-        if (
-          isActualHierarchyAdm &&
-          (!isLastExamActualHierarchyId || !isLastDoneExamAdm) &&
-          isLastExamBeforeHierarchyStartDate
-        )
-          this.statusStep = StatusEmployeeStepEnum.IN_ADMISSION;
+        if (isActualHierarchyAdm && (!isLastExamActualHierarchyId || !isLastDoneExamAdm) && isLastExamBeforeHierarchyStartDate) this.statusStep = StatusEmployeeStepEnum.IN_ADMISSION;
 
-        if (
-          isExpiredExam &&
-          isActualHierarchyOfficeChange &&
-          (!isLastExamActualHierarchyId || !isLastDoneExamOffice) &&
-          isLastExamBeforeHierarchyStartDate
-        )
+        if (isExpiredExam && isActualHierarchyOfficeChange && (!isLastExamActualHierarchyId || !isLastDoneExamOffice) && isLastExamBeforeHierarchyStartDate)
           this.statusStep = StatusEmployeeStepEnum.IN_TRANS;
 
-        const isOldHistory =
-          actualHierarchy?.startDate && Math.abs(dayjs(actualHierarchy?.startDate).diff(dayjs(), 'month')) >= 2;
+        const isOldHistory = actualHierarchy?.startDate && Math.abs(dayjs(actualHierarchy?.startDate).diff(dayjs(), 'month')) >= 2;
 
-        if (!isOldHistory && (isMissingLastDoneExam || isLastDoneExamDem))
-          this.statusStep = StatusEmployeeStepEnum.IN_ADMISSION;
+        if (!isOldHistory && (isMissingLastDoneExam || isLastDoneExamDem)) this.statusStep = StatusEmployeeStepEnum.IN_ADMISSION;
       } else if (!this.hierarchyId) {
         if (this.hierarchyHistory?.[0]?.motive == 'DEM') {
           if (isLastDoneExamDem) this.statusStep = StatusEmployeeStepEnum.DEMISSION;
-          else if (dayjs(dismissalDate).isSame(this.expiredDateExam))
-            this.statusStep = StatusEmployeeStepEnum.DEMISSION;
+          else if (dayjs(dismissalDate).isSame(this.expiredDateExam)) this.statusStep = StatusEmployeeStepEnum.DEMISSION;
           else this.statusStep = StatusEmployeeStepEnum.IN_DEMISSION;
         }
 
-        if (
-          isActualHierarchyAdm &&
-          [StatusExamEnum.EXPIRED, StatusExamEnum.PENDING, StatusExamEnum.PROCESSING].includes(this.statusExam)
-        ) {
+        if (isActualHierarchyAdm && [StatusExamEnum.EXPIRED, StatusExamEnum.PENDING, StatusExamEnum.PROCESSING].includes(this.statusExam)) {
           if (isMissingLastDoneExam || isLastDoneExamDem) this.statusStep = StatusEmployeeStepEnum.IN_ADMISSION;
         }
 
@@ -217,4 +190,5 @@ export class EmployeeEntity implements Employee {
       }
     }
   }
+  user_id: number;
 }

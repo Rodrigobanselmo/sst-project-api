@@ -4,17 +4,17 @@ import { ResponsibleBrowseResultModelMapper, IResponsibleBrowseResultModelMapper
 import { ResponsibleBrowseModel } from '@/@v2/security/action-plan/domain/models/responsible/responsible-browse.model';
 
 export type IResponsibleBrowseModelMapper = {
-  results: IResponsibleBrowseResultModelMapper[]
-  pagination: IPaginationModelMapper
-  filters: IResponsibleBrowseFilterModelMapper
-}
+  results: IResponsibleBrowseResultModelMapper[];
+  pagination: IPaginationModelMapper;
+  filters: IResponsibleBrowseFilterModelMapper;
+};
 
 export class ResponsibleBrowseModelMapper {
   static toModel(prisma: IResponsibleBrowseModelMapper): ResponsibleBrowseModel {
     return new ResponsibleBrowseModel({
       results: ResponsibleBrowseResultModelMapper.toModels(prisma.results),
       pagination: PaginationModelMapper.toModel(prisma.pagination),
-      filters: ResponsibleBrowseFilterModelMapper.toModel(prisma.filters),
-    })
+      filters: ResponsibleBrowseFilterModelMapper.toModel(),
+    });
   }
 }

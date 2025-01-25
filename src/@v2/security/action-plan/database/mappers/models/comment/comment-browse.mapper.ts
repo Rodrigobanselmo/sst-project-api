@@ -14,7 +14,7 @@ export class CommentBrowseModelMapper {
     return new CommentBrowseModel({
       results: CommentBrowseResultModelMapper.toModels(prisma.results),
       pagination: PaginationModelMapper.toModel(prisma.pagination),
-      filters: CommentBrowseFilterModelMapper.toModel(prisma.filters),
+      filters: CommentBrowseFilterModelMapper.toModel(),
     });
   }
 }

@@ -1,4 +1,4 @@
-import { EmailType } from './templates';
+import { EmailType } from '../../../../templates/@v2/email';
 
 export interface MailAdapter {
   sendMail(data: MailAdapter.SendMailData): Promise<void>;

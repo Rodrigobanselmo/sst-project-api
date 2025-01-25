@@ -20,8 +20,7 @@ export class SendForgotPassMailService {
 
   async execute(email: string) {
     const cacheBlockEmailSend = await this.cacheManager.get(email);
-    if (cacheBlockEmailSend)
-      throw new BadRequestException('Espere 45 segundos para solicitar um novo email de recuperação de senha');
+    if (cacheBlockEmailSend) throw new BadRequestException('Espere 45 segundos para solicitar um novo email de recuperação de senha');
 
     this.cacheManager.set(email, true, process.env.NODE_ENV === 'development' ? 1 : 45);
 
@@ -31,18 +30,7 @@ export class SendForgotPassMailService {
     });
     if (!user?.id) throw new BadRequestException('Usuário com esse email não existe');
 
-    const templatePath = resolve(
-      __dirname,
-      '..',
-      '..',
-      '..',
-      '..',
-      '..',
-      '..',
-      'templates',
-      'email',
-      'forgotPassword.hbs',
-    );
+    const templatePath = resolve(__dirname, '..', '..', '..', '..', '..', '..', 'templates', '@v1', 'email', 'forgotPassword.hbs');
 
     const expires_date = this.dateProvider.addHours(new Date(), 3);
 
