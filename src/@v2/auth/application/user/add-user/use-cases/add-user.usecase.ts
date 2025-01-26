@@ -33,8 +33,7 @@ export class AddUserUseCase {
     if (!accessGroup) throw new BadRequestException('Grupo de acesso não encontrado');
 
     const hasPermissions = this.checkPermissions(loggedUser, accessGroup);
-    if (!hasPermissions)
-      throw new BadRequestException('Você não tem permissão para criar/editar um usuário com essas credênciais');
+    if (!hasPermissions) throw new BadRequestException('Você não tem permissão para criar/editar um usuário com essas credênciais');
 
     const profileEntity = new ProfileEntity({
       companyId: params.companyId,
@@ -50,11 +49,7 @@ export class AddUserUseCase {
     await this.profileAggregateRepository.create(profileAggregate);
 
     if (user.email) {
-      this.authUserMailAdapter.sendInvite({
-        email: user.email,
-        companyName: 'Teste',
-        token: user.token,
-      });
+      this.authUserMailAdapter.sendInvite({ user, companyId: params.companyId });
     }
   }
 

@@ -12,9 +12,10 @@ import { getPagination } from '@/@v2/shared/utils/database/get-pagination';
 export class UserDAO {
   constructor(private readonly prisma: PrismaServiceV2) {}
 
-  async checkIfExist(params: IUserDAO.CheckIfExistParams) {
+  async checkIfExistWithDifferentToken(params: IUserDAO.CheckIfExistWIthDifferentTokenParams) {
     const user = await this.prisma.user.findFirst({
       where: {
+        token: { not: params.token },
         OR: [{ email: params.email }, { googleExternalId: params.googleExternalId || 'not-found' }],
       },
     });
@@ -64,10 +65,7 @@ export class UserDAO {
   }
 
   private browseWhere(filters: IUserDAO.BrowseParams['filters']) {
-    const where = [
-      Prisma.sql`w."companyId" = ${filters.companyId}`,
-      Prisma.sql`w."status"::text = ${StatusEnum.ACTIVE}`,
-    ];
+    const where = [Prisma.sql`w."companyId" = ${filters.companyId}`, Prisma.sql`w."status"::text = ${StatusEnum.ACTIVE}`];
 
     return where;
   }

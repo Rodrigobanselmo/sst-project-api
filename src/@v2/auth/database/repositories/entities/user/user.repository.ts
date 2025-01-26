@@ -38,6 +38,9 @@ export class UserRepository {
         where: { id: params.id },
         data: {
           name: params.name,
+          email: params.email,
+          password: params.password,
+          googleExternalId: params.googleExternalId,
         },
       });
 

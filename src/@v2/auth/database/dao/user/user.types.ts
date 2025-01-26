@@ -17,8 +17,9 @@ export namespace IUserDAO {
     };
   };
 
-  export type CheckIfExistParams = {
+  export type CheckIfExistWIthDifferentTokenParams = {
     email: string;
+    token: string;
     googleExternalId?: string | null;
   };
 }

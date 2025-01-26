@@ -19,9 +19,10 @@ export class FindAllByCompanyService {
       //     return null;
       //   })
       //   .filter((company) => company !== null);
+      const hasAccess = !!userCompany.googleExternalId || !!userCompany.password;
 
       delete userCompany.password;
-      return userCompany;
+      return { ...userCompany, hasAccess };
     });
   }
 }

@@ -19,6 +19,7 @@ export class SignInUseCase {
 
   async execute(params: ISigninUseCase.Params) {
     const user = await this.userRepository.findByToken(params);
+
     if (!user) throw new BadRequestException('Somente usuários convidados podem se cadastrar');
     if (user.hasAccess) throw new BadRequestException('Usuário já cadastrado');
 
@@ -30,7 +31,11 @@ export class SignInUseCase {
 
     //check if user already exists
     const email = googleCredentials?.email || params.email || '';
-    const userExists = await this.userDAO.checkIfExist({ email, googleExternalId: user.googleExternalId });
+    const userExists = await this.userDAO.checkIfExistWithDifferentToken({
+      token: params.token,
+      email,
+      googleExternalId: user.googleExternalId,
+    });
     if (userExists) throw new BadRequestException('Usuário já cadastrado');
 
     //set user password

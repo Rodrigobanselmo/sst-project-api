@@ -1,18 +1,20 @@
 import { SharedModule } from '@/@v2/shared/shared.module';
 import { Module } from '@nestjs/common';
-import { UserAggregateRepository } from './database/repositories/aggregates/user-aggregate/user-aggregate.repository';
-import { ProfileAggregateRepository } from './database/repositories/aggregates/profile-aggregate/profile-aggregate.repository';
-import { AccessGroupRepository } from './database/repositories/entities/access-group/access-group.repository';
-import { UserRepository } from './database/repositories/entities/user/user.repository';
 import { AuthUserMailAdapter } from './adapters/mail/auth-user-mail.adapter.ts';
-import { UserDAO } from './database/dao/user/user.dao';
+import { SignInController } from './application/session/signin/controllers/sign-in.controller';
+import { SignInUseCase } from './application/session/signin/use-cases/sign-in.usecase';
 import { AddUserController } from './application/user/add-user/controllers/add-user.controller';
 import { AddUserUseCase } from './application/user/add-user/use-cases/add-user.usecase';
-import { SignInUseCase } from './application/session/signin/use-cases/sign-in.usecase';
+import { CompanyDAO } from './database/dao/company/company.dao';
+import { UserDAO } from './database/dao/user/user.dao';
+import { ProfileAggregateRepository } from './database/repositories/aggregates/profile-aggregate/profile-aggregate.repository';
+import { UserAggregateRepository } from './database/repositories/aggregates/user-aggregate/user-aggregate.repository';
+import { AccessGroupRepository } from './database/repositories/entities/access-group/access-group.repository';
+import { UserRepository } from './database/repositories/entities/user/user.repository';
 
 @Module({
   imports: [SharedModule],
-  controllers: [AddUserController],
+  controllers: [AddUserController, SignInController],
   providers: [
     // Database
     UserAggregateRepository,
@@ -20,6 +22,7 @@ import { SignInUseCase } from './application/session/signin/use-cases/sign-in.us
     ProfileAggregateRepository,
     UserRepository,
     UserDAO,
+    CompanyDAO,
 
     //Adapters
     AuthUserMailAdapter,

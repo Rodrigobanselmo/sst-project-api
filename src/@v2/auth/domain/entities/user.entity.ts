@@ -47,6 +47,6 @@ export class UserEntity {
   }
 
   get hasAccess() {
-    return this.googleExternalId || this.password;
+    return !!this.googleExternalId || !!this.password;
   }
 }
