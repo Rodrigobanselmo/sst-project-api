@@ -11,6 +11,7 @@ import { ProfileAggregateRepository } from './database/repositories/aggregates/p
 import { UserAggregateRepository } from './database/repositories/aggregates/user-aggregate/user-aggregate.repository';
 import { AccessGroupRepository } from './database/repositories/entities/access-group/access-group.repository';
 import { UserRepository } from './database/repositories/entities/user/user.repository';
+import { EmployeeRepository } from './database/repositories/entities/employee/employee.repository.js';
 
 @Module({
   imports: [SharedModule],
@@ -23,6 +24,7 @@ import { UserRepository } from './database/repositories/entities/user/user.repos
     UserRepository,
     UserDAO,
     CompanyDAO,
+    EmployeeRepository,
 
     //Adapters
     AuthUserMailAdapter,

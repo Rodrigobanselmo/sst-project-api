@@ -98,7 +98,6 @@ export class CommentAggregateRepository implements ICommentAggregateRepository {
         items: params,
         batchSize: 10,
         callback: async (params) => {
-          console.log(params);
           await Promise.all([
             tx.riskFactorDataRecComments.update({
               select: { id: true },

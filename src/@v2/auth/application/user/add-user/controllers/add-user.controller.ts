@@ -28,6 +28,7 @@ export class AddUserController {
       groupId: body.groupId,
       phone: body.phone || undefined,
       cpf: body.cpf || undefined,
+      employeeId: body.employeeId || undefined,
     });
   }
 }

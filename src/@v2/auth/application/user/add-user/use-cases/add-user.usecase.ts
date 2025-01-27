@@ -11,6 +11,7 @@ import { ContextKey } from '@/@v2/shared/adapters/context/types/enum/context-key
 import { SharedTokens } from '@/@v2/shared/constants/tokens';
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { IAddUserUseCase } from './add-user.types';
+import { EmployeeRepository } from '@/@v2/auth/database/repositories/entities/employee/employee.repository';
 
 @Injectable()
 export class AddUserUseCase {
@@ -21,16 +22,31 @@ export class AddUserUseCase {
     private readonly userRepository: UserRepository,
     private readonly profileAggregateRepository: ProfileAggregateRepository,
     private readonly accessGroupRepository: AccessGroupRepository,
+    private readonly employeeRepository: EmployeeRepository,
   ) {}
 
-  async execute(params: IAddUserUseCase.Params) {
+  async execute(params: IAddUserUseCase.Params): Promise<IAddUserUseCase.Result> {
     const loggedUser = this.context.get<UserContext>(ContextKey.USER);
     const user = await this.getOrCreateUser(params);
     const accessGroup = await this.accessGroupRepository.find({ id: params.groupId });
     const profile = await this.profileAggregateRepository.find({ userId: user.id, companyId: params.companyId });
 
-    if (profile) throw new BadRequestException('Usuário já cadastrado');
     if (!accessGroup) throw new BadRequestException('Grupo de acesso não encontrado');
+    if (profile) {
+      if (params.employeeId) {
+        const employee = await this.employeeRepository.find({ id: params.employeeId });
+        if (!employee) throw new BadRequestException('Funcionário não encontrado');
+
+        const [, error] = profile.setEmployee(employee);
+        if (error) throw new BadRequestException(error);
+
+        await this.profileAggregateRepository.update(profile);
+
+        return { id: user.id };
+      }
+
+      throw new BadRequestException('Usuário já cadastrado');
+    }
 
     const hasPermissions = this.checkPermissions(loggedUser, accessGroup);
     if (!hasPermissions) throw new BadRequestException('Você não tem permissão para criar/editar um usuário com essas credênciais');
@@ -44,13 +60,24 @@ export class AddUserUseCase {
     const profileAggregate = new ProfileAggregate({
       profile: profileEntity,
       user,
+      employee: null,
     });
+
+    if (params.employeeId) {
+      const employee = await this.employeeRepository.find({ id: params.employeeId });
+      if (!employee) throw new BadRequestException('Funcionário não encontrado');
+
+      const [, error] = profileAggregate.setEmployee(employee);
+      if (error) throw new BadRequestException(error);
+    }
 
     await this.profileAggregateRepository.create(profileAggregate);
 
     if (user.email) {
       this.authUserMailAdapter.sendInvite({ user, companyId: params.companyId });
     }
+
+    return { id: user.id };
   }
 
   private getOrCreateUser = async (params: IAddUserUseCase.Params): Promise<UserEntity> => {

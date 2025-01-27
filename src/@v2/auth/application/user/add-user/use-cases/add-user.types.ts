@@ -5,6 +5,11 @@ export namespace IAddUserUseCase {
     email?: string;
     cpf?: string;
     phone?: string;
+    employeeId?: number;
     groupId: number;
+  };
+
+  export type Result = {
+    id: number;
   };
 }

@@ -9,6 +9,11 @@ export class AddUserPayload {
   @Type(() => Number)
   groupId!: number;
 
+  @IsNumber()
+  @Type(() => Number)
+  @IsOptional()
+  employeeId?: number;
+
   @IsString()
   @IsOptional()
   email?: string | null;

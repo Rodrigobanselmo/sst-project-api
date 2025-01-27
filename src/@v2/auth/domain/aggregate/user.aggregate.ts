@@ -30,8 +30,9 @@ export class UserAggregate {
 
   addProfile(profile: ProfileEntity) {
     const foundProfile = this.getProfile(profile.uuid.companyId);
-    if (foundProfile) throw new BadRequestException('Usuário já cadastrado');
+    if (foundProfile) return { error: 'Usuário já cadastrado' };
 
     this.profiles.push(profile);
+    return { error: null };
   }
 }

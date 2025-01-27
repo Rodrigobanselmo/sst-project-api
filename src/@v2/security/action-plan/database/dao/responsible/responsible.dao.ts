@@ -22,27 +22,33 @@ export class ResponsibleDAO {
 
     const usersPromise = this.prisma.$queryRaw<IResponsibleBrowseResultModelMapper[]>`
       SELECT
-        u."id" AS user_id,
-        u."name" AS row_name,
-        u."email" AS row_email,
-        NULL AS employee_id
-      FROM 
-        "User" u
-      LEFT JOIN 
-        "UserCompany" up ON u.id = up."userId" AND up.status <> 'INACTIVE'
-      ${gerWhereRawPrisma(whereUser)}
+        user_id,
+        employee_id,
+        row_name,
+        row_email
+      FROM (
+        SELECT
+          u."id" AS user_id,
+          u."name" AS row_name,
+          u."email" AS row_email,
+          NULL AS employee_id
+        FROM
+          "User" u
+        LEFT JOIN
+          "UserCompany" up ON u.id = up."userId" AND up.status <> 'INACTIVE'
+        ${gerWhereRawPrisma(whereUser)}
 
-      UNION ALL
+        UNION ALL
 
-      SELECT
-        employee."id" AS employee_id,
-        employee."name" AS row_name,
-        employee."email" AS row_email,
-        NULL AS user_id
-      FROM 
-        "Employee" employee
-      ${gerWhereRawPrisma(whereEmployee)} 
-
+        SELECT
+          NULL AS user_id,
+          employee."name" AS row_name,
+          employee."email" AS row_email,
+          employee."id" AS employee_id
+        FROM
+          "Employee" employee
+        ${gerWhereRawPrisma(whereEmployee)}
+      ) AS combined_results
       ${getOrderByRawPrisma(orderByParams)}
       LIMIT ${pagination.limit}
       OFFSET ${pagination.offSet};
@@ -70,7 +76,6 @@ export class ResponsibleDAO {
     `;
 
     const [users, totalUsers] = await Promise.all([usersPromise, totalUsersPromise]);
-    console.log({ users, totalUsers });
 
     return ResponsibleBrowseModelMapper.toModel({
       results: users,
@@ -80,13 +85,13 @@ export class ResponsibleDAO {
   }
 
   private browseUserWhere(filters: IResponsibleDAO.BrowseParams['filters']) {
-    const where = [Prisma.sql`up."companyId" = ${filters.companyId}`];
+    const where = [Prisma.sql`up."companyId" = ${filters.companyId}`, Prisma.sql`u."name" IS NOT NULL`];
 
     return where;
   }
 
   private browseEmployeeWhere(filters: IResponsibleDAO.BrowseParams['filters']) {
-    const where = [Prisma.sql`employee."companyId" = ${filters.companyId}`, Prisma.sql`employee."deleted_at" IS NULL`, Prisma.sql`employee."user_id" IS NULL`];
+    const where = [Prisma.sql`employee."companyId" = ${filters.companyId}`, Prisma.sql`employee."deleted_at" IS NULL`, Prisma.sql`employee."name" IS NOT NULL`, Prisma.sql`employee."user_id" IS NULL`];
 
     return where;
   }

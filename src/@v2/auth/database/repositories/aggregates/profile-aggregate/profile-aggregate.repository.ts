@@ -8,36 +8,69 @@ import { ProfileAggregateMapper } from '../../../mappers/aggregates/profile-aggr
 export class ProfileAggregateRepository {
   constructor(private readonly prisma: PrismaServiceV2) {}
 
-  static selectOptions() {
+  static selectOptions(options: IProfileAggregateRepository.SelectOptionsParams) {
     const include = {
       group: true,
-      user: true,
+      user: {
+        include: {
+          Employee: {
+            where: { companyId: options.companyId },
+            select: {
+              id: true,
+            },
+          },
+        },
+      },
     } satisfies Prisma.UserCompanyFindFirstArgs['include'];
 
     return { include };
   }
 
   async create(params: IProfileAggregateRepository.CreateParams): IProfileAggregateRepository.CreateReturn {
-    const user = await this.prisma.userCompany.create({
-      data: {
-        companyId: params.profile.uuid.companyId,
-        groupId: params.profile.accessGroup?.id,
-        userId: params.user.id,
-      },
-      ...ProfileAggregateRepository.selectOptions(),
-    });
+    const [user] = await this.prisma.$transaction([
+      this.prisma.userCompany.create({
+        data: {
+          companyId: params.profile.uuid.companyId,
+          groupId: params.profile.accessGroup?.id,
+          userId: params.user.id,
+        },
+        ...ProfileAggregateRepository.selectOptions(params.profile.uuid),
+      }),
+      ...(params.employee?.id
+        ? [
+            this.prisma.employee.update({
+              where: { id: params.employee.id },
+              data: {
+                user_id: params.profile.uuid.userId,
+              },
+            }),
+          ]
+        : []),
+    ]);
 
     return user ? ProfileAggregateMapper.toEntity(user) : null;
   }
 
   async update(params: IProfileAggregateRepository.UpdateParams): IProfileAggregateRepository.UpdateReturn {
-    const user = await this.prisma.userCompany.update({
-      where: { companyId_userId: params.profile.uuid },
-      data: {
-        groupId: params.profile.accessGroup?.id,
-      },
-      ...ProfileAggregateRepository.selectOptions(),
-    });
+    const [user] = await this.prisma.$transaction([
+      this.prisma.userCompany.update({
+        where: { companyId_userId: params.profile.uuid },
+        data: {
+          groupId: params.profile.accessGroup?.id,
+        },
+        ...ProfileAggregateRepository.selectOptions(params.profile.uuid),
+      }),
+      ...(params.employee?.id
+        ? [
+            this.prisma.employee.update({
+              where: { id: params.employee.id },
+              data: {
+                user_id: params.profile.uuid.userId,
+              },
+            }),
+          ]
+        : []),
+    ]);
 
     return user ? ProfileAggregateMapper.toEntity(user) : null;
   }
@@ -48,7 +81,7 @@ export class ProfileAggregateRepository {
         companyId: params.companyId,
         userId: params.userId,
       },
-      ...ProfileAggregateRepository.selectOptions(),
+      ...ProfileAggregateRepository.selectOptions(params),
     });
 
     return user ? ProfileAggregateMapper.toEntity(user) : null;
