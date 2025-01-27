@@ -1,11 +1,12 @@
+import { ResponsibleOrderByEnum } from '@/@v2/security/action-plan/database/dao/responsible/responsible.types';
 import { UserOrderByEnum } from '@/@v2/security/action-plan/database/dao/user/user.types';
 import { OrderByDirectionEnum } from '@/@v2/shared/types/order-by.types';
 import { Type } from 'class-transformer';
 import { IsArray, IsEnum, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 class OrderBy {
-  @IsEnum(UserOrderByEnum)
-  field!: UserOrderByEnum;
+  @IsEnum(ResponsibleOrderByEnum)
+  field!: ResponsibleOrderByEnum;
 
   @IsEnum(OrderByDirectionEnum)
   order!: OrderByDirectionEnum;
@@ -30,5 +31,3 @@ export class BrowseResponsibleQuery {
   @Type(() => OrderBy)
   orderBy?: OrderBy[];
 }
-
-
