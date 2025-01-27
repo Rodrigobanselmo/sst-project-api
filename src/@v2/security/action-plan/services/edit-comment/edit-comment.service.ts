@@ -14,11 +14,13 @@ export class EditCommentService {
 
     if (!aggregate) throw new BadRequestException('Comentário não encontrado');
 
-    aggregate.approve({
+    const [, error] = aggregate.approve({
       approvedById: params.userId,
       approvedComment: params.approvedComment || null,
       isApproved: params.isApproved,
     });
+
+    if (error) throw new BadRequestException(error);
 
     return aggregate;
   }

@@ -4,9 +4,8 @@ import { getPagination } from '@/@v2/shared/utils/database/get-pagination';
 import { gerWhereRawPrisma } from '@/@v2/shared/utils/database/get-where-raw-prisma';
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { ResponsibleBrowseFilterModelMapper } from '../../mappers/models/responsible/responsible-browse-filter.mapper';
-import { IResponsibleBrowseResultModelMapper } from '../../mappers/models/responsible/responsible-browse-result.mapper';
-import { ResponsibleBrowseModelMapper } from '../../mappers/models/responsible/responsible-browse.mapper';
+import { IUserBrowseResultModelMapper } from '../../mappers/models/user/user-browse-result.mapper';
+import { UserBrowseModelMapper } from '../../mappers/models/user/user-browse.mapper';
 import { IUserDAO, UserOrderByEnum } from './user.types';
 
 @Injectable()
@@ -22,7 +21,7 @@ export class UserDAO {
 
     const whereParams = [...browseWhereParams, ...browseFilterParams];
 
-    const usersPromise = this.prisma.$queryRaw<IResponsibleBrowseResultModelMapper[]>`
+    const usersPromise = this.prisma.$queryRaw<IUserBrowseResultModelMapper[]>`
       SELECT 
         u."id" AS user_id,
         u."name" AS user_name,
@@ -39,7 +38,7 @@ export class UserDAO {
       OFFSET ${pagination.offSet};
     `;
 
-    const totalUsersPromise = this.prisma.$queryRaw<[{ total: number } & ResponsibleBrowseFilterModelMapper]>`
+    const totalUsersPromise = this.prisma.$queryRaw<[{ total: number }]>`
       SELECT 
         COUNT(*)::integer AS total
         FROM 
@@ -53,10 +52,9 @@ export class UserDAO {
 
     const [users, totalUsers] = await Promise.all([usersPromise, totalUsersPromise]);
 
-    return ResponsibleBrowseModelMapper.toModel({
+    return UserBrowseModelMapper.toModel({
       results: users,
       pagination: { limit: pagination.limit, page: pagination.page, total: Number(totalUsers[0].total) },
-      filters: totalUsers[0],
     });
   }
 

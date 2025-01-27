@@ -31,7 +31,7 @@ type IActionPlanAggregateMapper = {
 export class ActionPlanAggregateMapper {
   static toAggregate(data: IActionPlanAggregateMapper): ActionPlanAggregate {
     const documentData = data.company.documentData?.[0];
-    const coordenator = documentData?.coordinator;
+    const coordinator = documentData?.coordinator;
     const dataRec =
       data.dataRecs[0] ||
       ({
@@ -49,7 +49,7 @@ export class ActionPlanAggregateMapper {
         level: data.level,
       }),
       comments: CommentMapper.toArrayEntity(dataRec.comments),
-      coordinator: coordenator ? CoordinatorMapper.toEntity(coordenator) : null,
+      coordinator: coordinator ? CoordinatorMapper.toEntity(coordinator) : null,
     });
   }
 }

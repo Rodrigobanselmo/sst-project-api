@@ -1,12 +1,10 @@
-import { IPaginationModelMapper, PaginationModelMapper } from '@/@v2/shared/utils/database/pagination-mapper';
-import { ResponsibleBrowseFilterModelMapper, IResponsibleBrowseFilterModelMapper } from './responsible-browse-filter.mapper';
-import { ResponsibleBrowseResultModelMapper, IResponsibleBrowseResultModelMapper } from './responsible-browse-result.mapper';
 import { ResponsibleBrowseModel } from '@/@v2/security/action-plan/domain/models/responsible/responsible-browse.model';
+import { IPaginationModelMapper, PaginationModelMapper } from '@/@v2/shared/utils/database/pagination-mapper';
+import { IResponsibleBrowseResultModelMapper, ResponsibleBrowseResultModelMapper } from './responsible-browse-result.mapper';
 
 export type IResponsibleBrowseModelMapper = {
   results: IResponsibleBrowseResultModelMapper[];
   pagination: IPaginationModelMapper;
-  filters: IResponsibleBrowseFilterModelMapper;
 };
 
 export class ResponsibleBrowseModelMapper {
@@ -14,7 +12,6 @@ export class ResponsibleBrowseModelMapper {
     return new ResponsibleBrowseModel({
       results: ResponsibleBrowseResultModelMapper.toModels(prisma.results),
       pagination: PaginationModelMapper.toModel(prisma.pagination),
-      filters: ResponsibleBrowseFilterModelMapper.toModel(),
     });
   }
 }

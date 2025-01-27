@@ -86,4 +86,10 @@ export class CommentEntity {
   get currentValidDate() {
     return this._currentValidDate;
   }
+
+  get isOnlyCoordinatorApproval() {
+    const isDone = this.type === CommentTypeEnum.DONE;
+    const isCanceled = this.type === CommentTypeEnum.CANCELED;
+    return isDone || isCanceled;
+  }
 }

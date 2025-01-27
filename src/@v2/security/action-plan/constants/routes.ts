@@ -19,7 +19,7 @@ export const ActionPlanRoutes = {
     BROWSE: 'v2/companies/:companyId/action-plans/responsibles',
   },
   COORDINATOR: {
-    BROWSE: 'v2/companies/:companyId/action-plans/condinators',
+    BROWSE: 'v2/companies/:companyId/action-plans/coordinators',
   },
   HIERARCHY: {
     BROWSE: 'v2/companies/:companyId/action-plans/hierarchies',

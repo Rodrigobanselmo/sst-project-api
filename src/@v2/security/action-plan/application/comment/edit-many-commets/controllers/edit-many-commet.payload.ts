@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsArray, IsBoolean, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsBoolean, IsOptional, IsString, ValidateIf } from 'class-validator';
 
 export class EditManyCommentPayload {
   @IsArray()
@@ -9,7 +9,8 @@ export class EditManyCommentPayload {
 
   @IsBoolean()
   @Type(() => Boolean)
-  isApproved!: boolean;
+  @ValidateIf((o) => o.isApproved !== null)
+  isApproved!: boolean | null;
 
   @IsString()
   @IsOptional()

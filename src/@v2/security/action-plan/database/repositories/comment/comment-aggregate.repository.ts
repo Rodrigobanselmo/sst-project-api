@@ -28,6 +28,7 @@ export class CommentAggregateRepository implements ICommentAggregateRepository {
                   months_period_level_4: true,
                   months_period_level_5: true,
                   validityStart: true,
+                  coordinator: true,
                 },
               },
             },

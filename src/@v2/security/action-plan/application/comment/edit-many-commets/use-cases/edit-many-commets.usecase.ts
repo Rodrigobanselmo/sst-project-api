@@ -25,7 +25,7 @@ export class EditManyCommentsUseCase {
       callback: async (id) => {
         return this.editCommentService.update({
           id,
-          isApproved: params.isApproved || false,
+          isApproved: params.isApproved,
           approvedComment: params.approvedComment,
           companyId: params.companyId,
           userId: loggedUser.id,

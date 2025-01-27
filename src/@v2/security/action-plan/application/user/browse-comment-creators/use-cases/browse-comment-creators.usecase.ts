@@ -4,10 +4,10 @@ import { IBrowseCommentCreatorsUseCase } from './browse-comment-creators.types';
 
 @Injectable()
 export class BrowseCommentCreatorsUseCase {
-  constructor(private readonly responsibleDAO: UserDAO) {}
+  constructor(private readonly userDAO: UserDAO) {}
 
   async execute(params: IBrowseCommentCreatorsUseCase.Params) {
-    const data = await this.responsibleDAO.browse({
+    const data = await this.userDAO.browse({
       page: params.pagination.page,
       limit: params.pagination.limit,
       orderBy: params.orderBy,

@@ -4,7 +4,6 @@ import { getPagination } from '@/@v2/shared/utils/database/get-pagination';
 import { gerWhereRawPrisma } from '@/@v2/shared/utils/database/get-where-raw-prisma';
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { ResponsibleBrowseFilterModelMapper } from '../../mappers/models/responsible/responsible-browse-filter.mapper';
 import { IResponsibleBrowseResultModelMapper } from '../../mappers/models/responsible/responsible-browse-result.mapper';
 import { ResponsibleBrowseModelMapper } from '../../mappers/models/responsible/responsible-browse.mapper';
 import { IResponsibleDAO, ResponsibleOrderByEnum } from './responsible.types';
@@ -54,7 +53,7 @@ export class ResponsibleDAO {
       OFFSET ${pagination.offSet};
     `;
 
-    const totalUsersPromise = this.prisma.$queryRaw<[{ total: number } & ResponsibleBrowseFilterModelMapper]>`
+    const totalUsersPromise = this.prisma.$queryRaw<[{ total: number }]>`
       SELECT COUNT(*) AS total_rows
       FROM (
         SELECT
@@ -80,7 +79,6 @@ export class ResponsibleDAO {
     return ResponsibleBrowseModelMapper.toModel({
       results: users,
       pagination: { limit: pagination.limit, page: pagination.page, total: Number(totalUsers[0].total) },
-      filters: totalUsers[0],
     });
   }
 
