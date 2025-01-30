@@ -1,4 +1,13 @@
+import 'dayjs/locale/pt-br';
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+
+dayjs.locale('pt-br');
+dayjs.extend(customParseFormat);
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 type UnitTypeShort = 'd' | 'M' | 'y' | 'h' | 'm' | 's' | 'ms' | 'w';
 

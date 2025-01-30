@@ -15,11 +15,10 @@ export const companyVariables = ({ employeeCount, company, workspace }: ICompany
   const address = workspace?.address || company?.address;
 
   return {
-    [VariablesPGREnum.CURRENT_DATE_LONG]: dateUtils().format('D [de] MMMM [de] YYYY hhmm').toLocaleLowerCase(),
+    [VariablesPGREnum.CURRENT_DATE_LONG]: dateUtils().format('D [de] MMMM [de] YYYY [às] hh:mm').toLocaleLowerCase(),
     [VariablesPGREnum.CURRENT_DATE_SHORT]: dateUtils().format('DD/MM/YYYY').toLocaleLowerCase(),
     [VariablesPGREnum.CONSULTANT_NAME]: company.consultant?.name || company.name,
-    [VariablesPGREnum.COMPANY_SIGNER_CITY]:
-      (company.consultant ? company.consultant.address?.formattedCity : company.address?.formattedCity) || '',
+    [VariablesPGREnum.COMPANY_SIGNER_CITY]: (company.consultant ? company.consultant.address?.formattedCity : company.address?.formattedCity) || '',
     [VariablesPGREnum.COMPANY_CNAE]: company.primaryActivity,
     [VariablesPGREnum.COMPANY_RISK_DEGREE]: company.primaryActivityRiskDegree,
     [VariablesPGREnum.COMPANY_INITIAL]: company.initials ? `(${company.initials})` : '',

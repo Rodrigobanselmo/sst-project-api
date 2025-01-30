@@ -17,6 +17,7 @@ export class FindByCompanyHomoGroupService {
                 companyId: true,
                 refName: true,
                 parentId: true,
+                name: true,
                 type: true,
                 workspaces: { select: { id: true } },
               },
