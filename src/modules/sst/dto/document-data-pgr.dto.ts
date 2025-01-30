@@ -50,6 +50,16 @@ export class DocumentDataPGRDto {
   @IsBoolean()
   @ToBoolean()
   @IsOptional()
+  isHideOriginColumn: boolean;
+
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  isHideCA: boolean;
+
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
   hasEmergencyPlan: boolean;
 }
 

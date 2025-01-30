@@ -18,6 +18,8 @@ export const booleanVariables = (document: IBooleanVariables) => {
 
   return {
     [VariablesPGREnum.IS_Q5]: document.documentVersion.documentBase.data.isQ5 ? 'true' : '',
+    [VariablesPGREnum.IS_HIDE_CA]: document.documentVersion.documentBase.data.isHideCA ? 'true' : '',
+    [VariablesPGREnum.IS_HIDE_ORIGIN_COLUMN]: document.documentVersion.documentBase.data.isHideOriginColumn ? 'true' : '',
     [VariablesPGREnum.HAS_RISK_FIS]: risksDataVariables.hasFis ? 'true' : '',
     [VariablesPGREnum.HAS_RISK_QUI]: risksDataVariables.hasQui ? 'true' : '',
     [VariablesPGREnum.HAS_RISK_BIO]: risksDataVariables.hasBio ? 'true' : '',

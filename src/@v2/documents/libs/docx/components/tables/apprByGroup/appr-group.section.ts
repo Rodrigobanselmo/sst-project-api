@@ -9,6 +9,7 @@ import { officeRiskInventoryTableSection } from './parts/2-offices/offices.table
 import { firstRiskInventoryTableSection } from './parts/first/first.table';
 import { secondRiskInventoryTableSection } from './parts/second/second.table';
 import { thirdRiskInventoryTableSection } from './parts/third/third.table';
+import { epiRiskInventoryTableSection } from './parts/epi/epi.table';
 
 export interface IAPPRTableOptions {
   isByGroup?: boolean;
@@ -73,8 +74,7 @@ export const APPRByGroupTableSection = (
       everyHomoFound.push(homo.gho.id);
 
       homoGroupTree[homo.gho.id].hierarchies.forEach((hierarchy, _i, hierarchies) => {
-        const allHomogeneousGroupIds = (hierarchyData.get(hierarchy.id) || { allHomogeneousGroupIds: [] })
-          ?.allHomogeneousGroupIds;
+        const allHomogeneousGroupIds = (hierarchyData.get(hierarchy.id) || { allHomogeneousGroupIds: [] })?.allHomogeneousGroupIds;
 
         removeDuplicate([...allHomogeneousGroupIds.map((id: string) => ({ id })), ...hierarchy.homogeneousGroups], {
           removeById: 'id',
@@ -86,9 +86,7 @@ export const APPRByGroupTableSection = (
               }
             )?.allHomogeneousGroupIds;
 
-            return [...everyAllHomogeneousGroupIds.map((id) => ({ id })), ...hierarchyEvery.homogeneousGroups].find(
-              (h) => h.id === homoGroup.id,
-            );
+            return [...everyAllHomogeneousGroupIds.map((id) => ({ id })), ...hierarchyEvery.homogeneousGroups].find((h) => h.id === homoGroup.id);
           });
 
           const mapDataHomo = hierarchyDataHomoGroup.get(homo.gho.id)!;
@@ -126,13 +124,17 @@ export const APPRByGroupTableSection = (
   });
 
   hierarchyDataHomoGroup.forEach((hierarchy) => {
+    const epis = hierarchy.allHomogeneousGroupIds.map((id) => {
+      return homoGroupTree[id].gho.risksData({ documentType: 'isPGR' }).map;
+    });
     const createTable = () => {
       const firstTable = firstRiskInventoryTableSection(riskFactorGroupData, homoGroupTree, hierarchy, isByGroup);
       const officeTable = officeRiskInventoryTableSection(hierarchy);
       const secondTable = secondRiskInventoryTableSection(hierarchy, isByGroup);
+      const epiTable = epiRiskInventoryTableSection(hierarchy);
       const thirdTable = thirdRiskInventoryTableSection(riskFactorGroupData, hierarchy, hierarchyTree);
 
-      sectionsTables.push([firstTable, ...officeTable, ...secondTable, ...thirdTable]);
+      sectionsTables.push([firstTable, ...officeTable, ...secondTable, ...epiTable, ...thirdTable]);
     };
     createTable();
   });
