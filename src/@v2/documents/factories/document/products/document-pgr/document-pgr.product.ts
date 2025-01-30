@@ -1,6 +1,6 @@
-import { DocumentBuildPGR } from '@/@v2/documents/application/libs/docx/builders/pgr/create';
-import { getDocumentFileName } from '@/@v2/documents/application/libs/docx/helpers/get-document-file-name';
-import { getDocumentVersion } from '@/@v2/documents/application/libs/docx/helpers/get-document-version';
+import { DocumentBuildPGR } from '@/@v2/documents/libs/docx/builders/pgr/create';
+import { getDocumentFileName } from '@/@v2/documents/libs/docx/helpers/get-document-file-name';
+import { getDocumentVersion } from '@/@v2/documents/libs/docx/helpers/get-document-version';
 import { DocumentDAO } from '@/@v2/documents/database/dao/document/document.dao';
 import { DocumentVersionRepository } from '@/@v2/documents/database/repositories/document-version/document-version.repository';
 import { DocumentVersionEntity } from '@/@v2/documents/domain/entities/document-version.entity';
