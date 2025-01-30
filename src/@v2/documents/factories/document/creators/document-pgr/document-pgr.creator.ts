@@ -4,7 +4,7 @@ import { DocumentCreationService } from '../../../../services/document-creation/
 import { ICreatorDocumentPGR } from './document-pgr.types';
 import { DocumentDAO } from '@/@v2/documents/database/dao/document/document.dao';
 import { DocumentVersionRepository } from '@/@v2/documents/database/repositories/document-version/document-version.repository';
-import { DonwloadImageService } from '@/@v2/documents/application/services/donwload-image/donwload-image.service';
+import { DownloadImageService } from '@/@v2/documents/services/donwload-image/donwload-image.service';
 
 @Injectable()
 export class CreatorDocumentPGR {
@@ -13,7 +13,7 @@ export class CreatorDocumentPGR {
 
     protected readonly documentDAO: DocumentDAO,
     protected readonly documentVersionRepository: DocumentVersionRepository,
-    protected readonly donwloadImageService: DonwloadImageService,
+    protected readonly donwloadImageService: DownloadImageService,
   ) {}
 
   async execute({ documentVersionId, homogeneousGroupsIds }: ICreatorDocumentPGR.Params) {

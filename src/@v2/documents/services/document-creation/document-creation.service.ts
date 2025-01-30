@@ -7,7 +7,8 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ISectionOptions, Packer } from 'docx';
 import { unlinkSync } from 'fs';
 import { IDocumentAttachment, IDocumentFactoryProduct, IUnlinkPaths } from '../../factories/document/types/document-factory.types';
-import { createBaseDocument } from '../../libs/docx/base/config/document';
+
+import { createBaseDocument } from '../../application/libs/docx/base/config/document';
 import { IDocumentCreation } from './document-creation.interface';
 
 @Injectable()

@@ -8,11 +8,11 @@ import { v4 } from 'uuid';
 import { donwloadPublicFile } from '@/@v2/shared/utils/helpers/downalod-public-file';
 
 @Injectable()
-export class DonwloadImageService {
+export class DownloadImageService {
   constructor(
     @Inject(SharedTokens.Storage)
     private readonly storage: IStorageAdapter,
-  ) { }
+  ) {}
 
   async donwloadBatch<T, S>({ images, callbackFn, getUrl }: IDonwloadImage.DownloadBatchParams<T, S>) {
     return await asyncBatch(images, 50, async (image) => {
@@ -34,13 +34,13 @@ export class DonwloadImageService {
 
     const fileBuffer = await this.storage.download({ fileUrl: imageUrl });
 
-    const extension = imageUrl.split('/').at(-1)?.split('.')[1]
+    const extension = imageUrl.split('/').at(-1)?.split('.')[1];
     if (!extension) return null;
 
     const path = `tmp/${v4()}.${extension}`;
 
     await fs.writeFile(path, fileBuffer, {});
 
-    return path
+    return path;
   }
 }

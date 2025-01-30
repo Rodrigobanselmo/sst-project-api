@@ -1,8 +1,7 @@
-import { AttachmentEntity } from "@/@v2/documents/domain/entities/attachment.entity";
-import { DocumentVersionEntity } from "@/@v2/documents/domain/entities/document-version.entity";
-import { AttachmentModel } from "@/@v2/documents/domain/models/attachment.model";
+import { AttachmentEntity } from '@/@v2/documents/domain/entities/attachment.entity';
+import { DocumentVersionEntity } from '@/@v2/documents/domain/entities/document-version.entity';
+import { AttachmentModel } from '@/@v2/documents/domain/models/attachment.model';
 import { ISectionOptions } from 'docx';
-
 
 export interface IDocumentAttachment {
   id: string;

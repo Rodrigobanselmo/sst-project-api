@@ -1,7 +1,6 @@
 import { DocumentBuildPGR } from '@/@v2/documents/application/libs/docx/builders/pgr/create';
 import { getDocumentFileName } from '@/@v2/documents/application/libs/docx/helpers/get-document-file-name';
 import { getDocumentVersion } from '@/@v2/documents/application/libs/docx/helpers/get-document-version';
-import { DonwloadImageService } from '@/@v2/documents/application/services/donwload-image/donwload-image.service';
 import { DocumentDAO } from '@/@v2/documents/database/dao/document/document.dao';
 import { DocumentVersionRepository } from '@/@v2/documents/database/repositories/document-version/document-version.repository';
 import { DocumentVersionEntity } from '@/@v2/documents/domain/entities/document-version.entity';
@@ -16,6 +15,7 @@ import { ISectionOptions } from 'docx';
 import { v4 } from 'uuid';
 import { IDocumentFactoryProduct, IGetAttachments, IGetDocument, ISaveDocument, ISaveErrorDocument, IUnlinkPaths } from '../../types/document-factory.types';
 import { IProductDocumentPGR } from './document-pgr.types';
+import { DownloadImageService } from '@/@v2/documents/services/donwload-image/donwload-image.service';
 
 export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocumentPGR, DocumentPGRModel> {
   public unlinkPaths: IUnlinkPaths[] = [];
@@ -24,7 +24,7 @@ export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocum
   constructor(
     private readonly documentDAO: DocumentDAO,
     private readonly documentVersionRepository: DocumentVersionRepository,
-    private readonly donwloadImageService: DonwloadImageService,
+    private readonly donwloadImageService: DownloadImageService,
   ) {}
 
   public async getData({ documentVersionId, homogeneousGroupsIds }: IProductDocumentPGR) {
