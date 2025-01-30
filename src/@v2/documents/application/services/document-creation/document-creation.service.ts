@@ -2,7 +2,7 @@ import { AttachmentEntity } from '@/@v2/documents/domain/entities/attachment.ent
 import { IStorageAdapter } from '@/@v2/shared/adapters/storage/storage.interface';
 import { BUCKET_FOLDERS } from '@/@v2/shared/constants/buckets';
 import { SharedTokens } from '@/@v2/shared/constants/tokens';
-import { isDevelopmentGetter } from '@/@v2/shared/utils/helpers/is-development';
+import { isDevelopment } from '@/@v2/shared/utils/helpers/is-development';
 import { Inject, Injectable } from '@nestjs/common';
 import { ISectionOptions, Packer } from 'docx';
 import { unlinkSync } from 'fs';
@@ -18,14 +18,14 @@ export class DocumentCreationService {
   ) {}
 
   public async execute<T, R>({ product, body }: IDocumentCreation.Params<T, R>) {
-    const isLocal = isDevelopmentGetter();
+    const IS_DEVELOPMENT = isDevelopment();
 
     try {
-      if (isLocal) console.log(1, 'start');
+      if (IS_DEVELOPMENT) console.log(1, 'start');
       const data = await product.getData(body);
       const attachmentsData = await product.getAttachments({ data, body });
       const attachments = await this.saveAttachments<T, R>(attachmentsData, product, data);
-      if (isLocal) console.log(2, 'attachments');
+      if (IS_DEVELOPMENT) console.log(2, 'attachments');
 
       const sections = await product.getSections({ data, attachments: attachmentsData.map((attachment) => attachment.model), body });
       const fileName = product.getFileName(data);
@@ -33,12 +33,12 @@ export class DocumentCreationService {
       const { buffer } = await this.generate({ sections });
       const { url } = await this.upload(buffer, fileName);
 
-      if (isLocal) console.log(3, url);
+      if (IS_DEVELOPMENT) console.log(3, url);
 
       await product.save({ body, attachments, url, data });
 
       this.unlinkFiles(product.unlinkPaths);
-      if (isLocal) console.log(4, 'unlinked');
+      if (IS_DEVELOPMENT) console.log(4, 'unlinked');
 
       return { buffer, fileName };
     } catch (error) {
@@ -78,7 +78,7 @@ export class DocumentCreationService {
   private async upload(fileBuffer: Buffer, fileName: string) {
     const { url, key } = await this.storage.upload({
       file: fileBuffer,
-      fileName: BUCKET_FOLDERS.TEMP_FILES_7 + fileName,
+      fileKey: BUCKET_FOLDERS.TEMP_FILES_7 + fileName,
     });
 
     return { url, key };

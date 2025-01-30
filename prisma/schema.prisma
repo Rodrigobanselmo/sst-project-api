@@ -354,6 +354,9 @@ model Company {
   UserHistory                UserHistory[]
   ExamToRiskSkipCompany      ExamToRiskSkipCompany[]
   Status                     Status[]
+  DocumentControl            DocumentControl[]
+  SystemFile                 SystemFile[]
+  DocumentControlFile        DocumentControlFile[]
 
   @@index([name])
   @@index([isClinic])
@@ -578,6 +581,66 @@ model DatabaseTable {
   company    Company    @relation(fields: [companyId], references: [id])
 
   @@id([id, companyId])
+}
+
+model DocumentControl {
+  id          Int        @id @default(autoincrement())
+  name        String
+  description String?
+  type        String
+  status      StatusEnum @default(ACTIVE)
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+
+  company_id   String
+  company      Company   @relation(fields: [company_id], references: [id])
+  workspace_id String
+  workspace    Workspace @relation(fields: [workspace_id], references: [id])
+
+  document_control_files DocumentControlFile[]
+
+  @@unique([id, company_id])
+  @@index([type])
+  @@index([company_id])
+}
+
+model DocumentControlFile {
+  id         Int        @id @default(autoincrement())
+  name       String
+  start_date DateTime   @default(now())
+  end_date   DateTime?
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
+  status     StatusEnum @default(ACTIVE)
+  file_id    Int
+  file       SystemFile @relation(fields: [file_id], references: [id], onDelete: Restrict)
+
+  document_control_id Int
+  document_control    DocumentControl @relation(fields: [document_control_id], references: [id], onDelete: Restrict)
+
+  company_id String
+  company    Company @relation(fields: [company_id], references: [id])
+
+  @@unique([id, company_id])
+  @@index([company_id])
+}
+
+model SystemFile {
+  id         Int      @id @default(autoincrement())
+  url        String
+  key        String
+  bucket     String
+  name       String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  company_id String
+  company    Company @relation(fields: [company_id], references: [id])
+
+  document_control_files DocumentControlFile[]
+
+  @@unique([id, company_id])
+  @@index([company_id])
 }
 
 model Document {
@@ -1802,6 +1865,7 @@ model Workspace {
   homogeneousGroup   HomogeneousGroup[]
   documentData       DocumentData[]
   RiskFactorDataRec  RiskFactorDataRec[]
+  DocumentControl    DocumentControl[]
 
   @@unique([abbreviation, companyId])
   @@unique([id, companyId])

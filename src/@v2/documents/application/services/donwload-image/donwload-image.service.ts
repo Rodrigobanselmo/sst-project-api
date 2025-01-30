@@ -12,7 +12,7 @@ export class DonwloadImageService {
   constructor(
     @Inject(SharedTokens.Storage)
     private readonly storage: IStorageAdapter,
-  ) { }
+  ) {}
 
   async donwloadBatch<T, S>({ images, callbackFn, getUrl }: IDonwloadImage.DownloadBatchParams<T, S>) {
     return await asyncBatch(images, 50, async (image) => {
@@ -32,15 +32,16 @@ export class DonwloadImageService {
       return donwloadPublicFile({ url: imageUrl });
     }
 
-    const fileBuffer = await this.storage.download({ fileUrl: imageUrl });
-
-    const extension = imageUrl.split('/').at(-1)?.split('.')[1]
+    const extension = imageUrl.split('/').at(-1)?.split('.')[1];
     if (!extension) return null;
+
+    const fileKey = imageUrl.split('.com/').at(-1);
+    const fileBuffer = await this.storage.download({ fileKey: fileKey });
 
     const path = `tmp/${v4()}.${extension}`;
 
     await fs.writeFile(path, fileBuffer, {});
 
-    return path
+    return path;
   }
 }

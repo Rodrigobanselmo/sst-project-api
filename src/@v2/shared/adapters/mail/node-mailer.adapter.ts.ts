@@ -4,12 +4,12 @@ import handlebars from 'handlebars';
 import nodemailer from 'nodemailer';
 import { MailAdapter } from './mail.interface';
 import { EmailType } from '../../../../templates/@v2/email';
-import { isDevelopmentGetter } from '../../utils/helpers/is-development';
+import { isDevelopment } from '../../utils/helpers/is-development';
 
 export class NodeMailerAdapter implements MailAdapter {
   async sendMail({ to, type, variables, attachments }: MailAdapter.SendMailData): Promise<any> {
     try {
-      if (isDevelopmentGetter()) return;
+      if (isDevelopment()) return;
       if (!to) return;
 
       const { path, subject } = EmailType[type];

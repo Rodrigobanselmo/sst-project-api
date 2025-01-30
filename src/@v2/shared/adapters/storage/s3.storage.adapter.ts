@@ -1,7 +1,7 @@
 import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
 import { config } from '@/@v2/shared/constants/config';
-import { isDevelopmentGetter } from '@/@v2/shared/utils/helpers/is-development';
+import { isDevelopment } from '@/@v2/shared/utils/helpers/is-development';
 import { getContentType } from '@/@v2/shared/utils/helpers/get-content-type';
 import { Readable } from 'stream';
 import { IStorageAdapter } from './storage.interface';
@@ -15,14 +15,14 @@ export class S3StorageAdapter implements IStorageAdapter {
     this.s3 = new S3Client({ region: config.AWS.S3_BUCKET_REGION });
   }
 
-  async upload({ file, fileName, isPublic }: IStorageAdapter.Upload.Params): Promise<IStorageAdapter.Upload.Result> {
-    const key = isDevelopmentGetter() ? `${'test'}/${fileName}` : fileName;
+  async upload({ file, fileKey, bucket, isPublic }: IStorageAdapter.Upload.Params): Promise<IStorageAdapter.Upload.Result> {
+    const key = isDevelopment() ? `${'test'}/${fileKey}` : fileKey;
 
     const command = new PutObjectCommand({
-      Bucket: this.bucket,
+      Bucket: bucket || this.bucket,
       Key: key,
       Body: file,
-      ContentType: this.contentType(fileName),
+      ContentType: this.contentType(fileKey),
       ACL: isPublic ? 'public-read' : undefined,
     });
 
@@ -31,26 +31,24 @@ export class S3StorageAdapter implements IStorageAdapter {
     return { url: this.getLocation(key), key };
   }
 
-  async download({ fileUrl }: IStorageAdapter.Download.Params): Promise<IStorageAdapter.Download.Result> {
-    const fileKey = fileUrl.split('.com/').at(-1);
-
+  async download({ fileKey: key, bucket }: IStorageAdapter.Download.Params): Promise<IStorageAdapter.Download.Result> {
     const command = new GetObjectCommand({
-      Bucket: this.bucket,
-      Key: fileKey,
+      Bucket: bucket || this.bucket,
+      Key: key,
     });
 
     const fileStream = await this.s3.send(command);
-    if (!fileStream.Body) throw new Error('File not found');
+    if (!fileStream.Body) throw new Error('Arquivo não encontrado');
 
     return Readable.from(this.toReadable(fileStream.Body.transformToWebStream()));
   }
 
-  async delete({ fileUrl }: IStorageAdapter.Delete.Params): Promise<IStorageAdapter.Delete.Result> {
-    const fileKey = fileUrl.split('.com/').at(-1);
-    if (isDevelopmentGetter() && !fileKey?.includes('test')) return;
+  async delete({ key, bucket }: IStorageAdapter.Delete.Params): Promise<IStorageAdapter.Delete.Result> {
+    const fileKey = key;
+    if (isDevelopment() && !fileKey?.includes('test')) return;
 
     const command = new DeleteObjectCommand({
-      Bucket: this.bucket,
+      Bucket: bucket || this.bucket,
       Key: fileKey,
     });
 
@@ -59,10 +57,10 @@ export class S3StorageAdapter implements IStorageAdapter {
 
   private contentType(filename: string): string {
     const extension = filename.split('.').pop();
-    if (!extension) throw new Error('Invalid file name');
+    if (!extension) throw new Error('Arquivo com extensão inválida');
 
     const contentType = getContentType(extension);
-    if (!contentType) throw new Error('Unsupported file type');
+    if (!contentType) throw new Error('Tipo de arquivo não suportado');
 
     return contentType;
   }

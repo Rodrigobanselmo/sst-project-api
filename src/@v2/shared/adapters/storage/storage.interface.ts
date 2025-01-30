@@ -10,7 +10,8 @@ export namespace IStorageAdapter {
   export namespace Upload {
     export type Params = {
       file: Buffer;
-      fileName: string;
+      fileKey: string;
+      bucket?: string;
       isPublic?: boolean;
     };
 
@@ -21,19 +22,14 @@ export namespace IStorageAdapter {
   }
 
   export namespace Download {
-    export type Params = {
-      fileUrl: string;
-    };
+    export type Params = { fileKey: string; bucket?: string };
 
     export type Result = internal.Readable;
   }
 
   export namespace Delete {
-    export type Params = {
-      fileUrl: string;
-    };
+    export type Params = { key: string; bucket?: string };
 
     export type Result = void;
   }
 }
-
