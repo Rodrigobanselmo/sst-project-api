@@ -6,12 +6,10 @@ import { TableHeaderElements } from '../../elements/header';
 import { thirdRiskInventoryColumnsHeader, thirdRiskInventoryHeader } from './third.constant';
 import { dataConverter } from './third.converter';
 
-export const thirdRiskInventoryTableSection = (
-  riskFactorGroupData: IDocumentRiskGroupDataConverter,
-  hierarchyData: HierarchyMapData,
-  isByGroup: boolean,
-) => {
+export const thirdRiskInventoryTableSection = (riskFactorGroupData: IDocumentRiskGroupDataConverter, hierarchyData: HierarchyMapData, isByGroup: boolean) => {
+  console.log(66);
   const data = dataConverter(riskFactorGroupData, hierarchyData, isByGroup);
+  console.log(77);
 
   const tableHeaderElements = new TableHeaderElements();
   const tableBodyElements = new TableBodyElements();
