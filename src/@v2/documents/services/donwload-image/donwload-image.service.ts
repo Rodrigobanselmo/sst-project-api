@@ -6,6 +6,7 @@ import { promises as fs } from 'fs';
 import { IDonwloadImage } from './donwload-image.interface';
 import { v4 } from 'uuid';
 import { donwloadPublicFile } from '@/@v2/shared/utils/helpers/downalod-public-file';
+import { isDevelopmentGetter } from '@/@v2/shared/utils/helpers/is-development';
 
 @Injectable()
 export class DownloadImageService {
@@ -24,6 +25,7 @@ export class DownloadImageService {
   }
 
   async donwload({ imageUrl }: IDonwloadImage.DownloadParams): Promise<string | null> {
+    if (isDevelopmentGetter()) return null;
     if (!imageUrl) return null;
 
     const isOldBucket = !imageUrl.includes('https://simplesst.s3.sa-east-1');
