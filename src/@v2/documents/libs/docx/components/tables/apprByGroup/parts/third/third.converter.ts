@@ -1,11 +1,7 @@
 import { RiskFactorsEnum } from '@prisma/client';
 import { AlignmentType } from 'docx';
 import { palette } from '../../../../../constants/palette';
-import {
-  HierarchyMapData,
-  IDocumentRiskGroupDataConverter,
-  IHierarchyMap,
-} from '../../../../../converter/hierarchy.converter';
+import { HierarchyMapData, IDocumentRiskGroupDataConverter, IHierarchyMap } from '../../../../../converter/hierarchy.converter';
 
 import { getMatrizRisk } from '@/@v2/shared/domain/functions/security/get-matrix-risk.func';
 import { sortNumber } from '@/@v2/shared/utils/sorts/number.sort';
@@ -22,6 +18,10 @@ export const dataConverter = (
   riskGroup: IDocumentRiskGroupDataConverter,
   hierarchyData: HierarchyMapData,
   hierarchyTree: IHierarchyMap,
+  options: {
+    isHideCA: boolean;
+    isHideOrigin: boolean;
+  },
 ) => {
   const riskFactorsMap = new Map<RiskFactorsEnum, bodyTableProps[][]>();
   const riskInventoryData: bodyTableProps[][] = [];
@@ -54,10 +54,8 @@ export const dataConverter = (
       const attention = { color: palette.text.attention.string, bold: true };
       const fill = { shading: { fill: palette.table.header.string } };
 
-      const riskOccupational =
-        matrixRiskMap[getMatrizRisk(riskData.riskData.risk.severity, riskData.riskData.probability)];
-      const riskOccupationalAfter =
-        matrixRiskMap[getMatrizRisk(riskData.riskData.risk.severity, riskData.riskData.probabilityAfter)];
+      const riskOccupational = matrixRiskMap[getMatrizRisk(riskData.riskData.risk.severity, riskData.riskData.probability)];
+      const riskOccupationalAfter = matrixRiskMap[getMatrizRisk(riskData.riskData.risk.severity, riskData.riskData.probabilityAfter)];
 
       let origin: string = '';
 
@@ -83,13 +81,14 @@ export const dataConverter = (
         ...fill,
       };
 
-      cells[ThirdRiskInventoryColumnEnum.ORIGIN] = {
-        text: origin || '',
-        bold: true,
-        size: 6,
-        ...base,
-        ...fill,
-      };
+      if (!options?.isHideOrigin)
+        cells[ThirdRiskInventoryColumnEnum.ORIGIN] = {
+          text: origin || '',
+          bold: true,
+          size: 6,
+          ...base,
+          ...fill,
+        };
 
       cells[ThirdRiskInventoryColumnEnum.RISK_FACTOR] = {
         text: riskData.riskData.risk.name,
@@ -111,7 +110,7 @@ export const dataConverter = (
 
       cells[ThirdRiskInventoryColumnEnum.EPI] = {
         //! EPI CA
-        text: riskData.riskData.epis.map((epi) => `${epi.equipment} CA: ${epi.ca}`).join('\n'),
+        text: riskData.riskData.epis.map((epi) => (options.isHideCA ? epi.equipment : epi.name) || '').join('\n'),
         size: 7,
         ...base,
       };
@@ -185,7 +184,7 @@ export const dataConverter = (
       };
 
       const rows = riskFactorsMap.get(riskData.riskData.risk.type) || [];
-      riskFactorsMap.set(riskData.riskData.risk.type, [...rows, cells]);
+      riskFactorsMap.set(riskData.riskData.risk.type, [...rows, cells.filter(Boolean)]);
     });
 
   riskFactorsMap.forEach((rows) => {

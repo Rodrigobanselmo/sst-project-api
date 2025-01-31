@@ -5,12 +5,7 @@ import { HierarchyMapData, IDocumentRiskGroupDataConverter, IHomoGroupMap } from
 import { bodyTableProps, borderNoneStyle } from '../../elements/body';
 import { FirstRiskInventoryColumnEnum, firstRiskInventoryHeader } from './first.constant';
 
-export const documentConverter = (
-  riskFactorGroupData: IDocumentRiskGroupDataConverter,
-  _homoGroupTree: IHomoGroupMap,
-  hierarchy: HierarchyMapData,
-  isByGroup: boolean,
-) => {
+export const documentConverter = (riskFactorGroupData: IDocumentRiskGroupDataConverter, _homoGroupTree: IHomoGroupMap, hierarchy: HierarchyMapData, isByGroup: boolean) => {
   const rows: bodyTableProps[][] = [];
   const homogeneousGroups = [] as string[];
   const environments = [] as string[];
@@ -108,7 +103,7 @@ export const documentConverter = (
       if (lastPenultimate)
         return {
           title: `Quantidade de Funcionários Expostos:`,
-          text: String(hierarchy.employeesLength || hierarchy.subEmployeesLength),
+          text: String(hierarchy.employeesLength || hierarchy.subEmployeesLength || ''),
           size: 30,
           borders: borderNoneStyle,
         };

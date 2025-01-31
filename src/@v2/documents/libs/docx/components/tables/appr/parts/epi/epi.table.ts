@@ -9,6 +9,7 @@ import { EPIModel } from '@/@v2/documents/domain/models/epis.model';
 
 export const epiRiskInventoryTableSection = (epis: EPIModel[], isHideCA: boolean) => {
   if (epis.length === 0) return [];
+
   let data = dataConverter(epis, isHideCA);
 
   const tableHeaderElements = new TableHeaderElements();

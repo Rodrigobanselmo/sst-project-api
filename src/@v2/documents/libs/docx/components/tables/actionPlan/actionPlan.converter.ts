@@ -1,6 +1,3 @@
-
-
-
 import { DocumentVersionModel } from '@/@v2/documents/domain/models/document-version.model';
 import { getMatrizRisk } from '@/@v2/shared/domain/functions/security/get-matrix-risk.func';
 import { sortNumber } from '@/@v2/shared/utils/sorts/number.sort';
@@ -14,11 +11,7 @@ import { IHierarchyMap, IRiskGroupDataConverter } from '../../../converter/hiera
 import { ActionPlanColumnEnum } from './actionPlan.constant';
 import { bodyTableProps } from './elements/body';
 
-export const actionPlanConverter = (
-  riskGroup: IRiskGroupDataConverter[],
-  documentVersion: DocumentVersionModel,
-  hierarchyTree: IHierarchyMap,
-) => {
+export const actionPlanConverter = (riskGroup: IRiskGroupDataConverter[], documentVersion: DocumentVersionModel, hierarchyTree: IHierarchyMap) => {
   const homogeneousGroupsMap = new Map<string, bodyTableProps[][]>();
   const actionPlanData: bodyTableProps[][] = [];
 

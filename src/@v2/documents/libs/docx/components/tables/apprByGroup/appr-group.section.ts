@@ -12,7 +12,8 @@ import { thirdRiskInventoryTableSection } from './parts/third/third.table';
 import { epiRiskInventoryTableSection } from './parts/epi/epi.table';
 
 export interface IAPPRTableOptions {
-  isByGroup?: boolean;
+  isHideCA: boolean;
+  isHideOrigin: boolean;
 }
 
 export const APPRByGroupTableSection = (
@@ -20,12 +21,10 @@ export const APPRByGroupTableSection = (
   hierarchyData: IHierarchyData,
   hierarchyTree: IHierarchyMap,
   homoGroupTree: IHomoGroupMap,
-  options: IAPPRTableOptions = {
-    isByGroup: true,
-  },
+  options: IAPPRTableOptions,
 ): ISectionOptions[] => {
   const sectionsTables = [] as (Table | Paragraph)[][];
-  const isByGroup = !!options.isByGroup;
+  const isByGroup = true;
   let workspace = '';
 
   hierarchyData.forEach((hierarchy) => {
@@ -124,15 +123,20 @@ export const APPRByGroupTableSection = (
   });
 
   hierarchyDataHomoGroup.forEach((hierarchy) => {
-    const epis = hierarchy.allHomogeneousGroupIds.map((id) => {
-      return homoGroupTree[id].gho.risksData({ documentType: 'isPGR' }).map;
-    });
     const createTable = () => {
+      const epis = hierarchy.allHomogeneousGroupIds
+        .map((id) => {
+          return homoGroupTree[id].gho.risksData({ documentType: 'isPGR' }).map((risk) => risk.epis.map((epi) => epi).flat());
+        })
+        .flat(2);
+
+      const episDeduplicated = epis.filter((epi, index, self) => index === self.findIndex((t) => t.ca === epi.ca));
+
       const firstTable = firstRiskInventoryTableSection(riskFactorGroupData, homoGroupTree, hierarchy, isByGroup);
       const officeTable = officeRiskInventoryTableSection(hierarchy);
       const secondTable = secondRiskInventoryTableSection(hierarchy, isByGroup);
-      const epiTable = epiRiskInventoryTableSection(hierarchy);
-      const thirdTable = thirdRiskInventoryTableSection(riskFactorGroupData, hierarchy, hierarchyTree);
+      const epiTable = epiRiskInventoryTableSection(episDeduplicated, options.isHideCA);
+      const thirdTable = thirdRiskInventoryTableSection(riskFactorGroupData, hierarchy, hierarchyTree, options);
 
       sectionsTables.push([firstTable, ...officeTable, ...secondTable, ...epiTable, ...thirdTable]);
     };

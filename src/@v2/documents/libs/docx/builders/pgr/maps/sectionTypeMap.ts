@@ -21,7 +21,7 @@ import { IDocVariables } from '../types/documet-section-groups.types';
 import { IMapElementDocumentType } from './elementTypeMap';
 import { CoverTypeEnum } from '@/@v2/shared/domain/enum/company/cover-type.enum';
 
-type IMapSectionDocumentType = Record<string, (arg: any) => ISectionOptions | ISectionOptions[]>;
+type IMapSectionDocumentType = Record<string, (arg: any) => ISectionOptions | ISectionOptions[] | Promise<ISectionOptions> | Promise<ISectionOptions[]>>;
 
 type IDocumentClassType = {
   data: DocumentPGRModel;
@@ -78,8 +78,16 @@ export class SectionsMapClass {
         ...this.getFooterHeader(footerText),
         ...sectionLandscapeProperties,
       })),
-    [DocumentSectionTypeEnum.APR]: () => APPRTableSection(this.oldData.documentRiskData, this.oldData.hierarchyData, this.oldData.homoGroupTree),
-    [DocumentSectionTypeEnum.APR_GROUP]: () => APPRByGroupTableSection(this.oldData.documentRiskData, this.oldData.hierarchyHighLevelsData, this.oldData.hierarchyTree, this.oldData.homoGroupTree),
+    [DocumentSectionTypeEnum.APR]: async () =>
+      APPRTableSection(this.oldData.documentRiskData, this.oldData.hierarchyData, this.oldData.homoGroupTree, {
+        isHideCA: Boolean(this.variables[VariablesPGREnum.IS_HIDE_CA]),
+        isHideOrigin: Boolean(this.variables[VariablesPGREnum.IS_HIDE_ORIGIN_COLUMN]),
+      }),
+    [DocumentSectionTypeEnum.APR_GROUP]: () =>
+      APPRByGroupTableSection(this.oldData.documentRiskData, this.oldData.hierarchyHighLevelsData, this.oldData.hierarchyTree, this.oldData.homoGroupTree, {
+        isHideCA: Boolean(this.variables[VariablesPGREnum.IS_HIDE_CA]),
+        isHideOrigin: Boolean(this.variables[VariablesPGREnum.IS_HIDE_ORIGIN_COLUMN]),
+      }),
     [DocumentSectionTypeEnum.ACTION_PLAN]: () => actionPlanTableSection(this.oldData.documentRiskData, this.oldData.hierarchyTree),
   };
 

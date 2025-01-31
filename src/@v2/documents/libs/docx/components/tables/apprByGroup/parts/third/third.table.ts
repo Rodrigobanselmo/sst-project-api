@@ -3,15 +3,19 @@ import { HierarchyMapData, IHierarchyMap } from '../../../../../converter/hierar
 
 import { TableBodyElements } from '../../elements/body';
 import { TableHeaderElements } from '../../elements/header';
-import { thirdRiskInventoryColumnsHeader, thirdRiskInventoryHeader } from './third.constant';
+import { ThirdRiskInventoryColumnsHeader, ThirdRiskInventoryHeader } from './third.constant';
 import { dataConverter } from './third.converter';
 
 export const thirdRiskInventoryTableSection = (
   riskFactorGroupData: any,
   hierarchyData: HierarchyMapData,
   hierarchyTree: IHierarchyMap,
+  options: {
+    isHideCA: boolean;
+    isHideOrigin: boolean;
+  },
 ) => {
-  const data = dataConverter(riskFactorGroupData, hierarchyData, hierarchyTree);
+  const data = dataConverter(riskFactorGroupData, hierarchyData, hierarchyTree, options);
 
   const tableHeaderElements = new TableHeaderElements();
   const tableBodyElements = new TableBodyElements();
@@ -19,8 +23,8 @@ export const thirdRiskInventoryTableSection = (
   const table = new Table({
     width: { size: 100, type: WidthType.PERCENTAGE },
     rows: [
-      tableHeaderElements.headerRow(thirdRiskInventoryHeader.map(tableHeaderElements.headerCell)),
-      tableHeaderElements.headerRow(thirdRiskInventoryColumnsHeader.map(tableHeaderElements.headerCell)),
+      tableHeaderElements.headerRow(ThirdRiskInventoryHeader(options.isHideOrigin).map(tableHeaderElements.headerCell)),
+      tableHeaderElements.headerRow(ThirdRiskInventoryColumnsHeader(options.isHideOrigin).map(tableHeaderElements.headerCell)),
       ...data.map((data) => tableBodyElements.tableRow(data.map(tableBodyElements.tableCell))),
     ],
   });

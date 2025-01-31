@@ -39,7 +39,7 @@ export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocum
   public async getAttachments({ data }: IGetAttachments<IProductDocumentPGR, DocumentPGRModel>) {
     const version = this.getVersionName(data);
 
-    const documentAPRSection = new DocumentBuildPGR({
+    const documentAPRSection = await new DocumentBuildPGR({
       data: data,
       version: version,
       attachments: [],
@@ -47,7 +47,7 @@ export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocum
       sections: [{ data: [{ type: DocumentSectionTypeEnum.APR }] }],
     }).build();
 
-    const documentAPRGroupSection = new DocumentBuildPGR({
+    const documentAPRGroupSection = await new DocumentBuildPGR({
       data: data,
       version: version,
       attachments: [],
@@ -55,7 +55,7 @@ export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocum
       sections: [{ data: [{ type: DocumentSectionTypeEnum.APR_GROUP }] }],
     }).build();
 
-    const documentActionPlanSection = new DocumentBuildPGR({
+    const documentActionPlanSection = await new DocumentBuildPGR({
       data: data,
       version: version,
       attachments: [],
@@ -103,7 +103,7 @@ export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocum
   public async getSections({ data, attachments }: IGetDocument<IProductDocumentPGR, DocumentPGRModel>) {
     const version = this.getVersionName(data);
 
-    const sections: ISectionOptions[] = new DocumentBuildPGR({
+    const sections: ISectionOptions[] = await new DocumentBuildPGR({
       data: data,
       version: version,
       attachments,

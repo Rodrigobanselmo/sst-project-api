@@ -25,14 +25,14 @@ export enum ThirdRiskInventoryColumnEnum {
   RISK_OCCUPATIONAL_AFTER,
 }
 
-const ThirdRiskInventoryHeader = (): bodyTableProps[] => {
+export const ThirdRiskInventoryHeader = (isHideOrigin: boolean): bodyTableProps[] => {
   const header: bodyTableProps[] = [];
 
   header[ThirdRiskInventoryHeaderEnum.FIRST] = {
     text: 'Severidade (S) x Probabilidade (P) = RISCO OCUPACIONAL (RO):',
     bold: true,
     borders: borderNoneStyle,
-    columnSpan: 5,
+    columnSpan: isHideOrigin ? 4 : 5,
   };
   header[ThirdRiskInventoryHeaderEnum.SECOND] = {
     text: 'RISCO PURO (REAL) Incluindo as Medidas de Controles Existentes',
@@ -50,9 +50,7 @@ const ThirdRiskInventoryHeader = (): bodyTableProps[] => {
   return header;
 };
 
-export const thirdRiskInventoryHeader = ThirdRiskInventoryHeader();
-
-const ThirdRiskInventoryColumnsHeader = (): bodyTableProps[] => {
+export const ThirdRiskInventoryColumnsHeader = (isHideOrigin: boolean): bodyTableProps[] => {
   const header: bodyTableProps[] = [];
 
   header[ThirdRiskInventoryColumnEnum.TYPE] = {
@@ -62,13 +60,14 @@ const ThirdRiskInventoryColumnsHeader = (): bodyTableProps[] => {
     size: 4,
     margins: { top: 100, bottom: 100 },
   };
-  header[ThirdRiskInventoryColumnEnum.ORIGIN] = {
-    text: 'Origem',
-    bold: true,
-    borders: { ...borderNoneStyle, right: whiteColumnBorder },
-    size: 6,
-    margins: { top: 100, bottom: 100 },
-  };
+  if (!isHideOrigin)
+    header[ThirdRiskInventoryColumnEnum.ORIGIN] = {
+      text: 'Origem',
+      bold: true,
+      borders: { ...borderNoneStyle, right: whiteColumnBorder },
+      size: 6,
+      margins: { top: 100, bottom: 100 },
+    };
   header[ThirdRiskInventoryColumnEnum.RISK_FACTOR] = {
     text: 'PERIGOS | FATORES DE RISCO',
     borders: { ...borderNoneStyle, right: whiteColumnBorder },
@@ -148,7 +147,5 @@ const ThirdRiskInventoryColumnsHeader = (): bodyTableProps[] => {
     margins: { top: 100, bottom: 100 },
   };
 
-  return header;
+  return header.filter(Boolean);
 };
-
-export const thirdRiskInventoryColumnsHeader = ThirdRiskInventoryColumnsHeader();

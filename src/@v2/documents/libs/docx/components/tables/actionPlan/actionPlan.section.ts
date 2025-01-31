@@ -6,10 +6,7 @@ import { actionPlanConverter } from './actionPlan.converter';
 import { TableBodyElements } from './elements/body';
 import { TableHeaderElements } from './elements/header';
 
-export const actionPlanTableSection = (
-  document: IDocumentRiskGroupDataConverter,
-  hierarchyTree: IHierarchyMap,
-) => {
+export const actionPlanTableSection = (document: IDocumentRiskGroupDataConverter, hierarchyTree: IHierarchyMap) => {
   const actionPlanData = actionPlanConverter(document.riskGroupData, document.documentVersion, hierarchyTree);
 
   const tableHeaderElements = new TableHeaderElements();
