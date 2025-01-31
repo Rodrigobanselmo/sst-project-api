@@ -16,6 +16,7 @@ import { v4 } from 'uuid';
 import { IDocumentFactoryProduct, IGetAttachments, IGetDocument, ISaveDocument, ISaveErrorDocument, IUnlinkPaths } from '../../types/document-factory.types';
 import { IProductDocumentPGR } from './document-pgr.types';
 import { DownloadImageService } from '@/@v2/documents/services/donwload-image/donwload-image.service';
+import { arrayChunks } from '@/@v2/shared/utils/helpers/array-chunks';
 
 export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocumentPGR, DocumentPGRModel> {
   public unlinkPaths: IUnlinkPaths[] = [];
@@ -65,20 +66,26 @@ export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocum
 
     const docVersionId = data.documentVersion.id;
     const companyId = data.documentBase.company.id;
-    const id1 = v4();
     const id2 = v4();
     const id3 = v4();
 
-    return [
-      {
-        id: id1,
-        section: documentAPRSection,
+    const sectionsAPRs = arrayChunks(documentAPRSection, 200);
+    const hasManyChunks = sectionsAPRs.length > 1;
+    const APRs = sectionsAPRs.map((section, index) => {
+      const id = v4();
+      return {
+        id: id,
+        section: section,
         model: new AttachmentModel({
-          name: 'Inventário de Risco por Função (APR)',
-          link: `${process.env.APP_HOST}/download/pgr/anexos?ref1=${docVersionId}&ref2=${id1}&ref3=${companyId}`,
+          name: `Inventário de Risco por Função (APR)${hasManyChunks ? ` - Parte ${index + 1}` : ''}`,
+          link: `${process.env.APP_HOST}/download/pgr/anexos?ref1=${docVersionId}&ref2=${id}&ref3=${companyId}`,
           type: 'PGR-APR',
         }),
-      },
+      };
+    });
+
+    return [
+      ...APRs,
       {
         id: id2,
         section: documentAPRGroupSection,

@@ -76,12 +76,12 @@ export const APPRTableSection = async (
     });
 
     createTable();
-    await simulateAwait(200);
+    await simulateAwait(100);
   };
 
   await asyncBatch({
     items: data,
-    batchSize: 10,
+    batchSize: 20,
     callback: createMapFunction,
   });
 

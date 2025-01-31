@@ -18,15 +18,15 @@ export class DocumentCreationService {
     private readonly storage: IStorageAdapter,
   ) {}
 
-  public async execute<T, R>({ product, body }: IDocumentCreation.Params<T, R>) {
-    const isLocal = isDevelopmentGetter();
+  private isLocal = isDevelopmentGetter();
 
+  public async execute<T, R>({ product, body }: IDocumentCreation.Params<T, R>) {
     try {
-      if (isLocal) console.log(1, 'start');
+      if (this.isLocal) console.log(1, 'start');
       const data = await product.getData(body);
       const attachmentsData = await product.getAttachments({ data, body });
       const attachments = await this.saveAttachments<T, R>(attachmentsData, product, data);
-      if (isLocal) console.log(2, 'attachments');
+      if (this.isLocal) console.log(2, 'attachments');
 
       const sections = await product.getSections({ data, attachments: attachmentsData.map((attachment) => attachment.model), body });
       const fileName = product.getFileName(data);
@@ -34,12 +34,12 @@ export class DocumentCreationService {
       const { buffer } = await this.generate({ sections });
       const { url } = await this.upload(buffer, fileName);
 
-      if (isLocal) console.log(3, url);
+      if (this.isLocal) console.log(3, url);
 
       await product.save({ body, attachments, url, data });
 
       this.unlinkFiles(product.unlinkPaths);
-      if (isLocal) console.log(4, 'unlinked');
+      if (this.isLocal) console.log(4, 'unlinked');
 
       return { buffer, fileName };
     } catch (error) {
@@ -51,20 +51,25 @@ export class DocumentCreationService {
   }
 
   private async saveAttachments<T, R>(attachments: IDocumentAttachment[], product: IDocumentFactoryProduct<T>, data: R) {
-    const attachmentsEntity = await Promise.all(
-      attachments.map(async (attachment) => {
-        const { buffer } = await this.generate({ sections: attachment.section });
-        const { url } = await this.upload(buffer, product.getFileName(data, attachment.model.type));
+    const attachmentsEntities: AttachmentEntity[] = [];
 
-        return new AttachmentEntity({
+    for (let index = 0; index < attachments.length; index++) {
+      const attachment = attachments[index];
+      if (this.isLocal) console.log('attachments start', index);
+      const { buffer } = await this.generate({ sections: attachment.section });
+      if (this.isLocal) console.log('attachments end', index);
+      const { url } = await this.upload(buffer, product.getFileName(data, attachment.model.type));
+
+      attachmentsEntities.push(
+        new AttachmentEntity({
           id: attachment.id,
           name: attachment.model.name,
           url,
-        });
-      }),
-    );
+        }),
+      );
+    }
 
-    return attachmentsEntity;
+    return attachmentsEntities;
   }
 
   private async generate({ sections }: { sections: ISectionOptions[] }) {
