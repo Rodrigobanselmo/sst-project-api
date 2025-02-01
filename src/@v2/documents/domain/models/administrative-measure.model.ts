@@ -1,13 +1,17 @@
+import { isNotAnMeasure } from '@/@v2/shared/domain/functions/shared/isNotAnMeasure';
 
 export type IAdministrativeMeasureModel = {
-  name: string
-}
+  name: string;
+};
 
 export class AdministrativeMeasureModel {
-  name: string
-
+  name: string;
 
   constructor(params: IAdministrativeMeasureModel) {
-    this.name = params.name
+    this.name = params.name;
+  }
+
+  get isNotAnMeasure() {
+    return isNotAnMeasure(this.name);
   }
 }

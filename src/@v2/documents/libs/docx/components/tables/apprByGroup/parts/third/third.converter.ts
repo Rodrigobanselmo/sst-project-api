@@ -116,7 +116,7 @@ export const dataConverter = (
       };
 
       cells[ThirdRiskInventoryColumnEnum.ENG] = {
-        text: riskData.riskData.egineeringMeasures.map((eng) => eng.name).join('\n'),
+        text: riskData.riskData.engineeringMeasures.map((eng) => eng.name).join('\n'),
         size: 7,
         ...base,
       };

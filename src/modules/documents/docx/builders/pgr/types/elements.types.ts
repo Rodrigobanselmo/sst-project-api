@@ -29,6 +29,9 @@ export enum DocumentSectionChildrenTypeEnum {
   ITERABLE_CHARACTERIZATION_ACTIVIT = 'ITERABLE_CHARACTERIZATION_ACTIVIT',
   ITERABLE_CHARACTERIZATION_WORKSTATION = 'ITERABLE_CHARACTERIZATION_WORKSTATION',
   ITERABLE_RECOMMENDATIONS = 'ITERABLE_RECOMMENDATIONS',
+  ITERABLE_CONTROL_MEASURES = 'ITERABLE_CONTROL_MEASURES',
+  ITERABLE_OTHER_CONTROL_MEASURES = 'ITERABLE_OTHER_CONTROL_MEASURES',
+  ITERABLE_EPI_CONTROL_MEASURES = 'ITERABLE_EPI_CONTROL_MEASURES',
   ITERABLE_EMERGENCY_RISKS = 'ITERABLE_EMERGENCY_RISKS',
   TABLE_GSE = 'TABLE_GSE',
   TABLE_HIERARCHY_ENV = 'TABLE_HIERARCHY_ENV',
@@ -347,6 +350,18 @@ export type IRecommendations = {
   type: DocumentSectionChildrenTypeEnum.ITERABLE_RECOMMENDATIONS;
 } & IBaseDocumentModel;
 
+export type IControlMeasures = {
+  type: DocumentSectionChildrenTypeEnum.ITERABLE_CONTROL_MEASURES;
+} & IBaseDocumentModel;
+
+export type IOtherControlMeasures = {
+  type: DocumentSectionChildrenTypeEnum.ITERABLE_OTHER_CONTROL_MEASURES;
+} & IBaseDocumentModel;
+
+export type IEpiControlMeasures = {
+  type: DocumentSectionChildrenTypeEnum.ITERABLE_EPI_CONTROL_MEASURES;
+} & IBaseDocumentModel;
+
 export type IEmergency = {
   type: DocumentSectionChildrenTypeEnum.ITERABLE_EMERGENCY_RISKS;
 } & IBaseDocumentModel;
@@ -442,6 +457,9 @@ export type ISectionChildrenType =
   | IPrioritizationE
   | IPrioritizationC
   | IRecommendations
+  | IControlMeasures
+  | IOtherControlMeasures
+  | IEpiControlMeasures
   | IGseCharTable
   | IGseEnvTable
   | IEmergency

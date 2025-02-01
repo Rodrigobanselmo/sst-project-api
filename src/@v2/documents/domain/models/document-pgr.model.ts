@@ -6,6 +6,9 @@ import { HierarchyModel } from './hierarchy.model';
 import { HomogeneousGroupModel } from './homogeneous-group.model';
 import { RiskDataExamModel } from './risk-data-exam.model';
 import { RiskDataModel } from './risk-data.model';
+import { EPIModel } from './epis.model';
+import { AdministrativeMeasureModel } from './administrative-measure.model';
+import { EngineeringMeasureModel } from './engineering-measure.model';
 
 export type IDocumentPGRModel = {
   documentVersion: DocumentVersionModel;
@@ -47,6 +50,33 @@ export class DocumentPGRModel {
 
   get risksData() {
     return this.homogeneousGroups.reduce((acc, group) => [...acc, ...group.risksData({ documentType: 'isPGR' })], [] as RiskDataModel[]);
+  }
+
+  get engineeringMeasures() {
+    const map = new Map<string, EngineeringMeasureModel>();
+    this.risksData.forEach((riskData) => {
+      riskData.engineeringMeasures.forEach((measure) => map.set(measure.name, measure));
+    });
+
+    return Array.from(map.values());
+  }
+
+  get administrativeMeasures() {
+    const map = new Map<string, AdministrativeMeasureModel>();
+    this.risksData.forEach((riskData) => {
+      riskData.administrativeMeasures.forEach((measure) => map.set(measure.name, measure));
+    });
+
+    return Array.from(map.values());
+  }
+
+  get epis() {
+    const map = new Map<string, EPIModel>();
+    this.risksData.forEach((riskData) => {
+      riskData.epis.forEach((epi) => map.set(epi.name, epi));
+    });
+
+    return Array.from(map.values());
   }
 
   get numOfEmployee() {

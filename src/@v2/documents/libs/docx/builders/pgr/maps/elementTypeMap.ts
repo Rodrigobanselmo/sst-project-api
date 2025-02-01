@@ -40,6 +40,9 @@ import { dataConverter } from '../../../converter/data.converter';
 import { convertToDocxHelper } from '../functions/convertToDocx';
 import { IDocVariables } from '../types/documet-section-groups.types';
 import { versionControlTable } from '../../../components/tables/versionControl/versionControl.table';
+import { controlMeasuresEngIterable } from '../../../components/iterables/controlMeasuresEng/control-measures-eng.iterable';
+import { controlMeasuresAdmIterable } from '../../../components/iterables/controlMeasuresAdm/control-measures-adm.iterable';
+import { controlMeasuresEpiIterable } from '../../../components/iterables/controlMeasuresEpi/control-measures-epi.iterable';
 
 export type IMapElementDocumentType = Record<string, (arg: any) => (Paragraph | Table)[]>;
 
@@ -178,6 +181,9 @@ export class ElementsMapClass {
     [DocumentChildrenTypeEnum.COMPLEMENTARY_DOCS]: () => complementaryDocsIterable(this.data.documentBase.data.complementaryDocs || [], (x, v) => this.convertToDocx(x, v)),
     [DocumentChildrenTypeEnum.COMPLEMENTARY_SYSTEMS]: () => complementarySystemsIterable(this.data.documentBase.data.complementarySystems || [], (x, v) => this.convertToDocx(x, v)),
     [DocumentChildrenTypeEnum.ITERABLE_RECOMMENDATIONS]: () => recommendationsIterable(this.oldRiskGroupData, (x, v) => this.convertToDocx(x, v)),
+    [DocumentChildrenTypeEnum.ITERABLE_CONTROL_MEASURES]: () => controlMeasuresEngIterable(this.data, (x, v) => this.convertToDocx(x, v)),
+    [DocumentChildrenTypeEnum.ITERABLE_OTHER_CONTROL_MEASURES]: () => controlMeasuresAdmIterable(this.data, (x, v) => this.convertToDocx(x, v)),
+    [DocumentChildrenTypeEnum.ITERABLE_EPI_CONTROL_MEASURES]: () => controlMeasuresEpiIterable(this.data, this.variables, (x, v) => this.convertToDocx(x, v)),
     [DocumentChildrenTypeEnum.ITERABLE_EMERGENCY_RISKS]: () => emergencyIterable(this.oldRiskGroupData, (x, v) => this.convertToDocx(x, v)),
     [DocumentChildrenTypeEnum.ATTACHMENTS]: () => attachmentsIterable(this.attachments || [], (x, v) => this.convertToDocx(x, v)),
     [DocumentChildrenTypeEnum.HEALTH_EFFECT_TABLES]: () => healthEffectTable((x, v) => this.convertToDocx(x, v)),

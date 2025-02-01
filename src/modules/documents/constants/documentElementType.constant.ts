@@ -258,6 +258,21 @@ export const documentElementTypeMap: IDocumentElementTypeMap = {
     type: DocumentSectionChildrenTypeEnum.ITERABLE_RECOMMENDATIONS,
     accept: ['PGR'],
   },
+  [DocumentSectionChildrenTypeEnum.ITERABLE_CONTROL_MEASURES]: {
+    label: 'Lista de Mediadas de Controle',
+    type: DocumentSectionChildrenTypeEnum.ITERABLE_CONTROL_MEASURES,
+    accept: ['PGR'],
+  },
+  [DocumentSectionChildrenTypeEnum.ITERABLE_OTHER_CONTROL_MEASURES]: {
+    label: 'Lista de Outras Mediadas de Controle',
+    type: DocumentSectionChildrenTypeEnum.ITERABLE_OTHER_CONTROL_MEASURES,
+    accept: ['PGR'],
+  },
+  [DocumentSectionChildrenTypeEnum.ITERABLE_EPI_CONTROL_MEASURES]: {
+    label: 'Lista de EPIs',
+    type: DocumentSectionChildrenTypeEnum.ITERABLE_EPI_CONTROL_MEASURES,
+    accept: ['PGR'],
+  },
   [DocumentSectionChildrenTypeEnum.ITERABLE_EMERGENCY_RISKS]: {
     label: 'Lista dos Riscos de Emergência',
     type: DocumentSectionChildrenTypeEnum.ITERABLE_EMERGENCY_RISKS,
