@@ -1,6 +1,3 @@
-import { DocumentBuildPGR } from '@/@v2/documents/libs/docx/builders/pgr/create';
-import { getDocumentFileName } from '@/@v2/documents/libs/docx/helpers/get-document-file-name';
-import { getDocumentVersion } from '@/@v2/documents/libs/docx/helpers/get-document-version';
 import { DocumentDAO } from '@/@v2/documents/database/dao/document/document.dao';
 import { DocumentVersionRepository } from '@/@v2/documents/database/repositories/document-version/document-version.repository';
 import { DocumentVersionEntity } from '@/@v2/documents/domain/entities/document-version.entity';
@@ -8,6 +5,12 @@ import { DocumentSectionTypeEnum } from '@/@v2/documents/domain/enums/document-s
 import { AttachmentModel } from '@/@v2/documents/domain/models/attachment.model';
 import { CharacterizationPhotoModel } from '@/@v2/documents/domain/models/characterization-photos.model';
 import { DocumentPGRModel } from '@/@v2/documents/domain/models/document-pgr.model';
+import { DocumentBuildPGR } from '@/@v2/documents/libs/docx/builders/pgr/create';
+import { getDocumentFileName } from '@/@v2/documents/libs/docx/helpers/get-document-file-name';
+import { getDocumentVersion } from '@/@v2/documents/libs/docx/helpers/get-document-version';
+import { DownloadImageService } from '@/@v2/documents/services/donwload-image/donwload-image.service';
+import { createDocumentAttachments } from '@/@v2/documents/utils/create-document-attachments';
+import { HierarchyTypeEnum } from '@/@v2/shared/domain/enum/company/hierarchy-type.enum';
 import { DocumentVersionStatus } from '@/@v2/shared/domain/enum/documents/document-version-status';
 import { dateUtils } from '@/@v2/shared/utils/helpers/date-utils';
 import { BadRequestException } from '@nestjs/common';
@@ -15,8 +18,6 @@ import { ISectionOptions } from 'docx';
 import { v4 } from 'uuid';
 import { IDocumentFactoryProduct, IGetAttachments, IGetDocument, ISaveDocument, ISaveErrorDocument, IUnlinkPaths } from '../../types/document-factory.types';
 import { IProductDocumentPGR } from './document-pgr.types';
-import { DownloadImageService } from '@/@v2/documents/services/donwload-image/donwload-image.service';
-import { arrayChunks } from '@/@v2/shared/utils/helpers/array-chunks';
 
 export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocumentPGR, DocumentPGRModel> {
   public unlinkPaths: IUnlinkPaths[] = [];
@@ -40,13 +41,43 @@ export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocum
   public async getAttachments({ data }: IGetAttachments<IProductDocumentPGR, DocumentPGRModel>) {
     const version = this.getVersionName(data);
 
-    const documentAPRSection = await new DocumentBuildPGR({
-      data: data,
-      version: version,
-      attachments: [],
-      variables: {},
-      sections: [{ data: [{ type: DocumentSectionTypeEnum.APR }] }],
-    }).build();
+    async function getDocumentAPRSections() {
+      async function createAPR(documentData: DocumentPGRModel) {
+        const apr = await new DocumentBuildPGR({
+          data: documentData,
+          version: version,
+          attachments: [],
+          variables: {},
+          sections: [{ data: [{ type: DocumentSectionTypeEnum.APR }] }],
+        }).build();
+
+        return apr;
+      }
+
+      async function getAPRSectionsByHierarchy(type: HierarchyTypeEnum) {
+        const sections: { sections: ISectionOptions[]; name: string; typeName: string }[] = [];
+
+        const aprByHierarchies = data.getHierarchiesByType(type);
+        for (const hierarchy of aprByHierarchies) {
+          const apr = await createAPR(data.getModifiedEntityFilteredByHierarchy(hierarchy));
+
+          const pathHierarchy = [...data.getHierarchyParents(hierarchy), hierarchy].map((hierarchy) => hierarchy.name);
+          sections.push({ sections: apr, name: `Inventário de Risco (APR) (${pathHierarchy})`, typeName: `PGR-APR-${pathHierarchy.join('-').replaceAll(' ', '_')}` });
+        }
+
+        return sections;
+      }
+
+      if (data.documentBase.data.aprTypeSeparation) {
+        const sections = await getAPRSectionsByHierarchy(data.documentBase.data.aprTypeSeparation);
+        return sections;
+      }
+
+      const apr = await createAPR(data);
+      return [{ sections: apr, name: 'Inventário de Risco por Função (APR)', typeName: 'PGR-APR' }];
+    }
+
+    const documentAPRSections = await getDocumentAPRSections();
 
     const documentAPRGroupSection = await new DocumentBuildPGR({
       data: data,
@@ -66,35 +97,31 @@ export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocum
 
     const docVersionId = data.documentVersion.id;
     const companyId = data.documentBase.company.id;
-    const id2 = v4();
     const id3 = v4();
 
-    const sectionsAPRs = arrayChunks(documentAPRSection, 200);
-    const hasManyChunks = sectionsAPRs.length > 1;
-    const APRs = sectionsAPRs.map((section, index) => {
-      const id = v4();
-      return {
-        id: id,
-        section: section,
-        model: new AttachmentModel({
-          name: `Inventário de Risco por Função (APR)${hasManyChunks ? ` - Parte ${index + 1}` : ''}`,
-          link: `${process.env.APP_HOST}/download/pgr/anexos?ref1=${docVersionId}&ref2=${id}&ref3=${companyId}`,
-          type: 'PGR-APR',
-        }),
-      };
+    const APRs = documentAPRSections
+      .map(({ sections, name, typeName }) => {
+        return createDocumentAttachments({
+          name: name,
+          typeName: typeName,
+          sections: sections,
+          documentVersionId: docVersionId,
+          companyId: companyId,
+        });
+      })
+      .flat();
+
+    const GroupsAPRs = createDocumentAttachments({
+      name: 'Inventário de Risco por GSE (APR)',
+      typeName: 'PGR-APR-GSE',
+      sections: documentAPRGroupSection,
+      documentVersionId: docVersionId,
+      companyId: companyId,
     });
 
     return [
       ...APRs,
-      {
-        id: id2,
-        section: documentAPRGroupSection,
-        model: new AttachmentModel({
-          type: 'PGR-APR-GSE',
-          name: 'Inventário de Risco por GSE (APR)',
-          link: `${process.env.APP_HOST}/download/pgr/anexos?ref1=${docVersionId}&ref2=${id2}&ref3=${companyId}`,
-        }),
-      },
+      ...GroupsAPRs,
       {
         id: id3,
         section: documentActionPlanSection,

@@ -29,7 +29,7 @@ export class HomogeneousGroupModel {
 
   hierarchies: HierarchyGroupModel[];
   characterization: CharacterizationModel | null;
-  #risksData: RiskDataModel[];
+  _risksData: RiskDataModel[];
 
   constructor(params: IHomogeneousGroupModel) {
     this.id = params.id;
@@ -41,7 +41,7 @@ export class HomogeneousGroupModel {
     this.hierarchies = params.hierarchies;
     this.characterization = params.characterization;
 
-    this.#risksData = params.risksData;
+    this._risksData = params.risksData;
   }
 
   get isEnviroment() {
@@ -63,7 +63,7 @@ export class HomogeneousGroupModel {
   }
 
   risksData({ documentType }: { documentType: IDocumentsRequirementKeys }) {
-    return this.#risksData.filter((riskData) => {
+    return this._risksData.filter((riskData) => {
       const { checkIfExistAny } = getRiskDocumentsRequirements({ companyId: this.companyId, requirements: riskData.risk.documentsRequirements });
       return checkIfExistAny({ documentType });
     });

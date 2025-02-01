@@ -54,11 +54,7 @@ export class ElementsMapClass {
   private variables: IDocVariables;
   private attachments: AttachmentModel[];
 
-  constructor({
-    data,
-    variables,
-    attachments,
-  }: IDocumentClassType) {
+  constructor({ data, variables, attachments }: IDocumentClassType) {
     this.data = data;
     this.variables = variables;
     this.attachments = attachments;
@@ -71,16 +67,16 @@ export class ElementsMapClass {
     [DocumentChildrenTypeEnum.H4]: ({ text }: IH4) => [h4(text)],
     [DocumentChildrenTypeEnum.H5]: ({ text }: IH5) => [h5(text)],
     [DocumentChildrenTypeEnum.H6]: ({ text }: IH6) => [h6(text)],
-    [DocumentChildrenTypeEnum.BREAK]: ({ }: IBreak) => [pageBreak()],
+    [DocumentChildrenTypeEnum.BREAK]: ({}: IBreak) => [pageBreak()],
     [DocumentChildrenTypeEnum.TITLE]: ({ text }: ITitle) => [title(text)],
     [DocumentChildrenTypeEnum.PARAGRAPH]: ({ text, ...rest }: IParagraph) => [paragraphNewNormal(text, rest)],
     [DocumentChildrenTypeEnum.IMAGE]: (data: IImage) => imageDoc(data),
     [DocumentChildrenTypeEnum.LEGEND]: ({ text, ...rest }: IParagraph) => [paragraphTableLegend(text, rest)],
     [DocumentChildrenTypeEnum.PARAGRAPH_TABLE]: ({ text, ...rest }: IParagraph) => [paragraphTable(text, rest)],
     [DocumentChildrenTypeEnum.PARAGRAPH_FIGURE]: ({ text, ...rest }: IParagraph) => {
-      const figure = paragraphFigure(text, rest)
-      if (figure) return [figure]
-      return []
+      const figure = paragraphFigure(text, rest);
+      if (figure) return [figure];
+      return [];
     },
     [DocumentChildrenTypeEnum.BULLET]: ({ level = 0, text, ...rest }: IBullet) => [bulletsNormal(text, level, rest)],
     [DocumentChildrenTypeEnum.BULLET_SPACE]: ({ text }: IBullet) => [bulletsSpace(text)],
@@ -155,47 +151,27 @@ export class ElementsMapClass {
     [DocumentChildrenTypeEnum.TABLE_QUANTITY_QUI]: () => [quantityQuiTable(this.oldDocumentRiskData, this.oldHierarchyTree)],
     [DocumentChildrenTypeEnum.ITERABLE_QUALITY_FIS]: () =>
       bulletTextIterable(
-        removeDuplicate(
-          (this.oldRiskGroupData || [])
-            .map(({ riskData }) => !!(riskData.risk.type === RiskTypeEnum.FIS) && riskData.risk.name)
-            .filter((x) => x) as unknown as string[],
-        ),
+        removeDuplicate((this.oldRiskGroupData || []).map(({ riskData }) => !!(riskData.risk.type === RiskTypeEnum.FIS) && riskData.risk.name).filter((x) => x) as unknown as string[]),
         (x, v) => this.convertToDocx(x, v),
       ),
     [DocumentChildrenTypeEnum.ITERABLE_QUALITY_QUI]: () =>
       bulletTextIterable(
-        removeDuplicate(
-          (this.oldRiskGroupData || [])
-            .map(({ riskData }) => !!(riskData.risk.type === RiskTypeEnum.QUI) && riskData.risk.name)
-            .filter((x) => x) as unknown as string[],
-        ),
+        removeDuplicate((this.oldRiskGroupData || []).map(({ riskData }) => !!(riskData.risk.type === RiskTypeEnum.QUI) && riskData.risk.name).filter((x) => x) as unknown as string[]),
         (x, v) => this.convertToDocx(x, v),
       ),
     [DocumentChildrenTypeEnum.ITERABLE_QUALITY_BIO]: () =>
       bulletTextIterable(
-        removeDuplicate(
-          (this.oldRiskGroupData || [])
-            .map(({ riskData }) => !!(riskData.risk.type === RiskTypeEnum.BIO) && riskData.risk.name)
-            .filter((x) => x) as unknown as string[],
-        ),
+        removeDuplicate((this.oldRiskGroupData || []).map(({ riskData }) => !!(riskData.risk.type === RiskTypeEnum.BIO) && riskData.risk.name).filter((x) => x) as unknown as string[]),
         (x, v) => this.convertToDocx(x, v),
       ),
     [DocumentChildrenTypeEnum.ITERABLE_QUALITY_ERG]: () =>
       bulletTextIterable(
-        removeDuplicate(
-          (this.oldRiskGroupData || [])
-            .map(({ riskData }) => !!(riskData.risk.type === RiskTypeEnum.ERG) && riskData.risk.name)
-            .filter((x) => x) as unknown as string[],
-        ),
+        removeDuplicate((this.oldRiskGroupData || []).map(({ riskData }) => !!(riskData.risk.type === RiskTypeEnum.ERG) && riskData.risk.name).filter((x) => x) as unknown as string[]),
         (x, v) => this.convertToDocx(x, v),
       ),
     [DocumentChildrenTypeEnum.ITERABLE_QUALITY_ACI]: () =>
       bulletTextIterable(
-        removeDuplicate(
-          (this.oldRiskGroupData || [])
-            .map(({ riskData }) => !!(riskData.risk.type === RiskTypeEnum.ACI) && riskData.risk.name)
-            .filter((x) => x) as unknown as string[],
-        ),
+        removeDuplicate((this.oldRiskGroupData || []).map(({ riskData }) => !!(riskData.risk.type === RiskTypeEnum.ACI) && riskData.risk.name).filter((x) => x) as unknown as string[]),
         (x, v) => this.convertToDocx(x, v),
       ),
     [DocumentChildrenTypeEnum.PROFESSIONAL]: () => professionalsIterable(this.data.documentBase.professionalSignatures, (x, v) => this.convertToDocx(x, v)),
@@ -217,16 +193,13 @@ export class ElementsMapClass {
         showHomogeneous: false,
         showHomogeneousDescription: false,
       })['children'],
-    [DocumentChildrenTypeEnum.RISK_TABLE]: () => riskCharacterizationTableSection(this.data.risksData, this.data.getRiskDataExams.bind(this.data))['children'],
-    [DocumentChildrenTypeEnum.HIERARCHY_RISK_TABLE]: () =>
-      hierarchyRisksTableAllSections(this.oldRiskGroupData, this.OldHierarchy, this.oldHierarchyTree, (x, v) =>
-        this.convertToDocx(x, v),
-      ),
+    [DocumentChildrenTypeEnum.RISK_TABLE]: () => riskCharacterizationTableSection(this.data.risksData, this.data.getExamsByRiskData.bind(this.data))['children'],
+    [DocumentChildrenTypeEnum.HIERARCHY_RISK_TABLE]: () => hierarchyRisksTableAllSections(this.oldRiskGroupData, this.OldHierarchy, this.oldHierarchyTree, (x, v) => this.convertToDocx(x, v)),
     [DocumentChildrenTypeEnum.PLAN_TABLE]: () => actionPlanTableSection(this.oldDocumentRiskData, this.oldHierarchyTree)['children'],
   };
 
   private convertToDocx(data: ISectionChildrenType[], variables = {} as IDocVariables) {
-    const components: (Paragraph | Table)[] = []
+    const components: (Paragraph | Table)[] = [];
 
     data.forEach((child) => {
       const childData = convertToDocxHelper(child, {
@@ -235,31 +208,29 @@ export class ElementsMapClass {
       });
 
       if (!childData) return null;
-      components.push(...this.map[childData.type](childData))
-    })
-
+      components.push(...this.map[childData.type](childData));
+    });
 
     return components;
   }
 
-
   private get oldData() {
-    const data = dataConverter({ data: this.data })
-    return data
+    const data = dataConverter({ data: this.data });
+    return data;
   }
   private get OldHierarchy() {
-    return this.oldData.hierarchyData
+    return this.oldData.hierarchyData;
   }
   private get OldHomogeneousGroup() {
-    return this.oldData.homoGroupTree
+    return this.oldData.homoGroupTree;
   }
   private get oldHierarchyTree() {
-    return this.oldData.hierarchyTree
+    return this.oldData.hierarchyTree;
   }
   private get oldRiskGroupData() {
-    return this.oldData.riskGroupData
+    return this.oldData.riskGroupData;
   }
   private get oldDocumentRiskData() {
-    return this.oldData.documentRiskData
+    return this.oldData.documentRiskData;
   }
 }

@@ -9,7 +9,7 @@ export interface IStorageAdapter {
 export namespace IStorageAdapter {
   export namespace Upload {
     export type Params = {
-      file: Buffer;
+      file: Buffer | internal.Readable;
       fileName: string;
       isPublic?: boolean;
     };
@@ -36,4 +36,3 @@ export namespace IStorageAdapter {
     export type Result = void;
   }
 }
-

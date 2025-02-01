@@ -1,3 +1,5 @@
+import { HierarchyTypeEnum } from '@/@v2/shared/domain/enum/company/hierarchy-type.enum';
+
 export type IDocumentBaseDataVO = {
   isQ5?: boolean;
   isHideOriginColumn?: boolean;
@@ -20,6 +22,7 @@ export class DocumentBaseDataVO {
   hasEmergencyPlan: boolean;
   source?: string;
   visitDate?: Date;
+  aprTypeSeparation?: HierarchyTypeEnum;
   complementaryDocs: string[];
   complementarySystems: string[];
   monthsPeriodLevel_2: number;
