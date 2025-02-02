@@ -9,7 +9,7 @@ export const epiRiskInventoryHeader = (): bodyTableProps[] => {
   const header: bodyTableProps[] = [];
 
   header[SecondRiskInventoryColumnEnum.OFFICIAL] = {
-    text: "EPI's DO GSE:",
+    text: "EPI's:",
     bold: true,
     borders: borderNoneStyle,
   };

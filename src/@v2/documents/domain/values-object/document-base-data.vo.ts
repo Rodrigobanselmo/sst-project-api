@@ -3,6 +3,7 @@ import { HierarchyTypeEnum } from '@/@v2/shared/domain/enum/company/hierarchy-ty
 export type IDocumentBaseDataVO = {
   isQ5?: boolean;
   isHideOriginColumn?: boolean;
+  aprTypeSeparation?: HierarchyTypeEnum;
   isHideCA?: boolean;
   hasEmergencyPlan?: boolean;
   source?: string;
@@ -34,6 +35,7 @@ export class DocumentBaseDataVO {
     this.isQ5 = params.isQ5 || false;
     this.isHideCA = params.isHideCA || false;
     this.isHideOriginColumn = params.isHideOriginColumn || false;
+    this.aprTypeSeparation = params.aprTypeSeparation;
     this.hasEmergencyPlan = params.hasEmergencyPlan || false;
     this.source = params.source;
     this.visitDate = params.visitDate;

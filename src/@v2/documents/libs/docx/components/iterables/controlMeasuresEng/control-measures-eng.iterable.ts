@@ -11,12 +11,14 @@ export const controlMeasuresEngIterable = (data: DocumentPGRModel, convertToDocx
   data.engineeringMeasures.forEach((measure) => {
     if (measure.isNotAnMeasure) return;
 
-    convertToDocx([
-      {
-        type: DocumentSectionChildrenTypeEnum.BULLET,
-        text: measure.name,
-      },
-    ]);
+    iterableSections.push(
+      ...convertToDocx([
+        {
+          type: DocumentSectionChildrenTypeEnum.BULLET,
+          text: measure.name,
+        },
+      ]),
+    );
   });
 
   return iterableSections;

@@ -13,12 +13,14 @@ export const controlMeasuresEpiIterable = (data: DocumentPGRModel, variables: ID
   data.epis.forEach((measure) => {
     if (measure.isNotAnEpi) return;
 
-    convertToDocx([
-      {
-        type: DocumentSectionChildrenTypeEnum.BULLET,
-        text: isHideCA ? measure.equipment : measure.name,
-      },
-    ]);
+    iterableSections.push(
+      ...convertToDocx([
+        {
+          type: DocumentSectionChildrenTypeEnum.BULLET,
+          text: isHideCA ? measure.equipment : measure.name,
+        },
+      ]),
+    );
   });
 
   return iterableSections;
