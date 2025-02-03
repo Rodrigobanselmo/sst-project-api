@@ -8,7 +8,6 @@ import { ISectionOptions, Packer } from 'docx';
 import { unlinkSync } from 'fs';
 import { IDocumentAttachment, IDocumentFactoryProduct, IUnlinkPaths } from '../../factories/document/types/document-factory.types';
 
-import internal, { Readable } from 'stream';
 import { createBaseDocument } from '../../libs/docx/base/config/document';
 import { IDocumentCreation } from './document-creation.interface';
 
@@ -32,8 +31,8 @@ export class DocumentCreationService {
       const sections = await product.getSections({ data, attachments: attachmentsData.map((attachment) => attachment.model), body });
       const fileName = product.getFileName(data);
 
-      const { stream } = this.generate({ sections });
-      const { url } = await this.upload(stream, fileName);
+      const { buffer } = await this.generate({ sections });
+      const { url } = await this.upload(buffer, fileName);
 
       if (this.isLocal) console.log(3, url);
 
@@ -41,6 +40,8 @@ export class DocumentCreationService {
 
       this.unlinkFiles(product.unlinkPaths);
       if (this.isLocal) console.log(4, 'unlinked');
+
+      return { buffer, fileName };
     } catch (error) {
       this.unlinkFiles(product.unlinkPaths);
 
@@ -54,12 +55,10 @@ export class DocumentCreationService {
 
     for (let index = 0; index < attachments.length; index++) {
       const attachment = attachments[index];
-
       if (this.isLocal) console.log('attachments start', index);
-      const { stream } = this.generate({ sections: attachment.section });
+      const { buffer } = await this.generate({ sections: attachment.section });
       if (this.isLocal) console.log('attachments end', index);
-
-      const { url } = await this.upload(stream, product.getFileName(data, attachment.model.type));
+      const { url } = await this.upload(buffer, product.getFileName(data, attachment.model.type));
 
       attachmentsEntities.push(
         new AttachmentEntity({
@@ -73,31 +72,18 @@ export class DocumentCreationService {
     return attachmentsEntities;
   }
 
-  private generate({ sections }: { sections: ISectionOptions[] }) {
+  private async generate({ sections }: { sections: ISectionOptions[] }) {
     const Doc = createBaseDocument(sections);
-    const stream = Packer.toStream(Doc);
-    const readableStream = new Readable({
-      read() {
-        stream.on('data', (chunk) => {
-          this.push(chunk);
-        });
 
-        stream.on('end', () => {
-          this.push(null);
-        });
+    const b64string = await Packer.toBase64String(Doc);
+    const buffer = Buffer.from(b64string, 'base64');
 
-        stream.on('error', (err) => {
-          this.emit('error', err);
-        });
-      },
-    });
-
-    return { stream: readableStream };
+    return { buffer };
   }
 
-  private async upload(fileStream: internal.Readable, fileName: string) {
+  private async upload(fileBuffer: Buffer, fileName: string) {
     const { url, key } = await this.storage.upload({
-      file: fileStream,
+      file: fileBuffer,
       fileName: BUCKET_FOLDERS.TEMP_FILES_7 + fileName,
     });
 

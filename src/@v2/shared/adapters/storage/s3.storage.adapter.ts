@@ -1,4 +1,3 @@
-import { Upload } from '@aws-sdk/lib-storage';
 import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
 import { config } from '@/@v2/shared/constants/config';
@@ -19,18 +18,15 @@ export class S3StorageAdapter implements IStorageAdapter {
   async upload({ file, fileName, isPublic }: IStorageAdapter.Upload.Params): Promise<IStorageAdapter.Upload.Result> {
     const key = isDevelopmentGetter() ? `${'test'}/${fileName}` : fileName;
 
-    const parallelUploads3 = new Upload({
-      client: this.s3,
-      params: {
-        Bucket: this.bucket,
-        Key: key,
-        Body: file,
-        ContentType: this.contentType(fileName),
-        ACL: isPublic ? 'public-read' : undefined,
-      },
+    const command = new PutObjectCommand({
+      Bucket: this.bucket,
+      Key: key,
+      Body: file,
+      ContentType: this.contentType(fileName),
+      ACL: isPublic ? 'public-read' : undefined,
     });
 
-    await parallelUploads3.done();
+    await this.s3.send(command);
 
     return { url: this.getLocation(key), key };
   }
