@@ -25,7 +25,7 @@ export class DocumentBaseDataMapper {
 
     return new DocumentBaseDataVO({
       isQ5: documentData?.isQ5,
-      aprTypeSeparation: documentData.aprTypeSeparation ? HierarchyTypeEnum[documentData.aprTypeSeparation] : undefined,
+      aprTypeSeparation: documentData?.aprTypeSeparation ? HierarchyTypeEnum[documentData.aprTypeSeparation] : undefined,
       isHideOriginColumn: documentData?.isHideOriginColumn,
       isHideCA: documentData?.isHideCA,
       hasEmergencyPlan: documentData?.hasEmergencyPlan,
