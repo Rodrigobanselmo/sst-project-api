@@ -1,3 +1,3 @@
-import { DomainError } from "../../error/domain-error.error";
+import { DomainError } from '../../error/domain-error.error';
 
-export type DomainResponse<T = void> = [T | void, DomainError | null]
+export type DomainResponse<T = void> = [T | void, DomainError | null];

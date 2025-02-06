@@ -1,6 +1,10 @@
-export const CompanyRoutes = {
-  WORKSPACE: {
-    BROWSE_ALL: 'v2/companies/:companyId/workspaces/all',
+export const DocumentControlRoutes = {
+  DOCUMENT_CONTROL: {
+    PATH: 'v2/companies/:companyId/workspaces/:workspaceId/document-control',
+    PATH_ID: 'v2/companies/:companyId/document-control/:documentControlId',
   },
-} as const
-
+  DOCUMENT_CONTROL_FILE: {
+    PATH: 'v2/companies/:companyId/document-control/document-control-files',
+    PATH_ID: 'v2/companies/:companyId/document-control/document-control-files/:documentControlFileId',
+  },
+} as const;

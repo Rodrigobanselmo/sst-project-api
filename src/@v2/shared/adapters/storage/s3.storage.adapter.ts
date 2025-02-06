@@ -17,9 +17,10 @@ export class S3StorageAdapter implements IStorageAdapter {
 
   async upload({ file, fileKey, bucket, isPublic }: IStorageAdapter.Upload.Params): Promise<IStorageAdapter.Upload.Result> {
     const key = isDevelopment() ? `${'test'}/${fileKey}` : fileKey;
+    const bucketName = bucket || this.bucket;
 
     const command = new PutObjectCommand({
-      Bucket: bucket || this.bucket,
+      Bucket: bucketName,
       Key: key,
       Body: file,
       ContentType: this.contentType(fileKey),
@@ -28,7 +29,7 @@ export class S3StorageAdapter implements IStorageAdapter {
 
     await this.s3.send(command);
 
-    return { url: this.getLocation(key), key };
+    return { url: this.getLocation(key), key, bucket: bucketName };
   }
 
   async download({ fileKey: key, bucket }: IStorageAdapter.Download.Params): Promise<IStorageAdapter.Download.Result> {

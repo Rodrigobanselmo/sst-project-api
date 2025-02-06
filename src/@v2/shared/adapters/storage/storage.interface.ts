@@ -17,6 +17,7 @@ export namespace IStorageAdapter {
 
     export type Result = {
       url: string;
+      bucket: string;
       key: string;
     };
   }

@@ -1,6 +1,8 @@
+import { DomainResponse } from '@/@v2/shared/domain/types/shared/domain-response';
 import { EmployeeEntity } from '../entities/employee.entity';
 import { ProfileEntity } from '../entities/profile.entity';
 import { UserEntity } from '../entities/user.entity';
+import { errorEmployeeAlreadyCreated } from '../errors/domain.errors';
 
 export type IProfileAggregate = {
   profile: ProfileEntity;
@@ -23,10 +25,10 @@ export class ProfileAggregate {
     return this._employee;
   }
 
-  setEmployee(employee: EmployeeEntity) {
-    if (this._employee) return [null, 'Funcionário já cadastrado'];
+  setEmployee(employee: EmployeeEntity): DomainResponse {
+    if (this._employee) return [, errorEmployeeAlreadyCreated];
     this._employee = employee;
 
-    return [null, null];
+    return [, null];
   }
 }

@@ -11,18 +11,10 @@ import { EmailModule } from './adapters/mail/email.module';
 import { JwtModule } from './adapters/jwt/jwt.module';
 import { HashModule } from './adapters/hash/hash.module';
 import { GoogleModule } from './adapters/google/google.module';
+import { FileRequesterModule } from './requesters/files/file.module';
 
 @Module({
-  imports: [
-    DatabaseModule,
-    ContextModule,
-    StorageModule,
-    QueueModule,
-    EmailModule,
-    JwtModule,
-    HashModule,
-    GoogleModule,
-  ],
+  imports: [DatabaseModule, ContextModule, StorageModule, QueueModule, EmailModule, JwtModule, HashModule, GoogleModule, FileRequesterModule],
   providers: [
     JwtStrategy,
     {
@@ -30,17 +22,6 @@ import { GoogleModule } from './adapters/google/google.module';
       useFactory: () => RequesterFactory.create(),
     },
   ],
-  exports: [
-    SharedTokens.GenericRequester,
-    DatabaseModule,
-    StorageModule,
-    ContextModule,
-    QueueModule,
-    EmailModule,
-    JwtModule,
-    JwtStrategy,
-    HashModule,
-    GoogleModule,
-  ],
+  exports: [SharedTokens.GenericRequester, DatabaseModule, StorageModule, ContextModule, QueueModule, EmailModule, JwtModule, JwtStrategy, HashModule, GoogleModule, FileRequesterModule],
 })
 export class SharedModule {}

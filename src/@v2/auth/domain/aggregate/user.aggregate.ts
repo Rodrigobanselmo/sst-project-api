@@ -1,6 +1,8 @@
 import { BadRequestException } from '@nestjs/common';
 import { ProfileEntity } from '../entities/profile.entity';
 import { UserEntity } from '../entities/user.entity';
+import { DomainResponse } from '@/@v2/shared/domain/types/shared/domain-response';
+import { errorUserAlreadyCreated } from '../errors/domain.errors';
 
 export type IUserAggregate = {
   user: UserEntity;
@@ -28,11 +30,11 @@ export class UserAggregate {
     return this.profiles.filter((profile) => profile.new);
   }
 
-  addProfile(profile: ProfileEntity) {
+  addProfile(profile: ProfileEntity): DomainResponse {
     const foundProfile = this.getProfile(profile.uuid.companyId);
-    if (foundProfile) return { error: 'Usuário já cadastrado' };
+    if (foundProfile) return [, errorUserAlreadyCreated];
 
     this.profiles.push(profile);
-    return { error: null };
+    return [, null];
   }
 }
