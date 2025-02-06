@@ -14,10 +14,23 @@ import { AddDocumentControlFileController } from './application/document-control
 import { EditDocumentControlFileController } from './application/document-control-file/edit-document-control-file/controllers/edit-document-control-file.controller';
 import { DocumentControlFileDAO } from './database/dao/document-control-file/document-control-file.dao';
 import { DocumentControlDAO } from './database/dao/document-control/document-control.dao';
+import { ReadDocumentControlFileController } from './application/document-control-file/read-document-control-file/controllers/read-document-control-file.controller';
+import { DeleteDocumentControlController } from './application/document-control/delete-document-control/controllers/delete-document-control-file.controller';
+import { DeleteDocumentControlFileController } from './application/document-control-file/delete-document-control-file/controllers/delete-document-control-file.controller';
+import { ReadDocumentControlController } from './application/document-control/read-document-control/controllers/read-document-control.controller';
 
 @Module({
   imports: [SharedModule],
-  controllers: [AddDocumentControlController, EditDocumentControlController, AddDocumentControlFileController, EditDocumentControlFileController],
+  controllers: [
+    AddDocumentControlController,
+    AddDocumentControlFileController,
+    EditDocumentControlController,
+    EditDocumentControlFileController,
+    ReadDocumentControlController,
+    ReadDocumentControlFileController,
+    DeleteDocumentControlController,
+    DeleteDocumentControlFileController,
+  ],
   providers: [
     // Database
     DocumentControlAggregateRepository,
@@ -29,8 +42,12 @@ import { DocumentControlDAO } from './database/dao/document-control/document-con
     // Use Cases
     AddDocumentControlUseCase,
     EditDocumentControlUseCase,
+    ReadDocumentControlController,
+    DeleteDocumentControlController,
     AddDocumentControlFileUseCase,
     EditDocumentControlFileUseCase,
+    ReadDocumentControlFileController,
+    DeleteDocumentControlFileController,
 
     // Services
     GetDocumentControlFileService,

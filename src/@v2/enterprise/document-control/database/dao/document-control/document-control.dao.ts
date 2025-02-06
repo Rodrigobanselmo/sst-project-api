@@ -54,7 +54,7 @@ export class DocumentControlDAO {
         ,document_control."updated_at"
     `;
 
-    return DocumentControlReadModelMapper.toModel(documentControl);
+    return documentControl?.id ? DocumentControlReadModelMapper.toModel(documentControl) : null;
   }
 
   async browse({ limit, page, orderBy, filters }: IDocumentControlDAO.BrowseParams) {

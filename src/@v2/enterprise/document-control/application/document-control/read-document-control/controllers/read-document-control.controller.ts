@@ -1,26 +1,26 @@
-import { Controller, Delete, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 
 import { DocumentControlRoutes } from '@/@v2/enterprise/document-control/constants/routes';
 import { JwtAuthGuard } from '@/@v2/shared/guards/jwt-auth.guard';
 import { PermissionEnum } from '@/shared/constants/enum/authorization';
 import { Permissions } from '@/shared/decorators/permissions.decorator';
-import { DeleteDocumentControlUseCase } from '../use-cases/delete-document-control.usecase';
-import { DeleteDocumentControlPath } from './delete-document-control-file.path';
+import { ReadDocumentControlUseCase } from '../use-cases/read-document-control.usecase';
+import { ReadDocumentControlPath } from './read-document-control.path';
 
 @Controller(DocumentControlRoutes.DOCUMENT_CONTROL.PATH_ID)
 @UseGuards(JwtAuthGuard)
-export class DeleteDocumentControlController {
-  constructor(private readonly deleteDocumentControlUseCase: DeleteDocumentControlUseCase) {}
+export class ReadDocumentControlController {
+  constructor(private readonly readDocumentControlUseCase: ReadDocumentControlUseCase) {}
 
-  @Delete()
+  @Get()
   @Permissions({
     code: PermissionEnum.DOCUMENTS,
     isContract: true,
     isMember: true,
     crud: true,
   })
-  async execute(@Param() path: DeleteDocumentControlPath) {
-    return this.deleteDocumentControlUseCase.execute({
+  async execute(@Param() path: ReadDocumentControlPath) {
+    return this.readDocumentControlUseCase.execute({
       companyId: path.companyId,
       documentControlId: path.documentControlId,
     });

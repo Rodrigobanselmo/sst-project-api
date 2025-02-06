@@ -1,9 +1,9 @@
 import { IsString, IsInt } from 'class-validator';
 
-export class DeleteDocumentControlPath {
+export class BrowseDocumentControlPath {
   @IsString()
   companyId!: string;
 
-  @IsInt()
-  documentControlId!: number;
+  @IsString()
+  workspaceId!: string;
 }
