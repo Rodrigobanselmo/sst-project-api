@@ -11,7 +11,7 @@ export namespace IFileRequester {
   export namespace Add {
     export type Params = {
       fileName: string;
-      fileKey: string;
+      fileFolder: string;
       buffer: Buffer;
       companyId: string;
       shouldDelete?: boolean;

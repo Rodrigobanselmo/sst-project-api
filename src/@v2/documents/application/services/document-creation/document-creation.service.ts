@@ -78,7 +78,7 @@ export class DocumentCreationService {
   private async upload(fileBuffer: Buffer, fileName: string) {
     const { url, key } = await this.storage.upload({
       file: fileBuffer,
-      fileKey: BUCKET_FOLDERS.TEMP_FILES_7 + fileName,
+      fileFolder: BUCKET_FOLDERS.TEMP_FILES_7 + fileName,
     });
 
     return { url, key };

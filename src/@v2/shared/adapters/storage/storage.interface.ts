@@ -4,13 +4,15 @@ export interface IStorageAdapter {
   upload(params: IStorageAdapter.Upload.Params): Promise<IStorageAdapter.Upload.Result>;
   delete(params: IStorageAdapter.Delete.Params): Promise<IStorageAdapter.Delete.Result>;
   download(params: IStorageAdapter.Download.Params): Promise<IStorageAdapter.Download.Result>;
+  generateSignedPath(params: IStorageAdapter.GenerateSignPath.Params): Promise<IStorageAdapter.GenerateSignPath.Result>;
 }
 
 export namespace IStorageAdapter {
   export namespace Upload {
     export type Params = {
       file: Buffer;
-      fileKey: string;
+      fileFolder: string;
+      fileName: string;
       bucket?: string;
       isPublic?: boolean;
     };
@@ -32,5 +34,15 @@ export namespace IStorageAdapter {
     export type Params = { key: string; bucket?: string };
 
     export type Result = void;
+  }
+
+  export namespace GenerateSignPath {
+    export type Params = {
+      fileKey: string;
+      expires?: number;
+      bucket?: string;
+    };
+
+    export type Result = string;
   }
 }

@@ -5,6 +5,7 @@ import { isDevelopment } from '@/@v2/shared/utils/helpers/is-development';
 import { getContentType } from '@/@v2/shared/utils/helpers/get-content-type';
 import { Readable } from 'stream';
 import { IStorageAdapter } from './storage.interface';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 export class S3StorageAdapter implements IStorageAdapter {
   private readonly bucket: string;
@@ -15,8 +16,9 @@ export class S3StorageAdapter implements IStorageAdapter {
     this.s3 = new S3Client({ region: config.AWS.S3_BUCKET_REGION });
   }
 
-  async upload({ file, fileKey, bucket, isPublic }: IStorageAdapter.Upload.Params): Promise<IStorageAdapter.Upload.Result> {
-    const key = isDevelopment() ? `${'test'}/${fileKey}` : fileKey;
+  async upload({ file, fileFolder: fileKey, fileName, bucket, isPublic }: IStorageAdapter.Upload.Params): Promise<IStorageAdapter.Upload.Result> {
+    const name = this.normalizeFileName(fileName);
+    const key = isDevelopment() ? `${'test'}/${fileKey}/${name}` : `${fileKey}/${name}`;
     const bucketName = bucket || this.bucket;
 
     const command = new PutObjectCommand({
@@ -56,6 +58,13 @@ export class S3StorageAdapter implements IStorageAdapter {
     await this.s3.send(command);
   }
 
+  async generateSignedPath(params: IStorageAdapter.GenerateSignPath.Params): Promise<IStorageAdapter.GenerateSignPath.Result> {
+    const { fileKey, expires = 900, bucket } = params;
+    const command = new GetObjectCommand({ Bucket: bucket || this.bucket, Key: fileKey });
+
+    return getSignedUrl(this.s3, command, { expiresIn: expires });
+  }
+
   private contentType(filename: string): string {
     const extension = filename.split('.').pop();
     if (!extension) throw new Error('Arquivo com extensão inválida');
@@ -83,4 +92,10 @@ export class S3StorageAdapter implements IStorageAdapter {
       },
     });
   }
+
+  private normalizeFileName = (fileName: string) =>
+    fileName
+      .normalize('NFD')
+      .replace(/\s+/g, '_')
+      .replace(/[^a-zA-Z0-9._-]/g, '');
 }

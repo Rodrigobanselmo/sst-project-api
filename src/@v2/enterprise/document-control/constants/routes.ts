@@ -4,7 +4,10 @@ export const DocumentControlRoutes = {
     PATH_ID: 'v2/companies/:companyId/document-control/:documentControlId',
   },
   DOCUMENT_CONTROL_FILE: {
-    PATH: 'v2/companies/:companyId/document-control/document-control-files',
+    PATH: 'v2/companies/:companyId/document-control/:documentControlId/document-control-files',
     PATH_ID: 'v2/companies/:companyId/document-control/document-control-files/:documentControlFileId',
+  },
+  FILE: {
+    PATH: 'v2/companies/:companyId/document-control/files',
   },
 } as const;

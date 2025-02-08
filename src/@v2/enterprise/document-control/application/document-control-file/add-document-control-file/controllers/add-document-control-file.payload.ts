@@ -19,10 +19,4 @@ export class AddDocumentControlFilePayload {
   @IsString()
   @IsOptional()
   description?: string;
-
-  @IsString()
-  companyId!: string;
-
-  @IsInt()
-  documentControlId!: number;
 }

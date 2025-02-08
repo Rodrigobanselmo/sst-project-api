@@ -4,7 +4,7 @@ import { FileEntity } from '../../domain/entities/file.entity';
 export namespace IAddFileService {
   export type Params = {
     fileName: string;
-    fileKey: string;
+    fileFolder: string;
     buffer: Buffer;
     companyId: string;
     shouldDelete?: boolean;

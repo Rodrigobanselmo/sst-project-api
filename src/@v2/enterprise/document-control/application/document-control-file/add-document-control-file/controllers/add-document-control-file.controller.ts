@@ -23,7 +23,7 @@ export class AddDocumentControlFileController {
   async execute(@Param() path: AddDocumentControlFilePath, @Body() body: AddDocumentControlFilePayload) {
     return this.addDocumentControlFileUseCase.execute({
       companyId: path.companyId,
-      documentControlId: body.documentControlId,
+      documentControlId: path.documentControlId,
       description: body.description,
       fileId: body.fileId,
       endDate: body.endDate,

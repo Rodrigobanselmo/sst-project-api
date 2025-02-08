@@ -18,11 +18,20 @@ import { ReadDocumentControlFileController } from './application/document-contro
 import { DeleteDocumentControlController } from './application/document-control/delete-document-control/controllers/delete-document-control-file.controller';
 import { DeleteDocumentControlFileController } from './application/document-control-file/delete-document-control-file/controllers/delete-document-control-file.controller';
 import { ReadDocumentControlController } from './application/document-control/read-document-control/controllers/read-document-control.controller';
+import { ReadDocumentControlUseCase } from './application/document-control/read-document-control/use-cases/read-document-control.usecase';
+import { AddFileController } from './application/document-control-file/add-document-control-system-file/controllers/add-file.controller';
+import { AddFileUseCase } from './application/document-control-file/add-document-control-system-file/use-cases/add-file.usecase';
+import { DeleteDocumentControlUseCase } from './application/document-control/delete-document-control/use-cases/delete-document-control.usecase';
+import { ReadDocumentControlFileUseCase } from './application/document-control-file/read-document-control-file/use-cases/read-document-control-file.usecase';
+import { DeleteDocumentControlFileUseCase } from './application/document-control-file/delete-document-control-file/use-cases/delete-document-control-file.usecase';
+import { BrowseDocumentControlUseCase } from './application/document-control/browse-document-control/use-cases/browse-document-control.usecase';
+import { BrowseDocumentControlController } from './application/document-control/browse-document-control/controllers/browse-document-control.controller';
 
 @Module({
   imports: [SharedModule],
   controllers: [
     AddDocumentControlController,
+    BrowseDocumentControlController,
     AddDocumentControlFileController,
     EditDocumentControlController,
     EditDocumentControlFileController,
@@ -30,6 +39,7 @@ import { ReadDocumentControlController } from './application/document-control/re
     ReadDocumentControlFileController,
     DeleteDocumentControlController,
     DeleteDocumentControlFileController,
+    AddFileController,
   ],
   providers: [
     // Database
@@ -41,17 +51,20 @@ import { ReadDocumentControlController } from './application/document-control/re
 
     // Use Cases
     AddDocumentControlUseCase,
+    BrowseDocumentControlUseCase,
     EditDocumentControlUseCase,
-    ReadDocumentControlController,
-    DeleteDocumentControlController,
+    ReadDocumentControlUseCase,
+    DeleteDocumentControlUseCase,
     AddDocumentControlFileUseCase,
     EditDocumentControlFileUseCase,
-    ReadDocumentControlFileController,
-    DeleteDocumentControlFileController,
+    ReadDocumentControlFileUseCase,
+    DeleteDocumentControlFileUseCase,
+    ReadDocumentControlUseCase,
+    AddFileUseCase,
 
     // Services
     GetDocumentControlFileService,
   ],
   exports: [],
 })
-export class CompanyModule {}
+export class DocumentControlModule {}
