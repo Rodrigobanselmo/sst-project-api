@@ -12,6 +12,7 @@ export class SystemFileMapper {
       bucket: prisma.bucket,
       key: prisma.key,
       url: prisma.url,
+      size: prisma.size,
     });
   }
 

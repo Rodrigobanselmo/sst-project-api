@@ -155,6 +155,11 @@ export class DocumentControlDAO {
       where.push(Prisma.sql`unaccent(lower(ranked_document.name)) ILIKE unaccent(lower(${search}))`);
     }
 
+    if (filters.types?.length) {
+      const types = filters.types.map((type) => type.toLowerCase());
+      where.push(Prisma.sql`lower(ranked_document.type) = ANY(${types})`);
+    }
+
     return where;
   }
 

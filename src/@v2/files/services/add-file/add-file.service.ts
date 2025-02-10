@@ -28,6 +28,7 @@ export class AddFileService {
       name: params.fileName,
       companyId: params.companyId,
       shouldDelete: params.shouldDelete,
+      size: params.size,
     });
 
     const file = await this.fileRepository.create(document);

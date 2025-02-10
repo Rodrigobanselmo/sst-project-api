@@ -18,6 +18,7 @@ export class BrowseDocumentControlUseCase {
       limit: params.pagination.limit,
       orderBy: params.orderBy,
       filters: {
+        types: params.types,
         companyId: params.companyId,
         workspaceId: params.workspaceId,
         search: params.search,

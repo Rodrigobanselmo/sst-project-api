@@ -608,7 +608,7 @@ model DocumentControl {
 model DocumentControlFile {
   id         Int        @id @default(autoincrement())
   name       String
-  start_date DateTime   @default(now())
+  start_date DateTime?
   end_date   DateTime?
   created_at DateTime   @default(now())
   updated_at DateTime   @updatedAt
@@ -632,7 +632,7 @@ model SystemFile {
   key           String
   bucket        String
   name          String
-  size          Int?
+  size          Int
   should_delete Boolean  @default(false)
   created_at    DateTime @default(now())
   updated_at    DateTime @updatedAt

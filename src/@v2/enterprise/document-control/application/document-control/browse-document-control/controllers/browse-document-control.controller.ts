@@ -21,11 +21,14 @@ export class BrowseDocumentControlController {
     crud: true,
   })
   async execute(@Param() path: BrowseDocumentControlPath, @Query() query: BrowseDocumentControlQuery) {
+    console.log('path', path);
+    console.log('query', query);
     return this.browseDocumentControlUseCase.execute({
       companyId: path.companyId,
       workspaceId: path.workspaceId,
       orderBy: query.orderBy,
       search: query.search,
+      types: query.types,
       pagination: {
         page: query.page,
         limit: query.limit,

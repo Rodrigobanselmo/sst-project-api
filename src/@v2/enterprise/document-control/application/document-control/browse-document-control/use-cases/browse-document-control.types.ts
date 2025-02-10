@@ -7,6 +7,7 @@ export namespace IDocumentControlUseCase {
     companyId: string;
     workspaceId: string;
     search?: string;
+    types?: string[];
     orderBy?: IOrderBy<DocumentControlOrderByEnum>;
     pagination: IPagination;
   };

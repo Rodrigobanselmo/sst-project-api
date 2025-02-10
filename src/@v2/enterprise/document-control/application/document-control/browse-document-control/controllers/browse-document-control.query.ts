@@ -16,6 +16,10 @@ export class BrowseDocumentControlQuery {
   @IsOptional()
   search?: string;
 
+  @IsString({ each: true })
+  @IsOptional()
+  types?: string[];
+
   @IsInt()
   @IsOptional()
   limit?: number;

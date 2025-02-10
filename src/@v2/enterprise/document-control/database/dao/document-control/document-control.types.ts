@@ -24,6 +24,7 @@ export namespace IDocumentControlDAO {
       companyId: string;
       workspaceId: string;
       search?: string;
+      types?: string[];
     };
   };
 }

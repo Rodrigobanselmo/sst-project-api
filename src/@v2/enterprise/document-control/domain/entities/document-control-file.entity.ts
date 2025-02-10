@@ -13,7 +13,7 @@ export type IDocumentControlFileEntity = {
   companyId: string;
   documentControlId: number;
   name: string;
-  startDate: Date;
+  startDate: Date | null;
   endDate: Date | null;
   status?: DocumentStatusEnum;
   createdAt?: Date;
@@ -26,7 +26,7 @@ export class DocumentControlFileEntity {
   companyId: string;
   documentControlId: number;
   name: string;
-  startDate: Date;
+  startDate: Date | null;
   endDate: Date | null;
   status: DocumentStatusEnum;
   createdAt: Date;

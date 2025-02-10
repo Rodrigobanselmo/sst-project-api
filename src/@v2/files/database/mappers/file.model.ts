@@ -14,6 +14,7 @@ export class FileEntityMapper {
       key: prisma.key,
       bucket: prisma.bucket,
       shouldDelete: prisma.should_delete,
+      size: prisma.size,
     });
   }
 

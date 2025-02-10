@@ -16,6 +16,7 @@ export namespace IFileRequester {
       companyId: string;
       shouldDelete?: boolean;
       bucket?: string;
+      size: number;
     };
 
     export type Result = Promise<DomainResponse<SystemFile>>;

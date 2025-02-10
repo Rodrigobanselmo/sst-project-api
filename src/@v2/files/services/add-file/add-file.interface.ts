@@ -9,6 +9,7 @@ export namespace IAddFileService {
     companyId: string;
     shouldDelete?: boolean;
     bucket?: string;
+    size: number;
   };
 
   export type Result = Promise<DomainResponse<FileEntity>>;

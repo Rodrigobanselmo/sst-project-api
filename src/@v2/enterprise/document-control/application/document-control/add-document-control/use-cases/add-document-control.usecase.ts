@@ -15,7 +15,7 @@ export class AddDocumentControlUseCase {
   async execute(params: IDocumentControlUseCase.Params) {
     const documentControlAggregate = this.createAggregate(params);
 
-    if (params.file?.fileId) await this.addFile(params, documentControlAggregate);
+    await this.addFile(params, documentControlAggregate);
 
     await this.documentControlAggregateRepository.create(documentControlAggregate);
   }

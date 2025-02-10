@@ -6,6 +6,7 @@ type FileEntityConstructor = {
   key: string;
   bucket: string;
   shouldDelete?: boolean;
+  size: number;
 };
 
 export class FileEntity {
@@ -16,6 +17,7 @@ export class FileEntity {
   key: string;
   bucket: string;
   shouldDelete: boolean;
+  size: number;
 
   constructor(params: FileEntityConstructor) {
     this.id = params.id || '';
@@ -25,5 +27,6 @@ export class FileEntity {
     this.key = params.key;
     this.bucket = params.bucket;
     this.shouldDelete = params.shouldDelete || false;
+    this.size = params.size;
   }
 }

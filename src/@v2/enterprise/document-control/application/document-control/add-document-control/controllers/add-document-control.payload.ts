@@ -1,10 +1,9 @@
 import { Type } from 'class-transformer';
-import { IsDate, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsDate, IsNotEmptyObject, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 class FilePayload {
   @IsString()
-  @IsOptional()
-  fileId?: string;
+  fileId!: string;
 
   @IsString()
   @IsOptional()
@@ -30,8 +29,8 @@ export class AddDocumentControlPayload {
   @IsString()
   type!: string;
 
-  @IsOptional()
   @ValidateNested()
+  @IsNotEmptyObject()
   @Type(() => FilePayload)
-  file?: FilePayload;
+  file!: FilePayload;
 }

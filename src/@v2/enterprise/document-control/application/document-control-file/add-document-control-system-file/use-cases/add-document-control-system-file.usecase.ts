@@ -19,6 +19,7 @@ export class AddFileUseCase {
       companyId: params.companyId,
       fileFolder: BUCKET_FOLDERS.DOCUMENT_CONTROL,
       shouldDelete: true,
+      size: params.size,
     });
 
     if (error || !file) throw new BadRequestException('Não foi possível adicionar o arquivo');

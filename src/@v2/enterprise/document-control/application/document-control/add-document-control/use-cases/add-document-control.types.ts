@@ -5,8 +5,8 @@ export namespace IDocumentControlUseCase {
     workspaceId: string;
     description?: string;
     type: string;
-    file?: {
-      fileId?: string;
+    file: {
+      fileId: string;
       endDate?: Date;
       startDate?: Date;
       name?: string;

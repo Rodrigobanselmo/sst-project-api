@@ -37,6 +37,7 @@ export class AddFileController {
       buffer: file.buffer,
       name: file.originalname,
       companyId: path.companyId,
+      size: file.size,
     });
   }
 }

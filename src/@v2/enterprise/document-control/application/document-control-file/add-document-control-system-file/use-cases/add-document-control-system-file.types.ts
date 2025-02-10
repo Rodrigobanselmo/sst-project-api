@@ -3,5 +3,6 @@ export namespace IUseCase {
     companyId: string;
     buffer: Buffer;
     name: string;
+    size: number;
   };
 }

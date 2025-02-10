@@ -5,6 +5,7 @@ export type ISystemFile = {
   url: string;
   key: string;
   bucket: string;
+  size: number;
 };
 
 export class SystemFile {
@@ -14,6 +15,7 @@ export class SystemFile {
   url: string;
   key: string;
   bucket: string;
+  size: number;
 
   constructor(params: ISystemFile) {
     this.id = params.id;
@@ -22,5 +24,6 @@ export class SystemFile {
     this.url = params.url;
     this.key = params.key;
     this.bucket = params.bucket;
+    this.size = params.size;
   }
 }
