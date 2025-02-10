@@ -14,6 +14,7 @@ export class DocumentControlFileEntityMapper {
       companyId: prisma.company_id,
       name: prisma.name,
       createdAt: prisma.created_at,
+      documentControlId: prisma.document_control_id,
       updatedAt: prisma.updated_at,
       endDate: prisma.end_date,
       file: SystemFileMapper.toClass(prisma.file),

@@ -3,7 +3,8 @@ import { IsDate, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 class FilePayload {
   @IsString()
-  fileId!: string;
+  @IsOptional()
+  fileId?: string;
 
   @IsString()
   @IsOptional()

@@ -65,7 +65,6 @@ export class FileRepository {
       where: {
         id: params.id,
         company_id: params.companyId,
-        should_delete: true,
       },
     });
 

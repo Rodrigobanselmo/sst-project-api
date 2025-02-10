@@ -19,8 +19,8 @@ import { DeleteDocumentControlController } from './application/document-control/
 import { DeleteDocumentControlFileController } from './application/document-control-file/delete-document-control-file/controllers/delete-document-control-file.controller';
 import { ReadDocumentControlController } from './application/document-control/read-document-control/controllers/read-document-control.controller';
 import { ReadDocumentControlUseCase } from './application/document-control/read-document-control/use-cases/read-document-control.usecase';
-import { AddFileController } from './application/document-control-file/add-document-control-system-file/controllers/add-file.controller';
-import { AddFileUseCase } from './application/document-control-file/add-document-control-system-file/use-cases/add-file.usecase';
+import { AddFileController } from './application/document-control-file/add-document-control-system-file/controllers/add-document-control-system-file.controller';
+import { AddFileUseCase } from './application/document-control-file/add-document-control-system-file/use-cases/add-document-control-system-file.usecase';
 import { DeleteDocumentControlUseCase } from './application/document-control/delete-document-control/use-cases/delete-document-control.usecase';
 import { ReadDocumentControlFileUseCase } from './application/document-control-file/read-document-control-file/use-cases/read-document-control-file.usecase';
 import { DeleteDocumentControlFileUseCase } from './application/document-control-file/delete-document-control-file/use-cases/delete-document-control-file.usecase';

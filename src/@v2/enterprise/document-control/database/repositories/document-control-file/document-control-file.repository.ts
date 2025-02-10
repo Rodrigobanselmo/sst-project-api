@@ -17,36 +17,56 @@ export class DocumentControlFileRepository {
   }
 
   async create(params: IDocumentControlRepository.CreateParams): IDocumentControlRepository.CreateReturn {
-    const documentControlFile = await this.prisma.documentControlFile.create({
-      data: {
-        name: params.name,
-        company_id: params.companyId,
-        document_control_id: params.documentControlId,
-        end_date: params.endDate,
-        start_date: params.startDate,
-        file_id: params.file.id,
-      },
-      ...DocumentControlFileRepository.selectOptions(),
-    });
+    const [documentControlFile] = await this.prisma.$transaction([
+      this.prisma.documentControlFile.create({
+        data: {
+          name: params.name,
+          company_id: params.companyId,
+          document_control_id: params.documentControlId,
+          end_date: params.endDate,
+          start_date: params.startDate,
+          file_id: params.file.id,
+        },
+        ...DocumentControlFileRepository.selectOptions(),
+      }),
+      this.prisma.systemFile.update({
+        where: {
+          id: params.file.id,
+        },
+        data: {
+          should_delete: false,
+        },
+      }),
+    ]);
 
     return documentControlFile ? DocumentControlFileEntityMapper.toEntity(documentControlFile) : null;
   }
 
   async update(params: IDocumentControlRepository.UpdateParams): IDocumentControlRepository.UpdateReturn {
-    const documentControlFile = await this.prisma.documentControlFile.update({
-      where: {
-        id: params.id,
-        company_id: params.companyId,
-        deleted_at: null,
-      },
-      data: {
-        name: params.name,
-        end_date: params.endDate,
-        start_date: params.startDate,
-        file_id: params.file.id,
-      },
-      ...DocumentControlFileRepository.selectOptions(),
-    });
+    const [documentControlFile] = await this.prisma.$transaction([
+      this.prisma.documentControlFile.update({
+        where: {
+          id: params.id,
+          company_id: params.companyId,
+          deleted_at: null,
+        },
+        data: {
+          name: params.name,
+          end_date: params.endDate,
+          start_date: params.startDate,
+          file_id: params.file.id,
+        },
+        ...DocumentControlFileRepository.selectOptions(),
+      }),
+      this.prisma.systemFile.update({
+        where: {
+          id: params.file.id,
+        },
+        data: {
+          should_delete: false,
+        },
+      }),
+    ]);
 
     return documentControlFile ? DocumentControlFileEntityMapper.toEntity(documentControlFile) : null;
   }

@@ -10,7 +10,7 @@ export class DocumentEntity implements Document {
   description: string;
   startDate: Date;
   endDate: Date;
-  type: string;
+  type: DocumentTypeEnum;
   status: StatusEnum;
   created_at: Date;
   updated_at: Date;

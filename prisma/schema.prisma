@@ -632,6 +632,7 @@ model SystemFile {
   key           String
   bucket        String
   name          String
+  size          Int?
   should_delete Boolean  @default(false)
   created_at    DateTime @default(now())
   updated_at    DateTime @updatedAt

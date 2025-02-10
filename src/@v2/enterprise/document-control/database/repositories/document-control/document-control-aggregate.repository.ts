@@ -20,28 +20,38 @@ export class DocumentControlAggregateRepository {
   }
 
   async create(params: IDocumentControlAggregateRepository.CreateParams): IDocumentControlAggregateRepository.CreateReturn {
-    const documentControl = await this.prisma.documentControl.create({
-      data: {
-        name: params.documentControl.name,
-        company_id: params.documentControl.companyId,
-        type: params.documentControl.type,
-        description: params.documentControl.description,
-        status: params.documentControl.status,
-        workspace_id: params.documentControl.workspaceId,
-        document_control_files: {
-          createMany: {
-            data: params.files.map((file) => ({
-              name: file.name,
-              company_id: file.companyId,
-              file_id: file.file.id,
-              end_date: file.endDate,
-              start_date: file.startDate,
-            })),
+    const [documentControl] = await this.prisma.$transaction([
+      this.prisma.documentControl.create({
+        data: {
+          name: params.documentControl.name,
+          company_id: params.documentControl.companyId,
+          type: params.documentControl.type,
+          description: params.documentControl.description,
+          status: params.documentControl.status,
+          workspace_id: params.documentControl.workspaceId,
+          document_control_files: {
+            createMany: {
+              data: params.files.map((file) => ({
+                name: file.name,
+                company_id: file.companyId,
+                file_id: file.file.id,
+                end_date: file.endDate,
+                start_date: file.startDate,
+              })),
+            },
           },
         },
-      },
-      ...DocumentControlAggregateRepository.selectOptions(),
-    });
+        ...DocumentControlAggregateRepository.selectOptions(),
+      }),
+      this.prisma.systemFile.updateMany({
+        where: {
+          id: { in: params.files.map((file) => file.file.id) },
+        },
+        data: {
+          should_delete: false,
+        },
+      }),
+    ]);
 
     return documentControl ? DocumentControlAggregateMapper.toAggregate(documentControl) : null;
   }

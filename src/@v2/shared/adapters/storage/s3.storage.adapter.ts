@@ -16,16 +16,16 @@ export class S3StorageAdapter implements IStorageAdapter {
     this.s3 = new S3Client({ region: config.AWS.S3_BUCKET_REGION });
   }
 
-  async upload({ file, fileFolder: fileKey, fileName, bucket, isPublic }: IStorageAdapter.Upload.Params): Promise<IStorageAdapter.Upload.Result> {
+  async upload({ file, fileFolder, fileName, bucket, isPublic }: IStorageAdapter.Upload.Params): Promise<IStorageAdapter.Upload.Result> {
     const name = this.normalizeFileName(fileName);
-    const key = isDevelopment() ? `${'test'}/${fileKey}/${name}` : `${fileKey}/${name}`;
+    const key = isDevelopment() ? `${'test'}/${fileFolder}${name}` : `${fileFolder}${name}`;
     const bucketName = bucket || this.bucket;
 
     const command = new PutObjectCommand({
       Bucket: bucketName,
       Key: key,
       Body: file,
-      ContentType: this.contentType(fileKey),
+      ContentType: this.contentType(key),
       ACL: isPublic ? 'public-read' : undefined,
     });
 
@@ -60,7 +60,12 @@ export class S3StorageAdapter implements IStorageAdapter {
 
   async generateSignedPath(params: IStorageAdapter.GenerateSignPath.Params): Promise<IStorageAdapter.GenerateSignPath.Result> {
     const { fileKey, expires = 900, bucket } = params;
-    const command = new GetObjectCommand({ Bucket: bucket || this.bucket, Key: fileKey });
+    const command = new GetObjectCommand({
+      Bucket: bucket || this.bucket,
+      Key: fileKey,
+      ResponseContentDisposition: 'inline',
+      ResponseContentType: this.contentType(fileKey),
+    });
 
     return getSignedUrl(this.s3, command, { expiresIn: expires });
   }

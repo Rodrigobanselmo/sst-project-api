@@ -17,7 +17,7 @@ export class AddFileService {
   async add(params: IAddFileService.Params): IAddFileService.Result {
     const { url, key, bucket } = await this.storage.upload({
       file: params.buffer,
-      fileFolder: params.fileFolder,
+      fileFolder: params.fileFolder.replace(':companyId', params.companyId),
       fileName: params.fileName,
     });
 

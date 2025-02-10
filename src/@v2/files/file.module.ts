@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { SharedModule } from '@/@v2/shared/shared.module';
 import { FileRepository } from './database/repositories/file/file.repository';
 import { AddFileService } from './services/add-file/add-file.service';
@@ -8,7 +8,7 @@ import { DeleteUnusedFilesUseCase } from './application/delete-unused-files/use-
 import { DeleteUnusedFilesCron } from './application/delete-unused-files/cron/delete-unused-files.cron';
 
 @Module({
-  imports: [SharedModule],
+  imports: [forwardRef(() => SharedModule)],
   controllers: [],
   providers: [
     // Cron
@@ -25,6 +25,6 @@ import { DeleteUnusedFilesCron } from './application/delete-unused-files/cron/de
     // Use Cases
     DeleteUnusedFilesUseCase,
   ],
-  exports: [],
+  exports: [ReadFileService, AddFileService],
 })
 export class FileModule {}

@@ -22,6 +22,7 @@ import { SharedModule } from './@v2/shared/shared.module';
 import { SecurityModule } from './@v2/security/security.module';
 import { EnterpriseModule } from './@v2/enterprise/enterprise.module';
 import { AuthModule } from './@v2/auth/auth.module';
+import { FileModule } from './@v2/files/file.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { AuthModule } from './@v2/auth/auth.module';
     SharedModule,
     EnterpriseModule,
     AuthModule,
+    FileModule,
   ],
   providers: [
     {

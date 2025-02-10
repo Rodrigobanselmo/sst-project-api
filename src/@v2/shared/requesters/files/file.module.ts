@@ -1,9 +1,10 @@
+import { FileModule } from '@/@v2/files/file.module';
 import { Module } from '@nestjs/common';
 import { SharedTokens } from '../../constants/tokens';
 import { ImportFileRequester } from './import.file.requester';
 
 @Module({
-  imports: [],
+  imports: [FileModule],
   providers: [
     {
       provide: SharedTokens.FileRequester,

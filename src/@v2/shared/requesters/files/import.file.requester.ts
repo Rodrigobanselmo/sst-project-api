@@ -2,7 +2,9 @@ import { AddFileService } from '@/@v2/files/services/add-file/add-file.service';
 import { ReadFileService } from '@/@v2/files/services/read-file/read-file.service';
 import { SystemFile } from '../../domain/types/shared/system-file';
 import { IFileRequester } from './file.interface';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class ImportFileRequester implements IFileRequester {
   constructor(
     private readonly addFileService: AddFileService,
@@ -11,6 +13,7 @@ export class ImportFileRequester implements IFileRequester {
 
   async read(params: IFileRequester.Read.Params): IFileRequester.Read.Result {
     const [file, error] = await this.readFileService.read(params);
+
     if (!file || error) return [, error];
 
     const systemFile = new SystemFile(file);

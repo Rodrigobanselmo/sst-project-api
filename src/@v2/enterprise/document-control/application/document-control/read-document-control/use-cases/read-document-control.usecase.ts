@@ -25,6 +25,8 @@ export class ReadDocumentControlUseCase {
       items: documentControl.files,
       batchSize: 15,
       callback: async (documentControlFile) => {
+        if (!documentControlFile.file) return;
+
         const url = await this.storage.generateSignedPath({
           fileKey: documentControlFile.file.key,
           bucket: documentControlFile.file.bucket,

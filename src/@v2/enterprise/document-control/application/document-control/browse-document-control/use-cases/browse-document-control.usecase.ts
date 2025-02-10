@@ -28,6 +28,8 @@ export class BrowseDocumentControlUseCase {
       items: documentControls.results,
       batchSize: 15,
       callback: async (documentControl) => {
+        if (!documentControl.file) return;
+
         const url = await this.storage.generateSignedPath({
           fileKey: documentControl.file.key,
           bucket: documentControl.file.bucket,

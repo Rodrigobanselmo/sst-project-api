@@ -6,7 +6,7 @@ export namespace IDocumentControlUseCase {
     description?: string;
     type: string;
     file?: {
-      fileId: string;
+      fileId?: string;
       endDate?: Date;
       startDate?: Date;
       name?: string;

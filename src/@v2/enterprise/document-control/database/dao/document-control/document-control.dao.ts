@@ -82,7 +82,7 @@ export class DocumentControlDAO {
           ,document_control_file."end_date"
           ,document_control_file."start_date"
           ,document_control_file."file_id"
-          ROW_NUMBER() OVER (PARTITION BY document_control."document_control_id" ORDER BY document_control_file."created_at" DESC) as row_num
+          ,ROW_NUMBER() OVER (PARTITION BY document_control_file."document_control_id" ORDER BY document_control_file."created_at" DESC) as row_num
         FROM
           "DocumentControl" document_control
         LEFT JOIN 
@@ -97,17 +97,20 @@ export class DocumentControlDAO {
         ,ranked_document.updated_at
         ,ranked_document.end_date
         ,ranked_document.start_date
-        ,JSONB_BUILD_OBJECT(
-            'url', system_file.url 
-            ,'name', system_file.name
-            ,'key', system_file.key
-            ,'bucket', system_file.bucket
-        ) AS file
+        ,CASE 
+          WHEN system_file.key IS NULL THEN NULL
+          ELSE JSONB_BUILD_OBJECT(
+            'url', system_file.url,
+            'name', system_file.name,
+            'key', system_file.key,
+            'bucket', system_file.bucket
+          )
+    END AS file
       FROM 
         "ranked_document"
       LEFT JOIN 
         "SystemFile" system_file ON system_file."id" = ranked_document.file_id
-      ${gerWhereRawPrisma([...whereParams, Prisma.sql`row_num = 1`])}
+      ${gerWhereRawPrisma([...whereParams, Prisma.sql`row_num = 1 OR system_file.key IS NULL`])}
       ${getOrderByRawPrisma(orderByParams)}
       LIMIT ${pagination.limit}
       OFFSET ${pagination.offSet};
@@ -120,8 +123,8 @@ export class DocumentControlDAO {
 
     const distinctFiltersPromise = this.prisma.$queryRaw<IDocumentControlBrowseFilterModelMapper[]>`
       SELECT 
-        array_agg(DISTINCT document_control.type) AS filter_types,
-      FROM "DocumentControl" document_control
+        array_agg(DISTINCT ranked_document.type) AS filter_types
+      FROM "DocumentControl" ranked_document
       ${gerWhereRawPrisma(browseWhereParams)};
     `;
 

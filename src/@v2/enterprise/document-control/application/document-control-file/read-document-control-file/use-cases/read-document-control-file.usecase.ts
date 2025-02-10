@@ -19,12 +19,14 @@ export class ReadDocumentControlFileUseCase {
 
     if (!documentControlFile) throw new BadRequestException('Documento não encontrado');
 
-    const url = await this.storage.generateSignedPath({
-      fileKey: documentControlFile.file.key,
-      bucket: documentControlFile.file.bucket,
-    });
+    if (documentControlFile.file) {
+      const url = await this.storage.generateSignedPath({
+        fileKey: documentControlFile.file.key,
+        bucket: documentControlFile.file.bucket,
+      });
 
-    documentControlFile.file.url = url;
+      documentControlFile.file.url = url;
+    }
 
     return documentControlFile;
   }

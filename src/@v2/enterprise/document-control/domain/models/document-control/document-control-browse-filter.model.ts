@@ -6,6 +6,6 @@ export class DocumentControlBrowseFilterModel {
   types: string[];
 
   constructor(params: IDocumentControlBrowseFilterModel) {
-    this.types = params.types;
+    this.types = params.types || [];
   }
 }
