@@ -1,16 +1,16 @@
+import { CompanyModel } from '@/@v2/documents/domain/models/company.model';
+import { DocumentVersionModel } from '@/@v2/documents/domain/models/document-version.model';
 import { EmployeeModel } from '@/@v2/documents/domain/models/employee.model';
 import { HierarchyGroupModel } from '@/@v2/documents/domain/models/hierarchy-groups.model';
 import { IHierarchyModel } from '@/@v2/documents/domain/models/hierarchy.model';
 import { HomogeneousGroupModel } from '@/@v2/documents/domain/models/homogeneous-group.model';
+import { RiskDataModel } from '@/@v2/documents/domain/models/risk-data.model';
 import { WorkspaceModel } from '@/@v2/documents/domain/models/workspace.model';
 import { HierarchyTypeEnum } from '@/@v2/shared/domain/enum/company/hierarchy-type.enum';
+import { IDocumentsRequirementKeys } from '@/@v2/shared/domain/types/document/document-types.type';
 import { removeDuplicate } from '@/shared/utils/removeDuplicate';
 import { HierarchyEnum } from '@prisma/client';
 import { hierarchyMap } from '../components/tables/appr/parts/first/first.constant';
-import { RiskDataModel } from '@/@v2/documents/domain/models/risk-data.model';
-import { DocumentVersionModel } from '@/@v2/documents/domain/models/document-version.model';
-import { CompanyModel } from '@/@v2/documents/domain/models/company.model';
-import { IDocumentsRequirementKeys } from '@/@v2/shared/domain/types/document/document-types.type';
 
 export type IHierarchyDataConverter = IHierarchyModel & {
   homogeneousGroups: HomogeneousGroupModel[];
@@ -73,7 +73,11 @@ const setMapHierarchies = (hierarchyData: IHierarchyDataConverter[], homoGroupDa
       hierarchyTree[hierarchy.parentId].children.push(hierarchy.id);
       if (!hierarchyTree[hierarchy.parentId].employees) hierarchyTree[hierarchy.parentId].employees = [];
 
-      if (hierarchy.type !== 'SUB_OFFICE') hierarchyTree[hierarchy.parentId].employees.push(...hierarchy.employees);
+      if (hierarchy.type !== 'SUB_OFFICE') {
+        for (const employeeId of hierarchy.employees) {
+          hierarchyTree[hierarchy.parentId].employees.push(employeeId);
+        }
+      }
     }
   });
 
