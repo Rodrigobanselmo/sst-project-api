@@ -55,7 +55,7 @@ export class DocumentControlDAO {
         ,document_control."updated_at"
     `;
 
-    return documentControl?.id ? DocumentControlReadModelMapper.toModel(documentControl) : null;
+    return documentControl[0]?.id ? DocumentControlReadModelMapper.toModel(documentControl[0]) : null;
   }
 
   async browse({ limit, page, orderBy, filters }: IDocumentControlDAO.BrowseParams) {
@@ -104,8 +104,8 @@ export class DocumentControlDAO {
             'name', system_file.name,
             'key', system_file.key,
             'bucket', system_file.bucket
-          )
-    END AS file
+          ) 
+        END AS file
       FROM 
         "ranked_document"
       LEFT JOIN 
@@ -177,6 +177,8 @@ export class DocumentControlDAO {
     };
 
     const orderByRaw = orderBy.map<IOrderByRawPrisma>(({ field, order }) => ({ column: map[field], order }));
+
+    console.log(orderByRaw);
 
     return orderByRaw;
   }

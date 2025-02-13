@@ -1,8 +1,7 @@
 import { FileModel } from '@/@v2/shared/models/common/file.model';
-import { SystemFile } from '@/@v2/shared/domain/types/shared/system-file';
 
 export type IDocumentControlBrowseResultModel = {
-  id: string;
+  id: number;
   name: string;
   description: string | undefined;
   endDate: Date | undefined;
@@ -14,7 +13,7 @@ export type IDocumentControlBrowseResultModel = {
 };
 
 export class DocumentControlBrowseResultModel {
-  id: string;
+  id: number;
   name: string;
   description: string | undefined;
   endDate: Date | undefined;

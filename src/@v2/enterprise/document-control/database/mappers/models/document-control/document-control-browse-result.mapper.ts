@@ -2,7 +2,7 @@ import { DocumentControlBrowseResultModel } from '@/@v2/enterprise/document-cont
 import { FileModelMapper } from '@/@v2/shared/utils/mappers/file-model.mapper';
 
 export type IDocumentControlBrowseResultModelMapper = {
-  id: string;
+  id: number;
   name: string;
   description: string | null;
   end_date: Date | null;
