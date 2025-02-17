@@ -606,14 +606,15 @@ model DocumentControl {
 }
 
 model DocumentControlFile {
-  id         Int        @id @default(autoincrement())
-  name       String
-  start_date DateTime?
-  end_date   DateTime?
-  created_at DateTime   @default(now())
-  updated_at DateTime   @updatedAt
-  deleted_at DateTime?
-  status     StatusEnum @default(ACTIVE)
+  id          Int        @id @default(autoincrement())
+  name        String
+  description String?
+  start_date  DateTime?
+  end_date    DateTime?
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+  deleted_at  DateTime?
+  status      StatusEnum @default(ACTIVE)
 
   file_id             String
   file                SystemFile      @relation(fields: [file_id], references: [id], onDelete: Restrict)

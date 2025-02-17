@@ -28,6 +28,7 @@ export class GetDocumentControlFileService {
       documentControlId: params.documentControlId,
       endDate: params.endDate,
       file,
+      description: params.description,
       name: file.name,
       startDate: params.startDate,
     });

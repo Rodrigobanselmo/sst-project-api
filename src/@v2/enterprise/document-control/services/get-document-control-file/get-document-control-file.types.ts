@@ -5,5 +5,6 @@ export namespace IDocumentControlFileService {
     documentControlId: number;
     endDate?: Date;
     startDate?: Date;
+    description?: string;
   };
 }

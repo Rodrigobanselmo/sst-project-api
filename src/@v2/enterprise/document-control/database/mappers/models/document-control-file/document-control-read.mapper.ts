@@ -7,6 +7,7 @@ export type IDocumentControlFileReadModelMapper = {
   description: string | undefined;
   end_date: Date | null;
   start_date: Date | null;
+  file_id: string;
   file_url: string;
   file_bucket: string;
   file_key: string;
@@ -22,6 +23,7 @@ export class DocumentControlFileReadModelMapper {
       endDate: prisma.end_date || undefined,
       startDate: prisma.start_date || undefined,
       file: FileModelMapper.toClass({
+        id: prisma.file_id,
         url: prisma.file_url,
         bucket: prisma.file_bucket,
         key: prisma.file_key,

@@ -1,7 +1,7 @@
 import { DocumentControlAggregate } from '@/@v2/enterprise/document-control/domain/aggregates/document-control.aggregate';
 import { DocumentControl as PrismaDocumentControl } from '@prisma/client';
-import { DocumentControlEntityMapper } from '../../entities/document-control/document-control.model';
-import { DocumentControlFileEntityMapper, DocumentControlFileEntityMapperConstructor } from '../../entities/document-control-file/document-control-file.model';
+import { DocumentControlEntityMapper } from '../../entities/document-control/document-control.mapper';
+import { DocumentControlFileEntityMapper, DocumentControlFileEntityMapperConstructor } from '../../entities/document-control-file/document-control-file.mapper';
 
 export type DocumentControlAggregateMapperConstructor = PrismaDocumentControl & {
   document_control_files: DocumentControlFileEntityMapperConstructor[];

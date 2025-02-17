@@ -19,6 +19,7 @@ export class DocumentControlDAO {
     const documentControl = await this.prisma.$queryRaw<IDocumentControlReadModelMapper>`
       SELECT
         document_control."id" as id
+        ,document_control."company_id" as company_id
         ,document_control."name" as name
         ,document_control."type" as type
         ,document_control."description" as description
@@ -26,9 +27,12 @@ export class DocumentControlDAO {
         ,document_control."updated_at" as updated_at
         ,COALESCE(
           JSON_AGG(DISTINCT JSONB_BUILD_OBJECT(
-            'name', document_control_file.name 
-            ,'end_date', document_control_file."end_date"
-            ,'start_date', document_control_file."start_date"
+            'id', document_control_file.id 
+            ,'name', document_control_file.name 
+            ,'description', document_control_file.description
+            ,'end_date', document_control_file.end_date
+            ,'start_date', document_control_file.start_date
+            ,'file_id', system_file.id
             ,'file_url', system_file.url
             ,'file_bucket', system_file.bucket
             ,'file_key', system_file.key
@@ -48,6 +52,7 @@ export class DocumentControlDAO {
         AND document_control."deleted_at" IS NULL
       GROUP BY 
         document_control."id"
+        ,document_control."company_id"
         ,document_control."name"
         ,document_control."type"
         ,document_control."description"
@@ -100,6 +105,7 @@ export class DocumentControlDAO {
         ,CASE 
           WHEN system_file.key IS NULL THEN NULL
           ELSE JSONB_BUILD_OBJECT(
+            'id', system_file.id,
             'url', system_file.url,
             'name', system_file.name,
             'key', system_file.key,
@@ -177,8 +183,6 @@ export class DocumentControlDAO {
     };
 
     const orderByRaw = orderBy.map<IOrderByRawPrisma>(({ field, order }) => ({ column: map[field], order }));
-
-    console.log(orderByRaw);
 
     return orderByRaw;
   }

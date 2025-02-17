@@ -12,6 +12,7 @@ export type IDocumentControlBrowseResultModelMapper = {
   updated_at: Date;
 
   file: {
+    id: string;
     url: string;
     bucket: string;
     key: string;

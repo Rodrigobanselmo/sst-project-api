@@ -22,6 +22,7 @@ export class AddDocumentControlFileUseCase {
 
     const documentFile = await this.getDocumentControlService.get({
       companyId: params.companyId,
+      description: params.description,
       documentControlId: params.documentControlId,
       endDate: params.endDate,
       startDate: params.startDate,

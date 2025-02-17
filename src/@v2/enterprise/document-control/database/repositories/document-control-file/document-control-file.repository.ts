@@ -2,7 +2,7 @@ import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { IDocumentControlRepository } from './document-control-file.types';
-import { DocumentControlFileEntityMapper } from '../../mappers/entities/document-control-file/document-control-file.model';
+import { DocumentControlFileEntityMapper } from '../../mappers/entities/document-control-file/document-control-file.mapper';
 
 @Injectable()
 export class DocumentControlFileRepository {
@@ -52,6 +52,7 @@ export class DocumentControlFileRepository {
         },
         data: {
           name: params.name,
+          description: params.description,
           end_date: params.endDate,
           start_date: params.startDate,
           file_id: params.file.id,

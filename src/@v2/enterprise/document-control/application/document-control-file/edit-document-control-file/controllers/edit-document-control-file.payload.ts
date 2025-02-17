@@ -3,7 +3,9 @@ import { IsDate, IsOptional, IsString } from 'class-validator';
 
 export class EditDocumentControlFilePayload {
   @IsString()
-  fileId!: string;
+  @IsOptional()
+  @IsNotNull()
+  fileId?: string;
 
   @IsString()
   @IsNotNull()
@@ -21,7 +23,4 @@ export class EditDocumentControlFilePayload {
   @IsString()
   @IsOptional()
   description?: string;
-
-  @IsString()
-  companyId!: string;
 }

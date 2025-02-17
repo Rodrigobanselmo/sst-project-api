@@ -1,6 +1,7 @@
 import { FileModel } from '../../models/common/file.model';
 
 export type FileModelMapperConstructor = {
+  id: string;
   name: string;
   bucket: string;
   key: string;
@@ -10,6 +11,7 @@ export type FileModelMapperConstructor = {
 export class FileModelMapper {
   static toClass(prisma: FileModelMapperConstructor): FileModel {
     return new FileModel({
+      id: prisma.id,
       name: prisma.name,
       bucket: prisma.bucket,
       key: prisma.key,

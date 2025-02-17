@@ -15,6 +15,7 @@ export class DocumentControlFileDAO {
         ,document_control_file."description" as description
         ,document_control_file."end_date" as end_date
         ,document_control_file."start_date" as start_date
+        ,system_file."id" as file_id
         ,system_file."url" as file_url
         ,system_file."bucket" as file_bucket
         ,system_file."key" as file_key

@@ -2,7 +2,7 @@ import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { IDocumentControlRepository } from './document-control.types';
-import { DocumentControlEntityMapper } from '../../mappers/entities/document-control/document-control.model';
+import { DocumentControlEntityMapper } from '../../mappers/entities/document-control/document-control.mapper';
 
 @Injectable()
 export class DocumentControlRepository {

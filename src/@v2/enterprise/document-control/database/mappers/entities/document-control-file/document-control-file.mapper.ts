@@ -13,6 +13,7 @@ export class DocumentControlFileEntityMapper {
       id: prisma.id,
       companyId: prisma.company_id,
       name: prisma.name,
+      description: prisma.description,
       createdAt: prisma.created_at,
       documentControlId: prisma.document_control_id,
       updatedAt: prisma.updated_at,

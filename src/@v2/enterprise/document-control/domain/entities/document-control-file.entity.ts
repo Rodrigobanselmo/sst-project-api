@@ -4,6 +4,7 @@ import { updateField } from '@/@v2/shared/domain/helpers/update-field.helper';
 
 type IUpdatePrams = {
   name?: string;
+  description?: string | null;
   startDate?: Date | null;
   endDate?: Date | null;
 };
@@ -13,6 +14,7 @@ export type IDocumentControlFileEntity = {
   companyId: string;
   documentControlId: number;
   name: string;
+  description?: string | null;
   startDate: Date | null;
   endDate: Date | null;
   status?: DocumentStatusEnum;
@@ -26,6 +28,7 @@ export class DocumentControlFileEntity {
   companyId: string;
   documentControlId: number;
   name: string;
+  description: string | null;
   startDate: Date | null;
   endDate: Date | null;
   status: DocumentStatusEnum;
@@ -38,8 +41,9 @@ export class DocumentControlFileEntity {
     this.documentControlId = params.documentControlId;
     this.companyId = params.companyId;
     this.name = params.name;
-    this.startDate = params.startDate;
-    this.endDate = params.endDate;
+    this.description = params.description || null;
+    this.startDate = params.startDate || null;
+    this.endDate = params.endDate || null;
     this.status = params.status || DocumentStatusEnum.ACTIVE;
     this.createdAt = params.createdAt || new Date();
     this.updatedAt = params.updatedAt || new Date();
@@ -50,5 +54,6 @@ export class DocumentControlFileEntity {
     this.name = updateField(this.name, data.name);
     this.startDate = updateField(this.startDate, data.startDate);
     this.endDate = updateField(this.endDate, data.endDate);
+    this.description = updateField(this.description, data.description);
   }
 }
