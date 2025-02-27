@@ -40,6 +40,7 @@
     "@aws-sdk/client-ses": "^3.609.0",
     "@aws-sdk/client-sqs": "^3.609.0",
     "@aws-sdk/s3-request-presigner": "^3.744.0",
+    "@aws-sdk/lib-storage": "^3.740.0",
     "@brazilian-utils/brazilian-utils": "^1.0.0-rc.12",
     "@nestjs/axios": "^3.0.2",
     "@nestjs/cache-manager": "^2.2.2",

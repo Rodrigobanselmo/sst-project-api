@@ -268,6 +268,18 @@ export type IRecommendations = {
   type: DocumentChildrenTypeEnum.ITERABLE_RECOMMENDATIONS;
 } & IBaseDocumentModel;
 
+export type IControlMeasures = {
+  type: DocumentChildrenTypeEnum.ITERABLE_CONTROL_MEASURES;
+} & IBaseDocumentModel;
+
+export type IOtherControlMeasures = {
+  type: DocumentChildrenTypeEnum.ITERABLE_OTHER_CONTROL_MEASURES;
+} & IBaseDocumentModel;
+
+export type IEpiControlMeasures = {
+  type: DocumentChildrenTypeEnum.ITERABLE_EPI_CONTROL_MEASURES;
+} & IBaseDocumentModel;
+
 export type IEmergency = {
   type: DocumentChildrenTypeEnum.ITERABLE_EMERGENCY_RISKS;
 } & IBaseDocumentModel;
@@ -363,6 +375,9 @@ export type ISectionChildrenType =
   | IPrioritizationE
   | IPrioritizationC
   | IRecommendations
+  | IControlMeasures
+  | IOtherControlMeasures
+  | IEpiControlMeasures
   | IGseCharTable
   | IGseEnvTable
   | IEmergency

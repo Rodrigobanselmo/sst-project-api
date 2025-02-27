@@ -9,17 +9,9 @@ import { RiskDataQuantityQuiVO } from '@/@v2/shared/domain/values-object/securit
 import { RiskDataQuantityRadiationVO } from '@/@v2/shared/domain/values-object/security/risk-data-quantity-radiation.vo';
 import { RiskDataQuantityVibrationFBVO } from '@/@v2/shared/domain/values-object/security/risk-data-quantity-vibration-fb.vo';
 import { RiskDataQuantityVibrationLVO } from '@/@v2/shared/domain/values-object/security/risk-data-quantity-vibration-l.vo';
-import {
-  Epi,
-  EpiToRiskFactorData,
-  ExamToRiskData,
-  RecTypeEnum as PrismaRecTypeEnum,
-  RecMed,
-  RiskFactorData,
-  RiskFactorDataRec,
-} from '@prisma/client';
+import { Epi, EpiToRiskFactorData, ExamToRiskData, RecTypeEnum as PrismaRecTypeEnum, RecMed, RiskFactorData, RiskFactorDataRec } from '@prisma/client';
 import { AdministrativeMeasureModel } from '../../domain/models/administrative-measure.model';
-import { EgineeringMeasureModel } from '../../domain/models/engineering-measure.model';
+import { EngineeringMeasureModel } from '../../domain/models/engineering-measure.model';
 import { EPIModel } from '../../domain/models/epis.model';
 import { ExamRiskModel } from '../../domain/models/exam-risk.model';
 import { GenerateSourceModel } from '../../domain/models/generate-source.model';
@@ -61,9 +53,9 @@ export class RiskDataMapper {
           }),
       ),
       generateSources: data.generateSources.map((gs) => new GenerateSourceModel({ name: gs.name || '' })),
-      egineeringMeasures: data.engsToRiskFactorData.map(
+      engineeringMeasures: data.engsToRiskFactorData.map(
         (eng) =>
-          new EgineeringMeasureModel({
+          new EngineeringMeasureModel({
             name: eng.recMed.medName || '',
             efficientlyCheck: eng.efficientlyCheck,
           }),
@@ -99,15 +91,7 @@ export class RiskDataMapper {
   }
 
   private static quantityParse(data: IRiskDataMapper) {
-    const quantityObject: Pick<
-      IRiskDataModel,
-      | 'quantityQui'
-      | 'quantityHeat'
-      | 'quantityRadiation'
-      | 'quantityVibrationFB'
-      | 'quantityNoise'
-      | 'quantityVibrationL'
-    > = {
+    const quantityObject: Pick<IRiskDataModel, 'quantityQui' | 'quantityHeat' | 'quantityRadiation' | 'quantityVibrationFB' | 'quantityNoise' | 'quantityVibrationL'> = {
       quantityQui: null,
       quantityNoise: null,
       quantityVibrationFB: null,
@@ -122,11 +106,9 @@ export class RiskDataMapper {
 
     if (json.type === QuantityTypeEnum.QUI) quantityObject.quantityQui = new RiskDataQuantityQuiVO(json);
     if (json.type === QuantityTypeEnum.NOISE) quantityObject.quantityNoise = new RiskDataQuantityNoiseVO(json);
-    if (json.type === QuantityTypeEnum.VFB)
-      quantityObject.quantityVibrationFB = new RiskDataQuantityVibrationFBVO(json);
+    if (json.type === QuantityTypeEnum.VFB) quantityObject.quantityVibrationFB = new RiskDataQuantityVibrationFBVO(json);
     if (json.type === QuantityTypeEnum.VL) quantityObject.quantityVibrationL = new RiskDataQuantityVibrationLVO(json);
-    if (json.type === QuantityTypeEnum.RADIATION)
-      quantityObject.quantityRadiation = new RiskDataQuantityRadiationVO(json);
+    if (json.type === QuantityTypeEnum.RADIATION) quantityObject.quantityRadiation = new RiskDataQuantityRadiationVO(json);
     if (json.type === QuantityTypeEnum.HEAT) quantityObject.quantityHeat = new RiskDataQuantityHeatVO(json);
 
     return quantityObject;

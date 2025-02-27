@@ -1,3 +1,4 @@
+import { HierarchyTypeEnum } from '@/@v2/shared/domain/enum/company/hierarchy-type.enum';
 import { getNumOfEmployees } from '../functions/get-num-of-employees.func';
 import { DocumentVersionModel } from './document-version.model';
 import { ExamModel } from './exam.model';
@@ -5,6 +6,9 @@ import { HierarchyModel } from './hierarchy.model';
 import { HomogeneousGroupModel } from './homogeneous-group.model';
 import { RiskDataExamModel } from './risk-data-exam.model';
 import { RiskDataModel } from './risk-data.model';
+import { EPIModel } from './epis.model';
+import { AdministrativeMeasureModel } from './administrative-measure.model';
+import { EngineeringMeasureModel } from './engineering-measure.model';
 
 export type IDocumentPGRModel = {
   documentVersion: DocumentVersionModel;
@@ -31,7 +35,7 @@ export class DocumentPGRModel {
     this.exams = params.exams;
 
     this.homogeneousGroupsMap = this.getHomogeneousGroupsMap();
-    this.hierarchiesMap = this.getHierarchiesMap();
+    this.hierarchiesMap = this.getHierarchiesMap(this.hierarchies);
     this.filterHierarchyGroups();
     this.setExamsMap();
   }
@@ -45,23 +49,45 @@ export class DocumentPGRModel {
   }
 
   get risksData() {
-    return this.homogeneousGroups.reduce(
-      (acc, group) => [...acc, ...group.risksData({ documentType: 'isPGR' })],
-      [] as RiskDataModel[],
-    );
+    return this.homogeneousGroups.reduce((acc, group) => [...acc, ...group.risksData({ documentType: 'isPGR' })], [] as RiskDataModel[]);
+  }
+
+  get engineeringMeasures() {
+    const map = new Map<string, EngineeringMeasureModel>();
+    this.risksData.forEach((riskData) => {
+      riskData.engineeringMeasures.forEach((measure) => map.set(measure.name, measure));
+    });
+
+    return Array.from(map.values());
+  }
+
+  get administrativeMeasures() {
+    const map = new Map<string, AdministrativeMeasureModel>();
+    this.risksData.forEach((riskData) => {
+      riskData.administrativeMeasures.forEach((measure) => map.set(measure.name, measure));
+    });
+
+    return Array.from(map.values());
+  }
+
+  get epis() {
+    const map = new Map<string, EPIModel>();
+    this.risksData.forEach((riskData) => {
+      riskData.epis.forEach((epi) => map.set(epi.name, epi));
+    });
+
+    return Array.from(map.values());
   }
 
   get numOfEmployee() {
     return getNumOfEmployees(this.hierarchies);
   }
 
-  getHierarchyGroups(hierarchy: HierarchyModel) {
-    return hierarchy.groups
-      .map((group) => this.homogeneousGroupsMap[group.homogeneousGroupId])
-      .filter(Boolean) as HomogeneousGroupModel[];
+  getHomogeneousGroupsByHierarchy(hierarchy: HierarchyModel) {
+    return hierarchy.groups.map((group) => this.homogeneousGroupsMap[group.homogeneousGroupId]).filter(Boolean) as HomogeneousGroupModel[];
   }
 
-  getRiskDataExams(riskData: RiskDataModel) {
+  getExamsByRiskData(riskData: RiskDataModel) {
     const exams = [] as RiskDataExamModel[];
 
     riskData.exams.forEach((exam) => {
@@ -81,26 +107,90 @@ export class DocumentPGRModel {
     return exams;
   }
 
+  getHierarchyNestedChildren(hierarchy: HierarchyModel) {
+    const children = [];
+
+    const findChildrenRecursively = (currentParentId: string) => {
+      for (const item of this.hierarchies) {
+        if (item.parentId === currentParentId) {
+          children.push(item);
+          findChildrenRecursively(item.id);
+        }
+      }
+    };
+
+    findChildrenRecursively(hierarchy.id);
+    return children;
+  }
+
+  getHierarchiesByType(type: HierarchyTypeEnum) {
+    return this.hierarchies.filter((hierarchy) => hierarchy.type === type);
+  }
+
+  getModifiedHomogeneousGroupsByHierarchies(hierarchies: HierarchyModel[]) {
+    const hierarchiesMap = this.getHierarchiesMap(hierarchies);
+    const homogeneousGroups = [] as HomogeneousGroupModel[];
+
+    this.homogeneousGroups.forEach((homogeneousGroup) => {
+      homogeneousGroup.hierarchies.some((hierarchy) => {
+        const found = hierarchiesMap[hierarchy.hierarchyId];
+        if (found) {
+          homogeneousGroups.push(
+            new HomogeneousGroupModel({
+              ...homogeneousGroup,
+              risksData: homogeneousGroup._risksData,
+              hierarchies: homogeneousGroup.hierarchies.filter((hierarchy) => hierarchiesMap[hierarchy.hierarchyId]),
+            }),
+          );
+          return true;
+        }
+      });
+    });
+
+    return homogeneousGroups;
+  }
+
+  getModifiedEntityFilteredByHierarchy(hierarchy: HierarchyModel) {
+    const hierarchies = [hierarchy, ...this.getHierarchyNestedChildren(hierarchy)];
+
+    return new DocumentPGRModel({
+      hierarchies: hierarchies,
+      documentVersion: this.documentVersion,
+      homogeneousGroups: this.getModifiedHomogeneousGroupsByHierarchies(hierarchies),
+      exams: this.exams,
+    });
+  }
+
+  getHierarchyParents(hierarchy: HierarchyModel) {
+    const parents = [] as HierarchyModel[];
+
+    const findParentsRecursively = (currentParentId: string) => {
+      const parent = this.hierarchies.find((item) => item.id === currentParentId);
+      if (parent) {
+        parents.unshift(parent);
+        findParentsRecursively(parent.parentId);
+      }
+    };
+
+    findParentsRecursively(hierarchy.parentId);
+    return parents;
+  }
+
   private getHomogeneousGroupsMap() {
     return this.homogeneousGroups.reduce((acc, group) => ({ ...acc, [group.id]: group }), {});
   }
 
-  private getHierarchiesMap() {
-    return this.hierarchies.reduce((acc, hierarchy) => ({ ...acc, [hierarchy.id]: hierarchy }), {});
+  private getHierarchiesMap(hierarchies: HierarchyModel[]) {
+    return hierarchies.reduce((acc, hierarchy) => ({ ...acc, [hierarchy.id]: hierarchy }), {});
   }
 
   private filterHierarchyGroups() {
     this.hierarchies.forEach((hierarchy) => {
-      hierarchy.groups = hierarchy.groups.filter(
-        (group) => this.homogeneousGroupsMap[group.homogeneousGroupId] && this.hierarchiesMap[group.hierarchyId],
-      );
+      hierarchy.groups = hierarchy.groups.filter((group) => this.homogeneousGroupsMap[group.homogeneousGroupId] && this.hierarchiesMap[group.hierarchyId]);
     });
 
     this.homogeneousGroups.forEach((group) => {
-      group.hierarchies = group.hierarchies.filter(
-        (hierarchy) =>
-          this.homogeneousGroupsMap[hierarchy.homogeneousGroupId] && this.hierarchiesMap[hierarchy.hierarchyId],
-      );
+      group.hierarchies = group.hierarchies.filter((hierarchy) => this.homogeneousGroupsMap[hierarchy.homogeneousGroupId] && this.hierarchiesMap[hierarchy.hierarchyId]);
     });
   }
 

@@ -8,9 +8,7 @@ type AsyncBatchProps<T, S> = {
 };
 
 export async function asyncBatch<T, S>({ items, callback, batchSize }: AsyncBatchProps<T, S>) {
-  const data = await asyncEach(arrayChunks(items, batchSize), async (chunk, batchIndex) =>
-    Promise.all(chunk.map(async (dt, chunkIndex) => callback(dt, batchIndex, chunkIndex))),
-  );
+  const data = await asyncEach(arrayChunks(items, batchSize), async (chunk, batchIndex) => Promise.all(chunk.map(async (dt, chunkIndex) => callback(dt, batchIndex, chunkIndex))));
 
   return data.reduce((acc, curr) => [...(acc || []), ...(curr || [])], []);
 }

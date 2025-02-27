@@ -1,8 +1,9 @@
 import { Type } from 'class-transformer';
-import { IsBoolean, IsDate, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsBoolean, IsDate, IsEnum, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 import { ToBoolean } from '../../../shared/decorators/boolean.decorator';
 import { UpsertDocumentDataDto } from './document-data.dto';
+import { HierarchyTypeEnum } from '@/@v2/shared/domain/enum/company/hierarchy-type.enum';
 
 export class DocumentDataPGRDto {
   @IsOptional()
@@ -46,6 +47,20 @@ export class DocumentDataPGRDto {
   @ToBoolean()
   @IsOptional()
   isQ5: boolean;
+
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  isHideOriginColumn: boolean;
+
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  isHideCA: boolean;
+
+  @IsOptional()
+  @IsEnum(HierarchyTypeEnum)
+  aprTypeSeparation: HierarchyTypeEnum;
 
   @IsBoolean()
   @ToBoolean()

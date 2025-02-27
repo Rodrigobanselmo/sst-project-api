@@ -111,7 +111,7 @@ export const documentConverter = (
       if (lastPenultimate)
         return {
           title: `Quantidade de Funcionários Expostos:`,
-          text: String(hierarchy.employeesLength || hierarchy.subEmployeesLength),
+          text: String(hierarchy.employeesLength || hierarchy.subEmployeesLength || ''),
           size: 30,
           borders: borderNoneStyle,
         };
