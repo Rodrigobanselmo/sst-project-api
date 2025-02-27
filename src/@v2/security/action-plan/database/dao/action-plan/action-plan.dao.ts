@@ -12,22 +12,19 @@ import { ActionPlanOrderByEnum, IActionPlanDAO } from './action-plan.types';
 import { ActionPlanStatusEnum } from '../../../domain/enums/action-plan-status.enum';
 import { OrderByDirectionEnum } from '@/@v2/shared/types/order-by.types';
 
-
 @Injectable()
 export class ActionPlanDAO {
-  constructor(
-    private readonly prisma: PrismaServiceV2,
-  ) { }
+  constructor(private readonly prisma: PrismaServiceV2) {}
 
   async browse({ limit, page, orderBy, filters }: IActionPlanDAO.BrowseParams) {
-    const pagination = getPagination(page, limit)
+    const pagination = getPagination(page, limit);
 
-    const browseWhereParams = this.browseWhere(filters)
-    const { filterHaving, filterWhere, } = this.filterWhere(filters)
-    const orderByParams = this.browseOrderBy(orderBy)
+    const browseWhereParams = this.browseWhere(filters);
+    const { filterHaving, filterWhere } = this.filterWhere(filters);
+    const orderByParams = this.browseOrderBy(orderBy);
 
-    const whereParams = [...browseWhereParams, ...filterWhere]
-    const whereTotalParams = [...whereParams, ...filterHaving]
+    const whereParams = [...browseWhereParams, ...filterWhere];
+    const whereTotalParams = [...whereParams, ...filterHaving];
 
     const actionplansPromise = this.prisma.$queryRaw<IActionPlanBrowseResultModelMapper[]>`
       WITH "DocumentDataUnique" AS (
@@ -92,7 +89,19 @@ export class ActionPlanDAO {
         COALESCE(
           JSON_AGG(DISTINCT JSONB_BUILD_OBJECT('name', gs."name", 'id', gs."id")) 
           FILTER (WHERE gs."name" IS NOT NULL), '[]'
-        ) AS generateSources
+        ) AS generateSources,
+        COALESCE(
+          JSON_AGG(DISTINCT JSONB_BUILD_OBJECT(
+            'id', comment."id"
+            ,'text', comment."text" 
+            ,'type', comment."type" 
+            ,'text_type', comment."textType"
+            ,'approved_comment', comment."approvedComment"
+            ,'is_approved', comment."isApproved"
+            ,'created_at', comment."created_at"
+          )) 
+          FILTER (WHERE comment."id" IS NOT NULL), '[]'
+        ) AS comments
       FROM 
         "RiskFactorData" rfd
       JOIN 
@@ -108,18 +117,26 @@ export class ActionPlanDAO {
       LEFT JOIN 
         "RiskFactorDataRec" rfd_rec ON rfd_rec."riskFactorDataId" = rfd."id" AND rfd_rec."recMedId" = rec."id"
       LEFT JOIN 
+        "RiskFactorDataRecComments" comment ON comment."riskFactorDataRecId" = rfd_rec."id"
+      LEFT JOIN 
         "User" u_resp ON u_resp."id" = rfd_rec."responsibleId"
       LEFT JOIN
         "HomogeneousGroup" hg ON hg."id" = rfd."homogeneousGroupId"
-      ${filters.workspaceIds?.length ? Prisma.sql`
+      ${
+        filters.workspaceIds?.length
+          ? Prisma.sql`
         LEFT JOIN
             "_HomogeneousGroupToWorkspace" hg_to_w ON hg_to_w."A" = hg."id"
-      ` : Prisma.sql``}
+      `
+          : Prisma.sql``
+      }
       LEFT JOIN
         "HierarchyOnHomogeneous" hh ON hh."homogeneousGroupId" = hg."id" AND hh."endDate" IS NULL
       LEFT JOIN 
         "Hierarchy" h ON h."id" = hh."hierarchyId"
-      ${(filters.hierarchyIds?.length) ? Prisma.sql`
+      ${
+        filters.hierarchyIds?.length
+          ? Prisma.sql`
         LEFT JOIN 
           "Hierarchy" h_parent_1 ON h_parent_1."id" = h."parentId"
         LEFT JOIN 
@@ -140,7 +157,9 @@ export class ActionPlanDAO {
           "Hierarchy" h_children_4 ON h_children_4."parentId" = h_children_3."id"
         LEFT JOIN
           "Hierarchy" h_children_5 ON h_children_5."parentId" = h_children_4."id"
-      ` : Prisma.sql``}
+      `
+          : Prisma.sql``
+      }
       LEFT JOIN
         "CompanyCharacterization" cc ON cc."id" = hg."id"
       LEFT JOIN
@@ -197,31 +216,49 @@ export class ActionPlanDAO {
         "_recs" rec_to_rfd ON rec_to_rfd."B" = rfd."id"
       LEFT JOIN
         "RecMed" rec ON rec."id" = rec_to_rfd."A"
-      ${filters.riskIds?.length ? Prisma.sql`
+      ${
+        filters.riskIds?.length
+          ? Prisma.sql`
         LEFT JOIN "RiskFactors" risk ON risk."id" = rfd."riskId"
-      ` : Prisma.sql``}
-      ${filters.generateSourceIds?.length ? Prisma.sql`
+      `
+          : Prisma.sql``
+      }
+      ${
+        filters.generateSourceIds?.length
+          ? Prisma.sql`
         LEFT JOIN
           "_GenerateSourceToRiskFactorData" gs_to_rfd ON gs_to_rfd."B" = rfd."id"
         LEFT JOIN
           "GenerateSource" gs ON gs."id" = gs_to_rfd."A"
-      ` : Prisma.sql``}
+      `
+          : Prisma.sql``
+      }
       LEFT JOIN 
         "RiskFactorDataRec" rfd_rec ON rfd_rec."riskFactorDataId" = rfd."id" AND rfd_rec."recMedId" = rec."id"
-      ${filters.responisbleIds?.length ? Prisma.sql`
+      ${
+        filters.responisbleIds?.length
+          ? Prisma.sql`
         LEFT JOIN  "User" u_resp ON u_resp."id" = rfd_rec."responsibleId"
-      ` : Prisma.sql``}
+      `
+          : Prisma.sql``
+      }
       LEFT JOIN
         "HomogeneousGroup" hg ON hg."id" = rfd."homogeneousGroupId"
-      ${filters.workspaceIds?.length ? Prisma.sql`
+      ${
+        filters.workspaceIds?.length
+          ? Prisma.sql`
         LEFT JOIN
             "_HomogeneousGroupToWorkspace" hg_to_w ON hg_to_w."A" = hg."id"
-      ` : Prisma.sql``}
+      `
+          : Prisma.sql``
+      }
       LEFT JOIN
         "HierarchyOnHomogeneous" hh ON hh."homogeneousGroupId" = hg."id" AND hh."endDate" IS NULL
       LEFT JOIN 
         "Hierarchy" h ON h."id" = hh."hierarchyId"
-      ${(filters.hierarchyIds?.length) ? Prisma.sql`
+      ${
+        filters.hierarchyIds?.length
+          ? Prisma.sql`
         LEFT JOIN 
           "Hierarchy" h_parent_1 ON h_parent_1."id" = h."parentId"
         LEFT JOIN 
@@ -242,7 +279,9 @@ export class ActionPlanDAO {
           "Hierarchy" h_children_4 ON h_children_4."parentId" = h_children_3."id"
         LEFT JOIN
           "Hierarchy" h_children_5 ON h_children_5."parentId" = h_children_4."id"
-      ` : Prisma.sql``}
+      `
+          : Prisma.sql``
+      }
       LEFT JOIN
         "CompanyCharacterization" cc ON cc."id" = hg."id"
       LEFT JOIN
@@ -252,32 +291,27 @@ export class ActionPlanDAO {
       ${gerWhereRawPrisma(whereTotalParams)}
     `;
 
-    const [actionplans, totalActionPlans] = await Promise.all([actionplansPromise, totalActionPlansPromise])
+    const [actionplans, totalActionPlans] = await Promise.all([actionplansPromise, totalActionPlansPromise]);
 
     return ActionPlanBrowseModelMapper.toModel({
       results: actionplans,
       pagination: { limit: pagination.limit, page: pagination.page, total: Number(totalActionPlans[0].total) },
       filters: totalActionPlans[0],
-    })
+    });
   }
 
   private browseWhere(filters: IActionPlanDAO.BrowseParams['filters']) {
-    const where = [
-      Prisma.sql`rfd."companyId" = ${filters.companyId}`,
-      Prisma.sql`rfd."endDate" IS NULL`,
-      Prisma.sql`rfd."deletedAt" IS NULL`,
-      Prisma.sql`w."id" IS NOT NULL`,
-    ]
+    const where = [Prisma.sql`rfd."companyId" = ${filters.companyId}`, Prisma.sql`rfd."endDate" IS NULL`, Prisma.sql`rfd."deletedAt" IS NULL`, Prisma.sql`w."id" IS NOT NULL`];
 
-    return where
+    return where;
   }
 
   private filterWhere(filters: IActionPlanDAO.BrowseParams['filters']) {
-    const where: Prisma.Sql[] = []
-    const having: Prisma.Sql[] = []
+    const where: Prisma.Sql[] = [];
+    const having: Prisma.Sql[] = [];
 
     if (filters.search) {
-      const search = `%${filters.search}%`
+      const search = `%${filters.search}%`;
       where.push(Prisma.sql`
         unaccent(lower(
           CASE 
@@ -286,45 +320,45 @@ export class ActionPlanDAO {
             ELSE hg."name"
           END
         )) ILIKE unaccent(lower(${search}))
-      `)
+      `);
     }
 
     if (filters.workspaceIds?.length) {
-      where.push(Prisma.sql`w."id" IN (${Prisma.join(filters.workspaceIds)})`)
-      where.push(Prisma.sql`hg_to_w."B" IN (${Prisma.join(filters.workspaceIds)})`)
+      where.push(Prisma.sql`w."id" IN (${Prisma.join(filters.workspaceIds)})`);
+      where.push(Prisma.sql`hg_to_w."B" IN (${Prisma.join(filters.workspaceIds)})`);
     }
 
     if (filters.generateSourceIds?.length) {
-      where.push(Prisma.sql`gs."id" IN (${Prisma.join(filters.generateSourceIds)})`)
+      where.push(Prisma.sql`gs."id" IN (${Prisma.join(filters.generateSourceIds)})`);
     }
 
     if (filters.responisbleIds?.length) {
-      const includeNull = filters.responisbleIds.includes(0)
+      const includeNull = filters.responisbleIds.includes(0);
 
       if (includeNull) {
-        if (filters.responisbleIds.length === 1) where.push(Prisma.sql`u_resp."id" IS NULL`)
-        else where.push(Prisma.sql`u_resp."id" IN (${Prisma.join(filters.responisbleIds.filter(Boolean))}) OR u_resp."id" IS NULL`)
+        if (filters.responisbleIds.length === 1) where.push(Prisma.sql`u_resp."id" IS NULL`);
+        else where.push(Prisma.sql`u_resp."id" IN (${Prisma.join(filters.responisbleIds.filter(Boolean))}) OR u_resp."id" IS NULL`);
       }
 
       if (!includeNull) {
-        where.push(Prisma.sql`u_resp."id" IN (${Prisma.join(filters.responisbleIds)})`)
+        where.push(Prisma.sql`u_resp."id" IN (${Prisma.join(filters.responisbleIds)})`);
       }
     }
 
     if (filters.recommendationIds?.length) {
-      where.push(Prisma.sql`rec."id" IN (${Prisma.join(filters.recommendationIds)})`)
+      where.push(Prisma.sql`rec."id" IN (${Prisma.join(filters.recommendationIds)})`);
     }
 
     if (filters.riskIds?.length) {
-      where.push(Prisma.sql`risk."id" IN (${Prisma.join(filters.riskIds)})`)
+      where.push(Prisma.sql`risk."id" IN (${Prisma.join(filters.riskIds)})`);
     }
 
     if (filters.recommendationIds?.length) {
-      where.push(Prisma.sql`rec."id" IN (${Prisma.join(filters.recommendationIds)})`)
+      where.push(Prisma.sql`rec."id" IN (${Prisma.join(filters.recommendationIds)})`);
     }
 
     if (filters.ocupationalRisks?.length) {
-      where.push(Prisma.sql`rfd."level" IN (${Prisma.join(filters.ocupationalRisks)})`)
+      where.push(Prisma.sql`rfd."level" IN (${Prisma.join(filters.ocupationalRisks)})`);
     }
     if (filters.status?.length) {
       where.push(Prisma.sql`
@@ -333,19 +367,19 @@ export class ActionPlanDAO {
           ELSE rfd_rec."status"::TEXT
         END
         IN (${Prisma.join(filters.status)})
-      `)
+      `);
     }
 
     if (typeof filters.isCanceled === 'boolean') {
-      where.push(Prisma.sql`rfd_rec."canceledDate" ${filters.isCanceled ? Prisma.sql`IS NOT` : Prisma.sql`IS`} NULL`)
+      where.push(Prisma.sql`rfd_rec."canceledDate" ${filters.isCanceled ? Prisma.sql`IS NOT` : Prisma.sql`IS`} NULL`);
     }
 
     if (typeof filters.isDone === 'boolean') {
-      where.push(Prisma.sql`rfd_rec."doneDate" ${filters.isDone ? Prisma.sql`IS NOT` : Prisma.sql`IS`} NULL`)
+      where.push(Prisma.sql`rfd_rec."doneDate" ${filters.isDone ? Prisma.sql`IS NOT` : Prisma.sql`IS`} NULL`);
     }
 
     if (typeof filters.isStarted === 'boolean') {
-      where.push(Prisma.sql`rfd_rec."startDate" ${filters.isStarted ? Prisma.sql`IS NOT` : Prisma.sql`IS`} NULL`)
+      where.push(Prisma.sql`rfd_rec."startDate" ${filters.isStarted ? Prisma.sql`IS NOT` : Prisma.sql`IS`} NULL`);
     }
 
     if (typeof filters.isExpired === 'boolean') {
@@ -360,8 +394,7 @@ export class ActionPlanDAO {
           WHEN rfd."level" = 6 THEN dd."validityStart"
           ELSE NULL::timestamp 
         END 
-        ${filters.isExpired ? Prisma.sql`<=` : Prisma.sql`>`} NOW()`
-      )
+        ${filters.isExpired ? Prisma.sql`<=` : Prisma.sql`>`} NOW()`);
     }
 
     if (filters.hierarchyIds?.length) {
@@ -377,14 +410,14 @@ export class ActionPlanDAO {
           h_children_3."id" IN (${Prisma.join(filters.hierarchyIds)}) OR
           h_children_4."id" IN (${Prisma.join(filters.hierarchyIds)}) OR
           h_children_5."id" IN (${Prisma.join(filters.hierarchyIds)})
-        `)
+        `);
     }
 
-    return { filterWhere: where, filterHaving: having }
+    return { filterWhere: where, filterHaving: having };
   }
 
   private browseOrderBy(orderBy: IActionPlanDAO.BrowseParams['orderBy'] = []) {
-    const desiredOrder = [ActionPlanStatusEnum.REJECTED, ActionPlanStatusEnum.PROGRESS, ActionPlanStatusEnum.PENDING, ActionPlanStatusEnum.DONE, ActionPlanStatusEnum.CANCELED]
+    const desiredOrder = [ActionPlanStatusEnum.REJECTED, ActionPlanStatusEnum.PROGRESS, ActionPlanStatusEnum.PENDING, ActionPlanStatusEnum.DONE, ActionPlanStatusEnum.CANCELED];
 
     const map: Record<ActionPlanOrderByEnum, string> = {
       [ActionPlanOrderByEnum.UPDATED_AT]: 'rfd_rec_updated_at',
@@ -399,7 +432,7 @@ export class ActionPlanDAO {
       [ActionPlanOrderByEnum.STATUS]: `
         CASE rfd_rec.status 
           ${desiredOrder.map((type, index) => `WHEN '${type}' THEN ${index}`).join(' ')} 
-          ELSE ${desiredOrder.findIndex(type => type === ActionPlanStatusEnum.PENDING)} 
+          ELSE ${desiredOrder.findIndex((type) => type === ActionPlanStatusEnum.PENDING)} 
         END
       `,
       [ActionPlanOrderByEnum.ORIGIN]: 'origin',
@@ -410,18 +443,16 @@ export class ActionPlanDAO {
           ELSE rfd."level"
         END
       `,
-    }
+    };
 
+    const orderByRaw = orderBy.map<IOrderByRawPrisma>(({ field, order }) => ({ column: map[field], order }));
+    orderByRaw.push({ column: 'rec_id', order: OrderByDirectionEnum.ASC });
+    orderByRaw.push({ column: 'rfd_rec_id', order: OrderByDirectionEnum.ASC });
+    orderByRaw.push({ column: 'rfd_id', order: OrderByDirectionEnum.ASC });
+    orderByRaw.push({ column: 'w_id', order: OrderByDirectionEnum.ASC });
+    orderByRaw.push({ column: 'hg_id', order: OrderByDirectionEnum.ASC });
+    orderByRaw.push({ column: 'cc_id', order: OrderByDirectionEnum.ASC });
 
-
-    const orderByRaw = orderBy.map<IOrderByRawPrisma>(({ field, order }) => ({ column: map[field], order }))
-    orderByRaw.push({ column: 'rec_id', order: OrderByDirectionEnum.ASC })
-    orderByRaw.push({ column: 'rfd_rec_id', order: OrderByDirectionEnum.ASC })
-    orderByRaw.push({ column: 'rfd_id', order: OrderByDirectionEnum.ASC })
-    orderByRaw.push({ column: 'w_id', order: OrderByDirectionEnum.ASC })
-    orderByRaw.push({ column: 'hg_id', order: OrderByDirectionEnum.ASC })
-    orderByRaw.push({ column: 'cc_id', order: OrderByDirectionEnum.ASC })
-
-    return orderByRaw
+    return orderByRaw;
   }
 }

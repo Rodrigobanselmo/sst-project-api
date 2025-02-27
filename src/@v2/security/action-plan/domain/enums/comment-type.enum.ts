@@ -1,5 +1,6 @@
 export enum CommentTypeEnum {
-    POSTPONED = 'POSTPONED',
-    CANCELED = 'CANCELED',
-    DONE = 'DONE',
+  POSTPONED = 'POSTPONED',
+  CANCELED = 'CANCELED',
+  PROGRESS = 'PROGRESS',
+  DONE = 'DONE',
 }

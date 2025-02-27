@@ -2068,6 +2068,7 @@ enum RiskFactorsEnum {
 enum RiskRecTypeEnum {
   CANCELED
   POSTPONED
+  PROGRESS
   DONE
 }
 

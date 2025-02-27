@@ -129,7 +129,7 @@ export class CommentDAO {
   }
 
   private browseWhere(filters: ICommentDAO.BrowseParams['filters']) {
-    const where = [Prisma.sql`rfs_rec."companyId" = ${filters.companyId}`];
+    const where = [Prisma.sql`rfs_rec."companyId" = ${filters.companyId}`, Prisma.sql`comment."type" <> 'PROGRESS'`];
 
     return where;
   }
@@ -171,12 +171,7 @@ export class CommentDAO {
     if (!orderBy) return [];
 
     const desiredTypeOrder = [RiskRecTypeEnum.POSTPONED, RiskRecTypeEnum.DONE, RiskRecTypeEnum.CANCELED];
-    const desiredTextTypeOrder = [
-      RiskRecTextTypeEnum.MONEY,
-      RiskRecTextTypeEnum.LOGISTICS,
-      RiskRecTextTypeEnum.TECHNIQUE,
-      RiskRecTextTypeEnum.OTHER,
-    ];
+    const desiredTextTypeOrder = [RiskRecTextTypeEnum.MONEY, RiskRecTextTypeEnum.LOGISTICS, RiskRecTextTypeEnum.TECHNIQUE, RiskRecTextTypeEnum.OTHER];
 
     const map: Record<CommentOrderByEnum, string> = {
       [CommentOrderByEnum.UPDATED_AT]: 'comment."updated_at"',
