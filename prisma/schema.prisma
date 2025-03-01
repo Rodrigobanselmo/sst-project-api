@@ -1662,11 +1662,25 @@ model RiskFactorDataRec {
   recMed           RecMed                      @relation(fields: [recMedId], references: [id])
   riskFactorData   RiskFactorData              @relation(fields: [riskFactorDataId], references: [id])
   comments         RiskFactorDataRecComments[]
+  photos           RiskFactorDataRecPhoto[]
 
   responsible   User? @relation(fields: [responsibleId], references: [id])
   responsibleId Int?
 
   @@unique([riskFactorDataId, recMedId, workspaceId])
+}
+
+model RiskFactorDataRecPhoto {
+  id          String    @id @default(uuid())
+  name        String
+  is_vertical Boolean   @default(false)
+  url         String
+  created_at  DateTime  @default(now())
+  deleted_at  DateTime?
+  updated_at  DateTime  @updatedAt
+
+  risk_data_rec_id String
+  risk_data_rec    RiskFactorDataRec @relation(fields: [risk_data_rec_id], references: [id])
 }
 
 model RiskFactorDataRecComments {

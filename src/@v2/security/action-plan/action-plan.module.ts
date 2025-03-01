@@ -34,6 +34,7 @@ import { BrowseHierarchiesController } from './application/hierarchy/browse-hier
 import { BrowseCommentCreatorsController } from './application/user/browse-comment-creators/controllers/browse-comment-creators.controller';
 import { BrowseCommentCreatorsUseCase } from './application/user/browse-comment-creators/use-cases/browse-comment-creators.usecase';
 import { ResponsibleDAO } from './database/dao/responsible/responsible.dao';
+import { OriginDAO } from './database/dao/origin/origin.dao';
 
 @Module({
   imports: [SharedModule],
@@ -62,6 +63,7 @@ import { ResponsibleDAO } from './database/dao/responsible/responsible.dao';
     UserDAO,
     HierarchyDAO,
     ResponsibleDAO,
+    OriginDAO,
 
     // Use Cases
     BrowseActionPlanUseCase,
