@@ -1,0 +1,15 @@
+meta {
+  name: browse educational stages
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{url}}/{{version}}/educational-stages
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

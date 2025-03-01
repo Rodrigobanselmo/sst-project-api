@@ -1,0 +1,22 @@
+meta {
+  name: browse-users
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{url}}/{{version}}/users?limit=15&offset=0&institution_id=2
+  body: none
+  auth: bearer
+}
+
+params:query {
+  limit: 15
+  offset: 0
+  institution_id: 2
+  ~user_id: 15
+}
+
+auth:bearer {
+  token: {{token}}
+}

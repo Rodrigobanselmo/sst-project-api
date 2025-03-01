@@ -1,0 +1,15 @@
+meta {
+  name: Get SaaS Settings
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{url}}/{{version}}/saas-settings
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

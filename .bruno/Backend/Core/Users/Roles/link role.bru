@@ -1,0 +1,27 @@
+meta {
+  name: link role
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{url}}/{{version}}/users/:userId/roles
+  body: json
+  auth: bearer
+}
+
+params:path {
+  userId: 15
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+      "institutionId": 4,
+      "profileId": 9,
+      "companyPositionId": 1
+  }
+}

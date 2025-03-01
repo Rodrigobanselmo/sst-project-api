@@ -1,0 +1,23 @@
+meta {
+  name: add image
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{url}}/{{version}}/users/:userId/images
+  body: multipartForm
+  auth: bearer
+}
+
+params:path {
+  userId: 15
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:multipart-form {
+  image: @file(postman-cloud:///1eeed29a-4ac6-4e70-a36f-b2f346fa2f5f)
+}

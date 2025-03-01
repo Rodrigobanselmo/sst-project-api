@@ -1,0 +1,29 @@
+meta {
+  name: edit health insurance
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{url}}/{{version}}/users/:userId/health-insurances/:healthInsuranceId
+  body: multipartForm
+  auth: bearer
+}
+
+params:path {
+  userId: 15
+  healthInsuranceId: 22
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:multipart-form {
+  insuranceCompany: qweqe
+  code: 22
+  plan: 33
+  validUntil: Wed Apr 03 2024 11:25:52 GMT-0300 (Brasilia Standard Time)
+  file: @file(postman-cloud:///1eeed29a-4ac6-4e70-a36f-b2f346fa2f5f)
+  ~insuranceCompany: qweqwe
+}

@@ -1,0 +1,29 @@
+meta {
+  name: edit professional reference
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{url}}/{{version}}/users/:userId/professional-references/:professionalReferenceId
+  body: json
+  auth: bearer
+}
+
+params:path {
+  userId: 15
+  professionalReferenceId: 51
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+      "name": "Teste 2",
+      "professionalType": "PSYCHIATRIST",
+      "telephone": "12996818163",
+      "email": "rodrigo@rodrigo.com"
+  }
+}

@@ -1,0 +1,19 @@
+meta {
+  name: browse professional reference
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{url}}/{{version}}/users/:userId/professional-references
+  body: none
+  auth: bearer
+}
+
+params:path {
+  userId: 15
+}
+
+auth:bearer {
+  token: {{token}}
+}

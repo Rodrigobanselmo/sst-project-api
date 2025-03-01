@@ -1,0 +1,19 @@
+meta {
+  name: delete profile
+  type: http
+  seq: 3
+}
+
+delete {
+  url: {{url}}/{{version}}/profiles/:id
+  body: none
+  auth: bearer
+}
+
+params:path {
+  id: 47
+}
+
+auth:bearer {
+  token: {{token}}
+}

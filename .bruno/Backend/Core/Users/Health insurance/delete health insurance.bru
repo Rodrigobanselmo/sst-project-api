@@ -1,0 +1,20 @@
+meta {
+  name: delete health insurance
+  type: http
+  seq: 3
+}
+
+delete {
+  url: {{url}}/{{version}}/users/:userId/health-insurances/:healthInsuranceId
+  body: none
+  auth: bearer
+}
+
+params:path {
+  userId: 15
+  healthInsuranceId: 22
+}
+
+auth:bearer {
+  token: {{token}}
+}

@@ -1,0 +1,20 @@
+meta {
+  name: remove responsible
+  type: http
+  seq: 2
+}
+
+delete {
+  url: {{url}}/{{version}}/users/:userId/responsible/:reponsibleId
+  body: none
+  auth: bearer
+}
+
+params:path {
+  userId: 15
+  reponsibleId: 50
+}
+
+auth:bearer {
+  token: {{token}}
+}

@@ -1,0 +1,29 @@
+meta {
+  name: add user
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{url}}/{{version}}/users
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+      "role": {
+          "profileId": 5,
+          "institutionId": null,
+          "healthRegister": "45678391023871"
+      },
+      "lastName": "cininho",
+      "name": "mediciicocon",
+      "email": "cininintho@email.com",
+      "telephone": "(12) 9587-55062"
+  }
+}

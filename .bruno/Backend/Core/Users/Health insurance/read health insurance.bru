@@ -1,0 +1,20 @@
+meta {
+  name: read health insurance
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{url}}/{{version}}/users/:userId/health-insurances/:healthInsuranceId
+  body: none
+  auth: bearer
+}
+
+params:path {
+  userId: 15
+  healthInsuranceId: 23
+}
+
+auth:bearer {
+  token: {{token}}
+}

@@ -1,0 +1,19 @@
+meta {
+  name: read user
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{url}}/{{version}}/users/:userId
+  body: none
+  auth: bearer
+}
+
+params:path {
+  userId: 15
+}
+
+auth:bearer {
+  token: {{token}}
+}

@@ -1,0 +1,20 @@
+meta {
+  name: delete professional reference
+  type: http
+  seq: 3
+}
+
+delete {
+  url: {{url}}/{{version}}/users/:userId/professional-references/:professionalReferenceId
+  body: none
+  auth: bearer
+}
+
+params:path {
+  userId: 15
+  professionalReferenceId: 51
+}
+
+auth:bearer {
+  token: {{token}}
+}
