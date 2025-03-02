@@ -40,6 +40,7 @@ export type IActionPlanBrowseResultModelMapper = {
   risk_name: string;
   risk_id: string;
   risk_type: RiskFactorsEnum;
+  hg_id: string;
   hg_name: string;
   hg_type: PrismaHomoTypeEnum | null;
   cc_name: string | null;
@@ -86,6 +87,7 @@ export class ActionPlanBrowseResultModelMapper {
             }
           : null,
       homogeneousGroup: {
+        id: prisma.hg_id,
         name: prisma.hg_name,
         type: prisma.hg_type ? HomoTypeEnum[prisma.hg_type] : null,
         characterization:

@@ -35,6 +35,8 @@ import { BrowseCommentCreatorsController } from './application/user/browse-comme
 import { BrowseCommentCreatorsUseCase } from './application/user/browse-comment-creators/use-cases/browse-comment-creators.usecase';
 import { ResponsibleDAO } from './database/dao/responsible/responsible.dao';
 import { OriginDAO } from './database/dao/origin/origin.dao';
+import { FindOriginController } from './application/origin/read-origin/controllers/read-origin.controller';
+import { ReadOriginUseCase } from './application/origin/read-origin/use-cases/find-origin.usecase';
 
 @Module({
   imports: [SharedModule],
@@ -50,6 +52,7 @@ import { OriginDAO } from './database/dao/origin/origin.dao';
     BrowseHierarchiesController,
     BrowseCommentsController,
     BrowseCommentCreatorsController,
+    FindOriginController,
   ],
   providers: [
     // Database
@@ -77,6 +80,7 @@ import { OriginDAO } from './database/dao/origin/origin.dao';
     BrowseHierarchiesUseCase,
     BrowseCommentsUseCase,
     BrowseCommentCreatorsUseCase,
+    ReadOriginUseCase,
 
     // Services
     EditActionPlanService,

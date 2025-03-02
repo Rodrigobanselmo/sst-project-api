@@ -14,21 +14,20 @@ export class OriginDAO {
       name: true,
       type: true,
       companyId: true,
-      riskFactorData: {
+      hierarchyOnHomogeneous: {
         select: {
-          recs: {
+          hierarchy: {
             select: {
-              dataRecs: {
-                select: {
-                  photos: true,
-                },
-              },
+              name: true,
+              type: true,
             },
           },
         },
       },
       characterization: {
         select: {
+          name: true,
+          type: true,
           photos: true,
         },
       },
@@ -51,6 +50,7 @@ export class OriginDAO {
         risk_data_rec: {
           workspaceId: params.workspaceId,
           companyId: params.companyId,
+          recMedId: params.recommendationId,
           riskFactorData: {
             homogeneousGroupId: params.id,
           },

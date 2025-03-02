@@ -1,11 +1,11 @@
-import { HomoTypeEnum } from '@/@v2/shared/domain/enum/security/homo-type.enum';
+import { OriginTypeEnum } from '@/@v2/shared/domain/enum/security/origin-type.enum';
 import { OriginPhotoModel } from './origin-photo.model';
 
 export type IOriginModel = {
   id: string;
   companyId: string;
   name: string;
-  type: HomoTypeEnum;
+  type: OriginTypeEnum;
 
   recommendationPhotos: OriginPhotoModel[];
   characterizationPhotos: OriginPhotoModel[];
@@ -15,7 +15,7 @@ export class OriginModel {
   id: string;
   companyId: string;
   name: string;
-  type: HomoTypeEnum;
+  type: OriginTypeEnum;
 
   recommendationPhotos: OriginPhotoModel[];
   characterizationPhotos: OriginPhotoModel[];

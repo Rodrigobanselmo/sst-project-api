@@ -16,13 +16,14 @@ headers {
 
 body:json {
   {
-      "access": "{{access}}",
+      "email": "{{access}}",
       "password": "{{password}}"
   }
 }
 
 tests {
   const r = res.getBody()
-  bru.setEnvVar("token", r.accessToken)
+  bru.setEnvVar("token", r.token)
+  
   
 }

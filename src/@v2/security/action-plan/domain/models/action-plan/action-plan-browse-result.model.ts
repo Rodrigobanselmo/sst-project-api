@@ -25,6 +25,7 @@ export type IActionPlanBrowseResultModel = {
   risk: { id: string; name: string; type: RiskTypeEnum };
   responsible: { id: string; name: string } | null;
   homogeneousGroup: {
+    id: string;
     name: string;
     type: HomoTypeEnum | null;
     characterization: { name: string; type: CharacterizationTypeEnum } | null;
@@ -61,7 +62,7 @@ export class ActionPlanBrowseResultModel {
   recommendation: { name: string; type: RecommendationTypeEnum };
   generateSources: { id: string; name: string }[];
   risk: { id: string; name: string; type: RiskTypeEnum };
-  origin: { name: string; type: OriginTypeEnum };
+  origin: { id: string; name: string; type: OriginTypeEnum };
   status: ActionPlanStatusEnum;
   hierarchies: { name: string; type: HierarchyTypeEnum }[];
   responsible: { id: string; name: string } | null;
@@ -109,6 +110,9 @@ export class ActionPlanBrowseResultModel {
       : null;
 
     this.validDate = getValidDateActionPlan({ ...params, level: params.ocupationalRisk });
-    this.origin = getOriginHomogeneousGroup(params.homogeneousGroup);
+    this.origin = {
+      id: params.homogeneousGroup.id,
+      ...getOriginHomogeneousGroup(params.homogeneousGroup),
+    };
   }
 }
