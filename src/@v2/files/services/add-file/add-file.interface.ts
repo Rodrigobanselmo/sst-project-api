@@ -10,6 +10,8 @@ export namespace IAddFileService {
     shouldDelete?: boolean;
     bucket?: string;
     size: number;
+    metadata?: Record<string, any>;
+    isPublic?: boolean;
   };
 
   export type Result = Promise<DomainResponse<FileEntity>>;

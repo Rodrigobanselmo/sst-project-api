@@ -136,9 +136,7 @@ export class ActionPlanAggregateRepository implements IActionPlanAggregateReposi
     });
   }
 
-  async updateMany(
-    params: IActionPlanAggregateRepository.UpdateManyParams,
-  ): IActionPlanAggregateRepository.UpdateManyReturn {
+  async updateMany(params: IActionPlanAggregateRepository.UpdateManyParams): IActionPlanAggregateRepository.UpdateManyReturn {
     await this.prisma.$transaction(async (tx) => {
       await asyncBatch({
         items: params,

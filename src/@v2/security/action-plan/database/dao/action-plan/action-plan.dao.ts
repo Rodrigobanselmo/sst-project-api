@@ -11,10 +11,63 @@ import { ActionPlanBrowseModelMapper } from '../../mappers/models/action-plan/ac
 import { ActionPlanOrderByEnum, IActionPlanDAO } from './action-plan.types';
 import { ActionPlanStatusEnum } from '../../../domain/enums/action-plan-status.enum';
 import { OrderByDirectionEnum } from '@/@v2/shared/types/order-by.types';
+import { ActionPlanReadMapper } from '../../mappers/models/action-plan/action-plan-read.mapper';
 
 @Injectable()
 export class ActionPlanDAO {
   constructor(private readonly prisma: PrismaServiceV2) {}
+
+  async find(params: IActionPlanDAO.FindParams) {
+    const homogeneousGroupPromise = this.prisma.homogeneousGroup.findFirst({
+      where: {
+        riskFactorData: {
+          some: { id: params.riskDataId },
+        },
+        companyId: params.companyId,
+      },
+      select: {
+        id: true,
+        name: true,
+        type: true,
+        companyId: true,
+        hierarchyOnHomogeneous: {
+          select: {
+            hierarchy: {
+              select: {
+                name: true,
+                type: true,
+              },
+            },
+          },
+        },
+        characterization: {
+          select: {
+            name: true,
+            type: true,
+            photos: true,
+          },
+        },
+      },
+    });
+
+    const photosPromise = this.prisma.riskFactorDataRecPhoto.findMany({
+      where: {
+        risk_data_rec: {
+          workspaceId: params.workspaceId,
+          companyId: params.companyId,
+          recMedId: params.recommendationId,
+          riskFactorDataId: params.riskDataId,
+        },
+      },
+      include: {
+        file: true,
+      },
+    });
+
+    const [homogeneousGroup, photos] = await Promise.all([homogeneousGroupPromise, photosPromise]);
+
+    return homogeneousGroup ? ActionPlanReadMapper.toModel({ homogeneousGroup, photos }) : null;
+  }
 
   async browse({ limit, page, orderBy, filters }: IActionPlanDAO.BrowseParams) {
     const pagination = getPagination(page, limit);

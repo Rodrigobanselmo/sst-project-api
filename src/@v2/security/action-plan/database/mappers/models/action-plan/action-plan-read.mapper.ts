@@ -1,12 +1,12 @@
-import { OriginPhotoModel } from '@/@v2/security/action-plan/domain/models/origin/origin-photo.model';
-import { OriginModel } from '@/@v2/security/action-plan/domain/models/origin/origin.model';
+import { ActionPlanReadPhotoModel } from '@/@v2/security/action-plan/domain/models/action-plan/action-plan-read-photo.model';
+import { ActionPlanReadModel } from '@/@v2/security/action-plan/domain/models/action-plan/action-plan-read.model';
 import { HierarchyTypeEnum } from '@/@v2/shared/domain/enum/company/hierarchy-type.enum';
 import { CharacterizationTypeEnum } from '@/@v2/shared/domain/enum/security/characterization-type.enum';
 import { HomoTypeEnum } from '@/@v2/shared/domain/enum/security/homo-type.enum';
 import { getOriginHomogeneousGroup } from '@/@v2/shared/domain/functions/security/get-origin-homogeneous-group.func';
 import { CharacterizationTypeEnum as PrismaCharacterizationTypeEnum, CompanyCharacterizationPhoto, HomogeneousGroup, HierarchyEnum } from '@prisma/client';
 
-export type IOriginMapper = {
+export type IActionPlanReadMapper = {
   homogeneousGroup: Pick<HomogeneousGroup, 'companyId' | 'id' | 'name' | 'type'> & {
     hierarchyOnHomogeneous: {
       hierarchy: {
@@ -23,18 +23,22 @@ export type IOriginMapper = {
 
   photos: {
     id: string;
-    name: string;
     is_vertical: boolean;
-    url: string;
-    created_at: Date;
+    file_id: string;
     deleted_at: Date | null;
-    updated_at: Date;
     risk_data_rec_id: string;
+
+    file: {
+      name: string;
+      url: string;
+      created_at: Date;
+      updated_at: Date;
+    };
   }[];
 };
 
-export class OriginMapper {
-  static toModel({ homogeneousGroup, photos }: IOriginMapper): OriginModel {
+export class ActionPlanReadMapper {
+  static toModel({ homogeneousGroup, photos }: IActionPlanReadMapper): ActionPlanReadModel {
     const origin = getOriginHomogeneousGroup({
       characterization: homogeneousGroup.characterization
         ? {
@@ -52,23 +56,23 @@ export class OriginMapper {
       type: homogeneousGroup.type as HomoTypeEnum,
     });
 
-    return new OriginModel({
+    return new ActionPlanReadModel({
       id: homogeneousGroup.id,
       name: origin.name,
       type: origin.type,
       companyId: homogeneousGroup.companyId,
       recommendationPhotos: photos.map(
         (photo) =>
-          new OriginPhotoModel({
+          new ActionPlanReadPhotoModel({
             id: photo.id,
             isVertical: photo.is_vertical,
-            name: photo.name,
-            url: photo.url,
+            name: photo.file.name,
+            url: photo.file.url,
           }),
       ),
       characterizationPhotos: homogeneousGroup.characterization?.photos.map(
         (photo) =>
-          new OriginPhotoModel({
+          new ActionPlanReadPhotoModel({
             id: photo.id,
             isVertical: photo.isVertical,
             name: photo.name,
@@ -78,7 +82,7 @@ export class OriginMapper {
     });
   }
 
-  static toModels(data: IOriginMapper[]): OriginModel[] {
-    return data.map((Origin) => this.toModel(Origin));
+  static toModels(data: IActionPlanReadMapper[]): ActionPlanReadModel[] {
+    return data.map((ActionPlan) => this.toModel(ActionPlan));
   }
 }

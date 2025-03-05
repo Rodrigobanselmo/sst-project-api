@@ -1,0 +1,22 @@
+meta {
+  name: Get Action Plan
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{url}}/v2/companies/:companyId/action-plans/:workspaceId/:riskDataId/:recommendationId
+  body: none
+  auth: bearer
+}
+
+params:path {
+  riskDataId: 417af75a-2e08-45ea-bdc4-828303f56d94
+  recommendationId: 8a3d32b3-ddd3-42f1-8ba0-cc46010917c7
+  companyId: {{companyId}}
+  workspaceId: {{workspaceId}}
+}
+
+auth:bearer {
+  token: {{token}}
+}

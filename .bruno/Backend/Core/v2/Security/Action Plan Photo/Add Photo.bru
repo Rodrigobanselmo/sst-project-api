@@ -1,0 +1,26 @@
+meta {
+  name: Add Photo
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{url}}/v2/companies/:companyId/action-plans/photo
+  body: multipartForm
+  auth: bearer
+}
+
+params:path {
+  companyId: {{companyId}}
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:multipart-form {
+  recommendationId: 8a3d32b3-ddd3-42f1-8ba0-cc46010917c7
+  riskDataId: 417af75a-2e08-45ea-bdc4-828303f56d94
+  workspaceId: {{workspaceId}}
+  file: @file(/Users/rodrigoanselmo/Downloads/Captura de Tela 2025-01-15 às 18.25.01.png)
+}

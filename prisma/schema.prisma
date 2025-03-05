@@ -637,11 +637,13 @@ model SystemFile {
   should_delete Boolean  @default(false)
   created_at    DateTime @default(now())
   updated_at    DateTime @updatedAt
+  metadata      Json?
 
   company_id String
   company    Company @relation(fields: [company_id], references: [id])
 
-  document_control_files DocumentControlFile[]
+  document_control_files           DocumentControlFile[]
+  action_plan_recommendation_photo RiskFactorDataRecPhoto[]
 
   @@unique([id, company_id])
   @@index([company_id])
@@ -1672,12 +1674,11 @@ model RiskFactorDataRec {
 
 model RiskFactorDataRecPhoto {
   id          String    @id @default(uuid())
-  name        String
   is_vertical Boolean   @default(false)
-  url         String
-  created_at  DateTime  @default(now())
   deleted_at  DateTime?
-  updated_at  DateTime  @updatedAt
+
+  file_id String
+  file    SystemFile @relation(fields: [file_id], references: [id])
 
   risk_data_rec_id String
   risk_data_rec    RiskFactorDataRec @relation(fields: [risk_data_rec_id], references: [id])

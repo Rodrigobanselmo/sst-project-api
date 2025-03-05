@@ -1,8 +1,8 @@
-export namespace IFindOriginUseCase {
+export namespace IFindActionPlanUseCase {
   export type Params = {
     companyId: string;
     workspaceId: string;
-    id: string;
+    riskDataId: string;
     recommendationId: string;
   };
 }

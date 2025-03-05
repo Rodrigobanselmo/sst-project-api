@@ -7,6 +7,7 @@ export const ActionPlanRoutes = {
     BROWSE: 'v2/companies/:companyId/action-plans',
     EDIT: 'v2/companies/:companyId/action-plans',
     EDIT_MANY: 'v2/companies/:companyId/action-plans/many',
+    GET: 'v2/companies/:companyId/action-plans/:workspaceId/:riskDataId/:recommendationId',
     PHOTO: {
       ADD: 'v2/companies/:companyId/action-plans/photo',
       EDIT: 'v2/companies/:companyId/action-plans/photo/:photoId',
@@ -28,8 +29,5 @@ export const ActionPlanRoutes = {
   },
   HIERARCHY: {
     BROWSE: 'v2/companies/:companyId/action-plans/hierarchies',
-  },
-  ORIGIN: {
-    GET: 'v2/companies/:companyId/workspaces/:workspaceId/origin/:id/recommendation/:recommendationId',
   },
 } as const;

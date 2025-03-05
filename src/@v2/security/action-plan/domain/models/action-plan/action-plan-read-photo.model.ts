@@ -1,17 +1,17 @@
-export type IOriginPhotoModel = {
+export type IActionPlanPhotoModel = {
   id: string;
   name: string;
   isVertical: boolean;
   url: string;
 };
 
-export class OriginPhotoModel {
+export class ActionPlanReadPhotoModel {
   id: string;
   name: string;
   isVertical: boolean;
   url: string;
 
-  constructor(params: IOriginPhotoModel) {
+  constructor(params: IActionPlanPhotoModel) {
     this.id = params.id;
     this.name = params.name;
     this.isVertical = params.isVertical;

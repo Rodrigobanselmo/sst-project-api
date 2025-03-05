@@ -4,13 +4,13 @@ import { ActionPlanRoutes } from '@/@v2/security/action-plan/constants/routes';
 import { JwtAuthGuard } from '@/@v2/shared/guards/jwt-auth.guard';
 import { PermissionEnum } from '@/shared/constants/enum/authorization';
 import { Permissions } from '@/shared/decorators/permissions.decorator';
-import { ReadOriginUseCase } from '../use-cases/find-origin.usecase';
-import { FindOriginPath } from './read-origin.path';
+import { ReadActionPlanUseCase } from '../use-cases/read-action-plan.usecase';
+import { FindActionPlanPath } from './read-action-plan.path';
 
-@Controller(ActionPlanRoutes.ORIGIN.GET)
+@Controller(ActionPlanRoutes.ACTION_PLAN.GET)
 @UseGuards(JwtAuthGuard)
-export class FindOriginController {
-  constructor(private readonly findActionPlanUseCase: ReadOriginUseCase) {}
+export class ReadActionPlanController {
+  constructor(private readonly findActionPlanUseCase: ReadActionPlanUseCase) {}
 
   @Get()
   @Permissions({
@@ -19,11 +19,11 @@ export class FindOriginController {
     isMember: true,
     crud: true,
   })
-  async find(@Param() path: FindOriginPath) {
+  async find(@Param() path: FindActionPlanPath) {
     return this.findActionPlanUseCase.execute({
       companyId: path.companyId,
       workspaceId: path.workspaceId,
-      id: path.id,
+      riskDataId: path.riskDataId,
       recommendationId: path.recommendationId,
     });
   }

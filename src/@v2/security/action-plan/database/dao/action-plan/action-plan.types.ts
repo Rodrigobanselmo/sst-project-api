@@ -1,5 +1,5 @@
-import { ActionPlanStatusEnum } from "@/@v2/security/action-plan/domain/enums/action-plan-status.enum";
-import { IOrderBy } from "@/@v2/shared/types/order-by.types";
+import { ActionPlanStatusEnum } from '@/@v2/security/action-plan/domain/enums/action-plan-status.enum';
+import { IOrderBy } from '@/@v2/shared/types/order-by.types';
 
 export enum ActionPlanOrderByEnum {
   ORIGIN = 'ORIGIN',
@@ -18,6 +18,13 @@ export enum ActionPlanOrderByEnum {
 }
 
 export namespace IActionPlanDAO {
+  export type FindParams = {
+    companyId: string;
+    workspaceId: string;
+    riskDataId: string;
+    recommendationId: string;
+  };
+
   export type BrowseParams = {
     orderBy?: IOrderBy<ActionPlanOrderByEnum>;
     limit?: number;
@@ -38,6 +45,5 @@ export namespace IActionPlanDAO {
       isCanceled?: boolean;
       isExpired?: boolean;
     };
-  }
+  };
 }
-

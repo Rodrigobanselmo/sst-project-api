@@ -1,6 +1,6 @@
 import { IsString } from 'class-validator';
 
-export class FindOriginPath {
+export class FindActionPlanPath {
   @IsString()
   companyId!: string;
 
@@ -8,8 +8,8 @@ export class FindOriginPath {
   workspaceId!: string;
 
   @IsString()
-  recommendationId!: string;
+  riskDataId!: string;
 
   @IsString()
-  id!: string;
+  recommendationId!: string;
 }

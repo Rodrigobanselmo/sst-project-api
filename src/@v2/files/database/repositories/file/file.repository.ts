@@ -36,6 +36,7 @@ export class FileRepository {
         url: params.url,
         should_delete: params.shouldDelete,
         size: params.size,
+        metadata: params.metadata,
       },
     });
 

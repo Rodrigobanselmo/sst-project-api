@@ -19,6 +19,7 @@ export class AddFileService {
       file: params.buffer,
       fileFolder: params.fileFolder.replace(':companyId', params.companyId),
       fileName: params.fileName,
+      isPublic: params.isPublic,
     });
 
     const document = new FileEntity({
@@ -29,6 +30,7 @@ export class AddFileService {
       companyId: params.companyId,
       shouldDelete: params.shouldDelete,
       size: params.size,
+      metadata: params.metadata,
     });
 
     const file = await this.fileRepository.create(document);

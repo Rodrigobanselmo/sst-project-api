@@ -1,26 +1,26 @@
 import { OriginTypeEnum } from '@/@v2/shared/domain/enum/security/origin-type.enum';
-import { OriginPhotoModel } from './origin-photo.model';
+import { ActionPlanReadPhotoModel } from './action-plan-read-photo.model';
 
-export type IOriginModel = {
+export type IActionPlanReadModel = {
   id: string;
   companyId: string;
   name: string;
   type: OriginTypeEnum;
 
-  recommendationPhotos: OriginPhotoModel[];
-  characterizationPhotos: OriginPhotoModel[];
+  recommendationPhotos: ActionPlanReadPhotoModel[];
+  characterizationPhotos: ActionPlanReadPhotoModel[];
 };
 
-export class OriginModel {
+export class ActionPlanReadModel {
   id: string;
   companyId: string;
   name: string;
   type: OriginTypeEnum;
 
-  recommendationPhotos: OriginPhotoModel[];
-  characterizationPhotos: OriginPhotoModel[];
+  recommendationPhotos: ActionPlanReadPhotoModel[];
+  characterizationPhotos: ActionPlanReadPhotoModel[];
 
-  constructor(params: IOriginModel) {
+  constructor(params: IActionPlanReadModel) {
     this.id = params.id;
     this.name = params.name;
     this.type = params.type;
