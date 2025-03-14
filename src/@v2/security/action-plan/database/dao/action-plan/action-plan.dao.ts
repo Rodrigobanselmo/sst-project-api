@@ -30,6 +30,21 @@ export class ActionPlanDAO {
         name: true,
         type: true,
         companyId: true,
+        riskFactorData: {
+          where: {
+            id: params.riskDataId,
+          },
+          select: {
+            recs: {
+              select :{ 
+                recName: true
+              },
+              where:{ 
+                id: params.recommendationId
+              }
+            }
+          }
+        },
         hierarchyOnHomogeneous: {
           select: {
             hierarchy: {
@@ -52,6 +67,7 @@ export class ActionPlanDAO {
 
     const photosPromise = this.prisma.riskFactorDataRecPhoto.findMany({
       where: {
+        deleted_at: null,
         risk_data_rec: {
           workspaceId: params.workspaceId,
           companyId: params.companyId,

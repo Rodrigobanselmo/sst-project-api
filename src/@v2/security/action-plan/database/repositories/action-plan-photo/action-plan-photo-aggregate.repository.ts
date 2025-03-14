@@ -134,6 +134,14 @@ export class ActionPlanPhotoAggregateRepository implements IActionPlanPhotoAggre
   }
 
   async find(params: IActionPlanPhotoAggregateRepository.FindParams): IActionPlanPhotoAggregateRepository.FindReturn {
+    const workspace = await this.prisma.riskFactorDataRecPhoto.findFirst({
+      select: { risk_data_rec: { select: { workspaceId: true } } },
+      where: { id: params.id },
+    });
+
+    const workspaceId = workspace.risk_data_rec.workspaceId;
+    if (!workspaceId) return null;
+
     const actionPlanPhoto = await this.prisma.riskFactorDataRecPhoto.findFirst({
       where: {
         id: params.id,
@@ -144,11 +152,23 @@ export class ActionPlanPhotoAggregateRepository implements IActionPlanPhotoAggre
       include: {
         file: true,
         risk_data_rec: {
-          ...ActionPlanPhotoAggregateRepository.selectOptions(params),
+          ...ActionPlanPhotoAggregateRepository.selectOptions({ workspaceId }),
         },
       },
     });
 
     return actionPlanPhoto ? ActionPlanPhotoAggregateMapper.toAggregate(actionPlanPhoto) : null;
+  }
+
+  async inactivate(params: IActionPlanPhotoAggregateRepository.InactivateParams): IActionPlanPhotoAggregateRepository.InactivateReturn {
+    const actionPlanPhoto = await this.prisma.riskFactorDataRecPhoto.update({
+      where: { id: params.photo.id },
+      data: {
+        deleted_at: new Date(),
+      },
+      select: { id: true },
+    });
+
+    return !!actionPlanPhoto;
   }
 }

@@ -7,7 +7,7 @@ import { Permissions } from '@/shared/decorators/permissions.decorator';
 import { ReadActionPlanUseCase } from '../use-cases/read-action-plan.usecase';
 import { FindActionPlanPath } from './read-action-plan.path';
 
-@Controller(ActionPlanRoutes.ACTION_PLAN.GET)
+@Controller(ActionPlanRoutes.ACTION_PLAN.READ)
 @UseGuards(JwtAuthGuard)
 export class ReadActionPlanController {
   constructor(private readonly findActionPlanUseCase: ReadActionPlanUseCase) {}

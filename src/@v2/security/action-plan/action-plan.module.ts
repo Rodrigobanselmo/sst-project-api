@@ -39,6 +39,8 @@ import { EditCommentService } from './services/edit-comment/edit-comment.service
 import { ActionPlanPhotoAggregateRepository } from './database/repositories/action-plan-photo/action-plan-photo-aggregate.repository';
 import { AddActionPlanPhotoFileController } from './application/action-plan-photo/add-action-plan-photo-file/controllers/add-action-plan-photo-file.controller';
 import { AddActionPlanPhotoFileUseCase } from './application/action-plan-photo/add-action-plan-photo-file/use-cases/add-action-plan-photo-file.usecase';
+import { DeleteActionPlanPhotoFileController } from './application/action-plan-photo/delete-action-plan-photo-file/controllers/delete-action-plan-photo-file.controller';
+import { DeleteActionPlanPhotoFileUseCase } from './application/action-plan-photo/delete-action-plan-photo-file/use-cases/delete-action-plan-photo-file.usecase';
 
 @Module({
   imports: [SharedModule],
@@ -56,6 +58,7 @@ import { AddActionPlanPhotoFileUseCase } from './application/action-plan-photo/a
     BrowseCommentCreatorsController,
     ReadActionPlanController,
     AddActionPlanPhotoFileController,
+    DeleteActionPlanPhotoFileController,
   ],
   providers: [
     // Database
@@ -85,6 +88,7 @@ import { AddActionPlanPhotoFileUseCase } from './application/action-plan-photo/a
     BrowseCommentCreatorsUseCase,
     ReadActionPlanUseCase,
     AddActionPlanPhotoFileUseCase,
+    DeleteActionPlanPhotoFileUseCase,
 
     // Services
     EditActionPlanService,

@@ -19,6 +19,11 @@ export type IActionPlanReadMapper = {
       type: PrismaCharacterizationTypeEnum;
       photos: CompanyCharacterizationPhoto[];
     } | null;
+    riskFactorData: {
+      recs: {
+          recName: string;
+      }[];
+  }[]
   };
 
   photos: {
@@ -61,15 +66,18 @@ export class ActionPlanReadMapper {
       name: origin.name,
       type: origin.type,
       companyId: homogeneousGroup.companyId,
-      recommendationPhotos: photos.map(
-        (photo) =>
-          new ActionPlanReadPhotoModel({
-            id: photo.id,
-            isVertical: photo.is_vertical,
-            name: photo.file.name,
-            url: photo.file.url,
-          }),
-      ),
+      recommendation: {
+        name: homogeneousGroup.riskFactorData[0].recs[0].recName,
+        photos: photos.map(
+          (photo) =>
+            new ActionPlanReadPhotoModel({
+              id: photo.id,
+              isVertical: photo.is_vertical,
+              name: photo.file.name,
+              url: photo.file.url,
+            }),
+        )
+      },
       characterizationPhotos: homogeneousGroup.characterization?.photos.map(
         (photo) =>
           new ActionPlanReadPhotoModel({
