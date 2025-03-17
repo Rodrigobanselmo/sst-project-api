@@ -2,7 +2,7 @@ import { OriginTypeEnum } from '@/@v2/shared/domain/enum/security/origin-type.en
 import { ActionPlanReadPhotoModel } from './action-plan-read-photo.model';
 
 export type IActionPlanReadModel = {
-  id: string;
+  uuid: { riskDataId: string; recommendationId: string; workspaceId: string };
   companyId: string;
   name: string;
   type: OriginTypeEnum;
@@ -10,12 +10,12 @@ export type IActionPlanReadModel = {
   characterizationPhotos: ActionPlanReadPhotoModel[];
   recommendation: {
     name: string;
-    photos:ActionPlanReadPhotoModel[];
-  }
+    photos: ActionPlanReadPhotoModel[];
+  };
 };
 
 export class ActionPlanReadModel {
-  id: string;
+  uuid: { riskDataId: string; recommendationId: string; workspaceId: string };
   companyId: string;
   name: string;
   type: OriginTypeEnum;
@@ -23,11 +23,11 @@ export class ActionPlanReadModel {
   characterizationPhotos: ActionPlanReadPhotoModel[];
   recommendation: {
     name: string;
-    photos:ActionPlanReadPhotoModel[];
-  }
+    photos: ActionPlanReadPhotoModel[];
+  };
 
   constructor(params: IActionPlanReadModel) {
-    this.id = params.id;
+    this.uuid = params.uuid;
     this.name = params.name;
     this.type = params.type;
     this.companyId = params.companyId;

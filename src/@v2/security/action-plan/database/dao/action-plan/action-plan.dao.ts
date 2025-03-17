@@ -82,7 +82,7 @@ export class ActionPlanDAO {
 
     const [homogeneousGroup, photos] = await Promise.all([homogeneousGroupPromise, photosPromise]);
 
-    return homogeneousGroup ? ActionPlanReadMapper.toModel({ homogeneousGroup, photos }) : null;
+    return homogeneousGroup ? ActionPlanReadMapper.toModel({ homogeneousGroup, photos, params }) : null;
   }
 
   async browse({ limit, page, orderBy, filters }: IActionPlanDAO.BrowseParams) {

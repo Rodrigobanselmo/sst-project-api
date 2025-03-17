@@ -5,6 +5,7 @@ import { CharacterizationTypeEnum } from '@/@v2/shared/domain/enum/security/char
 import { HomoTypeEnum } from '@/@v2/shared/domain/enum/security/homo-type.enum';
 import { getOriginHomogeneousGroup } from '@/@v2/shared/domain/functions/security/get-origin-homogeneous-group.func';
 import { CharacterizationTypeEnum as PrismaCharacterizationTypeEnum, CompanyCharacterizationPhoto, HomogeneousGroup, HierarchyEnum } from '@prisma/client';
+import { IActionPlanDAO } from '../../../dao/action-plan/action-plan.types';
 
 export type IActionPlanReadMapper = {
   homogeneousGroup: Pick<HomogeneousGroup, 'companyId' | 'id' | 'name' | 'type'> & {
@@ -21,9 +22,9 @@ export type IActionPlanReadMapper = {
     } | null;
     riskFactorData: {
       recs: {
-          recName: string;
+        recName: string;
       }[];
-  }[]
+    }[];
   };
 
   photos: {
@@ -40,10 +41,12 @@ export type IActionPlanReadMapper = {
       updated_at: Date;
     };
   }[];
+
+  params: IActionPlanDAO.FindParams;
 };
 
 export class ActionPlanReadMapper {
-  static toModel({ homogeneousGroup, photos }: IActionPlanReadMapper): ActionPlanReadModel {
+  static toModel({ homogeneousGroup, photos, params }: IActionPlanReadMapper): ActionPlanReadModel {
     const origin = getOriginHomogeneousGroup({
       characterization: homogeneousGroup.characterization
         ? {
@@ -62,7 +65,11 @@ export class ActionPlanReadMapper {
     });
 
     return new ActionPlanReadModel({
-      id: homogeneousGroup.id,
+      uuid: {
+        recommendationId: params.recommendationId,
+        riskDataId: params.riskDataId,
+        workspaceId: params.workspaceId,
+      },
       name: origin.name,
       type: origin.type,
       companyId: homogeneousGroup.companyId,
@@ -76,7 +83,7 @@ export class ActionPlanReadMapper {
               name: photo.file.name,
               url: photo.file.url,
             }),
-        )
+        ),
       },
       characterizationPhotos: homogeneousGroup.characterization?.photos.map(
         (photo) =>
