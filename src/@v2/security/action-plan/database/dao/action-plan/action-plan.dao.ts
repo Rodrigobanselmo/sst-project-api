@@ -36,14 +36,14 @@ export class ActionPlanDAO {
           },
           select: {
             recs: {
-              select :{ 
-                recName: true
+              select: {
+                recName: true,
               },
-              where:{ 
-                id: params.recommendationId
-              }
-            }
-          }
+              where: {
+                id: params.recommendationId,
+              },
+            },
+          },
         },
         hierarchyOnHomogeneous: {
           select: {
@@ -95,7 +95,7 @@ export class ActionPlanDAO {
     const whereParams = [...browseWhereParams, ...filterWhere];
     const whereTotalParams = [...whereParams, ...filterHaving];
 
-    const actionplansPromise = this.prisma.$queryRaw<IActionPlanBrowseResultModelMapper[]>`
+    const actionPlansPromise = this.prisma.$queryRaw<IActionPlanBrowseResultModelMapper[]>`
       WITH "DocumentDataUnique" AS (
         SELECT DISTINCT ON ("workspaceId") *
         FROM "DocumentData" dd
@@ -115,6 +115,7 @@ export class ActionPlanDAO {
         rfd_rec."canceledDate" AS rfd_rec_canceled_date,
         rfd_rec."endDate" AS rfd_rec_end_date,
         rfd_rec."status" AS rfd_rec_status,
+        rec_to_rfd."sequential_id" AS rec_to_rfd_sequential_id,
         w."id" AS w_id,
         w."name" AS w_name,
         dd."validityStart" as validity_start,
@@ -249,6 +250,7 @@ export class ActionPlanDAO {
         rfd_rec."canceledDate",
         rfd_rec."endDate",
         rfd_rec."status",
+        rec_to_rfd."sequential_id",
         w."id",
         w."name",
         dd."validityStart", 
@@ -360,10 +362,10 @@ export class ActionPlanDAO {
       ${gerWhereRawPrisma(whereTotalParams)}
     `;
 
-    const [actionplans, totalActionPlans] = await Promise.all([actionplansPromise, totalActionPlansPromise]);
+    const [actionPlans, totalActionPlans] = await Promise.all([actionPlansPromise, totalActionPlansPromise]);
 
     return ActionPlanBrowseModelMapper.toModel({
-      results: actionplans,
+      results: actionPlans,
       pagination: { limit: pagination.limit, page: pagination.page, total: Number(totalActionPlans[0].total) },
       filters: totalActionPlans[0],
     });
@@ -381,7 +383,7 @@ export class ActionPlanDAO {
 
     if (filters.search) {
       const search = `%${filters.search}%`;
-      where.push(Prisma.sql`
+      const searchOrigin = Prisma.sql`(
         unaccent(lower(
           CASE 
             WHEN hg."type" = 'HIERARCHY' THEN h."name" 
@@ -389,7 +391,13 @@ export class ActionPlanDAO {
             ELSE hg."name"
           END
         )) ILIKE unaccent(lower(${search}))
-      `);
+      )`;
+
+      const searchSequence = Prisma.sql`(
+        rec_to_rfd."sequential_id" = CAST(${filters.search} AS INTEGER)
+      )`;
+
+      where.push(gerWhereRawPrisma([searchOrigin, searchSequence], { type: 'OR', removeWhereStatement: true }));
     }
 
     if (filters.workspaceIds?.length) {

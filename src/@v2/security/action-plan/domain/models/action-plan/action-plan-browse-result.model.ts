@@ -13,6 +13,7 @@ import { CommentTextTypeEnum } from '../../enums/comment-text-type.enum';
 
 export type IActionPlanBrowseResultModel = {
   uuid: { riskDataId: string; recommendationId: string; workspaceId: string };
+  sequentialId: number;
   createdAt: Date;
   updatedAt: Date | null;
   startDate: Date | null;
@@ -52,6 +53,7 @@ export type IActionPlanBrowseResultModel = {
 
 export class ActionPlanBrowseResultModel {
   uuid: { riskDataId: string; recommendationId: string; workspaceId: string };
+  sequentialId: number;
   createdAt: Date;
   updatedAt: Date | null;
   startDate: Date | null;
@@ -76,6 +78,7 @@ export class ActionPlanBrowseResultModel {
   }[];
 
   constructor(params: IActionPlanBrowseResultModel) {
+    this.sequentialId = params.sequentialId;
     this.uuid = {
       recommendationId: params.uuid.recommendationId,
       riskDataId: params.uuid.riskDataId,

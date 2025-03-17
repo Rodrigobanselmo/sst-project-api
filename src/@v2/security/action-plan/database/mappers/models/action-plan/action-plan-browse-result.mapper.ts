@@ -29,6 +29,7 @@ export type IActionPlanBrowseResultModelMapper = {
   rfd_rec_canceled_date: Date | null;
   rfd_rec_end_date: Date | null;
   rfd_rec_status: ActionPlanStatusEnum | null;
+  rec_to_rfd_sequential_id: number;
   w_id: string;
   w_name: string;
   validity_start: Date | null;
@@ -74,6 +75,7 @@ export class ActionPlanBrowseResultModelMapper {
       startDate: prisma.rfd_rec_start_date,
       status: prisma.rfd_rec_status ? ActionPlanStatusEnum[prisma.rfd_rec_status] : ActionPlanStatusEnum.PENDING,
       updatedAt: prisma.rfd_rec_updated_at,
+      sequentialId: prisma.rec_to_rfd_sequential_id,
       uuid: {
         recommendationId: prisma.rec_id,
         riskDataId: prisma.rfd_id,
