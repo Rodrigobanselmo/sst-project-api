@@ -382,6 +382,7 @@ export class ActionPlanDAO {
     const having: Prisma.Sql[] = [];
 
     if (filters.search) {
+      const whereSearch: Prisma.Sql[] = [];
       const search = `%${filters.search}%`;
       const searchOrigin = Prisma.sql`(
         unaccent(lower(
@@ -393,11 +394,16 @@ export class ActionPlanDAO {
         )) ILIKE unaccent(lower(${search}))
       )`;
 
-      const searchSequence = Prisma.sql`(
+      if (!isNaN(Number(filters.search))) {
+        const searchSequence = Prisma.sql`(
         rec_to_rfd."sequential_id" = CAST(${filters.search} AS INTEGER)
       )`;
 
-      where.push(gerWhereRawPrisma([searchOrigin, searchSequence], { type: 'OR', removeWhereStatement: true }));
+        whereSearch.push(searchSequence);
+      }
+
+      whereSearch.push(searchOrigin);
+      where.push(gerWhereRawPrisma(whereSearch, { type: 'OR', removeWhereStatement: true }));
     }
 
     if (filters.workspaceIds?.length) {
