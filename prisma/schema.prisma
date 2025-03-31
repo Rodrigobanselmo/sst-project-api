@@ -357,6 +357,7 @@ model Company {
   DocumentControl            DocumentControl[]
   SystemFile                 SystemFile[]
   DocumentControlFile        DocumentControlFile[]
+  Form                       Form[]
 
   @@index([name])
   @@index([isClinic])
@@ -1174,6 +1175,134 @@ model ExamToRiskData {
   @@id([examId, riskFactorDataId])
 }
 
+model Form {
+  id            Int          @id @default(autoincrement())
+  name          String
+  description   String?
+  type          FormTypeEnum @default(NORMAL)
+  status        StatusEnum   @default(ACTIVE)
+  annonimous    Boolean      @default(false) // TRUE = pode ver quem respondeu, mas não as respostas, resultado liberado somente se cumprir anonimato / FALSE = pode ver quem respondeu e as respostas
+  shareble_link Boolean      @default(false) // TRUE = pode compartilhar o link e se não for anonimo pede para identificar
+  created_at    DateTime     @default(now())
+  updated_at    DateTime     @updatedAt
+  deleted_at    DateTime?
+
+  company_id String
+  company    Company @relation(fields: [company_id], references: [id])
+
+  participants FormParticipants?
+  questions    FormQuestion[]
+
+  @@unique([id, company_id])
+  @@index([type])
+  @@index([company_id])
+}
+
+model FormParticipants {
+  id Int @id @default(autoincrement())
+
+  form_id Int
+  form    Form @relation(fields: [form_id], references: [id], onDelete: Cascade)
+
+  workspaces  FormParticipantsWorkspace[]
+  hierarchies FormParticipantsHierarchy[]
+
+  @@unique(form_id)
+}
+
+model FormParticipantsWorkspace {
+  id          Int       @id @default(autoincrement())
+  workspaces  Workspace @relation(fields: [workspaceId], references: [id])
+  workspaceId String
+
+  form_participants_id Int
+  form_participants    FormParticipants? @relation(fields: [form_participants_id], references: [id], onDelete: Cascade)
+}
+
+model FormParticipantsHierarchy {
+  id          Int       @id @default(autoincrement())
+  hierarchy   Hierarchy @relation(fields: [hierarchyId], references: [id])
+  hierarchyId String
+
+  form_participants_id Int
+  form_participants    FormParticipants? @relation(fields: [form_participants_id], references: [id], onDelete: Cascade)
+}
+
+model FormQuestion {
+  id       Int     @id @default(autoincrement())
+  required Boolean @default(false)
+
+  form_id Int
+  form    Form @relation(fields: [form_id], references: [id], onDelete: Cascade)
+
+  core_id Int?
+  core    FormQuestionCore? @relation(fields: [core_id], references: [id], onDelete: Cascade)
+
+  copsoq_id Int?
+  copsoq    FormQuestionCOPSOQ? @relation(fields: [copsoq_id], references: [id], onDelete: Cascade)
+}
+
+model FormQuestionIdentifier {
+  id       Int                  @id @default(autoincrement())
+  question String
+  type     FormQuestionTypeEnum
+}
+
+model FormQuestionCore {
+  id           Int                  @id @default(autoincrement())
+  question     String
+  type         FormQuestionTypeEnum
+  accept_other Boolean              @default(false)
+
+  options            FormQuestionOption[]
+  form_question_risk FormQuestionRisk[]
+  form_question      FormQuestion[]
+}
+
+model FormQuestionOption {
+  id    Int    @id @default(autoincrement())
+  text  String
+  order Int
+
+  question_id Int
+  question    FormQuestionCore @relation(fields: [question_id], references: [id], onDelete: Cascade)
+
+  @@unique([order, question_id])
+}
+
+model FormQuestionRisk {
+  id Int @id @default(autoincrement())
+
+  question_Id Int
+  question    FormQuestionCore @relation(fields: [question_Id], references: [id], onDelete: Cascade)
+  risk_id     String
+  risk        RiskFactors      @relation(fields: [risk_id], references: [id])
+}
+
+model FormQuestionCOPSOQ {
+  id              Int                      @id @default(autoincrement())
+  dimension       String
+  category        String
+  item            String                   @unique
+  question        String
+  custom_question String
+  level           FormCOPSOQLevelEnum
+  type            FormQuestionTypeEnum
+  proportion      FormCOPSOQProportionEnum
+
+  copsoq_risk   FormQuestionCOPSOQRisk[]
+  form_question FormQuestion[]
+}
+
+model FormQuestionCOPSOQRisk {
+  id Int @id @default(autoincrement())
+
+  form_copsoq_id Int
+  form_copsoq    FormQuestionCOPSOQ @relation(fields: [form_copsoq_id], references: [id], onDelete: Cascade)
+  risk_id        String
+  risk           RiskFactors        @relation(fields: [risk_id], references: [id])
+}
+
 model GenerateSource {
   id             String           @id @default(uuid())
   riskId         String
@@ -1193,32 +1322,33 @@ model GenerateSource {
 }
 
 model Hierarchy {
-  id                            String                     @id @default(uuid())
-  status                        StatusEnum                 @default(ACTIVE)
+  id                            String                      @id @default(uuid())
+  status                        StatusEnum                  @default(ACTIVE)
   type                          HierarchyEnum
-  description                   String                     @default("")
-  realDescription               String                     @default("")
+  description                   String                      @default("")
+  realDescription               String                      @default("")
   name                          String
   companyId                     String
   parentId                      String?
   refName                       String?
-  created_at                    DateTime                   @default(now())
-  updated_at                    DateTime                   @updatedAt
+  created_at                    DateTime                    @default(now())
+  updated_at                    DateTime                    @updatedAt
   deletedAt                     DateTime?
   employees                     Employee[]
   employeeExamsHistory          EmployeeExamsHistory[] //poder ao adimitir um funcionario, escolher adicionar a este cargo 
-  employeeExamsHistorySubOffice EmployeeExamsHistory[]     @relation("subOffice_employee_exam")
+  employeeExamsHistorySubOffice EmployeeExamsHistory[]      @relation("subOffice_employee_exam")
   hierarchyHistory              EmployeeHierarchyHistory[]
-  company                       Company                    @relation(fields: [companyId], references: [id])
-  parent                        Hierarchy?                 @relation("children_parent", fields: [parentId], references: [id], onDelete: Cascade)
-  children                      Hierarchy[]                @relation("children_parent")
+  company                       Company                     @relation(fields: [companyId], references: [id])
+  parent                        Hierarchy?                  @relation("children_parent", fields: [parentId], references: [id], onDelete: Cascade)
+  children                      Hierarchy[]                 @relation("children_parent")
   hierarchyOnHomogeneous        HierarchyOnHomogeneous[]
   riskFactorDatas               RiskFactorData[]
   riskDocInfo                   RiskFactorsDocInfo[]
-  workspaces                    Workspace[]                @relation("HierarchyToWorkspace")
-  subOfficeEmployees            Employee[]                 @relation("sub_offices")
-  subHierarchyHistory           EmployeeHierarchyHistory[] @relation("sub_offices_history")
+  workspaces                    Workspace[]                 @relation("HierarchyToWorkspace")
+  subOfficeEmployees            Employee[]                  @relation("sub_offices")
+  subHierarchyHistory           EmployeeHierarchyHistory[]  @relation("sub_offices_history")
   protocolsData                 ProtocolToRisk[]
+  hormParticipantsHierarchy     FormParticipantsHierarchy[]
 
   @@unique([id, companyId])
   @@unique([parentId, name])
@@ -1453,58 +1583,60 @@ model RefreshToken {
 }
 
 model RiskFactors {
-  id                    String                  @id @default(uuid())
-  name                  String
-  companyId             String
-  severity              Int                     @default(0)
-  system                Boolean                 @default(false)
-  appendix              String?
-  grauInsalubridade     GrauInsalubridade?
-  synonymous            String[]
-  search                String?
-  otherAppendix         String?
-  risk                  String?
-  propagation           String[]
-  exame                 String?
-  symptoms              String?
-  method                String?
-  unit                  String?
-  cas                   String?
-  breather              String?
-  nr15lt                String?
-  twa                   String?
-  stel                  String?
-  ipvs                  String?
-  pv                    String?
-  pe                    String?
-  carnogenicityACGIH    String?
-  carnogenicityLinach   String?
-  status                StatusEnum              @default(ACTIVE)
-  type                  RiskFactorsEnum
-  representAll          Boolean                 @default(false)
-  created_at            DateTime                @default(now())
-  updated_at            DateTime                @updatedAt
-  deleted_at            DateTime?
-  isEmergency           Boolean                 @default(false)
-  json                  Json?
-  fraction              String?
-  tlv                   String?
-  isAso                 Boolean                 @default(true)
-  isPCMSO               Boolean                 @default(true)
-  isPGR                 Boolean                 @default(true)
-  isPPP                 Boolean                 @default(true)
-  esocialCode           String?
-  coments               String?
-  activities            Json?
-  examToRisk            ExamToRisk[]
-  generateSource        GenerateSource[]
-  protocolToRisk        ProtocolToRisk[]
-  recMed                RecMed[]
-  riskFactorData        RiskFactorData[]
-  riskFactorProbability RiskFactorProbability[]
-  company               Company                 @relation(fields: [companyId], references: [id])
-  esocial               EsocialTable24?         @relation(fields: [esocialCode], references: [id], onDelete: Restrict)
-  docInfo               RiskFactorsDocInfo[]
+  id                     String                   @id @default(uuid())
+  name                   String
+  companyId              String
+  severity               Int                      @default(0)
+  system                 Boolean                  @default(false)
+  appendix               String?
+  grauInsalubridade      GrauInsalubridade?
+  synonymous             String[]
+  search                 String?
+  otherAppendix          String?
+  risk                   String?
+  propagation            String[]
+  exame                  String?
+  symptoms               String?
+  method                 String?
+  unit                   String?
+  cas                    String?
+  breather               String?
+  nr15lt                 String?
+  twa                    String?
+  stel                   String?
+  ipvs                   String?
+  pv                     String?
+  pe                     String?
+  carnogenicityACGIH     String?
+  carnogenicityLinach    String?
+  status                 StatusEnum               @default(ACTIVE)
+  type                   RiskFactorsEnum
+  representAll           Boolean                  @default(false)
+  created_at             DateTime                 @default(now())
+  updated_at             DateTime                 @updatedAt
+  deleted_at             DateTime?
+  isEmergency            Boolean                  @default(false)
+  json                   Json?
+  fraction               String?
+  tlv                    String?
+  isAso                  Boolean                  @default(true)
+  isPCMSO                Boolean                  @default(true)
+  isPGR                  Boolean                  @default(true)
+  isPPP                  Boolean                  @default(true)
+  esocialCode            String?
+  coments                String?
+  activities             Json?
+  examToRisk             ExamToRisk[]
+  generateSource         GenerateSource[]
+  protocolToRisk         ProtocolToRisk[]
+  recMed                 RecMed[]
+  riskFactorData         RiskFactorData[]
+  riskFactorProbability  RiskFactorProbability[]
+  company                Company                  @relation(fields: [companyId], references: [id])
+  esocial                EsocialTable24?          @relation(fields: [esocialCode], references: [id], onDelete: Restrict)
+  docInfo                RiskFactorsDocInfo[]
+  formQuestionCOPSOQRisk FormQuestionCOPSOQRisk[]
+  formQuestionRisk       FormQuestionRisk[]
 
   @@unique([id, companyId])
   @@index([name])
@@ -1862,29 +1994,30 @@ model Uf {
 }
 
 model Workspace {
-  id                 String                    @id @default(uuid())
-  name               String
-  abbreviation       String?
-  description        String?
-  created_at         DateTime                  @default(now())
-  updated_at         DateTime                  @updatedAt
-  deleted_at         DateTime?
-  companyId          String
-  status             StatusEnum                @default(ACTIVE)
-  cnpj               String?
-  isOwner            Boolean                   @default(true)
-  companyJson        Json?
-  address            Address?
-  characterization   CompanyCharacterization[]
-  companyEnvironment CompanyEnvironment[]
-  documents          Document[]
-  riskFactorDocument RiskFactorDocument[]
-  company            Company                   @relation(fields: [companyId], references: [id])
-  hierarchy          Hierarchy[]               @relation("HierarchyToWorkspace")
-  homogeneousGroup   HomogeneousGroup[]
-  documentData       DocumentData[]
-  RiskFactorDataRec  RiskFactorDataRec[]
-  DocumentControl    DocumentControl[]
+  id                        String                      @id @default(uuid())
+  name                      String
+  abbreviation              String?
+  description               String?
+  created_at                DateTime                    @default(now())
+  updated_at                DateTime                    @updatedAt
+  deleted_at                DateTime?
+  companyId                 String
+  status                    StatusEnum                  @default(ACTIVE)
+  cnpj                      String?
+  isOwner                   Boolean                     @default(true)
+  companyJson               Json?
+  address                   Address?
+  characterization          CompanyCharacterization[]
+  companyEnvironment        CompanyEnvironment[]
+  documents                 Document[]
+  riskFactorDocument        RiskFactorDocument[]
+  company                   Company                     @relation(fields: [companyId], references: [id])
+  hierarchy                 Hierarchy[]                 @relation("HierarchyToWorkspace")
+  homogeneousGroup          HomogeneousGroup[]
+  documentData              DocumentData[]
+  RiskFactorDataRec         RiskFactorDataRec[]
+  DocumentControl           DocumentControl[]
+  FormParticipantsWorkspace FormParticipantsWorkspace[]
 
   @@unique([abbreviation, companyId])
   @@unique([id, companyId])
@@ -2006,6 +2139,12 @@ enum ExamHistoryConclusionEnum {
   ALTER_2
   ALTER_3
   NONE
+}
+
+enum FormTypeEnum {
+  NORMAL
+  PSICOSOCIAL
+  RISK
 }
 
 enum HierarchyEnum {
@@ -2167,4 +2306,40 @@ enum ImagesTypeEnum {
   EQUI
   ACTIV
   COMPANY
+}
+
+enum FormCOPSOQLevelEnum {
+  SHORT
+  MED
+  LONG
+}
+
+enum FormCOPSOQProportionEnum {
+  INVERSE
+  DIRECT
+}
+
+enum FormQuestionTypeEnum {
+  TEXT
+  RADIO
+  CHECKBOX
+  SELECT
+  SHORT_TEXT
+  LONG_TEXT
+  FREQUENCY
+  INTENSITY
+}
+
+enum FormIdentifierTypeEnum {
+  EMAIL
+  CPF
+  AGE
+  SEX
+  WORKSPACE
+  DIRECTORY
+  MANAGEMENT
+  SECTOR
+  SUB_SECTOR
+  OFFICE
+  SUB_OFFICE
 }

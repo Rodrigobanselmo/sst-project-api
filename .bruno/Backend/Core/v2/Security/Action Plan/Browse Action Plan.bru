@@ -5,13 +5,13 @@ meta {
 }
 
 get {
-  url: {{url}}/v2/companies/:companyId/action-plans?search=100
+  url: {{url}}/v2/companies/:companyId/action-plans
   body: none
   auth: bearer
 }
 
 params:query {
-  search: 100
+  ~search: 100
 }
 
 params:path {
