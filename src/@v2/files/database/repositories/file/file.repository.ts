@@ -77,6 +77,7 @@ export class FileRepository {
     const files = await this.prisma.systemFile.findMany({
       where: {
         company_id: params?.companyId,
+        deleted_at: null,
         ...FileRepository.whereUnusedFilter(),
       },
     });
@@ -88,8 +89,8 @@ export class FileRepository {
     await this.prisma.systemFile.deleteMany({
       where: {
         id: params.id,
+        deleted_at: new Date(),
         company_id: params.companyId,
-        ...FileRepository.whereUnusedFilter(),
       },
     });
   }
