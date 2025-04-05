@@ -25,7 +25,7 @@ export class AddActionPlanPhotoFileUseCase {
       fileName: getFileName(params.name),
       companyId: params.companyId,
       fileFolder: BUCKET_FOLDERS.ACTION_PLAN_RECOMMENDATION,
-      shouldDelete: true,
+      shouldDelete: false,
       size: params.size,
       isPublic: true,
     });
