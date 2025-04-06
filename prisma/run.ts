@@ -19,6 +19,7 @@ async function main() {
           where: { id: item.file_id },
           data: {
             deleted_at: null,
+
             should_delete: false,
           },
         });
