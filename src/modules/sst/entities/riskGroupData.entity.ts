@@ -17,7 +17,7 @@ export class RiskFactorGroupDataEntity implements RiskFactorGroupData {
     Object.assign(this, partial);
 
     if (partial?.data) {
-      this.data = partial.data.map((d) => new RiskFactorDataEntity(d));
+      this.data = partial.data.map((d) => new RiskFactorDataEntity(d as any));
     }
   }
 }

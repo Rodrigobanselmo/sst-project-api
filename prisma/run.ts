@@ -13,6 +13,18 @@ async function main() {
       include: { file: true },
     });
 
+    await Promise.all(
+      data.map(async (item) => {
+        await prisma.systemFile.update({
+          where: { id: item.file_id },
+          data: {
+            deleted_at: null,
+            should_delete: false,
+          },
+        });
+      }),
+    );
+
     const array = data.map((item) => {
       return item.file.url.split('/').at(-1);
     });

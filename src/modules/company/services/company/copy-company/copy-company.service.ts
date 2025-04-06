@@ -68,7 +68,11 @@ export class CopyCompanyService {
         riskFactorData: {
           include: {
             adms: true,
-            recs: true,
+            recs: {
+              select: {
+                recMed: true,
+              },
+            },
             generateSources: true,
             epiToRiskFactorData: { include: { epi: true } },
             engsToRiskFactorData: { include: { recMed: true } },
@@ -121,8 +125,7 @@ export class CopyCompanyService {
           if (!profileParentId && group?.characterization?.profileParentId) return; //log('skip profile');
           if (profileParentId && !group?.characterization?.profileParentId) return; //log('skip not profile');
 
-          if (group.characterization && isEnvironment(group.characterization.type))
-            group.environment = group.characterization;
+          if (group.characterization && isEnvironment(group.characterization.type)) group.environment = group.characterization;
 
           const hierarchies: HierarchyEntity[] = [];
 
@@ -162,10 +165,7 @@ export class CopyCompanyService {
                 data: {
                   id: _newHomoGroupId,
                   description: group.description,
-                  name:
-                    group.environment || group.characterization || group.type === HomoTypeEnum.HIERARCHY
-                      ? _newHomoGroupId
-                      : group.name,
+                  name: group.environment || group.characterization || group.type === HomoTypeEnum.HIERARCHY ? _newHomoGroupId : group.name,
                   companyId: companyId,
                   type: group.type,
                   ...(group.workspaces?.length && {
@@ -178,10 +178,7 @@ export class CopyCompanyService {
                 where: { id: foundHomo.id },
                 data: {
                   companyId: companyId,
-                  name:
-                    group.environment || group.characterization || group.type === HomoTypeEnum.HIERARCHY
-                      ? foundHomo.id
-                      : group.name,
+                  name: group.environment || group.characterization || group.type === HomoTypeEnum.HIERARCHY ? foundHomo.id : group.name,
                   type: group.type,
                   description: foundHomo.description ? group.description || undefined : undefined,
                   ...(group.workspaces?.length && {
@@ -217,8 +214,8 @@ export class CopyCompanyService {
                     recs:
                       riskFactorFromData.recs && riskFactorFromData.recs.length
                         ? {
-                            connect: riskFactorFromData.recs.map(({ id }) => ({
-                              id,
+                            create: riskFactorFromData.recs.map(({ id }) => ({
+                              rec_med_id: id,
                             })),
                           }
                         : undefined,
@@ -334,14 +331,7 @@ export class CopyCompanyService {
   async getCommonHierarchy(targetHierarchies: HierarchyEntity[], fromHierarchies: HierarchyEntity[]) {
     const equalHierarchy: Record<string, HierarchyEntity[]> = {};
     const equalWorkspace: Record<string, WorkspaceEntity> = {};
-    [
-      HierarchyEnum.DIRECTORY,
-      HierarchyEnum.MANAGEMENT,
-      HierarchyEnum.SECTOR,
-      HierarchyEnum.SUB_SECTOR,
-      HierarchyEnum.OFFICE,
-      HierarchyEnum.SUB_OFFICE,
-    ].forEach((hierarchyType) => {
+    [HierarchyEnum.DIRECTORY, HierarchyEnum.MANAGEMENT, HierarchyEnum.SECTOR, HierarchyEnum.SUB_SECTOR, HierarchyEnum.OFFICE, HierarchyEnum.SUB_OFFICE].forEach((hierarchyType) => {
       targetHierarchies.forEach((targetHierarchy) => {
         if (targetHierarchy.type !== hierarchyType) return;
 

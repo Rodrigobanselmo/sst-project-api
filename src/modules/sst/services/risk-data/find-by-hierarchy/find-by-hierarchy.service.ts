@@ -22,6 +22,6 @@ export class FindAllByHierarchyService {
       });
     });
 
-    return riskDataReturn.map((riskData) => new RiskFactorDataEntity(riskData));
+    return riskDataReturn.map((riskData) => new RiskFactorDataEntity(riskData as any));
   }
 }

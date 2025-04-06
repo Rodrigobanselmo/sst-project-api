@@ -37,10 +37,14 @@ export class ActionPlanDAO {
           select: {
             recs: {
               select: {
-                recName: true,
+                recMed: {
+                  select: {
+                    recName: true,
+                  },
+                },
               },
               where: {
-                id: params.recommendationId,
+                rec_med_id: params.recommendationId,
               },
             },
           },
@@ -175,9 +179,9 @@ export class ActionPlanDAO {
       FROM 
         "RiskFactorData" rfd
       JOIN 
-        "_recs" rec_to_rfd ON rec_to_rfd."B" = rfd."id"
+        "RecMedOnRiskData" rec_to_rfd ON rec_to_rfd."risk_data_id" = rfd."id"
       LEFT JOIN
-        "RecMed" rec ON rec."id" = rec_to_rfd."A"
+        "RecMed" rec ON rec."id" = rec_to_rfd."rec_med_id"
       LEFT JOIN
         "RiskFactors" risk ON risk."id" = rfd."riskId"
       LEFT JOIN
@@ -284,9 +288,9 @@ export class ActionPlanDAO {
       FROM 
         "RiskFactorData" rfd
       JOIN 
-        "_recs" rec_to_rfd ON rec_to_rfd."B" = rfd."id"
+        "RecMedOnRiskData" rec_to_rfd ON rec_to_rfd."risk_data_id" = rfd."id"
       LEFT JOIN
-        "RecMed" rec ON rec."id" = rec_to_rfd."A"
+        "RecMed" rec ON rec."id" = rec_to_rfd."rec_med_id"
       ${
         filters.riskIds?.length
           ? Prisma.sql`

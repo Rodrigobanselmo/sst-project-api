@@ -20,10 +20,7 @@ export class CopyCharacterizationService {
     private readonly prisma: PrismaService,
     private readonly homoGroupRepository: HomoGroupRepository,
   ) {}
-  async execute(
-    { companyCopyFromId, workspaceId, characterizationIds }: CopyCharacterizationDto,
-    user: UserPayloadDto,
-  ) {
+  async execute({ companyCopyFromId, workspaceId, characterizationIds }: CopyCharacterizationDto, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;
     const sameCompany = companyId === companyCopyFromId;
     const isMaster = user.isMaster;
@@ -72,7 +69,11 @@ export class CopyCharacterizationService {
         riskFactorData: {
           include: {
             adms: true,
-            recs: true,
+            recs: {
+              select: {
+                recMed: true,
+              },
+            },
             generateSources: true,
             epiToRiskFactorData: { include: { epi: true } },
             engsToRiskFactorData: { include: { recMed: true } },
@@ -100,8 +101,7 @@ export class CopyCharacterizationService {
           if (!profileParentId && group?.characterization?.profileParentId) return; //log('skip profile');
           if (profileParentId && !group?.characterization?.profileParentId) return; //log('skip not profile');
 
-          if (group.characterization && isEnvironment(group.characterization.type))
-            group.environment = group.characterization;
+          if (group.characterization && isEnvironment(group.characterization.type)) group.environment = group.characterization;
 
           let newHomoGroup: HomogeneousGroup;
           const newHomoGroupId = v4();
@@ -146,8 +146,8 @@ export class CopyCharacterizationService {
                     recs:
                       riskFactorFromData.recs && riskFactorFromData.recs.length
                         ? {
-                            connect: riskFactorFromData.recs.map(({ id }) => ({
-                              id,
+                            create: riskFactorFromData.recs.map(({ id }) => ({
+                              rec_med_id: id,
                             })),
                           }
                         : undefined,
@@ -239,14 +239,7 @@ export class CopyCharacterizationService {
   async getCommonHierarchy(targetHierarchies: HierarchyEntity[], fromHierarchies: HierarchyEntity[]) {
     const equalHierarchy: Record<string, HierarchyEntity[]> = {};
     const equalWorkspace: Record<string, WorkspaceEntity> = {};
-    [
-      HierarchyEnum.DIRECTORY,
-      HierarchyEnum.MANAGEMENT,
-      HierarchyEnum.SECTOR,
-      HierarchyEnum.SUB_SECTOR,
-      HierarchyEnum.OFFICE,
-      HierarchyEnum.SUB_OFFICE,
-    ].forEach((hierarchyType) => {
+    [HierarchyEnum.DIRECTORY, HierarchyEnum.MANAGEMENT, HierarchyEnum.SECTOR, HierarchyEnum.SUB_SECTOR, HierarchyEnum.OFFICE, HierarchyEnum.SUB_OFFICE].forEach((hierarchyType) => {
       targetHierarchies.forEach((targetHierarchy) => {
         if (targetHierarchy.type !== hierarchyType) return;
 

@@ -12,6 +12,7 @@ export class FileRepository {
     const beforeOneDay = new Date(new Date().setDate(new Date().getDate() - 1));
     const where = {
       should_delete: true,
+      deleted_at: null,
       created_at: {
         lte: beforeOneDay,
       },
@@ -77,7 +78,6 @@ export class FileRepository {
     const files = await this.prisma.systemFile.findMany({
       where: {
         company_id: params?.companyId,
-        deleted_at: null,
         ...FileRepository.whereUnusedFilter(),
       },
     });
@@ -86,11 +86,15 @@ export class FileRepository {
   }
 
   async delete(params: IFileRepository.DeleteParams): Promise<void> {
-    await this.prisma.systemFile.deleteMany({
+    await this.prisma.systemFile.update({
+      select: { id: true },
+      data: {
+        deleted_at: new Date(),
+      },
       where: {
         id: params.id,
-        deleted_at: new Date(),
         company_id: params.companyId,
+        deleted_at: null,
       },
     });
   }

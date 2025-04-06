@@ -14,7 +14,7 @@
     "dev:tsx": "tsx watch src/main.ts",
     "start:debug": "nest start --debug --watch",
     "seed": "node dist/prisma/seed.js",
-    "prisma:run": "node dist/prisma/run.js",
+    "prisma:run": "npx ts-node prisma/run.ts",
     "migrate": "npx prisma migrate dev && npx prisma generate",
     "reset": "npx prisma migrate reset && yarn seed",
     "deploy": "npx prisma migrate deploy && npx prisma generate && yarn build && npx kill-port 3333 && pm2 start simplesst",

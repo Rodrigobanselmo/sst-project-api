@@ -53,7 +53,9 @@ export class ActionPlanAggregateRepository implements IActionPlanAggregateReposi
         companyId: params.companyId,
         recs: {
           some: {
-            id: params.recommendationId,
+            recMed: {
+              id: params.recommendationId,
+            },
           },
         },
       },
