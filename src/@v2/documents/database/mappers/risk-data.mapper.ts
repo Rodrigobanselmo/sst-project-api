@@ -23,7 +23,7 @@ import { IRiskMapper, RiskMapper } from './risk.mapper';
 export type IRiskDataMapper = RiskFactorData & {
   riskFactor: IRiskMapper;
   adms: { medName: string | null }[];
-  recs: { id: string; recName: string | null; recType: PrismaRecTypeEnum | null }[];
+  recs: { recMed: { id: string; recName: string | null; recType: PrismaRecTypeEnum | null } }[];
   generateSources: { name: string | null }[];
   engsToRiskFactorData: {
     recMed: RecMed;
@@ -47,9 +47,9 @@ export class RiskDataMapper {
       recommendations: data.recs.map(
         (rec) =>
           new RecommendationModel({
-            id: rec.id,
-            name: rec.recName || '',
-            type: rec.recType as RecommendationTypeEnum,
+            id: rec.recMed.id,
+            name: rec.recMed.recName || '',
+            type: rec.recMed.recType as RecommendationTypeEnum,
           }),
       ),
       generateSources: data.generateSources.map((gs) => new GenerateSourceModel({ name: gs.name || '' })),

@@ -23,7 +23,6 @@ export class DeleteUnusedFileService {
       batchSize: 10,
       callback: async (file) => {
         try {
-          await this.storage.delete(file);
           await this.fileRepository.delete(file);
         } catch (error) {
           captureException({ error, extra: { file, action: 'delete unused document' } });

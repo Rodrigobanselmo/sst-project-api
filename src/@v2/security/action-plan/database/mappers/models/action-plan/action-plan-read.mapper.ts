@@ -22,7 +22,9 @@ export type IActionPlanReadMapper = {
     } | null;
     riskFactorData: {
       recs: {
-        recName: string;
+        recMed: {
+          recName: string;
+        };
       }[];
     }[];
   };
@@ -74,7 +76,7 @@ export class ActionPlanReadMapper {
       type: origin.type,
       companyId: homogeneousGroup.companyId,
       recommendation: {
-        name: homogeneousGroup.riskFactorData[0].recs[0].recName,
+        name: homogeneousGroup.riskFactorData[0].recs[0].recMed.recName,
         photos: photos.map(
           (photo) =>
             new ActionPlanReadPhotoModel({

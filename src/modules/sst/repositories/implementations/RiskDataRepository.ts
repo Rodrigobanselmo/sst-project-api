@@ -7,7 +7,7 @@ import { removeDuplicate } from '../../../../shared/utils/removeDuplicate';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { FindRiskDataDto, UpsertManyRiskDataDto, UpsertRiskDataDto } from '../../dto/risk-data.dto';
-import { RiskFactorDataEntity } from '../../entities/riskData.entity';
+import { IRiskFactorDataEntity, RiskFactorDataEntity } from '../../entities/riskData.entity';
 import { Prisma, PrismaPromise } from '@prisma/client';
 import { getMatrizRisk } from '../../../../shared/utils/matriz';
 import { EpiRiskDataEntity } from '../../entities/epiRiskData.entity';
@@ -19,7 +19,7 @@ import { ExamRiskDataEntity } from '../../entities/examRiskData.entity';
 
 @Injectable()
 export class RiskDataRepository {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
   async upsert(upsertRiskDataDto: Omit<UpsertRiskDataDto, 'keepEmpty' | 'type'>): Promise<RiskFactorDataEntity> {
     const level = await this.addLevel(upsertRiskDataDto);
     if (level) upsertRiskDataDto.level = level;
@@ -82,7 +82,11 @@ export class RiskDataRepository {
       where: { riskFactorGroupDataId, companyId },
       include: {
         adms: true,
-        recs: true,
+        recs: {
+          select: {
+            recMed: true,
+          },
+        },
         generateSources: true,
         hierarchy: true,
         riskFactor: true,
@@ -97,7 +101,7 @@ export class RiskDataRepository {
       },
     });
     return riskFactorData.map((data) => {
-      const riskData = { ...data } as unknown as RiskFactorDataEntity;
+      const riskData = { ...data } as unknown as IRiskFactorDataEntity;
       if (data.homogeneousGroup && data.homogeneousGroup.hierarchyOnHomogeneous)
         riskData.homogeneousGroup.hierarchies = data.homogeneousGroup.hierarchyOnHomogeneous.map((homo) => ({
           ...homo.hierarchy,
@@ -112,30 +116,28 @@ export class RiskDataRepository {
       where: { riskFactorGroupDataId, companyId, riskId },
       include: {
         adms: true,
-        recs: true,
+        recs: {
+          select: {
+            recMed: true,
+          },
+        },
         generateSources: true,
         epiToRiskFactorData: { include: { epi: true } },
         engsToRiskFactorData: { include: { recMed: true } },
         examsToRiskFactorData: { include: { exam: true } },
       },
-    })) as RiskFactorDataEntity[];
+    })) as IRiskFactorDataEntity[];
 
     return riskFactorData.map((data) => new RiskFactorDataEntity(data));
   }
 
-  async findAllActionPlan(
-    riskFactorGroupDataId: string,
-    workspaceId: string,
-    companyId: string,
-    query: Partial<FindRiskDataDto>,
-    pagination: PaginationQueryDto,
-  ) {
+  async findAllActionPlan(riskFactorGroupDataId: string, workspaceId: string, companyId: string, query: Partial<FindRiskDataDto>, pagination: PaginationQueryDto) {
     const where = {
       AND: [
         {
           riskFactorGroupDataId,
           companyId,
-          recs: { some: { recName: { contains: '' } } },
+          recs: { some: { recMed: { recName: { contains: '' } } } },
           homogeneousGroup: {
             hierarchyOnHomogeneous: {
               some: {
@@ -183,7 +185,11 @@ export class RiskDataRepository {
         skip: pagination.skip || 0,
         include: {
           adms: true,
-          recs: true,
+          recs: {
+            select: {
+              recMed: true,
+            },
+          },
           generateSources: true,
           riskFactor: true,
           dataRecs: { include: { comments: true } },
@@ -198,7 +204,7 @@ export class RiskDataRepository {
     ]);
 
     const riskData = await Promise.all(
-      (response[1] as unknown as RiskFactorDataEntity[]).map(async (data) => {
+      (response[1] as unknown as IRiskFactorDataEntity[]).map(async (data) => {
         if (data.homogeneousGroup && data.homogeneousGroup.type === 'HIERARCHY') {
           const hierarchy = await this.prisma.hierarchy.findUnique({
             where: { id: data.homogeneousGroup.id },
@@ -228,7 +234,11 @@ export class RiskDataRepository {
       where: { riskFactorGroupDataId, companyId, homogeneousGroupId },
       include: {
         adms: true,
-        recs: true,
+        recs: {
+          select: {
+            recMed: true,
+          },
+        },
         epiToRiskFactorData: { include: { epi: true } },
         engsToRiskFactorData: { include: { recMed: true } },
         examsToRiskFactorData: { include: { exam: true } },
@@ -240,19 +250,13 @@ export class RiskDataRepository {
               where: {
                 deletedAt: null,
                 companyId,
-                OR: [
-                  { isAdmission: true },
-                  { isPeriodic: true },
-                  { isReturn: true },
-                  { isChange: true },
-                  { isDismissal: true },
-                ],
+                OR: [{ isAdmission: true }, { isPeriodic: true }, { isReturn: true }, { isChange: true }, { isDismissal: true }],
               },
             },
           },
         },
       },
-    })) as RiskFactorDataEntity[];
+    })) as IRiskFactorDataEntity[];
 
     return riskFactorData.map((data) => new RiskFactorDataEntity(data));
   }
@@ -281,10 +285,14 @@ export class RiskDataRepository {
         },
         recs: {
           select: {
-            recName: true,
-            recType: true,
-            id: true,
-            riskId: true,
+            recMed: {
+              select: {
+                recName: true,
+                recType: true,
+                id: true,
+                riskId: true,
+              },
+            },
           },
         },
         generateSources: true,
@@ -308,7 +316,7 @@ export class RiskDataRepository {
         },
         ...options.include,
       },
-    })) as unknown as RiskFactorDataEntity[];
+    })) as unknown as IRiskFactorDataEntity[];
 
     return riskFactorData.map((data) => new RiskFactorDataEntity(data));
   }
@@ -348,29 +356,16 @@ export class RiskDataRepository {
   async deleteByHomoAndRisk(homogeneousGroupIds: string[], riskIds: string[], groupId: string) {
     const riskFactorData = await this.prisma.riskFactorData.deleteMany({
       where: {
-        AND: [
-          { homogeneousGroupId: { in: homogeneousGroupIds } },
-          { riskId: { in: riskIds } },
-          { riskFactorGroupDataId: groupId },
-        ],
+        AND: [{ homogeneousGroupId: { in: homogeneousGroupIds } }, { riskId: { in: riskIds } }, { riskFactorGroupDataId: groupId }],
       },
     });
 
     return riskFactorData;
   }
 
-  private async upsertPrisma({
-    recs,
-    adms,
-    engs,
-    epis,
-    exams,
-    generateSources,
-    companyId,
-    createId,
-    id,
-    ...createDto
-  }: Omit<UpsertRiskDataDto, 'keepEmpty'>) {
+  private async upsertPrisma({ recs, adms, engs, epis, exams, generateSources, companyId, createId, id, ...createDto }: Omit<UpsertRiskDataDto, 'keepEmpty'>) {
+    console.log({ recs, id });
+
     const isCreation = !id;
     if (isCreation) {
       const foundRiskData = await this.prisma.riskFactorData.findMany({
@@ -395,24 +390,24 @@ export class RiskDataRepository {
         companyId,
         generateSources: generateSources
           ? {
-            connect: generateSources.map((id) => ({
-              id,
-            })),
-          }
+              connect: generateSources.map((id) => ({
+                id,
+              })),
+            }
           : undefined,
         recs: recs
           ? {
-            connect: recs.map((id) => ({
-              id,
-            })),
-          }
+              create: recs.map((id) => ({
+                rec_med_id: id,
+              })),
+            }
           : undefined,
         adms: adms
           ? {
-            connect: adms.map((id) => ({
-              id,
-            })),
-          }
+              connect: adms.map((id) => ({
+                id,
+              })),
+            }
           : undefined,
       },
       update: {
@@ -420,24 +415,38 @@ export class RiskDataRepository {
         companyId,
         recs: recs
           ? {
-            set: recs.map((id) => ({
-              id,
-            })),
-          }
+              deleteMany: {
+                NOT: {
+                  rec_med_id: { in: recs },
+                },
+              },
+              upsert: recs.map((rec_id) => ({
+                create: {
+                  rec_med_id: rec_id,
+                },
+                update: {},
+                where: {
+                  rec_med_id_risk_data_id: {
+                    rec_med_id: rec_id,
+                    risk_data_id: id,
+                  },
+                },
+              })),
+            }
           : undefined,
         adms: adms
           ? {
-            set: adms.map((id) => ({
-              id,
-            })),
-          }
+              set: adms.map((id) => ({
+                id,
+              })),
+            }
           : undefined,
         generateSources: generateSources
           ? {
-            set: generateSources.map((id) => ({
-              id,
-            })),
-          }
+              set: generateSources.map((id) => ({
+                id,
+              })),
+            }
           : undefined,
       },
       where: {
@@ -445,13 +454,17 @@ export class RiskDataRepository {
       },
       include: {
         adms: true,
-        recs: true,
+        recs: {
+          select: {
+            recMed: true,
+          },
+        },
         generateSources: true,
         epiToRiskFactorData: { include: { epi: true } },
         engsToRiskFactorData: !engs ? { include: { recMed: true } } : undefined,
         examsToRiskFactorData: { include: { exam: true } },
       },
-    })) as RiskFactorDataEntity;
+    })) as IRiskFactorDataEntity;
 
     if (epis) {
       if (riskData.epiToRiskFactorData?.length) {
@@ -500,25 +513,13 @@ export class RiskDataRepository {
         });
       }
 
-      riskData.examsToRiskFactorData = await this.setExams(
-        exams.filter((i) => i.examId).map((exam) => ({ ...exam, riskFactorDataId: riskData.id })),
-      );
+      riskData.examsToRiskFactorData = await this.setExams(exams.filter((i) => i.examId).map((exam) => ({ ...exam, riskFactorDataId: riskData.id })));
     }
 
     return riskData;
   }
 
-  private async upsertConnectPrisma({
-    recs,
-    adms,
-    engs,
-    epis,
-    exams,
-    generateSources,
-    companyId,
-    id,
-    ...createDto
-  }: Omit<UpsertRiskDataDto, 'keepEmpty'>) {
+  private async upsertConnectPrisma({ recs, adms, engs, epis, exams, generateSources, companyId, id, ...createDto }: Omit<UpsertRiskDataDto, 'keepEmpty'>) {
     const foundRiskData = await this.prisma.riskFactorData.findMany({
       where: {
         riskFactorGroupDataId: createDto.riskFactorGroupDataId,
@@ -539,24 +540,24 @@ export class RiskDataRepository {
         companyId,
         generateSources: generateSources
           ? {
-            connect: generateSources.map((id) => ({
-              id,
-            })),
-          }
+              connect: generateSources.map((id) => ({
+                id,
+              })),
+            }
           : undefined,
         recs: recs
           ? {
-            connect: recs.map((id) => ({
-              id,
-            })),
-          }
+              create: recs.map((id) => ({
+                rec_med_id: id,
+              })),
+            }
           : undefined,
         adms: adms
           ? {
-            connect: adms.map((id) => ({
-              id,
-            })),
-          }
+              connect: adms.map((id) => ({
+                id,
+              })),
+            }
           : undefined,
       },
       update: {
@@ -564,24 +565,38 @@ export class RiskDataRepository {
         companyId,
         recs: recs
           ? {
-            connect: recs.map((id) => ({
-              id,
-            })),
-          }
+              deleteMany: {
+                NOT: {
+                  rec_med_id: { in: recs },
+                },
+              },
+              upsert: recs.map((rec_id) => ({
+                create: {
+                  rec_med_id: rec_id,
+                },
+                update: {},
+                where: {
+                  rec_med_id_risk_data_id: {
+                    rec_med_id: rec_id,
+                    risk_data_id: id,
+                  },
+                },
+              })),
+            }
           : undefined,
         adms: adms
           ? {
-            connect: adms.map((id) => ({
-              id,
-            })),
-          }
+              connect: adms.map((id) => ({
+                id,
+              })),
+            }
           : undefined,
         generateSources: generateSources
           ? {
-            connect: generateSources.map((id) => ({
-              id,
-            })),
-          }
+              connect: generateSources.map((id) => ({
+                id,
+              })),
+            }
           : undefined,
       },
       where: {
@@ -589,13 +604,17 @@ export class RiskDataRepository {
       },
       include: {
         adms: true,
-        recs: true,
+        recs: {
+          select: {
+            recMed: true,
+          },
+        },
         generateSources: true,
         epiToRiskFactorData: !epis ? { include: { epi: true } } : undefined,
         engsToRiskFactorData: !engs ? { include: { recMed: true } } : undefined,
         examsToRiskFactorData: !exams ? { include: { exam: true } } : undefined,
       },
-    })) as RiskFactorDataEntity;
+    })) as IRiskFactorDataEntity;
 
     if (epis)
       riskData.epiToRiskFactorData = await this.setEpis(

@@ -11,7 +11,7 @@ import { EmployeeEntity } from '../../entities/employee.entity';
 
 @Injectable()
 export class SyncRepository {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async findSyncChanges({
     lastPulledVersion,
@@ -34,11 +34,7 @@ export class SyncRepository {
       userId,
     });
 
-    const [riskChanges, recMedChanges, generateSourceChanges] = await Promise.all([
-      riskChangeszPromise,
-      recMedChangeszPromise,
-      generateSourceChangeszPromise,
-    ]);
+    const [riskChanges, recMedChanges, generateSourceChanges] = await Promise.all([riskChangeszPromise, recMedChangeszPromise, generateSourceChangeszPromise]);
 
     const changes: any = {
       Risk: riskChanges,
@@ -103,15 +99,7 @@ export class SyncRepository {
     return changes;
   }
 
-  async findRecMedSyncChanges({
-    lastPulledVersion,
-    companyId,
-    userId,
-  }: {
-    lastPulledVersion: Date;
-    companyId: string;
-    userId: number;
-  }) {
+  async findRecMedSyncChanges({ lastPulledVersion, companyId, userId }: { lastPulledVersion: Date; companyId: string; userId: number }) {
     const options: Prisma.RecMedFindManyArgs = {};
     options.select = {
       recName: true,
@@ -151,15 +139,7 @@ export class SyncRepository {
     return recMed;
   }
 
-  async findCompanySyncChanges({
-    lastPulledVersion,
-    companyIds,
-    userId,
-  }: {
-    lastPulledVersion: Date;
-    companyIds: string[];
-    userId: number;
-  }) {
+  async findCompanySyncChanges({ lastPulledVersion, companyIds, userId }: { lastPulledVersion: Date; companyIds: string[]; userId: number }) {
     const options: Prisma.CompanyFindManyArgs = {};
     options.select = {
       cnpj: true,
@@ -190,15 +170,7 @@ export class SyncRepository {
     return company;
   }
 
-  async findWorkspaceSyncChanges({
-    lastPulledVersion,
-    companyIds,
-    userId,
-  }: {
-    lastPulledVersion: Date;
-    companyIds: string[];
-    userId: number;
-  }) {
+  async findWorkspaceSyncChanges({ lastPulledVersion, companyIds, userId }: { lastPulledVersion: Date; companyIds: string[]; userId: number }) {
     const options: Prisma.WorkspaceFindManyArgs = {};
     options.select = {
       cnpj: true,
@@ -228,15 +200,7 @@ export class SyncRepository {
     return company;
   }
 
-  async findRiskSyncChanges({
-    lastPulledVersion,
-    companyId,
-    userId,
-  }: {
-    lastPulledVersion?: Date;
-    companyId: string;
-    userId: number;
-  }) {
+  async findRiskSyncChanges({ lastPulledVersion, companyId, userId }: { lastPulledVersion?: Date; companyId: string; userId: number }) {
     const options: Prisma.RiskFactorsFindManyArgs = {};
     options.select = {
       name: true,
@@ -281,15 +245,7 @@ export class SyncRepository {
     return riskChanges;
   }
 
-  async findGenerateSourceSyncChanges({
-    lastPulledVersion,
-    companyId,
-    userId,
-  }: {
-    lastPulledVersion: Date;
-    companyId: string;
-    userId: number;
-  }) {
+  async findGenerateSourceSyncChanges({ lastPulledVersion, companyId, userId }: { lastPulledVersion: Date; companyId: string; userId: number }) {
     const options: Prisma.GenerateSourceFindManyArgs = {};
     options.select = {
       name: true,
@@ -373,17 +329,7 @@ export class SyncRepository {
     });
   }
 
-  async findHierarchySyncChanges({
-    lastPulledVersion,
-    companyIds,
-    workspaceId,
-    userId,
-  }: {
-    lastPulledVersion: Date;
-    workspaceId?: string;
-    companyIds: string[];
-    userId: number;
-  }) {
+  async findHierarchySyncChanges({ lastPulledVersion, companyIds, workspaceId, userId }: { lastPulledVersion: Date; workspaceId?: string; companyIds: string[]; userId: number }) {
     const options: Prisma.HierarchyFindManyArgs = {};
     options.select = {
       name: true,
@@ -430,16 +376,7 @@ export class SyncRepository {
     return hierarchyChanges;
   }
 
-  async findEmployeeSyncChanges({
-    lastPulledVersion,
-    companyIds,
-    userId,
-  }: {
-    lastPulledVersion: Date;
-    workspaceId?: string;
-    companyIds: string[];
-    userId: number;
-  }) {
+  async findEmployeeSyncChanges({ lastPulledVersion, companyIds, userId }: { lastPulledVersion: Date; workspaceId?: string; companyIds: string[]; userId: number }) {
     const options: Prisma.EmployeeFindManyArgs = {};
     options.select = {
       name: true,
@@ -474,34 +411,27 @@ export class SyncRepository {
     return employeeChanges;
   }
 
-
-  async findCharacterizationChanges({
-    workspaceId,
-    companyId,
-    lastSync
-  }: {
-    workspaceId: string;
-    companyId: string;
-    lastSync?: Date
-  }) {
-
+  async findCharacterizationChanges({ workspaceId, companyId, lastSync }: { workspaceId: string; companyId: string; lastSync?: Date }) {
     const characterizations = await this.prisma.companyCharacterization.findMany({
       where: {
         companyId,
         workspaceId,
         ...(lastSync && {
-          OR: [{
-            updated_at: { gte: lastSync },
-          }, {
-            homogeneousGroup: {
-              riskFactorData: {
-                some: {
-                  updatedAt: { gte: lastSync },
-                }
-              }
-            }
-          }]
-        })
+          OR: [
+            {
+              updated_at: { gte: lastSync },
+            },
+            {
+              homogeneousGroup: {
+                riskFactorData: {
+                  some: {
+                    updatedAt: { gte: lastSync },
+                  },
+                },
+              },
+            },
+          ],
+        }),
       },
       select: {
         id: true,
@@ -524,13 +454,13 @@ export class SyncRepository {
           select: {
             hierarchyOnHomogeneous: {
               select: {
-                hierarchyId: true
-              }
+                hierarchyId: true,
+              },
             },
             riskFactorData: {
               where: {
                 endDate: null,
-                deletedAt: null
+                deletedAt: null,
               },
               select: {
                 createdAt: true,
@@ -541,21 +471,21 @@ export class SyncRepository {
                 exposure: true,
                 activities: true,
                 riskId: true,
-                recs: { select: { id: true, } },
-                adms: { select: { id: true, } },
-                generateSources: { select: { id: true, } },
+                recs: { select: { rec_med_id: true } },
+                adms: { select: { id: true } },
+                generateSources: { select: { id: true } },
                 epiToRiskFactorData: {
-                  include: { epi: { select: { ca: true, equipment: true, } } }
+                  include: { epi: { select: { ca: true, equipment: true } } },
                 },
                 engsToRiskFactorData: {
                   select: {
                     recMedId: true,
                     efficientlyCheck: true,
-                  }
+                  },
                 },
-              }
-            }
-          }
+              },
+            },
+          },
         },
         photos: {
           select: {
@@ -563,13 +493,19 @@ export class SyncRepository {
             photoUrl: true,
             created_at: true,
             updated_at: true,
-            deleted_at: true
-          }
-        }
-      }
-    })
+            deleted_at: true,
+          },
+        },
+      },
+    });
+    characterizations.forEach((c) => {
+      c.homogeneousGroup.riskFactorData.forEach((r) => {
+        r.recs.forEach((r) => {
+          (r as any).id = r.rec_med_id;
+        });
+      });
+    });
 
     return characterizations;
   }
 }
-

@@ -85,7 +85,11 @@ export class RiskGroupDataRepository {
           },
           include: {
             adms: true,
-            recs: true,
+            recs: {
+              select: {
+                recMed: true,
+              },
+            },
             generateSources: true,
             epiToRiskFactorData: { include: { epi: true } },
             engsToRiskFactorData: { include: { recMed: true } },
@@ -122,10 +126,8 @@ export class RiskGroupDataRepository {
 
     riskFactorGroupDataEntity.data.map((data, index) => {
       if (data.homogeneousGroup.characterization && isEnvironment(data.homogeneousGroup.characterization.type)) {
-        (riskFactorGroupDataEntity.data[index].homogeneousGroup as any).environment = data.homogeneousGroup
-          .characterization as any;
-        riskFactorGroupDataEntity.data[index].homogeneousGroup.characterization =
-          data.homogeneousGroup.characterization = null;
+        (riskFactorGroupDataEntity.data[index].homogeneousGroup as any).environment = data.homogeneousGroup.characterization as any;
+        riskFactorGroupDataEntity.data[index].homogeneousGroup.characterization = data.homogeneousGroup.characterization = null;
       }
     });
 
@@ -214,7 +216,11 @@ export class RiskGroupDataRepository {
           },
           include: {
             adms: true,
-            recs: true,
+            recs: {
+              select: {
+                recMed: true,
+              },
+            },
             generateSources: true,
             epiToRiskFactorData: { include: { epi: true } },
             engsToRiskFactorData: { include: { recMed: true } },

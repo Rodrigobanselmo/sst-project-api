@@ -631,15 +631,16 @@ model DocumentControlFile {
 }
 
 model SystemFile {
-  id            String   @id @default(uuid())
+  id            String    @id @default(uuid())
   url           String
   key           String
   bucket        String
   name          String
   size          Int
-  should_delete Boolean  @default(false)
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
+  should_delete Boolean   @default(false)
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  deleted_at    DateTime?
   metadata      Json?
 
   company_id String
@@ -1675,7 +1676,7 @@ model RecMed {
   dataRecs             RiskFactorDataRec[]
   engsToRiskFactorData EngsToRiskFactorData[]
   adms                 RiskFactorData[]       @relation("adms")
-  recs                 RiskFactorData[]       @relation("recs")
+  recs                 RecMedOnRiskData[]
 
   @@unique([id, companyId])
 }
@@ -1851,7 +1852,7 @@ model RiskFactorData {
   engsToRiskFactorData  EngsToRiskFactorData[]
   generateSources       GenerateSource[]       @relation("GenerateSourceToRiskFactorData")
   adms                  RecMed[]               @relation("adms")
-  recs                  RecMed[]               @relation("recs")
+  recs                  RecMedOnRiskData[]
 
   @@unique([id, companyId])
   @@unique([id, riskId, riskFactorGroupDataId])
@@ -2129,6 +2130,17 @@ model Workspace {
   @@unique([abbreviation, companyId])
   @@unique([id, companyId])
   @@index([companyId])
+}
+
+model RecMedOnRiskData {
+  recMed       RecMed         @relation(fields: [rec_med_id], references: [id])
+  rec_med_id   String
+  riskData     RiskFactorData @relation(fields: [risk_data_id], references: [id])
+  risk_data_id String
+
+  sequential_id Int?
+
+  @@id([rec_med_id, risk_data_id])
 }
 
 enum CharacterizationTypeEnum {

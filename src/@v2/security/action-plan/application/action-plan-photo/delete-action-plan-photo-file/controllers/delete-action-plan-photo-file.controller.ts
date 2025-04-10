@@ -17,7 +17,7 @@ export class DeleteActionPlanPhotoFileController {
     code: PermissionEnum.ACTION_PLAN,
     isContract: true,
     isMember: true,
-    crud: true,
+    crud: 'c',
   })
   async execute(@Param() path: DeleteFilePath) {
     return this.deleteActionPlanPhotoFileUseCase.execute({
