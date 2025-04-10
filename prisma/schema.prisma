@@ -357,7 +357,9 @@ model Company {
   DocumentControl            DocumentControl[]
   SystemFile                 SystemFile[]
   DocumentControlFile        DocumentControlFile[]
+  FormApplication            FormApplication[]
   Form                       Form[]
+  FormQuestionData           FormQuestionData[]
 
   @@index([name])
   @@index([isClinic])
@@ -799,6 +801,7 @@ model Employee {
   pppHistory           EmployeePPPHistory[]
   subOffices           Hierarchy[]                @relation("sub_offices")
   normalized           String?
+  form_answers         FormParticipantsAnswers[]
 
   @@unique([id, companyId])
   @@unique([cpf, companyId])
@@ -1176,42 +1179,75 @@ model ExamToRiskData {
 }
 
 model Form {
-  id            Int          @id @default(autoincrement())
-  name          String
-  description   String?
-  type          FormTypeEnum @default(NORMAL)
-  status        StatusEnum   @default(ACTIVE)
-  annonimous    Boolean      @default(false) // TRUE = pode ver quem respondeu, mas não as respostas, resultado liberado somente se cumprir anonimato / FALSE = pode ver quem respondeu e as respostas
-  shareble_link Boolean      @default(false) // TRUE = pode compartilhar o link e se não for anonimo pede para identificar
-  created_at    DateTime     @default(now())
-  updated_at    DateTime     @updatedAt
-  deleted_at    DateTime?
+  id             Int          @id @default(autoincrement())
+  name           String
+  description    String?
+  type           FormTypeEnum @default(NORMAL)
+  anonymous      Boolean      @default(false) // TRUE = pode ver quem respondeu, mas não as respostas, resultado liberado somente se cumprir anonimato / FALSE = pode ver quem respondeu e as respostas
+  shareable_link Boolean      @default(false) // TRUE = pode compartilhar o link e se não for anonimo pede para identificar
+  system         Boolean      @default(false) // TRUE = sistema / FALSE = cliente
+  created_at     DateTime     @default(now())
+  updated_at     DateTime     @updatedAt
+  deleted_at     DateTime?
 
   company_id String
   company    Company @relation(fields: [company_id], references: [id])
 
-  participants FormParticipants?
-  questions    FormQuestion[]
+  form_applications FormApplication[]
+  questions_groups  FormQuestionGroup[]
 
   @@unique([id, company_id])
   @@index([type])
   @@index([company_id])
 }
 
-model FormParticipants {
-  id Int @id @default(autoincrement())
+model FormApplication {
+  id             String     @id @default(uuid())
+  name           String
+  description    String?
+  status         StatusEnum @default(PENDING)
+  shareable_link String?
+  created_at     DateTime   @default(now())
+  updated_at     DateTime   @updatedAt
+  deleted_at     DateTime?
+  started_at     DateTime?
+  ended_at       DateTime?
+
+  company_id String
+  company    Company @relation(fields: [company_id], references: [id])
 
   form_id Int
-  form    Form @relation(fields: [form_id], references: [id], onDelete: Cascade)
+  form    Form @relation(fields: [form_id], references: [id])
+
+  identifier_group_id Int
+  identifier_group    FormQuestionIdentifierGroup @relation(fields: [identifier_group_id], references: [id])
+
+  participants         FormParticipants?
+  participants_answers FormParticipantsAnswers[]
+
+  @@unique([id, company_id])
+  @@index([company_id])
+}
+
+model FormParticipants {
+  id         Int      @id @default(autoincrement())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  form_application_id String
+  form_application    FormApplication @relation(fields: [form_application_id], references: [id], onDelete: Cascade)
 
   workspaces  FormParticipantsWorkspace[]
   hierarchies FormParticipantsHierarchy[]
 
-  @@unique(form_id)
+  @@unique(form_application_id)
 }
 
 model FormParticipantsWorkspace {
-  id          Int       @id @default(autoincrement())
+  id         Int      @id @default(autoincrement())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
   workspaces  Workspace @relation(fields: [workspaceId], references: [id])
   workspaceId String
 
@@ -1220,7 +1256,10 @@ model FormParticipantsWorkspace {
 }
 
 model FormParticipantsHierarchy {
-  id          Int       @id @default(autoincrement())
+  id         Int      @id @default(autoincrement())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
   hierarchy   Hierarchy @relation(fields: [hierarchyId], references: [id])
   hierarchyId String
 
@@ -1228,31 +1267,100 @@ model FormParticipantsHierarchy {
   form_participants    FormParticipants? @relation(fields: [form_participants_id], references: [id], onDelete: Cascade)
 }
 
-model FormQuestion {
-  id       Int     @id @default(autoincrement())
-  required Boolean @default(false)
+model FormQuestionIdentifierGroup {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  form_application FormApplication[]
+  questions        FormQuestion[]
+}
+
+model FormQuestionGroup {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  order       Int
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  deleted_at  DateTime?
 
   form_id Int
   form    Form @relation(fields: [form_id], references: [id], onDelete: Cascade)
 
-  core_id Int?
-  core    FormQuestionCore? @relation(fields: [core_id], references: [id], onDelete: Cascade)
+  questions FormQuestion[]
+}
+
+model FormParticipantsAnswers {
+  id         Int      @id @default(autoincrement())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  form_application_id String
+  form_application    FormApplication @relation(fields: [form_application_id], references: [id])
+
+  employee_id Int?
+  employee    Employee? @relation(fields: [employee_id], references: [id], onDelete: Cascade)
+
+  answers FormAnswer[]
+}
+
+model FormQuestion {
+  id         Int       @id @default(autoincrement())
+  required   Boolean   @default(false)
+  order      Int
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
+  question_id Int
+  question    FormQuestionData @relation(fields: [question_id], references: [id], onDelete: Cascade)
+
+  group_id Int?
+  group    FormQuestionGroup? @relation(fields: [group_id], references: [id], onDelete: Cascade)
+
+  identifier_group_id Int?
+  identifier_group    FormQuestionIdentifierGroup? @relation(fields: [identifier_group_id], references: [id])
+
+  answers FormAnswer[]
+}
+
+model FormAnswer {
+  id         Int      @id @default(autoincrement())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  value      String?
+
+  option_id Int?
+  option    FormQuestionOption? @relation(fields: [option_id], references: [id], onDelete: Cascade)
+
+  question_id Int
+  question    FormQuestion @relation(fields: [question_id], references: [id], onDelete: Cascade)
+
+  participants_answers_id Int
+  participants_answers    FormParticipantsAnswers @relation(fields: [participants_answers_id], references: [id])
+}
+
+model FormQuestionData {
+  id           Int                  @id @default(autoincrement())
+  text         String
+  type         FormQuestionTypeEnum
+  accept_other Boolean              @default(false)
+  system       Boolean              @default(false)
+  created_at   DateTime             @default(now())
+  updated_at   DateTime             @updatedAt
+  deleted_at   DateTime?
+
+  company_id String
+  company    Company @relation(fields: [company_id], references: [id])
 
   copsoq_id Int?
   copsoq    FormQuestionCOPSOQ? @relation(fields: [copsoq_id], references: [id], onDelete: Cascade)
-}
 
-model FormQuestionIdentifier {
-  id       Int                  @id @default(autoincrement())
-  question String
-  type     FormQuestionTypeEnum
-}
-
-model FormQuestionCore {
-  id           Int                  @id @default(autoincrement())
-  question     String
-  type         FormQuestionTypeEnum
-  accept_other Boolean              @default(false)
+  identifier_id Int?
+  identifier    FormQuestionIdentifier? @relation(fields: [identifier_id], references: [id], onDelete: Cascade)
 
   options            FormQuestionOption[]
   form_question_risk FormQuestionRisk[]
@@ -1263,9 +1371,12 @@ model FormQuestionOption {
   id    Int    @id @default(autoincrement())
   text  String
   order Int
+  value Int
 
   question_id Int
-  question    FormQuestionCore @relation(fields: [question_id], references: [id], onDelete: Cascade)
+  question    FormQuestionData @relation(fields: [question_id], references: [id], onDelete: Cascade)
+
+  answers FormAnswer[]
 
   @@unique([order, question_id])
 }
@@ -1274,33 +1385,29 @@ model FormQuestionRisk {
   id Int @id @default(autoincrement())
 
   question_Id Int
-  question    FormQuestionCore @relation(fields: [question_Id], references: [id], onDelete: Cascade)
+  question    FormQuestionData @relation(fields: [question_Id], references: [id], onDelete: Cascade)
   risk_id     String
   risk        RiskFactors      @relation(fields: [risk_id], references: [id])
 }
 
 model FormQuestionCOPSOQ {
-  id              Int                      @id @default(autoincrement())
-  dimension       String
-  category        String
-  item            String                   @unique
-  question        String
-  custom_question String
-  level           FormCOPSOQLevelEnum
-  type            FormQuestionTypeEnum
-  proportion      FormCOPSOQProportionEnum
+  id        Int                  @id @default(autoincrement())
+  dimension String
+  category  String
+  item      String               @unique
+  question  String
+  level     FormCOPSOQLevelEnum
+  type      FormQuestionTypeEnum
 
-  copsoq_risk   FormQuestionCOPSOQRisk[]
-  form_question FormQuestion[]
+  form_question_data FormQuestionData[]
 }
 
-model FormQuestionCOPSOQRisk {
-  id Int @id @default(autoincrement())
+model FormQuestionIdentifier {
+  id                 Int                    @id @default(autoincrement())
+  direct_association Boolean                @default(false)
+  type               FormIdentifierTypeEnum
 
-  form_copsoq_id Int
-  form_copsoq    FormQuestionCOPSOQ @relation(fields: [form_copsoq_id], references: [id], onDelete: Cascade)
-  risk_id        String
-  risk           RiskFactors        @relation(fields: [risk_id], references: [id])
+  form_question_data FormQuestionData[]
 }
 
 model GenerateSource {
@@ -1583,60 +1690,60 @@ model RefreshToken {
 }
 
 model RiskFactors {
-  id                     String                   @id @default(uuid())
-  name                   String
-  companyId              String
-  severity               Int                      @default(0)
-  system                 Boolean                  @default(false)
-  appendix               String?
-  grauInsalubridade      GrauInsalubridade?
-  synonymous             String[]
-  search                 String?
-  otherAppendix          String?
-  risk                   String?
-  propagation            String[]
-  exame                  String?
-  symptoms               String?
-  method                 String?
-  unit                   String?
-  cas                    String?
-  breather               String?
-  nr15lt                 String?
-  twa                    String?
-  stel                   String?
-  ipvs                   String?
-  pv                     String?
-  pe                     String?
-  carnogenicityACGIH     String?
-  carnogenicityLinach    String?
-  status                 StatusEnum               @default(ACTIVE)
-  type                   RiskFactorsEnum
-  representAll           Boolean                  @default(false)
-  created_at             DateTime                 @default(now())
-  updated_at             DateTime                 @updatedAt
-  deleted_at             DateTime?
-  isEmergency            Boolean                  @default(false)
-  json                   Json?
-  fraction               String?
-  tlv                    String?
-  isAso                  Boolean                  @default(true)
-  isPCMSO                Boolean                  @default(true)
-  isPGR                  Boolean                  @default(true)
-  isPPP                  Boolean                  @default(true)
-  esocialCode            String?
-  coments                String?
-  activities             Json?
-  examToRisk             ExamToRisk[]
-  generateSource         GenerateSource[]
-  protocolToRisk         ProtocolToRisk[]
-  recMed                 RecMed[]
-  riskFactorData         RiskFactorData[]
-  riskFactorProbability  RiskFactorProbability[]
-  company                Company                  @relation(fields: [companyId], references: [id])
-  esocial                EsocialTable24?          @relation(fields: [esocialCode], references: [id], onDelete: Restrict)
-  docInfo                RiskFactorsDocInfo[]
-  formQuestionCOPSOQRisk FormQuestionCOPSOQRisk[]
-  formQuestionRisk       FormQuestionRisk[]
+  id                    String                  @id @default(uuid())
+  name                  String
+  companyId             String
+  severity              Int                     @default(0)
+  system                Boolean                 @default(false)
+  appendix              String?
+  grauInsalubridade     GrauInsalubridade?
+  synonymous            String[]
+  search                String?
+  otherAppendix         String?
+  risk                  String?
+  propagation           String[]
+  exame                 String?
+  symptoms              String?
+  method                String?
+  unit                  String?
+  cas                   String?
+  breather              String?
+  nr15lt                String?
+  twa                   String?
+  stel                  String?
+  ipvs                  String?
+  pv                    String?
+  pe                    String?
+  carnogenicityACGIH    String?
+  carnogenicityLinach   String?
+  status                StatusEnum              @default(ACTIVE)
+  type                  RiskFactorsEnum
+  sub_type              RiskSubTypeEnum[]
+  representAll          Boolean                 @default(false)
+  created_at            DateTime                @default(now())
+  updated_at            DateTime                @updatedAt
+  deleted_at            DateTime?
+  isEmergency           Boolean                 @default(false)
+  json                  Json?
+  fraction              String?
+  tlv                   String?
+  isAso                 Boolean                 @default(true)
+  isPCMSO               Boolean                 @default(true)
+  isPGR                 Boolean                 @default(true)
+  isPPP                 Boolean                 @default(true)
+  esocialCode           String?
+  coments               String?
+  activities            Json?
+  examToRisk            ExamToRisk[]
+  generateSource        GenerateSource[]
+  protocolToRisk        ProtocolToRisk[]
+  recMed                RecMed[]
+  riskFactorData        RiskFactorData[]
+  riskFactorProbability RiskFactorProbability[]
+  company               Company                 @relation(fields: [companyId], references: [id])
+  esocial               EsocialTable24?         @relation(fields: [esocialCode], references: [id], onDelete: Restrict)
+  docInfo               RiskFactorsDocInfo[]
+  formQuestionRisk      FormQuestionRisk[]
 
   @@unique([id, companyId])
   @@index([name])
@@ -2141,12 +2248,6 @@ enum ExamHistoryConclusionEnum {
   NONE
 }
 
-enum FormTypeEnum {
-  NORMAL
-  PSICOSOCIAL
-  RISK
-}
-
 enum HierarchyEnum {
   DIRECTORY
   MANAGEMENT
@@ -2217,6 +2318,10 @@ enum RiskFactorsEnum {
   ERG
   ACI
   OUTROS
+}
+
+enum RiskSubTypeEnum {
+  PSYCHOSOCIAL
 }
 
 enum RiskRecTypeEnum {
@@ -2314,15 +2419,12 @@ enum FormCOPSOQLevelEnum {
   LONG
 }
 
-enum FormCOPSOQProportionEnum {
-  INVERSE
-  DIRECT
-}
-
 enum FormQuestionTypeEnum {
   TEXT
   RADIO
   CHECKBOX
+  DATE
+  NUMBER
   SELECT
   SHORT_TEXT
   LONG_TEXT
@@ -2342,4 +2444,11 @@ enum FormIdentifierTypeEnum {
   SUB_SECTOR
   OFFICE
   SUB_OFFICE
+  CUSTOM
+}
+
+enum FormTypeEnum {
+  NORMAL
+  PSYCHOSOCIAL
+  RISK
 }

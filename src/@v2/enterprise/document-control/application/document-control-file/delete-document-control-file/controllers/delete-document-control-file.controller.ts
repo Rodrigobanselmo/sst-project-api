@@ -1,13 +1,13 @@
 import { Controller, Delete, Param, UseGuards } from '@nestjs/common';
 
-import { DocumentControlRoutes } from '@/@v2/enterprise/document-control/constants/routes';
+import { FormRoutes } from '@/@v2/enterprise/document-control/constants/routes';
 import { JwtAuthGuard } from '@/@v2/shared/guards/jwt-auth.guard';
 import { PermissionEnum } from '@/shared/constants/enum/authorization';
 import { Permissions } from '@/shared/decorators/permissions.decorator';
 import { DeleteDocumentControlFileUseCase } from '../use-cases/delete-document-control-file.usecase';
 import { DeleteDocumentControlFilePath } from './delete-document-control-file.path';
 
-@Controller(DocumentControlRoutes.DOCUMENT_CONTROL_FILE.PATH_ID)
+@Controller(FormRoutes.DOCUMENT_CONTROL_FILE.PATH_ID)
 @UseGuards(JwtAuthGuard)
 export class DeleteDocumentControlFileController {
   constructor(private readonly DeleteDocumentControlFileUseCase: DeleteDocumentControlFileUseCase) {}

@@ -3,12 +3,12 @@ import { Body, Controller, Param, Patch, Post, UseGuards } from '@nestjs/common'
 import { JwtAuthGuard } from '@/@v2/shared/guards/jwt-auth.guard';
 import { PermissionEnum } from '@/shared/constants/enum/authorization';
 import { Permissions } from '@/shared/decorators/permissions.decorator';
-import { DocumentControlRoutes } from '@/@v2/enterprise/document-control/constants/routes';
+import { FormRoutes } from '@/@v2/enterprise/document-control/constants/routes';
 import { EditDocumentControlFilePayload } from './edit-document-control-file.payload';
 import { EditDocumentControlFilePath } from './edit-document-control-file.path';
 import { EditDocumentControlFileUseCase } from '../use-cases/edit-document-control-file.usecase';
 
-@Controller(DocumentControlRoutes.DOCUMENT_CONTROL_FILE.PATH_ID)
+@Controller(FormRoutes.DOCUMENT_CONTROL_FILE.PATH_ID)
 @UseGuards(JwtAuthGuard)
 export class EditDocumentControlFileController {
   constructor(private readonly EditDocumentControlFileUseCase: EditDocumentControlFileUseCase) {}

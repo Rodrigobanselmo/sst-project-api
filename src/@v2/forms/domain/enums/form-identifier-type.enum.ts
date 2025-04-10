@@ -1,0 +1,14 @@
+export enum FormIdentifierTypeEnum {
+  EMAIL = 'EMAIL',
+  CPF = 'CPF',
+  AGE = 'AGE',
+  SEX = 'SEX',
+  WORKSPACE = 'WORKSPACE',
+  DIRECTORY = 'DIRECTORY',
+  MANAGEMENT = 'MANAGEMENT',
+  SECTOR = 'SECTOR',
+  SUB_SECTOR = 'SUB_SECTOR',
+  OFFICE = 'OFFICE',
+  SUB_OFFICE = 'SUB_OFFICE',
+  CUSTOM = 'CUSTOM',
+}
