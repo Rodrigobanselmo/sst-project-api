@@ -8,10 +8,9 @@ export type FormApplicationEntityConstructor = {
   shareableLink?: string;
   createdAt?: Date;
   updatedAt?: Date;
-  deletedAt?: Date | null;
   companyId: string;
-  formId: number;
-  identifierGroupId: number;
+  endedAt?: Date;
+  startAt?: Date;
 };
 
 export class FormApplicationEntity {
@@ -22,10 +21,9 @@ export class FormApplicationEntity {
   shareableLink?: string;
   createdAt: Date;
   updatedAt: Date;
-  deletedAt: Date | null;
   companyId: string;
-  formId: number;
-  identifierGroupId: number;
+  endedAt?: Date;
+  startAt?: Date;
 
   constructor(params: FormApplicationEntityConstructor) {
     this.id = params.id ?? '-';
@@ -35,9 +33,8 @@ export class FormApplicationEntity {
     this.shareableLink = params.shareableLink;
     this.createdAt = params.createdAt ?? new Date();
     this.updatedAt = params.updatedAt ?? new Date();
-    this.deletedAt = params.deletedAt ?? null;
+    this.startAt = params.startAt;
+    this.endedAt = params.endedAt;
     this.companyId = params.companyId;
-    this.formId = params.formId;
-    this.identifierGroupId = params.identifierGroupId;
   }
 }

@@ -3,7 +3,8 @@ export type FormQuestionOptionEntityConstructor = {
   text: string;
   order: number;
   value: number;
-  questionId: number;
+  createdAt?: Date;
+  updatedAt?: Date;
 };
 
 export class FormQuestionOptionEntity {
@@ -11,13 +12,15 @@ export class FormQuestionOptionEntity {
   text: string;
   order: number;
   value: number;
-  questionId: number;
+  createdAt: Date;
+  updatedAt: Date;
 
   constructor(params: FormQuestionOptionEntityConstructor) {
     this.id = params.id ?? 0;
     this.text = params.text;
     this.order = params.order;
     this.value = params.value;
-    this.questionId = params.questionId;
+    this.createdAt = params.createdAt ?? new Date();
+    this.updatedAt = params.updatedAt ?? new Date();
   }
 }

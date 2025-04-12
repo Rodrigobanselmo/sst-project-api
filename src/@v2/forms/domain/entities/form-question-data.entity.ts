@@ -8,10 +8,7 @@ export type FormQuestionDataEntityConstructor = {
   system?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
-  deletedAt?: Date | null;
   companyId: string;
-  copsoqId?: number;
-  identifierId?: number;
 };
 
 export class FormQuestionDataEntity {
@@ -22,10 +19,7 @@ export class FormQuestionDataEntity {
   system: boolean;
   createdAt: Date;
   updatedAt: Date;
-  deletedAt: Date | null;
   companyId: string;
-  copsoqId?: number;
-  identifierId?: number;
 
   constructor(params: FormQuestionDataEntityConstructor) {
     this.id = params.id ?? 0;
@@ -35,9 +29,6 @@ export class FormQuestionDataEntity {
     this.system = params.system ?? false;
     this.createdAt = params.createdAt ?? new Date();
     this.updatedAt = params.updatedAt ?? new Date();
-    this.deletedAt = params.deletedAt ?? null;
     this.companyId = params.companyId;
-    this.copsoqId = params.copsoqId;
-    this.identifierId = params.identifierId;
   }
 }

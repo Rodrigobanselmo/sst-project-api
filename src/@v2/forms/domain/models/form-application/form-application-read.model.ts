@@ -11,7 +11,6 @@ export class FormApplicationReadModel {
   id: string;
   companyId: string;
   name: string;
-  type: string;
   description: string | undefined;
   createdAt: Date;
   updatedAt: Date;

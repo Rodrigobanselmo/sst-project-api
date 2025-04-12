@@ -1,8 +1,7 @@
 import { FormApplicationReadModel } from '@/@v2/forms/domain/models/form-application/form-application-read.model';
-import { FileModelMapper } from '@/@v2/shared/utils/mappers/file-model.mapper';
-import { FormApplication } from '@prisma/client';
+import { FormApplication as PrismaFormApplication } from '@prisma/client';
 
-export type IFormApplicationReadModelMapper = FormApplication;
+export type IFormApplicationReadModelMapper = PrismaFormApplication;
 
 export class FormApplicationReadModelMapper {
   static toModel(prisma: IFormApplicationReadModelMapper): FormApplicationReadModel {

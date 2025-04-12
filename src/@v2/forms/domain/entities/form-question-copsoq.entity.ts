@@ -1,24 +1,24 @@
+import { FormCOPSOQCategoryEnum } from '../enums/form-copsoq-category.enum';
+import { FormCOPSOQDimensionEnum } from '../enums/form-copsoq-dimension.enum';
 import { FormCOPSOQLevelEnum } from '../enums/form-copsoq-level.enum';
 import { FormQuestionTypeEnum } from '../enums/form-question-type.enum';
 
 export type FormQuestionCOPSOQEntityConstructor = {
   id?: number;
-  dimension: string;
-  category: string;
+  dimension: FormCOPSOQDimensionEnum;
+  category: FormCOPSOQCategoryEnum;
   item: string;
   question: string;
   level: FormCOPSOQLevelEnum;
-  type: FormQuestionTypeEnum;
 };
 
 export class FormQuestionCOPSOQEntity {
   id: number;
-  dimension: string;
-  category: string;
+  dimension: FormCOPSOQDimensionEnum;
+  category: FormCOPSOQCategoryEnum;
   item: string;
   question: string;
   level: FormCOPSOQLevelEnum;
-  type: FormQuestionTypeEnum;
 
   constructor(params: FormQuestionCOPSOQEntityConstructor) {
     this.id = params.id ?? 0;
@@ -27,6 +27,5 @@ export class FormQuestionCOPSOQEntity {
     this.item = params.item;
     this.question = params.question;
     this.level = params.level;
-    this.type = params.type;
   }
 }

@@ -1,3 +1,4 @@
+import { FormStatusEnum } from '@/@v2/forms/domain/enums/form-status.enum';
 import { IOrderBy } from '@/@v2/shared/types/order-by.types';
 
 export enum FormApplicationOrderByEnum {
@@ -23,6 +24,7 @@ export namespace IFormApplicationDAO {
     filters: {
       companyId: string;
       search?: string;
+      status?: FormStatusEnum[];
     };
   };
 }

@@ -1203,16 +1203,15 @@ model Form {
 }
 
 model FormApplication {
-  id             String     @id @default(uuid())
-  name           String
-  description    String?
-  status         StatusEnum @default(PENDING)
-  shareable_link String?
-  created_at     DateTime   @default(now())
-  updated_at     DateTime   @updatedAt
-  deleted_at     DateTime?
-  started_at     DateTime?
-  ended_at       DateTime?
+  id          String     @id @default(uuid())
+  name        String
+  description String?
+  status      StatusEnum @default(PENDING)
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+  deleted_at  DateTime?
+  started_at  DateTime?
+  ended_at    DateTime?
 
   company_id String
   company    Company @relation(fields: [company_id], references: [id])
@@ -1220,8 +1219,8 @@ model FormApplication {
   form_id Int
   form    Form @relation(fields: [form_id], references: [id])
 
-  identifier_group_id Int
-  identifier_group    FormQuestionIdentifierGroup @relation(fields: [identifier_group_id], references: [id])
+  question_identifier_group_id Int?
+  question_identifier_group    FormQuestionIdentifierGroup? @relation(fields: [question_identifier_group_id], references: [id])
 
   participants         FormParticipants?
   participants_answers FormParticipantsAnswers[]
@@ -1249,8 +1248,8 @@ model FormParticipantsWorkspace {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  workspaces  Workspace @relation(fields: [workspaceId], references: [id])
-  workspaceId String
+  workspaces   Workspace @relation(fields: [workspace_id], references: [id])
+  workspace_id String
 
   form_participants_id Int
   form_participants    FormParticipants? @relation(fields: [form_participants_id], references: [id], onDelete: Cascade)
@@ -1261,8 +1260,8 @@ model FormParticipantsHierarchy {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  hierarchy   Hierarchy @relation(fields: [hierarchyId], references: [id])
-  hierarchyId String
+  hierarchy    Hierarchy @relation(fields: [hierarchy_id], references: [id])
+  hierarchy_id String
 
   form_participants_id Int
   form_participants    FormParticipants? @relation(fields: [form_participants_id], references: [id], onDelete: Cascade)
@@ -1316,14 +1315,14 @@ model FormQuestion {
   updated_at DateTime  @updatedAt
   deleted_at DateTime?
 
-  question_id Int
-  question    FormQuestionData @relation(fields: [question_id], references: [id], onDelete: Cascade)
+  question_data_id Int
+  question_data    FormQuestionData @relation(fields: [question_data_id], references: [id], onDelete: Cascade)
 
-  group_id Int?
-  group    FormQuestionGroup? @relation(fields: [group_id], references: [id], onDelete: Cascade)
+  question_group_id Int?
+  question_group    FormQuestionGroup? @relation(fields: [question_group_id], references: [id], onDelete: Cascade)
 
-  identifier_group_id Int?
-  identifier_group    FormQuestionIdentifierGroup? @relation(fields: [identifier_group_id], references: [id])
+  question_identifier_group_id Int?
+  question_identifier_group    FormQuestionIdentifierGroup? @relation(fields: [question_identifier_group_id], references: [id])
 
   answers FormAnswer[]
 }
@@ -1357,11 +1356,11 @@ model FormQuestionData {
   company_id String
   company    Company @relation(fields: [company_id], references: [id])
 
-  copsoq_id Int?
-  copsoq    FormQuestionCOPSOQ? @relation(fields: [copsoq_id], references: [id], onDelete: Cascade)
+  question_copsoq_id Int?
+  question_copsoq    FormQuestionCOPSOQ? @relation(fields: [question_copsoq_id], references: [id], onDelete: Cascade)
 
-  identifier_id Int?
-  identifier    FormQuestionIdentifier? @relation(fields: [identifier_id], references: [id], onDelete: Cascade)
+  question_identifier_id Int?
+  question_identifier    FormQuestionIdentifier? @relation(fields: [question_identifier_id], references: [id], onDelete: Cascade)
 
   options            FormQuestionOption[]
   form_question_risk FormQuestionRisk[]
@@ -1369,10 +1368,12 @@ model FormQuestionData {
 }
 
 model FormQuestionOption {
-  id    Int    @id @default(autoincrement())
-  text  String
-  order Int
-  value Int
+  id         Int      @id @default(autoincrement())
+  text       String
+  order      Int
+  value      Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   question_id Int
   question    FormQuestionData @relation(fields: [question_id], references: [id], onDelete: Cascade)
@@ -1392,13 +1393,15 @@ model FormQuestionRisk {
 }
 
 model FormQuestionCOPSOQ {
-  id        Int                  @id @default(autoincrement())
-  dimension String
-  category  String
-  item      String               @unique
-  question  String
-  level     FormCOPSOQLevelEnum
-  type      FormQuestionTypeEnum
+  id         Int                     @id @default(autoincrement())
+  dimension  FormCOPSOQDimensionEnum
+  category   FormCOPSOQCategoryEnum
+  item       String                  @unique
+  question   String
+  level      FormCOPSOQLevelEnum
+  created_at DateTime                @default(now())
+  updated_at DateTime                @updatedAt
+  deleted_at DateTime?
 
   form_question_data FormQuestionData[]
 }
@@ -1407,6 +1410,10 @@ model FormQuestionIdentifier {
   id                 Int                    @id @default(autoincrement())
   direct_association Boolean                @default(false)
   type               FormIdentifierTypeEnum
+  system             Boolean                @default(false)
+  created_at         DateTime               @default(now())
+  updated_at         DateTime               @updatedAt
+  deleted_at         DateTime?
 
   form_question_data FormQuestionData[]
 }
@@ -2463,4 +2470,63 @@ enum FormTypeEnum {
   NORMAL
   PSYCHOSOCIAL
   RISK
+}
+
+enum FormCOPSOQCategoryEnum {
+  COMPORTAMENTOS_OFENSIVOS
+  EXIGENCIAS_LABORAIS
+  INTERFACE_TRABALHO_INDIVIDUO
+  ORGANIZACAO_DO_TRABALHO_E_CONTEUDO
+  PERSONALIDADE
+  RELACOES_SOCIAIS_E_LIDERANCA
+  SAUDE_E_BEM_ESTAR
+  VALORES_NO_LOCAL_DE_TRABALHO
+}
+
+enum FormCOPSOQDimensionEnum {
+  COMPORTAMENTOS_OFENSIVOS
+  AMEACAS_DE_VIOLENCIA
+  ASSEDIO_SEXUAL
+  ASSEDIO_VIRTUAL
+  ATOS_NEGATIVOS
+  BULLYING
+  CONFLITOS_E_DESENTENDIMENTOS
+  VIOLENCIA_FISICA
+  EXIGENCIAS_QUANTITATIVAS
+  RITMO_DE_TRABALHO
+  DEMANDAS_COGNITIVAS
+  DEMANDAS_EMOCIONAIS
+  DEMANDAS_PARA_ESCONDER_EMOCOES
+  SATISFACAO_NO_TRABALHO
+  INSEGURANCA_NO_TRABALHO
+  CONFLITO_TRABALHO_FAMILIA
+  INSEGURANCA_SOBRE_CONDICOES_DE_TRABALHO
+  QUALIDADE_DO_TRABALHO
+  CONTROLE_SOBRE_O_TEMPO_DE_TRABALHO
+  INFLUENCIA_NO_TRABALHO
+  POSSIBILIDADES_DE_DESENVOLVIMENTO
+  SIGNIFICADO_DO_TRABALHO
+  ENGAJAMENTO_NO_TRABALHO
+  COMPROMISSO_FACE_AO_LOCAL_DE_TRABALHO
+  VARIEDADE_DE_TRABALHO
+  AUTOEFICACIA
+  PREVISIBILIDADE
+  TRANSPARENCIA_DE_PAPEL
+  RECOMPENSAS
+  CONFLITOS_LABORAIS
+  TAREFAS_ILEGITIMAS
+  APOIO_SOCIAL_DE_COLEGAS
+  APOIO_SOCIAL_DE_SUPERIORES
+  QUALIDADE_DA_CHEFIA
+  SAUDE_GERAL
+  PROBLEMAS_EM_DORMIR
+  BURNOUT
+  ESTRESSE
+  SINTOMAS_DEPRESSIVOS
+  ESTRESSE_COGNITIVO
+  ESTRESSE_SOMATICO
+  SENTIDO_DE_COMUNIDADE_SOCIAL_NO_TRABALHO
+  CONFIANCA_HORIZONTAL
+  CONFIANCA_VERTICAL
+  JUSTICA_E_RESPEITO_ORGANIZACIONAL
 }

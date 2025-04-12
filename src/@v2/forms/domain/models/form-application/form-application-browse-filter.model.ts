@@ -1,11 +1,13 @@
+import { FormStatusEnum } from '../../enums/form-status.enum';
+
 export type IFormApplicationBrowseFilterModel = {
-  types: string[];
+  status: FormStatusEnum[];
 };
 
 export class FormApplicationBrowseFilterModel {
-  types: string[];
+  status: FormStatusEnum[];
 
   constructor(params: IFormApplicationBrowseFilterModel) {
-    this.types = params.types || [];
+    this.status = params.status || [];
   }
 }

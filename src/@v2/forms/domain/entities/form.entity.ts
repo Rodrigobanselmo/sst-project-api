@@ -10,7 +10,6 @@ export type FormEntityConstructor = {
   system?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
-  deletedAt?: Date | null;
   companyId: string;
 };
 
@@ -24,7 +23,6 @@ export class FormEntity {
   system: boolean;
   createdAt: Date;
   updatedAt: Date;
-  deletedAt: Date | null;
   companyId: string;
 
   constructor(params: FormEntityConstructor) {
@@ -37,7 +35,6 @@ export class FormEntity {
     this.system = params.system ?? false;
     this.createdAt = params.createdAt ?? new Date();
     this.updatedAt = params.updatedAt ?? new Date();
-    this.deletedAt = params.deletedAt ?? null;
     this.companyId = params.companyId;
   }
 }

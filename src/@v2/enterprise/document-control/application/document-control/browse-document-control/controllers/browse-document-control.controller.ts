@@ -1,6 +1,6 @@
 import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 
-import { FormRoutes } from '@/@v2/enterprise/document-control/constants/routes';
+import { DocumentControlRoutes } from '@/@v2/enterprise/document-control/constants/routes';
 import { JwtAuthGuard } from '@/@v2/shared/guards/jwt-auth.guard';
 import { PermissionEnum } from '@/shared/constants/enum/authorization';
 import { Permissions } from '@/shared/decorators/permissions.decorator';
@@ -8,7 +8,7 @@ import { BrowseDocumentControlUseCase } from '../use-cases/browse-document-contr
 import { BrowseDocumentControlPath } from './browse-document-control.path';
 import { BrowseDocumentControlQuery } from './browse-document-control.query';
 
-@Controller(FormRoutes.DOCUMENT_CONTROL.PATH)
+@Controller(DocumentControlRoutes.DOCUMENT_CONTROL.PATH)
 @UseGuards(JwtAuthGuard)
 export class BrowseDocumentControlController {
   constructor(private readonly browseDocumentControlUseCase: BrowseDocumentControlUseCase) {}

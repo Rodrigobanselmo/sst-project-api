@@ -3,7 +3,6 @@ export type FormParticipantsWorkspaceEntityConstructor = {
   createdAt?: Date;
   updatedAt?: Date;
   workspaceId: string;
-  formParticipantsId: number;
 };
 
 export class FormParticipantsWorkspaceEntity {
@@ -11,13 +10,11 @@ export class FormParticipantsWorkspaceEntity {
   createdAt: Date;
   updatedAt: Date;
   workspaceId: string;
-  formParticipantsId: number;
 
   constructor(params: FormParticipantsWorkspaceEntityConstructor) {
     this.id = params.id ?? 0;
     this.createdAt = params.createdAt ?? new Date();
     this.updatedAt = params.updatedAt ?? new Date();
     this.workspaceId = params.workspaceId;
-    this.formParticipantsId = params.formParticipantsId;
   }
 }
