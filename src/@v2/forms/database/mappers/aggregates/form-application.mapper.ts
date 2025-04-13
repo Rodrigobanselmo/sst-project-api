@@ -6,16 +6,14 @@ import { FormParticipantsWorkspaceEntityMapper } from '../entities/form-particip
 import { FormEntityMapper, FormEntityMapperConstructor } from '../entities/form.mapper';
 import { FormQuestionIdentifierGroupAggregateMapper, FormQuestionIdentifierGroupAggregateMapperConstructor } from './form-question-identifier-group.mapper';
 
-type NewType = {
+export type FormApplicationAggregateMapperConstructor = PrismaFormApplication & {
   form: FormEntityMapperConstructor;
   participants: {
     workspaces: PrismaFormParticipantsWorkspace[];
     hierarchies: PrismaFormParticipantsHierarchy[];
   } | null;
-  question_identifier_group: FormQuestionIdentifierGroupAggregateMapperConstructor;
+  question_identifier_group: FormQuestionIdentifierGroupAggregateMapperConstructor | null;
 };
-
-export type FormApplicationAggregateMapperConstructor = PrismaFormApplication & NewType;
 
 export class FormApplicationAggregateMapper {
   static toAggregate(prisma: FormApplicationAggregateMapperConstructor): FormApplicationAggregate {
@@ -24,7 +22,7 @@ export class FormApplicationAggregateMapper {
       form: FormEntityMapper.toEntity(prisma.form),
       participantsHierarchies: FormParticipantsHierarchiesEntityMapper.toArray(prisma.participants?.hierarchies || []),
       participantsWorkspaces: FormParticipantsWorkspaceEntityMapper.toArray(prisma.participants?.workspaces || []),
-      identifier: FormQuestionIdentifierGroupAggregateMapper.toAggregate(prisma.question_identifier_group),
+      identifier: prisma.question_identifier_group ? FormQuestionIdentifierGroupAggregateMapper.toAggregate(prisma.question_identifier_group) : undefined,
     });
   }
 

@@ -65,24 +65,27 @@ export class FormApplicationAggregateRepository {
           status: params.formApplication.status,
           ended_at: params.formApplication.endedAt,
           started_at: params.formApplication.startAt,
-          shareable_link: params.formApplication.shareableLink,
           question_identifier_group_id: questionIdentifierGroup?.id,
           participants: {
             create: {
-              hierarchies: {
-                createMany: {
-                  data: params.participantsHierarchies.map((patient) => ({
-                    hierarchy_id: patient.hierarchyId,
-                  })),
-                },
-              },
-              workspaces: {
-                createMany: {
-                  data: params.participantsWorkspaces.map((workspace) => ({
-                    workspace_id: workspace.workspaceId,
-                  })),
-                },
-              },
+              hierarchies: params.participantsHierarchies.length
+                ? {
+                    createMany: {
+                      data: params.participantsHierarchies.map((patient) => ({
+                        hierarchy_id: patient.hierarchyId,
+                      })),
+                    },
+                  }
+                : undefined,
+              workspaces: params.participantsWorkspaces.length
+                ? {
+                    createMany: {
+                      data: params.participantsWorkspaces.map((workspace) => ({
+                        workspace_id: workspace.workspaceId,
+                      })),
+                    },
+                  }
+                : undefined,
             },
           },
         },
@@ -96,12 +99,54 @@ export class FormApplicationAggregateRepository {
   }
 
   async update(params: IFormApplicationAggregateRepository.UpdateParams): IFormApplicationAggregateRepository.UpdateReturn {
+    const listCreateHierarchyParticipants = params.participantsHierarchies.filter((participant) => !participant.id);
+    const listCreateWorkspaceParticipants = params.participantsWorkspaces.filter((participant) => !participant.id);
+
     const formApplication = await this.prisma.formApplication.update({
       where: {
         id: params.formApplication.id,
         company_id: params.formApplication.companyId,
       },
-      data: {},
+      data: {
+        name: params.formApplication.name,
+        description: params.formApplication.description,
+        ended_at: params.formApplication.endedAt,
+        started_at: params.formApplication.startAt,
+        status: params.formApplication.status,
+        form_id: params.form.id,
+        participants: {
+          update: {
+            hierarchies: {
+              deleteMany: {
+                hierarchy_id: {
+                  notIn: params.participantsHierarchies.map((patient) => patient.hierarchyId),
+                },
+              },
+              createMany: listCreateHierarchyParticipants.length
+                ? {
+                    data: listCreateHierarchyParticipants.map((patient) => ({
+                      hierarchy_id: patient.hierarchyId,
+                    })),
+                  }
+                : undefined,
+            },
+            workspaces: {
+              deleteMany: {
+                workspace_id: {
+                  notIn: params.participantsWorkspaces.map((workspace) => workspace.workspaceId),
+                },
+              },
+              createMany: listCreateWorkspaceParticipants.length
+                ? {
+                    data: listCreateWorkspaceParticipants.map((workspace) => ({
+                      workspace_id: workspace.workspaceId,
+                    })),
+                  }
+                : undefined,
+            },
+          },
+        },
+      },
       ...FormApplicationAggregateRepository.selectOptions(),
     });
 
