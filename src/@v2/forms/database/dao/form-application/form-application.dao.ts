@@ -41,8 +41,8 @@ export class FormApplicationDAO {
         ,form_ap."description" as description
         ,form_ap."company_id" as company_id
         ,form_ap."status" as status
-        ,form_ap."end_date" as end_date
-        ,form_ap."start_date" as start_date
+        ,form_ap."ended_at" as end_date
+        ,form_ap."started_at" as start_date
         ,form_ap."created_at" as created_at
         ,form_ap."updated_at" as updated_at
         ,form."id" as form_id
@@ -58,14 +58,28 @@ export class FormApplicationDAO {
       LEFT JOIN 
         "FormParticipantsAnswers" form_part ON form_part."form_application_id" = form_ap."id"
       LEFT JOIN 
-        "FormParticipantsWorkspace" form_part_ws ON form_part_ws."form_participant_id" = form_part."id"
+        "FormParticipantsWorkspace" form_part_ws ON form_part_ws."form_participants_id" = form_part."id"
       LEFT JOIN 
         "_HierarchyToWorkspace" h_t_w ON h_t_w."B" = form_part_ws."workspace_id"
       LEFT JOIN 
-        "FormParticipantsHierarchy" form_part_hier ON form_part_hier."form_participant_id" = form_part."id"
+        "FormParticipantsHierarchy" form_part_hier ON form_part_hier."form_participants_id" = form_part."id"
       LEFT JOIN 
         "Employee" emp ON (emp."hierarchyId" = form_part_hier."hierarchy_id" OR emp."hierarchyId" = h_t_w."A") 
       ${gerWhereRawPrisma(whereParams)}
+      GROUP BY
+        form_ap."id"
+        ,form_ap."name"
+        ,form_ap."description"
+        ,form_ap."company_id"
+        ,form_ap."status"
+        ,form_ap."ended_at"
+        ,form_ap."started_at"
+        ,form_ap."created_at"
+        ,form_ap."updated_at"
+        ,form."id"
+        ,form."name"
+        ,form."type"
+        ,form."system"
       ${getOrderByRawPrisma(orderByParams)}
       LIMIT ${pagination.limit}
       OFFSET ${pagination.offSet};
@@ -93,7 +107,7 @@ export class FormApplicationDAO {
   }
 
   private browseWhere(filters: IFormApplicationDAO.BrowseParams['filters']) {
-    const where = [Prisma.sql`ranked_document."company_id" = ${filters.companyId}`, Prisma.sql`ranked_document."deleted_at" IS NULL`];
+    const where = [Prisma.sql`form."company_id" = ${filters.companyId}`, Prisma.sql`form."deleted_at" IS NULL`];
 
     return where;
   }
@@ -120,8 +134,8 @@ export class FormApplicationDAO {
     const map: Record<FormApplicationOrderByEnum, string> = {
       [FormApplicationOrderByEnum.NAME]: 'form_ap.name',
       [FormApplicationOrderByEnum.STATUS]: 'form_ap.type',
-      [FormApplicationOrderByEnum.START_DATE]: 'form_ap.start_date',
-      [FormApplicationOrderByEnum.END_DATE]: 'form_ap.end_date',
+      [FormApplicationOrderByEnum.END_DATE]: 'form_ap.ended_at',
+      [FormApplicationOrderByEnum.START_DATE]: 'form_ap.started_at',
       [FormApplicationOrderByEnum.CREATED_AT]: 'form_ap.created_at',
       [FormApplicationOrderByEnum.UPDATED_AT]: 'form_ap.updated_at',
       [FormApplicationOrderByEnum.DESCRIPTION]: 'form_ap.description',

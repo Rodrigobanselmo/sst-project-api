@@ -175,7 +175,6 @@ async function processJsonFile(inputFilePath: string, outputFilePath: string): P
         companyId: simpleCompanyId,
         text: (record['Pergunta Aplicada'] || record['Pergunta Traduzida']).replaceAll(' ', ' '),
         acceptOther: false,
-        copsoqId: copsoqQuestion.id,
         system: true,
       });
 
@@ -196,31 +195,26 @@ async function processJsonFile(inputFilePath: string, outputFilePath: string): P
         new FormQuestionOptionEntity({
           text: cleanText(record['Opções 1']),
           order: 1,
-          questionId: question.id,
           value: getValue(record['Opções 1']),
         }),
         new FormQuestionOptionEntity({
           text: cleanText(record['Opções 2']),
           order: 2,
-          questionId: question.id,
           value: getValue(record['Opções 2']),
         }),
         new FormQuestionOptionEntity({
           text: cleanText(record['Opções 3']),
           order: 3,
-          questionId: question.id,
           value: getValue(record['Opções 3']),
         }),
         new FormQuestionOptionEntity({
           text: cleanText(record['Opções 4']),
           order: 4,
-          questionId: question.id,
           value: getValue(record['Opções 4']),
         }),
         new FormQuestionOptionEntity({
           text: cleanText(record['Opções 5']),
           order: 5,
-          questionId: question.id,
           value: getValue(record['Opções 5']),
         }),
       ];
@@ -228,8 +222,6 @@ async function processJsonFile(inputFilePath: string, outputFilePath: string): P
       const questionShared = record.Nº
         ? new FormQuestionEntity({
             order: Number(record.Nº),
-            questionId: 0,
-            groupId: 0,
             required: true,
           })
         : null;
@@ -341,8 +333,8 @@ async function createRows(data: createData, form: createFormData): Promise<void>
     if (item.questionShared) {
       const formQuestion = await prisma.formQuestion.findFirst({
         where: {
-          question: {
-            id: questionCOPSOQ.form_question_data[0].id,
+          question_data: {
+            id: questionCOPSOQ.form_question_data[0].id || 0,
           },
         },
       });
@@ -358,7 +350,7 @@ async function createRows(data: createData, form: createFormData): Promise<void>
         create: {
           order: item.questionShared.order,
           required: item.questionShared.required,
-          question_id: questionCOPSOQ.form_question_data[0].id,
+          question_data_id: questionCOPSOQ.form_question_data[0].id,
         },
       });
     }
@@ -437,7 +429,7 @@ async function createForm(data: createData, form: createFormData): Promise<void>
             id: questionId,
           },
           data: {
-            group_id: dbGroup.id,
+            question_group_id: dbGroup.id,
           },
         });
       } else {

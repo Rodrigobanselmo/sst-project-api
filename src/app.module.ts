@@ -23,6 +23,7 @@ import { SecurityModule } from './@v2/security/security.module';
 import { EnterpriseModule } from './@v2/enterprise/enterprise.module';
 import { AuthModule } from './@v2/auth/auth.module';
 import { FileModule } from './@v2/files/file.module';
+import { FormModule } from './@v2/forms/forms.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { FileModule } from './@v2/files/file.module';
     EnterpriseModule,
     AuthModule,
     FileModule,
+    FormModule,
   ],
   providers: [
     {

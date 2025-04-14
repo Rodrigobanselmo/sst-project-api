@@ -2,7 +2,7 @@ import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { FormQuestionIdentifierDataAggregateMapper } from '../../mappers/aggregates/form-question-identifier-data.mapper';
-import { IFormQuestionIdentifierDataAggregateRepository } from './Form-question-identifier-data-aggregate.types';
+import { IFormQuestionIdentifierDataAggregateRepository } from './form-question-identifier-data-aggregate.types';
 
 @Injectable()
 export class FormQuestionDataAggregateRepository {

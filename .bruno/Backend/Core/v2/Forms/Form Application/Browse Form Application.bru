@@ -1,0 +1,23 @@
+meta {
+  name: Browse Form Application
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{url}}/v2/companies/:companyId/forms/applications/
+  body: none
+  auth: bearer
+}
+
+params:query {
+  ~search: 
+}
+
+params:path {
+  companyId: {{companyId}}
+}
+
+auth:bearer {
+  token: {{token}}
+}

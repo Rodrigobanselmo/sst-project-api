@@ -89,7 +89,7 @@ export class FormDAO {
   }
 
   private browseWhere(filters: IFormDAO.BrowseParams['filters']) {
-    const where = [Prisma.sql`ranked_document."company_id" = ${filters.companyId}`, Prisma.sql`ranked_document."deleted_at" IS NULL`];
+    const where = [Prisma.sql`form."company_id" = ${filters.companyId}`, Prisma.sql`form."deleted_at" IS NULL`];
 
     return where;
   }
