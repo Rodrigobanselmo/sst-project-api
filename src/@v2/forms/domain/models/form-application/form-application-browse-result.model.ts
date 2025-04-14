@@ -1,4 +1,3 @@
-import { FileModel } from '@/@v2/shared/models/common/file.model';
 import { FormStatusEnum } from '../../enums/form-status.enum';
 import { FormTypeEnum } from '../../enums/form-type.enum';
 

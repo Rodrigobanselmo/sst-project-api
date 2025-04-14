@@ -25,9 +25,9 @@ export class DocumentControlBrowseResultModelMapper {
     return new DocumentControlBrowseResultModel({
       id: prisma.id,
       name: prisma.name,
-      description: prisma.description,
-      endDate: prisma.end_date,
-      startDate: prisma.start_date,
+      description: prisma.description || undefined,
+      endDate: prisma.end_date || undefined,
+      startDate: prisma.start_date || undefined,
       type: prisma.type,
       file: prisma.file ? FileModelMapper.toClass(prisma.file) : undefined,
       createdAt: prisma.created_at,

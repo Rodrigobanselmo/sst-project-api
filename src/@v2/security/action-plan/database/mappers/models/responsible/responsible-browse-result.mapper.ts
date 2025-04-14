@@ -12,7 +12,7 @@ export class ResponsibleBrowseResultModelMapper {
     return new ResponsibleBrowseResultModel({
       userId: prisma.user_id || undefined,
       employeeId: prisma.employee_id || undefined,
-      email: prisma.row_email,
+      email: prisma.row_email || '',
       name: prisma.row_name,
     });
   }

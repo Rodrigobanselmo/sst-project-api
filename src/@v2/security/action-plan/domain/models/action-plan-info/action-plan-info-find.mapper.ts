@@ -25,8 +25,8 @@ export class ActionPlanInfoModel {
   };
   coordinator: {
     id: number;
-    name: string;
-    email: string;
+    name: string | null;
+    email: string | null;
   } | null;
 
   constructor(params: IActionPlanInfoModel) {

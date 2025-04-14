@@ -3,7 +3,7 @@ import { getOrderByRawPrisma, IOrderByRawPrisma } from '@/@v2/shared/utils/datab
 import { getPagination } from '@/@v2/shared/utils/database/get-pagination';
 import { gerWhereRawPrisma } from '@/@v2/shared/utils/database/get-where-raw-prisma';
 import { Injectable } from '@nestjs/common';
-import { CharacterizationTypeEnum, Prisma, StatusEnum } from '@prisma/client';
+import { CharacterizationTypeEnum, Prisma } from '@prisma/client';
 import { ICharacterizationBrowseFilterModelMapper } from '../../mappers/models/characterization/characterization-browse-filter.mapper';
 import { ICharacterizationBrowseResultModelMapper } from '../../mappers/models/characterization/characterization-browse-result.mapper';
 import { CharacterizationBrowseModelMapper } from '../../mappers/models/characterization/characterization-browse.mapper';
@@ -93,11 +93,7 @@ export class CharacterizationDAO {
       ${gerWhereRawPrisma(browseWhereParams)};
     `;
 
-    const [characterizations, totalCharacterizations, distinctFilters] = await Promise.all([
-      characterizationsPromise,
-      totalCharacterizationsPromise,
-      distinctFiltersPromise,
-    ]);
+    const [characterizations, totalCharacterizations, distinctFilters] = await Promise.all([characterizationsPromise, totalCharacterizationsPromise, distinctFiltersPromise]);
 
     return CharacterizationBrowseModelMapper.toModel({
       results: characterizations,
@@ -107,11 +103,7 @@ export class CharacterizationDAO {
   }
 
   private browseWhere(filters: ICharacterizationDAO.BrowseParams['filters']) {
-    const where = [
-      Prisma.sql`cc."companyId" = ${filters.companyId}`,
-      Prisma.sql`cc."workspaceId" = ${filters.workspaceId}`,
-      Prisma.sql`cc."profileParentId" IS NULL`,
-    ];
+    const where = [Prisma.sql`cc."companyId" = ${filters.companyId}`, Prisma.sql`cc."workspaceId" = ${filters.workspaceId}`, Prisma.sql`cc."profileParentId" IS NULL`];
 
     return where;
   }
@@ -129,10 +121,7 @@ export class CharacterizationDAO {
 
       if (includeNull) {
         if (filters.stageIds.length === 1) where.push(Prisma.sql`cc."stageId" IS NULL`);
-        else
-          where.push(
-            Prisma.sql`cc."stageId" IN (${Prisma.join(filters.stageIds.filter(Boolean))}) OR cc."stageId" IS NULL`,
-          );
+        else where.push(Prisma.sql`cc."stageId" IN (${Prisma.join(filters.stageIds.filter(Boolean))}) OR cc."stageId" IS NULL`);
       }
 
       if (!includeNull) {

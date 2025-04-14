@@ -1,6 +1,5 @@
-import { StatusTypeEnum } from '@/@v2/security/@shared/domain/enums/status-type.enum';
 import { Type } from 'class-transformer';
-import { ArrayMinSize, IsArray, IsBoolean, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, Min, ValidateNested } from 'class-validator';
+import { ArrayMinSize, IsArray, IsBoolean, IsInt, IsNotEmpty, IsOptional, IsString, Min, ValidateNested } from 'class-validator';
 
 class QuestionDto {
   @IsBoolean()

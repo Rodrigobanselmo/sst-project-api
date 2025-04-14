@@ -5,7 +5,7 @@ export function getImageSize(buffer: Buffer) {
 
   const dimensions = sizeOf(uint8Array);
 
-  const isVertical = dimensions.width < dimensions.height;
+  const isVertical = (dimensions.width || 0) < (dimensions.height || 0);
 
   return { ...dimensions, isVertical };
 }

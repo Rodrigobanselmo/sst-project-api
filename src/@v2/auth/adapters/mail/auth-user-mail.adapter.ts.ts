@@ -15,6 +15,7 @@ export class AuthUserMailAdapter implements IAuthUserMailAdapter {
 
   async sendInvite(params: IAuthUserMailAdapter.InviteParams) {
     if (!params.user.token) return;
+    if (!params.user.email) return;
 
     const company = await this.companyDAO.FindByIdParams({ id: params.companyId });
 
@@ -23,7 +24,7 @@ export class AuthUserMailAdapter implements IAuthUserMailAdapter {
         to: params.user.email,
         type: 'INVITE_USER',
         variables: {
-          company: company.name,
+          company: company?.name || '',
           link: `${process.env.APP_HOST}/cadastro/?token=${params.user.token}&email=${params.user.email}`,
         },
       });

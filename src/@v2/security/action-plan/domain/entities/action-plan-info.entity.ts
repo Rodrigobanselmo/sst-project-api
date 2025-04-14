@@ -1,32 +1,31 @@
-import { updateField } from "@/@v2/shared/domain/helpers/update-field.helper";
-import { CoordinatorEntity } from "./coordinator.entity";
+import { updateField } from '@/@v2/shared/domain/helpers/update-field.helper';
 
 export type IUpdateActionPlanInfoEntity = {
-  validityStart?: Date
-  validityEnd?: Date
+  validityStart?: Date;
+  validityEnd?: Date;
   monthsLevel_2?: number;
   monthsLevel_3?: number;
   monthsLevel_4?: number;
   monthsLevel_5?: number;
-}
+};
 
 export type IActionPlanInfoEntity = {
-  companyId: string
-  workspaceId: string
-  validityStart: Date | null
-  validityEnd: Date | null
+  companyId: string;
+  workspaceId: string;
+  validityStart: Date | null;
+  validityEnd: Date | null;
   monthsLevel_2: number;
   monthsLevel_3: number;
   monthsLevel_4: number;
   monthsLevel_5: number;
-}
+};
 
 export class ActionPlanInfoEntity {
-  readonly companyId: string
-  readonly workspaceId: string
+  readonly companyId: string;
+  readonly workspaceId: string;
 
-  private _validityStart: Date | null
-  private _validityEnd: Date | null
+  private _validityStart: Date | null;
+  private _validityEnd: Date | null;
   private _monthsLevel_2: number;
   private _monthsLevel_3: number;
   private _monthsLevel_4: number;
@@ -70,9 +69,9 @@ export class ActionPlanInfoEntity {
   update(params: IUpdateActionPlanInfoEntity) {
     this._validityStart = updateField(this._validityStart, params.validityStart);
     this._validityEnd = updateField(this._validityEnd, params.validityEnd);
-    this._monthsLevel_2 = params.monthsLevel_2 || this._monthsLevel_2
-    this._monthsLevel_3 = params.monthsLevel_3 || this._monthsLevel_3
-    this._monthsLevel_4 = params.monthsLevel_4 || this._monthsLevel_4
-    this._monthsLevel_5 = params.monthsLevel_5 || this._monthsLevel_5
+    this._monthsLevel_2 = params.monthsLevel_2 || this._monthsLevel_2;
+    this._monthsLevel_3 = params.monthsLevel_3 || this._monthsLevel_3;
+    this._monthsLevel_4 = params.monthsLevel_4 || this._monthsLevel_4;
+    this._monthsLevel_5 = params.monthsLevel_5 || this._monthsLevel_5;
   }
 }

@@ -1,8 +1,8 @@
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { IFileRepository } from './file.types';
 import { FileEntityMapper } from '../../mappers/file.model';
+import { IFileRepository } from './file.types';
 
 @Injectable()
 export class FileRepository {
@@ -37,7 +37,7 @@ export class FileRepository {
         url: params.url,
         should_delete: params.shouldDelete,
         size: params.size,
-        metadata: params.metadata,
+        metadata: params.metadata || undefined,
       },
     });
 

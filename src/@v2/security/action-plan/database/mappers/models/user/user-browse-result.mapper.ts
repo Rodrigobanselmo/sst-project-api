@@ -10,7 +10,7 @@ export class UserBrowseResultModelMapper {
   static toModel(prisma: IUserBrowseResultModelMapper): UserBrowseResultModel {
     return new UserBrowseResultModel({
       id: prisma.user_id,
-      name: prisma.user_name,
+      name: prisma.user_name || 'Sem Nome',
       email: prisma.user_email,
     });
   }

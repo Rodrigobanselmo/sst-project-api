@@ -51,8 +51,6 @@ export class CommentAggregateRepository implements ICommentAggregateRepository {
       ...CommentAggregateRepository.selectOptions(),
     });
 
-    comment.riskFactorDataRec.workspace.documentData[0].validityStart;
-
     return comment ? CommentAggregateMapper.toAggregate(comment) : null;
   }
 
@@ -60,7 +58,7 @@ export class CommentAggregateRepository implements ICommentAggregateRepository {
     const [comment] = await this.prisma.$transaction([
       this.prisma.riskFactorDataRecComments.update({
         where: {
-          id: params.comment.id,
+          id: params.comment.id || '-',
           riskFactorDataRec: {
             companyId: params.actionPlan.companyId,
           },
@@ -103,7 +101,7 @@ export class CommentAggregateRepository implements ICommentAggregateRepository {
             tx.riskFactorDataRecComments.update({
               select: { id: true },
               where: {
-                id: params.comment.id,
+                id: params.comment.id || '-',
                 riskFactorDataRec: {
                   companyId: params.actionPlan.companyId,
                 },

@@ -21,7 +21,7 @@ export class EditDocumentControlFileUseCase {
 
     if (!documentControlFile) throw new BadRequestException('Documento não encontrado');
 
-    if (params.fileId) await this.addFile(params, documentControlFile);
+    await this.addFile(params, documentControlFile);
 
     documentControlFile.update(params);
 
@@ -29,6 +29,8 @@ export class EditDocumentControlFileUseCase {
   }
 
   private async addFile(params: IDocumentControlUseCase.Params, documentControlFile: DocumentControlFileEntity) {
+    if (!params.fileId) return;
+
     const [file, error] = await this.fileRequester.read({
       fileId: params.fileId,
       companyId: params.companyId,

@@ -15,7 +15,7 @@ export class EditCharacterizationService {
 
     if (!characterization) return null;
 
-    characterization.stageId = params.stageId;
+    characterization.stageId = params.stageId || null;
 
     return characterization;
   }

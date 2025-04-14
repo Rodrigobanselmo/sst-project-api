@@ -15,6 +15,6 @@ export class ResponsibleBrowseResultModel {
     this.userId = params.userId;
     this.employeeId = params.employeeId;
     this.name = params.name;
-    this.email = params.email;
+    this.email = params.email || '';
   }
 }

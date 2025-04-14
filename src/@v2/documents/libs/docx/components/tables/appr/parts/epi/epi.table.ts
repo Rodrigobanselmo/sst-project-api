@@ -1,11 +1,10 @@
 import { Table, WidthType } from 'docx';
 
-import { HierarchyMapData } from '../../../../../converter/hierarchy.converter';
+import { EPIModel } from '@/@v2/documents/domain/models/epis.model';
 import { TableBodyElements } from '../../elements/body';
 import { TableHeaderElements } from '../../elements/header';
 import { epiRiskInventoryHeader } from './epi.constant';
 import { dataConverter } from './epi.converter';
-import { EPIModel } from '@/@v2/documents/domain/models/epis.model';
 
 export const epiRiskInventoryTableSection = (epis: EPIModel[], isHideCA: boolean) => {
   if (epis.length === 0) return [];

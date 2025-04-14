@@ -4,8 +4,8 @@ import { CommentTypeEnum } from '../enums/comment-type.enum';
 
 export type ICommentEntity = {
   id?: string;
-  text: string;
-  textType: CommentTextTypeEnum;
+  text: string | null;
+  textType: CommentTextTypeEnum | null;
   type: CommentTypeEnum;
   commentedById: number;
 

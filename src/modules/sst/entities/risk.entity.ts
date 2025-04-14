@@ -1,7 +1,7 @@
 import { AppendixEnum, OtherAppendixEnum } from './../../../shared/constants/enum/appendix';
 import { QuantityTypeEnum } from './../../company/interfaces/risk-data-json.types';
 
-import { Prisma, RiskFactors, RiskFactorsEnum } from '.prisma/client';
+import { Prisma, RiskFactors, RiskFactorsEnum, RiskSubTypeEnum } from '.prisma/client';
 import { GrauInsalubridade, StatusEnum } from '@prisma/client';
 import { RecMedEntity } from './recMed.entity';
 import { GenerateSourceEntity } from './generateSource.entity';
@@ -86,6 +86,7 @@ export class RiskFactorsEntity implements RiskFactors {
       this.riskFactorData = this.riskFactorData.map((riskData) => new RiskFactorDataEntity(riskData as any));
     }
   }
+  sub_type: RiskSubTypeEnum[];
 
   private getVMP(nr15lt?: string) {
     if (!nr15lt) return '';

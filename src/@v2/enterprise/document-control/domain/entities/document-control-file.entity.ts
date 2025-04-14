@@ -37,7 +37,7 @@ export class DocumentControlFileEntity {
   file: SystemFile;
 
   constructor(params: IDocumentControlFileEntity) {
-    this.id = params.id | 0;
+    this.id = params.id || 0;
     this.documentControlId = params.documentControlId;
     this.companyId = params.companyId;
     this.name = params.name;

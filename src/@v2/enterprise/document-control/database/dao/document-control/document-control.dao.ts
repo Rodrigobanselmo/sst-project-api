@@ -4,7 +4,6 @@ import { getPagination } from '@/@v2/shared/utils/database/get-pagination';
 import { gerWhereRawPrisma } from '@/@v2/shared/utils/database/get-where-raw-prisma';
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { DocumentControlFileReadModelMapper } from '../../mappers/models/document-control-file/document-control-read.mapper';
 import { IDocumentControlBrowseFilterModelMapper } from '../../mappers/models/document-control/document-control-browse-filter.mapper';
 import { IDocumentControlBrowseResultModelMapper } from '../../mappers/models/document-control/document-control-browse-result.mapper';
 import { DocumentControlBrowseModelMapper } from '../../mappers/models/document-control/document-control-browse.mapper';

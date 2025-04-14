@@ -1,12 +1,12 @@
-import { Body, Controller, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Param, Patch, UseGuards } from '@nestjs/common';
 
+import { DocumentControlRoutes } from '@/@v2/enterprise/document-control/constants/routes';
 import { JwtAuthGuard } from '@/@v2/shared/guards/jwt-auth.guard';
 import { PermissionEnum } from '@/shared/constants/enum/authorization';
 import { Permissions } from '@/shared/decorators/permissions.decorator';
-import { DocumentControlRoutes } from '@/@v2/enterprise/document-control/constants/routes';
-import { EditDocumentControlPayload } from './edit-document-control.payload';
-import { EditDocumentControlPath } from './edit-document-control.path';
 import { EditDocumentControlUseCase } from '../use-cases/edit-document-control.usecase';
+import { EditDocumentControlPath } from './edit-document-control.path';
+import { EditDocumentControlPayload } from './edit-document-control.payload';
 
 @Controller(DocumentControlRoutes.DOCUMENT_CONTROL.PATH_ID)
 @UseGuards(JwtAuthGuard)

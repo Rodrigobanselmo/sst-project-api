@@ -1,11 +1,11 @@
 import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
 import { config } from '@/@v2/shared/constants/config';
-import { isDevelopment } from '@/@v2/shared/utils/helpers/is-development';
 import { getContentType } from '@/@v2/shared/utils/helpers/get-content-type';
+import { isDevelopment } from '@/@v2/shared/utils/helpers/is-development';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Readable } from 'stream';
 import { IStorageAdapter } from './storage.interface';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 export class S3StorageAdapter implements IStorageAdapter {
   private readonly bucket: string;
@@ -67,7 +67,7 @@ export class S3StorageAdapter implements IStorageAdapter {
       ResponseContentType: this.contentType(fileKey),
     });
 
-    return getSignedUrl(this.s3, command, { expiresIn: expires });
+    return getSignedUrl(this.s3 as any, command as any, { expiresIn: expires });
   }
 
   private contentType(filename: string): string {

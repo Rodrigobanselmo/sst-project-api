@@ -1,7 +1,6 @@
 import { FormCOPSOQCategoryEnum } from '../enums/form-copsoq-category.enum';
 import { FormCOPSOQDimensionEnum } from '../enums/form-copsoq-dimension.enum';
 import { FormCOPSOQLevelEnum } from '../enums/form-copsoq-level.enum';
-import { FormQuestionTypeEnum } from '../enums/form-question-type.enum';
 
 export type FormQuestionCOPSOQEntityConstructor = {
   id?: number;

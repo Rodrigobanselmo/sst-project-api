@@ -1,15 +1,15 @@
 import { HierarchyTypeEnum } from '@/@v2/shared/domain/enum/company/hierarchy-type.enum';
 import { CharacterizationTypeEnum } from '@/@v2/shared/domain/enum/security/characterization-type.enum';
-import { ActionPlanStatusEnum } from '../../enums/action-plan-status.enum';
-import { RiskTypeEnum } from '@/@v2/shared/domain/enum/security/risk-type.enum';
-import { RecommendationTypeEnum } from '@/@v2/shared/domain/enum/security/recommendation-type.enum';
-import { IRiskLevelValues } from '@/@v2/shared/domain/types/security/risk-level-values.type';
 import { HomoTypeEnum } from '@/@v2/shared/domain/enum/security/homo-type.enum';
+import { OriginTypeEnum } from '@/@v2/shared/domain/enum/security/origin-type.enum';
+import { RecommendationTypeEnum } from '@/@v2/shared/domain/enum/security/recommendation-type.enum';
+import { RiskTypeEnum } from '@/@v2/shared/domain/enum/security/risk-type.enum';
 import { getOriginHomogeneousGroup } from '@/@v2/shared/domain/functions/security/get-origin-homogeneous-group.func';
 import { getValidDateActionPlan } from '@/@v2/shared/domain/functions/security/get-valid-date-action-plan.func';
-import { OriginTypeEnum } from '@/@v2/shared/domain/enum/security/origin-type.enum';
-import { CommentTypeEnum } from '../../enums/comment-type.enum';
+import { IRiskLevelValues } from '@/@v2/shared/domain/types/security/risk-level-values.type';
+import { ActionPlanStatusEnum } from '../../enums/action-plan-status.enum';
 import { CommentTextTypeEnum } from '../../enums/comment-text-type.enum';
+import { CommentTypeEnum } from '../../enums/comment-type.enum';
 
 export type IActionPlanBrowseResultModel = {
   uuid: { riskDataId: string; recommendationId: string; workspaceId: string };
@@ -66,7 +66,6 @@ export class ActionPlanBrowseResultModel {
   risk: { id: string; name: string; type: RiskTypeEnum };
   origin: { id: string; name: string; type: OriginTypeEnum };
   status: ActionPlanStatusEnum;
-  hierarchies: { name: string; type: HierarchyTypeEnum }[];
   responsible: { id: string; name: string } | null;
   comments: {
     id: string;

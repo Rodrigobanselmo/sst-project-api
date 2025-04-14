@@ -1,7 +1,6 @@
-import { BadRequestException } from '@nestjs/common';
+import { DomainResponse } from '@/@v2/shared/domain/types/shared/domain-response';
 import { ProfileEntity } from '../entities/profile.entity';
 import { UserEntity } from '../entities/user.entity';
-import { DomainResponse } from '@/@v2/shared/domain/types/shared/domain-response';
 import { errorUserAlreadyCreated } from '../errors/domain.errors';
 
 export type IUserAggregate = {

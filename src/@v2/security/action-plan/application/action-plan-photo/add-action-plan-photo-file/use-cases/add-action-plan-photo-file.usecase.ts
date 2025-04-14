@@ -39,6 +39,8 @@ export class AddActionPlanPhotoFileUseCase {
       riskDataId: params.riskDataId,
     });
 
+    if (!actionPlanAggregate) throw new BadRequestException('Não foi possível encintrar a recomendação');
+
     const { isVertical } = getImageSize(params.buffer);
 
     const photo = new ActionPlanPhotoEntity({ file, isVertical });

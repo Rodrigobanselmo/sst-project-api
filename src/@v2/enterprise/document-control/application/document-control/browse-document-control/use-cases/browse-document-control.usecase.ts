@@ -1,9 +1,9 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { IStorageAdapter } from '@/@v2/shared/adapters/storage/storage.interface';
+import { SharedTokens } from '@/@v2/shared/constants/tokens';
+import { asyncBatch } from '@/@v2/shared/utils/helpers/async-batch';
+import { Inject, Injectable } from '@nestjs/common';
 import { DocumentControlDAO } from '../../../../database/dao/document-control/document-control.dao';
 import { IDocumentControlUseCase } from './browse-document-control.types';
-import { SharedTokens } from '@/@v2/shared/constants/tokens';
-import { IStorageAdapter } from '@/@v2/shared/adapters/storage/storage.interface';
-import { asyncBatch } from '@/@v2/shared/utils/helpers/async-batch';
 
 @Injectable()
 export class BrowseDocumentControlUseCase {

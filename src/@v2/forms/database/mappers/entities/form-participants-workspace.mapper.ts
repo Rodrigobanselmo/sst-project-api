@@ -1,5 +1,5 @@
 import { FormParticipantsWorkspaceEntity } from '@/@v2/forms/domain/entities/form-participants-workspace.entity';
-import { FormParticipantsWorkspace as PrismaFormParticipantsWorkspace, FormParticipantsAnswers as PrismaFormParticipantsAnswers } from '@prisma/client';
+import { FormParticipantsWorkspace as PrismaFormParticipantsWorkspace } from '@prisma/client';
 
 export type FormParticipantsWorkspaceEntityMapperConstructor = PrismaFormParticipantsWorkspace;
 

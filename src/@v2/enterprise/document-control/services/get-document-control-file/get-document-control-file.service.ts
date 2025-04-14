@@ -1,7 +1,4 @@
-import { DocumentControlAggregateRepository } from '@/@v2/enterprise/document-control/database/repositories/document-control/document-control-aggregate.repository';
-import { DocumentControlAggregate } from '@/@v2/enterprise/document-control/domain/aggregates/document-control.aggregate';
 import { DocumentControlFileEntity } from '@/@v2/enterprise/document-control/domain/entities/document-control-file.entity';
-import { DocumentControlEntity } from '@/@v2/enterprise/document-control/domain/entities/document-control.entity';
 import { SharedTokens } from '@/@v2/shared/constants/tokens';
 import { IFileRequester } from '@/@v2/shared/requesters/files/file.interface';
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
@@ -26,11 +23,11 @@ export class GetDocumentControlFileService {
     const documentFile = new DocumentControlFileEntity({
       companyId: params.companyId,
       documentControlId: params.documentControlId,
-      endDate: params.endDate,
+      endDate: params.endDate || null,
       file,
       description: params.description,
       name: file.name,
-      startDate: params.startDate,
+      startDate: params.startDate || null,
     });
 
     return documentFile;

@@ -1,11 +1,8 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import { LocalContext, UserContext } from '@/@v2/shared/adapters/context';
-import { SharedTokens } from '@/@v2/shared/constants/tokens';
-import { ContextKey } from '@/@v2/shared/adapters/context/types/enum/context-key.enum';
-import { IEditManyCharacterizationUseCase } from './edit-many-characterization.types';
-import { asyncBatch } from '@/@v2/shared/utils/helpers/async-batch';
 import { CharacterizationRepository } from '@/@v2/security/characterization/database/repositories/characterization/characterization.repository';
 import { EditCharacterizationService } from '@/@v2/security/characterization/services/edit-characterization/edit-characterization.service';
+import { asyncBatch } from '@/@v2/shared/utils/helpers/async-batch';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { IEditManyCharacterizationUseCase } from './edit-many-characterization.types';
 
 @Injectable()
 export class EditManyCharacterizationUseCase {

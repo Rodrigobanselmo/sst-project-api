@@ -25,7 +25,7 @@ export class AddDocumentControlUseCase {
       name: params.name,
       companyId: params.companyId,
       type: params.type,
-      description: params.description,
+      description: params.description || null,
       workspaceId: params.workspaceId,
     });
 
