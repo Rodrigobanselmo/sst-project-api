@@ -8,29 +8,21 @@ async function main() {
   try {
     console.info('start');
 
-    const data = await prisma.riskFactorDataRecPhoto.findMany({
+    const data = await prisma.riskFactors.findMany({
       where: { deleted_at: null },
-      include: { file: true },
     });
 
-    await Promise.all(
-      data.map(async (item) => {
-        await prisma.systemFile.update({
-          where: { id: item.file_id },
-          data: {
-            deleted_at: null,
+    for (const riskFactor of data) {
+      const [name, ...rsdata] = riskFactor.name.split(';;');
 
-            should_delete: false,
-          },
-        });
-      }),
-    );
-
-    const array = data.map((item) => {
-      return item.file.url.split('/').at(-1);
-    });
-
-    console.log('data', array);
+      await prisma.riskFactors.update({
+        where: { id: riskFactor.id },
+        data: {
+          name,
+          rsdata: rsdata.join(';;'),
+        },
+      });
+    }
 
     console.info('end');
   } catch (err) {
