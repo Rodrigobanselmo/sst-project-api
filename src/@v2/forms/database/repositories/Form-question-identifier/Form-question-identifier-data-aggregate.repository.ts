@@ -53,6 +53,7 @@ export class FormQuestionDataAggregateRepository {
     const FormQuestionData = await this.prisma.formQuestionData.findFirst({
       where: {
         id: params.id,
+        question_identifier_id: { not: null },
         OR: [
           {
             company_id: params.companyId,

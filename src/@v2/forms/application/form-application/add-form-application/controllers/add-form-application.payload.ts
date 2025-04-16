@@ -42,24 +42,23 @@ export class AddFormApplicationPayload {
   @IsString()
   description?: string;
 
-  @IsString()
-  @IsNotEmpty()
-  companyId!: string;
-
   @IsInt()
   @Min(1)
   @IsNotEmpty()
   formId!: number;
 
   @IsArray()
+  @IsOptional()
   @IsString({ each: true })
   workspaceIds?: string[];
 
   @IsArray()
+  @IsOptional()
   @IsString({ each: true })
   hierarchyIds?: string[];
 
   @ValidateNested()
+  @IsOptional()
   @Type(() => IdentifierDto)
   identifier?: IdentifierDto;
 }

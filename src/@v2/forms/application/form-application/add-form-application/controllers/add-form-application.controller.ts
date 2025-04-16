@@ -8,7 +8,7 @@ import { AddFormApplicationUseCase } from '../use-cases/add-form-application.use
 import { AddFormApplicationPath } from './add-form-application.path';
 import { AddFormApplicationPayload } from './add-form-application.payload';
 
-@Controller(FormRoutes.FORM_APPLICATION.PATH_ID)
+@Controller(FormRoutes.FORM_APPLICATION.PATH)
 @UseGuards(JwtAuthGuard)
 export class AddFormApplicationController {
   constructor(private readonly addFormApplicationUseCase: AddFormApplicationUseCase) {}

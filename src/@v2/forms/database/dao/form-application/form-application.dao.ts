@@ -34,7 +34,7 @@ export class FormApplicationDAO {
 
     const whereParams = [...browseWhereParams, ...filterWhereParams];
 
-    const FormsPromise = this.prisma.$queryRaw<IFormApplicationBrowseResultModelMapper[]>`
+    const formsPromise = this.prisma.$queryRaw<IFormApplicationBrowseResultModelMapper[]>`
       SELECT 
         form_ap."id" as id
         ,form_ap."name" as name
@@ -45,12 +45,12 @@ export class FormApplicationDAO {
         ,form_ap."started_at" as start_date
         ,form_ap."created_at" as created_at
         ,form_ap."updated_at" as updated_at
-        ,form."id" as form_id
+        ,form."id"::integer as form_id
         ,form."name" as form_name
         ,form."type" as form_type
         ,form."system" as form_system
-        ,COUNT(form_part."id") as total_answers
-        ,COUNT(emp."id") as total_participants
+        ,COUNT(form_part."id"::integer) as total_answers
+        ,COUNT(emp."id"::integer) as total_participants
       FROM 
         "FormApplication" form_ap
       LEFT JOIN 
@@ -65,7 +65,6 @@ export class FormApplicationDAO {
         "FormParticipantsHierarchy" form_part_hier ON form_part_hier."form_participants_id" = form_part."id"
       LEFT JOIN 
         "Employee" emp ON (emp."hierarchyId" = form_part_hier."hierarchy_id" OR emp."hierarchyId" = h_t_w."A") 
-      ${gerWhereRawPrisma(whereParams)}
       GROUP BY
         form_ap."id"
         ,form_ap."name"
@@ -97,10 +96,11 @@ export class FormApplicationDAO {
       ${gerWhereRawPrisma(browseWhereParams)};
     `;
 
-    const [Forms, totalForms, distinctFilters] = await Promise.all([FormsPromise, totalFormsPromise, distinctFiltersPromise]);
+    const [forms, totalForms, distinctFilters] = await Promise.all([formsPromise, totalFormsPromise, distinctFiltersPromise]);
+    console.log(forms);
 
     return FormApplicationBrowseModelMapper.toModel({
-      results: Forms,
+      results: forms,
       pagination: { limit: pagination.limit, page: pagination.page, total: Number(totalForms[0].total) },
       filters: distinctFilters[0],
     });

@@ -441,14 +441,14 @@ async function createForm(data: createData, form: createFormData): Promise<void>
 
 async function createIdentifiers(): Promise<void> {
   const idCreate = [
-    { enum: FormIdentifierTypeEnum.EMAIL, direct: true },
-    { enum: FormIdentifierTypeEnum.CPF, direct: true },
-    { enum: FormIdentifierTypeEnum.AGE, direct: true },
-    { enum: FormIdentifierTypeEnum.SEX, direct: false },
-    { enum: FormIdentifierTypeEnum.WORKSPACE, direct: false },
-    { enum: FormIdentifierTypeEnum.DIRECTORY, direct: false },
-    { enum: FormIdentifierTypeEnum.MANAGEMENT, direct: false },
-    { enum: FormIdentifierTypeEnum.SECTOR, direct: false },
+    { enum: FormIdentifierTypeEnum.EMAIL, direct: true, text: 'Email', type: FormQuestionTypeEnum.TEXT },
+    { enum: FormIdentifierTypeEnum.CPF, direct: true, text: 'CPF', type: FormQuestionTypeEnum.TEXT },
+    { enum: FormIdentifierTypeEnum.AGE, direct: true, text: 'Idade', type: FormQuestionTypeEnum.DATE },
+    { enum: FormIdentifierTypeEnum.SEX, direct: false, text: 'Sexo', type: FormQuestionTypeEnum.RADIO },
+    { enum: FormIdentifierTypeEnum.WORKSPACE, direct: false, text: 'Estabelecimento', type: FormQuestionTypeEnum.SELECT },
+    { enum: FormIdentifierTypeEnum.DIRECTORY, direct: false, text: 'Diretória', type: FormQuestionTypeEnum.SELECT },
+    { enum: FormIdentifierTypeEnum.MANAGEMENT, direct: false, text: 'Gerência', type: FormQuestionTypeEnum.SELECT },
+    { enum: FormIdentifierTypeEnum.SECTOR, direct: false, text: 'Setor', type: FormQuestionTypeEnum.SELECT },
   ];
 
   asyncBatch(idCreate, 20, async (item) => {
@@ -463,6 +463,15 @@ async function createIdentifiers(): Promise<void> {
         data: {
           type: item.enum,
           direct_association: item.direct,
+          form_question_data: {
+            create: {
+              text: item.text,
+              type: FormQuestionTypeEnum.TEXT,
+              accept_other: false,
+              company_id: simpleCompanyId,
+              system: true,
+            },
+          },
         },
       });
     }

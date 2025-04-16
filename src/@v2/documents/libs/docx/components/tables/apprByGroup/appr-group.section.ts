@@ -76,7 +76,7 @@ export const APPRByGroupTableSection = (
         const allHomogeneousGroupIds = (hierarchyData.get(hierarchy.id) || { allHomogeneousGroupIds: [] })?.allHomogeneousGroupIds;
 
         removeDuplicate([...allHomogeneousGroupIds.map((id: string) => ({ id })), ...hierarchy.homogeneousGroups], {
-          removeById: 'id',
+          idPath: 'id',
         }).forEach((homoGroup) => {
           const isOnEvery = hierarchies.every((hierarchyEvery) => {
             const everyAllHomogeneousGroupIds = (
