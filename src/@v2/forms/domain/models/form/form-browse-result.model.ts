@@ -8,7 +8,7 @@ export type IFormBrowseResultModel = {
   type: FormTypeEnum;
   anonymous: boolean;
   system: boolean;
-  shareable_link: boolean;
+  shareableLink: boolean;
   updatedAt: Date;
   createdAt: Date;
 };
@@ -21,7 +21,7 @@ export class FormBrowseResultModel {
   type: FormTypeEnum;
   anonymous: boolean;
   system: boolean;
-  shareable_link: boolean;
+  shareableLink: boolean;
   updatedAt: Date;
   createdAt: Date;
 
@@ -32,7 +32,7 @@ export class FormBrowseResultModel {
     this.type = params.type;
     this.anonymous = params.anonymous;
     this.system = params.system;
-    this.shareable_link = params.shareable_link;
+    this.shareableLink = params.shareableLink;
     this.description = params.description;
     this.createdAt = params.createdAt;
     this.updatedAt = params.updatedAt;

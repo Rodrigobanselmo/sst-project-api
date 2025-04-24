@@ -1,7 +1,7 @@
 export const FormRoutes = {
   FORM: {
-    PATH: 'v2/companies/:companyId/forms/',
-    PATH_ID: 'v2/companies/:companyId/forms/:formId',
+    PATH: 'v2/companies/:companyId/forms/models/',
+    PATH_ID: 'v2/companies/:companyId/forms/models/:formId',
   },
   FORM_APPLICATION: {
     PATH: 'v2/companies/:companyId/forms/applications/',

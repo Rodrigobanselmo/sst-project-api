@@ -1,17 +1,17 @@
 meta {
-  name: Read Form Application
+  name: Read Form
   type: http
   seq: 1
 }
 
 get {
-  url: {{url}}/v2/companies/:companyId/forms/applications/:id
+  url: {{url}}/v2/companies/:companyId/forms/:formId
   body: none
   auth: bearer
 }
 
 params:path {
-  id: 7a2d7204-915f-41b2-b080-ae30f7fea54d
+  formId: 2
   companyId: {{companyId}}
 }
 

@@ -31,7 +31,10 @@ export class FormDAO {
         "Form" form
       WHERE 
         form."id" = ${params.id}
-        AND form."company_id" = ${params.companyId}
+        AND (
+          form."company_id" = ${params.companyId} 
+          OR form."system" = true
+        )
         AND form."deleted_at" IS NULL
     `;
 
@@ -47,9 +50,9 @@ export class FormDAO {
 
     const whereParams = [...browseWhereParams, ...filterWhereParams];
 
-    const FormsPromise = this.prisma.$queryRaw<IFormBrowseResultModelMapper[]>`
+    const formsPromise = this.prisma.$queryRaw<IFormBrowseResultModelMapper[]>`
       SELECT 
-        form."id" as id
+        form."id"::integer as id
         ,form."company_id" as company_id
         ,form."name" as name
         ,form."type" as type
@@ -79,17 +82,17 @@ export class FormDAO {
       ${gerWhereRawPrisma(browseWhereParams)};
     `;
 
-    const [Forms, totalForms, distinctFilters] = await Promise.all([FormsPromise, totalFormsPromise, distinctFiltersPromise]);
+    const [forms, totalForms, distinctFilters] = await Promise.all([formsPromise, totalFormsPromise, distinctFiltersPromise]);
 
     return FormBrowseModelMapper.toModel({
-      results: Forms,
+      results: forms,
       pagination: { limit: pagination.limit, page: pagination.page, total: Number(totalForms[0].total) },
       filters: distinctFilters[0],
     });
   }
 
   private browseWhere(filters: IFormDAO.BrowseParams['filters']) {
-    const where = [Prisma.sql`form."company_id" = ${filters.companyId}`, Prisma.sql`form."deleted_at" IS NULL`];
+    const where = [Prisma.sql`form."company_id" = ${filters.companyId} OR form.system = true`, Prisma.sql`form."deleted_at" IS NULL`];
 
     return where;
   }

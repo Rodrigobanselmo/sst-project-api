@@ -24,7 +24,7 @@ export class FormBrowseResultModelMapper {
       createdAt: prisma.created_at,
       anonymous: prisma.anonymous,
       system: prisma.system,
-      shareable_link: prisma.shareable_link,
+      shareableLink: prisma.shareable_link,
       type: FormTypeEnum[prisma.type],
       updatedAt: prisma.updated_at,
     });

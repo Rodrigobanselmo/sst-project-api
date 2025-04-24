@@ -7,7 +7,7 @@ import { ReadFormUseCase } from '../use-cases/read-form.usecase';
 import { ReadFormPath } from './read-form.path';
 import { JwtAuthGuard } from '@/@v2/shared/guards/jwt-auth.guard';
 
-@Controller(FormRoutes.FORM_APPLICATION.PATH_ID)
+@Controller(FormRoutes.FORM.PATH_ID)
 @UseGuards(JwtAuthGuard)
 export class ReadFormController {
   constructor(private readonly readFormUseCase: ReadFormUseCase) {}

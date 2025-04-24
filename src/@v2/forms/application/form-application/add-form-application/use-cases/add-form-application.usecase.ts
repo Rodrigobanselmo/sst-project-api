@@ -25,6 +25,10 @@ export class AddFormApplicationUseCase {
     const form = await this.formRepository.find({ id: params.formId, companyId: params.companyId });
     if (!form) throw new BadRequestException('Formulário não encontrado');
 
+    if (params.hierarchyIds.length === 0 && params.workspaceIds.length === 0) {
+      throw new BadRequestException('É necessário informar pelo menos um estabelecimento ou setor');
+    }
+
     const formApplication = new FormApplicationEntity({
       name: params.name,
       description: params.description,

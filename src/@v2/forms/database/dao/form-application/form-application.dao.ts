@@ -9,6 +9,7 @@ import { getOrderByRawPrisma, IOrderByRawPrisma } from '@/@v2/shared/utils/datab
 import { FormApplicationBrowseModelMapper } from '../../mappers/models/form-application/form-application-browse.mapper';
 import { Prisma } from '@prisma/client';
 import { FormApplicationReadModelMapper } from '../../mappers/models/form-application/form-application-read.mapper';
+import { FormStatusEnum } from '@/@v2/forms/domain/enums/form-status.enum';
 
 @Injectable()
 export class FormApplicationDAO {
@@ -49,14 +50,16 @@ export class FormApplicationDAO {
         ,form."name" as form_name
         ,form."type" as form_type
         ,form."system" as form_system
-        ,COUNT(form_part."id"::integer) as total_answers
-        ,COUNT(emp."id"::integer) as total_participants
+        ,COUNT(DISTINCT form_part_ans."id")::integer as total_answers
+        ,COUNT(DISTINCT emp."id")::integer as total_participants
       FROM 
         "FormApplication" form_ap
       LEFT JOIN 
         "Form" form ON form.id = form_ap."form_id"
       LEFT JOIN 
-        "FormParticipantsAnswers" form_part ON form_part."form_application_id" = form_ap."id"
+        "FormParticipantsAnswers" form_part_ans ON form_part_ans."form_application_id" = form_ap."id"
+      LEFT JOIN 
+        "FormParticipants" form_part ON form_part."form_application_id" = form_ap."id"
       LEFT JOIN 
         "FormParticipantsWorkspace" form_part_ws ON form_part_ws."form_participants_id" = form_part."id"
       LEFT JOIN 
@@ -65,6 +68,7 @@ export class FormApplicationDAO {
         "FormParticipantsHierarchy" form_part_hier ON form_part_hier."form_participants_id" = form_part."id"
       LEFT JOIN 
         "Employee" emp ON (emp."hierarchyId" = form_part_hier."hierarchy_id" OR emp."hierarchyId" = h_t_w."A") 
+      ${gerWhereRawPrisma(whereParams)}
       GROUP BY
         form_ap."id"
         ,form_ap."name"
@@ -85,19 +89,21 @@ export class FormApplicationDAO {
     `;
 
     const totalFormsPromise = this.prisma.$queryRaw<{ total: number }[]>`
-      SELECT COUNT(*) AS total FROM "Form" form
+      SELECT COUNT(*) AS total FROM "FormApplication" form_ap
       ${gerWhereRawPrisma(whereParams)};
     `;
 
     const distinctFiltersPromise = this.prisma.$queryRaw<IFormApplicationBrowseFilterModelMapper[]>`
       SELECT 
         array_agg(DISTINCT form.type) AS filter_types
-      FROM "Form" form
+      FROM 
+        "Form" form
+      LEFT JOIN 
+        "FormApplication" form_ap ON form_ap."form_id" = form.id
       ${gerWhereRawPrisma(browseWhereParams)};
     `;
 
     const [forms, totalForms, distinctFilters] = await Promise.all([formsPromise, totalFormsPromise, distinctFiltersPromise]);
-    console.log(forms);
 
     return FormApplicationBrowseModelMapper.toModel({
       results: forms,
@@ -107,7 +113,8 @@ export class FormApplicationDAO {
   }
 
   private browseWhere(filters: IFormApplicationDAO.BrowseParams['filters']) {
-    const where = [Prisma.sql`form."company_id" = ${filters.companyId}`, Prisma.sql`form."deleted_at" IS NULL`];
+    console.log(filters);
+    const where = [Prisma.sql`form_ap."company_id" = ${filters.companyId}`, Prisma.sql`form_ap."deleted_at" IS NULL`];
 
     return where;
   }
@@ -130,10 +137,16 @@ export class FormApplicationDAO {
 
   private browseOrderBy(orderBy?: IFormApplicationDAO.BrowseParams['orderBy']) {
     if (!orderBy) return [];
+    const desiredOrder = [FormStatusEnum.INACTIVE, FormStatusEnum.PENDING, FormStatusEnum.PROGRESS, FormStatusEnum.DONE, FormStatusEnum.CANCELED];
 
     const map: Record<FormApplicationOrderByEnum, string> = {
       [FormApplicationOrderByEnum.NAME]: 'form_ap.name',
-      [FormApplicationOrderByEnum.STATUS]: 'form_ap.type',
+      [FormApplicationOrderByEnum.STATUS]: `
+      CASE form_ap.status 
+        ${desiredOrder.map((type, index) => `WHEN '${type}' THEN ${index}`).join(' ')} 
+        ELSE ${desiredOrder.findIndex((type) => type === FormStatusEnum.PENDING)} 
+      END
+    `,
       [FormApplicationOrderByEnum.END_DATE]: 'form_ap.ended_at',
       [FormApplicationOrderByEnum.START_DATE]: 'form_ap.started_at',
       [FormApplicationOrderByEnum.CREATED_AT]: 'form_ap.created_at',
