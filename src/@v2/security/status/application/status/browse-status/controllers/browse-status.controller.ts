@@ -1,19 +1,17 @@
-import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common'
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 
-import { SecurityRoutes } from '@/@v2/security/status/constants/routes'
-import { JwtAuthGuard } from '@/@v2/shared/guards/jwt-auth.guard'
-import { PermissionEnum } from '@/shared/constants/enum/authorization'
-import { Permissions } from '@/shared/decorators/permissions.decorator'
-import { BrowseStatusPath } from './browse-status.path'
-import { BrowseStatusQuery } from './browse-status.query'
-import { BrowseStatusUseCase } from '../use-cases/browse-status.usecase'
+import { StatusRoutes } from '@/@v2/security/status/constants/routes';
+import { JwtAuthGuard } from '@/@v2/shared/guards/jwt-auth.guard';
+import { PermissionEnum } from '@/shared/constants/enum/authorization';
+import { Permissions } from '@/shared/decorators/permissions.decorator';
+import { BrowseStatusPath } from './browse-status.path';
+import { BrowseStatusQuery } from './browse-status.query';
+import { BrowseStatusUseCase } from '../use-cases/browse-status.usecase';
 
-@Controller(SecurityRoutes.STATUS.BROWSE)
+@Controller(StatusRoutes.STATUS.BROWSE)
 @UseGuards(JwtAuthGuard)
 export class BrowseStatusController {
-  constructor(
-    private readonly browseStatusUseCase: BrowseStatusUseCase
-  ) { }
+  constructor(private readonly browseStatusUseCase: BrowseStatusUseCase) {}
 
   @Get()
   @Permissions({
@@ -26,6 +24,6 @@ export class BrowseStatusController {
     return this.browseStatusUseCase.execute({
       companyId: path.companyId,
       type: query.type,
-    })
+    });
   }
 }

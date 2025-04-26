@@ -63,7 +63,16 @@ export class ActionPlanDAO {
           select: {
             name: true,
             type: true,
-            photos: true,
+            photos: {
+              include: {
+                characterizationPhotoRecommendation: {
+                  where: {
+                    recommendation_id: params.recommendationId,
+                    risk_data_id: params.riskDataId,
+                  },
+                },
+              },
+            },
           },
         },
       },

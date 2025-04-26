@@ -4,7 +4,7 @@ import { HierarchyTypeEnum } from '@/@v2/shared/domain/enum/company/hierarchy-ty
 import { CharacterizationTypeEnum } from '@/@v2/shared/domain/enum/security/characterization-type.enum';
 import { HomoTypeEnum } from '@/@v2/shared/domain/enum/security/homo-type.enum';
 import { getOriginHomogeneousGroup } from '@/@v2/shared/domain/functions/security/get-origin-homogeneous-group.func';
-import { CharacterizationTypeEnum as PrismaCharacterizationTypeEnum, CompanyCharacterizationPhoto, HomogeneousGroup, HierarchyEnum } from '@prisma/client';
+import { CharacterizationTypeEnum as PrismaCharacterizationTypeEnum, CompanyCharacterizationPhoto, HomogeneousGroup, HierarchyEnum, CharacterizationPhotoRecommendation } from '@prisma/client';
 import { IActionPlanDAO } from '../../../dao/action-plan/action-plan.types';
 
 export type IActionPlanReadMapper = {
@@ -18,7 +18,9 @@ export type IActionPlanReadMapper = {
     characterization: {
       name: string;
       type: PrismaCharacterizationTypeEnum;
-      photos: CompanyCharacterizationPhoto[];
+      photos: (CompanyCharacterizationPhoto & {
+        characterizationPhotoRecommendation: CharacterizationPhotoRecommendation[];
+      })[];
     } | null;
     riskFactorData: {
       recs: {
@@ -94,6 +96,7 @@ export class ActionPlanReadMapper {
             isVertical: photo.isVertical,
             name: photo.name,
             url: photo.photoUrl,
+            isVisible: photo.characterizationPhotoRecommendation.length ? photo.characterizationPhotoRecommendation.some((rec) => rec.is_visible) : true,
           }),
       ),
     });

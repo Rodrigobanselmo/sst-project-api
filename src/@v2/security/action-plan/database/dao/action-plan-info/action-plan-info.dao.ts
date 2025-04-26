@@ -20,6 +20,6 @@ export class ActionPlanInfoDAO {
       },
     });
 
-    return data ? ActionPlanInfoModelMapper.toModel(data) : null;
+    return ActionPlanInfoModelMapper.toModel(data);
   }
 }

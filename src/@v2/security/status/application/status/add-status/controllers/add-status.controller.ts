@@ -1,19 +1,17 @@
-import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common'
+import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common';
 
-import { SecurityRoutes } from '@/@v2/security/status/constants/routes'
-import { JwtAuthGuard } from '@/@v2/shared/guards/jwt-auth.guard'
-import { PermissionEnum } from '@/shared/constants/enum/authorization'
-import { Permissions } from '@/shared/decorators/permissions.decorator'
-import { AddStatusUseCase } from '../use-cases/add-status.usecase'
-import { AddStatusPath } from './add-status.path'
-import { AddStatusPayload } from './add-status.payload'
+import { StatusRoutes } from '@/@v2/security/status/constants/routes';
+import { JwtAuthGuard } from '@/@v2/shared/guards/jwt-auth.guard';
+import { PermissionEnum } from '@/shared/constants/enum/authorization';
+import { Permissions } from '@/shared/decorators/permissions.decorator';
+import { AddStatusUseCase } from '../use-cases/add-status.usecase';
+import { AddStatusPath } from './add-status.path';
+import { AddStatusPayload } from './add-status.payload';
 
-@Controller(SecurityRoutes.STATUS.ADD)
+@Controller(StatusRoutes.STATUS.ADD)
 @UseGuards(JwtAuthGuard)
 export class AddStatusController {
-  constructor(
-    private readonly addStatusUseCase: AddStatusUseCase
-  ) { }
+  constructor(private readonly addStatusUseCase: AddStatusUseCase) {}
 
   @Post()
   @Permissions({
@@ -28,6 +26,6 @@ export class AddStatusController {
       name: body.name,
       type: body.type,
       color: body.color,
-    })
+    });
   }
 }

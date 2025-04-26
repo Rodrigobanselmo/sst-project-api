@@ -1,19 +1,17 @@
-import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common'
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 
-import { SecurityRoutes } from '@/@v2/security/characterization/constants/routes'
-import { JwtAuthGuard } from '@/@v2/shared/guards/jwt-auth.guard'
-import { PermissionEnum } from '@/shared/constants/enum/authorization'
-import { Permissions } from '@/shared/decorators/permissions.decorator'
-import { BrowseCharacterizationUseCase } from '../use-cases/browse-characterizations.usecase'
-import { BrowseCharacterizationPath } from './browse-characterizations.path'
-import { BrowseCharacterizationQuery } from './browse-characterizations.query'
+import { CharacterizationRoutes } from '@/@v2/security/characterization/constants/routes';
+import { JwtAuthGuard } from '@/@v2/shared/guards/jwt-auth.guard';
+import { PermissionEnum } from '@/shared/constants/enum/authorization';
+import { Permissions } from '@/shared/decorators/permissions.decorator';
+import { BrowseCharacterizationUseCase } from '../use-cases/browse-characterizations.usecase';
+import { BrowseCharacterizationPath } from './browse-characterizations.path';
+import { BrowseCharacterizationQuery } from './browse-characterizations.query';
 
-@Controller(SecurityRoutes.CHARACTERIZATION.BROWSE)
+@Controller(CharacterizationRoutes.CHARACTERIZATION.BROWSE)
 @UseGuards(JwtAuthGuard)
 export class BrowseCharacterizationController {
-  constructor(
-    private readonly browseCharacterizationUseCase: BrowseCharacterizationUseCase
-  ) { }
+  constructor(private readonly browseCharacterizationUseCase: BrowseCharacterizationUseCase) {}
 
   @Get()
   @Permissions({
@@ -31,8 +29,8 @@ export class BrowseCharacterizationController {
       stageIds: query.stageIds,
       pagination: {
         page: query.page,
-        limit: query.limit
+        limit: query.limit,
       },
-    })
+    });
   }
 }

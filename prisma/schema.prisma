@@ -448,16 +448,34 @@ model CompanyCharacterization {
 }
 
 model CompanyCharacterizationPhoto {
-  id                        String                  @id @default(uuid())
-  name                      String
-  isVertical                Boolean                 @default(false)
-  photoUrl                  String
-  created_at                DateTime                @default(now())
-  deleted_at                DateTime?
-  updated_at                DateTime                @updatedAt
-  companyCharacterizationId String
-  order                     Int?
-  companyEnvironment        CompanyCharacterization @relation(fields: [companyCharacterizationId], references: [id])
+  id                                  String                                @id @default(uuid())
+  name                                String
+  isVertical                          Boolean                               @default(false)
+  photoUrl                            String
+  created_at                          DateTime                              @default(now())
+  deleted_at                          DateTime?
+  updated_at                          DateTime                              @updatedAt
+  companyCharacterizationId           String
+  order                               Int?
+  companyEnvironment                  CompanyCharacterization               @relation(fields: [companyCharacterizationId], references: [id])
+  characterizationPhotoRecommendation CharacterizationPhotoRecommendation[]
+}
+
+model CharacterizationPhotoRecommendation {
+  id         Int      @id @default(autoincrement())
+  created_at DateTime @default(now())
+  is_visible Boolean  @default(true)
+
+  risk_data_id   String
+  riskFactorData RiskFactorData @relation(fields: [risk_data_id], references: [id])
+
+  recommendation_id String
+  recommendation    RecMed @relation(fields: [recommendation_id], references: [id])
+
+  photo_id String
+  photo    CompanyCharacterizationPhoto @relation(fields: [photo_id], references: [id])
+
+  @@unique([risk_data_id, recommendation_id, photo_id])
 }
 
 model CompanyCharacterizationFile {
@@ -1420,26 +1438,27 @@ model ProtocolToRisk {
 }
 
 model RecMed {
-  id                   String                 @id @default(uuid())
-  riskId               String
-  recName              String?
-  medName              String?
-  companyId            String
-  generateSourceId     String?
-  system               Boolean
-  medType              MeasuresTypeEnum?
-  status               StatusEnum             @default(ACTIVE)
-  created_at           DateTime               @default(now())
-  updated_at           DateTime               @updatedAt
-  deleted_at           DateTime?
-  recType              RecTypeEnum?
-  company              Company                @relation(fields: [companyId], references: [id])
-  generateSource       GenerateSource?        @relation(fields: [generateSourceId], references: [id], onDelete: Cascade)
-  risk                 RiskFactors            @relation(fields: [riskId], references: [id], onDelete: Cascade)
-  dataRecs             RiskFactorDataRec[]
-  engsToRiskFactorData EngsToRiskFactorData[]
-  adms                 RiskFactorData[]       @relation("adms")
-  recs                 RecMedOnRiskData[]
+  id                                  String                                @id @default(uuid())
+  riskId                              String
+  recName                             String?
+  medName                             String?
+  companyId                           String
+  generateSourceId                    String?
+  system                              Boolean
+  medType                             MeasuresTypeEnum?
+  status                              StatusEnum                            @default(ACTIVE)
+  created_at                          DateTime                              @default(now())
+  updated_at                          DateTime                              @updatedAt
+  deleted_at                          DateTime?
+  recType                             RecTypeEnum?
+  company                             Company                               @relation(fields: [companyId], references: [id])
+  generateSource                      GenerateSource?                       @relation(fields: [generateSourceId], references: [id], onDelete: Cascade)
+  risk                                RiskFactors                           @relation(fields: [riskId], references: [id], onDelete: Cascade)
+  dataRecs                            RiskFactorDataRec[]
+  engsToRiskFactorData                EngsToRiskFactorData[]
+  adms                                RiskFactorData[]                      @relation("adms")
+  recs                                RecMedOnRiskData[]
+  CharacterizationPhotoRecommendation CharacterizationPhotoRecommendation[]
 
   @@unique([id, companyId])
 }
@@ -1583,38 +1602,39 @@ model DocumentDataToProfessional {
 }
 
 model RiskFactorData {
-  id                    String                 @id @default(uuid())
-  probability           Int?
-  probabilityAfter      Int?
-  exposure              ExposureTypeEnum?
-  companyId             String
-  riskId                String
-  homogeneousGroupId    String?
-  hierarchyId           String?
-  riskFactorGroupDataId String
-  json                  Json?
-  activities            Json?
-  level                 Int?
-  standardExams         Boolean                @default(true)
-  deletedAt             DateTime?
-  endDate               DateTime?
-  startDate             DateTime?
-  createdAt             DateTime               @default(now())
-  updatedAt             DateTime               @default(now()) @updatedAt
-  examsToRiskFactorData ExamToRiskData[]
-  company               Company                @relation(fields: [companyId], references: [id])
-  hierarchy             Hierarchy?             @relation(fields: [hierarchyId], references: [id], onDelete: Cascade)
-  homogeneousGroup      HomogeneousGroup?      @relation(fields: [homogeneousGroupId], references: [id], onDelete: Cascade)
-  riskFactorGroupData   RiskFactorGroupData    @relation(fields: [riskFactorGroupDataId], references: [id])
-  riskFactor            RiskFactors            @relation(fields: [riskId], references: [id])
-  dataRecs              RiskFactorDataRec[]
-  probabilityAfterCalc  RiskFactorProbability? @relation("RiskFactorProbabilityAfter")
-  probabilityCalc       RiskFactorProbability? @relation("RiskFactorProbabilityBefore")
-  epiToRiskFactorData   EpiToRiskFactorData[]
-  engsToRiskFactorData  EngsToRiskFactorData[]
-  generateSources       GenerateSource[]       @relation("GenerateSourceToRiskFactorData")
-  adms                  RecMed[]               @relation("adms")
-  recs                  RecMedOnRiskData[]
+  id                                  String                                @id @default(uuid())
+  probability                         Int?
+  probabilityAfter                    Int?
+  exposure                            ExposureTypeEnum?
+  companyId                           String
+  riskId                              String
+  homogeneousGroupId                  String?
+  hierarchyId                         String?
+  riskFactorGroupDataId               String
+  json                                Json?
+  activities                          Json?
+  level                               Int?
+  standardExams                       Boolean                               @default(true)
+  deletedAt                           DateTime?
+  endDate                             DateTime?
+  startDate                           DateTime?
+  createdAt                           DateTime                              @default(now())
+  updatedAt                           DateTime                              @default(now()) @updatedAt
+  examsToRiskFactorData               ExamToRiskData[]
+  company                             Company                               @relation(fields: [companyId], references: [id])
+  hierarchy                           Hierarchy?                            @relation(fields: [hierarchyId], references: [id], onDelete: Cascade)
+  homogeneousGroup                    HomogeneousGroup?                     @relation(fields: [homogeneousGroupId], references: [id], onDelete: Cascade)
+  riskFactorGroupData                 RiskFactorGroupData                   @relation(fields: [riskFactorGroupDataId], references: [id])
+  riskFactor                          RiskFactors                           @relation(fields: [riskId], references: [id])
+  dataRecs                            RiskFactorDataRec[]
+  probabilityAfterCalc                RiskFactorProbability?                @relation("RiskFactorProbabilityAfter")
+  probabilityCalc                     RiskFactorProbability?                @relation("RiskFactorProbabilityBefore")
+  epiToRiskFactorData                 EpiToRiskFactorData[]
+  engsToRiskFactorData                EngsToRiskFactorData[]
+  generateSources                     GenerateSource[]                      @relation("GenerateSourceToRiskFactorData")
+  adms                                RecMed[]                              @relation("adms")
+  recs                                RecMedOnRiskData[]
+  CharacterizationPhotoRecommendation CharacterizationPhotoRecommendation[]
 
   @@unique([id, companyId])
   @@unique([id, riskId, riskFactorGroupDataId])
@@ -1648,28 +1668,33 @@ model RiskFactorProbability {
 }
 
 model RiskFactorDataRec {
-  id               String                      @id @default(uuid())
-  responsibleName  String? //*not used
-  endDate          DateTime?
-  status           StatusEnum                  @default(PENDING)
-  startDate        DateTime?
-  doneDate         DateTime?
-  canceledDate     DateTime?
-  recMedId         String
+  id              String     @id @default(uuid())
+  responsibleName String? //*not used
+  endDate         DateTime?
+  status          StatusEnum @default(PENDING)
+  startDate       DateTime?
+  doneDate        DateTime?
+  canceledDate    DateTime?
+  created_at      DateTime   @default(now())
+  updated_at      DateTime   @updatedAt
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+
+  recMedId String
+  recMed   RecMed @relation(fields: [recMedId], references: [id])
+
   riskFactorDataId String
-  companyId        String
-  workspaceId      String
-  created_at       DateTime                    @default(now())
-  updated_at       DateTime                    @updatedAt
-  company          Company                     @relation(fields: [companyId], references: [id])
-  workspace        Workspace                   @relation(fields: [workspaceId], references: [id])
-  recMed           RecMed                      @relation(fields: [recMedId], references: [id])
-  riskFactorData   RiskFactorData              @relation(fields: [riskFactorDataId], references: [id])
-  comments         RiskFactorDataRecComments[]
-  photos           RiskFactorDataRecPhoto[]
+  riskFactorData   RiskFactorData @relation(fields: [riskFactorDataId], references: [id])
 
   responsible   User? @relation(fields: [responsibleId], references: [id])
   responsibleId Int?
+
+  comments RiskFactorDataRecComments[]
+  photos   RiskFactorDataRecPhoto[]
 
   @@unique([riskFactorDataId, recMedId, workspaceId])
 }

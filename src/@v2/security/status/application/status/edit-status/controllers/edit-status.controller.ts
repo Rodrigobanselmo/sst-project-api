@@ -1,19 +1,17 @@
-import { Body, Controller, Param, Patch, UseGuards } from '@nestjs/common'
+import { Body, Controller, Param, Patch, UseGuards } from '@nestjs/common';
 
-import { SecurityRoutes } from '@/@v2/security/status/constants/routes'
-import { JwtAuthGuard } from '@/@v2/shared/guards/jwt-auth.guard'
-import { PermissionEnum } from '@/shared/constants/enum/authorization'
-import { Permissions } from '@/shared/decorators/permissions.decorator'
-import { EditStatusUseCase } from '../use-cases/edit-status.usecase'
-import { EditStatusPath } from './edit-status.path'
-import { EditStatusPayload } from './edit-status.payload'
+import { StatusRoutes } from '@/@v2/security/status/constants/routes';
+import { JwtAuthGuard } from '@/@v2/shared/guards/jwt-auth.guard';
+import { PermissionEnum } from '@/shared/constants/enum/authorization';
+import { Permissions } from '@/shared/decorators/permissions.decorator';
+import { EditStatusUseCase } from '../use-cases/edit-status.usecase';
+import { EditStatusPath } from './edit-status.path';
+import { EditStatusPayload } from './edit-status.payload';
 
-@Controller(SecurityRoutes.STATUS.EDIT)
+@Controller(StatusRoutes.STATUS.EDIT)
 @UseGuards(JwtAuthGuard)
 export class EditStatusController {
-  constructor(
-    private readonly editStatusUseCase: EditStatusUseCase
-  ) { }
+  constructor(private readonly editStatusUseCase: EditStatusUseCase) {}
 
   @Patch()
   @Permissions({
@@ -28,6 +26,6 @@ export class EditStatusController {
       companyId: path.companyId,
       name: body.name,
       color: body.color,
-    })
+    });
   }
 }

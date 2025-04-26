@@ -5,7 +5,7 @@ export type IActionPlanInfoModelMapper = Prisma.DocumentDataGetPayload<{
   include: {
     coordinator: true;
   };
-}>;
+}> | null;
 
 export class ActionPlanInfoModelMapper {
   static toModel(prisma: IActionPlanInfoModelMapper): ActionPlanInfoModel {
