@@ -357,6 +357,8 @@ model Company {
   DocumentControl            DocumentControl[]
   SystemFile                 SystemFile[]
   DocumentControlFile        DocumentControlFile[]
+  TaskProject                TaskProject[]
+  Task                       Task[]
 
   @@index([name])
   @@index([isClinic])
@@ -663,6 +665,7 @@ model SystemFile {
 
   document_control_files           DocumentControlFile[]
   action_plan_recommendation_photo RiskFactorDataRecPhoto[]
+  task_photo                       TaskPhoto[]
 
   @@unique([id, company_id])
   @@index([company_id])
@@ -1695,6 +1698,7 @@ model RiskFactorDataRec {
 
   comments RiskFactorDataRecComments[]
   photos   RiskFactorDataRecPhoto[]
+  Task     Task[]
 
   @@unique([riskFactorDataId, recMedId, workspaceId])
 }
@@ -1806,6 +1810,7 @@ model Status {
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   CompanyCharacterization CompanyCharacterization[]
+  Task                    Task[]
 
   @@index(type)
 }
@@ -1843,6 +1848,10 @@ model User {
   recCommentsAnswer RiskFactorDataRecComments[] @relation("rec_comment_answer")
   RiskFactorDataRec RiskFactorDataRec[]
   Employee          Employee[]
+  taskHistory       TaskHistory[]
+  TaskProject       TaskProject[]
+  taskCreator       Task[]
+  taskResponsible   TaskResponsible[]
 
   @@unique([id, name])
   @@index([email])
@@ -1927,6 +1936,96 @@ model RecMedOnRiskData {
   sequential_id Int?
 
   @@id([rec_med_id, risk_data_id])
+}
+
+model TaskProject {
+  id          Int        @id @default(autoincrement())
+  name        String
+  description String?
+  status      StatusEnum @default(ACTIVE)
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+  deleted_at  DateTime?
+
+  company_id String
+  company    Company @relation(fields: [company_id], references: [id])
+
+  user_id Int
+  user    User @relation(fields: [user_id], references: [id])
+
+  tasks Task[]
+
+  @@unique([id, company_id])
+}
+
+model Task {
+  id          Int       @id @default(autoincrement())
+  description String
+  end_date    DateTime?
+  done_date   DateTime?
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  deleted_at  DateTime?
+
+  status_id Int?
+  status    Status? @relation(fields: [status_id], references: [id])
+
+  company_id String
+  company    Company @relation(fields: [company_id], references: [id])
+
+  project_id Int?
+  project    TaskProject? @relation(fields: [project_id], references: [id])
+
+  action_plan_id String?
+  action_plan    RiskFactorDataRec? @relation(fields: [action_plan_id], references: [id])
+
+  creator_id Int
+  creator    User @relation(fields: [creator_id], references: [id])
+
+  responsible TaskResponsible[]
+  history     TaskHistory[]
+  photos      TaskPhoto[]
+}
+
+model TaskResponsible {
+  created_at DateTime @default(now())
+
+  user_id Int
+  user    User @relation(fields: [user_id], references: [id])
+
+  task_id Int
+  task    Task @relation(fields: [task_id], references: [id])
+
+  @@unique([user_id, task_id])
+}
+
+model TaskPhoto {
+  id         Int       @id @default(autoincrement())
+  created_at DateTime  @default(now())
+  deleted_at DateTime?
+
+  file_id String
+  file    SystemFile @relation(fields: [file_id], references: [id])
+
+  task_id Int
+  task    Task @relation(fields: [task_id], references: [id])
+
+  @@unique([file_id, task_id])
+}
+
+model TaskHistory {
+  id      Int     @id @default(autoincrement())
+  text    String?
+  changes Json?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  task_id Int
+  task    Task @relation(fields: [task_id], references: [id])
+
+  user    User @relation(fields: [user_id], references: [id])
+  user_id Int
 }
 
 enum CharacterizationTypeEnum {

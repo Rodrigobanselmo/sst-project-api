@@ -6,6 +6,7 @@ import { DeleteUnusedFileService } from './services/delete-unused-file/delete-un
 import { ReadFileService } from './services/read-file/read-file.service';
 import { DeleteUnusedFilesUseCase } from './application/delete-unused-files/use-cases/delete-unused-files.usecase';
 import { DeleteUnusedFilesCron } from './application/delete-unused-files/cron/delete-unused-files.cron';
+import { ReadManyFileService } from './services/read-many-file/read-many-file.service';
 
 @Module({
   imports: [forwardRef(() => SharedModule)],
@@ -21,6 +22,7 @@ import { DeleteUnusedFilesCron } from './application/delete-unused-files/cron/de
     AddFileService,
     DeleteUnusedFileService,
     ReadFileService,
+    ReadManyFileService,
 
     // Use Cases
     DeleteUnusedFilesUseCase,

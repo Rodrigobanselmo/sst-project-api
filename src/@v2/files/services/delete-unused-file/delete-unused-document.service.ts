@@ -16,7 +16,7 @@ export class DeleteUnusedFileService {
   ) {}
 
   async delete(): IDeleteUnusedFileService.Result {
-    const files = await this.fileRepository.findMany();
+    const files = await this.fileRepository.findManyUnused();
 
     asyncBatch({
       items: files,

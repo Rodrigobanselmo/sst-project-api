@@ -77,6 +77,19 @@ export class FileRepository {
   async findMany(params?: IFileRepository.FindManyParams): IFileRepository.FindManyReturn {
     const files = await this.prisma.systemFile.findMany({
       where: {
+        company_id: params.companyId,
+        id: {
+          in: params.ids,
+        },
+      },
+    });
+
+    return FileEntityMapper.toArray(files);
+  }
+
+  async findManyUnused(params?: IFileRepository.FindManyUnusedParams): IFileRepository.FindManyUnusedReturn {
+    const files = await this.prisma.systemFile.findMany({
+      where: {
         company_id: params?.companyId,
         ...FileRepository.whereUnusedFilter(),
       },

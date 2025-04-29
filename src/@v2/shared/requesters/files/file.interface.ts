@@ -4,6 +4,7 @@ import { DomainResponse } from '../../domain/types/shared/domain-response';
 
 export interface IFileRequester {
   read(params: IFileRequester.Read.Params): IFileRequester.Read.Result;
+  readMany(params: IFileRequester.ReadMany.Params): IFileRequester.ReadMany.Result;
   add(params: IFileRequester.Add.Params): IFileRequester.Add.Result;
 }
 
@@ -27,5 +28,10 @@ export namespace IFileRequester {
   export namespace Read {
     export type Params = { fileId: string; companyId: string };
     export type Result = Promise<DomainResponse<SystemFile>>;
+  }
+
+  export namespace ReadMany {
+    export type Params = { fileIds: string[]; companyId: string };
+    export type Result = Promise<DomainResponse<SystemFile[]>>;
   }
 }
