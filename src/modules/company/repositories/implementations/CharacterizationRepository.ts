@@ -221,18 +221,7 @@ export class CharacterizationRepository {
   ) {
     const characterization = (await this.prisma.companyCharacterization.findUnique({
       where: { id },
-      include: {
-        photos: {
-          where: {
-            characterizationPhotoRecommendation: {
-              none: { id: { gt: 0 } },
-            },
-          },
-        },
-        profiles: true,
-        files: true,
-        ...options.include,
-      },
+      include: { photos: true, profiles: true, files: true, ...options.include },
     })) as CharacterizationEntity;
 
     if (characterization) {

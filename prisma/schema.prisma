@@ -467,13 +467,13 @@ model CharacterizationPhotoRecommendation {
   is_visible Boolean  @default(true)
 
   risk_data_id   String
-  riskFactorData RiskFactorData @relation(fields: [risk_data_id], references: [id])
+  riskFactorData RiskFactorData @relation(fields: [risk_data_id], references: [id], onDelete: Cascade)
 
   recommendation_id String
-  recommendation    RecMed @relation(fields: [recommendation_id], references: [id])
+  recommendation    RecMed @relation(fields: [recommendation_id], references: [id], onDelete: Cascade)
 
   photo_id String
-  photo    CompanyCharacterizationPhoto @relation(fields: [photo_id], references: [id])
+  photo    CompanyCharacterizationPhoto @relation(fields: [photo_id], references: [id], onDelete: Cascade)
 
   @@unique([risk_data_id, recommendation_id, photo_id])
 }
