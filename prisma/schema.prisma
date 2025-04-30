@@ -1685,12 +1685,12 @@ model RiskFactorDataRec {
   workspace   Workspace @relation(fields: [workspaceId], references: [id])
 
   recMedId String
-  recMed   RecMed @relation(fields: [recMedId], references: [id])
+  recMed   RecMed @relation(fields: [recMedId], references: [id], onDelete: Cascade)
 
   riskFactorDataId String
-  riskFactorData   RiskFactorData @relation(fields: [riskFactorDataId], references: [id])
+  riskFactorData   RiskFactorData @relation(fields: [riskFactorDataId], references: [id], onDelete: Cascade)
 
-  responsible   User? @relation(fields: [responsibleId], references: [id])
+  responsible   User? @relation(fields: [responsibleId], references: [id], onDelete: SetNull)
   responsibleId Int?
 
   comments RiskFactorDataRecComments[]
@@ -1919,9 +1919,9 @@ model Workspace {
 }
 
 model RecMedOnRiskData {
-  recMed       RecMed         @relation(fields: [rec_med_id], references: [id])
+  recMed       RecMed         @relation(fields: [rec_med_id], references: [id], onDelete: Cascade)
   rec_med_id   String
-  riskData     RiskFactorData @relation(fields: [risk_data_id], references: [id])
+  riskData     RiskFactorData @relation(fields: [risk_data_id], references: [id], onDelete: Cascade)
   risk_data_id String
 
   sequential_id Int?
