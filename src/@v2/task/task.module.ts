@@ -13,22 +13,53 @@ import { TaskAggregateRepository } from './database/repositories/task/task-aggre
 import { TaskActionPlanRepository } from './database/repositories/task-action-plan/task-action-plan.repository';
 import { TaskProjectRepository } from './database/repositories/task-project/task-project.repository';
 import { CreateTaskPhotosService } from './services/create-task-photos/create-task-photos.service';
+import { ReadTaskController } from './application/task/read-task/controllers/read-task.controller';
+import { ReadTaskUseCase } from './application/task/read-task/use-cases/read-task.usecase';
+import { TaskProjectAggregateRepository } from './database/repositories/task-project/task-project-aggregate.repository';
+import { AddTaskProjectUseCase } from './application/task-project/add-task-project/use-cases/add-task-project.usecase';
+import { BrowseTaskProjectUseCase } from './application/task-project/browse-task-project/use-cases/browse-task-project.usecase';
+import { EditTaskProjectUseCase } from './application/task-project/edit-task-project/use-cases/edit-task-project.usecase';
+import { DeleteTaskProjectUseCase } from './application/task-project/delete-task-project/use-cases/delete-task-project.usecase';
+import { ReadTaskProjectUseCase } from './application/task-project/read-task-project/use-cases/read-task-project.usecase';
+import { ReadTaskProjectController } from './application/task-project/read-task-project/controllers/read-task-project.controller';
+import { AddTaskProjectController } from './application/task-project/add-task-project/controllers/add-task-project.controller';
+import { EditTaskProjectController } from './application/task-project/edit-task-project/controllers/edit-task-project.controller';
+import { BrowseTaskProjectController } from './application/task-project/browse-task-project/controllers/browse-task-project.controller';
+import { DeleteTaskProjectController } from './application/task-project/delete-task-project/controllers/delete-task-project.controller';
 
 @Module({
   imports: [SharedModule],
-  controllers: [AddTaskController, EditTaskController, BrowseTaskController, DeleteTaskController],
+  controllers: [
+    ReadTaskController,
+    AddTaskController,
+    EditTaskController,
+    BrowseTaskController,
+    DeleteTaskController,
+    ReadTaskProjectController,
+    AddTaskProjectController,
+    EditTaskProjectController,
+    BrowseTaskProjectController,
+    DeleteTaskProjectController,
+  ],
   providers: [
     // Database
     TaskDAO,
     TaskAggregateRepository,
     TaskActionPlanRepository,
     TaskProjectRepository,
+    TaskProjectAggregateRepository,
 
     // Use Cases
     AddTaskUseCase,
     BrowseTaskUseCase,
     EditTaskUseCase,
     DeleteTaskUseCase,
+    ReadTaskUseCase,
+    AddTaskProjectUseCase,
+    BrowseTaskProjectUseCase,
+    EditTaskProjectUseCase,
+    DeleteTaskProjectUseCase,
+    ReadTaskProjectUseCase,
 
     // Services
     CreateTaskPhotosService,

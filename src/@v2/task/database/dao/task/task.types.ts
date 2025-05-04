@@ -12,6 +12,11 @@ export enum TaskOrderByEnum {
 }
 
 export namespace ITaskDAO {
+  export type ReadParams = {
+    id: number;
+    companyId: string;
+  };
+
   export type BrowseParams = {
     orderBy?: IOrderBy<TaskOrderByEnum>;
     limit?: number;
@@ -23,6 +28,7 @@ export namespace ITaskDAO {
       responsibleIds?: number[];
       statusIds?: number[];
       actionPlanIds?: String[];
+      projectIds?: number[];
     };
   };
 }

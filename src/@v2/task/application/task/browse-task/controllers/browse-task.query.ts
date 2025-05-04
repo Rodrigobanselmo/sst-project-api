@@ -46,6 +46,12 @@ export class BrowseTaskQuery {
   @IsOptional()
   @Type(() => Number)
   @IsInt({ each: true })
+  projectIds?: number[];
+
+  @IsArray()
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt({ each: true })
   statusIds?: number[];
 
   @IsArray()

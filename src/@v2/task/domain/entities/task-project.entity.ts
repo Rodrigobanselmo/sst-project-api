@@ -11,7 +11,7 @@ export type ITaskProjectEntity = {
   id?: number;
   name: string;
   description?: string | null;
-  status: TaskProjectStatusEnum;
+  status?: TaskProjectStatusEnum;
   createdAt?: Date;
   updatedAt?: Date;
   deletedAt?: Date | null;
@@ -34,7 +34,7 @@ export class TaskProjectEntity {
     this.id = params.id || -1;
     this.name = params.name;
     this.description = params.description || null;
-    this.status = params.status;
+    this.status = params.status || TaskProjectStatusEnum.ACTIVE;
     this.createdAt = params.createdAt || new Date();
     this.updatedAt = params.updatedAt || new Date();
     this.deletedAt = params.deletedAt || null;

@@ -1,6 +1,6 @@
 export enum TaskProjectStatusEnum {
+  ACTIVE = 'ACTIVE',
   PENDING = 'PENDING',
-  PROGRESS = 'PROGRESS',
   DONE = 'DONE',
   CANCELED = 'CANCELED',
 }

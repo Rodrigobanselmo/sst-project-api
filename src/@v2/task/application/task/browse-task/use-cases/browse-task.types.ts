@@ -11,6 +11,7 @@ export namespace IBrowseTaskUseCase {
     creatorsIds: number[] | undefined;
     responsibleIds: number[] | undefined;
     statusIds: number[] | undefined;
+    projectIds: number[] | undefined;
     actionPlanIds: String[] | undefined;
   };
 }

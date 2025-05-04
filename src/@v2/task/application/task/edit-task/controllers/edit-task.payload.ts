@@ -1,8 +1,8 @@
-import { IsArray, IsDateString, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
+import { IsArray, IsDateString, IsInt, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 class ResponsiblePayload {
-  @IsNumber()
+  @IsInt()
   userId!: number;
 }
 
@@ -12,7 +12,7 @@ class PhotoPayload {
   fileId?: string;
 
   @IsOptional()
-  @IsNumber()
+  @IsInt()
   id?: number;
 
   @IsOptional()

@@ -1843,15 +1843,16 @@ model User {
   alerts              Alert[]
   medicalVisits       ScheduleMedicalVisit[]
 
-  coordinator       DocumentData[]
-  recComments       RiskFactorDataRecComments[]
-  recCommentsAnswer RiskFactorDataRecComments[] @relation("rec_comment_answer")
-  RiskFactorDataRec RiskFactorDataRec[]
-  Employee          Employee[]
-  taskHistory       TaskHistory[]
-  TaskProject       TaskProject[]
-  taskCreator       Task[]
-  taskResponsible   TaskResponsible[]
+  coordinator        DocumentData[]
+  recComments        RiskFactorDataRecComments[]
+  recCommentsAnswer  RiskFactorDataRecComments[] @relation("rec_comment_answer")
+  RiskFactorDataRec  RiskFactorDataRec[]
+  Employee           Employee[]
+  taskHistory        TaskHistory[]
+  taskProject        TaskProject[]
+  taskCreator        Task[]
+  taskResponsible    TaskResponsible[]
+  taskProjectMembers TaskProjectMembers[]
 
   @@unique([id, name])
   @@index([email])
@@ -1953,9 +1954,23 @@ model TaskProject {
   user_id Int
   user    User @relation(fields: [user_id], references: [id])
 
-  tasks Task[]
+  tasks   Task[]
+  members TaskProjectMembers[]
 
   @@unique([id, company_id])
+}
+
+model TaskProjectMembers {
+  id         Int       @id @default(autoincrement())
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
+  user_id Int
+  user    User @relation(fields: [user_id], references: [id])
+
+  project_id Int
+  project    TaskProject @relation(fields: [project_id], references: [id])
 }
 
 model Task {
@@ -1966,6 +1981,7 @@ model Task {
   created_at  DateTime  @default(now())
   updated_at  DateTime  @updatedAt
   deleted_at  DateTime?
+  priority    Int       @default(0)
 
   status_id Int?
   status    Status? @relation(fields: [status_id], references: [id])
@@ -1979,12 +1995,16 @@ model Task {
   action_plan_id String?
   action_plan    RiskFactorDataRec? @relation(fields: [action_plan_id], references: [id])
 
+  parent_task_id Int?
+  parent_task    Task? @relation("sub_tasks_relation", fields: [parent_task_id], references: [id], onDelete: Cascade)
+
   creator_id Int
   creator    User @relation(fields: [creator_id], references: [id])
 
   responsible TaskResponsible[]
   history     TaskHistory[]
   photos      TaskPhoto[]
+  sub_tasks   Task[]            @relation("sub_tasks_relation")
 }
 
 model TaskResponsible {

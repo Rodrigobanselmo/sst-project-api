@@ -18,6 +18,7 @@ export class BrowseTaskUseCase {
         creatorsIds: params.creatorsIds,
         responsibleIds: params.responsibleIds,
         statusIds: params.statusIds,
+        projectIds: params.projectIds,
       },
     });
   }
