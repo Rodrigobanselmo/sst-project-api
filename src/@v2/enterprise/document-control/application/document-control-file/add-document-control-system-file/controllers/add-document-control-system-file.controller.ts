@@ -1,14 +1,14 @@
-import { Body, Controller, Param, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Controller, Param, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 
+import { DocumentControlRoutes } from '@/@v2/enterprise/document-control/constants/routes';
+import { ALLOWED_ALL_TYPES, MAX_DOCUMENT_SIZE } from '@/@v2/shared/constants/files';
 import { JwtAuthGuard } from '@/@v2/shared/guards/jwt-auth.guard';
+import { createFileValidator } from '@/@v2/shared/utils/file/create-file-validator';
 import { PermissionEnum } from '@/shared/constants/enum/authorization';
 import { Permissions } from '@/shared/decorators/permissions.decorator';
-import { DocumentControlRoutes } from '@/@v2/enterprise/document-control/constants/routes';
-import { AddFilePath } from './add-document-control-system-file.path';
-import { AddFileUseCase } from '../use-cases/add-document-control-system-file.usecase';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { createFileValidator } from '@/@v2/shared/utils/file/create-file-validator';
-import { ALLOWED_ALL_TYPES, MAX_DOCUMENT_SIZE } from '@/@v2/shared/constants/files';
+import { AddFileUseCase } from '../use-cases/add-document-control-system-file.usecase';
+import { AddFilePath } from './add-document-control-system-file.path';
 
 @Controller(DocumentControlRoutes.FILE.PATH)
 @UseGuards(JwtAuthGuard)

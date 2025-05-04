@@ -28,8 +28,8 @@ export type ITaskAggregate = {
   history: TaskHistoryEntity[];
   responsible: TaskResponsibleEntity[];
   photos: TaskPhotoEntity[];
-  actionPlan?: TaskActionPlanEntity;
-  project?: TaskProjectEntity;
+  actionPlan?: TaskActionPlanEntity | null;
+  project?: TaskProjectEntity | null;
 };
 
 export class TaskAggregate {

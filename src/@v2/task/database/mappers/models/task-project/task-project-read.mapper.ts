@@ -18,13 +18,13 @@ export class TaskProjectReadModelMapper {
       status: prisma.status as TaskProjectStatusEnum,
       creator: {
         id: prisma.user.id,
-        name: prisma.user.name,
-        email: prisma.user.email,
+        name: prisma.user.name!,
+        email: prisma.user.email!,
       },
       members: prisma.members.map((member) => ({
         id: member.user.id,
-        name: member.user.name,
-        email: member.user.email,
+        name: member.user.name!,
+        email: member.user.email!,
       })),
     });
   }

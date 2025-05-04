@@ -1,9 +1,7 @@
 import { AlignmentType } from 'docx';
 
-import { HierarchyMapData } from '../../../../../converter/hierarchy.converter';
-import { borderNoneStyle } from '../../elements/body';
-import { borderRightStyle } from '../../elements/header';
 import { EPIModel } from '@/@v2/documents/domain/models/epis.model';
+import { borderNoneStyle } from '../../elements/body';
 
 export const dataConverter = (epis: EPIModel[], isHideCA: boolean) => {
   return [

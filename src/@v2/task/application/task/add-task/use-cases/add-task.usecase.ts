@@ -73,11 +73,13 @@ export class AddTaskUseCase {
   }
 
   private createTaskResponsible(params: ITaskUseCase.Params): TaskResponsibleEntity[] {
-    return params.responsible.map(
-      (responsible) =>
-        new TaskResponsibleEntity({
-          userId: responsible.userId,
-        }),
+    return (
+      params.responsible?.map(
+        (responsible) =>
+          new TaskResponsibleEntity({
+            userId: responsible.userId,
+          }),
+      ) || []
     );
   }
 }

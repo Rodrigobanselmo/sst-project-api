@@ -1,5 +1,4 @@
 import { updateField } from '@/@v2/shared/domain/helpers/update-field.helper';
-import { CoordinatorEntity } from './coordinator.entity';
 
 export type IUpdateActionPlanInfoEntity = {
   validityStart?: Date;

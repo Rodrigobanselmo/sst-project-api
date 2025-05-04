@@ -3,7 +3,7 @@ import { TaskProjectBrowseFilterModel } from '@/@v2/task/domain/models/task-proj
 export type ITaskProjectBrowseFilterModelMapper = {};
 
 export class TaskProjectBrowseFilterModelMapper {
-  static toModel(prisma: ITaskProjectBrowseFilterModelMapper): TaskProjectBrowseFilterModel {
-    return new TaskProjectBrowseFilterModel({});
+  static toModel(): TaskProjectBrowseFilterModel {
+    return new TaskProjectBrowseFilterModel();
   }
 }

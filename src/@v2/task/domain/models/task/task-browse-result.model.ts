@@ -5,8 +5,8 @@ export type ITaskBrowseResultModel = {
   updatedAt: Date | null;
   priority: number;
 
-  parent: { name: string; id: number } | null;
-  status: { name: string; color: string | null } | null;
+  parent: { name: string; id: number } | undefined;
+  status: { name: string; color: string | undefined } | undefined;
   createdBy: { id: number; name: string; email: string };
   responsible: { id: number; name: string; email: string }[];
 };
@@ -18,8 +18,8 @@ export class TaskBrowseResultModel {
   updatedAt: Date | null;
   priority: number;
 
-  parent: { name: string; id: number } | null;
-  status: { name: string; color: string | null } | null;
+  parent: { name: string; id: number } | undefined;
+  status: { name: string; color: string | undefined } | undefined;
   createdBy: { id: number; name: string; email: string };
   responsible: { id: number; name: string; email: string }[];
 

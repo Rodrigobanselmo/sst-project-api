@@ -14,7 +14,6 @@ export class TaskMapper {
       deletedAt: data.deleted_at,
       statusId: data.status_id,
       companyId: data.company_id,
-      projectId: data.project_id,
       creatorId: data.creator_id,
       description: data.description,
     });

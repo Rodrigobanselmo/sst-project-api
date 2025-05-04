@@ -6,7 +6,6 @@ export type ITaskResponsibleEntityMapper = TaskResponsible;
 export class TaskResponsibleMapper {
   static toEntity(data: ITaskResponsibleEntityMapper): TaskResponsibleEntity {
     return new TaskResponsibleEntity({
-      taskId: data.task_id,
       userId: data.user_id,
     });
   }

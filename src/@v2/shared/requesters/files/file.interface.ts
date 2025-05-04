@@ -1,6 +1,5 @@
-import internal from 'stream';
-import { SystemFile } from '../../domain/types/shared/system-file';
 import { DomainResponse } from '../../domain/types/shared/domain-response';
+import { SystemFile } from '../../domain/types/shared/system-file';
 
 export interface IFileRequester {
   read(params: IFileRequester.Read.Params): IFileRequester.Read.Result;

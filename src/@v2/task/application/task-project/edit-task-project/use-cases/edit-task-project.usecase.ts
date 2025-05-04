@@ -1,8 +1,8 @@
 import { TaskProjectAggregateRepository } from '@/@v2/task/database/repositories/task-project/task-project-aggregate.repository';
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { ITaskProjectUseCase } from './edit-task-project.types';
 import { TaskProjectAggregate } from '@/@v2/task/domain/aggregations/task-project.aggregate';
 import { TaskProjectMemberEntity } from '@/@v2/task/domain/entities/task-project-member.entity';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { ITaskProjectUseCase } from './edit-task-project.types';
 
 @Injectable()
 export class EditTaskProjectUseCase {
@@ -24,7 +24,7 @@ export class EditTaskProjectUseCase {
   }
 
   private updateMembers({ params, taskProject }: { params: ITaskProjectUseCase.Params; taskProject: TaskProjectAggregate }) {
-    params.members.forEach((member) => {
+    params.members?.forEach((member) => {
       const isAdd = member.userId && !member.id;
       const isDelete = member.id && member.delete;
 

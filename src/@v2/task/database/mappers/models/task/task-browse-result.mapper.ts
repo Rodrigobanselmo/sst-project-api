@@ -4,7 +4,7 @@ export type ITaskBrowseResultModelMapper = {
   task_id: number;
   task_done_date: Date | null;
   task_end_date: Date | null;
-  task_description: string | null;
+  task_description: string;
   task_created_at: Date;
   task_updated_at: Date | null;
   task_priority: number;
@@ -45,7 +45,7 @@ export class TaskBrowseResultModelMapper {
             id: prisma.parent.id,
             name: prisma.parent.description,
           }
-        : null,
+        : undefined,
       createdBy: {
         name: prisma.creator_user.name,
         email: prisma.creator_user.email,
@@ -53,17 +53,17 @@ export class TaskBrowseResultModelMapper {
       },
       responsible: prisma.responsible
         ? prisma.responsible.map((resp) => ({
-            name: resp.name,
-            email: resp.email,
+            name: resp.name!,
+            email: resp.email!,
             id: resp.id,
           }))
-        : null,
+        : [],
       status: prisma.status
         ? {
             name: prisma.status.name,
-            color: prisma.status.color,
+            color: prisma.status.color || undefined,
           }
-        : null,
+        : undefined,
     });
   }
 

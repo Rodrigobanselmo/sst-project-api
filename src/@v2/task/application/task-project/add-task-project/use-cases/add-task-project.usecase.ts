@@ -26,12 +26,13 @@ export class AddTaskProjectUseCase {
       description: params.description,
     });
 
-    const members = params.members.map(
-      ({ userId }) =>
-        new TaskProjectMemberEntity({
-          userId,
-        }),
-    );
+    const members =
+      params.members?.map(
+        ({ userId }) =>
+          new TaskProjectMemberEntity({
+            userId,
+          }),
+      ) || [];
 
     const taskAggregate = new TaskProjectAggregate({
       project,

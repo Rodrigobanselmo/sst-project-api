@@ -1,9 +1,8 @@
-import { UserDAO } from '@/@v2/security/action-plan/database/dao/user/user.dao';
-import { Injectable } from '@nestjs/common';
-import { IBrowseResponsiblesUseCase } from './browse-responsibles.types';
 import { ResponsibleDAO } from '@/@v2/security/action-plan/database/dao/responsible/responsible.dao';
 import { ResponsibleOrderByEnum } from '@/@v2/security/action-plan/database/dao/responsible/responsible.types';
 import { OrderByDirectionEnum } from '@/@v2/shared/types/order-by.types';
+import { Injectable } from '@nestjs/common';
+import { IBrowseResponsiblesUseCase } from './browse-responsibles.types';
 
 @Injectable()
 export class BrowseResponsiblesUseCase {

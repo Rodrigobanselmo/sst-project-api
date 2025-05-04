@@ -15,7 +15,7 @@ export abstract class IPhotoRecommendationRepository {
 
 export namespace IPhotoRecommendationRepository {
   export type FindParams = { companyId: string; photoId: string; riskDataId: string; recommendationId: string };
-  export type FindReturn = Promise<PhotoRecommendationEntity>;
+  export type FindReturn = Promise<PhotoRecommendationEntity | null>;
 
   export type FindManyParams = { companyId: string; photoIds: string[]; riskDataId: string; recommendationId: string };
   export type FindManyReturn = Promise<PhotoRecommendationEntity[]>;

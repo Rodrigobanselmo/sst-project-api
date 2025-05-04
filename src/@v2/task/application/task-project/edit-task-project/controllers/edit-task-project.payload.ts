@@ -3,9 +3,8 @@ import { Type } from 'class-transformer';
 import { IsArray, IsEnum, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 class MembersPayload {
-  @IsOptional()
   @IsInt()
-  userId?: number;
+  userId!: number;
 
   @IsOptional()
   @IsInt()

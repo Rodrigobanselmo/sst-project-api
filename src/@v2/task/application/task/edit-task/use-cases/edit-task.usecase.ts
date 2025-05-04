@@ -40,7 +40,7 @@ export class EditTaskUseCase {
     const addPhotos = [] as { fileId: string }[];
     const deletePhotos = [] as number[];
 
-    params.photos.forEach((photo) => {
+    params.photos?.forEach((photo) => {
       if (photo.fileId && !photo.id) {
         addPhotos.push({ fileId: photo.fileId });
       }

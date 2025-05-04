@@ -1,9 +1,9 @@
-import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 
 import { JwtAuthGuard } from '@/@v2/shared/guards/jwt-auth.guard';
+import { TaskRoutes } from '@/@v2/task/constants/routes';
 import { PermissionEnum } from '@/shared/constants/enum/authorization';
 import { Permissions } from '@/shared/decorators/permissions.decorator';
-import { TaskRoutes } from '@/@v2/task/constants/routes';
 import { ReadTaskUseCase } from '../use-cases/read-task.usecase';
 import { ReadTaskPath } from './read-task.path';
 

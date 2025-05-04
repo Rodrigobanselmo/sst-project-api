@@ -6,7 +6,7 @@ export namespace ITaskProjectUseCase {
     companyId: string;
     name?: string;
     description?: string;
-    members?: { id?: number; userId?: number; delete?: boolean }[];
+    members?: { id?: number; userId: number; delete?: boolean }[];
     status?: TaskProjectStatusEnum;
   };
 }

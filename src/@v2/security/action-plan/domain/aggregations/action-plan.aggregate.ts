@@ -71,7 +71,7 @@ export class ActionPlanAggregate {
   }
 
   setStatus({ status, comment }: ISetStatus): DomainResponse {
-    const isCoordinator = this.coordinator?.id === comment.commentedById;
+    const isCoordinator = comment && this.coordinator?.id === comment.commentedById;
 
     if (status === ActionPlanStatusEnum.DONE) {
       if (!comment) return [, errorCommentRequired];
@@ -96,6 +96,8 @@ export class ActionPlanAggregate {
       );
     } else if (status === ActionPlanStatusEnum.PROGRESS) {
       this.actionPlan._startDate = new Date();
+      if (!comment) return [, errorCommentRequired];
+
       this.comments.push(
         new CommentEntity({
           text: comment.text || null,

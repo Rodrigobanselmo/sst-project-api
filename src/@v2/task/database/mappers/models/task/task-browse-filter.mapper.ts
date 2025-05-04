@@ -1,5 +1,5 @@
 import { TaskBrowseFilterModel } from '@/@v2/task/domain/models/task/task-browse-filter.model';
-import { CharacterizationTypeEnum as PrismaCharacterizationTypeEnum, Status as PrismaStatus } from '@prisma/client';
+import { Status as PrismaStatus } from '@prisma/client';
 
 export type ITaskBrowseFilterModelMapper = {
   status: (PrismaStatus | null)[] | null;

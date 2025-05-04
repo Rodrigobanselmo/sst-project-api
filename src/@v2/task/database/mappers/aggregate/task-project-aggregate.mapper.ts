@@ -1,7 +1,6 @@
 import { TaskProjectAggregate } from '@/@v2/task/domain/aggregations/task-project.aggregate';
 import { ITaskProjectMemberEntityMapper, TaskProjectMemberMapper } from '../entities/task-project-member.mapper';
 import { ITaskProjectEntityMapper, TaskProjectMapper } from '../entities/task-project.mapper';
-import { ITaskEntityMapper } from '../entities/task.mapper';
 
 type ITaskProjectAggregateMapper = ITaskProjectEntityMapper & {
   members: ITaskProjectMemberEntityMapper[];

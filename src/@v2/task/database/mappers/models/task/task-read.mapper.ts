@@ -29,8 +29,8 @@ export class TaskReadModelMapper {
       updatedAt: prisma.updated_at,
       description: prisma.description,
       priority: prisma.priority,
-      doneDate: prisma.done_date,
-      endDate: prisma.end_date,
+      doneDate: prisma.done_date || undefined,
+      endDate: prisma.end_date || undefined,
       parent: prisma.parent_task,
       history: prisma.history.map((history) => ({
         id: history.id,
@@ -39,7 +39,7 @@ export class TaskReadModelMapper {
         createdAt: history.created_at,
         user: {
           id: history.user.id,
-          name: history.user.name,
+          name: history.user.name!,
         },
       })),
       photos: prisma.photos.map((photo) => ({
@@ -55,33 +55,33 @@ export class TaskReadModelMapper {
         status: subTask.status
           ? {
               name: subTask.status.name,
-              color: subTask.status.color,
+              color: subTask.status.color || undefined,
             }
-          : null,
+          : undefined,
         responsible: subTask.responsible.map((resp) => ({
-          name: resp.user.name,
-          email: resp.user.email,
+          name: resp.user.name!,
+          email: resp.user.email!,
           id: resp.user.id,
         })),
       })),
       createdBy: {
-        name: prisma.creator.name,
-        email: prisma.creator.email,
+        name: prisma.creator.name!,
+        email: prisma.creator.email!,
         id: prisma.creator.id,
       },
       responsible: prisma.responsible
         ? prisma.responsible.map((resp) => ({
-            name: resp.user.name,
-            email: resp.user.email,
+            name: resp.user.name!,
+            email: resp.user.email!,
             id: resp.user.id,
           }))
-        : null,
+        : [],
       status: prisma.status
         ? {
             name: prisma.status.name,
-            color: prisma.status.color,
+            color: prisma.status.color || undefined,
           }
-        : null,
+        : undefined,
     });
   }
 

@@ -1,4 +1,3 @@
-import { TaskHistoryChangeEnum } from '../enums/task-history-changes.enum';
 import { ITaskHistoryChanges } from '../types/task-history-changes.type';
 
 export type ITaskHistoryEntity = {

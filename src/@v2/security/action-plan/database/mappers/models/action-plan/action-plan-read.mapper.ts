@@ -25,7 +25,7 @@ export type IActionPlanReadMapper = {
     riskFactorData: {
       recs: {
         recMed: {
-          recName: string;
+          recName: string | null;
         };
       }[];
     }[];
@@ -78,7 +78,7 @@ export class ActionPlanReadMapper {
       type: origin.type,
       companyId: homogeneousGroup.companyId,
       recommendation: {
-        name: homogeneousGroup.riskFactorData[0].recs[0].recMed.recName,
+        name: homogeneousGroup.riskFactorData[0].recs[0].recMed.recName || '',
         photos: photos.map(
           (photo) =>
             new ActionPlanReadPhotoModel({
@@ -89,16 +89,17 @@ export class ActionPlanReadMapper {
             }),
         ),
       },
-      characterizationPhotos: homogeneousGroup.characterization?.photos.map(
-        (photo) =>
-          new ActionPlanReadPhotoModel({
-            id: photo.id,
-            isVertical: photo.isVertical,
-            name: photo.name,
-            url: photo.photoUrl,
-            isVisible: photo.characterizationPhotoRecommendation.length ? photo.characterizationPhotoRecommendation.some((rec) => rec.is_visible) : true,
-          }),
-      ),
+      characterizationPhotos:
+        homogeneousGroup.characterization?.photos.map(
+          (photo) =>
+            new ActionPlanReadPhotoModel({
+              id: photo.id,
+              isVertical: photo.isVertical,
+              name: photo.name,
+              url: photo.photoUrl,
+              isVisible: photo.characterizationPhotoRecommendation.length ? photo.characterizationPhotoRecommendation.some((rec) => rec.is_visible) : true,
+            }),
+        ) || [],
     });
   }
 

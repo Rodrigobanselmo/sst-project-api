@@ -66,7 +66,6 @@ export class ActionPlanBrowseResultModel {
   risk: { id: string; name: string; type: RiskTypeEnum };
   origin: { id: string; name: string; type: OriginTypeEnum };
   status: ActionPlanStatusEnum;
-  hierarchies: { name: string; type: HierarchyTypeEnum }[];
   responsible: { id: string; name: string } | null;
   comments: {
     id: string;

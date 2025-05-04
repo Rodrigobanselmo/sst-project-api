@@ -21,8 +21,8 @@ export class ActionPlanInfoModelMapper {
       coordinator: prisma?.coordinator
         ? {
             id: prisma.coordinator.id,
-            name: prisma.coordinator.name,
-            email: prisma.coordinator.email,
+            name: prisma.coordinator.name!,
+            email: prisma.coordinator.email || undefined,
           }
         : null,
     });

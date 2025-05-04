@@ -34,6 +34,9 @@ export class AddFileService {
     });
 
     const file = await this.fileRepository.create(document);
+
+    if (!file) throw new Error('Não foi possível adicionar o arquivo');
+
     return [file, null];
   }
 }

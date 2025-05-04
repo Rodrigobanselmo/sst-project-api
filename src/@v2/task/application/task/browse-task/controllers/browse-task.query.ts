@@ -1,7 +1,7 @@
 import { OrderByDirectionEnum } from '@/@v2/shared/types/order-by.types';
 import { TaskOrderByEnum } from '@/@v2/task/database/dao/task/task.types';
 import { Type } from 'class-transformer';
-import { IsArray, IsBoolean, IsEnum, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsEnum, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 class OrderBy {
   @IsEnum(TaskOrderByEnum)

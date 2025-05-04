@@ -67,7 +67,7 @@ export class TaskAggregateRepository {
                   data: params.history.map((history) => ({
                     user_id: history.userId,
                     text: history.text,
-                    changes: history.changes,
+                    changes: history.changes as any,
                   })),
                 },
               }
@@ -125,7 +125,7 @@ export class TaskAggregateRepository {
                   data: createdHistory.map((history) => ({
                     user_id: history.userId,
                     text: history.text,
-                    changes: history.changes,
+                    changes: history.changes as any,
                   })),
                 },
               }
