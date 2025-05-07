@@ -4,5 +4,6 @@ export enum TaskHistoryChangeEnum {
   END_DATE = 'END_DATE',
   DONE_DATE = 'DONE_DATE',
   DESCRIPTION = 'DESCRIPTION',
+  PRIORITY = 'PRIORITY',
   PHOTO = 'PHOTO',
 }

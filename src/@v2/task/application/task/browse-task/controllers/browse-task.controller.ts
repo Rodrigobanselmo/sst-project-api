@@ -30,6 +30,8 @@ export class BrowseTaskController {
       creatorsIds: query.creatorsIds,
       responsibleIds: query.responsibleIds,
       projectIds: query.projectIds,
+      isExpired: query.isExpired,
+      priorities: query.priorities,
       pagination: {
         page: query.page,
         limit: query.limit,

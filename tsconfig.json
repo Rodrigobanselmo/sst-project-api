@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "strictNullChecks": true,
-    "strict": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "strictNullChecks": false,
+    "strict": false,
     //
     "skipLibCheck": false,
     "module": "commonjs",

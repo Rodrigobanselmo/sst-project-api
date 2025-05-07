@@ -46,11 +46,15 @@ export type IActionPlanReadMapper = {
     };
   }[];
 
+  actionPlan: {
+    id: string;
+  } | null;
+
   params: IActionPlanDAO.FindParams;
 };
 
 export class ActionPlanReadMapper {
-  static toModel({ homogeneousGroup, photos, params }: IActionPlanReadMapper): ActionPlanReadModel {
+  static toModel({ homogeneousGroup, photos, actionPlan, params }: IActionPlanReadMapper): ActionPlanReadModel {
     const origin = getOriginHomogeneousGroup({
       characterization: homogeneousGroup.characterization
         ? {
@@ -70,6 +74,7 @@ export class ActionPlanReadMapper {
 
     return new ActionPlanReadModel({
       uuid: {
+        id: actionPlan?.id || undefined,
         recommendationId: params.recommendationId,
         riskDataId: params.riskDataId,
         workspaceId: params.workspaceId,

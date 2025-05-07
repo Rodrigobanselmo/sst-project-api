@@ -40,6 +40,8 @@ export class TaskBrowseResultModelMapper {
       updatedAt: prisma.task_updated_at,
       description: prisma.task_description,
       priority: prisma.task_priority,
+      endDate: prisma.task_end_date,
+      doneDate: prisma.task_done_date,
       parent: prisma.parent
         ? {
             id: prisma.parent.id,

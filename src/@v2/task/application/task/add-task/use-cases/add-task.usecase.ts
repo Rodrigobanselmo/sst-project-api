@@ -42,6 +42,7 @@ export class AddTaskUseCase {
       statusId: params.statusId,
       doneDate: params.doneDate,
       endDate: params.endDate,
+      priority: params.priority,
     });
 
     const taskAggregate = new TaskAggregate({

@@ -9,6 +9,7 @@ type Props = {
   statusId?: number | null;
   doneDate?: Date | null;
   description?: string;
+  priority?: number;
   responsible?: TaskResponsibleEntity[];
   photos?: TaskPhotoEntity[];
 };
@@ -41,6 +42,13 @@ export function createHistoryChanges(oldParams: TaskAggregate, newParams: Props)
     diffs[TaskHistoryChangeEnum.DESCRIPTION] = {
       old: oldParams.task.description,
       new: newParams.description,
+    };
+  }
+
+  if (newParams.priority != undefined && newParams.priority !== oldParams.task.priority) {
+    diffs[TaskHistoryChangeEnum.PRIORITY] = {
+      old: oldParams.task.priority,
+      new: newParams.priority,
     };
   }
 

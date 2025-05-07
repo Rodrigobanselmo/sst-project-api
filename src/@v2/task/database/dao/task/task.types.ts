@@ -9,6 +9,7 @@ export enum TaskOrderByEnum {
   CREATOR = 'CREATOR',
   CREATED_AT = 'CREATED_AT',
   UPDATED_AT = 'UPDATED_AT',
+  PRIORITY = 'PRIORITY',
 }
 
 export namespace ITaskDAO {
@@ -29,6 +30,8 @@ export namespace ITaskDAO {
       statusIds?: number[];
       actionPlanIds?: String[];
       projectIds?: number[];
+      isExpired?: boolean | null;
+      priorities?: number[];
     };
   };
 }

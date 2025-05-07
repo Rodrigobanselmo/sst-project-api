@@ -5,6 +5,7 @@ export namespace ITaskUseCase {
     endDate: Date | undefined;
     doneDate: Date | undefined;
     statusId: number | undefined;
+    priority: number | undefined;
     projectId: number | undefined;
     responsible: { userId: number }[] | undefined;
     photos: { fileId: string }[] | undefined;

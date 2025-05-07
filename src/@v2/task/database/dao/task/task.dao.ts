@@ -65,13 +65,12 @@ export class TaskDAO {
         ,task."end_date" AS task_end_date
         ,task."priority" AS task_priority
         
-
-        COALESCE(
+        ,COALESCE(
           JSON_AGG(DISTINCT JSONB_BUILD_OBJECT(
             'id', responsible_user."id", 'name', responsible_user."name", 'email', responsible_user."email"
           )) 
           FILTER (WHERE responsible_user."id" IS NOT NULL), '[]'
-        ) AS responsible,
+        ) AS responsible
 
         ,JSONB_BUILD_OBJECT(
           'id', parent_task."parent_task_id", 'description', parent_task."description"
@@ -106,7 +105,6 @@ export class TaskDAO {
       ${gerWhereRawPrisma(whereParams)}
       GROUP BY 
         task."id"
-        ,task."text"
         ,task."description"
         ,task."created_at"
         ,task."updated_at"
@@ -115,6 +113,9 @@ export class TaskDAO {
         ,task."priority" 
         ,parent_task."parent_task_id"
         ,parent_task."description"
+        ,creator_user."id"
+        ,st."name"
+        ,st."color"
       ${getOrderByRawPrisma(orderByParams)}
       LIMIT ${pagination.limit}
       OFFSET ${pagination.offSet};
@@ -126,9 +127,13 @@ export class TaskDAO {
       FROM 
         "Task" task
       LEFT JOIN
+        "Task" parent_task ON parent_task."id" = task."parent_task_id"
+      LEFT JOIN
         "User" creator_user ON creator_user."id" = task."creator_id"
       LEFT JOIN
-        "User" responsible_user ON responsible_user."id" = task."responsible_id"
+        "TaskResponsible" tr ON tr."task_id" = task."id"
+      LEFT JOIN
+        "User" responsible_user ON responsible_user."id" = tr."user_id"
       LEFT JOIN
         "Status" st ON st."id" = task."status_id"
       ${
@@ -139,6 +144,19 @@ export class TaskDAO {
           : Prisma.sql``
       }
       ${gerWhereRawPrisma(whereParams)}
+      GROUP BY 
+        task."id"
+        ,task."description"
+        ,task."created_at"
+        ,task."updated_at"
+        ,task."done_date"
+        ,task."end_date"
+        ,task."priority" 
+        ,parent_task."parent_task_id"
+        ,parent_task."description"
+        ,creator_user."id"
+        ,st."name"
+        ,st."color"
     `;
 
     const distinctFiltersPromise = this.prisma.$queryRaw<ITaskBrowseFilterModelMapper[]>`
@@ -153,9 +171,11 @@ export class TaskDAO {
 
     const [tasks, totalTasks, distinctFilters] = await Promise.all([tasksPromise, totalTasksPromise, distinctFiltersPromise]);
 
+    console.log({ totalTasks });
+
     return TaskBrowseModelMapper.toModel({
       results: tasks,
-      pagination: { limit: pagination.limit, page: pagination.page, total: Number(totalTasks[0].total) },
+      pagination: { limit: pagination.limit, page: pagination.page, total: Number(totalTasks[0]?.total || 0) },
       filters: distinctFilters[0],
     });
   }
@@ -196,6 +216,14 @@ export class TaskDAO {
       where.push(Prisma.sql`task."project_id" IN (${Prisma.join(filters.projectIds)})`);
     }
 
+    if (typeof filters.isExpired === 'boolean') {
+      where.push(Prisma.sql`task."end_date" ${filters.isExpired ? Prisma.sql`<=` : Prisma.sql`>`} NOW()`);
+    }
+
+    if (filters.priorities?.length) {
+      where.push(Prisma.sql`task."priority" IN (${Prisma.join(filters.priorities)})`);
+    }
+
     return where;
   }
 
@@ -211,6 +239,12 @@ export class TaskDAO {
       [TaskOrderByEnum.END_DATE]: 'task."end_date"',
       [TaskOrderByEnum.RESPONSIBLE]: 'responsible_user."name"',
       [TaskOrderByEnum.STATUS]: 'st.name',
+      [TaskOrderByEnum.PRIORITY]: `
+      CASE
+        WHEN task.priority = 0 THEN 100
+        ELSE task.priority
+      END
+    `,
     };
 
     const orderByRaw = orderBy.map<IOrderByRawPrisma>(({ field, order }) => ({ column: map[field], order }));

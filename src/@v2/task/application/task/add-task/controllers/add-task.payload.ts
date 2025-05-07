@@ -60,4 +60,9 @@ export class AddTaskPayload {
   @ValidateNested()
   @Type(() => ActionPlanPayload)
   actionPlan?: ActionPlanPayload;
+
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  priority?: number;
 }

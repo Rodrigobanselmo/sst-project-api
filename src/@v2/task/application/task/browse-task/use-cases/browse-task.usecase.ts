@@ -19,6 +19,8 @@ export class BrowseTaskUseCase {
         responsibleIds: params.responsibleIds,
         statusIds: params.statusIds,
         projectIds: params.projectIds,
+        isExpired: params.isExpired,
+        priorities: params.priorities,
       },
     });
   }

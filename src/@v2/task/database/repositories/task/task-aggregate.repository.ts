@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { TaskAggregateMapper } from '../../mappers/aggregate/task-aggregate.mapper';
 import { ITaskAggregateRepository } from './task-aggregate.types';
+import { asyncBatch } from '@/@v2/shared/utils/helpers/async-batch';
 
 @Injectable()
 export class TaskAggregateRepository {
@@ -41,6 +42,7 @@ export class TaskAggregateRepository {
           status_id: params.task.statusId,
           description: params.task.description,
           creator_id: params.task.creatorId,
+          priority: params.task.priority,
           photos: params.photos.length
             ? {
                 createMany: {
@@ -108,6 +110,7 @@ export class TaskAggregateRepository {
           project_id: params.project?.id,
           status_id: params.task.statusId,
           description: params.task.description,
+          priority: params.task.priority,
           responsible: {
             deleteMany: {},
             createMany: params.responsible.length
@@ -155,6 +158,55 @@ export class TaskAggregateRepository {
     });
 
     return result ? TaskAggregateMapper.toAggregate(result) : null;
+  }
+
+  async updateMany(params: ITaskAggregateRepository.UpdateManyParams): ITaskAggregateRepository.UpdateManyReturn {
+    await this.prisma.$transaction(async (tx) => {
+      await asyncBatch({
+        items: params,
+        batchSize: 10,
+        callback: async (aggregate) => {
+          const createdHistory = aggregate.history.filter((history) => history.isNew);
+
+          await tx.task.update({
+            where: { id: aggregate.task.id, company_id: aggregate.task.companyId },
+            data: {
+              action_plan_id: aggregate.actionPlan?.id,
+              done_date: aggregate.task.doneDate,
+              end_date: aggregate.task.endDate,
+              deleted_at: aggregate.task.deletedAt,
+              project_id: aggregate.project?.id,
+              status_id: aggregate.task.statusId,
+              description: aggregate.task.description,
+              priority: aggregate.task.priority,
+              responsible: {
+                deleteMany: {},
+                createMany: aggregate.responsible.length
+                  ? {
+                      skipDuplicates: true,
+                      data: aggregate.responsible.map((responsible) => ({
+                        user_id: responsible.userId,
+                      })),
+                    }
+                  : undefined,
+              },
+              history: createdHistory.length
+                ? {
+                    createMany: {
+                      data: createdHistory.map((history) => ({
+                        user_id: history.userId,
+                        text: history.text,
+                        changes: history.changes as any,
+                      })),
+                    },
+                  }
+                : undefined,
+            },
+            select: { id: true },
+          });
+        },
+      });
+    });
   }
 
   async find(params: ITaskAggregateRepository.FindParams): ITaskAggregateRepository.FindReturn {

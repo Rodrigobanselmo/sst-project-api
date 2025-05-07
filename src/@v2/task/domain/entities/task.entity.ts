@@ -3,6 +3,7 @@ import { updateField } from '@/@v2/shared/domain/helpers/update-field.helper';
 type IUpdateTaskParams = {
   endDate?: Date | null;
   statusId?: number | null;
+  priority?: number;
   doneDate?: Date | null;
   description?: string;
 };
@@ -10,6 +11,7 @@ type IUpdateTaskParams = {
 export type ITaskEntity = {
   id?: number;
   description: string;
+  priority?: number;
   endDate?: Date | null;
   doneDate?: Date | null;
   createdAt?: Date;
@@ -25,6 +27,7 @@ export class TaskEntity {
   description: string;
   endDate: Date | null;
   doneDate: Date | null;
+  priority: number;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
@@ -43,6 +46,7 @@ export class TaskEntity {
     this.companyId = params.companyId;
     this.creatorId = params.creatorId;
     this.description = params.description;
+    this.priority = params.priority ?? 0;
   }
 
   delete() {
@@ -54,5 +58,6 @@ export class TaskEntity {
     this.endDate = updateField(this.endDate, data.endDate);
     this.doneDate = updateField(this.doneDate, data.doneDate);
     this.description = updateField(this.description, data.description);
+    this.priority = updateField(this.priority, data.priority);
   }
 }

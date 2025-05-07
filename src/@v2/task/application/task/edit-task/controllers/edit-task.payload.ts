@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsArray, IsDateString, IsInt, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsDate, IsDateString, IsInt, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 class ResponsiblePayload {
   @IsInt()
@@ -36,11 +36,11 @@ export class EditTaskPayload {
   description?: string;
 
   @IsOptional()
-  @IsDateString()
+  @IsDate()
   endDate?: Date;
 
   @IsOptional()
-  @IsDateString()
+  @IsDate()
   doneDate?: Date;
 
   @IsOptional()
@@ -67,4 +67,9 @@ export class EditTaskPayload {
   @ValidateNested()
   @Type(() => ActionPlanPayload)
   actionPlan?: ActionPlanPayload;
+
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  priority?: number;
 }

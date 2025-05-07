@@ -21,6 +21,7 @@ type IUpdateTaskParams = {
   doneDate?: Date | null;
   description?: string;
   responsible?: TaskResponsibleEntity[];
+  priority?: number;
 };
 
 export type ITaskAggregate = {

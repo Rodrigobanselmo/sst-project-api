@@ -1,7 +1,7 @@
 import { OrderByDirectionEnum } from '@/@v2/shared/types/order-by.types';
 import { TaskOrderByEnum } from '@/@v2/task/database/dao/task/task.types';
 import { Type } from 'class-transformer';
-import { IsArray, IsEnum, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsBoolean, IsEnum, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 class OrderBy {
   @IsEnum(TaskOrderByEnum)
@@ -58,5 +58,16 @@ export class BrowseTaskQuery {
   @IsOptional()
   @Type(() => String)
   @IsString({ each: true })
-  actionPlanIds?: String[];
+  actionPlanIds?: string[];
+
+  @IsArray()
+  @IsOptional()
+  @IsInt({ each: true })
+  @Type(() => Number)
+  priorities?: number[];
+
+  @IsOptional()
+  @IsBoolean()
+  @Type(() => Boolean)
+  isExpired?: boolean | null;
 }

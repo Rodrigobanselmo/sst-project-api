@@ -42,6 +42,19 @@ type ITaskHistoryChangesPhoto = {
   };
 };
 
+type ITaskHistoryChangesPriority = {
+  [TaskHistoryChangeEnum.PRIORITY]: {
+    old: number | null;
+    new: number | null;
+  };
+};
+
 export type ITaskHistoryChanges = Partial<
-  ITaskHistoryChangesDescription & ITaskHistoryChangesStatus & ITaskHistoryChangesResponsible & ITaskHistoryChangesEndDate & ITaskHistoryChangesDoneDate & ITaskHistoryChangesPhoto
+  ITaskHistoryChangesDescription &
+    ITaskHistoryChangesStatus &
+    ITaskHistoryChangesResponsible &
+    ITaskHistoryChangesEndDate &
+    ITaskHistoryChangesDoneDate &
+    ITaskHistoryChangesPhoto &
+    ITaskHistoryChangesPriority
 >;

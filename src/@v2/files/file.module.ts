@@ -27,6 +27,6 @@ import { ReadManyFileService } from './services/read-many-file/read-many-file.se
     // Use Cases
     DeleteUnusedFilesUseCase,
   ],
-  exports: [ReadFileService, AddFileService],
+  exports: [ReadFileService, AddFileService, ReadManyFileService],
 })
 export class FileModule {}

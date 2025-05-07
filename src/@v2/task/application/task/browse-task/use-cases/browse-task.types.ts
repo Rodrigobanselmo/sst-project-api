@@ -13,5 +13,7 @@ export namespace IBrowseTaskUseCase {
     statusIds: number[] | undefined;
     projectIds: number[] | undefined;
     actionPlanIds: String[] | undefined;
+    isExpired: boolean | null | undefined;
+    priorities: number[] | undefined;
   };
 }

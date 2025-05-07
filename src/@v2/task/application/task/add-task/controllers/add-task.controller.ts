@@ -31,6 +31,7 @@ export class AddTaskController {
       responsible: body.responsible,
       statusId: body.statusId,
       projectId: body.projectId,
+      priority: body.priority,
     });
   }
 }

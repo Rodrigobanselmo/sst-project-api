@@ -14,12 +14,20 @@ export class BrowseStatusController {
   constructor(private readonly browseStatusUseCase: BrowseStatusUseCase) {}
 
   @Get()
-  @Permissions({
-    code: PermissionEnum.CHARACTERIZATION,
-    isContract: true,
-    isMember: true,
-    crud: true,
-  })
+  @Permissions(
+    {
+      code: PermissionEnum.CHARACTERIZATION,
+      isContract: true,
+      isMember: true,
+      crud: true,
+    },
+    {
+      code: PermissionEnum.TASK,
+      isContract: true,
+      isMember: true,
+      crud: true,
+    },
+  )
   async browse(@Param() path: BrowseStatusPath, @Query() query: BrowseStatusQuery) {
     return this.browseStatusUseCase.execute({
       companyId: path.companyId,

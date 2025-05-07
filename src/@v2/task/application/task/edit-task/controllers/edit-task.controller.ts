@@ -15,7 +15,7 @@ export class EditTaskController {
 
   @Patch()
   @Permissions({
-    code: PermissionEnum.CHARACTERIZATION,
+    code: PermissionEnum.TASK,
     isContract: true,
     isMember: true,
     crud: true,
@@ -32,6 +32,7 @@ export class EditTaskController {
       projectId: body.projectId,
       responsible: body.responsible,
       statusId: body.statusId,
+      priority: body.priority,
     });
   }
 }

@@ -25,6 +25,7 @@ export class TaskReadModelMapper {
   static toModel(prisma: ITaskReadModelMapper): TaskReadModel {
     return new TaskReadModel({
       id: prisma.id,
+      companyId: prisma.company_id,
       createdAt: prisma.created_at,
       updatedAt: prisma.updated_at,
       description: prisma.description,
@@ -56,6 +57,7 @@ export class TaskReadModelMapper {
           ? {
               name: subTask.status.name,
               color: subTask.status.color || undefined,
+              id: subTask.status.id,
             }
           : undefined,
         responsible: subTask.responsible.map((resp) => ({
@@ -80,6 +82,7 @@ export class TaskReadModelMapper {
         ? {
             name: prisma.status.name,
             color: prisma.status.color || undefined,
+            id: prisma.status.id,
           }
         : undefined,
     });

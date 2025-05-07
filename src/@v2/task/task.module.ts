@@ -26,12 +26,21 @@ import { AddTaskProjectController } from './application/task-project/add-task-pr
 import { EditTaskProjectController } from './application/task-project/edit-task-project/controllers/edit-task-project.controller';
 import { BrowseTaskProjectController } from './application/task-project/browse-task-project/controllers/browse-task-project.controller';
 import { DeleteTaskProjectController } from './application/task-project/delete-task-project/controllers/delete-task-project.controller';
+import { TaskProjectDAO } from './database/dao/task-project/task-project.dao';
+import { EditTaskService } from './services/edit-task/edit-task.service';
+import { EditManyTaskUseCase } from './application/task/edit-many-task/use-cases/edit-many-task.usecase';
+import { EditManyTaskController } from './application/task/edit-many-task/controllers/edit-many-task.controller';
+import { ResponsibleDAO } from './database/dao/responsible/responsible.dao';
+import { BrowseResponsiblesUseCase } from './application/user/browse-responsible/use-cases/browse-responsibles.usecase';
+import { BrowseResponsiblesController } from './application/user/browse-responsible/controllers/browse-responsible.controller';
 
 @Module({
   imports: [SharedModule],
   controllers: [
+    BrowseResponsiblesController,
     ReadTaskController,
     AddTaskController,
+    EditManyTaskController,
     EditTaskController,
     BrowseTaskController,
     DeleteTaskController,
@@ -44,15 +53,18 @@ import { DeleteTaskProjectController } from './application/task-project/delete-t
   providers: [
     // Database
     TaskDAO,
+    TaskProjectDAO,
     TaskAggregateRepository,
     TaskActionPlanRepository,
     TaskProjectRepository,
     TaskProjectAggregateRepository,
+    ResponsibleDAO,
 
     // Use Cases
     AddTaskUseCase,
     BrowseTaskUseCase,
     EditTaskUseCase,
+    EditManyTaskUseCase,
     DeleteTaskUseCase,
     ReadTaskUseCase,
     AddTaskProjectUseCase,
@@ -60,9 +72,11 @@ import { DeleteTaskProjectController } from './application/task-project/delete-t
     EditTaskProjectUseCase,
     DeleteTaskProjectUseCase,
     ReadTaskProjectUseCase,
+    BrowseResponsiblesUseCase,
 
     // Services
     CreateTaskPhotosService,
+    EditTaskService,
   ],
   exports: [],
 })

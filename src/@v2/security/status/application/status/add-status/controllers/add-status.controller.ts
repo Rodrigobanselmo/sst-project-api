@@ -14,12 +14,20 @@ export class AddStatusController {
   constructor(private readonly addStatusUseCase: AddStatusUseCase) {}
 
   @Post()
-  @Permissions({
-    code: PermissionEnum.CHARACTERIZATION,
-    isContract: true,
-    isMember: true,
-    crud: true,
-  })
+  @Permissions(
+    {
+      code: PermissionEnum.CHARACTERIZATION,
+      isContract: true,
+      isMember: true,
+      crud: true,
+    },
+    {
+      code: PermissionEnum.TASK,
+      isContract: true,
+      isMember: true,
+      crud: true,
+    },
+  )
   async browse(@Param() path: AddStatusPath, @Body() body: AddStatusPayload) {
     return this.addStatusUseCase.execute({
       companyId: path.companyId,

@@ -1797,9 +1797,9 @@ model ScheduleMedicalVisit {
 }
 
 model Status {
-  id    Int            @id @default(autoincrement())
+  id    Int     @id @default(autoincrement())
   name  String
-  type  StatusTypeEnum
+  type  String
   color String?
 
   created_at DateTime  @default(now())
@@ -2215,11 +2215,6 @@ enum StatusEnum {
   TRANSMITTED
   WATTING_APPROVAL
   REJECTED
-}
-
-enum StatusTypeEnum {
-  CHARACTERIZATION
-  ACTION_PLAN
 }
 
 enum RecTypeEnum {
