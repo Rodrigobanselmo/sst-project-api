@@ -25,6 +25,7 @@ export class TaskReadModelMapper {
   static toModel(prisma: ITaskReadModelMapper): TaskReadModel {
     return new TaskReadModel({
       id: prisma.id,
+      sequentialId: prisma.sequential_id,
       companyId: prisma.company_id,
       createdAt: prisma.created_at,
       updatedAt: prisma.updated_at,
@@ -49,6 +50,7 @@ export class TaskReadModelMapper {
       })),
       subTasks: prisma.sub_tasks.map((subTask) => ({
         id: subTask.id,
+        sequentialId: subTask.sequential_id,
         description: subTask.description,
         priority: subTask.priority,
         endDate: subTask.end_date || undefined,

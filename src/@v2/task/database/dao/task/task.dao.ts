@@ -58,6 +58,7 @@ export class TaskDAO {
     const tasksPromise = this.prisma.$queryRaw<ITaskBrowseResultModelMapper[]>`
       SELECT 
         task."id" AS task_id
+        ,task."sequential_id" AS task_sequential_id
         ,task."description" AS  task_description
         ,task."created_at" AS task_created_at
         ,task."updated_at" AS task_updated_at
@@ -171,8 +172,6 @@ export class TaskDAO {
 
     const [tasks, totalTasks, distinctFilters] = await Promise.all([tasksPromise, totalTasksPromise, distinctFiltersPromise]);
 
-    console.log({ totalTasks });
-
     return TaskBrowseModelMapper.toModel({
       results: tasks,
       pagination: { limit: pagination.limit, page: pagination.page, total: Number(totalTasks[0]?.total || 0) },
@@ -190,10 +189,23 @@ export class TaskDAO {
     const where: Prisma.Sql[] = [];
 
     if (filters.search) {
+      const whereSearch: Prisma.Sql[] = [];
       const search = `%${filters.search}%`;
-      where.push(Prisma.sql`
+
+      const searchOrigin = Prisma.sql`
         unaccent(lower(task."description")) ILIKE unaccent(lower(${search}))
-      `);
+      `;
+
+      if (!isNaN(Number(filters.search))) {
+        const searchSequence = Prisma.sql`
+          (rec_to_rfd."sequential_id" = CAST(${filters.search} AS INTEGER))
+        `;
+
+        whereSearch.push(searchSequence);
+      }
+
+      whereSearch.push(searchOrigin);
+      where.push(gerWhereRawPrisma(whereSearch, { type: 'OR', removeWhereStatement: true }));
     }
 
     if (filters.creatorsIds?.length) {

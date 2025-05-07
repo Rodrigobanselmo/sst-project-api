@@ -7,6 +7,7 @@ export class TaskMapper {
   static toEntity(data: ITaskEntityMapper): TaskEntity {
     return new TaskEntity({
       id: data.id,
+      priority: data.priority,
       endDate: data.end_date,
       doneDate: data.done_date,
       createdAt: data.created_at,

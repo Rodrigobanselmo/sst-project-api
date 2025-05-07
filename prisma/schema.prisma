@@ -1974,14 +1974,15 @@ model TaskProjectMembers {
 }
 
 model Task {
-  id          Int       @id @default(autoincrement())
-  description String
-  end_date    DateTime?
-  done_date   DateTime?
-  created_at  DateTime  @default(now())
-  updated_at  DateTime  @updatedAt
-  deleted_at  DateTime?
-  priority    Int       @default(0)
+  id            Int       @id @default(autoincrement())
+  description   String
+  end_date      DateTime?
+  done_date     DateTime?
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  deleted_at    DateTime?
+  priority      Int       @default(0)
+  sequential_id Int?
 
   status_id Int?
   status    Status? @relation(fields: [status_id], references: [id])
@@ -2005,6 +2006,9 @@ model Task {
   history     TaskHistory[]
   photos      TaskPhoto[]
   sub_tasks   Task[]            @relation("sub_tasks_relation")
+
+  @@unique([company_id, project_id, action_plan_id, sequential_id], name: "UQ_Task_scoped_sequential_id")
+  @@index([company_id, project_id, action_plan_id])
 }
 
 model TaskResponsible {

@@ -2,6 +2,7 @@ import { TaskBrowseResultModel } from '@/@v2/task/domain/models/task/task-browse
 
 export type ITaskBrowseResultModelMapper = {
   task_id: number;
+  task_sequential_id: number;
   task_done_date: Date | null;
   task_end_date: Date | null;
   task_description: string;
@@ -36,6 +37,7 @@ export class TaskBrowseResultModelMapper {
   static toModel(prisma: ITaskBrowseResultModelMapper): TaskBrowseResultModel {
     return new TaskBrowseResultModel({
       id: prisma.task_id,
+      sequentialId: prisma.task_sequential_id,
       createdAt: prisma.task_created_at,
       updatedAt: prisma.task_updated_at,
       description: prisma.task_description,

@@ -10,7 +10,7 @@ export type ITaskResponsibleBrowseResultModelMapper = {
 export class TaskResponsibleBrowseResultModelMapper {
   static toModel(prisma: ITaskResponsibleBrowseResultModelMapper): TaskResponsibleBrowseResultModel {
     return new TaskResponsibleBrowseResultModel({
-      userId: prisma.user_id || undefined,
+      id: prisma.user_id || undefined,
       employeeId: prisma.employee_id || undefined,
       email: prisma.row_email || undefined,
       name: prisma.row_name,

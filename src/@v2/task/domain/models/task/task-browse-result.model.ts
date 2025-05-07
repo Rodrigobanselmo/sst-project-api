@@ -1,5 +1,6 @@
 export type ITaskBrowseResultModel = {
   id: number;
+  sequentialId: number;
   description: string;
   createdAt: Date;
   updatedAt: Date | undefined;
@@ -15,6 +16,7 @@ export type ITaskBrowseResultModel = {
 
 export class TaskBrowseResultModel {
   id: number;
+  sequentialId: number;
   description: string;
   createdAt: Date;
   updatedAt?: Date;
@@ -29,6 +31,7 @@ export class TaskBrowseResultModel {
 
   constructor(params: ITaskBrowseResultModel) {
     this.id = params.id;
+    this.sequentialId = params.sequentialId;
     this.createdAt = params.createdAt;
     this.updatedAt = params.updatedAt;
     this.description = params.description;

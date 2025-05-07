@@ -2,6 +2,7 @@ import { ITaskHistoryChanges } from '../../types/task-history-changes.type';
 
 export type ISubTaskReadModel = {
   id: number;
+  sequentialId: number;
   description: string;
   priority: number;
   endDate?: Date;
@@ -13,6 +14,7 @@ export type ISubTaskReadModel = {
 
 export type ITaskReadModel = {
   id: number;
+  sequentialId: number;
   companyId: string;
   description: string;
   priority: number;
@@ -32,6 +34,7 @@ export type ITaskReadModel = {
 
 export class TaskReadModel {
   id: number;
+  sequentialId: number;
   companyId: string;
   description: string;
   endDate?: Date;
@@ -50,6 +53,7 @@ export class TaskReadModel {
 
   constructor(params: ITaskReadModel) {
     this.id = params.id;
+    this.sequentialId = params.sequentialId;
     this.companyId = params.companyId;
     this.createdAt = params.createdAt;
     this.updatedAt = params.updatedAt;
