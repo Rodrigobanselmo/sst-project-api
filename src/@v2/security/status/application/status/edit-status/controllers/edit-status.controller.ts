@@ -14,12 +14,20 @@ export class EditStatusController {
   constructor(private readonly editStatusUseCase: EditStatusUseCase) {}
 
   @Patch()
-  @Permissions({
-    code: PermissionEnum.CHARACTERIZATION,
-    isContract: true,
-    isMember: true,
-    crud: true,
-  })
+  @Permissions(
+    {
+      code: PermissionEnum.CHARACTERIZATION,
+      isContract: true,
+      isMember: true,
+      crud: true,
+    },
+    {
+      code: PermissionEnum.TASK,
+      isContract: true,
+      isMember: true,
+      crud: true,
+    },
+  )
   async browse(@Param() path: EditStatusPath, @Body() body: EditStatusPayload) {
     return this.editStatusUseCase.execute({
       id: path.id,

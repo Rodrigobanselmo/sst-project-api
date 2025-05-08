@@ -3,15 +3,15 @@ import { UserBrowseResultModel } from '@/@v2/security/action-plan/domain/models/
 export type IUserBrowseResultModelMapper = {
   user_id: number;
   user_name: string | null;
-  user_email: string;
+  user_email: string | null;
 };
 
 export class UserBrowseResultModelMapper {
   static toModel(prisma: IUserBrowseResultModelMapper): UserBrowseResultModel {
     return new UserBrowseResultModel({
       id: prisma.user_id,
-      name: prisma.user_name,
-      email: prisma.user_email,
+      name: prisma.user_name || '',
+      email: prisma.user_email || undefined,
     });
   }
 

@@ -22,8 +22,8 @@ export class EditActionPlanService {
       aggregate.setValidDate({
         validDate: params.validDate,
         comment: {
-          text: params.comment.text,
-          textType: params.comment.textType,
+          text: params.comment?.text,
+          textType: params.comment?.textType,
           commentedById: params.userId,
         },
       });

@@ -4,6 +4,6 @@ export type ICommentBrowseFilterModelMapper = {};
 
 export class CommentBrowseFilterModelMapper {
   static toModel(): CommentBrowseFilterModel {
-    return new CommentBrowseFilterModel({});
+    return new CommentBrowseFilterModel();
   }
 }

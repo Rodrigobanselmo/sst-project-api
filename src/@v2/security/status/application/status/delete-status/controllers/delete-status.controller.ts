@@ -13,12 +13,20 @@ export class DeleteStatusController {
   constructor(private readonly deleteStatusUseCase: DeleteStatusUseCase) {}
 
   @Delete()
-  @Permissions({
-    code: PermissionEnum.CHARACTERIZATION,
-    isContract: true,
-    isMember: true,
-    crud: 'cu',
-  })
+  @Permissions(
+    {
+      code: PermissionEnum.CHARACTERIZATION,
+      isContract: true,
+      isMember: true,
+      crud: 'cu',
+    },
+    {
+      code: PermissionEnum.TASK,
+      isContract: true,
+      isMember: true,
+      crud: true,
+    },
+  )
   async browse(@Param() path: DeleteStatusPath) {
     return this.deleteStatusUseCase.execute({
       id: path.id,

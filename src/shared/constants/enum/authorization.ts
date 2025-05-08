@@ -33,6 +33,7 @@ export enum RoleEnum {
   CAT = '17',
   ABSENTEEISM = '18',
   ESOCIAL_EDIT = '19',
+  TASK = '20',
 
   DATABASE = '99',
   CHECKLIST = '98',
@@ -78,4 +79,5 @@ export enum PermissionEnum {
   CLINIC_COMPANY_LINK = '21',
   SCHEDULE_MEDICAL_VISIT = '22',
   IMAGE_GALLERY = '23',
+  TASK = '24',
 }

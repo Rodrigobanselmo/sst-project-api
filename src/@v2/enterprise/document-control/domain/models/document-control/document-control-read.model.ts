@@ -1,5 +1,4 @@
 import { FileModel } from '@/@v2/shared/models/common/file.model';
-import { SystemFile } from '@/@v2/shared/domain/types/shared/system-file';
 
 export type IDocumentControlReadModel = {
   id: string;

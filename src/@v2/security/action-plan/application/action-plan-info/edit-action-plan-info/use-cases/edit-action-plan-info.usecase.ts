@@ -20,9 +20,9 @@ export class EditActionPlanInfoUseCase {
     ]);
 
     if (!aggregate) {
-      await this._createActionPlanInfo(params, coordinator);
+      await this._createActionPlanInfo(params, coordinator || undefined);
     } else {
-      await this._updateActionPlanInfo(params, aggregate, coordinator);
+      await this._updateActionPlanInfo(params, aggregate, coordinator || undefined);
     }
   }
 
@@ -40,7 +40,7 @@ export class EditActionPlanInfoUseCase {
 
     const newAggregate = new ActionPlanInfoAggregate({
       actionPlanInfo,
-      coordinator,
+      coordinator: coordinator || null,
     });
 
     await this.actionPlanInfoAggregateRepository.create(newAggregate);

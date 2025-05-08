@@ -1,8 +1,5 @@
-
-export type ICommentBrowseFilterModel = {
-}
+export type ICommentBrowseFilterModel = {};
 
 export class CommentBrowseFilterModel {
-    constructor(params: ICommentBrowseFilterModel) {
-    }
+  constructor() {}
 }

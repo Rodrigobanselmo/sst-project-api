@@ -1,6 +1,5 @@
-import { updateField } from '@/@v2/shared/domain/helpers/update-field.helper';
-import { DocumentControlEntity } from '../entities/document-control.entity';
 import { DocumentControlFileEntity } from '../entities/document-control-file.entity';
+import { DocumentControlEntity } from '../entities/document-control.entity';
 
 export type IDocumentControlAggregate = {
   documentControl: DocumentControlEntity;

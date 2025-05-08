@@ -17,7 +17,7 @@ type IActionPlanAggregateMapper = {
       months_period_level_4: number;
       months_period_level_5: number;
       validityStart: Date | null;
-      coordinator: ICoordinatorMapper;
+      coordinator: ICoordinatorMapper | null;
     }[];
   };
   dataRecs: (

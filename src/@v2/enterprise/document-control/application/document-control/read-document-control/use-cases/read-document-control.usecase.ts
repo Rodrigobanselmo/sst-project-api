@@ -1,10 +1,9 @@
-import { DocumentControlDAO } from './../../../../database/dao/document-control/document-control.dao';
-import { DocumentControlRepository } from '@/@v2/enterprise/document-control/database/repositories/document-control/document-control.repository';
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import { IDocumentControlUseCase } from './read-document-control.types';
-import { asyncBatch } from '@/@v2/shared/utils/helpers/async-batch';
-import { SharedTokens } from '@/@v2/shared/constants/tokens';
 import { IStorageAdapter } from '@/@v2/shared/adapters/storage/storage.interface';
+import { SharedTokens } from '@/@v2/shared/constants/tokens';
+import { asyncBatch } from '@/@v2/shared/utils/helpers/async-batch';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { DocumentControlDAO } from './../../../../database/dao/document-control/document-control.dao';
+import { IDocumentControlUseCase } from './read-document-control.types';
 
 @Injectable()
 export class ReadDocumentControlUseCase {

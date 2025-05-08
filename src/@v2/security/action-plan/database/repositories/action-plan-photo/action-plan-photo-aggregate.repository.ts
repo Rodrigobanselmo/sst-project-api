@@ -122,7 +122,7 @@ export class ActionPlanPhotoAggregateRepository implements IActionPlanPhotoAggre
     if (!actionPlan) return null;
 
     const actionPlanPhoto = await this.prisma.riskFactorDataRecPhoto.update({
-      where: { id: params.photo.id },
+      where: { id: params.photo.id || '-' },
       data: {
         file_id: params.photo.file.id,
         is_vertical: params.photo.isVertical,
@@ -139,7 +139,7 @@ export class ActionPlanPhotoAggregateRepository implements IActionPlanPhotoAggre
       where: { id: params.id },
     });
 
-    const workspaceId = workspace.risk_data_rec.workspaceId;
+    const workspaceId = workspace?.risk_data_rec.workspaceId;
     if (!workspaceId) return null;
 
     const actionPlanPhoto = await this.prisma.riskFactorDataRecPhoto.findFirst({
@@ -162,7 +162,7 @@ export class ActionPlanPhotoAggregateRepository implements IActionPlanPhotoAggre
 
   async inactivate(params: IActionPlanPhotoAggregateRepository.InactivateParams): IActionPlanPhotoAggregateRepository.InactivateReturn {
     const actionPlanPhoto = await this.prisma.riskFactorDataRecPhoto.update({
-      where: { id: params.photo.id },
+      where: { id: params.photo.id || '-' },
       data: {
         deleted_at: new Date(),
       },

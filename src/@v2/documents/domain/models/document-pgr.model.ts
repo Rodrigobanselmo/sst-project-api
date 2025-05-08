@@ -1,14 +1,14 @@
 import { HierarchyTypeEnum } from '@/@v2/shared/domain/enum/company/hierarchy-type.enum';
 import { getNumOfEmployees } from '../functions/get-num-of-employees.func';
+import { AdministrativeMeasureModel } from './administrative-measure.model';
 import { DocumentVersionModel } from './document-version.model';
+import { EngineeringMeasureModel } from './engineering-measure.model';
+import { EPIModel } from './epis.model';
 import { ExamModel } from './exam.model';
 import { HierarchyModel } from './hierarchy.model';
 import { HomogeneousGroupModel } from './homogeneous-group.model';
 import { RiskDataExamModel } from './risk-data-exam.model';
 import { RiskDataModel } from './risk-data.model';
-import { EPIModel } from './epis.model';
-import { AdministrativeMeasureModel } from './administrative-measure.model';
-import { EngineeringMeasureModel } from './engineering-measure.model';
 
 export type IDocumentPGRModel = {
   documentVersion: DocumentVersionModel;
@@ -108,7 +108,7 @@ export class DocumentPGRModel {
   }
 
   getHierarchyNestedChildren(hierarchy: HierarchyModel) {
-    const children = [];
+    const children: HierarchyModel[] = [];
 
     const findChildrenRecursively = (currentParentId: string) => {
       for (const item of this.hierarchies) {
@@ -168,11 +168,11 @@ export class DocumentPGRModel {
       const parent = this.hierarchies.find((item) => item.id === currentParentId);
       if (parent) {
         parents.unshift(parent);
-        findParentsRecursively(parent.parentId);
+        if (parent.parentId) findParentsRecursively(parent.parentId);
       }
     };
 
-    findParentsRecursively(hierarchy.parentId);
+    if (hierarchy.parentId) findParentsRecursively(hierarchy.parentId);
     return parents;
   }
 

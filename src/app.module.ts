@@ -23,6 +23,7 @@ import { SecurityModule } from './@v2/security/security.module';
 import { EnterpriseModule } from './@v2/enterprise/enterprise.module';
 import { AuthModule } from './@v2/auth/auth.module';
 import { FileModule } from './@v2/files/file.module';
+import { TaskModule } from './@v2/task/task.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { FileModule } from './@v2/files/file.module';
     EnterpriseModule,
     AuthModule,
     FileModule,
+    TaskModule,
   ],
   providers: [
     {

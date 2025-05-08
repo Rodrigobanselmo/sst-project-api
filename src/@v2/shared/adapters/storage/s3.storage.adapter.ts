@@ -67,7 +67,7 @@ export class S3StorageAdapter implements IStorageAdapter {
       ResponseContentType: this.contentType(fileKey),
     });
 
-    return getSignedUrl(this.s3, command, { expiresIn: expires });
+    return getSignedUrl(this.s3 as any, command as any, { expiresIn: expires });
   }
 
   private contentType(filename: string): string {

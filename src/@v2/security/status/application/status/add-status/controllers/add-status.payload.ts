@@ -1,5 +1,4 @@
-import { StatusTypeEnum } from "@/@v2/security/@shared/domain/enums/status-type.enum"
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 
 export class AddStatusPayload {
   @IsString()
@@ -10,8 +9,5 @@ export class AddStatusPayload {
   color?: string | null;
 
   @IsString()
-  @IsEnum(StatusTypeEnum)
-  type!: StatusTypeEnum;
+  type!: string;
 }
-
-

@@ -1,17 +1,17 @@
-import { Prisma } from "@prisma/client";
-import { OrderByDirectionEnum } from "../../types/order-by.types";
+import { Prisma } from '@prisma/client';
+import { OrderByDirectionEnum } from '../../types/order-by.types';
 
 export type IOrderByRawPrisma = {
-    column: string;
-    order: OrderByDirectionEnum
-}
-
+  column: string;
+  order: OrderByDirectionEnum;
+};
 
 export function getOrderByRawPrisma(orderBy: IOrderByRawPrisma[]): Prisma.Sql {
-    if (orderBy.length == 0) return Prisma.sql``
+  if (orderBy.length == 0) return Prisma.sql``;
 
-    const prismaOrderBy = orderBy.map(({ order, column }) => (Prisma.sql`${Prisma.sql([column])} ${Prisma.sql([order])}`))
-    const prismaOrderBySQL = Prisma.join(prismaOrderBy, ', ')
+  const prismaOrderBy = orderBy.filter(({ order }) => order !== OrderByDirectionEnum.NONE).map(({ order, column }) => Prisma.sql`${Prisma.sql([column])} ${Prisma.sql([order])}`);
+  if (prismaOrderBy.length == 0) return Prisma.sql``;
 
-    return Prisma.sql`ORDER BY ${prismaOrderBySQL}`
+  const prismaOrderBySQL = Prisma.join(prismaOrderBy, ', ');
+  return Prisma.sql`ORDER BY ${prismaOrderBySQL}`;
 }

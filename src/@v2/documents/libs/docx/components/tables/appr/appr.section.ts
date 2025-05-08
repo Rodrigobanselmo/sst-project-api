@@ -1,15 +1,14 @@
-import { arrayChunks } from '@/@v2/shared/utils/helpers/array-chunks';
 import { HierarchyEnum } from '@prisma/client';
 import { ISectionOptions, PageOrientation, Paragraph, Table } from 'docx';
 
+import { asyncBatch } from '@/@v2/shared/utils/helpers/async-batch';
 import { sortString } from '@/@v2/shared/utils/sorts/string.sort';
 import { HierarchyMapData, IDocumentRiskGroupDataConverter, IHierarchyData, IHomoGroupMap } from '../../../converter/hierarchy.converter';
+import { simulateAwait } from '../../../helpers/simulate-await';
 import { epiRiskInventoryTableSection } from './parts/epi/epi.table';
 import { firstRiskInventoryTableSection } from './parts/first/first.table';
 import { secondRiskInventoryTableSection } from './parts/second/second.table';
 import { thirdRiskInventoryTableSection } from './parts/third/third.table';
-import { asyncBatch } from '@/@v2/shared/utils/helpers/async-batch';
-import { simulateAwait } from '../../../helpers/simulate-await';
 
 export interface IAPPRTableOptions {
   isHideCA: boolean;

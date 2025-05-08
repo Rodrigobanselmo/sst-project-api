@@ -10,7 +10,10 @@ export namespace IFileRepository {
   export type FindParams = { id: string; companyId: string };
   export type FindReturn = Promise<FileEntity | null>;
 
-  export type FindManyParams = { companyId?: string };
+  export type FindManyUnusedParams = { companyId?: string };
+  export type FindManyUnusedReturn = Promise<FileEntity[]>;
+
+  export type FindManyParams = { companyId: string; ids: string[] };
   export type FindManyReturn = Promise<FileEntity[]>;
 
   export type DeleteParams = { id: string; companyId: string };

@@ -12,7 +12,7 @@ import { CommentTypeEnum } from '../../enums/comment-type.enum';
 import { CommentTextTypeEnum } from '../../enums/comment-text-type.enum';
 
 export type IActionPlanBrowseResultModel = {
-  uuid: { riskDataId: string; recommendationId: string; workspaceId: string };
+  uuid: { id?: string; riskDataId: string; recommendationId: string; workspaceId: string };
   sequentialId: number;
   createdAt: Date;
   updatedAt: Date | null;
@@ -52,7 +52,7 @@ export type IActionPlanBrowseResultModel = {
 };
 
 export class ActionPlanBrowseResultModel {
-  uuid: { riskDataId: string; recommendationId: string; workspaceId: string };
+  uuid: { id?: string; riskDataId: string; recommendationId: string; workspaceId: string };
   sequentialId: number;
   createdAt: Date;
   updatedAt: Date | null;
@@ -66,7 +66,6 @@ export class ActionPlanBrowseResultModel {
   risk: { id: string; name: string; type: RiskTypeEnum };
   origin: { id: string; name: string; type: OriginTypeEnum };
   status: ActionPlanStatusEnum;
-  hierarchies: { name: string; type: HierarchyTypeEnum }[];
   responsible: { id: string; name: string } | null;
   comments: {
     id: string;
@@ -80,6 +79,7 @@ export class ActionPlanBrowseResultModel {
   constructor(params: IActionPlanBrowseResultModel) {
     this.sequentialId = params.sequentialId;
     this.uuid = {
+      id: params.uuid.id,
       recommendationId: params.uuid.recommendationId,
       riskDataId: params.uuid.riskDataId,
       workspaceId: params.uuid.workspaceId,

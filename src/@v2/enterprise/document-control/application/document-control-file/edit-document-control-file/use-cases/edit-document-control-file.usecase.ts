@@ -30,7 +30,7 @@ export class EditDocumentControlFileUseCase {
 
   private async addFile(params: IDocumentControlUseCase.Params, documentControlFile: DocumentControlFileEntity) {
     const [file, error] = await this.fileRequester.read({
-      fileId: params.fileId,
+      fileId: params.fileId!,
       companyId: params.companyId,
     });
 
