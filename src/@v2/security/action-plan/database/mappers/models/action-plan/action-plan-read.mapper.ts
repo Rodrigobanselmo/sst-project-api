@@ -91,6 +91,7 @@ export class ActionPlanReadMapper {
               isVertical: photo.is_vertical,
               name: photo.file.name,
               url: photo.file.url,
+              updatedAt: photo.file.updated_at,
             }),
         ),
       },
@@ -103,6 +104,7 @@ export class ActionPlanReadMapper {
               name: photo.name,
               url: photo.photoUrl,
               isVisible: photo.characterizationPhotoRecommendation.length ? photo.characterizationPhotoRecommendation.some((rec) => rec.is_visible) : true,
+              updatedAt: photo.updated_at,
             }),
         ) || [],
     });

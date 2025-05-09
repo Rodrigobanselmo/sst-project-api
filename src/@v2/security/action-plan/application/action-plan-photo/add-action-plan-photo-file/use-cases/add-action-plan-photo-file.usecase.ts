@@ -5,7 +5,6 @@ import { ActionPlanPhotoEntity } from '@/@v2/security/action-plan/domain/entitie
 import { BUCKET_FOLDERS } from '@/@v2/shared/constants/buckets';
 import { SharedTokens } from '@/@v2/shared/constants/tokens';
 import { IFileRequester } from '@/@v2/shared/requesters/files/file.interface';
-import { getFileName } from '@/@v2/shared/utils/file/get-file-name';
 import { getImageSize } from '@/@v2/shared/utils/helpers/get-image-size';
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { IUseCase } from './add-action-plan-photo-file.types';
@@ -22,7 +21,7 @@ export class AddActionPlanPhotoFileUseCase {
   async execute(params: IUseCase.Params) {
     const [file, error] = await this.fileRequester.add({
       buffer: params.buffer,
-      fileName: getFileName(params.name),
+      fileName: params.name,
       companyId: params.companyId,
       fileFolder: BUCKET_FOLDERS.ACTION_PLAN_RECOMMENDATION,
       shouldDelete: false,
