@@ -1726,7 +1726,6 @@ model RiskFactors {
   carnogenicityLinach   String?
   status                StatusEnum              @default(ACTIVE)
   type                  RiskFactorsEnum
-  sub_type              RiskSubTypeEnum[]
   representAll          Boolean                 @default(false)
   created_at            DateTime                @default(now())
   updated_at            DateTime                @updatedAt
@@ -2337,10 +2336,6 @@ enum RiskFactorsEnum {
   ERG
   ACI
   OUTROS
-}
-
-enum RiskSubTypeEnum {
-  PSYCHOSOCIAL
 }
 
 enum RiskRecTypeEnum {
