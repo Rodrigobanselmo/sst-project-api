@@ -1519,6 +1519,7 @@ model RiskFactors {
   esocialCode           String?
   coments               String?
   activities            Json?
+  rsdata                String?
   examToRisk            ExamToRisk[]
   generateSource        GenerateSource[]
   protocolToRisk        ProtocolToRisk[]
@@ -1528,11 +1529,34 @@ model RiskFactors {
   company               Company                 @relation(fields: [companyId], references: [id])
   esocial               EsocialTable24?         @relation(fields: [esocialCode], references: [id], onDelete: Restrict)
   docInfo               RiskFactorsDocInfo[]
-  rsdata                String?
+  subTypes              RiskToRiskSubType[]
 
   @@unique([id, companyId])
   @@index([name])
   @@index([esocialCode])
+}
+
+model RiskSubType {
+  id         Int             @id @default(autoincrement())
+  name       String
+  type       RiskFactorsEnum
+  created_at DateTime        @default(now())
+  updated_at DateTime        @updatedAt
+
+  RiskToRiskSubType RiskToRiskSubType[]
+
+  @@index([type])
+}
+
+model RiskToRiskSubType {
+  id         Int      @id @default(autoincrement())
+  created_at DateTime @default(now())
+
+  sub_type_id Int
+  sub_type    RiskSubType @relation(fields: [sub_type_id], references: [id])
+
+  risk_id String
+  risk    RiskFactors @relation(fields: [risk_id], references: [id], onDelete: Cascade)
 }
 
 model RiskFactorsDocInfo {

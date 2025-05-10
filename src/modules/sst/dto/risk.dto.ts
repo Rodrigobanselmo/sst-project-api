@@ -1,15 +1,11 @@
 import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
 import { RiskFactorsEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
-import { IsBoolean, IsEnum, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsBoolean, IsEnum, IsInt, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
-import {
-  RiskCreateGenerateSourceDto,
-  RiskUpdateGenerateSourceDto,
-  UpsertGenerateSourceDto,
-} from './generate-source.dto';
+import { RiskCreateGenerateSourceDto, RiskUpdateGenerateSourceDto, UpsertGenerateSourceDto } from './generate-source.dto';
 import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
 import { RiskCreateRecMedDto, RiskUpdateRecMedDto, UpsertRecMedDto } from './rec-med.dto';
@@ -21,6 +17,12 @@ export class CreateRiskDto {
     message: `type must be one of: ${KeysOfEnum(RiskFactorsEnum)}`,
   })
   type: RiskFactorsEnum;
+
+  @IsArray()
+  @IsOptional()
+  @IsInt({ each: true })
+  @Type(() => Number)
+  subTypesIds?: number[];
 
   @Transform(StringCapitalizeParagraphTransform, { toClassOnly: true })
   @IsString()
@@ -352,6 +354,12 @@ export class UpdateRiskDto {
   @IsOptional()
   @Type(() => ActivityDto)
   activities?: ActivityDto[];
+
+  @IsArray()
+  @IsOptional()
+  @IsInt({ each: true })
+  @Type(() => Number)
+  subTypesIds?: number[];
 }
 
 export class FindRiskDto extends PaginationQueryDto {
