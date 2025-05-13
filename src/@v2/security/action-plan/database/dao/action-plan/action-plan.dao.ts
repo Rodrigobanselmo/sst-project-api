@@ -63,9 +63,30 @@ export class ActionPlanDAO {
           select: {
             name: true,
             type: true,
-            photos: true,
+            photos: {
+              include: {
+                characterizationPhotoRecommendation: {
+                  where: {
+                    recommendation_id: params.recommendationId,
+                    risk_data_id: params.riskDataId,
+                  },
+                },
+              },
+            },
           },
         },
+      },
+    });
+
+    const actionPlanPromise = this.prisma.riskFactorDataRec.findFirst({
+      where: {
+        recMedId: params.recommendationId,
+        riskFactorDataId: params.riskDataId,
+        workspaceId: params.workspaceId,
+        companyId: params.companyId,
+      },
+      select: {
+        id: true,
       },
     });
 
@@ -84,9 +105,9 @@ export class ActionPlanDAO {
       },
     });
 
-    const [homogeneousGroup, photos] = await Promise.all([homogeneousGroupPromise, photosPromise]);
+    const [homogeneousGroup, photos, actionPlan] = await Promise.all([homogeneousGroupPromise, photosPromise, actionPlanPromise]);
 
-    return homogeneousGroup ? ActionPlanReadMapper.toModel({ homogeneousGroup, photos, params }) : null;
+    return homogeneousGroup ? ActionPlanReadMapper.toModel({ homogeneousGroup, photos, actionPlan, params }) : null;
   }
 
   async browse({ limit, page, orderBy, filters }: IActionPlanDAO.BrowseParams) {
@@ -197,11 +218,18 @@ export class ActionPlanDAO {
       LEFT JOIN
         "HomogeneousGroup" hg ON hg."id" = rfd."homogeneousGroupId"
       ${
+        filters.responisbleIds?.length
+          ? Prisma.sql`
+            LEFT JOIN "Task" task ON task."action_plan_id" = rfd_rec."id"
+            LEFT JOIN "TaskResponsible" task_resp ON task_resp."task_id" = task."id"
+          `
+          : Prisma.sql``
+      }
+      ${
         filters.workspaceIds?.length
           ? Prisma.sql`
-        LEFT JOIN
-            "_HomogeneousGroupToWorkspace" hg_to_w ON hg_to_w."A" = hg."id"
-      `
+              LEFT JOIN "_HomogeneousGroupToWorkspace" hg_to_w ON hg_to_w."A" = hg."id"
+            `
           : Prisma.sql``
       }
       LEFT JOIN
@@ -317,6 +345,14 @@ export class ActionPlanDAO {
       `
           : Prisma.sql``
       }
+      ${
+        filters.responisbleIds?.length
+          ? Prisma.sql`
+            LEFT JOIN "Task" task ON task."action_plan_id" = rfd_rec."id"
+            LEFT JOIN "TaskResponsible" task_resp ON task_resp."task_id" = task."id"
+          `
+          : Prisma.sql``
+      }
       LEFT JOIN
         "HomogeneousGroup" hg ON hg."id" = rfd."homogeneousGroupId"
       ${
@@ -424,11 +460,14 @@ export class ActionPlanDAO {
 
       if (includeNull) {
         if (filters.responisbleIds.length === 1) where.push(Prisma.sql`u_resp."id" IS NULL`);
-        else where.push(Prisma.sql`u_resp."id" IN (${Prisma.join(filters.responisbleIds.filter(Boolean))}) OR u_resp."id" IS NULL`);
+        else
+          where.push(
+            Prisma.sql`u_resp."id" IN (${Prisma.join(filters.responisbleIds.filter(Boolean))}) OR u_resp."id" IS NULL OR task_resp."user_id" IN (${Prisma.join(filters.responisbleIds.filter(Boolean))})`,
+          );
       }
 
       if (!includeNull) {
-        where.push(Prisma.sql`u_resp."id" IN (${Prisma.join(filters.responisbleIds)})`);
+        where.push(Prisma.sql`u_resp."id" IN (${Prisma.join(filters.responisbleIds)}) OR task_resp."user_id" IN (${Prisma.join(filters.responisbleIds.filter(Boolean))})`);
       }
     }
 

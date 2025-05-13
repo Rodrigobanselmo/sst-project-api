@@ -71,7 +71,7 @@ export class ActionPlanAggregate {
   }
 
   setStatus({ status, comment }: ISetStatus): DomainResponse {
-    const isCoordinator = this.coordinator?.id === comment?.commentedById;
+    const isCoordinator = comment && this.coordinator?.id === comment.commentedById;
 
     if (status === ActionPlanStatusEnum.DONE) {
       if (!comment) return [, errorCommentRequired];
@@ -96,20 +96,20 @@ export class ActionPlanAggregate {
       );
     } else if (status === ActionPlanStatusEnum.PROGRESS) {
       this.actionPlan._startDate = new Date();
-      if (comment) {
-        this.comments.push(
-          new CommentEntity({
-            text: comment.text || null,
-            textType: comment.textType || null,
-            commentedById: comment.commentedById,
-            type: CommentTypeEnum.PROGRESS,
-            previousStatus: this.actionPlan.status,
-            currentStatus: status,
-            currentValidDate: null,
-            previousValidDate: null,
-          }),
-        );
-      }
+      if (!comment) return [, errorCommentRequired];
+
+      this.comments.push(
+        new CommentEntity({
+          text: comment.text || null,
+          textType: comment.textType || null,
+          commentedById: comment.commentedById,
+          type: CommentTypeEnum.PROGRESS,
+          previousStatus: this.actionPlan.status,
+          currentStatus: status,
+          currentValidDate: null,
+          previousValidDate: null,
+        }),
+      );
     } else if (status === ActionPlanStatusEnum.PENDING) {
       this.actionPlan._startDate = null;
       this.actionPlan._doneDate = null;

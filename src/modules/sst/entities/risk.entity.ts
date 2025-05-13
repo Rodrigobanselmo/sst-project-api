@@ -1,16 +1,16 @@
-import { AppendixEnum, OtherAppendixEnum } from './../../../shared/constants/enum/appendix';
+import { AppendixEnum } from './../../../shared/constants/enum/appendix';
 import { QuantityTypeEnum } from './../../company/interfaces/risk-data-json.types';
 
-import { Prisma, RiskFactors, RiskFactorsEnum, RiskSubTypeEnum } from '.prisma/client';
+import { Prisma, RiskFactors, RiskFactorsEnum, RiskSubType, RiskToRiskSubType } from '.prisma/client';
 import { GrauInsalubridade, StatusEnum } from '@prisma/client';
-import { RecMedEntity } from './recMed.entity';
-import { GenerateSourceEntity } from './generateSource.entity';
+import { EsocialTable24Entity } from '../../../modules/esocial/entities/esocialTable24.entity';
+import { isRiskQuantity } from '../../../shared/utils/isRiskQuantity';
 import { ExamRiskEntity } from './examRisk.entity';
+import { GenerateSourceEntity } from './generateSource.entity';
+import { ProtocolToRiskEntity } from './protocol.entity';
+import { RecMedEntity } from './recMed.entity';
 import { RiskFactorDataEntity } from './riskData.entity';
 import { RiskDocInfoEntity } from './riskDocInfo.entity';
-import { EsocialTable24Entity } from '../../../modules/esocial/entities/esocialTable24.entity';
-import { ProtocolToRiskEntity } from './protocol.entity';
-import { isRiskQuantity } from '../../../shared/utils/isRiskQuantity';
 
 export type RiskFactorActivitie = {
   description: string;
@@ -77,6 +77,10 @@ export class RiskFactorsEntity implements RiskFactors {
 
   esocialCode: string;
   esocial?: EsocialTable24Entity;
+  subTypes: (RiskToRiskSubType & {
+    sub_type: RiskSubType;
+  })[] = [];
+  rsdata: string | null;
 
   constructor(partial: Partial<Omit<RiskFactorsEntity, 'activities'>>) {
     Object.assign(this, partial);
@@ -86,7 +90,6 @@ export class RiskFactorsEntity implements RiskFactors {
       this.riskFactorData = this.riskFactorData.map((riskData) => new RiskFactorDataEntity(riskData as any));
     }
   }
-  sub_type: RiskSubTypeEnum[];
 
   private getVMP(nr15lt?: string) {
     if (!nr15lt) return '';

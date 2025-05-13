@@ -5,6 +5,7 @@ import { SharedTokens } from '@/@v2/shared/constants/tokens';
 import { FileRepository } from '../../database/repositories/file/file.repository';
 import { FileEntity } from '../../domain/entities/file.entity';
 import { IAddFileService } from './add-file.interface';
+import { getFileName } from '@/@v2/shared/utils/file/get-file-name';
 
 @Injectable()
 export class AddFileService {
@@ -18,7 +19,7 @@ export class AddFileService {
     const { url, key, bucket } = await this.storage.upload({
       file: params.buffer,
       fileFolder: params.fileFolder.replace(':companyId', params.companyId),
-      fileName: params.fileName,
+      fileName: getFileName(params.fileName),
       isPublic: params.isPublic,
     });
 
@@ -34,7 +35,8 @@ export class AddFileService {
     });
 
     const file = await this.fileRepository.create(document);
-    if (!file) throw new Error('Não foi possível criar o documennto');
+    if (!file) throw new Error('Não foi possível adicionar o arquivo');
+
     return [file, null];
   }
 }

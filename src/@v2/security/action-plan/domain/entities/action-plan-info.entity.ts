@@ -12,12 +12,12 @@ export type IUpdateActionPlanInfoEntity = {
 export type IActionPlanInfoEntity = {
   companyId: string;
   workspaceId: string;
-  validityStart: Date | null;
-  validityEnd: Date | null;
-  monthsLevel_2: number;
-  monthsLevel_3: number;
-  monthsLevel_4: number;
-  monthsLevel_5: number;
+  validityStart?: Date | null;
+  validityEnd?: Date | null;
+  monthsLevel_2?: number;
+  monthsLevel_3?: number;
+  monthsLevel_4?: number;
+  monthsLevel_5?: number;
 };
 
 export class ActionPlanInfoEntity {
@@ -34,12 +34,12 @@ export class ActionPlanInfoEntity {
   constructor(params: IActionPlanInfoEntity) {
     this.companyId = params.companyId;
     this.workspaceId = params.workspaceId;
-    this._validityStart = params.validityStart;
-    this._validityEnd = params.validityEnd;
-    this._monthsLevel_2 = params.monthsLevel_2;
-    this._monthsLevel_3 = params.monthsLevel_3;
-    this._monthsLevel_4 = params.monthsLevel_4;
-    this._monthsLevel_5 = params.monthsLevel_5;
+    this._validityStart = params.validityStart || null;
+    this._validityEnd = params.validityEnd || null;
+    this._monthsLevel_2 = params.monthsLevel_2 || 24;
+    this._monthsLevel_3 = params.monthsLevel_3 || 12;
+    this._monthsLevel_4 = params.monthsLevel_4 || 6;
+    this._monthsLevel_5 = params.monthsLevel_5 || 3;
   }
 
   get validityStart() {

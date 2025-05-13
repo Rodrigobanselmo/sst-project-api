@@ -21,17 +21,17 @@ type AbsenceData = {
 // Function to read, modify, and save the JSON data
 async function processJsonFile(outputFilePath: string): Promise<void> {
   const rawData = await fs.readFile(outputFilePath, 'utf-8');
-  const jsonData: AbsenceData[] = [
-    {
-      dataFim: new Date('2021-01-01'),
-      dataInicio: new Date('2021-01-01'),
-      dias: 1,
-      matricula: '1',
-      motivo: 2,
-      nomeCompleto: 'Teste Anselmo',
-    },
-  ];
-  // const jsonData: AbsenceData[] = JSON.parse(rawData);
+  // const jsonData: AbsenceData[] = [
+  //   {
+  //     dataFim: new Date('2021-01-01'),
+  //     dataInicio: new Date('2021-01-01'),
+  //     dias: 1,
+  //     matricula: '1',
+  //     motivo: 2,
+  //     nomeCompleto: 'Teste Anselmo',
+  //   },
+  // ];
+  const jsonData: AbsenceData[] = JSON.parse(rawData);
 
   const employeeData = new Set<string>();
   const employeeDataFound = new Set<string>();
@@ -61,18 +61,12 @@ async function processJsonFile(outputFilePath: string): Promise<void> {
       employee = await prisma.employee.create({
         data: {
           companyId,
-          cpf: 'id-' + record.matricula,
+          cpf: record.matricula.padStart(11, '0'),
           name: record.nomeCompleto
             .normalize('NFD')
             .replace(/\p{Diacritic}/gu, '')
             .trim(),
           esocialCode: record.matricula,
-          hierarchyHistory: {
-            create: {
-              motive: 'DEM',
-              hierarchyId: 'd8e814d9-05ea-4b8d-95d0-f65aef2a3282',
-            },
-          },
         },
       });
 
@@ -91,6 +85,7 @@ async function processJsonFile(outputFilePath: string): Promise<void> {
       const endDate = dayjs(new Date(record.dataFim));
 
       const timeSpent = startDate.diff(endDate, 'minutes');
+      const daysSpent = startDate.diff(endDate, 'days');
 
       await prisma.absenteeism.create({
         data: {
@@ -100,7 +95,7 @@ async function processJsonFile(outputFilePath: string): Promise<void> {
           endDate: new Date(record.dataFim),
           observation: 'Importado por planilha',
           timeUnit: 'DAY',
-          motiveId: record.motivo,
+          motiveId: record.motivo || (Math.abs(daysSpent) > 15 ? 15 : 2),
         },
       });
     }

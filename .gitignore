@@ -1,4 +1,5 @@
 .env
+COPSOQ.xlsx
 
 # compiled output
 /dist

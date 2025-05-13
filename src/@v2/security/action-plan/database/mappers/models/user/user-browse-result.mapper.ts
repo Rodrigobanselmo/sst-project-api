@@ -3,7 +3,7 @@ import { UserBrowseResultModel } from '@/@v2/security/action-plan/domain/models/
 export type IUserBrowseResultModelMapper = {
   user_id: number;
   user_name: string | null;
-  user_email: string;
+  user_email: string | null;
 };
 
 export class UserBrowseResultModelMapper {

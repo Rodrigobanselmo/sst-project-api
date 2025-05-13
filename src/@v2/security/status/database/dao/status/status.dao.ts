@@ -5,36 +5,33 @@ import { StatusBrowseModelMapper } from '../../mappers/models/status/status-brow
 
 @Injectable()
 export class StatusDAO {
-  constructor(
-    private readonly prisma: PrismaServiceV2,
-  ) { }
+  constructor(private readonly prisma: PrismaServiceV2) {}
 
   async browse({ companyId, type }: IStatusDAO.BrowseParams) {
-
     const status = await this.prisma.status.findMany({
       where: {
         companyId,
         type,
-        deleted_at: null
+        deleted_at: null,
       },
       orderBy: {
-        name: 'asc'
-      }
-    })
+        name: 'asc',
+      },
+    });
 
-    return StatusBrowseModelMapper.toModel({ results: status })
+    return StatusBrowseModelMapper.toModel({ results: status });
   }
 
-  async checkIfExist({ name, companyId }: IStatusDAO.CheckIfExistParams) {
+  async checkIfExist({ name, companyId, type }: IStatusDAO.CheckIfExistParams) {
     const status = await this.prisma.status.findFirst({
       where: {
         name,
         companyId,
-        type: 'CHARACTERIZATION',
-        deleted_at: null
-      }
-    })
+        type,
+        deleted_at: null,
+      },
+    });
 
-    return !!status
+    return !!status;
   }
 }

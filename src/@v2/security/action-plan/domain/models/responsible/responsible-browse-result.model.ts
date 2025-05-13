@@ -9,7 +9,7 @@ export class ResponsibleBrowseResultModel {
   userId?: number;
   employeeId?: number;
   name: string;
-  email: string;
+  email?: string;
 
   constructor(params: IResponsibleBrowseResultModel) {
     this.userId = params.userId;

@@ -169,11 +169,11 @@ export class DocumentPGRModel {
       const parent = this.hierarchies.find((item) => item.id === currentParentId);
       if (parent) {
         parents.unshift(parent);
-        findParentsRecursively(parent.parentId);
+        if (parent.parentId) findParentsRecursively(parent.parentId);
       }
     };
 
-    findParentsRecursively(hierarchy.parentId);
+    if (hierarchy.parentId) findParentsRecursively(hierarchy.parentId);
     return parents;
   }
 

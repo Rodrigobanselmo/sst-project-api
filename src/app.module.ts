@@ -24,6 +24,7 @@ import { EnterpriseModule } from './@v2/enterprise/enterprise.module';
 import { AuthModule } from './@v2/auth/auth.module';
 import { FileModule } from './@v2/files/file.module';
 import { FormModule } from './@v2/forms/forms.module';
+import { TaskModule } from './@v2/task/task.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { FormModule } from './@v2/forms/forms.module';
     AuthModule,
     FileModule,
     FormModule,
+    TaskModule,
   ],
   providers: [
     {

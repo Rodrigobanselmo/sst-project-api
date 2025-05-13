@@ -37,7 +37,7 @@ export class FileRepository {
         url: params.url,
         should_delete: params.shouldDelete,
         size: params.size,
-        metadata: params.metadata || undefined,
+        metadata: params.metadata as any,
       },
     });
 
@@ -74,7 +74,20 @@ export class FileRepository {
     return fileEntity ? FileEntityMapper.toEntity(fileEntity) : null;
   }
 
-  async findMany(params?: IFileRepository.FindManyParams): IFileRepository.FindManyReturn {
+  async findMany(params: IFileRepository.FindManyParams): IFileRepository.FindManyReturn {
+    const files = await this.prisma.systemFile.findMany({
+      where: {
+        company_id: params.companyId,
+        id: {
+          in: params.ids,
+        },
+      },
+    });
+
+    return FileEntityMapper.toArray(files);
+  }
+
+  async findManyUnused(params?: IFileRepository.FindManyUnusedParams): IFileRepository.FindManyUnusedReturn {
     const files = await this.prisma.systemFile.findMany({
       where: {
         company_id: params?.companyId,

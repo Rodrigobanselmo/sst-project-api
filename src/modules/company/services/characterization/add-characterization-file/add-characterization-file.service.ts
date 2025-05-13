@@ -18,11 +18,7 @@ export class AddCharacterizationFileService {
     private readonly amazonStorageProvider: AmazonStorageProvider,
   ) {}
 
-  async execute(
-    addFileCharacterizationDto: AddFileCharacterizationDto,
-    userPayloadDto: UserPayloadDto,
-    file: Express.Multer.File,
-  ) {
+  async execute(addFileCharacterizationDto: AddFileCharacterizationDto, userPayloadDto: UserPayloadDto, file: Express.Multer.File) {
     const fileUrl = await this.upload(file);
 
     if (addFileCharacterizationDto.id) {
@@ -39,9 +35,7 @@ export class AddCharacterizationFileService {
       companyCharacterizationId: addFileCharacterizationDto.companyCharacterizationId,
     });
 
-    const characterizationData = await this.characterizationRepository.findById(
-      addFileCharacterizationDto.companyCharacterizationId,
-    );
+    const characterizationData = await this.characterizationRepository.findById(addFileCharacterizationDto.companyCharacterizationId);
 
     return characterizationData;
   }
@@ -71,7 +65,7 @@ export class AddCharacterizationFileService {
     file.originalname = file.originalname.replace('.3gp', '.mp3');
 
     try {
-      await writeFile(inputPath, file.buffer);
+      await writeFile(inputPath, file.buffer as any);
     } catch (err) {
       throw new Error(`Erro ao salvar arquivo 3gp: ${JSON.stringify(err)}`);
     }

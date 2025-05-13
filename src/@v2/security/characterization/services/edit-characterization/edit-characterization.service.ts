@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { IEditCharacterizationService } from './edit-characterization.service.types';
 import { CharacterizationRepository } from '../../database/repositories/characterization/characterization.repository';
+import { IEditCharacterizationService } from './edit-characterization.service.types';
 
 @Injectable()
 export class EditCharacterizationService {
@@ -15,7 +15,7 @@ export class EditCharacterizationService {
 
     if (!characterization) return null;
 
-    characterization.stageId = params.stageId || null;
+    characterization.update({ stageId: params.stageId });
 
     return characterization;
   }

@@ -23,6 +23,7 @@ export type IActionPlanBrowseResultModelMapper = {
   rfd_id: string;
   rfd_created_at: Date;
   rfd_level: number | null;
+  rfd_rec_id: string | null;
   rfd_rec_updated_at: Date | null;
   rfd_rec_start_date: Date | null;
   rfd_rec_done_date: Date | null;
@@ -77,6 +78,7 @@ export class ActionPlanBrowseResultModelMapper {
       updatedAt: prisma.rfd_rec_updated_at,
       sequentialId: prisma.rec_to_rfd_sequential_id,
       uuid: {
+        id: prisma.rfd_rec_id || undefined,
         recommendationId: prisma.rec_id,
         riskDataId: prisma.rfd_id,
         workspaceId: prisma.w_id,

@@ -1,6 +1,6 @@
 import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common';
 
-import { SecurityRoutes } from '@/@v2/security/characterization/constants/routes';
+import { CharacterizationRoutes } from '@/@v2/security/characterization/constants/routes';
 import { JwtAuthGuard } from '@/@v2/shared/guards/jwt-auth.guard';
 import { PermissionEnum } from '@/shared/constants/enum/authorization';
 import { Permissions } from '@/shared/decorators/permissions.decorator';
@@ -8,7 +8,7 @@ import { EditManyCharacterizationUseCase } from '../use-cases/edit-many-characte
 import { EditCharacterizationPath } from './edit-many-characterization.path';
 import { EditCharacterizationPayload } from './edit-many-characterization.payload';
 
-@Controller(SecurityRoutes.CHARACTERIZATION.EDIT_MANY)
+@Controller(CharacterizationRoutes.CHARACTERIZATION.EDIT_MANY)
 @UseGuards(JwtAuthGuard)
 export class EditManyCharacterizationController {
   constructor(private readonly editCharacterizationUseCase: EditManyCharacterizationUseCase) {}

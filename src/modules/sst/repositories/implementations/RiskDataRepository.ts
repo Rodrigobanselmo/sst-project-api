@@ -364,8 +364,6 @@ export class RiskDataRepository {
   }
 
   private async upsertPrisma({ recs, adms, engs, epis, exams, generateSources, companyId, createId, id, ...createDto }: Omit<UpsertRiskDataDto, 'keepEmpty'>) {
-    console.log({ recs, id });
-
     const isCreation = !id;
     if (isCreation) {
       const foundRiskData = await this.prisma.riskFactorData.findMany({

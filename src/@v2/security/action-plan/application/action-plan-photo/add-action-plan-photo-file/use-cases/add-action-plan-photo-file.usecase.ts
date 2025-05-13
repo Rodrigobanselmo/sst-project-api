@@ -1,14 +1,13 @@
+import { ActionPlanPhotoAggregateRepository } from '@/@v2/security/action-plan/database/repositories/action-plan-photo/action-plan-photo-aggregate.repository';
+import { ActionPlanAggregateRepository } from '@/@v2/security/action-plan/database/repositories/action-plan/action-plan-aggregate.repository';
+import { ActionPlanPhotoAggregate } from '@/@v2/security/action-plan/domain/aggregations/action-plan-photo.aggregate';
+import { ActionPlanPhotoEntity } from '@/@v2/security/action-plan/domain/entities/action-plan-photo.entity';
 import { BUCKET_FOLDERS } from '@/@v2/shared/constants/buckets';
 import { SharedTokens } from '@/@v2/shared/constants/tokens';
 import { IFileRequester } from '@/@v2/shared/requesters/files/file.interface';
-import { getFileName } from '@/@v2/shared/utils/file/get-file-name';
+import { getImageSize } from '@/@v2/shared/utils/helpers/get-image-size';
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { IUseCase } from './add-action-plan-photo-file.types';
-import { ActionPlanPhotoAggregateRepository } from '@/@v2/security/action-plan/database/repositories/action-plan-photo/action-plan-photo-aggregate.repository';
-import { ActionPlanPhotoEntity } from '@/@v2/security/action-plan/domain/entities/action-plan-photo.entity';
-import { getImageSize } from '@/@v2/shared/utils/helpers/get-image-size';
-import { ActionPlanAggregateRepository } from '@/@v2/security/action-plan/database/repositories/action-plan/action-plan-aggregate.repository';
-import { ActionPlanPhotoAggregate } from '@/@v2/security/action-plan/domain/aggregations/action-plan-photo.aggregate';
 
 @Injectable()
 export class AddActionPlanPhotoFileUseCase {
@@ -22,7 +21,7 @@ export class AddActionPlanPhotoFileUseCase {
   async execute(params: IUseCase.Params) {
     const [file, error] = await this.fileRequester.add({
       buffer: params.buffer,
-      fileName: getFileName(params.name),
+      fileName: params.name,
       companyId: params.companyId,
       fileFolder: BUCKET_FOLDERS.ACTION_PLAN_RECOMMENDATION,
       shouldDelete: false,
@@ -39,7 +38,7 @@ export class AddActionPlanPhotoFileUseCase {
       riskDataId: params.riskDataId,
     });
 
-    if (!actionPlanAggregate) throw new BadRequestException('Não foi possível encintrar a recomendação');
+    if (!actionPlanAggregate) throw new BadRequestException('Plano de ação não encontrado');
 
     const { isVertical } = getImageSize(params.buffer);
 

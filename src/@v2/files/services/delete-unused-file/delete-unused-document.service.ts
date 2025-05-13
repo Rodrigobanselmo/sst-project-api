@@ -10,7 +10,7 @@ export class DeleteUnusedFileService {
   constructor(private readonly fileRepository: FileRepository) {}
 
   async delete(): IDeleteUnusedFileService.Result {
-    const files = await this.fileRepository.findMany();
+    const files = await this.fileRepository.findManyUnused();
 
     asyncBatch({
       items: files,

@@ -1,22 +1,19 @@
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
-import { Prisma } from '@prisma/client'
-import { ActionPlanInfoAggregateMapper } from '../../mappers/aggregations/action-plan-info.mapper'
-import { IActionPlanInfoAggregateRepository } from './action-plan-aggregate.types'
+import { Prisma } from '@prisma/client';
+import { ActionPlanInfoAggregateMapper } from '../../mappers/aggregations/action-plan-info.mapper';
+import { IActionPlanInfoAggregateRepository } from './action-plan-aggregate.types';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class ActionPlanInfoAggregateRepository implements IActionPlanInfoAggregateRepository {
-  constructor(
-    private readonly prisma: PrismaServiceV2,
-  ) { }
-
+  constructor(private readonly prisma: PrismaServiceV2) {}
 
   static selectOptions() {
     const include = {
-      coordinator: true
-    } satisfies Prisma.DocumentDataFindFirstArgs['include']
+      coordinator: true,
+    } satisfies Prisma.DocumentDataFindFirstArgs['include'];
 
-    return { include }
+    return { include };
   }
 
   async findById(params: IActionPlanInfoAggregateRepository.FindByIdParams): IActionPlanInfoAggregateRepository.FindByIdReturn {
@@ -24,12 +21,32 @@ export class ActionPlanInfoAggregateRepository implements IActionPlanInfoAggrega
       where: {
         workspaceId: params.workspaceId,
         companyId: params.companyId,
-        type: 'PGR'
+        type: 'PGR',
       },
-      ...ActionPlanInfoAggregateRepository.selectOptions()
-    })
+      ...ActionPlanInfoAggregateRepository.selectOptions(),
+    });
 
-    return actionPlan ? ActionPlanInfoAggregateMapper.toAggregate(actionPlan) : null
+    return actionPlan ? ActionPlanInfoAggregateMapper.toAggregate(actionPlan) : null;
+  }
+
+  async create(params: IActionPlanInfoAggregateRepository.CreateParams): IActionPlanInfoAggregateRepository.CreateReturn {
+    const actionPlan = await this.prisma.documentData.create({
+      data: {
+        companyId: params.actionPlanInfo.companyId,
+        workspaceId: params.actionPlanInfo.workspaceId,
+        type: 'PGR',
+        months_period_level_2: params.actionPlanInfo.monthsLevel_2,
+        months_period_level_3: params.actionPlanInfo.monthsLevel_3,
+        months_period_level_4: params.actionPlanInfo.monthsLevel_4,
+        months_period_level_5: params.actionPlanInfo.monthsLevel_5,
+        validityStart: params.actionPlanInfo.validityStart,
+        validityEnd: params.actionPlanInfo.validityEnd,
+        coordinatorId: params.coordinator ? params.coordinator.id : null,
+      },
+      ...ActionPlanInfoAggregateRepository.selectOptions(),
+    });
+
+    return actionPlan ? ActionPlanInfoAggregateMapper.toAggregate(actionPlan) : null;
   }
 
   async update(params: IActionPlanInfoAggregateRepository.UpdateParams): IActionPlanInfoAggregateRepository.UpdateReturn {
@@ -38,7 +55,7 @@ export class ActionPlanInfoAggregateRepository implements IActionPlanInfoAggrega
         type_workspaceId_companyId: {
           companyId: params.actionPlanInfo.companyId,
           workspaceId: params.actionPlanInfo.workspaceId,
-          type: 'PGR'
+          type: 'PGR',
         },
       },
       data: {
@@ -48,11 +65,11 @@ export class ActionPlanInfoAggregateRepository implements IActionPlanInfoAggrega
         months_period_level_5: params.actionPlanInfo.monthsLevel_5,
         validityStart: params.actionPlanInfo.validityStart,
         validityEnd: params.actionPlanInfo.validityEnd,
-        coordinatorId: params.coordinator ? params.coordinator.id : null
+        coordinatorId: params.coordinator ? params.coordinator.id : null,
       },
-      ...ActionPlanInfoAggregateRepository.selectOptions()
-    })
+      ...ActionPlanInfoAggregateRepository.selectOptions(),
+    });
 
-    return actionPlan ? ActionPlanInfoAggregateMapper.toAggregate(actionPlan) : null
+    return actionPlan ? ActionPlanInfoAggregateMapper.toAggregate(actionPlan) : null;
   }
 }

@@ -1,9 +1,9 @@
 import { MailAdapter } from '@/@v2/shared/adapters/mail/mail.interface';
 import { SharedTokens } from '@/@v2/shared/constants/tokens';
-import { Inject, Injectable } from '@nestjs/common';
-import { IAuthUserMailAdapter } from './auth-user-mail.interface';
 import { captureException } from '@/@v2/shared/utils/helpers/capture-exception';
+import { Inject, Injectable } from '@nestjs/common';
 import { CompanyDAO } from '../../database/dao/company/company.dao';
+import { IAuthUserMailAdapter } from './auth-user-mail.interface';
 
 @Injectable()
 export class AuthUserMailAdapter implements IAuthUserMailAdapter {
@@ -20,8 +20,11 @@ export class AuthUserMailAdapter implements IAuthUserMailAdapter {
     const company = await this.companyDAO.FindByIdParams({ id: params.companyId });
 
     try {
+      if (!params.user.email) throw new Error('Email not provided');
+      if (!company) throw new Error('Company not found');
+
       await this.mailAdapter.sendMail({
-        to: params.user.email,
+        to: params.user.email || '',
         type: 'INVITE_USER',
         variables: {
           company: company?.name || '',

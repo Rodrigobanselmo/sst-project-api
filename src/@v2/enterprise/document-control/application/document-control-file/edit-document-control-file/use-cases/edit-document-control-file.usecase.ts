@@ -32,7 +32,7 @@ export class EditDocumentControlFileUseCase {
     if (!params.fileId) return;
 
     const [file, error] = await this.fileRequester.read({
-      fileId: params.fileId,
+      fileId: params.fileId!,
       companyId: params.companyId,
     });
 

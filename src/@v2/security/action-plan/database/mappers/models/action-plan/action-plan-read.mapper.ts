@@ -4,7 +4,7 @@ import { HierarchyTypeEnum } from '@/@v2/shared/domain/enum/company/hierarchy-ty
 import { CharacterizationTypeEnum } from '@/@v2/shared/domain/enum/security/characterization-type.enum';
 import { HomoTypeEnum } from '@/@v2/shared/domain/enum/security/homo-type.enum';
 import { getOriginHomogeneousGroup } from '@/@v2/shared/domain/functions/security/get-origin-homogeneous-group.func';
-import { CharacterizationTypeEnum as PrismaCharacterizationTypeEnum, CompanyCharacterizationPhoto, HomogeneousGroup, HierarchyEnum } from '@prisma/client';
+import { CharacterizationTypeEnum as PrismaCharacterizationTypeEnum, CompanyCharacterizationPhoto, HomogeneousGroup, HierarchyEnum, CharacterizationPhotoRecommendation } from '@prisma/client';
 import { IActionPlanDAO } from '../../../dao/action-plan/action-plan.types';
 
 export type IActionPlanReadMapper = {
@@ -18,7 +18,9 @@ export type IActionPlanReadMapper = {
     characterization: {
       name: string;
       type: PrismaCharacterizationTypeEnum;
-      photos: CompanyCharacterizationPhoto[];
+      photos: (CompanyCharacterizationPhoto & {
+        characterizationPhotoRecommendation: CharacterizationPhotoRecommendation[];
+      })[];
     } | null;
     riskFactorData: {
       recs: {
@@ -44,11 +46,15 @@ export type IActionPlanReadMapper = {
     };
   }[];
 
+  actionPlan: {
+    id: string;
+  } | null;
+
   params: IActionPlanDAO.FindParams;
 };
 
 export class ActionPlanReadMapper {
-  static toModel({ homogeneousGroup, photos, params }: IActionPlanReadMapper): ActionPlanReadModel {
+  static toModel({ homogeneousGroup, photos, actionPlan, params }: IActionPlanReadMapper): ActionPlanReadModel {
     const origin = getOriginHomogeneousGroup({
       characterization: homogeneousGroup.characterization
         ? {
@@ -68,6 +74,7 @@ export class ActionPlanReadMapper {
 
     return new ActionPlanReadModel({
       uuid: {
+        id: actionPlan?.id || undefined,
         recommendationId: params.recommendationId,
         riskDataId: params.riskDataId,
         workspaceId: params.workspaceId,
@@ -84,6 +91,7 @@ export class ActionPlanReadMapper {
               isVertical: photo.is_vertical,
               name: photo.file.name,
               url: photo.file.url,
+              updatedAt: photo.file.updated_at,
             }),
         ),
       },
@@ -95,6 +103,8 @@ export class ActionPlanReadMapper {
               isVertical: photo.isVertical,
               name: photo.name,
               url: photo.photoUrl,
+              isVisible: photo.characterizationPhotoRecommendation.length ? photo.characterizationPhotoRecommendation.some((rec) => rec.is_visible) : true,
+              updatedAt: photo.updated_at,
             }),
         ) || [],
     });
