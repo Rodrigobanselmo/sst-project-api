@@ -71,7 +71,7 @@ export class TaskAggregate {
   }
 
   get responsible() {
-    return removeDuplicate(this._responsible, { removeById: 'userId' });
+    return removeDuplicate(this._responsible, { idPath: 'userId' });
   }
 
   get photos() {

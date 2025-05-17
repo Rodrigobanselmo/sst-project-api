@@ -357,14 +357,11 @@ model Company {
   DocumentControl            DocumentControl[]
   SystemFile                 SystemFile[]
   DocumentControlFile        DocumentControlFile[]
-  <<<<<<< HEAD
   FormApplication            FormApplication[]
   Form                       Form[]
   FormQuestionData           FormQuestionData[]
-  =======
   TaskProject                TaskProject[]
   Task                       Task[]
-  >>>>>>> master
 
   @@index([name])
   @@index([isClinic])

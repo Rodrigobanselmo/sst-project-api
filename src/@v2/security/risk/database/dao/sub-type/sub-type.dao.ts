@@ -61,8 +61,7 @@ export class SubTypeDAO {
     }
 
     if (filters.types?.length) {
-      const types = filters.types.map((type) => type.toLowerCase());
-      where.push(Prisma.sql`lower(sub_risk.type) = ANY(${types})`);
+      where.push(Prisma.sql`sub_risk.type::text = ANY(${filters.types})`);
     }
 
     return where;

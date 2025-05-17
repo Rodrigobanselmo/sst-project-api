@@ -106,8 +106,7 @@ export class FormDAO {
     }
 
     if (filters.types?.length) {
-      const types = filters.types.map((type) => type.toLowerCase());
-      where.push(Prisma.sql`lower(form.type) = ANY(${types})`);
+      where.push(Prisma.sql`form.type::text = ANY(${filters.types})`);
     }
 
     return where;
