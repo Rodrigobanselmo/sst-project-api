@@ -66,11 +66,11 @@ async function processJsonFile(inputFilePath: string, outputFilePath: string): P
     const jsonData: AbsenceData = JSON.parse(rawData);
 
     const enhancedData = jsonData.map((record) => {
-      const days = Number(record['Dias de calendário'].replace('.00', '').trim());
+      const days = Number(String(record['Dias de calendário']).replace('.00', '').trim());
 
       // CONVERT FROM DD/MM/YYYY TO Date OBJECT
 
-      let motive = absenceTypeMapper[record['Txt.tp.pres./ausên.']];
+      let motive = absenceTypeMapper[record['Txt.tipo presença/ausên.']];
       if (motive === 0) {
         motive = days > 15 ? 15 : 2;
       }

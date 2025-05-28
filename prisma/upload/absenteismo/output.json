@@ -1,747 +1,102 @@
 [
   {
-    "matricula": "277573",
-    "nomeCompleto": "LUCIANA DE SOUZA",
+    "matricula": 10220643,
+    "nomeCompleto": "LICIA MARIA PASSOS DE MESQUITA",
     "motivo": 2,
-    "dataInicio": "2022-10-12T03:00:00.000Z",
-    "dataFim": "2022-10-14T03:00:00.000Z",
-    "dias": 3
-  },
-  {
-    "matricula": "9440515",
-    "nomeCompleto": "JANE PEREIRA DE SANTANA",
-    "motivo": 2,
-    "dataInicio": "2022-07-15T03:00:00.000Z",
-    "dataFim": "2022-07-19T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "10247666",
-    "nomeCompleto": "SUELI DE SOUZA ANDRADE",
-    "motivo": 2,
-    "dataInicio": "2023-04-17T03:00:00.000Z",
-    "dataFim": "2023-04-21T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "11193159",
-    "nomeCompleto": "ALBERICO TEIXEIRA SOARES",
-    "dataInicio": "2023-11-06T03:00:00.000Z",
-    "dataFim": "2023-11-30T03:00:00.000Z",
-    "dias": 25
-  },
-  {
-    "matricula": "11196218",
-    "nomeCompleto": "ANTONIO MARCIO DE AMORIM RAMOS",
-    "dataInicio": "2022-03-13T03:00:00.000Z",
-    "dataFim": "2022-06-10T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "11196218",
-    "nomeCompleto": "ANTONIO MARCIO DE AMORIM RAMOS",
-    "dataInicio": "2022-06-11T03:00:00.000Z",
-    "dataFim": "2022-09-08T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "11196218",
-    "nomeCompleto": "ANTONIO MARCIO DE AMORIM RAMOS",
-    "dataInicio": "2022-09-09T03:00:00.000Z",
-    "dataFim": "2022-10-08T03:00:00.000Z",
-    "dias": 30
-  },
-  {
-    "matricula": "11196218",
-    "nomeCompleto": "ANTONIO MARCIO DE AMORIM RAMOS",
-    "motivo": 2,
-    "dataInicio": "2022-03-03T03:00:00.000Z",
-    "dataFim": "2022-03-12T03:00:00.000Z",
+    "dataInicio": "2025-02-14T03:00:00.000Z",
+    "dataFim": "2025-02-23T03:00:00.000Z",
     "dias": 10
   },
   {
-    "matricula": "13018821",
-    "nomeCompleto": "LANDULFO ALVES DE SOUZA",
-    "dataInicio": "2022-08-08T03:00:00.000Z",
-    "dataFim": "2022-08-11T03:00:00.000Z",
-    "dias": 4
-  },
-  {
-    "matricula": "13018821",
-    "nomeCompleto": "LANDULFO ALVES DE SOUZA",
-    "dataInicio": "2023-01-17T03:00:00.000Z",
-    "dataFim": "2023-01-26T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13018821",
-    "nomeCompleto": "LANDULFO ALVES DE SOUZA",
-    "dataInicio": "2023-01-27T03:00:00.000Z",
-    "dataFim": "2023-04-26T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13018821",
-    "nomeCompleto": "LANDULFO ALVES DE SOUZA",
-    "dataInicio": "2023-04-27T03:00:00.000Z",
-    "dataFim": "2023-06-25T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13018821",
-    "nomeCompleto": "LANDULFO ALVES DE SOUZA",
-    "dataInicio": "2023-09-20T03:00:00.000Z",
-    "dataFim": "2023-12-18T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13018821",
-    "nomeCompleto": "LANDULFO ALVES DE SOUZA",
-    "dataInicio": "2023-12-19T03:00:00.000Z",
-    "dataFim": "2024-02-16T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13018821",
-    "nomeCompleto": "LANDULFO ALVES DE SOUZA",
+    "matricula": 11312301,
+    "nomeCompleto": "MARIA DAS GRACAS MORBECK",
     "motivo": 2,
-    "dataInicio": "2022-06-01T03:00:00.000Z",
-    "dataFim": "2022-06-10T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13018821",
-    "nomeCompleto": "LANDULFO ALVES DE SOUZA",
-    "motivo": 2,
-    "dataInicio": "2022-09-01T03:00:00.000Z",
-    "dataFim": "2022-09-05T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "13018821",
-    "nomeCompleto": "LANDULFO ALVES DE SOUZA",
-    "motivo": 2,
-    "dataInicio": "2022-12-19T03:00:00.000Z",
-    "dataFim": "2022-12-23T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "13018821",
-    "nomeCompleto": "LANDULFO ALVES DE SOUZA",
-    "motivo": 2,
-    "dataInicio": "2023-09-01T03:00:00.000Z",
-    "dataFim": "2023-09-10T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13019042",
-    "nomeCompleto": "RAYMUNDO JOSE ALVES BADARO",
-    "dataInicio": "2022-08-07T03:00:00.000Z",
-    "dataFim": "2022-08-31T03:00:00.000Z",
-    "dias": 25
-  },
-  {
-    "matricula": "13019042",
-    "nomeCompleto": "RAYMUNDO JOSE ALVES BADARO",
-    "motivo": 2,
-    "dataInicio": "2022-07-28T03:00:00.000Z",
-    "dataFim": "2022-08-06T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13019358",
-    "nomeCompleto": "JOSE CARLOS PEREIRA DE VASCONCELOS",
-    "motivo": 2,
-    "dataInicio": "2022-04-07T03:00:00.000Z",
-    "dataFim": "2022-04-16T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13020100",
-    "nomeCompleto": "PAULO ROBERTO DE OLIVEIRA COSTA",
-    "dataInicio": "2023-12-22T03:00:00.000Z",
-    "dataFim": "2023-12-27T03:00:00.000Z",
-    "dias": 6
-  },
-  {
-    "matricula": "13020100",
-    "nomeCompleto": "PAULO ROBERTO DE OLIVEIRA COSTA",
-    "dataInicio": "2024-02-05T03:00:00.000Z",
-    "dataFim": "2024-02-10T03:00:00.000Z",
-    "dias": 6
-  },
-  {
-    "matricula": "13020100",
-    "nomeCompleto": "PAULO ROBERTO DE OLIVEIRA COSTA",
-    "motivo": 2,
-    "dataInicio": "2022-05-19T03:00:00.000Z",
-    "dataFim": "2022-05-26T03:00:00.000Z",
-    "dias": 8
-  },
-  {
-    "matricula": "13020100",
-    "nomeCompleto": "PAULO ROBERTO DE OLIVEIRA COSTA",
-    "motivo": 2,
-    "dataInicio": "2022-08-21T03:00:00.000Z",
-    "dataFim": "2022-08-25T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "13020100",
-    "nomeCompleto": "PAULO ROBERTO DE OLIVEIRA COSTA",
-    "motivo": 2,
-    "dataInicio": "2022-08-26T03:00:00.000Z",
-    "dataFim": "2022-08-26T03:00:00.000Z",
-    "dias": 1
-  },
-  {
-    "matricula": "13020100",
-    "nomeCompleto": "PAULO ROBERTO DE OLIVEIRA COSTA",
-    "motivo": 2,
-    "dataInicio": "2023-02-03T03:00:00.000Z",
-    "dataFim": "2023-02-10T03:00:00.000Z",
-    "dias": 8
-  },
-  {
-    "matricula": "13020100",
-    "nomeCompleto": "PAULO ROBERTO DE OLIVEIRA COSTA",
-    "motivo": 2,
-    "dataInicio": "2023-04-25T03:00:00.000Z",
-    "dataFim": "2023-04-25T03:00:00.000Z",
-    "dias": 1
-  },
-  {
-    "matricula": "13020100",
-    "nomeCompleto": "PAULO ROBERTO DE OLIVEIRA COSTA",
-    "motivo": 2,
-    "dataInicio": "2023-06-06T03:00:00.000Z",
-    "dataFim": "2023-06-11T03:00:00.000Z",
-    "dias": 6
-  },
-  {
-    "matricula": "13020100",
-    "nomeCompleto": "PAULO ROBERTO DE OLIVEIRA COSTA",
-    "motivo": 2,
-    "dataInicio": "2023-06-26T03:00:00.000Z",
-    "dataFim": "2023-06-30T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "13020100",
-    "nomeCompleto": "PAULO ROBERTO DE OLIVEIRA COSTA",
-    "motivo": 2,
-    "dataInicio": "2023-08-06T03:00:00.000Z",
-    "dataFim": "2023-08-06T03:00:00.000Z",
-    "dias": 1
-  },
-  {
-    "matricula": "13020100",
-    "nomeCompleto": "PAULO ROBERTO DE OLIVEIRA COSTA",
-    "motivo": 2,
-    "dataInicio": "2023-08-07T03:00:00.000Z",
-    "dataFim": "2023-08-11T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "13020100",
-    "nomeCompleto": "PAULO ROBERTO DE OLIVEIRA COSTA",
-    "motivo": 2,
-    "dataInicio": "2023-10-05T03:00:00.000Z",
-    "dataFim": "2023-10-12T03:00:00.000Z",
-    "dias": 8
-  },
-  {
-    "matricula": "13020100",
-    "nomeCompleto": "PAULO ROBERTO DE OLIVEIRA COSTA",
-    "motivo": 2,
-    "dataInicio": "2023-11-03T03:00:00.000Z",
-    "dataFim": "2023-11-10T03:00:00.000Z",
-    "dias": 8
-  },
-  {
-    "matricula": "13020100",
-    "nomeCompleto": "PAULO ROBERTO DE OLIVEIRA COSTA",
-    "motivo": 2,
-    "dataInicio": "2023-12-11T03:00:00.000Z",
-    "dataFim": "2023-12-11T03:00:00.000Z",
-    "dias": 1
-  },
-  {
-    "matricula": "13020100",
-    "nomeCompleto": "PAULO ROBERTO DE OLIVEIRA COSTA",
-    "motivo": 2,
-    "dataInicio": "2024-03-01T03:00:00.000Z",
-    "dataFim": "2024-03-10T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13020100",
-    "nomeCompleto": "PAULO ROBERTO DE OLIVEIRA COSTA",
-    "motivo": 2,
-    "dataInicio": "2024-04-23T03:00:00.000Z",
-    "dataFim": "2024-04-27T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "13074441",
-    "nomeCompleto": "JOSE ROBERTO SANTANA",
-    "dataInicio": "2023-12-03T03:00:00.000Z",
-    "dataFim": "2023-12-07T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "13089960",
-    "nomeCompleto": "MARILDA DE MOURA REQUIAO",
-    "motivo": 2,
-    "dataInicio": "2023-05-15T03:00:00.000Z",
-    "dataFim": "2023-05-21T03:00:00.000Z",
+    "dataInicio": "2025-01-14T03:00:00.000Z",
+    "dataFim": "2025-01-20T03:00:00.000Z",
     "dias": 7
   },
   {
-    "matricula": "13093308",
-    "nomeCompleto": "ELIANA OTERO SAPUCAIA",
+    "matricula": 11312301,
+    "nomeCompleto": "MARIA DAS GRACAS MORBECK",
     "motivo": 2,
-    "dataInicio": "2023-02-01T03:00:00.000Z",
-    "dataFim": "2023-02-10T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13108595",
-    "nomeCompleto": "MARIA CELIA RICCIO FRANCO",
-    "dataInicio": "2024-04-04T03:00:00.000Z",
-    "dataFim": "2024-04-23T03:00:00.000Z",
-    "dias": 20
-  },
-  {
-    "matricula": "13108595",
-    "nomeCompleto": "MARIA CELIA RICCIO FRANCO",
-    "motivo": 2,
-    "dataInicio": "2024-03-22T03:00:00.000Z",
-    "dataFim": "2024-03-31T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13111572",
-    "nomeCompleto": "EDNOLIA GOMES NOVAIS",
-    "dataInicio": "2024-05-04T03:00:00.000Z",
-    "dataFim": "2024-07-02T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13111572",
-    "nomeCompleto": "EDNOLIA GOMES NOVAIS",
-    "dataInicio": "2024-07-03T03:00:00.000Z",
-    "dataFim": "2024-09-30T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13111572",
-    "nomeCompleto": "EDNOLIA GOMES NOVAIS",
-    "motivo": 2,
-    "dataInicio": "2024-04-23T03:00:00.000Z",
-    "dataFim": "2024-05-02T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13114381",
-    "nomeCompleto": "EVANDO FERNANDES BRITO",
-    "motivo": 2,
-    "dataInicio": "2022-06-06T03:00:00.000Z",
-    "dataFim": "2022-06-10T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "13117227",
-    "nomeCompleto": "ROQUE PEREIRA DA SILVA",
-    "dataInicio": "2022-03-18T03:00:00.000Z",
-    "dataFim": "2022-05-16T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13117227",
-    "nomeCompleto": "ROQUE PEREIRA DA SILVA",
-    "dataInicio": "2022-05-17T03:00:00.000Z",
-    "dataFim": "2022-07-15T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13117227",
-    "nomeCompleto": "ROQUE PEREIRA DA SILVA",
-    "dataInicio": "2022-07-16T03:00:00.000Z",
-    "dataFim": "2022-07-30T03:00:00.000Z",
-    "dias": 15
-  },
-  {
-    "matricula": "13117227",
-    "nomeCompleto": "ROQUE PEREIRA DA SILVA",
-    "dataInicio": "2022-07-31T03:00:00.000Z",
-    "dataFim": "2022-09-28T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13117227",
-    "nomeCompleto": "ROQUE PEREIRA DA SILVA",
-    "dataInicio": "2022-10-20T03:00:00.000Z",
-    "dataFim": "2022-10-29T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13117227",
-    "nomeCompleto": "ROQUE PEREIRA DA SILVA",
-    "dataInicio": "2023-12-15T03:00:00.000Z",
-    "dataFim": "2023-12-29T03:00:00.000Z",
-    "dias": 15
-  },
-  {
-    "matricula": "13117227",
-    "nomeCompleto": "ROQUE PEREIRA DA SILVA",
-    "motivo": 2,
-    "dataInicio": "2022-10-03T03:00:00.000Z",
-    "dataFim": "2022-10-03T03:00:00.000Z",
-    "dias": 1
-  },
-  {
-    "matricula": "13117227",
-    "nomeCompleto": "ROQUE PEREIRA DA SILVA",
-    "motivo": 2,
-    "dataInicio": "2022-10-04T03:00:00.000Z",
-    "dataFim": "2022-10-07T03:00:00.000Z",
-    "dias": 4
-  },
-  {
-    "matricula": "13128984",
-    "nomeCompleto": "RUI ALVES DE AMORIM",
-    "motivo": 2,
-    "dataInicio": "2024-02-28T03:00:00.000Z",
-    "dataFim": "2024-03-08T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13140789",
-    "nomeCompleto": "SONIA MARIA FERNANDES PASTANA",
-    "dataInicio": "2022-03-17T03:00:00.000Z",
-    "dataFim": "2022-05-15T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13147321",
-    "nomeCompleto": "JOSE MARIA BONFIM COSTA",
-    "dataInicio": "2022-02-14T03:00:00.000Z",
-    "dataFim": "2022-04-03T03:00:00.000Z",
-    "dias": 49
-  },
-  {
-    "matricula": "13147321",
-    "nomeCompleto": "JOSE MARIA BONFIM COSTA",
-    "motivo": 2,
-    "dataInicio": "2022-02-05T03:00:00.000Z",
-    "dataFim": "2022-02-13T03:00:00.000Z",
+    "dataInicio": "2025-01-21T03:00:00.000Z",
+    "dataFim": "2025-01-29T03:00:00.000Z",
     "dias": 9
   },
   {
-    "matricula": "13147322",
-    "nomeCompleto": "JAIME RAIMUNDO NASCIMENTO FILHO",
-    "dataInicio": "2024-04-05T03:00:00.000Z",
-    "dataFim": "2024-04-12T03:00:00.000Z",
-    "dias": 8
-  },
-  {
-    "matricula": "13147322",
-    "nomeCompleto": "JAIME RAIMUNDO NASCIMENTO FILHO",
+    "matricula": 13114381,
+    "nomeCompleto": "EVANDO FERNANDES BRITO",
     "motivo": 2,
-    "dataInicio": "2024-03-26T03:00:00.000Z",
-    "dataFim": "2024-04-04T03:00:00.000Z",
+    "dataInicio": "2025-02-01T03:00:00.000Z",
+    "dataFim": "2025-02-10T03:00:00.000Z",
     "dias": 10
   },
   {
-    "matricula": "13148714",
-    "nomeCompleto": "MARIA DA CONCEICAO REIS MACIEL",
-    "motivo": 2,
-    "dataInicio": "2022-07-13T03:00:00.000Z",
-    "dataFim": "2022-07-19T03:00:00.000Z",
-    "dias": 7
-  },
-  {
-    "matricula": "13151268",
-    "nomeCompleto": "NADIA MARIA CORREIA BRANDAO BRASIL",
-    "motivo": 2,
-    "dataInicio": "2024-03-04T03:00:00.000Z",
-    "dataFim": "2024-03-05T03:00:00.000Z",
-    "dias": 2
-  },
-  {
-    "matricula": "13151268",
-    "nomeCompleto": "NADIA MARIA CORREIA BRANDAO BRASIL",
-    "motivo": 2,
-    "dataInicio": "2024-03-06T03:00:00.000Z",
-    "dataFim": "2024-03-08T03:00:00.000Z",
-    "dias": 3
-  },
-  {
-    "matricula": "13151802",
-    "nomeCompleto": "RENATO DOS SANTOS FILHO",
-    "dataInicio": "2024-03-18T03:00:00.000Z",
-    "dataFim": "2024-03-22T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "13151802",
-    "nomeCompleto": "RENATO DOS SANTOS FILHO",
-    "motivo": 2,
-    "dataInicio": "2024-03-08T03:00:00.000Z",
-    "dataFim": "2024-03-17T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13151843",
+    "matricula": 13151843,
     "nomeCompleto": "LETICIA MARIA DOS SANTOS",
+    "motivo": 15,
     "dataInicio": "2024-09-12T03:00:00.000Z",
     "dataFim": "2024-10-31T03:00:00.000Z",
     "dias": 50
   },
   {
-    "matricula": "13151843",
+    "matricula": 13151843,
     "nomeCompleto": "LETICIA MARIA DOS SANTOS",
+    "motivo": 15,
     "dataInicio": "2024-11-01T03:00:00.000Z",
     "dataFim": "2024-12-30T03:00:00.000Z",
     "dias": 60
   },
   {
-    "matricula": "13151843",
-    "nomeCompleto": "LETICIA MARIA DOS SANTOS",
-    "motivo": 2,
-    "dataInicio": "2023-10-24T03:00:00.000Z",
-    "dataFim": "2023-11-02T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13151844",
-    "nomeCompleto": "DARCI SANTOS CARDOSO DE OLIVEIRA",
-    "dataInicio": "2023-03-16T03:00:00.000Z",
-    "dataFim": "2023-04-14T03:00:00.000Z",
-    "dias": 30
-  },
-  {
-    "matricula": "13151844",
-    "nomeCompleto": "DARCI SANTOS CARDOSO DE OLIVEIRA",
-    "dataInicio": "2023-04-15T03:00:00.000Z",
-    "dataFim": "2023-04-24T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13151844",
-    "nomeCompleto": "DARCI SANTOS CARDOSO DE OLIVEIRA",
-    "motivo": 2,
-    "dataInicio": "2023-03-08T03:00:00.000Z",
-    "dataFim": "2023-03-15T03:00:00.000Z",
-    "dias": 8
-  },
-  {
-    "matricula": "13151917",
-    "nomeCompleto": "JOSE VALDEK GONCALVES COSTA",
-    "motivo": 2,
-    "dataInicio": "2024-05-23T03:00:00.000Z",
-    "dataFim": "2024-06-01T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13152073",
-    "nomeCompleto": "JOSENITA COSTA DA PURIFICACAO",
-    "dataInicio": "2024-02-07T03:00:00.000Z",
-    "dataFim": "2024-03-07T03:00:00.000Z",
-    "dias": 30
-  },
-  {
-    "matricula": "13152073",
-    "nomeCompleto": "JOSENITA COSTA DA PURIFICACAO",
-    "dataInicio": "2024-03-08T03:00:00.000Z",
-    "dataFim": "2024-06-05T03:00:00.000Z",
+    "matricula": 13151928,
+    "nomeCompleto": "CLOVIS ALVES MOURA",
+    "motivo": 15,
+    "dataInicio": "2025-03-18T03:00:00.000Z",
+    "dataFim": "2025-06-15T03:00:00.000Z",
     "dias": 90
   },
   {
-    "matricula": "13152073",
-    "nomeCompleto": "JOSENITA COSTA DA PURIFICACAO",
-    "dataInicio": "2024-06-06T03:00:00.000Z",
-    "dataFim": "2024-08-04T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13152073",
-    "nomeCompleto": "JOSENITA COSTA DA PURIFICACAO",
+    "matricula": 13151928,
+    "nomeCompleto": "CLOVIS ALVES MOURA",
     "motivo": 2,
-    "dataInicio": "2022-08-18T03:00:00.000Z",
-    "dataFim": "2022-08-31T03:00:00.000Z",
-    "dias": 14
-  },
-  {
-    "matricula": "13152074",
-    "nomeCompleto": "MOISES ARAUJO ANDRADE",
-    "motivo": 2,
-    "dataInicio": "2023-05-02T03:00:00.000Z",
-    "dataFim": "2023-05-08T03:00:00.000Z",
-    "dias": 7
-  },
-  {
-    "matricula": "13152153",
-    "nomeCompleto": "MARIA DE FATIMA ALVES DA SILVA",
-    "motivo": 2,
-    "dataInicio": "2023-03-14T03:00:00.000Z",
-    "dataFim": "2023-03-23T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13152154",
-    "nomeCompleto": "MARIA AURINA PEREIRA SILVA",
-    "motivo": 2,
-    "dataInicio": "2023-09-13T03:00:00.000Z",
-    "dataFim": "2023-09-27T03:00:00.000Z",
-    "dias": 15
-  },
-  {
-    "matricula": "13152154",
-    "nomeCompleto": "MARIA AURINA PEREIRA SILVA",
-    "motivo": 2,
-    "dataInicio": "2023-06-26T03:00:00.000Z",
-    "dataFim": "2023-06-26T03:00:00.000Z",
-    "dias": 1
-  },
-  {
-    "matricula": "13152154",
-    "nomeCompleto": "MARIA AURINA PEREIRA SILVA",
-    "motivo": 2,
-    "dataInicio": "2024-02-28T03:00:00.000Z",
-    "dataFim": "2024-03-01T03:00:00.000Z",
+    "dataInicio": "2025-01-01T03:00:00.000Z",
+    "dataFim": "2025-01-03T03:00:00.000Z",
     "dias": 3
   },
   {
-    "matricula": "13152190",
-    "nomeCompleto": "MARLENE BARBOSA SANTOS",
-    "dataInicio": "2023-08-11T03:00:00.000Z",
-    "dataFim": "2023-10-09T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13152190",
-    "nomeCompleto": "MARLENE BARBOSA SANTOS",
-    "dataInicio": "2023-10-10T03:00:00.000Z",
-    "dataFim": "2023-12-08T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13152190",
-    "nomeCompleto": "MARLENE BARBOSA SANTOS",
-    "dataInicio": "2023-12-09T03:00:00.000Z",
-    "dataFim": "2024-02-06T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13152190",
-    "nomeCompleto": "MARLENE BARBOSA SANTOS",
-    "dataInicio": "2024-02-07T03:00:00.000Z",
-    "dataFim": "2024-04-06T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13152190",
-    "nomeCompleto": "MARLENE BARBOSA SANTOS",
-    "dataInicio": "2024-04-07T03:00:00.000Z",
-    "dataFim": "2024-07-05T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13152193",
-    "nomeCompleto": "JOSENILDA DOS SANTOS FERREIRA SILVA",
+    "matricula": 13152154,
+    "nomeCompleto": "MARIA AURINA PEREIRA SILVA",
     "motivo": 2,
-    "dataInicio": "2024-05-06T03:00:00.000Z",
-    "dataFim": "2024-05-10T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "13152246",
-    "nomeCompleto": "SANDRO CERQUEIRA OLIVEIRA",
-    "motivo": 2,
-    "dataInicio": "2023-04-13T03:00:00.000Z",
-    "dataFim": "2023-04-17T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "13152246",
-    "nomeCompleto": "SANDRO CERQUEIRA OLIVEIRA",
-    "motivo": 2,
-    "dataInicio": "2024-02-29T03:00:00.000Z",
-    "dataFim": "2024-03-09T03:00:00.000Z",
+    "dataInicio": "2025-02-27T03:00:00.000Z",
+    "dataFim": "2025-03-08T03:00:00.000Z",
     "dias": 10
   },
   {
-    "matricula": "13152274",
-    "nomeCompleto": "MARISA GONCALVES COSTA",
+    "matricula": 13152154,
+    "nomeCompleto": "MARIA AURINA PEREIRA SILVA",
     "motivo": 2,
-    "dataInicio": "2023-04-13T03:00:00.000Z",
-    "dataFim": "2023-04-21T03:00:00.000Z",
-    "dias": 9
+    "dataInicio": "2025-03-24T03:00:00.000Z",
+    "dataFim": "2025-04-02T03:00:00.000Z",
+    "dias": 10
   },
   {
-    "matricula": "13152274",
-    "nomeCompleto": "MARISA GONCALVES COSTA",
+    "matricula": 13152255,
+    "nomeCompleto": "TIOMIRES DA SILVA SOARES DE OLIVEIRA",
     "motivo": 2,
-    "dataInicio": "2023-07-28T03:00:00.000Z",
-    "dataFim": "2023-08-01T03:00:00.000Z",
-    "dias": 5
+    "dataInicio": "2025-03-14T03:00:00.000Z",
+    "dataFim": "2025-03-14T03:00:00.000Z",
+    "dias": 1
   },
   {
-    "matricula": "13152324",
-    "nomeCompleto": "MARIA ALBERTINA AMARAL OLIVEIRA",
+    "matricula": 13152255,
+    "nomeCompleto": "TIOMIRES DA SILVA SOARES DE OLIVEIRA",
     "motivo": 2,
-    "dataInicio": "2023-04-13T03:00:00.000Z",
-    "dataFim": "2023-04-17T03:00:00.000Z",
-    "dias": 5
+    "dataInicio": "2025-03-17T03:00:00.000Z",
+    "dataFim": "2025-03-17T03:00:00.000Z",
+    "dias": 1
   },
   {
-    "matricula": "13152324",
-    "nomeCompleto": "MARIA ALBERTINA AMARAL OLIVEIRA",
-    "motivo": 2,
-    "dataInicio": "2023-04-18T03:00:00.000Z",
-    "dataFim": "2023-04-21T03:00:00.000Z",
-    "dias": 4
-  },
-  {
-    "matricula": "13152374",
-    "nomeCompleto": "ELDA RODRIGUES MOREIRA",
-    "dataInicio": "2023-01-31T03:00:00.000Z",
-    "dataFim": "2023-02-03T03:00:00.000Z",
-    "dias": 4
-  },
-  {
-    "matricula": "13152377",
-    "nomeCompleto": "DOMINGOS REQUIAO DE OLIVEIRA",
-    "dataInicio": "2024-01-30T03:00:00.000Z",
-    "dataFim": "2024-03-29T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13152377",
-    "nomeCompleto": "DOMINGOS REQUIAO DE OLIVEIRA",
-    "dataInicio": "2024-03-30T03:00:00.000Z",
-    "dataFim": "2024-04-28T03:00:00.000Z",
-    "dias": 30
-  },
-  {
-    "matricula": "13152425",
-    "nomeCompleto": "UMBELINA MACEDO DOS SANTOS RIBEIRO",
-    "motivo": 2,
-    "dataInicio": "2023-03-29T03:00:00.000Z",
-    "dataFim": "2023-04-04T03:00:00.000Z",
-    "dias": 7
-  },
-  {
-    "matricula": "13152442",
-    "nomeCompleto": "JOELENO DIAS DE SOUZA",
-    "dataInicio": "2023-04-14T03:00:00.000Z",
-    "dataFim": "2023-05-13T03:00:00.000Z",
-    "dias": 30
-  },
-  {
-    "matricula": "13152454",
+    "matricula": 13152454,
     "nomeCompleto": "MARIA CRISTINA CONCEICAO PONDE",
     "motivo": 2,
     "dataInicio": "2024-12-02T03:00:00.000Z",
@@ -749,303 +104,55 @@
     "dias": 10
   },
   {
-    "matricula": "13152488",
-    "nomeCompleto": "JADILSON ALVES MOTA",
-    "motivo": 2,
-    "dataInicio": "2023-01-31T03:00:00.000Z",
-    "dataFim": "2023-02-09T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13152491",
-    "nomeCompleto": "RAYNALDA SOARES BRITO",
-    "dataInicio": "2022-01-17T03:00:00.000Z",
-    "dataFim": "2022-03-17T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13152491",
-    "nomeCompleto": "RAYNALDA SOARES BRITO",
-    "dataInicio": "2024-04-01T03:00:00.000Z",
-    "dataFim": "2024-04-12T03:00:00.000Z",
-    "dias": 12
-  },
-  {
-    "matricula": "13152554",
-    "nomeCompleto": "IONE CARVALHO DE ARAUJO CARDOSO",
-    "motivo": 2,
-    "dataInicio": "2024-04-01T03:00:00.000Z",
-    "dataFim": "2024-04-04T03:00:00.000Z",
-    "dias": 4
-  },
-  {
-    "matricula": "13152554",
-    "nomeCompleto": "IONE CARVALHO DE ARAUJO CARDOSO",
-    "motivo": 2,
-    "dataInicio": "2024-04-05T03:00:00.000Z",
-    "dataFim": "2024-04-10T03:00:00.000Z",
-    "dias": 6
-  },
-  {
-    "matricula": "13152564",
+    "matricula": 13152564,
     "nomeCompleto": "JORGE ROBERTO DOS SANTOS",
-    "dataInicio": "2024-03-30T03:00:00.000Z",
-    "dataFim": "2024-06-07T03:00:00.000Z",
-    "dias": 70
-  },
-  {
-    "matricula": "13152564",
-    "nomeCompleto": "JORGE ROBERTO DOS SANTOS",
-    "dataInicio": "2024-06-08T03:00:00.000Z",
-    "dataFim": "2024-08-06T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13152564",
-    "nomeCompleto": "JORGE ROBERTO DOS SANTOS",
+    "motivo": 15,
     "dataInicio": "2024-08-07T03:00:00.000Z",
     "dataFim": "2024-10-05T03:00:00.000Z",
     "dias": 60
   },
   {
-    "matricula": "13152564",
+    "matricula": 13152564,
     "nomeCompleto": "JORGE ROBERTO DOS SANTOS",
+    "motivo": 15,
     "dataInicio": "2024-10-06T03:00:00.000Z",
     "dataFim": "2024-12-04T03:00:00.000Z",
     "dias": 60
   },
   {
-    "matricula": "13152564",
+    "matricula": 13152564,
     "nomeCompleto": "JORGE ROBERTO DOS SANTOS",
+    "motivo": 15,
     "dataInicio": "2024-12-05T03:00:00.000Z",
     "dataFim": "2025-02-02T03:00:00.000Z",
     "dias": 60
   },
   {
-    "matricula": "13152588",
-    "nomeCompleto": "CARLOS DA CRUZ BRITO",
-    "motivo": 2,
-    "dataInicio": "2022-05-19T03:00:00.000Z",
-    "dataFim": "2022-05-28T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13152588",
-    "nomeCompleto": "CARLOS DA CRUZ BRITO",
-    "motivo": 2,
-    "dataInicio": "2024-05-08T03:00:00.000Z",
-    "dataFim": "2024-05-17T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13152594",
-    "nomeCompleto": "NORMA SUELY TEIXEIRA ROCHA",
-    "dataInicio": "2022-04-23T03:00:00.000Z",
-    "dataFim": "2022-07-11T03:00:00.000Z",
+    "matricula": 13152696,
+    "nomeCompleto": "IZABEL ALVES DOS ANJOS",
+    "motivo": 15,
+    "dataInicio": "2025-03-17T03:00:00.000Z",
+    "dataFim": "2025-06-04T03:00:00.000Z",
     "dias": 80
   },
   {
-    "matricula": "13152594",
-    "nomeCompleto": "NORMA SUELY TEIXEIRA ROCHA",
+    "matricula": 13152700,
+    "nomeCompleto": "ELIADE ANDRADE DE SANTANA",
     "motivo": 2,
-    "dataInicio": "2022-03-28T03:00:00.000Z",
-    "dataFim": "2022-04-06T03:00:00.000Z",
+    "dataInicio": "2025-02-14T03:00:00.000Z",
+    "dataFim": "2025-02-23T03:00:00.000Z",
     "dias": 10
   },
   {
-    "matricula": "13152695",
-    "nomeCompleto": "ILMA DE MELO NASCIMENTO",
-    "motivo": 2,
-    "dataInicio": "2023-09-12T03:00:00.000Z",
-    "dataFim": "2023-09-18T03:00:00.000Z",
-    "dias": 7
+    "matricula": 13153366,
+    "nomeCompleto": "ANA NERY CARVALHO SANTANA",
+    "motivo": 15,
+    "dataInicio": "2024-11-18T03:00:00.000Z",
+    "dataFim": "2024-12-22T03:00:00.000Z",
+    "dias": 35
   },
   {
-    "matricula": "13152744",
-    "nomeCompleto": "ANA CRISTINA CORREIA MESQUITA",
-    "dataInicio": "2023-09-18T03:00:00.000Z",
-    "dataFim": "2023-12-16T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13152744",
-    "nomeCompleto": "ANA CRISTINA CORREIA MESQUITA",
-    "motivo": 2,
-    "dataInicio": "2023-09-08T03:00:00.000Z",
-    "dataFim": "2023-09-17T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13152830",
-    "nomeCompleto": "SERGIO DA SILVA SANTANA",
-    "dataInicio": "2023-10-07T03:00:00.000Z",
-    "dataFim": "2023-10-21T03:00:00.000Z",
-    "dias": 15
-  },
-  {
-    "matricula": "13152830",
-    "nomeCompleto": "SERGIO DA SILVA SANTANA",
-    "motivo": 2,
-    "dataInicio": "2023-04-11T03:00:00.000Z",
-    "dataFim": "2023-04-20T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13152841",
-    "nomeCompleto": "MARIA CRISTINA SANTOS DE AZEVEDO",
-    "dataInicio": "2024-03-02T03:00:00.000Z",
-    "dataFim": "2024-03-15T03:00:00.000Z",
-    "dias": 14
-  },
-  {
-    "matricula": "13152843",
-    "nomeCompleto": "FRANCISCO AURELIO RODRIGUES BRASILEIRO",
-    "dataInicio": "2024-01-29T03:00:00.000Z",
-    "dataFim": "2024-04-27T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13152843",
-    "nomeCompleto": "FRANCISCO AURELIO RODRIGUES BRASILEIRO",
-    "dataInicio": "2024-04-28T03:00:00.000Z",
-    "dataFim": "2024-07-26T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13152845",
-    "nomeCompleto": "MONICA VIANNA CHAVES",
-    "dataInicio": "2023-10-21T03:00:00.000Z",
-    "dataFim": "2023-12-19T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13152845",
-    "nomeCompleto": "MONICA VIANNA CHAVES",
-    "motivo": 2,
-    "dataInicio": "2023-10-11T03:00:00.000Z",
-    "dataFim": "2023-10-20T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13154802",
-    "nomeCompleto": "MARIA LUIZA DE SANTANA SANTOS",
-    "motivo": 2,
-    "dataInicio": "2023-07-27T03:00:00.000Z",
-    "dataFim": "2023-08-09T03:00:00.000Z",
-    "dias": 14
-  },
-  {
-    "matricula": "13155941",
-    "nomeCompleto": "IBIS DO SOCORRO REIS FEITOSA",
-    "dataInicio": "2022-09-26T03:00:00.000Z",
-    "dataFim": "2022-10-16T03:00:00.000Z",
-    "dias": 21
-  },
-  {
-    "matricula": "13155950",
-    "nomeCompleto": "GERALDO CALDAS BARROS",
-    "motivo": 2,
-    "dataInicio": "2023-01-06T03:00:00.000Z",
-    "dataFim": "2023-01-11T03:00:00.000Z",
-    "dias": 6
-  },
-  {
-    "matricula": "13160350",
-    "nomeCompleto": "GERUSA SORAYA VEIGA",
-    "dataInicio": "2023-08-28T03:00:00.000Z",
-    "dataFim": "2023-10-26T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13160350",
-    "nomeCompleto": "GERUSA SORAYA VEIGA",
-    "dataInicio": "2023-10-27T03:00:00.000Z",
-    "dataFim": "2023-12-25T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13160350",
-    "nomeCompleto": "GERUSA SORAYA VEIGA",
-    "dataInicio": "2023-12-26T03:00:00.000Z",
-    "dataFim": "2024-02-23T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13160350",
-    "nomeCompleto": "GERUSA SORAYA VEIGA",
-    "dataInicio": "2024-02-24T03:00:00.000Z",
-    "dataFim": "2024-05-23T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13160351",
-    "nomeCompleto": "ANA BEATRIZ FERREIRA NASCIMENTO",
-    "motivo": 2,
-    "dataInicio": "2023-07-17T03:00:00.000Z",
-    "dataFim": "2023-07-21T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "13160374",
-    "nomeCompleto": "MARIA DE FATIMA DOS SANTOS MOTA SANTANA",
-    "motivo": 2,
-    "dataInicio": "2023-11-20T03:00:00.000Z",
-    "dataFim": "2023-11-29T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13160587",
-    "nomeCompleto": "ANTONIO JOSE SILVA DAS VIRGENS",
-    "dataInicio": "2022-02-02T03:00:00.000Z",
-    "dataFim": "2022-04-02T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13160587",
-    "nomeCompleto": "ANTONIO JOSE SILVA DAS VIRGENS",
-    "dataInicio": "2022-04-03T03:00:00.000Z",
-    "dataFim": "2022-06-01T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13160587",
-    "nomeCompleto": "ANTONIO JOSE SILVA DAS VIRGENS",
-    "dataInicio": "2022-06-02T03:00:00.000Z",
-    "dataFim": "2022-08-30T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13160587",
-    "nomeCompleto": "ANTONIO JOSE SILVA DAS VIRGENS",
-    "dataInicio": "2022-08-31T03:00:00.000Z",
-    "dataFim": "2022-11-28T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13160587",
-    "nomeCompleto": "ANTONIO JOSE SILVA DAS VIRGENS",
-    "dataInicio": "2022-11-29T03:00:00.000Z",
-    "dataFim": "2023-01-27T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13161786",
-    "nomeCompleto": "SUELY CUNHA DA FONSECA",
-    "motivo": 2,
-    "dataInicio": "2022-08-17T03:00:00.000Z",
-    "dataFim": "2022-08-26T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13162107",
-    "nomeCompleto": "CLAUDIO JOSE SILVA TEIXEIRA",
-    "motivo": 2,
-    "dataInicio": "2023-09-13T03:00:00.000Z",
-    "dataFim": "2023-09-14T03:00:00.000Z",
-    "dias": 2
-  },
-  {
-    "matricula": "13170621",
+    "matricula": 13170621,
     "nomeCompleto": "ROBERTO LUIZ PIMENTEL LERNER",
     "motivo": 2,
     "dataInicio": "2024-12-06T03:00:00.000Z",
@@ -1053,22 +160,7 @@
     "dias": 10
   },
   {
-    "matricula": "13170623",
-    "nomeCompleto": "SUELI SANTOS BARRETO",
-    "dataInicio": "2022-06-15T03:00:00.000Z",
-    "dataFim": "2022-07-04T03:00:00.000Z",
-    "dias": 20
-  },
-  {
-    "matricula": "13170623",
-    "nomeCompleto": "SUELI SANTOS BARRETO",
-    "motivo": 2,
-    "dataInicio": "2022-06-05T03:00:00.000Z",
-    "dataFim": "2022-06-14T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13191687",
+    "matricula": 13191687,
     "nomeCompleto": "TERESA CRISTINA VILELA HINAIN",
     "motivo": 2,
     "dataInicio": "2024-11-08T03:00:00.000Z",
@@ -1076,174 +168,23 @@
     "dias": 5
   },
   {
-    "matricula": "13191815",
-    "nomeCompleto": "CARLOS JOSE FREITAS MACHADO",
-    "dataInicio": "2022-11-01T03:00:00.000Z",
-    "dataFim": "2023-01-29T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13192189",
-    "nomeCompleto": "PAULO ROBERTO GUEDES FONSECA",
-    "dataInicio": "2023-03-16T03:00:00.000Z",
-    "dataFim": "2023-05-14T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13203622",
+    "matricula": 13203622,
     "nomeCompleto": "CLEMILDA SOUZA MOURA",
-    "motivo": 2,
-    "dataInicio": "2022-08-03T03:00:00.000Z",
-    "dataFim": "2022-08-11T03:00:00.000Z",
-    "dias": 9
-  },
-  {
-    "matricula": "13206865",
-    "nomeCompleto": "ANTONIO FERNANDO REIS DE ALMEIDA",
-    "motivo": 2,
-    "dataInicio": "2023-01-25T03:00:00.000Z",
-    "dataFim": "2023-02-03T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13206896",
-    "nomeCompleto": "OTHONIEL SANTOS FILHO",
-    "dataInicio": "2023-01-19T03:00:00.000Z",
-    "dataFim": "2023-03-09T03:00:00.000Z",
-    "dias": 50
-  },
-  {
-    "matricula": "13206951",
-    "nomeCompleto": "GERALDA INES TEIXEIRA COSTA",
-    "dataInicio": "2022-05-14T03:00:00.000Z",
-    "dataFim": "2022-05-31T03:00:00.000Z",
-    "dias": 18
-  },
-  {
-    "matricula": "13206951",
-    "nomeCompleto": "GERALDA INES TEIXEIRA COSTA",
-    "dataInicio": "2022-08-25T03:00:00.000Z",
-    "dataFim": "2022-10-23T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13206951",
-    "nomeCompleto": "GERALDA INES TEIXEIRA COSTA",
-    "motivo": 2,
-    "dataInicio": "2022-08-15T03:00:00.000Z",
-    "dataFim": "2022-08-24T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13207607",
-    "nomeCompleto": "VALMICE GARCIA SANTOS CUNHA",
-    "motivo": 2,
-    "dataInicio": "2024-04-10T03:00:00.000Z",
-    "dataFim": "2024-04-12T03:00:00.000Z",
-    "dias": 3
-  },
-  {
-    "matricula": "13207607",
-    "nomeCompleto": "VALMICE GARCIA SANTOS CUNHA",
-    "motivo": 2,
-    "dataInicio": "2024-04-15T03:00:00.000Z",
-    "dataFim": "2024-04-19T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "13207607",
-    "nomeCompleto": "VALMICE GARCIA SANTOS CUNHA",
-    "motivo": 2,
-    "dataInicio": "2024-04-20T03:00:00.000Z",
-    "dataFim": "2024-04-25T03:00:00.000Z",
-    "dias": 6
-  },
-  {
-    "matricula": "13209250",
-    "nomeCompleto": "MARIA SYBELE GUSMAO ALVES DIAS CORREIA S",
-    "dataInicio": "2023-04-05T03:00:00.000Z",
-    "dataFim": "2023-05-19T03:00:00.000Z",
-    "dias": 45
-  },
-  {
-    "matricula": "13209276",
-    "nomeCompleto": "JORGE EDUARDO SILVA BENEVIDES",
-    "motivo": 2,
-    "dataInicio": "2022-05-12T03:00:00.000Z",
-    "dataFim": "2022-05-21T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13209276",
-    "nomeCompleto": "JORGE EDUARDO SILVA BENEVIDES",
-    "motivo": 2,
-    "dataInicio": "2022-05-24T03:00:00.000Z",
-    "dataFim": "2022-06-02T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13209276",
-    "nomeCompleto": "JORGE EDUARDO SILVA BENEVIDES",
-    "motivo": 2,
-    "dataInicio": "2022-08-18T03:00:00.000Z",
-    "dataFim": "2022-08-27T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13209276",
-    "nomeCompleto": "JORGE EDUARDO SILVA BENEVIDES",
-    "motivo": 2,
-    "dataInicio": "2022-08-30T03:00:00.000Z",
-    "dataFim": "2022-09-08T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13209276",
-    "nomeCompleto": "JORGE EDUARDO SILVA BENEVIDES",
-    "motivo": 2,
-    "dataInicio": "2022-11-16T03:00:00.000Z",
-    "dataFim": "2022-11-25T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13209276",
-    "nomeCompleto": "JORGE EDUARDO SILVA BENEVIDES",
-    "motivo": 2,
-    "dataInicio": "2023-02-23T03:00:00.000Z",
-    "dataFim": "2023-03-04T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13210312",
-    "nomeCompleto": "SOLANGE MARIA PACHECO MAGALHAES",
-    "dataInicio": "2022-05-22T03:00:00.000Z",
-    "dataFim": "2022-07-20T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13210312",
-    "nomeCompleto": "SOLANGE MARIA PACHECO MAGALHAES",
-    "dataInicio": "2022-07-21T03:00:00.000Z",
-    "dataFim": "2022-07-30T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13210312",
-    "nomeCompleto": "SOLANGE MARIA PACHECO MAGALHAES",
-    "dataInicio": "2023-09-15T03:00:00.000Z",
-    "dataFim": "2023-12-13T03:00:00.000Z",
+    "motivo": 15,
+    "dataInicio": "2025-03-17T03:00:00.000Z",
+    "dataFim": "2025-06-14T03:00:00.000Z",
     "dias": 90
   },
   {
-    "matricula": "13210313",
-    "nomeCompleto": "NOE AMERICO MASCARENHAS FILHO",
+    "matricula": 13210311,
+    "nomeCompleto": "ARIOLANDO EDUAO FERREIRA",
     "motivo": 2,
-    "dataInicio": "2022-06-25T03:00:00.000Z",
-    "dataFim": "2022-07-02T03:00:00.000Z",
-    "dias": 8
+    "dataInicio": "2025-03-15T03:00:00.000Z",
+    "dataFim": "2025-03-29T03:00:00.000Z",
+    "dias": 15
   },
   {
-    "matricula": "13210331",
+    "matricula": 13210331,
     "nomeCompleto": "WASHINGTON LUIZ DE OLIVEIRA PORTUGAL",
     "motivo": 2,
     "dataInicio": "2024-12-02T03:00:00.000Z",
@@ -1251,167 +192,15 @@
     "dias": 10
   },
   {
-    "matricula": "13210373",
-    "nomeCompleto": "GENISSON BARBOSA VIANA",
-    "motivo": 2,
-    "dataInicio": "2022-11-29T03:00:00.000Z",
-    "dataFim": "2022-12-05T03:00:00.000Z",
-    "dias": 7
-  },
-  {
-    "matricula": "13210406",
-    "nomeCompleto": "ADRIANO DE QUEIROZ ALVES",
-    "dataInicio": "2023-11-28T03:00:00.000Z",
-    "dataFim": "2024-03-26T03:00:00.000Z",
-    "dias": 120
-  },
-  {
-    "matricula": "13210409",
-    "nomeCompleto": "MONICA CALIXTO POLITO BARRETO",
-    "motivo": 2,
-    "dataInicio": "2023-09-18T03:00:00.000Z",
-    "dataFim": "2023-09-27T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13210409",
-    "nomeCompleto": "MONICA CALIXTO POLITO BARRETO",
-    "motivo": 2,
-    "dataInicio": "2023-10-26T03:00:00.000Z",
-    "dataFim": "2023-11-04T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13210425",
-    "nomeCompleto": "JESNER ANDRADE BARBOSA",
-    "dataInicio": "2022-11-21T03:00:00.000Z",
-    "dataFim": "2022-12-20T03:00:00.000Z",
-    "dias": 30
-  },
-  {
-    "matricula": "13210426",
-    "nomeCompleto": "MARIA AMORIM DOS REIS GOMES",
-    "dataInicio": "2023-11-20T03:00:00.000Z",
-    "dataFim": "2024-01-03T03:00:00.000Z",
-    "dias": 45
-  },
-  {
-    "matricula": "13210426",
-    "nomeCompleto": "MARIA AMORIM DOS REIS GOMES",
-    "dataInicio": "2024-01-04T03:00:00.000Z",
-    "dataFim": "2024-04-02T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13210430",
-    "nomeCompleto": "ROBERVAL MACEDO NOBREGA",
-    "dataInicio": "2022-04-12T03:00:00.000Z",
-    "dataFim": "2022-06-10T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13210430",
-    "nomeCompleto": "ROBERVAL MACEDO NOBREGA",
-    "dataInicio": "2022-06-11T03:00:00.000Z",
-    "dataFim": "2022-08-09T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13210430",
-    "nomeCompleto": "ROBERVAL MACEDO NOBREGA",
-    "dataInicio": "2023-05-18T03:00:00.000Z",
-    "dataFim": "2023-07-16T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13210430",
-    "nomeCompleto": "ROBERVAL MACEDO NOBREGA",
-    "dataInicio": "2023-10-03T03:00:00.000Z",
-    "dataFim": "2023-12-01T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13210430",
+    "matricula": 13210430,
     "nomeCompleto": "ROBERVAL MACEDO NOBREGA",
     "motivo": 2,
-    "dataInicio": "2022-04-05T03:00:00.000Z",
-    "dataFim": "2022-04-11T03:00:00.000Z",
-    "dias": 7
+    "dataInicio": "2025-02-06T03:00:00.000Z",
+    "dataFim": "2025-02-10T03:00:00.000Z",
+    "dias": 5
   },
   {
-    "matricula": "13210430",
-    "nomeCompleto": "ROBERVAL MACEDO NOBREGA",
-    "motivo": 2,
-    "dataInicio": "2023-01-19T03:00:00.000Z",
-    "dataFim": "2023-01-28T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13210430",
-    "nomeCompleto": "ROBERVAL MACEDO NOBREGA",
-    "motivo": 2,
-    "dataInicio": "2023-02-20T03:00:00.000Z",
-    "dataFim": "2023-02-27T03:00:00.000Z",
-    "dias": 8
-  },
-  {
-    "matricula": "13210430",
-    "nomeCompleto": "ROBERVAL MACEDO NOBREGA",
-    "motivo": 2,
-    "dataInicio": "2023-03-21T03:00:00.000Z",
-    "dataFim": "2023-03-22T03:00:00.000Z",
-    "dias": 2
-  },
-  {
-    "matricula": "13210430",
-    "nomeCompleto": "ROBERVAL MACEDO NOBREGA",
-    "motivo": 2,
-    "dataInicio": "2023-04-20T03:00:00.000Z",
-    "dataFim": "2023-04-26T03:00:00.000Z",
-    "dias": 7
-  },
-  {
-    "matricula": "13210430",
-    "nomeCompleto": "ROBERVAL MACEDO NOBREGA",
-    "motivo": 2,
-    "dataInicio": "2023-05-06T03:00:00.000Z",
-    "dataFim": "2023-05-08T03:00:00.000Z",
-    "dias": 3
-  },
-  {
-    "matricula": "13210430",
-    "nomeCompleto": "ROBERVAL MACEDO NOBREGA",
-    "motivo": 2,
-    "dataInicio": "2023-05-09T03:00:00.000Z",
-    "dataFim": "2023-05-11T03:00:00.000Z",
-    "dias": 3
-  },
-  {
-    "matricula": "13210430",
-    "nomeCompleto": "ROBERVAL MACEDO NOBREGA",
-    "motivo": 2,
-    "dataInicio": "2023-08-02T03:00:00.000Z",
-    "dataFim": "2023-08-11T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13210430",
-    "nomeCompleto": "ROBERVAL MACEDO NOBREGA",
-    "motivo": 2,
-    "dataInicio": "2023-12-07T03:00:00.000Z",
-    "dataFim": "2023-12-10T03:00:00.000Z",
-    "dias": 4
-  },
-  {
-    "matricula": "13210430",
-    "nomeCompleto": "ROBERVAL MACEDO NOBREGA",
-    "motivo": 2,
-    "dataInicio": "2023-12-21T03:00:00.000Z",
-    "dataFim": "2023-12-23T03:00:00.000Z",
-    "dias": 3
-  },
-  {
-    "matricula": "13210431",
+    "matricula": 13210431,
     "nomeCompleto": "MOISES SOUZA DE RESENDE",
     "motivo": 2,
     "dataInicio": "2024-09-09T03:00:00.000Z",
@@ -1419,135 +208,15 @@
     "dias": 5
   },
   {
-    "matricula": "13210436",
-    "nomeCompleto": "MARIA DO SOCORRO SODRE PINHEIRO",
-    "motivo": 2,
-    "dataInicio": "2024-11-21T03:00:00.000Z",
-    "dataFim": "2024-11-30T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13210738",
+    "matricula": 13210738,
     "nomeCompleto": "EROTILDES OLIVEIRA MARTINS",
-    "dataInicio": "2022-07-08T03:00:00.000Z",
-    "dataFim": "2022-09-05T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13210738",
-    "nomeCompleto": "EROTILDES OLIVEIRA MARTINS",
-    "dataInicio": "2022-09-06T03:00:00.000Z",
-    "dataFim": "2022-11-04T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13210738",
-    "nomeCompleto": "EROTILDES OLIVEIRA MARTINS",
-    "dataInicio": "2023-01-27T03:00:00.000Z",
-    "dataFim": "2023-03-27T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13210738",
-    "nomeCompleto": "EROTILDES OLIVEIRA MARTINS",
-    "dataInicio": "2023-05-16T03:00:00.000Z",
-    "dataFim": "2023-07-14T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13210738",
-    "nomeCompleto": "EROTILDES OLIVEIRA MARTINS",
-    "dataInicio": "2023-07-15T03:00:00.000Z",
-    "dataFim": "2023-10-12T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13210738",
-    "nomeCompleto": "EROTILDES OLIVEIRA MARTINS",
-    "dataInicio": "2023-10-13T03:00:00.000Z",
-    "dataFim": "2024-01-10T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13210738",
-    "nomeCompleto": "EROTILDES OLIVEIRA MARTINS",
+    "motivo": 15,
     "dataInicio": "2024-10-12T03:00:00.000Z",
     "dataFim": "2024-12-25T03:00:00.000Z",
     "dias": 75
   },
   {
-    "matricula": "13210740",
-    "nomeCompleto": "JONALVO GUERRA DOS SANTOS",
-    "motivo": 2,
-    "dataInicio": "2022-11-29T03:00:00.000Z",
-    "dataFim": "2022-12-07T03:00:00.000Z",
-    "dias": 9
-  },
-  {
-    "matricula": "13211329",
-    "nomeCompleto": "ALEXINALDO DA SILVA LIMA",
-    "dataInicio": "2022-02-07T03:00:00.000Z",
-    "dataFim": "2022-04-07T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13211329",
-    "nomeCompleto": "ALEXINALDO DA SILVA LIMA",
-    "dataInicio": "2022-04-08T03:00:00.000Z",
-    "dataFim": "2022-05-07T03:00:00.000Z",
-    "dias": 30
-  },
-  {
-    "matricula": "13211329",
-    "nomeCompleto": "ALEXINALDO DA SILVA LIMA",
-    "dataInicio": "2022-05-08T03:00:00.000Z",
-    "dataFim": "2022-07-06T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13211329",
-    "nomeCompleto": "ALEXINALDO DA SILVA LIMA",
-    "dataInicio": "2022-07-07T03:00:00.000Z",
-    "dataFim": "2022-09-04T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13211329",
-    "nomeCompleto": "ALEXINALDO DA SILVA LIMA",
-    "dataInicio": "2022-09-05T03:00:00.000Z",
-    "dataFim": "2022-11-03T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13211329",
-    "nomeCompleto": "ALEXINALDO DA SILVA LIMA",
-    "dataInicio": "2022-11-04T03:00:00.000Z",
-    "dataFim": "2022-12-03T03:00:00.000Z",
-    "dias": 30
-  },
-  {
-    "matricula": "13211329",
-    "nomeCompleto": "ALEXINALDO DA SILVA LIMA",
-    "dataInicio": "2022-12-04T03:00:00.000Z",
-    "dataFim": "2023-02-01T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13211329",
-    "nomeCompleto": "ALEXINALDO DA SILVA LIMA",
-    "dataInicio": "2023-02-02T03:00:00.000Z",
-    "dataFim": "2023-03-18T03:00:00.000Z",
-    "dias": 45
-  },
-  {
-    "matricula": "13211329",
-    "nomeCompleto": "ALEXINALDO DA SILVA LIMA",
-    "dataInicio": "2023-03-19T03:00:00.000Z",
-    "dataFim": "2023-05-17T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13212146",
+    "matricula": 13212146,
     "nomeCompleto": "NOEL SACRAMENTO BARRETO",
     "motivo": 2,
     "dataInicio": "2024-10-21T03:00:00.000Z",
@@ -1555,298 +224,55 @@
     "dias": 8
   },
   {
-    "matricula": "13213082",
-    "nomeCompleto": "SANDRA HELENA DE CASTRO LIMA RAMOS",
-    "dataInicio": "2023-03-23T03:00:00.000Z",
-    "dataFim": "2023-07-20T03:00:00.000Z",
-    "dias": 120
-  },
-  {
-    "matricula": "13213082",
-    "nomeCompleto": "SANDRA HELENA DE CASTRO LIMA RAMOS",
-    "dataInicio": "2023-07-21T03:00:00.000Z",
-    "dataFim": "2023-10-18T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13213082",
-    "nomeCompleto": "SANDRA HELENA DE CASTRO LIMA RAMOS",
-    "dataInicio": "2023-10-19T03:00:00.000Z",
-    "dataFim": "2024-01-16T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13213083",
-    "nomeCompleto": "CRISTIANE VIEIRA DE SOUZA",
-    "motivo": 2,
-    "dataInicio": "2024-01-30T03:00:00.000Z",
-    "dataFim": "2024-01-30T03:00:00.000Z",
-    "dias": 1
-  },
-  {
-    "matricula": "13213089",
-    "nomeCompleto": "NORANEY FERNANDES DE OLIVEIRA",
-    "dataInicio": "2022-07-31T03:00:00.000Z",
-    "dataFim": "2022-08-14T03:00:00.000Z",
-    "dias": 15
-  },
-  {
-    "matricula": "13213089",
-    "nomeCompleto": "NORANEY FERNANDES DE OLIVEIRA",
-    "motivo": 2,
-    "dataInicio": "2023-10-28T03:00:00.000Z",
-    "dataFim": "2023-11-02T03:00:00.000Z",
-    "dias": 6
-  },
-  {
-    "matricula": "13213090",
-    "nomeCompleto": "JORGE FAUSTINO DOS SANTOS FILHO",
-    "motivo": 2,
-    "dataInicio": "2023-04-01T03:00:00.000Z",
-    "dataFim": "2023-04-10T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13217364",
-    "nomeCompleto": "WASHINGTON LUIS SANTANA FONSECA",
-    "motivo": 2,
-    "dataInicio": "2022-07-01T03:00:00.000Z",
-    "dataFim": "2022-07-05T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "13217369",
-    "nomeCompleto": "CLODOMILSON DE SOUZA MOURA",
-    "dataInicio": "2022-03-17T03:00:00.000Z",
-    "dataFim": "2022-05-15T03:00:00.000Z",
+    "matricula": 13213150,
+    "nomeCompleto": "NIVALDO DOS SANTOS CORDEIRO",
+    "motivo": 15,
+    "dataInicio": "2024-11-04T03:00:00.000Z",
+    "dataFim": "2025-01-02T03:00:00.000Z",
     "dias": 60
   },
   {
-    "matricula": "13217369",
-    "nomeCompleto": "CLODOMILSON DE SOUZA MOURA",
+    "matricula": 13217450,
+    "nomeCompleto": "EMANUEL DIAS MIRANDA",
     "motivo": 2,
-    "dataInicio": "2022-03-07T03:00:00.000Z",
-    "dataFim": "2022-03-16T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13218074",
-    "nomeCompleto": "ASTENIO GUIMARAES SILVA",
-    "motivo": 2,
-    "dataInicio": "2024-04-11T03:00:00.000Z",
-    "dataFim": "2024-04-20T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13218074",
-    "nomeCompleto": "ASTENIO GUIMARAES SILVA",
-    "motivo": 2,
-    "dataInicio": "2024-09-24T03:00:00.000Z",
-    "dataFim": "2024-10-03T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13222420",
-    "nomeCompleto": "AMELIA FIGUEIREDO GUEDES",
-    "dataInicio": "2022-09-09T03:00:00.000Z",
-    "dataFim": "2022-11-07T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13222420",
-    "nomeCompleto": "AMELIA FIGUEIREDO GUEDES",
-    "dataInicio": "2022-11-08T03:00:00.000Z",
-    "dataFim": "2023-01-06T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13222420",
-    "nomeCompleto": "AMELIA FIGUEIREDO GUEDES",
-    "dataInicio": "2023-01-07T03:00:00.000Z",
-    "dataFim": "2023-03-07T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13222420",
-    "nomeCompleto": "AMELIA FIGUEIREDO GUEDES",
-    "dataInicio": "2023-03-08T03:00:00.000Z",
-    "dataFim": "2023-05-06T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13222420",
-    "nomeCompleto": "AMELIA FIGUEIREDO GUEDES",
-    "dataInicio": "2023-05-07T03:00:00.000Z",
-    "dataFim": "2023-08-04T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13222420",
-    "nomeCompleto": "AMELIA FIGUEIREDO GUEDES",
-    "dataInicio": "2023-08-05T03:00:00.000Z",
-    "dataFim": "2023-10-03T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13222420",
-    "nomeCompleto": "AMELIA FIGUEIREDO GUEDES",
-    "dataInicio": "2023-10-04T03:00:00.000Z",
-    "dataFim": "2023-12-02T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13222420",
-    "nomeCompleto": "AMELIA FIGUEIREDO GUEDES",
-    "dataInicio": "2023-12-03T03:00:00.000Z",
-    "dataFim": "2024-03-01T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13222420",
-    "nomeCompleto": "AMELIA FIGUEIREDO GUEDES",
-    "dataInicio": "2024-07-05T03:00:00.000Z",
-    "dataFim": "2024-10-02T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13222420",
-    "nomeCompleto": "AMELIA FIGUEIREDO GUEDES",
-    "motivo": 2,
-    "dataInicio": "2022-08-30T03:00:00.000Z",
-    "dataFim": "2022-09-08T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13222473",
-    "nomeCompleto": "LUCIANO MACEDO PRAZERES",
-    "motivo": 2,
-    "dataInicio": "2022-06-10T03:00:00.000Z",
-    "dataFim": "2022-06-19T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13222552",
-    "nomeCompleto": "JOSE WALTER DE SOUZA ANDRADE",
-    "dataInicio": "2023-08-21T03:00:00.000Z",
-    "dataFim": "2023-10-04T03:00:00.000Z",
-    "dias": 45
-  },
-  {
-    "matricula": "13222552",
-    "nomeCompleto": "JOSE WALTER DE SOUZA ANDRADE",
-    "dataInicio": "2023-10-05T03:00:00.000Z",
-    "dataFim": "2023-12-03T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13225928",
-    "nomeCompleto": "MARGAREIDE LEAL SAMPAIO",
-    "dataInicio": "2022-02-01T03:00:00.000Z",
-    "dataFim": "2022-03-02T03:00:00.000Z",
-    "dias": 30
-  },
-  {
-    "matricula": "13225928",
-    "nomeCompleto": "MARGAREIDE LEAL SAMPAIO",
-    "motivo": 2,
-    "dataInicio": "2024-07-01T03:00:00.000Z",
-    "dataFim": "2024-07-10T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13232111",
-    "nomeCompleto": "VALMIR RIBEIRO ROCHA",
-    "motivo": 2,
-    "dataInicio": "2022-03-17T03:00:00.000Z",
-    "dataFim": "2022-03-18T03:00:00.000Z",
-    "dias": 2
-  },
-  {
-    "matricula": "13232117",
-    "nomeCompleto": "NADJA LEITE FERNANDES",
-    "motivo": 2,
-    "dataInicio": "2023-01-20T03:00:00.000Z",
-    "dataFim": "2023-02-02T03:00:00.000Z",
-    "dias": 14
-  },
-  {
-    "matricula": "13232117",
-    "nomeCompleto": "NADJA LEITE FERNANDES",
-    "motivo": 2,
-    "dataInicio": "2023-12-12T03:00:00.000Z",
-    "dataFim": "2023-12-16T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "13232129",
-    "nomeCompleto": "ANGELICA FALCAO MOURA SOUZA",
-    "motivo": 2,
-    "dataInicio": "2022-10-10T03:00:00.000Z",
-    "dataFim": "2022-10-10T03:00:00.000Z",
-    "dias": 1
-  },
-  {
-    "matricula": "13232129",
-    "nomeCompleto": "ANGELICA FALCAO MOURA SOUZA",
-    "motivo": 2,
-    "dataInicio": "2024-05-20T03:00:00.000Z",
-    "dataFim": "2024-05-22T03:00:00.000Z",
-    "dias": 3
-  },
-  {
-    "matricula": "13232160",
-    "nomeCompleto": "ANA CRISTINA BATISTA CARDOSO DAS NEVES",
-    "dataInicio": "2023-02-01T03:00:00.000Z",
-    "dataFim": "2023-05-01T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13232160",
-    "nomeCompleto": "ANA CRISTINA BATISTA CARDOSO DAS NEVES",
-    "dataInicio": "2023-05-02T03:00:00.000Z",
-    "dataFim": "2023-06-15T03:00:00.000Z",
-    "dias": 45
-  },
-  {
-    "matricula": "13232160",
-    "nomeCompleto": "ANA CRISTINA BATISTA CARDOSO DAS NEVES",
-    "dataInicio": "2024-05-27T03:00:00.000Z",
-    "dataFim": "2024-07-25T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13232182",
-    "nomeCompleto": "IARA VIRGINIA TEIXEIRA ROCHA",
-    "motivo": 2,
-    "dataInicio": "2022-09-05T03:00:00.000Z",
-    "dataFim": "2022-09-06T03:00:00.000Z",
-    "dias": 2
-  },
-  {
-    "matricula": "13232254",
-    "nomeCompleto": "MARCOS CAMPOS SAMPAIO",
-    "dataInicio": "2022-11-03T03:00:00.000Z",
-    "dataFim": "2022-11-13T03:00:00.000Z",
-    "dias": 11
-  },
-  {
-    "matricula": "13232254",
-    "nomeCompleto": "MARCOS CAMPOS SAMPAIO",
-    "motivo": 2,
-    "dataInicio": "2022-07-06T03:00:00.000Z",
-    "dataFim": "2022-07-12T03:00:00.000Z",
+    "dataInicio": "2024-11-01T03:00:00.000Z",
+    "dataFim": "2024-11-07T03:00:00.000Z",
     "dias": 7
   },
   {
-    "matricula": "13232254",
-    "nomeCompleto": "MARCOS CAMPOS SAMPAIO",
+    "matricula": 13218074,
+    "nomeCompleto": "ASTENIO GUIMARAES SILVA",
+    "motivo": 15,
+    "dataInicio": "2024-09-24T03:00:00.000Z",
+    "dataFim": "2024-11-22T03:00:00.000Z",
+    "dias": 60
+  },
+  {
+    "matricula": 13218074,
+    "nomeCompleto": "ASTENIO GUIMARAES SILVA",
+    "motivo": 15,
+    "dataInicio": "2024-11-23T03:00:00.000Z",
+    "dataFim": "2025-02-20T03:00:00.000Z",
+    "dias": 90
+  },
+  {
+    "matricula": 13222567,
+    "nomeCompleto": "ELMON CARVALHO DOS SANTOS",
     "motivo": 2,
-    "dataInicio": "2022-10-09T03:00:00.000Z",
-    "dataFim": "2022-10-18T03:00:00.000Z",
+    "dataInicio": "2024-10-30T03:00:00.000Z",
+    "dataFim": "2024-11-06T03:00:00.000Z",
+    "dias": 8
+  },
+  {
+    "matricula": 13222567,
+    "nomeCompleto": "ELMON CARVALHO DOS SANTOS",
+    "motivo": 2,
+    "dataInicio": "2025-01-13T03:00:00.000Z",
+    "dataFim": "2025-01-22T03:00:00.000Z",
     "dias": 10
   },
   {
-    "matricula": "13232254",
+    "matricula": 13232254,
     "nomeCompleto": "MARCOS CAMPOS SAMPAIO",
     "motivo": 2,
     "dataInicio": "2024-09-11T03:00:00.000Z",
@@ -1854,267 +280,55 @@
     "dias": 10
   },
   {
-    "matricula": "13232266",
-    "nomeCompleto": "TELMA AFRO LOPES",
-    "dataInicio": "2023-03-19T03:00:00.000Z",
-    "dataFim": "2023-04-10T03:00:00.000Z",
-    "dias": 23
-  },
-  {
-    "matricula": "13232266",
-    "nomeCompleto": "TELMA AFRO LOPES",
-    "dataInicio": "2023-04-11T03:00:00.000Z",
-    "dataFim": "2023-07-09T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13232266",
-    "nomeCompleto": "TELMA AFRO LOPES",
-    "dataInicio": "2023-09-16T03:00:00.000Z",
-    "dataFim": "2023-10-30T03:00:00.000Z",
-    "dias": 45
-  },
-  {
-    "matricula": "13232266",
-    "nomeCompleto": "TELMA AFRO LOPES",
-    "dataInicio": "2023-10-31T03:00:00.000Z",
-    "dataFim": "2023-11-29T03:00:00.000Z",
-    "dias": 30
-  },
-  {
-    "matricula": "13232266",
-    "nomeCompleto": "TELMA AFRO LOPES",
-    "dataInicio": "2023-11-30T03:00:00.000Z",
-    "dataFim": "2023-12-19T03:00:00.000Z",
-    "dias": 20
-  },
-  {
-    "matricula": "13232307",
-    "nomeCompleto": "MIGUEL MACHADO DE ANDRADE NETO",
-    "motivo": 2,
-    "dataInicio": "2022-02-20T03:00:00.000Z",
-    "dataFim": "2022-02-23T03:00:00.000Z",
-    "dias": 4
-  },
-  {
-    "matricula": "13232307",
-    "nomeCompleto": "MIGUEL MACHADO DE ANDRADE NETO",
-    "motivo": 2,
-    "dataInicio": "2022-03-06T03:00:00.000Z",
-    "dataFim": "2022-03-15T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13232307",
-    "nomeCompleto": "MIGUEL MACHADO DE ANDRADE NETO",
-    "motivo": 2,
-    "dataInicio": "2022-04-11T03:00:00.000Z",
-    "dataFim": "2022-04-12T03:00:00.000Z",
-    "dias": 2
-  },
-  {
-    "matricula": "13232307",
-    "nomeCompleto": "MIGUEL MACHADO DE ANDRADE NETO",
-    "motivo": 2,
-    "dataInicio": "2022-08-27T03:00:00.000Z",
-    "dataFim": "2022-08-29T03:00:00.000Z",
-    "dias": 3
-  },
-  {
-    "matricula": "13232307",
-    "nomeCompleto": "MIGUEL MACHADO DE ANDRADE NETO",
-    "motivo": 2,
-    "dataInicio": "2023-06-11T03:00:00.000Z",
-    "dataFim": "2023-06-12T03:00:00.000Z",
-    "dias": 2
-  },
-  {
-    "matricula": "13232307",
-    "nomeCompleto": "MIGUEL MACHADO DE ANDRADE NETO",
-    "motivo": 2,
-    "dataInicio": "2023-08-11T03:00:00.000Z",
-    "dataFim": "2023-08-16T03:00:00.000Z",
-    "dias": 6
-  },
-  {
-    "matricula": "13232307",
-    "nomeCompleto": "MIGUEL MACHADO DE ANDRADE NETO",
-    "motivo": 2,
-    "dataInicio": "2023-11-11T03:00:00.000Z",
-    "dataFim": "2023-11-12T03:00:00.000Z",
-    "dias": 2
-  },
-  {
-    "matricula": "13232307",
-    "nomeCompleto": "MIGUEL MACHADO DE ANDRADE NETO",
-    "motivo": 2,
-    "dataInicio": "2023-11-26T03:00:00.000Z",
-    "dataFim": "2023-11-30T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "13232307",
-    "nomeCompleto": "MIGUEL MACHADO DE ANDRADE NETO",
-    "motivo": 2,
-    "dataInicio": "2024-03-27T03:00:00.000Z",
-    "dataFim": "2024-03-31T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "13232307",
-    "nomeCompleto": "MIGUEL MACHADO DE ANDRADE NETO",
-    "motivo": 2,
-    "dataInicio": "2024-04-11T03:00:00.000Z",
-    "dataFim": "2024-04-15T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "13232307",
-    "nomeCompleto": "MIGUEL MACHADO DE ANDRADE NETO",
-    "motivo": 2,
-    "dataInicio": "2024-05-12T03:00:00.000Z",
-    "dataFim": "2024-05-13T03:00:00.000Z",
-    "dias": 2
-  },
-  {
-    "matricula": "13232322",
+    "matricula": 13232322,
     "nomeCompleto": "SIVERINO SILVA FILHO",
-    "dataInicio": "2023-06-29T03:00:00.000Z",
-    "dataFim": "2023-09-26T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13232322",
-    "nomeCompleto": "SIVERINO SILVA FILHO",
-    "dataInicio": "2023-09-27T03:00:00.000Z",
-    "dataFim": "2023-12-25T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13232322",
-    "nomeCompleto": "SIVERINO SILVA FILHO",
-    "dataInicio": "2024-01-23T03:00:00.000Z",
-    "dataFim": "2024-02-21T03:00:00.000Z",
-    "dias": 30
-  },
-  {
-    "matricula": "13232322",
-    "nomeCompleto": "SIVERINO SILVA FILHO",
-    "dataInicio": "2024-03-11T03:00:00.000Z",
-    "dataFim": "2024-04-09T03:00:00.000Z",
-    "dias": 30
-  },
-  {
-    "matricula": "13232322",
-    "nomeCompleto": "SIVERINO SILVA FILHO",
-    "dataInicio": "2024-04-10T03:00:00.000Z",
-    "dataFim": "2024-07-08T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13232322",
-    "nomeCompleto": "SIVERINO SILVA FILHO",
+    "motivo": 15,
     "dataInicio": "2024-09-02T03:00:00.000Z",
     "dataFim": "2024-10-31T03:00:00.000Z",
     "dias": 60
   },
   {
-    "matricula": "13232324",
-    "nomeCompleto": "WASHINGTON LUIZ PEREIRA DOS SANTOS",
-    "motivo": 2,
-    "dataInicio": "2022-05-11T03:00:00.000Z",
-    "dataFim": "2022-05-16T03:00:00.000Z",
-    "dias": 6
+    "matricula": 13232322,
+    "nomeCompleto": "SIVERINO SILVA FILHO",
+    "motivo": 15,
+    "dataInicio": "2024-11-01T03:00:00.000Z",
+    "dataFim": "2024-12-30T03:00:00.000Z",
+    "dias": 60
   },
   {
-    "matricula": "13232354",
-    "nomeCompleto": "CARLOS KLEY ALVES E SILVA",
-    "dataInicio": "2024-07-15T03:00:00.000Z",
-    "dataFim": "2024-08-03T03:00:00.000Z",
-    "dias": 20
+    "matricula": 13232322,
+    "nomeCompleto": "SIVERINO SILVA FILHO",
+    "motivo": 15,
+    "dataInicio": "2024-12-31T03:00:00.000Z",
+    "dataFim": "2025-02-28T03:00:00.000Z",
+    "dias": 60
   },
   {
-    "matricula": "13232354",
+    "matricula": 13232322,
+    "nomeCompleto": "SIVERINO SILVA FILHO",
+    "motivo": 15,
+    "dataInicio": "2025-03-01T03:00:00.000Z",
+    "dataFim": "2025-04-29T03:00:00.000Z",
+    "dias": 60
+  },
+  {
+    "matricula": 13232354,
     "nomeCompleto": "CARLOS KLEY ALVES E SILVA",
+    "motivo": 15,
     "dataInicio": "2024-08-04T03:00:00.000Z",
     "dataFim": "2024-08-24T03:00:00.000Z",
     "dias": 21
   },
   {
-    "matricula": "13232355",
+    "matricula": 13232355,
     "nomeCompleto": "WALDERILDA ANTONIA PEREIRA BARBOSA",
-    "dataInicio": "2022-02-08T03:00:00.000Z",
-    "dataFim": "2022-05-08T03:00:00.000Z",
-    "dias": 90
+    "motivo": 15,
+    "dataInicio": "2025-03-08T03:00:00.000Z",
+    "dataFim": "2025-04-26T03:00:00.000Z",
+    "dias": 50
   },
   {
-    "matricula": "13232355",
-    "nomeCompleto": "WALDERILDA ANTONIA PEREIRA BARBOSA",
-    "dataInicio": "2022-05-09T03:00:00.000Z",
-    "dataFim": "2022-06-07T03:00:00.000Z",
-    "dias": 30
-  },
-  {
-    "matricula": "13232355",
-    "nomeCompleto": "WALDERILDA ANTONIA PEREIRA BARBOSA",
-    "dataInicio": "2022-06-08T03:00:00.000Z",
-    "dataFim": "2022-09-05T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13232355",
-    "nomeCompleto": "WALDERILDA ANTONIA PEREIRA BARBOSA",
-    "dataInicio": "2022-09-06T03:00:00.000Z",
-    "dataFim": "2022-12-04T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13232355",
-    "nomeCompleto": "WALDERILDA ANTONIA PEREIRA BARBOSA",
-    "dataInicio": "2022-12-05T03:00:00.000Z",
-    "dataFim": "2023-03-04T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13232355",
-    "nomeCompleto": "WALDERILDA ANTONIA PEREIRA BARBOSA",
-    "dataInicio": "2023-03-05T03:00:00.000Z",
-    "dataFim": "2023-06-02T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13232355",
-    "nomeCompleto": "WALDERILDA ANTONIA PEREIRA BARBOSA",
-    "dataInicio": "2023-06-15T03:00:00.000Z",
-    "dataFim": "2023-08-13T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13232355",
-    "nomeCompleto": "WALDERILDA ANTONIA PEREIRA BARBOSA",
-    "motivo": 2,
-    "dataInicio": "2023-09-16T03:00:00.000Z",
-    "dataFim": "2023-09-20T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "13232355",
-    "nomeCompleto": "WALDERILDA ANTONIA PEREIRA BARBOSA",
-    "motivo": 2,
-    "dataInicio": "2023-09-26T03:00:00.000Z",
-    "dataFim": "2023-09-30T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "13232355",
-    "nomeCompleto": "WALDERILDA ANTONIA PEREIRA BARBOSA",
-    "motivo": 2,
-    "dataInicio": "2024-07-13T03:00:00.000Z",
-    "dataFim": "2024-07-15T03:00:00.000Z",
-    "dias": 3
-  },
-  {
-    "matricula": "13232355",
+    "matricula": 13232355,
     "nomeCompleto": "WALDERILDA ANTONIA PEREIRA BARBOSA",
     "motivo": 2,
     "dataInicio": "2024-10-26T03:00:00.000Z",
@@ -2122,174 +336,31 @@
     "dias": 7
   },
   {
-    "matricula": "13232357",
-    "nomeCompleto": "MARIA DO CARMO MATOS",
-    "dataInicio": "2024-10-03T03:00:00.000Z",
-    "dataFim": "2024-12-01T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13232361",
-    "nomeCompleto": "ELDA FIRMO TEIXEIRA",
+    "matricula": 13232355,
+    "nomeCompleto": "WALDERILDA ANTONIA PEREIRA BARBOSA",
     "motivo": 2,
-    "dataInicio": "2023-10-17T03:00:00.000Z",
-    "dataFim": "2023-10-26T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13232363",
-    "nomeCompleto": "ELIANE SILVA MOREIRA",
-    "motivo": 2,
-    "dataInicio": "2023-09-16T03:00:00.000Z",
-    "dataFim": "2023-09-20T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "13232366",
-    "nomeCompleto": "ALTEMARIO BARBOZA TELES",
-    "motivo": 2,
-    "dataInicio": "2023-09-01T03:00:00.000Z",
-    "dataFim": "2023-09-06T03:00:00.000Z",
-    "dias": 6
-  },
-  {
-    "matricula": "13232366",
-    "nomeCompleto": "ALTEMARIO BARBOZA TELES",
-    "motivo": 2,
-    "dataInicio": "2024-05-20T03:00:00.000Z",
-    "dataFim": "2024-05-20T03:00:00.000Z",
-    "dias": 1
-  },
-  {
-    "matricula": "13232411",
-    "nomeCompleto": "ANTONIO MANOEL DO NASCIMENTO FILHO",
-    "motivo": 2,
-    "dataInicio": "2022-07-22T03:00:00.000Z",
-    "dataFim": "2022-07-31T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13232418",
-    "nomeCompleto": "ELIALDO ANDRE DA ROCHA",
-    "motivo": 2,
-    "dataInicio": "2022-06-20T03:00:00.000Z",
-    "dataFim": "2022-06-29T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13232418",
-    "nomeCompleto": "ELIALDO ANDRE DA ROCHA",
-    "motivo": 2,
-    "dataInicio": "2022-10-18T03:00:00.000Z",
-    "dataFim": "2022-10-27T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13232421",
-    "nomeCompleto": "DEGINALDO DOS SANTOS DEZIDERIO",
-    "motivo": 2,
-    "dataInicio": "2022-02-24T03:00:00.000Z",
-    "dataFim": "2022-02-28T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "13232421",
-    "nomeCompleto": "DEGINALDO DOS SANTOS DEZIDERIO",
-    "motivo": 2,
-    "dataInicio": "2022-09-11T03:00:00.000Z",
-    "dataFim": "2022-09-11T03:00:00.000Z",
-    "dias": 1
-  },
-  {
-    "matricula": "13232421",
-    "nomeCompleto": "DEGINALDO DOS SANTOS DEZIDERIO",
-    "motivo": 2,
-    "dataInicio": "2022-11-10T03:00:00.000Z",
-    "dataFim": "2022-11-15T03:00:00.000Z",
-    "dias": 6
-  },
-  {
-    "matricula": "13232421",
-    "nomeCompleto": "DEGINALDO DOS SANTOS DEZIDERIO",
-    "motivo": 2,
-    "dataInicio": "2022-11-26T03:00:00.000Z",
-    "dataFim": "2022-11-30T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "13232421",
-    "nomeCompleto": "DEGINALDO DOS SANTOS DEZIDERIO",
-    "motivo": 2,
-    "dataInicio": "2023-03-11T03:00:00.000Z",
-    "dataFim": "2023-03-12T03:00:00.000Z",
-    "dias": 2
-  },
-  {
-    "matricula": "13232421",
-    "nomeCompleto": "DEGINALDO DOS SANTOS DEZIDERIO",
-    "motivo": 2,
-    "dataInicio": "2023-05-28T03:00:00.000Z",
-    "dataFim": "2023-06-01T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "13232421",
-    "nomeCompleto": "DEGINALDO DOS SANTOS DEZIDERIO",
-    "motivo": 2,
-    "dataInicio": "2023-09-26T03:00:00.000Z",
-    "dataFim": "2023-09-30T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "13232421",
-    "nomeCompleto": "DEGINALDO DOS SANTOS DEZIDERIO",
-    "motivo": 2,
-    "dataInicio": "2023-10-11T03:00:00.000Z",
-    "dataFim": "2023-10-16T03:00:00.000Z",
-    "dias": 6
-  },
-  {
-    "matricula": "13232421",
-    "nomeCompleto": "DEGINALDO DOS SANTOS DEZIDERIO",
-    "motivo": 2,
-    "dataInicio": "2023-12-11T03:00:00.000Z",
-    "dataFim": "2023-12-11T03:00:00.000Z",
-    "dias": 1
-  },
-  {
-    "matricula": "13232421",
-    "nomeCompleto": "DEGINALDO DOS SANTOS DEZIDERIO",
-    "motivo": 2,
-    "dataInicio": "2023-12-12T03:00:00.000Z",
-    "dataFim": "2023-12-18T03:00:00.000Z",
+    "dataInicio": "2025-01-25T03:00:00.000Z",
+    "dataFim": "2025-01-31T03:00:00.000Z",
     "dias": 7
   },
   {
-    "matricula": "13232421",
-    "nomeCompleto": "DEGINALDO DOS SANTOS DEZIDERIO",
+    "matricula": 13232355,
+    "nomeCompleto": "WALDERILDA ANTONIA PEREIRA BARBOSA",
     "motivo": 2,
-    "dataInicio": "2024-01-11T03:00:00.000Z",
-    "dataFim": "2024-01-15T03:00:00.000Z",
+    "dataInicio": "2025-02-11T03:00:00.000Z",
+    "dataFim": "2025-02-15T03:00:00.000Z",
     "dias": 5
   },
   {
-    "matricula": "13232421",
-    "nomeCompleto": "DEGINALDO DOS SANTOS DEZIDERIO",
+    "matricula": 13232355,
+    "nomeCompleto": "WALDERILDA ANTONIA PEREIRA BARBOSA",
     "motivo": 2,
-    "dataInicio": "2024-04-26T03:00:00.000Z",
-    "dataFim": "2024-04-30T03:00:00.000Z",
-    "dias": 5
+    "dataInicio": "2025-02-25T03:00:00.000Z",
+    "dataFim": "2025-03-06T03:00:00.000Z",
+    "dias": 10
   },
   {
-    "matricula": "13232421",
-    "nomeCompleto": "DEGINALDO DOS SANTOS DEZIDERIO",
-    "motivo": 2,
-    "dataInicio": "2024-05-11T03:00:00.000Z",
-    "dataFim": "2024-05-15T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "13232421",
+    "matricula": 13232421,
     "nomeCompleto": "DEGINALDO DOS SANTOS DEZIDERIO",
     "motivo": 2,
     "dataInicio": "2024-10-27T03:00:00.000Z",
@@ -2297,7 +368,7 @@
     "dias": 3
   },
   {
-    "matricula": "13232421",
+    "matricula": 13232421,
     "nomeCompleto": "DEGINALDO DOS SANTOS DEZIDERIO",
     "motivo": 2,
     "dataInicio": "2024-10-30T03:00:00.000Z",
@@ -2305,44 +376,47 @@
     "dias": 2
   },
   {
-    "matricula": "13232541",
-    "nomeCompleto": "PEDRITO GOMES PEREIRA",
-    "dataInicio": "2023-09-15T03:00:00.000Z",
-    "dataFim": "2023-11-13T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13232541",
-    "nomeCompleto": "PEDRITO GOMES PEREIRA",
+    "matricula": 13232421,
+    "nomeCompleto": "DEGINALDO DOS SANTOS DEZIDERIO",
     "motivo": 2,
-    "dataInicio": "2023-09-01T03:00:00.000Z",
-    "dataFim": "2023-09-10T03:00:00.000Z",
-    "dias": 10
+    "dataInicio": "2025-01-11T03:00:00.000Z",
+    "dataFim": "2025-01-15T03:00:00.000Z",
+    "dias": 5
   },
   {
-    "matricula": "13232588",
+    "matricula": 13232421,
+    "nomeCompleto": "DEGINALDO DOS SANTOS DEZIDERIO",
+    "motivo": 2,
+    "dataInicio": "2025-01-26T03:00:00.000Z",
+    "dataFim": "2025-01-30T03:00:00.000Z",
+    "dias": 5
+  },
+  {
+    "matricula": 13232588,
     "nomeCompleto": "LUIZ CARLOS DA SILVA AGUIAR",
+    "motivo": 2,
     "dataInicio": "2024-08-29T03:00:00.000Z",
     "dataFim": "2024-09-11T03:00:00.000Z",
     "dias": 14
   },
   {
-    "matricula": "13232588",
-    "nomeCompleto": "LUIZ CARLOS DA SILVA AGUIAR",
-    "motivo": 2,
-    "dataInicio": "2023-05-30T03:00:00.000Z",
-    "dataFim": "2023-06-08T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13232812",
+    "matricula": 13232812,
     "nomeCompleto": "LUIS HENRIQUE SANTANA LIMA",
+    "motivo": 15,
     "dataInicio": "2024-11-08T03:00:00.000Z",
     "dataFim": "2025-01-06T03:00:00.000Z",
     "dias": 60
   },
   {
-    "matricula": "13232812",
+    "matricula": 13232812,
+    "nomeCompleto": "LUIS HENRIQUE SANTANA LIMA",
+    "motivo": 15,
+    "dataInicio": "2025-01-07T03:00:00.000Z",
+    "dataFim": "2025-03-07T03:00:00.000Z",
+    "dias": 60
+  },
+  {
+    "matricula": 13232812,
     "nomeCompleto": "LUIS HENRIQUE SANTANA LIMA",
     "motivo": 2,
     "dataInicio": "2024-10-29T03:00:00.000Z",
@@ -2350,15 +424,15 @@
     "dias": 10
   },
   {
-    "matricula": "13232813",
-    "nomeCompleto": "GILMAR CARDOSO DOS SANTOS",
+    "matricula": 13232812,
+    "nomeCompleto": "LUIS HENRIQUE SANTANA LIMA",
     "motivo": 2,
-    "dataInicio": "2022-04-07T03:00:00.000Z",
-    "dataFim": "2022-04-11T03:00:00.000Z",
-    "dias": 5
+    "dataInicio": "2025-03-10T03:00:00.000Z",
+    "dataFim": "2025-03-19T03:00:00.000Z",
+    "dias": 10
   },
   {
-    "matricula": "13232813",
+    "matricula": 13232813,
     "nomeCompleto": "GILMAR CARDOSO DOS SANTOS",
     "motivo": 2,
     "dataInicio": "2024-09-16T03:00:00.000Z",
@@ -2366,7 +440,7 @@
     "dias": 10
   },
   {
-    "matricula": "13232813",
+    "matricula": 13232813,
     "nomeCompleto": "GILMAR CARDOSO DOS SANTOS",
     "motivo": 2,
     "dataInicio": "2024-10-06T03:00:00.000Z",
@@ -2374,403 +448,31 @@
     "dias": 6
   },
   {
-    "matricula": "13232882",
-    "nomeCompleto": "EDINALDO AVELINO DE PAIVA",
-    "dataInicio": "2022-12-05T03:00:00.000Z",
-    "dataFim": "2022-12-18T03:00:00.000Z",
-    "dias": 14
-  },
-  {
-    "matricula": "13232965",
-    "nomeCompleto": "TERESINHA RITA SILVA CARVALHO",
-    "dataInicio": "2022-04-14T03:00:00.000Z",
-    "dataFim": "2022-04-18T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "13232965",
-    "nomeCompleto": "TERESINHA RITA SILVA CARVALHO",
-    "dataInicio": "2022-04-20T03:00:00.000Z",
-    "dataFim": "2022-06-03T03:00:00.000Z",
-    "dias": 45
-  },
-  {
-    "matricula": "13232965",
-    "nomeCompleto": "TERESINHA RITA SILVA CARVALHO",
-    "motivo": 2,
-    "dataInicio": "2022-04-04T03:00:00.000Z",
-    "dataFim": "2022-04-13T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13233048",
+    "matricula": 13233048,
     "nomeCompleto": "KARIME MANSUR MACHADO",
+    "motivo": 15,
     "dataInicio": "2024-08-01T03:00:00.000Z",
     "dataFim": "2024-08-28T03:00:00.000Z",
     "dias": 28
   },
   {
-    "matricula": "13233049",
-    "nomeCompleto": "MANOEL CEZAR CARNEIRO DE ALMEIDA",
-    "dataInicio": "2022-07-25T03:00:00.000Z",
-    "dataFim": "2022-07-29T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "13233049",
-    "nomeCompleto": "MANOEL CEZAR CARNEIRO DE ALMEIDA",
+    "matricula": 13233048,
+    "nomeCompleto": "KARIME MANSUR MACHADO",
     "motivo": 2,
-    "dataInicio": "2022-07-15T03:00:00.000Z",
-    "dataFim": "2022-07-24T03:00:00.000Z",
+    "dataInicio": "2024-12-09T03:00:00.000Z",
+    "dataFim": "2024-12-18T03:00:00.000Z",
     "dias": 10
   },
   {
-    "matricula": "13233063",
-    "nomeCompleto": "GILVAN BASTOS CARDOSO",
+    "matricula": 13233048,
+    "nomeCompleto": "KARIME MANSUR MACHADO",
     "motivo": 2,
-    "dataInicio": "2023-01-10T03:00:00.000Z",
-    "dataFim": "2023-01-15T03:00:00.000Z",
-    "dias": 6
-  },
-  {
-    "matricula": "13233063",
-    "nomeCompleto": "GILVAN BASTOS CARDOSO",
-    "motivo": 2,
-    "dataInicio": "2023-01-16T03:00:00.000Z",
-    "dataFim": "2023-01-22T03:00:00.000Z",
-    "dias": 7
-  },
-  {
-    "matricula": "13233097",
-    "nomeCompleto": "CLAUDIO SANTOS VIEIRA",
-    "motivo": 2,
-    "dataInicio": "2023-05-29T03:00:00.000Z",
-    "dataFim": "2023-06-07T03:00:00.000Z",
+    "dataInicio": "2025-02-18T03:00:00.000Z",
+    "dataFim": "2025-02-27T03:00:00.000Z",
     "dias": 10
   },
   {
-    "matricula": "13233102",
-    "nomeCompleto": "CLEUZA CLARICE SOUZA MOURA",
-    "dataInicio": "2023-11-22T03:00:00.000Z",
-    "dataFim": "2023-12-21T03:00:00.000Z",
-    "dias": 30
-  },
-  {
-    "matricula": "13233102",
-    "nomeCompleto": "CLEUZA CLARICE SOUZA MOURA",
-    "dataInicio": "2024-01-01T03:00:00.000Z",
-    "dataFim": "2024-03-20T03:00:00.000Z",
-    "dias": 80
-  },
-  {
-    "matricula": "13233102",
-    "nomeCompleto": "CLEUZA CLARICE SOUZA MOURA",
-    "dataInicio": "2024-03-21T03:00:00.000Z",
-    "dataFim": "2024-06-18T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13233102",
-    "nomeCompleto": "CLEUZA CLARICE SOUZA MOURA",
-    "dataInicio": "2024-06-19T03:00:00.000Z",
-    "dataFim": "2024-09-16T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13235138",
-    "nomeCompleto": "CARLOS ALBERTO MATOS DA SILVA",
-    "dataInicio": "2024-06-28T03:00:00.000Z",
-    "dataFim": "2024-08-26T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13235138",
-    "nomeCompleto": "CARLOS ALBERTO MATOS DA SILVA",
-    "motivo": 2,
-    "dataInicio": "2024-06-18T03:00:00.000Z",
-    "dataFim": "2024-06-27T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13269112",
-    "nomeCompleto": "ADRIANO TOSTO DOS SANTOS SILVA",
-    "dataInicio": "2022-07-25T03:00:00.000Z",
-    "dataFim": "2022-09-22T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13269112",
-    "nomeCompleto": "ADRIANO TOSTO DOS SANTOS SILVA",
-    "dataInicio": "2022-09-23T03:00:00.000Z",
-    "dataFim": "2022-11-21T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13269112",
-    "nomeCompleto": "ADRIANO TOSTO DOS SANTOS SILVA",
-    "dataInicio": "2022-12-01T03:00:00.000Z",
-    "dataFim": "2023-01-29T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13269112",
-    "nomeCompleto": "ADRIANO TOSTO DOS SANTOS SILVA",
-    "dataInicio": "2023-07-29T03:00:00.000Z",
-    "dataFim": "2023-09-16T03:00:00.000Z",
-    "dias": 50
-  },
-  {
-    "matricula": "13269112",
-    "nomeCompleto": "ADRIANO TOSTO DOS SANTOS SILVA",
-    "dataInicio": "2023-09-17T03:00:00.000Z",
-    "dataFim": "2023-11-15T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13269112",
-    "nomeCompleto": "ADRIANO TOSTO DOS SANTOS SILVA",
-    "dataInicio": "2023-11-16T03:00:00.000Z",
-    "dataFim": "2024-01-14T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13269112",
-    "nomeCompleto": "ADRIANO TOSTO DOS SANTOS SILVA",
-    "dataInicio": "2024-01-15T03:00:00.000Z",
-    "dataFim": "2024-03-14T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13269112",
-    "nomeCompleto": "ADRIANO TOSTO DOS SANTOS SILVA",
-    "dataInicio": "2024-04-22T03:00:00.000Z",
-    "dataFim": "2024-06-20T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13269112",
-    "nomeCompleto": "ADRIANO TOSTO DOS SANTOS SILVA",
-    "motivo": 2,
-    "dataInicio": "2023-07-19T03:00:00.000Z",
-    "dataFim": "2023-07-28T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13269136",
-    "nomeCompleto": "TEODORO DIAS JUNIOR",
-    "motivo": 2,
-    "dataInicio": "2022-04-06T03:00:00.000Z",
-    "dataFim": "2022-04-15T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13269199",
-    "nomeCompleto": "SAYONARA AGUIAR PEREIRA RODRIGUES",
-    "motivo": 2,
-    "dataInicio": "2024-03-28T03:00:00.000Z",
-    "dataFim": "2024-04-04T03:00:00.000Z",
-    "dias": 8
-  },
-  {
-    "matricula": "13269204",
-    "nomeCompleto": "EXUPERIO OLIVEIRA QUINTEIRO PORTELA",
-    "dataInicio": "2022-02-04T03:00:00.000Z",
-    "dataFim": "2022-03-20T03:00:00.000Z",
-    "dias": 45
-  },
-  {
-    "matricula": "13269204",
-    "nomeCompleto": "EXUPERIO OLIVEIRA QUINTEIRO PORTELA",
-    "dataInicio": "2022-03-21T03:00:00.000Z",
-    "dataFim": "2022-05-04T03:00:00.000Z",
-    "dias": 45
-  },
-  {
-    "matricula": "13269357",
-    "nomeCompleto": "JUTAI LOPES DA COSTA",
-    "dataInicio": "2023-12-10T03:00:00.000Z",
-    "dataFim": "2024-01-01T03:00:00.000Z",
-    "dias": 23
-  },
-  {
-    "matricula": "13269357",
-    "nomeCompleto": "JUTAI LOPES DA COSTA",
-    "dataInicio": "2024-01-12T03:00:00.000Z",
-    "dataFim": "2024-03-11T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13277992",
-    "nomeCompleto": "ADILENE VIEIRA TEIXEIRA AMARAL",
-    "dataInicio": "2023-10-14T03:00:00.000Z",
-    "dataFim": "2023-11-02T03:00:00.000Z",
-    "dias": 20
-  },
-  {
-    "matricula": "13277992",
-    "nomeCompleto": "ADILENE VIEIRA TEIXEIRA AMARAL",
-    "dataInicio": "2023-11-03T03:00:00.000Z",
-    "dataFim": "2023-12-02T03:00:00.000Z",
-    "dias": 30
-  },
-  {
-    "matricula": "13277992",
-    "nomeCompleto": "ADILENE VIEIRA TEIXEIRA AMARAL",
-    "motivo": 2,
-    "dataInicio": "2023-10-04T03:00:00.000Z",
-    "dataFim": "2023-10-13T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13279267",
-    "nomeCompleto": "NANCY ALVES GALINDO",
-    "motivo": 2,
-    "dataInicio": "2022-09-15T03:00:00.000Z",
-    "dataFim": "2022-09-24T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13279547",
-    "nomeCompleto": "MARCO ANTONIO VALENTINO",
-    "dataInicio": "2023-03-26T03:00:00.000Z",
-    "dataFim": "2023-06-23T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13279547",
-    "nomeCompleto": "MARCO ANTONIO VALENTINO",
-    "dataInicio": "2023-06-24T03:00:00.000Z",
-    "dataFim": "2023-09-21T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13279693",
-    "nomeCompleto": "ANTONIO CARLOS BATISTA NEVES",
-    "motivo": 2,
-    "dataInicio": "2022-10-19T03:00:00.000Z",
-    "dataFim": "2022-10-28T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13293575",
-    "nomeCompleto": "TELESSON NEVES TELES",
-    "dataInicio": "2024-03-09T03:00:00.000Z",
-    "dataFim": "2024-05-07T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13297247",
-    "nomeCompleto": "PEDRO OLINTO CARVALHO PEREIRA",
-    "motivo": 2,
-    "dataInicio": "2024-07-02T03:00:00.000Z",
-    "dataFim": "2024-07-11T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13298625",
-    "nomeCompleto": "MARIA DE FATIMA MAQUIEIRA RODEIRO",
-    "dataInicio": "2023-05-04T03:00:00.000Z",
-    "dataFim": "2023-07-22T03:00:00.000Z",
-    "dias": 80
-  },
-  {
-    "matricula": "13298625",
-    "nomeCompleto": "MARIA DE FATIMA MAQUIEIRA RODEIRO",
-    "dataInicio": "2023-07-23T03:00:00.000Z",
-    "dataFim": "2023-10-20T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13298918",
-    "nomeCompleto": "GISELE MARIA FONSECA FERREIRA",
-    "dataInicio": "2022-11-20T03:00:00.000Z",
-    "dataFim": "2023-05-18T03:00:00.000Z",
-    "dias": 180
-  },
-  {
-    "matricula": "13298922",
-    "nomeCompleto": "LUCIANA MATHIAS DE ALMEIDA",
-    "dataInicio": "2022-02-03T03:00:00.000Z",
-    "dataFim": "2022-02-22T03:00:00.000Z",
-    "dias": 20
-  },
-  {
-    "matricula": "13298922",
-    "nomeCompleto": "LUCIANA MATHIAS DE ALMEIDA",
-    "dataInicio": "2022-02-23T03:00:00.000Z",
-    "dataFim": "2022-04-23T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13298922",
-    "nomeCompleto": "LUCIANA MATHIAS DE ALMEIDA",
-    "dataInicio": "2022-04-24T03:00:00.000Z",
-    "dataFim": "2022-06-22T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13298922",
-    "nomeCompleto": "LUCIANA MATHIAS DE ALMEIDA",
-    "dataInicio": "2023-05-12T03:00:00.000Z",
-    "dataFim": "2023-05-21T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13298922",
-    "nomeCompleto": "LUCIANA MATHIAS DE ALMEIDA",
-    "motivo": 2,
-    "dataInicio": "2022-01-24T03:00:00.000Z",
-    "dataFim": "2022-02-02T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13298922",
-    "nomeCompleto": "LUCIANA MATHIAS DE ALMEIDA",
-    "motivo": 2,
-    "dataInicio": "2023-05-02T03:00:00.000Z",
-    "dataFim": "2023-05-11T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13298927",
-    "nomeCompleto": "OZITA DE ANDRADE MASCARENHAS COSTA",
-    "motivo": 2,
-    "dataInicio": "2023-06-15T03:00:00.000Z",
-    "dataFim": "2023-06-17T03:00:00.000Z",
-    "dias": 3
-  },
-  {
-    "matricula": "13298936",
-    "nomeCompleto": "ZILCA LENIRA OLIVEIRA CAMPOS",
-    "dataInicio": "2024-04-16T03:00:00.000Z",
-    "dataFim": "2024-04-25T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13298936",
-    "nomeCompleto": "ZILCA LENIRA OLIVEIRA CAMPOS",
-    "motivo": 2,
-    "dataInicio": "2024-04-01T03:00:00.000Z",
-    "dataFim": "2024-04-10T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13298939",
-    "nomeCompleto": "SERGIO FERREIRA RIBEIRO",
-    "motivo": 2,
-    "dataInicio": "2022-07-13T03:00:00.000Z",
-    "dataFim": "2022-07-17T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "13298970",
-    "nomeCompleto": "MARIA OLIMPIA DE SOUZA ALMEIDA",
-    "dataInicio": "2022-10-13T03:00:00.000Z",
-    "dataFim": "2022-11-11T03:00:00.000Z",
-    "dias": 30
-  },
-  {
-    "matricula": "13304468",
+    "matricula": 13304468,
     "nomeCompleto": "MONICA ROCHA DE ANDRADE DOS SANTOS",
     "motivo": 2,
     "dataInicio": "2024-09-19T03:00:00.000Z",
@@ -2778,121 +480,15 @@
     "dias": 15
   },
   {
-    "matricula": "13333006",
-    "nomeCompleto": "ROSALVO RAMOS VIEIRA FILHO",
-    "dataInicio": "2022-04-05T03:00:00.000Z",
-    "dataFim": "2022-06-03T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13333006",
-    "nomeCompleto": "ROSALVO RAMOS VIEIRA FILHO",
-    "dataInicio": "2022-06-04T03:00:00.000Z",
-    "dataFim": "2022-06-30T03:00:00.000Z",
-    "dias": 27
-  },
-  {
-    "matricula": "13333006",
-    "nomeCompleto": "ROSALVO RAMOS VIEIRA FILHO",
-    "dataInicio": "2023-04-08T03:00:00.000Z",
-    "dataFim": "2023-04-27T03:00:00.000Z",
-    "dias": 20
-  },
-  {
-    "matricula": "13360582",
-    "nomeCompleto": "FERNANDO TANURE HALLA JUNIOR",
+    "matricula": 13421794,
+    "nomeCompleto": "JOAO FERREIRA BRANDAO FILHO",
     "motivo": 2,
-    "dataInicio": "2024-04-09T03:00:00.000Z",
-    "dataFim": "2024-04-09T03:00:00.000Z",
-    "dias": 1
-  },
-  {
-    "matricula": "13360582",
-    "nomeCompleto": "FERNANDO TANURE HALLA JUNIOR",
-    "motivo": 2,
-    "dataInicio": "2024-06-03T03:00:00.000Z",
-    "dataFim": "2024-06-12T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13360582",
-    "nomeCompleto": "FERNANDO TANURE HALLA JUNIOR",
-    "motivo": 2,
-    "dataInicio": "2024-06-25T03:00:00.000Z",
-    "dataFim": "2024-06-28T03:00:00.000Z",
+    "dataInicio": "2025-03-11T03:00:00.000Z",
+    "dataFim": "2025-03-14T03:00:00.000Z",
     "dias": 4
   },
   {
-    "matricula": "13360582",
-    "nomeCompleto": "FERNANDO TANURE HALLA JUNIOR",
-    "motivo": 2,
-    "dataInicio": "2023-08-29T03:00:00.000Z",
-    "dataFim": "2023-09-06T03:00:00.000Z",
-    "dias": 9
-  },
-  {
-    "matricula": "13387225",
-    "nomeCompleto": "ELISSON SANTOS DE CARVALHO",
-    "motivo": 2,
-    "dataInicio": "2024-06-19T03:00:00.000Z",
-    "dataFim": "2024-06-30T03:00:00.000Z",
-    "dias": 12
-  },
-  {
-    "matricula": "13413678",
-    "nomeCompleto": "SHEILA DOS SANTOS SILVA",
-    "motivo": 2,
-    "dataInicio": "2022-11-21T03:00:00.000Z",
-    "dataFim": "2022-11-25T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "13421674",
-    "nomeCompleto": "ZILRISNAIDE MATOS FERNANDES PINTO",
-    "motivo": 2,
-    "dataInicio": "2022-07-03T03:00:00.000Z",
-    "dataFim": "2022-07-12T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13421682",
-    "nomeCompleto": "DANIELA SAMPAIO VILAR OLIVEIRA",
-    "dataInicio": "2024-03-24T03:00:00.000Z",
-    "dataFim": "2024-04-22T03:00:00.000Z",
-    "dias": 30
-  },
-  {
-    "matricula": "13421682",
-    "nomeCompleto": "DANIELA SAMPAIO VILAR OLIVEIRA",
-    "motivo": 2,
-    "dataInicio": "2024-03-14T03:00:00.000Z",
-    "dataFim": "2024-03-23T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13421695",
-    "nomeCompleto": "LAINE COSTA CORREIA LIMA",
-    "dataInicio": "2022-01-30T03:00:00.000Z",
-    "dataFim": "2022-03-30T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13421715",
-    "nomeCompleto": "LIDIANE SANTOS XAVIER",
-    "motivo": 2,
-    "dataInicio": "2023-11-17T03:00:00.000Z",
-    "dataFim": "2023-11-26T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13421864",
-    "nomeCompleto": "RUBENS BEZERRA SOARES JUNIOR",
-    "dataInicio": "2024-02-05T03:00:00.000Z",
-    "dataFim": "2024-04-24T03:00:00.000Z",
-    "dias": 80
-  },
-  {
-    "matricula": "13421887",
+    "matricula": 13421887,
     "nomeCompleto": "ILAN NOGUEIRA DE OLIVEIRA SANTANA",
     "motivo": 2,
     "dataInicio": "2024-09-10T03:00:00.000Z",
@@ -2900,166 +496,23 @@
     "dias": 10
   },
   {
-    "matricula": "13436337",
-    "nomeCompleto": "VALNEIDE GOMES COELHO DOS SANTOS",
-    "motivo": 2,
-    "dataInicio": "2023-12-01T03:00:00.000Z",
-    "dataFim": "2023-12-06T03:00:00.000Z",
-    "dias": 6
-  },
-  {
-    "matricula": "13440899",
-    "nomeCompleto": "CARLOS ALBERTO NASCIMENTO",
-    "dataInicio": "2023-12-08T03:00:00.000Z",
-    "dataFim": "2024-01-14T03:00:00.000Z",
-    "dias": 38
-  },
-  {
-    "matricula": "13440899",
-    "nomeCompleto": "CARLOS ALBERTO NASCIMENTO",
-    "dataInicio": "2024-01-15T03:00:00.000Z",
-    "dataFim": "2024-01-29T03:00:00.000Z",
-    "dias": 15
-  },
-  {
-    "matricula": "13440999",
-    "nomeCompleto": "FORTUNATO ANTONIO DE MENEZES PORTUGAL FI",
+    "matricula": 13443274,
+    "nomeCompleto": "GIRLANDIA MARIA DE BRITO SILVA",
     "motivo": 15,
-    "dataInicio": "2023-09-21T03:00:00.000Z",
-    "dataFim": "2024-05-17T03:00:00.000Z",
-    "dias": 240
-  },
-  {
-    "matricula": "13443274",
-    "nomeCompleto": "GIRLANDIA MARIA DE BRITO SILVA",
-    "dataInicio": "2024-04-05T03:00:00.000Z",
-    "dataFim": "2024-06-03T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13443274",
-    "nomeCompleto": "GIRLANDIA MARIA DE BRITO SILVA",
-    "dataInicio": "2024-06-04T03:00:00.000Z",
-    "dataFim": "2024-08-02T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13443274",
-    "nomeCompleto": "GIRLANDIA MARIA DE BRITO SILVA",
     "dataInicio": "2024-08-03T03:00:00.000Z",
     "dataFim": "2024-10-01T03:00:00.000Z",
     "dias": 60
   },
   {
-    "matricula": "13443274",
-    "nomeCompleto": "GIRLANDIA MARIA DE BRITO SILVA",
-    "motivo": 2,
-    "dataInicio": "2024-03-26T03:00:00.000Z",
-    "dataFim": "2024-04-04T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13471896",
-    "nomeCompleto": "JOSE PEDRO BISPO",
-    "motivo": 2,
-    "dataInicio": "2023-12-11T03:00:00.000Z",
-    "dataFim": "2023-12-20T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13490311",
-    "nomeCompleto": "JOAO DUQUE DE BUENO NETO",
-    "motivo": 2,
-    "dataInicio": "2023-01-23T03:00:00.000Z",
-    "dataFim": "2023-01-30T03:00:00.000Z",
-    "dias": 8
-  },
-  {
-    "matricula": "13490391",
-    "nomeCompleto": "RUTE ALVES NASCIMENTO DO ROSARIO",
-    "dataInicio": "2022-02-04T03:00:00.000Z",
-    "dataFim": "2022-03-05T03:00:00.000Z",
-    "dias": 30
-  },
-  {
-    "matricula": "13490391",
-    "nomeCompleto": "RUTE ALVES NASCIMENTO DO ROSARIO",
-    "motivo": 2,
-    "dataInicio": "2022-03-11T03:00:00.000Z",
-    "dataFim": "2022-03-16T03:00:00.000Z",
-    "dias": 6
-  },
-  {
-    "matricula": "13490391",
-    "nomeCompleto": "RUTE ALVES NASCIMENTO DO ROSARIO",
-    "motivo": 2,
-    "dataInicio": "2023-03-28T03:00:00.000Z",
-    "dataFim": "2023-04-01T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "13490391",
-    "nomeCompleto": "RUTE ALVES NASCIMENTO DO ROSARIO",
-    "motivo": 2,
-    "dataInicio": "2023-10-11T03:00:00.000Z",
-    "dataFim": "2023-10-15T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "13491300",
-    "nomeCompleto": "GILCEMIRA ALVES COSTA",
-    "dataInicio": "2023-07-02T03:00:00.000Z",
-    "dataFim": "2023-07-21T03:00:00.000Z",
-    "dias": 20
-  },
-  {
-    "matricula": "13494826",
-    "nomeCompleto": "LENY VICTOR DA SILVA",
-    "dataInicio": "2023-05-11T03:00:00.000Z",
-    "dataFim": "2023-06-29T03:00:00.000Z",
-    "dias": 50
-  },
-  {
-    "matricula": "13494826",
-    "nomeCompleto": "LENY VICTOR DA SILVA",
-    "motivo": 2,
-    "dataInicio": "2023-01-11T03:00:00.000Z",
-    "dataFim": "2023-01-18T03:00:00.000Z",
-    "dias": 8
-  },
-  {
-    "matricula": "13494826",
-    "nomeCompleto": "LENY VICTOR DA SILVA",
-    "motivo": 2,
-    "dataInicio": "2023-05-01T03:00:00.000Z",
-    "dataFim": "2023-05-10T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13494894",
+    "matricula": 13494894,
     "nomeCompleto": "TELMA FACTUM RODRIGUES",
+    "motivo": 15,
     "dataInicio": "2024-08-12T03:00:00.000Z",
     "dataFim": "2024-10-10T03:00:00.000Z",
     "dias": 60
   },
   {
-    "matricula": "13494894",
-    "nomeCompleto": "TELMA FACTUM RODRIGUES",
-    "motivo": 2,
-    "dataInicio": "2023-04-10T03:00:00.000Z",
-    "dataFim": "2023-04-17T03:00:00.000Z",
-    "dias": 8
-  },
-  {
-    "matricula": "13494894",
-    "nomeCompleto": "TELMA FACTUM RODRIGUES",
-    "motivo": 2,
-    "dataInicio": "2024-07-30T03:00:00.000Z",
-    "dataFim": "2024-08-08T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13494894",
+    "matricula": 13494894,
     "nomeCompleto": "TELMA FACTUM RODRIGUES",
     "motivo": 2,
     "dataInicio": "2024-11-29T03:00:00.000Z",
@@ -3067,308 +520,55 @@
     "dias": 10
   },
   {
-    "matricula": "13495246",
-    "nomeCompleto": "MERYT SUERDA ROCHA",
+    "matricula": 13543891,
+    "nomeCompleto": "ANA LUCIA GONCALVES GOMES DE JESUS",
     "motivo": 2,
-    "dataInicio": "2022-09-12T03:00:00.000Z",
-    "dataFim": "2022-09-21T03:00:00.000Z",
-    "dias": 10
+    "dataInicio": "2025-02-14T03:00:00.000Z",
+    "dataFim": "2025-02-27T03:00:00.000Z",
+    "dias": 14
   },
   {
-    "matricula": "13495246",
-    "nomeCompleto": "MERYT SUERDA ROCHA",
+    "matricula": 13616252,
+    "nomeCompleto": "JERFFSON ALVES CIRQUEIRA",
     "motivo": 2,
-    "dataInicio": "2022-10-24T03:00:00.000Z",
-    "dataFim": "2022-11-02T03:00:00.000Z",
-    "dias": 10
+    "dataInicio": "2025-03-10T03:00:00.000Z",
+    "dataFim": "2025-03-12T03:00:00.000Z",
+    "dias": 3
   },
   {
-    "matricula": "13495246",
-    "nomeCompleto": "MERYT SUERDA ROCHA",
-    "motivo": 2,
-    "dataInicio": "2024-04-19T03:00:00.000Z",
-    "dataFim": "2024-04-28T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13500809",
-    "nomeCompleto": "CLAUDIO JOSE DE OLIVEIRA",
-    "motivo": 2,
-    "dataInicio": "2023-10-02T03:00:00.000Z",
-    "dataFim": "2023-10-16T03:00:00.000Z",
-    "dias": 15
-  },
-  {
-    "matricula": "13557641",
-    "nomeCompleto": "TEREZINHA AMORIM DOS SANTOS",
-    "motivo": 2,
-    "dataInicio": "2023-07-17T03:00:00.000Z",
-    "dataFim": "2023-07-31T03:00:00.000Z",
-    "dias": 15
-  },
-  {
-    "matricula": "13561991",
-    "nomeCompleto": "DILANE SANTOS FERREIRA DIAS",
-    "motivo": 2,
-    "dataInicio": "2022-11-16T03:00:00.000Z",
-    "dataFim": "2022-11-19T03:00:00.000Z",
-    "dias": 4
-  },
-  {
-    "matricula": "13561991",
-    "nomeCompleto": "DILANE SANTOS FERREIRA DIAS",
-    "motivo": 2,
-    "dataInicio": "2022-08-30T03:00:00.000Z",
-    "dataFim": "2022-09-03T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "13568957",
-    "nomeCompleto": "CARLA SOUZA DA SILVA",
-    "motivo": 2,
-    "dataInicio": "2022-09-20T03:00:00.000Z",
-    "dataFim": "2022-10-04T03:00:00.000Z",
-    "dias": 15
-  },
-  {
-    "matricula": "13616186",
-    "nomeCompleto": "MARLUCE MERCES DE OLIVEIRA",
-    "dataInicio": "2023-12-14T03:00:00.000Z",
-    "dataFim": "2024-03-12T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13616186",
-    "nomeCompleto": "MARLUCE MERCES DE OLIVEIRA",
-    "dataInicio": "2024-03-13T03:00:00.000Z",
-    "dataFim": "2024-05-11T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13616186",
-    "nomeCompleto": "MARLUCE MERCES DE OLIVEIRA",
-    "dataInicio": "2024-05-12T03:00:00.000Z",
-    "dataFim": "2024-08-09T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13616186",
-    "nomeCompleto": "MARLUCE MERCES DE OLIVEIRA",
-    "dataInicio": "2024-08-10T03:00:00.000Z",
-    "dataFim": "2024-11-07T03:00:00.000Z",
-    "dias": 90
-  },
-  {
-    "matricula": "13616186",
-    "nomeCompleto": "MARLUCE MERCES DE OLIVEIRA",
-    "dataInicio": "2024-11-09T03:00:00.000Z",
-    "dataFim": "2025-01-07T03:00:00.000Z",
-    "dias": 60
-  },
-  {
-    "matricula": "13616253",
+    "matricula": 13616253,
     "nomeCompleto": "ERVAL CARNEIRO SIMOES",
     "motivo": 2,
-    "dataInicio": "2023-05-08T03:00:00.000Z",
-    "dataFim": "2023-05-17T03:00:00.000Z",
+    "dataInicio": "2025-02-14T03:00:00.000Z",
+    "dataFim": "2025-02-23T03:00:00.000Z",
     "dias": 10
   },
   {
-    "matricula": "13616376",
-    "nomeCompleto": "ROBERTO BENEDITO DE FREITAS CALDEIRA FIL",
-    "dataInicio": "2022-10-14T03:00:00.000Z",
-    "dataFim": "2022-11-02T03:00:00.000Z",
-    "dias": 20
-  },
-  {
-    "matricula": "13616376",
-    "nomeCompleto": "ROBERTO BENEDITO DE FREITAS CALDEIRA FIL",
-    "motivo": 2,
-    "dataInicio": "2022-08-22T03:00:00.000Z",
-    "dataFim": "2022-08-26T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "13616376",
-    "nomeCompleto": "ROBERTO BENEDITO DE FREITAS CALDEIRA FIL",
-    "motivo": 2,
-    "dataInicio": "2022-09-19T03:00:00.000Z",
-    "dataFim": "2022-09-20T03:00:00.000Z",
-    "dias": 2
-  },
-  {
-    "matricula": "13616394",
-    "nomeCompleto": "IEDA MARIA ALMEIDA GONCALVES",
-    "motivo": 2,
-    "dataInicio": "2024-07-26T03:00:00.000Z",
-    "dataFim": "2024-08-04T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "13632579",
-    "nomeCompleto": "PATRICIA DANIELLE DE CARVALHO SANTOS GOE",
+    "matricula": 18160977,
+    "nomeCompleto": "CARLOS ALBERTO MATIAS DOS SANTOS",
     "motivo": 15,
-    "dataInicio": "2023-06-07T03:00:00.000Z",
-    "dataFim": "2023-07-09T03:00:00.000Z",
-    "dias": 33
-  },
-  {
-    "matricula": "13632579",
-    "nomeCompleto": "PATRICIA DANIELLE DE CARVALHO SANTOS GOE",
-    "motivo": 2,
-    "dataInicio": "2023-05-23T03:00:00.000Z",
-    "dataFim": "2023-06-06T03:00:00.000Z",
-    "dias": 15
-  },
-  {
-    "matricula": "13641216",
-    "nomeCompleto": "MARIA DE FATIMA ANDRADE CARDOSO BORGES",
-    "motivo": 2,
-    "dataInicio": "2023-07-10T03:00:00.000Z",
-    "dataFim": "2023-07-13T03:00:00.000Z",
-    "dias": 4
-  },
-  {
-    "matricula": "13641216",
-    "nomeCompleto": "MARIA DE FATIMA ANDRADE CARDOSO BORGES",
-    "motivo": 2,
-    "dataInicio": "2022-06-30T03:00:00.000Z",
-    "dataFim": "2022-07-06T03:00:00.000Z",
-    "dias": 7
-  },
-  {
-    "matricula": "13641216",
-    "nomeCompleto": "MARIA DE FATIMA ANDRADE CARDOSO BORGES",
-    "motivo": 2,
-    "dataInicio": "2022-11-23T03:00:00.000Z",
-    "dataFim": "2022-11-27T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "13641216",
-    "nomeCompleto": "MARIA DE FATIMA ANDRADE CARDOSO BORGES",
-    "motivo": 2,
-    "dataInicio": "2023-08-01T03:00:00.000Z",
-    "dataFim": "2023-08-04T03:00:00.000Z",
-    "dias": 4
-  },
-  {
-    "matricula": "13641218",
-    "nomeCompleto": "ELIANE DE LIMA PEREIRA",
-    "motivo": 2,
-    "dataInicio": "2023-09-22T03:00:00.000Z",
-    "dataFim": "2023-09-25T03:00:00.000Z",
-    "dias": 4
-  },
-  {
-    "matricula": "13641218",
-    "nomeCompleto": "ELIANE DE LIMA PEREIRA",
-    "motivo": 2,
-    "dataInicio": "2023-09-27T03:00:00.000Z",
-    "dataFim": "2023-10-10T03:00:00.000Z",
-    "dias": 14
-  },
-  {
-    "matricula": "13641218",
-    "nomeCompleto": "ELIANE DE LIMA PEREIRA",
-    "motivo": 2,
-    "dataInicio": "2023-10-11T03:00:00.000Z",
-    "dataFim": "2023-10-24T03:00:00.000Z",
-    "dias": 14
-  },
-  {
-    "matricula": "55001576",
-    "nomeCompleto": "MARIVALDA GOMES CORREIA",
-    "motivo": 2,
-    "dataInicio": "2024-06-13T03:00:00.000Z",
-    "dataFim": "2024-06-20T03:00:00.000Z",
-    "dias": 8
-  },
-  {
-    "matricula": "59085928",
-    "nomeCompleto": "TERESA MARIA COELHO SILVA",
-    "dataInicio": "2022-02-11T03:00:00.000Z",
-    "dataFim": "2022-02-24T03:00:00.000Z",
-    "dias": 14
-  },
-  {
-    "matricula": "59085928",
-    "nomeCompleto": "TERESA MARIA COELHO SILVA",
-    "motivo": 2,
-    "dataInicio": "2022-02-02T03:00:00.000Z",
-    "dataFim": "2022-02-10T03:00:00.000Z",
-    "dias": 9
-  },
-  {
-    "matricula": "59085928",
-    "nomeCompleto": "TERESA MARIA COELHO SILVA",
-    "motivo": 2,
-    "dataInicio": "2022-09-26T03:00:00.000Z",
-    "dataFim": "2022-09-30T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "59085928",
-    "nomeCompleto": "TERESA MARIA COELHO SILVA",
-    "motivo": 2,
-    "dataInicio": "2022-10-26T03:00:00.000Z",
-    "dataFim": "2022-10-28T03:00:00.000Z",
-    "dias": 3
-  },
-  {
-    "matricula": "59085928",
-    "nomeCompleto": "TERESA MARIA COELHO SILVA",
-    "motivo": 2,
-    "dataInicio": "2024-04-15T03:00:00.000Z",
-    "dataFim": "2024-04-17T03:00:00.000Z",
-    "dias": 3
-  },
-  {
-    "matricula": "59095660",
-    "nomeCompleto": "MARIA DO CARMO CAMPOS",
-    "dataInicio": "2023-04-24T03:00:00.000Z",
-    "dataFim": "2023-06-22T03:00:00.000Z",
+    "dataInicio": "2025-02-26T03:00:00.000Z",
+    "dataFim": "2025-04-26T03:00:00.000Z",
     "dias": 60
   },
   {
-    "matricula": "59107097",
-    "nomeCompleto": "MARIA LEITE DOS SANTOS",
+    "matricula": 92035353,
+    "nomeCompleto": "WELLINGTON DAS VIRGENS CORREIA JUNIOR",
     "motivo": 2,
-    "dataInicio": "2023-09-25T03:00:00.000Z",
-    "dataFim": "2023-10-09T03:00:00.000Z",
-    "dias": 15
-  },
-  {
-    "matricula": "92035353",
-    "nomeCompleto": "WELLINGTON DAS VIRGENS CORREIA JUNIOR",
-    "dataInicio": "2022-03-19T03:00:00.000Z",
-    "dataFim": "2022-04-17T03:00:00.000Z",
-    "dias": 30
-  },
-  {
-    "matricula": "92035353",
-    "nomeCompleto": "WELLINGTON DAS VIRGENS CORREIA JUNIOR",
     "dataInicio": "2024-08-30T03:00:00.000Z",
     "dataFim": "2024-09-12T03:00:00.000Z",
     "dias": 14
   },
   {
-    "matricula": "92035353",
+    "matricula": 92035353,
     "nomeCompleto": "WELLINGTON DAS VIRGENS CORREIA JUNIOR",
+    "motivo": 15,
     "dataInicio": "2024-09-13T03:00:00.000Z",
     "dataFim": "2024-11-11T03:00:00.000Z",
     "dias": 60
   },
   {
-    "matricula": "92035353",
-    "nomeCompleto": "WELLINGTON DAS VIRGENS CORREIA JUNIOR",
-    "motivo": 2,
-    "dataInicio": "2022-03-09T03:00:00.000Z",
-    "dataFim": "2022-03-18T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "92035353",
+    "matricula": 92035353,
     "nomeCompleto": "WELLINGTON DAS VIRGENS CORREIA JUNIOR",
     "motivo": 2,
     "dataInicio": "2024-08-22T03:00:00.000Z",
@@ -3376,7 +576,7 @@
     "dias": 8
   },
   {
-    "matricula": "92035353",
+    "matricula": 92035353,
     "nomeCompleto": "WELLINGTON DAS VIRGENS CORREIA JUNIOR",
     "motivo": 2,
     "dataInicio": "2024-12-03T03:00:00.000Z",
@@ -3384,68 +584,7 @@
     "dias": 10
   },
   {
-    "matricula": "92043265",
-    "nomeCompleto": "STEPHANIE CARVALHO FONSECA BRANDAO",
-    "dataInicio": "2024-01-25T03:00:00.000Z",
-    "dataFim": "2024-07-22T03:00:00.000Z",
-    "dias": 180
-  },
-  {
-    "matricula": "92043509",
-    "nomeCompleto": "RAMON FRANCISCO DAS MERCES SANTOS",
-    "dataInicio": "2023-09-27T03:00:00.000Z",
-    "dataFim": "2023-10-26T03:00:00.000Z",
-    "dias": 30
-  },
-  {
-    "matricula": "92043509",
-    "nomeCompleto": "RAMON FRANCISCO DAS MERCES SANTOS",
-    "dataInicio": "2023-10-27T03:00:00.000Z",
-    "dataFim": "2023-11-25T03:00:00.000Z",
-    "dias": 30
-  },
-  {
-    "matricula": "92064073",
-    "nomeCompleto": "CREUSA ANDRADE CARDOSO",
-    "motivo": 2,
-    "dataInicio": "2022-12-01T03:00:00.000Z",
-    "dataFim": "2022-12-08T03:00:00.000Z",
-    "dias": 8
-  },
-  {
-    "matricula": "92064081",
-    "nomeCompleto": "VANDA SOUZA SANTOS",
-    "motivo": 2,
-    "dataInicio": "2022-11-21T03:00:00.000Z",
-    "dataFim": "2022-11-23T03:00:00.000Z",
-    "dias": 3
-  },
-  {
-    "matricula": "92064081",
-    "nomeCompleto": "VANDA SOUZA SANTOS",
-    "motivo": 2,
-    "dataInicio": "2023-04-24T03:00:00.000Z",
-    "dataFim": "2023-05-07T03:00:00.000Z",
-    "dias": 14
-  },
-  {
-    "matricula": "92064081",
-    "nomeCompleto": "VANDA SOUZA SANTOS",
-    "motivo": 2,
-    "dataInicio": "2023-09-11T03:00:00.000Z",
-    "dataFim": "2023-09-15T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "92064081",
-    "nomeCompleto": "VANDA SOUZA SANTOS",
-    "motivo": 2,
-    "dataInicio": "2023-09-22T03:00:00.000Z",
-    "dataFim": "2023-10-01T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "92064090",
+    "matricula": 92064090,
     "nomeCompleto": "ADRIANA FERREIRA GARBOGGINI",
     "motivo": 2,
     "dataInicio": "2024-09-20T03:00:00.000Z",
@@ -3453,254 +592,11 @@
     "dias": 1
   },
   {
-    "matricula": "92064099",
-    "nomeCompleto": "KARLA REGINA ARAUJO MONTEIRO GALVÃO",
-    "motivo": 2,
-    "dataInicio": "2022-07-25T03:00:00.000Z",
-    "dataFim": "2022-07-29T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "92064099",
+    "matricula": 92064099,
     "nomeCompleto": "KARLA REGINA ARAUJO MONTEIRO GALVÃO",
     "motivo": 2,
     "dataInicio": "2024-09-16T03:00:00.000Z",
     "dataFim": "2024-09-20T03:00:00.000Z",
     "dias": 5
-  },
-  {
-    "matricula": "92064124",
-    "nomeCompleto": "SOLANGE FERREIRA ROCHA",
-    "motivo": 2,
-    "dataInicio": "2023-11-06T03:00:00.000Z",
-    "dataFim": "2023-11-20T03:00:00.000Z",
-    "dias": 15
-  },
-  {
-    "matricula": "92064130",
-    "nomeCompleto": "LUCIANA MARIA LELIS DE OLIVEIRA",
-    "motivo": 2,
-    "dataInicio": "2022-10-07T03:00:00.000Z",
-    "dataFim": "2022-10-21T03:00:00.000Z",
-    "dias": 15
-  },
-  {
-    "matricula": "92064130",
-    "nomeCompleto": "LUCIANA MARIA LELIS DE OLIVEIRA",
-    "motivo": 2,
-    "dataInicio": "2023-05-31T03:00:00.000Z",
-    "dataFim": "2023-06-12T03:00:00.000Z",
-    "dias": 13
-  },
-  {
-    "matricula": "92064130",
-    "nomeCompleto": "LUCIANA MARIA LELIS DE OLIVEIRA",
-    "motivo": 2,
-    "dataInicio": "2023-11-14T03:00:00.000Z",
-    "dataFim": "2023-11-28T03:00:00.000Z",
-    "dias": 15
-  },
-  {
-    "matricula": "92064130",
-    "nomeCompleto": "LUCIANA MARIA LELIS DE OLIVEIRA",
-    "motivo": 2,
-    "dataInicio": "2023-12-05T03:00:00.000Z",
-    "dataFim": "2023-12-14T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "92064130",
-    "nomeCompleto": "LUCIANA MARIA LELIS DE OLIVEIRA",
-    "motivo": 2,
-    "dataInicio": "2023-04-17T03:00:00.000Z",
-    "dataFim": "2023-04-20T03:00:00.000Z",
-    "dias": 4
-  },
-  {
-    "matricula": "92064166",
-    "nomeCompleto": "ANA LÚCIA BUENTE MARTINS",
-    "motivo": 2,
-    "dataInicio": "2023-05-01T03:00:00.000Z",
-    "dataFim": "2023-05-03T03:00:00.000Z",
-    "dias": 3
-  },
-  {
-    "matricula": "92064166",
-    "nomeCompleto": "ANA LÚCIA BUENTE MARTINS",
-    "motivo": 2,
-    "dataInicio": "2023-05-08T03:00:00.000Z",
-    "dataFim": "2023-05-10T03:00:00.000Z",
-    "dias": 3
-  },
-  {
-    "matricula": "92064254",
-    "nomeCompleto": "DENNISON GUIMARÃES DOS SANTOS",
-    "motivo": 2,
-    "dataInicio": "2024-04-04T03:00:00.000Z",
-    "dataFim": "2024-04-10T03:00:00.000Z",
-    "dias": 7
-  },
-  {
-    "matricula": "92064254",
-    "nomeCompleto": "DENNISON GUIMARÃES DOS SANTOS",
-    "motivo": 2,
-    "dataInicio": "2023-07-05T03:00:00.000Z",
-    "dataFim": "2023-07-06T03:00:00.000Z",
-    "dias": 2
-  },
-  {
-    "matricula": "92064254",
-    "nomeCompleto": "DENNISON GUIMARÃES DOS SANTOS",
-    "motivo": 2,
-    "dataInicio": "2023-07-17T03:00:00.000Z",
-    "dataFim": "2023-07-17T03:00:00.000Z",
-    "dias": 1
-  },
-  {
-    "matricula": "92064254",
-    "nomeCompleto": "DENNISON GUIMARÃES DOS SANTOS",
-    "motivo": 2,
-    "dataInicio": "2023-07-26T03:00:00.000Z",
-    "dataFim": "2023-07-26T03:00:00.000Z",
-    "dias": 1
-  },
-  {
-    "matricula": "92069485",
-    "nomeCompleto": "QUEIZE CRISTINE BADARÓ DOS SANTOS PEIXOT",
-    "motivo": 2,
-    "dataInicio": "2022-11-21T03:00:00.000Z",
-    "dataFim": "2022-11-23T03:00:00.000Z",
-    "dias": 3
-  },
-  {
-    "matricula": "92069485",
-    "nomeCompleto": "QUEIZE CRISTINE BADARÓ DOS SANTOS PEIXOT",
-    "motivo": 2,
-    "dataInicio": "2022-11-24T03:00:00.000Z",
-    "dataFim": "2022-11-27T03:00:00.000Z",
-    "dias": 4
-  },
-  {
-    "matricula": "92069485",
-    "nomeCompleto": "QUEIZE CRISTINE BADARÓ DOS SANTOS PEIXOT",
-    "motivo": 2,
-    "dataInicio": "2023-09-11T03:00:00.000Z",
-    "dataFim": "2023-09-15T03:00:00.000Z",
-    "dias": 5
-  },
-  {
-    "matricula": "92073498",
-    "nomeCompleto": "SERGIO AUGUSTO DOS SANTOS LIMA JUNIOR",
-    "motivo": 2,
-    "dataInicio": "2023-04-18T03:00:00.000Z",
-    "dataFim": "2023-05-01T03:00:00.000Z",
-    "dias": 14
-  },
-  {
-    "matricula": "92073498",
-    "nomeCompleto": "SERGIO AUGUSTO DOS SANTOS LIMA JUNIOR",
-    "motivo": 2,
-    "dataInicio": "2024-05-29T03:00:00.000Z",
-    "dataFim": "2024-06-11T03:00:00.000Z",
-    "dias": 14
-  },
-  {
-    "matricula": "92073649",
-    "nomeCompleto": "GILMARIO OLIVEIRA DE SOUZA",
-    "motivo": 2,
-    "dataInicio": "2022-12-26T03:00:00.000Z",
-    "dataFim": "2022-12-28T03:00:00.000Z",
-    "dias": 3
-  },
-  {
-    "matricula": "92073649",
-    "nomeCompleto": "GILMARIO OLIVEIRA DE SOUZA",
-    "motivo": 2,
-    "dataInicio": "2023-02-27T03:00:00.000Z",
-    "dataFim": "2023-03-01T03:00:00.000Z",
-    "dias": 3
-  },
-  {
-    "matricula": "92092365",
-    "nomeCompleto": "Mariana Gomes Da Silva",
-    "dataInicio": "2023-11-06T03:00:00.000Z",
-    "dataFim": "2024-05-03T03:00:00.000Z",
-    "dias": 180
-  },
-  {
-    "matricula": "92092497",
-    "nomeCompleto": "Patricia Barcelos Leal",
-    "dataInicio": "2023-07-25T03:00:00.000Z",
-    "dataFim": "2024-01-20T03:00:00.000Z",
-    "dias": 180
-  },
-  {
-    "matricula": "92092773",
-    "nomeCompleto": "VITORIA BARBOZA JUVENCIO FERREIRA",
-    "dataInicio": "2024-11-20T03:00:00.000Z",
-    "dataFim": "2025-05-18T03:00:00.000Z",
-    "dias": 180
-  },
-  {
-    "matricula": "92093437",
-    "nomeCompleto": "CATIA NEVES DA SILVA",
-    "dataInicio": "2024-08-03T03:00:00.000Z",
-    "dataFim": "2024-08-06T03:00:00.000Z",
-    "dias": 4
-  },
-  {
-    "matricula": "92093437",
-    "nomeCompleto": "CATIA NEVES DA SILVA",
-    "motivo": 2,
-    "dataInicio": "2024-07-25T03:00:00.000Z",
-    "dataFim": "2024-08-02T03:00:00.000Z",
-    "dias": 9
-  },
-  {
-    "matricula": "92095041",
-    "nomeCompleto": "NIVIA ROSEIRA",
-    "motivo": 2,
-    "dataInicio": "2024-04-16T03:00:00.000Z",
-    "dataFim": "2024-04-19T03:00:00.000Z",
-    "dias": 4
-  },
-  {
-    "matricula": "92095041",
-    "nomeCompleto": "NIVIA ROSEIRA",
-    "motivo": 2,
-    "dataInicio": "2024-04-20T03:00:00.000Z",
-    "dataFim": "2024-04-29T03:00:00.000Z",
-    "dias": 10
-  },
-  {
-    "matricula": "92095041",
-    "nomeCompleto": "NIVIA ROSEIRA",
-    "motivo": 2,
-    "dataInicio": "2024-05-04T03:00:00.000Z",
-    "dataFim": "2024-05-04T03:00:00.000Z",
-    "dias": 1
-  },
-  {
-    "matricula": "92095041",
-    "nomeCompleto": "NIVIA ROSEIRA",
-    "motivo": 2,
-    "dataInicio": "2024-05-14T03:00:00.000Z",
-    "dataFim": "2024-05-24T03:00:00.000Z",
-    "dias": 11
-  },
-  {
-    "matricula": "92112830",
-    "nomeCompleto": "Gabriela De Araujo Trajano",
-    "dataInicio": "2024-03-04T03:00:00.000Z",
-    "dataFim": "2024-08-30T03:00:00.000Z",
-    "dias": 180
-  },
-  {
-    "matricula": "92115144",
-    "nomeCompleto": "EULINA SILVA SANTOS",
-    "motivo": 2,
-    "dataInicio": "2024-07-19T03:00:00.000Z",
-    "dataFim": "2024-08-02T03:00:00.000Z",
-    "dias": 15
   }
 ]

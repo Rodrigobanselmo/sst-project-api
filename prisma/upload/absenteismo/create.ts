@@ -37,11 +37,12 @@ async function processJsonFile(outputFilePath: string): Promise<void> {
   const employeeDataFound = new Set<string>();
 
   await asyncBatch(jsonData, 100, async (record) => {
+    record.matricula = String(record.matricula);
     let employee = await prisma.employee.findFirst({
       where: {
         companyId,
         OR: [
-          { esocialCode: record.matricula },
+          { esocialCode: String(record.matricula) },
           {
             name: {
               mode: 'insensitive',
