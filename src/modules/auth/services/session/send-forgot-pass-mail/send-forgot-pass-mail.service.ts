@@ -30,7 +30,7 @@ export class SendForgotPassMailService {
     });
     if (!user?.id) throw new BadRequestException('Usuário com esse email não existe');
 
-    const templatePath = resolve(__dirname, '..', '..', '..', '..', '..', '..', 'templates', '@v1', 'email', 'forgotPassword.hbs');
+    const templatePath = resolve(__dirname, '..', '..', '..', '..', '..', 'templates', '@v1', 'email', 'forgotPassword.hbs');
 
     const expires_date = this.dateProvider.addHours(new Date(), 3);
 
