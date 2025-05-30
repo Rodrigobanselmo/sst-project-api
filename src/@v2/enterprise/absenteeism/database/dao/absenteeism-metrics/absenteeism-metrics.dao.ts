@@ -69,7 +69,7 @@ export class AbsenteeismMetricsDAO {
 
     return AbsenteeismTimelineTotalReadModelMapper.toModel({
       results: AbsenteeismMetrics,
-      range: gerRageDate(filters, { addYear: 1 }),
+      range: gerRageDate(filters, { addYear: 1, maxYears: 1 }),
     });
   }
 
@@ -338,13 +338,18 @@ export class AbsenteeismMetricsDAO {
 
       if (filters.search) {
         const search = `%${filters.search}%`;
-        where.push(Prisma.sql`
+
+        if (filters.type && filters.type == AbsenteeismHierarchyTypeEnum.HOMOGENEOUS_GROUP) {
+          where.push(Prisma.sql`unaccent(lower(hg."name")) ILIKE unaccent(lower(${search}))`);
+        } else {
+          where.push(Prisma.sql`
           unaccent(lower(h."name")) ILIKE unaccent(lower(${search})) OR
           unaccent(lower(h_parent_1."name")) ILIKE unaccent(lower(${search})) OR
           unaccent(lower(h_parent_2."name")) ILIKE unaccent(lower(${search})) OR
           unaccent(lower(h_parent_3."name")) ILIKE unaccent(lower(${search})) OR
           unaccent(lower(h_parent_4."name")) ILIKE unaccent(lower(${search})) 
         `);
+        }
       }
 
       return where;
@@ -372,99 +377,118 @@ export class AbsenteeismMetricsDAO {
 
     const whereParams = [...browseWhereParams, ...filterWhereParams];
 
+    const showHomogeneousGroup = AbsenteeismHierarchyTypeEnum.HOMOGENEOUS_GROUP == filters.type;
     const showOffice = !filters.type || AbsenteeismHierarchyTypeEnum.OFFICE == filters.type;
     const showSector = showOffice || AbsenteeismHierarchyTypeEnum.SECTOR == filters.type;
     const showManagement = showOffice || showSector || AbsenteeismHierarchyTypeEnum.MANAGEMENT == filters.type;
     const showDirectory = showOffice || showSector || showManagement || AbsenteeismHierarchyTypeEnum.DIRECTORY == filters.type;
-    // const showWorkspace = showOffice || showSector || showManagement || showDirectory || AbsenteeismHierarchyTypeEnum.WORKSPACE == filters.type;
+    const showWorkspace = !showHomogeneousGroup;
 
     const AbsenteeismMetricsPromise = this.prisma.$queryRaw<IAbsenteeismTotalHierarchyResultBrowseModelMapper[]>`
+    WITH DistinctAbsenteeismRecords AS (
+        SELECT DISTINCT
+          a.id AS absenteeism_id,
+          a."timeSpent" AS absenteeism_timeSpent,
+          a."employeeId" AS absenteeism_employeeId,
+          
+          ${gerRawPrisma(`h.name AS h_name,`, showOffice)}
+          ${gerRawPrisma(`h.type AS h_type,`, showOffice)}
+          ${gerRawPrisma(`h.id AS h_id,`, showOffice)}
+
+          ${gerRawPrisma(`CASE WHEN h_parent_1.type::text = 'SECTOR' THEN h_parent_1.id   WHEN h_parent_2.type::text = 'SECTOR' THEN h_parent_2.id   ELSE NULL END AS h_parent_1_id,`, showSector)}
+          ${gerRawPrisma(`CASE WHEN h_parent_1.type::text = 'SECTOR' THEN h_parent_1.name WHEN h_parent_2.type::text = 'SECTOR' THEN h_parent_2.name ELSE NULL END AS h_parent_1_name,`, showSector)}
+          ${gerRawPrisma(`CASE WHEN h_parent_1.type::text = 'SECTOR' THEN h_parent_1.type WHEN h_parent_2.type::text = 'SECTOR' THEN h_parent_2.type ELSE NULL END AS h_parent_1_type,`, showSector)}
+
+          ${gerRawPrisma(`CASE WHEN h_parent_2.type::text = 'MANAGEMENT' THEN h_parent_2.id   WHEN h_parent_3.type::text = 'MANAGEMENT' THEN h_parent_3.id   ELSE NULL END AS h_parent_2_id,`, showManagement)}
+          ${gerRawPrisma(`CASE WHEN h_parent_2.type::text = 'MANAGEMENT' THEN h_parent_2.name WHEN h_parent_3.type::text = 'MANAGEMENT' THEN h_parent_3.name ELSE NULL END AS h_parent_2_name,`, showManagement)}
+          ${gerRawPrisma(`CASE WHEN h_parent_2.type::text = 'MANAGEMENT' THEN h_parent_2.type WHEN h_parent_3.type::text = 'MANAGEMENT' THEN h_parent_3.type ELSE NULL END AS h_parent_2_type,`, showManagement)}
+
+          ${gerRawPrisma(`CASE WHEN h_parent_2.type::text = 'DIRECTORY' THEN h_parent_2.id   WHEN h_parent_3.type::text = 'DIRECTORY' THEN h_parent_3.id   WHEN h_parent_4.type::text = 'DIRECTORY' THEN h_parent_4.id   ELSE NULL END AS h_parent_3_id,`, showDirectory)}
+          ${gerRawPrisma(`CASE WHEN h_parent_2.type::text = 'DIRECTORY' THEN h_parent_2.name WHEN h_parent_3.type::text = 'DIRECTORY' THEN h_parent_3.name WHEN h_parent_4.type::text = 'DIRECTORY' THEN h_parent_4.name ELSE NULL END AS h_parent_3_name,`, showDirectory)}
+          ${gerRawPrisma(`CASE WHEN h_parent_2.type::text = 'DIRECTORY' THEN h_parent_2.type WHEN h_parent_3.type::text = 'DIRECTORY' THEN h_parent_3.type WHEN h_parent_4.type::text = 'DIRECTORY' THEN h_parent_4.type ELSE NULL END AS h_parent_3_type,`, showDirectory)}
+
+          ${gerRawPrisma(`w.id AS workspace_id,`, showWorkspace)}
+          ${gerRawPrisma(`w.name AS workspace_name`, showWorkspace)}
+
+          ${gerRawPrisma(`hg.id AS homo_id,`, showHomogeneousGroup)}
+          ${gerRawPrisma(`hg.name AS homo_name`, showHomogeneousGroup)}
+        FROM
+          "Absenteeism" a
+        JOIN
+          "Employee" e ON a."employeeId" = e.id AND e."deleted_at" IS null AND e."companyId" = ${filters.companyId}
+        JOIN
+          "EmployeeHierarchyHistory" ehh ON e.id = ehh."employeeId"
+        JOIN
+          "Hierarchy" h ON ehh."hierarchyId" = h.id AND h."deletedAt" IS null
+        LEFT JOIN 
+          "Hierarchy" h_parent_1 ON h_parent_1."id" = h."parentId" 
+        LEFT JOIN 
+          "Hierarchy" h_parent_2 ON h_parent_2."id" = h_parent_1."parentId"
+        LEFT JOIN 
+          "Hierarchy" h_parent_3 ON h_parent_3."id" = h_parent_2."parentId"
+        LEFT JOIN 
+          "Hierarchy" h_parent_4 ON h_parent_4."id" = h_parent_3."parentId"
+        LEFT JOIN 
+          "HierarchyOnHomogeneous" hoh ON hoh."hierarchyId" IN (h.id, h_parent_1.id, h_parent_2.id, h_parent_3.id, h_parent_4.id) AND hoh."deletedAt" IS NULL 
+        LEFT JOIN 
+          "HomogeneousGroup" hg ON hoh."homogeneousGroupId" = hg.id AND hg."deletedAt" IS null AND hg."status" = 'ACTIVE' AND hg."type" IS NULL
+        JOIN
+          "_HierarchyToWorkspace" htw ON h.id = htw."A"
+        JOIN
+          "Workspace" w ON htw."B" = w.id 
+        ${gerWhereRawPrisma(whereParams)}
+      )
       SELECT
-        ${gerRawPrisma(`h.name AS hierarchy_name,`, showOffice)}
-        ${gerRawPrisma(`h.type AS hierarchy_type,`, showOffice)}
-        ${gerRawPrisma(`h.id AS hierarchy_id,`, showOffice)}
+        ${gerRawPrisma(`disc_a.h_name AS hierarchy_name,`, showOffice)}
+        ${gerRawPrisma(`disc_a.h_type AS hierarchy_type,`, showOffice)}
+        ${gerRawPrisma(`disc_a.h_id AS hierarchy_id,`, showOffice)}
 
-        ${gerRawPrisma(`CASE WHEN h_parent_1.type::text = 'SECTOR' THEN h_parent_1.id ELSE NULL END AS hierarchy_parent_1_id,`, showSector)}
-        ${gerRawPrisma(`CASE WHEN h_parent_1.type::text = 'SECTOR' THEN h_parent_1.name ELSE NULL END AS hierarchy_parent_1_name,`, showSector)}
-        ${gerRawPrisma(`CASE WHEN h_parent_1.type::text = 'SECTOR' THEN h_parent_1.type ELSE NULL END AS hierarchy_parent_1_type,`, showSector)}
-        ${gerRawPrisma(`CASE WHEN h_parent_2.type::text = 'SECTOR' THEN h_parent_2.id ELSE NULL END AS hierarchy_parent_2_id,`, showSector)}
-        ${gerRawPrisma(`CASE WHEN h_parent_2.type::text = 'SECTOR' THEN h_parent_2.name ELSE NULL END AS hierarchy_parent_2_name,`, showSector)}
-        ${gerRawPrisma(`CASE WHEN h_parent_2.type::text = 'SECTOR' THEN h_parent_2.type ELSE NULL END AS hierarchy_parent_2_type,`, showSector)}
+        ${gerRawPrisma(`disc_a.h_parent_1_id AS hierarchy_parent_1_id,`, showSector)}
+        ${gerRawPrisma(`disc_a.h_parent_1_name AS hierarchy_parent_1_name,`, showSector)}
+        ${gerRawPrisma(`disc_a.h_parent_1_type AS hierarchy_parent_1_type,`, showSector)}
 
-        ${gerRawPrisma(`CASE WHEN h_parent_2.type::text = 'MANAGEMENT' THEN h_parent_2.id ELSE NULL END AS hierarchy_parent_2_id,`, showManagement)}
-        ${gerRawPrisma(`CASE WHEN h_parent_2.type::text = 'MANAGEMENT' THEN h_parent_2.name ELSE NULL END AS hierarchy_parent_2_name,`, showManagement)}
-        ${gerRawPrisma(`CASE WHEN h_parent_2.type::text = 'MANAGEMENT' THEN h_parent_2.type ELSE NULL END AS hierarchy_parent_2_type,`, showManagement)}
-        ${gerRawPrisma(`CASE WHEN h_parent_3.type::text = 'MANAGEMENT' THEN h_parent_3.id ELSE NULL END AS hierarchy_parent_3_id,`, showManagement)}
-        ${gerRawPrisma(`CASE WHEN h_parent_3.type::text = 'MANAGEMENT' THEN h_parent_3.name ELSE NULL END AS hierarchy_parent_3_name,`, showManagement)}
-        ${gerRawPrisma(`CASE WHEN h_parent_3.type::text = 'MANAGEMENT' THEN h_parent_3.type ELSE NULL END AS hierarchy_parent_3_type,`, showManagement)}
+        ${gerRawPrisma(`disc_a.h_parent_2_id AS hierarchy_parent_2_id,`, showManagement)}
+        ${gerRawPrisma(`disc_a.h_parent_2_name AS hierarchy_parent_2_name,`, showManagement)}
+        ${gerRawPrisma(`disc_a.h_parent_2_type AS hierarchy_parent_2_type,`, showManagement)}
 
-        ${gerRawPrisma(`CASE WHEN h_parent_2.type::text = 'DIRECTORY' THEN h_parent_2.id ELSE NULL END AS hierarchy_parent_2_id,`, showDirectory)}
-        ${gerRawPrisma(`CASE WHEN h_parent_2.type::text = 'DIRECTORY' THEN h_parent_2.name ELSE NULL END AS hierarchy_parent_2_name,`, showDirectory)}
-        ${gerRawPrisma(`CASE WHEN h_parent_2.type::text = 'DIRECTORY' THEN h_parent_2.type ELSE NULL END AS hierarchy_parent_2_type,`, showDirectory)}
-        ${gerRawPrisma(`CASE WHEN h_parent_3.type::text = 'DIRECTORY' THEN h_parent_3.id ELSE NULL END AS hierarchy_parent_3_id,`, showDirectory)}
-        ${gerRawPrisma(`CASE WHEN h_parent_3.type::text = 'DIRECTORY' THEN h_parent_3.name ELSE NULL END AS hierarchy_parent_3_name,`, showDirectory)}
-        ${gerRawPrisma(`CASE WHEN h_parent_3.type::text = 'DIRECTORY' THEN h_parent_3.type ELSE NULL END AS hierarchy_parent_3_type,`, showDirectory)}
-        ${gerRawPrisma(`CASE WHEN h_parent_4.type::text = 'DIRECTORY' THEN h_parent_4.id ELSE NULL END AS hierarchy_parent_4_id,`, showDirectory)}
-        ${gerRawPrisma(`CASE WHEN h_parent_4.type::text = 'DIRECTORY' THEN h_parent_4.name ELSE NULL END AS hierarchy_parent_4_name,`, showDirectory)}
-        ${gerRawPrisma(`CASE WHEN h_parent_4.type::text = 'DIRECTORY' THEN h_parent_4.type ELSE NULL END AS hierarchy_parent_4_type,`, showDirectory)}
+        ${gerRawPrisma(`disc_a.h_parent_3_id AS hierarchy_parent_3_id,`, showDirectory)}
+        ${gerRawPrisma(`disc_a.h_parent_3_name AS hierarchy_parent_3_name,`, showDirectory)}
+        ${gerRawPrisma(`disc_a.h_parent_3_type AS hierarchy_parent_3_type,`, showDirectory)}
 
-        w.id AS workspace_id,
-        w.name AS workspace_name,
-        COUNT(a.id) AS total_absenteeism_count,
-        SUM(ABS(a."timeSpent")) AS total_absenteeism_days,
-        (SUM(ABS(a."timeSpent"))) / NULLIF(COUNT(DISTINCT a."employeeId"), 0) AS avg_absenteeism_per_employee
+        ${gerRawPrisma(`disc_a.workspace_id AS workspace_id,`, showWorkspace)}
+        ${gerRawPrisma(`disc_a.workspace_name AS workspace_name,`, showWorkspace)}
+
+        ${gerRawPrisma(`disc_a.homo_id AS homo_id,`, showHomogeneousGroup)}
+        ${gerRawPrisma(`disc_a.homo_name AS homo_name,`, showHomogeneousGroup)}
+
+        COUNT(DISTINCT disc_a.absenteeism_id) AS total_absenteeism_count, 
+        SUM(ABS(disc_a.absenteeism_timeSpent)) AS total_absenteeism_days,
+        (SUM(ABS(disc_a.absenteeism_timeSpent))) / NULLIF(COUNT(DISTINCT disc_a.absenteeism_employeeId), 0) AS avg_absenteeism_per_employee
       FROM
-        "Absenteeism" a
-      JOIN
-        "Employee" e ON a."employeeId" = e.id AND e."deleted_at" IS null AND e."companyId" = ${filters.companyId}
-      JOIN
-        "EmployeeHierarchyHistory" ehh ON e.id = ehh."employeeId"
-      JOIN
-        "Hierarchy" h ON ehh."hierarchyId" = h.id AND h."deletedAt" IS null
-      LEFT JOIN 
-        "Hierarchy" h_parent_1 ON h_parent_1."id" = h."parentId" 
-      LEFT JOIN 
-        "Hierarchy" h_parent_2 ON h_parent_2."id" = h_parent_1."parentId"
-      LEFT JOIN 
-        "Hierarchy" h_parent_3 ON h_parent_3."id" = h_parent_2."parentId"
-      LEFT JOIN 
-        "Hierarchy" h_parent_4 ON h_parent_4."id" = h_parent_3."parentId"
-      JOIN
-        "_HierarchyToWorkspace" htw ON h.id = htw."A"
-      JOIN
-        "Workspace" w ON htw."B" = w.id 
-      ${gerWhereRawPrisma(whereParams)}
+        DistinctAbsenteeismRecords disc_a
+      ${gerRawPrisma(`where disc_a.homo_id IS NOT NULL`, showHomogeneousGroup)}
       GROUP BY
-        ${gerRawPrisma(`h."id",`, showOffice)}
-        ${gerRawPrisma(`h."name",`, showOffice)}
-        ${gerRawPrisma(`h."type",`, showOffice)}
+        ${gerRawPrisma(`disc_a.h_id,`, showOffice)}
+        ${gerRawPrisma(`disc_a.h_name,`, showOffice)}
+        ${gerRawPrisma(`disc_a.h_type,`, showOffice)}
         
-        ${gerRawPrisma(`CASE WHEN h_parent_1.type::text = 'SECTOR' THEN h_parent_1.id ELSE NULL END,`, showSector)}
-        ${gerRawPrisma(`CASE WHEN h_parent_1.type::text = 'SECTOR' THEN h_parent_1.name ELSE NULL END,`, showSector)}
-        ${gerRawPrisma(`CASE WHEN h_parent_1.type::text = 'SECTOR' THEN h_parent_1.type ELSE NULL END,`, showSector)}
-        ${gerRawPrisma(`CASE WHEN h_parent_2.type::text = 'SECTOR' THEN h_parent_2.id ELSE NULL END,`, showSector)}
-        ${gerRawPrisma(`CASE WHEN h_parent_2.type::text = 'SECTOR' THEN h_parent_2.name ELSE NULL END,`, showSector)}
-        ${gerRawPrisma(`CASE WHEN h_parent_2.type::text = 'SECTOR' THEN h_parent_2.type ELSE NULL END,`, showSector)}
+        ${gerRawPrisma(`disc_a.h_parent_1_id,`, showSector)}
+        ${gerRawPrisma(`disc_a.h_parent_1_name,`, showSector)}
+        ${gerRawPrisma(`disc_a.h_parent_1_type,`, showSector)}
 
-        ${gerRawPrisma(`CASE WHEN h_parent_2.type::text = 'MANAGEMENT' THEN h_parent_2.id ELSE NULL END,`, showManagement)}
-        ${gerRawPrisma(`CASE WHEN h_parent_2.type::text = 'MANAGEMENT' THEN h_parent_2.name ELSE NULL END,`, showManagement)}
-        ${gerRawPrisma(`CASE WHEN h_parent_2.type::text = 'MANAGEMENT' THEN h_parent_2.type ELSE NULL END,`, showManagement)}
-        ${gerRawPrisma(`CASE WHEN h_parent_3.type::text = 'MANAGEMENT' THEN h_parent_3.id ELSE NULL END,`, showManagement)}
-        ${gerRawPrisma(`CASE WHEN h_parent_3.type::text = 'MANAGEMENT' THEN h_parent_3.name ELSE NULL END,`, showManagement)}
-        ${gerRawPrisma(`CASE WHEN h_parent_3.type::text = 'MANAGEMENT' THEN h_parent_3.type ELSE NULL END,`, showManagement)}
+        ${gerRawPrisma(`disc_a.h_parent_2_id,`, showManagement)}
+        ${gerRawPrisma(`disc_a.h_parent_2_name,`, showManagement)}
+        ${gerRawPrisma(`disc_a.h_parent_2_type,`, showManagement)}
 
-        ${gerRawPrisma(`CASE WHEN h_parent_2.type::text = 'DIRECTORY' THEN h_parent_2.id ELSE NULL END,`, showDirectory)}
-        ${gerRawPrisma(`CASE WHEN h_parent_2.type::text = 'DIRECTORY' THEN h_parent_2.name ELSE NULL END,`, showDirectory)}
-        ${gerRawPrisma(`CASE WHEN h_parent_2.type::text = 'DIRECTORY' THEN h_parent_2.type ELSE NULL END,`, showDirectory)}
-        ${gerRawPrisma(`CASE WHEN h_parent_3.type::text = 'DIRECTORY' THEN h_parent_3.id ELSE NULL END,`, showDirectory)}
-        ${gerRawPrisma(`CASE WHEN h_parent_3.type::text = 'DIRECTORY' THEN h_parent_3.name ELSE NULL END,`, showDirectory)}
-        ${gerRawPrisma(`CASE WHEN h_parent_3.type::text = 'DIRECTORY' THEN h_parent_3.type ELSE NULL END,`, showDirectory)}
-        ${gerRawPrisma(`CASE WHEN h_parent_4.type::text = 'DIRECTORY' THEN h_parent_4.id ELSE NULL END,`, showDirectory)}
-        ${gerRawPrisma(`CASE WHEN h_parent_4.type::text = 'DIRECTORY' THEN h_parent_4.name ELSE NULL END,`, showDirectory)}
-        ${gerRawPrisma(`CASE WHEN h_parent_4.type::text = 'DIRECTORY' THEN h_parent_4.type ELSE NULL END,`, showDirectory)}
+        ${gerRawPrisma(`disc_a.h_parent_3_id,`, showDirectory)}
+        ${gerRawPrisma(`disc_a.h_parent_3_name,`, showDirectory)}
+        ${gerRawPrisma(`disc_a.h_parent_3_type,`, showDirectory)}
 
-        w."id",
-        w."name"
+        ${gerRawPrisma(`disc_a."workspace_id",`, showWorkspace)}
+        ${gerRawPrisma(`disc_a."workspace_name"`, showWorkspace)}
+
+        ${gerRawPrisma(`disc_a."homo_id",`, showHomogeneousGroup)}
+        ${gerRawPrisma(`disc_a."homo_name"`, showHomogeneousGroup)}
       ${getOrderByRawPrisma(orderByParams)}
       LIMIT ${pagination.limit}
       OFFSET ${pagination.offSet};
@@ -485,7 +509,10 @@ export class AbsenteeismMetricsDAO {
           ${gerRawPrisma(`CASE WHEN h_parent_2.type::text = 'DIRECTORY' THEN h_parent_2.id ELSE NULL END AS hierarchy_parent_2_id,`, AbsenteeismHierarchyTypeEnum.DIRECTORY == filters.type)}
           ${gerRawPrisma(`CASE WHEN h_parent_3.type::text = 'DIRECTORY' THEN h_parent_3.id ELSE NULL END AS hierarchy_parent_3_id,`, AbsenteeismHierarchyTypeEnum.DIRECTORY == filters.type)}
           ${gerRawPrisma(`CASE WHEN h_parent_4.type::text = 'DIRECTORY' THEN h_parent_4.id ELSE NULL END AS hierarchy_parent_4_id,`, AbsenteeismHierarchyTypeEnum.DIRECTORY == filters.type)}
-          w.id AS workspace_id
+          
+          ${gerRawPrisma(` w.id AS workspace_id`, AbsenteeismHierarchyTypeEnum.HOMOGENEOUS_GROUP != filters.type)}
+
+          ${gerRawPrisma(`hg.id AS homo_id`, AbsenteeismHierarchyTypeEnum.HOMOGENEOUS_GROUP == filters.type)}
         FROM
           "Absenteeism" a
         JOIN
@@ -502,11 +529,15 @@ export class AbsenteeismMetricsDAO {
           "Hierarchy" h_parent_3 ON h_parent_3."id" = h_parent_2."parentId"
         LEFT JOIN 
           "Hierarchy" h_parent_4 ON h_parent_4."id" = h_parent_3."parentId"
+        LEFT JOIN 
+          "HierarchyOnHomogeneous" hoh ON hoh."hierarchyId" IN (h.id, h_parent_1.id, h_parent_2.id, h_parent_3.id, h_parent_4.id) AND hoh."deletedAt" IS NULL 
+        LEFT JOIN 
+          "HomogeneousGroup" hg ON hoh."homogeneousGroupId" = hg.id AND hg."deletedAt" IS null AND hg."status" = 'ACTIVE' AND hg."type" IS NULL
         JOIN
           "_HierarchyToWorkspace" htw ON h.id = htw."A"
         JOIN
           "Workspace" w ON htw."B" = w.id 
-        ${gerWhereRawPrisma(whereParams)}
+        ${gerWhereRawPrisma([...whereParams, ...(AbsenteeismHierarchyTypeEnum.HOMOGENEOUS_GROUP == filters.type ? [Prisma.sql`hg.id IS NOT NULL`] : [])])}
         GROUP BY
           ${gerRawPrisma(`h."id",`, showOffice)}
           
@@ -520,8 +551,10 @@ export class AbsenteeismMetricsDAO {
           ${gerRawPrisma(`CASE WHEN h_parent_3.type::text = 'DIRECTORY' THEN h_parent_3.id ELSE NULL END,`, AbsenteeismHierarchyTypeEnum.DIRECTORY == filters.type)}
           ${gerRawPrisma(`CASE WHEN h_parent_4.type::text = 'DIRECTORY' THEN h_parent_4.id ELSE NULL END,`, AbsenteeismHierarchyTypeEnum.DIRECTORY == filters.type)}
 
-          w."id"
-      ) AS subquery
+          ${gerRawPrisma(`w."id"`, AbsenteeismHierarchyTypeEnum.HOMOGENEOUS_GROUP != filters.type)}
+          
+          ${gerRawPrisma(`hg.id`, AbsenteeismHierarchyTypeEnum.HOMOGENEOUS_GROUP == filters.type)}
+        ) AS subquery
     `;
 
     const filterAbsenteeismMetricsPromise = this.prisma.$queryRaw<{ types: HierarchyEnum[] }[]>`
@@ -539,6 +572,7 @@ export class AbsenteeismMetricsDAO {
     return AbsenteeismTotalHierarchyBrowseModelMapper.toModel({
       results: AbsenteeismMetrics,
       pagination: { limit: pagination.limit, page: pagination.page, total: Number(totalAbsenteeismMetrics[0].total) },
+      range: gerRageDate(filters),
       filters: {
         types: filterAbsenteeismMetrics[0].types,
       },

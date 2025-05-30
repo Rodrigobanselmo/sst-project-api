@@ -9,7 +9,7 @@ export type IAbsenteeismTotalHierarchyFilterBrowseModelMapper = {
 export class AbsenteeismTotalHierarchyFilterBrowseModelMapper {
   static toModel(prisma: IAbsenteeismTotalHierarchyFilterBrowseModelMapper): AbsenteeismTotalHierarchyFilterBrowseModel {
     return new AbsenteeismTotalHierarchyFilterBrowseModel({
-      types: [AbsenteeismHierarchyTypeEnum.WORKSPACE, ...prisma.types.map((type) => AbsenteeismHierarchyTypeEnum[type])],
+      types: [AbsenteeismHierarchyTypeEnum.WORKSPACE, ...prisma.types.map((type) => AbsenteeismHierarchyTypeEnum[type]), AbsenteeismHierarchyTypeEnum.HOMOGENEOUS_GROUP],
     });
   }
 }

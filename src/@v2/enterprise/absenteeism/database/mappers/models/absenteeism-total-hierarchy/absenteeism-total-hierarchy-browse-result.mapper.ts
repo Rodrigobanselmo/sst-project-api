@@ -23,9 +23,12 @@ export type IAbsenteeismTotalHierarchyResultBrowseModelMapper = {
   hierarchy_parent_4_type: HierarchyTypeEnum | null;
   workspace_id: string;
   workspace_name: string;
+  homo_id: string;
+  homo_name: string;
   total_absenteeism_count: number | null;
   total_absenteeism_days: number | null;
   avg_absenteeism_per_employee: number | null;
+  daysInRange: number;
 };
 
 export class AbsenteeismTotalHierarchyResultBrowseModelMapper {
@@ -71,20 +74,29 @@ export class AbsenteeismTotalHierarchyResultBrowseModelMapper {
       {} as Partial<Record<AbsenteeismHierarchyTypeEnum, IAbsenteeismTotalHierarchyModel>>,
     );
 
-    hierarchyMap.WORKSPACE = {
-      id: prisma.workspace_id,
-      name: prisma.workspace_name,
-    };
+    if (prisma.workspace_id) {
+      hierarchyMap.WORKSPACE = {
+        id: prisma.workspace_id,
+        name: prisma.workspace_name,
+      };
+    }
+
+    if (prisma.homo_id) {
+      hierarchyMap.HOMOGENEOUS_GROUP = {
+        id: prisma.homo_id,
+        name: prisma.homo_name,
+      };
+    }
 
     return new AbsenteeismTotalHierarchyResultBrowseModel({
-      averageDays: Number(prisma.avg_absenteeism_per_employee) / 60 / 24,
+      averageDays: Number(prisma.avg_absenteeism_per_employee) / 60 / 24 / prisma.daysInRange,
       total: Number(prisma.total_absenteeism_count),
       totalDays: Number(prisma.total_absenteeism_days) / 60 / 24,
       ...hierarchyMap,
     });
   }
 
-  static toModels(prisma: IAbsenteeismTotalHierarchyResultBrowseModelMapper[]): AbsenteeismTotalHierarchyResultBrowseModel[] {
-    return prisma.map((rec) => AbsenteeismTotalHierarchyResultBrowseModelMapper.toModel(rec));
+  static toModels(prisma: IAbsenteeismTotalHierarchyResultBrowseModelMapper[], daysInRange: number): AbsenteeismTotalHierarchyResultBrowseModel[] {
+    return prisma.map((rec) => AbsenteeismTotalHierarchyResultBrowseModelMapper.toModel({ ...rec, daysInRange }));
   }
 }

@@ -14,6 +14,7 @@ export type IAbsenteeismTotalHierarchyResultBrowseModel = {
   SUB_SECTOR?: IAbsenteeismTotalHierarchyModel;
   OFFICE?: IAbsenteeismTotalHierarchyModel;
   SUB_OFFICE?: IAbsenteeismTotalHierarchyModel;
+  HOMOGENEOUS_GROUP?: IAbsenteeismTotalHierarchyModel;
 };
 
 export class AbsenteeismTotalHierarchyResultBrowseModel {
@@ -28,6 +29,7 @@ export class AbsenteeismTotalHierarchyResultBrowseModel {
   SUB_SECTOR?: IAbsenteeismTotalHierarchyModel;
   OFFICE?: IAbsenteeismTotalHierarchyModel;
   SUB_OFFICE?: IAbsenteeismTotalHierarchyModel;
+  HOMOGENEOUS_GROUP?: IAbsenteeismTotalHierarchyModel;
 
   constructor(params: IAbsenteeismTotalHierarchyResultBrowseModel) {
     this.total = params.total;
@@ -41,5 +43,6 @@ export class AbsenteeismTotalHierarchyResultBrowseModel {
     this.SUB_SECTOR = params.SUB_SECTOR;
     this.OFFICE = params.OFFICE;
     this.SUB_OFFICE = params.SUB_OFFICE;
+    this.HOMOGENEOUS_GROUP = params.HOMOGENEOUS_GROUP;
   }
 }
