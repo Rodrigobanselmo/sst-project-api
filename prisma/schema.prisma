@@ -362,6 +362,7 @@ model Company {
   FormQuestionData           FormQuestionData[]
   TaskProject                TaskProject[]
   Task                       Task[]
+  CompanyFlags               CompanyFlags?
 
   @@index([name])
   @@index([isClinic])
@@ -369,6 +370,17 @@ model Company {
   @@index([initials])
   @@index([fantasy])
   @@index([cnpj])
+}
+
+model CompanyFlags {
+  id         Int      @id @default(autoincrement())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  action_plan_notifications_enabled Boolean @default(false)
+
+  company_id String  @unique
+  company    Company @relation(fields: [company_id], references: [id])
 }
 
 model CompanyCert {

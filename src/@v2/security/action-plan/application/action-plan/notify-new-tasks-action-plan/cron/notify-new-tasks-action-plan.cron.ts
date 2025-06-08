@@ -6,6 +6,7 @@ import { NewTasksActionPlanUseCase } from '../use-cases/notify-new-tasks-action-
 export class NewTasksActionPlanCron {
   constructor(private readonly newTasksActionPlanUseCase: NewTasksActionPlanUseCase) {}
 
+  @Cron('0 0 19 * * 1-5')
   @Cron(CronExpression.MONDAY_TO_FRIDAY_AT_3PM)
   async handleCron() {
     await this.newTasksActionPlanUseCase.execute({});

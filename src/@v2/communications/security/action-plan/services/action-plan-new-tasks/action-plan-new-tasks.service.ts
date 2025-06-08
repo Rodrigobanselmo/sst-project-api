@@ -7,6 +7,7 @@ import { UserCommunicationDAO } from '@/@v2/communications/base/database/dao/use
 import { ActionPlanCommunicationDAO } from '../../database/dao/action-plan/action-plan.dao';
 import { dateUtils } from '@/@v2/shared/utils/helpers/date-utils';
 import { ActionPlanStatusTypeColorTranslate, ActionPlanStatusTypeTranslate } from '../../translations/action-plan-status-type.translaton';
+import { CompanyCommunicationDAO } from '@/@v2/communications/base/database/dao/company/company.dao';
 
 @Injectable()
 export class ActionPlanNewTasksService implements IActionPlanNewTasksService {
@@ -14,12 +15,19 @@ export class ActionPlanNewTasksService implements IActionPlanNewTasksService {
     @Inject(SharedTokens.Email)
     private readonly mailAdapter: MailAdapter,
     private readonly userDao: UserCommunicationDAO,
+    private readonly companyDao: CompanyCommunicationDAO,
     private readonly actionPlanDAO: ActionPlanCommunicationDAO,
   ) {}
 
   async send(params: IActionPlanNewTasksService.Params): IActionPlanNewTasksService.Result {
-    const user = await this.userDao.find({ id: params.userId });
-    const actionPlan = await this.actionPlanDAO.findMany({ ids: params.ids.slice(0, 10) });
+    const userPromise = this.userDao.find({ id: params.userId });
+    const actionPlanPromise = this.actionPlanDAO.findMany({ ids: params.ids.slice(0, 10) });
+    const flagsPromise = this.companyDao.findFlags({ companyId: params.companyId });
+
+    const [user, actionPlan, flags] = await Promise.all([userPromise, actionPlanPromise, flagsPromise]);
+
+    if (!user || !actionPlan.length) return [, null];
+    if (!flags.actionPlanNotificationsEnabled) return [, null];
 
     await this.mailAdapter.sendMail({
       type: 'ACTION_PLAN_NEW_TASKS',
@@ -34,6 +42,6 @@ export class ActionPlanNewTasksService implements IActionPlanNewTasksService {
       })),
     });
 
-    return [undefined, null];
+    return [, null];
   }
 }

@@ -7,7 +7,7 @@ export class AllTasksActionPlanCron {
   constructor(private readonly allTasksActionPlanUseCase: AllTasksActionPlanUseCase) {}
 
   // This cron job runs every Monday at 11:00 AM
-  @Cron('0 0 11 * * 1')
+  @Cron('0 0 10 * * 1')
   async handleCron() {
     await this.allTasksActionPlanUseCase.execute({});
   }
