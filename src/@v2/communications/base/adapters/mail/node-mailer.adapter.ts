@@ -2,17 +2,17 @@ import { captureException } from '@/@v2/shared/utils/helpers/capture-exception';
 import { readFile } from 'fs/promises';
 import handlebars from 'handlebars';
 import nodemailer from 'nodemailer';
-import { MailAdapter } from './mail.interface';
-import { EmailType } from '../../../../templates/@v2/email';
-import { isDevelopment } from '../../utils/helpers/is-development';
+import { SendMailAdapter } from './mail.interface';
+import { EmailTemplate } from '@/templates/@v2/email';
+import { isDevelopment } from '@/@v2/shared/utils/helpers/is-development';
 
-export class NodeMailerAdapter implements MailAdapter {
-  async sendMail({ to, type, variables, attachments }: MailAdapter.SendMailData): Promise<any> {
+export class NodeMailerAdapter implements SendMailAdapter {
+  async sendMail({ to, type, variables, attachments }: SendMailAdapter.SendMailData): Promise<any> {
     try {
       if (isDevelopment()) return;
       if (!to) return;
 
-      const { path, subject } = EmailType[type];
+      const { path, subject } = EmailTemplate[type];
 
       const templateFileContent = await readFile(path, 'utf-8');
 

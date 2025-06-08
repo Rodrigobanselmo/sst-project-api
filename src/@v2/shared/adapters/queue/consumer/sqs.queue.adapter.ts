@@ -1,66 +1,55 @@
-import { Logger, OnModuleInit } from '@nestjs/common'
-import { Consumer as LibSQSConsumer } from 'sqs-consumer'
-import { SQS } from '@aws-sdk/client-sqs'
+import { SQSClient } from '@aws-sdk/client-sqs';
+import { Logger, OnModuleInit } from '@nestjs/common';
+import { Consumer as LibSQSConsumer } from 'sqs-consumer';
 
+import { QueueEvents } from '@/@v2/shared/constants/events';
+import { QueueEventsMap } from '@/@v2/shared/constants/queue';
+import { captureException } from '@/@v2/shared/utils/helpers/capture-exception';
+import { checkInternetConnectivity } from '@/@v2/shared/utils/helpers/check-internet-connectivity';
+import { Queue } from './queue.interface';
 
-import { Queue } from './queue.interface'
-import { validateDto } from '@/@v2/shared/utils/helpers/validate-dto'
-import { Events } from '@/@v2/shared/constants/events'
-import { QueueEvents } from '@/@v2/shared/constants/queue'
-
-export function MessageBody() {
-  return (target: object, propertyKey: string | symbol, parameterIndex: number) => {
-    const existingRequiredParameters: number[] = Reflect.getOwnMetadata('design:paramtypes', target, propertyKey) || []
-    existingRequiredParameters.push(parameterIndex)
-    Reflect.defineMetadata('design:paramtypes', existingRequiredParameters, target, propertyKey)
-  }
-}
-
-export function Consumer(eventName: Events) {
-  return function <T extends { new(...args: any[]): Queue }>(constructor: T) {
+export function Consumer(eventName: QueueEvents) {
+  return function <T extends { new (...args: any[]): Queue }>(constructor: T) {
     return class extends constructor implements OnModuleInit {
-      eventName = eventName
-      readonly logger = new Logger(constructor.name)
+      eventName = eventName;
+      readonly logger = new Logger(constructor.name);
 
       async onModuleInit() {
-        if (!this.eventName) {
-          throw new Error('@EventListener() decorator is required')
-        }
+        const online = await checkInternetConnectivity();
+        if (!online) return console.log('Skipping SQS connection. Working in offline mode.');
 
-        const paramTypes = Reflect.getMetadata('design:paramtypes', this, 'consume')
-        const consumeMessageType = paramTypes ? paramTypes[0] : null
+        if (!this.eventName) throw new Error('@EventListener() decorator is required');
 
         const app = LibSQSConsumer.create({
-          sqs: new SQS({ endpoint: process.env.AWS_ENDPOINT }),
-          queueUrl: QueueEvents[this.eventName].queueURL,
+          sqs: new SQSClient({ region: process.env.AWS_SQS_REGION }),
+          queueUrl: QueueEventsMap[this.eventName].queueURL,
           handleMessage: async (message) => {
-            let params: any = message
+            let params: any = message;
 
-            if (consumeMessageType && message.Body) {
-              const [body, error] = await validateDto(JSON.parse(message.Body), consumeMessageType)
-              if (error) throw new Error(error)
-              params = body
+            if (message.Body) {
+              params = JSON.parse(message.Body);
             }
 
-            return this.consume(params)
-          }
-        })
+            return this.consume(params);
+          },
+        });
 
-        app.on('error', this.handleSQSError)
-        app.on('processing_error', this.handleSQSProcessingError)
-        app.on('message_received', () => this.logger.log('Message received'))
-        app.start()
+        app.on('error', this.handleSQSError);
+        app.on('processing_error', this.handleSQSProcessingError);
+        app.on('message_received', () => this.logger.log(`SQS Message Received:[${eventName}]`));
+        app.on('message_processed', () => this.logger.log(`SQS Message Processed successfully:[${eventName}]`));
+        app.start();
       }
 
       public handleSQSError = (error: Error) => {
-        //! captureException(error)
-        this.logger.error(`SQS Error:[${eventName}]`, error.stack)
-      }
+        captureException(error);
+        this.logger.error(`SQS Error:[${eventName}]`, error.stack);
+      };
 
       public handleSQSProcessingError = (error: Error) => {
-        //! captureException(error)
-        this.logger.error(`SQS Processing Error:[${eventName}]`, error.stack)
-      }
-    }
-  }
+        captureException(error);
+        this.logger.error(`SQS Processing Error:[${eventName}]`, error.stack);
+      };
+    };
+  };
 }

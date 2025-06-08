@@ -21,14 +21,14 @@ export class ResponsibleDAO {
 
     const usersPromise = this.prisma.$queryRaw<IResponsibleBrowseResultModelMapper[]>`
       SELECT
-        user_id,
-        employee_id,
         row_name,
-        row_email
+        (ARRAY_AGG(row_email))[1] as row_email,
+        ARRAY_AGG(employee_id) as employee_ids,
+        ARRAY_AGG(user_id) as user_ids
       FROM (
         SELECT
           u."id" AS user_id,
-          u."name" AS row_name,
+          unaccent(upper(u."name")) AS row_name,
           u."email" AS row_email,
           NULL AS employee_id
         FROM
@@ -41,40 +41,52 @@ export class ResponsibleDAO {
 
         SELECT
           NULL AS user_id,
-          employee."name" AS row_name,
+          unaccent(upper(employee."name")) AS row_name,
           employee."email" AS row_email,
           employee."id" AS employee_id
         FROM
           "Employee" employee
         ${gerWhereRawPrisma(whereEmployee)}
       ) AS combined_results
+      GROUP BY
+        row_name
       ${getOrderByRawPrisma(orderByParams)}
       LIMIT ${pagination.limit}
       OFFSET ${pagination.offSet};
     `;
 
     const totalUsersPromise = this.prisma.$queryRaw<[{ total: number }]>`
-      SELECT COUNT(*) AS total_rows
-      FROM (
-        SELECT
-          u."id" AS user_id  
-        FROM 
-          "User" u
-        LEFT JOIN 
-          "UserCompany" up ON u.id = up."userId" AND up.status <> 'INACTIVE'
-        ${gerWhereRawPrisma(this.browseUserWhere(filters))}
+      WITH users AS (
+        SELECT row_name, row_email
+        FROM (
+          SELECT
+            u."name" AS row_name,
+            u."email" AS row_email
+          FROM 
+            "User" u
+          LEFT JOIN 
+            "UserCompany" up ON u.id = up."userId" AND up.status <> 'INACTIVE'
+          ${gerWhereRawPrisma(whereUser)}
 
-        UNION ALL
+          UNION ALL
 
-        SELECT
-          employee."id" AS employee_id
-        FROM 
-          "Employee" employee
-        ${gerWhereRawPrisma(this.browseEmployeeWhere(filters))} 
-      ) AS subquery;
+          SELECT
+            employee."name" AS row_name,
+            employee."email" AS row_email
+          FROM 
+            "Employee" employee
+          ${gerWhereRawPrisma(whereEmployee)}
+        ) AS subquery
+        GROUP BY
+          row_name, 
+          row_email
+      )
+      SELECT COUNT(*) AS total
+      FROM users
     `;
 
     const [users, totalUsers] = await Promise.all([usersPromise, totalUsersPromise]);
+    console.log('Total Users:', totalUsers);
 
     return ResponsibleBrowseModelMapper.toModel({
       results: users,

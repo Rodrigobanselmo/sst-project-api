@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Novas Tarefas Atribuídas</title>
+  <style>
+    /* Estilos otimizados para e-mail */
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      background-color: #ffffff;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    .logo {
+      margin-bottom: 20px;
+    }
+    .logo img {
+      max-width: 150px;
+      height: auto;
+    }
+    .title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #212529;
+      margin-bottom: 20px;
+    }
+    .content {
+      font-size: 16px;
+      color: #495057;
+      line-height: 1.6;
+      margin-bottom: 30px;
+      text-align: left;
+    }
+    .task-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 25px 0;
+      font-size: 15px;
+    }
+    .task-table th, .task-table td {
+      border: 1px solid #dddddd;
+      padding: 12px;
+      text-align: left;
+    }
+    .task-table th {
+      background-color: #f7f7f7;
+      font-weight: bold;
+      color: #333;
+    }
+    /* Estilo para o link do título da tarefa */
+    .task-link {
+        color: #007bff; /* Azul padrão de link */
+        text-decoration: none;
+        font-weight: bold;
+    }
+    .task-link:hover {
+        text-decoration: underline;
+    }
+    .button-container {
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    .button {
+      display: inline-block;
+      background-color: #4CAF50; /* Verde */
+      color: #ffffff !important;
+      padding: 15px 30px;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+    .button:hover {
+      background-color: #367c39;
+    }
+    .footer {
+      font-size: 14px;
+      color: #757575;
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class='container'>
+    {{#if company.logoUrl}}
+      <div class="logo">
+        <img src="{{company.logoUrl}}" alt="Logo da {{company.name}}">
+      </div>
+    {{/if}}
+
+    <h2 class="title">Você tem novas tarefas!</h2>
+
+    <div class="content">
+      <p>Olá, <strong>{{user.name}}</strong>!</p>
+      <p>Estas são as novas tarefas que foram atribuídas a você hoje no plano de ação da empresa <strong>{{company.name}}</strong>.</p>
+    </div>
+
+    {{#if tasks}}
+      <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+        <tr>
+          <td align="center" style="padding: 8px 0px;">
+            
+            <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+              {{#each tasks}}
+                <tr>
+                  <td style="padding-bottom: 16px;"> 
+                    
+                    <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color: #ffffff; border-radius: 6px; border: 1px solid #f2f2f2; border-top: 4px solid #007bff;">
+                      <tr>
+                        <td style="padding: 12px 16px;">
+                          
+                          <a href="{{../link}}" target="_blank" style="text-decoration: none; color: #333333; font-family: sans-serif; font-size: 16px; font-weight: 600;">
+                            {{this.title}}
+                          </a>
+
+                          <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="margin-top: 12px;">
+                            <tr>
+                              <td align="left" style="font-family: sans-serif; font-size: 13px; color: #666666; font-weight: 500;">
+                                📅 {{this.dueDate}}
+                              </td>
+                              
+                              <td align="right">
+                                <table border="0" cellpadding="0" cellspacing="0" role="presentation">
+                                  <tr>
+                                    <td align="center" style="background-color: {{this.statusColor}}; border-radius: 10px; padding: 2px 10px; font-family: sans-serif; font-size: 12px; font-weight: 600; color: #ffffff;">
+                                      {{this.status}}
+                                    </td>
+                                  </tr>
+                                </table>
+                              </td>
+                            </tr>
+                          </table>
+                          
+                        </td>
+                      </tr>
+                    </table>
+
+                  </td>
+                </tr>
+              {{/each}}
+            </table>
+
+          </td>
+        </tr>
+      </table>
+
+    {{else}}
+      <div class="content" style="padding: 20px; text-align: center; font-family: sans-serif; font-size: 16px; color: #666666;">
+        <p>Nenhuma nova tarefa foi atribuída a você hoje. Tenha um ótimo dia!</p>
+      </div>
+    {{/if}}
+
+
+    <div class="button-container">
+      <a href='{{link}}' class='button'>Acessar meu painel de tarefas</a>
+    </div>
+
+    <div class="content" style="text-align: center;">
+      <p><strong>Obrigado e bom trabalho!</strong></p>
+      <p>Equipe {{company.name}}</p>
+    </div>
+
+    <div class="footer">
+      <p>Este é um e-mail automático, por favor, não responda.</p>
+    </div>
+  </div>
+</body>
+</html>

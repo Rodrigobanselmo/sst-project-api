@@ -1,3 +1,5 @@
-export enum Events {
+export enum QueueEvents {
   GENERATE_DOCUMENT = 'GENERATE_DOCUMENT',
+  SEND_NOTIFICATION = 'SEND_NOTIFICATION',
+  SEND_EMAIL = 'SEND_EMAIL',
 }

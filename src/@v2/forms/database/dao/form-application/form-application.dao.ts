@@ -113,7 +113,6 @@ export class FormApplicationDAO {
   }
 
   private browseWhere(filters: IFormApplicationDAO.BrowseParams['filters']) {
-    console.log(filters);
     const where = [Prisma.sql`form_ap."company_id" = ${filters.companyId}`, Prisma.sql`form_ap."deleted_at" IS NULL`];
 
     return where;

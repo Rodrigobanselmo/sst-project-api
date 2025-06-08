@@ -15,7 +15,7 @@ export class PgrConsumer implements OnModuleInit {
   constructor(
     private readonly pgrUploadDocService: PgrUploadService,
     private readonly pcmsoUploadService: PcmsoUploadService,
-  ) { }
+  ) {}
 
   async onModuleInit() {
     const online = await checkInternetConnectivity();
@@ -24,7 +24,7 @@ export class PgrConsumer implements OnModuleInit {
       this.app = Consumer.create({
         queueUrl: process.env.AWS_SQS_PGR_URL,
         handleMessage: (message) => this.consume(message as any),
-        sqs: new SQSClient({ region: process.env.AWS_SQS_PGR_REGION }),
+        sqs: new SQSClient({ region: process.env.AWS_SQS_REGION }),
       });
 
       this.app.on('error', this.handleSQSError);
@@ -57,12 +57,12 @@ export class PgrConsumer implements OnModuleInit {
   }
 
   private handleSQSError = (error: Error) => {
-    console.log(1)
+    console.log(1);
     console.error('SQS Error:', error.message);
   };
 
   private handleSQSProcessingError = (error: Error) => {
-    console.log(1)
+    console.log(1);
     console.error('SQS Processing Error:', error.message);
   };
 }

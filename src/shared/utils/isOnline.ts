@@ -1,5 +1,9 @@
 import axios from 'axios';
 
+/**
+ * @deprecated
+ * This method is deprecated and has been replaced by newMethod()
+ */
 export async function checkInternetConnectivity(): Promise<boolean> {
   const isDev = process.env.NODE_ENV === 'development';
   if (!isDev) return true;

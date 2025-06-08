@@ -41,6 +41,11 @@ import { AddActionPlanPhotoFileController } from './application/action-plan-phot
 import { AddActionPlanPhotoFileUseCase } from './application/action-plan-photo/add-action-plan-photo-file/use-cases/add-action-plan-photo-file.usecase';
 import { DeleteActionPlanPhotoFileController } from './application/action-plan-photo/delete-action-plan-photo-file/controllers/delete-action-plan-photo-file.controller';
 import { DeleteActionPlanPhotoFileUseCase } from './application/action-plan-photo/delete-action-plan-photo-file/use-cases/delete-action-plan-photo-file.usecase';
+import { NewTasksActionPlanCron } from './application/action-plan/notify-new-tasks-action-plan/cron/notify-new-tasks-action-plan.cron';
+import { ActionPlanRepository } from './database/repositories/action-plan/action-plan.repository';
+import { AllTasksActionPlanCron } from './application/action-plan/notify-all-tasks-action-plan/cron/notify-all-tasks-action-plan.cron';
+import { NewTasksActionPlanUseCase } from './application/action-plan/notify-new-tasks-action-plan/use-cases/notify-new-tasks-action-plan.usecase';
+import { AllTasksActionPlanUseCase } from './application/action-plan/notify-all-tasks-action-plan/use-cases/notify-all-tasks-action-plan.usecase';
 
 @Module({
   imports: [SharedModule],
@@ -61,6 +66,10 @@ import { DeleteActionPlanPhotoFileUseCase } from './application/action-plan-phot
     DeleteActionPlanPhotoFileController,
   ],
   providers: [
+    // Crons
+    NewTasksActionPlanCron,
+    AllTasksActionPlanCron,
+
     // Database
     ActionPlanDAO,
     ActionPlanInfoDAO,
@@ -73,6 +82,7 @@ import { DeleteActionPlanPhotoFileUseCase } from './application/action-plan-phot
     UserDAO,
     HierarchyDAO,
     ResponsibleDAO,
+    ActionPlanRepository,
 
     // Use Cases
     BrowseActionPlanUseCase,
@@ -89,6 +99,8 @@ import { DeleteActionPlanPhotoFileUseCase } from './application/action-plan-phot
     ReadActionPlanUseCase,
     AddActionPlanPhotoFileUseCase,
     DeleteActionPlanPhotoFileUseCase,
+    NewTasksActionPlanUseCase,
+    AllTasksActionPlanUseCase,
 
     // Services
     EditActionPlanService,

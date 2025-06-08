@@ -1,9 +1,9 @@
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
-import { Prisma } from '@prisma/client';
-import { IActionPlanAggregateRepository } from './action-plan-aggregate.types';
 import { asyncBatch } from '@/@v2/shared/utils/helpers/async-batch';
-import { ActionPlanAggregateMapper } from '../../mappers/aggregations/action-plan.mapper';
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+import { ActionPlanAggregateMapper } from '../../mappers/aggregations/action-plan.mapper';
+import { IActionPlanAggregateRepository } from './action-plan-aggregate.types';
 
 @Injectable()
 export class ActionPlanAggregateRepository implements IActionPlanAggregateRepository {
@@ -81,6 +81,7 @@ export class ActionPlanAggregateRepository implements IActionPlanAggregateReposi
         recMedId: params.actionPlan.recommendationId,
         workspaceId: params.actionPlan.workspaceId,
         responsibleId: params.actionPlan.responsibleId,
+        responsible_updated_at: params.actionPlan.responsibleUpdatedAt,
         endDate: params.actionPlan.validDate,
         status: params.actionPlan.status,
         startDate: params.actionPlan.startDate,
@@ -109,6 +110,7 @@ export class ActionPlanAggregateRepository implements IActionPlanAggregateReposi
       },
       update: {
         responsibleId: params.actionPlan.responsibleId,
+        responsible_updated_at: params.actionPlan.responsibleUpdatedAt,
         endDate: params.actionPlan.validDate,
         status: params.actionPlan.status,
         startDate: params.actionPlan.startDate,
@@ -159,6 +161,7 @@ export class ActionPlanAggregateRepository implements IActionPlanAggregateReposi
               recMedId: params.actionPlan.recommendationId,
               workspaceId: params.actionPlan.workspaceId,
               responsibleId: params.actionPlan.responsibleId,
+              responsible_updated_at: params.actionPlan.responsibleUpdatedAt,
               endDate: params.actionPlan.validDate,
               status: params.actionPlan.status,
               startDate: params.actionPlan.startDate,
@@ -187,6 +190,7 @@ export class ActionPlanAggregateRepository implements IActionPlanAggregateReposi
             },
             update: {
               responsibleId: params.actionPlan.responsibleId,
+              responsible_updated_at: params.actionPlan.responsibleUpdatedAt,
               endDate: params.actionPlan.validDate,
               status: params.actionPlan.status,
               startDate: params.actionPlan.startDate,

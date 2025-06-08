@@ -12,10 +12,69 @@ import { IActionPlanBrowseResultModelMapper } from '../../mappers/models/action-
 import { ActionPlanBrowseModelMapper } from '../../mappers/models/action-plan/action-plan-browse.mapper';
 import { ActionPlanReadMapper } from '../../mappers/models/action-plan/action-plan-read.mapper';
 import { ActionPlanOrderByEnum, IActionPlanDAO } from './action-plan.types';
+import { ActionPlanNewTasksMapper, IActionPlanNewTasksMapper } from '../../mappers/models/action-plan/action-plan-new-tasks.mapper';
+import { ActionPlanAllTasksMapper } from '../../mappers/models/action-plan/action-plan-all-tasks.mapper';
 
 @Injectable()
 export class ActionPlanDAO {
   constructor(private readonly prisma: PrismaServiceV2) {}
+
+  async findAllTasks() {
+    const actionPlans = await this.prisma.$queryRaw<IActionPlanNewTasksMapper[]>`
+      SELECT
+        rf_data_rec."companyId" as company_id,
+        rf_data_rec."responsibleId" as responsible_id,
+        ARRAY_AGG(rf_data_rec."id") as ids
+      FROM
+        "RiskFactorDataRec" rf_data_rec
+      JOIN
+        "RecMedOnRiskData" rec_med_on_risk_data 
+          ON rec_med_on_risk_data."risk_data_id" = rf_data_rec."riskFactorDataId" 
+          AND rec_med_on_risk_data."rec_med_id" = rf_data_rec."recMedId"
+      WHERE
+        rf_data_rec."responsibleId" IS NOT NULL
+        AND rf_data_rec."status"::text <> 'CANCELED'
+        AND rf_data_rec."status"::text <> 'DONE'
+                                                              AND "companyId" = 'd1309cad-19d4-4102-9bf9-231f91095c20'
+      GROUP BY 
+        rf_data_rec."companyId",
+        rf_data_rec."responsibleId"
+      LIMIT 500
+      OFFSET 0
+    `;
+
+    return actionPlans ? ActionPlanAllTasksMapper.toModels(actionPlans) : null;
+  }
+
+  async findNewTasks() {
+    const actionPlans = await this.prisma.$queryRaw<IActionPlanNewTasksMapper[]>`
+      SELECT
+        rf_data_rec."companyId" as company_id,
+        rf_data_rec."responsibleId" as responsible_id,
+        ARRAY_AGG(rf_data_rec."id") as ids
+      FROM
+        "RiskFactorDataRec" rf_data_rec
+      JOIN
+        "RecMedOnRiskData" rec_med_on_risk_data 
+          ON rec_med_on_risk_data."risk_data_id" = rf_data_rec."riskFactorDataId" 
+          AND rec_med_on_risk_data."rec_med_id" = rf_data_rec."recMedId"
+      WHERE
+        rf_data_rec."responsibleId" IS NOT NULL
+        AND rf_data_rec."status"::text <> 'CANCELED'
+        AND rf_data_rec."status"::text <> 'DONE'
+        AND (
+          rf_data_rec."responsible_updated_at" > rf_data_rec."responsible_notified_at" 
+          OR rf_data_rec."responsible_notified_at" IS NULL
+        )
+      GROUP BY 
+        rf_data_rec."companyId",
+        rf_data_rec."responsibleId"
+      LIMIT 300
+      OFFSET 0
+    `;
+
+    return actionPlans ? ActionPlanNewTasksMapper.toModels(actionPlans) : null;
+  }
 
   async find(params: IActionPlanDAO.FindParams) {
     const homogeneousGroupPromise = this.prisma.homogeneousGroup.findFirst({

@@ -25,6 +25,7 @@ import { AuthModule } from './@v2/auth/auth.module';
 import { FileModule } from './@v2/files/file.module';
 import { FormModule } from './@v2/forms/forms.module';
 import { TaskModule } from './@v2/task/task.module';
+import { CommunicationModule } from './@v2/communications/comunication.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { TaskModule } from './@v2/task/task.module';
     FileModule,
     FormModule,
     TaskModule,
+    CommunicationModule,
   ],
   providers: [
     {

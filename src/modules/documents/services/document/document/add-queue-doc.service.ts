@@ -12,7 +12,7 @@ export class AddQueueDocumentService {
   private readonly queueUrl: string;
 
   constructor(private readonly riskDocumentRepository: RiskDocumentRepository) {
-    this.sqs = new SQSClient({ region: process.env.AWS_SQS_PGR_REGION });
+    this.sqs = new SQSClient({ region: process.env.AWS_SQS_REGION });
     this.queueUrl = process.env.AWS_SQS_PGR_URL;
   }
   async execute(upsertPgrDto: UploadDocumentDto, userPayloadDto: UserPayloadDto) {

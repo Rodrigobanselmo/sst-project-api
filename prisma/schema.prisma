@@ -1962,8 +1962,10 @@ model RiskFactorDataRec {
   riskFactorDataId String
   riskFactorData   RiskFactorData @relation(fields: [riskFactorDataId], references: [id], onDelete: Cascade)
 
-  responsible   User? @relation(fields: [responsibleId], references: [id], onDelete: SetNull)
-  responsibleId Int?
+  responsible             User?     @relation(fields: [responsibleId], references: [id], onDelete: SetNull)
+  responsibleId           Int?
+  responsible_updated_at  DateTime?
+  responsible_notified_at DateTime?
 
   comments RiskFactorDataRecComments[]
   photos   RiskFactorDataRecPhoto[]
@@ -2320,6 +2322,16 @@ model TaskHistory {
 
   user    User @relation(fields: [user_id], references: [id])
   user_id Int
+}
+
+model EmailLog {
+  id         Int      @id @default(autoincrement())
+  email      String
+  template   String
+  data       Json?
+  created_at DateTime @default(now())
+
+  @@index([email])
 }
 
 enum CharacterizationTypeEnum {

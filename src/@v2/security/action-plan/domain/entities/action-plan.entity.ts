@@ -21,6 +21,7 @@ export class ActionPlanEntity {
   readonly riskDataId: string;
   readonly workspaceId: string;
 
+  _responsibleUpdatedAt?: Date | null;
   _responsibleId: number | null;
   _status: ActionPlanStatusEnum;
   _startDate: Date | null;
@@ -46,8 +47,17 @@ export class ActionPlanEntity {
     return this._responsibleId;
   }
 
+  get responsibleUpdatedAt() {
+    return this._responsibleUpdatedAt || null;
+  }
+
   set responsibleId(responsibleId: number | null | undefined) {
+    const oldResponsibleId = this._responsibleId;
     this._responsibleId = updateField(this._responsibleId, responsibleId);
+
+    if (responsibleId && this._responsibleId !== oldResponsibleId) {
+      this._responsibleUpdatedAt = new Date();
+    }
   }
 
   get startDate() {
