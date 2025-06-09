@@ -35,7 +35,6 @@ export class ActionPlanDAO {
         rf_data_rec."responsibleId" IS NOT NULL
         AND rf_data_rec."status"::text <> 'CANCELED'
         AND rf_data_rec."status"::text <> 'DONE'
-                                                              AND "companyId" = 'd1309cad-19d4-4102-9bf9-231f91095c20'
       GROUP BY 
         rf_data_rec."companyId",
         rf_data_rec."responsibleId"
