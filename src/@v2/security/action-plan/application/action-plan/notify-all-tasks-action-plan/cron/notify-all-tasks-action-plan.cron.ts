@@ -8,8 +8,7 @@ export class AllTasksActionPlanCron {
   private logger = new Logger(AllTasksActionPlanCron.name);
 
   // Monday at 10:00 AM
-  // @Cron('0 0 16 * * 1')
-  @Cron(CronExpression.MONDAY_TO_FRIDAY_AT_8PM)
+  @Cron('0 0 10 * * 1')
   async handleCron() {
     this.logger.log('Running notify all tasks action plan cron job');
 

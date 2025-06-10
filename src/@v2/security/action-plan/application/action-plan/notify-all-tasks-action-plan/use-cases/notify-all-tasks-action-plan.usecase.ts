@@ -15,6 +15,10 @@ export class AllTasksActionPlanUseCase {
   ) {}
 
   async execute(params: IActionPlanUseCase.Params) {
+    const currentDate = new Date();
+    const firstWeekOfMonth = currentDate.getDate() <= 7;
+    if (!firstWeekOfMonth) return;
+
     const data = await this.actionPlanDAO.findAllTasks();
 
     await asyncBatch({

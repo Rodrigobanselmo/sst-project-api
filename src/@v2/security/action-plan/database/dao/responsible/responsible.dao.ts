@@ -86,7 +86,6 @@ export class ResponsibleDAO {
     `;
 
     const [users, totalUsers] = await Promise.all([usersPromise, totalUsersPromise]);
-    console.log('Total Users:', totalUsers);
 
     return ResponsibleBrowseModelMapper.toModel({
       results: users,
