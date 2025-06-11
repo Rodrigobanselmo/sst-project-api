@@ -4,7 +4,7 @@ export const ActionPlanRoutes = {
     GET: 'v2/companies/:companyId/workspaces/:workspaceId/action-plan-info',
   },
   ACTION_PLAN: {
-    BROWSE: 'v2/companies/:companyId/action-plans',
+    BROWSE: 'v2/companies/:companyId/action-plans/workspace/:workspaceId',
     EDIT: 'v2/companies/:companyId/action-plans',
     EDIT_MANY: 'v2/companies/:companyId/action-plans/many',
     READ: 'v2/companies/:companyId/action-plans/:workspaceId/:riskDataId/:recommendationId',

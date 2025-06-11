@@ -44,9 +44,7 @@ export class DocumentDataEntity implements DocumentData {
 
     if (!this?.professionals) this.professionals = [];
     if (partial?.professionalsSignatures) {
-      this.professionalsSignatures = partial.professionalsSignatures.map(
-        (professionalSig) => new ProfessionalDocumentDataEntity(professionalSig),
-      );
+      this.professionalsSignatures = partial.professionalsSignatures.map((professionalSig) => new ProfessionalDocumentDataEntity(professionalSig));
 
       this.professionals = this.professionalsSignatures.map(
         ({ professional, ...rest }) =>

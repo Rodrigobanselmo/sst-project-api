@@ -1470,33 +1470,34 @@ model GenerateSource {
 }
 
 model Hierarchy {
-  id                            String                      @id @default(uuid())
-  status                        StatusEnum                  @default(ACTIVE)
+  id                            String                       @id @default(uuid())
+  status                        StatusEnum                   @default(ACTIVE)
   type                          HierarchyEnum
-  description                   String                      @default("")
-  realDescription               String                      @default("")
+  description                   String                       @default("")
+  realDescription               String                       @default("")
   name                          String
   companyId                     String
   parentId                      String?
   refName                       String?
-  created_at                    DateTime                    @default(now())
-  updated_at                    DateTime                    @updatedAt
+  created_at                    DateTime                     @default(now())
+  updated_at                    DateTime                     @updatedAt
   deletedAt                     DateTime?
   employees                     Employee[]
   employeeExamsHistory          EmployeeExamsHistory[] //poder ao adimitir um funcionario, escolher adicionar a este cargo 
-  employeeExamsHistorySubOffice EmployeeExamsHistory[]      @relation("subOffice_employee_exam")
+  employeeExamsHistorySubOffice EmployeeExamsHistory[]       @relation("subOffice_employee_exam")
   hierarchyHistory              EmployeeHierarchyHistory[]
-  company                       Company                     @relation(fields: [companyId], references: [id])
-  parent                        Hierarchy?                  @relation("children_parent", fields: [parentId], references: [id], onDelete: Cascade)
-  children                      Hierarchy[]                 @relation("children_parent")
+  company                       Company                      @relation(fields: [companyId], references: [id])
+  parent                        Hierarchy?                   @relation("children_parent", fields: [parentId], references: [id], onDelete: Cascade)
+  children                      Hierarchy[]                  @relation("children_parent")
   hierarchyOnHomogeneous        HierarchyOnHomogeneous[]
   riskFactorDatas               RiskFactorData[]
   riskDocInfo                   RiskFactorsDocInfo[]
-  workspaces                    Workspace[]                 @relation("HierarchyToWorkspace")
-  subOfficeEmployees            Employee[]                  @relation("sub_offices")
-  subHierarchyHistory           EmployeeHierarchyHistory[]  @relation("sub_offices_history")
+  workspaces                    Workspace[]                  @relation("HierarchyToWorkspace")
+  subOfficeEmployees            Employee[]                   @relation("sub_offices")
+  subHierarchyHistory           EmployeeHierarchyHistory[]   @relation("sub_offices_history")
   protocolsData                 ProtocolToRisk[]
   hormParticipantsHierarchy     FormParticipantsHierarchy[]
+  ActionPlanRulesOnHierarchy    ActionPlanRulesOnHierarchy[]
 
   @@unique([id, companyId])
   @@unique([parentId, name])
@@ -1800,7 +1801,8 @@ model RiskSubType {
   created_at DateTime        @default(now())
   updated_at DateTime        @updatedAt
 
-  RiskToRiskSubType RiskToRiskSubType[]
+  RiskToRiskSubType            RiskToRiskSubType[]
+  ActionPlanRulesOnRiskSubType ActionPlanRulesOnRiskSubType[]
 
   @@index([type])
 }
@@ -2023,6 +2025,63 @@ model RiskFactorDataRecComments {
   userId Int
 }
 
+model ActionPlanRules {
+  id         Int       @id @default(autoincrement())
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
+  is_restriction     Boolean           @default(false)
+  is_all_hierarchies Boolean           @default(false)
+  risk_types         RiskFactorsEnum[]
+
+  workspace_id String
+  workspace    Workspace @relation(fields: [workspace_id], references: [id])
+
+  riskSubTypes ActionPlanRulesOnRiskSubType[]
+  hierarchies  ActionPlanRulesOnHierarchy[]
+  users        ActionPlanRulesOnUsers[]
+}
+
+model ActionPlanRulesOnUsers {
+  id         Int      @id @default(autoincrement())
+  created_at DateTime @default(now())
+
+  action_plan_rules_id Int
+  action_plan_rules    ActionPlanRules @relation(fields: [action_plan_rules_id], references: [id], onDelete: Cascade)
+
+  user_id Int
+  user    User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([action_plan_rules_id, user_id])
+}
+
+model ActionPlanRulesOnHierarchy {
+  id         Int      @id @default(autoincrement())
+  created_at DateTime @default(now())
+
+  action_plan_rules_id Int
+  action_plan_rules    ActionPlanRules @relation(fields: [action_plan_rules_id], references: [id], onDelete: Cascade)
+
+  hierarchy_id String
+  hierarchy    Hierarchy @relation(fields: [hierarchy_id], references: [id], onDelete: Cascade)
+
+  @@unique([action_plan_rules_id, hierarchy_id])
+}
+
+model ActionPlanRulesOnRiskSubType {
+  id         Int      @id @default(autoincrement())
+  created_at DateTime @default(now())
+
+  action_plan_rules_id Int
+  action_plan_rules    ActionPlanRules @relation(fields: [action_plan_rules_id], references: [id], onDelete: Cascade)
+
+  risk_sub_type_id Int
+  risk_sub_type    RiskSubType @relation(fields: [risk_sub_type_id], references: [id], onDelete: Cascade)
+
+  @@unique([action_plan_rules_id, risk_sub_type_id])
+}
+
 model ScheduleBlock {
   id          Int                    @id @default(autoincrement())
   name        String
@@ -2126,16 +2185,17 @@ model User {
   alerts              Alert[]
   medicalVisits       ScheduleMedicalVisit[]
 
-  coordinator        DocumentData[]
-  recComments        RiskFactorDataRecComments[]
-  recCommentsAnswer  RiskFactorDataRecComments[] @relation("rec_comment_answer")
-  RiskFactorDataRec  RiskFactorDataRec[]
-  Employee           Employee[]
-  taskHistory        TaskHistory[]
-  taskProject        TaskProject[]
-  taskCreator        Task[]
-  taskResponsible    TaskResponsible[]
-  taskProjectMembers TaskProjectMembers[]
+  coordinator            DocumentData[]
+  recComments            RiskFactorDataRecComments[]
+  recCommentsAnswer      RiskFactorDataRecComments[] @relation("rec_comment_answer")
+  RiskFactorDataRec      RiskFactorDataRec[]
+  Employee               Employee[]
+  taskHistory            TaskHistory[]
+  taskProject            TaskProject[]
+  taskCreator            Task[]
+  taskResponsible        TaskResponsible[]
+  taskProjectMembers     TaskProjectMembers[]
+  ActionPlanRulesOnUsers ActionPlanRulesOnUsers[]
 
   @@unique([id, name])
   @@index([email])
@@ -2182,18 +2242,19 @@ model Uf {
 }
 
 model Workspace {
-  id                        String                      @id @default(uuid())
-  name                      String
-  abbreviation              String?
-  description               String?
-  created_at                DateTime                    @default(now())
-  updated_at                DateTime                    @updatedAt
-  deleted_at                DateTime?
-  companyId                 String
-  status                    StatusEnum                  @default(ACTIVE)
-  cnpj                      String?
-  isOwner                   Boolean                     @default(true)
-  companyJson               Json?
+  id           String     @id @default(uuid())
+  name         String
+  abbreviation String?
+  description  String?
+  created_at   DateTime   @default(now())
+  updated_at   DateTime   @updatedAt
+  deleted_at   DateTime?
+  companyId    String
+  status       StatusEnum @default(ACTIVE)
+  cnpj         String?
+  isOwner      Boolean    @default(true)
+  companyJson  Json?
+
   address                   Address?
   characterization          CompanyCharacterization[]
   companyEnvironment        CompanyEnvironment[]
@@ -2206,6 +2267,7 @@ model Workspace {
   RiskFactorDataRec         RiskFactorDataRec[]
   DocumentControl           DocumentControl[]
   FormParticipantsWorkspace FormParticipantsWorkspace[]
+  ActionPlanRules           ActionPlanRules[]
 
   @@unique([abbreviation, companyId])
   @@unique([id, companyId])

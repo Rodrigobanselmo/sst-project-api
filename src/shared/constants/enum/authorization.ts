@@ -56,6 +56,8 @@ export enum PermissionEnum {
   RISK_DATA = '4.3',
   PGR = '4.4',
   ACTION_PLAN = '4.5',
+  ACTION_PLAN_PHOTOS = '4.51',
+  ACTION_PLAN_ADMIN = '4.52',
   CHARACTERIZATION = '4.6',
   PCMSO = '4.7',
   EXAM_RISK = '4.8',

@@ -46,6 +46,7 @@ import { ActionPlanRepository } from './database/repositories/action-plan/action
 import { AllTasksActionPlanCron } from './application/action-plan/notify-all-tasks-action-plan/cron/notify-all-tasks-action-plan.cron';
 import { NewTasksActionPlanUseCase } from './application/action-plan/notify-new-tasks-action-plan/use-cases/notify-new-tasks-action-plan.usecase';
 import { AllTasksActionPlanUseCase } from './application/action-plan/notify-all-tasks-action-plan/use-cases/notify-all-tasks-action-plan.usecase';
+import { ActionPlanRuleAggregateRepository } from './database/repositories/action-plan-rule/action-plan-rule-aggregate.repository';
 
 @Module({
   imports: [SharedModule],
@@ -83,6 +84,7 @@ import { AllTasksActionPlanUseCase } from './application/action-plan/notify-all-
     HierarchyDAO,
     ResponsibleDAO,
     ActionPlanRepository,
+    ActionPlanRuleAggregateRepository,
 
     // Use Cases
     BrowseActionPlanUseCase,

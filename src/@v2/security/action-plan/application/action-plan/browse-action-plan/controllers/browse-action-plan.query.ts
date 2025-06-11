@@ -41,12 +41,6 @@ export class BrowseActionPlanQuery {
   @IsOptional()
   @IsString({ each: true })
   @Type(() => String)
-  workspaceIds?: string[];
-
-  @IsArray()
-  @IsOptional()
-  @IsString({ each: true })
-  @Type(() => String)
   generateSourceIds?: string[];
 
   @IsArray()

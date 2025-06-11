@@ -1,5 +1,6 @@
 import { ActionPlanStatusEnum } from '@/@v2/security/action-plan/domain/enums/action-plan-status.enum';
 import { IOrderBy } from '@/@v2/shared/types/order-by.types';
+import { ActionPlanUserRulesVO } from '../../../domain/values-objects/action-plan-user-rules';
 
 export enum ActionPlanOrderByEnum {
   ORIGIN = 'ORIGIN',
@@ -44,6 +45,7 @@ export namespace IActionPlanDAO {
       isDone?: boolean;
       isCanceled?: boolean;
       isExpired?: boolean;
+      rules?: ActionPlanUserRulesVO;
     };
   };
 }

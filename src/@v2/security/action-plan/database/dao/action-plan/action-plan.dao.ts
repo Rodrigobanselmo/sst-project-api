@@ -4,7 +4,7 @@ import { gerHavingRawPrisma } from '@/@v2/shared/utils/database/get-having-raw-p
 import { getOrderByRawPrisma, IOrderByRawPrisma } from '@/@v2/shared/utils/database/get-order-by-raw-prisma';
 import { getPagination } from '@/@v2/shared/utils/database/get-pagination';
 import { gerWhereRawPrisma } from '@/@v2/shared/utils/database/get-where-raw-prisma';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { ActionPlanStatusEnum } from '../../../domain/enums/action-plan-status.enum';
 import { IActionPlanBrowseFilterModelMapper } from '../../mappers/models/action-plan/action-plan-browse-filter.mapper';
@@ -14,10 +14,17 @@ import { ActionPlanReadMapper } from '../../mappers/models/action-plan/action-pl
 import { ActionPlanOrderByEnum, IActionPlanDAO } from './action-plan.types';
 import { ActionPlanNewTasksMapper, IActionPlanNewTasksMapper } from '../../mappers/models/action-plan/action-plan-new-tasks.mapper';
 import { ActionPlanAllTasksMapper } from '../../mappers/models/action-plan/action-plan-all-tasks.mapper';
+import { LocalContext, UserContext } from '@/@v2/shared/adapters/context';
+import { SharedTokens } from '@/@v2/shared/constants/tokens';
+import { ContextKey } from '@/@v2/shared/adapters/context/types/enum/context-key.enum';
 
 @Injectable()
 export class ActionPlanDAO {
-  constructor(private readonly prisma: PrismaServiceV2) {}
+  constructor(
+    @Inject(SharedTokens.Context)
+    private readonly context: LocalContext,
+    private readonly prisma: PrismaServiceV2,
+  ) {}
 
   async findAllTasks() {
     const actionPlans = await this.prisma.$queryRaw<IActionPlanNewTasksMapper[]>`
@@ -178,6 +185,10 @@ export class ActionPlanDAO {
     const whereParams = [...browseWhereParams, ...filterWhere];
     const whereTotalParams = [...whereParams, ...filterHaving];
 
+    const includeHierarchies = Array.isArray(filters.rules?.hierarchyAccess?.value) || !!filters.hierarchyIds?.length;
+    const includeSubType = Array.isArray(filters.rules?.riskSubTypeAccess?.value);
+    const includeResponsible = filters.responisbleIds?.length || filters.rules.hasAnyRule;
+
     const actionPlansPromise = this.prisma.$queryRaw<IActionPlanBrowseResultModelMapper[]>`
       WITH "DocumentDataUnique" AS (
         SELECT DISTINCT ON ("workspaceId") *
@@ -263,6 +274,13 @@ export class ActionPlanDAO {
         "RecMed" rec ON rec."id" = rec_to_rfd."rec_med_id"
       LEFT JOIN
         "RiskFactors" risk ON risk."id" = rfd."riskId"
+      ${
+        includeSubType
+          ? Prisma.sql`
+            LEFT JOIN "RiskToRiskSubType" risk_sub_type ON risk_sub_type."risk_id" = risk."id"
+          `
+          : Prisma.sql``
+      }
       LEFT JOIN
         "_GenerateSourceToRiskFactorData" gs_to_rfd ON gs_to_rfd."B" = rfd."id"
       LEFT JOIN
@@ -276,7 +294,7 @@ export class ActionPlanDAO {
       LEFT JOIN
         "HomogeneousGroup" hg ON hg."id" = rfd."homogeneousGroupId"
       ${
-        filters.responisbleIds?.length
+        includeResponsible
           ? Prisma.sql`
             LEFT JOIN "Task" task ON task."action_plan_id" = rfd_rec."id"
             LEFT JOIN "TaskResponsible" task_resp ON task_resp."task_id" = task."id"
@@ -295,7 +313,7 @@ export class ActionPlanDAO {
       LEFT JOIN 
         "Hierarchy" h ON h."id" = hh."hierarchyId"
       ${
-        filters.hierarchyIds?.length
+        includeHierarchies
           ? Prisma.sql`
         LEFT JOIN 
           "Hierarchy" h_parent_1 ON h_parent_1."id" = h."parentId"
@@ -378,10 +396,17 @@ export class ActionPlanDAO {
       LEFT JOIN
         "RecMed" rec ON rec."id" = rec_to_rfd."rec_med_id"
       ${
-        filters.riskIds?.length
+        filters.riskIds?.length || includeSubType
           ? Prisma.sql`
         LEFT JOIN "RiskFactors" risk ON risk."id" = rfd."riskId"
       `
+          : Prisma.sql``
+      }
+      ${
+        includeSubType
+          ? Prisma.sql`
+            LEFT JOIN "RiskToRiskSubType" risk_sub_type ON risk_sub_type."risk_id" = risk."id"
+          `
           : Prisma.sql``
       }
       ${
@@ -397,14 +422,14 @@ export class ActionPlanDAO {
       LEFT JOIN 
         "RiskFactorDataRec" rfd_rec ON rfd_rec."riskFactorDataId" = rfd."id" AND rfd_rec."recMedId" = rec."id"
       ${
-        filters.responisbleIds?.length
+        includeResponsible
           ? Prisma.sql`
         LEFT JOIN  "User" u_resp ON u_resp."id" = rfd_rec."responsibleId"
       `
           : Prisma.sql``
       }
       ${
-        filters.responisbleIds?.length
+        includeResponsible
           ? Prisma.sql`
             LEFT JOIN "Task" task ON task."action_plan_id" = rfd_rec."id"
             LEFT JOIN "TaskResponsible" task_resp ON task_resp."task_id" = task."id"
@@ -426,7 +451,7 @@ export class ActionPlanDAO {
       LEFT JOIN 
         "Hierarchy" h ON h."id" = hh."hierarchyId"
       ${
-        filters.hierarchyIds?.length
+        includeHierarchies
           ? Prisma.sql`
         LEFT JOIN 
           "Hierarchy" h_parent_1 ON h_parent_1."id" = h."parentId"
@@ -476,7 +501,10 @@ export class ActionPlanDAO {
   }
 
   private filterWhere(filters: IActionPlanDAO.BrowseParams['filters']) {
+    const loggedUser = this.context.get<UserContext>(ContextKey.USER);
+
     const where: Prisma.Sql[] = [];
+    const whereOR: Prisma.Sql[] = [];
     const having: Prisma.Sql[] = [];
 
     if (filters.search) {
@@ -525,16 +553,15 @@ export class ActionPlanDAO {
       }
 
       if (!includeNull) {
-        where.push(Prisma.sql`u_resp."id" IN (${Prisma.join(filters.responisbleIds)}) OR task_resp."user_id" IN (${Prisma.join(filters.responisbleIds.filter(Boolean))})`);
+        where.push(Prisma.sql`
+          u_resp."id" IN (${Prisma.join(filters.responisbleIds)}) 
+          OR task_resp."user_id" IN (${Prisma.join(filters.responisbleIds.filter(Boolean))})
+        `);
       }
     }
 
     if (filters.recommendationIds?.length) {
       where.push(Prisma.sql`rec."id" IN (${Prisma.join(filters.recommendationIds)})`);
-    }
-
-    if (filters.riskIds?.length) {
-      where.push(Prisma.sql`risk."id" IN (${Prisma.join(filters.riskIds)})`);
     }
 
     if (filters.recommendationIds?.length) {
@@ -581,6 +608,10 @@ export class ActionPlanDAO {
         ${filters.isExpired ? Prisma.sql`<=` : Prisma.sql`>`} NOW()`);
     }
 
+    if (filters.riskIds?.length) {
+      where.push(Prisma.sql`risk."id" IN (${Prisma.join(filters.riskIds)})`);
+    }
+
     if (filters.hierarchyIds?.length) {
       where.push(Prisma.sql`
           h."id" IN (${Prisma.join(filters.hierarchyIds)}) OR 
@@ -595,6 +626,104 @@ export class ActionPlanDAO {
           h_children_4."id" IN (${Prisma.join(filters.hierarchyIds)}) OR
           h_children_5."id" IN (${Prisma.join(filters.hierarchyIds)})
         `);
+    }
+
+    if (filters.rules) {
+      const whereRules: Prisma.Sql[] = [];
+
+      if (filters.rules.hierarchyAccess) {
+        const { type, value } = filters.rules.hierarchyAccess;
+        if (type === 'restrict') {
+          if (value === 'all') {
+            whereRules.push(Prisma.sql`hg."id" = '-'`);
+          } else if (value.length > 0) {
+            whereRules.push(Prisma.sql`
+              h."id" NOT IN (${Prisma.join(value)}) OR 
+              h_parent_1."id" NOT IN (${Prisma.join(value)}) OR
+              h_parent_2."id" NOT IN (${Prisma.join(value)}) OR
+              h_parent_3."id" NOT IN (${Prisma.join(value)}) OR 
+              h_parent_4."id" NOT IN (${Prisma.join(value)}) OR
+              h_parent_5."id" NOT IN (${Prisma.join(value)}) OR
+              h_children_1."id" NOT IN (${Prisma.join(value)}) OR
+              h_children_2."id" NOT IN (${Prisma.join(value)}) OR
+              h_children_3."id" NOT IN (${Prisma.join(value)}) OR
+              h_children_4."id" NOT IN (${Prisma.join(value)}) OR
+              h_children_5."id" NOT IN (${Prisma.join(value)})
+            `);
+          }
+        }
+
+        if (type === 'allow') {
+          if (value === 'all') {
+            // do nothing, as 'all' means no restriction
+          } else if (value.length > 0) {
+            whereRules.push(Prisma.sql`
+              h."id" IN (${Prisma.join(value)}) OR 
+              h_parent_1."id" IN (${Prisma.join(value)}) OR
+              h_parent_2."id" IN (${Prisma.join(value)}) OR
+              h_parent_3."id" IN (${Prisma.join(value)}) OR 
+              h_parent_4."id" IN (${Prisma.join(value)}) OR
+              h_parent_5."id" IN (${Prisma.join(value)}) OR
+              h_children_1."id" IN (${Prisma.join(value)}) OR
+              h_children_2."id" IN (${Prisma.join(value)}) OR
+              h_children_3."id" IN (${Prisma.join(value)}) OR
+              h_children_4."id" IN (${Prisma.join(value)}) OR
+              h_children_5."id" IN (${Prisma.join(value)})
+            `);
+          }
+        }
+      }
+
+      if (filters.rules.riskTypeAccess) {
+        const { type, value } = filters.rules.riskTypeAccess;
+        if (type === 'restrict') {
+          if (value === 'all') {
+            whereRules.push(Prisma.sql`risk."id" = '-'`);
+          } else if (value.length > 0) {
+            whereRules.push(Prisma.sql`risk."type"::text NOT IN (${Prisma.join(value)})`);
+          }
+        }
+
+        if (type === 'allow') {
+          if (value === 'all') {
+            // do nothing, as 'all' means no restriction
+          } else if (value.length > 0) {
+            whereRules.push(Prisma.sql`risk."type"::text IN (${Prisma.join(value)})`);
+          }
+        }
+      }
+
+      if (filters.rules.riskSubTypeAccess) {
+        const { type, value } = filters.rules.riskSubTypeAccess;
+        if (type === 'restrict') {
+          if (value === 'all') {
+            whereRules.push(Prisma.sql`risk."id" = '-'`);
+          } else if (value.length > 0) {
+            whereRules.push(Prisma.sql`risk_sub_type."sub_type_id" NOT IN (${Prisma.join(value)}) OR risk_sub_type."sub_type_id" IS NULL`);
+          }
+        }
+
+        if (type === 'allow') {
+          if (value === 'all') {
+            // do nothing, as 'all' means no restriction
+          } else if (value.length > 0) {
+            whereRules.push(Prisma.sql`risk_sub_type."sub_type_id" IN (${Prisma.join(value)}) OR risk_sub_type."sub_type_id" IS NULL`);
+          }
+        }
+      }
+
+      if (whereRules.length > 0) {
+        whereOR.push(Prisma.sql`(${Prisma.join(whereRules, ' AND ')})`);
+
+        whereOR.push(Prisma.sql`
+          u_resp."id" IN (${Prisma.join([loggedUser.id])}) 
+          OR task_resp."user_id" IN (${Prisma.join([loggedUser.id])})
+      `);
+      }
+    }
+
+    if (whereOR.length) {
+      where.push(Prisma.sql`(${Prisma.join(whereOR, ' OR ')})`);
     }
 
     return { filterWhere: where, filterHaving: having };
