@@ -6,6 +6,7 @@ import { ActionPlanRulesDomainService } from '@/@v2/security/action-plan/domain/
 import { SharedTokens } from '@/@v2/shared/constants/tokens';
 import { LocalContext, UserContext } from '@/@v2/shared/adapters/context';
 import { ContextKey } from '@/@v2/shared/adapters/context/types/enum/context-key.enum';
+import { ActionPlanInfoAggregateRepository } from '@/@v2/security/action-plan/database/repositories/action-plan-info/action-plan-aggregate.repository';
 
 @Injectable()
 export class BrowseActionPlanUseCase {
@@ -14,20 +15,29 @@ export class BrowseActionPlanUseCase {
     private readonly context: LocalContext,
     private readonly actionplanDAO: ActionPlanDAO,
     private readonly actionPlanRuleAggregateRepository: ActionPlanRuleAggregateRepository,
+    private readonly actionPlanInfoAggregateRepository: ActionPlanInfoAggregateRepository,
   ) {}
 
   async execute(params: IBrowseActionPlanUseCase.Params) {
     const loggedUser = this.context.get<UserContext>(ContextKey.USER);
     if (!loggedUser.id) throw new Error('Usuário não encontrado no contexto');
 
-    const rules = await this.actionPlanRuleAggregateRepository.findMany({
+    const actionPlanInfoPromise = this.actionPlanInfoAggregateRepository.findById({
       companyId: params.companyId,
       workspaceId: params.workspaceId,
     });
 
+    const actionPlanRulesPromise = this.actionPlanRuleAggregateRepository.findMany({
+      companyId: params.companyId,
+      workspaceId: params.workspaceId,
+    });
+
+    const [actionPlanInfo, actionPlanRules] = await Promise.all([actionPlanInfoPromise, actionPlanRulesPromise]);
+
     const ruleVO = ActionPlanRulesDomainService.resolveUserPermissions({
-      rules,
       userId: loggedUser.id,
+      actionPlanRules,
+      actionPlanInfo,
     });
 
     const data = await this.actionplanDAO.browse({

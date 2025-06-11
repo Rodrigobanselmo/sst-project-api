@@ -5,13 +5,13 @@ export type IAccessParams<T = string> = { type: 'restrict' | 'allow'; value: T[]
 export type IHierarchyAccess = 'all' | string[];
 
 export interface IActionPlanUserRulesVO {
-  allowedHierarchyAccess: IHierarchyAccess;
-  allowedRiskType: RiskTypeEnum[];
-  allowedRiskSubTypeIds: number[];
+  allowedHierarchyAccess?: IHierarchyAccess;
+  allowedRiskType?: RiskTypeEnum[];
+  allowedRiskSubTypeIds?: number[];
 
-  restrictedHierarchyAccess: IHierarchyAccess;
-  restrictedRiskType: RiskTypeEnum[];
-  restrictedRiskSubTypeIds: number[];
+  restrictedHierarchyAccess?: IHierarchyAccess;
+  restrictedRiskType?: RiskTypeEnum[];
+  restrictedRiskSubTypeIds?: number[];
 }
 
 export class ActionPlanUserRulesVO {

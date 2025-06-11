@@ -1,10 +1,14 @@
 import { RiskTypeEnum } from '@/@v2/shared/domain/enum/security/risk-type.enum';
 import { ActionPlanRuleAggregate } from '../aggregations/action-plan-rule.aggregate';
 import { ActionPlanUserRulesVO, IActionPlanUserRulesVO } from '../values-objects/action-plan-user-rules';
+import { ActionPlanInfoAggregate } from '../aggregations/action-plan-info.aggregate';
 
 export class ActionPlanRulesDomainService {
-  public static resolveUserPermissions(params: { userId: number; rules: ActionPlanRuleAggregate[] }): ActionPlanUserRulesVO {
-    const applicableRules = params.rules.filter((rule) => {
+  public static resolveUserPermissions(params: { userId: number; actionPlanRules: ActionPlanRuleAggregate[]; actionPlanInfo: ActionPlanInfoAggregate | null }): ActionPlanUserRulesVO {
+    const isCoordinator = params.userId === params?.actionPlanInfo?.coordinator?.id;
+    if (isCoordinator) return new ActionPlanUserRulesVO({});
+
+    const applicableRules = params.actionPlanRules.filter((rule) => {
       const isDirectUserMatch = rule.usersIds.includes(params.userId);
       const isGlobalRule = rule.isAppliedToAllUser;
       return isDirectUserMatch || isGlobalRule;
