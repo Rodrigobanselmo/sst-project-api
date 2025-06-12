@@ -28,7 +28,10 @@ export type ICommentBrowseResultModelMapper = {
   approved_name: string | null;
   approved_email: string | null;
   approved_id: number | null;
+  w_id: string;
+  rfd_id: string;
   rec_name: string;
+  rec_id: string;
   hg_name: string;
   hg_type: PrismaHomoTypeEnum | null;
   cc_name: string | null;
@@ -54,6 +57,8 @@ export class CommentBrowseResultModelMapper {
 
     return new CommentBrowseResultModel({
       id: prisma.comment_id,
+      workspaceId: prisma.w_id,
+      riskDataId: prisma.rfd_id,
       isApproved: prisma.comment_is_approved,
       approvedAt: prisma.comment_approved_at,
       approvedComment: prisma.comment_approved_comment,
@@ -65,6 +70,7 @@ export class CommentBrowseResultModelMapper {
       updatedAt: prisma.comment_updated_at,
       recommendation: {
         name: prisma.rec_name,
+        id: prisma.rec_id,
       },
       createdBy:
         prisma.creator_name && prisma.creator_email && prisma.creator_id

@@ -7,6 +7,8 @@ export type ICommentBrowseResultModel = {
   id: string;
   createdAt: Date;
   updatedAt: Date | null;
+  workspaceId: string;
+  riskDataId: string;
 
   text: string | null;
   type: CommentTypeEnum;
@@ -22,6 +24,7 @@ export type ICommentBrowseResultModel = {
 
   recommendation: {
     name: string;
+    id: string;
   };
 
   changes: {
@@ -38,6 +41,8 @@ export class CommentBrowseResultModel {
   id: string;
   createdAt: Date;
   updatedAt: Date | null;
+  workspaceId: string;
+  riskDataId: string;
 
   text: string | null;
   type: CommentTypeEnum;
@@ -53,6 +58,7 @@ export class CommentBrowseResultModel {
 
   recommendation: {
     name: string;
+    id: string;
   };
 
   changes: {
@@ -69,6 +75,8 @@ export class CommentBrowseResultModel {
     this.id = params.id;
     this.createdAt = params.createdAt;
     this.updatedAt = params.updatedAt;
+    this.workspaceId = params.workspaceId;
+    this.riskDataId = params.riskDataId;
 
     this.text = params.text;
     this.type = params.type;
