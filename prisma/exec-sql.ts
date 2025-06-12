@@ -11,20 +11,19 @@ import { CommentTypeEnum } from '../src/@v2/security/action-plan/domain/enums/co
 
 const prisma = new PrismaClient({});
 
-
 {
-    const data = await new HierarchyBrowseShortQuerie(prisma).browseShort({
-        limit: 100,
-        filters: {
-            search: 'Jr II',
-            companyId: 'd1309cad-19d4-4102-9bf9-231f91095c20',
-            // search: 'Tostadeira Vertical e Condimentação',
-            workspaceIds: ['f588207b-ac7b-4b63-9d85-cd5753f9b288'],
-            // type: [],
-        },
-    })
+  const data = await new HierarchyBrowseShortQuerie(prisma).browseShort({
+    limit: 100,
+    filters: {
+      search: 'Jr II',
+      companyId: 'd1309cad-19d4-4102-9bf9-231f91095c20',
+      // search: 'Tostadeira Vertical e Condimentação',
+      workspaceIds: ['f588207b-ac7b-4b63-9d85-cd5753f9b288'],
+      // type: [],
+    },
+  });
 
-    console.log(data)
+  console.log(data);
 }
 
 //action plan
@@ -50,11 +49,11 @@ const prisma = new PrismaClient({});
 //             // isCanceled: false,
 //             // isDone: false,
 //             // isStarted: false,
-//             // ocupationalRisks: [4, 5],
+//             // occupationalRisks: [4, 5],
 //             // recommendationIds: ["52e056d1-40ab-4749-9a8f-07ceac162d31"],
 //             // riskIds: ["7406d7ed-d93a-466d-81ae-c4f052f6d525"],
 //             // status: ['PENDING'],
-//             // responisbleIds: [1],
+//             // responsibleIds: [1],
 //         },
 //         orderBy: [{
 //             field: ActionPlanOrderByEnum.ORIGIN,
@@ -82,7 +81,7 @@ const prisma = new PrismaClient({});
 //     //         // isCanceled: false,
 //     //         // isDone: false,
 //     //         // isStarted: false,
-//     //         // ocupationalRisks: [4, 5],
+//     //         // occupationalRisks: [4, 5],
 //     //         // recommendationIds: ["52e056d1-40ab-4749-9a8f-07ceac162d31"],
 //     //         // riskIds: ["7406d7ed-d93a-466d-81ae-c4f052f6d525"],
 //     //     }

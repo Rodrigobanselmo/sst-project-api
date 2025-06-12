@@ -13,7 +13,7 @@ export class BrowseActionPlanUseCase {
   constructor(
     @Inject(SharedTokens.Context)
     private readonly context: LocalContext,
-    private readonly actionplanDAO: ActionPlanDAO,
+    private readonly actionPlanDAO: ActionPlanDAO,
     private readonly actionPlanRuleAggregateRepository: ActionPlanRuleAggregateRepository,
     private readonly actionPlanInfoAggregateRepository: ActionPlanInfoAggregateRepository,
   ) {}
@@ -40,14 +40,14 @@ export class BrowseActionPlanUseCase {
       actionPlanInfo,
     });
 
-    const data = await this.actionplanDAO.browse({
+    const data = await this.actionPlanDAO.browse({
       page: params.pagination.page,
       limit: params.pagination.limit,
       orderBy: params.orderBy,
       filters: {
         companyId: params.companyId,
-        ocupationalRisks: params.ocupationalRisks,
-        responisbleIds: params.responisbleIds,
+        occupationalRisks: params.occupationalRisks,
+        responsibleIds: params.responsibleIds,
         status: params.status,
         workspaceIds: [params.workspaceId],
         search: params.search,
@@ -55,6 +55,8 @@ export class BrowseActionPlanUseCase {
         hierarchyIds: params.hierarchyIds,
         recommendationIds: params.recommendationIds,
         riskIds: params.riskIds,
+        riskSubTypes: params.riskSubTypes,
+        riskTypes: params.riskTypes,
         isExpired: params.isExpired,
         rules: ruleVO,
       },

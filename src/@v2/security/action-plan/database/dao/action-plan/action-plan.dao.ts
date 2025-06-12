@@ -186,8 +186,9 @@ export class ActionPlanDAO {
     const whereTotalParams = [...whereParams, ...filterHaving];
 
     const includeHierarchies = Array.isArray(filters.rules?.hierarchyAccess?.value) || !!filters.hierarchyIds?.length;
-    const includeSubType = Array.isArray(filters.rules?.riskSubTypeAccess?.value);
-    const includeResponsible = filters.responisbleIds?.length || filters.rules.hasAnyRule;
+    const includeRiskSubType = Array.isArray(filters.rules?.riskSubTypeAccess?.value) || !!filters.riskSubTypes?.length;
+    const includeResponsible = filters.responsibleIds?.length || filters.rules.hasAnyRule;
+    const includeRisk = filters.riskIds?.length || includeRiskSubType || !!filters.riskTypes?.length;
 
     const actionPlansPromise = this.prisma.$queryRaw<IActionPlanBrowseResultModelMapper[]>`
       WITH "DocumentDataUnique" AS (
@@ -275,7 +276,7 @@ export class ActionPlanDAO {
       LEFT JOIN
         "RiskFactors" risk ON risk."id" = rfd."riskId"
       ${
-        includeSubType
+        includeRiskSubType
           ? Prisma.sql`
             LEFT JOIN "RiskToRiskSubType" risk_sub_type ON risk_sub_type."risk_id" = risk."id"
           `
@@ -388,27 +389,21 @@ export class ActionPlanDAO {
       SELECT 
         COUNT(DISTINCT (rfd."id", rec."id"))::integer AS total,
         array_agg(DISTINCT CASE WHEN rfd_rec."status" is NULL THEN 'PENDING' ELSE rfd_rec."status"::TEXT END) AS filter_status,
-        json_agg(DISTINCT JSONB_BUILD_OBJECT('id', w.id, 'name', w.name)) AS workspaces
+        json_agg(DISTINCT JSONB_BUILD_OBJECT('id', w.id, 'name', w.name)) AS workspaces,
+        array_agg(DISTINCT risk."type") AS filter_risk_types,
+        json_agg(DISTINCT JSONB_BUILD_OBJECT('id', risk_sub_type_table."id", 'name', risk_sub_type_table."name", 'type' ,risk_sub_type_table."type")) AS filter_risk_sub_types
       FROM 
         "RiskFactorData" rfd
       JOIN 
         "RecMedOnRiskData" rec_to_rfd ON rec_to_rfd."risk_data_id" = rfd."id"
       LEFT JOIN
         "RecMed" rec ON rec."id" = rec_to_rfd."rec_med_id"
-      ${
-        filters.riskIds?.length || includeSubType
-          ? Prisma.sql`
-        LEFT JOIN "RiskFactors" risk ON risk."id" = rfd."riskId"
-      `
-          : Prisma.sql``
-      }
-      ${
-        includeSubType
-          ? Prisma.sql`
-            LEFT JOIN "RiskToRiskSubType" risk_sub_type ON risk_sub_type."risk_id" = risk."id"
-          `
-          : Prisma.sql``
-      }
+      LEFT JOIN 
+        "RiskFactors" risk ON risk."id" = rfd."riskId"
+      LEFT JOIN
+        "RiskToRiskSubType" risk_sub_type ON risk_sub_type."risk_id" = risk."id"
+      LEFT JOIN
+        "RiskSubType" risk_sub_type_table ON risk_sub_type_table."id" = risk_sub_type."sub_type_id"
       ${
         filters.generateSourceIds?.length
           ? Prisma.sql`
@@ -541,21 +536,21 @@ export class ActionPlanDAO {
       where.push(Prisma.sql`gs."id" IN (${Prisma.join(filters.generateSourceIds)})`);
     }
 
-    if (filters.responisbleIds?.length) {
-      const includeNull = filters.responisbleIds.includes(0);
+    if (filters.responsibleIds?.length) {
+      const includeNull = filters.responsibleIds.includes(0);
 
       if (includeNull) {
-        if (filters.responisbleIds.length === 1) where.push(Prisma.sql`u_resp."id" IS NULL`);
+        if (filters.responsibleIds.length === 1) where.push(Prisma.sql`u_resp."id" IS NULL`);
         else
           where.push(
-            Prisma.sql`u_resp."id" IN (${Prisma.join(filters.responisbleIds.filter(Boolean))}) OR u_resp."id" IS NULL OR task_resp."user_id" IN (${Prisma.join(filters.responisbleIds.filter(Boolean))})`,
+            Prisma.sql`u_resp."id" IN (${Prisma.join(filters.responsibleIds.filter(Boolean))}) OR u_resp."id" IS NULL OR task_resp."user_id" IN (${Prisma.join(filters.responsibleIds.filter(Boolean))})`,
           );
       }
 
       if (!includeNull) {
         where.push(Prisma.sql`
-          u_resp."id" IN (${Prisma.join(filters.responisbleIds)}) 
-          OR task_resp."user_id" IN (${Prisma.join(filters.responisbleIds.filter(Boolean))})
+          u_resp."id" IN (${Prisma.join(filters.responsibleIds)}) 
+          OR task_resp."user_id" IN (${Prisma.join(filters.responsibleIds.filter(Boolean))})
         `);
       }
     }
@@ -568,9 +563,10 @@ export class ActionPlanDAO {
       where.push(Prisma.sql`rec."id" IN (${Prisma.join(filters.recommendationIds)})`);
     }
 
-    if (filters.ocupationalRisks?.length) {
-      where.push(Prisma.sql`rfd."level" IN (${Prisma.join(filters.ocupationalRisks)})`);
+    if (filters.occupationalRisks?.length) {
+      where.push(Prisma.sql`rfd."level" IN (${Prisma.join(filters.occupationalRisks)})`);
     }
+
     if (filters.status?.length) {
       where.push(Prisma.sql`
         CASE 
@@ -610,6 +606,14 @@ export class ActionPlanDAO {
 
     if (filters.riskIds?.length) {
       where.push(Prisma.sql`risk."id" IN (${Prisma.join(filters.riskIds)})`);
+    }
+
+    if (filters.riskTypes?.length) {
+      where.push(Prisma.sql`risk."type"::text IN (${Prisma.join(filters.riskTypes)})`);
+    }
+
+    if (filters.riskSubTypes?.length) {
+      where.push(Prisma.sql`risk_sub_type."sub_type_id" IN (${Prisma.join(filters.riskSubTypes)})`);
     }
 
     if (filters.hierarchyIds?.length) {

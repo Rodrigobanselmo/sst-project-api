@@ -1,5 +1,6 @@
 import { ActionPlanOrderByEnum } from '@/@v2/security/action-plan/database/dao/action-plan/action-plan.types';
 import { ActionPlanStatusEnum } from '@/@v2/security/action-plan/domain/enums/action-plan-status.enum';
+import { RiskTypeEnum } from '@/@v2/shared/domain/enum/security/risk-type.enum';
 import { IRiskLevelValues } from '@/@v2/shared/domain/types/security/risk-level-values.type';
 import { OrderByDirectionEnum } from '@/@v2/shared/types/order-by.types';
 import { Type } from 'class-transformer';
@@ -65,16 +66,27 @@ export class BrowseActionPlanQuery {
   @IsOptional()
   @IsInt({ each: true })
   @Type(() => Number)
-  responisbleIds?: number[];
+  responsibleIds?: number[];
 
   @IsArray()
   @IsOptional()
   @IsInt({ each: true })
   @Type(() => Number)
-  ocupationalRisks?: IRiskLevelValues[];
+  occupationalRisks?: IRiskLevelValues[];
 
   @IsOptional()
   @IsBoolean()
   @Type(() => Boolean)
   isExpired?: boolean | null;
+
+  @IsArray()
+  @IsOptional()
+  @IsEnum(RiskTypeEnum, { each: true })
+  riskTypes?: RiskTypeEnum[];
+
+  @IsArray()
+  @IsOptional()
+  @IsInt({ each: true })
+  @Type(() => Number)
+  riskSubTypes?: number[];
 }

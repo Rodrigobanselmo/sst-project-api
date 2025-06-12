@@ -1,6 +1,7 @@
 import { ActionPlanStatusEnum } from '@/@v2/security/action-plan/domain/enums/action-plan-status.enum';
 import { IOrderBy } from '@/@v2/shared/types/order-by.types';
 import { ActionPlanUserRulesVO } from '../../../domain/values-objects/action-plan-user-rules';
+import { RiskTypeEnum } from '@/@v2/shared/domain/enum/security/risk-type.enum';
 
 export enum ActionPlanOrderByEnum {
   ORIGIN = 'ORIGIN',
@@ -34,13 +35,15 @@ export namespace IActionPlanDAO {
       companyId: string;
       search?: string;
       status?: ActionPlanStatusEnum[];
-      responisbleIds?: number[];
+      responsibleIds?: number[];
       workspaceIds?: string[];
       hierarchyIds?: string[];
       recommendationIds?: string[];
       generateSourceIds?: string[];
       riskIds?: string[];
-      ocupationalRisks?: number[];
+      riskTypes?: RiskTypeEnum[];
+      riskSubTypes?: number[];
+      occupationalRisks?: number[];
       isStarted?: boolean;
       isDone?: boolean;
       isCanceled?: boolean;
