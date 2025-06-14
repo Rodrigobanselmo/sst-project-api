@@ -11,6 +11,8 @@ import { ReadAbsenteeismMotiveCountUseCase } from './application/dashboard/read-
 import { ReadAbsenteeismMotiveCountController } from './application/dashboard/read-absenteeism-motive-count/controllers/read-absenteeism.controller';
 import { BrowseAbsenteeismEmployeeTotalUseCase } from './application/dashboard/browse-absenteeism-employee-total/use-cases/browse-absenteeism.usecase';
 import { BrowseAbsenteeismEmployeeTotalController } from './application/dashboard/browse-absenteeism-employee-total/controllers/browse-absenteeism.controller';
+import { ReadAbsenteeismHierarchyTimeCompareUseCase } from './application/dashboard/read-absenteeism-time-compare/use-cases/read-absenteeism.usecase';
+import { ReadAbsenteeismHierarchTimeCompareController } from './application/dashboard/read-absenteeism-time-compare/controllers/read-absenteeism.controller';
 
 @Module({
   imports: [SharedModule],
@@ -20,6 +22,7 @@ import { BrowseAbsenteeismEmployeeTotalController } from './application/dashboar
     ReadAbsenteeismDaysCountController,
     ReadAbsenteeismMotiveCountController,
     BrowseAbsenteeismEmployeeTotalController,
+    ReadAbsenteeismHierarchTimeCompareController,
   ],
   providers: [
     // Database
@@ -31,6 +34,7 @@ import { BrowseAbsenteeismEmployeeTotalController } from './application/dashboar
     ReadAbsenteeismDaysCountUseCase,
     ReadAbsenteeismMotiveCountUseCase,
     BrowseAbsenteeismEmployeeTotalUseCase,
+    ReadAbsenteeismHierarchyTimeCompareUseCase,
   ],
   exports: [],
 })

@@ -352,6 +352,12 @@ export class AbsenteeismMetricsDAO {
         }
       }
 
+      if (filters.homogeneousGroupsIds?.length) {
+        where.push(Prisma.sql`
+          hoh."homogeneousGroupId" IN (${Prisma.join(filters.homogeneousGroupsIds)})
+        `);
+      }
+
       return where;
     }
 

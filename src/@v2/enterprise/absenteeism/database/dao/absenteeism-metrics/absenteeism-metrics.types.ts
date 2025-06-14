@@ -16,6 +16,7 @@ export namespace IAbsenteeismMetricsDAO {
   export type FilterCommonParams = {
     workspacesIds?: string[];
     hierarchiesIds?: string[];
+    homogeneousGroupsIds?: string[];
     motivesIds?: number[];
     startDate?: Date;
     endDate?: Date;
@@ -73,6 +74,7 @@ export namespace IAbsenteeismMetricsDAO {
       type?: AbsenteeismHierarchyTypeEnum;
       workspacesIds?: string[];
       hierarchiesIds?: string[];
+      homogeneousGroupsIds?: string[];
       motivesIds?: number[];
       startDate?: Date;
       endDate?: Date;
