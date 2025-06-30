@@ -16,6 +16,7 @@ import { EngsRiskDataDto } from '../../dto/engs-risk-data.dto';
 import { EngsRiskDataEntity } from '../../entities/engsRiskData.entity';
 import { ExamsRiskDataDto } from '../../dto/exams-risk-data.dto';
 import { ExamRiskDataEntity } from '../../entities/examRiskData.entity';
+import { v4 } from 'uuid';
 
 @Injectable()
 export class RiskDataRepository {
@@ -381,6 +382,8 @@ export class RiskDataRepository {
       }
     }
 
+    if (!createId) createId = v4();
+
     const riskData = (await this.prisma.riskFactorData.upsert({
       create: {
         ...createDto,
@@ -395,8 +398,8 @@ export class RiskDataRepository {
           : undefined,
         recs: recs
           ? {
-              create: recs.map((id) => ({
-                rec_med_id: id,
+              create: recs.map((rec_med_id) => ({
+                rec_med_id: rec_med_id,
               })),
             }
           : undefined,
@@ -426,7 +429,7 @@ export class RiskDataRepository {
                 where: {
                   rec_med_id_risk_data_id: {
                     rec_med_id: rec_id,
-                    risk_data_id: id,
+                    risk_data_id: id || createId,
                   },
                 },
               })),
@@ -532,6 +535,8 @@ export class RiskDataRepository {
       if (findEndDateNull) id = findEndDateNull.id;
     }
 
+    const createId = id || v4();
+
     const riskData = (await this.prisma.riskFactorData.upsert({
       create: {
         ...createDto,
@@ -545,8 +550,8 @@ export class RiskDataRepository {
           : undefined,
         recs: recs
           ? {
-              create: recs.map((id) => ({
-                rec_med_id: id,
+              create: recs.map((rec_med_id) => ({
+                rec_med_id: rec_med_id,
               })),
             }
           : undefined,
@@ -576,7 +581,7 @@ export class RiskDataRepository {
                 where: {
                   rec_med_id_risk_data_id: {
                     rec_med_id: rec_id,
-                    risk_data_id: id,
+                    risk_data_id: id || createId,
                   },
                 },
               })),
