@@ -2,8 +2,8 @@ import { ReportFillColorEnum } from '../../../../../report/types/IReportFactory.
 import { ISheetHeaderList } from '../../../../types/IFileFactory.types';
 import { CompanyStructColumnMap, CompanyStructHeaderEnum } from '../company-struct.constants';
 
-export const CompanyStructColumnList: ISheetHeaderList = [
-  { group: [CompanyStructColumnMap[CompanyStructHeaderEnum.WORKSPACE]], name: 'Identifição Estabelecimento' },
+export const CompanyStructColumnList: (opt: { workspaceLength: number }) => ISheetHeaderList = ({ workspaceLength }) => [
+  ...(workspaceLength > 1 ? [{ group: [CompanyStructColumnMap[CompanyStructHeaderEnum.WORKSPACE]], name: 'Identifição Estabelecimento' }] : []),
   {
     group: [
       CompanyStructColumnMap[CompanyStructHeaderEnum.DIRECTORY],
@@ -20,20 +20,12 @@ export const CompanyStructColumnList: ISheetHeaderList = [
     name: 'Identificação GSE',
   },
   {
-    group: [
-      CompanyStructColumnMap[CompanyStructHeaderEnum.RISK],
-      CompanyStructColumnMap[CompanyStructHeaderEnum.PROB],
-      CompanyStructColumnMap[CompanyStructHeaderEnum.GENERATE_SOURCE],
-    ],
+    group: [CompanyStructColumnMap[CompanyStructHeaderEnum.RISK], CompanyStructColumnMap[CompanyStructHeaderEnum.PROB], CompanyStructColumnMap[CompanyStructHeaderEnum.GENERATE_SOURCE]],
     name: 'Risco Ocupacional',
   },
   {
     group: [
-      [
-        CompanyStructColumnMap[CompanyStructHeaderEnum.DBA_NR15_Q5],
-        CompanyStructColumnMap[CompanyStructHeaderEnum.DBA_LTCAT_Q5],
-        CompanyStructColumnMap[CompanyStructHeaderEnum.DBA_LTCAT_Q3],
-      ],
+      [CompanyStructColumnMap[CompanyStructHeaderEnum.DBA_NR15_Q5], CompanyStructColumnMap[CompanyStructHeaderEnum.DBA_LTCAT_Q5], CompanyStructColumnMap[CompanyStructHeaderEnum.DBA_LTCAT_Q3]],
 
       [
         CompanyStructColumnMap[CompanyStructHeaderEnum.IBTUG],
@@ -71,10 +63,7 @@ export const CompanyStructColumnList: ISheetHeaderList = [
     name: 'Medidas de Controle (EPI)',
   },
   {
-    group: [
-      CompanyStructColumnMap[CompanyStructHeaderEnum.EPC],
-      CompanyStructColumnMap[CompanyStructHeaderEnum.EPC_EFFICIENTLY],
-    ],
+    group: [CompanyStructColumnMap[CompanyStructHeaderEnum.EPC], CompanyStructColumnMap[CompanyStructHeaderEnum.EPC_EFFICIENTLY]],
     name: 'Medidas de Controle de Engenharia (EPC)',
   },
   {
@@ -82,17 +71,11 @@ export const CompanyStructColumnList: ISheetHeaderList = [
     name: 'Medidas de Controle Admnistrativa',
   },
   {
-    group: [
-      CompanyStructColumnMap[CompanyStructHeaderEnum.REC],
-      CompanyStructColumnMap[CompanyStructHeaderEnum.PROB_REC],
-    ],
+    group: [CompanyStructColumnMap[CompanyStructHeaderEnum.REC], CompanyStructColumnMap[CompanyStructHeaderEnum.PROB_REC]],
     name: 'Recomendações',
   },
   {
-    group: [
-      CompanyStructColumnMap[CompanyStructHeaderEnum.START_DATE],
-      CompanyStructColumnMap[CompanyStructHeaderEnum.END_DATE],
-    ],
+    group: [CompanyStructColumnMap[CompanyStructHeaderEnum.START_DATE], CompanyStructColumnMap[CompanyStructHeaderEnum.END_DATE]],
     name: 'Periódo de Exposição ao Risco',
     fillColors: [ReportFillColorEnum.HEADER_RED],
   },

@@ -5,7 +5,9 @@ import nodemailer from 'nodemailer';
 import { SendMailAdapter } from './mail.interface';
 import { EmailTemplate } from '@/templates/@v2/email';
 import { isDevelopment } from '@/@v2/shared/utils/helpers/is-development';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class NodeMailerAdapter implements SendMailAdapter {
   async sendMail({ to, type, variables, attachments }: SendMailAdapter.SendMailData): Promise<any> {
     try {

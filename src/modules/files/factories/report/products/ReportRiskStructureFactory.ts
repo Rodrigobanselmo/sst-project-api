@@ -1,9 +1,6 @@
 import { RiskFactorGroupDataEntity } from './../../../../sst/entities/riskGroupData.entity';
 import { DownloadRiskStructureReportDto } from './../../../dto/risk-structure-report.dto';
-import {
-  DocumentPGRFactory,
-  DocumentPGRFactoryProduct,
-} from './../../../../documents/factories/document/products/PGR/DocumentPGRFactory';
+import { DocumentPGRFactory, DocumentPGRFactoryProduct } from './../../../../documents/factories/document/products/PGR/DocumentPGRFactory';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { clothesList } from './../../../../../shared/constants/maps/ibtu-clothes.map';
 
@@ -12,14 +9,7 @@ import { CompanyRepository } from '../../../../company/repositories/implementati
 import { CompanyStructColumnList } from '../../upload/products/CompanyStructure/constants/headersList/CompanyStructColumnList';
 import { IColumnRule } from '../../upload/types/IFileFactory.types';
 import { ReportFactoryAbstractionCreator } from '../creator/ReportFactoryCreator';
-import {
-  IReportCell,
-  IReportFactoryProduct,
-  IReportFactoryProductFindData,
-  IReportHeader,
-  IReportSanitizeData,
-  ReportFillColorEnum,
-} from '../types/IReportFactory.types';
+import { IReportCell, IReportFactoryProduct, IReportFactoryProductFindData, IReportHeader, IReportSanitizeData, ReportFillColorEnum } from '../types/IReportFactory.types';
 import { PromiseInfer } from '../../../../../shared/interfaces/promise-infer.types';
 import { hierarchyMap } from '../../upload/products/CompanyStructure/maps/hierarchyMap';
 import { sortString } from '../../../../../shared/utils/sorts/string.sort';
@@ -92,22 +82,11 @@ export class ReportRiskStructureProduct implements IReportFactoryProduct<any> {
     return content;
   }
 
-  public getRiskDataByHierarchy({
-    riskData,
-    hierarchy,
-  }: {
-    hierarchy: HierarchyMapData;
-    riskData: Partial<RiskFactorDataEntity>[];
-  }) {
-    return riskData.filter((riskData) =>
-      isRiskValidForHierarchyData({ hierarchyData: hierarchy, riskData, isByGroup: true }),
-    );
+  public getRiskDataByHierarchy({ riskData, hierarchy }: { hierarchy: HierarchyMapData; riskData: Partial<RiskFactorDataEntity>[] }) {
+    return riskData.filter((riskData) => isRiskValidForHierarchyData({ hierarchyData: hierarchy, riskData, isByGroup: true }));
   }
 
-  public sanitizeData(
-    data: PromiseInfer<ReturnType<DocumentPGRFactoryProduct['getPrgRiskData']>>,
-    ..._: any
-  ): IReportSanitizeData[] {
+  public sanitizeData(data: PromiseInfer<ReturnType<DocumentPGRFactoryProduct['getPrgRiskData']>>, ..._: any): IReportSanitizeData[] {
     const rows: IReportSanitizeData[] = [];
 
     Array.from(data.hierarchyData.values())
@@ -139,17 +118,7 @@ export class ReportRiskStructureProduct implements IReportFactoryProduct<any> {
               epiCa: { content: this.joinArray(riskData.epis.map((epi) => epi.ca)) },
               //epi
               ...(riskData.epiToRiskFactorData.some((epi) => epi.efficientlyCheck) && {
-                ...[
-                  'epiEfficiently',
-                  'epiEpc',
-                  'epiLongPeriods',
-                  'epiValidation',
-                  'epiTradeSign',
-                  'epiSanitation',
-                  'epiMaintenance',
-                  'epiUnstopped',
-                  'epiTraining',
-                ].reduce(
+                ...['epiEfficiently', 'epiEpc', 'epiLongPeriods', 'epiValidation', 'epiTradeSign', 'epiSanitation', 'epiMaintenance', 'epiUnstopped', 'epiTraining'].reduce(
                   (acc, epi) => ({
                     ...acc,
                     [epi]: { content: 'Sim' },
@@ -201,7 +170,7 @@ export class ReportRiskStructureProduct implements IReportFactoryProduct<any> {
   }
 
   public getHeader(): IReportHeader {
-    const header: IReportHeader = convertHeaderUpload(CompanyStructColumnList);
+    const header: IReportHeader = convertHeaderUpload(CompanyStructColumnList({ workspaceLength: 2 }));
 
     return header;
   }
@@ -216,7 +185,7 @@ export class ReportRiskStructureProduct implements IReportFactoryProduct<any> {
       },
     ];
     const emptyRow: IReportCell[] = [{ content: '', fill: undefined }];
-    const headerTitle = convertTitleUpload(CompanyStructColumnList);
+    const headerTitle = convertTitleUpload(CompanyStructColumnList({ workspaceLength: 2 }));
 
     const tables = this.getClothesTable();
 
@@ -225,9 +194,7 @@ export class ReportRiskStructureProduct implements IReportFactoryProduct<any> {
   }
 
   public getClothesTable(): IReportCell[][] {
-    const rowTitle: IReportCell[] = [
-      { content: 'Tipos de Vestimentas [IBUTG]', mergeRight: 1, fill: ReportFillColorEnum.HEADER_RED },
-    ];
+    const rowTitle: IReportCell[] = [{ content: 'Tipos de Vestimentas [IBUTG]', mergeRight: 1, fill: ReportFillColorEnum.HEADER_RED }];
     const emptyRow: IReportCell[] = [{ content: '', fill: undefined }];
     const headerTitle: IReportCell[] = [
       { content: 'Vestimenta', fill: ReportFillColorEnum.HEADER },

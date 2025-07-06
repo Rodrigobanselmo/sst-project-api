@@ -11,14 +11,8 @@ import { convertHeaderUpload } from '../helpers/convertHeaderUpload';
 import { convertTitleUpload } from '../helpers/convertTitleUpload';
 import { getCompany, getCompanyInfo } from '../helpers/getCompanyInfo';
 import { getWorkspaceInfoTable } from '../helpers/getWorkspaceInfoTable';
-import {
-  IReportCell,
-  IReportFactoryProduct,
-  IReportFactoryProductFindData,
-  IReportHeader,
-  IReportSanitizeData,
-  ReportFillColorEnum,
-} from '../types/IReportFactory.types';
+import { IReportCell, IReportFactoryProduct, IReportFactoryProductFindData, IReportHeader, IReportSanitizeData, ReportFillColorEnum } from '../types/IReportFactory.types';
+import { concatSideBySideTables } from '../helpers/concatSideBySideTables';
 
 @Injectable()
 export class DownaldRiskModelFactory extends ReportFactoryAbstractionCreator<any> {
@@ -41,7 +35,7 @@ class DownloadFactoryProduct implements IReportFactoryProduct<any> {
     const company = await getCompany(companyId, this.companyRepository);
 
     const sanitizeData = this.sanitizeData();
-    const headerData = this.getHeader();
+    const headerData = this.getHeader(company);
     const titleData = this.getTitle(headerData, company);
     const infoData = [];
 
@@ -71,8 +65,8 @@ class DownloadFactoryProduct implements IReportFactoryProduct<any> {
     return name;
   }
 
-  public getHeader(): IReportHeader {
-    const header: IReportHeader = convertHeaderUpload(CompanyStructColumnList);
+  public getHeader(company: CompanyEntity): IReportHeader {
+    const header: IReportHeader = convertHeaderUpload(CompanyStructColumnList({ workspaceLength: company.workspace.length }));
     return header;
   }
 
@@ -86,11 +80,16 @@ class DownloadFactoryProduct implements IReportFactoryProduct<any> {
       },
     ];
     const emptyRow: IReportCell[] = [{ content: '', fill: undefined }];
-    const headerTitle = convertTitleUpload(CompanyStructColumnList);
+    const headerTitle = convertTitleUpload(CompanyStructColumnList({ workspaceLength: company.workspace.length }));
 
-    //TODO concat tables
-    // concatSideBySideTables() && this.getWorskpaces
-    const tables = this.getClothesTable();
+    const clothesTables = this.getClothesTable();
+    const workspacesTable = this.getWorkspaces(company);
+
+    const tables = [...clothesTables];
+
+    if (company.workspace.length > 1) {
+      tables.push(...workspacesTable, emptyRow);
+    }
 
     const rows: IReportCell[][] = [...main, row, ...sub, emptyRow, ...tables, headerTitle];
     return rows;

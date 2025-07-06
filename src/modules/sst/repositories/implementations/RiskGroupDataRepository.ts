@@ -166,7 +166,7 @@ export class RiskGroupDataRepository {
               status: 'ACTIVE',
               ...(options.workspaceId && {
                 workspaces: { some: { id: options.workspaceId } },
-                ...(options?.ghoIds.length && {
+                ...(options?.ghoIds?.length && {
                   OR: [
                     {
                       id: { in: options.ghoIds },

@@ -26,6 +26,7 @@ import { FileModule } from './@v2/files/file.module';
 import { FormModule } from './@v2/forms/forms.module';
 import { TaskModule } from './@v2/task/task.module';
 import { CommunicationModule } from './@v2/communications/comunication.module';
+import { UploadModule } from './@v2/import/upload/upload.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { CommunicationModule } from './@v2/communications/comunication.module';
     FormModule,
     TaskModule,
     CommunicationModule,
+    UploadModule,
   ],
   providers: [
     {
