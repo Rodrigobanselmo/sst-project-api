@@ -54,9 +54,9 @@ export enum CompanyStructHeaderEnum {
   // ACTIVITY = 'Atividade',
   // EQUIPMENT = 'Equipamento',
 
-  RISK = 'Risco',
+  RISK = 'Fator de Risco / Perigo',
   RISK_SEVERITY = 'Severidade do Risco',
-  RISK_DESCRIPTION = 'Descrição do Risco',
+  RISK_DESCRIPTION = 'Risco',
   RISK_SYMPTOMS = 'Sintomas do Risco',
   RISK_TYPE = 'Tipo do Risco',
   PROB = 'Probabilidade',
