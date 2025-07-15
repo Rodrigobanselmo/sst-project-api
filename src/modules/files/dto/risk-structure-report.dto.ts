@@ -31,6 +31,11 @@ export class UploadCompanyStructureReportDto {
   stopFirstError?: boolean;
 
   @IsOptional()
+  @IsBoolean()
+  @ToBoolean()
+  createRisk?: boolean;
+
+  @IsOptional()
   @IsString()
   companyId?: string;
 }

@@ -221,6 +221,7 @@ import { CacheModule } from '@nestjs/cache-manager';
     FindAllAvailableRiskService,
     CreateRecMedService,
     CreateGenerateSourceService,
+    CreateRiskService,
     ReloadEmployeeExamTimeService,
     ProtocolToRiskRepository,
   ],

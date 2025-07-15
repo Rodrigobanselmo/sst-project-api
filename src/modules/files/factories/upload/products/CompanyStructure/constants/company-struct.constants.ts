@@ -1,8 +1,6 @@
 import { normalizeToUpperString } from '../../../../../../../shared/utils/normalizeString';
-import {
-  SexTypeEnumTranslateBrToUs,
-  SexTypeEnumTranslatedNotes,
-} from '../../../../../../../shared/utils/translate/sexType.translate';
+import { SexTypeEnumTranslateBrToUs, SexTypeEnumTranslatedNotes } from '../../../../../../../shared/utils/translate/sexType.translate';
+import { RiskFactorsEnumTranslateBrToUs, RiskFactorsEnumTranslatedNotes } from '../../../../../../../shared/utils/translate/riskFactors.translate';
 import { checkIsValidCpf } from '../../../../../../../shared/utils/validators/checkIsValidCpf';
 import { ReportColorEnum, ReportFillColorEnum } from '../../../../report/types/IReportFactory.types';
 import { ClothesIBTUG, clothesList } from '../../../../../../../shared/constants/maps/ibtu-clothes.map';
@@ -12,7 +10,7 @@ import { checkIsNumber } from '../../../../../../../shared/utils/validators/chec
 import { IColumnRuleMap, ISheetRuleMap } from '../../../types/IFileFactory.types';
 import { checkIsString } from '../../../../../../../shared/utils/validators/checkIsString';
 import { checkIsEnum } from '../../../../../../../shared/utils/validators/checkIsEnum';
-import { SexTypeEnum } from '@prisma/client';
+import { SexTypeEnum, RiskFactorsEnum } from '@prisma/client';
 
 export const emptyHierarchy = '!!';
 
@@ -57,6 +55,10 @@ export enum CompanyStructHeaderEnum {
   // EQUIPMENT = 'Equipamento',
 
   RISK = 'Risco',
+  RISK_SEVERITY = 'Severidade do Risco',
+  RISK_DESCRIPTION = 'Descrição do Risco',
+  RISK_SYMPTOMS = 'Sintomas do Risco',
+  RISK_TYPE = 'Tipo do Risco',
   PROB = 'Probabilidade',
   GENERATE_SOURCE = 'Fonte Geradora',
 
@@ -348,6 +350,31 @@ export const CompanyStructColumnMap: IColumnRuleMap<CompanyStructHeaderEnum> = {
     notes: ['Nome do Risco cadastrado no sistema'],
     database: 'risk',
   },
+  [CompanyStructHeaderEnum.RISK_SEVERITY]: {
+    field: CompanyStructHeaderEnum.RISK_SEVERITY,
+    checkHandler: checkIsNumber,
+    width: 50,
+    database: 'riskSeverity',
+  },
+  [CompanyStructHeaderEnum.RISK_DESCRIPTION]: {
+    field: CompanyStructHeaderEnum.RISK_DESCRIPTION,
+    checkHandler: checkIsString,
+    width: 80,
+    database: 'riskDescription',
+  },
+  [CompanyStructHeaderEnum.RISK_SYMPTOMS]: {
+    field: CompanyStructHeaderEnum.RISK_SYMPTOMS,
+    checkHandler: checkIsString,
+    width: 80,
+    database: 'riskSymptoms',
+  },
+  [CompanyStructHeaderEnum.RISK_TYPE]: {
+    field: CompanyStructHeaderEnum.RISK_TYPE,
+    checkHandler: (value: any) => checkIsEnum(RiskFactorsEnumTranslateBrToUs(value), RiskFactorsEnum),
+    notes: RiskFactorsEnumTranslatedNotes,
+    width: 50,
+    database: 'riskType',
+  },
   [CompanyStructHeaderEnum.PROB]: {
     field: CompanyStructHeaderEnum.PROB,
     checkHandler: (value) => value && checkIsNumber(value),
@@ -382,11 +409,7 @@ export const CompanyStructColumnMap: IColumnRuleMap<CompanyStructHeaderEnum> = {
   [CompanyStructHeaderEnum.IBTUG]: {
     field: CompanyStructHeaderEnum.IBTUG,
     checkHandler: checkIsNumber,
-    requiredIfOneExist: [
-      CompanyStructHeaderEnum.MW,
-      CompanyStructHeaderEnum.IS_ACCLIMATIZED,
-      CompanyStructHeaderEnum.CLOTHES_TYPE,
-    ],
+    requiredIfOneExist: [CompanyStructHeaderEnum.MW, CompanyStructHeaderEnum.IS_ACCLIMATIZED, CompanyStructHeaderEnum.CLOTHES_TYPE],
     database: 'ibtug',
   },
   [CompanyStructHeaderEnum.MW]: {

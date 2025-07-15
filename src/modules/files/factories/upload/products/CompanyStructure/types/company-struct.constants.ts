@@ -1,21 +1,7 @@
+import { EmployeeHierarchyMotiveTypeEnum, HierarchyEnum, SexTypeEnum } from '@prisma/client';
 import { UserPayloadDto } from './../../../../../../../shared/dto/user-payload.dto';
-import { UploadCompanyStructureReportDto } from './../../../../../dto/risk-structure-report.dto';
 import { RiskFactorsEntity } from './../../../../../../sst/entities/risk.entity';
-import { ClothesIBTUG } from '../../../../../../../shared/constants/maps/ibtu-clothes.map';
-import { checkIsValidDate } from '../../../../../../../shared/utils/validators/checkIsValidDate';
-import { checkIsBoolean } from '../../../../../../../shared/utils/validators/checkIsBoolean';
-import { checkIsNumber } from '../../../../../../../shared/utils/validators/checkIdNumber';
-import { IColumnRuleMap, ISheetRuleMap } from '../../../types/IFileFactory.types';
-import { checkIsString } from '../../../../../../../shared/utils/validators/checkIsString';
-import { checkIsEnum } from '../../../../../../../shared/utils/validators/checkIsEnum';
-import {
-  CharacterizationTypeEnum,
-  EmployeeHierarchyMotiveTypeEnum,
-  HierarchyEnum,
-  RiskFactors,
-  SexTypeEnum,
-} from '@prisma/client';
-import { CompanyStructHeaderEnum } from '../constants/company-struct.constants';
+import { UploadCompanyStructureReportDto } from './../../../../../dto/risk-structure-report.dto';
 
 type IDataReturn = { id?: string | number; value: string };
 export type IDataReturnHierarchy = IDataReturn & {
@@ -97,6 +83,11 @@ export interface IRiskAllData extends IDataReturn {
   engs: Record<string, IDataReturn>;
   recs: Record<string, IDataReturn>;
   data: RiskFactorsEntity;
+  // Risk creation fields
+  severity?: number;
+  risk?: string;
+  symptoms?: string;
+  type?: string;
 }
 
 export interface IMapData {

@@ -16,6 +16,7 @@ import { RiskFactorsEntity } from './../../../../../sst/entities/risk.entity';
 import { RiskRepository } from './../../../../../sst/repositories/implementations/RiskRepository';
 import { CreateGenerateSourceService } from './../../../../../sst/services/generate-source/create-generate-source/create-generate-source.service';
 import { CreateRecMedService } from './../../../../../sst/services/rec-med/create-rec-med/create-rec-med.service';
+import { CreateRiskService } from './../../../../../sst/services/risk/create-risk/create-risk.service';
 import { UpsertRiskDataService } from './../../../../../sst/services/risk-data/upsert-risk-data/upsert-risk.service';
 
 import { formatCPF } from '@brazilian-utils/brazilian-utils';
@@ -56,6 +57,7 @@ export class FileCompanyStructureFactory extends FileFactoryAbstractionCreator<I
     readonly riskRepository: RiskRepository,
     readonly createRecMedService: CreateRecMedService,
     readonly createGenerateSourceService: CreateGenerateSourceService,
+    readonly createRiskService: CreateRiskService,
     readonly homoGroupRepository: HomoGroupRepository,
     readonly hierarchyRepository: HierarchyRepository,
     readonly employeeRepository: EmployeeRepository,
@@ -71,6 +73,7 @@ export class FileCompanyStructureFactory extends FileFactoryAbstractionCreator<I
       this.riskRepository,
       this.createRecMedService,
       this.createGenerateSourceService,
+      this.createRiskService,
       this.homoGroupRepository,
       this.hierarchyRepository,
       this.employeeRepository,
@@ -101,6 +104,7 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
     private readonly riskRepository: RiskRepository,
     private readonly createRecMedService: CreateRecMedService,
     private readonly createGenerateSourceService: CreateGenerateSourceService,
+    private readonly createRiskService: CreateRiskService,
     private readonly homoGroupRepository: HomoGroupRepository,
     private readonly hierarchyRepository: HierarchyRepository,
     private readonly employeeRepository: EmployeeRepository,
@@ -430,6 +434,11 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
             adms: {},
             recs: {},
             data: {} as any,
+            // Risk creation fields
+            severity: row[CompanyStructHeaderEnum.RISK_SEVERITY],
+            risk: row[CompanyStructHeaderEnum.RISK_DESCRIPTION],
+            symptoms: row[CompanyStructHeaderEnum.RISK_SYMPTOMS],
+            type: row[CompanyStructHeaderEnum.RISK_TYPE],
           };
 
         const isGenerateSource = !!row[CompanyStructHeaderEnum.GENERATE_SOURCE];
@@ -808,10 +817,53 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
 
     await Promise.all(promisesWorkspaces);
 
+    // First, create missing risks and add them to riskMap
+
+    if (body.createRisk) {
+      const createRiskPromises = Object.entries(mapData.risk)
+        .filter(([riskName]) => !riskMap[riskName])
+        .map(([riskName, riskValue]) => {
+          if (!riskValue.severity) {
+            return this.throwError(`Severidade do risco ${riskName} não informada`);
+          }
+
+          return async () => {
+            const newRisk = await this.createRiskService.execute(
+              {
+                name: riskName,
+                severity: riskValue.severity || 0,
+                risk: riskValue.risk || '',
+                symptoms: riskValue.symptoms || '',
+                type: (riskValue.type as any) || 'FIS',
+                companyId: companyId,
+              },
+              body.user,
+            );
+
+            riskMap[riskName] = newRisk;
+            mapData.risk[riskName].data = newRisk;
+          };
+        });
+
+      if (createRiskPromises.length > 0) {
+        await asyncBatch(createRiskPromises, 50, async (promise) => {
+          if (typeof promise === 'function') {
+            await promise();
+          }
+        });
+      }
+    }
+
+    console.log('riskMap', riskMap);
+
+    // Now process all risks (existing and newly created)
     const promisesRisks = Object.entries(mapData.risk)
       .map(([riskName, riskValue]) => {
         const risk = riskMap[riskName];
-        if (!risk) return this.throwError(`Risco ${riskName} não encontrado`);
+
+        if (!risk) {
+          return this.throwError(`Risco ${riskName} não encontrado`);
+        }
 
         mapData.risk[riskName].id = risk.id;
         mapData.risk[riskName].data = risk;

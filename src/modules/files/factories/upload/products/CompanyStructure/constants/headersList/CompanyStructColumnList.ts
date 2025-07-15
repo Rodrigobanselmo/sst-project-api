@@ -20,7 +20,14 @@ export const CompanyStructColumnList: (opt: { workspaceLength: number }) => IShe
     name: 'Identificação GSE',
   },
   {
-    group: [CompanyStructColumnMap[CompanyStructHeaderEnum.RISK], CompanyStructColumnMap[CompanyStructHeaderEnum.PROB], CompanyStructColumnMap[CompanyStructHeaderEnum.GENERATE_SOURCE]],
+    group: [
+      CompanyStructColumnMap[CompanyStructHeaderEnum.RISK],
+      CompanyStructColumnMap[CompanyStructHeaderEnum.RISK_SEVERITY],
+      CompanyStructColumnMap[CompanyStructHeaderEnum.RISK_DESCRIPTION],
+      CompanyStructColumnMap[CompanyStructHeaderEnum.RISK_TYPE],
+      CompanyStructColumnMap[CompanyStructHeaderEnum.PROB],
+      CompanyStructColumnMap[CompanyStructHeaderEnum.GENERATE_SOURCE],
+    ],
     name: 'Risco Ocupacional',
   },
   {
