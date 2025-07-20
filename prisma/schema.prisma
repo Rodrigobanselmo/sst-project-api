@@ -1401,12 +1401,13 @@ model FormQuestionData {
 }
 
 model FormQuestionOption {
-  id         Int      @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   text       String
   order      Int
   value      Int
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
 
   question_id Int
   question    FormQuestionData @relation(fields: [question_id], references: [id], onDelete: Cascade)

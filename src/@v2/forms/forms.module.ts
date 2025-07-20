@@ -8,24 +8,39 @@ import { AddFormApplicationUseCase } from './application/form-application/add-fo
 import { EditFormApplicationUseCase } from './application/form-application/edit-form-application/use-cases/edit-form-application.usecase';
 import { FormApplicationAggregateRepository } from './database/repositories/form-application/form-application-aggregate.repository';
 import { FormRepository } from './database/repositories/form/form.repository';
+import { FormAggregateRepository } from './database/repositories/form/form-aggregate.repository';
 import { FormQuestionDataAggregateRepository } from './database/repositories/form-question-identifier/form-question-identifier-data-aggregate.repository';
 import { ReadFormUseCase } from './application/form/read-form/use-cases/read-form.usecase';
 import { BrowseFormUseCase } from './application/form/browse-form/use-cases/browse-form.usecase';
+import { AddFormUseCase } from './application/form/add-form/use-cases/add-form.usecase';
+import { EditFormUseCase } from './application/form/edit-form/use-cases/edit-form.usecase';
 import { AddFormApplicationController } from './application/form-application/add-form-application/controllers/add-form-application.controller';
 import { BrowseFormApplicationController } from './application/form-application/browse-form-application/controllers/browse-form-application.controller';
 import { EditFormApplicationController } from './application/form-application/edit-form-application/controllers/edit-form-application.controller';
 import { ReadFormController } from './application/form/read-form/controllers/read-form.controller';
 import { BrowseFormController } from './application/form/browse-form/controllers/browse-form.controller';
+import { AddFormController } from './application/form/add-form/controllers/add-form.controller';
+import { EditFormController } from './application/form/edit-form/controllers/edit-form.controller';
 import { FormDAO } from './database/dao/form/form.dao';
 
 @Module({
   imports: [SharedModule],
-  controllers: [ReadFormController, BrowseFormController, ReadFormApplicationController, AddFormApplicationController, BrowseFormApplicationController, EditFormApplicationController],
+  controllers: [
+    ReadFormController,
+    BrowseFormController,
+    AddFormController,
+    EditFormController,
+    ReadFormApplicationController,
+    AddFormApplicationController,
+    BrowseFormApplicationController,
+    EditFormApplicationController,
+  ],
   providers: [
     // Database
     FormDAO,
     FormApplicationDAO,
     FormRepository,
+    FormAggregateRepository,
     FormQuestionDataAggregateRepository,
     FormApplicationAggregateRepository,
 
@@ -36,6 +51,8 @@ import { FormDAO } from './database/dao/form/form.dao';
     EditFormApplicationUseCase,
     ReadFormUseCase,
     BrowseFormUseCase,
+    AddFormUseCase,
+    EditFormUseCase,
   ],
   exports: [],
 })

@@ -29,4 +29,8 @@ export class FormQuestionGroupEntity {
     this.deletedAt = params.deletedAt ?? null;
     this.formId = params.formId;
   }
+
+  equals(other: { name: string; description?: string; order: number }): boolean {
+    return this.name === other.name && this.description === other.description && this.order === other.order;
+  }
 }

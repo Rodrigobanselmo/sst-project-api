@@ -8,6 +8,7 @@ export type FormQuestionDataEntityConstructor = {
   system?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
+  deletedAt?: Date;
   companyId: string;
 };
 
@@ -19,6 +20,7 @@ export class FormQuestionDataEntity {
   system: boolean;
   createdAt: Date;
   updatedAt: Date;
+  deletedAt?: Date;
   companyId: string;
 
   constructor(params: FormQuestionDataEntityConstructor) {
@@ -29,6 +31,15 @@ export class FormQuestionDataEntity {
     this.system = params.system ?? false;
     this.createdAt = params.createdAt ?? new Date();
     this.updatedAt = params.updatedAt ?? new Date();
+    this.deletedAt = params.deletedAt;
     this.companyId = params.companyId;
+  }
+
+  get needsOptions(): boolean {
+    return this.type === 'RADIO' || this.type === 'CHECKBOX' || this.type === 'SELECT';
+  }
+
+  equals(other: { text: string; type: FormQuestionTypeEnum; acceptOther?: boolean }): boolean {
+    return this.text === other.text && this.type === other.type && this.acceptOther === other.acceptOther;
   }
 }

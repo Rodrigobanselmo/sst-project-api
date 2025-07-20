@@ -10,6 +10,7 @@ export class FormQuestionOptionEntityMapper {
       order: prisma.order,
       createdAt: prisma.created_at,
       updatedAt: prisma.updated_at,
+      deletedAt: prisma.deleted_at,
       text: prisma.text,
       value: prisma.value,
     });
