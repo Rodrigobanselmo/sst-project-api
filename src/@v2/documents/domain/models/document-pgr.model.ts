@@ -151,7 +151,7 @@ export class DocumentPGRModel {
   }
 
   getModifiedEntityFilteredByHierarchy(hierarchy: HierarchyModel) {
-    const hierarchies = [hierarchy, ...this.getHierarchyNestedChildren(hierarchy)];
+    const hierarchies = [...this.getHierarchyParents(hierarchy), hierarchy, ...this.getHierarchyNestedChildren(hierarchy)];
 
     return new DocumentPGRModel({
       hierarchies: hierarchies,

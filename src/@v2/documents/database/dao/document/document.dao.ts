@@ -31,11 +31,13 @@ export class DocumentDAO {
       this.examDAO.findMany({ companyId: document.documentBase.company.id }),
     ]);
 
-    return new DocumentPGRModel({
+    const documentModel = new DocumentPGRModel({
       documentVersion: document,
       homogeneousGroups,
       exams,
       hierarchies,
     });
+
+    return documentModel;
   }
 }
