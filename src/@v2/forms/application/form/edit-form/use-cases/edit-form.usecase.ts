@@ -35,8 +35,6 @@ export class EditFormUseCase {
     if (params.questionGroups) {
       existingForm.updateQuestionGroups({
         questionGroups: params.questionGroups,
-        companyId: params.companyId,
-        system: loggedUser.isAdmin,
       });
     }
 

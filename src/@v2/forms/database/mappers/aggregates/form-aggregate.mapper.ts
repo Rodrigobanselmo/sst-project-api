@@ -7,11 +7,13 @@ import { FormEntityMapper, FormEntityMapperConstructor } from '../entities/form.
 
 export type FormAggregateMapperConstructor = FormEntityMapperConstructor & {
   questions_groups: (FormQuestionGroupEntityMapperConstructor & {
-    questions: (FormQuestionEntityMapperConstructor & {
-      question_data: FormQuestionDataEntityMapperConstructor & {
-        options: FormQuestionOptionEntityMapperConstructor[];
+    question_group_to_question: {
+      question: FormQuestionEntityMapperConstructor & {
+        question_data: FormQuestionDataEntityMapperConstructor & {
+          options: FormQuestionOptionEntityMapperConstructor[];
+        };
       };
-    })[];
+    }[];
   })[];
 };
 
@@ -19,19 +21,20 @@ export class FormAggregateMapper {
   static toAggregate(prisma: FormAggregateMapperConstructor): FormAggregate {
     return new FormAggregate({
       form: FormEntityMapper.toEntity(prisma),
-      questionGroups: prisma.questions_groups.map((group) => ({
-        ...FormQuestionGroupEntityMapper.toEntity(group),
-        questions: group.questions.map((question) => {
-          const questionEntity = FormQuestionEntityMapper.toEntity(question);
-          const questionData = FormQuestionDataEntityMapper.toEntity(question.question_data);
+      questionGroups: prisma.questions_groups.map((group) => {
+        const questionGroupEntity = FormQuestionGroupEntityMapper.toEntity(group);
+        const questions = group.question_group_to_question.map((groupToQuestion) => {
+          const questionEntity = FormQuestionEntityMapper.toEntity(groupToQuestion.question);
+          const questionData = FormQuestionDataEntityMapper.toEntity(groupToQuestion.question.question_data);
 
-          return {
-            ...questionEntity,
+          return Object.assign(questionEntity, {
             data: questionData,
-            options: FormQuestionOptionEntityMapper.toArray(question.question_data.options),
-          };
-        }),
-      })),
+            options: FormQuestionOptionEntityMapper.toArray(groupToQuestion.question.question_data.options),
+          });
+        });
+
+        return Object.assign(questionGroupEntity, { questions });
+      }),
     });
   }
 

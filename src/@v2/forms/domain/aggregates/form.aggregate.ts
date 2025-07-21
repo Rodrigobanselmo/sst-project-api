@@ -61,13 +61,6 @@ interface IQuestionGroupInput {
 
 interface IUpdateQuestionGroupsParams {
   questionGroups: IQuestionGroupInput[];
-  companyId: string;
-  system: boolean;
-}
-
-interface ICreateQuestionParams {
-  companyId: string;
-  system: boolean;
 }
 
 interface IQuestionDataCreationInput {
@@ -130,7 +123,7 @@ export class FormAggregate {
         }
       } else {
         const questionsAggregate = newGroup.questions.map((question, questionIndex) => {
-          return this.createQuestionAggregate(question, questionIndex, params);
+          return this.createQuestionAggregate(question, questionIndex);
         });
 
         this.questionGroups.push(this.createQuestionGroupAggregate(questionGroupEntity, questionsAggregate));
@@ -161,7 +154,7 @@ export class FormAggregate {
           this.updateQuestion(existingQuestion, newQuestion, questionIndex);
         }
       } else {
-        const questionEntity = this.createQuestionAggregate(newQuestion, questionIndex, { companyId: '', system: false });
+        const questionEntity = this.createQuestionAggregate(newQuestion, questionIndex);
         existingGroup.questions.push(questionEntity);
       }
     });
@@ -187,7 +180,7 @@ export class FormAggregate {
         }
       });
 
-      const questionEntity = this.createQuestionAggregate(newQuestion, questionIndex, { companyId: '', system: false });
+      const questionEntity = this.createQuestionAggregate(newQuestion, questionIndex);
 
       Object.assign(existingQuestion, questionEntity);
     } else {
@@ -257,9 +250,9 @@ export class FormAggregate {
     });
   }
 
-  private createQuestionAggregate(question: IQuestionCreationInput, questionIndex: number, params: ICreateQuestionParams): IFormQuestionAggregate {
+  private createQuestionAggregate(question: IQuestionCreationInput, questionIndex: number): IFormQuestionAggregate {
     const questionEntity = this.createQuestionEntity(question, questionIndex);
-    const questionDataEntity = this.createQuestionDataEntity(question.data, params);
+    const questionDataEntity = this.createQuestionDataEntity(question.data);
     const optionsAggregate = this.createQuestionOptionsEntities(question.options);
 
     return {
@@ -277,14 +270,14 @@ export class FormAggregate {
     });
   }
 
-  private createQuestionDataEntity(questionData: IQuestionDataCreationInput, params: ICreateQuestionParams): FormQuestionDataEntity {
+  private createQuestionDataEntity(questionData: IQuestionDataCreationInput): FormQuestionDataEntity {
     return new FormQuestionDataEntity({
       id: 0,
       text: questionData.text,
       type: questionData.type,
       acceptOther: questionData.acceptOther,
-      companyId: params.companyId,
-      system: params.system,
+      companyId: this.form.companyId,
+      system: false,
     });
   }
 

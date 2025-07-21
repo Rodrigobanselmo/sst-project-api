@@ -2,7 +2,6 @@ import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { FormAggregateMapper } from '../../mappers/aggregates/form-aggregate.mapper';
-import { FormAggregate } from '@/@v2/forms/domain/aggregates/form.aggregate';
 import { IFormAggregateRepository } from './form-aggregate.types';
 
 @Injectable()
@@ -19,19 +18,22 @@ export class FormAggregateRepository {
           order: 'asc',
         },
         include: {
-          questions: {
-            where: {
-              deleted_at: null,
-            },
+          question_group_to_question: {
             orderBy: {
-              order: 'asc',
+              question: {
+                order: 'asc',
+              },
             },
             include: {
-              question_data: {
+              question: {
                 include: {
-                  options: {
-                    orderBy: {
-                      order: 'asc',
+                  question_data: {
+                    include: {
+                      options: {
+                        orderBy: {
+                          order: 'asc',
+                        },
+                      },
                     },
                   },
                 },
@@ -91,12 +93,19 @@ export class FormAggregateRepository {
             });
           }
 
-          await tx.formQuestion.create({
+          const createdQuestion = await tx.formQuestion.create({
             data: {
               required: question.required,
               order: question.order,
               question_data_id: createdQuestionData.id,
+            },
+          });
+
+          // Create the many-to-many relationship
+          await tx.formQuestionGroupToQuestion.create({
+            data: {
               question_group_id: createdGroup.id,
+              question_id: createdQuestion.id,
             },
           });
         }
@@ -156,13 +165,17 @@ export class FormAggregateRepository {
           questions_groups: {
             where: { deleted_at: null },
             include: {
-              questions: {
-                where: { deleted_at: null },
+              question_group_to_question: {
+                where: { question: { deleted_at: null } },
                 include: {
-                  question_data: {
+                  question: {
                     include: {
-                      options: {
-                        where: { deleted_at: null },
+                      question_data: {
+                        include: {
+                          options: {
+                            where: { deleted_at: null },
+                          },
+                        },
                       },
                     },
                   },
@@ -225,7 +238,7 @@ export class FormAggregateRepository {
         }
 
         // Handle questions within this group
-        const existingQuestions = existingGroup?.questions || [];
+        const existingQuestions = existingGroup?.question_group_to_question.map((q) => q.question) || [];
 
         // Soft delete questions that no longer exist in this group
         for (const existingQuestion of existingQuestions) {
@@ -293,7 +306,9 @@ export class FormAggregateRepository {
                 required: newQuestion.required,
                 order: questionIndex + 1,
                 question_data_id: questionDataId,
-                question_group_id: groupId,
+                question_group_to_question: {
+                  create: [{ question_group_id: groupId }],
+                },
               },
             });
           }

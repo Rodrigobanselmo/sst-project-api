@@ -1323,7 +1323,7 @@ model FormQuestionGroup {
   form_id Int
   form    Form @relation(fields: [form_id], references: [id], onDelete: Cascade)
 
-  questions FormQuestion[]
+  question_group_to_question FormQuestionGroupToQuestion[]
 }
 
 model FormParticipantsAnswers {
@@ -1340,6 +1340,18 @@ model FormParticipantsAnswers {
   answers FormAnswer[]
 }
 
+model FormQuestionGroupToQuestion {
+  created_at DateTime @default(now())
+
+  question_group_id Int
+  question_group    FormQuestionGroup @relation(fields: [question_group_id], references: [id], onDelete: Cascade)
+
+  question_id Int
+  question    FormQuestion @relation(fields: [question_id], references: [id], onDelete: Cascade)
+
+  @@unique([question_group_id, question_id])
+}
+
 model FormQuestion {
   id         Int       @id @default(autoincrement())
   required   Boolean   @default(false)
@@ -1351,13 +1363,11 @@ model FormQuestion {
   question_data_id Int
   question_data    FormQuestionData @relation(fields: [question_data_id], references: [id], onDelete: Cascade)
 
-  question_group_id Int?
-  question_group    FormQuestionGroup? @relation(fields: [question_group_id], references: [id], onDelete: Cascade)
-
   question_identifier_group_id Int?
   question_identifier_group    FormQuestionIdentifierGroup? @relation(fields: [question_identifier_group_id], references: [id])
 
-  answers FormAnswer[]
+  answers                    FormAnswer[]
+  question_group_to_question FormQuestionGroupToQuestion[]
 }
 
 model FormAnswer {
