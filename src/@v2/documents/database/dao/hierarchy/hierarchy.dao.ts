@@ -26,6 +26,7 @@ export class HierarchyDAO {
     const hierarchies = await this.prisma.hierarchy.findMany({
       where: {
         workspaces: { some: { id: params.workspaceId } },
+        status: 'ACTIVE',
         ...(params?.homogeneousGroupsIds?.length && {
           OR: [
             {

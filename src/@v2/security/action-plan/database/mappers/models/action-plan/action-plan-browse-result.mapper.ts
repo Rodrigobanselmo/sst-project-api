@@ -64,6 +64,7 @@ export type IActionPlanBrowseResultModelMapper = {
     is_approved: boolean | null;
     created_at: Date;
   }[];
+  risk_sub_types: { id: number; name: string }[];
 };
 
 export class ActionPlanBrowseResultModelMapper {
@@ -121,6 +122,10 @@ export class ActionPlanBrowseResultModelMapper {
         id: prisma.risk_id,
         name: prisma.risk_name,
         type: RiskTypeEnum[prisma.risk_type],
+        subTypes: prisma.risk_sub_types.map((subType) => ({
+          id: subType.id,
+          name: subType.name,
+        })),
       },
       recommendation: {
         name: prisma.rec_name,

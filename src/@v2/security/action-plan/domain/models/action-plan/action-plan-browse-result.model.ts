@@ -23,7 +23,7 @@ export type IActionPlanBrowseResultModel = {
   recommendation: { name: string; type: RecommendationTypeEnum };
   generateSources: { id: string; name: string }[];
   status: ActionPlanStatusEnum;
-  risk: { id: string; name: string; type: RiskTypeEnum };
+  risk: { id: string; name: string; type: RiskTypeEnum; subTypes?: { id: number; name: string }[] };
   responsible: { id: string; name: string } | null;
   homogeneousGroup: {
     id: string;
@@ -63,7 +63,7 @@ export class ActionPlanBrowseResultModel {
   ocupationalRisk: IRiskLevelValues | null;
   recommendation: { name: string; type: RecommendationTypeEnum };
   generateSources: { id: string; name: string }[];
-  risk: { id: string; name: string; type: RiskTypeEnum };
+  risk: { id: string; name: string; type: RiskTypeEnum; subTypes?: { id: number; name: string }[] };
   origin: { id: string; name: string; type: OriginTypeEnum };
   status: ActionPlanStatusEnum;
   responsible: { id: string; name: string } | null;
@@ -104,6 +104,7 @@ export class ActionPlanBrowseResultModel {
       id: params.risk.id,
       name: params.risk.name,
       type: params.risk.type,
+      subTypes: params.risk.subTypes ?? [],
     };
     this.responsible = params.responsible
       ? {

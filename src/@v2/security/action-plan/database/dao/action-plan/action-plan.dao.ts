@@ -257,6 +257,12 @@ export class ActionPlanDAO {
         ) AS generateSources,
         COALESCE(
           JSON_AGG(DISTINCT JSONB_BUILD_OBJECT(
+            'id', risk_sub_type_table."id",
+            'name', risk_sub_type_table."name"
+          )) FILTER (WHERE risk_sub_type_table."id" IS NOT NULL), '[]'
+        ) AS risk_sub_types,
+        COALESCE(
+          JSON_AGG(DISTINCT JSONB_BUILD_OBJECT(
             'id', comment."id"
             ,'text', comment."text" 
             ,'type', comment."type" 
@@ -275,13 +281,10 @@ export class ActionPlanDAO {
         "RecMed" rec ON rec."id" = rec_to_rfd."rec_med_id"
       LEFT JOIN
         "RiskFactors" risk ON risk."id" = rfd."riskId"
-      ${
-        includeRiskSubType
-          ? Prisma.sql`
-            LEFT JOIN "RiskToRiskSubType" risk_sub_type ON risk_sub_type."risk_id" = risk."id"
-          `
-          : Prisma.sql``
-      }
+      LEFT JOIN 
+        "RiskToRiskSubType" risk_sub_type ON risk_sub_type."risk_id" = risk."id"
+      LEFT JOIN
+        "RiskSubType" risk_sub_type_table ON risk_sub_type_table."id" = risk_sub_type."sub_type_id"
       LEFT JOIN
         "_GenerateSourceToRiskFactorData" gs_to_rfd ON gs_to_rfd."B" = rfd."id"
       LEFT JOIN
