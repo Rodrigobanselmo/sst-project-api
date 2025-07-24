@@ -11,29 +11,20 @@ export class FormAggregateRepository {
   static selectOptions() {
     const include = {
       questions_groups: {
-        where: {
-          deleted_at: null,
-        },
-        orderBy: {
-          order: 'asc',
-        },
+        where: { deleted_at: null },
         include: {
-          question_group_to_question: {
-            orderBy: {
-              question: {
-                order: 'asc',
-              },
-            },
+          data: { where: { deleted_at: null } },
+          questions: {
+            where: { deleted_at: null },
             include: {
-              question: {
+              data: { where: { deleted_at: null } },
+              question_details: {
                 include: {
-                  question_data: {
+                  data: { where: { deleted_at: null } },
+                  options: {
+                    where: { deleted_at: null },
                     include: {
-                      options: {
-                        orderBy: {
-                          order: 'asc',
-                        },
-                      },
+                      data: { where: { deleted_at: null } },
                     },
                   },
                 },
@@ -64,50 +55,73 @@ export class FormAggregateRepository {
       for (const questionGroup of params.questionGroups) {
         const createdGroup = await tx.formQuestionGroup.create({
           data: {
-            name: questionGroup.name,
-            description: questionGroup.description,
-            order: questionGroup.order,
             form_id: form.id,
           },
         });
 
+        // Create the group data
+        await tx.formQuestionGroupData.create({
+          data: {
+            name: questionGroup?.name || '',
+            description: questionGroup?.description,
+            order: questionGroup?.order || 0,
+            form_question_group_id: createdGroup.id,
+          },
+        });
+
         for (const question of questionGroup.questions) {
-          const createdQuestionData = await tx.formQuestionData.create({
+          // Create FormQuestionDetails first
+          const createdQuestionDetails = await tx.formQuestionDetails.create({
             data: {
-              text: question.data.text,
-              type: question.data.type,
-              accept_other: question.data.acceptOther,
-              system: question.data.system,
-              company_id: question.data.companyId,
+              system: question.details.system,
+              company_id: question.details.companyId,
             },
           });
 
+          // Create FormQuestionDetailsData
+          await tx.formQuestionDetailsData.create({
+            data: {
+              text: question.details.text,
+              type: question.details.type,
+              accept_other: question.details.acceptOther,
+              form_question_details_id: createdQuestionDetails.id,
+            },
+          });
+
+          // Create FormQuestion
+          const createdQuestion = await tx.formQuestion.create({
+            data: {
+              question_details_id: createdQuestionDetails.id,
+              question_group_id: createdGroup.id,
+            },
+          });
+
+          // Create FormQuestionData for required/order
+          await tx.formQuestionData.create({
+            data: {
+              required: question.required,
+              order: question.order,
+              form_question_id: createdQuestion.id,
+            },
+          });
+
+          // Create options
           for (const option of question.options) {
-            await tx.formQuestionOption.create({
+            const createdOption = await tx.formQuestionOption.create({
+              data: {
+                question_id: createdQuestionDetails.id,
+              },
+            });
+
+            await tx.formQuestionOptionData.create({
               data: {
                 text: option.text,
                 order: option.order,
                 value: option.value,
-                question_id: createdQuestionData.id,
+                form_question_option_id: createdOption.id,
               },
             });
           }
-
-          const createdQuestion = await tx.formQuestion.create({
-            data: {
-              required: question.required,
-              order: question.order,
-              question_data_id: createdQuestionData.id,
-            },
-          });
-
-          // Create the many-to-many relationship
-          await tx.formQuestionGroupToQuestion.create({
-            data: {
-              question_group_id: createdGroup.id,
-              question_id: createdQuestion.id,
-            },
-          });
         }
       }
 
@@ -141,232 +155,118 @@ export class FormAggregateRepository {
     return formAggregate ? FormAggregateMapper.toAggregate(formAggregate) : null;
   }
 
-  async update(params: IFormAggregateRepository.UpdateParams): IFormAggregateRepository.UpdateReturn {
+  async update(aggregate: IFormAggregateRepository.UpdateParams): IFormAggregateRepository.UpdateReturn {
     const formAggregate = await this.prisma.$transaction(async (tx) => {
-      // Update the form
       await tx.form.update({
         where: {
-          id: params.form.id,
-          company_id: params.form.companyId,
+          id: aggregate.form.id,
+          company_id: aggregate.form.companyId,
         },
         data: {
-          name: params.form.name,
-          type: params.form.type,
-          description: params.form.description,
-          anonymous: params.form.anonymous,
-          shareable_link: params.form.shareableLink,
+          name: aggregate.form.name,
+          type: aggregate.form.type,
+          description: aggregate.form.description,
+          anonymous: aggregate.form.anonymous,
+          shareable_link: aggregate.form.shareableLink,
         },
       });
 
-      // Get existing form structure for comparison
-      const existingForm = await tx.form.findFirst({
-        where: { id: params.form.id },
-        include: {
-          questions_groups: {
-            where: { deleted_at: null },
-            include: {
-              question_group_to_question: {
-                where: { question: { deleted_at: null } },
-                include: {
-                  question: {
-                    include: {
-                      question_data: {
-                        include: {
-                          options: {
-                            where: { deleted_at: null },
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      });
-
-      if (!existingForm) {
-        throw new Error('Form not found');
-      }
-
-      // Compare and update question groups
-      const existingGroups = existingForm.questions_groups;
-      const newGroups = params.questionGroups;
-
-      // Soft delete groups that no longer exist
-      for (const existingGroup of existingGroups) {
-        const groupStillExists = newGroups.some((newGroup, index) => newGroup.name === existingGroup.name && newGroup.description === existingGroup.description && index + 1 === existingGroup.order);
-
-        if (!groupStillExists) {
+      for (const questionGroup of aggregate.questionGroups) {
+        if (questionGroup.deletedAt) {
+          // Soft delete the entire group and all its children
           await tx.formQuestionGroup.update({
-            where: { id: existingGroup.id },
+            where: { id: questionGroup.id },
             data: { deleted_at: new Date() },
           });
-        }
-      }
-
-      // Update or create question groups
-      for (let groupIndex = 0; groupIndex < newGroups.length; groupIndex++) {
-        const newGroup = newGroups[groupIndex];
-        const existingGroup = existingGroups.find((eg) => eg.name === newGroup.name && eg.description === newGroup.description && eg.order === groupIndex + 1);
-
-        let groupId: number;
-
-        if (existingGroup) {
-          // Update existing group
-          await tx.formQuestionGroup.update({
-            where: { id: existingGroup.id },
-            data: {
-              name: newGroup.name,
-              description: newGroup.description,
-              order: groupIndex + 1,
-            },
-          });
-          groupId = existingGroup.id;
-        } else {
-          // Create new group
-          const createdGroup = await tx.formQuestionGroup.create({
-            data: {
-              name: newGroup.name,
-              description: newGroup.description,
-              order: groupIndex + 1,
-              form_id: params.form.id,
-            },
-          });
-          groupId = createdGroup.id;
+          continue;
         }
 
-        // Handle questions within this group
-        const existingQuestions = existingGroup?.question_group_to_question.map((q) => q.question) || [];
+        if (questionGroup.diff().hasChanges) {
+          await tx.formQuestionGroupData.updateMany({
+            where: { form_question_group_id: questionGroup.id, deleted_at: null },
+            data: { deleted_at: new Date() },
+          });
 
-        // Soft delete questions that no longer exist in this group
-        for (const existingQuestion of existingQuestions) {
-          const questionStillExists = newGroup.questions.some(
-            (newQuestion, qIndex) =>
-              newQuestion.data.text === existingQuestion.question_data.text &&
-              newQuestion.data.type === existingQuestion.question_data.type &&
-              newQuestion.required === existingQuestion.required &&
-              qIndex + 1 === existingQuestion.order,
-          );
+          await tx.formQuestionGroupData.create({
+            data: {
+              name: questionGroup.name,
+              description: questionGroup.description,
+              order: questionGroup.order,
+              form_question_group_id: questionGroup.id,
+            },
+          });
+        }
 
-          if (!questionStillExists) {
+        for (const question of questionGroup.questions) {
+          if (question.deletedAt) {
             await tx.formQuestion.update({
-              where: { id: existingQuestion.id },
+              where: { id: question.id },
               data: { deleted_at: new Date() },
             });
+            continue;
           }
-        }
 
-        // Update or create questions
-        for (let questionIndex = 0; questionIndex < newGroup.questions.length; questionIndex++) {
-          const newQuestion = newGroup.questions[questionIndex];
-          const existingQuestion = existingQuestions.find(
-            (eq) => eq.question_data.text === newQuestion.data.text && eq.question_data.type === newQuestion.data.type && eq.required === newQuestion.required && eq.order === questionIndex + 1,
-          );
-
-          let questionDataId: number;
-
-          if (existingQuestion) {
-            // Update existing question data
-            await tx.formQuestionData.update({
-              where: { id: existingQuestion.question_data_id },
-              data: {
-                text: newQuestion.data.text,
-                type: newQuestion.data.type,
-                accept_other: newQuestion.data.acceptOther,
-              },
+          if (question.diff().hasChanges) {
+            await tx.formQuestionData.updateMany({
+              where: { form_question_id: question.id, deleted_at: null },
+              data: { deleted_at: new Date() },
             });
-            questionDataId = existingQuestion.question_data_id;
 
-            // Update question
-            await tx.formQuestion.update({
-              where: { id: existingQuestion.id },
+            await tx.formQuestionData.create({
               data: {
-                required: newQuestion.required,
-                order: questionIndex + 1,
-              },
-            });
-          } else {
-            // Create new question data
-            const createdQuestionData = await tx.formQuestionData.create({
-              data: {
-                text: newQuestion.data.text,
-                type: newQuestion.data.type,
-                accept_other: newQuestion.data.acceptOther,
-                system: newQuestion.data.system,
-                company_id: newQuestion.data.companyId,
-              },
-            });
-            questionDataId = createdQuestionData.id;
-
-            // Create new question
-            await tx.formQuestion.create({
-              data: {
-                required: newQuestion.required,
-                order: questionIndex + 1,
-                question_data_id: questionDataId,
-                question_group_to_question: {
-                  create: [{ question_group_id: groupId }],
-                },
+                required: question.required,
+                order: question.order,
+                form_question_id: question.id,
               },
             });
           }
 
-          // Handle options for this question
-          if (newQuestion.data.needsOptions) {
-            const existingOptions = existingQuestion?.question_data.options || [];
+          if (question.details.diff().hasChanges) {
+            await tx.formQuestionDetailsData.updateMany({
+              where: { form_question_details_id: question.details.id, deleted_at: null },
+              data: { deleted_at: new Date() },
+            });
 
-            // Soft delete options that no longer exist
-            for (const existingOption of existingOptions) {
-              const optionStillExists = newQuestion.options?.some(
-                (newOption, oIndex) => newOption.text === existingOption.text && newOption.value === existingOption.value && oIndex + 1 === existingOption.order,
-              );
+            await tx.formQuestionDetailsData.create({
+              data: {
+                text: question.details.text,
+                type: question.details.type,
+                accept_other: question.details.acceptOther,
+                form_question_details_id: question.details.id,
+              },
+            });
+          }
 
-              if (!optionStillExists) {
-                await tx.formQuestionOption.update({
-                  where: { id: existingOption.id },
-                  data: { deleted_at: new Date() },
-                });
-              }
+          for (const option of question.options) {
+            if (option.deletedAt) {
+              await tx.formQuestionOption.update({
+                where: { id: option.id },
+                data: { deleted_at: new Date() },
+              });
+              continue;
             }
 
-            // Update or create options
-            if (newQuestion.options) {
-              for (let optionIndex = 0; optionIndex < newQuestion.options.length; optionIndex++) {
-                const newOption = newQuestion.options[optionIndex];
-                const existingOption = existingOptions.find((eo) => eo.text === newOption.text && eo.value === newOption.value && eo.order === optionIndex + 1);
+            if (option.diff().hasChanges) {
+              await tx.formQuestionOptionData.updateMany({
+                where: { form_question_option_id: option.id, deleted_at: null },
+                data: { deleted_at: new Date() },
+              });
 
-                if (existingOption) {
-                  // Update existing option
-                  await tx.formQuestionOption.update({
-                    where: { id: existingOption.id },
-                    data: {
-                      text: newOption.text,
-                      order: optionIndex + 1,
-                      value: newOption.value,
-                    },
-                  });
-                } else {
-                  // Create new option
-                  await tx.formQuestionOption.create({
-                    data: {
-                      text: newOption.text,
-                      order: optionIndex + 1,
-                      value: newOption.value,
-                      question_id: questionDataId,
-                    },
-                  });
-                }
-              }
+              await tx.formQuestionOptionData.create({
+                data: {
+                  text: option.text,
+                  order: option.order,
+                  value: option.value,
+                  form_question_option_id: option.id,
+                },
+              });
             }
           }
         }
       }
 
-      // Fetch the complete form with all relations
       const completeForm = await tx.form.findFirst({
-        where: { id: params.form.id },
+        where: { id: aggregate.form.id },
         ...FormAggregateRepository.selectOptions(),
       });
 

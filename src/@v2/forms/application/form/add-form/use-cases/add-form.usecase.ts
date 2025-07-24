@@ -1,6 +1,6 @@
 import { FormAggregateRepository } from '@/@v2/forms/database/repositories/form/form-aggregate.repository';
 import { FormAggregate } from '@/@v2/forms/domain/aggregates/form.aggregate';
-import { FormQuestionDataEntity } from '@/@v2/forms/domain/entities/form-question-data.entity';
+import { FormQuestionDetailsEntity } from '@/@v2/forms/domain/entities/form-question-details.entity';
 import { FormQuestionGroupEntity } from '@/@v2/forms/domain/entities/form-question-group.entity';
 import { FormQuestionOptionEntity } from '@/@v2/forms/domain/entities/form-question-option.entity';
 import { FormQuestionEntity } from '@/@v2/forms/domain/entities/form-question.entity';
@@ -37,43 +37,46 @@ export class AddFormUseCase {
         const questionGroupEntity = new FormQuestionGroupEntity({
           name: group.name,
           description: group.description,
-          order: groupIndex + 1,
+          order: groupIndex,
           formId: formEntity.id,
         });
 
         const questionsAggregate = group.questions.map((question, questionIndex) => {
           const questionEntity = new FormQuestionEntity({
             required: question.required,
-            order: questionIndex + 1,
+            order: questionIndex,
           });
 
-          const questionDataEntity = new FormQuestionDataEntity({
-            text: question.data.text,
-            type: question.data.type,
-            acceptOther: question.data.acceptOther,
+          const questionDataEntity = new FormQuestionDetailsEntity({
+            text: question.details.text,
+            type: question.details.type,
+            acceptOther: question.details.acceptOther,
             companyId: params.companyId,
             system: loggedUser.isAdmin,
           });
 
-          const optionsAggregate = question.options?.map((option, optionIndex) => {
-            return new FormQuestionOptionEntity({
-              text: option.text,
-              order: optionIndex + 1,
-              value: option.value,
-            });
-          });
+          const optionsAggregate: FormQuestionOptionEntity[] = [];
+          if (questionDataEntity.needsOptions) {
+            question.options?.forEach((option, optionIndex) => {
+              const optionEntity = new FormQuestionOptionEntity({
+                text: option.text,
+                order: optionIndex,
+                value: option.value,
+              });
 
-          return {
-            ...questionEntity,
-            data: questionDataEntity,
-            options: questionDataEntity.needsOptions ? optionsAggregate : [],
-          };
+              optionsAggregate.push(optionEntity);
+            });
+          }
+
+          return Object.assign(questionEntity, {
+            details: questionDataEntity,
+            options: optionsAggregate,
+          });
         });
 
-        return {
-          ...questionGroupEntity,
+        return Object.assign(questionGroupEntity, {
           questions: questionsAggregate,
-        };
+        });
       }) || [];
 
     const formAggregate = new FormAggregate({

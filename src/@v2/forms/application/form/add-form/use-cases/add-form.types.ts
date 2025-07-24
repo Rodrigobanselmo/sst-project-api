@@ -6,7 +6,7 @@ export class FormQuestionOptionParams {
   value?: number;
 }
 
-export class FormQuestionDataParams {
+export class FormQuestionDetailsParams {
   text: string;
   type: FormQuestionTypeEnum;
   acceptOther?: boolean;
@@ -14,7 +14,7 @@ export class FormQuestionDataParams {
 
 export class FormQuestionParams {
   required?: boolean;
-  data: FormQuestionDataParams;
+  details: FormQuestionDetailsParams;
   options?: FormQuestionOptionParams[];
 }
 

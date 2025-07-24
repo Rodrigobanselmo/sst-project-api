@@ -1,10 +1,12 @@
+import { compareObjects } from '@/@v2/shared/domain/helpers/object-diff.helper';
+import { updateField } from '@/@v2/shared/domain/helpers/update-field.helper';
+
 export type FormQuestionGroupEntityConstructor = {
   id?: number;
   name: string;
   description?: string;
   order: number;
   createdAt?: Date;
-  updatedAt?: Date;
   deletedAt?: Date | null;
   formId: number;
 };
@@ -15,9 +17,10 @@ export class FormQuestionGroupEntity {
   description?: string;
   order: number;
   createdAt: Date;
-  updatedAt: Date;
   deletedAt: Date | null;
   formId: number;
+
+  private _originalEntity: FormQuestionGroupEntity;
 
   constructor(params: FormQuestionGroupEntityConstructor) {
     this.id = params.id ?? 0;
@@ -25,12 +28,31 @@ export class FormQuestionGroupEntity {
     this.description = params.description;
     this.order = params.order;
     this.createdAt = params.createdAt ?? new Date();
-    this.updatedAt = params.updatedAt ?? new Date();
     this.deletedAt = params.deletedAt ?? null;
     this.formId = params.formId;
+
+    this._originalEntity = this.clone();
   }
 
-  equals(other: { name: string; description?: string; order: number }): boolean {
-    return this.name === other.name && this.description === other.description && this.order === other.order;
+  get originalEntity() {
+    return this._originalEntity;
+  }
+
+  delete() {
+    this.deletedAt = new Date();
+  }
+
+  clone() {
+    return Object.assign({}, this);
+  }
+
+  update(params: { name: string; description?: string; order: number }) {
+    this.name = params.name || this.name;
+    this.order = params.order || this.order;
+    this.description = updateField(this.description, params.description);
+  }
+
+  diff() {
+    return compareObjects(this._originalEntity, this);
   }
 }

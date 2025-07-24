@@ -12,7 +12,7 @@ export class FormQuestionOptionPayload {
   value?: number;
 }
 
-export class FormQuestionDataPayload {
+export class FormQuestionDetailsPayload {
   @IsString()
   text!: string;
 
@@ -30,8 +30,8 @@ export class FormQuestionPayload {
   required?: boolean;
 
   @ValidateNested()
-  @Type(() => FormQuestionDataPayload)
-  data!: FormQuestionDataPayload;
+  @Type(() => FormQuestionDetailsPayload)
+  details!: FormQuestionDetailsPayload;
 
   @IsOptional()
   @IsArray()

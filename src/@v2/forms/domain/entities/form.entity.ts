@@ -1,4 +1,5 @@
 import { FormTypeEnum } from '../enums/form-type.enum';
+import { compareObjects } from '@/@v2/shared/domain/helpers/object-diff.helper';
 
 export type FormEntityConstructor = {
   id?: number;
@@ -22,8 +23,9 @@ export class FormEntity {
   shareableLink: boolean;
   system: boolean;
   createdAt: Date;
-  updatedAt: Date;
   companyId: string;
+
+  private _originalEntity: FormEntity;
 
   constructor(params: FormEntityConstructor) {
     this.id = params.id ?? 0;
@@ -34,7 +36,20 @@ export class FormEntity {
     this.shareableLink = params.shareableLink ?? false;
     this.system = params.system ?? false;
     this.createdAt = params.createdAt ?? new Date();
-    this.updatedAt = params.updatedAt ?? new Date();
     this.companyId = params.companyId;
+
+    this._originalEntity = this.clone();
+  }
+
+  get originalEntity() {
+    return this._originalEntity;
+  }
+
+  clone() {
+    return Object.assign({}, this);
+  }
+
+  diff() {
+    return compareObjects(this._originalEntity, this);
   }
 }

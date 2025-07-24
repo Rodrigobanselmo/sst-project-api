@@ -359,7 +359,7 @@ model Company {
   DocumentControlFile        DocumentControlFile[]
   FormApplication            FormApplication[]
   Form                       Form[]
-  FormQuestionData           FormQuestionData[]
+  FormQuestionDetails        FormQuestionDetails[]
   TaskProject                TaskProject[]
   Task                       Task[]
   CompanyFlags               CompanyFlags?
@@ -1312,6 +1312,19 @@ model FormQuestionIdentifierGroup {
 }
 
 model FormQuestionGroup {
+  id         Int       @id @default(autoincrement())
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
+  form_id Int
+  form    Form @relation(fields: [form_id], references: [id], onDelete: Cascade)
+
+  questions FormQuestion[]
+  data      FormQuestionGroupData[]
+}
+
+model FormQuestionGroupData {
   id          Int       @id @default(autoincrement())
   name        String
   description String?
@@ -1320,10 +1333,8 @@ model FormQuestionGroup {
   updated_at  DateTime  @updatedAt
   deleted_at  DateTime?
 
-  form_id Int
-  form    Form @relation(fields: [form_id], references: [id], onDelete: Cascade)
-
-  question_group_to_question FormQuestionGroupToQuestion[]
+  form_question_group_id Int
+  form_question_group    FormQuestionGroup @relation(fields: [form_question_group_id], references: [id], onDelete: Cascade)
 }
 
 model FormParticipantsAnswers {
@@ -1340,19 +1351,26 @@ model FormParticipantsAnswers {
   answers FormAnswer[]
 }
 
-model FormQuestionGroupToQuestion {
-  created_at DateTime @default(now())
+model FormQuestion {
+  id         Int       @id @default(autoincrement())
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
 
-  question_group_id Int
-  question_group    FormQuestionGroup @relation(fields: [question_group_id], references: [id], onDelete: Cascade)
+  question_details_id Int
+  question_details    FormQuestionDetails @relation(fields: [question_details_id], references: [id], onDelete: Cascade)
 
-  question_id Int
-  question    FormQuestion @relation(fields: [question_id], references: [id], onDelete: Cascade)
+  question_group_id Int?
+  question_group    FormQuestionGroup? @relation(fields: [question_group_id], references: [id], onDelete: Cascade)
 
-  @@unique([question_group_id, question_id])
+  question_identifier_group_id Int?
+  question_identifier_group    FormQuestionIdentifierGroup? @relation(fields: [question_identifier_group_id], references: [id])
+
+  data    FormQuestionData[]
+  answers FormAnswer[]
 }
 
-model FormQuestion {
+model FormQuestionData {
   id         Int       @id @default(autoincrement())
   required   Boolean   @default(false)
   order      Int
@@ -1360,14 +1378,8 @@ model FormQuestion {
   updated_at DateTime  @updatedAt
   deleted_at DateTime?
 
-  question_data_id Int
-  question_data    FormQuestionData @relation(fields: [question_data_id], references: [id], onDelete: Cascade)
-
-  question_identifier_group_id Int?
-  question_identifier_group    FormQuestionIdentifierGroup? @relation(fields: [question_identifier_group_id], references: [id])
-
-  answers                    FormAnswer[]
-  question_group_to_question FormQuestionGroupToQuestion[]
+  form_question_id Int
+  form_question    FormQuestion @relation(fields: [form_question_id], references: [id], onDelete: Cascade)
 }
 
 model FormAnswer {
@@ -1386,15 +1398,12 @@ model FormAnswer {
   participants_answers    FormParticipantsAnswers @relation(fields: [participants_answers_id], references: [id])
 }
 
-model FormQuestionData {
-  id           Int                  @id @default(autoincrement())
-  text         String
-  type         FormQuestionTypeEnum
-  accept_other Boolean              @default(false)
-  system       Boolean              @default(false)
-  created_at   DateTime             @default(now())
-  updated_at   DateTime             @updatedAt
-  deleted_at   DateTime?
+model FormQuestionDetails {
+  id         Int       @id @default(autoincrement())
+  system     Boolean   @default(false)
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
 
   company_id String
   company    Company @relation(fields: [company_id], references: [id])
@@ -1405,35 +1414,59 @@ model FormQuestionData {
   question_identifier_id Int?
   question_identifier    FormQuestionIdentifier? @relation(fields: [question_identifier_id], references: [id], onDelete: Cascade)
 
+  data               FormQuestionDetailsData[]
   options            FormQuestionOption[]
   form_question_risk FormQuestionRisk[]
   form_question      FormQuestion[]
 }
 
+model FormQuestionDetailsData {
+  id           Int                  @id @default(autoincrement())
+  text         String
+  type         FormQuestionTypeEnum
+  accept_other Boolean              @default(false)
+  created_at   DateTime             @default(now())
+  updated_at   DateTime             @updatedAt
+  deleted_at   DateTime?
+
+  form_question_details_id Int
+  form_question_details    FormQuestionDetails @relation(fields: [form_question_details_id], references: [id], onDelete: Cascade)
+}
+
 model FormQuestionOption {
-  id         Int       @id @default(autoincrement())
-  text       String
-  order      Int
-  value      Int
+  id Int @id @default(autoincrement())
+
   created_at DateTime  @default(now())
   updated_at DateTime  @updatedAt
   deleted_at DateTime?
 
   question_id Int
-  question    FormQuestionData @relation(fields: [question_id], references: [id], onDelete: Cascade)
+  question    FormQuestionDetails @relation(fields: [question_id], references: [id], onDelete: Cascade)
 
+  data    FormQuestionOptionData[]
   answers FormAnswer[]
+}
 
-  @@unique([order, question_id])
+model FormQuestionOptionData {
+  id         Int       @id @default(autoincrement())
+  text       String
+  order      Int
+  value      Int?
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
+  form_question_option_id Int
+  form_question_option    FormQuestionOption @relation(fields: [form_question_option_id], references: [id], onDelete: Cascade)
 }
 
 model FormQuestionRisk {
   id Int @id @default(autoincrement())
 
   question_Id Int
-  question    FormQuestionData @relation(fields: [question_Id], references: [id], onDelete: Cascade)
+  question    FormQuestionDetails @relation(fields: [question_Id], references: [id], onDelete: Cascade)
   risk_id     String
-  risk        RiskFactors      @relation(fields: [risk_id], references: [id])
+  risk        RiskFactors         @relation(fields: [risk_id], references: [id])
 }
 
 model FormQuestionCOPSOQ {
@@ -1447,7 +1480,7 @@ model FormQuestionCOPSOQ {
   updated_at DateTime                @updatedAt
   deleted_at DateTime?
 
-  form_question_data FormQuestionData[]
+  form_question_data FormQuestionDetails[]
 }
 
 model FormQuestionIdentifier {
@@ -1459,7 +1492,7 @@ model FormQuestionIdentifier {
   updated_at         DateTime               @updatedAt
   deleted_at         DateTime?
 
-  form_question_data FormQuestionData[]
+  form_question_data FormQuestionDetails[]
 }
 
 model GenerateSource {

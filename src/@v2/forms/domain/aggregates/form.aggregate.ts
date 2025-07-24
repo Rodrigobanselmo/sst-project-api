@@ -1,16 +1,17 @@
-import { FormQuestionDataEntity } from '../entities/form-question-data.entity';
+import { updateField } from '@/@v2/shared/domain/helpers/update-field.helper';
+import { FormQuestionDetailsEntity } from '../entities/form-question-details.entity';
 import { FormQuestionGroupEntity } from '../entities/form-question-group.entity';
 import { FormQuestionOptionEntity } from '../entities/form-question-option.entity';
 import { FormQuestionEntity } from '../entities/form-question.entity';
 import { FormEntity } from '../entities/form.entity';
-import { updateField } from '@/@v2/shared/domain/helpers/update-field.helper';
+import { FormQuestionTypeEnum } from '../enums/form-question-type.enum';
 
 // ========================================
 // TYPE DEFINITIONS
 // ========================================
 
 export type IFormQuestionAggregate = FormQuestionEntity & {
-  data: FormQuestionDataEntity;
+  details: FormQuestionDetailsEntity;
   options: FormQuestionOptionEntity[];
 };
 
@@ -20,7 +21,7 @@ export type IFormAggregate = {
   questionGroups: IFormQuestionGroupAggregate[];
 };
 
-// ========================================
+// ================================p========
 // INTERFACE DEFINITIONS
 // ========================================
 
@@ -63,28 +64,6 @@ interface IUpdateQuestionGroupsParams {
   questionGroups: IQuestionGroupInput[];
 }
 
-interface IQuestionDataCreationInput {
-  text: string;
-  type: any;
-  acceptOther?: boolean;
-}
-
-interface IQuestionOptionCreationInput {
-  text: string;
-  value?: number;
-}
-
-interface IQuestionCreationInput {
-  required?: boolean;
-  data: IQuestionDataCreationInput;
-  options?: IQuestionOptionCreationInput[];
-}
-
-interface IQuestionGroupCreationInput {
-  name: string;
-  description?: string;
-}
-
 // ========================================
 // AGGREGATE CLASS
 // ========================================
@@ -108,197 +87,184 @@ export class FormAggregate {
     this.form.type = updateField(this.form.type, params.type);
     this.form.anonymous = updateField(this.form.anonymous, params.anonymous);
     this.form.shareableLink = updateField(this.form.shareableLink, params.shareableLink);
-    this.form.updatedAt = new Date();
   }
 
   updateQuestionGroups(params: IUpdateQuestionGroupsParams) {
-    params.questionGroups.forEach((newGroup, groupIndex) => {
-      const questionGroupEntity = this.createQuestionGroupEntity(newGroup, groupIndex);
+    const newQuestionGroups = params.questionGroups;
+    const currentQuestionGroups = this.questionGroups;
 
-      if (newGroup.id) {
-        const existingGroup = this.questionGroups.find((g) => g.id === newGroup.id);
-        if (existingGroup) {
-          this.updateQuestionGroupEntity(existingGroup, questionGroupEntity);
-          this.updateQuestionsInGroup(existingGroup, newGroup.questions);
-        }
-      } else {
-        const questionsAggregate = newGroup.questions.map((question, questionIndex) => {
-          return this.createQuestionAggregate(question, questionIndex);
-        });
-
-        this.questionGroups.push(this.createQuestionGroupAggregate(questionGroupEntity, questionsAggregate));
+    // Track deleted question groups
+    for (const currentGroup of currentQuestionGroups) {
+      const stillExists = newQuestionGroups.some((newGroup) => newGroup.id === currentGroup.id);
+      if (!stillExists) {
+        this.deleteQuestionGroup(currentGroup);
       }
-    });
-  }
+    }
 
-  // ========================================
-  // PRIVATE UPDATE METHODS
-  // ========================================
+    // Process each new question group
+    for (let groupIndex = 0; groupIndex < newQuestionGroups.length; groupIndex++) {
+      const newGroup = newQuestionGroups[groupIndex];
+      const currentGroup = currentQuestionGroups.find((g) => g.id === newGroup.id);
 
-  private updateQuestionGroupEntity(existingGroup: IFormQuestionGroupAggregate, newQuestionGroupEntity: FormQuestionGroupEntity) {
-    if (!existingGroup.equals(newQuestionGroupEntity)) {
-      existingGroup.deletedAt = new Date();
-
-      const existingGroupIndex = this.questionGroups.findIndex((g) => g.id === existingGroup.id);
-      if (existingGroupIndex !== -1) {
-        this.questionGroups[existingGroupIndex] = this.createQuestionGroupAggregate(newQuestionGroupEntity, existingGroup.questions);
+      if (currentGroup) {
+        this.updateQuestionGroup(currentGroup, newGroup, groupIndex);
+      } else {
+        this.createQuestionGroup(newGroup, groupIndex);
       }
     }
   }
 
-  private updateQuestionsInGroup(existingGroup: IFormQuestionGroupAggregate, newQuestions: IQuestionInput[]) {
-    newQuestions.forEach((newQuestion, questionIndex) => {
-      if (newQuestion.id) {
-        const existingQuestion = existingGroup.questions.find((q) => q.id === newQuestion.id);
-        if (existingQuestion) {
-          this.updateQuestion(existingQuestion, newQuestion, questionIndex);
-        }
-      } else {
-        const questionEntity = this.createQuestionAggregate(newQuestion, questionIndex);
-        existingGroup.questions.push(questionEntity);
-      }
-    });
-  }
-
-  private updateQuestion(existingQuestion: IFormQuestionAggregate, newQuestion: IQuestionCreationInput, questionIndex: number) {
-    const newQuestionEntity = new FormQuestionEntity({
-      id: 0,
-      required: newQuestion.required,
-      order: questionIndex + 1,
-    });
-
-    if (!existingQuestion.equals(newQuestionEntity)) {
-      if ('deletedAt' in existingQuestion) {
-        (existingQuestion as any).deletedAt = new Date();
-      }
-      if ('deletedAt' in existingQuestion.data) {
-        (existingQuestion.data as any).deletedAt = new Date();
-      }
-      existingQuestion.options.forEach((option) => {
-        if ('deletedAt' in option) {
-          (option as any).deletedAt = new Date();
-        }
-      });
-
-      const questionEntity = this.createQuestionAggregate(newQuestion, questionIndex);
-
-      Object.assign(existingQuestion, questionEntity);
-    } else {
-      this.updateQuestionData(existingQuestion.data, newQuestion.data);
-      this.updateQuestionOptions(existingQuestion.options, newQuestion.options, questionIndex);
-    }
-  }
-
-  private updateQuestionData(existingData: FormQuestionDataEntity, newData: IQuestionDataCreationInput) {
-    const newQuestionDataEntity = new FormQuestionDataEntity({
-      id: 0,
-      text: newData.text,
-      type: newData.type,
-      acceptOther: newData.acceptOther,
-      companyId: existingData.companyId,
-      system: existingData.system,
-    });
-
-    if (!existingData.equals(newQuestionDataEntity)) {
-      existingData.deletedAt = new Date();
-
-      Object.assign(existingData, newQuestionDataEntity);
-    }
-  }
-
-  private updateQuestionOptions(existingOptions: FormQuestionOptionEntity[], newOptions: IQuestionOptionInput[] | undefined, questionIndex: number) {
-    newOptions?.forEach((newOption, optionIndex) => {
-      if (newOption.id) {
-        const existingOption = existingOptions.find((o) => o.id === newOption.id);
-        if (existingOption) {
-          const newQuestionOptionEntity = new FormQuestionOptionEntity({
-            id: 0,
-            text: newOption.text,
-            order: optionIndex + 1,
-            value: newOption.value,
-          });
-
-          if (!existingOption.equals(newQuestionOptionEntity)) {
-            existingOption.deletedAt = new Date();
-
-            Object.assign(existingOption, newQuestionOptionEntity);
-          }
-        }
-      } else {
-        const newQuestionOption = new FormQuestionOptionEntity({
-          id: 0,
-          text: newOption.text,
-          order: optionIndex + 1,
-          value: newOption.value,
-        });
-        existingOptions.push(newQuestionOption);
-      }
-    });
-  }
-
   // ========================================
-  // PRIVATE CREATION METHODS
+  // PRIVATE QUESTION GROUP METHODS
   // ========================================
 
-  private createQuestionGroupEntity(group: IQuestionGroupCreationInput, groupIndex: number): FormQuestionGroupEntity {
-    return new FormQuestionGroupEntity({
-      id: 0,
-      name: group.name,
-      description: group.description,
-      order: groupIndex + 1,
+  private createQuestionGroup(newGroup: IQuestionGroupInput, order: number) {
+    const questionGroup = new FormQuestionGroupEntity({
       formId: this.form.id,
+      name: newGroup.name,
+      description: newGroup.description,
+      order,
     });
+
+    const newQuestionGroup = Object.assign(questionGroup, { questions: [] });
+
+    this.updateQuestionsInGroup(newQuestionGroup, newGroup);
+
+    this.questionGroups.push(newQuestionGroup);
   }
 
-  private createQuestionAggregate(question: IQuestionCreationInput, questionIndex: number): IFormQuestionAggregate {
-    const questionEntity = this.createQuestionEntity(question, questionIndex);
-    const questionDataEntity = this.createQuestionDataEntity(question.data);
-    const optionsAggregate = this.createQuestionOptionsEntities(question.options);
+  private updateQuestionGroup(currentGroup: IFormQuestionGroupAggregate, newGroup: IQuestionGroupInput, order: number) {
+    currentGroup.update({ name: newGroup.name, description: newGroup.description, order });
 
-    return {
-      ...questionEntity,
-      data: questionDataEntity,
-      options: questionDataEntity.needsOptions ? optionsAggregate : [],
-    } as IFormQuestionAggregate;
+    this.updateQuestionsInGroup(currentGroup, newGroup);
   }
 
-  private createQuestionEntity(question: Pick<IQuestionCreationInput, 'required'>, questionIndex: number): FormQuestionEntity {
-    return new FormQuestionEntity({
-      id: 0,
-      required: question.required,
-      order: questionIndex + 1,
-    });
+  private deleteQuestionGroup(group: IFormQuestionGroupAggregate) {
+    group.delete();
   }
 
-  private createQuestionDataEntity(questionData: IQuestionDataCreationInput): FormQuestionDataEntity {
-    return new FormQuestionDataEntity({
-      id: 0,
-      text: questionData.text,
-      type: questionData.type,
-      acceptOther: questionData.acceptOther,
+  // ========================================
+  // PRIVATE QUESTION METHODS
+  // ========================================
+
+  private updateQuestionsInGroup(currentGroup: IFormQuestionGroupAggregate, newGroup: IQuestionGroupInput) {
+    const newQuestions = newGroup.questions;
+    const currentQuestions = currentGroup.questions;
+
+    // Track deleted questions
+    for (const currentQuestion of currentQuestions) {
+      const stillExists = newQuestions.some((newQuestion) => newQuestion.id === currentQuestion.id);
+      if (!stillExists) {
+        this.deleteQuestion(currentQuestion);
+      }
+    }
+
+    // Process each new question
+    for (let questionIndex = 0; questionIndex < newQuestions.length; questionIndex++) {
+      const newQuestion = newQuestions[questionIndex];
+      const currentQuestion = currentQuestions.find((q) => q.id === newQuestion.id);
+
+      if (currentQuestion) {
+        this.updateQuestion(currentQuestion, newQuestion, questionIndex);
+      } else {
+        this.createQuestion(currentGroup, newQuestion, questionIndex);
+      }
+    }
+  }
+
+  private createQuestion(group: IFormQuestionGroupAggregate, newQuestion: IQuestionInput, order: number) {
+    const questionData = new FormQuestionDetailsEntity({
+      text: newQuestion.data.text,
+      type: newQuestion.data.type,
+      acceptOther: newQuestion.data.acceptOther,
       companyId: this.form.companyId,
-      system: false,
     });
+
+    const question = new FormQuestionEntity({
+      required: newQuestion.required ?? false,
+      order,
+    });
+
+    const newQuestionAggregate = Object.assign(question, {
+      details: questionData,
+      options: [],
+    });
+
+    if (newQuestion.options && newQuestionAggregate.details.needsOptions) {
+      for (let optionIndex = 0; optionIndex < newQuestion.options.length; optionIndex++) {
+        const optionInput = newQuestion.options[optionIndex];
+
+        this.createQuestionOption(newQuestionAggregate, optionInput, optionIndex);
+      }
+    }
+
+    group.questions.push(newQuestionAggregate);
   }
 
-  private createQuestionOptionsEntities(options: IQuestionOptionCreationInput[] | undefined): FormQuestionOptionEntity[] {
-    return (
-      options?.map((option, optionIndex) => {
-        return new FormQuestionOptionEntity({
-          id: 0,
-          text: option.text,
-          order: optionIndex + 1,
-          value: option.value,
-        });
-      }) || []
-    );
+  private updateQuestion(currentQuestion: IFormQuestionAggregate, newQuestion: IQuestionInput, order: number) {
+    currentQuestion.update({ required: newQuestion.required, order });
+
+    this.updateQuestionData(currentQuestion.details, newQuestion.data);
+
+    if (newQuestion.options && currentQuestion.details.needsOptions) {
+      this.updateQuestionOptions(currentQuestion, newQuestion.options);
+    }
+  }
+
+  private deleteQuestion(question: IFormQuestionAggregate) {
+    question.delete();
   }
 
   // ========================================
-  // PRIVATE HELPER METHODS
+  // PRIVATE QUESTION DATA METHODS
   // ========================================
 
-  private createQuestionGroupAggregate(questionGroupEntity: FormQuestionGroupEntity, questions: IFormQuestionAggregate[]): IFormQuestionGroupAggregate {
-    return Object.assign(questionGroupEntity, { questions });
+  private updateQuestionData(currentData: FormQuestionDetailsEntity, newData: IQuestionDataInput) {
+    currentData.update({ text: newData.text, type: newData.type, acceptOther: newData.acceptOther });
+  }
+
+  // ========================================
+  // PRIVATE QUESTION OPTION METHODS
+  // ========================================
+
+  private updateQuestionOptions(currentQuestion: IFormQuestionAggregate, newOptions: IQuestionOptionInput[]) {
+    const currentOptions = currentQuestion.options;
+
+    // Track deleted options
+    for (const currentOption of currentOptions) {
+      const stillExists = newOptions.some((newOption) => newOption.id === currentOption.id);
+      if (!stillExists) {
+        this.deleteQuestionOption(currentOption);
+      }
+    }
+
+    // Process each new option
+    for (let optionIndex = 0; optionIndex < newOptions.length; optionIndex++) {
+      const newOption = newOptions[optionIndex];
+      const currentOption = currentOptions.find((o) => o.id === newOption.id);
+
+      if (currentOption) {
+        this.updateQuestionOption(currentOption, newOption, optionIndex);
+      } else {
+        this.createQuestionOption(currentQuestion, newOption, optionIndex);
+      }
+    }
+  }
+
+  private createQuestionOption(question: IFormQuestionAggregate, newOption: IQuestionOptionInput, order: number) {
+    const option = new FormQuestionOptionEntity({
+      text: newOption.text,
+      value: newOption.value,
+      order: order,
+    });
+    question.options.push(option);
+  }
+
+  private updateQuestionOption(currentOption: FormQuestionOptionEntity, newOption: IQuestionOptionInput, order: number) {
+    currentOption.update({ text: newOption.text, value: newOption.value, order });
+  }
+
+  private deleteQuestionOption(option: FormQuestionOptionEntity) {
+    option.deletedAt = new Date();
   }
 }

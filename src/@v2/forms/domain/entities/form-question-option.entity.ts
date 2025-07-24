@@ -1,10 +1,12 @@
+import { compareObjects } from '@/@v2/shared/domain/helpers/object-diff.helper';
+import { updateField } from '@/@v2/shared/domain/helpers/update-field.helper';
+
 export type FormQuestionOptionEntityConstructor = {
   id?: number;
   text: string;
   order: number;
   value?: number;
   createdAt?: Date;
-  updatedAt?: Date;
   deletedAt?: Date;
 };
 
@@ -14,8 +16,9 @@ export class FormQuestionOptionEntity {
   order: number;
   value?: number;
   createdAt: Date;
-  updatedAt: Date;
   deletedAt?: Date;
+
+  private _originalEntity: FormQuestionOptionEntity;
 
   constructor(params: FormQuestionOptionEntityConstructor) {
     this.id = params.id ?? 0;
@@ -23,11 +26,26 @@ export class FormQuestionOptionEntity {
     this.order = params.order;
     this.value = params.value;
     this.createdAt = params.createdAt ?? new Date();
-    this.updatedAt = params.updatedAt ?? new Date();
     this.deletedAt = params.deletedAt;
+
+    this._originalEntity = this.clone();
   }
 
-  equals(other: { text: string; value?: number; order: number }): boolean {
-    return this.text === other.text && this.value === other.value && this.order === other.order;
+  get originalEntity() {
+    return this._originalEntity;
+  }
+
+  update(params: { text?: string; value?: number; order?: number }) {
+    this.text = params.text || this.text;
+    this.value = updateField(this.value, params.value);
+    this.order = params.order || this.order;
+  }
+
+  clone() {
+    return Object.assign({}, this);
+  }
+
+  diff() {
+    return compareObjects(this._originalEntity, this);
   }
 }
