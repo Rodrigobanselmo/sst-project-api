@@ -29,6 +29,7 @@ export class DocumentBaseDataMapper {
       isHideOriginColumn: documentData?.isHideOriginColumn,
       isHideCA: documentData?.isHideCA,
       hasEmergencyPlan: documentData?.hasEmergencyPlan,
+      complementaryDocs: documentData?.complementaryDocs,
       complementarySystems: documentData?.complementarySystems,
       source: documentData?.source,
       visitDate: documentData?.visitDate,
