@@ -11,9 +11,9 @@ class QuestionDto {
   @IsNotEmpty()
   order!: number;
 
-  @IsInt()
+  @IsString()
   @IsNotEmpty()
-  questionDataId!: number;
+  questionDataId!: string;
 }
 
 class IdentifierDto {
@@ -42,10 +42,9 @@ export class AddFormApplicationPayload {
   @IsString()
   description?: string;
 
-  @IsInt()
-  @Min(1)
+  @IsString()
   @IsNotEmpty()
-  formId!: number;
+  formId!: string;
 
   @IsArray()
   @IsOptional()

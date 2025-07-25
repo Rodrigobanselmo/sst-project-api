@@ -172,8 +172,23 @@ export class FormAggregateRepository {
       });
 
       for (const questionGroup of aggregate.questionGroups) {
+        if (questionGroup.isNew) {
+          await tx.formQuestionGroup.create({
+            data: {
+              id: questionGroup.id,
+              form_id: aggregate.form.id,
+              data: {
+                create: {
+                  name: questionGroup.name,
+                  description: questionGroup.description,
+                  order: questionGroup.order,
+                },
+              },
+            },
+          });
+        }
+
         if (questionGroup.deletedAt) {
-          // Soft delete the entire group and all its children
           await tx.formQuestionGroup.update({
             where: { id: questionGroup.id },
             data: { deleted_at: new Date() },
@@ -198,6 +213,36 @@ export class FormAggregateRepository {
         }
 
         for (const question of questionGroup.questions) {
+          if (question.isNew) {
+            await tx.formQuestionDetails.create({
+              data: {
+                id: question.details.id,
+                company_id: question.details.companyId,
+                system: question.details.system,
+                data: {
+                  create: {
+                    text: question.details.text,
+                    type: question.details.type,
+                    accept_other: question.details.acceptOther,
+                  },
+                },
+              },
+            });
+
+            await tx.formQuestion.create({
+              data: {
+                question_group_id: questionGroup.id,
+                question_details_id: question.details.id,
+                data: {
+                  create: {
+                    required: question.required,
+                    order: question.order,
+                  },
+                },
+              },
+            });
+          }
+
           if (question.deletedAt) {
             await tx.formQuestion.update({
               where: { id: question.id },
@@ -238,6 +283,22 @@ export class FormAggregateRepository {
           }
 
           for (const option of question.options) {
+            if (option.isNew) {
+              await tx.formQuestionOption.create({
+                data: {
+                  question_id: question.details.id,
+                  id: option.id,
+                  data: {
+                    create: {
+                      text: option.text,
+                      order: option.order,
+                      value: option.value,
+                    },
+                  },
+                },
+              });
+            }
+
             if (option.deletedAt) {
               await tx.formQuestionOption.update({
                 where: { id: option.id },

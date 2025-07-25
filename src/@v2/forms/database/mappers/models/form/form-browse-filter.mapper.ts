@@ -1,5 +1,5 @@
 import { FormTypeEnum } from '@/@v2/forms/domain/enums/form-type.enum';
-import { FormBrowseFilterModel } from '@/@v2/forms/domain/models/form/form-browse-filter.model';
+import { FormBrowseFilterModel } from '@/@v2/forms/domain/models/form/components/form-browse-filter.model';
 
 export type IFormBrowseFilterModelMapper = {
   filter_types: string[] | undefined;

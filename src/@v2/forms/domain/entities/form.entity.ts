@@ -1,8 +1,9 @@
+import { generateCuid } from '@/@v2/shared/utils/helpers/generate-cuid';
 import { FormTypeEnum } from '../enums/form-type.enum';
-import { compareObjects } from '@/@v2/shared/domain/helpers/object-diff.helper';
+import { compareEntities } from '@/@v2/shared/domain/helpers/entity-diff.helper';
 
 export type FormEntityConstructor = {
-  id?: number;
+  id?: string;
   name: string;
   description?: string;
   type?: FormTypeEnum;
@@ -15,7 +16,7 @@ export type FormEntityConstructor = {
 };
 
 export class FormEntity {
-  id: number;
+  id: string;
   name: string;
   description?: string;
   type: FormTypeEnum;
@@ -26,9 +27,10 @@ export class FormEntity {
   companyId: string;
 
   private _originalEntity: FormEntity;
+  private _isNew: boolean;
 
   constructor(params: FormEntityConstructor) {
-    this.id = params.id ?? 0;
+    this.id = params.id ?? generateCuid();
     this.name = params.name;
     this.description = params.description;
     this.type = params.type ?? FormTypeEnum.NORMAL;
@@ -38,6 +40,7 @@ export class FormEntity {
     this.createdAt = params.createdAt ?? new Date();
     this.companyId = params.companyId;
 
+    this._isNew = !params.id;
     this._originalEntity = this.clone();
   }
 
@@ -45,11 +48,15 @@ export class FormEntity {
     return this._originalEntity;
   }
 
+  get isNew() {
+    return this._isNew;
+  }
+
   clone() {
     return Object.assign({}, this);
   }
 
   diff() {
-    return compareObjects(this._originalEntity, this);
+    return compareEntities(this._originalEntity, this, { keysToCompare: Object.keys(this._originalEntity) });
   }
 }

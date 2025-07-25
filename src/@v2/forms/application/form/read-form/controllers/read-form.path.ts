@@ -1,9 +1,9 @@
-import { IsInt, IsString } from 'class-validator';
+import { IsString } from 'class-validator';
 
 export class ReadFormPath {
   @IsString()
   companyId!: string;
 
-  @IsInt()
-  formId!: number;
+  @IsString()
+  formId!: string;
 }

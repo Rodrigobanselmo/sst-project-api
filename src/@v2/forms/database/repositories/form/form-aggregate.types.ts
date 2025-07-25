@@ -4,7 +4,7 @@ export namespace IFormAggregateRepository {
   export type CreateParams = FormAggregate;
   export type CreateReturn = Promise<FormAggregate | null>;
 
-  export type FindParams = { id: number; companyId: string };
+  export type FindParams = { id: string; companyId: string };
   export type FindReturn = Promise<FormAggregate | null>;
 
   export type UpdateParams = FormAggregate;

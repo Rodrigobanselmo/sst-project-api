@@ -12,19 +12,25 @@ export class FormQuestionDataAggregateRepository {
   static selectOptions() {
     const include = {
       question_identifier: true,
-    } satisfies Prisma.FormQuestionDataFindFirstArgs['include'];
+      data: true,
+    } satisfies Prisma.FormQuestionDetailsFindFirstArgs['include'];
 
     return { include };
   }
 
   async create(params: IFormQuestionIdentifierDataAggregateRepository.CreateParams): IFormQuestionIdentifierDataAggregateRepository.CreateReturn {
-    const FormQuestionData = await this.prisma.formQuestionData.create({
+    const FormQuestionData = await this.prisma.formQuestionDetails.create({
       data: {
-        text: params.data.text,
         system: params.data.system,
-        type: params.data.type,
-        accept_other: params.data.acceptOther,
         company_id: params.data.companyId,
+        question_identifier_id: params.identifier.id,
+        data: {
+          create: {
+            text: params.data.text,
+            type: params.data.type,
+            accept_other: params.data.acceptOther,
+          },
+        },
       },
       ...FormQuestionDataAggregateRepository.selectOptions(),
     });
@@ -33,25 +39,27 @@ export class FormQuestionDataAggregateRepository {
   }
 
   async update(params: IFormQuestionIdentifierDataAggregateRepository.UpdateParams): IFormQuestionIdentifierDataAggregateRepository.UpdateReturn {
-    const FormQuestionData = await this.prisma.formQuestionData.update({
-      where: {
-        id: params.data.id,
-      },
-      data: {
-        text: params.data.text,
-        system: params.data.system,
-        type: params.data.type,
-        accept_other: params.data.acceptOther,
-        company_id: params.data.companyId,
-      },
-      ...FormQuestionDataAggregateRepository.selectOptions(),
+    await this.prisma.$transaction(async (tx) => {
+      await tx.formQuestionDetailsData.updateMany({
+        where: { form_question_details_id: params.data.id, deleted_at: null },
+        data: { deleted_at: new Date() },
+      });
+
+      await tx.formQuestionDetailsData.create({
+        data: {
+          text: params.data.text,
+          type: params.data.type,
+          accept_other: params.data.acceptOther,
+          form_question_details_id: params.data.id,
+        },
+      });
     });
 
-    return FormQuestionData ? FormQuestionIdentifierDataAggregateMapper.toAggregate(FormQuestionData) : null;
+    return this.find({ id: params.data.id, companyId: params.data.companyId });
   }
 
   async find(params: IFormQuestionIdentifierDataAggregateRepository.FindParams): IFormQuestionIdentifierDataAggregateRepository.FindReturn {
-    const FormQuestionData = await this.prisma.formQuestionData.findFirst({
+    const FormQuestionData = await this.prisma.formQuestionDetails.findFirst({
       where: {
         id: params.id,
         question_identifier_id: { not: null },
@@ -71,7 +79,7 @@ export class FormQuestionDataAggregateRepository {
   }
 
   async findMany(params: IFormQuestionIdentifierDataAggregateRepository.FindManyParams): IFormQuestionIdentifierDataAggregateRepository.FindManyReturn {
-    const FormQuestionData = await this.prisma.formQuestionData.findMany({
+    const FormQuestionData = await this.prisma.formQuestionDetails.findMany({
       where: {
         id: { in: params.ids },
         OR: [

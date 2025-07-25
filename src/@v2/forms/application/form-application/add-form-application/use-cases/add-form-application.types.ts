@@ -3,7 +3,7 @@ export namespace IAddFormApplicationUseCase {
     name: string;
     description?: string;
     companyId: string;
-    formId: number;
+    formId: string;
     workspaceIds: string[];
     hierarchyIds: string[];
     identifier?: {
@@ -12,7 +12,7 @@ export namespace IAddFormApplicationUseCase {
       questions: {
         required: boolean;
         order: number;
-        questionDataId: number;
+        questionDataId: string;
       }[];
     };
   };

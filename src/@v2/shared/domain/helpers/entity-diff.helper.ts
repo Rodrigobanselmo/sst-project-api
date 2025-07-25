@@ -3,19 +3,31 @@ export interface IObjectDiff {
   hasChanges: boolean;
 }
 
-export function compareObjects<T extends Record<string, any>>(oldObj: T, newObj: T): IObjectDiff {
+export interface CompareEntitiesOptions<T> {
+  keysToCompare?: string[];
+}
+
+export function compareEntities<T extends Record<string, any>>(oldObj: T, newObj: T, options?: CompareEntitiesOptions<T>): IObjectDiff {
   const changes: Record<string, { old: any; new: any }> = {};
   let hasChanges = false;
 
-  // Get all unique keys from both objects
-  const allKeys = new Set([...Object.keys(oldObj || {}), ...Object.keys(newObj || {})]);
+  // Get keys to compare
+  let keysToCheck: string[];
 
-  for (const key of allKeys) {
+  if (options?.keysToCompare && options.keysToCompare.length > 0) {
+    // Use only the specified keys
+    keysToCheck = options.keysToCompare.map((key) => String(key));
+  } else {
+    // Get all unique keys from both objects (original behavior)
+    keysToCheck = [...new Set([...Object.keys(oldObj || {}), ...Object.keys(newObj || {})])];
+  }
+
+  for (const key of keysToCheck) {
     const oldValue = oldObj?.[key];
     const newValue = newObj?.[key];
 
-    // Skip functions and internal properties
-    if (key.startsWith('_') || typeof oldValue === 'function' || typeof newValue === 'function') {
+    // Skip functions, internal properties, and classes
+    if (key.startsWith('_') || key === 'isNew' || key === 'originalEntity' || typeof oldValue === 'function' || typeof newValue === 'function') {
       continue;
     }
 

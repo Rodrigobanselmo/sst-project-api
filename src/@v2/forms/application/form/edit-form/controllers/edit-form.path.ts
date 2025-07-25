@@ -4,6 +4,6 @@ export class EditFormPath {
   @IsString()
   companyId!: string;
 
-  @IsNumberString()
+  @IsString()
   formId!: string;
 }

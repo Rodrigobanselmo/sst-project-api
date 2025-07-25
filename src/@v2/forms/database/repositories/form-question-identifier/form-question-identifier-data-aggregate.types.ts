@@ -8,9 +8,9 @@ export namespace IFormQuestionIdentifierDataAggregateRepository {
   export type UpdateParams = FormQuestionIdentifierDataAggregate;
   export type UpdateReturn = Promise<FormQuestionIdentifierDataAggregate | null>;
 
-  export type FindParams = { id: number; companyId: string };
+  export type FindParams = { id: string; companyId: string };
   export type FindReturn = Promise<FormQuestionIdentifierDataAggregate | null>;
 
-  export type FindManyParams = { ids: number[]; companyId: string };
+  export type FindManyParams = { ids: string[]; companyId: string };
   export type FindManyReturn = Promise<FormQuestionIdentifierDataAggregate[]>;
 }

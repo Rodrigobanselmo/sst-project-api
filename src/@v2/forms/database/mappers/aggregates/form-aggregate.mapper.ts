@@ -2,8 +2,7 @@ import { FormAggregate } from '@/@v2/forms/domain/aggregates/form.aggregate';
 import { FormQuestionDetailsEntity } from '@/@v2/forms/domain/entities/form-question-details.entity';
 import { FormQuestionOptionEntity } from '@/@v2/forms/domain/entities/form-question-option.entity';
 import { FormQuestionTypeEnum } from '@/@v2/forms/domain/enums/form-question-type.enum';
-import { FormQuestionDetails, FormQuestionDetailsData, FormQuestionOption, FormQuestionOptionData } from '@prisma/client';
-import { FormQuestionDataEntityMapperConstructor } from '../entities/form-question-data.mapper';
+import { FormQuestionDetails, FormQuestionDetailsData, FormQuestionOption, FormQuestionOptionData, FormQuestionData } from '@prisma/client';
 import { FormQuestionGroupEntityMapper, FormQuestionGroupEntityMapperConstructor } from '../entities/form-question-group.mapper';
 import { FormQuestionEntityMapper, FormQuestionEntityMapperConstructor } from '../entities/form-question.mapper';
 import { FormEntityMapper, FormEntityMapperConstructor } from '../entities/form.mapper';
@@ -11,7 +10,6 @@ import { FormEntityMapper, FormEntityMapperConstructor } from '../entities/form.
 export type FormAggregateMapperConstructor = FormEntityMapperConstructor & {
   questions_groups: (FormQuestionGroupEntityMapperConstructor & {
     questions: (FormQuestionEntityMapperConstructor & {
-      data: FormQuestionDataEntityMapperConstructor[];
       question_details: FormQuestionDetails & {
         data: FormQuestionDetailsData[];
         options: (FormQuestionOption & {

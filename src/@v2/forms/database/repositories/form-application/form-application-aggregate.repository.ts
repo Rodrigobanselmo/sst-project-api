@@ -16,9 +16,11 @@ export class FormApplicationAggregateRepository {
         include: {
           questions: {
             include: {
-              question_data: {
+              data: true,
+              question_details: {
                 include: {
                   question_identifier: true,
+                  data: true,
                 },
               },
             },
@@ -48,7 +50,7 @@ export class FormApplicationAggregateRepository {
                   data: params.identifier.questionIdentifiers.map(({ question, identifierData }) => ({
                     order: question.order,
                     required: question.required,
-                    question_data_id: identifierData.data.id,
+                    question_details_id: identifierData.data.id,
                   })),
                 },
               },

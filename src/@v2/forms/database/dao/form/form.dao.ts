@@ -15,30 +15,59 @@ export class FormDAO {
   constructor(private readonly prisma: PrismaServiceV2) {}
 
   async read(params: IFormDAO.ReadParams) {
-    const form = await this.prisma.$queryRaw<IFormReadModelMapper>`
-      SELECT
-        form."id" as id
-        ,form."company_id" as company_id
-        ,form."name" as name
-        ,form."type" as type
-        ,form."anonymous" as anonymous
-        ,form."system" as system
-        ,form."shareable_link" as shareable_link
-        ,form."description" as description
-        ,form."created_at" as created_at
-        ,form."updated_at" as updated_at
-      FROM
-        "Form" form
-      WHERE 
-        form."id" = ${params.id}
-        AND (
-          form."company_id" = ${params.companyId} 
-          OR form."system" = true
-        )
-        AND form."deleted_at" IS NULL
-    `;
+    const form = await this.prisma.form.findFirst({
+      where: {
+        id: params.id,
+        OR: [
+          {
+            company_id: params.companyId,
+          },
+          {
+            system: true,
+          },
+        ],
+        deleted_at: null,
+      },
+      include: {
+        questions_groups: {
+          where: { deleted_at: null },
+          include: {
+            data: {
+              where: { deleted_at: null },
+              take: 1,
+            },
+            questions: {
+              where: { deleted_at: null },
+              include: {
+                data: {
+                  where: { deleted_at: null },
+                  take: 1,
+                },
+                question_details: {
+                  include: {
+                    data: {
+                      where: { deleted_at: null },
+                      take: 1,
+                    },
+                    options: {
+                      where: { deleted_at: null },
+                      include: {
+                        data: {
+                          where: { deleted_at: null },
+                          take: 1,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
 
-    return form[0]?.id ? FormReadModelMapper.toModel(form[0]) : null;
+    return form ? FormReadModelMapper.toModel(form) : null;
   }
 
   async browse({ limit, page, orderBy, filters }: IFormDAO.BrowseParams) {
@@ -52,7 +81,7 @@ export class FormDAO {
 
     const formsPromise = this.prisma.$queryRaw<IFormBrowseResultModelMapper[]>`
       SELECT 
-        form."id"::integer as id
+        form."id" as id
         ,form."company_id" as company_id
         ,form."name" as name
         ,form."type" as type

@@ -34,27 +34,27 @@ interface IUpdateFormParams {
 }
 
 interface IQuestionDataInput {
-  id?: number;
+  id?: string;
   text: string;
   type: any;
   acceptOther?: boolean;
 }
 
 interface IQuestionOptionInput {
-  id?: number;
+  id?: string;
   text: string;
   value?: number;
 }
 
 interface IQuestionInput {
-  id?: number;
+  id?: string;
   required?: boolean;
-  data: IQuestionDataInput;
+  details: IQuestionDataInput;
   options?: IQuestionOptionInput[];
 }
 
 interface IQuestionGroupInput {
-  id?: number;
+  id?: string;
   name: string;
   description?: string;
   questions: IQuestionInput[];
@@ -105,7 +105,6 @@ export class FormAggregate {
     for (let groupIndex = 0; groupIndex < newQuestionGroups.length; groupIndex++) {
       const newGroup = newQuestionGroups[groupIndex];
       const currentGroup = currentQuestionGroups.find((g) => g.id === newGroup.id);
-
       if (currentGroup) {
         this.updateQuestionGroup(currentGroup, newGroup, groupIndex);
       } else {
@@ -174,9 +173,9 @@ export class FormAggregate {
 
   private createQuestion(group: IFormQuestionGroupAggregate, newQuestion: IQuestionInput, order: number) {
     const questionData = new FormQuestionDetailsEntity({
-      text: newQuestion.data.text,
-      type: newQuestion.data.type,
-      acceptOther: newQuestion.data.acceptOther,
+      text: newQuestion.details.text,
+      type: newQuestion.details.type,
+      acceptOther: newQuestion.details.acceptOther,
       companyId: this.form.companyId,
     });
 
@@ -204,7 +203,7 @@ export class FormAggregate {
   private updateQuestion(currentQuestion: IFormQuestionAggregate, newQuestion: IQuestionInput, order: number) {
     currentQuestion.update({ required: newQuestion.required, order });
 
-    this.updateQuestionData(currentQuestion.details, newQuestion.data);
+    this.updateQuestionData(currentQuestion.details, newQuestion.details);
 
     if (newQuestion.options && currentQuestion.details.needsOptions) {
       this.updateQuestionOptions(currentQuestion, newQuestion.options);
@@ -257,6 +256,7 @@ export class FormAggregate {
       value: newOption.value,
       order: order,
     });
+
     question.options.push(option);
   }
 

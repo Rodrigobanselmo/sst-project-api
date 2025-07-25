@@ -6,7 +6,7 @@ export namespace IEditFormApplicationUseCase {
     companyId: string;
     name?: string;
     description?: string | null;
-    formId?: number;
+    formId?: string;
     status?: FormStatusEnum;
     workspaceIds?: string[];
     hierarchyIds?: string[];
@@ -16,7 +16,7 @@ export namespace IEditFormApplicationUseCase {
       questions?: {
         required: boolean;
         order: number;
-        questionDataId: number;
+        questionDataId: string;
       }[];
     };
   };

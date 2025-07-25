@@ -11,7 +11,7 @@ export enum FormOrderByEnum {
 export namespace IFormDAO {
   export type ReadParams = {
     companyId: string;
-    id: number;
+    id: string;
   };
 
   export type BrowseParams = {

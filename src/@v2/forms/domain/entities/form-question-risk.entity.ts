@@ -1,16 +1,16 @@
 export type FormQuestionRiskEntityConstructor = {
-  id?: number;
-  questionId: number;
+  id?: string;
+  questionId: string;
   riskId: string;
 };
 
 export class FormQuestionRiskEntity {
-  id: number;
-  questionId: number;
+  id: string;
+  questionId: string;
   riskId: string;
 
   constructor(params: FormQuestionRiskEntityConstructor) {
-    this.id = params.id ?? 0;
+    this.id = params.id ?? '';
     this.questionId = params.questionId;
     this.riskId = params.riskId;
   }

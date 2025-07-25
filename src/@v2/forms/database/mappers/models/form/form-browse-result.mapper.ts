@@ -1,5 +1,5 @@
 import { FormTypeEnum } from '@/@v2/forms/domain/enums/form-type.enum';
-import { FormBrowseResultModel } from '@/@v2/forms/domain/models/form/form-browse-result.model';
+import { FormBrowseResultModel } from '@/@v2/forms/domain/models/form/components/form-browse-result.model';
 
 export type IFormBrowseResultModelMapper = {
   id: number;

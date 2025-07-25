@@ -12,9 +12,9 @@ class QuestionDto {
   @IsNotEmpty()
   order!: number;
 
-  @IsInt()
+  @IsString()
   @IsNotEmpty()
-  questionDataId!: number;
+  questionDataId!: string;
 }
 
 class IdentifierDto {
@@ -47,9 +47,9 @@ export class EditFormApplicationPayload {
   @IsEnum(FormStatusEnum)
   status?: FormStatusEnum;
 
-  @IsInt()
+  @IsString()
   @IsOptional()
-  formId?: number;
+  formId?: string;
 
   @IsArray()
   @IsOptional()

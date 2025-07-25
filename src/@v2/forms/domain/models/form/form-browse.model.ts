@@ -1,6 +1,6 @@
 import { PaginationModel } from '@/@v2/shared/models/common/pagination.model';
-import { FormBrowseFilterModel } from './form-browse-filter.model';
-import { FormBrowseResultModel } from './form-browse-result.model';
+import { FormBrowseResultModel } from './components/form-browse-result.model';
+import { FormBrowseFilterModel } from './components/form-browse-filter.model';
 
 export type IFormBrowseModel = {
   pagination: PaginationModel;

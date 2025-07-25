@@ -2,27 +2,27 @@ import { FormTypeEnum } from '@/@v2/forms/domain/enums/form-type.enum';
 import { FormQuestionTypeEnum } from '@/@v2/forms/domain/enums/form-question-type.enum';
 
 export class FormQuestionOptionParams {
-  id?: number;
+  id?: string;
   text: string;
   value?: number;
 }
 
 export class FormQuestionDataParams {
-  id?: number;
+  id?: string;
   text: string;
   type: FormQuestionTypeEnum;
   acceptOther?: boolean;
 }
 
 export class FormQuestionParams {
-  id?: number;
+  id?: string;
   required?: boolean;
-  data: FormQuestionDataParams;
+  details: FormQuestionDataParams;
   options?: FormQuestionOptionParams[];
 }
 
 export class FormQuestionGroupParams {
-  id?: number;
+  id?: string;
   name: string;
   description?: string;
   questions: FormQuestionParams[];
@@ -30,7 +30,7 @@ export class FormQuestionGroupParams {
 
 export namespace IEditFormUseCase {
   export type Params = {
-    formId: number;
+    formId: string;
     companyId: string;
     name: string;
     description?: string;

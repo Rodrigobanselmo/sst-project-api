@@ -1,8 +1,8 @@
 import { FormQuestionIdentifierDataAggregate } from '@/@v2/forms/domain/aggregates/form-question-identifier-data.aggregate';
-import { FormQuestionDataEntityMapper, FormQuestionDataEntityMapperConstructor } from '../entities/form-question-data.mapper';
+import { FormQuestionDetailsEntityMapper, FormQuestionDetailsEntityMapperConstructor } from '../entities/form-question-details.mapper';
 import { FormQuestionIdentifierEntityMapper, FormQuestionIdentifierEntityMapperConstructor } from '../entities/form-question-identifier.mapper';
 
-export type FormQuestionIdentifierDataAggregateMapperConstructor = FormQuestionDataEntityMapperConstructor & {
+export type FormQuestionIdentifierDataAggregateMapperConstructor = FormQuestionDetailsEntityMapperConstructor & {
   question_identifier: FormQuestionIdentifierEntityMapperConstructor | null;
 };
 
@@ -11,7 +11,7 @@ export class FormQuestionIdentifierDataAggregateMapper {
     if (!prisma.question_identifier) throw new Error('Missing question_identifier error');
 
     return new FormQuestionIdentifierDataAggregate({
-      data: FormQuestionDataEntityMapper.toEntity(prisma),
+      data: FormQuestionDetailsEntityMapper.toEntity(prisma),
       identifier: FormQuestionIdentifierEntityMapper.toEntity(prisma.question_identifier),
     });
   }

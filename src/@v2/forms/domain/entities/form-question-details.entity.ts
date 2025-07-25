@@ -1,9 +1,10 @@
 import { updateField } from '@/@v2/shared/domain/helpers/update-field.helper';
 import { FormQuestionTypeEnum } from '../enums/form-question-type.enum';
-import { compareObjects } from '@/@v2/shared/domain/helpers/object-diff.helper';
+import { compareEntities } from '@/@v2/shared/domain/helpers/entity-diff.helper';
+import { generateCuid } from '@/@v2/shared/utils/helpers/generate-cuid';
 
 export type FormQuestionDetailsEntityConstructor = {
-  id?: number;
+  id?: string;
   text: string;
   type: FormQuestionTypeEnum;
   acceptOther?: boolean;
@@ -14,7 +15,7 @@ export type FormQuestionDetailsEntityConstructor = {
 };
 
 export class FormQuestionDetailsEntity {
-  id: number;
+  id: string;
   text: string;
   type: FormQuestionTypeEnum;
   acceptOther: boolean;
@@ -24,9 +25,10 @@ export class FormQuestionDetailsEntity {
   companyId: string;
 
   private _originalEntity: FormQuestionDetailsEntity;
+  private _isNew: boolean;
 
   constructor(params: FormQuestionDetailsEntityConstructor) {
-    this.id = params.id ?? 0;
+    this.id = params.id ?? generateCuid();
     this.text = params.text;
     this.type = params.type;
     this.acceptOther = params.acceptOther ?? false;
@@ -35,11 +37,16 @@ export class FormQuestionDetailsEntity {
     this.deletedAt = params.deletedAt;
     this.companyId = params.companyId;
 
+    this._isNew = !params.id;
     this._originalEntity = this.clone();
   }
 
   get originalEntity() {
     return this._originalEntity;
+  }
+
+  get isNew() {
+    return this._isNew;
   }
 
   update(params: { text?: string; type?: FormQuestionTypeEnum; acceptOther?: boolean }) {
@@ -53,7 +60,7 @@ export class FormQuestionDetailsEntity {
   }
 
   diff() {
-    return compareObjects(this._originalEntity, this);
+    return compareEntities(this._originalEntity, this, { keysToCompare: Object.keys(this._originalEntity) });
   }
 
   get needsOptions(): boolean {

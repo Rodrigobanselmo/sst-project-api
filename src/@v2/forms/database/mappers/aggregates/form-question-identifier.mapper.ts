@@ -3,14 +3,14 @@ import { FormQuestionEntityMapper, FormQuestionEntityMapperConstructor } from '.
 import { FormQuestionIdentifierDataAggregateMapper, FormQuestionIdentifierDataAggregateMapperConstructor } from './form-question-identifier-data.mapper';
 
 export type FormQuestionIdentifierAggregateMapperConstructor = FormQuestionEntityMapperConstructor & {
-  question_data: FormQuestionIdentifierDataAggregateMapperConstructor;
+  question_details: FormQuestionIdentifierDataAggregateMapperConstructor;
 };
 
 export class FormQuestionIdentifierAggregateMapper {
   static toAggregate(prisma: FormQuestionIdentifierAggregateMapperConstructor): FormQuestionIdentifierAggregate {
     return new FormQuestionIdentifierAggregate({
       question: FormQuestionEntityMapper.toEntity(prisma),
-      identifierData: FormQuestionIdentifierDataAggregateMapper.toAggregate(prisma.question_data),
+      identifierData: FormQuestionIdentifierDataAggregateMapper.toAggregate(prisma.question_details),
     });
   }
 

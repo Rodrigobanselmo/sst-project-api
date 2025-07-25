@@ -1,12 +1,12 @@
-import { IsBoolean, IsEnum, IsOptional, IsString, IsArray, ValidateNested, IsNumber } from 'class-validator';
+import { IsBoolean, IsEnum, IsOptional, IsString, IsArray, ValidateNested, IsNumber, IsNotEmpty } from 'class-validator';
 import { Type } from 'class-transformer';
 import { FormTypeEnum } from '@/@v2/forms/domain/enums/form-type.enum';
 import { FormQuestionTypeEnum } from '@/@v2/forms/domain/enums/form-question-type.enum';
 
 export class FormQuestionOptionPayload {
   @IsOptional()
-  @IsNumber()
-  id?: number;
+  @IsString()
+  id?: string;
 
   @IsString()
   text!: string;
@@ -16,10 +16,10 @@ export class FormQuestionOptionPayload {
   value?: number;
 }
 
-export class FormQuestionDataPayload {
+export class FormQuestionDetailsPayload {
   @IsOptional()
-  @IsNumber()
-  id?: number;
+  @IsString()
+  id?: string;
 
   @IsString()
   text!: string;
@@ -34,16 +34,17 @@ export class FormQuestionDataPayload {
 
 export class FormQuestionPayload {
   @IsOptional()
-  @IsNumber()
-  id?: number;
+  @IsString()
+  id?: string;
 
   @IsOptional()
   @IsBoolean()
   required?: boolean;
 
+  @IsNotEmpty()
   @ValidateNested()
-  @Type(() => FormQuestionDataPayload)
-  data!: FormQuestionDataPayload;
+  @Type(() => FormQuestionDetailsPayload)
+  details!: FormQuestionDetailsPayload;
 
   @IsOptional()
   @IsArray()
@@ -54,8 +55,8 @@ export class FormQuestionPayload {
 
 export class FormQuestionGroupPayload {
   @IsOptional()
-  @IsNumber()
-  id?: number;
+  @IsString()
+  id?: string;
 
   @IsString()
   name!: string;

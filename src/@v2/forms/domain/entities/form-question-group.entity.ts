@@ -1,29 +1,31 @@
-import { compareObjects } from '@/@v2/shared/domain/helpers/object-diff.helper';
+import { compareEntities } from '@/@v2/shared/domain/helpers/entity-diff.helper';
 import { updateField } from '@/@v2/shared/domain/helpers/update-field.helper';
+import { generateCuid } from '@/@v2/shared/utils/helpers/generate-cuid';
 
 export type FormQuestionGroupEntityConstructor = {
-  id?: number;
+  id?: string;
   name: string;
   description?: string;
   order: number;
   createdAt?: Date;
   deletedAt?: Date | null;
-  formId: number;
+  formId: string;
 };
 
 export class FormQuestionGroupEntity {
-  id: number;
+  id: string;
   name: string;
   description?: string;
   order: number;
   createdAt: Date;
   deletedAt: Date | null;
-  formId: number;
+  formId: string;
 
   private _originalEntity: FormQuestionGroupEntity;
+  private _isNew: boolean;
 
   constructor(params: FormQuestionGroupEntityConstructor) {
-    this.id = params.id ?? 0;
+    this.id = params.id ?? generateCuid();
     this.name = params.name;
     this.description = params.description;
     this.order = params.order;
@@ -31,11 +33,16 @@ export class FormQuestionGroupEntity {
     this.deletedAt = params.deletedAt ?? null;
     this.formId = params.formId;
 
+    this._isNew = !params.id;
     this._originalEntity = this.clone();
   }
 
   get originalEntity() {
     return this._originalEntity;
+  }
+
+  get isNew() {
+    return this._isNew;
   }
 
   delete() {
@@ -53,6 +60,6 @@ export class FormQuestionGroupEntity {
   }
 
   diff() {
-    return compareObjects(this._originalEntity, this);
+    return compareEntities(this._originalEntity, this, { keysToCompare: Object.keys(this._originalEntity) });
   }
 }

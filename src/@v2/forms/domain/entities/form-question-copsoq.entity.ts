@@ -1,9 +1,10 @@
+import { generateCuid } from '@/@v2/shared/utils/helpers/generate-cuid';
 import { FormCOPSOQCategoryEnum } from '../enums/form-copsoq-category.enum';
 import { FormCOPSOQDimensionEnum } from '../enums/form-copsoq-dimension.enum';
 import { FormCOPSOQLevelEnum } from '../enums/form-copsoq-level.enum';
 
 export type FormQuestionCOPSOQEntityConstructor = {
-  id?: number;
+  id?: string;
   dimension: FormCOPSOQDimensionEnum;
   category: FormCOPSOQCategoryEnum;
   item: string;
@@ -12,7 +13,7 @@ export type FormQuestionCOPSOQEntityConstructor = {
 };
 
 export class FormQuestionCOPSOQEntity {
-  id: number;
+  id: string;
   dimension: FormCOPSOQDimensionEnum;
   category: FormCOPSOQCategoryEnum;
   item: string;
@@ -20,7 +21,7 @@ export class FormQuestionCOPSOQEntity {
   level: FormCOPSOQLevelEnum;
 
   constructor(params: FormQuestionCOPSOQEntityConstructor) {
-    this.id = params.id ?? 0;
+    this.id = params.id ?? generateCuid();
     this.dimension = params.dimension;
     this.category = params.category;
     this.item = params.item;

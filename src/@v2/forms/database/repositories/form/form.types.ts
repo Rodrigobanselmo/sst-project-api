@@ -7,7 +7,7 @@ export namespace IFormRepository {
   export type UpdateParams = FormEntity;
   export type UpdateReturn = Promise<FormEntity | null>;
 
-  export type FindParams = { id: number; companyId: string };
+  export type FindParams = { id: string; companyId: string };
   export type FindReturn = Promise<FormEntity | null>;
 
   export type DeleteParams = FormEntity;
