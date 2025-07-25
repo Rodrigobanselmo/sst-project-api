@@ -3,7 +3,7 @@ import { FormTypeEnum } from '@/@v2/forms/domain/enums/form-type.enum';
 import { FormApplicationBrowseResultModel } from '@/@v2/forms/domain/models/form-application/form-application-browse-result.model';
 
 export type IFormApplicationBrowseResultModelMapper = {
-  id: number;
+  id: string;
   name: string;
   description: string | null;
   status: FormStatusEnum;
@@ -15,7 +15,7 @@ export type IFormApplicationBrowseResultModelMapper = {
   total_answers: number;
   total_participants: number;
 
-  form_id: number;
+  form_id: string;
   form_name: string;
   form_type: FormTypeEnum;
   form_system: boolean;

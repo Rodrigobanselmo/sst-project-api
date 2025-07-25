@@ -2,14 +2,14 @@ import { FormStatusEnum } from '../../enums/form-status.enum';
 import { FormTypeEnum } from '../../enums/form-type.enum';
 
 type IFormResultModel = {
-  id: number;
+  id: string;
   name: string;
   type: FormTypeEnum;
   system: boolean;
 };
 
 export type IFormApplicationBrowseResultModel = {
-  id: number;
+  id: string;
   name: string;
   description: string | undefined;
   status: FormStatusEnum;
@@ -24,7 +24,7 @@ export type IFormApplicationBrowseResultModel = {
 };
 
 export class FormApplicationBrowseResultModel {
-  id: number;
+  id: string;
   name: string;
   description: string | undefined;
   status: FormStatusEnum;

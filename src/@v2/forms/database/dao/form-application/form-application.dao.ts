@@ -46,7 +46,7 @@ export class FormApplicationDAO {
         ,form_ap."started_at" as start_date
         ,form_ap."created_at" as created_at
         ,form_ap."updated_at" as updated_at
-        ,form."id"::integer as form_id
+        ,form."id" as form_id
         ,form."name" as form_name
         ,form."type" as form_type
         ,form."system" as form_system
