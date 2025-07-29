@@ -48,9 +48,9 @@ export class FormQuestionGroupEntity {
     return Object.assign({}, this);
   }
 
-  update(params: { name: string; description?: string; order: number }) {
+  update(params: { name?: string; description?: string; order?: number }) {
     this.name = params.name || this.name;
-    this.order = params.order || this.order;
+    this.order = params.order ?? this.order;
     this.description = updateField(this.description, params.description);
   }
 
