@@ -16,7 +16,6 @@ export class FormQuestionGroupEntityMapper {
       order: data.order,
       createdAt: prisma.created_at,
       deletedAt: prisma.deleted_at,
-      formId: prisma.form_id,
     });
   }
 

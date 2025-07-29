@@ -1,21 +1,21 @@
-import { FormApplicationEntity } from '../entities/form-application.entity';
+import { FormEntity } from '../entities/form.entity';
 import { FormQuestionGroupEntity } from '../entities/form-question-group.entity';
 import { FormQuestionAggregate } from './form-question.aggregate';
 
-export type IFormQuestionIdentifierGroupAggregate = {
+export type IFormQuestionGroupAggregate = {
   questionGroup: FormQuestionGroupEntity;
   questions: FormQuestionAggregate[];
-  formApplication: FormApplicationEntity;
+  form: FormEntity;
 };
 
-export class FormQuestionIdentifierGroupAggregate {
+export class FormQuestionGroupAggregate {
   questionGroup: FormQuestionGroupEntity;
   questions: FormQuestionAggregate[];
-  formApplication: FormApplicationEntity;
+  form: FormEntity;
 
-  constructor(params: IFormQuestionIdentifierGroupAggregate) {
+  constructor(params: IFormQuestionGroupAggregate) {
     this.questionGroup = params.questionGroup;
     this.questions = params.questions;
-    this.formApplication = params.formApplication;
+    this.form = params.form;
   }
 }

@@ -3,35 +3,20 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { FormAggregateMapper } from '../../mappers/aggregates/form-aggregate.mapper';
 import { IFormAggregateRepository } from './form-aggregate.types';
+import { FormQuestionGroupAggregateRepository } from '../form-question-group/form-question-group-aggregate.repository';
 
 @Injectable()
 export class FormAggregateRepository {
-  constructor(private readonly prisma: PrismaServiceV2) {}
+  constructor(
+    private readonly prisma: PrismaServiceV2,
+    private readonly formQuestionGroupAggregateRepository: FormQuestionGroupAggregateRepository,
+  ) {}
 
   static selectOptions() {
     const include = {
       questions_groups: {
         where: { deleted_at: null },
-        include: {
-          data: { where: { deleted_at: null } },
-          questions: {
-            where: { deleted_at: null },
-            include: {
-              data: { where: { deleted_at: null } },
-              question_details: {
-                include: {
-                  data: { where: { deleted_at: null } },
-                  options: {
-                    where: { deleted_at: null },
-                    include: {
-                      data: { where: { deleted_at: null } },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
+        ...FormQuestionGroupAggregateRepository.selectOptions(),
       },
     } satisfies Prisma.FormFindFirstArgs['include'];
 
@@ -42,6 +27,7 @@ export class FormAggregateRepository {
     const formAggregate = await this.prisma.$transaction(async (tx) => {
       const form = await tx.form.create({
         data: {
+          id: params.form.id,
           name: params.form.name,
           company_id: params.form.companyId,
           type: params.form.type,
@@ -53,76 +39,7 @@ export class FormAggregateRepository {
       });
 
       for (const questionGroup of params.questionGroups) {
-        const createdGroup = await tx.formQuestionGroup.create({
-          data: {
-            form_id: form.id,
-          },
-        });
-
-        // Create the group data
-        await tx.formQuestionGroupData.create({
-          data: {
-            name: questionGroup?.name || '',
-            description: questionGroup?.description,
-            order: questionGroup?.order || 0,
-            form_question_group_id: createdGroup.id,
-          },
-        });
-
-        for (const question of questionGroup.questions) {
-          // Create FormQuestionDetails first
-          const createdQuestionDetails = await tx.formQuestionDetails.create({
-            data: {
-              system: question.details.system,
-              company_id: question.details.companyId,
-            },
-          });
-
-          // Create FormQuestionDetailsData
-          await tx.formQuestionDetailsData.create({
-            data: {
-              text: question.details.text,
-              type: question.details.type,
-              accept_other: question.details.acceptOther,
-              form_question_details_id: createdQuestionDetails.id,
-            },
-          });
-
-          // Create FormQuestion
-          const createdQuestion = await tx.formQuestion.create({
-            data: {
-              question_details_id: createdQuestionDetails.id,
-              question_group_id: createdGroup.id,
-            },
-          });
-
-          // Create FormQuestionData for required/order
-          await tx.formQuestionData.create({
-            data: {
-              required: question.required,
-              order: question.order,
-              form_question_id: createdQuestion.id,
-            },
-          });
-
-          // Create options
-          for (const option of question.options) {
-            const createdOption = await tx.formQuestionOption.create({
-              data: {
-                question_id: createdQuestionDetails.id,
-              },
-            });
-
-            await tx.formQuestionOptionData.create({
-              data: {
-                text: option.text,
-                order: option.order,
-                value: option.value,
-                form_question_option_id: createdOption.id,
-              },
-            });
-          }
-        }
+        await this.formQuestionGroupAggregateRepository.createTx(questionGroup, tx);
       }
 
       const completeForm = await tx.form.findFirst({
@@ -172,158 +89,7 @@ export class FormAggregateRepository {
       });
 
       for (const questionGroup of aggregate.questionGroups) {
-        if (questionGroup.isNew) {
-          await tx.formQuestionGroup.create({
-            data: {
-              id: questionGroup.id,
-              form_id: aggregate.form.id,
-              data: {
-                create: {
-                  name: questionGroup.name,
-                  description: questionGroup.description,
-                  order: questionGroup.order,
-                },
-              },
-            },
-          });
-        }
-
-        if (questionGroup.deletedAt) {
-          await tx.formQuestionGroup.update({
-            where: { id: questionGroup.id },
-            data: { deleted_at: new Date() },
-          });
-          continue;
-        }
-
-        if (questionGroup.diff().hasChanges) {
-          await tx.formQuestionGroupData.updateMany({
-            where: { form_question_group_id: questionGroup.id, deleted_at: null },
-            data: { deleted_at: new Date() },
-          });
-
-          await tx.formQuestionGroupData.create({
-            data: {
-              name: questionGroup.name,
-              description: questionGroup.description,
-              order: questionGroup.order,
-              form_question_group_id: questionGroup.id,
-            },
-          });
-        }
-
-        for (const question of questionGroup.questions) {
-          if (question.isNew) {
-            await tx.formQuestionDetails.create({
-              data: {
-                id: question.details.id,
-                company_id: question.details.companyId,
-                system: question.details.system,
-                data: {
-                  create: {
-                    text: question.details.text,
-                    type: question.details.type,
-                    accept_other: question.details.acceptOther,
-                  },
-                },
-              },
-            });
-
-            await tx.formQuestion.create({
-              data: {
-                question_group_id: questionGroup.id,
-                question_details_id: question.details.id,
-                data: {
-                  create: {
-                    required: question.required,
-                    order: question.order,
-                  },
-                },
-              },
-            });
-          }
-
-          if (question.deletedAt) {
-            await tx.formQuestion.update({
-              where: { id: question.id },
-              data: { deleted_at: new Date() },
-            });
-            continue;
-          }
-
-          if (question.diff().hasChanges) {
-            await tx.formQuestionData.updateMany({
-              where: { form_question_id: question.id, deleted_at: null },
-              data: { deleted_at: new Date() },
-            });
-
-            await tx.formQuestionData.create({
-              data: {
-                required: question.required,
-                order: question.order,
-                form_question_id: question.id,
-              },
-            });
-          }
-
-          if (question.details.diff().hasChanges) {
-            await tx.formQuestionDetailsData.updateMany({
-              where: { form_question_details_id: question.details.id, deleted_at: null },
-              data: { deleted_at: new Date() },
-            });
-
-            await tx.formQuestionDetailsData.create({
-              data: {
-                text: question.details.text,
-                type: question.details.type,
-                accept_other: question.details.acceptOther,
-                form_question_details_id: question.details.id,
-              },
-            });
-          }
-
-          for (const option of question.options) {
-            if (option.isNew) {
-              await tx.formQuestionOption.create({
-                data: {
-                  question_id: question.details.id,
-                  id: option.id,
-                  data: {
-                    create: {
-                      text: option.text,
-                      order: option.order,
-                      value: option.value,
-                    },
-                  },
-                },
-              });
-            }
-
-            if (option.deletedAt) {
-              await tx.formQuestionOption.update({
-                where: { id: option.id },
-                data: { deleted_at: new Date() },
-              });
-              continue;
-            }
-
-            if (option.diff().hasChanges) {
-              await tx.formQuestionOptionData.updateMany({
-                where: { form_question_option_id: option.id, deleted_at: null },
-                data: { deleted_at: new Date() },
-              });
-
-              await tx.formQuestionOptionData.create({
-                data: {
-                  text: option.text,
-                  order: option.order,
-                  value: option.value,
-                  form_question_option_id: option.id,
-                },
-              });
-            }
-          }
-        }
+        await this.formQuestionGroupAggregateRepository.upsertTx(questionGroup, tx);
       }
 
       const completeForm = await tx.form.findFirst({

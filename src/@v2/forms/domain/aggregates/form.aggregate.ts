@@ -4,21 +4,16 @@ import { FormQuestionGroupEntity } from '../entities/form-question-group.entity'
 import { FormQuestionOptionEntity } from '../entities/form-question-option.entity';
 import { FormQuestionEntity } from '../entities/form-question.entity';
 import { FormEntity } from '../entities/form.entity';
-import { FormQuestionTypeEnum } from '../enums/form-question-type.enum';
+import { FormQuestionGroupAggregate } from './form-question-group.aggregate';
+import { FormQuestionAggregate } from './form-question.aggregate';
 
 // ========================================
 // TYPE DEFINITIONS
 // ========================================
 
-export type IFormQuestionAggregate = FormQuestionEntity & {
-  details: FormQuestionDetailsEntity;
-  options: FormQuestionOptionEntity[];
-};
-
-export type IFormQuestionGroupAggregate = FormQuestionGroupEntity & { questions: IFormQuestionAggregate[] };
 export type IFormAggregate = {
   form: FormEntity;
-  questionGroups: IFormQuestionGroupAggregate[];
+  questionGroups: FormQuestionGroupAggregate[];
 };
 
 // ================================p========
@@ -70,7 +65,7 @@ interface IUpdateQuestionGroupsParams {
 
 export class FormAggregate {
   form: FormEntity;
-  questionGroups: IFormQuestionGroupAggregate[];
+  questionGroups: FormQuestionGroupAggregate[];
 
   constructor(params: IFormAggregate) {
     this.form = params.form;
@@ -95,7 +90,7 @@ export class FormAggregate {
 
     // Track deleted question groups
     for (const currentGroup of currentQuestionGroups) {
-      const stillExists = newQuestionGroups.some((newGroup) => newGroup.id === currentGroup.id);
+      const stillExists = newQuestionGroups.some((newGroup) => newGroup.id === currentGroup.questionGroup.id);
       if (!stillExists) {
         this.deleteQuestionGroup(currentGroup);
       }
@@ -104,7 +99,7 @@ export class FormAggregate {
     // Process each new question group
     for (let groupIndex = 0; groupIndex < newQuestionGroups.length; groupIndex++) {
       const newGroup = newQuestionGroups[groupIndex];
-      const currentGroup = currentQuestionGroups.find((g) => g.id === newGroup.id);
+      const currentGroup = currentQuestionGroups.find((g) => g.questionGroup.id === newGroup.id);
       if (currentGroup) {
         this.updateQuestionGroup(currentGroup, newGroup, groupIndex);
       } else {
@@ -119,40 +114,43 @@ export class FormAggregate {
 
   private createQuestionGroup(newGroup: IQuestionGroupInput, order: number) {
     const questionGroup = new FormQuestionGroupEntity({
-      formId: this.form.id,
       name: newGroup.name,
       description: newGroup.description,
       order,
     });
 
-    const newQuestionGroup = Object.assign(questionGroup, { questions: [] });
+    const newQuestionGroup = new FormQuestionGroupAggregate({
+      questionGroup,
+      questions: [],
+      form: this.form,
+    });
 
     this.updateQuestionsInGroup(newQuestionGroup, newGroup);
 
     this.questionGroups.push(newQuestionGroup);
   }
 
-  private updateQuestionGroup(currentGroup: IFormQuestionGroupAggregate, newGroup: IQuestionGroupInput, order: number) {
-    currentGroup.update({ name: newGroup.name, description: newGroup.description, order });
+  private updateQuestionGroup(currentGroup: FormQuestionGroupAggregate, newGroup: IQuestionGroupInput, order: number) {
+    currentGroup.questionGroup.update({ name: newGroup.name, description: newGroup.description, order });
 
     this.updateQuestionsInGroup(currentGroup, newGroup);
   }
 
-  private deleteQuestionGroup(group: IFormQuestionGroupAggregate) {
-    group.delete();
+  private deleteQuestionGroup(group: FormQuestionGroupAggregate) {
+    group.questionGroup.delete();
   }
 
   // ========================================
   // PRIVATE QUESTION METHODS
   // ========================================
 
-  private updateQuestionsInGroup(currentGroup: IFormQuestionGroupAggregate, newGroup: IQuestionGroupInput) {
+  private updateQuestionsInGroup(currentGroup: FormQuestionGroupAggregate, newGroup: IQuestionGroupInput) {
     const newQuestions = newGroup.questions;
     const currentQuestions = currentGroup.questions;
 
     // Track deleted questions
     for (const currentQuestion of currentQuestions) {
-      const stillExists = newQuestions.some((newQuestion) => newQuestion.id === currentQuestion.id);
+      const stillExists = newQuestions.some((newQuestion) => newQuestion.id === currentQuestion.question.id);
       if (!stillExists) {
         this.deleteQuestion(currentQuestion);
       }
@@ -161,7 +159,7 @@ export class FormAggregate {
     // Process each new question
     for (let questionIndex = 0; questionIndex < newQuestions.length; questionIndex++) {
       const newQuestion = newQuestions[questionIndex];
-      const currentQuestion = currentQuestions.find((q) => q.id === newQuestion.id);
+      const currentQuestion = currentQuestions.find((q) => q.question.id === newQuestion.id);
 
       if (currentQuestion) {
         this.updateQuestion(currentQuestion, newQuestion, questionIndex);
@@ -171,7 +169,7 @@ export class FormAggregate {
     }
   }
 
-  private createQuestion(group: IFormQuestionGroupAggregate, newQuestion: IQuestionInput, order: number) {
+  private createQuestion(group: FormQuestionGroupAggregate, newQuestion: IQuestionInput, order: number) {
     const questionData = new FormQuestionDetailsEntity({
       text: newQuestion.details.text,
       type: newQuestion.details.type,
@@ -180,13 +178,16 @@ export class FormAggregate {
     });
 
     const question = new FormQuestionEntity({
+      groupId: group.questionGroup.id,
       required: newQuestion.required ?? false,
       order,
     });
 
-    const newQuestionAggregate = Object.assign(question, {
+    const newQuestionAggregate = new FormQuestionAggregate({
+      question,
       details: questionData,
       options: [],
+      identifier: null,
     });
 
     if (newQuestion.options && newQuestionAggregate.details.needsOptions) {
@@ -200,8 +201,8 @@ export class FormAggregate {
     group.questions.push(newQuestionAggregate);
   }
 
-  private updateQuestion(currentQuestion: IFormQuestionAggregate, newQuestion: IQuestionInput, order: number) {
-    currentQuestion.update({ required: newQuestion.required, order });
+  private updateQuestion(currentQuestion: FormQuestionAggregate, newQuestion: IQuestionInput, order: number) {
+    currentQuestion.question.update({ required: newQuestion.required, order });
 
     this.updateQuestionData(currentQuestion.details, newQuestion.details);
 
@@ -210,8 +211,8 @@ export class FormAggregate {
     }
   }
 
-  private deleteQuestion(question: IFormQuestionAggregate) {
-    question.delete();
+  private deleteQuestion(question: FormQuestionAggregate) {
+    question.question.delete();
   }
 
   // ========================================
@@ -226,7 +227,7 @@ export class FormAggregate {
   // PRIVATE QUESTION OPTION METHODS
   // ========================================
 
-  private updateQuestionOptions(currentQuestion: IFormQuestionAggregate, newOptions: IQuestionOptionInput[]) {
+  private updateQuestionOptions(currentQuestion: FormQuestionAggregate, newOptions: IQuestionOptionInput[]) {
     const currentOptions = currentQuestion.options;
 
     // Track deleted options
@@ -250,7 +251,7 @@ export class FormAggregate {
     }
   }
 
-  private createQuestionOption(question: IFormQuestionAggregate, newOption: IQuestionOptionInput, order: number) {
+  private createQuestionOption(question: FormQuestionAggregate, newOption: IQuestionOptionInput, order: number) {
     const option = new FormQuestionOptionEntity({
       text: newOption.text,
       value: newOption.value,

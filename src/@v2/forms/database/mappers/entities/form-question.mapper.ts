@@ -19,6 +19,7 @@ export class FormQuestionEntityMapper {
       required: questionData.required,
       createdAt: prisma.created_at,
       deletedAt: prisma.deleted_at,
+      groupId: prisma.question_group_id,
     });
   }
 

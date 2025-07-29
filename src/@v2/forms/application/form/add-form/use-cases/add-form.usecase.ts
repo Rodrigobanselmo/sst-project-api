@@ -10,6 +10,8 @@ import { ContextKey } from '@/@v2/shared/adapters/context/types/enum/context-key
 import { SharedTokens } from '@/@v2/shared/constants/tokens';
 import { Inject, Injectable } from '@nestjs/common';
 import { IAddFormUseCase } from './add-form.types';
+import { FormQuestionGroupAggregate } from '@/@v2/forms/domain/aggregates/form-question-group.aggregate';
+import { FormQuestionAggregate } from '@/@v2/forms/domain/aggregates/form-question.aggregate';
 
 @Injectable()
 export class AddFormUseCase {
@@ -38,16 +40,16 @@ export class AddFormUseCase {
           name: group.name,
           description: group.description,
           order: groupIndex,
-          formId: formEntity.id,
         });
 
         const questionsAggregate = group.questions.map((question, questionIndex) => {
           const questionEntity = new FormQuestionEntity({
             required: question.required,
             order: questionIndex,
+            groupId: questionGroupEntity.id,
           });
 
-          const questionDataEntity = new FormQuestionDetailsEntity({
+          const detailsEntity = new FormQuestionDetailsEntity({
             text: question.details.text,
             type: question.details.type,
             acceptOther: question.details.acceptOther,
@@ -55,8 +57,8 @@ export class AddFormUseCase {
             system: loggedUser.isAdmin,
           });
 
-          const optionsAggregate: FormQuestionOptionEntity[] = [];
-          if (questionDataEntity.needsOptions) {
+          const optionsEntities: FormQuestionOptionEntity[] = [];
+          if (detailsEntity.needsOptions) {
             question.options?.forEach((option, optionIndex) => {
               const optionEntity = new FormQuestionOptionEntity({
                 text: option.text,
@@ -64,18 +66,22 @@ export class AddFormUseCase {
                 value: option.value,
               });
 
-              optionsAggregate.push(optionEntity);
+              optionsEntities.push(optionEntity);
             });
           }
 
-          return Object.assign(questionEntity, {
-            details: questionDataEntity,
-            options: optionsAggregate,
+          return new FormQuestionAggregate({
+            question: questionEntity,
+            details: detailsEntity,
+            options: optionsEntities,
+            identifier: undefined,
           });
         });
 
-        return Object.assign(questionGroupEntity, {
+        return new FormQuestionGroupAggregate({
+          questionGroup: questionGroupEntity,
           questions: questionsAggregate,
+          form: formEntity,
         });
       }) || [];
 

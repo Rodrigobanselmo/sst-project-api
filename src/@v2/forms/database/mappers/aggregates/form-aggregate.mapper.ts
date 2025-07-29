@@ -6,6 +6,8 @@ import { FormQuestionDetails, FormQuestionDetailsData, FormQuestionOption, FormQ
 import { FormQuestionGroupEntityMapper, FormQuestionGroupEntityMapperConstructor } from '../entities/form-question-group.mapper';
 import { FormQuestionEntityMapper, FormQuestionEntityMapperConstructor } from '../entities/form-question.mapper';
 import { FormEntityMapper, FormEntityMapperConstructor } from '../entities/form.mapper';
+import { FormQuestionGroupAggregate } from '@/@v2/forms/domain/aggregates/form-question-group.aggregate';
+import { FormQuestionAggregate } from '@/@v2/forms/domain/aggregates/form-question.aggregate';
 
 export type FormAggregateMapperConstructor = FormEntityMapperConstructor & {
   questions_groups: (FormQuestionGroupEntityMapperConstructor & {
@@ -22,8 +24,10 @@ export type FormAggregateMapperConstructor = FormEntityMapperConstructor & {
 
 export class FormAggregateMapper {
   static toAggregate(prisma: FormAggregateMapperConstructor): FormAggregate {
+    const formEntity = FormEntityMapper.toEntity(prisma);
+
     return new FormAggregate({
-      form: FormEntityMapper.toEntity(prisma),
+      form: formEntity,
       questionGroups: prisma.questions_groups.map((group) => {
         const questionGroupEntity = FormQuestionGroupEntityMapper.toEntity(group);
         const questions = group.questions.map((question) => {
@@ -55,13 +59,17 @@ export class FormAggregateMapper {
             });
           });
 
-          return Object.assign(questionEntity, {
+          return new FormQuestionAggregate({
+            question: questionEntity,
             details: detailsEntity,
             options: optionsEntities,
+            identifier: null,
           });
         });
 
-        return Object.assign(questionGroupEntity, {
+        return new FormQuestionGroupAggregate({
+          questionGroup: questionGroupEntity,
+          form: formEntity,
           questions,
         });
       }),

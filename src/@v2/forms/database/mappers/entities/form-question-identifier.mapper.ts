@@ -8,8 +8,9 @@ export class FormQuestionIdentifierEntityMapper {
   static toEntity(prisma: FormQuestionIdentifierEntityMapperConstructor): FormQuestionIdentifierEntity {
     return new FormQuestionIdentifierEntity({
       id: prisma.id,
+      system: prisma.system,
       createdAt: prisma.created_at,
-      updatedAt: prisma.updated_at,
+      deletedAt: prisma.deleted_at,
       type: FormIdentifierTypeEnum[prisma.type],
       directAssociation: prisma.direct_association,
     });

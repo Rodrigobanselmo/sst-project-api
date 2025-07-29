@@ -8,7 +8,16 @@ export type FormQuestionEntityConstructor = {
   order: number;
   createdAt?: Date;
   deletedAt?: Date;
-};
+} & (
+  | {
+      identifierGroupId: string;
+      groupId?: string;
+    }
+  | {
+      identifierGroupId?: string;
+      groupId: string;
+    }
+);
 
 export class FormQuestionEntity {
   id: string;
@@ -16,6 +25,8 @@ export class FormQuestionEntity {
   order: number;
   createdAt: Date;
   deletedAt?: Date;
+  identifierGroupId?: string;
+  groupId?: string;
 
   private _originalEntity: FormQuestionEntity;
   private _isNew: boolean;
@@ -26,6 +37,12 @@ export class FormQuestionEntity {
     this.order = params.order;
     this.createdAt = params.createdAt ?? new Date();
     this.deletedAt = params.deletedAt;
+    this.identifierGroupId = params.identifierGroupId;
+    this.groupId = params.groupId;
+
+    if (!params.identifierGroupId && !params.groupId) {
+      throw new Error('question group is required');
+    }
 
     this._isNew = !params.id;
     this._originalEntity = this.clone();

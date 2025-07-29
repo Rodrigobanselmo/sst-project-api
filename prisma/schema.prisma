@@ -1236,7 +1236,7 @@ model Form {
 }
 
 model FormApplication {
-  id          String     @id @default(uuid())
+  id          String     @id @default(cuid())
   name        String
   description String?
   status      StatusEnum @default(PENDING)
@@ -1252,11 +1252,9 @@ model FormApplication {
   form_id String
   form    Form   @relation(fields: [form_id], references: [id])
 
-  question_identifier_group_id String?
-  question_identifier_group    FormQuestionIdentifierGroup? @relation(fields: [question_identifier_group_id], references: [id])
-
-  participants         FormParticipants?
-  participants_answers FormParticipantsAnswers[]
+  participants              FormParticipants?
+  participants_answers      FormParticipantsAnswers[]
+  question_identifier_group FormQuestionGroup[]
 
   @@unique([id, company_id])
   @@index([company_id])
@@ -1300,25 +1298,17 @@ model FormParticipantsHierarchy {
   form_participants    FormParticipants? @relation(fields: [form_participants_id], references: [id], onDelete: Cascade)
 }
 
-model FormQuestionIdentifierGroup {
-  id          String   @id @default(cuid())
-  name        String
-  description String?
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-
-  form_application FormApplication[]
-  questions        FormQuestion[]
-}
-
 model FormQuestionGroup {
   id         String    @id @default(cuid())
   created_at DateTime  @default(now())
   updated_at DateTime  @updatedAt
   deleted_at DateTime?
 
-  form_id String
-  form    Form   @relation(fields: [form_id], references: [id], onDelete: Cascade)
+  form_id String?
+  form    Form?   @relation(fields: [form_id], references: [id], onDelete: Cascade)
+
+  form_application_id String?
+  form_application    FormApplication? @relation(fields: [form_application_id], references: [id], onDelete: Cascade)
 
   questions FormQuestion[]
   data      FormQuestionGroupData[]
@@ -1360,11 +1350,8 @@ model FormQuestion {
   question_details_id String
   question_details    FormQuestionDetails @relation(fields: [question_details_id], references: [id], onDelete: Cascade)
 
-  question_group_id String?
-  question_group    FormQuestionGroup? @relation(fields: [question_group_id], references: [id], onDelete: Cascade)
-
-  question_identifier_group_id String?
-  question_identifier_group    FormQuestionIdentifierGroup? @relation(fields: [question_identifier_group_id], references: [id])
+  question_group_id String
+  question_group    FormQuestionGroup @relation(fields: [question_group_id], references: [id], onDelete: Cascade)
 
   data    FormQuestionData[]
   answers FormAnswer[]
@@ -1408,12 +1395,6 @@ model FormQuestionDetails {
   company_id String
   company    Company @relation(fields: [company_id], references: [id])
 
-  question_copsoq_id String?
-  question_copsoq    FormQuestionCOPSOQ? @relation(fields: [question_copsoq_id], references: [id], onDelete: Cascade)
-
-  question_identifier_id String?
-  question_identifier    FormQuestionIdentifier? @relation(fields: [question_identifier_id], references: [id], onDelete: Cascade)
-
   data               FormQuestionDetailsData[]
   options            FormQuestionOption[]
   form_question_risk FormQuestionRisk[]
@@ -1428,6 +1409,12 @@ model FormQuestionDetailsData {
   created_at   DateTime             @default(now())
   updated_at   DateTime             @updatedAt
   deleted_at   DateTime?
+
+  question_copsoq_id String?
+  question_copsoq    FormQuestionCOPSOQ? @relation(fields: [question_copsoq_id], references: [id], onDelete: Cascade)
+
+  question_identifier_id String?
+  question_identifier    FormQuestionIdentifier? @relation(fields: [question_identifier_id], references: [id], onDelete: Cascade)
 
   form_question_details_id String
   form_question_details    FormQuestionDetails @relation(fields: [form_question_details_id], references: [id], onDelete: Cascade)
@@ -1480,7 +1467,7 @@ model FormQuestionCOPSOQ {
   updated_at DateTime                @updatedAt
   deleted_at DateTime?
 
-  form_question_data FormQuestionDetails[]
+  form_question_data FormQuestionDetailsData[]
 }
 
 model FormQuestionIdentifier {
@@ -1492,7 +1479,7 @@ model FormQuestionIdentifier {
   updated_at         DateTime               @updatedAt
   deleted_at         DateTime?
 
-  form_question_data FormQuestionDetails[]
+  form_question_data FormQuestionDetailsData[]
 }
 
 model GenerateSource {

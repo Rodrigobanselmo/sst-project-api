@@ -9,7 +9,6 @@ export type FormQuestionGroupEntityConstructor = {
   order: number;
   createdAt?: Date;
   deletedAt?: Date | null;
-  formId: string;
 };
 
 export class FormQuestionGroupEntity {
@@ -19,8 +18,6 @@ export class FormQuestionGroupEntity {
   order: number;
   createdAt: Date;
   deletedAt: Date | null;
-  formId: string;
-
   private _originalEntity: FormQuestionGroupEntity;
   private _isNew: boolean;
 
@@ -31,8 +28,6 @@ export class FormQuestionGroupEntity {
     this.order = params.order;
     this.createdAt = params.createdAt ?? new Date();
     this.deletedAt = params.deletedAt ?? null;
-    this.formId = params.formId;
-
     this._isNew = !params.id;
     this._originalEntity = this.clone();
   }
@@ -60,6 +55,10 @@ export class FormQuestionGroupEntity {
   }
 
   diff() {
+    if (this.isNew) {
+      return { hasChanges: true, changes: {} };
+    }
+
     return compareEntities(this._originalEntity, this, { keysToCompare: Object.keys(this._originalEntity) });
   }
 }

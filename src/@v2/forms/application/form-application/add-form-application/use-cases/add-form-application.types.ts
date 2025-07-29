@@ -1,3 +1,23 @@
+import { FormIdentifierTypeEnum } from '@/@v2/forms/domain/enums/form-identifier-type.enum';
+import { FormQuestionTypeEnum } from '@/@v2/forms/domain/enums/form-question-type.enum';
+
+export interface FormQuestionOptionParams {
+  text: string;
+  value?: number;
+}
+
+export interface FormQuestionDetailsParams {
+  text: string;
+  type: FormQuestionTypeEnum;
+  identifierType: FormIdentifierTypeEnum;
+  acceptOther?: boolean;
+}
+
+export type FormQuestionParams = {
+  required?: boolean;
+  details: FormQuestionDetailsParams;
+  options?: FormQuestionOptionParams[];
+};
 export namespace IAddFormApplicationUseCase {
   export type Params = {
     name: string;
@@ -6,14 +26,10 @@ export namespace IAddFormApplicationUseCase {
     formId: string;
     workspaceIds: string[];
     hierarchyIds: string[];
-    identifier?: {
+    identifier: {
       name: string;
       description?: string;
-      questions: {
-        required: boolean;
-        order: number;
-        questionDataId: string;
-      }[];
+      questions: FormQuestionParams[];
     };
   };
 }

@@ -3,25 +3,25 @@ import { FormApplicationEntity } from '../entities/form-application.entity';
 import { FormParticipantsHierarchyEntity } from '../entities/form-participants-hierarchy.entity';
 import { FormParticipantsWorkspaceEntity } from '../entities/form-participants-workspace.entity';
 import { FormEntity } from '../entities/form.entity';
-import { FormQuestionIdentifierGroupAggregate } from './form-question-identifier-group.aggregate';
 import { errorFormAlreadyStarted } from '../errors/domain.errors';
+import { FormQuestionIdentifierGroupAggregate } from './form-question-identifier-group.aggregate';
 
 export type IFormApplicationAggregate = {
   formApplication: FormApplicationEntity;
   form: FormEntity;
   participantsWorkspaces: FormParticipantsWorkspaceEntity[];
   participantsHierarchies: FormParticipantsHierarchyEntity[];
-  identifier?: FormQuestionIdentifierGroupAggregate;
+  identifier: FormQuestionIdentifierGroupAggregate | null;
 };
 
 export class FormApplicationAggregate {
   formApplication: FormApplicationEntity;
+  identifier: FormQuestionIdentifierGroupAggregate | null;
   private _form: FormEntity;
   private _participants: {
     workspaces: FormParticipantsWorkspaceEntity[];
     hierarchies: FormParticipantsHierarchyEntity[];
   };
-  identifier?: FormQuestionIdentifierGroupAggregate;
 
   constructor(params: IFormApplicationAggregate) {
     this.formApplication = params.formApplication;
