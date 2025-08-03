@@ -32,6 +32,7 @@ export class FormApplicationAggregateRepository {
     const formApplication = await this.prisma.$transaction(async (tx) => {
       const formApplication = await tx.formApplication.create({
         data: {
+          id: params.formApplication.id,
           form_id: params.form.id,
           name: params.formApplication.name,
           company_id: params.formApplication.companyId,

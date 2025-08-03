@@ -154,7 +154,7 @@ export class FormApplicationAggregate {
     const questionEntity = new FormQuestionEntity({
       order,
       required: newQuestion.required,
-      identifierGroupId: this.identifier.questionGroup.id,
+      groupId: this.identifier.questionGroup.id,
     });
 
     const detailsEntity = new FormQuestionDetailsEntity({

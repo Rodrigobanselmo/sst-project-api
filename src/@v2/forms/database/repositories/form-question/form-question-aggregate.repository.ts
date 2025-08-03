@@ -61,7 +61,6 @@ export class FormQuestionAggregateRepository {
         id: question.id,
         question_details_id: createdQuestionDetails.id,
         question_group_id: question.groupId,
-        question_identifier_group_id: question.identifierGroupId,
       },
     });
 
@@ -118,7 +117,6 @@ export class FormQuestionAggregateRepository {
       await tx.formQuestion.create({
         data: {
           question_group_id: question.groupId,
-          question_identifier_group_id: question.identifierGroupId,
           question_details_id: details.id,
           data: {
             create: {

@@ -7,7 +7,7 @@ import { Prisma } from '@prisma/client';
 import { IFormBrowseFilterModelMapper } from '../../mappers/models/form/form-browse-filter.mapper';
 import { IFormBrowseResultModelMapper } from '../../mappers/models/form/form-browse-result.mapper';
 import { FormBrowseModelMapper } from '../../mappers/models/form/form-browse.mapper';
-import { FormReadModelMapper, IFormReadModelMapper } from '../../mappers/models/form/form-read.mapper';
+import { FormReadModelMapper } from '../../mappers/models/form/form-read.mapper';
 import { FormOrderByEnum, IFormDAO } from './form.types';
 
 @Injectable()

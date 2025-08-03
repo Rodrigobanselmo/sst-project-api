@@ -19,7 +19,6 @@ export class FormQuestionIdentifierEntityRepository {
     const FormQuestionIdentifier = await this.prisma.formQuestionIdentifier.findFirst({
       where: {
         type: params.type,
-        system: true,
       },
       ...FormQuestionIdentifierEntityRepository.selectOptions(),
     });

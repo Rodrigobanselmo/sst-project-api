@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Param, Put, UseGuards } from '@nestjs/common';
 
 import { FormRoutes } from '@/@v2/forms/constants/routes';
 import { JwtAuthGuard } from '@/@v2/shared/guards/jwt-auth.guard';
@@ -13,14 +13,14 @@ import { EditFormApplicationPayload } from './edit-form-application.payload';
 export class EditFormApplicationController {
   constructor(private readonly editFormApplicationUseCase: EditFormApplicationUseCase) {}
 
-  @Post()
+  @Put()
   @Permissions({
     code: PermissionEnum.FORM,
     isContract: true,
     isMember: true,
     crud: true,
   })
-  async add(@Param() path: EditFormApplicationPath, @Body() body: EditFormApplicationPayload) {
+  async edit(@Param() path: EditFormApplicationPath, @Body() body: EditFormApplicationPayload) {
     return this.editFormApplicationUseCase.execute({
       companyId: path.companyId,
       name: body.name,

@@ -1,4 +1,4 @@
-import { FormTypeEnum } from '../../../enums/form-type.enum';
+import { FormTypeEnum } from '../../enums/form-type.enum';
 
 export type IFormBrowseFilterModel = {
   types: FormTypeEnum[];

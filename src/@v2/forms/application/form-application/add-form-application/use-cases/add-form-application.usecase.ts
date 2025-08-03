@@ -10,6 +10,7 @@ import { FormParticipantsWorkspaceEntity } from '@/@v2/forms/domain/entities/for
 import { FormQuestionDetailsEntity } from '@/@v2/forms/domain/entities/form-question-details.entity';
 import { FormQuestionGroupEntity } from '@/@v2/forms/domain/entities/form-question-group.entity';
 import { FormQuestionEntity } from '@/@v2/forms/domain/entities/form-question.entity';
+import { FormQuestionDetailsFactory } from '@/@v2/forms/domain/factories/form-question-details.factory';
 import { asyncBatch } from '@/@v2/shared/utils/helpers/async-batch';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { IAddFormApplicationUseCase } from './add-form-application.types';
@@ -62,15 +63,15 @@ export class AddFormApplicationUseCase {
         const questionEntity = new FormQuestionEntity({
           order: index,
           required: question.required,
-          identifierGroupId: questionGroup.id,
+          groupId: questionGroup.id,
         });
 
         const identifierEntity = await this.formQuestionIdentifierEntityRepository.find({ type: question.details.identifierType });
         if (!identifierEntity) throw new BadRequestException('Tipo  de pergunta não encontrada');
 
-        const detailsEntity = new FormQuestionDetailsEntity({
+        const detailsEntity = FormQuestionDetailsFactory.createFromIdentifierType({
           text: question.details.text,
-          type: question.details.type,
+          identifierType: question.details.identifierType,
           companyId: params.companyId,
           acceptOther: question.details.acceptOther,
         });

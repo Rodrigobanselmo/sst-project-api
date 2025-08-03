@@ -1,10 +1,11 @@
 import { FormQuestionTypeEnum } from '@/@v2/forms/domain/enums/form-question-type.enum';
 import { FormTypeEnum } from '@/@v2/forms/domain/enums/form-type.enum';
-import { FormQuestionDetailsReadModel } from '@/@v2/forms/domain/models/form/components/form-question-details-read.model';
-import { FormQuestionGroupReadModel } from '@/@v2/forms/domain/models/form/components/form-question-group-read.model';
-import { FormQuestionOptionReadModel } from '@/@v2/forms/domain/models/form/components/form-question-option-read.model';
-import { FormQuestionReadModel } from '@/@v2/forms/domain/models/form/components/form-question-read.model';
+
 import { FormReadModel } from '@/@v2/forms/domain/models/form/form-read.model';
+import { FormQuestionDetailsReadModel } from '@/@v2/forms/domain/models/shared/form-question-details-read.model';
+import { FormQuestionGroupReadModel } from '@/@v2/forms/domain/models/shared/form-question-group-read.model';
+import { FormQuestionOptionReadModel } from '@/@v2/forms/domain/models/shared/form-question-option-read.model';
+import { FormQuestionReadModel } from '@/@v2/forms/domain/models/shared/form-question-read.model';
 import { Form } from '@prisma/client';
 
 export type IFormReadModelMapper = Form & {

@@ -8,7 +8,6 @@ export interface FormQuestionOptionParams {
 
 export interface FormQuestionDetailsParams {
   text: string;
-  type: FormQuestionTypeEnum;
   identifierType: FormIdentifierTypeEnum;
   acceptOther?: boolean;
 }

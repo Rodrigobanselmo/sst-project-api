@@ -21,6 +21,70 @@ export class FormApplicationDAO {
         id: params.id,
         company_id: params.companyId,
       },
+      include: {
+        form: true,
+        participants: {
+          include: {
+            hierarchies: {
+              include: {
+                hierarchy: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
+              },
+            },
+            workspaces: {
+              include: {
+                workspaces: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        question_identifier_group: {
+          include: {
+            data: {
+              where: { deleted_at: null },
+              take: 1,
+            },
+            questions: {
+              where: { deleted_at: null },
+              include: {
+                data: {
+                  where: { deleted_at: null },
+                  take: 1,
+                },
+                question_details: {
+                  include: {
+                    data: {
+                      where: { deleted_at: null },
+                      take: 1,
+                      include: {
+                        question_identifier: true,
+                      },
+                    },
+                    options: {
+                      where: { deleted_at: null },
+                      include: {
+                        data: {
+                          where: { deleted_at: null },
+                          take: 1,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     });
 
     return formApplication?.id ? FormApplicationReadModelMapper.toModel(formApplication) : null;
