@@ -2606,6 +2606,7 @@ enum StatusEnum {
   TRANSMITTED
   WATTING_APPROVAL
   REJECTED
+  TESTING
 }
 
 enum RecTypeEnum {

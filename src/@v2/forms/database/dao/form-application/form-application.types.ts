@@ -17,6 +17,10 @@ export namespace IFormApplicationDAO {
     id: string;
   };
 
+  export type ReadPublicParams = {
+    id: string;
+  };
+
   export type BrowseParams = {
     orderBy?: IOrderBy<FormApplicationOrderByEnum>;
     limit?: number;

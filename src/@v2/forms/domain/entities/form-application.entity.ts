@@ -86,6 +86,14 @@ export class FormApplicationEntity {
   }
 
   canBeAnswered() {
+    return this.isPublic() || this.isTesting();
+  }
+
+  isPublic() {
     return this.status === FormStatusEnum.PROGRESS;
+  }
+
+  isTesting() {
+    return this.status === FormStatusEnum.TESTING;
   }
 }

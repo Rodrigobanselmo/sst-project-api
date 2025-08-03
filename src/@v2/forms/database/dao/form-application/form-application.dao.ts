@@ -9,6 +9,7 @@ import { getOrderByRawPrisma, IOrderByRawPrisma } from '@/@v2/shared/utils/datab
 import { FormApplicationBrowseModelMapper } from '../../mappers/models/form-application/form-application-browse.mapper';
 import { Prisma } from '@prisma/client';
 import { FormApplicationReadModelMapper } from '../../mappers/models/form-application/form-application-read.mapper';
+import { FormApplicationReadPublicModelMapper } from '../../mappers/models/form-application/form-application-read-public.mapper';
 import { FormStatusEnum } from '@/@v2/forms/domain/enums/form-status.enum';
 
 @Injectable()
@@ -88,6 +89,93 @@ export class FormApplicationDAO {
     });
 
     return formApplication?.id ? FormApplicationReadModelMapper.toModel(formApplication) : null;
+  }
+
+  async readPublic(params: IFormApplicationDAO.ReadPublicParams) {
+    const formApplication = await this.prisma.formApplication.findFirst({
+      where: {
+        id: params.id,
+      },
+      include: {
+        form: {
+          include: {
+            questions_groups: {
+              include: {
+                data: {
+                  where: { deleted_at: null },
+                  take: 1,
+                },
+                questions: {
+                  where: { deleted_at: null },
+                  include: {
+                    data: {
+                      where: { deleted_at: null },
+                      take: 1,
+                    },
+                    question_details: {
+                      include: {
+                        data: {
+                          where: { deleted_at: null },
+                          take: 1,
+                        },
+                        options: {
+                          where: { deleted_at: null },
+                          include: {
+                            data: {
+                              where: { deleted_at: null },
+                              take: 1,
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        question_identifier_group: {
+          include: {
+            data: {
+              where: { deleted_at: null },
+              take: 1,
+            },
+            questions: {
+              where: { deleted_at: null },
+              include: {
+                data: {
+                  where: { deleted_at: null },
+                  take: 1,
+                },
+                question_details: {
+                  include: {
+                    data: {
+                      where: { deleted_at: null },
+                      take: 1,
+                      include: {
+                        question_identifier: true,
+                      },
+                    },
+                    options: {
+                      where: { deleted_at: null },
+                      include: {
+                        data: {
+                          where: { deleted_at: null },
+                          take: 1,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return formApplication?.id ? FormApplicationReadPublicModelMapper.toModel(formApplication) : null;
   }
 
   async browse({ limit, page, orderBy, filters }: IFormApplicationDAO.BrowseParams) {

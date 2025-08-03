@@ -8,6 +8,8 @@ import { EditFormApplicationController } from './application/form-application/ed
 import { EditFormApplicationUseCase } from './application/form-application/edit-form-application/use-cases/edit-form-application.usecase';
 import { ReadFormApplicationController } from './application/form-application/read-form-application/controllers/read-form-application.controller';
 import { ReadFormApplicationUseCase } from './application/form-application/read-form-application/use-cases/read-form-application.usecase';
+import { PublicFormApplicationController } from './application/form-application/public-form-application/controllers/public-form-application.controller';
+import { PublicFormApplicationUseCase } from './application/form-application/public-form-application/use-cases/public-form-application.usecase';
 import { AddFormController } from './application/form/add-form/controllers/add-form.controller';
 import { AddFormUseCase } from './application/form/add-form/use-cases/add-form.usecase';
 import { BrowseFormController } from './application/form/browse-form/controllers/browse-form.controller';
@@ -25,6 +27,10 @@ import { FormAggregateRepository } from './database/repositories/form/form-aggre
 import { FormRepository } from './database/repositories/form/form.repository';
 import { FormQuestionAggregateRepository } from './database/repositories/form-question/form-question-aggregate.repository';
 import { FormQuestionIdentifierGroupAggregateRepository } from './database/repositories/form-question-identifier-group/form-question-identifier-group-aggregate.repository';
+import { FormApplicationRepository } from './database/repositories/form-application/form-application.repository';
+import { FormParticipantsAnswersRepository } from './database/repositories/form-participants-answers/form-participants-answers.repository';
+import { SubmitFormApplicationUseCase } from './application/form-application/public-submit-form-application/use-cases/public-submit-form-application.usecase';
+import { PublicSubmitFormApplicationController } from './application/form-application/public-submit-form-application/controllers/public-submit-form-application.controller';
 
 @Module({
   imports: [SharedModule],
@@ -37,6 +43,8 @@ import { FormQuestionIdentifierGroupAggregateRepository } from './database/repos
     AddFormApplicationController,
     BrowseFormApplicationController,
     EditFormApplicationController,
+    PublicFormApplicationController,
+    PublicSubmitFormApplicationController,
   ],
   providers: [
     // Database
@@ -49,12 +57,16 @@ import { FormQuestionIdentifierGroupAggregateRepository } from './database/repos
     FormQuestionGroupAggregateRepository,
     FormQuestionAggregateRepository,
     FormQuestionIdentifierGroupAggregateRepository,
+    FormApplicationRepository,
+    FormParticipantsAnswersRepository,
 
     // Use Cases
     ReadFormApplicationUseCase,
     BrowseFormApplicationUseCase,
     AddFormApplicationUseCase,
     EditFormApplicationUseCase,
+    PublicFormApplicationUseCase,
+    SubmitFormApplicationUseCase,
     ReadFormUseCase,
     BrowseFormUseCase,
     AddFormUseCase,

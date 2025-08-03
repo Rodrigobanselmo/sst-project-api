@@ -13,10 +13,18 @@ export class FormParticipantsHierarchyEntity {
   updatedAt: Date;
   hierarchyId: string;
 
+  private _isNew: boolean;
+
   constructor(params: FormParticipantsHierarchyEntityConstructor) {
     this.id = params.id ?? generateCuid();
     this.createdAt = params.createdAt ?? new Date();
     this.updatedAt = params.updatedAt ?? new Date();
     this.hierarchyId = params.hierarchyId;
+
+    this._isNew = !params.id;
+  }
+
+  get isNew() {
+    return this._isNew;
   }
 }

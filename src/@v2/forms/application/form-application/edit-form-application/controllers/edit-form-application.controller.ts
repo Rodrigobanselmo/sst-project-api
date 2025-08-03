@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Param, Patch, Put, UseGuards } from '@nestjs/common';
 
 import { FormRoutes } from '@/@v2/forms/constants/routes';
 import { JwtAuthGuard } from '@/@v2/shared/guards/jwt-auth.guard';
@@ -13,7 +13,7 @@ import { EditFormApplicationPayload } from './edit-form-application.payload';
 export class EditFormApplicationController {
   constructor(private readonly editFormApplicationUseCase: EditFormApplicationUseCase) {}
 
-  @Put()
+  @Patch()
   @Permissions({
     code: PermissionEnum.FORM,
     isContract: true,
@@ -28,8 +28,8 @@ export class EditFormApplicationController {
       status: body.status,
       description: body.description,
       formId: body.formId,
-      hierarchyIds: body.hierarchyIds || [],
-      workspaceIds: body.workspaceIds || [],
+      hierarchyIds: body.hierarchyIds,
+      workspaceIds: body.workspaceIds,
       identifier: body.identifier,
     });
   }

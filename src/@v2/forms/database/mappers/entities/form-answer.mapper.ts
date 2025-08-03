@@ -10,6 +10,8 @@ export class FormAnswerEntityMapper {
       value: prisma.value || undefined,
       createdAt: prisma.created_at,
       updatedAt: prisma.updated_at,
+      questionId: prisma.question_id,
+      optionId: prisma.option_id || null,
     });
   }
 

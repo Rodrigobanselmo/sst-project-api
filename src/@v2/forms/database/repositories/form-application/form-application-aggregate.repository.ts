@@ -77,57 +77,63 @@ export class FormApplicationAggregateRepository {
   }
 
   async update(params: IFormApplicationAggregateRepository.UpdateParams): IFormApplicationAggregateRepository.UpdateReturn {
-    const listCreateHierarchyParticipants = params.participantsHierarchies.filter((participant) => !participant.id);
-    const listCreateWorkspaceParticipants = params.participantsWorkspaces.filter((participant) => !participant.id);
+    const formApplication = await this.prisma.$transaction(async (tx) => {
+      const listCreateHierarchyParticipants = params.participantsHierarchies.filter((participant) => participant.isNew);
+      const listCreateWorkspaceParticipants = params.participantsWorkspaces.filter((participant) => participant.isNew);
 
-    const formApplication = await this.prisma.formApplication.update({
-      where: {
-        id: params.formApplication.id,
-        company_id: params.formApplication.companyId,
-      },
-      data: {
-        name: params.formApplication.name,
-        description: params.formApplication.description,
-        ended_at: params.formApplication.endedAt,
-        started_at: params.formApplication.startAt,
-        status: params.formApplication.status,
-        form_id: params.form.id,
-        participants: {
-          update: {
-            hierarchies: {
-              deleteMany: {
-                hierarchy_id: {
-                  notIn: params.participantsHierarchies.map((patient) => patient.hierarchyId),
+      const formApplication = await tx.formApplication.update({
+        where: {
+          id: params.formApplication.id,
+          company_id: params.formApplication.companyId,
+        },
+        data: {
+          name: params.formApplication.name,
+          description: params.formApplication.description,
+          ended_at: params.formApplication.endedAt,
+          started_at: params.formApplication.startAt,
+          status: params.formApplication.status,
+          form_id: params.form.id,
+          participants: {
+            update: {
+              hierarchies: {
+                deleteMany: {
+                  hierarchy_id: {
+                    notIn: params.participantsHierarchies.map((patient) => patient.hierarchyId),
+                  },
                 },
+                createMany: listCreateHierarchyParticipants.length
+                  ? {
+                      data: listCreateHierarchyParticipants.map((patient) => ({
+                        hierarchy_id: patient.hierarchyId,
+                      })),
+                    }
+                  : undefined,
               },
-              createMany: listCreateHierarchyParticipants.length
-                ? {
-                    data: listCreateHierarchyParticipants.map((patient) => ({
-                      hierarchy_id: patient.hierarchyId,
-                    })),
-                  }
-                : undefined,
-            },
-            workspaces: {
-              deleteMany: {
-                workspace_id: {
-                  notIn: params.participantsWorkspaces.map((workspace) => workspace.workspaceId),
+              workspaces: {
+                deleteMany: {
+                  workspace_id: {
+                    notIn: params.participantsWorkspaces.map((workspace) => workspace.workspaceId),
+                  },
                 },
+                createMany: listCreateWorkspaceParticipants.length
+                  ? {
+                      data: listCreateWorkspaceParticipants.map((workspace) => ({
+                        workspace_id: workspace.workspaceId,
+                      })),
+                    }
+                  : undefined,
               },
-              createMany: listCreateWorkspaceParticipants.length
-                ? {
-                    data: listCreateWorkspaceParticipants.map((workspace) => ({
-                      workspace_id: workspace.workspaceId,
-                    })),
-                  }
-                : undefined,
             },
           },
         },
-      },
-      select: {
-        id: true,
-      },
+        select: {
+          id: true,
+        },
+      });
+
+      await this.formQuestionIdentifierGroupAggregateRepository.upsertTx(params.identifier, tx);
+
+      return formApplication;
     });
 
     return !!formApplication?.id;
