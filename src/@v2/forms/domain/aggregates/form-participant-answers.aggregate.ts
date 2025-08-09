@@ -1,15 +1,15 @@
 import { FormAnswerEntity } from '../entities/form-answer.entity';
 import { FormApplicationEntity } from '../entities/form-application.entity';
-import { FormParticipantsEntity } from '../entities/form-participants.entity';
+import { FormParticipantsAggregate } from './form-participants.aggregate';
 
 export type IFormParticipantsAnswersAggregate = {
-  participant: FormParticipantsEntity;
+  participant: FormParticipantsAggregate;
   application: FormApplicationEntity;
   answers: FormAnswerEntity[];
 };
 
 export class FormParticipantsAnswersAggregate {
-  participant: FormParticipantsEntity;
+  participant: FormParticipantsAggregate;
   application: FormApplicationEntity;
   answers: FormAnswerEntity[];
 

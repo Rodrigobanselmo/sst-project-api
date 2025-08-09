@@ -24,5 +24,9 @@ export class FormAnswerEntity {
     this.optionId = params.optionId || null;
     this.questionId = params.questionId;
     this.value = params.value;
+
+    if (!this.optionId && !this.value) {
+      throw new Error('Nenhum valor foi informado para a resposta');
+    }
   }
 }

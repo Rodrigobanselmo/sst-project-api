@@ -31,6 +31,8 @@ import { FormApplicationRepository } from './database/repositories/form-applicat
 import { FormParticipantsAnswersRepository } from './database/repositories/form-participants-answers/form-participants-answers.repository';
 import { SubmitFormApplicationUseCase } from './application/form-application/public-submit-form-application/use-cases/public-submit-form-application.usecase';
 import { PublicSubmitFormApplicationController } from './application/form-application/public-submit-form-application/controllers/public-submit-form-application.controller';
+import { FormParticipantsAnswersAggregateRepository } from './database/repositories/form-participants-answers/form-participants-answers-aggregate.repository';
+import { FormParticipantsAggregateRepository } from './database/repositories/form-participants/form-participants-aggregate.repository';
 
 @Module({
   imports: [SharedModule],
@@ -59,7 +61,8 @@ import { PublicSubmitFormApplicationController } from './application/form-applic
     FormQuestionIdentifierGroupAggregateRepository,
     FormApplicationRepository,
     FormParticipantsAnswersRepository,
-
+    FormParticipantsAnswersAggregateRepository,
+    FormParticipantsAggregateRepository,
     // Use Cases
     ReadFormApplicationUseCase,
     BrowseFormApplicationUseCase,

@@ -2,12 +2,13 @@ import { FormApplicationAggregateRepository } from '@/@v2/forms/database/reposit
 import { FormQuestionIdentifierEntityRepository } from '@/@v2/forms/database/repositories/form-question-identifier/form-question-identifier.repository';
 import { FormRepository } from '@/@v2/forms/database/repositories/form/form.repository';
 import { FormApplicationAggregate } from '@/@v2/forms/domain/aggregates/form-application.aggregate';
+import { FormParticipantsAggregate } from '@/@v2/forms/domain/aggregates/form-participants.aggregate';
 import { FormQuestionIdentifierGroupAggregate } from '@/@v2/forms/domain/aggregates/form-question-identifier-group.aggregate';
 import { FormQuestionAggregate } from '@/@v2/forms/domain/aggregates/form-question.aggregate';
 import { FormApplicationEntity } from '@/@v2/forms/domain/entities/form-application.entity';
+import { FormParticipantsEntity } from '@/@v2/forms/domain/entities/form-participants.entity';
 import { FormParticipantsHierarchyEntity } from '@/@v2/forms/domain/entities/form-participants-hierarchy.entity';
 import { FormParticipantsWorkspaceEntity } from '@/@v2/forms/domain/entities/form-participants-workspace.entity';
-import { FormQuestionDetailsEntity } from '@/@v2/forms/domain/entities/form-question-details.entity';
 import { FormQuestionGroupEntity } from '@/@v2/forms/domain/entities/form-question-group.entity';
 import { FormQuestionEntity } from '@/@v2/forms/domain/entities/form-question.entity';
 import { FormQuestionDetailsFactory } from '@/@v2/forms/domain/factories/form-question-details.factory';
@@ -104,11 +105,18 @@ export class AddFormApplicationUseCase {
       formApplication,
     });
 
+    const formParticipants = new FormParticipantsEntity({});
+
+    const participantsAggregate = new FormParticipantsAggregate({
+      formParticipants,
+      participantsHierarchies,
+      participantsWorkspaces,
+    });
+
     const formApplicationAggregate = new FormApplicationAggregate({
       form,
       formApplication,
-      participantsHierarchies,
-      participantsWorkspaces,
+      participants: participantsAggregate,
       identifier: questionIdentifierGroup,
     });
 
