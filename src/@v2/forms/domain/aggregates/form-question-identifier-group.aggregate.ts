@@ -1,18 +1,21 @@
-import { removeDuplicate } from '@/@v2/shared/utils/helpers/remove-duplicate';
-import { FormQuestionIdentifierGroupEntity } from '../entities/form-question-identifier-group.entity';
-import { FormQuestionIdentifierAggregate } from './form-question-identifier.aggregate';
+import { FormApplicationEntity } from '../entities/form-application.entity';
+import { FormQuestionGroupEntity } from '../entities/form-question-group.entity';
+import { FormQuestionAggregate } from './form-question.aggregate';
 
 export type IFormQuestionIdentifierGroupAggregate = {
-  group: FormQuestionIdentifierGroupEntity;
-  questionIdentifiers: FormQuestionIdentifierAggregate[];
+  questionGroup: FormQuestionGroupEntity;
+  questions: FormQuestionAggregate[];
+  formApplication: FormApplicationEntity;
 };
 
 export class FormQuestionIdentifierGroupAggregate {
-  group: FormQuestionIdentifierGroupEntity;
-  questionIdentifiers: FormQuestionIdentifierAggregate[];
+  questionGroup: FormQuestionGroupEntity;
+  questions: FormQuestionAggregate[];
+  formApplication: FormApplicationEntity;
 
   constructor(params: IFormQuestionIdentifierGroupAggregate) {
-    this.group = params.group;
-    this.questionIdentifiers = params.questionIdentifiers;
+    this.questionGroup = params.questionGroup;
+    this.questions = params.questions;
+    this.formApplication = params.formApplication;
   }
 }

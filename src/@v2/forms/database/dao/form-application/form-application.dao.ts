@@ -9,6 +9,7 @@ import { getOrderByRawPrisma, IOrderByRawPrisma } from '@/@v2/shared/utils/datab
 import { FormApplicationBrowseModelMapper } from '../../mappers/models/form-application/form-application-browse.mapper';
 import { Prisma } from '@prisma/client';
 import { FormApplicationReadModelMapper } from '../../mappers/models/form-application/form-application-read.mapper';
+import { FormApplicationReadPublicModelMapper } from '../../mappers/models/form-application/form-application-read-public.mapper';
 import { FormStatusEnum } from '@/@v2/forms/domain/enums/form-status.enum';
 
 @Injectable()
@@ -21,9 +22,160 @@ export class FormApplicationDAO {
         id: params.id,
         company_id: params.companyId,
       },
+      include: {
+        form: true,
+        participants: {
+          include: {
+            hierarchies: {
+              include: {
+                hierarchy: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
+              },
+            },
+            workspaces: {
+              include: {
+                workspaces: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        question_identifier_group: {
+          include: {
+            data: {
+              where: { deleted_at: null },
+              take: 1,
+            },
+            questions: {
+              where: { deleted_at: null },
+              include: {
+                data: {
+                  where: { deleted_at: null },
+                  take: 1,
+                },
+                question_details: {
+                  include: {
+                    data: {
+                      where: { deleted_at: null },
+                      take: 1,
+                      include: {
+                        question_identifier: true,
+                      },
+                    },
+                    options: {
+                      where: { deleted_at: null },
+                      include: {
+                        data: {
+                          where: { deleted_at: null },
+                          take: 1,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     });
 
     return formApplication?.id ? FormApplicationReadModelMapper.toModel(formApplication) : null;
+  }
+
+  async readPublic(params: IFormApplicationDAO.ReadPublicParams) {
+    const formApplication = await this.prisma.formApplication.findFirst({
+      where: {
+        id: params.id,
+      },
+      include: {
+        form: {
+          include: {
+            questions_groups: {
+              include: {
+                data: {
+                  where: { deleted_at: null },
+                  take: 1,
+                },
+                questions: {
+                  where: { deleted_at: null },
+                  include: {
+                    data: {
+                      where: { deleted_at: null },
+                      take: 1,
+                    },
+                    question_details: {
+                      include: {
+                        data: {
+                          where: { deleted_at: null },
+                          take: 1,
+                        },
+                        options: {
+                          where: { deleted_at: null },
+                          include: {
+                            data: {
+                              where: { deleted_at: null },
+                              take: 1,
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        question_identifier_group: {
+          include: {
+            data: {
+              where: { deleted_at: null },
+              take: 1,
+            },
+            questions: {
+              where: { deleted_at: null },
+              include: {
+                data: {
+                  where: { deleted_at: null },
+                  take: 1,
+                },
+                question_details: {
+                  include: {
+                    data: {
+                      where: { deleted_at: null },
+                      take: 1,
+                      include: {
+                        question_identifier: true,
+                      },
+                    },
+                    options: {
+                      where: { deleted_at: null },
+                      include: {
+                        data: {
+                          where: { deleted_at: null },
+                          take: 1,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return formApplication?.id ? FormApplicationReadPublicModelMapper.toModel(formApplication) : null;
   }
 
   async browse({ limit, page, orderBy, filters }: IFormApplicationDAO.BrowseParams) {
@@ -46,7 +198,7 @@ export class FormApplicationDAO {
         ,form_ap."started_at" as start_date
         ,form_ap."created_at" as created_at
         ,form_ap."updated_at" as updated_at
-        ,form."id"::integer as form_id
+        ,form."id" as form_id
         ,form."name" as form_name
         ,form."type" as form_type
         ,form."system" as form_system

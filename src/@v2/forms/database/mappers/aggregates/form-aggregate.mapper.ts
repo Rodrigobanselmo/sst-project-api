@@ -1,0 +1,82 @@
+import { FormAggregate } from '@/@v2/forms/domain/aggregates/form.aggregate';
+import { FormQuestionDetailsEntity } from '@/@v2/forms/domain/entities/form-question-details.entity';
+import { FormQuestionOptionEntity } from '@/@v2/forms/domain/entities/form-question-option.entity';
+import { FormQuestionTypeEnum } from '@/@v2/forms/domain/enums/form-question-type.enum';
+import { FormQuestionDetails, FormQuestionDetailsData, FormQuestionOption, FormQuestionOptionData, FormQuestionData } from '@prisma/client';
+import { FormQuestionGroupEntityMapper, FormQuestionGroupEntityMapperConstructor } from '../entities/form-question-group.mapper';
+import { FormQuestionEntityMapper, FormQuestionEntityMapperConstructor } from '../entities/form-question.mapper';
+import { FormEntityMapper, FormEntityMapperConstructor } from '../entities/form.mapper';
+import { FormQuestionGroupAggregate } from '@/@v2/forms/domain/aggregates/form-question-group.aggregate';
+import { FormQuestionAggregate } from '@/@v2/forms/domain/aggregates/form-question.aggregate';
+
+export type FormAggregateMapperConstructor = FormEntityMapperConstructor & {
+  questions_groups: (FormQuestionGroupEntityMapperConstructor & {
+    questions: (FormQuestionEntityMapperConstructor & {
+      question_details: FormQuestionDetails & {
+        data: FormQuestionDetailsData[];
+        options: (FormQuestionOption & {
+          data: FormQuestionOptionData[];
+        })[];
+      };
+    })[];
+  })[];
+};
+
+export class FormAggregateMapper {
+  static toAggregate(prisma: FormAggregateMapperConstructor): FormAggregate {
+    const formEntity = FormEntityMapper.toEntity(prisma);
+
+    return new FormAggregate({
+      form: formEntity,
+      questionGroups: prisma.questions_groups.map((group) => {
+        const questionGroupEntity = FormQuestionGroupEntityMapper.toEntity(group);
+        const questions = group.questions.map((question) => {
+          const questionEntity = FormQuestionEntityMapper.toEntity(question);
+          const questionDetails = question.question_details.data[0]!; // Get the first details data entry
+
+          // Create FormQuestionDetailsEntity
+          const detailsEntity = new FormQuestionDetailsEntity({
+            id: question.question_details.id,
+            text: questionDetails.text,
+            type: FormQuestionTypeEnum[questionDetails.type],
+            acceptOther: questionDetails.accept_other,
+            system: question.question_details.system,
+            companyId: question.question_details.company_id,
+            createdAt: question.question_details.created_at,
+            deletedAt: question.question_details.deleted_at,
+          });
+
+          // Create FormQuestionOptionEntity array
+          const optionsEntities = question.question_details.options.map((option) => {
+            const optionData = option.data[0];
+            return new FormQuestionOptionEntity({
+              id: option.id,
+              text: optionData?.text || '',
+              order: optionData?.order || 0,
+              value: optionData?.value || 0,
+              createdAt: option.created_at,
+              deletedAt: option.deleted_at,
+            });
+          });
+
+          return new FormQuestionAggregate({
+            question: questionEntity,
+            details: detailsEntity,
+            options: optionsEntities,
+            identifier: null,
+          });
+        });
+
+        return new FormQuestionGroupAggregate({
+          questionGroup: questionGroupEntity,
+          form: formEntity,
+          questions,
+        });
+      }),
+    });
+  }
+
+  static toArray(prisma: FormAggregateMapperConstructor[]) {
+    return prisma.map((p: FormAggregateMapperConstructor) => FormAggregateMapper.toAggregate(p));
+  }
+}

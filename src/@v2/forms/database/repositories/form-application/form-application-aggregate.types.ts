@@ -2,10 +2,10 @@ import { FormApplicationAggregate } from '@/@v2/forms/domain/aggregates/form-app
 
 export namespace IFormApplicationAggregateRepository {
   export type CreateParams = FormApplicationAggregate;
-  export type CreateReturn = Promise<FormApplicationAggregate | null>;
+  export type CreateReturn = Promise<boolean>;
 
   export type UpdateParams = FormApplicationAggregate;
-  export type UpdateReturn = Promise<FormApplicationAggregate | null>;
+  export type UpdateReturn = Promise<boolean>;
 
   export type FindParams = { id: string; companyId: string };
   export type FindReturn = Promise<FormApplicationAggregate | null>;

@@ -9,9 +9,14 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class NodeMailerAdapter implements SendMailAdapter {
+  private readonly whitelist = ['rodrigobanselmo@gmail.com', 'rodrigoanselmo.dev@gmail.com'];
+
   async sendMail({ to, type, variables, attachments }: SendMailAdapter.SendMailData): Promise<any> {
     try {
-      if (isDevelopment()) return;
+      const emailArray = Array.isArray(to) ? to : [to];
+      const isWhitelisted = emailArray.every((email) => this.whitelist.includes(email));
+
+      if (isDevelopment() && !isWhitelisted) return;
       if (!to) return;
 
       const { path, subject } = EmailTemplate[type];

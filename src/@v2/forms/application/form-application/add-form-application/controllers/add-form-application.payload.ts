@@ -1,19 +1,54 @@
+import { FormIdentifierTypeEnum } from '@/@v2/forms/domain/enums/form-identifier-type.enum';
 import { Type } from 'class-transformer';
-import { ArrayMinSize, IsArray, IsBoolean, IsInt, IsNotEmpty, IsOptional, IsString, Min, ValidateNested } from 'class-validator';
+import { ArrayMinSize, IsArray, IsBoolean, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
+
+class FormQuestionOptionDto {
+  @IsOptional()
+  @IsString()
+  id?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  text!: string;
+
+  @IsOptional()
+  @IsInt()
+  value?: number;
+}
+
+class FormQuestionDetailsDto {
+  @IsString()
+  @IsNotEmpty()
+  text!: string;
+
+  @IsEnum(FormIdentifierTypeEnum)
+  @IsNotEmpty()
+  identifierType!: FormIdentifierTypeEnum;
+
+  @IsOptional()
+  @IsBoolean()
+  acceptOther?: boolean;
+}
 
 class QuestionDto {
+  @IsOptional()
+  @IsString()
+  id?: string;
+
   @IsBoolean()
   @IsNotEmpty()
   required!: boolean;
 
-  @IsInt()
-  @Min(1)
+  @ValidateNested()
+  @Type(() => FormQuestionDetailsDto)
   @IsNotEmpty()
-  order!: number;
+  details!: FormQuestionDetailsDto;
 
-  @IsInt()
-  @IsNotEmpty()
-  questionDataId!: number;
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => FormQuestionOptionDto)
+  options?: FormQuestionOptionDto[];
 }
 
 class IdentifierDto {
@@ -42,10 +77,9 @@ export class AddFormApplicationPayload {
   @IsString()
   description?: string;
 
-  @IsInt()
-  @Min(1)
+  @IsString()
   @IsNotEmpty()
-  formId!: number;
+  formId!: string;
 
   @IsArray()
   @IsOptional()

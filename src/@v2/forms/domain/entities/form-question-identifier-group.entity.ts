@@ -1,5 +1,7 @@
+import { generateCuid } from '@/@v2/shared/utils/helpers/generate-cuid';
+
 export type FormQuestionIdentifierGroupEntityConstructor = {
-  id?: number;
+  id?: string;
   name: string;
   description?: string;
   createdAt?: Date;
@@ -7,14 +9,14 @@ export type FormQuestionIdentifierGroupEntityConstructor = {
 };
 
 export class FormQuestionIdentifierGroupEntity {
-  id: number;
+  id: string;
   name: string;
   description?: string;
   createdAt: Date;
   updatedAt: Date;
 
   constructor(params: FormQuestionIdentifierGroupEntityConstructor) {
-    this.id = params.id ?? 0;
+    this.id = params.id ?? generateCuid();
     this.name = params.name;
     this.description = params.description;
     this.createdAt = params.createdAt ?? new Date();

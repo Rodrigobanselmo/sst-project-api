@@ -2,6 +2,7 @@ import { updateField } from '@/@v2/shared/domain/helpers/update-field.helper';
 import { FormStatusEnum } from '../enums/form-status.enum';
 import { DomainResponse } from '@/@v2/shared/domain/types/shared/domain-response';
 import { errorCantChangeToPendingForm } from '../errors/domain.errors';
+import { generateCuid } from '@/@v2/shared/utils/helpers/generate-cuid';
 
 type IUpdatePrams = {
   name?: string;
@@ -33,7 +34,7 @@ export class FormApplicationEntity {
   private _status: FormStatusEnum;
 
   constructor(params: FormApplicationEntityConstructor) {
-    this.id = params.id ?? '-';
+    this.id = params.id || generateCuid();
     this.name = params.name;
     this.description = params.description || null;
     this._status = params.status ?? FormStatusEnum.PENDING;
@@ -85,6 +86,14 @@ export class FormApplicationEntity {
   }
 
   canBeAnswered() {
+    return this.isPublic || this.isTesting;
+  }
+
+  get isPublic() {
     return this.status === FormStatusEnum.PROGRESS;
+  }
+
+  get isTesting() {
+    return this.status === FormStatusEnum.TESTING;
   }
 }
