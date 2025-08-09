@@ -1,12 +1,10 @@
 import { FormApplicationRepository } from '@/@v2/forms/database/repositories/form-application/form-application.repository';
 import { FormParticipantsAnswersAggregateRepository } from '@/@v2/forms/database/repositories/form-participants-answers/form-participants-answers-aggregate.repository';
+import { FormParticipantsAggregateRepository } from '@/@v2/forms/database/repositories/form-participants/form-participants-aggregate.repository';
 import { FormParticipantsAnswersAggregate } from '@/@v2/forms/domain/aggregates/form-participant-answers.aggregate';
-import { FormParticipantsAggregate } from '@/@v2/forms/domain/aggregates/form-participants.aggregate';
 import { FormAnswerEntity } from '@/@v2/forms/domain/entities/form-answer.entity';
-import { FormParticipantsEntity } from '@/@v2/forms/domain/entities/form-participants.entity';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { ISubmitFormApplicationUseCase } from './public-form-application.types';
-import { FormParticipantsAggregateRepository } from '@/@v2/forms/database/repositories/form-participants/form-participants-aggregate.repository';
 
 @Injectable()
 export class SubmitFormApplicationUseCase {

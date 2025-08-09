@@ -1,6 +1,6 @@
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, StatusEnum } from '@prisma/client';
 import { FormParticipantsAnswersAggregateMapper } from '../../mappers/aggregates/form-participant-answers-aggregate.mapper';
 import { IFormParticipantsAnswersAggregateRepository } from './form-participants-answers-aggregate.repository.types';
 
@@ -32,6 +32,7 @@ export class FormParticipantsAnswersAggregateRepository {
         data: {
           form_application_id: params.application.id,
           employee_id: undefined,
+          status: StatusEnum[params.status],
         },
       });
 

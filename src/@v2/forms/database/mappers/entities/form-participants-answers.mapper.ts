@@ -1,4 +1,5 @@
 import { FormParticipantsAnswersEntity } from '@/@v2/forms/domain/entities/form-participants-answer.entity';
+import { FormParticipantsAnswerStatusEnum } from '@/@v2/forms/domain/enums/form-participants-answer-status.enum';
 import { FormParticipantsAnswers as PrismaFormParticipantsAnswers } from '@prisma/client';
 
 export type FormParticipantsAnswersEntityMapperConstructor = PrismaFormParticipantsAnswers;
@@ -10,6 +11,7 @@ export class FormParticipantsAnswersEntityMapper {
       employeeId: prisma.employee_id || undefined,
       createdAt: prisma.created_at,
       updatedAt: prisma.updated_at,
+      status: FormParticipantsAnswerStatusEnum[prisma.status],
     });
   }
 

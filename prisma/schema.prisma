@@ -1328,9 +1328,10 @@ model FormQuestionGroupData {
 }
 
 model FormParticipantsAnswers {
-  id         String   @id @default(cuid())
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  id         String     @id @default(cuid())
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
+  status     StatusEnum @default(VALID)
 
   form_application_id String
   form_application    FormApplication @relation(fields: [form_application_id], references: [id])
