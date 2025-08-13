@@ -2,6 +2,7 @@ import { FormParticipantsAnswersAggregate } from '@/@v2/forms/domain/aggregates/
 import {
   FormParticipantsAnswers as PrismaFormParticipantsAnswers,
   FormAnswer as PrismaFormAnswer,
+  FormAnswerOption as PrismaFormAnswerOption,
   FormApplication as PrismaFormApplication,
   FormParticipants as PrismaFormParticipants,
   FormParticipantsHierarchy as PrismaFormParticipantsHierarchy,
@@ -20,7 +21,9 @@ export type FormParticipantsAnswersAggregateMapperConstructor = PrismaFormPartic
         })
       | null;
   };
-  answers: PrismaFormAnswer[];
+  answers: (PrismaFormAnswer & {
+    options: PrismaFormAnswerOption[];
+  })[];
 };
 
 export class FormParticipantsAnswersAggregateMapper {

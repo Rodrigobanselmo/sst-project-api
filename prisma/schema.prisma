@@ -1376,14 +1376,27 @@ model FormAnswer {
   updated_at DateTime @updatedAt
   value      String?
 
-  option_id String?
-  option    FormQuestionOption? @relation(fields: [option_id], references: [id], onDelete: Cascade)
-
   question_id String
   question    FormQuestion @relation(fields: [question_id], references: [id], onDelete: Cascade)
 
   participants_answers_id String
   participants_answers    FormParticipantsAnswers @relation(fields: [participants_answers_id], references: [id])
+
+  options FormAnswerOption[]
+}
+
+model FormAnswerOption {
+  id         String   @id @default(cuid())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  answer_id String
+  answer    FormAnswer @relation(fields: [answer_id], references: [id], onDelete: Cascade)
+
+  option_id String
+  option    FormQuestionOption @relation(fields: [option_id], references: [id], onDelete: Cascade)
+
+  @@unique([answer_id, option_id])
 }
 
 model FormQuestionDetails {
@@ -1432,7 +1445,7 @@ model FormQuestionOption {
   question    FormQuestionDetails @relation(fields: [question_id], references: [id], onDelete: Cascade)
 
   data    FormQuestionOptionData[]
-  answers FormAnswer[]
+  answers FormAnswerOption[]
 }
 
 model FormQuestionOptionData {

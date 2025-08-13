@@ -8,4 +8,7 @@ export const FormRoutes = {
     PATH_ID: 'v2/companies/:companyId/forms/applications/:applicationId',
     PATH_PUBLIC: 'v2/forms/applications/:applicationId/public',
   },
+  FORM_QUESTIONS_ANSWERS: {
+    PATH: 'v2/companies/:companyId/forms/questions-answers/',
+  },
 } as const;

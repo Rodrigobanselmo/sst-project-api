@@ -5,7 +5,7 @@ export namespace ISubmitFormApplicationUseCase {
     answers: {
       questionId: string;
       value?: string;
-      optionId?: string;
+      optionIds?: string[];
     }[];
   };
 }

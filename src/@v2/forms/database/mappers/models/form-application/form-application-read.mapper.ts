@@ -18,6 +18,8 @@ import { FormIdentifierTypeEnum } from '@/@v2/forms/domain/enums/form-identifier
 
 export type IFormApplicationReadModelMapper = PrismaFormApplication & {
   form: PrismaForm;
+  totalParticipants: number;
+  totalAnswers: number;
   participants:
     | (PrismaFormParticipants & {
         hierarchies: (PrismaFormParticipantsHierarchy & { hierarchy: { id: string; name: string } })[];
@@ -79,6 +81,8 @@ export class FormApplicationReadModelMapper {
       isShareableLink: prisma.form.shareable_link,
       isAnonymous: prisma.form.anonymous,
       form: prisma.form,
+      totalParticipants: prisma.totalParticipants,
+      totalAnswers: prisma.totalAnswers,
       participants: prisma.participants
         ? {
             hierarchies: prisma.participants.hierarchies.map((h) => ({

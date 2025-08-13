@@ -40,7 +40,7 @@ export class SubmitFormApplicationUseCase {
             new FormAnswerEntity({
               questionId: answer.questionId,
               value: answer.value,
-              optionId: answer.optionId,
+              optionIds: answer.optionIds,
             }),
         );
       } catch (error) {
