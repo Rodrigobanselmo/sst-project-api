@@ -5,7 +5,7 @@ export type FormAnswerEntityConstructor = {
   questionId: string;
   createdAt?: Date;
   updatedAt?: Date;
-  optionId?: string | null;
+  optionIds?: string[];
   value?: string;
 };
 
@@ -13,7 +13,7 @@ export class FormAnswerEntity {
   id: string;
   createdAt: Date;
   updatedAt: Date;
-  optionId: string | null;
+  optionIds: string[];
   questionId: string;
   value?: string;
 
@@ -21,11 +21,11 @@ export class FormAnswerEntity {
     this.id = params.id ?? generateCuid();
     this.createdAt = params.createdAt ?? new Date();
     this.updatedAt = params.updatedAt ?? new Date();
-    this.optionId = params.optionId || null;
+    this.optionIds = params.optionIds || [];
     this.questionId = params.questionId;
     this.value = params.value;
 
-    if (!this.optionId && !this.value) {
+    if (this.optionIds.length === 0 && !this.value) {
       throw new Error('Nenhum valor foi informado para a resposta');
     }
   }

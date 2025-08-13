@@ -38,8 +38,8 @@ export class PublicFormApplicationUseCase {
 
     return {
       data: formApplicationData,
-      isPublic: formApplication.isPublic(),
-      isTesting: formApplication.isTesting(),
+      isPublic: formApplication.isPublic,
+      isTesting: formApplication.isTesting,
     };
   }
 }

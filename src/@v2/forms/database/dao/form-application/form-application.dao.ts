@@ -88,7 +88,37 @@ export class FormApplicationDAO {
       },
     });
 
-    return formApplication?.id ? FormApplicationReadModelMapper.toModel(formApplication) : null;
+    if (!formApplication?.id) return null;
+
+    const totalParticipantsPromise = this.prisma.employee.count({
+      where: {
+        companyId: params.companyId,
+        hierarchy: {
+          workspaces: {
+            some: {
+              id: {
+                in: formApplication.participants?.workspaces.map((workspace) => workspace.workspace_id) || [],
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const totalAnswersPromise = this.prisma.formParticipantsAnswers.count({
+      where: {
+        form_application_id: params.id,
+        status: 'VALID',
+      },
+    });
+
+    const [totalParticipants, totalAnswers] = await Promise.all([totalParticipantsPromise, totalAnswersPromise]);
+
+    return FormApplicationReadModelMapper.toModel({
+      ...formApplication,
+      totalParticipants,
+      totalAnswers,
+    });
   }
 
   async readPublic(params: IFormApplicationDAO.ReadPublicParams) {
@@ -209,7 +239,7 @@ export class FormApplicationDAO {
       LEFT JOIN 
         "Form" form ON form.id = form_ap."form_id"
       LEFT JOIN 
-        "FormParticipantsAnswers" form_part_ans ON form_part_ans."form_application_id" = form_ap."id"
+        "FormParticipantsAnswers" form_part_ans ON form_part_ans."form_application_id" = form_ap."id" AND form_part_ans.status = 'VALID'
       LEFT JOIN 
         "FormParticipants" form_part ON form_part."form_application_id" = form_ap."id"
       LEFT JOIN 

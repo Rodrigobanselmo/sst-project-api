@@ -1,7 +1,9 @@
 import { FormAnswerEntity } from '@/@v2/forms/domain/entities/form-answer.entity';
-import { FormAnswer as PrismaFormAnswer } from '@prisma/client';
+import { FormAnswer as PrismaFormAnswer, FormAnswerOption as PrismaFormAnswerOption } from '@prisma/client';
 
-export type FormAnswerEntityMapperConstructor = PrismaFormAnswer;
+export type FormAnswerEntityMapperConstructor = PrismaFormAnswer & {
+  options: PrismaFormAnswerOption[];
+};
 
 export class FormAnswerEntityMapper {
   static toEntity(prisma: FormAnswerEntityMapperConstructor): FormAnswerEntity {
@@ -11,7 +13,7 @@ export class FormAnswerEntityMapper {
       createdAt: prisma.created_at,
       updatedAt: prisma.updated_at,
       questionId: prisma.question_id,
-      optionId: prisma.option_id || null,
+      optionIds: prisma.options.map((option) => option.option_id),
     });
   }
 

@@ -14,12 +14,15 @@ import { AddFormController } from './application/form/add-form/controllers/add-f
 import { AddFormUseCase } from './application/form/add-form/use-cases/add-form.usecase';
 import { BrowseFormController } from './application/form/browse-form/controllers/browse-form.controller';
 import { BrowseFormUseCase } from './application/form/browse-form/use-cases/browse-form.usecase';
+import { BrowseFormQuestionsAnswersController } from './application/form-questions-answers/browse-form-questions-answers/controllers/browse-form-questions-answers.controller';
+import { BrowseFormQuestionsAnswersUseCase } from './application/form-questions-answers/browse-form-questions-answers/use-cases/browse-form-questions-answers.usecase';
 import { EditFormController } from './application/form/edit-form/controllers/edit-form.controller';
 import { EditFormUseCase } from './application/form/edit-form/use-cases/edit-form.usecase';
 import { ReadFormController } from './application/form/read-form/controllers/read-form.controller';
 import { ReadFormUseCase } from './application/form/read-form/use-cases/read-form.usecase';
 import { FormApplicationDAO } from './database/dao/form-application/form-application.dao';
 import { FormDAO } from './database/dao/form/form.dao';
+import { FormQuestionsAnswersDAO } from './database/dao/form-questions-answers/form-questions-answers.dao';
 import { FormApplicationAggregateRepository } from './database/repositories/form-application/form-application-aggregate.repository';
 import { FormQuestionGroupAggregateRepository } from './database/repositories/form-question-group/form-question-group-aggregate.repository';
 import { FormQuestionIdentifierEntityRepository } from './database/repositories/form-question-identifier/form-question-identifier.repository';
@@ -39,6 +42,7 @@ import { FormParticipantsAggregateRepository } from './database/repositories/for
   controllers: [
     ReadFormController,
     BrowseFormController,
+    BrowseFormQuestionsAnswersController,
     AddFormController,
     EditFormController,
     ReadFormApplicationController,
@@ -52,6 +56,7 @@ import { FormParticipantsAggregateRepository } from './database/repositories/for
     // Database
     FormDAO,
     FormApplicationDAO,
+    FormQuestionsAnswersDAO,
     FormRepository,
     FormAggregateRepository,
     FormQuestionIdentifierEntityRepository,
@@ -72,6 +77,7 @@ import { FormParticipantsAggregateRepository } from './database/repositories/for
     SubmitFormApplicationUseCase,
     ReadFormUseCase,
     BrowseFormUseCase,
+    BrowseFormQuestionsAnswersUseCase,
     AddFormUseCase,
     EditFormUseCase,
   ],

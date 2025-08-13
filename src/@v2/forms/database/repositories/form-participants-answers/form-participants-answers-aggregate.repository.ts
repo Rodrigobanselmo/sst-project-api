@@ -1,6 +1,7 @@
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { Prisma, StatusEnum } from '@prisma/client';
+import { asyncBatch } from '@/@v2/shared/utils/helpers/async-batch';
 import { FormParticipantsAnswersAggregateMapper } from '../../mappers/aggregates/form-participant-answers-aggregate.mapper';
 import { IFormParticipantsAnswersAggregateRepository } from './form-participants-answers-aggregate.repository.types';
 
@@ -20,7 +21,11 @@ export class FormParticipantsAnswersAggregateRepository {
           },
         },
       },
-      answers: true,
+      answers: {
+        include: {
+          options: true,
+        },
+      },
     } satisfies Prisma.FormParticipantsAnswersFindFirstArgs['include'];
 
     return { include };
@@ -36,18 +41,37 @@ export class FormParticipantsAnswersAggregateRepository {
         },
       });
 
-      await Promise.all(
-        params.answers.map(async (answer) => {
-          return await tx.formAnswer.create({
+      await asyncBatch({
+        items: params.answers,
+        batchSize: 10,
+        callback: async (answer) => {
+          const createdAnswer = await tx.formAnswer.create({
             data: {
               question_id: answer.questionId,
               value: answer.value,
-              option_id: answer.optionId,
               participants_answers_id: participantsAnswers.id,
             },
           });
-        }),
-      );
+
+          // Create FormAnswerOption entries for each selected option
+          if (answer.optionIds && answer.optionIds.length > 0) {
+            await asyncBatch({
+              items: answer.optionIds,
+              batchSize: 5,
+              callback: async (optionId) => {
+                return await tx.formAnswerOption.create({
+                  data: {
+                    answer_id: createdAnswer.id,
+                    option_id: optionId,
+                  },
+                });
+              },
+            });
+          }
+
+          return createdAnswer;
+        },
+      });
 
       return participantsAnswers;
     });

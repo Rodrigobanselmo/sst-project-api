@@ -10,8 +10,9 @@ export class FormAnswerPayload {
   value?: string;
 
   @IsOptional()
-  @IsString()
-  optionId?: string;
+  @IsArray()
+  @IsString({ each: true })
+  optionIds?: string[];
 }
 
 export class PublicSubmitFormApplicationPayload {
