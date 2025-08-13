@@ -391,12 +391,10 @@ export class AbsenteeismMetricsDAO {
     const showWorkspace = !showHomogeneousGroup;
 
     const AbsenteeismMetricsPromise = this.prisma.$queryRaw<IAbsenteeismTotalHierarchyResultBrowseModelMapper[]>`
-    WITH DistinctAbsenteeismRecords AS (
+    WITH AllEmployeesInHierarchy AS (
         SELECT DISTINCT
-          a.id AS absenteeism_id,
-          a."timeSpent" AS absenteeism_timeSpent,
-          a."employeeId" AS absenteeism_employeeId,
-          
+          e.id AS employee_id,
+
           ${gerRawPrisma(`h.name AS h_name,`, showOffice)}
           ${gerRawPrisma(`h.type AS h_type,`, showOffice)}
           ${gerRawPrisma(`h.id AS h_id,`, showOffice)}
@@ -419,6 +417,50 @@ export class AbsenteeismMetricsDAO {
           ${gerRawPrisma(`hg.id AS homo_id,`, showHomogeneousGroup)}
           ${gerRawPrisma(`hg.name AS homo_name`, showHomogeneousGroup)}
         FROM
+          "Employee" e
+        JOIN
+          "EmployeeHierarchyHistory" ehh ON e.id = ehh."employeeId"
+        JOIN
+          "Hierarchy" h ON ehh."hierarchyId" = h.id AND h."deletedAt" IS null
+        LEFT JOIN
+          "Hierarchy" h_parent_1 ON h_parent_1."id" = h."parentId"
+        LEFT JOIN
+          "Hierarchy" h_parent_2 ON h_parent_2."id" = h_parent_1."parentId"
+        LEFT JOIN
+          "Hierarchy" h_parent_3 ON h_parent_3."id" = h_parent_2."parentId"
+        LEFT JOIN
+          "Hierarchy" h_parent_4 ON h_parent_4."id" = h_parent_3."parentId"
+        LEFT JOIN
+          "HierarchyOnHomogeneous" hoh ON hoh."hierarchyId" IN (h.id, h_parent_1.id, h_parent_2.id, h_parent_3.id, h_parent_4.id) AND hoh."deletedAt" IS NULL
+        LEFT JOIN
+          "HomogeneousGroup" hg ON hoh."homogeneousGroupId" = hg.id AND hg."deletedAt" IS null AND hg."status" = 'ACTIVE' AND hg."type" IS NULL
+        JOIN
+          "_HierarchyToWorkspace" htw ON h.id = htw."A"
+        JOIN
+          "Workspace" w ON htw."B" = w.id
+        WHERE
+          e."deleted_at" IS null
+          AND e."companyId" = ${filters.companyId}
+          ${
+            filters.hierarchiesIds?.length
+              ? Prisma.sql`AND (
+            h.id IN (${Prisma.join(filters.hierarchiesIds)}) OR
+            h_parent_1.id IN (${Prisma.join(filters.hierarchiesIds)}) OR
+            h_parent_2.id IN (${Prisma.join(filters.hierarchiesIds)}) OR
+            h_parent_3.id IN (${Prisma.join(filters.hierarchiesIds)}) OR
+            h_parent_4.id IN (${Prisma.join(filters.hierarchiesIds)})
+          )`
+              : Prisma.sql``
+          }
+          ${filters.workspacesIds?.length ? Prisma.sql`AND w."id" IN (${Prisma.join(filters.workspacesIds)})` : Prisma.sql``}
+          ${filters.homogeneousGroupsIds?.length ? Prisma.sql`AND hoh."homogeneousGroupId" IN (${Prisma.join(filters.homogeneousGroupsIds)})` : Prisma.sql``}
+      ),
+      AbsenteeismAggregates AS (
+        SELECT
+          a."employeeId",
+          COUNT(a.id) AS total_absenteeism_count,
+          SUM(ABS(a."timeSpent")) AS total_absenteeism_days
+        FROM
           "Absenteeism" a
         JOIN
           "Employee" e ON a."employeeId" = e.id AND e."deleted_at" IS null AND e."companyId" = ${filters.companyId}
@@ -426,75 +468,78 @@ export class AbsenteeismMetricsDAO {
           "EmployeeHierarchyHistory" ehh ON e.id = ehh."employeeId"
         JOIN
           "Hierarchy" h ON ehh."hierarchyId" = h.id AND h."deletedAt" IS null
-        LEFT JOIN 
-          "Hierarchy" h_parent_1 ON h_parent_1."id" = h."parentId" 
-        LEFT JOIN 
+        LEFT JOIN
+          "Hierarchy" h_parent_1 ON h_parent_1."id" = h."parentId"
+        LEFT JOIN
           "Hierarchy" h_parent_2 ON h_parent_2."id" = h_parent_1."parentId"
-        LEFT JOIN 
+        LEFT JOIN
           "Hierarchy" h_parent_3 ON h_parent_3."id" = h_parent_2."parentId"
-        LEFT JOIN 
+        LEFT JOIN
           "Hierarchy" h_parent_4 ON h_parent_4."id" = h_parent_3."parentId"
-        LEFT JOIN 
-          "HierarchyOnHomogeneous" hoh ON hoh."hierarchyId" IN (h.id, h_parent_1.id, h_parent_2.id, h_parent_3.id, h_parent_4.id) AND hoh."deletedAt" IS NULL 
-        LEFT JOIN 
+        LEFT JOIN
+          "HierarchyOnHomogeneous" hoh ON hoh."hierarchyId" IN (h.id, h_parent_1.id, h_parent_2.id, h_parent_3.id, h_parent_4.id) AND hoh."deletedAt" IS NULL
+        LEFT JOIN
           "HomogeneousGroup" hg ON hoh."homogeneousGroupId" = hg.id AND hg."deletedAt" IS null AND hg."status" = 'ACTIVE' AND hg."type" IS NULL
         JOIN
           "_HierarchyToWorkspace" htw ON h.id = htw."A"
         JOIN
-          "Workspace" w ON htw."B" = w.id 
+          "Workspace" w ON htw."B" = w.id
         ${gerWhereRawPrisma(whereParams)}
+        GROUP BY a."employeeId"
       )
       SELECT
-        ${gerRawPrisma(`disc_a.h_name AS hierarchy_name,`, showOffice)}
-        ${gerRawPrisma(`disc_a.h_type AS hierarchy_type,`, showOffice)}
-        ${gerRawPrisma(`disc_a.h_id AS hierarchy_id,`, showOffice)}
+        ${gerRawPrisma(`aeh.h_name AS hierarchy_name,`, showOffice)}
+        ${gerRawPrisma(`aeh.h_type AS hierarchy_type,`, showOffice)}
+        ${gerRawPrisma(`aeh.h_id AS hierarchy_id,`, showOffice)}
 
-        ${gerRawPrisma(`disc_a.h_parent_1_id AS hierarchy_parent_1_id,`, showSector)}
-        ${gerRawPrisma(`disc_a.h_parent_1_name AS hierarchy_parent_1_name,`, showSector)}
-        ${gerRawPrisma(`disc_a.h_parent_1_type AS hierarchy_parent_1_type,`, showSector)}
+        ${gerRawPrisma(`aeh.h_parent_1_id AS hierarchy_parent_1_id,`, showSector)}
+        ${gerRawPrisma(`aeh.h_parent_1_name AS hierarchy_parent_1_name,`, showSector)}
+        ${gerRawPrisma(`aeh.h_parent_1_type AS hierarchy_parent_1_type,`, showSector)}
 
-        ${gerRawPrisma(`disc_a.h_parent_2_id AS hierarchy_parent_2_id,`, showManagement)}
-        ${gerRawPrisma(`disc_a.h_parent_2_name AS hierarchy_parent_2_name,`, showManagement)}
-        ${gerRawPrisma(`disc_a.h_parent_2_type AS hierarchy_parent_2_type,`, showManagement)}
+        ${gerRawPrisma(`aeh.h_parent_2_id AS hierarchy_parent_2_id,`, showManagement)}
+        ${gerRawPrisma(`aeh.h_parent_2_name AS hierarchy_parent_2_name,`, showManagement)}
+        ${gerRawPrisma(`aeh.h_parent_2_type AS hierarchy_parent_2_type,`, showManagement)}
 
-        ${gerRawPrisma(`disc_a.h_parent_3_id AS hierarchy_parent_3_id,`, showDirectory)}
-        ${gerRawPrisma(`disc_a.h_parent_3_name AS hierarchy_parent_3_name,`, showDirectory)}
-        ${gerRawPrisma(`disc_a.h_parent_3_type AS hierarchy_parent_3_type,`, showDirectory)}
+        ${gerRawPrisma(`aeh.h_parent_3_id AS hierarchy_parent_3_id,`, showDirectory)}
+        ${gerRawPrisma(`aeh.h_parent_3_name AS hierarchy_parent_3_name,`, showDirectory)}
+        ${gerRawPrisma(`aeh.h_parent_3_type AS hierarchy_parent_3_type,`, showDirectory)}
 
-        ${gerRawPrisma(`disc_a.workspace_id AS workspace_id,`, showWorkspace)}
-        ${gerRawPrisma(`disc_a.workspace_name AS workspace_name,`, showWorkspace)}
+        ${gerRawPrisma(`aeh.workspace_id AS workspace_id,`, showWorkspace)}
+        ${gerRawPrisma(`aeh.workspace_name AS workspace_name,`, showWorkspace)}
 
-        ${gerRawPrisma(`disc_a.homo_id AS homo_id,`, showHomogeneousGroup)}
-        ${gerRawPrisma(`disc_a.homo_name AS homo_name,`, showHomogeneousGroup)}
+        ${gerRawPrisma(`aeh.homo_id AS homo_id,`, showHomogeneousGroup)}
+        ${gerRawPrisma(`aeh.homo_name AS homo_name,`, showHomogeneousGroup)}
 
-        COUNT(DISTINCT disc_a.absenteeism_id) AS total_absenteeism_count, 
-        SUM(ABS(disc_a.absenteeism_timeSpent)) AS total_absenteeism_days,
-        (SUM(ABS(disc_a.absenteeism_timeSpent))) / NULLIF(COUNT(DISTINCT disc_a.absenteeism_employeeId), 0) AS avg_absenteeism_per_employee
-      FROM
-        DistinctAbsenteeismRecords disc_a
-      ${gerRawPrisma(`where disc_a.homo_id IS NOT NULL`, showHomogeneousGroup)}
+        COUNT(DISTINCT aeh.employee_id) AS total_employee_count,
+        COALESCE(SUM(aa.total_absenteeism_count), 0) AS total_absenteeism_count,
+        COALESCE(SUM(aa.total_absenteeism_days), 0) AS total_absenteeism_days,
+        COALESCE(SUM(aa.total_absenteeism_days), 0) / NULLIF(COUNT(DISTINCT aeh.employee_id), 0) AS avg_absenteeism_per_employee
+        FROM
+        AllEmployeesInHierarchy aeh
+        LEFT JOIN AbsenteeismAggregates aa ON aeh.employee_id = aa."employeeId"
+      ${gerRawPrisma(`WHERE aeh.homo_id IS NOT NULL`, showHomogeneousGroup)}
       GROUP BY
-        ${gerRawPrisma(`disc_a.h_id,`, showOffice)}
-        ${gerRawPrisma(`disc_a.h_name,`, showOffice)}
-        ${gerRawPrisma(`disc_a.h_type,`, showOffice)}
-        
-        ${gerRawPrisma(`disc_a.h_parent_1_id,`, showSector)}
-        ${gerRawPrisma(`disc_a.h_parent_1_name,`, showSector)}
-        ${gerRawPrisma(`disc_a.h_parent_1_type,`, showSector)}
+        ${gerRawPrisma(`aeh.h_id,`, showOffice)}
+        ${gerRawPrisma(`aeh.h_name,`, showOffice)}
+        ${gerRawPrisma(`aeh.h_type,`, showOffice)}
 
-        ${gerRawPrisma(`disc_a.h_parent_2_id,`, showManagement)}
-        ${gerRawPrisma(`disc_a.h_parent_2_name,`, showManagement)}
-        ${gerRawPrisma(`disc_a.h_parent_2_type,`, showManagement)}
+        ${gerRawPrisma(`aeh.h_parent_1_id,`, showSector)}
+        ${gerRawPrisma(`aeh.h_parent_1_name,`, showSector)}
+        ${gerRawPrisma(`aeh.h_parent_1_type,`, showSector)}
 
-        ${gerRawPrisma(`disc_a.h_parent_3_id,`, showDirectory)}
-        ${gerRawPrisma(`disc_a.h_parent_3_name,`, showDirectory)}
-        ${gerRawPrisma(`disc_a.h_parent_3_type,`, showDirectory)}
+        ${gerRawPrisma(`aeh.h_parent_2_id,`, showManagement)}
+        ${gerRawPrisma(`aeh.h_parent_2_name,`, showManagement)}
+        ${gerRawPrisma(`aeh.h_parent_2_type,`, showManagement)}
 
-        ${gerRawPrisma(`disc_a."workspace_id",`, showWorkspace)}
-        ${gerRawPrisma(`disc_a."workspace_name"`, showWorkspace)}
+        ${gerRawPrisma(`aeh.h_parent_3_id,`, showDirectory)}
+        ${gerRawPrisma(`aeh.h_parent_3_name,`, showDirectory)}
+        ${gerRawPrisma(`aeh.h_parent_3_type,`, showDirectory)}
 
-        ${gerRawPrisma(`disc_a."homo_id",`, showHomogeneousGroup)}
-        ${gerRawPrisma(`disc_a."homo_name"`, showHomogeneousGroup)}
+        ${gerRawPrisma(`aeh."workspace_id",`, showWorkspace)}
+        ${gerRawPrisma(`aeh."workspace_name"`, showWorkspace)}
+
+        ${gerRawPrisma(`aeh."homo_id",`, showHomogeneousGroup)}
+        ${gerRawPrisma(`aeh."homo_name"`, showHomogeneousGroup)}
       ${getOrderByRawPrisma(orderByParams)}
       LIMIT ${pagination.limit}
       OFFSET ${pagination.offSet};
@@ -574,6 +619,10 @@ export class AbsenteeismMetricsDAO {
     `;
 
     const [AbsenteeismMetrics, totalAbsenteeismMetrics, filterAbsenteeismMetrics] = await Promise.all([AbsenteeismMetricsPromise, totalAbsenteeismMetricsPromise, filterAbsenteeismMetricsPromise]);
+
+    [AbsenteeismMetrics[0]].map(async (item) => {
+      console.log(item);
+    });
 
     return AbsenteeismTotalHierarchyBrowseModelMapper.toModel({
       results: AbsenteeismMetrics,
