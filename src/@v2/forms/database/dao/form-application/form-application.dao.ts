@@ -108,7 +108,7 @@ export class FormApplicationDAO {
     const totalAnswersPromise = this.prisma.formParticipantsAnswers.count({
       where: {
         form_application_id: params.id,
-        status: 'VALID',
+        status: formApplication.status === FormStatusEnum.TESTING ? 'TESTING' : 'VALID',
       },
     });
 

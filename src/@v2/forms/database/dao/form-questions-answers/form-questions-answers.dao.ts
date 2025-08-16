@@ -5,6 +5,8 @@ import { Prisma } from '@prisma/client';
 import { FormQuestionsAnswersBrowseResultModelMapper, IFormQuestionsAnswersBrowseResultModelMapper } from '../../mappers/models/form-questions-answers/form-questions-answers-browse-result.mapper';
 import { IFormQuestionsAnswersDAO } from './form-questions-answers.types';
 import { FormQuestionsAnswersBrowseModel } from '@/@v2/forms/domain/models/form-questions-answers/form-questions-answers-browse.model';
+import { FormStatusEnum } from '@/@v2/forms/domain/enums/form-status.enum';
+import { FormParticipantsAnswerStatusEnum } from '@/@v2/forms/domain/enums/form-participants-answer-status.enum';
 
 @Injectable()
 export class FormQuestionsAnswersDAO {
@@ -13,14 +15,14 @@ export class FormQuestionsAnswersDAO {
   async browse({ filters }: IFormQuestionsAnswersDAO.BrowseParams) {
     const form = await this.prisma.formApplication.findUnique({
       where: { id: filters.formApplicationId },
-      select: { form_id: true },
+      select: { form_id: true, status: true },
     });
 
     if (!form) {
       throw new NotFoundException('Formulário não encontrado');
     }
 
-    const whereParams = this.browseWhere(filters, form.form_id);
+    const whereParams = this.browseWhere(filters, form.form_id, form.status as FormStatusEnum);
 
     const queryResults = await this.prisma.$queryRaw<IFormQuestionsAnswersBrowseResultModelMapper[]>`
       SELECT 
@@ -90,7 +92,7 @@ export class FormQuestionsAnswersDAO {
     return new FormQuestionsAnswersBrowseModel({ results });
   }
 
-  private browseWhere(filters: IFormQuestionsAnswersDAO.BrowseParams['filters'], formId: string) {
+  private browseWhere(filters: IFormQuestionsAnswersDAO.BrowseParams['filters'], formId: string, status: FormStatusEnum) {
     const where = [
       Prisma.sql`qgd."deleted_at" IS NULL`,
       Prisma.sql`qd."deleted_at" IS NULL`,
@@ -108,7 +110,7 @@ export class FormQuestionsAnswersDAO {
           qg."form_application_id" = ${filters.formApplicationId}
           OR qg."form_id" = ${formId}
         ) 
-        -- AND fpa."status" = 'VALID'
+        AND fpa."status"::text = ${status === FormStatusEnum.TESTING ? FormParticipantsAnswerStatusEnum.TESTING : FormParticipantsAnswerStatusEnum.VALID}
       `);
     }
 
