@@ -1843,6 +1843,7 @@ model RiskSubType {
   id         Int             @id @default(autoincrement())
   name       String
   type       RiskFactorsEnum
+  sub_type   RiskSubTypeEnum @default(PSICOSOCIAL)
   created_at DateTime        @default(now())
   updated_at DateTime        @updatedAt
 
@@ -2638,6 +2639,10 @@ enum RiskFactorsEnum {
   OUTROS
 }
 
+enum RiskSubTypeEnum {
+  PSICOSOCIAL
+}
+
 enum RiskRecTypeEnum {
   CANCELED
   POSTPONED
@@ -2784,6 +2789,7 @@ enum FormCOPSOQDimensionEnum {
   ASSEDIO_SEXUAL
   ASSEDIO_VIRTUAL
   ATOS_NEGATIVOS
+  PROVOCACOES_DESAGRADAVEIS
   BULLYING
   CONFLITOS_E_DESENTENDIMENTOS
   VIOLENCIA_FISICA

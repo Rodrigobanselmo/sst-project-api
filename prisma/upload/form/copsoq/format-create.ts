@@ -1,21 +1,21 @@
-import { FormIdentifierTypeEnum } from './../../../../src/@v2/forms/domain/enums/form-identifier-type.enum';
-import { FormEntity } from './../../../../src/@v2/forms/domain/entities/form.entity';
-import { FormQuestionGroupEntity } from './../../../../src/@v2/forms/domain/entities/form-question-group.entity';
-import { FormQuestionEntity } from './../../../../src/@v2/forms/domain/entities/form-question.entity';
-import { FormQuestionRiskEntity } from '../../../../src/@v2/forms/domain/entities/form-question-risk.entity';
-import { FormQuestionOptionEntity } from '../../../../src/@v2/forms/domain/entities/form-question-option.entity';
-import { simpleCompanyId } from '../../../../src/shared/constants/ids';
-import { FormQuestionDataEntity } from '../../../../src/@v2/forms/domain/entities/form-question-data.entity';
-import { FormQuestionCOPSOQEntity } from '../../../../src/@v2/forms/domain/entities/form-question-copsoq.entity';
+import { FormIdentifierTypeEnum } from '../@v2/forms/domain/enums/form-identifier-type.enum';
+import { FormEntity } from '../@v2/forms/domain/entities/form.entity';
+import { FormQuestionGroupEntity } from '../@v2/forms/domain/entities/form-question-group.entity';
+import { FormQuestionEntity } from '../@v2/forms/domain/entities/form-question.entity';
+import { FormQuestionRiskEntity } from '../@v2/forms/domain/entities/form-question-risk.entity';
+import { FormQuestionOptionEntity } from '../@v2/forms/domain/entities/form-question-option.entity';
+import { simpleCompanyId } from '../shared/constants/ids';
+import { FormQuestionDetailsEntity } from '../@v2/forms/domain/entities/form-question-details.entity';
+import { FormQuestionCOPSOQEntity } from '../@v2/forms/domain/entities/form-question-copsoq.entity';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { FormCOPSOQCategoryEnum } from '../../../../src/@v2/forms/domain/enums/form-copsoq-category.enum';
-import { FormCOPSOQDimensionEnum } from '../../../../src/@v2/forms/domain/enums/form-copsoq-dimension.enum';
-import { FormCOPSOQLevelEnum } from '../../../../src/@v2/forms/domain/enums/form-copsoq-level.enum';
-import { FormQuestionTypeEnum } from '../../../../src/@v2/forms/domain/enums/form-question-type.enum';
-import { PrismaClient, $Enums } from '@prisma/client';
-import { asyncBatch } from '../../../../src/shared/utils/asyncBatch';
-import { FormTypeEnum } from '../../../../src/@v2/forms/domain/enums/form-type.enum';
+import { FormCOPSOQCategoryEnum } from '../@v2/forms/domain/enums/form-copsoq-category.enum';
+import { FormCOPSOQDimensionEnum } from '../@v2/forms/domain/enums/form-copsoq-dimension.enum';
+import { FormCOPSOQLevelEnum } from '../@v2/forms/domain/enums/form-copsoq-level.enum';
+import { FormQuestionTypeEnum } from '../@v2/forms/domain/enums/form-question-type.enum';
+import { PrismaClient, RiskSubTypeEnum } from '@prisma/client';
+import { asyncBatch } from '../shared/utils/asyncBatch';
+import { FormTypeEnum } from '../@v2/forms/domain/enums/form-type.enum';
 
 const prisma = new PrismaClient();
 
@@ -61,6 +61,7 @@ export const dimensionMapper: DimensionRecordMapping = {
   'Assédio Sexual': FormCOPSOQDimensionEnum.ASSEDIO_SEXUAL,
   'Assédio Virtual': FormCOPSOQDimensionEnum.ASSEDIO_VIRTUAL,
   'Atos Negativos': FormCOPSOQDimensionEnum.ATOS_NEGATIVOS,
+  'Provocações Desagradáveis': FormCOPSOQDimensionEnum.PROVOCACOES_DESAGRADAVEIS,
   Bullying: FormCOPSOQDimensionEnum.BULLYING,
   'Conflitos e Desentendimentos': FormCOPSOQDimensionEnum.CONFLITOS_E_DESENTENDIMENTOS,
   'Violência Física': FormCOPSOQDimensionEnum.VIOLENCIA_FISICA,
@@ -115,7 +116,7 @@ type createData = {
   risk: FormQuestionRiskEntity;
   options: FormQuestionOptionEntity[];
   copsoq: FormQuestionCOPSOQEntity;
-  question: FormQuestionDataEntity;
+  question: FormQuestionDetailsEntity;
   questionShared: FormQuestionEntity | null;
 }[];
 type createFormData = {
@@ -161,16 +162,38 @@ async function processJsonFile(inputFilePath: string, outputFilePath: string): P
         return text.trim().replace('1 (', '').replace('2 (', '').replace('3 (', '').replace('4 (', '').replace('5 (', '').replace(')', '').replaceAll(' ', ' ');
       }
 
+      const dimension = dimensionMapper[record.Dimensão];
+      const category = categoryMapper[record.Categoria];
+      const level = levelMapper[record.Nível];
+
+      if (!dimension) {
+        console.error('Dimension not found in mapper:', record.Dimensão);
+        console.error('Available dimensions:', Object.keys(dimensionMapper));
+        throw new Error(`Dimension not found: ${record.Dimensão}`);
+      }
+
+      if (!category) {
+        console.error('Category not found in mapper:', record.Categoria);
+        console.error('Available categories:', Object.keys(categoryMapper));
+        throw new Error(`Category not found: ${record.Categoria}`);
+      }
+
+      if (!level) {
+        console.error('Level not found in mapper:', record.Nível);
+        console.error('Available levels:', Object.keys(levelMapper));
+        throw new Error(`Level not found: ${record.Nível}`);
+      }
+
       const copsoqQuestion = new FormQuestionCOPSOQEntity({
-        dimension: dimensionMapper[record.Dimensão],
-        category: categoryMapper[record.Categoria],
+        dimension,
+        category,
         item: record['Nome do Item'],
         question: record['Pergunta Traduzida'],
-        level: levelMapper[record.Nível],
+        level,
       });
 
       const questionType = record.TIPO === 'Outros' ? FormQuestionTypeEnum.CHECKBOX : FormQuestionTypeEnum.RADIO;
-      const question = new FormQuestionDataEntity({
+      const question = new FormQuestionDetailsEntity({
         type: questionType,
         companyId: simpleCompanyId,
         text: (record['Pergunta Aplicada'] || record['Pergunta Traduzida']).replaceAll(' ', ' '),
@@ -178,13 +201,42 @@ async function processJsonFile(inputFilePath: string, outputFilePath: string): P
         system: true,
       });
 
-      const riskFactor = await prisma.riskFactors.findFirst({
+      let riskFactor = await prisma.riskFactors.findFirst({
         where: {
           name: record['Fator de Risco'],
         },
       });
 
-      if (!riskFactor) throw new Error('Fator de risco não encontrado: ' + record['Fator de Risco']);
+      if (!riskFactor) {
+        console.log('Fator de risco não encontrado: ' + record['Fator de Risco']);
+
+        const subType = await prisma.riskSubType.findFirst({
+          where: {
+            sub_type: RiskSubTypeEnum.PSICOSOCIAL,
+          },
+        });
+
+        console.log('subType', subType.id);
+
+        riskFactor = await prisma.riskFactors.create({
+          data: {
+            name: record['Fator de Risco'],
+            severity: Number(record['Severidade']) || 4,
+            type: 'ERG',
+            companyId: simpleCompanyId,
+          },
+        });
+
+        await prisma.riskToRiskSubType.create({
+          data: {
+            risk_id: riskFactor.id,
+            sub_type_id: subType.id,
+          },
+        });
+
+        console.log('Fator de risco criado: ' + riskFactor.id);
+        // throw new Error('Fator de risco não encontrado: ' + record['Fator de Risco']);
+      }
 
       const risk = new FormQuestionRiskEntity({
         questionId: question.id,
@@ -223,6 +275,7 @@ async function processJsonFile(inputFilePath: string, outputFilePath: string): P
         ? new FormQuestionEntity({
             order: Number(record.Nº),
             required: true,
+            groupId: '', // Will be set later
           })
         : null;
 
@@ -236,7 +289,6 @@ async function processJsonFile(inputFilePath: string, outputFilePath: string): P
       if (needToCreateGroup) {
         form.groups[copsoqQuestion.category] = {
           group: new FormQuestionGroupEntity({
-            formId: 0,
             name: record.Categoria,
             order: Number(record.Nº),
           }),
@@ -269,27 +321,61 @@ async function processJsonFile(inputFilePath: string, outputFilePath: string): P
   }
 }
 
-async function createRows(data: createData, form: createFormData): Promise<void> {
+async function createRows(data: createData, _form: createFormData): Promise<void> {
   await asyncBatch(data, 20, async (item) => {
-    const copsoq = await prisma.formQuestionCOPSOQ.findFirst({
+    // First, create or find the FormQuestionDetails
+    let questionDetails = await prisma.formQuestionDetails.findFirst({
       where: {
-        item: item.copsoq.item,
+        company_id: item.question.companyId,
+        system: item.question.system,
+        form_question_risk: {
+          some: {
+            risk_id: item.risk.riskId,
+          },
+        },
+        data: {
+          some: {
+            text: item.question.text,
+          },
+        },
       },
     });
 
-    const questionCOPSOQ = await prisma.formQuestionCOPSOQ.upsert({
-      where: {
-        id: copsoq?.id || 0,
-      },
-      update: {
-        form_question_data: {
-          updateMany: {
-            where: {},
-            data: {
-              text: item.question.text,
+    if (!questionDetails) {
+      questionDetails = await prisma.formQuestionDetails.create({
+        data: {
+          company_id: item.question.companyId,
+          system: item.question.system,
+          form_question_risk: {
+            create: {
+              risk_id: item.risk.riskId,
             },
           },
+          options: {
+            create: item.options.map((option) => ({
+              data: {
+                create: {
+                  text: option.text,
+                  order: option.order,
+                  value: option.value,
+                },
+              },
+            })),
+          },
         },
+      });
+    }
+
+    // Create or update the COPSOQ question
+    const questionCOPSOQ = await prisma.formQuestionCOPSOQ.upsert({
+      where: {
+        item: item.copsoq.item,
+      },
+      update: {
+        category: item.copsoq.category,
+        dimension: item.copsoq.dimension,
+        level: item.copsoq.level,
+        question: item.copsoq.question,
       },
       create: {
         category: item.copsoq.category,
@@ -297,67 +383,49 @@ async function createRows(data: createData, form: createFormData): Promise<void>
         item: item.copsoq.item,
         level: item.copsoq.level,
         question: item.copsoq.question,
-        form_question_data: {
-          create: {
-            text: item.question.text,
-            type: item.question.type,
-            accept_other: item.question.acceptOther,
-            company_id: item.question.companyId,
-            system: item.question.system,
-            form_question_risk: {
-              create: {
-                risk_id: item.risk.riskId,
-              },
-            },
-            options: {
-              createMany: {
-                data: item.options.map((option) => ({
-                  text: option.text,
-                  order: option.order,
-                  value: option.value,
-                })),
-              },
-            },
-          },
-        },
-      },
-      select: {
-        form_question_data: {
-          select: {
-            id: true,
-          },
-        },
       },
     });
 
-    if (item.questionShared) {
-      const formQuestion = await prisma.formQuestion.findFirst({
-        where: {
-          question_data: {
-            id: questionCOPSOQ.form_question_data[0].id || 0,
-          },
-        },
-      });
+    // Create or find the FormQuestionDetailsData linking COPSOQ to FormQuestionDetails
+    let questionDetailsData = await prisma.formQuestionDetailsData.findFirst({
+      where: {
+        question_copsoq_id: questionCOPSOQ.id,
+        form_question_details_id: questionDetails.id,
+      },
+    });
 
-      await prisma.formQuestion.upsert({
-        where: {
-          id: formQuestion?.id || 0,
-        },
-        update: {
-          order: item.questionShared.order,
-          required: item.questionShared.required,
-        },
-        create: {
-          order: item.questionShared.order,
-          required: item.questionShared.required,
-          question_data_id: questionCOPSOQ.form_question_data[0].id,
+    if (!questionDetailsData) {
+      questionDetailsData = await prisma.formQuestionDetailsData.create({
+        data: {
+          text: item.question.text,
+          type: item.question.type,
+          accept_other: item.question.acceptOther,
+          question_copsoq_id: questionCOPSOQ.id,
+          form_question_details_id: questionDetails.id,
         },
       });
+    } else {
+      questionDetailsData = await prisma.formQuestionDetailsData.update({
+        where: {
+          id: questionDetailsData.id,
+        },
+        data: {
+          text: item.question.text,
+          type: item.question.type,
+          accept_other: item.question.acceptOther,
+        },
+      });
+    }
+
+    // Store question data for later creation after groups are created
+    if (item.questionShared) {
+      // We'll create the FormQuestion later in createForm after groups are created
+      // For now, just ensure the question details are created
     }
   });
 }
 
-async function createForm(data: createData, form: createFormData): Promise<void> {
+async function createForm(_data: createData, form: createFormData): Promise<void> {
   let dbForm = await prisma.form.findFirst({
     where: {
       name: form.form.name,
@@ -366,7 +434,7 @@ async function createForm(data: createData, form: createFormData): Promise<void>
 
   dbForm = await prisma.form.upsert({
     where: {
-      id: dbForm?.id || 0,
+      id: dbForm?.id || '',
     },
     update: {},
     create: {
@@ -385,20 +453,28 @@ async function createForm(data: createData, form: createFormData): Promise<void>
   await asyncBatch(Object.values(form.groups), 20, async (group) => {
     let dbGroup = await prisma.formQuestionGroup.findFirst({
       where: {
-        name: group.group.name,
+        data: {
+          some: {
+            name: group.group.name,
+          },
+        },
       },
     });
 
     dbGroup = await prisma.formQuestionGroup.upsert({
       where: {
-        id: dbGroup?.id || 0,
+        id: dbGroup?.id || '',
       },
       update: {},
       create: {
-        name: group.group.name,
         form_id: dbForm.id,
-        order: group.group.order,
-        description: group.group.description,
+        data: {
+          create: {
+            name: group.group.name,
+            order: group.group.order,
+            description: group.group.description,
+          },
+        },
       },
     });
 
@@ -412,9 +488,14 @@ async function createForm(data: createData, form: createFormData): Promise<void>
         select: {
           form_question_data: {
             select: {
-              form_question: {
+              form_question_details: {
                 select: {
                   id: true,
+                  form_question: {
+                    select: {
+                      id: true,
+                    },
+                  },
                 },
               },
             },
@@ -422,18 +503,38 @@ async function createForm(data: createData, form: createFormData): Promise<void>
         },
       });
 
-      const questionId = formQuestionCOPSOQ?.form_question_data[0]?.form_question[0]?.id;
-      if (questionId) {
-        await prisma.formQuestion.update({
-          where: {
-            id: questionId,
-          },
-          data: {
-            question_group_id: dbGroup.id,
-          },
-        });
+      const questionDetails = formQuestionCOPSOQ?.form_question_data[0]?.form_question_details;
+      if (questionDetails) {
+        // Check if FormQuestion already exists
+        const existingFormQuestion = questionDetails.form_question[0];
+
+        if (existingFormQuestion) {
+          // Update existing FormQuestion with the correct group
+          await prisma.formQuestion.update({
+            where: {
+              id: existingFormQuestion.id,
+            },
+            data: {
+              question_group_id: dbGroup.id,
+            },
+          });
+        } else if (item.data.questionShared) {
+          // Create new FormQuestion if it doesn't exist and questionShared is provided
+          await prisma.formQuestion.create({
+            data: {
+              question_details_id: questionDetails.id,
+              question_group_id: dbGroup.id,
+              data: {
+                create: {
+                  order: item.data.questionShared.order,
+                  required: item.data.questionShared.required,
+                },
+              },
+            },
+          });
+        }
       } else {
-        console.log('Question not found for item:', item.data.copsoq.item);
+        console.log('Question details not found for item:', item.data.copsoq.item);
       }
     });
   });
@@ -463,13 +564,18 @@ async function createIdentifiers(): Promise<void> {
         data: {
           type: item.enum,
           direct_association: item.direct,
+          system: true,
           form_question_data: {
             create: {
               text: item.text,
-              type: FormQuestionTypeEnum.TEXT,
+              type: item.type,
               accept_other: false,
-              company_id: simpleCompanyId,
-              system: true,
+              form_question_details: {
+                create: {
+                  company_id: simpleCompanyId,
+                  system: true,
+                },
+              },
             },
           },
         },
@@ -478,7 +584,7 @@ async function createIdentifiers(): Promise<void> {
   });
 }
 
-async function main() {
+export async function mainFormatCreate() {
   console.log('Processing JSON data...');
   const inputFilePath = path.join(__dirname, 'input.json'); // Replace with your input file path
   console.log('Input file path:', inputFilePath);
@@ -487,5 +593,3 @@ async function main() {
 
   await processJsonFile(inputFilePath, outputFilePath);
 }
-
-main();

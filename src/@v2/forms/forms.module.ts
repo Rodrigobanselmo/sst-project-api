@@ -36,6 +36,8 @@ import { SubmitFormApplicationUseCase } from './application/form-application/pub
 import { PublicSubmitFormApplicationController } from './application/form-application/public-submit-form-application/controllers/public-submit-form-application.controller';
 import { FormParticipantsAnswersAggregateRepository } from './database/repositories/form-participants-answers/form-participants-answers-aggregate.repository';
 import { FormParticipantsAggregateRepository } from './database/repositories/form-participants/form-participants-aggregate.repository';
+import { BrowseRisksController } from './application/risk/browse-risks/controllers/browse-risks.controller';
+import { BrowseRisksUseCase } from './application/risk/browse-risks/use-cases/browse-risks.usecase';
 
 @Module({
   imports: [SharedModule],
@@ -51,6 +53,7 @@ import { FormParticipantsAggregateRepository } from './database/repositories/for
     EditFormApplicationController,
     PublicFormApplicationController,
     PublicSubmitFormApplicationController,
+    BrowseRisksController,
   ],
   providers: [
     // Database
@@ -80,6 +83,7 @@ import { FormParticipantsAggregateRepository } from './database/repositories/for
     BrowseFormQuestionsAnswersUseCase,
     AddFormUseCase,
     EditFormUseCase,
+    BrowseRisksUseCase,
   ],
   exports: [],
 })
