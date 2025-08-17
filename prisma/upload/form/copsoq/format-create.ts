@@ -1,21 +1,21 @@
-import { FormIdentifierTypeEnum } from '../@v2/forms/domain/enums/form-identifier-type.enum';
-import { FormEntity } from '../@v2/forms/domain/entities/form.entity';
-import { FormQuestionGroupEntity } from '../@v2/forms/domain/entities/form-question-group.entity';
-import { FormQuestionEntity } from '../@v2/forms/domain/entities/form-question.entity';
-import { FormQuestionRiskEntity } from '../@v2/forms/domain/entities/form-question-risk.entity';
-import { FormQuestionOptionEntity } from '../@v2/forms/domain/entities/form-question-option.entity';
-import { simpleCompanyId } from '../shared/constants/ids';
-import { FormQuestionDetailsEntity } from '../@v2/forms/domain/entities/form-question-details.entity';
-import { FormQuestionCOPSOQEntity } from '../@v2/forms/domain/entities/form-question-copsoq.entity';
+import { PrismaClient, RiskSubTypeEnum } from '@prisma/client';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { FormCOPSOQCategoryEnum } from '../@v2/forms/domain/enums/form-copsoq-category.enum';
-import { FormCOPSOQDimensionEnum } from '../@v2/forms/domain/enums/form-copsoq-dimension.enum';
-import { FormCOPSOQLevelEnum } from '../@v2/forms/domain/enums/form-copsoq-level.enum';
-import { FormQuestionTypeEnum } from '../@v2/forms/domain/enums/form-question-type.enum';
-import { PrismaClient, RiskSubTypeEnum } from '@prisma/client';
-import { asyncBatch } from '../shared/utils/asyncBatch';
-import { FormTypeEnum } from '../@v2/forms/domain/enums/form-type.enum';
+import { FormQuestionCOPSOQEntity } from '../../../../src/@v2/forms/domain/entities/form-question-copsoq.entity';
+import { FormQuestionOptionEntity } from '../../../../src/@v2/forms/domain/entities/form-question-option.entity';
+import { FormQuestionRiskEntity } from '../../../../src/@v2/forms/domain/entities/form-question-risk.entity';
+import { FormCOPSOQCategoryEnum } from '../../../../src/@v2/forms/domain/enums/form-copsoq-category.enum';
+import { FormCOPSOQDimensionEnum } from '../../../../src/@v2/forms/domain/enums/form-copsoq-dimension.enum';
+import { FormQuestionDetailsEntity } from '../../../../src/@v2/forms/domain/entities/form-question-details.entity';
+import { FormCOPSOQLevelEnum } from '../../../../src/@v2/forms/domain/enums/form-copsoq-level.enum';
+import { FormQuestionTypeEnum } from '../../../../src/@v2/forms/domain/enums/form-question-type.enum';
+import { FormTypeEnum } from '../../../../src/@v2/forms/domain/enums/form-type.enum';
+import { simpleCompanyId } from '../../../../src/shared/constants/ids';
+import { asyncBatch } from '../../../../src/shared/utils/asyncBatch';
+import { FormQuestionGroupEntity } from './../../../../src/@v2/forms/domain/entities/form-question-group.entity';
+import { FormQuestionEntity } from './../../../../src/@v2/forms/domain/entities/form-question.entity';
+import { FormEntity } from './../../../../src/@v2/forms/domain/entities/form.entity';
+import { FormIdentifierTypeEnum } from './../../../../src/@v2/forms/domain/enums/form-identifier-type.enum';
 
 const prisma = new PrismaClient();
 
@@ -216,7 +216,7 @@ async function processJsonFile(inputFilePath: string, outputFilePath: string): P
           },
         });
 
-        console.log('subType', subType.id);
+        console.log('subType', subType?.id);
 
         riskFactor = await prisma.riskFactors.create({
           data: {
@@ -230,7 +230,7 @@ async function processJsonFile(inputFilePath: string, outputFilePath: string): P
         await prisma.riskToRiskSubType.create({
           data: {
             risk_id: riskFactor.id,
-            sub_type_id: subType.id,
+            sub_type_id: subType?.id || 0,
           },
         });
 
