@@ -1,4 +1,4 @@
-import { IsArray, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class FormAnswerPayload {
@@ -20,4 +20,8 @@ export class PublicSubmitFormApplicationPayload {
   @ValidateNested({ each: true })
   @Type(() => FormAnswerPayload)
   answers!: FormAnswerPayload[];
+
+  @IsOptional()
+  @IsNumber()
+  timeSpent?: number;
 }

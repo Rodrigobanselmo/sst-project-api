@@ -16,6 +16,7 @@ export class PublicSubmitFormApplicationController {
     return this.submitFormApplicationUseCase.execute({
       applicationId: path.applicationId,
       answers: body.answers,
+      timeSpent: body.timeSpent,
     });
   }
 }

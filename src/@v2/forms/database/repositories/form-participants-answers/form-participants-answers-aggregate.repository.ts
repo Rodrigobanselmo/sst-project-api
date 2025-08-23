@@ -38,6 +38,7 @@ export class FormParticipantsAnswersAggregateRepository {
           form_application_id: params.application.id,
           employee_id: undefined,
           status: StatusEnum[params.status],
+          time_spent: params.timeSpent,
         },
       });
 

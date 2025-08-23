@@ -36,6 +36,7 @@ export class FormParticipantsAnswersAggregateMapper {
       participant: FormParticipantsAggregateMapper.toAggregate(prisma.form_application.participants),
       application: FormApplicationEntityMapper.toEntity(prisma.form_application),
       answers: FormAnswerEntityMapper.toArray(prisma.answers),
+      timeSpent: prisma.time_spent ?? undefined,
     });
   }
 

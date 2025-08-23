@@ -12,6 +12,7 @@ export class FormParticipantsAnswersEntityMapper {
       createdAt: prisma.created_at,
       updatedAt: prisma.updated_at,
       status: FormParticipantsAnswerStatusEnum[prisma.status],
+      timeSpent: prisma.time_spent || undefined,
     });
   }
 

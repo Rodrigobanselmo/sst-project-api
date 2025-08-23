@@ -7,6 +7,7 @@ export type FormParticipantsAnswersEntityConstructor = {
   updatedAt?: Date;
   employeeId?: number;
   status?: FormParticipantsAnswerStatusEnum;
+  timeSpent?: number;
 };
 
 export class FormParticipantsAnswersEntity {
@@ -15,6 +16,7 @@ export class FormParticipantsAnswersEntity {
   updatedAt: Date;
   employeeId?: number;
   status: FormParticipantsAnswerStatusEnum;
+  timeSpent?: number;
 
   constructor(params: FormParticipantsAnswersEntityConstructor) {
     this.id = params.id ?? generateCuid();
@@ -22,5 +24,6 @@ export class FormParticipantsAnswersEntity {
     this.updatedAt = params.updatedAt ?? new Date();
     this.employeeId = params.employeeId;
     this.status = params.status ?? FormParticipantsAnswerStatusEnum.VALID;
+    this.timeSpent = params.timeSpent;
   }
 }

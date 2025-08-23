@@ -1332,6 +1332,7 @@ model FormParticipantsAnswers {
   created_at DateTime   @default(now())
   updated_at DateTime   @updatedAt
   status     StatusEnum @default(VALID)
+  time_spent Int? // Time spent in seconds
 
   form_application_id String
   form_application    FormApplication @relation(fields: [form_application_id], references: [id])

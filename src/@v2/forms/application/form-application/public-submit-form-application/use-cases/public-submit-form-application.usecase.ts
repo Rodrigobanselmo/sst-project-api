@@ -52,6 +52,7 @@ export class SubmitFormApplicationUseCase {
       application: formApplication,
       participant: participantAggregate,
       answers: answerEntities,
+      timeSpent: params.timeSpent,
     });
 
     await this.formParticipantsAnswersAggregateRepository.create(formParticipantsAnswersAggregate);
