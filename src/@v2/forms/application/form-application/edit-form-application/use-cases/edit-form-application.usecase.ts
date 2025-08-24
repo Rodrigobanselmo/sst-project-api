@@ -67,7 +67,6 @@ export class EditFormApplicationUseCase {
             details: {
               text: question.details.text,
               type: question.details.type,
-              identifierType: question.details.identifierType,
               acceptOther: question.details.acceptOther,
             },
             options: question.options?.map((option) => ({

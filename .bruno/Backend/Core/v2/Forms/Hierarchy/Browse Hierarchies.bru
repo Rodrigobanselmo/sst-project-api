@@ -1,0 +1,53 @@
+meta {
+  name: Browse Hierarchies
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{url}}/v2/companies/:companyId/forms/hierarchies/
+  body: none
+  auth: bearer
+}
+
+params:query {
+  ~type: OFFICE
+  ~type: SECTOR
+  ~parent: null
+}
+
+params:path {
+  companyId: {{companyId}}
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  # Browse Hierarchies for Forms
+  
+  This endpoint allows you to browse hierarchies for forms with filtering capabilities.
+  
+  ## Query Parameters
+  
+  - `type`: Array of hierarchy types to filter by (DIRECTORY, MANAGEMENT, SECTOR, SUB_SECTOR, OFFICE, SUB_OFFICE)
+  - `parent`: Filter by parent ID. Use "null" to get root hierarchies (no parent), or specific parent ID
+  
+  ## Examples
+  
+  1. Get all hierarchies:
+     `GET /v2/companies/{companyId}/forms/hierarchies/`
+  
+  2. Get only OFFICE and SECTOR hierarchies:
+     `GET /v2/companies/{companyId}/forms/hierarchies/?type=OFFICE&type=SECTOR`
+  
+  3. Get root hierarchies (no parent):
+     `GET /v2/companies/{companyId}/forms/hierarchies/?parent=null`
+  
+  4. Get hierarchies with specific parent:
+     `GET /v2/companies/{companyId}/forms/hierarchies/?parent={parentId}`
+  
+  5. Get OFFICE hierarchies with specific parent:
+     `GET /v2/companies/{companyId}/forms/hierarchies/?type=OFFICE&parent={parentId}`
+}

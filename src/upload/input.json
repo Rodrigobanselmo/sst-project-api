@@ -312,7 +312,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "MIDDLE",
-   "Fator de Risco": "Exigência de alto nível de concentração, atenção e memória",
+   "Fator de Risco": "Excesso de exigências cognitivas",
    "Severidade": 4
   },
   {
@@ -330,7 +330,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "MIDDLE",
-   "Fator de Risco": "Exigência de realização de múltiplas tarefas, com alta demanda cognitiva",
+   "Fator de Risco": "Excesso de exigências cognitivas",
    "Severidade": 4
   },
   {
@@ -349,7 +349,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "MIDDLE",
-   "Fator de Risco": "Exigência de realização de múltiplas tarefas, com alta demanda cognitiva",
+   "Fator de Risco": "Excesso de exigências cognitivas",
    "Severidade": 4
   },
   {
@@ -368,7 +368,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "MIDDLE",
-   "Fator de Risco": "Exigência de realização de múltiplas tarefas, com alta demanda cognitiva",
+   "Fator de Risco": "Excesso de exigências cognitivas",
    "Severidade": 4
   },
   {
@@ -386,7 +386,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "MIDDLE",
-   "Fator de Risco": "Excesso de demandas emocionais\/afetivas no trabalho",
+   "Fator de Risco": "Excesso de exigências emocionais",
    "Severidade": 5
   },
   {
@@ -405,7 +405,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "MIDDLE",
-   "Fator de Risco": "Excesso de demandas emocionais\/afetivas no trabalho",
+   "Fator de Risco": "Excesso de exigências emocionais",
    "Severidade": 5
   },
   {
@@ -424,7 +424,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "MIDDLE",
-   "Fator de Risco": "Excesso de demandas emocionais\/afetivas no trabalho",
+   "Fator de Risco": "Excesso de exigências emocionais",
    "Severidade": 5
   },
   {
@@ -442,7 +442,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "MIDDLE",
-   "Fator de Risco": "Assédio de qualquer natureza no trabalho",
+   "Fator de Risco": "Excesso de exigências emocionais",
    "Severidade": 5
   },
   {
@@ -461,7 +461,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "MIDDLE",
-   "Fator de Risco": "Assédio de qualquer natureza no trabalho",
+   "Fator de Risco": "Excesso de exigências emocionais",
    "Severidade": 5
   },
   {
@@ -479,7 +479,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "MIDDLE",
-   "Fator de Risco": "Assédio de qualquer natureza no trabalho",
+   "Fator de Risco": "Excesso de exigências emocionais",
    "Severidade": 5
   },
   {
@@ -497,7 +497,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "MIDDLE",
-   "Fator de Risco": "Assédio de qualquer natureza no trabalho",
+   "Fator de Risco": "Excesso de exigências emocionais",
    "Severidade": 5
   },
   {
@@ -516,7 +516,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "MIDDLE",
-   "Fator de Risco": "Situações de sobrecarga de trabalho mental",
+   "Fator de Risco": "Excesso de demandas no trabalho (sobrecarga)",
    "Severidade": 3
   },
   {
@@ -535,7 +535,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "MIDDLE",
-   "Fator de Risco": "Situações de sobrecarga de trabalho mental",
+   "Fator de Risco": "Excesso de demandas no trabalho (sobrecarga)",
    "Severidade": 3
   },
   {
@@ -553,7 +553,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "MIDDLE",
-   "Fator de Risco": "Situações de sobrecarga de trabalho mental",
+   "Fator de Risco": "Excesso de demandas no trabalho (sobrecarga)",
    "Severidade": 3
   },
   {
@@ -571,7 +571,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "MIDDLE",
-   "Fator de Risco": "Situações de sobrecarga de trabalho mental",
+   "Fator de Risco": "Excesso de demandas no trabalho (sobrecarga)",
    "Severidade": 3
   },
   {
@@ -590,7 +590,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "MIDDLE",
-   "Fator de Risco": "Exigência de alto nível de concentração, atenção e memória",
+   "Fator de Risco": "Excesso de demandas no trabalho (sobrecarga)",
    "Severidade": 3
   },
   {
@@ -608,7 +608,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "MIDDLE",
-   "Fator de Risco": "Exigência de alto nível de concentração, atenção e memória",
+   "Fator de Risco": "Excesso de demandas no trabalho (sobrecarga)",
    "Severidade": 3
   },
   {
@@ -626,7 +626,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "MIDDLE",
-   "Fator de Risco": "Exigência de alto nível de concentração, atenção e memória",
+   "Fator de Risco": "Excesso de demandas no trabalho (sobrecarga)",
    "Severidade": 3
   },
   {
@@ -645,7 +645,7 @@
    "Opções 4": "4 (Muito)",
    "Opções 5": "5 (Extremamente)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de demandas emocionais\/afetivas no trabalho",
+   "Fator de Risco": "Desequilíbrio entre vida pessoal e profissional",
    "Severidade": 4
   },
   {
@@ -664,7 +664,7 @@
    "Opções 4": "4 (Muito)",
    "Opções 5": "5 (Extremamente)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de demandas emocionais\/afetivas no trabalho",
+   "Fator de Risco": "Desequilíbrio entre vida pessoal e profissional",
    "Severidade": 4
   },
   {
@@ -683,7 +683,7 @@
    "Opções 4": "4 (Muito)",
    "Opções 5": "5 (Extremamente)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de demandas emocionais\/afetivas no trabalho",
+   "Fator de Risco": "Desequilíbrio entre vida pessoal e profissional",
    "Severidade": 4
   },
   {
@@ -701,7 +701,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Trabalho com demandas divergentes (ordens divergentes, metas incompatíveis entre si, exigência de qualidade X quantidade, entre outras)",
+   "Fator de Risco": "Desequilíbrio entre vida pessoal e profissional",
    "Severidade": 4
   },
   {
@@ -719,7 +719,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Trabalho com demandas divergentes (ordens divergentes, metas incompatíveis entre si, exigência de qualidade X quantidade, entre outras)",
+   "Fator de Risco": "Desequilíbrio entre vida pessoal e profissional",
    "Severidade": 4
   },
   {
@@ -737,7 +737,7 @@
    "Opções 4": "4 (Muito)",
    "Opções 5": "5 (Extremamente)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse",
+   "Fator de Risco": "Insegurança no Trabalho e Condições Desfavoráveis",
    "Severidade": 4
   },
   {
@@ -755,7 +755,7 @@
    "Opções 4": "4 (Muito)",
    "Opções 5": "5 (Extremamente)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse",
+   "Fator de Risco": "Insegurança no Trabalho e Condições Desfavoráveis",
    "Severidade": 4
   },
   {
@@ -773,7 +773,7 @@
    "Opções 4": "4 (Muito)",
    "Opções 5": "5 (Extremamente)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse",
+   "Fator de Risco": "Insegurança no Trabalho e Condições Desfavoráveis",
    "Severidade": 4
   },
   {
@@ -791,7 +791,7 @@
    "Opções 4": "4 (Muito)",
    "Opções 5": "5 (Extremamente)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse",
+   "Fator de Risco": "Insegurança no Trabalho e Condições Desfavoráveis",
    "Severidade": 4
   },
   {
@@ -809,7 +809,7 @@
    "Opções 4": "4 (Muito)",
    "Opções 5": "5 (Extremamente)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse",
+   "Fator de Risco": "Insegurança no Trabalho e Condições Desfavoráveis",
    "Severidade": 4
   },
   {
@@ -828,7 +828,7 @@
    "Opções 4": "4 (Muito)",
    "Opções 5": "5 (Extremamente)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse",
+   "Fator de Risco": "Insegurança no Trabalho e Condições Desfavoráveis",
    "Severidade": 4
   },
   {
@@ -846,7 +846,7 @@
    "Opções 4": "4 (Muito)",
    "Opções 5": "5 (Extremamente)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse",
+   "Fator de Risco": "Insegurança no Trabalho e Condições Desfavoráveis",
    "Severidade": 4
   },
   {
@@ -864,7 +864,7 @@
    "Opções 4": "4 (Muito)",
    "Opções 5": "5 (Extremamente)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse",
+   "Fator de Risco": "Insegurança no Trabalho e Condições Desfavoráveis",
    "Severidade": 4
   },
   {
@@ -882,7 +882,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Insatisfação no trabalho",
+   "Fator de Risco": "Insegurança no Trabalho e Condições Desfavoráveis",
    "Severidade": 4
   },
   {
@@ -900,7 +900,7 @@
    "Opções 4": "4 (Muito)",
    "Opções 5": "5 (Extremamente)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Insatisfação no trabalho",
+   "Fator de Risco": "Insegurança no Trabalho e Condições Desfavoráveis",
    "Severidade": 4
   },
   {
@@ -919,7 +919,7 @@
    "Opções 4": "4 (Muito)",
    "Opções 5": "5 (Extremamente)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Insatisfação no trabalho",
+   "Fator de Risco": "Insegurança no Trabalho e Condições Desfavoráveis",
    "Severidade": 4
   },
   {
@@ -938,7 +938,7 @@
    "Opções 4": "4 (Muito)",
    "Opções 5": "5 (Extremamente)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Insatisfação no trabalho",
+   "Fator de Risco": "Insegurança no Trabalho e Condições Desfavoráveis",
    "Severidade": 4
   },
   {
@@ -957,7 +957,7 @@
    "Opções 4": "4 (Muito)",
    "Opções 5": "5 (Extremamente)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Insatisfação no trabalho",
+   "Fator de Risco": "Insegurança no Trabalho e Condições Desfavoráveis",
    "Severidade": 4
   },
   {
@@ -976,7 +976,7 @@
    "Opções 4": "4 (Muito)",
    "Opções 5": "5 (Extremamente)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Insatisfação no trabalho",
+   "Fator de Risco": "Insegurança no Trabalho e Condições Desfavoráveis",
    "Severidade": 4
   },
   {
@@ -994,7 +994,7 @@
    "Opções 4": "4 (Muito)",
    "Opções 5": "5 (Extremamente)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Insatisfação no trabalho",
+   "Fator de Risco": "Insegurança no Trabalho e Condições Desfavoráveis",
    "Severidade": 4
   },
   {
@@ -1013,7 +1013,7 @@
    "Opções 4": "4 (Muito)",
    "Opções 5": "5 (Extremamente)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Insatisfação no trabalho",
+   "Fator de Risco": "Baixa satisfação com o trabalho",
    "Severidade": 4
   },
   {
@@ -1032,7 +1032,7 @@
    "Opções 4": "4 (Muito)",
    "Opções 5": "5 (Extremamente)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Insatisfação no trabalho",
+   "Fator de Risco": "Baixa satisfação com o trabalho",
    "Severidade": 4
   },
   {
@@ -1050,7 +1050,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Insatisfação no trabalho",
+   "Fator de Risco": "Baixa satisfação com o trabalho",
    "Severidade": 4
   },
   {
@@ -1068,7 +1068,7 @@
    "Opções 4": "4 (Muito)",
    "Opções 5": "5 (Extremamente)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Insatisfação no trabalho",
+   "Fator de Risco": "Baixa satisfação com o trabalho",
    "Severidade": 4
   },
   {
@@ -1086,7 +1086,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Insatisfação no trabalho",
+   "Fator de Risco": "Baixa satisfação com o trabalho",
    "Severidade": 4
   },
   {
@@ -1105,7 +1105,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Falta de autonomia no trabalho",
+   "Fator de Risco": "Baixo controle no trabalho\/falta de autonomia",
    "Severidade": 4
   },
   {
@@ -1123,7 +1123,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Falta de autonomia no trabalho",
+   "Fator de Risco": "Baixo controle no trabalho\/falta de autonomia",
    "Severidade": 4
   },
   {
@@ -1141,7 +1141,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Falta de autonomia no trabalho",
+   "Fator de Risco": "Baixo controle no trabalho\/falta de autonomia",
    "Severidade": 4
   },
   {
@@ -1159,7 +1159,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Falta de autonomia no trabalho",
+   "Fator de Risco": "Baixo controle no trabalho\/falta de autonomia",
    "Severidade": 4
   },
   {
@@ -1178,7 +1178,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Situações de sobrecarga de trabalho mental",
+   "Fator de Risco": "Excesso de demandas no trabalho (sobrecarga)",
    "Severidade": 3
   },
   {
@@ -1196,7 +1196,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse",
+   "Fator de Risco": "Baixa satisfação com o trabalho",
    "Severidade": 4
   },
   {
@@ -1215,7 +1215,7 @@
    "Opções 4": "4 (Muito)",
    "Opções 5": "5 (Extremamente)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse",
+   "Fator de Risco": "Baixa satisfação com o trabalho",
    "Severidade": 4
   },
   {
@@ -1233,7 +1233,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse",
+   "Fator de Risco": "Baixa satisfação com o trabalho",
    "Severidade": 4
   },
   {
@@ -1252,7 +1252,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Falta de autonomia no trabalho",
+   "Fator de Risco": "Baixo controle no trabalho\/falta de autonomia",
    "Severidade": 4
   },
   {
@@ -1271,7 +1271,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Falta de autonomia no trabalho",
+   "Fator de Risco": "Baixo controle no trabalho\/falta de autonomia",
    "Severidade": 4
   },
   {
@@ -1290,7 +1290,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Falta de autonomia no trabalho",
+   "Fator de Risco": "Baixo controle no trabalho\/falta de autonomia",
    "Severidade": 4
   },
   {
@@ -1308,7 +1308,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Falta de autonomia no trabalho",
+   "Fator de Risco": "Baixo controle no trabalho\/falta de autonomia",
    "Severidade": 4
   },
   {
@@ -1326,7 +1326,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Falta de autonomia no trabalho",
+   "Fator de Risco": "Baixo controle no trabalho\/falta de autonomia",
    "Severidade": 4
   },
   {
@@ -1345,7 +1345,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Falta de autonomia no trabalho",
+   "Fator de Risco": "Baixo controle no trabalho\/falta de autonomia",
    "Severidade": 4
   },
   {
@@ -1364,7 +1364,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Exigência de realização de múltiplas tarefas, com alta demanda cognitiva",
+   "Fator de Risco": "Pouco estímulo ao desenvolvimento",
    "Severidade": 3
   },
   {
@@ -1383,7 +1383,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Exigência de realização de múltiplas tarefas, com alta demanda cognitiva",
+   "Fator de Risco": "Pouco estímulo ao desenvolvimento",
    "Severidade": 3
   },
   {
@@ -1402,7 +1402,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Exigência de realização de múltiplas tarefas, com alta demanda cognitiva",
+   "Fator de Risco": "Pouco estímulo ao desenvolvimento",
    "Severidade": 3
   },
   {
@@ -1421,7 +1421,7 @@
    "Opções 4": "4 (Muito)",
    "Opções 5": "5 (Extremamente)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Insatisfação no trabalho",
+   "Fator de Risco": "Baixa satisfação com o trabalho",
    "Severidade": 4
   },
   {
@@ -1440,7 +1440,7 @@
    "Opções 4": "4 (Muito)",
    "Opções 5": "5 (Extremamente)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Insatisfação no trabalho",
+   "Fator de Risco": "Baixa satisfação com o trabalho",
    "Severidade": 4
   },
   {
@@ -1458,7 +1458,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Exigência de realização de múltiplas tarefas, com alta demanda cognitiva",
+   "Fator de Risco": "Pouco estímulo ao desenvolvimento",
    "Severidade": 3
   },
   {
@@ -1476,7 +1476,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Exigência de realização de múltiplas tarefas, com alta demanda cognitiva",
+   "Fator de Risco": "Pouco estímulo ao desenvolvimento",
    "Severidade": 3
   },
   {
@@ -1495,7 +1495,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "LONG",
-   "Fator de Risco": "Excesso de situações de estresse",
+   "Fator de Risco": "Baixo controle no trabalho\/falta de autonomia",
    "Severidade": 4
   },
   {
@@ -1513,7 +1513,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "LONG",
-   "Fator de Risco": "Excesso de situações de estresse",
+   "Fator de Risco": "Baixo controle no trabalho\/falta de autonomia",
    "Severidade": 4
   },
   {
@@ -1532,7 +1532,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "LONG",
-   "Fator de Risco": "Excesso de situações de estresse",
+   "Fator de Risco": "Baixo controle no trabalho\/falta de autonomia",
    "Severidade": 4
   },
   {
@@ -1550,7 +1550,7 @@
    "Opções 4": "4 (Muito)",
    "Opções 5": "5 (Extremamente)",
    "Opsões Originais": "LONG",
-   "Fator de Risco": "Excesso de situações de estresse",
+   "Fator de Risco": "Baixo controle no trabalho\/falta de autonomia",
    "Severidade": 4
   },
   {
@@ -1568,7 +1568,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "LONG",
-   "Fator de Risco": "Excesso de situações de estresse",
+   "Fator de Risco": "Baixo controle no trabalho\/falta de autonomia",
    "Severidade": 4
   },
   {
@@ -1586,7 +1586,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "LONG",
-   "Fator de Risco": "Excesso de situações de estresse",
+   "Fator de Risco": "Baixo controle no trabalho\/falta de autonomia",
    "Severidade": 4
   },
   {
@@ -1605,7 +1605,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Trabalho em condições de difícil comunicação",
+   "Fator de Risco": "Falta de suporte\/apoio no trabalho",
    "Severidade": 4
   },
   {
@@ -1624,7 +1624,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Trabalho em condições de difícil comunicação",
+   "Fator de Risco": "Falta de suporte\/apoio no trabalho",
    "Severidade": 4
   },
   {
@@ -1643,7 +1643,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Trabalho em condições de difícil comunicação",
+   "Fator de Risco": "Falta de suporte\/apoio no trabalho",
    "Severidade": 4
   },
   {
@@ -1662,7 +1662,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Trabalho em condições de difícil comunicação",
+   "Fator de Risco": "Falta de suporte\/apoio no trabalho",
    "Severidade": 4
   },
   {
@@ -1681,7 +1681,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Trabalho em condições de difícil comunicação",
+   "Fator de Risco": "Falta de suporte\/apoio no trabalho",
    "Severidade": 4
   },
   {
@@ -1700,7 +1700,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Trabalho em condições de difícil comunicação",
+   "Fator de Risco": "Falta de suporte\/apoio no trabalho",
    "Severidade": 4
   },
   {
@@ -1719,7 +1719,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Trabalho com demandas divergentes (ordens divergentes, metas incompatíveis entre si, exigência de qualidade X quantidade, entre outras)",
+   "Fator de Risco": "Conflito de Valores",
    "Severidade": 4
   },
   {
@@ -1738,7 +1738,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Trabalho com demandas divergentes (ordens divergentes, metas incompatíveis entre si, exigência de qualidade X quantidade, entre outras)",
+   "Fator de Risco": "Conflito de Valores",
    "Severidade": 4
   },
   {
@@ -1757,7 +1757,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Trabalho com demandas divergentes (ordens divergentes, metas incompatíveis entre si, exigência de qualidade X quantidade, entre outras)",
+   "Fator de Risco": "Trabalho em condições de difícil comunicação",
    "Severidade": 3
   },
   {
@@ -1776,7 +1776,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Trabalho com demandas divergentes (ordens divergentes, metas incompatíveis entre si, exigência de qualidade X quantidade, entre outras)",
+   "Fator de Risco": "Trabalho em condições de difícil comunicação",
    "Severidade": 3
   },
   {
@@ -1795,7 +1795,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de conflitos hierárquicos no trabalho",
+   "Fator de Risco": "Liderança e Gestão Ineficaz",
    "Severidade": 5
   },
   {
@@ -1814,7 +1814,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de conflitos hierárquicos no trabalho",
+   "Fator de Risco": "Liderança e Gestão Ineficaz",
    "Severidade": 5
   },
   {
@@ -1833,7 +1833,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de conflitos hierárquicos no trabalho",
+   "Fator de Risco": "Liderança e Gestão Ineficaz",
    "Severidade": 5
   },
   {
@@ -1852,7 +1852,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de conflitos hierárquicos no trabalho",
+   "Fator de Risco": "Pouco estímulo à desenvolvimento",
    "Severidade": 3
   },
   {
@@ -1871,7 +1871,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Insatisfação no trabalho",
+   "Fator de Risco": "Baixas recompensas e reconhecimentos",
    "Severidade": 4
   },
   {
@@ -1890,7 +1890,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Insatisfação no trabalho",
+   "Fator de Risco": "Baixa justiça organizacional",
    "Severidade": 4
   },
   {
@@ -1909,7 +1909,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Insatisfação no trabalho",
+   "Fator de Risco": "Baixa justiça organizacional",
    "Severidade": 4
   },
   {
@@ -1928,7 +1928,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Trabalho com demandas divergentes (ordens divergentes, metas incompatíveis entre si, exigência de qualidade X quantidade, entre outras)",
+   "Fator de Risco": "Conflito de Valores",
    "Severidade": 4
   },
   {
@@ -1947,7 +1947,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Trabalho com demandas divergentes (ordens divergentes, metas incompatíveis entre si, exigência de qualidade X quantidade, entre outras)",
+   "Fator de Risco": "Baixa clareza de papel\/função",
    "Severidade": 3
   },
   {
@@ -1966,7 +1966,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Trabalho com demandas divergentes (ordens divergentes, metas incompatíveis entre si, exigência de qualidade X quantidade, entre outras)",
+   "Fator de Risco": "Baixa clareza de papel\/função",
    "Severidade": 3
   },
   {
@@ -1985,7 +1985,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Trabalho com demandas divergentes (ordens divergentes, metas incompatíveis entre si, exigência de qualidade X quantidade, entre outras)",
+   "Fator de Risco": "Baixa clareza de papel\/função",
    "Severidade": 3
   },
   {
@@ -2002,8 +2002,7 @@
    "Opções 3": "3 (Às vezes)",
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
-   "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse"
+   "Opsões Originais": "CORE"
   },
   {
    "Categoria": "SAÚDE E BEM-ESTAR",
@@ -2019,8 +2018,7 @@
    "Opções 3": "3 (Às vezes)",
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
-   "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse"
+   "Opsões Originais": "CORE"
   },
   {
    "Categoria": "SAÚDE E BEM-ESTAR",
@@ -2036,8 +2034,7 @@
    "Opções 3": "3 (Às vezes)",
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
-   "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse"
+   "Opsões Originais": "CORE"
   },
   {
    "Categoria": "SAÚDE E BEM-ESTAR",
@@ -2053,8 +2050,7 @@
    "Opções 3": "3 (Às vezes)",
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
-   "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse"
+   "Opsões Originais": "CORE"
   },
   {
    "Categoria": "SAÚDE E BEM-ESTAR",
@@ -2070,8 +2066,7 @@
    "Opções 3": "3 (Às vezes)",
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
-   "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse"
+   "Opsões Originais": "CORE"
   },
   {
    "Categoria": "SAÚDE E BEM-ESTAR",
@@ -2087,8 +2082,7 @@
    "Opções 3": "3 (Às vezes)",
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
-   "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse"
+   "Opsões Originais": "CORE"
   },
   {
    "Categoria": "SAÚDE E BEM-ESTAR",
@@ -2104,8 +2098,7 @@
    "Opções 3": "3 (Às vezes)",
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
-   "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse"
+   "Opsões Originais": "CORE"
   },
   {
    "Categoria": "SAÚDE E BEM-ESTAR",
@@ -2121,8 +2114,7 @@
    "Opções 3": "3 (Às vezes)",
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
-   "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse"
+   "Opsões Originais": "CORE"
   },
   {
    "Categoria": "SAÚDE E BEM-ESTAR",
@@ -2138,8 +2130,7 @@
    "Opções 3": "3 (Às vezes)",
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
-   "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse"
+   "Opsões Originais": "CORE"
   },
   {
    "Categoria": "SAÚDE E BEM-ESTAR",
@@ -2155,8 +2146,7 @@
    "Opções 3": "3 (Às vezes)",
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
-   "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse"
+   "Opsões Originais": "CORE"
   },
   {
    "Categoria": "SAÚDE E BEM-ESTAR",
@@ -2172,8 +2162,7 @@
    "Opções 3": "3 (Às vezes)",
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
-   "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse"
+   "Opsões Originais": "CORE"
   },
   {
    "Categoria": "SAÚDE E BEM-ESTAR",
@@ -2189,8 +2178,7 @@
    "Opções 3": "3 (Às vezes)",
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
-   "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse"
+   "Opsões Originais": "CORE"
   },
   {
    "Categoria": "SAÚDE E BEM-ESTAR",
@@ -2206,8 +2194,7 @@
    "Opções 3": "3 (Às vezes)",
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
-   "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse"
+   "Opsões Originais": "CORE"
   },
   {
    "Categoria": "SAÚDE E BEM-ESTAR",
@@ -2223,8 +2210,7 @@
    "Opções 3": "3 (Às vezes)",
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
-   "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse"
+   "Opsões Originais": "CORE"
   },
   {
    "Categoria": "SAÚDE E BEM-ESTAR",
@@ -2240,8 +2226,7 @@
    "Opções 3": "3 (Às vezes)",
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
-   "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse"
+   "Opsões Originais": "CORE"
   },
   {
    "Categoria": "SAÚDE E BEM-ESTAR",
@@ -2257,8 +2242,7 @@
    "Opções 3": "3 (Às vezes)",
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
-   "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse"
+   "Opsões Originais": "CORE"
   },
   {
    "Categoria": "SAÚDE E BEM-ESTAR",
@@ -2274,8 +2258,7 @@
    "Opções 3": "3 (Às vezes)",
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
-   "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse"
+   "Opsões Originais": "CORE"
   },
   {
    "Categoria": "SAÚDE E BEM-ESTAR",
@@ -2291,8 +2274,7 @@
    "Opções 3": "3 (Às vezes)",
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
-   "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse"
+   "Opsões Originais": "CORE"
   },
   {
    "Categoria": "SAÚDE E BEM-ESTAR",
@@ -2308,8 +2290,7 @@
    "Opções 3": "3 (Às vezes)",
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
-   "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse"
+   "Opsões Originais": "CORE"
   },
   {
    "Categoria": "SAÚDE E BEM-ESTAR",
@@ -2325,8 +2306,7 @@
    "Opções 3": "3 (Boa)",
    "Opções 4": "4 (Muito boa)",
    "Opções 5": "5 (Excelente)",
-   "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse"
+   "Opsões Originais": "CORE"
   },
   {
    "Categoria": "SAÚDE E BEM-ESTAR",
@@ -2342,8 +2322,7 @@
    "Opções 3": 3,
    "Opções 4": 4,
    "Opções 5": 5,
-   "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse"
+   "Opsões Originais": "CORE"
   },
   {
    "Categoria": "SAÚDE E BEM-ESTAR",
@@ -2359,8 +2338,7 @@
    "Opções 3": "3 (Às vezes)",
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
-   "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse"
+   "Opsões Originais": "CORE"
   },
   {
    "Categoria": "SAÚDE E BEM-ESTAR",
@@ -2376,8 +2354,7 @@
    "Opções 3": "3 (Às vezes)",
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
-   "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse"
+   "Opsões Originais": "CORE"
   },
   {
    "Categoria": "SAÚDE E BEM-ESTAR",
@@ -2393,8 +2370,7 @@
    "Opções 3": "3 (Às vezes)",
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
-   "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse"
+   "Opsões Originais": "CORE"
   },
   {
    "Categoria": "SAÚDE E BEM-ESTAR",
@@ -2410,8 +2386,7 @@
    "Opções 3": "3 (Às vezes)",
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
-   "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de situações de estresse"
+   "Opsões Originais": "CORE"
   },
   {
    "Categoria": "VALORES NO LOCAL DE TRABALHO",
@@ -2429,7 +2404,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Trabalho em condições de difícil comunicação",
+   "Fator de Risco": "Baixa confiança e cooperação no trabalho",
    "Severidade": 3
   },
   {
@@ -2448,7 +2423,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Trabalho em condições de difícil comunicação",
+   "Fator de Risco": "Baixa confiança e cooperação no trabalho",
    "Severidade": 3
   },
   {
@@ -2467,7 +2442,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Trabalho em condições de difícil comunicação",
+   "Fator de Risco": "Baixa confiança e cooperação no trabalho",
    "Severidade": 3
   },
   {
@@ -2486,7 +2461,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Trabalho em condições de difícil comunicação",
+   "Fator de Risco": "Baixa confiança e cooperação no trabalho",
    "Severidade": 3
   },
   {
@@ -2505,7 +2480,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Trabalho em condições de difícil comunicação",
+   "Fator de Risco": "Baixa confiança e cooperação no trabalho",
    "Severidade": 3
   },
   {
@@ -2523,7 +2498,7 @@
    "Opções 4": "4 (Em pequena medida)",
    "Opções 5": "5 (Em muito pequena medida)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Trabalho em condições de difícil comunicação",
+   "Fator de Risco": "Baixa confiança e cooperação no trabalho",
    "Severidade": 3
   },
   {
@@ -2542,7 +2517,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Trabalho em condições de difícil comunicação",
+   "Fator de Risco": "Baixa confiança e cooperação no trabalho",
    "Severidade": 3
   },
   {
@@ -2561,7 +2536,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de conflitos hierárquicos no trabalho",
+   "Fator de Risco": "Baixa justiça organizacional",
    "Severidade": 4
   },
   {
@@ -2579,7 +2554,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de conflitos hierárquicos no trabalho",
+   "Fator de Risco": "Baixa justiça organizacional",
    "Severidade": 4
   },
   {
@@ -2598,7 +2573,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de conflitos hierárquicos no trabalho",
+   "Fator de Risco": "Baixas recompensas e reconhecimentos",
    "Severidade": 4
   },
   {
@@ -2617,7 +2592,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Excesso de conflitos hierárquicos no trabalho",
+   "Fator de Risco": "Baixa justiça organizacional",
    "Severidade": 4
   },
   {
@@ -2636,7 +2611,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Trabalho em condições de difícil comunicação",
+   "Fator de Risco": "Relacionamentos ruins no local de trabalho",
    "Severidade": 4
   },
   {
@@ -2655,7 +2630,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Trabalho em condições de difícil comunicação",
+   "Fator de Risco": "Baixa confiança e cooperação no trabalho",
    "Severidade": 3
   },
   {
@@ -2674,7 +2649,7 @@
    "Opções 4": "4 (Frequentemente)",
    "Opções 5": "5 (Sempre)",
    "Opsões Originais": "CORE",
-   "Fator de Risco": "Trabalho em condições de difícil comunicação",
+   "Fator de Risco": "Baixa confiança e cooperação no trabalho",
    "Severidade": 3
   }
  ]

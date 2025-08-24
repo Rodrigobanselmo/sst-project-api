@@ -12,6 +12,8 @@ import { FormQuestionEntity } from '../entities/form-question.entity';
 import { FormQuestionOptionEntity } from '../entities/form-question-option.entity';
 import { FormQuestionIdentifierEntity } from '../entities/form-question-identifier.entity';
 import { FormParticipantsAggregate } from './form-participants.aggregate';
+import { FormIdentifierTypeEnum } from '../enums/form-identifier-type.enum';
+import { FormQuestionDetailsFactory } from '../factories/form-question-details.factory';
 
 export type IFormApplicationAggregate = {
   formApplication: FormApplicationEntity;
@@ -27,7 +29,6 @@ export interface IIdentifierQuestionInput {
   details: {
     text: string;
     type: any;
-    identifierType: any;
     acceptOther?: boolean;
   };
   options?: {
@@ -70,6 +71,25 @@ export class FormApplicationAggregate {
 
   get participantsHierarchies() {
     return this._participants?.participantsHierarchies || [];
+  }
+
+  get isAskingHierarchy() {
+    const hierarchyTypes = [
+      FormIdentifierTypeEnum.DIRECTORY,
+      FormIdentifierTypeEnum.MANAGEMENT,
+      FormIdentifierTypeEnum.SECTOR,
+      FormIdentifierTypeEnum.OFFICE,
+      FormIdentifierTypeEnum.SUB_OFFICE,
+      FormIdentifierTypeEnum.SUB_SECTOR,
+    ];
+
+    return this.identifier.questions.some((question) => {
+      if (hierarchyTypes.includes(question.identifier.type)) {
+        return true;
+      }
+
+      return false;
+    });
   }
 
   setForm(value: FormEntity): DomainResponse {
@@ -182,7 +202,7 @@ export class FormApplicationAggregate {
 
     currentQuestion.details.update({
       text: newQuestion.details.text,
-      type: newQuestion.details.type,
+      type: FormQuestionDetailsFactory.mapIdentifierTypeToQuestionType(newQuestion.identifierEntity.type),
       acceptOther: newQuestion.details.acceptOther,
     });
 

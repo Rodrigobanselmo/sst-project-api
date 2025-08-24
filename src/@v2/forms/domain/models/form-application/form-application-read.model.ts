@@ -1,3 +1,4 @@
+import { FormTypeEnum } from '../../enums/form-type.enum';
 import { FormStatusEnum } from '../../enums/form-status.enum';
 import { FormQuestionGroupReadModel } from '../shared/form-question-group-read.model';
 
@@ -10,7 +11,7 @@ export type IFormApplicationReadModel = {
   updatedAt: Date;
   startedAt: Date | null;
   endedAt: Date | null;
-  form: { id: string; name: string };
+  form: { id: string; name: string; type: FormTypeEnum };
   status: FormStatusEnum;
   participants: {
     hierarchies: { id: string; name: string }[];
@@ -34,7 +35,7 @@ export class FormApplicationReadModel {
   startedAt: Date | null;
   endedAt: Date | null;
   status: FormStatusEnum;
-  form: { id: string; name: string };
+  form: { id: string; name: string; type: FormTypeEnum };
   isShareableLink: boolean;
   isAnonymous: boolean;
   participants: {

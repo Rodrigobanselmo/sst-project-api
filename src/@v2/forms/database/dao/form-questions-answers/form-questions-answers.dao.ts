@@ -14,7 +14,7 @@ export class FormQuestionsAnswersDAO {
 
   async browse({ filters }: IFormQuestionsAnswersDAO.BrowseParams) {
     const form = await this.prisma.formApplication.findUnique({
-      where: { id: filters.formApplicationId },
+      where: { id: filters.formApplicationId, company_id: filters.companyId },
       select: { form_id: true, status: true },
     });
 
@@ -69,7 +69,7 @@ export class FormQuestionsAnswersDAO {
           '[]'::json
         ) as answers
       FROM 
-        "FormQuestionGroup" qg
+      "FormQuestionGroup" qg
         INNER JOIN "FormQuestionGroupData" qgd ON qg."id" = qgd."form_question_group_id" AND qgd."deleted_at" IS NULL
         INNER JOIN "FormQuestion" q ON qg."id" = q."question_group_id" AND q."deleted_at" IS NULL
         INNER JOIN "FormQuestionData" qd ON q."id" = qd."form_question_id" AND qd."deleted_at" IS NULL
@@ -99,10 +99,6 @@ export class FormQuestionsAnswersDAO {
       Prisma.sql`qdetd."deleted_at" IS NULL`,
       Prisma.sql`(qod."deleted_at" IS NULL OR qod."deleted_at" IS NULL)`,
     ];
-
-    if (filters.companyId) {
-      where.push(Prisma.sql`qdet."company_id" = ${filters.companyId}`);
-    }
 
     if (filters.formApplicationId) {
       where.push(Prisma.sql`

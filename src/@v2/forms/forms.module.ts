@@ -38,6 +38,8 @@ import { FormParticipantsAnswersAggregateRepository } from './database/repositor
 import { FormParticipantsAggregateRepository } from './database/repositories/form-participants/form-participants-aggregate.repository';
 import { BrowseRisksController } from './application/risk/browse-risks/controllers/browse-risks.controller';
 import { BrowseRisksUseCase } from './application/risk/browse-risks/use-cases/browse-risks.usecase';
+import { BrowseHierarchiesController } from './application/hierarchy/browse-hierarchies/controllers/browse-hierarchies.controller';
+import { BrowseHierarchiesUseCase } from './application/hierarchy/browse-hierarchies/use-cases/browse-hierarchies.usecase';
 
 @Module({
   imports: [SharedModule],
@@ -54,6 +56,7 @@ import { BrowseRisksUseCase } from './application/risk/browse-risks/use-cases/br
     PublicFormApplicationController,
     PublicSubmitFormApplicationController,
     BrowseRisksController,
+    BrowseHierarchiesController,
   ],
   providers: [
     // Database
@@ -84,6 +87,7 @@ import { BrowseRisksUseCase } from './application/risk/browse-risks/use-cases/br
     AddFormUseCase,
     EditFormUseCase,
     BrowseRisksUseCase,
+    BrowseHierarchiesUseCase,
   ],
   exports: [],
 })

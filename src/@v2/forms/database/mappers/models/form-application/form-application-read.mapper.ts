@@ -15,6 +15,7 @@ import {
   FormIdentifierTypeEnum as PrismaFormIdentifierTypeEnum,
 } from '@prisma/client';
 import { FormIdentifierTypeEnum } from '@/@v2/forms/domain/enums/form-identifier-type.enum';
+import { FormTypeEnum } from '@/@v2/forms/domain/enums/form-type.enum';
 
 export type IFormApplicationReadModelMapper = PrismaFormApplication & {
   form: PrismaForm;
@@ -81,7 +82,11 @@ export class FormApplicationReadModelMapper {
       status: FormStatusEnum[prisma.status],
       isShareableLink: prisma.form.shareable_link,
       isAnonymous: prisma.form.anonymous,
-      form: prisma.form,
+      form: {
+        id: prisma.form.id,
+        name: prisma.form.name,
+        type: FormTypeEnum[prisma.form.type],
+      },
       totalParticipants: prisma.totalParticipants,
       totalAnswers: prisma.totalAnswers,
       averageTimeSpent: prisma.averageTimeSpent,

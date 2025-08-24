@@ -3,12 +3,12 @@ import { FormQuestionTypeEnum } from '../enums/form-question-type.enum';
 import { FormIdentifierTypeEnum } from '../enums/form-identifier-type.enum';
 
 export class FormQuestionDetailsFactory {
-  private static mapIdentifierTypeToQuestionType(identifierType: FormIdentifierTypeEnum): FormQuestionTypeEnum {
+  static mapIdentifierTypeToQuestionType(identifierType: FormIdentifierTypeEnum): FormQuestionTypeEnum {
     switch (identifierType) {
       case FormIdentifierTypeEnum.CUSTOM:
         return FormQuestionTypeEnum.RADIO;
       default:
-        return FormQuestionTypeEnum.TEXT;
+        return FormQuestionTypeEnum.SYSTEM;
     }
   }
 

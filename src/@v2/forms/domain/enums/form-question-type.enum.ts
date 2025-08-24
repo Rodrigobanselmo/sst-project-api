@@ -9,4 +9,5 @@ export enum FormQuestionTypeEnum {
   INTENSITY = 'INTENSITY',
   DATE = 'DATE',
   NUMBER = 'NUMBER',
+  SYSTEM = 'SYSTEM',
 }

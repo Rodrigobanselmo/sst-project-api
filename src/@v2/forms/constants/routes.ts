@@ -14,4 +14,7 @@ export const FormRoutes = {
   RISK: {
     PATH: 'v2/companies/:companyId/forms/risks/',
   },
+  HIERARCHY: {
+    PATH: 'v2/companies/:companyId/forms/hierarchies/',
+  },
 } as const;
