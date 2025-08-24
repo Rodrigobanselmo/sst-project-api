@@ -14,6 +14,7 @@ export type IFormApplicationBrowseResultModelMapper = {
   companyId: string;
   total_answers: number;
   total_participants: number;
+  average_time_spent: number | null;
 
   form_id: string;
   form_name: string;
@@ -35,6 +36,7 @@ export class FormApplicationBrowseResultModelMapper {
       companyId: prisma.companyId,
       totalAnswers: prisma.total_answers,
       totalParticipants: prisma.total_participants,
+      averageTimeSpent: prisma.average_time_spent,
       form: {
         id: prisma.form_id,
         name: prisma.form_name,

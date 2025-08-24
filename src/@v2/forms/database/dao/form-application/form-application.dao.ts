@@ -112,12 +112,26 @@ export class FormApplicationDAO {
       },
     });
 
-    const [totalParticipants, totalAnswers] = await Promise.all([totalParticipantsPromise, totalAnswersPromise]);
+    const averageTimeSpentPromise = this.prisma.formParticipantsAnswers.aggregate({
+      where: {
+        form_application_id: params.id,
+        status: formApplication.status === FormStatusEnum.TESTING ? 'TESTING' : 'VALID',
+        time_spent: {
+          not: null,
+        },
+      },
+      _avg: {
+        time_spent: true,
+      },
+    });
+
+    const [totalParticipants, totalAnswers, averageTimeSpentResult] = await Promise.all([totalParticipantsPromise, totalAnswersPromise, averageTimeSpentPromise]);
 
     return FormApplicationReadModelMapper.toModel({
       ...formApplication,
       totalParticipants,
       totalAnswers,
+      averageTimeSpent: averageTimeSpentResult._avg.time_spent,
     });
   }
 
@@ -234,6 +248,7 @@ export class FormApplicationDAO {
         ,form."system" as form_system
         ,COUNT(DISTINCT form_part_ans."id")::integer as total_answers
         ,COUNT(DISTINCT emp."id")::integer as total_participants
+        ,AVG(form_part_ans."time_spent")::integer as average_time_spent
       FROM 
         "FormApplication" form_ap
       LEFT JOIN 

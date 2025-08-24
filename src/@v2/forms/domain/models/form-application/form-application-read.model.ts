@@ -21,6 +21,7 @@ export type IFormApplicationReadModel = {
   isAnonymous: boolean;
   totalParticipants: number;
   totalAnswers: number;
+  averageTimeSpent: number | null;
 };
 
 export class FormApplicationReadModel {
@@ -42,6 +43,7 @@ export class FormApplicationReadModel {
   };
   totalParticipants: number;
   totalAnswers: number;
+  averageTimeSpent: number | null;
   questionIdentifierGroup: FormQuestionGroupReadModel;
 
   constructor(params: IFormApplicationReadModel) {
@@ -60,5 +62,6 @@ export class FormApplicationReadModel {
     this.questionIdentifierGroup = params.questionIdentifierGroup;
     this.totalParticipants = params.totalParticipants;
     this.totalAnswers = params.totalAnswers;
+    this.averageTimeSpent = params.averageTimeSpent;
   }
 }

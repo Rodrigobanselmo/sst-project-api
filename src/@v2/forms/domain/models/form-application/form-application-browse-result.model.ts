@@ -20,6 +20,7 @@ export type IFormApplicationBrowseResultModel = {
   companyId: string;
   totalAnswers: number;
   totalParticipants: number;
+  averageTimeSpent: number | null;
   form: IFormResultModel;
 };
 
@@ -35,6 +36,7 @@ export class FormApplicationBrowseResultModel {
   companyId: string;
   totalAnswers: number;
   totalParticipants: number;
+  averageTimeSpent: number | null;
   form: IFormResultModel;
 
   constructor(params: IFormApplicationBrowseResultModel) {
@@ -50,6 +52,7 @@ export class FormApplicationBrowseResultModel {
 
     this.totalParticipants = params.totalParticipants;
     this.totalAnswers = params.totalAnswers;
+    this.averageTimeSpent = params.averageTimeSpent;
     this.form = params.form;
   }
 }

@@ -20,6 +20,7 @@ export type IFormApplicationReadModelMapper = PrismaFormApplication & {
   form: PrismaForm;
   totalParticipants: number;
   totalAnswers: number;
+  averageTimeSpent: number | null;
   participants:
     | (PrismaFormParticipants & {
         hierarchies: (PrismaFormParticipantsHierarchy & { hierarchy: { id: string; name: string } })[];
@@ -83,6 +84,7 @@ export class FormApplicationReadModelMapper {
       form: prisma.form,
       totalParticipants: prisma.totalParticipants,
       totalAnswers: prisma.totalAnswers,
+      averageTimeSpent: prisma.averageTimeSpent,
       participants: prisma.participants
         ? {
             hierarchies: prisma.participants.hierarchies.map((h) => ({
