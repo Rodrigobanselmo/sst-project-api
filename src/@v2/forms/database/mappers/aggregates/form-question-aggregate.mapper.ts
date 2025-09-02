@@ -3,11 +3,13 @@ import { FormQuestionDetails, FormQuestionDetailsData } from '@prisma/client';
 import { FormQuestionDetailsEntityMapper } from '../entities/form-question-details.mapper';
 import { FormQuestionIdentifierEntityMapper, FormQuestionIdentifierEntityMapperConstructor } from '../entities/form-question-identifier.mapper';
 import { FormQuestionOptionEntityMapper, FormQuestionOptionEntityMapperConstructor } from '../entities/form-question-option.mapper';
+import { FormQuestionRiskEntityMapper, FormQuestionRiskEntityMapperConstructor } from '../entities/form-question-risk.mapper';
 import { FormQuestionEntityMapper, FormQuestionEntityMapperConstructor } from '../entities/form-question.mapper';
 
 export type FormQuestionAggregateMapperConstructor = FormQuestionEntityMapperConstructor & {
   question_details: FormQuestionDetails & {
     options: FormQuestionOptionEntityMapperConstructor[];
+    form_question_risk: FormQuestionRiskEntityMapperConstructor[];
     data: (FormQuestionDetailsData & {
       question_identifier: FormQuestionIdentifierEntityMapperConstructor | null;
     })[];
@@ -19,6 +21,7 @@ export class FormQuestionAggregateMapper {
     const questionEntity = FormQuestionEntityMapper.toEntity(prisma);
     const detailsEntity = FormQuestionDetailsEntityMapper.toEntity(prisma.question_details);
     const optionsEntities = FormQuestionOptionEntityMapper.toArray(prisma.question_details.options);
+    const riskEntities = FormQuestionRiskEntityMapper.toArray(prisma.question_details.form_question_risk || []);
     const identifierEntity = prisma.question_details.data[0]?.question_identifier ? FormQuestionIdentifierEntityMapper.toEntity(prisma.question_details.data[0]?.question_identifier) : null;
 
     return new FormQuestionAggregate({
@@ -26,6 +29,7 @@ export class FormQuestionAggregateMapper {
       details: detailsEntity,
       options: optionsEntities,
       identifier: identifierEntity,
+      risks: riskEntities,
     });
   }
 

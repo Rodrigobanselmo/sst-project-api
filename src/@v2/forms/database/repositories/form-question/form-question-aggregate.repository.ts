@@ -23,6 +23,7 @@ export class FormQuestionAggregateRepository {
                   data: { where: { deleted_at: null } },
                 },
               },
+              form_question_risk: true,
             },
           },
         },
@@ -33,7 +34,7 @@ export class FormQuestionAggregateRepository {
   }
 
   async createTx(params: IFormQuestionAggregateRepository.CreateTxParams, tx: Prisma.TransactionClient) {
-    const { question, details, identifier, options } = params;
+    const { question, details, identifier, options, risks } = params;
 
     // Create FormQuestionDetails first
     const createdQuestionDetails = await tx.formQuestionDetails.create({
@@ -91,10 +92,21 @@ export class FormQuestionAggregateRepository {
         },
       });
     }
+
+    // Create risk associations
+    for (const risk of risks || []) {
+      await tx.formQuestionRisk.create({
+        data: {
+          id: risk.id,
+          question_Id: createdQuestionDetails.id,
+          risk_id: risk.riskId,
+        },
+      });
+    }
   }
 
   async upsertTx(params: IFormQuestionAggregateRepository.UpsertTxParams, tx: Prisma.TransactionClient) {
-    const { question, details, identifier, options } = params;
+    const { question, details, identifier, options, risks } = params;
 
     if (question.isNew) {
       await tx.formQuestionDetails.create({
@@ -126,6 +138,17 @@ export class FormQuestionAggregateRepository {
           },
         },
       });
+
+      // Create risk associations for new questions
+      for (const risk of risks || []) {
+        await tx.formQuestionRisk.create({
+          data: {
+            id: risk.id,
+            question_Id: details.id,
+            risk_id: risk.riskId,
+          },
+        });
+      }
     }
 
     if (question.deletedAt) {
@@ -205,6 +228,25 @@ export class FormQuestionAggregateRepository {
             order: option.order,
             value: option.value,
             form_question_option_id: option.id,
+          },
+        });
+      }
+    }
+
+    // Handle risk associations for existing questions
+    if (!question.isNew && risks) {
+      // Delete existing risk associations
+      await tx.formQuestionRisk.deleteMany({
+        where: { question_Id: details.id },
+      });
+
+      // Create new risk associations
+      for (const risk of risks) {
+        await tx.formQuestionRisk.create({
+          data: {
+            id: risk.id,
+            question_Id: details.id,
+            risk_id: risk.riskId,
           },
         });
       }

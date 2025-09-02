@@ -22,6 +22,11 @@ export class FormQuestionDetailsPayload {
   @IsOptional()
   @IsBoolean()
   acceptOther?: boolean;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  riskIds?: string[];
 }
 
 export class FormQuestionPayload {

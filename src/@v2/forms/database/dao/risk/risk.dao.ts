@@ -59,9 +59,9 @@ export class RiskDAO {
     // Filter for PSICOSOCIAL subtype
     where.push(Prisma.sql`
       EXISTS (
-        SELECT 1 FROM "RiskFactorsSubType" rfst
-        INNER JOIN "RiskSubType" rst ON rfst."subTypeId" = rst."id"
-        WHERE rfst."riskId" = rf."id" AND rst."sub_type" = 'PSICOSOCIAL'
+        SELECT 1 FROM "RiskToRiskSubType" rrst
+        INNER JOIN "RiskSubType" rst ON rrst."sub_type_id" = rst."id"
+        WHERE rrst."risk_id" = rf."id" AND rst."sub_type" = 'PSICOSOCIAL'
       )
     `);
 

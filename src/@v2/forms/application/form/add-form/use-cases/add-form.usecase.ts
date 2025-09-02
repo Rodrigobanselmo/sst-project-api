@@ -3,6 +3,7 @@ import { FormAggregate } from '@/@v2/forms/domain/aggregates/form.aggregate';
 import { FormQuestionDetailsEntity } from '@/@v2/forms/domain/entities/form-question-details.entity';
 import { FormQuestionGroupEntity } from '@/@v2/forms/domain/entities/form-question-group.entity';
 import { FormQuestionOptionEntity } from '@/@v2/forms/domain/entities/form-question-option.entity';
+import { FormQuestionRiskEntity } from '@/@v2/forms/domain/entities/form-question-risk.entity';
 import { FormQuestionEntity } from '@/@v2/forms/domain/entities/form-question.entity';
 import { FormEntity } from '@/@v2/forms/domain/entities/form.entity';
 import { LocalContext, UserContext } from '@/@v2/shared/adapters/context';
@@ -70,11 +71,24 @@ export class AddFormUseCase {
             });
           }
 
+          const riskEntities: FormQuestionRiskEntity[] = [];
+          if (question.details.riskIds) {
+            question.details.riskIds.forEach((riskId) => {
+              const riskEntity = new FormQuestionRiskEntity({
+                questionId: detailsEntity.id,
+                riskId: riskId,
+              });
+
+              riskEntities.push(riskEntity);
+            });
+          }
+
           return new FormQuestionAggregate({
             question: questionEntity,
             details: detailsEntity,
             options: optionsEntities,
             identifier: undefined,
+            risks: riskEntities,
           });
         });
 

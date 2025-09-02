@@ -2,6 +2,7 @@ import { updateField } from '@/@v2/shared/domain/helpers/update-field.helper';
 import { FormQuestionDetailsEntity } from '../entities/form-question-details.entity';
 import { FormQuestionGroupEntity } from '../entities/form-question-group.entity';
 import { FormQuestionOptionEntity } from '../entities/form-question-option.entity';
+import { FormQuestionRiskEntity } from '../entities/form-question-risk.entity';
 import { FormQuestionEntity } from '../entities/form-question.entity';
 import { FormEntity } from '../entities/form.entity';
 import { FormQuestionGroupAggregate } from './form-question-group.aggregate';
@@ -33,6 +34,7 @@ interface IQuestionDataInput {
   text: string;
   type: any;
   acceptOther?: boolean;
+  riskIds?: string[];
 }
 
 interface IQuestionOptionInput {
@@ -183,11 +185,23 @@ export class FormAggregate {
       order,
     });
 
+    const riskEntities: FormQuestionRiskEntity[] = [];
+    if (newQuestion.details.riskIds) {
+      newQuestion.details.riskIds.forEach((riskId) => {
+        const riskEntity = new FormQuestionRiskEntity({
+          questionId: questionData.id,
+          riskId: riskId,
+        });
+        riskEntities.push(riskEntity);
+      });
+    }
+
     const newQuestionAggregate = new FormQuestionAggregate({
       question,
       details: questionData,
       options: [],
       identifier: null,
+      risks: riskEntities,
     });
 
     if (newQuestion.options && newQuestionAggregate.details.needsOptions) {
@@ -208,6 +222,18 @@ export class FormAggregate {
 
     if (newQuestion.options && currentQuestion.details.needsOptions) {
       this.updateQuestionOptions(currentQuestion, newQuestion.options);
+    }
+
+    // Update risks
+    if (newQuestion.details.riskIds) {
+      currentQuestion.risks = [];
+      newQuestion.details.riskIds.forEach((riskId) => {
+        const riskEntity = new FormQuestionRiskEntity({
+          questionId: currentQuestion.details.id,
+          riskId: riskId,
+        });
+        currentQuestion.risks.push(riskEntity);
+      });
     }
   }
 
