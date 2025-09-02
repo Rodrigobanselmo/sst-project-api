@@ -22,6 +22,7 @@ import { ReadFormController } from './application/form/read-form/controllers/rea
 import { ReadFormUseCase } from './application/form/read-form/use-cases/read-form.usecase';
 import { FormApplicationDAO } from './database/dao/form-application/form-application.dao';
 import { FormDAO } from './database/dao/form/form.dao';
+import { RiskDAO } from './database/dao/risk/risk.dao';
 import { FormQuestionsAnswersDAO } from './database/dao/form-questions-answers/form-questions-answers.dao';
 import { FormApplicationAggregateRepository } from './database/repositories/form-application/form-application-aggregate.repository';
 import { FormQuestionGroupAggregateRepository } from './database/repositories/form-question-group/form-question-group-aggregate.repository';
@@ -61,6 +62,7 @@ import { BrowseHierarchiesUseCase } from './application/hierarchy/browse-hierarc
   providers: [
     // Database
     FormDAO,
+    RiskDAO,
     FormApplicationDAO,
     FormQuestionsAnswersDAO,
     FormRepository,

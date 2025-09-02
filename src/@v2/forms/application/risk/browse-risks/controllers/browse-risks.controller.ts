@@ -4,6 +4,7 @@ import { PermissionEnum } from '@/shared/constants/enum/authorization';
 import { Permissions } from '@/shared/decorators/permissions.decorator';
 import { BrowseRisksUseCase } from '../use-cases/browse-risks.usecase';
 import { BrowseRisksPath } from './browse-risks.path';
+import { BrowseRisksQuery } from './browse-risks.query';
 import { FormRoutes } from '@/@v2/forms/constants/routes';
 
 @Controller(FormRoutes.RISK.PATH)
@@ -18,9 +19,15 @@ export class BrowseRisksController {
     isMember: true,
     crud: true,
   })
-  async execute(@Param() path: BrowseRisksPath) {
+  async execute(@Param() path: BrowseRisksPath, @Query() query: BrowseRisksQuery) {
     return this.browseRisksUseCase.execute({
       companyId: path.companyId,
+      orderBy: query.orderBy,
+      search: query.search,
+      pagination: {
+        page: query.page,
+        limit: query.limit,
+      },
     });
   }
 }

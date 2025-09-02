@@ -1,29 +1,22 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
+import { RiskDAO } from '@/@v2/forms/database/dao/risk/risk.dao';
 import { IBrowseRisksUseCase } from './browse-risks.types';
 
 @Injectable()
 export class BrowseRisksUseCase {
-  constructor(private readonly prisma: PrismaServiceV2) {}
+  constructor(private readonly riskDAO: RiskDAO) {}
 
-  async execute(params: IBrowseRisksUseCase.Params): Promise<IBrowseRisksUseCase.Result[]> {
-    const risks = await this.prisma.riskFactors.findMany({
-      where: {
+  async execute(params: IBrowseRisksUseCase.Params) {
+    const data = await this.riskDAO.browse({
+      page: params.pagination.page,
+      limit: params.pagination.limit,
+      orderBy: params.orderBy,
+      filters: {
         companyId: params.companyId,
-        status: 'ACTIVE',
-        deleted_at: null,
-        type: 'ERG',
-        subTypes: {
-          some: {
-            sub_type: {
-              sub_type: 'PSICOSOCIAL',
-            },
-          },
-        },
+        search: params.search,
       },
-      select: { id: true, name: true, severity: true },
     });
 
-    return risks;
+    return data;
   }
 }
