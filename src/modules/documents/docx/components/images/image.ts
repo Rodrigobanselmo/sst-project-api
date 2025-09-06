@@ -15,7 +15,7 @@ export const imageDoc = (data: IImage, imagesMap?: IImagesMap) => {
   const imageWidth = (pageWidth * (data.width || 100)) / 100;
 
   const { height: imgHeight, width: imgWidth } = sizeOf(file);
-  const { height, width } = setNiceProportion(imageWidth, pageHeight / 2, imgWidth, imgHeight);
+  const { height, width } = setNiceProportion(imageWidth, pageHeight * 0.95, imgWidth, imgHeight);
 
   const images = new Paragraph({
     children: [
