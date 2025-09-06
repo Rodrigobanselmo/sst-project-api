@@ -13,7 +13,7 @@ export const imageDoc = (data: IImage) => {
   const imageWidth = (pageWidth * (data.width || 100)) / 100;
 
   const { height: imgHeight, width: imgWidth } = sizeOf(file as any);
-  const { height, width } = setNiceProportion(imageWidth, pageHeight / 2, imgWidth || 0, imgHeight || 0);
+  const { height, width } = setNiceProportion(imageWidth, pageHeight * 0.95, imgWidth || 0, imgHeight || 0);
 
   const images = new Paragraph({
     children: [
