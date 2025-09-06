@@ -34,7 +34,7 @@ interface IQuestionDataInput {
   text: string;
   type: any;
   acceptOther?: boolean;
-  riskIds?: string[];
+  risksIds?: string[];
 }
 
 interface IQuestionOptionInput {
@@ -186,8 +186,8 @@ export class FormAggregate {
     });
 
     const riskEntities: FormQuestionRiskEntity[] = [];
-    if (newQuestion.details.riskIds) {
-      newQuestion.details.riskIds.forEach((riskId) => {
+    if (newQuestion.details.risksIds) {
+      newQuestion.details.risksIds.forEach((riskId) => {
         const riskEntity = new FormQuestionRiskEntity({
           questionId: questionData.id,
           riskId: riskId,
@@ -225,9 +225,9 @@ export class FormAggregate {
     }
 
     // Update risks
-    if (newQuestion.details.riskIds) {
+    if (newQuestion.details.risksIds) {
       currentQuestion.risks = [];
-      newQuestion.details.riskIds.forEach((riskId) => {
+      newQuestion.details.risksIds.forEach((riskId) => {
         const riskEntity = new FormQuestionRiskEntity({
           questionId: currentQuestion.details.id,
           riskId: riskId,

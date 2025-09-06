@@ -41,9 +41,17 @@ import { BrowseRisksController } from './application/risk/browse-risks/controlle
 import { BrowseRisksUseCase } from './application/risk/browse-risks/use-cases/browse-risks.usecase';
 import { BrowseHierarchiesController } from './application/hierarchy/browse-hierarchies/controllers/browse-hierarchies.controller';
 import { BrowseHierarchiesUseCase } from './application/hierarchy/browse-hierarchies/use-cases/browse-hierarchies.usecase';
+import { BrowseFormQuestionsAnswersRisksUseCase } from './application/form-questions-answers/browse-form-questions-answers-risks/use-cases/browse-form-questions-answers-risks.usecase';
+import { BrowseFormQuestionsAnswersRisksController } from './application/form-questions-answers/browse-form-questions-answers-risks/controllers/browse-form-questions-answers-risks.controller';
+import { AssignRisksFormApplicationController } from './application/form-application/assign-risks-form-application/controllers/assign-risks-form-application.controller';
+import { AssignRisksFormApplicationUseCase } from './application/form-application/assign-risks-form-application/use-cases/assign-risks-form-application.usecase';
+import { BrowseFormApplicationRiskLogController } from './application/form-application-risk-log/browse-form-application-risk-log/controllers/browse-form-application-risk-log.controller';
+import { BrowseFormApplicationRiskLogUseCase } from './application/form-application-risk-log/browse-form-application-risk-log/use-cases/browse-form-application-risk-log.usecase';
+import { FormApplicationRiskLogDAO } from './database/dao/form-application-risk-log/form-application-risk-log.dao';
+import { SSTModule } from '@/modules/sst/sst.module';
 
 @Module({
-  imports: [SharedModule],
+  imports: [SharedModule, SSTModule],
   controllers: [
     ReadFormController,
     BrowseFormController,
@@ -58,12 +66,16 @@ import { BrowseHierarchiesUseCase } from './application/hierarchy/browse-hierarc
     PublicSubmitFormApplicationController,
     BrowseRisksController,
     BrowseHierarchiesController,
+    BrowseFormQuestionsAnswersRisksController,
+    AssignRisksFormApplicationController,
+    BrowseFormApplicationRiskLogController,
   ],
   providers: [
     // Database
     FormDAO,
     RiskDAO,
     FormApplicationDAO,
+    FormApplicationRiskLogDAO,
     FormQuestionsAnswersDAO,
     FormRepository,
     FormAggregateRepository,
@@ -90,6 +102,9 @@ import { BrowseHierarchiesUseCase } from './application/hierarchy/browse-hierarc
     EditFormUseCase,
     BrowseRisksUseCase,
     BrowseHierarchiesUseCase,
+    BrowseFormQuestionsAnswersRisksUseCase,
+    AssignRisksFormApplicationUseCase,
+    BrowseFormApplicationRiskLogUseCase,
   ],
   exports: [],
 })

@@ -7,6 +7,7 @@ import { IFormQuestionsAnswersDAO } from './form-questions-answers.types';
 import { FormQuestionsAnswersBrowseModel } from '@/@v2/forms/domain/models/form-questions-answers/form-questions-answers-browse.model';
 import { FormStatusEnum } from '@/@v2/forms/domain/enums/form-status.enum';
 import { FormParticipantsAnswerStatusEnum } from '@/@v2/forms/domain/enums/form-participants-answer-status.enum';
+import { getParticiantAnswersStatus } from '@/@v2/forms/domain/utils/get-particiant-answers-status';
 
 @Injectable()
 export class FormQuestionsAnswersDAO {
@@ -106,7 +107,7 @@ export class FormQuestionsAnswersDAO {
           qg."form_application_id" = ${filters.formApplicationId}
           OR qg."form_id" = ${formId}
         ) 
-        AND fpa."status"::text = ${status === FormStatusEnum.TESTING ? FormParticipantsAnswerStatusEnum.TESTING : FormParticipantsAnswerStatusEnum.VALID}
+        AND fpa."status"::text = ${getParticiantAnswersStatus(FormStatusEnum[status])}
       `);
     }
 

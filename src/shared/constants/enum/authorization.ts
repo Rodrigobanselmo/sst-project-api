@@ -83,4 +83,6 @@ export enum PermissionEnum {
   IMAGE_GALLERY = '23',
   TASK = '24',
   FORM = '25',
+  FORM_MODEL = '25.1',
+  FORM_PSIC = '25.2',
 }

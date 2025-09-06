@@ -156,7 +156,7 @@ async function processJsonFile(inputFilePath: string, outputFilePath: string): P
     groups: {},
     form: new FormEntity({
       companyId: simpleCompanyId,
-      name: 'Formularios de Riscos Psicosociais',
+      name: 'Formularios de Riscos Psicosociais (COPSOQ Core)',
       anonymous: true,
       shareableLink: true,
       description: 'Descrição do formulário',

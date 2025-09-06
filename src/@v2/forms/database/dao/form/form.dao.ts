@@ -58,6 +58,16 @@ export class FormDAO {
                         },
                       },
                     },
+                    form_question_risk: {
+                      include: {
+                        risk: {
+                          select: {
+                            id: true,
+                            name: true,
+                          },
+                        },
+                      },
+                    },
                   },
                 },
               },

@@ -34,7 +34,7 @@ export class FormQuestionDetailsPayload {
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  riskIds?: string[];
+  risksIds?: string[];
 }
 
 export class FormQuestionPayload {

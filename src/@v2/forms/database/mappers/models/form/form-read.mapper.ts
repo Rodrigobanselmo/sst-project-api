@@ -39,6 +39,12 @@ export type IFormReadModelMapper = Form & {
             value: number | null;
           }[];
         }[];
+        form_question_risk: {
+          risk: {
+            id: string;
+            name: string;
+          };
+        }[];
       };
     }[];
   }[];
@@ -79,6 +85,10 @@ export class FormReadModelMapper {
                 acceptOther: questionDetailsData?.accept_other || false,
                 system: question.question_details.system,
                 companyId: question.question_details.company_id || undefined,
+                risks: question.question_details.form_question_risk.map((risk) => ({
+                  id: risk.risk.id,
+                  name: risk.risk.name,
+                })),
               }),
               options: question.question_details.options.map((option) => {
                 const optionData = option.data[0]; // Get the latest data

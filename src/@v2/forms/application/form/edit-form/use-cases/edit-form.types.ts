@@ -12,7 +12,7 @@ export class FormQuestionDataParams {
   text: string;
   type: FormQuestionTypeEnum;
   acceptOther?: boolean;
-  riskIds?: string[];
+  risksIds?: string[];
 }
 
 export class FormQuestionParams {

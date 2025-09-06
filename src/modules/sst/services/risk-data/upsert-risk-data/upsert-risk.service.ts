@@ -21,6 +21,7 @@ export class UpsertRiskDataService {
   ) {}
 
   async execute(upsertRiskDataDto: UpsertRiskDataDto) {
+    console.log('upsertRiskDataDto', upsertRiskDataDto);
     const keepEmpty = upsertRiskDataDto.keepEmpty;
     const workspaceId = upsertRiskDataDto.workspaceId;
     const type = upsertRiskDataDto.type;

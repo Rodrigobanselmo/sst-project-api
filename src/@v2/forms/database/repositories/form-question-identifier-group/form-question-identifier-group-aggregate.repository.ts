@@ -33,6 +33,7 @@ export class FormQuestionIdentifierGroupAggregateRepository {
                   data: { where: { deleted_at: null } },
                 },
               },
+              form_question_risk: true,
             },
           },
         },

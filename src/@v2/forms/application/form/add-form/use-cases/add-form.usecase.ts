@@ -72,8 +72,8 @@ export class AddFormUseCase {
           }
 
           const riskEntities: FormQuestionRiskEntity[] = [];
-          if (question.details.riskIds) {
-            question.details.riskIds.forEach((riskId) => {
+          if (question.details.risksIds) {
+            question.details.risksIds.forEach((riskId) => {
               const riskEntity = new FormQuestionRiskEntity({
                 questionId: detailsEntity.id,
                 riskId: riskId,

@@ -224,6 +224,7 @@ import { CacheModule } from '@nestjs/cache-manager';
     CreateRiskService,
     ReloadEmployeeExamTimeService,
     ProtocolToRiskRepository,
+    UpsertRiskDataService,
   ],
   imports: [forwardRef(() => CompanyModule), CacheModule.register()],
 })

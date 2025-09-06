@@ -1255,9 +1255,25 @@ model FormApplication {
   participants              FormParticipants?
   participants_answers      FormParticipantsAnswers[]
   question_identifier_group FormQuestionGroup[]
+  formApplicationRiskLog    FormApplicationRiskLog[]
 
   @@unique([id, company_id])
   @@index([company_id])
+}
+
+model FormApplicationRiskLog {
+  id         String   @id @default(cuid())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  form_application_id String
+  form_application    FormApplication @relation(fields: [form_application_id], references: [id], onDelete: Cascade)
+
+  risk_id String
+  risk    RiskFactors @relation(fields: [risk_id], references: [id])
+
+  entity_id   String
+  probability Int
 }
 
 model FormParticipants {
@@ -1779,61 +1795,62 @@ model RefreshToken {
 }
 
 model RiskFactors {
-  id                    String                  @id @default(uuid())
-  name                  String
-  companyId             String
-  severity              Int                     @default(0)
-  system                Boolean                 @default(false)
-  appendix              String?
-  grauInsalubridade     GrauInsalubridade?
-  synonymous            String[]
-  search                String?
-  otherAppendix         String?
-  risk                  String?
-  propagation           String[]
-  exame                 String?
-  symptoms              String?
-  method                String?
-  unit                  String?
-  cas                   String?
-  breather              String?
-  nr15lt                String?
-  twa                   String?
-  stel                  String?
-  ipvs                  String?
-  pv                    String?
-  pe                    String?
-  carnogenicityACGIH    String?
-  carnogenicityLinach   String?
-  status                StatusEnum              @default(ACTIVE)
-  type                  RiskFactorsEnum
-  representAll          Boolean                 @default(false)
-  created_at            DateTime                @default(now())
-  updated_at            DateTime                @updatedAt
-  deleted_at            DateTime?
-  isEmergency           Boolean                 @default(false)
-  json                  Json?
-  fraction              String?
-  tlv                   String?
-  isAso                 Boolean                 @default(true)
-  isPCMSO               Boolean                 @default(true)
-  isPGR                 Boolean                 @default(true)
-  isPPP                 Boolean                 @default(true)
-  esocialCode           String?
-  coments               String?
-  activities            Json?
-  rsdata                String?
-  examToRisk            ExamToRisk[]
-  generateSource        GenerateSource[]
-  protocolToRisk        ProtocolToRisk[]
-  recMed                RecMed[]
-  riskFactorData        RiskFactorData[]
-  riskFactorProbability RiskFactorProbability[]
-  company               Company                 @relation(fields: [companyId], references: [id])
-  esocial               EsocialTable24?         @relation(fields: [esocialCode], references: [id], onDelete: Restrict)
-  docInfo               RiskFactorsDocInfo[]
-  formQuestionRisk      FormQuestionRisk[]
-  subTypes              RiskToRiskSubType[]
+  id                     String                   @id @default(uuid())
+  name                   String
+  companyId              String
+  severity               Int                      @default(0)
+  system                 Boolean                  @default(false)
+  appendix               String?
+  grauInsalubridade      GrauInsalubridade?
+  synonymous             String[]
+  search                 String?
+  otherAppendix          String?
+  risk                   String?
+  propagation            String[]
+  exame                  String?
+  symptoms               String?
+  method                 String?
+  unit                   String?
+  cas                    String?
+  breather               String?
+  nr15lt                 String?
+  twa                    String?
+  stel                   String?
+  ipvs                   String?
+  pv                     String?
+  pe                     String?
+  carnogenicityACGIH     String?
+  carnogenicityLinach    String?
+  status                 StatusEnum               @default(ACTIVE)
+  type                   RiskFactorsEnum
+  representAll           Boolean                  @default(false)
+  created_at             DateTime                 @default(now())
+  updated_at             DateTime                 @updatedAt
+  deleted_at             DateTime?
+  isEmergency            Boolean                  @default(false)
+  json                   Json?
+  fraction               String?
+  tlv                    String?
+  isAso                  Boolean                  @default(true)
+  isPCMSO                Boolean                  @default(true)
+  isPGR                  Boolean                  @default(true)
+  isPPP                  Boolean                  @default(true)
+  esocialCode            String?
+  coments                String?
+  activities             Json?
+  rsdata                 String?
+  examToRisk             ExamToRisk[]
+  generateSource         GenerateSource[]
+  protocolToRisk         ProtocolToRisk[]
+  recMed                 RecMed[]
+  riskFactorData         RiskFactorData[]
+  riskFactorProbability  RiskFactorProbability[]
+  company                Company                  @relation(fields: [companyId], references: [id])
+  esocial                EsocialTable24?          @relation(fields: [esocialCode], references: [id], onDelete: Restrict)
+  docInfo                RiskFactorsDocInfo[]
+  formQuestionRisk       FormQuestionRisk[]
+  subTypes               RiskToRiskSubType[]
+  formApplicationRiskLog FormApplicationRiskLog[]
 
   @@unique([id, companyId])
   @@index([name])

@@ -243,8 +243,6 @@ async function processJsonFile(inputFilePath: string, outputFilePath: string): P
         riskId: riskFactor.id,
       });
 
-      console.log('record', record);
-
       const options = [
         new FormQuestionOptionEntity({
           text: cleanText(record['Opções 1']),
@@ -455,6 +453,7 @@ async function createForm(_data: createData, form: createFormData): Promise<void
   await asyncBatch(Object.values(form.groups), 20, async (group) => {
     let dbGroup = await prisma.formQuestionGroup.findFirst({
       where: {
+        id: '-',
         data: {
           some: {
             name: group.group.name,
@@ -466,6 +465,7 @@ async function createForm(_data: createData, form: createFormData): Promise<void
     dbGroup = await prisma.formQuestionGroup.upsert({
       where: {
         id: dbGroup?.id || '',
+        form_id: '-',
       },
       update: {},
       create: {
@@ -508,7 +508,8 @@ async function createForm(_data: createData, form: createFormData): Promise<void
       const questionDetails = formQuestionCOPSOQ?.form_question_data[0]?.form_question_details;
       if (questionDetails) {
         // Check if FormQuestion already exists
-        const existingFormQuestion = questionDetails.form_question[0];
+        const existingFormQuestion = null;
+        // const existingFormQuestion = questionDetails.form_question[0] "-" '-';
 
         if (existingFormQuestion) {
           // Update existing FormQuestion with the correct group

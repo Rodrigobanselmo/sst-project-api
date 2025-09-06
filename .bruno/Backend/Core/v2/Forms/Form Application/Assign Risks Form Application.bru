@@ -1,0 +1,87 @@
+meta {
+  name: Assign Risks Form Application
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{url}}/v2/companies/:companyId/forms/applications/:applicationId/assign-risks
+  body: json
+  auth: bearer
+}
+
+params:path {
+  companyId: {{companyId}}
+  applicationId: 7a2d7204-915f-41b2-b080-ae30f7fea54d
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "risks": [
+      {
+        "riskId": "risk-id-1",
+        "probability": 3,
+        "hierarchyId": "hierarchy-id-1"
+      },
+      {
+        "riskId": "risk-id-2", 
+        "probability": 2,
+        "hierarchyId": "hierarchy-id-2"
+      }
+    ]
+  }
+}
+
+docs {
+  # Assign Risks to Form Application
+
+  This endpoint allows you to assign risks to a form application with specific probability values and hierarchy associations.
+
+  ## Request Body
+
+  The request body should contain an array of risk assignments:
+
+  ```json
+  {
+    "risks": [
+      {
+        "riskId": "string",      // ID of the risk to assign
+        "probability": number,   // Probability value for the risk
+        "hierarchyId": "string"  // ID of the hierarchy to associate with
+      }
+    ]
+  }
+  ```
+
+  ## Example
+
+  ```json
+  {
+    "risks": [
+      {
+        "riskId": "risk-id-1",
+        "probability": 3,
+        "hierarchyId": "hierarchy-id-1"
+      },
+      {
+        "riskId": "risk-id-2", 
+        "probability": 2,
+        "hierarchyId": "hierarchy-id-2"
+      }
+    ]
+  }
+  ```
+
+  ## Response
+
+  ```json
+  {
+    "success": true,
+    "message": "Risks assigned successfully"
+  }
+  ```
+}
