@@ -1,6 +1,7 @@
 .env
 COPSOQ.xlsx
 upload_data.xlsx
+/upload
 
 # compiled output
 /dist
