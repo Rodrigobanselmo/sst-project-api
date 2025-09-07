@@ -79,7 +79,7 @@ export class FormQuestionsAnswersDAO {
         LEFT JOIN "FormQuestionOption" qo ON qdet."id" = qo."question_id" AND qo."deleted_at" IS NULL
         LEFT JOIN "FormQuestionOptionData" qod ON qo."id" = qod."form_question_option_id" AND qod."deleted_at" IS NULL
         LEFT JOIN "FormAnswer" fa ON q."id" = fa."question_id" 
-        LEFT JOIN "FormParticipantsAnswers" fpa ON fa."participants_answers_id" = fpa."id"
+        INNER JOIN "FormParticipantsAnswers" fpa ON fa."participants_answers_id" = fpa."id" AND fpa."form_application_id" = ${filters.formApplicationId}
       ${gerWhereRawPrisma(whereParams)}
       GROUP BY 
         qg."id", qgd."name", qgd."description", qgd."order",
