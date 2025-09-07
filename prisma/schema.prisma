@@ -2061,7 +2061,7 @@ model RiskFactorDataRecPhoto {
   file    SystemFile @relation(fields: [file_id], references: [id])
 
   risk_data_rec_id String
-  risk_data_rec    RiskFactorDataRec @relation(fields: [risk_data_rec_id], references: [id])
+  risk_data_rec    RiskFactorDataRec @relation(fields: [risk_data_rec_id], references: [id], onDelete: Cascade)
 }
 
 model RiskFactorDataRecComments {
@@ -2072,7 +2072,7 @@ model RiskFactorDataRecComments {
   created_at          DateTime             @default(now())
   updated_at          DateTime             @updatedAt
   textType            RiskRecTextTypeEnum?
-  riskFactorDataRec   RiskFactorDataRec    @relation(fields: [riskFactorDataRecId], references: [id])
+  riskFactorDataRec   RiskFactorDataRec    @relation(fields: [riskFactorDataRecId], references: [id], onDelete: Cascade)
   previous_status     StatusEnum?
   current_status      StatusEnum?
   previous_valid_date DateTime?
