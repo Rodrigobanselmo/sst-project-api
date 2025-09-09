@@ -21,6 +21,7 @@ export enum RoleAccessEnum {
   ABSENTEEISM = '18',
   ESOCIAL_EDIT = '19',
   TASK = '20',
+  FORM = '21',
 
   DATABASE = '99',
   CHECKLIST = '98',
