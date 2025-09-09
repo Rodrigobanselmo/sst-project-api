@@ -45,7 +45,7 @@ export class FormQuestionOptionEntity {
   update(params: { text?: string; value?: number; order?: number }) {
     this.text = params.text || this.text;
     this.value = updateField(this.value, params.value);
-    this.order = params.order || this.order;
+    this.order = params.order ?? this.order;
   }
 
   clone() {

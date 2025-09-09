@@ -482,7 +482,12 @@ async function createForm(_data: createData, form: createFormData): Promise<void
 
     if (!dbGroup) return;
 
-    await asyncBatch(group.items, 20, async (item) => {
+    // Sort items by question order before processing
+    const sortedItems = group.items
+      .filter((item) => item.data.questionShared) // Only process items with questionShared
+      .sort((a, b) => (a.data.questionShared?.order || 0) - (b.data.questionShared?.order || 0));
+
+    await asyncBatch(sortedItems, 20, async (item) => {
       const formQuestionCOPSOQ = await prisma.formQuestionCOPSOQ.findFirst({
         where: {
           item: item.data.copsoq.item,

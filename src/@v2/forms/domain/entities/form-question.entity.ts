@@ -44,7 +44,7 @@ export class FormQuestionEntity {
 
   update(params: { required?: boolean; order?: number }) {
     this.required = updateField(this.required, params.required);
-    this.order = params.order || this.order;
+    this.order = params.order ?? this.order;
   }
 
   delete() {
