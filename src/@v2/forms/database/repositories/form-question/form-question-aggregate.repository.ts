@@ -193,19 +193,31 @@ export class FormQuestionAggregateRepository {
 
     for (const option of options) {
       if (option.isNew) {
-        await tx.formQuestionOption.create({
-          data: {
-            question_id: details.id,
-            id: option.id,
+        try {
+          await tx.formQuestionOption.create({
             data: {
-              create: {
-                text: option.text,
-                order: option.order,
-                value: option.value,
+              question_id: details.id,
+              id: option.id,
+              data: {
+                create: {
+                  text: option.text,
+                  order: option.order,
+                  value: option.value,
+                },
               },
             },
-          },
-        });
+          });
+        } catch (error) {
+          console.error('Error creating FormQuestionOption:', error);
+          console.error('Option data:', {
+            question_id: details.id,
+            id: option.id,
+            text: option.text,
+            order: option.order,
+            value: option.value,
+          });
+          throw error;
+        }
       }
 
       if (option.deletedAt) {

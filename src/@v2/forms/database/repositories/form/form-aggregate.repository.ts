@@ -73,32 +73,37 @@ export class FormAggregateRepository {
   }
 
   async update(aggregate: IFormAggregateRepository.UpdateParams): IFormAggregateRepository.UpdateReturn {
-    const formAggregate = await this.prisma.$transaction(async (tx) => {
-      await tx.form.update({
-        where: {
-          id: aggregate.form.id,
-          company_id: aggregate.form.companyId,
-        },
-        data: {
-          name: aggregate.form.name,
-          type: aggregate.form.type,
-          description: aggregate.form.description,
-          anonymous: aggregate.form.anonymous,
-          shareable_link: aggregate.form.shareableLink,
-        },
-      });
+    const formAggregate = await this.prisma.$transaction(
+      async (tx) => {
+        await tx.form.update({
+          where: {
+            id: aggregate.form.id,
+            company_id: aggregate.form.companyId,
+          },
+          data: {
+            name: aggregate.form.name,
+            type: aggregate.form.type,
+            description: aggregate.form.description,
+            anonymous: aggregate.form.anonymous,
+            shareable_link: aggregate.form.shareableLink,
+          },
+        });
 
-      for (const questionGroup of aggregate.questionGroups) {
-        await this.formQuestionGroupAggregateRepository.upsertTx(questionGroup, tx);
-      }
+        for (const questionGroup of aggregate.questionGroups) {
+          await this.formQuestionGroupAggregateRepository.upsertTx(questionGroup, tx);
+        }
 
-      const completeForm = await tx.form.findFirst({
-        where: { id: aggregate.form.id },
-        ...FormAggregateRepository.selectOptions(),
-      });
+        const completeForm = await tx.form.findFirst({
+          where: { id: aggregate.form.id },
+          ...FormAggregateRepository.selectOptions(),
+        });
 
-      return completeForm;
-    });
+        return completeForm;
+      },
+      {
+        timeout: 30000, // 30 seconds timeout
+      },
+    );
 
     return formAggregate ? FormAggregateMapper.toAggregate(formAggregate) : null;
   }

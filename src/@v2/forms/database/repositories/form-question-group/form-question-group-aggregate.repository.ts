@@ -15,7 +15,14 @@ export class FormQuestionGroupAggregateRepository {
     const include = {
       data: { where: { deleted_at: null } },
       questions: {
-        where: { deleted_at: null },
+        where: {
+          deleted_at: null,
+          data: {
+            some: {
+              deleted_at: null,
+            },
+          },
+        },
         include: {
           data: { where: { deleted_at: null } },
           question_details: {
