@@ -50,7 +50,7 @@ export class FormApplicationEntity {
   }
 
   get hasStarted() {
-    if (this.status === FormStatusEnum.PENDING) return false;
+    if (this.status === FormStatusEnum.INACTIVE) return false;
     return !!this.startAt;
   }
 
