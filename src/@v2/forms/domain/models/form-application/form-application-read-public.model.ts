@@ -28,7 +28,11 @@ export class FormApplicationReadPublicModel {
     this.id = params.id;
     this.name = params.name;
     this.description = params.description;
-    this.form = params.form;
+    this.form = {
+      name: params.form.name,
+      type: params.form.type,
+      questionGroups: params.form.questionGroups.sort((a, b) => a.order - b.order),
+    };
     this.questionIdentifierGroup = params.questionIdentifierGroup;
   }
 }
