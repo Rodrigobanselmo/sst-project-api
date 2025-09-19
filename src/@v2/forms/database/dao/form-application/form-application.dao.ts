@@ -144,6 +144,7 @@ export class FormApplicationDAO {
         form: {
           include: {
             questions_groups: {
+              where: { deleted_at: null },
               include: {
                 data: {
                   where: { deleted_at: null },
@@ -180,6 +181,7 @@ export class FormApplicationDAO {
           },
         },
         question_identifier_group: {
+          where: { deleted_at: null },
           include: {
             data: {
               where: { deleted_at: null },

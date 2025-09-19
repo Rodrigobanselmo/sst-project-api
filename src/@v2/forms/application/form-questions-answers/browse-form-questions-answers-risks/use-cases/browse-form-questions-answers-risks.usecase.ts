@@ -296,7 +296,7 @@ export class BrowseFormQuestionsAnswersRisksUseCase {
     Object.keys(hierarchyRiskMap).forEach((hierarchyId) => {
       Object.keys(hierarchyRiskMap[hierarchyId]).forEach((riskId) => {
         const averageValue = hierarchyRiskMap[hierarchyId][riskId].values.reduce((acc, value) => acc + value, 0) / hierarchyRiskMap[hierarchyId][riskId].values.length;
-        hierarchyRiskMap[hierarchyId][riskId].probability = 6 - Math.floor(averageValue);
+        hierarchyRiskMap[hierarchyId][riskId].probability = Math.ceil(averageValue);
       });
     });
 
