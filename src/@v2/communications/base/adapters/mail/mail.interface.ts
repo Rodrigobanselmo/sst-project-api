@@ -1,4 +1,5 @@
 import type { EmailTemplate } from '@/templates/@v2/email';
+import { EmailProviderEnum } from './email-provider.enum';
 
 export interface SendMailAdapter {
   sendMail(data: SendMailAdapter.SendMailData): Promise<void>;
@@ -18,5 +19,6 @@ export namespace SendMailAdapter {
     type: EmailTemplate;
     variables?: Record<string, unknown>;
     attachments?: SendMailAttachmentData[];
+    provider?: EmailProviderEnum;
   }
 }

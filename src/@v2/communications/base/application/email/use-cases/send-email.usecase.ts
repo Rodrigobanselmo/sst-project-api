@@ -1,16 +1,16 @@
-import { Injectable } from '@nestjs/common';
 import { simulateAwait } from '@/@v2/shared/utils/helpers/simulate-await';
-import { NodeMailerAdapter } from '../../../adapters/mail/node-mailer.adapter';
-import { ISendEmailUseCase } from './send-email.types';
-import { UserCommunicationDAO } from '../../../database/dao/user/user.dao.js';
+import { Injectable } from '@nestjs/common';
+import { CompositeEmailAdapter } from '../../../adapters/mail/composite-email.adapter';
 import { CompanyCommunicationDAO } from '../../../database/dao/company/company.dao.js';
+import { UserCommunicationDAO } from '../../../database/dao/user/user.dao.js';
 import { EmailLogRepository } from '../../../database/repositories/email-log/email-log.repository';
 import { EmailLogEntity } from '../../../domain/entities/email-log.entity';
+import { ISendEmailUseCase } from './send-email.types';
 
 @Injectable()
 export class SendEmailUseCase {
   constructor(
-    private readonly emailService: NodeMailerAdapter,
+    private readonly emailService: CompositeEmailAdapter,
     private readonly emailLogRepository: EmailLogRepository,
     private readonly userDao: UserCommunicationDAO,
     private readonly companyDao: CompanyCommunicationDAO,
