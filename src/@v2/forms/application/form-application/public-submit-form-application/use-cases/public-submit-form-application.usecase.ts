@@ -5,17 +5,18 @@ import { FormParticipantsAnswersAggregate } from '@/@v2/forms/domain/aggregates/
 import { FormAnswerEntity } from '@/@v2/forms/domain/entities/form-answer.entity';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { ISubmitFormApplicationUseCase } from './public-form-application.types';
+import { FormApplicationAggregateRepository } from '@/@v2/forms/database/repositories/form-application/form-application-aggregate.repository';
 
 @Injectable()
 export class SubmitFormApplicationUseCase {
   constructor(
     private readonly formParticipantsAnswersAggregateRepository: FormParticipantsAnswersAggregateRepository,
-    private readonly formApplicationRepository: FormApplicationRepository,
+    private readonly formApplicationAggregateRepository: FormApplicationAggregateRepository,
     private readonly formParticipantsAggregateRepository: FormParticipantsAggregateRepository,
   ) {}
 
   async execute(params: ISubmitFormApplicationUseCase.Params) {
-    const formApplication = await this.formApplicationRepository.find({
+    const formApplication = await this.formApplicationAggregateRepository.find({
       id: params.applicationId,
       companyId: undefined,
     });
@@ -24,9 +25,16 @@ export class SubmitFormApplicationUseCase {
       throw new NotFoundException('Formulário não encontrado');
     }
 
+    // Validate if form is shareable - if not, employeeId is required
+    if (!formApplication.isShareableLink) {
+      if (!params.employeeId) {
+        throw new BadRequestException('Este formulário requer identificação do funcionário');
+      }
+    }
+
     const participantAggregate = await this.formParticipantsAggregateRepository.findByFormApplicationId({
       formApplicationId: params.applicationId,
-      companyId: formApplication.companyId,
+      companyId: formApplication.formApplication.companyId,
     });
 
     if (!participantAggregate) {
@@ -49,10 +57,11 @@ export class SubmitFormApplicationUseCase {
     })();
 
     const formParticipantsAnswersAggregate = new FormParticipantsAnswersAggregate({
-      application: formApplication,
+      application: formApplication.formApplication,
       participant: participantAggregate,
       answers: answerEntities,
       timeSpent: params.timeSpent,
+      employeeId: params.employeeId,
     });
 
     await this.formParticipantsAnswersAggregateRepository.create(formParticipantsAnswersAggregate);

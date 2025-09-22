@@ -30,6 +30,8 @@ export class EditFormApplicationController {
       formId: body.formId,
       hierarchyIds: body.hierarchyIds,
       workspaceIds: body.workspaceIds,
+      anonymous: body.anonymous,
+      shareableLink: body.shareableLink,
       identifier: body.identifier,
     });
   }

@@ -50,7 +50,6 @@ export class FormApplicationReadModel {
   constructor(params: IFormApplicationReadModel) {
     this.id = params.id;
     this.companyId = params.companyId;
-    this.isShareableLink = params.isShareableLink;
     this.name = params.name;
     this.description = params.description;
     this.createdAt = params.createdAt;
@@ -60,6 +59,8 @@ export class FormApplicationReadModel {
     this.endedAt = params.endedAt;
     this.form = params.form;
     this.participants = params.participants;
+    this.isAnonymous = params.isAnonymous;
+    this.isShareableLink = params.isShareableLink;
     this.questionIdentifierGroup = params.questionIdentifierGroup;
     this.totalParticipants = params.totalParticipants;
     this.totalAnswers = params.totalAnswers;

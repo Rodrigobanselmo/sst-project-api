@@ -37,6 +37,8 @@ export class AddFormApplicationUseCase {
       name: params.name,
       description: params.description,
       companyId: params.companyId,
+      anonymous: params.anonymous,
+      shareableLink: params.shareableLink,
     });
 
     const participantsHierarchies = params.hierarchyIds.map((hierarchyId) => {

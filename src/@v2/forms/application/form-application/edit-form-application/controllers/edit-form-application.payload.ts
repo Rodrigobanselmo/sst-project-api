@@ -102,6 +102,14 @@ export class EditFormApplicationPayload {
   hierarchyIds?: string[];
 
   @IsOptional()
+  @IsBoolean()
+  anonymous?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  shareableLink?: boolean;
+
+  @IsOptional()
   @ValidateNested()
   @Type(() => IdentifierDto)
   identifier?: IdentifierDto;

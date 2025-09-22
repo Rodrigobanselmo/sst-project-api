@@ -1,5 +1,6 @@
 import { SharedModule } from '@/@v2/shared/shared.module';
 import { Module } from '@nestjs/common';
+import { CacheModule } from '@nestjs/cache-manager';
 import { AddFormApplicationController } from './application/form-application/add-form-application/controllers/add-form-application.controller';
 import { AddFormApplicationUseCase } from './application/form-application/add-form-application/use-cases/add-form-application.usecase';
 import { BrowseFormApplicationController } from './application/form-application/browse-form-application/controllers/browse-form-application.controller';
@@ -48,10 +49,13 @@ import { AssignRisksFormApplicationUseCase } from './application/form-applicatio
 import { BrowseFormApplicationRiskLogController } from './application/form-application-risk-log/browse-form-application-risk-log/controllers/browse-form-application-risk-log.controller';
 import { BrowseFormApplicationRiskLogUseCase } from './application/form-application-risk-log/browse-form-application-risk-log/use-cases/browse-form-application-risk-log.usecase';
 import { FormApplicationRiskLogDAO } from './database/dao/form-application-risk-log/form-application-risk-log.dao';
+import { BrowseFormParticipantsController } from './application/form-participants/browse-form-participants/controllers/browse-form-participants.controller';
+import { BrowseFormParticipantsUseCase } from './application/form-participants/browse-form-participants/use-cases/browse-form-participants.usecase';
+import { FormParticipantsDAO } from './database/dao/form-participants/form-participants.dao';
 import { SSTModule } from '@/modules/sst/sst.module';
 
 @Module({
-  imports: [SharedModule, SSTModule],
+  imports: [SharedModule, SSTModule, CacheModule.register()],
   controllers: [
     ReadFormController,
     BrowseFormController,
@@ -69,6 +73,7 @@ import { SSTModule } from '@/modules/sst/sst.module';
     BrowseFormQuestionsAnswersRisksController,
     AssignRisksFormApplicationController,
     BrowseFormApplicationRiskLogController,
+    BrowseFormParticipantsController,
   ],
   providers: [
     // Database
@@ -77,6 +82,7 @@ import { SSTModule } from '@/modules/sst/sst.module';
     FormApplicationDAO,
     FormApplicationRiskLogDAO,
     FormQuestionsAnswersDAO,
+    FormParticipantsDAO,
     FormRepository,
     FormAggregateRepository,
     FormQuestionIdentifierEntityRepository,
@@ -105,6 +111,7 @@ import { SSTModule } from '@/modules/sst/sst.module';
     BrowseFormQuestionsAnswersRisksUseCase,
     AssignRisksFormApplicationUseCase,
     BrowseFormApplicationRiskLogUseCase,
+    BrowseFormParticipantsUseCase,
   ],
   exports: [],
 })

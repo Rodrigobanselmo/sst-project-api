@@ -3,6 +3,7 @@ import { FormApplicationReadPublicModel } from '@/@v2/forms/domain/models/form-a
 export namespace IPublicFormApplicationUseCase {
   export type Params = {
     applicationId: string;
+    employeeId?: number;
   };
 
   export type Result = {

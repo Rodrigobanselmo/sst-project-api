@@ -1,8 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { FormApplicationDAO } from '../../../../database/dao/form-application/form-application.dao';
-import { FormApplicationRepository } from '../../../../database/repositories/form-application/form-application.repository';
 import { IPublicFormApplicationUseCase } from './public-form-application.types';
-import { FormQuestionTypeEnum } from '@/@v2/forms/domain/enums/form-question-type.enum';
 import { FormIdentifierTypeEnum } from '@prisma/client';
 import { FormApplicationAggregateRepository } from '@/@v2/forms/database/repositories/form-application/form-application-aggregate.repository';
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
@@ -34,6 +32,15 @@ export class PublicFormApplicationUseCase {
       };
     }
 
+    // Validate if form is shareable - if not, employeeId is required
+    if (!formApplication.isShareableLink) {
+      if (!params.employeeId) {
+        throw new BadRequestException('Este formulário requer identificação do funcionário');
+      }
+
+      await this.validateEmployeeEligibility(params.employeeId, formApplication);
+    }
+
     const formApplicationData = await this.formApplicationDAO.readPublic({
       id: params.applicationId,
     });
@@ -56,7 +63,6 @@ export class PublicFormApplicationUseCase {
     if (!formApplication.isAskingHierarchy) {
       return [];
     }
-    console.log(formApplication.participantsWorkspaces);
 
     const hierarchies = await this.prisma.hierarchy.findMany({
       select: {
@@ -83,5 +89,25 @@ export class PublicFormApplicationUseCase {
     });
 
     return hierarchies;
+  }
+
+  private async validateEmployeeEligibility(employeeId: number, formApplication: FormApplicationAggregate) {
+    // Check if employee exists and is active
+    const employee = await this.prisma.employee.findFirst({
+      where: {
+        id: employeeId,
+        companyId: formApplication.formApplication.companyId,
+        status: 'ACTIVE',
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!employee) {
+      throw new BadRequestException('Funcionário não encontrado ou inativo');
+    }
+
+    //TODO Validate if employee exists and is eligible for this form
   }
 }

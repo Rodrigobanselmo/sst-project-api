@@ -7,6 +7,8 @@ import { generateCuid } from '@/@v2/shared/utils/helpers/generate-cuid';
 type IUpdatePrams = {
   name?: string;
   description?: string | null;
+  anonymous?: boolean | null;
+  shareableLink?: boolean | null;
 };
 
 export type FormApplicationEntityConstructor = {
@@ -19,6 +21,8 @@ export type FormApplicationEntityConstructor = {
   companyId: string;
   endedAt?: Date;
   startAt?: Date;
+  anonymous?: boolean | null;
+  shareableLink?: boolean | null;
 };
 
 export class FormApplicationEntity {
@@ -30,6 +34,8 @@ export class FormApplicationEntity {
   companyId: string;
   endedAt: Date | null;
   startAt?: Date;
+  anonymous: boolean | null;
+  shareableLink: boolean | null;
 
   private _status: FormStatusEnum;
 
@@ -43,6 +49,8 @@ export class FormApplicationEntity {
     this.startAt = params.startAt;
     this.endedAt = params.endedAt || null;
     this.companyId = params.companyId;
+    this.anonymous = params.anonymous ?? null;
+    this.shareableLink = params.shareableLink ?? null;
   }
 
   get status() {
@@ -84,6 +92,8 @@ export class FormApplicationEntity {
   update(data: IUpdatePrams) {
     this.name = updateField(this.name, data.name);
     this.description = updateField(this.description, data.description);
+    this.anonymous = updateField(this.anonymous, data.anonymous);
+    this.shareableLink = updateField(this.shareableLink, data.shareableLink);
   }
 
   canBeAnswered() {

@@ -1,0 +1,26 @@
+meta {
+  name: Browse Form Participants
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{url}}/v2/companies/:companyId/forms/applications/:applicationId/participants/
+  body: none
+  auth: bearer
+}
+
+params:query {
+  ~search: 
+  ~page: 1
+  ~limit: 10
+}
+
+params:path {
+  companyId: {{companyId}}
+  applicationId: {{applicationId}}
+}
+
+auth:bearer {
+  token: {{token}}
+}

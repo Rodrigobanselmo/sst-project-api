@@ -36,7 +36,7 @@ export class FormParticipantsAnswersAggregateRepository {
       const participantsAnswers = await tx.formParticipantsAnswers.create({
         data: {
           form_application_id: params.application.id,
-          employee_id: undefined,
+          employee_id: params.employeeId,
           status: StatusEnum[params.status],
           time_spent: params.timeSpent,
         },

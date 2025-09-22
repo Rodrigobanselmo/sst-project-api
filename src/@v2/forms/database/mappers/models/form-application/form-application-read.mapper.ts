@@ -80,8 +80,8 @@ export class FormApplicationReadModelMapper {
       startedAt: prisma.started_at,
       endedAt: prisma.ended_at,
       status: FormStatusEnum[prisma.status],
-      isShareableLink: prisma.form.shareable_link,
-      isAnonymous: prisma.form.anonymous,
+      isShareableLink: prisma.shareable_link ?? prisma.form.shareable_link ?? true,
+      isAnonymous: prisma.anonymous ?? prisma.form.anonymous ?? true,
       form: {
         id: prisma.form.id,
         name: prisma.form.name,

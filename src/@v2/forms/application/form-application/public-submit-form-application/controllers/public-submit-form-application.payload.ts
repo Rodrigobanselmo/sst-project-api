@@ -24,4 +24,8 @@ export class PublicSubmitFormApplicationPayload {
   @IsOptional()
   @IsNumber()
   timeSpent?: number;
+
+  @IsOptional()
+  @IsNumber()
+  employeeId?: number;
 }

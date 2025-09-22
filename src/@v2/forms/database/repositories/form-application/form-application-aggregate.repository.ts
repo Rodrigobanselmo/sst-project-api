@@ -40,6 +40,8 @@ export class FormApplicationAggregateRepository {
           status: params.formApplication.status,
           ended_at: params.formApplication.endedAt,
           started_at: params.formApplication.startAt,
+          anonymous: params.formApplication.anonymous,
+          shareable_link: params.formApplication.shareableLink,
           participants: {
             create: {
               hierarchies: params.participantsHierarchies.length
@@ -93,6 +95,8 @@ export class FormApplicationAggregateRepository {
           started_at: params.formApplication.startAt,
           status: params.formApplication.status,
           form_id: params.form.id,
+          anonymous: params.formApplication.anonymous,
+          shareable_link: params.formApplication.shareableLink,
           participants: {
             update: {
               hierarchies: {

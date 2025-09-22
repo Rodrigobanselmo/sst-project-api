@@ -32,6 +32,8 @@ export namespace IEditFormApplicationUseCase {
     status?: FormStatusEnum;
     workspaceIds?: string[];
     hierarchyIds?: string[];
+    anonymous?: boolean;
+    shareableLink?: boolean;
     identifier?: {
       name?: string;
       description?: string;

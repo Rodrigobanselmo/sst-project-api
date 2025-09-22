@@ -25,6 +25,8 @@ export namespace IAddFormApplicationUseCase {
     formId: string;
     workspaceIds: string[];
     hierarchyIds: string[];
+    anonymous?: boolean;
+    shareableLink?: boolean;
     identifier: {
       name: string;
       description?: string;

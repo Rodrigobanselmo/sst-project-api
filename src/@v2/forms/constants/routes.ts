@@ -20,4 +20,7 @@ export const FormRoutes = {
   HIERARCHY: {
     PATH: 'v2/companies/:companyId/forms/hierarchies/',
   },
+  FORM_PARTICIPANTS: {
+    PATH: 'v2/companies/:companyId/forms/applications/:applicationId/participants/',
+  },
 } as const;

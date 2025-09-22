@@ -8,6 +8,7 @@ export type IFormParticipantsAnswersAggregate = {
   application: FormApplicationEntity;
   answers: FormAnswerEntity[];
   timeSpent?: number;
+  employeeId?: number;
 };
 
 export class FormParticipantsAnswersAggregate {
@@ -16,6 +17,7 @@ export class FormParticipantsAnswersAggregate {
   answers: FormAnswerEntity[];
   status: FormParticipantsAnswerStatusEnum;
   timeSpent?: number;
+  employeeId?: number;
 
   constructor(params: IFormParticipantsAnswersAggregate) {
     this.participant = params.participant;
@@ -23,5 +25,6 @@ export class FormParticipantsAnswersAggregate {
     this.answers = params.answers;
     this.status = params.application.isTesting ? FormParticipantsAnswerStatusEnum.TESTING : FormParticipantsAnswerStatusEnum.VALID;
     this.timeSpent = params.timeSpent;
+    this.employeeId = params.employeeId;
   }
 }

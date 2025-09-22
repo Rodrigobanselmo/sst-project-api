@@ -91,6 +91,14 @@ export class AddFormApplicationPayload {
   @IsString({ each: true })
   hierarchyIds?: string[];
 
+  @IsOptional()
+  @IsBoolean()
+  anonymous?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  shareableLink?: boolean;
+
   @ValidateNested()
   @IsOptional()
   @Type(() => IdentifierDto)

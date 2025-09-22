@@ -1236,15 +1236,17 @@ model Form {
 }
 
 model FormApplication {
-  id          String     @id @default(cuid())
-  name        String
-  description String?
-  status      StatusEnum @default(PENDING)
-  created_at  DateTime   @default(now())
-  updated_at  DateTime   @updatedAt
-  deleted_at  DateTime?
-  started_at  DateTime?
-  ended_at    DateTime?
+  id             String     @id @default(cuid())
+  name           String
+  description    String?
+  status         StatusEnum @default(PENDING)
+  anonymous      Boolean? // TRUE = pode ver quem respondeu, mas não as respostas, resultado liberado somente se cumprir anonimato / FALSE = pode ver quem respondeu e as respostas
+  shareable_link Boolean? // TRUE = pode compartilhar o link e se não for anonimo pede para identificar
+  created_at     DateTime   @default(now())
+  updated_at     DateTime   @updatedAt
+  deleted_at     DateTime?
+  started_at     DateTime?
+  ended_at       DateTime?
 
   company_id String
   company    Company @relation(fields: [company_id], references: [id])

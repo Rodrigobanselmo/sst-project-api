@@ -17,6 +17,7 @@ export class PublicSubmitFormApplicationController {
       applicationId: path.applicationId,
       answers: body.answers,
       timeSpent: body.timeSpent,
+      employeeId: body.employeeId,
     });
   }
 }
