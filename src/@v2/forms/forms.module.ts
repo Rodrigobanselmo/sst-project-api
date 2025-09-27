@@ -1,6 +1,7 @@
 import { SharedModule } from '@/@v2/shared/shared.module';
 import { Module } from '@nestjs/common';
 import { CacheModule } from '@nestjs/cache-manager';
+import { FormApplicationCacheService } from './services/form-application-cache.service';
 import { AddFormApplicationController } from './application/form-application/add-form-application/controllers/add-form-application.controller';
 import { AddFormApplicationUseCase } from './application/form-application/add-form-application/use-cases/add-form-application.usecase';
 import { BrowseFormApplicationController } from './application/form-application/browse-form-application/controllers/browse-form-application.controller';
@@ -112,6 +113,8 @@ import { SSTModule } from '@/modules/sst/sst.module';
     AssignRisksFormApplicationUseCase,
     BrowseFormApplicationRiskLogUseCase,
     BrowseFormParticipantsUseCase,
+    // Services
+    FormApplicationCacheService,
   ],
   exports: [],
 })

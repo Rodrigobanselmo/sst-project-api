@@ -21,13 +21,20 @@ export class PublicFormApplicationController {
   @Get()
   @Public()
   async execute(@Param() path: PublicFormApplicationPath, @Query() query: PublicFormApplicationQuery) {
+    if (query.employeeId) {
+      return this.publicFormApplicationUseCase.execute({
+        applicationId: path.applicationId,
+        employeeId: query.employeeId,
+      });
+    }
+
     // Create cache key based on parameters
-    const cacheKey = `${CacheEnum.PUBLIC_FORM_APPLICATION}_${path.applicationId}_${query.employeeId || 'no-employee'}`;
+    const cacheKey = `${CacheEnum.PUBLIC_FORM_APPLICATION}_${path.applicationId}`;
 
     // Initialize cache provider
     const cache = new CacheProvider({
       cacheManager: this.cacheManager,
-      ttlSeconds: CacheTtlEnum.HOUR_24, // Cache for 10 minutes
+      ttlSeconds: CacheTtlEnum.HOUR_24,
     });
 
     // Try to get cached result or execute use case

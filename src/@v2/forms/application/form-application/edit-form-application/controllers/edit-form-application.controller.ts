@@ -7,11 +7,15 @@ import { Permissions } from '@/shared/decorators/permissions.decorator';
 import { EditFormApplicationUseCase } from '../use-cases/edit-form-application.usecase';
 import { EditFormApplicationPath } from './edit-form-application.path';
 import { EditFormApplicationPayload } from './edit-form-application.payload';
+import { FormApplicationCacheService } from '@/@v2/forms/services/form-application-cache.service';
 
 @Controller(FormRoutes.FORM_APPLICATION.PATH_ID)
 @UseGuards(JwtAuthGuard)
 export class EditFormApplicationController {
-  constructor(private readonly editFormApplicationUseCase: EditFormApplicationUseCase) {}
+  constructor(
+    private readonly editFormApplicationUseCase: EditFormApplicationUseCase,
+    private readonly formApplicationCacheService: FormApplicationCacheService,
+  ) {}
 
   @Patch()
   @Permissions({
@@ -21,7 +25,7 @@ export class EditFormApplicationController {
     crud: true,
   })
   async edit(@Param() path: EditFormApplicationPath, @Body() body: EditFormApplicationPayload) {
-    return this.editFormApplicationUseCase.execute({
+    const result = await this.editFormApplicationUseCase.execute({
       companyId: path.companyId,
       name: body.name,
       applicationId: path.applicationId,
@@ -34,5 +38,10 @@ export class EditFormApplicationController {
       shareableLink: body.shareableLink,
       identifier: body.identifier,
     });
+
+    // Invalidate cache after successful update
+    await this.formApplicationCacheService.invalidateFormApplicationCache(path.applicationId);
+
+    return result;
   }
 }
