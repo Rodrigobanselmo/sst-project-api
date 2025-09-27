@@ -233,8 +233,9 @@ export class FormApplicationDAO {
 
     const whereParams = [...browseWhereParams, ...filterWhereParams];
 
-    const formsPromise = this.prisma.$queryRaw<IFormApplicationBrowseResultModelMapper[]>`
-      SELECT 
+    // Main query - get basic form application data without complex JOINs
+    const formsPromise = this.prisma.$queryRaw<Omit<IFormApplicationBrowseResultModelMapper, 'total_answers' | 'total_participants' | 'average_time_spent'>[]>`
+      SELECT
         form_ap."id" as id
         ,form_ap."name" as name
         ,form_ap."description" as description
@@ -248,40 +249,11 @@ export class FormApplicationDAO {
         ,form."name" as form_name
         ,form."type" as form_type
         ,form."system" as form_system
-        ,COUNT(DISTINCT form_part_ans."id")::integer as total_answers
-        ,COUNT(DISTINCT emp."id")::integer as total_participants
-        ,AVG(form_part_ans."time_spent")::integer as average_time_spent
-      FROM 
+      FROM
         "FormApplication" form_ap
-      LEFT JOIN 
+      LEFT JOIN
         "Form" form ON form.id = form_ap."form_id"
-      LEFT JOIN 
-        "FormParticipantsAnswers" form_part_ans ON form_part_ans."form_application_id" = form_ap."id" AND form_part_ans.status = 'VALID'
-      LEFT JOIN 
-        "FormParticipants" form_part ON form_part."form_application_id" = form_ap."id"
-      LEFT JOIN 
-        "FormParticipantsWorkspace" form_part_ws ON form_part_ws."form_participants_id" = form_part."id"
-      LEFT JOIN 
-        "_HierarchyToWorkspace" h_t_w ON h_t_w."B" = form_part_ws."workspace_id"
-      LEFT JOIN 
-        "FormParticipantsHierarchy" form_part_hier ON form_part_hier."form_participants_id" = form_part."id"
-      LEFT JOIN 
-        "Employee" emp ON (emp."hierarchyId" = form_part_hier."hierarchy_id" OR emp."hierarchyId" = h_t_w."A") 
       ${gerWhereRawPrisma(whereParams)}
-      GROUP BY
-        form_ap."id"
-        ,form_ap."name"
-        ,form_ap."description"
-        ,form_ap."company_id"
-        ,form_ap."status"
-        ,form_ap."ended_at"
-        ,form_ap."started_at"
-        ,form_ap."created_at"
-        ,form_ap."updated_at"
-        ,form."id"
-        ,form."name"
-        ,form."type"
-        ,form."system"
       ${getOrderByRawPrisma(orderByParams)}
       LIMIT ${pagination.limit}
       OFFSET ${pagination.offSet};
@@ -293,19 +265,22 @@ export class FormApplicationDAO {
     `;
 
     const distinctFiltersPromise = this.prisma.$queryRaw<IFormApplicationBrowseFilterModelMapper[]>`
-      SELECT 
+      SELECT
         array_agg(DISTINCT form.type) AS filter_types
-      FROM 
+      FROM
         "Form" form
-      LEFT JOIN 
+      LEFT JOIN
         "FormApplication" form_ap ON form_ap."form_id" = form.id
       ${gerWhereRawPrisma(browseWhereParams)};
     `;
 
     const [forms, totalForms, distinctFilters] = await Promise.all([formsPromise, totalFormsPromise, distinctFiltersPromise]);
 
+    // Get aggregated data for each form application separately
+    const formsWithAggregatedData = await this.addAggregatedDataToForms(forms);
+
     return FormApplicationBrowseModelMapper.toModel({
-      results: forms,
+      results: formsWithAggregatedData,
       pagination: { limit: pagination.limit, page: pagination.page, total: Number(totalForms[0].total) },
       filters: distinctFilters[0],
     });
@@ -355,5 +330,80 @@ export class FormApplicationDAO {
     const orderByRaw = orderBy.map<IOrderByRawPrisma>(({ field, order }) => ({ column: map[field], order }));
 
     return orderByRaw;
+  }
+
+  private async addAggregatedDataToForms(
+    forms: Omit<IFormApplicationBrowseResultModelMapper, 'total_answers' | 'total_participants' | 'average_time_spent'>[],
+  ): Promise<IFormApplicationBrowseResultModelMapper[]> {
+    if (forms.length === 0) return [];
+
+    const formApplicationIds = forms.map((form) => form.id);
+
+    // Get answers count and average time spent for all form applications
+    const answersDataPromise = this.prisma.$queryRaw<{ form_application_id: string; total_answers: number; average_time_spent: number | null }[]>`
+      SELECT
+        form_application_id,
+        COUNT(*)::integer as total_answers,
+        AVG(time_spent)::integer as average_time_spent
+      FROM "FormParticipantsAnswers"
+      WHERE form_application_id = ANY(${formApplicationIds})
+        AND status = 'VALID'
+      GROUP BY form_application_id;
+    `;
+
+    // Get participants count for all form applications - optimized approach
+    const participantsDataPromise = this.getParticipantsCountOptimized(formApplicationIds);
+
+    const [answersData, participantsData] = await Promise.all([answersDataPromise, participantsDataPromise]);
+
+    // Create lookup maps for efficient data retrieval
+    const answersMap = new Map(answersData.map((item) => [item.form_application_id, item]));
+    const participantsMap = new Map(participantsData.map((item) => [item.form_application_id, item]));
+
+    // Combine the data
+    return forms.map((form) => {
+      const answers = answersMap.get(form.id);
+      const participants = participantsMap.get(form.id);
+
+      return {
+        ...form,
+        total_answers: answers?.total_answers || 0,
+        total_participants: participants?.total_participants || 0,
+        average_time_spent: answers?.average_time_spent || null,
+      };
+    });
+  }
+
+  private async getParticipantsCountOptimized(formApplicationIds: string[]): Promise<{ form_application_id: string; total_participants: number }[]> {
+    // Use UNION to combine hierarchy and workspace participants, letting the database handle deduplication
+    // This is much faster than the original LEFT JOIN with OR condition
+    return this.prisma.$queryRaw<{ form_application_id: string; total_participants: number }[]>`
+      SELECT
+        form_application_id,
+        COUNT(DISTINCT employee_id)::integer as total_participants
+      FROM (
+        SELECT
+          form_part.form_application_id,
+          emp.id as employee_id
+        FROM "FormParticipants" form_part
+        INNER JOIN "FormParticipantsHierarchy" form_part_hier ON form_part_hier.form_participants_id = form_part.id
+        INNER JOIN "Employee" emp ON emp."hierarchyId" = form_part_hier.hierarchy_id
+        WHERE form_part.form_application_id = ANY(${formApplicationIds})
+          AND emp.id IS NOT NULL
+
+        UNION
+
+        SELECT
+          form_part.form_application_id,
+          emp.id as employee_id
+        FROM "FormParticipants" form_part
+        INNER JOIN "FormParticipantsWorkspace" form_part_ws ON form_part_ws.form_participants_id = form_part.id
+        INNER JOIN "_HierarchyToWorkspace" h_t_w ON h_t_w."B" = form_part_ws.workspace_id
+        INNER JOIN "Employee" emp ON emp."hierarchyId" = h_t_w."A"
+        WHERE form_part.form_application_id = ANY(${formApplicationIds})
+          AND emp.id IS NOT NULL
+      ) combined_participants
+      GROUP BY form_application_id;
+    `;
   }
 }

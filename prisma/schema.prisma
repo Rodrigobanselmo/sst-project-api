@@ -845,6 +845,8 @@ model Employee {
   @@index([email])
   @@index([companyId])
   @@index([expiredDateExam])
+  @@index([hierarchyId])
+  @@index([hierarchyId, companyId])
 }
 
 model EmployeeHierarchyHistory {
@@ -1302,6 +1304,9 @@ model FormParticipantsWorkspace {
 
   form_participants_id String
   form_participants    FormParticipants? @relation(fields: [form_participants_id], references: [id], onDelete: Cascade)
+
+  @@index([form_participants_id])
+  @@index([workspace_id])
 }
 
 model FormParticipantsHierarchy {
@@ -1314,6 +1319,9 @@ model FormParticipantsHierarchy {
 
   form_participants_id String
   form_participants    FormParticipants? @relation(fields: [form_participants_id], references: [id], onDelete: Cascade)
+
+  @@index([form_participants_id])
+  @@index([hierarchy_id])
 }
 
 model FormQuestionGroup {
@@ -1359,6 +1367,11 @@ model FormParticipantsAnswers {
   employee    Employee? @relation(fields: [employee_id], references: [id], onDelete: Cascade)
 
   answers FormAnswer[]
+
+  @@index([form_application_id])
+  @@index([employee_id])
+  @@index([status])
+  @@index([form_application_id, status])
 }
 
 model FormQuestion {
