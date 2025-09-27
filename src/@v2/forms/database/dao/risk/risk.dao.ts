@@ -51,10 +51,10 @@ export class RiskDAO {
   private browseWhere(filters: IRiskDAO.BrowseParams['filters']) {
     const where: Prisma.Sql[] = [];
 
-    where.push(Prisma.sql`rf."companyId" = ${filters.companyId}`);
+    where.push(Prisma.sql`rf."companyId" = ${filters.companyId} OR rf."system" = true`);
     where.push(Prisma.sql`rf."status" = 'ACTIVE'`);
     where.push(Prisma.sql`rf."deleted_at" IS NULL`);
-    where.push(Prisma.sql`rf."type" = 'ERG'`);
+    // where.push(Prisma.sql`rf."type" = 'ERG'`);
 
     // Filter for PSICOSOCIAL subtype
     where.push(Prisma.sql`

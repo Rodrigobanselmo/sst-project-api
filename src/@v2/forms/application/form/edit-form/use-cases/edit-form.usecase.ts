@@ -1,9 +1,8 @@
 import { FormAggregateRepository } from '@/@v2/forms/database/repositories/form/form-aggregate.repository';
-import { FormAggregate } from '@/@v2/forms/domain/aggregates/form.aggregate';
 import { LocalContext, UserContext } from '@/@v2/shared/adapters/context';
 import { ContextKey } from '@/@v2/shared/adapters/context/types/enum/context-key.enum';
 import { SharedTokens } from '@/@v2/shared/constants/tokens';
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { IEditFormUseCase } from './edit-form.types';
 
 @Injectable()
@@ -23,6 +22,11 @@ export class EditFormUseCase {
     });
 
     if (!existingForm) throw new NotFoundException('Formulário não encontrado');
+
+    // System forms can only be edited by the system itself, not by regular users
+    if (existingForm.form.system && !loggedUser.isAdmin) {
+      throw new BadRequestException('Formulário não pode ser editado, é um formulário padrão do sistema');
+    }
 
     existingForm.updateForm({
       name: params.name,
