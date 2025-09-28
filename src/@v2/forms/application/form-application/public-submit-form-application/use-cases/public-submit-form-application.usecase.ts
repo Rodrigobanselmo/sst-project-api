@@ -26,9 +26,23 @@ export class SubmitFormApplicationUseCase {
     }
 
     // Validate if form is shareable - if not, employeeId is required
-    if (!formApplication.isShareableLink) {
+    // Exception: when form is in testing mode, allow submission without employeeId
+    if (!formApplication.isShareableLink && !formApplication.formApplication.isTesting) {
       if (!params.employeeId) {
         throw new BadRequestException('Este formulário requer identificação do funcionário');
+      }
+    }
+
+    // Check if user has already answered this form
+    if (params.employeeId) {
+      const existingAnswer = await this.formParticipantsAnswersAggregateRepository.findByEmployeeAndFormApplication({
+        formApplicationId: params.applicationId,
+        employeeId: params.employeeId,
+        companyId: formApplication.formApplication.companyId,
+      });
+
+      if (existingAnswer) {
+        throw new BadRequestException('Você já respondeu este formulário');
       }
     }
 

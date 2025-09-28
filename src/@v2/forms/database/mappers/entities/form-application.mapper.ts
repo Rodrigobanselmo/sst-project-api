@@ -14,6 +14,8 @@ export class FormApplicationEntityMapper {
       description: prisma.description || undefined,
       updatedAt: prisma.updated_at,
       status: FormStatusEnum[prisma.status],
+      shareableLink: prisma.shareable_link ?? true,
+      anonymous: prisma.anonymous ?? true,
       endedAt: prisma.ended_at,
       startAt: prisma.started_at,
     });

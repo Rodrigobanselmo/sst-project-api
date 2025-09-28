@@ -90,6 +90,7 @@ export class FormApplicationEntity {
   }
 
   update(data: IUpdatePrams) {
+    console.log({ data, this: this.shareableLink });
     this.name = updateField(this.name, data.name);
     this.description = updateField(this.description, data.description);
     this.anonymous = updateField(this.anonymous, data.anonymous);

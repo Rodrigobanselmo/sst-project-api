@@ -38,7 +38,27 @@ interface IActionPlanNewTasks extends IEmailType {
   }[];
 }
 
-export type ISendEmail = IInviteUser | IActionPlanAllTasks | IActionPlanNewTasks;
+interface IFormInvitation extends IEmailType {
+  type: 'FORM_INVITATION';
+  companyId: string;
+  participantId: number;
+  applicationId: string;
+  link: string;
+  form: {
+    name: string;
+    description?: string | null;
+  };
+  application: {
+    name: string;
+    description?: string | null;
+  };
+  participant: {
+    name: string;
+  };
+  checkDuplicates?: boolean; // Flag for consumer to check if email was already sent to this participant
+}
+
+export type ISendEmail = IInviteUser | IActionPlanAllTasks | IActionPlanNewTasks | IFormInvitation;
 
 export interface MailAdapter {
   sendMail(data: MailAdapter.SendMailData): Promise<void>;

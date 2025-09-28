@@ -93,11 +93,11 @@ export class FormApplicationAggregate {
   }
 
   get isAnonymous() {
-    return this.formApplication.anonymous || this.form.anonymous;
+    return this.formApplication.anonymous ?? this.form.anonymous;
   }
 
   get isShareableLink() {
-    return this.formApplication.shareableLink || this.form.shareableLink;
+    return this.formApplication.shareableLink ?? this.form.shareableLink;
   }
 
   setForm(value: FormEntity): DomainResponse {

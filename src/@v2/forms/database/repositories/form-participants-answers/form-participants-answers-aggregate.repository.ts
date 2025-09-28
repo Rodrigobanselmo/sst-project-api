@@ -107,4 +107,21 @@ export class FormParticipantsAnswersAggregateRepository {
 
     return FormParticipantsAnswersAggregateMapper.toArray(participantsAnswers);
   }
+
+  async findByEmployeeAndFormApplication(
+    params: IFormParticipantsAnswersAggregateRepository.FindByEmployeeAndFormApplicationParams,
+  ): IFormParticipantsAnswersAggregateRepository.FindByEmployeeAndFormApplicationReturn {
+    const participantsAnswers = await this.prisma.formParticipantsAnswers.findFirst({
+      where: {
+        form_application_id: params.formApplicationId,
+        employee_id: params.employeeId,
+        form_application: {
+          company_id: params.companyId,
+        },
+      },
+      ...FormParticipantsAnswersAggregateRepository.selectOptions(),
+    });
+
+    return participantsAnswers ? FormParticipantsAnswersAggregateMapper.toAggregate(participantsAnswers) : null;
+  }
 }

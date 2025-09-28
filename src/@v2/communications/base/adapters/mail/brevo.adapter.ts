@@ -6,42 +6,15 @@ import { EmailTemplate } from '@/templates/@v2/email';
 import { isDevelopment } from '@/@v2/shared/utils/helpers/is-development';
 import { Injectable, Logger } from '@nestjs/common';
 import { config } from '@/@v2/shared/constants/config';
-import axios, { AxiosInstance } from 'axios';
+import { TransactionalEmailsApi, SendSmtpEmail, TransactionalEmailsApiApiKeys } from '@getbrevo/brevo';
 
-interface BrevoSender {
-  name?: string;
-  email: string;
-}
-
-interface BrevoRecipient {
-  name?: string;
-  email: string;
-}
-
-interface BrevoAttachment {
-  content: string;
-  name: string;
-}
-
-interface BrevoEmailRequest {
-  sender: BrevoSender;
-  to: BrevoRecipient[];
-  subject: string;
-  htmlContent: string;
-  textContent?: string;
-  attachment?: BrevoAttachment[];
-  tags?: string[];
-}
-
-interface BrevoEmailResponse {
-  messageId: string;
-}
+// Using official Brevo SDK types
 
 @Injectable()
 export class BrevoAdapter implements SendMailAdapter {
   private readonly logger = new Logger(BrevoAdapter.name);
   private readonly whitelist = ['rodrigobanselmo@gmail.com', 'rodrigoanselmo.dev@gmail.com'];
-  private readonly httpClient: AxiosInstance;
+  private readonly apiInstance: TransactionalEmailsApi;
   private readonly fromEmail: string;
   private readonly fromName: string;
 
@@ -49,18 +22,23 @@ export class BrevoAdapter implements SendMailAdapter {
     this.fromEmail = config.EMAIL.SES_FROM_EMAIL;
     this.fromName = config.EMAIL.SES_FROM_NAME;
 
-    this.httpClient = axios.create({
-      baseURL: 'https://api.brevo.com/v3',
-      headers: {
-        'api-key': config.EMAIL.BRAVO_API_KEY,
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-    });
+    // Initialize Brevo SDK only if API key is available
+    if (!config.EMAIL.BREVO_API_KEY) {
+      this.logger.warn('Brevo API key not configured. Brevo adapter will not function.');
+      return;
+    }
+
+    this.apiInstance = new TransactionalEmailsApi();
+    this.apiInstance.setApiKey(TransactionalEmailsApiApiKeys.apiKey, config.EMAIL.BREVO_API_KEY);
+    (this.apiInstance as any).authentications.apiKey.apiKey = config.EMAIL.BREVO_API_KEY;
   }
 
   async sendMail({ to, type, variables, attachments }: SendMailAdapter.SendMailData): Promise<void> {
     try {
+      if (!this.apiInstance) {
+        throw new Error('Brevo API not initialized. Check API key configuration.');
+      }
+
       const emailArray = Array.isArray(to) ? to : [to];
       const isWhitelisted = emailArray.every((email) => this.whitelist.includes(email));
 
@@ -80,35 +58,35 @@ export class BrevoAdapter implements SendMailAdapter {
       const templateParse = handlebars.compile(templateFileContent);
       const templateHTML = templateParse(variables);
 
-      const brevoRequest: BrevoEmailRequest = {
-        sender: {
-          name: this.fromName,
-          email: this.fromEmail,
-        },
-        to: emailArray.map((email) => ({ email })),
-        subject,
-        htmlContent: templateHTML,
-        tags: ['transactional', type], // Add tags for better tracking
+      // Create SendSmtpEmail object
+      const sendSmtpEmail = new SendSmtpEmail();
+      sendSmtpEmail.subject = subject;
+      sendSmtpEmail.htmlContent = templateHTML;
+      sendSmtpEmail.sender = {
+        name: this.fromName,
+        email: this.fromEmail,
       };
+      sendSmtpEmail.to = emailArray.map((email) => ({ email }));
+      sendSmtpEmail.tags = ['transactional', type]; // Add tags for better tracking
 
       // Add attachments if provided
       if (attachments?.length) {
         this.validateAttachments(attachments);
-        brevoRequest.attachment = attachments.map((attachment) => ({
+        sendSmtpEmail.attachment = attachments.map((attachment) => ({
           content: attachment.content,
           name: attachment.filename,
         }));
       }
 
-      const response = await this.httpClient.post<BrevoEmailResponse>('/smtp/email', brevoRequest);
+      const response = await this.apiInstance.sendTransacEmail(sendSmtpEmail);
 
       this.logger.log(`Email sent successfully to: ${emailArray.join(', ')}`);
-      this.logger.debug(`Brevo MessageId: ${response.data.messageId}`);
+      this.logger.debug(`Brevo MessageId: ${response.body.messageId}`);
     } catch (error) {
       this.logger.error(`Failed to send email via Brevo: ${error.message}`, error.stack);
 
-      if (error.response) {
-        this.logger.error(`Brevo API Error: ${error.response.status} - ${JSON.stringify(error.response.data)}`);
+      if (error.body) {
+        this.logger.error(`Brevo API Error: ${JSON.stringify(error.body)}`);
       }
 
       captureException(error);
@@ -145,25 +123,19 @@ export class BrevoAdapter implements SendMailAdapter {
   }
 
   /**
-   * Get account information from Brevo API
-   * Useful for testing API key validity
-   */
-  async getAccountInfo(): Promise<any> {
-    try {
-      const response = await this.httpClient.get('/account');
-      return response.data;
-    } catch (error) {
-      this.logger.error(`Failed to get Brevo account info: ${error.message}`);
-      throw error;
-    }
-  }
-
-  /**
-   * Test the Brevo API connection
+   * Test the Brevo API connection by attempting to send a test email
    */
   async testConnection(): Promise<boolean> {
     try {
-      await this.getAccountInfo();
+      // Create a minimal test email to validate API key
+      const testEmail = new SendSmtpEmail();
+      testEmail.subject = 'API Test';
+      testEmail.textContent = 'Test connection';
+      testEmail.sender = { name: this.fromName, email: this.fromEmail };
+      testEmail.to = [{ email: this.fromEmail }]; // Send to self for testing
+
+      // This will throw an error if API key is invalid
+      await this.apiInstance.sendTransacEmail(testEmail);
       this.logger.log('Brevo API connection test successful');
       return true;
     } catch (error) {

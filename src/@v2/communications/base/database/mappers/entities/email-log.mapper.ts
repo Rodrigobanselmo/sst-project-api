@@ -11,6 +11,7 @@ export class EmailLogMapper {
       template: data.template,
       createdAt: data.created_at || new Date(),
       data: (data.data as any) || undefined,
+      deduplicationId: data.deduplicationId || undefined,
     });
   }
 }

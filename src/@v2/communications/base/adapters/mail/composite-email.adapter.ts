@@ -1,11 +1,10 @@
+import { captureException } from '@/@v2/shared/utils/helpers/capture-exception';
 import { Injectable, Logger } from '@nestjs/common';
-import { SendMailAdapter } from './mail.interface';
-import { NodeMailerAdapter } from './node-mailer.adapter';
 import { AwsSesAdapter } from './aws-ses.adapter';
 import { BrevoAdapter } from './brevo.adapter';
 import { EmailProviderEnum } from './email-provider.enum';
-import { captureException } from '@/@v2/shared/utils/helpers/capture-exception';
-import { config } from '@/@v2/shared/constants/config';
+import { SendMailAdapter } from './mail.interface';
+import { NodeMailerAdapter } from './node-mailer.adapter';
 
 interface EmailProviderMap {
   [EmailProviderEnum.MAIN]: SendMailAdapter;
@@ -26,6 +25,7 @@ export class CompositeEmailAdapter implements SendMailAdapter {
     private readonly brevoAdapter: BrevoAdapter,
   ) {
     // Configure which adapter maps to which provider level
+    // Using NodeMailer as MAIN since Brevo domain is not authenticated
     this.providers = {
       [EmailProviderEnum.MAIN]: this.brevoAdapter,
       [EmailProviderEnum.SECONDARY]: this.awsSesAdapter,
@@ -34,6 +34,7 @@ export class CompositeEmailAdapter implements SendMailAdapter {
   }
 
   async sendMail(data: SendMailAdapter.SendMailData): Promise<void> {
+    // Enable fallback to secondary providers for better reliability
     const providers = [EmailProviderEnum.MAIN, EmailProviderEnum.SECONDARY];
     if (data.provider) providers.unshift(data.provider);
 
@@ -51,6 +52,7 @@ export class CompositeEmailAdapter implements SendMailAdapter {
       for (let attempt = 1; attempt <= this.retryAttempts; attempt++) {
         try {
           this.logger.debug(`Attempting to send email via ${providerType} (attempt ${attempt}/${this.retryAttempts})`);
+          this.logger.debug(`data: ${JSON.stringify(data)}`);
 
           await provider.sendMail(data);
 

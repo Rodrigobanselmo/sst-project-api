@@ -27,6 +27,6 @@ import { AuthCommunicationModule } from './auth/auth-communication.module';
     SendEmailUseCase,
     NotificationUseCase,
   ],
-  exports: [],
+  exports: [SendEmailUseCase],
 })
 export class CommunicationModule {}

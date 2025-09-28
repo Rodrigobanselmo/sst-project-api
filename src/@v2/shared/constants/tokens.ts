@@ -10,4 +10,5 @@ export class SharedTokens {
   public static GenericRequester = Symbol.for('GenericRequester');
   public static FileRequester = Symbol.for('FileRequester');
   public static Notification = Symbol.for('Notification');
+  public static Crypto = Symbol.for('Crypto');
 }

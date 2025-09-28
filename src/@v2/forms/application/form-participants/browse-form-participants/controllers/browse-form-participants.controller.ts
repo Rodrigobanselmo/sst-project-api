@@ -26,6 +26,8 @@ export class BrowseFormParticipantsController {
       applicationId: path.applicationId,
       orderBy: query.orderBy,
       search: query.search,
+      hierarchyIds: query.hierarchyIds,
+      onlyWithEmail: query.onlyWithEmail,
       pagination: {
         page: query.page,
         limit: query.limit,

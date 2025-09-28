@@ -5,12 +5,14 @@ import { FormIdentifierTypeEnum } from '@prisma/client';
 import { FormApplicationAggregateRepository } from '@/@v2/forms/database/repositories/form-application/form-application-aggregate.repository';
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
 import { FormApplicationAggregate } from '@/@v2/forms/domain/aggregates/form-application.aggregate';
+import { FormParticipantsAnswersAggregateRepository } from '@/@v2/forms/database/repositories/form-participants-answers/form-participants-answers-aggregate.repository';
 
 @Injectable()
 export class PublicFormApplicationUseCase {
   constructor(
     private readonly formApplicationDAO: FormApplicationDAO,
     private readonly formApplicationRepository: FormApplicationAggregateRepository,
+    private readonly formParticipantsAnswersAggregateRepository: FormParticipantsAnswersAggregateRepository,
     private readonly prisma: PrismaServiceV2,
   ) {}
 
@@ -32,13 +34,31 @@ export class PublicFormApplicationUseCase {
       };
     }
 
+    let hierarchyId: string | undefined;
     // Validate if form is shareable - if not, employeeId is required
-    if (!formApplication.isShareableLink) {
+    // Exception: when form is in testing mode, allow access without employeeId
+    if (!formApplication.isShareableLink && !formApplication.formApplication.isTesting) {
       if (!params.employeeId) {
-        throw new BadRequestException('Este formulário requer identificação do funcionário');
+        return {
+          data: null,
+          isPublic: false,
+          isTesting: false,
+        };
       }
 
-      await this.validateEmployeeEligibility(params.employeeId, formApplication);
+      const validate = await this.validateEmployeeEligibility(params.employeeId, formApplication);
+      hierarchyId = validate.hierarchyId;
+    }
+
+    // Check if user has already answered this form
+    let hasAlreadyAnswered = false;
+    if (params.employeeId) {
+      const existingAnswer = await this.formParticipantsAnswersAggregateRepository.findByEmployeeAndFormApplication({
+        formApplicationId: params.applicationId,
+        employeeId: params.employeeId,
+        companyId: formApplication.formApplication.companyId,
+      });
+      hasAlreadyAnswered = !!existingAnswer;
     }
 
     const formApplicationData = await this.formApplicationDAO.readPublic({
@@ -54,6 +74,9 @@ export class PublicFormApplicationUseCase {
       options: {
         hierarchies: await this.getHierarchies(formApplication),
       },
+      hierarchyId: hierarchyId,
+      employeeId: params.employeeId,
+      hasAlreadyAnswered: hasAlreadyAnswered,
       isPublic: formApplication.formApplication.isPublic,
       isTesting: formApplication.formApplication.isTesting,
     };
@@ -101,13 +124,39 @@ export class PublicFormApplicationUseCase {
       },
       select: {
         id: true,
+        hierarchy: {
+          select: {
+            id: true,
+            type: true,
+            parent: {
+              select: {
+                id: true,
+                type: true,
+                parent: {
+                  select: {
+                    id: true,
+                    type: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
 
-    if (!employee) {
+    // get SECTOR
+
+    if (!employee?.hierarchy) {
       throw new BadRequestException('Funcionário não encontrado ou inativo');
     }
 
-    //TODO Validate if employee exists and is eligible for this form
+    const sector = employee.hierarchy.parent.type == 'SECTOR' ? employee.hierarchy?.parent : employee.hierarchy.parent?.parent;
+
+    if (!sector?.id) {
+      throw new BadRequestException('Funcionário não encontrado ou inativo');
+    }
+
+    return { hierarchyId: sector.id };
   }
 }

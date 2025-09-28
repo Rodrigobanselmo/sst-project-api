@@ -9,4 +9,11 @@ export namespace IFormParticipantsAnswersAggregateRepository {
 
   export type FindManyParams = { formApplicationId: string; companyId: string };
   export type FindManyReturn = Promise<FormParticipantsAnswersAggregate[]>;
+
+  export type FindByEmployeeAndFormApplicationParams = {
+    formApplicationId: string;
+    employeeId: number;
+    companyId: string;
+  };
+  export type FindByEmployeeAndFormApplicationReturn = Promise<FormParticipantsAnswersAggregate | null>;
 }

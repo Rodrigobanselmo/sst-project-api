@@ -1,9 +1,7 @@
-import { IsOptional, IsNumberString } from 'class-validator';
-import { Transform } from 'class-transformer';
+import { IsOptional, IsString } from 'class-validator';
 
 export class PublicFormApplicationQuery {
   @IsOptional()
-  @IsNumberString()
-  @Transform(({ value }) => (value ? parseInt(value, 10) : undefined))
-  employeeId?: number;
+  @IsString()
+  encrypt?: string;
 }

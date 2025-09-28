@@ -13,7 +13,7 @@ if (!process.env.AWS_SECRET_ACCESS_KEY) throw new Error('AWS_SECRET_ACCESS_KEY n
 export const config = {
   SYSTEM: {
     NODE_ENV: process.env.NODE_ENV,
-    APP_HOST: process.env.APP_HOST,
+    APP_HOST: process.env.APP_HOST || 'https://www.simplesst.com.br/',
   },
   AWS: {
     AWS_SQS_REGION: process.env.AWS_SQS_REGION,
@@ -32,7 +32,7 @@ export const config = {
     SES_REGION: process.env.AWS_SQS_REGION || 'us-east-1',
     SES_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
     SES_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
-    // BRAVO
-    BRAVO_API_KEY: process.env.BRAVO_API_KEY || 'TakdZVG276yBcIKz',
+    // BREVO
+    BREVO_API_KEY: process.env.BREVO_API_KEY,
   },
 };

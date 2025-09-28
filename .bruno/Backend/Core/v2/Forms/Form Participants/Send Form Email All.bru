@@ -1,0 +1,24 @@
+meta {
+  name: Send Form Email All (With Deduplication)
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{url}}/v2/companies/:companyId/forms/applications/:applicationId/participants/send-email
+  body: json
+  auth: bearer
+}
+
+params:path {
+  companyId: {{companyId}}
+  applicationId: {{applicationId}}
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {}
+}

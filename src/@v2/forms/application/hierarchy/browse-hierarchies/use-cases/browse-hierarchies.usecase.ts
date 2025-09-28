@@ -1,43 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
 import { IBrowseHierarchiesUseCase } from './browse-hierarchies.types';
-import { StatusEnum } from '@prisma/client';
+import { HierarchyBrowseShortQuery } from '@/@v2/enterprise/hierarchy/database/dao/hierarchy/queries/browse-short-hierarchy.dao';
+import { HierarchyTypeEnum } from '@/@v2/shared/domain/enum/company/hierarchy-type.enum';
 
 @Injectable()
 export class BrowseHierarchiesUseCase {
   constructor(private readonly prisma: PrismaServiceV2) {}
 
-  async execute(params: IBrowseHierarchiesUseCase.Params): Promise<IBrowseHierarchiesUseCase.Result[]> {
-    const hierarchies = await this.prisma.hierarchy.findMany({
-      where: {
+  async execute(params: IBrowseHierarchiesUseCase.Params) {
+    return new HierarchyBrowseShortQuery(this.prisma).browseShort({
+      filters: {
         companyId: params.companyId,
-        status: StatusEnum.ACTIVE,
-        deletedAt: null,
-        ...(params.type?.length && {
-          type: {
-            in: params.type,
-          },
-        }),
-        ...(params.parent !== undefined && {
-          parentId: params.parent === 'null' ? null : params.parent,
-        }),
-      },
-      select: {
-        id: true,
-        name: true,
-        type: true,
-        parentId: true,
-      },
-      orderBy: {
-        name: 'asc',
+        type: [HierarchyTypeEnum.DIRECTORY, HierarchyTypeEnum.MANAGEMENT, HierarchyTypeEnum.SECTOR, HierarchyTypeEnum.SUB_SECTOR, HierarchyTypeEnum.OFFICE],
       },
     });
-
-    return hierarchies.map(hierarchy => ({
-      id: hierarchy.id,
-      name: hierarchy.name,
-      type: hierarchy.type as any,
-      parentId: hierarchy.parentId || undefined,
-    }));
   }
 }

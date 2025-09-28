@@ -2478,13 +2478,15 @@ model TaskHistory {
 }
 
 model EmailLog {
-  id         Int      @id @default(autoincrement())
-  email      String
-  template   String
-  data       Json?
-  created_at DateTime @default(now())
+  id              Int      @id @default(autoincrement())
+  email           String
+  template        String
+  data            Json?
+  deduplicationId String?
+  created_at      DateTime @default(now())
 
   @@index([email])
+  @@index([deduplicationId])
 }
 
 enum CharacterizationTypeEnum {

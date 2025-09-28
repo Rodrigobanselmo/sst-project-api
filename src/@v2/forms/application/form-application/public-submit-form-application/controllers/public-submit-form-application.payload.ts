@@ -26,6 +26,6 @@ export class PublicSubmitFormApplicationPayload {
   timeSpent?: number;
 
   @IsOptional()
-  @IsNumber()
-  employeeId?: number;
+  @IsString()
+  encryptedEmployeeId?: string;
 }

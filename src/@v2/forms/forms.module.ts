@@ -52,6 +52,8 @@ import { BrowseFormApplicationRiskLogUseCase } from './application/form-applicat
 import { FormApplicationRiskLogDAO } from './database/dao/form-application-risk-log/form-application-risk-log.dao';
 import { BrowseFormParticipantsController } from './application/form-participants/browse-form-participants/controllers/browse-form-participants.controller';
 import { BrowseFormParticipantsUseCase } from './application/form-participants/browse-form-participants/use-cases/browse-form-participants.usecase';
+import { SendFormEmailController } from './application/form-participants/send-form-email/controllers/send-form-email.controller';
+import { SendFormEmailUseCase } from './application/form-participants/send-form-email/use-cases/send-form-email.usecase';
 import { FormParticipantsDAO } from './database/dao/form-participants/form-participants.dao';
 import { SSTModule } from '@/modules/sst/sst.module';
 
@@ -75,6 +77,7 @@ import { SSTModule } from '@/modules/sst/sst.module';
     AssignRisksFormApplicationController,
     BrowseFormApplicationRiskLogController,
     BrowseFormParticipantsController,
+    SendFormEmailController,
   ],
   providers: [
     // Database
@@ -113,6 +116,7 @@ import { SSTModule } from '@/modules/sst/sst.module';
     AssignRisksFormApplicationUseCase,
     BrowseFormApplicationRiskLogUseCase,
     BrowseFormParticipantsUseCase,
+    SendFormEmailUseCase,
     // Services
     FormApplicationCacheService,
   ],

@@ -1,0 +1,26 @@
+meta {
+  name: Send Form Email (Specific Participants)
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{url}}/v2/companies/:companyId/forms/applications/:applicationId/participants/send-email
+  body: json
+  auth: bearer
+}
+
+params:path {
+  companyId: {{companyId}}
+  applicationId: {{applicationId}}
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "participantIds": [1, 2, 3]
+  }
+}

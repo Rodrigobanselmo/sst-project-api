@@ -9,5 +9,7 @@ export namespace IFormParticipantsUseCase {
     search?: string;
     orderBy?: IOrderBy<FormParticipantsOrderByEnum>;
     pagination: IPagination;
+    hierarchyIds?: string[];
+    onlyWithEmail?: boolean;
   };
 }

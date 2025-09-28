@@ -3,6 +3,7 @@ export type IEmailLogEntity = {
   email: string;
   template: string; //should be EmailsEnum
   data?: Record<string, any>;
+  deduplicationId?: string;
   createdAt?: Date;
 };
 
@@ -11,6 +12,7 @@ export class EmailLogEntity {
   email: string;
   template: string; //should be EmailsEnum
   data?: Record<string, any>;
+  deduplicationId?: string;
   createdAt?: Date;
 
   constructor(params: IEmailLogEntity) {
@@ -18,6 +20,7 @@ export class EmailLogEntity {
     this.email = params.email;
     this.template = params.template;
     this.data = params.data || {};
+    this.deduplicationId = params.deduplicationId;
     this.createdAt = params.createdAt || new Date();
   }
 }

@@ -15,6 +15,7 @@ export class EmailLogRepository {
           data: params.data,
           created_at: params.createdAt || new Date(),
           email: params.email,
+          deduplicationId: params.deduplicationId,
         },
       });
 

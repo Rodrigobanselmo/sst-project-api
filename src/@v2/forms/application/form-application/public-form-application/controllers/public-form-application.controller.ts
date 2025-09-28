@@ -10,21 +10,36 @@ import { PublicFormApplicationQuery } from './public-form-application.query';
 import { CacheProvider } from '@/shared/providers/CacheProvider/CacheProvider';
 import { CacheTtlEnum } from '@/shared/interfaces/cache.types';
 import { CacheEnum } from '@/shared/constants/enum/cache';
+import { CryptoAdapter } from '@/@v2/shared/adapters/crypto/models/crypto.interface';
+import { SharedTokens } from '@/@v2/shared/constants/tokens';
 
 @Controller(FormRoutes.FORM_APPLICATION.PATH_PUBLIC)
 export class PublicFormApplicationController {
   constructor(
     private readonly publicFormApplicationUseCase: PublicFormApplicationUseCase,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+    @Inject(SharedTokens.Crypto) private readonly cryptoAdapter: CryptoAdapter,
   ) {}
 
   @Get()
   @Public()
   async execute(@Param() path: PublicFormApplicationPath, @Query() query: PublicFormApplicationQuery) {
-    if (query.employeeId) {
+    let employeeId: number | undefined;
+
+    // If encrypted employee ID is provided, decrypt it
+    if (query.encrypt) {
+      try {
+        employeeId = this.cryptoAdapter.decryptNumber(query.encrypt);
+      } catch (error) {
+        // If decryption fails, continue without employee ID (will be handled by use case)
+        employeeId = undefined;
+      }
+    }
+
+    if (employeeId) {
       return this.publicFormApplicationUseCase.execute({
         applicationId: path.applicationId,
-        employeeId: query.employeeId,
+        employeeId: employeeId,
       });
     }
 
@@ -42,7 +57,7 @@ export class PublicFormApplicationController {
       () =>
         this.publicFormApplicationUseCase.execute({
           applicationId: path.applicationId,
-          employeeId: query.employeeId,
+          employeeId: employeeId,
         }),
       cacheKey,
     );

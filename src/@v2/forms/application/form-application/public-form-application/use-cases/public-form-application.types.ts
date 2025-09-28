@@ -8,6 +8,12 @@ export namespace IPublicFormApplicationUseCase {
 
   export type Result = {
     data: FormApplicationReadPublicModel | null;
+    options?: {
+      hierarchies: any[];
+    };
+    hierarchyId?: string;
+    employeeId?: number;
+    hasAlreadyAnswered?: boolean;
     isPublic: boolean;
     isTesting: boolean;
   };

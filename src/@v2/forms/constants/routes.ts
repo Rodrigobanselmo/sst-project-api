@@ -22,5 +22,6 @@ export const FormRoutes = {
   },
   FORM_PARTICIPANTS: {
     PATH: 'v2/companies/:companyId/forms/applications/:applicationId/participants/',
+    SEND_EMAIL: 'v2/companies/:companyId/forms/applications/:applicationId/participants/send-email',
   },
 } as const;

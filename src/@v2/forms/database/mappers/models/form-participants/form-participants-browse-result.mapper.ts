@@ -1,11 +1,13 @@
 import { FormParticipantsBrowseResultModel } from '@/@v2/forms/domain/models/form-participants/form-participants-browse-result.model';
 import { HierarchyTypeEnum } from '@/@v2/shared/domain/enum/company/hierarchy-type.enum';
+import { CryptoAdapter } from '@/@v2/shared/adapters/crypto/models/crypto.interface';
 
 export type IFormParticipantsBrowseResultModelMapper = {
   id: number;
   name: string;
   cpf: string;
   email: string;
+  phone: string | null;
   status: string;
   company_id: string;
   hierarchy_id: string;
@@ -27,12 +29,15 @@ export type IFormParticipantsBrowseResultModelMapper = {
   h_parent_5_name: string | null;
   h_parent_5_type: string | null;
   has_responded: boolean;
+  email_sent: boolean;
+  email_sent_at: Date | null;
+  hierarchy_sort_name: string | null;
   created_at: Date;
   updated_at: Date;
 };
 
 export class FormParticipantsBrowseResultModelMapper {
-  static toModel(prisma: IFormParticipantsBrowseResultModelMapper): FormParticipantsBrowseResultModel {
+  static toModel(prisma: IFormParticipantsBrowseResultModelMapper, cryptoAdapter: CryptoAdapter): FormParticipantsBrowseResultModel {
     // Build hierarchies array from current hierarchy and parents
     const hierarchies = [];
 
@@ -69,18 +74,22 @@ export class FormParticipantsBrowseResultModelMapper {
       name: prisma.name,
       cpf: prisma.cpf,
       email: prisma.email,
+      phone: prisma.phone,
       status: prisma.status,
       companyId: prisma.company_id,
       hierarchyId: prisma.hierarchy_id,
       hierarchyName: prisma.hierarchy_name,
       hierarchies,
       hasResponded: prisma.has_responded,
+      emailSent: prisma.email_sent,
+      emailSentAt: prisma.email_sent_at,
       createdAt: prisma.created_at,
       updatedAt: prisma.updated_at,
+      encryptedEmployeeId: cryptoAdapter.encryptNumber(prisma.id),
     });
   }
 
-  static toModels(prisma: IFormParticipantsBrowseResultModelMapper[]): FormParticipantsBrowseResultModel[] {
-    return prisma.map((rec) => FormParticipantsBrowseResultModelMapper.toModel(rec));
+  static toModels(prisma: IFormParticipantsBrowseResultModelMapper[], cryptoAdapter: CryptoAdapter): FormParticipantsBrowseResultModel[] {
+    return prisma.map((rec) => FormParticipantsBrowseResultModelMapper.toModel(rec, cryptoAdapter));
   }
 }
