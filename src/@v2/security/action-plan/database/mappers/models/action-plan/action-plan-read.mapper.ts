@@ -50,11 +50,16 @@ export type IActionPlanReadMapper = {
     id: string;
   } | null;
 
+  generateSources: {
+    id: string;
+    name: string;
+  }[];
+
   params: IActionPlanDAO.FindParams;
 };
 
 export class ActionPlanReadMapper {
-  static toModel({ homogeneousGroup, photos, actionPlan, params }: IActionPlanReadMapper): ActionPlanReadModel {
+  static toModel({ homogeneousGroup, photos, actionPlan, generateSources, params }: IActionPlanReadMapper): ActionPlanReadModel {
     const origin = getOriginHomogeneousGroup({
       characterization: homogeneousGroup.characterization
         ? {
@@ -107,6 +112,10 @@ export class ActionPlanReadMapper {
               updatedAt: photo.updated_at,
             }),
         ) || [],
+      generateSources: generateSources.map((source) => ({
+        id: source.id,
+        name: source.name,
+      })),
     });
   }
 

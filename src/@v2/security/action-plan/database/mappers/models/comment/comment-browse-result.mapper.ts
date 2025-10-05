@@ -38,6 +38,7 @@ export type ICommentBrowseResultModelMapper = {
   cc_type: PrismaCharacterizationTypeEnum | null;
   h_type: PrismaHierarchyEnum | null;
   h_name: string | null;
+  generatesources: { id: string; name: string }[];
 };
 
 export class CommentBrowseResultModelMapper {
@@ -72,6 +73,10 @@ export class CommentBrowseResultModelMapper {
         name: prisma.rec_name,
         id: prisma.rec_id,
       },
+      generateSources: prisma.generatesources.map((source) => ({
+        id: source.id,
+        name: source.name,
+      })),
       createdBy:
         prisma.creator_name && prisma.creator_email && prisma.creator_id
           ? {

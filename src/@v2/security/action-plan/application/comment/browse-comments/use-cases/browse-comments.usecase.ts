@@ -1,12 +1,10 @@
-import { Injectable } from '@nestjs/common'
-import { IBrowseCommentsUseCase } from './browse-comments.types'
-import { CommentDAO } from '@/@v2/security/action-plan/database/dao/comment/comment.dao'
+import { Injectable } from '@nestjs/common';
+import { IBrowseCommentsUseCase } from './browse-comments.types';
+import { CommentDAO } from '@/@v2/security/action-plan/database/dao/comment/comment.dao';
 
 @Injectable()
 export class BrowseCommentsUseCase {
-  constructor(
-    private readonly commentDAO: CommentDAO
-  ) { }
+  constructor(private readonly commentDAO: CommentDAO) {}
 
   async execute(params: IBrowseCommentsUseCase.Params) {
     const data = await this.commentDAO.browse({
@@ -21,10 +19,10 @@ export class BrowseCommentsUseCase {
         isApproved: params.isApproved,
         type: params.type,
         textType: params.textType,
-      }
-    })
+        generateSourceIds: params.generateSourceIds,
+      },
+    });
 
-    return data
-
+    return data;
   }
 }

@@ -1,6 +1,6 @@
-import { IOrderBy } from "@/@v2/shared/types/order-by.types";
-import { CommentTextTypeEnum } from "../../../domain/enums/comment-text-type.enum";
-import { CommentTypeEnum } from "../../../domain/enums/comment-type.enum";
+import { IOrderBy } from '@/@v2/shared/types/order-by.types';
+import { CommentTextTypeEnum } from '../../../domain/enums/comment-text-type.enum';
+import { CommentTypeEnum } from '../../../domain/enums/comment-type.enum';
 
 export enum CommentOrderByEnum {
   CREATOR = 'CREATOR',
@@ -25,7 +25,7 @@ export namespace ICommentDAO {
       isApproved?: boolean | null;
       type?: CommentTypeEnum[];
       textType?: CommentTextTypeEnum[];
+      generateSourceIds?: string[];
     };
-  }
+  };
 }
-

@@ -27,6 +27,11 @@ export type ICommentBrowseResultModel = {
     id: string;
   };
 
+  generateSources: {
+    id: string;
+    name: string;
+  }[];
+
   changes: {
     status: ActionPlanStatusEnum | undefined;
     previousStatus: ActionPlanStatusEnum | undefined;
@@ -61,6 +66,11 @@ export class CommentBrowseResultModel {
     id: string;
   };
 
+  generateSources: {
+    id: string;
+    name: string;
+  }[];
+
   changes: {
     status: ActionPlanStatusEnum | undefined;
     previousStatus: ActionPlanStatusEnum | undefined;
@@ -86,6 +96,7 @@ export class CommentBrowseResultModel {
     this.approvedComment = params.approvedComment;
     this.origin = params.origin;
     this.recommendation = params.recommendation;
+    this.generateSources = params.generateSources;
 
     this.changes = params.changes;
     this.approvedBy = params.approvedBy;

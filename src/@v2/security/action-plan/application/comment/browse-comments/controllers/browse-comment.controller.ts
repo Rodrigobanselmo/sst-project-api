@@ -1,19 +1,17 @@
-import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common'
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 
-import { ActionPlanRoutes } from '@/@v2/security/action-plan/constants/routes'
-import { JwtAuthGuard } from '@/@v2/shared/guards/jwt-auth.guard'
-import { PermissionEnum } from '@/shared/constants/enum/authorization'
-import { Permissions } from '@/shared/decorators/permissions.decorator'
-import { BrowseCommentsUseCase } from '../use-cases/browse-comments.usecase'
-import { BrowseCommentsPath } from './browse-comment.path'
-import { BrowseCommentsQuery } from './browse-comment.query'
+import { ActionPlanRoutes } from '@/@v2/security/action-plan/constants/routes';
+import { JwtAuthGuard } from '@/@v2/shared/guards/jwt-auth.guard';
+import { PermissionEnum } from '@/shared/constants/enum/authorization';
+import { Permissions } from '@/shared/decorators/permissions.decorator';
+import { BrowseCommentsUseCase } from '../use-cases/browse-comments.usecase';
+import { BrowseCommentsPath } from './browse-comment.path';
+import { BrowseCommentsQuery } from './browse-comment.query';
 
 @Controller(ActionPlanRoutes.COMMENT.BROWSE)
 @UseGuards(JwtAuthGuard)
 export class BrowseCommentsController {
-  constructor(
-    private readonly browseCommentsUseCase: BrowseCommentsUseCase
-  ) { }
+  constructor(private readonly browseCommentsUseCase: BrowseCommentsUseCase) {}
 
   @Get()
   @Permissions({
@@ -32,10 +30,11 @@ export class BrowseCommentsController {
       isApproved: query.isApproved,
       textType: query.textType,
       type: query.type,
+      generateSourceIds: query.generateSourceIds,
       pagination: {
         page: query.page,
-        limit: query.limit
+        limit: query.limit,
       },
-    })
+    });
   }
 }

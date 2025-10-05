@@ -12,6 +12,10 @@ export type IActionPlanReadModel = {
     name: string;
     photos: ActionPlanReadPhotoModel[];
   };
+  generateSources: {
+    id: string;
+    name: string;
+  }[];
 };
 
 export class ActionPlanReadModel {
@@ -25,6 +29,10 @@ export class ActionPlanReadModel {
     name: string;
     photos: ActionPlanReadPhotoModel[];
   };
+  generateSources: {
+    id: string;
+    name: string;
+  }[];
 
   constructor(params: IActionPlanReadModel) {
     this.uuid = params.uuid;
@@ -34,5 +42,6 @@ export class ActionPlanReadModel {
 
     this.recommendation = params.recommendation;
     this.characterizationPhotos = params.characterizationPhotos;
+    this.generateSources = params.generateSources;
   }
 }

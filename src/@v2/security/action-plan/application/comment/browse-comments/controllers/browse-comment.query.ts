@@ -57,6 +57,10 @@ export class BrowseCommentsQuery {
   @IsBoolean()
   @Type(() => Boolean)
   isApproved?: boolean | null;
+
+  @IsArray()
+  @IsOptional()
+  @IsString({ each: true })
+  @Type(() => String)
+  generateSourceIds?: string[];
 }
-
-

@@ -54,7 +54,11 @@ export class CommentDAO {
         creator_user."id" AS creator_id,
         approved_user."name" AS approved_name,
         approved_user."email" AS approved_email,
-        approved_user."id" AS approved_id
+        approved_user."id" AS approved_id,
+        COALESCE(
+          JSON_AGG(DISTINCT JSONB_BUILD_OBJECT('name', gs."name", 'id', gs."id"))
+          FILTER (WHERE gs."name" IS NOT NULL), '[]'
+        ) AS generateSources
       FROM 
         "RiskFactorDataRecComments" comment
       LEFT JOIN
@@ -75,6 +79,10 @@ export class CommentDAO {
         "Hierarchy" h ON h."id" = hh."hierarchyId"
       LEFT JOIN
         "CompanyCharacterization" cc ON cc."id" = hg."id"
+      LEFT JOIN
+        "_GenerateSourceToRiskFactorData" gs_to_rfd ON gs_to_rfd."B" = rfd."id"
+      LEFT JOIN
+        "GenerateSource" gs ON gs."id" = gs_to_rfd."A"
       ${gerWhereRawPrisma(whereParams)}
       GROUP BY 
         comment."id",
@@ -112,9 +120,9 @@ export class CommentDAO {
     `;
 
     const totalCommentsPromise = this.prisma.$queryRaw<[{ total: number } & CommentBrowseFilterModelMapper]>`
-      SELECT 
+      SELECT
         COUNT(*)::integer AS total
-      FROM 
+      FROM
         "RiskFactorDataRecComments" comment
       LEFT JOIN
         "User" creator_user ON creator_user."id" = comment."userId"
@@ -122,6 +130,28 @@ export class CommentDAO {
         "User" approved_user ON approved_user."id" = comment."approvedById"
       LEFT JOIN
         "RiskFactorDataRec" rfs_rec ON rfs_rec."id" = comment."riskFactorDataRecId"
+      LEFT JOIN
+        "RecMed" rec ON rec."id" = rfs_rec."recMedId"
+      LEFT JOIN
+        "RiskFactorData" rfd ON rfd."id" = rfs_rec."riskFactorDataId"
+      LEFT JOIN
+        "HomogeneousGroup" hg ON hg."id" = rfd."homogeneousGroupId"
+      LEFT JOIN
+        "HierarchyOnHomogeneous" hh ON hh."homogeneousGroupId" = hg."id" AND hh."endDate" IS NULL
+      LEFT JOIN
+        "Hierarchy" h ON h."id" = hh."hierarchyId"
+      LEFT JOIN
+        "CompanyCharacterization" cc ON cc."id" = hg."id"
+      ${
+        filters.generateSourceIds?.length
+          ? Prisma.sql`
+        LEFT JOIN
+          "_GenerateSourceToRiskFactorData" gs_to_rfd ON gs_to_rfd."B" = rfd."id"
+        LEFT JOIN
+          "GenerateSource" gs ON gs."id" = gs_to_rfd."A"
+      `
+          : Prisma.sql``
+      }
       ${gerWhereRawPrisma(whereParams)}
     `;
 
@@ -168,6 +198,10 @@ export class CommentDAO {
 
     if (typeof filters.isApproved === 'boolean') {
       where.push(Prisma.sql`comment."isApproved" = ${filters.isApproved}`);
+    }
+
+    if (filters.generateSourceIds?.length) {
+      where.push(Prisma.sql`gs."id" IN (${Prisma.join(filters.generateSourceIds)})`);
     }
 
     return where;

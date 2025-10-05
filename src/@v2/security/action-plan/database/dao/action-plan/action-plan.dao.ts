@@ -170,9 +170,24 @@ export class ActionPlanDAO {
       },
     });
 
-    const [homogeneousGroup, photos, actionPlan] = await Promise.all([homogeneousGroupPromise, photosPromise, actionPlanPromise]);
+    const generateSourcesPromise = this.prisma.riskFactorData.findFirst({
+      where: {
+        id: params.riskDataId,
+        companyId: params.companyId,
+      },
+      select: {
+        generateSources: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
 
-    return homogeneousGroup ? ActionPlanReadMapper.toModel({ homogeneousGroup, photos, actionPlan, params }) : null;
+    const [homogeneousGroup, photos, actionPlan, generateSourcesData] = await Promise.all([homogeneousGroupPromise, photosPromise, actionPlanPromise, generateSourcesPromise]);
+
+    return homogeneousGroup ? ActionPlanReadMapper.toModel({ homogeneousGroup, photos, actionPlan, generateSources: generateSourcesData?.generateSources || [], params }) : null;
   }
 
   async browse({ limit, page, orderBy, filters }: IActionPlanDAO.BrowseParams) {
