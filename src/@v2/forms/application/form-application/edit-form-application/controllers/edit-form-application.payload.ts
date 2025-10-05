@@ -2,7 +2,7 @@ import { FormStatusEnum } from '@/@v2/forms/domain/enums/form-status.enum';
 import { FormIdentifierTypeEnum } from '@/@v2/forms/domain/enums/form-identifier-type.enum';
 import { FormQuestionTypeEnum } from '@/@v2/forms/domain/enums/form-question-type.enum';
 import { Type } from 'class-transformer';
-import { ArrayMinSize, IsArray, IsBoolean, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, Min, ValidateNested } from 'class-validator';
+import { ArrayMinSize, IsArray, IsBoolean, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, Min, Max, ValidateNested } from 'class-validator';
 
 class FormQuestionOptionDto {
   @IsOptional()
@@ -113,4 +113,10 @@ export class EditFormApplicationPayload {
   @ValidateNested()
   @Type(() => IdentifierDto)
   identifier?: IdentifierDto;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(100)
+  participationGoal?: number;
 }

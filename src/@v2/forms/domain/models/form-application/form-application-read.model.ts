@@ -19,6 +19,7 @@ export type IFormApplicationReadModel = {
   };
   questionIdentifierGroup: FormQuestionGroupReadModel;
   isShareableLink: boolean;
+  participationGoal: number | null;
   isAnonymous: boolean;
   totalParticipants: number;
   totalAnswers: number;
@@ -45,6 +46,7 @@ export class FormApplicationReadModel {
   totalParticipants: number;
   totalAnswers: number;
   averageTimeSpent: number | null;
+  participationGoal: number | null;
   questionIdentifierGroup: FormQuestionGroupReadModel;
 
   constructor(params: IFormApplicationReadModel) {
@@ -64,6 +66,7 @@ export class FormApplicationReadModel {
     this.questionIdentifierGroup = params.questionIdentifierGroup;
     this.totalParticipants = params.totalParticipants;
     this.totalAnswers = params.totalAnswers;
+    this.participationGoal = params.participationGoal;
     this.averageTimeSpent = params.averageTimeSpent;
   }
 }

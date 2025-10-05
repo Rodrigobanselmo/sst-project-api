@@ -9,6 +9,7 @@ type IUpdatePrams = {
   description?: string | null;
   anonymous?: boolean | null;
   shareableLink?: boolean | null;
+  participationGoal?: number | null;
 };
 
 export type FormApplicationEntityConstructor = {
@@ -23,6 +24,7 @@ export type FormApplicationEntityConstructor = {
   startAt?: Date;
   anonymous?: boolean | null;
   shareableLink?: boolean | null;
+  participationGoal?: number | null;
 };
 
 export class FormApplicationEntity {
@@ -36,6 +38,7 @@ export class FormApplicationEntity {
   startAt?: Date;
   anonymous: boolean | null;
   shareableLink: boolean | null;
+  participationGoal: number | null;
 
   private _status: FormStatusEnum;
 
@@ -51,6 +54,7 @@ export class FormApplicationEntity {
     this.companyId = params.companyId;
     this.anonymous = params.anonymous ?? null;
     this.shareableLink = params.shareableLink ?? null;
+    this.participationGoal = params.participationGoal ?? null;
   }
 
   get status() {
@@ -95,6 +99,7 @@ export class FormApplicationEntity {
     this.description = updateField(this.description, data.description);
     this.anonymous = updateField(this.anonymous, data.anonymous);
     this.shareableLink = updateField(this.shareableLink, data.shareableLink);
+    this.participationGoal = updateField(this.participationGoal, data.participationGoal);
   }
 
   canBeAnswered() {

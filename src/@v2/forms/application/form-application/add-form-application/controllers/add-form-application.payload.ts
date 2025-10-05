@@ -1,6 +1,6 @@
 import { FormIdentifierTypeEnum } from '@/@v2/forms/domain/enums/form-identifier-type.enum';
 import { Type } from 'class-transformer';
-import { ArrayMinSize, IsArray, IsBoolean, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { ArrayMinSize, IsArray, IsBoolean, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, ValidateNested, Min, Max } from 'class-validator';
 
 class FormQuestionOptionDto {
   @IsOptional()
@@ -98,6 +98,12 @@ export class AddFormApplicationPayload {
   @IsOptional()
   @IsBoolean()
   shareableLink?: boolean;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(100)
+  participationGoal?: number;
 
   @ValidateNested()
   @IsOptional()

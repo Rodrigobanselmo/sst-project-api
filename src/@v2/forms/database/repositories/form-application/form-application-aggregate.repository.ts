@@ -40,6 +40,7 @@ export class FormApplicationAggregateRepository {
           status: params.formApplication.status,
           ended_at: params.formApplication.endedAt,
           started_at: params.formApplication.startAt,
+          participation_goal: params.formApplication.participationGoal,
           anonymous: params.formApplication.anonymous,
           shareable_link: params.formApplication.shareableLink,
           participants: {
@@ -94,6 +95,7 @@ export class FormApplicationAggregateRepository {
           ended_at: params.formApplication.endedAt,
           started_at: params.formApplication.startAt,
           status: params.formApplication.status,
+          participation_goal: params.formApplication.participationGoal,
           form_id: params.form.id,
           anonymous: params.formApplication.anonymous,
           shareable_link: params.formApplication.shareableLink,

@@ -27,6 +27,7 @@ export namespace IAddFormApplicationUseCase {
     hierarchyIds: string[];
     anonymous?: boolean;
     shareableLink?: boolean;
+    participationGoal?: number;
     identifier: {
       name: string;
       description?: string;

@@ -31,6 +31,7 @@ export class AddFormApplicationController {
       anonymous: body.anonymous,
       shareableLink: body.shareableLink,
       identifier: body.identifier,
+      participationGoal: body.participationGoal,
     });
   }
 }
