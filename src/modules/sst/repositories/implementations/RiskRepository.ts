@@ -353,6 +353,11 @@ export class RiskRepository implements IRiskRepository {
         company: !!include.company,
         recMed: !!include.recMed,
         generateSource: !!include.generateSource,
+        subTypes: {
+          include: {
+            sub_type: true,
+          },
+        },
       },
     });
 
@@ -395,6 +400,11 @@ export class RiskRepository implements IRiskRepository {
         company: !!include.company,
         recMed: !!include.recMed,
         generateSource: !!include.generateSource,
+        subTypes: {
+          include: {
+            sub_type: true,
+          },
+        },
       },
     });
 
@@ -604,6 +614,11 @@ export class RiskRepository implements IRiskRepository {
         activities: true,
         twa: true,
         unit: true,
+        subTypes: {
+          include: {
+            sub_type: true,
+          },
+        },
         // _count: { select: { riskFactorData: true } },
         // recMed: { where: { deleted_at: null, AND: [...tenant] } },
         // generateSource: { where: { deleted_at: null, AND: [...tenant] } },

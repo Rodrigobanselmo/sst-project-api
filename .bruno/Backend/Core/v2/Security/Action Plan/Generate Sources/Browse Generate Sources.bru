@@ -1,0 +1,26 @@
+meta {
+  name: Browse Generate Sources
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{url}}/v2/companies/:companyId/action-plans/generate-sources
+  body: none
+  auth: bearer
+}
+
+params:query {
+  ~search: 
+  ~page: 1
+  ~limit: 10
+  ~riskIds: 
+}
+
+params:path {
+  companyId: {{companyId}}
+}
+
+auth:bearer {
+  token: {{token}}
+}

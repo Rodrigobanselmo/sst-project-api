@@ -40,6 +40,12 @@ export class FindRiskService {
           nr15lt: true,
           stel: true,
 
+          subTypes: {
+            include: {
+              sub_type: true,
+            },
+          },
+
           docInfo: {
             where: {
               OR: [

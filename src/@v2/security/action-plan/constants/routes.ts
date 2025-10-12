@@ -30,4 +30,7 @@ export const ActionPlanRoutes = {
   HIERARCHY: {
     BROWSE: 'v2/companies/:companyId/action-plans/hierarchies',
   },
+  GENERATE_SOURCE: {
+    BROWSE: 'v2/companies/:companyId/action-plans/generate-sources',
+  },
 } as const;

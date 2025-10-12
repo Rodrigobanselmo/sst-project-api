@@ -4,4 +4,5 @@ export enum PermissionCompanyEnum {
   schedule = '3',
   absenteeism = '4',
   esocial = '5',
+  forms = '6',
 }

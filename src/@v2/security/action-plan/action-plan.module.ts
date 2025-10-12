@@ -21,6 +21,8 @@ import { BrowseHierarchiesController } from './application/hierarchy/browse-hier
 import { BrowseHierarchiesUseCase } from './application/hierarchy/browse-hierarchies/use-cases/browse-hierarchies.usecase';
 import { BrowseCommentCreatorsController } from './application/user/browse-comment-creators/controllers/browse-comment-creators.controller';
 import { BrowseCommentCreatorsUseCase } from './application/user/browse-comment-creators/use-cases/browse-comment-creators.usecase';
+import { BrowseGenerateSourcesController } from './application/generate-source/browse-generate-sources/controllers/browse-generate-sources.controller';
+import { BrowseGenerateSourcesUseCase } from './application/generate-source/browse-generate-sources/use-cases/browse-generate-sources.usecase';
 import { BrowseCoordinatorsController } from './application/user/browse-coordinators/controllers/browse-coordinators.controller';
 import { BrowseCoordinatorsUseCase } from './application/user/browse-coordinators/use-cases/browse-coordinators.usecase';
 import { BrowseResponsiblesController } from './application/user/browse-responsible/controllers/browse-responsible.controller';
@@ -28,6 +30,7 @@ import { BrowseResponsiblesUseCase } from './application/user/browse-responsible
 import { ActionPlanInfoDAO } from './database/dao/action-plan-info/action-plan-info.dao';
 import { ActionPlanDAO } from './database/dao/action-plan/action-plan.dao';
 import { CommentDAO } from './database/dao/comment/comment.dao';
+import { GenerateSourceDAO } from './database/dao/generate-source/generate-source.dao';
 import { HierarchyDAO } from './database/dao/hierarchy/hierarchy.dao';
 import { ResponsibleDAO } from './database/dao/responsible/responsible.dao';
 import { UserDAO } from './database/dao/user/user.dao';
@@ -62,6 +65,7 @@ import { ActionPlanRuleAggregateRepository } from './database/repositories/actio
     BrowseHierarchiesController,
     BrowseCommentsController,
     BrowseCommentCreatorsController,
+    BrowseGenerateSourcesController,
     ReadActionPlanController,
     AddActionPlanPhotoFileController,
     DeleteActionPlanPhotoFileController,
@@ -80,6 +84,7 @@ import { ActionPlanRuleAggregateRepository } from './database/repositories/actio
     CoordinatorRepository,
     ActionPlanPhotoAggregateRepository,
     CommentDAO,
+    GenerateSourceDAO,
     UserDAO,
     HierarchyDAO,
     ResponsibleDAO,
@@ -98,6 +103,7 @@ import { ActionPlanRuleAggregateRepository } from './database/repositories/actio
     BrowseHierarchiesUseCase,
     BrowseCommentsUseCase,
     BrowseCommentCreatorsUseCase,
+    BrowseGenerateSourcesUseCase,
     ReadActionPlanUseCase,
     AddActionPlanPhotoFileUseCase,
     DeleteActionPlanPhotoFileUseCase,

@@ -61,7 +61,7 @@ export class RiskDAO {
       EXISTS (
         SELECT 1 FROM "RiskToRiskSubType" rrst
         INNER JOIN "RiskSubType" rst ON rrst."sub_type_id" = rst."id"
-        WHERE rrst."risk_id" = rf."id" AND rst."sub_type" = 'PSICOSOCIAL'
+        WHERE rrst."risk_id" = rf."id" AND (rst."sub_type" = 'PSICOSOCIAL' OR rst."sub_type" = 'INDICADORES_SAUDE' OR rst."sub_type" = 'INDICADORES_CONTROLES')
       )
     `);
 

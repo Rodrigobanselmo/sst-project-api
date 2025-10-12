@@ -246,6 +246,11 @@ export class RiskDataRepository {
         generateSources: true,
         riskFactor: {
           select: {
+            subTypes: {
+              select: {
+                sub_type: true,
+              },
+            },
             examToRisk: {
               select: { id: true, exam: { select: { name: true } } },
               where: {
