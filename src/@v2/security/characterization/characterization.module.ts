@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { CacheModule } from '@nestjs/cache-manager';
 import { BrowseCharacterizationController } from './application/characterization/browse-characterizations/controllers/browse-characterizations.controller';
 import { BrowseCharacterizationUseCase } from './application/characterization/browse-characterizations/use-cases/browse-characterizations.usecase';
 import { CharacterizationDAO } from './database/dao/characterization/characterization.dao';
@@ -12,10 +13,12 @@ import { PhotoRecommendationRepository } from './database/repositories/photo-rec
 import { EditManyPhotoRecommendationUseCase } from './application/photo-recommendation/edit-many-photo-recommendation/use-cases/edit-many-photo-recommendation.usecase';
 import { EditManyPhotoRecommendationController } from './application/photo-recommendation/edit-many-photo-recommendation/controllers/edit-many-photo-recommendation.controller';
 import { EditPhotoRecommendationService } from './services/edit-photo-recommendation/edit-photo-recommendation.service';
+import { AiAnalyzeCharacterizationController } from './application/characterization/ai-analyze-characterization/controllers/ai-analyze-characterization.controller';
+import { AiAnalyzeCharacterizationUseCase } from './application/characterization/ai-analyze-characterization/use-cases/ai-analyze-characterization.usecase';
 
 @Module({
-  imports: [SharedModule],
-  controllers: [BrowseCharacterizationController, EditManyCharacterizationController, EditManyPhotoRecommendationController],
+  imports: [SharedModule, CacheModule.register()],
+  controllers: [BrowseCharacterizationController, EditManyCharacterizationController, EditManyPhotoRecommendationController, AiAnalyzeCharacterizationController],
   providers: [
     // Database
     CharacterizationDAO,
@@ -27,6 +30,7 @@ import { EditPhotoRecommendationService } from './services/edit-photo-recommenda
     BrowseCharacterizationUseCase,
     EditManyCharacterizationUseCase,
     EditManyPhotoRecommendationUseCase,
+    AiAnalyzeCharacterizationUseCase,
 
     //Services
     EditCharacterizationService,

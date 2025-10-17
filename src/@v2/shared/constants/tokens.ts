@@ -11,4 +11,5 @@ export class SharedTokens {
   public static FileRequester = Symbol.for('FileRequester');
   public static Notification = Symbol.for('Notification');
   public static Crypto = Symbol.for('Crypto');
+  public static AI = Symbol.for('AI');
 }

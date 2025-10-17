@@ -14,9 +14,10 @@ import { GoogleModule } from './adapters/google/google.module';
 import { FileRequesterModule } from './requesters/files/file.module';
 import { NotificationModule } from './adapters/notification/notification.module';
 import { CryptoModule } from './adapters/crypto/crypto.module';
+import { AiModule } from './adapters/ai/ai.module';
 
 @Module({
-  imports: [DatabaseModule, ContextModule, StorageModule, QueueModule, EmailModule, JwtModule, HashModule, GoogleModule, FileRequesterModule, NotificationModule, CryptoModule],
+  imports: [DatabaseModule, ContextModule, StorageModule, QueueModule, EmailModule, JwtModule, HashModule, GoogleModule, FileRequesterModule, NotificationModule, CryptoModule, AiModule],
   providers: [
     JwtStrategy,
     {
@@ -38,6 +39,7 @@ import { CryptoModule } from './adapters/crypto/crypto.module';
     FileRequesterModule,
     NotificationModule,
     CryptoModule,
+    AiModule,
   ],
 })
 export class SharedModule {}
