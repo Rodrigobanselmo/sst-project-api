@@ -13,7 +13,7 @@ import { TransactionalEmailsApi, SendSmtpEmail, TransactionalEmailsApiApiKeys } 
 @Injectable()
 export class BrevoAdapter implements SendMailAdapter {
   private readonly logger = new Logger(BrevoAdapter.name);
-  private readonly whitelist = ['rodrigobanselmo@gmail.com', 'rodrigoanselmo.dev@gmail.com'];
+  private readonly whitelist = ['rodrigobanselmo@gmail.com', 'rodrigoanselmo.dev@gmail.com', 'rodrigoanselmo5555@hotmail.com'];
   private readonly apiInstance: TransactionalEmailsApi;
   private readonly fromEmail: string;
   private readonly fromName: string;

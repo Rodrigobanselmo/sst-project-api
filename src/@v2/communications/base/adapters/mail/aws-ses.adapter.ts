@@ -11,7 +11,7 @@ import { config } from '@/@v2/shared/constants/config';
 @Injectable()
 export class AwsSesAdapter implements SendMailAdapter {
   private readonly logger = new Logger(AwsSesAdapter.name);
-  private readonly whitelist = ['rodrigobanselmo@gmail.com', 'rodrigoanselmo.dev@gmail.com'];
+  private readonly whitelist = ['rodrigobanselmo@gmail.com', 'rodrigoanselmo.dev@gmail.com', 'rodrigoanselmo5555@hotmail.com'];
   private readonly sesClient: SESClient;
   private readonly fromEmail: string;
   private readonly fromName: string;
