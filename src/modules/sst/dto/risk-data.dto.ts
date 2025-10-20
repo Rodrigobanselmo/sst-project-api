@@ -9,6 +9,8 @@ import { EpiRoRiskDataDto } from './epi-risk-data.dto';
 import { EngsRiskDataDto } from './engs-risk-data.dto';
 import { ExamsRiskDataDto } from './exams-risk-data.dto';
 import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
+import { UpdateRecMedDto } from './rec-med.dto';
+import { UpdateGenerateSourceDto } from './generate-source.dto';
 
 export class UpsertRiskDataDto {
   @IsString()
@@ -119,6 +121,26 @@ export class UpsertRiskDataDto {
   @IsDate({ message: 'Data de fim inválida' })
   @Type(() => Date)
   endDate?: Date;
+
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @Type(() => UpdateRecMedDto)
+  recAddOnly?: UpdateRecMedDto[];
+
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @Type(() => UpdateRecMedDto)
+  admsAddOnly?: UpdateRecMedDto[];
+
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @Type(() => UpdateGenerateSourceDto)
+  generateSourcesAddOnly?: UpdateGenerateSourceDto[];
+
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @Type(() => UpdateRecMedDto)
+  engsAddOnly?: UpdateRecMedDto[];
 }
 
 export class UpsertManyRiskDataDto {

@@ -97,22 +97,57 @@ export class AiAnalyzeCharacterizationUseCase {
                       fonteGeradora: { type: 'string' },
                       probabilidade: { type: 'number', minimum: 1, maximum: 5 },
                       controlesExistentes: { type: 'string' },
-                      medidasEngenharia: {
+                      medidasEngenhariaRecomendadas: {
                         type: 'array',
                         items: { type: 'string' },
                       },
-                      medidasAdministrativas: {
+                      medidasAdministrativasRecomendadas: {
+                        type: 'array',
+                        items: { type: 'string' },
+                      },
+                      medidasEngenhariaExistentes: {
+                        type: 'array',
+                        items: { type: 'string' },
+                      },
+                      medidasAdministrativasExistentes: {
                         type: 'array',
                         items: { type: 'string' },
                       },
                       confianca: { type: 'number', minimum: 0, maximum: 1 },
                     },
-                    required: ['id_risco', 'explicacao', 'fonteGeradora', 'probabilidade', 'controlesExistentes', 'medidasEngenharia', 'medidasAdministrativas', 'confianca'],
+                    required: [
+                      'id_risco',
+                      'explicacao',
+                      'fonteGeradora',
+                      'probabilidade',
+                      'controlesExistentes',
+                      'medidasEngenhariaRecomendadas',
+                      'medidasAdministrativasRecomendadas',
+                      'medidasEngenhariaExistentes',
+                      'medidasAdministrativasExistentes',
+                      'confianca',
+                    ],
+                    additionalProperties: false,
+                  },
+                },
+                descricao: { type: 'string' },
+                processoTrabalho: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      desc: { type: 'string' },
+                      type: {
+                        type: 'string',
+                        enum: ['PARAGRAPH', 'BULLET_0', 'BULLET_1', 'BULLET_2'],
+                      },
+                    },
+                    required: ['desc', 'type'],
                     additionalProperties: false,
                   },
                 },
               },
-              required: ['riscos'],
+              required: ['riscos', 'descricao', 'processoTrabalho'],
               additionalProperties: false,
             },
           },
@@ -124,13 +159,15 @@ export class AiAnalyzeCharacterizationUseCase {
       console.log(JSON.stringify({ prompt, content, result }));
 
       // Parse the structured JSON response and map integer IDs back to UUIDs
-      const { recommendedRiskIds, detailedRisks } = this.parseStructuredResponse(result.analysis, riskIdMapping.intToUuid, availableRisks);
+      const { recommendedRiskIds, detailedRisks, description, workProcess } = this.parseStructuredResponse(result.analysis, riskIdMapping.intToUuid, availableRisks);
 
       return {
         analysis: result.analysis,
         confidence: result.confidence,
         recommendedRisks: recommendedRiskIds,
         detailedRisks: detailedRisks,
+        description: description,
+        workProcess: workProcess,
         metadata: {
           ...result.metadata,
           companyId: params.companyId,
@@ -270,11 +307,17 @@ export class AiAnalyzeCharacterizationUseCase {
     }
 
     // Add the default prompt instructions
-    prompt += `Identifique nessa imagem os principais Perigos ou Fatores de Riscos Ocupacionais (P/FRO), com suas respectivas Probabilidades, fontes geradoras, controles existentes (se houver) e as recomendações para mitigação.
+    prompt += `Analise as imagens e informações fornecidas para:
 
-Use APENAS os IDs da "Base de Conhecimento de Riscos Disponíveis".
+1. IDENTIFICAR RISCOS OCUPACIONAIS: Identifique os principais Perigos ou Fatores de Riscos Ocupacionais (P/FRO), com suas respectivas Probabilidades, fontes geradoras, controles existentes (se houver) e as recomendações para mitigação.
 
-INSTRUÇÕES:
+2. EXTRAIR DESCRIÇÃO: Crie uma descrição detalhada em um parágrafo sobre o ambiente de trabalho, atividades realizadas e características observadas nas imagens.
+
+3. EXTRAIR PROCESSO DE TRABALHO: Identifique e descreva o processo de trabalho em formato estruturado, incluindo etapas, procedimentos e atividades observadas.
+
+Use APENAS os IDs da "Base de Conhecimento de Riscos Disponíveis" para identificação de riscos.
+
+INSTRUÇÕES PARA RISCOS:
 - Use SOMENTE os IDs fornecidos na base de conhecimento
 - Seja conservador: prefira não identificar um risco do que identificar incorretamente
 - Para cada risco identificado, explique por que foi identificado
@@ -282,14 +325,28 @@ INSTRUÇÕES:
 - Avalie a probabilidade do risco de 1 a 5 (chance de um dano ocorrer ou frequência de exposição)
 - Identifique controles existentes no ambiente (se houver)
 - Recomende medidas de controle separadas em engenharia e administrativas
+- Identifique medidas de controle existentes separadas em engenharia e administrativas
 - Avalie sua confiança de 0 a 1 para cada identificação
+
+INSTRUÇÕES PARA DESCRIÇÃO:
+- Crie um parágrafo descritivo e detalhado sobre o ambiente de trabalho
+- Inclua informações sobre o local, equipamentos, atividades e condições observadas
+- Seja objetivo e técnico na descrição
+
+INSTRUÇÕES PARA PROCESSO DE TRABALHO:
+- Identifique as etapas do processo de trabalho observado
+- Use os tipos: PARAGRAPH para descrições gerais, BULLET_0 para itens principais, BULLET_1 para subitens, BULLET_2 para sub-subitens
+- Organize de forma hierárquica e lógica
+- Seja específico sobre as atividades e procedimentos
 
 ORIENTAÇÕES ESPECÍFICAS:
 - fonteGeradora: descreva o que origina o risco (ex: "máquina gerando ruído", "postura inadequada na atividade", "fiação exposta")
 - probabilidade: escala de 1 a 5 representando a chance de dano ocorrer (1=muito baixa, 5=muito alta)
 - controlesExistentes: descreva controles já implementados no ambiente
-- medidasEngenharia: modificações no local/equipamento para isolar/remover perigo
-- medidasAdministrativas: organização do trabalho para reduzir exposição
+- medidasEngenhariaRecomendadas: modificações recomendadas no local/equipamento para isolar/remover perigo
+- medidasAdministrativasRecomendadas: organização recomendada do trabalho para reduzir exposição
+- medidasEngenhariaExistentes: modificações de engenharia já existentes no ambiente
+- medidasAdministrativasExistentes: medidas administrativas já implementadas no ambiente
 - confianca: seja realista na avaliação (0.7-0.9 para riscos claros, 0.5-0.7 para riscos prováveis)`;
 
     return prompt;
@@ -302,13 +359,21 @@ ORIENTAÇÕES ESPECÍFICAS:
   ): {
     recommendedRiskIds: string[];
     detailedRisks: IAiAnalyzeCharacterizationUseCase.DetailedRisk[];
+    description: string;
+    workProcess: IAiAnalyzeCharacterizationUseCase.WorkProcessItem[];
   } {
     const recommendedRiskIds: string[] = [];
     const detailedRisks: IAiAnalyzeCharacterizationUseCase.DetailedRisk[] = [];
+    let description = '';
+    let workProcess: IAiAnalyzeCharacterizationUseCase.WorkProcessItem[] = [];
 
     try {
       // Parse the structured JSON response
       const jsonResponse: IAiAnalyzeCharacterizationUseCase.AiJsonResponse = JSON.parse(aiResponse);
+
+      // Extract description and work process
+      description = jsonResponse.descricao || '';
+      workProcess = jsonResponse.processoTrabalho || [];
 
       if (jsonResponse.riscos && Array.isArray(jsonResponse.riscos)) {
         jsonResponse.riscos.forEach((risco: IAiAnalyzeCharacterizationUseCase.AiRiskResponse) => {
@@ -332,8 +397,10 @@ ORIENTAÇÕES ESPECÍFICAS:
                   generateSource: risco.fonteGeradora || '',
                   probability: risco.probabilidade || 0,
                   existingControls: risco.controlesExistentes || '',
-                  engineeringMeasures: risco.medidasEngenharia || [],
-                  administrativeMeasures: risco.medidasAdministrativas || [],
+                  recommendedEngineeringMeasures: risco.medidasEngenhariaRecomendadas || [],
+                  recommendedAdministrativeMeasures: risco.medidasAdministrativasRecomendadas || [],
+                  existingEngineeringMeasures: risco.medidasEngenhariaExistentes || [],
+                  existingAdministrativeMeasures: risco.medidasAdministrativasExistentes || [],
                   confidence: risco.confianca || 0,
                 });
               }
@@ -343,10 +410,10 @@ ORIENTAÇÕES ESPECÍFICAS:
       }
     } catch (error) {
       console.error('Failed to parse structured response:', error);
-      // If parsing fails, return empty arrays
+      // If parsing fails, return empty arrays and strings
     }
 
-    return { recommendedRiskIds, detailedRisks };
+    return { recommendedRiskIds, detailedRisks, description, workProcess };
   }
 
   /**

@@ -1,10 +1,10 @@
-import { QueryArray } from './../../../shared/transformers/query-array';
-import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
 import { PartialType } from '@nestjs/swagger';
 import { MeasuresTypeEnum, RecTypeEnum, RiskFactorsEnum, StatusEnum } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import { IsBoolean, IsEnum, IsOptional, IsString } from 'class-validator';
 import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
+import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
+import { QueryArray } from './../../../shared/transformers/query-array';
 
 import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';

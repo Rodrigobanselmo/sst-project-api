@@ -53,13 +53,22 @@ export namespace IAiAnalyzeCharacterizationUseCase {
     fonteGeradora: string;
     probabilidade: number;
     controlesExistentes: string;
-    medidasEngenharia: string[];
-    medidasAdministrativas: string[];
+    medidasEngenhariaRecomendadas: string[];
+    medidasAdministrativasRecomendadas: string[];
+    medidasEngenhariaExistentes: string[];
+    medidasAdministrativasExistentes: string[];
     confianca: number;
+  };
+
+  export type WorkProcessItem = {
+    desc: string;
+    type: 'PARAGRAPH' | 'BULLET_0' | 'BULLET_1' | 'BULLET_2';
   };
 
   export type AiJsonResponse = {
     riscos: AiRiskResponse[];
+    descricao: string;
+    processoTrabalho: WorkProcessItem[];
   };
 
   export type DetailedRisk = {
@@ -70,8 +79,10 @@ export namespace IAiAnalyzeCharacterizationUseCase {
     generateSource: string;
     probability: number; // 1-5 scale
     existingControls: string;
-    engineeringMeasures: string[];
-    administrativeMeasures: string[];
+    recommendedEngineeringMeasures: string[];
+    recommendedAdministrativeMeasures: string[];
+    existingEngineeringMeasures: string[];
+    existingAdministrativeMeasures: string[];
     confidence: number;
   };
 
@@ -80,6 +91,8 @@ export namespace IAiAnalyzeCharacterizationUseCase {
     confidence: number;
     recommendedRisks: string[]; // Array of risk UUIDs recommended by AI
     detailedRisks: DetailedRisk[]; // Detailed information about each recommended risk
+    description: string; // Descrição extraída das fotos e informações
+    workProcess: WorkProcessItem[]; // Processo de trabalho extraído
     metadata?: Record<string, any>;
     characterization: {
       id: string;
