@@ -27,7 +27,7 @@ export class OpenAIAiAdapter implements AiAdapter {
 
   constructor() {
     this.client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-    this.model = process.env.OPENAI_MODEL || 'gpt-4o';
+    this.model = process.env.OPENAI_MODEL || 'o4-mini' || 'gpt-4.1' || 'gpt-4o';
   }
 
   async analyze({ content, prompt, language = 'pt-BR', additionalContext, responseFormat = 'text', systemPrompt, model }: AiAdapter.AnalyzeParams): Promise<AiAnalysisResult> {
