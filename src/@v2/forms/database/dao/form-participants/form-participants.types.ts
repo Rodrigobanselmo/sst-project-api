@@ -14,6 +14,7 @@ export namespace IFormParticipantsDAO {
       hierarchyIds?: string[];
       participantIds?: number[];
       onlyWithEmail?: boolean;
+      employeeIds?: number[];
     };
     cryptoAdapter: CryptoAdapter;
   };

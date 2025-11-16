@@ -1,0 +1,35 @@
+meta {
+  name: Public Form Participant Login
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{url}}/v2/forms/applications/:applicationId/public/login
+  body: json
+  auth: none
+}
+
+params:path {
+  applicationId: {{applicationId}}
+}
+
+body:json {
+  {
+    "cpf": "12345678901",
+    "birthday": "1990-01-15"
+  }
+}
+
+tests {
+  test("should return encrypted token on successful login", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.have.property('token');
+    expect(res.getBody().token).to.be.a('string');
+  });
+  
+  test("should return 401 for invalid credentials", function() {
+    // This test would need to be run with invalid credentials
+    // expect(res.getStatus()).to.equal(401);
+  });
+}

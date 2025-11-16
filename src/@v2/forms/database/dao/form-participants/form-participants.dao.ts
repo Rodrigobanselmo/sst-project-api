@@ -154,6 +154,10 @@ export class FormParticipantsDAO {
       where.push(Prisma.sql`emp."email" IS NOT NULL AND emp."email" != ''`);
     }
 
+    if (filters.employeeIds && filters.employeeIds.length > 0) {
+      where.push(Prisma.sql`emp."id" IN (${Prisma.join(filters.employeeIds)})`);
+    }
+
     // Filter by hierarchy IDs if provided (including parent hierarchies)
     if (filters.hierarchyIds && filters.hierarchyIds.length > 0) {
       where.push(Prisma.sql`(

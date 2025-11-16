@@ -363,6 +363,7 @@ model Company {
   TaskProject                TaskProject[]
   Task                       Task[]
   CompanyFlags               CompanyFlags?
+  formAiAnalyses             FormAiAnalysis[]
 
   @@index([name])
   @@index([isClinic])
@@ -1261,9 +1262,40 @@ model FormApplication {
   participants_answers      FormParticipantsAnswers[]
   question_identifier_group FormQuestionGroup[]
   formApplicationRiskLog    FormApplicationRiskLog[]
+  formAiAnalysis            FormAiAnalysis[]
 
   @@unique([id, company_id])
   @@index([company_id])
+}
+
+model FormAiAnalysis {
+  id                String                   @id @default(cuid())
+  companyId         String
+  formApplicationId String
+  hierarchyId       String
+  riskId            String
+  status            FormAiAnalysisStatusEnum @default(PROCESSING)
+  probability       Float?
+  confidence        Float?
+  analysis          Json? // Stores the AiRiskAnalysisResponse
+  metadata          Json? // Additional metadata
+  model             String? // AI model used
+  processingTimeMs  Int?
+  created_at        DateTime                 @default(now())
+  updated_at        DateTime                 @updatedAt
+
+  // Relations
+  company         Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  formApplication FormApplication @relation(fields: [formApplicationId], references: [id], onDelete: Cascade)
+  hierarchy       Hierarchy       @relation(fields: [hierarchyId], references: [id], onDelete: Cascade)
+  riskFactor      RiskFactors     @relation(fields: [riskId], references: [id], onDelete: Cascade)
+
+  // Indexes
+  @@unique([formApplicationId, hierarchyId, riskId])
+  @@index([companyId])
+  @@index([formApplicationId])
+  @@index([hierarchyId])
+  @@index([riskId])
 }
 
 model FormApplicationRiskLog {
@@ -1576,6 +1608,7 @@ model Hierarchy {
   protocolsData                 ProtocolToRisk[]
   hormParticipantsHierarchy     FormParticipantsHierarchy[]
   ActionPlanRulesOnHierarchy    ActionPlanRulesOnHierarchy[]
+  formAiAnalyses                FormAiAnalysis[]
 
   @@unique([id, companyId])
   @@unique([parentId, name])
@@ -1867,6 +1900,7 @@ model RiskFactors {
   formQuestionRisk       FormQuestionRisk[]
   subTypes               RiskToRiskSubType[]
   formApplicationRiskLog FormApplicationRiskLog[]
+  formAiAnalyses         FormAiAnalysis[]
 
   @@unique([id, companyId])
   @@index([name])
@@ -2683,6 +2717,12 @@ enum RiskSubTypeEnum {
   ORGANIZACIONAIS
   INDICADORES_SAUDE
   INDICADORES_CONTROLES
+}
+
+enum FormAiAnalysisStatusEnum {
+  PROCESSING
+  DONE
+  FAILED
 }
 
 enum RiskRecTypeEnum {

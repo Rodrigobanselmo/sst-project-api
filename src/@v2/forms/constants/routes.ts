@@ -9,10 +9,14 @@ export const FormRoutes = {
     PATH_ASSIGN_RISKS: 'v2/companies/:companyId/forms/applications/:applicationId/assign-risks',
     PATH_RISK_LOGS: 'v2/companies/:companyId/forms/applications/:applicationId/risk-logs',
     PATH_PUBLIC: 'v2/forms/applications/:applicationId/public',
+    PATH_PUBLIC_LOGIN: 'v2/forms/applications/:applicationId/public/login',
   },
   FORM_QUESTIONS_ANSWERS: {
     PATH: 'v2/companies/:companyId/forms/questions-answers/',
     PATH_RISKS: 'v2/companies/:companyId/forms/applications/:applicationId/questions-answers/risks/',
+    AI_ANALYZE_RISKS: 'v2/companies/:companyId/forms/applications/:applicationId/questions-answers/ai-analyze-risks',
+    BROWSE_ANALYSIS: 'v2/companies/:companyId/forms/applications/:applicationId/questions-answers-analysis',
+    EDIT_ANALYSIS: 'v2/companies/:companyId/forms/applications/:applicationId/questions-answers-analysis/:analysisId',
   },
   RISK: {
     PATH: 'v2/companies/:companyId/forms/risks/',

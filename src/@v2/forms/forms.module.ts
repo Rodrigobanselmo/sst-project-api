@@ -2,6 +2,7 @@ import { SharedModule } from '@/@v2/shared/shared.module';
 import { Module } from '@nestjs/common';
 import { CacheModule } from '@nestjs/cache-manager';
 import { FormApplicationCacheService } from './services/form-application-cache.service';
+import { FormQuestionsAnswersRisksService } from './application/form-questions-answers/shared/services/form-questions-answers-risks.service';
 import { AddFormApplicationController } from './application/form-application/add-form-application/controllers/add-form-application.controller';
 import { AddFormApplicationUseCase } from './application/form-application/add-form-application/use-cases/add-form-application.usecase';
 import { BrowseFormApplicationController } from './application/form-application/browse-form-application/controllers/browse-form-application.controller';
@@ -55,6 +56,14 @@ import { BrowseFormParticipantsUseCase } from './application/form-participants/b
 import { SendFormEmailController } from './application/form-participants/send-form-email/controllers/send-form-email.controller';
 import { SendFormEmailUseCase } from './application/form-participants/send-form-email/use-cases/send-form-email.usecase';
 import { FormParticipantsDAO } from './database/dao/form-participants/form-participants.dao';
+import { AiAnalyzeFormQuestionsRisksController } from './application/form-questions-answers/ai-analyze-form-questions-risks/controllers/ai-analyze-form-questions-risks.controller';
+import { AiAnalyzeFormQuestionsRisksUseCase } from './application/form-questions-answers/ai-analyze-form-questions-risks/use-cases/ai-analyze-form-questions-risks.usecase';
+import { BrowseFormQuestionsAnswersAnalysisController } from './application/form-questions-answers/browse-form-questions-answers-analysis/controllers/browse-form-questions-answers-analysis.controller';
+import { BrowseFormQuestionsAnswersAnalysisUseCase } from './application/form-questions-answers/browse-form-questions-answers-analysis/use-cases/browse-form-questions-answers-analysis.usecase';
+import { EditFormQuestionsAnswersAnalysisController } from './application/form-questions-answers/edit-form-questions-answers-analysis/controllers/edit-form-questions-answers-analysis.controller';
+import { EditFormQuestionsAnswersAnalysisUseCase } from './application/form-questions-answers/edit-form-questions-answers-analysis/use-cases/edit-form-questions-answers-analysis.usecase';
+import { PublicFormParticipantLoginController } from './application/form-application/public-form-participant-login/controllers/public-form-participant-login.controller';
+import { PublicFormParticipantLoginUseCase } from './application/form-application/public-form-participant-login/use-cases/public-form-participant-login.usecase';
 import { SSTModule } from '@/modules/sst/sst.module';
 
 @Module({
@@ -78,6 +87,10 @@ import { SSTModule } from '@/modules/sst/sst.module';
     BrowseFormApplicationRiskLogController,
     BrowseFormParticipantsController,
     SendFormEmailController,
+    AiAnalyzeFormQuestionsRisksController,
+    BrowseFormQuestionsAnswersAnalysisController,
+    EditFormQuestionsAnswersAnalysisController,
+    PublicFormParticipantLoginController,
   ],
   providers: [
     // Database
@@ -117,8 +130,13 @@ import { SSTModule } from '@/modules/sst/sst.module';
     BrowseFormApplicationRiskLogUseCase,
     BrowseFormParticipantsUseCase,
     SendFormEmailUseCase,
+    AiAnalyzeFormQuestionsRisksUseCase,
+    BrowseFormQuestionsAnswersAnalysisUseCase,
+    EditFormQuestionsAnswersAnalysisUseCase,
+    PublicFormParticipantLoginUseCase,
     // Services
     FormApplicationCacheService,
+    FormQuestionsAnswersRisksService,
   ],
   exports: [],
 })
