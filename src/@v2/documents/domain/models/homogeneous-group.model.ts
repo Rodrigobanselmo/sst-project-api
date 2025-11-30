@@ -68,4 +68,8 @@ export class HomogeneousGroupModel {
       return checkIfExistAny({ documentType });
     });
   }
+
+  get allRiskData() {
+    return this._risksData;
+  }
 }

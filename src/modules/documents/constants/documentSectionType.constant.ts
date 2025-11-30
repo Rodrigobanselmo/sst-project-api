@@ -81,5 +81,11 @@ export const documentSectionTypeMap: IDocumentSectionTypeMap = {
     order: fourthOrder,
   },
 
-  //*PGR string --------------------->
+  // *PERICULOSIDADE string ---------------------->
+  [DocumentSectionTypeEnum.PERICULOSIDADE_ACTIVITIES]: {
+    label: 'Avaliação das Atividades Periculosas',
+    type: DocumentSectionTypeEnum.PERICULOSIDADE_ACTIVITIES,
+    accept: [DocumentTypeEnum.PERICULOSIDADE],
+    order: fourthOrder,
+  },
 };

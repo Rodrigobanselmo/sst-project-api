@@ -17,6 +17,11 @@ import { RecommendationDataModel } from './recommendation-data.model';
 import { RecommendationModel } from './recommendation.model';
 import { RiskModel } from './risk.model';
 
+export type IRiskDataActivity = {
+  realActivity: string;
+  activities: { description?: string; subActivity?: string }[];
+};
+
 export type IRiskDataModel = {
   probability: IRiskProbabilityValues | null;
   probabilityAfter: IRiskProbabilityValues | null;
@@ -37,6 +42,8 @@ export type IRiskDataModel = {
   quantityQui: RiskDataQuantityQuiVO | null;
   quantityVibrationFB: RiskDataQuantityVibrationFBVO | null;
   quantityVibrationL: RiskDataQuantityVibrationLVO | null;
+
+  activities: IRiskDataActivity;
 };
 
 export class RiskDataModel {
@@ -60,6 +67,8 @@ export class RiskDataModel {
   quantityVibrationFB: RiskDataQuantityVibrationFBVO | null;
   quantityVibrationL: RiskDataQuantityVibrationLVO | null;
 
+  activities: IRiskDataActivity;
+
   constructor(params: IRiskDataModel) {
     this.#probability = params.probability || 0;
     this.probabilityAfter = params.probabilityAfter || 0;
@@ -80,6 +89,8 @@ export class RiskDataModel {
     this.quantityQui = params.quantityQui;
     this.quantityVibrationFB = params.quantityVibrationFB;
     this.quantityVibrationL = params.quantityVibrationL;
+
+    this.activities = params.activities;
   }
 
   get isQuantity() {

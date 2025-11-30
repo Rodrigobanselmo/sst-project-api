@@ -34,12 +34,14 @@ export type IRiskDataMapper = RiskFactorData & {
   })[];
   examsToRiskFactorData: ExamToRiskData[];
   dataRecs: RiskFactorDataRec[];
+  activities: any;
 };
 
 export class RiskDataMapper {
   static toModel(data: IRiskDataMapper): RiskDataModel {
     return new RiskDataModel({
       ...this.quantityParse(data),
+      activities: data.activities,
       level: data.level as IRiskLevelValues,
       probability: data.probability as IRiskProbabilityValues,
       probabilityAfter: data.probabilityAfter as IRiskProbabilityValues,

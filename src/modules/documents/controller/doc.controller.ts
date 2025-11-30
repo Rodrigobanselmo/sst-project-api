@@ -35,17 +35,8 @@ export class DocumentsBaseController {
     },
   )
   @Get('/:docId/attachment/:attachmentId/:companyId?')
-  async downloadAttachment(
-    @Res() res,
-    @User() userPayloadDto: UserPayloadDto,
-    @Param('docId') docId: string,
-    @Param('attachmentId') attachmentId: string,
-  ) {
-    const { fileKey, fileStream } = await this.pgrDownloadAttachmentsService.execute(
-      userPayloadDto,
-      docId,
-      attachmentId,
-    );
+  async downloadAttachment(@Res() res, @User() userPayloadDto: UserPayloadDto, @Param('docId') docId: string, @Param('attachmentId') attachmentId: string) {
+    const { fileKey, fileStream } = await this.pgrDownloadAttachmentsService.execute(userPayloadDto, docId, attachmentId);
 
     res.setHeader('Content-Disposition', `attachment; filename=${fileKey.split('/')[fileKey.split('/').length - 1]}`);
     fileStream.on('error', function (e) {
@@ -100,6 +91,42 @@ export class DocumentsBaseController {
   @Post('/add-queue/pcmso')
   async addPCMSOQueueDoc(@User() userPayloadDto: UserPayloadDto, @Body() upsertPgrDto: UploadDocumentDto) {
     upsertPgrDto.type = DocumentTypeEnum.PCSMO;
+    return this.addQueueDocumentService.execute(upsertPgrDto, userPayloadDto);
+  }
+
+  @Permissions({
+    code: PermissionEnum.PGR,
+    isMember: true,
+    isContract: true,
+    crud: true,
+  })
+  @Post('/add-queue/periculosidade')
+  async addPericulosidadeQueueDoc(@User() userPayloadDto: UserPayloadDto, @Body() upsertPgrDto: UploadDocumentDto) {
+    upsertPgrDto.type = DocumentTypeEnum.PERICULOSIDADE;
+    return this.addQueueDocumentService.execute(upsertPgrDto, userPayloadDto);
+  }
+
+  @Permissions({
+    code: PermissionEnum.PGR,
+    isMember: true,
+    isContract: true,
+    crud: true,
+  })
+  @Post('/add-queue/ltcat')
+  async addLTCATQueueDoc(@User() userPayloadDto: UserPayloadDto, @Body() upsertPgrDto: UploadDocumentDto) {
+    upsertPgrDto.type = DocumentTypeEnum.LTCAT;
+    return this.addQueueDocumentService.execute(upsertPgrDto, userPayloadDto);
+  }
+
+  @Permissions({
+    code: PermissionEnum.PGR,
+    isMember: true,
+    isContract: true,
+    crud: true,
+  })
+  @Post('/add-queue/insalubridade')
+  async addInsalubridadeQueueDoc(@User() userPayloadDto: UserPayloadDto, @Body() upsertPgrDto: UploadDocumentDto) {
+    upsertPgrDto.type = DocumentTypeEnum.INSALUBRIDADE;
     return this.addQueueDocumentService.execute(upsertPgrDto, userPayloadDto);
   }
 }

@@ -4,20 +4,19 @@ import { RiskFactors, RiskFactorsDocInfo } from '@prisma/client';
 import { RiskModel } from '../../domain/models/risk.model';
 
 export type IRiskMapper = RiskFactors & {
-  docInfo: RiskFactorsDocInfo[]
-}
+  docInfo: RiskFactorsDocInfo[];
+};
 
 export class RiskMapper {
   static toModel(data: IRiskMapper): RiskModel {
-    const documentRequirement = (new RiskDocumentsRequirementVO({
+    const documentRequirement = new RiskDocumentsRequirementVO({
       isAso: data.isAso,
       isPGR: data.isPGR,
       isPCMSO: data.isPCMSO,
       isPPP: data.isPPP,
       companyId: null,
-      hierarchyId: null
-    }))
-
+      hierarchyId: null,
+    });
 
     return new RiskModel({
       id: data.id,
@@ -39,13 +38,13 @@ export class RiskMapper {
       stel: data.stel,
       symptoms: data.symptoms,
       twa: data.twa,
+      otherAppendix: data.otherAppendix,
       requirement: { document: documentRequirement },
-      documentsRequirements: data.docInfo.map(doc => new RiskDocumentsRequirementVO(doc))
-    })
+      documentsRequirements: data.docInfo.map((doc) => new RiskDocumentsRequirementVO(doc)),
+    });
   }
 
   static toModels(data: IRiskMapper[]): RiskModel[] {
-    return data.map(RiskData => this.toModel(RiskData))
+    return data.map((RiskData) => this.toModel(RiskData));
   }
 }
-

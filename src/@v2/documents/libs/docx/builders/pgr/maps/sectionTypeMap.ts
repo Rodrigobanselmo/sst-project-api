@@ -20,6 +20,7 @@ import { replaceAllVariables } from '../functions/replaceAllVariables';
 import { IDocVariables } from '../types/documet-section-groups.types';
 import { IMapElementDocumentType } from './elementTypeMap';
 import { CoverTypeEnum } from '@/@v2/shared/domain/enum/company/cover-type.enum';
+import { activitiesPericulosidadeSections } from '../../../components/iterables/activities-periculosidade/activities-periculosidade.sections';
 
 type IMapSectionDocumentType = Record<string, (arg: any) => ISectionOptions | ISectionOptions[] | Promise<ISectionOptions> | Promise<ISectionOptions[]>>;
 
@@ -89,6 +90,14 @@ export class SectionsMapClass {
         isHideOrigin: Boolean(this.variables[VariablesPGREnum.IS_HIDE_ORIGIN_COLUMN]),
       }),
     [DocumentSectionTypeEnum.ACTION_PLAN]: () => actionPlanTableSection(this.oldData.documentRiskData, this.oldData.hierarchyTree),
+
+    // *PERICULOSIDADE string --------------------->
+    [DocumentSectionTypeEnum.PERICULOSIDADE_ACTIVITIES]: (): ISectionOptions[] =>
+      activitiesPericulosidadeSections(this.data, this.oldData.hierarchyData, this.oldData.homoGroupTree, this.oldData.hierarchyTree, (x) => this.convertToDocx(x)).map(({ footerText, children }) => ({
+        children,
+        ...this.getFooterHeader(footerText),
+        ...sectionLandscapeProperties,
+      })),
   };
 
   getFooterHeader = (footerText: string, title?: string) => {

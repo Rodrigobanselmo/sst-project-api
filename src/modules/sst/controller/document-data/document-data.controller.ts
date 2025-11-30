@@ -43,6 +43,39 @@ export class DocumentDataController {
     code: PermissionEnum.COMPANY,
     isContract: true,
     isMember: true,
+    crud: 'cu',
+  })
+  @Post('periculosidade')
+  async upsertPericulosidade(@Body() dto: UpsertDocumentDataPCMSODto, @User() user: UserPayloadDto) {
+    return await this.upsertDocumentDataService.execute({ ...dto, type: 'PERICULOSIDADE' }, user);
+  }
+
+  @Permissions({
+    code: PermissionEnum.COMPANY,
+    isContract: true,
+    isMember: true,
+    crud: 'cu',
+  })
+  @Post('ltcat')
+  async upsertLtcat(@Body() dto: UpsertDocumentDataPCMSODto, @User() user: UserPayloadDto) {
+    return await this.upsertDocumentDataService.execute({ ...dto, type: 'LTCAT' }, user);
+  }
+
+  @Permissions({
+    code: PermissionEnum.COMPANY,
+    isContract: true,
+    isMember: true,
+    crud: 'cu',
+  })
+  @Post('insalubridade')
+  async upsertInsalubridade(@Body() dto: UpsertDocumentDataPCMSODto, @User() user: UserPayloadDto) {
+    return await this.upsertDocumentDataService.execute({ ...dto, type: 'INSALUBRIDADE' }, user);
+  }
+
+  @Permissions({
+    code: PermissionEnum.COMPANY,
+    isContract: true,
+    isMember: true,
   })
   @Get()
   async findById(@Query() query: FindOneDocumentDataDto, @User() userPayloadDto: UserPayloadDto) {

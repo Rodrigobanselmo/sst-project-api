@@ -58,15 +58,8 @@ export type IActionPlanTable = {
   properties?: ISectionPropertiesOptions;
 } & IBase;
 
-export type IAllDocumentSectionType =
-  | IChapter
-  | ISection
-  | ICover
-  | ISectionEnv
-  | ISectionChar
-  | ITOC
-  | IAprTable
-  | IAprGroupTable
-  | IActionPlanTable;
+export type IPericulosidadeActivities = {
+  type: DocumentSectionTypeEnum.PERICULOSIDADE_ACTIVITIES;
+} & IBase;
 
-
+export type IAllDocumentSectionType = IChapter | ISection | ICover | ISectionEnv | ISectionChar | ITOC | IAprTable | IAprGroupTable | IActionPlanTable | IPericulosidadeActivities;

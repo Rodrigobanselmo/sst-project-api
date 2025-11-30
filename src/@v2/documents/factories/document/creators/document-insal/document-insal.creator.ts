@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { ProductDocumentPGR } from '../../products/document-pgr/document-pgr.product';
 import { DocumentCreationService } from '../../../../services/document-creation/document-creation.service';
-import { ICreatorDocumentPGR } from './document-pgr.types';
+import { ICreatorDocumentINSAL } from './document-insal.types';
 import { DocumentDAO } from '@/@v2/documents/database/dao/document/document.dao';
 import { DocumentVersionRepository } from '@/@v2/documents/database/repositories/document-version/document-version.repository';
 import { DownloadImageService } from '@/@v2/documents/services/download-image/download-image.service';
+import { ProductDocumentINSAL } from '../../products/document-insal/document-insal.product';
 
 @Injectable()
-export class CreatorDocumentPGR {
+export class CreatorDocumentINSAL {
   constructor(
     private readonly documentCreationService: DocumentCreationService,
 
@@ -16,7 +16,7 @@ export class CreatorDocumentPGR {
     protected readonly donwloadImageService: DownloadImageService,
   ) {}
 
-  async execute({ documentVersionId, homogeneousGroupsIds }: ICreatorDocumentPGR.Params) {
+  async execute({ documentVersionId, homogeneousGroupsIds }: ICreatorDocumentINSAL.Params) {
     this.documentCreationService.execute({
       product: this.factoryMethod(),
       body: { documentVersionId, homogeneousGroupsIds },
@@ -24,6 +24,7 @@ export class CreatorDocumentPGR {
   }
 
   private factoryMethod() {
-    return new ProductDocumentPGR(this.documentDAO, this.documentVersionRepository, this.donwloadImageService);
+    return new ProductDocumentINSAL(this.documentDAO, this.documentVersionRepository, this.donwloadImageService);
   }
 }
+

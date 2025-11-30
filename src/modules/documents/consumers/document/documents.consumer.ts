@@ -8,6 +8,9 @@ import { UploadDocumentDto } from '../../dto/document.dto';
 import { PcmsoUploadService } from '../../services/document/document/upload-pcmso-doc.service';
 import { PgrUploadService } from '../../services/document/document/upload-pgr-doc.service';
 import { checkInternetConnectivity } from '../../../../shared/utils/isOnline';
+import { PerUploadService } from '../../services/document/document/upload-per-doc.service';
+import { LtcatUploadService } from '../../services/document/document/upload-ltcat-doc.service';
+import { InsalUploadService } from '../../services/document/document/upload-insal-doc.service';
 
 @Injectable()
 export class PgrConsumer implements OnModuleInit {
@@ -15,6 +18,9 @@ export class PgrConsumer implements OnModuleInit {
   constructor(
     private readonly pgrUploadDocService: PgrUploadService,
     private readonly pcmsoUploadService: PcmsoUploadService,
+    private readonly perUploadService: PerUploadService,
+    private readonly ltcatUploadService: LtcatUploadService,
+    private readonly insalUploadService: InsalUploadService,
   ) {}
 
   async onModuleInit() {
@@ -47,6 +53,21 @@ export class PgrConsumer implements OnModuleInit {
       }
       if (body.type == DocumentTypeEnum.PCSMO) {
         await this.pcmsoUploadService.execute({
+          ...body,
+        });
+      }
+      if (body.type == DocumentTypeEnum.PERICULOSIDADE) {
+        await this.perUploadService.execute({
+          ...body,
+        });
+      }
+      if (body.type == DocumentTypeEnum.LTCAT) {
+        await this.ltcatUploadService.execute({
+          ...body,
+        });
+      }
+      if (body.type == DocumentTypeEnum.INSALUBRIDADE) {
+        await this.insalUploadService.execute({
           ...body,
         });
       }

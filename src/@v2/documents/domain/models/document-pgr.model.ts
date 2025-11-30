@@ -9,6 +9,7 @@ import { HierarchyModel } from './hierarchy.model';
 import { HomogeneousGroupModel } from './homogeneous-group.model';
 import { RiskDataExamModel } from './risk-data-exam.model';
 import { RiskDataModel } from './risk-data.model';
+import { DocumentModelModel } from './document-model.model';
 
 export type IDocumentPGRModel = {
   documentVersion: DocumentVersionModel;
@@ -46,6 +47,10 @@ export class DocumentPGRModel {
 
   get model() {
     return this.documentVersion.documentBase.model;
+  }
+
+  set model(model: DocumentModelModel) {
+    this.documentVersion.documentBase.model = model;
   }
 
   get risksData() {

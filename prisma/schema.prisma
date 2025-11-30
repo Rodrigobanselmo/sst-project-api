@@ -2574,6 +2574,9 @@ enum DateUnitEnum {
 enum DocumentTypeEnum {
   PGR
   PCSMO
+  LTCAT
+  PERICULOSIDADE
+  INSALUBRIDADE
   OTHER
 }
 

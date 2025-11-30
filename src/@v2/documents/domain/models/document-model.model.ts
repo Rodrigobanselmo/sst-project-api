@@ -4,9 +4,14 @@ import { convertModelDataBuffer } from '../functions/conver-model-data-buffer';
 import { IDocumentModelData } from '../types/document-mode-data.types';
 import { IImage } from '../types/elements.types';
 
-export type IDocumentModelModel = {
-  data: Buffer;
-};
+export type IDocumentModelModel =
+  | {
+      data: Buffer;
+    }
+  | {
+      sections: IDocumentSectionGroup[];
+      variables: Record<string, string>;
+    };
 
 export class DocumentModelModel {
   #data: IDocumentModelData | null = null;
@@ -14,6 +19,12 @@ export class DocumentModelModel {
   variables: Record<string, string> = {};
 
   constructor(params: IDocumentModelModel) {
+    if ('sections' in params) {
+      this.sections = params.sections;
+      this.variables = params.variables;
+      return;
+    }
+
     this.#data = convertModelDataBuffer(params.data);
 
     const data = this.data();

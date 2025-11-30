@@ -38,6 +38,9 @@ import { DownloadPreviewModel } from './services/document/document-models/downlo
 import { PdfVisitReportDataService } from './services/pdf/visitReport/visit-report-data.service';
 import { DocumentPCMSOFactory } from './factories/document/products/PGR/DocumentPCMSOFactory';
 import { DocumentModule } from '@/@v2/documents/document.module';
+import { PerUploadService } from './services/document/document/upload-per-doc.service';
+import { LtcatUploadService } from './services/document/document/upload-ltcat-doc.service';
+import { InsalUploadService } from './services/document/document/upload-insal-doc.service';
 
 @Module({
   controllers: [DocumentModelController, DocumentsPgrController, DocumentsPdfController, DocumentsBaseController],
@@ -46,6 +49,9 @@ import { DocumentModule } from '@/@v2/documents/document.module';
     ExcelProvider,
     DownloadDocumentService,
     PgrUploadService,
+    PerUploadService,
+    LtcatUploadService,
+    InsalUploadService,
     PgrDownloadTableService,
     DayJSProvider,
     AmazonStorageProvider,
@@ -76,4 +82,4 @@ import { DocumentModule } from '@/@v2/documents/document.module';
   ],
   exports: [DocumentPGRFactory],
 })
-export class DocumentsModule { }
+export class DocumentsModule {}

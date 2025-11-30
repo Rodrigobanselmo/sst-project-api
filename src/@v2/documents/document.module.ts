@@ -12,7 +12,15 @@ import { RiskDataDAO } from './database/dao/risk-data/risk-data.dao';
 import { ProductDocumentPGR } from './factories/document/products/document-pgr/document-pgr.product';
 import { CreatorDocumentPGR } from './factories/document/creators/document-pgr/document-pgr.creator';
 import { DocumentCreationService } from './services/document-creation/document-creation.service';
-import { DownloadImageService } from './services/donwload-image/donwload-image.service';
+import { DownloadImageService } from './services/download-image/download-image.service';
+import { CreatorDocumentPER } from './factories/document/creators/document-per/document-per.creator';
+import { ProductDocumentPER } from './factories/document/products/document-per/document-per.product';
+import { ProductDocumentPreview } from './factories/document/products/document-preview/document-preview.product';
+import { CreatorDocumentPreview } from './factories/document/creators/document-preview/document-preview.creator';
+import { CreatorDocumentLTCAT } from './factories/document/creators/document-ltcat/document-ltcat.creator';
+import { ProductDocumentLTCAT } from './factories/document/products/document-ltcat/document-ltcat.product';
+import { CreatorDocumentINSAL } from './factories/document/creators/document-insal/document-insal.creator';
+import { ProductDocumentINSAL } from './factories/document/products/document-insal/document-insal.product';
 
 @Module({
   imports: [SharedModule],
@@ -20,6 +28,14 @@ import { DownloadImageService } from './services/donwload-image/donwload-image.s
   providers: [
     CreatorDocumentPGR,
     ProductDocumentPGR,
+    CreatorDocumentPER,
+    ProductDocumentPER,
+    CreatorDocumentLTCAT,
+    ProductDocumentLTCAT,
+    CreatorDocumentINSAL,
+    ProductDocumentINSAL,
+    CreatorDocumentPreview,
+    ProductDocumentPreview,
     DocumentCreationService,
     DownloadImageService,
     DocumentVersionRepository,
@@ -32,6 +48,6 @@ import { DownloadImageService } from './services/donwload-image/donwload-image.s
     RiskDAO,
     RiskDataDAO,
   ],
-  exports: [CreatorDocumentPGR],
+  exports: [CreatorDocumentPGR, CreatorDocumentPER, CreatorDocumentLTCAT, CreatorDocumentINSAL, CreatorDocumentPreview],
 })
 export class DocumentModule {}

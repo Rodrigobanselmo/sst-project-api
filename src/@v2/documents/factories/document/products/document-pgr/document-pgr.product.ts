@@ -8,7 +8,7 @@ import { DocumentPGRModel } from '@/@v2/documents/domain/models/document-pgr.mod
 import { DocumentBuildPGR } from '@/@v2/documents/libs/docx/builders/pgr/create';
 import { getDocumentFileName } from '@/@v2/documents/libs/docx/helpers/get-document-file-name';
 import { getDocumentVersion } from '@/@v2/documents/libs/docx/helpers/get-document-version';
-import { DownloadImageService } from '@/@v2/documents/services/donwload-image/donwload-image.service';
+import { DownloadImageService } from '@/@v2/documents/services/download-image/download-image.service';
 import { createDocumentAttachments } from '@/@v2/documents/utils/create-document-attachments';
 import { HierarchyTypeEnum } from '@/@v2/shared/domain/enum/company/hierarchy-type.enum';
 import { DocumentVersionStatus } from '@/@v2/shared/domain/enum/documents/document-version-status';
@@ -26,7 +26,7 @@ export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocum
   constructor(
     private readonly documentDAO: DocumentDAO,
     private readonly documentVersionRepository: DocumentVersionRepository,
-    private readonly donwloadImageService: DownloadImageService,
+    private readonly downloadImageService: DownloadImageService,
   ) {}
 
   public async getData({ documentVersionId, homogeneousGroupsIds }: IProductDocumentPGR) {
@@ -190,8 +190,8 @@ export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocum
     const company = document.documentBase.company;
     const consultant = document.documentBase.company.consultant;
 
-    const companyLogoPath = await this.donwloadImageService.donwload({ imageUrl: company.logoUrl });
-    const consultantLogoPath = await this.donwloadImageService.donwload({ imageUrl: consultant?.logoUrl });
+    const companyLogoPath = await this.downloadImageService.download({ imageUrl: company.logoUrl });
+    const consultantLogoPath = await this.downloadImageService.download({ imageUrl: consultant?.logoUrl });
 
     if (companyLogoPath) {
       this.unlinkPaths.push({ path: companyLogoPath });
@@ -202,7 +202,7 @@ export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocum
       consultant.logoPath = consultantLogoPath;
     }
 
-    await this.donwloadImageService.donwloadBatch({
+    await this.downloadImageService.downloadBatch({
       images: images,
       getUrl: (image) => image.url,
       callbackFn: async (path, image) => {
@@ -217,7 +217,7 @@ export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocum
       .map((group) => group.characterization?.photos)
       .flat()
       .filter(Boolean) as CharacterizationPhotoModel[];
-    await this.donwloadImageService.donwloadBatch({
+    await this.downloadImageService.downloadBatch({
       images: photos,
       getUrl: (photo) => photo.url,
       callbackFn: async (path, photo) => {

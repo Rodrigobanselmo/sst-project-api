@@ -11,6 +11,8 @@ import { IDocumentAttachment, IDocumentFactoryProduct, IUnlinkPaths } from '../.
 import { createBaseDocument } from '../../libs/docx/base/config/document';
 import { IDocumentCreation } from './document-creation.interface';
 
+export const PREVIEW_TYPE = 'PREVIEW' as const;
+
 @Injectable()
 export class DocumentCreationService {
   constructor(
@@ -32,7 +34,10 @@ export class DocumentCreationService {
       const fileName = product.getFileName(data);
 
       const { buffer } = await this.generate({ sections });
-      const { url } = await this.upload(buffer, fileName);
+
+      const isPreview = product.type == PREVIEW_TYPE;
+
+      const { url } = isPreview ? { url: ' ' } : await this.upload(buffer, fileName);
 
       if (IS_DEVELOPMENT) console.log(3, url);
 

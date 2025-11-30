@@ -1,10 +1,10 @@
 import { DocumentPGRModel } from '@/@v2/documents/domain/models/document-pgr.model';
 import { Injectable } from '@nestjs/common';
+import { DocumentVersionDAO } from '../document-version/document-version.dao';
+import { ExamDAO } from '../exam/exam.dao';
 import { HierarchyDAO } from '../hierarchy/hierarchy.dao';
 import { HomogeneousGroupDAO } from '../homogeneous-group/homogeneous-group.dao';
 import { IDocumentDAO } from './document.types';
-import { DocumentVersionDAO } from '../document-version/document-version.dao';
-import { ExamDAO } from '../exam/exam.dao';
 
 @Injectable()
 export class DocumentDAO {

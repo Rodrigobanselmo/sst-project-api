@@ -154,67 +154,67 @@ export const documentElementTypeMap: IDocumentElementTypeMap = {
   [DocumentSectionChildrenTypeEnum.TABLE_PRIORITIZATION_HIERARCHY]: {
     label: 'Tabela de Priorização por Cargo',
     type: DocumentSectionChildrenTypeEnum.TABLE_PRIORITIZATION_HIERARCHY,
-    accept: ['PGR', 'PCSMO'],
+    accept: ['PGR', 'PCSMO', 'PERICULOSIDADE', 'INSALUBRIDADE', 'LTCAT'],
   },
   [DocumentSectionChildrenTypeEnum.TABLE_PRIORITIZATION]: {
     label: 'Tabela de Priorização por GSE',
     type: DocumentSectionChildrenTypeEnum.TABLE_PRIORITIZATION,
-    accept: ['PGR', 'PCSMO'],
+    accept: ['PGR', 'PCSMO', 'PERICULOSIDADE', 'INSALUBRIDADE', 'LTCAT'],
   },
   [DocumentSectionChildrenTypeEnum.TABLE_GSE]: {
     label: 'Tabela de Grupos Similares de Exposição',
     type: DocumentSectionChildrenTypeEnum.TABLE_GSE,
-    accept: ['PGR', 'PCSMO'],
+    accept: ['PGR', 'PCSMO', 'PERICULOSIDADE', 'INSALUBRIDADE', 'LTCAT'],
   },
   [DocumentSectionChildrenTypeEnum.COMPLEMENTARY_DOCS]: {
     label: 'Lista de Documentos Complementares',
     type: DocumentSectionChildrenTypeEnum.COMPLEMENTARY_DOCS,
-    accept: ['PGR', 'PCSMO'],
+    accept: ['PGR', 'PCSMO', 'PERICULOSIDADE', 'INSALUBRIDADE', 'LTCAT'],
   },
   [DocumentSectionChildrenTypeEnum.HIERARCHY_RISK_TABLE]: {
     label: 'Tabela Relação Cargos vs Riscos',
     type: DocumentSectionChildrenTypeEnum.HIERARCHY_RISK_TABLE,
-    accept: ['PGR', 'PCSMO'],
+    accept: ['PGR', 'PCSMO', 'PERICULOSIDADE', 'INSALUBRIDADE', 'LTCAT'],
   },
   [DocumentSectionChildrenTypeEnum.RISK_TABLE]: {
     label: 'Tabela de Riscos e Perigos',
     type: DocumentSectionChildrenTypeEnum.RISK_TABLE,
-    accept: ['PGR', 'PCSMO'],
+    accept: ['PGR', 'PCSMO', 'PERICULOSIDADE', 'INSALUBRIDADE', 'LTCAT'],
   },
   [DocumentSectionChildrenTypeEnum.COMPLEMENTARY_SYSTEMS]: {
     label: 'Lista de Sistemas de Gestão Implementados',
     type: DocumentSectionChildrenTypeEnum.COMPLEMENTARY_SYSTEMS,
-    accept: ['PGR', 'PCSMO'],
+    accept: ['PGR', 'PCSMO', 'PERICULOSIDADE', 'INSALUBRIDADE', 'LTCAT'],
   },
   [DocumentSectionChildrenTypeEnum.HEALTH_EFFECT_TABLES]: {
     label: 'Tabela de Potenciais Efeitos Adversos à Saúde',
     type: DocumentSectionChildrenTypeEnum.HEALTH_EFFECT_TABLES,
-    accept: ['PGR', 'PCSMO'],
+    accept: ['PGR', 'PCSMO', 'PERICULOSIDADE', 'INSALUBRIDADE', 'LTCAT'],
   },
   [DocumentSectionChildrenTypeEnum.EXPOSITION_DEGREE_TABLES]: {
     label: 'Tabela de Grau de exposição a Saúde',
     type: DocumentSectionChildrenTypeEnum.EXPOSITION_DEGREE_TABLES,
-    accept: ['PGR', 'PCSMO'],
+    accept: ['PGR', 'PCSMO', 'PERICULOSIDADE', 'INSALUBRIDADE', 'LTCAT'],
   },
   [DocumentSectionChildrenTypeEnum.HIERARCHY_ORG_TABLE]: {
     label: 'Tabela de Organograma',
     type: DocumentSectionChildrenTypeEnum.HIERARCHY_ORG_TABLE,
-    accept: ['PGR', 'PCSMO'],
+    accept: ['PGR', 'PCSMO', 'PERICULOSIDADE', 'INSALUBRIDADE', 'LTCAT'],
   },
   [DocumentSectionChildrenTypeEnum.QUANTITY_RESULTS_TABLES]: {
     label: 'Tabela de Avaliação Quantitativa do Risco Ocupacional',
     type: DocumentSectionChildrenTypeEnum.QUANTITY_RESULTS_TABLES,
-    accept: ['PGR', 'PCSMO'],
+    accept: ['PGR', 'PCSMO', 'PERICULOSIDADE', 'INSALUBRIDADE', 'LTCAT'],
   },
   [DocumentSectionChildrenTypeEnum.QUANTITY_CONSIDERATION_TABLES]: {
     label: 'Tabela de Considerações da Avaliação Quantitativa do Risco Ocupacional',
     type: DocumentSectionChildrenTypeEnum.QUANTITY_CONSIDERATION_TABLES,
-    accept: ['PGR', 'PCSMO'],
+    accept: ['PGR', 'PCSMO', 'PERICULOSIDADE', 'INSALUBRIDADE', 'LTCAT'],
   },
   [DocumentSectionChildrenTypeEnum.MATRIX_TABLES]: {
     label: 'Tabela Matriz de Riscos Ocupacionais',
     type: DocumentSectionChildrenTypeEnum.MATRIX_TABLES,
-    accept: ['PGR', 'PCSMO'],
+    accept: ['PGR', 'PCSMO', 'PERICULOSIDADE', 'INSALUBRIDADE', 'LTCAT'],
   },
 
   //*PGR string --------------------->
