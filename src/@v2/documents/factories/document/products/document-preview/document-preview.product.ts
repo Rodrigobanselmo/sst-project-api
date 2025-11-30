@@ -20,7 +20,7 @@ export class ProductDocumentPreview implements IDocumentFactoryProduct<IProductD
   constructor(private readonly documentDAO: DocumentDAO) {}
 
   public async getData({ model }: IProductDocumentPreview) {
-    const document = await this.documentDAO.findDocumentPGR({ documentVersionId: '69ef6b48-a94c-4ca8-b811-ef9e3be6d30e' });
+    const document = await this.documentDAO.findDocumentPGR({ documentVersionId: 'd4a95404-f195-4729-83a1-e672e81a3f6b' });
     if (!document) throw new BadRequestException('Nenhum documento PGR cadastrado');
 
     document.model = model;
