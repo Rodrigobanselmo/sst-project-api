@@ -43,6 +43,7 @@ import { versionControlTable } from '../../../components/tables/versionControl/v
 import { controlMeasuresEngIterable } from '../../../components/iterables/controlMeasuresEng/control-measures-eng.iterable';
 import { controlMeasuresAdmIterable } from '../../../components/iterables/controlMeasuresAdm/control-measures-adm.iterable';
 import { controlMeasuresEpiIterable } from '../../../components/iterables/controlMeasuresEpi/control-measures-epi.iterable';
+import { activitiesPericulosidadeElements } from '../../../components/iterables/activities-periculosidade/activities-periculosidade.elements';
 
 export type IMapElementDocumentType = Record<string, (arg: any) => (Paragraph | Table)[]>;
 
@@ -202,6 +203,8 @@ export class ElementsMapClass {
     [DocumentChildrenTypeEnum.RISK_TABLE]: () => riskCharacterizationTableSection(this.data.risksData, this.data.getExamsByRiskData.bind(this.data))['children'],
     [DocumentChildrenTypeEnum.HIERARCHY_RISK_TABLE]: () => hierarchyRisksTableAllSections(this.oldRiskGroupData, this.OldHierarchy, this.oldHierarchyTree, (x, v) => this.convertToDocx(x, v)),
     [DocumentChildrenTypeEnum.PLAN_TABLE]: () => actionPlanTableSection(this.oldDocumentRiskData, this.oldHierarchyTree)['children'],
+    [DocumentChildrenTypeEnum.PERICULOSIDADE_ACTIVITIES]: () =>
+      activitiesPericulosidadeElements(this.data, this.OldHierarchy, this.OldHomogeneousGroup, this.oldHierarchyTree, (x: ISectionChildrenType[]) => this.convertToDocx(x)),
   };
 
   private convertToDocx(data: ISectionChildrenType[], variables = {} as IDocVariables) {

@@ -390,4 +390,10 @@ export const documentElementTypeMap: IDocumentElementTypeMap = {
     type: DocumentSectionChildrenTypeEnum.TABLE_PCMSO_HIERARCHY_CONCAT,
     accept: ['PCSMO'],
   },
+
+  [DocumentSectionChildrenTypeEnum.PERICULOSIDADE_ACTIVITIES]: {
+    label: 'Atividades Perigosas',
+    type: DocumentSectionChildrenTypeEnum.PERICULOSIDADE_ACTIVITIES,
+    accept: ['PERICULOSIDADE'],
+  },
 };

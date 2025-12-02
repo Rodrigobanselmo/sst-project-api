@@ -72,6 +72,8 @@ export enum DocumentSectionChildrenTypeEnum {
   TABLE_PCMSO_GHO = 'TABLE_PCMSO_GHO',
   TABLE_PCMSO_HIERARCHY = 'TABLE_PCMSO_HIERARCHY',
   TABLE_PCMSO_HIERARCHY_CONCAT = 'TABLE_PCMSO_HIERARCHY_CONCAT',
+
+  PERICULOSIDADE_ACTIVITIES = 'PERICULOSIDADE_ACTIVITIES',
 }
 
 export enum InlineStyleTypeEnum {
@@ -410,6 +412,10 @@ export type ITablePcmsoHierarchyConcat = {
   type: DocumentSectionChildrenTypeEnum.TABLE_PCMSO_HIERARCHY_CONCAT;
 } & IBaseDocumentModel;
 
+export type ITablePericulosidadeActivities = {
+  type: DocumentSectionChildrenTypeEnum.PERICULOSIDADE_ACTIVITIES;
+} & IBaseDocumentModel;
+
 export type ISectionChildrenType =
   | IH1
   | IH2
@@ -476,4 +482,5 @@ export type ISectionChildrenType =
   | ITablePcmsoGho
   | ITablePcmsoHierarchy
   | ITablePcmsoHierarchyConcat
+  | ITablePericulosidadeActivities
   | IProfessional;
