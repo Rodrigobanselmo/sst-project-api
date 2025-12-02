@@ -30,24 +30,20 @@ export interface IEnvironmentConvertResponse {
   profiles?: HomogeneousGroupModel[];
 }
 
-export const environmentsConverter = (homogeneousGroups: (HomogeneousGroupModel)[]): IEnvironmentConvertResponse[] => {
+export const environmentsConverter = (homogeneousGroups: HomogeneousGroupModel[]): IEnvironmentConvertResponse[] => {
   return homogeneousGroups
     .sort((a, b) => sortNumber(a, b, 'order'))
     .map((homogeneousGroup) => {
       const environment = homogeneousGroup.characterization!;
 
-      const imagesVertical = environment.photos.filter((image) => image.isVertical);
+      const imagesVertical = environment.photos.filter((image) => image.isVertical && image.path);
 
-      const imagesHorizontal = environment.photos.filter((image) => !image.isVertical);
+      const imagesHorizontal = environment.photos.filter((image) => !image.isVertical && image.path);
 
       const breakPage = imagesVertical.length > 0 || imagesHorizontal.length > 0;
       const elements = getLayouts(imagesVertical, imagesHorizontal);
 
-      const profileName = environment.profileParentId
-        ? environment.name
-        : environment.profileName
-          ? `${environment.profileName} (${environment.name})`
-          : environment.name;
+      const profileName = environment.profileParentId ? environment.name : environment.profileName ? `${environment.profileName} (${environment.name})` : environment.name;
 
       const variables = {
         [VariablesPGREnum.ENVIRONMENT_NAME]: environment.name || '',
@@ -117,9 +113,7 @@ export const getLayouts = (vPhotos: CharacterizationPhotoModel[], hPhotos: Chara
 
     if (length >= 2) {
       const removeLegend = isAllLegendEqual && (length - 2 !== 0 || hLength !== 0);
-      layouts.push(
-        VTwoImages([vPhotos[0].path!, vPhotos[1].path!], [vPhotos[0].name, vPhotos[1].name], removeLegend),
-      );
+      layouts.push(VTwoImages([vPhotos[0].path!, vPhotos[1].path!], [vPhotos[0].name, vPhotos[1].name], removeLegend));
 
       const restOfPhotos = vPhotos.slice(2);
       return vLayout(restOfPhotos, restOfPhotos.length);
@@ -142,9 +136,7 @@ export const getLayouts = (vPhotos: CharacterizationPhotoModel[], hPhotos: Chara
       }
 
       if (hLength > 0) {
-        layouts.push(
-          VHImages([vPhotos[0].path!, hPhotos[0].path!], [vPhotos[0].name, hPhotos[0].name], removeLegend),
-        );
+        layouts.push(VHImages([vPhotos[0].path!, hPhotos[0].path!], [vPhotos[0].name, hPhotos[0].name], removeLegend));
 
         const restOfPhotos = hPhotos.slice(1);
         return hLayout(restOfPhotos, [], restOfPhotos.length);
@@ -156,9 +148,7 @@ export const getLayouts = (vPhotos: CharacterizationPhotoModel[], hPhotos: Chara
 
     if (hLength >= 2) {
       const removeLegend = isAllLegendEqual && hLength - 2 !== 0;
-      layouts.push(
-        HTwoImages([hPhotos[0].path!, hPhotos[1].path!], [hPhotos[0].name, hPhotos[1].name], removeLegend),
-      );
+      layouts.push(HTwoImages([hPhotos[0].path!, hPhotos[1].path!], [hPhotos[0].name, hPhotos[1].name], removeLegend));
 
       const restOfPhotos = hPhotos.slice(2);
       return hLayout(restOfPhotos, [], restOfPhotos.length);
