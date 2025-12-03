@@ -175,43 +175,45 @@ const getSharedData = ({ riskData, periculosidadeType }: { riskData: RiskDataMod
     });
 
     // Add real activities and normative activities
-    [riskData.activities]?.forEach((activityData) => {
-      // Atividade Real
-      if (activityData?.realActivity) {
-        if (realActivities.length === 0) {
+    if (riskData.activities) {
+      [riskData.activities]?.forEach((activityData) => {
+        // Atividade Real
+        if (activityData?.realActivity) {
+          if (realActivities.length === 0) {
+            realActivities.push({
+              type: DocumentChildrenTypeEnum.PARAGRAPH,
+              text: '**Atividade Real:**',
+              spacing: { after: 100 },
+            });
+          }
           realActivities.push({
             type: DocumentChildrenTypeEnum.PARAGRAPH,
-            text: '**Atividade Real:**',
-            spacing: { after: 100 },
-          });
-        }
-        realActivities.push({
-          type: DocumentChildrenTypeEnum.PARAGRAPH,
-          text: activityData.realActivity,
-        });
-      }
-
-      // Atividades Normativas Vinculadas (subActivities)
-      const subActivitiesWithValue = activityData.activities?.filter((act) => act.subActivity);
-      if (subActivitiesWithValue && subActivitiesWithValue.length > 0) {
-        if (normativeActivities.length === 0) {
-          normativeActivities.push({
-            type: DocumentChildrenTypeEnum.PARAGRAPH,
-            text: `**Atividades Normativas Vinculadas (${config.anexo}):**`,
+            text: activityData.realActivity,
           });
         }
 
-        subActivitiesWithValue.forEach((act) => {
-          const subActivity = `“${act.subActivity} — ${act.description}”`;
+        // Atividades Normativas Vinculadas (subActivities)
+        const subActivitiesWithValue = activityData.activities?.filter((act) => act.subActivity);
+        if (subActivitiesWithValue && subActivitiesWithValue.length > 0) {
+          if (normativeActivities.length === 0) {
+            normativeActivities.push({
+              type: DocumentChildrenTypeEnum.PARAGRAPH,
+              text: `**Atividades Normativas Vinculadas (${config.anexo}):**`,
+            });
+          }
 
-          normativeActivities.push({
-            type: DocumentChildrenTypeEnum.PARAGRAPH,
-            text: subActivity,
-            inlineStyleRangeBlock: [[{ offset: 0, length: subActivity.length, style: InlineStyleTypeEnum.ITALIC }]],
+          subActivitiesWithValue.forEach((act) => {
+            const subActivity = `“${act.subActivity} — ${act.description}”`;
+
+            normativeActivities.push({
+              type: DocumentChildrenTypeEnum.PARAGRAPH,
+              text: subActivity,
+              inlineStyleRangeBlock: [[{ offset: 0, length: subActivity.length, style: InlineStyleTypeEnum.ITALIC }]],
+            });
           });
-        });
-      }
-    });
+        }
+      });
+    }
   });
 
   return { riskFactors, realActivities, normativeActivities };

@@ -43,7 +43,7 @@ export type IRiskDataModel = {
   quantityVibrationFB: RiskDataQuantityVibrationFBVO | null;
   quantityVibrationL: RiskDataQuantityVibrationLVO | null;
 
-  activities: IRiskDataActivity;
+  activities: IRiskDataActivity | null;
 };
 
 export class RiskDataModel {
@@ -67,7 +67,7 @@ export class RiskDataModel {
   quantityVibrationFB: RiskDataQuantityVibrationFBVO | null;
   quantityVibrationL: RiskDataQuantityVibrationLVO | null;
 
-  activities: IRiskDataActivity;
+  activities: IRiskDataActivity | null;
 
   constructor(params: IRiskDataModel) {
     this.#probability = params.probability || 0;
