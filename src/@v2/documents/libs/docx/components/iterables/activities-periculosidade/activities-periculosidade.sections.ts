@@ -232,7 +232,7 @@ export const activitiesPericulosidadeSections = (
 
   document.homogeneousGroups.forEach((group) => {
     group.allRiskData.forEach((riskData) => {
-      if (riskData.risk.periculosidade) {
+      if (riskData.risk.periculosidade && riskData.activities) {
         if (!periculosidade[riskData.risk.periculosidade]) {
           periculosidade[riskData.risk.periculosidade] = {
             groups: [],
