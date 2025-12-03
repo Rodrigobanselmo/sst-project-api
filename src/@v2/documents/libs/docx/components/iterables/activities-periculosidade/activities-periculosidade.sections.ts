@@ -177,7 +177,7 @@ const getSharedData = ({ riskData, periculosidadeType }: { riskData: RiskDataMod
     // Add real activities and normative activities
     [riskData.activities]?.forEach((activityData) => {
       // Atividade Real
-      if (activityData.realActivity) {
+      if (activityData?.realActivity) {
         if (realActivities.length === 0) {
           realActivities.push({
             type: DocumentChildrenTypeEnum.PARAGRAPH,

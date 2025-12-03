@@ -18,8 +18,8 @@ import { RecommendationModel } from './recommendation.model';
 import { RiskModel } from './risk.model';
 
 export type IRiskDataActivity = {
-  realActivity: string;
-  activities: { description?: string; subActivity?: string }[];
+  realActivity?: string;
+  activities?: { description?: string; subActivity?: string }[];
 };
 
 export type IRiskDataModel = {
