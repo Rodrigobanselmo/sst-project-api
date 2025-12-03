@@ -100,12 +100,12 @@ export class RiskModel {
   get periculosidade() {
     if (!this.isPericulosidade) return null;
 
-    if (this.otherAppendix.includes('1')) return RiskPericulosidadeEnum.EXPLOSIVOS_1;
-    if (this.otherAppendix.includes('2')) return RiskPericulosidadeEnum.INFLAMAVEIS_2;
-    if (this.otherAppendix.includes('3')) return RiskPericulosidadeEnum.ROUBO_3;
-    if (this.otherAppendix.includes('4')) return RiskPericulosidadeEnum.ELETRICIDADE_4;
-    if (this.otherAppendix.includes('5')) return RiskPericulosidadeEnum.MOTOCICLETA_5;
-    if (this.otherAppendix.includes('6')) return RiskPericulosidadeEnum.RADIACAO_6;
+    if (this.otherAppendix.includes('NR 16 Anexo 1')) return RiskPericulosidadeEnum.EXPLOSIVOS_1;
+    if (this.otherAppendix.includes('NR 16 Anexo 2')) return RiskPericulosidadeEnum.INFLAMAVEIS_2;
+    if (this.otherAppendix.includes('NR 16 Anexo 3')) return RiskPericulosidadeEnum.ROUBO_3;
+    if (this.otherAppendix.includes('NR 16 Anexo 4')) return RiskPericulosidadeEnum.ELETRICIDADE_4;
+    if (this.otherAppendix.includes('NR 16 Anexo 5')) return RiskPericulosidadeEnum.MOTOCICLETA_5;
+    if (this.otherAppendix.includes('NR 16 Anexo 6')) return RiskPericulosidadeEnum.RADIACAO_6;
     return null;
   }
 }
