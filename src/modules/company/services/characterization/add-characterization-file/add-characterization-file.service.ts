@@ -5,7 +5,7 @@ import { v4 } from 'uuid';
 import { ErrorCompanyEnum } from '../../../../../shared/constants/enum/errorMessage';
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { AmazonStorageProvider } from '../../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
-import { convert3gpToMp3 } from '../../../../../shared/utils/convert3gpToMp3';
+import { convertMediaFile, getMediaConversionInfo } from '../../../../../shared/utils/convert3gpToMp3';
 import { AddFileCharacterizationDto } from '../../../dto/characterization.dto';
 import { CharacterizationFileRepository } from '../../../repositories/implementations/CharacterizationFileRepository';
 import { CharacterizationRepository } from '../../../repositories/implementations/CharacterizationRepository';
@@ -57,21 +57,26 @@ export class AddCharacterizationFileService {
 
   private async convertFileBuffer(file: Express.Multer.File) {
     if (!file?.originalname) return file.buffer;
-    if (file.originalname.split('.').pop() !== '3gp') return file.buffer;
 
-    const outputPath = 'tmp/' + v4() + '.mp3';
-    const inputPath = 'tmp/' + v4() + '.3gp';
+    const originalExtension = file.originalname.split('.').pop()?.toLowerCase() || '';
+    const conversionInfo = getMediaConversionInfo(originalExtension);
 
-    file.originalname = file.originalname.replace('.3gp', '.mp3');
+    if (!conversionInfo.shouldConvert) return file.buffer;
+
+    const inputPath = 'tmp/' + v4() + '.' + originalExtension;
+    const outputPath = 'tmp/' + v4() + '.' + conversionInfo.targetExtension;
+
+    // Atualiza o nome do arquivo para a nova extensão
+    file.originalname = file.originalname.replace(new RegExp(`\\.${originalExtension}$`, 'i'), '.' + conversionInfo.targetExtension);
 
     try {
       await writeFile(inputPath, file.buffer as any);
     } catch (err) {
-      throw new Error(`Erro ao salvar arquivo 3gp: ${JSON.stringify(err)}`);
+      throw new Error(`Erro ao salvar arquivo ${originalExtension}: ${JSON.stringify(err)}`);
     }
 
     try {
-      await convert3gpToMp3(inputPath, outputPath);
+      await convertMediaFile(inputPath, outputPath, conversionInfo.targetFormat!);
       const fileBuffer = await readFile(outputPath);
 
       try {
@@ -90,7 +95,7 @@ export class AddCharacterizationFileService {
         await unlink(outputPath);
       } catch (err) {}
 
-      throw new Error(`Erro ao converter arquivo mp3: ${JSON.stringify(err)}`);
+      throw new Error(`Erro ao converter arquivo para ${conversionInfo.targetExtension}: ${JSON.stringify(err)}`);
     }
   }
 }
