@@ -153,7 +153,7 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
 
     return await asyncBatch(sheetData, 20, async (row) => {
       const touchRisk = !!row[CompanyStructHeaderEnum.RISK];
-      const workspaceMap = mapDataWithId.workspace[row[CompanyStructHeaderEnum.WORKSPACE]];
+      const workspaceNames = row[CompanyStructHeaderEnum.WORKSPACE] as string[];
       const riskMap = mapDataWithId.risk[row[CompanyStructHeaderEnum.RISK]];
       const episMap = mapDataWithId.epis;
 
@@ -183,26 +183,32 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
             }) as EpiRoRiskDataDto,
         );
 
-        const homogeneousGroupId = workspaceMap.homogeneousGroup[row[CompanyStructHeaderEnum.GHO]]?.id as string;
+        // Process risk data for all workspaces
+        for (const workspaceName of workspaceNames) {
+          const workspaceMap = mapDataWithId.workspace[workspaceName];
+          if (!workspaceMap) continue;
 
-        await this.upsertRiskDataService.execute({
-          companyId,
-          homogeneousGroupId,
-          ...(!homogeneousGroupId && { hierarchyId: workspaceMap.hierarchies[hierarchyPath]?.id as string }),
-          riskFactorGroupDataId: company.riskFactorGroupData[0]?.id,
-          adms,
-          engs,
-          recs,
-          epis,
-          generateSources,
-          keepEmpty: true,
-          riskId: riskMap?.id as string,
-          probability: row[CompanyStructHeaderEnum.PROB],
-          probabilityAfter: row[CompanyStructHeaderEnum.PROB_REC],
-          endDate: row[CompanyStructHeaderEnum.END_DATE],
-          startDate: row[CompanyStructHeaderEnum.START_DATE],
-          ...(json && { json }),
-        });
+          const homogeneousGroupId = workspaceMap.homogeneousGroup[row[CompanyStructHeaderEnum.GHO]]?.id as string;
+
+          await this.upsertRiskDataService.execute({
+            companyId,
+            homogeneousGroupId,
+            ...(!homogeneousGroupId && { hierarchyId: workspaceMap.hierarchies[hierarchyPath]?.id as string }),
+            riskFactorGroupDataId: company.riskFactorGroupData[0]?.id,
+            adms,
+            engs,
+            recs,
+            epis,
+            generateSources,
+            keepEmpty: true,
+            riskId: riskMap?.id as string,
+            probability: row[CompanyStructHeaderEnum.PROB],
+            probabilityAfter: row[CompanyStructHeaderEnum.PROB_REC],
+            endDate: row[CompanyStructHeaderEnum.END_DATE],
+            startDate: row[CompanyStructHeaderEnum.START_DATE],
+            ...(json && { json }),
+          });
+        }
       }
     });
   }
@@ -284,24 +290,34 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
       risk: {},
       epis: {},
       cids: {},
+      globalHierarchies: {},
+      globalHomoGroups: {},
     };
 
     const subOfficeIndex = hierarchyList.findIndex((i) => i == HierarchyEnum.SUB_OFFICE);
     const officeIndex = hierarchyList.findIndex((i) => i == HierarchyEnum.OFFICE);
 
     sheetData.forEach((row) => {
-      if (!row[CompanyStructHeaderEnum.WORKSPACE]) row[CompanyStructHeaderEnum.WORKSPACE] = company?.workspace?.[0]?.name;
-      if (!row[CompanyStructHeaderEnum.WORKSPACE]) throw new BadRequestException('Cadastre ou informe um estabelecimento antes de importar os dado');
+      // Handle multiple workspaces separated by ";"
+      let workspaceNames: string[] = row[CompanyStructHeaderEnum.WORKSPACE] as unknown as string[];
+      if (!workspaceNames || workspaceNames.length === 0) {
+        workspaceNames = company?.workspace?.[0]?.name ? [company.workspace[0].name] : [];
+        row[CompanyStructHeaderEnum.WORKSPACE] = workspaceNames as any;
+      }
+      if (!workspaceNames || workspaceNames.length === 0) throw new BadRequestException('Cadastre ou informe um estabelecimento antes de importar os dado');
 
-      if (!mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]])
-        mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]] = {
-          value: row[CompanyStructHeaderEnum.WORKSPACE],
-          hierarchies: {},
-          homogeneousGroup: {},
-          hierarchyOnHomogeneous: {},
-          employees: {},
-          // characterization: {},
-        };
+      // Initialize all workspaces for this row
+      workspaceNames.forEach((workspaceName) => {
+        if (!mapData.workspace[workspaceName])
+          mapData.workspace[workspaceName] = {
+            value: workspaceName,
+            hierarchies: {},
+            homogeneousGroup: {},
+            hierarchyOnHomogeneous: {},
+            employees: {},
+            // characterization: {},
+          };
+      });
 
       const hierarchyArray = this.getHierarchyPath(row);
 
@@ -311,13 +327,26 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
       const isHomogeneousGroup = row[CompanyStructHeaderEnum.GHO];
       const isRisk = !!row[CompanyStructHeaderEnum.RISK];
 
+      // Process homogeneous groups - add to global map with all workspaceNames
       if (isHomogeneousGroup) {
-        mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]].homogeneousGroup[row[CompanyStructHeaderEnum.GHO]] = {
-          value: row[CompanyStructHeaderEnum.GHO],
-          description: row[CompanyStructHeaderEnum.GHO_DESCRIPTION],
-        };
+        const homoName = row[CompanyStructHeaderEnum.GHO];
+        if (!mapData.globalHomoGroups[homoName]) {
+          mapData.globalHomoGroups[homoName] = {
+            value: homoName,
+            description: row[CompanyStructHeaderEnum.GHO_DESCRIPTION],
+            workspaceNames: [...workspaceNames],
+          };
+        } else {
+          // Add any new workspaces to the existing homo group
+          workspaceNames.forEach((wsName) => {
+            if (!mapData.globalHomoGroups[homoName].workspaceNames.includes(wsName)) {
+              mapData.globalHomoGroups[homoName].workspaceNames.push(wsName);
+            }
+          });
+        }
       }
 
+      // Process hierarchies - add to global map with all workspaceNames
       if (isHierarchy) {
         hierarchyArray.forEach((hierarchyName, index) => {
           if (hierarchyName == emptyHierarchy) return;
@@ -325,44 +354,89 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
           const hierarchyNewArray = hierarchyArray.slice(0, index + 1).concat(hierarchyArray.slice(index + 1).map(() => emptyHierarchy));
           const hierarchyPath = hierarchyNewArray.join('--');
 
-          if (mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]].hierarchies[hierarchyPath]) return;
-
-          const { parentHierarchyPath, name, type } = this.getHierarchyData(clone(hierarchyNewArray));
-          mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]].hierarchies[hierarchyPath] = {
-            name,
-            type,
-            value: hierarchyPath,
-            parentPath: parentHierarchyPath.join('--'),
-            cbo: row[CompanyStructHeaderEnum.CBO],
-            ...(index == officeIndex && {
-              description: row[CompanyStructHeaderEnum.OFFICE_DESCRIPTION],
-              realDescription: row[CompanyStructHeaderEnum.OFFICE_REAL_DESCRIPTION],
-            }),
-          };
+          if (!mapData.globalHierarchies[hierarchyPath]) {
+            const { parentHierarchyPath, name, type } = this.getHierarchyData(clone(hierarchyNewArray));
+            mapData.globalHierarchies[hierarchyPath] = {
+              name,
+              type,
+              value: hierarchyPath,
+              parentPath: parentHierarchyPath.join('--'),
+              cbo: row[CompanyStructHeaderEnum.CBO],
+              workspaceNames: [...workspaceNames],
+              ...(index == officeIndex && {
+                description: row[CompanyStructHeaderEnum.OFFICE_DESCRIPTION],
+                realDescription: row[CompanyStructHeaderEnum.OFFICE_REAL_DESCRIPTION],
+              }),
+            };
+          } else {
+            // Add any new workspaces to the existing hierarchy
+            workspaceNames.forEach((wsName) => {
+              if (!mapData.globalHierarchies[hierarchyPath].workspaceNames.includes(wsName)) {
+                mapData.globalHierarchies[hierarchyPath].workspaceNames.push(wsName);
+              }
+            });
+          }
         });
       }
 
-      if (isHierarchy && isHomogeneousGroup) {
-        const hierarchyPath = hierarchyArray.join('--');
-        const ghoName = row[CompanyStructHeaderEnum.GHO];
-        const value = ghoName + hierarchyPath;
+      // Process for each workspace in the row (for per-workspace data structures)
+      workspaceNames.forEach((workspaceName) => {
+        if (isHomogeneousGroup) {
+          mapData.workspace[workspaceName].homogeneousGroup[row[CompanyStructHeaderEnum.GHO]] = {
+            value: row[CompanyStructHeaderEnum.GHO],
+            description: row[CompanyStructHeaderEnum.GHO_DESCRIPTION],
+          };
+        }
 
-        mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]].hierarchyOnHomogeneous[value] = {
-          value,
-          ghoName,
-          hierarchyPath,
-        };
-      }
+        if (isHierarchy) {
+          hierarchyArray.forEach((hierarchyName, index) => {
+            if (hierarchyName == emptyHierarchy) return;
+
+            const hierarchyNewArray = hierarchyArray.slice(0, index + 1).concat(hierarchyArray.slice(index + 1).map(() => emptyHierarchy));
+            const hierarchyPath = hierarchyNewArray.join('--');
+
+            if (mapData.workspace[workspaceName].hierarchies[hierarchyPath]) return;
+
+            const { parentHierarchyPath, name, type } = this.getHierarchyData(clone(hierarchyNewArray));
+            mapData.workspace[workspaceName].hierarchies[hierarchyPath] = {
+              name,
+              type,
+              value: hierarchyPath,
+              parentPath: parentHierarchyPath.join('--'),
+              cbo: row[CompanyStructHeaderEnum.CBO],
+              ...(index == officeIndex && {
+                description: row[CompanyStructHeaderEnum.OFFICE_DESCRIPTION],
+                realDescription: row[CompanyStructHeaderEnum.OFFICE_REAL_DESCRIPTION],
+              }),
+            };
+          });
+        }
+
+        if (isHierarchy && isHomogeneousGroup) {
+          const hierarchyPath = hierarchyArray.join('--');
+          const ghoName = row[CompanyStructHeaderEnum.GHO];
+          const value = ghoName + hierarchyPath;
+
+          mapData.workspace[workspaceName].hierarchyOnHomogeneous[value] = {
+            value,
+            ghoName,
+            hierarchyPath,
+          };
+        }
+      });
 
       // if (!isHierarchy && !isHomogeneousGroup) throw new BadRequestException(`Informe ao menos um Setor, Cargo ou Grupo homogênio (Obrigatório)`);
       if (!isHierarchy && isEmployeeHistory) throw new BadRequestException(`Quando informado data de admissão, informe ao menos um Setor e Cargo (Obrigatório)`);
+
+      // Employee data is only added to the first workspace (employees belong to one workspace)
+      const primaryWorkspace = workspaceNames[0];
 
       if (isEmployee) {
         const isOffice = hierarchyArray?.[officeIndex] != emptyHierarchy;
         const isSubOffice = hierarchyArray?.[subOfficeIndex] != emptyHierarchy;
 
-        if (!mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]].employees[row[CompanyStructHeaderEnum.EMPLOYEE_CPF]])
-          mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]].employees[row[CompanyStructHeaderEnum.EMPLOYEE_CPF]] = {
+        if (!mapData.workspace[primaryWorkspace].employees[row[CompanyStructHeaderEnum.EMPLOYEE_CPF]])
+          mapData.workspace[primaryWorkspace].employees[row[CompanyStructHeaderEnum.EMPLOYEE_CPF]] = {
             value: row[CompanyStructHeaderEnum.EMPLOYEE_CPF],
             name: row[CompanyStructHeaderEnum.EMPLOYEE_NAME],
             birth: row[CompanyStructHeaderEnum.EMPLOYEE_BIRTH],
@@ -384,7 +458,7 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
         if (isCid) {
           row[CompanyStructHeaderEnum.EMPLOYEE_CIDS].map((value: string) => {
             mapData.cids[value] = value;
-            mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]].employees[row[CompanyStructHeaderEnum.EMPLOYEE_CPF]].cids[value] = value;
+            mapData.workspace[primaryWorkspace].employees[row[CompanyStructHeaderEnum.EMPLOYEE_CPF]].cids[value] = value;
           });
         }
 
@@ -397,7 +471,7 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
 
           if (admDate && isOffice) {
             const value = adm + dayjs(admDate).format('YYYY-MM-DD');
-            mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]].employees[row[CompanyStructHeaderEnum.EMPLOYEE_CPF]].employeesHistory[value] = {
+            mapData.workspace[primaryWorkspace].employees[row[CompanyStructHeaderEnum.EMPLOYEE_CPF]].employeesHistory[value] = {
               value: value,
               motive: adm,
               startDate: row[CompanyStructHeaderEnum.EMPLOYEE_ADMISSION],
@@ -416,7 +490,7 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
 
           if (demDate) {
             const value = dem + dayjs(demDate).format('YYYY-MM-DD');
-            mapData.workspace[row[CompanyStructHeaderEnum.WORKSPACE]].employees[row[CompanyStructHeaderEnum.EMPLOYEE_CPF]].employeesHistory[value] = {
+            mapData.workspace[primaryWorkspace].employees[row[CompanyStructHeaderEnum.EMPLOYEE_CPF]].employeesHistory[value] = {
               value: value,
               motive: dem,
               startDate: row[CompanyStructHeaderEnum.EMPLOYEE_DEMISSION],
@@ -655,43 +729,113 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
       mapData.epis[ca].id = epiId;
     });
 
+    // Map to track created hierarchies and homogroups (so we create only once with all workspaces)
+    const createdHierarchies: Record<string, string> = {};
+    const createdHomogroups: Record<string, string> = {};
+
+    // First, create global homogeneous groups with all their workspaceIds
+    if (body.createHomo) {
+      for (const [homoName, homoData] of Object.entries(mapData.globalHomoGroups)) {
+        const existingHomoGroupId = homoGroupsMap[homoName]?.id;
+        if (!existingHomoGroupId) {
+          const workspaceIds = homoData.workspaceNames.map((wsName) => workspaceMap[wsName]?.id).filter((id): id is string => !!id);
+
+          if (workspaceIds.length > 0) {
+            const homogroup = await this.createHomogroup(
+              {
+                companyId,
+                name: homoName,
+                description: homoData.description || '',
+                workspaceIds,
+              },
+              company,
+            );
+            createdHomogroups[homoName] = homogroup.id;
+          }
+        }
+      }
+    }
+
+    // Create global hierarchies with all their workspaceIds (in order by type)
+    if (body.createHierarchy) {
+      const hierarchyTypes = [HierarchyEnum.DIRECTORY, HierarchyEnum.MANAGEMENT, HierarchyEnum.SECTOR, HierarchyEnum.SUB_SECTOR, HierarchyEnum.OFFICE, HierarchyEnum.SUB_OFFICE];
+
+      for (const hierarchyType of hierarchyTypes) {
+        const hierarchiesOfType = Object.entries(mapData.globalHierarchies).filter(([, h]) => h.type === hierarchyType);
+
+        for (const [hierarchyPath, hierarchyData] of hierarchiesOfType) {
+          // Check if hierarchy already exists in any of its workspaces
+          const workspaceIds = hierarchyData.workspaceNames.map((wsName) => workspaceMap[wsName]?.id).filter((id): id is string => !!id);
+
+          // Check if already exists in ANY workspace (not just the first one)
+          let existingHierarchyId: string | undefined;
+          for (const wsId of workspaceIds) {
+            const fullPath = wsId + '--' + hierarchyPath;
+            existingHierarchyId = hierarchyPathMap[fullPath]?.id;
+            if (existingHierarchyId) break;
+          }
+
+          if (!existingHierarchyId && workspaceIds.length > 0) {
+            // Get parent ID from already created hierarchies or existing ones
+            let parentId: string | null = null;
+            if (hierarchyData.parentPath) {
+              parentId = createdHierarchies[hierarchyData.parentPath] || null;
+              if (!parentId) {
+                // Try to find parent in any workspace
+                for (const wsId of workspaceIds) {
+                  const parentFullPath = wsId + '--' + hierarchyData.parentPath;
+                  parentId = hierarchyPathMap[parentFullPath]?.id || null;
+                  if (parentId) break;
+                }
+              }
+            }
+
+            const hierarchy = await this.createHierarchy(
+              {
+                companyId,
+                name: hierarchyData.name,
+                description: hierarchyData.description || '',
+                type: hierarchyData.type,
+                realDescription: hierarchyData.realDescription,
+                workspaceIds,
+                parentId,
+              },
+              company,
+            );
+
+            createdHierarchies[hierarchyPath] = hierarchy.id;
+          } else if (existingHierarchyId) {
+            createdHierarchies[hierarchyPath] = existingHierarchyId;
+          }
+        }
+      }
+    }
+
     const promisesWorkspaces = Object.entries(mapData.workspace).map(async ([workspaceName, workspaceValue]) => {
       const workspaceId = workspaceMap[workspaceName]?.id;
       if (!workspaceId) return this.throwError(`Estabelecimento ${workspaceName} não encontrado`);
 
       mapData.workspace[workspaceName].id = workspaceId;
 
+      // Assign homogroup IDs (from created or existing)
       const promisesHomogroups = Object.keys(workspaceValue.homogeneousGroup).map((homoName) => {
-        const homogeneousGroupId = homoGroupsMap[homoName]?.id;
+        const homogeneousGroupId = createdHomogroups[homoName] || homoGroupsMap[homoName]?.id;
         if (!homogeneousGroupId && !body.createHomo) {
           return this.throwError(`Grupo homogênio ${homoName} não encontrado`);
         }
 
         return async () => {
-          if (!homogeneousGroupId && body.createHomo) {
-            const homogroupImportData = workspaceValue.homogeneousGroup[homoName];
-            const homogroup = await this.createHomogroup(
-              {
-                companyId,
-                name: homoName,
-                description: homogroupImportData.description || '',
-                workspaceIds: [workspaceId],
-              },
-              company,
-            );
-            mapData.workspace[workspaceName].homogeneousGroup[homoName].id = homogroup.id;
-          } else {
-            mapData.workspace[workspaceName].homogeneousGroup[homoName].id = homogeneousGroupId;
-          }
+          mapData.workspace[workspaceName].homogeneousGroup[homoName].id = homogeneousGroupId;
         };
       });
 
+      // Assign hierarchy IDs (from created or existing)
       const handleHierarchy = (hierarchiesMan: IDataReturnHierarchy[]) => {
         return hierarchiesMan.map(({ value: hierarchyPath }) => {
           const fullPath = workspaceId + '--' + hierarchyPath;
-          const hierarchyFullPathId = hierarchyPathMap[fullPath]?.id;
+          const hierarchyId = createdHierarchies[hierarchyPath] || hierarchyPathMap[fullPath]?.id;
 
-          if (!hierarchyFullPathId && !body.createHierarchy) {
+          if (!hierarchyId && !body.createHierarchy) {
             return this.throwError(
               `Departamento ${hierarchyPath
                 .split('--')
@@ -701,26 +845,6 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
           }
 
           return async () => {
-            const hierarchyImportData = workspaceValue.hierarchies[hierarchyPath];
-            let hierarchyId = hierarchyFullPathId;
-
-            if (!hierarchyId && body.createHierarchy) {
-              const hierarchy = await this.createHierarchy(
-                {
-                  companyId,
-                  name: hierarchyImportData.name,
-                  description: hierarchyImportData.description || '',
-                  type: hierarchyImportData.type,
-                  realDescription: hierarchyImportData.realDescription,
-                  workspaceIds: [workspaceId],
-                  parentId: (mapData.workspace[workspaceName].hierarchies[hierarchyImportData.parentPath]?.id as string) || null,
-                },
-                company,
-              );
-
-              hierarchyId = hierarchy.id;
-            }
-
             mapData.workspace[workspaceName].hierarchies[hierarchyPath].id = hierarchyId;
           };
         });

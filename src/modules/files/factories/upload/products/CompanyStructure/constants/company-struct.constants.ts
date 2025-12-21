@@ -119,6 +119,7 @@ export const CompanyStructColumnMap: IColumnRuleMap<CompanyStructHeaderEnum> = {
   [CompanyStructHeaderEnum.WORKSPACE]: {
     field: CompanyStructHeaderEnum.WORKSPACE,
     checkHandler: checkIsString,
+    isArray: true,
     width: 80,
     database: 'workspace',
   },

@@ -1589,6 +1589,7 @@ model Hierarchy {
   companyId                     String
   parentId                      String?
   refName                       String?
+  metadata                      Json?
   created_at                    DateTime                     @default(now())
   updated_at                    DateTime                     @updatedAt
   deletedAt                     DateTime?

@@ -90,11 +90,17 @@ export interface IRiskAllData extends IDataReturn {
   type?: string;
 }
 
+export type IGlobalHierarchy = IDataReturnHierarchy & { workspaceNames: string[] };
+export type IGlobalHomoGroup = { value: string; description?: string; workspaceNames: string[] };
+
 export interface IMapData {
   workspace: Record<string, IWorkspaceData>;
   risk: Record<string, IRiskAllData>;
   epis: Record<string, IDataReturn>;
   cids: Record<string, string>;
+  // Global maps to track hierarchies/homogroups with all their workspaces
+  globalHierarchies: Record<string, IGlobalHierarchy>;
+  globalHomoGroups: Record<string, IGlobalHomoGroup>;
 }
 export interface ICompanyData {
   id: string;
