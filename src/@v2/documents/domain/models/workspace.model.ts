@@ -1,26 +1,49 @@
-import { AddressModel } from "./address.model"
+import { AddressModel } from './address.model';
 
 export type IWorkspaceModel = {
-  id: string
-  name: string
-  cnpj: string | null
-  isOwner: boolean
-  address: AddressModel | null
-}
+  id: string;
+  name: string;
+  isOwner: boolean;
+  address: AddressModel | null;
+
+  cnpj: string | null;
+  razaoSocial: string | null;
+  riskDegree: number | null;
+  cnaeLabel: string | null;
+  cnaeCode: string | null;
+  workSchedule: string | null;
+
+  customSectionHTML: string | null;
+};
 
 export class WorkspaceModel {
-  id: string
-  name: string
-  cnpj: string | null
-  isOwner: boolean
-  address: AddressModel | null
+  id: string;
+  name: string;
+  isOwner: boolean;
+  address: AddressModel | null;
+
+  cnpj: string | null;
+  razaoSocial: string | null;
+  riskDegree: number | null;
+  cnaeLabel: string | null;
+  cnaeCode: string | null;
+  workSchedule: string | null;
+
+  customSectionHTML: string | null;
 
   constructor(params: IWorkspaceModel) {
     this.id = params.id;
-    this.name = params.name
-    this.cnpj = params.cnpj
-    this.isOwner = params.isOwner
+    this.name = params.name;
+    this.isOwner = params.isOwner;
+    this.address = params.address;
 
-    this.address = params.address
+    this.cnpj = params.cnpj;
+    this.razaoSocial = params.razaoSocial;
+    this.riskDegree = params.riskDegree;
+    this.cnaeLabel = params.cnaeLabel;
+    this.cnaeCode = params.cnaeCode;
+    this.workSchedule = params.workSchedule;
+
+    this.customSectionHTML = params.customSectionHTML;
   }
 }

@@ -328,6 +328,14 @@ export type ITablePcmsoHierarchyConcat = {
   type: DocumentChildrenTypeEnum.TABLE_PCMSO_HIERARCHY_CONCAT;
 } & IBaseDocumentModel;
 
+export type IWorkspaceBlock = {
+  type: DocumentChildrenTypeEnum.WORKSPACE_BLOCK;
+} & IBaseDocumentModel;
+
+export type IScopeBlock = {
+  type: DocumentChildrenTypeEnum.SCOPE_BLOCK;
+} & IBaseDocumentModel;
+
 export type ISectionChildrenType =
   | IH1
   | IH2
@@ -394,4 +402,6 @@ export type ISectionChildrenType =
   | ITablePcmsoGho
   | ITablePcmsoHierarchy
   | ITablePcmsoHierarchyConcat
-  | IProfessional;
+  | IProfessional
+  | IScopeBlock
+  | IWorkspaceBlock;

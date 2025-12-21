@@ -150,6 +150,18 @@ export const documentElementTypeMap: IDocumentElementTypeMap = {
     order: fourthOrder,
   },
 
+  [DocumentSectionChildrenTypeEnum.WORKSPACE_BLOCK]: {
+    label: 'Dados do Estabelecimento',
+    type: DocumentSectionChildrenTypeEnum.WORKSPACE_BLOCK,
+    accept: ['OTHER'],
+  },
+
+  [DocumentSectionChildrenTypeEnum.SCOPE_BLOCK]: {
+    label: 'Abrangência do documento',
+    type: DocumentSectionChildrenTypeEnum.SCOPE_BLOCK,
+    accept: ['OTHER'],
+  },
+
   //*MANY string --------------------->
   [DocumentSectionChildrenTypeEnum.TABLE_PRIORITIZATION_HIERARCHY]: {
     label: 'Tabela de Priorização por Cargo',

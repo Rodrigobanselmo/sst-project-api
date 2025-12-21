@@ -16,6 +16,7 @@ export type IDocumentPGRModel = {
   hierarchies: HierarchyModel[];
   homogeneousGroups: HomogeneousGroupModel[];
   exams: ExamModel[];
+  scopeOfSelectedGroupIds: string[];
 };
 
 export class DocumentPGRModel {
@@ -23,6 +24,7 @@ export class DocumentPGRModel {
   hierarchies: HierarchyModel[];
   homogeneousGroups: HomogeneousGroupModel[];
   exams: ExamModel[];
+  scopeOfSelectedGroupIds: string[];
 
   homogeneousGroupsMap: Record<string, HomogeneousGroupModel | null>;
   hierarchiesMap: Record<string, HierarchyModel | null>;
@@ -163,6 +165,7 @@ export class DocumentPGRModel {
       documentVersion: this.documentVersion,
       homogeneousGroups: this.getModifiedHomogeneousGroupsByHierarchies(hierarchies),
       exams: this.exams,
+      scopeOfSelectedGroupIds: this.scopeOfSelectedGroupIds,
     });
   }
 

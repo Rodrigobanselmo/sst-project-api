@@ -1,7 +1,4 @@
-import {
-  FindExamByHierarchyService,
-  filterOriginsByHierarchy,
-} from './../../../../../sst/services/exam/find-by-hierarchy /find-exam-by-hierarchy.service';
+import { FindExamByHierarchyService, filterOriginsByHierarchy } from './../../../../../sst/services/exam/find-by-hierarchy /find-exam-by-hierarchy.service';
 import { Injectable } from '@nestjs/common';
 import { v4 } from 'uuid';
 import { ServerlessLambdaProvider } from '../../../../../../shared/providers/ServerlessFunctionsProvider/implementations/ServerlessLambda/ServerlessLambdaProvider';
@@ -87,16 +84,7 @@ export class DocumentPCMSOFactoryProduct extends DocumentPGRFactoryProduct {
     protected readonly documentModelRepository: DocumentModelRepository,
     protected readonly findExamByHierarchyService: FindExamByHierarchyService,
   ) {
-    super(
-      riskGroupDataRepository,
-      riskDocumentRepository,
-      workspaceRepository,
-      companyRepository,
-      homoGroupRepository,
-      hierarchyRepository,
-      documentModelRepository,
-      findExamByHierarchyService,
-    );
+    super(riskGroupDataRepository, riskDocumentRepository, workspaceRepository, companyRepository, homoGroupRepository, hierarchyRepository, documentModelRepository, findExamByHierarchyService);
   }
 
   public async getData({ companyId, workspaceId, ...body }: IDocumentPGRBody) {
@@ -105,9 +93,7 @@ export class DocumentPCMSOFactoryProduct extends DocumentPGRFactoryProduct {
     return { ...allData };
   }
 
-  public async getAttachments(
-    options: IGetDocument<IDocumentPGRBody, PromiseInfer<ReturnType<DocumentPCMSOFactoryProduct['getData']>>>,
-  ) {
+  public async getAttachments(options: IGetDocument<IDocumentPGRBody, PromiseInfer<ReturnType<DocumentPCMSOFactoryProduct['getData']>>>) {
     const documentBaseBuild = await this.getDocumentBuild(options);
 
     const documentRiskExamGroupBuild: typeof documentBaseBuild = {
@@ -241,9 +227,7 @@ export class DocumentPCMSOFactoryProduct extends DocumentPGRFactoryProduct {
     ];
   }
 
-  public async getDocumentBuild(
-    options: IGetDocument<IDocumentPGRBody, PromiseInfer<ReturnType<DocumentPCMSOFactoryProduct['getData']>>>,
-  ) {
+  public async getDocumentBuild(options: IGetDocument<IDocumentPGRBody, PromiseInfer<ReturnType<DocumentPCMSOFactoryProduct['getData']>>>) {
     const docData = await this.getDocumentPgrBuild(options);
     return { ...docData };
   }

@@ -71,6 +71,8 @@ export class DocumentBuildPGR {
   private async convertToSections(data: IAllDocumentSectionType[]): Promise<ISectionOptions[]> {
     const sections: ISectionOptions[] = [];
 
+    console.log('2131');
+
     const elementsMap = new ElementsMapClass({
       data: this.data,
       variables: this.variables,

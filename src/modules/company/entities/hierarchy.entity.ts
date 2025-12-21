@@ -1,4 +1,4 @@
-import { Hierarchy, HierarchyEnum, StatusEnum } from '@prisma/client';
+import { Hierarchy, HierarchyEnum, Prisma, StatusEnum } from '@prisma/client';
 import { EmployeeHierarchyHistoryEntity } from './employee-hierarchy-history.entity';
 
 import { EmployeeEntity } from './employee.entity';
@@ -72,5 +72,6 @@ export class HierarchyEntity implements Hierarchy {
       }
     }
   }
+  metadata: Prisma.JsonValue;
   refName: string;
 }

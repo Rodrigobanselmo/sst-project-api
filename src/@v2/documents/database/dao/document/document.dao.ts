@@ -36,6 +36,7 @@ export class DocumentDAO {
       homogeneousGroups,
       exams,
       hierarchies,
+      scopeOfSelectedGroupIds: params.homogeneousGroupsIds || [],
     });
 
     return documentModel;
