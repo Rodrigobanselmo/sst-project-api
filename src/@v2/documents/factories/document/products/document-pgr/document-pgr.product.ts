@@ -25,6 +25,7 @@ export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocum
 
   constructor(
     private readonly documentDAO: DocumentDAO,
+
     private readonly documentVersionRepository: DocumentVersionRepository,
     private readonly downloadImageService: DownloadImageService,
   ) {}
