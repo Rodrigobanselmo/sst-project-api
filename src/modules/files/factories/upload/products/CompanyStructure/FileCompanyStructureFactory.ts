@@ -340,10 +340,16 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
           };
         } else {
           // Track this as a new workspace set occurrence
+          // Only add if not already present (exact match check)
           if (!mapData.globalHomoGroups[homoName].workspaceSets) {
             mapData.globalHomoGroups[homoName].workspaceSets = [[...mapData.globalHomoGroups[homoName].workspaceNames]];
           }
-          mapData.globalHomoGroups[homoName].workspaceSets.push([...workspaceNames]);
+
+          const existingSet = mapData.globalHomoGroups[homoName].workspaceSets.find((set) => set.length === workspaceNames.length && set.every((ws) => workspaceNames.includes(ws)));
+
+          if (!existingSet) {
+            mapData.globalHomoGroups[homoName].workspaceSets.push([...workspaceNames]);
+          }
         }
       }
 
@@ -372,10 +378,16 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
             };
           } else {
             // Track this as a new workspace set occurrence
+            // Only add if not already present (exact match check)
             if (!mapData.globalHierarchies[hierarchyPath].workspaceSets) {
               mapData.globalHierarchies[hierarchyPath].workspaceSets = [[...mapData.globalHierarchies[hierarchyPath].workspaceNames]];
             }
-            mapData.globalHierarchies[hierarchyPath].workspaceSets.push([...workspaceNames]);
+
+            const existingSet = mapData.globalHierarchies[hierarchyPath].workspaceSets.find((set) => set.length === workspaceNames.length && set.every((ws) => workspaceNames.includes(ws)));
+
+            if (!existingSet) {
+              mapData.globalHierarchies[hierarchyPath].workspaceSets.push([...workspaceNames]);
+            }
           }
         });
       }
