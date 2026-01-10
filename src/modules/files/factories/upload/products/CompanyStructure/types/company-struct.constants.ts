@@ -90,8 +90,8 @@ export interface IRiskAllData extends IDataReturn {
   type?: string;
 }
 
-export type IGlobalHierarchy = IDataReturnHierarchy & { workspaceNames: string[] };
-export type IGlobalHomoGroup = { value: string; description?: string; workspaceNames: string[] };
+export type IGlobalHierarchy = IDataReturnHierarchy & { workspaceNames: string[]; workspaceSets?: string[][] };
+export type IGlobalHomoGroup = { value: string; description?: string; workspaceNames: string[]; workspaceSets?: string[][] };
 
 export interface IMapData {
   workspace: Record<string, IWorkspaceData>;

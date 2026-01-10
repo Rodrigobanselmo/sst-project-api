@@ -327,7 +327,8 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
       const isHomogeneousGroup = row[CompanyStructHeaderEnum.GHO];
       const isRisk = !!row[CompanyStructHeaderEnum.RISK];
 
-      // Process homogeneous groups - add to global map with all workspaceNames
+      // Process homogeneous groups - track workspace sets per occurrence
+      // We'll merge overlapping sets later
       if (isHomogeneousGroup) {
         const homoName = row[CompanyStructHeaderEnum.GHO];
         if (!mapData.globalHomoGroups[homoName]) {
@@ -335,18 +336,18 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
             value: homoName,
             description: row[CompanyStructHeaderEnum.GHO_DESCRIPTION],
             workspaceNames: [...workspaceNames],
+            workspaceSets: [[...workspaceNames]], // Track each occurrence as a separate set
           };
         } else {
-          // Add any new workspaces to the existing homo group
-          workspaceNames.forEach((wsName) => {
-            if (!mapData.globalHomoGroups[homoName].workspaceNames.includes(wsName)) {
-              mapData.globalHomoGroups[homoName].workspaceNames.push(wsName);
-            }
-          });
+          // Track this as a new workspace set occurrence
+          if (!mapData.globalHomoGroups[homoName].workspaceSets) {
+            mapData.globalHomoGroups[homoName].workspaceSets = [[...mapData.globalHomoGroups[homoName].workspaceNames]];
+          }
+          mapData.globalHomoGroups[homoName].workspaceSets.push([...workspaceNames]);
         }
       }
 
-      // Process hierarchies - add to global map with all workspaceNames
+      // Process hierarchies - track workspace sets per occurrence
       if (isHierarchy) {
         hierarchyArray.forEach((hierarchyName, index) => {
           if (hierarchyName == emptyHierarchy) return;
@@ -363,29 +364,34 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
               parentPath: parentHierarchyPath.join('--'),
               cbo: row[CompanyStructHeaderEnum.CBO],
               workspaceNames: [...workspaceNames],
+              workspaceSets: [[...workspaceNames]], // Track each occurrence as a separate set
               ...(index == officeIndex && {
                 description: row[CompanyStructHeaderEnum.OFFICE_DESCRIPTION],
                 realDescription: row[CompanyStructHeaderEnum.OFFICE_REAL_DESCRIPTION],
               }),
             };
           } else {
-            // Add any new workspaces to the existing hierarchy
-            workspaceNames.forEach((wsName) => {
-              if (!mapData.globalHierarchies[hierarchyPath].workspaceNames.includes(wsName)) {
-                mapData.globalHierarchies[hierarchyPath].workspaceNames.push(wsName);
-              }
-            });
+            // Track this as a new workspace set occurrence
+            if (!mapData.globalHierarchies[hierarchyPath].workspaceSets) {
+              mapData.globalHierarchies[hierarchyPath].workspaceSets = [[...mapData.globalHierarchies[hierarchyPath].workspaceNames]];
+            }
+            mapData.globalHierarchies[hierarchyPath].workspaceSets.push([...workspaceNames]);
           }
         });
       }
 
       // Process for each workspace in the row (for per-workspace data structures)
+      // Each workspace gets its own hierarchy/homogroup - no cross-workspace deduplication
       workspaceNames.forEach((workspaceName) => {
         if (isHomogeneousGroup) {
-          mapData.workspace[workspaceName].homogeneousGroup[row[CompanyStructHeaderEnum.GHO]] = {
-            value: row[CompanyStructHeaderEnum.GHO],
-            description: row[CompanyStructHeaderEnum.GHO_DESCRIPTION],
-          };
+          const homoName = row[CompanyStructHeaderEnum.GHO];
+          // Only deduplicate within the same workspace
+          if (!mapData.workspace[workspaceName].homogeneousGroup[homoName]) {
+            mapData.workspace[workspaceName].homogeneousGroup[homoName] = {
+              value: homoName,
+              description: row[CompanyStructHeaderEnum.GHO_DESCRIPTION],
+            };
+          }
         }
 
         if (isHierarchy) {
@@ -395,6 +401,7 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
             const hierarchyNewArray = hierarchyArray.slice(0, index + 1).concat(hierarchyArray.slice(index + 1).map(() => emptyHierarchy));
             const hierarchyPath = hierarchyNewArray.join('--');
 
+            // Only deduplicate within the same workspace
             if (mapData.workspace[workspaceName].hierarchies[hierarchyPath]) return;
 
             const { parentHierarchyPath, name, type } = this.getHierarchyData(clone(hierarchyNewArray));
@@ -729,34 +736,90 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
       mapData.epis[ca].id = epiId;
     });
 
-    // Map to track created hierarchies and homogroups (so we create only once with all workspaces)
-    const createdHierarchies: Record<string, string> = {};
-    const createdHomogroups: Record<string, string> = {};
+    // Helper function to merge overlapping workspace sets
+    // Returns an array of merged workspace sets where each set has no overlap with others
+    const mergeOverlappingWorkspaceSets = (workspaceSets: string[][]): string[][] => {
+      if (!workspaceSets || workspaceSets.length === 0) return [];
+      if (workspaceSets.length === 1) return workspaceSets;
 
-    // First, create global homogeneous groups with all their workspaceIds
+      const merged: string[][] = [];
+      const processed = new Set<number>();
+
+      for (let i = 0; i < workspaceSets.length; i++) {
+        if (processed.has(i)) continue;
+
+        let currentSet = [...workspaceSets[i]];
+        let hasOverlap = true;
+
+        // Keep merging until no more overlaps found
+        while (hasOverlap) {
+          hasOverlap = false;
+          for (let j = 0; j < workspaceSets.length; j++) {
+            if (i === j || processed.has(j)) continue;
+
+            // Check if currentSet overlaps with workspaceSets[j]
+            const overlaps = currentSet.some((ws) => workspaceSets[j].includes(ws));
+            if (overlaps) {
+              // Merge the sets
+              workspaceSets[j].forEach((ws) => {
+                if (!currentSet.includes(ws)) {
+                  currentSet.push(ws);
+                }
+              });
+              processed.add(j);
+              hasOverlap = true;
+            }
+          }
+        }
+
+        merged.push(currentSet);
+        processed.add(i);
+      }
+
+      return merged;
+    };
+
+    // Map to track created hierarchies and homogroups
+    // Key format: "hierarchyPath--index" or "homoName--index" for multiple non-overlapping groups
+    // Value: { id: string, workspaceIds: string[] }
+    const createdHierarchies: Record<string, { id: string; workspaceIds: string[] }> = {};
+    const createdHomogroups: Record<string, { id: string; workspaceIds: string[] }> = {};
+
+    // First pass: Create all homogroups with merged workspace sets
     if (body.createHomo) {
       for (const [homoName, homoData] of Object.entries(mapData.globalHomoGroups)) {
         const existingHomoGroupId = homoGroupsMap[homoName]?.id;
         if (!existingHomoGroupId) {
-          const workspaceIds = homoData.workspaceNames.map((wsName) => workspaceMap[wsName]?.id).filter((id): id is string => !!id);
+          // Merge overlapping workspace sets
+          const workspaceSets = homoData.workspaceSets || [[...homoData.workspaceNames]];
+          const mergedSets = mergeOverlappingWorkspaceSets(workspaceSets);
 
-          if (workspaceIds.length > 0) {
-            const homogroup = await this.createHomogroup(
-              {
-                companyId,
-                name: homoName,
-                description: homoData.description || '',
-                workspaceIds,
-              },
-              company,
-            );
-            createdHomogroups[homoName] = homogroup.id;
+          // Create a separate homogroup for each non-overlapping workspace set
+          for (let i = 0; i < mergedSets.length; i++) {
+            const workspaceNames = mergedSets[i];
+            const workspaceIds = workspaceNames.map((wsName) => workspaceMap[wsName]?.id).filter((id): id is string => !!id);
+
+            if (workspaceIds.length > 0) {
+              const homogroup = await this.createHomogroup(
+                {
+                  companyId,
+                  name: homoName,
+                  description: homoData.description || '',
+                  workspaceIds,
+                },
+                company,
+              );
+
+              // Store with index if multiple groups, otherwise just the name
+              const key = mergedSets.length > 1 ? `${homoName}--${i}` : homoName;
+              createdHomogroups[key] = { id: homogroup.id, workspaceIds };
+            }
           }
         }
       }
     }
 
-    // Create global hierarchies with all their workspaceIds (in order by type)
+    // Create all hierarchies with merged workspace sets (in order by type)
     if (body.createHierarchy) {
       const hierarchyTypes = [HierarchyEnum.DIRECTORY, HierarchyEnum.MANAGEMENT, HierarchyEnum.SECTOR, HierarchyEnum.SUB_SECTOR, HierarchyEnum.OFFICE, HierarchyEnum.SUB_OFFICE];
 
@@ -764,48 +827,73 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
         const hierarchiesOfType = Object.entries(mapData.globalHierarchies).filter(([, h]) => h.type === hierarchyType);
 
         for (const [hierarchyPath, hierarchyData] of hierarchiesOfType) {
-          // Check if hierarchy already exists in any of its workspaces
-          const workspaceIds = hierarchyData.workspaceNames.map((wsName) => workspaceMap[wsName]?.id).filter((id): id is string => !!id);
+          // Merge overlapping workspace sets
+          const workspaceSets = hierarchyData.workspaceSets || [[...hierarchyData.workspaceNames]];
+          const mergedSets = mergeOverlappingWorkspaceSets(workspaceSets);
 
-          // Check if already exists in ANY workspace (not just the first one)
-          let existingHierarchyId: string | undefined;
-          for (const wsId of workspaceIds) {
-            const fullPath = wsId + '--' + hierarchyPath;
-            existingHierarchyId = hierarchyPathMap[fullPath]?.id;
-            if (existingHierarchyId) break;
-          }
+          // Create a separate hierarchy for each non-overlapping workspace set
+          for (let i = 0; i < mergedSets.length; i++) {
+            const workspaceNames = mergedSets[i];
+            const workspaceIds = workspaceNames.map((wsName) => workspaceMap[wsName]?.id).filter((id): id is string => !!id);
 
-          if (!existingHierarchyId && workspaceIds.length > 0) {
-            // Get parent ID from already created hierarchies or existing ones
-            let parentId: string | null = null;
-            if (hierarchyData.parentPath) {
-              parentId = createdHierarchies[hierarchyData.parentPath] || null;
-              if (!parentId) {
-                // Try to find parent in any workspace
-                for (const wsId of workspaceIds) {
-                  const parentFullPath = wsId + '--' + hierarchyData.parentPath;
-                  parentId = hierarchyPathMap[parentFullPath]?.id || null;
-                  if (parentId) break;
-                }
-              }
+            // Check if already exists in ANY of these workspaces
+            let existingHierarchyId: string | undefined;
+            for (const wsId of workspaceIds) {
+              const fullPath = wsId + '--' + hierarchyPath;
+              existingHierarchyId = hierarchyPathMap[fullPath]?.id;
+              if (existingHierarchyId) break;
             }
 
-            const hierarchy = await this.createHierarchy(
-              {
-                companyId,
-                name: hierarchyData.name,
-                description: hierarchyData.description || '',
-                type: hierarchyData.type,
-                realDescription: hierarchyData.realDescription,
-                workspaceIds,
-                parentId,
-              },
-              company,
-            );
+            if (!existingHierarchyId && workspaceIds.length > 0) {
+              // Get parent ID - need to find the parent that has overlapping workspaces
+              let parentId: string | null = null;
+              if (hierarchyData.parentPath) {
+                // Try to find a created parent that has overlapping workspaces
+                for (let j = 0; j < 10; j++) {
+                  const parentKey = j === 0 ? hierarchyData.parentPath : `${hierarchyData.parentPath}--${j}`;
+                  const parentMatch = createdHierarchies[parentKey];
+                  if (parentMatch) {
+                    // Check if parent has overlapping workspaces
+                    const hasOverlap = parentMatch.workspaceIds.some((wsId) => workspaceIds.includes(wsId));
+                    if (hasOverlap) {
+                      parentId = parentMatch.id;
+                      break;
+                    }
+                  }
+                  if (j === 0 && !createdHierarchies[hierarchyData.parentPath]) break;
+                }
 
-            createdHierarchies[hierarchyPath] = hierarchy.id;
-          } else if (existingHierarchyId) {
-            createdHierarchies[hierarchyPath] = existingHierarchyId;
+                // If no created parent found, try database
+                if (!parentId) {
+                  for (const wsId of workspaceIds) {
+                    const parentFullPath = wsId + '--' + hierarchyData.parentPath;
+                    parentId = hierarchyPathMap[parentFullPath]?.id || null;
+                    if (parentId) break;
+                  }
+                }
+              }
+
+              const hierarchy = await this.createHierarchy(
+                {
+                  companyId,
+                  name: hierarchyData.name,
+                  description: hierarchyData.description || '',
+                  type: hierarchyData.type,
+                  realDescription: hierarchyData.realDescription,
+                  workspaceIds,
+                  parentId,
+                },
+                company,
+              );
+
+              // Store with index if multiple groups, otherwise just the path
+              const key = mergedSets.length > 1 ? `${hierarchyPath}--${i}` : hierarchyPath;
+              createdHierarchies[key] = { id: hierarchy.id, workspaceIds };
+            } else if (existingHierarchyId) {
+              // Store existing hierarchy
+              const key = mergedSets.length > 1 ? `${hierarchyPath}--${i}` : hierarchyPath;
+              createdHierarchies[key] = { id: existingHierarchyId, workspaceIds };
+            }
           }
         }
       }
@@ -817,39 +905,91 @@ export class FileCompanyStructureProduct implements IFileFactoryProduct {
 
       mapData.workspace[workspaceName].id = workspaceId;
 
-      // Assign homogroup IDs (from created or existing)
+      // Assign homogroup IDs
       const promisesHomogroups = Object.keys(workspaceValue.homogeneousGroup).map((homoName) => {
-        const homogeneousGroupId = createdHomogroups[homoName] || homoGroupsMap[homoName]?.id;
-        if (!homogeneousGroupId && !body.createHomo) {
-          return this.throwError(`Grupo homogênio ${homoName} não encontrado`);
-        }
-
         return async () => {
-          mapData.workspace[workspaceName].homogeneousGroup[homoName].id = homogeneousGroupId;
+          // Find the matching created or existing homogroup
+          let homogeneousGroupId: string | undefined;
+
+          // Check existing in database
+          const existingHomo = homoGroupsMap[homoName];
+          if (existingHomo) {
+            homogeneousGroupId = existingHomo.id;
+          } else {
+            // Check created homogroups - try exact match first
+            const exactMatch = createdHomogroups[homoName];
+            if (exactMatch && exactMatch.workspaceIds.includes(workspaceId)) {
+              homogeneousGroupId = exactMatch.id;
+            } else {
+              // Try indexed keys (for multiple non-overlapping groups)
+              for (let i = 0; i < 10; i++) {
+                const key = `${homoName}--${i}`;
+                const indexedMatch = createdHomogroups[key];
+                if (indexedMatch && indexedMatch.workspaceIds.includes(workspaceId)) {
+                  homogeneousGroupId = indexedMatch.id;
+                  break;
+                }
+              }
+            }
+          }
+
+          if (!homogeneousGroupId && !body.createHomo) {
+            return this.throwError(`Grupo homogênio ${homoName} não encontrado`);
+          }
+
+          if (homogeneousGroupId) {
+            mapData.workspace[workspaceName].homogeneousGroup[homoName].id = homogeneousGroupId;
+          }
         };
       });
 
-      // Assign hierarchy IDs (from created or existing)
+      // Assign hierarchy IDs
       const handleHierarchy = (hierarchiesMan: IDataReturnHierarchy[]) => {
         return hierarchiesMan.map(({ value: hierarchyPath }) => {
-          const fullPath = workspaceId + '--' + hierarchyPath;
-          const hierarchyId = createdHierarchies[hierarchyPath] || hierarchyPathMap[fullPath]?.id;
-
-          if (!hierarchyId && !body.createHierarchy) {
-            return this.throwError(
-              `Departamento ${hierarchyPath
-                .split('--')
-                .filter((v) => v != emptyHierarchy)
-                .join(' --> ')} não encontrado`,
-            );
-          }
-
           return async () => {
-            mapData.workspace[workspaceName].hierarchies[hierarchyPath].id = hierarchyId;
+            const fullPath = workspaceId + '--' + hierarchyPath;
+
+            // Find the matching created or existing hierarchy
+            let hierarchyId: string | undefined;
+
+            // Check existing in database
+            hierarchyId = hierarchyPathMap[fullPath]?.id;
+
+            if (!hierarchyId) {
+              // Check created hierarchies - try exact match first
+              const exactMatch = createdHierarchies[hierarchyPath];
+              if (exactMatch && exactMatch.workspaceIds.includes(workspaceId)) {
+                hierarchyId = exactMatch.id;
+              } else {
+                // Try indexed keys (for multiple non-overlapping groups)
+                for (let i = 0; i < 10; i++) {
+                  const key = `${hierarchyPath}--${i}`;
+                  const indexedMatch = createdHierarchies[key];
+                  if (indexedMatch && indexedMatch.workspaceIds.includes(workspaceId)) {
+                    hierarchyId = indexedMatch.id;
+                    break;
+                  }
+                }
+              }
+            }
+
+            if (!hierarchyId && !body.createHierarchy) {
+              return this.throwError(
+                `Departamento ${hierarchyPath
+                  .split('--')
+                  .filter((v) => v != emptyHierarchy)
+                  .join(' --> ')} não encontrado`,
+              );
+            }
+
+            if (hierarchyId) {
+              mapData.workspace[workspaceName].hierarchies[hierarchyPath].id = hierarchyId;
+            }
           };
         });
       };
 
+      // Process hierarchies in order (parents before children)
       const hierarchies = Object.values(workspaceValue.hierarchies);
       const promiseHierarchiesDir = handleHierarchy(hierarchies.filter((h) => h.type == HierarchyEnum.DIRECTORY));
       const promiseHierarchiesMan = handleHierarchy(hierarchies.filter((h) => h.type == HierarchyEnum.MANAGEMENT));
