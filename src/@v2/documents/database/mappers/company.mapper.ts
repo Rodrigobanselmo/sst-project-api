@@ -20,18 +20,19 @@ export type ICompanyMapper = Company & {
 
 export class CompanyMapper {
   static toModel(data: ICompanyMapper): CompanyModel {
-    const consultant =
-      data.receivingServiceContracts.find((consult) => !consult?.applyingServiceCompany?.isGroup)
-        ?.applyingServiceCompany || null;
+    const consultant = data.receivingServiceContracts.find((consult) => !consult?.applyingServiceCompany?.isGroup)?.applyingServiceCompany || null;
     const primaryActivity = data.primary_activity[0];
 
-    const covers = data.covers.map(
-      (cover) =>
-        new CoverModel({
-          types: cover.acceptType.map((type) => CoverTypeEnum[type]),
-          data: new CompanyDocumentsCoverVO(cover.json as any),
-        }),
-    );
+    const covers = data.covers.map((cover) => {
+      // Handle both formats: { coverProps: {...} } and { logoProps: {...}, ... }
+      const jsonData = cover.json as any;
+      const coverData = jsonData?.coverProps || jsonData;
+
+      return new CoverModel({
+        types: cover.acceptType.map((type) => CoverTypeEnum[type]),
+        data: new CompanyDocumentsCoverVO(coverData),
+      });
+    });
 
     if (covers.length === 0) {
       const cover = new CoverModel({
@@ -73,13 +74,15 @@ export class CompanyMapper {
             address: consultant.address ? new AddressModel(consultant.address) : null,
             logoUrl: consultant.logoUrl,
             name: consultant.name,
-            covers: consultant.covers.map(
-              (cover) =>
-                new CoverModel({
-                  types: cover.acceptType.map((type) => CoverTypeEnum[type]),
-                  data: new CompanyDocumentsCoverVO(cover.json as any),
-                }),
-            ),
+            covers: consultant.covers.map((cover) => {
+              const jsonData = cover.json as any;
+              const coverData = jsonData?.coverProps || jsonData;
+
+              return new CoverModel({
+                types: cover.acceptType.map((type) => CoverTypeEnum[type]),
+                data: new CompanyDocumentsCoverVO(coverData),
+              });
+            }),
           })
         : null,
     });

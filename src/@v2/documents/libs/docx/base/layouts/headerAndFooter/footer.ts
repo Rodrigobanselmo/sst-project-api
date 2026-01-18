@@ -52,33 +52,33 @@ const firstCell = (title: string, footerText: string, version: string) =>
             text: title,
             size: 12,
             color: palette.text.main.string,
-          }),
+          } as any),
         ],
         alignment: AlignmentType.START,
         spacing: { after: 0, before: 100 },
-      }),
+      } as any),
       new Paragraph({
         children: [
           new TextRun({
             text: footerText,
             size: 12,
             color: palette.text.main.string,
-          }),
+          } as any),
         ],
         alignment: AlignmentType.START,
         spacing: { after: 0, before: 0 },
-      }),
+      } as any),
       new Paragraph({
         children: [
           new TextRun({
             text: version,
             size: 12,
             color: palette.text.main.string,
-          }),
+          } as any),
         ],
         alignment: AlignmentType.START,
         spacing: { after: 0, before: 0 },
-      }),
+      } as any),
     ],
   });
 
@@ -93,17 +93,17 @@ const secondCell = (consultantLogoPath: string) => {
               size: 42,
               color: palette.text.main.string,
               bold: true,
-            }),
+            } as any),
             new TextRun({
               text: 'SST',
               size: 42,
               color: palette.text.simple.string,
               bold: true,
-            }),
+            } as any),
           ],
           alignment: AlignmentType.END,
           spacing: { after: 0, before: 0 },
-        }),
+        } as any),
       ],
     });
 
@@ -121,7 +121,7 @@ const secondCell = (consultantLogoPath: string) => {
     ? new ImageRun({
       data: readFileSync(consultantLogoPath),
       transformation: getProportion(),
-    })
+    } as any)
     : undefined;
 
   return new TableCell({
@@ -131,7 +131,7 @@ const secondCell = (consultantLogoPath: string) => {
         children: image ? [image] : [],
         alignment: AlignmentType.END,
         spacing: { after: 0, before: 100 },
-      }),
+      } as any),
     ],
     margins: { top: 0 },
   });
@@ -146,10 +146,10 @@ export const createFooter = ({ title, footerText, version, consultantLogoPath }:
   const footer = {
     default: new Footer({
       children: [table([row(title, footerText, version, consultantLogoPath)])],
-    }),
+    } as any),
     first: new Footer({
       children: [],
-    }),
+    } as any),
   };
 
   return footer;

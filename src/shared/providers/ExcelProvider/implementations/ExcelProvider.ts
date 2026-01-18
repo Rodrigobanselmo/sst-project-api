@@ -284,7 +284,7 @@ class ExcelProvider implements IExcelProvider {
     const workbook = new ExcelJS.Workbook();
 
     try {
-      const workSheetsFromBuffer = await workbook.xlsx.load(buffer);
+      const workSheetsFromBuffer = await workbook.xlsx.load(buffer as any);
       const workbookData: IExcelReadData[] = [];
 
       workSheetsFromBuffer.eachSheet((sheet) => {

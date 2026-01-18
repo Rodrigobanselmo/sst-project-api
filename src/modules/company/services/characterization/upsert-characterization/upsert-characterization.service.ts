@@ -25,7 +25,7 @@ export class UpsertCharacterizationService {
     { photos, createWithId, ...upsertCharacterizationDto }: UpsertCharacterizationDto,
     workspaceId: string,
     userPayloadDto: UserPayloadDto,
-    files: Array<Express.Multer.File>,
+    files: Array<any>,
   ) {
     const companyId = userPayloadDto.targetCompanyId;
     const inactivating = upsertCharacterizationDto.status == 'INACTIVE';
@@ -105,7 +105,7 @@ export class UpsertCharacterizationService {
     return characterizationData;
   }
 
-  private async upload(companyId: string, files: Array<Express.Multer.File>) {
+  private async upload(companyId: string, files: Array<any>) {
     const urls = await Promise.all(
       files.map(async (file) => {
         const fileType = file.originalname.split('.')[file.originalname.split('.').length - 1];

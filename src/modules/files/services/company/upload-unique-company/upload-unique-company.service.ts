@@ -29,7 +29,7 @@ export class UploadUniqueCompanyService {
     private readonly hierarchyRepository: HierarchyRepository,
   ) {}
 
-  async execute(file: Express.Multer.File, userPayloadDto: UserPayloadDto) {
+  async execute(file: any, userPayloadDto: UserPayloadDto) {
     if (!file) throw new BadRequestException(`file is not available`);
     const buffer = file.buffer;
     const hierarchyExcel = new HierarchyExcelProvider();

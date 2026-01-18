@@ -15,13 +15,13 @@ export const HFullWidthImage = (image: string, text: string, options?: IParagrap
             width: fullWidth,
             height: fullWidth * (9 / 16),
           },
-        }),
+        } as any),
       ],
       spacing: { after: 100 },
       ...options,
-    }),
+    } as any),
     paragraphFigure(text, {
       spacingAfter: 200,
-    }),
+    } as any),
   ].filter((i) => i) as Paragraph[];
 };

@@ -18,7 +18,7 @@ export class AddCharacterizationPhotoService {
     private readonly amazonStorageProvider: AmazonStorageProvider,
   ) {}
 
-  async execute(addPhotoCharacterizationDto: AddPhotoCharacterizationDto, userPayloadDto: UserPayloadDto, file: Express.Multer.File) {
+  async execute(addPhotoCharacterizationDto: AddPhotoCharacterizationDto, userPayloadDto: UserPayloadDto, file: any) {
     const companyId = userPayloadDto.targetCompanyId;
     const [photoUrl, isVertical] = await this.upload(companyId, file);
 
@@ -45,7 +45,7 @@ export class AddCharacterizationPhotoService {
     return characterizationData;
   }
 
-  public async upload(companyId: string, file: Express.Multer.File, opt?: { id?: string }) {
+  public async upload(companyId: string, file: any, opt?: { id?: string }) {
     const fileType = file.originalname.split('.')[file.originalname.split('.').length - 1];
     const path = 'characterization/' + (opt?.id || v4()) + '.' + fileType;
 

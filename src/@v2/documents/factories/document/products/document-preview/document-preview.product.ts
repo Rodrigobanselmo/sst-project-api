@@ -79,15 +79,20 @@ export class ProductDocumentPreview implements IDocumentFactoryProduct<IProductD
     const images = document.model.images;
     const company = document.documentBase.company;
     const consultant = document.documentBase.company.consultant;
+    const workspace = document.documentBase.workspace;
 
     const companyLogoPath = 'images/logo/logo-main.png';
     const consultantLogoPath = 'images/logo/logo-simple.png';
+    const workspaceLogoPath = 'images/logo/logo-main.png';
 
     if (companyLogoPath) {
       company.logoPath = companyLogoPath;
     }
     if (consultantLogoPath && consultant) {
       consultant.logoPath = consultantLogoPath;
+    }
+    if (workspaceLogoPath && workspace) {
+      workspace.logoPath = workspaceLogoPath;
     }
 
     images.forEach((image) => {

@@ -15,10 +15,10 @@ export const VFullWidthImage = (image: string, text: string, options?: IParagrap
             width: fullWidth * (9 / 16),
             height: fullWidth,
           },
-        }),
+        } as any),
       ],
       ...options,
-    }),
-    paragraphFigure(text, { spacingAfter: 200 }),
+    } as any),
+    paragraphFigure(text, { spacingAfter: 200 } as any),
   ].filter((i) => i) as Paragraph[];
 };

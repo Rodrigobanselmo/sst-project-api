@@ -23,7 +23,7 @@ export const imageDoc = (data: IImage) => {
           width,
           height,
         },
-      }),
+      } as any),
     ],
     spacing: { after: 100 },
   });

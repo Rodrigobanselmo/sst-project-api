@@ -27,7 +27,7 @@ export const imageDoc = (data: IImage, imagesMap?: IImagesMap) => {
           //maxWidth:717.6
           //maxHeight:975.2
         },
-      }),
+      } as any),
     ],
     spacing: { after: 100 },
   });

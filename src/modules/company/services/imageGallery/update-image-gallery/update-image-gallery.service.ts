@@ -14,7 +14,7 @@ export class UpdateImageGalleryService {
     private readonly amazonStorageProvider: AmazonStorageProvider,
   ) {}
 
-  async execute(id: number, file: Express.Multer.File, body: UpdateImageGalleryDto, user: UserPayloadDto) {
+  async execute(id: number, file: any, body: UpdateImageGalleryDto, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;
     let url: string;
 

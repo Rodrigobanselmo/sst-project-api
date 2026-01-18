@@ -15,7 +15,7 @@ export class CreateDocumentService {
     private readonly amazonStorageProvider: AmazonStorageProvider,
   ) {}
 
-  async execute({ parentDocumentId, ...dto }: CreateDocumentDto, user: UserPayloadDto, file: Express.Multer.File) {
+  async execute({ parentDocumentId, ...dto }: CreateDocumentDto, user: UserPayloadDto, file: any) {
     const companyId = user.targetCompanyId;
 
     if (parentDocumentId) {
@@ -86,7 +86,7 @@ export class CreateDocumentService {
     return document;
   }
 
-  private async upload(companyId: string, file: Express.Multer.File, dto: CreateDocumentDto) {
+  private async upload(companyId: string, file: any, dto: CreateDocumentDto) {
     const fileType = file.originalname.split('.')[file.originalname.split('.').length - 1];
     const path = 'documents/' + `${dto?.name || ''}-${v4()}` + '.' + fileType;
 

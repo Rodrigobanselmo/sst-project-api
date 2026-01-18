@@ -16,7 +16,7 @@ export class UploadExamFileService {
     private readonly amazonStorageProvider: AmazonStorageProvider,
   ) {}
 
-  async execute({ ids }: UpdateFileExamDto, user: UserPayloadDto, file: Express.Multer.File) {
+  async execute({ ids }: UpdateFileExamDto, user: UserPayloadDto, file: any) {
     const companyId = user.targetCompanyId;
 
     const found = await this.employeeExamHistoryRepository.findNude({
@@ -46,7 +46,7 @@ export class UploadExamFileService {
     return document;
   }
 
-  private async upload(companyId: string, file: Express.Multer.File, examFound: EmployeeExamsHistoryEntity[]) {
+  private async upload(companyId: string, file: any, examFound: EmployeeExamsHistoryEntity[]) {
     const fileUrls = removeDuplicate(
       examFound.map((exam) => exam.fileUrl).filter((i) => i),
       { removeById: 'fileUrl' },

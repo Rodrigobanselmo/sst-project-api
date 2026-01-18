@@ -18,7 +18,7 @@ export class FilesCnaeController {
   @Roles(RoleEnum.MASTER)
   @Post('/upload')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadCnaeFile(@UploadedFile() file: Express.Multer.File, @User() userPayloadDto: UserPayloadDto, @Res() res) {
+  async uploadCnaeFile(@UploadedFile() file: any, @User() userPayloadDto: UserPayloadDto, @Res() res) {
     const { workbook, filename } = await this.uploadCnaeService.execute(file, userPayloadDto);
 
     res.attachment(filename);

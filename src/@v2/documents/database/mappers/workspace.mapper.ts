@@ -23,6 +23,7 @@ export class WorkspaceMapper {
       cnaeLabel: json.primaryActivity?.name || null,
       cnaeCode: json.primaryActivity?.code || null,
       workSchedule: json.workSchedule || null,
+      logoUrl: data.logoUrl || null,
     });
   }
 }

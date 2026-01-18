@@ -28,7 +28,7 @@ export class ESocialEventController {
 
   @Post('certificate')
   @UseInterceptors(FileInterceptor('file', { fileFilter: pfxFileFilter }))
-  addCert(@UploadedFile() file: Express.Multer.File, @User() user: UserPayloadDto, @Body() body: AddCertDto) {
+  addCert(@UploadedFile() file: any, @User() user: UserPayloadDto, @Body() body: AddCertDto) {
     return this.addCertificationESocialService.execute(file, body, user);
   }
 

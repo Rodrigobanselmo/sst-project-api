@@ -35,20 +35,20 @@ const jsonCover = {
 };
 
 export const planlinkCover = async (prisma: PrismaClient) => {
-  // await prisma.documentCover.create({
-  //   data: {
-  //     json: jsonCover,
-  //     companyId: realizaId,
-  //   },
-  // });
   const planlink = await prisma.documentCover.findFirst({
     where: { companyId: planlinkId },
   });
-  await prisma.documentCover.update({
-    data: {
+
+  await prisma.documentCover.upsert({
+    where: { id: planlink?.id ?? 0 },
+    update: {
+      json: jsonCover,
+    },
+    create: {
       json: jsonCover,
       companyId: planlinkId,
     },
-    where: { id: planlink?.id ?? 0 },
   });
 };
+
+planlinkCover(new PrismaClient());

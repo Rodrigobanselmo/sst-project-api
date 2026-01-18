@@ -61,7 +61,7 @@ export class ImageGalleryController {
   @Post()
   @UseInterceptors(FileInterceptor('file'))
   async uploadRiskFile(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file: any,
     @Body() body: CreateImageGalleryDto,
     @User() user: UserPayloadDto,
   ) {
@@ -77,7 +77,7 @@ export class ImageGalleryController {
   @UseInterceptors(FileInterceptor('file'))
   @Patch('/:id')
   async update(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file: any,
     @Body() body: UpdateImageGalleryDto,
     @User() user: UserPayloadDto,
     @Param('id', ParseIntPipe) id: number,

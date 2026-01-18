@@ -18,7 +18,7 @@ export class CreateImageGalleyService {
     private readonly amazonStorageProvider: AmazonStorageProvider,
   ) {}
 
-  async execute(body: CreateImageGalleryDto, userPayloadDto: UserPayloadDto, file: Express.Multer.File) {
+  async execute(body: CreateImageGalleryDto, userPayloadDto: UserPayloadDto, file: any) {
     const companyId = userPayloadDto.targetCompanyId;
     const url = await this.upload(companyId, file);
 
@@ -31,7 +31,7 @@ export class CreateImageGalleyService {
     return result;
   }
 
-  public async upload(companyId: string, file: Express.Multer.File, opt?: { id?: string }) {
+  public async upload(companyId: string, file: any, opt?: { id?: string }) {
     const fileType = file.originalname.split('.')[file.originalname.split('.').length - 1];
     const path = 'gallery/' + (opt?.id || v4()) + '.' + fileType;
 

@@ -13,13 +13,13 @@ export class SendEmailService {
     private readonly prisma: PrismaService,
   ) {}
 
-  async execute(user: UserPayloadDto, dto: EmailDto, files?: Array<Express.Multer.File>) {
+  async execute(user: UserPayloadDto, dto: EmailDto, files?: Array<any>) {
     if (dto.template === EmailsTemplatesEnum.REFERRAL_GUIDE) {
       this.sendReferralGuide(user, dto, files);
     }
   }
 
-  async sendReferralGuide(user: UserPayloadDto, dto: EmailDto, files?: Array<Express.Multer.File>) {
+  async sendReferralGuide(user: UserPayloadDto, dto: EmailDto, files?: Array<any>) {
     const templatePath = resolve(__dirname, '..', '..', '..', '..', 'templates', '@v1', 'email', 'referralGuide.hbs');
 
     await this.mailProvider.sendMail({

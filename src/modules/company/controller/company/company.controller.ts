@@ -1,31 +1,14 @@
 import { Public } from './../../../../shared/decorators/public.decorator';
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Post,
-  Query,
-  UploadedFile,
-  UseInterceptors,
-} from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import { FindActivityDto } from '../../dto/activity.dto';
 import { SetCompanyClinicDto, TestRoute123CompanyDto } from '../../dto/company-clinic.dto';
-import {
-  CreateCompanyDto,
-  FindCompaniesDto,
-  UpdateApplyServiceCompanyDto,
-  UpdateCompanyDto,
-} from '../../dto/company.dto';
+import { CreateCompanyDto, FindCompaniesDto, UpdateApplyServiceCompanyDto, UpdateCompanyDto } from '../../dto/company.dto';
 import { AddCompanyPhotoService } from '../../services/company/add-company-photo/add-company-photo.service';
+import { AddWorkspacePhotoService } from '../../services/workspace/add-workspace-photo/add-workspace-photo.service';
 import { CopyCompanyService } from '../../services/company/copy-company/copy-company.service';
 import { CreateCompanyService } from '../../services/company/create-company/create-company.service';
 import { CreateContractService } from '../../services/company/create-contract/create-contract.service';
@@ -67,7 +50,8 @@ export class CompanyController {
     private readonly updateAllCompaniesService: UpdateAllCompaniesService,
     private readonly updateApplyServiceCompanyService: UpdateApplyServiceCompanyService,
     private readonly deleteCompanyService: DeleteCompanyService,
-  ) { }
+    private readonly addWorkspacePhotoService: AddWorkspacePhotoService,
+  ) {}
 
   @Roles(RoleEnum.COMPANY, RoleEnum.CONTRACTS, RoleEnum.CLINICS, RoleEnum.USER, RoleEnum.DOCTOR)
   @Permissions({ isContract: true, isMember: true })
@@ -177,8 +161,20 @@ export class CompanyController {
   })
   @Post('/:companyId/photo')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadRiskFile(@UploadedFile() file: Express.Multer.File, @User() userPayloadDto: UserPayloadDto) {
+  async uploadRiskFile(@UploadedFile() file: any, @User() userPayloadDto: UserPayloadDto) {
     return this.addCompanyPhotoService.execute(userPayloadDto, file);
+  }
+
+  @Permissions({
+    code: PermissionEnum.COMPANY,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
+  @Post('/:companyId/workspace/:workspaceId/photo')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadWorkspacePhoto(@UploadedFile() file: any, @Param('workspaceId') workspaceId: string, @User() userPayloadDto: UserPayloadDto) {
+    return this.addWorkspacePhotoService.execute(workspaceId, userPayloadDto, file);
   }
 
   @Permissions({
@@ -222,11 +218,7 @@ export class CompanyController {
     crud: true,
   })
   @Post('/copy/:copyFromCompanyId/:riskGroupId/:companyId')
-  copy(
-    @Param('copyFromCompanyId') copyFromCompanyId: string,
-    @Param('riskGroupId') riskGroupId: string,
-    @User() userPayloadDto: UserPayloadDto,
-  ) {
+  copy(@Param('copyFromCompanyId') copyFromCompanyId: string, @Param('riskGroupId') riskGroupId: string, @User() userPayloadDto: UserPayloadDto) {
     return this.copyCompanyService.execute(copyFromCompanyId, riskGroupId, userPayloadDto);
   }
 

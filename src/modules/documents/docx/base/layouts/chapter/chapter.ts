@@ -67,9 +67,9 @@ const imageCover = (imgPath: string, verticalAlign: (typeof VerticalAlign)[keyof
             data: readFileSync(imgPath),
             transformation: {
               width,
-              height,
+              height, 
             },
-          }),
+          } as any),
         ],
         alignment: AlignmentType.CENTER,
       }),

@@ -18,7 +18,7 @@ export class FilesCidController {
   @Roles(RoleEnum.MASTER)
   @Post('/upload')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadCidFile(@UploadedFile() file: Express.Multer.File, @User() userPayloadDto: UserPayloadDto, @Res() res) {
+  async uploadCidFile(@UploadedFile() file: any, @User() userPayloadDto: UserPayloadDto, @Res() res) {
     const { workbook, filename } = await this.uploadCidService.execute(file, userPayloadDto);
 
     res.attachment(filename);

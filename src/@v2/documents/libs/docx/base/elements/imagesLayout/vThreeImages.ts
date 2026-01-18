@@ -43,17 +43,17 @@ export const VThreeImages = (
                         width: width,
                         height: width * (16 / 9),
                       },
-                    }),
+                    } as any),
                   ],
                   spacing: { after: 32 },
-                }),
+                } as any),
               ],
               width: {
                 size: 33,
                 type: WidthType.PERCENTAGE,
               },
               margins: { bottom: 0, right: 10 },
-            }),
+            } as any),
             new TableCell({
               children: [
                 new Paragraph({
@@ -65,11 +65,11 @@ export const VThreeImages = (
                           width: width,
                           height: width * (16 / 9),
                         },
-                      }),
+                      } as any),
                     ]
                     : [],
                   spacing: { after: 32 },
-                }),
+                } as any),
               ],
               width: {
                 size: 33,
@@ -77,7 +77,7 @@ export const VThreeImages = (
               },
               margins: { bottom: 0 },
               verticalAlign: VerticalAlign.BOTTOM,
-            }),
+            } as any),
             new TableCell({
               children: [
                 new Paragraph({
@@ -89,35 +89,35 @@ export const VThreeImages = (
                           width: width,
                           height: width * (16 / 9),
                         },
-                      }),
+                      } as any),
                     ]
                     : [],
                   spacing: { after: 32 },
-                }),
+                } as any),
               ],
               width: {
                 size: 33,
                 type: WidthType.PERCENTAGE,
               },
               margins: { bottom: 0 },
-            }),
+            } as any),
           ],
-        }),
+        } as any),
         new TableRow({
           children: [
             new TableCell({
               children: [paragraphFigure(texts[0])].filter((i) => i) as Paragraph[],
-            }),
+            } as any),
             new TableCell({
               children: [paragraphFigure(texts[1])].filter((i) => i) as Paragraph[],
-            }),
+            } as any),
             new TableCell({
               children: [paragraphFigure(texts[2])].filter((i) => i) as Paragraph[],
-            }),
+            } as any),
           ],
-        }),
+        } as any),
       ],
       borders: borderNoneStyle,
-    }),
+    } as any),
   ];
 };

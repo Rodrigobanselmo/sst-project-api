@@ -23,7 +23,7 @@ export class UploadCnaeDataService {
     private readonly uploadExcelProvider: UploadExcelProvider,
   ) {}
 
-  async execute(file: Express.Multer.File, userPayloadDto: UserPayloadDto) {
+  async execute(file: any, userPayloadDto: UserPayloadDto) {
     if (!file) throw new BadRequestException(`file is not available`);
     const buffer = file.buffer;
 

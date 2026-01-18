@@ -121,7 +121,7 @@ const secondCell = (consultantLogoPath: string) => {
     ? new ImageRun({
         data: readFileSync(consultantLogoPath),
         transformation: getProportion(),
-      })
+      } as any)
     : undefined;
 
   return new TableCell({

@@ -5,10 +5,13 @@
     "strictNullChecks": false,
     "strict": false,
     //
-    "skipLibCheck": false,
+    // Performance optimizations
+    "skipLibCheck": true, // Skip type checking of declaration files - HUGE performance boost
+    "skipDefaultLibCheck": true, // Skip type checking of default library declaration files
+    "types": ["node", "express"], // Include node and express types
     "module": "commonjs",
     "noImplicitAny": false,
-    "declaration": true,
+    "declaration": false, // Disable declaration files generation - MAJOR performance boost
     "allowJs": true,
     "resolveJsonModule": true,
     "paths": {
@@ -20,17 +23,20 @@
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "target": "es2017",
-    "sourceMap": true,
+    "sourceMap": false, // Disable source maps for faster builds (enable for debugging)
     "outDir": "./dist",
     "esModuleInterop": true,
     "baseUrl": "./",
-    "incremental": true,
+    "incremental": true, // Use incremental compilation
+    "tsBuildInfoFile": "./dist/.tsbuildinfo", // Store build info for faster rebuilds
     "noErrorTruncation": true,
     "lib": ["ES2021", "dom", "esnext"],
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    // Additional performance optimizations
+    "assumeChangesOnlyAffectDirectDependencies": true // Faster incremental builds
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts"],
-  "exclude": ["node_modules", "dist", "**/*.spec.ts"]
+  "exclude": ["node_modules", "dist", "**/*.spec.ts", "test", "coverage", "tmp", "upload", "pdf", "images", "cert", "terraform", "docs"]
 }

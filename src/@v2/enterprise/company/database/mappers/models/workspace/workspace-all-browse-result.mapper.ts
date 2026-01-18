@@ -8,7 +8,8 @@ export type IWorkspaceBrowseResultModelMapper = {
   updated_at: Date;
   name: string;
   status: StatusEnum;
-}
+  logoUrl: string | null;
+};
 
 export class WorkspaceBrowseResultModelMapper {
   static toModel(prisma: IWorkspaceBrowseResultModelMapper): WorkspaceBrowseResultModel {
@@ -18,10 +19,11 @@ export class WorkspaceBrowseResultModelMapper {
       updatedAt: prisma.updated_at,
       name: prisma.name,
       status: WorkspaceStatusEnum[prisma.status],
-    })
+      logoUrl: prisma.logoUrl,
+    });
   }
 
   static toModels(prisma: IWorkspaceBrowseResultModelMapper[]): WorkspaceBrowseResultModel[] {
-    return prisma.map((rec) => WorkspaceBrowseResultModelMapper.toModel(rec))
+    return prisma.map((rec) => WorkspaceBrowseResultModelMapper.toModel(rec));
   }
 }

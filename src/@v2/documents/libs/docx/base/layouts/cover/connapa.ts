@@ -18,7 +18,7 @@ const title = () =>
         text: '??TITULO_DO_DOCUMENTO??',
         size: 96,
         bold: true,
-      }),
+      } as any),
     ],
     spacing: { after: 400, before: 0 },
   });
@@ -29,7 +29,7 @@ const textShow = (version: string) =>
       new TextRun({
         text: version,
         size: 40,
-      }),
+      } as any),
     ],
     spacing: { after: 100, before: 0 },
   });
@@ -50,7 +50,7 @@ const imageCover = (imgPath: string) => {
           width,
           height,
         },
-      }),
+      } as any),
     ],
     alignment: AlignmentType.CENTER,
   });

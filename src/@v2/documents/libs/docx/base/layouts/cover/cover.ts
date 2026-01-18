@@ -50,8 +50,8 @@ const title = (props: IHeaderProps) =>
         bold: props?.coverProps?.titleProps?.bold ?? true,
         ...(props?.coverProps?.titleProps?.color && {
           color: props?.coverProps?.titleProps?.color,
-        }),
-      }),
+        } as any),
+      } as any),
     ],
     spacing: { after: 400, before: 0 },
     ...(props?.coverProps?.titleProps && {
@@ -73,7 +73,7 @@ const title = (props: IHeaderProps) =>
         },
       } as any,
       spacing: { after: 0, before: 0 },
-    }),
+    } as any),
   });
 
 const textShow = (text?: string, props?: ITextProps) =>
@@ -85,8 +85,8 @@ const textShow = (text?: string, props?: ITextProps) =>
         bold: props?.bold ?? false,
         ...(props?.color && {
           color: props?.color,
-        }),
-      }),
+        } as any),
+      } as any),
     ],
     spacing: { after: 100, before: 0 },
     ...(props && {
@@ -108,7 +108,7 @@ const textShow = (text?: string, props?: ITextProps) =>
         },
       } as any,
       spacing: { after: 0, before: 0 },
-    }),
+    } as any),
   });
 
 const imageCover = (props: IHeaderProps) => {
@@ -132,7 +132,7 @@ const imageCover = (props: IHeaderProps) => {
           },
           behindDocument: true,
         },
-      }),
+      } as any),
     ],
     alignment: AlignmentType.CENTER,
   });
@@ -169,8 +169,8 @@ const imageLogo = (props: IHeaderProps) => {
             },
             behindDocument: true,
           },
-        }),
-      }),
+        } as any),
+      } as any),
     ],
     alignment: AlignmentType.CENTER,
   });

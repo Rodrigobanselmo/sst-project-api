@@ -5,6 +5,8 @@ upload_data.xlsx
 
 # compiled output
 /dist
+*.tsbuildinfo
+.tsbuildinfo
 .terraform
 .terraform.lock.hcl
 .terraformrc

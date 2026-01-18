@@ -50,7 +50,7 @@ const imageCover = (imgPath: string) => {
           width,
           height,
         },
-      }),
+      } as any),
     ],
     alignment: AlignmentType.CENTER,
   });

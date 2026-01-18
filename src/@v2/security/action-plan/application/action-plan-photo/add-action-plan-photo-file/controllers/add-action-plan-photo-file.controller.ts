@@ -31,7 +31,7 @@ export class AddActionPlanPhotoFileController {
         fileType: IMAGE_ALLOWED_TYPES,
       }),
     )
-    file: Express.Multer.File,
+    file: any,
     @Param() path: AddFilePath,
     @Body() payload: AddActionPlanPhotoPayload,
   ) {

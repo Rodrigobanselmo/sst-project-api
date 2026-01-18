@@ -161,7 +161,7 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
       created_at: new Date(),
     });
 
-    const { consultantLogo, logo } = await this.downloadLogos(company, consultant);
+    const { consultantLogo, logo, workspaceLogo } = await this.downloadLogos(company, consultant, workspace);
 
     versions.unshift(version);
 
@@ -186,6 +186,11 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
         },
       });
 
+    // Set workspace logo path if available
+    if (workspaceLogo) {
+      workspace.logoPath = workspaceLogo;
+    }
+
     return {
       company,
       workspace,
@@ -202,6 +207,7 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
       docId,
       consultantLogo,
       logo,
+      workspaceLogo,
       characterizations,
       cover,
       imagesMap,
@@ -532,13 +538,14 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
     });
   };
 
-  public async downloadLogos(company: CompanyEntity, consultant: CompanyEntity) {
-    const [logo, consultantLogo] = await this.downloadPathLogoImage(company?.logoUrl, consultant?.logoUrl);
+  public async downloadLogos(company: CompanyEntity, consultant: CompanyEntity, workspace?: any) {
+    const [logo, consultantLogo, workspaceLogo] = await this.downloadPathLogoImage(company?.logoUrl, consultant?.logoUrl, workspace?.logoUrl);
 
     if (logo) this.unlinkPaths.push({ path: logo, url: company?.logoUrl });
     if (consultantLogo) this.unlinkPaths.push({ path: consultantLogo, url: consultant?.logoUrl });
+    if (workspaceLogo) this.unlinkPaths.push({ path: workspaceLogo, url: workspace?.logoUrl });
 
-    return { logo, consultantLogo: consultantLogo || 'images/logo/logo-simple.png' };
+    return { logo, consultantLogo: consultantLogo || 'images/logo/logo-simple.png', workspaceLogo };
   }
 
   private getHierarchyData(
@@ -659,16 +666,17 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
     return { imagesMap };
   }
 
-  public async downloadPathLogoImage(logoUrl: string, consultLogoUrl: string) {
+  public async downloadPathLogoImage(logoUrl: string, consultLogoUrl: string, workspaceLogoUrl?: string) {
     if (!this.localCreation) {
       const logo = getPathImage(logoUrl);
       const consultantLogo = getPathImage(consultLogoUrl);
+      const workspaceLogo = getPathImage(workspaceLogoUrl);
 
-      return [logo, consultantLogo];
+      return [logo, consultantLogo, workspaceLogo];
     }
 
-    const [logo, consultantLogo] = await downloadPathImages([logoUrl, consultLogoUrl]);
-    return [logo, consultantLogo];
+    const [logo, consultantLogo, workspaceLogo] = await downloadPathImages([logoUrl, consultLogoUrl, workspaceLogoUrl]);
+    return [logo, consultantLogo, workspaceLogo];
   }
 
   public async downloadPathImage(url: string) {

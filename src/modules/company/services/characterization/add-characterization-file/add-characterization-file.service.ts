@@ -18,7 +18,7 @@ export class AddCharacterizationFileService {
     private readonly amazonStorageProvider: AmazonStorageProvider,
   ) {}
 
-  async execute(addFileCharacterizationDto: AddFileCharacterizationDto, userPayloadDto: UserPayloadDto, file: Express.Multer.File) {
+  async execute(addFileCharacterizationDto: AddFileCharacterizationDto, userPayloadDto: UserPayloadDto, file: any) {
     const fileUrl = await this.upload(file);
 
     if (addFileCharacterizationDto.id) {
@@ -40,7 +40,7 @@ export class AddCharacterizationFileService {
     return characterizationData;
   }
 
-  public async upload(file: Express.Multer.File, opt?: { id?: string }) {
+  public async upload(file: any, opt?: { id?: string }) {
     const fileBuffer = await this.convertFileBuffer(file);
 
     const fileType = file.originalname.split('.')[file.originalname.split('.').length - 1];
@@ -55,7 +55,7 @@ export class AddCharacterizationFileService {
     return url;
   }
 
-  private async convertFileBuffer(file: Express.Multer.File) {
+  private async convertFileBuffer(file: any) {
     if (!file?.originalname) return file.buffer;
 
     const originalExtension = file.originalname.split('.').pop()?.toLowerCase() || '';

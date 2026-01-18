@@ -42,7 +42,7 @@ export class NotificationController {
 
   @Post('email')
   @UseInterceptors(FilesInterceptor('files[]', 5))
-  sendEmail(@User() user: UserPayloadDto, @Body() dto: EmailDto, @UploadedFiles() files?: Array<Express.Multer.File>) {
+  sendEmail(@User() user: UserPayloadDto, @Body() dto: EmailDto, @UploadedFiles() files?: Array<any>) {
     return this.sendEmailService.execute(user, dto, files);
   }
 

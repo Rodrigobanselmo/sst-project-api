@@ -32,7 +32,7 @@ export const HOneMiddleImages = (image: string, text: string) => {
                         width: fullWidth / 2 - 5,
                         height: 404 / 2,
                       },
-                    }),
+                    } as any),
                   ],
                   spacing: { after: 32 },
                 }),

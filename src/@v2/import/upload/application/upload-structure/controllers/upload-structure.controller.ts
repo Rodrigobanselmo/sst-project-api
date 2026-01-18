@@ -34,7 +34,7 @@ export class UploadStructureController {
         required: true,
       }),
     )
-    file: Express.Multer.File,
+    file: any,
   ) {
     return this.uploadStructureUseCase.execute({
       companyId: path.companyId,

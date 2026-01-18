@@ -1,34 +1,37 @@
-import sizeOf from 'image-size';
 import { Injectable } from '@nestjs/common';
-import { Readable } from 'stream';
 import { v4 } from 'uuid';
 
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { AmazonStorageProvider } from '../../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
+import { WorkspaceRepository } from '../../../repositories/implementations/WorkspaceRepository';
 import { CompanyRepository } from '../../../repositories/implementations/CompanyRepository';
 
 @Injectable()
-export class AddCompanyPhotoService {
+export class AddWorkspacePhotoService {
   constructor(
-    private readonly companyRepository: CompanyRepository,
+    private readonly workspaceRepository: WorkspaceRepository,
     private readonly amazonStorageProvider: AmazonStorageProvider,
+    private readonly companyRepository: CompanyRepository,
   ) {}
 
-  async execute(userPayloadDto: UserPayloadDto, file: any) {
+  async execute(workspaceId: string, userPayloadDto: UserPayloadDto, file: any) {
     const companyId = userPayloadDto.targetCompanyId;
-    const [photoUrl] = await this.upload(companyId, file);
+    const photoUrl = await this.upload(file);
 
-    const companyData = await this.companyRepository.update({
-      companyId,
+    await this.workspaceRepository.update(workspaceId, {
       logoUrl: photoUrl,
     });
 
+    // Return the full company object with workspace data so the frontend can update the cache
+    const companyData = await this.companyRepository.findById(companyId, {
+      include: { workspace: true },
+    });
     return companyData;
   }
 
-  private async upload(companyId: string, file: any) {
+  private async upload(file: any) {
     const fileType = file.originalname.split('.')[file.originalname.split('.').length - 1];
-    const path = 'company/' + v4() + '.' + fileType;
+    const path = 'workspace/' + v4() + '.' + fileType;
 
     const { url } = await this.amazonStorageProvider.upload({
       file: file.buffer,
@@ -36,9 +39,6 @@ export class AddCompanyPhotoService {
       fileName: path,
     });
 
-    const dimensions = sizeOf(file.buffer);
-    const isVertical = dimensions.width < dimensions.height;
-
-    return [url, isVertical] as [string, boolean];
+    return url;
   }
 }

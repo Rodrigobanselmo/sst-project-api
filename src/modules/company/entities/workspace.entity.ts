@@ -24,4 +24,6 @@ export class WorkspaceEntity implements Workspace {
   isOwner: boolean;
   cnpj: string;
   abbreviation: string;
+  logoUrl: string;
+  logoPath?: string;
 }

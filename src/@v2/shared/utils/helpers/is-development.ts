@@ -6,5 +6,5 @@ export function isDevelopment() {
 }
 
 export function isHidePhotos() {
-  return isDevelopment();
+  return false
 }

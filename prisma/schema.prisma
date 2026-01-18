@@ -2369,6 +2369,7 @@ model Workspace {
   cnpj         String?
   isOwner      Boolean    @default(true)
   companyJson  Json?
+  logoUrl      String?
 
   address                   Address?
   characterization          CompanyCharacterization[]

@@ -5,7 +5,7 @@ export async function checkInternetConnectivity(): Promise<boolean> {
   if (!isDev) return true;
 
   try {
-    const response = await axios.get('https://www.example.com');
+    const response = await axios.get('https://www.google.com', { timeout: 3000 });
     if (response.status === 200) {
       return true;
     }

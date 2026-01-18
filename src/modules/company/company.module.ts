@@ -74,6 +74,7 @@ import { FindByIdCharacterizationService } from './services/characterization/fin
 import { UpdateCharacterizationPhotoService } from './services/characterization/update-characterization-photo/update-characterization-photo.service';
 import { UpsertCharacterizationService } from './services/characterization/upsert-characterization/upsert-characterization.service';
 import { AddCompanyPhotoService } from './services/company/add-company-photo/add-company-photo.service';
+import { AddWorkspacePhotoService } from './services/workspace/add-workspace-photo/add-workspace-photo.service';
 import { CopyCompanyService } from './services/company/copy-company/copy-company.service';
 import { CreateCompanyService } from './services/company/create-company/create-company.service';
 import { CreateContractService } from './services/company/create-contract/create-contract.service';
@@ -237,6 +238,7 @@ import { SyncCharacterizationService } from './services/sync/sync-characterizati
     FindCepService,
     AmazonStorageProvider,
     AddCompanyPhotoService,
+    AddWorkspacePhotoService,
     UpsertCharacterizationService,
     FindAllCharacterizationService,
     DeleteCharacterizationService,
@@ -383,4 +385,4 @@ import { SyncCharacterizationService } from './services/sync/sync-characterizati
     ScheduleMedicalVisitRepository,
   ],
 })
-export class CompanyModule { }
+export class CompanyModule {}

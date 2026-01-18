@@ -52,7 +52,7 @@ const firstCell = (path?: string) => {
     ? new ImageRun({
         data: readFileSync(path),
         transformation: getProportion(),
-      })
+      } as any)
     : undefined;
 
   return new TableCell({

@@ -35,10 +35,10 @@ const text = (text: string, verticalAlign: (typeof VerticalAlign)[keyof typeof V
             text: text,
             size: 36,
             bold: true,
-          }),
+          } as any),
         ],
         alignment: AlignmentType.CENTER,
-      }),
+      } as any),
     ],
     verticalAlign,
   });
@@ -69,10 +69,10 @@ const imageCover = (imgPath: string, verticalAlign: (typeof VerticalAlign)[keyof
               width,
               height,
             },
-          }),
+          } as any),
         ],
         alignment: AlignmentType.CENTER,
-      }),
+      } as any),
     ],
     verticalAlign,
   });
@@ -83,23 +83,23 @@ export const createChapterPage = ({ version, chapter, imagePath, title }: IChapt
     new TableRow({
       children: [text(title, VerticalAlign.TOP)],
       height: { value: 1500, rule: HeightRule.EXACT },
-    }),
+    } as any),
     ...(imagePath
       ? [
         new TableRow({
           children: [imageCover(imagePath, VerticalAlign.CENTER)],
           height: { value: 3000, rule: HeightRule.EXACT },
-        }),
+        } as any),
       ]
       : []),
     new TableRow({
       children: [text(chapter, VerticalAlign.CENTER)],
       height: { value: 4500, rule: HeightRule.EXACT },
-    }),
+    } as any),
     new TableRow({
       children: [text(version, VerticalAlign.BOTTOM)],
       height: { value: 4500, rule: HeightRule.EXACT },
-    }),
+    } as any),
   ]);
 };
 
@@ -110,12 +110,12 @@ export const chapterSection = ({ version, chapter, imagePath, title }: IChapterP
     footers: {
       default: new Footer({
         children: [],
-      }),
+      } as any),
     },
     headers: {
       default: new Header({
         children: [],
-      }),
+      } as any),
     },
   };
 };

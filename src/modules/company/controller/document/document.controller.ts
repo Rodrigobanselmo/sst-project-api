@@ -87,7 +87,7 @@ export class DocumentController {
   @Post()
   @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 1000000000 } }))
   create(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file: any,
     @Body() createDto: CreateDocumentDto,
     @User() userPayloadDto: UserPayloadDto,
   ) {
@@ -103,7 +103,7 @@ export class DocumentController {
   @Patch('/:id')
   @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 1000000000 } }))
   update(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file: any,
     @Body() update: UpdateDocumentDto,
     @User() userPayloadDto: UserPayloadDto,
     @Param('id', ParseIntPipe) id: number,

@@ -46,19 +46,22 @@ export class SectionsMapClass {
 
   public map: IMapSectionDocumentType = {
     [DocumentSectionTypeEnum.TOC]: () => summarySections(),
-    [DocumentSectionTypeEnum.COVER]: ({}: ICover) =>
-      coverSections({
-        imgPath: this.data.documentBase.company.logoPath,
+    [DocumentSectionTypeEnum.COVER]: ({}: ICover) => {
+      const coverProps = this.data.documentBase.company.cover(CoverTypeEnum.PGR);
+      const logoPath = this.data.documentBase.logoPath;
+      return coverSections({
+        imgPath: logoPath,
         version: this.version,
         title: replaceAllVariables(`??${VariablesPGREnum.DOCUMENT_TITLE}??`, this.variables),
         companyName: `${this.data.documentBase.company.name} ${this.data.documentBase.company.initials ? `(${this.data.documentBase.company.initials})` : ''}`,
-        coverProps: this.data.documentBase.company.cover(CoverTypeEnum.PGR),
-      }),
+        coverProps,
+      });
+    },
     [DocumentSectionTypeEnum.CHAPTER]: ({ text }: IChapter) =>
       chapterSection({
         version: this.version,
         chapter: replaceAllVariables(text || '', this.variables),
-        imagePath: this.data.documentBase.company.logoPath,
+        imagePath: this.data.documentBase.logoPath,
         title: replaceAllVariables(`??${VariablesPGREnum.DOCUMENT_TITLE}??`, this.variables),
       }),
     [DocumentSectionTypeEnum.SECTION]: ({ title, children, footerText, ...rest }: ISection) => ({

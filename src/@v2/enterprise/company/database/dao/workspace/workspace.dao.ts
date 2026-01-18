@@ -19,13 +19,14 @@ export class WorkspaceDAO {
     const whereParams = [...browseWhereParams, ...filterWhereParams];
 
     const workspacesPromise = this.prisma.$queryRaw<IWorkspaceBrowseResultModelMapper[]>`
-      SELECT 
-        w.created_at, 
-        w.updated_at, 
-        w.id, 
+      SELECT
+        w.created_at,
+        w.updated_at,
+        w.id,
         w.name,
-        w.status
-      FROM 
+        w.status,
+        w."logoUrl"
+      FROM
         "Workspace" w
       ${gerWhereRawPrisma(whereParams)}
       ${getOrderByRawPrisma(orderByParams)};

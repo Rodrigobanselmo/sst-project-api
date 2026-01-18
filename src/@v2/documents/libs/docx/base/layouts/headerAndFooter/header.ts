@@ -52,7 +52,7 @@ const firstCell = (path?: string) => {
     ? new ImageRun({
       data: readFileSync(path),
       transformation: getProportion(),
-    })
+    } as any)
     : undefined;
 
   return new TableCell({
@@ -60,7 +60,7 @@ const firstCell = (path?: string) => {
     children: [
       new Paragraph({
         children: image ? [image] : [],
-      }),
+      } as any),
     ],
   });
 };
@@ -74,11 +74,11 @@ const secondCell = () =>
           new TextRun({
             children: [PageNumber.CURRENT],
             size: 16,
-          }),
+          } as any),
         ],
         alignment: AlignmentType.END,
         spacing: { after: 0, before: 0 },
-      }),
+      } as any),
     ],
   });
 
@@ -91,10 +91,10 @@ export const createHeader = ({ path }: IHeaderProps) => {
   const header = {
     default: new Header({
       children: [table([row(path)])],
-    }),
+    } as any),
     first: new Header({
       children: [],
-    }),
+    } as any),
   };
 
   return header;

@@ -91,9 +91,11 @@ export class ProductDocumentPER implements IDocumentFactoryProduct<IProductDocum
     const images = document.model.images;
     const company = document.documentBase.company;
     const consultant = document.documentBase.company.consultant;
+    const workspace = document.documentBase.workspace;
 
     const companyLogoPath = await this.donwloadImageService.download({ imageUrl: company.logoUrl });
     const consultantLogoPath = await this.donwloadImageService.download({ imageUrl: consultant?.logoUrl });
+    const workspaceLogoPath = await this.donwloadImageService.download({ imageUrl: workspace?.logoUrl });
 
     if (companyLogoPath) {
       this.unlinkPaths.push({ path: companyLogoPath });
@@ -102,6 +104,10 @@ export class ProductDocumentPER implements IDocumentFactoryProduct<IProductDocum
     if (consultantLogoPath && consultant) {
       this.unlinkPaths.push({ path: consultantLogoPath });
       consultant.logoPath = consultantLogoPath;
+    }
+    if (workspaceLogoPath && workspace) {
+      this.unlinkPaths.push({ path: workspaceLogoPath });
+      workspace.logoPath = workspaceLogoPath;
     }
 
     await this.donwloadImageService.downloadBatch({

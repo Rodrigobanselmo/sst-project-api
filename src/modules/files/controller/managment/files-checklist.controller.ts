@@ -27,7 +27,7 @@ export class FilesChecklistController {
   })
   @Post('/upload/:companyId?')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadRiskFile(@UploadedFile() file: Express.Multer.File, @User() userPayloadDto: UserPayloadDto, @Res() res) {
+  async uploadRiskFile(@UploadedFile() file: any, @User() userPayloadDto: UserPayloadDto, @Res() res) {
     const { workbook, filename } = await this.uploadRiskService.execute(file, userPayloadDto);
 
     res.attachment(filename);
@@ -60,7 +60,7 @@ export class FilesChecklistController {
   })
   @Post('epi/upload/:companyId?')
   @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 10_000_000_000 } }))
-  async uploadEpiFile(@UploadedFile() file: Express.Multer.File, @User() userPayloadDto: UserPayloadDto, @Res() res) {
+  async uploadEpiFile(@UploadedFile() file: any, @User() userPayloadDto: UserPayloadDto, @Res() res) {
     const { workbook, filename } = await this.uploadEpiDataService.execute(file, userPayloadDto);
 
     res.attachment(filename);

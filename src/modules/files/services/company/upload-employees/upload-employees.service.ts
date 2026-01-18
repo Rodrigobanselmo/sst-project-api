@@ -36,7 +36,7 @@ export class UploadEmployeesService {
     private readonly checkEmployeeExamService: CheckEmployeeExamService,
   ) {}
 
-  async execute(file: Express.Multer.File, userPayloadDto: UserPayloadDto) {
+  async execute(file: any, userPayloadDto: UserPayloadDto) {
     if (!file) throw new BadRequestException(`file is not available`);
     const buffer = file.buffer;
     const hierarchyExcel = new HierarchyExcelProvider();

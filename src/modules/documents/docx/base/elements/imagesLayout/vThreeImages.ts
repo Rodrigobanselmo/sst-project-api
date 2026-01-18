@@ -43,7 +43,7 @@ export const VThreeImages = (
                         width: width,
                         height: width * (16 / 9),
                       },
-                    }),
+                    } as any),
                   ],
                   spacing: { after: 32 },
                 }),
@@ -65,7 +65,7 @@ export const VThreeImages = (
                             width: width,
                             height: width * (16 / 9),
                           },
-                        }),
+                        } as any),
                       ]
                     : [],
                   spacing: { after: 32 },
@@ -89,7 +89,7 @@ export const VThreeImages = (
                             width: width,
                             height: width * (16 / 9),
                           },
-                        }),
+                        } as any),
                       ]
                     : [],
                   spacing: { after: 32 },

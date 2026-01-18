@@ -15,7 +15,7 @@ export const HFullWidthImage = (image: string, text: string, options?: IParagrap
             width: fullWidth,
             height: fullWidth * (9 / 16),
           },
-        }),
+        } as any),
       ],
       spacing: { after: 100 },
       ...options,

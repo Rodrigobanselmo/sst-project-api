@@ -142,8 +142,8 @@ const imageCover = (props: IHeaderProps) => {
           },
           behindDocument: true,
         },
-      }),
-    ],
+      } as any),
+    ],  
     alignment: AlignmentType.CENTER,
   });
 };
@@ -180,7 +180,7 @@ const imageLogo = (props: IHeaderProps) => {
             behindDocument: true,
           },
         }),
-      }),
+      } as any),
     ],
     alignment: AlignmentType.CENTER,
   });

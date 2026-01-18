@@ -4,7 +4,8 @@ import { donwloadPublicFile } from '@/@v2/shared/utils/helpers/downalod-public-f
 import { isHidePhotos } from '@/@v2/shared/utils/helpers/is-development';
 import { asyncBatch } from '@/shared/utils/asyncBatch';
 import { Inject, Injectable } from '@nestjs/common';
-import { promises as fs } from 'fs';
+import { createWriteStream } from 'fs';
+import { pipeline } from 'stream/promises';
 import { v4 } from 'uuid';
 import { IDownloadImage } from './download-image.interface';
 
@@ -25,25 +26,37 @@ export class DownloadImageService {
   }
 
   async download({ imageUrl }: IDownloadImage.DownloadParams): Promise<string | null> {
-    if (isHidePhotos()) return null;
-    if (!imageUrl) return null;
 
-    const isOldBucket = !imageUrl.includes('https://simplesst.s3.sa-east-1');
+    if (isHidePhotos()) {
+      return null;
+    }
+    if (!imageUrl) {
+      return null;
+    }
 
-    if (isOldBucket) {
-      return donwloadPublicFile({ url: imageUrl });
+    // Check if URL is from our S3 bucket (handles both URL formats)
+    const isS3Bucket = imageUrl.includes('simplesst.s3.amazonaws.com') || imageUrl.includes('simplesst.s3.sa-east-1');
+
+    if (!isS3Bucket) {
+      const result = await donwloadPublicFile({ url: imageUrl });
+      return result;
     }
 
     const extension = imageUrl.split('/').at(-1)?.split('.')[1];
-    if (!extension) return null;
+    if (!extension) {
+      return null;
+    }
 
     const fileKey = imageUrl.split('.com/').at(-1) || '';
-    const fileBuffer = await this.storage.download({ fileKey: fileKey });
 
-    const path = `tmp/${v4()}.${extension}`;
-
-    await fs.writeFile(path, fileBuffer, {});
-
-    return path;
+    try {
+      const fileStream = await this.storage.download({ fileKey: fileKey });
+      const path = `tmp/${v4()}.${extension}`;
+      await pipeline(fileStream, createWriteStream(path));
+      return path;
+    } catch (error) {
+      const result = await donwloadPublicFile({ url: imageUrl });
+      return result;
+    }
   }
 }

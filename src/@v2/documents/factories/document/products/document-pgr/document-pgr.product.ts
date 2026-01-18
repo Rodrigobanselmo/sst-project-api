@@ -190,9 +190,11 @@ export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocum
     const images = document.model.images;
     const company = document.documentBase.company;
     const consultant = document.documentBase.company.consultant;
+    const workspace = document.documentBase.workspace;
 
     const companyLogoPath = await this.downloadImageService.download({ imageUrl: company.logoUrl });
     const consultantLogoPath = await this.downloadImageService.download({ imageUrl: consultant?.logoUrl });
+    const workspaceLogoPath = await this.downloadImageService.download({ imageUrl: workspace?.logoUrl });
 
     if (companyLogoPath) {
       this.unlinkPaths.push({ path: companyLogoPath });
@@ -201,6 +203,10 @@ export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocum
     if (consultantLogoPath && consultant) {
       this.unlinkPaths.push({ path: consultantLogoPath });
       consultant.logoPath = consultantLogoPath;
+    }
+    if (workspaceLogoPath && workspace) {
+      this.unlinkPaths.push({ path: workspaceLogoPath });
+      workspace.logoPath = workspaceLogoPath;
     }
 
     await this.downloadImageService.downloadBatch({

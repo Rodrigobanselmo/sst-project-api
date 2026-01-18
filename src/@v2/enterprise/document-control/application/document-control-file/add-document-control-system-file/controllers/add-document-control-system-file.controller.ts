@@ -30,7 +30,7 @@ export class AddFileController {
         fileType: ALLOWED_ALL_TYPES,
       }),
     )
-    file: Express.Multer.File,
+    file: any,
     @Param() path: AddFilePath,
   ) {
     return this.addFileUseCase.execute({

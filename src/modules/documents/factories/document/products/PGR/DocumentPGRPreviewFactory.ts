@@ -76,7 +76,7 @@ export class DocumentPreviewPGRFactoryProduct extends DocumentPGRFactoryProduct 
   }
 
   public async downloadLogos() {
-    return { logo: 'images/logo/logo-main.png', consultantLogo: 'images/logo/logo-simple.png' };
+    return { logo: 'images/logo/logo-main.png', consultantLogo: 'images/logo/logo-simple.png', workspaceLogo: 'images/logo/logo-main.png' };
   }
 
   public async downloadPathImage() {

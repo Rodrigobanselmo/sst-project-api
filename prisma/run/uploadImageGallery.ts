@@ -5,12 +5,12 @@
 //       if (fileName.includes('PGR')) {
 
 //         const file = readFileSync(`tmp/upload/${fileName}`)
-//         //convert to Express.Multer.File
+//         //convert to any
 
 //         const sss = {
 //           buffer: file,
 //           originalname: fileName
-//         } as Express.Multer.File
+//         } as any
 
 //         console.log('adding image ' + fileName)
 //         await this.createImageGalleyService.execute({ companyId: user.targetCompanyId, name: fileName, types: ['PGR'] }, user, sss);

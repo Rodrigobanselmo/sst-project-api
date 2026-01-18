@@ -18,7 +18,7 @@ import { EmployeeESocialEventTypeEnum, Prisma } from '@prisma/client';
 import { EmployeePPPHistoryEntity } from './../../../../modules/company/entities/employee-ppp-history.entity';
 import { IEvent2210Props } from './../../../../modules/esocial/interfaces/event-2210';
 export interface IConvertPfx {
-  file: Express.Multer.File;
+  file: any;
   password: string;
 }
 

@@ -89,7 +89,7 @@ export class EpiRepository {
     const epis = await this.prisma.epi.findMany({
       where: {
         ca: {
-          in: Array.isArray(query?.ca) ? (query?.ca as unknown as string[]) : [query?.ca] || ['0', '1', '2'],
+          in: Array.isArray(query?.ca) ? (query?.ca as unknown as string[]) : ((query?.ca as any) || ['0', '1', '2']) as string[],
         },
       },
     });

@@ -11,7 +11,7 @@ export class UploadCompanyStructureService {
     private readonly checkEmployeeExamService: CheckEmployeeExamService,
   ) {}
 
-  async execute(file: Express.Multer.File, userPayloadDto: UserPayloadDto, body: UploadCompanyStructureReportDto) {
+  async execute(file: any, userPayloadDto: UserPayloadDto, body: UploadCompanyStructureReportDto) {
     if (!file) throw new BadRequestException(`file is not available`);
     const buffer = file.buffer;
 

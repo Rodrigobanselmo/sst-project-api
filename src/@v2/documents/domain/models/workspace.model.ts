@@ -14,6 +14,7 @@ export type IWorkspaceModel = {
   workSchedule: string | null;
 
   customSectionHTML: string | null;
+  logoUrl: string | null;
 };
 
 export class WorkspaceModel {
@@ -30,6 +31,8 @@ export class WorkspaceModel {
   workSchedule: string | null;
 
   customSectionHTML: string | null;
+  logoUrl: string | null;
+  logoPath: string | null;
 
   constructor(params: IWorkspaceModel) {
     this.id = params.id;
@@ -45,5 +48,7 @@ export class WorkspaceModel {
     this.workSchedule = params.workSchedule;
 
     this.customSectionHTML = params.customSectionHTML;
+    this.logoUrl = params.logoUrl;
+    this.logoPath = null;
   }
 }

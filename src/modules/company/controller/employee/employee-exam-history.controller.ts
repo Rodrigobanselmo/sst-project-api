@@ -283,7 +283,7 @@ export class EmployeeExamHistoryController {
   @Post('upload/:companyId')
   @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 100000000 } }))
   upload(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file: any,
     @Body() createDto: UpdateFileExamDto,
     @User() userPayloadDto: UserPayloadDto,
   ) {

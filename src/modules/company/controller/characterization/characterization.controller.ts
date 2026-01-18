@@ -85,7 +85,7 @@ export class CharacterizationController {
     @Body() body: UpsertCharacterizationDto,
     @User() userPayloadDto: UserPayloadDto,
     @Param('workspaceId') workspaceId: string,
-    @UploadedFiles() files?: Array<Express.Multer.File>,
+    @UploadedFiles() files?: Array<any>,
   ) {
     if ('considerations' in body) body.considerations = body.considerations.filter((item) => item !== '');
     if ('activities' in body) body.activities = body.activities.filter((item) => item !== '');
@@ -104,7 +104,7 @@ export class CharacterizationController {
   @Post('/photo')
   @UseInterceptors(FileInterceptor('file'))
   async uploadRiskFile(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file: any,
     @Body() addPhotoCharacterizationDto: AddPhotoCharacterizationDto,
     @User() userPayloadDto: UserPayloadDto,
   ) {
@@ -120,7 +120,7 @@ export class CharacterizationController {
   @UseInterceptors(FileInterceptor('file'))
   @Patch('/photo/:id')
   async update(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file: any,
     @Body() updatePhotoCharacterizationDto: UpdatePhotoCharacterizationDto,
     @User() userPayloadDto: UserPayloadDto,
     @Param('id') id: string,
@@ -137,7 +137,7 @@ export class CharacterizationController {
   @Post('/files')
   @UseInterceptors(FileInterceptor('file', { limits: { fieldSize: 20 * 1024 * 1024 } }))
   async uploadFiles(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file: any,
     @Body() addFileCharacterizationDto: AddFileCharacterizationDto,
     @User() userPayloadDto: UserPayloadDto,
   ) {

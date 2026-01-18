@@ -14,7 +14,7 @@ export class UpdateDocumentService {
     private readonly amazonStorageProvider: AmazonStorageProvider,
   ) {}
 
-  async execute(updateDto: UpdateDocumentDto, user: UserPayloadDto, file: Express.Multer.File) {
+  async execute(updateDto: UpdateDocumentDto, user: UserPayloadDto, file: any) {
     const companyId = user.targetCompanyId;
     const documentFound = await this.documentRepository.findFirstNude({
       where: {
@@ -41,7 +41,7 @@ export class UpdateDocumentService {
     return document;
   }
 
-  private async upload(companyId: string, file: Express.Multer.File, documentFound: DocumentEntity) {
+  private async upload(companyId: string, file: any, documentFound: DocumentEntity) {
     if (documentFound?.fileUrl) {
       const splitUrl = documentFound.fileUrl.split('.com/');
 

@@ -17,11 +17,11 @@ export const HOneMiddleImages = (image: string, text: string) => {
               children: [
                 new Paragraph({
                   children: [],
-                }),
+                } as any),
               ],
               width: { size: 27, type: WidthType.PERCENTAGE },
               margins: { bottom: 0 },
-            }),
+            } as any),
             new TableCell({
               children: [
                 new Paragraph({
@@ -32,51 +32,51 @@ export const HOneMiddleImages = (image: string, text: string) => {
                         width: fullWidth / 2 - 5,
                         height: 404 / 2,
                       },
-                    }),
+                    } as any),
                   ],
                   spacing: { after: 32 },
-                }),
+                } as any),
               ],
               width: { size: 46, type: WidthType.PERCENTAGE },
               margins: { bottom: 0 },
-            }),
+            } as any),
             new TableCell({
               children: [
                 new Paragraph({
                   children: [],
-                }),
+                } as any),
               ],
               width: { size: 27, type: WidthType.PERCENTAGE },
               margins: { bottom: 0 },
-            }),
+            } as any),
           ],
-        }),
+        } as any),
         new TableRow({
           children: [
             new TableCell({
               children: [
                 new Paragraph({
                   children: [],
-                }),
+                } as any),
               ],
               width: { size: 5, type: WidthType.PERCENTAGE },
-            }),
+            } as any),
             new TableCell({
               children: [paragraphFigure(text)].filter((i) => i) as Paragraph[],
               width: { size: 90, type: WidthType.PERCENTAGE },
-            }),
+            } as any),
             new TableCell({
               children: [
                 new Paragraph({
                   children: [],
-                }),
+                } as any),
               ],
               width: { size: 5, type: WidthType.PERCENTAGE },
-            }),
+            } as any),
           ],
-        }),
+        } as any),
       ],
       borders: borderNoneStyle,
-    }),
+    } as any),
   ];
 };

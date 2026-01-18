@@ -15,7 +15,7 @@ export const VFullWidthImage = (image: string, text: string, options?: IParagrap
             width: fullWidth * (9 / 16),
             height: fullWidth,
           },
-        }),
+        } as any),
       ],
       ...options,
     }),

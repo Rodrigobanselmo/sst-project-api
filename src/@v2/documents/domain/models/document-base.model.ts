@@ -75,4 +75,9 @@ export class DocumentBaseModel {
   get versions() {
     return this._versions.filter(version => version.version.includes('.0.0'));
   }
+
+  get logoPath(): string | null {
+    // Prioritize workspace logo over company logo
+    return this.workspace?.logoPath || this.company?.logoPath || null;
+  }
 }

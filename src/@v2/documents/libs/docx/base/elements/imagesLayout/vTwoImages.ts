@@ -31,22 +31,22 @@ export const VTwoImages = (images: [string, string], texts: [string, string], re
                         width: fullWidth / 2 - 5,
                         height: (fullWidth / 2 - 5) * (16 / 9),
                       },
-                    }),
+                    } as any),
                   ],
                   spacing: { after: 32 },
-                }),
+                } as any),
               ],
               width: {
                 size: ((fullWidth / 2 - 5) / fullWidth) * 100,
                 type: WidthType.PERCENTAGE,
               },
               margins: { bottom: 0 },
-            }),
+            } as any),
             new TableCell({
               children: [],
               width: { size: 10, type: WidthType.PERCENTAGE },
               margins: { bottom: 0 },
-            }),
+            } as any),
             new TableCell({
               children: [
                 new Paragraph({
@@ -57,10 +57,10 @@ export const VTwoImages = (images: [string, string], texts: [string, string], re
                         width: fullWidth / 2 - 5,
                         height: (fullWidth / 2 - 5) * (16 / 9),
                       },
-                    }),
+                    } as any),
                   ],
                   spacing: { after: 32 },
-                }),
+                } as any),
               ],
               width: {
                 size: 100 - ((fullWidth / 2 - 5) / fullWidth) * 100,
@@ -68,27 +68,27 @@ export const VTwoImages = (images: [string, string], texts: [string, string], re
               },
               margins: { bottom: 0 },
               verticalAlign: VerticalAlign.BOTTOM,
-            }),
+            } as any),
           ],
-        }),
+        } as any),
         new TableRow({
           children: [
             new TableCell({
               children: [paragraphFigure(texts[0])].filter((i) => i) as Paragraph[],
               width: { size: 45, type: WidthType.PERCENTAGE },
-            }),
+            } as any),
             new TableCell({
               children: [],
               width: { size: 10, type: WidthType.PERCENTAGE },
-            }),
+            } as any),
             new TableCell({
               children: [paragraphFigure(texts[1])].filter((i) => i) as Paragraph[],
               width: { size: 45, type: WidthType.PERCENTAGE },
-            }),
+            } as any),
           ],
-        }),
+        } as any),
       ],
       borders: borderNoneStyle,
-    }),
+    } as any),
   ];
 };

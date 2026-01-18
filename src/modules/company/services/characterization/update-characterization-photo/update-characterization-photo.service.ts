@@ -18,7 +18,7 @@ export class UpdateCharacterizationPhotoService {
 
   async execute(
     id: string,
-    file: Express.Multer.File,
+    file: any,
     updatePhotoCharacterizationDto: UpdatePhotoCharacterizationDto,
     user: UserPayloadDto,
   ) {

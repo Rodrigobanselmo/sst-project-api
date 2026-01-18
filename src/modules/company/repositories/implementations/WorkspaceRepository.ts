@@ -44,6 +44,16 @@ export class WorkspaceRepository {
     return new WorkspaceEntity(workspace);
   }
 
+  async update(id: string, data: Partial<WorkspaceDto>) {
+    const workspace = await this.prisma.workspace.update({
+      where: { id },
+      data: data as any,
+      include: { address: true },
+    });
+
+    return new WorkspaceEntity(workspace);
+  }
+
   async findByCompany(companyId: string) {
     const workspaces = await this.prisma.workspace.findMany({
       where: { companyId },
@@ -60,11 +70,7 @@ export class WorkspaceRepository {
     return [...workspaces.map((workspace) => new WorkspaceEntity(workspace))];
   }
 
-  async find(
-    query: Partial<FindWorkspaceDto>,
-    pagination: PaginationQueryDto,
-    options: Prisma.WorkspaceFindManyArgs = {},
-  ) {
+  async find(query: Partial<FindWorkspaceDto>, pagination: PaginationQueryDto, options: Prisma.WorkspaceFindManyArgs = {}) {
     const whereInit = {
       AND: [
         // {

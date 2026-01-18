@@ -11,7 +11,7 @@ export class AddCertificationESocialService {
     private readonly eSocialMethodsProvider: ESocialMethodsProvider,
   ) {}
 
-  async execute(file: Express.Multer.File, { password }: AddCertDto, user: UserPayloadDto) {
+  async execute(file: any, { password }: AddCertDto, user: UserPayloadDto) {
     const convertedPem = await this.eSocialMethodsProvider.convertPfxToPem({
       file,
       password,

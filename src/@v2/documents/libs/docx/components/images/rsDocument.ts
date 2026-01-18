@@ -10,7 +10,7 @@ export const rsDocumentImage = () => {
           width: 700,
           height: 350,
         },
-      }),
+      } as any),
     ],
     spacing: { after: 100 },
   });

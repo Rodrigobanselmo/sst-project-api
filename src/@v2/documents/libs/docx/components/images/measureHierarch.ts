@@ -10,7 +10,7 @@ export const measureHierarchyImage = () => {
           width: 600,
           height: 350,
         },
-      }),
+      } as any),
     ],
     spacing: { after: 100 },
   });

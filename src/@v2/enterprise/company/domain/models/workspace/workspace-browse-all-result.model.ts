@@ -6,6 +6,7 @@ export type IWorkspaceBrowseResultModel = {
   updatedAt: Date;
   name: string;
   status: WorkspaceStatusEnum;
+  logoUrl: string | null;
 };
 
 export class WorkspaceBrowseResultModel {
@@ -14,6 +15,7 @@ export class WorkspaceBrowseResultModel {
   updatedAt: Date;
   name: string;
   status: WorkspaceStatusEnum;
+  logoUrl: string | null;
 
   constructor(params: IWorkspaceBrowseResultModel) {
     this.id = params.id;
@@ -21,5 +23,6 @@ export class WorkspaceBrowseResultModel {
     this.updatedAt = params.updatedAt;
     this.name = params.name;
     this.status = params.status;
+    this.logoUrl = params.logoUrl;
   }
 }
