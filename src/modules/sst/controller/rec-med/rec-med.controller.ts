@@ -46,6 +46,7 @@ export class RecMedController {
     code: PermissionEnum.REC_MED,
     crud: true,
     isMember: true,
+    isContract: true,
   })
   @Patch('/:recMedId')
   async update(
@@ -60,6 +61,7 @@ export class RecMedController {
     code: PermissionEnum.REC_MED,
     crud: true,
     isMember: true,
+    isContract: true,
   })
   @Delete('/:recMedId')
   async deleteSoft(@Param('recMedId') recMedId: string, @User() userPayloadDto: UserPayloadDto) {

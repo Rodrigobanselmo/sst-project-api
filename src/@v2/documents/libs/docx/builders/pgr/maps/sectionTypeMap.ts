@@ -48,7 +48,7 @@ export class SectionsMapClass {
     [DocumentSectionTypeEnum.TOC]: () => summarySections(),
     [DocumentSectionTypeEnum.COVER]: ({}: ICover) => {
       const coverProps = this.data.documentBase.company.cover(CoverTypeEnum.PGR);
-      const logoPath = this.data.documentBase.logoPath;
+      const logoPath = this.data.documentBase.mainLogoPath;
       return coverSections({
         imgPath: logoPath,
         version: this.version,
@@ -61,7 +61,7 @@ export class SectionsMapClass {
       chapterSection({
         version: this.version,
         chapter: replaceAllVariables(text || '', this.variables),
-        imagePath: this.data.documentBase.logoPath,
+        imagePath: this.data.documentBase.mainLogoPath,
         title: replaceAllVariables(`??${VariablesPGREnum.DOCUMENT_TITLE}??`, this.variables),
       }),
     [DocumentSectionTypeEnum.SECTION]: ({ title, children, footerText, ...rest }: ISection) => ({
@@ -107,8 +107,8 @@ export class SectionsMapClass {
     return headerAndFooter({
       title: title || replaceAllVariables(`??${VariablesPGREnum.DOCUMENT_TITLE}??`, this.variables),
       footerText: replaceAllVariables(footerText, this.variables),
-      logoPath: this.data.documentBase.company.logoPath,
-      consultantLogoPath: this.data.documentBase.company.consultantLogoPath,
+      logoPath: this.data.documentBase.mainLogoPath,
+      consultantLogoPath: this.data.documentBase.consultantLogoPath,
       version: this.version,
     });
   };
