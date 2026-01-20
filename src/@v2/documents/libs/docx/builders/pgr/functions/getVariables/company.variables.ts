@@ -12,7 +12,8 @@ interface ICompanyVariables {
 }
 
 export const companyVariables = ({ employeeCount, company, workspace }: ICompanyVariables) => {
-  const address = workspace.isOwner ? workspace?.address || company?.address : company?.address;
+  // const address = workspace.isOwner ? workspace?.address || company?.address : company?.address;
+  const address = company?.address;
 
   return {
     [VariablesPGREnum.CURRENT_DATE_LONG]: dateUtils().format('D [de] MMMM [de] YYYY [às] hh:mm').toLocaleLowerCase(),

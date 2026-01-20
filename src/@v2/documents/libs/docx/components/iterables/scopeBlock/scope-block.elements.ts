@@ -38,7 +38,8 @@ export function scopeBlockElements({ data }: IScopeBlockParams): Paragraph[] {
 
   paragraphs.push(paragraphNewNormal('A critério da organização, o PGR pode ser implementado por unidade operacional, setor ou atividade. **(NR-01 Item 1.5.3.1.1.1)**'));
 
-  const cnpj = workspace.isOwner ? company.cnpj : workspace.cnpj;
+  // const cnpj = workspace.isOwner ? company.cnpj : workspace.cnpj;
+  const cnpj = company.cnpj;
 
   // Check if there are selected group IDs for scope filtering
   if (data.scopeOfSelectedGroupIds && data.scopeOfSelectedGroupIds.length > 0) {
