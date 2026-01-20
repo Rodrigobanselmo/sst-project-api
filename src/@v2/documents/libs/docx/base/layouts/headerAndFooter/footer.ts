@@ -51,6 +51,7 @@ const firstCell = (title: string, footerText: string, version: string) =>
           new TextRun({
             text: title,
             size: 12,
+            bold: true,
             color: palette.text.main.string,
           } as any),
         ],
