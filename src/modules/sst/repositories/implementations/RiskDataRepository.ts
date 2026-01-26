@@ -467,7 +467,7 @@ export class RiskDataRepository {
         },
         generateSources: true,
         epiToRiskFactorData: { include: { epi: true } },
-        engsToRiskFactorData: !engs ? { include: { recMed: true } } : undefined,
+        engsToRiskFactorData: { include: { recMed: true } },
         examsToRiskFactorData: { include: { exam: true } },
       },
     })) as IRiskFactorDataEntity;
