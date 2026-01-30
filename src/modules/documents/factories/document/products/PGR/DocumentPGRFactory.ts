@@ -186,6 +186,9 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
         },
       });
 
+    // Download cover background image from S3 if it's a URL
+    await this.downloadCoverBackgroundImage(cover);
+
     // Set workspace logo path if available
     if (workspaceLogo) {
       workspace.logoPath = workspaceLogo;
@@ -689,6 +692,22 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
     if (!this.localCreation) return getPathImage(url);
 
     return downloadPathImage(url);
+  }
+
+  public async downloadCoverBackgroundImage(cover: DocumentCoverEntity) {
+    const coverJson = cover.json as any;
+    const backgroundUrl = coverJson?.coverProps?.backgroundImagePath;
+
+    // Skip if no background image or if it's already a local path (not a URL)
+    if (!backgroundUrl || !backgroundUrl.includes('http')) {
+      return;
+    }
+
+    const downloadedPath = await this.downloadPathImage(backgroundUrl);
+    if (downloadedPath) {
+      this.unlinkPaths.push({ path: downloadedPath, url: backgroundUrl });
+      coverJson.coverProps.backgroundImagePath = downloadedPath;
+    }
   }
 
   public async documentModelData(id: number, companyId: string) {

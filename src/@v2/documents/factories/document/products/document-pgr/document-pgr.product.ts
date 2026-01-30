@@ -209,6 +209,13 @@ export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocum
       workspace.logoPath = workspaceLogoPath;
     }
 
+    // Download cover background images from S3 if they are URLs
+    const allCovers = [
+      ...(company['covers'] || []),
+      ...(consultant?.covers || []),
+    ];
+    await this.downloadImageService.downloadCoverImages({ covers: allCovers, unlinkPaths: this.unlinkPaths });
+
     await this.downloadImageService.downloadBatch({
       images: images,
       getUrl: (image) => image.url,

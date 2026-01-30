@@ -59,4 +59,21 @@ export class DownloadImageService {
       return result;
     }
   }
+
+  async downloadCoverImages({ covers, unlinkPaths }: IDownloadImage.DownloadCoverImagesParams): Promise<void> {
+    for (const cover of covers) {
+      const backgroundUrl = cover.data.backgroundImageUrl;
+
+      // Skip if no background image or if it's already a local path (not a URL)
+      if (!backgroundUrl || !backgroundUrl.includes('http')) {
+        continue;
+      }
+
+      const downloadedPath = await this.download({ imageUrl: backgroundUrl });
+      if (downloadedPath) {
+        unlinkPaths.push({ path: downloadedPath });
+        cover.data.backgroundImagePath = downloadedPath;
+      }
+    }
+  }
 }

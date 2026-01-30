@@ -176,6 +176,12 @@ import { AddCharacterizationFileService } from './services/characterization/add-
 import { CharacterizationFileRepository } from './repositories/implementations/CharacterizationFileRepository';
 import { CacheModule } from '@nestjs/cache-manager';
 import { SyncCharacterizationService } from './services/sync/sync-characterization/sync-characterization.service';
+import { DocumentCoverController } from './controller/document-cover/document-cover.controller';
+import { DocumentCoverRepository } from './repositories/implementations/DocumentCoverRepository';
+import { UpsertDocumentCoverService } from './services/document-cover/upsert-document-cover/upsert-document-cover.service';
+import { FindDocumentCoverService } from './services/document-cover/find-document-cover/find-document-cover.service';
+import { DeleteDocumentCoverService } from './services/document-cover/delete-document-cover/delete-document-cover.service';
+import { PreviewDocumentCoverService } from './services/document-cover/preview-document-cover/preview-document-cover.service';
 
 @Module({
   imports: [
@@ -207,6 +213,7 @@ import { SyncCharacterizationService } from './services/sync/sync-characterizati
     ImageGalleryController,
     WorkspaceController,
     SyncController,
+    DocumentCoverController,
   ],
   providers: [
     CreateCompanyService,
@@ -362,6 +369,11 @@ import { SyncCharacterizationService } from './services/sync/sync-characterizati
     AddCharacterizationFileService,
     CharacterizationFileRepository,
     SyncCharacterizationService,
+    DocumentCoverRepository,
+    UpsertDocumentCoverService,
+    FindDocumentCoverService,
+    DeleteDocumentCoverService,
+    PreviewDocumentCoverService,
   ],
   exports: [
     CompanyRepository,
