@@ -12,8 +12,14 @@ import { RecMedEntity } from './recMed.entity';
 import { RiskFactorDataEntity } from './riskData.entity';
 import { RiskDocInfoEntity } from './riskDocInfo.entity';
 
+export enum ActivityTypeEnum {
+  PERICULOSIDADE = 'PERICULOSIDADE',
+  INSALUBRIDADE = 'INSALUBRIDADE',
+}
+
 export type RiskFactorActivitie = {
   description: string;
+  activityType?: ActivityTypeEnum;
   subActivities: {
     description: string;
   }[];

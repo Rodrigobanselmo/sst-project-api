@@ -19,7 +19,7 @@ import { RiskModel } from './risk.model';
 
 export type IRiskDataActivity = {
   realActivity?: string;
-  activities?: { description?: string; subActivity?: string }[];
+  activities?: { description?: string; subActivity?: string; activityType?: string }[];
 };
 
 export type IRiskDataModel = {

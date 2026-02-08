@@ -193,7 +193,8 @@ const getSharedData = ({ riskData, periculosidadeType }: { riskData: RiskDataMod
         }
 
         // Atividades Normativas Vinculadas (subActivities)
-        const subActivitiesWithValue = activityData.activities?.filter((act) => act.subActivity);
+        // Filter only PERICULOSIDADE activities for periculosidade document
+        const subActivitiesWithValue = activityData.activities?.filter((act) => act.subActivity && act.activityType === 'PERICULOSIDADE');
         if (subActivitiesWithValue && subActivitiesWithValue.length > 0) {
           if (normativeActivities.length === 0) {
             normativeActivities.push({

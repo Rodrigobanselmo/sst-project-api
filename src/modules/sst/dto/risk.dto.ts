@@ -1,5 +1,5 @@
 import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
-import { RiskFactorsEnum, StatusEnum } from '@prisma/client';
+import { GrauInsalubridade, RiskFactorsEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import { IsArray, IsBoolean, IsEnum, IsInt, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
@@ -9,6 +9,7 @@ import { RiskCreateGenerateSourceDto, RiskUpdateGenerateSourceDto, UpsertGenerat
 import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
 import { RiskCreateRecMedDto, RiskUpdateRecMedDto, UpsertRecMedDto } from './rec-med.dto';
+import { ActivityTypeEnum } from '../entities/risk.entity';
 
 export class CreateRiskDto {
   @Transform(StringUppercaseTransform, { toClassOnly: true })
@@ -169,6 +170,13 @@ export class CreateRiskDto {
   @IsOptional()
   otherAppendix?: string;
 
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsOptional()
+  @IsEnum(GrauInsalubridade, {
+    message: `grauInsalubridade must be one of: ${KeysOfEnum(GrauInsalubridade)}`,
+  })
+  grauInsalubridade?: GrauInsalubridade | null;
+
   @ValidateNested({ each: true })
   @IsOptional()
   @Type(() => ActivityDto)
@@ -215,6 +223,13 @@ export class UpdateRiskDto {
   @IsString()
   @IsOptional()
   otherAppendix?: string;
+
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsOptional()
+  @IsEnum(GrauInsalubridade, {
+    message: `grauInsalubridade must be one of: ${KeysOfEnum(GrauInsalubridade)}`,
+  })
+  grauInsalubridade?: GrauInsalubridade | null;
 
   @IsNumber()
   @IsOptional()
@@ -383,6 +398,14 @@ export class ActivityDto {
 
   @IsString()
   description: string;
+
+  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @IsString()
+  @IsOptional()
+  @IsEnum(ActivityTypeEnum, {
+    message: `activityType must be one of: ${KeysOfEnum(ActivityTypeEnum)}`,
+  })
+  activityType?: ActivityTypeEnum;
 
   // @Transform(StringUppercaseTransform, { toClassOnly: true })
   // @IsString()
