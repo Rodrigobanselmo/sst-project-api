@@ -16,6 +16,7 @@ import { GenerateSourceModel } from './generate-source.model';
 import { RecommendationDataModel } from './recommendation-data.model';
 import { RecommendationModel } from './recommendation.model';
 import { RiskModel } from './risk.model';
+import { ExposureTypeEnum } from '@prisma/client';
 
 export type IRiskDataActivity = {
   realActivity?: string;
@@ -44,6 +45,7 @@ export type IRiskDataModel = {
   quantityVibrationL: RiskDataQuantityVibrationLVO | null;
 
   activities: IRiskDataActivity | null;
+  exposure: ExposureTypeEnum | null;
 };
 
 export class RiskDataModel {
@@ -68,6 +70,7 @@ export class RiskDataModel {
   quantityVibrationL: RiskDataQuantityVibrationLVO | null;
 
   activities: IRiskDataActivity | null;
+  exposure: ExposureTypeEnum | null;
 
   constructor(params: IRiskDataModel) {
     this.#probability = params.probability || 0;
@@ -91,6 +94,7 @@ export class RiskDataModel {
     this.quantityVibrationL = params.quantityVibrationL;
 
     this.activities = params.activities;
+    this.exposure = params.exposure;
   }
 
   get isQuantity() {
@@ -99,5 +103,29 @@ export class RiskDataModel {
 
   get probability(): IRiskProbabilityValues {
     return getQuantityProbability({ ...this }) || this.#probability;
+  }
+
+  // Getter to return only INSALUBRIDADE activities
+  get insalubridadeActivities(): IRiskDataActivity | null {
+    if (!this.activities) return null;
+
+    const filteredActivities = this.activities.activities?.filter((a) => a.activityType === 'INSALUBRIDADE');
+
+    return {
+      realActivity: this.activities.realActivity,
+      activities: filteredActivities,
+    };
+  }
+
+  // Getter to return only PERICULOSIDADE activities
+  get periculosidadeActivities(): IRiskDataActivity | null {
+    if (!this.activities) return null;
+
+    const filteredActivities = this.activities.activities?.filter((a) => a.activityType === 'PERICULOSIDADE');
+
+    return {
+      realActivity: this.activities.realActivity,
+      activities: filteredActivities,
+    };
   }
 }

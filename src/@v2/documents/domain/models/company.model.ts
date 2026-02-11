@@ -1,4 +1,5 @@
 import { CoverTypeEnum } from '@/@v2/shared/domain/enum/company/cover-type.enum';
+import { CompanyDocumentsCoverVO } from '@/@v2/shared/domain/values-object/company/company-document-cover.vo';
 import { formatCnae } from '@/@v2/shared/utils/helpers/formats-cnae';
 import { AddressModel } from './address.model';
 import { ConsultantModel } from './consultant.model';
@@ -100,6 +101,19 @@ export class CompanyModel {
 
     // Fallback: use a cover with empty types (applies to all types)
     const fallback = allCovers.find((cover) => cover.types.length === 0);
-    return fallback?.data || null;
+    if (fallback) return fallback.data;
+
+    // Final fallback: return default cover if none found
+    return CompanyModel.getDefaultCover();
+  }
+
+  private static getDefaultCover(): CompanyDocumentsCoverVO {
+    return new CompanyDocumentsCoverVO({
+      backgroundImagePath: 'images/cover/simple.png',
+      logoProps: { x: 160, y: 58, maxLogoWidth: 212, maxLogoHeight: 141 },
+      titleProps: { x: 103, y: 310, boxX: 464, boxY: 0, size: 28, color: '000000' },
+      companyProps: { x: 103, y: 510, boxX: 464, boxY: 0, size: 14, color: '000000' },
+      versionProps: { x: 103, y: 480, boxX: 464, boxY: 0, size: 14, color: '000000' },
+    });
   }
 }

@@ -1,4 +1,4 @@
-import { ProfessionalCouncil, StatusEnum } from '@prisma/client';
+import { ProfessionalCouncil, Prisma, StatusEnum } from '@prisma/client';
 import { DocumentDataEntity } from './../../sst/entities/documentData.entity';
 import { ExamEntity } from './../../sst/entities/exam.entity';
 import { ProtocolEntity } from './../../sst/entities/protocol.entity';
@@ -161,6 +161,7 @@ export class CompanyEntity implements Company {
   legal_nature: string;
   cadastral_situation: string;
   cadastral_situation_description: string;
+  metadata: Prisma.JsonValue;
 
   coordinatorName: string; // remover
   stateRegistration: string;

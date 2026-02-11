@@ -288,6 +288,7 @@ model Company {
   companyGroupId                  Int?                    @unique
   esocialLastTransmission         DateTime?
   esocialSend                     Boolean?
+  metadata                        Json?
 
   permissions String[]
 
@@ -1612,7 +1613,7 @@ model Hierarchy {
   formAiAnalyses                FormAiAnalysis[]
 
   @@unique([id, companyId])
-  @@unique([parentId, name])
+  @@unique([parentId, type, name])
   @@index([parentId])
   @@index([deletedAt])
   @@index([companyId])

@@ -42,6 +42,7 @@ export class RiskDataMapper {
     return new RiskDataModel({
       ...this.quantityParse(data),
       activities: data.activities,
+      exposure: data.exposure,
       level: data.level as IRiskLevelValues,
       probability: data.probability as IRiskProbabilityValues,
       probabilityAfter: data.probabilityAfter as IRiskProbabilityValues,
@@ -67,6 +68,7 @@ export class RiskDataMapper {
           new EPIModel({
             ca: epi.epi.ca,
             equipment: epi.epi.equipment,
+            efficientlyCheck: epi.efficientlyCheck,
           }),
       ),
       exams: data.examsToRiskFactorData.map(
@@ -107,7 +109,7 @@ export class RiskDataMapper {
     if (typeof json !== 'object') return quantityObject;
 
     if (json.type === QuantityTypeEnum.QUI) quantityObject.quantityQui = new RiskDataQuantityQuiVO(json);
-    if (json.type === QuantityTypeEnum.NOISE) quantityObject.quantityNoise = new RiskDataQuantityNoiseVO(json);
+    if (json.type === QuantityTypeEnum.NOISE) quantityObject.quantityNoise = new RiskDataQuantityNoiseVO({ ...json, appendix: data.riskFactor?.appendix });
     if (json.type === QuantityTypeEnum.VFB) quantityObject.quantityVibrationFB = new RiskDataQuantityVibrationFBVO(json);
     if (json.type === QuantityTypeEnum.VL) quantityObject.quantityVibrationL = new RiskDataQuantityVibrationLVO(json);
     if (json.type === QuantityTypeEnum.RADIATION) quantityObject.quantityRadiation = new RiskDataQuantityRadiationVO(json);

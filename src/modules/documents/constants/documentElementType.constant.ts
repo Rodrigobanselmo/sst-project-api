@@ -408,4 +408,9 @@ export const documentElementTypeMap: IDocumentElementTypeMap = {
     type: DocumentSectionChildrenTypeEnum.PERICULOSIDADE_ACTIVITIES,
     accept: ['PERICULOSIDADE'],
   },
+  [DocumentSectionChildrenTypeEnum.INSALUBRIDADE_ACTIVITIES]: {
+    label: 'Atividades Insalubres',
+    type: DocumentSectionChildrenTypeEnum.INSALUBRIDADE_ACTIVITIES,
+    accept: ['INSALUBRIDADE'],
+  },
 };

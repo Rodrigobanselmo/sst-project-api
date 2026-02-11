@@ -34,21 +34,6 @@ export class CompanyMapper {
       });
     });
 
-    if (covers.length === 0) {
-      const cover = new CoverModel({
-        data: new CompanyDocumentsCoverVO({
-          backgroundImagePath: 'images/cover/simple.png',
-          logoProps: { x: 160, y: 58, maxLogoWidth: 212, maxLogoHeight: 141 },
-          titleProps: { x: 103, y: 310, boxX: 464, boxY: 0, size: 28, color: '000000' },
-          companyProps: { x: 103, y: 510, boxX: 464, boxY: 0, size: 14, color: '000000' },
-          versionProps: { x: 103, y: 480, boxX: 464, boxY: 0, size: 14, color: '000000' },
-        }),
-        types: [CoverTypeEnum.PGR, CoverTypeEnum.PCSMO],
-      });
-
-      covers.push(cover);
-    }
-
     return new CompanyModel({
       id: data.id,
       name: data.name,

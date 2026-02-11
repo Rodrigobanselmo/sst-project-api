@@ -44,6 +44,7 @@ import { controlMeasuresEngIterable } from '../../../components/iterables/contro
 import { controlMeasuresAdmIterable } from '../../../components/iterables/controlMeasuresAdm/control-measures-adm.iterable';
 import { controlMeasuresEpiIterable } from '../../../components/iterables/controlMeasuresEpi/control-measures-epi.iterable';
 import { activitiesPericulosidadeElements } from '../../../components/iterables/activities-periculosidade/activities-periculosidade.elements';
+import { activitiesInsalubridadeElements } from '../../../components/iterables/activities-insalubridade/activities-insalubridade.elements';
 import { workspaceBlockElements } from '../../../components/iterables/workspaceBlock/workspace-block.elements';
 import { scopeBlockElements } from '../../../components/iterables/scopeBlock/scope-block.elements';
 
@@ -207,6 +208,8 @@ export class ElementsMapClass {
     [DocumentChildrenTypeEnum.PLAN_TABLE]: () => actionPlanTableSection(this.oldDocumentRiskData, this.oldHierarchyTree)['children'],
     [DocumentChildrenTypeEnum.PERICULOSIDADE_ACTIVITIES]: () =>
       activitiesPericulosidadeElements(this.data, this.OldHierarchy, this.OldHomogeneousGroup, this.oldHierarchyTree, (x: ISectionChildrenType[]) => this.convertToDocx(x)),
+    [DocumentChildrenTypeEnum.INSALUBRIDADE_ACTIVITIES]: () =>
+      activitiesInsalubridadeElements(this.data, this.OldHierarchy, this.OldHomogeneousGroup, this.oldHierarchyTree, (x: ISectionChildrenType[]) => this.convertToDocx(x)),
     [DocumentChildrenTypeEnum.WORKSPACE_BLOCK]: () => workspaceBlockElements({ workspace: this.data.documentBase.workspace }),
     [DocumentChildrenTypeEnum.SCOPE_BLOCK]: () => scopeBlockElements({ data: this.data }),
   };

@@ -12,6 +12,7 @@ export enum DocumentSectionTypeEnum {
   ITERABLE_ENVIRONMENTS = 'ITERABLE_ENVIRONMENTS',
   ITERABLE_CHARACTERIZATION = 'ITERABLE_CHARACTERIZATION',
   PERICULOSIDADE_ACTIVITIES = 'PERICULOSIDADE_ACTIVITIES',
+  INSALUBRIDADE_ACTIVITIES = 'INSALUBRIDADE_ACTIVITIES',
 }
 
 interface IBase {
@@ -74,7 +75,11 @@ export type IPericulosidadeActivities = {
   type: DocumentSectionTypeEnum.PERICULOSIDADE_ACTIVITIES;
 } & IBase;
 
-export type IAllDocumentSectionType = IChapter | ISection | ICover | ISectionEnv | ISectionChar | ITOC | IAprTable | IAprGroupTable | IActionPlanTable | IPericulosidadeActivities;
+export type IInsalubridadeActivities = {
+  type: DocumentSectionTypeEnum.INSALUBRIDADE_ACTIVITIES;
+} & IBase;
+
+export type IAllDocumentSectionType = IChapter | ISection | ICover | ISectionEnv | ISectionChar | ITOC | IAprTable | IAprGroupTable | IActionPlanTable | IPericulosidadeActivities | IInsalubridadeActivities;
 
 export type IDocumentPGRSectionGroup = {
   data: IAllDocumentSectionType[];

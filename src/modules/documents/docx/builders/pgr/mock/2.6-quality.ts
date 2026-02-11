@@ -67,7 +67,7 @@ export const qualitySection: IDocumentPGRSectionGroup = {
         },
         {
           type: DocumentSectionChildrenTypeEnum.BULLET,
-          text: 'Nenhum fator de risco quimíco foi caracterizado.',
+          text: 'Nenhum fator de risco químico foi caracterizado.',
           removeWithAllValidVars: [VariablesPGREnum.HAS_RISK_QUI],
         },
         {

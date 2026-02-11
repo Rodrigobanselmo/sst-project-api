@@ -420,6 +420,9 @@ export class UpdateCompanyDto {
     message: `Tipo de pagamento inválido`,
   })
   paymentType?: CompanyPaymentTypeEnum;
+
+  @IsOptional()
+  metadata?: Record<string, any>;
 }
 
 export class UpdateApplyServiceCompanyDto {

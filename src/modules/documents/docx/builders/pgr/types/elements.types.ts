@@ -74,6 +74,7 @@ export enum DocumentSectionChildrenTypeEnum {
   TABLE_PCMSO_HIERARCHY_CONCAT = 'TABLE_PCMSO_HIERARCHY_CONCAT',
 
   PERICULOSIDADE_ACTIVITIES = 'PERICULOSIDADE_ACTIVITIES',
+  INSALUBRIDADE_ACTIVITIES = 'INSALUBRIDADE_ACTIVITIES',
   WORKSPACE_BLOCK = 'WORKSPACE_BLOCK',
   SCOPE_BLOCK = 'SCOPE_BLOCK',
 }
@@ -418,6 +419,10 @@ export type ITablePericulosidadeActivities = {
   type: DocumentSectionChildrenTypeEnum.PERICULOSIDADE_ACTIVITIES;
 } & IBaseDocumentModel;
 
+export type ITableInsalubridadeActivities = {
+  type: DocumentSectionChildrenTypeEnum.INSALUBRIDADE_ACTIVITIES;
+} & IBaseDocumentModel;
+
 export type IWorkspaceBlock = {
   type: DocumentSectionChildrenTypeEnum.WORKSPACE_BLOCK;
 } & IBaseDocumentModel;
@@ -495,4 +500,5 @@ export type ISectionChildrenType =
   | ITablePericulosidadeActivities
   | IProfessional
   | IScopeBlock
-  | IWorkspaceBlock;
+  | IWorkspaceBlock
+  | ITableInsalubridadeActivities;

@@ -88,4 +88,12 @@ export const documentSectionTypeMap: IDocumentSectionTypeMap = {
     accept: [DocumentTypeEnum.PERICULOSIDADE],
     order: fourthOrder,
   },
+
+  // *INSALUBRIDADE string ---------------------->
+  [DocumentSectionTypeEnum.INSALUBRIDADE_ACTIVITIES]: {
+    label: 'Avaliação das Atividades Insalubres',
+    type: DocumentSectionTypeEnum.INSALUBRIDADE_ACTIVITIES,
+    accept: [DocumentTypeEnum.INSALUBRIDADE],
+    order: fourthOrder,
+  },
 };

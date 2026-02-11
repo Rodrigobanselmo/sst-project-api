@@ -31,6 +31,7 @@ export class RiskMapper {
       cas: data.cas,
       healthRisk: data.risk,
       ipvs: data.ipvs,
+      appendix: data.appendix,
       nr15lt: data.nr15lt,
       pe: data.pe,
       propagation: data.propagation,
@@ -39,6 +40,7 @@ export class RiskMapper {
       symptoms: data.symptoms,
       twa: data.twa,
       otherAppendix: data.otherAppendix,
+      grauInsalubridade: data.grauInsalubridade,
       requirement: { document: documentRequirement },
       documentsRequirements: data.docInfo.map((doc) => new RiskDocumentsRequirementVO(doc)),
     });

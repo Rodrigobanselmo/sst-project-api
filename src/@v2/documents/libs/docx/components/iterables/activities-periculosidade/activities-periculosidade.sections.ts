@@ -269,6 +269,7 @@ export const activitiesPericulosidadeSections = (
     if (hasGroups) {
       const groupsWithCharacterization = groups.filter((group) => group.characterization).sort((a, b) => sortNumber(a, b, 'order'));
       const groupsHierarchy = groups.filter((group) => group.isHierarchy);
+      const groupsGHO = groups.filter((group) => group.isGHO);
 
       groupsWithCharacterization.forEach((group) => {
         const characterizationName = group.characterization!.name;
@@ -339,6 +340,62 @@ export const activitiesPericulosidadeSections = (
         sectionElements.push(...convertToDocx(h2Section));
 
         const { riskFactors, realActivities, normativeActivities } = getSharedData({ riskData: group.allRiskData, periculosidadeType });
+
+        sectionElements.push(...convertToDocx([...riskFactors, ...realActivities, ...normativeActivities]));
+      });
+
+      // Process GHO (Grupo Homogêneo de Exposição) groups
+      groupsGHO.forEach((group) => {
+        const h2Section: ISectionChildrenType[] = [
+          {
+            type: DocumentChildrenTypeEnum.H2,
+            text: `GHO: ${group.name}`,
+          },
+        ];
+
+        sectionElements.push(...convertToDocx(h2Section));
+
+        // Add description if available
+        if (group.description) {
+          sectionElements.push(
+            ...convertToDocx([
+              {
+                type: DocumentChildrenTypeEnum.PARAGRAPH,
+                text: group.description,
+              },
+            ]),
+          );
+        }
+
+        const { riskFactors, realActivities, normativeActivities } = getSharedData({ riskData: group.allRiskData, periculosidadeType });
+
+        // Add hierarchy table for GHO
+        const { table: officesTable, missingBody } = hierarchyHomoOrgTable(hierarchiesTreeOrg, homoGroupTree, {
+          showDescription: false,
+          showHomogeneous: true,
+          type: group.type,
+          groupIdFilter: group.id,
+        });
+
+        if (!missingBody) {
+          const titleTable: ISectionChildrenType[] = [
+            {
+              type: DocumentChildrenTypeEnum.PARAGRAPH_TABLE,
+              text: `Cargos lotados no GHO ${group.name}`,
+            },
+          ];
+
+          sectionElements.push(...convertToDocx(titleTable));
+          sectionElements.push(officesTable);
+          sectionElements.push(
+            ...convertToDocx([
+              {
+                type: DocumentChildrenTypeEnum.PARAGRAPH,
+                text: '',
+              },
+            ]),
+          );
+        }
 
         sectionElements.push(...convertToDocx([...riskFactors, ...realActivities, ...normativeActivities]));
       });

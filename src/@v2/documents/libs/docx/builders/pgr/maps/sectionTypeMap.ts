@@ -21,6 +21,7 @@ import { IDocVariables } from '../types/documet-section-groups.types';
 import { IMapElementDocumentType } from './elementTypeMap';
 import { CoverTypeEnum } from '@/@v2/shared/domain/enum/company/cover-type.enum';
 import { activitiesPericulosidadeSections } from '../../../components/iterables/activities-periculosidade/activities-periculosidade.sections';
+import { activitiesInsalubridadeSections } from '../../../components/iterables/activities-insalubridade/activities-insalubridade.sections';
 
 type IMapSectionDocumentType = Record<string, (arg: any) => ISectionOptions | ISectionOptions[] | Promise<ISectionOptions> | Promise<ISectionOptions[]>>;
 
@@ -97,6 +98,14 @@ export class SectionsMapClass {
     // *PERICULOSIDADE string --------------------->
     [DocumentSectionTypeEnum.PERICULOSIDADE_ACTIVITIES]: (): ISectionOptions[] =>
       activitiesPericulosidadeSections(this.data, this.oldData.hierarchyData, this.oldData.homoGroupTree, this.oldData.hierarchyTree, (x) => this.convertToDocx(x)).map(({ footerText, children }) => ({
+        children,
+        ...this.getFooterHeader(footerText),
+        ...sectionLandscapeProperties,
+      })),
+
+    // *INSALUBRIDADE string --------------------->
+    [DocumentSectionTypeEnum.INSALUBRIDADE_ACTIVITIES]: (): ISectionOptions[] =>
+      activitiesInsalubridadeSections(this.data, this.oldData.hierarchyData, this.oldData.homoGroupTree, this.oldData.hierarchyTree, (x) => this.convertToDocx(x)).map(({ footerText, children }) => ({
         children,
         ...this.getFooterHeader(footerText),
         ...sectionLandscapeProperties,

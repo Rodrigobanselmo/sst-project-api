@@ -136,6 +136,7 @@ export class CompanyRepository implements ICompanyRepository {
       companyId,
       doctorResponsibleId,
       tecResponsibleId,
+      metadata,
       ...updateCompanyDto
     }: UpdateCompanyDto & { deleted_at?: Date },
     options?: IPrismaOptions<{
@@ -155,10 +156,23 @@ export class CompanyRepository implements ICompanyRepository {
         data: { primary_activity: { set: [] } },
       });
 
+    // Merge metadata instead of overwriting
+    let mergedMetadata = metadata;
+    if (metadata) {
+      const currentCompany = await this.prisma.company.findUnique({
+        where: { id: companyId },
+        select: { metadata: true },
+      });
+
+      const currentMetadata = (currentCompany?.metadata as any) || {};
+      mergedMetadata = { ...currentMetadata, ...metadata };
+    }
+
     const companyPrisma = this.prisma.company.update({
       where: { id: companyId },
       data: {
         ...updateCompanyDto,
+        ...(mergedMetadata && { metadata: mergedMetadata }),
         doctorResponsible: doctorResponsibleId ? { connect: { id: doctorResponsibleId } } : undefined,
         tecResponsible: tecResponsibleId ? { connect: { id: tecResponsibleId } } : undefined,
         users: {
