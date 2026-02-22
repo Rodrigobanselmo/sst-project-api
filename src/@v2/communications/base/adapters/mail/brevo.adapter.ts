@@ -6,15 +6,15 @@ import { EmailTemplate } from '@/templates/@v2/email';
 import { isDevelopment } from '@/@v2/shared/utils/helpers/is-development';
 import { Injectable, Logger } from '@nestjs/common';
 import { config } from '@/@v2/shared/constants/config';
-import * as Brevo from '@getbrevo/brevo';
+import { BrevoClient, BrevoError } from '@getbrevo/brevo';
 
-// Using official Brevo SDK types
+// Using Brevo SDK v4.x
 
 @Injectable()
 export class BrevoAdapter implements SendMailAdapter {
   private readonly logger = new Logger(BrevoAdapter.name);
   private readonly whitelist = ['rodrigobanselmo@gmail.com', 'rodrigoanselmo.dev@gmail.com', 'rodrigoanselmo5555@hotmail.com'];
-  private readonly apiInstance: Brevo.TransactionalEmailsApi;
+  private readonly brevoClient: BrevoClient | null = null;
   private readonly fromEmail: string;
   private readonly fromName: string;
 
@@ -28,14 +28,16 @@ export class BrevoAdapter implements SendMailAdapter {
       return;
     }
 
-    this.apiInstance = new Brevo.TransactionalEmailsApi();
-    const apiKey = this.apiInstance.authentications['apiKey'];
-    apiKey.apiKey = config.EMAIL.BREVO_API_KEY;
+    this.brevoClient = new BrevoClient({
+      apiKey: config.EMAIL.BREVO_API_KEY,
+      timeoutInSeconds: 30,
+      maxRetries: 2,
+    });
   }
 
   async sendMail({ to, type, variables, attachments }: SendMailAdapter.SendMailData): Promise<void> {
     try {
-      if (!this.apiInstance) {
+      if (!this.brevoClient) {
         throw new Error('Brevo API not initialized. Check API key configuration.');
       }
 
@@ -58,8 +60,8 @@ export class BrevoAdapter implements SendMailAdapter {
       const templateParse = handlebars.compile(templateFileContent);
       const templateHTML = templateParse(variables);
 
-      // Create SendSmtpEmail object
-      const sendSmtpEmail: Brevo.SendSmtpEmail = {
+      // Create email payload for Brevo v4.x
+      const emailPayload: Parameters<typeof this.brevoClient.transactionalEmails.sendTransacEmail>[0] = {
         subject: subject,
         htmlContent: templateHTML,
         sender: {
@@ -68,27 +70,26 @@ export class BrevoAdapter implements SendMailAdapter {
         },
         to: emailArray.map((email) => ({ email })),
         tags: ['transactional', type],
-        attachment: undefined,
       };
 
       // Add attachments if provided
       if (attachments?.length) {
         this.validateAttachments(attachments);
-        sendSmtpEmail.attachment = attachments.map((attachment) => ({
+        emailPayload.attachment = attachments.map((attachment) => ({
           content: attachment.content,
           name: attachment.filename,
         }));
       }
 
-      const response = await this.apiInstance.sendTransacEmail(sendSmtpEmail);
+      const response = await this.brevoClient.transactionalEmails.sendTransacEmail(emailPayload);
 
       this.logger.log(`Email sent successfully to: ${emailArray.join(', ')}`);
-      this.logger.debug(`Brevo MessageId: ${response.body.messageId}`);
+      this.logger.debug(`Brevo MessageId: ${response.messageId}`);
     } catch (error) {
       this.logger.error(`Failed to send email via Brevo: ${error.message}`, error.stack);
 
-      if (error.body) {
-        this.logger.error(`Brevo API Error: ${JSON.stringify(error.body)}`);
+      if (error instanceof BrevoError) {
+        this.logger.error(`Brevo API Error ${error.statusCode}: ${error.message}`);
       }
 
       captureException(error);
@@ -125,20 +126,17 @@ export class BrevoAdapter implements SendMailAdapter {
   }
 
   /**
-   * Test the Brevo API connection by attempting to send a test email
+   * Test the Brevo API connection
    */
   async testConnection(): Promise<boolean> {
     try {
-      // Create a minimal test email to validate API key
-      const testEmail: Brevo.SendSmtpEmail = {
-        subject: 'API Test',
-        textContent: 'Test connection',
-        sender: { name: this.fromName, email: this.fromEmail },
-        to: [{ email: this.fromEmail }],
-      };
+      if (!this.brevoClient) {
+        this.logger.error('Brevo API not configured');
+        return false;
+      }
 
-      // This will throw an error if API key is invalid
-      await this.apiInstance.sendTransacEmail(testEmail);
+      // Try to get account info to validate API key
+      await this.brevoClient.account.getAccount();
       this.logger.log('Brevo API connection test successful');
       return true;
     } catch (error) {
