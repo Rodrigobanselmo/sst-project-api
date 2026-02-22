@@ -7,13 +7,14 @@ WORKDIR /app
 RUN corepack enable
 
 COPY package*.json ./
+COPY yarn.lock ./
 COPY prisma ./prisma/
 
-RUN yarn install
+RUN yarn install --frozen-lockfile
 
 COPY . .
 
-RUN yarn build
+RUN npx prisma generate && yarn build
 
 # ---
 
@@ -29,4 +30,6 @@ COPY --from=builder /app/dist ./dist/
 COPY --from=builder /app/prisma ./prisma
 
 EXPOSE 3333
-CMD ["yarn", "start:prod"]
+
+# Run migrations and start the app (no rebuild needed - dist is already built)
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main --max-old-space-size=4096"]
