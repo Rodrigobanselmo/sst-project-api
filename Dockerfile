@@ -28,5 +28,5 @@ COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/dist ./dist/
 COPY --from=builder /app/prisma ./prisma
 
-EXPOSE 1235
+EXPOSE 3333
 CMD ["yarn", "start:prod"]

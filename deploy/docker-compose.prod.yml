@@ -1,0 +1,94 @@
+services:
+  # ===================
+  # API NestJS
+  # ===================
+  api:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: simplesst-api
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - PORT=3333
+      - DATABASE_URL=postgresql://${DATABASE_USER}:${DATABASE_PASSWORD}@db:5432/${DATABASE_NAME}?schema=public&pool_timeout=0
+    env_file:
+      - ../.env
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - simplesst-network
+    deploy:
+      resources:
+        limits:
+          memory: 5G
+        reservations:
+          memory: 2G
+
+  # ===================
+  # PostgreSQL Database
+  # ===================
+  db:
+    image: postgres:16-alpine
+    container_name: simplesst-db
+    restart: always
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backups:/backups
+    networks:
+      - simplesst-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER} -d ${DATABASE_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 512M
+
+  # ===================
+  # Nginx + SSL (Certbot)
+  # ===================
+  nginx:
+    image: nginx:alpine
+    container_name: simplesst-nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./certbot/www:/var/www/certbot:ro
+      - ./certbot/conf:/etc/letsencrypt:ro
+    depends_on:
+      - api
+    networks:
+      - simplesst-network
+
+  # ===================
+  # Certbot (SSL Auto-Renewal)
+  # ===================
+  certbot:
+    image: certbot/certbot
+    container_name: simplesst-certbot
+    volumes:
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/conf:/etc/letsencrypt
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+networks:
+  simplesst-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+
