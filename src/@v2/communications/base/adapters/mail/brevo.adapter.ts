@@ -6,7 +6,7 @@ import { EmailTemplate } from '@/templates/@v2/email';
 import { isDevelopment } from '@/@v2/shared/utils/helpers/is-development';
 import { Injectable, Logger } from '@nestjs/common';
 import { config } from '@/@v2/shared/constants/config';
-import { TransactionalEmailsApi, SendSmtpEmail, TransactionalEmailsApiApiKeys } from '@getbrevo/brevo';
+import * as Brevo from '@getbrevo/brevo';
 
 // Using official Brevo SDK types
 
@@ -14,7 +14,7 @@ import { TransactionalEmailsApi, SendSmtpEmail, TransactionalEmailsApiApiKeys } 
 export class BrevoAdapter implements SendMailAdapter {
   private readonly logger = new Logger(BrevoAdapter.name);
   private readonly whitelist = ['rodrigobanselmo@gmail.com', 'rodrigoanselmo.dev@gmail.com', 'rodrigoanselmo5555@hotmail.com'];
-  private readonly apiInstance: TransactionalEmailsApi;
+  private readonly apiInstance: Brevo.TransactionalEmailsApi;
   private readonly fromEmail: string;
   private readonly fromName: string;
 
@@ -28,9 +28,9 @@ export class BrevoAdapter implements SendMailAdapter {
       return;
     }
 
-    this.apiInstance = new TransactionalEmailsApi();
-    this.apiInstance.setApiKey(TransactionalEmailsApiApiKeys.apiKey, config.EMAIL.BREVO_API_KEY);
-    (this.apiInstance as any).authentications.apiKey.apiKey = config.EMAIL.BREVO_API_KEY;
+    this.apiInstance = new Brevo.TransactionalEmailsApi();
+    const apiKey = this.apiInstance.authentications['apiKey'];
+    apiKey.apiKey = config.EMAIL.BREVO_API_KEY;
   }
 
   async sendMail({ to, type, variables, attachments }: SendMailAdapter.SendMailData): Promise<void> {
@@ -59,15 +59,17 @@ export class BrevoAdapter implements SendMailAdapter {
       const templateHTML = templateParse(variables);
 
       // Create SendSmtpEmail object
-      const sendSmtpEmail = new SendSmtpEmail();
-      sendSmtpEmail.subject = subject;
-      sendSmtpEmail.htmlContent = templateHTML;
-      sendSmtpEmail.sender = {
-        name: this.fromName,
-        email: this.fromEmail,
+      const sendSmtpEmail: Brevo.SendSmtpEmail = {
+        subject: subject,
+        htmlContent: templateHTML,
+        sender: {
+          name: this.fromName,
+          email: this.fromEmail,
+        },
+        to: emailArray.map((email) => ({ email })),
+        tags: ['transactional', type],
+        attachment: undefined,
       };
-      sendSmtpEmail.to = emailArray.map((email) => ({ email }));
-      sendSmtpEmail.tags = ['transactional', type]; // Add tags for better tracking
 
       // Add attachments if provided
       if (attachments?.length) {
@@ -128,11 +130,12 @@ export class BrevoAdapter implements SendMailAdapter {
   async testConnection(): Promise<boolean> {
     try {
       // Create a minimal test email to validate API key
-      const testEmail = new SendSmtpEmail();
-      testEmail.subject = 'API Test';
-      testEmail.textContent = 'Test connection';
-      testEmail.sender = { name: this.fromName, email: this.fromEmail };
-      testEmail.to = [{ email: this.fromEmail }]; // Send to self for testing
+      const testEmail: Brevo.SendSmtpEmail = {
+        subject: 'API Test',
+        textContent: 'Test connection',
+        sender: { name: this.fromName, email: this.fromEmail },
+        to: [{ email: this.fromEmail }],
+      };
 
       // This will throw an error if API key is invalid
       await this.apiInstance.sendTransacEmail(testEmail);
