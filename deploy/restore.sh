@@ -8,8 +8,9 @@
 
 set -e
 
-# Carregar variáveis de ambiente
-source ../.env
+# Diretório do script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
 
 BACKUP_FILE=$1
 
@@ -28,6 +29,9 @@ if [ ! -f "$BACKUP_FILE" ]; then
 fi
 
 echo "⚠️  ATENÇÃO: Isso irá SUBSTITUIR todos os dados do banco!"
+echo "   Arquivo: $BACKUP_FILE"
+echo "   Tamanho: $(ls -lh $BACKUP_FILE | awk '{print $5}')"
+echo ""
 read -p "Tem certeza? (digite 'sim' para confirmar): " CONFIRM
 
 if [ "$CONFIRM" != "sim" ]; then
@@ -37,8 +41,8 @@ fi
 
 echo "🔄 Restaurando backup: $BACKUP_FILE"
 
-# Restaurar
-gunzip -c $BACKUP_FILE | docker exec -i simplesst-db psql -U $DATABASE_USER $DATABASE_NAME
+# Restaurar (usa postgres como usuário padrão)
+gunzip -c $BACKUP_FILE | docker exec -i simplesst-db psql -U postgres postgres
 
 echo "✅ Backup restaurado com sucesso!"
 
