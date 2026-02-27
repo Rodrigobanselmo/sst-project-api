@@ -98,6 +98,10 @@ export class CreateRiskDto {
   @IsOptional()
   propagation?: string[];
 
+  @IsString({ each: true })
+  @IsOptional()
+  synonymous?: string[];
+
   //FIS QUI
 
   @IsString()
@@ -270,6 +274,10 @@ export class UpdateRiskDto {
   @IsString({ each: true })
   @IsOptional()
   propagation?: string[];
+
+  @IsString({ each: true })
+  @IsOptional()
+  synonymous?: string[];
 
   //FIS QUI
 
