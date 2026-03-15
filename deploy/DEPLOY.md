@@ -11,11 +11,12 @@
 | **URL da API**     | `https://api.production.simplesst.com.br`         |
 | **Usuário SSH**    | `ubuntu`                                          |
 | **Chave SSH**      | `~/.ssh/simplesst_magalu`                         |
-| **VM**             | Magalu Cloud BV2-4-20 (4GB RAM, 2 vCPU, 20GB SSD) |
+| **VM**             | Magalu Cloud BV2-8-40 (8GB RAM, 2 vCPU, 40GB SSD) |
 | **Sistema**        | Ubuntu 24.04 LTS                                  |
 | **Node.js**        | v22.22.0                                          |
 | **PM2**            | v6.0.14                                           |
 | **PostgreSQL**     | 17.8 + pgvector 0.8.1 (Docker)                    |
+| **Node Max Heap**  | 6144 MB (6 GB)                                    |
 | **SSL**            | Let's Encrypt (válido até 23/05/2026)             |
 
 ---
@@ -128,8 +129,8 @@ npx prisma migrate deploy
 ```bash
 cd /home/ubuntu/sst-project-api
 
-# Iniciar aplicação
-pm2 start dist/main.js --name simplesst-api --max-memory-restart 3G
+# Iniciar aplicação (6GB de memória para documentos grandes)
+pm2 start dist/main.js --name simplesst-api --max-memory-restart 6G --node-args='--max-old-space-size=6144'
 
 # Salvar configuração PM2
 pm2 save
@@ -397,7 +398,7 @@ sudo certbot renew
 pm2 status
 
 # Se não estiver, iniciar
-pm2 start dist/main.js --name simplesst-api --max-memory-restart 3G
+pm2 start dist/main.js --name simplesst-api --max-memory-restart 6G --node-args='--max-old-space-size=6144'
 
 # Verificar logs de erro
 pm2 logs simplesst-api --err --lines 50
