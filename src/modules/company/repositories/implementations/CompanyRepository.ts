@@ -256,7 +256,7 @@ export class CompanyRepository implements ICompanyRepository {
         },
       },
       include: {
-        workspace: include.workspace ? { include: { address: true } } : false,
+        workspace: include.workspace ? { where: { deleted_at: null }, include: { address: true } } : false,
         primary_activity: !!include.primary_activity,
         secondary_activity: !!include.secondary_activity,
         license: !!include.license,
@@ -378,7 +378,7 @@ export class CompanyRepository implements ICompanyRepository {
             },
           },
           include: {
-            workspace: include.workspace ? { include: { address: true } } : false,
+            workspace: include.workspace ? { where: { deleted_at: null }, include: { address: true } } : false,
             primary_activity: !!include.primary_activity,
             secondary_activity: !!include.secondary_activity,
             license: !!include.license,
@@ -418,7 +418,7 @@ export class CompanyRepository implements ICompanyRepository {
         },
       },
       include: {
-        workspace: { include: { address: true } },
+        workspace: { where: { deleted_at: null }, include: { address: true } },
         primary_activity: true,
         secondary_activity: true,
         group: true,
@@ -757,7 +757,7 @@ export class CompanyRepository implements ICompanyRepository {
         where,
         ...(!options?.select && {
           include: {
-            workspace: { include: { address: true } },
+            workspace: { where: { deleted_at: null }, include: { address: true } },
             doctorResponsible: { include: { professional: true } },
             group: true,
             tecResponsible: { include: { professional: true } },
@@ -823,7 +823,7 @@ export class CompanyRepository implements ICompanyRepository {
         },
         primary_activity: !!include?.primary_activity,
         secondary_activity: !!include?.secondary_activity,
-        workspace: !!include?.workspace ? { include: { address: true } } : false,
+        workspace: !!include?.workspace ? { where: { deleted_at: null }, include: { address: true } } : false,
         address: true,
         doctorResponsible: { include: { professional: true } },
         tecResponsible: { include: { professional: true } },

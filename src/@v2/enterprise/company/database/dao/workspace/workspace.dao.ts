@@ -41,7 +41,11 @@ export class WorkspaceDAO {
   }
 
   private browseWhere(filters: IWorkspaceDAO.BrowseParams['filters']) {
-    const where = [Prisma.sql`w."companyId" = ${filters.companyId}`, Prisma.sql`w."status"::text = ${StatusEnum.ACTIVE}`];
+    const where = [
+      Prisma.sql`w."companyId" = ${filters.companyId}`,
+      Prisma.sql`w."status"::text = ${StatusEnum.ACTIVE}`,
+      Prisma.sql`w."deleted_at" IS NULL`,
+    ];
 
     return where;
   }
@@ -65,5 +69,13 @@ export class WorkspaceDAO {
     const orderByRaw = orderBy.map<IOrderByRawPrisma>(({ field, order }) => ({ column: map[field], order }));
 
     return orderByRaw;
+  }
+
+  async softDelete(workspaceId: string, companyId: string): Promise<number> {
+    const result = await this.prisma.workspace.updateMany({
+      where: { id: workspaceId, companyId },
+      data: { deleted_at: new Date() },
+    });
+    return result.count;
   }
 }

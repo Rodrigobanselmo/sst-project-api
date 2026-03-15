@@ -29,6 +29,7 @@ import { FindCompanyDashDto } from '../../dto/dashboard.dto';
 import { DashboardCompanyService } from '../../services/report/dashboard-company/dashboard-company.service';
 import { UpdateApplyServiceCompanyService } from '../../services/company/update-apply-service-company/update-apply-service-company.service';
 import { DeleteCompanyService } from '../../services/company/delete-company/delete-company.service';
+import { DeleteWorkspaceService } from '../../services/workspace/delete-workspace/delete-workspace.service';
 
 @Controller('company')
 export class CompanyController {
@@ -50,6 +51,7 @@ export class CompanyController {
     private readonly updateAllCompaniesService: UpdateAllCompaniesService,
     private readonly updateApplyServiceCompanyService: UpdateApplyServiceCompanyService,
     private readonly deleteCompanyService: DeleteCompanyService,
+    private readonly deleteWorkspaceService: DeleteWorkspaceService,
     private readonly addWorkspacePhotoService: AddWorkspacePhotoService,
   ) {}
 
@@ -171,6 +173,11 @@ export class CompanyController {
     isMember: true,
     crud: true,
   })
+  @Delete('/:companyId/workspace/:workspaceId')
+  deleteWorkspace(@Param('workspaceId') workspaceId: string, @User() userPayloadDto: UserPayloadDto) {
+    return this.deleteWorkspaceService.execute(workspaceId, userPayloadDto);
+  }
+
   @Post('/:companyId/workspace/:workspaceId/photo')
   @UseInterceptors(FileInterceptor('file'))
   async uploadWorkspacePhoto(@UploadedFile() file: any, @Param('workspaceId') workspaceId: string, @User() userPayloadDto: UserPayloadDto) {

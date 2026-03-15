@@ -166,8 +166,10 @@ import { FindImageGalleryService } from './services/imageGallery/find-image-gall
 import { DeleteImageGalleryService } from './services/imageGallery/delete-image-gallery/delete-image-gallery.service';
 import { ImageGalleryRepository } from './repositories/implementations/ImageGalleryRepository';
 import { ImageGalleryController } from './controller/imageGallery/imageGallery.controller';
+import { DeleteWorkspaceService } from './services/workspace/delete-workspace/delete-workspace.service';
 import { FindWorkspaceService } from './services/workspace/find-workspace/find-workspace.service';
 import { WorkspaceController } from './controller/workspace/workspace.controller';
+import { WorkspaceV2Controller } from './controller/workspace-v2/workspace-v2.controller';
 import { SyncRepository } from './repositories/implementations/SyncRepository';
 import { SyncMainService } from './services/sync/sync-main/sync-main.service';
 import { SyncController } from './controller/sync/sync.controller';
@@ -212,6 +214,7 @@ import { PreviewDocumentCoverService } from './services/document-cover/preview-d
     ScheduleMedicalVisitController,
     ImageGalleryController,
     WorkspaceController,
+    WorkspaceV2Controller,
     SyncController,
     DocumentCoverController,
   ],
@@ -362,6 +365,7 @@ import { PreviewDocumentCoverService } from './services/document-cover/preview-d
     DeleteImageGalleryService,
     FindImageGalleryService,
     ImageGalleryRepository,
+    DeleteWorkspaceService,
     FindWorkspaceService,
     SyncRepository,
     SyncMainService,

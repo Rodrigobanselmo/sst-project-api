@@ -36,12 +36,12 @@ export class WorkspaceRepository {
   }
 
   async findById(id: string) {
-    const workspace = await this.prisma.workspace.findUnique({
-      where: { id },
+    const workspace = await this.prisma.workspace.findFirst({
+      where: { id, deleted_at: null },
       include: { address: true },
     });
 
-    return new WorkspaceEntity(workspace);
+    return workspace ? new WorkspaceEntity(workspace) : null;
   }
 
   async update(id: string, data: Partial<WorkspaceDto>) {
@@ -54,9 +54,16 @@ export class WorkspaceRepository {
     return new WorkspaceEntity(workspace);
   }
 
+  async softDelete(id: string): Promise<void> {
+    await this.prisma.workspace.update({
+      where: { id },
+      data: { deleted_at: new Date() },
+    });
+  }
+
   async findByCompany(companyId: string) {
     const workspaces = await this.prisma.workspace.findMany({
-      where: { companyId },
+      where: { companyId, deleted_at: null },
     });
 
     return [...workspaces.map((workspace) => new WorkspaceEntity(workspace))];
@@ -72,18 +79,7 @@ export class WorkspaceRepository {
 
   async find(query: Partial<FindWorkspaceDto>, pagination: PaginationQueryDto, options: Prisma.WorkspaceFindManyArgs = {}) {
     const whereInit = {
-      AND: [
-        // {
-        //   OR: [
-        //     { companyId: query.companyId },
-        //     {
-        //       company: {
-        //         group: { companies: { some: { companyId: query.companyId } } },
-        //       },
-        //     },
-        //   ],
-        // },
-      ],
+      AND: [{ deleted_at: null }],
     } as typeof options.where;
 
     const { where } = prismaFilter(whereInit, {
