@@ -32,6 +32,7 @@ import { CreateDocumentModelService } from './services/document/document-models/
 import { UpdateDocumentModelService } from './services/document/document-models/update-document-model.service';
 import { FindDocumentModelService } from './services/document/document-models/find-document-model.service';
 import { FindOneDocumentModelService } from './services/document/document-models/find-one-document-model.service';
+import { DeleteDocumentModelService } from './services/document/document-models/delete-document-model.service';
 import { DocumentModelController } from './controller/document-model.controller';
 import { DocumentPGRPreviewFactory } from './factories/document/products/PGR/DocumentPGRPreviewFactory';
 import { DownloadPreviewModel } from './services/document/document-models/download-preview-model.service';
@@ -74,6 +75,7 @@ import { InsalUploadService } from './services/document/document/upload-insal-do
     CreateDocumentModelService,
     FindDocumentModelService,
     FindOneDocumentModelService,
+    DeleteDocumentModelService,
     DocumentPGRPreviewFactory,
     FakeStorageProvider,
     DownloadPreviewModel,

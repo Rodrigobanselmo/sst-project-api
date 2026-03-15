@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Res } from '@nestjs/common';
 import { Readable } from 'stream';
 
 import { PermissionEnum } from '../../../shared/constants/enum/authorization';
@@ -16,6 +16,7 @@ import { CreateDocumentModelService } from '../services/document/document-models
 import { FindDocumentModelService } from '../services/document/document-models/find-document-model.service';
 import { FindOneDocumentModelService } from '../services/document/document-models/find-one-document-model.service';
 import { UpdateDocumentModelService } from '../services/document/document-models/update-document-model.service';
+import { DeleteDocumentModelService } from '../services/document/document-models/delete-document-model.service';
 import { GetDocVariablesService } from '../services/document/document/get-doc-variables.service';
 import { Response } from 'express';
 import { DocumentTypeEnum } from '@prisma/client';
@@ -30,6 +31,7 @@ export class DocumentModelController {
     private readonly findOneDocumentModelService: FindOneDocumentModelService,
     private readonly getDocVariablesService: GetDocVariablesService,
     private readonly downloadPreviewModel: DownloadPreviewModel,
+    private readonly deleteDocumentModelService: DeleteDocumentModelService,
   ) {}
 
   @Permissions({
@@ -131,14 +133,18 @@ export class DocumentModelController {
     return data;
   }
 
-  // @Permissions({
-  //   code: PermissionEnum.DOCUMENT_MODEL,
-  //   isContract: true,
-  //   isMember: true,
-  //   crud: true,
-  // })
-  // @Delete('/:companyId/:id')
-  // delete(@User() userPayloadDto: UserPayloadDto, @Param('id', ParseIntPipe) id: number) {
-  //   return this.deleteDocumentModelService.execute(id, userPayloadDto);
-  // }
+  @Permissions({
+    code: PermissionEnum.DOCUMENT_MODEL,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
+  @Delete('/:companyId/:id')
+  delete(
+    @User() userPayloadDto: UserPayloadDto,
+    @Param('companyId') companyId: string,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.deleteDocumentModelService.execute(id, userPayloadDto);
+  }
 }
