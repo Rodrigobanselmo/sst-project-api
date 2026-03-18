@@ -35,7 +35,7 @@ export class CompositeEmailAdapter implements SendMailAdapter {
 
   async sendMail(data: SendMailAdapter.SendMailData): Promise<void> {
     // Enable fallback to secondary providers for better reliability
-    const providers = [EmailProviderEnum.MAIN, EmailProviderEnum.SECONDARY];
+    const providers = [EmailProviderEnum.MAIN, EmailProviderEnum.SECONDARY, EmailProviderEnum.MOST_RELIABLE];
     if (data.provider) providers.unshift(data.provider);
 
     let lastError: Error | null = null;
