@@ -21,6 +21,7 @@ export class BrowseFormParticipantsController {
     crud: true,
   })
   async execute(@Param() path: BrowseFormParticipantsPath, @Query() query: BrowseFormParticipantsQuery) {
+    const q = query as any;
     return this.browseFormParticipantsUseCase.execute({
       companyId: path.companyId,
       applicationId: path.applicationId,
@@ -29,8 +30,10 @@ export class BrowseFormParticipantsController {
       hierarchyIds: query.hierarchyIds,
       onlyWithEmail: query.onlyWithEmail,
       pagination: {
-        page: query.page,
-        limit: query.limit,
+        // A paginação pode vir como `page/limit` ou como `pagination[page]/pagination[limit]`
+        // (o front v2 usa bindUrlParams que serializa objetos aninhados).
+        page: query.page ?? q?.pagination?.page,
+        limit: query.limit ?? q?.pagination?.limit,
       },
     });
   }
