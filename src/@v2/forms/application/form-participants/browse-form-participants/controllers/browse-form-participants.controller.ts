@@ -29,8 +29,10 @@ export class BrowseFormParticipantsController {
       hierarchyIds: query.hierarchyIds,
       onlyWithEmail: query.onlyWithEmail,
       pagination: {
-        page: query.page,
-        limit: query.limit,
+        // A paginação pode vir como `page/limit` ou como `pagination[page]/pagination[limit]`
+        // (o front v2 usa bindUrlParams que serializa objetos aninhados).
+        page: query.page ?? query?.pagination?.page,
+        limit: query.limit ?? query?.pagination?.limit,
       },
     });
   }

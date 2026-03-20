@@ -22,10 +22,25 @@ class OrderBy {
   order!: OrderByDirectionEnum;
 }
 
+class Pagination {
+  @IsInt()
+  @IsOptional()
+  limit?: number;
+
+  @IsInt()
+  @IsOptional()
+  page?: number;
+}
+
 export class BrowseFormParticipantsQuery {
   @IsString()
   @IsOptional()
   search?: string;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => Pagination)
+  pagination?: Pagination;
 
   @IsInt()
   @IsOptional()
