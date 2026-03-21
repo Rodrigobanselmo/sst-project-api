@@ -1,7 +1,6 @@
-import { ErrorCompanyEnum, ErrorMessageEnum } from './../../../../../shared/constants/enum/errorMessage';
+import { ErrorMessageEnum } from './../../../../../shared/constants/enum/errorMessage';
 import { HomoGroupRepository } from './../../../repositories/implementations/HomoGroupRepository';
 import { CharacterizationPhotoRepository } from './../../../repositories/implementations/CharacterizationPhotoRepository';
-import { AmazonStorageProvider } from './../../../../../shared/providers/StorageProvider/implementations/AmazonStorage/AmazonStorageProvider';
 import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
@@ -13,7 +12,6 @@ export class DeleteCharacterizationService {
   constructor(
     private readonly characterizationRepository: CharacterizationRepository,
     private readonly characterizationPhotoRepository: CharacterizationPhotoRepository,
-    private readonly amazonStorageProvider: AmazonStorageProvider,
     private readonly homoGroupRepository: HomoGroupRepository,
     private readonly deleteHomoGroupService: DeleteHomoGroupService,
   ) {}
@@ -22,17 +20,8 @@ export class DeleteCharacterizationService {
     await this.deleteHomoGroupService.checkDeletion(id, userPayloadDto);
     const photos = await this.characterizationPhotoRepository.findByCharacterization(id);
 
-    await Promise.all(
-      photos.map(async (photo) => {
-        const splitUrl = photo.photoUrl.split('.com/');
-
-        await this.amazonStorageProvider.delete({
-          fileName: splitUrl[splitUrl.length - 1],
-        });
-
-        await this.characterizationPhotoRepository.delete(photo.id);
-      }),
-    );
+    // Remove apenas vínculos no banco; arquivos permanecem no S3 (alinhado à exclusão individual de foto).
+    await Promise.all(photos.map((photo) => this.characterizationPhotoRepository.delete(photo.id)));
 
     const characterizations = await this.characterizationRepository.findById(id);
 
