@@ -2312,9 +2312,85 @@ model User {
   taskResponsible        TaskResponsible[]
   taskProjectMembers     TaskProjectMembers[]
   ActionPlanRulesOnUsers ActionPlanRulesOnUsers[]
+  aiThreads              AiThread[]
+  aiFiles                AiFile[]   @relation("AiFileUploader")
 
   @@unique([id, name])
   @@index([email])
+}
+
+model AiThread {
+  id            String      @id @default(cuid())
+  title         String      @default("Novo Chat")
+  userId        Int
+  lastMessageAt DateTime?
+  created_at    DateTime    @default(now())
+  updated_at    DateTime    @updatedAt
+  deleted_at    DateTime?
+
+  user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages AiMessage[]
+
+  @@index([userId])
+  @@index([created_at])
+  @@index([deleted_at])
+}
+
+model AiMessage {
+  id              String          @id @default(cuid())
+  threadId        String
+  role            AiMessageRoleEnum
+  content         String          @db.Text
+  toolName        String?
+  toolStatus      String?
+  toolDescription String?
+  created_at      DateTime        @default(now())
+
+  thread AiThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  files  AiMessageFile[]
+
+  @@index([threadId])
+  @@index([created_at])
+}
+
+enum AiMessageRoleEnum {
+  user
+  assistant
+  tool
+}
+
+model AiFile {
+  id         String    @id @default(cuid())
+  key        String    @unique
+  bucket     String
+  region     String
+  filename   String
+  mimeType   String
+  size       Int
+  uploaderId Int
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
+  uploader User            @relation("AiFileUploader", fields: [uploaderId], references: [id], onDelete: Cascade)
+  messages AiMessageFile[]
+
+  @@index([uploaderId])
+  @@index([key])
+}
+
+model AiMessageFile {
+  id         String   @id @default(cuid())
+  messageId  String
+  fileId     String
+  created_at DateTime @default(now())
+
+  message AiMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  file    AiFile    @relation(fields: [fileId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, fileId])
+  @@index([messageId])
+  @@index([fileId])
 }
 
 model UserCompany {

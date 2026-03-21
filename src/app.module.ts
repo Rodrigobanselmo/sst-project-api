@@ -27,6 +27,7 @@ import { FormModule } from './@v2/forms/forms.module';
 import { TaskModule } from './@v2/task/task.module';
 import { CommunicationModule } from './@v2/communications/comunication.module';
 import { UploadModule } from './@v2/import/upload/upload.module';
+import { AiChatModule } from './@v2/ai-chat/ai-chat.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { UploadModule } from './@v2/import/upload/upload.module';
     TaskModule,
     CommunicationModule,
     UploadModule,
+    AiChatModule,
   ],
   providers: [
     {
