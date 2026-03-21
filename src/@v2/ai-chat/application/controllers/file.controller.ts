@@ -6,7 +6,34 @@ import { AiFileRepository } from '../../database/repositories/ai-file.repository
 import { S3StorageAdapter } from '@/@v2/shared/adapters/storage/s3.storage.adapter';
 import { config } from '@/@v2/shared/constants/config';
 
-const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
+// Supported MIME types for AI chat (matches takehome)
+const AI_CHAT_SUPPORTED_TYPES: Record<string, string[]> = {
+  image: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif', 'image/heic', 'image/heif'],
+  video: ['video/mp4', 'video/mpeg', 'video/quicktime', 'video/webm', 'video/x-matroska'],
+  audio: ['audio/mpeg', 'audio/wav', 'audio/aac', 'audio/flac', 'audio/ogg', 'audio/webm', 'audio/mp4'],
+  document: ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
+  text: ['text/plain'],
+  spreadsheet: ['text/csv', 'application/csv', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
+};
+
+// Fine-grained size limits per type (matches takehome)
+const MAX_SIZE_BY_TYPE: Record<string, number> = {
+  image: 20 * 1024 * 1024,
+  video: 100 * 1024 * 1024,
+  audio: 25 * 1024 * 1024,
+  document: 50 * 1024 * 1024,
+  text: 10 * 1024 * 1024,
+  spreadsheet: 25 * 1024 * 1024,
+};
+
+function getFileCategory(mimeType: string): string | null {
+  for (const [category, types] of Object.entries(AI_CHAT_SUPPORTED_TYPES)) {
+    if (types.some((t) => mimeType.startsWith(t) || mimeType === t)) {
+      return category;
+    }
+  }
+  return null;
+}
 
 @Controller('ai-chat/files')
 export class FileController {
@@ -17,10 +44,25 @@ export class FileController {
   }
 
   @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: {
+        fileSize: 100 * 1024 * 1024, // 100MB hard limit (max of all categories)
+      },
+    }),
+  )
   async upload(@User() user: UserPayloadDto, @UploadedFile() file: any) {
     if (!file) throw new BadRequestException('No file provided');
-    if (file.size > MAX_FILE_SIZE) throw new BadRequestException('File too large (max 20MB)');
+
+    const category = getFileCategory(file.mimetype);
+    if (!category) {
+      throw new BadRequestException(`Unsupported file type: ${file.mimetype}. Supported: images, videos, audio, PDF, Word, TXT, CSV, Excel.`);
+    }
+
+    const maxSize = MAX_SIZE_BY_TYPE[category] || 20 * 1024 * 1024;
+    if (file.size > maxSize) {
+      throw new BadRequestException(`File too large. Maximum size for ${category} is ${Math.round(maxSize / (1024 * 1024))}MB`);
+    }
 
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const safeFilename = file.originalname
@@ -29,21 +71,15 @@ export class FileController {
       .replace(/[^a-zA-Z0-9._-]/g, '');
     const folder = `ai-chat/${user.userId}/`;
     const fileName = `${timestamp}_${safeFilename}`;
-    const key = `${folder}${fileName}`;
-
-    const { bucket } = await this.s3.upload({
+    const { bucket, key: actualKey } = await this.s3.upload({
       file: file.buffer,
       fileFolder: folder,
       fileName: `${timestamp}_${safeFilename}`,
       isPublic: false,
     });
 
-    // The S3 adapter normalizes the file name and prepends the folder,
-    // but we already pre-normalized safeFilename, so the stored key matches.
-    const url = await this.s3.generateSignedPath({ fileKey: key, expires: 3600 });
-
     const record = await this.aiFileRepository.create({
-      key,
+      key: actualKey,
       bucket,
       region: config.AWS.S3_BUCKET_REGION,
       filename: file.originalname,
@@ -51,6 +87,8 @@ export class FileController {
       size: file.size,
       uploaderId: user.userId,
     });
+
+    const url = await this.s3.generateSignedPath({ fileKey: actualKey, expires: 3600 });
 
     return { ...record, url };
   }

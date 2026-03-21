@@ -44,6 +44,13 @@ export class AiFileRepository {
     return files.map((f) => this.map(f));
   }
 
+  async softDelete(id: string): Promise<void> {
+    await this.prisma.aiFile.update({
+      where: { id },
+      data: { deleted_at: new Date() },
+    });
+  }
+
   private map(raw: any): AiFileRecord {
     return {
       id: raw.id,

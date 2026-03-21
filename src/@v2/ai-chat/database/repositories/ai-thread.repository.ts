@@ -22,6 +22,8 @@ export interface AiFileAttachment {
   key: string;
   bucket: string;
   region: string;
+  extractedContent?: string | null;
+  extractionType?: string | null;
 }
 
 export interface AIMessage {
@@ -305,6 +307,8 @@ export class AiThreadRepository {
       key: mf.file.key,
       bucket: mf.file.bucket,
       region: mf.file.region,
+      extractedContent: mf.extractedContent,
+      extractionType: mf.extractionType,
     }));
   }
 }

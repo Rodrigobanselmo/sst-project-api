@@ -2380,10 +2380,13 @@ model AiFile {
 }
 
 model AiMessageFile {
-  id         String   @id @default(cuid())
-  messageId  String
-  fileId     String
-  created_at DateTime @default(now())
+  id               String    @id @default(cuid())
+  messageId        String
+  fileId           String
+  extractedContent String?   @db.Text
+  extractionType   String?
+  extractedAt      DateTime?
+  created_at       DateTime  @default(now())
 
   message AiMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
   file    AiFile    @relation(fields: [fileId], references: [id], onDelete: Cascade)
