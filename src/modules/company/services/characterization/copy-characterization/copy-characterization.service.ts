@@ -57,7 +57,7 @@ export class CopyCharacterizationService {
       include: {
         characterization: {
           include: {
-            // photos: true,
+            photos: true,
             profiles: {
               include: {
                 homogeneousGroup: true,
@@ -203,16 +203,19 @@ export class CopyCharacterizationService {
               },
             });
 
-            //! don't include photos
-            // if (group.characterization.photos)
-            //   await this.prisma.companyCharacterizationPhoto.createMany({
-            //     data: group.characterization.photos.map(
-            //       ({ id, created_at, updated_at, deleted_at, ...photo }) => ({
-            //         ...photo,
-            //         companyCharacterizationId: newHomoGroup.id,
-            //       }),
-            //     ),
-            //   });
+            // Novos registros no banco, mesma photoUrl (sem duplicar arquivo no S3).
+            const sourcePhotos = group.characterization.photos?.filter((p) => !p.deleted_at) ?? [];
+            if (sourcePhotos.length > 0) {
+              await this.prisma.companyCharacterizationPhoto.createMany({
+                data: sourcePhotos.map((photo) => ({
+                  name: photo.name,
+                  isVertical: photo.isVertical,
+                  photoUrl: photo.photoUrl,
+                  order: photo.order ?? undefined,
+                  companyCharacterizationId: newHomoGroup.id,
+                })),
+              });
+            }
           }
 
           if (group.riskFactorData && group.riskFactorData.length) {
