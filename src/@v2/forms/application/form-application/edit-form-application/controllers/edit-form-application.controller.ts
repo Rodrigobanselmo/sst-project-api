@@ -1,10 +1,11 @@
-import { Body, Controller, Param, Patch, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Param, Patch, Put, UseGuards } from '@nestjs/common';
 
 import { FormRoutes } from '@/@v2/forms/constants/routes';
 import { JwtAuthGuard } from '@/@v2/shared/guards/jwt-auth.guard';
 import { PermissionEnum } from '@/shared/constants/enum/authorization';
 import { Permissions } from '@/shared/decorators/permissions.decorator';
 import { EditFormApplicationUseCase } from '../use-cases/edit-form-application.usecase';
+import { SoftDeleteFormApplicationUseCase } from '../../soft-delete-form-application/use-cases/soft-delete-form-application.usecase';
 import { EditFormApplicationPath } from './edit-form-application.path';
 import { EditFormApplicationPayload } from './edit-form-application.payload';
 import { FormApplicationCacheService } from '@/@v2/forms/services/form-application-cache.service';
@@ -14,6 +15,7 @@ import { FormApplicationCacheService } from '@/@v2/forms/services/form-applicati
 export class EditFormApplicationController {
   constructor(
     private readonly editFormApplicationUseCase: EditFormApplicationUseCase,
+    private readonly softDeleteFormApplicationUseCase: SoftDeleteFormApplicationUseCase,
     private readonly formApplicationCacheService: FormApplicationCacheService,
   ) {}
 
@@ -44,5 +46,19 @@ export class EditFormApplicationController {
     await this.formApplicationCacheService.invalidateFormApplicationCache(path.applicationId);
 
     return result;
+  }
+
+  @Delete()
+  @Permissions({
+    code: PermissionEnum.FORM,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
+  async softDelete(@Param() path: EditFormApplicationPath) {
+    await this.softDeleteFormApplicationUseCase.execute({
+      companyId: path.companyId,
+      applicationId: path.applicationId,
+    });
   }
 }

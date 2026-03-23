@@ -14,8 +14,12 @@ export class FormQuestionsAnswersDAO {
   constructor(private readonly prisma: PrismaServiceV2) {}
 
   async browse({ filters }: IFormQuestionsAnswersDAO.BrowseParams) {
-    const form = await this.prisma.formApplication.findUnique({
-      where: { id: filters.formApplicationId, company_id: filters.companyId },
+    const form = await this.prisma.formApplication.findFirst({
+      where: {
+        id: filters.formApplicationId,
+        company_id: filters.companyId,
+        deleted_at: null,
+      },
       select: { form_id: true, status: true },
     });
 

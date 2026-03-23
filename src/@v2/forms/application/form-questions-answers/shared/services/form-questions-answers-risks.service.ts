@@ -85,6 +85,7 @@ export class FormQuestionsAnswersRisksService {
       where: {
         id: params.formApplicationId,
         company_id: params.companyId,
+        deleted_at: null,
       },
     });
     if (!formApplication) throw new NotFoundException('Formulário não encontrado');
@@ -93,6 +94,7 @@ export class FormQuestionsAnswersRisksService {
       where: {
         id: params.formApplicationId,
         company_id: params.companyId,
+        deleted_at: null,
       },
       select: {
         form: {

@@ -9,6 +9,7 @@ import { BrowseFormApplicationController } from './application/form-application/
 import { BrowseFormApplicationUseCase } from './application/form-application/browse-form-application/use-cases/browse-form-application.usecase';
 import { EditFormApplicationController } from './application/form-application/edit-form-application/controllers/edit-form-application.controller';
 import { EditFormApplicationUseCase } from './application/form-application/edit-form-application/use-cases/edit-form-application.usecase';
+import { SoftDeleteFormApplicationUseCase } from './application/form-application/soft-delete-form-application/use-cases/soft-delete-form-application.usecase';
 import { ReadFormApplicationController } from './application/form-application/read-form-application/controllers/read-form-application.controller';
 import { ReadFormApplicationUseCase } from './application/form-application/read-form-application/use-cases/read-form-application.usecase';
 import { PublicFormApplicationController } from './application/form-application/public-form-application/controllers/public-form-application.controller';
@@ -116,6 +117,7 @@ import { SSTModule } from '@/modules/sst/sst.module';
     BrowseFormApplicationUseCase,
     AddFormApplicationUseCase,
     EditFormApplicationUseCase,
+    SoftDeleteFormApplicationUseCase,
     PublicFormApplicationUseCase,
     SubmitFormApplicationUseCase,
     ReadFormUseCase,
