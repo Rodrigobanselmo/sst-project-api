@@ -7,6 +7,6 @@ export namespace IFormApplicationAggregateRepository {
   export type UpdateParams = FormApplicationAggregate;
   export type UpdateReturn = Promise<boolean>;
 
-  export type FindParams = { id: string; companyId: string };
+  export type FindParams = { id: string; companyId?: string | null };
   export type FindReturn = Promise<FormApplicationAggregate | null>;
 }

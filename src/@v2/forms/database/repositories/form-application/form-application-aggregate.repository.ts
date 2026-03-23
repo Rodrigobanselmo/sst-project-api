@@ -149,7 +149,8 @@ export class FormApplicationAggregateRepository {
     const formApplication = await this.prisma.formApplication.findFirst({
       where: {
         id: params.id,
-        company_id: params.companyId,
+        deleted_at: null,
+        ...(params.companyId != null ? { company_id: params.companyId } : {}),
       },
       ...FormApplicationAggregateRepository.selectOptions(),
     });

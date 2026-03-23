@@ -19,6 +19,7 @@ export class AssignRisksFormApplicationUseCase {
       where: {
         id: applicationId,
         company_id: companyId,
+        deleted_at: null,
       },
     });
 

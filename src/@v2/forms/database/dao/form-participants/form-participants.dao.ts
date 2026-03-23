@@ -84,7 +84,7 @@ export class FormParticipantsDAO {
       LEFT JOIN
         "_HierarchyToWorkspace" h_t_w ON h_t_w."A" = emp."hierarchyId"
       LEFT JOIN
-        "FormApplication" form_ap ON form_ap."id" = ${filters.applicationId}
+        "FormApplication" form_ap ON form_ap."id" = ${filters.applicationId} AND form_ap."deleted_at" IS NULL
       LEFT JOIN
         "FormParticipants" form_part ON form_part."form_application_id" = form_ap."id"
       LEFT JOIN
@@ -120,7 +120,7 @@ export class FormParticipantsDAO {
       LEFT JOIN
         "_HierarchyToWorkspace" h_t_w ON h_t_w."A" = emp."hierarchyId"
       LEFT JOIN
-        "FormApplication" form_ap ON form_ap."id" = ${filters.applicationId}
+        "FormApplication" form_ap ON form_ap."id" = ${filters.applicationId} AND form_ap."deleted_at" IS NULL
       LEFT JOIN
         "FormParticipants" form_part ON form_part."form_application_id" = form_ap."id"
       LEFT JOIN

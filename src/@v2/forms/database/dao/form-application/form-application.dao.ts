@@ -21,6 +21,7 @@ export class FormApplicationDAO {
       where: {
         id: params.id,
         company_id: params.companyId,
+        deleted_at: null,
       },
       include: {
         form: true,
@@ -139,6 +140,7 @@ export class FormApplicationDAO {
     const formApplication = await this.prisma.formApplication.findFirst({
       where: {
         id: params.id,
+        deleted_at: null,
       },
       include: {
         form: {
