@@ -80,6 +80,68 @@ export class FormDAO {
     return form ? FormReadModelMapper.toModel(form) : null;
   }
 
+  /**
+   * Carrega o modelo completo para duplicação profunda (inclui COPSOQ/identificador em details e vínculos FRPS).
+   */
+  async findForDuplication(params: IFormDAO.ReadParams) {
+    return this.prisma.form.findFirst({
+      where: {
+        id: params.id,
+        OR: [
+          {
+            company_id: params.companyId,
+          },
+          {
+            system: true,
+          },
+        ],
+        deleted_at: null,
+      },
+      include: {
+        questions_groups: {
+          where: { deleted_at: null },
+          include: {
+            data: {
+              where: { deleted_at: null },
+              orderBy: { updated_at: 'desc' },
+              take: 1,
+            },
+            questions: {
+              where: { deleted_at: null },
+              include: {
+                data: {
+                  where: { deleted_at: null },
+                  orderBy: { updated_at: 'desc' },
+                  take: 1,
+                },
+                question_details: {
+                  include: {
+                    data: {
+                      where: { deleted_at: null },
+                      orderBy: { updated_at: 'desc' },
+                      take: 1,
+                    },
+                    options: {
+                      where: { deleted_at: null },
+                      include: {
+                        data: {
+                          where: { deleted_at: null },
+                          orderBy: { updated_at: 'desc' },
+                          take: 1,
+                        },
+                      },
+                    },
+                    form_question_risk: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
   async browse({ limit, page, orderBy, filters }: IFormDAO.BrowseParams) {
     const pagination = getPagination(page, limit);
 

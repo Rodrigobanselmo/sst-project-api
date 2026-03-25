@@ -2,6 +2,8 @@ export const FormRoutes = {
   FORM: {
     PATH: 'v2/companies/:companyId/forms/models/',
     PATH_ID: 'v2/companies/:companyId/forms/models/:formId',
+    /** Path completo para @Controller() + @Post (sem prefixo no controller). */
+    PATH_ID_DUPLICATE: 'v2/companies/:companyId/forms/models/:formId/duplicate',
   },
   FORM_APPLICATION: {
     PATH: 'v2/companies/:companyId/forms/applications/',
