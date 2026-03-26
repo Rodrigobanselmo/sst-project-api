@@ -78,12 +78,7 @@ export class ThreadController {
   }
 
   @Post(':id/messages/stream')
-  async sendMessageStream(
-    @User() user: UserPayloadDto,
-    @Param('id') threadId: string,
-    @Body() dto: SendMessageDto,
-    @Res() res: Response,
-  ) {
+  async sendMessageStream(@User() user: UserPayloadDto, @Param('id') threadId: string, @Body() dto: SendMessageDto, @Res() res: Response) {
     // Verify thread exists and belongs to user
     const thread = await this.aiThreadRepository.findById(threadId, user.userId);
     if (!thread) throw new NotFoundException('Thread not found');
@@ -144,6 +139,7 @@ export class ThreadController {
         attachments: attachmentsForAgent,
         mode: dto.mode,
         extractedContents,
+        pageContext: dto.pageContext,
       })) {
         // Accumulate content for saving
         if (event.type === 'content') {
@@ -158,13 +154,7 @@ export class ThreadController {
 
         // Persist tool messages to DB (fire after SSE write)
         if (event.type === 'tool_start') {
-          const toolMsg = await this.aiThreadRepository.addToolMessage(
-            threadId,
-            event.description,
-            event.tool,
-            'running',
-            event.description,
-          );
+          const toolMsg = await this.aiThreadRepository.addToolMessage(threadId, event.description, event.tool, 'running', event.description);
           toolMessages.push({ id: toolMsg.id, toolName: event.tool });
         }
 

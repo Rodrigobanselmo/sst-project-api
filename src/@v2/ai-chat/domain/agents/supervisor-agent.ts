@@ -1,81 +1,142 @@
 import { SystemMessage, HumanMessage } from '@langchain/core/messages';
 import type { BaseMessage } from '@langchain/core/messages';
 import type { BaseChatModel } from '@langchain/core/language_models/chat_models';
+import type { PrismaClient } from '@prisma/client';
 import { type AgentType, type StreamEvent } from '../types/stream-events';
 import { streamUserAgent } from './user-agent';
 import { streamDocumentAgent } from './document-agent';
+import { streamCharacterizationAgent } from './characterization-agent';
 import type { UsersRepository } from '../../../../modules/users/repositories/implementations/UsersRepository';
 import type { AiFileAttachment } from '../../database/repositories/ai-thread.repository';
-import {
-  buildHistoryMessages,
-  buildCurrentUserMessage,
-  type FileAttachment,
-  type ExtractionResult,
-} from '../file-processing';
+import { buildHistoryMessages, buildCurrentUserMessage, type FileAttachment, type ExtractionResult } from '../file-processing';
 import { createFileTools } from '../tools/file.tools';
+import { RunTree } from 'langsmith';
+import { createChildRun, endRun } from '../llm/tracing';
+import type { CallbackManager } from '@langchain/core/callbacks/manager';
 
 /**
  * Agent metadata for display
  */
 export const AGENT_METADATA: Record<AgentType, { name: string; description: string }> = {
-  user: { name: 'User Agent', description: 'Assistente de gerenciamento de usuarios' },
-  document: { name: 'Document Agent', description: 'Assistente de documentos' },
-  general: { name: 'General', description: 'Assistente geral' },
+  user: { name: 'Agente de Usuários', description: 'Assistente de gerenciamento de usuarios' },
+  document: { name: 'Agente de Documentos', description: 'Assistente de documentos' },
+  characterization: { name: 'Agente de Caracterização', description: 'Assistente de caracterização de riscos' },
+  general: { name: 'Agente Geral', description: 'Assistente geral' },
 };
 
 const SUPERVISOR_SYSTEM_PROMPT = `Voce e um supervisor que classifica a intencao do usuario.
 Analise a mensagem e responda APENAS com uma das seguintes categorias:
 - "user" - se o usuario quer listar, buscar ou gerenciar usuarios/funcionarios/colaboradores
 - "document" - se o usuario quer gerar, criar ou gerenciar documentos
-- "general" - para qualquer outra pergunta ou conversa geral
+- "characterization" - se o usuario quer consultar, listar ou analisar riscos/fatores de risco (BIO, QUI, FIS, ERG, ACI, OUTROS), ambientes de trabalho, postos de trabalho, cargos, setores, grupos homogêneos, caracterização, ou perigos ocupacionais. Na duvida entre characterization e outra categoria, prefira characterization.
 
 Responda SOMENTE com a categoria, sem explicacao.`;
 
-const GENERAL_SYSTEM_PROMPT = `Voce e um assistente prestativo para uma plataforma de SST (Seguranca e Saude no Trabalho).
 
-IMPORTANTE: Sempre responda no MESMO IDIOMA que o usuario esta usando. Detecte o idioma da conversa e corresponda.
+export interface PageContext {
+  companyId?: string;
+  homogeneousGroupId?: string;
+}
 
-Voce pode analisar imagens e documentos enviados pelo usuario.
-Se voce ver um placeholder [Previously attached ...] no historico para um arquivo,
-voce pode usar a ferramenta reread_file com o fileId para re-examinar o conteudo do arquivo.
-Seja claro, objetivo e amigavel nas respostas.
-Formate as respostas de forma legivel.`;
+export interface SupervisorUser {
+  userId: number;
+  companyId: string;
+  targetCompanyId?: string;
+  email: string;
+  isMaster: boolean;
+}
 
 export interface SupervisorInput {
   message: string;
   history?: Array<{ role: 'user' | 'assistant'; content: string; attachments?: AiFileAttachment[] }>;
   attachments?: FileAttachment[];
-  companyId: string;
+  user: SupervisorUser;
   usersRepository: UsersRepository;
+  prisma: PrismaClient;
   llm: BaseChatModel;
-  userId: number;
   /** Pre-extracted file contents from controller (avoids double S3 download) */
   extractedContents?: Map<string, ExtractionResult>;
+  /** Page context from frontend (URL params, current page info) */
+  pageContext?: PageContext;
+}
+
+/**
+ * Builds context-aware system prompt with page context
+ */
+function buildContextAwarePrompt(basePrompt: string, pageContext?: PageContext, userCompanyId?: string): string {
+  if (!pageContext) return basePrompt;
+
+  const contextParts: string[] = [];
+
+  // Company context
+  if (pageContext.companyId) {
+    contextParts.push(`- Empresa sendo visualizada: ID ${pageContext.companyId}`);
+  }
+
+  // Homogeneous group context
+  if (pageContext.homogeneousGroupId) {
+    contextParts.push(`- Grupo homogêneo sendo visualizado: ID ${pageContext.homogeneousGroupId}`);
+    contextParts.push(`- Quando o usuário se referir a "este grupo", "esse grupo", "o grupo que estou vendo", "grupo similar de exposição", use este ID: ${pageContext.homogeneousGroupId}`);
+  }
+
+  if (contextParts.length === 0) return basePrompt;
+
+  return `${basePrompt}
+
+CONTEXTO DA PÁGINA ATUAL:
+${contextParts.join('\n')}`;
 }
 
 /**
  * Classifies user intent using LLM
  */
-async function classifyIntent(llm: BaseChatModel, message: string): Promise<AgentType> {
-  const response = await llm.invoke([new SystemMessage(SUPERVISOR_SYSTEM_PROMPT), new HumanMessage(message)]);
+async function classifyIntent(llm: BaseChatModel, message: string, history: BaseMessage[], callbacks: CallbackManager, pageContext?: PageContext, userCompanyId?: string): Promise<AgentType> {
+  const systemPrompt = buildContextAwarePrompt(SUPERVISOR_SYSTEM_PROMPT, pageContext, userCompanyId);
+  const response = await llm.invoke([new SystemMessage(systemPrompt), ...history, new HumanMessage(message)], { callbacks });
 
   const content = typeof response.content === 'string' ? response.content.trim().toLowerCase() : '';
 
   if (content.includes('user')) return 'user';
   if (content.includes('document')) return 'document';
-  return 'general';
+  // Default to characterization — it has the broadest toolset for SST queries
+  return 'characterization';
 }
 
 /**
  * Streams the supervisor agent response.
- * Handles file processing globally before delegating to sub-agents:
- * - Builds history messages using cached extracted content (no redundant S3 downloads)
- * - Builds current user message with actual file content (using pre-extracted results)
- * - Injects reread_file tool for all sub-agents
+ * Handles file processing globally before delegating to sub-agents.
  */
 export async function* streamSupervisorAgent(input: SupervisorInput): AsyncGenerator<StreamEvent, void, undefined> {
+  // Create a parent run for LangSmith to group all traces
+  const companyId = input.user.targetCompanyId ?? input.user.companyId;
+
+  const parentRun = new RunTree({
+    name: 'SupervisorAgent',
+    run_type: 'chain',
+    inputs: {
+      message: input.message.substring(0, 200),
+      userId: input.user.userId,
+      companyId,
+    },
+    tags: ['supervisor', 'main'],
+  });
+
+  await parentRun.postRun();
+
   try {
-    const agentType = await classifyIntent(input.llm, input.message);
+    // Create child run for intent classification
+    const { childRun: classifyRun, callbacks: classifyCallbacks } = await createChildRun(parentRun, 'ClassifyIntent', {
+      tags: ['supervisor', 'classification'],
+      inputs: { message: input.message.substring(0, 200) },
+    });
+
+    // Build history early so classifyIntent has conversation context
+    const historyMessages = await buildHistoryMessages(input.history ?? []);
+
+    // Only send last few messages for classification — enough for context, avoids sending the full history
+    const recentHistory = historyMessages.slice(-6);
+    const agentType = await classifyIntent(input.llm, input.message, recentHistory, classifyCallbacks, input.pageContext, companyId);
+    await endRun(classifyRun, { outputs: { agentType } });
 
     // Emit agent start event
     yield {
@@ -84,9 +145,6 @@ export async function* streamSupervisorAgent(input: SupervisorInput): AsyncGener
       name: AGENT_METADATA[agentType].name,
       description: AGENT_METADATA[agentType].description,
     };
-
-    // Build pre-processed messages from history (uses cached extractions)
-    const historyMessages = await buildHistoryMessages(input.history ?? []);
 
     // Process current message attachments
     const hasAttachments = input.attachments && input.attachments.length > 0;
@@ -105,7 +163,28 @@ export async function* streamSupervisorAgent(input: SupervisorInput): AsyncGener
     }
 
     // Build current user message (this is where S3 downloads happen for binary files)
-    const currentUserMessage = await buildCurrentUserMessage(input.message, input.attachments, extractedContents);
+    let userMessageText = input.message;
+
+    // Inject page context into user message if available
+    if (input.pageContext) {
+      const contextParts: string[] = [];
+
+      // Company context
+      if (input.pageContext.companyId) {
+        contextParts.push(`Empresa sendo visualizada: ID ${input.pageContext.companyId}`);
+      }
+
+      // Homogeneous group context
+      if (input.pageContext.homogeneousGroupId) {
+        contextParts.push(`Grupo homogêneo sendo visualizado: ID ${input.pageContext.homogeneousGroupId}`);
+      }
+
+      if (contextParts.length > 0) {
+        userMessageText = `[CONTEXTO DA PÁGINA]\n${contextParts.join('\n')}\n\n${input.message}`;
+      }
+    }
+
+    const currentUserMessage = await buildCurrentUserMessage(userMessageText, input.attachments, extractedContents);
 
     // Emit completion AFTER the actual work
     if (hasAttachments) {
@@ -120,133 +199,73 @@ export async function* streamSupervisorAgent(input: SupervisorInput): AsyncGener
     }
 
     // Create global file tools
-    const fileTools = createFileTools(input.userId);
+    const fileTools = createFileTools(input.prisma, input.user.userId);
 
-    if (agentType === 'user') {
-      for await (const event of streamUserAgent({
-        message: input.message,
-        history: input.history,
-        attachments: input.attachments,
-        companyId: input.companyId,
-        usersRepository: input.usersRepository,
-        llm: input.llm,
-        prebuiltHistoryMessages: historyMessages,
-        prebuiltCurrentMessage: currentUserMessage,
-        additionalTools: fileTools,
-      })) {
-        yield event;
-      }
-    } else if (agentType === 'document') {
-      for await (const event of streamDocumentAgent({
-        message: input.message,
-        history: input.history,
-        companyId: input.companyId,
-      })) {
-        yield event;
-      }
-    } else {
-      // General - respond directly via LLM streaming with multimodal support
-      // Bind file tools to the general LLM so it can re-read files
-      const llmWithTools = input.llm.bindTools(fileTools);
+    // Create child run for the delegated agent
+    const agentName = AGENT_METADATA[agentType].name;
+    const { childRun: agentRun, callbacks: agentCallbacks } = await createChildRun(parentRun, agentName, {
+      tags: ['agent', agentType],
+      inputs: { message: input.message.substring(0, 200), agentType },
+    });
 
-      const messagesWithSystem = [new SystemMessage(GENERAL_SYSTEM_PROMPT), ...historyMessages, currentUserMessage];
-
-      let currentMessages: BaseMessage[] = messagesWithSystem;
-      let iterations = 0;
-      const maxIterations = 10;
-
-      while (iterations < maxIterations) {
-        iterations++;
-        const response = await llmWithTools.invoke(currentMessages);
-
-        // Check if there are tool calls (e.g., reread_file)
-        if ('tool_calls' in response && Array.isArray(response.tool_calls) && response.tool_calls.length > 0) {
-          currentMessages = [...currentMessages, response];
-
-          for (const toolCall of response.tool_calls) {
-            const foundTool = fileTools.find((t) => t.name === toolCall.name);
-            if (foundTool) {
-              const args = toolCall.args as Record<string, unknown>;
-              const description = (args._actionDescription as string | undefined) ?? toolCall.name;
-
-              yield { type: 'tool_start', tool: toolCall.name, args, description };
-
-              try {
-                const toolResult = await (foundTool.invoke as (args: unknown) => Promise<string>)(toolCall.args);
-                const resultStr = typeof toolResult === 'string' ? toolResult : JSON.stringify(toolResult);
-
-                // Check for binary file result (e.g., image from reread_file)
-                const { BINARY_RESULT_PREFIX } = await import('../tools/file.tools');
-                if (resultStr.startsWith(BINARY_RESULT_PREFIX)) {
-                  const binaryJson = resultStr.slice(BINARY_RESULT_PREFIX.length);
-                  const binaryData = JSON.parse(binaryJson) as { filename: string; mimeType: string; dataUrl: string };
-
-                  yield { type: 'tool_end', tool: toolCall.name, result: `Loaded ${binaryData.filename}`, success: true };
-
-                  currentMessages.push({
-                    role: 'tool',
-                    content: `File ${binaryData.filename} loaded — see the image below.`,
-                    tool_call_id: toolCall.id,
-                    name: toolCall.name,
-                  } as unknown as BaseMessage);
-
-                  currentMessages.push(
-                    new HumanMessage({
-                      content: [
-                        { type: 'text' as const, text: `[Re-read file: ${binaryData.filename}]` },
-                        { type: 'image_url' as const, image_url: { url: binaryData.dataUrl, detail: 'auto' as const } },
-                      ],
-                    }),
-                  );
-                } else {
-                  yield {
-                    type: 'tool_end',
-                    tool: toolCall.name,
-                    result: resultStr,
-                    success: !resultStr.toLowerCase().startsWith('failed'),
-                  };
-
-                  currentMessages.push({
-                    role: 'tool',
-                    content: resultStr,
-                    tool_call_id: toolCall.id,
-                    name: toolCall.name,
-                  } as unknown as BaseMessage);
-                }
-              } catch (error) {
-                const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-                yield { type: 'tool_end', tool: toolCall.name, result: errorMsg, success: false };
-              }
-            }
-          }
-          continue;
+    try {
+      if (agentType === 'user') {
+        for await (const event of streamUserAgent({
+          message: input.message,
+          history: input.history,
+          attachments: input.attachments,
+          companyId,
+          usersRepository: input.usersRepository,
+          llm: input.llm,
+          prebuiltHistoryMessages: historyMessages,
+          prebuiltCurrentMessage: currentUserMessage,
+          additionalTools: fileTools,
+          callbacks: agentCallbacks,
+        })) {
+          yield event;
         }
-
-        // No tool calls - stream the final response
-        const stream = await llmWithTools.stream(currentMessages);
-
-        for await (const chunk of stream) {
-          const content =
-            typeof chunk.content === 'string'
-              ? chunk.content
-              : Array.isArray(chunk.content)
-                ? chunk.content
-                    .filter((c): c is { type: 'text'; text: string } => c.type === 'text')
-                    .map((c) => c.text)
-                    .join('')
-                : '';
-
-          if (content) {
-            yield { type: 'content', content };
-          }
+      } else if (agentType === 'document') {
+        for await (const event of streamDocumentAgent({
+          message: input.message,
+          history: input.history,
+          companyId,
+        })) {
+          yield event;
         }
-        break;
+      } else if (agentType === 'characterization') {
+        for await (const event of streamCharacterizationAgent({
+          message: input.message,
+          history: input.history,
+          attachments: input.attachments,
+          companyId,
+          prisma: input.prisma,
+          llm: input.llm,
+          prebuiltHistoryMessages: historyMessages,
+          prebuiltCurrentMessage: currentUserMessage,
+          additionalTools: fileTools,
+          callbacks: agentCallbacks,
+        })) {
+          yield event;
+        }
       }
+
+      await endRun(agentRun, { outputs: { success: true } });
+    } catch (agentError) {
+      await endRun(agentRun, { error: agentError instanceof Error ? agentError.message : 'Unknown error' });
+      throw agentError;
     }
 
     yield { type: 'agent_end', agent: agentType, success: true };
+
+    // End the parent run successfully
+    await parentRun.end({ success: true });
+    await parentRun.patchRun();
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     yield { type: 'error', message: errorMessage };
+
+    // End the parent run with error
+    await parentRun.end({ error: errorMessage });
+    await parentRun.patchRun();
   }
 }

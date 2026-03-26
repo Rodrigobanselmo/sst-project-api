@@ -40,6 +40,14 @@ export class LlmFactory {
     const modeConfig = MODE_CONFIG[mode];
     const finalMaxOutputTokens = maxOutputTokens ?? modeConfig.maxOutputTokens;
 
+    // Log LangSmith configuration
+    const langsmithEnabled = process.env.LANGCHAIN_TRACING_V2 === 'true';
+    if (langsmithEnabled) {
+      console.log(`[LangSmith] ✅ Tracing enabled - Project: ${process.env.LANGCHAIN_PROJECT || 'default'}`);
+    } else {
+      console.log('[LangSmith] ⚠️  Tracing disabled - Set LANGCHAIN_TRACING_V2=true to enable');
+    }
+
     switch (provider) {
       case 'openai': {
         const apiKey = process.env.OPENAI_API_KEY;

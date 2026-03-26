@@ -1,4 +1,4 @@
-export type AgentType = 'user' | 'document' | 'general';
+export type AgentType = 'user' | 'document' | 'characterization' | 'general';
 
 export type StreamEvent =
   | { type: 'content'; content: string }

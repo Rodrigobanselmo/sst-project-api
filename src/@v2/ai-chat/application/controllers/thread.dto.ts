@@ -1,4 +1,4 @@
-import { IsInt, IsOptional, IsString, IsArray, MaxLength, Min, Max, IsIn } from 'class-validator';
+import { IsInt, IsOptional, IsString, IsArray, MaxLength, Min, Max, IsIn, IsObject, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateThreadDto {
@@ -14,6 +14,16 @@ export class UpdateThreadDto {
   title: string;
 }
 
+export class PageContextDto {
+  @IsOptional()
+  @IsString()
+  companyId?: string;
+
+  @IsOptional()
+  @IsString()
+  homogeneousGroupId?: string;
+}
+
 export class SendMessageDto {
   @IsString()
   message: string;
@@ -26,6 +36,12 @@ export class SendMessageDto {
   @IsArray()
   @IsString({ each: true })
   fileIds?: string[];
+
+  @IsOptional()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => PageContextDto)
+  pageContext?: PageContextDto;
 }
 
 export class ListThreadsQueryDto {
