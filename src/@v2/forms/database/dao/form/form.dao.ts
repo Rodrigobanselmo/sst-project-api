@@ -193,7 +193,19 @@ export class FormDAO {
   }
 
   private browseWhere(filters: IFormDAO.BrowseParams['filters']) {
-    const where = [Prisma.sql`form."company_id" = ${filters.companyId} OR form.system = true`, Prisma.sql`form."deleted_at" IS NULL`];
+    const where = [
+      Prisma.sql`(
+        form."company_id" = ${filters.companyId}
+        OR form."system" = true
+        OR form."company_id" IN (
+          SELECT DISTINCT contract."applyingServiceCompanyId"
+          FROM "Contract" contract
+          WHERE contract."receivingServiceCompanyId" = ${filters.companyId}
+            AND contract."status" = 'ACTIVE'
+        )
+      )`,
+      Prisma.sql`form."deleted_at" IS NULL`,
+    ];
 
     return where;
   }

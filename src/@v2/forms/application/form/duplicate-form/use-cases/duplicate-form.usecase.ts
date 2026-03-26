@@ -1,17 +1,24 @@
 import { FormDAO } from '@/@v2/forms/database/dao/form/form.dao';
+import { LocalContext, UserContext } from '@/@v2/shared/adapters/context';
+import { ContextKey } from '@/@v2/shared/adapters/context/types/enum/context-key.enum';
+import { SharedTokens } from '@/@v2/shared/constants/tokens';
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
 import { generateCuid } from '@/@v2/shared/utils/helpers/generate-cuid';
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { IDuplicateFormUseCase } from './duplicate-form.types';
 
 @Injectable()
 export class DuplicateFormUseCase {
   constructor(
+    @Inject(SharedTokens.Context)
+    private readonly context: LocalContext,
     private readonly formDAO: FormDAO,
     private readonly prisma: PrismaServiceV2,
   ) {}
 
   async execute(params: IDuplicateFormUseCase.Params): Promise<IDuplicateFormUseCase.Result> {
+    const loggedUser = this.context.get<UserContext>(ContextKey.USER);
+
     const source = await this.formDAO.findForDuplication({
       id: params.sourceFormId,
       companyId: params.companyId,
@@ -33,7 +40,7 @@ export class DuplicateFormUseCase {
             type: source.type,
             anonymous: source.anonymous,
             shareable_link: source.shareable_link,
-            system: false,
+            system: loggedUser.isAdmin,
             company_id: params.companyId,
           },
         });
