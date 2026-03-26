@@ -14,6 +14,7 @@ export namespace IBrowseFormQuestionsAnswersRisksUseCase {
       {
         id: string;
         name: string;
+        severity: number;
         type: RiskFactorsEnum;
         subTypes: { sub_type: { id: number; name: string } }[];
       }
