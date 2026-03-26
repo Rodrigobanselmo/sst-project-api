@@ -9,6 +9,7 @@ export namespace IFormQuestionsAnswersRisksService {
   export type RiskData = {
     id: string;
     name: string;
+    severity: number;
     type: RiskFactorsEnum;
     subTypes: { sub_type: { id: number; name: string } }[];
   };

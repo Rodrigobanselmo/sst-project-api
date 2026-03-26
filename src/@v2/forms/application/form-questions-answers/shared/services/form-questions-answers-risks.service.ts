@@ -20,6 +20,7 @@ export class FormQuestionsAnswersRisksService {
                 select: {
                   id: true,
                   name: true,
+                  severity: true,
                   type: true,
                   subTypes: {
                     select: {
