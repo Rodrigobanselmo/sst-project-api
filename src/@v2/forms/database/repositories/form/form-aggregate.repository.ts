@@ -4,6 +4,7 @@ import { Prisma } from '@prisma/client';
 import { FormAggregateMapper } from '../../mappers/aggregates/form-aggregate.mapper';
 import { IFormAggregateRepository } from './form-aggregate.types';
 import { FormQuestionGroupAggregateRepository } from '../form-question-group/form-question-group-aggregate.repository';
+import { getAccessibleFormCompanyIds } from '../../utils/get-accessible-form-company-ids';
 
 @Injectable()
 export class FormAggregateRepository {
@@ -54,12 +55,16 @@ export class FormAggregateRepository {
   }
 
   async find(params: IFormAggregateRepository.FindParams): IFormAggregateRepository.FindReturn {
+    const accessibleCompanyIds = await getAccessibleFormCompanyIds(
+      this.prisma,
+      params.companyId,
+    );
     const formAggregate = await this.prisma.form.findFirst({
       where: {
         id: params.id,
         OR: [
           {
-            company_id: params.companyId,
+            company_id: { in: accessibleCompanyIds },
           },
           {
             system: true,

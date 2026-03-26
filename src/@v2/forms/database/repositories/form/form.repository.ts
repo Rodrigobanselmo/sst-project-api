@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { IFormRepository } from './form.types';
 import { FormEntityMapper } from '../../mappers/entities/form.mapper';
+import { getAccessibleFormCompanyIds } from '../../utils/get-accessible-form-company-ids';
 
 @Injectable()
 export class FormRepository {
@@ -49,12 +50,16 @@ export class FormRepository {
   }
 
   async find(params: IFormRepository.FindParams): IFormRepository.FindReturn {
+    const accessibleCompanyIds = await getAccessibleFormCompanyIds(
+      this.prisma,
+      params.companyId,
+    );
     const formEntity = await this.prisma.form.findFirst({
       where: {
         id: params.id,
         OR: [
           {
-            company_id: params.companyId,
+            company_id: { in: accessibleCompanyIds },
           },
           {
             system: true,

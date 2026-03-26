@@ -9,18 +9,23 @@ import { IFormBrowseResultModelMapper } from '../../mappers/models/form/form-bro
 import { FormBrowseModelMapper } from '../../mappers/models/form/form-browse.mapper';
 import { FormReadModelMapper } from '../../mappers/models/form/form-read.mapper';
 import { FormOrderByEnum, IFormDAO } from './form.types';
+import { getAccessibleFormCompanyIds } from '../../utils/get-accessible-form-company-ids';
 
 @Injectable()
 export class FormDAO {
   constructor(private readonly prisma: PrismaServiceV2) {}
 
   async read(params: IFormDAO.ReadParams) {
+    const accessibleCompanyIds = await getAccessibleFormCompanyIds(
+      this.prisma,
+      params.companyId,
+    );
     const form = await this.prisma.form.findFirst({
       where: {
         id: params.id,
         OR: [
           {
-            company_id: params.companyId,
+            company_id: { in: accessibleCompanyIds },
           },
           {
             system: true,
@@ -84,12 +89,16 @@ export class FormDAO {
    * Carrega o modelo completo para duplicação profunda (inclui COPSOQ/identificador em details e vínculos FRPS).
    */
   async findForDuplication(params: IFormDAO.ReadParams) {
+    const accessibleCompanyIds = await getAccessibleFormCompanyIds(
+      this.prisma,
+      params.companyId,
+    );
     return this.prisma.form.findFirst({
       where: {
         id: params.id,
         OR: [
           {
-            company_id: params.companyId,
+            company_id: { in: accessibleCompanyIds },
           },
           {
             system: true,
