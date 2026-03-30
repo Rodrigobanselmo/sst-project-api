@@ -26,6 +26,8 @@ import { ReadFormController } from './application/form/read-form/controllers/rea
 import { ReadFormUseCase } from './application/form/read-form/use-cases/read-form.usecase';
 import { DuplicateFormController } from './application/form/duplicate-form/controllers/duplicate-form.controller';
 import { DuplicateFormUseCase } from './application/form/duplicate-form/use-cases/duplicate-form.usecase';
+import { DeleteFormController } from './application/form/delete-form/controllers/delete-form.controller';
+import { DeleteFormUseCase } from './application/form/delete-form/use-cases/delete-form.usecase';
 import { FormApplicationDAO } from './database/dao/form-application/form-application.dao';
 import { FormDAO } from './database/dao/form/form.dao';
 import { RiskDAO } from './database/dao/risk/risk.dao';
@@ -74,6 +76,7 @@ import { SSTModule } from '@/modules/sst/sst.module';
   controllers: [
     ReadFormController,
     DuplicateFormController,
+    DeleteFormController,
     BrowseFormController,
     BrowseFormQuestionsAnswersController,
     AddFormController,
@@ -125,6 +128,7 @@ import { SSTModule } from '@/modules/sst/sst.module';
     SubmitFormApplicationUseCase,
     ReadFormUseCase,
     DuplicateFormUseCase,
+    DeleteFormUseCase,
     BrowseFormUseCase,
     BrowseFormQuestionsAnswersUseCase,
     AddFormUseCase,

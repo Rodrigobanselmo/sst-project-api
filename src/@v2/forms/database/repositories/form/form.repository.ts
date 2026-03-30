@@ -57,6 +57,7 @@ export class FormRepository {
     const formEntity = await this.prisma.form.findFirst({
       where: {
         id: params.id,
+        deleted_at: null,
         OR: [
           {
             company_id: { in: accessibleCompanyIds },
